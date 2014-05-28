@@ -32,6 +32,8 @@ License
 #include "IOobject.H"
 #include "JobInfo.H"
 #include "labelList.H"
+#include "SortableList.H"
+//#include "dimensionedConstants.H"
 
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
@@ -39,7 +41,31 @@ License
 Foam::SLList<Foam::string> Foam::argList::validArgs;
 Foam::HashTable<Foam::string> Foam::argList::validOptions;
 Foam::HashTable<Foam::string> Foam::argList::validParOptions;
+Foam::word Foam::argList::appDictName_("");
 bool Foam::argList::bannerEnabled(true);
+
+template<>
+const char*
+Foam::NamedEnum
+<
+    Foam::debug::globalControlDictSwitchSet,
+    5
+>::names[] =
+{
+    "DebugSwitches",
+    "InfoSwitches",
+    "OptimisationSwitches",
+    "Tolerances",
+    "DimensionedConstants"
+};
+
+
+const Foam::NamedEnum
+<
+    Foam::debug::globalControlDictSwitchSet,
+    5
+>
+Foam::argList::globalControlDictSwitchSetNames_;
 
 
 Foam::argList::initValidTables::initValidTables()
@@ -48,7 +74,11 @@ Foam::argList::initValidTables::initValidTables()
     validOptions.set("parallel", "");
     validParOptions.set("parallel", "");
     validOptions.set("noFunctionObjects", "");
-
+    validOptions.set("DebugSwitches", "key=value");
+    validOptions.set("InfoSwitches", "key=value");
+    validOptions.set("OptimisationSwitches", "key=value");
+    validOptions.set("Tolerances", "key=value");
+    validOptions.set("DimensionedConstants", "key=value");
     Pstream::addValidParOptions(validParOptions);
 }
 
@@ -308,6 +338,7 @@ Foam::argList::argList
         FatalError.exit();
     }
 
+    // From here, we consider the command-line arguments to be valid
 
     string dateString = clock::date();
     string timeString = clock::clockTime();
@@ -326,6 +357,19 @@ Foam::argList::argList
             << "PID      : " << pid() << nl
             << "CtrlDict : " << ctrlDictString.c_str()
             << endl;
+    }
+
+    // Command-line override for central controlDict's variables
+    forAll(globalControlDictSwitchSetNames_, cI)
+    {
+	word switchSetName = globalControlDictSwitchSetNames_.names[cI];
+
+	if( optionFound(switchSetName) )
+	    Foam::debug::updateCentralDictVars
+	    (
+		globalControlDictSwitchSetNames_[switchSetName],
+		option(switchSetName)
+	    );
     }
 
     jobInfo.add("startDate", dateString);
@@ -540,7 +584,7 @@ Foam::argList::argList
             Info<< "Slaves : " << slaveProcs << nl
                 << "Pstream initialized with:" << nl
                 << "    floatTransfer     : " << Pstream::floatTransfer << nl
-                << "    nProcsSimpleSum   : " << Pstream::nProcsSimpleSum << nl
+                << "    nProcsSimpleSum   : " << Pstream::nProcsSimpleSum() << nl
                 << "    commsType         : "
                 << Pstream::commsTypeNames[Pstream::defaultCommsType]
                 << endl;
@@ -568,6 +612,13 @@ Foam::argList::argList
         Info<< endl;
         IOobject::writeDivider(Info);
     }
+
+    // If the macro AppSpecificDictionary is used, one can
+    // modify the application-specific dictionnary using the
+    // command-line parameter -appDict
+    if(appDictName_ != "")
+      optionReadIfPresent("appDict", appDictName_);
+
 }
 
 
@@ -608,22 +659,31 @@ void Foam::argList::printUsage() const
         Info<< " <" << iter().c_str() << '>';
     }
 
+    int i=0;
+    SortableList<Foam::string> sortedValidOptions(validOptions.size());
+
     for
     (
         HashTable<string>::iterator iter = validOptions.begin();
         iter != validOptions.end();
-        ++iter
+        ++iter, ++i
     )
     {
-        Info<< " [-" << iter.key();
+	OStringStream keyValuePair;
+        keyValuePair << "[-" << iter.key();
 
         if (iter().size())
         {
-            Info<< ' ' << iter().c_str();
+            keyValuePair<< ' ' << iter().c_str();
         }
 
-        Info<< ']';
+        keyValuePair<< ']';
+	sortedValidOptions[i]= keyValuePair.str();
     }
+    sortedValidOptions.sort();
+
+    forAll(sortedValidOptions, sI)
+	Info << " " << sortedValidOptions[sI].c_str();
 
     // place help/doc/srcDoc options of the way at the end,
     // but with an extra space to separate it a little

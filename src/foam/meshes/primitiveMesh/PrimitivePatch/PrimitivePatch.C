@@ -24,6 +24,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "Map.H"
+#include "debug.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
@@ -34,11 +35,12 @@ template
     class PointField,
     class PointType
 >
-const bool
+const Foam::debug::optimisationSwitch
 Foam::PrimitivePatch<Face, FaceList, PointField, PointType>::
 nSquaredProjection_
 (
-    debug::optimisationSwitch("nSquaredProjection", 0) > 0
+    "nSquaredProjection",
+    0
 );
 
 
@@ -77,7 +79,8 @@ PrimitivePatch
     faceCentresPtr_(NULL),
     faceNormalsPtr_(NULL),
     pointNormalsPtr_(NULL)
-{}
+{
+}
 
 
 template

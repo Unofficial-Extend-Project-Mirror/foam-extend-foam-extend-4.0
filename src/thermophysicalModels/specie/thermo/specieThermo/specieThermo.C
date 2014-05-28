@@ -34,25 +34,30 @@ Description
 /* * * * * * * * * * * * * * * Private Static Data * * * * * * * * * * * * * */
 
 template<class thermo>
-const Foam::scalar Foam::specieThermo<thermo>::tol_
+const Foam::debug::tolerancesSwitch
+Foam::specieThermo<thermo>::tol_
 (
-    debug::tolerances("speciesThermoTol", 1e-4)
+    "speciesThermoTol",
+    1e-4
 );
 
 
 template<class thermo>
-const Foam::scalar Foam::specieThermo<thermo>::TJump_
+const Foam::debug::tolerancesSwitch
+Foam::specieThermo<thermo>::TJump_
 (
-    debug::tolerances("speciesThermoTJump", 20)
+    "speciesThermoTJump",
+    20
 );
 
 
 template<class thermo>
-const int Foam::specieThermo<thermo>::maxIter_
+const Foam::debug::optimisationSwitch
+Foam::specieThermo<thermo>::maxIter_
 (
-    debug::optimisationSwitch("speciesThermoMaxIter", 100)
+    "speciesThermoMaxIter",
+    100
 );
-
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 

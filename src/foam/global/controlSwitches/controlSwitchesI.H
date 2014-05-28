@@ -23,34 +23,57 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "OSstream.H"
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-inline Foam::OSstream::OSstream
-(
-    ostream& os,
-    const string& name,
-    streamFormat format,
-    versionNumber version,
-    compressionType compression
-)
-:
-    Ostream(format, version, compression),
-    name_(name),
-    os_(os)
+
+// * * * * * * * * * * * * * * * Member Operators  * * * * * * * * * * * * * //
+
+template<class T>
+inline void Foam::debug::controlSwitches<T>::operator=(const T& rhs)
 {
-    if (os_.good())
-    {
-        setOpened();
-        setGood();
-        os_.precision(precision_());
-    }
-    else
-    {
-        setState(os_.rdstate());
-    }
+    switchValue_ = rhs;
 }
+
+template<class T>
+inline const T Foam::debug::controlSwitches<T>::operator&(const T& rhs)
+{
+    return switchValue_ & rhs;
+}
+
+template<class T>
+inline bool Foam::debug::controlSwitches<T>::operator==(const T& rhs)
+{
+    return switchValue_ == rhs;
+}
+
+template<class T>
+inline bool Foam::debug::controlSwitches<T>::operator>=(const T& rhs)
+{
+    return switchValue_ >= rhs;
+}
+
+template<class T>
+inline bool Foam::debug::controlSwitches<T>::operator>(const T& rhs)
+{
+    return switchValue_ > rhs;
+}
+
+template<class T>
+inline bool Foam::debug::controlSwitches<T>::operator<(const T& rhs)
+{
+    return switchValue_ < rhs;
+}
+
+
+// * * * * * * * * * * * * * * IOstream Operators  * * * * * * * * * * * * * //
+
+
+// * * * * * * * * * * * * * * * Ostream Operator  * * * * * * * * * * * * * //
+
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 
 // ************************************************************************* //

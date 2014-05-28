@@ -30,7 +30,7 @@ License
 
 const char* const Foam::cell::typeName = "cell";
 
-int Foam::cell::debug(debug::debugSwitch("cell", 0));
+int Foam::cell::debug(debug::debugSwitchFromDict("cell", 0));
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 

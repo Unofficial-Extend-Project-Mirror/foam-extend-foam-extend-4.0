@@ -37,6 +37,7 @@ SourceFiles
 
 #include "scalar.H"
 #include "NamedEnum.H"
+#include "controlSwitches.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -59,10 +60,11 @@ public:
         //  intersects the triangle or not.
         //  Adjusting the tolerance from the code does not allow it to be const
         //  HJ, 5/Jan/2008
-        static const scalar planarTol_;
+        //static Foam::debug::controlSwitches<scalar> planarTol_;
+        static Foam::debug::tolerancesSwitch planarTol_;
 
         //- Intersection miss tolerance, of the order of 1e-15
-        static const scalar missTol_;
+        static const Foam::debug::tolerancesSwitch missTol_;
 
 
         enum direction
@@ -101,9 +103,14 @@ public:
 
             // Ugly violence to allow tolerance to remain a const scalar
             // HJ, 7/Sep/2008
-            scalar oldTol = planarTol_;
-            scalar* ptPtr = const_cast<scalar*>(&planarTol_);
-            (*ptPtr) = t;
+            scalar oldTol = planarTol_();
+
+	    // Is this still necessary? If not a const, then it is not a const.
+            // MB 18/05_2014
+            //scalar* ptPtr = const_cast<scalar*>(&planarTol_);
+            //(*ptPtr) = t;
+
+	    planarTol_ = t;
 
             return oldTol;
         }

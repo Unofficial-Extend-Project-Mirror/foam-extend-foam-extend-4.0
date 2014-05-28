@@ -22,27 +22,21 @@ License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    Foam::JobInfo
+    Foam::safe_bool
 
 Description
-    Helper class for recording information about run/finished jobs.
+    Implementation of the Safe Bool Idiom.
+    This is the version without virtual functions.
 
-    Writes the following files:
-      - $FOAM_JOB_DIR/runningJobs
-      - $FOAM_JOB_DIR/finishedJobs
+    Author: Bjorn Karlsson
+    http://www.artima.com/cppsource/safebool.html
 
 SourceFiles
-    JobInfo.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef JobInfo_H
-#define JobInfo_H
-
-#include "dictionary.H"
-#include "fileName.H"
-#include "cpuTime.H"
-#include "controlSwitches.H"
+#ifndef safe_bool_H
+#define safe_bool_H
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -50,62 +44,54 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class JobInfo Declaration
+                          Class safe_bool_base Declaration
 \*---------------------------------------------------------------------------*/
-
-class JobInfo
-:
-    public dictionary
+class safe_bool_base
 {
-    // Private data
-        fileName runningJobPath_;
-        fileName finishedJobPath_;
-        cpuTime  cpuTime_;
+    public:
+        typedef void (safe_bool_base::*bool_type)() const;
+        void this_type_does_not_support_comparisons() const {}
 
-    // Private member functions
+    protected:
 
-        bool write(Ostream&) const;
-        void end(const word& terminationType);
-
-
-public:
-
-    static bool constructed;
-    static Foam::debug::infoSwitch writeJobInfo;
-
-    // Constructors
-
-        //- Construct null
-        JobInfo();
-
-
-    // Destructor
-
-        ~JobInfo();
-
-
-    // Member Functions
-
-        // Write
-
-            void write() const;
-
-            void end();
-
-            void exit();
-
-            void abort();
-
-            void signalEnd() const;
+        safe_bool_base() {}
+        safe_bool_base(const safe_bool_base&) {}
+        safe_bool_base& operator=(const safe_bool_base&) {return *this;}
+        ~safe_bool_base() {}
 };
 
+/*---------------------------------------------------------------------------*\
+                          Class safe_bool Declaration
+\*---------------------------------------------------------------------------*/
 
-extern JobInfo jobInfo;
+template <typename T=void>
+class safe_bool
+:
+    private safe_bool_base
+{
+  // private or protected inheritance is very important here as it triggers the
+  // access control violation in main.
 
+public:
+    operator bool_type() const
+    {
+	return (static_cast<const T*>(this))->boolean_test()
+	    ? &safe_bool_base::this_type_does_not_support_comparisons : 0;
+    }
+
+protected:
+    //- Destructor
+    ~safe_bool()
+    {}
+};
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#include "safe_boolI.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

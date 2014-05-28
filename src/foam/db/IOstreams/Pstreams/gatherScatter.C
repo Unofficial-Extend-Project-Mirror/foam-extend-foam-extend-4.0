@@ -103,7 +103,7 @@ void Pstream::gather
 template <class T, class BinaryOp>
 void Pstream::gather(T& Value, const BinaryOp& bop)
 {
-    if (Pstream::nProcs() < Pstream::nProcsSimpleSum)
+    if (Pstream::nProcs() < Pstream::nProcsSimpleSum())
     {
         gather(Pstream::linearCommunication(), Value, bop);
     }
@@ -168,7 +168,7 @@ void Pstream::scatter(const List<Pstream::commsStruct>& comms, T& Value)
 template <class T>
 void Pstream::scatter(T& Value)
 {
-    if (Pstream::nProcs() < Pstream::nProcsSimpleSum)
+    if (Pstream::nProcs() < Pstream::nProcsSimpleSum())
     {
         scatter(Pstream::linearCommunication(), Value);
     }

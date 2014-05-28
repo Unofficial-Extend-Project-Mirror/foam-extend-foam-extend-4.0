@@ -33,14 +33,29 @@ Description
 /* * * * * * * * * * * * * public constants  * * * * * * * * * * * * */
 
 //- Universal gas constant (default in [J/(kmol K)])
-const Foam::scalar Foam::specie::RR = dimensionedConstant("R", 8314.51);
+const Foam::debug::constantsSwitch
+Foam::specie::RR
+(
+    "R",
+    8314.51
+);
+
 
 //- Standard pressure (default in [Pa])
-const Foam::scalar Foam::specie::Pstd = dimensionedConstant("Pstd", 1.0e5);
+const Foam::debug::constantsSwitch
+Foam::specie::Pstd
+(
+    "Pstd",
+    1.0e5
+);
 
 //- Standard temperature (default in [K])
-const Foam::scalar Foam::specie::Tstd = dimensionedConstant("Tstd", 298.15);
-
+const Foam::debug::constantsSwitch
+Foam::specie::Tstd
+(
+    "Tstd",
+    298.15
+);
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 

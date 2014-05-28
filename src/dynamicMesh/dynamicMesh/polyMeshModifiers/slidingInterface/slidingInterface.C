@@ -631,8 +631,8 @@ void Foam::slidingInterface::modifyMotionPoints(pointField& motionPoints) const
 
                     if
                     (
-                        cutOnMaster > edgeEndCutoffTol_
-                     && cutOnMaster < 1.0 - edgeEndCutoffTol_
+                        cutOnMaster > edgeEndCutoffTol_()
+		     && cutOnMaster < 1.0 - edgeEndCutoffTol_()
                     )
                     {
                         // Master is cut, check the slave
@@ -658,12 +658,12 @@ void Foam::slidingInterface::modifyMotionPoints(pointField& motionPoints) const
                             // Calculate merge tolerance from the
                             // target edge length
                             scalar mergeTol =
-                                edgeCoPlanarTol_*mag(b - a);
+                                edgeCoPlanarTol_()*mag(b - a);
 
                             if
                             (
-                                cutOnSlave > edgeEndCutoffTol_
-                             && cutOnSlave < 1.0 - edgeEndCutoffTol_
+                                cutOnSlave > edgeEndCutoffTol_()
+			     && cutOnSlave < 1.0 - edgeEndCutoffTol_()
                              && slaveCut.distance() < mergeTol
                             )
                             {

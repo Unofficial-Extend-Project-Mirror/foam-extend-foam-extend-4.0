@@ -28,7 +28,7 @@ License
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-int Foam::scalarRange::debug(::Foam::debug::debugSwitch("scalarRange", 0));
+int Foam::scalarRange::debug(::Foam::debug::debugSwitchFromDict("scalarRange", 0));
 
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //

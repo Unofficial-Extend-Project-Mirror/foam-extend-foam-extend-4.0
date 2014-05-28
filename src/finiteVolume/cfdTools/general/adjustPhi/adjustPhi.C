@@ -29,6 +29,7 @@ License
 #include "processorFvsPatchFields.H"
 #include "inletOutletFvPatchFields.H"
 #include "fvc.H"
+#include "controlSwitches.H"
 
 // * * * * * * * * * * * * * * * Global Functions  * * * * * * * * * * * * * //
 
@@ -115,8 +116,11 @@ bool Foam::adjustPhi
 
         scalar massCorr = 1.0;
 
-        static const scalar closedDomainTol =
-            debug::tolerances("closedDomainTol", 1e-10);
+        static const Foam::debug::tolerancesSwitch closedDomainTol
+	(
+	    "closedDomainTol",
+	    1e-10
+	);
 
         if (mag(adjustableMassOut) > SMALL)
         {
@@ -125,7 +129,7 @@ bool Foam::adjustPhi
         else if
         (
             mag(fixedMassOut - massIn)
-          > closedDomainTol*Foam::max(1.0, mag(massIn))
+	  > closedDomainTol()*Foam::max(1.0, mag(massIn))
         )
         {
             phi.write();

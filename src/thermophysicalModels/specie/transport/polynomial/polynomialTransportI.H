@@ -116,9 +116,9 @@ inline Foam::scalar Foam::polynomialTransport<Thermo, PolySize>::alpha
     const scalar T
 ) const
 {
-    scalar deltaT = T - specie::Tstd;
+    scalar deltaT = T - specie::Tstd();
     scalar CpBar =
-        (deltaT*(this->H(T) - this->H(specie::Tstd)) + this->Cp(T))
+        (deltaT*(this->H(T) - this->H(specie::Tstd())) + this->Cp(T))
        /(sqr(deltaT) + 1);
 
     return kappa(T)/CpBar;

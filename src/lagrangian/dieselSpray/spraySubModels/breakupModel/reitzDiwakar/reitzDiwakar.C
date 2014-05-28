@@ -102,7 +102,7 @@ void reitzDiwakar::breakupParcel
         Winv += Y[i][cellI]/spray_.gasProperties()[i].W();
         muAverage += Y[i][cellI]*spray_.gasProperties()[i].mu(Taverage);
     }
-    scalar R = specie::RR*Winv;
+    scalar R = specie::RR()*Winv;
 
     // ideal gas law to evaluate density
     scalar rhoAverage = pressure/R/Taverage;

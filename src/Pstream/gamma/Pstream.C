@@ -320,7 +320,7 @@ bool Pstream::init(int& argc, char**& argv)
 
     Info<< "GAMMA Pstream initialized with:" << nl
         << "    floatTransfer         : " << floatTransfer << nl
-        << "    nProcsSimpleSum       : " << nProcsSimpleSum << nl
+        << "    nProcsSimpleSum       : " << nProcsSimpleSum() << nl
         << "    scheduledTransfer     : " << Pstream::scheduledTransfer << nl
         << Foam::endl;
 

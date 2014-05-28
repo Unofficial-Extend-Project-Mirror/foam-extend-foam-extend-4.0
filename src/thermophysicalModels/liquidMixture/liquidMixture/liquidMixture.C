@@ -132,7 +132,7 @@ Foam::scalar Foam::liquidMixture::Ppc
         Zc += x[i]*properties_[i].Zc();
     }
 
-    return specie::RR*Zc*Tpc(x)/Vc;
+    return specie::RR()*Zc*Tpc(x)/Vc;
 }
 
 

@@ -29,6 +29,13 @@ License
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 //- Stefan-Boltzmann constant (default in [J/(K4 m2 s)])
+const Foam::debug::constantsSwitch
+Foam::radiation::sigmaSB_
+(
+    "sigmaSB",
+    5.670E-08
+);
+
 const Foam::dimensionedScalar Foam::radiation::sigmaSB
 (
     Foam::dimensionedConstant
@@ -38,10 +45,9 @@ const Foam::dimensionedScalar Foam::radiation::sigmaSB
         (
             "sigmaSB",
             dimensionSet(1, 0, -3, -4, 0, 0, 0),
-            5.670E-08
+            sigmaSB_()
         )
     )
 );
-
 
 // ************************************************************************* //

@@ -37,7 +37,6 @@ Modification by:
 #include "objectHit.H"
 #include "boolList.H"
 #include "DynamicList.H"
-
 #include "dimensionedConstants.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -48,18 +47,20 @@ namespace Foam
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
 template<class MasterPatch, class SlavePatch>
-const scalar GGIInterpolation<MasterPatch, SlavePatch>::areaErrorTol_
+const Foam::debug::tolerancesSwitch
+GGIInterpolation<MasterPatch, SlavePatch>::areaErrorTol_
 (
-    debug::tolerances("GGIAreaErrorTol", 1.0e-8)
+    "GGIAreaErrorTol",
+    1.0e-8
 );
-
 
 template<class MasterPatch, class SlavePatch>
-const scalar GGIInterpolation<MasterPatch, SlavePatch>::featureCosTol_
+const Foam::debug::tolerancesSwitch
+GGIInterpolation<MasterPatch, SlavePatch>::featureCosTol_
 (
-    debug::tolerances("GGIFeatureCosTol", 0.8)
+    "GGIFeatureCosTol",
+    0.8
 );
-
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
@@ -354,7 +355,7 @@ void GGIInterpolation<MasterPatch, SlavePatch>::calcAddressing() const
                 (
                     masterPointsInUV,
                     neighbPointsInUV,
-                    sqrt(areaErrorTol_) // distErrorTol
+                    sqrt(areaErrorTol_()) // distErrorTol
                 )
             )
             {

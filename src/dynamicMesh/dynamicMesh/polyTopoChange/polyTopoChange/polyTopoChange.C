@@ -36,7 +36,7 @@ const Foam::label Foam::polyTopoChange::cellFraction = 10;
 
 int Foam::polyTopoChange::debug
 (
-    Foam::debug::debugSwitch("polyTopoChange", 0)
+    Foam::debug::debugSwitchFromDict("polyTopoChange", 0)
 );
 
 

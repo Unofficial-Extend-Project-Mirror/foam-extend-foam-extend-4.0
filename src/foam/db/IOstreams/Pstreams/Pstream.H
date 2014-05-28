@@ -45,6 +45,7 @@ SourceFiles
 #include "HashTable.H"
 #include "string.H"
 #include "NamedEnum.H"
+#include "controlSwitches.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -224,11 +225,11 @@ public:
         //- Should compact transfer be used in which floats replace doubles
         //  reducing the bandwidth requirement at the expense of some loss
         //  in accuracy
-        static bool floatTransfer;
+        static const Foam::debug::optimisationSwitch floatTransfer;
 
         //- Number of processors at which the sum algorithm changes from linear
         //  to tree
-        static int nProcsSimpleSum;
+        static const Foam::debug::optimisationSwitch nProcsSimpleSum;
 
         //- Default commsType
         static commsTypes defaultCommsType;

@@ -49,6 +49,7 @@ Author
 #include "point.H"
 #include "className.H"
 #include "linePointRef.H"
+#include "controlSwitches.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -69,7 +70,7 @@ class octreeDataBoundBox
     // Static data
 
         //- Tolerance on linear dimensions
-        static scalar tol;
+        static const Foam::debug::tolerancesSwitch tol;
 
 
     // Private data

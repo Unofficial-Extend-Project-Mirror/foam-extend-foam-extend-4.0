@@ -82,7 +82,7 @@ protected:
             const vectorField& nf,
             const vectorField& nr,
             const scalarField& smallDist,
-            const scalar absTol = matchTol_
+            const scalar absTol = matchTol_()
         ) const;
 
         //- Initialise the calculation of the patch addressing

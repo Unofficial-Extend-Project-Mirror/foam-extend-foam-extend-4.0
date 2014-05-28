@@ -23,34 +23,57 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "OSstream.H"
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * * Member Operators  * * * * * * * * * * * * * //
 
-inline Foam::OSstream::OSstream
-(
-    ostream& os,
-    const string& name,
-    streamFormat format,
-    versionNumber version,
-    compressionType compression
-)
-:
-    Ostream(format, version, compression),
-    name_(name),
-    os_(os)
+template <typename T>
+inline bool operator==(const Foam::safe_bool<T>& lhs, bool b)
 {
-    if (os_.good())
+    if (b)
     {
-        setOpened();
-        setGood();
-        os_.precision(precision_());
+	if (lhs) return true;
+	else return false;
     }
     else
     {
-        setState(os_.rdstate());
+	if (lhs) return false;
+	else return true;
     }
 }
+
+template <typename T>
+inline bool operator==(bool b, const Foam::safe_bool<T>& rhs)
+{
+    if (b)
+    {
+	if (rhs) return true;
+	else return false;
+    }
+    else
+    {
+	if (rhs) return false;
+	else return true;
+    }
+}
+
+
+template <typename T, typename U>
+inline bool operator==(const Foam::safe_bool<T>& lhs,const Foam::safe_bool<U>& rhs)
+{
+    lhs.this_type_does_not_support_comparisons();
+    return false;
+}
+
+template <typename T,typename U>
+inline  bool operator!=(const Foam::safe_bool<T>& lhs,const Foam::safe_bool<U>& rhs)
+{
+    lhs.this_type_does_not_support_comparisons();
+    return false;
+}
+
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 
 // ************************************************************************* //

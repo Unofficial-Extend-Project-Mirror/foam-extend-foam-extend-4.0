@@ -100,20 +100,20 @@ bool triangle<Point, PointRef>::intersection
 
     // User-controlled projection tolerance
     // HJ, 23/Oct/2007
-    if (Foam::mag(u1) < intersection::missTol_)
+    if (Foam::mag(u1) < intersection::missTol_())
     {
         beta = u0/u2;
         if
         (
-            (beta > -intersection::missTol_)
-         && (beta < 1 + intersection::missTol_)
+            (beta > -intersection::missTol_())
+         && (beta < 1 + intersection::missTol_())
         )
         {
             alpha = (v0 - beta*v2)/v1;
             hit =
             (
-                (alpha > -intersection::missTol_)
-             && ((alpha + beta) < 1 + intersection::missTol_)
+                (alpha > -intersection::missTol_())
+             && ((alpha + beta) < 1 + intersection::missTol_())
             );
         }
     }
@@ -122,15 +122,15 @@ bool triangle<Point, PointRef>::intersection
         beta = (v0*u1 - u0*v1)/det;
         if
         (
-            (beta > -intersection::missTol_)
-         && (beta < 1 + intersection::missTol_)
+            (beta > -intersection::missTol_())
+         && (beta < 1 + intersection::missTol_())
         )
         {
             alpha = (u0 - beta*u2)/u1;
             hit =
             (
-                (alpha > -intersection::missTol_)
-             && ((alpha + beta) < 1 + intersection::missTol_)
+                (alpha > -intersection::missTol_())
+             && ((alpha + beta) < 1 + intersection::missTol_())
             );
         }
     }
@@ -552,7 +552,7 @@ inline pointHit triangle<Point, PointRef>::ray
                 Foam::mag(E1)
             ),
             Foam::mag(c_ - b_)
-        )*intersection::planarTol_;
+        )*intersection::planarTol_();
 
     bool eligible =
         alg == intersection::FULL_RAY

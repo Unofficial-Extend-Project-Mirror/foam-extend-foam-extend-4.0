@@ -549,9 +549,10 @@ public:
     template<>                                                                \
     const Foam::word KinematicParcel<Type>::typeName(#Type);                  \
     template<>                                                                \
-    int KinematicParcel<Type>::debug                                          \
+    Foam::debug::debugSwitch						      \
+    KinematicParcel<Type>::debug                                              \
     (                                                                         \
-        Foam::debug::debugSwitch(#Type, DebugSwitch)                          \
+        std::string(#Type), DebugSwitch                                       \
     );
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

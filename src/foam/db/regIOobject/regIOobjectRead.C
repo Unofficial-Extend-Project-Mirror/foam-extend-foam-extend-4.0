@@ -154,7 +154,7 @@ bool Foam::regIOobject::modified() const
     return
     (
         lastModified_
-     && lastModified(filePath()) > (lastModified_ + fileModificationSkew)
+     && lastModified(filePath()) > (lastModified_ + fileModificationSkew())
     );
 }
 
@@ -167,7 +167,7 @@ bool Foam::regIOobject::readIfModified()
 
         bool readFile = false;
 
-        if (newTimeStamp > (lastModified_ + fileModificationSkew))
+        if (newTimeStamp > (lastModified_ + fileModificationSkew()))
         {
             readFile = true;
         }

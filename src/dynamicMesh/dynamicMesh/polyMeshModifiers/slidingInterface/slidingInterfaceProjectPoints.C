@@ -44,30 +44,41 @@ Author
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-const Foam::scalar Foam::slidingInterface::pointMergeTol_
+const Foam::debug::tolerancesSwitch
+Foam::slidingInterface::pointMergeTol_
 (
-    debug::tolerances("slidingPointMergeTol", 0.2)
+    "slidingPointMergeTol",
+    0.2
 );
 
-const Foam::scalar Foam::slidingInterface::edgeMergeTol_
+const Foam::debug::tolerancesSwitch
+Foam::slidingInterface::edgeMergeTol_
 (
-    debug::tolerances("slidingEdgeMergeTol", 0.05)
+    "slidingEdgeMergeTol",
+    0.05
 );
 
-const Foam::scalar Foam::slidingInterface::integralAdjTol_
+const Foam::debug::tolerancesSwitch
+Foam::slidingInterface::integralAdjTol_
 (
-    debug::tolerances("slidingIntegralAdjTol", 0.15)
+    "slidingIntegralAdjTol",
+    0.15
 );
 
-const Foam::scalar Foam::slidingInterface::edgeMasterCatchFraction_
+const Foam::debug::tolerancesSwitch
+Foam::slidingInterface::edgeMasterCatchFraction_
 (
-    debug::tolerances("slidingEdgeMasterCatchFraction", 0.4)
+    "slidingEdgeMasterCatchFraction",
+    0.4
 );
 
-const Foam::scalar Foam::slidingInterface::edgeEndCutoffTol_
+const Foam::debug::tolerancesSwitch
+Foam::slidingInterface::edgeEndCutoffTol_
 (
-    debug::tolerances("slidingEdgeEndCutoffTol", 0.0001)
+    "slidingEdgeEndCutoffTol",
+    0.0001
 );
+
 
 const Foam::label Foam::slidingInterface::nFacesPerSlaveEdge_ = 5;
 
@@ -105,7 +116,13 @@ bool Foam::slidingInterface::projectPoints() const
             << name() << " : "
             << "Projecting slave points onto master surface using ";
 
-        if (debug::optimisationSwitch("nSquaredProjection", 0) > 0)
+	const Foam::debug::optimisationSwitch nSquaredProjection
+	(
+	    "nSquaredProjection",
+	    0
+	);
+
+        if (nSquaredProjection() > 0)
         {
             Pout<< "N-squared point projection" << endl;
         }
@@ -358,7 +375,7 @@ bool Foam::slidingInterface::projectPoints() const
 
                     // Calculate the tolerance
                     const scalar mergeTol =
-                        integralAdjTol_*minSlavePointLength[pointI];
+                        integralAdjTol_()*minSlavePointLength[pointI];
 
                     // Adjust the hit
                     if (mag(nearPoint - missPoint) < mergeTol)
@@ -576,7 +593,7 @@ bool Foam::slidingInterface::projectPoints() const
 
                 // Calculate the tolerance
                 const scalar mergeTol =
-                    pointMergeTol_*
+                    pointMergeTol_()*
                     min
                     (
                         minSlavePointLength[pointI],
@@ -678,7 +695,7 @@ bool Foam::slidingInterface::projectPoints() const
                     minMasterFaceLength[slavePointFaceHits[pointI].hitObject()]
                 );
 
-            const scalar mergeTol = pointMergeTol_*mergeLength;
+            const scalar mergeTol = pointMergeTol_()*mergeLength;
 
             scalar minDistance = GREAT;
 
@@ -739,7 +756,7 @@ bool Foam::slidingInterface::projectPoints() const
 
                     // Calculate the tolerance
                     const scalar mergeTol =
-                        pointMergeTol_*
+                        pointMergeTol_()*
                         min
                         (
                             minSlavePointLength[pointI],
@@ -1051,7 +1068,7 @@ bool Foam::slidingInterface::projectPoints() const
             // Calculated as a combination of travel distance in projection and
             // edge length
             scalar slaveCatchDist =
-                edgeMasterCatchFraction_*edgeMag
+                edgeMasterCatchFraction_()*edgeMag
               + 0.5*
                 (
                     mag
@@ -1144,9 +1161,9 @@ bool Foam::slidingInterface::projectPoints() const
                     // Not a point hit, check for edge
                     if
                     (
-                        cutOnSlave > edgeEndCutoffTol_
-                     && cutOnSlave < 1.0 - edgeEndCutoffTol_ // check edge cut
-                     && distInEdgePlane < edgeMergeTol_*edgeMag // merge plane
+                        cutOnSlave > edgeEndCutoffTol_()
+		     && cutOnSlave < 1.0 - edgeEndCutoffTol_() // check edge cut
+		     && distInEdgePlane < edgeMergeTol_()*edgeMag // merge plane
                      && edgeLineHit.distance()
                       < min
                         (

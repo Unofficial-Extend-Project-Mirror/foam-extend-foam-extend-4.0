@@ -58,7 +58,7 @@ void reduce
     const BinaryOp& bop
 )
 {
-    if (Pstream::nProcs() < Pstream::nProcsSimpleSum)
+    if (Pstream::nProcs() < Pstream::nProcsSimpleSum())
     {
         reduce(Pstream::linearCommunication(), Value, bop);
     }
@@ -79,7 +79,7 @@ T returnReduce
 {
     T WorkValue(Value);
 
-    if (Pstream::nProcs() < Pstream::nProcsSimpleSum)
+    if (Pstream::nProcs() < Pstream::nProcsSimpleSum())
     {
         reduce(Pstream::linearCommunication(), WorkValue, bop);
     }

@@ -47,6 +47,16 @@ class dictionary;
 
 namespace debug
 {
+    //- Define central control dictionary switchSet
+    enum globalControlDictSwitchSet
+    {
+	DEBUGSWITCHES,
+	INFOSWITCHES,
+	OPTIMISATIONSWITCHES,
+	TOLERANCES,
+	DIMENSIONEDCONSTANTS
+    };
+
     //- The central control dictionary.
     //  Located in $WM_PROJECT_DIR/etc
     //  @sa Foam::findEtcFile()
@@ -64,20 +74,34 @@ namespace debug
     //- The Tolerances sub-dictionary in the central controlDict.
     dictionary& tolerances();
 
+    //- The DimensionedConstants sub-dictionary in the central controlDict.
+    dictionary& constants();
+
     //- Lookup debug switch or add default value.
-    int debugSwitch(const char* name, const int defaultValue = 0);
+    int debugSwitchFromDict(const char* name, const int defaultValue = 0);
 
     //- Lookup info switch or add default value.
-    int infoSwitch(const char* name, const int defaultValue = 0);
+    int infoSwitchFromDict(const char* name, const int defaultValue = 0);
 
     //- Lookup optimisation switch or add default value.
-    int optimisationSwitch(const char* name, const int defaultValue = 0);
+    int optimisationSwitchFromDict(const char* name, const int defaultValue = 0);
 
     //- Lookup tolerances switch or add default value.
-    double tolerances(const char* name, const double defaultValue = 0);
+    double tolerancesFromDict(const char* name, const double defaultValue = 0);
+
+    //- Lookup tolerances switch or add default value.
+    double constantsFromDict(const char* name, const double defaultValue = 0);
 
     //- Internal function to lookup a sub-dictionary from controlDict.
     dictionary& switchSet(const char* subDictName, dictionary*& subDictPtr);
+
+    //- Update central controlDict variables
+    //  supported keyValues format: key1=value1,key2=value2
+    void updateCentralDictVars
+    (
+	globalControlDictSwitchSet centralDictSwitchSetName,
+	Foam::string keyValues
+    );
 
 } // End namespace debug
 

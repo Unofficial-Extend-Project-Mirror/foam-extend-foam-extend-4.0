@@ -35,11 +35,12 @@ License
 
 defineTypeNameAndDebug(Foam::octreeDataBoundBox, 0);
 
-Foam::scalar Foam::octreeDataBoundBox::tol
+const Foam::debug::tolerancesSwitch
+Foam::octreeDataBoundBox::tol
 (
-    debug::tolerances("octreeDataBoundBoxTol", 1e-6)
+    "octreeDataBoundBoxTol",
+    1e-6
 );
-
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 

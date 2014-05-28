@@ -31,6 +31,7 @@ Description
 
 #include "word.H"
 #include "debug.H"
+#include "controlSwitches.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -72,13 +73,13 @@ public:                                                                       \
 //  Also declares debug information.
 #define ClassName(TypeNameString)                                             \
     ClassNameNoDebug(TypeNameString);                                         \
-    static int debug
+    static Foam::debug::debugSwitch debug;
 
 //- Add typeName information from argument @a TypeNameString to a namespace.
 //  Also declares debug information.
 #define NamespaceName(TypeNameString)                                         \
     NamespaceNameNoDebug(TypeNameString);                                     \
-    extern int debug
+    extern Foam::debug::debugSwitch debug;
 
 //- Add typeName information from argument @a TypeNameString to a template class.
 //  Also declares debug information.
@@ -133,21 +134,23 @@ public:                                                                       \
 
 //- Define the debug information, lookup as @a Name
 #define defineDebugSwitchWithName(Type, Name, DebugSwitch)                    \
-    int Type::debug(::Foam::debug::debugSwitch(Name, DebugSwitch))
+    ::Foam::debug::debugSwitch                                                \
+    Type::debug(std::string(Name), DebugSwitch)
 
 //- Define the debug information
 #define defineDebugSwitch(Type, DebugSwitch)                                  \
-    defineDebugSwitchWithName(Type, Type::typeName_(), DebugSwitch)
+    defineDebugSwitchWithName(Type, Type::typeName_(), DebugSwitch);
 
 #ifdef __INTEL_COMPILER
 //- Define the debug information for templates, lookup as @a Name
 # define defineTemplateDebugSwitchWithName(Type, Name, DebugSwitch)           \
-    defineDebugSwitchWithName(Type, Name, DebugSwitch)
+    defineDebugSwitchWithName(Type, Name, DebugSwitch);
+
 #else
 //- Define the debug information for templates, lookup as @a Name
 # define defineTemplateDebugSwitchWithName(Type, Name, DebugSwitch)           \
     template<>                                                                \
-    defineDebugSwitchWithName(Type, Name, DebugSwitch)
+    defineDebugSwitchWithName(Type, Name, DebugSwitch);
 #endif
 
 //- Define the debug information for templates

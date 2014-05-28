@@ -41,7 +41,7 @@ namespace Foam
 
     int polyPatch::disallowGenericPolyPatch
     (
-        debug::debugSwitch("disallowGenericPolyPatch", 0)
+        debug::debugSwitchFromDict("disallowGenericPolyPatch", 0)
     );
 
     defineRunTimeSelectionTable(polyPatch, word);
@@ -52,11 +52,12 @@ namespace Foam
 }
 
 
-const Foam::scalar Foam::polyPatch::matchTol_
+const Foam::debug::tolerancesSwitch
+Foam::polyPatch::matchTol_
 (
-    debug::tolerances("patchFaceMatchTol", 1e-3)
+    "patchFaceMatchTol",
+    1e-3
 );
-
 
 // * * * * * * * * * * * * Protected Member Functions  * * * * * * * * * * * //
 
@@ -253,7 +254,7 @@ Foam::scalarField Foam::polyPatch::calcFaceTol
             maxLen = max(maxLen, mag(points[f[fp]] - cc));
         }
 
-        tols[faceI] = matchTol_*maxLen;
+        tols[faceI] = matchTol_()*maxLen;
     }
 
     return tols;

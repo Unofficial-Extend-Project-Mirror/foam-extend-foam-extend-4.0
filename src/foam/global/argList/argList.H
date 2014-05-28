@@ -126,6 +126,9 @@ public:
 
     // Static data members
 
+        //- Central dictionary switchSet names
+        static const NamedEnum<Foam::debug::globalControlDictSwitchSet, 5> globalControlDictSwitchSetNames_;
+
         //- A list of valid (mandatory) arguments
         static SLList<string> validArgs;
 
@@ -134,6 +137,9 @@ public:
 
         //- A list of valid parallel options
         static HashTable<string> validParOptions;
+
+        //- Name of the application-specific dictionary
+        static word appDictName_;
 
         //! @cond ignoreDocumentation
         class initValidTables
@@ -263,6 +269,11 @@ public:
                 return readList<T>(optionLookup(opt)());
             }
 
+            //- Return appDictName_
+            const word appDictName() const
+            {
+                return appDictName_;
+            }
 
         // Edit
 
@@ -290,8 +301,21 @@ public:
 
             //- Check root path and case path
             bool checkRootCase() const;
+
 };
 
+// Allow overriding the application-specific dictionary using the command-line
+// parameter -appDict. The dictionary file must still be located in the case's
+// "system" directory, or accessible using a path relative to the case's
+// "system" directory.
+// Example:
+//    cellSet                                     # Default will be cellSetDict
+//    cellSet -appDict cellSetDict                # Same as above
+//    cellSet -appDict cellSetDict.rotorOnly
+//
+#define  AppSpecificDictionary(DefaultAppDict)                            \
+    argList::appDictName_ = (DefaultAppDict);		           \
+    argList::validOptions.insert("appDict", argList::appDictName_);
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

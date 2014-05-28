@@ -32,6 +32,7 @@ License
 #include "processorPolyPatch.H"
 #include "addToRunTimeSelectionTable.H"
 #include "polyMesh.H"
+#include "controlSwitches.H"
 
 #include "matchPoints.H"
 #include "DimensionedField.H"
@@ -1872,10 +1873,14 @@ void mesquiteMotionSolver::initParallelSurfaceSmoothing()
     const boundBox& box = mesh().bounds();
 
     // Fetch relative tolerance
-    scalar relTol = debug::tolerances("processorMatchTol", 1e-4);
+    const Foam::debug::tolerancesSwitch relTol
+    (
+	"processorMatchTol",
+	1e-4
+    );
 
     // Compute tolerance
-    scalar tol = relTol * box.mag();
+    scalar tol = relTol() * box.mag();
 
     // Wait for all transfers to complete.
     OPstream::waitRequests();

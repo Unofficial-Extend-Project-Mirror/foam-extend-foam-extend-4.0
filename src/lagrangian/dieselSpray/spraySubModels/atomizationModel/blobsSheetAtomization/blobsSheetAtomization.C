@@ -94,7 +94,7 @@ void blobsSheetAtomization::atomizeParcel
     {
         Winv += Y[i][cellI]/spray_.gasProperties()[i].W();
     }
-    scalar R = specie::RR*Winv;
+    scalar R = specie::RR()*Winv;
 
     // ideal gas law to evaluate density
     scalar rhoAverage = pressure/R/Taverage;

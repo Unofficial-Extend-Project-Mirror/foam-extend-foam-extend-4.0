@@ -38,7 +38,7 @@ defineNamedTemplateTypeNameAndDebug(fvsPatchTypeField, 0);                    \
 template<>                                                                    \
 int fvsPatchTypeField::disallowDefaultFvsPatchField                           \
 (                                                                             \
-    debug::debugSwitch("disallowDefaultFvsPatchField", 0)                     \
+    debug::debugSwitchFromDict("disallowDefaultFvsPatchField", 0)                     \
 );                                                                            \
 defineTemplateRunTimeSelectionTable(fvsPatchTypeField, patch);                \
 defineTemplateRunTimeSelectionTable(fvsPatchTypeField, patchMapper);          \

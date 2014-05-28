@@ -40,6 +40,7 @@ SourceFiles
 
 #include "amgPolicy.H"
 #include "lduMatrix.H"
+#include "controlSwitches.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -84,7 +85,7 @@ class pamgPolicy
     // Private Static Data
 
         //- Diagonal scaling factor
-        static const scalar diagFactor_;
+        static const Foam::debug::tolerancesSwitch diagFactor_;
 
 
 public:

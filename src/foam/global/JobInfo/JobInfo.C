@@ -31,7 +31,13 @@ License
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-bool Foam::JobInfo::writeJobInfo(Foam::debug::infoSwitch("writeJobInfo", 0));
+Foam::debug::infoSwitch
+Foam::JobInfo::writeJobInfo
+(
+    "writeJobInfo",
+    0
+);
+
 Foam::JobInfo Foam::jobInfo;
 
 

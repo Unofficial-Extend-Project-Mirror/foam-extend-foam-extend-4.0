@@ -29,17 +29,21 @@ Description
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-const Foam::scalar Foam::intersection::planarTol_
+//Foam::debug::controlSwitches<Foam::scalar>
+Foam::debug::tolerancesSwitch
+Foam::intersection::planarTol_
 (
-    debug::tolerances("intersectionPlanarTol", 0.2)
+    "intersectionPlanarTol",
+    0.2
 );
 
-
-const Foam::scalar Foam::intersection::missTol_
+//const Foam::debug::controlSwitches<Foam::scalar>
+const Foam::debug::tolerancesSwitch
+Foam::intersection::missTol_
 (
-    debug::tolerances("intersectionMissTol", SMALL)
+    "intersectionMissTol",
+    SMALL
 );
-
 
 template<>
 const char* Foam::NamedEnum<Foam::intersection::direction, 2>::names[] =

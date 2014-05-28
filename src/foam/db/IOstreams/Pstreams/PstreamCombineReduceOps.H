@@ -62,7 +62,7 @@ void combineReduce
 template <class T, class CombineOp>
 void combineReduce(T& Value, const CombineOp& cop)
 {
-    if (Pstream::nProcs() < Pstream::nProcsSimpleSum)
+    if (Pstream::nProcs() < Pstream::nProcsSimpleSum())
     {
         Pstream::combineGather(Pstream::linearCommunication(), Value, cop);
         Pstream::combineScatter(Pstream::linearCommunication(), Value);

@@ -57,6 +57,7 @@ SourceFiles
 #include "point.H"
 #include "intersection.H"
 #include "HashSet.H"
+#include "controlSwitches.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -177,7 +178,7 @@ private:
 
     // Static Private Data
 
-        static const bool nSquaredProjection_;
+        static const Foam::debug::optimisationSwitch nSquaredProjection_;
 
 
     // Private Member Functions

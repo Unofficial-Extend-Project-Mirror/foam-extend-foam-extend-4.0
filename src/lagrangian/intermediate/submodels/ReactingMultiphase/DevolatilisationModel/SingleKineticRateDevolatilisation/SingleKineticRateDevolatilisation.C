@@ -83,7 +83,7 @@ Foam::scalar Foam::SingleKineticRateDevolatilisation<CloudType>::calculate
     }
 
     // Kinetic rate
-    const scalar kappa = A1_*exp(-E_/(specie::RR*T));
+    const scalar kappa = A1_*exp(-E_/(specie::RR()*T));
 
     // Volatile devolatilisation from particle to carrier gas phase
     const scalar dMass = min(dt*kappa*massVolatile, massVolatile);

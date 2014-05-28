@@ -1,0 +1,358 @@
+/*---------------------------------------------------------------------------*\
+  =========                 |
+  \\      /  F ield         | foam-extend: Open Source CFD
+   \\    /   O peration     |
+    \\  /    A nd           | For copyright notice see file Copyright
+     \\/     M anipulation  |
+-------------------------------------------------------------------------------
+License
+    This file is part of foam-extend.
+
+    foam-extend is free software: you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by the
+    Free Software Foundation, either version 3 of the License, or (at your
+    option) any later version.
+
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
+
+Class
+    Foam::controlSwitches
+
+Author
+    Martin Beaudoin, Hydro-Quebec, 2014.  All rights reserved
+
+Description
+    Handling of runtime controlSwitches
+    - Debug switches
+    - Info switches
+    - Optimisation switches
+    - Tolerances switches
+    - DimensionedConstants values
+
+    This class is a specialization of the safe_bool class, where additional
+    boolean operators are allowed. This class is also offering access to
+    information like the switch name, etc.
+
+Note:
+    We will be using std::map and std::list for the containers for this class.
+    In some sections of the code where controlSwitches are being used, we are at
+    a relatively low level, so we cannot use HashTable and DynamicList.
+    MB 23/05/2014
+
+SourceFiles
+    controlSwitchesI.H
+    controlSwitches.C
+    controlSwitchesIO.C
+
+\*---------------------------------------------------------------------------*/
+
+#ifndef controlSwitches_H
+#define controlSwitches_H
+
+#include <list>
+#include <map>
+#include <string>
+#include "safe_bool.H"
+
+#include "scalar.H"
+#include "debug.H"
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+namespace Foam
+{
+
+namespace debug
+{
+
+// Forward declaration of classes
+template<class T> class controlSwitches;
+
+// Typedefs
+// Hashtables to static class attributes addresses holding the
+// runtime debug/info/optimisation/tolerances values
+typedef std::map<std::string, std::list<controlSwitches<int> *> >         ListDebugControlSwitches;
+typedef std::map<std::string, std::list<controlSwitches<int> *> >         ListInfoControlSwitches;
+typedef std::map<std::string, std::list<controlSwitches<int> *> >         ListOptimisationControlSwitches;
+typedef std::map<std::string, std::list<controlSwitches<Foam::scalar> *> > ListTolerancesControlSwitches;
+typedef std::map<std::string, std::list<controlSwitches<Foam::scalar> *> > ListConstantsControlSwitches;
+
+extern ListDebugControlSwitches* debugSwitchValues_;
+extern ListInfoControlSwitches* infoSwitchValues_;
+extern ListOptimisationControlSwitches* optimisationSwitchValues_;
+extern ListTolerancesControlSwitches* tolerancesSwitchValues_;
+extern ListConstantsControlSwitches* constantsSwitchValues_;
+
+/*---------------------------------------------------------------------------*\
+                          Class controlSwitches Declaration
+\*---------------------------------------------------------------------------*/
+
+template<class T>
+class controlSwitches
+    : public safe_bool<controlSwitches<T> > // using the CRTP idiom
+{
+    // Private data
+
+        //- Switch section
+        globalControlDictSwitchSet switchSet_;
+
+        //- Switch name
+        std::string switchName_;
+
+        //- Switch value
+        T switchValue_;
+
+        //- Handle to runTime switches list
+        std::map<std::string, std::list<controlSwitches<T> *> >* switchValuesTable_ ;
+
+    // Private Member Functions
+
+public:
+
+    // Constructors
+
+        //- Construct null
+        controlSwitches();
+
+        //- Construct from components
+        controlSwitches(const T& data);
+
+        controlSwitches
+	(
+	    const std::string& switchName,
+	    const T& switchValue,
+	    globalControlDictSwitchSet switchSet,
+	    std::map<std::string, std::list<controlSwitches<T> *> >** switchesValues
+	);
+
+        //- Construct as copy
+        controlSwitches(const controlSwitches&);
+
+    //- Destructor
+        ~controlSwitches();
+
+
+    // Member Functions
+        // Access
+
+        // Check
+        bool boolean_test() const
+	{
+	    // Perform Boolean logic here
+	    return switchValue_ != 0;
+	}
+
+    // Member Operators
+
+        // Assignement operator
+        void operator=(const T&);
+
+        //- Assignement operator
+        void operator=(const controlSwitches&);
+
+        // & operator
+        const T operator&(const T&);
+
+        // == operator
+        bool operator==(const T&);
+
+        // >= operator
+        bool operator>=(const T&);
+
+        // > operator
+        bool operator>(const T&);
+
+        // < operator
+        bool operator<(const T&);
+
+        // Return value
+        T operator()() const
+	{
+	    return switchValue_;
+	}
+};
+
+// Utility classes
+class debugSwitch
+    : public controlSwitches<int>
+{
+public:
+    debugSwitch
+    (
+	const std::string& switchName,
+	const int& switchValue
+    )
+	:
+	controlSwitches<int>
+	(
+	    switchName,
+	    debug::debugSwitchFromDict(switchName.c_str(), switchValue),
+	    debug::DEBUGSWITCHES,
+	    &debugSwitchValues_
+	)
+    {}
+
+    virtual ~debugSwitch()
+    {
+    }
+
+    // Assignement operator
+    void operator=(const int& rhs)
+    {
+	controlSwitches<int>::operator=(rhs);
+    }
+};
+
+class infoSwitch
+    : public controlSwitches<int>
+{
+public:
+    infoSwitch
+    (
+	const std::string& switchName,
+	const int& switchValue
+    )
+	:
+	controlSwitches<int>
+	(
+	    switchName,
+	    debug::infoSwitchFromDict(switchName.c_str(), switchValue),
+	    debug::INFOSWITCHES,
+	    &infoSwitchValues_
+	)
+    {}
+
+    virtual ~infoSwitch()
+    {
+    }
+
+    // Assignement operator
+    void operator=(const int& rhs)
+    {
+	controlSwitches<int>::operator=(rhs);
+    }
+};
+
+class optimisationSwitch
+    : public controlSwitches<int>
+{
+public:
+    optimisationSwitch
+    (
+	const std::string& switchName,
+	const int& switchValue
+    )
+	:
+	controlSwitches<int>
+	(
+	    switchName,
+	    debug::optimisationSwitchFromDict(switchName.c_str(), switchValue),
+	    debug::OPTIMISATIONSWITCHES,
+	    &optimisationSwitchValues_
+	)
+    {}
+
+    virtual ~optimisationSwitch()
+    {
+    }
+
+    // Assignement operator
+    void operator=(const int& rhs)
+    {
+	controlSwitches<int>::operator=(rhs);
+    }
+
+
+};
+
+class tolerancesSwitch
+    : public controlSwitches<Foam::scalar>
+{
+public:
+    tolerancesSwitch
+    (
+	const std::string& switchName,
+	const Foam::scalar& switchValue
+    )
+	:
+	controlSwitches<Foam::scalar>
+	(
+	    switchName,
+	    debug::tolerancesFromDict(switchName.c_str(), switchValue),
+	    debug::TOLERANCES,
+	    &tolerancesSwitchValues_
+	)
+    {
+    }
+
+    virtual ~tolerancesSwitch()
+    {
+    }
+
+   // Assignement operator
+    void operator=(const Foam::scalar& rhs)
+    {
+	controlSwitches<Foam::scalar>::operator=(rhs);
+    }
+};
+
+class constantsSwitch
+    : public controlSwitches<Foam::scalar>
+{
+public:
+    constantsSwitch
+    (
+	const std::string& switchName,
+	const Foam::scalar& switchValue
+    )
+	:
+	controlSwitches<Foam::scalar>
+	(
+	    switchName,
+	    debug::constantsFromDict(switchName.c_str(), switchValue),
+	    debug::DIMENSIONEDCONSTANTS,
+	    &constantsSwitchValues_
+	)
+    {
+    }
+
+    virtual ~constantsSwitch()
+    {
+    }
+
+   // Assignement operator
+    void operator=(const Foam::scalar& rhs)
+    {
+	controlSwitches<Foam::scalar>::operator=(rhs);
+    }
+};
+
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+} // End namespace debug
+
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+} // End namespace Foam
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#include "controlSwitchesI.H"
+
+#ifdef NoRepository
+#   include "controlSwitches.C"
+#endif
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#endif
+
+// ************************************************************************* //

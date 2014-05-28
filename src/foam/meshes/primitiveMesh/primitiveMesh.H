@@ -66,6 +66,7 @@ SourceFiles
 #include "HashSet.H"
 #include "Map.H"
 #include "EdgeMap.H"
+#include "controlSwitches.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -321,22 +322,22 @@ public:
 
             //- Cell closedness warning threshold
             //  set as the fraction of un-closed area to closed area
-            static scalar closedThreshold_;
+            static const Foam::debug::tolerancesSwitch closedThreshold_;
 
             //- Aspect ratio warning threshold
-            static scalar aspectThreshold_;
+            static const Foam::debug::tolerancesSwitch aspectThreshold_;
 
             //- Non-orthogonality warning threshold in deg
-            static scalar nonOrthThreshold_;
+            static Foam::debug::tolerancesSwitch nonOrthThreshold_;
 
             //- Skewness warning threshold
-            static scalar skewThreshold_;
+            static const Foam::debug::tolerancesSwitch skewThreshold_;
 
             //- Face angle threshold
-            static scalar faceAngleThreshold_;
+            static Foam::debug::tolerancesSwitch faceAngleThreshold_;
 
             //- Face flatness threshold
-            static scalar faceFlatnessThreshold_;
+            static const Foam::debug::tolerancesSwitch faceFlatnessThreshold_;
 
 
     // Constructors

@@ -44,31 +44,35 @@ namespace Foam
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
 template<class MasterPatch, class SlavePatch>
-const scalar
+const Foam::debug::tolerancesSwitch
 GGIInterpolation<MasterPatch, SlavePatch>::faceBoundBoxExtendSpanFraction_
 (
-    debug::tolerances("GGIFaceBoundBoxExtendSpanFraction", 1.0e-2)
+    "GGIFaceBoundBoxExtendSpanFraction",
+    1.0e-2
 );
 
 template<class MasterPatch, class SlavePatch>
-const label
+const Foam::debug::optimisationSwitch
  GGIInterpolation<MasterPatch, SlavePatch>::octreeSearchMinNLevel_
 (
-    debug::optimisationSwitch("GGIOctreeSearchMinNLevel", 3)
+    "GGIOctreeSearchMinNLevel",
+    3
 );
 
 template<class MasterPatch, class SlavePatch>
-const scalar
+const Foam::debug::optimisationSwitch
 GGIInterpolation<MasterPatch, SlavePatch>::octreeSearchMaxLeafRatio_
 (
-    debug::optimisationSwitch("GGIOctreeSearchMaxLeafRatio", 3)
+    "GGIOctreeSearchMaxLeafRatio",
+    3
 );
 
 template<class MasterPatch, class SlavePatch>
-const scalar
+const Foam::debug::optimisationSwitch
 GGIInterpolation<MasterPatch, SlavePatch>::octreeSearchMaxShapeRatio_
 (
-    debug::optimisationSwitch("GGIOctreeSearchMaxShapeRatio", 1)
+    "GGIOctreeSearchMaxShapeRatio",
+    1
 );
 
 
@@ -397,7 +401,7 @@ void GGIInterpolation<MasterPatch, SlavePatch>::findNeighboursAABB
                 scalar featureCos =
                     masterFaceNormals[faceMi] & slaveNormals[faceSi];
 
-                if (mag(featureCos) > featureCosTol_)
+                if (mag(featureCos) > featureCosTol_())
                 {
                     candidateMasterNeighbors[faceMi].append(faceSi);
                 }
@@ -440,7 +444,7 @@ void GGIInterpolation<MasterPatch, SlavePatch>::findNeighboursBBOctree
         treeBoundBox bbFaceMaster(facePoints);
 
         lmasterFaceBB[faceMi] =
-            bbFaceMaster.extend(faceBoundBoxExtendSpanFraction_);
+            bbFaceMaster.extend(faceBoundBoxExtendSpanFraction_());
     }
 
     // Initialize the list of slave patch faces bounding box
@@ -484,7 +488,7 @@ void GGIInterpolation<MasterPatch, SlavePatch>::findNeighboursBBOctree
         treeBoundBox bbFaceSlave(facePoints);
 
         lslaveFaceBB[faceSi] =
-            bbFaceSlave.extend(faceBoundBoxExtendSpanFraction_);
+            bbFaceSlave.extend(faceBoundBoxExtendSpanFraction_());
     }
 
     // Create the slave octreeData, using the boundBox flavor
@@ -499,9 +503,9 @@ void GGIInterpolation<MasterPatch, SlavePatch>::findNeighboursBBOctree
     (
         slaveOverallBB,              // overall search domain
         slaveDataBB,
-        octreeSearchMinNLevel_,      // min number of levels
-        octreeSearchMaxLeafRatio_,   // max avg. size of leaves
-        octreeSearchMaxShapeRatio_   // max avg. duplicity.
+        octreeSearchMinNLevel_(),      // min number of levels
+        octreeSearchMaxLeafRatio_(),   // max avg. size of leaves
+        octreeSearchMaxShapeRatio_()   // max avg. duplicity.
     );
 
     const vectorField& masterFaceNormals = masterPatch_.faceNormals();
@@ -538,7 +542,7 @@ void GGIInterpolation<MasterPatch, SlavePatch>::findNeighboursBBOctree
             scalar featureCos =
                 masterFaceNormals[faceMi] & slaveNormals[faceSi];
 
-            if (mag(featureCos) > featureCosTol_)
+            if (mag(featureCos) > featureCosTol_())
             {
                 candidateMasterNeighbors[faceMi].append(faceSi);
             }

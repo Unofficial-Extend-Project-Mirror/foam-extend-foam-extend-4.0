@@ -41,7 +41,7 @@ defineNamedTemplateTypeNameAndDebug(faePatchTypeField, 0);                    \
 template<>                                                                    \
 int faePatchTypeField::disallowDefaultFaePatchField                           \
 (                                                                             \
-    debug::debugSwitch("disallowDefaultFaePatchField", 0)                     \
+    debug::debugSwitchFromDict("disallowDefaultFaePatchField", 0)                     \
 );                                                                            \
 defineTemplateRunTimeSelectionTable(faePatchTypeField, patch);                \
 defineTemplateRunTimeSelectionTable(faePatchTypeField, patchMapper);          \

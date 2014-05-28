@@ -39,6 +39,7 @@ SourceFiles
 #define specieThermo_H
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+#include "controlSwitches.H"
 
 namespace Foam
 {
@@ -95,13 +96,13 @@ class specieThermo
     // Private data
 
         //- Convergence tolerance of energy -> temperature inversion functions
-        static const scalar tol_;
+        static const Foam::debug::tolerancesSwitch tol_;
 
         //- Max temperature jump of energy -> temperature inversion functions
-        static const scalar TJump_;
+        static const Foam::debug::tolerancesSwitch TJump_;
 
         //- Max number of iterations in energy->temperature inversion functions
-        static const int maxIter_;
+        static const Foam::debug::optimisationSwitch maxIter_;
 
 
     // Private member functions

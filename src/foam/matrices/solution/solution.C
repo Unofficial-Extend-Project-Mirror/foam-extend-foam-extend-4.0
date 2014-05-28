@@ -33,7 +33,7 @@ License
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-int Foam::solution::debug(::Foam::debug::debugSwitch("solution", 0));
+int Foam::solution::debug(::Foam::debug::debugSwitchFromDict("solution", 0));
 
 // List of sub-dictionaries to rewrite
 //! @cond localScope

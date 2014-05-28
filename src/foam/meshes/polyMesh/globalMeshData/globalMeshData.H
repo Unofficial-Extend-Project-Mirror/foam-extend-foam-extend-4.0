@@ -75,6 +75,7 @@ SourceFiles
 #include "Switch.H"
 #include "processorTopology.H"
 #include "labelPair.H"
+#include "controlSwitches.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -230,7 +231,7 @@ public:
     // Static data members
 
         //- Geomtric tolerance (fraction of bounding box)
-        static const Foam::scalar matchTol_;
+        static const Foam::debug::tolerancesSwitch matchTol_;
 
 
     // Constructors

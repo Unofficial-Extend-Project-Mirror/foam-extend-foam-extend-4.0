@@ -399,7 +399,7 @@ projectFaceCentres
 
         // Force the full search for the first point to ensure good
         // starting face
-        if (faceI == 0 || nSquaredProjection_)
+        if (faceI == 0 || nSquaredProjection_() > 0)
         {
             doNSquaredSearch = true;
         }
