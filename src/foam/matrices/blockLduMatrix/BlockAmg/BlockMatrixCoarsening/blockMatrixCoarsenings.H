@@ -21,41 +21,43 @@ License
     You should have received a copy of the GNU General Public License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
+Class
+    BlockMatrixCoarsening
+
+Description
+    Typedefs for block matrix AMG coarsening.
+
+Author
+    Klas Jareteg, 2012-12-15
+
+SourceFiles
+    blockMatrixCoarsenings.C
+
 \*---------------------------------------------------------------------------*/
 
-#include "blockAmgPolicies.H"
+#ifndef blockMatrixCoarsenings_H
+#define blockMatrixCoarsenings_H
+
+#include "BlockMatrixCoarsening.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 
-// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-defineNamedTemplateTypeNameAndDebug(blockScalarAmgPolicy, 0);
-defineNamedTemplateTypeNameAndDebug(blockVectorAmgPolicy, 0);
-defineNamedTemplateTypeNameAndDebug(blockTensorAmgPolicy, 0);
+typedef BlockMatrixCoarsening<scalar> blockScalarMatrixCoarsening;
+typedef BlockMatrixCoarsening<vector> blockVectorMatrixCoarsening;
+typedef BlockMatrixCoarsening<tensor> blockTensorMatrixCoarsening;
 
-defineTemplateRunTimeSelectionTable
-(
-    blockScalarAmgPolicy,
-    matrix
-);
-
-defineTemplateRunTimeSelectionTable
-(
-    blockVectorAmgPolicy,
-    matrix
-);
-
-defineTemplateRunTimeSelectionTable
-(
-    blockTensorAmgPolicy,
-    matrix
-);
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#endif
 
 // ************************************************************************* //

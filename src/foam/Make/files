@@ -661,8 +661,8 @@ $(BlockLduInterfaceField)/blockVectorNGAMGInterfaceFields.C
 
 matrices/blockLduMatrix/BlockAmg/blockAmgCycles.C
 matrices/blockLduMatrix/BlockAmg/blockAmgLevels.C
-matrices/blockLduMatrix/BlockAmg/BlockAmgPolicy/blockAmgPolicies.C
-matrices/blockLduMatrix/BlockAmg/BlockAmgPolicy/blockAamgPolicies.C
+matrices/blockLduMatrix/BlockAmg/BlockMatrixCoarsening/blockMatrixCoarsenings.C
+matrices/blockLduMatrix/BlockAmg/BlockMatrixCoarsening/blockMatrixAgglomerations.C
 
 matrices/blockLduMatrix/BlockLduPrecons/BlockLduPrecon/blockLduPrecons.C
 matrices/blockLduMatrix/BlockLduPrecons/BlockNoPrecon/blockNoPrecons.C

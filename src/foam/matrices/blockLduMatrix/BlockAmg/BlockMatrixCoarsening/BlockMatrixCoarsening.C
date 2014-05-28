@@ -22,18 +22,18 @@ License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    BlockAmgPolicy
+    BlockMatrixCoarsening
 
 \*---------------------------------------------------------------------------*/
 
-#include "BlockAmgPolicy.H"
+#include "BlockMatrixCoarsening.H"
 
 // * * * * * * * * * * * * * * * * Selectors * * * * * * * * * * * * * * * * //
 
 template<class Type>
-Foam::autoPtr<Foam::BlockAmgPolicy<Type> > Foam::BlockAmgPolicy<Type>::New
+Foam::autoPtr<Foam::BlockMatrixCoarsening<Type> > Foam::BlockMatrixCoarsening<Type>::New
 (
-    const word& policyType,
+    const word& coarseningType,
     const BlockLduMatrix<Type>& matrix,
     const dictionary& dict,
     const label groupSize,
@@ -41,27 +41,27 @@ Foam::autoPtr<Foam::BlockAmgPolicy<Type> > Foam::BlockAmgPolicy<Type>::New
 )
 {
     typename matrixConstructorTable::iterator constructorIter =
-        matrixConstructorTablePtr_->find(policyType);
+        matrixConstructorTablePtr_->find(coarseningType);
 
     if (constructorIter == matrixConstructorTablePtr_->end())
     {
         FatalErrorIn
         (
-            "autoPtr<BlockAmgPolicy<Type> > BlockAmgPolicy<Type>::New\n"
+            "autoPtr<BlockMatrixCoarsening<Type> > BlockMatrixCoarsening<Type>::New\n"
             "(\n"
-            "    const word& policyType,\n"
+            "    const word& coarseningType,\n"
             "    const lduMatrix& matrix,\n"
             "    const label groupSize\n"
             "    const label nCoarseCells\n"
             ")"
-        )   << "Unknown AMG policy " << policyType
+        )   << "Unknown AMG coarsening type. " << coarseningType
             << endl << endl
-            << "Valid AMG policies are :" << endl
+            << "Valid AMG coarsening types are :" << endl
             << matrixConstructorTablePtr_->toc()
             << exit(FatalError);
     }
 
-    return autoPtr<BlockAmgPolicy<Type> >
+    return autoPtr<BlockMatrixCoarsening<Type> >
     (
         constructorIter()
         (

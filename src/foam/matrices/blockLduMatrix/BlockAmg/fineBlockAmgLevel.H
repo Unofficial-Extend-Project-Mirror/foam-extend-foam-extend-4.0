@@ -55,7 +55,7 @@ template<class Type>
 class coarseBlockAmgLevel;
 
 template<class Type>
-class BlockAmgPolicy;
+class BlockMatrixCoarsening;
 
 /*---------------------------------------------------------------------------*\
                         Class fineBlockAmgLevel Declaration
@@ -74,8 +74,8 @@ class fineBlockAmgLevel
         //- Dictionary
         const dictionary& dict_;
 
-        //- AMG policy
-        autoPtr<BlockAmgPolicy<Type> > policyPtr_;
+        //- AMG coarsening
+        autoPtr<BlockMatrixCoarsening<Type> > coarseningPtr_;
 
         //- Smoother
         autoPtr<BlockLduSmoother<Type> > smootherPtr_;
@@ -101,7 +101,7 @@ public:
         (
             const BlockLduMatrix<Type>& matrix,
             const dictionary& dict,
-            const word& policyType,
+            const word& coarseningType,
             const label groupSize,
             const label minCoarseEqns,
             const word& smootherType

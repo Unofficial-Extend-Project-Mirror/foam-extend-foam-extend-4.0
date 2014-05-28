@@ -21,43 +21,22 @@ License
     You should have received a copy of the GNU General Public License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
-Class
-    BlockAmgPolicy
-
-Description
-    Typedefs for block AMG policies.
-
-Author
-    Klas Jareteg, 2012-12-15
-
-SourceFiles
-    blockAmgPolicies.C
-
 \*---------------------------------------------------------------------------*/
 
-#ifndef blockAmgPolicies_H
-#define blockAmgPolicies_H
-
-#include "BlockAmgPolicy.H"
+#include "blockMatrixAgglomerations.H"
+#include "blockMatrixCoarsenings.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-typedef BlockAmgPolicy<scalar> blockScalarAmgPolicy;
-typedef BlockAmgPolicy<vector> blockVectorAmgPolicy;
-typedef BlockAmgPolicy<tensor> blockTensorAmgPolicy;
-
+makeBlockMatrixCoarsenings(blockMatrixAgglomeration);
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-#endif
 
 // ************************************************************************* //

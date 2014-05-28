@@ -22,17 +22,17 @@ License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    BlockAamgPolicy
+    BlockMatrixAgglomeration
 
 Description
-    Agglomerative AMG policy, adjusted for BlockLduMatrix
+    Agglomerative block matrix AMG corsening, adjusted for BlockLduMatrix
 
 Author
     Klas Jareteg, 2012-12-13
 
 \*---------------------------------------------------------------------------*/
 
-#include "BlockAamgPolicy.H"
+#include "BlockMatrixAgglomeration.H"
 #include "coeffFields.H"
 #include "addToRunTimeSelectionTable.H"
 #include "BlockGAMGInterfaceField.H"
@@ -41,13 +41,13 @@ Author
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
 template<class Type>
-const Foam::scalar Foam::BlockAamgPolicy<Type>::weightFactor_ = 0.65;
+const Foam::scalar Foam::BlockMatrixAgglomeration<Type>::weightFactor_ = 0.65;
 
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
 template<class Type>
-void Foam::BlockAamgPolicy<Type>::calcChild()
+void Foam::BlockMatrixAgglomeration<Type>::calcChild()
 {
     // Algorithm:
     // 1) Create temporary equation addressing using a double-pass algorithm.
@@ -249,7 +249,7 @@ void Foam::BlockAamgPolicy<Type>::calcChild()
 
     if
     (
-        nCoarseEqns_ > BlockAmgPolicy<Type>::minCoarseEqns()
+        nCoarseEqns_ > BlockMatrixCoarsening<Type>::minCoarseEqns()
      && 3*nCoarseEqns_ <= 2*nRows
     )
     {
@@ -264,7 +264,7 @@ void Foam::BlockAamgPolicy<Type>::calcChild()
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 template<class Type>
-Foam::BlockAamgPolicy<Type>::BlockAamgPolicy
+Foam::BlockMatrixAgglomeration<Type>::BlockMatrixAgglomeration
 (
     const BlockLduMatrix<Type>& matrix,
     const dictionary& dict,
@@ -272,7 +272,7 @@ Foam::BlockAamgPolicy<Type>::BlockAamgPolicy
     const label minCoarseEqns
 )
 :
-    BlockAmgPolicy<Type>(matrix, dict, groupSize, minCoarseEqns),
+    BlockMatrixCoarsening<Type>(matrix, dict, groupSize, minCoarseEqns),
     matrix_(matrix),
     normPtr_
     (
@@ -292,7 +292,7 @@ Foam::BlockAamgPolicy<Type>::BlockAamgPolicy
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
 template<class Type>
-Foam::BlockAamgPolicy<Type>::~BlockAamgPolicy()
+Foam::BlockMatrixAgglomeration<Type>::~BlockMatrixAgglomeration()
 {}
 
 
@@ -300,13 +300,14 @@ Foam::BlockAamgPolicy<Type>::~BlockAamgPolicy()
 
 template<class Type>
 Foam::autoPtr<Foam::BlockLduMatrix<Type> >
-Foam::BlockAamgPolicy<Type>::restrictMatrix() const
+Foam::BlockMatrixAgglomeration<Type>::restrictMatrix() const
 {
     if (!coarsen_)
     {
         FatalErrorIn
         (
-            "autoPtr<amgMatrix> BlockAamgPolicy<Type>::restrictMatrix() const"
+            "autoPtr<amgMatrix> "
+            "BlockMatrixAgglomeration<Type>::restrictMatrix() const"
         )   << "Requesting coarse matrix when it cannot be created"
             << abort(FatalError);
     }
@@ -335,7 +336,7 @@ Foam::BlockAamgPolicy<Type>::restrictMatrix() const
     {
         FatalErrorIn
         (
-            "autoPtr<BlockLduMatrix<Type> > BlockAamgPolicy<Type>::"
+            "autoPtr<BlockLduMatrix<Type> > BlockMatrixAgglomeration<Type>::"
             "restrictMatrix() const"
         )   << "Child array does not correspond to fine level. " << endl
             << " Child size: " << child_.size()
@@ -671,39 +672,42 @@ Foam::BlockAamgPolicy<Type>::restrictMatrix() const
 
                     if (cCoeff >= 0)
                     {
-                        activeCoarseUpper[cCoeff] += activeFineUpper[fineCoeffI];
-                        activeCoarseLower[cCoeff] += activeFineLower[fineCoeffI];
+                        activeCoarseUpper[cCoeff]
+                            += activeFineUpper[fineCoeffI];
+                        activeCoarseLower[cCoeff]
+                            += activeFineLower[fineCoeffI];
                     }
                     else
                     {
                         // Add the fine face coefficients into the diagonal.
                         activeCoarseDiag[-1 - cCoeff] +=
-                            activeFineUpper[fineCoeffI] + activeFineLower[fineCoeffI];
+                            activeFineUpper[fineCoeffI]
+                          + activeFineLower[fineCoeffI];
                     }
                 }
             }
             else if (fineUpper.activeType() == blockCoeffBase::LINEAR)
             {
-                FatalErrorIn("autoPtr<amgMatrix> BlockAamgPolicy<Type>::restrictMatrix() const")
+                FatalErrorIn("autoPtr<amgMatrix> BlockMatrixAgglomeration<Type>::restrictMatrix() const")
                     << "Matrix diagonal of square type and upper of linear type is not implemented"
                     << abort(FatalError);
             }
             else
             {
-                FatalErrorIn("autoPtr<amgMatrix> BlockAamgPolicy<Type>::restrictMatrix() const")
+                FatalErrorIn("autoPtr<amgMatrix> BlockMatrixAgglomeration<Type>::restrictMatrix() const")
                     << "Matrix diagonal of square type and upper of scalar type is not implemented"
                     << abort(FatalError);
             }
         }
         else if (fineDiag.activeType() == blockCoeffBase::LINEAR)
         {
-                FatalErrorIn("autoPtr<amgMatrix> BlockAamgPolicy<Type>::restrictMatrix() const")
+                FatalErrorIn("autoPtr<amgMatrix> BlockMatrixAgglomeration<Type>::restrictMatrix() const")
                     << "Matrix diagonal of linear type not implemented"
                     << abort(FatalError);
         }
         else
         {
-                FatalErrorIn("autoPtr<amgMatrix> BlockAamgPolicy<Type>::restrictMatrix() const")
+                FatalErrorIn("autoPtr<amgMatrix> BlockMatrixAgglomeration<Type>::restrictMatrix() const")
                     << "Matrix diagonal of scalar type not implemented"
                     << abort(FatalError);
         }
@@ -726,24 +730,26 @@ Foam::BlockAamgPolicy<Type>::restrictMatrix() const
 
                     if (cCoeff >= 0)
                     {
-                        activeCoarseUpper[cCoeff] += activeFineUpper[fineCoeffI];
+                        activeCoarseUpper[cCoeff]
+                            += activeFineUpper[fineCoeffI];
                     }
                     else
                     {
                         // Add the fine face coefficient into the diagonal.
-                        activeCoarseDiag[-1 - cCoeff] += 2*activeFineUpper[fineCoeffI];
+                        activeCoarseDiag[-1 - cCoeff]
+                            += 2*activeFineUpper[fineCoeffI];
                     }
                 }
             }
             else if (fineUpper.activeType() == blockCoeffBase::LINEAR)
             {
-                FatalErrorIn("autoPtr<amgMatrix> BlockAamgPolicy<Type>::restrictMatrix() const")
+                FatalErrorIn("autoPtr<amgMatrix> BlockMatrixAgglomeration<Type>::restrictMatrix() const")
                     << "Matrix diagonal of square type and upper of linear type is not implemented"
                     << abort(FatalError);
             }
             else
             {
-                FatalErrorIn("autoPtr<amgMatrix> BlockAamgPolicy<Type>::restrictMatrix() const")
+                FatalErrorIn("autoPtr<amgMatrix> BlockMatrixAgglomeration<Type>::restrictMatrix() const")
                     << "Matrix diagonal of square type and upper of scalar type is not implemented"
                     << abort(FatalError);
             }
@@ -753,7 +759,7 @@ Foam::BlockAamgPolicy<Type>::restrictMatrix() const
         {
                 FatalErrorIn
                 (
-                    "autoPtr<amgMatrix> BlockAamgPolicy<Type>::"
+                    "autoPtr<amgMatrix> BlockMatrixAgglomeration<Type>::"
                     "restrictMatrix() const"
                 )   << "Matrix diagonal of linear type not implemented"
                     << abort(FatalError);
@@ -762,7 +768,7 @@ Foam::BlockAamgPolicy<Type>::restrictMatrix() const
         {
                 FatalErrorIn
                 (
-                    "autoPtr<amgMatrix> BlockAamgPolicy<Type>::"
+                    "autoPtr<amgMatrix> BlockMatrixAgglomeration<Type>::"
                     "restrictMatrix() const"
                 )   << "Matrix diagonal of scalar type not implemented"
                     << abort(FatalError);
@@ -780,7 +786,7 @@ Foam::BlockAamgPolicy<Type>::restrictMatrix() const
 
 
 template<class Type>
-void Foam::BlockAamgPolicy<Type>::restrictResidual
+void Foam::BlockMatrixAgglomeration<Type>::restrictResidual
 (
     const CoeffField<Type>& res,
     CoeffField<Type>& coarseRes
@@ -809,7 +815,7 @@ void Foam::BlockAamgPolicy<Type>::restrictResidual
     }
     else
     {
-        FatalErrorIn("void  BlockAamgPolicy<Type>::restrictResidual() const")
+        FatalErrorIn("void  BlockMatrixAgglomeration<Type>::restrictResidual() const")
             << "Only present for square type coeff type"
             << abort(FatalError);
     }
@@ -817,7 +823,7 @@ void Foam::BlockAamgPolicy<Type>::restrictResidual
 
 
 template<class Type>
-void Foam::BlockAamgPolicy<Type>::restrictResidual
+void Foam::BlockMatrixAgglomeration<Type>::restrictResidual
 (
     const Field<Type>& res,
     Field<Type>& coarseRes
@@ -833,7 +839,7 @@ void Foam::BlockAamgPolicy<Type>::restrictResidual
 
 
 template<class Type>
-void Foam::BlockAamgPolicy<Type>::prolongateCorrection
+void Foam::BlockMatrixAgglomeration<Type>::prolongateCorrection
 (
     Field<Type>& x,
     const Field<Type>& coarseX

@@ -50,7 +50,7 @@ Foam::coarseBlockAmgLevel<Type>::coarseBlockAmgLevel
 (
     autoPtr<BlockLduMatrix<Type> > matrixPtr,
     const dictionary& dict,
-    const word& policyType,
+    const word& coarseningType,
     const label groupSize,
     const label minCoarseEqns,
     const word& smootherType
@@ -60,11 +60,11 @@ Foam::coarseBlockAmgLevel<Type>::coarseBlockAmgLevel
     x_(matrixPtr_->diag().size(),pTraits<Type>::zero),
     b_(matrixPtr_->diag().size(),pTraits<Type>::zero),
     dict_(dict),
-    policyPtr_
+    coarseningPtr_
     (
-        BlockAmgPolicy<Type>::New
+        BlockMatrixCoarsening<Type>::New
         (
-            policyType,
+            coarseningType,
             matrixPtr_,
             dict_,
             groupSize,
@@ -148,13 +148,13 @@ void Foam::coarseBlockAmgLevel<Type>::restrictResidual
 
         residual(x, b, res);
 
-        policyPtr_->restrictResidual(res, coarseRes);
+        coarseningPtr_->restrictResidual(res, coarseRes);
 
     }
     else
     {
         // No pre-sweeps done: x = 0 and residual = b
-        policyPtr_->restrictResidual(b, coarseRes);
+        coarseningPtr_->restrictResidual(b, coarseRes);
     }
 }
 
@@ -166,7 +166,7 @@ void Foam::coarseBlockAmgLevel<Type>::prolongateCorrection
     const Field<Type>& coarseX
 ) const
 {
-    policyPtr_->prolongateCorrection(x, coarseX);
+    coarseningPtr_->prolongateCorrection(x, coarseX);
 }
 
 
@@ -279,17 +279,17 @@ void Foam::coarseBlockAmgLevel<Type>::scaleX
 template<class Type>
 Foam::autoPtr<Foam::BlockAmgLevel<Type> > Foam::coarseBlockAmgLevel<Type>::makeNextLevel() const
 {
-    if (policyPtr_->coarsen())
+    if (coarseningPtr_->coarsen())
     {
         return autoPtr<Foam::BlockAmgLevel<Type> >
         (
             new coarseBlockAmgLevel
             (
-                policyPtr_->restrictMatrix(),
+                coarseningPtr_->restrictMatrix(),
                 dict(),
-                policyPtr_->type(),
-                policyPtr_->groupSize(),
-                policyPtr_->minCoarseEqns(),
+                coarseningPtr_->type(),
+                coarseningPtr_->groupSize(),
+                coarseningPtr_->minCoarseEqns(),
                 smootherPtr_->type()
             )
         );

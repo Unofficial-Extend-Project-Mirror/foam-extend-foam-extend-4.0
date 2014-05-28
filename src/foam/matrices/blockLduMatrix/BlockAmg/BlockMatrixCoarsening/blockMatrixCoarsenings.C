@@ -23,8 +23,7 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "blockAamgPolicies.H"
-#include "blockAmgPolicies.H"
+#include "blockMatrixCoarsenings.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -33,7 +32,27 @@ namespace Foam
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-makeBlockAmgPolicys(blockAamgPolicy);
+defineNamedTemplateTypeNameAndDebug(blockScalarMatrixCoarsening, 0);
+defineNamedTemplateTypeNameAndDebug(blockVectorMatrixCoarsening, 0);
+defineNamedTemplateTypeNameAndDebug(blockTensorMatrixCoarsening, 0);
+
+defineTemplateRunTimeSelectionTable
+(
+    blockScalarMatrixCoarsening,
+    matrix
+);
+
+defineTemplateRunTimeSelectionTable
+(
+    blockVectorMatrixCoarsening,
+    matrix
+);
+
+defineTemplateRunTimeSelectionTable
+(
+    blockTensorMatrixCoarsening,
+    matrix
+);
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

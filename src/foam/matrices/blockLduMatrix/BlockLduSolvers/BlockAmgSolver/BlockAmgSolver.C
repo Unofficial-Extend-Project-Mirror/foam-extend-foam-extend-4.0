@@ -22,7 +22,7 @@ License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Description
-    Algebraic Multigrid solver with run-time selection of policy and cycle
+    Algebraic Multigrid solver with run-time selection of coarsening and cycle
 
 Author
     Klas Jareteg, 2013-04-15

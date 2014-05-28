@@ -70,8 +70,8 @@ class coarseBlockAmgLevel
         //- Dictionary
         const dictionary& dict_;
 
-        //- AMG policy
-        autoPtr<BlockAmgPolicy<Type> > policyPtr_;
+        //- AMG coarsening
+        autoPtr<BlockMatrixCoarsening<Type> > coarseningPtr_;
 
         //- Smoother
         autoPtr<BlockLduSmoother<Type> > smootherPtr_;
@@ -96,7 +96,7 @@ public:
         (
             autoPtr<BlockLduMatrix<Type> > matrixPtr,
             const dictionary& dict,
-            const word& policyType,
+            const word& coarseningType,
             const label groupSize,
             const label minCoarseEqns,
             const word& smootherType

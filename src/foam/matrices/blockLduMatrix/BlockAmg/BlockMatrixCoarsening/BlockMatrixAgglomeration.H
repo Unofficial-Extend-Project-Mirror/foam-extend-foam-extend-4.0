@@ -22,23 +22,23 @@ License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    BlockAamgPolicy
+    BlockMatrixAgglomeration
 
 Description
-    Agglomerative AMG policy
+    Agglomerative block matrix AMG coarsening
 
 Author
     Klas Jareteg, 2013-04-15
 
 SourceFiles
-    BlockAamgPolicy.C
+    BlockMatrixAgglomeration.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef BlockAamgPolicy_H
-#define BlockAamgPolicy_H
+#ifndef BlockMatrixAgglomeration_H
+#define BlockMatrixAgglomeration_H
 
-#include "BlockAmgPolicy.H"
+#include "BlockMatrixCoarsening.H"
 #include "BlockLduMatrix.H"
 #include "BlockCoeffNorm.H"
 #include "BlockCoeff.H"
@@ -51,13 +51,13 @@ namespace Foam
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 /*---------------------------------------------------------------------------*\
-                           Class BlockAamgPolicy Declaration
+                           Class BlockMatrixAgglomeration Declaration
 \*---------------------------------------------------------------------------*/
 
 template<class Type>
-class BlockAamgPolicy
+class BlockMatrixAgglomeration
 :
-    public BlockAmgPolicy<Type>
+    public BlockMatrixCoarsening<Type>
 {
 
 public:
@@ -85,10 +85,10 @@ public:
     // Private Member Functions
 
         //- Disallow default bitwise copy construct
-        BlockAamgPolicy(const BlockAamgPolicy<Type>&);
+        BlockMatrixAgglomeration(const BlockMatrixAgglomeration<Type>&);
 
         // Disallow default bitwise assignment
-        void operator=(const BlockAamgPolicy<Type>&);
+        void operator=(const BlockMatrixAgglomeration<Type>&);
 
         //- Calculate child
         void calcChild();
@@ -109,7 +109,7 @@ public:
     // Constructors
 
         //- Construct from matrix and group size
-        BlockAamgPolicy
+        BlockMatrixAgglomeration
         (
             const BlockLduMatrix<Type>& matrix,
             const dictionary& dict,
@@ -119,7 +119,7 @@ public:
 
     // Destructor
 
-        virtual ~BlockAamgPolicy();
+        virtual ~BlockMatrixAgglomeration();
 
 
     // Member Functions
@@ -165,7 +165,7 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-#   include "BlockAamgPolicy.C"
+#   include "BlockMatrixAgglomeration.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
