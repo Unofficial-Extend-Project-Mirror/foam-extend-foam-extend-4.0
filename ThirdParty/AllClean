@@ -27,6 +27,7 @@
 #
 # Description
 #     Cleanup script for ThirdParty packages.
+#     Add option alsoPackage to remove the installed files.
 #
 # Author:
 #     Martin Beaudoin, Hydro-Quebec, (2013)
@@ -50,22 +51,22 @@ echo ========================================
 echo
 
 # Cleaning stage 1
-./AllClean.stage1
+./AllClean.stage1 $1
 
 # Cleaning stage 2
-./AllClean.stage2
+./AllClean.stage2 $1
 
 # Cleaning stage 3
-./AllClean.stage3
+./AllClean.stage3 $1
 
 # Cleaning stage 4
-./AllClean.stage4
+./AllClean.stage4 $1
 
 # Cleaning stage 5
-./AllClean.stage5
+./AllClean.stage5 $1
 
 # Cleaning stage 6
-./AllClean.stage6
+./AllClean.stage6 $1
 
 echo ========================================
 echo Done ThirdParty Allclean

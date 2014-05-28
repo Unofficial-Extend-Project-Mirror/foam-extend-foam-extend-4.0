@@ -30,6 +30,7 @@
 #
 # Author:
 #     Martin Beaudoin, Hydro-Quebec, (2013)
+#     Add option alsoPackage to remove the installed files.
 #
 #------------------------------------------------------------------------------
 # run from third-party directory only
@@ -50,11 +51,11 @@ echo ========================================
 echo
 
 # openmpi
-uninstallPackage openmpi-1.4.1
-uninstallPackage openmpi-1.4.3
-uninstallPackage openmpi-1.5
-uninstallPackage openmpi-1.6.3
-uninstallPackage openmpi-1.6.5
+uninstallPackage openmpi-1.4.1 $1
+uninstallPackage openmpi-1.4.3 $1
+uninstallPackage openmpi-1.5 $1
+uninstallPackage openmpi-1.6.3 $1
+uninstallPackage openmpi-1.6.5 $1
 
 echo
 echo ========================================
