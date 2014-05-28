@@ -21,26 +21,10 @@ License
     You should have received a copy of the GNU General Public License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
-Class
-    BlockAmgPrecon
-
-Description
-    Typedefs for Amg preconditioning.
-
-Author
-    Klas Jareteg, 2012-12-13
-
-SourceFiles
-    blockAmgPrecons.C
-
 \*---------------------------------------------------------------------------*/
 
-#ifndef blockAmgPrecons_H
-#define blockAmgPrecons_H
-
-// KRJ: No specializations implemented
-//#include "scalarBlockAmgPrecon.H"
-#include "tensorBlockAmgPrecon.H"
+#ifndef tensorBlockAmgPrecon_H
+#define tensorBlockAmgPrecon_H
 
 #include "BlockAmgPrecon.H"
 
@@ -49,11 +33,29 @@ SourceFiles
 namespace Foam
 {
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+template<>
+void Foam::BlockAmgPrecon<tensor>::precondition
+(
+    tensorField& x,
+    const tensorField& b
+) const
+{
+    // Decoupled version
+    notImplemented("void Foam::BlockAmgPrecon<tensor>::precondition");
+}
 
-typedef BlockAmgPrecon<scalar> blockAmgPreconScalar;
-typedef BlockAmgPrecon<vector> blockAmgPreconVector;
-typedef BlockAmgPrecon<tensor> blockAmgPreconTensor;
+
+// template<>
+// void Foam::BlockAmgPrecon<tensor>::preconditionT
+// (
+//     tensorField& xT,
+//     const tensorField& bT
+// ) const
+// {
+//     // Decoupled version
+//     decoupledPreconditionT(xT, bT);
+// }
+
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

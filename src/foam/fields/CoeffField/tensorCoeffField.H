@@ -87,6 +87,7 @@ public:
 
 /* * * * * * * * * * * * * * * * Global functions  * * * * * * * * * * * * * */
 
+template<>
 tmp<CoeffField<tensor> > inv(const CoeffField<tensor>& f);
 
 

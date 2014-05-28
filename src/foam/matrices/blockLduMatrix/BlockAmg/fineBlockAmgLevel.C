@@ -34,12 +34,11 @@ Author
 
 #include "fineBlockAmgLevel.H"
 #include "coarseBlockAmgLevel.H"
-#include "ICCG.H"
-#include "BICCG.H"
-#include "BlockGaussSeidelSolver.H"
 #include "BlockSolverPerformance.H"
 #include "BlockCoeffNorm.H"
 #include "BlockCoeffTwoNorm.H"
+#include "BlockBiCGStabSolver.H"
+#include "BlockCGSolver.H"
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
@@ -194,7 +193,7 @@ void Foam::fineBlockAmgLevel<Type>::solve
                 dict_
             ).solve(x, b);
 
-        if (lduMatrix::debug >= 2)
+        if (BlockLduMatrix<Type>::debug >= 2)
         {
             coarseSolverPerf.print();
         }
@@ -209,7 +208,7 @@ void Foam::fineBlockAmgLevel<Type>::solve
                 dict_
             ).solve(x, b);
 
-        if (lduMatrix::debug >= 2)
+        if (BlockLduMatrix<Type>::debug >= 2)
         {
             coarseSolverPerf.print();
         }

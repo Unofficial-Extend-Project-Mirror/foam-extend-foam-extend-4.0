@@ -25,22 +25,18 @@ Class
     BlockAmgPrecon
 
 Description
-    Typedefs for Amg preconditioning.
+    Template specialisation for tensor block Amg preconditioning
 
 Author
-    Klas Jareteg, 2012-12-13
+    Hrvoje Jasak, Wikki Ltd.  All rights reserved.
 
 SourceFiles
-    blockAmgPrecons.C
+    tensorBlockAmgPrecon.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef blockAmgPrecons_H
-#define blockAmgPrecons_H
-
-// KRJ: No specializations implemented
-//#include "scalarBlockAmgPrecon.H"
-#include "tensorBlockAmgPrecon.H"
+#ifndef tensorBlockAmgPrecon_H
+#define tensorBlockAmgPrecon_H
 
 #include "BlockAmgPrecon.H"
 
@@ -49,11 +45,21 @@ SourceFiles
 namespace Foam
 {
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+template<>
+void Foam::BlockAmgPrecon<tensor>::precondition
+(
+    tensorField& x,
+    const tensorField& b
+) const;
 
-typedef BlockAmgPrecon<scalar> blockAmgPreconScalar;
-typedef BlockAmgPrecon<vector> blockAmgPreconVector;
-typedef BlockAmgPrecon<tensor> blockAmgPreconTensor;
+
+// template<>
+// void Foam::BlockAmgPrecon<tensor>::preconditionT
+// (
+//     tensorField& xT,
+//     const tensorField& bT
+// ) const;
+
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
