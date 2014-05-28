@@ -32,14 +32,9 @@ License
 
 #include "basicThermo.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-namespace Foam
-{
-
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-temperatureDirectedInletOutletVelocityFvPatchVectorField::
+Foam::temperatureDirectedInletOutletVelocityFvPatchVectorField::
 temperatureDirectedInletOutletVelocityFvPatchVectorField
 (
     const fvPatch& p,
@@ -60,26 +55,7 @@ temperatureDirectedInletOutletVelocityFvPatchVectorField
 }
 
 
-temperatureDirectedInletOutletVelocityFvPatchVectorField::
-temperatureDirectedInletOutletVelocityFvPatchVectorField
-(
-    const temperatureDirectedInletOutletVelocityFvPatchVectorField& ptf,
-    const fvPatch& p,
-    const DimensionedField<vector, volMesh>& iF,
-    const fvPatchFieldMapper& mapper
-)
-:
-    mixedFvPatchVectorField(ptf, p, iF, mapper),
-    phiName_(ptf.phiName_),
-    TName_(ptf.TName_),
-    T0_(ptf.T0_, mapper),
-    inletDir_(ptf.inletDir_, mapper),
-    cylindricalCCS_(ptf.cylindricalCCS_),
-    omega_(ptf.omega_)
-{}
-
-
-temperatureDirectedInletOutletVelocityFvPatchVectorField::
+Foam::temperatureDirectedInletOutletVelocityFvPatchVectorField::
 temperatureDirectedInletOutletVelocityFvPatchVectorField
 (
     const fvPatch& p,
@@ -108,7 +84,26 @@ temperatureDirectedInletOutletVelocityFvPatchVectorField
 }
 
 
-temperatureDirectedInletOutletVelocityFvPatchVectorField::
+Foam::temperatureDirectedInletOutletVelocityFvPatchVectorField::
+temperatureDirectedInletOutletVelocityFvPatchVectorField
+(
+    const temperatureDirectedInletOutletVelocityFvPatchVectorField& ptf,
+    const fvPatch& p,
+    const DimensionedField<vector, volMesh>& iF,
+    const fvPatchFieldMapper& mapper
+)
+:
+    mixedFvPatchVectorField(ptf, p, iF, mapper),
+    phiName_(ptf.phiName_),
+    TName_(ptf.TName_),
+    T0_(ptf.T0_, mapper),
+    inletDir_(ptf.inletDir_, mapper),
+    cylindricalCCS_(ptf.cylindricalCCS_),
+    omega_(ptf.omega_)
+{}
+
+
+Foam::temperatureDirectedInletOutletVelocityFvPatchVectorField::
 temperatureDirectedInletOutletVelocityFvPatchVectorField
 (
     const temperatureDirectedInletOutletVelocityFvPatchVectorField& pivpvf
@@ -124,7 +119,7 @@ temperatureDirectedInletOutletVelocityFvPatchVectorField
 {}
 
 
-temperatureDirectedInletOutletVelocityFvPatchVectorField::
+Foam::temperatureDirectedInletOutletVelocityFvPatchVectorField::
 temperatureDirectedInletOutletVelocityFvPatchVectorField
 (
     const temperatureDirectedInletOutletVelocityFvPatchVectorField& pivpvf,
@@ -143,18 +138,19 @@ temperatureDirectedInletOutletVelocityFvPatchVectorField
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-void temperatureDirectedInletOutletVelocityFvPatchVectorField::autoMap
+void Foam::temperatureDirectedInletOutletVelocityFvPatchVectorField::autoMap
 (
     const fvPatchFieldMapper& m
 )
 {
     mixedFvPatchVectorField::autoMap(m);
 
+    T0_.autoMap(m);
     inletDir_.autoMap(m);
 }
 
 
-void temperatureDirectedInletOutletVelocityFvPatchVectorField::rmap
+void Foam::temperatureDirectedInletOutletVelocityFvPatchVectorField::rmap
 (
     const fvPatchVectorField& ptf,
     const labelList& addr
@@ -163,13 +159,18 @@ void temperatureDirectedInletOutletVelocityFvPatchVectorField::rmap
     mixedFvPatchVectorField::rmap(ptf, addr);
 
     const temperatureDirectedInletOutletVelocityFvPatchVectorField& tiptf =
-        refCast<const temperatureDirectedInletOutletVelocityFvPatchVectorField>(ptf);
+        refCast<const temperatureDirectedInletOutletVelocityFvPatchVectorField>
+        (
+            ptf
+        );
 
+    T0_.rmap(tiptf.T0_, addr);
     inletDir_.rmap(tiptf.inletDir_, addr);
 }
 
 
-void temperatureDirectedInletOutletVelocityFvPatchVectorField::updateCoeffs()
+void
+Foam::temperatureDirectedInletOutletVelocityFvPatchVectorField::updateCoeffs()
 {
     if (updated())
     {
@@ -184,7 +185,8 @@ void temperatureDirectedInletOutletVelocityFvPatchVectorField::updateCoeffs()
     if (cylindricalCCS_)
     {
         scalar radius;
-        forAll(C, facei)
+
+        forAll (C, facei)
         {
             radius = sqrt(sqr(C[facei].x())+ sqr(C[facei].y()));
             inletDir[facei].z() = inletDirCCS[facei].z();
@@ -256,14 +258,18 @@ void temperatureDirectedInletOutletVelocityFvPatchVectorField::updateCoeffs()
 
 
 void
-temperatureDirectedInletOutletVelocityFvPatchVectorField::write(Ostream& os) const
+Foam::temperatureDirectedInletOutletVelocityFvPatchVectorField::write
+(
+    Ostream& os
+) const
 {
     fvPatchVectorField::write(os);
     os.writeKeyword("phi") << phiName_ << token::END_STATEMENT << nl;
     os.writeKeyword("T") << TName_ << token::END_STATEMENT << nl;
     T0_.writeEntry("T0", os);
     inletDir_.writeEntry("inletDirection", os);
-    os.writeKeyword("cylindricalCCS") << cylindricalCCS_ << token::END_STATEMENT << nl;
+    os.writeKeyword("cylindricalCCS")
+        << cylindricalCCS_ << token::END_STATEMENT << nl;
     os.writeKeyword("omega")<< omega_ << token::END_STATEMENT << nl;
     writeEntry("value", os);
 }
@@ -271,14 +277,16 @@ temperatureDirectedInletOutletVelocityFvPatchVectorField::write(Ostream& os) con
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
+namespace Foam
+{
+
 makePatchTypeField
 (
     fvPatchVectorField,
     temperatureDirectedInletOutletVelocityFvPatchVectorField
 );
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
 } // End namespace Foam
+
 
 // ************************************************************************* //

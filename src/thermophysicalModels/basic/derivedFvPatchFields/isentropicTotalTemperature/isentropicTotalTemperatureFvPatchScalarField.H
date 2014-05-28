@@ -85,8 +85,8 @@ public:
             const dictionary&
         );
 
-        //- Construct by mapping given isentropicTotalTemperatureFvPatchScalarField
-        //  onto a new patch
+        //- Construct by mapping given
+        //  isentropicTotalTemperatureFvPatchScalarField onto a new patch
         isentropicTotalTemperatureFvPatchScalarField
         (
             const isentropicTotalTemperatureFvPatchScalarField&,

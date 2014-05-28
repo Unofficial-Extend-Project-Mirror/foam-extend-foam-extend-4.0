@@ -61,17 +61,19 @@ class temperatureDirectedInletOutletVelocityFvPatchVectorField
         //- Name of static Temperature field
         word TName_;
 
-        //- Total Temperature field
+        //- Total temperature field
         scalarField T0_;
 
         //- Inlet direction
         vectorField inletDir_;
 
-        //- Is the supplied inlet value in cartesian or cylindrical coordinates?
+        //- Is the supplied inlet value in cartesian or
+        //  cylindrical coordinates?
         Switch cylindricalCCS_;
 
         //- Angular velocity of the frame
         vector omega_;
+
 
 public:
 
