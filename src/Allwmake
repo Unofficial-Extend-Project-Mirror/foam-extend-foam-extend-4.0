@@ -70,6 +70,7 @@ wmake libso equationReader
 wmake libso multiSolver
 
 wmake libso solidModels
+wmake libso dbns
 
 ( cd cudaSolvers ; ./Allwmake )
 
