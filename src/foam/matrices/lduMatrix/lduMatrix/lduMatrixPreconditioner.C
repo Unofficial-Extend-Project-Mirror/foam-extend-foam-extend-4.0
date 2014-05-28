@@ -104,7 +104,7 @@ Foam::lduPreconditioner::New
             )   << "Unknown symmetric matrix preconditioner "
                 << preconName << endl << endl
                 << "Valid symmetric matrix preconditioners are :" << endl
-                << symMatrixConstructorTablePtr_->toc()
+                << symMatrixConstructorTablePtr_->sortedToc()
                 << exit(FatalIOError);
         }
 
@@ -141,7 +141,7 @@ Foam::lduPreconditioner::New
             )   << "Unknown asymmetric matrix preconditioner "
                 << preconName << endl << endl
                 << "Valid asymmetric matrix preconditioners are :" << endl
-                << asymMatrixConstructorTablePtr_->toc()
+                << asymMatrixConstructorTablePtr_->sortedToc()
                 << exit(FatalIOError);
         }
 

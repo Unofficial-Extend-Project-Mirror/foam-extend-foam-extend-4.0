@@ -53,7 +53,7 @@ Foam::autoPtr<Foam::GAMGInterface> Foam::GAMGInterface::New
             "const labelField& neighbourRestrictAddressing)"
         )   << "Unknown GAMGInterface type " << coupleType << ".\n"
             << "Valid GAMGInterface types are :"
-            << lduInterfaceConstructorTablePtr_->toc()
+            << lduInterfaceConstructorTablePtr_->sortedToc()
             << exit(FatalError);
     }
 

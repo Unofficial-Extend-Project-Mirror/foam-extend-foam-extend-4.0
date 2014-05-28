@@ -64,7 +64,7 @@ autoPtr<thermalLaw> thermalLaw::New
         )   << "Unknown thermalLaw type "
             << rheoTypeName << endl << endl
             << "Valid  thermalLaws are : " << endl
-            << dictionaryConstructorTablePtr_->toc()
+            << dictionaryConstructorTablePtr_->sortedToc()
             << exit(FatalIOError);
     }
 

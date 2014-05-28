@@ -29,44 +29,15 @@ License
 #include "HashTable.H"
 #include "List.H"
 
-// * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * * //
-
-template<class T, class Key, class Hash>
-Foam::label Foam::HashTable<T, Key, Hash>::canonicalSize(const label size)
-{
-    if (size < 1)
-    {
-        return 0;
-    }
-
-    // enforce power of two
-    unsigned int goodSize = size;
-
-    if (goodSize & (goodSize - 1))
-    {
-        // brute-force is fast enough
-        goodSize = 1;
-        while (goodSize < unsigned(size))
-        {
-            goodSize <<= 1;
-        }
-    }
-
-    return goodSize;
-}
-
-
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 template<class T, class Key, class Hash>
 Foam::HashTable<T, Key, Hash>::HashTable(const label size)
 :
-    HashTableName(),
+    HashTableCore(),
     nElmts_(0),
-    tableSize_(canonicalSize(size)),
-    table_(NULL),
-    endIter_(*this, NULL, 0),
-    endConstIter_(*this, NULL, 0)
+    tableSize_(HashTableCore::canonicalSize(size)),
+    table_(NULL)
 {
     if (tableSize_)
     {
@@ -83,12 +54,10 @@ Foam::HashTable<T, Key, Hash>::HashTable(const label size)
 template<class T, class Key, class Hash>
 Foam::HashTable<T, Key, Hash>::HashTable(const HashTable<T, Key, Hash>& ht)
 :
-    HashTableName(),
+    HashTableCore(),
     nElmts_(0),
     tableSize_(ht.tableSize_),
-    table_(NULL),
-    endIter_(*this, NULL, 0),
-    endConstIter_(*this, NULL, 0)
+    table_(NULL)
 {
     if (tableSize_)
     {
@@ -112,12 +81,10 @@ Foam::HashTable<T, Key, Hash>::HashTable
     const Xfer<HashTable<T, Key, Hash> >& ht
 )
 :
-    HashTableName(),
+    HashTableCore(),
     nElmts_(0),
     tableSize_(0),
-    table_(NULL),
-    endIter_(*this, NULL, 0),
-    endConstIter_(*this, NULL, 0)
+    table_(NULL)
 {
     transfer(ht());
 }
@@ -181,7 +148,7 @@ Foam::HashTable<T, Key, Hash>::find
         {
             if (key == ep->key_)
             {
-                return iterator(*this, ep, hashIdx);
+                return iterator(this, ep, hashIdx);
             }
         }
     }
@@ -194,7 +161,7 @@ Foam::HashTable<T, Key, Hash>::find
     }
 #   endif
 
-    return end();
+    return iterator();
 }
 
 
@@ -213,7 +180,7 @@ Foam::HashTable<T, Key, Hash>::find
         {
             if (key == ep->key_)
             {
-                return const_iterator(*this, ep, hashIdx);
+                return const_iterator(this, ep, hashIdx);
             }
         }
     }
@@ -226,23 +193,32 @@ Foam::HashTable<T, Key, Hash>::find
     }
 #   endif
 
-    return cend();
+    return const_iterator();
 }
 
 
-// Return the table of contents
 template<class T, class Key, class Hash>
 Foam::List<Key> Foam::HashTable<T, Key, Hash>::toc() const
 {
-    List<Key> tofc(nElmts_);
-    label i = 0;
+    List<Key> keys(nElmts_);
+    label keyI = 0;
 
     for (const_iterator iter = cbegin(); iter != cend(); ++iter)
     {
-        tofc[i++] = iter.key();
+        keys[keyI++] = iter.key();
     }
 
-    return tofc;
+    return keys;
+}
+
+
+template<class T, class Key, class Hash>
+Foam::List<Key> Foam::HashTable<T, Key, Hash>::sortedToc() const
+{
+    List<Key> sortedLst = this->toc();
+    sort(sortedLst);
+
+    return sortedLst;
 }
 
 
@@ -280,7 +256,7 @@ bool Foam::HashTable<T, Key, Hash>::set
         table_[hashIdx] = new hashedEntry(key, table_[hashIdx], newEntry);
         nElmts_++;
 
-        if (double(nElmts_)/tableSize_ > 0.8)
+        if (double(nElmts_)/tableSize_ > 0.8 && tableSize_ < maxTableSize)
         {
 #           ifdef FULLDEBUG
             if (debug)
@@ -332,18 +308,22 @@ bool Foam::HashTable<T, Key, Hash>::set
 
 
 template<class T, class Key, class Hash>
-bool Foam::HashTable<T, Key, Hash>::erase(const iterator& cit)
+bool Foam::HashTable<T, Key, Hash>::iteratorBase::erase()
 {
-    if (cit.elmtPtr_)    // note: endIter_ also has 0 elmtPtr_
+    // note: entryPtr_ is NULL for end(), so this catches that too
+    if (entryPtr_)
     {
-        iterator& it = const_cast<iterator&>(cit);
-
-        // Search element before elmtPtr_
+        // Search element before entryPtr_
         hashedEntry* prev = 0;
 
-        for (hashedEntry* ep = table_[it.hashIndex_]; ep; ep = ep->next_)
+        for
+        (
+            hashedEntry* ep = hashTable_->table_[hashIndex_];
+            ep;
+            ep = ep->next_
+        )
         {
-            if (ep == it.elmtPtr_)
+            if (ep == entryPtr_)
             {
                 break;
             }
@@ -352,98 +332,76 @@ bool Foam::HashTable<T, Key, Hash>::erase(const iterator& cit)
 
         if (prev)
         {
-            // Have element before elmtPtr
-            prev->next_ = it.elmtPtr_->next_;
-            delete it.elmtPtr_;
-            it.elmtPtr_ = prev;
+            // has an element before entryPtr - reposition to there
+            prev->next_ = entryPtr_->next_;
+            delete entryPtr_;
+            entryPtr_ = prev;
         }
         else
         {
-            // elmtPtr is first element on SLList
-            table_[it.hashIndex_] = it.elmtPtr_->next_;
-            delete it.elmtPtr_;
+            // entryPtr was first element on SLList
+            hashTable_->table_[hashIndex_] = entryPtr_->next_;
+            delete entryPtr_;
 
-            // Search back for previous non-zero table entry
-            while (--it.hashIndex_ >= 0 && !table_[it.hashIndex_])
-            {}
+            // assign any non-NULL pointer value so it doesn't look
+            // like end()/cend()
+            entryPtr_ = reinterpret_cast<hashedEntry*>(this);
 
-            if (it.hashIndex_ >= 0)
-            {
-                // In table entry search for last element
-                it.elmtPtr_ = table_[it.hashIndex_];
-
-                while (it.elmtPtr_ && it.elmtPtr_->next_)
-                {
-                    it.elmtPtr_ = it.elmtPtr_->next_;
-                }
-            }
-            else
-            {
-                // No previous found. Mark with special value which is
-                // - not end()/cend()
-                // - handled by operator++
-                it.elmtPtr_ = reinterpret_cast<hashedEntry*>(this);
-                it.hashIndex_ = -1;
-            }
+            // Mark with special hashIndex value to signal it has been rewound.
+            // The next increment will bring it back to the present location.
+            //
+            // From the current position 'curPos', we wish to continue at
+            // prevPos='curPos-1', which we mark as markPos='-curPos-1'.
+            // The negative lets us notice it is special, the extra '-1'
+            // is needed to avoid ambiguity for position '0'.
+            // To retrieve prevPos, we would later use '-(markPos+1) - 1'
+            hashIndex_ = -hashIndex_ - 1;
         }
 
-        nElmts_--;
-
-#       ifdef FULLDEBUG
-        if (debug)
-        {
-            Info<< "HashTable<T, Key, Hash>::erase(iterator&) : "
-                << "hashedEntry " << it.elmtPtr_->key_ << " removed.\n";
-        }
-#       endif
+        hashTable_->nElmts_--;
 
         return true;
     }
     else
     {
-#       ifdef FULLDEBUG
-        if (debug)
-        {
-            Info<< "HashTable<T, Key, Hash>::erase(iterator&) : "
-                << "cannot remove hashedEntry from hash table\n";
-        }
-#       endif
-
         return false;
     }
+}
+
+
+
+// NOTE:
+// We use (const iterator&) here, but manipulate its contents anyhow.
+// The parameter should be (iterator&), but then the compiler doesn't find
+// it correctly and tries to call as (iterator) instead.
+//
+template<class T, class Key, class Hash>
+bool Foam::HashTable<T, Key, Hash>::erase(const iterator& iter)
+{
+    // adjust iterator after erase
+    return const_cast<iterator&>(iter).erase();
 }
 
 
 template<class T, class Key, class Hash>
 bool Foam::HashTable<T, Key, Hash>::erase(const Key& key)
 {
-    iterator fnd = find(key);
-
-    if (fnd != end())
-    {
-        return erase(fnd);
-    }
-    else
-    {
-        return false;
-    }
+    return erase(find(key));
 }
 
 
 template<class T, class Key, class Hash>
 Foam::label Foam::HashTable<T, Key, Hash>::erase(const UList<Key>& keys)
 {
+    const label nTotal = nElmts_;
     label count = 0;
 
-    // Remove listed keys from this table
-    if (this->size())
+    // Remove listed keys from this table - terminates early if possible
+    for (label keyI = 0; count < nTotal && keyI < keys.size(); ++keyI)
     {
-        forAll(keys, keyI)
+        if (erase(keys[keyI]))
         {
-            if (erase(keys[keyI]))
-            {
-                count++;
-            }
+            count++;
         }
     }
 
@@ -477,7 +435,7 @@ Foam::label Foam::HashTable<T, Key, Hash>::erase
 template<class T, class Key, class Hash>
 void Foam::HashTable<T, Key, Hash>::resize(const label sz)
 {
-    label newSize = canonicalSize(sz);
+    label newSize = HashTableCore::canonicalSize(sz);
 
     if (newSize == tableSize_)
     {
@@ -492,22 +450,22 @@ void Foam::HashTable<T, Key, Hash>::resize(const label sz)
         return;
     }
 
-    HashTable<T, Key, Hash>* newTable = new HashTable<T, Key, Hash>(newSize);
+    HashTable<T, Key, Hash>* tmpTable = new HashTable<T, Key, Hash>(newSize);
 
     for (const_iterator iter = cbegin(); iter != cend(); ++iter)
     {
-        newTable->insert(iter.key(), *iter);
+        tmpTable->insert(iter.key(), *iter);
     }
 
-    label oldTableSize = tableSize_;
-    tableSize_ = newTable->tableSize_;
-    newTable->tableSize_ = oldTableSize;
+    label oldSize = tableSize_;
+    tableSize_ = tmpTable->tableSize_;
+    tmpTable->tableSize_ = oldSize;
 
     hashedEntry** oldTable = table_;
-    table_ = newTable->table_;
-    newTable->table_ = oldTable;
+    table_ = tmpTable->table_;
+    tmpTable->table_ = oldTable;
 
-    delete newTable;
+    delete tmpTable;
 }
 
 
@@ -540,6 +498,19 @@ void Foam::HashTable<T, Key, Hash>::clearStorage()
 {
     clear();
     resize(0);
+}
+
+
+template<class T, class Key, class Hash>
+void Foam::HashTable<T, Key, Hash>::shrink()
+{
+    const label newSize = HashTableCore::canonicalSize(nElmts_);
+
+    if (newSize < tableSize_)
+    {
+        // avoid having the table disappear on us
+        resize(newSize ? newSize : 2);
+    }
 }
 
 
@@ -606,18 +577,12 @@ bool Foam::HashTable<T, Key, Hash>::operator==
     const HashTable<T, Key, Hash>& rhs
 ) const
 {
-    // Are all my elements in rhs?
-    for (const_iterator iter = cbegin(); iter != cend(); ++iter)
+    // sizes (number of keys) must match
+    if (size() != rhs.size())
     {
-        const_iterator fnd = rhs.find(iter.key());
-
-        if (fnd == rhs.cend() || fnd() != iter())
-        {
-            return false;
-        }
+        return false;
     }
 
-    // Are all rhs elements in me?
     for (const_iterator iter = rhs.cbegin(); iter != rhs.cend(); ++iter)
     {
         const_iterator fnd = find(iter.key());
@@ -627,6 +592,7 @@ bool Foam::HashTable<T, Key, Hash>::operator==
             return false;
         }
     }
+
     return true;
 }
 

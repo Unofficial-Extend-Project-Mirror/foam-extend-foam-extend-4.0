@@ -70,7 +70,7 @@ autoPtr<frictionContactModel> frictionContactModel::New
         )   << "Unknown frictionContactModel type "
             << name << endl << endl
             << "Valid  frictionContactModels are : " << endl
-            << dictionaryConstructorTablePtr_->toc()
+            << dictionaryConstructorTablePtr_->sortedToc()
             << exit(FatalIOError);
     }
 

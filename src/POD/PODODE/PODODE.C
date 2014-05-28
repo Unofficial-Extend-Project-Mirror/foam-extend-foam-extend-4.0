@@ -65,7 +65,7 @@ Foam::autoPtr<Foam::PODODE> Foam::PODODE::New
         )   << "Unknown PODODE type "
             << PODTypeName << endl << endl
             << "Valid  POD ODEs are : " << endl
-            << dictionaryConstructorTablePtr_->toc()
+            << dictionaryConstructorTablePtr_->sortedToc()
             << exit(FatalIOError);
     }
 

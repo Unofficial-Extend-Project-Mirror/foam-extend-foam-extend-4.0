@@ -79,7 +79,7 @@ Foam::autoPtr<Foam::lduMatrix::solver> Foam::lduMatrix::solver::New
                 "lduSolver::New", dict
             )   << "Unknown symmetric matrix solver " << solverName << nl << nl
                 << "Valid symmetric matrix solvers are :" << endl
-                << symMatrixConstructorTablePtr_->toc()
+                << symMatrixConstructorTablePtr_->sortedToc()
                 << exit(FatalIOError);
         }
 
@@ -110,7 +110,7 @@ Foam::autoPtr<Foam::lduMatrix::solver> Foam::lduMatrix::solver::New
                 "lduSolver::New", dict
             )   << "Unknown asymmetric matrix solver " << solverName << nl
                 << "Valid asymmetric matrix solvers are :" << endl
-                << asymMatrixConstructorTablePtr_->toc()
+                << asymMatrixConstructorTablePtr_->sortedToc()
                 << exit(FatalIOError);
         }
 

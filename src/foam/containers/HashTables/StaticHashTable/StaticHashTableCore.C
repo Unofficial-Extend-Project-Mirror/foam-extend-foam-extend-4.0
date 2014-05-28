@@ -23,10 +23,14 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "HashTable.H"
+#include "StaticHashTable.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-defineTypeNameAndDebug(Foam::HashTableName, 0);
+namespace Foam
+{
+defineTypeNameAndDebug(StaticHashTableCore, 0);
+}
+
 
 // ************************************************************************* //

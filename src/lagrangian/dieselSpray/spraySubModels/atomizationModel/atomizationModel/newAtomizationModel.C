@@ -60,7 +60,7 @@ autoPtr<atomizationModel> atomizationModel::New
             << atomizationModelType
             << ", constructor not in hash table" << endl << endl
             << "    Valid atomizationModel types are :" << endl;
-        Info<< dictionaryConstructorTablePtr_->toc() << abort(FatalError);
+        Info<< dictionaryConstructorTablePtr_->sortedToc() << abort(FatalError);
     }
 
     return autoPtr<atomizationModel>(cstrIter()(dict, sm));

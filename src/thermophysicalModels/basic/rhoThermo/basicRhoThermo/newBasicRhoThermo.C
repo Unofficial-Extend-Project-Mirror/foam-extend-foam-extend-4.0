@@ -67,7 +67,7 @@ Foam::autoPtr<Foam::basicRhoThermo> Foam::basicRhoThermo::New
         FatalErrorIn("basicRhoThermo::New(const fvMesh&, const objectRegistry&)")
             << "Unknown basicRhoThermo type " << thermoTypeName << nl << nl
             << "Valid basicRhoThermo types are:" << nl
-            << fvMeshConstructorTablePtr_->toc() << nl
+            << fvMeshConstructorTablePtr_->sortedToc() << nl
             << exit(FatalError);
     }
 

@@ -81,8 +81,8 @@ coordinateSystems/coordinateRotation/axisCoordinateRotation.C
 
 primitives/random/Random.C
 
-containers/HashTables/HashTable/HashTableName.C
-containers/HashTables/StaticHashTable/StaticHashTableName.C
+containers/HashTables/HashTable/HashTableCore.C
+containers/HashTables/StaticHashTable/StaticHashTableCore.C
 containers/Lists/SortableList/ParSortableListName.C
 containers/Lists/PackedList/PackedListName.C
 containers/Lists/ListOps/ListOps.C

@@ -90,7 +90,7 @@ autoPtr<fluxCorrector> fluxCorrector::New
             )   << "Unknown fluxCorrector type " << correctorTypeName
                 << endl << endl
                 << "Valid fluxCorrector types are: " << endl
-                << meshConstructorTablePtr_->toc()
+                << meshConstructorTablePtr_->sortedToc()
                 << exit(FatalError);
         }
 
