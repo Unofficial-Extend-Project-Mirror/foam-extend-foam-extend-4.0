@@ -22,85 +22,72 @@ License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    Foam::JobInfo
+    Foam::infoSwitch
+
+Author
+    Martin Beaudoin, Hydro-Quebec, 2014.  All rights reserved
 
 Description
-    Helper class for recording information about run/finished jobs.
-
-    Writes the following files:
-      - $FOAM_JOB_DIR/runningJobs
-      - $FOAM_JOB_DIR/finishedJobs
-
-SourceFiles
-    JobInfo.C
+    Handling of runtime controlSwitches.
+    Specialization of controlSwitches class for dimensionedConstant switches
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef JobInfo_H
-#define JobInfo_H
+#ifndef constantsSwitch_H
+#define constantsSwitch_H
 
-#include "dictionary.H"
-#include "fileName.H"
-#include "cpuTime.H"
-#include "infoSwitch.H"
+#include "controlSwitches.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 
-/*---------------------------------------------------------------------------*\
-                           Class JobInfo Declaration
-\*---------------------------------------------------------------------------*/
-
-class JobInfo
-:
-    public dictionary
+namespace debug
 {
-    // Private data
-        fileName runningJobPath_;
-        fileName finishedJobPath_;
-        cpuTime  cpuTime_;
 
-    // Private member functions
+// Typedefs
+// Hashtables to static class attributes addresses holding the
+// runtime dimensionedConstants values
+typedef std::map<std::string, std::list<controlSwitches<Foam::scalar> *> > ListConstantsControlSwitches;
 
-        bool write(Ostream&) const;
-        void end(const word& terminationType);
+extern ListConstantsControlSwitches* constantsSwitchValues_;
 
 
+class constantsSwitch
+    : public controlSwitches<Foam::scalar>
+{
 public:
+    constantsSwitch
+    (
+	const std::string& switchName,
+	const Foam::scalar& switchValue
+    )
+	:
+	controlSwitches<Foam::scalar>
+	(
+	    switchName,
+	    debug::constantsFromDict(switchName.c_str(), switchValue),
+	    debug::DIMENSIONEDCONSTANTS,
+	    &constantsSwitchValues_
+	)
+    {
+    }
 
-    static bool constructed;
-    static Foam::debug::infoSwitch writeJobInfo;
+    virtual ~constantsSwitch()
+    {
+    }
 
-    // Constructors
-
-        //- Construct null
-        JobInfo();
-
-
-    // Destructor
-
-        ~JobInfo();
-
-
-    // Member Functions
-
-        // Write
-
-            void write() const;
-
-            void end();
-
-            void exit();
-
-            void abort();
-
-            void signalEnd() const;
+   // Assignement operator
+    void operator=(const Foam::scalar& rhs)
+    {
+	controlSwitches<Foam::scalar>::operator=(rhs);
+    }
 };
 
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-extern JobInfo jobInfo;
+} // End namespace debug
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

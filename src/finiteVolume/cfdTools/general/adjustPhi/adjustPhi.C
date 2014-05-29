@@ -29,7 +29,7 @@ License
 #include "processorFvsPatchFields.H"
 #include "inletOutletFvPatchFields.H"
 #include "fvc.H"
-#include "controlSwitches.H"
+#include "tolerancesSwitch.H"
 
 // * * * * * * * * * * * * * * * Global Functions  * * * * * * * * * * * * * //
 

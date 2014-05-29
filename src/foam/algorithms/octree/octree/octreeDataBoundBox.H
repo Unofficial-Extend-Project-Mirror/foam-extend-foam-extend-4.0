@@ -49,7 +49,7 @@ Author
 #include "point.H"
 #include "className.H"
 #include "linePointRef.H"
-#include "controlSwitches.H"
+#include "tolerancesSwitch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

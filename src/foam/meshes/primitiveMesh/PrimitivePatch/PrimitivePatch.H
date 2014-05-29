@@ -57,7 +57,7 @@ SourceFiles
 #include "point.H"
 #include "intersection.H"
 #include "HashSet.H"
-#include "controlSwitches.H"
+#include "optimisationSwitch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

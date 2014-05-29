@@ -63,7 +63,7 @@ SourceFiles
 #include "ZoneIDs.H"
 #include "intersection.H"
 #include "Pair.H"
-#include "controlSwitches.H"
+#include "tolerancesSwitch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

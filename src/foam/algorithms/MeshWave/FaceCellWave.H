@@ -50,7 +50,7 @@ SourceFiles
 #include "boolList.H"
 #include "labelList.H"
 #include "primitiveFieldsFwd.H"
-#include "controlSwitches.H"
+#include "tolerancesSwitch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

@@ -66,7 +66,7 @@ SourceFiles
 #include "HashSet.H"
 #include "Map.H"
 #include "EdgeMap.H"
-#include "controlSwitches.H"
+#include "tolerancesSwitch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

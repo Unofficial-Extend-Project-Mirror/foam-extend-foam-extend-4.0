@@ -53,7 +53,8 @@ SourceFiles
 #include "intersection.H"
 #include "point2D.H"
 #include "NamedEnum.H"
-#include "controlSwitches.H"
+#include "tolerancesSwitch.H"
+#include "optimisationSwitch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

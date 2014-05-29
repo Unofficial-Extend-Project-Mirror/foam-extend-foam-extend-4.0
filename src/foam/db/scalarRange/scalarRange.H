@@ -40,7 +40,7 @@ SourceFiles
 #define scalarRange_H
 
 #include "scalar.H"
-#include "controlSwitches.H"
+#include "debugSwitch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

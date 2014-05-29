@@ -51,7 +51,8 @@ SourceFiles
 #include "primitivePatch.H"
 #include "typeInfo.H"
 #include "runTimeSelectionTables.H"
-#include "controlSwitches.H"
+#include "debugSwitch.H"
+#include "tolerancesSwitch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

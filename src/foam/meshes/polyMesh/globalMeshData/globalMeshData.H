@@ -75,7 +75,7 @@ SourceFiles
 #include "Switch.H"
 #include "processorTopology.H"
 #include "labelPair.H"
-#include "controlSwitches.H"
+#include "tolerancesSwitch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

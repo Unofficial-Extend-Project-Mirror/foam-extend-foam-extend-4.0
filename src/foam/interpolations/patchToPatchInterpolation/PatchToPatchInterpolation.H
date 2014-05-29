@@ -45,7 +45,7 @@ SourceFiles
 #include "FieldFields.H"
 #include "faceList.H"
 #include "intersection.H"
-#include "controlSwitches.H"
+#include "tolerancesSwitch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

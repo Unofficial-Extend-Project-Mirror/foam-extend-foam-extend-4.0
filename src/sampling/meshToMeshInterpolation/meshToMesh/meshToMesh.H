@@ -43,7 +43,7 @@ SourceFiles
 #include "fvPatchMapper.H"
 #include "scalarList.H"
 #include "className.H"
-#include "controlSwitches.H"
+#include "tolerancesSwitch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

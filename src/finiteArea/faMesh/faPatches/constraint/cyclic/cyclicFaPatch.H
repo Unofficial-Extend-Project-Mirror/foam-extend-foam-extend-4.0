@@ -38,7 +38,7 @@ SourceFiles
 #include "coupledFaPatch.H"
 #include "cyclicLduInterface.H"
 #include "cyclicPolyPatch.H"
-#include "controlSwitches.H"
+#include "tolerancesSwitch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

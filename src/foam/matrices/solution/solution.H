@@ -36,7 +36,7 @@ SourceFiles
 #define solution_H
 
 #include "IOdictionary.H"
-#include "controlSwitches.H"
+#include "debugSwitch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

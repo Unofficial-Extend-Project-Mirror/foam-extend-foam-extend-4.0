@@ -37,7 +37,7 @@ SourceFiles
 
 #include "faceList.H"
 #include "oppositeFace.H"
-#include "controlSwitches.H"
+#include "debugSwitch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

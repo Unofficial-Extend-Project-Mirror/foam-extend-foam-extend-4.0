@@ -22,85 +22,71 @@ License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    Foam::JobInfo
+    Foam::infoSwitch
+
+Author
+    Martin Beaudoin, Hydro-Quebec, 2014.  All rights reserved
 
 Description
-    Helper class for recording information about run/finished jobs.
-
-    Writes the following files:
-      - $FOAM_JOB_DIR/runningJobs
-      - $FOAM_JOB_DIR/finishedJobs
-
-SourceFiles
-    JobInfo.C
+    Handling of runtime controlSwitches.
+    Specialization of controlSwitches class for tolerances switches
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef JobInfo_H
-#define JobInfo_H
+#ifndef tolerancesSwitch_H
+#define tolerancesSwitch_H
 
-#include "dictionary.H"
-#include "fileName.H"
-#include "cpuTime.H"
-#include "infoSwitch.H"
+#include "controlSwitches.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 
-/*---------------------------------------------------------------------------*\
-                           Class JobInfo Declaration
-\*---------------------------------------------------------------------------*/
-
-class JobInfo
-:
-    public dictionary
+namespace debug
 {
-    // Private data
-        fileName runningJobPath_;
-        fileName finishedJobPath_;
-        cpuTime  cpuTime_;
 
-    // Private member functions
+// Typedefs
+// Hashtable to static class attributes addresses holding the
+// runtime tolerances switch values
+typedef std::map<std::string, std::list<controlSwitches<Foam::scalar> *> > ListTolerancesControlSwitches;
 
-        bool write(Ostream&) const;
-        void end(const word& terminationType);
+extern ListTolerancesControlSwitches* tolerancesSwitchValues_;
 
-
+class tolerancesSwitch
+    : public controlSwitches<Foam::scalar>
+{
 public:
+    tolerancesSwitch
+    (
+	const std::string& switchName,
+	const Foam::scalar& switchValue
+    )
+	:
+	controlSwitches<Foam::scalar>
+	(
+	    switchName,
+	    debug::tolerancesFromDict(switchName.c_str(), switchValue),
+	    debug::TOLERANCES,
+	    &tolerancesSwitchValues_
+	)
+    {
+    }
 
-    static bool constructed;
-    static Foam::debug::infoSwitch writeJobInfo;
+    virtual ~tolerancesSwitch()
+    {
+    }
 
-    // Constructors
-
-        //- Construct null
-        JobInfo();
-
-
-    // Destructor
-
-        ~JobInfo();
-
-
-    // Member Functions
-
-        // Write
-
-            void write() const;
-
-            void end();
-
-            void exit();
-
-            void abort();
-
-            void signalEnd() const;
+   // Assignement operator
+    void operator=(const Foam::scalar& rhs)
+    {
+	controlSwitches<Foam::scalar>::operator=(rhs);
+    }
 };
 
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-extern JobInfo jobInfo;
+} // End namespace debug
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

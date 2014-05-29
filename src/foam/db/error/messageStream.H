@@ -48,7 +48,7 @@ SourceFiles
 
 #include "label.H"
 #include "string.H"
-#include "controlSwitches.H"
+#include "debugSwitch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

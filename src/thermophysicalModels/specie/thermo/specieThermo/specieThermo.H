@@ -39,7 +39,8 @@ SourceFiles
 #define specieThermo_H
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-#include "controlSwitches.H"
+#include "optimisationSwitch.H"
+#include "tolerancesSwitch.H"
 
 namespace Foam
 {

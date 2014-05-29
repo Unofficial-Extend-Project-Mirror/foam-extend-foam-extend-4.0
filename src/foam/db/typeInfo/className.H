@@ -31,7 +31,7 @@ Description
 
 #include "word.H"
 #include "debug.H"
-#include "controlSwitches.H"
+#include "debugSwitch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

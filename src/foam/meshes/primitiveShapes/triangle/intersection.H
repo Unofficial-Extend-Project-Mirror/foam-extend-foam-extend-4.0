@@ -37,7 +37,7 @@ SourceFiles
 
 #include "scalar.H"
 #include "NamedEnum.H"
-#include "controlSwitches.H"
+#include "tolerancesSwitch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

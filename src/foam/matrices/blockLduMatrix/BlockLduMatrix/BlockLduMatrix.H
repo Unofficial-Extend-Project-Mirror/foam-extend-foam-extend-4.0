@@ -53,7 +53,7 @@ SourceFiles
 #include "HashSet.H"
 #include "BlockLduInterfaceFieldPtrsList.H"
 #include "Map.H"
-#include "controlSwitches.H"
+#include "optimisationSwitch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

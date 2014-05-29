@@ -38,7 +38,7 @@ SourceFiles
 #define fvSchemes_H
 
 #include "IOdictionary.H"
-#include "controlSwitches.H"
+#include "debugSwitch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

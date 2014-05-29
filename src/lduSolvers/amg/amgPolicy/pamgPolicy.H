@@ -40,7 +40,7 @@ SourceFiles
 
 #include "amgPolicy.H"
 #include "lduMatrix.H"
-#include "controlSwitches.H"
+#include "tolerancesSwitch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

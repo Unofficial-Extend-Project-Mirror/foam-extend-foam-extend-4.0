@@ -32,7 +32,11 @@ Description
 #include "OSspecific.H"
 #include "dimensionedConstants.H"
 #include "SortableList.H"
-#include "controlSwitches.H"
+#include "debugSwitch.H"
+#include "infoSwitch.H"
+#include "optimisationSwitch.H"
+#include "tolerancesSwitch.H"
+#include "constantsSwitch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

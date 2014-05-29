@@ -43,7 +43,7 @@ SourceFiles
 
 #include "faPatch.H"
 #include "DimensionedField.H"
-#include "controlSwitches.H"
+#include "debugSwitch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

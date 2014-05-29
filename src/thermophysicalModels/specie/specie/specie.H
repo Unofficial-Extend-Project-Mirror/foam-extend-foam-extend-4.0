@@ -39,7 +39,7 @@ SourceFiles
 #include "word.H"
 #include "scalar.H"
 #include "debug.H"
-#include "controlSwitches.H"
+#include "constantsSwitch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

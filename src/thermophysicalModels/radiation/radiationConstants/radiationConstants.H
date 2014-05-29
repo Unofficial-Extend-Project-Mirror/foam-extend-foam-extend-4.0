@@ -33,6 +33,7 @@ Description
 #define radiationConstants_H
 
 #include "dimensionedScalar.H"
+#include "constantsSwitch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

@@ -45,7 +45,7 @@ SourceFiles
 #include "HashTable.H"
 #include "string.H"
 #include "NamedEnum.H"
-#include "controlSwitches.H"
+#include "optimisationSwitch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

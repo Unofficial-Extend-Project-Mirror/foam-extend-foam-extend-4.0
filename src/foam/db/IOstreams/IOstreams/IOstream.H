@@ -49,7 +49,7 @@ SourceFiles
 #include "scalar.H"
 #include "fileName.H"
 #include "InfoProxy.H"
-#include "controlSwitches.H"
+#include "infoSwitch.H"
 
 #include "debug.H"
 

@@ -22,85 +22,72 @@ License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    Foam::JobInfo
+    Foam::infoSwitch
+
+Author
+    Martin Beaudoin, Hydro-Quebec, 2014.  All rights reserved
 
 Description
-    Helper class for recording information about run/finished jobs.
-
-    Writes the following files:
-      - $FOAM_JOB_DIR/runningJobs
-      - $FOAM_JOB_DIR/finishedJobs
-
-SourceFiles
-    JobInfo.C
+    Handling of runtime controlSwitches.
+    Specialization of controlSwitches class for optimisation switches
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef JobInfo_H
-#define JobInfo_H
+#ifndef optimisationSwitch_H
+#define optimisationSwitch_H
 
-#include "dictionary.H"
-#include "fileName.H"
-#include "cpuTime.H"
-#include "infoSwitch.H"
+#include "controlSwitches.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 
-/*---------------------------------------------------------------------------*\
-                           Class JobInfo Declaration
-\*---------------------------------------------------------------------------*/
-
-class JobInfo
-:
-    public dictionary
+namespace debug
 {
-    // Private data
-        fileName runningJobPath_;
-        fileName finishedJobPath_;
-        cpuTime  cpuTime_;
 
-    // Private member functions
-
-        bool write(Ostream&) const;
-        void end(const word& terminationType);
+// Typedefs
+// Hashtable to static class attributes addresses holding the
+// runtime optimisation switch values
+typedef std::map<std::string, std::list<controlSwitches<int> *> > ListOptimisationControlSwitches;
+extern ListOptimisationControlSwitches* optimisationSwitchValues_;
 
 
+class optimisationSwitch
+    : public controlSwitches<int>
+{
 public:
+    optimisationSwitch
+    (
+	const std::string& switchName,
+	const int& switchValue
+    )
+	:
+	controlSwitches<int>
+	(
+	    switchName,
+	    debug::optimisationSwitchFromDict(switchName.c_str(), switchValue),
+	    debug::OPTIMISATIONSWITCHES,
+	    &optimisationSwitchValues_
+	)
+    {}
 
-    static bool constructed;
-    static Foam::debug::infoSwitch writeJobInfo;
+    virtual ~optimisationSwitch()
+    {
+    }
 
-    // Constructors
-
-        //- Construct null
-        JobInfo();
-
-
-    // Destructor
-
-        ~JobInfo();
+    // Assignement operator
+    void operator=(const int& rhs)
+    {
+	controlSwitches<int>::operator=(rhs);
+    }
 
 
-    // Member Functions
-
-        // Write
-
-            void write() const;
-
-            void end();
-
-            void exit();
-
-            void abort();
-
-            void signalEnd() const;
 };
 
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-extern JobInfo jobInfo;
+} // End namespace debug
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

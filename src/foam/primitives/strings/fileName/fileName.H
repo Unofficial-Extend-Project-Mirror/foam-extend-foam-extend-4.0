@@ -45,7 +45,7 @@ SourceFiles
 #define fileName_H
 
 #include "word.H"
-#include "controlSwitches.H"
+#include "debugSwitch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
