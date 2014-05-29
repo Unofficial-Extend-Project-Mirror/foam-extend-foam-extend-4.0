@@ -494,8 +494,8 @@ endif
 
 # PyFoam
 # ~~~~~~
-if ( $?PYFOAM_SYSTEM == 0 && -e "$WM_THIRD_PARTY_DIR"/packages/PyFoam-0.6.2/platforms/noarch ) then
-    _foamSource $WM_THIRD_PARTY_DIR/packages/PyFoam-0.6.2/platforms/noarch/etc/PyFoam-0.6.2.csh
+if ( $?PYFOAM_SYSTEM == 0 && -e "$WM_THIRD_PARTY_DIR"/packages/PyFoam-0.6.3/platforms/noarch ) then
+    _foamSource $WM_THIRD_PARTY_DIR/packages/PyFoam-0.6.3/platforms/noarch/etc/PyFoam-0.6.3.csh
 endif
 
 # hwloc
