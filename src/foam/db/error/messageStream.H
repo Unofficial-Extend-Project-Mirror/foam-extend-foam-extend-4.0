@@ -48,6 +48,7 @@ SourceFiles
 
 #include "label.H"
 #include "string.H"
+#include "controlSwitches.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -93,7 +94,7 @@ public:
 
     // Debug switches
 
-        static int level;
+        static debug::debugSwitch level;
 
 
     // Constructors

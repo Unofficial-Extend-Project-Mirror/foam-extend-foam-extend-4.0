@@ -37,6 +37,7 @@ SourceFiles
 
 #include "faceList.H"
 #include "oppositeFace.H"
+#include "controlSwitches.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -66,7 +67,7 @@ public:
         static const char* const typeName;
 
     //- Debug switch
-        static int debug;
+        static Foam::debug::debugSwitch debug;
 
     // Constructors
 

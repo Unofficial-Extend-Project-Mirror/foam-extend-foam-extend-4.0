@@ -30,7 +30,13 @@ License
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
 defineRunTimeSelectionTable(Foam::functionObject, dictionary);
-int Foam::functionObject::debug(Foam::debug::debugSwitchFromDict("functionObject", 0));
+
+Foam::debug::debugSwitch
+Foam::functionObject::debug
+(
+    "functionObject",
+    0
+);
 
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //

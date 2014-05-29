@@ -39,9 +39,11 @@ namespace Foam
 {
     defineTypeNameAndDebug(polyPatch, 0);
 
-    int polyPatch::disallowGenericPolyPatch
+    debug::debugSwitch
+    polyPatch::disallowGenericPolyPatch
     (
-        debug::debugSwitchFromDict("disallowGenericPolyPatch", 0)
+        "disallowGenericPolyPatch",
+	0
     );
 
     defineRunTimeSelectionTable(polyPatch, word);

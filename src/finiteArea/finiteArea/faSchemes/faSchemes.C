@@ -35,7 +35,12 @@ Description
 namespace Foam
 {
 
-int faSchemes::debug(Foam::debug::debugSwitchFromDict("faSchemes", false));
+Foam::debug::debugSwitch
+faSchemes::debug
+(
+    "faSchemes",
+    false
+);
 
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //

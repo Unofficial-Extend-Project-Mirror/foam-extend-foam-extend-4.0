@@ -38,6 +38,7 @@ SourceFiles
 #define faSchemes_H
 
 #include "IOdictionary.H"
+#include "controlSwitches.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -90,7 +91,7 @@ private:
 public:
 
     //- Debug switch
-    static int debug;
+    static debug::debugSwitch debug;
 
 
     // Constructors

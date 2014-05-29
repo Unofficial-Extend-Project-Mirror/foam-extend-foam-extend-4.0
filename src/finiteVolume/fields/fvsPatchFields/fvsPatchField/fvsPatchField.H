@@ -98,7 +98,7 @@ public:
     TypeName("fvsPatchField");
 
     //- Debug switch to disallow the use of
-    static int disallowDefaultFvsPatchField;
+    static debug::debugSwitch disallowDefaultFvsPatchField;
 
 
     // Declare run-time constructor selection tables

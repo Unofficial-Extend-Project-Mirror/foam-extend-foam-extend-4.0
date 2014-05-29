@@ -32,7 +32,14 @@ License
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
 const char* const Foam::fileName::typeName = "fileName";
-int Foam::fileName::debug(debug::debugSwitchFromDict(fileName::typeName, 0));
+
+Foam::debug::debugSwitch
+Foam::fileName::debug
+(
+    fileName::typeName,
+    0
+);
+
 const Foam::fileName Foam::fileName::null;
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //

@@ -226,7 +226,7 @@ public:
     // Static data
 
         //- Debug switch to disallow the use of genericPolyPatch
-        static int disallowGenericPolyPatch;
+        static debug::debugSwitch disallowGenericPolyPatch;
 
         //- Relative tolerance (for geometric matching)
         //  Calculated as a factor of maximum edge length per face.

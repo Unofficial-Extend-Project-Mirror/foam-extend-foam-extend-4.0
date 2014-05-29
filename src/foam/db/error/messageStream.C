@@ -29,7 +29,12 @@ License
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-int Foam::messageStream::level(Foam::debug::debugSwitchFromDict("level", 2));
+Foam::debug::debugSwitch
+Foam::messageStream::level
+(
+    "level",
+    2
+);
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
