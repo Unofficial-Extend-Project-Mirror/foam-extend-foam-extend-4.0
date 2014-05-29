@@ -121,8 +121,8 @@ leastSquaresGrad<Type>::grad
             forAll(neiVsf, patchFaceI)
             {
                 lsGrad[faceCells[patchFaceI]] +=
-                    patchOwnLs[patchFaceI]
-                   *(neiVsf[patchFaceI] - vsf[faceCells[patchFaceI]]);
+                    patchOwnLs[patchFaceI]*
+                    (neiVsf[patchFaceI] - vsf[faceCells[patchFaceI]]);
             }
         }
         else
@@ -132,8 +132,8 @@ leastSquaresGrad<Type>::grad
             forAll(patchVsf, patchFaceI)
             {
                 lsGrad[faceCells[patchFaceI]] +=
-                     patchOwnLs[patchFaceI]
-                    *(patchVsf[patchFaceI] - vsf[faceCells[patchFaceI]]);
+                     patchOwnLs[patchFaceI]*
+                    (patchVsf[patchFaceI] - vsf[faceCells[patchFaceI]]);
             }
         }
     }
