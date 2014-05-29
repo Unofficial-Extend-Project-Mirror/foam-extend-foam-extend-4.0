@@ -130,11 +130,12 @@ if(GIT_FOUND)
      ARGS id
          OUTPUT_VARIABLE GIT_BRANCH_NAME
        )
+       string(REPLACE " " "_" GIT_BRANCH_NAME ${GIT_BRANCH_NAME})
+       string(REPLACE "+" "_modified" GIT_BRANCH_NAME ${GIT_BRANCH_NAME})
+       SET(GIT_BRANCH_NAME "hg_${GIT_BRANCH_NAME}")
        message("Git branch (mercurial): ${GIT_BRANCH_NAME}")
     endif()
-    SET(BUILDNAME "${BUILDNAME}-git-branch='hg_${GIT_BRANCH_NAME}'")
-    string(REPLACE " " "_" BUILDNAME ${BUILDNAME})
-    string(REPLACE "+" "_modified" BUILDNAME ${BUILDNAME})
+    SET(BUILDNAME "${BUILDNAME}-git-branch=${GIT_BRANCH_NAME}")
 endif()
 
 # Some last minute cleanup
