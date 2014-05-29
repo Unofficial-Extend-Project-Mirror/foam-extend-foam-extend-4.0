@@ -248,7 +248,13 @@ MACPORTOPENMPI)
 	export FOAM_MPI_LIBBIN=$FOAM_LIBBIN/$FOAM_MPI
 	_foamAddLib     $libDir
 	unset libDir
-	;;
+
+	which mpirun >/dev/null
+	if [ $? -ne 0 ]
+	then
+	    export WM_MPIRUN_PROG=mpirun-openmpi-$WM_MACPORT_MPI_VERSION
+	fi
+ 	;;
 
 MACPORTMPICH)
     export FOAM_MPI=mpich-macports-$WM_MACPORT_MPI_VERSION
@@ -260,6 +266,11 @@ MACPORTMPICH)
     _foamAddLib     $libDir
     unset libDir
 
+    which mpirun >/dev/null
+    if [ $? -ne 0 ]
+    then
+	export WM_MPIRUN_PROG=mpirun-mpich-$WM_MACPORT_MPI_VERSION
+    fi
     ;;
 
 SYSTEMOPENMPI)
