@@ -107,58 +107,160 @@ edges
     arc  C1 C3  (calc(r3*cos((angleA+angleC)/2)) calc(r3*sin((angleA+angleC)/2)) zB)
 );
 
-patches
+boundary
 (
-    patch outflow
-    (
-        ( B5 B7 C3 C1 )
-    )
-    patch inflow
-    (
-        ( A0 B0 B2 A2 )
-    )
+    outflow
+    {
+        type patch;
+        faces
+        (
+            (B5 B7 C3 C1)
+        );
+    }
+    
+    inflow
+    {
+        type patch;
+        faces
+        (
+            (A0 B0 B2 A2)
+        );
+    }
 
-    cyclicGgi upstreamPerio1
-    (
-        (B4 B5 C1 C0)
-    )
+    upstreamPerio1
+    {
+        type cyclicGgi;
 
-    cyclicGgi upstreamPerio2
-    (
-        (B6 C2 C3 B7)
-    )
+        shadowPatch upstreamPerio2;
+        zone upstreamPerio1Zone;
+        bridgeOverlap false;
+        rotationAxis (0 0 1);
+        rotationAngle 36;
+        separationOffset (0 0 0);
 
-    mixingPlane upstreamMixingPlanePatch
-    (
-        ( B4 C0 C2 B6 )
-    )
+        faces
+        (
+            (B4 B5 C1 C0)
+        );
+    }
 
-    mixingPlane downstreamMixingPlanePatch
-    (
-        ( A1 A3 B3 B1 )
-    )
+    upstreamPerio2
+    {
+        type cyclicGgi;
 
-    symmetryPlane downstreamWall
-    (
-        ( A0 A2 A3 A1 )
-        ( B0 B1 B3 B2 )
-    )
+        shadowPatch upstreamPerio1;
+        zone upstreamPerio2Zone;
+        bridgeOverlap false;
+        rotationAxis (0 0 1);
+        rotationAngle -36;
+        separationOffset (0 0 0);
 
-    symmetryPlane upstreamWall
-    (
-        ( C1 C3 C2 C0)
-        (B4 B6 B7 B5)
-    )
+        faces
+        (
+            (B6 C2 C3 B7)
+        );
+    }
 
-    cyclicGgi downstreamPerio1
-    (
-        (A0 A1 B1 B0)
-    )
+    upstreamMixingPlanePatch
+    {
+        type mixingPlane;
 
-    cyclicGgi downstreamPerio2
-    (
-        (A2 B2 B3 A3)
-    )
+        shadowPatch downstreamMixingPlanePatch;
+        zone upstreamMixingPlaneZone;
+        ribbonPatch
+        {
+            discretisation  bothPatches;
+            sweepAxis       Theta;
+            stackAxis       Z;
+        }
+
+        coordinateSystem
+        {
+            type cylindrical;
+            origin (0 0 0);
+            axis (0 0 1);
+            direction (1 1 0);
+        }
+
+        faces
+        (
+            (B4 C0 C2 B6)
+        );
+    }
+
+    downstreamMixingPlanePatch
+    {
+        type mixingPlane;
+
+        shadowPatch upstreamMixingPlanePatch;
+        zone downstreamMixingPlaneZone;
+        coordinateSystem
+        {
+            type cylindrical;
+            origin (0 0 0);
+            axis (0 0 1);
+            direction (1 1 0);
+        }
+
+        faces
+        (
+            (A1 A3 B3 B1)
+        );
+    }
+
+    downstreamWall
+    {
+        type symmetryPlane;
+        faces
+        (
+            (A0 A2 A3 A1)
+            (B0 B1 B3 B2)
+        );
+    }
+
+    upstreamWall
+    {
+        type symmetryPlane;
+        faces
+        (
+            (C1 C3 C2 C0)
+            (B4 B6 B7 B5)
+        );
+    }
+
+    downstreamPerio1
+    {
+        type cyclicGgi;
+
+        shadowPatch downstreamPerio2;
+        zone downstreamPerio1Zone;
+        bridgeOverlap false;
+        rotationAxis (0 0 1);
+        rotationAngle 90;
+        separationOffset (0 0 0);
+
+        faces
+        (
+            (A0 A1 B1 B0)
+        );
+    }
+
+    downstreamPerio2
+    {
+        type cyclicGgi;
+
+        shadowPatch downstreamPerio1;
+        zone downstreamPerio2Zone;
+        bridgeOverlap false;
+        rotationAxis (0 0 1);
+        rotationAngle -90;
+        separationOffset (0 0 0);
+
+        faces
+        (
+            (A2 B2 B3 A3)
+        );
+    }
 
 );
 

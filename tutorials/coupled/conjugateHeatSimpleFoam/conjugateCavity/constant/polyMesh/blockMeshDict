@@ -45,7 +45,7 @@ boundary
         faces
         (
             (3 7 6 2)
-        )
+        );
     }
     left
     {
@@ -53,15 +53,25 @@ boundary
         faces
         (
             (0 4 7 3)
-        )
+        );
     }
     right
     {
-        type wall;
+        type regionCouple;
+
+        shadowRegion    solid;
+        shadowPatch     left;
+        attached        off;
+        isWall          on;
+
+        zone            rightZone;
+        master          on;
+        bridgeOverlap   off;
+
         faces
         (
             (2 6 5 1)
-        )
+        );
     }
     bottom
     {

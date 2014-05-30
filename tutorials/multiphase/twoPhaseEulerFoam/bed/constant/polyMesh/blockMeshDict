@@ -48,29 +48,45 @@ edges
 (
 );
 
-patches
+boundary
 (
-    patch top
-    (
-        (3 2 6 7)
-    )
+    top
+    {
+        type patch;
+        faces
+        (
+            (3 2 6 7)
+        );
+    }
 
-    patch bottom
-    (
-        (1 0 4 5)
-    )
+    bottom
+    {
+        type patch;
+        faces
+        (
+            (1 0 4 5)
+        );
+    }
 
-    wall walls
-    (
-        (2 1 5 6)
-        (0 3 7 4)
-    )
+    walls
+    {
+        type wall;
+        faces
+        (
+            (2 1 5 6)
+            (0 3 7 4)
+        );
+    }
 
-    empty frontBack
-    (
-        (0 1 2 3)
-        (7 6 5 4)
-    )
+    frontBack
+    {
+        type empty;
+        faces
+        (
+            (0 1 2 3)
+            (7 6 5 4)
+        );
+    }
 );
 
 // ************************************************************************* //

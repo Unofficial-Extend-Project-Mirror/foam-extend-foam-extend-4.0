@@ -48,6 +48,7 @@ boundary
             (1 5 4 0)
         );
     }
+
     inlet
     {
         type patch;
@@ -56,6 +57,7 @@ boundary
             (0 4 7 3)
         );
     }
+
     outlet
     {
         type patch;
@@ -64,6 +66,7 @@ boundary
             (2 6 5 1)
         );
     }
+
     lowerWall
     {
         type wall;
@@ -72,6 +75,7 @@ boundary
             (0 3 2 1)
         );
     }
+
     upperWall
     {
         type patch;

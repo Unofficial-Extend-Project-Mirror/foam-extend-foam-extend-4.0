@@ -7,12 +7,10 @@
 application=`getApplication`
 
 runApplication -l log.blockMesh.solid blockMesh -region solid
-cp constant/solid/polyMesh/boundaryCoupled constant/solid/polyMesh/boundary
 runApplication -l log.setSet.solid setSet -region solid -batch solid.setSet
 runApplication -l log.setsToZones.solid setsToZones -region solid -noFlipMap
 
 runApplication blockMesh
-cp constant/polyMesh/boundaryCoupled constant/polyMesh/boundary
 runApplication setSet -batch fluid.setSet
 runApplication setsToZones -noFlipMap
 

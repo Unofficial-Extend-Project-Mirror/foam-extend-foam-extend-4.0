@@ -18,53 +18,6 @@ echo "$caseName: Creating the file blockMeshDict using m4"
 echo "$caseName: Running blockMesh"
 runApplicationAndReportOnError blockMesh
 
-echo "$caseName: Updating the GGI and mixingPlane interfaces parameters"
-
-# Let's see if pyFoamChangeMixingPlaneBoundary.py is available
-command -v pyFoamChangeMixingPlaneBoundary.py >/dev/null
-if [ $? -eq 0 ];
-then
-    echo "Using pyFoamChangeMixingPlaneBoundary.py"
-    pyFoamChangeMixingPlaneBoundary.py . B_UPSTREAM   \
-	--shadowPatch                    B_DOWNSTREAM \
-	--zone                           B_UPSTREAMZone  \
-	--ribbonPatchDiscretisation      bothPatches  \
-	--ribbonPatchStackAxis           R            \
-	--ribbonPatchSweepAxis           Theta        \
-	--coordinateSystemType           cylindrical  \
-	--coordinateSystemOrigin         "(0 0 0)"    \
-	--coordinateSystemE1             "(1 0 0)"    \
-	--coordinateSystemE3             "(0 0 1)"    \
-
-    pyFoamChangeMixingPlaneBoundary.py . B_DOWNSTREAM \
-	--shadowPatch                    B_UPSTREAM   \
-	--zone                           B_DOWNSTREAMZone  \
-	--ribbonPatchDiscretisation      bothPatches  \
-	--ribbonPatchStackAxis           R            \
-	--ribbonPatchSweepAxis           Theta        \
-	--coordinateSystemType           cylindrical  \
-	--coordinateSystemOrigin         "(0 0 0)"    \
-	--coordinateSystemE1             "(1 0 0)"    \
-	--coordinateSystemE3             "(0 0 1)"    \
-
-    echo "Using pyFoamChangeGGIBoundary.py"
-    pyFoamChangeGGIBoundary.py . sideWallA_BB_cyclic1   \
-	--shadowPatch            sideWallA_BB_cyclic2   \
-	--rotationAxis           "(0 0 1)"              \
-	--rotationAngle          60                     \
-	--zone                   sideWallA_BB_cyclic1Zone
-
-    pyFoamChangeGGIBoundary.py . sideWallA_BB_cyclic2   \
-	--shadowPatch            sideWallA_BB_cyclic1   \
-	--rotationAxis           "(0 0 1)"              \
-	--rotationAngle          -60                    \
-	--zone                   sideWallA_BB_cyclic2Zone
-
-else
-    echo "pyFoamChangeMixingPlaneBoundary.py is missing. Using the file constant/polyMesh/boundary.preconfigured"
-    cp constant/polyMesh/boundary.preconfigured constant/polyMesh/boundary
-fi
-
 echo "$caseName: Creating the starting time directory"
 cp -r 0_orig 0
 
