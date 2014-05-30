@@ -27,8 +27,10 @@ License
 
 /* * * * * * * * * * * * * * * * Global functions  * * * * * * * * * * * * * */
 
+namespace Foam { // namespace added to make CLang happy
+
 template<class Type>
-Foam::tmp<Foam::CoeffField<Type> > Foam::inv(const CoeffField<Type>& f)
+tmp<CoeffField<Type> > inv(const CoeffField<Type>& f)
 {
     // The inverse of a linear coefficient type is currently done "by
     // hand".  The need for this will disappear once the diagonal tensor
@@ -68,7 +70,7 @@ Foam::tmp<Foam::CoeffField<Type> > Foam::inv(const CoeffField<Type>& f)
 
 
 template<class Type>
-void Foam::multiply
+void multiply
 (
     Field<Type>& f,
     const CoeffField<Type>& f1,
@@ -91,7 +93,7 @@ void Foam::multiply
 
 
 template<class Type>
-void Foam::multiply
+void multiply
 (
     Field<Type>& f,
     const CoeffField<Type>& f1,
@@ -114,7 +116,7 @@ void Foam::multiply
 
 
 template<class Type>
-void Foam::multiply
+void multiply
 (
     Field<Type>& f,
     const Field<Type>& f1,
@@ -141,7 +143,7 @@ void Foam::multiply
 #define UNARY_OPERATOR(op, opFunc)                                            \
                                                                               \
 template<class Type>                                                          \
-void Foam::opFunc                                                             \
+void opFunc                                                             \
 (                                                                             \
     CoeffField<Type>& f,                                                      \
     const CoeffField<Type>& f1                                                \
@@ -174,7 +176,7 @@ void Foam::opFunc                                                             \
 }                                                                             \
                                                                               \
 template<class Type>                                                          \
-Foam::tmp<Foam::CoeffField<Type> > Foam::operator op                          \
+tmp<CoeffField<Type> > operator op                          \
 (                                                                             \
     const CoeffField<Type>& f1                                                \
 )                                                                             \
@@ -185,7 +187,7 @@ Foam::tmp<Foam::CoeffField<Type> > Foam::operator op                          \
 }                                                                             \
                                                                               \
 template<class Type>                                                          \
-Foam::tmp<Foam::CoeffField<Type> > Foam::operator op                          \
+tmp<CoeffField<Type> > operator op                          \
 (                                                                             \
     const tmp<CoeffField<Type> >& tf1                                         \
 )                                                                             \
@@ -203,7 +205,7 @@ UNARY_OPERATOR(-, negate)
 #define BINARY_OPERATOR_FF(Type1, Type2, op, opFunc)                          \
                                                                               \
 template<class Type>                                                          \
-Foam::tmp<Foam::Field<Type> > Foam::operator op                               \
+tmp<Field<Type> > operator op                               \
 (                                                                             \
     const CoeffField<Type1>& f1,                                              \
     const Type2& f2                                                           \
@@ -216,7 +218,7 @@ Foam::tmp<Foam::Field<Type> > Foam::operator op                               \
                                                                               \
                                                                               \
 template<class Type>                                                          \
-Foam::tmp<Foam::Field<Type> > Foam::operator op                               \
+tmp<Field<Type> > operator op                               \
 (                                                                             \
     const CoeffField<Type1>& f1,                                              \
     const Field<Type2>& f2                                                    \
@@ -229,7 +231,7 @@ Foam::tmp<Foam::Field<Type> > Foam::operator op                               \
                                                                               \
                                                                               \
 template<class Type>                                                          \
-Foam::tmp<Foam::Field<Type> > Foam::operator op                               \
+tmp<Field<Type> > operator op                               \
 (                                                                             \
     const Field<Type2>& f1,                                                   \
     const CoeffField<Type1>& f2                                               \
@@ -242,7 +244,7 @@ Foam::tmp<Foam::Field<Type> > Foam::operator op                               \
 
 #define BINARY_OPERATOR_FTR(Type1, Type2, op, opFunc)                         \
 template<class Type>                                                          \
-Foam::tmp<Foam::Field<Type> > Foam::operator op                               \
+tmp<Field<Type> > operator op                               \
 (                                                                             \
     const CoeffField<Type1>& f1,                                              \
     const tmp<Field<Type2> >& tf2                                             \
@@ -255,7 +257,7 @@ Foam::tmp<Foam::Field<Type> > Foam::operator op                               \
 
 #define BINARY_OPERATOR_FT(Type1, Type2, op, opFunc)                          \
 template<class Type>                                                          \
-Foam::tmp<Foam::Field<Type> > Foam::operator op                               \
+tmp<Field<Type> > operator op                               \
 (                                                                             \
     const Field<Type1>& f1,                                                   \
     const tmp<CoeffField<Type2> >& tf2                                        \
@@ -268,7 +270,7 @@ Foam::tmp<Foam::Field<Type> > Foam::operator op                               \
 
 #define BINARY_OPERATOR_TRF(Type1, Type2, op, opFunc)                         \
 template<class Type>                                                          \
-Foam::tmp<Foam::Field<Type> > Foam::operator op                               \
+tmp<Field<Type> > operator op                               \
 (                                                                             \
     const tmp<CoeffField<Type1> >& tf1,                                       \
     const Field<Type2>& f2                                                    \
@@ -281,7 +283,7 @@ Foam::tmp<Foam::Field<Type> > Foam::operator op                               \
 
 #define BINARY_OPERATOR_TF(Type1, Type2, op, opFunc)                          \
 template<class Type>                                                          \
-Foam::tmp<Foam::Field<Type> > Foam::operator op                               \
+tmp<Field<Type> > operator op                               \
 (                                                                             \
     const tmp<CoeffField<Type1> >& tf1,                                       \
     const Field<Type2>& f2                                                    \
@@ -294,7 +296,7 @@ Foam::tmp<Foam::Field<Type> > Foam::operator op                               \
 
 #define BINARY_OPERATOR_TRT(Type1, Type2, op, opFunc)                         \
 template<class Type>                                                          \
-Foam::tmp<Foam::Field<Type> > Foam::operator op                               \
+tmp<Field<Type> > operator op                               \
 (                                                                             \
     const tmp<CoeffField<Type1> >& tf1,                                       \
     const tmp<Field<Type2> >& tf2                                             \
@@ -308,7 +310,7 @@ Foam::tmp<Foam::Field<Type> > Foam::operator op                               \
 
 #define BINARY_OPERATOR_TTR(Type1, Type2, op, opFunc)                         \
 template<class Type>                                                          \
-Foam::tmp<Foam::Field<Type> > Foam::operator op                               \
+tmp<Field<Type> > operator op                               \
 (                                                                             \
     const tmp<Field<Type1> >& tf1,                                            \
     const tmp<CoeffField<Type2> >& tf2                                        \
@@ -329,6 +331,8 @@ Foam::tmp<Foam::Field<Type> > Foam::operator op                               \
 // Operator multiply is not available for all types, as it expands rank
 // HJ, 17/Jun/2010
 BINARY_OPERATOR_R(Type, Type, *, multiply)
+
+} // namespace Foam
 
 #undef BINARY_OPERATOR_R
 #undef BINARY_OPERATOR_FF

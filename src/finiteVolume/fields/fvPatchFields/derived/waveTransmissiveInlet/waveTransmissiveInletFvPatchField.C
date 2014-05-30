@@ -123,7 +123,7 @@ tmp<scalarField>
     );
 
     const surfaceScalarField& phi =
-        this->db().objectRegistry::lookupObject<surfaceScalarField>
+        this->db().objectRegistry::template lookupObject<surfaceScalarField>
         (this->phiName_);
 
     fvsPatchField<scalar> phip = this->patch().lookupPatchField
