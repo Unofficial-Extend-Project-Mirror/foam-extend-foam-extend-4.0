@@ -6,7 +6,6 @@ This part of the repository is for FOAM test harnesses.
 Directory Structure
 ===================
 
-FOAM            : CMake/CTest scripts for compilation and execution test harness for FOAM.
 foam-extend-3.0    : Test harness for foam-extend version 3.0. See the file foam-extend-3.0/README.txt for more information
 
 OSIG                : CMake/CTest scripts for FOAM Special Interest Group (OSIG) test harness
