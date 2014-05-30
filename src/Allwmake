@@ -51,6 +51,7 @@ wmake libso sampling
 wmake libso ODE
 wmake libso POD
 wmake libso randomProcesses
+mesh/Allwmake
 
 thermophysicalModels/Allwmake
 transportModels/Allwmake
