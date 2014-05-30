@@ -1262,7 +1262,7 @@ void insertEquationCoupling
     }
 
     // Get references to fvScalarMatrix fields, updating boundary contributions
-    scalarField& diag = matrix.D();
+    scalarField& diag = matrix.D()();
     scalarField& source = matrix.source();
     matrix.addBoundarySource(source, false);
 
