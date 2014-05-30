@@ -329,14 +329,17 @@ Darwin)
 	    then
 		export WM_CC="gcc-mp-$WM_MACPORT_VERSION"
 		export WM_CXX="g++-mp-$WM_MACPORT_VERSION"
+		export WM_FC="gfortran-mp-$WM_MACPORT_VERSION"
 	    elif [ "$WM_BASE_COMPILER" == "Clang" ]
 	    then
 		export WM_CC="clang-mp-$WM_MACPORT_VERSION"
 		export WM_CXX="clang++-mp-$WM_MACPORT_VERSION"
+		# Seems like there is no Fortran-frontend for LLVM at thistime
 	    elif [ "$WM_BASE_COMPILER" == "Dragonegg" ]
 	    then
 		export WM_CC="dragonegg-$WM_MACPORT_VERSION-gcc"
 		export WM_CXX="dragonegg-$WM_MACPORT_VERSION-g++"
+		export WM_CXX="dragonegg-$WM_MACPORT_VERSION-gfortran"
 	    else
 		echo "Unknown base compiler $WM_BASE_COMPILER"
 	    fi

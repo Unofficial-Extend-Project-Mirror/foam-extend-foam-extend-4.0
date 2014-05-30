@@ -584,8 +584,8 @@ steadyInertialDdtScheme<Type>::fvcDdtPhiCorr
                 new fluxFieldType
                 (
                     ddtIOobject,
-                    this->fvcDdtPhiCoeff(U.oldTime(), phi.oldTime())*
-                    (
+                    fvcDdtPhiCoeff(U.oldTime(), phi.oldTime())
+                   *(
                         fvc::interpolate(rDeltaT*rA*rho.oldTime())*
                         phi.oldTime()
                       - (fvc::interpolate(rDeltaT*rA*rho.oldTime()*U.oldTime())
@@ -605,14 +605,14 @@ steadyInertialDdtScheme<Type>::fvcDdtPhiCorr
                 new fluxFieldType
                 (
                     ddtIOobject,
-                    this->fvcDdtPhiCoeff
+                    fvcDdtPhiCoeff
                     (
                         U.oldTime(),
                         phi.oldTime()/fvc::interpolate(rho.oldTime())
-                    )*
-                    (
-                        fvc::interpolate(rDeltaT*rA*rho.oldTime())*
-                        phi.oldTime()/fvc::interpolate(rho.oldTime())
+                    )
+                   *(
+                        fvc::interpolate(rDeltaT*rA*rho.oldTime())
+                       *phi.oldTime()/fvc::interpolate(rho.oldTime())
                       - (
                             fvc::interpolate
                             (
@@ -634,17 +634,11 @@ steadyInertialDdtScheme<Type>::fvcDdtPhiCorr
                 new fluxFieldType
                 (
                     ddtIOobject,
-                    this->fvcDdtPhiCoeff
-                    (
-                        rho.oldTime(),
-                        U.oldTime(),
-                        phi.oldTime()
-                    )*
-                    (
+                    fvcDdtPhiCoeff(rho.oldTime(), U.oldTime(), phi.oldTime())
+                   *(
                         fvc::interpolate(rDeltaT*rA)*phi.oldTime()
                       - (
-                            fvc::interpolate(rDeltaT*rA*U.oldTime())
-                          & mesh().Sf()
+                            fvc::interpolate(rDeltaT*rA*U.oldTime())&mesh().Sf()
                         )
                     )
                 )
