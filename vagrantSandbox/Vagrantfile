@@ -4,7 +4,7 @@
 Vagrant.configure("2") do |config|
   config.vm.synced_folder "..", "/FOAM-sources"
 
-  config.vm.hostname="vagrant."+ (ENV["HOSTNAME"] || `hostname`)
+  config.vm.hostname="vagrant."+ (ENV["HOSTNAME"] || `hostname`.strip)
 
   nrCPU=1
   if ENV["WM_VAGRANT_CPUS"]
@@ -26,7 +26,7 @@ Vagrant.configure("2") do |config|
     #     vb.customize ["modifyvm", :id, "--memory", "1024"]
     vb.cpus=nrCPU
     # make sure each CPU has enough memory (at least 1.5 Gig)
-    vb.memory=512*[(1+nrCPU),3].max
+    vb.memory=512*[(1+nrCPU),4].max
   end
 
   config.vm.define :trusty do |trusty|
