@@ -48,8 +48,9 @@
    machine prepended with =vagrant.=
 * Virtual machines
   Currently existing virtual machines are
-  - precise :: Latest LTS Ubuntu. Currently the default machine to use
-  - lucid :: Previous LTS Ubuntu. Currently problems
+  - trusty :: Latest LTS 14.04 Ubuntu. Currently the default machine to use
+  - prescise :: Previous LTS Ubuntu.
+  - lucid :: Old LTS Ubuntu. Currently problems
              with automatic setting up (something with the
              =postfix=-package)
   - maverick :: Tries to fix the problems with the
@@ -75,6 +76,8 @@
        the ThirdParty-packages in one go (no paraview and QT). If this
        works the box is considered operational. The script leaves a
        log file =bootstrapFoam-log= in the home directory
+  - bootstrapAndTest.sh :: Calls =bootstrapFoam.sh= and then runs the
+       =testHarness= in the =foam=-installation
 * Provisioning scripts
   Every "family" of machines has a specific script that makes sure
   that the software packages necessary to compile =Foam= are installed
