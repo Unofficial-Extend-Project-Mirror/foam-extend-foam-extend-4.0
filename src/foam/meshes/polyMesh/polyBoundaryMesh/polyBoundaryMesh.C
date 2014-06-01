@@ -699,6 +699,49 @@ bool Foam::polyBoundaryMesh::writeObject
     return regIOobject::writeObject(fmt, ver, IOstream::UNCOMPRESSED);
 }
 
+// * * * * * * * * * * * * * * Member Operators  * * * * * * * * * * * * * * //
+
+const Foam::polyPatch& Foam::polyBoundaryMesh::operator[]
+(
+    const word& patchName
+) const
+{
+    const label patchI = findPatchID(patchName);
+
+    if (patchI < 0)
+    {
+        FatalErrorIn
+        (
+            "polyBoundaryMesh::operator[](const word&) const"
+        )   << "Patch named " << patchName << " not found." << nl
+            << "Available patch names: " << names() << endl
+            << abort(FatalError);
+    }
+
+    return operator[](patchI);
+}
+
+
+Foam::polyPatch& Foam::polyBoundaryMesh::operator[]
+(
+    const word& patchName
+)
+{
+    const label patchI = findPatchID(patchName);
+
+    if (patchI < 0)
+    {
+        FatalErrorIn
+        (
+            "polyBoundaryMesh::operator[](const word&)"
+        )   << "Patch named " << patchName << " not found." << nl
+            << "Available patch names: " << names() << endl
+            << abort(FatalError);
+    }
+
+    return operator[](patchI);
+}
+
 
 // * * * * * * * * * * * * * * * IOstream Operators  * * * * * * * * * * * * //
 

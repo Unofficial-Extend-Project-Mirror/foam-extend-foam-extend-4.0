@@ -37,22 +37,33 @@ edges
 (
 );
 
-patches
+boundary
 (
-    wall stationaryWalls
-    (
-        (0 3 2 1)
-        (2 6 5 1)
-        (1 5 4 0)
-        (3 7 6 2)
-        (0 4 7 3)
-    )
-    patch atmosphere
-    (
-        (4 5 6 7)
-    )
-    wall floatingObject
-    ()
+    stationaryWalls
+    {
+        type wall;
+        faces
+        (
+            (0 3 2 1)
+            (2 6 5 1)
+            (1 5 4 0)
+            (3 7 6 2)
+            (0 4 7 3)
+        );
+    }
+    atmosphere
+    {
+        type patch;
+        faces
+        (
+            (4 5 6 7)
+        );
+    }
+    floatingObject
+    {
+        type wall;
+        faces ();
+    }
 );
 
 mergePatchPairs

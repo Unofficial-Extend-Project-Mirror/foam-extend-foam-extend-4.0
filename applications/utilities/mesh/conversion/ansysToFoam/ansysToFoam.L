@@ -47,7 +47,6 @@ Description
 using namespace Foam;
 
 #include "argList.H"
-#include "objectRegistry.H"
 #include "Time.H"
 #include "polyMesh.H"
 #include "emptyPolyPatch.H"
@@ -63,10 +62,15 @@ label maxNodei = 0;
 
 SLPtrList<labelList> slCellLabels;
 SLList<label> slCellMap;
+SLList<label> slCellType;
 label maxCelli = 0;
 
 PtrList<SLList<label> > slPatchCells;
 PtrList<SLList<label> > slPatchCellFaces;
+
+// Cell types
+Map<word> cellTypes;
+label currentTypei = -1;
 
 
 // Dummy yywrap to keep yylex happy at compile time.
@@ -90,27 +94,26 @@ cspace                ","{space}
 
 alpha                 [_A-Za-z]
 digit                 [0-9]
-dec_digit             [0-9]
-octal_digit           [0-7]
-hex_digit             [0-9a-fA-F]
 
 identifier            {alpha}({alpha}|{digit})*
-integer               {dec_digit}+
-label                 [1-9]{dec_digit}*
+integer               {digit}+
+label                 [1-9]{digit}*
 
 exponent_part         [eE][-+]?{digit}+
 fractional_constant   [-+]?(({digit}*"."{digit}+)|({digit}+"."?))
 
-double                (({fractional_constant}{exponent_part}?)|({digit}+{exponent_part}))
+floatNum              (({fractional_constant}{exponent_part}?)|({digit}+{exponent_part}))
 
-x                     {double}
-y                     {double}
-z                     {double}
-value                 {double}
+x                     {floatNum}
+y                     {floatNum}
+z                     {floatNum}
+value                 {floatNum}
 
 node                  ^{space}"N"{cspace}
 element               ^{space}"EN"{cspace}
 bface                 ^{space}"SFE"{cspace}
+elementTypeName       ^{space}"ET"{cspace}
+elementType           ^{space}"TYPE"{cspace}
 
 
 %%
@@ -163,6 +166,7 @@ bface                 ^{space}"SFE"{cspace}
 
         slCellMap.append(celli);
         slCellLabels.append(new labelList(labels));
+        slCellType.append(currentTypei);
     }
 
 
@@ -213,6 +217,37 @@ bface                 ^{space}"SFE"{cspace}
     }
 
 
+{elementTypeName}{label}{cspace}{identifier}{space}\n {
+
+        IStringStream elementStream(YYText());
+        char tag,c;
+        label cellTypei;
+        word cellTypeName;
+        elementStream
+            >> tag >> tag           // skip 'ET'
+            >> c >> cellTypei
+            >> c >> cellTypeName;
+
+        Info<< "Read typeName " << cellTypeName
+            << " for type " << cellTypei << endl;
+
+        cellTypes.insert(cellTypei, cellTypeName);
+    }
+
+
+{elementType}{label}{space}\n {
+        IStringStream elementStream(YYText());
+        char tag,c;
+        label cellTypei;
+        elementStream
+            >> tag >> tag >> tag >> tag     // skip 'TYPE'
+            >> c >> cellTypei;
+
+        currentTypei = cellTypei;
+    }
+
+
+
  /* ------------------------------------------------------------------------- *\
     ------ Ignore remaining space and \n s.  Any other characters are errors.
  \* ------------------------------------------------------------------------- */
@@ -233,6 +268,29 @@ bface                 ^{space}"SFE"{cspace}
 #include "fileName.H"
 #include <fstream>
 using std::ifstream;
+
+
+label findFace(const polyMesh& mesh, const face& f)
+{
+    const labelList& pFaces = mesh.pointFaces()[f[0]];
+
+    forAll(pFaces, i)
+    {
+        label faceI = pFaces[i];
+
+        if (mesh.faces()[faceI] == f)
+        {
+            return faceI;
+        }
+    }
+
+    FatalErrorIn("findFace(const polyMesh&, const face&)")
+        << "Cannot find a face matching " << f
+        << exit(FatalError);
+
+    return -1;
+}
+
 
 int main(int argc, char *argv[])
 {
@@ -264,20 +322,15 @@ int main(int argc, char *argv[])
     }
 
     yyFlexLexer lexer(&ansysStream);
-    while(lexer.yylex() != 0)
+    while (lexer.yylex() != 0)
     {}
 
-    Info << "Creating points" << endl;
+    Info<< "Creating points" << endl;
 
     pointField points(slPoints.size());
 
-    label i=0;
-    for
-    (
-        SLList<point>::iterator pointIter = slPoints.begin();
-        pointIter != slPoints.end();
-        ++pointIter
-    )
+    label i = 0;
+    forAllConstIter(SLList<point>, slPoints, pointIter)
     {
         // Scale points for the given scale factor
         points[i++] = scaleFactor * pointIter();
@@ -286,28 +339,18 @@ int main(int argc, char *argv[])
 
     labelList pointMap(maxNodei+1);
 
-    i=0;
-    for
-    (
-        SLList<label>::iterator pointMapIter = slPointMap.begin();
-        pointMapIter != slPointMap.end();
-        ++pointMapIter
-    )
+    i = 0;
+    forAllConstIter(SLList<label>, slPointMap, pointMapIter)
     {
         pointMap[pointMapIter()] = i++;
     }
 
-    Info << "Creating cells" << endl;
+    Info<< "Creating cells" << endl;
 
     labelList cellMap(maxCelli+1);
 
-    i=0;
-    for
-    (
-        SLList<label>::iterator cellMapIter = slCellMap.begin();
-        cellMapIter != slCellMap.end();
-        ++cellMapIter
-    )
+    i = 0;
+    forAllConstIter(SLList<label>, slCellMap, cellMapIter)
     {
         cellMap[cellMapIter()] = i++;
     }
@@ -326,12 +369,7 @@ int main(int argc, char *argv[])
     cellShapeList cellShapes(slCellLabels.size());
     label nCells = 0;
 
-    for
-    (
-        SLPtrList<labelList>::iterator cellIter = slCellLabels.begin();
-        cellIter != slCellLabels.end();
-        ++cellIter
-    )
+    forAllConstIter(SLPtrList<labelList>, slCellLabels, cellIter)
     {
         if      // Tetrahedron
         (
@@ -396,6 +434,34 @@ int main(int argc, char *argv[])
         }
     }
 
+
+    const word defaultFacesName = "defaultFaces";
+    word defaultFacesType = emptyPolyPatch::typeName;
+
+    // Create dummy mesh just to find out what are internal/external
+    // faces
+    autoPtr<polyMesh> dummyMesh
+    (
+        new polyMesh
+        (
+            IOobject
+            (
+                "dummyMesh",
+                runTime.constant(),
+                runTime
+            ),
+            xferCopy(points),
+            cellShapes,
+            faceListList(0),
+            wordList(0),
+            wordList(0),
+            defaultFacesName,
+            defaultFacesType,
+            wordList(0)
+        )
+    );
+
+
     // Warning: tet face order has changed between version 1.9.6 and 2.0
     //
     label faceIndex[7][6] =
@@ -404,12 +470,12 @@ int main(int argc, char *argv[])
         {-1, -1, -1, -1, -1, -1}, // 1
         {-1, -1, -1, -1, -1, -1}, // 2
         {-1, -1, -1, -1, -1, -1}, // 3
-        {-1,  2,  0,  3,  1, -1}, // tet (version 2.0)
+        { 3,  2,  0, -1,  1, -1}, // tet (version 2.0)
         { 0,  4,  3, -1,  2,  1}, // prism
         { 4,  2,  1,  3,  0,  5}, // hex
     };
 
-    Info << "Creating boundary patches" << endl;
+    Info<< "Creating boundary patches" << endl;
 
     faceListList boundary(slPatchCells.size());
     wordList patchNames(slPatchCells.size());
@@ -429,12 +495,14 @@ int main(int argc, char *argv[])
             ++cellIter, ++faceIter
         )
         {
+            const cellShape& shape = cellShapes[cellMap[cellIter()]];
+
             patchFaces.append
             (
-                cellShapes[cellMap[cellIter()] ].faces()
+                shape.faces()
                 [
                     faceIndex
-                        [cellShapes[cellMap[cellIter()] ].nFaces()]
+                        [shape.nFaces()]
                         [faceIter()-1]
                 ]
             );
@@ -442,33 +510,84 @@ int main(int argc, char *argv[])
 
         boundary[patchI] = patchFaces;
         patchNames[patchI] = word("patch") + name(patchI + 1);
-        Info << "Patch " << patchI << " named " << patchNames[patchI]
+    }
+
+
+    //
+    // Lookup the face labels for all the boundary faces
+    //
+    labelListList boundaryFaceLabels(boundary.size());
+    forAll(boundary, patchI)
+    {
+        const faceList& bFaces = boundary[patchI];
+        labelList& bFaceLabels = boundaryFaceLabels[patchI];
+        bFaceLabels.setSize(bFaces.size());
+        forAll(bFaces, i)
+        {
+            bFaceLabels[i] = findFace(dummyMesh(), bFaces[i]);
+        }
+    }
+
+
+    // Now split the boundary faces into external and internal faces. All
+    // faces go into faceZones and external faces go into patches.
+    List<faceList> patchFaces(slPatchCells.size());
+    labelList patchNFaces(slPatchCells.size(), 0);
+    forAll(boundary, patchI)
+    {
+        const faceList& bFaces = boundary[patchI];
+        const labelList& bFaceLabels = boundaryFaceLabels[patchI];
+
+        patchFaces[patchI].setSize(bFaces.size());
+
+        forAll(bFaces, i)
+        {
+            if (!dummyMesh().isInternalFace(bFaceLabels[i]))
+            {
+                patchFaces[patchI][patchNFaces[patchI]++] = bFaces[i];
+            }
+        }
+        patchFaces[patchI].setSize(patchNFaces[patchI]);
+
+        Info<< "Patch " << patchI << " named " << patchNames[patchI]
             << ": " << boundary[patchI].size() << " faces" << endl;
     }
 
-    Info << "ansysToFoam: " << endl
+    // We no longer need the dummyMesh
+    dummyMesh.clear();
+
+
+    Info<< "ansysToFoam: " << endl
         << "Ansys file format does not provide information about the type of "
         << "the patch (eg. wall, symmetry plane, cyclic etc)." << endl
         << "All the patches have been created "
         << "as type patch. Please reset after mesh conversion as necessary."
         << endl;
 
-    wordList patchTypes(boundary.size(), polyPatch::typeName);
-    word defaultFacesName = "defaultFaces";
-    word defaultFacesType = emptyPolyPatch::typeName;
-    wordList patchPhysicalTypes(boundary.size());
+    PtrList<dictionary> patchDicts;
 
     preservePatchTypes
     (
         runTime,
         runTime.constant(),
-        polyMesh::defaultRegion,
+        polyMesh::meshSubDir,
         patchNames,
-        patchTypes,
+        patchDicts,
         defaultFacesName,
-        defaultFacesType,
-        patchPhysicalTypes
+        defaultFacesType
     );
+
+    // Add information to dictionary
+    forAll(patchNames, patchI)
+    {
+        if (!patchDicts.set(patchI))
+        {
+            patchDicts.set(patchI, new dictionary());
+        }
+        // Add but not overwrite
+        patchDicts[patchI].add("type", polyPatch::typeName, false);
+    }
+
 
     polyMesh pShapeMesh
     (
@@ -480,18 +599,101 @@ int main(int argc, char *argv[])
         ),
         xferMove(points),
         cellShapes,
-        boundary,
+        patchFaces,
         patchNames,
-        patchTypes,
+        patchDicts,
         defaultFacesName,
-        defaultFacesType,
-        patchPhysicalTypes
+        defaultFacesType
     );
 
-    // Set the precision of the points data to 10
-    IOstream::defaultPrecision(10);
 
-    Info << "Writing polyMesh" << endl;
+    if (cellTypes.size() > 0 || patchNames.size() > 0)
+    {
+        DynamicList<pointZone*> pz;
+        DynamicList<faceZone*> fz;
+        DynamicList<cellZone*> cz;
+
+        // FaceZones
+        forAll(boundaryFaceLabels, patchI)
+        {
+            if (boundaryFaceLabels[patchI].size())
+            {
+                // Re-do the boundaryFaceLabels since the boundary face
+                // labels will be different on the pShapeMesh.
+                const faceList& bFaces = boundary[patchI];
+                labelList& bFaceLabels = boundaryFaceLabels[patchI];
+                forAll(bFaceLabels, i)
+                {
+                    bFaceLabels[i] = findFace(pShapeMesh, bFaces[i]);
+                }
+
+                Info<< "Creating faceZone " <<  patchNames[patchI]
+                    << " with " << bFaceLabels.size() << " faces" << endl;
+
+                fz.append
+                (
+                    new faceZone
+                    (
+                        patchNames[patchI],
+                        bFaceLabels,
+                        boolList(bFaceLabels.size(), false),
+                        fz.size(),
+                        pShapeMesh.faceZones()
+                    )
+                );
+            }
+        }
+
+
+        // CellZones
+        labelList types = cellTypes.toc();
+
+        forAll(types, j)
+        {
+            label cellType = types[j];
+
+            // Pick up cells in zone
+            DynamicList<label> addr;
+
+            SLList<label>::iterator cellMapIter = slCellMap.begin();
+            SLList<label>::iterator typeIter = slCellType.begin();
+
+            for
+            (
+                ;
+                typeIter != slCellType.end();
+                ++typeIter, ++cellMapIter
+            )
+            {
+                if (typeIter() == cellType)
+                {
+                    addr.append(cellMap[cellMapIter()]);
+                }
+            }
+
+            Info<< "Creating cellZone " << cellTypes[cellType]
+                << " with " << addr.size() << " cells" << endl;
+
+            cz.append
+            (
+                new cellZone
+                (
+                    cellTypes[cellType],
+                    addr,
+                    j,
+                    pShapeMesh.cellZones()
+                )
+            );
+        }
+
+        pShapeMesh.addZones(pz, fz, cz);
+    }
+
+
+    // Set the precision of the points data to 10
+    IOstream::defaultPrecision(max(10u, IOstream::defaultPrecision()));
+
+    Info<< "Writing polyMesh" << endl;
     pShapeMesh.write();
 
     Info<< nl << "end" << endl;

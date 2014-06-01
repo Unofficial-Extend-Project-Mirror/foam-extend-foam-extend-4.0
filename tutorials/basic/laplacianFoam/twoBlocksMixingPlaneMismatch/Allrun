@@ -15,38 +15,6 @@ export caseName=`basename $PWD`
 echo "$caseName: Running blockMesh"
 runApplicationAndReportOnError blockMesh
 
-echo "$caseName: Updating the boundary file"
-# Let's see if pyFoamChangeMixingPlaneBoundary.py is available
-command -v pyFoamChangeMixingPlaneBoundary.py >/dev/null
-if [ $? -eq 0 ];
-then
-    echo "Using pyFoamChangeMixingPlaneBoundary.py"
-    pyFoamChangeMixingPlaneBoundary.py . mixpLeftOut      \
-    --shadowPatch                    mixpRightIn      \
-    --zone                           mixpLeftOutZone  \
-    --ribbonPatchDiscretisation      bothPatches      \
-    --ribbonPatchStackAxis           Y                \
-    --ribbonPatchSweepAxis           Z                \
-    --coordinateSystemType           coordinateSystem \
-    --coordinateSystemOrigin         "(0 0 0.005)"    \
-    --coordinateSystemE1             "(1 0 0)"        \
-    --coordinateSystemE3             "(0 0 1)"
-
-    pyFoamChangeMixingPlaneBoundary.py . mixpRightIn      \
-    --shadowPatch                    mixpLeftOut      \
-    --zone                           mixpRightInZone  \
-    --ribbonPatchDiscretisation      bothPatches      \
-    --ribbonPatchStackAxis           Y                \
-    --ribbonPatchSweepAxis           Z                \
-    --coordinateSystemType           coordinateSystem \
-    --coordinateSystemOrigin         "(0 0 0.005)"    \
-    --coordinateSystemE1             "(1 0 0)"        \
-    --coordinateSystemE3             "(0 0 1)"
-else
-    echo "pyFoamChangeMixingPlaneBoundary.py is missing. Using the file constant/polyMesh/boundary.preconfigured"
-    cp constant/polyMesh/boundary.preconfigured constant/polyMesh/boundary
-fi
-
 echo "$caseName: Creating zones for the mixingPlane"
 runApplicationAndReportOnError setSet -batch setBatch
 runApplicationAndReportOnError setsToZones -noFlipMap

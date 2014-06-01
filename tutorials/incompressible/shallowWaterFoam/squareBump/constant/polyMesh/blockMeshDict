@@ -37,26 +37,42 @@ edges
 (
 );
 
-patches
+boundary
 (
-    patch sides
-    (
-        (3 7 6 2)
-        (1 5 4 0)
-    )
-    patch inlet
-    (
-        (0 4 7 3)
-    )
-    patch outlet
-    (
-        (2 6 5 1)
-    )
-    empty frontAndBack
-    (
-        (0 3 2 1)
-        (4 5 6 7)
-    )
+    sides
+    {
+        type patch;
+        faces
+        (
+            (3 7 6 2)
+            (1 5 4 0)
+        );
+    }
+    inlet
+    {
+        type patch;
+        faces
+        (
+            (0 4 7 3)
+        );
+    }
+    outlet
+    {
+        type patch;
+        faces
+        (
+            (2 6 5 1)
+        );
+    }
+    frontAndBack
+    {
+        type empty;
+        faces
+        (
+            (0 3 2 1)
+            (4 5 6 7)
+        );
+    }
 );
 
 mergePatchPairs

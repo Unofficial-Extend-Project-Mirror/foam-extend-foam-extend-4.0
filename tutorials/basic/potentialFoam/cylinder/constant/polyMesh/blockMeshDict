@@ -92,39 +92,59 @@ edges
     arc 34 28 (-0.34202 0.939693 0.5)
 );
 
-patches
+boundary
 (
-    symmetryPlane down
-    (
-        (0 1 20 19)
-        (1 2 21 20)
-        (12 11 30 31)
-        (13 12 31 32)
-    )
-    patch right
-    (
-        (2 3 22 21)
-        (3 6 25 22)
-    )
-    symmetryPlane up
-    (
-        (7 8 27 26)
-        (6 7 26 25)
-        (8 18 37 27)
-        (18 17 36 37)
-    )
-    patch left
-    (
-        (14 13 32 33)
-        (17 14 33 36)
-    )
-    symmetryPlane cylinder
-    (
-        (10 5 24 29)
-        (5 0 19 24)
-        (16 10 29 35)
-        (11 16 35 30)
-    )
+    down
+    {
+        type symmetryPlane;
+        faces
+        (
+            (0 1 20 19)
+            (1 2 21 20)
+            (12 11 30 31)
+            (13 12 31 32)
+        );
+    }
+    right
+    {
+        type patch;
+        faces
+        (
+            (2 3 22 21)
+            (3 6 25 22)
+        );
+    }
+    up
+    {
+        type symmetryPlane;
+        faces
+        (
+            (7 8 27 26)
+            (6 7 26 25)
+            (8 18 37 27)
+            (18 17 36 37)
+        );
+    }
+    left
+    {
+        type patch;
+        faces
+        (
+            (14 13 32 33)
+            (17 14 33 36)
+        );
+    }
+    cylinder
+    {
+        type symmetry;
+        faces
+        (
+            (10 5 24 29)
+            (5 0 19 24)
+            (16 10 29 35)
+            (11 16 35 30)
+        );
+    }
 );
 
 mergePatchPairs

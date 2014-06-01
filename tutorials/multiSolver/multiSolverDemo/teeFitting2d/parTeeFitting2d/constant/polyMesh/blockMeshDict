@@ -54,33 +54,53 @@ edges
 (
 );
 
-patches
+boundary
 (
-    wall steetWalls
-    (
-        (1 0 10 11)
-        (4 1 11 14)
-        (5 4 14 15)
-        (2 3 13 12)
-        (6 7 17 16)
-    )
-    wall branchWalls
-    (
-        (8 2 12 18)
-        (7 9 19 17)
-    )
-    patch westStreet
-    (
-        (3 0 10 13)
-    )
-    patch eastStreet
-    (
-        (5 6 16 15)
-    )
-    patch northBranch
-    (
-        (9 8 18 19)
-    )
+    steetWalls
+    {
+        type wall;
+        faces
+        (
+            (1 0 10 11)
+            (4 1 11 14)
+            (5 4 14 15)
+            (2 3 13 12)
+            (6 7 17 16)
+        )
+    }
+    branchWalls
+    {
+        type wall;
+        faces
+        (
+            (8 2 12 18)
+            (7 9 19 17)
+        );
+    }
+    westStreet
+    {
+        type patch;
+        faces
+        (
+            (3 0 10 13)
+        );
+    }
+    eastStreet
+    {
+        type patch;
+        faces
+        (
+            (5 6 16 15)
+        );
+    }
+    northBranch
+    {
+        type patch;
+        faces
+        (
+            (9 8 18 19)
+        );
+    }
 );
 
 mergePatchPairs

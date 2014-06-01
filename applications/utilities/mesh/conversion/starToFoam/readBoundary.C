@@ -228,17 +228,28 @@ void starMesh::readBoundary()
 
     patchPhysicalTypes_.setSize(patchTypes_.size());
 
+    PtrList<dictionary> patchDicts;
+
     preservePatchTypes
     (
         runTime_,
         runTime_.constant(),
-        polyMesh::defaultRegion,
+        polyMesh::meshSubDir,
         patchNames_,
-        patchTypes_,
+        patchDicts,
         defaultFacesName_,
-        defaultFacesType_,
-        patchPhysicalTypes_
+        defaultFacesType_
     );
+
+    forAll(patchDicts, patchI)
+    {
+        if (patchDicts.set(patchI))
+        {
+            const dictionary& dict = patchDicts[patchI];
+            dict.readIfPresent("type", patchTypes_[patchI]);
+            dict.readIfPresent("physicalType", patchPhysicalTypes_[patchI]);
+        }
+    }
 }
 
 
