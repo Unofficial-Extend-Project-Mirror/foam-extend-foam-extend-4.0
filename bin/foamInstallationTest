@@ -32,7 +32,7 @@
 #------------------------------------------------------------------------------
 
 # Base settings
-FOAM_VERSION=foam-extend-3.0
+FOAM_VERSION=foam-extend-3.1
 SUPPLIED_VERSION_GCC=4.3.3
 MIN_VERSION_GCC=4.3.1
 
