@@ -40,7 +40,7 @@ http://sourceforge.net/projects/openfoam-extend/files/foam-extend-3.1/
   Here is a list of sed commands that will do just that. You can copy/paste
   the following block of commands in a control terminal in order to make
   the necessary adjustments. You will need to be located at the root of your
-  foam-extend-3.0 installation for those commands to work.
+  foam-extend-3.1 installation for those commands to work.
 
   ####################################################################
   #
