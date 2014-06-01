@@ -1,7 +1,7 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | foam-extend: Open Source CFD                    |
-|  \\    /   O peration     | Version:     3.0                                |
+|  \\    /   O peration     | Version:     3.1                                |
 |   \\  /    A nd           | Web:         http://www.extend-project.de       |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
@@ -235,28 +235,28 @@ edges // Inappropriate with arc due to coordinate conversion
     spline RU1lt RU2lt
     (
         (sr calc(RUt1+0.65*(RUt2-(RUt1))) calc(RUa0+RUoal+0.5*RUal))
-    )    
+    )
     spline RU1lb RU2lb
     (
         (hr calc(RUt1+0.65*(RUt2-(RUt1))) calc(RUa0+RUoal+0.5*RUal))
-    )    
+    )
     spline RU1rt RU2rt
     (
         (sr calc(RUt1+RUp+0.75*(RUt2-(RUt1))) calc(RUa0+RUoal+0.5*RUal))
-    )    
+    )
     spline RU1rb RU2rb
     (
         (hr calc(RUt1+RUp+0.75*(RUt2-(RUt1))) calc(RUa0+RUoal+0.5*RUal))
-    )    
+    )
 //Guide vane
     spline GV1lt GV2lt
     (
         (sr calc(GVt1+0.75*(GVt2-(GVt1))) calc(GVa0+GVoal+0.5*GVbal))
-    )    
+    )
     spline GV1lb GV2lb
     (
         (hr calc(GVt1+0.75*(GVt2-(GVt1))) calc(GVa0+GVoal+0.5*GVbal))
-    )    
+    )
     spline GV1rt GV2rt
     (
         (sr calc(GVt1+GVp+0.65*(GVt2-(GVt1))) calc(GVa0+GVoal+0.5*GVbal))
@@ -264,7 +264,7 @@ edges // Inappropriate with arc due to coordinate conversion
     spline GV1rb GV2rb
     (
         (hr calc(GVt1+GVp+0.65*(GVt2-(GVt1))) calc(GVa0+GVoal+0.5*GVbal))
-    )    
+    )
 );
 
 patches

@@ -1,7 +1,7 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | foam-extend: Open Source CFD                    |
-|  \\    /   O peration     | Version:     3.0                                |
+|  \\    /   O peration     | Version:     3.1                                |
 |   \\  /    A nd           | Web:         http://www.extend-project.de       |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
@@ -279,7 +279,7 @@ boundary
             (A0 A2 A1 A0)
         );
     }
-    
+
     outlet
     {
         type patch;
@@ -291,7 +291,7 @@ boundary
             (F0 F4 F1 F0)
         );
     }
-    
+
     wallProlongation
     {
         type wall;
@@ -303,7 +303,7 @@ boundary
             (E4 E1 F1 F4)
         );
     }
-    
+
     wallDiffuser
     {
         type wall;
@@ -315,7 +315,7 @@ boundary
             (D4 D1 E1 E4)
         );
     }
-    
+
     statSwirlWallB_C
     {
         type wall;
@@ -325,14 +325,14 @@ boundary
             (B2 B3 C3 C2)
             (B3 B4 C4 C3)
             (B4 B1 C1 C4)
-            
+
             (C1 C2 D2 D1)
             (C2 C3 D3 D2)
             (C3 C4 D4 D3)
             (C4 C1 D1 D4)
         );
     }
- 
+
     rotSwirlWallA_BB
     {
         type wall;
@@ -387,7 +387,7 @@ boundary
         	stackAxis R;
         	sweepAxis Theta;
         }
-        
+
         coordinateSystem
         {
             type cylindrical;
@@ -413,7 +413,7 @@ boundary
             stackAxis R;
             sweepAxis Theta;
         }
-    
+
         coordinateSystem
         {
             type cylindrical;

@@ -1,7 +1,7 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | foam-extend: Open Source CFD                    |
-|  \\    /   O peration     | Version:     3.0                                |
+|  \\    /   O peration     | Version:     3.1                                |
 |   \\  /    A nd           | Web:         http://www.extend-project.de       |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
@@ -117,7 +117,7 @@ boundary
             (B5 B7 C3 C1)
         );
     }
-    
+
     inflow
     {
         type patch;

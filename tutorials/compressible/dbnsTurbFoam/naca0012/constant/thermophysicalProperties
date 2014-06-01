@@ -1,8 +1,8 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM Extend Project: Open Source CFD        |
-|  \\    /   O peration     | Version:  1.6-ext                               |
-|   \\  /    A nd           | Web:      www.extend-project.de                 |
+| \\      /  F ield         | foam-extend: Open Source CFD                    |
+|  \\    /   O peration     | Version:     3.1                                |
+|   \\  /    A nd           | Web:         http://www.extend-project.de       |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 FoamFile
@@ -19,6 +19,5 @@ thermoType      hPsiThermo<pureMixture<constTransport<specieThermo<hConstThermo<
 
 // name, nMoles, mol weight, CP, Hf, mu, Pr;
 mixture         air 1 28.9 717.5 0 1.8e-05 0.7;
-
 
 // ************************************************************************* //

@@ -23,7 +23,7 @@
 #
 # Description
 #     CMakeLists.txt file for implementing a test harness for the compilation
-#     and test of foam-extend-3.0 using Kitware CTest./CMake/CDash
+#     and test of foam-extend-3.1 using Kitware CTest./CMake/CDash
 #
 #     The results will be submitted to the CDash server identified by the file
 #     CTestConfig.cmake
@@ -36,7 +36,7 @@
 
 cmake_minimum_required (VERSION 2.8)
 
-PROJECT(foam-extend-3.0)
+PROJECT(foam-extend-3.1)
 
 #-----------------------------------------------------------------------------
 # Initialization of CTest specific variables

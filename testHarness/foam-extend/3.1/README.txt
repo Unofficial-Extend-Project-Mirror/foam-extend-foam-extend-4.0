@@ -74,5 +74,5 @@ To submit your results to the CDash server on openfoam-extend, just use
 the file CTestConfig.cmake.openfoam-extend.
 
 If submitted to the CDash server on openfoam-extend, your results will be displayed here:
-http://openfoam-extend.sourceforge.net/CDash/index.php?project=foam-extend-3.0
+http://openfoam-extend.sourceforge.net/CDash/index.php?project=foam-extend-3.1
 

@@ -1,7 +1,7 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | foam-extend: Open Source CFD                    |
-|  \\    /   O peration     | Version:     3.0                                |
+|  \\    /   O peration     | Version:     3.1                                |
 |   \\  /    A nd           | Web:         http://www.extend-project.de       |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
@@ -708,16 +708,16 @@ boundary
             quad2D(r5, r6s)
             quad2D(r6, r7)
             quad2D(r7, r0s)
-    
+
             quad2D(r0, rb0)
             quad2D(r0s, rb0)
-    
+
             quad2D(r2, rb2)
             quad2D(r2s, rb2)
-    
+
             quad2D(r4, rb4)
             quad2D(r4s, rb4)
-    
+
             quad2D(r6, rb6)
             quad2D(r6s, rb6)
         );
@@ -736,16 +736,16 @@ boundary
             quad2D(R5, R6)
             quad2D(R6, R7s)
             quad2D(R7, R0)
-    
+
             quad2D(R1, Rb1)
             quad2D(R1s, Rb1)
-    
+
             quad2D(R3, Rb3)
             quad2D(R3s, Rb3)
-    
+
             quad2D(R5, Rb5)
             quad2D(R5s, Rb5)
-    
+
             quad2D(R7, Rb7)
             quad2D(R7s, Rb7)
         );

@@ -1,8 +1,8 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM Extend Project: Open Source CFD        |
-|  \\    /   O peration     | Version:  1.6-ext                               |
-|   \\  /    A nd           | Web:      www.extend-project.de                 |
+| \\      /  F ield         | foam-extend: Open Source CFD                    |
+|  \\    /   O peration     | Version:     3.1                                |
+|   \\  /    A nd           | Web:         http://www.extend-project.de       |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 FoamFile
@@ -46,7 +46,6 @@ vertices
     (   2            5             -0.05)
     (  -2            5             -0.05)
 
-
     // Second cylinder
 
     // Inner circle
@@ -73,7 +72,6 @@ vertices
     (   6            5             -0.05)
     (   2            5             -0.05)
 
-
     // Lead square
 
     ( -10            -5            -0.05)
@@ -87,7 +85,6 @@ vertices
     (  14            -5            -0.05)
     (   6             5            -0.05)
     (  14             5            -0.05)
-
 
     // BACK PLANE
 
@@ -117,7 +114,6 @@ vertices
     (   2            5              0.05)
     (  -2            5              0.05)
 
-
     // Second cylinder
 
     // Inner circle
@@ -143,7 +139,6 @@ vertices
     (   6           -5              0.05)
     (   6            5              0.05)
     (   2            5              0.05)
-
 
     // Lead square
 
@@ -175,7 +170,6 @@ blocks
     // Top and bottom
     hex (12 13 9 8 52 53 49 48) c1Bot (10 10 1) simpleGrading (1 1 1)
     hex (11 10 14 15 51 50 54 55) c1Top (10 10 1) simpleGrading (1 1 1)
-
 
     // Second cylinder
     hex (16 20 21 17 56 60 61 57) cyl2 (7 10 1) simpleGrading (1 1 1)
@@ -326,6 +320,5 @@ patches
         (36 76 78 38)
     )
 );
-
 
 // ************************************************************************* //
