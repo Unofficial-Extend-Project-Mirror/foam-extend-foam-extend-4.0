@@ -59,7 +59,7 @@ History
  2011-04-05:
     * Major upgrade
         * Now works for parallel simulations
- 2011-06-03: 
+ 2011-06-03:
     * Minor bug fix:
         * Parallel decomposing no longer omits the initial directory
  2011-07-01: Overhauled documentation; no change to code

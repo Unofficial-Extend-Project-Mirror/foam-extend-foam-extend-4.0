@@ -202,22 +202,22 @@ void Foam::numericFlux<Flux, Limiter>::computeFlux()
         if (pp.coupled())
         {
             // Coupled patch
-            const scalarField ppLeft  = 
+            const scalarField ppLeft  =
                 p_.boundaryField()[patchi].patchInternalField();
 
-            const scalarField ppRight = 
+            const scalarField ppRight =
                 p_.boundaryField()[patchi].patchNeighbourField();
 
-            const vectorField pULeft  = 
+            const vectorField pULeft  =
                 U_.boundaryField()[patchi].patchInternalField();
 
-            const vectorField pURight = 
+            const vectorField pURight =
                 U_.boundaryField()[patchi].patchNeighbourField();
 
-            const scalarField pTLeft  = 
+            const scalarField pTLeft  =
                 T_.boundaryField()[patchi].patchInternalField();
 
-            const scalarField pTRight = 
+            const scalarField pTRight =
                 T_.boundaryField()[patchi].patchNeighbourField();
 
             // Gradients

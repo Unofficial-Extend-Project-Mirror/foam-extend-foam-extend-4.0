@@ -76,9 +76,9 @@ void Foam::betaFlux::evaluateFlux
     const scalar qRightSquare = magSqr(URight);
 
     // compute left and right speed of sound
-    const scalar cLeft = 
+    const scalar cLeft =
         sqrt(max((kappaLeft - 1)*(hLeft - 0.5*qLeftSquare), SMALL));
-    const scalar cRight = 
+    const scalar cRight =
         sqrt(max((kappaRight - 1)*(hRight - 0.5*qRightSquare), SMALL));
 
     const scalar magULeft  = mag(ULeft);

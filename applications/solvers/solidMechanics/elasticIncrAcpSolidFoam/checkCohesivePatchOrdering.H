@@ -7,7 +7,7 @@
         Cczm[i] -= Cczm[sizeByTwo + i];
         Cczm[sizeByTwo + i] = Cczm[i];
     }
-    
+
     scalar error = sum(mag(Cczm));
 
     if(error < SMALL)
@@ -16,7 +16,7 @@
     }
     else
     {
-        Info << "Cohesive patch face ordering: error (" << error << ")" 
+        Info << "Cohesive patch face ordering: error (" << error << ")"
             << endl;
     }
 }

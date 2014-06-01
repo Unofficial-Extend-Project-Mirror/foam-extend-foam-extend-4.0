@@ -5,7 +5,7 @@
 cd foam/foam-extend-3.0
 source etc/bashrc
 
-cd testHarness/foam-extend/3.0/runDir 
+cd testHarness/foam-extend/3.0/runDir
 
 ./Allclean
 

@@ -5,7 +5,7 @@ EXE_INC = \
     -I$(LIB_SRC)/dynamicMesh/dynamicMesh/lnInclude \
     -I$(LIB_SRC)/dynamicMesh/dynamicFvMesh/lnInclude\
     -I$(LIB_SRC)/tetFiniteElement/lnInclude \
-    -I$(LIB_SRC)/dynamicMesh/meshMotion/tetMotionSolver/lnInclude 
+    -I$(LIB_SRC)/dynamicMesh/meshMotion/tetMotionSolver/lnInclude
 
 EXE_LIBS = \
     -lfiniteArea \

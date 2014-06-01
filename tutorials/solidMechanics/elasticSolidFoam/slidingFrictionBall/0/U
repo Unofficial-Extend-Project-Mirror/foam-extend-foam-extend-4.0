@@ -75,7 +75,7 @@ boundaryField
 	  oscillationCorrection          yes;
 	  smoothingSteps                 1;
 	  infoFrequency                  10;
-	
+
 	  frictionLaw       coulomb;
 	  frictionLawDict
 	    {

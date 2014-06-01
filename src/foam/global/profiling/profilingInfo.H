@@ -86,12 +86,12 @@ class profilingInfo
 
     //- Disallow default bitwise copy construct
     profilingInfo(const profilingInfo&);
-    
+
     //- Disallow default bitwise assignment
     void operator=(const profilingInfo&);
 
     // Static data members
-    
+
     //- Counter that is used to generate the ids
     static label nextId_;
 
@@ -102,22 +102,22 @@ class profilingInfo
     void raiseID(label maxVal);
 
 protected:
-    
-    void addedToStack() 
+
+    void addedToStack()
         { onStack_=true; }
 
-    void removedFromStack() 
+    void removedFromStack()
         { onStack_=false; }
 
     //- Construct null - only the master-element
     profilingInfo();
 
-    void writeWithOffset(Ostream &os,bool offset=false,scalar time=0,scalar childTime=0) const; 
+    void writeWithOffset(Ostream &os,bool offset=false,scalar time=0,scalar childTime=0) const;
 
 public:
 
     // Constructors
-    
+
     //- Construct from components
     profilingInfo(profilingInfo &parent,const string &descr);
 
@@ -132,7 +132,7 @@ public:
     // Member Functions
 
     // Access
-    
+
     label id() const
         { return id_; }
 

@@ -353,24 +353,24 @@ void Foam::equationSource<Type>::addSource
         newIndex,
         new dimensionSet(gFieldIn.dimensions())
     );
-    
+
     // Set name
     fieldNames_[newIndex] = gFieldIn.name();
-    
+
     // Create fields pointer object
     fields_.set
     (
         newIndex,
         new UPtrList<const Field<Type> >(newGeoIndex)
     );
-    
+
     // Set internal field
     fields_[newIndex].set
     (
         0,
         &gFieldIn.internalField()
     );
-    
+
     // Set boundary fields
     forAll(gFieldIn.boundaryField(), patchI)
     {
@@ -417,7 +417,7 @@ void Foam::equationSource<Type>::removeSingle(label sourceIndex)
     singles_.reorder(oldToNew);
     singleDimensions_.reorder(oldToNew);
     singleNames_.reorder(oldToNew);*/
-    
+
     label newSize(singles_.size() - 1);
     singles_.setSize(newSize);
     singleDimensions_.setSize(newSize);
@@ -490,7 +490,7 @@ Foam::dictionary Foam::equationSource<Type>::outputDictionary() const
         keyType(word("single(" + templateTypeName_ + "s)")),
         singlesDict
     );
-    
+
     dictionary fieldsDict;
     forAll(fields_, sourceIndex)
     {

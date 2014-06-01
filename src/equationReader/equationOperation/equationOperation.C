@@ -800,7 +800,7 @@ Foam::Istream& Foam::operator>>(Istream& is, equationOperation& I)
 {
     label st(I.source_);
     label op(I.operation_);
-    
+
     is >> st >> I.sourceIndex_ >> I.dictLookupIndex_ >> op;
     return is;
 }

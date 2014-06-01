@@ -208,19 +208,19 @@ public:
        // Return residuals
 
             //- Return density equation residual
-            virtual tmp<scalarField> rhoResidual() const 
+            virtual tmp<scalarField> rhoResidual() const
             {
                 return fvc::div(rhoFlux_)().internalField();
             }
 
             //- Return momentum equation flux
-            virtual tmp<vectorField> rhoUResidual() const 
+            virtual tmp<vectorField> rhoUResidual() const
             {
                 return fvc::div(rhoUFlux_)().internalField();
             }
 
             //- Return energy equation flux
-            virtual tmp<scalarField> rhoEResidual() const 
+            virtual tmp<scalarField> rhoEResidual() const
             {
                 return fvc::div(rhoEFlux_)().internalField();
             }

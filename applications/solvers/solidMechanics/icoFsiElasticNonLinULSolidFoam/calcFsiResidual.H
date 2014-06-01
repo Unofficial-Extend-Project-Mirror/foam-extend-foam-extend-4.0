@@ -1,14 +1,14 @@
 {
-    const vectorField& solidPatchDisplacement = 
+    const vectorField& solidPatchDisplacement =
         DU.boundaryField()[solidPatchID];
 
     vectorField solidZoneDisplacement
         (
-            stressMesh.faceZones()[solidZoneID]().size(), 
+            stressMesh.faceZones()[solidZoneID]().size(),
             vector::zero
         );
 
-    const label solidPatchStart = 
+    const label solidPatchStart =
         stressMesh.boundaryMesh()[solidPatchID].start();
 
     forAll(solidPatchDisplacement, i)
@@ -17,7 +17,7 @@
         [
             stressMesh.faceZones()[solidZoneID]
            .whichFace(solidPatchStart + i)
-        ] = 
+        ] =
             solidPatchDisplacement[i];
     }
 
@@ -36,7 +36,7 @@
             vector::zero
         );
 
-    const label fluidPatchStart = 
+    const label fluidPatchStart =
         mesh.boundaryMesh()[fluidPatchID].start();
 
     forAll(fluidPatchDisplacement, i)
@@ -63,7 +63,7 @@
 
     fsiResidual = solidPatchPointsDispl - fluidPatchPointsDispl;
 
-//     maxFsiResidual = 
+//     maxFsiResidual =
 //        gMax
 //         (
 //             mag(fsiResidual)

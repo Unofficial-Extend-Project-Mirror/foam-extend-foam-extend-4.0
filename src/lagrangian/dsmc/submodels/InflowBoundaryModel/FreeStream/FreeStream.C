@@ -204,7 +204,7 @@ void Foam::FreeStream<CloudType>::inflow()
             // geometrical properties multiple times.
 
             labelList faceVertices = patch[f];
-            
+
             label nVertices = faceVertices.size();
 
             label globalFaceIndex = f + patch.start();

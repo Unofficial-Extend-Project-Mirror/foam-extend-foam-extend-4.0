@@ -106,7 +106,7 @@ Foam::tmp<Foam::volScalarField> Foam::BurgersViscoelastic::E(scalar t) const
             + eta2_.value()/k2_.value();
 
         scalar p2 = eta1_.value()*eta2_.value()/(k1_.value()*k2_.value());
-        
+
         scalar q1 = eta1_.value();
 
         scalar q2 = eta1_.value()*eta2_.value()/k2_.value();
@@ -119,7 +119,7 @@ Foam::tmp<Foam::volScalarField> Foam::BurgersViscoelastic::E(scalar t) const
 
         E = (q1 - q2*r1)*exp(-r1*t)/A - (q1 - q2*r2)*exp(-r2*t)/A;
     }
-    
+
 
     tmp<volScalarField> tresult
     (
@@ -177,7 +177,7 @@ Foam::tmp<Foam::volScalarField> Foam::BurgersViscoelastic::J(scalar t) const
 
     if(t >= 0)
     {
-        J = 1.0/k1_.value() 
+        J = 1.0/k1_.value()
           + (1 - exp(-k2_.value()*t/eta2_.value()))/k2_.value()
           + t/eta1_.value();
     }

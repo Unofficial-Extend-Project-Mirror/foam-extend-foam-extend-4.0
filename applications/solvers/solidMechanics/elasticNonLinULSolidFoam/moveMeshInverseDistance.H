@@ -4,13 +4,13 @@
 // if(min(J.internalField()) > 0)
   {
     Info << "Move solid mesh using inverse distance interpolation" << endl;
-    
+
     // Create point mesh
     pointMesh pMesh(mesh);
 
     // Create point interpolation
     volPointInterpolation pointInterpolation(mesh);
-    
+
     wordList types
       (
         pMesh.boundary().size(),
@@ -45,12 +45,12 @@
 
     // Move mesh
     vectorField newPoints = mesh.allPoints();
-    
+
      forAll (pointDUI, pointI)
        {
  	newPoints[pointI] += pointDUI[pointI];
       }
-  
+
     twoDPointCorrector twoDCorrector(mesh);
     twoDCorrector.correctPoints(newPoints);
     mesh.movePoints(newPoints);

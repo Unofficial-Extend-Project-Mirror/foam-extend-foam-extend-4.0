@@ -63,7 +63,7 @@ void equationReader::evaluateTypeField
  *      scalar fields must use evaluate...ScalarField functions;
  *      other types must use evaluate...TypeField functions;
  * This is still safe as a mismatch produces compile-time errors.
- 
+
 template<class GeoMesh>
 void equationReader::evaluateDimensionedTypeField<scalar, GeoMesh>
 (

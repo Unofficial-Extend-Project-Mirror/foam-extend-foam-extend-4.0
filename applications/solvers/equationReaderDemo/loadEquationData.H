@@ -3,18 +3,18 @@
         //  We could try addSource(runTime), but since runTime.name()
         //  constantly changes, we assign it our own name:
         eqns.scalarSources().addSource(runTime.value(), "t", dimTime);
-        
+
         // Add mesh coordinates (cell centres) gives variable names:
         // C.x, C.y, C.z
         eqns.vectorSources().addSource(mesh.C());
-        
+
         // Add mesh volumes
         eqns.scalarSources().addSource(mesh.V());
-        
+
         // Add simpleFoam's existing variables
         eqns.scalarSources().addSource(p);
         eqns.vectorSources().addSource(U);
-        
+
         // Adding a "derived" variable - one that exists only temporarily e.g.:
         // turbulence->R() - since it does not permanently exist, this won't
         // work:
@@ -49,18 +49,18 @@
         );
 
         eqns.addSource(equationDict);
-        
+
         // Generic sources for demo purposes:
-        
+
         // Scalars
         scalar sA(1.0);
         scalar sB(2.0);
         scalar sC(3.0);
-        
+
         eqns.scalarSources().addSource(sA, "sA");
         eqns.scalarSources().addSource(sB, "sB");
         eqns.scalarSources().addSource(sC, "sC");
-        
+
         // Dimensioned scalars
         dimensionedScalar dsA("dsA", dimless, 4.0);
         dimensionedScalar dsB("dsB", dimless, 5.0);
@@ -131,7 +131,7 @@
         eqns.vectorSources().addSource(vA, "vA");
         eqns.vectorSources().addSource(vB, "vB");
         eqns.vectorSources().addSource(vC, "vC");
-        
+
         dimensionedVector dvA("dvA", dimless, vector(400.0, 400.0, 400.0));
         dimensionedVector dvB("dvB", dimless, vector(500.0, -500.0, 500.0));
         dimensionedVector dvC("dvC", dimless, vector(600.0, 600.0, -600.0));
@@ -382,7 +382,7 @@
         eqns.readEquation(equationDict, "dsOut");
         eqns.readEquation(equationDict, "dsfOut");
         eqns.readEquation(equationDict, "volSfOut");
-        
+
         // vector equations
         eqns.readEquation(equationDict, "vOut.x");
         eqns.readEquation(equationDict, "vOut.y");
@@ -396,7 +396,7 @@
         eqns.readEquation(equationDict, "volVfOut.x");
         eqns.readEquation(equationDict, "volVfOut.y");
         eqns.readEquation(equationDict, "volVfOut.z");
-        
+
         // tensor equations
         eqns.readEquation(equationDict, "tOut.xx");
         eqns.readEquation(equationDict, "tOut.xy");
@@ -449,7 +449,7 @@
                 IOobject::AUTO_WRITE
             )
         );
-    
+
         // scalars
         scalar scalarOut;
         dimensionedScalar dimensionedScalarOut

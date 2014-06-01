@@ -59,7 +59,7 @@ int main(int argc, char *argv[])
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
     Info << "\nCalculating displacement field\n" << endl;
- 
+
     for (runTime++; !runTime.end(); runTime++)
     {
         Info<< "Iteration: " << runTime.timeName() << nl << endl;

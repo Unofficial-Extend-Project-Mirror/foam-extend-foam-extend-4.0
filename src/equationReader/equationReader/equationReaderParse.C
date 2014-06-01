@@ -40,7 +40,7 @@ void Foam::equationReader::parse(label index) const
             << size() - 1 << ")"
             << abort(FatalError);
     }
-    
+
     clearEquation(index);
 
     // First, ensure there are no ':' or '&' characters.  This is to
@@ -64,9 +64,9 @@ void Foam::equationReader::parse(label index) const
     // Precondition the string, and load it into a stream
     IStringStream rawStream(stringPreconditioner(operator[](index).rawText()));
     tokenList tl;
-    
+
     bool forceEnd(false);
-    
+
     // Read tokens from raw equation string stream
     while (!rawStream.eof() && !forceEnd)
     {
@@ -87,7 +87,7 @@ void Foam::equationReader::parse(label index) const
     // - operation: conatains operation number only (last field)
     // - brackets, comma: all are zero
     PtrList<equationOperation> map(tl.size());
-    
+
     // opLvl: level of operation precedence
     // 0. variable
     // 1. + -
@@ -96,10 +96,10 @@ void Foam::equationReader::parse(label index) const
     // 4. ( ) and functions; special case -4 indicates close bracket ')'
     // 5. , used only in functions
     labelList opLvl(tl.size());
-    
+
     // parenthesis level, negative means function root
     labelList pl(tl.size());
-    
+
     createMap(index, tl, map, opLvl, pl);
 
     // As a bug fix, we find any instance of pow(a,b) and remove the b part to
@@ -135,7 +135,7 @@ void Foam::equationReader::parse(label index) const
         Info << "pl is: " << pl << endl;
         Info << "Map is: " << map << endl;
     }*/
-    
+
     // In the main parsing loop, we create labelLists of indices that specify
     // what part of the equation we are working with.  As the equation is
     // parsed, the indices lists will shrink, but tl, pl, opLvl, and map will
@@ -189,7 +189,7 @@ void Foam::equationReader::parse(label index) const
                 // Not a function, first bracket is first index
                 trimListWithParent(eqnIndices, subEqnIndices, 0, 0);
             }
-            
+
             // Trimming trailing bracket
             trimListWithParent
             (
@@ -205,7 +205,7 @@ void Foam::equationReader::parse(label index) const
 
         label commaIndex(-1);
         label commaPos(-1);
-                
+
         // Look for a comma
         forAll(subEqnIndices, i)
         {
@@ -262,7 +262,7 @@ void Foam::equationReader::parse(label index) const
             {
                 // This is a single parameter function call - evaluate it
                 operator[](index).setSize(operator[](index).size() + 3);
-                
+
                 // retrieve parameter value
                 operator[](index).set
                 (
@@ -276,7 +276,7 @@ void Foam::equationReader::parse(label index) const
                         equationOperation::otretrieve
                     )
                 );
-                
+
                 // perform function operation
                 currentIndex = findIndex(resultIndex, eqnIndices);
                 operator[](index).set
@@ -302,12 +302,12 @@ void Foam::equationReader::parse(label index) const
                         equationOperation::ststorage,
                         storeIndex + 1,
                         0,
-                        0,                        
+                        0,
                         equationOperation::otstore
                     )
                 );
 
-                // Set term in map to store location                    
+                // Set term in map to store location
                 map[resultIndex] =
                     operator[](index)
                     [
@@ -340,7 +340,7 @@ void Foam::equationReader::parse(label index) const
                 }
             }
         } // end standard parenthesis / single parameter function
-        else if 
+        else if
         (
             (commaIndex < 1) || (commaIndex >= (subEqnIndices.size() - 1))
         )
@@ -392,7 +392,7 @@ void Foam::equationReader::parse(label index) const
                     storeIndex
                 )
             );
-            
+
             trimListWithParent
             (
                 eqnIndices,
@@ -455,7 +455,7 @@ void Foam::equationReader::parse(label index) const
                     map[eqnIndices[currentIndex - 1]].operation()
                 )
             );
-            
+
             // store result
             storeIndex++;
             operator[](index).set
@@ -466,12 +466,12 @@ void Foam::equationReader::parse(label index) const
                     equationOperation::ststorage,
                     storeIndex + 1,
                     0,
-                    0,                        
+                    0,
                     equationOperation::otstore
                 )
             );
-            
-            // Set term in map to store location                    
+
+            // Set term in map to store location
             map.set
             (
                 resultIndex,
@@ -481,7 +481,7 @@ void Foam::equationReader::parse(label index) const
                 )
             );
             map[resultIndex].operation() = equationOperation::otnone;
-            
+
             // trim function call from indices list
             trimList(eqnIndices, currentIndex - 1, currentIndex - 1);
 
@@ -536,12 +536,12 @@ void Foam::equationReader::parse(label index) const
                 description
             );
         }
-        
+
         // Add two operations - the first retrieves the variable, the second
         // is a dummy because the last operation is trimmed before exitting
         // equationReader::parse
         operator[](index).setSize(operator[](index).size() + 2);
-        
+
         // retrieve parameter value
         operator[](index).set
         (
@@ -555,7 +555,7 @@ void Foam::equationReader::parse(label index) const
                 equationOperation::otretrieve
             )
         );
-        
+
         // Store this result
         operator[](index).set
         (
@@ -565,7 +565,7 @@ void Foam::equationReader::parse(label index) const
                 equationOperation::ststorage,
                 storeIndex + 1,
                 0,
-                0,                        
+                0,
                 equationOperation::otstore
             )
         );
@@ -590,10 +590,10 @@ void Foam::equationReader::parse(label index) const
 
     // Link the eval function pointers (for efficiency)
     assignFunctionPointers(index);
-    
+
     // Determine the maximum field sizes available for this equation
     findMaxFieldSize(index);
-    
+
     if (debug)
     {
         Info << "Parsing complete for equation " << operator[](index).name()
@@ -692,7 +692,7 @@ Foam::label Foam::equationReader::parseExpression
                 );
             }
             operator[](index).setSize(operator[](index).size() + 1);
-            
+
             operator[](index).set
             (
                 operator[](index).size() - 1,
@@ -743,7 +743,7 @@ Foam::label Foam::equationReader::parseExpression
                             equationOperation::ststorage,
                             storeIndex + 1,
                             0,
-                            0,                        
+                            0,
                             equationOperation::otstore
                         )
                     );

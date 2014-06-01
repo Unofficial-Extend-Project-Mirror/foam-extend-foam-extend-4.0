@@ -1,7 +1,7 @@
 thermalModel/thermalModel.C
 thermalLaws          = thermalModel/thermalLaws
 
-$(thermalLaws)/thermalLaw/thermalLaw.C 
+$(thermalLaws)/thermalLaw/thermalLaw.C
 $(thermalLaws)/thermalLaw/newThermalLaw.C
 $(thermalLaws)/constantThermal/constantThermal.C
 $(thermalLaws)/multiMaterialThermal/multiMaterialThermal.C
@@ -9,7 +9,7 @@ $(thermalLaws)/multiMaterialZonesThermal/multiMaterialZonesThermal.C
 
 thermalGaps          = thermalModel/thermalGaps
 
-$(thermalGaps)/thermalGap/thermalGap.C 
+$(thermalGaps)/thermalGap/thermalGap.C
 $(thermalGaps)/thermalGap/newThermalGap.C
 $(thermalGaps)/constantThermalGap/constantThermalGap.C
 $(thermalGaps)/constantResistanceThermalGap/constantResistanceThermalGap.C

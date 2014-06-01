@@ -122,7 +122,7 @@ inline SymmTensor4thOrder<Cmpt> transform
   //- where A is a function of stt
 
   const double s = ::sqrt(2);
-  const double A[6][6] = 
+  const double A[6][6] =
     {
       { stt.xx()*stt.xx(), stt.xy()*stt.xy(), stt.xz()*stt.xz(), s*stt.xx()*stt.xy(), s*stt.xy()*stt.xz(), s*stt.xz()*stt.xx() },
       { stt.xy()*stt.xy(), stt.yy()*stt.yy(), stt.yz()*stt.yz(), s*stt.xy()*stt.yy(), s*stt.yy()*stt.yz(), s*stt.yz()*stt.xy() },
@@ -178,7 +178,7 @@ inline SymmTensor4thOrder<Cmpt> transform
      A[3][0] * C.xyxy() * A[3][2] +
      A[4][0] * C.yzyz() * A[4][2] +
      A[5][0] * C.zxzx() * A[5][2],
-     
+
      // yyyy
      A[0][1] * C.xxxx() * A[0][1] +
      A[1][1] * C.xxyy() * A[0][1] +
@@ -192,7 +192,7 @@ inline SymmTensor4thOrder<Cmpt> transform
      A[3][1] * C.xyxy() * A[3][1] +
      A[4][1] * C.yzyz() * A[4][1] +
      A[5][1] * C.zxzx() * A[5][1],
-     
+
      // yyzz
      A[0][1] * C.xxxx() * A[0][2] +
      A[1][1] * C.xxyy() * A[0][2] +
@@ -206,7 +206,7 @@ inline SymmTensor4thOrder<Cmpt> transform
      A[3][1] * C.xyxy() * A[3][2] +
      A[4][1] * C.yzyz() * A[4][2] +
      A[5][1] * C.zxzx() * A[5][2],
-     
+
      // zzzz
      A[0][2] * C.xxxx() * A[0][2] +
      A[1][2] * C.xxyy() * A[0][2] +

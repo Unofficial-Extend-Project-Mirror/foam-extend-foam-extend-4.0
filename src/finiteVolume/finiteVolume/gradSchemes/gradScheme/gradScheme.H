@@ -138,7 +138,7 @@ public:
         ) const = 0;
 
 
-        //- Return the blockLduMatrix<vector> corresponding to the implicit 
+        //- Return the blockLduMatrix<vector> corresponding to the implicit
         // grad discretization. For block coupled systems.
         virtual tmp<blockVectorMatrix> fvmGrad
         (

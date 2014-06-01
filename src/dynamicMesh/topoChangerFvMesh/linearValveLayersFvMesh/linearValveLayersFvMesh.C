@@ -121,7 +121,7 @@ void Foam::linearValveLayersFvMesh::addZonesAndModifiers()
     {
         pz[nPz] = pointZones()[zoneI].clone(pointZones()).ptr();
         nPz++;
-    }  
+    }
 
     // Copy existing face zones
     forAll (faceZones(), zoneI)
@@ -129,7 +129,7 @@ void Foam::linearValveLayersFvMesh::addZonesAndModifiers()
         fz[nFz] = faceZones()[zoneI].clone(faceZones()).ptr();
         nFz++;
     }
-    
+
     // Copy existing cell zones
     forAll (cellZones(), zoneI)
     {

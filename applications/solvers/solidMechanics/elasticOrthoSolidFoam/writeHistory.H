@@ -6,9 +6,9 @@ if(historyPatchID != -1)
 
      //- for small strain or moving mesh
     vector force = gSum(mesh.boundary()[historyPatchID].Sf() & sigma.boundaryField()[historyPatchID]);
-    
+
     vector avDisp = gAverage(U.boundaryField()[historyPatchID]);
-     
+
     //- write to file
     if(Pstream::master())
       {

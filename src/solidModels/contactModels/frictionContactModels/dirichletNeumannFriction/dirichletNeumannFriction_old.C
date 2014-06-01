@@ -349,7 +349,7 @@ Foam::dirichletNeumannFriction::dirichletNeumannFriction
             // add on the original disp
             slaveDisp_[faceI] += oldSlaveDisp[faceI];
             // remove normal component
-            slaveDisp_[faceI] = 
+            slaveDisp_[faceI] =
                 (I-sqr(slaveFaceNormals[faceI])) & slaveDisp_[faceI];
 
             // set slave valueFraction

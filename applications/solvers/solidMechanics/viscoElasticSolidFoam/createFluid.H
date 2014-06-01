@@ -24,13 +24,13 @@
         )
     );
 
-    label fluidInterfacePatchID = 
+    label fluidInterfacePatchID =
         fluidMesh.boundaryMesh().findPatchID("interface");
 
     if(fluidInterfacePatchID == -1)
     {
         FatalErrorIn(args.executable())
-            << "Can't find patch with name interface" << abort(FatalError);  
+            << "Can't find patch with name interface" << abort(FatalError);
     }
 
     patchToPatchInterpolation interpolator
@@ -40,7 +40,7 @@
 	intersection::VISIBLE
     );
 
-    scalarField error = 
+    scalarField error =
         mag
         (
             mesh.C().boundaryField()[interfacePatchID]

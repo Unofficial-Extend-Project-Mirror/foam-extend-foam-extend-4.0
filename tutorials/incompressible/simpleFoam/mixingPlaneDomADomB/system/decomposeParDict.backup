@@ -19,22 +19,22 @@ method manual; 	//metis; //simple;
 globalFaceZones (
     ggi1DomAZone
     ggi2DomAZone
-); 	
+);
 
 manualCoeffs
 {
   dataFile "manualDecomp.txt";
-} 	
+}
 
 simpleCoeffs
 {
   n (1 4 1);
-  delta 0.001; 	
-} 	
+  delta 0.001;
+}
 
-distributed no; 	
+distributed no;
 
 roots
   (
-  ); 	
+  );
 

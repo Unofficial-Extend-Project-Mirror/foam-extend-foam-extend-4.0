@@ -108,7 +108,7 @@ tmp<blockVectorMatrix> gradScheme<Type>::fvmGrad
     (
         "tmp<blockVectorMatrix> fvmGrad\n",
         "(\n"
-        "    GeometricField<Type, fvPatchField, volMesh>&" 
+        "    GeometricField<Type, fvPatchField, volMesh>&"
         ")\n"
     )   << "Implicit gradient operator currently defined only for Gauss grad."
         << abort(FatalIOError);

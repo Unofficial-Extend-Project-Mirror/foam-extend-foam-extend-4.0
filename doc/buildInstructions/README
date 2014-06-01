@@ -1,13 +1,13 @@
 Here you can find build instructions for foam-extend-3.0 . The instructions for
-different Linux distributions are in corresponding sub-folders. If you need to 
+different Linux distributions are in corresponding sub-folders. If you need to
 take different or additional steps to get foam-extend compiled on your machine,
 please file a bug at http://sourceforge.net/apps/mantisbt/openfoam-extend/.
 
-If you compiled/installed on a Linux distribution that is not listed here, 
+If you compiled/installed on a Linux distribution that is not listed here,
 please contribute to the project and submit installation instructions. Contact
-the project admins on http://sourceforge.net/projects/openfoam-extend/ for 
+the project admins on http://sourceforge.net/projects/openfoam-extend/ for
 details.
 
-Please also refer to the unofficial OpenFOAM Wiki for additional installation 
+Please also refer to the unofficial OpenFOAM Wiki for additional installation
 instructions:
 http://openfoamwiki.net/index.php/Installation/Linux/foam-extend-3.0

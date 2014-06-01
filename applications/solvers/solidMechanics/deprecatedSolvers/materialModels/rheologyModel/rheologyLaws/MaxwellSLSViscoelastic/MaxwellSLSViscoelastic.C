@@ -100,7 +100,7 @@ Foam::tmp<Foam::volScalarField> Foam::MaxwellSLSViscoelastic::E(scalar t) const
     {
         E = k2_.value() + k1_.value()*exp(-k1_.value()*t/eta1_.value());
     }
-    
+
 
     tmp<volScalarField> tresult
     (

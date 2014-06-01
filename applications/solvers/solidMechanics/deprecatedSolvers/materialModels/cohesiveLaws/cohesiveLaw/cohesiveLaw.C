@@ -73,7 +73,7 @@ Foam::autoPtr<Foam::cohesiveLaw> Foam::cohesiveLaw::New
 Foam::cohesiveLaw::cohesiveLaw
 (
     const word& cohesiveLawName,
-    const dictionary& dict            
+    const dictionary& dict
 )
 :
     cohesiveLawCoeffs_(dict.subDict(cohesiveLawName + "Coeffs")),

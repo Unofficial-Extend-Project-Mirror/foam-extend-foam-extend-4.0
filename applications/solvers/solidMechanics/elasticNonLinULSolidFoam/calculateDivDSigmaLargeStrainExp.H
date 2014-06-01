@@ -6,7 +6,7 @@ if(divDSigmaLargeStrainExpMethod == "standard")
     divDSigmaLargeStrainExp =
       fvc::div
       (
-       mu*(gradDU & gradDU.T())	
+       mu*(gradDU & gradDU.T())
        //+ 0.5*lambda*(gradDU && gradDU)*I //- equivalent to 0.5*lambda*(I*tr(gradDU & gradDU.T()))
        + 0.5*lambda*tr(gradDU & gradDU.T())*I
        + ((sigma + DSigma) & gradDU),

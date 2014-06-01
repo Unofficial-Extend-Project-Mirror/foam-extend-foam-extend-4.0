@@ -7,19 +7,19 @@ then
     echo "Error: Current directory is not \$WM_PROJECT_DIR"
     echo "    The environment variables are not consistent with the installation."
     echo "    Please source configuration files."
-    echo 
+    echo
     echo "Examples:"
     echo "    bash: . etc/bashrc"
     echo "    tcsh: source etc/cshrc"
-    echo 
-    echo "    If you sourced the configuration files, please check the 'foamInstall' entry."   
+    echo
+    echo "    If you sourced the configuration files, please check the 'foamInstall' entry."
     echo
     exit 1
 fi
 
 if [ -z "$PARAVIEW_SYSTEM" ] && [ -z "$QT_BIN_DIR" ]
 then
-    echo 
+    echo
     echo "\$QT_BIN_DIR not set. To compile Paraview from sources"
     echo "the command \$QT_BIN_DIR/qmake needs to be valid."
     echo
@@ -27,13 +27,13 @@ then
     echo "    Ubuntu:   \"export QT_BIN_DIR=/usr/bin\""
     echo "    Fedora:   \"export QT_BIN_DIR=/usr/lib64/qt4/bin\""
     echo "    openSuse: \"export QT_BIN_DIR=/usr/bin\""
-    echo 
+    echo
     read -r -p "Proceed without compiling ParaView [Y/n] " response
     if [[ $response =~ ^([nN][oO]|[nN])$ ]]
     then
         exit 0
     fi
-fi 
+fi
 
 # Check whether we will be compiling cudaSolvers
 if [ -f $CUDA_BIN_DIR/nvcc ]
@@ -43,12 +43,12 @@ then
     echo "cudaSolvers will be compiled by default."
     echo
 
-    # If yes, check presence of $CUDA_ARCH 
+    # If yes, check presence of $CUDA_ARCH
     if [ -z "$CUDA_ARCH" ]
     then
         echo
         echo "\$CUDA_ARCH is required by nvcc compiler but not set."
-        echo "Check section '-gpu-architecture' in 'man nvcc' for details." 
+        echo "Check section '-gpu-architecture' in 'man nvcc' for details."
         echo
         read -r -p "Proceed without compiling cudaSolvers? [Y/n] " response
         if [[ $response =~ ^([nN][oO]|[nN])$ ]]

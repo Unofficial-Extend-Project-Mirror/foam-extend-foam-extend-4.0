@@ -26,18 +26,18 @@
 #     foamProbe
 #
 # Description
-#     Proccess a scalar, vetorial or tensorial field of OpenFOAM 
+#     Proccess a scalar, vetorial or tensorial field of OpenFOAM
 #     probe file (for monitoring points). The original file will not be changed
 #     and the fields of each monitoring point will be stored in a new
 #      directory named probe<Name> (where <Name> is the field name) in the
 #     directory where are the original probes files.
 #     The fourth optional parameter can be used to create xmgrace sequentially
-#     graphs (case is 0)  
+#     graphs (case is 0)
 #     for monitoring points or automatically create eps figures (case is 1).
 
 #
-# Author: 
-#     Jovani L. Favero, J. F. Mitre (2009) 
+# Author:
+#     Jovani L. Favero, J. F. Mitre (2009)
 #
 #------------------------------------------------------------------------------
 
@@ -115,7 +115,7 @@ if [ "$xmgrace" = 1 ]; then
     echo " Opening file $CNAME$underscore$point"
     if [ "$save" = 0 ]; then
      echo " Opened $CNAME$underscore$point"
-     xmgrace -nxy $CNAME\_$point -noask 
+     xmgrace -nxy $CNAME\_$point -noask
     fi
 
     if [ "$save" -ne 0 ]; then

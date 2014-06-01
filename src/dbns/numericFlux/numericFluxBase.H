@@ -86,13 +86,13 @@ public:
 
 
         // Return residuals
-    
+
             //- Return mass residual
-            virtual tmp<scalarField> rhoResidual() const = 0; 
+            virtual tmp<scalarField> rhoResidual() const = 0;
 
             //- Return momentum residual
-            virtual tmp<vectorField> rhoUResidual() const = 0; 
-                         
+            virtual tmp<vectorField> rhoUResidual() const = 0;
+
             //- Return energy residual
             virtual tmp<scalarField> rhoEResidual() const = 0;
 

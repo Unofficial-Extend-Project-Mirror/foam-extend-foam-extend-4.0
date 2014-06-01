@@ -55,7 +55,7 @@ boundaryField
 	    aitkenRelaxation      no;
 	    infoFrequency         10;
 	    oscillationCorrection yes;
-	    smoothingSteps        1;	
+	    smoothingSteps        1;
 	  }
 	//frictionContactModel   frictionless;
 	frictionContactModel   dirichletNeumann;
@@ -64,8 +64,8 @@ boundaryField
 	    relaxationFactor      0.2;
 	    infoFrequency         10;
 	    oscillationCorrection yes;
-	    smoothingSteps        1;	
-	
+	    smoothingSteps        1;
+
 	    frictionLaw           coulomb;
 	    frictionLawDict
 	      {

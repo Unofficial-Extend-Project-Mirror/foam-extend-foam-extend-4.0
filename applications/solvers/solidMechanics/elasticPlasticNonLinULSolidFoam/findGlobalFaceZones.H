@@ -34,7 +34,7 @@ forAll(globalFaceZones, zoneI)
 
     labelList curMap(mesh.faceZones()[curZoneID]().nPoints(), -1);
 
-    vectorField fzGlobalPoints = 
+    vectorField fzGlobalPoints =
         mesh.faceZones()[curZoneID]().localPoints();
 
     //- set all slave points to zero because only the master order is used
@@ -50,13 +50,13 @@ forAll(globalFaceZones, zoneI)
     //- every proc must now find the mapping from their local FZ points to
     //- the global FZ points
 
-    const vectorField& fzLocalPoints = 
+    const vectorField& fzLocalPoints =
         mesh.faceZones()[curZoneID]().localPoints();
 
     const edgeList& fzLocalEdges =
         mesh.faceZones()[curZoneID]().edges();
 
-    const labelListList& fzPointEdges = 
+    const labelListList& fzPointEdges =
         mesh.faceZones()[curZoneID]().pointEdges();
 
     scalarField minEdgeLength(fzLocalPoints.size(), GREAT);
@@ -84,7 +84,7 @@ forAll(globalFaceZones, zoneI)
             scalar curDist =
                 mag
                 (
-                    fzLocalPoints[procPointI] 
+                    fzLocalPoints[procPointI]
                   - fzGlobalPoints[globalPointI]
                 );
 
@@ -111,10 +111,10 @@ forAll(globalFaceZones, zoneI)
         if (curMap[globalPointI] == -1)
         {
             FatalErrorIn(args.executable())
-                << "local to global face zone point map is not correct" 
+                << "local to global face zone point map is not correct"
                     << abort(FatalError);
         }
     }
-    
+
     globalToLocalFaceZonePointMap[zoneI] = curMap;
 }

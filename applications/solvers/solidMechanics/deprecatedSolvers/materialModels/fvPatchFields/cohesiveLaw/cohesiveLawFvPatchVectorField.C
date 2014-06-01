@@ -244,7 +244,7 @@ void cohesiveLawFvPatchVectorField::write(Ostream& os) const
 {
     fvPatchVectorField::write(os);
     traction_.writeEntry("traction", os);
-    os.writeKeyword("cohesiveLaw") << law().type() 
+    os.writeKeyword("cohesiveLaw") << law().type()
         << token::END_STATEMENT << nl;
     os.writeKeyword("relaxationFactor") << relaxationFactor_
         << token::END_STATEMENT << nl;

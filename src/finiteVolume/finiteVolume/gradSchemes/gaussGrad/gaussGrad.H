@@ -139,7 +139,7 @@ public:
             const GeometricField<Type, fvPatchField, volMesh>&
         ) const;
 
-        //- Return the blockLduMatrix<vector> corresponding to the implicit 
+        //- Return the blockLduMatrix<vector> corresponding to the implicit
         // grad discretization. For block coupled systems.
         tmp<blockVectorMatrix> fvmGrad
         (

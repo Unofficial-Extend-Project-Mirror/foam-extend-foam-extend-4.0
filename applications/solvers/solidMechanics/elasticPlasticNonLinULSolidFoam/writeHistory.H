@@ -9,13 +9,13 @@ if(historyPatchID != -1)
      //		    direction &
      //		    (mesh.boundary()[historyPatchID].Sf() & sigma.boundaryField()[historyPatchID])
      //		    );
-     
+
      //- for large strain total lagrangian
      //tensorField F = I + gradU.boundaryField()[historyPatchID];
-     //vector force = gSum(mesh.Sf().boundaryField()[historyPatchID] & (sigma.boundaryField()[historyPatchID] & F));    
+     //vector force = gSum(mesh.Sf().boundaryField()[historyPatchID] & (sigma.boundaryField()[historyPatchID] & F));
 
      //- for large strain updated lagrangian
-     vector force = gSum(mesh.Sf().boundaryField()[historyPatchID] & sigma.boundaryField()[historyPatchID]);    
+     vector force = gSum(mesh.Sf().boundaryField()[historyPatchID] & sigma.boundaryField()[historyPatchID]);
 
      vector disp = gAverage(U.boundaryField()[historyPatchID]);
 
@@ -27,7 +27,7 @@ if(historyPatchID != -1)
      symmTensor stress = gAverage(sigma.boundaryField()[historyPatchID]);
      symmTensor strain = gAverage(epsilon.boundaryField()[historyPatchID]);
 
- 
+
      // write to file
      if(Pstream::master())
        {

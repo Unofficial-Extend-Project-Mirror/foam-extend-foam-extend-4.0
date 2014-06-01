@@ -103,7 +103,7 @@ Foam::contactPatchPair::contactPatchPair
         cp.mesh().boundaryMesh()[slavePatch_.index()],     // to patch
         intersection::algorithmNames_.read(dict.lookup("projectionAlgo")),
         intersection::directionNames_.read(dict.lookup("projectionDir"))
-        
+
     ),
     slaveToMasterInterpolate_
     (
@@ -111,7 +111,7 @@ Foam::contactPatchPair::contactPatchPair
         cp.mesh().boundaryMesh()[masterPatch_.index()],    // to patch
         intersection::algorithmNames_.read(dict.lookup("projectionAlgo")),
         intersection::directionNames_.read(dict.lookup("projectionDir"))
-        
+
     )
 {}
 

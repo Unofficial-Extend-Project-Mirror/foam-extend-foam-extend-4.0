@@ -56,7 +56,7 @@ class coarseMgFieldLevel
 
         // Mesh levels
 
-            //- Reference to the current mesh level 
+            //- Reference to the current mesh level
             //  corresponding to the current field level
             const mgMeshLevel& meshLevel_;
 
@@ -143,7 +143,7 @@ class coarseMgFieldLevel
        template <typename T>
        void interpolate
        (
-           Field<T>& c, 
+           Field<T>& c,
            Field<T> f
        )
        {
@@ -204,7 +204,7 @@ public:
 
             if (level_ == 1)
             {
-                const scalarField& fineVol = 
+                const scalarField& fineVol =
                     meshLevel_.fineLevel().cellVolumes();
 
                 rhoRes_ = 0;
@@ -227,21 +227,21 @@ public:
                 rhoRes_ = 0;
                 fineFieldLevel_.restrict
                 (
-                    rhoRes_, 
+                    rhoRes_,
                     fineFieldLevel_.rhoResVar()
                 );
 
                 rhoURes_ = vector::zero;
                 fineFieldLevel_.restrict
                 (
-                     rhoURes_, 
+                     rhoURes_,
                      fineFieldLevel_.rhoUResVar()
                 );
 
                 rhoERes_ = 0;
                 fineFieldLevel_.restrict
                 (
-                    rhoERes_, 
+                    rhoERes_,
                     fineFieldLevel_.rhoEResVar()
                 );
             }

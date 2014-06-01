@@ -173,7 +173,7 @@ public:
 
             //- Update the coefficients associated with the patch field
             virtual void updateCoeffs();
-    
+
 
         //- Write
         virtual void write(Ostream&) const;

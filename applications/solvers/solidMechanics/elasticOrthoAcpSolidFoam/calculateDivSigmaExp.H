@@ -1,10 +1,10 @@
 if(divSigmaExpMethod == "standard")
   {
     //- calculating the full gradient has good convergence and no high freq oscillations
-    divSigmaExp = fvc::div(C && epsilon) - fvc::div(K & gradU);     
+    divSigmaExp = fvc::div(C && epsilon) - fvc::div(K & gradU);
   }
  else if(divSigmaExpMethod == "surface")
-   { 
+   {
      //- this form seems to have the best convergence
      divSigmaExp =
        fvc::div(mesh.magSf()*

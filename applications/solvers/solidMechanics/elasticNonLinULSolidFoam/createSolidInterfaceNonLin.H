@@ -6,7 +6,7 @@ if(solidInterfaceCorr)
   {
     solidInterfacePtr = &rheology.solInterface();
     solidInterfacePtr->modifyProperties(muf, lambdaf);
-    
+
     //- solidInterface needs muf and lambdaf to be used for divDSigmaExp
     if(divDSigmaExpMethod != "surface" && divDSigmaExpMethod != "decompose")
       {

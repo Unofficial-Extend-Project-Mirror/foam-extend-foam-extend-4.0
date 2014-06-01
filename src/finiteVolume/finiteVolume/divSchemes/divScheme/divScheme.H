@@ -152,7 +152,7 @@ public:
             const GeometricField<Type, fvPatchField, volMesh>&
         ) = 0;
 
-        //- Return the blockLduMatrix<vector> corresponding to the implicit 
+        //- Return the blockLduMatrix<vector> corresponding to the implicit
         // div discretization. For block coupled system.
         virtual tmp<blockVectorMatrix> fvmDiv
         (

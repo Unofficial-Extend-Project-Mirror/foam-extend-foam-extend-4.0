@@ -70,7 +70,7 @@ class profilingTrigger
 
 protected:
 
-    clockTime &clock() 
+    clockTime &clock()
         { return clock_; }
 
     const profilingInfo &info() const
@@ -81,7 +81,7 @@ public:
     // Constructors
 
     profilingTrigger(const string &name);
-        
+
     ~profilingTrigger();
 
     void stop();

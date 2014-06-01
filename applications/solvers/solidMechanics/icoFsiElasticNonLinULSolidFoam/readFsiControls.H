@@ -4,9 +4,9 @@ if (couplingProperties.found("couplingScheme"))
 {
     couplingScheme = word(couplingProperties.lookup("couplingScheme"));
 
-    if 
+    if
     (
-        (couplingScheme == "IQN-ILS") 
+        (couplingScheme == "IQN-ILS")
      || (couplingScheme == "Aitken")
      || (couplingScheme == "FixedRelaxation")
     )
@@ -31,7 +31,7 @@ if (couplingProperties.found("couplingScheme"))
 //     (
 //         couplingProperties.lookup("couplingReuse")
 //     )
-// ); 
+// );
 
 scalar interfaceDeformationLimit
 (
@@ -66,6 +66,6 @@ fsiRelaxationFactor = fsiRelaxationFactorMin;
 scalar outerCorrTolerance
 (
     readScalar(couplingProperties.lookup("outerCorrTolerance"))
-); 
+);
 
 Switch fsi(couplingProperties.lookup("fsi"));

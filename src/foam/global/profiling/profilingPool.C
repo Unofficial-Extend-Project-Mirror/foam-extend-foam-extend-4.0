@@ -77,7 +77,7 @@ Foam::profilingInfo &Foam::profilingPool::getInfo(const string& name)
         FatalErrorIn("profilingPool::addInfo(const string& name)")
             << "Singleton not initialized\n" << endl
             << abort(FatalError);
-    } 
+    }
 
     profilingStack& stack = thePool_->stack();
     mapType& map = thePool_->map();
@@ -124,8 +124,8 @@ void Foam::profilingPool::rememberTimer
             "clockTime& timer)"
         )   << "Singleton not initialized\n" << endl
             << abort(FatalError);
-    } 
-    
+    }
+
     thePool_->stack().addTimer(info, timer);
 }
 
@@ -137,16 +137,16 @@ void Foam::profilingPool::remove(const profilingInfo &info)
         FatalErrorIn("profilingPool::addInfo(const string& name)")
             << "Singleton not initialized\n" << endl
             << abort(FatalError);
-    } 
+    }
 
     profilingStack& stack = thePool_->stack();
 
     if(info.id() != stack.top().id())
     {
         FatalErrorIn("profilingPool::update(const string &name)")
-            << "The id " << info.id() << " of the updated info " 
+            << "The id " << info.id() << " of the updated info "
             << info.description()
-            << " is no the same as the one on top of the stack: " 
+            << " is no the same as the one on top of the stack: "
             << stack.top().id() << " (" << stack.top().description()
             << ")\n" << endl
             << abort(FatalError);

@@ -15,7 +15,7 @@ scalar deltaTmin(readScalar(stressControl.lookup("deltaTmin")));
 scalar deltaTmax(readScalar(stressControl.lookup("deltaTmax")));
 
 int infoFrequency(readInt(stressControl.lookup("infoFrequency")));
-//Info << "\nFrequency of info statements is " << infoFrequency << endl;    
+//Info << "\nFrequency of info statements is " << infoFrequency << endl;
 
 Switch aitkenRelax(stressControl.lookup("aitkenRelaxation"));
 Switch predictor(stressControl.lookup("predictor"));

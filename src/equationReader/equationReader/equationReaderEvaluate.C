@@ -56,7 +56,7 @@ Foam::dimensionSet Foam::equationReader::internalEvaluateDimensions
     //      // does nothing
     //  }
     (*this.*reportDimsEvalStartFunction_)(equationIndex);
-    
+
     if (eqn.size() == 0)
     {
         parse(equationIndex);
@@ -115,7 +115,7 @@ Foam::dimensionSet Foam::equationReader::internalEvaluateDimensions
         //      // does nothing
         //  }
         (*this.*reportDimsOperationFunction_)(equationIndex, i);
-        
+
         // Execute the eval function to which this operation points
         eqn[i].opDimsFunction
         (
@@ -127,7 +127,7 @@ Foam::dimensionSet Foam::equationReader::internalEvaluateDimensions
             xDims,
             sourceDims
         );
-        
+
         // Launch the reportDimsResultFunction, which does this:
         //  if ((debug == 4) || (debug == 6))
         //  {
@@ -141,12 +141,12 @@ Foam::dimensionSet Foam::equationReader::internalEvaluateDimensions
         //  }
         (*this.*reportDimsResultFunction_)(xDims);
     }
-    
+
     //Move one level back up on the dependents_ list
     if (dependents_.size())
     {
         dependents_.setSize(dependents_.size() - 1);
-    }    
+    }
 
     storageDims_.setSize(storageOffset);
 
@@ -199,7 +199,7 @@ Foam::scalar Foam::equationReader::internalEvaluateScalar
     //      // does nothing
     //  }
     (*this.*reportScalarEvalStartFunction_)(equationIndex);
-    
+
     if (eqn.size() == 0)
     {
         parse(equationIndex);
@@ -258,7 +258,7 @@ Foam::scalar Foam::equationReader::internalEvaluateScalar
         //      // does nothing
         //  }
         (*this.*reportScalarOperationFunction_)(equationIndex, i);
-        
+
         // Execute the eval function to which this operation points
         eqn[i].opScalarFunction
         (
@@ -270,7 +270,7 @@ Foam::scalar Foam::equationReader::internalEvaluateScalar
             x,
             source
         );
-        
+
         // Launch the reportScalarResultFunction, which does this:
         //  if ((debug == 2) || (debug == 6))
         //  {
@@ -284,12 +284,12 @@ Foam::scalar Foam::equationReader::internalEvaluateScalar
         //  }
         (*this.*reportScalarResultFunction_)(x);
     }
-    
+
     //Move one level back up on the dependents_ list
     if (dependents_.size())
     {
         dependents_.setSize(dependents_.size() - 1);
-    }    
+    }
 
     storageScalars_.setSize(storageOffset);
 
@@ -345,7 +345,7 @@ void Foam::equationReader::internalEvaluateScalarField
     //      // does nothing
     //  }
     (*this.*reportScalarEvalStartFunction_)(equationIndex);
-    
+
     if (eqn.size() == 0)
     {
         parse(equationIndex);
@@ -404,7 +404,7 @@ void Foam::equationReader::internalEvaluateScalarField
         //      // does nothing
         //  }
         (*this.*reportScalarOperationFunction_)(equationIndex, i);
-        
+
         // Execute the eval function to which this operation points
         eqn[i].opScalarFieldFunction
         (
@@ -416,7 +416,7 @@ void Foam::equationReader::internalEvaluateScalarField
             result,
             source
         );
-        
+
         // Launch the reportScalarResultFunction, which does this:
         //  if ((debug == 2) || (debug == 6))
         //  {
@@ -430,12 +430,12 @@ void Foam::equationReader::internalEvaluateScalarField
         //  }
         (*this.*reportScalarResultFunction_)(result[0]);
     }
-    
+
     //Move one level back up on the dependents_ list
     if (dependents_.size())
     {
         dependents_.setSize(dependents_.size() - 1);
-    }    
+    }
 
     storageScalarFields_.setSize(storageOffset);
 

@@ -285,7 +285,7 @@ public:
                         "    UList<T>& coarseData,\n"
                         "    const UList<T>& fineData\n"
                         ") const\n"
-                    )    << "Incorrect data sizes "   
+                    )    << "Incorrect data sizes "
                          << abort(FatalError);
                 }
 

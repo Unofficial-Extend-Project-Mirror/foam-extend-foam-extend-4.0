@@ -1,6 +1,6 @@
 Below are build instructions for Ubuntu 12.04 and Ubuntu 13.10.
 
-These instructions assume that you install in the default location, which is 
+These instructions assume that you install in the default location, which is
 ~/foam/ . Create this folder with:
 
     cd ~
@@ -9,12 +9,12 @@ These instructions assume that you install in the default location, which is
 
 * Obtain and unpack source code (if you read this, you probably already have):
 
-The recommended way is to get the source code through git source code 
+The recommended way is to get the source code through git source code
 management system. This way, you can get updates and bugfixes easily by running
-"git pull". To install into the default location run: 
+"git pull". To install into the default location run:
 
     cd ~/foam
-    git clone git://git.code.sf.net/p/openfoam-extend/foam-extend-3.0 
+    git clone git://git.code.sf.net/p/openfoam-extend/foam-extend-3.0
 
 
 Alternatively, you can download a snapshot (.tgz) of the source code from:
@@ -23,7 +23,7 @@ http://sourceforge.net/projects/openfoam-extend/files/foam-extend-3.0/
 
 * Install required packages:
 
-    sudo apt-get install git-core build-essential binutils-dev flex bison \ 
+    sudo apt-get install git-core build-essential binutils-dev flex bison \
     zlib1g-dev qt4-dev-tools libqt4-dev libncurses5-dev libxt-dev rpm \
     mercurial graphviz
 
@@ -36,12 +36,12 @@ Make an additional link:
     cd ~/foam/foam-extend-3.0
     . etc/bashrc
 
-Optionally, set environment variable for Qt to compile ParaView: 
+Optionally, set environment variable for Qt to compile ParaView:
 
     export QT_BIN_DIR=/usr/bin
 
 Optionally, set environment variable for compiling Cuda solvers, for example
-(replace "sm_30" with value according to your GPU architecture): 
+(replace "sm_30" with value according to your GPU architecture):
 
     export CUDA_ARCH=sm_30
 

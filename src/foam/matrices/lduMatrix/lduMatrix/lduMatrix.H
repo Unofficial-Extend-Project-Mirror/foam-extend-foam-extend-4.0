@@ -275,7 +275,7 @@ public:
 
 
             profilingTrigger profile_;
- 
+
         // Protected Member Functions
 
             //- Return dictionary

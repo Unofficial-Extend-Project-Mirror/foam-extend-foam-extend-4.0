@@ -224,7 +224,7 @@ public:
                     gradPhiIn[own],
                     deltaRRight
                 );
-		
+
                 // find minimal limiter value in each cell
                 phiLimiterIn[own] =
                     min(phiLimiterIn[own], phiOwnerLimiter);

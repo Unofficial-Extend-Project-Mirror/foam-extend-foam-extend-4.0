@@ -95,7 +95,7 @@
        );
 
     constitutiveModel rheology(sigma, U);
-    
+
     surfaceVectorField traction
     (
         IOobject

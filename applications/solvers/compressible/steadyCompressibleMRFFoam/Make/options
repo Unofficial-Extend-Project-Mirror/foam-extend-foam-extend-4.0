@@ -3,7 +3,7 @@ EXE_INC = \
     -I$(LIB_SRC)/thermophysicalModels/basic/lnInclude \
     -I$(LIB_SRC)/turbulenceModels \
     -I$(LIB_SRC)/turbulenceModels/compressible/RAS/RASModel \
-    
+
 EXE_LIBS = \
     -lfiniteVolume \
     -lmeshTools \

@@ -29,7 +29,7 @@ License
 
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
 
-Foam::autoPtr<Foam::mgFieldLevel> 
+Foam::autoPtr<Foam::mgFieldLevel>
 Foam::mgFieldLevel::makeNextLevel
 (
     const mgMeshLevel& coarseMeshLevel
@@ -39,7 +39,7 @@ Foam::mgFieldLevel::makeNextLevel
     (
         new coarseMgFieldLevel
         (
-            coarseMeshLevel, 
+            coarseMeshLevel,
             *this
         )
     );

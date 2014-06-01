@@ -25,7 +25,7 @@ Class
     regionCouplingResistanceFvPatchField
 
 Description
-    Region couple patch field jump resistance on the surface taking 
+    Region couple patch field jump resistance on the surface taking
     radiation into account
 
 Author

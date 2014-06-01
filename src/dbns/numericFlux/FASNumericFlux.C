@@ -156,17 +156,17 @@ void Foam::FASNumericFlux<Flux>::computeFlux()
 
         if (fieldLevel_.p().boundaryField()[patchi].coupled())
         {
-            const scalarField ppLeft  = 
+            const scalarField ppLeft  =
                 fieldLevel_.p().boundaryField()[patchi].patchInternalField();
-            const scalarField ppRight = 
+            const scalarField ppRight =
                 fieldLevel_.p().boundaryField()[patchi].patchNeighbourField();
-            const vectorField pULeft  = 
+            const vectorField pULeft  =
                 fieldLevel_.U().boundaryField()[patchi].patchInternalField();
-            const vectorField pURight = 
+            const vectorField pURight =
                 fieldLevel_.U().boundaryField()[patchi].patchNeighbourField();
-            const scalarField pTLeft  = 
+            const scalarField pTLeft  =
                 fieldLevel_.T().boundaryField()[patchi].patchInternalField();
-            const scalarField pTRight = 
+            const scalarField pTRight =
                 fieldLevel_.T().boundaryField()[patchi].patchNeighbourField();
 
             forAll(owner, facei)

@@ -54,10 +54,10 @@ Foam::label Foam::equationReader::createEquation
                 << size() << endl;
         }
         label newSize(size() + 1);
-        
+
         setSize(newSize);
         set(newSize - 1, new equation(eqn));
-        
+
         evaluateDimsFunctions_.setSize(newSize);
         evaluateDimsFunctions_.set
         (
@@ -151,7 +151,7 @@ Foam::string Foam::equationReader::stringPreconditioner
     stringReplaceAll(rawWorking, "*", " * ");
     stringReplaceAll(rawWorking, "/", " / ");
     stringReplaceAll(rawWorking, ",", " , ");
-    
+
     return rawWorking;
 }
 
@@ -287,12 +287,12 @@ void Foam::equationReader::removePowExponents
                 }
                 tokenI++;
             }
-            
+
             const label closeFoundAt(tokenI);
             // Ignore if the exponent is only 1 token
             if ((closeFoundAt - commaFoundAt) > 2)
             {
-            
+
                 // Now create sub-equation
                 OStringStream subEqnStream;
                 for
@@ -323,7 +323,7 @@ void Foam::equationReader::removePowExponents
                     eqn.overrideDimensions(),
                     eqn.changeDimensions()
                 );
-                
+
                 bool eqnCreated(false);
                 for (label eqnI(0); eqnI < size(); eqnI++)
                 {
@@ -348,7 +348,7 @@ void Foam::equationReader::removePowExponents
                 {
                     createEquation(subEqn);
                 }
-                
+
                 // Change commaFoundAt + 1 entry to reflect new subEquation
                 // reference
                 tl[commaFoundAt + 1] = token(subEqn.name());
@@ -359,7 +359,7 @@ void Foam::equationReader::removePowExponents
                 );
                 opLvl[commaFoundAt + 1] = 0;
                 pl[commaFoundAt + 1] = pl[commaFoundAt];
-                
+
                 // Remove the subEquation from tl, map, opLvl and pl
                 label tokensRemoved(closeFoundAt - (commaFoundAt + 2));
                 label newSize(map.size() - tokensRemoved);
@@ -468,7 +468,7 @@ void Foam::equationReader::absorbNegatives
                     description
                 );
             }
-            map[subEqnIndices[i + 1]].sourceIndex() = 
+            map[subEqnIndices[i + 1]].sourceIndex() =
                 -map[subEqnIndices[i + 1]].sourceIndex();
 
             trimListWithParent(eqnIndices, subEqnIndices, i, i);
@@ -504,7 +504,7 @@ void Foam::equationReader::findMaxFieldSize(const label equationIndex) const
     //       and we assume the equation is only for the internal field.
 #ifdef FULLDEBUG
     labelList maxFieldSizes(0);
-    
+
     const equation& eqn(operator[](equationIndex));
 
     forAll(eqn, opindex)
@@ -661,7 +661,7 @@ void Foam::equationReader::findMaxFieldSize(const label equationIndex) const
                     << "fieldSizes [" << srcFieldSizes << "]."
                     << abort(FatalError);
             }
-        }            
+        }
     }
     eqn.setMaxFieldSizes(maxFieldSizes);
 #endif
@@ -753,7 +753,7 @@ void Foam::equationReader::trimList
 
     if (!(exceptFor == from && from == to))
     {
-        
+
         if (exceptFor == from)
         {
             from++;
@@ -802,7 +802,7 @@ Foam::equationOperation Foam::equationReader::findSource
     // varName may contain a component: varPart.componentPart
     word varPart(varName);
     word componentPart(word::null);
-    
+
     // Search for last '.', excluding extreme ends
     for (label i(varName.size() - 2); i > 0; i--)
     {
@@ -812,7 +812,7 @@ Foam::equationOperation Foam::equationReader::findSource
             varPart = varName(0, i);
         }
     }
-    
+
     // Search order:
     // -other known equations
     // -activeSources;
@@ -1033,7 +1033,7 @@ Foam::equationOperation Foam::equationReader::findSource
                     );
                     dictLookupIndex = dictLookups_.size() - 1;
                 }
-                
+
                 return equationOperation
                 (
                     equationOperation::stdictSource,

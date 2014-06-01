@@ -169,7 +169,7 @@ $(derivedFvPatchFields)/turbulentIntensityKineticEnergyInlet/turbulentIntensityK
 $(derivedFvPatchFields)/uniformFixedValue/uniformFixedValueFvPatchFields.C
 $(derivedFvPatchFields)/waveTransmissive/waveTransmissiveFvPatchFields.C
 $(derivedFvPatchFields)/uniformDensityHydrostaticPressure/uniformDensityHydrostaticPressureFvPatchScalarField.C
-$(derivedFvPatchFields)/pulseFixedValue/pulseFixedValueFvPatchFields.C                        
+$(derivedFvPatchFields)/pulseFixedValue/pulseFixedValueFvPatchFields.C
 $(derivedFvPatchFields)/waveTransmissiveInlet/waveTransmissiveInletFvPatchFields.C
 
 
@@ -386,7 +386,7 @@ $(SRF)/derivedFvPatchFields/SRFVelocityFvPatchVectorField/SRFVelocityFvPatchVect
 $(SRF)/derivedFvPatchFields/SRFSurfaceNormalVelocityFvPatchVectorField/SRFSurfaceNormalVelocityFvPatchVectorField.C
 $(SRF)/derivedFvPatchFields/SRFTotalTemperature/SRFTotalTemperatureFvPatchScalarField.C
 $(SRF)/derivedFvPatchFields/SRFFlowRateInletVelocity/SRFFlowRateInletVelocityFvPatchVectorField.C
-$(SRF)/derivedFvPatchFields/SRFTotalPressure/SRFTotalPressureFvPatchScalarField.C               
+$(SRF)/derivedFvPatchFields/SRFTotalPressure/SRFTotalPressureFvPatchScalarField.C
 
 fieldSources = $(general)/fieldSources
 $(fieldSources)/pressureGradientExplicitSource/pressureGradientExplicitSource.C

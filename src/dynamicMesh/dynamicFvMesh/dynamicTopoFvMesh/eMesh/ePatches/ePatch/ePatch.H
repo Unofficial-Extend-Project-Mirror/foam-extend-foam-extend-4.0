@@ -188,7 +188,7 @@ public:
         );
 
 
-        //- Return a pointer to a new patch created 
+        //- Return a pointer to a new patch created
         // on freestore from dictionary
         static autoPtr<ePatch> New
         (

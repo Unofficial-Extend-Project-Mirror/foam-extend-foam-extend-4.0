@@ -75,22 +75,22 @@ class equation
 
         //- Operation list
         mutable PtrList<equationOperation> ops_;
-        
+
         //- raw text read from the dictionary
         mutable string rawText_;
 
         //- Result of most recent evaluate() or update()
         mutable dimensionedScalar lastResult_;
-        
+
         //- Override dimensions - if read from a dictionary with dimensions,
         //  eg:  nu      nu [0 2 -1 0 0 0 0] "sin(theta)";
         //  the dimensionedScalar resulting from evaluate() is given these
         //  dimensions
         mutable dimensionSet overrideDimensions_;
-        
+
         //- true if there is a dimension override
         mutable bool changeDimensions_;
-        
+
         //- Maximum field size of output, indexed by geoIndex
         mutable labelList maxFieldSizes_;
 
@@ -102,7 +102,7 @@ class equation
 public:
 
     // Static data members
-    
+
         static const char* const typeName;
 
 
@@ -113,10 +113,10 @@ public:
 
         //- Construct copy
         equation(const equation&);
-        
+
         //- Construct from Istream with optional name
         equation(Istream& is, const word& name = word::null);
-        
+
         //- Construct from components
         equation
         (
@@ -130,18 +130,18 @@ public:
     ~equation();
 
     // Member functions
-    
+
         // Access
 
             //- Equation name
             inline const word& name() const;
-            
+
             //- Size of operation list
             inline label size() const;
 
             //- setSize of operation list
             inline void setSize(const label newSize) const;
-            
+
             //- set an element of operation list
             inline autoPtr<equationOperation> set
             (
@@ -151,16 +151,16 @@ public:
 
             //- Change the equation name
             inline word& name();
-            
+
             //- Equation text
             inline const string& rawText() const;
 
             //- Set equation text
             inline void setRawText(const string& newRawText) const;
-            
+
             //- Last result
             inline const dimensionedScalar& lastResult() const;
-            
+
             //- Set the last result
             inline void setLastResult
             (
@@ -190,16 +190,16 @@ public:
 
             //- Set the changeDimensions flag
             inline void setChangeDimensions(bool newFlag) const;
-            
+
             //- Return maxFieldSizes
             inline const labelList& maxFieldSizes() const;
-            
+
             //- Set maxFieldSizes
             inline void setMaxFieldSizes
             (
                 const labelList& newSizes
             ) const;
-            
+
     // Delete the operation list
     void clear() const;
 
@@ -211,12 +211,12 @@ public:
 
         //- Access to ops_
         inline equationOperation& operator[](const label) const;
-      
+
     // Friend IOstream Operators
 
         friend Istream& operator>>(Istream&, equation&);
         friend Ostream& operator<<(Ostream&, const equation&);
-      
+
 };
 
 
