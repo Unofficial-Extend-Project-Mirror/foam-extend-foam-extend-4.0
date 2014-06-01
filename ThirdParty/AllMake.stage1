@@ -31,13 +31,13 @@
 #     Compilers and basic tools.
 #
 #     Once this stage is built, you would normally re-initialize your
-#     OpenFOAM environment in order to use the new compilers and tools
+#     foam-extend environment in order to use the new compilers and tools
 #
 #     NOTE: This stage is optional. Use it only if you want to override
 #           your system pre-installed compilers and tools
 #
 # Requirements:
-#     1: Your OpenFOAM environment must be properly initialized
+#     1: Your foam-extend environment must be properly initialized
 #
 # Author:
 #     Martin Beaudoin, Hydro-Quebec, (2010)
@@ -49,7 +49,7 @@ cd ${0%/*} || exit 1
 wmakeCheckPwd "$WM_THIRD_PARTY_DIR" || {
     echo "Error: Current directory is not \$WM_THIRD_PARTY_DIR"
     echo "    The environment variables are inconsistent with the installation."
-    echo "    Check the OpenFOAM entries in your dot-files and source them."
+    echo "    Check the foam-extend entries in your dot-files and source them."
     exit 1
 }
 . tools/makeThirdPartyFunctionsForRPM
@@ -87,13 +87,13 @@ echo
 #( rpm_make -p m4-1.4.16  -s m4-1.4.16.spec   -u http://ftp.gnu.org/gnu/m4/m4-1.4.16.tar.gz               )
 
 # bison
-#( rpm_make -p bison-2.4.3 -s bison-2.4.3.spec -u http://ftp.gnu.org/gnu/bison/bison-2.4.3.tar.gz           )
+( rpm_make -p bison-2.7 -s bison-2.7.spec -u http://ftp.gnu.org/gnu/bison/bison-2.7.tar.gz           )
 
 # flex
 #( rpm_make -p flex-2.5.35 -s flex-2.5.35.spec -u http://downloads.sourceforge.net/project/flex/flex/flex-2.5.35/flex-2.5.35.tar.gz )
 
 # cmake
-( rpm_make -p cmake-2.8.12 -s cmake-2.8.12.spec -u http://www.cmake.org/files/v2.8/cmake-2.8.12.tar.gz        )
+#( rpm_make -p cmake-2.8.12 -s cmake-2.8.12.spec -u http://www.cmake.org/files/v2.8/cmake-2.8.12.tar.gz        )
 
 echo ========================================
 echo Done ThirdParty AllMake: Stage1

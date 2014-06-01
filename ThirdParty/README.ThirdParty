@@ -2,7 +2,7 @@ A new design for the ThirdParty packages compilation and installation process:
 ==============================================================================
 
 The main purpose of this new development is to build a complete ThirParty
-packages set for OpenFOAM 1.6-ext using only the original package source
+packages set for foam-extend-3.1 using only the original package source
 tarball and some patch files (when necessary).
 
 A useful by-product of this development is also to provide some kind of
@@ -87,16 +87,16 @@ and .csh files one needs to source in order to properly initialize the PATH and
 LD_LIBRARY_PATH environment variables for running the packages. 
 
 Some packages will also create environments variables necessary for the
-compilation of some OpenFOAM libraries. 
+compilation of some foam-extend libraries. 
 
 The scripts AllMake.stage[1-4] are taking care of refreshing the environment
 variable after the installation of every single package, so you will not need to
-manually refresh your OpenFOAM environment yourself when building individual
+manually refresh your foam-extend environment yourself when building individual
 ThirdParty packages through the AllMake.stage[1-4] scripts.
 
-The main Allwmake script for the compilation of OpenFOAM will also take care of
+The main Allwmake script for the compilation of foam-extend will also take care of
 refreshing the environment variable before moving on to the compilation of the
-main OpenFOAM libraries and applications.
+main foam-extend libraries and applications.
 
 However, if you decide to compile the libraries and/or applications manually, or
 through the src/Allwmake or applications/Allwmake scripts, YOU MUST MAKE SURE
@@ -169,7 +169,7 @@ Warning: This section is a bit advanced, and as of yet, I have no evidence that
        of my machines, I will get: 
  
        > rpm -qip cmake-2.8.3-darwinIntelGccDPOpt.i386.rpm| grep Relocations
-         Name  : cmake     Relocations: /home/beaudoin/OpenFOAM/OpenFOAM-1.6-ext/ThirdParty
+         Name  : cmake     Relocations: /home/beaudoin/foam/foam-extend-3.1/ThirdParty
  
       The Relocations path is the actual location pointed by the
       $WM_THIRD_PARTY_DIR on my virtual machine when I generated the RPM. It is
@@ -186,7 +186,7 @@ Warning: This section is a bit advanced, and as of yet, I have no evidence that
       this:  
  
       rpm -ivh ./cmake-2.8.3-darwinIntelGccDPOpt.i386.rpm \
-      --relocate /home/beaudoin/OpenFOAM/OpenFOAM-1.6-ext/ThirdParty=/tmp/someDir
+      --relocate /home/beaudoin/foam/foam-extend-3.1/ThirdParty=/tmp/someDir
  
       Even better, you can dig down the hard-coded path even deeper in order to
       relocate the whole installation directory, down to the last hard-coded
@@ -238,7 +238,7 @@ Warning: This section is a bit advanced, and as of yet, I have no evidence that
 --------------------
 
     Please report ThirdParty packages related bugs to the Bug tracking system
-    for OpenFOAM-1.6-ext.
+    for foam-extend-3.1
     http://sourceforge.net/apps/mantisbt/openfoam-extend/main_page.php
  
 
@@ -246,3 +246,4 @@ Warning: This section is a bit advanced, and as of yet, I have no evidence that
 Martin Beaudoin
 Rev 0: 05/2011
 Rev 1: 08/2011
+Rev 2: 05/2014

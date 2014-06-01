@@ -131,13 +131,13 @@ Group: 			Development/Tools
 %install
     make install DESTDIR=$RPM_BUILD_ROOT
 
-    # Creation of OpenFOAM specific .csh and .sh files"
+    # Creation of foam-extend specific .csh and .sh files"
 
     echo ""
-    echo "Generating OpenFOAM specific .csh and .sh files for the package %{name}-%{version}"
+    echo "Generating foam-extend specific .csh and .sh files for the package %{name}-%{version}"
     echo ""
     #
-    # Generate package specific .sh file for OpenFOAM
+    # Generate package specific .sh file for foam-extend
     #
 mkdir -p $RPM_BUILD_ROOT/%{_installPrefix}/etc
 cat << DOT_SH_EOF > $RPM_BUILD_ROOT/%{_installPrefix}/etc/%{name}-%{version}.sh
@@ -160,7 +160,7 @@ export OPENMPI_INCLUDE_DIR="\`mpicc --showme:incdirs\`"
 export OPENMPI_COMPILE_FLAGS="\`mpicc --showme:compile\`"
 export OPENMPI_LINK_FLAGS="\`mpicc --showme:link\`"
 
-# Set the OpenFOAM compilation flags 
+# Set the foam-extend compilation flags 
 export PINC=\$OPENMPI_COMPILE_FLAGS
 export PLIBS=\$OPENMPI_LINK_FLAGS
 
@@ -183,7 +183,7 @@ fi
 DOT_SH_EOF
 
     #
-    # Generate package specific .csh file for OpenFOAM
+    # Generate package specific .csh file for foam-extend
     #
 cat << DOT_CSH_EOF > $RPM_BUILD_ROOT/%{_installPrefix}/etc/%{name}-%{version}.csh
 # Load %{name}-%{version} libraries and binaries
@@ -210,7 +210,7 @@ setenv OPENMPI_INCLUDE_DIR "\`mpicc --showme:incdirs\`"
 setenv OPENMPI_COMPILE_FLAGS "\`mpicc --showme:compile\`"
 setenv OPENMPI_LINK_FLAGS "\`mpicc --showme:link\`"
 
-# Set the OpenFOAM compilation flags 
+# Set the foam-extend compilation flags 
 setenv PINC \`echo \$OPENMPI_COMPILE_FLAGS\`
 setenv PLIBS \`echo \$OPENMPI_LINK_FLAGS\`
 

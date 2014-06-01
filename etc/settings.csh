@@ -486,6 +486,30 @@ if ( $?CMAKE_SYSTEM == 0 && -e "$WM_THIRD_PARTY_DIR"/packages/cmake-2.8.12/platf
     _foamSource $WM_THIRD_PARTY_DIR/packages/cmake-2.8.12/platforms/$WM_OPTIONS/etc/cmake-2.8.12.csh
 endif
 
+# m4
+# ~~~~~
+if ( $?M4_SYSTEM == 0 && -e "$WM_THIRD_PARTY_DIR"/packages/m4-1.4.16/platforms/$WM_OPTIONS ) then
+    _foamSource $WM_THIRD_PARTY_DIR/packages/m4-1.4.16/platforms/$WM_OPTIONS/etc/m4-1.4.16.csh
+endif
+
+# bison
+# ~~~~~
+if ( $?BISON_SYSTEM == 0 && -e "$WM_THIRD_PARTY_DIR"/packages/bison-2.7/platforms/$WM_OPTIONS ) then
+    _foamSource $WM_THIRD_PARTY_DIR/packages/bison-2.7/platforms/$WM_OPTIONS/etc/bison-2.7.csh
+endif
+
+# flex
+# ~~~~~
+if ( $?FLEX_SYSTEM == 0 && -e "$WM_THIRD_PARTY_DIR"/packages/flex-2.5.35/platforms/$WM_OPTIONS ) then
+    _foamSource $WM_THIRD_PARTY_DIR/packages/flex-2.5.35/platforms/$WM_OPTIONS/etc/flex-2.5.35.csh
+endif
+
+# zoltan
+# ~~~~~
+if ( $?ZOLTAN_SYSTEM == 0 && -e "$WM_THIRD_PARTY_DIR"/packages/zoltan-3.5/platforms/$WM_OPTIONS ) then
+    _foamSource $WM_THIRD_PARTY_DIR/packages/zoltan-3.5/platforms/$WM_OPTIONS/etc/zoltan-3.5.csh
+endif
+
 # Python
 # ~~~~~
 if ( $?PYTHON_SYSTEM == 0 && -e "$WM_THIRD_PARTY_DIR"/packages/Python-2.7/platforms/$WM_OPTIONS ) then

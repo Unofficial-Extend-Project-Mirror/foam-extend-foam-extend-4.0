@@ -44,8 +44,8 @@ if [ -z "$PYFOAM_DIR" ]
 then
     echo "Error: Missing environment variable \$PYFOAM_DIR."
     echo "       Please execute the script ThirdParty/AllMake.stage5 to install PyFoam."  
-    echo "       Then, make sure to freshen your OpenFOAM environment by sourcing your main"
-    echo "       OpenFOAM configuration file."
+    echo "       Then, make sure to freshen your foam-extend environment by sourcing your main"
+    echo "       foam-extend configuration file."
     exit -1
 fi
 

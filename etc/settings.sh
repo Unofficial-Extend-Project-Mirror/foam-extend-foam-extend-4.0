@@ -597,8 +597,8 @@ export MPI_BUFFER_SIZE
 
 # Load bison
 # ~~~~~~~~~~
-[ -z "$BISON_SYSTEM" ] && [ -e $WM_THIRD_PARTY_DIR/packages/bison-2.4.3/platforms/$WM_OPTIONS ] && {
-    _foamSource $WM_THIRD_PARTY_DIR/packages/bison-2.4.3/platforms/$WM_OPTIONS/etc/bison-2.4.3.sh
+[ -z "$BISON_SYSTEM" ] && [ -e $WM_THIRD_PARTY_DIR/packages/bison-2.7/platforms/$WM_OPTIONS ] && {
+    _foamSource $WM_THIRD_PARTY_DIR/packages/bison-2.7/platforms/$WM_OPTIONS/etc/bison-2.7.sh
 }
 [ "$FOAM_VERBOSE" -a "$PS1" ] && echo "    BISON_DIR is initialized to: $BISON_DIR"
 
