@@ -246,24 +246,36 @@ rpm_populateRPMvault()
     echo " Current content of the local RPM vault:"
     ls -axlt $rpmVault
     echo ""
-
 }
+
 #
 # Remove an installed package
 #
 uninstallPackage()
 {
     pkg="$1";
-    if [ -d $WM_THIRD_PARTY_DIR/packages/${pkg} ]; then
-	set -x
-	rm -f  $WM_THIRD_PARTY_DIR/rpmBuild/RPMS/$architecture/${pkg}*.rpm
-	rm -f  $WM_THIRD_PARTY_DIR/rpmBuild/TGZS/$architecture/${pkg}.tgz
-	rm -rf $WM_THIRD_PARTY_DIR/rpmBuild/BUILD/${pkg}*
-	rm -rf $WM_THIRD_PARTY_DIR/packages/$pkg
-	set +x
+
+    echo "Removing ${pkg}"
+    [ -f $WM_THIRD_PARTY_DIR/rpmBuild/RPMS/$architecture/${pkg}*.rpm ] && \
+      rm -f $WM_THIRD_PARTY_DIR/rpmBuild/RPMS/$architecture/${pkg}*.rpm || \
+      echo "Not found: $WM_THIRD_PARTY_DIR/rpmBuild/RPMS/$architecture/${pkg}*.rpm"
+    [ -f $WM_THIRD_PARTY_DIR/rpmBuild/SOURCES/${pkg}.tar.gz ] && \
+      rm -f $WM_THIRD_PARTY_DIR/rpmBuild/SOURCES/${pkg}.tar.gz || \
+      echo "Not found: $WM_THIRD_PARTY_DIR/rpmBuild/SOURCES/${pkg}.tar.gz"
+    [ -f $WM_THIRD_PARTY_DIR/rpmBuild/TGZS/$architecture/${pkg}.tgz ] && \
+      rm -f $WM_THIRD_PARTY_DIR/rpmBuild/TGZS/$architecture/${pkg}.tgz || \
+      echo "Not found: $WM_THIRD_PARTY_DIR/rpmBuild/TGZS/$architecture/${pkg}.tgz"
+    [ -d $WM_THIRD_PARTY_DIR/rpmBuild/BUILD/${pkg}* ] && \
+      rm -rf $WM_THIRD_PARTY_DIR/rpmBuild/BUILD/${pkg}* || \
+      echo "Not found: $WM_THIRD_PARTY_DIR/rpmBuild/BUILD/${pkg}*"
+    if [ "$2" = "alsoPackage" ]; then
+      [ -d $WM_THIRD_PARTY_DIR/packages/$pkg ] && \
+        rm -rf $WM_THIRD_PARTY_DIR/packages/$pkg || \
+        echo "Not found: $WM_THIRD_PARTY_DIR/packages/$pkg"
     else
-	echo "Package ${pkg} is already removed."
+        echo "Add option alsoPackage to remove the installed files."
     fi
+    echo
 }
 
 # ----------------------------------------------------------------- end-of-file
