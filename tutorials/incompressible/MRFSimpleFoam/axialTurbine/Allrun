@@ -7,16 +7,14 @@ application="MRFSimpleFoam"
 #application="simpleFoam"
 
 #Create the mesh:
-./makeMesh
+m4 < constant/polyMesh/blockMeshDict.m4 > constant/polyMesh/blockMeshDict
+blockMesh
+transformPoints -cylToCart "((0 0 0) (0 0 1) (1 0 0))"
 
 # Set 0-directory and create GGI set:
 cp -r 0_orig 0
 setSet -batch setBatchGgi
 setsToZones -noFlipMap
-
-#Fix constant/boundary:
-cp system/changeDictionaryDict_ggi system/changeDictionaryDict
-changeDictionary
 
 #Pick settings:
 cp system/fvSolution_ggi system/fvSolution

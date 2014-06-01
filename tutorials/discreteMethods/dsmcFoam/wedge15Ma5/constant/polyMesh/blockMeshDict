@@ -66,9 +66,9 @@ boundary
             (1 2 8 7)
         );
     }
-    frontAndBack
+    periodic
     {
-        type empty;
+        type cyclic;
         faces
         (
             (0 3 4 1)

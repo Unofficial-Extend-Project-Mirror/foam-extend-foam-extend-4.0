@@ -41,7 +41,7 @@ boundary
 (
     maxY
     {
-        type symmetryPlane;
+        type empty;
         faces
         (
             (3 7 6 2)
@@ -50,7 +50,7 @@ boundary
 
     minX
     {
-        type symmetryPlane;
+        type empty;
         faces
         (
             (0 4 7 3)
@@ -59,7 +59,7 @@ boundary
 
     maxX
     {
-        type symmetryPlane;
+        type empty;
         faces
         (
             (2 6 5 1)
@@ -68,7 +68,7 @@ boundary
 
     minY
     {
-        type symmetryPlane;
+        type empty;
         faces
         (
             (1 5 4 0)
@@ -77,7 +77,7 @@ boundary
 
     ground
     {
-        type        wall;
+        type wall;
         faces
         (
             (0 3 2 1)
@@ -86,7 +86,7 @@ boundary
 
     maxZ
     {
-        type symmetryPlane;
+        type empty;
         faces
         (
             (4 5 6 7)

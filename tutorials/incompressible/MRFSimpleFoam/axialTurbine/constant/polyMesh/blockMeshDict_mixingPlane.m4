@@ -280,10 +280,23 @@ boundary
 
     GVOUTLET
     {
-        type            ggi;
+        type            mixingPlane;
         shadowPatch     RUINLET;
         zone            GVOUTLETZone;
-        bridgeOverlap   false;
+        coordinateSystem
+        {
+            type            cylindrical;
+            //name            mixingCS;
+            origin          (0 0 0);
+            e1              (1 0 0);
+            e3              (0 0 1);
+        }
+        ribbonPatch
+        {
+            sweepAxis       Theta;
+            stackAxis       R;
+            discretisation  bothPatches;
+        }
         faces
         (
             quad2D(GV0l, GV0r)
@@ -368,10 +381,23 @@ boundary
 
     RUINLET
     {
-        type            ggi;
+        type            mixingPlane;
         shadowPatch     GVOUTLET;
         zone            RUINLETZone;
-        bridgeOverlap   false;
+        coordinateSystem
+        {
+            type            cylindrical;
+            //name            mixingCS;
+            origin          (0 0 0);
+            e1              (1 0 0);
+            e3              (0 0 1);
+        }
+        ribbonPatch
+        {
+            sweepAxis       Theta;
+            stackAxis       R;
+            discretisation  bothPatches;
+        }
         faces
         (
             quad2D(RU3r, RU3l)
@@ -380,10 +406,23 @@ boundary
 
     RUOUTLET
     {
-        type            ggi;
+        type            mixingPlane;
         shadowPatch     DTINLET;
         zone            RUOUTLETZone;
-        bridgeOverlap   false;
+        coordinateSystem
+        {
+            type            cylindrical;
+            //name            mixingCS;
+            origin          (0 0 0);
+            e1              (1 0 0);
+            e3              (0 0 1);
+        }
+        ribbonPatch
+        {
+            sweepAxis       Theta;
+            stackAxis       R;
+            discretisation  bothPatches;
+        }
         faces
         (
             quad2D(RU0l, RU0r)
@@ -468,10 +507,23 @@ boundary
 
     DTINLET
     {
-        type            ggi;
+        type            mixingPlane;
         shadowPatch     RUOUTLET;
         zone            DTINLETZone;
-        bridgeOverlap   false;
+        coordinateSystem
+        {
+            type            cylindrical;
+            //name            mixingCS;
+            origin          (0 0 0);
+            e1              (1 0 0);
+            e3              (0 0 1);
+        }
+        ribbonPatch
+        {
+            sweepAxis       Theta;
+            stackAxis       R;
+            discretisation  bothPatches;
+        }
         faces
         (
             quad2D(DT1r, DT1l)

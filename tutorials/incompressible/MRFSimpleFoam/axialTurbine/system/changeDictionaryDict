@@ -1,0 +1,112 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | foam-extend: Open Source CFD                    |
+|  \\    /   O peration     | Version:     3.1                                |
+|   \\  /    A nd           | Web:         http://www.extend-project.de       |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      changeDictionaryDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+dictionaryReplacement
+{
+    epsilon
+    {
+        boundaryField
+        {
+            GVOUTLET
+            {
+                type            mixingPlane;
+            }
+            RUINLET
+            {
+                type            mixingPlane;
+            }
+            RUOUTLET
+            {
+                type            mixingPlane;
+            }
+            DTINLET
+            {
+                type            mixingPlane;
+            }
+        }
+    }
+
+    k
+    {
+        boundaryField
+        {
+            GVOUTLET
+            {
+                type            mixingPlane;
+            }
+            RUINLET
+            {
+                type            mixingPlane;
+            }
+            RUOUTLET
+            {
+                type            mixingPlane;
+            }
+            DTINLET
+            {
+                type            mixingPlane;
+            }
+        }
+    }
+
+    U
+    {
+        boundaryField
+        {
+            GVOUTLET
+            {
+                type            mixingPlane;
+            }
+            RUINLET
+            {
+                type            mixingPlane;
+            }
+            RUOUTLET
+            {
+                type            mixingPlane;
+            }
+            DTINLET
+            {
+                type            mixingPlane;
+            }
+        }
+    }
+
+    p
+    {
+        boundaryField
+        {
+            GVOUTLET
+            {
+                type            mixingPlane;
+            }
+            RUINLET
+            {
+                type            mixingPlane;
+            }
+            RUOUTLET
+            {
+                type            mixingPlane;
+            }
+            DTINLET
+            {
+                type            mixingPlane;
+            }
+        }
+    }
+}
+
+// ************************************************************************* //

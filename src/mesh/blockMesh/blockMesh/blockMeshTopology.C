@@ -120,60 +120,7 @@ bool Foam::blockMesh::readPatches
 
 
         // Split old style cyclics
-
-        if (patchTypes[nPatches-1] == cyclicPolyPatch::typeName)
-        {
-            word halfA = patchNames[nPatches-1] + "_half0";
-            word halfB = patchNames[nPatches-1] + "_half1";
-
-            WarningIn("blockMesh::createTopology(IOdictionary&)")
-                << "Old-style cyclic definition."
-                << " Splitting patch "
-                << patchNames[nPatches-1] << " into two halves "
-                << halfA << " and " << halfB << endl
-                << "    Alternatively use new 'boundary' dictionary syntax."
-                << endl;
-
-            // Add extra patch
-            if (tmpBlocksPatches.size() <= nPatches)
-            {
-                tmpBlocksPatches.setSize(nPatches + 1);
-                patchNames.setSize(nPatches + 1);
-                patchTypes.setSize(nPatches + 1);
-                nbrPatchNames.setSize(nPatches + 1);
-            }
-
-            // Update halfA info
-            patchNames[nPatches-1] = halfA;
-            nbrPatchNames[nPatches-1] = halfB;
-            // Update halfB info
-            patchTypes[nPatches] = patchTypes[nPatches-1];
-            patchNames[nPatches] = halfB;
-            nbrPatchNames[nPatches] = halfA;
-
-            // Split faces
-            if ((tmpBlocksPatches[nPatches-1].size() % 2) != 0)
-            {
-                FatalErrorIn
-                (
-                    "blockMesh::createTopology(IOdictionary&)"
-                )   << "Size of cyclic faces is not a multiple of 2 :"
-                    << tmpBlocksPatches[nPatches-1]
-                    << exit(FatalError);
-            }
-            label sz = tmpBlocksPatches[nPatches-1].size()/2;
-            faceList unsplitFaces(tmpBlocksPatches[nPatches-1], true);
-            tmpBlocksPatches[nPatches-1] = faceList
-            (
-                SubList<face>(unsplitFaces, sz)
-            );
-            tmpBlocksPatches[nPatches] = faceList
-            (
-                SubList<face>(unsplitFaces, sz, sz)
-            );
-
-            nPatches++;
-        }
+        // HR 1.6.2014: New style cyclics unsupported for the moment
 
         patchStream >> lastToken;
     }

@@ -1,5 +1,5 @@
 #!/bin/sh
 
 ( cd constant/polyMesh && \rm -rf boundary* blockMeshDict *Zones* faces* neighbour* owner* points* sets )
-( cd system && \rm -f changeDictionaryDict fvSolution )
+( cd system && \rm -f fvSolution )
 \rm -rf 0 [1-9]* VTK log* processor*

@@ -33,7 +33,7 @@ blocks
     hex (0 1 2 3 4 5 6 7) liquid (12 12 11) simpleGrading (1 1 1)
 );
 
-patches
+boundary
 (
     periodicX
     {
@@ -42,7 +42,7 @@ patches
         (
             (1 2 6 5)
             (0 4 7 3)
-        )
+        );
     }
 
     periodicY
@@ -52,7 +52,7 @@ patches
         (
             (2 3 7 6)
             (0 1 5 4)
-        )
+        );
     }
 
     periodicZ
@@ -62,7 +62,7 @@ patches
         (
             (0 3 2 1)
             (4 5 6 7)
-        )
+        );
     }
 )
 
