@@ -2,10 +2,10 @@
 
 /home/vagrant/bootstrapFoam.sh
 
-cd foam/foam-extend-3.0
+cd foam/foam-extend-3.1
 source etc/bashrc
 
-cd testHarness/foam-extend/3.0/runDir
+cd testHarness/foam-extend/3.1/runDir
 
 ./Allclean
 

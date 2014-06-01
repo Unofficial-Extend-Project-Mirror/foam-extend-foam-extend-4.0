@@ -24,11 +24,11 @@
   One can then connect to the virtual machine with
 : vagrant ssh <machinName>
   and will be in the =$HOME= directory of the user =vagrant= where in
-  the directory =~/foam/foam-extend-3.0= the sources are
+  the directory =~/foam/foam-extend-3.1= the sources are
   available. Modifications can be pushed "outside" the virtual machine
   with
 : hg push
-  There is also a symbolic link =~/foam/foam-extend-3.0-parent=
+  There is also a symbolic link =~/foam/foam-extend-3.1-parent=
   to the sources if you want to edit there directly. Use with care
   and don't compile in that directory unless you know what you're
   doing

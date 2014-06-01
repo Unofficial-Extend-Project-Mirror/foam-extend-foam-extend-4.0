@@ -6,7 +6,7 @@ export CCACHE_DIR=/vagrant/ccache4vm
 
 BOOTSTRAPLOG=/home/vagrant/bootstrapFoam.log
 
-cd foam/foam-extend-3.0
+cd foam/foam-extend-3.1
 source etc/bashrc
 
 ( cd wmake/src && make )
