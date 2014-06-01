@@ -23,3 +23,6 @@ source etc/bashrc
 
 ./Allwmake  2>&1 | tee --append $BOOTSTRAPLOG
 
+# compile swak4Foam
+cd $WM_THIRD_PARTY_DIR
+./AllMake.stage5  2>&1 | tee --append $BOOTSTRAPLOG
