@@ -14,11 +14,11 @@ management system. This way, you can get updates and bugfixes easily by running
 "git pull". To install into the default location run:
 
     cd ~/foam
-    git clone git://git.code.sf.net/p/openfoam-extend/foam-extend-3.0
+    git clone git://git.code.sf.net/p/openfoam-extend/foam-extend-3.1
 
 
 Alternatively, you can download a snapshot (.tgz) of the source code from:
-http://sourceforge.net/projects/openfoam-extend/files/foam-extend-3.0/
+http://sourceforge.net/projects/openfoam-extend/files/foam-extend-3.1/
 
 
 * Update your Ubuntu installation:
@@ -68,7 +68,7 @@ http://sourceforge.net/projects/openfoam-extend/files/foam-extend-3.0/
 
 * Set environment variables:
 
-    cd ~/foam/foam-extend-3.0
+    cd ~/foam/foam-extend-3.1
     . etc/bashrc
 
 Optionally, set environment variable for compiling Cuda solvers, for example

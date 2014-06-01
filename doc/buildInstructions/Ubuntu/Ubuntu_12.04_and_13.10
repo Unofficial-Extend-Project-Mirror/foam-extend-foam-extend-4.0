@@ -14,11 +14,11 @@ management system. This way, you can get updates and bugfixes easily by running
 "git pull". To install into the default location run:
 
     cd ~/foam
-    git clone git://git.code.sf.net/p/openfoam-extend/foam-extend-3.0
+    git clone git://git.code.sf.net/p/openfoam-extend/foam-extend-3.1
 
 
 Alternatively, you can download a snapshot (.tgz) of the source code from:
-http://sourceforge.net/projects/openfoam-extend/files/foam-extend-3.0/
+http://sourceforge.net/projects/openfoam-extend/files/foam-extend-3.1/
 
 
 * Install required packages:
@@ -27,13 +27,9 @@ http://sourceforge.net/projects/openfoam-extend/files/foam-extend-3.0/
     zlib1g-dev qt4-dev-tools libqt4-dev libncurses5-dev libxt-dev rpm \
     mercurial graphviz
 
-Make an additional link:
-
-    sudo ln -s /usr/bin/make /usr/bin/gmake
-
 * Set environment variables:
 
-    cd ~/foam/foam-extend-3.0
+    cd ~/foam/foam-extend-3.1
     . etc/bashrc
 
 Optionally, set environment variable for Qt to compile ParaView:
