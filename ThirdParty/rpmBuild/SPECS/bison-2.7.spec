@@ -22,13 +22,13 @@
 #     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 #
 # Script
-#     RPM spec file for Zoltan-3.6
+#     RPM spec file for bison-2.7
 #
 # Description
 #     RPM spec file for creating a relocatable RPM
 #
 # Author:
-#     Martin Beaudoin, Hydro-Quebec, (2011)
+#     Martin Beaudoin, Hydro-Quebec, (2014)
 #
 #------------------------------------------------------------------------------
 
@@ -45,8 +45,8 @@
 
 # Will install the package directly $WM_THIRD_PARTY_DIR
 #   Some comments about package relocation:
-#   By using this prefix for the Prefix:  parameter in this file, you will make this
-#   package relocatable.
+#   By using this prefix for the Prefix:  parameter in this file, you will make this 
+#   package relocatable. 
 #
 #   This is fine, as long as your software is itself relocatable.
 #
@@ -55,25 +55,25 @@
 #   Ref: http://sourceware.org/autobook/autobook/autobook_80.html
 #
 #   In that case, if you ever change the value of the $WM_THIRD_PARTY_DIR, you will
-#   not be able to reutilize this RPM, even though it is relocatable. You will need to
+#   not be able to reutilize this RPM, even though it is relocatable. You will need to 
 #   regenerate the RPM.
 #
 %define _prefix         %{_WM_THIRD_PARTY_DIR}
 
-%define name		zoltan
+%define name		bison
 %define release		%{_WM_OPTIONS}
-%define version 	3.6
+%define version 	2.7
 
 %define buildroot       %{_topdir}/BUILD/%{name}-%{version}-root
 
 BuildRoot:	        %{buildroot}
-Summary: 		zoltan
+Summary: 		bison
 License: 		Unkown
 Name: 			%{name}
 Version: 		%{version}
 Release: 		%{release}
-URL:                    http://www.cs.sandia.gov/~kddevin/Zoltan_Distributions
-Source: 		%url/zoltan_distrib_v%{version}.tar.gz
+URL:                    http://ftp.gnu.org/gnu/bison
+Source: 		%url/%{name}-%{version}.tar.gz
 Prefix: 		%{_prefix}
 Group: 			Development/Tools
 
@@ -83,35 +83,24 @@ Group: 			Development/Tools
 %{summary}
 
 %prep
-%setup -q -n Zoltan_v3.6
-
+%setup -q
 
 %build
-    # NB: By defining ZOLTAN_ALIGN_VAL=3, we forcing 4 bytes alignment for Zoltan communication
-    #     As of now, the information we are exchanging are cellID, encoded using unsigned int.
-    mkdir buildDir
-    cd buildDir
-    ../configure     \
-	--with-cflags=-DZOLTAN_ALIGN_VAL=3 \
-	--with-cxxflags=-DZOLTAN_ALIGN_VAL=3 \
-        --with-mpi=$MPI_HOME \
-	--with-scotch \
-	--with-scotch-libdir=$SCOTCH_DIR/lib \
-	--with-scotch-incdir=$SCOTCH_DIR/include \
-	--with-parmetis \
-	--with-parmetis-libdir=$PARMETIS_DIR/lib \
-	--with-parmetis-incdir=$PARMETIS_DIR/include \
-	--with-ldflags=-L$METIS_DIR/lib \
+    # export WM settings in a form that GNU configure recognizes
+    [ -n "$WM_CC" ]         &&  export CC="$WM_CC"
+    [ -n "$WM_CXX" ]        &&  export CXX="$WM_CXX"
+    [ -n "$WM_CFLAGS" ]     &&  export CFLAGS="$WM_CFLAGS"
+    [ -n "$WM_CXXFLAGS" ]   &&  export CXXFLAGS="$WM_CXXFLAGS"
+    [ -n "$WM_LDFLAGS" ]    &&  export LDFLAGS="$WM_LDFLAGS"
+
+    ./configure     \
         --prefix=%{_installPrefix}
 
-
     [ -z "$WM_NCOMPPROCS" ] && WM_NCOMPPROCS=1
-    make -j $WM_NCOMPPROCS everything
+    make -j $WM_NCOMPPROCS
 
 %install
-    cd buildDir
     make install DESTDIR=$RPM_BUILD_ROOT
-    cp ./src/include/Zoltan_config.h $RPM_BUILD_ROOT/%{_installPrefix}/include
 
     # Creation of foam-extend specific .csh and .sh files"
 
@@ -126,12 +115,12 @@ cat << DOT_SH_EOF > $RPM_BUILD_ROOT/%{_installPrefix}/etc/%{name}-%{version}.sh
 # Load %{name}-%{version} libraries and binaries if available
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-export ZOLTAN_DIR=\$WM_THIRD_PARTY_DIR/packages/%{name}-%{version}/platforms/\$WM_OPTIONS
+export BISON_DIR=\$WM_THIRD_PARTY_DIR/packages/%{name}-%{version}/platforms/\$WM_OPTIONS
 
-[ -d \$ZOLTAN_DIR/lib ] && _foamAddLib \$ZOLTAN_DIR/lib
+[ -d \$BISON_DIR/lib ] && _foamAddLib \$BISON_DIR/lib
 
 # Enable access to the package applications if present
-[ -d \$ZOLTAN_DIR/bin ] && _foamAddPath \$ZOLTAN_DIR/bin
+[ -d \$BISON_DIR/bin ] && _foamAddPath \$BISON_DIR/bin
 DOT_SH_EOF
 
     #
@@ -140,21 +129,21 @@ DOT_SH_EOF
 cat << DOT_CSH_EOF > $RPM_BUILD_ROOT/%{_installPrefix}/etc/%{name}-%{version}.csh
 # Load %{name}-%{version} libraries and binaries if available
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-setenv ZOLTAN_DIR \$WM_THIRD_PARTY_DIR/packages/%{name}-%{version}/platforms/\$WM_OPTIONS
+setenv BISON_DIR \$WM_THIRD_PARTY_DIR/packages/%{name}-%{version}/platforms/\$WM_OPTIONS
 
-if ( -e \$ZOLTAN_DIR/lib ) then
-    _foamAddLib \$ZOLTAN_DIR/lib
+if ( -e \$BISON_DIR/lib ) then
+    _foamAddLib \$BISON_DIR/lib
 endif
 
-if ( -e \$ZOLTAN_DIR/bin ) then
-    _foamAddPath \$ZOLTAN_DIR/bin
+if ( -e \$BISON_DIR/bin ) then
+    _foamAddPath \$BISON_DIR/bin
 endif
 DOT_CSH_EOF
 
     #finally, generate a .tgz file for systems where using rpm for installing packages
     # as a non-root user might be a problem.
     (mkdir -p  %{_topdir}/TGZS/%{_target_cpu}; cd $RPM_BUILD_ROOT/%{_prefix}; tar -zcvf %{_topdir}/TGZS/%{_target_cpu}/%{name}-%{version}.tgz  packages/%{name}-%{version})
-
+ 
 
 %clean
 rm -rf %{buildroot}

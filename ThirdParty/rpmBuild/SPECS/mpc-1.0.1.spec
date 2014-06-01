@@ -1,26 +1,25 @@
 #------------------------------------------------------------------------------
 # =========                 |
-# \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+# \\      /  F ield         | foam-extend: Open Source CFD
 #  \\    /   O peration     |
-#   \\  /    A nd           | Copyright held by original author
+#   \\  /    A nd           | For copyright notice see file Copyright
 #    \\/     M anipulation  |
 #------------------------------------------------------------------------------
 # License
-#     This file is part of OpenFOAM.
+#     This file is part of foam-extend.
 #
-#     OpenFOAM is free software; you can redistribute it and/or modify it
+#     foam-extend is free software: you can redistribute it and/or modify it
 #     under the terms of the GNU General Public License as published by the
-#     Free Software Foundation; either version 2 of the License, or (at your
+#     Free Software Foundation, either version 3 of the License, or (at your
 #     option) any later version.
 #
-#     OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-#     ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-#     FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-#     for more details.
+#     foam-extend is distributed in the hope that it will be useful, but
+#     WITHOUT ANY WARRANTY; without even the implied warranty of
+#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+#     General Public License for more details.
 #
 #     You should have received a copy of the GNU General Public License
-#     along with OpenFOAM; if not, write to the Free Software Foundation,
-#     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+#     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 #
 # Script
 #     RPM spec file for mpc-1.0.1
@@ -109,13 +108,13 @@ Group: 			Development/Tools
 %install
     make install DESTDIR=$RPM_BUILD_ROOT
 
-    # Creation of OpenFOAM specific .csh and .sh files"
+    # Creation of foam-extend specific .csh and .sh files"
 
     echo ""
-    echo "Generating OpenFOAM specific .csh and .sh files for the package %{name}-%{version}"
+    echo "Generating foam-extend specific .csh and .sh files for the package %{name}-%{version}"
     echo ""
     #
-    # Generate package specific .sh file for OpenFOAM
+    # Generate package specific .sh file for foam-extend
     #
 mkdir -p $RPM_BUILD_ROOT/%{_installPrefix}/etc
 cat << DOT_SH_EOF > $RPM_BUILD_ROOT/%{_installPrefix}/etc/%{name}-%{version}.sh
@@ -131,7 +130,7 @@ export MPC_DIR=\$WM_THIRD_PARTY_DIR/packages/%{name}-%{version}/platforms/\$WM_O
 DOT_SH_EOF
 
     #
-    # Generate package specific .csh file for OpenFOAM
+    # Generate package specific .csh file for foam-extend
     #
 cat << DOT_CSH_EOF > $RPM_BUILD_ROOT/%{_installPrefix}/etc/%{name}-%{version}.csh
 # Load %{name}-%{version} libraries and binaries if available

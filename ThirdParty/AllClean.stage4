@@ -38,7 +38,7 @@ cd ${0%/*} || exit 1
 wmakeCheckPwd "$WM_THIRD_PARTY_DIR" || {
     echo "Error: Current directory is not \$WM_THIRD_PARTY_DIR"
     echo "    The environment variables are inconsistent with the installation."
-    echo "    Check the OpenFOAM entries in your dot-files and source them."
+    echo "    Check the foam-extend entries in your dot-files and source them."
     exit 1
 }
 . tools/makeThirdPartyFunctionsForRPM

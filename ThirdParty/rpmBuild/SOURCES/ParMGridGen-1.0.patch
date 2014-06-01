@@ -1,6 +1,14 @@
 diff -ruN ParMGridGen-1.0_orig/Makefile.in ParMGridGen-1.0/Makefile.in
---- ParMGridGen-1.0_orig/Makefile.in	2001-12-04 19:30:33.000000000 -0500
-+++ ParMGridGen-1.0/Makefile.in	2010-10-31 16:18:41.000000000 -0400
+--- ParMGridGen-1.0_orig/Makefile.in	2001-12-04 16:30:33.000000000 -0800
++++ ParMGridGen-1.0/Makefile.in	2013-08-22 20:07:33.491171127 -0700
+@@ -1,6 +1,6 @@
+ #--------------------------------------------------------------------------
+ # Which make to use 
+-make = gmake
++make = make
+ 
+ # Which compiler to use
+ #  CC is the compiler for the serial code
 @@ -12,7 +12,7 @@
  OPTFLAGS = -O3
  
@@ -41,8 +49,8 @@ diff -ruN ParMGridGen-1.0_orig/Makefile.in ParMGridGen-1.0/Makefile.in
  #--------------------------------------------------------------------------
  # 
 diff -ruN ParMGridGen-1.0_orig/MGridGen/IMlib/Makefile ParMGridGen-1.0/MGridGen/IMlib/Makefile
---- ParMGridGen-1.0_orig/MGridGen/IMlib/Makefile	2001-12-04 17:46:56.000000000 -0500
-+++ ParMGridGen-1.0/MGridGen/IMlib/Makefile	2010-10-31 16:16:54.000000000 -0400
+--- ParMGridGen-1.0_orig/MGridGen/IMlib/Makefile	2001-12-04 14:46:56.000000000 -0800
++++ ParMGridGen-1.0/MGridGen/IMlib/Makefile	2013-08-22 20:03:32.925673296 -0700
 @@ -33,7 +33,7 @@
  .c.o:
  	$(CC) $(CFLAGS) -c $*.c
@@ -59,8 +67,8 @@ diff -ruN ParMGridGen-1.0_orig/MGridGen/IMlib/Makefile ParMGridGen-1.0/MGridGen/
 -	rm -f *.o ; rm -f ./libIMlib.a
 +	rm -f *.o ; rm -f ./libIMlib.$(LIBEXT)
 diff -ruN ParMGridGen-1.0_orig/MGridGen/Lib/Makefile ParMGridGen-1.0/MGridGen/Lib/Makefile
---- ParMGridGen-1.0_orig/MGridGen/Lib/Makefile	2001-12-04 18:01:00.000000000 -0500
-+++ ParMGridGen-1.0/MGridGen/Lib/Makefile	2010-10-31 16:16:54.000000000 -0400
+--- ParMGridGen-1.0_orig/MGridGen/Lib/Makefile	2001-12-04 15:01:00.000000000 -0800
++++ ParMGridGen-1.0/MGridGen/Lib/Makefile	2013-08-22 20:03:32.925673296 -0700
 @@ -22,7 +22,7 @@
  INCLUDES = -I./ -I$(IMLIBDIR) $(INCDIR)
  CFLAGS = $(COPTIONS) $(OPTFLAGS) $(DEBUGFLAGS) $(INCLUDES)
@@ -86,8 +94,8 @@ diff -ruN ParMGridGen-1.0_orig/MGridGen/Lib/Makefile ParMGridGen-1.0/MGridGen/Li
 -	rm -f *.o ; rm -f ../../libmgrid.a
 +	rm -f *.o ; rm -f ./libMGridGen.$(LIBEXT)
 diff -ruN ParMGridGen-1.0_orig/MGridGen/Programs/Makefile ParMGridGen-1.0/MGridGen/Programs/Makefile
---- ParMGridGen-1.0_orig/MGridGen/Programs/Makefile	2001-12-04 18:02:26.000000000 -0500
-+++ ParMGridGen-1.0/MGridGen/Programs/Makefile	2010-10-31 16:16:54.000000000 -0400
+--- ParMGridGen-1.0_orig/MGridGen/Programs/Makefile	2001-12-04 15:02:26.000000000 -0800
++++ ParMGridGen-1.0/MGridGen/Programs/Makefile	2013-08-22 20:03:32.925673296 -0700
 @@ -1,6 +1,6 @@
  include ../../Makefile.in
  

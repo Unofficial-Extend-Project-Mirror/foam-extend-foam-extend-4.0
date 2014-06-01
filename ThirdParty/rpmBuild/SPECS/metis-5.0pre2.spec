@@ -116,13 +116,13 @@ Patch0:                 metis-5.0pre2_patch_darwin
     cp build/*/libmetis.*        $RPM_BUILD_ROOT/%{_installPrefix}/lib
     cp include/metis.h           $RPM_BUILD_ROOT/%{_installPrefix}/include
 
-    # Creation of OpenFOAM specific .csh and .sh files"
+    # Creation of foam-extend specific .csh and .sh files"
 
     echo ""
-    echo "Generating OpenFOAM specific .csh and .sh files for the package %{name}-%{version}"
+    echo "Generating foam-extend specific .csh and .sh files for the package %{name}-%{version}"
     echo ""
     #
-    # Generate package specific .sh file for OpenFOAM
+    # Generate package specific .sh file for foam-extend
     #
 mkdir -p $RPM_BUILD_ROOT/%{_installPrefix}/etc
 cat << DOT_SH_EOF > $RPM_BUILD_ROOT/%{_installPrefix}/etc/%{name}-%{version}.sh
@@ -141,7 +141,7 @@ export METIS_INCLUDE_DIR=\$METIS_DIR/include
 DOT_SH_EOF
 
     #
-    # Generate package specific .csh file for OpenFOAM
+    # Generate package specific .csh file for foam-extend
     #
 cat << DOT_CSH_EOF > $RPM_BUILD_ROOT/%{_installPrefix}/etc/%{name}-%{version}.csh
 # Load %{name}-%{version} libraries and binaries if available
