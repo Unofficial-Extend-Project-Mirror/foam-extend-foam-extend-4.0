@@ -267,144 +267,287 @@ edges // Inappropriate with arc due to coordinate conversion
     )
 );
 
-patches
+boundary
 (
-    patch  GVINLET
-    (
-        quad2D(GV3r, GV3l)
-    )
+    GVINLET
+    {
+        type            patch;
+        faces
+        (
+            quad2D(GV3r, GV3l)
+        );
+    }
 
-    overlapGgi  GVOUTLET
-    (
-        quad2D(GV0l, GV0r)
-    )
+    GVOUTLET
+    {
+        type            overlapGgi;
+        shadowPatch     RUINLET;
+        zone            GVOUTLETZone;
+        rotationAxis    ( 0 0 1 );
+        nCopies         5;
+        faces
+        (
+            quad2D(GV0l, GV0r)
+        );
+    }
 
-    cyclicGgi GVCYCLIC1
-    (
-        quad2D(GV1l, GV0l)
-        quad2D(GV3l, GV2l)
-    )
+    GVCYCLIC1
+    {
+        type             cyclicGgi;
+        shadowPatch      GVCYCLIC2;
+        zone             GVCYCLIC1Zone;
+        bridgeOverlap    false;
+        rotationAxis     (0 0 1);
+        rotationAngle    72;
+        separationOffset (0 0 0);
+        faces
+        (
+            quad2D(GV1l, GV0l)
+            quad2D(GV3l, GV2l)
+        );
+    }
 
-    cyclicGgi GVCYCLIC2
-    (
-        quad2D(GV0r, GV1r)
-        quad2D(GV2r, GV3r)
-    )
+    GVCYCLIC2
+    {
+        type             cyclicGgi;
+        shadowPatch      GVCYCLIC1;
+        zone             GVCYCLIC2Zone;
+        bridgeOverlap    false;
+        rotationAxis     (0 0 1);
+        rotationAngle    -72;
+        separationOffset (0 0 0);
+        faces
+        (
+            quad2D(GV0r, GV1r)
+            quad2D(GV2r, GV3r)
+        );
+    }
 
-    //cyclic GVCYCLIC
-    //(
-    //    quad2D(GV1l, GV0l)
-    //    quad2D(GV3l, GV2l)
-    //    quad2D(GV0r, GV1r)
-    //    quad2D(GV2r, GV3r)
-    //)
+    //GVCYCLIC
+    //{
+    //    type cyclic;
+    //    faces
+    //    (
+    //        quad2D(GV1l, GV0l)
+    //        quad2D(GV3l, GV2l)
+    //        quad2D(GV0r, GV1r)
+    //        quad2D(GV2r, GV3r)
+    //    );
+    //}
 
-    wall GVBLADE
-    (
-        quad2D(GV2l, GV1l)
-        quad2D(GV1r, GV2r)
-    )
+    GVBLADE
+    {
+        type wall;
+        faces
+        (
+            quad2D(GV2l, GV1l)
+            quad2D(GV1r, GV2r)
+        );
+    }
 
-    wall GVHUB
-    (
-        backQuad(GV0l, GV0r, GV1r, GV1l)
-        backQuad(GV1l, GV1r, GV2r, GV2l)
-        backQuad(GV2l, GV2r, GV3r, GV3l)
-    )
+    GVHUB
+    {
+        type wall;
+        faces
+        (
+            backQuad(GV0l, GV0r, GV1r, GV1l)
+            backQuad(GV1l, GV1r, GV2r, GV2l)
+            backQuad(GV2l, GV2r, GV3r, GV3l)
+        );
+    }
 
-    wall GVSHROUD
-    (
-        frontQuad(GV0l, GV0r, GV1r, GV1l)
-        frontQuad(GV1l, GV1r, GV2r, GV2l)
-        frontQuad(GV2l, GV2r, GV3r, GV3l)
-    )
+    GVSHROUD
+    {
+        type wall;
+        faces
+        (
+            frontQuad(GV0l, GV0r, GV1r, GV1l)
+            frontQuad(GV1l, GV1r, GV2r, GV2l)
+            frontQuad(GV2l, GV2r, GV3r, GV3l)
+        );
+    }
 
-    overlapGgi RUINLET
-    (
-        quad2D(RU3r, RU3l)
-    )
+    RUINLET
+    {
+        type            overlapGgi;
+        shadowPatch     GVOUTLET;
+        zone            RUINLETZone;
+        rotationAxis    ( 0 0 1 );
+        nCopies         5;
+        faces
+        (
+            quad2D(RU3r, RU3l)
+        );
+    }
 
-    overlapGgi RUOUTLET
-    (
-        quad2D(RU0l, RU0r)
-    )
+    RUOUTLET
+    {
+        type            overlapGgi;
+        shadowPatch     DTINLET;
+        zone            RUOUTLETZone;
+        rotationAxis    ( 0 0 1 );
+        nCopies         5;
+        faces
+        (
+            quad2D(RU0l, RU0r)
+        );
+    }
 
-    cyclicGgi RUCYCLIC1
-    (
-        quad2D(RU1l, RU0l)
-        quad2D(RU3l, RU2l)
-    )
+    RUCYCLIC1
+    {
+        type             cyclicGgi;
+        shadowPatch      RUCYCLIC2;
+        zone             RUCYCLIC1Zone;
+        bridgeOverlap    false;
+        rotationAxis     (0 0 1);
+        rotationAngle    72;
+        separationOffset (0 0 0);
+        faces
+        (
+            quad2D(RU1l, RU0l)
+            quad2D(RU3l, RU2l)
+        );
+    }
 
-    cyclicGgi RUCYCLIC2
-    (
-        quad2D(RU0r, RU1r)
-        quad2D(RU2r, RU3r)
-    )
+    RUCYCLIC2
+    {
+        type             cyclicGgi;
+        shadowPatch      RUCYCLIC1;
+        zone             RUCYCLIC2Zone;
+        bridgeOverlap    false;
+        rotationAxis     (0 0 1);
+        rotationAngle    -72;
+        separationOffset (0 0 0);
+        faces
+        (
+            quad2D(RU0r, RU1r)
+            quad2D(RU2r, RU3r)
+        );
+    }
 
-    //cyclic RUCYCLIC
-    //(
-    //    quad2D(RU1l, RU0l)
-    //    quad2D(RU3l, RU2l)
-    //    quad2D(RU0r, RU1r)
-    //    quad2D(RU2r, RU3r)
-    //)
+    //RUCYCLIC
+    //{
+    //    type cyclic;
+    //    faces
+    //    (
+    //        quad2D(RU1l, RU0l)
+    //        quad2D(RU3l, RU2l)
+    //        quad2D(RU0r, RU1r)
+    //        quad2D(RU2r, RU3r)
+    //    );
+    //}
 
-    wall RUBLADE
-    (
-        quad2D(RU2l, RU1l)
-        quad2D(RU1r, RU2r)
-    )
+    RUBLADE
+    {
+        type wall;
+        faces
+        (
+            quad2D(RU2l, RU1l)
+            quad2D(RU1r, RU2r)
+        );
+    }
 
-    wall RUHUB
-    (
-        backQuad(RU0l, RU0r, RU1r, RU1l)
-        backQuad(RU1l, RU1r, RU2r, RU2l)
-        backQuad(RU2l, RU2r, RU3r, RU3l)
-    )
+    RUHUB
+    {
+        type wall;
+        faces
+        (
+            backQuad(RU0l, RU0r, RU1r, RU1l)
+            backQuad(RU1l, RU1r, RU2r, RU2l)
+            backQuad(RU2l, RU2r, RU3r, RU3l)
+        );
+    }
 
-    wall RUSHROUD
-    (
-        frontQuad(RU0l, RU0r, RU1r, RU1l)
-        frontQuad(RU1l, RU1r, RU2r, RU2l)
-        frontQuad(RU2l, RU2r, RU3r, RU3l)
-    )
+    RUSHROUD
+    {
+        type wall;
+        faces
+        (
+            frontQuad(RU0l, RU0r, RU1r, RU1l)
+            frontQuad(RU1l, RU1r, RU2r, RU2l)
+            frontQuad(RU2l, RU2r, RU3r, RU3l)
+        );
+    }
 
-    overlapGgi DTINLET
-    (
-        quad2D(DT1r, DT1l)
-    )
+    DTINLET
+    {
+        type            overlapGgi;
+        shadowPatch     RUOUTLET;
+        zone            DTINLETZone;
+        rotationAxis    ( 0 0 1 );
+        nCopies         5;
+        faces
+        (
+            quad2D(DT1r, DT1l)
+        );
+    }
 
-    patch DTOUTLET
-    (
-        quad2D(DT0l, DT0r)
-    )
+    DTOUTLET
+    {
+        type patch;
+        faces
+        (
+            quad2D(DT0l, DT0r)
+        );
+    }
 
-    cyclicGgi DTCYCLIC1
-    (
-        quad2D(DT1l, DT0l)
-    )
+    DTCYCLIC1
+    {
+        type             cyclicGgi;
+        shadowPatch      DTCYCLIC2;
+        zone             DTCYCLIC1Zone;
+        bridgeOverlap    false;
+        rotationAxis     (0 0 1);
+        rotationAngle    72;
+        separationOffset (0 0 0);
+        faces
+        (
+            quad2D(DT1l, DT0l)
+        );
+    }
 
-    cyclicGgi DTCYCLIC2
-    (
-        quad2D(DT0r, DT1r)
-    )
+    DTCYCLIC2
+    {
+        type             cyclicGgi;
+        shadowPatch      DTCYCLIC1;
+        zone             DTCYCLIC2Zone;
+        bridgeOverlap    false;
+        rotationAxis     (0 0 1);
+        rotationAngle    -72;
+        separationOffset (0 0 0);
+        faces
+        (
+            quad2D(DT0r, DT1r)
+        );
+    }
 
-    //cyclic DTCYCLIC
-    //(
-    //    quad2D(DT1l, DT0l)
-    //    quad2D(DT0r, DT1r)
-    //)
+    //DTCYCLIC
+    //{
+    //    type cyclic;
+    //    faces
+    //    (
+    //        quad2D(DT1l, DT0l)
+    //        quad2D(DT0r, DT1r)
+    //    );
+    //}
 
-    wall DTHUB
-    (
-        backQuad(DT0l, DT0r, DT1r, DT1l)
-    )
+    DTHUB
+    {
+        type wall;
+        faces
+        (
+            backQuad(DT0l, DT0r, DT1r, DT1l)
+        );
+    }
 
-    wall DTSHROUD
-    (
-        frontQuad(DT0l, DT0r, DT1r, DT1l)
-    )
-
+    DTSHROUD
+    {
+        type wall;
+        faces
+        (
+            frontQuad(DT0l, DT0r, DT1r, DT1l)
+        );
+    }
 );
 
 // ************************************************************************* //

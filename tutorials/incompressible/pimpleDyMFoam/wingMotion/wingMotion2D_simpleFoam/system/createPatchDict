@@ -68,7 +68,7 @@ patchInfo
     }
 
     {
-        name back;
+        name symBack;
         dictionary
         {
             type empty;
@@ -78,7 +78,7 @@ patchInfo
     }
 
     {
-        name front;
+        name symFront;
         dictionary
         {
             type empty;

@@ -15,6 +15,5 @@ runApplication setSet -batch setBatchMotion
 runApplication setsToZones
 
 \rm -rf constant/polyMesh/sets/
-\cp boundary constant/polyMesh/boundary
 
 runApplication $application

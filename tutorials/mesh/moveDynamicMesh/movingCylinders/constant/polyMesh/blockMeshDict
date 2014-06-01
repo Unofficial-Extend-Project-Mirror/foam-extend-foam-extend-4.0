@@ -238,87 +238,153 @@ edges
     arc 63 60 (  2.5  0    0.05)
 );
 
-patches
+boundary
 (
-    patch inlet
-    (
-        (32 72 74 34)
-    )
+    inlet
+    {
+        type patch;
+        faces
+        (
+            (32 72 74 34)
+        );
+    }
 
-    patch outlet
-    (
-        (37 39 79 77)
-    )
+    outlet
+    {
+        type patch;
+        faces
+        (
+            (37 39 79 77)
+        );
+    }
 
-    wall bottom
-    (
-        (32 33 73 72)
-        (12 13 53 52)
-        (28 29 69 68)
-        (36 37 77 76)
-    )
+    bottom
+    {
+        type wall;
+        faces
+        (
+            (32 33 73 72)
+            (12 13 53 52)
+            (28 29 69 68)
+            (36 37 77 76)
+        );
+    }
 
-    wall top
-    (
-        (34 74 75 35)
-        (15 55 54 14)
-        (31 71 70 30)
-        (38 78 79 39)
-    )
+    top
+    {
+        type wall;
+        faces
+        (
+            (34 74 75 35)
+            (15 55 54 14)
+            (31 71 70 30)
+            (38 78 79 39)
+        );
+    }
 
-    wall firstCyl
-    (
-        (0 40 41 1)
-        (1 41 42 2)
-        (2 42 43 3)
-        (3 43 40 0)
-    )
+    firstCyl
+    {
+        type wall;
+        faces
+        (
+            (0 40 41 1)
+            (1 41 42 2)
+            (2 42 43 3)
+            (3 43 40 0)
+        );
+    }
 
-    wall secondCyl
-    (
-        (16 56 57 17)
-        (17 57 58 18)
-        (18 58 59 19)
-        (19 59 56 16)
-    )
+    secondCyl
+    {
+        type wall;
+        faces
+        (
+            (16 56 57 17)
+            (17 57 58 18)
+            (18 58 59 19)
+            (19 59 56 16)
+        );
+    }
 
-    ggi frontIn
-    (
-        (33 35 75 73)
-    )
+    frontIn
+    {
+        type            ggi;
+        shadowPatch     frontOut;
+        zone            frontInZone;
+        bridgeOverlap   true;
+        faces
+        (
+            (33 35 75 73)
+        );
+    }
 
-    ggi frontOut
-    (
-        (12 52 48 8)
-        (8 48 51 11)
-        (11 51 55 15)
-    )
+    frontOut
+    {
+        type            ggi;
+        shadowPatch     frontIn;
+        zone            frontOutZone;
+        bridgeOverlap   true;
+        faces
+        (
+            (12 52 48 8)
+            (8 48 51 11)
+            (11 51 55 15)
+        );
+    }
 
-    ggi middleIn
-    (
-        (13 9 49 53)
-        (9 10 50 49)
-        (10 14 54 50)
-    )
+    middleIn
+    {
+        type            ggi;
+        shadowPatch     middleOut;
+        zone            middleInZone;
+        bridgeOverlap   true;
+        faces
+        (
+            (13 9 49 53)
+            (9 10 50 49)
+            (10 14 54 50)
+        );
+    }
 
-    ggi middleOut
-    (
-        (28 68 64 24)
-        (24 64 67 27)
-        (27 67 71 31)
-    )
+    middleOut
+    {
+        type            ggi;
+        shadowPatch     middleIn;
+        zone            middleOutZone;
+        bridgeOverlap   true;
+        faces
+        (
+            (28 68 64 24)
+            (24 64 67 27)
+            (27 67 71 31)
+        );
+    }
 
-    ggi backIn
-    (
-        (29 25 65 69)
-        (25 26 66 65)
-        (26 30 70 66)
-    )
+    backIn
+    {
+        type            ggi;
+        shadowPatch     backOut;
+        zone            backInZone;
+        bridgeOverlap   true;
+        faces
+        (
+            (29 25 65 69)
+            (25 26 66 65)
+            (26 30 70 66)
+        );
+    }
 
-    ggi backOut
-    (
-        (36 76 78 38)
-    )
+    backOut
+    {
+        type            ggi;
+        shadowPatch     backIn;
+        zone            backOutZone;
+        bridgeOverlap   true;
+        faces
+        (
+            (36 76 78 38)
+        );
+    }
 );
 
 // ************************************************************************* //
