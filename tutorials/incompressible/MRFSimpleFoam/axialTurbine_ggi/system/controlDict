@@ -44,4 +44,19 @@ timePrecision   6;
 
 runTimeModifiable yes;
 
+// Compute the flux value on each side of a GGI interface
+functions
+(
+    ggiCheck
+    {
+        // Type of functionObject
+        type ggiCheck;
+
+        phi phi;
+
+        // Where to load it from (if not already in solver)
+        functionObjectLibs ("libcheckFunctionObjects.so");
+    }
+);
+
 // ************************************************************************* //

@@ -15,7 +15,4 @@ cp -r 0_orig 0
 setSet -batch setBatchGgi
 setsToZones -noFlipMap
 
-#Pick settings:
-cp system/fvSolution_ggi system/fvSolution
-
 runApplication $application
