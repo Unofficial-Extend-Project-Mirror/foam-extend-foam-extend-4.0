@@ -68,7 +68,7 @@ boundary
 
     centreLeft
     {
-        type symmetry;
+        type symmetryPlane;
         faces
         (
             (0 4 7 3)
