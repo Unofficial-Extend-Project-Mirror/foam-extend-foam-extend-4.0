@@ -68,6 +68,8 @@
                  folders via NFS. Currently not working
   - opensuse12 :: OpenSUSE 12.3 machine. Currently not completely
                   compiling Foam
+  - opensuse13 ::  OpenSUSE 13.1 machine. The current LTS-version of
+                   OpenSUSE
   Some machines (read: the BSD-boxes) need the =VirtualBox Extension
   Pack= installed (because they have USB 2.0)
 * Scripts in the machine
