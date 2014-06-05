@@ -1014,8 +1014,7 @@ void Foam::refinementHistory::compact()
     }
 
     splitCells_.transfer(newSplitCells);
-    freeSplitCells_.clear();
-    freeSplitCells_.labelList::clear();
+    freeSplitCells_.clearStorage();
 
 
     if (debug)
