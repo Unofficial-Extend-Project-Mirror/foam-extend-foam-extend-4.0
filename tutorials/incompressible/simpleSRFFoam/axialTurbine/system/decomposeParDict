@@ -10,42 +10,58 @@ FoamFile
     version     2.0;
     format      ascii;
     class       dictionary;
-    object      controlDict;
+    object      decomposeParDict;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-application pimpleDyMFoam;
+numberOfSubdomains 8;
 
-startFrom       startTime;
+method               metis;
 
-startTime       0;
+globalFaceZones
+(
+    RUCYCLIC1Zone
+    RUCYCLIC2Zone
+);
 
-stopAt          endTime;
+simpleCoeffs
+{
+    n               (2 2 1);
+    delta             0.001;
+}
 
-endTime         0.6283; //One rotation
+hierarchicalCoeffs
+{
+    n               (1 1 1);
+    delta           0.001;
+    order           xyz;
+}
 
-deltaT          0.00175; //Approx 1 degree per time step
+metisCoeffs
+{
+    processorWeights
+    (
+        1
+        1
+        1
+        1
+        1
+        1
+        1
+        1
+    );
+}
 
-writeControl    timeStep;
+manualCoeffs
+{
+    dataFile        "";
+}
 
-writeInterval   10; //Every 10 degrees
+distributed     no;
 
-purgeWrite      0;
-
-writeFormat     ascii;
-
-writePrecision  6;
-
-writeCompression compressed;
-
-timeFormat      general;
-
-timePrecision   6;
-
-runTimeModifiable yes;
-
-adjustTimeStep  no;
-
-maxCo           5;
+roots
+(
+);
 
 // ************************************************************************* //
+

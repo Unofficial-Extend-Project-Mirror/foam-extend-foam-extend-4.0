@@ -10,42 +10,28 @@ FoamFile
     version     2.0;
     format      ascii;
     class       dictionary;
-    object      controlDict;
+    object      transportProperties;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-application pimpleDyMFoam;
+transportModel  Newtonian;
 
-startFrom       startTime;
+nu              nu [0 2 -1 0 0 0 0] 1.5e-05;
 
-startTime       0;
+CrossPowerLawCoeffs
+{
+    nu0             nu0 [0 2 -1 0 0 0 0] 1e-06;
+    nuInf           nuInf [0 2 -1 0 0 0 0] 1e-06;
+    m               m [0 0 1 0 0 0 0] 1;
+    n               n [0 0 0 0 0 0 0] 1;
+}
 
-stopAt          endTime;
-
-endTime         0.6283; //One rotation
-
-deltaT          0.00175; //Approx 1 degree per time step
-
-writeControl    timeStep;
-
-writeInterval   10; //Every 10 degrees
-
-purgeWrite      0;
-
-writeFormat     ascii;
-
-writePrecision  6;
-
-writeCompression compressed;
-
-timeFormat      general;
-
-timePrecision   6;
-
-runTimeModifiable yes;
-
-adjustTimeStep  no;
-
-maxCo           5;
+BirdCarreauCoeffs
+{
+    nu0             nu0 [0 2 -1 0 0 0 0] 1e-06;
+    nuInf           nuInf [0 2 -1 0 0 0 0] 1e-06;
+    k               k [0 0 1 0 0 0 0] 0;
+    n               n [0 0 0 0 0 0 0] 1;
+}
 
 // ************************************************************************* //

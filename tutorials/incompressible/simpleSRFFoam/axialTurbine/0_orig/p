@@ -9,43 +9,46 @@ FoamFile
 {
     version     2.0;
     format      ascii;
-    class       dictionary;
-    object      controlDict;
+    class       volScalarField;
+    object      p;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-application pimpleDyMFoam;
+dimensions      [0 2 -2 0 0 0 0];
 
-startFrom       startTime;
+internalField   uniform 0;
 
-startTime       0;
-
-stopAt          endTime;
-
-endTime         0.6283; //One rotation
-
-deltaT          0.00175; //Approx 1 degree per time step
-
-writeControl    timeStep;
-
-writeInterval   10; //Every 10 degrees
-
-purgeWrite      0;
-
-writeFormat     ascii;
-
-writePrecision  6;
-
-writeCompression compressed;
-
-timeFormat      general;
-
-timePrecision   6;
-
-runTimeModifiable yes;
-
-adjustTimeStep  no;
-
-maxCo           5;
+boundaryField
+{
+    RUINLET
+    {
+        type            zeroGradient;
+    }
+    RUOUTLET
+    {
+        type            fixedValue;
+        value           uniform 0;
+    }
+    RUCYCLIC1
+    {
+        type            cyclicGgi;
+    }
+    RUCYCLIC2
+    {
+        type            cyclicGgi;
+    }
+    RUBLADE
+    {
+        type            zeroGradient;
+    }
+    RUHUB
+    {
+        type            zeroGradient;
+    }
+    RUSHROUD
+    {
+        type            zeroGradient;
+    }
+}
 
 // ************************************************************************* //
