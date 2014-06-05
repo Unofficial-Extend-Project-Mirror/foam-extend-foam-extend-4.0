@@ -17,39 +17,39 @@ FoamFile
 
 dimensions      [0 1 -1 0 0 0 0];
 
-internalField   uniform (0 0 0); 
+internalField   uniform (0 0 0);
 
 boundaryField
 {
     RUINLET
     {
         type            calculated;
-        value           uniform (0 0 0); 
+        value           uniform (0 0 0);
     }
     RUOUTLET
     {
         type            calculated;
-        value           uniform (0 0 0); 
+        value           uniform (0 0 0);
     }
     RUCYCLIC1
     {
         type            cyclicGgi;
-        value           uniform (0 0 0); 
+        value           uniform (0 0 0);
     }
     RUCYCLIC2
     {
         type            cyclicGgi;
-        value           uniform (0 0 0); 
+        value           uniform (0 0 0);
     }
     RUBLADE
     {
         type            calculated;
-        value           uniform (0 0 0); 
+        value           uniform (0 0 0);
     }
     RUHUB
     {
         type            calculated;
-        value           uniform (0 0 0); 
+        value           uniform (0 0 0);
     }
     RUSHROUD
     {
