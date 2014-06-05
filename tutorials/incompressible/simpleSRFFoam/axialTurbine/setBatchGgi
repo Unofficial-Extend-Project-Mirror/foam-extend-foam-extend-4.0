@@ -1,0 +1,3 @@
+faceSet RUCYCLIC1Zone new patchToFace RUCYCLIC1
+faceSet RUCYCLIC2Zone new patchToFace RUCYCLIC2
+quit
