@@ -111,22 +111,52 @@ public:
             return false;
         }
 
-        //- Decompose cells with weights
+        //- Return for every coordinate the wanted processor number. Use the
+        //  mesh connectivity (if needed)
+        //  Weights get normalised so the minimum value is 1 before truncation
+        //  to an integer so the weights should be multiples of the minimum
+        //  value. The overall sum of weights might otherwise overflow.
         virtual labelList decompose
         (
             const pointField& points,
             const scalarField& pointWeights
         );
 
-        //- Decompose cell clusters with weights on clusters
+        //- Return for every coordinate the wanted processor number. Gets
+        //  passed agglomeration map (from fine to coarse cells) and coarse cell
+        //  location. Can be overridden by decomposers that provide this
+        //  functionality natively.
+        //  See note on weights above.
         virtual labelList decompose
         (
-            const labelList& fineToCoarse,
-            const pointField& coarsePoints,
-            const scalarField& coarseWeights
+            const labelList& agglom,
+            const pointField& regionPoints,
+            const scalarField& regionWeights
         );
 
-        //- Decompose cells with weights with explicitly provided connectivity
+        //- Same but with uniform weights
+        virtual labelList decompose
+        (
+            const labelList& agglom,
+            const pointField& regionPoints
+        )
+        {
+            return decompose
+            (
+                agglom,
+                regionPoints,
+                scalarField(regionPoints.size(), 1.0)
+            );
+        }
+
+        //- Return for every coordinate the wanted processor number. Explicitly
+        //  provided mesh connectivity.
+        //  The connectivity is equal to mesh.cellCells() except for
+        //  - in parallel the cell numbers are global cell numbers (starting
+        //    from 0 at processor0 and then incrementing all through the
+        //    processors)
+        //  - the connections are across coupled patches
+        //  See note on weights above.
         virtual labelList decompose
         (
             const labelListList& globalCellCells,
