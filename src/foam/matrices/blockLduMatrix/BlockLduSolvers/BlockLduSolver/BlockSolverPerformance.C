@@ -39,9 +39,17 @@ bool Foam::BlockSolverPerformance<Type>::checkConvergence
         Info<< solverName_
             << ":  Iteration " << nIterations_
             << " residual = " << finalResidual_
+            << " mag = " << mag(finalResidual_)
+            << " tol = "
+            << Foam::max(Tolerance, RelTolerance*mag(initialResidual_))
             << endl;
     }
 
+    // Reconsider evaluation of the final residual residualVector
+    // - mag(residualVector) = sqrt(sum(sqr(cmpt))).  Currently used - strict
+    // - cmptSum(residualVector) = consistent with 1-norm
+    // - cmptMax(residualVector) = consistent with inftyNorm
+    // HJ, 29/May/2014
     if
     (
         mag(finalResidual_) < Tolerance
