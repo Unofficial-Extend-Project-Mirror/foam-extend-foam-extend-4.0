@@ -44,6 +44,7 @@ Description
 using namespace Foam;
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+// Main program:
 
 int main(int argc, char *argv[])
 {
@@ -80,7 +81,7 @@ int main(int argc, char *argv[])
         word blockName;
         label nx, ny, nz;
 
-        forAll(blocks, blockI)
+        forAll (blocks, blockI)
         {
             cfxFile >> blockName;
             cfxFile >> nx >> ny >> nz;
@@ -100,7 +101,7 @@ int main(int argc, char *argv[])
     {
         label no, blkNo, patchLabel;
 
-        forAll(cfxPatchTypes, patchI)
+        forAll (cfxPatchTypes, patchI)
         {
             // Grab patch type and name
             cfxFile >> cfxPatchTypes[patchI] >> cfxPatchNames[patchI] >> no;
@@ -109,7 +110,7 @@ int main(int argc, char *argv[])
             patchRanges[patchI].setSize(6);
             labelList& curRange = patchRanges[patchI];
 
-            forAll(curRange, rI)
+            forAll (curRange, rI)
             {
                 cfxFile >> curRange[rI];
             }
@@ -146,7 +147,7 @@ int main(int argc, char *argv[])
 
     Info<< "Reading block points" << endl;
 
-    forAll(blocks, blockI)
+    forAll (blocks, blockI)
     {
         Info<< "block " << blockI << " is a ";
         blocks[blockI].readPoints(cfxFile);
@@ -175,7 +176,7 @@ int main(int argc, char *argv[])
 
     faceListList rawPatches(npatch);
 
-    forAll(rawPatches, patchI)
+    forAll (rawPatches, patchI)
     {
         const word& patchType = cfxPatchTypes[patchI];
 
@@ -213,7 +214,7 @@ int main(int argc, char *argv[])
     // For efficiency, create merge pairs in the first pass
     labelListListList glueMergePairs(glueMasterPatches.size());
 
-    forAll(glueMasterPatches, glueI)
+    forAll (glueMasterPatches, glueI)
     {
         const label masterPatch = glueMasterPatches[glueI];
         const label slavePatch = glueSlavePatches[glueI];
@@ -246,14 +247,14 @@ int main(int argc, char *argv[])
 
         scalar sqrMergeTol = GREAT;
 
-        forAll(blockPFaces, blockPFaceLabel)
+        forAll (blockPFaces, blockPFaceLabel)
         {
             const labelList& blockPFacePoints =
                 blockPFaces[blockPFaceLabel];
 
-            forAll(blockPFacePoints, blockPFacePointI)
+            forAll (blockPFacePoints, blockPFacePointI)
             {
-                forAll(blockPFacePoints, blockPFacePointI2)
+                forAll (blockPFacePoints, blockPFacePointI2)
                 {
                     if (blockPFacePointI != blockPFacePointI2)
                     {
@@ -280,7 +281,7 @@ int main(int argc, char *argv[])
 
         // N-squared point search over all points of all faces of
         // master block over all point of all faces of slave block
-        forAll(blockPFaces, blockPFaceLabel)
+        forAll (blockPFaces, blockPFaceLabel)
         {
             const labelList& blockPFacePoints =
                 blockPFaces[blockPFaceLabel];
@@ -288,16 +289,16 @@ int main(int argc, char *argv[])
             labelList& cp = curPairs[blockPFaceLabel];
             cp.setSize(blockPFacePoints.size());
 
-        forAll(blockPFacePoints, blockPFacePointI)
+        forAll (blockPFacePoints, blockPFacePointI)
         {
             found = false;
 
-            forAll(blockNFaces, blockNFaceLabel)
+            forAll (blockNFaces, blockNFaceLabel)
             {
                 const labelList& blockNFacePoints =
                     blockNFaces[blockNFaceLabel];
 
-            forAll(blockNFacePoints, blockNFacePointI)
+            forAll (blockNFacePoints, blockNFacePointI)
             {
                 if
                 (
@@ -359,7 +360,7 @@ int main(int argc, char *argv[])
         changedPointMerge = false;
         nPasses++;
 
-        forAll(glueMasterPatches, glueI)
+        forAll (glueMasterPatches, glueI)
         {
             const label masterPatch = glueMasterPatches[glueI];
             const label slavePatch = glueSlavePatches[glueI];
@@ -371,14 +372,14 @@ int main(int argc, char *argv[])
 
             const labelListList& curPairs = glueMergePairs[glueI];
 
-            forAll(blockPFaces, blockPFaceLabel)
+            forAll (blockPFaces, blockPFaceLabel)
             {
                 const labelList& blockPFacePoints =
                     blockPFaces[blockPFaceLabel];
 
                 const labelList& cp = curPairs[blockPFaceLabel];
 
-                forAll(cp, blockPFacePointI)
+                forAll (cp, blockPFacePointI)
                 {
                     label PpointLabel =
                         blockPFacePoints[blockPFacePointI]
@@ -420,7 +421,7 @@ int main(int argc, char *argv[])
     }
 
 
-    forAll(glueMasterPatches, glueI)
+    forAll (glueMasterPatches, glueI)
     {
         const label masterPatch = glueMasterPatches[glueI];
         const label slavePatch = glueSlavePatches[glueI];
@@ -432,12 +433,12 @@ int main(int argc, char *argv[])
         const faceList& blockNFaces = rawPatches[slavePatch];
 
 
-        forAll(blockPFaces, blockPFaceLabel)
+        forAll (blockPFaces, blockPFaceLabel)
         {
             const labelList& blockPFacePoints
                 = blockPFaces[blockPFaceLabel];
 
-            forAll(blockPFacePoints, blockPFacePointI)
+            forAll (blockPFacePoints, blockPFacePointI)
             {
                 label PpointLabel =
                     blockPFacePoints[blockPFacePointI]
@@ -454,12 +455,12 @@ int main(int argc, char *argv[])
             }
         }
 
-        forAll(blockNFaces, blockNFaceLabel)
+        forAll (blockNFaces, blockNFaceLabel)
         {
             const labelList& blockNFacePoints
                 = blockNFaces[blockNFaceLabel];
 
-            forAll(blockNFacePoints, blockNFacePointI)
+            forAll (blockNFacePoints, blockNFacePointI)
             {
                 label NpointLabel =
                     blockNFacePoints[blockNFacePointI]
@@ -482,7 +483,7 @@ int main(int argc, char *argv[])
     // given old point label
     label nNewPoints = 0;
 
-    forAll(pointMergeList, pointLabel)
+    forAll (pointMergeList, pointLabel)
     {
         if (pointMergeList[pointLabel] > pointLabel)
         {
@@ -512,11 +513,11 @@ int main(int argc, char *argv[])
 
     pointField points(nMeshPoints);
 
-    forAll(blocks, blockI)
+    forAll (blocks, blockI)
     {
         const pointField& blockPoints = blocks[blockI].points();
 
-        forAll(blockPoints, blockPointLabel)
+        forAll (blockPoints, blockPointLabel)
         {
             points
             [
@@ -543,15 +544,15 @@ int main(int argc, char *argv[])
 
     label nCreatedCells = 0;
 
-    forAll(blocks, blockI)
+    forAll (blocks, blockI)
     {
         labelListList curBlockCells = blocks[blockI].blockCells();
 
-        forAll(curBlockCells, blockCellI)
+        forAll (curBlockCells, blockCellI)
         {
             labelList cellPoints(curBlockCells[blockCellI].size());
 
-            forAll(cellPoints, pointI)
+            forAll (cellPoints, pointI)
             {
                 cellPoints[pointI] =
                     pointMergeList
@@ -577,7 +578,7 @@ int main(int argc, char *argv[])
 
     label nCreatedPatches = 0;
 
-    forAll(rawPatches, patchI)
+    forAll (rawPatches, patchI)
     {
         if (rawPatches[patchI].size() && cfxPatchTypes[patchI] != "BLKBDY")
         {
@@ -608,14 +609,14 @@ int main(int argc, char *argv[])
                 label oldSize = renumberedPatch.size();
                 renumberedPatch.setSize(oldSize + curRawPatch.size());
 
-                forAll(curRawPatch, faceI)
+                forAll (curRawPatch, faceI)
                 {
                     const face& oldFace = curRawPatch[faceI];
 
                     face& newFace = renumberedPatch[oldSize + faceI];
                     newFace.setSize(oldFace.size());
 
-                    forAll(oldFace, pointI)
+                    forAll (oldFace, pointI)
                     {
                         newFace[pointI] =
                             pointMergeList
@@ -632,14 +633,14 @@ int main(int argc, char *argv[])
                 faceList& renumberedPatch = boundary[nCreatedPatches];
                 renumberedPatch.setSize(curRawPatch.size());
 
-                forAll(curRawPatch, faceI)
+                forAll (curRawPatch, faceI)
                 {
                     const face& oldFace = curRawPatch[faceI];
 
                     face& newFace = renumberedPatch[faceI];
                     newFace.setSize(oldFace.size());
 
-                    forAll(oldFace, pointI)
+                    forAll (oldFace, pointI)
                     {
                         newFace[pointI] =
                             pointMergeList
@@ -716,7 +717,7 @@ int main(int argc, char *argv[])
     );
 
     // Add information to dictionary
-    forAll(patchNames, patchI)
+    forAll (patchNames, patchI)
     {
         if (!patchDicts.set(patchI))
         {
