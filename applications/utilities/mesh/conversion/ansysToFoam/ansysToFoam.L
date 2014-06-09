@@ -47,6 +47,7 @@ Description
 using namespace Foam;
 
 #include "argList.H"
+#include "objectRegistry.H"
 #include "Time.H"
 #include "polyMesh.H"
 #include "emptyPolyPatch.H"

@@ -60,7 +60,6 @@ lagrangian/Allwmake
 postProcessing/Allwmake
 conversion/Allwmake
 
-wmake libso autoMesh
 wmake libso errorEstimation
 
 fvAgglomerationMethods/Allwmake
