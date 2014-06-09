@@ -93,4 +93,74 @@ void Foam::preservePatchTypes
 }
 
 
+void Foam::preservePatchTypes
+(
+    const objectRegistry& obr,
+    const word& meshInstance,
+    const fileName& meshDir,
+    const wordList& patchNames,
+    wordList& patchTypes,
+    const word& defaultFacesName,
+    word& defaultFacesType,
+    wordList& patchPhysicalTypes
+)
+{
+    dictionary patchDictionary;
+
+    {
+        IOobject patchEntriesHeader
+        (
+            "boundary",
+            meshInstance,
+            meshDir,
+            obr,
+            IOobject::MUST_READ,
+            IOobject::NO_WRITE,
+            false
+        );
+
+        if (patchEntriesHeader.headerOk())
+        {
+            // Create a list of entries from the boundary file.
+            polyBoundaryMeshEntries patchEntries(patchEntriesHeader);
+
+            forAll(patchEntries, patchi)
+            {
+                patchDictionary.add(patchEntries[patchi]);
+            }
+        }
+    }
+
+    if (patchDictionary.size())
+    {
+        forAll(patchNames, patchi)
+        {
+            if (patchDictionary.found(patchNames[patchi]))
+            {
+                const dictionary& patchDict =
+                    patchDictionary.subDict(patchNames[patchi]);
+
+                patchDict.lookup("type") >> patchTypes[patchi];
+
+                patchDict.readIfPresent("geometricType", patchTypes[patchi]);
+                patchDict.readIfPresent
+                (
+                    "physicalType",
+                    patchPhysicalTypes[patchi]
+                );
+            }
+        }
+
+        if (patchDictionary.found(defaultFacesName))
+        {
+            const dictionary& patchDict =
+                patchDictionary.subDict(defaultFacesName);
+
+            patchDict.readIfPresent("geometricType", defaultFacesType);
+        }
+    }
+
+    Info << nl << "Default patch type set to " << defaultFacesType << endl;
+}
+
 // ************************************************************************* //

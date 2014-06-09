@@ -58,6 +58,19 @@ void preservePatchTypes
     word& defaultFacesType
 );
 
+//- preserve patch types
+void preservePatchTypes
+(
+    const objectRegistry& obr,
+    const word& meshInstance,
+    const fileName& meshDir,
+    const wordList& patchNames,
+    wordList& patchTypes,
+    const word& defaultFacesName,
+    word& defaultFacesType,
+    wordList& patchPhysicalTypes
+);
+
 } // End namespace Foam
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
