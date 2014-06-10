@@ -68,7 +68,7 @@ void Foam::preservePatchTypes
         }
     }
 
-    forAll(patchNames, patchi)
+    forAll (patchNames, patchi)
     {
         if (patchDictionary.found(patchNames[patchi]))
         {
