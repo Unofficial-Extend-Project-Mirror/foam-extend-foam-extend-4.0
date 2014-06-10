@@ -1,0 +1,6 @@
+EXE_INC = -I../../meshLibrary/lnInclude \
+    -I$(LIB_SRC)/meshTools/lnInclude
+
+EXE_LIBS = \
+    -lmeshLibrary \
+    -lmeshTools
