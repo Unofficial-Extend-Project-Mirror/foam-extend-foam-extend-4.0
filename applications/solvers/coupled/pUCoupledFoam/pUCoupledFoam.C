@@ -61,9 +61,9 @@ int main(int argc, char *argv[])
 
     // Calculate coupling matrices only once since the mesh doesn't change and
     // implicit div and grad operators are only dependant on Sf. Actually
-    // coupling terms (div(U) and grad(p)) in blockMatrix do not change, so they
-    // could be inserted only once, resetting other parts of blockMatrix to zero
-    // at the end of each time step. VV, 30/April/2014
+    // coupling terms (div(U) and grad(p)) in blockMatrix do not change,
+    // so they could be inserted only once, resetting other parts of
+    // blockMatrix to zero at the end of each time step. VV, 30/April/2014
 #   include "calculateCouplingMatrices.H"
 
     Info<< "\nStarting time loop\n" << endl;
