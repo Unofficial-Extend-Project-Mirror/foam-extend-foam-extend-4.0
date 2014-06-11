@@ -215,6 +215,7 @@ private:
                 cellList& cells
             );
 
+
 public:
 
     // Public typedefs
@@ -290,6 +291,7 @@ public:
             const word& defaultBoundaryPatchType,
             const bool syncPar = true
         );
+
 
     // Destructor
 
@@ -548,13 +550,11 @@ public:
             //- Remove all files from mesh instance()
             void removeFiles() const;
 
+
         // Helper functions
 
             //- Find cell enclosing this location (-1 if not in mesh)
-            label findCell
-            (
-                const point&
-            ) const;
+            label findCell(const point&) const;
 };
 
 

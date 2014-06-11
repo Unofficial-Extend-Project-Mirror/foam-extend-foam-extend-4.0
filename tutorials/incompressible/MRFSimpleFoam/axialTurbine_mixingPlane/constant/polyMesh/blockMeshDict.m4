@@ -20,7 +20,7 @@ define(calc, [esyscmd(perl -e 'printf ($1)')])
 //define(calc, [esyscmd(echo $1 | bc | tr -d \\n)])
 define(VCOUNT, 0)
 define(vlabel, [[// ]Vertex $1 = VCOUNT define($1, VCOUNT)define([VCOUNT], incr(VCOUNT))])
-define(pi, calc(3.14159265/20))
+define(pi, 3.14159265)
 
 define(hex2D, hex ($1b $2b $3b $4b $1t $2t $3t $4t))
 define(quad2D, ($1b $2b $2t $1t))
@@ -200,7 +200,7 @@ blocks
 
     hex2D(GV1l, GV1r, GV2r, GV2l)
     (GVtc GVbac GVrc)
-    simpleGrading (1 1 1)
+    simpleGrading (1 0.2 1)
 
     hex2D(GV2l, GV2r, GV3r, GV3l)
     (GVtc GViac GVrc)
@@ -215,7 +215,7 @@ blocks
     hex2D(RU1l, RU1r, RU2r, RU2l)
     rotor
     (RUtc RUbac RUrc)
-    simpleGrading (1 1 1)
+    simpleGrading (1 0.4 1)
 
     hex2D(RU2l, RU2r, RU3r, RU3l)
     rotor

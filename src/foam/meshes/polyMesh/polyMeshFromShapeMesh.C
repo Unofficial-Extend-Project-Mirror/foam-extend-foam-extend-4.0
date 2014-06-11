@@ -132,7 +132,7 @@ Foam::labelList Foam::polyMesh::facePatchFaceCells
 }
 
 
-//- Set faces_, calculate cells and patchStarts.
+// Set faces, calculate cells and patchStarts.
 void Foam::polyMesh::setTopology
 (
     const cellShapeList& cellsAsShapes,
@@ -584,7 +584,7 @@ Foam::polyMesh::polyMesh
 
     // Warning: Patches can only be added once the face list is
     // completed, as they hold a subList of the face list
-    forAll(boundaryFaces, patchI)
+    forAll (boundaryFaces, patchI)
     {
         // add the patch to the list
         boundary_.set
@@ -869,7 +869,7 @@ Foam::polyMesh::polyMesh
 
     // Warning: Patches can only be added once the face list is
     // completed, as they hold a subList of the face list
-    forAll(boundaryDicts, patchI)
+    forAll (boundaryDicts, patchI)
     {
         dictionary patchDict(boundaryDicts[patchI]);
 

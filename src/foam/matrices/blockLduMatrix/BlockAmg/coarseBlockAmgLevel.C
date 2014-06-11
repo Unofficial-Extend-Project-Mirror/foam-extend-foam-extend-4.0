@@ -293,8 +293,8 @@ void Foam::coarseBlockAmgLevel<Type>::scaleX
         x
     );
 
-    scalar scalingFactorNum = sumProd(x,b);
-    scalar scalingFactorDenom = sumProd(x,Ax);
+    scalar scalingFactorNum = sumProd(x, b);
+    scalar scalingFactorDenom = sumProd(x, Ax);
 
     vector2D scalingVector(scalingFactorNum, scalingFactorDenom);
     reduce(scalingVector, sumOp<vector2D>());

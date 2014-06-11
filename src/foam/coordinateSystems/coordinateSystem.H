@@ -198,6 +198,7 @@ protected:
             bool translate
         ) const;
 
+
 public:
 
     //- Runtime type information
@@ -308,6 +309,7 @@ public:
         //- Select constructed from Istream
         static autoPtr<coordinateSystem> New(Istream& is);
 
+
     // Destructor
 
         virtual ~coordinateSystem();
@@ -414,6 +416,7 @@ public:
             return origin_;
         }
 
+
       // Write
 
         //- Write
@@ -421,6 +424,7 @@ public:
 
         //- Write dictionary
         virtual void writeDict(Ostream&, bool subDict = true) const;
+
 
       // Transformations
 
@@ -487,7 +491,7 @@ public:
         void operator=(const dictionary&);
 
 
-    // friend Operators
+    // Friend Operators
 
         friend bool operator!=
         (

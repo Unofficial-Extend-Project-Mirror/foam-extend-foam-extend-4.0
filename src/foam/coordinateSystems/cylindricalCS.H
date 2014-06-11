@@ -153,7 +153,7 @@ public:
 
 
         //- Are angles in degrees?
-        bool  inDegrees() const;
+        bool inDegrees() const;
 
         //- Non-const access to inDegrees
         bool& inDegrees();
