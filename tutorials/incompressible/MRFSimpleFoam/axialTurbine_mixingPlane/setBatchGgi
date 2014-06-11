@@ -1,5 +1,3 @@
-faceSet GVCYCLIC1Zone new patchToFace GVCYCLIC1
-faceSet GVCYCLIC2Zone new patchToFace GVCYCLIC2
 faceSet RUCYCLIC1Zone new patchToFace RUCYCLIC1
 faceSet RUCYCLIC2Zone new patchToFace RUCYCLIC2
 faceSet DTCYCLIC1Zone new patchToFace DTCYCLIC1

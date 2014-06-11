@@ -30,13 +30,9 @@ boundaryField
     {
         type            mixingPlane;
     }
-    GVCYCLIC1
+    GVCYCLIC
     {
-        type            cyclicGgi;
-    }
-    GVCYCLIC2
-    {
-        type            cyclicGgi;
+        type            cyclic;
     }
     GVBLADE
     {

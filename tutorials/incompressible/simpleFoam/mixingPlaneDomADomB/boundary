@@ -55,6 +55,7 @@ FoamFile
             origin          (0 0 0);
             e1              (1 0 0);
             e3              (0 0 1);
+            degrees         false; //Use radians
         }
         ribbonPatch
         {

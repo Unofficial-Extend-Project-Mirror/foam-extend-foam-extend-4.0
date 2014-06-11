@@ -29,13 +29,9 @@ boundaryField
     {
         type            ggi;
     }
-    GVCYCLIC1
+    GVCYCLIC
     {
-        type            cyclicGgi;
-    }
-    GVCYCLIC2
-    {
-        type            cyclicGgi;
+        type            cyclic;
     }
     GVBLADE
     {

@@ -290,49 +290,30 @@ boundary
         );
     }
 
-    GVCYCLIC1
+    GVCYCLIC
     {
-        type             cyclicGgi;
-        shadowPatch      GVCYCLIC2;
-        zone             GVCYCLIC1Zone;
-        bridgeOverlap    false;
-        rotationAxis     (0 0 1);
-        rotationAngle    72;
-        separationOffset (0 0 0);
+        type cyclic;
+        featureCos      0.9;
+        //MUST specify transformation since cyclic is not flat.
+        //Set global debugSwitch cyclic to 1 to check that it is correct!
+        transform   rotational;
+        rotationAxis (0 0 1);
+        rotationCentre (0 0 0);
+        rotationAngle  -72; //Degrees from second half to first half
+        //Face numbering must be same on both halfs/sides. The numbering
+        //is determined by the block definition, not by the faces list
+        //below. Just make sure that each face definition is according
+        //to the rule "clockwise when looking from inside the block".
         faces
         (
+            //First half, left side:
             quad2D(GV1l, GV0l)
             quad2D(GV3l, GV2l)
-        );
-    }
-
-    GVCYCLIC2
-    {
-        type             cyclicGgi;
-        shadowPatch      GVCYCLIC1;
-        zone             GVCYCLIC2Zone;
-        bridgeOverlap    false;
-        rotationAxis     (0 0 1);
-        rotationAngle    -72;
-        separationOffset (0 0 0);
-        faces
-        (
+            //Second half, right side:
             quad2D(GV0r, GV1r)
             quad2D(GV2r, GV3r)
         );
     }
-
-    //GVCYCLIC
-    //{
-    //    type cyclic;
-    //    faces
-    //    (
-    //        quad2D(GV1l, GV0l)
-    //        quad2D(GV3l, GV2l)
-    //        quad2D(GV0r, GV1r)
-    //        quad2D(GV2r, GV3r)
-    //    );
-    //}
 
     GVBLADE
     {
@@ -422,18 +403,6 @@ boundary
         );
     }
 
-    //RUCYCLIC
-    //{
-    //    type cyclic;
-    //    faces
-    //    (
-    //        quad2D(RU1l, RU0l)
-    //        quad2D(RU3l, RU2l)
-    //        quad2D(RU0r, RU1r)
-    //        quad2D(RU2r, RU3r)
-    //    );
-    //}
-
     RUBLADE
     {
         type wall;
@@ -516,16 +485,6 @@ boundary
             quad2D(DT0r, DT1r)
         );
     }
-
-    //DTCYCLIC
-    //{
-    //    type cyclic;
-    //    faces
-    //    (
-    //        quad2D(DT1l, DT0l)
-    //        quad2D(DT0r, DT1r)
-    //    );
-    //}
 
     DTHUB
     {

@@ -63,9 +63,14 @@ fluxRequired
 
 mixingPlane
 {
-    default         areaAveraging;
-    //U               fluxAveragingAdjustMassFlow;
-    //p               zeroGradientAreaAveragingMix;
+    default         areaAveraging; 
+    U               areaAveraging;
+    p               areaAveraging;
+    k               fluxAveraging; //Transported variable
+    epsilon         fluxAveraging; //Transported variable
+    //NOTE: Ideally, tangential velocity components should also be
+    //fluxAveraged, while keeping areaAveraging for normal velocity
+    //component (to preserve perfect mass conservation)
 }
 
 // ************************************************************************* //
