@@ -33,7 +33,6 @@ wmake libso edgeMesh
 wmake libso surfMesh
 
 wmake libso meshTools
-wmake libso meshLibrary
 wmake libso finiteVolume
 wmake libso finiteArea
 
