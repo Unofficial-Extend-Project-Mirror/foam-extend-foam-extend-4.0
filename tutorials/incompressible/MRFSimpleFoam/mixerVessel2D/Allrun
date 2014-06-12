@@ -5,8 +5,5 @@
 
 application="MRFSimpleFoam"
 
-# Build tutorial app
-wmake ../$application
-
 ./makeMesh
 runApplication $application
