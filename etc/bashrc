@@ -355,8 +355,7 @@ Darwin)
 	    unset ruleDir ruleDirBase
 	fi
     else
-	echo "Seems you're not using MacPorts. This is currently not supported/tested. Find this line in 'etc/config/settings.sh', modify it accordingly and send patches to Bernhard"
-        export WM_COMPILER=
+        export WM_COMPILER=Gcc
         export WM_MPLIB=OPENMPI
     fi
 
