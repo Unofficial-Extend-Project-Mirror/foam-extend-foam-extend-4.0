@@ -29,13 +29,9 @@ boundaryField
     {
         type            ggi;
     }
-    GVCYCLIC1
+    GVCYCLIC
     {
-        type            cyclicGgi;
-    }
-    GVCYCLIC2
-    {
-        type            cyclicGgi;
+        type            cyclic;
     }
     GVBLADE
     {
@@ -44,10 +40,7 @@ boundaryField
     }
     GVHUB
     {
-        type            rotatingWallVelocity;
-        origin          (0 0 0);
-        axis            (0 0 1);
-        omega           -10;
+        type            fixedValue;
         value           uniform (0 0 0);
     }
     GVSHROUD

@@ -196,18 +196,6 @@ boundary
         );
     }
 
-    //RUCYCLIC
-    //{
-    //    type cyclic;
-    //    faces
-    //    (
-    //        quad2D(RU1l, RU0l)
-    //        quad2D(RU3l, RU2l)
-    //        quad2D(RU0r, RU1r)
-    //        quad2D(RU2r, RU3r)
-    //    );
-    //}
-
     RUBLADE
     {
         type wall;

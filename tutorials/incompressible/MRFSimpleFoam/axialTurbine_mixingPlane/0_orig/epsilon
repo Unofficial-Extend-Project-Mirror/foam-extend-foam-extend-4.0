@@ -31,14 +31,9 @@ boundaryField
         type            mixingPlane;
         value           uniform 14.855;
     }
-    GVCYCLIC1
+    GVCYCLIC
     {
-        type            cyclicGgi;
-        value           uniform 14.855;
-    }
-    GVCYCLIC2
-    {
-        type            cyclicGgi;
+        type            cyclic;
         value           uniform 14.855;
     }
     GVBLADE

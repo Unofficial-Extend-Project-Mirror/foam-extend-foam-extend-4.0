@@ -21,14 +21,12 @@ method    patchConstrained;
 
 globalFaceZones
 (
-    GVCYCLIC2Zone
     RUCYCLIC1Zone
     RUINLETZone
     RUCYCLIC2Zone
     RUOUTLETZone
     GVOUTLETZone
     DTINLETZone
-    GVCYCLIC1Zone
     DTCYCLIC1Zone
     DTCYCLIC2Zone
 );
