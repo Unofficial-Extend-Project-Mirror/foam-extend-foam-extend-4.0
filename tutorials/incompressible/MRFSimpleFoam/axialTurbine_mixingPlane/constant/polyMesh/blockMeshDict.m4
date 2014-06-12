@@ -20,7 +20,7 @@ define(calc, [esyscmd(perl -e 'printf ($1)')])
 //define(calc, [esyscmd(echo $1 | bc | tr -d \\n)])
 define(VCOUNT, 0)
 define(vlabel, [[// ]Vertex $1 = VCOUNT define($1, VCOUNT)define([VCOUNT], incr(VCOUNT))])
-define(pi, 3.14159265)
+define(pi, calc(3.14159265/20))
 
 define(hex2D, hex ($1b $2b $3b $4b $1t $2t $3t $4t))
 define(quad2D, ($1b $2b $2t $1t))
