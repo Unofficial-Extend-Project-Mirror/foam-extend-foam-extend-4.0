@@ -43,10 +43,12 @@ boundaryField
 	correctionFrequency  50;
 	normalContactModel    dirichletNeumann;
 	dirichletNeumannNormalModelDict
-	  {
+	{
 	    relaxationFactor      0.9;
 	    contactGapTol         1e-10;
 	    limitPenetration      no;
+            settleContact         no;
+            settleIterationNumber 100;
 	    penetrationLimit      -0.03;
 	    limitPressure         no;
 	    pressureLimit         1e9;
