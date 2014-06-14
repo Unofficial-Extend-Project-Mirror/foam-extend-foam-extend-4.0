@@ -57,66 +57,76 @@ dirichletNeumann::dirichletNeumann
     const PrimitivePatch<face, List, pointField>& slaveFaceZonePatch
  )
 :
-  normalContactModel
-  (
-      name,
-      patch,
-      dict,
-      masterPatchID,
-      slavePatchID,
-      masterFaceZoneID,
-      slaveFaceZoneID,
-      masterFaceZonePatch,
-      slaveFaceZonePatch
-  ),
-  normalContactModelDict_(dict.subDict(name+"NormalModelDict")),
-  mesh_(patch.boundaryMesh().mesh()),
-  slaveDisp_(mesh_.boundaryMesh()[slavePatchID].size(), vector::zero),
-  oldSlaveDispMag_(mesh_.boundaryMesh()[slavePatchID].size(), 0.0),
-  slavePressure_(mesh_.boundaryMesh()[slavePatchID].size(), vector::zero),
-  oldSlavePressure_(mesh_.boundaryMesh()[slavePatchID].size(), vector::zero),
-  touchFraction_(mesh_.boundaryMesh()[slavePatchID].size(), 0.0),
-  slaveValueFrac_(mesh_.boundaryMesh()[slavePatchID].size(), symmTensor::zero),
-  oldSlaveValueFrac_
-  (mesh_.boundaryMesh()[slavePatchID].size(), symmTensor::zero),
-  limitPenetration_(normalContactModelDict_.lookup("limitPenetration")),
-  penetrationLimit_
-  (readScalar(normalContactModelDict_.lookup("penetrationLimit"))),
-  limitPressure_(normalContactModelDict_.lookup("limitPressure")),
-  pressureLimit_(readScalar(normalContactModelDict_.lookup("pressureLimit"))),
-  settleContact_
-  (
-      normalContactModelDict_.found("settleContact") ?
-      normalContactModelDict_.lookup("settleContact") : false
-      ),
-  settleIterationNumber_
-  (
-      settleContact_ ?
-      readInt(normalContactModelDict_.lookup("settleIterationNumber")) : GREAT
-      ),
-  correctMissedVertices_
-  (
-      normalContactModelDict_.lookup("correctMissedVertices")
-  ),
-  slavePointPointsPtr_(NULL),
-  contactGapTol_(readScalar(normalContactModelDict_.lookup("contactGapTol"))),
-  contactIterNum_(0),
-  relaxFactor_(readScalar(normalContactModelDict_.lookup("relaxationFactor"))),
-  distanceMethod_(normalContactModelDict_.lookup("distanceMethod")),
-  aitkenRelaxation_(normalContactModelDict_.lookup("aitkenRelaxation")),
-  curTimeIndex_(-1),
-  iCorr_(0),
-  aitkenRes0_(1.0),
-  aitkenTheta_(relaxFactor_),
-  aitkenDelta_(slaveDisp_.size(), vector::zero),
-  aitkenDeltaPrevIter_(slaveDisp_.size(), vector::zero),
-  slaveDispPrevIter_(slaveDisp_.size(), vector::zero),
-  oscillationCorr_(normalContactModelDict_.lookup("oscillationCorrection")),
-  smoothingSteps_(readInt(normalContactModelDict_.lookup("smoothingSteps"))),
-  infoFreq_(readInt(normalContactModelDict_.lookup("infoFrequency"))),
-  contactFilePtr_(NULL)
+    normalContactModel
+    (
+        name,
+        patch,
+        dict,
+        masterPatchID,
+        slavePatchID,
+        masterFaceZoneID,
+        slaveFaceZoneID,
+        masterFaceZonePatch,
+        slaveFaceZonePatch
+    ),
+    normalContactModelDict_(dict.subDict(name+"NormalModelDict")),
+    mesh_(patch.boundaryMesh().mesh()),
+    slaveDisp_(mesh_.boundaryMesh()[slavePatchID].size(), vector::zero),
+    oldSlaveDispMag_(mesh_.boundaryMesh()[slavePatchID].size(), 0.0),
+    slavePressure_(mesh_.boundaryMesh()[slavePatchID].size(), vector::zero),
+    oldSlavePressure_(mesh_.boundaryMesh()[slavePatchID].size(), vector::zero),
+    touchFraction_(mesh_.boundaryMesh()[slavePatchID].size(), 0.0),
+    slaveValueFrac_(mesh_.boundaryMesh()[slavePatchID].size(), symmTensor::zero),
+    oldSlaveValueFrac_
+    (
+        mesh_.boundaryMesh()[slavePatchID].size(), symmTensor::zero
+    ),
+    limitPenetration_(normalContactModelDict_.lookup("limitPenetration")),
+    penetrationLimit_
+    (
+        readScalar(normalContactModelDict_.lookup("penetrationLimit"))
+    ),
+    limitPressure_(normalContactModelDict_.lookup("limitPressure")),
+    pressureLimit_(readScalar(normalContactModelDict_.lookup("pressureLimit"))),
+    settleContact_
+    (
+        normalContactModelDict_.lookupOrDefault<Switch>
+        (
+             "settleContact",
+             false
+        )
+    ),
+    settleIterationNumber_
+    (
+        normalContactModelDict_.lookupOrDefault<label>
+        (
+            "settleIterationNumber",
+            1000
+        )
+    ),
+    correctMissedVertices_
+    (
+        normalContactModelDict_.lookup("correctMissedVertices")
+    ),
+    slavePointPointsPtr_(NULL),
+    contactGapTol_(readScalar(normalContactModelDict_.lookup("contactGapTol"))),
+    contactIterNum_(0),
+    relaxFactor_(readScalar(normalContactModelDict_.lookup("relaxationFactor"))),
+    distanceMethod_(normalContactModelDict_.lookup("distanceMethod")),
+    aitkenRelaxation_(normalContactModelDict_.lookup("aitkenRelaxation")),
+    curTimeIndex_(-1),
+    iCorr_(0),
+    aitkenRes0_(1.0),
+    aitkenTheta_(relaxFactor_),
+    aitkenDelta_(slaveDisp_.size(), vector::zero),
+    aitkenDeltaPrevIter_(slaveDisp_.size(), vector::zero),
+    slaveDispPrevIter_(slaveDisp_.size(), vector::zero),
+    oscillationCorr_(normalContactModelDict_.lookup("oscillationCorrection")),
+    smoothingSteps_(readInt(normalContactModelDict_.lookup("smoothingSteps"))),
+    infoFreq_(readInt(normalContactModelDict_.lookup("infoFrequency"))),
+    contactFilePtr_(NULL)
 {
-  // master proc open contact info file
+    // master proc open contact info file
     if (Pstream::master())
     {
         word masterName = mesh_.boundary()[masterPatchID].name();
