@@ -116,7 +116,7 @@ class dirichletNeumann
        // so we can turn off contact corrections after the specified
        // number of corrections
        Switch settleContact_;
-       int settleIterationNumber_;
+       label settleIterationNumber_;
 
        // correct pointDistToInter misses
        // pointPoints are needed

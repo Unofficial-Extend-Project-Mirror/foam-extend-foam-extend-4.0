@@ -441,14 +441,15 @@ then
     export LD_PRELOAD
 fi
 
-if [[ `uname -s` == "Darwin" ]]
-then
-    if [[ `ulimit -n` == "unlimited" || `ulimit -n` < 8192 ]]
-    then
-	# higher limit needed for wmkdeps
-	ulimit -n 8192
-    fi
-fi
+# temporarily disabled.  HJ, 13/Jun/2014
+# if [[ `uname -s` == "Darwin" ]]
+# then
+#     if [[ `ulimit -n` == "unlimited" || `ulimit -n` < 8192 ]]
+#     then
+# 	# higher limit needed for wmkdeps
+# 	ulimit -n 8192
+#     fi
+# fi
 
 # cleanup environment:
 # ~~~~~~~~~~~~~~~~~~~~
