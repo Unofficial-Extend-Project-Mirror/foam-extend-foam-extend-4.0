@@ -21,7 +21,7 @@ _________________
 9 List of Contributors:
 
 
-################################################################################
+###############################################################################
 
 
 1 Overview
@@ -36,8 +36,10 @@ _________________
   ListOfContributors), such as dynamic mesh and topological change
   support, turbomachinery extensions including general grid
   interpolation (GGI), cyclic GGI and mixing plane, block-coupled matrix
-  support, finite area method, comprehensive mesh motion capability and
-  GPU support. For a full list, see below and previous release notes at:
+  support, implicitly coupled conjugate heat transfer and
+   other pyshics coupling, finite area method, comprehensive dynamic mesh
+  (motion and topological changes) capability and GPU support.
+  For a full list, see below and previous release notes at:
   [http://sourceforge.net/p/openfoam-extend/wiki/Home/]
 
   Version 3.1, nicknamed "Zagreb", is the current version of
@@ -181,6 +183,9 @@ _________________
 
   * Algebraic multigrid solver framework
 
+  * Approximately 6000 bug fixes in fundamental level libraries and
+    discretisation techniques
+
   * 210 tutorials with automated run scripts
 
   * Automatic test harness
@@ -207,6 +212,13 @@ _________________
   * Major new features:
     - Pressure-based compressible turbo functionalities
     - Pressure-based coupled solver (block-coupling p and U)
+    - Density-based coupled Roe flux solver dbnsFoam and dbnsTurbFoam
+    - major update and validation of mixing plane boundary
+    - full deploymenr of block matrix, including block-AMG solvers
+    - further parallel dynamic mesh capability: all topological changes
+      supported in parallel execution
+    - major upgrade of solid mechanics solvers
+    - support for CLang-based compilers
 
   * Licence: GPLv3
 
@@ -255,7 +267,7 @@ _________________
       - thermophysicalModels/basic/derivedFvPatchFields/temperatureDirectedInletOutletVelocity
       - fvMesh/fvPatches/constraint/mixingPlane
     - Turbulence modeling:
-      - Removed kOmegaSST_lowRe - USE WHAT INSTEAD???
+      - Removed kOmegaSST_lowRe - use standard kOmegaSST
 
   - Tutorial updates (settings, initial conditions, bug fixes etc.):
     - incompressible/icoDyMFoam/mixerGgi
@@ -290,8 +302,15 @@ _________________
     - incompressible/simpleSRFFoam/axialTurbine
     - mesh/moveDynamicMesh/movingCylinders
 
-  * Bug fixes: LinearUpwind no longer hangs in parallel execution on
-    empty patches
+  * Bug fixes:
+    - Correct snGrad on coupled boundaries
+    - handling of static null pointers: safe to dereference
+    - LinearUpwind no longer hangs in parallel execution on empty patches
+    - mesh update on parallel topo changes: zones before boundaries
+    - GGI interpolation updates on topologically changing meshes
+    - cell layering issues off complex surfaces
+    - template depth for block matrix support
+    - parallel efficiency improvements
 
 
 6 Recent sucessful compilations and tests
@@ -309,13 +328,21 @@ _________________
 
     [http://openfoam-extend.sourceforge.net/CDash/viewTest.php?buildid=734]
 
-  * Mac OX X & CLang:
+  * Mac OS X 10.9.3 Maverick & CLang (XCode compiler):
 
     [http://openfoam-extend.sourceforge.net/CDash/viewTest.php?buildid=733]
 
-  * Mac OX X & gcc
+  * Mac OS X & gcc (Macports)
 
     [http://openfoam-extend.sourceforge.net/CDash/viewTest.php?buildid=737]
+
+  * Linux PPC ppc64 (Blue Gene)
+
+    [http://openfoam-extend.sourceforge.net/CDash/viewTest.php?buildid=742]
+
+  * Red Hat Enterprise Linux Server release 5.2 (Tikanga), Intel CC 11.1
+
+    [http://openfoam-extend.sourceforge.net/CDash/viewTest.php?buildid=743]
 
 
 7 Reporting bugs
