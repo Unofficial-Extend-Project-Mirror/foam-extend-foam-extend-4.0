@@ -21,7 +21,7 @@ _________________
 9 List of Contributors:
 
 
-###############################################################################
+################################################################################
 
 
 1 Overview
@@ -36,10 +36,10 @@ _________________
   ListOfContributors), such as dynamic mesh and topological change
   support, turbomachinery extensions including general grid
   interpolation (GGI), cyclic GGI and mixing plane, block-coupled matrix
-  support, implicitly coupled conjugate heat transfer and
-   other pyshics coupling, finite area method, comprehensive dynamic mesh
-  (motion and topological changes) capability and GPU support.
-  For a full list, see below and previous release notes at:
+  support, implicitly coupled conjugate heat transfer and other pyshics
+  coupling, finite area method, comprehensive dynamic mesh (motion and
+  topological changes) capability and GPU support. For a full list, see
+  below and previous release notes at:
   [http://sourceforge.net/p/openfoam-extend/wiki/Home/]
 
   Version 3.1, nicknamed "Zagreb", is the current version of
@@ -183,12 +183,12 @@ _________________
 
   * Algebraic multigrid solver framework
 
-  * Approximately 6000 bug fixes in fundamental level libraries and
-    discretisation techniques
-
   * 210 tutorials with automated run scripts
 
   * Automatic test harness
+
+  * Approximately 6000 bug fixes in fundamental level libraries and
+    discretisation techniques
 
 
 5 New features in foam-extend-3.1, since foam-extend-3.0
@@ -214,7 +214,7 @@ _________________
     - Pressure-based coupled solver (block-coupling p and U)
     - Density-based coupled Roe flux solver dbnsFoam and dbnsTurbFoam
     - major update and validation of mixing plane boundary
-    - full deploymenr of block matrix, including block-AMG solvers
+    - full deploymenr of block matrix, including block-AMG solverse
     - further parallel dynamic mesh capability: all topological changes
       supported in parallel execution
     - major upgrade of solid mechanics solvers
@@ -269,7 +269,7 @@ _________________
     - Turbulence modeling:
       - Removed kOmegaSST_lowRe - use standard kOmegaSST
 
-  - Tutorial updates (settings, initial conditions, bug fixes etc.):
+  * Tutorial updates (settings, initial conditions, bug fixes etc.):
     - incompressible/icoDyMFoam/mixerGgi
     - incompressible/icoDyMFoam/movingConeMotion
     - incompressible/icoDyMFoam/movingConeTopo
@@ -305,7 +305,8 @@ _________________
   * Bug fixes:
     - Correct snGrad on coupled boundaries
     - handling of static null pointers: safe to dereference
-    - LinearUpwind no longer hangs in parallel execution on empty patches
+    - LinearUpwind no longer hangs in parallel execution on empty
+      patches
     - mesh update on parallel topo changes: zones before boundaries
     - GGI interpolation updates on topologically changing meshes
     - cell layering issues off complex surfaces
@@ -328,11 +329,11 @@ _________________
 
     [http://openfoam-extend.sourceforge.net/CDash/viewTest.php?buildid=734]
 
-  * Mac OS X 10.9.3 Maverick & CLang (XCode compiler):
+  * Mac OX X 10.9.3 Maverick & CLang (XCode compiler):
 
     [http://openfoam-extend.sourceforge.net/CDash/viewTest.php?buildid=733]
 
-  * Mac OS X & gcc (Macports)
+  * Mac OX X & gcc (Macports)
 
     [http://openfoam-extend.sourceforge.net/CDash/viewTest.php?buildid=737]
 

@@ -17,26 +17,30 @@
 ################################################################################
 
 ** Overview
-  The foam-extend project is a fork of the OpenFOAM® open source library for 
-  Computational Fluid Dynamics (CFD). It is an open project welcoming and 
-  integrating contributions from all users and developers. Previously known as 
-  OpenFOAM®-dev and OpenFOAM®-extend, it contains bug fixes and performance 
-  improvements, as well as extensions and additional features provided
-  by community contributors (see file ListOfContributors), such as dynamic mesh 
-  and topological change support, turbomachinery extensions including general
-  grid interpolation (GGI), cyclic GGI and mixing plane, block-coupled matrix 
-  support, finite area method, comprehensive mesh motion capability and GPU 
-  support. For a full list, see below and previous release notes at:
+  The foam-extend project is a fork of the OpenFOAM® open source
+  library for Computational Fluid Dynamics (CFD). It is an open
+  project welcoming and integrating contributions from all users and
+  developers. Previously known as OpenFOAM®-dev and OpenFOAM®-extend,
+  it contains bug fixes and performance improvements, as well as
+  extensions and additional features provided by community
+  contributors (see file ListOfContributors), such as dynamic mesh and
+  topological change support, turbomachinery extensions including
+  general grid interpolation (GGI), cyclic GGI and mixing plane,
+  block-coupled matrix support, implicitly coupled conjugate heat
+  transfer and other pyshics coupling, finite area method,
+  comprehensive dynamic mesh (motion and topological changes)
+  capability and GPU support. For a full list, see below and previous
+  release notes at:
   http://sourceforge.net/p/openfoam-extend/wiki/Home/
 
-  Version 3.1, nicknamed "Zagreb", is the current version of foam-extend. The 
-  release continues the tradition and spirit of the original FOAM code
-  developed by prof. Jasak and Mr. Weller during their time at
-  Imperial College and released as the general purpose CFD/CCM package by
-  Nabla Ltd. in 2000. In this spirit, we reverted 18 December 2013 to the
-  original numbering scheme (foam-2.3.2, 13 December 2004) as release
-  number 3.0.
-  Visit http://foam-extend.org for more information.
+  Version 3.1, nicknamed "Zagreb", is the current version of
+  foam-extend. The release continues the tradition and spirit of the
+  original FOAM code developed by prof. Jasak and Mr. Weller during
+  their time at Imperial College and released as the general purpose
+  CFD/CCM package by Nabla Ltd. in 2000. In this spirit, we reverted
+  18 December 2013 to the original numbering scheme (foam-2.3.2, 13
+  December 2004) as release number 3.0.  Visit http://foam-extend.org
+  for more information.
 
   OPENFOAM® is a registered trademark of ESI Group. OpenFOAM-extend and 
   foam-extend are a community effort not endorsed by ESI Group.
@@ -168,6 +172,9 @@
 
   * Automatic test harness
 
+  * Approximately 6000 bug fixes in fundamental level libraries and
+    discretisation techniques
+
 ** New features in foam-extend-3.1, since foam-extend-3.0
   The list of features is a result of the work of numerous
   contributors. The maintainers of foam-extend would formally like to
@@ -187,6 +194,13 @@ user@machine> git log 3.0.. > commitLog
   * Major new features:
     - Pressure-based compressible turbo functionalities
     - Pressure-based coupled solver (block-coupling p and U)
+    - Density-based coupled Roe flux solver dbnsFoam and dbnsTurbFoam
+    - major update and validation of mixing plane boundary
+    - full deploymenr of block matrix, including block-AMG solverse
+    - further parallel dynamic mesh capability: all topological changes
+      supported in parallel execution
+    - major upgrade of solid mechanics solvers
+    - support for CLang-based compilers
 
   * Licence: GPLv3
 
@@ -235,9 +249,9 @@ user@machine> git log 3.0.. > commitLog
       - thermophysicalModels/basic/derivedFvPatchFields/temperatureDirectedInletOutletVelocity
       - fvMesh/fvPatches/constraint/mixingPlane
     - Turbulence modeling:
-      - Removed kOmegaSST_lowRe - USE WHAT INSTEAD???
+      - Removed kOmegaSST_lowRe - use standard kOmegaSST
 
-  - Tutorial updates (settings, initial conditions, bug fixes etc.):
+  * Tutorial updates (settings, initial conditions, bug fixes etc.):
     - incompressible/icoDyMFoam/mixerGgi
     - incompressible/icoDyMFoam/movingConeMotion
     - incompressible/icoDyMFoam/movingConeTopo
@@ -271,7 +285,14 @@ user@machine> git log 3.0.. > commitLog
     - mesh/moveDynamicMesh/movingCylinders
 
   * Bug fixes:
-    LinearUpwind no longer hangs in parallel execution on empty patches
+    - Correct snGrad on coupled boundaries
+    - handling of static null pointers: safe to dereference
+    - LinearUpwind no longer hangs in parallel execution on empty patches
+    - mesh update on parallel topo changes: zones before boundaries
+    - GGI interpolation updates on topologically changing meshes
+    - cell layering issues off complex surfaces
+    - template depth for block matrix support
+    - parallel efficiency improvements
 
 ** Recent sucessful compilations and tests
    * Ubuntu 14.04:
@@ -286,13 +307,21 @@ user@machine> git log 3.0.. > commitLog
 
      http://openfoam-extend.sourceforge.net/CDash/viewTest.php?buildid=734
 
-   * Mac OX X & CLang:
+   * Mac OX X 10.9.3 Maverick & CLang (XCode compiler):
 
      http://openfoam-extend.sourceforge.net/CDash/viewTest.php?buildid=733
 
-   * Mac OX X & gcc
+   * Mac OX X & gcc (Macports)
 
      http://openfoam-extend.sourceforge.net/CDash/viewTest.php?buildid=737
+
+  * Linux PPC ppc64 (Blue Gene)
+
+    http://openfoam-extend.sourceforge.net/CDash/viewTest.php?buildid=742
+
+  * Red Hat Enterprise Linux Server release 5.2 (Tikanga), Intel CC 11.1
+
+    http://openfoam-extend.sourceforge.net/CDash/viewTest.php?buildid=743
 
 ** Reporting bugs
     To report bugs, please use the MantisBT bugtracker at

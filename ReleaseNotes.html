@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
 <title><b>Release notes for foam-extend-3.1</b></title>
-<!-- 2014-06-15 Sun 13:44 -->
+<!-- 2014-06-16 Mon 16:40 -->
 <meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta  name="generator" content="Org-mode" />
 <style type="text/css">
@@ -159,28 +159,32 @@ for the JavaScript code in this tag.
 <h2 id="sec-1"><span class="section-number-2">1</span> Overview</h2>
 <div class="outline-text-2" id="text-1">
 <p>
-The foam-extend project is a fork of the OpenFOAM® open source library for 
-Computational Fluid Dynamics (CFD). It is an open project welcoming and 
-integrating contributions from all users and developers. Previously known as 
-OpenFOAM®-dev and OpenFOAM®-extend, it contains bug fixes and performance 
-improvements, as well as extensions and additional features provided
-by community contributors (see file ListOfContributors), such as dynamic mesh 
-and topological change support, turbomachinery extensions including general
-grid interpolation (GGI), cyclic GGI and mixing plane, block-coupled matrix 
-support, finite area method, comprehensive mesh motion capability and GPU 
-support. For a full list, see below and previous release notes at:
+The foam-extend project is a fork of the OpenFOAM® open source
+library for Computational Fluid Dynamics (CFD). It is an open
+project welcoming and integrating contributions from all users and
+developers. Previously known as OpenFOAM®-dev and OpenFOAM®-extend,
+it contains bug fixes and performance improvements, as well as
+extensions and additional features provided by community
+contributors (see file ListOfContributors), such as dynamic mesh and
+topological change support, turbomachinery extensions including
+general grid interpolation (GGI), cyclic GGI and mixing plane,
+block-coupled matrix support, implicitly coupled conjugate heat
+transfer and other pyshics coupling, finite area method,
+comprehensive dynamic mesh (motion and topological changes)
+capability and GPU support. For a full list, see below and previous
+release notes at:
 <a href="http://sourceforge.net/p/openfoam-extend/wiki/Home/">http://sourceforge.net/p/openfoam-extend/wiki/Home/</a>
 </p>
 
 <p>
-Version 3.1, nicknamed "Zagreb", is the current version of foam-extend. The 
-release continues the tradition and spirit of the original FOAM code
-developed by prof. Jasak and Mr. Weller during their time at
-Imperial College and released as the general purpose CFD/CCM package by
-Nabla Ltd. in 2000. In this spirit, we reverted 18 December 2013 to the
-original numbering scheme (foam-2.3.2, 13 December 2004) as release
-number 3.0.
-Visit <a href="http://foam-extend.org">http://foam-extend.org</a> for more information.
+Version 3.1, nicknamed "Zagreb", is the current version of
+foam-extend. The release continues the tradition and spirit of the
+original FOAM code developed by prof. Jasak and Mr. Weller during
+their time at Imperial College and released as the general purpose
+CFD/CCM package by Nabla Ltd. in 2000. In this spirit, we reverted
+18 December 2013 to the original numbering scheme (foam-2.3.2, 13
+December 2004) as release number 3.0.  Visit <a href="http://foam-extend.org">http://foam-extend.org</a>
+for more information.
 </p>
 
 <p>
@@ -382,6 +386,10 @@ correction or explicit schemes
 
 <li>Automatic test harness
 </li>
+
+<li>Approximately 6000 bug fixes in fundamental level libraries and
+discretisation techniques
+</li>
 </ul>
 </div>
 </div>
@@ -419,6 +427,19 @@ Get a full log of the updates by (either):
 <li>Pressure-based compressible turbo functionalities
 </li>
 <li>Pressure-based coupled solver (block-coupling p and U)
+</li>
+<li>Density-based coupled Roe flux solver dbnsFoam and dbnsTurbFoam
+</li>
+<li>major update and validation of mixing plane boundary
+</li>
+<li>full deploymenr of block matrix, including block-AMG solverse
+</li>
+<li>further parallel dynamic mesh capability: all topological changes
+supported in parallel execution
+</li>
+<li>major upgrade of solid mechanics solvers
+</li>
+<li>support for CLang-based compilers
 </li>
 </ul>
 </li>
@@ -522,7 +543,7 @@ solvers/solidMechanics/stressFemFoam
 </li>
 <li>Turbulence modeling:
 <ul class="org-ul">
-<li>Removed kOmegaSST_lowRe - USE WHAT INSTEAD???
+<li>Removed kOmegaSST_lowRe - use standard kOmegaSST
 </li>
 </ul>
 </li>
@@ -598,7 +619,24 @@ solvers/solidMechanics/stressFemFoam
 </li>
 
 <li>Bug fixes:
-LinearUpwind no longer hangs in parallel execution on empty patches
+<ul class="org-ul">
+<li>Correct snGrad on coupled boundaries
+</li>
+<li>handling of static null pointers: safe to dereference
+</li>
+<li>LinearUpwind no longer hangs in parallel execution on empty patches
+</li>
+<li>mesh update on parallel topo changes: zones before boundaries
+</li>
+<li>GGI interpolation updates on topologically changing meshes
+</li>
+<li>cell layering issues off complex surfaces
+</li>
+<li>template depth for block matrix support
+</li>
+<li>parallel efficiency improvements
+</li>
+</ul>
 </li>
 </ul>
 </div>
@@ -628,17 +666,31 @@ LinearUpwind no longer hangs in parallel execution on empty patches
 </p>
 </li>
 
-<li>Mac OX X &amp; CLang:
+<li>Mac OX X 10.9.3 Maverick &amp; CLang (XCode compiler):
 
 <p>
 <a href="http://openfoam-extend.sourceforge.net/CDash/viewTest.php?buildid=733">http://openfoam-extend.sourceforge.net/CDash/viewTest.php?buildid=733</a>
 </p>
 </li>
 
-<li>Mac OX X &amp; gcc
+<li>Mac OX X &amp; gcc (Macports)
 
 <p>
 <a href="http://openfoam-extend.sourceforge.net/CDash/viewTest.php?buildid=737">http://openfoam-extend.sourceforge.net/CDash/viewTest.php?buildid=737</a>
+</p>
+</li>
+
+<li>Linux PPC ppc64 (Blue Gene)
+
+<p>
+<a href="http://openfoam-extend.sourceforge.net/CDash/viewTest.php?buildid=742">http://openfoam-extend.sourceforge.net/CDash/viewTest.php?buildid=742</a>
+</p>
+</li>
+
+<li>Red Hat Enterprise Linux Server release 5.2 (Tikanga), Intel CC 11.1
+
+<p>
+<a href="http://openfoam-extend.sourceforge.net/CDash/viewTest.php?buildid=743">http://openfoam-extend.sourceforge.net/CDash/viewTest.php?buildid=743</a>
 </p>
 </li>
 </ul>
@@ -675,7 +727,7 @@ See file ListOfContributors
 </div>
 <div id="postamble" class="status">
 <p class="date">Date: 8 June 2014</p>
-<p class="date">Created: 2014-06-15 Sun 13:44</p>
+<p class="date">Created: 2014-06-16 Mon 16:40</p>
 <p class="creator"><a href="http://www.gnu.org/software/emacs/">Emacs</a> 24.3.1 (<a href="http://orgmode.org">Org</a> mode 8.2.4)</p>
 <p class="validation"><a href="http://validator.w3.org/check?uri=referer">Validate</a></p>
 </div>
