@@ -1,0 +1,30 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                |
+| \\      /  F ield         | OpenFOAM GUI Project: creativeFields           |
+|  \\    /   O peration     | Version:  0.8.9.0                                  |
+|   \\  /    A nd           | Web: www.c-fields.com                                       |
+|    \\/     M anipulation  |                                                |
+\*---------------------------------------------------------------------------*/
+
+FoamFile
+{
+version	2;
+format	ascii;
+class	dictionary;
+location	"system";
+object	meshDict;
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+maxCellSize	0.01;
+
+surfaceFile	"geom.fms";
+
+boundaryLayers
+{
+    nLayers         6;
+    thicknessRatio  1.2;
+}
+
+// ************************************************************************* //

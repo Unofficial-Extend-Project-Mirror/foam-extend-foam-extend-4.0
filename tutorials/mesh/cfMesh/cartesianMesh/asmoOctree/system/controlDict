@@ -1,0 +1,66 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                |
+| \\      /  F ield         | cfMesh: A library for mesh generation          | 
+|  \\    /   O peration     |                                                |
+|   \\  /    A nd           | Author: Franjo Juretic                         | 
+|    \\/     M anipulation  | E-mail: franjo.juretic@c-fields.com            |
+\*---------------------------------------------------------------------------*/
+
+FoamFile
+{
+    version   2.0;
+    format    ascii;
+    class     dictionary;
+    location  "system";
+    object    meshDict;
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+// Foam Application Class
+applicationClass ;
+
+// Start point of run
+startFrom       latestTime;
+
+// Calculation start time
+startTime       0;
+
+// End point of run
+stopAt          endTime;
+
+// Calculation end time
+endTime         20;
+
+// Calculation time step
+deltaT          1;
+
+// Type of write output control
+writeControl    timeStep;
+
+// Interval with which the results are output
+writeInterval   550;
+
+// Limits number of time directories before overwriting
+cycleWrite      0;
+
+// Write Format
+writeFormat     ascii;
+
+// Significant figures of written ASCII data
+writePrecision  6;
+
+// Write Compression
+writeCompression compressed;
+
+// Time directories name format
+timeFormat      general;
+
+// Decimal precision of time directory names
+timePrecision   6;
+
+// Can parameters be modified during run time?
+runTimeModifiable no;
+
+
+// ************************************************************************* //

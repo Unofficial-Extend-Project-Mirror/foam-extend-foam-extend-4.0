@@ -6,5 +6,6 @@ set -x
 wmake $makeType autoMesh
 wmake $makeType blockMesh
 wmake $makeType extrudeModel
+wmake $makeType cfMesh/meshLibrary
 
 # ----------------------------------------------------------------- end-of-file
