@@ -83,4 +83,7 @@ fi
 export WM_NCOMPPROCS=1
 ( cd $WM_THIRD_PARTY_DIR && ./AllMake.post )
 
+# Build extend-bazaar packages
+( cd extend-bazaar && ./Allwmake)
+
 # ----------------------------------------------------------------- end-of-file
