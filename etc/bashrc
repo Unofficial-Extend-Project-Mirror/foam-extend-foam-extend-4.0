@@ -447,7 +447,7 @@ fi
 #     if [[ `ulimit -n` == "unlimited" || `ulimit -n` < 8192 ]]
 #     then
 # 	# higher limit needed for wmkdeps
-# 	ulimit -n 8192
+ 	ulimit -n 8192
 #     fi
 # fi
 
