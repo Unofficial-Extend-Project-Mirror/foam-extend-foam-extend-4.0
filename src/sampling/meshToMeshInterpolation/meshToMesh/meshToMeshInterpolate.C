@@ -177,12 +177,13 @@ void meshToMesh::interpolateInternalField
         break;
 
         default:
+            // Temporary fix: this needs clear-up.  HJ/15/Jun/2014
             FatalErrorIn
             (
                 "meshToMesh::interpolateInternalField(Field<Type>& toF, "
                 "const GeometricField<Type, fvPatchField, volMesh>& fromVf, "
                 "meshToMesh::order ord) const"
-            )   << "unknown interpolation scheme " << ord
+            )   << "unknown interpolation scheme " << label(ord)
                 << exit(FatalError);
     }
 }
