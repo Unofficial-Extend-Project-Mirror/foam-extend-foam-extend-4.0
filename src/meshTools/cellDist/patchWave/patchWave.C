@@ -126,6 +126,7 @@ Foam::label Foam::patchWave::getValues(const MeshWave<wallPoint>& waveInfo)
             }
         }
     }
+
     return nIllegal;
 }
 

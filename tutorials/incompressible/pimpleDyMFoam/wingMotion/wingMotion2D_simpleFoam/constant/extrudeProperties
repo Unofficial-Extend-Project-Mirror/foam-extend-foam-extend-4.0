@@ -1,7 +1,7 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | foam-extend: Open Source CFD                    |
-|  \\    /   O peration     | Version:     3.0                                |
+|  \\    /   O peration     | Version:     3.1                                |
 |   \\  /    A nd           | Web:         http://www.extend-project.de       |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
@@ -19,10 +19,10 @@ FoamFile
 
 constructFrom patch;
 sourceCase "../wingMotion_snappyHexMesh";
-sourcePatch front;
+sourcePatch symFront;
 
 // If construct from patch: patch to use for back (can be same as sourcePatch)
-exposedPatchName back;
+exposedPatchName symBack;
 
 // Flip surface normals before usage.
 flipNormals false;

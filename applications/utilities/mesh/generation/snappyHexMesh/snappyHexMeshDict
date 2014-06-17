@@ -1,7 +1,7 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | foam-extend: Open Source CFD                    |
-|  \\    /   O peration     | Version:     3.0                                |
+|  \\    /   O peration     | Version:     3.1                                |
 |   \\  /    A nd           | Web:         http://www.extend-project.de       |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
@@ -12,14 +12,12 @@ FoamFile
     class       dictionary;
     object      snappyHexMeshDict;
 }
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 // Which of the steps to run
 castellatedMesh true;
 snap            true;
 addLayers       false;
-
 
 // Geometry. Definition of all surfaces. All surfaces are of class
 // searchableSurface.
@@ -62,8 +60,6 @@ geometry
     }
 };
 
-
-
 // Settings for the castellatedMesh generation.
 castellatedMeshControls
 {
@@ -95,13 +91,10 @@ castellatedMeshControls
     // nProcs). 0=balance always.
     maxLoadUnbalance 0.10;
 
-
     // Number of buffer layers between different levels.
     // 1 means normal 2:1 refinement restriction, larger means slower
     // refinement.
     nCellsBetweenLevels 1;
-
-
 
     // Explicit feature edge refinement
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -115,8 +108,6 @@ castellatedMeshControls
         //    level 2;
         //}
     );
-
-
 
     // Surface based refinement
     // ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -153,7 +144,6 @@ castellatedMeshControls
 
     resolveFeatureAngle 30;
 
-
     // Region-wise refinement
     // ~~~~~~~~~~~~~~~~~~~~~~
 
@@ -181,7 +171,6 @@ castellatedMeshControls
         //}
     }
 
-
     // Mesh selection
     // ~~~~~~~~~~~~~~
 
@@ -192,14 +181,11 @@ castellatedMeshControls
     // after refinement.
     locationInMesh (5 0.28 0.43);
 
-
     // Whether any faceZones (as specified in the refinementSurfaces)
     // are only on the boundary of corresponding cellZones or also allow
     // free-standing zone faces
     allowFreeStandingZoneFaces true;
 }
-
-
 
 // Settings for the snapping.
 snapControls
@@ -220,8 +206,6 @@ snapControls
     //  before upon reaching a correct mesh.
     nRelaxIter 5;
 }
-
-
 
 // Settings for the layer addition.
 addLayersControls
@@ -247,7 +231,6 @@ addLayersControls
     // Expansion factor for layer mesh
     expansionRatio 1.0;
 
-
     //- Wanted thickness of final added cell layer. If multiple layers
     //  is the thickness of the layer furthest away from the wall.
     //  See relativeSizes parameter.
@@ -262,7 +245,6 @@ addLayersControls
     //  also not grown. This helps convergence of the layer addition process
     //  close to features.
     nGrow 1;
-
 
     // Advanced settings
 
@@ -296,7 +278,6 @@ addLayersControls
     // Create buffer region for new layer terminations
     nBufferCellsNoExtrude 0;
 
-
     // Overall max number of layer addition iterations. The mesher will exit
     // if it reaches this number of iterations; possibly with an illegal
     // mesh.
@@ -307,8 +288,6 @@ addLayersControls
     // after nRelaxIter it uses the values in meshQualityControls::relaxed.
     nRelaxedIter 20;
 }
-
-
 
 // Generic mesh quality settings. At any undoable phase these determine
 // where to undo.
@@ -360,15 +339,12 @@ meshQualityControls
     //  If <0 : delete always.
     //minVolCollapseRatio 0.5;
 
-
     // Advanced
 
     //- Number of error distribution iterations
     nSmoothScale 4;
     //- amount to scale back displacement at error points
     errorReduction 0.75;
-
-
 
     // Optional : some meshing phases allow usage of relaxed rules.
     // See e.g. addLayersControls::nRelaxedIter.
@@ -379,7 +355,6 @@ meshQualityControls
     }
 }
 
-
 // Advanced
 
 // Flags for optional output
@@ -389,10 +364,8 @@ meshQualityControls
 // 4 : write current intersections as .obj files
 debug 0;
 
-
 // Merge tolerance. Is fraction of overall bounding box of initial mesh.
 // Note: the write tolerance needs to be higher than this.
 mergeTolerance 1E-6;
-
 
 // ************************************************************************* //

@@ -27,6 +27,7 @@
 #
 # Description
 #     Cleanup script for ThirdParty packages.
+#     Add option alsoPackage to remove the installed files.
 #
 # Author:
 #     Martin Beaudoin, Hydro-Quebec, (2013)
@@ -38,7 +39,7 @@ cd ${0%/*} || exit 1
 wmakeCheckPwd "$WM_THIRD_PARTY_DIR" || {
     echo "Error: Current directory is not \$WM_THIRD_PARTY_DIR"
     echo "    The environment variables are inconsistent with the installation."
-    echo "    Check the OpenFOAM entries in your dot-files and source them."
+    echo "    Check the foam-extend entries in your dot-files and source them."
     exit 1
 }
 . tools/makeThirdPartyFunctionsForRPM
@@ -50,22 +51,22 @@ echo ========================================
 echo
 
 # Cleaning stage 1
-./AllClean.stage1
+./AllClean.stage1 $1
 
 # Cleaning stage 2
-./AllClean.stage2
+./AllClean.stage2 $1
 
 # Cleaning stage 3
-./AllClean.stage3
+./AllClean.stage3 $1
 
 # Cleaning stage 4
-./AllClean.stage4
+./AllClean.stage4 $1
 
 # Cleaning stage 5
-./AllClean.stage5
+./AllClean.stage5 $1
 
 # Cleaning stage 6
-./AllClean.stage6
+./AllClean.stage6 $1
 
 echo ========================================
 echo Done ThirdParty Allclean

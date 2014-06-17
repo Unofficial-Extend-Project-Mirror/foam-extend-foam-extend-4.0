@@ -3,7 +3,7 @@ nCoupledFacesToBreak = 0;
 {
     // Check internal faces
 
-    // scalarField effTraction = 
+    // scalarField effTraction =
     //   cohesiveZone.internalField() *
     //   mag(traction.internalField());
   scalarField normalTraction =
@@ -26,7 +26,7 @@ nCoupledFacesToBreak = 0;
     // scalarField effTractionFraction =
     //   (normalTraction/sigmaMaxI)*(normalTraction/sigmaMaxI) + (shearTraction/tauMaxI)*(shearTraction/tauMaxI);
     scalarField effTractionFraction(normalTraction.size(), 0.0);
-    
+
     if(cohesivePatchDUPtr)
       {
 	effTractionFraction =
@@ -75,7 +75,7 @@ nCoupledFacesToBreak = 0;
             faceToBreakIndex = facesToBreak[faceI];
         }
     }
-    scalar gMaxEffTractionFraction = 
+    scalar gMaxEffTractionFraction =
         returnReduce(faceToBreakEffTractionFraction, maxOp<scalar>());
 
     if (Pstream::parRun())
@@ -91,7 +91,7 @@ nCoupledFacesToBreak = 0;
         }
 
         // Check if maximum is present on more then one processors
-        
+
         label procID = Pstream::nProcs();
         if (procHasFaceToBreak)
         {
@@ -117,7 +117,7 @@ nCoupledFacesToBreak = 0;
     {
         if (mesh.boundary()[patchI].coupled())
         {
-            // scalarField pEffTraction = 
+            // scalarField pEffTraction =
 	    //   cohesiveZone.boundaryField()[patchI] *
 	    //   mag(traction.boundaryField()[patchI]);
 	    // scalarField pEffTractionFraction = pEffTraction/sigmaMax.boundaryField()[patchI];
@@ -129,12 +129,12 @@ nCoupledFacesToBreak = 0;
 	  scalarField pShearTraction =
 	    cohesiveZone.boundaryField()[patchI] *
 	    mag( (I - Foam::sqr(n.boundaryField()[patchI])) & traction.boundaryField()[patchI] );
-	  
+
 	  // the traction fraction is monitored to decide which faces to break:
 	  // ie (tN/tNC)^2 + (tS/tSC)^2 >1 to crack a face
 	  const scalarField& pSigmaMax = sigmaMax.boundaryField()[patchI];
 	  const scalarField& pTauMax = tauMax.boundaryField()[patchI];
-	  
+
 	  // scalarField pEffTractionFraction =
 	  //   (pNormalTraction/pSigmaMax)*(pNormalTraction/pSigmaMax) + (pShearTraction/pTauMax)*(pShearTraction/pTauMax);
 	  scalarField pEffTractionFraction(pNormalTraction.size(), 0.0);
@@ -158,7 +158,7 @@ nCoupledFacesToBreak = 0;
 		{
 		  maxEffTractionFraction = pEffTractionFraction[faceI];
                 }
-	      
+
 	      if (pEffTractionFraction[faceI] > 1.0)
                 {
 		  //Pout << "coupled face to break " << faceI << endl;
@@ -168,7 +168,7 @@ nCoupledFacesToBreak = 0;
                         pEffTractionFraction[faceI]
                     );
                 }
-            }	    
+            }
         }
     }
 
@@ -186,26 +186,26 @@ nCoupledFacesToBreak = 0;
     {
         nCoupledFacesToBreak = 1;
     }
-    
+
     // Select coupled face with maximum effective traction fraction
     label coupledFaceToBreakIndex = -1;
     scalar coupledFaceToBreakEffTractionFraction = 0;
     forAll(coupledFacesToBreakEffTractionFraction, faceI)
     {
-        if 
+        if
         (
-            coupledFacesToBreakEffTractionFraction[faceI] 
+            coupledFacesToBreakEffTractionFraction[faceI]
           > coupledFaceToBreakEffTractionFraction
         )
         {
-            coupledFaceToBreakEffTractionFraction = 
+            coupledFaceToBreakEffTractionFraction =
                 coupledFacesToBreakEffTractionFraction[faceI];
             coupledFaceToBreakIndex = coupledFacesToBreak[faceI];
         }
     }
 
 
-    scalar gMaxCoupledEffTractionFraction = 
+    scalar gMaxCoupledEffTractionFraction =
         returnReduce(coupledFaceToBreakEffTractionFraction, maxOp<scalar>());
 
     if (Pstream::parRun())
@@ -216,8 +216,8 @@ nCoupledFacesToBreak = 0;
         {
             if
             (
-                mag(gMaxCoupledEffTractionFraction - coupledFaceToBreakEffTractionFraction) 
-              < SMALL 
+                mag(gMaxCoupledEffTractionFraction - coupledFaceToBreakEffTractionFraction)
+              < SMALL
             )
             {
                 // Maximum traction fraction is on this processor
@@ -226,7 +226,7 @@ nCoupledFacesToBreak = 0;
         }
 
         // Check if maximum is present on more then one processors
-        
+
         label procID = Pstream::nProcs();
         if (procHasCoupledFaceToBreak)
         {
@@ -235,11 +235,11 @@ nCoupledFacesToBreak = 0;
 
         label minProcID =
             returnReduce<label>(procID, minOp<label>());
-	
+
         if (procID != minProcID)
         {
             nCoupledFacesToBreak = 0;
-        }      
+        }
     }
 
     if (gMaxCoupledEffTractionFraction > gMaxEffTractionFraction)
@@ -258,7 +258,7 @@ nCoupledFacesToBreak = 0;
     labelList index(Pstream::nProcs(), -1);
     if (nCoupledFacesToBreak)
     {
-        label patchID = 
+        label patchID =
             mesh.boundaryMesh().whichPatch(coupledFaceToBreakIndex);
         label start = mesh.boundaryMesh()[patchID].start();
         label localIndex = coupledFaceToBreakIndex - start;
@@ -296,10 +296,10 @@ nCoupledFacesToBreak = 0;
                                     mesh.boundaryMesh()[patchI]
                                 );
                             label ngbProcNo = procPatch.neighbProcNo();
-                       
+
                             if (ngbProcNo == procI)
                             {
-                                label start = 
+                                label start =
                                     mesh.boundaryMesh()[patchI].start();
                                 coupledFaceToBreakIndex = start + index[procI];
                                 nCoupledFacesToBreak = 1;
@@ -356,14 +356,14 @@ nCoupledFacesToBreak = 0;
     }
     else if (nCoupledFacesToBreak > 0)
     {
-        label patchID = 
+        label patchID =
             mesh.boundaryMesh().whichPatch(coupledFaceToBreakIndex);
         label start = mesh.boundaryMesh()[patchID].start();
         label localIndex = coupledFaceToBreakIndex - start;
 
         faceToBreakTraction = traction.boundaryField()[patchID][localIndex];
         faceToBreakNormal = n.boundaryField()[patchID][localIndex];
-	
+
         // Scale broken face traction
 	faceToBreakSigmaMax = sigmaMax.boundaryField()[patchID][localIndex];
 	faceToBreakTauMax = tauMax.boundaryField()[patchID][localIndex];
@@ -436,19 +436,19 @@ nCoupledFacesToBreak = 0;
 
         // All values on the new crack faces get set to zero
 	// so we must manually correct them
-        const vectorField DUpI = 
+        const vectorField DUpI =
             DU.boundaryField()[cohesivePatchID].patchInternalField();
-        const vectorField oldDUpI = 
+        const vectorField oldDUpI =
             DU.oldTime().boundaryField()[cohesivePatchID].patchInternalField();
-        const vectorField UpI = 
+        const vectorField UpI =
             U.boundaryField()[cohesivePatchID].patchInternalField();
-        const vectorField oldUpI = 
+        const vectorField oldUpI =
             U.oldTime().boundaryField()[cohesivePatchID].patchInternalField();
-        const symmTensorField sigmapI = 
+        const symmTensorField sigmapI =
             sigma.boundaryField()[cohesivePatchID].patchInternalField();
         const scalarField muPI = mu.boundaryField()[cohesivePatchID].patchInternalField();
         const scalarField lambdaPI = lambda.boundaryField()[cohesivePatchID].patchInternalField();
-        
+
         // Global crack fields
         const vectorField globalDUpI = mesh.globalCrackField(DUpI);
         const vectorField globalOldDUpI = mesh.globalCrackField(oldDUpI);
@@ -478,31 +478,31 @@ nCoupledFacesToBreak = 0;
                 DU.boundaryField()[cohesivePatchID][i] =
                     0.5
                    *(
-                       globalDUpI[globalIndex] 
+                       globalDUpI[globalIndex]
                      + globalDUpI[gcfa[globalIndex]]
                     );
                 DU.oldTime().boundaryField()[cohesivePatchID][i] =
                     0.5
                    *(
-                       globalOldDUpI[globalIndex] 
+                       globalOldDUpI[globalIndex]
                      + globalOldDUpI[gcfa[globalIndex]]
                     );
                 U.boundaryField()[cohesivePatchID][i] =
                     0.5
                    *(
-                       globalUpI[globalIndex] 
+                       globalUpI[globalIndex]
                      + globalUpI[gcfa[globalIndex]]
                     );
                 U.oldTime().boundaryField()[cohesivePatchID][i] =
                     0.5
                    *(
-                       globalOldUpI[globalIndex] 
+                       globalOldUpI[globalIndex]
                      + globalOldUpI[gcfa[globalIndex]]
                     );
                 sigma.boundaryField()[cohesivePatchID][i] =
                     0.5
                    *(
-                       globalsigmapI[globalIndex] 
+                       globalsigmapI[globalIndex]
                      + globalsigmapI[gcfa[globalIndex]]
                     );
 
@@ -535,7 +535,7 @@ nCoupledFacesToBreak = 0;
 #       include "calculateTraction.H"
 	//if (nFacesToBreak || nCoupledFacesToBreak) mesh.write(); traction.write();
 
-        // Initialise initiation traction for new cohesive patch face 
+        // Initialise initiation traction for new cohesive patch face
 	// we also need to update the traction_ field in the crack boundary condition
 	// this is because it cannot set itself during mapping.
         //for (label i=0; i<cohesivePatchDU.size(); i++)
@@ -550,7 +550,7 @@ nCoupledFacesToBreak = 0;
              || (oldFaceIndex == coupledFaceToBreakIndex)
             )
             {
-                vector n0 = 
+                vector n0 =
                     mesh.Sf().boundaryField()[cohesivePatchID][i]
                    /mesh.magSf().boundaryField()[cohesivePatchID][i];
                 //vector n1 = -n0;
@@ -597,7 +597,7 @@ nCoupledFacesToBreak = 0;
                 }
             }
         }
-		  
+
 	// hmmnn we only need a reference for very small groups of cells
 	// turn off for now
 	//#       include "updateReference.H"

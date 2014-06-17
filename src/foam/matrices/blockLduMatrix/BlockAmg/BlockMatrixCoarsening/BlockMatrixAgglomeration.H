@@ -59,9 +59,6 @@ class BlockMatrixAgglomeration
 :
     public BlockMatrixCoarsening<Type>
 {
-
-public:
-
     // Private Data
 
         //- Reference to matrix
@@ -70,8 +67,9 @@ public:
         //- Reference to a templated norm calculator
         autoPtr<BlockCoeffNorm<Type> > normPtr_;
 
-        //- Child array
-        labelField child_;
+        //- Child array: for each fine equation give agglomeration cluster
+        //  index
+        labelField agglomIndex_;
 
         //- Group size
         label groupSize_;
@@ -82,6 +80,7 @@ public:
         //- Can a coarse level be constructed?
         bool coarsen_;
 
+
     // Private Member Functions
 
         //- Disallow default bitwise copy construct
@@ -90,11 +89,14 @@ public:
         // Disallow default bitwise assignment
         void operator=(const BlockMatrixAgglomeration<Type>&);
 
-        //- Calculate child
-        void calcChild();
+        //- Calculate agglomeration index (child)
+        void calcAgglomeration();
 
 
     // Private Static Data
+
+        //- Diagonal scaling factor
+        static const scalar diagFactor_;
 
         //- Weighting factor
         static const scalar weightFactor_;
@@ -102,8 +104,8 @@ public:
 
 public:
 
-        //- Runtime type information
-        TypeName("AAMG");
+    //- Runtime type information
+    TypeName("AAMG");
 
 
     // Constructors
@@ -116,6 +118,7 @@ public:
             const label groupSize,
             const label minCoarseEqns
         );
+
 
     // Destructor
 
@@ -131,8 +134,7 @@ public:
         }
 
         //- Restrict matrix
-        virtual autoPtr<BlockLduMatrix<Type> > restrictMatrix
-        ()  const;
+        virtual autoPtr<BlockLduMatrix<Type> > restrictMatrix() const;
 
         //- Restrict residual
         virtual void restrictResidual
@@ -141,11 +143,11 @@ public:
             Field<Type>& coarseRes
         ) const;
 
-        //- Restrict residual using CoeffField
-        void restrictResidual
+        //- Restrict CoeffField.  Used for diag coefficient
+        void restrictDiag
         (
-            const CoeffField<Type>& res,
-            CoeffField<Type>& coarseRes
+            const CoeffField<Type>& Coeff,
+            CoeffField<Type>& coarseCoeff
         ) const;
 
         //- Prolongate correction
@@ -154,7 +156,6 @@ public:
             Field<Type>& x,
             const Field<Type>& coarseX
         ) const;
-
 };
 
 

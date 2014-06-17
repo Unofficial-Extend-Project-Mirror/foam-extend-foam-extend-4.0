@@ -125,6 +125,7 @@ addSolverToBlockMatrix(Type, block##Type##CGSolver, symMatrix);               \
 typedef BlockGaussSeidelSolver<type > block##Type##GaussSeidelSolver;         \
 makeBlockSolverTypeName(block##Type##GaussSeidelSolver);                      \
 addSolverToBlockMatrix(Type, block##Type##GaussSeidelSolver, symMatrix);      \
+addSolverToBlockMatrix(Type, block##Type##GaussSeidelSolver, asymMatrix);     \
                                                                               \
 typedef BlockGMRESSolver<type > block##Type##GMRESSolver;                     \
 makeBlockSolverTypeName(block##Type##GMRESSolver);                            \

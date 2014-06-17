@@ -79,7 +79,7 @@ int main(int argc, char *argv[])
 
 #           include "calculateDivDSigmaExp.H"
 
-            //- linear momentum equation
+            // Linear momentum equation
             fvVectorMatrix DUEqn
             (
                 fvm::d2dt2(rho, DU)
@@ -127,7 +127,8 @@ int main(int argc, char *argv[])
          && ++iCorr < nCorr
         );
 
-        Info<< nl << "Time " << runTime.value() << ", Solving for " << DU.name()
+        Info<< nl << "Time " << runTime.value()
+            << ", Solving for " << DU.name()
             << ", Initial residual = " << initialResidual
             << ", Final residual = " << solverPerf.initialResidual()
             << ", Relative residual = " << relativeResidual

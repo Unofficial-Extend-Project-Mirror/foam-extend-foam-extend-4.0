@@ -3,19 +3,19 @@
 //--------------------------------------------------//
 {
   //Info << "Moving mesh using least squares interpolation" << endl;
-    
+
     leastSquaresVolPointInterpolation pointInterpolation(mesh);
-  
+
     // Create point mesh
     pointMesh pMesh(mesh);
     //pointMesh pMesh(mesh);
-    
+
     wordList types
     (
         pMesh.boundary().size(),
         calculatedFvPatchVectorField::typeName
     );
-    
+
     pointVectorField pointDU
     (
         IOobject
@@ -61,15 +61,15 @@
     }
 
     // Correct symmetryPlane points
-        
+
     forAll(mesh.boundaryMesh(), patchI)
     {
         if (isA<symmetryPolyPatch>(mesh.boundaryMesh()[patchI]))
         {
-            const labelList& meshPoints = 
+            const labelList& meshPoints =
                 mesh.boundaryMesh()[patchI].meshPoints();
 
-            vector avgN = 
+            vector avgN =
                 gAverage(mesh.boundaryMesh()[patchI].pointNormals());
 
             vector i(1, 0, 0);
@@ -101,11 +101,11 @@
     }
 
 
-#   include "calcUnusedNewPoints.H"    
+#   include "calcUnusedNewPoints.H"
 
 //     // now we make sure processor patches are exactly the same
 //     newPoints.correctBoundaryConditions();
-    
+
     twoDPointCorrector twoDCorrector(mesh);
     twoDCorrector.correctPoints(newPoints);
     mesh.movePoints(newPoints);

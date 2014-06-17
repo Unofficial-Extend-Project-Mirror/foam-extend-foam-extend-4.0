@@ -28,10 +28,10 @@ if (runTime.outputTime())
 	),
        sqrt((3.0/2.0)*magSqr(dev(sigma)))
        );
-    
+
     Info<< "Max sigmaEq = " << max(sigmaEq).value()
 	<< endl;
-    
+
     //- boundary traction
     // volVectorField traction
     //   (
@@ -98,7 +98,7 @@ if (runTime.outputTime())
 
 // 	vector force = sum( totalForce );
 // 	Info << "\ttotal force is " << force << " N" << endl;
-	
+
 // 	const vectorField& nb = n.boundaryField()[patchi];
 // 	scalar normalForce = sum( nb & totalForce );
 // 	Info << "\tnormal force is " << normalForce << " N" << endl;

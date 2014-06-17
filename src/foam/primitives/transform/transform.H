@@ -153,7 +153,7 @@ inline SymmTensor4thOrder<Cmpt> transform(const tensor& L, const SymmTensor4thOr
   //- where A is a function of L
 
   const double s = ::sqrt(2);
-  const double A[6][6] = 
+  const double A[6][6] =
     {
       { L.xx()*L.xx(), L.xy()*L.xy(), L.xz()*L.xz(), s*L.xx()*L.xy(), s*L.xy()*L.xz(), s*L.xz()*L.xx() },
       { L.yx()*L.yx(), L.yy()*L.yy(), L.yz()*L.yz(), s*L.yx()*L.yy(), s*L.yy()*L.yz(), s*L.yz()*L.yx() },
@@ -206,7 +206,7 @@ inline SymmTensor4thOrder<Cmpt> transform(const tensor& L, const SymmTensor4thOr
      A[3][0] * C.xyxy() * A[3][2] +
      A[4][0] * C.yzyz() * A[4][2] +
      A[5][0] * C.zxzx() * A[5][2],
-     
+
      // yyyy
      A[0][1] * C.xxxx() * A[0][1] +
      A[1][1] * C.xxyy() * A[0][1] +
@@ -220,7 +220,7 @@ inline SymmTensor4thOrder<Cmpt> transform(const tensor& L, const SymmTensor4thOr
      A[3][1] * C.xyxy() * A[3][1] +
      A[4][1] * C.yzyz() * A[4][1] +
      A[5][1] * C.zxzx() * A[5][1],
-     
+
      // yyzz
      A[0][1] * C.xxxx() * A[0][2] +
      A[1][1] * C.xxyy() * A[0][2] +
@@ -234,7 +234,7 @@ inline SymmTensor4thOrder<Cmpt> transform(const tensor& L, const SymmTensor4thOr
      A[3][1] * C.xyxy() * A[3][2] +
      A[4][1] * C.yzyz() * A[4][2] +
      A[5][1] * C.zxzx() * A[5][2],
-     
+
      // zzzz
      A[0][2] * C.xxxx() * A[0][2] +
      A[1][2] * C.xxyy() * A[0][2] +
@@ -309,7 +309,7 @@ inline DiagTensor<Cmpt> transform
 		 "const DiagTensor<Cmpt>& st\n"
 		 ")\n"
 		 "not implemented");
-  
+
   return st;
 }
 

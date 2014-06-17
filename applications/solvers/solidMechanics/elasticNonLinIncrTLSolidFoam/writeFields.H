@@ -28,10 +28,10 @@ if (runTime.outputTime())
 	),
        sqrt((3.0/2.0)*magSqr(dev(sigma)))
        );
-    
+
     Info<< "Max sigmaEq = " << max(sigmaEq).value()
 	<< endl;
-    
+
     //- Calculate Cauchy stress
     volTensorField F = I + gradU;
     volScalarField J = det(F);
@@ -65,7 +65,7 @@ if (runTime.outputTime())
 	),
        sqrt((3.0/2.0)*magSqr(dev(sigmaCauchy)))
        );
-    
+
     Info<< "Max sigmaCauchyEq = " << max(sigmaCauchyEq).value()
 	<< endl;
 

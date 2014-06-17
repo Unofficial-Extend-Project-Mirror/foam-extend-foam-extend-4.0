@@ -31,12 +31,8 @@ Author
 
 #include "BlockAmgSolver.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-//- Construct from matrix and solver data stream
 template<class Type>
 Foam::BlockAmgSolver<Type>::BlockAmgSolver
 (
@@ -76,34 +72,22 @@ Foam::BlockAmgSolver<Type>::solve
         this->fieldName()
     );
 
-    // Create local references to avoid the spread this-> ugliness
-    const BlockLduMatrix<Type>& matrix = this->matrix_;
-
     scalar norm = this->normFactor(x, b);
 
-    Field<Type> wA(x.size());
-
-    // Calculate residual.  Note: sign of residual swapped for efficiency
-    matrix.Amul(wA, x);
-    wA -= b;
-
-    solverPerf.initialResidual() = gSum(cmptMag(wA))/norm;
+    // Calculate initial residual
+    solverPerf.initialResidual() = gSum(cmptMag(amg_.residual(x, b)))/norm;
     solverPerf.finalResidual() = solverPerf.initialResidual();
 
-    if (!solverPerf.checkConvergence(this->tolerance(), this->relTolerance()))
+    if (!this->stop(solverPerf))
     {
         do
         {
             amg_.cycle(x, b);
 
-            // Re-calculate residual.  Note: sign of residual swapped
-            // for efficiency
-            matrix.Amul(wA, x);
-            wA -= b;
+            solverPerf.finalResidual() =
+                gSum(cmptMag(amg_.residual(x, b)))/norm;
 
-            solverPerf.finalResidual() = gSum(cmptMag(wA))/norm;
             solverPerf.nIterations()++;
-
         } while (!this->stop(solverPerf));
     }
 

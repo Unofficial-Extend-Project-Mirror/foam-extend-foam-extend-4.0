@@ -76,7 +76,7 @@ autoPtr<normalContactModel> normalContactModel::New
         )   << "Unknown normalContactModel type "
             << name << endl << endl
             << "Valid  normalContactModels are : " << endl
-            << dictionaryConstructorTablePtr_->toc()
+            << dictionaryConstructorTablePtr_->sortedToc()
             << exit(FatalIOError);
     }
 

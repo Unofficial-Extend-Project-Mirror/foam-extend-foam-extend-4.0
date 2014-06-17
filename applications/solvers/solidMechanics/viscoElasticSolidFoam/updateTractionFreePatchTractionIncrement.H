@@ -5,7 +5,7 @@
     if(patchID == -1)
     {
         FatalErrorIn(args.executable())
-            << "Can't find patch with name freeSurface" << abort(FatalError);  
+            << "Can't find patch with name freeSurface" << abort(FatalError);
     }
 
     if
@@ -15,9 +15,9 @@
     )
     {
         FatalErrorIn(args.executable())
-            << "Bounary condition on " << DU.name() 
-                <<  " is " 
-                << DU.boundaryField()[patchID].type() 
+            << "Bounary condition on " << DU.name()
+                <<  " is "
+                << DU.boundaryField()[patchID].type()
                 << "for patch: " << mesh.boundaryMesh()[patchID].name()
                 <<  ", instead "
                 << tractionDisplacementIncrementFvPatchVectorField::typeName
@@ -35,7 +35,7 @@
     vector traction = vector::zero;
     vector DTraction = vector::zero;
 
-    vectorField relaxedTraction = 
+    vectorField relaxedTraction =
         (
             n
           & (

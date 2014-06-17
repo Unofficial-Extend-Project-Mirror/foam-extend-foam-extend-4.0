@@ -269,18 +269,24 @@ Foam::dirichletNeumannFriction::dirichletNeumannFriction
     const fvPatch& slavePatch = mesh.boundary()[slavePatchIndex];
     const fvPatchField<tensor>& gradField =
         slavePatch.lookupPatchField<volTensorField, tensor>
-        ("grad("+fieldName+")");
-    vectorField slaveShearTraction =
-      (I - sqr(slaveFaceNormals))
-      &
-      tractionBoundaryGradient().traction
-      (
-       gradField,
-       fieldName,
-       slavePatch,
-       orthotropic,
-       nonLinear
-       );
+        ("grad(" + fieldName + ")");
+
+    bool incremental(fieldName == "DU");
+
+    vectorField slaveShearTraction
+    (
+        (I - sqr(slaveFaceNormals))
+      & tractionBoundaryGradient::traction
+        (
+            gradField,
+            fieldName,
+            "U",
+            slavePatch,
+            orthotropic,
+            nonLinearGeometry::nonLinearNames_[nonLinear],
+            incremental
+        )
+    );
 
 
     // algorithm

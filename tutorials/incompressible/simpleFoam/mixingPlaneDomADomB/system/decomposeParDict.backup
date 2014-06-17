@@ -1,7 +1,7 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | foam-extend: Open Source CFD                    |
-|  \\    /   O peration     | Version:     3.0                                |
+|  \\    /   O peration     | Version:     3.1                                |
 |   \\  /    A nd           | Web:         http://www.extend-project.de       |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
@@ -19,22 +19,22 @@ method manual; 	//metis; //simple;
 globalFaceZones (
     ggi1DomAZone
     ggi2DomAZone
-); 	
+);
 
 manualCoeffs
 {
   dataFile "manualDecomp.txt";
-} 	
+}
 
 simpleCoeffs
 {
   n (1 4 1);
-  delta 0.001; 	
-} 	
+  delta 0.001;
+}
 
-distributed no; 	
+distributed no;
 
 roots
   (
-  ); 	
+  );
 

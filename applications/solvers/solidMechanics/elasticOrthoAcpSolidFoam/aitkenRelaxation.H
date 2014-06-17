@@ -1,4 +1,4 @@
-// aitken acceleration 
+// aitken acceleration
 aitkenDelta.storePrevIter();
 
 // update delta

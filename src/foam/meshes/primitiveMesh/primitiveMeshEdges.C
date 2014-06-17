@@ -66,6 +66,7 @@ Foam::label Foam::primitiveMesh::getEdge
     {
         es.append(edge(nextPointI, pointI));
     }
+
     return edgeI;
 }
 
@@ -97,12 +98,12 @@ void Foam::primitiveMesh::calcEdges() const
         // HJ, 27/Aug/2010
 
         // ALGORITHM:
-        // Go through the pointFace list.  Go through the list of faces for that
-        // point and ask for edges.  If the edge has got the point in question
-        // AND the second point in the edge is larger than the first, add the
-        // edge to the list.  At the same time, add the edge label to the list
-        // of edges for the current face (faceEdges) and log the other face as
-        // the neighbour of this face.
+        // Go through the pointFace list.  Go through the list of faces for
+        // that point and ask for edges.  If the edge has got the point
+        // in question AND the second point in the edge is larger than
+        // the first, add the edge to the list.  At the same time,
+        // add the edge label to the listof edges for the current face
+        // (faceEdges) and log the other face as the neighbour of this face.
 
         const faceList& f = faces();
 
@@ -217,7 +218,7 @@ void Foam::primitiveMesh::calcEdges() const
             }
 
             // All edges for the current point found. Before adding them to the
-            // list, it is necessary to sort them in the increasing order of the
+            // list, it is necessary to sort them in the increasing order of
             // neighbouring point.
 
             // Make real list out of SLList to simplify the manipulation.
@@ -265,7 +266,10 @@ void Foam::primitiveMesh::calcEdges() const
 
             forAll (faceGivingNeighbour, i)
             {
-                fgn[reshuffleList[i]].transfer(faceGivingNeighbour[i].shrink());
+                fgn[reshuffleList[i]].transfer
+                (
+                    faceGivingNeighbour[i].shrink()
+                );
             }
 
             labelListList eofgn(edgeOfFaceGivingNeighbour.size());
@@ -300,7 +304,7 @@ void Foam::primitiveMesh::calcEdges() const
 }
 
 // Removed ordered edges: reverting to correct parallelisation
-// of edge data.  HJ, 17/Au/2010
+// of edge data.  HJ, 17/Aug/2010
 // void primitiveMesh::calcOrderedEdges() const
 
 

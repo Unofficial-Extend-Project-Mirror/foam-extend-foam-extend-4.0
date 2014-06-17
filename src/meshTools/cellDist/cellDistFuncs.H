@@ -80,9 +80,11 @@ class cellDistFuncs
         //- Disallow default bitwise assignment
         void operator=(const cellDistFuncs&);
 
+
 public:
 
     ClassName("cellDistFuncs");
+
 
     // Constructors
 
@@ -101,7 +103,7 @@ public:
         //- Get patchIDs of named patches
         labelHashSet getPatchIDs(const wordList&) const;
 
-        //- Get patchIDs of/derived off certain type (e.g. 'processorPolyPatch')
+        //- Get patchIDs of/derived off certain type (e.g. processorPolyPatch)
         //  Uses isA, not isType
         template<class Type>
         labelHashSet getPatchIDs() const;

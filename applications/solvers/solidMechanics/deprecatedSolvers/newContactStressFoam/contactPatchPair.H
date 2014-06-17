@@ -26,7 +26,7 @@ Class
 
 Description
     A pair of surfaces in contact.
-    
+
 SourceFiles
     contactPatchPair.C
 

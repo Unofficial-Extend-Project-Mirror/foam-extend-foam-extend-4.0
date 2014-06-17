@@ -1,7 +1,7 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | foam-extend: Open Source CFD                    |
-|  \\    /   O peration     | Version:     3.0                                |
+|  \\    /   O peration     | Version:     3.1                                |
 |   \\  /    A nd           | Web:         http://www.extend-project.de       |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
@@ -44,27 +44,39 @@ edges
 (
 );
 
-patches
+boundary
 (
-    patch flow
-    (
-        (0 6 9 3)
-        (2 5 11 8)
-        (0 1 7 6)
-        (3 9 10 4)
-        (4 10 11 5)
-    )
-    wall obstacle
-    (
-        (1 2 8 7)
-    )
-    cyclic periodic
-    (
-        (0 3 4 1)
-        (1 4 5 2)
-        (6 7 10 9)
-        (7 8 11 10)
-    )
+    flow
+    {
+        type patch;
+        faces
+        (
+            (0 6 9 3)
+            (2 5 11 8)
+            (0 1 7 6)
+            (3 9 10 4)
+            (4 10 11 5)
+        );
+    }
+    obstacle
+    {
+        type wall;
+        faces
+        (
+            (1 2 8 7)
+        );
+    }
+    periodic
+    {
+        type cyclic;
+        faces
+        (
+            (0 3 4 1)
+            (1 4 5 2)
+            (6 7 10 9)
+            (7 8 11 10)
+        );
+    }
 );
 
 mergePatchPairs

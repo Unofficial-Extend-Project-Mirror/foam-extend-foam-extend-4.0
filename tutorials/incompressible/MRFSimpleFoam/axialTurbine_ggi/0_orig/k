@@ -1,0 +1,120 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | foam-extend: Open Source CFD                    |
+|  \\    /   O peration     | Version:     3.1                                |
+|   \\  /    A nd           | Web:         http://www.extend-project.de       |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       volScalarField;
+    location    "0";
+    object      k;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+dimensions      [0 2 -2 0 0 0 0];
+
+internalField   uniform 0.375;
+
+boundaryField
+{
+    GVINLET
+    {
+        type            fixedValue;
+        value           uniform 0.375;
+    }
+    GVOUTLET
+    {
+        type            ggi;
+        value           uniform 0.375;
+    }
+    GVCYCLIC
+    {
+        type            cyclic;
+        value           uniform 0.375;
+    }
+    GVBLADE
+    {
+        type            kqRWallFunction;
+        value           uniform 0.375;
+    }
+    GVHUB
+    {
+        type            kqRWallFunction;
+        value           uniform 0.375;
+    }
+    GVSHROUD
+    {
+        type            kqRWallFunction;
+        value           uniform 0.375;
+    }
+    RUINLET
+    {
+        type            ggi;
+        value           uniform 0.375;
+    }
+    RUOUTLET
+    {
+        type            ggi;
+        value           uniform 0.375;
+    }
+    RUCYCLIC1
+    {
+        type            cyclicGgi;
+        value           uniform 0.375;
+    }
+    RUCYCLIC2
+    {
+        type            cyclicGgi;
+        value           uniform 0.375;
+    }
+    RUBLADE
+    {
+        type            kqRWallFunction;
+        value           uniform 0.375;
+    }
+    RUHUB
+    {
+        type            kqRWallFunction;
+        value           uniform 0.375;
+    }
+    RUSHROUD
+    {
+        type            kqRWallFunction;
+        value           uniform 0.375;
+    }
+    DTINLET
+    {
+        type            ggi;
+        value           uniform 0.375;
+    }
+    DTOUTLET
+    {
+        type            zeroGradient;
+    }
+    DTCYCLIC1
+    {
+        type            cyclicGgi;
+        value           uniform 0.375;
+    }
+    DTCYCLIC2
+    {
+        type            cyclicGgi;
+        value           uniform 0.375;
+    }
+    DTHUB
+    {
+        type            kqRWallFunction;
+        value           uniform 0.375;
+    }
+    DTSHROUD
+    {
+        type            kqRWallFunction;
+        value           uniform 0.375;
+    }
+}
+
+// ************************************************************************* //

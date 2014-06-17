@@ -92,7 +92,7 @@ void Foam::profilingInfo::update(scalar elapsedTimee)
 void Foam::profilingInfo::writeWithOffset(Ostream &os,bool offset,scalar time,scalar childTimes) const
 {
     dictionary tmp;
-    
+
     tmp.add("id",id());
     if(id()!=parent().id()) {
         tmp.add("parentId",parent().id());
@@ -103,7 +103,7 @@ void Foam::profilingInfo::writeWithOffset(Ostream &os,bool offset,scalar time,sc
     tmp.add("childTime",childTime()+childTimes);
     tmp.add("onStack",onStack());
 
-    os << tmp;  
+    os << tmp;
 }
 
 // * * * * * * * * * * * * * * * Friend Functions  * * * * * * * * * * * * * //

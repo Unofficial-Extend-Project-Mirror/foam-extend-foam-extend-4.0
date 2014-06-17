@@ -25,7 +25,7 @@ Class
     Foam::profilingPool
 
 Description
-    Collects all the data for profiling 
+    Collects all the data for profiling
 
 SourceFiles
     profilingPool.C
@@ -86,10 +86,10 @@ class profilingPool
 
         //- Disallow default bitwise copy construct
         profilingPool(const profilingPool&);
-    
+
         //- Disallow default bitwise assignment
         void operator=(const profilingPool&);
-    
+
 
     // Static data members
 
@@ -106,7 +106,7 @@ class profilingPool
     //- Destructor
     ~profilingPool();
 
-    
+
     // Member functions
 
         mapType& map()
@@ -119,7 +119,7 @@ class profilingPool
             return allInfo_;
         }
 
-        profilingStack& stack() 
+        profilingStack& stack()
         {
             return theStack_;
         }

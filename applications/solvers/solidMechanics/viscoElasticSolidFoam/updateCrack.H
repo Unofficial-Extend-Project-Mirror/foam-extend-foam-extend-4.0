@@ -3,11 +3,11 @@
     {
         if
         (
-            DU.boundaryField()[patchI].type() 
+            DU.boundaryField()[patchI].type()
          == cohesiveZoneIncrementalModeIIFvPatchVectorField::typeName
         )
         {
-            cohesiveZoneIncrementalModeIIFvPatchVectorField& cohesivePatchDU = 
+            cohesiveZoneIncrementalModeIIFvPatchVectorField& cohesivePatchDU =
                 refCast<cohesiveZoneIncrementalModeIIFvPatchVectorField>
                 (
                     DU.boundaryField()[patchI]

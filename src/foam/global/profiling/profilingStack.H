@@ -61,7 +61,7 @@ class profilingStack
 
     //- Disallow default bitwise copy construct
     profilingStack(const profilingStack&);
-    
+
     //- Disallow default bitwise assignment
     void operator=(const profilingStack&);
 
@@ -79,7 +79,7 @@ public:
     profilingStack();
 
     // Destructor
-    
+
     ~profilingStack();
 
 
@@ -87,7 +87,7 @@ public:
     profilingInfo &top() const;
 
     profilingInfo &bottom() const;
-    
+
     bool empty() const;
 
     void push(profilingInfo &);

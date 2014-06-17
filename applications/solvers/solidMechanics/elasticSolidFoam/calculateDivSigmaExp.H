@@ -7,7 +7,7 @@ if(divSigmaExpMethod == "standard")
        );
   }
  else if(divSigmaExpMethod == "surface")
-   { 
+   {
      divSigmaExp = fvc::div
        (
 	muf*(mesh.Sf() & fvc::interpolate(gradU.T()))
@@ -21,7 +21,7 @@ if(divSigmaExpMethod == "standard")
 
      surfaceTensorField shearGradU =
        ((I - n*n)&fvc::interpolate(gradU));
-     
+
      divSigmaExp = fvc::div
        (
 	mesh.magSf()

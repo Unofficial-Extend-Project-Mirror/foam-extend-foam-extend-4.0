@@ -56,7 +56,7 @@ autoPtr<RBFFunction> RBFFunction::New
         )   << "Unknown RBFFunction type "
             << type << endl << endl
             << "Valid  RBFFunctions are : " << endl
-            << dictionaryConstructorTablePtr_->toc()
+            << dictionaryConstructorTablePtr_->sortedToc()
             << exit(FatalIOError);
     }
 

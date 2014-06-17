@@ -60,7 +60,7 @@ autoPtr<frictionLaw> frictionLaw::New
         )   << "Unknown frictionLaw type "
             << name << endl << endl
             << "Valid  frictionLaws are : " << endl
-            << dictionaryConstructorTablePtr_->toc()
+            << dictionaryConstructorTablePtr_->sortedToc()
             << exit(FatalIOError);
     }
 

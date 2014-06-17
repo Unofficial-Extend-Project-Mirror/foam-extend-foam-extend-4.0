@@ -58,7 +58,7 @@ autoPtr<faceTetPolyPatch> faceTetPolyPatch::New
         )   << "Unknown faceTetPolyPatch type "
             << patch.type()
             << ".  Valid faceTetPolyPatch types are :" << endl
-            << polyPatchConstructorTablePtr_->toc()
+            << polyPatchConstructorTablePtr_->sortedToc()
             << exit(FatalError);
     }
 

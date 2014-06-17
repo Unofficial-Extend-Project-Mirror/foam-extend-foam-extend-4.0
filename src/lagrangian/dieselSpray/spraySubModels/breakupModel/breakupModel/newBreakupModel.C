@@ -61,7 +61,7 @@ autoPtr<breakupModel> breakupModel::New
             << breakupModelType
             << ", constructor not in hash table" << endl << endl
             << "    Valid breakupModel types are :" << endl;
-        Info<< dictionaryConstructorTablePtr_->toc() << abort(FatalError);
+        Info<< dictionaryConstructorTablePtr_->sortedToc() << abort(FatalError);
     }
 
     return autoPtr<breakupModel>(cstrIter()(dict, sm));

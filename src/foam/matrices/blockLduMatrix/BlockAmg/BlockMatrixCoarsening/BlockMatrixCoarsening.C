@@ -57,7 +57,7 @@ Foam::autoPtr<Foam::BlockMatrixCoarsening<Type> > Foam::BlockMatrixCoarsening<Ty
         )   << "Unknown AMG coarsening type. " << coarseningType
             << endl << endl
             << "Valid AMG coarsening types are :" << endl
-            << matrixConstructorTablePtr_->toc()
+            << matrixConstructorTablePtr_->sortedToc()
             << exit(FatalError);
     }
 

@@ -77,14 +77,14 @@ void Foam::multiSolver::setNextSolverDomain(const word& solverDomainName)
     );
     multiSolverTime.set("globalOffset", globalTimeOffset_);
     multiSolverTime.set("globalIndex", globalIndex_);
-    
+
     globalIndex_++;
-    
+
     // Write multiSolverTime to the case/constant directory, then move to
     // archivePath
     multiSolverTime.regIOobject::write();
     mv(multiDictRegistry_.constantPath()/"multiSolverTime", archivePath);
-    
+
     // tcSource is to where the latest data has been moved
     timeCluster tcSource
     (
@@ -130,7 +130,7 @@ void Foam::multiSolver::setNextSolverDomain(const word& solverDomainName)
             localStartTime = globalTime;
             break;
     }
-    
+
     startTime_ = localStartTime;
     globalTimeOffset_ = globalTime - startTime_;
 
@@ -170,14 +170,14 @@ void Foam::multiSolver::setNextSolverDomain(const word& solverDomainName)
                     0
                 )
             );
-            
+
             forAll (previousStoreFields, i)
             {
                 // Copy the stored fields to case/[localTime].
                 if (exists(storedSourcePath/previousStoreFields[i]))
                 {
                     fileName storedSource(storedSourcePath/previousStoreFields[i]);
-                    
+
                     cp
                     (
                         storedSource,
@@ -199,8 +199,8 @@ void Foam::multiSolver::setNextSolverDomain(const word& solverDomainName)
                         << abort(FatalError);
                 }
             }
-        }        
-        
+        }
+
         swapBoundaryConditions
         (
             multiDictRegistry_.path()/Time::timeName(startTime_),
@@ -247,7 +247,7 @@ void Foam::multiSolver::setNextSolverDomain(const word& solverDomainName)
         ),
         currentSolverDomainDict_
     );
-    
+
     // Remove multiSolver-specific values from dictionary
     newControlDict.remove("startFrom");
     newControlDict.remove("startTime");
@@ -259,7 +259,7 @@ void Foam::multiSolver::setNextSolverDomain(const word& solverDomainName)
     newControlDict.remove("timePrecision");
     newControlDict.remove("storeFields");
     newControlDict.remove("elapsedTime");
-    
+
     // Add values to obtain the desired behaviour
     newControlDict.set("startFrom", "startTime");
     newControlDict.set("startTime", startTime_);

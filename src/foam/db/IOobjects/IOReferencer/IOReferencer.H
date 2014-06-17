@@ -33,7 +33,7 @@ Description
     @verbatim
         // Your non-IOobject, e.g. Type = scalar
         Type myObject;
-        
+
         // Register it to the object registry
         IOReferencer<scalar> myIOobject
         (
@@ -118,10 +118,10 @@ public:
 
         //- A "do nothing" writeData function, required by regIOobject
         virtual bool writeData(Ostream&) const;
-        
+
         //- Return the pointer as a reference
         const Type& operator()() const;
-        
+
         //- Set the pointer
         void set(const Type& reference);
 

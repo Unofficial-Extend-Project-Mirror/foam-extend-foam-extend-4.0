@@ -67,19 +67,19 @@
     {
       const dictionary& stressControl =
 	mesh.solutionDict().subDict("solidMechanics");
-      
+
       List<boundBox> userBoxes(stressControl.lookup("crackLimitingBoxes"));
       const surfaceVectorField& Cf = mesh.Cf();
       //int numPossibleCrackFaces = 0;
       forAll(cohesiveZone.internalField(), faceI)
 	{
 	  bool faceInsideBox = false;
-	  
+
 	  forAll(userBoxes, boxi)
 	    {
 	      if(userBoxes[boxi].contains(Cf.internalField()[faceI])) faceInsideBox = true;
 	    }
-	  
+
 	  if(faceInsideBox)
 	    {
 	      cohesiveZone.internalField()[faceI] = 1.0;
@@ -96,18 +96,18 @@
 	      forAll(cohesiveZone.boundaryField()[patchI], faceI)
 		{
 		  bool faceInsideBox = false;
-		  
+
 		  forAll(userBoxes, boxi)
 		    {
 		      if(userBoxes[boxi].contains(Cf.boundaryField()[patchI][faceI])) faceInsideBox = true;
 		    }
-		  
+
 		  if(faceInsideBox)
 		    {
 		      cohesiveZone.boundaryField()[patchI][faceI] = 1.0;
 		    }
 		}
-	      
+
 	      // numPossibleCrackFaces += int(sum(cohesiveZone.boundaryField()[patchI]));
 	      // philipc multiMat cracks not working on proc boundaries yet... disable for now
 	      // found the problem: solidInterface needs to know about mesh changes so
@@ -168,7 +168,7 @@
 
     Switch initialiseSolution(false);
 
-    if 
+    if
     (
         mesh.solutionDict().subDict("solidMechanics")
        .found("initialiseSolution")
@@ -187,7 +187,7 @@
 
     Switch breakOnlyOneFacePerTopologyChange(true);
 
-    if 
+    if
     (
         mesh.solutionDict().subDict("solidMechanics")
        .found("breakOnlyOneFacePerTopologyChange")

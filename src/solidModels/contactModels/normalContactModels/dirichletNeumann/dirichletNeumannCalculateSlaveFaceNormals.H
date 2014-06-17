@@ -115,7 +115,11 @@
          }
              }
      }
-   else if (nonLinear == "updatedLagrangian" || "totalLagrangian")
+     else if
+     (
+         nonLinear == "updatedLagrangian"
+      || nonLinear == "totalLagrangian"
+     )
      {
        // a few different ways to calculate deformed normals
 

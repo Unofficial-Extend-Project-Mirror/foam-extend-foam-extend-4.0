@@ -71,7 +71,7 @@ private:
 
         //- Given x-data
         scalarField X_;
-        
+
         //- Given y-data
         scalarField Y_;
 

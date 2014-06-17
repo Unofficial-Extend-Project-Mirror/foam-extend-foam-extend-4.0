@@ -10,7 +10,7 @@
     forcedEnd_(false),
     noSaveSinceSuperLoopIncrement_(false),
     manageLocalRoot_(false),
-    
+
     superLoop_(0),
     currentSolverDomain_("default"),
 
@@ -23,12 +23,12 @@
     finalEndTime_(0),
 
     endSuperLoop_(0),
-    
+
     multiDictsRunTimeModifiable_(true),
 
     globalTimeOffset_(0),
     globalIndex_(0),
-    
+
     purgeWriteSuperLoops_(prefixes_.size()),
 
 //    timeValueStartFrom_,

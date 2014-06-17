@@ -1,0 +1,118 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | foam-extend: Open Source CFD                    |
+|  \\    /   O peration     | Version:     3.1                                |
+|   \\  /    A nd           | Web:         http://www.extend-project.de       |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       polyBoundaryMesh;
+    location    "constant/polyMesh";
+    object      boundary;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+13
+(
+    inlet
+    {
+        type            patch;
+        nFaces          20;
+        startFace       4120;
+    }
+    outlet
+    {
+        type            patch;
+        nFaces          20;
+        startFace       4140;
+    }
+    bottom
+    {
+        type            wall;
+        nFaces          60;
+        startFace       4160;
+    }
+    top
+    {
+        type            wall;
+        nFaces          60;
+        startFace       4220;
+    }
+    firstCyl
+    {
+        type            wall;
+        nFaces          40;
+        startFace       4280;
+    }
+    secondCyl
+    {
+        type            wall;
+        nFaces          40;
+        startFace       4320;
+    }
+    frontIn
+    {
+        type            ggi;
+        nFaces          20;
+        startFace       4360;
+        shadowPatch     frontOut;
+        zone            frontInZone;
+        bridgeOverlap   true;
+    }
+    frontOut
+    {
+        type            ggi;
+        nFaces          30;
+        startFace       4380;
+        shadowPatch     frontIn;
+        zone            frontOutZone;
+        bridgeOverlap   true;
+    }
+    middleIn
+    {
+        type            ggi;
+        nFaces          30;
+        startFace       4410;
+        shadowPatch     middleOut;
+        zone            middleInZone;
+        bridgeOverlap   true;
+    }
+    middleOut
+    {
+        type            ggi;
+        nFaces          30;
+        startFace       4440;
+        shadowPatch     middleIn;
+        zone            middleOutZone;
+        bridgeOverlap   true;
+    }
+    backIn
+    {
+        type            ggi;
+        nFaces          30;
+        startFace       4470;
+        shadowPatch     backOut;
+        zone            backInZone;
+        bridgeOverlap   true;
+    }
+    backOut
+    {
+        type            ggi;
+        nFaces          20;
+        startFace       4500;
+        shadowPatch     backIn;
+        zone            backOutZone;
+        bridgeOverlap   true;
+    }
+    defaultFaces
+    {
+        type            empty;
+        nFaces          4320;
+        startFace       4520;
+    }
+)
+
+// ************************************************************************* //

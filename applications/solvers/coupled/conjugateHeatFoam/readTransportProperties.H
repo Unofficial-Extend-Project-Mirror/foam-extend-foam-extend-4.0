@@ -1,5 +1,5 @@
     singlePhaseTransportModel laminarTransport(U, phi);
- 
+
     // Density [kg/m^3]
     dimensionedScalar rho(laminarTransport.lookup("rho"));
 

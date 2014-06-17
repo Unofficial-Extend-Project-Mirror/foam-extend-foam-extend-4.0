@@ -32,21 +32,9 @@ License
 
 #define createReactingMultiphaseParcelType(ParcelType)                        \
                                                                               \
-    createReactingMultiphaseParcelThermoType                                  \
-    (                                                                         \
-        ParcelType,                                                           \
-        constGasThermoPhysics                                                 \
-    );                                                                        \
-    createReactingMultiphaseParcelThermoType                                  \
-    (                                                                         \
-        ParcelType,                                                           \
-        gasThermoPhysics                                                      \
-    );                                                                        \
-    createReactingMultiphaseParcelThermoType                                  \
-    (                                                                         \
-        ParcelType,                                                           \
-        icoPoly8ThermoPhysics                                                 \
-    );
+    createReactingMultiphaseParcelThermoType(ParcelType, constGasThermoPhysics);\
+    createReactingMultiphaseParcelThermoType(ParcelType, gasThermoPhysics);  \
+    createReactingMultiphaseParcelThermoType(ParcelType, icoPoly8ThermoPhysics);
 
 
 #define createReactingMultiphaseParcelThermoType(ParcelType, ThermoType)      \

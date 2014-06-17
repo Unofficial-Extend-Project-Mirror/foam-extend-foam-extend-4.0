@@ -14,7 +14,7 @@ if (runTime.outputTime())
        );
     Info<< "Max epsilonEq = " << max(epsilonEq).value()
         << endl;
-    
+
     volScalarField epsilonPEq
       (
        IOobject
@@ -44,7 +44,7 @@ if (runTime.outputTime())
        );
     Info<< "Max sigmaEq = " << max(sigmaEq).value()
 	<< endl;
-    
+
     volScalarField sigmaHyd
       (
        IOobject

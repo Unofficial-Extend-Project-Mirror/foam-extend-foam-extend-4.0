@@ -213,9 +213,9 @@ chtRcThermalDiffusivityFvPatchScalarField::calcThermalDiffusivity
 
     //Info << "Qr = " << Qr << endl;
     //Info << "kOwn + kNei = " << (kOwn + kNei) << endl;
- 
+
     //Info << "k = " << k << endl;
-    
+
     k = kOwn*(TwOwn*(kNei*(TcNei - TcOwn) + Qr + fourQro) - TcOwn*fourQro);
     k /= stabilise((fourQro + TwOwn*(kOwn + kNei))*(TcNei - TcOwn), SMALL);
     k /= p.deltaCoeffs();

@@ -64,7 +64,6 @@ Description
 #include "IOobjectList.H"
 #include "ReadFields.H"
 
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 // Checks whether patch present
@@ -101,7 +100,7 @@ int main(int argc, char *argv[])
 
     Foam::argList::validOptions.insert("partial", "");
     Foam::argList::validOptions.insert("perfect", "");
-
+    Foam::argList::validOptions.insert("clearUnusedFaces", "");
     Foam::argList::validOptions.insert("overwrite", "");
 
 #   include "setRootCase.H"
@@ -116,6 +115,7 @@ int main(int argc, char *argv[])
 
     bool partialCover = args.optionFound("partial");
     bool perfectCover = args.optionFound("perfect");
+    bool clearUnusedFaces = args.optionFound("clearUnusedFaces");
     bool overwrite = args.optionFound("overwrite");
 
     if (partialCover && perfectCover)
@@ -363,6 +363,45 @@ int main(int argc, char *argv[])
     autoPtr<mapPolyMesh> morphMap = stitcher.changeMesh();
 
     mesh.movePoints(morphMap->preMotionPoints());
+
+    if (clearUnusedFaces)
+    {
+        // Clear unused points and faces by manually resetting the list"
+        Info << "Clear unused points and faces" << nl << endl;
+
+        pointField& p = const_cast<pointField&>(mesh.allPoints());
+        p.setSize(mesh.nPoints());
+
+        faceList& f = const_cast<faceList&>(mesh.allFaces());
+        f.setSize(mesh.nFaces());
+
+        Xfer<pointField> pXfer(p);
+        Xfer<faceList> fXfer(f);
+        Xfer<labelList> ownXfer(mesh.faceOwner());
+        Xfer<labelList> neiXfer(mesh.faceNeighbour());
+
+        label nPatches = mesh.boundaryMesh().size();
+        labelList patchSizes(nPatches, 0);
+        labelList patchStarts(nPatches, -1);
+        forAll(patchSizes, patchI)
+        {
+            patchSizes[patchI] = mesh.boundaryMesh()[patchI].size();
+            patchStarts[patchI] = mesh.boundaryMesh()[patchI].start();
+        }
+
+        mesh.removeZones();
+
+        mesh.resetPrimitives
+        (
+            pXfer,
+            fXfer,
+            ownXfer,
+            neiXfer,
+            patchSizes,
+            patchStarts
+        );
+    }
+
 
     // Write mesh
     if (overwrite)

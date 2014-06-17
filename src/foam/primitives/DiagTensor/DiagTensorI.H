@@ -322,7 +322,7 @@ template<class Cmpt>
 class outerProduct<DiagTensor<Cmpt>, Cmpt>
 {
 public:
-  
+
     typedef DiagTensor<Cmpt> type;
 };
 

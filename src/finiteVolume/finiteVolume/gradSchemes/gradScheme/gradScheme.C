@@ -64,7 +64,7 @@ tmp<gradScheme<Type> > gradScheme<Type>::New
             schemeData
         )   << "Grad scheme not specified" << endl << endl
             << "Valid grad schemes are :" << endl
-            << IstreamConstructorTablePtr_->toc()
+            << IstreamConstructorTablePtr_->sortedToc()
             << exit(FatalIOError);
     }
 
@@ -81,7 +81,7 @@ tmp<gradScheme<Type> > gradScheme<Type>::New
             schemeData
         )   << "unknown grad scheme " << schemeName << endl << endl
             << "Valid grad schemes are :" << endl
-            << IstreamConstructorTablePtr_->toc()
+            << IstreamConstructorTablePtr_->sortedToc()
             << exit(FatalIOError);
     }
 
@@ -97,6 +97,33 @@ gradScheme<Type>::~gradScheme()
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+
+template<class Type>
+tmp<blockVectorMatrix> gradScheme<Type>::fvmGrad
+(
+    const GeometricField<Type, fvPatchField, volMesh>& vf
+) const
+{
+    FatalIOErrorIn
+    (
+        "tmp<blockVectorMatrix> fvmGrad\n",
+        "(\n"
+        "    GeometricField<Type, fvPatchField, volMesh>&"
+        ")\n"
+    )   << "Implicit gradient operator currently defined only for Gauss grad."
+        << abort(FatalIOError);
+
+    tmp<blockVectorMatrix> tbm
+    (
+        new blockVectorMatrix
+        (
+           vf.mesh()
+        )
+    );
+
+    return tbm;
+}
+
 
 template<class Type>
 void gradScheme<Type>::correctBoundaryConditions

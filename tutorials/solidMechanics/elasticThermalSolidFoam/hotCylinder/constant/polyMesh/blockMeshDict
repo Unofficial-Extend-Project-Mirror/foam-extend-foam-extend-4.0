@@ -1,7 +1,7 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | foam-extend: Open Source CFD                    |
-|  \\    /   O peration     | Version:     3.0                                |
+|  \\    /   O peration     | Version:     3.1                                |
 |   \\  /    A nd           | Web:         http://www.extend-project.de       |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
@@ -19,15 +19,14 @@ convertToMeters 1;
 
 vertices
 (
- (0 0.5 0)
- (0.5 0 0)
- (0.7 0 0)
- (0 0.7 0)
- (0 0.5 0.1)
- (0.5 0 0.1)
- (0.7 0 0.1)
- (0 0.7 0.1)
-
+    (0 0.5 0)
+    (0.5 0 0)
+    (0.7 0 0)
+    (0 0.7 0)
+    (0 0.5 0.1)
+    (0.5 0 0.1)
+    (0.7 0 0.1)
+    (0 0.7 0.1)
 );
 
 blocks
@@ -45,34 +44,30 @@ edges
 
 patches
 (
-
+    symmetryPlane left
+    (
+        (4 7 3 0)
+    )
+    symmetryPlane bottom
+    (
+        (1 2 6 5)
+    )
+    patch inside
+    (
+        (0 1 5 4)
+    )
+    patch outside
+    (
+        (7 6 2 3)
+    )
     empty back
     (
-     (3 2 1 0)
+        (3 2 1 0)
     )
     empty front
     (
-     (4 5 6 7)
-     )
-
-    symmetryPlane left
-    (
-     (4 7 3 0)
-     )
-
-    symmetryPlane bottom
-    (
-     (1 2 6 5)
-     )
-
-    patch inside
-    (
-     (0 1 5 4)
-     )
-    patch outside
-    (
-     (7 6 2 3)
-     )
+        (4 5 6 7)
+    )
 );
 
 mergePatchPairs

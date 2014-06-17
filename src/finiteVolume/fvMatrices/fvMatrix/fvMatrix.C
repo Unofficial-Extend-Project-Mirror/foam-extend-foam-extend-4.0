@@ -738,7 +738,7 @@ Foam::tmp<Foam::Field<Type> > Foam::fvMatrix<Type>::DD() const
     {
         const fvPatchField<Type>& ptf = psi_.boundaryField()[patchI];
 
-        if (!ptf.coupled() && ptf.size())
+        if (!ptf.coupled())
         {
             addToInternalField
             (

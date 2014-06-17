@@ -2,7 +2,7 @@ forAll(globalFaceZones, zoneI)
 {
     const label curZoneID = globalFaceZones[zoneI];
 
-    const labelList& curMap = 
+    const labelList& curMap =
         globalToLocalFaceZonePointMap[zoneI];
 
     const labelList& curZoneMeshPoints =
@@ -10,7 +10,7 @@ forAll(globalFaceZones, zoneI)
 
     vectorField curGlobalZonePointDispl
     (
-        curZoneMeshPoints.size(), 
+        curZoneMeshPoints.size(),
         vector::zero
     );
 
@@ -21,13 +21,13 @@ forAll(globalFaceZones, zoneI)
     forAll(curGlobalZonePointDispl, globalPointI)
     {
         label localPoint = curMap[globalPointI];
-	    
+
         if(curZoneMeshPoints[localPoint] < mesh.nPoints())
         {
             label procPoint = curZoneMeshPoints[localPoint];
-            
+
             curGlobalZonePointDispl[globalPointI] = pointDUI[procPoint];
-            
+
             pointNumProcs[globalPointI] = 1;
         }
     }
@@ -41,13 +41,13 @@ forAll(globalFaceZones, zoneI)
         curGlobalZonePointDispl /= pointNumProcs;
     }
 
-    //- The curZonePointsDisplGlobal now contains the correct face zone 
-    //  displacement in a global master processor order, now convert them 
+    //- The curZonePointsDisplGlobal now contains the correct face zone
+    //  displacement in a global master processor order, now convert them
     //  back into the local proc order
 
     vectorField curZonePointDispl
     (
-        curZoneMeshPoints.size(), 
+        curZoneMeshPoints.size(),
         vector::zero
     );
 
@@ -55,7 +55,7 @@ forAll(globalFaceZones, zoneI)
     {
         label localPoint = curMap[globalPointI];
 
-        curZonePointDispl[localPoint] = 
+        curZonePointDispl[localPoint] =
             curGlobalZonePointDispl[globalPointI];
     }
 

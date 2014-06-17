@@ -1,7 +1,7 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | foam-extend: Open Source CFD                    |
-|  \\    /   O peration     | Version:     3.0                                |
+|  \\    /   O peration     | Version:     3.1                                |
 |   \\  /    A nd           | Web:         http://www.extend-project.de       |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
@@ -28,10 +28,10 @@ boundaryField
 
     right
     {
-      type             timeVaryingSolidTraction;
-      nonLinear        off;
-      outOfBounds      clamp;
-      fileName         "$FOAM_CASE/constant/timeVsRightTraction";
+        type             timeVaryingSolidTraction;
+        nonLinear        off;
+        outOfBounds      clamp;
+        fileName         "$FOAM_CASE/constant/timeVsRightTraction";
     }
 
     down

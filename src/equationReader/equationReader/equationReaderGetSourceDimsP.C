@@ -149,7 +149,7 @@ Foam::dimensionSet Foam::equationReader::getDimsSrcEquation
     if (dependents_.size())
     {
         dependents_.setSize(dependents_.size() - 1);
-    }    
+    }
 
     return returnMe;
 }
@@ -252,7 +252,7 @@ Foam::dimensionSet Foam::equationReader::getDimsSrcEquationCircRefDetect
     if (dependents_.size())
     {
         dependents_.setSize(dependents_.size() - 1);
-    }    
+    }
 
     return returnMe;
 }
@@ -286,7 +286,7 @@ Foam::dimensionSet Foam::equationReader::getDimsSrcDictSourceDScalar
     label zeroSourceIndex = mag(eqOp.sourceIndex()) - 1;
 
     word varName(dictLookups_[eqOp.dictLookupIndex()]);
-    
+
     ITstream srcStrm
     (
         dictSources_[zeroSourceIndex].lookup(varName)

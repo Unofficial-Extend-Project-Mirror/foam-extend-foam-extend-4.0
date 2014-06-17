@@ -84,7 +84,7 @@ void Foam::timeClusterList::append(const timeClusterList& tclIn)
 {
     label wasSize = this->size();
     this->setSize(tclIn.size() + this->size());
-    
+
     for (label i = 0; i < tclIn.size(); i++)
     {
         this->operator[](i + wasSize) = tclIn[i];
@@ -96,7 +96,7 @@ void Foam::timeClusterList::append(const timeCluster& tcIn)
 {
     label wasSize = this->size();
     this->setSize(this->size() + 1);
-    
+
     this->operator[](wasSize) = tcIn;
 }
 
@@ -104,7 +104,7 @@ void Foam::timeClusterList::append(const timeCluster& tcIn)
 bool Foam::timeClusterList::purgeEmpties()
 {
     if (!this->size()) return false;
-    
+
     label empties(0);
     for (label i = 0; i < this->size(); i++)
     {
@@ -132,7 +132,7 @@ Foam::timeClusterList Foam::timeClusterList::selectiveSubList
 ) const
 {
     timeClusterList tcl(indices.size());
-    
+
     forAll(indices, i)
     {
         if (indices[i] > this->size())

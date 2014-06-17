@@ -68,7 +68,7 @@ Foam::autoPtr<Foam::engineTopoChangerMesh> Foam::engineTopoChangerMesh::New
         )   << "Unknown engineTopoChangerMesh type " << engineTopoChangerMeshTypeName
             << endl << endl
             << "Valid engineTopoChangerMesh types are :" << endl
-            << IOobjectConstructorTablePtr_->toc()
+            << IOobjectConstructorTablePtr_->sortedToc()
             << exit(FatalError);
     }
 

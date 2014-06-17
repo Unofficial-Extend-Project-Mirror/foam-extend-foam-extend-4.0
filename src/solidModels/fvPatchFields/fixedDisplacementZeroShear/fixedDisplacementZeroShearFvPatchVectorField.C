@@ -130,31 +130,32 @@ fixedDisplacementZeroShearFvPatchVectorField
             << "non-orthogonal correction to be right" << endl;
     }
 
-  this->refGrad() = vector::zero;
+    this->refGrad() = vector::zero;
 
-  vectorField n = patch().nf();
-  this->valueFraction() = sqr(n);
+    vectorField n = patch().nf();
+    this->valueFraction() = sqr(n);
 
-  if (dict.found("value"))
+    if (dict.found("value"))
     {
-      Field<vector>::operator=(vectorField("value", dict, p.size()));
+        Field<vector>::operator=(vectorField("value", dict, p.size()));
     }
-  else
+    else
     {
-      FatalError << "value entry not found for patch " << patch().name()
-         << exit(FatalError);
+        FatalError << "value entry not found for patch " << patch().name()
+            << exit(FatalError);
     }
-  this->refValue() = *this;
 
-  Field<vector> normalValue = transform(valueFraction(), refValue());
+    this->refValue() = *this;
 
-  Field<vector> gradValue =
-    this->patchInternalField() + refGrad()/this->patch().deltaCoeffs();
+    Field<vector> normalValue = transform(valueFraction(), refValue());
 
-  Field<vector> transformGradValue =
-    transform(I - valueFraction(), gradValue);
+    Field<vector> gradValue =
+        this->patchInternalField() + refGrad()/this->patch().deltaCoeffs();
 
-  Field<vector>::operator=(normalValue + transformGradValue);
+    Field<vector> transformGradValue =
+        transform(I - valueFraction(), gradValue);
+
+    Field<vector>::operator=(normalValue + transformGradValue);
 }
 
 
@@ -223,15 +224,19 @@ void fixedDisplacementZeroShearFvPatchVectorField::updateCoeffs()
     //     this->valueFraction() = sqr(nCurrent);
     //   }
 
-    refGrad() = tractionBoundaryGradient()
-      (
-       vectorField(patch().size(), vector::zero),
-       scalarField(patch().size(), 0.0),
-       word(fieldName_),
-       patch(),
-       orthotropic_,
-       nonLinearGeometry::nonLinearNames_[nonLinear_]
-       )();
+    bool incremental(fieldName_ == "DU");
+
+    refGrad() = tractionBoundaryGradient::snGrad
+    (
+        vectorField(patch().size(), vector::zero),
+        scalarField(patch().size(), 0.0),
+        fieldName_,
+        "U",
+        patch(),
+        orthotropic_,
+        nonLinear_,
+        incremental
+    );
 
     directionMixedFvPatchVectorField::updateCoeffs();
 }

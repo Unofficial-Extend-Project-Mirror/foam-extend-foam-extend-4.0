@@ -30,13 +30,13 @@ vectorField fsiResidualOld
 
 vectorField solidPatchTraction
 (
-    stressMesh.boundary()[solidPatchID].size(), 
+    stressMesh.boundary()[solidPatchID].size(),
     vector::zero
 );
 
 scalarField solidPatchPressure
 (
-    stressMesh.boundary()[solidPatchID].size(), 
+    stressMesh.boundary()[solidPatchID].size(),
     0.0
 );
 

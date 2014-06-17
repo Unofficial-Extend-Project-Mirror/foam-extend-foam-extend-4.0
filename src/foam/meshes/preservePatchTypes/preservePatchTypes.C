@@ -25,9 +25,73 @@ License
 
 #include "preservePatchTypes.H"
 #include "polyBoundaryMeshEntries.H"
-#include "dictionary.H"
 
 // * * * * * * * * * * * * * * * Global Functions  * * * * * * * * * * * * * //
+
+void Foam::preservePatchTypes
+(
+    const objectRegistry& obr,
+    const word& meshInstance,
+    const fileName& meshDir,
+    const wordList& patchNames,
+    PtrList<dictionary>& patchDicts,
+    const word& defaultFacesName,
+    word& defaultFacesType
+)
+{
+    patchDicts.setSize(patchNames.size());
+
+    dictionary patchDictionary;
+
+    // Read boundary file as single dictionary
+    {
+        IOobject patchEntriesHeader
+        (
+            "boundary",
+            meshInstance,
+            meshDir,
+            obr,
+            IOobject::MUST_READ,
+            IOobject::NO_WRITE,
+            false
+        );
+
+        if (patchEntriesHeader.headerOk())
+        {
+            // Create a list of entries from the boundary file.
+            polyBoundaryMeshEntries patchEntries(patchEntriesHeader);
+
+            forAll(patchEntries, patchi)
+            {
+                patchDictionary.add(patchEntries[patchi]);
+            }
+        }
+    }
+
+    forAll (patchNames, patchi)
+    {
+        if (patchDictionary.found(patchNames[patchi]))
+        {
+            const dictionary& patchDict =
+                patchDictionary.subDict(patchNames[patchi]);
+
+            patchDicts.set(patchi, patchDict.clone());
+            patchDicts[patchi].remove("nFaces");
+            patchDicts[patchi].remove("startFace");
+        }
+    }
+
+    if (patchDictionary.found(defaultFacesName))
+    {
+        const dictionary& patchDict =
+            patchDictionary.subDict(defaultFacesName);
+
+        patchDict.readIfPresent("geometricType", defaultFacesType);
+    }
+
+    Info<< nl << "Default patch type set to " << defaultFacesType << endl;
+}
+
 
 void Foam::preservePatchTypes
 (
@@ -98,6 +162,5 @@ void Foam::preservePatchTypes
 
     Info << nl << "Default patch type set to " << defaultFacesType << endl;
 }
-
 
 // ************************************************************************* //

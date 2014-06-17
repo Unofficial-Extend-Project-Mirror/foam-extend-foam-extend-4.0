@@ -244,10 +244,9 @@ void meshToMesh::cellAddresses
     bool forceFind
 ) const
 {
-
     label nCellsOutsideAddressing = 0;
 
-    // the implemented search method is a simple neighbour array search.
+    // The implemented search method is a simple neighbour array search.
     // It starts from a cell zero, searches its neighbours and finds one
     // which is nearer to the target point than the current position.
     // The location of the "current position" is reset to that cell and
@@ -264,7 +263,6 @@ void meshToMesh::cellAddresses
 
     forAll (points, toI)
     {
-
         scalar localTol = cellCentreDistanceTol;
 
         bool isBoundary = false;
@@ -272,7 +270,7 @@ void meshToMesh::cellAddresses
         // pick up target position
         const vector& p = points[toI];
 
-        // set the sqr-distance
+        // Set the sqr-distance
         scalar distSqr = magSqr(p - centresFrom[curCell]);
 
         bool closer;
@@ -281,7 +279,7 @@ void meshToMesh::cellAddresses
         {
             closer = false;
 
-            // set the current list of neighbouring cells
+            // Set the current list of neighbouring cells
             const labelList& neighbours = cc[curCell];
 
             forAll (neighbours, nI)
@@ -289,7 +287,7 @@ void meshToMesh::cellAddresses
                 scalar curDistSqr =
                     magSqr(p - centresFrom[neighbours[nI]]);
 
-                // search through all the neighbours.
+                // Search through all the neighbours.
                 // If the cell is closer, reset current cell and distance
                 if (curDistSqr < (1 - SMALL)*distSqr)
                 {

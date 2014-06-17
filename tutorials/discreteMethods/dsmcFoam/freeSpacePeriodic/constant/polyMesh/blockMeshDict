@@ -1,7 +1,7 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | foam-extend: Open Source CFD                    |
-|  \\    /   O peration     | Version:     3.0                                |
+|  \\    /   O peration     | Version:     3.1                                |
 |   \\  /    A nd           | Web:         http://www.extend-project.de       |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
@@ -33,28 +33,37 @@ blocks
     hex (0 1 2 3 4 5 6 7) (20 16 16) simpleGrading (1 1 1)
 );
 
-patches
+boundary
 (
-    cyclic
     xPeriodic
-    (
+    {
+        type cyclic;
+        faces
+        (
         (1 2 6 5)
         (0 4 7 3)
-    )
+        );
+    }
 
-    cyclic
     yPeriodic
-    (
+    {
+        type cyclic;
+        faces
+        (
         (2 3 7 6)
         (0 1 5 4)
-    )
+        );
+    }
 
-    cyclic
     zPeriodic
-    (
-        (4 5 6 7)
-        (0 3 2 1)
-    )
+    {
+        type cyclic;
+        faces
+        (
+            (4 5 6 7)
+            (0 3 2 1)
+        );
+    }
 )
 
 mergePatchPairs

@@ -171,6 +171,17 @@ bool ping(const word&, const label timeOut = 10);
 //- Execute the specified command
 int system(const string& command);
 
+// Low level random numbers. Use Random class instead.
+
+//- Seed random number generator.
+void osRandomSeed(const label seed);
+
+//- Return random integer (uniform distribution between 0 and 2^31)
+label osRandomInteger();
+
+//- Return random double precision (uniform distribution between 0 and 1)
+scalar osRandomDouble();
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam

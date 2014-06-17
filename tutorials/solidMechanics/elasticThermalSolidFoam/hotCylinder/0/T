@@ -1,7 +1,7 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | foam-extend: Open Source CFD                    |
-|  \\    /   O peration     | Version:     3.0                                |
+|  \\    /   O peration     | Version:     3.1                                |
 |   \\  /    A nd           | Web:         http://www.extend-project.de       |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
@@ -32,26 +32,21 @@ boundaryField
 
     inside
     {
-      type              fixedValue;
-      value             uniform 100;
+        type            fixedValue;
+        value           uniform 100;
     }
-
     outside
     {
-      type              fixedValue;
-      value             uniform 100;
+        type            fixedValue;
+        value           uniform 100;
     }
-
     front
     {
-       type            empty;
-       //type            symmetryPlane;
+        type            empty;
     }
-
     back
     {
-      type            empty;
-      //type            symmetryPlane;
+        type            empty;
     }
 }
 

@@ -1,0 +1,30 @@
+#!/bin/bash
+cd ${0%/*} || exit 1    # run from this directory
+
+
+# Install Fluid-Structure Interaction package
+if [ ! -d "FluidStructureInteraction" ]; then
+    wget http://openfoamwiki.net/images/5/52/Fsi_31.tar.gz
+    tar zxvf Fsi_31.tar.gz
+    rm Fsi_31.tar.gz
+fi 
+
+cd FluidStructureInteraction/src/
+./Allwmake
+cd -
+
+# Install cfMesh mesh generation package
+if [ ! -d "cfMesh-v1.0" ]; then
+    wget http://www.c-fields.com/Media/Default/Repository/cfMesh-v1.0.tgz
+    tar zxvf cfMesh-v1.0.tgz
+    rm cfMesh-v1.0.tgz
+fi 
+# Change FOAM_LIBBIN to FOAM_USER_LIBBIN
+find cfMesh-v1.0/ -type f | grep "Make/files" | xargs sed -i s/FOAM_LIBBIN/FOAM_USER_LIBBIN/g
+find cfMesh-v1.0/ -type f | grep "Make/files" | xargs sed -i s/FOAM_APPBIN/FOAM_USER_APPBIN/g
+
+cd cfMesh-v1.0/
+./Allwmake
+cd -
+
+# ----------------------------------------------------------------- end-of-file

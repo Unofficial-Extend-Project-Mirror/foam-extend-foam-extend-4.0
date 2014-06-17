@@ -16,11 +16,11 @@
 
     vectorField fluidZoneTraction
         (
-            mesh.faceZones()[fluidZoneID].size(), 
+            mesh.faceZones()[fluidZoneID].size(),
             vector::zero
         );
 
-    const label fluidPatchStart = 
+    const label fluidPatchStart =
         mesh.boundaryMesh()[fluidPatchID].start();
 
     forAll(fluidPatchTraction, i)
@@ -28,7 +28,7 @@
         fluidZoneTraction
         [
             mesh.faceZones()[fluidZoneID].whichFace(fluidPatchStart + i)
-        ] = 
+        ] =
             fluidPatchTraction[i];
     }
 
@@ -38,7 +38,7 @@
 
     scalarField fluidZonePressure
         (
-            mesh.faceZones()[fluidZoneID].size(), 
+            mesh.faceZones()[fluidZoneID].size(),
             0.0
         );
 
@@ -47,7 +47,7 @@
         fluidZonePressure
         [
             mesh.faceZones()[fluidZoneID].whichFace(fluidPatchStart + i)
-        ] = 
+        ] =
             fluidPatchPressure[i];
     }
 
@@ -66,7 +66,7 @@
             fluidZonePressure
         );
 
-    const label solidPatchStart = 
+    const label solidPatchStart =
         stressMesh.boundaryMesh()[solidPatchID].start();
 
     forAll(solidPatchTraction, i)

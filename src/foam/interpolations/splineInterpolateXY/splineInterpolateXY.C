@@ -117,7 +117,7 @@ void Foam::splineInterpolateXY::setData
             "(\n"
             "    const splineBCType& startBC,\n"
             "    const splineBCType& endBC\n"
-            ")" 
+            ")"
         )   << "Unknown splineBC: " << splineBCTypeNames[startBC]
             << ". Should be " << splineBCTypeNames
             << abort(FatalError);
@@ -151,7 +151,7 @@ void Foam::splineInterpolateXY::setData
             "(\n"
             "    const splineBCType& startBC,\n"
             "    const splineBCType& endBC\n"
-            ")" 
+            ")"
         )   << "Unknown splineBC: " << splineBCTypeNames[endBC]
             << ". Should be " << splineBCTypeNames
             << abort(FatalError);
@@ -163,7 +163,7 @@ void Foam::splineInterpolateXY::setData
         A[0][i] = firstRow[i];
     }
     A.source()[0] = 0;
-    
+
     // Set the last row
     forAll(lastRow, i)
     {
@@ -203,8 +203,8 @@ Foam::scalar Foam::splineInterpolateXY::interpolate
     scalar a = (X_[nHigh] - XStar)/(h + SMALL);
     scalar b = (XStar - X_[nLow])/(h + SMALL);
 
-    // Svaluate spline    
-    return a*Y_[nLow] + b*Y_[nHigh] 
+    // Svaluate spline
+    return a*Y_[nLow] + b*Y_[nHigh]
         + ((pow3(a) - a)*Y2_[nLow] + (pow3(b) - b)*Y2_[nHigh])*sqr(h)/6;
 }
 

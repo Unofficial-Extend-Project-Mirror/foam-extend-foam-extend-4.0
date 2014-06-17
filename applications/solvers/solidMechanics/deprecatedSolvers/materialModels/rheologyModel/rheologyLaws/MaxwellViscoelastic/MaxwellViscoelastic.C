@@ -168,8 +168,8 @@ Foam::tmp<Foam::volScalarField> Foam::MaxwellViscoelastic::J(scalar t) const
             mesh(),
             dimensionedScalar
             (
-                "J", 
-                dimless/k_.dimensions(), 
+                "J",
+                dimless/k_.dimensions(),
                 1.0/k_.value() + t/eta_.value()
             ),
             zeroGradientFvPatchScalarField::typeName

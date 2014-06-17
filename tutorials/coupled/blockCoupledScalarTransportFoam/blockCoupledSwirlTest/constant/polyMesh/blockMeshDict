@@ -1,7 +1,7 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | foam-extend: Open Source CFD                    |
-|  \\    /   O peration     | Version:     3.0                                |
+|  \\    /   O peration     | Version:     3.1                                |
 |   \\  /    A nd           | Web:         http://www.extend-project.de       |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
@@ -42,23 +42,35 @@ edges
 (
 );
 
-patches
+boundary
 (
-    patch inlet
-    (
-        (4 10 11 5)
-    )
-    patch outlet
-    (
-        (3 9 10 4)
-    )
-    wall fixedWalls
-    (
-        (3 0 6 9)
-        (0 1 7 6)
-        (1 2 8 7)
-        (2 5 11 8)
-    )
+    inlet
+    {
+        type patch;
+        faces
+        (
+            (4 10 11 5)
+        );
+    }
+    outlet
+    {
+        type patch;
+        faces
+        (
+            (3 9 10 4)
+        );
+    }
+    fixedWalls
+    {
+        type wall;
+        faces
+        (
+            (3 0 6 9)
+            (0 1 7 6)
+            (1 2 8 7)
+            (2 5 11 8)
+        );
+    }
 );
 
 // ************************************************************************* //

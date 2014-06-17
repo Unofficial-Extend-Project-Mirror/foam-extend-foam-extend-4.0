@@ -65,7 +65,7 @@ class wallPointData
 {
     // Private data
 
-        //- data at nearest wall center
+        //- Data at nearest wall center
         Type data_;
 
 

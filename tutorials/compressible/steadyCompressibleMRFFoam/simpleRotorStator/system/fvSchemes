@@ -1,0 +1,77 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | foam-extend: Open Source CFD                    |
+|  \\    /   O peration     | Version:     3.1                                |
+|   \\  /    A nd           | Web:         http://www.extend-project.de       |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      fvSchemes;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+ddtSchemes
+{
+    default         none;
+
+    ddt(rho,U)      steadyState;
+    ddt(rho,h)      steadyInertial phi rho 0.25;
+    ddt(psi,p)      steadyInertial phi rho 0.25;
+
+    ddt(rho,k)        steadyState;
+    ddt(rho,epsilon)  steadyState;
+
+    U               steadyState;
+    T               steadyState;
+    p               steadyState;
+}
+
+gradSchemes
+{
+    default         Gauss linear;
+}
+
+divSchemes
+{
+    default          none;
+    div(phi,U)       Gauss upwind;
+    div(phi,h)       Gauss upwind;
+    div(phid,p)      Gauss upwind;
+
+//     div(phi,U)       Gauss vanLeerDC;
+//     div(phi,h)       Gauss vanLeerDC;
+//     div(phid,p)      Gauss vanLeerDC;
+
+    div(phi,k)       Gauss upwind;
+    div(phi,epsilon) Gauss upwind;
+    div((muEff*dev2(grad(U).T()))) Gauss linear;
+
+    div(U,p)       Gauss linear;
+}
+
+laplacianSchemes
+{
+    default         Gauss linear corrected;
+}
+
+interpolationSchemes
+{
+    default         linear;
+}
+
+snGradSchemes
+{
+    default         corrected;
+}
+
+fluxRequired
+{
+    default         no;
+    p;
+}
+
+// ************************************************************************* //

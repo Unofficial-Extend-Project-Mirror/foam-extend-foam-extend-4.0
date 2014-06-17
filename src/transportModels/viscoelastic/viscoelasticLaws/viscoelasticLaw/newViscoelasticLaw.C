@@ -52,7 +52,7 @@ Foam::autoPtr<Foam::viscoelasticLaw> Foam::viscoelasticLaw::New
         )   << "Unknown viscoelasticLaw type " << typeName
             << endl << endl
             << "Valid viscoelasticLaw types are :" << endl
-            << dictionaryConstructorTablePtr_->toc()
+            << dictionaryConstructorTablePtr_->sortedToc()
             << exit(FatalError);
     }
 

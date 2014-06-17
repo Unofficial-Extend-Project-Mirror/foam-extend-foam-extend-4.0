@@ -1,7 +1,7 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | foam-extend: Open Source CFD                    |
-|  \\    /   O peration     | Version:     3.0                                |
+|  \\    /   O peration     | Version:     3.1                                |
 |   \\  /    A nd           | Web:         http://www.extend-project.de       |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
@@ -29,31 +29,29 @@ boundaryField
     {
         type            symmetryPlane;
     }
-
     inside
     {
-      type            solidTraction;
-      traction        uniform ( 0 0 0 );
-      pressure        uniform 50e6;
-      value           uniform (0 0 0);
+        type            solidTraction;
+        traction        uniform ( 0 0 0 );
+        pressure        uniform 50e6;
+        DT              k;
+        value           uniform (0 0 0);
     }
-
     outside
     {
         type            solidTraction;
         traction        uniform ( 0 0 0 );
         pressure        uniform 0.1e6;
+        DT              k;
         value           uniform (0 0 0);
     }
-
     front
     {
-      type            empty;
+        type            empty;
     }
-
     back
     {
-      type            empty;
+        type            empty;
     }
 }
 

@@ -44,6 +44,14 @@ Usage
     -scale vector
         Scales the points by the given vector.
 
+    -cylToCart (vector vector)
+        Assumes that constant/points is defined in cylindrical coordinates:
+        (radialPosition tangentialPosition axialPosition) for a coordinate
+        system with origin: first vec, axis: second vec, direction: third vec
+        Radial and axial positions should be in [m].
+        Tangential positions should be in [radians].
+        Transforms the points to Cartesian positions.
+
     The any or all of the three options may be specified and are processed
     in the above order.
 
@@ -69,6 +77,7 @@ Usage
 #include "transformGeometricField.H"
 #include "IStringStream.H"
 #include "RodriguesRotation.H"
+#include "cylindricalCS.H"
 
 using namespace Foam;
 using namespace Foam::mathematicalConstant;
@@ -151,6 +160,7 @@ int main(int argc, char *argv[])
     argList::validOptions.insert("yawPitchRoll", "(yaw pitch roll)");
     argList::validOptions.insert("rotateFields", "");
     argList::validOptions.insert("scale", "vector");
+    argList::validOptions.insert("cylToCart", "(originVec axisVec directionVec)");
 
 #   include "setRootCase.H"
 #   include "createTime.H"
@@ -186,7 +196,7 @@ int main(int argc, char *argv[])
     {
         FatalErrorIn(args.executable())
             << "No options supplied, please use one or more of "
-               "-translate, -rotate or -scale options."
+               "-translate, -rotate, -scale, or -cylToCart options."
             << exit(FatalError);
     }
 
@@ -299,6 +309,25 @@ int main(int argc, char *argv[])
         points.replace(vector::X, scaleVector.x()*points.component(vector::X));
         points.replace(vector::Y, scaleVector.y()*points.component(vector::Y));
         points.replace(vector::Z, scaleVector.z()*points.component(vector::Z));
+    }
+
+    if (args.optionFound("cylToCart"))
+    //HN, 140523
+    {
+        vectorField n1n2(args.optionLookup("cylToCart")());
+        n1n2[1] /= mag(n1n2[1]);
+        n1n2[2] /= mag(n1n2[2]);
+
+        cylindricalCS ccs
+        (
+            "ccs",
+            n1n2[0],
+            n1n2[1],
+            n1n2[2],
+            false // Use radians
+        );
+
+        points = ccs.globalPosition(points);
     }
 
     // Set the precision of the points data to 10

@@ -1,7 +1,7 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | foam-extend: Open Source CFD                    |
-|  \\    /   O peration     | Version:     3.0                                |
+|  \\    /   O peration     | Version:     3.1                                |
 |   \\  /    A nd           | Web:         http://www.extend-project.de       |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
@@ -43,10 +43,12 @@ boundaryField
 	correctionFrequency  50;
 	normalContactModel    dirichletNeumann;
 	dirichletNeumannNormalModelDict
-	  {
+	{
 	    relaxationFactor      0.9;
 	    contactGapTol         1e-10;
 	    limitPenetration      no;
+            settleContact         no;
+            settleIterationNumber 100;
 	    penetrationLimit      -0.03;
 	    limitPressure         no;
 	    pressureLimit         1e9;
@@ -55,7 +57,7 @@ boundaryField
 	    aitkenRelaxation      no;
 	    infoFrequency         10;
 	    oscillationCorrection yes;
-	    smoothingSteps        1;	
+	    smoothingSteps        1;
 	  }
 	//frictionContactModel   frictionless;
 	frictionContactModel   dirichletNeumann;
@@ -64,8 +66,8 @@ boundaryField
 	    relaxationFactor      0.2;
 	    infoFrequency         10;
 	    oscillationCorrection yes;
-	    smoothingSteps        1;	
-	
+	    smoothingSteps        1;
+
 	    frictionLaw           coulomb;
 	    frictionLawDict
 	      {

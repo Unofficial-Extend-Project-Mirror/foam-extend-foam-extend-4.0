@@ -1,6 +1,6 @@
 Below are build instructions for Ubuntu 14.04.
 
-These instructions assume that you install in the default location, which is 
+These instructions assume that you install in the default location, which is
 ~/foam/ . Create this folder with:
 
     cd ~
@@ -9,39 +9,70 @@ These instructions assume that you install in the default location, which is
 
 * Obtain and unpack source code (if you read this, you probably already have):
 
-The recommended way is to get the source code through git source code 
+The recommended way is to get the source code through git source code
 management system. This way, you can get updates and bugfixes easily by running
-"git pull". To install into the default location run: 
+"git pull". To install into the default location run:
 
     cd ~/foam
-    git clone git://git.code.sf.net/p/openfoam-extend/foam-extend-3.0 
+    git clone git://git.code.sf.net/p/openfoam-extend/foam-extend-3.1
 
 
 Alternatively, you can download a snapshot (.tgz) of the source code from:
-http://sourceforge.net/projects/openfoam-extend/files/foam-extend-3.0/
+http://sourceforge.net/projects/openfoam-extend/files/foam-extend-3.1/
 
+
+* Update your Ubuntu installation:
+
+    sudo apt-get update
+    sudo apt-get upgrade
 
 * Install required packages:
 
-    sudo apt-get install git-core build-essential binutils-dev flex bison \ 
+    sudo apt-get install git-core build-essential binutils-dev flex \
     zlib1g-dev qt4-dev-tools libqt4-dev libncurses5-dev libiberty-dev \
-    libxt-dev rpm mercurial graphviz
+    libxt-dev rpm mercurial graphviz openmpi-bin libopenmpi-dev cmake
 
-Make an additional link:
 
-    sudo ln -s /usr/bin/make /usr/bin/gmake
+* For Ubuntu 14.04, you need to customize some of the ThirdParty packages
+  in order to enable the usage of system-provided packages, and to enable
+  the compilation of other, like bison-2.7.
+
+  Here is a list of sed commands that will do just that. You can copy/paste
+  the following block of commands in a control terminal in order to make
+  the necessary adjustments. You will need to be located at the root of your
+  foam-extend-3.1 installation for those commands to work.
+
+  ####################################################################
+  #
+  # Create a prefs.sh file
+  cp etc/prefs.sh-EXAMPLE etc/prefs.sh
+
+  # Use openmpi 1.6.5 as supplied by Ubuntu 14.04
+  sed -i s/"#export WM_MPLIB=SYSTEMOPENMPI"/"export WM_MPLIB=SYSTEMOPENMPI"/g etc/prefs.sh
+  sed -i s/"#export OPENMPI_DIR=path_to_system_installed_openmpi"/"export OPENMPI_DIR=\/usr"/g etc/prefs.sh
+  sed -i s/"#export OPENMPI_BIN_DIR=\$OPENMPI_DIR\/bin"/"export OPENMPI_BIN_DIR=\$OPENMPI_DIR\/bin"/g etc/prefs.sh
+
+  # Use Qt 4.8.6 as provided by Ubuntu 14.04
+  sed -i s/"#export QT_DIR=path_to_system_installed_qt"/"export QT_DIR=\/usr"/g etc/prefs.sh
+  sed -i s/"#export QT_BIN_DIR=\$QT_DIR\/bin"/"export QT_BIN_DIR=\$QT_DIR\/bin"/g etc/prefs.sh
+
+  # Use cmake 2.8.12.2 as provided by Ubuntu 14.04
+  sed -i s/"( rpm_make -p cmake"/"#( rpm_make -p cmake"/g ThirdParty/AllMake.stage1
+
+  # Compile and install bison-2.7 from the ThirdParty packages.
+  sed -i 0,/"#( rpm_make -p bison-2.7"/s//"( rpm_make -p bison-2.7"/ ThirdParty/AllMake.stage1
+
+  #
+  ####################################################################
+
 
 * Set environment variables:
 
-    cd ~/foam/foam-extend-3.0
+    cd ~/foam/foam-extend-3.1
     . etc/bashrc
 
-Optionally, set environment variable for Qt to compile ParaView: 
-
-    export QT_BIN_DIR=/usr/bin
-
 Optionally, set environment variable for compiling Cuda solvers, for example
-(replace "sm_30" with value according to your GPU architecture): 
+(replace "sm_30" with value according to your GPU architecture):
 
     export CUDA_ARCH=sm_30
 

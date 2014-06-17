@@ -38,7 +38,7 @@
         ) const;
 
     // Private data related to dimensionSet functions
-    
+
         //- Function pointer (used to avoid a conditional at every evaluation
         //  for debug levels 3,4,5 or 6)
         void (Foam::equationReader::*reportDimsEvalStartFunction_)
@@ -149,7 +149,7 @@
         ) const;
 
     // Private member functions related to dimensionSet function
-    
+
         //- Pointed to by reportDimsEvalStartFunction_ when debug level
         //  is none of: 3,4,5,6 - this function does nothing
         void reportDimsEvalStartDisabled

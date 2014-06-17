@@ -9,11 +9,11 @@
 //     Info << "Number of times: " << Times.size() << endl;
 
     sigma = dimensionedSymmTensor("zero", dimForce/dimArea, symmTensor::zero);
-    DSigmaCorr = 
+    DSigmaCorr =
         dimensionedSymmTensor
         (
-            "zero", 
-            dimForce/dimArea, 
+            "zero",
+            dimForce/dimArea,
             symmTensor::zero
         );
 
@@ -46,7 +46,7 @@
 
             if(tau < 0)
             {
-                sigma += 2.0*rheology.mu(t)*DepsilonOld 
+                sigma += 2.0*rheology.mu(t)*DepsilonOld
                     + rheology.lambda(t)*(I*tr(DepsilonOld));
 
                 DSigmaCorr += 2.0*rheology.mu(tNext)*DepsilonOld
@@ -54,7 +54,7 @@
             }
             else
             {
-                sigma += 2.0*rheology.mu(t - tau)*DepsilonOld 
+                sigma += 2.0*rheology.mu(t - tau)*DepsilonOld
                     + rheology.lambda(t - tau)*(I*tr(DepsilonOld));
 
                 DSigmaCorr += 2.0*rheology.mu(tNext - tau)*DepsilonOld

@@ -237,20 +237,41 @@ OPENMPI)
     ;;
 
 MACPORTOPENMPI)
-       unset OPAL_PREFIX
+	unset OPAL_PREFIX
 
-       export FOAM_MPI=openmpi-macport
-       libDir=`openmpicc --showme:link | sed -e 's/.*-L\([^ ]*\).*/\1/'`
+	export FOAM_MPI=openmpi-macport-$WM_MACPORT_MPI_VERSION
 
-       # Bit of a hack: strip off 'lib' and hope this is the path to openmpi
-       # include files and libraries.
-       export MPI_ARCH_PATH="${libDir%/*}"
+	# Currently not correctly working on MacPorts
+	#	libDir=`mpicc-openmpi-$WM_MACPORT_MPI_VERSION --showme:libdirs`
+	libDir=/opt/local/lib/openmpi-$WM_MACPORT_MPI_VERSION
 
-       export FOAM_MPI_LIBBIN=$FOAM_LIBBIN/$mpi_version
+	export FOAM_MPI_LIBBIN=$FOAM_LIBBIN/$FOAM_MPI
+	_foamAddLib     $libDir
+	unset libDir
 
-       _foamAddLib     $libDir
-       unset libDir
-       ;;
+	which mpirun >/dev/null
+	if [ $? -ne 0 ]
+	then
+	    export WM_MPIRUN_PROG=mpirun-openmpi-$WM_MACPORT_MPI_VERSION
+	fi
+ 	;;
+
+MACPORTMPICH)
+    export FOAM_MPI=mpich-macports-$WM_MACPORT_MPI_VERSION
+    export MPI_HOME=$WM_THIRD_PARTY_DIR/$FOAM_MPI
+
+    export FOAM_MPI_LIBBIN=$FOAM_LIBBIN/$FOAM_MPI
+    libDir=/opt/local/lib/mpich-$WM_MACPORT_MPI_VERSION
+
+    _foamAddLib     $libDir
+    unset libDir
+
+    which mpirun >/dev/null
+    if [ $? -ne 0 ]
+    then
+	export WM_MPIRUN_PROG=mpirun-mpich-$WM_MACPORT_MPI_VERSION
+    fi
+    ;;
 
 SYSTEMOPENMPI)
     mpi_version=openmpi-system
@@ -326,6 +347,42 @@ SYSTEMOPENMPI)
         echo "    MPI_HOME              : $MPI_HOME"
         echo "    MPI_ARCH_PATH         : $MPI_ARCH_PATH"
         echo "    OPAL_PREFIX           : $OPAL_PREFIX"
+        echo "    PINC                  : $PINC"
+        echo "    PLIBS                 : $PLIBS"
+    fi
+
+    export FOAM_MPI_LIBBIN=$FOAM_LIBBIN/$mpi_version
+    unset mpi_version
+    ;;
+
+MVAPICH2)
+    mpi_version=mvapich2
+
+    if [ -n "${MVAPICH2_BIN_DIR}" ] && [ -d "${MVAPICH2_BIN_DIR}" ]
+    then
+        _foamAddPath $MVAPICH2_BIN_DIR
+    else
+        MVAPICH2_BIN_DIR=$(dirname `which mpicc`)
+    fi
+
+    if which mpicc >/dev/null
+    then
+        mpicc -v 2>/dev/null | grep -q "mpicc for MVAPICH2" ||
+            echo "Warning: `which mpicc` does not appear to be for MVAPICH2"
+    else
+        echo "Warning: mpicc not available"
+    fi
+
+    export MPI_HOME=`dirname $MVAPICH2_BIN_DIR`
+    export MPI_ARCH_PATH=$MPI_HOME
+
+    export PINC="`mpicc -show -cc= -nativelinking`"
+    export PLIBS="`mpicc -show -cc= | sed "s%$PINC%%"`"
+
+    if [ "$FOAM_VERBOSE" -a "$PS1" ]
+    then
+        echo "  Environment variables defined for MVAPICH2:"
+        echo "    MPI_ARCH_PATH         : $MPI_ARCH_PATH"
         echo "    PINC                  : $PINC"
         echo "    PLIBS                 : $PLIBS"
     fi
@@ -540,8 +597,8 @@ export MPI_BUFFER_SIZE
 
 # Load bison
 # ~~~~~~~~~~
-[ -z "$BISON_SYSTEM" ] && [ -e $WM_THIRD_PARTY_DIR/packages/bison-2.4.3/platforms/$WM_OPTIONS ] && {
-    _foamSource $WM_THIRD_PARTY_DIR/packages/bison-2.4.3/platforms/$WM_OPTIONS/etc/bison-2.4.3.sh
+[ -z "$BISON_SYSTEM" ] && [ -e $WM_THIRD_PARTY_DIR/packages/bison-2.7/platforms/$WM_OPTIONS ] && {
+    _foamSource $WM_THIRD_PARTY_DIR/packages/bison-2.7/platforms/$WM_OPTIONS/etc/bison-2.7.sh
 }
 [ "$FOAM_VERBOSE" -a "$PS1" ] && echo "    BISON_DIR is initialized to: $BISON_DIR"
 
@@ -570,8 +627,8 @@ export MPI_BUFFER_SIZE
 
 # Load PyFoam
 # ~~~~~~~~~~~
-[ -z "$PYFOAM_SYSTEM" ] && [ -e $WM_THIRD_PARTY_DIR/packages/PyFoam-0.6.1/platforms/noarch ] && {
-    _foamSource $WM_THIRD_PARTY_DIR/packages/PyFoam-0.6.1/platforms/noarch/etc/PyFoam-0.6.1.sh
+[ -z "$PYFOAM_SYSTEM" ] && [ -e $WM_THIRD_PARTY_DIR/packages/PyFoam-0.6.3/platforms/noarch ] && {
+    _foamSource $WM_THIRD_PARTY_DIR/packages/PyFoam-0.6.3/platforms/noarch/etc/PyFoam-0.6.3.sh
 }
 [ "$FOAM_VERBOSE" -a "$PS1" ] && echo "    PYFOAM_DIR is initialized to: $PYFOAM_DIR"
 

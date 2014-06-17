@@ -52,7 +52,7 @@ void Foam::layerAdditionRemoval::addCellLayer
 
     if (debug)
     {
-        Info<< "void layerAdditionRemoval::addCellLayer("
+        Pout<< "void layerAdditionRemoval::addCellLayer("
             << "polyTopoChange& ref) const for object " << name() << " : "
             << "Adding cell layer" << endl;
     }
@@ -74,7 +74,7 @@ void Foam::layerAdditionRemoval::addCellLayer
     {
         if (debug)
         {
-            Info<< "void layerAdditionRemoval::addCellLayer("
+            Pout<< "void layerAdditionRemoval::addCellLayer("
                 << "polyTopoChange& ref) const "
                 << " for object " << name() << " : "
                 << "Using edges for point insertion" << endl;
@@ -93,7 +93,7 @@ void Foam::layerAdditionRemoval::addCellLayer
     {
         if (debug)
         {
-            Info<< "void layerAdditionRemoval::addCellLayer("
+            Pout<< "void layerAdditionRemoval::addCellLayer("
                 << "polyTopoChange& ref) const "
                 << " for object " << name() << " : "
                 << "A valid layer could not be found in front of "
@@ -102,7 +102,7 @@ void Foam::layerAdditionRemoval::addCellLayer
                 << endl;
         }
 
-        extrusionDir = 1.1*minLayerThickness_*masterFaceLayer.pointNormals();
+        extrusionDir = minLayerThickness_*masterFaceLayer.pointNormals();
     }
 
     // Add the new points
@@ -550,7 +550,7 @@ void Foam::layerAdditionRemoval::addCellLayer
 
     if (debug)
     {
-        Info<< "void layerAdditionRemoval::addCellLayer("
+        Pout<< "void layerAdditionRemoval::addCellLayer("
             << "polyTopoChange& ref) const "
             << " for object " << name() << " : "
             << "Finished adding cell layer" << endl;

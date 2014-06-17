@@ -82,11 +82,11 @@ Foam::heatFlux::~heatFlux()
 
 void Foam::heatFlux::calcAndPrint()
 {
-    const volScalarField& T = 
+    const volScalarField& T =
         obr_.lookupObject<volScalarField>("T");
-    const volScalarField& kappaEff = 
+    const volScalarField& kappaEff =
         obr_.lookupObject<volScalarField>(Kfluid_);
-    //const surfaceScalarField& kappaEff = 
+    //const surfaceScalarField& kappaEff =
     //    obr_.lookupObject<surfaceScalarField>(Kfluid_);
 
     scalar rho = 1.2;
@@ -103,8 +103,8 @@ void Foam::heatFlux::calcAndPrint()
     //const surfaceScalarField::GeometricBoundaryField& patchHeatFluxD =
     //    heatFluxC.boundaryField();
 
-    //surfaceScalarField::GeometricBoundaryField patchHeatFluxC = 
-            
+    //surfaceScalarField::GeometricBoundaryField patchHeatFluxC =
+
     scalar sumConduction = 0.0;
     scalar sumConvection = 0.0;
     scalar sumRadiation = 0.0;
@@ -143,7 +143,7 @@ void Foam::heatFlux::calcAndPrint()
 
         if(obr_.foundObject<surfaceScalarField>("phi"))
         {
-            const surfaceScalarField& phi = 
+            const surfaceScalarField& phi =
                 obr_.lookupObject<surfaceScalarField>("phi");
 
             convection = gSum

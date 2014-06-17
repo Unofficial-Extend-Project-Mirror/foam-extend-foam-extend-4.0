@@ -25,7 +25,7 @@ Application
     stressedFoam
 
 Description
-    Transient/steady-state solver of linear-elastic, small-strain deformation 
+    Transient/steady-state solver of linear-elastic, small-strain deformation
     of solid bodies in contact.
 
     Simple linear elasticity structural analysis code.

@@ -279,7 +279,8 @@ public:
             }
 
             //- Return internal field reference
-            const DimensionedField<Type, Mesh>& dimensionedInternalField() const
+            const DimensionedField<Type, Mesh>&
+            dimensionedInternalField() const
             {
                 return internalField_;
             }
@@ -555,7 +556,7 @@ public:
 
 
 // This function is added as a hack to enable simple backward compatability
-// with verions using referenceLevel in GeometicField
+// with versions using referenceLevel in GeometricField
 template
 <
     template<class> class PatchField,
@@ -564,7 +565,8 @@ template
     template<class> class MatrixType,
     class Type
 >
-const PointPatchField<PatchField, Mesh, PointPatch, MatrixType, Type>& operator+
+const PointPatchField<PatchField, Mesh, PointPatch, MatrixType, Type>&
+operator+
 (
     const PointPatchField<PatchField, Mesh, PointPatch, MatrixType, Type>& ppf,
     const Type&
@@ -735,7 +737,7 @@ typedef Type##PointPatchField                                                 \
 typedef Type##PointPatchField                                                 \
  <pointPatch##Field, mesh, patchPatch, matrixType, diagTensor>                \
  type##pointPatchType##DiagTensorField;                                       \
-typedef Type##PointPatchField	                                              \
+typedef Type##PointPatchField                                                 \
     <pointPatch##Field, mesh, patchPatch, matrixType, tensor>                 \
     type##pointPatchType##TensorField;
 

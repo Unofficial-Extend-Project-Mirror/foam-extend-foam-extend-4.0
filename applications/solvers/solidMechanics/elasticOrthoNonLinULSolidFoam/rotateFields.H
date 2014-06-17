@@ -5,9 +5,9 @@
   Info << "Rotating fields" << endl;
 
   volTensorField F = I + gradDU;
-  
+
   U += DU;
-  
+
   epsilon += DEpsilon;
 
   sigma += DSigma;
@@ -21,7 +21,7 @@
 	<< "Negative Jacobian - a cell volume has become negative!"
 	<< exit(FatalError);
     }
-  
+
   rho = rho/J;
 
   n = mesh.Sf()/mesh.magSf();

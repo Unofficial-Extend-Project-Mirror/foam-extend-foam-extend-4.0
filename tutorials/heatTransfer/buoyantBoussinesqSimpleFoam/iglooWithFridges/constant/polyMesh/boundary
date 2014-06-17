@@ -1,7 +1,7 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | foam-extend: Open Source CFD                    |
-|  \\    /   O peration     | Version:     3.0                                |
+|  \\    /   O peration     | Version:     3.1                                |
 |   \\  /    A nd           | Web:         http://www.extend-project.de       |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
@@ -15,61 +15,43 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-9
+6
 (
     maxY
     {
         type            empty;
-        nFaces          0;
-        startFace       60456;
+        nFaces          400;
+        startFace       22800;
     }
     minX
     {
         type            empty;
-        nFaces          0;
-        startFace       60456;
+        nFaces          400;
+        startFace       23200;
     }
     maxX
     {
         type            empty;
-        nFaces          0;
-        startFace       60456;
+        nFaces          400;
+        startFace       23600;
     }
     minY
     {
         type            empty;
-        nFaces          0;
-        startFace       60456;
+        nFaces          400;
+        startFace       24000;
     }
     ground
     {
         type            wall;
-        nFaces          590;
-        startFace       60456;
+        nFaces          400;
+        startFace       24400;
     }
     maxZ
     {
         type            empty;
-        nFaces          0;
-        startFace       61046;
-    }
-    igloo_region0
-    {
-        type            wall;
-        nFaces          2260;
-        startFace       61046;
-    }
-    twoFridgeFreezers_seal_0
-    {
-        type            wall;
-        nFaces          1344;
-        startFace       63306;
-    }
-    twoFridgeFreezers_herring_1
-    {
-        type            wall;
-        nFaces          1116;
-        startFace       64650;
+        nFaces          400;
+        startFace       24800;
     }
 )
 

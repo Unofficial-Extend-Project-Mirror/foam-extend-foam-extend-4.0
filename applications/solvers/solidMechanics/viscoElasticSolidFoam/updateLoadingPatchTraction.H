@@ -14,7 +14,7 @@
      == directionMixedFvPatchVectorField::typeName
     )
     {
-        directionMixedFvPatchVectorField& loadingPatchU = 
+        directionMixedFvPatchVectorField& loadingPatchU =
             refCast<directionMixedFvPatchVectorField>
             (
                 DU.boundaryField()[patchID]
@@ -29,7 +29,7 @@
 
         tensorField lpGradDU = gradDU.boundaryField()[patchID];
 
-        loadingPatchU.refGrad() = 
+        loadingPatchU.refGrad() =
         (
             traction
           - (n & (lpMu*lpGradDU.T() - (lpMu + lpLambda)*lpGradDU))
@@ -55,7 +55,7 @@
      == directionMixedFvPatchVectorField::typeName
     )
     {
-        directionMixedFvPatchVectorField& bottomPatchU = 
+        directionMixedFvPatchVectorField& bottomPatchU =
             refCast<directionMixedFvPatchVectorField>
             (
                 DU.boundaryField()[patchID]
@@ -70,7 +70,7 @@
 
         tensorField bpGradDU = gradDU.boundaryField()[patchID];
 
-        bottomPatchU.refGrad() = 
+        bottomPatchU.refGrad() =
         (
             traction
           - (n & (bpMu*bpGradDU.T() - (bpMu + bpLambda)*bpGradDU))

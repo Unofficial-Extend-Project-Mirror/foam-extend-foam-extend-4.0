@@ -204,7 +204,7 @@ void Foam::extendedWallHeatTransferFvPatchScalarField::write(Ostream& os) const
 
     os  << nl << indent << "radiationSources" << nl
         << indent << token::BEGIN_LIST << incrIndent << nl;
-    
+
     forAll(radSources_, rsI)
     {
         os  << indent << radSources_[rsI].name() << nl

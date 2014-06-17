@@ -27,6 +27,7 @@
 #
 # Description
 #     Cleaning script for ThirdParty packages: Stage3
+#     Add option alsoPackage to remove the installed files.
 #
 # Author:
 #     Martin Beaudoin, Hydro-Quebec, (2013)
@@ -38,7 +39,7 @@ cd ${0%/*} || exit 1
 wmakeCheckPwd "$WM_THIRD_PARTY_DIR" || {
     echo "Error: Current directory is not \$WM_THIRD_PARTY_DIR"
     echo "    The environment variables are inconsistent with the installation."
-    echo "    Check the OpenFOAM entries in your dot-files and source them."
+    echo "    Check the foam-extend entries in your dot-files and source them."
     exit 1
 }
 . tools/makeThirdPartyFunctionsForRPM
@@ -50,31 +51,32 @@ echo ========================================
 echo
 
 # metis
-uninstallPackage metis-5.0pre2
+uninstallPackage metis-5.1.0 $1
 
 # ParMGridGen
-uninstallPackage ParMGridGen-1.0
+uninstallPackage ParMGridGen-1.0 $1
 
 # Libccmio
-uninstallPackage libccmio-2.6.1
+uninstallPackage libccmio-2.6.1 $1
 
 # Mesquite
-uninstallPackage mesquite-2.1.2
+uninstallPackage mesquite-2.1.2 $1
 
 # Scotch/PtScotch
-uninstallPackage scotch-5.1.10b
+uninstallPackage scotch-6.0.0 $1
+uninstallPackage scotch_6.0.0 $1
 
 # ParMertis
-uninstallPackage ParMetis-3.1.1
+uninstallPackage parmetis-4.0.3 $1
 
 # Zoltan
-# uninstallPackage zoltan-3.6
+# uninstallPackage zoltan-3.6 $1
 
 # PyFoam
-uninstallPackage PyFoam-0.6.1
+uninstallPackage PyFoam-0.6.1 $1
 
 # hwloc
-uninstallPackage hwloc-1.7.1
+uninstallPackage hwloc-1.7.2 $1
 
 echo
 echo ========================================

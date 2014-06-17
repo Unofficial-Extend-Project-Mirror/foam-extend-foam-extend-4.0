@@ -65,7 +65,7 @@ autoPtr<ePatch> ePatch::New
         )   << "Unknown ePatch type " << patchType << " for patch " << name
             << endl << endl
             << "Valid ePatch types are :" << endl
-            << wordConstructorTablePtr_->toc()
+            << wordConstructorTablePtr_->sortedToc()
             << exit(FatalError);
     }
 
@@ -102,7 +102,7 @@ autoPtr<ePatch> ePatch::New
             dict
         )   << "Unknown ePatch type " << patchType << endl << endl
             << "Valid ePatch types are :" << endl
-            << dictionaryConstructorTablePtr_->toc()
+            << dictionaryConstructorTablePtr_->sortedToc()
             << exit(FatalIOError);
     }
 

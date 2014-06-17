@@ -34,12 +34,11 @@ Author
 
 #include "fineBlockAmgLevel.H"
 #include "coarseBlockAmgLevel.H"
-#include "ICCG.H"
-#include "BICCG.H"
-#include "BlockGaussSeidelSolver.H"
 #include "BlockSolverPerformance.H"
 #include "BlockCoeffNorm.H"
 #include "BlockCoeffTwoNorm.H"
+#include "BlockBiCGStabSolver.H"
+#include "BlockCGSolver.H"
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
@@ -181,35 +180,46 @@ void Foam::fineBlockAmgLevel<Type>::solve
     const scalar relTol
 ) const
 {
+    Info<< "Fine level solver"<<endl;
 
-    Info<<"Fine level solver"<<endl;
+    // Create artificial dictionary for finest solution
+    dictionary finestDict;
+//     finestDict.add("nDirections", "5");
+    finestDict.add("minIter", 1);
+    finestDict.add("maxIter", 1000);
+    finestDict.add("tolerance", tolerance);
+    finestDict.add("relTol", relTol);
 
     if (matrix_.symmetric())
     {
+        finestDict.add("preconditioner", "Cholesky");
+
         BlockSolverPerformance<Type> coarseSolverPerf =
             BlockCGSolver<Type>
             (
                 "topLevelCorr",
                 matrix_,
-                dict_
+                finestDict
             ).solve(x, b);
 
-        if (lduMatrix::debug >= 2)
+        if (BlockLduMatrix<Type>::debug >= 2)
         {
             coarseSolverPerf.print();
         }
     }
     else
     {
+        finestDict.add("preconditioner", "Cholesky");
+
         BlockSolverPerformance<Type> coarseSolverPerf =
             BlockBiCGStabSolver<Type>
             (
                 "topLevelCorr",
                 matrix_,
-                dict_
+                finestDict
             ).solve(x, b);
 
-        if (lduMatrix::debug >= 2)
+        if (BlockLduMatrix<Type>::debug >= 2)
         {
             coarseSolverPerf.print();
         }
@@ -235,8 +245,8 @@ void Foam::fineBlockAmgLevel<Type>::scaleX
         x
     );
 
-    scalar scalingFactorNum = sumProd(x,b);
-    scalar scalingFactorDenom = sumProd(x,Ax);
+    scalar scalingFactorNum = sumProd(x, b);
+    scalar scalingFactorDenom = sumProd(x, Ax);
 
     vector scalingVector(scalingFactorNum, scalingFactorDenom, 0);
     reduce(scalingVector, sumOp<vector>());

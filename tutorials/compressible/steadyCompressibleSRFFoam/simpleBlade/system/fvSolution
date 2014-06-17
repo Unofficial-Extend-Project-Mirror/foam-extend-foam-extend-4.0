@@ -1,0 +1,103 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | foam-extend: Open Source CFD                    |
+|  \\    /   O peration     | Version:     3.1                                |
+|   \\  /    A nd           | Web:         http://www.extend-project.de       |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      fvSolution;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+solvers
+{
+    p
+    {
+        solver           BiCGStab;
+        preconditioner   DILU;
+
+        minIter          0;
+        maxIter          1000;
+        tolerance        1e-8;
+        relTol           0.01;
+    };
+    Urel
+    {
+        solver           BiCGStab;
+        preconditioner   DILU;
+
+        minIter           0;
+        maxIter           1000;
+        tolerance        1e-8;
+        relTol           0.01;
+    };
+    h
+    {
+        solver           BiCGStab;
+        preconditioner   DILU;
+
+        minIter          0;
+        maxIter          1000;
+        tolerance        1e-8;
+        relTol           0.01;
+    };
+    k
+    {
+        solver           BiCGStab;
+        preconditioner   DILU;
+
+        minIter          0;
+        maxIter          1000;
+        tolerance        1e-8;
+        relTol           0.0;
+    };
+    epsilon
+    {
+        solver           BiCGStab;
+        preconditioner   DILU;
+
+        minIter          0;
+        maxIter          1000;
+        tolerance        1e-8;
+        relTol           0.0;
+    };
+}
+
+PIMPLE
+{
+    nOuterCorrectors         1;
+    nCorrectors              2;
+    nNonOrthogonalCorrectors 0;
+}
+
+relaxationFactors
+{
+    // Note: under-relaxation factors used in wave-transmissive schemes
+    Urel            0.5;
+    p               0.3;
+    h               0.5;
+    rho             0.5;
+
+    k               0.5;
+    epsilon         0.5;
+}
+
+fieldBounds
+{
+    // No bounding
+//     p     0    1e7;
+//     T     0    10000;
+//     Urel       1e6;
+
+    // With bounding
+    p      50     1e6;
+    T      20    3000;
+    Urel   1000;
+}
+
+// ************************************************************************* //

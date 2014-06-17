@@ -96,15 +96,15 @@ public:
 
 
     // Member functions
-    
+
         // Access
-        
+
             //- Time directory precision
             inline const int& precision() const
             {
                 return Time::precision_;
             }
-            
+
             //- Time directory format
             inline const Time::fmtflags& format() const
             {

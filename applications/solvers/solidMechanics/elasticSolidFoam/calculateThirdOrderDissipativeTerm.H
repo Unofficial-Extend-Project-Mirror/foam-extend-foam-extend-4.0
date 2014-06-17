@@ -93,7 +93,7 @@ forAll(extrapGradU.internalField(), facei)
   const tensor& gradUOwn = gradU.internalField()[own];
   const tensor& gradUNei = gradU.internalField()[nei];
 
-  // as there is there is no thirdOrderTensor class, we will 
+  // as there is there is no thirdOrderTensor class, we will
   // calculate (deltaOwn&gradGradUOwn) out manually
   // tensor deltaOwnDotgradGradUOwn = tensor::zero;
   // tensor deltaNeiDotgradGradUNei = tensor::zero;
@@ -118,7 +118,7 @@ forAll(extrapGradU.internalField(), facei)
   // deltaNeiDotgradGradUNei[tensor::ZY] = deltaNei & gradGradUcompZY.internalField()[nei];
   // deltaOwnDotgradGradUOwn[tensor::ZZ] = deltaOwn & gradGradUcompZZ.internalField()[own];
   // deltaNeiDotgradGradUNei[tensor::ZZ] = deltaNei & gradGradUcompZZ.internalField()[nei];
-  
+
   scalar gradGradUXXXOwn = gradGradUXXX.internalField()[own];
   scalar gradGradUXXYOwn = gradGradUXXY.internalField()[own];
   scalar gradGradUXXZOwn = gradGradUXXZ.internalField()[own];

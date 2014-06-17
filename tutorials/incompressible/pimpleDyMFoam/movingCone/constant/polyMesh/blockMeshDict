@@ -1,7 +1,7 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | foam-extend: Open Source CFD                    |
-|  \\    /   O peration     | Version:     3.0                                |
+|  \\    /   O peration     | Version:     3.1                                |
 |   \\  /    A nd           | Web:         http://www.extend-project.de       |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
@@ -53,54 +53,86 @@ edges
 (
 );
 
-patches
+boundary
 (
-    wall movingWall
-    (
-        (1 5 13 1)
-        (5 6 14 13)
-        (2 2 14 6)
-    )
-    patch farFieldMoving
-    (
-        (9 17 18 10)
-    )
-    wall fixedWall
-    (
-        (3 7 15 3)
-        (7 11 19 15)
-    )
-    symmetryPlane axis
-    (
-        (0 1 1 0)
-        (2 3 3 2)
-    )
-    patch left
-    (
-        (0 0 12 4)
-        (4 12 16 8)
-    )
-    patch farField
-    (
-        (8 16 17 9)
-        (10 18 19 11)
-    )
-    wedge back
-    (
-        (0 4 5 1)
-        (2 6 7 3)
-        (4 8 9 5)
-        (5 9 10 6)
-        (6 10 11 7)
-    )
-    wedge front
-    (
-        (0 1 13 12)
-        (2 3 15 14)
-        (12 13 17 16)
-        (13 14 18 17)
-        (14 15 19 18)
-    )
+    movingWall
+    {
+        type wall;
+        faces
+        (
+            (1 5 13 1)
+            (5 6 14 13)
+            (2 2 14 6)
+        );
+    }
+    farFieldMoving
+    {
+        type patch;
+        faces
+        (
+            (9 17 18 10)
+        );
+    }
+    fixedWall
+    {
+        type wall;
+        faces
+        (
+            (3 7 15 3)
+            (7 11 19 15)
+        );
+    }
+    axis
+    {
+        type empty;
+        faces
+        (
+            (0 1 1 0)
+            (2 3 3 2)
+        );
+    }
+    left
+    {
+        type patch;
+        faces
+        (
+            (0 0 12 4)
+            (4 12 16 8)
+        );
+    }
+    farField
+    {
+        type patch;
+        faces
+        (
+            (8 16 17 9)
+            (10 18 19 11)
+        );
+    }
+    back
+    {
+        type wedge;
+        faces
+        (
+            (0 4 5 1)
+            (2 6 7 3)
+            (4 8 9 5)
+            (5 9 10 6)
+            (6 10 11 7)
+        );
+    }
+    front
+    {
+        type wedge;
+        faces
+        (
+            (0 1 13 12)
+            (2 3 15 14)
+            (12 13 17 16)
+            (13 14 18 17)
+            (14 15 19 18)
+        );
+    }
 );
 
 mergePatchPairs

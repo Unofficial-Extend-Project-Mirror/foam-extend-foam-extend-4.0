@@ -1,7 +1,7 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | foam-extend: Open Source CFD                    |
-|  \\    /   O peration     | Version:     3.0                                |
+|  \\    /   O peration     | Version:     3.1                                |
 |   \\  /    A nd           | Web:         http://www.extend-project.de       |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
@@ -49,10 +49,10 @@ solvers
         	nPreSweeps       0;
         	nPostSweeps      2;
         	nFinestSweeps    2;
-		
+
         	scaleCorrection true;
         	directSolveCoarsest false;
-				   		
+
         	 cacheAgglomeration true;
 
 		 nCellsInCoarsestLevel 20;

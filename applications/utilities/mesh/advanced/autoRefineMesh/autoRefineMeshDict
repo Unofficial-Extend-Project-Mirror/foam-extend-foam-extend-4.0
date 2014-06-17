@@ -1,7 +1,7 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | foam-extend: Open Source CFD                    |
-|  \\    /   O peration     | Version:     3.0                                |
+|  \\    /   O peration     | Version:     3.1                                |
 |   \\  /    A nd           | Web:         http://www.extend-project.de       |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
@@ -12,16 +12,13 @@ FoamFile
     class       dictionary;
     object      autoRefineMeshDict;
 }
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
 
 // Surface to keep to
 surface         "plexi.ftr";
 
 // What is outside. These points have to be inside a cell (so not on a face!)
 outsidePoints   ((-0.99001 -0.99001 -0.99001));
-
 
 //
 // Selection of cells to refine
@@ -50,7 +47,6 @@ minEdgeLen      0.1;
 // this)
 cellLimit       2500000;
 
-
 //
 // Selection of final set
 //
@@ -69,8 +65,6 @@ nearDistance    -1;
 // are either kept and refined (selectHanging) or removed from the set
 selectHanging   false;
 
-
-
 //
 // Refinement parameters
 //
@@ -78,7 +72,6 @@ selectHanging   false;
 // Type of coordinate system
 coordinateSystem global;
 //coordinateSystem patchLocal;
-
 
 // .. and its coefficients. x,y in this case. (normal = tan1^tan2)
 globalCoeffs

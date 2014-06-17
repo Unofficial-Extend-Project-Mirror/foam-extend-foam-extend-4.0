@@ -78,7 +78,7 @@ tmp<adjConvectionScheme<Type> > adjConvectionScheme<Type>::New
             schemeData
         )   << "AdjConvection scheme not specified" << endl << endl
             << "Valid adjConvection schemes are :" << endl
-            << IstreamConstructorTablePtr_->toc()
+            << IstreamConstructorTablePtr_->sortedToc()
             << exit(FatalIOError);
     }
 
@@ -96,7 +96,7 @@ tmp<adjConvectionScheme<Type> > adjConvectionScheme<Type>::New
             schemeData
         )   << "unknown adjConvection scheme " << schemeName << endl << endl
             << "Valid adjConvection schemes are :" << endl
-            << IstreamConstructorTablePtr_->toc()
+            << IstreamConstructorTablePtr_->sortedToc()
             << exit(FatalIOError);
     }
 

@@ -62,7 +62,7 @@ Foam::autoPtr<Foam::motionDiff> Foam::motionDiff::New
         )   << "Unknown diffusivity type " << diffTypeName
             << endl << endl
             << "Valid diffusivity types are :" << endl
-            << dictionaryConstructorTablePtr_->toc()
+            << dictionaryConstructorTablePtr_->sortedToc()
             << exit(FatalError);
     }
 

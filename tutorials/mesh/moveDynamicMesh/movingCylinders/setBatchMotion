@@ -1,0 +1,28 @@
+faceSet topLayerCyl1 new cellToFace cyl1 all
+faceSet topLayerCyl1 subset cellToFace c1Top all
+cellSet topLayerCyl1MasterCells new cellToCell c1Top
+
+faceSet botLayerCyl1 new cellToFace cyl1 all
+faceSet botLayerCyl1 subset cellToFace c1Bot all
+cellSet botLayerCyl1MasterCells new cellToCell c1Bot
+
+faceSet topLayerCyl2 new cellToFace cyl2 all
+faceSet topLayerCyl2 subset cellToFace c2Top all
+cellSet topLayerCyl2MasterCells new cellToCell c2Top
+
+faceSet botLayerCyl2 new cellToFace cyl2 all
+faceSet botLayerCyl2 subset cellToFace c2Bot all
+cellSet botLayerCyl2MasterCells new cellToCell c2Bot
+
+cellSet c1Top delete
+cellSet c1Bot delete
+cellSet c2Top delete
+cellSet c2Bot delete
+
+
+quit
+
+cd constant/polyMesh/sets/
+\rm *_old *_old.gz
+
+setsToZones

@@ -1,0 +1,68 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | foam-extend: Open Source CFD                    |
+|  \\    /   O peration     | Version:     3.1                                |
+|   \\  /    A nd           | Web:         http://www.extend-project.de       |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       volScalarField;
+    location    "0";
+    object      mut;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+dimensions      [1 -1 -1 0 0 0 0];
+
+internalField   uniform 1;
+
+boundaryField
+{
+    inlet
+    {
+        type            calculated;
+    }
+    outlet
+    {
+        type            calculated;
+    }
+    bladeRotor
+    {
+        type            mutWallFunction;
+        value           uniform 1;
+    }
+    shaftRotor
+    {
+        type            mutWallFunction;
+        value           uniform 1;
+    }
+    shroudRotor
+    {
+        type            mutWallFunction;
+        value           uniform 1;
+    }
+    bladeStator
+    {
+        type            mutWallFunction;
+        value           uniform 1;
+    }
+    shaftStator
+    {
+        type            mutWallFunction;
+        value           uniform 1;
+    }
+    shroudStator
+    {
+        type            mutWallFunction;
+        value           uniform 1;
+    }
+    frontAndBack
+    {
+        type            cyclic;
+    }
+}
+
+// ************************************************************************* //

@@ -1,7 +1,7 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | foam-extend: Open Source CFD                    |
-|  \\    /   O peration     | Version:     3.0                                |
+|  \\    /   O peration     | Version:     3.1                                |
 |   \\  /    A nd           | Web:         http://www.extend-project.de       |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
@@ -268,74 +268,168 @@ edges
 
 );
 
-// Defining patches:
-patches
+// Defining boundary:
+boundary
 (
-    patch inlet
-    (
-       (A0 A2 A1 A0)
-    )
-    patch outlet
-    (
-       (F0 F1 F2 F0)
-       (F0 F2 F3 F0)
-       (F0 F3 F4 F0)
-       (F0 F4 F1 F0)
-    )
-    wall wallProlongation
-    (
-      (E1 E2 F2 F1)
-      (E2 E3 F3 F2)
-      (E3 E4 F4 F3)
-      (E4 E1 F1 F4)
-    )
-    wall wallDiffuser
-    (
-      (D1 D2 E2 E1)
-      (D2 D3 E3 E2)
-      (D3 D4 E4 E3)
-      (D4 D1 E1 E4)
-    )
-    wall statSwirlWallB_C
-    (
-      (B1 B2 C2 C1)
-      (B2 B3 C3 C2)
-      (B3 B4 C4 C3)
-      (B4 B1 C1 C4)
+    inlet
+    {
+        type patch;
+        faces
+        (
+            (A0 A2 A1 A0)
+        );
+    }
 
-      (C1 C2 D2 D1)
-      (C2 C3 D3 D2)
-      (C3 C4 D4 D3)
-      (C4 C1 D1 D4)
-    )
-   wall rotSwirlWallA_BB
-   (
-      (A1 A2 BB2 BB1)
-   )
+    outlet
+    {
+        type patch;
+        faces
+        (
+            (F0 F1 F2 F0)
+            (F0 F2 F3 F0)
+            (F0 F3 F4 F0)
+            (F0 F4 F1 F0)
+        );
+    }
 
-    cyclicGgi sideWallA_BB_cyclic1
-    (
-      (A0 BB0 BB1 A1)
-    )
+    wallProlongation
+    {
+        type wall;
+        faces
+        (
+            (E1 E2 F2 F1)
+            (E2 E3 F3 F2)
+            (E3 E4 F4 F3)
+            (E4 E1 F1 F4)
+        );
+    }
 
-    cyclicGgi sideWallA_BB_cyclic2
-    (
-      (BB0 A0 A2 BB2)
-    )
+    wallDiffuser
+    {
+        type wall;
+        faces
+        (
+            (D1 D2 E2 E1)
+            (D2 D3 E3 E2)
+            (D3 D4 E4 E3)
+            (D4 D1 E1 E4)
+        );
+    }
 
-    mixingPlane B_UPSTREAM   // BB : master
-    (
-       (BB0 BB2 BB1 BB0)
-    )
+    statSwirlWallB_C
+    {
+        type wall;
+        faces
+        (
+            (B1 B2 C2 C1)
+            (B2 B3 C3 C2)
+            (B3 B4 C4 C3)
+            (B4 B1 C1 C4)
 
-    mixingPlane B_DOWNSTREAM  // B : master
-    (
-       (B0 B2 B1 B0)
-       (B0 B1 B4 B0)
-       (B0 B4 B3 B0)
-       (B0 B3 B2 B0)
-    )
+            (C1 C2 D2 D1)
+            (C2 C3 D3 D2)
+            (C3 C4 D4 D3)
+            (C4 C1 D1 D4)
+        );
+    }
 
+    rotSwirlWallA_BB
+    {
+        type wall;
+        faces
+        (
+            (A1 A2 BB2 BB1)
+        );
+    }
+
+    sideWallA_BB_cyclic1
+    {
+        type cyclicGgi;
+
+        shadowPatch sideWallA_BB_cyclic2;
+        zone sideWallA_BB_cyclic1Zone;
+        bridgeOverlap off;
+        rotationAxis (0 0 1);
+        rotationAngle 60;
+        separationOffset (0 0 0);
+
+        faces
+        (
+            (A0 BB0 BB1 A1)
+        );
+    }
+
+    sideWallA_BB_cyclic2
+    {
+        type cyclicGgi;
+
+        shadowPatch sideWallA_BB_cyclic1;
+        zone sideWallA_BB_cyclic2Zone;
+        bridgeOverlap off;
+        rotationAxis (0 0 1);
+        rotationAngle -60;
+        separationOffset (0 0 0);
+
+        faces
+        (
+            (BB0 A0 A2 BB2)
+        );
+    }
+
+    B_UPSTREAM   // BB : master
+    {
+        type mixingPlane;
+        shadowPatch B_DOWNSTREAM;
+        zone B_UPSTREAMZone;
+        ribbonPatch
+        {
+        	discretisation bothPatches;
+        	stackAxis R;
+        	sweepAxis Theta;
+        }
+
+        coordinateSystem
+        {
+            type cylindrical;
+            origin (0 0 0);
+            axis (0 0 1);
+            direction (1 0 0);
+        }
+
+        faces
+        (
+            (BB0 BB2 BB1 BB0)
+        );
+    }
+
+    B_DOWNSTREAM  // B : master
+    {
+        type mixingPlane;
+        shadowPatch B_UPSTREAM;
+        zone B_DOWNSTREAMZone;
+        ribbonPatch
+        {
+            discretisation bothPatches;
+            stackAxis R;
+            sweepAxis Theta;
+        }
+
+        coordinateSystem
+        {
+            type cylindrical;
+            origin (0 0 0);
+            axis (0 0 1);
+            direction (1 0 0);
+        }
+
+        faces
+        (
+            (B0 B2 B1 B0)
+            (B0 B1 B4 B0)
+            (B0 B4 B3 B0)
+            (B0 B3 B2 B0)
+        );
+    }
 );
 
 mergePatchPairs

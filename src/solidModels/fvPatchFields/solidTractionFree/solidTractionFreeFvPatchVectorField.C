@@ -75,9 +75,9 @@ solidTractionFreeFvPatchVectorField
     if (dict.found("nonLinear"))
     {
         nonLinear_ = nonLinearGeometry::nonLinearNames_.read
-            (
-                dict.lookup("nonLinear")
-                );
+        (
+            dict.lookup("nonLinear")
+        );
 
         if (nonLinear_ == nonLinearGeometry::UPDATED_LAGRANGIAN)
         {
@@ -191,15 +191,19 @@ void solidTractionFreeFvPatchVectorField::updateCoeffs()
         return;
     }
 
-    gradient() = tractionBoundaryGradient()
+    bool incremental(fieldName_ == "DU");
+
+    gradient() = tractionBoundaryGradient::snGrad
     (
         vectorField(patch().size(), vector::zero),
         scalarField(patch().size(), 0.0),
-        word(fieldName_),
+        fieldName_,
+        "U",
         patch(),
         orthotropic_,
-        nonLinearGeometry::nonLinearNames_[nonLinear_]
-       )();
+        nonLinear_,
+        incremental
+    );
 
     fixedGradientFvPatchVectorField::updateCoeffs();
 }
@@ -226,7 +230,7 @@ void solidTractionFreeFvPatchVectorField::evaluate(const Pstream::commsTypes)
     Field<vector>::operator=
     (
         this->patchInternalField()
-      + (k&gradField.patchInternalField())
+      + (k & gradField.patchInternalField())
       + gradient()/this->patch().deltaCoeffs()
     );
 

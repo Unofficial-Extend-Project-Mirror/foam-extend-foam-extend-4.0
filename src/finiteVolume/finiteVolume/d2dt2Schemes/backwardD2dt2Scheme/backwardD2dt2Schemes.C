@@ -22,7 +22,7 @@ License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Description
-    
+
 \*---------------------------------------------------------------------------*/
 
 #include "backwardD2dt2Scheme.H"

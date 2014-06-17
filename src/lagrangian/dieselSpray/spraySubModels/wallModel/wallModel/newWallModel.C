@@ -60,7 +60,7 @@ autoPtr<wallModel> wallModel::New
             << wallModelType
             << ", constructor not in hash table" << endl << endl
             << "    Valid wallModel types are :" << endl;
-        Info<< dictionaryConstructorTablePtr_->toc() << abort(FatalError);
+        Info<< dictionaryConstructorTablePtr_->sortedToc() << abort(FatalError);
     }
 
     return autoPtr<wallModel>(cstrIter()(dict, U, sm));

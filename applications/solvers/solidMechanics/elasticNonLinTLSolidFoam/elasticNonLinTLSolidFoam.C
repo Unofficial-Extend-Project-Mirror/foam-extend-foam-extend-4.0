@@ -44,21 +44,21 @@ Author
 
 int main(int argc, char *argv[])
 {
-# include "setRootCase.H"
-# include "createTime.H"
-# include "createMesh.H"
-# include "createFields.H"
-# include "createSolidInterfaceNonLin.H"
+#   include "setRootCase.H"
+#   include "createTime.H"
+#   include "createMesh.H"
+#   include "createFields.H"
+#   include "createSolidInterfaceNonLin.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-  Info<< "\nStarting time loop\n" << endl;
+    Info<< "\nStarting time loop\n" << endl;
 
-  while(runTime.loop())
+    while(runTime.loop())
     {
-      Info<< "Time: " << runTime.timeName() << nl << endl;
+        Info<< "Time: " << runTime.timeName() << nl << endl;
 
-#     include "readSolidMechanicsControls.H"
+#       include "readSolidMechanicsControls.H"
 
       int iCorr = 0;
       scalar initialResidual = 0;
@@ -70,36 +70,40 @@ int main(int argc, char *argv[])
       {
           U.storePrevIter();
 
-          surfaceTensorField shearGradU =
-              ((I - n*n)&fvc::interpolate(gradU));
+          surfaceTensorField shearGradU
+          (
+              "shearGradU",
+              (I - sqr(n)) & fvc::interpolate(gradU)
+          );
 
           fvVectorMatrix UEqn
+          (
+              fvm::d2dt2(rho, U)
+           ==
+              fvm::laplacian(2*muf + lambdaf, U, "laplacian(DU,U)")
+//             + fvc::div
+//               (
+//                   -(mu + lambda)*gradU
+//                   + mu*gradU.T()
+//                   + mu*(gradU & gradU.T())
+//                   + lambda*tr(gradU)*I
+//                   + 0.5*lambda*tr(gradU & gradU.T())*I
+//                   + (sigma & gradU),
+//                   "div(sigma)"
+//               )
+            + fvc::div
               (
-                  fvm::d2dt2(rho, U)
-                  ==
-                  fvm::laplacian(2*muf + lambdaf, U, "laplacian(DU,U)")
-                  // + fvc::div(
-                  //         -( (mu + lambda) * gradU )
-                  //         + ( mu * gradU.T() )
-                  //         + ( mu * (gradU & gradU.T()) )
-                  //         + ( lambda * tr(gradU) * I )
-                  //         + ( 0.5 * lambda * tr(gradU & gradU.T()) * I )
-                  //         + ( sigma & gradU ),
-                  //         "div(sigma)"
-                  //         )
-                  + fvc::div(
-                      mesh.magSf()
-                      *(
-                          - (muf + lambdaf)*(fvc::snGrad(U)&(I - n*n))
-                          + lambdaf*tr(shearGradU&(I - n*n))*n
-                          + muf*(shearGradU&n)
-                          + muf * (n & fvc::interpolate(gradU & gradU.T()))
-                          + 0.5*lambdaf
-                          *(n * tr(fvc::interpolate(gradU & gradU.T())))
-                          + (n & fvc::interpolate( sigma & gradU ))
-                          )
-                      )
-                  );
+                  mesh.magSf()*
+                  (
+                      - (muf + lambdaf)*(fvc::snGrad(U) & (I - n*n))
+                      + lambdaf*tr(shearGradU & (I - n*n))*n
+                      + muf*(shearGradU & n)
+                      + muf*(n & fvc::interpolate(gradU & gradU.T()))
+                      + 0.5*lambdaf*(n*tr(fvc::interpolate(gradU & gradU.T())))
+                      + (n & fvc::interpolate(sigma & gradU))
+                  )
+              )
+          );
 
           if (solidInterfaceCorr)
           {
@@ -153,9 +157,9 @@ int main(int argc, char *argv[])
           << " s\n\n" << endl;
     }
 
-  Info<< "End\n" << endl;
+    Info<< "End\n" << endl;
 
-  return(0);
+    return(0);
 }
 
 

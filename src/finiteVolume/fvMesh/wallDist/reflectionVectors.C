@@ -49,13 +49,12 @@ Foam::reflectionVectors::reflectionVectors(const Foam::fvMesh& mesh)
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-
 void Foam::reflectionVectors::correct()
 {
     const fvMesh& mesh = n_.mesh();
     const fvPatchList& patches = mesh.boundary();
 
-    forAll(patches, patchi)
+    forAll (patches, patchi)
     {
         // find the nearest face for every cell
         if (patches[patchi].isWall())

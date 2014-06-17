@@ -282,6 +282,36 @@ case SYSTEMOPENMPI:
     unset mpi_version
     breaksw
 
+case MVAPICH2:
+    set mpi_version=mvapich2
+
+    if ($?MVAPICH2_BIN_DIR != 0) then
+        if (-d "${MVAPICH2_BIN_DIR}" ) then
+        _foamAddPath $MVAPICH2_BIN_DIR
+        endif
+    else
+        set mpicc_cmd=`which mpicc`
+        setenv MVAPICH2_BIN_DIR `dirname $mpicc_cmd`
+        unset mpicc_cmd
+    endif
+
+    setenv MPI_HOME `dirname $MVAPICH2_BIN_DIR`
+    setenv MPI_ARCH_PATH $MPI_HOME
+
+    setenv  PINC "`mpicc -show -cc= -nativelinking`"
+    setenv  PLIBS "`mpicc -show -cc= | sed "s%$PINC%%"`"
+
+    if ($?FOAM_VERBOSE && $?prompt) then
+        echo "  Environment variables defined for MVAPICH2:"
+        echo "    MPI_ARCH_PATH         : $MPI_ARCH_PATH"
+        echo "    PINC                  : $PINC"
+        echo "    PLIBS                 : $PLIBS"
+    endif
+
+    setenv FOAM_MPI_LIBBIN $FOAM_LIBBIN/$mpi_version
+    unset mpi_version
+    breaksw
+
 case MPICH:
     set mpi_version=mpich-1.2.4
     setenv MPI_HOME $WM_THIRD_PARTY_DIR/$mpi_version
@@ -456,6 +486,30 @@ if ( $?CMAKE_SYSTEM == 0 && -e "$WM_THIRD_PARTY_DIR"/packages/cmake-2.8.12/platf
     _foamSource $WM_THIRD_PARTY_DIR/packages/cmake-2.8.12/platforms/$WM_OPTIONS/etc/cmake-2.8.12.csh
 endif
 
+# m4
+# ~~~~~
+if ( $?M4_SYSTEM == 0 && -e "$WM_THIRD_PARTY_DIR"/packages/m4-1.4.16/platforms/$WM_OPTIONS ) then
+    _foamSource $WM_THIRD_PARTY_DIR/packages/m4-1.4.16/platforms/$WM_OPTIONS/etc/m4-1.4.16.csh
+endif
+
+# bison
+# ~~~~~
+if ( $?BISON_SYSTEM == 0 && -e "$WM_THIRD_PARTY_DIR"/packages/bison-2.7/platforms/$WM_OPTIONS ) then
+    _foamSource $WM_THIRD_PARTY_DIR/packages/bison-2.7/platforms/$WM_OPTIONS/etc/bison-2.7.csh
+endif
+
+# flex
+# ~~~~~
+if ( $?FLEX_SYSTEM == 0 && -e "$WM_THIRD_PARTY_DIR"/packages/flex-2.5.35/platforms/$WM_OPTIONS ) then
+    _foamSource $WM_THIRD_PARTY_DIR/packages/flex-2.5.35/platforms/$WM_OPTIONS/etc/flex-2.5.35.csh
+endif
+
+# zoltan
+# ~~~~~
+if ( $?ZOLTAN_SYSTEM == 0 && -e "$WM_THIRD_PARTY_DIR"/packages/zoltan-3.5/platforms/$WM_OPTIONS ) then
+    _foamSource $WM_THIRD_PARTY_DIR/packages/zoltan-3.5/platforms/$WM_OPTIONS/etc/zoltan-3.5.csh
+endif
+
 # Python
 # ~~~~~
 if ( $?PYTHON_SYSTEM == 0 && -e "$WM_THIRD_PARTY_DIR"/packages/Python-2.7/platforms/$WM_OPTIONS ) then
@@ -464,8 +518,8 @@ endif
 
 # PyFoam
 # ~~~~~~
-if ( $?PYFOAM_SYSTEM == 0 && -e "$WM_THIRD_PARTY_DIR"/packages/PyFoam-0.6.1/platforms/noarch ) then
-    _foamSource $WM_THIRD_PARTY_DIR/packages/PyFoam-0.6.1/platforms/noarch/etc/PyFoam-0.6.1.csh
+if ( $?PYFOAM_SYSTEM == 0 && -e "$WM_THIRD_PARTY_DIR"/packages/PyFoam-0.6.3/platforms/noarch ) then
+    _foamSource $WM_THIRD_PARTY_DIR/packages/PyFoam-0.6.3/platforms/noarch/etc/PyFoam-0.6.3.csh
 endif
 
 # hwloc

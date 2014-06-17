@@ -30,8 +30,10 @@ License
 #include "emptyPolyPatch.H"
 #include "globalMeshData.H"
 #include "processorPolyPatch.H"
-#include "meshObjectBase.H"
-#include "demandDrivenData.H"
+#include "indexedOctree.H"
+#include "treeDataCell.H"
+#include "MeshObject.H"
+#include "pointMesh.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
@@ -1334,6 +1336,38 @@ void Foam::polyMesh::removeFiles(const fileName& instanceDir) const
 void Foam::polyMesh::removeFiles() const
 {
     removeFiles(instance());
+}
+
+
+Foam::label Foam::polyMesh::findCell
+(
+    const point& location
+) const
+{
+    if (nCells() == 0)
+    {
+        return -1;
+    }
+
+    // Find the nearest cell centre to this location
+    label cellI = findNearestCell(location);
+
+    // If point is in the nearest cell return
+    if (pointInCell(location, cellI))
+    {
+        return cellI;
+    }
+    else // point is not in the nearest cell so search all cells
+    {
+        for (label cellI = 0; cellI < nCells(); cellI++)
+        {
+            if (pointInCell(location, cellI))
+            {
+                return cellI;
+            }
+        }
+        return -1;
+    }
 }
 
 

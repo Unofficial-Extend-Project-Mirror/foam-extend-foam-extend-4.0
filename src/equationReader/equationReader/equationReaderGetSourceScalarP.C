@@ -145,7 +145,7 @@ Foam::scalar Foam::equationReader::getScalarSrcEquation
     if (dependents_.size())
     {
         dependents_.setSize(dependents_.size() - 1);
-    }    
+    }
 
     returnMe *= sign(eqOp.sourceIndex());
     return returnMe;
@@ -173,7 +173,7 @@ Foam::scalar Foam::equationReader::getScalarSrcEquationCircRefDetect
         if (dependents_[i] == zeroSourceIndex)
         {
             // Circular reference detected
-            
+
             string dependencies;
             for (label j(i); j < dependents_.size(); j++)
             {
@@ -229,13 +229,13 @@ Foam::scalar Foam::equationReader::getScalarSrcEquationCircRefDetect
     //      // does nothing
     //  }
     (*this.*reportEmbeddedReturnFunction_)();
-    
+
     //Move one level back up on the dependents_ list
     if (dependents_.size())
     {
         dependents_.setSize(dependents_.size() - 1);
-    }    
-    
+    }
+
     returnMe *= sign(eqOp.sourceIndex());
     return returnMe;
 }
@@ -275,7 +275,7 @@ Foam::scalar Foam::equationReader::getScalarSrcDictSourceDScalar
     label zeroSourceIndex = mag(eqOp.sourceIndex()) - 1;
 
     word varName(dictLookups_[eqOp.dictLookupIndex()]);
-    
+
     ITstream srcStrm
     (
         dictSources_[zeroSourceIndex].lookup(varName)
@@ -299,7 +299,7 @@ Foam::scalar Foam::equationReader::getScalarSrcDictSourceScalar
     label zeroSourceIndex = mag(eqOp.sourceIndex()) - 1;
 
     word varName(dictLookups_[eqOp.dictLookupIndex()]);
-    
+
     scalar returnMe
     (
         readScalar(dictSources_[zeroSourceIndex].lookup(varName))

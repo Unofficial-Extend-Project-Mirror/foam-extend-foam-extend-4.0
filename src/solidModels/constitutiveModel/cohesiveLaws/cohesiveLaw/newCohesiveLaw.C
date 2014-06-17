@@ -61,7 +61,7 @@ autoPtr<cohesiveLaw> cohesiveLaw::New
         )   << "Unknown cohesiveLaw type "
             << cohTypeName << endl << endl
             << "Valid  cohesiveLaws are : " << endl
-            << dictionaryConstructorTablePtr_->toc()
+            << dictionaryConstructorTablePtr_->sortedToc()
             << exit(FatalIOError);
     }
 

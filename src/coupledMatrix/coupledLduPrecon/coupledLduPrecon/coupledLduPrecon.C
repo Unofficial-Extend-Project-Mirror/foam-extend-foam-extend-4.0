@@ -109,7 +109,7 @@ Foam::autoPtr<Foam::coupledLduPrecon> Foam::coupledLduPrecon::New
         )   << "Unknown matrix preconditioner " << preconName
             << endl << endl
             << "Valid matrix preconditioners are :" << endl
-            << dictionaryConstructorTablePtr_->toc()
+            << dictionaryConstructorTablePtr_->sortedToc()
             << exit(FatalIOError);
     }
 

@@ -12,21 +12,20 @@
         mesh
     );
 
-    //     volTensorField gradU = fvc::grad(U);
     volTensorField gradU
     (
         IOobject
         (
-	 "grad(U)",
-	 runTime.timeName(),
-	 mesh,
-	 IOobject::NO_READ,
-	 IOobject::NO_WRITE
-	 ),
+            "grad(U)",
+            runTime.timeName(),
+            mesh,
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        ),
         mesh,
         dimensionedTensor("zero", dimless, tensor::zero)
-     );
-    //surfaceVectorField snGradU = fvc::snGrad(U);
+    );
+
     surfaceVectorField snGradU
     (
         IOobject
@@ -38,7 +37,7 @@
             IOobject::NO_WRITE
         ),
         mesh,
-	dimensionedVector("zero", dimless, vector::zero)
+        dimensionedVector("zero", dimless, vector::zero)
     );
 
     volSymmTensorField epsilon
@@ -115,31 +114,33 @@
     thermalModel thermal(T);
 
     volScalarField C = thermal.C();
-    volScalarField k = thermal.k();
+    volScalarField k
+    (
+        "DT",
+        thermal.k()
+    );
     volScalarField threeKalpha = rheology.threeK()*rho*thermal.alpha();
-    surfaceScalarField threeKalphaf = fvc::interpolate(threeKalpha, "threeKalpha");
+    surfaceScalarField threeKalphaf =
+        fvc::interpolate(threeKalpha, "threeKalpha");
     volScalarField T0 = thermal.T0();
     volScalarField rhoC = rho*C;
 
 
-// for aitken relaxation
-volVectorField aitkenDelta
-   (
+    // for aitken relaxation
+    volVectorField aitkenDelta
+    (
         IOobject
         (
-	 "aitkenDelta",
-	 runTime.timeName(),
-	 mesh,
-	 IOobject::NO_READ,
-	 IOobject::NO_WRITE
-	 ),
+         "aitkenDelta",
+         runTime.timeName(),
+         mesh,
+         IOobject::NO_READ,
+         IOobject::NO_WRITE
+         ),
         mesh,
         dimensionedVector("zero", dimLength, vector::zero)
     );
-// aitken relaxation factor
-scalar aitkenInitialRes = 1.0;
-scalar aitkenTheta = 0.01;
-// if(mesh.relax(U.name()))
-//   {
-//     aitkenTheta = mesh.relaxationFactor(U.name());
-//   }
+
+    // aitken relaxation factor
+    scalar aitkenInitialRes = 1.0;
+    scalar aitkenTheta = 0.01;

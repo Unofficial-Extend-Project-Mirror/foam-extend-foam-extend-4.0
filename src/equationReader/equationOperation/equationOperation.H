@@ -160,7 +160,7 @@ private:
 
     // Source to read the data from
     sourceTypeEnum source_;
-    
+
     // Index in the field where the data is located.  Note, the
     // equationOperation lists created by equationReader make this variable a
     // 1-indexed (i.e. starts from 1, not zero) in order to use its sign to
@@ -168,19 +168,19 @@ private:
     // equationReader will constantly be adding / subtracting 1 to get these
     // to match
     label sourceIndex_;
-    
+
     // Component index - for Types with multiple components
     label componentIndex_;
-    
+
     // Rather than store the keywords that have to be searched in a dictionary,
     // equationReader keeps its own list of keywords, and the dictLookupIndex
     // is the index in this list.  This is only applicable if the sourceType is
     // of type sldictSource
     label dictLookupIndex_;
-    
+
     // The operation to be performed (+ - sin exp min, etc...)
     operationType operation_;
-    
+
     // A pointer to the scalarField source data retrieval function
     mutable const scalarField&
     (Foam::equationReader::*getSourceScalarFieldFunction_)
@@ -252,17 +252,17 @@ private:
 public:
 
     // Static data members
-    
+
         static const char* const typeName;
 
     // Constructors
 
         //- Construct null
         equationOperation();
-        
+
         //- Construct copy
         equationOperation(const equationOperation& eqop);
-        
+
         //- Construct from components
         equationOperation
         (
@@ -335,39 +335,39 @@ public:
     // Member functions
 
         // Access
-        
+
             //- Const access to source
             inline const sourceTypeEnum& sourceType() const;
-            
+
             //- Access to source
             inline sourceTypeEnum& sourceType();
 
             //- Const access to source index
             inline const label& sourceIndex() const;
-            
+
             //- Access to source index
             inline label& sourceIndex();
 
             //- Const access to componentIndex
             inline const label& componentIndex() const;
-            
+
             //- Access to componentIndex
             inline label& componentIndex();
 
             //- Const access to dictionary lookup name index
             inline const label& dictLookupIndex() const;
-            
+
             //- Access to dictionary lookup name index
             inline label& dictLookupIndex();
 
             //- Const access to operation
             inline const operationType& operation() const;
-            
+
             //- Access to operation
             inline operationType& operation();
 
         // Function pointers
-            
+
             //- Assign the source scalarField function
             void assignSourceScalarFieldFunction
             (
@@ -519,7 +519,7 @@ public:
             ) const;
 
         // Convenience
-                    
+
             //- Look up operation number, given a word
             static operationType findOp(const word& opName);
 
@@ -533,12 +533,12 @@ public:
 
         void operator=(equationOperation&);
 
-    
+
     // Friend IOstream Operators
 
         friend Istream& operator>>(Istream&, equationOperation&);
         friend Ostream& operator<<(Ostream&, const equationOperation&);
-      
+
 };
 
 

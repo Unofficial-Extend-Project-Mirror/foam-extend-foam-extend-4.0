@@ -8,8 +8,5 @@ cleanCase
 rm -f 0/cellToRegion
 rm -rf constant/polyMesh/boundary
 
-if [ -d "VTK" ]
-then
-    rm -r VTK
-fi
+rm -rf VTK
 

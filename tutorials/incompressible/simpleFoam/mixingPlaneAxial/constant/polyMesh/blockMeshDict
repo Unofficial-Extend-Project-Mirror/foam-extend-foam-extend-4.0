@@ -1,7 +1,7 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | foam-extend: Open Source CFD                    |
-|  \\    /   O peration     | Version:     3.0                                |
+|  \\    /   O peration     | Version:     3.1                                |
 |   \\  /    A nd           | Web:         http://www.extend-project.de       |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
@@ -12,6 +12,23 @@ FoamFile
     class       dictionary;
     object      blockMeshDict;
 }
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+//process this file using: m4 -P blockMeshDict.m4 > blockMeshDict
+
+//m4 definitions -----------------------------
+
+//Geometry -----------------------------------
+// 2 planes levels
+
+// Angle span for inner block
+
+// Angle span for outer block
+
+// Radial dimensions
+
+// Mesh parameters
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 convertToMeters 1;
@@ -71,58 +88,160 @@ edges
     arc  13 15  (2.76151456035732 1.17219338546782 0.1)
 );
 
-patches
+boundary
 (
-    patch outflow
-    (
-        ( 9 11 15 13 )
-    )
-    patch inflow
-    (
-        ( 0 4 6 2 )
-    )
+    outflow
+    {
+        type patch;
+        faces
+        (
+            (9 11 15 13)
+        );
+    }
 
-    cyclicGgi upstreamPerio1
-    (
-        (8 9 13 12)
-    )
+    inflow
+    {
+        type patch;
+        faces
+        (
+            (0 4 6 2)
+        );
+    }
 
-    cyclicGgi upstreamPerio2
-    (
-        (10 14 15 11)
-    )
+    upstreamPerio1
+    {
+        type cyclicGgi;
 
-    mixingPlane upstreamMixingPlanePatch
-    (
-        ( 8 12 14 10 )
-    )
+        shadowPatch upstreamPerio2;
+        zone upstreamPerio1Zone;
+        bridgeOverlap false;
+        rotationAxis (0 0 1);
+        rotationAngle 36;
+        separationOffset (0 0 0);
 
-    mixingPlane downstreamMixingPlanePatch
-    (
-        ( 1 3 7 5 )
-    )
+        faces
+        (
+            (8 9 13 12)
+        );
+    }
 
-    symmetryPlane downstreamWall
-    (
-        ( 0 2 3 1 )
-        ( 4 5 7 6 )
-    )
+    upstreamPerio2
+    {
+        type cyclicGgi;
 
-    symmetryPlane upstreamWall
-    (
-        ( 13 15 14 12)
-        (8 10 11 9)
-    )
+        shadowPatch upstreamPerio1;
+        zone upstreamPerio2Zone;
+        bridgeOverlap false;
+        rotationAxis (0 0 1);
+        rotationAngle -36;
+        separationOffset (0 0 0);
 
-    cyclicGgi downstreamPerio1
-    (
-        (0 1 5 4)
-    )
+        faces
+        (
+            (10 14 15 11)
+        );
+    }
 
-    cyclicGgi downstreamPerio2
-    (
-        (2 6 7 3)
-    )
+    upstreamMixingPlanePatch
+    {
+        type mixingPlane;
+
+        shadowPatch downstreamMixingPlanePatch;
+        zone upstreamMixingPlaneZone;
+        ribbonPatch
+        {
+            discretisation  bothPatches;
+            sweepAxis       Theta;
+            stackAxis       Z;
+        }
+
+        coordinateSystem
+        {
+            type cylindrical;
+            origin (0 0 0);
+            axis (0 0 1);
+            direction (1 1 0);
+        }
+
+        faces
+        (
+            (8 12 14 10)
+        );
+    }
+
+    downstreamMixingPlanePatch
+    {
+        type mixingPlane;
+
+        shadowPatch upstreamMixingPlanePatch;
+        zone downstreamMixingPlaneZone;
+        coordinateSystem
+        {
+            type cylindrical;
+            origin (0 0 0);
+            axis (0 0 1);
+            direction (1 1 0);
+        }
+
+        faces
+        (
+            (1 3 7 5)
+        );
+    }
+
+    downstreamWall
+    {
+        type symmetryPlane;
+        faces
+        (
+            (0 2 3 1)
+            (4 5 7 6)
+        );
+    }
+
+    upstreamWall
+    {
+        type symmetryPlane;
+        faces
+        (
+            (13 15 14 12)
+            (8 10 11 9)
+        );
+    }
+
+    downstreamPerio1
+    {
+        type cyclicGgi;
+
+        shadowPatch downstreamPerio2;
+        zone downstreamPerio1Zone;
+        bridgeOverlap false;
+        rotationAxis (0 0 1);
+        rotationAngle 90;
+        separationOffset (0 0 0);
+
+        faces
+        (
+            (0 1 5 4)
+        );
+    }
+
+    downstreamPerio2
+    {
+        type cyclicGgi;
+
+        shadowPatch downstreamPerio1;
+        zone downstreamPerio2Zone;
+        bridgeOverlap false;
+        rotationAxis (0 0 1);
+        rotationAngle -90;
+        separationOffset (0 0 0);
+
+        faces
+        (
+            (2 6 7 3)
+        );
+    }
 
 );
 

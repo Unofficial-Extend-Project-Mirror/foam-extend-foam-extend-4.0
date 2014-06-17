@@ -28,10 +28,10 @@ Description
     The master class for reading equations from a dictionary file.  This class
     holds all the equations, all the data sources, and gives access to all the
     equation parsing / evaluating functions.
-    
+
     Has in-depth debug logging to help find problems with equations.  Debug
     switches:
-    
+
     @verbatim
         0 - None
         1 - Report scalar evaluations (per equation)
@@ -41,7 +41,7 @@ Description
         5 - Combine 1 and 3 above
         6 - Combine 2 and 4 above
     @endverbatim
-    
+
     Additional index checking implemented in FULLDEBUG mode.
 
 SourceFiles
@@ -51,7 +51,7 @@ SourceFiles
 
     Inline functions
         equationReaderI.H
-    
+
     Standard functions
         equationReader.C
         equationReaderAssignFunctionPointers.C
@@ -61,7 +61,7 @@ SourceFiles
 
     Templates included with norepository
         equationReaderTemplates.C
-        
+
     Template specialization
         equationReaders.C
 
@@ -125,10 +125,10 @@ class equationReader
 //:public PtrList<equation>
 {
     // Private data
-    
+
         //- Equations
         mutable PtrList<equation> eqns_;
-    
+
         //- Dependency backtrace, used for circular-reference detection
         mutable labelList dependents_;
 
@@ -145,20 +145,20 @@ class equationReader
 
         // Sources - these are locations where variables appearing in the
         // equations can be retrieved
-        
+
             //- Internal scalars for storing constants read from equations.
             mutable PtrList<scalar> internalScalars_;
-            
+
             //- Variables that can be looked up in a dictionary
             UPtrList<const dictionary> dictSources_;
-            
+
             //- Words to be looked up in a dictionary (equation operation only
             //  gives indices; this is necessary if the source is a dictionary)
             mutable PtrList<word> dictLookups_;
 
             //- Active equation variable sources
             mutable UPtrList<const equationVariable> activeSources_;
-            
+
             //- List of active equation variable names
             mutable wordList activeSourceNames_;
 
@@ -167,10 +167,10 @@ class equationReader
 
             //- External vector sources
             equationSource<vector> vectorSources_;
-            
+
             //- External tensor sources
             equationSource<tensor> tensorSources_;
-            
+
             //- External diagTensor sources
             equationSource<diagTensor> diagTensorSources_;
 
@@ -182,17 +182,17 @@ class equationReader
 
             //- Current geoIndex of source fields
             mutable label geoIndex_;
-            
+
             //- Current cellIndex of source fields
             mutable label cellIndex_;
-            
+
             //- Temporary storage during evaluation
             //mutable fieldSize_;
             mutable scalarField tempSrcField_;
             mutable PtrList<scalarField> storageScalarFields_;
             mutable scalarList storageScalars_;
             mutable PtrList<dimensionSet> storageDims_;
-            
+
     // Private Member Functions
 
         //- Disallow default bitwise copy construct
@@ -208,7 +208,7 @@ class equationReader
             const label& equationIndex,
             label storageOffset
         ) const;
-        
+
         //- Internal scalar evaluation function
         //  *** Located in equationReaderEvaluate.C ***
         scalar internalEvaluateScalar
@@ -235,14 +235,14 @@ class equationReader
             const word& outputName
         ) const;
 
-    
+
         // Main parser functions
 
             //- Parse an equation
             //  *** Located in equationReaderParse.C ***
             void parse(label index) const;
 
-            // Parses a segment of an equation, used after parenthesis 
+            // Parses a segment of an equation, used after parenthesis
             // precedence is determined.  Returns the map index that holds the
             // source info for the result
             //  *** Located in equationReaderParse.C ***
@@ -258,7 +258,7 @@ class equationReader
 
 
         // General parser support functions
-            
+
             //- Creates a new equation but does not parse it.  If equation
             //  exists, throws an error.  Returns equationIndex.
             label createEquation
@@ -327,7 +327,7 @@ class equationReader
 
             //- Returns a labelList with the indices of the maximum parenthesis
             //  level.  If more than one grouping exists, returns the first
-            //  one.        
+            //  one.
             labelList findMaxParenthesis
             (
                 const labelList& parenthesisList,
@@ -349,7 +349,7 @@ class equationReader
             //- Finds the maximum field size that can be returned from an
             //  equation, based on its sources, indexed by geoIndex
             void findMaxFieldSize(const label equationIndex) const;
-            
+
             //- Sets the first dimensionedScalar equal to the second one
             //  without tripping dimension checking errors
             void dsEqual
@@ -462,7 +462,7 @@ class equationReader
 
             //- Set size of equation list (private)
             void setSize(const label newSize) const;
-            
+
             //- Set the an element of the equation list (private)
             void set(const label index, equation * eqn) const;
 
@@ -470,7 +470,7 @@ class equationReader
 public:
 
     // Static data members
-    
+
     TypeName("equationReader");
 
 
@@ -483,21 +483,21 @@ public:
     // Member functions
 
         // Access
-        
+
             //- Version number
             word version() const;
-            
+
             //- Equation list
             inline const PtrList<equation>& eqns() const;
 
             //- Internal scalars
             //  *** Located in equationReaderI.H ***
             inline const PtrList<scalar>& internalScalars() const;
-            
+
             //- Dictionary sources
             //  *** Located in equationReaderI.H ***
             inline const UPtrList<const dictionary>& dictSources() const;
-            
+
             //- Dictionary lookup words
             //  *** Located in equationReaderI.H ***
             inline const PtrList<word>& dictLookups() const;
@@ -520,12 +520,12 @@ public:
             //  *** Located in equationReaderI.H ***
             inline const equationSource<vector>& vectorSources() const;
             inline equationSource<vector>& vectorSources();
-            
+
             //- Access tensor sources
             //  *** Located in equationReaderI.H ***
             inline const equationSource<tensor>& tensorSources() const;
             inline equationSource<tensor>& tensorSources();
-            
+
             //- Access diagTensor sources
             //  *** Located in equationReaderI.H ***
             inline const equationSource<diagTensor>& diagTensorSources() const;
@@ -562,15 +562,15 @@ public:
 
             //- Returns true if equationName exists in equation list
             bool found(const word& equationName);
-            
+
             //- Returns the index of a given equationName, -1 if not found
             label lookup(const word& equationName) const;
-            
+
         // Adding data sources
 
             //- Add a dictionary
             void addSource(const dictionary& dict);
-            
+
             //- Add an active variable
             void addSource(const equationVariable& aVar);
 
@@ -599,15 +599,15 @@ public:
 
             //- Force an equation to re-parse
             void clearEquation(const label equationIndex) const;
-            
+
             //- Delete an equation, given a name
             void deleteEquation(const word& equationName);
-            
+
             //- Delete an equation, given an index number
             void deleteEquation(const label& index);
-      
+
         // Evaluate equations
-        
+
             //- Return a scalar, given the equation name
             //  *** Located in equationReaderEvaluate.C ***
             scalar evaluateScalar
@@ -629,7 +629,7 @@ public:
             //- Return the resulting dimensions, given an equation name
             //  *** Located in equationReaderEvaluate.C ***
             dimensionSet evaluateDimensions(const word& equationName) const;
-            
+
             //- Return the resulting dimensions, given an equation index
             //  *** Located in equationReaderEvaluate.C ***
             dimensionSet evaluateDimensions(const label equationIndex) const;
@@ -808,7 +808,7 @@ public:
 
             //- Index operator
             const equation& operator[](const label equationIndex) const;
-            
+
             //- Index operator
             equation& operator[](const label equationIndex);
 

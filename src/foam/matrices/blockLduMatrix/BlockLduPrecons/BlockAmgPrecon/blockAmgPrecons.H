@@ -40,7 +40,7 @@ SourceFiles
 
 // KRJ: No specializations implemented
 //#include "scalarBlockAmgPrecon.H"
-//#include "tensorBlockAmgPrecon.H"
+#include "tensorBlockAmgPrecon.H"
 
 #include "BlockAmgPrecon.H"
 

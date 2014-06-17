@@ -31,16 +31,16 @@ template<class Stream>
 inline Stream& Foam::IOobject::writeBanner(Stream& os, bool noHint)
 {
     static bool spacesSet = false;
-    static char spaces[40];
+    static char spaces[37];
 
     if (!spacesSet)
     {
-        memset(spaces, ' ', 40);
+        memset(spaces, ' ', 37);
 
         size_t len = strlen(Foam::FOAMversion);
-        if (len < 38)
+        if (len < 35)
         {
-            spaces[38 - len] = '\0';
+            spaces[35 - len] = '\0';
         }
         else
         {
@@ -63,7 +63,7 @@ inline Stream& Foam::IOobject::writeBanner(Stream& os, bool noHint)
     os  <<
         "| =========                 |                                                 |\n"
         "| \\\\      /  F ield         | foam-extend: Open Source CFD                    |\n"
-        "|  \\\\    /   O peration     | Version:  " << FOAMversion << spaces << "|\n"
+        "|  \\\\    /   O peration     | Version:     " << FOAMversion << spaces << "|\n"
         "|   \\\\  /    A nd           | Web:         http://www.extend-project.de       |\n"
         "|    \\\\/     M anipulation  |                                                 |\n"
         "\\*---------------------------------------------------------------------------*/\n";

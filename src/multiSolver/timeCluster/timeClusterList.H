@@ -59,7 +59,7 @@ public:
         static const char* const typeName;
 
     // Constructors
-    
+
         //- Null constructor
         timeClusterList();
 
@@ -71,7 +71,7 @@ public:
 
         //- Construct with given size and value for all elements.
         timeClusterList(const label, const timeCluster&);
-        
+
         //- Construct as a sublist of another timeClusterList. This is not
         //  like the SubList in that this is not a new class, rather it is only
         //  producing a new copy that contains the specified entries.
@@ -81,7 +81,7 @@ public:
         timeClusterList(Istream&);
 
     // Member functions
-    
+
         //- Sort by global time
         void globalSort();
 
@@ -90,7 +90,7 @@ public:
 
         //- Append a timeCluster on the end of this list
         void append(const timeCluster& tcIn);
-        
+
         //- Remove timeClusters with empty instantLists return false if all are
         //  empty
         bool purgeEmpties();

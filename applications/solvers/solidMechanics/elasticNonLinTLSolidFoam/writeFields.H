@@ -28,10 +28,10 @@ if (runTime.outputTime())
 	),
        sqrt((3.0/2.0)*magSqr(dev(sigma)))
        );
-    
+
     Info<< "Max sigmaEq = " << max(sigmaEq).value()
 	<< endl;
-    
+
     //- Calculate Cauchy stress
     volTensorField F = I + gradU;
     volScalarField J = det(F);
@@ -65,7 +65,7 @@ if (runTime.outputTime())
 	),
        sqrt((3.0/2.0)*magSqr(dev(sigmaCauchy)))
        );
-    
+
     Info<< "Max sigmaCauchyEq = " << max(sigmaCauchyEq).value()
 	<< endl;
 
@@ -105,7 +105,7 @@ if (runTime.outputTime())
 // 	traction.boundaryField()[patchi] =
 // 	  nCurrent & sigmaCauchy.boundaryField()[patchi];
 //       }
-    
+
 //     //- write boundary forces
 //     //- integrate (sigma2PK & F) over reference area
 //     //- which is equivalent to integrating sigmaCauchy
@@ -117,12 +117,12 @@ if (runTime.outputTime())
 // 	const tensorField& Fb = F.boundaryField()[patchi];
 // 	vectorField totalForce = mesh.Sf().boundaryField()[patchi] & (sigma.boundaryField()[patchi] & Fb);
 // 	//vectorField totalForce2 = Sf.boundaryField()[patchi] & (sigmaCauchy.boundaryField()[patchi]);
-	
+
 // 	vector force = sum( totalForce );
 // 	//vector force2 = sum( totalForce2 );
 // 	Info << "\ttotal force is " << force << " N" << endl;
 // 	//Info << "\ttotal force2 is " << force2 << " N" << endl;
-	
+
 // 	const tensorField& Fbinv = Finv.boundaryField()[patchi];
 // 	vectorField nCurrent = Fbinv & n.boundaryField()[patchi];
 // 	nCurrent /= mag(nCurrent);

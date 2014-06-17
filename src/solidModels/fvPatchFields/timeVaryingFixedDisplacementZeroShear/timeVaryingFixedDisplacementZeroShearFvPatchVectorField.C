@@ -133,32 +133,32 @@ timeVaryingFixedDisplacementZeroShearFvPatchVectorField
             << "non-orthogonal correction to be right" << endl;
     }
 
-  this->refGrad() = vector::zero;
+    this->refGrad() = vector::zero;
 
-  vectorField n = patch().nf();
-  this->valueFraction() = sqr(n);
+    vectorField n = patch().nf();
+    this->valueFraction() = sqr(n);
 
-  if (dict.found("value"))
+    if (dict.found("value"))
     {
-      Field<vector>::operator=(vectorField("value", dict, p.size()));
+        Field<vector>::operator=(vectorField("value", dict, p.size()));
     }
-  else
+    else
     {
         FatalError
             << "value entry not found for patch " << patch().name() << endl;
     }
-  //this->refValue() = *this;
-  this->refValue() = timeSeries_(this->db().time().timeOutputValue());
 
-  Field<vector> normalValue = transform(valueFraction(), refValue());
+    this->refValue() = timeSeries_(this->db().time().timeOutputValue());
 
-  Field<vector> gradValue =
-    this->patchInternalField() + refGrad()/this->patch().deltaCoeffs();
+    Field<vector> normalValue = transform(valueFraction(), refValue());
 
-  Field<vector> transformGradValue =
-    transform(I - valueFraction(), gradValue);
+    Field<vector> gradValue =
+        this->patchInternalField() + refGrad()/this->patch().deltaCoeffs();
 
-  Field<vector>::operator=(normalValue + transformGradValue);
+    Field<vector> transformGradValue =
+        transform(I - valueFraction(), gradValue);
+
+    Field<vector>::operator=(normalValue + transformGradValue);
 }
 
 
@@ -209,16 +209,17 @@ void timeVaryingFixedDisplacementZeroShearFvPatchVectorField::updateCoeffs()
 
     // set refValue
     vectorField disp
-        (
-            patch().size(),
-            timeSeries_(this->db().time().timeOutputValue())
-            );
+    (
+        patch().size(),
+        timeSeries_(this->db().time().timeOutputValue())
+    );
+
     if (fieldName_ == "DU")
-      {
+    {
           const fvPatchField<vector>& U =
               patch().lookupPatchField<volVectorField, vector>("U");
           disp -= U;
-      }
+    }
     else if (fieldName_ != "U")
     {
         FatalError
@@ -227,21 +228,24 @@ void timeVaryingFixedDisplacementZeroShearFvPatchVectorField::updateCoeffs()
     }
     this->refValue() = disp;
 
-
     // set value fraction to fix reference patch normal
     // only done at initialisation above
     //vectorField n = patch().nf();
     //this->valueFraction() = sqr(n);
 
-    refGrad() = tractionBoundaryGradient()
-      (
-       vectorField(patch().size(), vector::zero),
-       scalarField(patch().size(), 0.0),
-       word(fieldName_),
-       patch(),
-       orthotropic_,
-       nonLinearGeometry::nonLinearNames_[nonLinear_]
-       )();
+    bool incremental(fieldName_ == "DU");
+
+    refGrad() = tractionBoundaryGradient::snGrad
+    (
+        vectorField(patch().size(), vector::zero),
+        scalarField(patch().size(), 0),
+        fieldName_,
+        "U",
+        patch(),
+        orthotropic_,
+        nonLinear_,
+        incremental
+    );
 
     directionMixedFvPatchVectorField::updateCoeffs();
 }

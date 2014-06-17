@@ -30,7 +30,7 @@ if (runTime.outputTime())
 	),
        sqrt((3.0/2.0)*magSqr(dev(sigma)))
        );
-    
+
     Info<< "Max sigmaEq = " << max(sigmaEq).value()
 	<< endl;
 
@@ -53,7 +53,7 @@ if (runTime.outputTime())
 // 	  n.boundaryField()[patchi] & sigma.boundaryField()[patchi];
 //       }
 
-//     //- patch forces    
+//     //- patch forces
 //     forAll(mesh.boundary(), patchi)
 //       {
 //         Info << "Patch " << mesh.boundary()[patchi].name() << endl;

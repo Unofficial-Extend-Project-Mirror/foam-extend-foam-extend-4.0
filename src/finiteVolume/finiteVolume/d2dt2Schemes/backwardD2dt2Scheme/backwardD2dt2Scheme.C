@@ -60,7 +60,7 @@ scalar backwardD2dt2Scheme<Type>::deltaT0_(GeometricField<Type, fvPatchField, vo
     // Bug fix, Zeljko Tukovic: solver with outer iterations over a time-step
     // HJ, 12/Feb/2010
 //     if (vf.oldTime().timeIndex() == vf.oldTime().oldTime().timeIndex())
-    if 
+    if
     (
         vf.oldTime().oldTime().timeIndex()
      == vf.oldTime().oldTime().oldTime().timeIndex()

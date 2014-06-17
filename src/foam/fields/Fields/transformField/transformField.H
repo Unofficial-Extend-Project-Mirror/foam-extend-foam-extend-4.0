@@ -117,13 +117,13 @@ tmp<Field<symmTensor4thOrder> > transformFieldMask<symmTensor4thOrder>
 (
     const tmp<tensorField>&
  );
- 
+
 template<>
 tmp<Field<symmTensor4thOrder> > transformFieldMask<symmTensor4thOrder>
 (
      const symmTensorField&
  );
- 
+
  template<>
  tmp<Field<symmTensor4thOrder> > transformFieldMask<symmTensor4thOrder>
  (
@@ -141,7 +141,7 @@ tmp<Field<diagTensor> > transformFieldMask<diagTensor>
 (
     const tmp<tensorField>&
  );
- 
+
 template<>
 tmp<Field<diagTensor> > transformFieldMask<diagTensor>
 (

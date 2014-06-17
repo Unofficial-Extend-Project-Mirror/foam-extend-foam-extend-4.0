@@ -170,7 +170,7 @@ void tractionDisplacementFvPatchVectorField::updateCoeffs()
 
     vectorField n = patch().nf();
 
-    const fvPatchField<tensor>& gradU =
+    const fvPatchTensorField& gradU =
         patch().lookupPatchField<volTensorField, tensor>("grad(U)");
 
     gradient() =
@@ -188,7 +188,7 @@ void tractionDisplacementFvPatchVectorField::updateCoeffs()
         dimensionedScalar alpha(thermalProperties.lookup("alpha"));
         dimensionedScalar threeKalpha = threeK*alpha;
 
-        const fvPatchField<scalar>& T =
+        const fvPatchScalarField& T =
             patch().lookupPatchField<volScalarField, scalar>("T");
 
         gradient() += n*threeKalpha.value()*T/(2.0*mu + lambda).value();

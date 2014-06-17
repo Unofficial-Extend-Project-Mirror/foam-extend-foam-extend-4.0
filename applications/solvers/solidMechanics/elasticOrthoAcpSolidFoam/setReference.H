@@ -4,10 +4,10 @@
     {
         if (needRef[regI])
         {
-            UEqn.source()[refCells[regI]] += 
+            UEqn.source()[refCells[regI]] +=
                 UEqn.diag()[refCells[regI]]*vector::zero;
 
-            UEqn.diag()[refCells[regI]] += 
+            UEqn.diag()[refCells[regI]] +=
                 UEqn.diag()[refCells[regI]];
         }
     }

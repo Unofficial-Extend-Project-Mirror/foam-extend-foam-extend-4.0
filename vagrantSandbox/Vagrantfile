@@ -4,14 +4,65 @@
 Vagrant.configure("2") do |config|
   config.vm.synced_folder "..", "/FOAM-sources"
 
+  config.vm.hostname="vagrant."+ (ENV["HOSTNAME"] || `hostname`.strip)
+
+  nrCPU=1
+  if ENV["WM_VAGRANT_CPUS"]
+    nrCPU=ENV["WM_VAGRANT_CPUS"].to_i
+  else
+    if ENV["WM_NCOMPPROCS"]
+      nrCPU=ENV["WM_NCOMPPROCS"].to_i/2
+    end
+  end
+  if nrCPU<1
+    nrCPU=1
+  end
+
   config.vm.provider :virtualbox do |vb|
     #   # Don't boot with headless mode
     #   vb.gui = true
     #
     #   # Use VBoxManage to customize the VM. For example to change memory:
-    vb.customize ["modifyvm", :id, "--memory", "1024"]
+    #     vb.customize ["modifyvm", :id, "--memory", "1024"]
+    vb.cpus=nrCPU
+    # make sure each CPU has enough memory (at least .5 Gig per CPU. 2.5 Gig Minimum to run the testHarness)
+    vb.memory=512*[(1+nrCPU),5].max
   end
 
+  config.vm.define :trusty do |trusty|
+    trusty.vm.box = "ubuntu/trusty64"
+    trusty.vm.box_check_update = true
+    trusty.vm.provision :shell do |s|
+      s.args   = "trusty"
+      s.path   = "initUbunutuScript.sh"
+    end
+    trusty.vm.hostname="trusty."+config.vm.hostname
+  end
+
+  # default
+  config.vm.define :precise do |precise|
+    precise.vm.box = "hashicorp/precise64"
+    precise.vm.box_check_update = true
+    #    precise.vm.box_url = "http://files.vagrantup.com/precise64.box"
+    precise.vm.provision :shell do |s|
+      s.args   = "precise"
+      s.path   = "initUbunutuScript.sh"
+    end
+    precise.vm.hostname="precise."+config.vm.hostname
+  end
+
+  config.vm.define :centos65 do |centos65|
+    centos65.vm.box = "chef/centos-6.5"
+    centos65.vm.box_check_update = true
+    #    centos65.vm.box_url = "https://github.com/2creatives/vagrant-centos/releases/download/v6.5.1/centos65-x86_64-20131205.box"
+    centos65.vm.provision :shell do |s|
+      s.args   = "centos65"
+      s.path   = "initCentOSRHELScript.sh"
+    end
+    centos65.vm.hostname="centos65."+config.vm.hostname
+  end
+
+  # legacy
   config.vm.define :lucid do |lucid|
     lucid.vm.box = "lucid64"
     lucid.vm.box_url = "http://files.vagrantup.com/lucid64.box"
@@ -19,8 +70,10 @@ Vagrant.configure("2") do |config|
       s.args   = "lucid"
       s.path   = "initUbunutuScript.sh"
     end
+    lucid.vm.hostname="lucid."+config.vm.hostname
   end
 
+  #legacy
   config.vm.define :maverick do |maverick|
     maverick.vm.box = "maverick64"
     maverick.vm.box_url = "http://mathie-vagrant-boxes.s3.amazonaws.com/maverick64.box"
@@ -28,15 +81,66 @@ Vagrant.configure("2") do |config|
       s.args   = "lucid"
       s.path   = "initUbunutuScript.sh"
     end
+    maverick.vm.hostname="maverick."+config.vm.hostname
   end
 
-  config.vm.define :precise do |precise|
-    precise.vm.box = "precise64"
-    precise.vm.box_url = "http://files.vagrantup.com/precise64.box"
-    precise.vm.provision :shell do |s|
-      s.args   = "precise"
-      s.path   = "initUbunutuScript.sh"
+  # experimental
+  config.vm.define :freebsd92 do |freebsd92|
+    freebsd92.vm.box = "chef/freebsd-9.2"
+    freebsd92.vm.box_check_update = true
+#     freebsd92.vm.box_url = "https://wunki.org/files/freebsd-9.2-amd64-wunki.box"
+#    freebsd92.vm.box_url = "http://iris.hosting.lv/freebsd-9.2-i386.box"
+    freebsd92.vm.provision :shell do |s|
+      s.args   = "freebsd92"
+      s.path   = "initFreeBSDScript.sh"
     end
+    freebsd92.vm.synced_folder "..", "/FOAM-sources", type: "rsync", rsync__exclude: "vagrantSandbox/"
+    freebsd92.vm.synced_folder ".", "/vagrant", type: "rsync", rsync__exclude: "ccache4vm/"
+    freebsd92.vm.hostname="freebsd92."+config.vm.hostname
+  end
+
+  # legacy/experimental
+  config.vm.define :freebsd10 do |freebsd10|
+    freebsd10.vm.box = "freebsd10"
+#     freebsd10.vm.box_url = "https://wunki.org/files/freebsd-10.0-amd64-wunki.box"
+    freebsd10.vm.box_url = "http://iris.hosting.lv/freebsd-10.0-i386.box"
+    freebsd10.vm.provision :shell do |s|
+      s.args   = "freebsd10"
+      s.path   = "initFreeBSDScript.sh"
+    end
+    freebsd10.vm.network :private_network, ip: "10.0.0.2"
+
+    # configure the NICs
+    freebsd10.vm.provider :virtualbox do |vb|
+      vb.customize ["modifyvm", :id, "--nictype1", "virtio"]
+      vb.customize ["modifyvm", :id, "--nictype2", "virtio"]
+    end
+
+    # use NFS for the synced folder
+    freebsd10.vm.synced_folder "..", "/FOAM-sources", :nfs => true
+
+    freebsd10.vm.hostname="freebsd10."+config.vm.hostname
+  end
+
+  # legacy
+  config.vm.define :opensuse12 do |opensuse12|
+    opensuse12.vm.box = "opensuse12"
+    opensuse12.vm.box_url = "http://sourceforge.net/projects/opensusevagrant/files/12.3/opensuse-12.3-64.box/download"
+    opensuse12.vm.provision :shell do |s|
+      s.args   = "opensuse12"
+      s.path   = "initOpenSUSEScript.sh"
+    end
+    opensuse12.vm.hostname="opensuse12."+config.vm.hostname
+  end
+
+  config.vm.define :opensuse13 do |opensuse13|
+    opensuse13.vm.box = "berendt/opensuse-13.1-x86_64"
+    opensuse13.vm.box_check_update = true
+    opensuse13.vm.provision :shell do |s|
+      s.args   = "opensuse13"
+      s.path   = "initOpenSUSEScript.sh"
+    end
+    opensuse13.vm.hostname="opensuse13."+config.vm.hostname
   end
 
 end

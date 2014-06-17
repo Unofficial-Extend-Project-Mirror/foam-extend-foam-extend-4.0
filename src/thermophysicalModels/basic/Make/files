@@ -24,4 +24,7 @@ derivedFvPatchFields/mixedInternalEnergy/mixedInternalEnergyFvPatchScalarField.C
 
 derivedFvPatchFields/wallHeatTransfer/wallHeatTransferFvPatchScalarField.C
 
+derivedFvPatchFields/temperatureDirectedInletOutletVelocity/temperatureDirectedInletOutletVelocityFvPatchVectorField.C
+derivedFvPatchFields/isentropicTotalTemperature/isentropicTotalTemperatureFvPatchScalarField.C
+
 LIB = $(FOAM_LIBBIN)/libbasicThermophysicalModels

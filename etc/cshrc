@@ -32,7 +32,7 @@
 
 setenv WM_PROJECT foam
 setenv WM_FORK extend
-setenv WM_PROJECT_VERSION 3.0
+setenv WM_PROJECT_VERSION 3.1
 
 # helps to easily write #ifdefs to detect a foam-extend version
 setenv FOAM_DEV 1
@@ -128,7 +128,7 @@ if ( ! $?WM_COMPILE_OPTION ) setenv WM_COMPILE_OPTION Opt
 #setenv WM_COMPILE_OPTION Opt
 #setenv WM_COMPILE_OPTION Debug
 
-# WM_MPLIB = SYSTEMOPENMPI | OPENMPI | MPICH | MPICH-GM | HPMPI | GAMMA | MPI | QSMPI
+# WM_MPLIB = SYSTEMOPENMPI | OPENMPI | MPICH | MPICH-GM | HPMPI | GAMMA | MPI | QSMPI | MVAPICH2
 if ( ! $?WM_MPLIB ) setenv WM_MPLIB OPENMPI
 
 # WM_NCOMPPROCS = <number of processes to use>

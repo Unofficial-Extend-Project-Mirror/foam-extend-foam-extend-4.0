@@ -27,7 +27,7 @@ Class
 Description
     helper class to sum up external radiation sources
 
-      
+
 SourceFiles
     ersPointSource.C
 

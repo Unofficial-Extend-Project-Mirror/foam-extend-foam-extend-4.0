@@ -27,17 +27,13 @@ License
 #include "Istream.H"
 #include "Ostream.H"
 #include "INew.H"
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-namespace Foam
-{
+#include "dictionary.H"
 
 // * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * * //
 
 template<class T, class Key, class Hash>
 template<class INew>
-void HashPtrTable<T, Key, Hash>::read(Istream& is, const INew& inewt)
+void Foam::HashPtrTable<T, Key, Hash>::read(Istream& is, const INew& inewt)
 {
     is.fatalCheck("HashPtrTable<T, Key, Hash>::read(Istream&, const INew&)");
 
@@ -54,7 +50,7 @@ void HashPtrTable<T, Key, Hash>::read(Istream& is, const INew& inewt)
         label s = firstToken.labelToken();
 
         // Read beginning of contents
-        char listDelimiter = is.readBeginList("HashPtrTable<T, Key, Hash>");
+        char delimiter = is.readBeginList("HashPtrTable<T, Key, Hash>");
 
         if (s)
         {
@@ -63,7 +59,7 @@ void HashPtrTable<T, Key, Hash>::read(Istream& is, const INew& inewt)
                 this->resize(2*s);
             }
 
-            if (listDelimiter == token::BEGIN_LIST)
+            if (delimiter == token::BEGIN_LIST)
             {
                 for (label i=0; i<s; i++)
                 {
@@ -142,27 +138,71 @@ void HashPtrTable<T, Key, Hash>::read(Istream& is, const INew& inewt)
 }
 
 
-// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
-
 template<class T, class Key, class Hash>
 template<class INew>
-HashPtrTable<T, Key, Hash>::HashPtrTable(Istream& is, const INew& inewt)
+void Foam::HashPtrTable<T, Key, Hash>::read
+(
+    const dictionary& dict,
+    const INew& inewt
+)
 {
-    read(is, inewt);
+    forAllConstIter(dictionary, dict, iter)
+    {
+        this->insert
+        (
+            iter().keyword(),
+            inewt(dict.subDict(iter().keyword())).ptr()
+        );
+    }
 }
 
 
 template<class T, class Key, class Hash>
-HashPtrTable<T, Key, Hash>::HashPtrTable(Istream& is)
+void Foam::HashPtrTable<T, Key, Hash>::write(Ostream& os) const
 {
-    read(is, INew<T>());
+
+    for
+    (
+        typename HashPtrTable<T, Key, Hash>::const_iterator
+        iter = this->begin();
+        iter != this->end();
+        ++iter
+    )
+    {
+        const T* ptr = iter();
+        ptr->write(os);
+    }
+}
+
+
+// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
+
+template<class T, class Key, class Hash>
+template<class INew>
+Foam::HashPtrTable<T, Key, Hash>::HashPtrTable(Istream& is, const INew& inewt)
+{
+    this->read(is, inewt);
+}
+
+
+template<class T, class Key, class Hash>
+Foam::HashPtrTable<T, Key, Hash>::HashPtrTable(Istream& is)
+{
+    this->read(is, INew<T>());
+}
+
+
+template<class T, class Key, class Hash>
+Foam::HashPtrTable<T, Key, Hash>::HashPtrTable(const dictionary& dict)
+{
+    this->read(dict, INew<T>());
 }
 
 
 // * * * * * * * * * * * * * * * IOstream Operators  * * * * * * * * * * * * //
 
 template<class T, class Key, class Hash>
-Istream& operator>>(Istream& is, HashPtrTable<T, Key, Hash>& L)
+Foam::Istream& Foam::operator>>(Istream& is, HashPtrTable<T, Key, Hash>& L)
 {
     L.clear();
     L.read(is, INew<T>());
@@ -172,15 +212,16 @@ Istream& operator>>(Istream& is, HashPtrTable<T, Key, Hash>& L)
 
 
 template<class T, class Key, class Hash>
-Ostream& operator<<(Ostream& os, const HashPtrTable<T, Key, Hash>& L)
+Foam::Ostream& Foam::operator<<
+(
+    Ostream& os,
+    const HashPtrTable<T, Key, Hash>& L
+)
 {
-    // Write size of HashPtrTable
-    os << nl << L.size();
+    // Write size and start delimiter
+    os << nl << L.size() << nl << token::BEGIN_LIST << nl;
 
-    // Write beginning of contents
-    os << nl << token::BEGIN_LIST << nl;
-
-    // Write HashPtrTable contents
+    // Write contents
     for
     (
         typename HashPtrTable<T, Key, Hash>::const_iterator iter = L.begin();
@@ -191,7 +232,7 @@ Ostream& operator<<(Ostream& os, const HashPtrTable<T, Key, Hash>& L)
         os << iter.key() << token::SPACE << *iter() << nl;
     }
 
-    // Write end of contents
+    // Write end delimiter
     os << token::END_LIST;
 
     // Check state of IOstream
@@ -200,9 +241,5 @@ Ostream& operator<<(Ostream& os, const HashPtrTable<T, Key, Hash>& L)
     return os;
 }
 
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // ************************************************************************* //

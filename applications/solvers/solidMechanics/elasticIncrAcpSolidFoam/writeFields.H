@@ -165,7 +165,7 @@ if (runTime.outputTime() || topoChange)
 	    GII.boundaryField()[patchi] = DUpatch.GII();
 	    damageAndCracks.boundaryField()[patchi] = DUpatch.crackingAndDamage();
 	  }
-      } 
+      }
 
     //Info << "done" << endl;
 

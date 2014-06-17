@@ -85,7 +85,7 @@ controlledParabolicVelocityFvPatchVectorField::controlledParabolicVelocityFvPatc
 :
     fixedValueFvPatchVectorField(p, iF),
     Umean_(readScalar(dict.lookup("Umean"))),
-    n_(dict.lookup("n")), 
+    n_(dict.lookup("n")),
     y_(dict.lookup("y")),
     target_(readScalar(dict.lookup("target"))),
     obsFieldName_(dict.lookup("obsFieldName")),
@@ -168,7 +168,7 @@ void controlledParabolicVelocityFvPatchVectorField::updateCoeffs()
         const vectorField& c = patch().Cf();
 
         // Calculate local 1-D coordinate for the parabolic profile
-        scalarField coord = 
+        scalarField coord =
             0.5 - ((c - ctr) & y_)/((bb.max() - bb.min()) & y_);
 
         operator==(n_*3/2*Umean_*(1.0 - sqr(coord)));

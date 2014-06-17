@@ -1205,7 +1205,7 @@ SEARCHENGINE           = YES
 # full text search. The disadvantages are that it is more difficult to setup
 # and does not have live searching capabilities.
 
-SERVER_BASED_SEARCH    = YES 
+SERVER_BASED_SEARCH    = YES
 
 #---------------------------------------------------------------------------
 # configuration options related to the LaTeX output

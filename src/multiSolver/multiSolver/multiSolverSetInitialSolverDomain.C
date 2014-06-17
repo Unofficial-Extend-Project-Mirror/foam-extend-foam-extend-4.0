@@ -42,7 +42,7 @@ void Foam::multiSolver::setInitialSolverDomain(const word& solverDomainName)
 
     // Purge all time directories from case directory root
     purgeTimeDirs(multiDictRegistry_.path());
-    
+
     // Purge any constant/superLoopData/
     fileName superLoopDataPath
     (
@@ -76,7 +76,7 @@ void Foam::multiSolver::setInitialSolverDomain(const word& solverDomainName)
     fileName sourcePath(findInstancePath(tcSource, tcSource.size() - 1));
     superLoop_ = tcSource.superLoop();
     globalIndex_ = tcSource.globalIndex();
-    
+
     // If starting from initial conditions, superLoop_ = -1
     if (superLoop_ < 0) superLoop_ = 0;
     scalar globalTime(tcSource.globalValue(tcSource.size() - 1));
@@ -88,7 +88,7 @@ void Foam::multiSolver::setInitialSolverDomain(const word& solverDomainName)
     {
         superLoop_++;
         globalIndex_++;
-        
+
         switch (startFrom_)
         {
             case mtsFirstTime:
@@ -118,7 +118,7 @@ void Foam::multiSolver::setInitialSolverDomain(const word& solverDomainName)
     startTime_ = localStartTime;
 
     globalTimeOffset_ = globalTime - startTime_;
-    
+
     // Give multiDictRegistry a time value (required for regIOobject::write()
     // to case/[timeValue]
     multiDictRegistry_.setTime(startTime_, 0);
@@ -163,7 +163,7 @@ void Foam::multiSolver::setInitialSolverDomain(const word& solverDomainName)
         ),
         currentSolverDomainDict_
     );
-    
+
     // Remove multiSolver-specific values from dictionary
     newControlDict.remove("startFrom");
     newControlDict.remove("startTime");
@@ -175,24 +175,24 @@ void Foam::multiSolver::setInitialSolverDomain(const word& solverDomainName)
     newControlDict.remove("timePrecision");
     newControlDict.remove("storeFields");
     newControlDict.remove("elapsedTime");
-    
+
     // Add values to obtain the desired behaviour
     // Start with timePrecision, it may affect writePrecision, which affects
     // all other settings
     if (multiSolverControl_.found("timePrecision"))
-    {    
+    {
         unsigned int newPrecision
         (
             readUint(multiSolverControl_.lookup("timePrecision"))
         );
-        
+
         // Increase writePrecision if less than timePrecision, otherwise
         // resuming a run will fail
         if (IOstream::defaultPrecision() < (newPrecision + 1))
         {
             IOstream::defaultPrecision(newPrecision + 1);
         }
-    
+
         newControlDict.set
         (
             "timePrecision",

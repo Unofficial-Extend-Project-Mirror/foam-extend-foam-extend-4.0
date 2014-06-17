@@ -20,10 +20,10 @@
     )
     {
         FatalErrorIn(args.executable())
-            << "Bounary condition on " << DU.name() 
-                <<  " is " 
-                << DU.boundaryField()[interfacePatchID].type() 
-                << "for patch: " 
+            << "Bounary condition on " << DU.name()
+                <<  " is "
+                << DU.boundaryField()[interfacePatchID].type()
+                << "for patch: "
                 << mesh.boundaryMesh()[interfacePatchID].name()
                 <<  ", instead "
                 << tractionDisplacementIncrementFvPatchVectorField::typeName
