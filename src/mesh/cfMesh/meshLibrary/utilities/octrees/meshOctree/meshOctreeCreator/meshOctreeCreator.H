@@ -37,6 +37,7 @@ SourceFiles
 
 #include "boolList.H"
 #include "DynList.H"
+#include "IOdictionary.H"
 #include "meshOctreeModifier.H"
 //#include "volFields.H"
 #include "patchRefinementList.H"
@@ -49,7 +50,6 @@ namespace Foam
 {
 
 // Forward declarations
-class IOdictionary;
 class meshOctreeCube;
 
 /*---------------------------------------------------------------------------*\

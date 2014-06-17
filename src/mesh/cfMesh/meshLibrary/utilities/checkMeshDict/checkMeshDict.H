@@ -35,6 +35,8 @@ SourceFiles
 #ifndef checkMeshDict_H
 #define checkMeshDict_H
 
+#include "objectRegistry.H"
+#include "Time.H"
 #include "IOdictionary.H"
 
 #include <map>
