@@ -37,6 +37,7 @@ SourceFiles
 #define meshOctreeAutomaticRefinement_H
 
 #include "meshOctreeModifier.H"
+#include "IOdictionary.H"
 //#include "volFields.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -60,7 +61,7 @@ class meshOctreeAutomaticRefinement
         meshOctree& octree_;
 
         //- const reference to mesh dictionary
-        const IOdictionary& meshDict_;
+        const dictionary& meshDict_;
 
         //- use DATA boxes
         bool useDATABoxes_;

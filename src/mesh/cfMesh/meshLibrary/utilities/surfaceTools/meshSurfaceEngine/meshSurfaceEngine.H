@@ -35,6 +35,8 @@ SourceFiles
 #ifndef meshSurfaceEngine_H
 #define meshSurfaceEngine_H
 
+#include "objectRegistry.H"
+#include "Time.H"
 #include "polyMeshGenModifier.H"
 #include "SubList.H"
 #include "boolList.H"
