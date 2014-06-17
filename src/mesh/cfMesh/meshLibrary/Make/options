@@ -1,0 +1,10 @@
+#if defined(__GNUC__)
+   OMP_FLAGS = -DUSE_OMP -fopenmp
+#else
+   OMP_FLAGS =
+#endif
+
+EXE_INC = \
+    $(OMP_FLAGS) \
+    -I$(LIB_SRC)/triSurface/lnInclude \
+    -I$(LIB_SRC)/meshTools/lnInclude
