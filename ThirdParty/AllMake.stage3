@@ -59,7 +59,7 @@ echo
 # Metis
 if [ -z "$METIS_SYSTEM" ]
 then
-    ( rpm_make -p metis-5.1.0 -s metis-5.1.0.spec -u http://glaros.dtc.umn.edu/gkhome/fetch/sw/metis/metis-5.1.0.tar.gz      )
+    ( rpm_make -p metis-5.1.0 -s metis-5.1.0.spec -u http://downloads.sourceforge.net/project/openfoam-extend/foam-extend-3.1/ThirdParty/metis-5.1.0.tar.gz )
 else
     echo "Using system installed Metis"
     echo ""
@@ -69,7 +69,7 @@ fi
 if [ -z "$PARMGRIDGEN_SYSTEM" ]
 then
     #( rpm_make -p ParMGridGen-1.0 -s ParMGridGen-1.0.spec -u http://www.mgnet.org/mgnet/Codes/parmgridgen/ParMGridGen-1.0.tar.gz       )
-    ( rpm_make -p ParMGridGen-1.0 -s ParMGridGen-1.0.spec -u ftp://ftp.proxad.net/.mirrors1/ftp.freebsd.org/ports/distfiles/ParMGridGen-1.0.tar.gz       )
+    ( rpm_make -p ParMGridGen-1.0 -s ParMGridGen-1.0.spec -u http://downloads.sourceforge.net/project/openfoam-extend/foam-extend-3.1/ThirdParty/ParMGridGen-1.0.tar.gz )
 else
     echo "Using system installed ParMGridGen"
     echo ""
@@ -87,7 +87,7 @@ fi
 # Mesquite
 if [ -z "$MESQUITE_SYSTEM" ]
 then
-    ( rpm_make -p mesquite-2.1.2 -s mesquite-2.1.2.spec -u http://downloads.sourceforge.net/project/openfoam-extend/foam-extend-3.0/ThirdParty/mesquite-2.1.2.tar.gz )
+    ( rpm_make -p mesquite-2.1.2 -s mesquite-2.1.2.spec -u http://downloads.sourceforge.net/project/openfoam-extend/foam-extend-3.1/ThirdParty/mesquite-2.1.2.tar.gz )
 else
     echo "Using system installed Mesquite"
     echo ""
@@ -102,7 +102,7 @@ fi
 # Scotch
 if [ -z "$SCOTCH_SYSTEM" ]
 then
-    ( rpm_make -p scotch-6.0.0 -s scotch-6.0.0.spec -u https://gforge.inria.fr/frs/download.php/31831/scotch-6.0.0.tar.gz  )
+    ( rpm_make -p scotch-6.0.0 -s scotch-6.0.0.spec -u http://downloads.sourceforge.net/project/openfoam-extend/foam-extend-3.1/ThirdParty/scotch-6.0.0.tar.gz )
 else
     echo "Using system installed Scotch"
     echo ""
@@ -133,7 +133,7 @@ then
 #   ( rpm_make -p PyFoam-0.5.7 -s PyFoam-0.5.7.spec  -u http://openfoamwiki.net/images/d/dc/PyFoam-0.5.7.tar.gz -n PyFoam-0.5.7-1.noarch -a noarch)
 #   ( rpm_make -p PyFoam-0.6.1 -s PyFoam-0.6.1.spec  -u http://openfoamwiki.net/images/3/33/PyFoam-0.6.1.tar.gz -n PyFoam-0.6.1-1.noarch -a noarch)
 #   ( rpm_make -p PyFoam-0.6.2 -s PyFoam-0.6.2.spec  -u http://openfoamwiki.net/images/8/89/PyFoam-0.6.2.tar.gz -n PyFoam-0.6.2-1.noarch -a noarch)
-    ( rpm_make -p PyFoam-0.6.3 -s PyFoam-0.6.3.spec  -u http://openfoamwiki.net/images/e/e3/PyFoam-0.6.3-rc.tar.gz -n PyFoam-0.6.3-1.noarch -a noarch)
+    ( rpm_make -p PyFoam-0.6.3 -s PyFoam-0.6.3.spec  -u http://downloads.sourceforge.net/project/openfoam-extend/foam-extend-3.1/ThirdParty/PyFoam-0.6.1.tar.gz )
 else
     echo "Using system installed PyFoam"
     echo ""
@@ -142,7 +142,7 @@ fi
 # hwloc
 if [ -z "$HWLOC_SYSTEM" ]
 then
-    ( rpm_make -p hwloc-1.7.2 -s hwloc-1.7.2.spec  -u http://www.open-mpi.org/software/hwloc/v1.7/downloads/hwloc-1.7.2.tar.gz )
+    ( rpm_make -p hwloc-1.7.2 -s hwloc-1.7.2.spec  -u http://downloads.sourceforge.net/project/openfoam-extend/foam-extend-3.1/ThirdParty/hwloc-1.7.2.tar.gz )
 else
     echo "Using system installed hwloc"
     echo ""
