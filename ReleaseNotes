@@ -195,12 +195,12 @@ user@machine> git log 3.0.. > commitLog
     - Pressure-based compressible turbo functionalities
     - Pressure-based coupled solver (block-coupling p and U)
     - Density-based coupled Roe flux solver dbnsFoam and dbnsTurbFoam
-    - major update and validation of mixing plane boundary
-    - full deploymenr of block matrix, including block-AMG solverse
-    - further parallel dynamic mesh capability: all topological changes
+    - Major update and validation of mixing plane boundary
+    - Full deploymenr of block matrix, including block-AMG solverse
+    - Further parallel dynamic mesh capability: all topological changes
       supported in parallel execution
-    - major upgrade of solid mechanics solvers
-    - support for CLang-based compilers
+    - Major upgrade of solid mechanics solvers
+    - Support for CLang-based compilers
 
   * Licence: GPLv3
 
@@ -286,15 +286,15 @@ user@machine> git log 3.0.. > commitLog
 
   * Bug fixes:
     - Correct snGrad on coupled boundaries
-    - handling of static null pointers: safe to dereference
+    - Handling of static null pointers: safe to dereference
     - LinearUpwind no longer hangs in parallel execution on empty patches
-    - mesh update on parallel topo changes: zones before boundaries
+    - Mesh update on parallel topo changes: zones before boundaries
     - GGI interpolation updates on topologically changing meshes
-    - cell layering issues off complex surfaces
-    - template depth for block matrix support
-    - parallel efficiency improvements
+    - Cell layering issues off complex surfaces
+    - Template depth for block matrix support
+    - Parallel efficiency improvements
 
-** Recent sucessful compilations and tests
+** Recent successful compilations and tests
    * Ubuntu 14.04:
 
      http://openfoam-extend.sourceforge.net/CDash/viewTest.php?buildid=736
@@ -330,8 +330,8 @@ user@machine> git log 3.0.. > commitLog
 ** How to contribute
     All your contributions are highly welcome: New solvers, utilities and 
     models; bug fixes; documentation. The many ways of contributing and the 
-    contribution process are described in detail in the file "HowToContribute"
-    and at http://sourceforge.net/p/openfoam-extend/wiki/Home/
+    contribution process are described in detail at:
+    http://sourceforge.net/p/openfoam-extend/wiki/HowToContribute/
 
 ** List of Contributors:
     See file ListOfContributors

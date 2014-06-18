@@ -1,64 +1,58 @@
-		 _____________________________________
+                 *Release notes for foam-extend-3.1*
+                 ===================================
 
-		  *RELEASE NOTES FOR FOAM-EXTEND-3.1*
-		 _____________________________________
+Date: 8 June 2014
 
 
-			      8 June 2014
-
+################################################################################
 
 Table of Contents
-_________________
-
+=================
 1 Overview
 2 Installation
 3 Compatibility
 4 Main differentiators between foam-extend and OpenFOAM
 5 New features in foam-extend-3.1, since foam-extend-3.0
-6 Recent sucessful compilations and tests
+6 Recent successful compilations and tests
 7 Reporting bugs
 8 How to contribute
 9 List of Contributors:
 
 
-################################################################################
-
-
-1 Overview
-==========
-
-  The foam-extend project is a fork of the OpenFOAM® open source library
-  for Computational Fluid Dynamics (CFD). It is an open project
-  welcoming and integrating contributions from all users and
-  developers. Previously known as OpenFOAM®-dev and OpenFOAM®-extend, it
-  contains bug fixes and performance improvements, as well as extensions
-  and additional features provided by community contributors (see file
-  ListOfContributors), such as dynamic mesh and topological change
-  support, turbomachinery extensions including general grid
-  interpolation (GGI), cyclic GGI and mixing plane, block-coupled matrix
-  support, implicitly coupled conjugate heat transfer and other pyshics
-  coupling, finite area method, comprehensive dynamic mesh (motion and
-  topological changes) capability and GPU support. For a full list, see
-  below and previous release notes at:
+1 Overview 
+-----------
+  The foam-extend project is a fork of the OpenFOAM® open source
+  library for Computational Fluid Dynamics (CFD). It is an open
+  project welcoming and integrating contributions from all users and
+  developers. Previously known as OpenFOAM®-dev and OpenFOAM®-extend,
+  it contains bug fixes and performance improvements, as well as
+  extensions and additional features provided by community
+  contributors (see file ListOfContributors), such as dynamic mesh and
+  topological change support, turbomachinery extensions including
+  general grid interpolation (GGI), cyclic GGI and mixing plane,
+  block-coupled matrix support, implicitly coupled conjugate heat
+  transfer and other pyshics coupling, finite area method,
+  comprehensive dynamic mesh (motion and topological changes)
+  capability and GPU support. For a full list, see below and previous
+  release notes at:
   [http://sourceforge.net/p/openfoam-extend/wiki/Home/]
 
   Version 3.1, nicknamed "Zagreb", is the current version of
   foam-extend. The release continues the tradition and spirit of the
   original FOAM code developed by prof. Jasak and Mr. Weller during
   their time at Imperial College and released as the general purpose
-  CFD/CCM package by Nabla Ltd. in 2000. In this spirit, we reverted 18
-  December 2013 to the original numbering scheme (foam-2.3.2, 13
+  CFD/CCM package by Nabla Ltd. in 2000. In this spirit, we reverted
+  18 December 2013 to the original numbering scheme (foam-2.3.2, 13
   December 2004) as release number 3.0.  Visit [http://foam-extend.org]
   for more information.
 
-  OPENFOAM® is a registered trademark of ESI Group. OpenFOAM-extend and
+  OPENFOAM® is a registered trademark of ESI Group. OpenFOAM-extend and 
   foam-extend are a community effort not endorsed by ESI Group.
+ 
 
-
-2 Installation
-==============
-
-  foam-extend-3.1 can be compiled and runs on any linux system
+2 Installation 
+---------------
+   foam-extend-3.1 can be compiled and runs on any linux system
 
   * Main supported OSs:
     - Ubuntu 14.04
@@ -80,7 +74,7 @@ _________________
     Binary packages are available for download at
     [http://sourceforge.net/projects/openfoam-extend/] for the following
     systems: Ubuntu 14.04, Fedora 20 and Mac OS X.
-
+    
   * Accompanying ThirdParty software:
     - gcc compatibility up to 4.8.2
     - Paraview 4.0.1
@@ -98,28 +92,26 @@ _________________
     - bison 2.7
     - hwloc 1.7.2
     - libccmio 2.6.1
+  
 
-
-3 Compatibility
-===============
-
+3 Compatibility 
+----------------
   Upstream features from the OpenFOAM® code base are merged into
-  foam-extend on regular basis. The interface format of foam-extend-3.1
-  is largely compatible to OpenFOAM-1.6-ext and OpenFOAM-1.7.x. In some
-  cases, the differences are caused by bug fixes and algorithmic
-  improvements, considered more important than inter-operability.
+  foam-extend on regular basis. The interface format of
+  foam-extend-3.1 is largely compatible to OpenFOAM-1.6-ext and
+  OpenFOAM-1.7.x. In some cases, the differences are caused by bug
+  fixes and algorithmic improvements, considered more important than
+  inter-operability.
 
-
-4 Main differentiators between foam-extend and OpenFOAM
-=======================================================
-
+4 Main differentiators between foam-extend and OpenFOAM 
+--------------------------------------------------------
   A large number of features have been lost within the release of
-  OpenFOAM since version 1.3, the code base has shrunk by more than 40%.
-  While we understand the lack of technical ability of supporting
-  advanced CFD features, we feel that existing features and specifically
-  large-scale contributions should remain active and developed
-  further. Below is a list of main features of foam-extend which are
-  lacking, lost, deactivated or unusable in ESI releases:
+  OpenFOAM since version 1.3, the code base has shrunk by more than
+  40%.  While we understand the lack of technical ability of
+  supporting advanced CFD features, we feel that existing features and
+  specifically large-scale contributions should remain active and
+  developed further. Below is a list of main features of foam-extend
+  which are lacking, lost, deactivated or unusable in ESI releases:
 
   * Turbomachinery features, including General Grid Interface (GGI),
     partial overlap GGI, cyclic GGI, with improvements in parallel
@@ -139,20 +131,21 @@ _________________
     tetrahedral remeshing dynamic mesh support and solid body motion
     functions.  All of the above include parallelisation support
 
-  * Library of dynamic meshes with topological changes with full second
-    order FVM discretisation support on moving meshes with topological
-    changes
+  * Library of dynamic meshes with topological changes with full
+    second order FVM discretisation support on moving meshes with
+    topological changes
 
   * Internal combustion engine-specific dynamic mesh classes such as
     two-stroke engine and various forms of 4-stroke and multi-valve
     dynamic mesh classes
 
-  * Finite Area Method providing support for FVM-like discretisation on
-    a curved surface in 3-D, with examples of liquid film modelling
+  * Finite Area Method providing support for FVM-like discretisation
+    on a curved surface in 3-D, with examples of liquid film modelling
 
-  * Block-coupled matrix support, allowing fully implicit multi-equation
-    solution of NxN equation sets, with full parallelisation support.
-    First release of a block-AMG linear equation solver
+  * Block-coupled matrix support, allowing fully implicit
+    multi-equation solution of NxN equation sets, with full
+    parallelisation support.  First release of a block-AMG linear
+    equation solver
 
   * Fully implicit conjugate-coupled solution framework, allowing
     implicit solution fo multiple equations over multiple meshes, with
@@ -166,16 +159,17 @@ _________________
   * Multi-solver solution framework, allowing multiple field models to
     be solved in a coupled manner
 
-  * A major contribution is solid mechanics modelling, including linear
-    and non-linear materials, contact, self-contact and friction, with
-    updated Lagrangian or absolute Lagrangian formulation.  Solution of
-    damage models and crack propagation in complex materials via
-    topological changes
+  * A major contribution is solid mechanics modelling, including
+    linear and non-linear materials, contact, self-contact and
+    friction, with updated Lagrangian or absolute Lagrangian
+    formulation.  Solution of damage models and crack propagation in
+    complex materials via topological changes
 
   * CUDA solver release, provided in full source and as an example of
     coupling external linear equation solvers with FOAM
 
-  * Library-level support for Immersed Boundary Method and Overset Mesh
+  * Library-level support for Immersed Boundary Method and Overset
+    Mesh
 
   * Major improvements in accuracy and stability of FVM discretisation
     with options on convection and diffusion discretisation, deferred
@@ -190,35 +184,36 @@ _________________
   * Approximately 6000 bug fixes in fundamental level libraries and
     discretisation techniques
 
-
-5 New features in foam-extend-3.1, since foam-extend-3.0
-========================================================
-
+5 New features in foam-extend-3.1, since foam-extend-3.0 
+---------------------------------------------------------
   The list of features is a result of the work of numerous
   contributors. The maintainers of foam-extend would formally like to
   thank them all.
 
   Get a full log of the updates by (either):
-  ,----
-  | user@machine> git log 3.0.. > commitLog
-  `----
-  ,----
-  | user@machine> git log 3.0.. --oneline > commitLog
-  `----
-  ,----
-  | user@machine> gitg 3.0..
-  `----
+
+
+  user@machine> git log 3.0.. > commitLog
+
+
+
+  user@machine> git log 3.0.. --oneline > commitLog
+
+
+
+  user@machine> gitg 3.0..
+
 
   * Major new features:
     - Pressure-based compressible turbo functionalities
     - Pressure-based coupled solver (block-coupling p and U)
     - Density-based coupled Roe flux solver dbnsFoam and dbnsTurbFoam
-    - major update and validation of mixing plane boundary
-    - full deploymenr of block matrix, including block-AMG solverse
-    - further parallel dynamic mesh capability: all topological changes
+    - Major update and validation of mixing plane boundary
+    - Full deploymenr of block matrix, including block-AMG solverse
+    - Further parallel dynamic mesh capability: all topological changes
       supported in parallel execution
-    - major upgrade of solid mechanics solvers
-    - support for CLang-based compilers
+    - Major upgrade of solid mechanics solvers
+    - Support for CLang-based compilers
 
   * Licence: GPLv3
 
@@ -229,8 +224,8 @@ _________________
       - ThirdParty/Allclean alsoPackage - new option
       - wcleanAllButLibBinLnInclude
     - Fixed problem with ParaView reader for Ubuntu 14.04
-    - foamToTecplot360: building tecio doesn't require X.org development
-      files
+    - foamToTecplot360: building tecio doesn't require X.org
+      development files
 
   * Solvers:
     - compressible/dbnsFoam
@@ -304,38 +299,35 @@ _________________
 
   * Bug fixes:
     - Correct snGrad on coupled boundaries
-    - handling of static null pointers: safe to dereference
-    - LinearUpwind no longer hangs in parallel execution on empty
-      patches
-    - mesh update on parallel topo changes: zones before boundaries
+    - Handling of static null pointers: safe to dereference
+    - LinearUpwind no longer hangs in parallel execution on empty patches
+    - Mesh update on parallel topo changes: zones before boundaries
     - GGI interpolation updates on topologically changing meshes
-    - cell layering issues off complex surfaces
-    - template depth for block matrix support
-    - parallel efficiency improvements
+    - Cell layering issues off complex surfaces
+    - Template depth for block matrix support
+    - Parallel efficiency improvements
 
+6 Recent successful compilations and tests 
+-------------------------------------------
+   * Ubuntu 14.04:
 
-6 Recent sucessful compilations and tests
-=========================================
+     [http://openfoam-extend.sourceforge.net/CDash/viewTest.php?buildid=736]
 
-  * Ubuntu 14.04:
+   * Ubuntu 12.04:
 
-    [http://openfoam-extend.sourceforge.net/CDash/viewTest.php?buildid=736]
+     [http://openfoam-extend.sourceforge.net/CDash/viewTest.php?buildid=738]
 
-  * Ubuntu 12.04:
+   * CentOS 6.4:
 
-    [http://openfoam-extend.sourceforge.net/CDash/viewTest.php?buildid=738]
+     [http://openfoam-extend.sourceforge.net/CDash/viewTest.php?buildid=734]
 
-  * CentOS 6.4:
+   * Mac OX X 10.9.3 Maverick & CLang (XCode compiler):
 
-    [http://openfoam-extend.sourceforge.net/CDash/viewTest.php?buildid=734]
+     [http://openfoam-extend.sourceforge.net/CDash/viewTest.php?buildid=733]
 
-  * Mac OX X 10.9.3 Maverick & CLang (XCode compiler):
+   * Mac OX X & gcc (Macports)
 
-    [http://openfoam-extend.sourceforge.net/CDash/viewTest.php?buildid=733]
-
-  * Mac OX X & gcc (Macports)
-
-    [http://openfoam-extend.sourceforge.net/CDash/viewTest.php?buildid=737]
+     [http://openfoam-extend.sourceforge.net/CDash/viewTest.php?buildid=737]
 
   * Linux PPC ppc64 (Blue Gene)
 
@@ -345,25 +337,18 @@ _________________
 
     [http://openfoam-extend.sourceforge.net/CDash/viewTest.php?buildid=743]
 
+7 Reporting bugs 
+-----------------
+    To report bugs, please use the MantisBT bugtracker at
+    [http://sourceforge.net/apps/mantisbt/openfoam-extend]
 
-7 Reporting bugs
-================
+8 How to contribute 
+--------------------
+    All your contributions are highly welcome: New solvers, utilities and 
+    models; bug fixes; documentation. The many ways of contributing and the 
+    contribution process are described in detail at:
+    [http://sourceforge.net/p/openfoam-extend/wiki/HowToContribute/]
 
-  To report bugs, please use the MantisBT bugtracker at
-  [http://sourceforge.net/apps/mantisbt/openfoam-extend]
-
-
-8 How to contribute
-===================
-
-  All your contributions are highly welcome: New solvers, utilities and
-  models; bug fixes; documentation. The many ways of contributing and
-  the contribution process are described in detail in the file
-  "HowToContribute" and at
-  [http://sourceforge.net/p/openfoam-extend/wiki/Home/]
-
-
-9 List of Contributors:
-=======================
-
-  See file ListOfContributors
+9 List of Contributors: 
+------------------------
+    See file ListOfContributors
