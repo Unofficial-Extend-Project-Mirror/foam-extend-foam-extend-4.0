@@ -5,3 +5,6 @@
 
 cleanCase
 \rm -rf *.py
+\rm -f constant/polyMesh/boundary
+\rm -rf 0
+\cp -r 0.orig 0
