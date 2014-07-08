@@ -71,12 +71,20 @@ if sys.version_info<(2,6):
 else:
     from subprocess import Popen,PIPE,STDOUT
 
+# only for development
 verbose="FOAM_NEW_STARTUP_DEBUG" in environ
+
+# Location of this script
 here=path.dirname(path.abspath(sys.argv[0]))
 if verbose:
     print_("Using scripts in",here)
+
+# For which shell
 destShell=sys.argv[1]
+
+# Variables like WM_COMPILER=Gcc46
 additional=sys.argv[2:]
+
 if verbose:
     print("Target shell",destShell)
     print("Additional settings:",additional)
@@ -91,15 +99,20 @@ for v in ["FOAM_INST_DIR",
     except KeyError:
         pass
 
+# To be executed in bash
 cmd ='echo "=== Export pre";export;echo "=== Alias pre";alias;'
 cmd+='echo "=== Script";. '+path.join(here,"bashrc")+' '+' '.join(additional)+';'
 cmd+='echo "=== Export post";export;echo "=== Alias post";alias;'
 cmd+='echo "=== End"'
 
+cmd="bash -c '"+cmd+"'"
+
 if verbose:
     print_("Cmd:",cmd)
 
+# Execute the shell commands
 if sys.version_info<(2,6):
+    # for old machines (RHEL 5)
     raus,rein = popen4(cmd)
 else:
     p = Popen(cmd, shell=True,
@@ -118,9 +131,16 @@ if verbose:
 
 def extractVariables(lines):
     vars={}
+    # different forms if bash is called as sh
+    prefixes=["export ","declare -x "]
     for l in lines:
+        pref=None
+        for p in prefixes:
+            if l.find(p)==0:
+                pref=p
+                break
         pos=l.find("=")
-        name=l[len("export "):pos]
+        name=l[len(pref):pos]
         if pos>0:
             val=l[pos+1:]
             if val[0]=='"' and val[-1]=='"':
@@ -134,8 +154,11 @@ def extractVariables(lines):
 def extractAliases(lines):
     aliases={}
     for l in lines:
+        pref=""  # if called as sh
+        if l.find("alias ")==0:
+            pref="alias "
         pos=l.find("=")
-        aliases[l[:pos]]=l[pos+2:-1]
+        aliases[l[len(pref):pos]]=l[pos+2:-1]
 
     return aliases
 
@@ -176,10 +199,12 @@ if len(scriptOutput)>0:
 
 class ShellConvert(object):
     def __call__(self,vars,aliases):
+        result=""
         for v in sorted(vars.keys()):
-            print_(self.toVar(v,vars[v]))
+            result+=self.toVar(v,vars[v])+"\n"
         for a in sorted(aliases.keys()):
-            print_(self.toAlias(a,aliases[a]))
+            result+=self.toAlias(a,aliases[a])+"\n"
+        return result
 
 class BashConvert(ShellConvert):
     def toVar(self,n,v):
@@ -222,4 +247,6 @@ shells={"bash":BashConvert,
         "zsh":ZshConvert,
         "csh":CshConvert}
 
-shells[destShell]()(vars,aliases)
+result=shells[destShell]()(vars,aliases)
+open(path.abspath(sys.argv[0])+"."+destShell,"w").write(result)
+print_(result)
