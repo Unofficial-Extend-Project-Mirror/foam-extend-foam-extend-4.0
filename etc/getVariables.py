@@ -239,13 +239,39 @@ class CshConvert(ShellConvert):
             val=val[:pos]+val[pos:].replace("="," ",1)
         return "alias %s '%s'" % (n,val)
 
+class FishConvert(ShellConvert):
+    def toVar(self,n,v):
+        if type(v)==list:
+            val=":".join(v)
+        else:
+            val=v
+
+        if n=="PATH":
+            result="\nset -x PATH %s" % " ".join(v)
+        else:
+            result='set -x %s "%s"' % (n,val)
+
+        return result
+
+    def toAlias(self,n,v):
+        val=v.replace(" . ","source ").replace("bash","fish")
+        if val.find("unset ")>=0:
+            val=val.replace("unset ","set -e ")
+        # Make sure that more than one export is possible and no wrong = is replaced
+        while val.find("export ")>=0:
+            pos=val.find("export ")
+            val=val.replace("export ","set -x ",1)
+            val=val[:pos]+val[pos:].replace("="," ",1)
+        return "alias %s '%s'" % (n,val)
+
 class ZshConvert(BashConvert):
     def toAlias(self,n,v):
         return BashConvert.toAlias(self,n,v).replace("bash","zsh")
 
-shells={"bash":BashConvert,
-        "zsh":ZshConvert,
-        "csh":CshConvert}
+shells={"bash" : BashConvert,
+        "zsh"  : ZshConvert,
+        "fish" : FishConvert,
+        "csh"  : CshConvert}
 
 result=shells[destShell]()(vars,aliases)
 open(path.abspath(sys.argv[0])+"."+destShell,"w").write(result)
