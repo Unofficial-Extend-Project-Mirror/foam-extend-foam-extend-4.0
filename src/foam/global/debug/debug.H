@@ -85,6 +85,7 @@ namespace debug
 
     //- Lookup optimisation switch or add default value.
     int optimisationSwitchFromDict(const char* name, const int defaultValue = 0);
+    int optimisationSwitchFromDict(const Foam::string name, const Foam::word defaultValue);
 
     //- Lookup tolerances switch or add default value.
     double tolerancesFromDict(const char* name, const double defaultValue = 0);

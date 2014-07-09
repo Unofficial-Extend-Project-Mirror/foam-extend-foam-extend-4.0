@@ -25,9 +25,6 @@ License
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
-
-
 // * * * * * * * * * * * * * * * Member Operators  * * * * * * * * * * * * * //
 
 template<class T>
@@ -43,7 +40,7 @@ inline const T Foam::debug::controlSwitches<T>::operator&(const T& rhs)
 }
 
 template<class T>
-inline bool Foam::debug::controlSwitches<T>::operator==(const T& rhs)
+inline bool Foam::debug::controlSwitches<T>::operator==(const T& rhs) const
 {
     return switchValue_ == rhs;
 }
@@ -65,13 +62,6 @@ inline bool Foam::debug::controlSwitches<T>::operator<(const T& rhs)
 {
     return switchValue_ < rhs;
 }
-
-
-// * * * * * * * * * * * * * * IOstream Operators  * * * * * * * * * * * * * //
-
-
-// * * * * * * * * * * * * * * * Ostream Operator  * * * * * * * * * * * * * //
-
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

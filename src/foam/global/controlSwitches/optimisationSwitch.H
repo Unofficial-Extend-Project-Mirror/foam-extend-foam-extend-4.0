@@ -72,6 +72,23 @@ public:
 	)
     {}
 
+
+    // This constructor is essentially for 'commsType'
+    optimisationSwitch
+    (
+	const std::string& switchName,
+	const std::string& switchValue
+    )
+	:
+	controlSwitches<int>
+	(
+	    switchName,
+	    debug::optimisationSwitchFromDict(switchName, switchValue),
+	    debug::OPTIMISATIONSWITCHES,
+	    &optimisationSwitchValues_
+	)
+    {}
+
     virtual ~optimisationSwitch()
     {
     }
@@ -82,6 +99,20 @@ public:
 	controlSwitches<int>::operator=(rhs);
     }
 
+    bool operator==(const int& rhs) const
+    {
+        return controlSwitches<int>::operator==(rhs);
+    }
+
+#if 0
+    // Cannot use a conversion operator for Pstream::commsTypes
+    // since including Pstream.H generates compilation errors.
+    // MB 06/2014
+    operator Pstream::commsTypes () const
+    {
+	return static_cast<Pstream::commsTypes>(operator()());
+    }
+#endif
 
 };
 

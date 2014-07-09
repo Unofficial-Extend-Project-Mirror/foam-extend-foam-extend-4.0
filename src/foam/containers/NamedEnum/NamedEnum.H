@@ -120,6 +120,13 @@ public:
             return names[e];
         }
 
+        //- Return the name of the given enumeration element
+        //  where e is specified as a int
+        const char* operator[](const int e) const
+        {
+            return names[e];
+        }
+
 
     // Friend operators
 

@@ -90,6 +90,9 @@ class controlSwitches
         //- Switch name
         std::string switchName_;
 
+        //- Switch Description
+        std::string switchDescription_;
+
         //- Switch value
         T switchValue_;
 
@@ -145,7 +148,7 @@ public:
         const T operator&(const T&);
 
         // == operator
-        bool operator==(const T&);
+        bool operator==(const T&) const;
 
         // >= operator
         bool operator>=(const T&);
@@ -160,6 +163,17 @@ public:
         T operator()() const
 	{
 	    return switchValue_;
+	}
+
+        // Return switch name
+        std::string switchName()
+	{
+	    return switchName_;
+	}
+        // Return switch description
+        std::string switchDescription()
+	{
+	    return switchDescription_;
 	}
 };
 

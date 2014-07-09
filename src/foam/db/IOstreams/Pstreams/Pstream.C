@@ -244,9 +244,16 @@ Foam::Pstream::nProcsSimpleSum
 );
 
 // Default commsType
-Foam::Pstream::commsTypes Foam::Pstream::defaultCommsType
+Foam::Pstream::commsTypes Foam::Pstream::defaultCommsType_
 (
     commsTypeNames.read(debug::optimisationSwitches().lookup("commsType"))
+);
+
+const Foam::debug::optimisationSwitch
+Foam::Pstream::defaultCommsType
+(
+    "commsType",
+    "blocking"
 );
 
 // ************************************************************************* //

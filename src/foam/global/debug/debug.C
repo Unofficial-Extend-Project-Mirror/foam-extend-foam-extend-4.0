@@ -192,7 +192,11 @@ int Foam::debug::infoSwitchFromDict(const char* name, const int defaultValue)
 }
 
 
-int Foam::debug::optimisationSwitchFromDict(const char* name, const int defaultValue)
+int Foam::debug::optimisationSwitchFromDict
+(
+    const char* name,
+    const int defaultValue
+)
 {
     return optimisationSwitches().lookupOrAddDefault
     (
@@ -201,7 +205,38 @@ int Foam::debug::optimisationSwitchFromDict(const char* name, const int defaultV
 }
 
 
-double Foam::debug::tolerancesFromDict(const char* name, const double defaultValue)
+// This is essentially for reading 'commsType'
+int Foam::debug::optimisationSwitchFromDict
+(
+    const Foam::string name,
+    const Foam::word defaultValueStr
+)
+{
+    int retValue = 0;
+
+    if (name == "commsType")
+    {
+	Foam::string valueStr = optimisationSwitches().lookupOrAddDefault
+	(
+	    name, defaultValueStr, false, false
+	);
+
+	retValue = Pstream::commsTypeNames[valueStr];
+    }
+    else
+    {
+	// Need a warning here...
+    }
+
+    return retValue;
+}
+
+
+double Foam::debug::tolerancesFromDict
+(
+    const char* name,
+    const double defaultValue
+)
 {
     return tolerances().lookupOrAddDefault
     (
@@ -209,7 +244,11 @@ double Foam::debug::tolerancesFromDict(const char* name, const double defaultVal
     );
 }
 
-double Foam::debug::constantsFromDict(const char* name, const double defaultValue)
+double Foam::debug::constantsFromDict
+(
+    const char* name,
+    const double defaultValue
+)
 {
     return tolerances().lookupOrAddDefault
     (
@@ -217,7 +256,11 @@ double Foam::debug::constantsFromDict(const char* name, const double defaultValu
     );
 }
 
-void Foam::debug::updateCentralDictVars(Foam::debug::globalControlDictSwitchSet globalControlDictSwitchSetName, Foam::string keyValues)
+void Foam::debug::updateCentralDictVars
+(
+    Foam::debug::globalControlDictSwitchSet globalControlDictSwitchSetName,
+    Foam::string keyValues
+)
 {
     Foam::word token;
 
@@ -241,50 +284,82 @@ void Foam::debug::updateCentralDictVars(Foam::debug::globalControlDictSwitchSet 
 		{
 		    if (debugSwitchValues_)
 		    {
-			ListDebugControlSwitches& runTimeDebugSwitchValues = *debugSwitchValues_;
+			ListDebugControlSwitches& debugSwitchValues =
+			    *debugSwitchValues_;
+
 			label oldDebugValue;
 			label newDebugValue;
 			isskv >> newDebugValue;
 
-			if(Foam::debug::debugSwitches().readIfPresent(key, oldDebugValue))
+			if (Foam::debug::debugSwitches().readIfPresent
+			    (
+				key,
+				oldDebugValue
+			    )
+			   )
 			{
 			    Info << endl
-				 << "Warning: Modification of DebugSwitch: " << key << endl
+				 << "Warning: Modification of DebugSwitch: "
+				 << key << endl
 				 << "    Old value: " << oldDebugValue << endl
 				 << "    New value: " << newDebugValue << endl
 				 << endl;
 
-			    Foam::debug::debugSwitches().set(key, newDebugValue);
+			    Foam::debug::debugSwitches().set
+				(
+				    key,
+				    newDebugValue
+				);
 
-			    std::list<controlSwitches<int> *> curList = runTimeDebugSwitchValues[key];
+			    std::list<controlSwitches<int> *> curList =
+				debugSwitchValues[key];
 
 			    // Modify all entries for this key
-			    forAllIter(std::list<controlSwitches<int> *>, curList, iterI)
+			    forAllIter
+			    (
+				std::list<controlSwitches<int> *>,
+				curList,
+				iterI
+			    )
+			    {
 				*(*iterI) =  newDebugValue;
+			    }
 			}
 			else
 			{
-			    //  Usage of non-existent DebugSwitches: best to abort right away
-			    SortableList<Foam::word> sortedValidKeys(runTimeDebugSwitchValues.size());
+			    //  Usage of non-existent DebugSwitches: best to
+			    // abort right away
+			    SortableList<Foam::word> sortedValidKeys
+			    (
+				debugSwitchValues.size()
+			    );
 
 			    int i=0;
-			    forAllIter(ListDebugControlSwitches, runTimeDebugSwitchValues, iterI)
+			    forAllIter
+			    (
+				ListDebugControlSwitches,
+				debugSwitchValues,
+				iterI
+			    )
 			    {
 				sortedValidKeys[i++] = iterI->first;
 			    }
 			    sortedValidKeys.sort();
 
 			    FatalError
-				<< "Usage of non-existent DebugSwitches: " << key
+				<< "Usage of non-existent DebugSwitches name: "
+				<< key
 				<< endl << endl
-				<< "Valid entries for this application are: " << sortedValidKeys
+				<< "Valid entries for this application are: "
+				<< sortedValidKeys
 				<< exit(FatalError);
 			}
 		    }
 		    else
 		    {
 			FatalError
-			    << "No DebugSwitches values are available for this application."
+			    << "No DebugSwitches values are available for "
+			    << "this application."
 			    << exit(FatalError);
 		    }
 		}
@@ -293,50 +368,78 @@ void Foam::debug::updateCentralDictVars(Foam::debug::globalControlDictSwitchSet 
 		{
 		    if (infoSwitchValues_)
 		    {
-			ListInfoControlSwitches& runTimeInfoSwitchValues = *infoSwitchValues_;
+			ListInfoControlSwitches& infoSwitchValues =
+			    *infoSwitchValues_;
+
 			label oldInfoValue;
 			label newInfoValue;
 			isskv >> newInfoValue;
 
-			if(Foam::debug::infoSwitches().readIfPresent(key, oldInfoValue))
+			if (Foam::debug::infoSwitches().readIfPresent
+			    (
+				key,
+				oldInfoValue
+			    )
+			   )
 			{
 			    Info << endl
-				 << "Warning: Modification of InfoSwitch: " << key << endl
+				 << "Warning: Modification of InfoSwitch: "
+				 << key << endl
 				 << "    Old value: " << oldInfoValue << endl
 				 << "    New value: " << newInfoValue << endl
 				 << endl;
 
 			    Foam::debug::infoSwitches().set(key, newInfoValue);
 
-			    std::list<controlSwitches<int> *> curList = runTimeInfoSwitchValues[key];
+			    std::list<controlSwitches<int> *> curList =
+				infoSwitchValues[key];
 
 			    // Modify all entries for this key
-			    forAllIter(std::list<controlSwitches<int> *>, curList, iterI)
+			    forAllIter
+			    (
+				std::list<controlSwitches<int> *>,
+				curList,
+				iterI
+			    )
+			    {
 				*(*iterI) =  newInfoValue;
+			    }
 			}
 			else
 			{
-			    // Usage of non-existent InfoSwitches: best to abort right away
-			    SortableList<Foam::word> sortedValidKeys(runTimeInfoSwitchValues.size());
+			    // Usage of non-existent InfoSwitches: best to
+			    // abort right away
+			    SortableList<Foam::word> sortedValidKeys
+			    (
+				infoSwitchValues.size()
+			    );
 
 			    int i=0;
-			    forAllIter(ListInfoControlSwitches, runTimeInfoSwitchValues, iterI)
+			    forAllIter
+			    (
+				ListInfoControlSwitches,
+				infoSwitchValues,
+				iterI
+			    )
 			    {
 				sortedValidKeys[i++] = iterI->first;
 			    }
 			    sortedValidKeys.sort();
 
 			    FatalError
-				<< "Usage of non-existent InfoSwitches: " << key
+				<< "Usage of non-existent InfoSwitches name: "
+				<< key
 				<< endl << endl
-				<< "Valid entries for this application are: " << sortedValidKeys
+				<< "Valid entries for this application are: "
+				<< sortedValidKeys
 				<< exit(FatalError);
 			}
 		    }
 		    else
 		    {
 			FatalError
-			    << "No InfoSwitches values are available for this application."
+			    << "No InfoSwitches values are available for "
+			    << "this application."
 			    << exit(FatalError);
 		    }
 		}
@@ -345,50 +448,122 @@ void Foam::debug::updateCentralDictVars(Foam::debug::globalControlDictSwitchSet 
 		{
 		    if (optimisationSwitchValues_)
 		    {
-			ListOptimisationControlSwitches& runTimeOptimisationSwitchValues = *optimisationSwitchValues_;
-			label oldOptimisationValue;
-			label newOptimisationValue;
-			isskv >> newOptimisationValue;
+			ListOptimisationControlSwitches&
+			    optimisationSwitchValues = *optimisationSwitchValues_;
 
-			if(Foam::debug::optimisationSwitches().readIfPresent(key, oldOptimisationValue))
+			label newOptimisationValue;
+			label oldOptimisationValue;
+			word newOptimisationValueStr;
+			word oldOptimisationValueStr;
+			bool keyIsPresent(false);
+
+			// We need to check if the switch 'commsType' is being
+			// overriden. This switch is coded as an enum, but will
+			// be specified using a string like "blocking",
+			// "scheduled, etc. Some additional logic is needed.
+			if (key == "commsType")
+			{
+			    // Handle a string value, then convert to enum
+			    isskv >> newOptimisationValueStr;
+			    newOptimisationValue =
+				Pstream::commsTypeNames[newOptimisationValueStr];
+			    keyIsPresent =
+				Foam::debug::optimisationSwitches().readIfPresent
+				(
+				    key,
+				    oldOptimisationValueStr
+				);
+			}
+			else
+			{
+			    // Handling label values
+			    isskv >> newOptimisationValue;
+			    keyIsPresent =
+				Foam::debug::optimisationSwitches().readIfPresent
+				(
+				    key,
+				    oldOptimisationValue
+				);
+
+			    std::ostringstream newOptimisationValueOstream;
+			    newOptimisationValueOstream << newOptimisationValue;
+			    newOptimisationValueStr =
+				newOptimisationValueOstream.str();
+
+			    std::ostringstream oldOptimisationValueOstream;
+			    oldOptimisationValueOstream << oldOptimisationValue;
+			    oldOptimisationValueStr =
+				oldOptimisationValueOstream.str();
+			}
+
+			if(keyIsPresent)
 			{
 			    Info << endl
-				 << "Warning: Modification of OptimisationSwitch value: " << key << endl
-				 << "    Old value: " << oldOptimisationValue << endl
-				 << "    New value: " << newOptimisationValue << endl
+				 << "Warning: Modification of "
+				 << "OptimisationSwitch: "
+				 << key << endl
+				 << "    Old value: "
+				 << oldOptimisationValueStr << endl
+				 << "    New value: "
+				 << newOptimisationValueStr << endl
 				 << endl;
 
-			    Foam::debug::optimisationSwitches().set(key, newOptimisationValue);
+			    Foam::debug::optimisationSwitches().set
+			    (
+				key,
+				newOptimisationValue
+			    );
 
-			    std::list<controlSwitches<int> *> curList = runTimeOptimisationSwitchValues[key];
+			    std::list<controlSwitches<int> *> curList =
+				optimisationSwitchValues[key];
 
+			    std::cout << "curList.size(): "  << curList.size() << std::endl;
 			    // Modify all entries for this key
-			    forAllIter(std::list<controlSwitches<int> *>, curList, iterI)
+			    forAllIter
+			    (
+				std::list<controlSwitches<int> *>,
+				curList,
+				iterI
+			    )
+			    {
 				*(*iterI) =  newOptimisationValue;
+			    }
 			}
 			else
 		        {
-			    // Usage of non-existent OptimisationSwitches: best to abort right away
-			    SortableList<Foam::word> sortedValidKeys(runTimeOptimisationSwitchValues.size());
+			    // Usage of non-existent OptimisationSwitches: best to
+			    // abort right away
+			    SortableList<Foam::word> sortedValidKeys
+			    (
+				optimisationSwitchValues.size()
+			    );
 
 			    int i=0;
-			    forAllIter(ListOptimisationControlSwitches, runTimeOptimisationSwitchValues, iterI)
+			    forAllIter
+			    (
+				ListOptimisationControlSwitches,
+				optimisationSwitchValues,
+				iterI
+			    )
 			    {
 				sortedValidKeys[i++] = iterI->first;
 			    }
 			    sortedValidKeys.sort();
 
 			    FatalError
-				<< "Usage of non-existent OptimisationSwitches value: " << key
+				<< "Usage of non-existent "
+				<< " OptimisationSwitches name: " << key
 				<< endl << endl
-				<< "Valid entries for this application are: " << sortedValidKeys
+				<< "Valid entries for this application are: "
+				<< sortedValidKeys
 				<< exit(FatalError);
 			}
 		    }
 		    else
 		    {
 			FatalError
-			    << "No OptimisationSwitches values are available for this application."
+			    << "No OptimisationSwitches values are available "
+			    << "for this application."
 			    << exit(FatalError);
 		    }
 		}
@@ -397,50 +572,84 @@ void Foam::debug::updateCentralDictVars(Foam::debug::globalControlDictSwitchSet 
 		{
 		    if (tolerancesSwitchValues_)
 		    {
-			ListTolerancesControlSwitches& runTimeTolerancesSwitchValues = *tolerancesSwitchValues_;
+			ListTolerancesControlSwitches& tolerancesSwitchValues =
+			    *tolerancesSwitchValues_;
+
 			scalar oldTolerancesValue;
 			scalar newTolerancesValue;
 			isskv >> newTolerancesValue;
 
-			if(Foam::debug::tolerances().readIfPresent(key, oldTolerancesValue))
+			if (Foam::debug::tolerances().readIfPresent
+			    (
+				key,
+				oldTolerancesValue
+			    )
+			   )
 			{
 			    Info << endl
-				 << "Warning: Modification of Tolerance value: " << key << endl
-				 << "    Old value: " << oldTolerancesValue << endl
-				 << "    New value: " << newTolerancesValue << endl
+				 << "Warning: Modification of Tolerance: "
+				 << key << endl
+				 << "    Old value: "
+				 << oldTolerancesValue << endl
+				 << "    New value: "
+				 << newTolerancesValue << endl
 				 << endl;
 
-			    Foam::debug::tolerances().set(key, newTolerancesValue);
+			    Foam::debug::tolerances().set
+			    (
+				key,
+				newTolerancesValue
+			    );
 
-			    std::list<controlSwitches<scalar> *> curList = runTimeTolerancesSwitchValues[key];
+			    std::list<controlSwitches<scalar> *> curList =
+				tolerancesSwitchValues[key];
 
 			    // Modify all entries for this key
-			    forAllIter(std::list<controlSwitches<scalar> *>, curList, iterI)
+			    forAllIter
+			    (
+				std::list<controlSwitches<scalar> *>,
+				curList,
+				iterI
+			    )
+			    {
 				*(*iterI) =  newTolerancesValue;
+			    }
 			}
 			else
 			{
-			    // Usage of non-existent Tolerances: best to abort right away
-			    SortableList<Foam::word> sortedValidKeys(runTimeTolerancesSwitchValues.size());
+			    // Usage of non-existent Tolerances: best to
+			    // abort right away
+			    SortableList<Foam::word> sortedValidKeys
+			    (
+				tolerancesSwitchValues.size()
+			    );
 
 			    int i=0;
-			    forAllIter(ListTolerancesControlSwitches, runTimeTolerancesSwitchValues, iterI)
-				{
-				    sortedValidKeys[i++] = iterI->first;
-				}
+			    forAllIter
+			    (
+				ListTolerancesControlSwitches,
+				tolerancesSwitchValues,
+				iterI
+			    )
+			    {
+				sortedValidKeys[i++] = iterI->first;
+			    }
 			    sortedValidKeys.sort();
 
 			    FatalError
-				<< "Usage of non-existent Tolerances value: " << key
+				<< "Usage of non-existent Tolerances name: "
+				<< key
 				<< endl << endl
-				<< "Valid entries for this application are: " << sortedValidKeys
+				<< "Valid entries for this application are: "
+				<< sortedValidKeys
 				<< exit(FatalError);
 			}
 		    }
 		    else
 		    {
 			FatalError
-			    << "No Tolerances values are available for this application."
+			    << "No Tolerances values are available for "
+			    << "this application."
 			    << exit(FatalError);
 		    }
 		}
@@ -449,50 +658,85 @@ void Foam::debug::updateCentralDictVars(Foam::debug::globalControlDictSwitchSet 
 		{
 		    if (constantsSwitchValues_)
 		    {
-			ListConstantsControlSwitches& runTimeConstantsSwitchValues = *constantsSwitchValues_;
+			ListConstantsControlSwitches& constantsSwitchValues =
+			    *constantsSwitchValues_;
+
 			scalar oldDimensionedConstantsValue;
 			scalar newDimensionedConstantsValue;
 			isskv >> newDimensionedConstantsValue;
 
-			if(Foam::dimensionedConstants().readIfPresent(key, oldDimensionedConstantsValue))
+			if (Foam::dimensionedConstants().readIfPresent
+			    (
+				key,
+				oldDimensionedConstantsValue
+			    )
+			  )
 			{
 			    Info << endl
-				 << "Warning: Modification of DimensionedConstant: " << key << endl
-				 << "    Old value: " << oldDimensionedConstantsValue << endl
-				 << "    New value: " << newDimensionedConstantsValue << endl
+				 << "Warning: Modification of DimensionedConstant: "
+				 << key << endl
+				 << "    Old value: "
+				 << oldDimensionedConstantsValue << endl
+				 << "    New value: "
+				 << newDimensionedConstantsValue << endl
 				 << endl;
 
-			    Foam::dimensionedConstants().set(key, newDimensionedConstantsValue);
+			    Foam::dimensionedConstants().set
+			    (
+				key,
+				newDimensionedConstantsValue
+			    );
 
-			    std::list<controlSwitches<scalar> *> curList = runTimeConstantsSwitchValues[key];
+			    std::list<controlSwitches<scalar> *> curList =
+				constantsSwitchValues[key];
 
 			    // Modify all entries for this key
-			    forAllIter(std::list<controlSwitches<scalar> *>, curList, iterI)
+			    forAllIter
+			    (
+				std::list<controlSwitches<scalar> *>,
+				curList,
+				iterI
+			    )
+			    {
 				*(*iterI) =  newDimensionedConstantsValue;
+			    }
 			}
 			else
 			{
-			    // Usage of non-existent DimensionedConstants: best to abort right away
-			    SortableList<Foam::word> sortedValidKeys(runTimeConstantsSwitchValues.size());
+			    // Usage of non-existent DimensionedConstants: best to
+			    // abort right away
+			    SortableList<Foam::word> sortedValidKeys
+			    (
+				constantsSwitchValues.size()
+			    );
 
 			    int i=0;
-			    forAllIter(ListConstantsControlSwitches, runTimeConstantsSwitchValues, iterI)
+			    forAllIter
+			    (
+				ListConstantsControlSwitches,
+				constantsSwitchValues,
+				iterI
+			    )
 			    {
 				sortedValidKeys[i++] = iterI->first;
 			    }
 			    sortedValidKeys.sort();
 
 			    FatalError
-				<< "Usage of non-existent DimensionedConstants: " << key
+				<< "Usage of non-existent "
+				<< "DimensionedConstants name: "
+				<< key
 				<< endl << endl
-				<< "Valid entries for this application are: " << sortedValidKeys
+				<< "Valid entries for this application are: "
+				<< sortedValidKeys
 				<< exit(FatalError);
 			}
 		    }
 		    else
 		    {
 			FatalError
-			    << "No DimensionedConstants values are available for this application."
+			    << "No DimensionedConstants values are available "
+			    << "for this application."
 			    << exit(FatalError);
 		    }
 		}

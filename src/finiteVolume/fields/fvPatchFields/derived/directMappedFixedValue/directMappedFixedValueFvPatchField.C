@@ -77,7 +77,7 @@ void directMappedFixedValueFvPatchField<Type>::mapField()
             }
             mapDistribute::distribute
             (
-                Pstream::defaultCommsType,
+                static_cast<Pstream::commsTypes>(Pstream::defaultCommsType()),
                 distMap.schedule(),
                 distMap.constructSize(),
                 distMap.subMap(),
@@ -112,7 +112,7 @@ void directMappedFixedValueFvPatchField<Type>::mapField()
             newValues_ = nbrField.boundaryField()[nbrPatchID];
             mapDistribute::distribute
             (
-                Pstream::defaultCommsType,
+                static_cast<Pstream::commsTypes>(Pstream::defaultCommsType()),
                 distMap.schedule(),
                 distMap.constructSize(),
                 distMap.subMap(),
@@ -144,7 +144,7 @@ void directMappedFixedValueFvPatchField<Type>::mapField()
 
             mapDistribute::distribute
             (
-                Pstream::defaultCommsType,
+                static_cast<Pstream::commsTypes>(Pstream::defaultCommsType()),
                 distMap.schedule(),
                 distMap.constructSize(),
                 distMap.subMap(),

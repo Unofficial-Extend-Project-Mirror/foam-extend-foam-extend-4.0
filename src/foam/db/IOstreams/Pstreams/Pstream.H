@@ -232,8 +232,9 @@ public:
         static const Foam::debug::optimisationSwitch nProcsSimpleSum;
 
         //- Default commsType
-        static commsTypes defaultCommsType;
+        static commsTypes defaultCommsType_;
 
+        static const Foam::debug::optimisationSwitch defaultCommsType;
 
     // Constructors
 

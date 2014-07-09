@@ -274,7 +274,7 @@ void Foam::turbulentTemperatureCoupledBaffleFvPatchScalarField::updateCoeffs()
         scalarField nbrIntFld = nbrField.patchInternalField();
         mapDistribute::distribute
         (
-            Pstream::defaultCommsType,
+            static_cast<Pstream::commsTypes>(Pstream::defaultCommsType()),
             distMap.schedule(),
             distMap.constructSize(),
             distMap.subMap(),           // what to send
@@ -286,7 +286,7 @@ void Foam::turbulentTemperatureCoupledBaffleFvPatchScalarField::updateCoeffs()
         scalarField nbrKDelta = nbrField.K()*nbrPatch.deltaCoeffs();
         mapDistribute::distribute
         (
-            Pstream::defaultCommsType,
+            static_cast<Pstream::commsTypes>(Pstream::defaultCommsType()),
             distMap.schedule(),
             distMap.constructSize(),
             distMap.subMap(),           // what to send
@@ -307,7 +307,7 @@ void Foam::turbulentTemperatureCoupledBaffleFvPatchScalarField::updateCoeffs()
         // Distribute back and assign to neighbour
         mapDistribute::distribute
         (
-            Pstream::defaultCommsType,
+            static_cast<Pstream::commsTypes>(Pstream::defaultCommsType()),
             distMap.schedule(),
             nbrField.size(),
             distMap.constructMap(),     // reverse : what to send
