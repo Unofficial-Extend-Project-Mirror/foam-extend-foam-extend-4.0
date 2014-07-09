@@ -63,6 +63,9 @@ else:
             write(arg)
         write(end)
 
+def printDebug(*args):
+    print_(*args,file=sys.stderr)
+
 # the actual work starts here
 from os import environ,path
 
@@ -77,7 +80,7 @@ verbose="FOAM_NEW_STARTUP_DEBUG" in environ
 # Location of this script
 here=path.dirname(path.abspath(sys.argv[0]))
 if verbose:
-    print_("Using scripts in",here)
+    printDebug("Using scripts in",here)
 
 # For which shell
 destShell=sys.argv[1]
@@ -108,26 +111,31 @@ cmd+='echo "=== End"'
 cmd="bash -c '"+cmd+"'"
 
 if verbose:
-    print_("Cmd:",cmd)
+    printDebug("Cmd:",cmd)
 
 # Execute the shell commands
 if sys.version_info<(2,6):
     # for old machines (RHEL 5)
     raus,rein = popen4(cmd)
+    ret=0 # standin for a proper implementation
 else:
     p = Popen(cmd, shell=True,
               stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
     (rein,raus)=(p.stdin,p.stdout)
+    ret=p.wait()
 
 lines=[l.strip().decode() for l in raus.readlines()]
 rein.close()
 raus.close()
 
-if verbose:
-    print_("========= Script output start")
+if verbose or ret!=0:
+    printDebug("========= Script output start")
     for l in lines:
-        print_(l)
-    print_("========= Script output end")
+        printDebug(l)
+    printDebug("========= Script output end")
+
+if ret!=0:
+    printDebug("Command return code",ret,". There seems to be a problem")
 
 def extractVariables(lines):
     vars={}
@@ -180,22 +188,31 @@ def splitPaths(orig):
             new[k]=orig[k]
     return new
 
-vars=splitPaths(
-    changedVars(extractVariables(lines[lines.index("=== Export pre")+1:
-                                        lines.index("=== Alias pre")]),
-                 extractVariables(lines[lines.index("=== Export post")+1:
-                                        lines.index("=== Alias post")])))
-aliases=changedVars(extractAliases(lines[lines.index("=== Alias post")+1:
-                                         lines.index("=== Script")]),
-                    extractAliases(lines[lines.index("=== Alias post")+1:
-                                         lines.index("=== End")]))
+try:
+    vars=splitPaths(
+        changedVars(extractVariables(lines[lines.index("=== Export pre")+1:
+                                           lines.index("=== Alias pre")]),
+                    extractVariables(lines[lines.index("=== Export post")+1:
+                                           lines.index("=== Alias post")])))
+    aliases=changedVars(extractAliases(lines[lines.index("=== Alias post")+1:
+                                             lines.index("=== Script")]),
+                        extractAliases(lines[lines.index("=== Alias post")+1:
+                                             lines.index("=== End")]))
 
-scriptOutput=lines[lines.index("=== Script")+1:
-                   lines.index("=== Export post")]
+    scriptOutput=lines[lines.index("=== Script")+1:
+                       lines.index("=== Export post")]
+except Exception:
+    e = sys.exc_info()[1] # Needed because python 2.5 does not support 'as e'
+    err, detail, tb = sys.exc_info()
+    printDebug("Output of",cmd,"not successfully parsed")
+    import traceback
+    traceback.print_exception(err,detail,tb,file=sys.stderr)
+    sys.exit(-1)
 
+# Pass output of the script to stderr for debugging
 if len(scriptOutput)>0:
     for l in scriptOutput:
-        print_("Script output:",l,file=sys.stderr)
+        print_(l,file=sys.stderr)
 
 class ShellConvert(object):
     def __call__(self,vars,aliases):
@@ -218,6 +235,9 @@ class BashConvert(ShellConvert):
         return "alias %s='%s'" % (n,v)
 
 class CshConvert(ShellConvert):
+    def __init__(self,sName="csh"):
+        self.shellName=sName
+
     def toVar(self,n,v):
         if type(v)==list:
             val=":".join(v)
@@ -229,7 +249,7 @@ class CshConvert(ShellConvert):
         return result
 
     def toAlias(self,n,v):
-        val=v.replace(" . ","source ").replace("bash","csh")
+        val=v.replace(" . ","source ").replace("bash",self.shellName)
         if val.find("unset ")>=0:
             val=val.replace("unset ","unsetenv ")
         # Make sure that more than one export is possible and no wrong = is replaced
@@ -238,6 +258,10 @@ class CshConvert(ShellConvert):
             val=val.replace("export ","setenv ",1)
             val=val[:pos]+val[pos:].replace("="," ",1)
         return "alias %s '%s'" % (n,val)
+
+class TcshConvert(CshConvert):
+    def __init__(self):
+        CshConvert.__init__(self,"tcsh")
 
 class FishConvert(ShellConvert):
     def toVar(self,n,v):
@@ -272,8 +296,35 @@ shells={"bash" : BashConvert,
         "zsh"  : ZshConvert,
         "fish" : FishConvert,
         "csh"  : CshConvert,
-        "tcsh"  : CshConvert}
+        "tcsh" : TcshConvert}
 
-result=shells[destShell]()(vars,aliases)
-open(path.abspath(sys.argv[0])+"."+destShell,"w").write(result)
+try:
+    converter=shells[destShell]()
+except KeyError:
+    printDebug("No converter for shell",destShell,
+               "Available:"," ".join(shells.keys()))
+    sys.exit(-1)
+
+try:
+    result=converter(vars,aliases)
+except Exception:
+    e = sys.exc_info()[1] # Needed because python 2.5 does not support 'as e'
+    err, detail, tb = sys.exc_info()
+    printDebug("Problem while converting output for",destShell)
+    import traceback
+    traceback.print_exception(err,detail,tb,file=sys.stderr)
+    sys.exit(-1)
+
+try:
+    open(path.abspath(sys.argv[0])+"."+destShell,"w").write(result)
+except OSError:
+    # We are not allowed to write here. Try tmp
+    try:
+        open(path.join("/tmp",
+                       path.basename(sys.argv[0])+"."+destShell),"w").write(result)
+    except OSError:
+        # Nobody wants this
+        pass
+
+# This is the only part that goes to stdout to be sourced by the calling script
 print_(result)
