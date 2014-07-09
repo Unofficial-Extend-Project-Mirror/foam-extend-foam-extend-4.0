@@ -225,7 +225,7 @@ class CshConvert(ShellConvert):
             val=v
         result='setenv %s "%s"' % (n,val)
         if n=="PATH":
-            result+="\nset path (%s)" % " ".join(v)
+            result+="\nset path=(%s)" % " ".join(v)
         return result
 
     def toAlias(self,n,v):
@@ -271,7 +271,8 @@ class ZshConvert(BashConvert):
 shells={"bash" : BashConvert,
         "zsh"  : ZshConvert,
         "fish" : FishConvert,
-        "csh"  : CshConvert}
+        "csh"  : CshConvert,
+        "tcsh"  : CshConvert}
 
 result=shells[destShell]()(vars,aliases)
 open(path.abspath(sys.argv[0])+"."+destShell,"w").write(result)
