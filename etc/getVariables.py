@@ -315,14 +315,19 @@ except Exception:
     traceback.print_exception(err,detail,tb,file=sys.stderr)
     sys.exit(-1)
 
+if PY3:
+    osException=OSError
+else:
+    osException=IOError
+
 try:
     open(path.abspath(sys.argv[0])+"."+destShell,"w").write(result)
-except OSError:
+except osException:
     # We are not allowed to write here. Try tmp
     try:
         open(path.join("/tmp",
                        path.basename(sys.argv[0])+"."+destShell),"w").write(result)
-    except OSError:
+    except osException:
         # Nobody wants this
         pass
 
