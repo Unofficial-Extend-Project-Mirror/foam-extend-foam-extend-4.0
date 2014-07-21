@@ -89,8 +89,8 @@ destShell=sys.argv[1]
 additional=sys.argv[2:]
 
 if verbose:
-    print("Target shell",destShell)
-    print("Additional settings:",additional)
+    printDebug("Target shell",destShell)
+    printDebug("Additional settings:",additional)
 
 # Certain bashrc-s fail if these are set
 for v in ["FOAM_INST_DIR",
@@ -229,7 +229,10 @@ class BashConvert(ShellConvert):
             val=":".join(v)
         else:
             val=v
-        return 'export %s=%s' % (n,val)
+        if val.find(" "):
+            return 'export %s="%s"' % (n,val)
+        else:
+            return 'export %s=%s' % (n,val)
 
     def toAlias(self,n,v):
         return "alias %s='%s'" % (n,v)
