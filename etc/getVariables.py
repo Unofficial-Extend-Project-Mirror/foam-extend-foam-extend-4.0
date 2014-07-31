@@ -260,6 +260,11 @@ class CshConvert(ShellConvert):
             pos=val.find("export ")
             val=val.replace("export ","setenv ",1)
             val=val[:pos]+val[pos:].replace("="," ",1)
+
+        # Prefix with a variable that tells the script that it is sourced from an alias
+        if val.find("source")>=0:
+            val=("setenv FOAM_SOURCED_FROM_ALIAS %s/tcshrc ; " % here)+val
+
         return "alias %s '%s'" % (n,val)
 
 class TcshConvert(CshConvert):

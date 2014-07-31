@@ -31,11 +31,23 @@
 #
 #------------------------------------------------------------------------------
 
-set sourced=($_)
-set thisScript=($sourced[2])
+if ( $?FOAM_SOURCED_FROM_ALIAS ) then
+    # Sourced from an alias
+    set sourced=($_)
+    shift sourced
 
-shift sourced
-shift sourced
+    set thisScript=$FOAM_SOURCED_FROM_ALIAS
+
+    # Clear the variable to make sure regular sourcing still works
+    unsetenv FOAM_SOURCED_FROM_ALIAS
+else
+    # regular sourcing
+    set sourced=($_)
+    set thisScript=($sourced[2])
+
+    shift sourced
+    shift sourced
+endif
 
 set thisDir=`python -c "from os.path import *;import sys;sys.stdout.write(dirname(abspath(join(curdir,'$thisScript'))))"`
 
