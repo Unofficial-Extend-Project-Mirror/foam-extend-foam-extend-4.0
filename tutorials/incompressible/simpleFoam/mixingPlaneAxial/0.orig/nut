@@ -11,58 +11,64 @@ FoamFile
     format      ascii;
     class       volScalarField;
     location    "0";
-    object      epsilon;
+    object      nut;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-dimensions [ 0 2 -3 0 0 0 0 ];
+dimensions      [0 2 -1 0 0 0 0];
 
-internalField uniform 0.1;
+internalField   uniform 0;
 
 boundaryField
 {
-    downstreamMixingPlanePatch
+    outflow
     {
-        type mixingPlane;
-    }
-    upstreamMixingPlanePatch
-    {
-        type mixingPlane;
-    }
-    downstreamWall
-    {
-        type symmetryPlane;
-    }
-    upstreamWall
-    {
-        type symmetryPlane;
-    }
-    downstreamPerio1
-    {
-        type cyclicGgi;
-    }
-    downstreamPerio2
-    {
-        type cyclicGgi;
-    }
-    upstreamPerio1
-    {
-        type cyclicGgi;
-    }
-    upstreamPerio2
-    {
-        type cyclicGgi;
+        type            calculated;
+        value           uniform 0;
     }
     inflow
     {
-        type fixedValue;
-        value uniform 0.1;
+        type            calculated;
+        value           uniform 0;
     }
-    outflow
+    upstreamPerio1
     {
-        type zeroGradient;
+        type            cyclicGgi;
+        value           uniform 0;
+    }
+    upstreamPerio2
+    {
+        type            cyclicGgi;
+        value           uniform 0;
+    }
+    upstreamMixingPlanePatch
+    {
+        type            mixingPlane;
+        value           uniform 0;
+    }
+    downstreamMixingPlanePatch
+    {
+        type            mixingPlane;
+        value           uniform 0;
+    }
+    downstreamWall
+    {
+        type            symmetryPlane;
+    }
+    upstreamWall
+    {
+        type            symmetryPlane;
+    }
+    downstreamPerio1
+    {
+        type            cyclicGgi;
+        value           uniform 0;
+    }
+    downstreamPerio2
+    {
+        type            cyclicGgi;
+        value           uniform 0;
     }
 }
 
 // ************************************************************************* //
-
