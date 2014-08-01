@@ -41,7 +41,7 @@ SourceFiles
 #include "linear.H"
 #include "typeInfo.H"
 #include "runTimeSelectionTables.H"
-#include "blockLduMatrices.H"
+#include "BlockLduSystem.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -152,12 +152,15 @@ public:
             const GeometricField<Type, fvPatchField, volMesh>&
         ) = 0;
 
-        //- Return the blockLduMatrix<vector> corresponding to the implicit
-        // div discretization. For block coupled system.
-        virtual tmp<blockVectorMatrix> fvmDiv
+        //- Return the BlockLduSystem corresponding to the implicit div
+        // discretization. For block coupled system.
+        virtual tmp
+        <
+            BlockLduSystem<vector, typename innerProduct<vector, Type>::type>
+        > fvmDiv
         (
             const GeometricField<Type, fvPatchField, volMesh>&
-        ) const = 0;
+        ) const;
 };
 
 

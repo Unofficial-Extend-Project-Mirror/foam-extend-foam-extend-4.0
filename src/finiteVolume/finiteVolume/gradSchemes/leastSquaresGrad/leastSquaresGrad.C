@@ -121,8 +121,8 @@ leastSquaresGrad<Type>::grad
             forAll(neiVsf, patchFaceI)
             {
                 lsGrad[faceCells[patchFaceI]] +=
-                    patchOwnLs[patchFaceI]*
-                    (neiVsf[patchFaceI] - vsf[faceCells[patchFaceI]]);
+                    patchOwnLs[patchFaceI]
+                   *(neiVsf[patchFaceI] - vsf[faceCells[patchFaceI]]);
             }
         }
         else
@@ -132,8 +132,8 @@ leastSquaresGrad<Type>::grad
             forAll(patchVsf, patchFaceI)
             {
                 lsGrad[faceCells[patchFaceI]] +=
-                     patchOwnLs[patchFaceI]*
-                    (patchVsf[patchFaceI] - vsf[faceCells[patchFaceI]]);
+                     patchOwnLs[patchFaceI]
+                    *(patchVsf[patchFaceI] - vsf[faceCells[patchFaceI]]);
             }
         }
     }
@@ -143,6 +143,34 @@ leastSquaresGrad<Type>::grad
     gaussGrad<Type>::correctBoundaryConditions(vsf, lsGrad);
 
     return tlsGrad;
+}
+
+template<class Type>
+tmp
+<
+    BlockLduSystem<vector, typename outerProduct<vector, Type>::type>
+> leastSquaresGrad<Type>::fvmGrad
+(
+   const GeometricField<Type, fvPatchField, volMesh>& vf
+) const
+{
+   FatalErrorIn
+   (
+       "tmp<BlockLduSystem> fvmGrad\n"
+       "(\n"
+       "    GeometricField<Type, fvPatchField, volMesh>&"
+       ")\n"
+   )   << "Implicit gradient operator defined only for scalar."
+       << abort(FatalError);
+
+   typedef typename outerProduct<vector, Type>::type GradType;
+
+   tmp<BlockLduSystem<vector, GradType> > tbs
+   (
+       new BlockLduSystem<vector, GradType>(vf.mesh())
+   );
+
+   return tbs;
 }
 
 

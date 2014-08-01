@@ -127,7 +127,6 @@ public:
             const GeometricField<Type, fvsPatchField, surfaceMesh>&
         );
 
-
         //- Return the gradient of the given field calculated
         //  using Gauss' theorem on the interpolated field
         tmp
@@ -139,13 +138,15 @@ public:
             const GeometricField<Type, fvPatchField, volMesh>&
         ) const;
 
-        //- Return the blockLduMatrix<vector> corresponding to the implicit
-        // grad discretization. For block coupled systems.
-        tmp<blockVectorMatrix> fvmGrad
+        //- Return the BlockLduSystem corresponding to the implicit grad
+        // discretization. For block coupled systems.
+        tmp
+        <
+            BlockLduSystem<vector, typename outerProduct<vector, Type>::type>
+        > fvmGrad
         (
             const GeometricField<Type, fvPatchField, volMesh>&
         ) const;
-
 
         // Correct boundary conditions moved to base class
         // HJ, 14/Jun/2013

@@ -40,7 +40,7 @@ SourceFiles
 #include "surfaceFieldsFwd.H"
 #include "typeInfo.H"
 #include "runTimeSelectionTables.H"
-#include "blockLduMatrices.H"
+#include "BlockLduSystem.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -138,9 +138,12 @@ public:
         ) const = 0;
 
 
-        //- Return the blockLduMatrix<vector> corresponding to the implicit
-        // grad discretization. For block coupled systems.
-        virtual tmp<blockVectorMatrix> fvmGrad
+        //- Return the BlockLduSystem corresponding to the implicit grad
+        // discretization. For block coupled systems.
+        virtual tmp
+        <
+            BlockLduSystem<vector, typename outerProduct<vector, Type>::type>
+        > fvmGrad
         (
             const GeometricField<Type, fvPatchField, volMesh>&
         ) const;

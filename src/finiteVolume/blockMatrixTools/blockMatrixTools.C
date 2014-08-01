@@ -862,12 +862,12 @@ void insertEquation
 }
 
 
-template<class blockType1, class blockType2>
+template<class blockType1, class fieldType, class blockType2>
 void insertBlock
 (
     const label loc1,
     const label loc2,
-    const BlockLduMatrix<blockType1>& blockMatrix,
+    const BlockLduSystem<blockType1, fieldType>& blockSystem,
     BlockLduMatrix<blockType2>& A,
     const bool incFirst
 )
@@ -875,9 +875,9 @@ void insertBlock
     // Sanity checks
     {
         const label blockMatrixSize = pTraits<blockType1>::nComponents;
-        const label blockSystemSize = pTraits<blockType2>::nComponents;
+        const label blockMatrixASize = pTraits<blockType2>::nComponents;
 
-        if (blockMatrixSize > blockSystemSize)
+        if (blockMatrixSize > blockMatrixASize)
         {
             FatalErrorIn
             (
@@ -908,7 +908,6 @@ void insertBlock
                 << "member function."
                 << abort(FatalError);
         }
-
     }
 
     const label nCmpts = pTraits<blockType1>::nComponents;
@@ -917,11 +916,11 @@ void insertBlock
 
     // Get references to ldu fields of blockMatrix always as linear
     const typename CoeffField<blockType1>::linearTypeField& bmd =
-        blockMatrix.diag().asLinear();
+        blockSystem.diag().asLinear();
     const typename CoeffField<blockType1>::linearTypeField& bmu =
-        blockMatrix.upper().asLinear();
+        blockSystem.upper().asLinear();
     const typename CoeffField<blockType1>::linearTypeField& bml =
-        blockMatrix.lower().asLinear();
+        blockSystem.lower().asLinear();
 
     // Get references to ldu fields of A matrix always as square
     typename CoeffField<blockType2>::squareTypeField& blockDiag =
@@ -936,13 +935,16 @@ void insertBlock
     {
         forAll(bmd, cellI)
         {
-            blockDiag[cellI](localLoc1, localLoc2) += bmd[cellI](cmptI);
+            blockDiag[cellI](localLoc1, localLoc2) +=
+                bmd[cellI].component(cmptI);
         }
 
         forAll(bmu, faceI)
         {
-            blockUpper[faceI](localLoc1, localLoc2) += bmu[faceI](cmptI);
-            blockLower[faceI](localLoc1, localLoc2) += bml[faceI](cmptI);
+            blockUpper[faceI](localLoc1, localLoc2) +=
+                bmu[faceI].component(cmptI);
+            blockLower[faceI](localLoc1, localLoc2) +=
+                bml[faceI].component(cmptI);
         }
 
         if (incFirst)
@@ -957,255 +959,85 @@ void insertBlock
 }
 
 
-template<class blockType1, class blockType2>
+template<class blockType1, class blockType2, class fieldType>
 void insertBoundaryContributions
 (
     const label loc1,
     const label loc2,
-    const BlockLduMatrix<blockType1>& blockMatrix,
-    GeometricField<scalar, fvPatchField, volMesh>& psi,
+    const BlockLduSystem<blockType1, fieldType>& blockSystem,
     BlockLduMatrix<blockType2>& A,
     Field<blockType2>& b,
     const bool incFirst
 )
 {
-    // Interpolation scheme for pressure gradient
-    tmp<surfaceInterpolationScheme<scalar> >
-    tinterpScheme
-    (
-        surfaceInterpolationScheme<scalar>::New
-        (
-            psi.mesh(),
-            psi.mesh().schemesDict().interpolationScheme
-            (
-                "grad(" + psi.name() + ')'
-            )
-        )
-    );
-
-    surfaceScalarField weights(tinterpScheme().weights(psi));
+    // Need to get reference to fvMesh instead of lduMesh
+    const fvBoundaryMesh& bmesh = refCast<const fvMesh>(A.mesh()).boundary();
 
     const label nCmpts = pTraits<blockType1>::nComponents;
+    const label nSrcCmpts = pTraits<fieldType>::nComponents;
     label localLoc1 = loc1;
     label localLoc2 = loc2;
 
-    // Get references to ldu fields of A matrix always as square
-    typename CoeffField<blockType2>::squareTypeField& blockDiag =
-         A.diag().asSquare();
+    const Field<fieldType>& source = blockSystem.source();
 
-    // Insert boundary contributions directly into the matrix, this assumes
-    // that blockMatrix came from implicit grad or div operators!
-    psi.boundaryField().updateCoeffs();
-    forAll(psi.boundaryField(), patchI)
+    // Insert source from block system to rhs
+    for (label cmptI = 0; cmptI < nSrcCmpts; cmptI++)
     {
-        const fvPatchScalarField& pf = psi.boundaryField()[patchI];
-        const fvPatch& patch = pf.patch();
-        const vectorField& Sf = patch.Sf();
-        const fvsPatchScalarField& pw = weights.boundaryField()[patchI];
+        scalarField sourceCmpt(source.component(cmptI));
 
-        scalarField internalCoeffs(pf.valueInternalCoeffs(pw));
-
-        if (patch.coupled())
+        forAll(b, cellI)
         {
-            typename CoeffField<blockType2>::squareTypeField& pcoupleUpper =
-                A.coupleUpper()[patchI].asSquare();
-            typename CoeffField<blockType2>::squareTypeField& pcoupleLower =
-                A.coupleLower()[patchI].asSquare();
+            b[cellI](localLoc1) += sourceCmpt[cellI];
+        }
 
-            vectorField pcl = -pw*Sf;
-            vectorField pcu = pcl + Sf;
-
-            for (label cmptI = 0; cmptI < nCmpts; cmptI++)
-            {
-                forAll(pf, faceI)
-                {
-                    label cellI = patch.faceCells()[faceI];
-
-                    // Diag contribution
-                    blockDiag[cellI](localLoc1, localLoc2) +=
-                        internalCoeffs[faceI]*Sf[faceI].component(cmptI);
-
-                    // Coupling contributions
-                    pcoupleUpper[faceI](localLoc1, localLoc2) -=
-                          pcu[faceI].component(cmptI);
-                    pcoupleLower[faceI](localLoc1, localLoc2) -=
-                          pcl[faceI].component(cmptI);
-                }
-
-                if (incFirst)
-                {
-                    localLoc1++;
-                }
-                else
-                {
-                    localLoc2++;
-                }
-            }
-
-            // Reset local locations for other patches
-            localLoc1 = loc1;
-            localLoc2 = loc2;
+        if (incFirst)
+        {
+            localLoc1++;
         }
         else
         {
-            scalarField boundaryCoeffs(pf.valueBoundaryCoeffs(pw));
-
-            for (label cmptI = 0; cmptI < nCmpts; cmptI++)
-            {
-                forAll(pf, faceI)
-                {
-                    label cellI = patch.faceCells()[faceI];
-
-                    // Diag contribution
-                    blockDiag[cellI](localLoc1, localLoc2) +=
-                        internalCoeffs[faceI]*Sf[faceI].component(cmptI);
-
-                    // Source contribution
-                    b[cellI](localLoc1) -=
-                        boundaryCoeffs[faceI]*Sf[faceI].component(cmptI);
-                }
-
-                if (incFirst)
-                {
-                    localLoc1++;
-                }
-                else
-                {
-                    localLoc2++;
-                }
-            }
-
-            // Reset local locations for other patches
-            localLoc1 = loc1;
-            localLoc2 = loc2;
+            localLoc2++;
         }
     }
-}
 
+    // Reset local locations for coupling contributions
+    localLoc1 = loc1;
+    localLoc2 = loc2;
 
-template<class blockType1, class blockType2>
-void insertBoundaryContributions
-(
-    const label loc1,
-    const label loc2,
-    const BlockLduMatrix<blockType1>& blockMatrix,
-    GeometricField<vector, fvPatchField, volMesh>& psi,
-    BlockLduMatrix<blockType2>& A,
-    Field<blockType2>& b,
-    const bool incFirst
-)
-{
-    // Interpolation scheme for velocity divergence
-    tmp<surfaceInterpolationScheme<scalar> >
-    tinterpScheme
-    (
-        surfaceInterpolationScheme<scalar>::New
-        (
-            psi.mesh(),
-            psi.mesh().schemesDict().interpolationScheme
-            (
-                "div(" + psi.name() + ')'
-            )
-        )
-    );
-
-    surfaceScalarField weights(tinterpScheme().weights(mag(psi)));
-
-    const label nCmpts = pTraits<blockType1>::nComponents;
-    label localLoc1 = loc1;
-    label localLoc2 = loc2;
-
-    // Get references to ldu fields of A matrix always as square
-    typename CoeffField<blockType2>::squareTypeField& blockDiag =
-         A.diag().asSquare();
-
-    // Insert boundary contributions directly into the matrix, this assumes
-    // that blockMatrix came from implicit grad or div operators!
-    psi.boundaryField().updateCoeffs();
-    forAll(psi.boundaryField(), patchI)
+    // Insert coupling contributions into block matrix
+    forAll(bmesh, patchI)
     {
-        const fvPatchVectorField& pf = psi.boundaryField()[patchI];
-        const fvPatch& patch = pf.patch();
-        const vectorField& Sf = patch.Sf();
-        const fvsPatchScalarField& pw = weights.boundaryField()[patchI];
-
-        vectorField internalCoeffs(pf.valueInternalCoeffs(pw));
-
-        if (patch.coupled())
+        if (bmesh[patchI].coupled())
         {
             typename CoeffField<blockType2>::squareTypeField& pcoupleUpper =
                 A.coupleUpper()[patchI].asSquare();
             typename CoeffField<blockType2>::squareTypeField& pcoupleLower =
                 A.coupleLower()[patchI].asSquare();
 
-            vectorField pcl = -pw*Sf;
-            vectorField pcu = pcl + Sf;
+            const typename CoeffField<blockType1>::linearTypeField& bmcu =
+                blockSystem.coupleUpper()[patchI].asLinear();
+            const typename CoeffField<blockType1>::linearTypeField& bmcl =
+                blockSystem.coupleLower()[patchI].asLinear();
 
-            for (label cmptI = 0; cmptI < nCmpts; cmptI++)
-            {
-                forAll(pf, faceI)
+                for (label cmptI = 0; cmptI < nCmpts; cmptI++)
                 {
-                    label cellI = patch.faceCells()[faceI];
+                    forAll(bmcu, faceI)
+                    {
+                        pcoupleUpper[faceI](localLoc1, localLoc2) +=
+                              bmcu[faceI].component(cmptI);
+                        pcoupleLower[faceI](localLoc1, localLoc2) +=
+                              bmcl[faceI].component(cmptI);
+                    }
 
-                    // Diag contribution
-                    blockDiag[cellI](localLoc1, localLoc2) += cmptMultiply
-                    (
-                        internalCoeffs[faceI], Sf[faceI]
-                    ).component(cmptI);
-
-                    // Coupling contributions
-                    pcoupleLower[faceI](localLoc1, localLoc2) -=
-                        pcl[faceI].component(cmptI);
-                    pcoupleUpper[faceI](localLoc1, localLoc2) -=
-                        pcu[faceI].component(cmptI);
+                    if (incFirst)
+                    {
+                        localLoc1++;
+                    }
+                    else
+                    {
+                        localLoc2++;
+                    }
                 }
-
-                if (incFirst)
-                {
-                    localLoc1++;
-                }
-                else
-                {
-                    localLoc2++;
-                }
-            }
-
-            // Reset local locations for other patches
-            localLoc1 = loc1;
-            localLoc2 = loc2;
-        }
-        else
-        {
-            vectorField boundaryCoeffs(pf.valueBoundaryCoeffs(pw));
-
-            for (label cmptI = 0; cmptI < nCmpts; cmptI++)
-            {
-                forAll(pf, faceI)
-                {
-                    label cellI = patch.faceCells()[faceI];
-
-                    // Diag contribution
-                    blockDiag[cellI](localLoc1, localLoc2) += cmptMultiply
-                    (
-                        internalCoeffs[faceI], Sf[faceI]
-                    ).component(cmptI);
-
-                    // Source contribution
-                    b[cellI](localLoc1) -= cmptMultiply
-                    (
-                        boundaryCoeffs[faceI], Sf[faceI]
-                    ).component(cmptI);
-                }
-
-                if (incFirst)
-                {
-                    localLoc1++;
-                }
-                else
-                {
-                    localLoc2++;
-                }
-            }
 
             // Reset local locations for other patches
             localLoc1 = loc1;
@@ -1220,15 +1052,14 @@ void insertBlockCoupling
 (
     const label loc1,
     const label loc2,
-    const BlockLduMatrix<blockType1>& blockMatrix,
-    GeometricField<fieldType, fvPatchField, volMesh>& psi,
+    const BlockLduSystem<blockType1, fieldType>& blockSystem,
     BlockLduMatrix<blockType2>& A,
     Field<blockType2>& b,
     const bool incFirst
 )
 {
-    insertBlock(loc1, loc2, blockMatrix, A, incFirst);
-    insertBoundaryContributions(loc1, loc2, blockMatrix, psi, A, b, incFirst);
+    insertBlock(loc1, loc2, blockSystem, A, incFirst);
+    insertBoundaryContributions(loc1, loc2, blockSystem, A, b, incFirst);
 }
 
 
@@ -1262,7 +1093,7 @@ void insertEquationCoupling
     }
 
     // Get references to fvScalarMatrix fields, updating boundary contributions
-    const scalarField& diag = matrix.D()();
+    scalarField& diag = matrix.D();
     scalarField& source = matrix.source();
     matrix.addBoundarySource(source, false);
 

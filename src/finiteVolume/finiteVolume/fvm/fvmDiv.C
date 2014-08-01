@@ -98,8 +98,12 @@ div
     return Div;
 }
 
+
 template<class Type>
-tmp<BlockLduMatrix<vector> > div
+tmp
+<
+    BlockLduSystem<vector, typename innerProduct<vector, Type>::type>
+> div
 (
     GeometricField<Type, fvPatchField, volMesh>& vf,
     const word& name
@@ -114,7 +118,10 @@ tmp<BlockLduMatrix<vector> > div
 
 
 template<class Type>
-tmp<BlockLduMatrix<vector> > div
+tmp
+<
+    BlockLduSystem<vector, typename innerProduct<vector, Type>::type>
+> div
 (
     GeometricField<Type, fvPatchField, volMesh>& vf
 )
