@@ -14,7 +14,7 @@
 #+OPTIONS: _:nil
 #+OPTIONS: ^:nil
 
-################################################################################
+###############################################################################
 
 ** Overview
   The foam-extend project is a fork of the OpenFOAM® open source
@@ -196,7 +196,7 @@ user@machine> git log 3.0.. > commitLog
     - Pressure-based coupled solver (block-coupling p and U)
     - Density-based coupled Roe flux solver dbnsFoam and dbnsTurbFoam
     - Major update and validation of mixing plane boundary
-    - Full deploymenr of block matrix, including block-AMG solverse
+    - Full deployment of block matrix, including block-AMG solverse
     - Further parallel dynamic mesh capability: all topological changes
       supported in parallel execution
     - Major upgrade of solid mechanics solvers
