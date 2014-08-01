@@ -1,0 +1,3 @@
+pUCoupledFullPicardFoam.C
+
+EXE = $(FOAM_APPBIN)/pUCoupledFullPicardFoam

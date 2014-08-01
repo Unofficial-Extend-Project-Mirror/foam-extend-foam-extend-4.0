@@ -61,13 +61,13 @@ defineTemplateRunTimeSelectionTable
 
 defineTemplateRunTimeSelectionTable
 (
- divScheme<symmTensor4thOrder>,
+    divScheme<symmTensor4thOrder>,
     Istream
  );
 
 defineTemplateRunTimeSelectionTable
 (
- divScheme<diagTensor>,
+    divScheme<diagTensor>,
     Istream
  );
 

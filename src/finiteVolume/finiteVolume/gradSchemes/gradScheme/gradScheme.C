@@ -99,29 +99,33 @@ gradScheme<Type>::~gradScheme()
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 template<class Type>
-tmp<blockVectorMatrix> gradScheme<Type>::fvmGrad
+tmp
+<
+    BlockLduSystem<vector, typename outerProduct<vector, Type>::type>
+>
+gradScheme<Type>::fvmGrad
 (
     const GeometricField<Type, fvPatchField, volMesh>& vf
 ) const
 {
-    FatalIOErrorIn
+    FatalErrorIn
     (
-        "tmp<blockVectorMatrix> fvmGrad\n",
+        "tmp<BlockLduSystem> gradScheme<Type>::fvmGrad\n"
         "(\n"
-        "    GeometricField<Type, fvPatchField, volMesh>&"
+        "    GeometricField<Type, fvPatchField, volMesh>&" 
         ")\n"
-    )   << "Implicit gradient operator currently defined only for Gauss grad."
-        << abort(FatalIOError);
+    )   << "Implicit gradient operator currently defined only for Gauss linear "
+        << "and leastSquares (cell and face limiters are optional)."
+        << abort(FatalError);
 
-    tmp<blockVectorMatrix> tbm
+    typedef typename outerProduct<vector, Type>::type GradType;
+
+    tmp<BlockLduSystem<vector, GradType> > tbs
     (
-        new blockVectorMatrix
-        (
-           vf.mesh()
-        )
+        new BlockLduSystem<vector, GradType>(vf.mesh())
     );
 
-    return tbm;
+    return tbs;
 }
 
 

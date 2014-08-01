@@ -1,32 +1,33 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | foam-extend: Open Source CFD
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
+    \\  /    A nd           | Copyright held by original author
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
-    This file is part of foam-extend.
+    This file is part of OpenFOAM.
 
-    foam-extend is free software: you can redistribute it and/or modify it
+    OpenFOAM is free software; you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation, either version 3 of the License, or (at your
+    Free Software Foundation; either version 2 of the License, or (at your
     option) any later version.
 
-    foam-extend is distributed in the hope that it will be useful, but
-    WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    General Public License for more details.
+    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
+    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+    for more details.
 
     You should have received a copy of the GNU General Public License
-    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
+    along with OpenFOAM; if not, write to the Free Software Foundation,
+    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 Application
     pUCoupledFoam
 
 Description
     Steady-state solver for incompressible, turbulent flow, with implicit
-    coupling between pressure and velocity achieved by BlockLduMatrix
+    coupling between pressure and velocity achieved by fvBlockMatrix.
     Turbulence is in this version solved using the existing turbulence
     structure.
 
@@ -39,13 +40,7 @@ Authors
 #include "fvCFD.H"
 #include "singlePhaseTransportModel.H"
 #include "RASModel.H"
-
-#include "VectorNFieldTypes.H"
-#include "volVectorNFields.H"
-#include "blockLduSolvers.H"
-#include "blockVectorNMatrices.H"
-
-#include "blockMatrixTools.H"
+#include "fvBlockMatrix.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -59,12 +54,8 @@ int main(int argc, char *argv[])
 #   include "initContinuityErrs.H"
 #   include "readBlockSolverControls.H"
 
-    // Calculate coupling matrices only once since the mesh doesn't change and
-    // implicit div and grad operators are only dependant on Sf. Actually
-    // coupling terms (div(U) and grad(p)) in blockMatrix do not change,
-    // so they could be inserted only once, resetting other parts of
-    // blockMatrix to zero at the end of each time step. VV, 30/April/2014
-#   include "calculateCouplingMatrices.H"
+    // Calculate div U coupling only once since it is only geometry dependant.
+    BlockLduSystem<vector, scalar> UInp(fvm::div(U));
 
     Info<< "\nStarting time loop\n" << endl;
     while (runTime.loop())
@@ -73,8 +64,8 @@ int main(int argc, char *argv[])
 
         p.storePrevIter();
 
-        // Initialize block matrix
-#       include "initializeBlockMatrix.H"
+        // Initialize the Up block system (matrix, source and reference to Up)
+        fvBlockMatrix<vector4> UpEqn(Up);
 
         // Assemble and insert momentum equation
 #       include "UEqn.H"
@@ -82,27 +73,22 @@ int main(int argc, char *argv[])
         // Assemble and insert pressure equation
 #       include "pEqn.H"
 
-        // Insert coupling, updating the boundary contributions
-        // Last argument in insertBlockCoupling says if the first location
+        // Calculate grad p coupling matrix. Needs to be here if one uses
+        // gradient schemes with limiters. VV, 9/June/2014
+        BlockLduSystem<vector, vector> pInU(fvm::grad(p));
+
+        // Last argument in insertBlockCoupling says if the column direction
         // should be incremented. This is needed for arbitrary positioning
         // of U and p in the system. This could be better. VV, 30/April/2014
-        blockMatrixTools::insertBlockCoupling(3, 0, UInp, U, A, b, false);
-        blockMatrixTools::insertBlockCoupling(0, 3, pInU, p, A, b, true);
+        UpEqn.insertBlockCoupling(0, 3, pInU, true);
+        UpEqn.insertBlockCoupling(3, 0, UInp, false);
 
         // Solve the block matrix
-        BlockSolverPerformance<vector4> solverPerf =
-            BlockLduSolver<vector4>::New
-            (
-                word("Up"),
-                A,
-                mesh.solutionDict().solver("Up")
-            )->solve(Up, b);
-
-        solverPerf.print();
+        UpEqn.solve();
 
         // Retrieve solution
-        blockMatrixTools::retrieveSolution(0, U.internalField(), Up);
-        blockMatrixTools::retrieveSolution(3, p.internalField(), Up);
+        UpEqn.retrieveSolution(0, U.internalField());
+        UpEqn.retrieveSolution(3, p.internalField());
 
         U.correctBoundaryConditions();
         p.correctBoundaryConditions();

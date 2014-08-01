@@ -98,6 +98,35 @@ divScheme<Type>::~divScheme()
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
+template<class Type>
+tmp
+<
+    BlockLduSystem<vector, typename innerProduct<vector, Type>::type>
+>
+divScheme<Type>::fvmDiv
+(
+    const GeometricField<Type, fvPatchField, volMesh>& vf
+) const
+{
+    FatalErrorIn
+    (
+        "tmp<BlockLduSystem> divScheme<Type>::fvmDiv\n"
+        "(\n"
+        "    GeometricField<Type, fvPatchField, volMesh>&"
+        ")\n"
+    )   << "Implicit div operator currently defined only for Gauss linear. "
+        << abort(FatalError);
+
+    typedef typename innerProduct<vector, Type>::type DivType;
+
+    tmp<BlockLduSystem<vector, DivType> > tbs
+    (
+        new BlockLduSystem<vector, DivType>(vf.mesh())
+    );
+
+    return tbs;
+}
+
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

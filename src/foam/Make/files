@@ -212,6 +212,7 @@ dimensionedTypes/dimensionedDiagTensor/dimensionedDiagTensor.C
 dimensionedTypes/dimensionedSymmTensor/dimensionedSymmTensor.C
 dimensionedTypes/dimensionedSymmTensor4thOrder/dimensionedSymmTensor4thOrder.C
 dimensionedTypes/dimensionedTensor/dimensionedTensor.C
+dimensionedTypes/dimensionedVectorTensorN/dimensionedVectorTensorN.C
 
 matrices/solution/solution.C
 matrices/constraint/scalarConstraint.C

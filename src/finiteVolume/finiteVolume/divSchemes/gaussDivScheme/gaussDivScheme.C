@@ -69,38 +69,31 @@ gaussDivScheme<Type>::fvcDiv
 
 
 template<class Type>
-tmp<blockVectorMatrix> gaussDivScheme<Type>::fvmDiv
+tmp
+<
+    BlockLduSystem<vector, typename innerProduct<vector, Type>::type>
+> gaussDivScheme<Type>::fvmDiv
 (
     const GeometricField<Type, fvPatchField, volMesh>& vf
 ) const
 {
-    tmp<surfaceScalarField> tweights = this->tinterpScheme_().weights(vf);
-    const scalarField& wIn = tweights().internalField();
+   FatalErrorIn
+   (
+       "tmp<BlockLduSystem> fvmDiv\n"
+       "(\n"
+       "    GeometricField<Type, fvPatchField, volMesh>&"
+       ")\n"
+   )   << "Implicit div operator defined only for vector."
+       << abort(FatalError);
 
-    const fvMesh& mesh = vf.mesh();
+   typedef typename innerProduct<vector, Type>::type DivType;
 
-    tmp<blockVectorMatrix> tbm
-    (
-        new blockVectorMatrix
-        (
-           mesh
-        )
-    );
-    blockVectorMatrix& bm = tbm();
+   tmp<BlockLduSystem<vector, DivType> > tbs
+   (
+       new BlockLduSystem<vector, DivType>(vf.mesh())
+   );
 
-    // Grab ldu parts of block matrix as linear always
-    typename CoeffField<vector>::linearTypeField& u = bm.upper().asLinear();
-    typename CoeffField<vector>::linearTypeField& l = bm.lower().asLinear();
-
-    const vectorField& SfIn = mesh.Sf().internalField();
-
-    l = -wIn*SfIn;
-    u = l + SfIn;
-    bm.negSumDiag();
-
-    // Interpolation schemes with corrections not accounted for
-
-    return tbm;
+   return tbs;
 }
 
 

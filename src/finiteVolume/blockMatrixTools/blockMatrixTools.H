@@ -25,7 +25,11 @@ InNamespace
     Foam::
 
 Description
-    Block matrix insertion and retrieval tools
+    Block matrix insertion and retrieval tools.
+    Note: these will be obsolete since all of the functions are now member
+    functions in fvBlockMatrix class. All top level coupled solvers should
+    be rewritten using fvBlockMatrix - then we can get rid of this.
+    VV, 20/July/2014.
 
 SourceFiles
     blockMatrixTools.C
@@ -36,7 +40,7 @@ SourceFiles
 #ifndef blockMatrixTools_H
 #define blockMatrixTools_H
 
-#include "blockLduMatrices.H"
+#include "BlockLduSystem.H"
 #include "fvMatrices.H"
 #include "surfaceFieldsFwd.H"
 
@@ -218,60 +222,37 @@ namespace blockMatrixTools
             Field<blockType>& b
         );
 
-        // Insert block coupling
-        template<class blockType1, class blockType2>
+        // Insert diagonal, lower and upper of blockMatrix into A
+        template<class blockType1, class fieldType, class blockType2>
         void insertBlock
         (
             const label loc1,
             const label loc2,
-            const BlockLduMatrix<blockType1>& blockMatrix,
+            const BlockLduSystem<blockType1, fieldType>& blockMatrix,
             BlockLduMatrix<blockType2>& A,
             const bool incFirst
         );
 
-        // Insert boundary contributions. These functions update the matrix coeffs
-        // according to boundary conditions. Two functions are needed for
-        // specialization if the field is scalar or vector. If the field is scalar,
-        // it is assumed that the grad(p) was used to obtain the matrix, and the
-        // boundary contributions to the source are vectors. If the field is
-        // vector, assumed is the div(U) and the source is scalar.
-        // Note parameter GeometricField<scalar...>, this is grad specialization.
-        template<class blockType1, class blockType2>
+        // Insert source and coupling coeffs of block system into A and b
+        template<class blockType1, class blockType2, class fieldType>
         void insertBoundaryContributions
         (
             const label loc1,
             const label loc2,
-            const BlockLduMatrix<blockType1>& blockMatrix,
-            GeometricField<scalar, fvPatchField, volMesh>& psi,
+            const BlockLduSystem<blockType1, fieldType>& blockSystem,
             BlockLduMatrix<blockType2>& A,
             Field<blockType2>& b,
             const bool incFirst
         );
 
-        // Note parameter GeometricField<vector...>, this is div specialization.
-        template<class blockType1, class blockType2>
-        void insertBoundaryContributions
-        (
-            const label loc1,
-            const label loc2,
-            const BlockLduMatrix<blockType1>& blockMatrix,
-            GeometricField<vector, fvPatchField, volMesh>& psi,
-            BlockLduMatrix<blockType2>& A,
-            Field<blockType2>& b,
-            const bool incFirst
-        );
-
-        // Insert existing block matrix (obtained by implicit grad/div operator)
-        // into block system, updating the matrix coefficients from boundaries.
-        // To be used ONLY for pressure velocity coupling terms, other scenarios
-        // are not considered at the moment.
+        // Insert existing block system (obtained by implicit grad/div operator)
+        // into block system.
         template<class blockType1, class blockType2, class fieldType>
         void insertBlockCoupling
         (
             const label loc1,
             const label loc2,
-            const BlockLduMatrix<blockType1>& blockMatrix,
-            GeometricField<fieldType, fvPatchField, volMesh>& psi,
+            const BlockLduSystem<blockType1, fieldType>& blockSystem,
             BlockLduMatrix<blockType2>& A,
             Field<blockType2>& b,
             const bool incFirst
