@@ -45,7 +45,7 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class fixedFluxPressureFvPatch Declaration
+                   Class fixedFluxPressureFvPatch Declaration
 \*---------------------------------------------------------------------------*/
 
 class fixedFluxPressureFvPatchScalarField
@@ -63,6 +63,9 @@ class fixedFluxPressureFvPatchScalarField
         //- Name of the density field used to normalise the mass flux
         //  if neccessary
         word rhoName_;
+
+        //- Name of the pressure diffusivity factor
+        word rAUName_;
 
         //- Is the pressure adjoint, i.e. has the opposite sign
         Switch adjoint_;
