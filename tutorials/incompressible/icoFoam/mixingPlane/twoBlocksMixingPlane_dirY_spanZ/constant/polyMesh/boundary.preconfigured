@@ -41,6 +41,7 @@ FoamFile
         nFaces          10;
         startFace       410;
         shadowPatch     mixpRightIn;
+        zone mixpLeftOutZone;
         orientation dirY_spanZ;
         assembly both;
         coordinateSystem
@@ -50,6 +51,12 @@ FoamFile
             axis (0 0 1);
             direction (1 0 0);
         }
+        ribbonPatch
+        {
+          sweepAxis Z;
+          stackAxis Y;
+          discretisation bothPatches;
+        }
     }
     mixpRightIn
     {
@@ -57,6 +64,7 @@ FoamFile
         nFaces          10;
         startFace       420;
         shadowPatch     mixpLeftOut;
+        zone mixpRightInZone;
         orientation dirY_spanZ;
         assembly both;
         coordinateSystem
@@ -65,6 +73,12 @@ FoamFile
             origin (0 0 0.005);
             axis (0 0 1);
             direction (1 0 0);
+        }
+        ribbonPatch
+        {
+            discretisation bothPatches;
+            stackAxis Y;
+            sweepAxis Z;
         }
     }
     rightOut
