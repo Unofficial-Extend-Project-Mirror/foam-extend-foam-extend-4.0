@@ -4,7 +4,5 @@
 . $WM_PROJECT_DIR/bin/tools/CleanFunctions
 
 cleanCase
-\rm -rf *.py
-\rm -f constant/polyMesh/boundary
-\rm -rf 0
-\cp -r 0.orig 0
+\rm constant/polyMesh/blockMeshDict constant/polyMesh/boundary
+\rm -r 0 
