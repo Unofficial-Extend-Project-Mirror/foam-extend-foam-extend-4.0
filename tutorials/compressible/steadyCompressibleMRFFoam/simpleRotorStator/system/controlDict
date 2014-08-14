@@ -14,13 +14,14 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-startFrom       startTime;
+startFrom       latestTime;
+// startFrom       startTime;
 
 startTime       0;
 
 stopAt          endTime;
 
-endTime         2000;
+endTime         5000;
 
 deltaT          1;
 

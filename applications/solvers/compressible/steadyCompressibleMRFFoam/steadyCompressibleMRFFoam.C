@@ -65,7 +65,9 @@ int main(int argc, char *argv[])
 #       include "initConvergenceCheck.H"
 
 #       include "UEqn.H"
-#       include "hEqn.H"
+// #       include "hEqn.H"
+        // Solving for rothalpy
+#       include "iEqn.H"
 #       include "pEqn.H"
 
 #       include "rhoFromP.H"
