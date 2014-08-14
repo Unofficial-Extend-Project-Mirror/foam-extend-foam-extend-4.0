@@ -112,7 +112,11 @@ void Foam::mixedEnthalpyFvPatchScalarField::updateCoeffs()
 
     valueFraction() = Tw.valueFraction();
 
-    if (dimensionedInternalField().name() == db().mangleFileName("h"))
+    if
+    (
+        dimensionedInternalField().name() == db().mangleFileName("h")
+     || dimensionedInternalField().name() == db().mangleFileName("i")
+    )
     {
         refValue() = thermo.h(Tw.refValue(), patchi);
         refGrad() = thermo.Cp(Tw, patchi)*Tw.refGrad()
