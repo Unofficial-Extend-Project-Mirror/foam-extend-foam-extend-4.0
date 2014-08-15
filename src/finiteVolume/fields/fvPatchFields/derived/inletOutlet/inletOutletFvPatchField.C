@@ -129,6 +129,13 @@ void inletOutletFvPatchField<Type>::updateCoeffs()
     if (!this->db().objectRegistry::found(phiName_))
     {
         // Flux not available, do not update
+        InfoIn
+        (
+            "void inletOutletFvPatchField<Type>::"
+            "updateCoeffs()"
+        )   << "Flux field " << phiName_ << " not found.  "
+            << "Performing mixed update" << endl;
+
         mixedFvPatchField<Type>::updateCoeffs();
 
         return;

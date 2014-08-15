@@ -82,8 +82,6 @@ class wallDist
     public volScalarField,
     public cellDistFuncs
 {
-
-
 private:
 
     // Private Member Data
