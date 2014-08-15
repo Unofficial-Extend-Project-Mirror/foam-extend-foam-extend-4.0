@@ -56,7 +56,10 @@ class pressureNormalInletOutletVelocityFvPatchVectorField
 {
     // Private data
 
+        //- Name of the flux field
         word phiName_;
+
+        //- Name of the density field
         word rhoName_;
 
 
