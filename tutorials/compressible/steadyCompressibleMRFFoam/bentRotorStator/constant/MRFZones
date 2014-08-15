@@ -22,9 +22,10 @@ FoamFile
         nonRotatingPatches ();
 
         origin    origin [0 1 0 0 0 0 0]  (0 0 0);
-        axis      axis   [0 0 0 0 0 0 0]  (-1 0 0);
-//         omega     omega  [0 0 -1 0 0 0 0] 5231.25;
-        omega     omega  [0 0 -1 0 0 0 0] 1000;
+        axis      axis   [0 0 0 0 0 0 0]  (1 0 0);
+//         omega     omega  [0 0 -1 0 0 0 0] 5231.25;   // 50k rpm, Utip = 261 m/s
+        omega     omega  [0 0 -1 0 0 0 0]  2094.395; // 20k rpm, Utip = 100 m/s
+//         omega     omega  [0 0 -1 0 0 0 0] 523.125;   // 5k rpm, utip = 25.1 m/s
     }
 )
 

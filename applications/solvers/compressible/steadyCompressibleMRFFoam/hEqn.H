@@ -13,7 +13,7 @@
         // Note: potential issue with reconstructed relative velocity.
         // HJ, 12/Dec/2009
 //         fvc::div(faceU, p, "div(U,p)")
-        fvc::div(faceU + mrfZones.fluxCorrection(), p,"div(U,p)")
+        fvc::div(faceU + mrfZones.fluxCorrection(), p, "div(U,p)")
       - p*fvc::div(faceU)
         // Viscous heating: note sign (devRhoReff has a minus in it)
       - (turbulence->devRhoReff() && fvc::grad(U))

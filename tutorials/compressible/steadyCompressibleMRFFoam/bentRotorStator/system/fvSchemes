@@ -19,7 +19,7 @@ ddtSchemes
     default         none;
 
     ddt(rho,U)      steadyState;
-    ddt(rho,h)      steadyInertial phi rho 0.25;
+    ddt(rho,i)      steadyState;
     ddt(psi,p)      steadyInertial phi rho 0.25;
 
     ddt(rho,k)        steadyState;
@@ -39,7 +39,7 @@ divSchemes
 {
     default          none;
     div(phi,U)       Gauss upwind;
-    div(phi,h)       Gauss upwind;
+    div(phi,i)       Gauss upwind;
     div(phid,p)      Gauss upwind;
 
 //     div(phi,U)       Gauss vanLeerDC;

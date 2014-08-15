@@ -103,7 +103,11 @@ void Foam::fixedEnthalpyFvPatchScalarField::updateCoeffs()
         const_cast<fvPatchScalarField&>(thermo.T().boundaryField()[patchi]);
     Tw.evaluate();
 
-    if (dimensionedInternalField().name() == db().mangleFileName("h"))
+    if
+    (
+        dimensionedInternalField().name() == db().mangleFileName("h")
+     || dimensionedInternalField().name() == db().mangleFileName("i")
+    )
     {
         operator==(thermo.h(Tw, patchi));
     }

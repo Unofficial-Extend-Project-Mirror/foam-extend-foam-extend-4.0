@@ -20,16 +20,4 @@ turbulence          on;
 
 printCoeffs         on;
 
-laminarCoeffs
-{}
-
-kEpsilonCoeffs
-{}
-
-wallFunctionCoeffs
-{
-    kappa            0.4187;
-    E                9;
-}
-
 // ************************************************************************* //

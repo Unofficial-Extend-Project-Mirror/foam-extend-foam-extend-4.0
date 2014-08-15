@@ -17,47 +17,67 @@ FoamFile
 
 dimensions      [1 -1 -1 0 0 0 0];
 
-internalField   uniform 1;
+internalField   uniform 0;
 
 boundaryField
 {
     inlet
     {
         type            calculated;
+        value           uniform 0;
     }
     outlet
     {
         type            calculated;
+        value           uniform 0;
     }
     bladeRotor
     {
         type            mutWallFunction;
-        value           uniform 1;
+        Cmu             0.09;
+        kappa           0.41;
+        E               9.8;
+        value           uniform 0;
     }
     shaftRotor
     {
         type            mutWallFunction;
-        value           uniform 1;
+        Cmu             0.09;
+        kappa           0.41;
+        E               9.8;
+        value           uniform 0;
     }
     shroudRotor
     {
         type            mutWallFunction;
-        value           uniform 1;
+        Cmu             0.09;
+        kappa           0.41;
+        E               9.8;
+        value           uniform 0;
     }
     bladeStator
     {
         type            mutWallFunction;
-        value           uniform 1;
+        Cmu             0.09;
+        kappa           0.41;
+        E               9.8;
+        value           uniform 0;
     }
     shaftStator
     {
         type            mutWallFunction;
-        value           uniform 1;
+        Cmu             0.09;
+        kappa           0.41;
+        E               9.8;
+        value           uniform 0;
     }
     shroudStator
     {
         type            mutWallFunction;
-        value           uniform 1;
+        Cmu             0.09;
+        kappa           0.41;
+        E               9.8;
+        value           uniform 0;
     }
     frontAndBack
     {
