@@ -22,36 +22,20 @@ boundaryField
 {
     inlet
     {
-        type         zeroGradient;
-
-//         type            waveTransmissiveInlet;
-//         phi             phi;
-//         rho             rho;
-//         psi             psi;
-//         U               Urel;
-//         gamma           1.4;
-//         inletOutlet     false;
-//         correctSupercritical false;
-//         lInf            0.0;
-//         fieldInf        101325;
-//         value           uniform 101325;
+        type            totalPressure;
+        phi             phi;
+        rho             none;
+        psi             psi;
+        U               Uabs;
+        gamma           1.4;
+        p0              uniform 1.4e5;
+        value           $internalField;
     }
 
     outlet
     {
-//         type            fixedValue;
-
-        type            waveTransmissive;
-        phi             phi;
-        rho             rho;
-        psi             psi;
-        U               Urel;
-        gamma           1.4;
-        inletOutlet     false;
-        correctSupercritical true;
-        lInf            0.1;
-        fieldInf        101325;
-        value           uniform 101325;
+        type            fixedValue;
+        value           $internalField;
     }
 
     blade

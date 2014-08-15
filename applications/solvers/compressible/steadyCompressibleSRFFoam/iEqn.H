@@ -1,25 +1,13 @@
 {
-    // Solve the rothalpy equation
+    // Solve the enthalpy equation
     T.storePrevIter();
 
-    // Create relative velocity
-    Urel == U;
-    mrfZones.relativeVelocity(Urel);
-
-    // Create rotational velocity (= omega x r)
-    Urot = U - Urel;
-
-    // Calculate face velocity from absolute flux
-    surfaceScalarField rhof = fvc::interpolate(rho);
-
-    surfaceScalarField phiAbs
+    // Calculate face velocity from flux
+    surfaceScalarField faceU
     (
-        "phiAbs",
-        phi
+        "faceU",
+        phi/fvc::interpolate(rho) + (SRF->faceU() & mesh.Sf())
     );
-    mrfZones.absoluteFlux(rhof, phiAbs);
-
-    surfaceScalarField faceU("faceU", phiAbs/rhof);
 
     fvScalarMatrix iEqn
     (
@@ -27,8 +15,9 @@
       + fvm::div(phi, i)
       - fvm::laplacian(turbulence->alphaEff(), i)
         // u & gradP term (steady-state formulation)
-      + fvm::SuSp((fvc::div(faceU, p, "div(U,p)") - fvc::div(faceU)*p)/i, i)
+      + fvm::SuSp((fvc::div(faceU, p, "div(U,p)") - p*fvc::div(faceU))/i, i)
      ==
+        // ddt(p) term removed: steady-state.  HJ, 27/Apr/2010
         // Viscous heating: note sign (devRhoReff has a minus in it)
       - (turbulence->devRhoReff() && fvc::grad(Urel))
     );
@@ -39,6 +28,8 @@
     maxResidual = max(eqnResidual, maxResidual);
 
     // Calculate enthalpy out of rothalpy
+    volVectorField Urot("Urot", SRF->U());
+
     h = i + 0.5*magSqr(Urot);
     h.correctBoundaryConditions();
 
