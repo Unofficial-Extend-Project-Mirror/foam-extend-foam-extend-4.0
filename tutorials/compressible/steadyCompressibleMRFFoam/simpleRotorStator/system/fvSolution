@@ -35,8 +35,8 @@ solvers
         maxIter           1000;
         tolerance        1e-8;
         relTol           0.01;
-    };
-    h
+    }
+    i
     {
         solver           BiCGStab;
         preconditioner   DILU;
@@ -45,7 +45,7 @@ solvers
         maxIter          1000;
         tolerance        1e-8;
         relTol           0.01;
-    };
+    }
     k
     {
         solver           BiCGStab;
@@ -55,7 +55,7 @@ solvers
         maxIter          1000;
         tolerance        1e-8;
         relTol           0.0;
-    };
+    }
     epsilon
     {
         solver           BiCGStab;
@@ -65,7 +65,7 @@ solvers
         maxIter          1000;
         tolerance        1e-8;
         relTol           0.0;
-    };
+    }
 }
 
 PIMPLE
@@ -79,9 +79,10 @@ relaxationFactors
 {
     // Note: under-relaxation factors used in wave-transmissive schemes
     U               0.5;
-    p               1;
+    p               0.2;
+    i               0.1;
     h               0.5;
-    rho             0.5;
+    rho             0.25;
 
     k               0.2;
     epsilon         0.2;
@@ -95,9 +96,9 @@ fieldBounds
 //     U     1e6;
 
     // With bounding
-    p      50     1e6;
-    T      20    3000;
-    U      1000;
+    p      2e4     1e6;
+    T      200     500;
+    U      500;
 }
 
 // ************************************************************************* //

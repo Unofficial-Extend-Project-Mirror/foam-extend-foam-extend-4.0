@@ -16,34 +16,21 @@ FoamFile
 
 dimensions      [0 1 -1 0 0 0 0];
 
-internalField   uniform (234 0 0);
+internalField   uniform (100 0 0);
 
 boundaryField
 {
     inlet
     {
-        type            fixedValue;
-        value           uniform (234 0 0);
+        type            pressureInletVelocity;
+        value           uniform (100 0 0);
     }
 
     outlet
     {
-//         type            zeroGradient;
-
         type           inletOutlet;
         inletValue     uniform (0 0 0);
-
-//         type            waveTransmissive;
-//         phi             phi;
-//         rho             rho;
-//         psi             psi;
-//         U               U;
-//         gamma           1.4;
-//         inletOutlet     true;
-//         correctSupercritical false;
-//         lInf            0;
-//         fieldInf        (0 0 0);
-//         value           $internalField;
+        value          $internalField;
     }
 
     bladeRotor
