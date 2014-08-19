@@ -87,6 +87,7 @@ class overlapGgiPolyPatch
             // Number of copies in order to complete 360 degrees
             const label nCopies_;
 
+
         // Interpolation
 
             //- Pointer to expanded master patch
@@ -105,6 +106,7 @@ class overlapGgiPolyPatch
 
             //- Reconstructed patch neighbour cell centres
             mutable vectorField* reconFaceCellCentresPtr_;
+
 
     // Private member functions
 

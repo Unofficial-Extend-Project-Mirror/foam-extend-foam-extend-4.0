@@ -85,6 +85,7 @@ Foam::overlapGgiPolyPatch::expandData(const Field<Type>& pf) const
     return texpandField;
 }
 
+
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 template<class Type>
@@ -137,5 +138,6 @@ Foam::overlapGgiPolyPatch::interpolate(const tmp<Field<Type> >& tpf) const
     tpf.clear();
     return tint;
 }
+
 
 // ************************************************************************* //
