@@ -165,7 +165,7 @@ bool Foam::ellipticCylindricalCS::inDegrees() const
 }
 
 
-bool& Foam::ellipticCylindricalCS::inDegrees()
+Foam::Switch& Foam::ellipticCylindricalCS::inDegrees()
 {
     return inDegrees_;
 }
@@ -252,6 +252,31 @@ Foam::tmp<Foam::vectorField> Foam::ellipticCylindricalCS::globalToLocal
     );
 
     return tmp<vectorField>(vectorField::null());
+}
+
+
+void Foam::ellipticCylindricalCS::write(Ostream& os) const
+{
+    coordinateSystem::write(os);
+    os << "inDegrees: " << inDegrees() << endl;
+}
+
+
+void Foam::ellipticCylindricalCS::writeDict(Ostream& os, bool subDict) const
+{
+    if (subDict)
+    {
+        os  << indent << nl
+            << indent << token::BEGIN_BLOCK << incrIndent << nl;
+    }
+
+    coordinateSystem::writeDict(os, false);
+    os.writeKeyword("inDegrees") << inDegrees_ << token::END_STATEMENT << nl;
+
+    if (subDict)
+    {
+        os << decrIndent << indent << token::END_BLOCK << endl;
+    }
 }
 
 

@@ -25,7 +25,6 @@ License
 
 #include "parabolicCylindricalCS.H"
 #include "mathematicalConstants.H"
-#include "Switch.H"
 #include "boundBox.H"
 #include "addToRunTimeSelectionTable.H"
 
@@ -119,7 +118,7 @@ bool Foam::parabolicCylindricalCS::inDegrees() const
 }
 
 
-bool& Foam::parabolicCylindricalCS::inDegrees()
+Foam::Switch& Foam::parabolicCylindricalCS::inDegrees()
 {
     return inDegrees_;
 }
@@ -224,6 +223,31 @@ Foam::tmp<Foam::vectorField> Foam::parabolicCylindricalCS::globalToLocal
     );
 
     return tmp<vectorField>(vectorField::null());
+}
+
+
+void Foam::parabolicCylindricalCS::write(Ostream& os) const
+{
+    coordinateSystem::write(os);
+    os << "inDegrees: " << inDegrees() << endl;
+}
+
+
+void Foam::parabolicCylindricalCS::writeDict(Ostream& os, bool subDict) const
+{
+    if (subDict)
+    {
+        os  << indent << nl
+            << indent << token::BEGIN_BLOCK << incrIndent << nl;
+    }
+
+    coordinateSystem::writeDict(os, false);
+    os.writeKeyword("inDegrees") << inDegrees_ << token::END_STATEMENT << nl;
+
+    if (subDict)
+    {
+        os << decrIndent << indent << token::END_BLOCK << endl;
+    }
 }
 
 
