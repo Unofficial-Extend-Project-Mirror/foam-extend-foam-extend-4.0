@@ -9,44 +9,48 @@ FoamFile
 {
     version     2.0;
     format      ascii;
-    class       polyBoundaryMesh;
-    location    "constant/polyMesh";
-    object      boundary;
+    class       volScalarField;
+    object      T;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-5
-(
+dimensions      [0 0 0 1 0 0 0];
+
+internalField   uniform 300;
+
+boundaryField
+{
     INLE1
     {
-        type            patch;
-        nFaces          160;
-        startFace       152960;
+        type            isentropicTotalTemperature;
+        phi             phi;
+        rho             none;
+        psi             psi;
+        p               p;
+        T0              uniform 327.335857;
+        value           uniform 300;
     }
+
     PRES2
     {
-        type            patch;
-        nFaces          160;
-        startFace       153120;
+        type            zeroGradient;
     }
+
     WALL3
     {
-        type            wall;
-        nFaces          480;
-        startFace       153280;
+        type            zeroGradient;
     }
+
     WALL4
     {
-        type            wall;
-        nFaces          480;
-        startFace       153760;
+        type            zeroGradient;
     }
+
     defaultFaces
     {
         type            empty;
-        nFaces          153600;
-        startFace       154240;
     }
-)
+}
+
 
 // ************************************************************************* //

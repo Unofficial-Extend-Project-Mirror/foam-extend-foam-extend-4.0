@@ -16,32 +16,20 @@ FoamFile
 
 dimensions      [0 1 -1 0 0 0 0];
 
-internalField   uniform (173 0 0);
+internalField   uniform (234.636777 0 0);
 
 boundaryField
 {
     INLE1
     {
         type            fixedValue;
-        value           uniform (173 0 0);
+        value           uniform (234.636777 0 0);
     }
 
     PRES2
     {
-//        type           inletOutlet;
-//        inletValue     uniform (0 0 0);
-
-         type            waveTransmissive;
-         phi             phi;
-         rho             rho;
-         psi             psi;
-         U               U;
-         gamma           1.4;
-         inletOutlet     true;
-         correctSupercritical false;
-         lInf            0.5;
-         fieldInf        (0 0 0);
-         value           $internalField;
+        type           inletOutlet;
+        inletValue     uniform (0 0 0);
     }
 
     WALL3
@@ -61,5 +49,6 @@ boundaryField
         type            empty;
     }
 }
+
 
 // ************************************************************************* //

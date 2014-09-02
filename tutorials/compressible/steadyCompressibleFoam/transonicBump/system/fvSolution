@@ -16,6 +16,20 @@ FoamFile
 
 solvers
 {
+    // Coupled
+    Up
+    {
+        solver BiCGStab;
+        preconditioner Cholesky;
+
+        tolerance 1e-09;
+        relTol  0.0;
+
+        minIter 1;
+        maxIter 500;
+    }
+
+    // Segregated
     p
     {
         solver           BiCGStab;
@@ -25,7 +39,7 @@ solvers
         maxIter          1000;
         tolerance        1e-8;
         relTol           0.0;
-    };
+    }
     U
     {
         solver           BiCGStab;
@@ -35,7 +49,8 @@ solvers
         maxIter           1000;
         tolerance        1e-8;
         relTol           0.0;
-    };
+    }
+
     h
     {
         solver           BiCGStab;
@@ -45,7 +60,7 @@ solvers
         maxIter           1000;
         tolerance        1e-8;
         relTol           0.0;
-    };
+    }
 }
 
 PIMPLE
@@ -58,19 +73,19 @@ PIMPLE
 relaxationFactors
 {
     // Note: under-relaxation factors used in wave-transmissive schemes
-    U               0.4;
-    p               0.2;
-    h               0.5;
+    U               0.1;
+    p               0.25;
+    h               0.1;
     rho             0.5;
-    T               1;
+    T               0.5;
 }
 
 fieldBounds
 {
     // With bounding
-    p      50     1e6;
-    T      20    3000;
-    U    1000;
+    p     5e4    3e5;
+    T     230    500;
+    U     500;
 }
 
 // ************************************************************************* //

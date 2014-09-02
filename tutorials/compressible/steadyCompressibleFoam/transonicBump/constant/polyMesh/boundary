@@ -20,32 +20,32 @@ FoamFile
     INLE1
     {
         type            patch;
-        nFaces          160;
-        startFace       105110;
+        nFaces          75;
+        startFace       22275;
     }
     PRES2
     {
         type            patch;
-        nFaces          160;
-        startFace       105270;
+        nFaces          75;
+        startFace       22350;
     }
     WALL3
     {
         type            wall;
-        nFaces          330;
-        startFace       105430;
+        nFaces          150;
+        startFace       22425;
     }
     WALL4
     {
         type            wall;
-        nFaces          330;
-        startFace       105760;
+        nFaces          150;
+        startFace       22575;
     }
     defaultFaces
     {
         type            empty;
-        nFaces          105600;
-        startFace       106090;
+        nFaces          22500;
+        startFace       22725;
     }
 )
 
