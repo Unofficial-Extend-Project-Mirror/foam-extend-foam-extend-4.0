@@ -65,8 +65,9 @@ int main(int argc, char *argv[])
 #       include "initConvergenceCheck.H"
 
 #       include "UEqn.H"
-#       include "hEqn.H"
 #       include "pEqn.H"
+
+#       include "hEqn.H"
 
 #       include "rhoFromP.H"
 
