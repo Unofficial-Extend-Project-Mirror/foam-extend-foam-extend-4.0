@@ -1,2 +1,2 @@
-cellSet rotor new boxToCell (0.039 -10 -10) (0.0725 10 10)
+cellSet rotor new boxToCell (0.039 -10 -10) (0.0723 10 10)
 quit
