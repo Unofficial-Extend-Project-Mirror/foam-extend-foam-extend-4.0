@@ -2,9 +2,17 @@
 # Source tutorial run functions
 . $WM_PROJECT_DIR/bin/tools/RunFunctions
 
-cp -r 0.org 0
+\cp -r 0.org 0
+
 runApplication blockMesh
 runApplication setSet -batch createObstacle.setSet
 runApplication subsetMesh c0 -patch walls -overwrite
+
+# Move subset mesh in to proper place
+\cp constant/setSubset/polyMesh/* constant/polyMesh
+\rm -rf constant/setSubset
+# Mapping in 0/ not needed
+\rm -rf 0/setSubset
+
 runApplication setFields
 runApplication interDyMFoam
