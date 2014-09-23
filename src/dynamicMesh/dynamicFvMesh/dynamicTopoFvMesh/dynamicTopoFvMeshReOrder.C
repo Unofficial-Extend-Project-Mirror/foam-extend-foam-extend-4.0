@@ -24,7 +24,6 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "objectMap.H"
-#include "objectRegistry.H"
 #include "coupledInfo.H"
 #include "dynamicTopoFvMesh.H"
 
@@ -118,10 +117,6 @@ void dynamicTopoFvMesh::reOrderPoints
             << " Something's messed up." << nl
             << abort(FatalError);
     }
-
-    // Wipe out pointsFromPoints, since this is not
-    // really used in this context for mapping.
-    pointsFromPoints_.clear();
 
     // Renumber all maps.
     forAll(pointsFromPoints_, indexI)
@@ -534,7 +529,7 @@ void dynamicTopoFvMesh::reOrderEdges
         entityMutex_[2].unlock();
     }
 
-    if (!twoDMesh_)
+    if (is3D())
     {
         // Invert edges to obtain pointEdges
         pointEdges_ = invertManyToMany<edge, labelList>(nPoints_, edges_);
@@ -1725,7 +1720,30 @@ void dynamicTopoFvMesh::reOrderMesh
 {
     if (debug)
     {
-        Info<< nl
+        // Buffered print-out of mesh-stats
+        if (Pstream::parRun())
+        {
+            if (Pstream::master())
+            {
+                for (label i = Pstream::nProcs() - 1; i >= 1; i--)
+                {
+                    // Notify slave
+                    meshOps::pWrite(i, i);
+
+                    // Wait for response from slave
+                    label j = 0;
+                    meshOps::pRead(i, j);
+                }
+            }
+            else
+            {
+                // Wait for master
+                label i = 0;
+                meshOps::pRead(Pstream::masterNo(), i);
+            }
+        }
+
+        Pout<< nl
             << "=================" << nl
             << " Mesh reOrdering " << nl
             << "=================" << nl
@@ -1740,13 +1758,13 @@ void dynamicTopoFvMesh::reOrderMesh
 
         if (debug > 1)
         {
-            Info<< " Patch Starts [Face]: " << oldPatchStarts_ << nl
+            Pout<< " Patch Starts [Face]: " << oldPatchStarts_ << nl
                 << " Patch Sizes  [Face]: " << oldPatchSizes_ << nl
                 << " Patch Starts [Edge]: " << oldEdgePatchStarts_ << nl
                 << " Patch Sizes  [Edge]: " << oldEdgePatchSizes_ << nl;
         }
 
-        Info<< "=================" << nl
+        Pout<< "=================" << nl
             << " Mesh Info [n+1]:" << nl
             << " Points: " << nPoints_ << nl
             << " Edges: " << nEdges_ << nl
@@ -1758,13 +1776,22 @@ void dynamicTopoFvMesh::reOrderMesh
 
         if (debug > 1)
         {
-            Info<< " Patch Starts [Face]: " << patchStarts_ << nl
+            Pout<< " Patch Starts [Face]: " << patchStarts_ << nl
                 << " Patch Sizes: [Face]: " << patchSizes_ << nl
                 << " Patch Starts [Edge]: " << edgePatchStarts_ << nl
                 << " Patch Sizes: [Edge]: " << edgePatchSizes_ << nl;
         }
 
-        Info<< "=================" << endl;
+        Pout<< "=================" << endl;
+
+        // Notify master
+        if (Pstream::parRun() && !Pstream::master())
+        {
+            meshOps::pWrite(Pstream::masterNo(), Pstream::myProcNo());
+        }
+
+        bool checkPoint = false;
+        reduce(checkPoint, andOp<bool>());
 
         // Check connectivity structures for consistency
         // before entering the reOrdering phase.

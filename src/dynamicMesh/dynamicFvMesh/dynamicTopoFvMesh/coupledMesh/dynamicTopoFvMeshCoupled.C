@@ -38,6 +38,7 @@ Author
 
 #include "Time.H"
 #include "eMesh.H"
+#include "Random.H"
 #include "triFace.H"
 #include "volFields.H"
 #include "changeMap.H"
@@ -63,6 +64,32 @@ namespace Foam
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
 defineTypeNameAndDebug(coupleMap, 0);
+
+//! \cond fileScope
+// Geometric relative match tolerance
+static scalar geomMatchTol_ = 1e-4;
+
+// Priority scheme enumerants
+enum priorityScheme
+{
+    LINEAR,
+    RANDOM,
+    LIST,
+    ROTATE,
+    MAX_PRIORITY_SCHEMES
+};
+
+// Priority scheme names
+static const char* prioritySchemeNames_[MAX_PRIORITY_SCHEMES + 1] =
+{
+    "Linear",
+    "Random",
+    "List",
+    "Rotate",
+    "Invalid"
+};
+
+//! \endcond
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
@@ -101,7 +128,7 @@ void dynamicTopoFvMesh::initCoupledStack
             // Add only valid entities
             emptyEntity =
             (
-                twoDMesh_ ?
+                is2D() ?
                 faces_[eIter.key()].empty() :
                 edgeFaces_[eIter.key()].empty()
             );
@@ -128,7 +155,7 @@ void dynamicTopoFvMesh::initCoupledStack
                     stackElements[elemI] = stack(0)[elemI];
                 }
 
-                label elemType = twoDMesh_ ? 2 : 1;
+                label elemType = is2D() ? 2 : 1;
 
                 writeVTK
                 (
@@ -183,7 +210,7 @@ void dynamicTopoFvMesh::initCoupledStack
                 // Add this to the coupled modification stack.
                 if (addIndex)
                 {
-                    if (twoDMesh_)
+                    if (is2D())
                     {
                         stack(0).push(faceI);
                     }
@@ -202,53 +229,76 @@ void dynamicTopoFvMesh::initCoupledStack
         }
 
         // Check if this is a processor patch.
+        label myProcID = Pstream::myProcNo();
         label neiProcID = getNeighbourProcessor(pIndex);
 
-        if (neiProcID > -1)
+        // Check if this is a master processor patch.
+        if
+        (
+            neiProcID > -1
+         && priority(neiProcID, greaterOp<label>(), myProcID)
+        )
         {
-            // Check if this is a master processor patch.
-            if (neiProcID > Pstream::myProcNo())
+            // Add this to the coupled modification stack.
+            if (is2D())
             {
-                // Add this to the coupled modification stack.
-                if (twoDMesh_)
-                {
-                    stack(0).push(faceI);
-                }
-                else
-                {
-                    const label edgeEnum = coupleMap::EDGE;
-                    const labelList& mfEdges = faceEdges_[faceI];
+                stack(0).push(faceI);
+            }
+            else
+            {
+                const label edgeEnum = coupleMap::EDGE;
+                const label pointEnum = coupleMap::POINT;
 
-                    forAll(mfEdges, edgeI)
+                const labelList& mfEdges = faceEdges_[faceI];
+
+                forAll(mfEdges, edgeI)
+                {
+                    label eIndex = mfEdges[edgeI];
+
+                    const edge& checkEdge = edges_[eIndex];
+
+                    // Need to avoid this edge if it is
+                    // talking to higher-priority processors.
+                    bool permissible = true;
+
+                    forAll(procIndices_, pI)
                     {
-                        label eIndex = mfEdges[edgeI];
+                        label nProc = procIndices_[pI];
 
-                        // Need to avoid this edge if it is
-                        // talking to lower-ranked processors.
-                        bool permissible = true;
-
-                        forAll(procIndices_, pI)
+                        // List is specified in ascending order
+                        // of neighbour processors, so break out.
+                        if (priority(nProc, greaterOp<label>(), myProcID))
                         {
-                            if (procIndices_[pI] > Pstream::myProcNo())
-                            {
-                                continue;
-                            }
-
-                            // Fetch reference to subMeshes
-                            const coupledInfo& recvMesh = recvMeshes_[pI];
-                            const coupleMap& rcMap = recvMesh.map();
-
-                            if (rcMap.findSlave(edgeEnum, eIndex) > -1)
-                            {
-                                permissible = false;
-                                break;
-                            }
+                            break;
                         }
 
-                        if (permissible)
+                        // Fetch reference to subMeshes
+                        const coupledMesh& recvMesh = recvMeshes_[pI];
+                        const coupleMap& rcMap = recvMesh.map();
+
+                        if (rcMap.findSlave(edgeEnum, eIndex) > -1)
                         {
-                            stack(0).push(eIndex);
+                            permissible = false;
+                            break;
                         }
+
+                        // Check points as well, since there might be
+                        // situations where both points lie on a lower
+                        // ranked processor, but not the edge itself.
+                        if
+                        (
+                            (rcMap.findSlave(pointEnum, checkEdge[0]) > -1)
+                         && (rcMap.findSlave(pointEnum, checkEdge[1]) > -1)
+                        )
+                        {
+                            permissible = false;
+                            break;
+                        }
+                    }
+
+                    if (permissible)
+                    {
+                        stack(0).push(eIndex);
                     }
                 }
             }
@@ -269,7 +319,7 @@ void dynamicTopoFvMesh::initCoupledStack
                 stackElements[elemI] = stack(0)[elemI];
             }
 
-            label elemType = twoDMesh_ ? 2 : 1;
+            label elemType = is2D() ? 2 : 1;
 
             writeVTK
             (
@@ -286,7 +336,7 @@ void dynamicTopoFvMesh::initCoupledStack
 // Execute load balancing operations on the mesh
 void dynamicTopoFvMesh::executeLoadBalancing
 (
-    const dictionary& balanceDict
+    dictionary& balanceDict
 )
 {
     if (!Pstream::parRun())
@@ -348,6 +398,10 @@ void dynamicTopoFvMesh::executeLoadBalancing
         }
     }
 
+    // Ensure that the number of processors is consistent,
+    // and silently modify dictionary entry if not
+    balanceDict.set("numberOfSubdomains", Pstream::nProcs());
+
     // Read decomposition options and initialize
     autoPtr<decompositionMethod> decomposerPtr
     (
@@ -366,8 +420,7 @@ void dynamicTopoFvMesh::executeLoadBalancing
         FatalErrorIn("void dynamicTopoFvMesh::executeLoadBalancing()")
             << "You have selected decomposition method "
             << decomposer.typeName
-            << " which is not parallel aware." << endl
-            << "Please select one that is (hierarchical, parMetis)"
+            << " which is not parallel aware."
             << exit(FatalError);
     }
 
@@ -493,20 +546,184 @@ void dynamicTopoFvMesh::executeLoadBalancing
     // Load the field-mapper
     loadFieldMapper();
 
-    // Set sizes for the reverse maps
-    reversePointMap_.setSize(nPoints_, -7);
-    reverseEdgeMap_.setSize(nEdges_, -7);
-    reverseFaceMap_.setSize(nFaces_, -7);
-    reverseCellMap_.setSize(nCells_, -7);
-
     // Load the length-scale estimator,
     // and read refinement options
     loadLengthScaleEstimator();
 
     // Clear parallel structures
     procIndices_.clear();
+    procPriority_.clear();
     sendMeshes_.clear();
     recvMeshes_.clear();
+}
+
+
+// Set processor rank priority
+void dynamicTopoFvMesh::initProcessorPriority()
+{
+    if (!Pstream::parRun())
+    {
+        return;
+    }
+
+    if (Pstream::master())
+    {
+        // Default to linear
+        int type = LINEAR;
+
+        const dictionary& meshSubDict = dict_.subDict("dynamicTopoFvMesh");
+
+        if (meshSubDict.found("priorityScheme") || mandatory_)
+        {
+            word schemeType(meshSubDict.lookup("priorityScheme"));
+
+            type = MAX_PRIORITY_SCHEMES;
+
+            for (label i = 0; i < MAX_PRIORITY_SCHEMES; i++)
+            {
+                if (prioritySchemeNames_[i] == schemeType)
+                {
+                    type = i;
+                    break;
+                }
+            }
+        }
+
+        switch (type)
+        {
+            case LINEAR:
+            {
+                // Initialize to identity map
+                procPriority_ = identity(Pstream::nProcs());
+                break;
+            }
+
+            case RANDOM:
+            {
+                Random randomizer(std::time(NULL));
+
+                // Initialize to identity map
+                procPriority_ = identity(Pstream::nProcs());
+
+                for (label i = 0; i < Pstream::nProcs(); i++)
+                {
+                    // Specify a random index to shuffle
+                    label j = randomizer.integer(0, Pstream::nProcs() - 1);
+
+                    Foam::Swap(procPriority_[i], procPriority_[j]);
+                }
+
+                break;
+            }
+
+            case ROTATE:
+            {
+                const label listSize = Pstream::nProcs();
+
+                // Initialize to identity map
+                procPriority_ = identity(listSize);
+
+                // In-place reverse macro
+#               define inPlaceReverse(list)                                    \
+                {                                                              \
+                    const label listSize = list.size();                        \
+                    const label lastIndex = listSize - 1;                      \
+                    const label nIterations = listSize >> 1;                   \
+                                                                               \
+                    label elemI = 0;                                           \
+                    while (elemI < nIterations)                                \
+                    {                                                          \
+                        Swap(list[elemI], list[lastIndex - elemI]);            \
+                        elemI++;                                               \
+                    }                                                          \
+                }
+
+                // Rotate by time index
+                label n = time().timeIndex() % listSize;
+
+                if (n < 0)
+                {
+                    n += listSize;
+                }
+
+                // Rotate list in place
+                SubList<label> firstHalf(procPriority_, n, 0);
+                SubList<label> secondHalf(procPriority_, listSize - n, n);
+
+                inPlaceReverse(firstHalf);
+                inPlaceReverse(secondHalf);
+
+                inPlaceReverse(procPriority_);
+
+                break;
+            }
+
+            case LIST:
+            {
+                procPriority_ = labelList(meshSubDict.lookup("priorityList"));
+
+                if (procPriority_.size() != Pstream::nProcs())
+                {
+                    FatalErrorIn
+                    (
+                        "void dynamicTopoFvMesh::initProcessorPriority()"
+                    )
+                        << " Priority scheme size mismatch." << nl
+                        << "   List size: " << procPriority_.size() << nl
+                        << "   Processor count: " << Pstream::nProcs() << nl
+                        << abort(FatalError);
+                }
+
+                break;
+            }
+
+            default:
+            {
+                Info<< "Available schemes: " << endl;
+
+                for (label i = 0; i < MAX_PRIORITY_SCHEMES; i++)
+                {
+                    Info<< ' ' << prioritySchemeNames_[i] << endl;
+                }
+
+                FatalErrorIn
+                (
+                    "void dynamicTopoFvMesh::initProcessorPriority()"
+                )
+                    << " Unknown priority scheme." << nl
+                    << abort(FatalError);
+            }
+        }
+
+        // Send priority list to others
+        for (label proc = 1; proc < Pstream::nProcs(); proc++)
+        {
+            meshOps::pWrite(proc, procPriority_);
+        }
+    }
+    else
+    {
+        // Receive priority from master
+        procPriority_.setSize(Pstream::nProcs());
+        meshOps::pRead(Pstream::masterNo(), procPriority_);
+    }
+
+    // Wait for transfers to complete
+    meshOps::waitForBuffers();
+
+    if (debug)
+    {
+        labelList ranks(Pstream::nProcs(), -1);
+
+        forAll(ranks, procI)
+        {
+            ranks[procPriority_[procI]] = procI;
+        }
+
+        Info<< " Processor priority: " << procPriority_ << nl
+            << " Processor rankings: " << ranks
+            << endl;
+    }
 }
 
 
@@ -689,8 +906,6 @@ bool dynamicTopoFvMesh::identifyCoupledPatches()
     // Estimate an initial size
     procIndices_.setSize(Pstream::nProcs());
 
-    // Patch sub meshes need to be prepared in ascending
-    // order of neighbouring processors.
     label nTotalProcs = 0;
 
     forAll(procPoints, procI)
@@ -710,6 +925,17 @@ bool dynamicTopoFvMesh::identifyCoupledPatches()
     // Shrink to actual size
     procIndices_.setSize(nTotalProcs);
 
+    // Initialize the processor priority list
+    initProcessorPriority();
+
+    // Sort by order of neighbouring
+    // processor priority - highest to lowest
+    Foam::sort
+    (
+        procIndices_,
+        UList<label>::less(procPriority_)
+    );
+
     // Size the PtrLists.
     sendMeshes_.setSize(nTotalProcs);
     recvMeshes_.setSize(nTotalProcs);
@@ -724,7 +950,8 @@ bool dynamicTopoFvMesh::identifyCoupledPatches()
         // specify an invalid patch ID for now
         label patchID = immNeighbours.found(proc) ? immNeighbours[proc] : -1;
 
-        if (proc < Pstream::myProcNo())
+        // Check if this processor is of higher priority
+        if (priority(proc, lessOp<label>(), Pstream::myProcNo()))
         {
             master = proc;
             slave = Pstream::myProcNo();
@@ -738,10 +965,10 @@ bool dynamicTopoFvMesh::identifyCoupledPatches()
         sendMeshes_.set
         (
             pI,
-            new coupledInfo
+            new coupledMesh
             (
                 *this,               // Reference to this mesh
-                twoDMesh_,           // 2D or 3D
+                is2D(),              // 2D or 3D
                 false,               // Not local
                 true,                // Sent to neighbour
                 patchID,             // Patch index
@@ -763,10 +990,10 @@ bool dynamicTopoFvMesh::identifyCoupledPatches()
         recvMeshes_.set
         (
             pI,
-            new coupledInfo
+            new coupledMesh
             (
                 *this,               // Reference to this mesh
-                twoDMesh_,           // 2D or 3D
+                is2D(),              // 2D or 3D
                 false,               // Not local
                 false,               // Not sent to neighbour
                 patchID,             // Patch index
@@ -796,44 +1023,20 @@ bool dynamicTopoFvMesh::identifyCoupledPatches()
         {
             label proc = procIndices_[pI];
 
-            const List<labelPair>* gppPtr = NULL;
-
             // Write out subMeshPoints as a VTK
-            if (proc < Pstream::myProcNo())
-            {
-                const coupleMap& cMap = sendMeshes_[pI].map();
+            const coupleMap& cMap = sendMeshes_[pI].map();
 
-                writeVTK
-                (
-                    "subMeshPoints_" +
-                    Foam::name(Pstream::myProcNo()) + "to" +
-                    Foam::name(proc),
-                    cMap.subMeshPoints(),
-                    0
-                );
-
-                // Fetch reference
-                gppPtr = &(cMap.globalProcPoints());
-            }
-            else
-            {
-                const coupleMap& cMap = sendMeshes_[pI].map();
-
-                writeVTK
-                (
-                    "subMeshPoints_" +
-                    Foam::name(Pstream::myProcNo()) + "to" +
-                    Foam::name(proc),
-                    cMap.subMeshPoints(),
-                    0
-                );
-
-                // Fetch reference
-                gppPtr = &(cMap.globalProcPoints());
-            }
+            writeVTK
+            (
+                "subMeshPoints_" +
+                Foam::name(Pstream::myProcNo()) + "to" +
+                Foam::name(proc),
+                cMap.subMeshPoints(),
+                0, false, true
+            );
 
             // Write out globalProcPoints as a VTK
-            const List<labelPair>& gpp = *gppPtr;
+            const List<labelPair>& gpp = cMap.globalProcPoints();
 
             if (gpp.size())
             {
@@ -850,7 +1053,7 @@ bool dynamicTopoFvMesh::identifyCoupledPatches()
                     Foam::name(Pstream::myProcNo()) + "to" +
                     Foam::name(proc),
                     gpPoints,
-                    0
+                    0, false, true
                 );
             }
         }
@@ -941,7 +1144,7 @@ void dynamicTopoFvMesh::readCoupledPatches()
                         IOobject::AUTO_WRITE,
                         true
                     ),
-                    twoDMesh_,
+                    is2D(),
                     true,
                     false,
                     mPatch,
@@ -953,7 +1156,7 @@ void dynamicTopoFvMesh::readCoupledPatches()
                 patchCoupling_.set
                 (
                     mPatch,
-                    new coupledInfo
+                    new coupledMesh
                     (
                         *this,
                         cMap,
@@ -1013,7 +1216,7 @@ void dynamicTopoFvMesh::readCoupledPatches()
                 IOobject::AUTO_WRITE,
                 true
             ),
-            twoDMesh_,
+            is2D(),
             true,
             false,
             patchI,
@@ -1025,7 +1228,7 @@ void dynamicTopoFvMesh::readCoupledPatches()
         patchCoupling_.set
         (
             patchI,
-            new coupledInfo(*this, cMap, -1, -1)
+            new coupledMesh(*this, cMap, -1, -1)
         );
     }
 }
@@ -1078,8 +1281,8 @@ void dynamicTopoFvMesh::moveCoupledSubMeshes()
     {
         label proc = procIndices_[pI];
 
-        const coupledInfo& sPM = sendMeshes_[pI];
-        const coupledInfo& rPM = recvMeshes_[pI];
+        const coupledMesh& sPM = sendMeshes_[pI];
+        const coupledMesh& rPM = recvMeshes_[pI];
 
         // Fetch the coupleMap
         const coupleMap& scMap = sPM.map();
@@ -1116,7 +1319,7 @@ void dynamicTopoFvMesh::moveCoupledSubMeshes()
     forAll(procIndices_, pI)
     {
         // Fetch non-const reference to patchSubMesh
-        coupledInfo& rPM = recvMeshes_[pI];
+        coupledMesh& rPM = recvMeshes_[pI];
 
         // Fetch the coupleMap
         const coupleMap& rcMap = rPM.map();
@@ -1143,9 +1346,9 @@ void dynamicTopoFvMesh::moveCoupledSubMeshes()
         mesh.resetPrimitives
         (
             xferCopy(rcMap.oldPointBuffer()),
-            Xfer<faceList>::null(),
-            Xfer<labelList>::null(),
-            Xfer<labelList>::null(),
+            (*reinterpret_cast<Xfer<faceList>*>(0)),
+            (*reinterpret_cast<Xfer<labelList>*>(0)),
+            (*reinterpret_cast<Xfer<labelList>*>(0)),
             patchSizes,
             patchStarts,
             false
@@ -1189,7 +1392,7 @@ const changeMap dynamicTopoFvMesh::insertCells(const label mIndex)
     // First check to ensure that this case can be handled
     forAll(procIndices_, pI)
     {
-        const label cplEnum = twoDMesh_ ? coupleMap::FACE : coupleMap::EDGE;
+        const label cplEnum = is2D() ? coupleMap::FACE : coupleMap::EDGE;
 
         // Fetch reference to maps
         const coupleMap& cMap = recvMeshes_[pI].map();
@@ -1201,7 +1404,7 @@ const changeMap dynamicTopoFvMesh::insertCells(const label mIndex)
         }
 
         // If this entity is being handled elsewhere, bail out
-        if (procIndices_[pI] < Pstream::myProcNo())
+        if (priority(procIndices_[pI], lessOp<label>(), Pstream::myProcNo()))
         {
             map.type() = -2;
 
@@ -1214,7 +1417,7 @@ const changeMap dynamicTopoFvMesh::insertCells(const label mIndex)
     // Agglomerate cells from surrounding subMeshes
     forAll(procIndices_, pI)
     {
-        const label cplEnum = twoDMesh_ ? coupleMap::FACE : coupleMap::EDGE;
+        const label cplEnum = is2D() ? coupleMap::FACE : coupleMap::EDGE;
 
         // Fetch reference to maps
         const coupleMap& cMap = recvMeshes_[pI].map();
@@ -1230,7 +1433,7 @@ const changeMap dynamicTopoFvMesh::insertCells(const label mIndex)
         // Fetch references
         Map<label>& procCellMap = cellsToInsert[pI];
 
-        if (twoDMesh_)
+        if (is2D())
         {
             // Insert the owner cell
             procCellMap.insert(mesh.owner_[sIndex], -1);
@@ -1312,8 +1515,10 @@ const changeMap dynamicTopoFvMesh::insertCells(const label mIndex)
                 // Configure points which need to be inserted
                 forAll(sFace, pointI)
                 {
+                    label sFacePoint = sFace[pointI];
+
                     // Skip if added already
-                    if (pointsToInsert[pI].found(sFace[pointI]))
+                    if (pointsToInsert[pI].found(sFacePoint))
                     {
                         continue;
                     }
@@ -1321,11 +1526,11 @@ const changeMap dynamicTopoFvMesh::insertCells(const label mIndex)
                     // Check for coupled points
                     pointsToInsert[pI].insert
                     (
-                        sFace[pointI],
+                        sFacePoint,
                         cMap.findMaster
                         (
                             coupleMap::POINT,
-                            sFace[pointI]
+                            sFacePoint
                         )
                     );
                 }
@@ -1372,7 +1577,36 @@ const changeMap dynamicTopoFvMesh::insertCells(const label mIndex)
                     if (sePatch == -1)
                     {
                         // Slave edge was an interior one
-                        edgePatch = neiProcPatch;
+                        if (neiProcPatch > -1)
+                        {
+                            edgePatch = neiProcPatch;
+                        }
+                        else
+                        {
+                            neiProcNo = procIndices_[pI];
+
+                            if (debug > 3)
+                            {
+                                Pout<< nl << nl
+                                    << " No face contact with"
+                                    << " processor: " << neiProcNo
+                                    << endl;
+                            }
+
+                            label pIdx = sendMeshes_[pI].map().patchIndex();
+
+                            // Add a patch creation order, if necessary
+                            if (pIdx == -1 && !createPatch.found(neiProcNo))
+                            {
+                                createPatch.insert(neiProcNo, -1);
+                            }
+
+                            // Specify a value for edgePatch:
+                            //  - Specify a value that we can use
+                            //    to back out the patch after creation
+                            //  - Also needs to bypass failure check
+                            edgePatch = (-2 - neiProcNo);
+                        }
                     }
                     else
                     if (sePatch == (slaveBoundary.size() - 1))
@@ -1392,7 +1626,15 @@ const changeMap dynamicTopoFvMesh::insertCells(const label mIndex)
                         {
                             // If this other processor is
                             // lesser-ranked, bail out.
-                            if (neiProcNo < Pstream::myProcNo())
+                            if
+                            (
+                                priority
+                                (
+                                    neiProcNo,
+                                    lessOp<label>(),
+                                    Pstream::myProcNo()
+                                )
+                            )
                             {
                                 map.type() = -2;
 
@@ -1448,9 +1690,13 @@ const changeMap dynamicTopoFvMesh::insertCells(const label mIndex)
                         mesh.writeVTK("seEdge", seIndex, 1);
 
                         Pout<< " Could not find correct patch info: " << nl
+                            << " sEdge: " << sEdge << nl
                             << " seIndex: " << seIndex << nl
                             << " sePatch: " << sePatch << nl
                             << " neiProcPatch: " << neiProcPatch << nl
+                            << " neiProcNo: " << neiProcNo << nl
+                            << " proc: " << procIndices_[pI] << nl
+                            << " cMs: " << cMs << " cMe: " << cMe << nl
                             << " Patch Name: " <<
                             (
                                 sePatch > -1 ?
@@ -1480,7 +1726,36 @@ const changeMap dynamicTopoFvMesh::insertCells(const label mIndex)
                 if (sfPatch == -1)
                 {
                     // Slave face was an interior one
-                    facePatch = neiProcPatch;
+                    if (neiProcPatch > -1)
+                    {
+                        facePatch = neiProcPatch;
+                    }
+                    else
+                    {
+                        neiProcNo = procIndices_[pI];
+
+                        if (debug > 3)
+                        {
+                            Pout<< nl << nl
+                                << " No face contact with"
+                                << " processor: " << neiProcNo
+                                << endl;
+                        }
+
+                        label pIdx = sendMeshes_[pI].map().patchIndex();
+
+                        // Add a patch creation order, if necessary
+                        if (pIdx == -1 && !createPatch.found(neiProcNo))
+                        {
+                            createPatch.insert(neiProcNo, -1);
+                        }
+
+                        // Specify a value for facePatch:
+                        //  - Specify a value that we can use
+                        //    to back out the patch after creation
+                        //  - Also needs to bypass failure check
+                        facePatch = (-2 - neiProcNo);
+                    }
                 }
                 else
                 if (sfPatch == (slaveBoundary.size() - 1))
@@ -1514,7 +1789,7 @@ const changeMap dynamicTopoFvMesh::insertCells(const label mIndex)
                             {
                                 scalar dist = mag(fC - pts[ptI]);
 
-                                if (dist < (1e-4 * tol))
+                                if (dist < (geomMatchTol_ * tol))
                                 {
                                     // Face was converted before
                                     if (debug > 3)
@@ -1540,7 +1815,15 @@ const changeMap dynamicTopoFvMesh::insertCells(const label mIndex)
                     {
                         // If this other processor is
                         // lesser-ranked, bail out.
-                        if (neiProcNo < Pstream::myProcNo())
+                        if
+                        (
+                            priority
+                            (
+                                neiProcNo,
+                                lessOp<label>(),
+                                Pstream::myProcNo()
+                            )
+                        )
                         {
                             map.type() = -2;
 
@@ -1595,10 +1878,7 @@ const changeMap dynamicTopoFvMesh::insertCells(const label mIndex)
                                     << abort(FatalError);
                             }
 
-                            label pIdx =
-                            (
-                                sendMeshes_[prI].map().patchIndex()
-                            );
+                            label pIdx = sendMeshes_[prI].map().patchIndex();
 
                             // Add a patch creation order, if necessary
                             if (pIdx == -1 && !createPatch.found(neiProcNo))
@@ -1655,12 +1935,213 @@ const changeMap dynamicTopoFvMesh::insertCells(const label mIndex)
         }
     }
 
+    // Specify a merge tolerance for insertion points
+    scalar mergeTol =
+    (
+        is2D() ? 0.0 : geomMatchTol_ * magSqr(edges_[mIndex].vec(points_))
+    );
+
+    // Check for point / edge processor connections
+    if (is3D())
+    {
+        const label myProcNo = Pstream::myProcNo();
+
+        forAll(procIndices_, pI)
+        {
+            const Map<label>& cEdges = edgesToInsert[pI];
+            const coupleMap& cMap = recvMeshes_[pI].map();
+            const Map<labelList>& pEdgeMap = cMap.subMeshEdgeMap();
+            const Map<labelList>& pPointMap = cMap.subMeshPointMap();
+            const dynamicTopoFvMesh& sMesh = recvMeshes_[pI].subMesh();
+
+            // Some points may have been inserted by a prior
+            // operation involving disconnected entities.
+            // Check if points need to be truly inserted.
+            Map<label>& cPoints = pointsToInsert[pI];
+
+            forAllIter(Map<label>, cPoints, pIter)
+            {
+                if (pIter() > -1)
+                {
+                    continue;
+                }
+
+                label cSp = pIter.key();
+
+                Map<labelList>::const_iterator pIt = pPointMap.find(cSp);
+
+                if (pIt == pPointMap.end())
+                {
+                    continue;
+                }
+
+                const point& pointI = sMesh.points_[pIt.key()];
+
+                bool foundMaster = false;
+                const labelList& procs = pIt();
+
+                forAll(procs, procJ)
+                {
+                    label pJ = -1, nProcNo = procs[procJ];
+
+                    if
+                    (
+                        (nProcNo == procIndices_[pI]) ||
+                        ((pJ = findIndex(procIndices_, nProcNo)) == -1)
+                    )
+                    {
+                        continue;
+                    }
+
+                    // Fetch map from the other processor,
+                    // and check if a mapping already exists
+                    const coupleMap& cMapJ = recvMeshes_[pJ].map();
+                    const Map<labelList>& pMapJ = cMapJ.subMeshPointMap();
+                    const dynamicTopoFvMesh& sMeshJ = recvMeshes_[pJ].subMesh();
+
+                    forAllConstIter(Map<labelList>, pMapJ, pjIter)
+                    {
+                        label pointMaster =
+                        (
+                            cMapJ.findMaster
+                            (
+                                coupleMap::POINT,
+                                pjIter.key()
+                            )
+                        );
+
+                        if (pointMaster == -1)
+                        {
+                            continue;
+                        }
+
+                        const point& pointJ = sMeshJ.points_[pjIter.key()];
+
+                        if (magSqr(pointI - pointJ) < mergeTol)
+                        {
+                            if (debug > 2)
+                            {
+                                Pout<< " Using mapped point: " << pjIter.key()
+                                    << " :: " << pointJ
+                                    << " procs: " << pjIter()
+                                    << " master: " << pointMaster
+                                    << endl;
+                            }
+
+                            // Assign to existing master point
+                            pIter() = pointMaster;
+
+                            // Update maps for the point
+                            cMap.mapSlave
+                            (
+                                coupleMap::POINT,
+                                pIter(), pIter.key()
+                            );
+
+                            cMap.mapMaster
+                            (
+                                coupleMap::POINT,
+                                pIter.key(), pIter()
+                            );
+
+                            foundMaster = true;
+                            break;
+                        }
+                    }
+
+                    if (foundMaster)
+                    {
+                        break;
+                    }
+                }
+            }
+
+            forAllConstIter(Map<label>, cEdges, eIter)
+            {
+                label cSe = eIter.key();
+
+                Map<labelList>::const_iterator eIt = pEdgeMap.find(cSe);
+
+                if (eIt != pEdgeMap.end())
+                {
+                    const labelList& procs = eIt();
+
+                    forAll(procs, procI)
+                    {
+                        label nProcNo = procs[procI];
+
+                        if (priority(nProcNo, greaterEqOp<label>(), myProcNo))
+                        {
+                            continue;
+                        }
+
+                        if (debug > 3)
+                        {
+                            Pout<< nl << nl
+                                << " Edge: " << cSe
+                                << " :: " << sMesh.edges_[cSe]
+                                << " is talking to processors: " << procs
+                                << " so bailing out."
+                                << endl;
+                        }
+
+                        map.type() = -2;
+
+                        return map;
+                    }
+                }
+
+                const edge& checkEdge = sMesh.edges_[cSe];
+
+                forAll(checkEdge, pointI)
+                {
+                    label cSp = checkEdge[pointI];
+
+                    Map<labelList>::const_iterator pIt = pPointMap.find(cSp);
+
+                    if (pIt == pPointMap.end())
+                    {
+                        continue;
+                    }
+
+                    const labelList& procs = pIt();
+
+                    forAll(procs, procI)
+                    {
+                        label nProcNo = procs[procI];
+
+                        if (priority(nProcNo, greaterEqOp<label>(), myProcNo))
+                        {
+                            continue;
+                        }
+
+                        if (debug > 3)
+                        {
+                            Pout<< nl << nl
+                                << " Points: " << nl
+                                << "  Edge[0]: " << checkEdge[0] << nl
+                                << "  Edge[1]: " << checkEdge[1] << nl
+                                << " Processor conflict: " << nl
+                                << "  Point: " << cSp << nl
+                                << "  Processors: " << procs
+                                << endl;
+                        }
+
+                        map.type() = -2;
+
+                        return map;
+                    }
+                }
+            }
+        }
+    }
+
     // Perform a few debug calls before modifications
     if (debug > 1)
     {
         Pout<< nl << nl
             << "Inserting cell(s) around coupled "
-            << (twoDMesh_ ? "face: " : "edge: ") << mIndex
+            << (is2D() ? "face: " : "edge: ") << mIndex
             << endl;
     }
 
@@ -1673,6 +2154,28 @@ const changeMap dynamicTopoFvMesh::insertCells(const label mIndex)
         // Create a new processor patch
         procIter() = createProcessorPatch(neiProcNo);
 
+        // Renumber edge conversion patches
+        forAll(masterConvertEdgePatch, pI)
+        {
+            Map<label>& convertMap = masterConvertEdgePatch[pI];
+
+            forAllIter(Map<label>, convertMap, mIter)
+            {
+                if (mIter() < 0)
+                {
+                    // Back out the neighbouring processor ID
+                    label proc = Foam::mag(mIter() + 2);
+
+                    if (proc == neiProcNo)
+                    {
+                        // Set the index
+                        mIter() = procIter();
+                    }
+                }
+            }
+        }
+
+        // Renumber face conversion patches
         forAll(masterConvertFacePatch, pI)
         {
             Map<label>& convertMap = masterConvertFacePatch[pI];
@@ -1706,13 +2209,13 @@ const changeMap dynamicTopoFvMesh::insertCells(const label mIndex)
         // Create patch on subMesh
         dynamicTopoFvMesh& mesh = recvMeshes_[pI].subMesh();
 
-        mesh.createProcessorPatch(Pstream::myProcNo());
+        slaveConvertPatch[pI] = mesh.createProcessorPatch(Pstream::myProcNo());
     }
 
     // Build a list of mapping entities on this processor
     DynamicList<label> mapCells(10);
 
-    if (twoDMesh_)
+    if (is2D())
     {
         label own = owner_[mIndex];
 
@@ -1746,7 +2249,7 @@ const changeMap dynamicTopoFvMesh::insertCells(const label mIndex)
     // create an equivalent on this mesh
     forAll(procIndices_, pI)
     {
-        const label cplEnum = twoDMesh_ ? coupleMap::FACE : coupleMap::EDGE;
+        const label cplEnum = is2D() ? coupleMap::FACE : coupleMap::EDGE;
 
         // Fetch reference to maps
         const coupleMap& cMap = recvMeshes_[pI].map();
@@ -1850,13 +2353,7 @@ const changeMap dynamicTopoFvMesh::insertCells(const label mIndex)
         }
     }
 
-    // Loop through all insertion points, and merge if necessary
-    scalar mergeTol =
-    (
-        twoDMesh_ ? 0.0 : 1e-4 * mag(edges_[mIndex].vec(points_))
-    );
-
-    // Insert all points
+    // Insert all points, with merging if necessary
     forAll(pointsToInsert, pI)
     {
         Map<label>& procPointMapI = pointsToInsert[pI];
@@ -1894,7 +2391,7 @@ const changeMap dynamicTopoFvMesh::insertCells(const label mIndex)
                 {
                     const point& pointJ = meshJ.points_[pItJ.key()];
 
-                    if (mag(pointI - pointJ) < mergeTol)
+                    if (magSqr(pointI - pointJ) < mergeTol)
                     {
                         if (pItJ() == -1)
                         {
@@ -2025,7 +2522,7 @@ const changeMap dynamicTopoFvMesh::insertCells(const label mIndex)
 
     // Occassionally, inserted edges may already be present.
     // Ensure that edges are not added twice.
-    if (!twoDMesh_)
+    if (is3D())
     {
         forAll(facesToInsert, pI)
         {
@@ -2110,7 +2607,15 @@ const changeMap dynamicTopoFvMesh::insertCells(const label mIndex)
                             }
 
                             edgesToInsert[pI][seIndex] = meIndex;
-                            edgesToConvert[pI][seIndex] = meIndex;
+
+                            if (edgesToConvert[pI].found(seIndex))
+                            {
+                                edgesToConvert[pI][seIndex] = meIndex;
+                            }
+                            else
+                            {
+                                edgesToConvert[pI].insert(seIndex, meIndex);
+                            }
                         }
                     }
                 }
@@ -2370,7 +2875,7 @@ const changeMap dynamicTopoFvMesh::insertCells(const label mIndex)
                             if
                             (
                                 convertPatchPoints[pI].found(fJ.key())
-                             &&	convertPatchPoints[pJ].found(fI.key())
+                             && convertPatchPoints[pJ].found(fI.key())
                             )
                             {
                                 convertPatchPoints[pI].erase(fJ.key());
@@ -2382,6 +2887,11 @@ const changeMap dynamicTopoFvMesh::insertCells(const label mIndex)
 
                         break;
                     }
+                }
+
+                if (foundDuplicate)
+                {
+                    break;
                 }
             }
 
@@ -2504,12 +3014,10 @@ const changeMap dynamicTopoFvMesh::insertCells(const label mIndex)
                     nPatch,
                     nF,
                     nOwner,
-                    nNeighbour
+                    nNeighbour,
+                    nFaceEdges
                 )
             );
-
-            // Add the faceEdges entry as well
-            faceEdges_.append(nFaceEdges);
 
             // Size up edgeFaces for each edge
             forAll(nFaceEdges, edgeI)
@@ -2577,8 +3085,10 @@ const changeMap dynamicTopoFvMesh::insertCells(const label mIndex)
             label newNeighbour = cellsToInsert[pI][sFaceOwn];
 
             // Insert a new internal face.
-            // Orientation should be correct, because this is a boundary
-            // face converted to an interior, and adjacent to an added cell.
+            //  - Orientation should be correct, because this is a boundary
+            //    face converted to an interior, and adjacent to an added cell.
+            //  - Add the new faceEdges from the existing face. This may contain
+            //    edges that need to be converted, but that will be done later.
             label newFaceIndex =
             (
                 insertFace
@@ -2586,13 +3096,10 @@ const changeMap dynamicTopoFvMesh::insertCells(const label mIndex)
                     -1,
                     face(faces_[fIndex]),
                     mFaceOwn,
-                    newNeighbour
+                    newNeighbour,
+                    labelList(faceEdges_[fIndex])
                 )
             );
-
-            // Add the new faceEdges from the existing face. This may contain
-            // edges that need to be converted, but that will be done later.
-            faceEdges_.append(labelList(faceEdges_[fIndex]));
 
             // Update map
             map.addFace(newFaceIndex, labelList(1, fIndex));
@@ -2632,7 +3139,7 @@ const changeMap dynamicTopoFvMesh::insertCells(const label mIndex)
 
             // For 2D meshes, the boundary face gets converted
             // to an interior one. Note the index for further operations.
-            if ((mIndex == fIndex) && twoDMesh_)
+            if ((mIndex == fIndex) && is2D())
             {
                 map.index() = newFaceIndex;
             }
@@ -2721,7 +3228,7 @@ const changeMap dynamicTopoFvMesh::insertCells(const label mIndex)
                 scalar tol = mag(mesh.points_[fCheck[0]] - fC);
                 scalar dist = mag(fC - newCentre);
 
-                if (dist < (1e-4 * tol))
+                if (dist < (geomMatchTol_ * tol))
                 {
                     replaceFace = faceI;
                     break;
@@ -2763,6 +3270,8 @@ const changeMap dynamicTopoFvMesh::insertCells(const label mIndex)
             // Obtain a copy before adding the new face,
             // since the reference might become
             // invalid during list resizing.
+            // Edges don't have to change, since they're
+            // all on the boundary anyway.
             face newFace = mesh.faces_[replaceFace];
             label newOwn = mesh.owner_[replaceFace];
             labelList newFaceEdges = mesh.faceEdges_[replaceFace];
@@ -2774,14 +3283,10 @@ const changeMap dynamicTopoFvMesh::insertCells(const label mIndex)
                     procPatch,
                     newFace,
                     newOwn,
-                    -1
+                    -1,
+                    newFaceEdges
                 )
             );
-
-            // Add a faceEdges entry as well.
-            // Edges don't have to change, since they're
-            // all on the boundary anyway.
-            mesh.faceEdges_.append(newFaceEdges);
 
             // changeMap update for the new face is not necessary,
             // since it is on the slave subMesh
@@ -2931,7 +3436,7 @@ const changeMap dynamicTopoFvMesh::insertCells(const label mIndex)
                     keepEdge = false;
                 }
                 else
-                if ((mIndex == eIndex) && !twoDMesh_ && map.index() == -1)
+                if ((mIndex == eIndex) && is3D() && map.index() == -1)
                 {
                     // Keep the edge, and note index for later
                     keepEdge = true;
@@ -2979,7 +3484,7 @@ const changeMap dynamicTopoFvMesh::insertCells(const label mIndex)
 
             // For 3D meshes, the boundary edge gets converted
             // to an interior one. Note the index for further operations.
-            if ((mIndex == eIndex) && !twoDMesh_)
+            if ((mIndex == eIndex) && is3D())
             {
                 map.index() = newEdgeIndex;
             }
@@ -2992,6 +3497,8 @@ const changeMap dynamicTopoFvMesh::insertCells(const label mIndex)
     List<changeMap> slaveMaps(procIndices_.size());
 
     // Loop through all processors, and remove cells
+    const label emptyMap = -7;
+
     forAll(cellsToInsert, pI)
     {
         const Map<label>& procCellMap = cellsToInsert[pI];
@@ -2999,7 +3506,7 @@ const changeMap dynamicTopoFvMesh::insertCells(const label mIndex)
         if (procCellMap.empty())
         {
             // Set type to something recognizable
-            slaveMaps[pI].type() = -7;
+            slaveMaps[pI].type() = emptyMap;
 
             continue;
         }
@@ -3028,7 +3535,7 @@ const changeMap dynamicTopoFvMesh::insertCells(const label mIndex)
         const changeMap& slaveMap = slaveMaps[pI];
 
         // Skip empty entities
-        if (slaveMap.type() == -7)
+        if (slaveMap.type() == emptyMap)
         {
             continue;
         }
@@ -3163,7 +3670,7 @@ const changeMap dynamicTopoFvMesh::insertCells(const label mIndex)
         }
 
         // Map edges for 3D meshes
-        if (!twoDMesh_)
+        if (is3D())
         {
             // Map edges from patches.
             const Map<label>& procEdgeMap = edgesToInsert[pI];
@@ -3376,7 +3883,7 @@ const changeMap dynamicTopoFvMesh::insertCells(const label mIndex)
                     continue;
                 }
 
-                if (twoDMesh_)
+                if (is2D())
                 {
                     if (face::compare(cFace, sFace))
                     {
@@ -3438,7 +3945,7 @@ const changeMap dynamicTopoFvMesh::insertCells(const label mIndex)
                     << abort(FatalError);
             }
 
-            if (twoDMesh_)
+            if (is2D())
             {
                 continue;
             }
@@ -3598,7 +4105,7 @@ const changeMap dynamicTopoFvMesh::removeCells
                 edgesToConvert.set(fEdges[edgeI], -1);
             }
 
-            if (twoDMesh_)
+            if (is2D())
             {
                 // Add all points as candidates for removal.
                 // Some (or all) of these will be weeded out.
@@ -3660,7 +4167,7 @@ const changeMap dynamicTopoFvMesh::removeCells
     }
 
     // Build a set of points to be removed.
-    if (twoDMesh_)
+    if (is2D())
     {
         forAllConstIter(Map<label>, edgesToConvert, eIter)
         {
@@ -3834,6 +4341,7 @@ const changeMap dynamicTopoFvMesh::removeCells
         }
 
         // Insert the reconfigured face at the boundary.
+        // faceEdges will be corrected later.
         fIter() =
         (
             insertFace
@@ -3841,13 +4349,10 @@ const changeMap dynamicTopoFvMesh::removeCells
                 patch,
                 newFace,
                 newOwner,
-                -1
+                -1,
+                fEdges
             )
         );
-
-        // Add the faceEdges entry.
-        // Edges will be corrected later.
-        faceEdges_.append(fEdges);
 
         // Add this face to the map.
         map.addFace(fIter());
@@ -4190,7 +4695,7 @@ void dynamicTopoFvMesh::handleCoupledPatches
         initCoupledStack(entities, false);
     }
 
-    if (twoDMesh_)
+    if (is2D())
     {
         swap2DEdges(&(handlerPtr_[0]));
     }
@@ -4243,25 +4748,29 @@ void dynamicTopoFvMesh::handleCoupledPatches
     {
         label proc = procIndices_[pI];
 
-        coupledInfo& sPM = sendMeshes_[pI];
-        coupledInfo& rPM = recvMeshes_[pI];
+        coupledMesh& sPM = sendMeshes_[pI];
+        coupledMesh& rPM = recvMeshes_[pI];
 
-        if (proc < Pstream::myProcNo())
+        if (priority(proc, lessOp<label>(), Pstream::myProcNo()))
         {
             const coupleMap& cMap = sPM.map();
 
             // How many entities am I receiving..
-            label nEntities = -1, nMovePoints = -1;
+            FixedList<label, 3> nOps(-1);
 
-            meshOps::pRead(proc, nEntities);
-            meshOps::pRead(proc, nMovePoints);
+            meshOps::pRead(proc, nOps);
+
+            label nEntities = nOps[0];
+            label nMovePoints = nOps[1];
+            label nPatchConvert = nOps[2];
 
             if (debug > 3)
             {
-                Pout<< " Op tranfer:"
+                Pout<< " Op transfer:"
                     << " Receiving from [" << proc << "]::"
                     << " nEntities: " << nEntities
                     << " nMovePoints: " << nMovePoints
+                    << " nPatchConvert: " << nPatchConvert
                     << endl;
             }
 
@@ -4292,17 +4801,31 @@ void dynamicTopoFvMesh::handleCoupledPatches
                 meshOps::pRead(proc, newPoints);
                 meshOps::pRead(proc, oldPoints);
             }
+
+            if (nPatchConvert)
+            {
+                // Size up the receipt buffers
+                labelList& patches = cMap.patchIndices();
+
+                patches.setSize(nPatchConvert);
+
+                // Schedule patch indices for receipt
+                meshOps::pRead(proc, patches);
+            }
         }
         else
         {
             const coupleMap& cMap = rPM.map();
 
+            FixedList<label, 3> nOps(-1);
+
             label nEntities = cMap.entityIndices().size();
             label nMovePoints = cMap.moveNewPoints().size();
+            label nPatchConvert = cMap.patchIndices().size();
 
             if (debug > 3)
             {
-                Pout<< " Op tranfer:"
+                Pout<< " Op transfer:"
                     << " Sending to [" << proc << "]:: "
                     << " nEntities: " << nEntities << nl
                     << "  entityIndices: " << cMap.entityIndices() << nl
@@ -4310,11 +4833,16 @@ void dynamicTopoFvMesh::handleCoupledPatches
                     << " nMovePoints: " << nMovePoints << nl
                     << "  moveNewPoints: " << cMap.moveNewPoints() << nl
                     << "  moveOldPoints: " << cMap.moveOldPoints() << nl
+                    << " nPatchConvert: " << nPatchConvert << nl
+                    << "  patchIndices: " << cMap.patchIndices() << nl
                     << endl;
             }
 
-            meshOps::pWrite(proc, nEntities);
-            meshOps::pWrite(proc, nMovePoints);
+            nOps[0] = nEntities;
+            nOps[1] = nMovePoints;
+            nOps[2] = nPatchConvert;
+
+            meshOps::pWrite(proc, nOps);
 
             if (nEntities)
             {
@@ -4328,6 +4856,12 @@ void dynamicTopoFvMesh::handleCoupledPatches
                 // Schedule transfer to processor
                 meshOps::pWrite(proc, cMap.moveNewPoints());
                 meshOps::pWrite(proc, cMap.moveOldPoints());
+            }
+
+            if (nPatchConvert)
+            {
+                // Schedule transfer to processor
+                meshOps::pWrite(proc, cMap.patchIndices());
             }
         }
     }
@@ -4346,44 +4880,54 @@ void dynamicTopoFvMesh::syncCoupledPatches(labelHashSet& entities)
         return;
     }
 
+    // Temporarily reset maxModifications to
+    // ensure that synchronization succeeds
+    label maxModSave = maxModifications_;
+
+    maxModifications_ = -1;
+
     const polyBoundaryMesh& boundary = boundaryMesh();
 
-    labelList createPatchOrders(Pstream::nProcs(), 0);
+    labelList createPatchOrders(procIndices_.size(), 0);
 
     forAll(procIndices_, pI)
     {
-        const coupleMap& cMap = sendMeshes_[pI].map();
+        const coupleMap& cMap = recvMeshes_[pI].map();
 
         if (cMap.patchIndex() >= boundary.size())
         {
             // This processor needs a new patch talking to me
-            createPatchOrders[procIndices_[pI]] = 1;
+            createPatchOrders[pI] = 1;
         }
     }
 
     // Send / recv create patch orders, if any
-    for (label proc = 0; proc < Pstream::nProcs(); proc++)
+    forAll(procIndices_, pI)
     {
-        if (proc == Pstream::myProcNo())
-        {
-            continue;
-        }
+        label proc = procIndices_[pI];
 
-        if (proc > Pstream::myProcNo())
+        if (priority(proc, greaterOp<label>(), Pstream::myProcNo()))
         {
-            meshOps::pWrite(proc, createPatchOrders[proc]);
+            // Non-blocking send to processor
+            meshOps::pWrite(proc, createPatchOrders[pI], false);
         }
         else
         {
-            meshOps::pRead(proc, createPatchOrders[proc]);
+            // Non-blocking receive from processor
+            meshOps::pRead(proc, createPatchOrders[pI], false);
         }
     }
 
+    // Wait for all transfers to complete.
+    meshOps::waitForBuffers();
+
     Map<label> addedProcPatches;
 
-    for (label proc = 0; proc < Pstream::myProcNo(); proc++)
+    forAll(procIndices_, pI)
     {
-        if (createPatchOrders[proc])
+        label proc = procIndices_[pI];
+
+        if (createPatchOrders[pI])
         {
             // Create a new processor patch
             addedProcPatches.insert
@@ -4394,9 +4938,6 @@ void dynamicTopoFvMesh::syncCoupledPatches(labelHashSet& entities)
         }
     }
 
-    // Wait for all transfers to complete.
-    meshOps::waitForBuffers();
-
     // Buffer for cell-removal
     DynamicList<label> rCellList(10);
 
@@ -4404,13 +4945,15 @@ void dynamicTopoFvMesh::syncCoupledPatches(labelHashSet& entities)
     {
         label proc = procIndices_[pI];
 
-        const coupledInfo& sPM = sendMeshes_[pI];
+        const coupledMesh& sPM = sendMeshes_[pI];
 
-        if (proc < Pstream::myProcNo())
+        if (priority(proc, lessOp<label>(), Pstream::myProcNo()))
         {
             const coupleMap& cMap = sPM.map();
             const labelList& indices = cMap.entityIndices();
             const List<coupleMap::opType>& operations = cMap.entityOperations();
+
+            const labelList& patches = cMap.patchIndices();
             const pointField& newPoints = cMap.moveNewPoints();
             const pointField& oldPoints = cMap.moveOldPoints();
 
@@ -4447,11 +4990,33 @@ void dynamicTopoFvMesh::syncCoupledPatches(labelHashSet& entities)
                 else
                 if (operations.size())
                 {
+                    bool required = false;
+
+                    forAll(operations, opI)
+                    {
+                        const coupleMap::opType op = operations[opI];
+
+                        if
+                        (
+                            op == coupleMap::REMOVE_CELL ||
+                            op == coupleMap::CONVERT_PATCH
+                        )
+                        {
+                            required = true;
+                            break;
+                        }
+                    }
+
                     // If we actually have operations from
-                    // this processor, this is a problem.
-                    Pout<< " * * * Sync Operations * * * " << nl
-                        << " Could not find patch for proc: " << proc << nl
-                        << abort(FatalError);
+                    // this processor that require patch conversion,
+                    // this is a problem.
+                    if (required)
+                    {
+                        Pout<< " * * * Sync Operations * * * " << nl
+                            << " Could not find patch for proc: " << proc << nl
+                            << " procIndices: " << procIndices_
+                            << abort(FatalError);
+                    }
                 }
                 else
                 {
@@ -4460,7 +5025,7 @@ void dynamicTopoFvMesh::syncCoupledPatches(labelHashSet& entities)
                 }
             }
 
-            label pointCounter = 0;
+            label pointCounter = 0, patchCounter = 0;
 
             // Sequentially execute operations
             forAll(indices, indexI)
@@ -4481,7 +5046,11 @@ void dynamicTopoFvMesh::syncCoupledPatches(labelHashSet& entities)
                     localIndex = cMap.entityMap(coupleMap::POINT)[index];
                 }
                 else
-                if (op == coupleMap::CONVERT_PATCH)
+                if
+                (
+                    op == coupleMap::CONVERT_PATCH ||
+                    op == coupleMap::CONVERT_PHYSICAL
+                )
                 {
                     localIndex =
                     (
@@ -4491,20 +5060,31 @@ void dynamicTopoFvMesh::syncCoupledPatches(labelHashSet& entities)
 
                     if (debug > 3)
                     {
-                        const point& newCentre = newPoints[pointCounter];
-                        const point& oldCentre = oldPoints[pointCounter];
+                        if (op == coupleMap::CONVERT_PATCH)
+                        {
+                            const point& newCentre = newPoints[pointCounter];
+                            const point& oldCentre = oldPoints[pointCounter];
 
-                        Pout<< " Convert patch: " << index << nl
-                            << " localIndex: " << localIndex << nl
-                            << " newCentre: " << newCentre << nl
-                            << " oldCentre: " << oldCentre << nl
-                            << endl;
+                            Pout<< " Convert patch: " << index << nl
+                                << "  localIndex: " << localIndex << nl
+                                << "  newCentre: " << newCentre << nl
+                                << "  oldCentre: " << oldCentre << nl
+                                << endl;
+                        }
+
+                        if (op == coupleMap::CONVERT_PHYSICAL)
+                        {
+                            Pout<< " Convert patch: " << index << nl
+                                << "  localIndex: " << localIndex << nl
+                                << "  patch: " << patches[patchCounter] << nl
+                                << endl;
+                        }
                     }
                 }
                 else
                 {
                     // Pick localIndex based on entity type
-                    if (twoDMesh_)
+                    if (is2D())
                     {
                         const Map<label>& fM = cMap.entityMap(coupleMap::FACE);
 
@@ -4581,7 +5161,7 @@ void dynamicTopoFvMesh::syncCoupledPatches(labelHashSet& entities)
                         // Clear existing list
                         rCellList.clear();
 
-                        if (twoDMesh_)
+                        if (is2D())
                         {
                             // Insert the owner cell
                             rCellList.append(owner_[localIndex]);
@@ -4690,7 +5270,7 @@ void dynamicTopoFvMesh::syncCoupledPatches(labelHashSet& entities)
                                 scalar tol = mag(points_[fCheck[0]] - fC);
                                 scalar dist = mag(fC - newCentre);
 
-                                if (dist < (1e-4 * tol))
+                                if (dist < (geomMatchTol_ * tol))
                                 {
                                     localIndex = faceI;
                                     break;
@@ -4740,7 +5320,7 @@ void dynamicTopoFvMesh::syncCoupledPatches(labelHashSet& entities)
                         scalar dist = mag(fC - newCentre);
 
                         // Ensure a face-match
-                        if (dist > (1e-4 * tol))
+                        if (dist > (geomMatchTol_ * tol))
                         {
                             Pout<< " * * * Sync Operations * * * " << nl
                                 << " Convert patch Op failed." << nl
@@ -4750,7 +5330,7 @@ void dynamicTopoFvMesh::syncCoupledPatches(labelHashSet& entities)
                                 << " faceCentre: " << fC << nl
                                 << " Master processor: " << proc << nl
                                 << " procPatch: " << procPatch << nl
-                                << " tolerance: " << tol << nl
+                                << " tolerance: " << (geomMatchTol_ * tol) << nl
                                 << " distance: " << dist << nl
                                 << " pointCounter: " << pointCounter << nl
                                 << " newCentre: " << newCentre << nl
@@ -4761,6 +5341,8 @@ void dynamicTopoFvMesh::syncCoupledPatches(labelHashSet& entities)
                         // Obtain a copy before adding the new face,
                         // since the reference might become
                         // invalid during list resizing.
+                        // Edges don't have to change, since they're
+                        // all on the boundary anyway.
                         face newFace = faces_[localIndex];
                         label newOwn = owner_[localIndex];
                         labelList newFaceEdges = faceEdges_[localIndex];
@@ -4772,14 +5354,10 @@ void dynamicTopoFvMesh::syncCoupledPatches(labelHashSet& entities)
                                 procPatch,
                                 newFace,
                                 newOwn,
-                                -1
+                                -1,
+                                newFaceEdges
                             )
                         );
-
-                        // Add a faceEdges entry as well.
-                        // Edges don't have to change, since they're
-                        // all on the boundary anyway.
-                        faceEdges_.append(newFaceEdges);
 
                         meshOps::replaceLabel
                         (
@@ -4820,6 +5398,70 @@ void dynamicTopoFvMesh::syncCoupledPatches(labelHashSet& entities)
                         break;
                     }
 
+                    case coupleMap::CONVERT_PHYSICAL:
+                    {
+                        const label patchIndex = patches[patchCounter];
+
+                        // Obtain a copy before adding the new face,
+                        // since the reference might become
+                        // invalid during list resizing.
+                        // Edges don't have to change, since they're
+                        // all on the boundary anyway.
+                        face newFace = faces_[localIndex];
+                        label newOwn = owner_[localIndex];
+                        labelList newFaceEdges = faceEdges_[localIndex];
+
+                        label newFaceIndex =
+                        (
+                            insertFace
+                            (
+                                patchIndex,
+                                newFace,
+                                newOwn,
+                                -1,
+                                newFaceEdges
+                            )
+                        );
+
+                        meshOps::replaceLabel
+                        (
+                            localIndex,
+                            newFaceIndex,
+                            cells_[newOwn]
+                        );
+
+                        // Correct edgeFaces with the new face label.
+                        forAll(newFaceEdges, edgeI)
+                        {
+                            meshOps::replaceLabel
+                            (
+                                localIndex,
+                                newFaceIndex,
+                                edgeFaces_[newFaceEdges[edgeI]]
+                            );
+                        }
+
+                        // Finally remove the face
+                        removeFace(localIndex);
+
+                        // Clear the existing map
+                        opMap.clear();
+
+                        // Update map
+                        opMap.addFace
+                        (
+                            newFaceIndex,
+                            labelList(1, localIndex)
+                        );
+
+                        // Force a successful operation
+                        opMap.type() = 1;
+
+                        patchCounter++;
+
+                        break;
+                    }
+
                     case coupleMap::INVALID:
                     {
                         Pout<< " * * * Sync Operations * * * " << nl
@@ -4846,6 +5488,9 @@ void dynamicTopoFvMesh::syncCoupledPatches(labelHashSet& entities)
             }
         }
     }
+
+    // Reinstate max modifications
+    maxModifications_ = maxModSave;
 
     // Re-Initialize the stack with avoided entities from subMeshes
     // and leave those on processor patches untouched
@@ -4874,7 +5519,7 @@ void dynamicTopoFvMesh::syncCoupledPatches(labelHashSet& entities)
     // Re-Initialize the stack, using supplied entities
     initCoupledStack(entities, true);
 
-    if (twoDMesh_)
+    if (is2D())
     {
         swap2DEdges(&(handlerPtr_[0]));
     }
@@ -4892,9 +5537,6 @@ bool dynamicTopoFvMesh::checkCoupledBoundaries(bool report) const
     const polyBoundaryMesh& boundary = boundaryMesh();
 
     bool sizeError = false, misMatchError = false;
-
-    // Check if a geometric tolerance has been specified.
-    scalar gTol = debug::tolerances("processorMatchTol", 1e-4);
 
     // Maintain a list of master / neighbour anchors
     List<vectorField> mAnchors(boundary.size());
@@ -5013,7 +5655,7 @@ bool dynamicTopoFvMesh::checkCoupledBoundaries(bool report) const
                         (
                             Foam::transform
                             (
-                                cp.transformT(0),
+                                cp.forwardT()[0],
                                 half0Centres[faceI]
                             )
                         );
@@ -5022,7 +5664,7 @@ bool dynamicTopoFvMesh::checkCoupledBoundaries(bool report) const
                         (
                             Foam::transform
                             (
-                                cp.transformT(0),
+                                cp.forwardT()[0],
                                 mAnchors[pI][faceI]
                             )
                         );
@@ -5053,7 +5695,7 @@ bool dynamicTopoFvMesh::checkCoupledBoundaries(bool report) const
                     scalar rMagSf = mag(half1Areas[faceI]);
                     scalar avSf = 0.5 * (fMagSf + rMagSf);
 
-                    if (mag(fMagSf - rMagSf)/avSf > gTol)
+                    if (mag(fMagSf - rMagSf)/avSf > geomMatchTol_)
                     {
                         misMatchError = true;
 
@@ -5071,7 +5713,7 @@ bool dynamicTopoFvMesh::checkCoupledBoundaries(bool report) const
                         Foam::max
                         (
                             pTol,
-                            gTol * mag(lP[lF[faceI][0]] - lC[faceI])
+                            geomMatchTol_ * mag(lP[lF[faceI][0]] - lC[faceI])
                         )
                     );
                 }
@@ -5217,7 +5859,7 @@ bool dynamicTopoFvMesh::checkCoupledBoundaries(bool report) const
             scalar nbrMagSf = mag(fAreas[pI][faceI]);
             scalar avSf = 0.5 * (magSf + nbrMagSf);
 
-            if (mag(magSf - nbrMagSf)/avSf > gTol)
+            if (mag(magSf - nbrMagSf)/avSf > geomMatchTol_)
             {
                 misMatchError = true;
 
@@ -5236,7 +5878,7 @@ bool dynamicTopoFvMesh::checkCoupledBoundaries(bool report) const
                 Foam::max
                 (
                     pTol,
-                    gTol *
+                    geomMatchTol_ *
                     mag
                     (
                         myPoints[myFaces[faceI][0]]
@@ -5327,7 +5969,7 @@ void dynamicTopoFvMesh::buildProcessorPatchMeshes()
     {
         label proc = procIndices_[pI];
 
-        coupledInfo& sPM = sendMeshes_[pI];
+        coupledMesh& sPM = sendMeshes_[pI];
 
         // Build the subMesh.
         buildProcessorPatchMesh(sPM, commonCells);
@@ -5357,7 +5999,7 @@ void dynamicTopoFvMesh::buildProcessorPatchMeshes()
         }
 
         // Obtain references
-        const coupledInfo& rPM = recvMeshes_[pI];
+        const coupledMesh& rPM = recvMeshes_[pI];
         const coupleMap& rcMap = rPM.map();
 
         // First read entity sizes.
@@ -5396,7 +6038,7 @@ void dynamicTopoFvMesh::buildProcessorPatchMeshes()
 //   of neighbouring processors.
 void dynamicTopoFvMesh::buildProcessorPatchMesh
 (
-    coupledInfo& subMesh,
+    coupledMesh& subMesh,
     Map<labelList>& commonCells
 )
 {
@@ -5432,30 +6074,6 @@ void dynamicTopoFvMesh::buildProcessorPatchMesh
     // Check if this is a direct neighbour
     const polyBoundaryMesh& boundary = boundaryMesh();
 
-/*
-    // unused code section - to be removed
-    // HR: 30/11/2013
-
-    label patchIndex = -1;
-
-    forAll(boundary, patchI)
-    {
-        if (isA<processorPolyPatch>(boundary[patchI]))
-        {
-            const processorPolyPatch& pp =
-            (
-                refCast<const processorPolyPatch>(boundary[patchI])
-            );
-
-            if (pp.neighbProcNo() == proc)
-            {
-                patchIndex = patchI;
-                break;
-            }
-        }
-    }
-*/
-
     // Add sub-mesh points first.
     // Additional halo points will be added later.
     forAll(subMeshPoints, pointI)
@@ -5489,13 +6107,19 @@ void dynamicTopoFvMesh::buildProcessorPatchMesh
     labelHashSet localCommonCells;
 
     // Detect all cells surrounding shared points.
-    if (twoDMesh_)
+    if (is2D())
     {
         // No pointEdges structure, so loop through all cells
         // to check for those connected to subMeshPoints
         forAll(cells_, cellI)
         {
             const cell& cellToCheck = cells_[cellI];
+
+            if (cellToCheck.empty())
+            {
+                continue;
+            }
+
             const labelList cellPoints = cellToCheck.labels(faces_);
 
             forAll(cellPoints, pointI)
@@ -5927,15 +6551,12 @@ void dynamicTopoFvMesh::buildProcessorPatchMesh
         }
     }
 
-    // Fill variable size face-list sizes for 2D
-    if (twoDMesh_)
-    {
-        labelList& nfeBuffer = cMap.entityBuffer(coupleMap::NFE_BUFFER);
+    // Fill variable size face-list sizes
+    labelList& nfeBuffer = cMap.entityBuffer(coupleMap::NFE_BUFFER);
 
-        forAllConstIter(Map<label>, faceMap, fIter)
-        {
-            nfeBuffer[fIter.key()] = faces_[fIter()].size();
-        }
+    forAllConstIter(Map<label>, faceMap, fIter)
+    {
+        nfeBuffer[fIter.key()] = faces_[fIter()].size();
     }
 
     // Fill in boundary information
@@ -6013,7 +6634,7 @@ void dynamicTopoFvMesh::buildProcessorPatchMesh
             );
 
             // Add type
-            patchSubDict.add("type", "processor");
+            patchSubDict.add("type", "subMeshProcessor");
 
             // Add start / size
             patchSubDict.add("startFace", bdyFaceStarts[patchI]);
@@ -6116,10 +6737,9 @@ void dynamicTopoFvMesh::buildLocalCoupledMaps()
 
     // Check if a geometric tolerance has been specified.
     const boundBox& box = polyMesh::bounds();
-    scalar relTol = debug::tolerances("patchFaceMatchTol", 1e-4);
 
     // Compute tolerance
-    scalar tol = relTol * box.mag();
+    scalar tol = geomMatchTol_ * box.mag();
 
     const polyBoundaryMesh& boundary = boundaryMesh();
 
@@ -6181,7 +6801,7 @@ void dynamicTopoFvMesh::buildLocalCoupledMaps()
                 FatalErrorIn("void dynamicTopoFvMesh::buildLocalCoupledMaps()")
                     << " Failed to match all points"
                     << " within a tolerance of: " << tol << nl
-                    << " relTol: " << relTol << nl
+                    << " matchTol: " << geomMatchTol_ << nl
                     << abort(FatalError);
             }
 
@@ -6247,7 +6867,7 @@ void dynamicTopoFvMesh::buildLocalCoupledMaps()
 
                 const face& mFace = faces_[mfIndex];
 
-                if (twoDMesh_)
+                if (is2D())
                 {
                     // Set up a comparison face.
                     face cFace(4);
@@ -6504,7 +7124,7 @@ void dynamicTopoFvMesh::buildLocalCoupledMaps()
                 );
             }
 
-            if (twoDMesh_)
+            if (is2D())
             {
                 continue;
             }
@@ -6598,7 +7218,7 @@ void dynamicTopoFvMesh::buildProcessorCoupledMaps()
     {
         label proc = procIndices_[pI];
 
-        coupledInfo& rPM = recvMeshes_[pI];
+        coupledMesh& rPM = recvMeshes_[pI];
         const coupleMap& cMap = rPM.map();
         const labelList& ptBuffer = cMap.entityBuffer(coupleMap::PATCH_ID);
 
@@ -6649,7 +7269,7 @@ void dynamicTopoFvMesh::buildProcessorCoupledMaps()
                 );
 
                 // Add type
-                patchSubDict.add("type", "processor");
+                patchSubDict.add("type", "subMeshProcessor");
 
                 // Add start / size
                 patchSubDict.add("startFace", faceStarts[patchI]);
@@ -6716,7 +7336,8 @@ void dynamicTopoFvMesh::buildProcessorCoupledMaps()
               + Foam::name(Pstream::myProcNo())
               + "to"
               + Foam::name(proc),
-                identity(cMap.nEntities(coupleMap::CELL))
+                identity(cMap.nEntities(coupleMap::CELL)),
+                3, false, true
             );
         }
 
@@ -6842,11 +7463,8 @@ void dynamicTopoFvMesh::buildProcessorCoupledMaps()
             const pointField& sPoints = rPM.subMesh().points_;
             const Map<label>& pMap = cMap.entityMap(coupleMap::POINT);
 
-            // Fetch relative tolerance
-            scalar relTol = debug::tolerances("processorMatchTol", 1e-4);
-
             // Compute tolerance
-            scalar tol = relTol * box.mag();
+            scalar tol = geomMatchTol_ * box.mag();
 
             forAllConstIter(Map<label>, pMap, pIter)
             {
@@ -6875,9 +7493,6 @@ void dynamicTopoFvMesh::buildProcessorCoupledMaps()
         // Now match all faces connected to master points.
         if (nPrc.found(proc))
         {
-            // Fetch a global faceList for the slave subMesh
-            const faceList& slaveFaces = rPM.subMesh().faces();
-
             // This is an immediate neighbour.
             label mStart = boundary[nPrc[proc]].start();
             label mSize  = boundary[nPrc[proc]].size();
@@ -6889,10 +7504,11 @@ void dynamicTopoFvMesh::buildProcessorCoupledMaps()
             const Map<label>& fMap = cMap.entityMap(coupleMap::FACE);
 
             // Fetch global pointFaces for the slave.
-            const labelListList& spF = rPM.subMesh().pointFaces();
+            const faceList& slaveFaces = sMesh.faces();
+            const labelListList& spF = sMesh.pointFaces();
 
             // Match patch faces for both 2D and 3D.
-            for(label i = 0; i < mSize; i++)
+            for (label i = 0; i < mSize; i++)
             {
                 // Fetch the global face index
                 label mfIndex = (mStart + i);
@@ -6913,160 +7529,129 @@ void dynamicTopoFvMesh::buildProcessorCoupledMaps()
                 // Fetch pointFaces for the zeroth point.
                 const labelList& spFaces = spF[cFace[0]];
 
-                if (twoDMesh_)
+                label sFaceIndex = -1, compareVal = -1;
+
+                forAll(spFaces, faceJ)
                 {
-                    bool matched = false;
+                    // Fetch the global face index
+                    label sfIndex = spFaces[faceJ];
 
-                    forAll(spFaces, faceJ)
+                    const face& sFace = slaveFaces[sfIndex];
+
+                    // Check for triangle face optimization
+                    if (mFace.size() == 3)
                     {
-                        // Fetch the global face index
-                        label sfIndex = spFaces[faceJ];
-
-                        const face& sFace = slaveFaces[sfIndex];
-
-                        if (face::compare(cFace, sFace))
-                        {
-                            // Found the slave. Add a map entry
-                            cMap.mapSlave
-                            (
-                                coupleMap::FACE,
-                                mfIndex,
-                                sfIndex
-                            );
-
-                            cMap.mapMaster
-                            (
-                                coupleMap::FACE,
-                                sfIndex,
-                                mfIndex
-                            );
-
-                            matched = true;
-
-                            break;
-                        }
-                    }
-
-                    if (!matched)
-                    {
-                        unMatchedFaces.insert(mfIndex);
-
-                        continue;
-                    }
-                }
-                else
-                {
-                    label sFaceIndex = -1;
-
-                    forAll(spFaces, faceJ)
-                    {
-                        // Fetch the global face index
-                        label sfIndex = spFaces[faceJ];
-
-                        const face& sFace = slaveFaces[sfIndex];
-
-                        if
+                        compareVal =
                         (
                             triFace::compare
                             (
                                 triFace(cFace[0], cFace[1], cFace[2]),
                                 triFace(sFace[0], sFace[1], sFace[2])
                             )
-                        )
+                        );
+                    }
+                    else
+                    {
+                        compareVal = face::compare(cFace, sFace);
+                    }
+
+                    if (compareVal)
+                    {
+                        // Found the slave. Add a map entry
+                        cMap.mapSlave
+                        (
+                            coupleMap::FACE,
+                            mfIndex,
+                            sfIndex
+                        );
+
+                        cMap.mapMaster
+                        (
+                            coupleMap::FACE,
+                            sfIndex,
+                            mfIndex
+                        );
+
+                        sFaceIndex = sfIndex;
+
+                        break;
+                    }
+                }
+
+                if (sFaceIndex == -1)
+                {
+                    unMatchedFaces.insert(mfIndex);
+
+                    continue;
+                }
+
+                // No need to match edges in 2D
+                if (is2D())
+                {
+                    continue;
+                }
+
+                // Match all edges on this face as well.
+                const labelList& mfEdges = faceEdges_[mfIndex];
+                const labelList& sfEdges = sMesh.faceEdges_[sFaceIndex];
+
+                forAll(mfEdges, edgeI)
+                {
+                    if (eMap.found(mfEdges[edgeI]))
+                    {
+                        continue;
+                    }
+
+                    const edge& mEdge = edges_[mfEdges[edgeI]];
+
+                    // Configure a comparison edge.
+                    edge cEdge(pMap[mEdge[0]], pMap[mEdge[1]]);
+
+                    bool matchedEdge = false;
+
+                    forAll(sfEdges, edgeJ)
+                    {
+                        const edge& sEdge = sMesh.edges_[sfEdges[edgeJ]];
+
+                        if (cEdge == sEdge)
                         {
                             // Found the slave. Add a map entry
                             cMap.mapSlave
                             (
-                                coupleMap::FACE,
-                                mfIndex,
-                                sfIndex
+                                coupleMap::EDGE,
+                                mfEdges[edgeI],
+                                sfEdges[edgeJ]
                             );
 
                             cMap.mapMaster
                             (
-                                coupleMap::FACE,
-                                sfIndex,
-                                mfIndex
+                                coupleMap::EDGE,
+                                sfEdges[edgeJ],
+                                mfEdges[edgeI]
                             );
 
-                            sFaceIndex = sfIndex;
+                            matchedEdge = true;
 
                             break;
                         }
                     }
 
-                    if (sFaceIndex == -1)
+                    if (!matchedEdge)
                     {
-                        unMatchedFaces.insert(mfIndex);
+                        // Write out the edge
+                        writeVTK("mEdge", mfEdges[edgeI], 1);
 
-                        continue;
-                    }
-
-                    // Match all edges on this face as well.
-                    const labelList& mfEdges = faceEdges_[mfIndex];
-                    const labelList& sfEdges = sMesh.faceEdges_[sFaceIndex];
-
-                    forAll(mfEdges, edgeI)
-                    {
-                        if (eMap.found(mfEdges[edgeI]))
-                        {
-                            continue;
-                        }
-
-                        const edge& mEdge = edges_[mfEdges[edgeI]];
-
-                        // Configure a comparison edge.
-                        edge cEdge(pMap[mEdge[0]], pMap[mEdge[1]]);
-
-                        bool matchedEdge = false;
-
-                        forAll(sfEdges, edgeJ)
-                        {
-                            const edge& sEdge =
-                            (
-                                sMesh.edges_[sfEdges[edgeJ]]
-                            );
-
-                            if (cEdge == sEdge)
-                            {
-                                // Found the slave. Add a map entry
-                                cMap.mapSlave
-                                (
-                                    coupleMap::EDGE,
-                                    mfEdges[edgeI],
-                                    sfEdges[edgeJ]
-                                );
-
-                                cMap.mapMaster
-                                (
-                                    coupleMap::EDGE,
-                                    sfEdges[edgeJ],
-                                    mfEdges[edgeI]
-                                );
-
-                                matchedEdge = true;
-
-                                break;
-                            }
-                        }
-
-                        if (!matchedEdge)
-                        {
-                            // Write out the edge
-                            writeVTK("mEdge", mfEdges[edgeI], 1);
-
-                            FatalErrorIn
-                            (
-                                "void dynamicTopoFvMesh::"
-                                "buildProcessorCoupledMaps()"
-                            )
-                                << " Failed to match edge: "
-                                << mfEdges[edgeI] << ": "
-                                << mEdge << nl
-                                << " cEdge: " << cEdge
-                                << " for processor: " << proc
-                                << abort(FatalError);
-                        }
+                        FatalErrorIn
+                        (
+                            "void dynamicTopoFvMesh::"
+                            "buildProcessorCoupledMaps()"
+                        )
+                            << " Failed to match edge: "
+                            << mfEdges[edgeI] << ": "
+                            << mEdge << nl
+                            << " cEdge: " << cEdge
+                            << " for processor: " << proc
+                            << abort(FatalError);
                     }
                 }
             }
@@ -7074,7 +7659,7 @@ void dynamicTopoFvMesh::buildProcessorCoupledMaps()
 
         // Attempt to match other edges in 3D, provided any common ones exist.
         //  - This will handle point-only coupling situations for edges.
-        if (!twoDMesh_)
+        if (is3D())
         {
             // Fetch Maps for this processor
             const Map<label>& edgeMap = cMap.entityMap(coupleMap::EDGE);
@@ -7148,6 +7733,80 @@ void dynamicTopoFvMesh::buildProcessorCoupledMaps()
                     }
                 }
             }
+
+            // Prepare processor point and edge maps
+            //  - For each point / edge on the subMesh, create
+            //    a list of processors (other than this one)
+            //    that are connected to it
+            Map<labelList>& pEdgeMap = cMap.subMeshEdgeMap();
+            Map<labelList>& pPointMap = cMap.subMeshPointMap();
+
+            const dynamicTopoFvMesh& sMesh = rPM.subMesh();
+            const polyBoundaryMesh& bdy = sMesh.boundaryMesh();
+
+            forAll(bdy, pI)
+            {
+                if (!isA<processorPolyPatch>(bdy[pI]))
+                {
+                    continue;
+                }
+
+                const processorPolyPatch& pp =
+                (
+                    refCast<const processorPolyPatch>(bdy[pI])
+                );
+
+                label neiProcNo = pp.neighbProcNo();
+                label myProcNo = Pstream::myProcNo();
+
+                if (neiProcNo == myProcNo)
+                {
+                    continue;
+                }
+
+                label mStart = pp.start();
+                label mSize  = pp.size();
+
+                for (label i = 0; i < mSize; i++)
+                {
+                    const face& f = sMesh.faces_[i + mStart];
+                    const labelList& fe = sMesh.faceEdges_[i + mStart];
+
+                    forAll(f, j)
+                    {
+                        const label pIndex = f[j];
+                        const label eIndex = fe[j];
+
+                        Map<labelList>::iterator pIt = pPointMap.find(pIndex);
+
+                        if (pIt == pPointMap.end())
+                        {
+                            pPointMap.insert(pIndex, labelList(1, neiProcNo));
+                        }
+                        else
+                        {
+                            if (findIndex(pIt(), neiProcNo) == -1)
+                            {
+                                meshOps::sizeUpList(neiProcNo, pIt());
+                            }
+                        }
+
+                        Map<labelList>::iterator eIt = pEdgeMap.find(eIndex);
+
+                        if (eIt == pEdgeMap.end())
+                        {
+                            pEdgeMap.insert(eIndex, labelList(1, neiProcNo));
+                        }
+                        else
+                        {
+                            if (findIndex(eIt(), neiProcNo) == -1)
+                            {
+                                meshOps::sizeUpList(neiProcNo, eIt());
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         if (unMatchedFaces.size())
@@ -7163,6 +7822,82 @@ void dynamicTopoFvMesh::buildProcessorCoupledMaps()
                 << abort(FatalError);
         }
     }
+
+    // Use subMesh and global points to identify additional
+    // processors, and update maps accordingly
+    if (is3D())
+    {
+        forAll(procIndices_, pI)
+        {
+            const label neiProcNo = procIndices_[pI];
+            const coupleMap& cMi = recvMeshes_[pI].map();
+
+            const labelList& smPts = cMi.subMeshPoints();
+            const List<labelPair>& gpp = cMi.globalProcPoints();
+
+            forAll(procIndices_, pJ)
+            {
+                if (pJ == pI)
+                {
+                    continue;
+                }
+
+                const coupleMap& cMj = recvMeshes_[pJ].map();
+
+                Map<labelList>& pPointMap = cMj.subMeshPointMap();
+
+                forAll(smPts, pointI)
+                {
+                    label mP = smPts[pointI];
+                    label sP = cMj.findSlave(coupleMap::POINT, mP);
+
+                    if (sP == -1)
+                    {
+                        continue;
+                    }
+
+                    Map<labelList>::iterator pIt = pPointMap.find(sP);
+
+                    if (pIt == pPointMap.end())
+                    {
+                        pPointMap.insert(sP, labelList(1, neiProcNo));
+                    }
+                    else
+                    {
+                        if (findIndex(pIt(), neiProcNo) == -1)
+                        {
+                            meshOps::sizeUpList(neiProcNo, pIt());
+                        }
+                    }
+                }
+
+                forAll(gpp, pointI)
+                {
+                    label mP = gpp[pointI].first();
+                    label sP = cMj.findSlave(coupleMap::POINT, mP);
+
+                    if (sP == -1)
+                    {
+                        continue;
+                    }
+
+                    Map<labelList>::iterator pIt = pPointMap.find(sP);
+
+                    if (pIt == pPointMap.end())
+                    {
+                        pPointMap.insert(sP, labelList(1, neiProcNo));
+                    }
+                    else
+                    {
+                        if (findIndex(pIt(), neiProcNo) == -1)
+                        {
+                            meshOps::sizeUpList(neiProcNo, pIt());
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 
 
@@ -7174,12 +7909,23 @@ label dynamicTopoFvMesh::createProcessorPatch(const label proc)
         return -2;
     }
 
+    // Find index in list of processors
+    label pI = findIndex(procIndices_, proc);
+
+    // Check if an entry already exists
+    if (pI > -1)
+    {
+        label patchIndex = sendMeshes_[pI].map().patchIndex();
+
+        if (patchIndex > -1)
+        {
+            return patchIndex;
+        }
+    }
+
     // Get the new patch index,
     // and increment the number of patches
     label patchID = nPatches_++;
-
-    // Find index in list of processors
-    label pI = findIndex(procIndices_, proc);
 
     // Set the new patch index in patchMaps
     if (isSubMesh_)
@@ -7192,16 +7938,16 @@ label dynamicTopoFvMesh::createProcessorPatch(const label proc)
             sendMeshes_.setSize(pI + 1);
         }
 
-        // Create a basic entry
+        // Create a basic entry on the subMesh
         procIndices_[pI] = proc;
 
         sendMeshes_.set
         (
             pI,
-            new coupledInfo
+            new coupledMesh
             (
                 *this,               // Reference to this mesh
-                twoDMesh_,           // 2D or 3D
+                is2D(),              // 2D or 3D
                 false,               // Not local
                 true,                // Sent to neighbour
                 patchID,             // Patch index
@@ -7261,9 +8007,11 @@ label dynamicTopoFvMesh::createProcessorPatch(const label proc)
     {
         Pout<< " dynamicTopoFvMesh::createProcessorPatch :"
             << " Created new patch for processor: " << proc << nl
-            << " On subMesh: " << Switch::asText(isSubMesh_) << nl
+            << " On subMesh: " << isSubMesh_ << nl
             << " pI: " << pI << nl
             << " patchID: " << patchID << nl
+            << " oldPatchStarts: " << oldPatchStarts_ << nl
+            << " oldPatchSizes: " << oldPatchSizes_ << nl
             << " patchStarts: " << patchStarts_ << nl
             << " patchSizes: " << patchSizes_ << nl
             << endl;
@@ -7343,17 +8091,19 @@ void dynamicTopoFvMesh::resetBoundaries()
     // Fetch reference to existing boundary
     // - The removeBoundary member merely resets
     //   boundary size, so this reference is safe
-    const polyBoundaryMesh& boundary = boundaryMesh();
+    const polyBoundaryMesh& polyBoundary = boundaryMesh();
 
     // Copy all existing patches first
-    for (label patchI = 0; patchI < boundaryMesh().size(); patchI++)
+    label nOldPatches = polyBoundary.size();
+
+    for (label patchI = 0; patchI < nOldPatches; patchI++)
     {
         // Clone the patch
-        patches[patchI] = boundary[patchI].clone(boundary).ptr();
+        patches[patchI] = polyBoundary[patchI].clone(polyBoundary).ptr();
     }
 
     // Create new processor patches
-    for (label patchI = boundaryMesh().size(); patchI < nPatches_; patchI++)
+    for (label patchI = nOldPatches; patchI < nPatches_; patchI++)
     {
         // Make a temporary dictionary for patch construction
         dictionary patchDict;
@@ -7363,8 +8113,8 @@ void dynamicTopoFvMesh::resetBoundaries()
 
         // Add relevant info
         patchDict.add("type", "processor");
-        patchDict.add("startFace", patchStarts_[patchI]);
-        patchDict.add("nFaces", patchSizes_[patchI]);
+        patchDict.add("startFace", oldPatchStarts_[patchI]);
+        patchDict.add("nFaces", oldPatchSizes_[patchI]);
         patchDict.add("myProcNo", Pstream::myProcNo());
         patchDict.add("neighbProcNo", neiProcNo);
 
@@ -7379,7 +8129,7 @@ void dynamicTopoFvMesh::resetBoundaries()
               + Foam::name(neiProcNo),
                 patchDict,
                 patchI,
-                boundary
+                polyBoundary
             ).ptr()
         );
     }
@@ -7389,6 +8139,54 @@ void dynamicTopoFvMesh::resetBoundaries()
 
     // Add patches, but don't calculate geometry, etc
     fvMesh::addFvPatches(patches, false);
+
+    // Since all fvPatches in fvBoundaryMesh have been reset,
+    // fvPatch references in all fvPatchFields are no longer
+    // valid, and must therefore be remapped.
+    const fvBoundaryMesh& bdy = fvMesh::boundary();
+
+    coupledMesh::resizeBoundaries<volScalarField>(*this, bdy);
+    coupledMesh::resizeBoundaries<volVectorField>(*this, bdy);
+    coupledMesh::resizeBoundaries<volSphericalTensorField>(*this, bdy);
+    coupledMesh::resizeBoundaries<volSymmTensorField>(*this, bdy);
+    coupledMesh::resizeBoundaries<volTensorField>(*this, bdy);
+
+    coupledMesh::resizeBoundaries<surfaceScalarField>(*this, bdy);
+    coupledMesh::resizeBoundaries<surfaceVectorField>(*this, bdy);
+    coupledMesh::resizeBoundaries<surfaceSphericalTensorField>(*this, bdy);
+    coupledMesh::resizeBoundaries<surfaceSymmTensorField>(*this, bdy);
+    coupledMesh::resizeBoundaries<surfaceTensorField>(*this, bdy);
+}
+
+
+// Convenience macro for field sub-setting
+#define sendFieldsOfType(type, info, names, types, offset, map, stream)        \
+{                                                                              \
+    {                                                                          \
+        scalar zeroValue = pTraits<scalar>::zero;                              \
+        info.send<type##ScalarField>                                           \
+        (names[0 + offset], types[0 + offset], zeroValue, map, stream);        \
+    }                                                                          \
+    {                                                                          \
+        vector zeroValue = pTraits<vector>::zero;                              \
+        info.send<type##VectorField>                                           \
+        (names[1 + offset], types[1 + offset], zeroValue, map, stream);        \
+    }                                                                          \
+    {                                                                          \
+        sphericalTensor zeroValue = pTraits<sphericalTensor>::zero;            \
+        info.send<type##SphericalTensorField>                                  \
+        (names[2 + offset], types[2 + offset], zeroValue, map, stream);        \
+    }                                                                          \
+    {                                                                          \
+        symmTensor zeroValue = pTraits<symmTensor>::zero;                      \
+        info.send<type##SymmTensorField>                                       \
+        (names[3 + offset], types[3 + offset], zeroValue, map, stream);        \
+    }                                                                          \
+    {                                                                          \
+        tensor zeroValue = pTraits<tensor>::zero;                              \
+        info.send<type##TensorField>                                           \
+        (names[4 + offset], types[4 + offset], zeroValue, map, stream);        \
+    }                                                                          \
 }
 
 
@@ -7421,10 +8219,8 @@ void dynamicTopoFvMesh::initFieldTransfers
     // Size up wordLists
     //  - Five templated volFields
     //  - Five templated surfaceFields
-    //  - One scalar volume gradient (conservative mapping)
-    //  - One vector volume gradient (conservative mapping)
-    names.setSize(12);
-    types.setSize(12);
+    names.setSize(10);
+    types.setSize(10);
 
     // Fill in field-types
     types[0] = volScalarField::typeName;
@@ -7439,14 +8235,8 @@ void dynamicTopoFvMesh::initFieldTransfers
     types[8] = surfaceSymmTensorField::typeName;
     types[9] = surfaceTensorField::typeName;
 
-    types[10] = "grad(" + volScalarField::typeName + ')';
-    types[11] = "grad(" + volVectorField::typeName + ')';
-
     // Send / recv buffers for field names
     List<char> fieldNameSendBuffer, fieldNameRecvBuffer;
-
-    // Fetch reference to mapper
-    const topoMapper& fieldMapper = mapper_();
 
     if (Pstream::master())
     {
@@ -7459,17 +8249,11 @@ void dynamicTopoFvMesh::initFieldTransfers
         OStringStream& fNStream = fieldNameStream[0];
 
         // Fetch field-names by type
-        for (label typeI = 0; typeI < 10; typeI++)
+        forAll(types, typeI)
         {
             // Get all fields of type
             names[typeI] = objectRegistry::names(types[typeI]);
         }
-
-        // Fetch scalar gradient names
-        names[10] = fieldMapper.scalarGrads();
-
-        // Fetch vector gradient names
-        names[11] = fieldMapper.vectorGrads();
 
         // Send field names to Ostream
         fNStream << names;
@@ -7545,84 +8329,20 @@ void dynamicTopoFvMesh::initFieldTransfers
     {
         label proc = procIndices_[pI];
 
-        const coupledInfo& cInfo = sendMeshes_[pI];
+        const coupledMesh& cInfo = sendMeshes_[pI];
 
         // Initialize stream
         stream.set(pI, new OStringStream(IOstream::BINARY));
 
-        // Subset volFields to stream
-        cInfo.mapVolField<scalar>(names[0], types[0], stream[pI]);
-        cInfo.mapVolField<vector>(names[1], types[1], stream[pI]);
-        cInfo.mapVolField<sphericalTensor>(names[2], types[2], stream[pI]);
-        cInfo.mapVolField<symmTensor>(names[3], types[3], stream[pI]);
-        cInfo.mapVolField<tensor>(names[4], types[4], stream[pI]);
+        // Subset and send volFields to stream
+        const labelList& cMap = cInfo.map().cellMap();
 
-        // Subset surfaceFields to stream
-        cInfo.mapSurfaceField<scalar>(names[5], types[5], stream[pI]);
-        cInfo.mapSurfaceField<vector>(names[6], types[6], stream[pI]);
-        cInfo.mapSurfaceField<sphericalTensor>(names[7], types[7], stream[pI]);
-        cInfo.mapSurfaceField<symmTensor>(names[8], types[8], stream[pI]);
-        cInfo.mapSurfaceField<tensor>(names[9], types[9], stream[pI]);
+        sendFieldsOfType(vol, cInfo, names, types, 0, cMap, stream[pI]);
 
-        // Subset scalar gradients to stream
-        stream[pI]
-            << types[10] << token::NL
-            << token::BEGIN_BLOCK << token::NL;
+        // Subset and send surfaceFields to stream
+        const labelList& fMap = cInfo.map().internalFaceMap();
 
-        forAll(names[10], i)
-        {
-            tmp<volVectorField> tvvfFld =
-            (
-                cInfo.subSetVolField
-                (
-                    fieldMapper.gradient<volVectorField>
-                    (
-                        names[10][i]
-                    )
-                )
-            );
-
-            // Send field through stream
-            stream[pI]
-                << names[10][i]
-                << token::NL << token::BEGIN_BLOCK
-                << tvvfFld
-                << token::NL << token::END_BLOCK
-                << token::NL;
-        }
-
-        stream[pI]
-            << token::END_BLOCK << token::NL;
-
-        // Subset vector gradients to stream
-        stream[pI]
-            << types[11] << token::NL
-            << token::BEGIN_BLOCK << token::NL;
-
-        forAll(names[11], i)
-        {
-            tmp<volTensorField> tvtfFld =
-            (
-                cInfo.subSetVolField
-                (
-                    fieldMapper.gradient<volTensorField>
-                    (
-                        names[11][i]
-                    )
-                )
-            );
-
-            // Send field through stream
-            stream[pI]
-                << names[11][i]
-                << token::NL << token::BEGIN_BLOCK
-                << tvtfFld
-                << token::NL << token::END_BLOCK
-                << token::NL;
-        }
-
-        stream[pI]
-            << token::END_BLOCK << token::NL;
+        sendFieldsOfType(surface, cInfo, names, types, 5, fMap, stream[pI]);
 
         // Size up buffers and fill contents
         string contents = stream[pI].str();
@@ -7700,22 +8420,14 @@ void dynamicTopoFvMesh::syncFieldTransfers
     List<PtrList<surfaceSymmTensorField> > ssytF(nProcs);
     List<PtrList<surfaceTensorField> > stF(nProcs);
 
-    // Gradients
-    List<PtrList<volVectorField> > vgsF(nProcs);
-    List<PtrList<volTensorField> > vgvF(nProcs);
-
-    // Geometry
-    List<PtrList<volVectorField> > vC(nProcs);
-    List<PtrList<surfaceScalarField> > sSf(nProcs);
-
-    const polyBoundaryMesh& boundary = boundaryMesh();
+    const polyBoundaryMesh& polyBoundary = boundaryMesh();
 
     // Determine number of physical (non-processor) patches
     label nPhysical = 0;
 
-    forAll(boundary, patchI)
+    forAll(polyBoundary, patchI)
     {
-        if (isA<processorPolyPatch>(boundary[patchI]))
+        if (isA<processorPolyPatch>(polyBoundary[patchI]))
         {
             continue;
         }
@@ -7733,7 +8445,7 @@ void dynamicTopoFvMesh::syncFieldTransfers
 
     forAll(procIndices_, pI)
     {
-        const coupledInfo& cInfo = recvMeshes_[pI];
+        const coupledMesh& cInfo = recvMeshes_[pI];
 
         // Convert buffer to string
         string contents(recvBuffer[pI].begin(), recvBuffer[pI].size());
@@ -7744,31 +8456,25 @@ void dynamicTopoFvMesh::syncFieldTransfers
         // Construct dictionary from stream
         dictionary dict(stream[pI]);
 
-        // Set field pointers
-        cInfo.setField(names[0], dict.subDict(types[0]), vsF[pI]);
-        cInfo.setField(names[1], dict.subDict(types[1]), vvF[pI]);
-        cInfo.setField(names[2], dict.subDict(types[2]), vsptF[pI]);
-        cInfo.setField(names[3], dict.subDict(types[3]), vsytF[pI]);
-        cInfo.setField(names[4], dict.subDict(types[4]), vtF[pI]);
-
-        cInfo.setField(names[5], dict.subDict(types[5]), ssF[pI]);
-        cInfo.setField(names[6], dict.subDict(types[6]), svF[pI]);
-        cInfo.setField(names[7], dict.subDict(types[7]), ssptF[pI]);
-        cInfo.setField(names[8], dict.subDict(types[8]), ssytF[pI]);
-        cInfo.setField(names[9], dict.subDict(types[9]), stF[pI]);
-
-        cInfo.setField(names[10], dict.subDict(types[10]), vgsF[pI]);
-        cInfo.setField(names[11], dict.subDict(types[11]), vgvF[pI]);
-
-        // Set centres
-        cInfo.setCentres(vC[pI]);
-
         // Count the number of additional entities
         const coupleMap& cMap = cInfo.map();
 
         // Fetch size from subMesh
         label nCells = cMap.nEntities(coupleMap::CELL);
         label nIntFaces = cMap.nEntities(coupleMap::INTERNAL_FACE);
+
+        // Set field pointers
+        cInfo.setField(names[0], dict.subDict(types[0]), nCells, vsF[pI]);
+        cInfo.setField(names[1], dict.subDict(types[1]), nCells, vvF[pI]);
+        cInfo.setField(names[2], dict.subDict(types[2]), nCells, vsptF[pI]);
+        cInfo.setField(names[3], dict.subDict(types[3]), nCells, vsytF[pI]);
+        cInfo.setField(names[4], dict.subDict(types[4]), nCells, vtF[pI]);
+
+        cInfo.setField(names[5], dict.subDict(types[5]), nIntFaces, ssF[pI]);
+        cInfo.setField(names[6], dict.subDict(types[6]), nIntFaces, svF[pI]);
+        cInfo.setField(names[7], dict.subDict(types[7]), nIntFaces, ssptF[pI]);
+        cInfo.setField(names[8], dict.subDict(types[8]), nIntFaces, ssytF[pI]);
+        cInfo.setField(names[9], dict.subDict(types[9]), nIntFaces, stF[pI]);
 
         // Set rmap for this processor
         irvMaps[pI] = (labelField(identity(nCells)) + nTotalCells);
@@ -7820,13 +8526,13 @@ void dynamicTopoFvMesh::syncFieldTransfers
         faceAddressing[i] = i;
     }
 
-    coupledInfo::subMeshMapper vMap
+    coupledMesh::subMeshMapper vMap
     (
         nOldCells_,
         cellAddressing
     );
 
-    coupledInfo::subMeshMapper sMap
+    coupledMesh::subMeshMapper sMap
     (
         nOldInternalFaces_,
         faceAddressing
@@ -7834,7 +8540,7 @@ void dynamicTopoFvMesh::syncFieldTransfers
 
     // Prepare boundary mappers
     labelListList patchAddressing(nPhysical);
-    PtrList<coupledInfo::subMeshMapper> bMap(nPhysical);
+    PtrList<coupledMesh::subMeshMapper> bMap(nPhysical);
 
     forAll(bMap, patchI)
     {
@@ -7852,7 +8558,7 @@ void dynamicTopoFvMesh::syncFieldTransfers
         bMap.set
         (
             patchI,
-            new coupledInfo::subMeshMapper
+            new coupledMesh::subMeshMapper
             (
                 oldPatchSizes_[patchI],
                 patchAddressing[patchI]
@@ -7862,49 +8568,17 @@ void dynamicTopoFvMesh::syncFieldTransfers
 
     // Loop through all volFields and re-size
     // to accomodate additional cells / faces
-    coupledInfo::resizeMap(names[0], *this, vMap, irvMaps, bMap, brMaps, vsF);
-    coupledInfo::resizeMap(names[1], *this, vMap, irvMaps, bMap, brMaps, vvF);
-    coupledInfo::resizeMap(names[2], *this, vMap, irvMaps, bMap, brMaps, vsptF);
-    coupledInfo::resizeMap(names[3], *this, vMap, irvMaps, bMap, brMaps, vsytF);
-    coupledInfo::resizeMap(names[4], *this, vMap, irvMaps, bMap, brMaps, vtF);
+    coupledMesh::resizeMap(names[0], *this, vMap, irvMaps, bMap, brMaps, vsF);
+    coupledMesh::resizeMap(names[1], *this, vMap, irvMaps, bMap, brMaps, vvF);
+    coupledMesh::resizeMap(names[2], *this, vMap, irvMaps, bMap, brMaps, vsptF);
+    coupledMesh::resizeMap(names[3], *this, vMap, irvMaps, bMap, brMaps, vsytF);
+    coupledMesh::resizeMap(names[4], *this, vMap, irvMaps, bMap, brMaps, vtF);
 
-    coupledInfo::resizeMap(names[5], *this, sMap, irsMaps, bMap, brMaps, ssF);
-    coupledInfo::resizeMap(names[6], *this, sMap, irsMaps, bMap, brMaps, svF);
-    coupledInfo::resizeMap(names[7], *this, sMap, irsMaps, bMap, brMaps, ssptF);
-    coupledInfo::resizeMap(names[8], *this, sMap, irsMaps, bMap, brMaps, ssytF);
-    coupledInfo::resizeMap(names[9], *this, sMap, irsMaps, bMap, brMaps, stF);
-
-    // Fetch reference to mapper
-    const topoMapper& fieldMapper = mapper_();
-
-    // Map gradient fields
-    forAll(names[10], i)
-    {
-        volVectorField& sGrad =
-        (
-            fieldMapper.gradient<volVectorField>(names[10][i])
-        );
-
-        // Map the field
-        coupledInfo::resizeMap(i, vMap, irvMaps, bMap, brMaps, vgsF, sGrad);
-    }
-
-    forAll(names[11], i)
-    {
-        volTensorField& vGrad =
-        (
-            fieldMapper.gradient<volTensorField>(names[11][i])
-        );
-
-        // Map the field
-        coupledInfo::resizeMap(i, vMap, irvMaps, bMap, brMaps, vgvF, vGrad);
-    }
-
-    // Map stored geometry
-    volVectorField& mapC = fieldMapper.volCentres();
-
-    // Map geometry fields
-    coupledInfo::resizeMap(0, vMap, irvMaps, bMap, brMaps, vC, mapC);
+    coupledMesh::resizeMap(names[5], *this, sMap, irsMaps, bMap, brMaps, ssF);
+    coupledMesh::resizeMap(names[6], *this, sMap, irsMaps, bMap, brMaps, svF);
+    coupledMesh::resizeMap(names[7], *this, sMap, irsMaps, bMap, brMaps, ssptF);
+    coupledMesh::resizeMap(names[8], *this, sMap, irsMaps, bMap, brMaps, ssytF);
+    coupledMesh::resizeMap(names[9], *this, sMap, irsMaps, bMap, brMaps, stF);
 }
 
 
@@ -8027,9 +8701,6 @@ bool dynamicTopoFvMesh::syncCoupledBoundaryOrdering
 {
     bool anyChange = false, failedPatchMatch = false;
 
-    // Fetch tolerance
-    scalar matchTol = Foam::debug::tolerances("patchFaceMatchTol", 1e-4);
-
     // Calculate centres and tolerances for any slave patches
     List<scalarField> slaveTols(nPatches_);
     List<pointField> slaveCentres(nPatches_);
@@ -8090,7 +8761,7 @@ bool dynamicTopoFvMesh::syncCoupledBoundaryOrdering
                     maxLen = max(maxLen, mag(points_[sFace[fpI]] - sfc));
                 }
 
-                slaveTols[slavePatch][fI] = matchTol*maxLen;
+                slaveTols[slavePatch][fI] = geomMatchTol_ * maxLen;
             }
 
             // For cyclics, additionally test for halves,
@@ -8160,8 +8831,8 @@ bool dynamicTopoFvMesh::syncCoupledBoundaryOrdering
                         else
                         {
                             // Assume constant transform tensor
-                            mA = Foam::transform(cyclicPatch.transformT(0), mA);
-                            mC = Foam::transform(cyclicPatch.transformT(0), mC);
+                            mA = Foam::transform(cyclicPatch.forwardT()[0], mA);
+                            mC = Foam::transform(cyclicPatch.forwardT()[0], mC);
                         }
 
                         // Set the transformed anchor / centre
@@ -8221,6 +8892,8 @@ bool dynamicTopoFvMesh::syncCoupledBoundaryOrdering
             // Try zero separation automatic matching
             bool matchedAll =
             (
+                (mSize == sSize)
+             &&
                 matchPoints
                 (
                     slaveCentres[slavePatch],
@@ -8442,7 +9115,7 @@ bool dynamicTopoFvMesh::syncCoupledBoundaryOrdering
                     maxLen = max(maxLen, mag(points_[checkFace[fpI]] - fc));
                 }
 
-                slaveTols[pI][fI] = matchTol*maxLen;
+                slaveTols[pI][fI] = geomMatchTol_ * maxLen;
             }
 
             // Write out my centres to disk
@@ -8493,8 +9166,13 @@ bool dynamicTopoFvMesh::syncCoupledBoundaryOrdering
         else
         {
             // Try zero separation automatic matching
+            label mSize = centres[pI].size();
+            label sSize = slaveCentres[pI].size();
+
             bool matchedAll =
             (
+                (mSize == sSize)
+             &&
                 matchPoints
                 (
                     slaveCentres[pI],
@@ -8508,9 +9186,6 @@ bool dynamicTopoFvMesh::syncCoupledBoundaryOrdering
             // Write out centres to disk
             if (debug > 3 || !matchedAll)
             {
-                label mSize = centres[pI].size();
-                label sSize = slaveCentres[pI].size();
-
                 meshOps::writeVTK
                 (
                     (*this),
@@ -8539,7 +9214,7 @@ bool dynamicTopoFvMesh::syncCoupledBoundaryOrdering
                   + Foam::name(Pstream::myProcNo())
                   + '_'
                   + Foam::name(neiProcNo),
-                    identity(mSize) + patchStarts_[pI],
+                    identity(patchSizes_[pI]) + patchStarts_[pI],
                     2, false, true
                 );
 
@@ -8645,7 +9320,7 @@ bool dynamicTopoFvMesh::syncCoupledBoundaryOrdering
               + '_'
               + Foam::name(neiProcNo),
                 identity(patchSizes_[pI]) + patchStarts_[pI],
-                2
+                2, false, true
             );
         }
 
@@ -8686,8 +9361,8 @@ void dynamicTopoFvMesh::exchangeLengthBuffers()
 
     forAll(procIndices_, pI)
     {
-        coupledInfo& sPM = sendMeshes_[pI];
-        coupledInfo& rPM = recvMeshes_[pI];
+        coupledMesh& sPM = sendMeshes_[pI];
+        coupledMesh& rPM = recvMeshes_[pI];
 
         const coupleMap& scMap = sPM.map();
         const coupleMap& rcMap = rPM.map();
@@ -8764,7 +9439,7 @@ void dynamicTopoFvMesh::exchangeLengthBuffers()
     {
         forAll(procIndices_, pI)
         {
-            const coupledInfo& rPM = recvMeshes_[pI];
+            const coupledMesh& rPM = recvMeshes_[pI];
             const coupleMap& rcMap = rPM.map();
 
             if (rcMap.masterIndex() == Pstream::myProcNo())
@@ -8886,7 +9561,11 @@ bool dynamicTopoFvMesh::coupledFillTables
             label fPatch = whichPatch(eFaces[faceI]);
             label neiProc = getNeighbourProcessor(fPatch);
 
-            if (neiProc > -1 && neiProc < Pstream::myProcNo())
+            if
+            (
+                neiProc > -1
+             && priority(neiProc, lessOp<label>(), Pstream::myProcNo())
+            )
             {
                 // This edge should not be here
                 Pout<< " Edge: " << eIndex
@@ -8993,7 +9672,11 @@ bool dynamicTopoFvMesh::coupledFillTables
                 // skip the insertion step.
                 label neiProc = mesh.getNeighbourProcessor(slavePatch);
 
-                if (neiProc > -1 && neiProc < proc)
+                if
+                (
+                    neiProc > -1
+                 && priority(neiProc, lessOp<label>(), proc)
+                )
                 {
                     continue;
                 }
@@ -9102,10 +9785,12 @@ bool dynamicTopoFvMesh::coupledFillTables
 
             if (minQuality < 0.0)
             {
+                Switch isClosed(closed);
+
                 Pout<< " * * * Error in fillTables * * * " << nl
                     << " Edge: " << eIndex << " :: " << checkEdge << nl
                     << " minQuality: " << minQuality << nl
-                    << " Closed: " << Switch::asText(closed) << nl
+                    << " Closed: " << isClosed << nl
                     << abort(FatalError);
             }
         }
@@ -9156,6 +9841,33 @@ bool dynamicTopoFvMesh::coupledFillTables
     }
 
     return success;
+}
+
+
+// Initialize coupled weights calculation
+void dynamicTopoFvMesh::initCoupledWeights()
+{
+    if (!Pstream::parRun())
+    {
+        return;
+    }
+
+    forAll(procIndices_, pI)
+    {
+        // Fetch reference to subMesh
+        const dynamicTopoFvMesh& mesh = recvMeshes_[pI].subMesh();
+
+        mesh.cells();
+        mesh.cellCells();
+        mesh.cellPoints();
+
+        const polyBoundaryMesh& sBoundary = mesh.boundaryMesh();
+
+        forAll(sBoundary, patchI)
+        {
+            sBoundary[patchI].faceFaces();
+        }
+    }
 }
 
 
@@ -9372,7 +10084,7 @@ scalar dynamicTopoFvMesh::processorLengthScale(const label index) const
 {
     scalar procScale = 0.0;
 
-    if (twoDMesh_)
+    if (is2D())
     {
         // First check the master processor
         procScale += lengthScale_[owner_[index]];
@@ -9638,7 +10350,7 @@ bool dynamicTopoFvMesh::locallyCoupledEntity
         return false;
     }
 
-    if (twoDMesh_ || checkFace)
+    if (is2D() || checkFace)
     {
         label patch = whichPatch(index);
 
@@ -9803,7 +10515,7 @@ bool dynamicTopoFvMesh::processorCoupledEntity
 
     label patch = -2;
 
-    if ((twoDMesh_ || checkFace) && !checkEdge)
+    if ((is2D() || checkFace) && !checkEdge)
     {
         patch = whichPatch(index);
 
@@ -9972,7 +10684,7 @@ void dynamicTopoFvMesh::buildEntitiesToAvoid
             getNeighbourProcessor(pIndex) > -1
         )
         {
-            if (twoDMesh_)
+            if (is2D())
             {
                 // Avoid this face during regular modification.
                 if (!entities.found(faceI))
@@ -10008,7 +10720,7 @@ void dynamicTopoFvMesh::buildEntitiesToAvoid
             {
                 forAllConstIter(Map<label>, rEdgeMap, eIter)
                 {
-                    if (twoDMesh_)
+                    if (is2D())
                     {
                         const labelList& eFaces = edgeFaces_[eIter.key()];
 
@@ -10057,7 +10769,7 @@ void dynamicTopoFvMesh::buildEntitiesToAvoid
         if (debug > 4)
         {
             // Write out entities
-            label elemType = twoDMesh_ ? 2 : 1;
+            label elemType = is2D() ? 2 : 1;
 
             writeVTK
             (

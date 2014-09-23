@@ -222,7 +222,7 @@ inline bool coupleMap::isRecv() const
 }
 
 
-inline FixedList<label,10>& coupleMap::nEntities() const
+inline coupleMap::EntitySizeList& coupleMap::nEntities() const
 {
     return nEntities_;
 }
@@ -246,7 +246,7 @@ inline Map<label>& coupleMap::reverseEntityMap(const label eType) const
 }
 
 
-inline FixedList<labelList,12>& coupleMap::entityBuffer() const
+inline coupleMap::EntityBufferList& coupleMap::entityBuffer() const
 {
     return entityBuffer_;
 }
@@ -270,6 +270,12 @@ inline List<coupleMap::opType>& coupleMap::entityOperations() const
 }
 
 
+inline labelList& coupleMap::patchIndices() const
+{
+    return patchIndices_;
+}
+
+
 inline pointField& coupleMap::moveNewPoints() const
 {
     return moveNewPoints_;
@@ -279,6 +285,18 @@ inline pointField& coupleMap::moveNewPoints() const
 inline pointField& coupleMap::moveOldPoints() const
 {
     return moveOldPoints_;
+}
+
+
+inline Map<labelList>& coupleMap::subMeshPointMap() const
+{
+    return subMeshPointMap_;
+}
+
+
+inline Map<labelList>& coupleMap::subMeshEdgeMap() const
+{
+    return subMeshEdgeMap_;
 }
 
 

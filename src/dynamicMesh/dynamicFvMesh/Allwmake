@@ -1,0 +1,9 @@
+#!/bin/sh
+cd ${0%/*} || exit 1    # run from this directory
+set -x
+
+# Make dynamicFvMesh libraries
+wmake libso
+wmake libso dynamicTopoFvMesh
+
+# ----------------------------------------------------------------- end-of-file

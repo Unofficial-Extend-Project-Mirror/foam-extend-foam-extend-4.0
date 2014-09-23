@@ -35,7 +35,6 @@ SourceFiles
 #ifndef eMesh_H
 #define eMesh_H
 
-#include "objectRegistry.H"
 #include "Time.H"
 #include "polyMesh.H"
 #include "edgeIOList.H"
@@ -80,12 +79,6 @@ class eMesh
             //- Mapping between ordered edge-data and regular edges.
             labelList reverseEdgeMap_;
 
-            //- Point-edges
-            mutable labelListList* pePtr_;
-
-            //- Edge-points
-            mutable labelListList* epPtr_;
-
             //- Face-edges
             mutable labelListIOList* fePtr_;
 
@@ -110,12 +103,6 @@ class eMesh
 
             //- Calculate ordered edges (and edgeFaces)
             void calcOrderedEdgeList();
-
-            //- Calculate ordered edgePoints
-            void calcEdgePoints() const;
-
-            //- Calculate point-edges
-            void calcPointEdges() const;
 
             //- Calculate face-edges
             void calcFaceEdges() const;
@@ -196,13 +183,6 @@ public:
 
 
         // Demand-driven data
-
-            //- Return constant reference to the pointEdges list
-            const labelListList& pointEdges() const;
-
-            //- Return constant reference to the edgePoints list
-            //- Valid for 3D tetrahedral meshes only.
-            const labelListList& edgePoints() const;
 
             //- Return constant reference to the faceEdges list
             const labelListList& faceEdges() const;

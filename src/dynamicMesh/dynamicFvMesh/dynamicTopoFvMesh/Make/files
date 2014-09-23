@@ -1,0 +1,39 @@
+eMesh/eMesh.C
+eMesh/eMeshDemandDrivenData.C
+eMesh/eBoundaryMesh/eBoundaryMesh.C
+
+ePatches = eMesh/ePatches
+$(ePatches)/ePatch/ePatch.C
+$(ePatches)/ePatch/newEPatch.C
+
+dynamicTopoFvMesh.C
+dynamicTopoFvMeshCheck.C
+dynamicTopoFvMeshReOrder.C
+dynamicTopoFvMeshMapping.C
+edgeSwap.C
+edgeBisect.C
+edgeCollapse.C
+
+coupledMesh/coupleMap.C
+coupledMesh/dynamicTopoFvMeshCoupled.C
+coupledMesh/subMeshProcessorPolyPatch.C
+coupledMesh/subMeshProcessorFvPatch.C
+
+convexSetAlgorithm/convexSetAlgorithm.C
+convexSetAlgorithm/faceSetAlgorithm.C
+convexSetAlgorithm/cellSetAlgorithm.C
+
+fieldMapping/topoMapper.C
+fieldMapping/fluxCorrector.C
+fieldMapping/topoCellMapper.C
+fieldMapping/topoPatchMapper.C
+fieldMapping/topoSurfaceMapper.C
+
+tetMetrics = tetMetrics
+$(tetMetrics)/tetMetric.C
+$(tetMetrics)/tetMetrics.C
+
+lengthScaleEstimator = lengthScaleEstimator
+$(lengthScaleEstimator)/lengthScaleEstimator.C
+
+LIB = $(FOAM_LIBBIN)/libdynamicTopoFvMesh
