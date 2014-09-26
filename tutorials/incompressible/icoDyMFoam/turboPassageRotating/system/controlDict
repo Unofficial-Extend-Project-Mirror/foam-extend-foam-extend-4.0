@@ -50,4 +50,28 @@ maxCo           0.8;
 
 maxDeltaT       0.01;
 
+
+functions
+(
+    minMaxU
+    {
+        type        minMaxField;
+
+        // Where to load it from (if not already in solver)
+        functionObjectLibs (/*"libsampling.so"*/ "libfieldFunctionObjects.so");
+
+        name U;
+    }
+    minMaxP
+    {
+        type        minMaxField;
+
+        // Where to load it from (if not already in solver)
+        functionObjectLibs ("libfieldFunctionObjects.so");
+
+        name p;
+    }
+);
+
+
 // ************************************************************************* //

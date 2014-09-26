@@ -9,50 +9,61 @@ FoamFile
 {
     version     2.0;
     format      ascii;
-    class       dictionary;
-    object      fvSchemes;
+    class       volScalarField;
+    location    "0";
+    object      k;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-ddtSchemes
-{
-    default Euler;
-}
+dimensions [ 0 2 -2 0 0 0 0 ];
 
-gradSchemes
-{
-    default         Gauss linear;
-    grad(p)         Gauss linear;
-}
+internalField uniform 0.01;
 
-divSchemes
+boundaryField
 {
-    default         none;
-    div(phi,U)      Gauss upwind;
-}
+    downstreamPerio1
+    {
+        type cyclicGgi;
+    }
+    downstreamPerio2
+    {
+        type cyclicGgi;
+    }
+    upstreamPerio1
+    {
+        type cyclicGgi;
+    }
+    upstreamPerio2
+    {
+        type cyclicGgi;
+    }
+    downstreamWall
+    {
+        type symmetryPlane;
+    }
+    upstreamWall
+    {
+        type symmetryPlane;
+    }
+    downstreamMixingPlanePatch
+    {
+        type mixingPlane;
+    }
+    upstreamMixingPlanePatch
+    {
+        type mixingPlane;
+    }
+    inflow
+    {
+        type fixedValue;
+        value uniform 0.01;
+    }
+    outflow
+    {
+        type zeroGradient;
+    }
 
-laplacianSchemes
-{
-    default         Gauss linear corrected;
-}
-
-interpolationSchemes
-{
-    default         linear;
-    interpolate(HbyA) linear;
-    interpolate(1|A) linear;
-}
-
-snGradSchemes
-{
-    default         corrected;
-}
-
-fluxRequired
-{
-    default         no;
-    pcorr;
-    p;
 }
 
 // ************************************************************************* //
+
