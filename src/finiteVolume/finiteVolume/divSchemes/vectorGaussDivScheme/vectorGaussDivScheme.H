@@ -51,8 +51,15 @@ namespace fv
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 template<>
-tmp<BlockLduSystem<vector, scalar> > gaussDivScheme<vector>::fvmDiv
+tmp<BlockLduSystem<vector, scalar> > gaussDivScheme<vector>::fvmUDiv
 (
+    const GeometricField<vector, fvPatchField, volMesh>&
+) const;
+
+template<>
+tmp<BlockLduSystem<vector, scalar> > gaussDivScheme<vector>::fvmUDiv
+(
+    const surfaceScalarField& flux,
     const GeometricField<vector, fvPatchField, volMesh>&
 ) const;
 

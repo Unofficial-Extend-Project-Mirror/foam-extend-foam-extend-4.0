@@ -80,9 +80,9 @@ tmp<BlockLduSystem<vector, vector> > leastSquaresGrad<scalar>::fvmGrad
     vectorField& source = bs.source();
 
     // Grab ldu parts of block matrix as linear always
-    typename CoeffField<vector>::linearTypeField& d = bs.diag().asLinear();
-    typename CoeffField<vector>::linearTypeField& u = bs.upper().asLinear();
-    typename CoeffField<vector>::linearTypeField& l = bs.lower().asLinear();
+    CoeffField<vector>::linearTypeField& d = bs.diag().asLinear();
+    CoeffField<vector>::linearTypeField& u = bs.upper().asLinear();
+    CoeffField<vector>::linearTypeField& l = bs.lower().asLinear();
 
     // Get references to least square vectors
     const leastSquaresVectors& lsv = leastSquaresVectors::New(mesh);
@@ -125,9 +125,9 @@ tmp<BlockLduSystem<vector, vector> > leastSquaresGrad<scalar>::fvmGrad
             const scalarField cellVInNei =
                 cellV.boundaryField()[patchI].patchNeighbourField();
 
-            typename CoeffField<vector>::linearTypeField& pcoupleUpper =
+            CoeffField<vector>::linearTypeField& pcoupleUpper =
                 bs.coupleUpper()[patchI].asLinear();
-            typename CoeffField<vector>::linearTypeField& pcoupleLower =
+            CoeffField<vector>::linearTypeField& pcoupleLower =
                 bs.coupleLower()[patchI].asLinear();
 
             // Coupling  and diagonal contributions

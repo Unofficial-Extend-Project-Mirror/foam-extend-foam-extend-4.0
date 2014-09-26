@@ -68,7 +68,6 @@ namespace fvm
         const word& name
     );
 
-
     template<class Type>
     tmp<fvMatrix<Type> > div
     (
@@ -83,12 +82,12 @@ namespace fvm
         GeometricField<Type, fvPatchField, volMesh>&
     );
 
-    // Implicit div operator for block systems
+    // Implicit div operators for block systems
     template<class Type>
     tmp
     <
         BlockLduSystem<vector, typename innerProduct<vector, Type>::type>
-    > div
+    > UDiv
     (
         GeometricField<Type, fvPatchField, volMesh>&,
         const word&
@@ -98,8 +97,50 @@ namespace fvm
     tmp
     <
         BlockLduSystem<vector, typename innerProduct<vector, Type>::type>
-    > div
+    > UDiv
     (
+        const surfaceScalarField&,
+        GeometricField<Type, fvPatchField, volMesh>&,
+        const word&
+    );
+
+    template<class Type>
+    tmp
+    <
+        BlockLduSystem<vector, typename innerProduct<vector, Type>::type>
+    > UDiv
+    (
+        const tmp<surfaceScalarField>&,
+        GeometricField<Type, fvPatchField, volMesh>&,
+        const word&
+    );
+
+    template<class Type>
+    tmp
+    <
+        BlockLduSystem<vector, typename innerProduct<vector, Type>::type>
+    > UDiv
+    (
+        GeometricField<Type, fvPatchField, volMesh>&
+    );
+
+    template<class Type>
+    tmp
+    <
+        BlockLduSystem<vector, typename innerProduct<vector, Type>::type>
+    > UDiv
+    (
+        const surfaceScalarField&,
+        GeometricField<Type, fvPatchField, volMesh>&
+    );
+
+    template<class Type>
+    tmp
+    <
+        BlockLduSystem<vector, typename innerProduct<vector, Type>::type>
+    > UDiv
+    (
+        const tmp<surfaceScalarField>&,
         GeometricField<Type, fvPatchField, volMesh>&
     );
 }
