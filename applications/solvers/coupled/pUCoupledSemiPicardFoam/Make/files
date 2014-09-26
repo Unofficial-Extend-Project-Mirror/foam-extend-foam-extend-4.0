@@ -1,3 +1,0 @@
-pUCoupledSemiPicardFoam.C
-
-EXE = $(FOAM_APPBIN)/pUCoupledSemiPicardFoam
