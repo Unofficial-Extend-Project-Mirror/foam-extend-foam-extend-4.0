@@ -43,7 +43,7 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                   Class isentropicTotalTemperatureFvPatch Declaration
+         Class isentropicTotalTemperatureFvPatchScalarField Declaration
 \*---------------------------------------------------------------------------*/
 
 class isentropicTotalTemperatureFvPatchScalarField
@@ -58,8 +58,6 @@ class isentropicTotalTemperatureFvPatchScalarField
         //- Total temperature field
         scalarField T0_;
 
-        //- Total pressure field
-        scalarField p0_;
 
 public:
 
