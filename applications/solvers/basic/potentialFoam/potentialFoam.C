@@ -32,7 +32,6 @@ Description
 
 #include "fvCFD.H"
 
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 int main(int argc, char *argv[])
@@ -53,7 +52,7 @@ int main(int argc, char *argv[])
 
     adjustPhi(phi, U, p);
 
-    for (int nonOrth=0; nonOrth<=nNonOrthCorr; nonOrth++)
+    for (int nonOrth = 0; nonOrth <= nNonOrthCorr; nonOrth++)
     {
         p.storePrevIter();
 
@@ -102,7 +101,7 @@ int main(int argc, char *argv[])
     {
         volScalarField magU = mag(U);
 
-        Info << "mag(U): max: " << gMax(magU.internalField())
+        Info<< "mag(U): max: " << gMax(magU.internalField())
             << " min: " << gMin(magU.internalField()) << endl;
     }
 
