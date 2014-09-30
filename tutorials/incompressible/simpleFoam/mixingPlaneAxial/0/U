@@ -10,56 +10,62 @@ FoamFile
     version     2.0;
     format      ascii;
     class       volVectorField;
+    location    "0";
     object      U;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 dimensions      [0 1 -1 0 0 0 0];
 
-internalField   uniform (173 0 0);
+internalField uniform (0 0 0);
 
 boundaryField
 {
-    INLE1
+    upstreamMixingPlanePatch
     {
-        type            fixedValue;
-        value           uniform (173 0 0);
+        type mixingPlane;
     }
-
-    PRES2
+    downstreamMixingPlanePatch
     {
-//        type           inletOutlet;
-//        inletValue     uniform (0 0 0);
-
-         type            waveTransmissive;
-         phi             phi;
-         rho             rho;
-         psi             psi;
-         U               U;
-         gamma           1.4;
-         inletOutlet     true;
-         correctSupercritical false;
-         lInf            0.5;
-         fieldInf        (0 0 0);
-         value           $internalField;
+        type mixingPlane;
     }
-
-    WALL3
+    upstreamPerio1
     {
-        type            fixedValue;
+        type cyclicGgi;
+    }
+    upstreamPerio2
+    {
+        type cyclicGgi;
+    }
+    downstreamPerio1
+    {
+        type cyclicGgi;
+    }
+    downstreamPerio2
+    {
+        type cyclicGgi;
+    }
+    downstreamWall
+    {
+        type symmetryPlane;
+    }
+    upstreamWall
+    {
+        type symmetryPlane;
+    }
+    inflow
+    {
+        type            surfaceNormalFixedValue;
+        refValue        uniform -10;
         value           uniform (0 0 0);
     }
-
-    WALL4
+    outflow
     {
-        type            fixedValue;
+        type inletOutlet;
+        inletValue      uniform (0 0 0);
         value           uniform (0 0 0);
-    }
-
-    defaultFaces
-    {
-        type            empty;
     }
 }
 
 // ************************************************************************* //
+

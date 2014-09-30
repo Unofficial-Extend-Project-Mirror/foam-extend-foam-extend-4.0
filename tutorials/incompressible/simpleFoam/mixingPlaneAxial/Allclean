@@ -5,4 +5,4 @@
 
 cleanCase
 \rm constant/polyMesh/blockMeshDict constant/polyMesh/boundary
-\rm -r 0 
+\rm -rf 0 ; cp -r save 0

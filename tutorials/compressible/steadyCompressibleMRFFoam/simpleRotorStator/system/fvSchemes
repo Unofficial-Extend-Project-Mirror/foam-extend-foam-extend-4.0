@@ -42,10 +42,6 @@ divSchemes
     div(phi,i)       Gauss upwind;
     div(phid,p)      Gauss upwind;
 
-//     div(phi,U)       Gauss vanLeerDC;
-//     div(phi,h)       Gauss vanLeerDC;
-//     div(phid,p)      Gauss vanLeerDC;
-
     div(phi,k)       Gauss upwind;
     div(phi,epsilon) Gauss upwind;
     div((muEff*dev2(grad(U).T()))) Gauss linear;

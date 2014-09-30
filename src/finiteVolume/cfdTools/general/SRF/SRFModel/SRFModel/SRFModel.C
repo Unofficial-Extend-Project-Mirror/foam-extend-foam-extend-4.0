@@ -208,6 +208,26 @@ Foam::tmp<Foam::volVectorField> Foam::SRF::SRFModel::U() const
 }
 
 
+Foam::tmp<Foam::surfaceVectorField> Foam::SRF::SRFModel::faceU() const
+{
+    return tmp<surfaceVectorField>
+    (
+        new surfaceVectorField
+        (
+            IOobject
+            (
+                "faceUsrf",
+                mesh_.time().timeName(),
+                mesh_,
+                IOobject::NO_READ,
+                IOobject::NO_WRITE
+            ),
+            omega_ ^ (mesh_.Cf() - axis_*(axis_ & mesh_.Cf()))
+        )
+    );
+}
+
+
 Foam::tmp<Foam::volVectorField> Foam::SRF::SRFModel::Uabs() const
 {
     const volVectorField Usrf = U();

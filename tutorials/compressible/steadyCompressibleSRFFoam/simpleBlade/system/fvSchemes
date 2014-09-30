@@ -19,9 +19,8 @@ ddtSchemes
     default           none;
 
     ddt(rho,Urel)     steadyState;
-    ddt(rho,h)        steadyState;
-//     ddt(rho,h)      steadyInertial phi rho 1;
-    ddt(psi,p)        steadyInertial phi rho 0.8;
+    ddt(rho,i)        steadyState;
+    ddt(psi,p)        steadyInertial phi rho 0.25;
 
     ddt(rho,k)        steadyState;
     ddt(rho,epsilon)  steadyState;
@@ -40,7 +39,7 @@ divSchemes
 {
     default           none;
     div(phi,Urel)    Gauss upwind;
-    div(phi,h)       Gauss upwind;
+    div(phi,i)       Gauss upwind;
     div(phid,p)      Gauss upwind;
 
     div(phi,k)       Gauss upwind;

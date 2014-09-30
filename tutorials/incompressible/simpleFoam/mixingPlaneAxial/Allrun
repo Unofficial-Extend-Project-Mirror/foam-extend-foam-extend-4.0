@@ -9,11 +9,7 @@ runApplication blockMesh
 
 runApplication setSet -batch setBatch.batch
 runApplication setsToZones -noFlipMap
-
-cp -r save 0
-
 runApplication potentialFoam
-
 runApplication simpleFoam
 
 

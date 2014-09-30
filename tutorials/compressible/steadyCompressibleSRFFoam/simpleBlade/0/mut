@@ -58,7 +58,6 @@ boundaryField
     frontAndBack
     {
         type            cyclic;
-        value           uniform 0;
     }
 }
 

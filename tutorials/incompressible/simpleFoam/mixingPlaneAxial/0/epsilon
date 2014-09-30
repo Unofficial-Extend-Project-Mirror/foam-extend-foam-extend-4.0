@@ -9,44 +9,60 @@ FoamFile
 {
     version     2.0;
     format      ascii;
-    class       polyBoundaryMesh;
-    location    "constant/polyMesh";
-    object      boundary;
+    class       volScalarField;
+    location    "0";
+    object      epsilon;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-5
-(
-    INLE1
+dimensions [ 0 2 -3 0 0 0 0 ];
+
+internalField uniform 0.1;
+
+boundaryField
+{
+    downstreamMixingPlanePatch
     {
-        type            patch;
-        nFaces          160;
-        startFace       105110;
+        type mixingPlane;
     }
-    PRES2
+    upstreamMixingPlanePatch
     {
-        type            patch;
-        nFaces          160;
-        startFace       105270;
+        type mixingPlane;
     }
-    WALL3
+    downstreamWall
     {
-        type            wall;
-        nFaces          330;
-        startFace       105430;
+        type symmetryPlane;
     }
-    WALL4
+    upstreamWall
     {
-        type            wall;
-        nFaces          330;
-        startFace       105760;
+        type symmetryPlane;
     }
-    defaultFaces
+    downstreamPerio1
     {
-        type            empty;
-        nFaces          105600;
-        startFace       106090;
+        type cyclicGgi;
     }
-)
+    downstreamPerio2
+    {
+        type cyclicGgi;
+    }
+    upstreamPerio1
+    {
+        type cyclicGgi;
+    }
+    upstreamPerio2
+    {
+        type cyclicGgi;
+    }
+    inflow
+    {
+        type fixedValue;
+        value uniform 0.1;
+    }
+    outflow
+    {
+        type zeroGradient;
+    }
+}
 
 // ************************************************************************* //
+

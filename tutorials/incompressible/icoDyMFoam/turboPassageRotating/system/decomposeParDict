@@ -14,12 +14,6 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-//- Keep owner and neighbour on same processor for faces in zones:
-// preserveFaceZones ( interface1_faces interface2_faces );
-
-//- Keep owner and neighbour on same processor for faces in patches:
-// preservePatches ( interface1 interface2 );
-
 globalFaceZones
 (
     interface1_faces
@@ -28,41 +22,14 @@ globalFaceZones
     rotor_cyclic_lower_faces
 );  // Those are the names of the face zones created previously
 
-numberOfSubdomains 4;        // The problem will be decomposed in 4 different processors
+numberOfSubdomains 4;
 
 method          scotch;
-// method          metis;
 
 simpleCoeffs
 {
      n               (2 2 1);
      delta           0.001;
-}
-
-metisCoeffs
-{
-/*
-    processorWeights
-    (
-        1
-        1
-        1
-        1
-    );
-*/
-}
-
-scotchCoeffs
-{
-    //processorWeights
-    //(
-    //    1
-    //    1
-    //    1
-    //    1
-    //);
-    //writeGraph  true;
-    //strategy "b";
 }
 
 distributed     no;

@@ -9,24 +9,46 @@ FoamFile
 {
     version     2.0;
     format      ascii;
-    class       dictionary;
-    object      RASProperties;
+    class       volVectorField;
+    object      U;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-RASModel            laminar;
+dimensions      [0 1 -1 0 0 0 0];
 
-turbulence          on;
+internalField   uniform (234.636777 0 0);
 
-printCoeffs         on;
-
-laminarCoeffs
-{}
-
-wallFunctionCoeffs
+boundaryField
 {
-    kappa            0.4187;
-    E                9;
+    INLE1
+    {
+        type            fixedValue;
+        value           uniform (234.636777 0 0);
+    }
+
+    PRES2
+    {
+        type           inletOutlet;
+        inletValue     uniform (0 0 0);
+    }
+
+    WALL3
+    {
+        type            fixedValue;
+        value           uniform (0 0 0);
+    }
+
+    WALL4
+    {
+        type            fixedValue;
+        value           uniform (0 0 0);
+    }
+
+    defaultFaces
+    {
+        type            empty;
+    }
 }
+
 
 // ************************************************************************* //

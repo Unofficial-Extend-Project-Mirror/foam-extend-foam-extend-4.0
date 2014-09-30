@@ -23,29 +23,30 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "isentropicTotalTemperatureFvPatchScalarField.H"
+#include "isentropicTotalPressureFvPatchScalarField.H"
 #include "addToRunTimeSelectionTable.H"
 #include "fvPatchFieldMapper.H"
 #include "basicThermo.H"
-#include "isentropicTotalPressureFvPatchScalarField.H"
+#include "isentropicTotalTemperatureFvPatchScalarField.H"
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-Foam::isentropicTotalTemperatureFvPatchScalarField::
-isentropicTotalTemperatureFvPatchScalarField
+Foam::isentropicTotalPressureFvPatchScalarField::
+isentropicTotalPressureFvPatchScalarField
 (
     const fvPatch& p,
     const DimensionedField<scalar, volMesh>& iF
 )
 :
     fixedValueFvPatchScalarField(p, iF),
-    pName_("p"),
-    T0_(p.size(), 0.0)
+    UName_("U"),
+    TName_("T"),
+    p0_(p.size(), 0.0)
 {}
 
 
-Foam::isentropicTotalTemperatureFvPatchScalarField::
-isentropicTotalTemperatureFvPatchScalarField
+Foam::isentropicTotalPressureFvPatchScalarField::
+isentropicTotalPressureFvPatchScalarField
 (
     const fvPatch& p,
     const DimensionedField<scalar, volMesh>& iF,
@@ -53,8 +54,9 @@ isentropicTotalTemperatureFvPatchScalarField
 )
 :
     fixedValueFvPatchScalarField(p, iF),
-    pName_(dict.lookupOrDefault<word>("p", "p")),
-    T0_("T0", dict, p.size())
+    UName_(dict.lookupOrDefault<word>("U", "U")),
+    TName_(dict.lookupOrDefault<word>("T", "T")),
+    p0_("p0", dict, p.size())
 {
     if (dict.found("value"))
     {
@@ -65,64 +67,67 @@ isentropicTotalTemperatureFvPatchScalarField
     }
     else
     {
-        fvPatchField<scalar>::operator=(T0_);
+        fvPatchField<scalar>::operator=(p0_);
     }
 }
 
 
-Foam::isentropicTotalTemperatureFvPatchScalarField::
-isentropicTotalTemperatureFvPatchScalarField
+Foam::isentropicTotalPressureFvPatchScalarField::
+isentropicTotalPressureFvPatchScalarField
 (
-    const isentropicTotalTemperatureFvPatchScalarField& ptf,
+    const isentropicTotalPressureFvPatchScalarField& ptf,
     const fvPatch& p,
     const DimensionedField<scalar, volMesh>& iF,
     const fvPatchFieldMapper& mapper
 )
 :
     fixedValueFvPatchScalarField(ptf, p, iF, mapper),
-    pName_(ptf.pName_),
-    T0_(ptf.T0_, mapper)
+    UName_(ptf.UName_),
+    TName_(ptf.TName_),
+    p0_(ptf.p0_, mapper)
 {}
 
 
-Foam::isentropicTotalTemperatureFvPatchScalarField::
-isentropicTotalTemperatureFvPatchScalarField
+Foam::isentropicTotalPressureFvPatchScalarField::
+isentropicTotalPressureFvPatchScalarField
 (
-    const isentropicTotalTemperatureFvPatchScalarField& ptf
+    const isentropicTotalPressureFvPatchScalarField& ptf
 )
 :
     fixedValueFvPatchScalarField(ptf),
-    pName_(ptf.pName_),
-    T0_(ptf.T0_)
+    UName_(ptf.UName_),
+    TName_(ptf.TName_),
+    p0_(ptf.p0_)
 {}
 
 
-Foam::isentropicTotalTemperatureFvPatchScalarField::
-isentropicTotalTemperatureFvPatchScalarField
+Foam::isentropicTotalPressureFvPatchScalarField::
+isentropicTotalPressureFvPatchScalarField
 (
-    const isentropicTotalTemperatureFvPatchScalarField& ptf,
+    const isentropicTotalPressureFvPatchScalarField& ptf,
     const DimensionedField<scalar, volMesh>& iF
 )
 :
     fixedValueFvPatchScalarField(ptf, iF),
-    pName_(ptf.pName_),
-    T0_(ptf.T0_)
+    UName_(ptf.UName_),
+    TName_(ptf.TName_),
+    p0_(ptf.p0_)
 {}
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-void Foam::isentropicTotalTemperatureFvPatchScalarField::autoMap
+void Foam::isentropicTotalPressureFvPatchScalarField::autoMap
 (
     const fvPatchFieldMapper& m
 )
 {
     fixedValueFvPatchScalarField::autoMap(m);
-    T0_.autoMap(m);
+    p0_.autoMap(m);
 }
 
 
-void Foam::isentropicTotalTemperatureFvPatchScalarField::rmap
+void Foam::isentropicTotalPressureFvPatchScalarField::rmap
 (
     const fvPatchScalarField& ptf,
     const labelList& addr
@@ -130,42 +135,47 @@ void Foam::isentropicTotalTemperatureFvPatchScalarField::rmap
 {
     fixedValueFvPatchScalarField::rmap(ptf, addr);
 
-    const isentropicTotalTemperatureFvPatchScalarField& tiptf =
-        refCast<const isentropicTotalTemperatureFvPatchScalarField>(ptf);
+    const isentropicTotalPressureFvPatchScalarField& tiptf =
+        refCast<const isentropicTotalPressureFvPatchScalarField>(ptf);
 
-    T0_.rmap(tiptf.T0_, addr);
+    p0_.rmap(tiptf.p0_, addr);
 }
 
 
-void Foam::isentropicTotalTemperatureFvPatchScalarField::updateCoeffs()
+void Foam::isentropicTotalPressureFvPatchScalarField::updateCoeffs()
 {
     if (updated())
     {
         return;
     }
 
-    // Get pressure and temperature
-    const scalarField& T = *this;
+    // Get velocity
+    const fvPatchVectorField& U =
+        patch().lookupPatchField<volVectorField, scalar>(UName_);
 
-    const fvPatchScalarField& pp =
-        patch().lookupPatchField<volScalarField, scalar>(pName_);
-
-    const isentropicTotalPressureFvPatchScalarField& p =
-        refCast<const isentropicTotalPressureFvPatchScalarField>(pp);
+    // Get temperature
+    const fvPatchScalarField& T =
+        patch().lookupPatchField<volScalarField, scalar>(TName_);
 
     const basicThermo& thermo =
         db().lookupObject<basicThermo>("thermophysicalProperties");
 
-    scalarField gamma =
-        thermo.Cp(T, patch().index())/thermo.Cv(T, patch().index());
+    scalarField Cp = thermo.Cp(T, patch().index());
+    scalarField Cv = thermo.Cv(T, patch().index());
 
-    operator==(T0_*pow(p/p.p0(), (gamma - 1)/gamma));
+    scalarField gamma = Cp/Cv;
+    scalarField R = Cp - Cv;
+
+    scalarField Ma = -(patch().nf() & U)/sqrt(gamma*R*T);
+
+    scalarField a = 1 + 0.5*(gamma - 1)*sqr(Ma);
+
+    operator==(p0_*pow(a, -gamma/(gamma - 1)));
 
     fixedValueFvPatchScalarField::updateCoeffs();
 }
 
-
-void Foam::isentropicTotalTemperatureFvPatchScalarField::updateCoeffs
+void Foam::isentropicTotalPressureFvPatchScalarField::updateCoeffs
 (
     const vectorField& Up
 )
@@ -174,14 +184,14 @@ void Foam::isentropicTotalTemperatureFvPatchScalarField::updateCoeffs
 }
 
 
-void Foam::isentropicTotalTemperatureFvPatchScalarField::write
+void Foam::isentropicTotalPressureFvPatchScalarField::write
 (
     Ostream& os
 ) const
 {
     fixedValueFvPatchScalarField::write(os);
-    writeEntryIfDifferent<word>(os, "p", "p", pName_);
-    T0_.writeEntry("T0", os);
+    writeEntryIfDifferent<word>(os, "T", "T", TName_);
+    p0_.writeEntry("p0", os);
 }
 
 
@@ -193,7 +203,7 @@ namespace Foam
 makePatchTypeField
 (
     fvPatchScalarField,
-    isentropicTotalTemperatureFvPatchScalarField
+    isentropicTotalPressureFvPatchScalarField
 );
 
 } // End namespace Foam
