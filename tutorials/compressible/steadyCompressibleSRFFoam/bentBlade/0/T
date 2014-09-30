@@ -22,24 +22,19 @@ boundaryField
 {
     inlet
     {
-        type            fixedValue;
+        type            totalTemperature;
+        phi             phi;
+        rho             none;
+        psi             psi;
+        U               Uabs;
+        gamma           1.4;
+        T0              uniform 300;
         value           $internalField;
     }
 
     outlet
     {
-//         type            zeroGradient;
-
-        type            waveTransmissive;
-        phi             phi;
-        rho             rho;
-        psi             psi;
-        U               Urel;
-        gamma           1.4;
-        inletOutlet     true;
-        correctSupercritical false;
-        lInf            0.0;
-        fieldInf        300;
+        type            zeroGradient;
         value           $internalField;
     }
 

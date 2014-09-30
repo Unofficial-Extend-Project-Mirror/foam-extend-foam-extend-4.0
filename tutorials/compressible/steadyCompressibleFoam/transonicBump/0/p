@@ -10,49 +10,28 @@ FoamFile
     version     2.0;
     format      ascii;
     class       volScalarField;
-    object      T;
+    object      p;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-dimensions      [0 0 0 1 0 0 0];
+dimensions      [1 -1 -2 0 0 0 0];
 
-internalField   uniform 300;
+internalField   uniform 101325;
 
 boundaryField
 {
     INLE1
     {
-        type            fixedValue;
-        value           $internalField;
-
-//         type            waveTransmissiveInlet;
-//         phi             phi;
-//         rho             rho;
-//         psi             psi;
-//         U               U;
-//         gamma           1.4;
-//         inletOutlet     false;
-//         correctSupercritical false;
-//         lInf            0.01;//HJ
-//         fieldInf        300;
-//         value           $internalField;
+        type            isentropicTotalPressure;
+        U               U;
+        p0              uniform 137491.986;
+        value           uniform 101325;
     }
 
     PRES2
     {
-//        type            zeroGradient;
-
-         type            waveTransmissive;
-         phi             phi;
-         rho             rho;
-         psi             psi;
-         U               U;
-         gamma           1.4;
-         inletOutlet     true;
-         correctSupercritical false;
-         lInf            0.5;
-         fieldInf        300;
-         value           $internalField;
+        type            fixedValue;
+        value           uniform 101325;
     }
 
     WALL3
@@ -70,5 +49,6 @@ boundaryField
         type            empty;
     }
 }
+
 
 // ************************************************************************* //

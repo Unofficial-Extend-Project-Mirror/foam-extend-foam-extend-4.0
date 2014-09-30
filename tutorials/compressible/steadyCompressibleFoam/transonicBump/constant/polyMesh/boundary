@@ -9,14 +9,44 @@ FoamFile
 {
     version     2.0;
     format      ascii;
-    class       dictionary;
-    object      thermophysicalProperties;
+    class       polyBoundaryMesh;
+    location    "constant/polyMesh";
+    object      boundary;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-thermoType      hPsiThermo<pureMixture<constTransport<specieThermo<hConstThermo<perfectGas>>>>>;
-
-// name, nMoles, mol weight, CP, Hf, mu, Pr;
-mixture         air 1 28.9 1007 0 0 0.7;
+5
+(
+    INLE1
+    {
+        type            patch;
+        nFaces          75;
+        startFace       22275;
+    }
+    PRES2
+    {
+        type            patch;
+        nFaces          75;
+        startFace       22350;
+    }
+    WALL3
+    {
+        type            wall;
+        nFaces          150;
+        startFace       22425;
+    }
+    WALL4
+    {
+        type            wall;
+        nFaces          150;
+        startFace       22575;
+    }
+    defaultFaces
+    {
+        type            empty;
+        nFaces          22500;
+        startFace       22725;
+    }
+)
 
 // ************************************************************************* //

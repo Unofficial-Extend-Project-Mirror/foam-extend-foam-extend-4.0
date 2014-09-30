@@ -22,37 +22,18 @@ boundaryField
 {
     INLE1
     {
-        type            fixedValue;
-        value           $internalField;
-
-//         type            waveTransmissiveInlet;
-//         phi             phi;
-//         rho             rho;
-//         psi             psi;
-//         U               U;
-//         gamma           1.4;
-//         inletOutlet     false;
-//         correctSupercritical false;
-//         lInf            0.01;//HJ
-//         fieldInf        300;
-//         value           $internalField;
+        type            isentropicTotalTemperature;
+        phi             phi;
+        rho             none;
+        psi             psi;
+        p               p;
+        T0              uniform 327.335857;
+        value           uniform 300;
     }
 
     PRES2
     {
         type            zeroGradient;
-
-//         type            waveTransmissive;
-//         phi             phi;
-//         rho             rho;
-//         psi             psi;
-//         U               U;
-//         gamma           1.4;
-//         inletOutlet     true;
-//         correctSupercritical false;
-//         lInf            0.0;
-//         fieldInf        300;
-//         value           $internalField;
     }
 
     WALL3
@@ -60,20 +41,16 @@ boundaryField
         type            zeroGradient;
     }
 
-    SYMP5
-    {
-        type            empty;
-    }
-
-    SYMP6
-    {
-        type            empty;
-    }
-
     WALL4
     {
         type            zeroGradient;
     }
+
+    defaultFaces
+    {
+        type            empty;
+    }
 }
+
 
 // ************************************************************************* //

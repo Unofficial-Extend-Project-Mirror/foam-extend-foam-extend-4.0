@@ -22,18 +22,18 @@ License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    Foam::isentropicTotalTemperatureFvPatchScalarField
+    Foam::isentropicTotalPressureFvPatchScalarField
 
 Description
-    Foam::isentropicTotalTemperatureFvPatchScalarField
+    Foam::isentropicTotalPressureFvPatchScalarField
 
 SourceFiles
-    isentropicTotalTemperatureFvPatchScalarField.C
+    isentropicTotalPressureFvPatchScalarField.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef isentropicTotalTemperatureFvPatchScalarField_H
-#define isentropicTotalTemperatureFvPatchScalarField_H
+#ifndef isentropicTotalPressureFvPatchScalarField_H
+#define isentropicTotalPressureFvPatchScalarField_H
 
 #include "fixedValueFvPatchFields.H"
 
@@ -43,39 +43,42 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-         Class isentropicTotalTemperatureFvPatchScalarField Declaration
+           Class isentropicTotalPressureFvPatchScalarField Declaration
 \*---------------------------------------------------------------------------*/
 
-class isentropicTotalTemperatureFvPatchScalarField
+class isentropicTotalPressureFvPatchScalarField
 :
     public fixedValueFvPatchScalarField
 {
     // Private data
 
-        //- Name of the static pressure field
-        word pName_;
+        //- Name of the velocity field
+        word UName_;
 
-        //- Total temperature field
-        scalarField T0_;
+        //- Name of the static temperature field
+        word TName_;
+
+        //- Total pressure field
+        scalarField p0_;
 
 
 public:
 
     //- Runtime type information
-    TypeName("isentropicTotalTemperature");
+    TypeName("isentropicTotalPressure");
 
 
     // Constructors
 
         //- Construct from patch and internal field
-        isentropicTotalTemperatureFvPatchScalarField
+        isentropicTotalPressureFvPatchScalarField
         (
             const fvPatch&,
             const DimensionedField<scalar, volMesh>&
         );
 
         //- Construct from patch, internal field and dictionary
-        isentropicTotalTemperatureFvPatchScalarField
+        isentropicTotalPressureFvPatchScalarField
         (
             const fvPatch&,
             const DimensionedField<scalar, volMesh>&,
@@ -83,19 +86,19 @@ public:
         );
 
         //- Construct by mapping given
-        //  isentropicTotalTemperatureFvPatchScalarField onto a new patch
-        isentropicTotalTemperatureFvPatchScalarField
+        //  isentropicTotalPressureFvPatchScalarField onto a new patch
+        isentropicTotalPressureFvPatchScalarField
         (
-            const isentropicTotalTemperatureFvPatchScalarField&,
+            const isentropicTotalPressureFvPatchScalarField&,
             const fvPatch&,
             const DimensionedField<scalar, volMesh>&,
             const fvPatchFieldMapper&
         );
 
         //- Construct as copy
-        isentropicTotalTemperatureFvPatchScalarField
+        isentropicTotalPressureFvPatchScalarField
         (
-            const isentropicTotalTemperatureFvPatchScalarField&
+            const isentropicTotalPressureFvPatchScalarField&
         );
 
         //- Construct and return a clone
@@ -103,14 +106,14 @@ public:
         {
             return tmp<fvPatchScalarField>
             (
-                new isentropicTotalTemperatureFvPatchScalarField(*this)
+                new isentropicTotalPressureFvPatchScalarField(*this)
             );
         }
 
         //- Construct as copy setting internal field reference
-        isentropicTotalTemperatureFvPatchScalarField
+        isentropicTotalPressureFvPatchScalarField
         (
-            const isentropicTotalTemperatureFvPatchScalarField&,
+            const isentropicTotalPressureFvPatchScalarField&,
             const DimensionedField<scalar, volMesh>&
         );
 
@@ -122,7 +125,7 @@ public:
         {
             return tmp<fvPatchScalarField>
             (
-                new isentropicTotalTemperatureFvPatchScalarField(*this, iF)
+                new isentropicTotalPressureFvPatchScalarField(*this, iF)
             );
         }
 
@@ -132,15 +135,15 @@ public:
         // Access
 
             //- Return the total pressure
-            const scalarField& T0() const
+            const scalarField& p0() const
             {
-                return T0_;
+                return p0_;
             }
 
             //- Return reference to the total pressure to allow adjustment
-            scalarField& T0()
+            scalarField& p0()
             {
-                return T0_;
+                return p0_;
             }
 
 

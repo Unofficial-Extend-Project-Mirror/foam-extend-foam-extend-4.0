@@ -55,7 +55,7 @@ int main(int argc, char *argv[])
 
     Info<< "\nStarting time loop\n" << endl;
 
-    for (runTime++; !runTime.end(); runTime++)
+    while (runTime.loop())
     {
         Info<< "Time = " << runTime.timeName() << nl << endl;
 
@@ -65,9 +65,8 @@ int main(int argc, char *argv[])
 #       include "initConvergenceCheck.H"
 
 #       include "UEqn.H"
+#       include "iEqn.H"
 #       include "pEqn.H"
-
-#       include "hEqn.H"
 
 #       include "rhoFromP.H"
 

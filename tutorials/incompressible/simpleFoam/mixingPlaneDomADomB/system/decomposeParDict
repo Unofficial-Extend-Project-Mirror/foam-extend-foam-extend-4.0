@@ -14,9 +14,10 @@ FoamFile
 }
 numberOfSubdomains 4;
 
-method manual; 	//metis; //simple;
+method metis; 	//metis; //simple;
 
-globalFaceZones (
+globalFaceZones
+(
     ggi1DomBZone
     ggi1DomAZone
     ggi2DomBZone

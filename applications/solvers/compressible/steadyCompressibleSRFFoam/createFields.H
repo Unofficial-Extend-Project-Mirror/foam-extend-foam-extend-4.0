@@ -85,3 +85,18 @@
         ),
         Urel + SRF->U()
     );
+
+    // Create rothalpy, in two steps to preserve boundary conditions
+    volScalarField i
+    (
+        IOobject
+        (
+            "i",
+            runTime.timeName(),
+            mesh,
+            IOobject::NO_READ,
+            IOobject::AUTO_WRITE
+        ),
+        h
+    );
+    i -= 0.5*magSqr(SRF->U());
