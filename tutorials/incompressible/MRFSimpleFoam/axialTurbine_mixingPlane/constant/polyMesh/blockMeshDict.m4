@@ -290,7 +290,7 @@ boundary
             origin          (0 0 0);
             axis            (0 0 1);
             direction       (1 0 0);
-            degrees         false; //Use radians
+            inDegrees       false; //Use radians
             //Equivalent axis/direction definition:
             //e3              (0 0 1);
             //e1              (1 0 0);
@@ -376,7 +376,7 @@ boundary
             origin          (0 0 0);
             axis            (0 0 1);
             direction       (1 0 0);
-            degrees         false; //Use radians
+            inDegrees       false; //Use radians
             //Equivalent axis/direction definition:
             //e3              (0 0 1);
             //e1              (1 0 0);
@@ -405,7 +405,7 @@ boundary
             origin          (0 0 0);
             axis            (0 0 1);
             direction       (1 0 0);
-            degrees         false; //Use radians
+            inDegrees       false; //Use radians
             //Equivalent axis/direction definition:
             //e3              (0 0 1);
             //e1              (1 0 0);
@@ -498,7 +498,7 @@ boundary
             origin          (0 0 0);
             axis            (0 0 1);
             direction       (1 0 0);
-            degrees         false; //Use radians
+            inDegrees       false; //Use radians
             //Equivalent axis/direction definition:
             //e3              (0 0 1);
             //e1              (1 0 0);
