@@ -8,32 +8,32 @@ cd cartesianMesh
 
 cd asmoOctree
     cleanCase
-    rm -rf constant/polyMesh > /dev/null 2>&1
-    rm log.* 
+    \rm -rf constant/polyMesh > /dev/null 2>&1
+    \rm -f log.* 
 cd ..
 
 cd bunnyOctree
     cleanCase
-    rm -rf constant/polyMesh > /dev/null 2>&1
-    rm log.*
+    \rm -rf constant/polyMesh > /dev/null 2>&1
+    \rm -f log.*
 cd ..
 
 cd intakePortOctree
     cleanCase
-    rm -rf constant/polyMesh > /dev/null 2>&1
-    rm log.*
+    \rm -rf constant/polyMesh > /dev/null 2>&1
+    \rm -f log.*
 cd ..
 
 cd sawOctree
     cleanCase
-    rm -rf processor* > /dev/null 2>&1
-    rm log.*
+    \rm -rf processor* > /dev/null 2>&1
+    \rm -f log.*
 cd ..
 
 cd sBendOctree
     cleanCase
-    rm -rf constant/polyMesh > /dev/null 2>&1
-    rm log.*
+    \rm -rf constant/polyMesh > /dev/null 2>&1
+    \rm -f log.*
 cd ..
 
 cd ..
@@ -42,8 +42,8 @@ cd cartesian2DMesh
 
 cd hatOctree
     cleanCase
-    rm -rf constant/polyMesh > /dev/null 2>&1
-    rm log.*
+    \rm -rf constant/polyMesh > /dev/null 2>&1
+    \rm -f log.*
 cd ..
 
 cd ..
@@ -52,14 +52,14 @@ cd tetMesh
 
 cd cutCubeOctree
     cleanCase
-    rm -rf constant/polyMesh > /dev/null 2>&1
-    rm log.*
+    \rm -rf constant/polyMesh > /dev/null 2>&1
+    \rm -f log.*
 cd ..
 
 cd socketOctree
     cleanCase
-    rm -rf constant/polyMesh > /dev/null 2>&1
-    rm log.*
+    \rm -rf constant/polyMesh > /dev/null 2>&1
+    \rm -f log.*
 cd ..
 
 cd ..
