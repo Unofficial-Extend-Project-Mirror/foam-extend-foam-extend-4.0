@@ -36,7 +36,7 @@ SourceFiles
 #define cylindricalCS_H
 
 #include "coordinateSystem.H"
-#include "typeInfo.H"
+#include "Switch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -54,7 +54,7 @@ class cylindricalCS
     // Private data members
 
         //- Are angles in degrees? (default = true)
-        bool inDegrees_;
+        Switch inDegrees_;
 
 
 protected:
@@ -156,8 +156,16 @@ public:
         bool inDegrees() const;
 
         //- Non-const access to inDegrees
-        bool& inDegrees();
+        Switch& inDegrees();
 
+
+        // Write
+
+            //- Write
+            virtual void write(Ostream&) const;
+
+            //- Write dictionary
+            virtual void writeDict(Ostream&, bool subDict = true) const;
 };
 
 

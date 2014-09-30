@@ -26,7 +26,6 @@ License
 #include "sphericalCS.H"
 
 #include "one.H"
-#include "Switch.H"
 #include "mathematicalConstants.H"
 #include "boundBox.H"
 #include "addToRunTimeSelectionTable.H"
@@ -150,7 +149,7 @@ bool Foam::sphericalCS::inDegrees() const
 }
 
 
-bool& Foam::sphericalCS::inDegrees()
+Foam::Switch& Foam::sphericalCS::inDegrees()
 {
     return inDegrees_;
 }
@@ -271,6 +270,31 @@ Foam::tmp<Foam::vectorField> Foam::sphericalCS::globalToLocal
     );
 
     return tresult;
+}
+
+
+void Foam::sphericalCS::write(Ostream& os) const
+{
+    coordinateSystem::write(os);
+    os << "inDegrees: " << inDegrees() << endl;
+}
+
+
+void Foam::sphericalCS::writeDict(Ostream& os, bool subDict) const
+{
+    if (subDict)
+    {
+        os  << indent << nl
+            << indent << token::BEGIN_BLOCK << incrIndent << nl;
+    }
+
+    coordinateSystem::writeDict(os, false);
+    os.writeKeyword("inDegrees") << inDegrees_ << token::END_STATEMENT << nl;
+
+    if (subDict)
+    {
+        os << decrIndent << indent << token::END_BLOCK << endl;
+    }
 }
 
 
