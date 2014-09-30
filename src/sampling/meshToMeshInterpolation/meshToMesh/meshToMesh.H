@@ -275,7 +275,7 @@ public:
             (
                 Field<Type>&,
                 const GeometricField<Type, fvPatchField, volMesh>&,
-                order=INTERPOLATE
+                order = INTERPOLATE
             ) const;
 
             template<class Type>
@@ -283,7 +283,7 @@ public:
             (
                 Field<Type>&,
                 const tmp<GeometricField<Type, fvPatchField, volMesh> >&,
-                order=INTERPOLATE
+                order = INTERPOLATE
             ) const;
 
 
@@ -293,7 +293,7 @@ public:
             (
                 GeometricField<Type, fvPatchField, volMesh>&,
                 const GeometricField<Type, fvPatchField, volMesh>&,
-                order=INTERPOLATE
+                order = INTERPOLATE
             ) const;
 
             template<class Type>
@@ -301,7 +301,7 @@ public:
             (
                 GeometricField<Type, fvPatchField, volMesh>&,
                 const tmp<GeometricField<Type, fvPatchField, volMesh> >&,
-                order=INTERPOLATE
+                order = INTERPOLATE
             ) const;
 
 
@@ -310,14 +310,14 @@ public:
             tmp<GeometricField<Type, fvPatchField, volMesh> > interpolate
             (
                 const GeometricField<Type, fvPatchField, volMesh>&,
-                order=INTERPOLATE
+                order = INTERPOLATE
             ) const;
 
             template<class Type>
             tmp<GeometricField<Type, fvPatchField, volMesh> > interpolate
             (
                 const tmp<GeometricField<Type, fvPatchField, volMesh> >&,
-                order=INTERPOLATE
+                order = INTERPOLATE
             ) const;
 };
 

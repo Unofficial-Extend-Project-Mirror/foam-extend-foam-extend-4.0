@@ -150,7 +150,7 @@ tmp<Field<Type> > cyclicFvPatchField<Type>::patchNeighbourField() const
 
     if (doTransform())
     {
-        for (label facei=0; facei<sizeby2; facei++)
+        for (label facei = 0; facei < sizeby2; facei++)
         {
             pnf[facei] = transform
             (
@@ -165,7 +165,7 @@ tmp<Field<Type> > cyclicFvPatchField<Type>::patchNeighbourField() const
     }
     else
     {
-        for (label facei=0; facei<sizeby2; facei++)
+        for (label facei = 0; facei < sizeby2; facei++)
         {
             pnf[facei] = iField[faceCells[facei + sizeby2]];
             pnf[facei + sizeby2] = iField[faceCells[facei]];
@@ -193,7 +193,7 @@ void cyclicFvPatchField<Type>::updateInterfaceMatrix
     label sizeby2 = this->size()/2;
     const unallocLabelList& faceCells = cyclicPatch_.faceCells();
 
-    for (label facei=0; facei<sizeby2; facei++)
+    for (label facei = 0; facei < sizeby2; facei++)
     {
         pnf[facei] = psiInternal[faceCells[facei + sizeby2]];
         pnf[facei + sizeby2] = psiInternal[faceCells[facei]];
