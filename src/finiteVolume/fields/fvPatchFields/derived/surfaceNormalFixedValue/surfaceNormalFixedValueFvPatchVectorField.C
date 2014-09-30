@@ -56,11 +56,9 @@ surfaceNormalFixedValueFvPatchVectorField
     const fvPatchFieldMapper& mapper
 )
 :
-    fixedValueFvPatchVectorField(p, iF),
+    fixedValueFvPatchVectorField(ptf, p, iF, mapper),
     refValue_(ptf.refValue_, mapper)
-{
-    fvPatchVectorField::operator=(refValue_*patch().nf());
-}
+{}
 
 
 surfaceNormalFixedValueFvPatchVectorField::
@@ -71,11 +69,9 @@ surfaceNormalFixedValueFvPatchVectorField
     const dictionary& dict
 )
 :
-    fixedValueFvPatchVectorField(p, iF),
+    fixedValueFvPatchVectorField(p, iF, dict),
     refValue_("refValue", dict, p.size())
-{
-    fvPatchVectorField::operator=(refValue_*patch().nf());
-}
+{}
 
 
 surfaceNormalFixedValueFvPatchVectorField::
@@ -142,9 +138,8 @@ void surfaceNormalFixedValueFvPatchVectorField::updateCoeffs()
 
 void surfaceNormalFixedValueFvPatchVectorField::write(Ostream& os) const
 {
-    fvPatchVectorField::write(os);
+    fixedValueFvPatchVectorField::write(os);
     refValue_.writeEntry("refValue", os);
-    writeEntry("value", os);
 }
 
 
