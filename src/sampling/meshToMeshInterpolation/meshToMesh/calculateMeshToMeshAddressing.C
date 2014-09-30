@@ -410,7 +410,6 @@ void meshToMesh::cellAddresses
 
                             }
                         }
-
                     }
                 }
             }
