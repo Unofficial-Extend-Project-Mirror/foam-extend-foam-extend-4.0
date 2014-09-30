@@ -108,7 +108,7 @@ class ggiGAMGInterface
     // Private static data
 
         //- Processor cluster offset index
-        static const label procOffset = 1000000;
+        static const label procOffset = 4000000;
 
 
 public:
