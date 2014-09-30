@@ -102,8 +102,17 @@ public:
         tmp
         <
             BlockLduSystem<vector, typename innerProduct<vector, Type>::type>
-        > fvmDiv
+        > fvmUDiv
         (
+            const GeometricField<Type, fvPatchField, volMesh>&
+        ) const;
+
+        tmp
+        <
+            BlockLduSystem<vector, typename innerProduct<vector, Type>::type>
+        > fvmUDiv
+        (
+            const surfaceScalarField& flux,
             const GeometricField<Type, fvPatchField, volMesh>&
         ) const;
 };

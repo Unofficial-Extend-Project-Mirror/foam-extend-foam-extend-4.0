@@ -103,7 +103,7 @@ template<class Type>
 tmp
 <
     BlockLduSystem<vector, typename innerProduct<vector, Type>::type>
-> div
+> UDiv
 (
     GeometricField<Type, fvPatchField, volMesh>& vf,
     const word& name
@@ -113,7 +113,7 @@ tmp
     (
         vf.mesh(),
         vf.mesh().schemesDict().divScheme(name)
-    )().fvmDiv(vf);
+    )().fvmUDiv(vf);
 }
 
 
@@ -121,16 +121,95 @@ template<class Type>
 tmp
 <
     BlockLduSystem<vector, typename innerProduct<vector, Type>::type>
-> div
+> UDiv
+(
+    const surfaceScalarField& flux,
+    GeometricField<Type, fvPatchField, volMesh>& vf,
+    const word& name
+)
+{
+    return fv::divScheme<Type>::New
+    (
+        vf.mesh(),
+        vf.mesh().schemesDict().divScheme(name)
+    )().fvmUDiv(flux, vf);
+}
+
+
+template<class Type>
+tmp
+<
+    BlockLduSystem<vector, typename innerProduct<vector, Type>::type>
+> UDiv
+(
+    const tmp<surfaceScalarField>& tflux,
+    GeometricField<Type, fvPatchField, volMesh>& vf,
+    const word& name
+)
+{
+    tmp
+    <
+        BlockLduSystem<vector, typename innerProduct<vector, Type>::type>
+    >
+    Div(fvm::UDiv(tflux(), vf, name));
+    tflux.clear();
+    return Div;
+}
+
+
+template<class Type>
+tmp
+<
+    BlockLduSystem<vector, typename innerProduct<vector, Type>::type>
+> UDiv
 (
     GeometricField<Type, fvPatchField, volMesh>& vf
 )
 {
-    return fvm::div
+    return fvm::UDiv
     (
         vf,
         "div(" + vf.name() + ')'
     );
+}
+
+
+template<class Type>
+tmp
+<
+    BlockLduSystem<vector, typename innerProduct<vector, Type>::type>
+> UDiv
+(
+    const surfaceScalarField& flux,
+    GeometricField<Type, fvPatchField, volMesh>& vf
+)
+{
+    return fvm::UDiv
+    (
+        flux,
+        vf,
+        "div(" + vf.name() + ')'
+    );
+}
+
+
+template<class Type>
+tmp
+<
+    BlockLduSystem<vector, typename innerProduct<vector, Type>::type>
+> UDiv
+(
+    const tmp<surfaceScalarField>& tflux,
+    GeometricField<Type, fvPatchField, volMesh>& vf
+)
+{
+    tmp
+    <
+        BlockLduSystem<vector, typename innerProduct<vector, Type>::type>
+    >
+    Div(fvm::UDiv(tflux(), vf));
+    tflux.clear();
+    return Div;
 }
 
 

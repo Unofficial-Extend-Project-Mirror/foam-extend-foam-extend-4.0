@@ -60,9 +60,9 @@ tmp<BlockLduSystem<vector, vector> > gaussGrad<scalar>::fvmGrad
     vectorField& source = bs.source();
 
     // Grab ldu parts of block matrix as linear always
-    typename CoeffField<vector>::linearTypeField& d = bs.diag().asLinear();
-    typename CoeffField<vector>::linearTypeField& u = bs.upper().asLinear();
-    typename CoeffField<vector>::linearTypeField& l = bs.lower().asLinear();
+    CoeffField<vector>::linearTypeField& d = bs.diag().asLinear();
+    CoeffField<vector>::linearTypeField& u = bs.upper().asLinear();
+    CoeffField<vector>::linearTypeField& l = bs.lower().asLinear();
 
     const vectorField& SfIn = mesh.Sf().internalField();
 
@@ -89,9 +89,9 @@ tmp<BlockLduSystem<vector, vector> > gaussGrad<scalar>::fvmGrad
 
         if (patch.coupled())
         {
-            typename CoeffField<vector>::linearTypeField& pcoupleUpper =
+            CoeffField<vector>::linearTypeField& pcoupleUpper =
                 bs.coupleUpper()[patchI].asLinear();
-            typename CoeffField<vector>::linearTypeField& pcoupleLower =
+            CoeffField<vector>::linearTypeField& pcoupleLower =
                 bs.coupleLower()[patchI].asLinear();
 
             const vectorField pcl = -pw*Sf;

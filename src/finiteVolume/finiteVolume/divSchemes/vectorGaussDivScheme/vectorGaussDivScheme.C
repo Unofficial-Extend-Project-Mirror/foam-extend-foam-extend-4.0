@@ -42,7 +42,7 @@ namespace fv
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 template<>
-tmp<BlockLduSystem<vector, scalar> > gaussDivScheme<vector>::fvmDiv
+tmp<BlockLduSystem<vector, scalar> > gaussDivScheme<vector>::fvmUDiv
 (
     const GeometricField<vector, fvPatchField, volMesh>& vf
 ) const
@@ -60,9 +60,9 @@ tmp<BlockLduSystem<vector, scalar> > gaussDivScheme<vector>::fvmDiv
     scalarField& source = bs.source();
 
     // Grab ldu parts of block matrix as linear always
-    typename CoeffField<vector>::linearTypeField& d = bs.diag().asLinear();
-    typename CoeffField<vector>::linearTypeField& u = bs.upper().asLinear();
-    typename CoeffField<vector>::linearTypeField& l = bs.lower().asLinear();
+    CoeffField<vector>::linearTypeField& d = bs.diag().asLinear();
+    CoeffField<vector>::linearTypeField& u = bs.upper().asLinear();
+    CoeffField<vector>::linearTypeField& l = bs.lower().asLinear();
 
     const vectorField& SfIn = mesh.Sf().internalField();
 
@@ -89,9 +89,9 @@ tmp<BlockLduSystem<vector, scalar> > gaussDivScheme<vector>::fvmDiv
 
         if (patch.coupled())
         {
-            typename CoeffField<vector>::linearTypeField& pcoupleUpper =
+            CoeffField<vector>::linearTypeField& pcoupleUpper =
                 bs.coupleUpper()[patchI].asLinear();
-            typename CoeffField<vector>::linearTypeField& pcoupleLower =
+            CoeffField<vector>::linearTypeField& pcoupleLower =
                 bs.coupleLower()[patchI].asLinear();
 
             const vectorField pcl = -pw*Sf;
@@ -118,6 +118,95 @@ tmp<BlockLduSystem<vector, scalar> > gaussDivScheme<vector>::fvmDiv
     return tbs;
 }
 
+
+template<>
+tmp<BlockLduSystem<vector, scalar> > gaussDivScheme<vector>::fvmUDiv
+(
+    const surfaceScalarField& flux,
+    const GeometricField<vector, fvPatchField, volMesh>& vf
+) const
+{
+    tmp<surfaceScalarField> tweights = this->tinterpScheme_().weights(vf);
+    const scalarField& wIn = tweights().internalField();
+
+    const fvMesh& mesh = vf.mesh();
+
+    tmp<BlockLduSystem<vector, scalar> > tbs
+    (
+        new BlockLduSystem<vector, scalar>(mesh)
+    );
+    BlockLduSystem<vector, scalar>& bs = tbs();
+    scalarField& source = bs.source();
+
+    // Grab ldu parts of block matrix as linear always
+    CoeffField<vector>::linearTypeField& d = bs.diag().asLinear();
+    CoeffField<vector>::linearTypeField& u = bs.upper().asLinear();
+    CoeffField<vector>::linearTypeField& l = bs.lower().asLinear();
+
+    const vectorField& SfIn = mesh.Sf().internalField();
+
+    const scalarField& fluxIn = flux.internalField();
+
+    l = -wIn*fluxIn*SfIn;
+    u = l + fluxIn*SfIn;
+    bs.negSumDiag();
+
+    // Boundary contributions
+    forAll(vf.boundaryField(), patchI)
+    {
+        const fvPatchVectorField& pf = vf.boundaryField()[patchI];
+        const fvPatch& patch = pf.patch();
+        const vectorField& Sf = patch.Sf();
+        const fvsPatchScalarField& pw = tweights().boundaryField()[patchI];
+        const unallocLabelList& fc = patch.faceCells();
+
+        const scalarField& pFlux = flux.boundaryField()[patchI];
+
+        const vectorField internalCoeffs(pf.valueInternalCoeffs(pw));
+
+        // Diag contribution
+        forAll(pf, faceI)
+        {
+            d[fc[faceI]] += cmptMultiply
+            (
+                internalCoeffs[faceI],
+                pFlux[faceI]*Sf[faceI]
+            );
+        }
+
+        if (patch.coupled())
+        {
+            CoeffField<vector>::linearTypeField& pcoupleUpper =
+                bs.coupleUpper()[patchI].asLinear();
+            CoeffField<vector>::linearTypeField& pcoupleLower =
+                bs.coupleLower()[patchI].asLinear();
+
+            const vectorField pcl = -pw*pFlux*Sf;
+            const vectorField pcu = pcl + pFlux*Sf;
+
+            // Coupling  contributions
+            pcoupleLower -= pcl;
+            pcoupleUpper -= pcu;
+        }
+        else
+        {
+            const vectorField boundaryCoeffs(pf.valueBoundaryCoeffs(pw));
+
+            // Boundary contribution
+            forAll(pf, faceI)
+            {
+                source[fc[faceI]] -=
+                (
+                    boundaryCoeffs[faceI] & (pFlux[faceI]*Sf[faceI])
+                );
+            }
+        }
+    }
+
+    // Interpolation schemes with corrections not accounted for
+
+    return tbs;
+}
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
