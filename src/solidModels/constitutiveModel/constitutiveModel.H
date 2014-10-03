@@ -116,8 +116,8 @@ public:
         //- Construct from components
         constitutiveModel
         (
-       const volSymmTensorField& sigma,
-       const volVectorField& U
+            const volSymmTensorField& sigma,
+            const volVectorField& U
         );
 
 
