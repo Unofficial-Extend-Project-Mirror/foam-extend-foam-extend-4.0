@@ -13,4 +13,7 @@ wclean all executables
 wclean all utilities
 cd -
 
+#Clean makeAxialMesh
+wclean MakeAxialMesh/makeAxialMesh
+
 # ----------------------------------------------------------------- end-of-file

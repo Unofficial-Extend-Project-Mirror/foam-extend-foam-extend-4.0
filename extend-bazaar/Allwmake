@@ -7,7 +7,7 @@ if [ ! -d "FluidStructureInteraction" ]; then
     wget http://openfoamwiki.net/images/5/52/Fsi_31.tar.gz
     tar zxvf Fsi_31.tar.gz
     rm Fsi_31.tar.gz
-fi 
+fi
 
 cd FluidStructureInteraction/src/
 ./Allwmake
@@ -18,7 +18,7 @@ if [ ! -d "cfMesh-v1.0" ]; then
     wget http://www.c-fields.com/Media/Default/Repository/cfMesh-v1.0.tgz
     tar zxvf cfMesh-v1.0.tgz
     rm cfMesh-v1.0.tgz
-fi 
+fi
 # Change FOAM_LIBBIN to FOAM_USER_LIBBIN
 find cfMesh-v1.0/ -type f | grep "Make/files" | xargs sed -i s/FOAM_LIBBIN/FOAM_USER_LIBBIN/g
 find cfMesh-v1.0/ -type f | grep "Make/files" | xargs sed -i s/FOAM_APPBIN/FOAM_USER_APPBIN/g
@@ -26,5 +26,12 @@ find cfMesh-v1.0/ -type f | grep "Make/files" | xargs sed -i s/FOAM_APPBIN/FOAM_
 cd cfMesh-v1.0/
 ./Allwmake
 cd -
+
+# Install the makeAxialMesh utilitiy
+if [ ! -d "MakeAxialMesh" ]; then
+    svn export svn://svn.code.sf.net/p/openfoam-extend/svn/trunk/Breeder_1.6/utilities/mesh/manipulation/MakeAxialMesh MakeAxialMesh
+fi
+
+wmake MakeAxialMesh/makeAxialMesh
 
 # ----------------------------------------------------------------- end-of-file
