@@ -20,8 +20,8 @@ if [ ! -d "cfMesh-v1.0" ]; then
     rm cfMesh-v1.0.tgz
 fi
 # Change FOAM_LIBBIN to FOAM_USER_LIBBIN
-find cfMesh-v1.0/ -type f | grep "Make/files" | xargs sed -i s/FOAM_LIBBIN/FOAM_USER_LIBBIN/g
-find cfMesh-v1.0/ -type f | grep "Make/files" | xargs sed -i s/FOAM_APPBIN/FOAM_USER_APPBIN/g
+find cfMesh-v1.0/ -type f | grep "Make/files" | xargs sed -i "" -e s/FOAM_LIBBIN/FOAM_USER_LIBBIN/g
+find cfMesh-v1.0/ -type f | grep "Make/files" | xargs sed -i "" -e s/FOAM_APPBIN/FOAM_USER_APPBIN/g
 
 cd cfMesh-v1.0/
 ./Allwmake
