@@ -9,9 +9,10 @@ if [ ! -d "FluidStructureInteraction" ]; then
     rm Fsi_31.tar.gz
 fi
 
-cd FluidStructureInteraction/src/
-./Allwmake
-cd -
+(
+    cd FluidStructureInteraction/src
+    ./Allwmake
+)
 
 # Install cfMesh mesh generation package
 if [ ! -d "cfMesh-v1.0" ]; then
@@ -23,9 +24,10 @@ fi
 find cfMesh-v1.0/ -type f | grep "Make/files" | xargs sed -i "" -e s/FOAM_LIBBIN/FOAM_USER_LIBBIN/g
 find cfMesh-v1.0/ -type f | grep "Make/files" | xargs sed -i "" -e s/FOAM_APPBIN/FOAM_USER_APPBIN/g
 
-cd cfMesh-v1.0/
-./Allwmake
-cd -
+(
+    cd cfMesh-v1.0
+    ./Allwmake
+)
 
 # Install the makeAxialMesh utilitiy
 if [ ! -d "MakeAxialMesh" ]; then
