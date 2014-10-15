@@ -323,6 +323,7 @@ void Foam::probes::write()
 {
     // Check if the mesh is changing and if so, resample
     const fvMesh& mesh = refCast<const fvMesh>(obr_);
+
     if (mesh.moving() || mesh.changing())
     {
         cellList_.clear();
