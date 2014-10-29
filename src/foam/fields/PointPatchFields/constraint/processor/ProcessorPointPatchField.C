@@ -511,18 +511,7 @@ evaluate
             }
 
             // Average over two sides
-
-            // ZT, 22-07-2014 - point ordering is not same 
-            // at master and slave side after topology change
-            const labelList& neiPoints = 
-                procPatch_.procPolyPatch().neighbPoints();
-
-            tpn = 
-                0.5
-               *(
-                   this->patchInternalField(this->internalField())
-                 + Field<Type>(tpn, neiPoints)
-                );
+            tpn = 0.5*(this->patchInternalField(this->internalField()) + tpn);
 
             // Get internal field to insert values into
             Field<Type>& iF = const_cast<Field<Type>&>(this->internalField());
