@@ -64,88 +64,89 @@ constitutiveModel::constitutiveModel
     cohesiveLawPtr_(NULL),
     planeStress_(lookup("planeStress")),
     solidInterfacePtr_(NULL),
-    solidInterfaceRefPtr_(NULL),
     solidInterfaceActive_(false),
     plasticityStressReturnPtr_(NULL)
 {
-  Info << "Creating constitutive model" << endl;
+    Info << "Creating constitutive model" << endl;
 
-  if (rheologyLawPtr_->plasticityModelNeeded())
+    if (rheologyLawPtr_->plasticityModelNeeded())
     {
-      plasticityStressReturnPtr_ =
-    plasticityStressReturn::New(lookup("plasticityModel"), *this);
+        plasticityStressReturnPtr_ =
+            plasticityStressReturn::New(lookup("plasticityModel"), *this);
     }
-  else if (found("plasticityModel"))
+    else if (found("plasticityModel"))
     {
-      Warning << "plasticityModel is specified in rheologyProperties"
-          << " but plasticity is not active in the current model"
-          << endl;
+        Warning
+            << "plasticityModel is specified in rheologyProperties"
+            << " but plasticity is not active in the current model"
+                << endl;
     }
 
-  // create solidInterface if the case is multiMaterial
-  if (rheologyLawPtr_->type() == "multiMaterial")
+    // create solidInterface if the case is multiMaterial
+    if (rheologyLawPtr_->type() == "multiMaterial")
     {
-      // we should figure it out automatically
-      // for now we will ask the user
-      //word solIntType("smallStrain");
-      solidInterfaceActive_ = true;
+        // we should figure it out automatically
+        // for now we will ask the user
+        //word solIntType("smallStrain");
+        solidInterfaceActive_ = true;
 
-      word solIntType
-          (
-              sigma.mesh().solutionDict().subDict
-              (
-                  "solidMechanics"
-                  ).lookup("solidInterfaceMethod"));
-      solidInterfacePtr_ =
-    solidInterface::New(solIntType, sigma.mesh(), *this);
-
-      solidInterfaceRefPtr_ =
-    new IOReferencer<solidInterface>
-    (
-     IOobject
-     (
-      "solidInterface",
-      sigma.time().timeName(),
-      sigma.db(),
-      IOobject::NO_READ,  /*must be NO_READ*/
-      IOobject::NO_WRITE  /*must be NO_WRITE*/
-      ),
-     solidInterfacePtr_()
-     );
-    }
-  // else
-  //   {
-  //     // create none solidInterface
-  //     solidInterfacePtr_ =
-  //    solidInterface::New("none", sigma.mesh(), *this);
-  //   }
-
-  // create cohesiveLaw if a solidCohesive patch
-  forAll(U.boundaryField(), patchi)
-    {
-      if (isA<solidCohesiveFvPatchVectorField>(U.boundaryField()[patchi])
-      || isA<solidCohesiveFixedModeMixFvPatchVectorField>
-         (U.boundaryField()[patchi]))
-    {
-      Info<< "Reading cohesiveProperties because "
-          << "a solidCohesive patch exists" << endl;
-      cohesiveDictPtr_ =
-        new IOdictionary
+        word solIntType
         (
-         IOobject
-         (
-          "cohesiveProperties",
-          sigma.time().constant(),
-          sigma.db(),
-          IOobject::MUST_READ,
-          IOobject::NO_WRITE
-          )
-         );
+            sigma.mesh().solutionDict().subDict
+            (
+                "solidMechanics"
+            ).lookup("solidInterfaceMethod")
+        );
 
-      cohesiveLawPtr_ =
-        cohesiveLaw::New("law", sigma_, cohesiveDictPtr_->subDict("cohesive"));
-      break;
+        solidInterfacePtr_ =
+            new IOReferencer<solidInterface>
+            (
+                IOobject
+                (
+                    "solidInterface",
+                    sigma.time().timeName(),
+                    sigma.db(),
+                    IOobject::NO_READ,  /*must be NO_READ*/
+                    IOobject::NO_WRITE  /*must be NO_WRITE*/
+                ),
+                solidInterface::New(solIntType, sigma.mesh(), *this).ptr()
+            );
     }
+
+    // create cohesiveLaw if a solidCohesive patch
+    forAll(U.boundaryField(), patchi)
+    {
+        if
+        (
+            isA<solidCohesiveFvPatchVectorField>(U.boundaryField()[patchi])
+         || isA<solidCohesiveFixedModeMixFvPatchVectorField>
+            (U.boundaryField()[patchi])
+        )
+        {
+            Info<< "Reading cohesiveProperties because "
+                << "a solidCohesive patch exists" << endl;
+            cohesiveDictPtr_ =
+                new IOdictionary
+                (
+                    IOobject
+                    (
+                        "cohesiveProperties",
+                        sigma.time().constant(),
+                        sigma.db(),
+                        IOobject::MUST_READ,
+                        IOobject::NO_WRITE
+                    )
+                );
+
+            cohesiveLawPtr_ =
+                cohesiveLaw::New
+                (
+                    "law",
+                    sigma_,
+                    cohesiveDictPtr_->subDict("cohesive")
+                );
+            break;
+        }
     }
 }
 
@@ -158,21 +159,21 @@ constitutiveModel::~constitutiveModel()
 
 void constitutiveModel::correct()
 {
-  if (plasticityStressReturnPtr_.valid())
+    if (plasticityStressReturnPtr_.valid())
     {
-      plasticityStressReturnPtr_->correct();
+        plasticityStressReturnPtr_->correct();
     }
-  else
+    else
     {
-      rheologyLawPtr_->correct();
+        rheologyLawPtr_->correct();
     }
 }
 
 void constitutiveModel::updateYieldStress()
 {
-  if (plasticityStressReturnPtr_.valid())
+    if (plasticityStressReturnPtr_.valid())
     {
-      plasticityStressReturnPtr_->updateYieldStress();
+        plasticityStressReturnPtr_->updateYieldStress();
     }
 }
 
@@ -185,8 +186,8 @@ const volSymmTensorField& constitutiveModel::DEpsilonP() const
 // Return first Lame's coefficient
 tmp<volScalarField> constitutiveModel::mu() const
 {
-  volScalarField lawE = rheologyLawPtr_->E();
-  volScalarField lawNu = rheologyLawPtr_->nu();
+    volScalarField lawE = rheologyLawPtr_->E();
+    volScalarField lawNu = rheologyLawPtr_->nu();
 
     return tmp<volScalarField>
     (
@@ -321,7 +322,8 @@ tmp<volScalarField> constitutiveModel::mu(scalar t) const
 
 
 // Return first Lame's coefficient
-tmp<volScalarField> constitutiveModel::mu(const volScalarField& epsilonEq) const
+tmp<volScalarField>
+constitutiveModel::mu(const volScalarField& epsilonEq) const
 {
     volScalarField lawE = rheologyLawPtr_->E(epsilonEq);
     volScalarField lawNu = rheologyLawPtr_->nu();
@@ -438,147 +440,147 @@ tmp<volScalarField> constitutiveModel::lambda
 
 tmp<volDiagTensorField> constitutiveModel::K() const
 {
-  return rheologyLawPtr_->K();
+    return rheologyLawPtr_->K();
 }
 
 tmp<volSymmTensor4thOrderField> constitutiveModel::C() const
 {
-  return rheologyLawPtr_->C();
+    return rheologyLawPtr_->C();
 }
 
 tmp<surfaceScalarField> constitutiveModel::muf() const
 {
-  tmp<surfaceScalarField> tresult
+    tmp<surfaceScalarField> tresult
     (
-     new surfaceScalarField
-     (
-      IOobject
-      (
-       "muf",
-       sigma_.time().timeName(),
-       sigma_.db(),
-       IOobject::NO_READ,
-       IOobject::NO_WRITE
-       ),
-      fvc::interpolate(mu(), "mu")
-      )
-     );
-  surfaceScalarField& muf = tresult();
+        new surfaceScalarField
+        (
+            IOobject
+            (
+                "muf",
+                sigma_.time().timeName(),
+                sigma_.db(),
+                IOobject::NO_READ,
+                IOobject::NO_WRITE
+            ),
+            fvc::interpolate(mu(), "mu")
+        )
+    );
+    surfaceScalarField& muf = tresult();
 
-  if (solidInterfaceActive_)
+    if (solidInterfaceActive_)
     {
-      solidInterfacePtr_->modifyProperties(muf);
+        solInterface().modifyProperties(muf);
     }
 
-  return tresult;
+    return tresult;
 }
 
 tmp<surfaceScalarField> constitutiveModel::lambdaf() const
 {
-  tmp<surfaceScalarField> tresult
+    tmp<surfaceScalarField> tresult
     (
-     new surfaceScalarField
-     (
-      IOobject
-      (
-       "lambdaf",
-       sigma_.time().timeName(),
-       sigma_.db(),
-       IOobject::NO_READ,
-       IOobject::NO_WRITE
-       ),
-      fvc::interpolate(lambda(), "lambda")
-      )
-     );
-  surfaceScalarField& lambdaf = tresult();
+        new surfaceScalarField
+        (
+            IOobject
+            (
+                "lambdaf",
+                sigma_.time().timeName(),
+                sigma_.db(),
+                IOobject::NO_READ,
+                IOobject::NO_WRITE
+            ),
+            fvc::interpolate(lambda(), "lambda")
+        )
+    );
+    surfaceScalarField& lambdaf = tresult();
 
-  if (solidInterfaceActive_)
+    if (solidInterfaceActive_)
     {
-      solidInterfacePtr_->modifyProperties(lambdaf);
+        solInterface().modifyProperties(lambdaf);
     }
 
-  return tresult;
+    return tresult;
 }
 
 tmp<surfaceScalarField> constitutiveModel::threeKf() const
 {
-  tmp<surfaceScalarField> tresult
+    tmp<surfaceScalarField> tresult
     (
-     new surfaceScalarField
-     (
-      IOobject
-      (
-       "threeKf",
-       sigma_.time().timeName(),
-       sigma_.db(),
-       IOobject::NO_READ,
-       IOobject::NO_WRITE
-       ),
-      fvc::interpolate(threeK(), "threeK")
-      )
-     );
-  surfaceScalarField& threeKf = tresult();
+        new surfaceScalarField
+        (
+            IOobject
+            (
+                "threeKf",
+                sigma_.time().timeName(),
+                sigma_.db(),
+                IOobject::NO_READ,
+                IOobject::NO_WRITE
+            ),
+            fvc::interpolate(threeK(), "threeK")
+        )
+    );
+    surfaceScalarField& threeKf = tresult();
 
-  if (solidInterfaceActive_)
+    if (solidInterfaceActive_)
     {
-      solidInterfacePtr_->modifyProperties(threeKf);
+        solInterface().modifyProperties(threeKf);
     }
 
-  return tresult;
+    return tresult;
 }
 
 tmp<surfaceDiagTensorField> constitutiveModel::Kf() const
 {
-  tmp<surfaceDiagTensorField> tresult
+    tmp<surfaceDiagTensorField> tresult
     (
-     new surfaceDiagTensorField
-     (
-      IOobject
-      (
-       "Kf",
-       sigma_.time().timeName(),
-       sigma_.db(),
-       IOobject::NO_READ,
-       IOobject::NO_WRITE
-       ),
-      fvc::interpolate(K(), "K")
-      )
-     );
-  surfaceDiagTensorField& Kf = tresult();
+        new surfaceDiagTensorField
+        (
+            IOobject
+            (
+                "Kf",
+                sigma_.time().timeName(),
+                sigma_.db(),
+                IOobject::NO_READ,
+                IOobject::NO_WRITE
+            ),
+            fvc::interpolate(K(), "K")
+        )
+    );
+    surfaceDiagTensorField& Kf = tresult();
 
-  if (solidInterfaceActive_)
+    if (solidInterfaceActive_)
     {
-      solidInterfacePtr_->modifyProperties(Kf);
+        solInterface().modifyProperties(Kf);
     }
 
-  return tresult;
+    return tresult;
 }
 
 tmp<surfaceSymmTensor4thOrderField> constitutiveModel::Cf() const
 {
-  tmp<surfaceSymmTensor4thOrderField> tresult
+    tmp<surfaceSymmTensor4thOrderField> tresult
     (
-     new surfaceSymmTensor4thOrderField
-     (
-      IOobject
-      (
-       "Cf",
-       sigma_.time().timeName(),
-       sigma_.db(),
-       IOobject::NO_READ,
-       IOobject::NO_WRITE
-       ),
-      fvc::interpolate(C(), "C")
-      )
-     );
-  surfaceSymmTensor4thOrderField& Cf = tresult();
+        new surfaceSymmTensor4thOrderField
+        (
+            IOobject
+            (
+                "Cf",
+                sigma_.time().timeName(),
+                sigma_.db(),
+                IOobject::NO_READ,
+                IOobject::NO_WRITE
+            ),
+            fvc::interpolate(C(), "C")
+        )
+    );
+    surfaceSymmTensor4thOrderField& Cf = tresult();
 
-  if (solidInterfaceActive_)
+    if (solidInterfaceActive_)
     {
-      solidInterfacePtr_->modifyProperties(Cf);
+        solInterface().modifyProperties(Cf);
     }
 
-  return tresult;
+    return tresult;
 }
 
 
