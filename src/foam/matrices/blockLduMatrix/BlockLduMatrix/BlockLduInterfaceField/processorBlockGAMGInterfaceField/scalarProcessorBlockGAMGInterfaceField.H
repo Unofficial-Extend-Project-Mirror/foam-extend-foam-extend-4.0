@@ -74,7 +74,7 @@ void processorBlockGAMGInterfaceField<scalar>::updateInterfaceMatrix
         procInterface_.compressedReceive<scalar>(commsType, coeffs.size())
     );
 
-    pnf = coeffs.asScalar() *
+    pnf = coeffs.asScalar()*
         procInterface_.compressedReceive<scalar>(commsType, this->size())();
 
     const unallocLabelList& faceCells = procInterface_.faceCells();
@@ -84,14 +84,14 @@ void processorBlockGAMGInterfaceField<scalar>::updateInterfaceMatrix
     {
         forAll(faceCells, elemI)
         {
-            result[faceCells[elemI]] += coeffs[elemI]*pnf[elemI];
+            result[faceCells[elemI]] += pnf[elemI];
         }
     }
     else
     {
         forAll(faceCells, elemI)
         {
-            result[faceCells[elemI]] -= coeffs[elemI]*pnf[elemI];
+            result[faceCells[elemI]] -= pnf[elemI];
         }
 
     }
