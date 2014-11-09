@@ -42,7 +42,6 @@ SourceFiles
 
 #include "label.H"
 #include "bool.H"
-#include "IOstreams.H"
 #include "error.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

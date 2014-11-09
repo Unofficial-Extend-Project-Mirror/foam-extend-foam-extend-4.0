@@ -135,7 +135,7 @@ void cartesianMeshGenerator::mapMeshToSurface()
 
     # ifdef DEBUG
     mesh_.write();
-    //::exit(EXIT_SUCCESS);
+    ::exit(EXIT_SUCCESS);
     # endif
 
     deleteDemandDrivenData(msePtr);
@@ -192,12 +192,30 @@ void cartesianMeshGenerator::refBoundaryLayers()
 void cartesianMeshGenerator::optimiseFinalMesh()
 {
     //- untangle the surface if needed
-    meshSurfaceEngine mse(mesh_);
-    meshSurfaceOptimizer(mse, *octreePtr_).optimizeSurface();
+    bool enforceConstraints(false);
+    if( meshDict_.found("enforceGeometryConstraints") )
+    {
+        enforceConstraints =
+            readBool(meshDict_.lookup("enforceGeometryConstraints"));
+    }
+
+    if( true )
+    {
+        meshSurfaceEngine mse(mesh_);
+        meshSurfaceOptimizer surfOpt(mse, *octreePtr_);
+
+        if( enforceConstraints )
+            surfOpt.enforceConstraints();
+
+        surfOpt.optimizeSurface();
+    }
+
     deleteDemandDrivenData(octreePtr_);
 
     //- final optimisation
     meshOptimizer optimizer(mesh_);
+    if( enforceConstraints )
+        optimizer.enforceConstraints();
     optimizer.optimizeMeshFV();
     optimizer.optimizeLowQualityFaces();
     optimizer.untangleMeshFV();
@@ -230,25 +248,35 @@ void cartesianMeshGenerator::renumberMesh()
 
 void cartesianMeshGenerator::generateMesh()
 {
-    createCartesianMesh();
+    try
+    {
+        createCartesianMesh();
 
-    surfacePreparation();
+        surfacePreparation();
 
-    mapMeshToSurface();
+        mapMeshToSurface();
 
-    mapEdgesAndCorners();
+        mapEdgesAndCorners();
 
-    optimiseMeshSurface();
+        optimiseMeshSurface();
 
-    generateBoundaryLayers();
+        generateBoundaryLayers();
 
-    optimiseFinalMesh();
+        optimiseFinalMesh();
 
-    refBoundaryLayers();
+        refBoundaryLayers();
 
-    renumberMesh();
+        renumberMesh();
 
-    replaceBoundaries();
+        replaceBoundaries();
+    }
+    catch(...)
+    {
+        WarningIn
+        (
+            "void cartesianMeshGenerator::generateMesh()"
+        ) << "Meshing process terminated!" << endl;
+    }
 }
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //

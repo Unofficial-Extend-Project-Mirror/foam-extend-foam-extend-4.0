@@ -243,6 +243,15 @@ void boundaryLayers::createLayerCells(const labelList& patchLabels)
         const label pKeyI = patchKey_[patchI];
         const label pKeyJ = patchKey_[patchJ];
 
+        if( pKeyI < 0 || pKeyJ < 0 )
+        {
+            continue;
+            FatalErrorIn
+            (
+                "void boundaryLayers::createLayerCells(const labelList&)"
+            ) << "Patch key is negative at concave edge" << abort(FatalError);
+        }
+
         if( pKeyI == pKeyJ )
             continue;
 
@@ -332,6 +341,10 @@ void boundaryLayers::createLayerCells(const labelList& patchLabels)
             pointProcFaces.append(cellFaces[4]);
             faceAtPatches.append(labelPair(patchI, patchJ));
         }
+
+        # ifdef DEBUGLayer
+        Info << "Adding new cell at edge " << cellFaces << endl;
+        # endif
 
         //- append cell to the queue
         cellsToAdd.appendGraph(cellFaces);
@@ -627,10 +640,6 @@ void boundaryLayers::createLayerCells(const labelList& patchLabels)
 
     //- delete meshSurfaceEngine
     this->clearOut();
-
-    # ifdef DEBUGLayer
-    mesh_.addressingData().checkMesh(true);
-    # endif
 
     Info << "Finished creating layer cells" << endl;
 }

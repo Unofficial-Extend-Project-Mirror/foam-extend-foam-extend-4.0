@@ -31,7 +31,7 @@ License
 
 namespace Foam
 {
-    
+
 defineTypeNameAndDebug(objectRefinement, 0);
 defineRunTimeSelectionTable(objectRefinement, dictionary);
 
@@ -40,7 +40,8 @@ defineRunTimeSelectionTable(objectRefinement, dictionary);
 objectRefinement::objectRefinement()
 :
     name_(),
-    cellSize_()
+    cellSize_(),
+    refThickness_(0.0)
 {}
 
 
@@ -51,8 +52,11 @@ objectRefinement::objectRefinement
 )
 :
     name_(name),
-    cellSize_(readScalar(dict.lookup("cellSize")))
+    cellSize_(readScalar(dict.lookup("cellSize"))),
+    refThickness_(0.0)
 {
+    if( dict.found("refinementThickness") )
+        refThickness_ = readScalar(dict.lookup("refinementThickness"));
 }
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
@@ -62,101 +66,6 @@ objectRefinement::~objectRefinement()
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
-/*
-dictionary Foam::objectRefinement::dict(bool ignoreType) const
-{
-    dictionary dict;
-
-    dict.add("name", name_);
-
-    // only write type for derived types
-    if (!ignoreType && type() != typeName_())
-    {
-        dict.add("type", type());
-    }
-
-    dict.add("origin", origin_);
-    dict.add("e1", e1());
-    dict.add("e3", e3());
-
-    return dict;
-}
-
-void objectRefinement::write(Ostream& os) const
-{
-    os  << type()
-        << " origin: " << origin()
-        << " e1: " << e1() << " e3: " << e3();
-}
-
-
-void objectRefinement::writeDict(Ostream& os, bool subDict) const
-{
-    if (subDict)
-    {
-        os  << indent << name_ << nl
-            << indent << token::BEGIN_BLOCK << incrIndent << nl;
-    }
-
-    // only write type for derived types
-    if (type() != typeName_())
-    {
-        os.writeKeyword("type")  << type()      << token::END_STATEMENT << nl;
-    }
-
-    os.writeKeyword("origin") << origin_  << token::END_STATEMENT << nl;
-    os.writeKeyword("e1")     << e1()     << token::END_STATEMENT << nl;
-    os.writeKeyword("e3")     << e3()     << token::END_STATEMENT << nl;
-
-    if (subDict)
-    {
-        os << decrIndent << indent << token::END_BLOCK << endl;
-    }
-}
-
-void coordinateSystem::operator=(const dictionary& rhs)
-{
-    if (debug)
-    {
-        Pout<< "coordinateSystem::operator=(const dictionary&) : "
-            << "assign from " << rhs << endl;
-    }
-
-    // allow as embedded sub-dictionary "coordinateSystem"
-    const dictionary& dict =
-    (
-        rhs.found(typeName_())
-      ? rhs.subDict(typeName_())
-      : rhs
-    );
-
-    // unspecified origin is (0 0 0)
-    if (dict.found("origin"))
-    {
-        dict.lookup("origin") >> origin_;
-    }
-    else
-    {
-        origin_ = vector::zero;
-    }
-
-    // specify via coordinateRotation
-    if (dict.found("coordinateRotation"))
-    {
-        autoPtr<coordinateRotation> cr =
-            coordinateRotation::New(dict.subDict("coordinateRotation"));
-
-        R_  = cr();
-    }
-    else
-    {
-        // no sub-dictionary - specify via axes
-        R_ = coordinateRotation(dict);
-    }
-
-    Rtr_ = R_.T();
-}
-*/
 
 Ostream& operator<<(Ostream& os, const objectRefinement& obr)
 {

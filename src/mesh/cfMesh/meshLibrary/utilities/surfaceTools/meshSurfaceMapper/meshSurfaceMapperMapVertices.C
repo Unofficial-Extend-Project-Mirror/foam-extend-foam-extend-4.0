@@ -366,16 +366,18 @@ void meshSurfaceMapper::mapVerticesOntoSurfacePatches
             # ifdef USE_OMP
             # pragma omp critical
             # endif
-            parallelBndNodes.append
-            (
-                parMapperHelper
+            {
+                parallelBndNodes.append
                 (
-                    mapPoint,
-                    dSq,
-                    bpI,
-                    -1
-                )
-            );
+                    parMapperHelper
+                    (
+                        mapPoint,
+                        dSq,
+                        bpI,
+                        -1
+                    )
+                );
+            }
         }
 
         # ifdef DEBUGMapping

@@ -37,7 +37,6 @@ SourceFiles
 #ifndef triSurfacePatchManipulator_H
 #define triSurfacePatchManipulator_H
 
-#include "IOdictionary.H"
 #include "triSurf.H"
 #include "VRWGraph.H"
 

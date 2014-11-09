@@ -225,7 +225,7 @@ bool meshOctree::findNearestEdgePoint
 
     DynList<const meshOctreeCube*, 256> neighbours;
 
-    const pointField& sp = surface_.points();
+    const pointField& sPoints = surface_.points();
     const edgeLongList& edges = surface_.edges();
     const VRWGraph& edgeFaces = surface_.edgeFacets();
 
@@ -255,12 +255,14 @@ bool meshOctree::findNearestEdgePoint
 
             forAll(ce, eI)
             {
+                const label edgeI = ce[eI];
+
                 //- find if the edge is in correct patches
                 bool correctPatches(true);
 
-                forAllRow(edgeFaces, ce[eI], efI)
+                forAllRow(edgeFaces, edgeI, efI)
                 {
-                    const label facetI = edgeFaces(ce[eI], efI);
+                    const label facetI = edgeFaces(edgeI, efI);
 
                     if( !regions.contains(surface_[facetI].region()) )
                     {
@@ -272,9 +274,10 @@ bool meshOctree::findNearestEdgePoint
                 if( !correctPatches )
                     continue;
 
-                const point s = sp[edges[ce[eI]].start()];
-                const point e = sp[edges[ce[eI]].end()];
-                const point np = help::nearestPointOnTheEdgeExact(s, e, p);
+                const edge& e = edges[edgeI];
+                const point& sp = sPoints[e.start()];
+                const point& ep = sPoints[e.end()];
+                const point np = help::nearestPointOnTheEdgeExact(sp, ep, p);
                 const scalar dSq = Foam::magSqr(np - p);
 
                 if( dSq < distSq )

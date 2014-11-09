@@ -80,7 +80,7 @@ void meshSurfaceMapper2D::findMappingDistance
         }
 
         //- safety factor
-        mIter->second *= 4.0;
+        mIter->second *= 16.0;
     }
 
     if( Pstream::parRun() )
@@ -420,7 +420,7 @@ void meshSurfaceMapper2D::mapCorners(const labelLongList& edgesToMap)
         scalar distSqApprox;
 
         label iter(0);
-        while( iter++ < 20 )
+        while( iter++ < 40 )
         {
             point newP(vector::zero);
             forAll(ePatches, epI)

@@ -46,9 +46,8 @@ void meshOctreeCube::leavesInBox
     DynList<const meshOctreeCube*, 256>& leaves
 ) const
 {
-    point min, max;
-    this->cubeBox(rootBox, min, max);
-    const boundBox cubeBox(min, max);
+    boundBox cubeBox;
+    this->cubeBox(rootBox, cubeBox.min(), cubeBox.max());
 
     if( cubeBox.overlaps(searchingBox) )
     {
@@ -74,8 +73,10 @@ void meshOctreeCube::leavesInBox
                 else if( Pstream::parRun() )
                 {
                     meshOctreeCubeCoordinates cc = refineForPosition(scI);
-                    cc.cubeBox(rootBox, min, max);
-                    const boundBox bb(min, max);
+
+                    boundBox bb;
+                    cc.cubeBox(rootBox, bb.min(), bb.max());
+
                     if( bb.overlaps(searchingBox) )
                         leaves.append(this);
                 }

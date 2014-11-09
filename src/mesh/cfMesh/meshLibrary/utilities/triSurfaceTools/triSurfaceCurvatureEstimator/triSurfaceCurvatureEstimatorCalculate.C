@@ -28,6 +28,7 @@ Description
 #include "triSurfaceCurvatureEstimator.H"
 #include "matrix3D.H"
 #include "quadricFitting.H"
+#include "helperFunctions.H"
 #include "HashSet.H"
 #include "boolList.H"
 #include "Map.H"
@@ -82,6 +83,69 @@ void writeSurfaceToVTK
     {
         const labelledTri& tri = surf[triI];
         file << 3 << " " << tri[0] << " " << tri[1] << " " << tri[2] << endl;
+    }
+}
+
+void writeSurfaceToVTK
+(
+    OFstream& file,
+    const triSurf& surf,
+    const DynList<label>& triangles,
+    const labelHashSet& labels
+)
+{
+    //- write the header
+    file << "# vtk DataFile Version 3.0\n";
+    file << "vtk output\n";
+    file << "ASCII\n";
+    file << "DATASET POLYDATA\n";
+
+    //- write points
+    std::map<label, label> newPointLabel;
+    forAll(triangles, tI)
+    {
+        const labelledTri& tri = surf[triangles[tI]];
+
+        for(label pI=0;pI<3;++pI)
+        {
+            newPointLabel[tri[pI]];
+        }
+    }
+
+    forAllConstIter(labelHashSet, labels, it)
+        newPointLabel[it.key()];
+
+    const pointField& points = surf.points();
+    file << "POINTS " << label(newPointLabel.size()) << " float\n";
+    label counter(0);
+    for
+    (
+        std::map<label, label>::iterator it=newPointLabel.begin();
+        it!=newPointLabel.end();
+        ++it
+    )
+    {
+        it->second = counter++;
+
+        const point& p = points[it->first];
+
+        file << p.x() << ' ' << p.y() << ' ' << p.z() << ' ';
+
+        file << nl;
+    }
+
+    //- write triangles
+    file << "\n";
+    file << "\nPOLYGONS " << triangles.size()
+         << " " << 4*triangles.size() << endl;
+    forAll(triangles, tI)
+    {
+        const labelledTri& tri = surf[triangles[tI]];
+
+        file << 3
+             << " " << newPointLabel[tri[0]]
+             << " " << newPointLabel[tri[1]]
+             << " " << newPointLabel[tri[2]] << endl;
     }
 }
 
@@ -209,17 +273,15 @@ void triSurfaceCurvatureEstimator::calculateEdgeCurvature()
             {
                 //- calculate the curvature and store it in the map
                 vector e1 = edges[features[0]].vec(points);
-                const scalar d1 = mag(e1);
-                if( d1 > VSMALL )
-                    e1 /= d1;
+                const scalar d1 = mag(e1) + VSMALL;
+                e1 /= d1;
                 vector e2 = edges[features[1]].vec(points);
-                const scalar d2 = mag(e2);
-                if( d2 > VSMALL )
-                    e2 /= d2;
+                const scalar d2 = mag(e2) + VSMALL;
+                e2 /= d2;
 
                 scalar cs = e1 & e2;
                 cs = Foam::min(1.0, cs);
-                cs = Foam::max(1.0, cs);
+                cs = Foam::max(-1.0, cs);
 
                 const scalar curv = Foam::acos(cs) / (0.5 * (d1+d2+VSMALL));
                 edgePointCurvature_[pI] = Foam::mag(curv);
@@ -233,8 +295,6 @@ void triSurfaceCurvatureEstimator::calculateSurfaceCurvatures()
     const VRWGraph& pointTriangles = surface_.pointFacets();
 
     const pointField& points = surface_.points();
-    const VRWGraph& pointEdges = surface_.pointEdges();
-    const edgeLongList& edges = surface_.edges();
 
     patchPositions_.setSize(surface_.size());
     gaussianCurvature_.setSize(points.size());
@@ -292,30 +352,24 @@ void triSurfaceCurvatureEstimator::calculateSurfaceCurvatures()
         {
             const labelHashSet& currLabels = it();
 
+            if( otherLabels[it.key()].size() > 5 )
+                continue;
+
             labelHashSet additionalPoints;
             forAllConstIter(labelHashSet, currLabels, lit)
             {
                 const label neiPointI = lit.key();
-                const constRow pEdges = pointEdges[neiPointI];
+                const constRow pTriangles = pointTriangles[neiPointI];
 
-                forAll(pEdges, peI)
+                forAll(pTriangles, ptI)
                 {
-                    const label neiPointJ =
-                        edges[pEdges[peI]].otherVertex(neiPointI);
+                    const labelledTri& nTri = surface_[pTriangles[ptI]];
 
-                    if( neiPointJ == pointI )
+                    if( nTri.region() != it.key() )
                         continue;
 
-                    bool correctPatch(false);
-                    forAll(pointTriangles[neiPointJ], ntJ)
-                    {
-                        const label pJ = pointTriangles[neiPointJ][ntJ];
-                        if( surface_[pJ].region() == it.key() )
-                            correctPatch = true;
-                    }
-
-                    if( correctPatch )
-                        additionalPoints.insert(neiPointJ);
+                    forAll(nTri, pI)
+                        additionalPoints.insert(nTri[pI]);
                 }
             }
 
@@ -363,8 +417,19 @@ void triSurfaceCurvatureEstimator::calculateSurfaceCurvatures()
 
             # ifdef DEBUGCurvatureEstimator
             Info << "Point " << pointI << " in patch " << regionI
+                << " normal " << normals[it.key()]
+                << " evalution points " << labels
                 << " has max curvature " << qfit.maxCurvature()
                 << " and min curvature " << qfit.minCurvature() << endl;
+            OFstream file
+            (
+                "point_" +
+                help::scalarToText(pointI) +
+                "_region_" +
+                help::scalarToText(regionI) +
+                "_triangles.vtk"
+            );
+            writeSurfaceToVTK(file, surface_, rTriangles, labels);
             # endif
 
             //- store curvatures
@@ -390,9 +455,9 @@ void triSurfaceCurvatureEstimator::calculateSurfaceCurvatures()
             # ifdef USE_OMP
             # pragma omp for schedule(static, 1)
             # endif
-            forAll(pointEdges, pointI)
+            forAll(pointTriangles, pointI)
             {
-                const constRow pEdges = pointEdges[pointI];
+                const constRow pTriangles = pointTriangles[pointI];
 
                 //- find neighbouring points for each patch
                 Map<DynList<label> > patchNeiPoints;
@@ -403,17 +468,21 @@ void triSurfaceCurvatureEstimator::calculateSurfaceCurvatures()
                         DynList<label>()
                     );
 
-                forAll(pEdges, peI)
+                forAll(pTriangles, ptI)
                 {
-                    const edge& e = edges[pEdges[peI]];
-                    const label neiPointI = e.otherVertex(pointI);
+                    const labelledTri& tri = surface_[pTriangles[ptI]];
 
-                    forAll(pointPatches[neiPointI], i)
+                    if( !patchNeiPoints.found(tri.region()) )
+                        patchNeiPoints.insert(tri.region(), DynList<label>());
+
+                    forAll(tri, pI)
                     {
-                        const label patchI = pointPatches[neiPointI][i];
+                        const label neiPointI = tri[pI];
 
-                        if( patchNeiPoints.found(patchI) )
-                            patchNeiPoints[patchI].append(neiPointI);
+                        if( neiPointI == pointI )
+                            continue;
+
+                        patchNeiPoints[tri.region()].appendIfNotIn(neiPointI);
                     }
                 }
 

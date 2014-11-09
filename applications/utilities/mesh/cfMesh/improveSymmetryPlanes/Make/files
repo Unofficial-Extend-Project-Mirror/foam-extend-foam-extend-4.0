@@ -1,0 +1,3 @@
+improveSymmetryPlanes.C
+
+EXE = $(FOAM_APPBIN)/improveSymmetryPlanes

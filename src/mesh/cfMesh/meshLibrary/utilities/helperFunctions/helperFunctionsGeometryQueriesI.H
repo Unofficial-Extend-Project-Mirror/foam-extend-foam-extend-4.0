@@ -70,35 +70,43 @@ bool isinf(const ListType& l)
     return false;
 }
 
+template<class Face1, class Face2>
 inline bool isSharedEdgeConvex
 (
     const pointField& points,
-    const face& f1,
-    const face& f2
+    const Face1& f1,
+    const Face2& f2
 )
 {
-    face triOwn(3);
-    face triNei(3);
+    DynList<label, 3> triOwn(3);
+    DynList<label, 3> triNei(3);
 
     forAll(f1, pI)
     {
-        label pos = f2.which(f1[pI]);
-        if( pos == -1 )
+        label pos(-1);
+        forAll(f2, pJ)
+            if( f2[pJ] == f1[pI] )
+            {
+                pos = pJ;
+                break;
+            }
+
+        if( pos < 0 )
             continue;
 
         triNei[0] = f2[pos];
-        triNei[1] = f2.nextLabel(pos);
-        triNei[2] = f2.prevLabel(pos);
+        triNei[1] = f2[f2.fcIndex(pos)];
+        triNei[2] = f2[f2.rcIndex(pos)];
 
         triOwn[0] = f1[pI];
-        triOwn[1] = f1.nextLabel(pI);
-        triOwn[2] = f1.prevLabel(pI);
+        triOwn[1] = f1[f1.fcIndex(pI)];
+        triOwn[2] = f1[f1.rcIndex(pI)];
 
         scalar vol(0.0);
 
         forAll(triOwn, pJ)
         {
-            if( triNei.which(triOwn[pJ]) == -1 )
+            if( !triNei.contains(triOwn[pJ]) )
             {
                 tetrahedron<point, point> tet
                 (
@@ -118,6 +126,107 @@ inline bool isSharedEdgeConvex
     }
 
     return true;
+}
+
+template<class Face1, class Face2>
+inline scalar angleBetweenFaces
+(
+    const pointField& points,
+    const Face1& f1,
+    const Face2& f2
+)
+{
+    DynList<label, 3> triOwn(3);
+    DynList<label, 3> triNei(3);
+
+    scalar angle(0.0);
+    label counter(0);
+
+    forAll(f1, pI)
+    {
+        label pos(-1);
+        forAll(f2, pJ)
+            if( f2[pJ] == f1[pI] )
+            {
+                pos = pJ;
+                break;
+            }
+
+        if( pos < 0 )
+            continue;
+
+        triNei[0] = f2[pos];
+        triNei[1] = f2[f2.fcIndex(pos)];
+        triNei[2] = f2[f2.rcIndex(pos)];
+
+        triOwn[0] = f1[pI];
+        triOwn[1] = f1[f1.fcIndex(pI)];
+        triOwn[2] = f1[f1.rcIndex(pI)];
+
+        scalar vol(0.0);
+
+        forAll(triOwn, pJ)
+        {
+            if( !triNei.contains(triOwn[pJ]) )
+            {
+                tetrahedron<point, point> tet
+                (
+                    points[triNei[0]],
+                    points[triNei[1]],
+                    points[triNei[2]],
+                    points[triOwn[pJ]]
+                );
+
+                vol = tet.mag();
+                break;
+            }
+        }
+
+        vector nOwn
+        (
+            (points[triOwn[1]] - points[triOwn[0]]) ^
+            (points[triOwn[2]] - points[triOwn[0]])
+        );
+        nOwn /= (mag(nOwn) + VSMALL);
+
+        vector nNei
+        (
+            (points[triNei[1]] - points[triNei[0]]) ^
+            (points[triNei[2]] - points[triNei[0]])
+        );
+        nNei /= (mag(nNei) + VSMALL);
+
+        const scalar dot = Foam::max(-1.0, Foam::min(nOwn & nNei, 1.0));
+
+        if( vol > -VSMALL )
+        {
+            //- the angle is in the interval [Pi, 2Pi>
+            const scalar ang = Foam::acos(dot);
+
+            angle += ang + M_PI;
+            ++counter;
+        }
+        else
+        {
+            //- the angle is in the interval [0, Pi>
+            const scalar ang = Foam::acos(-dot);
+
+            angle += ang;
+            ++counter;
+        }
+    }
+
+    if( counter == 0 )
+    {
+        FatalErrorIn
+        (
+            "scalar angleBetweenFaces"
+            "(const pointField&, const face&, const face&)"
+        ) << "Faces " << f1 << " and " << f2
+          << " do no share an edge" << abort(FatalError);
+    }
+
+    return angle / counter;
 }
 
 inline faceList mergePatchFaces
@@ -769,7 +878,7 @@ inline point nearestPointOnTheEdgeExact
     if( d < VSMALL )
         return edgePoint0;
 
-    const scalar t = (e & k) / (d * d);
+    const scalar t = (e & k) / (d * d + VSMALL);
     if( t > 1.0 )
     {
         return edgePoint1;

@@ -1,0 +1,98 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                |
+| \\      /  F ield         | cfMesh: A library for mesh generation          | 
+|  \\    /   O peration     |                                                |
+|   \\  /    A nd           | Author: Franjo Juretic                         | 
+|    \\/     M anipulation  | E-mail: franjo.juretic@c-fields.com            |
+\*---------------------------------------------------------------------------*/
+
+FoamFile
+{
+    version   2.0;
+    format    ascii;
+    class     dictionary;
+    location  "system";
+    object    meshDict;
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+surfaceFile "singleOrifice.stl";
+
+maxCellSize 3.0;
+
+boundaryCellSize 1.0;
+
+minCellSize 0.50;
+
+localRefinement
+{
+    "orificeRegion.*"
+    {
+        cellSize 0.2;
+    } 
+}
+
+boundaryLayers
+{
+//    nLayers 3;
+
+//    thicknessRatio 1.2;
+
+//    maxFirstLayerThickness 0.5;
+
+    patchBoundaryLayers
+    {
+        "orificeRegion.*"
+        {
+            nLayers           4;
+
+            thicknessRatio    1.2;
+
+            maxFirstLayerThickness 0.2;
+
+            allowDiscontinuity 0;
+        }
+
+    	"fixedWalls.*"
+        {
+            nLayers           4;
+
+            thicknessRatio    1.2;
+
+            maxFirstLayerThickness 0.5;
+
+            allowDiscontinuity 0;
+        }
+    }
+}
+
+renameBoundary
+{
+    defaultName		fixedWalls;
+    defaultType		wall;
+
+    newPatchNames
+    {
+        "orificeRegion.*"
+        {
+            newName	orificeRegion;
+	    newType     wall;
+        }
+ 
+        "inlet.*"
+        {
+            newName     inlet;
+            newType     patch;
+        }
+
+        "outlet.*"
+        {
+            newName     outlet;
+            newType     patch;
+        }
+    }
+}
+               
+     
+// ************************************************************************* //

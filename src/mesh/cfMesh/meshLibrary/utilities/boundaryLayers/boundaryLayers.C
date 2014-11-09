@@ -93,7 +93,7 @@ void boundaryLayers::findPatchesToBeTreatedTogether()
     {
         const label bpI = it.key();
 
-        if( mPart.numberOfFeatureEdgesAtPoint(bpI) != 3 )
+        if( mPart.numberOfFeatureEdgesAtPoint(bpI) > 3 )
         {
             labelHashSet commonPatches;
             DynList<label> allPatches;
@@ -133,18 +133,18 @@ void boundaryLayers::findPatchesToBeTreatedTogether()
     const labelHashSet& invertedVertices = vertexCheck.invertedVertices();
 
     std::map<std::pair<label, label>, Pair<label> > edgeClassification;
-    labelLongList procEdges;
     forAll(eFaces, eI)
     {
         if( eFaces.sizeOfRow(eI) != 2 )
-        {
-            procEdges.append(eI);
             continue;
-        }
 
         //- check if the any of the face vertices is tangled
         const edge& e = edges[eI];
-        if( invertedVertices.found(e[0]) || invertedVertices.found(e[1]) )
+        if
+        (
+            !is2DMesh_ &&
+            (invertedVertices.found(e[0]) || invertedVertices.found(e[1]))
+        )
             continue;
 
         const label patch0 = boundaryFacePatches[eFaces(eI, 0)];
@@ -164,7 +164,12 @@ void boundaryLayers::findPatchesToBeTreatedTogether()
 
             const face& f1 = bFaces[eFaces(eI, 0)];
             const face& f2 = bFaces[eFaces(eI, 1)];
-            if( !help::isSharedEdgeConvex(points, f1, f2) )
+
+            if
+            (
+                !help::isSharedEdgeConvex(points, f1, f2) ||
+                (help::angleBetweenFaces(points, f1, f2) > 0.75 * M_PI)
+            )
             {
                 ++edgeClassification[pp].second();
             }
@@ -177,9 +182,10 @@ void boundaryLayers::findPatchesToBeTreatedTogether()
 
     if( Pstream::parRun() )
     {
+        const labelList& bPoints = mse.boundaryPoints();
+
         //- check faces over processor edges
         const labelList& globalEdgeLabel = mse.globalBoundaryEdgeLabel();
-        const VRWGraph& beAtProcs = mse.beAtProcs();
         const Map<label>& globalToLocal = mse.globalToLocalBndEdgeAddressing();
 
         const DynList<label>& neiProcs = mse.beNeiProcs();
@@ -203,14 +209,20 @@ void boundaryLayers::findPatchesToBeTreatedTogether()
         }
 
         //- store faces for sending
-        forAll(procEdges, eI)
+        forAllConstIter(Map<label>, otherFaceProc, it)
         {
-            const label beI = procEdges[eI];
+            const label beI = it.key();
+
             if( eFaces.sizeOfRow(beI) == 0 )
                 continue;
 
             const edge& e = edges[beI];
-            if( invertedVertices.found(e[0]) || invertedVertices.found(e[1]) )
+
+            if
+            (
+                !is2DMesh_ &&
+                (invertedVertices.found(e[0]) || invertedVertices.found(e[1]))
+            )
                 continue;
 
             //- do not send data if the face on other processor
@@ -220,30 +232,25 @@ void boundaryLayers::findPatchesToBeTreatedTogether()
 
             const face& f = bFaces[eFaces(beI, 0)];
 
-            forAllRow(beAtProcs, beI, procI)
-            {
-                const label neiProc = beAtProcs(beI, procI);
-                if( neiProc == Pstream::myProcNo() )
-                    continue;
+            const label neiProc = it();
 
-                //- each face is sent as follows
-                //- 1. global edge label
-                //- 2. number of face nodes
-                //- 3. faces nodes and vertex coordinates
-                LongList<labelledPoint>& dps = exchangePoints[neiProc];
-                dps.append(labelledPoint(globalEdgeLabel[beI], point()));
-                dps.append(labelledPoint(f.size(), point()));
-                forAll(f, pI)
-                {
-                    dps.append
+            //- each face is sent as follows
+            //- 1. global edge label
+            //- 2. number of face nodes
+            //- 3. faces nodes and vertex coordinates
+            LongList<labelledPoint>& dps = exchangePoints[neiProc];
+            dps.append(labelledPoint(globalEdgeLabel[beI], point()));
+            dps.append(labelledPoint(f.size(), point()));
+            forAll(f, pI)
+            {
+                dps.append
+                (
+                    labelledPoint
                     (
-                        labelledPoint
-                        (
-                            globalPointLabel[bp[f[pI]]],
-                            points[f[pI]]
-                        )
-                    );
-                }
+                        globalPointLabel[bp[f[pI]]],
+                        points[f[pI]]
+                    )
+                );
             }
         }
 
@@ -258,14 +265,16 @@ void boundaryLayers::findPatchesToBeTreatedTogether()
         {
             const label beI =
                 globalToLocal[receivedData[counter++].pointLabel()];
-            face f(receivedData[counter++].pointLabel());
+
+            DynList<label> f(receivedData[counter++].pointLabel());
             forAll(f, pI)
             {
                 const labelledPoint& lp = receivedData[counter++];
+
                 if( globalPointToLocal.found(lp.pointLabel()) )
                 {
                     //- this point already exist on this processor
-                    f[pI] = globalPointToLocal[lp.pointLabel()];
+                    f[pI] = bPoints[globalPointToLocal[lp.pointLabel()]];
                 }
                 else
                 {
@@ -287,6 +296,8 @@ void boundaryLayers::findPatchesToBeTreatedTogether()
                 }
             }
 
+            const face& bf = bFaces[eFaces(beI, 0)];
+
             const label patch0 = boundaryFacePatches[eFaces(beI, 0)];
             const label patch1 = otherProcPatches[beI];
 
@@ -303,7 +314,10 @@ void boundaryLayers::findPatchesToBeTreatedTogether()
 
             if(
                 (otherFaceProc[beI] > Pstream::myProcNo()) &&
-                !help::isSharedEdgeConvex(points, bFaces[eFaces(beI, 0)], f)
+                (
+                    !help::isSharedEdgeConvex(points, bf, f) ||
+                    (help::angleBetweenFaces(points, bf, f) > 0.75 * M_PI)
+                )
             )
             {
                 ++edgeClassification[pp].second();
@@ -443,6 +457,35 @@ void boundaryLayers::findPatchesToBeTreatedTogether()
 
     Info << "Patch names " << patchNames_ << endl;
     Info << "Treat patches with patch " << treatPatchesWithPatch_ << endl;
+
+    label layerI(0), subsetId;
+    boolList usedPatch(treatPatchesWithPatch_.size(), false);
+    const PtrList<boundaryPatch>& boundaries = mesh_.boundaries();
+
+    forAll(treatPatchesWithPatch_, patchI)
+    {
+        if( usedPatch[patchI] || (boundaries[patchI].patchSize() == 0) )
+            continue;
+
+        Info << "Adding layer subset " << layerI
+             << " for patch " << patchI << endl;
+        usedPatch[patchI] = true;
+        subsetId = mesh_.addFaceSubset("layer_"+help::scalarToText(layerI));
+        ++layerI;
+
+        forAll(treatPatchesWithPatch_[patchI], i)
+        {
+            const label cPatch = treatPatchesWithPatch_[patchI][i];
+            usedPatch[cPatch] = true;
+
+            label start = boundaries[cPatch].patchStart();
+            const label size = boundaries[cPatch].patchSize();
+            for(label i=0;i<size;++i)
+                mesh_.addFaceToSubset(subsetId, start++);
+        }
+    }
+
+    mesh_.write();
     # endif
 
     geometryAnalysed_ = true;
@@ -498,6 +541,7 @@ boundaryLayers::boundaryLayers
     meshPartitionerPtr_(NULL),
     patchWiseLayers_(true),
     terminateLayersAtConcaveEdges_(false),
+    is2DMesh_(false),
     patchNames_(),
     treatedPatch_(),
     treatPatchesWithPatch_(),
@@ -597,6 +641,8 @@ void boundaryLayers::activate2DMode()
             if( treatedPatch_[patches[i]] )
                 patches.removeElement(i);
     }
+
+    is2DMesh_ = true;
 }
 
 void boundaryLayers::addLayerForAllPatches()
