@@ -72,6 +72,9 @@
                   compiling Foam
   - opensuse13 ::  OpenSUSE 13.1 machine. The current LTS-version of
                    OpenSUSE
+  - archlinux :: An ArchLinux-machine. Might take a long time during
+                 provisioning as the script updated the full
+                 OS.
   Some machines (read: the BSD-boxes) need the =VirtualBox Extension
   Pack= installed (because they have USB 2.0)
 * Scripts in the machine

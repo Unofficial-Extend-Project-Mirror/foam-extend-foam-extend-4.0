@@ -12,6 +12,7 @@ do
     else
 	echo "Copying $target from skeleton"
 	cp -r "/vagrant/skel/$f" $target
+        chown -R vagrant:vagrant $target
     fi
 done
 
