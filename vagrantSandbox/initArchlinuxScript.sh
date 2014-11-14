@@ -30,6 +30,12 @@ for p in ${thirdpartyPackages[@]}; do
     pacman --noconfirm -S $p
 done
 
+# for the used archlinux-Box the /home is too small but / is big enough
+
+mkdir /Foam
+ln -s /Foam/ /home/vagrant/foam/
+chown vagrant:vagrant /Foam
+
 echo
 echo "Archlinux-specific ended. Now doing general stuff"
 echo
