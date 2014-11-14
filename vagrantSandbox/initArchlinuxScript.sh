@@ -33,7 +33,7 @@ done
 # for the used archlinux-Box the /home is too small but / is big enough
 
 mkdir /Foam
-ln -s /Foam/ /home/vagrant/foam/
+ln -s /Foam/ /home/vagrant/foam
 chown vagrant:vagrant /Foam
 
 echo

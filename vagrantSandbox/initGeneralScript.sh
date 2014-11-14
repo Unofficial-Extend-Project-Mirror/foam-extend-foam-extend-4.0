@@ -18,7 +18,12 @@ done
 
 OFDIR=/home/vagrant/foam/
 
-mkdir -vp $OFDIR
+# make sure that a symbolic link is not erased
+if [ ! -e $OFDIR ]; then
+    echo "Making directory $OFDIR"
+    mkdir -vp $OFDIR
+fi
+
 chown -R vagrant:vagrant $OFDIR
 
 # for distros that don't have group vagrant
@@ -42,7 +47,7 @@ then
 	echo
 
 	# su -c not correctly working on FreeBSD
-	su vagrant - -c "git clone $OFParent $OFClone"
+	su - vagrant -c "git clone $OFParent $OFClone"
 
 	echo
 	echo "Git cloned: TODO: set same branch as parent"
@@ -58,7 +63,7 @@ then
 
 	echo "Parent is on id $idName"
 	echo "Cloning. This may take some time"
-	su vagrant - -c "hg clone -u $idName $OFParent $OFClone"
+	su - vagrant -c "hg clone -u $idName $OFParent $OFClone"
 	echo
     else
 	echo
