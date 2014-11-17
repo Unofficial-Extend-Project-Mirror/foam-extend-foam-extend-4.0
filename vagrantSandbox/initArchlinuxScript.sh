@@ -14,7 +14,7 @@ pacman -Syu
 
 yaourt --noconfirm -S rpm-org
 
-neededPackages=(gcc-fortran ccache mercurial bison flex git )
+neededPackages=(gcc-fortran ccache mercurial bison flex git svn)
 bonusPackages=(emacs tcsh)
 thirdpartyPackages=(openmpi cmake hwloc)
 
