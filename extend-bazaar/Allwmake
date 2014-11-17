@@ -21,12 +21,12 @@ setDestination()
     fi
 
     # remove installation to general binaries
-    find $pkg -type f | grep "Make/files" | xargs sed -i "" -e s/FOAM_LIBBIN/FOAM_${dst}_LIBBIN/g
-    find $pkg -type f | grep "Make/files" | xargs sed -i "" -e s/FOAM_APPBIN/FOAM_${dst}_APPBIN/g
+    find $pkg -type f | grep "Make/files" | grep -v bak | xargs sed -i.bak -e s/FOAM_LIBBIN/FOAM_${dst}_LIBBIN/g
+    find $pkg -type f | grep "Make/files" | grep -v bak | xargs sed -i.bak -e s/FOAM_APPBIN/FOAM_${dst}_APPBIN/g
 
     # revert installation to the "other" destination
-    find $pkg -type f | grep "Make/files" | xargs sed -i "" -e s/FOAM_${wrong}_LIBBIN/FOAM_${dst}_LIBBIN/g
-    find $pkg -type f | grep "Make/files" | xargs sed -i "" -e s/FOAM_${wrong}_APPBIN/FOAM_${dst}_APPBIN/g
+    find $pkg -type f | grep "Make/files" | grep -v bak | xargs sed -i.bak -e s/FOAM_${wrong}_LIBBIN/FOAM_${dst}_LIBBIN/g
+    find $pkg -type f | grep "Make/files" | grep -v bak | xargs sed -i.bak -e s/FOAM_${wrong}_APPBIN/FOAM_${dst}_APPBIN/g
 
 }
 
