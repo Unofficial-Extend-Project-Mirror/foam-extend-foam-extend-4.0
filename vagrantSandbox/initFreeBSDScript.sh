@@ -20,6 +20,11 @@ for p in ${bonusPackages[@]}; do
 done
 
 echo
+echo "Upgrading all to get working packages"
+echo
+pkg upgrade -y
+
+echo
 echo "FreeBSD-specific ended. Now doing general stuff"
 echo
 
