@@ -67,7 +67,10 @@
                  then halt the machine and bring it up again (with the
                  =--provision=-option)
   - freebsd10 :: FreeBSD 10.0 32-big machine. Tries to set up shared
-                 folders via NFS. Currently not working
+                 folders via NFS. Needs user interaction during
+                 creation (password to get root privileges to
+                 manipulate the =/etc/exports=-file to allow the
+                 NFS-sharing)
   - opensuse12 :: OpenSUSE 12.3 machine. Currently not completely
                   compiling Foam
   - opensuse13 ::  OpenSUSE 13.1 machine. The current LTS-version of
