@@ -9,8 +9,9 @@ Author:
 
 """
 
-from PyFoamApplication import PyFoamApplication
+from PyFoam.Applications.PyFoamApplication import PyFoamApplication
 from PyFoam.RunDictionary.ParsedParameterFile import ParsedParameterFile
+from PyFoam.ThirdParty.six import print_
 from os import path
 import sys
 import re
@@ -74,7 +75,7 @@ Change GGI boundary condition parameters
                                dest="separationOffset",
                                default=None,
                                help='separation offset for cyclicGgi')
-        
+
         self.parser.add_option("--test",
                                action="store_true",
                                default=False,
@@ -84,7 +85,7 @@ Change GGI boundary condition parameters
     def run(self):
         fName=self.parser.getArgs()[0]
         bName=self.parser.getArgs()[1]
- 
+
         boundary=ParsedParameterFile(path.join(".",fName,"constant","polyMesh","boundary"),debug=False,boundaryDict=True)
 
         bnd=boundary.content
@@ -123,7 +124,7 @@ Change GGI boundary condition parameters
                             val["separationOffset"]=self.parser.getOptions().separationOffset
 
 
-                    # Deprecated        
+                    # Deprecated
                     if self.parser.getOptions().shadowName!=None:
                         self.warning("\n    PatchName:",bName,":  Option --shadowName is deprecated. Use --shadowPatch instead\n")
                         shadowName=self.parser.getOptions().shadowName
@@ -131,26 +132,25 @@ Change GGI boundary condition parameters
                         if shadowName not in bnd:
                             self.error("\n    Option --shadowName for patch:",bName,": there is no patch called",shadowName,"\n")
 
-                    # Deprecated        
+                    # Deprecated
                     if self.parser.getOptions().patchZoneName!=None:
                         self.warning("\n    PatchName:",bName,":  Option --patchZoneName is deprecated. Use --zone instead\n")
                         val["zone"]=self.parser.getOptions().patchZoneName
 
-                    # Deprecated        
+                    # Deprecated
                     if self.parser.getOptions().bridgeOverlapFlag!=None:
                         self.warning("\n    PatchName:",bName,":  Option --bridgeOverlapFlag is deprecated. Use --bridgeOverlap instead\n")
                         val["bridgeOverlap"]=self.parser.getOptions().bridgeOverlapFlag
 
 
                 else:
-                    print "Unsupported GGI type '",bcType,"' for patch",bName
+                    print_("Unsupported GGI type '",bcType,"' for patch",bName)
                 break
 
         if not found:
             self.error("Boundary",bName,"not found in",bnd[::2])
 
         if self.parser.getOptions().test:
-            print boundary
+            print_(boundary)
         else:
             boundary.writeFile()
-

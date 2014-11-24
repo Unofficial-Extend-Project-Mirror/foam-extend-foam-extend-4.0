@@ -1,5 +1,5 @@
 #!/usr/bin/env python
 
-from PyFoam.Applications.ChangeMixingPlaneBoundary import ChangeMixingPlaneBoundary
+from PyFoam.Site.ChangeMixingPlaneBoundary import ChangeMixingPlaneBoundary
 
 ChangeMixingPlaneBoundary()
