@@ -640,6 +640,15 @@ export MPI_BUFFER_SIZE
 }
 [ "$FOAM_VERBOSE" -a "$PS1" ] && echo "    PYFOAM_DIR is initialized to: $PYFOAM_DIR"
 
+# Make sure that there is a special directory for special PyFoam-scripts
+[ -z "$PYFOAM_SITE_DIR" ] && export PYFOAM_SITE_DIR=$WM_THIRD_PARTY_DIR/PyFoamSiteScripts
+if [ -d $PYFOAM_SITE_DIR/bin ]
+then
+    _foamAddPath $PYFOAM_SITE_DIR/bin
+fi
+
+[ "$FOAM_VERBOSE" -a "$PS1" ] && echo "    PYFOAM_SITE_DIR is initialized to: $PYFOAM_SITE_DIR"
+
 # Load hwloc
 # ~~~~~~~~~~~
 [ -z "$HWLOC_SYSTEM" ] && [ -e $WM_THIRD_PARTY_DIR/packages/hwloc-1.7.2/platforms/$WM_OPTIONS ] && {
