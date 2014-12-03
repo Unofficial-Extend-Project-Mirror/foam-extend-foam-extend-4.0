@@ -27,8 +27,6 @@ License
 #include "Ostream.H"
 #include "token.H"
 
-#include "Time.H"
-
 // * * * * * * * * * * * * * * * IOstream Operators  * * * * * * * * * * * * //
 
 template<class T, Foam::label Offset>

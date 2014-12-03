@@ -866,14 +866,19 @@ void checkMeshDict::updateBoundaryLayers
 
                 const std::map<word, wordList>::const_iterator it =
                     patchesFromPatch.find(pName);
-                const wordList& newNames = it->second;
 
-                forAll(newNames, i)
+                //- patch name may be a regex
+                if( it != patchesFromPatch.end() )
                 {
-                    patchBndLayers.add(newNames[i], dict);
-                }
+                    const wordList& newNames = it->second;
 
-                patchBndLayers.remove(pName);
+                    forAll(newNames, i)
+                    {
+                        patchBndLayers.add(newNames[i], dict);
+                    }
+
+                    patchBndLayers.remove(pName);
+                }
             }
         }
     }

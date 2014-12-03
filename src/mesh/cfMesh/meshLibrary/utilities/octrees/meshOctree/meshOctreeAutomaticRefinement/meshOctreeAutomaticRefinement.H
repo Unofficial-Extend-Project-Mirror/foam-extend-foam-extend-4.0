@@ -37,6 +37,7 @@ SourceFiles
 #define meshOctreeAutomaticRefinement_H
 
 #include "meshOctreeModifier.H"
+#include "IOdictionary.H"
 //#include "volFields.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
