@@ -88,7 +88,7 @@ Ostream& operator<<(Ostream&, const globalMeshData&);
 
 
 /*---------------------------------------------------------------------------*\
-                           Class globalMeshData Declaration
+                       Class globalMeshData Declaration
 \*---------------------------------------------------------------------------*/
 
 class globalMeshData
