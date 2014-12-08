@@ -962,6 +962,17 @@ void Foam::ggiPolyPatch::calcTransforms() const
                     << abort(FatalError);
             }
         }
+        else
+        {
+            InfoIn("label ggiPolyPatch::shadowIndex() const")
+                << "ggi patch " << name() << " with shadow "
+                << shadowName() << " has "
+                << patchToPatch().uncoveredMasterFaces().size()
+                << " uncovered master faces and "
+                << patchToPatch().uncoveredSlaveFaces().size()
+                << " uncovered slave faces.  Bridging is switched on. "
+                << abort(FatalError);
+        }
     }
 }
 
