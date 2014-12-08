@@ -168,7 +168,7 @@ void Foam::polyBoundaryMesh::calcGeometry()
 }
 
 
-const Foam::List<Foam::labelPairList>&
+const Foam::labelPairListList&
 Foam::polyBoundaryMesh::neighbourEdges() const
 {
     if (Pstream::parRun())
@@ -180,8 +180,8 @@ Foam::polyBoundaryMesh::neighbourEdges() const
 
     if (!neighbourEdgesPtr_)
     {
-        neighbourEdgesPtr_ = new List<labelPairList>(size());
-        List<labelPairList>& neighbourEdges = *neighbourEdgesPtr_;
+        neighbourEdgesPtr_ = new labelPairListList(size());
+        labelPairListList& neighbourEdges = *neighbourEdgesPtr_;
 
         // Initialize.
         label nEdgePairs = 0;

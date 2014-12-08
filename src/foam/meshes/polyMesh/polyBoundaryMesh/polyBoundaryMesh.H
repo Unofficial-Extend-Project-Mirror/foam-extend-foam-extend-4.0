@@ -37,14 +37,13 @@ SourceFiles
 
 #include "polyPatchList.H"
 #include "regIOobject.H"
-#include "labelPair.H"
+#include "labelPairList.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 
-typedef List<labelPair> labelPairList;
 class polyMesh;
 
 // Forward declaration of friend functions and operators
@@ -69,7 +68,7 @@ class polyBoundaryMesh
         const polyMesh& mesh_;
 
         //- Edges of neighbouring patches
-        mutable List<labelPairList>* neighbourEdgesPtr_;
+        mutable labelPairListList* neighbourEdgesPtr_;
 
 
     // Private Member Functions
@@ -138,13 +137,14 @@ public:
             return mesh_;
         }
 
-        //- Per patch the edges on the neighbouring patch. Is for every external
-        //  edge the neighbouring patch and neighbouring (external) patch edge
-        //  label. Note that edge indices are offset by nInternalEdges to keep
-        //  it as much as possible consistent with coupled patch addressing
+        //- Per patch the edges on the neighbouring patch
+        //  For every external edge the neighbouring patch and
+        //  neighbouring (external) patch edge label.  Note that edge
+        //  indices are offset by nInternalEdges to keep it as much as
+        //  possible consistent with coupled patch addressing
         //  (where coupling is by local patch face index).
         //  Only valid for singly connected polyBoundaryMesh and not parallel
-        const List<labelPairList>& neighbourEdges() const;
+        const labelPairListList& neighbourEdges() const;
 
         //- Return a list of patch names
         wordList names() const;

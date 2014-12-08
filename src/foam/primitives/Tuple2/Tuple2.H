@@ -25,7 +25,7 @@ Class
     Foam::Tuple2
 
 Description
-    A 2-tuple.
+    A 2-tuple: storing two objects of different types.
 
 SeeAlso
     Foam::Pair for storing two objects of identical types.
