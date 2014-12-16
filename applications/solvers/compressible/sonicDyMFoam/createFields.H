@@ -6,6 +6,7 @@
     );
     basicPsiThermo& thermo = pThermo();
 
+    volScalarField& T = const_cast<volScalarField&>(thermo.T());
     volScalarField& p = thermo.p();
     volScalarField& e = thermo.e();
     const volScalarField& psi = thermo.psi();
