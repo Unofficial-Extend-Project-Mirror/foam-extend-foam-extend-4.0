@@ -156,6 +156,9 @@ public:
         fvDOM(const volScalarField& T);
 
         //- Construct from components
+        fvDOM(const word& type, const volScalarField& T);
+
+        //- Construct from components
         fvDOM(const dictionary& dict, const volScalarField& T);
 
 
@@ -171,7 +174,7 @@ public:
             void calculate();
 
             //- Read radiation properties dictionary
-            bool read();
+            virtual bool read();
 
             //- Update G and calculate total heat flux on boundary
             void updateG();
