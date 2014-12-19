@@ -309,6 +309,55 @@ Foam::radiation::fvDOM::~fvDOM()
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
+Foam::tmp<Foam::volScalarField::GeometricBoundaryField>
+Foam::radiation::fvDOM::Qin() const
+{
+    tmp<volScalarField::GeometricBoundaryField> tQin
+    (
+        new volScalarField::GeometricBoundaryField
+        (
+            mesh().boundary(),
+            mesh().V(),           // Dummy internal field,
+            calculatedFvPatchScalarField::typeName
+        )
+    );
+    volScalarField::GeometricBoundaryField& sumQin = tQin();
+
+    sumQin = 0;
+
+    forAll(Qin_, lambdaI)
+    {
+        sumQin += Qin(lambdaI);
+    }
+
+    return tQin;
+}
+
+
+Foam::tmp<Foam::volScalarField::GeometricBoundaryField>
+Foam::radiation::fvDOM::Qem() const
+{
+    tmp<volScalarField::GeometricBoundaryField> tsumQem
+    (
+        new volScalarField::GeometricBoundaryField
+        (
+            mesh().boundary(),
+            mesh().V(),           // Dummy internal field,
+            calculatedFvPatchScalarField::typeName
+        )
+    );
+    volScalarField::GeometricBoundaryField& sumQem = tsumQem();
+
+    sumQem = 0;
+
+    forAll(Qem_, lambdaI)
+    {
+        sumQem += Qem(lambdaI);
+    }
+
+    return tsumQem;
+}
+
 
 bool Foam::radiation::fvDOM::read()
 {

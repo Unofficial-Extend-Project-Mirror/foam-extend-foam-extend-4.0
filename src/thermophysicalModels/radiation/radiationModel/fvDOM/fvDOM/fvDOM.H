@@ -234,6 +234,12 @@ public:
                 const label lambda
             ) const;
 
+            //- Total incident radiative heat flux field
+            tmp<volScalarField::GeometricBoundaryField> Qin() const;
+
+            //- Total emitted radiative heat flux field
+            tmp<volScalarField::GeometricBoundaryField> Qem() const;
+
             //- Const access to black body
             inline const blackBodyEmission& blackBody() const;
 
