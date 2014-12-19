@@ -38,75 +38,14 @@ namespace Foam
     namespace radiation
     {
         defineTypeNameAndDebug(fvDOM, 0);
-
-        addToRunTimeSelectionTable
-        (
-            radiationModel,
-            fvDOM,
-            dictionary
-        );
+        addToRadiationRunTimeSelectionTables(fvDOM);
     }
 }
 
 
-// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
-Foam::radiation::fvDOM::fvDOM(const volScalarField& T)
-:
-    radiationModel(typeName, T),
-    G_
-    (
-        IOobject
-        (
-            "G",
-            mesh().time().timeName(),
-            T.db(),
-            IOobject::NO_READ,
-            IOobject::AUTO_WRITE
-        ),
-        mesh(),
-        dimensionedScalar("G", dimMass/pow3(dimTime), 0.0)
-    ),
-    Qr_
-    (
-        IOobject
-        (
-            "Qr",
-            mesh_.time().timeName(),
-            T.db(),
-            IOobject::READ_IF_PRESENT,
-            IOobject::AUTO_WRITE
-        ),
-        mesh_,
-        dimensionedScalar("Qr", dimMass/pow3(dimTime), 0.0)
-    ),
-    a_
-    (
-        IOobject
-        (
-            "a",
-            mesh().time().timeName(),
-            T.db(),
-            IOobject::NO_READ,
-            IOobject::AUTO_WRITE
-        ),
-        mesh(),
-        dimensionedScalar("a", dimless/dimLength, 0.0)
-    ),
-    nTheta_(readLabel(coeffs_.lookup("nTheta"))),
-    nPhi_(readLabel(coeffs_.lookup("nPhi"))),
-    nRay_(0),
-    nLambda_(absorptionEmission_->nBands()),
-    aLambda_(nLambda_),
-    blackBody_(nLambda_, T),
-    IRay_(0),
-    Qem_(nLambda_),
-    Qin_(nLambda_),
-    convergence_(coeffs_.lookupOrDefault<scalar>("convergence", 0.0)),
-    maxIter_(coeffs_.lookupOrDefault<label>("maxIter", 50)),
-    fvRayDiv_(nLambda_),
-    cacheDiv_(coeffs_.lookupOrDefault<bool>("cacheDiv", false)),
-    omegaMax_(0)
+void Foam::radiation::fvDOM::initialise()
 {
     if (mesh().nSolutionD() == 3)    //3D
     {
@@ -221,7 +160,7 @@ Foam::radiation::fvDOM::fvDOM(const volScalarField& T)
                 (
                     "aLambda_" + Foam::name(lambdaI) ,
                     mesh().time().timeName(),
-                    T.db(),
+                    T_.db(),
                     IOobject::NO_READ,
                     IOobject::NO_WRITE
                 ),
@@ -298,6 +237,133 @@ Foam::radiation::fvDOM::fvDOM(const volScalarField& T)
     }
 
     Info<< endl;
+}
+
+// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
+
+Foam::radiation::fvDOM::fvDOM(const volScalarField& T)
+:
+    radiationModel(typeName, T),
+    G_
+    (
+        IOobject
+        (
+            "G",
+            mesh().time().timeName(),
+            T.db(),
+            IOobject::NO_READ,
+            IOobject::AUTO_WRITE
+        ),
+        mesh(),
+        dimensionedScalar("G", dimMass/pow3(dimTime), 0.0)
+    ),
+    Qr_
+    (
+        IOobject
+        (
+            "Qr",
+            mesh_.time().timeName(),
+            T.db(),
+            IOobject::READ_IF_PRESENT,
+            IOobject::AUTO_WRITE
+        ),
+        mesh_,
+        dimensionedScalar("Qr", dimMass/pow3(dimTime), 0.0)
+    ),
+    a_
+    (
+        IOobject
+        (
+            "a",
+            mesh().time().timeName(),
+            T.db(),
+            IOobject::NO_READ,
+            IOobject::AUTO_WRITE
+        ),
+        mesh(),
+        dimensionedScalar("a", dimless/dimLength, 0.0)
+    ),
+    nTheta_(readLabel(coeffs_.lookup("nTheta"))),
+    nPhi_(readLabel(coeffs_.lookup("nPhi"))),
+    nRay_(0),
+    nLambda_(absorptionEmission_->nBands()),
+    aLambda_(nLambda_),
+    blackBody_(nLambda_, T),
+    IRay_(0),
+    Qem_(nLambda_),
+    Qin_(nLambda_),
+    convergence_(coeffs_.lookupOrDefault<scalar>("convergence", 0.0)),
+    maxIter_(coeffs_.lookupOrDefault<label>("maxIter", 50)),
+    fvRayDiv_(nLambda_),
+    cacheDiv_(coeffs_.lookupOrDefault<bool>("cacheDiv", false)),
+    omegaMax_(0)
+{
+    initialise();
+}
+
+
+Foam::radiation::fvDOM::fvDOM
+(
+    const dictionary& dict,
+    const volScalarField& T
+)
+:
+    radiationModel(typeName, dict, T),
+    G_
+    (
+        IOobject
+        (
+            "G",
+            mesh().time().timeName(),
+            T.db(),
+            IOobject::NO_READ,
+            IOobject::AUTO_WRITE
+        ),
+        mesh(),
+        dimensionedScalar("G", dimMass/pow3(dimTime), 0.0)
+    ),
+    Qr_
+    (
+        IOobject
+        (
+            "Qr",
+            mesh_.time().timeName(),
+            T.db(),
+            IOobject::READ_IF_PRESENT,
+            IOobject::AUTO_WRITE
+        ),
+        mesh_,
+        dimensionedScalar("Qr", dimMass/pow3(dimTime), 0.0)
+    ),
+    a_
+    (
+        IOobject
+        (
+            "a",
+            mesh().time().timeName(),
+            T.db(),
+            IOobject::NO_READ,
+            IOobject::AUTO_WRITE
+        ),
+        mesh(),
+        dimensionedScalar("a", dimless/dimLength, 0.0)
+    ),
+    nTheta_(readLabel(coeffs_.lookup("nTheta"))),
+    nPhi_(readLabel(coeffs_.lookup("nPhi"))),
+    nRay_(0),
+    nLambda_(absorptionEmission_->nBands()),
+    aLambda_(nLambda_),
+    blackBody_(nLambda_, T),
+    IRay_(0),
+    Qem_(nLambda_),
+    Qin_(nLambda_),
+    convergence_(coeffs_.lookupOrDefault<scalar>("convergence", 0.0)),
+    maxIter_(coeffs_.lookupOrDefault<label>("maxIter", 50)),
+    fvRayDiv_(nLambda_),
+    cacheDiv_(coeffs_.lookupOrDefault<bool>("cacheDiv", false)),
+    omegaMax_(0)
+{
+    initialise();
 }
 
 

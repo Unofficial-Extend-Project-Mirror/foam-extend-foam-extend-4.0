@@ -131,6 +131,9 @@ class fvDOM
 
     // Private member functions
 
+        //- Initialise
+        void initialise();
+
         //- Disallow default bitwise copy construct
         fvDOM(const fvDOM&);
 
@@ -151,6 +154,9 @@ public:
 
         //- Construct from components
         fvDOM(const volScalarField& T);
+
+        //- Construct from components
+        fvDOM(const dictionary& dict, const volScalarField& T);
 
 
     //- Destructor
