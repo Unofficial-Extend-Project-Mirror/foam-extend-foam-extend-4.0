@@ -80,6 +80,9 @@ class fvDOM
         //- Incident radiation  [W/m2]
         volScalarField G_;
 
+        //- Total radiative heat flux [W/m2]
+        volScalarField Qr_;
+
         //- Total absorption coefficient [1/m]
         volScalarField a_;
 
@@ -156,41 +159,31 @@ public:
 
     // Member functions
 
-        //- Total incident radiative heat flux field
-        tmp<volScalarField::GeometricBoundaryField> Qin() const;
+        // Edit
 
-        //- Total emitted radiative heat flux field
-        tmp<volScalarField::GeometricBoundaryField> Qem() const;
+            //- Solve radiation equation(s)
+            void calculate();
 
-        //- Total radiative heat flux as difference of Qem and Qin
-        tmp<volScalarField::GeometricBoundaryField> Qr() const;
+            //- Read radiation properties dictionary
+            bool read();
 
-        //- Band-wise radiative heat flux as difference of Qem and Qin
-        tmp<volScalarField::GeometricBoundaryField> Qr(scalar lambda) const;
+            //- Update G and calculate total heat flux on boundary
+            void updateG();
 
-        //- Solve radiation equation(s)
-        void calculate();
+            //- Set the rayId and lambdaId from by decomposing an intensity
+            //  field name
+            void setRayIdLambdaId
+            (
+                const word& name,
+                label& rayId,
+                label& lambdaId
+            ) const;
 
-        //- Read radiation properties dictionary
-        bool read();
+            //- Source term component (for power of T^4)
+            virtual tmp<volScalarField> Rp() const;
 
-        //- Update G and calculate total heat flux on boundary
-        void updateG();
-
-        //- Set the rayId and lambdaId from by decomposing an intensity
-        //  field name
-        void setRayIdLambdaId
-        (
-            const word& name,
-            label& rayId,
-            label& lambdaId
-        ) const;
-
-        //- Source term component (for power of T^4)
-        virtual tmp<volScalarField> Rp() const;
-
-        //- Source term component (constant)
-        virtual tmp<DimensionedField<scalar, volMesh> > Ru() const;
+            //- Source term component (constant)
+            virtual tmp<DimensionedField<scalar, volMesh> > Ru() const;
 
 
         // Access
@@ -226,16 +219,19 @@ public:
             //- Const access to incident radiation field
             inline const volScalarField& G() const;
 
+            //- Const access to total radiative heat flux field
+            inline const volScalarField& Qr() const;
+
             //- Const access to band wise emitted radiative heat flux field
             inline const volScalarField::GeometricBoundaryField& Qem
             (
-                scalar lambda
+                const label lambda
             ) const;
 
             //- Const access to band wise incident radiative heat flux field
             inline const volScalarField::GeometricBoundaryField& Qin
             (
-                scalar lambda
+                const label lambda
             ) const;
 
             //- Const access to black body

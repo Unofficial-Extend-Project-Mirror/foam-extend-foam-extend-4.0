@@ -67,6 +67,19 @@ Foam::radiation::fvDOM::fvDOM(const volScalarField& T)
         mesh(),
         dimensionedScalar("G", dimMass/pow3(dimTime), 0.0)
     ),
+    Qr_
+    (
+        IOobject
+        (
+            "Qr",
+            mesh_.time().timeName(),
+            T.db(),
+            IOobject::READ_IF_PRESENT,
+            IOobject::AUTO_WRITE
+        ),
+        mesh_,
+        dimensionedScalar("Qr", dimMass/pow3(dimTime), 0.0)
+    ),
     a_
     (
         IOobject
@@ -260,8 +273,7 @@ Foam::radiation::fvDOM::fvDOM(const volScalarField& T)
             forAll(IRay_, rayId)
             {
                 const surfaceScalarField Ji(IRay_[rayId].dAve() & mesh().Sf());
-                volScalarField& iRayLambdaI =
-                    IRay_[rayId].ILambda(lambdaI);
+                volScalarField& iRayLambdaI = IRay_[rayId].ILambda(lambdaI);
 
                 fvRayDiv_[lambdaI].set
                 (
@@ -296,102 +308,6 @@ Foam::radiation::fvDOM::~fvDOM()
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
-
-Foam::tmp<Foam::volScalarField::GeometricBoundaryField>
-Foam::radiation::fvDOM::Qin() const
-{
-    tmp<volScalarField::GeometricBoundaryField> tQin
-    (
-        new volScalarField::GeometricBoundaryField
-        (
-            mesh().boundary(),
-            mesh().V(),           // Dummy internal field,
-            calculatedFvPatchScalarField::typeName
-        )
-    );
-    volScalarField::GeometricBoundaryField& sumQin = tQin();
-
-    sumQin = 0;
-
-    forAll(Qin_, lambdaI)
-    {
-        sumQin += Qin(lambdaI);
-    }
-
-    return tQin;
-}
-
-
-Foam::tmp<Foam::volScalarField::GeometricBoundaryField>
-Foam::radiation::fvDOM::Qem() const
-{
-    tmp<volScalarField::GeometricBoundaryField> tsumQem
-    (
-        new volScalarField::GeometricBoundaryField
-        (
-            mesh().boundary(),
-            mesh().V(),           // Dummy internal field,
-            calculatedFvPatchScalarField::typeName
-        )
-    );
-    volScalarField::GeometricBoundaryField& sumQem = tsumQem();
-
-    sumQem = 0;
-
-    forAll(Qem_, lambdaI)
-    {
-        sumQem += Qem(lambdaI);
-    }
-
-    return tsumQem;
-}
-
-Foam::tmp<Foam::volScalarField::GeometricBoundaryField>
-Foam::radiation::fvDOM::Qr() const
-{
-    tmp<volScalarField::GeometricBoundaryField> tQr
-    (
-        new volScalarField::GeometricBoundaryField
-        (
-            mesh().boundary(),
-            mesh().V(),           // Dummy internal field,
-            calculatedFvPatchScalarField::typeName
-        )
-    );
-    volScalarField::GeometricBoundaryField& Qr = tQr();
-
-    Qr = 0;
-
-    forAll(Qem_, lambdaI)
-    {
-        Qr += Qin(lambdaI);
-        Qr -= Qem(lambdaI);
-    }
-
-    return tQr;
-}
-
-
-Foam::tmp<Foam::volScalarField::GeometricBoundaryField>
-Foam::radiation::fvDOM::Qr(scalar lambdaI) const
-{
-    tmp<volScalarField::GeometricBoundaryField> tQr
-    (
-        new volScalarField::GeometricBoundaryField
-        (
-            mesh().boundary(),
-            mesh().V(),           // Dummy internal field,
-            calculatedFvPatchScalarField::typeName
-        )
-    );
-    volScalarField::GeometricBoundaryField& Qr = tQr();
-
-    Qr = 0;
-    Qr += Qin(lambdaI);
-    Qr -= Qem(lambdaI);
-
-    return tQr;
-}
 
 
 bool Foam::radiation::fvDOM::read()
@@ -562,11 +478,20 @@ void Foam::radiation::fvDOM::updateBlackBodyEmission()
 void Foam::radiation::fvDOM::updateG()
 {
     G_ = dimensionedScalar("zero",dimMass/pow3(dimTime), 0.0);
+    Qr_ = dimensionedScalar("zero",dimMass/pow3(dimTime), 0.0);
 
     forAll(IRay_, rayI)
     {
         IRay_[rayI].addIntensity();
         G_ += IRay_[rayI].I()*IRay_[rayI].omega();
+    }
+
+    forAll(Qr_.boundaryField(), patchI)
+    {
+        forAll(aLambda_, lambdaI)
+        {
+            Qr_.boundaryField()[patchI] += Qin_[lambdaI][patchI] - Qem_[lambdaI][patchI];
+        }
     }
 }
 
