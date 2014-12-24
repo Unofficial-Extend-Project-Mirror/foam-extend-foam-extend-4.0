@@ -5,19 +5,19 @@
   Info << "Rotating fields" << endl;
 
   volTensorField F = I + gradDU;
-  
+
   volTensorField Finv = inv(F);
 
   volScalarField J = det(F);
-  if(min(J.internalField()) < 0)  
+  if(min(J.internalField()) < 0)
     {
       FatalErrorIn(args.executable())
         << "Negative Jacobian -> cell negative volumes!!!"
-        << exit(FatalError);      
+        << exit(FatalError);
     }
 
   rho = rho/J;
-  n = mesh.Sf()/mesh.magSf();  
+  n = mesh.Sf()/mesh.magSf();
 
   // rotate strain and stress fields
   //epsilon = symm(Finv & epsilon & Finv.T());

@@ -1,6 +1,6 @@
     {
         // Move fluid mesh
-        const vectorField& n = 
+        const vectorField& n =
             mesh.boundaryMesh()[fluidPatchID].pointNormals();
 
         primitivePatchInterpolation patchInterpolator
@@ -14,7 +14,7 @@
                 mesh.boundary()[fluidPatchID].deltaCoeffs()
             );
 
-        scalar delta = 
+        scalar delta =
             gMax
             (
                 mag
@@ -29,7 +29,7 @@
                *pointDeltaCoeffs
             );
 
-        Info << "Maximal accumulated displacement of interface points: " 
+        Info << "Maximal accumulated displacement of interface points: "
             << delta << endl;
 
         if(delta < interfaceDeformationLimit)
@@ -37,12 +37,12 @@
             // Move only interface points
             pointField newPoints = mesh.allPoints();
 
-            const labelList& meshPoints = 
+            const labelList& meshPoints =
                 mesh.boundaryMesh()[fluidPatchID].meshPoints();
 
             forAll (fluidPatchPointsDispl, pointI)
             {
-                newPoints[meshPoints[pointI]] += 
+                newPoints[meshPoints[pointI]] +=
                     fluidPatchPointsDispl[pointI]
                   - fluidPatchPointsDisplOld[pointI];
             }
@@ -54,7 +54,7 @@
             mesh.movePoints(newPoints);
 
             // Accumulate interface points displacement
-            accumulatedFluidInterfaceDisplacement += 
+            accumulatedFluidInterfaceDisplacement +=
                 fluidPatchPointsDispl
               - fluidPatchPointsDisplOld;
         }
@@ -63,13 +63,13 @@
             // Move whole fluid mesh
             pointField newPoints = mesh.allPoints();
 
-            const labelList& meshPoints = 
+            const labelList& meshPoints =
                 mesh.boundaryMesh()[fluidPatchID].meshPoints();
 
             forAll (accumulatedFluidInterfaceDisplacement, pointI)
             {
-                newPoints[meshPoints[pointI]] -= 
-                    accumulatedFluidInterfaceDisplacement[pointI]; 
+                newPoints[meshPoints[pointI]] -=
+                    accumulatedFluidInterfaceDisplacement[pointI];
             }
 
             twoDPointCorrector twoDCorrector(mesh);
@@ -78,7 +78,7 @@
 
             mesh.movePoints(newPoints);
 
-            accumulatedFluidInterfaceDisplacement += 
+            accumulatedFluidInterfaceDisplacement +=
                 fluidPatchPointsDispl
               - fluidPatchPointsDisplOld;
 
@@ -94,7 +94,7 @@
                             "motionU"
                         )
                     );
-                
+
                 fixedValueTetPolyPatchVectorField& motionUFluidPatch =
                     refCast<fixedValueTetPolyPatchVectorField>
                     (
@@ -106,7 +106,7 @@
                     refCast<const faceTetPolyPatch>(motionUFluidPatch.patch())
                 );
 
-                motionUFluidPatch == 
+                motionUFluidPatch ==
                     tppi.pointToPointInterpolate
                     (
                         accumulatedFluidInterfaceDisplacement
@@ -124,14 +124,14 @@
                             "pointMotionU"
                         )
                     );
-	        
+
                 fixedValuePointPatchVectorField& motionUFluidPatch =
                     refCast<fixedValuePointPatchVectorField>
                     (
                         motionU.boundaryField()[fluidPatchID]
                     );
 
-                motionUFluidPatch == 
+                motionUFluidPatch ==
                     accumulatedFluidInterfaceDisplacement
                    /runTime.deltaT().value();
             }

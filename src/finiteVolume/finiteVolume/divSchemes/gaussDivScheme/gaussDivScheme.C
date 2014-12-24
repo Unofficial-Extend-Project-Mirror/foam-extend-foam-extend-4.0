@@ -68,6 +68,66 @@ gaussDivScheme<Type>::fvcDiv
 }
 
 
+template<class Type>
+tmp
+<
+    BlockLduSystem<vector, typename innerProduct<vector, Type>::type>
+> gaussDivScheme<Type>::fvmUDiv
+(
+    const GeometricField<Type, fvPatchField, volMesh>& vf
+) const
+{
+   FatalErrorIn
+   (
+       "tmp<BlockLduSystem> fvmUDiv\n"
+       "(\n"
+       "    GeometricField<Type, fvPatchField, volMesh>&"
+       ")\n"
+   )   << "Implicit div operator defined only for vector."
+       << abort(FatalError);
+
+   typedef typename innerProduct<vector, Type>::type DivType;
+
+   tmp<BlockLduSystem<vector, DivType> > tbs
+   (
+       new BlockLduSystem<vector, DivType>(vf.mesh())
+   );
+
+   return tbs;
+}
+
+
+template<class Type>
+tmp
+<
+    BlockLduSystem<vector, typename innerProduct<vector, Type>::type>
+> gaussDivScheme<Type>::fvmUDiv
+(
+    const surfaceScalarField& flux,
+    const GeometricField<Type, fvPatchField, volMesh>& vf
+) const
+{
+   FatalErrorIn
+   (
+       "tmp<BlockLduSystem> fvmUDiv\n"
+       "(\n"
+       "    const surfaceScalarField& flux"
+       "    const GeometricField<Type, fvPatchField, volMesh>&"
+       ")\n"
+   )   << "Implicit div operator defined only for vector."
+       << abort(FatalError);
+
+   typedef typename innerProduct<vector, Type>::type DivType;
+
+   tmp<BlockLduSystem<vector, DivType> > tbs
+   (
+       new BlockLduSystem<vector, DivType>(vf.mesh())
+   );
+
+   return tbs;
+}
+
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace fv

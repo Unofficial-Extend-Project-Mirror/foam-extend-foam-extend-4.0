@@ -26,14 +26,14 @@ Class
 
 Description
     A wrapper class that allows you to retrieve non-IOobjects through the
-    object registry.  Performs no input or output, simply for a const reference
-    retrieval.
+    object registry.  Performs no input or output.  Internally stores pointer
+    to object it manages and takes care of its scoping.
 
     Syntax:
     @verbatim
         // Your non-IOobject, e.g. Type = scalar
         Type myObject;
-        
+
         // Register it to the object registry
         IOReferencer<scalar> myIOobject
         (
@@ -48,8 +48,6 @@ Description
             ),
             myObject
         );
-
-        // (Now don't let myObject and myIOobject go out of scope)
 
         // In another part of your solver, e.g. in a custom boundary condition:
         const Type& myConstObject = registry.lookupObject<IOReferencer<Type> >
@@ -88,8 +86,11 @@ class IOReferencer
 :
     public regIOobject
 {
+    // Private data
 
-    const Type * typePtr_;
+        //- Pointer to object
+        Type* typePtr_;
+
 
 public:
 
@@ -105,7 +106,7 @@ public:
         IOReferencer
         (
             const IOobject& io,
-            const Type& reference
+            Type* ptr
         );
 
 
@@ -118,13 +119,15 @@ public:
 
         //- A "do nothing" writeData function, required by regIOobject
         virtual bool writeData(Ostream&) const;
-        
-        //- Return the pointer as a reference
-        const Type& operator()() const;
-        
-        //- Set the pointer
-        void set(const Type& reference);
 
+        //- Return const reference to object
+        const Type& operator()() const;
+
+        //- Return access to object
+        Type& operator()();
+
+        //- Set the pointer
+        void set(Type* ptr);
 };
 
 

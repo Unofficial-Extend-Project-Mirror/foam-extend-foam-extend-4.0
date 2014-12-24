@@ -1,4 +1,4 @@
-// aitken acceleration 
+// aitken acceleration
 if(iCorr == 0)
   {
     aitkenInitialRes = gMax(mag(DU.internalField()));

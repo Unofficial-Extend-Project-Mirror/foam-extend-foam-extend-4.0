@@ -37,7 +37,7 @@ void Foam::multiSolver::setMultiSolverControls()
             multiSolverControl_.lookup("initialStartFrom")
         );
     }
-    
+
     if (multiSolverControl_.found("startTime"))
     {
         initialStartTime_ = readScalar(multiSolverControl_.lookup("startTime"));
@@ -71,7 +71,7 @@ void Foam::multiSolver::setMultiSolverControls()
     {
         startDomain_ = word(multiSolverControl_.lookup("startDomain"));
     }
-    else if 
+    else if
     (
         (initialStartFrom_ == misFirstTimeInStartDomain)
      || (initialStartFrom_ == misFirstTimeInStartDomainInStartSuperLoop)
@@ -92,7 +92,7 @@ void Foam::multiSolver::setMultiSolverControls()
             << "'latestTimeInStartDomainInStartSuperLoop'."
             << abort(FatalError);
     }
-    
+
     finalStopAt_ = mfsEndTime;
     if (multiSolverControl_.found("finalStopAt"))
     {
@@ -101,7 +101,7 @@ void Foam::multiSolver::setMultiSolverControls()
             multiSolverControl_.lookup("finalStopAt")
         );
     }
-    
+
     if (multiSolverControl_.found("endDomain"))
     {
         endDomain_ = word(multiSolverControl_.lookup("endDomain"));
@@ -159,10 +159,10 @@ void Foam::multiSolver::setMultiSolverControls()
             << "'latestTimeInStartDomainInStartSuperLoop'."
             << abort(FatalError);
     }
-    
+
     if (multiSolverControl_.found("endSuperLoop"))
     {
-        endSuperLoop_ = 
+        endSuperLoop_ =
             readLabel(multiSolverControl_.lookup("endSuperLoop"));
     }
     else if
@@ -199,7 +199,7 @@ void Foam::multiSolver::setMultiSolverControls()
             << "other than 'default'."
             << abort(FatalError);
     }
-    
+
     dictionary solverDomainsDefault
     (
         solverDomains_.found("default")
@@ -234,7 +234,7 @@ void Foam::multiSolver::setSolverDomainControls(const word& solverDomainName)
         if (startTime_ < 0)
         {
             FatalErrorIn("multiSolver::setSolverDomainControls")
-                << "'startTime' in multiControlDict/solverDomains/" 
+                << "'startTime' in multiControlDict/solverDomains/"
                 << solverDomainName << " cannot be negative."
                 << abort(FatalError);
         }
@@ -247,7 +247,7 @@ void Foam::multiSolver::setSolverDomainControls(const word& solverDomainName)
             << "is set to 'startTime'."
             << abort(FatalError);
     }
-    
+
     stopAt_ = msaEndTime;
     if (currentSolverDomainDict_.found("stopAt"))
     {
@@ -271,7 +271,7 @@ void Foam::multiSolver::setSolverDomainControls(const word& solverDomainName)
             << abort(FatalError);
         }
     }
-    
+
     endTime_ = 0;
     if (currentSolverDomainDict_.found("endTime"))
     {
@@ -293,7 +293,7 @@ void Foam::multiSolver::setSolverDomainControls(const word& solverDomainName)
             << "when stopAt is set to iterations."
             << abort(FatalError);
     }
-    
+
     if (currentSolverDomainDict_.found("elapsedTime"))
     {
         elapsedTime_ = readScalar(currentSolverDomainDict_.lookup("elapsedTime"));
@@ -314,7 +314,7 @@ void Foam::multiSolver::setSolverDomainControls(const word& solverDomainName)
             currentSolverDomainDict_.lookup("storeFields")
         );
     }
-    
+
     purgeWriteSuperLoops_ = 0;
     if (currentSolverDomainDict_.found("purgeWriteSuperLoops"))
     {
@@ -323,7 +323,7 @@ void Foam::multiSolver::setSolverDomainControls(const word& solverDomainName)
             currentSolverDomainDict_.lookup("purgeWriteSuperLoops")
         );
     }
-    
+
     if (currentSolverDomainDict_.found("deltaT"))
     {
         deltaT_ = readScalar
@@ -338,7 +338,7 @@ void Foam::multiSolver::setSolverDomainControls(const word& solverDomainName)
             << solverDomainName << "' or 'default'.  deltaT is required."
             << abort(FatalError);
     }
-    
+
     if
     (
         currentSolverDomainDict_.found("timeFormat")

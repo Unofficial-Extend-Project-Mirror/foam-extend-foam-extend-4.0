@@ -67,10 +67,10 @@ class equationSource
 
         //- Individual "Type"s as sources
         UPtrList<const Type> singles_;
-        
+
         //- Names associated with singles_
         wordList singleNames_;
-        
+
         //- Dimensions associated with singles_
         PtrList<dimensionSet> singleDimensions_;
 
@@ -84,17 +84,17 @@ class equationSource
         //          1+ = boundary patch as a Field<Type>
         //      cellIndex is the index number of the Field<Type>
         PtrList<UPtrList<const Field<Type> > > fields_;
-        
+
         //- Dimensions associated with the fields_
         PtrList<dimensionSet> fieldDimensions_;
-        
+
         //- Names associated with the fields_
         wordList fieldNames_;
-        
+
 public:
 
     // Static data members
-    
+
         static const char* const typeName;
 
 
@@ -105,47 +105,47 @@ public:
         (
             const word& templateTypeName
         );
-        
+
     // Destructor
     ~equationSource();
 
     // Member functions
-    
+
         // Access
-        
+
             //- Individual "Type"s as sources
             inline const UPtrList<const Type>& singles() const;
-            
+
             //- Names associated with singles
             inline const wordList& singleNames() const;
-            
+
             //- Dimensions associated with singles_
             inline const PtrList<dimensionSet>& singleDimensions() const;
 
             //- Fields of Type - holds the source data for regular
             inline const PtrList<UPtrList<const Field<Type> > >&
                 fields() const;
-            
+
             //- Dimensions associated with the fields_
             inline const PtrList<dimensionSet>& fieldDimensions() const;
-            
+
             //- Names associated with the fields_
             inline const wordList& fieldNames() const;
 
         // Data lookup
-        
+
             //- True if lookupName is a valid single source
             bool foundSingle(const word& lookupName) const;
 
             //- True if lookupName is a valid field source
             bool foundField(const word& lookupName) const;
-            
+
             //- Returns single sourceIndex for lookupName - fails if not found
             label lookupSingle(const word& lookupName) const;
 
             //- Returns field sourceIndex for lookupName - fails if not found
             label lookupField(const word& lookupName) const;
-            
+
             //- Returns the number of fields associated with sourceIndex
             label geoSize(label sourceIndex) const;
 
@@ -155,7 +155,7 @@ public:
                 label sourceIndex,
                 label geoIndex
             ) const;
-            
+
             //- Return componentIndex for a given component name
             //  Returns -1 if not found (error handled by calling function)
             label lookupComponentIndex(const word& componentName) const;
@@ -206,7 +206,7 @@ public:
             const word& fieldName(label sourceIndex) const;
 
         // Adding data sources
-        
+
             //- Add single source
             void addSource
             (
@@ -244,15 +244,15 @@ public:
             );
 
         // Removing data sources
-        
+
             //- Remove a single source and reorder index
             void removeSingle(label sourceIndex);
-            
+
             //- Remove a field source and reorderd index
             void removeField(label sourceIndex);
 
         // Input / output
-        
+
             //- Output sources to a dictionary
             dictionary outputDictionary() const;
 };

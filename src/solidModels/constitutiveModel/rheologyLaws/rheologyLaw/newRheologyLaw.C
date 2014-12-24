@@ -66,7 +66,7 @@ autoPtr<rheologyLaw> rheologyLaw::New
         )   << "Unknown rheologyLaw type "
             << rheoTypeName << endl << endl
             << "Valid  rheologyLaws are : " << endl
-            << dictionaryConstructorTablePtr_->toc()
+            << dictionaryConstructorTablePtr_->sortedToc()
             << exit(FatalIOError);
     }
 

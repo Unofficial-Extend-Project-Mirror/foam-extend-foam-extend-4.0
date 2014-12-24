@@ -57,18 +57,18 @@ namespace Foam
 
 class equationVariable
 {
-        
+
 public:
 
     // Destructor
     virtual ~equationVariable() {}
 
     virtual const word& name() const = 0;
-    
+
     virtual const dimensionSet& dimensions() const = 0;
-    
+
     virtual label lookupComponentIndex(const word) const = 0;
-    
+
     virtual scalar evaluateScalar
     (
         const label componentIndex,

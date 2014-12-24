@@ -29,7 +29,7 @@
      == directionMixedFvPatchVectorField::typeName
     )
     {
-        directionMixedFvPatchVectorField& topPatchU = 
+        directionMixedFvPatchVectorField& topPatchU =
             refCast<directionMixedFvPatchVectorField>
             (
                 DU.boundaryField()[patchID]
@@ -51,9 +51,9 @@
     else
     {
         FatalErrorIn(args.executable())
-            << "Bounary condition on " << DU.name() 
-                <<  " is " 
-                << DU.boundaryField()[patchID].type() 
+            << "Bounary condition on " << DU.name()
+                <<  " is "
+                << DU.boundaryField()[patchID].type()
                 << "for patch: " << mesh.boundaryMesh()[patchID].name()
                 <<  ", instead "
                 << fixedValueFvPatchVectorField::typeName
@@ -78,7 +78,7 @@
      == directionMixedFvPatchVectorField::typeName
     )
     {
-        directionMixedFvPatchVectorField& bottomPatchU = 
+        directionMixedFvPatchVectorField& bottomPatchU =
             refCast<directionMixedFvPatchVectorField>
             (
                 DU.boundaryField()[patchID]

@@ -55,7 +55,7 @@ template<class Type>
 class coarseBlockAmgLevel;
 
 template<class Type>
-class BlockAmgPolicy;
+class BlockMatrixCoarsening;
 
 template<class Type>
 class BlockAmgLevel;

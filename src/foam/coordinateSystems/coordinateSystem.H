@@ -198,6 +198,7 @@ protected:
             bool translate
         ) const;
 
+
 public:
 
     //- Runtime type information
@@ -308,6 +309,7 @@ public:
         //- Select constructed from Istream
         static autoPtr<coordinateSystem> New(Istream& is);
 
+
     // Destructor
 
         virtual ~coordinateSystem();
@@ -400,29 +402,31 @@ public:
         virtual dictionary dict(bool ignoreType = false) const;
 
 
-      // Edit
+        // Edit
 
-        //- Rename
-        virtual void rename(const word& newName)
-        {
-            name_ = newName;
-        }
+            //- Rename
+            virtual void rename(const word& newName)
+            {
+                name_ = newName;
+            }
 
-        //- Edit access to origin
-        point& origin()
-        {
-            return origin_;
-        }
+            //- Edit access to origin
+            point& origin()
+            {
+                return origin_;
+            }
 
-      // Write
 
-        //- Write
-        virtual void write(Ostream&) const;
+        // Write
 
-        //- Write dictionary
-        virtual void writeDict(Ostream&, bool subDict = true) const;
+            //- Write
+            virtual void write(Ostream&) const;
 
-      // Transformations
+            //- Write dictionary
+            virtual void writeDict(Ostream&, bool subDict = true) const;
+
+
+        // Transformations
 
         //- Convert from position in local coordinate system to
         //  global Cartesian position
@@ -487,7 +491,7 @@ public:
         void operator=(const dictionary&);
 
 
-    // friend Operators
+    // Friend Operators
 
         friend bool operator!=
         (

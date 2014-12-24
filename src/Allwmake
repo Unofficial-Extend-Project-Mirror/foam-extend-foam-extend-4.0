@@ -37,7 +37,6 @@ wmake libso finiteVolume
 wmake libso finiteArea
 
 wmake libso lduSolvers
-wmake libso VectorN
 
 wmake libso tetFiniteElement
 
@@ -51,6 +50,7 @@ wmake libso sampling
 wmake libso ODE
 wmake libso POD
 wmake libso randomProcesses
+mesh/Allwmake
 
 thermophysicalModels/Allwmake
 transportModels/Allwmake
@@ -59,7 +59,6 @@ lagrangian/Allwmake
 postProcessing/Allwmake
 conversion/Allwmake
 
-wmake libso autoMesh
 wmake libso errorEstimation
 
 fvAgglomerationMethods/Allwmake
@@ -70,6 +69,7 @@ wmake libso equationReader
 wmake libso multiSolver
 
 wmake libso solidModels
+wmake libso dbns
 
 ( cd cudaSolvers ; ./Allwmake )
 

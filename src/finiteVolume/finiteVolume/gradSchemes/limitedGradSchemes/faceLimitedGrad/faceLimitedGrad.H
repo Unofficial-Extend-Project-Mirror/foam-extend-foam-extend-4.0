@@ -125,6 +125,17 @@ public:
         (
             const GeometricField<Type, fvPatchField, volMesh>&
         ) const;
+
+        //- Return the BlockLduSystem corresponding to the implicit face
+        // limted grad discretization. For block coupled systems.
+        tmp
+        <
+            BlockLduSystem<vector, typename outerProduct<vector, Type>::type>
+        > fvmGrad
+        (
+            const GeometricField<Type, fvPatchField, volMesh>&
+        ) const;
+
 };
 
 

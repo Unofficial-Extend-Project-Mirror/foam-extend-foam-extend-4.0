@@ -142,7 +142,6 @@ void meshToMesh::calcAddressing()
 
     forAll (toMesh_.boundaryMesh(), patchi)
     {
-
         const polyPatch& toPatch = toMesh_.boundaryMesh()[patchi];
 
         if (cuttingPatches_.found(toPatch.name()))
@@ -238,7 +237,7 @@ void meshToMesh::calcAddressing()
 
 void meshToMesh::cellAddresses
 (
-    labelList& cellAddressing_,
+    labelList& cellAddr,
     const pointField& points,
     const fvMesh& fromMesh,
     const List<bool>& boundaryCell,
@@ -300,12 +299,12 @@ void meshToMesh::cellAddresses
             }
         } while (closer);
 
-        cellAddressing_[toI] = -1;
+        cellAddr[toI] = -1;
 
         // Check point is actually in the nearest cell
         if (fromMesh.pointInCell(p, curCell))
         {
-            cellAddressing_[toI] = curCell;
+            cellAddr[toI] = curCell;
         }
         else
         {
@@ -315,7 +314,7 @@ void meshToMesh::cellAddresses
             if (boundaryCell[curCell])
             {
                 isBoundary = true;
-                cellAddressing_[toI] = oc.find(p);
+                cellAddr[toI] = oc.find(p);
             }
             else
             {
@@ -331,7 +330,7 @@ void meshToMesh::cellAddresses
                     // If point is in neighbour reset current cell
                     if (fromMesh.pointInCell(p, neighbours[nI]))
                     {
-                        cellAddressing_[toI] = neighbours[nI];
+                        cellAddr[toI] = neighbours[nI];
                         found = true;
                         break;
                     }
@@ -355,7 +354,7 @@ void meshToMesh::cellAddresses
                             // If point is in neighbour reset current cell
                             if (fromMesh.pointInCell(p, nn[nI]))
                             {
-                                cellAddressing_[toI] = nn[nI];
+                                cellAddr[toI] = nn[nI];
                                 found = true;
                                 break;
                             }
@@ -367,11 +366,11 @@ void meshToMesh::cellAddresses
                 if (!found)
                 {
                     // Still not found so use the octree
-                    cellAddressing_[toI] = oc.find(p);
+                    cellAddr[toI] = oc.find(p);
                 }
             }
 
-            if (cellAddressing_[toI] < 0)
+            if (cellAddr[toI] < 0)
             {
                 nCellsOutsideAddressing++;
 
@@ -408,12 +407,11 @@ void meshToMesh::cellAddresses
                                 if (mag(points[toI] - centre) < localTol)
                                 {
                                     localTol = mag(points[toI] - centre);
-                                    cellAddressing_[toI] = celli;
+                                    cellAddr[toI] = celli;
                                 }
 
                             }
                         }
-
                     }
                 }
             }
@@ -424,7 +422,7 @@ void meshToMesh::cellAddresses
     {
         Info<< "Found " << nCellsOutsideAddressing
             << " cells outside of the addressing" << nl
-            << "Cell addressing size = " << cellAddressing_.size() << endl;
+            << "Cell addressing size = " << cellAddr.size() << endl;
     }
 }
 

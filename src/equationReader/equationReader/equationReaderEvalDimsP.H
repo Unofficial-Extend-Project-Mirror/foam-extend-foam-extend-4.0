@@ -9,7 +9,7 @@
     // function evaluateDimsDisabled.  Since each equation may require
     // different treatment, there is a pointer function for each equation.  The
     // pointers are therefore in a list.
-    
+
         //- Typedef the evaluateDims function pointer to make it available to
         //  PtrList
         typedef dimensionSet (Foam::equationReader::*evaluateDimsFunction)

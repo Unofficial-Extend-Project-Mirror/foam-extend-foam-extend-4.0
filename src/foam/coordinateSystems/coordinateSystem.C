@@ -336,7 +336,6 @@ void Foam::coordinateSystem::writeDict(Ostream& os, bool subDict) const
     }
 
     os.writeKeyword("name")   << name_    << token::END_STATEMENT << nl;
-    os.writeKeyword("type")   << type() << token::END_STATEMENT << nl;
     os.writeKeyword("origin") << origin_  << token::END_STATEMENT << nl;
     os.writeKeyword("e1")     << e1()     << token::END_STATEMENT << nl;
     os.writeKeyword("e3")     << e3()     << token::END_STATEMENT << nl;

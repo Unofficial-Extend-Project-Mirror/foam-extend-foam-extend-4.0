@@ -36,7 +36,7 @@ void Foam::equationReader::createMap
 ) const
 {
 //    equation * eqn(&this->operator[](index));
-    
+
     // current parenthesis level - note, a negative parenthesis value indicates
     // that this is the root level of a function, and therefore ',' is allowed
     label p(0);
@@ -88,7 +88,7 @@ void Foam::equationReader::createMap
                         equationOperation::findOp(tl[i].wordToken())
                     )
                 );
-                    
+
                 if (map[i].operation() == equationOperation::otnone)
                 {
                     OStringStream description;
@@ -104,7 +104,7 @@ void Foam::equationReader::createMap
                         description
                     );
                 }
-                
+
                 // Set next token as well (function opening parenthesis)
                 i++;
                 opLvl[i] = 4;
@@ -154,7 +154,7 @@ void Foam::equationReader::createMap
                         << " mathematical constant. The mathematical constant "
                         << "will be used." << endl;
                 }
-                
+
                 opLvl[i] = 0;
                 pl[i] = p;
                 label internalIndex(0);
@@ -322,7 +322,7 @@ void Foam::equationReader::createMap
                             break;
                         }
                     }
-                    
+
                     map.set
                     (
                         i,
@@ -503,7 +503,7 @@ void Foam::equationReader::createMap
             );
         }
     } // mapping loop
-    
+
     if (p)
     {
         OStringStream description;
@@ -519,7 +519,7 @@ void Foam::equationReader::createMap
             description
         );
     }
-    
+
     // Assign negatives (distinguish these from subtraction)
     // The difference is characterized by the preceding character:
     // -preceeded by an operator = negative '+' '-' '*' '/' '^'

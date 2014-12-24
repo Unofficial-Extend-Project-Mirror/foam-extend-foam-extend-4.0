@@ -1017,4 +1017,34 @@ int Foam::system(const string& command)
 }
 
 
+void Foam::osRandomSeed(const label seed)
+{
+#ifdef USE_RANDOM
+    srandom((unsigned int)seed);
+#else
+    srand48(seed);
+#endif
+}
+
+
+Foam::label Foam::osRandomInteger()
+{
+#ifdef USE_RANDOM
+    return random();
+#else
+    return lrand48();
+#endif
+}
+
+
+Foam::scalar Foam::osRandomDouble()
+{
+#ifdef USE_RANDOM
+    return (scalar)random()/INT_MAX;
+#else
+    return drand48();
+#endif
+}
+
+
 // ************************************************************************* //

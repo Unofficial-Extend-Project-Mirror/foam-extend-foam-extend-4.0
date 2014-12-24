@@ -238,7 +238,7 @@ Foam::BlockLduMatrix<Type>::lower()
     {
         if (upperPtr_)
         {
-            Info << "Manufacturing lower from upper transpose" << endl;
+//             Info << "Manufacturing lower from upper transpose" << endl;
             lowerPtr_ = new TypeCoeffField(upperPtr_->transpose());
         }
         else

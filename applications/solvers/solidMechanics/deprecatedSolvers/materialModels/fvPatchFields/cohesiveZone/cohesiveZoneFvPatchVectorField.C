@@ -98,7 +98,7 @@ cohesiveZoneFvPatchVectorField::cohesiveZoneFvPatchVectorField
     {
         this->refValue() = vector::zero;
     }
-    
+
     if (dict.found("refGradient"))
     {
         this->refGrad() = vectorField("refGradient", dict, p.size());
@@ -110,7 +110,7 @@ cohesiveZoneFvPatchVectorField::cohesiveZoneFvPatchVectorField
 
     if (dict.found("valueFraction"))
     {
-        this->valueFraction() = 
+        this->valueFraction() =
             symmTensorField("valueFraction", dict, p.size());
     }
     else
@@ -205,7 +205,7 @@ void cohesiveZoneFvPatchVectorField::updateCoeffs()
     const rheologyModel& rheology =
         this->db().objectRegistry::lookupObject<rheologyModel>(rheologyName_);
 
-    const scalarField mu = 
+    const scalarField mu =
         rheology.mu()().boundaryField()[patch().index()];
 
     const scalarField lambda =
@@ -275,17 +275,17 @@ void cohesiveZoneFvPatchVectorField::updateCoeffs()
 
         if(magSqr(valueFraction()[faceI]) < SMALL)
         {
-            cohesiveTraction = 
-                relaxationFactor_*cohesiveTraction 
+            cohesiveTraction =
+                relaxationFactor_*cohesiveTraction
               + (1.0 - relaxationFactor_)*sigmaN[faceI]*n[faceI];
 
             refGrad()[faceI] =
             (
                 cohesiveTraction
               - (
-                    n[faceI] 
+                    n[faceI]
                   & (
-                        mu[faceI]*gradU[faceI].T() 
+                        mu[faceI]*gradU[faceI].T()
                       - (mu[faceI] + lambda[faceI])*gradU[faceI]
                     )
                 )
@@ -305,7 +305,7 @@ void cohesiveZoneFvPatchVectorField::write(Ostream& os) const
     directionMixedFvPatchVectorField::write(os);
     os.writeKeyword("U") << UName_ << token::END_STATEMENT << nl;
     os.writeKeyword("rheology") << rheologyName_ << token::END_STATEMENT << nl;
-    os.writeKeyword("cohesiveLaw") << law().type() 
+    os.writeKeyword("cohesiveLaw") << law().type()
         << token::END_STATEMENT << nl;
     os.writeKeyword("relaxationFactor") << relaxationFactor_
         << token::END_STATEMENT << nl;

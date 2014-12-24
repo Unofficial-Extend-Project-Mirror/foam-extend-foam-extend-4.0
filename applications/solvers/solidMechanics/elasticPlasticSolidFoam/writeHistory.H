@@ -9,11 +9,11 @@ if(historyPatchID != -1)
     //- for small strain or moving mesh
     vector force =
       gSum(mesh.boundary()[historyPatchID].Sf() & sigma.boundaryField()[historyPatchID]);
-    
+
     //- for large strain total lagrangian
     // tensorField F = I + gradU.boundaryField()[historyPatchID];
-    // vector force = gSum(mesh.Sf().boundaryField()[historyPatchID] & (sigma.boundaryField()[historyPatchID] & F));    
-    
+    // vector force = gSum(mesh.Sf().boundaryField()[historyPatchID] & (sigma.boundaryField()[historyPatchID] & F));
+
     Info << "Writing strain-stress to file for patch " << historyPatchName
 	  << endl;
 
@@ -21,7 +21,7 @@ if(historyPatchID != -1)
      symmTensor stress = gAverage(sigma.boundaryField()[historyPatchID]);
      symmTensor strain = gAverage(epsilon.boundaryField()[historyPatchID]);
 
- 
+
      // write to file
      if(Pstream::master())
        {

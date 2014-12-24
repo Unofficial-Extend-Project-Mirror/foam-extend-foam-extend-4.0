@@ -101,19 +101,15 @@ void Foam::leastSquaresVectors::makeLeastSquaresVectors() const
     // Set local references to mesh data
     const unallocLabelList& owner = mesh().owner();
     const unallocLabelList& neighbour = mesh().neighbour();
-
     const volVectorField& C = mesh().C();
-    const surfaceScalarField& w = mesh().weights();
-//     const surfaceScalarField& magSf = mesh().magSf();
-
 
     // Set up temporary storage for the dd tensor (before inversion)
     symmTensorField dd(mesh().nCells(), symmTensor::zero);
 
-    forAll(owner, facei)
+    forAll(owner, faceI)
     {
-        label own = owner[facei];
-        label nei = neighbour[facei];
+        label own = owner[faceI];
+        label nei = neighbour[faceI];
 
         vector d = C[nei] - C[own];
         symmTensor wdd = (1.0/magSqr(d))*sqr(d);
@@ -122,113 +118,88 @@ void Foam::leastSquaresVectors::makeLeastSquaresVectors() const
         dd[nei] += wdd;
     }
 
-
-    forAll(lsP.boundaryField(), patchi)
+    forAll(lsP.boundaryField(), patchI)
     {
-        const fvsPatchScalarField& pw = w.boundaryField()[patchi];
-        // Note: least squares in 1.4.1 and other OpenCFD versions
-        // are wrong because of incorrect weighting.  HJ, 23/Oct/2008
-//         const fvsPatchScalarField& pMagSf = magSf.boundaryField()[patchi];
-
-        const fvPatch& p = pw.patch();
+        const fvPatch& p = mesh().boundary()[patchI];
         const unallocLabelList& faceCells = p.patch().faceCells();
 
-        // Build the d-vectors
-
-        // Original version: closest distance to boundary
-        vectorField pd =
-            mesh().Sf().boundaryField()[patchi]
-           /(
-               mesh().magSf().boundaryField()[patchi]
-              *mesh().deltaCoeffs().boundaryField()[patchi]
-           );
-
-        if (!mesh().orthogonal())
-        {
-            pd -= mesh().correctionVectors().boundaryField()[patchi]
-                /mesh().deltaCoeffs().boundaryField()[patchi];
-        }
-
         // Better version of d-vectors: Zeljko Tukovic, 25/Apr/2010
-        // Experimental: review fixed gradient condition.  HJ, 30/Sep/2010
-//         vectorField pd = p.delta();
+        const vectorField pd = p.delta();
 
-        if (p.coupled())
+        forAll(pd, patchFaceI)
         {
-            forAll(pd, patchFacei)
-            {
-                const vector& d = pd[patchFacei];
-
-                dd[faceCells[patchFacei]] += (1.0/magSqr(d))*sqr(d);
-            }
-        }
-        else
-        {
-            forAll(pd, patchFacei)
-            {
-                const vector& d = pd[patchFacei];
-
-                dd[faceCells[patchFacei]] += (1.0/magSqr(d))*sqr(d);
-            }
+            const vector& d = pd[patchFaceI];
+            dd[faceCells[patchFaceI]] += (1.0/magSqr(d))*sqr(d);
         }
     }
 
-
-    // Invert the dd tensor
-//     symmTensorField invDd = inv(dd);
-    // Fix: householder inverse.  HJ, 3/Nov/2009
-    symmTensorField invDd = hinv(dd);
-
+    // For easy access of neighbour coupled patch field needed for
+    // lsN vectors on implicitly coupled boundaries. VV, 18/June/2014
+    volSymmTensorField volInvDd
+    (
+        IOobject
+        (
+            "volInvDd",
+            mesh().pointsInstance(),
+            mesh(),
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        ),
+        mesh(),
+        dimensionedSymmTensor("zero", dimless, symmTensor::zero),
+        "zeroGradient"
+    );
+    symmTensorField& invDd = volInvDd.internalField();
+//    invDd = inv(dd);
+    invDd = hinv(dd);
 
     // Revisit all faces and calculate the lsP and lsN vectors
-    forAll(owner, facei)
+    forAll(owner, faceI)
     {
-        label own = owner[facei];
-        label nei = neighbour[facei];
+        label own = owner[faceI];
+        label nei = neighbour[faceI];
 
         vector d = C[nei] - C[own];
         scalar magSfByMagSqrd = 1.0/magSqr(d);
 
-        lsP[facei] = magSfByMagSqrd*(invDd[own] & d);
-        lsN[facei] = -magSfByMagSqrd*(invDd[nei] & d);
+        lsP[faceI] = magSfByMagSqrd*(invDd[own] & d);
+        lsN[faceI] = -magSfByMagSqrd*(invDd[nei] & d);
     }
 
-    forAll(lsP.boundaryField(), patchi)
+    forAll(lsP.boundaryField(), patchI)
     {
-        fvsPatchVectorField& patchLsP = lsP.boundaryField()[patchi];
-
-        const fvsPatchScalarField& pw = w.boundaryField()[patchi];
-        // Note: least squares in 1.4.1 and other OpenCFD versions
-        // are wrong because of incorrect weighting.  HJ, 23/Oct/2008
-//         const fvsPatchScalarField& pMagSf = magSf.boundaryField()[patchi];
-
-        const fvPatch& p = pw.patch();
+        fvsPatchVectorField& patchLsP = lsP.boundaryField()[patchI];
+        fvsPatchVectorField& patchLsN = lsN.boundaryField()[patchI];
+        const fvPatch& p = mesh().boundary()[patchI];
         const unallocLabelList& faceCells = p.faceCells();
 
-        // Build the d-vectors
         // Better version of d-vectors: Zeljko Tukovic, 25/Apr/2010
-        vectorField pd = p.delta();
+        const vectorField pd = p.delta();
 
         if (p.coupled())
         {
-            forAll(pd, patchFacei)
-            {
-                const vector& d = pd[patchFacei];
+            const symmTensorField invDdNei =
+                volInvDd.boundaryField()[patchI].patchNeighbourField();
 
-                patchLsP[patchFacei] =
-                    (1.0/magSqr(d))
-                   *(invDd[faceCells[patchFacei]] & d);
+            forAll(pd, patchFaceI)
+            {
+                const vector& d = pd[patchFaceI];
+
+                patchLsP[patchFaceI] = (1.0/magSqr(d))
+                   *(invDd[faceCells[patchFaceI]] & d);
+
+                patchLsN[patchFaceI] = - (1.0/magSqr(d))
+                   *(invDdNei[faceCells[patchFaceI]] & d);
             }
         }
         else
         {
-            forAll(pd, patchFacei)
+            forAll(pd, patchFaceI)
             {
-                const vector& d = pd[patchFacei];
+                const vector& d = pd[patchFaceI];
 
-                patchLsP[patchFacei] =
-                    (1.0/magSqr(d))
-                   *(invDd[faceCells[patchFacei]] & d);
+                patchLsP[patchFaceI] = (1.0/magSqr(d))
+                   *(invDd[faceCells[patchFaceI]] & d);
             }
         }
     }

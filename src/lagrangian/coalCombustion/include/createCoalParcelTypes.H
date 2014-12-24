@@ -33,21 +33,9 @@ License
 
 #define createCoalParcelType(ParcelType)                                      \
                                                                               \
-    createCoalParcelThermoType                                                \
-    (                                                                         \
-        ParcelType,                                                           \
-        constGasThermoPhysics                                                 \
-    );                                                                        \
-    createCoalParcelThermoType                                                \
-    (                                                                         \
-        ParcelType,                                                           \
-        gasThermoPhysics                                                      \
-    );                                                                        \
-    createCoalParcelThermoType                                                \
-    (                                                                         \
-        ParcelType,                                                           \
-        icoPoly8ThermoPhysics                                                 \
-    );
+    createCoalParcelThermoType(ParcelType, constGasThermoPhysics);            \
+    createCoalParcelThermoType(ParcelType, gasThermoPhysics);                 \
+    createCoalParcelThermoType(ParcelType, icoPoly8ThermoPhysics);
 
 
 #define createCoalParcelThermoType(ParcelType, ThermoType)                    \

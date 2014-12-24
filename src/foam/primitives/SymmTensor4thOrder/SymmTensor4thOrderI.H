@@ -206,10 +206,10 @@ operator&&(const SymmTensor4thOrder<Cmpt>& t4th, const SymmTensor<Cmpt>& st)
         t4th.xxxx()*st.xx() + t4th.xxyy()*st.yy() + t4th.xxzz()*st.zz(),
         t4th.xyxy()*st.xy(),
         t4th.zxzx()*st.xz(),
-     
+
         t4th.xxyy()*st.xx() + t4th.yyyy()*st.yy() + t4th.yyzz()*st.zz(),
         t4th.yzyz()*st.yz(),
-     
+
         t4th.xxzz()*st.xx() + t4th.yyzz()*st.yy() + t4th.zzzz()*st.zz()
      );
 }
@@ -228,10 +228,10 @@ operator&&(const SymmTensor<Cmpt>& st, const SymmTensor4thOrder<Cmpt>& t4th)
         t4th.xxxx()*st.xx() + t4th.xxyy()*st.yy() + t4th.xxzz()*st.zz(),
         t4th.xyxy()*st.xy(),
         t4th.zxzx()*st.xz(),
-     
+
         t4th.xxyy()*st.xx() + t4th.yyyy()*st.yy() + t4th.yyzz()*st.zz(),
         t4th.yzyz()*st.yz(),
-     
+
         t4th.xxzz()*st.xx() + t4th.yyzz()*st.yy() + t4th.zzzz()*st.zz()
     );
 }

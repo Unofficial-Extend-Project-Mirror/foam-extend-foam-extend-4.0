@@ -15,7 +15,7 @@
             ? IOobject::AUTO_WRITE
             : IOobject::NO_WRITE
           : IOobject::NO_WRITE
-        ),        
+        ),
         runTime.controlDict().found("outputEquationDataSources")
       ? bool(Switch(runTime.controlDict().lookup("outputEquationDataSources")))
       : false

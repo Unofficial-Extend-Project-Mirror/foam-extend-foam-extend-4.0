@@ -1,0 +1,62 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | foam-extend: Open Source CFD                    |
+|  \\    /   O peration     | Version:     3.1                                |
+|   \\  /    A nd           | Web:         http://www.extend-project.de       |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       volVectorField;
+    location    "0";
+    object      Uabs;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+dimensions      [0 1 -1 0 0 0 0];
+
+internalField   uniform (0 0 0);
+
+boundaryField
+{
+    RUINLET
+    {
+        type            calculated;
+        value           uniform (0 0 0);
+    }
+    RUOUTLET
+    {
+        type            calculated;
+        value           uniform (0 0 0);
+    }
+    RUCYCLIC1
+    {
+        type            cyclicGgi;
+        value           uniform (0 0 0);
+    }
+    RUCYCLIC2
+    {
+        type            cyclicGgi;
+        value           uniform (0 0 0);
+    }
+    RUBLADE
+    {
+        type            calculated;
+        value           uniform (0 0 0);
+    }
+    RUHUB
+    {
+        type            calculated;
+        value           uniform (0 0 0);
+    }
+    RUSHROUD
+    {
+        type            calculated;
+        value           uniform (0 0 0);
+    }
+}
+
+
+// ************************************************************************* //

@@ -117,10 +117,10 @@ void Foam::multiSolver::setUpParallel()
     if (Pstream::master())
     {
         fileNameList roots(Pstream::nProcs());
-        
+
         roots[0] = multiDictRegistry_.rootPath();
         manageLocalRoot_ = true;
-        
+
         // Receive from slaves
         for
         (
@@ -132,7 +132,7 @@ void Foam::multiSolver::setUpParallel()
             IPstream fromSlave(Pstream::blocking, slave);
             roots[slave] = fileName(fromSlave);
         }
-        
+
         // Distribute
         for
         (
@@ -239,7 +239,7 @@ Foam::word Foam::multiSolver::setLocalEndTime()
 
             break;
         case mfsEndTimeInEndDomain:
-            if 
+            if
             (
                 (currentSolverDomain_ == endDomain_)
              && (endTime_ >= finalEndTime_)
@@ -320,7 +320,7 @@ bool Foam::multiSolver::checkGlobalEnd() const
             }
             break;
         case mfsEndTimeInEndDomain:
-            if 
+            if
             (
                 (currentSolverDomain_ == endDomain_)
              && (startTime_ >= finalEndTime_)
@@ -383,7 +383,7 @@ void Foam::multiSolver::buildDictionary
             outputDict.remove("sameAs");
         }
     }
-    
+
     // We load solverDomain last, but we need its sameAs / multiLoad now
     if (inputDict.found(solverDomainName))
     {
@@ -399,7 +399,7 @@ void Foam::multiSolver::buildDictionary
             mergeMe[newIndex] = word(solverDict.lookup("sameAs"));
         }
     }
-    
+
     label mergeI(-1);
     while ((mergeI + 1) < mergeMe.size())
     {
@@ -418,12 +418,12 @@ void Foam::multiSolver::buildDictionary
             break;
         }
         outputDict.merge(inputDict.subDict(mergeMe[mergeI]));
-        
+
         // Add to alreadyMerged
         label mergedIndex(alreadyMerged.size());
         alreadyMerged.setSize(mergedIndex + 1);
         alreadyMerged[mergedIndex] = mergeMe[mergeI];
-        
+
         // Recursive search
         if (outputDict.found("multiLoad"))
         {
@@ -438,18 +438,18 @@ void Foam::multiSolver::buildDictionary
             outputDict.remove("sameAs");
         }
     }
-    
+
     // Merge the solverDomain name, even if it already has merged
     if (inputDict.found(solverDomainName))
     {
         outputDict.merge(inputDict.subDict(solverDomainName));
 
-        // These have been handled already        
+        // These have been handled already
         outputDict.remove("sameAs");
         outputDict.remove("multiLoad");
     }
 }
-    
+
 
 void Foam::multiSolver::checkTimeDirectories() const
 {
@@ -501,7 +501,7 @@ void Foam::multiSolver::swapDictionaries(const word& solverDomainName)
                 false
             )
         );
-        
+
         buildDictionary
         (
             newMultiDict,
@@ -511,7 +511,7 @@ void Foam::multiSolver::swapDictionaries(const word& solverDomainName)
 
         newMultiDict.regIOobject::write();
     }
-    
+
     if
     (
         exists
@@ -560,7 +560,7 @@ void Foam::multiSolver::swapBoundaryConditions
     (
         readDir(dataSourcePath, fileName::FILE)
     );
-    
+
     word headerClassName;
     forAll(dirEntries, i)
     {
@@ -584,7 +584,7 @@ void Foam::multiSolver::swapBoundaryConditions
 
         dictionary bcDict(bc);
         dictionary dataDict(data);
-        
+
         if
         (
             !bcDict.found("dimensions")
@@ -610,7 +610,7 @@ void Foam::multiSolver::swapBoundaryConditions
             << bcDims << " and the previous domain has " << dataDims << "."
             << abort(FatalError);
         }
-        
+
         dictionary outputDict(bcDict);
 
         outputDict.set("internalField", dataDict.lookup("internalField"));
@@ -619,11 +619,11 @@ void Foam::multiSolver::swapBoundaryConditions
         wordList bcPatches(bcDict.subDict("boundaryField").toc());
         sort(dataPatches);
         sort(bcPatches);
-        
+
         if (dataPatches.size() != bcPatches.size())
         {
             WarningIn("multiSolver::swapBoundaryConditions")
-            << "Boundary fields do not match.  Solver domain [" 
+            << "Boundary fields do not match.  Solver domain ["
             << intoSolverDomain << "] has " << bcPatches.size() << " patches "
             << ", and the previous domain has " << dataPatches.size() << "."
             << endl;
@@ -637,7 +637,7 @@ void Foam::multiSolver::swapBoundaryConditions
                 if ((j + offset) == bcPatches.size())
                 {
                     FatalErrorIn("multiSolver::swapBoundaryConditions")
-                    << "Boundary fields do not match.  Solver domain [" 
+                    << "Boundary fields do not match.  Solver domain ["
                     << intoSolverDomain << "] has:" << bcPatches
                     << " and the previous domain has:" << dataPatches << "."
                     << abort(FatalError);
@@ -647,7 +647,7 @@ void Foam::multiSolver::swapBoundaryConditions
             /*if (dataPatches[j] != bcPatches[j])
             {
                 FatalErrorIn("multiSolver::swapBoundaryConditions")
-                << "Boundary fields do not match.  Solver domain [" 
+                << "Boundary fields do not match.  Solver domain ["
                 << intoSolverDomain << "] has:" << bcPatches << " patches "
                 << "and the previous domain has:" << dataPatches << "."
                 << abort(FatalError);
@@ -656,7 +656,7 @@ void Foam::multiSolver::swapBoundaryConditions
             {
                 IFstream firstDataStream(firstDataSourcePath/dirEntries[i]);
                 dictionary firstDict(firstDataStream);
-                
+
                 // Check for 'multiSolverRemembering' entries, copy them from
                 // the earliest time (this superLoop) to the outputDict
                 if
@@ -744,7 +744,7 @@ void Foam::multiSolver::swapBoundaryConditions
                                     << dirEntries[i]
                                     << exit(FatalIOError);
                             }
-                            
+
                             outputDict
                                 .subDict("boundaryField")
                                 .subDict(bcPatches[j + offset]).set
@@ -777,7 +777,7 @@ void Foam::multiSolver::swapBoundaryConditions
                                 remembering[remember.size() + l] = msr[l];
                             }
                         }
-                        
+
                         outputDict
                             .subDict("boundaryField")
                             .subDict(bcPatches[j + offset]).set
@@ -824,7 +824,7 @@ void Foam::multiSolver::readAllMultiDicts()
     (
         multiDictRegistry_.path()/multiDictRegistry_.constant()
     );
-    
+
     label done(0);
     while (done <= 0)
     {
@@ -852,7 +852,7 @@ void Foam::multiSolver::readAllMultiDicts()
             constantPath,
             fileName::DIRECTORY
         );
-        
+
         forAll(dirEntries, i)
         {
             readMultiDictDirectory
@@ -861,7 +861,7 @@ void Foam::multiSolver::readAllMultiDicts()
                 dirEntries[i]
             );
         }
-    
+
         // Add local root for parallel runs and repeat
         if (manageLocalRoot_)
         {
@@ -906,7 +906,7 @@ void Foam::multiSolver::readMultiDictDirectory
         {
             IFstream is(sourcePath/dirEntries[i]);
             dictionary candidate(is);
-            
+
             if
             (
                 candidate.found("dictionaryName")
@@ -1029,7 +1029,7 @@ Foam::timeCluster Foam::multiSolver::parseConditionedFile
     (
         pcFile(first)
     );
-    
+
     IStringStream superLoopStream(pcFile(first + 1, second));
     token superLoopToken(superLoopStream);
 
@@ -1046,7 +1046,7 @@ Foam::timeCluster Foam::multiSolver::parseConditionedFile
     (
         superLoopToken.labelToken()
     );
-    
+
     IStringStream globalOffsetStream(pcFile(first + second + 2, third));
     token globalOffsetToken(globalOffsetStream);
 
@@ -1092,7 +1092,7 @@ Foam::timeCluster Foam::multiSolver::parseConditionedFile
             pcFile.size() - first - second - third - fourth - 4
         )
     );
-    
+
     return timeCluster
     (
         instantList(1, inst),
@@ -1119,7 +1119,7 @@ Foam::multiSolver::multiSolver
 )
 :
     dcd_(dict),
-    
+
     multiDictRegistry_
     (
         dcd_,
@@ -1128,7 +1128,7 @@ Foam::multiSolver::multiSolver
         systemName,
         constantName
     ),
-    
+
     multiControlDict_
     (
         IOobject
@@ -1179,7 +1179,7 @@ Foam::multiSolver::multiSolver
 )
 :
     dcd_(rootPath/caseName/systemName/multiControlDictName),
-    
+
     multiDictRegistry_
     (
         dcd_,
@@ -1266,7 +1266,7 @@ void Foam::multiSolver::preCondition(const word& processor)
     forAll(tclSource, tc)
     {
         forAll(tclSource[tc], inst)
-        {        
+        {
             fileName sourcePath;
             fileName destPath;
 
@@ -1288,7 +1288,7 @@ void Foam::multiSolver::preCondition(const word& processor)
                 destPath = path/tclSource[tc][inst].name();
             }
             mkDir(destPath);
-            
+
             fileNameList rootFiles
             (
                 readDir(sourcePath, fileName::FILE)
@@ -1304,16 +1304,16 @@ void Foam::multiSolver::preCondition(const word& processor)
                   + "@" + rootFiles[rf]
                 );
             }
-            
+
             fileNameList subDirs
             (
                 readDir(sourcePath, fileName::DIRECTORY)
             );
-            
+
             forAll(subDirs, sd)
             {
                 mkDir(destPath/subDirs[sd]);
-                
+
                 fileNameList subDirFiles
                 (
                     readDir(sourcePath/subDirs[sd], fileName::FILE)
@@ -1373,7 +1373,7 @@ void Foam::multiSolver::postCondition(const word& processor)
         (
             path/times[t].name()
         );
-        
+
         // If timeFormat is not general, it will miss the -1 initial directory
         if (!exists(sourcePath))
         {
@@ -1386,7 +1386,7 @@ void Foam::multiSolver::postCondition(const word& processor)
                 continue;
             }
         }
-        
+
         // Root files first
         fileNameList rootFiles
         (
@@ -1436,7 +1436,7 @@ void Foam::multiSolver::postCondition(const word& processor)
                 );
                 multiSolverTime.set("globalOffset", tcSubject.globalOffset());
                 multiSolverTime.set("globalIndex", tcSubject.globalIndex());
-                
+
                 // Write multiSolverTime to the case/constant directory, then
                 // move to destination path
                 multiSolverTime.regIOobject::write();
@@ -1458,7 +1458,7 @@ void Foam::multiSolver::postCondition(const word& processor)
         (
             readDir(sourcePath, fileName::DIRECTORY)
         );
-        
+
         forAll(subDirs, sd)
         {
             fileNameList subDirFiles
@@ -1629,7 +1629,7 @@ void Foam::multiSolver::setSolverDomainPostProcessing
     }
 
     currentSolverDomain_ = solverDomainName;
-    
+
     setSolverDomainControls(currentSolverDomain_);
 
     // startTime is set to the earliest in case/[time]
@@ -1654,7 +1654,7 @@ void Foam::multiSolver::setSolverDomainPostProcessing
         ),
         currentSolverDomainDict_
     );
-    
+
     // Remove multiSolver-specific values from dictionary
     newControlDict.remove("startFrom");
     newControlDict.remove("startTime");
@@ -1666,14 +1666,14 @@ void Foam::multiSolver::setSolverDomainPostProcessing
     newControlDict.remove("timePrecision");
     newControlDict.remove("storeFields");
     newControlDict.remove("elapsedTime");
-    
+
     // Add values to obtain the desired behaviour
     newControlDict.set("startFrom", "startTime");
     newControlDict.set("startTime", startTime_);
     newControlDict.set("stopAt", stopAtSetting);
     newControlDict.set("endTime", endTime_);
     if (multiSolverControl_.found("timeFormat"))
-    {    
+    {
         newControlDict.set
         (
             "timeFormat",
@@ -1681,7 +1681,7 @@ void Foam::multiSolver::setSolverDomainPostProcessing
         );
     }
     if (multiSolverControl_.found("timePrecision"))
-    {    
+    {
         newControlDict.set
         (
             "timePrecision",

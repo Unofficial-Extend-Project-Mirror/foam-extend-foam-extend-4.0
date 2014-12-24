@@ -34,12 +34,11 @@ Author
 
 #include "fineBlockAmgLevel.H"
 #include "coarseBlockAmgLevel.H"
-#include "ICCG.H"
-#include "BICCG.H"
-#include "BlockGaussSeidelSolver.H"
 #include "BlockSolverPerformance.H"
 #include "BlockCoeffNorm.H"
 #include "BlockCoeffTwoNorm.H"
+#include "BlockBiCGStabSolver.H"
+#include "BlockCGSolver.H"
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
@@ -49,7 +48,7 @@ Foam::fineBlockAmgLevel<Type>::fineBlockAmgLevel
 (
     const BlockLduMatrix<Type>& matrix,
     const dictionary& dict,
-    const word& policyType,
+    const word& coarseningType,
     const label groupSize,
     const label minCoarseEqns,
     const word& smootherType
@@ -57,11 +56,11 @@ Foam::fineBlockAmgLevel<Type>::fineBlockAmgLevel
 :
     matrix_(matrix),
     dict_(dict),
-    policyPtr_
+    coarseningPtr_
     (
-        BlockAmgPolicy<Type>::New
+        BlockMatrixCoarsening<Type>::New
         (
-            policyType,
+            coarseningType,
             matrix_,
             dict_,
             groupSize,
@@ -145,7 +144,7 @@ void Foam::fineBlockAmgLevel<Type>::restrictResidual
 
     // Here x != 0.  It is assumed that the buffer will contain the residual
     // if no pre-sweeps have been done.  HJ, 4/Sep/2006
-    policyPtr_->restrictResidual(xBuffer, coarseRes);
+    coarseningPtr_->restrictResidual(xBuffer, coarseRes);
 }
 
 
@@ -156,7 +155,7 @@ void Foam::fineBlockAmgLevel<Type>::prolongateCorrection
     const Field<Type>& coarseX
 ) const
 {
-    policyPtr_->prolongateCorrection(x, coarseX);
+    coarseningPtr_->prolongateCorrection(x, coarseX);
 }
 
 
@@ -181,35 +180,46 @@ void Foam::fineBlockAmgLevel<Type>::solve
     const scalar relTol
 ) const
 {
+    Info<< "Fine level solver"<<endl;
 
-    Info<<"Fine level solver"<<endl;
+    // Create artificial dictionary for finest solution
+    dictionary finestDict;
+//     finestDict.add("nDirections", "5");
+    finestDict.add("minIter", 1);
+    finestDict.add("maxIter", 1000);
+    finestDict.add("tolerance", tolerance);
+    finestDict.add("relTol", relTol);
 
     if (matrix_.symmetric())
     {
+        finestDict.add("preconditioner", "Cholesky");
+
         BlockSolverPerformance<Type> coarseSolverPerf =
             BlockCGSolver<Type>
             (
                 "topLevelCorr",
                 matrix_,
-                dict_
+                finestDict
             ).solve(x, b);
 
-        if (lduMatrix::debug >= 2)
+        if (BlockLduMatrix<Type>::debug >= 2)
         {
             coarseSolverPerf.print();
         }
     }
     else
     {
+        finestDict.add("preconditioner", "Cholesky");
+
         BlockSolverPerformance<Type> coarseSolverPerf =
             BlockBiCGStabSolver<Type>
             (
                 "topLevelCorr",
                 matrix_,
-                dict_
+                finestDict
             ).solve(x, b);
 
-        if (lduMatrix::debug >= 2)
+        if (BlockLduMatrix<Type>::debug >= 2)
         {
             coarseSolverPerf.print();
         }
@@ -235,8 +245,8 @@ void Foam::fineBlockAmgLevel<Type>::scaleX
         x
     );
 
-    scalar scalingFactorNum = sumProd(x,b);
-    scalar scalingFactorDenom = sumProd(x,Ax);
+    scalar scalingFactorNum = sumProd(x, b);
+    scalar scalingFactorDenom = sumProd(x, Ax);
 
     vector scalingVector(scalingFactorNum, scalingFactorDenom, 0);
     reduce(scalingVector, sumOp<vector>());
@@ -267,17 +277,17 @@ template<class Type>
 Foam::autoPtr<Foam::BlockAmgLevel<Type> >
 Foam::fineBlockAmgLevel<Type>::makeNextLevel() const
 {
-    if (policyPtr_->coarsen())
+    if (coarseningPtr_->coarsen())
     {
         return autoPtr<Foam::BlockAmgLevel<Type> >
         (
             new coarseBlockAmgLevel<Type>
             (
-                policyPtr_->restrictMatrix(),
+                coarseningPtr_->restrictMatrix(),
                 dict(),
-                policyPtr_->type(),
-                policyPtr_->groupSize(),
-                policyPtr_->minCoarseEqns(),
+                coarseningPtr_->type(),
+                coarseningPtr_->groupSize(),
+                coarseningPtr_->minCoarseEqns(),
                 smootherPtr_->type()
             )
         );

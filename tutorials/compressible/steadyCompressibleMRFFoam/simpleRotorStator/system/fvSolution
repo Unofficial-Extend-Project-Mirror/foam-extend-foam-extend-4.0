@@ -1,0 +1,99 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | foam-extend: Open Source CFD                    |
+|  \\    /   O peration     | Version:     3.1                                |
+|   \\  /    A nd           | Web:         http://www.extend-project.de       |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      fvSolution;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+solvers
+{
+    p
+    {
+        solver           BiCGStab;
+        preconditioner   DILU;
+
+        minIter          0;
+        maxIter          1000;
+        tolerance        1e-8;
+        relTol           0.01;
+    }
+    U
+    {
+        solver           BiCGStab;
+        preconditioner   DILU;
+
+        minIter           0;
+        maxIter           1000;
+        tolerance        1e-8;
+        relTol           0.01;
+    }
+    i
+    {
+        solver           BiCGStab;
+        preconditioner   DILU;
+
+        minIter          0;
+        maxIter          1000;
+        tolerance        1e-8;
+        relTol           0.01;
+    }
+    k
+    {
+        solver           BiCGStab;
+        preconditioner   DILU;
+
+        minIter          0;
+        maxIter          1000;
+        tolerance        1e-8;
+        relTol           0.0;
+    }
+    epsilon
+    {
+        solver           BiCGStab;
+        preconditioner   DILU;
+
+        minIter          0;
+        maxIter          1000;
+        tolerance        1e-8;
+        relTol           0.0;
+    }
+}
+
+PIMPLE
+{
+    nOuterCorrectors         1;
+    nCorrectors              2;
+    nNonOrthogonalCorrectors 0;
+}
+
+relaxationFactors
+{
+    // Note: under-relaxation factors used in wave-transmissive schemes
+    U               0.5;
+    p               0.2;
+    i               0.1;
+    h               0.5;
+    rho             0.25;
+
+    k               0.2;
+    epsilon         0.2;
+}
+
+fieldBounds
+{
+    // With bounding
+    p      2e4     1e6;
+    T      200     500;
+    U      500;
+}
+
+// ************************************************************************* //

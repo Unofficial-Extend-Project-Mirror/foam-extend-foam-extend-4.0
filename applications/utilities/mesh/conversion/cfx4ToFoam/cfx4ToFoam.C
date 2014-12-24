@@ -73,7 +73,7 @@ int main(int argc, char *argv[])
 
     cfxFile >> nblock >> npatch >> nglue >> nelem >> npoint;
 
-    Info << "Reading blocks" << endl;
+    Info<< "Reading blocks" << endl;
 
     PtrList<hexBlock> blocks(nblock);
 
@@ -90,7 +90,7 @@ int main(int argc, char *argv[])
         }
     }
 
-    Info << "Reading patch definitions" << endl;
+    Info<< "Reading patch definitions" << endl;
 
     wordList cfxPatchTypes(npatch);
     wordList cfxPatchNames(npatch);
@@ -126,7 +126,7 @@ int main(int argc, char *argv[])
         }
     }
 
-    Info << "Reading block glueing information" << endl;
+    Info<< "Reading block glueing information" << endl;
 
     labelList glueMasterPatches(nglue, -1);
     labelList glueSlavePatches(nglue, -1);
@@ -145,15 +145,15 @@ int main(int argc, char *argv[])
         }
     }
 
-    Info << "Reading block points" << endl;
+    Info<< "Reading block points" << endl;
 
     forAll (blocks, blockI)
     {
-        Info << "block " << blockI << " is a ";
+        Info<< "block " << blockI << " is a ";
         blocks[blockI].readPoints(cfxFile);
     }
 
-    Info << "Calculating block offsets" << endl;
+    Info<< "Calculating block offsets" << endl;
 
     labelList blockOffsets(nblock, -1);
 
@@ -172,7 +172,7 @@ int main(int argc, char *argv[])
           + blocks[blockI - 1].nBlockPoints();
     }
 
-    Info << "Assembling patches" << endl;
+    Info<< "Assembling patches" << endl;
 
     faceListList rawPatches(npatch);
 
@@ -203,7 +203,7 @@ int main(int argc, char *argv[])
         }
     }
 
-    Info << "Merging points ";
+    Info<< "Merging points ";
 
     labelList pointMergeList(nMeshPoints, -1);
 
@@ -408,10 +408,10 @@ int main(int argc, char *argv[])
                 }
             }
         }
-        Info << "." << flush;
+        Info<< "." << flush;
     }
     while (changedPointMerge && nPasses < 8);
-    Info << endl;
+    Info<< endl;
 
     if (changedPointMerge == true)
     {
@@ -509,7 +509,7 @@ int main(int argc, char *argv[])
 
     nMeshPoints = nNewPoints;
 
-    Info << "Creating points" << endl;
+    Info<< "Creating points" << endl;
 
     pointField points(nMeshPoints);
 
@@ -536,7 +536,7 @@ int main(int argc, char *argv[])
         points *= scaleFactor;
     }
 
-    Info << "Creating cells" << endl;
+    Info<< "Creating cells" << endl;
 
     cellShapeList cellShapes(nMeshCells);
 
@@ -568,14 +568,13 @@ int main(int argc, char *argv[])
         }
     }
 
-    Info << "Creating boundary patches" << endl;
+    Info<< "Creating boundary patches" << endl;
 
     faceListList boundary(npatch);
     wordList patchNames(npatch);
     wordList patchTypes(npatch);
     word defaultFacesName = "defaultFaces";
     word defaultFacesType = wallPolyPatch::typeName;
-    wordList patchPhysicalTypes(npatch);
 
     label nCreatedPatches = 0;
 
@@ -600,7 +599,7 @@ int main(int argc, char *argv[])
 
             if (existingPatch >= 0)
             {
-                Info << "CFX patch " << patchI
+                Info<< "CFX patch " << patchI
                     << ", of type " << cfxPatchTypes[patchI]
                     << ", name " << cfxPatchNames[patchI]
                     << " already exists as FOAM patch " << existingPatch
@@ -652,7 +651,7 @@ int main(int argc, char *argv[])
                     }
                 }
 
-                Info << "CFX patch " << patchI
+                Info<< "CFX patch " << patchI
                     << ", of type " << cfxPatchTypes[patchI]
                     << ", name " << cfxPatchNames[patchI]
                     << " converted into FOAM patch " << nCreatedPatches
@@ -660,7 +659,7 @@ int main(int argc, char *argv[])
 
                 if (cfxPatchTypes[patchI] == "WALL")
                 {
-                    Info << "wall." << endl;
+                    Info<< "wall." << endl;
 
                     patchTypes[nCreatedPatches] = wallPolyPatch::typeName;
                     patchNames[nCreatedPatches] = cfxPatchNames[patchI];
@@ -668,7 +667,7 @@ int main(int argc, char *argv[])
                 }
                 else if (cfxPatchTypes[patchI] == "SYMMET")
                 {
-                    Info << "symmetryPlane." << endl;
+                    Info<< "symmetryPlane." << endl;
 
                     patchTypes[nCreatedPatches] = symmetryPolyPatch::typeName;
                     patchNames[nCreatedPatches] = cfxPatchNames[patchI];
@@ -683,7 +682,7 @@ int main(int argc, char *argv[])
                  || cfxPatchTypes[patchI] == "USER2D"
                 )
                 {
-                    Info << "generic." << endl;
+                    Info<< "generic." << endl;
 
                     patchTypes[nCreatedPatches] = polyPatch::typeName;
                     patchNames[nCreatedPatches] = cfxPatchNames[patchI];
@@ -704,17 +703,29 @@ int main(int argc, char *argv[])
     patchTypes.setSize(nCreatedPatches);
     patchNames.setSize(nCreatedPatches);
 
+    PtrList<dictionary> patchDicts;
+
     preservePatchTypes
     (
         runTime,
         runTime.constant(),
-        polyMesh::defaultRegion,
+        polyMesh::meshSubDir,
         patchNames,
-        patchTypes,
+        patchDicts,
         defaultFacesName,
-        defaultFacesType,
-        patchPhysicalTypes
+        defaultFacesType
     );
+
+    // Add information to dictionary
+    forAll (patchNames, patchI)
+    {
+        if (!patchDicts.set(patchI))
+        {
+            patchDicts.set(patchI, new dictionary());
+        }
+        // Add but not overwrite
+        patchDicts[patchI].add("type", patchTypes[patchI], false);
+    }
 
     polyMesh pShapeMesh
     (
@@ -728,19 +739,18 @@ int main(int argc, char *argv[])
         cellShapes,
         boundary,
         patchNames,
-        patchTypes,
+        patchDicts,
         defaultFacesName,
-        defaultFacesType,
-        patchPhysicalTypes
+        defaultFacesType
     );
 
     // Set the precision of the points data to 10
-    IOstream::defaultPrecision(10);
+    IOstream::defaultPrecision(max(10u, IOstream::defaultPrecision()));
 
-    Info << "Writing polyMesh" << endl;
+    Info<< "Writing polyMesh" << endl;
     pShapeMesh.write();
 
-    Info << "End\n" << endl;
+    Info<< "End\n" << endl;
 
     return 0;
 }

@@ -83,7 +83,7 @@ skewCorrectedSnGrad<Type>::correction
     ssf = pTraits<Type>::zero;
 
     typedef typename
-        outerProduct<vector, typename pTraits<Type>::cmptType>::type 
+        outerProduct<vector, typename pTraits<Type>::cmptType>::type
         CmptGradType;
 
     const unallocLabelList& owner = mesh.owner();
@@ -95,7 +95,7 @@ skewCorrectedSnGrad<Type>::correction
     const vectorField& Cf = mesh.Cf().internalField();
     const vectorField& C = mesh.C().internalField();
 
-    const scalarField& deltaCoeffs = 
+    const scalarField& deltaCoeffs =
         mesh.deltaCoeffs().internalField();
 
     surfaceVectorField kP
@@ -134,7 +134,7 @@ skewCorrectedSnGrad<Type>::correction
     kNI = Cf - vectorField(C, neighbour);
     kNI -= Sf*(Sf&kNI)/sqr(magSf);
 
-    vectorField delta = 
+    vectorField delta =
         Cf - (vectorField(C, neighbour) + kN + vectorField(C, owner) + kP)/2.0;
 
     kPI += delta;
@@ -144,34 +144,34 @@ skewCorrectedSnGrad<Type>::correction
     {
         if (kP.boundaryField()[patchI].coupled())
         {
-            kP.boundaryField()[patchI] = 
+            kP.boundaryField()[patchI] =
                 mesh.Cf().boundaryField()[patchI]
               - mesh.C().boundaryField()[patchI].patchInternalField();
 
-            kP.boundaryField()[patchI] -= 
+            kP.boundaryField()[patchI] -=
                 mesh.Sf().boundaryField()[patchI]
                *(
                     mesh.Sf().boundaryField()[patchI]
                   & kP.boundaryField()[patchI]
                 )/sqr(mesh.magSf().boundaryField()[patchI]);
 
-            kN.boundaryField()[patchI] = 
+            kN.boundaryField()[patchI] =
                 mesh.Cf().boundaryField()[patchI]
               - mesh.C().boundaryField()[patchI].patchNeighbourField();
 
-            kN.boundaryField()[patchI] -= 
+            kN.boundaryField()[patchI] -=
                 mesh.Sf().boundaryField()[patchI]
                *(
                     mesh.Sf().boundaryField()[patchI]
                   & kN.boundaryField()[patchI]
                 )/sqr(mesh.magSf().boundaryField()[patchI]);
 
-            vectorField delta = 
+            vectorField delta =
                 mesh.Cf().boundaryField()[patchI]
               - (
                     mesh.C().boundaryField()[patchI].patchNeighbourField()
                   + kN.boundaryField()[patchI]
-                  + mesh.C().boundaryField()[patchI].patchInternalField() 
+                  + mesh.C().boundaryField()[patchI].patchInternalField()
                   + kP.boundaryField()[patchI]
                 )/2.0;
 
@@ -225,7 +225,7 @@ skewCorrectedSnGrad<Type>::correction
                         )
                     )
                    *mesh.deltaCoeffs().boundaryField()[patchI]
-                );                
+                );
             }
         }
     }
@@ -239,8 +239,8 @@ skewCorrectedSnGrad<Type>::correction
             (
 	        uncorrectedSnGrad<Type>::snGrad
 		(
-		    vf, 
-		    this->deltaCoeffs(vf), 
+		    vf,
+		    this->deltaCoeffs(vf),
 		    "orthSnGrad"
 		)
 	      + ssf

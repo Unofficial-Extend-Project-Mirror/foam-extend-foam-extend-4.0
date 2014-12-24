@@ -24,7 +24,7 @@ echo
 echo "Installing additional packages"
 echo
 
-neededPackages=(g++ bison flex mercurial git make ccache cmake rpm)
+neededPackages=(g++ bison flex mercurial git make ccache cmake rpm zlib1g-dev libiberty-dev)
 bonusPackages=(emacs csh tcsh zsh)
 
 for p in ${neededPackages[@]}; do

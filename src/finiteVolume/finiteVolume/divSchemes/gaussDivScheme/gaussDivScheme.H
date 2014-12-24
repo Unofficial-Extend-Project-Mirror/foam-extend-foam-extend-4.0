@@ -96,6 +96,25 @@ public:
         (
             const GeometricField<Type, fvPatchField, volMesh>&
         );
+
+        //- Return the BlockLduSystem corresponding to the implicit div
+        // discretization. For block coupled system.
+        tmp
+        <
+            BlockLduSystem<vector, typename innerProduct<vector, Type>::type>
+        > fvmUDiv
+        (
+            const GeometricField<Type, fvPatchField, volMesh>&
+        ) const;
+
+        tmp
+        <
+            BlockLduSystem<vector, typename innerProduct<vector, Type>::type>
+        > fvmUDiv
+        (
+            const surfaceScalarField& flux,
+            const GeometricField<Type, fvPatchField, volMesh>&
+        ) const;
 };
 
 

@@ -5,7 +5,7 @@
     {
       magDEp = SMALL;
     }
-  
+
   plasticResidual =
     gMax
     (

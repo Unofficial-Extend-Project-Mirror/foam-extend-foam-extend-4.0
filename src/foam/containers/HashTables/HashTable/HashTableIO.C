@@ -32,16 +32,19 @@ License
 template<class T, class Key, class Hash>
 Foam::HashTable<T, Key, Hash>::HashTable(Istream& is, const label size)
 :
-    HashTableName(),
+    HashTableCore(),
     nElmts_(0),
-    tableSize_(canonicalSize(size)),
-    table_(new hashedEntry*[tableSize_]),
-    endIter_(*this, NULL, 0),
-    endConstIter_(*this, NULL, 0)
+    tableSize_(HashTableCore::canonicalSize(size)),
+    table_(NULL)
 {
-    for (label hashIdx = 0; hashIdx < tableSize_; hashIdx++)
+    if (tableSize_)
     {
-        table_[hashIdx] = 0;
+        table_ = new hashedEntry*[tableSize_];
+
+        for (label hashIdx = 0; hashIdx < tableSize_; hashIdx++)
+        {
+            table_[hashIdx] = 0;
+        }
     }
 
     operator>>(is, *this);

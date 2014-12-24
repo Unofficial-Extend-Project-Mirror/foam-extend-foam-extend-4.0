@@ -30,9 +30,9 @@
 #
 #
 # Requirements:
-#     1: Your OpenFOAM environment must be properly initialized
-#     2: OpenFOAM must already been compiled because swak4Foam depends on
-#        OpenFOAM include files and libraries
+#     1: Your foam-extend environment must be properly initialized
+#     2: foam-extend must already been compiled because swak4Foam depends on
+#        foam-extend include files and libraries
 #
 # Author:
 #     Martin Beaudoin, Hydro-Quebec, (2012)
@@ -44,7 +44,7 @@ cd ${0%/*} || exit 1
 wmakeCheckPwd "$WM_THIRD_PARTY_DIR" || {
     echo "Error: Current directory is not \$WM_THIRD_PARTY_DIR"
     echo "    The environment variables are inconsistent with the installation."
-    echo "    Check the OpenFOAM entries in your dot-files and source them."
+    echo "    Check the foam-extend entries in your dot-files and source them."
     exit 1
 }
 
@@ -70,42 +70,40 @@ then
     # centralized under the same scratch area
     if [ ! -e ./rpmBuild/BUILD/swak4Foam-$SWAK_RELEASE_VERSION ];
     then
-	echo "Checking for a Mercurial client: hg"
+        echo "Checking for a Mercurial client: hg"
         command -v hg >/dev/null
         if [ $? -eq 0 ];
-	then
-	    echo "Using Mercurial/hg to download the source code for swak4Foam"
-	    (
-		cd ./rpmBuild/BUILD;
-		hg clone http://hg.code.sf.net/p/openfoam-extend/swak4Foam swak4Foam-$SWAK_RELEASE_VERSION;
-		cd swak4Foam-$SWAK_RELEASE_VERSION;
-		hg checkout version_${SWAK_RELEASE_VERSION}_v2.x
-	    )
+        then
+            echo "Using Mercurial/hg to download the source code for swak4Foam"
+            (
+                cd ./rpmBuild/BUILD;
+                hg clone http://hg.code.sf.net/p/openfoam-extend/swak4Foam swak4Foam-$SWAK_RELEASE_VERSION;
+                cd swak4Foam-$SWAK_RELEASE_VERSION;
+                hg checkout version_${SWAK_RELEASE_VERSION}_v2.x
+            )
         else
-	    echo "Warning: Mercurial/hg is not installed. Switching to an alternate Subversion repository"
+            echo "Warning: Mercurial/hg is not installed. Switching to an alternate Subversion repository"
             command -v svn >/dev/null
             if [ $? -eq 0 ];
-	    then
-		echo "Using Subversion/svn to download the source code for swak4Foam"
-		echo "Error: current Subversion-version does not support foam3. Please install mercurial"
-		exit -1
-		(cd ./rpmBuild/BUILD; svn checkout svn://svn.code.sf.net/p/openfoam-extend/svn/trunk/Breeder_1.7/libraries/swak4Foam swak4Foam-$SWAK_RELEASE_VERSION)
+            then
+                echo "Using Subversion/svn to download the source code for swak4Foam"
+                (cd ./rpmBuild/BUILD; svn checkout svn://svn.code.sf.net/p/openfoam-extend/svn/trunk/Breeder_2.0/libraries/swak4Foam swak4Foam-$SWAK_RELEASE_VERSION)
             else
-		echo "Error: Please install either a Mercurial or Subversion client in order to download the source code for swak4Foam"
-		exit -1
-	    fi
-	fi
+                echo "Error: Please install either a Mercurial or Subversion client in order to download the source code for swak4Foam"
+                exit -1
+            fi
+        fi
         # We move the compilation results directly to $FOAM_SITE_APPBIN and $FOAM_SITE_LIBBIN
         # If you prefer to keep the libraries and tools under $FOAM_USER_LIBBIN and $FOAM_USER_APPBIN, simply
         # comment out the next two lines
-	(cd ./rpmBuild/BUILD/swak4Foam-$SWAK_RELEASE_VERSION; find . -name files   | xargs -n 1 sed -i.old "s/FOAM_USER/FOAM_SITE/g")
-	(cd ./rpmBuild/BUILD/swak4Foam-$SWAK_RELEASE_VERSION; find . -name options | xargs -n 1 sed -i.old "s/FOAM_USER/FOAM_SITE/g")
+        (cd ./rpmBuild/BUILD/swak4Foam-$SWAK_RELEASE_VERSION; find . -name files   | xargs -n 1 sed -i.old "s/FOAM_USER/FOAM_SITE/g")
+        (cd ./rpmBuild/BUILD/swak4Foam-$SWAK_RELEASE_VERSION; find . -name options | xargs -n 1 sed -i.old "s/FOAM_USER/FOAM_SITE/g")
 
         # We recompile everything
-	(cd ./rpmBuild/BUILD/swak4Foam-$SWAK_RELEASE_VERSION; ./Allwclean; ./Allwmake)
+        (cd ./rpmBuild/BUILD/swak4Foam-$SWAK_RELEASE_VERSION; ./Allwclean; ./Allwmake)
     else
-	echo "The source code for swak4Foam is already present under ./rpmBuild/BUILD/swak4Foam-$SWAK_RELEASE_VERSION"
-	echo "Please remove this directory if you want to refresh your installation of swak4Foam"
+        echo "The source code for swak4Foam is already present under ./rpmBuild/BUILD/swak4Foam-$SWAK_RELEASE_VERSION"
+        echo "Please remove this directory if you want to refresh your installation of swak4Foam"
     fi
     echo ""
 else

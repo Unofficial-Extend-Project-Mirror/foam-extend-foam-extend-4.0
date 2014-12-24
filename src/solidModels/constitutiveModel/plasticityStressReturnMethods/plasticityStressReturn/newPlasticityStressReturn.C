@@ -62,7 +62,7 @@ autoPtr<plasticityStressReturn> plasticityStressReturn::New
     << "Unknown plasticityStressReturn type "
     << name << endl << endl
     << "Valid  plasticityStressReturns methods are : " << endl
-    << dictionaryConstructorTablePtr_->toc()
+    << dictionaryConstructorTablePtr_->sortedToc()
     << exit(FatalIOError);
     }
 

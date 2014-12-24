@@ -9,7 +9,7 @@ pointPatchInterpolation patchPointInterpolator(stressMesh);
 
 wordList types
 (
-    pStressMesh.boundary().size(), 
+    pStressMesh.boundary().size(),
     calculatedFvPatchVectorField::typeName
 );
 
@@ -17,9 +17,9 @@ wordList types
 
 forAll(DU.boundaryField().types(), patchI)
 {
-    if 
+    if
     (
-        DU.boundaryField().types()[patchI] 
+        DU.boundaryField().types()[patchI]
      == fixedValueFvPatchVectorField::typeName
     )
     {

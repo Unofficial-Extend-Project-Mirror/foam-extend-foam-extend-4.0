@@ -3,7 +3,7 @@
 
 //     traction = (n&fvc::interpolate(sigma));
 
-    // surfaceTensorField sGradU = 
+    // surfaceTensorField sGradU =
     //     ((I - n*n)&fvc::interpolate(gradU));
 
     // traction =

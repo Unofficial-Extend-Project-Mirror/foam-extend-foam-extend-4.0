@@ -75,6 +75,7 @@ void Foam::MRFZone::setMRFFaces()
     {
         if (zoneCell[own[faceI]] || zoneCell[nei[faceI]])
         {
+            // By default, set type "other" for faces in MRF zone
             faceType[faceI] = 1;
             nZoneFaces++;
         }
@@ -87,20 +88,7 @@ void Foam::MRFZone::setMRFFaces()
     {
         const polyPatch& pp = patches[patchI];
 
-        if (pp.coupled() || excludedPatches.found(patchI))
-        {
-            forAll(pp, i)
-            {
-                label faceI = pp.start()+i;
-
-                if (zoneCell[own[faceI]])
-                {
-                    faceType[faceI] = 2;
-                    nZoneFaces++;
-                }
-            }
-        }
-        else if (!isA<emptyPolyPatch>(pp))
+        if (pp.isWall() && !excludedPatches.found(patchI))
         {
             forAll(pp, i)
             {
@@ -113,11 +101,24 @@ void Foam::MRFZone::setMRFFaces()
                 }
             }
         }
+        else if (!isA<emptyPolyPatch>(pp))
+        {
+            forAll(pp, i)
+            {
+                label faceI = pp.start()+i;
+
+                if (zoneCell[own[faceI]])
+                {
+                    faceType[faceI] = 2;
+                    nZoneFaces++;
+                }
+            }
+        }
     }
 
     // Now we have for faceType:
     //  0   : face not in cellZone
-    //  1   : internal face or normal patch face
+    //  1   : internal face or wall patch or empty patch
     //  2   : coupled patch face or excluded patch face
 
     // Sort into lists per patch.

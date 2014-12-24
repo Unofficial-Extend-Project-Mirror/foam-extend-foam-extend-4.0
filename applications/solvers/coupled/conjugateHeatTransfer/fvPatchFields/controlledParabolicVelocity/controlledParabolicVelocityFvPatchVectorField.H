@@ -58,7 +58,7 @@ class controlledParabolicVelocityFvPatchVectorField
 {
     // Private data
 
-        //- Volumetric flow rate 
+        //- Volumetric flow rate
         scalar Umean_;
 
         //- Flow direction

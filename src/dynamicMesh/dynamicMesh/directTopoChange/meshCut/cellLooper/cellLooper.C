@@ -61,7 +61,7 @@ autoPtr<cellLooper> cellLooper::New
         )   << "Unknown set type " << type
             << endl << endl
             << "Valid cellLooper types : " << endl
-            << wordConstructorTablePtr_->toc()
+            << wordConstructorTablePtr_->sortedToc()
             << exit(FatalError);
     }
 

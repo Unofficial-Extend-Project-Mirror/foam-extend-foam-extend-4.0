@@ -1,7 +1,7 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | foam-extend: Open Source CFD                    |
-|  \\    /   O peration     | Version:     3.0                                |
+|  \\    /   O peration     | Version:     3.1                                |
 |   \\  /    A nd           | Web:         http://www.extend-project.de       |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
@@ -15,59 +15,54 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-dimensions      [0 2 -3 0 0 0 0];
+dimensions [ 0 2 -3 0 0 0 0 ];
 
-internalField   uniform 0.1;
+internalField uniform 0.1;
 
 boundaryField
 {
-    outflow
+    downstreamMixingPlanePatch
     {
-        type            zeroGradient;
-    }
-    inflow
-    {
-        type            fixedValue;
-        value           uniform 0.1;
-    }
-    upstreamPerio1
-    {
-        type            cyclicGgi;
-        value           uniform 0.1;
-    }
-    upstreamPerio2
-    {
-        type            cyclicGgi;
-        value           uniform 0.1;
+        type mixingPlane;
     }
     upstreamMixingPlanePatch
     {
-        type            mixingPlane;
-        value           uniform 0.1;
-    }
-    downstreamMixingPlanePatch
-    {
-        type            mixingPlane;
-        value           uniform 0.1;
+        type mixingPlane;
     }
     downstreamWall
     {
-        type            symmetryPlane;
+        type symmetryPlane;
     }
     upstreamWall
     {
-        type            symmetryPlane;
+        type symmetryPlane;
     }
     downstreamPerio1
     {
-        type            cyclicGgi;
-        value           uniform 0.1;
+        type cyclicGgi;
     }
     downstreamPerio2
     {
-        type            cyclicGgi;
-        value           uniform 0.1;
+        type cyclicGgi;
+    }
+    upstreamPerio1
+    {
+        type cyclicGgi;
+    }
+    upstreamPerio2
+    {
+        type cyclicGgi;
+    }
+    inflow
+    {
+        type fixedValue;
+        value uniform 0.1;
+    }
+    outflow
+    {
+        type zeroGradient;
     }
 }
 
 // ************************************************************************* //
+

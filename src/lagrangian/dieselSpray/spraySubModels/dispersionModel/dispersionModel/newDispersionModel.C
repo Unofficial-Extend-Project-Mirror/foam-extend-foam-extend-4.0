@@ -61,7 +61,7 @@ autoPtr<dispersionModel> dispersionModel::New
             << dispersionModelType
             << ", constructor not in hash table" << endl << endl
             << "    Valid dispersionModel types are :" << endl;
-        Info<< dictionaryConstructorTablePtr_->toc() << abort(FatalError);
+        Info<< dictionaryConstructorTablePtr_->sortedToc() << abort(FatalError);
     }
 
     return autoPtr<dispersionModel>(cstrIter()(dict, sm));

@@ -1,7 +1,7 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | foam-extend: Open Source CFD                    |
-|  \\    /   O peration     | Version:     3.0                                |
+|  \\    /   O peration     | Version:     3.1                                |
 |   \\  /    A nd           | Web:         http://www.extend-project.de       |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
@@ -12,7 +12,6 @@ FoamFile
     class       dictionary;
     object      modifyMeshDict;
 }
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 // Move points:
@@ -39,16 +38,12 @@ facesToTriangulate
     (( -0.039123 -0.45045 0.74083) (-0.03844 -0.45049 0.73572))
 );
 
-
-
 // Edges to collapse. First coord is point on the edge, second is coordinate
 // to collapse to.
 edgesToCollapse
 (
     ((0.054975 0.099987 0.0044074)(0.054975 0.099987 0.0044074))
 );
-
-
 
 // Split cells:
 // First coord is a point inside the cell to split. A point inside the cell will
@@ -59,14 +54,12 @@ cellsToSplit
     (( -0.039123 -0.45045 0.74083) (-0.03844 -0.45049 0.73572))
 );
 
-
 // Change patch:
 // Changes patchID of faces. Coord selects the face, label is the patch index.
 facesToRepatch
 (
     (( -0.039123 -0.45045 0.74083) 1)
 );
-
 
 //// Create cell:
 //// Creates a cell on the boundary given a face covering a cavity. Gets
@@ -81,6 +74,5 @@ facesToRepatch
 //        (0.5 0.5 0.1)                       // cell centre
 //    )
 //);
-
 
 // ************************************************************************* //

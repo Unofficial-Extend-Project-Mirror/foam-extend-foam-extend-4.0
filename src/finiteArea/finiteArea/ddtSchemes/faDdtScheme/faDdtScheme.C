@@ -63,7 +63,7 @@ tmp<faDdtScheme<Type> > faDdtScheme<Type>::New
             schemeData
         )   << "Ddt scheme not specified" << endl << endl
             << "Valid ddt schemes are :" << endl
-            << IstreamConstructorTablePtr_->toc()
+            << IstreamConstructorTablePtr_->sortedToc()
             << exit(FatalIOError);
     }
 
@@ -80,7 +80,7 @@ tmp<faDdtScheme<Type> > faDdtScheme<Type>::New
             schemeData
         )   << "unknown ddt scheme " << schemeName << endl << endl
             << "Valid ddt schemes are :" << endl
-            << IstreamConstructorTablePtr_->toc()
+            << IstreamConstructorTablePtr_->sortedToc()
             << exit(FatalIOError);
     }
 

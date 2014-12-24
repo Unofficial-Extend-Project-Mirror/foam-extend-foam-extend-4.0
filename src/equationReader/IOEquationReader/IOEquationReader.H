@@ -84,7 +84,7 @@ public:
 
 
     // Member functions
-    
+
         //- Access showDataSourceInfo flag
         inline bool& showDataSourceInfo()
         {

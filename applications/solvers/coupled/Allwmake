@@ -4,7 +4,10 @@ set -x
 
 wmake libso conjugateHeatTransfer
 
-wmake blockCoupledScalarTransportFoam  
+wmake blockCoupledScalarTransportFoam
 wmake conjugateHeatFoam
-wmake conjugateHeatSimpleFoam  
+wmake conjugateHeatSimpleFoam
+wmake pUCoupledFoam
+wmake pUCoupledFullPicardFoam
+wmake pUCoupledSemiPicardFoam
 # ----------------------------------------------------------------- end-of-file

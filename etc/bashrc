@@ -34,7 +34,7 @@
 
 export WM_PROJECT=foam
 export WM_FORK=extend
-export WM_PROJECT_VERSION=3.0
+export WM_PROJECT_VERSION=3.1
 
 # helps to easily write #ifdefs to detect a dev-version
 export FOAM_DEV=1
@@ -329,14 +329,17 @@ Darwin)
 	    then
 		export WM_CC="gcc-mp-$WM_MACPORT_VERSION"
 		export WM_CXX="g++-mp-$WM_MACPORT_VERSION"
+		export WM_FC="gfortran-mp-$WM_MACPORT_VERSION"
 	    elif [ "$WM_BASE_COMPILER" == "Clang" ]
 	    then
 		export WM_CC="clang-mp-$WM_MACPORT_VERSION"
 		export WM_CXX="clang++-mp-$WM_MACPORT_VERSION"
+		# Seems like there is no Fortran-frontend for LLVM at thistime
 	    elif [ "$WM_BASE_COMPILER" == "Dragonegg" ]
 	    then
 		export WM_CC="dragonegg-$WM_MACPORT_VERSION-gcc"
 		export WM_CXX="dragonegg-$WM_MACPORT_VERSION-g++"
+		export WM_CXX="dragonegg-$WM_MACPORT_VERSION-gfortran"
 	    else
 		echo "Unknown base compiler $WM_BASE_COMPILER"
 	    fi
@@ -352,8 +355,7 @@ Darwin)
 	    unset ruleDir ruleDirBase
 	fi
     else
-	echo "Seems you're not using MacPorts. This is currently not supported/tested. Find this line in 'etc/config/settings.sh', modify it accordingly and send patches to Bernhard"
-        export WM_COMPILER=
+        export WM_COMPILER=Gcc
         export WM_MPLIB=OPENMPI
     fi
 
@@ -439,14 +441,15 @@ then
     export LD_PRELOAD
 fi
 
-if [[ `uname -s` == "Darwin" ]]
-then
-    if [[ `ulimit -n` == "unlimited" || `ulimit -n` < 8192 ]]
-    then
-	# higher limit needed for wmkdeps
-	ulimit -n 8192
-    fi
-fi
+# temporarily disabled.  HJ, 13/Jun/2014
+# if [[ `uname -s` == "Darwin" ]]
+# then
+#     if [[ `ulimit -n` == "unlimited" || `ulimit -n` < 8192 ]]
+#     then
+# 	# higher limit needed for wmkdeps
+# 	ulimit -n 8192
+#     fi
+# fi
 
 # cleanup environment:
 # ~~~~~~~~~~~~~~~~~~~~

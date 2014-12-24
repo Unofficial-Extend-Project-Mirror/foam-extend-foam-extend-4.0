@@ -133,10 +133,7 @@ void Foam::BlockAmgCycle<Type>::fixedCycle
         Field<Type>& bCoarse = coarseLevelPtr_->levelPtr_->b();
 
         // Zero out coarse x
-        forAll (xCoarse,i)
-        {
-            xCoarse[i] *= 0.0;
-        }
+        xCoarse = pTraits<Type>::zero;
 
         // Restrict residual: optimisation on number of pre-sweeps
         levelPtr_->restrictResidual

@@ -1,0 +1,71 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | foam-extend: Open Source CFD                    |
+|  \\    /   O peration     | Version:     3.1                                |
+|   \\  /    A nd           | Web:         http://www.extend-project.de       |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       volScalarField;
+    location    "0";
+    object      k;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+dimensions      [0 2 -2 0 0 0 0];
+
+internalField   uniform 4.86;
+
+boundaryField
+{
+    inlet
+    {
+        type            fixedValue;
+        value           $internalField;
+    }
+    outlet
+    {
+        type            inletOutlet;
+        inletValue      $internalField;
+        value           $internalField;
+    }
+    bladeRotor
+    {
+        type            compressible::kqRWallFunction;
+        value           $internalField;
+    }
+    shaftRotor
+    {
+        type            compressible::kqRWallFunction;
+        value           $internalField;
+    }
+    shroudRotor
+    {
+        type            compressible::kqRWallFunction;
+        value           $internalField;
+    }
+    bladeStator
+    {
+        type            compressible::kqRWallFunction;
+        value           $internalField;
+    }
+    shaftStator
+    {
+        type            compressible::kqRWallFunction;
+        value           $internalField;
+    }
+    shroudStator
+    {
+        type            compressible::kqRWallFunction;
+        value           $internalField;
+    }
+    frontAndBack
+    {
+        type            cyclic;
+    }
+}
+
+// ************************************************************************* //

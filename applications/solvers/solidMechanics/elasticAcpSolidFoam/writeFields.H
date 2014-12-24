@@ -140,7 +140,7 @@ if (runTime.outputTime() || topoChange)
 	    GII.boundaryField()[patchi] = Upatch.GII();
 	    damageAndCracks.boundaryField()[patchi] = Upatch.crackingAndDamage();
 	  }
-      } 
+      }
     volScalarField GTotal("GTotal", GI + GII);
     GTotal.write();
 

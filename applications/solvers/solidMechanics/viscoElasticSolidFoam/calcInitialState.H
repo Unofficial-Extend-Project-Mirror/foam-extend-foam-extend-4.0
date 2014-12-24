@@ -24,7 +24,7 @@
                 fvm::laplacian(2*mu+lambda, DU, "laplacian(DDU,DU)")
               + fvc::div
                 (
-                    mu*gradDU.T() 
+                    mu*gradDU.T()
                   + lambda*(I*tr(gradDU))
                   - (mu + lambda)*gradDU,
                     "div(sigma)"
@@ -65,8 +65,8 @@
             DSigmaCorr =
                 dimensionedSymmTensor
                 (
-                    "zero", 
-                    dimForce/dimArea, 
+                    "zero",
+                    dimForce/dimArea,
                     symmTensor::zero
                 );
             scalar t = runTime.value();

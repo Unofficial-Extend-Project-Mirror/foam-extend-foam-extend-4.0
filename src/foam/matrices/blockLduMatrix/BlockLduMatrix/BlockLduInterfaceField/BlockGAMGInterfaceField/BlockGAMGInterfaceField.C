@@ -49,7 +49,7 @@ Foam::autoPtr<Foam::BlockGAMGInterfaceField<Type> > Foam::BlockGAMGInterfaceFiel
             "const BlockLduInterfaceField<Type>& fineInterface)"
         )   << "Unknown BlockGAMGInterfaceField type " << coupleType << ".\n"
             << "Valid BlockGAMGInterfaceField types are :"
-            << lduInterfaceConstructorTablePtr_->toc()
+            << lduInterfaceConstructorTablePtr_->sortedToc()
             << exit(FatalError);
     }
 

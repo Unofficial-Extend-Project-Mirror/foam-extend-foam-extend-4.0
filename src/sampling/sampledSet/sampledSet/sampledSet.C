@@ -429,7 +429,7 @@ Foam::autoPtr<Foam::sampledSet> Foam::sampledSet::New
         )   << "Unknown sample type " << sampleType
             << endl << endl
             << "Valid sample types : " << endl
-            << wordConstructorTablePtr_->toc()
+            << wordConstructorTablePtr_->sortedToc()
             << exit(FatalError);
     }
 

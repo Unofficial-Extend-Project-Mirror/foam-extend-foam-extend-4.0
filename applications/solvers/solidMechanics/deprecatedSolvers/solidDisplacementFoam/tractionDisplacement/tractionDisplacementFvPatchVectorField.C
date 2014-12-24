@@ -176,7 +176,7 @@ void tractionDisplacementFvPatchVectorField::updateCoeffs()
     gradient() =
     (
         (traction_ + pressure_*n)/rho.value()
-      + twoMuLambda*fvPatchField<vector>::snGrad() - (n & sigmaD) 
+      + twoMuLambda*fvPatchField<vector>::snGrad() - (n & sigmaD)
     )/twoMuLambda;
 
     Switch thermalStress(thermalProperties.lookup("thermalStress"));
@@ -186,7 +186,7 @@ void tractionDisplacementFvPatchVectorField::updateCoeffs()
         dimensionedScalar alpha(thermalProperties.lookup("alpha"));
         dimensionedScalar threeKalpha = threeK*alpha;
 
-        const fvPatchField<scalar>& T = 
+        const fvPatchField<scalar>& T =
             patch().lookupPatchField<volScalarField, scalar>("T");
 
         gradient() += n*threeKalpha.value()*T/twoMuLambda;

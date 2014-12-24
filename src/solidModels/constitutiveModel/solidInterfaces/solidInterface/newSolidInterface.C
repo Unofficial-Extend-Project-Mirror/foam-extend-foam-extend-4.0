@@ -62,7 +62,7 @@ autoPtr<solidInterface> solidInterface::New
                 )   << "Unknown solidInterfaceMethod "
                     << name << endl << endl
                     << "Valid  solidInterfaces are : " << endl
-                    << dictionaryConstructorTablePtr_->toc()
+                    << dictionaryConstructorTablePtr_->sortedToc()
                     << exit(FatalIOError);
     }
 

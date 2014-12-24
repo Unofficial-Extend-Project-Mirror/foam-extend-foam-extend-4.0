@@ -147,6 +147,13 @@ void pressureDirectedInletVelocityFvPatchVectorField::updateCoeffs()
     if (!this->db().objectRegistry::found(phiName_))
     {
         // Flux not available, do not update
+        InfoIn
+        (
+            "void pressureDirectedInletVelocityFvPatchVectorField::"
+            "updateCoeffs()"
+        )   << "Flux field " << phiName_ << " not found.  "
+            << "Performing fixed value update" << endl;
+
         fixedValueFvPatchVectorField::updateCoeffs();
 
         return;

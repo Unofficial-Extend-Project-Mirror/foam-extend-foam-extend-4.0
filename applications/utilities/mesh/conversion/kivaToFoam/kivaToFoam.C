@@ -43,11 +43,11 @@ Description
 #include "symmetryPolyPatch.H"
 #include "wedgePolyPatch.H"
 #include "cyclicPolyPatch.H"
-#include "mathematicalConstants.H"
+#include "unitConversion.H"
 
 using namespace Foam;
 
-// Supported KIVA versions
+//- Supported KIVA versions
 enum kivaVersions
 {
     kiva3,
@@ -55,7 +55,6 @@ enum kivaVersions
 };
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-// Main program:
 
 int main(int argc, char *argv[])
 {
@@ -93,7 +92,6 @@ int main(int argc, char *argv[])
                 << exit(FatalError);
 
             args.printUsage();
-
             FatalError.exit(1);
         }
     }
@@ -103,7 +101,7 @@ int main(int argc, char *argv[])
 
 #   include "readKivaGrid.H"
 
-    Info << "End\n" << endl;
+    Info<< "End\n" << endl;
 
     return 0;
 }

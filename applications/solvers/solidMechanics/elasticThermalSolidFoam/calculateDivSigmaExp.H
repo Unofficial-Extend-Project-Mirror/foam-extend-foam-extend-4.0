@@ -8,7 +8,7 @@ if(divSigmaExpMethod == "standard")
       - gradThreeKalphaDeltaT;
 }
 else if(divSigmaExpMethod == "surface")
-{ 
+{
      divSigmaExp = fvc::div
        (
 	muf*(mesh.Sf() & fvc::interpolate(gradU.T()))
@@ -23,7 +23,7 @@ else if(divSigmaExpMethod == "decompose")
 
     surfaceTensorField shearGradU =
         ((I - n*n)&fvc::interpolate(gradU));
-     
+
     divSigmaExp = fvc::div
     (
         (
@@ -34,7 +34,7 @@ else if(divSigmaExpMethod == "decompose")
                 + muf*(shearGradU & n)
             )
         )
-      - threeKalphaDeltaTf	  
+      - threeKalphaDeltaTf
 	);
 }
 /* else if(divSigmaExpMethod == "expLaplacian")

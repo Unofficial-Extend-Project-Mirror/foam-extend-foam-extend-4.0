@@ -849,6 +849,7 @@ Foam::cyclicPolyPatch::cyclicPolyPatch
     if (dict.found("transform"))
     {
         transform_ = transformTypeNames.read(dict.lookup("transform"));
+
         switch (transform_)
         {
             case ROTATIONAL:

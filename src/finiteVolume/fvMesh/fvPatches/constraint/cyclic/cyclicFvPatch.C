@@ -46,7 +46,7 @@ void cyclicFvPatch::makeWeights(scalarField& w) const
     const scalarField& magFa = magSf();
 
     // Note: mag in the dot-product.
-    // For all valid meshes, the non-orthogonality will be less that
+    // For all valid meshes, the non-orthogonality will be less than
     // 90 deg and the dot-product will be positive.  For invalid
     // meshes (d & s <= 0), this will stabilise the calculation
     // but the result will be poor.  HJ, 24/Aug/2011

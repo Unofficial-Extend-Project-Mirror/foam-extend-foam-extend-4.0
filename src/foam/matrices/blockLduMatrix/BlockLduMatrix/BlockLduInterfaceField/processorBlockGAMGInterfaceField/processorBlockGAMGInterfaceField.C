@@ -24,6 +24,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "processorBlockGAMGInterfaceField.H"
+#include "processorLduInterfaceField.H"
 #include "addToRunTimeSelectionTable.H"
 #include "lduMatrix.H"
 
@@ -52,6 +53,14 @@ Foam::processorBlockGAMGInterfaceField<Type>::processorBlockGAMGInterfaceField
             (
                 fineInterfaceField
             );
+
+        doTransform_ = p.doTransform();
+        rank_ = p.rank();
+    }
+    else if (isA<processorLduInterfaceField>(fineInterfaceField))
+    {
+        const processorLduInterfaceField& p =
+            refCast<const processorLduInterfaceField >(fineInterfaceField);
 
         doTransform_ = p.doTransform();
         rank_ = p.rank();

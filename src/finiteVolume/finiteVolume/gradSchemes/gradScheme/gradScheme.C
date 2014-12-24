@@ -64,7 +64,7 @@ tmp<gradScheme<Type> > gradScheme<Type>::New
             schemeData
         )   << "Grad scheme not specified" << endl << endl
             << "Valid grad schemes are :" << endl
-            << IstreamConstructorTablePtr_->toc()
+            << IstreamConstructorTablePtr_->sortedToc()
             << exit(FatalIOError);
     }
 
@@ -81,7 +81,7 @@ tmp<gradScheme<Type> > gradScheme<Type>::New
             schemeData
         )   << "unknown grad scheme " << schemeName << endl << endl
             << "Valid grad schemes are :" << endl
-            << IstreamConstructorTablePtr_->toc()
+            << IstreamConstructorTablePtr_->sortedToc()
             << exit(FatalIOError);
     }
 
@@ -97,6 +97,37 @@ gradScheme<Type>::~gradScheme()
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+
+template<class Type>
+tmp
+<
+    BlockLduSystem<vector, typename outerProduct<vector, Type>::type>
+>
+gradScheme<Type>::fvmGrad
+(
+    const GeometricField<Type, fvPatchField, volMesh>& vf
+) const
+{
+    FatalErrorIn
+    (
+        "tmp<BlockLduSystem> gradScheme<Type>::fvmGrad\n"
+        "(\n"
+        "    GeometricField<Type, fvPatchField, volMesh>&" 
+        ")\n"
+    )   << "Implicit gradient operator currently defined only for Gauss linear "
+        << "and leastSquares (cell and face limiters are optional)."
+        << abort(FatalError);
+
+    typedef typename outerProduct<vector, Type>::type GradType;
+
+    tmp<BlockLduSystem<vector, GradType> > tbs
+    (
+        new BlockLduSystem<vector, GradType>(vf.mesh())
+    );
+
+    return tbs;
+}
+
 
 template<class Type>
 void gradScheme<Type>::correctBoundaryConditions

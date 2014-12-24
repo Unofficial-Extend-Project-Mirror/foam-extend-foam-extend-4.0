@@ -1,0 +1,3 @@
+removeSurfaceFacets.C
+
+EXE = $(FOAM_APPBIN)/removeSurfaceFacets

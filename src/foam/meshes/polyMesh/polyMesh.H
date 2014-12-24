@@ -60,6 +60,7 @@ SourceFiles
 namespace Foam
 {
 
+// Forward declaration of classes
 class globalMeshData;
 class mapPolyMesh;
 
@@ -202,6 +203,18 @@ private:
                 const label patchID
             ) const;
 
+            void setTopology
+            (
+                const cellShapeList& cellsAsShapes,
+                const faceListList& boundaryFaces,
+                const wordList& boundaryPatchNames,
+                labelList& patchSizes,
+                labelList& patchStarts,
+                label& defaultPatchStart,
+                label& nFaces,
+                cellList& cells
+            );
+
 
 public:
 
@@ -261,6 +274,21 @@ public:
             const word& defaultBoundaryPatchName,
             const word& defaultBoundaryPatchType,
             const wordList& boundaryPatchPhysicalTypes,
+            const bool syncPar = true
+        );
+
+        //- Construct from cell shapes with patch information in dictionary
+        //  format.
+        polyMesh
+        (
+            const IOobject& io,
+            const Xfer<pointField>& points,
+            const cellShapeList& shapes,
+            const faceListList& boundaryFaces,
+            const wordList& boundaryPatchNames,
+            const PtrList<dictionary>& boundaryDicts,
+            const word& defaultBoundaryPatchName,
+            const word& defaultBoundaryPatchType,
             const bool syncPar = true
         );
 
@@ -521,6 +549,12 @@ public:
 
             //- Remove all files from mesh instance()
             void removeFiles() const;
+
+
+        // Helper functions
+
+            //- Find cell enclosing this location (-1 if not in mesh)
+            label findCell(const point&) const;
 };
 
 

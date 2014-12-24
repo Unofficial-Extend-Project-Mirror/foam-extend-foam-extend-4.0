@@ -104,7 +104,11 @@ void Foam::gradientEnthalpyFvPatchScalarField::updateCoeffs()
 
     Tw.evaluate();
 
-    if (dimensionedInternalField().name() == db().mangleFileName("h"))
+    if
+    (
+        dimensionedInternalField().name() == db().mangleFileName("h")
+     || dimensionedInternalField().name() == db().mangleFileName("i")
+    )
     {
         gradient() = thermo.Cp(Tw, patchi)*Tw.snGrad()
         + patch().deltaCoeffs()*

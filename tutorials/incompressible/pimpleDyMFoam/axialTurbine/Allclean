@@ -1,0 +1,4 @@
+#!/bin/sh
+
+( cd constant/polyMesh && rm -rf boundary* blockMeshDict *Zones* faces* neighbour* owner* points* sets )
+rm -rf 0 0.* [1-9]* VTK log* processor*

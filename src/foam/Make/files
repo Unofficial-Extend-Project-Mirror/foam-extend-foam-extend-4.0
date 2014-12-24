@@ -81,8 +81,8 @@ coordinateSystems/coordinateRotation/axisCoordinateRotation.C
 
 primitives/random/Random.C
 
-containers/HashTables/HashTable/HashTableName.C
-containers/HashTables/StaticHashTable/StaticHashTableName.C
+containers/HashTables/HashTable/HashTableCore.C
+containers/HashTables/StaticHashTable/StaticHashTableCore.C
 containers/Lists/SortableList/ParSortableListName.C
 containers/Lists/PackedList/PackedListName.C
 containers/Lists/ListOps/ListOps.C
@@ -212,6 +212,7 @@ dimensionedTypes/dimensionedDiagTensor/dimensionedDiagTensor.C
 dimensionedTypes/dimensionedSymmTensor/dimensionedSymmTensor.C
 dimensionedTypes/dimensionedSymmTensor4thOrder/dimensionedSymmTensor4thOrder.C
 dimensionedTypes/dimensionedTensor/dimensionedTensor.C
+dimensionedTypes/dimensionedVectorTensorN/dimensionedVectorTensorN.C
 
 matrices/solution/solution.C
 matrices/constraint/scalarConstraint.C
@@ -661,8 +662,8 @@ $(BlockLduInterfaceField)/blockVectorNGAMGInterfaceFields.C
 
 matrices/blockLduMatrix/BlockAmg/blockAmgCycles.C
 matrices/blockLduMatrix/BlockAmg/blockAmgLevels.C
-matrices/blockLduMatrix/BlockAmg/BlockAmgPolicy/blockAmgPolicies.C
-matrices/blockLduMatrix/BlockAmg/BlockAmgPolicy/blockAamgPolicies.C
+matrices/blockLduMatrix/BlockAmg/BlockMatrixCoarsening/blockMatrixCoarsenings.C
+matrices/blockLduMatrix/BlockAmg/BlockMatrixCoarsening/blockMatrixAgglomerations.C
 
 matrices/blockLduMatrix/BlockLduPrecons/BlockLduPrecon/blockLduPrecons.C
 matrices/blockLduMatrix/BlockLduPrecons/BlockNoPrecon/blockNoPrecons.C

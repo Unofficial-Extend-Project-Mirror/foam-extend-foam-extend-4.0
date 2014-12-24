@@ -25,7 +25,6 @@ License
 
 #include "toroidalCS.H"
 #include "mathematicalConstants.H"
-#include "Switch.H"
 #include "boundBox.H"
 #include "addToRunTimeSelectionTable.H"
 
@@ -106,7 +105,7 @@ bool Foam::toroidalCS::inDegrees() const
 }
 
 
-bool& Foam::toroidalCS::inDegrees()
+Foam::Switch& Foam::toroidalCS::inDegrees()
 {
     return inDegrees_;
 }
@@ -205,7 +204,7 @@ void Foam::toroidalCS::writeDict(Ostream& os, bool subDict) const
 {
     if (subDict)
     {
-        os  << indent << name() << nl
+        os  << indent << nl
             << indent << token::BEGIN_BLOCK << incrIndent << nl;
     }
 
@@ -217,5 +216,6 @@ void Foam::toroidalCS::writeDict(Ostream& os, bool subDict) const
         os << decrIndent << indent << token::END_BLOCK << endl;
     }
 }
+
 
 // ************************************************************************* //

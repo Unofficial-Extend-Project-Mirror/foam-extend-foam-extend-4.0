@@ -260,7 +260,7 @@ chtRcThermalDiffusivityResistanceFvPatchScalarField::calcThermalDiffusivity
     k /= stabilise(TcOwn - TcNei, SMALL)*p.deltaCoeffs();
 */
 
-    // Expression is equivalent to the one above 
+    // Expression is equivalent to the one above
     k = kOwn*
     (
         TwOwn*

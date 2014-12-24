@@ -25,7 +25,7 @@ if(divDSigmaNonLinExpMethod == "standard")
     );
 }
 else if(divDSigmaNonLinExpMethod == "surface")
-{ 
+{
      divDSigmaNonLinExp = fvc::div
      (
          mesh.magSf()*

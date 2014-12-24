@@ -1,4 +1,4 @@
-// aitken acceleration 
+// aitken acceleration
 
 // update delta
 aitkenDelta.storePrevIter();
@@ -24,7 +24,7 @@ if(iCorr == 0)
 	 // << endl;
 	 sumMagB += SMALL;
        }
-     
+
      aitkenTheta = -aitkenTheta*
        gSum(aitkenDelta.prevIter().internalField() & b)
        /

@@ -44,6 +44,7 @@ Authors
 #define ellipticCylindricalCS_H
 
 #include "coordinateSystem.H"
+#include "Switch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -64,7 +65,7 @@ class ellipticCylindricalCS
         const scalar a_;
 
         //- Are angles in degrees? (default = true)
-        bool inDegrees_;
+        Switch inDegrees_;
 
 
 protected:
@@ -168,10 +169,19 @@ public:
 
 
         //- Are angles in degrees?
-        bool  inDegrees() const;
+        bool inDegrees() const;
 
         //- Non-const access to inDegrees
-        bool& inDegrees();
+        Switch& inDegrees();
+
+
+        // Write
+
+            //- Write
+            virtual void write(Ostream&) const;
+
+            //- Write dictionary
+            virtual void writeDict(Ostream&, bool subDict = true) const;
 };
 
 

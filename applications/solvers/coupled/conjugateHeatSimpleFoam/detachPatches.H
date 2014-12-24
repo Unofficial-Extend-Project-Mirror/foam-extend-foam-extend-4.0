@@ -14,7 +14,7 @@
     }
 
     // Force recalculation of weights
-    mesh.surfaceInterpolation::movePoints(); 
+    mesh.surfaceInterpolation::movePoints();
 }
 /*
 {
@@ -33,6 +33,6 @@
     }
 
     // Force recalculation of weights
-    solidMesh.surfaceInterpolation::movePoints(); 
+    solidMesh.surfaceInterpolation::movePoints();
 }
 */

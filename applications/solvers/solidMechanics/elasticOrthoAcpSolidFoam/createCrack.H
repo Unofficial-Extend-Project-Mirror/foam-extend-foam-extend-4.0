@@ -42,7 +42,7 @@
     // 	(
     // 	 U.boundaryField()[cohesivePatchID]
     //     );
-    
+
    // philipc: I have moved cohesive stuff to constitutiveModel
    // cohesiveZone is an index field
    // which allows the user to limit the crack to certain areas at runtime
@@ -66,18 +66,18 @@
     {
       const dictionary& stressControl =
 	mesh.solutionDict().subDict("solidMechanics");
-      
+
       List<boundBox> userBoxes(stressControl.lookup("crackLimitingBoxes"));
       const surfaceVectorField& Cf = mesh.Cf();
       forAll(cohesiveZone.internalField(), faceI)
 	{
 	  bool faceInsideBox = false;
-	  
+
 	  forAll(userBoxes, boxi)
 	    {
 	      if(userBoxes[boxi].contains(Cf.internalField()[faceI])) faceInsideBox = true;
 	    }
-	  
+
 	  if(faceInsideBox)
 	    {
 	      cohesiveZone.internalField()[faceI] = 1.0;
@@ -92,12 +92,12 @@
 	      forAll(cohesiveZone.boundaryField()[patchI], faceI)
 		{
 		  bool faceInsideBox = false;
-		  
+
 		  forAll(userBoxes, boxi)
 		    {
 		      if(userBoxes[boxi].contains(Cf.boundaryField()[patchI][faceI])) faceInsideBox = true;
 		    }
-		  
+
 		  if(faceInsideBox)
 		    {
 		      cohesiveZone.boundaryField()[patchI][faceI] = 1.0;
@@ -148,7 +148,7 @@
 
     Switch initialiseSolution(false);
 
-    if 
+    if
     (
         mesh.solutionDict().subDict("solidMechanics")
        .found("initialiseSolution")
@@ -167,7 +167,7 @@
 
     Switch breakOnlyOneFacePerTopologyChange(true);
 
-    if 
+    if
     (
         mesh.solutionDict().subDict("solidMechanics")
        .found("breakOnlyOneFacePerTopologyChange")

@@ -66,17 +66,17 @@ normalContactModel::normalContactModel
     (patch.boundaryMesh().mesh().boundaryMesh()[slavePatchID].nPoints(), 0.0),
     masterToSlaveInterpolatorPtr_
     (
-     // new zoneToZoneInterpolation
-     new PatchToPatchInterpolation<
-         PrimitivePatch<
-             face, List, pointField
-             >, PrimitivePatch<face, List, pointField> >
-     (
-      masterFaceZonePatch,
-      slaveFaceZonePatch,
-      intersection::algorithmNames_.read(dict.lookup("projectionAlgo")),
-      intersection::directionNames_.read(dict.lookup("projectionDir"))
-      )
+        new PatchToPatchInterpolation
+        <
+            PrimitivePatch<face, List, pointField>,
+            PrimitivePatch<face, List, pointField>
+        >
+        (
+            masterFaceZonePatch,
+            slaveFaceZonePatch,
+            intersection::algorithmNames_.read(dict.lookup("projectionAlgo")),
+            intersection::directionNames_.read(dict.lookup("projectionDir"))
+        )
      )
 {}
 

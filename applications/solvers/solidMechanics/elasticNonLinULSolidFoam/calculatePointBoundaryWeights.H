@@ -13,7 +13,7 @@ FieldField<Field, scalar> w(ptc.size());
   const volVectorField& centres = mesh.C();
 
   const fvBoundaryMesh& bm = mesh.boundary();
-  
+
   pointScalarField volPointSumWeights
     (
      IOobject
@@ -25,13 +25,13 @@ FieldField<Field, scalar> w(ptc.size());
      pMesh,
      dimensionedScalar("zero", dimless, 0)
      );
-  
+
   forAll (ptc, pointI)
     {
       const label curPoint = ptc[pointI];
-      
+
       const labelList& curFaces = pf[curPoint];
-      
+
       //w.hook(new scalarField(curFaces.size())); //philipc no hook function
       w.set
        (
@@ -40,11 +40,11 @@ FieldField<Field, scalar> w(ptc.size());
 	);
 
       scalarField& curWeights = w[pointI];
-      
+
       label nFacesAroundPoint = 0;
-      
+
       const vector& pointLoc = mesh.points()[curPoint];
-      
+
       // Go through all the faces
       forAll (curFaces, faceI)
 	{
@@ -54,7 +54,7 @@ FieldField<Field, scalar> w(ptc.size());
 	      // or coupled calculate the extrapolation vector
 	      label patchID =
 		mesh.boundaryMesh().whichPatch(curFaces[faceI]);
-	      
+
 	      if
 		(
 		 !isA<emptyFvPatch>(bm[patchID])
@@ -74,23 +74,23 @@ FieldField<Field, scalar> w(ptc.size());
 		      bm[patchID].patch().whichFace(curFaces[faceI])
 		      ]
 		     );
-		  
+
 		  nFacesAroundPoint++;
 		}
 	    }
 	}
-      
+
       // Reset the sizes of the local weights
       curWeights.setSize(nFacesAroundPoint);
-      
+
       // Collect the sum of weights for parallel correction
       volPointSumWeights[curPoint] += sum(curWeights);
     }
-  
+
   // Do parallel correction of weights
-  
+
   // Update coupled boundaries
-  // Work-around for cyclic parallels.  
+  // Work-around for cyclic parallels.
   /*if (Pstream::parRun() && !mesh.parallelData().cyclicParallel())
     {
     forAll (volPointSumWeights.boundaryField(), patchI)
@@ -100,7 +100,7 @@ FieldField<Field, scalar> w(ptc.size());
     volPointSumWeights.boundaryField()[patchI].initAddField();
     }
     }
-    
+
     forAll (volPointSumWeights.boundaryField(), patchI)
     {
     if (volPointSumWeights.boundaryField()[patchI].coupled())
@@ -112,7 +112,7 @@ FieldField<Field, scalar> w(ptc.size());
     }
     }
     }*/
-  
+
   // Re-scale the weights for the current point
   forAll (ptc, pointI)
     {

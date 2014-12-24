@@ -39,6 +39,7 @@ SourceFiles
 #define toroidalCS_H
 
 #include "coordinateSystem.H"
+#include "Switch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -60,7 +61,7 @@ class toroidalCS
         scalar radius_;
 
         //- Are angles in degrees? (default = true)
-        bool inDegrees_;
+        Switch inDegrees_;
 
 
     // Private Member Functions
@@ -130,10 +131,10 @@ public:
 
 
         //- Are angles in degrees?
-        bool  inDegrees() const;
+        bool inDegrees() const;
 
         //- Non-const access to inDegrees
-        bool& inDegrees();
+        Switch& inDegrees();
 
         //- Return radius
         scalar radius() const
@@ -145,7 +146,7 @@ public:
         virtual void write(Ostream&) const;
 
         //- Write dictionary
-        virtual void writeDict(Ostream&, bool subDict=true) const;
+        virtual void writeDict(Ostream&, bool subDict = true) const;
 };
 
 

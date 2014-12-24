@@ -145,6 +145,34 @@ leastSquaresGrad<Type>::grad
     return tlsGrad;
 }
 
+template<class Type>
+tmp
+<
+    BlockLduSystem<vector, typename outerProduct<vector, Type>::type>
+> leastSquaresGrad<Type>::fvmGrad
+(
+   const GeometricField<Type, fvPatchField, volMesh>& vf
+) const
+{
+   FatalErrorIn
+   (
+       "tmp<BlockLduSystem> fvmGrad\n"
+       "(\n"
+       "    GeometricField<Type, fvPatchField, volMesh>&"
+       ")\n"
+   )   << "Implicit gradient operator defined only for scalar."
+       << abort(FatalError);
+
+   typedef typename outerProduct<vector, Type>::type GradType;
+
+   tmp<BlockLduSystem<vector, GradType> > tbs
+   (
+       new BlockLduSystem<vector, GradType>(vf.mesh())
+   );
+
+   return tbs;
+}
+
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

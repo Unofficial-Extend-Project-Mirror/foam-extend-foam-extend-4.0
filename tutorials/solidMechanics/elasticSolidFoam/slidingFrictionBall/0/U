@@ -1,7 +1,7 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | foam-extend: Open Source CFD                    |
-|  \\    /   O peration     | Version:     3.0                                |
+|  \\    /   O peration     | Version:     3.1                                |
 |   \\  /    A nd           | Web:         http://www.extend-project.de       |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
@@ -75,7 +75,7 @@ boundaryField
 	  oscillationCorrection          yes;
 	  smoothingSteps                 1;
 	  infoFrequency                  10;
-	
+
 	  frictionLaw       coulomb;
 	  frictionLawDict
 	    {

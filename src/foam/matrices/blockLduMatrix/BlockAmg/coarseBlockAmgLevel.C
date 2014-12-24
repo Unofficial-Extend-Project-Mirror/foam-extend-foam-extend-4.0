@@ -34,13 +34,13 @@ Author
 
 #include "coarseBlockAmgLevel.H"
 #include "SubField.H"
-#include "ICCG.H"
-#include "BICCG.H"
 #include "vector2D.H"
+#include "coeffFields.H"
 #include "BlockSolverPerformance.H"
-#include "BlockGaussSeidelSolver.H"
-#include "BlockBiCGStabSolver.H"
-#include "BlockCGSolver.H"
+// #include "BlockGaussSeidelSolver.H"
+// #include "BlockBiCGStabSolver.H"
+// #include "BlockCGSolver.H"
+#include "BlockGMRESSolver.H"
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
@@ -50,7 +50,7 @@ Foam::coarseBlockAmgLevel<Type>::coarseBlockAmgLevel
 (
     autoPtr<BlockLduMatrix<Type> > matrixPtr,
     const dictionary& dict,
-    const word& policyType,
+    const word& coarseningType,
     const label groupSize,
     const label minCoarseEqns,
     const word& smootherType
@@ -60,11 +60,11 @@ Foam::coarseBlockAmgLevel<Type>::coarseBlockAmgLevel
     x_(matrixPtr_->diag().size(),pTraits<Type>::zero),
     b_(matrixPtr_->diag().size(),pTraits<Type>::zero),
     dict_(dict),
-    policyPtr_
+    coarseningPtr_
     (
-        BlockAmgPolicy<Type>::New
+        BlockMatrixCoarsening<Type>::New
         (
-            policyType,
+            coarseningType,
             matrixPtr_,
             dict_,
             groupSize,
@@ -148,13 +148,12 @@ void Foam::coarseBlockAmgLevel<Type>::restrictResidual
 
         residual(x, b, res);
 
-        policyPtr_->restrictResidual(res, coarseRes);
-
+        coarseningPtr_->restrictResidual(res, coarseRes);
     }
     else
     {
         // No pre-sweeps done: x = 0 and residual = b
-        policyPtr_->restrictResidual(b, coarseRes);
+        coarseningPtr_->restrictResidual(b, coarseRes);
     }
 }
 
@@ -166,7 +165,7 @@ void Foam::coarseBlockAmgLevel<Type>::prolongateCorrection
     const Field<Type>& coarseX
 ) const
 {
-    policyPtr_->prolongateCorrection(x, coarseX);
+    coarseningPtr_->prolongateCorrection(x, coarseX);
 }
 
 
@@ -191,40 +190,88 @@ void Foam::coarseBlockAmgLevel<Type>::solve
     const scalar relTol
 ) const
 {
+    BlockSolverPerformance<Type> coarseSolverPerf
+    (
+        BlockGMRESSolver<Type>::typeName,
+        "topLevelCorr"
+    );
+
+    label maxIter = Foam::min(2*coarseningPtr_->minCoarseEqns(), 1000);
+
+    // Create artificial dictionary for top-level solution
+    dictionary topLevelDict;
+    topLevelDict.add("nDirections", "5");
+    topLevelDict.add("minIter", 1);
+    topLevelDict.add("maxIter", maxIter);
+    topLevelDict.add("tolerance", tolerance);
+    topLevelDict.add("relTol", relTol);
+
+    // Avoid issues with round-off on strict tolerance setup
+    // HJ, 27/Jun/2013
+    // Create multiplication function object
+    typename BlockCoeff<Type>::multiply mult;
+
+//     x = inverse(diag) & b
+    CoeffField<Type> invDiag = inv(matrixPtr_->diag());
+    multiply(x, invDiag, b);
+
+    // Do not solve if the number of equations is smaller than 5
+    if (coarseningPtr_->minCoarseEqns() < 5)
+    {
+        return;
+    }
 
     if (matrixPtr_->symmetric())
     {
-        BlockSolverPerformance<Type> coarseSolverPerf =
+        topLevelDict.add("preconditioner", "Cholesky");
+
+        coarseSolverPerf =
         //BlockGaussSeidelSolver<Type>
-        BlockCGSolver<Type>
+//         BlockCGSolver<Type>
+        BlockGMRESSolver<Type>
         (
             "topLevelCorr",
             matrixPtr_,
-            dict_
+            topLevelDict
         ).solve(x, b);
-
-        if (lduMatrix::debug >= 2)
-        {
-            coarseSolverPerf.print();
-        }
     }
     else
     {
-        BlockSolverPerformance<Type> coarseSolverPerf =
+        topLevelDict.add("preconditioner", "Cholesky");
+
+        coarseSolverPerf =
         //BlockGaussSeidelSolver<Type>
-        BlockBiCGStabSolver<Type>
+//         BlockBiCGStabSolver<Type>
+        BlockGMRESSolver<Type>
         (
             "topLevelCorr",
             matrixPtr_,
-            dict_
+            topLevelDict
         ).solve(x, b);
-
-        if (lduMatrix::debug >= 2)
-        {
-            coarseSolverPerf.print();
-        }
     }
 
+    // Escape cases of top-level solver divergence
+    if
+    (
+        coarseSolverPerf.nIterations() == maxIter
+     && (
+            coarseSolverPerf.finalResidual()
+         >= coarseSolverPerf.initialResidual()
+        )
+    )
+    {
+        // Top-level solution failed.  Attempt rescue
+        // HJ, 27/Jul/2013
+        multiply(x, invDiag, b);
+
+        // Print top level correction failure as info for user
+        coarseSolverPerf.print();
+    }
+
+    if (BlockLduMatrix<Type>::debug >= 2)
+    {
+        coarseSolverPerf.print();
+    }
 }
 
 
@@ -246,8 +293,8 @@ void Foam::coarseBlockAmgLevel<Type>::scaleX
         x
     );
 
-    scalar scalingFactorNum = sumProd(x,b);
-    scalar scalingFactorDenom = sumProd(x,Ax);
+    scalar scalingFactorNum = sumProd(x, b);
+    scalar scalingFactorDenom = sumProd(x, Ax);
 
     vector2D scalingVector(scalingFactorNum, scalingFactorDenom);
     reduce(scalingVector, sumOp<vector2D>());
@@ -277,19 +324,20 @@ void Foam::coarseBlockAmgLevel<Type>::scaleX
 
 
 template<class Type>
-Foam::autoPtr<Foam::BlockAmgLevel<Type> > Foam::coarseBlockAmgLevel<Type>::makeNextLevel() const
+Foam::autoPtr<Foam::BlockAmgLevel<Type> >
+Foam::coarseBlockAmgLevel<Type>::makeNextLevel() const
 {
-    if (policyPtr_->coarsen())
+    if (coarseningPtr_->coarsen())
     {
         return autoPtr<Foam::BlockAmgLevel<Type> >
         (
             new coarseBlockAmgLevel
             (
-                policyPtr_->restrictMatrix(),
+                coarseningPtr_->restrictMatrix(),
                 dict(),
-                policyPtr_->type(),
-                policyPtr_->groupSize(),
-                policyPtr_->minCoarseEqns(),
+                coarseningPtr_->type(),
+                coarseningPtr_->groupSize(),
+                coarseningPtr_->minCoarseEqns(),
                 smootherPtr_->type()
             )
         );

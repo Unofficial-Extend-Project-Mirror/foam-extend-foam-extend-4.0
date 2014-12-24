@@ -117,7 +117,7 @@ void Foam::coupledPolyPatch::calcTransformTensors
             forwardT_.setSize(0);
             reverseT_.setSize(0);
 
-            separation_ = (nf&(Cr - Cf))*nf;
+            separation_ = (nf & (Cr - Cf))*nf;
 
             // Three situations:
             // - separation is zero. No separation.

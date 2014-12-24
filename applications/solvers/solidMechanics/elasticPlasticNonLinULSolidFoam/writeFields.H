@@ -28,7 +28,7 @@ if (runTime.outputTime())
 	),
        sqrt((3.0/2.0)*magSqr(dev(sigma)))
        );
-    
+
     Info<< "Max sigmaEq = " << max(sigmaEq).value()
 	<< endl;
 
@@ -54,7 +54,7 @@ if (runTime.outputTime())
 	    const solidContactFvPatchVectorField& DUpatch =
 	      refCast<const solidContactFvPatchVectorField>
 	      (DU.boundaryField()[patchi]);
-	    
+
 		if(!DUpatch.master())
 		  {
 		    const labelList& meshPoints = mesh.boundaryMesh()[patchi].meshPoints();
@@ -66,9 +66,9 @@ if (runTime.outputTime())
 		  }
 	  }
       }
-	
-    
-    //- total force                                                                                                                                         
+
+
+    //- total force
     /*    forAll(mesh.boundary(), patchi)
       {
         Info << "Patch " << mesh.boundary()[patchi].name() << endl;

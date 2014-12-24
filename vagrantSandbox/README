@@ -24,18 +24,33 @@
   One can then connect to the virtual machine with
 : vagrant ssh <machinName>
   and will be in the =$HOME= directory of the user =vagrant= where in
-  the directory =~/foam/foam-extend-3.0= the sources are
+  the directory =~/foam/foam-extend-3.1= the sources are
   available. Modifications can be pushed "outside" the virtual machine
   with
 : hg push
-  There is also a symbolic link =~/foam/foam-extend-3.0-parent=
+  There is also a symbolic link =~/foam/foam-extend-3.1-parent=
   to the sources if you want to edit there directly. Use with care
   and don't compile in that directory unless you know what you're
   doing
+** Memory size and CPU-number
+   The number of CPUs in the virtual machine is determined by (the
+   first one that matches is used)
+   * If the variable =WM_VAGRANT_CPUS= exists then the number of CPUs
+     is set to this
+   * If the variable =WM_NCOMPPROCS= is set then the number of CPUs is
+     fixed with *half* that number (so that the virtual machine
+     doesn't make the machine unuable)
+   The amount of memory is set according to the number of CPUs:
+   $(1+N)*512$ Megabytes. This should allow half a Gigabyte for the OS
+   and half a Gigagbyte for each compiling process
+
+   The hostname of the virtual machine is the hostname of the host
+   machine prepended with =vagrant.=
 * Virtual machines
   Currently existing virtual machines are
-  - precise :: Latest LTS Ubuntu. Currently the default machine to use
-  - lucid :: Previous LTS Ubuntu. Currently problems
+  - trusty :: Latest LTS 14.04 Ubuntu. Currently the default machine to use
+  - prescise :: Previous LTS Ubuntu.
+  - lucid :: Old LTS Ubuntu. Currently problems
              with automatic setting up (something with the
              =postfix=-package)
   - maverick :: Tries to fix the problems with the
@@ -53,13 +68,18 @@
                  folders via NFS. Currently not working
   - opensuse12 :: OpenSUSE 12.3 machine. Currently not completely
                   compiling Foam
+  - opensuse13 ::  OpenSUSE 13.1 machine. The current LTS-version of
+                   OpenSUSE
   Some machines (read: the BSD-boxes) need the =VirtualBox Extension
   Pack= installed (because they have USB 2.0)
 * Scripts in the machine
   In the home directory these scripts are found
   - bootstrapFoam.sh :: A script whose aim it is to compile Foam and
        the ThirdParty-packages in one go (no paraview and QT). If this
-       works the box is considered operational
+       works the box is considered operational. The script leaves a
+       log file =bootstrapFoam-log= in the home directory
+  - bootstrapAndTest.sh :: Calls =bootstrapFoam.sh= and then runs the
+       =testHarness= in the =foam=-installation
 * Provisioning scripts
   Every "family" of machines has a specific script that makes sure
   that the software packages necessary to compile =Foam= are installed

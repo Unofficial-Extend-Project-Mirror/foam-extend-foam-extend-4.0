@@ -197,6 +197,18 @@ public:
         ) const;
 
 
+    // Member Operators
+
+        //- Return const and non-const reference to polyPatch by index.
+        using polyPatchList::operator[];
+
+        //- Return const reference to polyPatch by name.
+        const polyPatch& operator[](const word&) const;
+
+        //- Return reference to polyPatch by name.
+        polyPatch& operator[](const word&);
+
+
     // Ostream operator
 
         friend Ostream& operator<<(Ostream&, const polyBoundaryMesh&);

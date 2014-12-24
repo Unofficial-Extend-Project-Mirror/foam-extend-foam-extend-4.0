@@ -29,6 +29,7 @@ Description
 
 Author
     Hrvoje Jasak, Wikki Ltd.  All rights reserved
+
 \*---------------------------------------------------------------------------*/
 
 #include "pamgPolicy.H"
@@ -302,12 +303,26 @@ void Foam::pamgPolicy::calcChild()
     // whole gang of processes; otherwise I may end up with a different
     // number of agglomeration levels on different processors.
 
-    if (nCoarseEqns_ > minCoarseEqns())
+    if (nCoarseEqns_ > minCoarseEqns() && 3*nCoarseEqns_ <= 2*nEqns)
     {
         coarsen_ = true;
     }
 
     reduce(coarsen_, andOp<bool>());
+
+    if (lduMatrix::debug >= 2)
+    {
+        Pout << "Coarse level size: " << nCoarseEqns_;
+
+        if (coarsen_)
+        {
+            Pout << ".  Accepted" << endl;
+        }
+        else
+        {
+            Pout << ".  Rejected" << endl;
+        }
+    }
 }
 
 
@@ -415,8 +430,8 @@ Foam::autoPtr<Foam::amgMatrix> Foam::pamgPolicy::restrictMatrix
         if (rmUpperAddr == rmLowerAddr)
         {
             // For each fine coeff inside of a coarse cluster keep the address
-            // of the cluster corresponding to the coeff in th
-            // e coeffRestrictAddr as a negative index
+            // of the cluster corresponding to the coeff in the
+            // coeffRestrictAddr as a negative index
             coeffRestrictAddr[fineCoeffi] = -(rmUpperAddr + 1);
         }
         else
@@ -426,7 +441,7 @@ Foam::autoPtr<Foam::amgMatrix> Foam::pamgPolicy::restrictMatrix
             label cOwn = rmUpperAddr;
             label cNei = rmLowerAddr;
 
-            // get coarse owner and neighbour
+            // Get coarse owner and neighbour
             if (rmUpperAddr > rmLowerAddr)
             {
                 cOwn = rmLowerAddr;
@@ -439,7 +454,7 @@ Foam::autoPtr<Foam::amgMatrix> Foam::pamgPolicy::restrictMatrix
             bool nbrFound = false;
             label& ccnCoeffs = blockNnbrs[cOwn];
 
-            for (int i=0; i<ccnCoeffs; i++)
+            for (int i = 0; i < ccnCoeffs; i++)
             {
                 if (initCoarseNeighb[ccCoeffs[i]] == cNei)
                 {
@@ -550,6 +565,7 @@ Foam::autoPtr<Foam::amgMatrix> Foam::pamgPolicy::restrictMatrix
 
     // Add the coarse level
 
+    // Set the coarse ldu addressing onto the list
     lduPrimitiveMesh* coarseAddrPtr =
         new lduPrimitiveMesh
         (
@@ -598,6 +614,7 @@ Foam::autoPtr<Foam::amgMatrix> Foam::pamgPolicy::restrictMatrix
         }
     }
 
+    // Create GAMG interfaces
     forAll (interfaceFields, intI)
     {
         if (interfaceFields.set(intI))
@@ -666,7 +683,8 @@ Foam::autoPtr<Foam::amgMatrix> Foam::pamgPolicy::restrictMatrix
     lduMatrix* coarseMatrixPtr = new lduMatrix(*coarseAddrPtr);
     lduMatrix& coarseMatrix = *coarseMatrixPtr;
 
-    // Coarse matrix diagonal initialised by restricting the finer mesh diagonal
+    // Coarse matrix diagonal initialised by restricting the
+    // finer mesh diagonal
     scalarField& coarseDiag = coarseMatrix.diag();
     restrictResidual(matrix_.diag(), coarseDiag);
 

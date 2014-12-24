@@ -27,7 +27,7 @@ Class
 Description
     Virtual base class for external radiation sources
 
-      
+
 SourceFiles
     externalRadiationSource.C
 

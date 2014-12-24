@@ -39,7 +39,10 @@ Foam::CoeffField<Foam::tensor>::CoeffField(const CoeffField<tensor>& f)
 {}
 
 
-Foam::CoeffField<Foam::tensor>::CoeffField(const DecoupledCoeffField<tensor>& f)
+Foam::CoeffField<Foam::tensor>::CoeffField
+(
+    const DecoupledCoeffField<tensor>& f
+)
 :
     DecoupledCoeffField<tensor>(f)
 {}
@@ -115,6 +118,7 @@ void Foam::CoeffField<Foam::tensor>::operator=
 
 /* * * * * * * * * * * * * * * * Global functions  * * * * * * * * * * * * * */
 
+template<>
 Foam::tmp<Foam::CoeffField<Foam::tensor> > Foam::inv
 (
     const CoeffField<tensor>& f

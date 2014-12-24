@@ -1,7 +1,7 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | foam-extend: Open Source CFD                    |
-|  \\    /   O peration     | Version:     3.0                                |
+|  \\    /   O peration     | Version:     3.1                                |
 |   \\  /    A nd           | Web:         http://www.extend-project.de       |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
@@ -708,127 +708,143 @@ edges
     arc R7t R0t evert(4, 7, Zt)
 );
 
-patches
+boundary
 (
-    wall rotor
-    (
-        quad2D(r0, r1)
-        quad2D(r1, r2s)
-        quad2D(r2, r3)
-        quad2D(r3, r4s)
-        quad2D(r4, r5)
-        quad2D(r5, r6s)
-        quad2D(r6, r7)
-        quad2D(r7, r0s)
+    rotor
+    {
+        type wall;
+        faces
+        (
+            quad2D(r0, r1)
+            quad2D(r1, r2s)
+            quad2D(r2, r3)
+            quad2D(r3, r4s)
+            quad2D(r4, r5)
+            quad2D(r5, r6s)
+            quad2D(r6, r7)
+            quad2D(r7, r0s)
 
-        quad2D(r0, rb0)
-        quad2D(r0s, rb0)
+            quad2D(r0, rb0)
+            quad2D(r0s, rb0)
 
-        quad2D(r2, rb2)
-        quad2D(r2s, rb2)
+            quad2D(r2, rb2)
+            quad2D(r2s, rb2)
 
-        quad2D(r4, rb4)
-        quad2D(r4s, rb4)
+            quad2D(r4, rb4)
+            quad2D(r4s, rb4)
 
-        quad2D(r6, rb6)
-        quad2D(r6s, rb6)
-    )
+            quad2D(r6, rb6)
+            quad2D(r6s, rb6)
+        );
+    }
 
-    wall stator
-    (
-        quad2D(R0, R1s)
-        quad2D(R1, R2)
-        quad2D(R2, R3s)
-        quad2D(R3, R4)
-        quad2D(R4, R5s)
-        quad2D(R5, R6)
-        quad2D(R6, R7s)
-        quad2D(R7, R0)
+    stator
+    {
+        type wall;
+        faces
+        (
+            quad2D(R0, R1s)
+            quad2D(R1, R2)
+            quad2D(R2, R3s)
+            quad2D(R3, R4)
+            quad2D(R4, R5s)
+            quad2D(R5, R6)
+            quad2D(R6, R7s)
+            quad2D(R7, R0)
 
-        quad2D(R1, Rb1)
-        quad2D(R1s, Rb1)
+            quad2D(R1, Rb1)
+            quad2D(R1s, Rb1)
 
-        quad2D(R3, Rb3)
-        quad2D(R3s, Rb3)
+            quad2D(R3, Rb3)
+            quad2D(R3s, Rb3)
 
-        quad2D(R5, Rb5)
-        quad2D(R5s, Rb5)
+            quad2D(R5, Rb5)
+            quad2D(R5s, Rb5)
 
-        quad2D(R7, Rb7)
-        quad2D(R7s, Rb7)
-    )
+            quad2D(R7, Rb7)
+            quad2D(R7s, Rb7)
+        );
+    }
 
-    empty front
-    (
-        frontQuad(r0, r1, rb1, rb0)
-        frontQuad(r1, r2s, rb2, rb1)
-        frontQuad(r2, r3, rb3, rb2)
-        frontQuad(r3, r4s, rb4, rb3)
-        frontQuad(r4, r5, rb5, rb4)
-        frontQuad(r5, r6s, rb6, rb5)
-        frontQuad(r6, r7, rb7, rb6)
-        frontQuad(r7, r0s, rb0, rb7)
-        frontQuad(rb0, rb1, ri1, ri0)
-        frontQuad(rb1, rb2, ri2, ri1)
-        frontQuad(rb2, rb3, ri3, ri2)
-        frontQuad(rb3, rb4, ri4, ri3)
-        frontQuad(rb4, rb5, ri5, ri4)
-        frontQuad(rb5, rb6, ri6, ri5)
-        frontQuad(rb6, rb7, ri7, ri6)
-        frontQuad(rb7, rb0, ri0, ri7)
-        frontQuad(ri0, ri1, Rb1, Rb0)
-        frontQuad(ri1, ri2, Rb2, Rb1)
-        frontQuad(ri2, ri3, Rb3, Rb2)
-        frontQuad(ri3, ri4, Rb4, Rb3)
-        frontQuad(ri4, ri5, Rb5, Rb4)
-        frontQuad(ri5, ri6, Rb6, Rb5)
-        frontQuad(ri6, ri7, Rb7, Rb6)
-        frontQuad(ri7, ri0, Rb0, Rb7)
-        frontQuad(Rb0, Rb1, R1s, R0)
-        frontQuad(Rb1, Rb2, R2, R1)
-        frontQuad(Rb2, Rb3, R3s, R2)
-        frontQuad(Rb3, Rb4, R4, R3)
-        frontQuad(Rb4, Rb5, R5s, R4)
-        frontQuad(Rb5, Rb6, R6, R5)
-        frontQuad(Rb6, Rb7, R7s, R6)
-        frontQuad(Rb7, Rb0, R0, R7)
-    )
+    front
+    {
+        type empty;
+        faces
+        (
+            frontQuad(r0, r1, rb1, rb0)
+            frontQuad(r1, r2s, rb2, rb1)
+            frontQuad(r2, r3, rb3, rb2)
+            frontQuad(r3, r4s, rb4, rb3)
+            frontQuad(r4, r5, rb5, rb4)
+            frontQuad(r5, r6s, rb6, rb5)
+            frontQuad(r6, r7, rb7, rb6)
+            frontQuad(r7, r0s, rb0, rb7)
+            frontQuad(rb0, rb1, ri1, ri0)
+            frontQuad(rb1, rb2, ri2, ri1)
+            frontQuad(rb2, rb3, ri3, ri2)
+            frontQuad(rb3, rb4, ri4, ri3)
+            frontQuad(rb4, rb5, ri5, ri4)
+            frontQuad(rb5, rb6, ri6, ri5)
+            frontQuad(rb6, rb7, ri7, ri6)
+            frontQuad(rb7, rb0, ri0, ri7)
+            frontQuad(ri0, ri1, Rb1, Rb0)
+            frontQuad(ri1, ri2, Rb2, Rb1)
+            frontQuad(ri2, ri3, Rb3, Rb2)
+            frontQuad(ri3, ri4, Rb4, Rb3)
+            frontQuad(ri4, ri5, Rb5, Rb4)
+            frontQuad(ri5, ri6, Rb6, Rb5)
+            frontQuad(ri6, ri7, Rb7, Rb6)
+            frontQuad(ri7, ri0, Rb0, Rb7)
+            frontQuad(Rb0, Rb1, R1s, R0)
+            frontQuad(Rb1, Rb2, R2, R1)
+            frontQuad(Rb2, Rb3, R3s, R2)
+            frontQuad(Rb3, Rb4, R4, R3)
+            frontQuad(Rb4, Rb5, R5s, R4)
+            frontQuad(Rb5, Rb6, R6, R5)
+            frontQuad(Rb6, Rb7, R7s, R6)
+            frontQuad(Rb7, Rb0, R0, R7)
+        );
+    }
 
-    empty back
-    (
-        backQuad(r0, r1, rb1, rb0)
-        backQuad(r1, r2s, rb2, rb1)
-        backQuad(r2, r3, rb3, rb2)
-        backQuad(r3, r4s, rb4, rb3)
-        backQuad(r4, r5, rb5, rb4)
-        backQuad(r5, r6s, rb6, rb5)
-        backQuad(r6, r7, rb7, rb6)
-        backQuad(r7, r0s, rb0, rb7)
-        backQuad(rb0, rb1, ri1, ri0)
-        backQuad(rb1, rb2, ri2, ri1)
-        backQuad(rb2, rb3, ri3, ri2)
-        backQuad(rb3, rb4, ri4, ri3)
-        backQuad(rb4, rb5, ri5, ri4)
-        backQuad(rb5, rb6, ri6, ri5)
-        backQuad(rb6, rb7, ri7, ri6)
-        backQuad(rb7, rb0, ri0, ri7)
-        backQuad(ri0, ri1, Rb1, Rb0)
-        backQuad(ri1, ri2, Rb2, Rb1)
-        backQuad(ri2, ri3, Rb3, Rb2)
-        backQuad(ri3, ri4, Rb4, Rb3)
-        backQuad(ri4, ri5, Rb5, Rb4)
-        backQuad(ri5, ri6, Rb6, Rb5)
-        backQuad(ri6, ri7, Rb7, Rb6)
-        backQuad(ri7, ri0, Rb0, Rb7)
-        backQuad(Rb0, Rb1, R1s, R0)
-        backQuad(Rb1, Rb2, R2, R1)
-        backQuad(Rb2, Rb3, R3s, R2)
-        backQuad(Rb3, Rb4, R4, R3)
-        backQuad(Rb4, Rb5, R5s, R4)
-        backQuad(Rb5, Rb6, R6, R5)
-        backQuad(Rb6, Rb7, R7s, R6)
-        backQuad(Rb7, Rb0, R0, R7)
-    )
+    back
+    {
+        type empty;
+        faces
+        (
+            backQuad(r0, r1, rb1, rb0)
+            backQuad(r1, r2s, rb2, rb1)
+            backQuad(r2, r3, rb3, rb2)
+            backQuad(r3, r4s, rb4, rb3)
+            backQuad(r4, r5, rb5, rb4)
+            backQuad(r5, r6s, rb6, rb5)
+            backQuad(r6, r7, rb7, rb6)
+            backQuad(r7, r0s, rb0, rb7)
+            backQuad(rb0, rb1, ri1, ri0)
+            backQuad(rb1, rb2, ri2, ri1)
+            backQuad(rb2, rb3, ri3, ri2)
+            backQuad(rb3, rb4, ri4, ri3)
+            backQuad(rb4, rb5, ri5, ri4)
+            backQuad(rb5, rb6, ri6, ri5)
+            backQuad(rb6, rb7, ri7, ri6)
+            backQuad(rb7, rb0, ri0, ri7)
+            backQuad(ri0, ri1, Rb1, Rb0)
+            backQuad(ri1, ri2, Rb2, Rb1)
+            backQuad(ri2, ri3, Rb3, Rb2)
+            backQuad(ri3, ri4, Rb4, Rb3)
+            backQuad(ri4, ri5, Rb5, Rb4)
+            backQuad(ri5, ri6, Rb6, Rb5)
+            backQuad(ri6, ri7, Rb7, Rb6)
+            backQuad(ri7, ri0, Rb0, Rb7)
+            backQuad(Rb0, Rb1, R1s, R0)
+            backQuad(Rb1, Rb2, R2, R1)
+            backQuad(Rb2, Rb3, R3s, R2)
+            backQuad(Rb3, Rb4, R4, R3)
+            backQuad(Rb4, Rb5, R5s, R4)
+            backQuad(Rb5, Rb6, R6, R5)
+            backQuad(Rb6, Rb7, R7s, R6)
+            backQuad(Rb7, Rb0, R0, R7)
+        );
+    }
 );
 
 // ************************************************************************* //

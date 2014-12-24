@@ -900,7 +900,7 @@ int main(int argc, char *argv[])
     patchNameIDs.setSize(maxZoneID);
 
     yyFlexLexer lexer(&fluentStream);
-    while(lexer.yylex() != 0)
+    while (lexer.yylex() != 0)
     {}
 
     Info<< "\n\nFINISHED LEXING\n\n\n";
@@ -1538,7 +1538,7 @@ int main(int argc, char *argv[])
     // this routine should generally not be invoked
     {
         DynamicList<label> defaultBoundaryFaces(facePatchID.size());
-        forAll(facePatchID, idI)
+        forAll (facePatchID, idI)
         {
             if(facePatchID[idI] == -1)
             {
@@ -1677,7 +1677,7 @@ int main(int argc, char *argv[])
             );
 
             DynamicList<label> zoneFaces(pShapeMesh.nFaces());
-            forAll(pShapeMesh.faceNeighbour(), faceI)
+            forAll (pShapeMesh.faceNeighbour(), faceI)
             {
                 label nei = pShapeMesh.faceNeighbour()[faceI];
                 label own = pShapeMesh.faceOwner()[faceI];
@@ -1701,7 +1701,7 @@ int main(int argc, char *argv[])
             );
 
             // Add cell zones to patch zone list
-            forAll(bPatches, pI)
+            forAll (bPatches, pI)
             {
                 const labelList& faceCells = bPatches[pI].faceCells();
                 forAll(faceCells, fcI)
@@ -1760,7 +1760,7 @@ int main(int argc, char *argv[])
     // soon negating the need for double output
     if (writeSets)
     {
-        if (cellGroupZoneID.size() > 1 )
+        if (cellGroupZoneID.size() > 1)
         {
             Info<< "Writing cell sets" << endl;
 
@@ -1783,7 +1783,7 @@ int main(int argc, char *argv[])
                 cellSet internal(pShapeMesh, name, end() - start());
 
                 // shift cell indizes by 1
-                for(label celli=start() - 1; celli<=end() - 1; celli++)
+                for (label celli = start() - 1; celli <= end() - 1; celli++)
                 {
                     internal.insert(celli);
                 }
@@ -1797,7 +1797,7 @@ int main(int argc, char *argv[])
         }
     }
 
-    Info<< nl << "End" << endl;
+    Info<< "\nEnd\n" << endl;
     return 0;
 }
 

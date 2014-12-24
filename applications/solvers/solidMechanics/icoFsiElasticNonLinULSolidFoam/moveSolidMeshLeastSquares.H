@@ -6,16 +6,16 @@ if(min(J.internalField()) > 0)
     Info << "Moving mesh using least squares interpolation" << endl;
 
     leastSquaresVolPointInterpolation pointInterpolation(stressMesh);
-  
+
     // Create point mesh
     pointMesh pMesh(stressMesh);
-    
+
     wordList types
       (
        pMesh.boundary().size(),
        calculatedFvPatchVectorField::typeName
        );
-    
+
     pointVectorField pointDU
       (
        IOobject
@@ -28,7 +28,7 @@ if(min(J.internalField()) > 0)
        dimensionedVector("zero", dimLength, vector::zero),
        types
        );
-    
+
     pointInterpolation.interpolate(DU, pointDU);
 
     const vectorField& pointDUI =
@@ -43,15 +43,15 @@ if(min(J.internalField()) > 0)
       }
 
     // Correct symmetryPlane points
-        
+
     forAll(stressMesh.boundaryMesh(), patchI)
       {
         if (isA<symmetryPolyPatch>(stressMesh.boundaryMesh()[patchI]))
         {
-            const labelList& meshPoints = 
+            const labelList& meshPoints =
                 stressMesh.boundaryMesh()[patchI].meshPoints();
 
-            vector avgN = 
+            vector avgN =
                 gAverage(stressMesh.boundaryMesh()[patchI].pointNormals());
 
             vector i(1, 0, 0);
@@ -82,7 +82,7 @@ if(min(J.internalField()) > 0)
         }
     }
 
-#   include "calcUnusedNewPoints.H"    
+#   include "calcUnusedNewPoints.H"
 
     twoDPointCorrector twoDCorrector(stressMesh);
     twoDCorrector.correctPoints(newPoints);

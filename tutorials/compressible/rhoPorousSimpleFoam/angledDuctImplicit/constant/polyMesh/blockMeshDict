@@ -1,14 +1,14 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | foam-extend: Open Source CFD                    |
-|  \\    /   O peration     | Version:     3.0                                |
+|  \\    /   O peration     | Version:     3.1                                |
 |   \\  /    A nd           | Web:         http://www.extend-project.de       |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 FoamFile
 {
     version     2.0;
-    format      ascii;
+    format      ;
     class       dictionary;
     object      blockMeshDict;
 }
@@ -65,55 +65,79 @@ edges
 (
 );
 
-patches
+boundary
 (
     // is there no way of defining all my 'defaultFaces' to be 'wall'?
-    wall front
-    (
-    // inlet block
-    (2 6 7 3)
-    // outlet block
-    (10 14 15 11)
-    )
+    front
+    {
+        type wall;
+        faces
+        (
+            // inlet block
+            (2 6 7 3)
+            // outlet block
+            (10 14 15 11)
+        );
+    }
 
-    wall back
-    (
-    // inlet block
-    (1 5 4 0)
-    // outlet block
-    (9 13 12 8)
-    )
+    back
+    {
+        type wall;
+        faces
+        (
+            // inlet block
+            (1 5 4 0)
+            // outlet block
+            (9 13 12 8)
+        );
+    }
 
-    wall wall
-    (
-    // inlet block
-    (2 0 4 6)
-    (7 5 1 3)
-    // outlet block
-    (10 8 12 14)
-    (15 13 9 11)
-    )
+    wall
+    {
+        type wall;
+        faces
+        (
+            // inlet block
+            (2 0 4 6)
+            (7 5 1 3)
+            // outlet block
+            (10 8 12 14)
+            (15 13 9 11)
+        );
+    }
 
-    wall porosityWall
-    (
-    // porosity block
-    (6 10 11 7)
-    // porosity block
-    (5 9 8 4)
-    // porosity block
-    (6 4 8 10)
-    (11 9 5 7)
-    )
+    porosityWall
+    {
+        type wall;
+        faces
+        (
+            // porosity block
+            (6 10 11 7)
+            // porosity block
+            (5 9 8 4)
+            // porosity block
+            (6 4 8 10)
+            (11 9 5 7)
+        );
+    }
 
-    patch inlet
-    (
-    (3 1 0 2)
-    )
+    inlet
+    {
+        type patch;
+        faces
+        (
+            (3 1 0 2)
+        );
+    }
 
-    patch outlet
-    (
-    (15 13 12 14)
-    )
+    outlet
+    {
+        type patch;
+        faces
+        (
+            (15 13 12 14)
+        );
+    }
 );
 
 mergePatchPairs

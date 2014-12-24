@@ -25,7 +25,7 @@ pointVectorField& pf = pointDU;
  pf.boundaryField().types()
  );*/
 
-pointVectorField pfCorr 
+pointVectorField pfCorr
 (
  IOobject
  (
@@ -58,11 +58,11 @@ const labelListList& PointFaces = mesh.pointFaces();
 forAll (ptc, pointI)
 {
   const label curPoint = ptc[pointI];
-  
+
   const labelList& curFaces = PointFaces[curPoint];
-  
+
   label fI = 0;
-  
+
   // Go through all the faces
   forAll (curFaces, faceI)
     {
@@ -72,7 +72,7 @@ forAll (ptc, pointI)
 	  // or coupled calculate the extrapolation vector
 	  label patchID =
 	    mesh.boundaryMesh().whichPatch(curFaces[faceI]);
-	  
+
 	  if
 	    (
 	     !isA<emptyFvPatch>(mesh.boundary()[patchID])
@@ -81,14 +81,14 @@ forAll (ptc, pointI)
 	    {
 	      label faceInPatchID =
 		bm[patchID].patch().whichFace(curFaces[faceI]);
-	      
+
 	      pfCorr[curPoint] +=
 		w[pointI][fI]*
 		(
 		 extraVecs[pointI][fI]
 		 & gradDU.boundaryField()[patchID][faceInPatchID]
 		 );
-	      
+
 	      fI++;
 	    }
 	}

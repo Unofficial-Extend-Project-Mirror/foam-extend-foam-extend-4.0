@@ -40,6 +40,7 @@ SourceFiles
 #include "surfaceFieldsFwd.H"
 #include "typeInfo.H"
 #include "runTimeSelectionTables.H"
+#include "BlockLduSystem.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -135,6 +136,17 @@ public:
         (
             const GeometricField<Type, fvPatchField, volMesh>&
         ) const = 0;
+
+
+        //- Return the BlockLduSystem corresponding to the implicit grad
+        // discretization. For block coupled systems.
+        virtual tmp
+        <
+            BlockLduSystem<vector, typename outerProduct<vector, Type>::type>
+        > fvmGrad
+        (
+            const GeometricField<Type, fvPatchField, volMesh>&
+        ) const;
 
 
         //  Moved from gaussGrad into base class.  HJ, 14/Jun/2013

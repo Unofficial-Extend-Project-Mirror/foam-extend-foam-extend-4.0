@@ -1,0 +1,71 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | foam-extend: Open Source CFD                    |
+|  \\    /   O peration     | Version:     3.1                                |
+|   \\  /    A nd           | Web:         http://www.extend-project.de       |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       volScalarField;
+    location    "0";
+    object      epsilon;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+dimensions      [0 2 -3 0 0 0 0];
+
+internalField   uniform 100;
+
+boundaryField
+{
+    inlet
+    {
+        type            fixedValue;
+        value           uniform 100;
+    }
+    outlet
+    {
+        type            inletOutlet;
+        inletValue      uniform 100;
+        value           uniform 100;
+    }
+    blade
+    {
+        type            compressible::epsilonWallFunction;
+        refValue        uniform 0;
+        value           uniform 100;
+        U               Urel;
+        Cmu             0.09;
+        kappa           0.41;
+        E               9.8;
+    }
+    shaft
+    {
+        type            compressible::epsilonWallFunction;
+        refValue        uniform 0;
+        value           uniform 100;
+        U               Urel;
+        Cmu             0.09;
+        kappa           0.41;
+        E               9.8;
+    }
+    shroud
+    {
+        type            compressible::epsilonWallFunction;
+        refValue        uniform 0;
+        value           uniform 100;
+        U               Urel;
+        Cmu             0.09;
+        kappa           0.41;
+        E               9.8;
+    }
+    frontAndBack
+    {
+        type            cyclic;
+    }
+}
+
+// ************************************************************************* //

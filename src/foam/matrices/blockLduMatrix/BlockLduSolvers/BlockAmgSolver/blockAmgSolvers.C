@@ -37,10 +37,19 @@ namespace Foam
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-makeBlockSolvers(blockAmgSolver);
+// Excluded tensor: needs reduced version.  HJ, 28/May/2014
 
-addSymSolverToBlockMatrix(blockAmgSolver);
-addAsymSolverToBlockMatrix(blockAmgSolver);
+makeBlockSolverTypeName(blockAmgSolverScalar);
+makeBlockSolverTypeName(blockAmgSolverVector);
+// makeBlockSolvers(blockAmgSolver);
+
+addSolverToBlockMatrix(Scalar, blockAmgSolverScalar, symMatrix);
+addSolverToBlockMatrix(Vector, blockAmgSolverVector, symMatrix);
+// addSymSolverToBlockMatrix(blockAmgSolver);
+
+addSolverToBlockMatrix(Scalar, blockAmgSolverScalar, asymMatrix);
+addSolverToBlockMatrix(Vector, blockAmgSolverVector, asymMatrix);
+// addAsymSolverToBlockMatrix(blockAmgSolver);
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

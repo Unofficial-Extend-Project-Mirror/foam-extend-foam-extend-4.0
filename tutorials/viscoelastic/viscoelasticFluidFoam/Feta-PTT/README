@@ -1,12 +1,12 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
-| \\      /  F ield         | foam-extend Project: Open source CFD        |
-|  \\    /   O peration     | Version:  3.0                               |
-|   \\  /    A nd           | Web:      www.extend-project.de                 |
+| \\      /  F ield         | foam-extend: Open Source CFD                    |
+|  \\    /   O peration     | Version:     3.1                                |
+|   \\  /    A nd           | Web:         http://www.extend-project.de       |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 #
-#+TITLE: *Feta-PTT viscoelastic constitutive model README file for version 3.0*
+#+TITLE: *Feta-PTT viscoelastic constitutive model README file for version 3.1*
 #+AUTHOR: Jovani
 #+DATE:  05 October 2010
 

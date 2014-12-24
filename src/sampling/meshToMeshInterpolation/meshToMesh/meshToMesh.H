@@ -63,9 +63,12 @@ class meshToMesh
 {
     // Private data
 
-        // mesh references
+        // Mesh references
 
+        //- Source mesh reference - containing data
         const fvMesh& fromMesh_;
+
+        //- Target mesh reference - mapping target
         const fvMesh& toMesh_;
 
         //- fromMesh patch labels
@@ -92,21 +95,29 @@ class meshToMesh
 
     // Private Member Functions
 
-        void calcAddressing();
+        // Access
 
-        void cellAddresses
-        (
-            labelList& cells,
-            const pointField& points,
-            const fvMesh& fromMesh,
-            const List<bool>& boundaryCell,
-            const octree<octreeDataCell>& oc,
-            bool forceFind = false
-        ) const;
+            //- Return addressing
+            void cellAddresses
+            (
+                labelList& cells,
+                const pointField& points,
+                const fvMesh& fromMesh,
+                const List<bool>& boundaryCell,
+                const octree<octreeDataCell>& oc,
+                bool forceFind = false
+            ) const;
 
-        void calculateInverseDistanceWeights() const;
+            //- Return inverse distance weights
+            const scalarListList& inverseDistanceWeights() const;
 
-        const scalarListList& inverseDistanceWeights() const;
+        // Data calculation functions
+
+            //- Calculate weights
+            void calculateInverseDistanceWeights() const;
+
+            //- Calculate addressing
+            void calcAddressing();
 
 
     // Private static data members
@@ -155,9 +166,8 @@ public:
         );
 
 
-    // Destructor
-
-        ~meshToMesh();
+    //- Destructor
+    ~meshToMesh();
 
 
     //- Patch-field interpolation class
@@ -266,7 +276,7 @@ public:
             (
                 Field<Type>&,
                 const GeometricField<Type, fvPatchField, volMesh>&,
-                order=INTERPOLATE
+                order = INTERPOLATE
             ) const;
 
             template<class Type>
@@ -274,7 +284,7 @@ public:
             (
                 Field<Type>&,
                 const tmp<GeometricField<Type, fvPatchField, volMesh> >&,
-                order=INTERPOLATE
+                order = INTERPOLATE
             ) const;
 
 
@@ -284,7 +294,7 @@ public:
             (
                 GeometricField<Type, fvPatchField, volMesh>&,
                 const GeometricField<Type, fvPatchField, volMesh>&,
-                order=INTERPOLATE
+                order = INTERPOLATE
             ) const;
 
             template<class Type>
@@ -292,7 +302,7 @@ public:
             (
                 GeometricField<Type, fvPatchField, volMesh>&,
                 const tmp<GeometricField<Type, fvPatchField, volMesh> >&,
-                order=INTERPOLATE
+                order = INTERPOLATE
             ) const;
 
 
@@ -301,14 +311,14 @@ public:
             tmp<GeometricField<Type, fvPatchField, volMesh> > interpolate
             (
                 const GeometricField<Type, fvPatchField, volMesh>&,
-                order=INTERPOLATE
+                order = INTERPOLATE
             ) const;
 
             template<class Type>
             tmp<GeometricField<Type, fvPatchField, volMesh> > interpolate
             (
                 const tmp<GeometricField<Type, fvPatchField, volMesh> >&,
-                order=INTERPOLATE
+                order = INTERPOLATE
             ) const;
 };
 

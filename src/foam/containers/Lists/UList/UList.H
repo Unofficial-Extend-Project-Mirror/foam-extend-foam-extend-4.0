@@ -167,6 +167,18 @@ public:
             //  This can be used (with caution) when interfacing with C code.
             inline T* data();
 
+            //- Return the first element of the list.
+            inline T& first();
+
+            //- Return first element of the list.
+            inline const T& first() const;
+
+            //- Return the last element of the list.
+            inline T& last();
+
+            //- Return the last element of the list.
+            inline const T& last() const;
+
 
         // Check
 

@@ -75,14 +75,14 @@ protected:
 
     // Protected member functions
 
-        //- Check that the laws and the material field are okay 
+        //- Check that the laws and the material field are okay
         void readLaws
         (
             const volScalarField& T,
             const dictionary& dict
         );
 
-        //- Check that the laws and the material field are okay 
+        //- Check that the laws and the material field are okay
         void checkLaws() const;
 
 

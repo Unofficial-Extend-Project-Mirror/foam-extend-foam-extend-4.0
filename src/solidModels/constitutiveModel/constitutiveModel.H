@@ -55,8 +55,9 @@ Author
 
 namespace Foam
 {
-  // forward declaration
-  class solidInterface;
+
+// forward declaration
+class solidInterface;
 
 /*---------------------------------------------------------------------------*\
                         Class constitutiveModel Declaration
@@ -83,12 +84,7 @@ class constitutiveModel
 
         //- Run-time selectable solidInterface method for correct
         //  discretisation on bi-material interfaces
-        autoPtr<solidInterface> solidInterfacePtr_;
-
-        // we use IOReferencer to allow lookup of solidInterface object in
-        // the objectRegistry, for instance to be used by
-        // leastSquaresSolidInterface gradScheme
-        IOReferencer<solidInterface>* solidInterfaceRefPtr_;
+        IOReferencer<solidInterface>* solidInterfacePtr_;
 
         // if solidInterface is on/off
         bool solidInterfaceActive_;
@@ -240,9 +236,15 @@ public:
         virtual void correct();
 
         //- Return reference to solidInterface
+        virtual const solidInterface& solInterface() const
+        {
+            return solidInterfacePtr_->operator()();
+        }
+
+        //- Return access to solidInterface
         virtual solidInterface& solInterface()
         {
-            return solidInterfacePtr_();
+            return solidInterfacePtr_->operator()();
         }
 
         //- Return true if solidInterface is active

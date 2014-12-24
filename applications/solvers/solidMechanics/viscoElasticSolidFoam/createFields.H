@@ -113,4 +113,4 @@
 
     constitutiveModel rheology(sigma, DU);
 
-    volScalarField rho = rheology.rho(); 
+    volScalarField rho = rheology.rho();

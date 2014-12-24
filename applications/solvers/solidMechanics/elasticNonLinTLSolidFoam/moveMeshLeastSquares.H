@@ -6,16 +6,16 @@ if(min(J.internalField()) > 0)
     Info << "Moving mesh using least squares interpolation" << endl;
 
     leastSquaresVolPointInterpolation pointInterpolation(mesh);
-  
+
     // Create point mesh
     pointMesh pMesh(mesh);
-    
+
     wordList types
       (
        pMesh.boundary().size(),
        calculatedFvPatchVectorField::typeName
        );
-    
+
     pointVectorField pointU
       (
        IOobject
@@ -28,7 +28,7 @@ if(min(J.internalField()) > 0)
        dimensionedVector("zero", dimLength, vector::zero),
        types
        );
-    
+
     pointInterpolation.interpolate(U, pointU);
 
     const vectorField& pointUI =

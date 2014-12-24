@@ -39,7 +39,7 @@ SourceFiles
 #define BlockAmgLevel_H
 
 #include "BlockLduMatrix.H"
-#include "BlockAmgPolicy.H"
+#include "BlockMatrixCoarsening.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -58,7 +58,7 @@ template<class Type>
 class BlockAmgCycle;
 
 template<class Type>
-class BlockAmgPolicy;
+class BlockMatrixCoarsening;
 
 template<class Type>
 class BlockAmgSolver;

@@ -37,6 +37,7 @@ SourceFiles
 
 #include "fileName.H"
 #include "wordList.H"
+#include "dictionary.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -44,6 +45,18 @@ namespace Foam
 {
 
 class objectRegistry;
+
+//- preserve patch types
+void preservePatchTypes
+(
+    const objectRegistry& obr,
+    const word& meshInstance,
+    const fileName& meshDir,
+    const wordList& patchNames,
+    PtrList<dictionary>& patchDicts,
+    const word& defaultFacesName,
+    word& defaultFacesType
+);
 
 //- preserve patch types
 void preservePatchTypes

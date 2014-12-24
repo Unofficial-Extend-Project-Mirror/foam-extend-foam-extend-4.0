@@ -1,7 +1,7 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | foam-extend: Open Source CFD                    |
-|  \\    /   O peration     | Version:     3.0                                |
+|  \\    /   O peration     | Version:     3.1                                |
 |   \\  /    A nd           | Web:         http://www.extend-project.de       |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
@@ -42,33 +42,57 @@ edges
 (
 );
 
-patches
+boundary
 (
-    patch inlet
-    (
-        (0 4 7 3)
-        (3 7 10 8)
-    )
-    patch outlet
-    (
-        (2 6 5 1)
-        (6 2 9 11)
-    )
-    wall upperWall
-    (
-        (8 9 11 10)
-    )
-    wall lowerWall
-    (
-        (1 5 4 0)
-    )
-    empty frontAndBack
-    (
-        (2 3 8 9)
-        (6 7 10 11)
-        (0 3 2 1)
-        (4 5 6 7)
-    )
+    inlet
+    {
+        type patch;
+        faces
+        (
+            (0 4 7 3)
+            (3 7 10 8)
+        );
+    }
+
+    outlet
+    {
+        type patch;
+        faces
+        (
+            (2 6 5 1)
+            (6 2 9 11)
+        );
+    }
+
+    upperWall
+    {
+        type wall;
+        faces
+        (
+            (8 9 11 10)
+        );
+    }
+
+    lowerWall
+    {
+        type wall;
+        faces
+        (
+            (1 5 4 0)
+        );
+    }
+
+    frontAndBack
+    {
+        type empty;
+        faces
+        (
+            (2 3 8 9)
+            (6 7 10 11)
+            (0 3 2 1)
+            (4 5 6 7)
+        );
+    }
 );
 
 mergePatchPairs

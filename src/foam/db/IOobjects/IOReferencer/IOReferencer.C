@@ -33,12 +33,13 @@ Foam::IOReferencer<Type>::IOReferencer
     const IOobject& io
 )
 :
-    regIOobject(io)
+    regIOobject(io),
+    typePtr_(NULL)
 {
     if
     (
-        (io.readOpt() != IOobject::NO_READ)
-     || (io.writeOpt() != IOobject::NO_WRITE)
+        io.readOpt() != IOobject::NO_READ
+     || io.writeOpt() != IOobject::NO_WRITE
     )
     {
         FatalErrorIn("IOReferencer<Type>::IOReferencer")
@@ -52,11 +53,11 @@ template<class Type>
 Foam::IOReferencer<Type>::IOReferencer
 (
     const IOobject& io,
-    const Type& reference
+    Type* ptr
 )
 :
     regIOobject(io),
-    typePtr_(& reference)
+    typePtr_(ptr)
 {
     if
     (
@@ -75,8 +76,12 @@ Foam::IOReferencer<Type>::IOReferencer
 
 template<class Type>
 Foam::IOReferencer<Type>::~IOReferencer()
-{}
-
+{
+    if (typePtr_)
+    {
+        delete typePtr_;
+    }
+}
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
@@ -90,8 +95,7 @@ bool Foam::IOReferencer<Type>::writeData(Ostream& os) const
 
 
 template<class Type>
-const Type&
-    Foam::IOReferencer<Type>::operator()() const
+const Type& Foam::IOReferencer<Type>::operator()() const
 {
     if (!typePtr_)
     {
@@ -103,17 +107,42 @@ const Type&
             << "first."
             << abort(FatalError);
     }
-    return * typePtr_;
+
+    return *typePtr_;
+}
+
+
+template<class Type>
+Type& Foam::IOReferencer<Type>::operator()()
+{
+    if (!typePtr_)
+    {
+        FatalErrorIn
+        (
+            "IOReferencer<Type>::operator()"
+        )
+            << "Attempting to derefence a null typePtr - use IOReferencer::set"
+            << "first."
+            << abort(FatalError);
+    }
+
+    return *typePtr_;
 }
 
 
 template<class Type>
 void Foam::IOReferencer<Type>::set
 (
-    const Type& reference
+    Type* ptr
 )
 {
-    typePtr_ = &reference;
+    if (typePtr_)
+    {
+        delete typePtr_;
+    }
+
+    typePtr_ = ptr;
 }
+
 
 // ************************************************************************* //

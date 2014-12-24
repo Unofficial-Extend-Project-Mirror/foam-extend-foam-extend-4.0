@@ -1,0 +1,87 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | foam-extend: Open Source CFD                    |
+|  \\    /   O peration     | Version:     3.1                                |
+|   \\  /    A nd           | Web:         http://www.extend-project.de       |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      decomposeParDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+numberOfSubdomains 8;
+
+//method               metis;
+method    patchConstrained;
+
+globalFaceZones
+(
+    RUCYCLIC1Zone
+    RUINLETZone
+    RUCYCLIC2Zone
+    RUOUTLETZone
+    GVOUTLETZone
+    DTINLETZone
+    DTCYCLIC1Zone
+    DTCYCLIC2Zone
+);
+
+patchConstrainedCoeffs
+{
+    method            metis;
+    numberOfSubdomains    8;
+    patchConstraints
+    (
+        (RUINLET 1)
+        (GVOUTLET 1)
+        (RUOUTLET 2)
+        (DTINLET 2)
+    );
+}
+
+simpleCoeffs
+{
+    n               (2 2 1);
+    delta             0.001;
+}
+
+hierarchicalCoeffs
+{
+    n               (1 1 1);
+    delta           0.001;
+    order           xyz;
+}
+
+metisCoeffs
+{
+    processorWeights
+    (
+        1
+        1
+        1
+        1
+        1
+        1
+        1
+        1
+    );
+}
+
+manualCoeffs
+{
+    dataFile        "";
+}
+
+distributed     no;
+
+roots
+(
+);
+
+// ************************************************************************* //
+

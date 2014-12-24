@@ -95,13 +95,13 @@ Group: 			Development/Tools
 
     %define pythonVersion $(python -V 2>&1 | awk -F ' ' {'print $2'} |  awk -F \. {'print $1 "." $2'})
 
-    # Creation of OpenFOAM specific .csh and .sh files"
+    # Creation of foam-extend specific .csh and .sh files"
 
     echo ""
-    echo "Generating OpenFOAM specific .csh and .sh files for the package %{name}-%{version}"
+    echo "Generating foam-extend specific .csh and .sh files for the package %{name}-%{version}"
     echo ""
     #
-    # Generate package specific .sh file for OpenFOAM
+    # Generate package specific .sh file for foam-extend
     #
 mkdir -p $RPM_BUILD_ROOT/%{_installPrefix}/etc
 cat << DOT_SH_EOF > $RPM_BUILD_ROOT/%{_installPrefix}/etc/%{name}-%{version}.sh
@@ -117,7 +117,7 @@ export PYTHONPATH=\$PYFOAM_DIR/lib/python%{pythonVersion}/site-packages:\$PYTHON
 DOT_SH_EOF
 
     #
-    # Generate package specific .csh file for OpenFOAM
+    # Generate package specific .csh file for foam-extend
     #
 cat << DOT_CSH_EOF > $RPM_BUILD_ROOT/%{_installPrefix}/etc/%{name}-%{version}.csh
 # Load %{name}-%{version} libraries and binaries if available
@@ -144,7 +144,7 @@ DOT_CSH_EOF
 
 cat << DOT_HARDCODED_SH_EOF > $RPM_BUILD_ROOT/%{_installPrefix}/etc/%{name}-%{version}_hardcoded.sh
 # In this version of the configuration script, the paths are hardcoded,
-# which makes it easier to load PyFoam without the OpenFOAM environment
+# which makes it easier to load PyFoam without the foam-extend environment
 # variables
 #
 # Load %{name}-%{version} libraries and binaries if available
@@ -159,11 +159,11 @@ export PYTHONPATH=\$PYFOAM_DIR/lib/python%{pythonVersion}/site-packages:\$PYTHON
 DOT_HARDCODED_SH_EOF
 
     #
-    # Generate package specific .csh file for OpenFOAM
+    # Generate package specific .csh file for foam-extend
     #
 cat << DOT_HARDCODED_CSH_EOF > $RPM_BUILD_ROOT/%{_installPrefix}/etc/%{name}-%{version}_hardcoded.csh
 # In this version of the configuration script, the paths are hardcoded,
-# which makes it easier to load PyFoam without the OpenFOAM environment
+# which makes it easier to load PyFoam without the foam-extend environment
 # variables
 #
 # Load %{name}-%{version} libraries and binaries if available

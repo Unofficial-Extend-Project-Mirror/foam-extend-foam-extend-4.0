@@ -9,7 +9,7 @@
         );
 
     solidPatchPressure *= rhoFluid.value();
-   
+
     tForce.pressure() = solidPatchPressure;
 
 
@@ -20,6 +20,6 @@
             mesh.Sf().boundaryField()[fluidPatchID]
         );
 
-     
+
     Info << "Total pressure force = " << totalPressureForce << endl;
 }

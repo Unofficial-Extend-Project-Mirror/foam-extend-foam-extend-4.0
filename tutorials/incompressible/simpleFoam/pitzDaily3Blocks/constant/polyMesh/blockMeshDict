@@ -1,7 +1,7 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | foam-extend: Open Source CFD                    |
-|  \\    /   O peration     | Version:     3.0                                |
+|  \\    /   O peration     | Version:     3.1                                |
 |   \\  /    A nd           | Web:         http://www.extend-project.de       |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
@@ -49,40 +49,73 @@ edges
 (
 );
 
-patches
+boundary
 (
-    patch inlet
-    (
-        (0 9 10 1)
-    )
-    patch outlet
-    (
-        (8 17 16 7)
-    )
-    wall upperWall
-    (
-        (1 10 13 4)
-        (4 13 15 6)
-        (6 15 17 8)
-    )
-    wall lowerWall
-    (
-        (7 16 14 5)
-        (5 14 11 2)
-    )
+    inlet
+    {
+        type patch;
+        faces
+        (
+            (0 9 10 1)
+        );
+    }
 
-    wall lowerWallInterface
-    (
-        (2 11 13 4)
-    )
-    wall lowerWallInlet
-    (
-        (3 12 9 0)
-    )
-    patch interface
-    (
-        (4 13 12 3)
-    )
+    outlet
+    {
+        type patch;
+        faces
+        (
+            (8 17 16 7)
+        );
+    }
+
+    upperWall
+    {
+        type wall;
+        faces
+        (
+            (1 10 13 4)
+            (4 13 15 6)
+            (6 15 17 8)
+        );
+    }
+
+    lowerWall
+    {
+        type wall;
+        faces
+        (
+            (7 16 14 5)
+            (5 14 11 2)
+        );
+    }
+
+    lowerWallInterface
+    {
+        type wall;
+        faces
+        (
+            (2 11 13 4)
+        );
+    }
+
+    lowerWallInlet
+    {
+        type wall;
+        faces
+        (
+            (3 12 9 0)
+        );
+    }
+
+    interface
+    {
+        type patch;
+        faces
+        (
+            (4 13 12 3)
+        );
+    }
 );
 
 mergePatchPairs

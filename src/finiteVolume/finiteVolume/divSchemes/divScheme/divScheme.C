@@ -64,7 +64,7 @@ tmp<divScheme<Type> > divScheme<Type>::New
             schemeData
         )   << "Div scheme not specified" << endl << endl
             << "Valid div schemes are :" << endl
-            << IstreamConstructorTablePtr_->toc()
+            << IstreamConstructorTablePtr_->sortedToc()
             << exit(FatalIOError);
     }
 
@@ -81,7 +81,7 @@ tmp<divScheme<Type> > divScheme<Type>::New
             schemeData
         )   << "unknown div scheme " << schemeName << endl << endl
             << "Valid div schemes are :" << endl
-            << IstreamConstructorTablePtr_->toc()
+            << IstreamConstructorTablePtr_->sortedToc()
             << exit(FatalIOError);
     }
 
@@ -97,6 +97,67 @@ divScheme<Type>::~divScheme()
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+
+template<class Type>
+tmp
+<
+    BlockLduSystem<vector, typename innerProduct<vector, Type>::type>
+>
+divScheme<Type>::fvmUDiv
+(
+    const GeometricField<Type, fvPatchField, volMesh>& vf
+) const
+{
+    FatalErrorIn
+    (
+        "tmp<BlockLduSystem> divScheme<Type>::fvmDiv\n"
+        "(\n"
+        "    GeometricField<Type, fvPatchField, volMesh>&"
+        ")\n"
+    )   << "Implicit div operator currently defined only for Gauss linear. "
+        << abort(FatalError);
+
+    typedef typename innerProduct<vector, Type>::type DivType;
+
+    tmp<BlockLduSystem<vector, DivType> > tbs
+    (
+        new BlockLduSystem<vector, DivType>(vf.mesh())
+    );
+
+    return tbs;
+}
+
+
+template<class Type>
+tmp
+<
+    BlockLduSystem<vector, typename innerProduct<vector, Type>::type>
+>
+divScheme<Type>::fvmUDiv
+(
+    const surfaceScalarField& flux,
+    const GeometricField<Type, fvPatchField, volMesh>& vf
+) const
+{
+    FatalErrorIn
+    (
+        "tmp<BlockLduSystem> divScheme<Type>::fvmDiv\n"
+        "(\n"
+        "    surfaceScalarField&"
+        "    GeometricField<Type, fvPatchField, volMesh>&"
+        ")\n"
+    )   << "Implicit div operator currently defined only for Gauss linear. "
+        << abort(FatalError);
+
+    typedef typename innerProduct<vector, Type>::type DivType;
+
+    tmp<BlockLduSystem<vector, DivType> > tbs
+    (
+        new BlockLduSystem<vector, DivType>(vf.mesh())
+    );
+
+    return tbs;
+}
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

@@ -115,7 +115,7 @@ void movingWallVelocityFvPatchVectorField::updateCoeffs()
         }
 
         // Get wall-parallel mesh motion velocity from geometry
-        vectorField Up = 
+        vectorField Up =
             (pp.faceCentres() - oldFc)/mesh.time().deltaT().value();
 
         const volVectorField& U =
