@@ -642,17 +642,25 @@ void Foam::Time::setEndTime(const scalar endTime)
 }
 
 
-void Foam::Time::setDeltaT(const dimensionedScalar& deltaT)
+void Foam::Time::setDeltaT
+(
+    const dimensionedScalar& deltaT,
+    const bool bAdjustDeltaT
+)
 {
-    setDeltaT(deltaT.value());
+    setDeltaT(deltaT.value(), bAdjustDeltaT);
 }
 
 
-void Foam::Time::setDeltaT(const scalar deltaT)
+void Foam::Time::setDeltaT(const scalar deltaT, const bool bAdjustDeltaT)
 {
     deltaT_ = deltaT;
     deltaTchanged_ = true;
-    adjustDeltaT();
+
+    if (bAdjustDeltaT)
+    {
+        adjustDeltaT();
+    }
 }
 
 
