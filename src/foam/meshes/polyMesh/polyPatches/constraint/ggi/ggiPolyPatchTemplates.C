@@ -31,7 +31,6 @@ Author
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-// New.  HJ, 12/Jun/2011
 template<class Type>
 Foam::tmp<Foam::Field<Type> > Foam::ggiPolyPatch::fastExpand
 (
@@ -40,22 +39,6 @@ Foam::tmp<Foam::Field<Type> > Foam::ggiPolyPatch::fastExpand
 {
     // Check and expand the field from patch size to zone size
     // with communication
-
-    // Algorithm:
-    // 1) Master processor holds maps of all zone addressing (data provided)
-    // and all remote zone addressing (data required)
-    // 2) Each processor will send the locally active data to the master
-    // 3) Master assembles all the data
-    // 4) Master sends to all processors the data they need to receive
-    //
-    // Notes:
-    // A) If the size of zone addressing is zero, data is not sent
-    // B) Communicated data on each processor has the size of live faces
-    // C) Expanded data will be equal to actual data from other processors
-    //    only for the faces marked in remote; for other faces, it will be
-    //    equal to zero
-    // D) On processor zero, complete data is available
-    // HJ, 4/Jun/2011
     if (ff.size() != size())
     {
         FatalErrorIn
@@ -80,6 +63,22 @@ Foam::tmp<Foam::Field<Type> > Foam::ggiPolyPatch::fastExpand
         )   << "Requested expand on local parallel.  This is not allowed"
             << abort(FatalError);
     }
+
+    // Algorithm:
+    // 1) Master processor holds maps of all zone addressing (data provided)
+    // and all remote zone addressing (data required)
+    // 2) Each processor will send the locally active data to the master
+    // 3) Master assembles all the data
+    // 4) Master sends to all processors the data they need to receive
+    //
+    // Notes:
+    // A) If the size of zone addressing is zero, data is not sent
+    // B) Communicated data on each processor has the size of live faces
+    // C) Expanded data will be equal to actual data from other processors
+    //    only for the faces marked in remote; for other faces, it will be
+    //    equal to zero
+    // D) On processor zero, complete data is available
+    // HJ, 4/Jun/2011
 
     // HR, 10/Jul/2013
     // This function requires send-receive-addressing, but usage is not

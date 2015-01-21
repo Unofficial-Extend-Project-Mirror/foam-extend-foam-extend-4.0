@@ -279,9 +279,8 @@ public:
         }
 
 
-    // Destructor
-
-        virtual ~ggiPolyPatch();
+    //- Destructor
+    virtual ~ggiPolyPatch();
 
 
     // Member functions
