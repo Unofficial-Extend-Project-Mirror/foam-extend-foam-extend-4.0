@@ -270,14 +270,14 @@ void Foam::block::createCells() const
             {
                 cells_[cellNo].setSize(8);
 
-                cells_[cellNo][0] =  vtxLabel(i, j, k);
-                cells_[cellNo][1] =  vtxLabel(i+1, j, k);
-                cells_[cellNo][2] =  vtxLabel(i+1, j+1, k);
-                cells_[cellNo][3] =  vtxLabel(i, j+1, k);
-                cells_[cellNo][4] =  vtxLabel(i, j, k+1);
-                cells_[cellNo][5] =  vtxLabel(i+1, j, k+1);
-                cells_[cellNo][6] =  vtxLabel(i+1, j+1, k+1);
-                cells_[cellNo][7] =  vtxLabel(i, j+1, k+1);
+                cells_[cellNo][0] = vtxLabel(i, j, k);
+                cells_[cellNo][1] = vtxLabel(i+1, j, k);
+                cells_[cellNo][2] = vtxLabel(i+1, j+1, k);
+                cells_[cellNo][3] = vtxLabel(i, j+1, k);
+                cells_[cellNo][4] = vtxLabel(i, j, k+1);
+                cells_[cellNo][5] = vtxLabel(i+1, j, k+1);
+                cells_[cellNo][6] = vtxLabel(i+1, j+1, k+1);
+                cells_[cellNo][7] = vtxLabel(i, j+1, k+1);
                 cellNo++;
             }
         }
