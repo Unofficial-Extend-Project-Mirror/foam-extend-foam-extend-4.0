@@ -70,7 +70,7 @@ int main(int argc, char *argv[])
 #       include "setDeltaT.H"
 
         runTime++;
-
+        Info<< "deltaT = " << runTime.deltaT().value() << nl << endl;
         Info<< "Time = " << runTime.timeName() << nl << endl;
 
         bool meshChanged = mesh.update();
