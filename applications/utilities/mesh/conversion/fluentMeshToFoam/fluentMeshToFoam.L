@@ -1616,7 +1616,7 @@ int main(int argc, char *argv[])
     // interior boundaries are handled via faceSets
     // cell zones will only be written if there is more than one
 
-    if (writeZones && cellGroupZoneID.size()>1)
+    if (writeZones && cellGroupZoneID.size() > 1)
     {
         Info<< "Adding Zones" << endl;
         List<pointZone*> pz(0);
