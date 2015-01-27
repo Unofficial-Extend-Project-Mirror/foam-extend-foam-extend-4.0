@@ -44,7 +44,7 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class hhuCombustionThermo Declaration
+                  Class hhuCombustionThermo Declaration
 \*---------------------------------------------------------------------------*/
 
 class hhuCombustionThermo
