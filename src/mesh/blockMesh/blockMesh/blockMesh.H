@@ -202,7 +202,7 @@ public:
             void clearGeom();
 
             //- Enable/disable verbose information about the progress
-            static void verbose(const bool on=true);
+            static void verbose(const bool on = true);
 
         // Write
 
