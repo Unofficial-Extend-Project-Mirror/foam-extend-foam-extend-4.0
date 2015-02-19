@@ -192,8 +192,6 @@ void Foam::pamgPolicy::calcChild()
             }
         }
 
-        reduce(nSolo, sumOp<label>());
-
         if (nSolo > 0)
         {
             // Found solo equations
@@ -201,7 +199,7 @@ void Foam::pamgPolicy::calcChild()
 
             if (lduMatrix::debug >= 2)
             {
-                Info<< "Found " << nSolo << " weakly connected equations."
+                Pout << "Found " << nSolo << " weakly connected equations."
                     << endl;
             }
         }
