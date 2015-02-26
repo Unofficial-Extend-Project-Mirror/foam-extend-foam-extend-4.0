@@ -213,8 +213,6 @@ void Foam::BlockMatrixAgglomeration<Type>::calcAgglomeration()
             }
         }
 
-        reduce(nSolo, sumOp<label>());
-
         if (nSolo > 0)
         {
             // Found solo equations
@@ -222,7 +220,7 @@ void Foam::BlockMatrixAgglomeration<Type>::calcAgglomeration()
 
             if (BlockLduMatrix<Type>::debug >= 2)
             {
-                Info<< "Found " << nSolo << " weakly connected equations."
+                Pout<< "Found " << nSolo << " weakly connected equations."
                     << endl;
             }
         }

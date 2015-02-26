@@ -37,7 +37,6 @@ Author
 #include "vector2D.H"
 #include "coeffFields.H"
 #include "BlockSolverPerformance.H"
-// #include "BlockGaussSeidelSolver.H"
 // #include "BlockBiCGStabSolver.H"
 // #include "BlockCGSolver.H"
 #include "BlockGMRESSolver.H"
@@ -78,7 +77,8 @@ Foam::coarseBlockAmgLevel<Type>::coarseBlockAmgLevel
             matrixPtr_,
             dict
         )
-    )
+    ),
+    Ax_()
 {}
 
 
@@ -226,7 +226,6 @@ void Foam::coarseBlockAmgLevel<Type>::solve
         topLevelDict.add("preconditioner", "Cholesky");
 
         coarseSolverPerf =
-        //BlockGaussSeidelSolver<Type>
 //         BlockCGSolver<Type>
         BlockGMRESSolver<Type>
         (
@@ -240,7 +239,6 @@ void Foam::coarseBlockAmgLevel<Type>::solve
         topLevelDict.add("preconditioner", "Cholesky");
 
         coarseSolverPerf =
-        //BlockGaussSeidelSolver<Type>
 //         BlockBiCGStabSolver<Type>
         BlockGMRESSolver<Type>
         (
@@ -283,18 +281,21 @@ void Foam::coarseBlockAmgLevel<Type>::scaleX
     Field<Type>& xBuffer
 ) const
 {
+    // KRJ: 2013-02-05: Removed subfield, creating a new field
+    // Initialise and size buffer to avoid multiple allocation.
+    // Buffer is created as private data of AMG level
+    // HJ, 26/Feb/2015
+    if (Ax_.empty())
+    {
+        Ax_.setSize(x.size());
+    }
 
-    // KRJ: 2013-02-05: Creating a new field not re-using
-    Field<Type> Ax(x.size());
+    matrixPtr_->Amul(Ax_, x);
 
-    matrixPtr_->Amul
-    (
-        reinterpret_cast<Field<Type>&>(Ax),
-        x
-    );
+#if 0
 
     scalar scalingFactorNum = sumProd(x, b);
-    scalar scalingFactorDenom = sumProd(x, Ax);
+    scalar scalingFactorDenom = sumProd(x, Ax_);
 
     vector2D scalingVector(scalingFactorNum, scalingFactorDenom);
     reduce(scalingVector, sumOp<vector2D>());
@@ -320,6 +321,46 @@ void Foam::coarseBlockAmgLevel<Type>::scaleX
         // Regular scaling
         x *= scalingVector[0]/stabilise(scalingVector[1], SMALL);
     }
+
+#else
+
+    Type scalingFactorNum = sumCmptProd(x, b);
+    Type scalingFactorDenom = sumCmptProd(x, Ax_);
+
+    Vector2D<Type> scalingVector(scalingFactorNum, scalingFactorDenom);
+    reduce(scalingVector, sumOp<Vector2D<Type> >());
+
+    Type scalingFactor = pTraits<Type>::one;
+
+    // Scale x
+    for (direction dir = 0; dir < pTraits<Type>::nComponents; dir++)
+    {
+        scalar num = component(scalingVector[0], dir);
+        scalar denom = component(scalingVector[1], dir);
+
+        if
+        (
+            mag(num) > GREAT || mag(denom) > GREAT
+         || num*denom <= 0 || mag(num) < mag(denom)
+        )
+        {
+            // Factor = 1.0, no scaling
+        }
+        else if (mag(num) > 2*mag(denom))
+        {
+            setComponent(scalingFactor, dir) = 2;
+        }
+        else
+        {
+            // Regular scaling
+            setComponent(scalingFactor, dir) = num/stabilise(denom, SMALL);
+        }
+    }
+
+    // Scale X
+    cmptMultiply(x, x, scalingFactor);
+
+#endif
 }
 
 

@@ -76,6 +76,9 @@ class coarseBlockAmgLevel
         //- Smoother
         autoPtr<BlockLduSmoother<Type> > smootherPtr_;
 
+        //- Ax buffer
+        mutable Field<Type> Ax_;
+
 
     // Private Member Functions
 
@@ -90,6 +93,9 @@ public:
 
     //- Runtime type information
         TypeName("coarseBlockAmgLevel");
+
+
+    // Constructors
 
         //- Construct from components
         coarseBlockAmgLevel

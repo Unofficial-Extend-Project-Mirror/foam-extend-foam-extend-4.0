@@ -74,7 +74,8 @@ Foam::fineBlockAmgLevel<Type>::fineBlockAmgLevel
             matrix,
             dict
         )
-    )
+    ),
+    Ax_()
 {}
 
 
@@ -184,7 +185,6 @@ void Foam::fineBlockAmgLevel<Type>::solve
 
     // Create artificial dictionary for finest solution
     dictionary finestDict;
-//     finestDict.add("nDirections", "5");
     finestDict.add("minIter", 1);
     finestDict.add("maxIter", 1000);
     finestDict.add("tolerance", tolerance);
@@ -235,26 +235,31 @@ void Foam::fineBlockAmgLevel<Type>::scaleX
     Field<Type>& xBuffer
 ) const
 {
-
     // KRJ: 2013-02-05: Removed subfield, creating a new field
-    Field<Type> Ax(x.size());
+    // Initialise and size buffer to avoid multiple allocation.
+    // Buffer is created as private data of AMG level
+    // HJ, 26/Feb/2015
+    if (Ax_.empty())
+    {
+        Ax_.setSize(x.size());
+    }
 
-    matrix_.Amul
-    (
-        reinterpret_cast<Field<Type>&>(Ax),
-        x
-    );
+    matrix_.Amul(Ax_, x);
+
+#if 0
 
     scalar scalingFactorNum = sumProd(x, b);
-    scalar scalingFactorDenom = sumProd(x, Ax);
+    scalar scalingFactorDenom = sumProd(x, Ax_);
 
-    vector scalingVector(scalingFactorNum, scalingFactorDenom, 0);
-    reduce(scalingVector, sumOp<vector>());
+    vector2D scalingVector(scalingFactorNum, scalingFactorDenom);
+    reduce(scalingVector, sumOp<vector2D>());
 
     // Scale x
     if
     (
-        scalingVector[0]*scalingVector[1] <= 0
+        mag(scalingVector[0]) > GREAT
+     || mag(scalingVector[1]) > GREAT
+     || scalingVector[0]*scalingVector[1] <= 0
      || mag(scalingVector[0]) < mag(scalingVector[1])
     )
     {
@@ -270,6 +275,46 @@ void Foam::fineBlockAmgLevel<Type>::scaleX
         // Regular scaling
         x *= scalingVector[0]/stabilise(scalingVector[1], SMALL);
     }
+
+#else
+
+    Type scalingFactorNum = sumCmptProd(x, b);
+    Type scalingFactorDenom = sumCmptProd(x, Ax_);
+
+    Vector2D<Type> scalingVector(scalingFactorNum, scalingFactorDenom);
+    reduce(scalingVector, sumOp<Vector2D<Type> >());
+
+    Type scalingFactor = pTraits<Type>::one;
+
+    // Scale x
+    for (direction dir = 0; dir < pTraits<Type>::nComponents; dir++)
+    {
+        scalar num = component(scalingVector[0], dir);
+        scalar denom = component(scalingVector[1], dir);
+
+        if
+        (
+            mag(num) > GREAT || mag(denom) > GREAT
+         || num*denom <= 0 || mag(num) < mag(denom)
+        )
+        {
+            // Factor = 1.0, no scaling
+        }
+        else if (mag(num) > 2*mag(denom))
+        {
+            setComponent(scalingFactor, dir) = 2;
+        }
+        else
+        {
+            // Regular scaling
+            setComponent(scalingFactor, dir) = num/stabilise(denom, SMALL);
+        }
+    }
+
+    // Scale X
+    cmptMultiply(x, x, scalingFactor);
+
+#endif
 }
 
 
