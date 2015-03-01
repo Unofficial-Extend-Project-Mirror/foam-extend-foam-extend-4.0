@@ -116,6 +116,7 @@ public:
     //- Runtime type information
     TypeName("coordinateRotation");
 
+
     // Constructors
 
         //- Construct null
