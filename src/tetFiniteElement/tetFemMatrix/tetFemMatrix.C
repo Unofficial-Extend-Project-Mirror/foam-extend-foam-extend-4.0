@@ -176,14 +176,6 @@ void tetFemMatrix<Type>::addConstraint
     }
     else
     {
-        WarningIn
-        (
-            "void tetFemMatrix<Type>::addConstraint(const label vertex, "
-            "const Type& value)"
-        )   << "Adding constraint on an already constrained point."
-            << "  Point: " << vertex
-            << endl;
-
         fixedEqns_[vertex].combine(cp);
     }
 }
