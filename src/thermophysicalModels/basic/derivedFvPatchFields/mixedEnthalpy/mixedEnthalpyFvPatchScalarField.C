@@ -115,7 +115,6 @@ void Foam::mixedEnthalpyFvPatchScalarField::updateCoeffs()
     if
     (
         dimensionedInternalField().name() == db().mangleFileName("h")
-     || dimensionedInternalField().name() == db().mangleFileName("i")
     )
     {
         refValue() = thermo.h(Tw.refValue(), patchi);
@@ -125,6 +124,12 @@ void Foam::mixedEnthalpyFvPatchScalarField::updateCoeffs()
             thermo.h(Tw, patchi)
           - thermo.h(Tw, patch().faceCells())
          );
+    }
+    else if
+    (
+        dimensionedInternalField().name() == db().mangleFileName("i")
+    )
+    {
     }
     else
     {
