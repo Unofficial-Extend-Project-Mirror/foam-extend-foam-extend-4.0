@@ -118,6 +118,12 @@ public:
                 new wedgeFvsPatchField<Type>(*this, iF)
             );
         }
+
+
+    // I-O
+
+        //- Write
+        virtual void write(Ostream&) const;
 };
 
 
