@@ -167,7 +167,7 @@ public:
             //- Evaluate the patch field
             virtual void evaluate
             (
-                const Pstream::commsTypes commsType=Pstream::blocking
+                const Pstream::commsTypes commsType = Pstream::blocking
             );
 
             //- Return the matrix diagonal coefficients corresponding to the
