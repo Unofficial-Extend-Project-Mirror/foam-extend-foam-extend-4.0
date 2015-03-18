@@ -28,7 +28,7 @@ Description
     Calculates the forces and moments by integrating the pressure and
     skin-friction forces over a given list of patches.
 
-    Member function calcForcesMoment()calculates and returns the forces and
+    Member function calcForcesMoment() calculates and returns the forces and
     moments.
 
     Member function forces::write() calls calcForcesMoment() and writes the
