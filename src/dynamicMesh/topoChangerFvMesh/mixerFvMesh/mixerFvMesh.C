@@ -467,7 +467,7 @@ bool Foam::mixerFvMesh::update()
 
     if (globalMorphing)
     {
-        Info << "Attaching rotors" << endl;
+        Info<< "Attaching rotors" << endl;
 
         deleteDemandDrivenData(movingPointsMaskPtr_);
 
