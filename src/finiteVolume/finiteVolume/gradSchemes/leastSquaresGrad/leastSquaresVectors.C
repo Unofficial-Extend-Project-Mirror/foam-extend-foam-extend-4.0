@@ -153,6 +153,10 @@ void Foam::leastSquaresVectors::makeLeastSquaresVectors() const
 //    invDd = inv(dd);
     invDd = hinv(dd);
 
+    // Evaluate coupled to exchange coupled neighbour field data
+    // across coupled boundaries.  HJ, 18/Mar/2015
+    volInvDd.boundaryField().evaluateCoupled();
+
     // Revisit all faces and calculate the lsP and lsN vectors
     forAll(owner, faceI)
     {
@@ -249,12 +253,15 @@ bool Foam::leastSquaresVectors::movePoints() const
     return true;
 }
 
+
 bool Foam::leastSquaresVectors::updateMesh(const mapPolyMesh& mpm) const
 {
     if (debug)
     {
-        InfoIn("bool leastSquaresVectors::updateMesh(const mapPolyMesh&) const")
-            << "Clearing least square data" << endl;
+        InfoIn
+        (
+            "bool leastSquaresVectors::updateMesh(const mapPolyMesh&) const"
+        )   << "Clearing least square data" << endl;
     }
 
     deleteDemandDrivenData(pVectorsPtr_);
