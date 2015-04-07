@@ -168,14 +168,9 @@ tmp<volScalarField> RASModel::nuEff() const
         new volScalarField("nuEff", nut() + nu())
     );
 
-    if (gMax(tnuEff().internalField()) > nuRatio_*gMax(nu().internalField()))
-    {
-        Info<< "Limiting turbulence viscosity" << endl;
-
-        // Apply nut limiter
-        tnuEff().internalField() =
-            Foam::min(tnuEff().internalField(), nuRatio_*nu().internalField());
-    }
+    // Apply nut limiter
+    tnuEff().internalField() =
+        Foam::min(tnuEff().internalField(), nuRatio_*nu().internalField());
 
     return tnuEff;
 }

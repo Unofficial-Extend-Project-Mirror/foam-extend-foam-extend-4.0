@@ -173,14 +173,9 @@ tmp<volScalarField> RASModel::muEff() const
         new volScalarField("muEff", mut() + mu())
     );
 
-    if (gMax(tmuEff().internalField()) > muRatio_*gMax(mu().internalField()))
-    {
-        Info<< "Limiting turbulence viscosity" << endl;
-
-        // Apply mut limiter
-        tmuEff().internalField() =
-            Foam::min(tmuEff().internalField(), muRatio_*mu().internalField());
-    }
+    // Apply mut limiter
+    tmuEff().internalField() =
+        Foam::min(tmuEff().internalField(), muRatio_*mu().internalField());
 
     return tmuEff;
 }
