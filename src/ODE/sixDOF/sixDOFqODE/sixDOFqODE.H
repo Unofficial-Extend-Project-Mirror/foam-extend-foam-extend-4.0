@@ -173,17 +173,17 @@ class sixDOFqODE
 
 public:
 
-
-//     //- Runtime type information
-//       Not possible because of I/O error: incorrect type, expecting dictionary
-//       HJ, 11/Feb/2008
-//     TypeName("sixDOFqODE");
-
-
     // Constructors
 
         //- Construct from dictionary
         sixDOFqODE(const IOobject& io);
+
+        //- Construct sixDOFqODE, changing name
+        sixDOFqODE
+        (
+            const word& name,
+            const sixDOFqODE& sd
+        );
 
 
     // Destructor
@@ -246,14 +246,21 @@ public:
             inline dimensionedScalar rotAngle() const;
 
 
-        // Non-constant access to velocities
+        // Non-constant access to 
 
-            //- Return access to velocity of origin
-            inline dimensionedVector& U();
+            //- Set position of origin
+            inline void setXrel(const vector& x);
 
-            //- Return access to rotational velocity in relative
+            //- Set velocity of origin
+            inline void setU(const vector& u);
+
+            //- Set rotational angle in relative
             //  coordinate system
-            inline dimensionedVector& omega();
+            inline void setRotation(const HamiltonRodriguezRot& rot);
+
+            //- Set rotational velocity in relative
+            //  coordinate system
+            inline void setOmega(const vector& omega);
 
 
         // Average motion per time-step
@@ -261,10 +268,12 @@ public:
             //- Return average rotational vector of body
             inline vector rotVectorAverage() const;
 
-            //- Return average rotational velocity in relative coordinate system
+            //- Return average rotational velocity in
+            //  relative coordinate system
             inline const dimensionedVector& omegaAverage() const;
 
-            //- Return average rotational velocity in absolute coordinate system
+            //- Return average rotational velocity in
+            //  absolute coordinate system
             inline const dimensionedVector& omegaAverageAbsolute() const;
 
 
@@ -312,6 +321,9 @@ public:
 
             //- Return transformation tensor between new and previous rotation
             inline const tensor& rotIncrementTensor() const;
+
+            //-  Set ODE parameters from another ODE
+            void setState(const sixDOFqODE&);
 
 
         // ODE parameters

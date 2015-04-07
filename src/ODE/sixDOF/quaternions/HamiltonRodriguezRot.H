@@ -74,17 +74,17 @@ class HamiltonRodriguezRot
         //- Calculate R_ - inertial to body coord. sys. rotation
         inline void calculateR() const
         {
-            R_.xx() = 2 * (e1_*e1_ + e0_*e0_ - 0.5);
-            R_.xy() = 2 * (e1_*e2_ + e0_*e3_);
-            R_.xz() = 2 * (e1_*e3_ - e0_*e2_);
+            R_.xx() = 2*(e1_*e1_ + e0_*e0_ - 0.5);
+            R_.xy() = 2*(e1_*e2_ + e0_*e3_);
+            R_.xz() = 2*(e1_*e3_ - e0_*e2_);
 
-            R_.yx() = 2 * (e2_*e1_ - e0_*e3_);
-            R_.yy() = 2 * (e2_*e2_ + e0_*e0_ - 0.5);
-            R_.yz() = 2 * (e2_*e3_ + e0_*e1_);
+            R_.yx() = 2*(e2_*e1_ - e0_*e3_);
+            R_.yy() = 2*(e2_*e2_ + e0_*e0_ - 0.5);
+            R_.yz() = 2*(e2_*e3_ + e0_*e1_);
 
-            R_.zx() = 2 * (e3_*e1_ + e0_*e2_);
-            R_.zy() = 2 * (e3_*e2_ - e0_*e1_);
-            R_.zz() = 2 * (e3_*e3_ + e0_*e0_ - 0.5);
+            R_.zx() = 2*(e3_*e1_ + e0_*e2_);
+            R_.zy() = 2*(e3_*e2_ - e0_*e1_);
+            R_.zz() = 2*(e3_*e3_ + e0_*e0_ - 0.5);
         }
 
         //- Calculate Gt()

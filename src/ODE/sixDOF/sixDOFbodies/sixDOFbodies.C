@@ -30,7 +30,7 @@ Description
 Author
     Dubravko Matijasevic, FSB Zagreb.  All rights reserved.
 
-\*----------------------------------------------------------------------------*/
+\*---------------------------------------------------------------------------*/
 
 #include "objectRegistry.H"
 #include "sixDOFbodies.H"
