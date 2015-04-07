@@ -25,8 +25,11 @@ Application
     sonicDyMFoam
 
 Description
-    Transient solver for trans-sonic/supersonic, laminar flow of a
+    Transient solver for trans-sonic/supersonic for laminar or flow of a
     compressible gas with support for mesh motion and topological changes
+
+    Uses the flexible PIMPLE (PISO-SIMPLE) solution for time-resolved and
+    pseudo-transient simulations.
 
     Updated from sonicFoamAutoMotion by Hrvoje Jasak
 
@@ -64,7 +67,7 @@ int main(int argc, char *argv[])
 #       include "setDeltaT.H"
 
         runTime++;
-        Info<< "deltaT = " << runTime.deltaT().value() << nl << endl;
+
         Info<< "Time = " << runTime.timeName() << nl << endl;
 
         bool meshChanged = mesh.update();
@@ -102,7 +105,14 @@ int main(int argc, char *argv[])
         {
             // Under-relax pDivU term
             pDivU.storePrevIter();
-            pDivU = p*fvc::div(phi/fvc::interpolate(rho));
+
+            pDivU =
+                p*fvc::div
+                (
+                    phi/fvc::interpolate(rho)
+                  + fvc::meshPhi(rho, U)
+                );
+
             pDivU.relax();
 
 #           include "rhoEqn.H"

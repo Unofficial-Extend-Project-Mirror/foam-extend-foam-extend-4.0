@@ -14,7 +14,7 @@
     fieldBounds.lookup("T") >> TMin.value() >> TMax.value();
 
     // Velocity bound
-    dimensionedScalar UMax("UMax", dimVelocity, GREAT);
+    dimensionedScalar UrelMax("UrelMax", dimVelocity, GREAT);
 
-    fieldBounds.lookup(U.name()) >> UMax.value();
-    dimensionedScalar smallU("smallU", dimVelocity, 1e-10);
+    fieldBounds.lookup(Urel.name()) >> UrelMax.value();
+    dimensionedScalar smallUrel("smallUrel", dimVelocity, 1e-10);
