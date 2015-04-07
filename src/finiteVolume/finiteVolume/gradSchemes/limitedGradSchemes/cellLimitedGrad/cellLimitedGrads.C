@@ -411,7 +411,7 @@ tmp<BlockLduSystem<vector, vector> > cellLimitedGrad<scalar>::fvmGrad
 ) const
 {
     // Consider doing a calculateLimiter member function since both fvmGrad and
-    // grad use almost the same procedure to calculate limiter. VV, 9/June/2014.
+    // grad use almost the same procedure to calculate limiter. VV, 9/June/2014
     const fvMesh& mesh = vsf.mesh();
 
     tmp<BlockLduSystem<vector, vector> > tbs = basicGradScheme_().fvmGrad(vsf);
@@ -494,9 +494,6 @@ tmp<BlockLduSystem<vector, vector> > cellLimitedGrad<scalar>::fvmGrad
         scalarField maxMinVsf = (1.0/k_ - 1.0)*(maxVsf - minVsf);
         maxVsf += maxMinVsf;
         minVsf -= maxMinVsf;
-
-        //maxVsf *= 1.0/k_;
-        //minVsf *= 1.0/k_;
     }
 
 
@@ -600,6 +597,8 @@ tmp<BlockLduSystem<vector, vector> > cellLimitedGrad<scalar>::fvmGrad
         const fvPatchScalarField& pf = vsf.boundaryField()[patchI];
         const fvPatch& patch = pf.patch();
 
+        const labelList& fc = patch.faceCells();
+
         if (patch.coupled())
         {
             CoeffField<vector>::linearTypeField& pcoupleUpper =
@@ -612,9 +611,7 @@ tmp<BlockLduSystem<vector, vector> > cellLimitedGrad<scalar>::fvmGrad
 
             forAll(pf, faceI)
             {
-                label cellI = patch.faceCells()[faceI];
-
-                pcoupleUpper[faceI] *= lfIn[cellI];
+                pcoupleUpper[faceI] *= lfIn[fc[faceI]];
                 pcoupleLower[faceI] *= lfNei[faceI];
             }
         }
