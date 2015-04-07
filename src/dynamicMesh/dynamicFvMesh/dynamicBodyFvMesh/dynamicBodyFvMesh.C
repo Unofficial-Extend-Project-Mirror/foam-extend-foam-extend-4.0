@@ -98,7 +98,7 @@ Foam::dynamicBodyFvMesh::dynamicBodyFvMesh(const IOobject& io)
 {
     bodyPatchID_ = boundaryMesh().findPatchID(bodyPatchName_);
 
-    if(bodyPatchID_<0)
+    if (bodyPatchID_<0)
     {
         FatalErrorIn
         (
