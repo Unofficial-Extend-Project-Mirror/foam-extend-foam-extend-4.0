@@ -201,11 +201,6 @@ void Foam::fineBlockAmgLevel<Type>::solve
                 matrix_,
                 finestDict
             ).solve(x, b);
-
-        if (BlockLduMatrix<Type>::debug >= 2)
-        {
-            coarseSolverPerf.print();
-        }
     }
     else
     {
@@ -218,11 +213,6 @@ void Foam::fineBlockAmgLevel<Type>::solve
                 matrix_,
                 finestDict
             ).solve(x, b);
-
-        if (BlockLduMatrix<Type>::debug >= 2)
-        {
-            coarseSolverPerf.print();
-        }
     }
 }
 
@@ -273,7 +263,7 @@ void Foam::fineBlockAmgLevel<Type>::scaleX
     else
     {
         // Regular scaling
-        x *= scalingVector[0]/stabilise(scalingVector[1], SMALL);
+        x *= scalingVector[0]/stabilise(scalingVector[1], VSMALL);
     }
 
 #else
@@ -307,7 +297,7 @@ void Foam::fineBlockAmgLevel<Type>::scaleX
         else
         {
             // Regular scaling
-            setComponent(scalingFactor, dir) = num/stabilise(denom, SMALL);
+            setComponent(scalingFactor, dir) = num/stabilise(denom, VSMALL);
         }
     }
 

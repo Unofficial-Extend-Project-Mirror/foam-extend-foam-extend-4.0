@@ -221,6 +221,18 @@ void Foam::coarseBlockAmgLevel<Type>::solve
         return;
     }
 
+    // Switch of debug in top-level direct solve
+    label oldDebug = BlockLduMatrix<Type>::debug;
+
+    if (BlockLduMatrix<Type>::debug >= 3)
+    {
+        BlockLduMatrix<Type>::debug = 1;
+    }
+    else
+    {
+        BlockLduMatrix<Type>::debug = 0;
+    }
+
     if (matrixPtr_->symmetric())
     {
         topLevelDict.add("preconditioner", "Cholesky");
@@ -248,6 +260,9 @@ void Foam::coarseBlockAmgLevel<Type>::solve
         ).solve(x, b);
     }
 
+    // Restore debug
+    BlockLduMatrix<Type>::debug = oldDebug;
+
     // Escape cases of top-level solver divergence
     if
     (
@@ -263,11 +278,6 @@ void Foam::coarseBlockAmgLevel<Type>::solve
         multiply(x, invDiag, b);
 
         // Print top level correction failure as info for user
-        coarseSolverPerf.print();
-    }
-
-    if (BlockLduMatrix<Type>::debug >= 2)
-    {
         coarseSolverPerf.print();
     }
 }
@@ -294,6 +304,7 @@ void Foam::coarseBlockAmgLevel<Type>::scaleX
 
 #if 0
 
+    // Variant 1 (old): scale complete x with a single scaling factor
     scalar scalingFactorNum = sumProd(x, b);
     scalar scalingFactorDenom = sumProd(x, Ax_);
 
@@ -319,11 +330,13 @@ void Foam::coarseBlockAmgLevel<Type>::scaleX
     else
     {
         // Regular scaling
-        x *= scalingVector[0]/stabilise(scalingVector[1], SMALL);
+        x *= scalingVector[0]/stabilise(scalingVector[1], VSMALL);
     }
 
 #else
 
+    // Variant 2: scale each x individually
+    // HJ, 25/Feb/2015
     Type scalingFactorNum = sumCmptProd(x, b);
     Type scalingFactorDenom = sumCmptProd(x, Ax_);
 
@@ -353,7 +366,7 @@ void Foam::coarseBlockAmgLevel<Type>::scaleX
         else
         {
             // Regular scaling
-            setComponent(scalingFactor, dir) = num/stabilise(denom, SMALL);
+            setComponent(scalingFactor, dir) = num/stabilise(denom, VSMALL);
         }
     }
 
