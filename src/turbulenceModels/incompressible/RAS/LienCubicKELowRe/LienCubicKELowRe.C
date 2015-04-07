@@ -292,6 +292,7 @@ LienCubicKELowRe::LienCubicKELowRe
             dimensionedScalar("0", C5viscosity_.dimensions(), 0.0)
         );
 
+    nut_ = min(nut_, nuRatio()*nu());
     nut_.correctBoundaryConditions();
 
     printCoeffs();
@@ -482,6 +483,8 @@ void LienCubicKELowRe::correct()
             C5viscosity_,
             dimensionedScalar("0", C5viscosity_.dimensions(), 0.0)
         );
+    nut_ = min(nut_, nuRatio()*nu());
+    nut_.correctBoundaryConditions();
 
     nonlinearStress_ = symm
     (
