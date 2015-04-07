@@ -78,7 +78,7 @@ void printEdgeStats(const primitiveMesh& mesh)
 
     const edgeList& edges = mesh.edges();
 
-    forAll(edges, edgeI)
+    forAll (edges, edgeI)
     {
         const edge& e = edges[edgeI];
 
@@ -88,19 +88,19 @@ void printEdgeStats(const primitiveMesh& mesh)
 
         eVec /= eMag;
 
-        if (mag(eVec & x) > 1-edgeTol)
+        if (mag(eVec & x) > 1 - edgeTol)
         {
             minX = min(minX, eMag);
             maxX = max(maxX, eMag);
             nX++;
         }
-        else if (mag(eVec & y) > 1-edgeTol)
+        else if (mag(eVec & y) > 1 - edgeTol)
         {
             minY = min(minY, eMag);
             maxY = max(maxY, eMag);
             nY++;
         }
-        else if (mag(eVec & z) > 1-edgeTol)
+        else if (mag(eVec & z) > 1 - edgeTol)
         {
             minZ = min(minZ, eMag);
             maxZ = max(maxZ, eMag);
@@ -131,15 +131,15 @@ label axis(const vector& normal)
 {
     label axisIndex = -1;
 
-    if (mag(normal & point(1, 0, 0)) > (1-edgeTol))
+    if (mag(normal & point(1, 0, 0)) > (1 - edgeTol))
     {
         axisIndex = 0;
     }
-    else if (mag(normal & point(0, 1, 0)) > (1-edgeTol))
+    else if (mag(normal & point(0, 1, 0)) > (1 - edgeTol))
     {
         axisIndex = 1;
     }
-    else if (mag(normal & point(0, 0, 1)) > (1-edgeTol))
+    else if (mag(normal & point(0, 0, 1)) > (1 - edgeTol))
     {
         axisIndex = 2;
     }
@@ -194,13 +194,13 @@ label twoDNess(const polyMesh& mesh)
     plane cellPlane(ctrs[0], ctrs[1], ctrs[otherCellI]);
 
 
-    forAll(ctrs, cellI)
+    forAll (ctrs, cellI)
     {
         const labelList& cEdges = mesh.cellEdges()[cellI];
 
         scalar minLen = GREAT;
 
-        forAll(cEdges, i)
+        forAll (cEdges, i)
         {
             minLen = min(minLen, mesh.edges()[cEdges[i]].mag(mesh.points()));
         }
@@ -230,15 +230,15 @@ label twoDNess(const polyMesh& mesh)
     // Mark boundary points
     boolList boundaryPoint(mesh.allPoints().size(), false);
 
-    forAll(patches, patchI)
+    forAll (patches, patchI)
     {
         const polyPatch& patch = patches[patchI];
 
-        forAll(patch, patchFaceI)
+        forAll (patch, patchFaceI)
         {
             const face& f = patch[patchFaceI];
 
-            forAll(f, fp)
+            forAll (f, fp)
             {
                 boundaryPoint[f[fp]] = true;
             }
@@ -248,7 +248,7 @@ label twoDNess(const polyMesh& mesh)
 
     const edgeList& edges = mesh.edges();
 
-    forAll(edges, edgeI)
+    forAll (edges, edgeI)
     {
         const edge& e = edges[edgeI];
 
@@ -263,7 +263,7 @@ label twoDNess(const polyMesh& mesh)
     // 3. For all non-wedge patches: all faces either perp or aligned with
     //    cell-plane normal. (wedge patches already checked upon construction)
 
-    forAll(patches, patchI)
+    forAll (patches, patchI)
     {
         const polyPatch& patch = patches[patchI];
 
@@ -349,7 +349,9 @@ int main(int argc, char *argv[])
         // Select all cells
         refCells.setSize(mesh.nCells());
 
-        forAll(mesh.cells(), cellI)
+        const cellList& c = mesh.cells();
+
+        forAll (c, cellI)
         {
             refCells[cellI] = cellI;
         }
@@ -440,11 +442,11 @@ int main(int argc, char *argv[])
     // Create cellSet with added cells for easy inspection
     cellSet newCells(mesh, "refinedCells", refCells.size());
 
-    forAll(oldToNew, oldCellI)
+    forAll (oldToNew, oldCellI)
     {
         const labelList& added = oldToNew[oldCellI];
 
-        forAll(added, i)
+        forAll (added, i)
         {
             newCells.insert(added[i]);
         }
@@ -482,14 +484,13 @@ int main(int argc, char *argv[])
       + " to cells in mesh at "
       + oldTimeName;
 
-
-    forAll(oldToNew, oldCellI)
+    forAll (oldToNew, oldCellI)
     {
         const labelList& added = oldToNew[oldCellI];
 
         if (added.size())
         {
-            forAll(added, i)
+            forAll (added, i)
             {
                 newToOld[added[i]] = oldCellI;
             }
@@ -505,7 +506,6 @@ int main(int argc, char *argv[])
         << newToOld.objectPath() << nl << endl;
 
     newToOld.write();
-
 
     // Some statistics.
 
