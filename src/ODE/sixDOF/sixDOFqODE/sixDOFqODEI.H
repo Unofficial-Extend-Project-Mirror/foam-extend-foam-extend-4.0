@@ -118,15 +118,51 @@ Foam::dimensionedScalar Foam::sixDOFqODE::rotAngle() const
 }
 
 
-Foam::dimensionedVector& Foam::sixDOFqODE::U()
+void Foam::sixDOFqODE::setXrel(const vector& x)
 {
-    return U_;
+    Xrel_.value() = x;
+
+    // Set X in coefficients
+    coeffs_[0] = x.x();
+    coeffs_[1] = x.y();
+    coeffs_[2] = x.z();
 }
 
 
-Foam::dimensionedVector& Foam::sixDOFqODE::omega()
+void Foam::sixDOFqODE::setU(const vector& U)
 {
-    return omega_;
+    U_.value() = U;
+    Uaverage_ = U_;
+
+    // Set U in coefficients
+    coeffs_[3] = U.x();
+    coeffs_[4] = U.y();
+    coeffs_[5] = U.z();
+}
+
+
+void Foam::sixDOFqODE::setRotation(const HamiltonRodriguezRot& rot)
+{
+    // Cannot call update rotation: simply set up coefficients
+    // HJ, 23/Mar/2015
+
+    coeffs_[9] = rot.e0();
+    coeffs_[10] = rot.e1();
+    coeffs_[11] = rot.e2();
+    coeffs_[12] = rot.e3();
+}
+
+
+void Foam::sixDOFqODE::setOmega(const vector& omega)
+{
+    omega_.value() = omega;
+    omegaAverage_ = omega_;
+    omegaAverageAbsolute_ = omega_;
+
+    // Set omega in coefficients
+    coeffs_[6] = omega.x();
+    coeffs_[7] = omega.y();
+    coeffs_[8] = omega.z();
 }
 
 
