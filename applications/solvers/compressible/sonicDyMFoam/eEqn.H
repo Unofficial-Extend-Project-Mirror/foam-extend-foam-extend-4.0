@@ -5,8 +5,7 @@
       + fvm::div(phi, e)
       - fvm::laplacian(turbulence->alphaEff(), e)
      ==
-//       - p*fvc::div(phi/fvc::interpolate(rho) + fvc::meshPhi(rho, U))
-        - fvm::SuSp(pDivU/e, e)
+      - fvm::SuSp(pDivU/e, e)
         // viscous heating?
     );
 
