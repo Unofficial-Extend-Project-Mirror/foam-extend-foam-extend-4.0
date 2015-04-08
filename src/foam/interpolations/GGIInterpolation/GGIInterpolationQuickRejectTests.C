@@ -52,7 +52,7 @@ GGIInterpolation<MasterPatch, SlavePatch>::faceBoundBoxExtendSpanFraction_
 
 template<class MasterPatch, class SlavePatch>
 const label
- GGIInterpolation<MasterPatch, SlavePatch>::octreeSearchMinNLevel_
+GGIInterpolation<MasterPatch, SlavePatch>::octreeSearchMinNLevel_
 (
     debug::optimisationSwitch("GGIOctreeSearchMinNLevel", 3)
 );

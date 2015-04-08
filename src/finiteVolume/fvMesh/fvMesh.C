@@ -421,7 +421,7 @@ const Foam::lduAddressing& Foam::fvMesh::lduAddr() const
 }
 
 
-void  Foam::fvMesh::mapFields(const mapPolyMesh& meshMap) const
+void Foam::fvMesh::mapFields(const mapPolyMesh& meshMap) const
 {
     if (debug)
     {
@@ -536,7 +536,7 @@ void Foam::fvMesh::mapOldVolumes(const mapPolyMesh& meshMap)
 }
 
 
-void  Foam::fvMesh::updateMesh(const mapPolyMesh& mpm)
+void Foam::fvMesh::updateMesh(const mapPolyMesh& mpm)
 {
     // Update polyMesh. This needs to keep volume existent!
     polyMesh::updateMesh(mpm);
@@ -561,7 +561,7 @@ void  Foam::fvMesh::updateMesh(const mapPolyMesh& mpm)
 }
 
 
-void  Foam::fvMesh::syncUpdateMesh()
+void Foam::fvMesh::syncUpdateMesh()
 {
     // Update polyMesh. This needs to keep volume existent!
     polyMesh::syncUpdateMesh();

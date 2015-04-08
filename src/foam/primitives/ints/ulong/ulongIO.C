@@ -42,6 +42,7 @@ Foam::word Foam::name(const unsigned long val)
     return buf.str();
 }
 
+
 // * * * * * * * * * * * * * * * IOstream Operators  * * * * * * * * * * * * //
 
 Foam::Istream& Foam::operator>>(Istream& is, unsigned long& val)

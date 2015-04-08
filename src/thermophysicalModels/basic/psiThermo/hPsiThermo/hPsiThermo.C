@@ -96,7 +96,11 @@ void Foam::hPsiThermo<MixtureType>::calculate()
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 template<class MixtureType>
-Foam::hPsiThermo<MixtureType>::hPsiThermo(const fvMesh& mesh, const objectRegistry& obj)
+Foam::hPsiThermo<MixtureType>::hPsiThermo
+(
+    const fvMesh& mesh,
+    const objectRegistry& obj
+)
 :
     basicPsiThermo(mesh, obj),
     MixtureType(*this, mesh, obj),

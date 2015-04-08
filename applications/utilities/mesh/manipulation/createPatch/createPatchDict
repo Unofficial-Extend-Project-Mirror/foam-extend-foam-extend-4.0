@@ -38,7 +38,7 @@ FoamFile
 // Tolerance used in matching faces. Absolute tolerance is span of
 // face times this factor. To load incorrectly matches meshes set this
 // to a higher value.
-matchTolerance 1E-3;
+matchTolerance 1e-3;
 
 // Do a synchronisation of coupled points after creation of any patches.
 // Note: this does not work with points that are on multiple coupled patches

@@ -7,4 +7,5 @@ application="dbnsTurbFoam"
 
 gunzip naca0012.cas.gz
 runApplication fluentMeshToFoam naca0012.cas
+gzip naca0012.cas
 runApplication $application

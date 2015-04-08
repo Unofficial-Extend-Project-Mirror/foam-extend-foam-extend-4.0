@@ -297,7 +297,10 @@ bool Foam::slidingInterface::projectPoints() const
     }
 
     // Projected slave points are stored for mesh motion correction
-    if (projectedSlavePointsPtr_) delete projectedSlavePointsPtr_;
+    if (projectedSlavePointsPtr_)
+    {
+        delete projectedSlavePointsPtr_;
+    }
 
     projectedSlavePointsPtr_ =
         new pointField(slavePointFaceHits.size(), vector::zero);

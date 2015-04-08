@@ -309,14 +309,15 @@ Foam::labelList Foam::faPatch::ngbPolyPatchFaces() const
 
 Foam::tmp<Foam::vectorField> Foam::faPatch::ngbPolyPatchFaceNormals() const
 {
-    tmp<vectorField> fN(new vectorField());
+    tmp<vectorField> tfN(new vectorField());
+    vectorField& fN = tfN();
 
     if (ngbPolyPatchIndex() == -1)
     {
-        return fN;
+        return tfN;
     }
 
-    fN().setSize(faPatch::size());
+    fN.setSize(faPatch::size());
 
     labelList ngbFaces = ngbPolyPatchFaces();
 
@@ -325,13 +326,13 @@ Foam::tmp<Foam::vectorField> Foam::faPatch::ngbPolyPatchFaceNormals() const
     const faceList& faces = pMesh.faces();
     const pointField& points = pMesh.points();
 
-    forAll(fN(), faceI)
+    forAll(fN, faceI)
     {
-        fN() = faces[ngbFaces[faceI]].normal(points)
+        fN[faceI] = faces[ngbFaces[faceI]].normal(points)
             /faces[ngbFaces[faceI]].mag(points);
     }
 
-    return fN;
+    return tfN;
 }
 
 
@@ -344,21 +345,22 @@ Foam::tmp<Foam::vectorField> Foam::faPatch::ngbPolyPatchPointNormals() const
 
     labelListList pntEdges = pointEdges();
 
-    tmp<vectorField> pN(new vectorField(pntEdges.size(), vector::zero));
+    tmp<vectorField> tpN(new vectorField(pntEdges.size(), vector::zero));
+    vectorField& pN = tpN();
 
     vectorField faceNormals = ngbPolyPatchFaceNormals();
 
-    forAll(pN(), pointI)
+    forAll(pN, pointI)
     {
         forAll(pntEdges[pointI], edgeI)
         {
-            pN()[pointI] += faceNormals[pntEdges[pointI][edgeI]];
+            pN[pointI] += faceNormals[pntEdges[pointI][edgeI]];
         }
     }
 
-    pN() /= mag(pN());
+    pN /= mag(pN);
 
-    return pN;
+    return tpN;
 }
 
 

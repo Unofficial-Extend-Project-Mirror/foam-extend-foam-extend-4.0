@@ -36,7 +36,6 @@ Description
 
 int main(int argc, char *argv[])
 {
-
 #   include "addTimeOptions.H"
 #   include "setRootCase.H"
 
@@ -53,7 +52,7 @@ int main(int argc, char *argv[])
 #   include "createMesh.H"
 #   include "readMechanicalProperties.H"
 
-    for (label i=startTime; i<endTime; i++)
+    for (label i = startTime; i < endTime; i++)
     {
         runTime.setTime(Times[i], i);
 
@@ -79,8 +78,8 @@ int main(int argc, char *argv[])
 
             volTensorField gradU = fvc::grad(U);
 
-        volSymmTensorField sigma =
-            rho*(2.0*mu*symm(gradU) + lambda*I*tr(gradU));
+            volSymmTensorField sigma =
+                rho*(2.0*mu*symm(gradU) + lambda*I*tr(gradU));
 
             volScalarField sigmaEq
             (

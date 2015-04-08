@@ -579,7 +579,7 @@ void Foam::blockMesh::calcMergeInfo()
     }
 
     nPoints_ = newPointLabel;
-
 }
+
 
 // ************************************************************************* //

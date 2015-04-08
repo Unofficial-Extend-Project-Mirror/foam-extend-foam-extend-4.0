@@ -135,9 +135,10 @@ snGrad() const
     return
     (
         *this
-      - (patchInternalField() + (k&gradField.patchInternalField()))
+      - (patchInternalField() + (k & gradField.patchInternalField()))
       )*this->patch().deltaCoeffs();
 }
+
 
 tmp<Field<vector> > fixedDisplacementFvPatchVectorField::
 gradientBoundaryCoeffs() const
@@ -152,11 +153,12 @@ gradientBoundaryCoeffs() const
     vectorField delta = this->patch().delta();
 
     //- correction vector
-    vectorField k = delta - n*(n&delta);
+    vectorField k = delta - n*(n & delta);
 
     return this->patch().deltaCoeffs()
        *(*this - (k&gradField.patchInternalField()));
 }
+
 
 void fixedDisplacementFvPatchVectorField::write(Ostream& os) const
 {

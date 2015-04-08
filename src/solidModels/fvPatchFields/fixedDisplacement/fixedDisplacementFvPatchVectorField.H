@@ -56,11 +56,11 @@ class fixedDisplacementFvPatchVectorField
 :
     public fixedValueFvPatchVectorField
 {
-
     // Private Data
 
         //- Name of the displacement field
         const word fieldName_;
+
 
 public:
 
@@ -138,8 +138,9 @@ public:
             //- field name
             word fieldName() const
             {
-	      return fieldName_;
-	    }
+                return fieldName_;
+            }
+
 
         // Evaluation functions
 
@@ -151,6 +152,7 @@ public:
             //- Return the matrix source coefficients corresponding to the
             //  evaluation of the gradient of this patchField
             virtual tmp<Field<vector> > gradientBoundaryCoeffs() const;
+
 
         //- Write
         virtual void write(Ostream&) const;

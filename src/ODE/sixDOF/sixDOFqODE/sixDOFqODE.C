@@ -35,17 +35,6 @@ Author
 #include "objectRegistry.H"
 #include "sixDOFqODE.H"
 
-// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
-
-// Runtime type information
-// Not possible because of I/O error: incorrect type, expecting dictionary
-// HJ, 11/Feb/2008
-// namespace Foam
-// {
-//     defineTypeNameAndDebug(sixDOFqODE, 0);
-// }
-
-
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
 void Foam::sixDOFqODE::setCoeffs()
@@ -155,6 +144,49 @@ Foam::sixDOFqODE::sixDOFqODE(const IOobject& io)
 }
 
 
+// Construct as copy
+Foam::sixDOFqODE::sixDOFqODE
+(
+    const word& name,
+    const sixDOFqODE& sd
+)
+:
+    IOdictionary
+    (
+        IOobject
+        (
+            name,
+            sd.instance(),
+            sd.local(),
+            sd.db(),
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        )
+    ),
+    mass_(sd.mass_.name(), sd.mass_),
+    momentOfInertia_(sd.momentOfInertia_.name(), sd.momentOfInertia_),
+    Xequilibrium_(sd.Xequilibrium_.name(), sd.Xequilibrium_),
+    linSpringCoeffs_(sd.linSpringCoeffs_.name(), sd.linSpringCoeffs_),
+    linDampingCoeffs_(sd.linDampingCoeffs_.name(), sd.linDampingCoeffs_),
+    Xrel_(sd.Xrel_.name(), sd.Xrel_),
+    U_(sd.U_.name(), sd.U_),
+    Uaverage_(sd.Uaverage_.name(), sd.Uaverage_),
+    rotation_(sd.rotation_),
+    omega_(sd.omega_.name(), sd.omega_),
+    omegaAverage_(sd.omegaAverage_.name(), sd.omegaAverage_),
+    omegaAverageAbsolute_
+    (
+        sd.omegaAverageAbsolute_.name(),
+        sd.omegaAverageAbsolute_
+    ),
+    force_(sd.force_.name(), sd.force_),
+    moment_(sd.moment_.name(), sd.moment_),
+    forceRelative_(sd.forceRelative_.name(), sd.forceRelative_),
+    momentRelative_(sd.momentRelative_.name(), sd.momentRelative_),
+    coeffs_(sd.coeffs_)
+{}
+
+
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
 Foam::sixDOFqODE::~sixDOFqODE()
@@ -162,6 +194,31 @@ Foam::sixDOFqODE::~sixDOFqODE()
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+
+void Foam::sixDOFqODE::setState(const sixDOFqODE& sd)
+{
+    mass_ = sd.mass_;
+    momentOfInertia_ = sd.momentOfInertia_;
+    Xequilibrium_ = sd.Xequilibrium_;
+    linSpringCoeffs_ = sd.linSpringCoeffs_;
+    linDampingCoeffs_ = sd.linDampingCoeffs_;
+    Xrel_ = sd.Xrel_;
+    U_ = sd.U_;
+    Uaverage_ = sd.Uaverage_;
+    rotation_ = sd.rotation_;
+    omega_ = sd.omega_;
+    omegaAverage_ = sd.omegaAverage_;
+    omegaAverageAbsolute_ = sd.omegaAverageAbsolute_;
+    force_ = sd.force_;
+    moment_ = sd.moment_;
+    forceRelative_ = sd.forceRelative_;
+    momentRelative_ = sd.momentRelative_;
+
+    // Copy ODE coefficients: this carries actual ODE state
+    // HJ, 23/Mar/2015
+    coeffs_ = sd.coeffs_;
+}
+
 
 void Foam::sixDOFqODE::derivatives
 (

@@ -52,7 +52,7 @@ class finiteRotation
     // Private data
 
         //- Initial rotation
-        const HamiltonRodriguezRot eInitial_;
+        HamiltonRodriguezRot eInitial_;
 
         //- Rotational tensor
         tensor rotTensor_;
@@ -62,13 +62,6 @@ class finiteRotation
 
 
     // Private Member Functions
-
-        //- Disallow default bitwise copy construct
-        finiteRotation(const finiteRotation&);
-
-        //- Disallow default bitwise assignment
-        void operator=(const finiteRotation&);
-
 
         //- Calculate unit rotation vector from given rotation tensor
         static vector rotVector(const tensor& rotT);
