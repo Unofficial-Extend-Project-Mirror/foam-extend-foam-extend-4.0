@@ -45,7 +45,7 @@ volVector4Field Up
        runTime.timeName(),
        mesh,
        IOobject::NO_READ,
-       IOobject::AUTO_WRITE
+       IOobject::NO_WRITE
     ),
     mesh,
     dimensionedVector4("zero", dimless, vector4::zero)
