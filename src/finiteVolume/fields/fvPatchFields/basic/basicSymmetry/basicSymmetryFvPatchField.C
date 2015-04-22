@@ -73,18 +73,7 @@ basicSymmetryFvPatchField<Type>::basicSymmetryFvPatchField
     skewCorrected_(dict.lookupOrDefault<Switch>("skewCorrected", false)),
     secondOrder_(dict.lookupOrDefault<Switch>("secondOrder", false))
 {
-    // Read the value if present
-    if (dict.found("value"))
-    {
-        fvPatchField<Type>::operator==
-        (
-            Field<Type>("value", dict, p.size())
-        );
-    }
-    else
-    {
-        this->evaluate();
-    }
+    this->evaluate();
 }
 
 
