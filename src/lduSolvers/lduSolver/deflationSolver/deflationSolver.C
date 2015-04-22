@@ -188,7 +188,7 @@ Foam::lduSolverPerformance Foam::deflationSolver::solve
         scalarFieldField Q(2);
         forAll (Q, i)
         {
-            Q.set(i, new scalarField(x.size()));
+            Q.set(i, new scalarField(x.size(), 0));
         }
 
         // Create stable (q) and unstable (p) solution

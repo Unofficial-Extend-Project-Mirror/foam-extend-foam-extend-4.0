@@ -187,6 +187,7 @@ LaunderSharmaKE::LaunderSharmaKE
     )
 {
     mut_ = rho_*Cmu_*fMu()*sqr(k_)/(epsilon_ + epsilonSmall_);
+    mut_ = min(mut_, muRatio()*mu());
     mut_.correctBoundaryConditions();
 
     alphat_ = mut_/Prt_;
@@ -283,6 +284,7 @@ void LaunderSharmaKE::correct()
     {
         // Re-calculate viscosity
         mut_ == rho_*Cmu_*fMu()*sqr(k_)/(epsilon_ + epsilonSmall_);
+        mut_ == min(mut_, muRatio()*mu());
 
         // Re-calculate thermal diffusivity
         alphat_ = mut_/Prt_;
@@ -350,6 +352,7 @@ void LaunderSharmaKE::correct()
 
     // Re-calculate viscosity
     mut_ == Cmu_*fMu()*rho_*sqr(k_)/(epsilon_ + epsilonSmall_);
+    mut_ == min(mut_, muRatio()*mu());
 
 
     // Re-calculate thermal diffusivity

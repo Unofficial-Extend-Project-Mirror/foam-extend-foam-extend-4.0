@@ -203,6 +203,7 @@ realizableKE::realizableKE
     bound(epsilon_, epsilon0_);
 
     mut_ = rCmu(fvc::grad(U_))*rho_*sqr(k_)/(epsilon_ + epsilonSmall_);
+    mut_ = min(mut_, muRatio()*mu());
     mut_.correctBoundaryConditions();
 
     alphat_ = mut_/Prt_;
@@ -298,6 +299,7 @@ void realizableKE::correct()
     {
         // Re-calculate viscosity
         mut_ = rCmu(fvc::grad(U_))*rho_*sqr(k_)/epsilon_;
+        mut_ = min(mut_, muRatio()*mu());
         mut_.correctBoundaryConditions();
 
         // Re-calculate thermal diffusivity
@@ -371,6 +373,7 @@ void realizableKE::correct()
 
     // Re-calculate viscosity
     mut_ = rCmu(gradU, S2, magS)*rho_*sqr(k_)/epsilon_;
+    mut_ = min(mut_, muRatio()*mu());
     mut_.correctBoundaryConditions();
 
     // Re-calculate thermal diffusivity

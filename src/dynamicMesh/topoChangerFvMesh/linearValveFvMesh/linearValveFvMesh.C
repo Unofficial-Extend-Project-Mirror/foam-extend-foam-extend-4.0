@@ -178,7 +178,7 @@ void Foam::linearValveFvMesh::addZonesAndModifiers()
 }
 
 
-void Foam::linearValveFvMesh::makeSlidersDead()
+void Foam::linearValveFvMesh::deactivateSliders()
 {
     const polyTopoChanger& topoChanges = topoChanger_;
 
@@ -191,7 +191,7 @@ void Foam::linearValveFvMesh::makeSlidersDead()
         }
         else
         {
-            FatalErrorIn("void Foam::linearValveFvMesh::makeSlidersDead()")
+            FatalErrorIn("void Foam::linearValveFvMesh::deactivateSliders()")
                 << "Don't know what to do with mesh modifier "
                 << modI << " of type " << topoChanges[modI].type()
                 << abort(FatalError);
@@ -200,7 +200,7 @@ void Foam::linearValveFvMesh::makeSlidersDead()
 }
 
 
-void Foam::linearValveFvMesh::makeSlidersLive()
+void Foam::linearValveFvMesh::activateSliders()
 {
     const polyTopoChanger& topoChanges = topoChanger_;
 
@@ -213,7 +213,7 @@ void Foam::linearValveFvMesh::makeSlidersLive()
         }
         else
         {
-            FatalErrorIn("void Foam::linearValveFvMesh::makeLayersLive()")
+            FatalErrorIn("void Foam::linearValveFvMesh::activateSliders()")
                 << "Don't know what to do with mesh modifier "
                 << modI << " of type " << topoChanges[modI].type()
                 << abort(FatalError);
@@ -250,7 +250,8 @@ bool Foam::linearValveFvMesh::attached() const
             )
             {
                 FatalErrorIn("bool linearValveFvMesh::attached() const")
-                    << "Slider " << modI << " named " << topoChanges[modI].name()
+                    << "Slider " << modI << " named "
+                    << topoChanges[modI].name()
                     << " out of sync: Should be" << result
                     << abort(FatalError);
             }
@@ -310,7 +311,7 @@ bool Foam::linearValveFvMesh::update()
     if (attached())
     {
         Info << "Decoupling sliding interfaces" << endl;
-        makeSlidersLive();
+        activateSliders();
 
         // Changing topology by hand
         autoPtr<mapPolyMesh> topoChangeMap1 = topoChanger_.changeMesh();
@@ -326,7 +327,7 @@ bool Foam::linearValveFvMesh::update()
     }
 
     // Perform mesh motion
-    makeSlidersDead();
+    deactivateSliders();
 
     // Changing topology by hand
     {
@@ -351,7 +352,7 @@ bool Foam::linearValveFvMesh::update()
 
     // Attach the interface
     Info << "Coupling sliding interfaces" << endl;
-    makeSlidersLive();
+    activateSliders();
 
     // Changing topology by hand
     {

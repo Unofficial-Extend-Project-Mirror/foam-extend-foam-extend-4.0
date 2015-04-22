@@ -168,10 +168,16 @@ scalar RASModel::yPlusLam(const scalar kappa, const scalar E) const
 
 tmp<volScalarField> RASModel::muEff() const
 {
-    return tmp<volScalarField>
+    tmp<volScalarField> tmuEff
     (
         new volScalarField("muEff", mut() + mu())
     );
+
+    // Apply mut limiter
+    tmuEff().internalField() =
+        Foam::min(tmuEff().internalField(), muRatio_*mu().internalField());
+
+    return tmuEff;
 }
 
 

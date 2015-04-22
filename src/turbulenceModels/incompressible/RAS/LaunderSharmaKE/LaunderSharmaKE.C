@@ -146,6 +146,7 @@ LaunderSharmaKE::LaunderSharmaKE
     )
 {
     nut_ = Cmu_*fMu()*sqr(k_)/(epsilonTilda_ + epsilonSmall_);
+    nut_ = min(nut_, nuRatio()*nu());
     nut_.correctBoundaryConditions();
 
     printCoeffs();
@@ -286,6 +287,7 @@ void LaunderSharmaKE::correct()
 
     // Re-calculate viscosity
     nut_ == Cmu_*fMu()*sqr(k_)/epsilonTilda_;
+    nut_ == min(nut_, nuRatio()*nu());
 }
 
 
