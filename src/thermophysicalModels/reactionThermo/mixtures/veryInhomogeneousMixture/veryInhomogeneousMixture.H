@@ -86,7 +86,12 @@ public:
     // Constructors
 
         //- Construct from dictionary and mesh
-        veryInhomogeneousMixture(const dictionary&, const fvMesh&, const objectRegistry&);
+        veryInhomogeneousMixture
+        (
+            const dictionary&,
+            const fvMesh&,
+            const objectRegistry&
+        );
 
 
     //- Destructor

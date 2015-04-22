@@ -172,7 +172,7 @@ void epsilonWallFunctionFvPatchScalarField::updateCoeffs()
     if (!db().foundObject<volScalarField>(GName_))
     {
         InfoIn("void epsilonWallFunctionFvPatchScalarField::updateCoeffs()")
-            << "Cannot access " << GName_ << " field.  for patch "
+            << "Cannot access " << GName_ << " field for patch "
             << patch().name() << ".  Evaluating as zeroGradient"
             << endl;
 

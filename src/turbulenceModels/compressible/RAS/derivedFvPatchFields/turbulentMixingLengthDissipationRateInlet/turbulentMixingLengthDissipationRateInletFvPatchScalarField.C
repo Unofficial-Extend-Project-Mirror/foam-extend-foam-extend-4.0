@@ -119,7 +119,8 @@ turbulentMixingLengthDissipationRateInletFvPatchScalarField
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-void turbulentMixingLengthDissipationRateInletFvPatchScalarField::updateCoeffs()
+void
+turbulentMixingLengthDissipationRateInletFvPatchScalarField::updateCoeffs()
 {
     if (updated())
     {

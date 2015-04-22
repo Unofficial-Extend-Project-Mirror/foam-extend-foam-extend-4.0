@@ -56,10 +56,10 @@ echo Starting ThirdParty AllMake: Stage4
 echo ========================================
 echo
 
-# qt-everywhere-opensource-src-4.8.5
+# qt-everywhere-opensource-src-4.8.6
 if [ ! -z "$QT_THIRD_PARTY" ]
 then
-    ( rpm_make -p qt-everywhere-opensource-src-4.8.5 -s qt-everywhere-opensource-src-4.8.5.spec -u http://download.qt-project.org/official_releases/qt/4.8/4.8.5/qt-everywhere-opensource-src-4.8.5.tar.gz )
+    ( rpm_make -p qt-everywhere-opensource-src-4.8.6 -s qt-everywhere-opensource-src-4.8.6.spec -u http://download.qt-project.org/official_releases/qt/4.8/4.8.6/qt-everywhere-opensource-src-4.8.6.tar.gz )
 else
     echo "Using system installed QT"
     echo ""
@@ -75,10 +75,14 @@ then
     then
         ( rpm_make -p ParaView-4.0.1 -s ParaView-4.0.1.spec -u http://downloads.sourceforge.net/project/openfoam-extend/foam-extend-3.1/ThirdParty/ParaView-v4.0.1-source.tgz \
             -f --define='_qmakePath $QT_BIN_DIR/qmake'
+#        ( rpm_make -p ParaView-4.2.0 -s ParaView-4.2.0.spec -u http://www.paraview.org/files/v4.2/ParaView-v4.2.0-source.tar.gz \
+#            -f --define='_qmakePath $QT_BIN_DIR/qmake'
+#        ( rpm_make -p ParaView-4.2.0 -s ParaView-4.2.0.spec -u http://downloads.sourceforge.net/project/openfoam-extend/foam-extend-3.1/ThirdParty/ParaView-v4.2.0-source.tgz \
+#            -f --define='_qmakePath $QT_BIN_DIR/qmake'
         )
     else
         echo "WARNING: "
-        echo "WARNING: Skipping the installation of ParaView-4.0.1."
+        echo "WARNING: Skipping the installation of ParaView-4.2.0."
         echo "WARNING: Please make sure the QT_BIN_DIR environment variable properly"
         echo "WARNING: initialized in the file prefs.sh or prefs.csh"
         echo "WARNING: The command \$QT_BIN_DIR/qmake needs to be valid"

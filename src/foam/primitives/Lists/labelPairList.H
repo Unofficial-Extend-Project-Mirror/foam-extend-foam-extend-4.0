@@ -21,65 +21,31 @@ License
     You should have received a copy of the GNU General Public License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
-Application
-    moveDynamicMesh
+Typedef
+    Foam::labelPairList
 
 Description
-    Mesh motion and topological mesh changes utility.
+    List of labelPairs.
 
 \*---------------------------------------------------------------------------*/
 
-#include "fvCFD.H"
-#include "dynamicFvMesh.H"
+#ifndef labelPairList_H
+#define labelPairList_H
 
-using namespace Foam;
+#include "labelPair.H"
+#include "List.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-// Main program:
 
-int main(int argc, char *argv[])
+namespace Foam
 {
-    argList::validOptions.insert("checkFrequency", "int");
-
-#   include "setRootCase.H"
-#   include "createTime.H"
-#   include "createDynamicFvMesh.H"
-
-    // Read check frequency
-    label checkFrequency = 1;
-    args.optionReadIfPresent("checkFrequency", checkFrequency);
-
-    while (runTime.loop())
-    {
-        Info<< "Time = " << runTime.timeName() << endl;
-
-        if (isDir(runTime.path()/"VTK"))
-        {
-            Info << "Clear VTK directory" << endl;
-            rmDir(runTime.path()/"VTK");
-        }
-
-        mesh.update();
-
-#       include "checkVolContinuity.H"
-#       include "meshCourantNo.H"
-
-        if (runTime.timeIndex() % checkFrequency == 0)
-        {
-            mesh.checkMesh(true);
-        }
-
-        runTime.write();
-
-        Info<< "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
-            << "  ClockTime = " << runTime.elapsedClockTime() << " s"
-            << nl << endl;
-    }
-
-    Info<< "End\n" << endl;
-
-    return 0;
+    typedef List<labelPair> labelPairList;
+    typedef List<labelPairList> labelPairListList;
+    typedef List<labelPairListList> labelPairListListList;
 }
 
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#endif
 
 // ************************************************************************* //

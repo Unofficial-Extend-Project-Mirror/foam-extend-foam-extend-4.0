@@ -76,6 +76,7 @@ void Foam::OutputFilterFunctionObject<OutputFilter>::destroyFilter()
     ptr_.reset();
 }
 
+
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 template<class OutputFilter>
