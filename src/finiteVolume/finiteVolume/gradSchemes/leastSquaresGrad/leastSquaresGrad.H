@@ -119,6 +119,8 @@ public:
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
+#include "scalarLeastSquaresGrad.H"
+
 #ifdef NoRepository
 #   include "leastSquaresGrad.C"
 #endif

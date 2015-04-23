@@ -74,6 +74,12 @@ public:
     TypeName("leastSquaresVectors");
 
 
+    // Static data members
+
+        //- Point merge tolerance
+        static const scalar smallDotProdTol_;
+
+
     // Constructors
 
         //- Construct given an fvMesh
