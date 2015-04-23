@@ -93,6 +93,12 @@ relaxationFactors
     epsilon         0.9;
 }
 
+fieldBounds
+{
+    U      500;
+    p      -5e4 5e4;
+}
+
 SIMPLE
 {
     nNonOrthoCorrectors 0;

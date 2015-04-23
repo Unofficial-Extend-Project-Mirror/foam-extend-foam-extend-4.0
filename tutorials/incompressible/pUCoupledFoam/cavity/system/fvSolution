@@ -75,6 +75,12 @@ blockSolver
     pRefValue 0;
 }
 
+fieldBounds
+{
+    U      500;
+    p      -5e4 5e4;
+}
+
 relaxationFactors
 {
     U   0.999;
