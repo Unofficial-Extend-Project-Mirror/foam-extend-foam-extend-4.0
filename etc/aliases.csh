@@ -25,8 +25,8 @@
 #     aliases.csh
 #
 # Description
-#     Aliases for working with OpenFOAM
-#     Sourced from OpenFOAM-??/etc/cshrc and/or ~/.cshrc
+#     Aliases for working with FOAM
+#     Sourced from FOAM-??/etc/cshrc and/or ~/.cshrc
 #
 #------------------------------------------------------------------------------
 
