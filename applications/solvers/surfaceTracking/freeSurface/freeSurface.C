@@ -35,7 +35,7 @@ Description
 #include "wallFvPatch.H"
 
 #include "EulerDdtScheme.H"
-#include "CrankNicholsonDdtScheme.H"
+#include "CrankNicolsonDdtScheme.H"
 #include "backwardDdtScheme.H"
 
 #include "tetFemMatrices.H"
@@ -480,7 +480,7 @@ bool freeSurface::movePoints(const scalarField& interfacePhi)
     if
     (
         ddtScheme
-     == fv::CrankNicholsonDdtScheme<vector>::typeName
+     == fv::CrankNicolsonDdtScheme<vector>::typeName
     )
     {
         sweptVolCorr *= (1.0/2.0)*DB().deltaT().value();
@@ -890,7 +890,7 @@ bool freeSurface::moveMeshPoints()
         if
         (
             ddtScheme
-         == fv::CrankNicholsonDdtScheme<vector>::typeName
+         == fv::CrankNicolsonDdtScheme<vector>::typeName
         )
         {
             sweptVolCorr *= (1.0/2.0)*DB().deltaT().value();

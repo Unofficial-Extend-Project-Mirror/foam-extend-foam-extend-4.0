@@ -328,7 +328,7 @@ $(ddtSchemes)/SLTSDdtScheme/SLTSDdtSchemes.C
 $(ddtSchemes)/backwardDdtScheme/backwardDdtSchemes.C
 $(ddtSchemes)/boundedBackwardDdtScheme/boundedBackwardDdtScheme.C
 $(ddtSchemes)/boundedBackwardDdtScheme/boundedBackwardDdtSchemes.C
-$(ddtSchemes)/CrankNicholsonDdtScheme/CrankNicholsonDdtSchemes.C
+$(ddtSchemes)/CrankNicolsonDdtScheme/CrankNicolsonDdtSchemes.C
 $(ddtSchemes)/steadyInertialDdtScheme/steadyInertialDdtSchemes.C
 
 d2dt2Schemes = finiteVolume/d2dt2Schemes
