@@ -5,3 +5,4 @@
 
 cleanCase
 \rm -rf constant/polyMesh/*
+\rm -f naca0012.cas
