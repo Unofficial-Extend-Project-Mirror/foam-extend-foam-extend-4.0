@@ -186,7 +186,7 @@ void pressureInletOutletVelocityFvPatchVectorField::updateCoeffs()
         InfoIn
         (
             "pressureInletOutletVelocityFvPatchVectorField::updateCoeffs()"
-        )<< "Cannot find phi.  Return" << endl;
+        )   << "Cannot find phi.  Return" << endl;
 
         valueFraction() = symmTensor::one;
     }
