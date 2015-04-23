@@ -68,7 +68,9 @@ solvers
 }
 
 blockSolver
-{}
+{
+    convergence 1e-6;
+}
 
 SIMPLE
 {
