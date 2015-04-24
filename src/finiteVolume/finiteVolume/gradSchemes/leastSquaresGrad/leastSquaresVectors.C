@@ -30,18 +30,16 @@ License
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
+namespace Foam
+{
+    defineTypeNameAndDebug(leastSquaresVectors, 0);
+}
+
 
 const Foam::scalar Foam::leastSquaresVectors::smallDotProdTol_
 (
     debug::tolerances("leastSquaresSmallDotProdTol", 0.1)
 );
-
-
-namespace Foam
-{
-    defineTypeNameAndDebug(leastSquaresVectors, 0);
-}
 
 
 // * * * * * * * * * * * * * * * * Constructors * * * * * * * * * * * * * * //
@@ -220,6 +218,8 @@ void Foam::leastSquaresVectors::makeLeastSquaresVectors() const
             }
         }
     }
+
+# if 0
 
     // Coefficient sign correction on least squares vectors
     // The sign of the coefficient must be positive to ensure correct
@@ -405,6 +405,8 @@ void Foam::leastSquaresVectors::makeLeastSquaresVectors() const
             }
         }
     }
+
+#endif
 
     if (debug)
     {
