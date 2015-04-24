@@ -119,11 +119,11 @@ void Foam::mixedEnthalpyFvPatchScalarField::updateCoeffs()
     {
         refValue() = thermo.h(Tw.refValue(), patchi);
         refGrad() = thermo.Cp(Tw, patchi)*Tw.refGrad()
-        + patch().deltaCoeffs()*
-         (
-            thermo.h(Tw, patchi)
-          - thermo.h(Tw, patch().faceCells())
-         );
+          + patch().deltaCoeffs()*
+            (
+                thermo.h(Tw, patchi)
+              - thermo.h(Tw, patch().faceCells())
+            );
     }
     else if
     (
@@ -135,11 +135,11 @@ void Foam::mixedEnthalpyFvPatchScalarField::updateCoeffs()
     {
         refValue() = thermo.hs(Tw.refValue(), patchi);
         refGrad() = thermo.Cp(Tw, patchi)*Tw.refGrad()
-        + patch().deltaCoeffs()*
-         (
-            thermo.hs(Tw, patchi)
-          - thermo.hs(Tw, patch().faceCells())
-         );
+          + patch().deltaCoeffs()*
+            (
+                thermo.hs(Tw, patchi)
+              - thermo.hs(Tw, patch().faceCells())
+            );
     }
 
     mixedFvPatchScalarField::updateCoeffs();

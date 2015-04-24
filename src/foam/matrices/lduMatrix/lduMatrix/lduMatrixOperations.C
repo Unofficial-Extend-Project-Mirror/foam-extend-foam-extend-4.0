@@ -329,7 +329,7 @@ void Foam::lduMatrix::operator*=(scalar s)
 }
 
 
-Foam::tmp<Foam::scalarField > Foam::lduMatrix::H1() const
+Foam::tmp<Foam::scalarField> Foam::lduMatrix::H1() const
 {
     tmp<scalarField > tH1
     (

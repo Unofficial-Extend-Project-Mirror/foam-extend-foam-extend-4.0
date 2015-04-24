@@ -26,7 +26,7 @@
 #     etc/bashrc
 #
 # Description
-#     Startup file for OpenFOAM
+#     Startup file for FOAM
 #     Sourced from ~/.profile or ~/.bashrc
 #     Should be usable by any POSIX-compliant shell (eg, ksh)
 #
@@ -43,7 +43,7 @@ export FOAM_DEV=1
 # USER EDITABLE PART
 #
 # either set $FOAM_INST_DIR before sourcing this file or set
-#    $foamInstall below to where OpenFOAM is installed
+#    $foamInstall below to where FOAM is installed
 #
 # Location of FOAM installation
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -379,7 +379,7 @@ SunOS)
     cat <<USAGE
 
     Your "$WM_ARCH" operating system is not supported by this release
-    of OpenFOAM. For further assistance, please contact www.extend-project.de
+    of foam-extend. For further assistance, please contact www.foam-extend.org
 
 USAGE
     ;;

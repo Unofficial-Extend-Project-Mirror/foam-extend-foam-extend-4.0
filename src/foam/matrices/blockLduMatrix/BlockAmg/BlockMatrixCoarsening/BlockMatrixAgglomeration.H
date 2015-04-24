@@ -74,6 +74,9 @@ class BlockMatrixAgglomeration
         //- Group size
         label groupSize_;
 
+        //- Number of solo cells
+        label nSolo_;
+
         //- Number of coarse equations
         label nCoarseEqns_;
 

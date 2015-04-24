@@ -66,13 +66,8 @@ class BlockCoeffMaxNorm
         //- Control data dictionary
         dictionary dict_;
 
+
 protected:
-
-    // Protected data types
-
-
-    // Protected data
-
 
     // Protected Member Functions
 
@@ -81,6 +76,7 @@ protected:
         {
             return dict_;
         }
+
 
 public:
 

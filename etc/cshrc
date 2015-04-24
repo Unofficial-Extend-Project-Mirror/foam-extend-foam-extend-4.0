@@ -25,7 +25,7 @@
 #     etc/cshrc
 #
 # Description
-#     Startup file for OpenFOAM
+#     Startup file for FOAM
 #     Sourced from ~/.login or ~/.cshrc
 #
 #------------------------------------------------------------------------------

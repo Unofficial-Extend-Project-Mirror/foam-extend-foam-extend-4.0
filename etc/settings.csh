@@ -25,8 +25,8 @@
 #     etc/settings.csh
 #
 # Description
-#     Startup file for OpenFOAM
-#     Sourced from OpenFOAM-??/etc/cshrc
+#     Startup file for FOAM
+#     Sourced from FOAM-??/etc/cshrc
 #
 #------------------------------------------------------------------------------
 
@@ -51,7 +51,7 @@ setenv FOAM_LIB $WM_PROJECT_DIR/lib
 setenv FOAM_LIBBIN $WM_PROJECT_DIR/lib/$WM_OPTIONS
 setenv FOAM_SRC $WM_PROJECT_DIR/src
 
-# shared site configuration - similar naming convention as ~OpenFOAM expansion
+# shared site configuration - similar naming convention as ~FOAM expansion
 setenv FOAM_SITE_APPBIN $WM_PROJECT_INST_DIR/site/$WM_PROJECT_VERSION/bin/$WM_OPTIONS
 setenv FOAM_SITE_LIBBIN $WM_PROJECT_INST_DIR/site/$WM_PROJECT_VERSION/lib/$WM_OPTIONS
 
@@ -65,7 +65,7 @@ setenv FOAM_UTILITIES $FOAM_APP/utilities
 setenv FOAM_SOLVERS $FOAM_APP/solvers
 setenv FOAM_RUN $WM_PROJECT_USER_DIR/run
 
-# add OpenFOAM scripts and wmake to the path
+# add FOAM scripts and wmake to the path
 set path=($WM_DIR $WM_PROJECT_DIR/bin $path)
 
 _foamAddPath $FOAM_APPBIN
@@ -80,41 +80,49 @@ _foamAddLib  $FOAM_USER_LIBBIN
 
 # Select compiler installation
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# compilerInstall = OpenFOAM | System
-#set compilerInstall=OpenFOAM
+# compilerInstall = FOAM | System
+#set compilerInstall=FOAM
 #set compilerInstall=System
 if ( ! $?compilerInstall ) then
     setenv compilerInstall System
 endif
 
 switch ("$compilerInstall")
-case OpenFOAM:
+case FOAM:
     switch ("$WM_COMPILER")
     case Gcc:
-        setenv WM_COMPILER_DIR $WM_THIRD_PARTY_DIR/gcc-4.3.3/platforms/$WM_ARCH$WM_COMPILER_ARCH
-        _foamAddLib $WM_THIRD_PARTY_DIR/mpfr-2.4.1/platforms/$WM_ARCH$WM_COMPILER_ARCH/lib
-        _foamAddLib $WM_THIRD_PARTY_DIR/gmp-4.2.4/platforms/$WM_ARCH$WM_COMPILER_ARCH/lib
+        setenv WM_COMPILER_DIR $WM_THIRD_PARTY_DIR/packages/gcc-4.6.4/platforms/$WM_OPTIONS
+        _foamSource $WM_THIRD_PARTY_DIR/packages/gmp-5.1.2/platforms/$WM_OPTIONS/etc/gmp-5.1.2.csh
+        _foamSource $WM_THIRD_PARTY_DIR/packages/mpfr-3.1.2/platforms/$WM_OPTIONS/etc/mpfr-3.1.2.csh
+        _foamSource $WM_THIRD_PARTY_DIR/packages/mpc-1.0.1/platforms/$WM_OPTIONS/etc/mpc-1.0.1.csh
+        _foamSource $WM_THIRD_PARTY_DIR/packages/gcc-4.6.4/platforms/$WM_OPTIONS/etc/gcc-4.6.4.csh
+    breaksw
+    case Gcc49:
+        setenv WM_COMPILER_DIR $WM_THIRD_PARTY_DIR/packages/gcc-4.9.2/platforms/$WM_OPTIONS
+        _foamSource $WM_THIRD_PARTY_DIR/packages/gmp-5.1.2/platforms/$WM_OPTIONS/etc/gmp-5.1.2.csh
+        _foamSource $WM_THIRD_PARTY_DIR/packages/mpfr-3.1.2/platforms/$WM_OPTIONS/etc/mpfr-3.1.2.csh
+        _foamSource $WM_THIRD_PARTY_DIR/packages/mpc-1.0.1/platforms/$WM_OPTIONS/etc/mpc-1.0.1.csh
+        _foamSource $WM_THIRD_PARTY_DIR/packages/gcc-4.9.2/platforms/$WM_OPTIONS/etc/gcc-4.9.2.csh
+    breaksw
+    case Gcc47:
+        setenv WM_COMPILER_DIR $WM_THIRD_PARTY_DIR/packages/gcc-4.7.4/platforms/$WM_OPTIONS
+        _foamSource $WM_THIRD_PARTY_DIR/packages/gmp-5.1.2/platforms/$WM_OPTIONS/etc/gmp-5.1.2.csh
+        _foamSource $WM_THIRD_PARTY_DIR/packages/mpfr-3.1.2/platforms/$WM_OPTIONS/etc/mpfr-3.1.2.csh
+        _foamSource $WM_THIRD_PARTY_DIR/packages/mpc-1.0.1/platforms/$WM_OPTIONS/etc/mpc-1.0.1.csh
+        _foamSource $WM_THIRD_PARTY_DIR/packages/gcc-4.7.4/platforms/$WM_OPTIONS/etc/gcc-4.7.4.csh
     breaksw
     case Gcc45:
         setenv WM_COMPILER_DIR $WM_THIRD_PARTY_DIR/packages/gcc-4.5.1/platforms/$WM_OPTIONS
-        _foamSource  $WM_THIRD_PARTY_DIR/packages/gmp-5.0.1/platforms/$WM_OPTIONS/etc/gmp-5.0.1.csh
-        _foamSource  $WM_THIRD_PARTY_DIR/packages/mpfr-3.0.1/platforms/$WM_OPTIONS/etc/mpfr-3.0.1.csh
-        _foamSource  $WM_THIRD_PARTY_DIR/packages/mpc-0.8.2/platforms/$WM_OPTIONS/etc/mpc-0.8.2.csh
-        _foamSource  $WM_THIRD_PARTY_DIR/packages/gcc-4.5.1/platforms/$WM_OPTIONS/etc/gcc-4.5.1.csh
+        _foamSource $WM_THIRD_PARTY_DIR/packages/gmp-5.0.1/platforms/$WM_OPTIONS/etc/gmp-5.0.1.csh
+        _foamSource $WM_THIRD_PARTY_DIR/packages/mpfr-3.0.1/platforms/$WM_OPTIONS/etc/mpfr-3.0.1.csh
+        _foamSource $WM_THIRD_PARTY_DIR/packages/mpc-0.8.2/platforms/$WM_OPTIONS/etc/mpc-0.8.2.csh
+        _foamSource $WM_THIRD_PARTY_DIR/packages/gcc-4.5.1/platforms/$WM_OPTIONS/etc/gcc-4.5.1.csh
     breaksw
     case Gcc44:
         setenv WM_COMPILER_DIR $WM_THIRD_PARTY_DIR/packages/gcc-4.4.5/platforms/$WM_OPTIONS
-        _foamSource  $WM_THIRD_PARTY_DIR/packages/mpfr-3.0.1/platforms/$WM_OPTIONS/etc/mpfr-3.0.1.csh
-        _foamSource  $WM_THIRD_PARTY_DIR/packages/gmp-5.0.1/platforms/$WM_OPTIONS/etc/gmp-5.0.1.csh
-        _foamSource  $WM_THIRD_PARTY_DIR/packages/gcc-4.4.5/platforms/$WM_OPTIONS/etc/gcc-4.4.5.csh
-    breaksw
-    case Gcc43:
-        setenv WM_COMPILER_DIR $WM_THIRD_PARTY_DIR/gcc-4.3.3/platforms/$WM_ARCH$WM_COMPILER_ARCH
-        _foamAddLib $WM_THIRD_PARTY_DIR/mpfr-2.4.1/platforms/$WM_ARCH$WM_COMPILER_ARCH/lib
-        _foamAddLib $WM_THIRD_PARTY_DIR/gmp-4.2.4/platforms/$WM_ARCH$WM_COMPILER_ARCH/lib
-    breaksw
-    case Gcc42:
-        setenv WM_COMPILER_DIR $WM_THIRD_PARTY_DIR/gcc-4.2.4/platforms/$WM_ARCH$WM_COMPILER_ARCH
+        _foamSource $WM_THIRD_PARTY_DIR/packages/gmp-5.0.1/platforms/$WM_OPTIONS/etc/gmp-5.0.1.csh
+        _foamSource $WM_THIRD_PARTY_DIR/packages/mpfr-3.0.1/platforms/$WM_OPTIONS/etc/mpfr-3.0.1.csh
+        _foamSource $WM_THIRD_PARTY_DIR/packages/gcc-4.4.5/platforms/$WM_OPTIONS/etc/gcc-4.4.5.csh
     breaksw
     endsw
 
@@ -530,8 +538,8 @@ endif
 
 # QT
 # ~~~~~
-if ( $?QT_SYSTEM == 0 && -e "$WM_THIRD_PARTY_DIR"/packages/qt-everywhere-opensource-src-4.8.5/platforms/$WM_OPTIONS )then
-    _foamSource $WM_THIRD_PARTY_DIR/packages/qt-everywhere-opensource-src-4.8.5/platforms/$WM_OPTIONS/etc/qt-everywhere-opensource-src-4.8.5.csh
+if ( $?QT_SYSTEM == 0 && -e "$WM_THIRD_PARTY_DIR"/packages/qt-everywhere-opensource-src-4.8.6/platforms/$WM_OPTIONS )then
+    _foamSource $WM_THIRD_PARTY_DIR/packages/qt-everywhere-opensource-src-4.8.6/platforms/$WM_OPTIONS/etc/qt-everywhere-opensource-src-4.8.6.csh
 endif
 
 # PARAVIEW

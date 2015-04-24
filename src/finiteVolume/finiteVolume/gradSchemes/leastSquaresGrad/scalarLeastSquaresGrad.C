@@ -27,7 +27,7 @@ Description
 
 \*---------------------------------------------------------------------------*/
 
-#include "scalarLeastSquaresGrad.H"
+#include "leastSquaresGrad.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -64,7 +64,7 @@ tmp<BlockLduSystem<vector, vector> > leastSquaresGrad<scalar>::fvmGrad
         ),
         mesh,
         dimensionedScalar("zero", dimVolume, 0),
-        "zeroGradient"
+        zeroGradientFvPatchScalarField::typeName
     );
     cellV.internalField() = mesh.V();
     cellV.correctBoundaryConditions();
@@ -90,7 +90,7 @@ tmp<BlockLduSystem<vector, vector> > leastSquaresGrad<scalar>::fvmGrad
     const surfaceVectorField& ownLs = lsv.pVectors();
     const surfaceVectorField& neiLs = lsv.nVectors();
 
-    forAll(nei, faceI)
+    forAll (nei, faceI)
     {
         register label owner = own[faceI];
         register label neighbour = nei[faceI];
@@ -104,7 +104,7 @@ tmp<BlockLduSystem<vector, vector> > leastSquaresGrad<scalar>::fvmGrad
     }
 
     // Boundary contributions
-    forAll(vf.boundaryField(), patchI)
+    forAll (vf.boundaryField(), patchI)
     {
         const fvPatchScalarField& pf = vf.boundaryField()[patchI];
         const fvPatch& patch = pf.patch();
@@ -113,7 +113,7 @@ tmp<BlockLduSystem<vector, vector> > leastSquaresGrad<scalar>::fvmGrad
         const labelList& fc = patch.faceCells();
 
         // Part of diagonal contribution irrespective of the patch type
-        forAll(pf, faceI)
+        forAll (pf, faceI)
         {
             const label cellI = fc[faceI];
             d[cellI] -= cellVIn[cellI]*pownLs[faceI];
@@ -131,7 +131,7 @@ tmp<BlockLduSystem<vector, vector> > leastSquaresGrad<scalar>::fvmGrad
                 bs.coupleLower()[patchI].asLinear();
 
             // Coupling  and diagonal contributions
-            forAll(pf, faceI)
+            forAll (pf, faceI)
             {
                 const vector upper = cellVIn[fc[faceI]]*pownLs[faceI];
                 const vector lower = cellVInNei[faceI]*pneiLs[faceI];
@@ -146,7 +146,7 @@ tmp<BlockLduSystem<vector, vector> > leastSquaresGrad<scalar>::fvmGrad
             const scalarField boundaryCoeffs(pf.valueBoundaryCoeffs(pw));
 
             // Diagonal and source contributions depending on the patch type
-            forAll(pf, faceI)
+            forAll (pf, faceI)
             {
                 const label cellI = fc[faceI];
                 d[cellI] += cellVIn[cellI]*pownLs[faceI]*internalCoeffs[faceI];

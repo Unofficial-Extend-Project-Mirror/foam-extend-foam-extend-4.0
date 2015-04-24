@@ -236,7 +236,10 @@ Foam::lduSolverPerformance Foam::deflationSolver::solve
                     if
                     (
                         nDirs < maxDirs_
-                     && R[qI][qI] > 1e-3*Foam::max(R[0][0], R[1][1])
+                     && (
+                            R[qI][qI] > GREAT
+                         || R[qI][qI] > 1e-3*Foam::max(R[0][0], R[1][1])
+                        )
                     )
                     {
                         Z.set(nDirs, new scalarField(Q[qI]));

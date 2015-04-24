@@ -200,27 +200,25 @@ void Foam::BlockMatrixAgglomeration<Type>::calcAgglomeration()
         }
 
         // Collect solo equations
-        label nSolo = 0;
-
         forAll (zeroCluster, eqnI)
         {
             if (zeroCluster[eqnI])
             {
                 // Found solo equation
-                nSolo++;
+                nSolo_++;
 
                 agglomIndex_[eqnI] = nCoarseEqns_;
             }
         }
 
-        if (nSolo > 0)
+        if (nSolo_ > 0)
         {
             // Found solo equations
             nCoarseEqns_++;
 
-            if (BlockLduMatrix<Type>::debug >= 2)
+            if (BlockLduMatrix<Type>::debug >= 3)
             {
-                Pout<< "Found " << nSolo << " weakly connected equations."
+                Pout<< "Found " << nSolo_ << " weakly connected equations."
                     << endl;
             }
         }
@@ -347,7 +345,7 @@ void Foam::BlockMatrixAgglomeration<Type>::calcAgglomeration()
 
     reduce(coarsen_, andOp<bool>());
 
-    if (BlockLduMatrix<Type>::debug >= 2)
+    if (BlockLduMatrix<Type>::debug >= 3)
     {
         Pout << "Coarse level size: " << nCoarseEqns_;
 
@@ -379,6 +377,7 @@ Foam::BlockMatrixAgglomeration<Type>::BlockMatrixAgglomeration
     normPtr_(BlockCoeffNorm<Type>::New(dict)),
     agglomIndex_(matrix_.lduAddr().size()),
     groupSize_(groupSize),
+    nSolo_(0),
     nCoarseEqns_(0),
     coarsen_(false)
 {
@@ -441,6 +440,8 @@ Foam::BlockMatrixAgglomeration<Type>::restrictMatrix() const
     }
 #   endif
 
+    // Does the matrix have solo equations
+    bool soloEqns = nSolo_ > 0;
 
     // Storage for block neighbours and coefficients
 
@@ -467,6 +468,13 @@ Foam::BlockMatrixAgglomeration<Type>::restrictMatrix() const
     {
         label rmUpperAddr = agglomIndex_[upperAddr[fineCoeffi]];
         label rmLowerAddr = agglomIndex_[lowerAddr[fineCoeffi]];
+
+        // If the coefficient touches block zero and solo equations are
+        // present, skip it
+        if (soloEqns && (rmUpperAddr == 0 || rmLowerAddr == 0))
+        {
+            continue;
+        }
 
         if (rmUpperAddr == rmLowerAddr)
         {
@@ -563,6 +571,16 @@ Foam::BlockMatrixAgglomeration<Type>::restrictMatrix() const
 
     forAll(coeffRestrictAddr, fineCoeffi)
     {
+        label rmUpperAddr = agglomIndex_[upperAddr[fineCoeffi]];
+        label rmLowerAddr = agglomIndex_[lowerAddr[fineCoeffi]];
+
+        // If the coefficient touches block zero and solo equations are
+        // present, skip it
+        if (soloEqns && (rmUpperAddr == 0 || rmLowerAddr == 0))
+        {
+            continue;
+        }
+
         if (coeffRestrictAddr[fineCoeffi] >= 0)
         {
             coeffRestrictAddr[fineCoeffi] =
@@ -765,6 +783,16 @@ Foam::BlockMatrixAgglomeration<Type>::restrictMatrix() const
 
                 forAll(coeffRestrictAddr, fineCoeffI)
                 {
+                    label rmUpperAddr = agglomIndex_[upperAddr[fineCoeffI]];
+                    label rmLowerAddr = agglomIndex_[lowerAddr[fineCoeffI]];
+
+                    // If the coefficient touches block zero and
+                    //  solo equations are present, skip it
+                    if (soloEqns && (rmUpperAddr == 0 || rmLowerAddr == 0))
+                    {
+                        continue;
+                    }
+
                     label cCoeff = coeffRestrictAddr[fineCoeffI];
 
                     if (cCoeff >= 0)
@@ -837,6 +865,16 @@ Foam::BlockMatrixAgglomeration<Type>::restrictMatrix() const
 
                 forAll(coeffRestrictAddr, fineCoeffI)
                 {
+                    label rmUpperAddr = agglomIndex_[upperAddr[fineCoeffI]];
+                    label rmLowerAddr = agglomIndex_[lowerAddr[fineCoeffI]];
+
+                    // If the coefficient touches block zero and
+                    //  solo equations are present, skip it
+                    if (soloEqns && (rmUpperAddr == 0 || rmLowerAddr == 0))
+                    {
+                        continue;
+                    }
+
                     label cCoeff = coeffRestrictAddr[fineCoeffI];
 
                     if (cCoeff >= 0)

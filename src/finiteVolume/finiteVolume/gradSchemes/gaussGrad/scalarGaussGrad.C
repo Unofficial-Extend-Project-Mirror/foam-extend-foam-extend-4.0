@@ -27,7 +27,7 @@ Description
 
 \*---------------------------------------------------------------------------*/
 
-#include "scalarGaussGrad.H"
+#include "gaussGrad.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -71,20 +71,20 @@ tmp<BlockLduSystem<vector, vector> > gaussGrad<scalar>::fvmGrad
     bs.negSumDiag();
 
     // Boundary contributions
-    forAll(vf.boundaryField(), patchI)
+    forAll (vf.boundaryField(), patchI)
     {
         const fvPatchScalarField& pf = vf.boundaryField()[patchI];
         const fvPatch& patch = pf.patch();
-        const vectorField& Sf = patch.Sf();
+        const vectorField& pSf = patch.Sf();
         const fvsPatchScalarField& pw = tweights().boundaryField()[patchI];
         const labelList& fc = patch.faceCells();
 
         const scalarField internalCoeffs(pf.valueInternalCoeffs(pw));
 
         // Diag contribution
-        forAll(pf, faceI)
+        forAll (pf, faceI)
         {
-            d[fc[faceI]] += internalCoeffs[faceI]*Sf[faceI];
+            d[fc[faceI]] += internalCoeffs[faceI]*pSf[faceI];
         }
 
         if (patch.coupled())
@@ -94,8 +94,8 @@ tmp<BlockLduSystem<vector, vector> > gaussGrad<scalar>::fvmGrad
             CoeffField<vector>::linearTypeField& pcoupleLower =
                 bs.coupleLower()[patchI].asLinear();
 
-            const vectorField pcl = -pw*Sf;
-            const vectorField pcu = pcl + Sf;
+            const vectorField pcl = -pw*pSf;
+            const vectorField pcu = pcl + pSf;
 
             // Coupling  contributions
             pcoupleLower -= pcl;
@@ -106,9 +106,9 @@ tmp<BlockLduSystem<vector, vector> > gaussGrad<scalar>::fvmGrad
             const scalarField boundaryCoeffs(pf.valueBoundaryCoeffs(pw));
 
             // Boundary contribution
-            forAll(pf, faceI)
+            forAll (pf, faceI)
             {
-                source[fc[faceI]] -= boundaryCoeffs[faceI]*Sf[faceI];
+                source[fc[faceI]] -= boundaryCoeffs[faceI]*pSf[faceI];
             }
         }
     }

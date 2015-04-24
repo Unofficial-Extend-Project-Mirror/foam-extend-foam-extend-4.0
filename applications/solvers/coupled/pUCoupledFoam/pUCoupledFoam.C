@@ -52,11 +52,14 @@ int main(int argc, char *argv[])
 #   include "createMesh.H"
 #   include "createFields.H"
 #   include "initContinuityErrs.H"
-#   include "readBlockSolverControls.H"
+#   include "initConvergenceCheck.H"
 
     Info<< "\nStarting time loop\n" << endl;
     while (runTime.loop())
     {
+#       include "readBlockSolverControls.H"
+#       include "readFieldBounds.H"
+
         Info<< "Time = " << runTime.timeName() << nl << endl;
 
         p.storePrevIter();
@@ -74,7 +77,7 @@ int main(int argc, char *argv[])
 #       include "couplingTerms.H"
 
         // Solve the block matrix
-        UpEqn.solve();
+        maxResidual = cmptMax(UpEqn.solve().initialResidual());
 
         // Retrieve solution
         UpEqn.retrieveSolution(0, U.internalField());
@@ -87,6 +90,8 @@ int main(int argc, char *argv[])
 
 #       include "continuityErrs.H"
 
+#       include "boundPU.H"
+
         p.relax();
 
         turbulence->correct();
@@ -95,6 +100,8 @@ int main(int argc, char *argv[])
         Info<< "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
             << "  ClockTime = " << runTime.elapsedClockTime() << " s"
             << nl << endl;
+
+#       include "convergenceCheck.H"
     }
 
     Info<< "End\n" << endl;
