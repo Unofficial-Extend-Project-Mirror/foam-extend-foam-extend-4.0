@@ -85,6 +85,7 @@ Foam::tmp<Foam::surfaceScalarField> Foam::MRFZones::fluxCorrection() const
     return tMRFZonesPhiCorr;
 }
 
+
 Foam::tmp<Foam::surfaceVectorField> Foam::MRFZones::meshPhi() const
 {
     tmp<surfaceVectorField> tMRFZonesPhiCorr
@@ -112,6 +113,7 @@ Foam::tmp<Foam::surfaceVectorField> Foam::MRFZones::meshPhi() const
 
     return tMRFZonesPhiCorr;
 }
+
 
 void Foam::MRFZones::addCoriolis(fvVectorMatrix& UEqn) const
 {
@@ -274,5 +276,6 @@ Foam::tmp<Foam::volVectorField> Foam::MRFZones::Su
 
     return tPhiSource;
 }
+
 
 // ************************************************************************* //
