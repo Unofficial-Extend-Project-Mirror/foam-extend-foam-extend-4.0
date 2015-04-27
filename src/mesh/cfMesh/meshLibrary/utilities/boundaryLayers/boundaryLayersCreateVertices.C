@@ -408,7 +408,6 @@ void boundaryLayers::createNewVertices(const labelList& patchLabels)
 
     const meshSurfaceEngine& mse = surfaceEngine();
     const labelList& bPoints = mse.boundaryPoints();
-    const label nBndPts = bPoints.size();
 
     const meshSurfacePartitioner& mPart = surfacePartitioner();
     const VRWGraph& pPatches = mPart.pointPatches();
@@ -422,10 +421,10 @@ void boundaryLayers::createNewVertices(const labelList& patchLabels)
 
     pointFieldPMG& points = mesh_.points();
     boolList treatPatches(mesh_.boundaries().size());
-    List<direction> patchVertex(nBndPts);
+    List<direction> patchVertex(bPoints.size());
 
     //- make sure than the points are never re-allocated during the process
-    points.reserve(points.size() + 2 * nBndPts);
+    points.reserve(points.size() + 2 * bPoints.size());
 
     //- generate new layer vertices for each patch
     forAll(patchLabels, patchI)
@@ -457,12 +456,9 @@ void boundaryLayers::createNewVertices(const labelList& patchLabels)
         //- classify vertices belonging to this patch
         findPatchVertices(treatPatches, patchVertex);
 
-        //- go throught the vertices and create the new ones
-        labelLongList procPoints;
-        # ifdef USE_OMP
-        # pragma omp parallel for if( nBndPts > 1000 ) schedule(dynamic, 50)
-        # endif
-        for(label bpI=0;bpI<nBndPts;++bpI)
+        //- create indices and allocate maps for new points
+        labelLongList procPoints, patchPoints;
+        forAll(bPoints, bpI)
         {
             if( !patchVertex[bpI] )
                 continue;
@@ -470,53 +466,67 @@ void boundaryLayers::createNewVertices(const labelList& patchLabels)
             //- skip vertices at parallel boundaries
             if( patchVertex[bpI] & PARALLELBOUNDARY )
             {
-                # ifdef USE_OMP
-                # pragma omp critical(appendProcPoints)
-                # endif
                 procPoints.append(bpI);
 
                 continue;
             }
 
+            patchPoints.append(bpI);
             const label pointI = bPoints[bpI];
-            label nPoints;
-            # ifdef USE_OMP
-            # pragma omp critical(incrementNumPoints)
-            # endif
-            nPoints = nPoints_++;
+
+            if( patchVertex[bpI] & EDGENODE )
+            {
+                if( otherVrts_.find(pointI) == otherVrts_.end() )
+                {
+                    std::map<std::pair<label, label>, label> m;
+
+                    otherVrts_.insert(std::make_pair(pointI, m));
+                }
+
+                std::pair<label, label> pr(pKey, pKey);
+                otherVrts_[pointI].insert(std::make_pair(pr, nPoints_++));
+            }
+            else
+            {
+                //- this the only new point
+                newLabelForVertex_[pointI] = nPoints_++;
+            }
+        }
+
+        //- set the size of points
+        points.setSize(nPoints_);
+
+        //- calculate coordinates of new points
+        # ifdef USE_OMP
+        # pragma omp parallel for schedule(dynamic, 50)
+        # endif
+        forAll(patchPoints, i)
+        {
+            const label bpI = patchPoints[i];
+
+            const label pointI = bPoints[bpI];
 
             //- create new point
             const point p = createNewVertex(bpI, treatPatches, patchVertex);
 
             if( patchVertex[bpI] & EDGENODE )
             {
-                # ifdef USE_OMP
-                # pragma omp critical(adjustMap)
-                # endif
+                //- set the new point or an edge point
+                if( otherVrts_.find(pointI) == otherVrts_.end() )
                 {
-                    if( otherVrts_.find(pointI) == otherVrts_.end() )
-                    {
-                        std::map<std::pair<label, label>, label> m;
+                    std::map<std::pair<label, label>, label> m;
 
-                        otherVrts_.insert(std::make_pair(pointI, m));
-                    }
-
-                    std::pair<label, label> pr(pKey, pKey);
-                    otherVrts_[pointI].insert(std::make_pair(pr, nPoints));
+                    otherVrts_.insert(std::make_pair(pointI, m));
                 }
+
+                std::pair<label, label> pr(pKey, pKey);
+                const label npI = otherVrts_[pointI][pr];
+                points[npI] = p;
             }
             else
             {
-                //- this the only new point for a given vertex
-                newLabelForVertex_[pointI] = nPoints;
-            }
-
-            //- store the point
-            # ifdef USE_OMP
-            # pragma omp critical(addVertex)
-            # endif
-            {
-                points.newElmt(nPoints) = p;
+                //- set the new point
+                points[newLabelForVertex_[pointI]] = p;
             }
         }
 

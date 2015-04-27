@@ -1,0 +1,71 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                |
+| \\      /  F ield         | cfMesh: A library for mesh generation          | 
+|  \\    /   O peration     |                                                |
+|   \\  /    A nd           | Author: Franjo Juretic                         | 
+|    \\/     M anipulation  | E-mail: franjo.juretic@c-fields.com            |
+\*---------------------------------------------------------------------------*/
+
+FoamFile
+{
+    version   2.0;
+    format    ascii;
+    class     dictionary;
+    location  "system";
+    object    meshDict;
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+surfaceFile "elbow_90degree.stl";
+
+maxCellSize 5.0;
+
+boundaryCellSize 3.0;
+
+minCellSize 1.00;
+
+localRefinement
+{
+    "ringArea.*"
+    {
+        cellSize 0.2;
+    } 
+}
+
+boundaryLayers
+{
+    nLayers 5;
+
+    thicknessRatio 1.1;
+
+    maxFirstLayerThickness 0.5;
+
+//    patchBoundaryLayers
+//    {
+//    }
+}
+
+renameBoundary
+{
+    defaultName		fixedWalls;
+    defaultType		wall;
+
+    newPatchNames
+    {
+        "inlet.*"
+        {
+            newName     inlet;
+            newType     patch;
+        }
+
+        "outlet.*"
+        {
+            newName     outlet;
+            newType     patch;
+        }
+    }
+}
+               
+     
+// ************************************************************************* //

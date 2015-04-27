@@ -61,7 +61,7 @@ class meshOctreeAutomaticRefinement
         meshOctree& octree_;
 
         //- const reference to mesh dictionary
-        const dictionary& meshDict_;
+        const IOdictionary& meshDict_;
 
         //- use DATA boxes
         bool useDATABoxes_;

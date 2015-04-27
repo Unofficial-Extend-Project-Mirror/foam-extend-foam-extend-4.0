@@ -66,11 +66,21 @@ namespace help
     bool isinf(const ListType&);
 
     //- check if the faces share a convex edge
-    bool isSharedEdgeConvex
+    template<class Face1, class Face2>
+    inline bool isSharedEdgeConvex
     (
         const pointField& points,
-        const face& f1,
-        const face& f2
+        const Face1& f1,
+        const Face2& f2
+    );
+
+    //- angle between the two faces in radians
+    template<class Face1, class Face2>
+    inline scalar angleBetweenFaces
+    (
+        const pointField& points,
+        const Face1& f1,
+        const Face2& f2
     );
 
     // merge faces which are in the same patch

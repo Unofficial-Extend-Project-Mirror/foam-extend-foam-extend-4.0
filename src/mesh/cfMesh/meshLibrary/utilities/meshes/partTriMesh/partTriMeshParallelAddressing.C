@@ -41,7 +41,7 @@ Description
 
 namespace Foam
 {
-    
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 void partTriMesh::createParallelAddressing
@@ -56,27 +56,27 @@ void partTriMesh::createParallelAddressing
 
     //- vertices marked as SMOOTH are used by the smoother
     const direction useType = SMOOTH;
-    
+
     //- allocate global point labels
     if( !globalPointLabelPtr_ )
         globalPointLabelPtr_ = new labelLongList();
     labelLongList& globalPointLabel = *globalPointLabelPtr_;
     globalPointLabel.setSize(pts.size());
     globalPointLabel = -1;
-    
+
     //- allocated point-processors addressing
     if( !pAtProcsPtr_ )
         pAtProcsPtr_ = new VRWGraph();
     VRWGraph& pProcs = *pAtProcsPtr_;
     pProcs.setSize(0);
     pProcs.setSize(pts.size());
-    
+
     //- allocate global-to-local point addressing
     if( !globalToLocalPointAddressingPtr_ )
         globalToLocalPointAddressingPtr_ = new Map<label>();
     Map<label>& globalToLocal = *globalToLocalPointAddressingPtr_;
     globalToLocal.clear();
-    
+
     //- allocate storage for points at parallel boundaries
     if( !pAtParallelBoundariesPtr_ )
         pAtParallelBoundariesPtr_ = new labelLongList();
@@ -86,22 +86,22 @@ void partTriMesh::createParallelAddressing
     //- create point-processors addressing
     std::map<label, labelLongList> exchangeData;
     std::map<label, labelLongList>::iterator iter;
-    
+
     const Map<label>& globalToLocalPointAddressing =
         mse.globalToLocalBndPointAddressing();
     const VRWGraph& pAtProcs = mse.bpAtProcs();
     const DynList<label>& pNeiProcs = mse.bpNeiProcs();
-    
+
     forAll(pNeiProcs, procI)
         exchangeData.insert(std::make_pair(pNeiProcs[procI], labelLongList()));
-    
+
     //- make sure that the same vertices are marked for smoothing on all procs
     //- this is performed by sending the labels of vertices which are not used
     //- for tet mesh creation and the tet mesh vertices which are not moved
     forAllConstIter(Map<label>, globalToLocalPointAddressing, it)
     {
         const label pI = it();
-        
+
         if(
             nodeLabelForPoint[pI] == -1 ||
             !pointType_[nodeLabelForPoint[pI]]
@@ -112,12 +112,12 @@ void partTriMesh::createParallelAddressing
                 const label neiProc = pAtProcs(pI, procI);
                 if( neiProc == Pstream::myProcNo() )
                     continue;
-                
+
                 exchangeData[neiProc].append(it.key());
             }
         }
     }
-    
+
     //- exchange data with other processors
     labelLongList receivedData;
     help::exchangeMap(exchangeData, receivedData);
@@ -126,62 +126,62 @@ void partTriMesh::createParallelAddressing
     forAll(receivedData, i)
     {
         const label pointI = globalToLocalPointAddressing[receivedData[i]];
-        
+
         if( nodeLabelForPoint[pointI] == -1 )
             continue;
-        
+
         pointType_[nodeLabelForPoint[pointI]] = NONE;
     }
-    
+
     for(iter=exchangeData.begin();iter!=exchangeData.end();++iter)
         iter->second.clear();
-    
+
     //- start creating global-to-local addressing
     //- find the starting point labels
     label startPoint(0), nLocalPoints(0), nSharedPoints(0);
-    
+
     //- count the number of points at processor boundaries
     forAllConstIter(Map<label>, globalToLocalPointAddressing, it)
     {
         const label pI = it();
-        
+
         if( nodeLabelForPoint[pI] == -1 )
             continue;
         if( !(pointType_[nodeLabelForPoint[pI]] & useType) )
             continue;
-        
+
         ++nSharedPoints;
-        
+
         label pMin(Pstream::myProcNo());
         forAllRow(pAtProcs, pI, procI)
             pMin = Foam::min(pMin, pAtProcs(pI, procI));
-        
+
         if( pMin == Pstream::myProcNo() )
             ++nLocalPoints;
     }
-    
+
     labelList nPointsAtProc(Pstream::nProcs());
     nSharedPoints -= nLocalPoints;
     nPointsAtProc[Pstream::myProcNo()] = pts.size() - nSharedPoints;
     Pstream::gatherList(nPointsAtProc);
     Pstream::scatterList(nPointsAtProc);
-    
+
     for(label i=0;i<Pstream::myProcNo();++i)
         startPoint += nPointsAtProc[i];
-    
+
     //- create global labels for points at processor boundaries
     forAllConstIter(Map<label>, globalToLocalPointAddressing, it)
     {
         const label pI = it();
-        
+
         if( nodeLabelForPoint[pI] == -1 )
             continue;
-        
+
         const label pLabel = nodeLabelForPoint[pI];
-        
+
         if( !(pointType_[pLabel] & useType) )
             continue;
-        
+
         label pMin(Pstream::myProcNo());
         forAllRow(pAtProcs, pI, procI)
         {
@@ -189,19 +189,19 @@ void partTriMesh::createParallelAddressing
             pProcs.append(pLabel, neiProc);
             pMin = Foam::min(pMin, neiProc);
         }
-        
+
         if( pMin != Pstream::myProcNo() )
             continue;
-        
+
         globalPointLabel[pLabel] = startPoint++;
-        
+
         forAllRow(pAtProcs, pI, procI)
         {
             const label neiProc = pAtProcs(pI, procI);
-            
+
             if( neiProc == Pstream::myProcNo() )
                 continue;
-            
+
             //- the following information is sent to other processor
             //- 1. global point label in the original mesh
             //- 2. global point label in the tet mesh
@@ -213,7 +213,7 @@ void partTriMesh::createParallelAddressing
     //- exchange data with other processors
     receivedData.clear();
     help::exchangeMap(exchangeData, receivedData);
-    
+
     label counter(0);
     while( counter < receivedData.size() )
     {
@@ -221,17 +221,17 @@ void partTriMesh::createParallelAddressing
         const label tgI = receivedData[counter++];
         const label pLabel =
             nodeLabelForPoint[globalToLocalPointAddressing[gpI]];
-        
+
         globalPointLabel[pLabel] = tgI;
     }
-    
+
     //- set global labels for remaining points
     forAll(globalPointLabel, pI)
     {
         if( globalPointLabel[pI] == -1 )
             globalPointLabel[pI] = startPoint++;
     }
-        
+
     //- create global to local mapping
     forAll(globalPointLabel, pI)
     {
@@ -241,17 +241,17 @@ void partTriMesh::createParallelAddressing
             globalToLocal.insert(globalPointLabel[pI], pI);
         }
     }
-    
+
     //- mark vertices at parallel boundaries
     forAll(pointType_, pI)
         if( (pointType_[pI] & useType) && (pProcs.sizeOfRow(pI) != 0) )
             pointType_[pI] |= PARALLELBOUNDARY;
-        
+
     //- create neighbour processors addressing
     if( !neiProcsPtr_ )
         neiProcsPtr_ = new DynList<label>();
     DynList<label>& neiProcs = *neiProcsPtr_;
-    
+
     for(iter=exchangeData.begin();iter!=exchangeData.end();++iter)
         neiProcs.append(iter->first);
 }
@@ -264,12 +264,12 @@ void partTriMesh::createBufferLayers()
     labelLongList& globalPointLabel = *globalPointLabelPtr_;
     Map<label>& globalToLocal = *globalToLocalPointAddressingPtr_;
     const DynList<label>& neiProcs = *this->neiProcsPtr_;
-    
+
     if( !pAtBufferLayersPtr_ )
         pAtBufferLayersPtr_ = new labelLongList();
     labelLongList& pAtBufferLayers = *pAtBufferLayersPtr_;
     pAtBufferLayers.clear();
-    
+
     //- create the map
     std::map<label, LongList<parTriFace> > exchangeTrias;
     forAll(neiProcs, procI)
@@ -277,32 +277,32 @@ void partTriMesh::createBufferLayers()
         (
             std::make_pair(neiProcs[procI], LongList<parTriFace>())
         );
-    
-    //- go through the tets and add the ones having vertices at parallel
+
+    //- loop over triangles and add the ones having vertices at parallel
     //- boundaries for sending
     forAll(surf_, triI)
     {
         const labelledTri& pt = surf_[triI];
-        
+
         DynList<label> sendToProcs;
         forAll(pt, i)
         {
             const label pLabel = pt[i];
-            
+
             if( pointType_[pLabel] & PARALLELBOUNDARY )
             {
                 forAllRow(pProcs, pLabel, i)
                 {
                     const label neiProc = pProcs(pLabel, i);
-                    
+
                     if( neiProc == Pstream::myProcNo() )
                         continue;
-                    
+
                     sendToProcs.appendIfNotIn(neiProc);
                 }
             }
         }
-        
+
         if( sendToProcs.size() )
         {
             const parTriFace tri
@@ -312,91 +312,109 @@ void partTriMesh::createBufferLayers()
                 globalPointLabel[pt[2]],
                 triangle<point, point>(pts[pt[0]], pts[pt[1]], pts[pt[2]])
             );
-            
+
             forAll(sendToProcs, i)
             {
                 exchangeTrias[sendToProcs[i]].append(tri);
-                
+
                 forAll(pt, j)
                 {
                     if( pProcs.sizeOfRow(pt[j]) == 0 )
                         pAtBufferLayers.append(pt[j]);
-                    
+
                     pProcs.appendIfNotIn(pt[j], sendToProcs[i]);
                 }
             }
         }
     }
-    
-    LongList<parTriFace> receivedTrias;
-    help::exchangeMap(exchangeTrias, receivedTrias);
+
+    //- receive triangles sent to this processor
+    std::map<label, List<parTriFace> > receivedTriangles;
+    help::exchangeMap(exchangeTrias, receivedTriangles);
     exchangeTrias.clear();
-    
+
+    //- add triangles into the mesh and update the addressing
     Map<label> newGlobalToLocal;
     std::map<label, point> addCoordinates;
     label nPoints = pts.size();
-    forAll(receivedTrias, i)
+    for
+    (
+        std::map<label, List<parTriFace> >::const_iterator it =
+        receivedTriangles.begin();
+        it!=receivedTriangles.end();
+        ++it
+    )
     {
-        const parTriFace& tri = receivedTrias[i];
-        
-        DynList<label, 3> triPointLabels;
-        for(label j=0;j<3;++j)
-        {
-            const label gpI = tri.globalLabelOfPoint(j);
-            
-            if( globalToLocal.found(gpI) )
-            {
-                const label pI = globalToLocal[gpI];
-                triPointLabels.append(pI);
-            }
-            else if( newGlobalToLocal.found(gpI) )
-            {
-                triPointLabels.append(newGlobalToLocal[gpI]);
-            }
-            else
-            {
-                newGlobalToLocal.insert(gpI, nPoints);
-                triPointLabels.append(nPoints);
+        const List<parTriFace>& receivedTrias = it->second;
 
-                point tp;
-                if( j == 0 )
+        forAll(receivedTrias, i)
+        {
+            const parTriFace& tri = receivedTrias[i];
+
+            DynList<label, 3> triPointLabels(3);
+            for(label j=0;j<3;++j)
+            {
+                const label gpI = tri.globalLabelOfPoint(j);
+
+                if( globalToLocal.found(gpI) )
                 {
-                    tp = tri.trianglePoints().a();
+                    //- point already exists in the triangulation
+                    const label pI = globalToLocal[gpI];
+                    triPointLabels[j] = pI;
                 }
-                else if( j == 1 )
+                else if( newGlobalToLocal.found(gpI) )
                 {
-                    tp = tri.trianglePoints().b();
+                    //- point is already added into the triangulation
+                    triPointLabels[j] = newGlobalToLocal[gpI];
+                    pProcs.appendIfNotIn(newGlobalToLocal[gpI], it->first);
                 }
                 else
                 {
-                    tp = tri.trianglePoints().c();
+                    //- point does not exist in the triangulation
+                    //- and is not yet added in
+                    newGlobalToLocal.insert(gpI, nPoints);
+                    triPointLabels[j] = nPoints;
+
+                    point tp;
+                    if( j == 0 )
+                    {
+                        tp = tri.trianglePoints().a();
+                    }
+                    else if( j == 1 )
+                    {
+                        tp = tri.trianglePoints().b();
+                    }
+                    else
+                    {
+                        tp = tri.trianglePoints().c();
+                    }
+                    addCoordinates[nPoints] = tp;
+                    ++nPoints;
+
+                    pointLabelInMeshSurface_.append(-1);
+                    pointType_.append(NONE);
+
+                    DynList<label> triAtProcs;
+                    triAtProcs.append(it->first);
+
+                    globalPointLabel.append(gpI);
+                    triAtProcs.append(Pstream::myProcNo());
+                    pProcs.appendList(triAtProcs);
                 }
-                addCoordinates[nPoints] = tp;
-                ++nPoints;
-
-                pointLabelInMeshSurface_.append(-1);
-                pointType_.append(NONE);
-
-                DynList<label> helper;
-                helper.append(surf_.size());
-                
-                globalPointLabel.append(gpI);
-                helper[0] = Pstream::myProcNo();
-                pProcs.appendList(helper);
             }
-        }
-        
-        //- append tet
-        surf_.appendTriangle
-        (
-            labelledTri
+
+            //- append tet
+            surf_.appendTriangle
             (
-                triPointLabels[0],
-                triPointLabels[1],
-                triPointLabels[2],
-                -1
-            )
-        );
+                labelledTri
+                (
+                    triPointLabels[0],
+                    triPointLabels[1],
+                    triPointLabels[2],
+                    -1
+                )
+            );
+        }
     }
 
     //- store newly added points
@@ -410,7 +428,7 @@ void partTriMesh::createBufferLayers()
         pts[it->first] = it->second;
 
     addCoordinates.clear();
-    
+
     //- insert the global labels of the buffer points
     //- into the globalToLocal map
     forAllConstIter(Map<label>, newGlobalToLocal, it)

@@ -78,6 +78,9 @@ class boundaryLayers
         //- shall the layers be terminated at concave edges (true)
         bool terminateLayersAtConcaveEdges_;
 
+        //- is it a 2D mesh
+        bool is2DMesh_;
+
         //- patch names
         wordList patchNames_;
 

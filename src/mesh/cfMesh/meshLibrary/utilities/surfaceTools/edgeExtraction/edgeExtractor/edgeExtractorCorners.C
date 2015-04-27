@@ -256,7 +256,7 @@ void edgeExtractor::faceEvaluator::neiPatchesOverEdges
 
             neiPatches[feI] = fPatches[nei];
         }
-        else if( edgeFaces.sizeOfRow(beI) == 1 )
+        else if( Pstream::parRun() && (edgeFaces.sizeOfRow(beI) == 1) )
         {
             neiPatches[feI] = otherFacePatch[beI];
         }
@@ -422,8 +422,8 @@ label edgeExtractor::faceEvaluator::bestPatchAfterModification
 
         forAll(neiFaces, eI)
         {
-            const label origPatchI = extractor_.facePatch_[neiFaces[eI]];
-            const label newPatchI = (*newBoundaryPatchesPtr_)[neiFaces[eI]];
+            const label origPatchI = oldNeiPatches[eI];
+            const label newPatchI = newNeiPatches[eI];
 
             if( neiFaces[eI] > bfI )
             {

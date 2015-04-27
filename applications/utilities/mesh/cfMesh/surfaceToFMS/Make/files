@@ -1,0 +1,3 @@
+surfaceToFMS.C
+
+EXE = $(FOAM_APPBIN)/surfaceToFMS

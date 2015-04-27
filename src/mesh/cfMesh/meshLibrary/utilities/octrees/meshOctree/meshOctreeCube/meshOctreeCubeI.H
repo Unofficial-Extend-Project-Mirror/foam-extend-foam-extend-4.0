@@ -45,6 +45,16 @@ inline meshOctreeCube::meshOctreeCube()
     containedEdgesLabel_(-1)
 {}
 
+inline meshOctreeCube::meshOctreeCube(const meshOctreeCube& moc)
+:
+    meshOctreeCubeBasic(moc.coordinates(), moc.cubeType(), moc.procNo()),
+    activeSlotPtr_(moc.activeSlotPtr_),
+    subCubesPtr_(moc.subCubesPtr_),
+    cubeLabel_(moc.cubeLabel_),
+    containedElementsLabel_(moc.containedElementsLabel_),
+    containedEdgesLabel_(moc.containedEdgesLabel_)
+{}
+
 inline const meshOctreeSlot* meshOctreeCube::slotPtr() const
 {
     return activeSlotPtr_;

@@ -25,6 +25,8 @@ Description
 
 \*---------------------------------------------------------------------------*/
 
+#include <stdexcept>
+
 #include "demandDrivenData.H"
 #include "meshOptimizer.H"
 #include "polyMeshGenAddressing.H"
@@ -154,7 +156,36 @@ void meshOptimizer::untangleMeshFV()
 
             //- perform optimisation
             if( nBadFaces == 0 )
+            {
                 break;
+            }
+            else if( enforceConstraints_ )
+            {
+                const label subsetId =
+                    mesh_.addPointSubset(badPointsSubsetName_);
+
+                forAllConstIter(labelHashSet, badFaces, it)
+                {
+                    const face& f = faces[it.key()];
+                    forAll(f, pI)
+                        mesh_.addPointToSubset(subsetId, f[pI]);
+                }
+
+                WarningIn
+                (
+                    "void meshOptimizer::untangleMeshFV()"
+                ) << "Writing mesh with " << badPointsSubsetName_
+                  << " subset. These points cannot be untangled"
+                  << " without sacrificing geometry constraints. Exitting.."
+                  << endl;
+
+                returnReduce(1, sumOp<label>());
+                throw std::logic_error
+                (
+                    "void meshOptimizer::untangleMeshFV()"
+                    "Cannot untangle mesh!!"
+                );
+            }
 
             partTetMesh tetMesh(mesh_, badFaces, 0);
             tetMeshOptimisation tmo(tetMesh);

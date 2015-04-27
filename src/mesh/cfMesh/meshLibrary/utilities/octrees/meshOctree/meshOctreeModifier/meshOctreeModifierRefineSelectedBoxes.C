@@ -28,6 +28,7 @@ Description
 #include "meshOctreeModifier.H"
 #include "triSurf.H"
 #include "HashSet.H"
+#include "helperFunctions.H"
 
 # ifdef USE_OMP
 #include <omp.h>
@@ -161,6 +162,205 @@ void meshOctreeModifier::markAdditionalLayers
             }
         }
     }
+}
+
+label meshOctreeModifier::markAdditionalLayers
+(
+    List<direction>& refineBox,
+    labelList& nLayers,
+    List<direction>& targetRefLevel
+) const
+{
+    const FixedList<meshOctreeCubeCoordinates, 26>& rp =
+        octree_.regularityPositions_;
+    const LongList<meshOctreeCube*>& leaves = octree_.leaves_;
+
+    //- this is needed for parallel runs to reduce the length of messages
+    labelHashSet transferCoordinates;
+
+    FixedList<meshOctreeCube*, 26> neighbours;
+
+    labelList currentLayer(leaves.size());
+    forAll(targetRefLevel, leafI)
+    {
+        currentLayer[leafI] = targetRefLevel[leafI] ? 1 : 0;
+    }
+
+    bool changed;
+    label i(0), nMarked(0);
+    do
+    {
+        ++i;
+        changed = false;
+
+        labelList newNLayers = nLayers;
+        labelList newCurrentLayer = currentLayer;
+        List<direction> newTargetRefLevel = targetRefLevel;
+
+        LongList<meshOctreeCubeCoordinates> processorChecks;
+        labelLongList processorNLayers;
+        labelLongList processorTargetLevels;
+
+        forAll(leaves, leafI)
+        {
+            if( currentLayer[leafI] != i )
+                continue;
+
+            const meshOctreeCube* oc = leaves[leafI];
+
+            forAll(rp, posI)
+            {
+                const meshOctreeCubeCoordinates cc
+                (
+                    oc->coordinates() + rp[posI]
+                );
+
+                const label neiLabel = octree_.findLeafLabelForPosition(cc);
+
+                if( neiLabel > -1 )
+                {
+                    neighbours[posI] = leaves[neiLabel];
+                }
+                else if( neiLabel == -1 )
+                {
+                    neighbours[posI] = NULL;
+                }
+                else if( neiLabel == meshOctreeCubeBasic::OTHERPROC )
+                {
+                    neighbours[posI] = NULL;
+
+                    if( !transferCoordinates.found(leafI) )
+                    {
+                        processorChecks.append(oc->coordinates());
+                        processorNLayers.append(nLayers[leafI]);
+                        processorTargetLevels.append(targetRefLevel[leafI]);
+                        transferCoordinates.insert(leafI);
+                    }
+                }
+            }
+
+            forAll(neighbours, neiI)
+            {
+                const meshOctreeCube* nei = neighbours[neiI];
+                if( !nei ) continue;
+                if( !nei->isLeaf() ) continue;
+
+                if( i <= nLayers[leafI] )
+                {
+                    newNLayers[nei->cubeLabel()] =
+                        Foam::max(nLayers[nei->cubeLabel()], nLayers[leafI]);
+                    newTargetRefLevel[nei->cubeLabel()] =
+                        Foam::max
+                        (
+                            targetRefLevel[nei->cubeLabel()],
+                            targetRefLevel[leafI]
+                        );
+
+                    changed = true;
+                    newCurrentLayer[nei->cubeLabel()] = i+1;
+                }
+            }
+        }
+
+        if( octree_.neiProcs().size() )
+        {
+            std::map<label, LongList<meshOctreeCubeCoordinates> > eCoords;
+            std::map<label, labelLongList > eNLayers;
+            std::map<label, labelLongList > eTargetLevels;
+
+            forAll(octree_.neiProcs(), neiI)
+            {
+                const label neiProc = octree_.neiProcs()[neiI];
+                eCoords[neiProc] = processorChecks;
+                eNLayers[neiProc] = processorNLayers;
+                eTargetLevels[neiProc] = processorTargetLevels;
+            }
+
+            LongList<meshOctreeCubeCoordinates> receivedCoords;
+            help::exchangeMap(eCoords, receivedCoords);
+
+            labelLongList receivedNLayers;
+            help::exchangeMap(eNLayers, receivedNLayers);
+
+            labelLongList receivedTargetLevels;
+            help::exchangeMap(eTargetLevels, receivedTargetLevels);
+
+            if( receivedCoords.size() != receivedNLayers.size() )
+                FatalErrorIn
+                (
+                    "label meshOctreeModifier::markAdditionalLayers("
+                    "List<direction>&, labelList&, List<direction>&) const"
+                ) << "Invalid list size" << abort(FatalError);
+            if( receivedCoords.size() != receivedTargetLevels.size() )
+                FatalErrorIn
+                (
+                    "label meshOctreeModifier::markAdditionalLayers("
+                    "List<direction>&, labelList&, List<direction>&) const"
+                ) << "Invalid list size" << abort(FatalError);
+
+            //- check consistency with received cube coordinates
+            forAll(receivedCoords, ccI)
+            {
+                forAll(rp, posI)
+                {
+                    const meshOctreeCubeCoordinates cc
+                    (
+                        receivedCoords[ccI] + rp[posI]
+                    );
+
+                    const meshOctreeCube* nei =
+                        octree_.findCubeForPosition(cc);
+
+                    if( !nei ) continue;
+                    if( !nei->isLeaf() ) continue;
+
+                    if( i <= receivedNLayers[ccI] )
+                    {
+                        newNLayers[nei->cubeLabel()] =
+                            Foam::max
+                            (
+                                nLayers[nei->cubeLabel()],
+                                receivedNLayers[ccI]
+                            );
+
+                        newTargetRefLevel[nei->cubeLabel()] =
+                            Foam::max
+                            (
+                                targetRefLevel[nei->cubeLabel()],
+                                direction(receivedTargetLevels[ccI])
+                            );
+
+                        changed = true;
+                        newCurrentLayer[nei->cubeLabel()] = i+1;
+                    }
+                }
+            }
+        }
+
+        nLayers.transfer(newNLayers);
+        currentLayer.transfer(newCurrentLayer);
+        targetRefLevel.transfer(newTargetRefLevel);
+
+        //- exchange information with all processors
+        reduce(changed, maxOp<bool>());
+
+    } while( changed );
+
+    //- update refine data
+    forAll(targetRefLevel, leafI)
+    {
+        if
+        (
+            !refineBox[leafI] &&
+            (targetRefLevel[leafI] > leaves[leafI]->level())
+        )
+        {
+            refineBox[leafI] = 1;
+            ++nMarked;
+        }
+    }
+
+    return nMarked;
 }
 
 void meshOctreeModifier::refineSelectedBoxes

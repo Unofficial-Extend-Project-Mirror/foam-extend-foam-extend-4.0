@@ -40,6 +40,7 @@ Description
 #include "FIFOStack.H"
 
 #include <map>
+#include <stdexcept>
 
 # ifdef USE_OMP
 #include <omp.h>
@@ -282,7 +283,10 @@ void meshSurfaceOptimizer::smoothSurfaceOptimizer
     const labelLongList& selectedPoints
 )
 {
+    //- create partTriMesh is it is not yet present
     this->triMesh();
+
+    //- update coordinates of the triangulation
     updateTriMesh(selectedPoints);
 
     pointField newPositions(selectedPoints.size());
@@ -370,7 +374,40 @@ bool meshSurfaceOptimizer::untangleSurface
             nInvertedTria =
                 findInvertedVertices(smoothVertex, nAdditionalLayers);
 
-            if( nInvertedTria == 0 ) break;
+            if( nInvertedTria == 0 )
+            {
+                break;
+            }
+            else if( enforceConstraints_ && !remapVertex )
+            {
+                polyMeshGen& mesh =
+                    const_cast<polyMeshGen&>(surfaceEngine_.mesh());
+
+                const label subsetId =
+                    mesh.addPointSubset(badPointsSubsetName_);
+
+                forAll(smoothVertex, bpI)
+                    if( smoothVertex[bpI] )
+                        mesh.addPointToSubset(subsetId, bPoints[bpI]);
+
+                WarningIn
+                (
+                    "bool meshSurfaceOptimizer::untangleSurface"
+                    "(const labelLongList&, const label)"
+                ) << "Writing mesh with " << badPointsSubsetName_
+                  << " subset. These points cannot be untangled"
+                  << " without sacrificing geometry constraints. Exitting.."
+                  << endl;
+
+                returnReduce(1, sumOp<label>());
+
+                throw std::logic_error
+                (
+                    "bool meshSurfaceOptimizer::untangleSurface"
+                    "(const labelLongList&, const label)"
+                    "Cannot untangle mesh!!"
+                );
+            }
 
             //- find the min number of inverted points and
             //- add the last number to the stack
@@ -488,7 +525,7 @@ bool meshSurfaceOptimizer::untangleSurface
             //- update normals and other geometric data
             surfaceModifier.updateGeometry(movedPoints);
 
-            if( nGlobalIter > 3 )
+            if( nGlobalIter > 5 )
                 remapVertex = false;
         }
 
@@ -700,7 +737,7 @@ void meshSurfaceOptimizer::optimizeSurface2D(const label nIterations)
     {
         Info << "." << flush;
 
-        smoothLaplacianFC(movedPoints, procBndPoints, false);
+        smoothSurfaceOptimizer(movedPoints);
 
         //- move the points which are not at minimum z coordinate
         mesh2DEngine.correctPoints();

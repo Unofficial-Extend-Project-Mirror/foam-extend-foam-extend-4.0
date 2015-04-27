@@ -102,8 +102,6 @@ void tetMeshExtractorOctree::createPolyMesh()
 
             const partTet& elmt = tets[elmtI];
 
-            //tessellationElement telmt(elmt[0], elmt[1], elmt[2], elmt[3]);
-
             label faceI = 4 * elmtI;
 
             //- first face

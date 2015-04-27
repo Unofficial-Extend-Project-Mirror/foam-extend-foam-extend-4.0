@@ -139,7 +139,9 @@ meshOptimizer::meshOptimizer(polyMeshGen& mesh)
 :
     mesh_(mesh),
     vertexLocation_(mesh.points().size(), INSIDE),
-    msePtr_(NULL)
+    msePtr_(NULL),
+    enforceConstraints_(false),
+    badPointsSubsetName_()
 {
     const meshSurfaceEngine& mse = meshSurface();
     const labelList& bPoints = mse.boundaryPoints();
@@ -173,6 +175,15 @@ meshOptimizer::meshOptimizer(polyMeshGen& mesh)
 meshOptimizer::~meshOptimizer()
 {
     clearSurface();
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+void meshOptimizer::enforceConstraints(const word subsetName)
+{
+    enforceConstraints_ = true;
+
+    badPointsSubsetName_ = subsetName;
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
