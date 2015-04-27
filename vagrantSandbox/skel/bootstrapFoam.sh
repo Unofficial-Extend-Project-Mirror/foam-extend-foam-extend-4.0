@@ -32,3 +32,7 @@ source etc/bashrc
 # compile swak4Foam
 cd $WM_THIRD_PARTY_DIR
 ./AllMake.stage5  2>&1 | tee --append $BOOTSTRAPLOG
+
+# compile the Bazaar
+cd $WM_PROJECT_DIR/extend-bazaar
+./Allwmake  2>&1 | tee --append $BOOTSTRAPLOG
