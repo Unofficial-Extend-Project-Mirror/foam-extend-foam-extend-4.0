@@ -1,5 +1,5 @@
 #!/usr/bin/env python
 
-from PyFoam.Applications.InitGgiInterface import InitGgiInterface
+from PyFoam.Site.InitGgiInterface import InitGgiInterface
 
 InitGgiInterface()

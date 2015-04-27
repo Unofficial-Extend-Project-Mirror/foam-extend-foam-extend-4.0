@@ -1,5 +1,5 @@
 #!/usr/bin/env python
 
-from PyFoam.Applications.ChangeGGIBoundary import ChangeGGIBoundary
+from PyFoam.Site.ChangeGGIBoundary import ChangeGGIBoundary
 
 ChangeGGIBoundary()
