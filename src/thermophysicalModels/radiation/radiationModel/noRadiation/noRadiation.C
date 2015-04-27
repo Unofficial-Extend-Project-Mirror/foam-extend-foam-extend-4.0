@@ -36,13 +36,7 @@ namespace Foam
     namespace radiation
     {
         defineTypeNameAndDebug(noRadiation, 0);
-
-        addToRunTimeSelectionTable
-        (
-            radiationModel,
-            noRadiation,
-            dictionary
-        );
+        addToRadiationRunTimeSelectionTables(noRadiation);
     }
 }
 
@@ -50,6 +44,16 @@ namespace Foam
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 Foam::radiation::noRadiation::noRadiation(const volScalarField& T)
+:
+    radiationModel(T)
+{}
+
+
+Foam::radiation::noRadiation::noRadiation
+(
+    const dictionary& dict,
+    const volScalarField& T
+)
 :
     radiationModel(T)
 {}

@@ -73,6 +73,9 @@ public:
         //- Construct from components
         noRadiation(const volScalarField& T);
 
+        //- Construct from components
+        noRadiation(const dictionary& dict, const volScalarField& T);
+
 
     //- Destructor
     virtual ~noRadiation();

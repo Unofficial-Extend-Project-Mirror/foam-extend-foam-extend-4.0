@@ -29,6 +29,7 @@ Foam::radiation::fvDOM::IRay(const label rayI) const
     return  IRay_[rayI];
 }
 
+
 inline const Foam::volScalarField&
 Foam::radiation::fvDOM::IRayLambda
 (
@@ -85,34 +86,26 @@ inline const Foam::volScalarField& Foam::radiation::fvDOM::G() const
 }
 
 
+inline const Foam::volScalarField& Foam::radiation::fvDOM::Qr() const
+{
+    return Qr_;
+}
+
+
 inline const Foam::volScalarField::GeometricBoundaryField&
-Foam::radiation::fvDOM::Qin(scalar lambdaI) const
+Foam::radiation::fvDOM::Qin(const label lambdaI) const
 {
     return Qin_[lambdaI];
 }
 
 
-/*
-inline Foam::volScalarField::GeometricBoundaryField&
-Foam::radiation::fvDOM::Qin(scalar lambdaI)
-{
-    return Qin_[lambdaI];
-}
-*/
 inline const Foam::volScalarField::GeometricBoundaryField&
-Foam::radiation::fvDOM::Qem(scalar lambdaI) const
+Foam::radiation::fvDOM::Qem(const label lambdaI) const
 {
     return Qem_[lambdaI];
 }
 
 
-/*
-inline Foam::volScalarField::GeometricBoundaryField&
-Foam::radiation::fvDOM::Qem(scalar lambdaI)
-{
-    return Qem_[lambdaI];
-}
-*/
 inline const Foam::radiation::blackBodyEmission&
 Foam::radiation::fvDOM::blackBody() const
 {
