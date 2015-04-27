@@ -93,8 +93,6 @@ int main(int argc, char *argv[])
 
         phi = (fvc::interpolate(U) & mesh.Sf()) + pEqn.flux() + presSource;
 
-#       include "continuityErrs.H"
-
         // Make flux relative in rotating zones
         mrfZones.relativeFlux(phi);
 
