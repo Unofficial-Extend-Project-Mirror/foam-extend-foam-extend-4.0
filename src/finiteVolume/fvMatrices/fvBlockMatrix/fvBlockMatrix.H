@@ -26,11 +26,12 @@ Class
 
 Description
     fvBlockMatrix is an extension of fvMatrix for block coupled types. It holds
-    general insertion and retrieval tools for block coupling along with specific
+    general insertion and retrieval tools for block coupling and specific
     functions for p-U coupling.
 
 Author
     Vuko Vukcevic, FMENA Zagreb.
+    Update by Hrvoje Jasak
 
 SourceFiles
     fvBlockMatrix.C
@@ -112,14 +113,13 @@ class fvBlockMatrix
 
         // Insertion functions for fvScalarMatrix into off-diagonal positions
         // (coupling matrices)
-        // These two functions are dubious. Reconsider. HJ, 17/July/2014.
 
-            //- Insert coupling matrix diag and source into this fvBlockMatrix
-            void insertCouplingDiagSource
+            //- Insert coupling matrix diag element into this fvBlockMatrix
+            void insertCouplingDiag
             (
                 const direction dirI,
                 const direction dirJ,
-                const fvScalarMatrix& matrix
+                const scalarField& coeffIJ
             );
 
             //- Insert coupling matrix lower and upper into this fvBlockMatrix
@@ -144,8 +144,8 @@ class fvBlockMatrix
                 const bool incrementColumnDir
             );
 
-            //- Insert source and coupling coeffs of BlockLduSystem (obtained by
-            // implicit grad/div operator) into this fvBlockMatrix
+            //- Insert source and coupling coeffs of BlockLduSystem
+            // (eg. obtained by implicit grad/div operator)
             template<class blockType, class fieldType>
             void insertBoundaryContributions
             (
@@ -192,7 +192,7 @@ public:
 
         // Insertion and retrieval public tools
 
-            //- Retrieve part of internal (solved) field from this fvBlockMatrix
+            //- Retrieve part of internal field from this fvBlockMatrix
             template<class fieldType>
             void retrieveSolution
             (
@@ -220,12 +220,13 @@ public:
             );
 
             //- Insert scalar equation coupling into this fvBlockMatrix 
-            // Not tested: VV, 10/July/2014
+            //  Source compensation is done in function updateSourceCoupling()
+            //  after all coupling terms are added.  HJ, 27/Apr/2015
             void insertEquationCoupling
             (
                 const direction dirI,
                 const direction dirJ,
-                const fvScalarMatrix& matrix
+                const scalarField& coeffIJ
             );
             
             //- Add field into block field
@@ -237,19 +238,10 @@ public:
             );
 
             //- Update coupling of block system.
-            // Subtracts the block-coefficient coupling as specified by the user
-            // from the source, leaving the implicit update given by 
-            // linearisation
+            //  Subtracts the block-coefficient coupling as specified by the
+            //  user from the source, leaving the implicit update given by 
+            //  linearisation
             void updateSourceCoupling();
-
-            //- Insert Picard tensor term that comes from Picard linearisation
-            // of convection term in momentum equation. VV, 21/July/2014.
-            void insertPicardTensor
-            (
-                const direction UEqnDir,
-                const volVectorField& U,
-                const surfaceScalarField& phi
-            );
 
 
         // Solver calls for fvBlockMatrix
