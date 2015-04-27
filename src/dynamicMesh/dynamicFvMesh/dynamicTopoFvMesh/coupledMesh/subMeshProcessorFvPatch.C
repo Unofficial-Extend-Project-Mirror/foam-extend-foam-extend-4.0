@@ -21,64 +21,51 @@ License
     You should have received a copy of the GNU General Public License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
+Class
+    subMeshProcessorFvPatch
+
+Description
+    Functions specific to subMeshProcessorFvPatch
+
+Author
+    Sandeep Menon
+    University of Massachusetts Amherst
+    All rights reserved
+
 \*---------------------------------------------------------------------------*/
 
-#include "mapPolyMesh.H"
+#include "subMeshProcessorFvPatch.H"
+#include "addToRunTimeSelectionTable.H"
 
 namespace Foam
 {
 
-// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-//- Map the patch field
-template <class Type>
-void topoPatchMapper::mapFvPatchField
-(
-    const word& fieldName,
-    fvPatchField<Type>& pF
-) const
+defineTypeNameAndDebug(subMeshProcessorFvPatch, 0);
+addToRunTimeSelectionTable(fvPatch, subMeshProcessorFvPatch, polyPatch);
+
+
+// * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
+
+void subMeshProcessorFvPatch::makeWeights(scalarField& w) const
 {
-    // Specify that mapping is conservative
-    conservative_ = true;
-
-    if (fvMesh::debug)
-    {
-        Pout<< " Field: " << fieldName
-            << " Mapping patch: " << pF.patch().name()
-            << " size: " << this->size()
-            << " sizeBeforeMapping: " << this->sizeBeforeMapping()
-            << endl;
-    }
-
-    // Map patchField onto itself
-    pF.autoMap(*this);
+    w = 1.0;
 }
 
 
-//- Map the patch field
-template <class Type>
-void topoPatchMapper::mapFvsPatchField
-(
-    const word& fieldName,
-    fvsPatchField<Type>& pF
-) const
+void subMeshProcessorFvPatch::makeDeltaCoeffs(scalarField& dc) const
 {
-    // Specify that mapping is conservative
-    conservative_ = true;
-
-    if (fvMesh::debug)
-    {
-        Pout<< " Field: " << fieldName
-            << " Mapping patch: " << pF.patch().name()
-            << " size: " << this->size()
-            << " sizeBeforeMapping: " << this->sizeBeforeMapping()
-            << endl;
-    }
-
-    // Map patchField onto itself
-    pF.autoMap(*this);
+    dc = 1.0/(nf() & fvPatch::delta());
 }
 
+
+tmp<vectorField> subMeshProcessorFvPatch::delta() const
+{
+    return fvPatch::delta();
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam
 

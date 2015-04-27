@@ -1,0 +1,12 @@
+#!/bin/sh
+cd ${0%/*} || exit 1    # run from this directory
+set -x
+
+# Clean dynamicFvMesh libraries
+wclean
+wclean dynamicTopoFvMesh
+
+# Wipe out all lnInclude directories and re-link
+wcleanLnIncludeAll
+
+# ----------------------------------------------------------------- end-of-file

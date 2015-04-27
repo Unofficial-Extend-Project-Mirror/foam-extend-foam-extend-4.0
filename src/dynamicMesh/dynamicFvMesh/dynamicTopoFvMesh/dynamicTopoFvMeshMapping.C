@@ -131,7 +131,7 @@ void dynamicTopoFvMesh::computeMapping
                 // for mild convexity.
                 const cell& cellToCheck = cells_[cIndex];
 
-                if (twoDMesh_)
+                if (is2D())
                 {
                     const labelList& parents = cellParents_[cIndex];
 
@@ -603,6 +603,9 @@ void dynamicTopoFvMesh::threadedMapping
         boundary[patchI].faceFaces();
     }
 
+    // Force calculation of demand-driven data on subMeshes
+    initCoupledWeights();
+
     // Execute threads in linear sequence
     executeThreads(identity(nThreads), hdl, &computeMappingThread);
 }
@@ -668,7 +671,7 @@ void dynamicTopoFvMesh::setCellMapping
                 masterCells.append(mapCells[cellI]);
             }
         }
-        else
+
         if (cellParents_.found(mapCells[cellI]))
         {
             const labelList& nParents = cellParents_[mapCells[cellI]];

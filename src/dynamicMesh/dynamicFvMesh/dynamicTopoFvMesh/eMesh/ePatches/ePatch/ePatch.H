@@ -68,14 +68,6 @@ private:
         //- Size of the patch
         label size_;
 
-        // Demand-driven private data
-
-
-    // Private Member Functions
-
-        //- Disallow construct as copy
-        ePatch(const ePatch&);
-
 protected:
 
         // The ePatch geometry initialisation is called by eBoundaryMesh
@@ -159,7 +151,6 @@ public:
             const eBoundaryMesh& bm
         );
 
-
         //- Construct from dictionary
         ePatch
         (
@@ -171,6 +162,9 @@ public:
 
         //- Construct as copy, resetting the boundary mesh
         ePatch(const ePatch&, const eBoundaryMesh&);
+
+        //- Construct as copy
+        ePatch(const ePatch&);
 
 
     // Selectors

@@ -187,10 +187,18 @@ public:
 
         //- Map the patch field
         template <class Type>
-        void mapPatchField
+        void mapFvPatchField
         (
             const word& fieldName,
-            Field<Type>& pF
+            fvPatchField<Type>& pF
+        ) const;
+
+        //- Map the patch field
+        template <class Type>
+        void mapFvsPatchField
+        (
+            const word& fieldName,
+            fvsPatchField<Type>& pF
         ) const;
 };
 

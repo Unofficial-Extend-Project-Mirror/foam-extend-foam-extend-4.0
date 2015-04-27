@@ -15,6 +15,9 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
+//- Specify dynamicFvMesh library
+dynamicFvMeshLibs       ("libdynamicTopoFvMesh.so");
+
 //- Select the type of dynamicFvMesh
 dynamicFvMesh           dynamicTopoFvMesh;
 

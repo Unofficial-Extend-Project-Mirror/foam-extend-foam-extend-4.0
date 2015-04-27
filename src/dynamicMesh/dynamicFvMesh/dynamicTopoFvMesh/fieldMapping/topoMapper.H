@@ -41,7 +41,9 @@ SourceFiles
 #ifndef topoMapper_H
 #define topoMapper_H
 
+#include "Tuple2.H"
 #include "autoPtr.H"
+#include "PtrList.H"
 #include "IOmanip.H"
 #include "volFields.H"
 
@@ -62,6 +64,11 @@ class topoBoundaryMeshMapper;
 
 class topoMapper
 {
+    // Private typedefs
+
+        typedef Tuple2<word, label> GradientMap;
+        typedef HashTable<GradientMap> GradientTable;
+
     // Private data
 
         //- Reference to fvMesh
@@ -84,11 +91,15 @@ class topoMapper
         //- Flux corrector
         mutable autoPtr<fluxCorrector> fluxCorrector_;
 
+        // Index map for gradients
+        mutable GradientTable gradTable_;
+
         // Stored gradients for mapping
-        mutable HashTable<autoPtr<volVectorField> > sGrads_;
-        mutable HashTable<autoPtr<volTensorField> > vGrads_;
+        mutable PtrList<volVectorField> sGradPtrs_;
+        mutable PtrList<volTensorField> vGradPtrs_;
 
         //- Geometric information on the old mesh
+        mutable scalarField* cellVolumesPtr_;
         mutable volVectorField* cellCentresPtr_;
 
         //- Intersection weights
@@ -120,7 +131,8 @@ class topoMapper
         template <class Type, class gradType>
         void storeGradients
         (
-            HashTable<autoPtr<gradType> >& gradTable
+            GradientTable& gradTable,
+            PtrList<gradType>& gradList
         ) const;
 
         //- Store gradients prior to mesh reset
@@ -209,8 +221,15 @@ public:
         //- Store mesh information for the mapping stage
         void storeMeshInformation() const;
 
+        //- Deregister gradient fields and centres,
+        //  but retain for mapping
+        void deregisterMeshInformation() const;
+
         //- Return non-const access to cell centres
         volVectorField& volCentres() const;
+
+        //- Return non-const access to cell volumes
+        scalarField& internalVolumes() const;
 
         //- Return stored cell centre information
         const vectorField& internalCentres() const;
@@ -218,11 +237,8 @@ public:
         //- Return stored patch centre information
         const vectorField& patchCentres(const label i) const;
 
-        //- Return names of stored scalar gradients
-        const wordList scalarGrads() const;
-
-        //- Return names of stored vector gradients
-        const wordList vectorGrads() const;
+        //- Return names of stored gradients
+        const wordList gradientTable() const;
 
         //- Fetch the gradient field
         template <class Type>

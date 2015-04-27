@@ -462,12 +462,13 @@ inline bool pointInTriFace
 inline void pWrite
 (
     const label toID,
-    const label& data
+    const label& data,
+    bool blocking
 )
 {
     OPstream::write
     (
-        Pstream::blocking,
+        (blocking ? Pstream::blocking : Pstream::nonBlocking),
         toID,
         reinterpret_cast<const char*>(&data),
         sizeof(label)
@@ -479,12 +480,13 @@ inline void pWrite
 inline void pRead
 (
     const label fromID,
-    label& data
+    label& data,
+    bool blocking
 )
 {
     IPstream::read
     (
-        Pstream::blocking,
+        (blocking ? Pstream::blocking : Pstream::nonBlocking),
         fromID,
         reinterpret_cast<char*>(&data),
         sizeof(label)
@@ -492,6 +494,79 @@ inline void pRead
 }
 
 
+// Parallel non-blocking send for fixed lists
+template <class Type, unsigned Size>
+inline void pWrite
+(
+    const label toID,
+    const FixedList<Type, Size>& data
+)
+{
+    OPstream::write
+    (
+        Pstream::blocking,
+        toID,
+        reinterpret_cast<const char*>(&data[0]),
+        Size*sizeof(Type)
+    );
+}
+
+
+// Parallel non-blocking receive for fixed lists
+template <class Type, unsigned Size>
+inline void pRead
+(
+    const label fromID,
+    FixedList<Type, Size>& data
+)
+{
+    IPstream::read
+    (
+        Pstream::blocking,
+        fromID,
+        reinterpret_cast<char*>(data.begin()),
+        Size*sizeof(Type)
+    );
+}
+
+
+// Parallel non-blocking send for lists
+template <class Type>
+inline void pWrite
+(
+    const label toID,
+    const UList<Type>& data
+)
+{
+    OPstream::write
+    (
+        Pstream::nonBlocking,
+        toID,
+        reinterpret_cast<const char*>(&data[0]),
+        data.size()*sizeof(Type)
+    );
+}
+
+
+// Parallel non-blocking receive for lists
+template <class Type>
+inline void pRead
+(
+    const label fromID,
+    UList<Type>& data
+)
+{
+    IPstream::read
+    (
+        Pstream::nonBlocking,
+        fromID,
+        reinterpret_cast<char*>(&data[0]),
+        data.size()*sizeof(Type)
+    );
+}
+
+
+// Wait for buffer transfer completion.
 inline void waitForBuffers()
 {
     if (Pstream::parRun())
@@ -585,6 +660,76 @@ inline void replaceLabel
             << " was not used in replacement."
             << abort(FatalError);
     }
+}
+
+
+// Utility method to size-up the list to include an item
+template <class Type>
+inline void sizeUpList
+(
+    const Type& item,
+    List<Type>& list
+)
+{
+    list.setSize(list.size() + 1, item);
+}
+
+
+// Utility method to size-down the list to remove an item
+template <class Type>
+inline void sizeDownList
+(
+    const Type& item,
+    List<Type>& list
+)
+{
+    label index = -1;
+
+    if ((index = findIndex(list, item)) > -1)
+    {
+        meshOps::removeIndex(index, list);
+    }
+    else
+    {
+        FatalErrorIn
+        (
+            "inline void meshOps::sizeDownList"
+            "(const Type& item, List<Type>& list)"
+        )
+            << nl << "Item: " << item
+            << " was not found in list. " << nl
+            << " List: " << nl << list
+            << abort(FatalError);
+    }
+}
+
+
+// Remove an item at a particular index in the list
+template <class Type>
+inline void removeIndex
+(
+    const label index,
+    List<Type>& list
+)
+{
+    // Create a new list
+    List<Type> newList(list.size() - 1);
+
+    // Copy individual items
+    label n = 0;
+
+    forAll(list, itemI)
+    {
+        if (itemI == index)
+        {
+            continue;
+        }
+
+        newList[n++] = list[itemI];
+    }
+
+    // Overwrite
+    list.transfer(newList);
 }
 
 

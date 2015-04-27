@@ -73,41 +73,50 @@ public:
         enum entityType
         {
             // Buffers and sizes
-            POINT = 0,
-            EDGE = 1,
-            FACE = 2,
+            POINT         = 0,
+            EDGE          = 1,
+            FACE          = 2,
             // Sizes only
-            CELL = 3,
+            CELL          = 3,
+            MAX_ENTITIES  = 4,
             INTERNAL_EDGE = 4,
             INTERNAL_FACE = 5,
-            SHARED_POINT = 6,
-            GLOBAL_POINT = 7,
-            NFE_SIZE = 8,
-            NBDY = 9,
+            SHARED_POINT  = 6,
+            GLOBAL_POINT  = 7,
+            NFE_SIZE      = 8,
+            NBDY          = 9,
+            MAX_SIZES     = 10,
             // Buffers only
-            OWNER = 3,
-            NEIGHBOUR = 4,
-            FACE_EDGE = 5,
-            NFE_BUFFER = 6,
-            FACE_STARTS = 7,
-            FACE_SIZES = 8,
-            EDGE_STARTS = 9,
-            EDGE_SIZES = 10,
-            PATCH_ID = 11
+            OWNER         = 3,
+            NEIGHBOUR     = 4,
+            FACE_EDGE     = 5,
+            NFE_BUFFER    = 6,
+            FACE_STARTS   = 7,
+            FACE_SIZES    = 8,
+            EDGE_STARTS   = 9,
+            EDGE_SIZES    = 10,
+            PATCH_ID      = 11,
+            MAX_BUFFERS   = 12
         };
 
         //- Enumerants for operations
         enum opType
         {
-            BISECTION = 0,
-            COLLAPSE_FIRST = 1,
-            COLLAPSE_SECOND = 2,
+            BISECTION         = 0,
+            COLLAPSE_FIRST    = 1,
+            COLLAPSE_SECOND   = 2,
             COLLAPSE_MIDPOINT = 3,
-            REMOVE_CELL = 4,
-            MOVE_POINT = 5,
-            CONVERT_PATCH = 6,
+            REMOVE_CELL       = 4,
+            MOVE_POINT        = 5,
+            CONVERT_PATCH     = 6,
+            CONVERT_PHYSICAL  = 7,
             INVALID
         };
+
+        //- Public typedefs
+        typedef FixedList<label, MAX_SIZES> EntitySizeList;
+        typedef FixedList<Map<label>, MAX_ENTITIES> EntityMapList;
+        typedef FixedList<labelList, MAX_BUFFERS> EntityBufferList;
 
 private:
 
@@ -136,20 +145,23 @@ private:
         mutable List<labelPair> globalProcPoints_;
 
         // Entity sizes (as specified by the entityType enumerant)
-        mutable FixedList<label,10> nEntities_;
+        mutable EntitySizeList nEntities_;
 
         // Maps for entities
-        mutable FixedList<Map<label>,4> entityMap_;
-        mutable FixedList<Map<label>,4> reverseEntityMap_;
+        mutable EntityMapList entityMap_;
+        mutable EntityMapList reverseEntityMap_;
 
         // Entity Buffers (as specified by the entityType enumerant)
-        mutable FixedList<labelList,12> entityBuffer_;
+        mutable EntityBufferList entityBuffer_;
 
         // List of entity indices with topological operations
         mutable labelList entityIndices_;
 
         // List of operations performed on entities
         mutable List<opType> entityOperations_;
+
+        // Physical patch conversion indices
+        mutable labelList patchIndices_;
 
         // List of point-locations to move points to
         mutable pointField moveNewPoints_;
@@ -158,17 +170,25 @@ private:
         // Addressing for field mapping
         mutable labelList faceMap_;
         mutable labelList cellMap_;
+        mutable labelList internalFaceMap_;
+
+        // Processor point and edge mapping
+        mutable Map<labelList> subMeshPointMap_;
+        mutable Map<labelList> subMeshEdgeMap_;
 
         //- Demand-driven connectivity data.
         mutable edgeList* edgesPtr_;
         mutable faceList* facesPtr_;
         mutable labelListList* faceEdgesPtr_;
 
+    // Private Member Functions
+
         void makeEdges() const;
         void makeFaces() const;
 
         void makeFaceMap() const;
         void makeCellMap() const;
+        void makeInternalFaceMap() const;
 
         void clearAddressing() const;
 
@@ -311,27 +331,44 @@ public:
             const label master
         ) const;
 
-        inline FixedList<label,10>& nEntities() const;
+        inline EntitySizeList& nEntities() const;
         inline label& nEntities(const label eType) const;
 
         inline Map<label>& entityMap(const label eType) const;
         inline Map<label>& reverseEntityMap(const label eType) const;
 
-        inline FixedList<labelList,12>& entityBuffer() const;
+        inline EntityBufferList& entityBuffer() const;
         inline labelList& entityBuffer(const label eType) const;
 
         inline labelList& entityIndices() const;
         inline List<opType>& entityOperations() const;
 
+        inline labelList& patchIndices() const;
         inline pointField& moveNewPoints() const;
         inline pointField& moveOldPoints() const;
+
+        inline Map<labelList>& subMeshPointMap() const;
+        inline Map<labelList>& subMeshEdgeMap() const;
+
+        void pushOperation
+        (
+            const label index,
+            const opType oType
+        ) const;
 
         void pushOperation
         (
             const label index,
             const opType oType,
-            const point& newPoint = vector::zero,
-            const point& oldPoint = vector::zero
+            const label pIndex
+        ) const;
+
+        void pushOperation
+        (
+            const label index,
+            const opType oType,
+            const point& newPoint,
+            const point& oldPoint
         ) const;
 
         //- Demand-driven data
@@ -344,6 +381,7 @@ public:
 
         const labelList& faceMap() const;
         const labelList& cellMap() const;
+        const labelList& internalFaceMap() const;
 
         void transferMaps
         (

@@ -43,83 +43,91 @@ SourceFiles
 #include "autoPtr.H"
 #include "coupleMap.H"
 #include "volFieldsFwd.H"
-#include "surfaceFieldsFwd.H"
 #include "fvPatchFieldMapper.H"
 
 namespace Foam
 {
 
 // Class forward declarations
-class dynamicTopoFvMesh;
+class fvBoundaryMesh;
 
 /*---------------------------------------------------------------------------*\
                          Class coupledInfo Declaration
 \*---------------------------------------------------------------------------*/
 
+template <class MeshType>
 class coupledInfo
 {
-    // Reference to the parent mesh
-    const dynamicTopoFvMesh& mesh_;
 
-    // Auto pointer to a subMesh
-    autoPtr<dynamicTopoFvMesh> subMesh_;
+    // Private data
 
-    // Flag to determine whether maps have been built.
-    bool builtMaps_;
+        // Reference to the parent mesh
+        const MeshType& mesh_;
 
-    // For locally coupled patches,
-    // specify a master / slave index
-    coupleMap map_;
+        // Auto pointer to a subMesh
+        autoPtr<MeshType> subMesh_;
 
-    // Zone IDs for patches associated with faceZones
-    label masterFaceZone_;
-    label slaveFaceZone_;
+        // Flag to determine whether maps have been built.
+        bool builtMaps_;
 
-    //- Disallow default bitwise assignment
-    inline void operator=(const coupledInfo&);
+        // For locally coupled patches,
+        // specify a master / slave index
+        coupleMap map_;
+
+        // Zone IDs for patches associated with faceZones
+        label masterFaceZone_;
+        label slaveFaceZone_;
+
+    // Private member functions
+
+        // Disallow default bitwise assignment
+        inline void operator=(const coupledInfo&);
 
 public:
 
-    // Constructor
-    inline coupledInfo
-    (
-        const dynamicTopoFvMesh& mesh,
-        const coupleMap& cMap,
-        const label mfzIndex = -1,
-        const label sfzIndex = -1
-    );
+    //- Constructors
 
-    inline coupledInfo
-    (
-        const dynamicTopoFvMesh& mesh,
-        const bool isTwoDMesh,
-        const bool isLocal,
-        const bool isSend,
-        const label patchIndex,
-        const label mPatch,
-        const label sPatch,
-        const label mfzIndex = -1,
-        const label sfzIndex = -1
-    );
+        // Construct given mesh, coupleMap and master / slave indices
+        inline coupledInfo
+        (
+            const MeshType& mesh,
+            const coupleMap& cMap,
+            const label mfzIndex = -1,
+            const label sfzIndex = -1
+        );
+
+        // Construct from components
+        inline coupledInfo
+        (
+            const MeshType& mesh,
+            const bool isTwoDMesh,
+            const bool isLocal,
+            const bool isSend,
+            const label patchIndex,
+            const label mPatch,
+            const label sPatch,
+            const label mfzIndex = -1,
+            const label sfzIndex = -1
+        );
 
     //- Access
 
         // Return a const reference to the parent mesh
-        inline const dynamicTopoFvMesh& baseMesh() const;
+        inline const MeshType& baseMesh() const;
 
         // Set a new subMesh
-        inline void setMesh(label index, dynamicTopoFvMesh* mesh);
+        inline void setMesh(label index, MeshType* mesh);
 
         // Return a reference to the subMesh
-        inline dynamicTopoFvMesh& subMesh();
+        inline MeshType& subMesh();
 
         // Return a const reference to the subMesh
-        inline const dynamicTopoFvMesh& subMesh() const;
+        inline const MeshType& subMesh() const;
 
-        // Have maps been built?
+        // Return if maps have been built
         inline bool builtMaps() const;
 
-        // Change the flag
+        // Set internal state of maps as built
         inline void setBuiltMaps();
 
         // Return a reference to the coupleMap
@@ -128,8 +136,10 @@ public:
         // Return a const reference to the coupleMap
         inline const coupleMap& map() const;
 
-        // Return the master / slave face zone IDs
+        // Return the master face zone ID
         inline label masterFaceZone() const;
+
+        // Return the slave face zone ID
         inline label slaveFaceZone() const;
 
     //- Interpolation
@@ -179,7 +189,7 @@ public:
 
                 label sizeBeforeMapping() const
                 {
-                    return directAddressing_.size();
+                    return sizeBeforeMapping_;
                 }
 
                 bool direct() const
@@ -193,49 +203,34 @@ public:
                 }
         };
 
-        // Set subMesh centres
-        inline void setCentres(PtrList<volVectorField>& centres) const;
-
-        // Subset volume field
-        template <class Type>
-        tmp<GeometricField<Type, fvPatchField, volMesh> >
-        subSetVolField
+        // Subset geometric field
+        template <class GeomField, class ZeroType>
+        tmp<GeomField>
+        subSetField
         (
-            const GeometricField<Type, fvPatchField, volMesh>& field
+            const GeomField& f,
+            const ZeroType& zeroValue,
+            const labelList& internalMapper
         ) const;
 
-        // Subset surface field
-        template <class Type>
-        tmp<GeometricField<Type, fvsPatchField, surfaceMesh> >
-        subSetSurfaceField
-        (
-            const GeometricField<Type, fvsPatchField, surfaceMesh>& field
-        ) const;
-
-        // Subset the volume fields from registry to output stream
-        template <class Type>
-        void mapVolField
+        // Subset geometric fields from registry to output stream
+        template <class GeomField, class ZeroType>
+        void send
         (
             const wordList& fieldNames,
             const word& fieldType,
+            const ZeroType& zeroValue,
+            const labelList& internalMapper,
             OSstream& strStream
         ) const;
 
-        // Subset the surface field from registry to output stream
-        template <class Type>
-        void mapSurfaceField
-        (
-            const wordList& fieldNames,
-            const word& fieldType,
-            OSstream& strStream
-        ) const;
-
-        // Set volume field pointer from input dictionary
+        // Set geometric field pointers from input dictionary
         template <class GeomField>
         void setField
         (
             const wordList& fieldNames,
             const dictionary& fieldDicts,
+            const label internalSize,
             PtrList<GeomField>& fields
         ) const;
 
@@ -263,6 +258,14 @@ public:
             const PtrList<subMeshMapper>& boundaryMapper,
             const List<labelListList>& boundaryReverseMaps,
             const List<PtrList<GeomField> >& srcFields
+        );
+
+        // Resize boundaryFields for all fields in the registry
+        template <class GeomField>
+        static void resizeBoundaries
+        (
+            const objectRegistry& mesh,
+            const fvBoundaryMesh& boundary
         );
 };
 

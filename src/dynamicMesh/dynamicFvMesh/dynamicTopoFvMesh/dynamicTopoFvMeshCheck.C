@@ -57,8 +57,7 @@ bool dynamicTopoFvMesh::meshQuality
     label nCells = 0, minCell = -1;
     scalar maxQuality = -GREAT;
     scalar minQuality =  GREAT;
-    scalar cQuality = 0.0;
-    scalar meanQuality = 0.0;
+    scalar cQuality, meanQuality = 0.0;
 
     // Track slivers
     bool sliversAbsent = true;
@@ -89,7 +88,7 @@ bool dynamicTopoFvMesh::meshQuality
             continue;
         }
 
-        if (twoDMesh_)
+        if (is2D())
         {
             // Assume XY plane here
             vector n = vector(0,0,1);
@@ -198,24 +197,19 @@ bool dynamicTopoFvMesh::meshQuality
     // Output statistics:
     if (outputOption || (debug > 0))
     {
+        if (minQuality < 0.0)
+        {
+            Pout<< nl
+                << " Warning: Minimum cell quality is: " << minQuality
+                << " at cell: " << minCell
+                << endl;
+        }
+
         // Reduce statistics across processors.
         reduce(minQuality, minOp<scalar>());
         reduce(maxQuality, maxOp<scalar>());
         reduce(meanQuality, sumOp<scalar>());
         reduce(nCells, sumOp<label>());
-
-        if (minQuality < 0.0)
-        {
-            WarningIn
-            (
-                "bool dynamicTopoFvMesh::meshQuality"
-                "(bool outputOption)"
-            )
-                << nl
-                << "Minimum cell quality is: " << minQuality
-                << " at cell: " << minCell
-                << endl;
-        }
 
         Info<< nl
             << " ~~~ Mesh Quality Statistics ~~~ " << nl
@@ -600,8 +594,7 @@ bool dynamicTopoFvMesh::checkTriangulationVolumes
 ) const
 {
     label m = hullVertices.size();
-    scalar oldTetVol = 0.0;
-    scalar newTetVol = 0.0;
+    scalar oldTetVol = 0.0, newTetVol = 0.0;
 
     const edge& edgeToCheck = edges_[eIndex];
 
@@ -723,7 +716,7 @@ void dynamicTopoFvMesh::writeEdgeConnectivity
     {
         label pIdx = whichPatch(eFaces[faceI]);
 
-        word pName((pIdx < 0) ?	"Internal" : boundaryMesh()[pIdx].name());
+        word pName((pIdx < 0) ? "Internal" : boundaryMesh()[pIdx].name());
 
         Pout<< " Face: " << eFaces[faceI]
             << " :: " << faces_[eFaces[faceI]]
@@ -760,7 +753,7 @@ void dynamicTopoFvMesh::writeEdgeConnectivity
         3, false, true
     );
 
-    if (twoDMesh_)
+    if (is2D())
     {
         return;
     }
@@ -1132,6 +1125,25 @@ void dynamicTopoFvMesh::checkConnectivity(const label maxErrors) const
 
         if (curFace.empty())
         {
+            // This might be a deleted face
+            if (faceI < nOldFaces_)
+            {
+                if (reverseFaceMap_[faceI] == -1)
+                {
+                    continue;
+                }
+            }
+            else
+            if (deletedFaces_.found(faceI))
+            {
+                continue;
+            }
+
+            Pout<< "Face " << faceI
+                << " has no vertex labels."
+                << endl;
+
+            nFailedChecks++;
             continue;
         }
 
@@ -1196,7 +1208,7 @@ void dynamicTopoFvMesh::checkConnectivity(const label maxErrors) const
 
             if (nCommon != 1)
             {
-                Pout<< "Cells: " << nl
+                Pout<< "Cells for face: " << faceI << "::" << curFace << nl
                     << '\t' << owner_[faceI] << ":: " << ownCell << nl
                     << '\t' << neighbour_[faceI] << " :: " << neiCell << nl
                     << " share multiple faces. "
@@ -1691,7 +1703,7 @@ void dynamicTopoFvMesh::checkConnectivity(const label maxErrors) const
         }
     }
 
-    if (!twoDMesh_)
+    if (is3D())
     {
         Pout<< "Checking point-edge connectivity...";
 
@@ -1818,8 +1830,8 @@ void dynamicTopoFvMesh::checkConnectivity(const label maxErrors) const
 
         if
         (
-            (cellToNode[cellI].size() != 6 && twoDMesh_) ||
-            (cellToNode[cellI].size() != 4 && !twoDMesh_)
+            (cellToNode[cellI].size() != 6 && is2D()) ||
+            (cellToNode[cellI].size() != 4 && is3D())
         )
         {
             Pout<< nl << "Warning: Cell: "
@@ -2183,9 +2195,7 @@ bool dynamicTopoFvMesh::checkCollapse
 ) const
 {
     label faceIndex = -1;
-    scalar cQuality = 0;
-    scalar oldVolume = 0;
-    scalar newVolume = 0;
+    scalar cQuality = 0.0, oldVolume = 0.0, newVolume = 0.0;
     const cell& cellToCheck = cells_[cellIndex];
 
     // Look for a face that doesn't contain 'pointIndex'

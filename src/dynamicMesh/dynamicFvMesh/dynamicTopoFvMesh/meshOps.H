@@ -33,8 +33,8 @@ Author
     All rights reserved
 
 SourceFiles
+    meshOpsI.H
     meshOps.C
-    meshOpsTemplates.C
 
 \*---------------------------------------------------------------------------*/
 
@@ -93,7 +93,7 @@ namespace meshOps
 
     // Utility method to build a hull of cells
     // connected to the edge (for 2D simplical meshes)
-    void constructPrismHull
+    inline void constructPrismHull
     (
         const label eIndex,
         const UList<face>& faces,
@@ -107,7 +107,7 @@ namespace meshOps
 
     // Utility method to build a hull of cells (and faces)
     // around an edge (for 3D simplical meshes)
-    void constructHull
+    inline void constructHull
     (
         const label eIndex,
         const UList<face>& faces,
@@ -181,7 +181,7 @@ namespace meshOps
     );
 
     // Dijkstra's algorithm for the shortest path problem
-    bool Dijkstra
+    inline bool Dijkstra
     (
         const Map<point>& points,
         const Map<edge>& edges,
@@ -235,7 +235,8 @@ namespace meshOps
     inline void pWrite
     (
         const label toID,
-        const label& data
+        const label& data,
+        bool blocking = true
     );
 
     // Parallel send (for fixed lists)
@@ -258,7 +259,8 @@ namespace meshOps
     inline void pRead
     (
         const label fromID,
-        label& data
+        label& data,
+        bool blocking = true
     );
 
     // Parallel receive (for fixed lists)
@@ -282,7 +284,7 @@ namespace meshOps
 
     // Select a list of elements from connectivity,
     // and output to a VTK format
-    void writeVTK
+    inline void writeVTK
     (
         const polyMesh& mesh,
         const word& name,
@@ -299,7 +301,7 @@ namespace meshOps
     );
 
     // Actual routine to write out the VTK file
-    void writeVTK
+    inline void writeVTK
     (
         const polyMesh& mesh,
         const word& name,
@@ -320,6 +322,23 @@ namespace meshOps
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
+// Add additional operations missing in ops.H
+template<class T>
+class lessOp
+{ public: T operator()(const T& x, const T& y) const { return x < y; } };
+
+template<class T>
+class lessEqOp
+{ public: T operator()(const T& x, const T& y) const { return x <= y; } };
+
+template<class T>
+class greaterOp
+{ public: T operator()(const T& x, const T& y) const { return x > y; } };
+
+template<class T>
+class greaterEqOp
+{ public: T operator()(const T& x, const T& y) const { return x >= y; } };
+
 } // End namespace Foam
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -327,7 +346,7 @@ namespace meshOps
 #include "meshOpsI.H"
 
 #ifdef NoRepository
-#    include "meshOpsTemplates.C"
+#    include "meshOps.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
