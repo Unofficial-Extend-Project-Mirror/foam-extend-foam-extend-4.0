@@ -28,7 +28,7 @@ Description
 
 Author
 
-\*----------------------------------------------------------------------------*/
+\*---------------------------------------------------------------------------*/
 
 #include "BlockLduInterfaceField.H"
 #include "processorBlockLduInterfaceField.H"
@@ -41,10 +41,10 @@ namespace Foam
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-#define makeTemplateTypeNameAndDebug(type, Type, args...)                      \
-    defineTemplateTypeNameAndDebug(BlockLduInterfaceField<type>, 0);           \
-                                                                               \
-    defineTemplateTypeNameAndDebug(processorBlockLduInterfaceField<type>, 0);  \
+#define makeTemplateTypeNameAndDebug(type, Type, args...)                     \
+    defineTemplateTypeNameAndDebug(BlockLduInterfaceField<type>, 0);          \
+                                                                              \
+    defineTemplateTypeNameAndDebug(processorBlockLduInterfaceField<type>, 0);
 
 forAllVectorNTypes(makeTemplateTypeNameAndDebug);
 
