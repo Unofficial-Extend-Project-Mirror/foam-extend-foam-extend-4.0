@@ -1,5 +1,12 @@
 #!/usr/bin/python
 
+forcesfilename = 'forces/0/forces.dat'
+
+import sys
+if len(sys.argv) != 1:
+        print 'script assumes forces file ', forcesfilename
+        sys.exit()
+
 import re
 forceRegex=r"([0-9.Ee\-+]+)\s+\(+([0-9.Ee\-+]+)\s([0-9.Ee\-+]+)\s([0-9.Ee\-+]+)\)\s\(([0-9.Ee\-+]+)\s([0-9.Ee\-+]+)\s([0-9 .Ee\-+]+)\)+\s\(+([0-9.Ee\-+]+)\s([0-9.Ee\-+]+)\s([0-9.Ee\-+]+)\)\s\(([0-9.Ee\-+]+)\s([0-9.Ee\-+]+)\s([0-9.Ee\-+]+)\)+"
 t = []
@@ -7,8 +14,10 @@ fpx = []; fpy = []; fpz = []
 fvx = []; fvy = []; fvz = []
 mpx = []; mpy = []; mpz = []
 mvx = []; mvy = []; mvz = []
-pipefile=open('forces/0/forces.dat','r')
+
+pipefile=open(forcesfilename,'r')
 lines = pipefile.readlines()
+
 for line in lines:
         match=re.search(forceRegex,line)
         if match:
