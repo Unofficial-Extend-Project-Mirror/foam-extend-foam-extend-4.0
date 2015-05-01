@@ -315,8 +315,7 @@ void cyclicGgiFvPatchField<Type>::updateInterfaceMatrix
     const CoeffField<Type>&,
     const Pstream::commsTypes commsType
 ) const
-{
-}
+{}
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
