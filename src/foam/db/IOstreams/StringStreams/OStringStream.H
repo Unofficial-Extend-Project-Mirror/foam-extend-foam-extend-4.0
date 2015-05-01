@@ -59,8 +59,8 @@ public:
         //- Construct and set stream status
         OStringStream
         (
-            streamFormat format=ASCII,
-            versionNumber version=currentVersion
+            streamFormat format = ASCII,
+            versionNumber version = currentVersion
         )
         :
             OSstream

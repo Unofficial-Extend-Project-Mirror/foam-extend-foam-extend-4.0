@@ -516,8 +516,8 @@ evaluate
 
             // ZT, 22-07-2014 - point ordering is not same
             // at master and slave side after topology change
-            const labelList& neiPoints =
-                procPatch_.procPolyPatch().neighbPoints();
+//             const labelList& neiPoints =
+//                 procPatch_.procPolyPatch().neighbPoints();
 
             // VS, 2015-04-12 - This doesn't work in parallel!
 //            tpn =

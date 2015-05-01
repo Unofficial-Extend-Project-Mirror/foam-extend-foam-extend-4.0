@@ -83,7 +83,7 @@ public:
             const int toProcNo,
             const label bufSize = 0,
             streamFormat format=BINARY,
-            versionNumber version=currentVersion
+            versionNumber version = currentVersion
         );
 
 
@@ -151,6 +151,9 @@ public:
 
             //- Write doubleScalar
             Ostream& write(const doubleScalar);
+
+            //- Write longDoubleScalar
+            Ostream& write(const longDoubleScalar);
 
             //- Write binary block
             Ostream& write(const char*, std::streamsize);

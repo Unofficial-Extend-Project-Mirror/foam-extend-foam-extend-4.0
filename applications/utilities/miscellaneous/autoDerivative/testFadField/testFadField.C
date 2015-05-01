@@ -43,7 +43,7 @@ int main(int argc, char *argv[])
     Info << "tf value: " << FadOneValue(tf) << endl;
     Info << "tf deriv: " << FadOneDeriv(tf, 0) << endl;
 
-    FadOneSetDeriv(tf, 0, Field<double>(3, 1));
+    FadOneSetDeriv(tf, 0, scalarField(3, 1));
 
     fadScalar ten(10.0);
     fadScalar bs = tf[0] - ten;

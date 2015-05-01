@@ -38,6 +38,7 @@ SourceFiles
 
 #include "floatScalar.H"
 #include "doubleScalar.H"
+#include "longDoubleScalar.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -73,6 +74,24 @@ namespace Foam
     static const scalar SMALL = doubleScalarSMALL;
     static const scalar VSMALL = doubleScalarVSMALL;
     static const scalar ROOTVSMALL = doubleScalarROOTVSMALL;
+
+    scalar readScalar(Istream& is);
+}
+
+#elif defined(WM_LDP)
+
+// Define scalar as a long double
+
+namespace Foam
+{
+    typedef longDoubleScalar scalar;
+
+    static const scalar GREAT = longDoubleScalarGREAT;
+    static const scalar VGREAT = longDoubleScalarVGREAT;
+    static const scalar ROOTVGREAT = longDoubleScalarROOTVGREAT;
+    static const scalar SMALL = longDoubleScalarSMALL;
+    static const scalar VSMALL = longDoubleScalarVSMALL;
+    static const scalar ROOTVSMALL = longDoubleScalarROOTVSMALL;
 
     scalar readScalar(Istream& is);
 }

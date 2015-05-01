@@ -97,9 +97,9 @@ public:
         (
             istream& is,
             const string& name,
-            streamFormat format=ASCII,
-            versionNumber version=currentVersion,
-            compressionType compression=UNCOMPRESSED
+            streamFormat format = ASCII,
+            versionNumber version = currentVersion,
+            compressionType compression = UNCOMPRESSED
         );
 
 
@@ -164,6 +164,9 @@ public:
 
             //- Read a doubleScalar
             virtual Istream& read(doubleScalar&);
+
+            //- Read a longDoubleScalar
+            virtual Istream& read(longDoubleScalar&);
 
             //- Read binary block
             virtual Istream& read(char*, std::streamsize);

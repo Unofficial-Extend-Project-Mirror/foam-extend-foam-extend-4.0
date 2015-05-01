@@ -195,6 +195,14 @@ Foam::Ostream& Foam::OSstream::write(const doubleScalar val)
 }
 
 
+Foam::Ostream& Foam::OSstream::write(const longDoubleScalar val)
+{
+    os_ << val;
+    setState(os_.rdstate());
+    return *this;
+}
+
+
 Foam::Ostream& Foam::OSstream::write(const char* buf, std::streamsize count)
 {
     if (format() != BINARY)

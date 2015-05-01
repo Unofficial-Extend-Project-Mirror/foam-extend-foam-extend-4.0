@@ -118,7 +118,7 @@ vector eigenValues(const tensor& t)
 
             if (disc >= -SMALL)
             {
-                scalar q = -0.5*sqrt(max(0.0, disc));
+                scalar q = -0.5*sqrt(max(scalar(0), disc));
 
                 i = 0;
                 ii = -0.5*a + q;
@@ -381,7 +381,7 @@ vector eigenValues(const symmTensor& t)
         // If there is a zero root
         if (mag(c) < SMALL)
         {
-            const scalar disc = Foam::max(sqr(a) - 4*b, 0.0);
+            const scalar disc = Foam::max(sqr(a) - 4*b, scalar(0));
 
             scalar q = -0.5*sqrt(max(scalar(0), disc));
 

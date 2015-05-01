@@ -21,50 +21,23 @@ License
     You should have received a copy of the GNU General Public License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
-Description
-
 \*---------------------------------------------------------------------------*/
 
-#include "error.H"
+#include "longDoubleScalar.H"
+#include "IOstreams.H"
 
-#include "contactPatchPair.H"
-#include "volFields.H"
+#include <sstream>
 
-// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-// Construct from components
-    Foam::contactPatchPair::contactPatchPair
-(
-    const fvMesh& m,
-    const label master,
-    const label slave,
-    const scalar tolerance
-)
-:
-    mesh_(m),
-    masterPatchIndex_(master),
-    slavePatchIndex_(slave),
-    masterInterpolate_(m.boundaryMesh()[masterPatchIndex_]),
-    slaveInterpolate_(m.boundaryMesh()[slavePatchIndex_]),
-    patchToPatchInterpolate_
-    (
-        m.boundaryMesh()[masterPatchIndex_],
-        m.boundaryMesh()[slavePatchIndex_],
-        intersection::FULL_RAY,
-        intersection::CONTACT_SPHERE
-    ),
-    tol_(tolerance),
-    touchFraction_
-    (
-        mesh_.boundaryMesh()[slavePatchIndex_].size(),
-        pTraits<scalar>::zero
-    ),
-    slaveDisplacement_
-    (
-        mesh_.boundaryMesh()[slavePatchIndex_].size(),
-        pTraits<vector>::zero
-    )
-{}
-
+#define Scalar longDoubleScalar
+#define ScalarVGREAT longDoubleScalarVGREAT
+#define ScalarVSMALL longDoubleScalarVSMALL
+#define readScalar readLongDoubleScalar
+#include "Scalar.C"
+#undef Scalar
+#undef ScalarVGREAT
+#undef ScalarVSMALL
+#undef readScalar
 
 // ************************************************************************* //

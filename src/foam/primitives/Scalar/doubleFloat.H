@@ -84,6 +84,13 @@ inline double pow(const type1 s, const type2 e)   \
     return ::pow(double(s), double(e));           \
 }
 
+MAXMINPOW(long double, long double, long double)
+MAXMINPOW(long double, long double, double)
+MAXMINPOW(long double, long double, float)
+MAXMINPOW(long double, long double, int)
+MAXMINPOW(long double, double, long double)
+MAXMINPOW(long double, float, long double)
+MAXMINPOW(long double, int, long double)
 
 MAXMINPOW(double, double, double)
 MAXMINPOW(double, double, float)

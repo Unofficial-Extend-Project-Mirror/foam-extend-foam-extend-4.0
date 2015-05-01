@@ -302,7 +302,7 @@ void Foam::contactPatchPair::correct
             (
                 slavePressure
             ),
-            0.0
+            scalar(0)
         );
 
     // Calculate master traction, using the positive part of

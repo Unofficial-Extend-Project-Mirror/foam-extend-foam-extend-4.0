@@ -70,8 +70,8 @@ public:
         (
             const string& name,
             const tokenList& tokens,
-            streamFormat format=ASCII,
-            versionNumber version=currentVersion
+            streamFormat format = ASCII,
+            versionNumber version = currentVersion
         )
         :
             Istream(format, version),
@@ -166,6 +166,9 @@ public:
 
             //- Read a doubleScalar
             virtual Istream& read(doubleScalar&);
+
+            //- Read a longDoubleScalar
+            virtual Istream& read(longDoubleScalar&);
 
             //- Read binary block
             virtual Istream& read(char*, std::streamsize);

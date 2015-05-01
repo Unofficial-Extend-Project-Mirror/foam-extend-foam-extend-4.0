@@ -149,6 +149,13 @@ Foam::Istream& Foam::ITstream::read(doubleScalar&)
 }
 
 
+Foam::Istream& Foam::ITstream::read(longDoubleScalar&)
+{
+    notImplemented("Istream& ITstream::read(longDoubleScalar&)");
+    return *this;
+}
+
+
 Foam::Istream& Foam::ITstream::read(char*, std::streamsize)
 {
     notImplemented("Istream& ITstream::read(char*, std::streamsize)");

@@ -210,6 +210,14 @@ Foam::Ostream& Foam::OPstream::write(const doubleScalar val)
 }
 
 
+Foam::Ostream& Foam::OPstream::write(const longDoubleScalar val)
+{
+    write(char(token::LONG_DOUBLE_SCALAR));
+    writeToBuffer(val);
+    return *this;
+}
+
+
 Foam::Ostream& Foam::OPstream::write(const char* data, std::streamsize count)
 {
     if (format() != BINARY)
