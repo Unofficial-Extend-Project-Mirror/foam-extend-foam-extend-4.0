@@ -185,6 +185,7 @@ LRR::LRR
     )
 {
     nut_ = Cmu_*sqr(k_)/(epsilon_ + epsilonSmall_);
+    nut_ = min(nut_, nuRatio()*nu());
     nut_.correctBoundaryConditions();
 
     if (couplingFactor_.value() < 0.0 || couplingFactor_.value() > 1.0)
@@ -394,6 +395,7 @@ void LRR::correct()
 
     // Re-calculate viscosity
     nut_ = Cmu_*sqr(k_)/epsilon_;
+    nut_ = min(nut_, nuRatio()*nu());
     nut_.correctBoundaryConditions();
 
 

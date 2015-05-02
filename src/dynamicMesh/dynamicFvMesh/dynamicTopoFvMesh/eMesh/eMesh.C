@@ -63,8 +63,6 @@ void eMesh::clearAddressing() const
 
     edges_.clear();
 
-    deleteDemandDrivenData(pePtr_);
-    deleteDemandDrivenData(epPtr_);
     deleteDemandDrivenData(fePtr_);
     deleteDemandDrivenData(efPtr_);
 }
@@ -147,8 +145,6 @@ eMesh::eMesh(const polyMesh& pMesh, const word& subDir)
         ),
         *this
     ),
-    pePtr_(NULL),
-    epPtr_(NULL),
     fePtr_(NULL),
     efPtr_(NULL)
 {
@@ -388,28 +384,6 @@ void eMesh::setInstance(const fileName& inst)
         boundary_.writeOpt() = IOobject::AUTO_WRITE;
         boundary_.instance() = inst;
     }
-}
-
-
-const labelListList& eMesh::pointEdges() const
-{
-    if (!pePtr_)
-    {
-        calcPointEdges();
-    }
-
-    return *pePtr_;
-}
-
-
-const labelListList& eMesh::edgePoints() const
-{
-    if (!epPtr_)
-    {
-        calcEdgePoints();
-    }
-
-    return *epPtr_;
 }
 
 

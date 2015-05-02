@@ -208,6 +208,9 @@ void Foam::coarseAmgLevel::solve
         return;
     }
 
+    // Switch of debug in top-level direct solve
+    debug::debugSwitch oldDebug = lduMatrix::debug;
+
     if (matrixPtr_->matrix().symmetric())
     {
         topLevelDict.add("preconditioner", "Cholesky");
@@ -236,6 +239,9 @@ void Foam::coarseAmgLevel::solve
             topLevelDict
         ).solve(x, b, cmpt);
     }
+
+    // Restore debug
+    lduMatrix::debug = oldDebug;
 
     // Escape cases of top-level solver divergence
     if

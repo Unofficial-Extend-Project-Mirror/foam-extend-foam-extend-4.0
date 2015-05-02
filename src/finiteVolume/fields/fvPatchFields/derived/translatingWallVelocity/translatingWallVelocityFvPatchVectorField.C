@@ -109,7 +109,8 @@ void translatingWallVelocityFvPatchVectorField::updateCoeffs()
         return;
     }
 
-    // Remove the component of U normal to the wall in case the wall is not flat
+    // Remove the component of U normal to the wall in case the wall
+    // is not flat
     vectorField n = patch().nf();
     vectorField::operator=(U_ - n*(n & U_));
 

@@ -38,16 +38,9 @@ Foam::radiation::sigmaSB_
 
 const Foam::dimensionedScalar Foam::radiation::sigmaSB
 (
-    Foam::dimensionedConstant
-    (
-        "sigmaSB",
-        dimensionedScalar
-        (
-            "sigmaSB",
-            dimensionSet(1, 0, -3, -4, 0, 0, 0),
-            sigmaSB_()
-        )
-    )
+    "sigmaSB",
+    dimensionSet(1, 0, -3, -4, 0, 0, 0),
+    sigmaSB_()
 );
 
 // ************************************************************************* //

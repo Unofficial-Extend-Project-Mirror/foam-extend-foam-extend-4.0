@@ -32,11 +32,14 @@ divSchemes
     div(phi,epsilon) Gauss upwind;
     div(devRhoReff) Gauss linear;
     div((devRhoReff&U)) Gauss linear;
+
+    div((muEff*dev2(grad(U).T()))) Gauss linear;
 }
 
 laplacianSchemes
 {
     default         none;
+    laplacian(muEff,U) Gauss linear limited 0.5;
     laplacian(DkEff,k) Gauss linear limited 0.5;
     laplacian(DepsilonEff,epsilon) Gauss linear limited 0.5;
     laplacian(alphaEff,e) Gauss linear limited 0.5;

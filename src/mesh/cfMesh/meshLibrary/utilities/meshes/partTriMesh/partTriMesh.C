@@ -362,6 +362,9 @@ void partTriMesh::updateVerticesSMP(const List<LongList<labelledPoint> >& np)
             pts[pI] = centre / faceArea;
         }
     }
+
+    if( Pstream::parRun() )
+        updateBufferLayers();
 }
 
 void partTriMesh::updateVertices()
@@ -397,6 +400,9 @@ void partTriMesh::updateVertices(const labelLongList& movedPoints)
         const label bpI = movedPoints[i];
         const label pointI = bPoints[bpI];
         const label triPointI = meshSurfacePointLabelInTriMesh_[bpI];
+
+        if( triPointI < 0 )
+            continue;
 
         pts[triPointI] = points[pointI];
         updateType[triPointI] |= SMOOTH;
@@ -495,6 +501,9 @@ void partTriMesh::updateVertices(const labelLongList& movedPoints)
             pts[pI] = centre / faceArea;
         }
     }
+
+    if( Pstream::parRun() )
+        updateBufferLayers();
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

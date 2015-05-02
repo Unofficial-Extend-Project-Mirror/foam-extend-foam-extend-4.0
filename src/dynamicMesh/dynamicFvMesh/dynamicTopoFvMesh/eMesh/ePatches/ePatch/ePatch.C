@@ -79,12 +79,24 @@ ePatch::ePatch
     size_(readLabel(dict.lookup("size")))
 {}
 
+
+//- Construct as copy, resetting the boundary mesh
 ePatch::ePatch(const ePatch& p, const eBoundaryMesh& bm)
 :
     patchIdentifier(p, p.index()),
     boundaryMesh_(bm),
     start_(p.start()),
     size_(p.size())
+{}
+
+
+//- Construct as copy
+ePatch::ePatch(const ePatch& p)
+:
+    patchIdentifier(p),
+    boundaryMesh_(p.boundaryMesh_),
+    start_(p.start_),
+    size_(p.size_)
 {}
 
 

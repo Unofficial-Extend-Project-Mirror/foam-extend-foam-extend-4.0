@@ -24,6 +24,9 @@ findCellsIntersectingSurface = $(intersectionTools)/findCellsIntersectingSurface
 
 meshOptimizer = utilities/smoothers/geometry/meshOptimizer
 tetMeshOptimisation = $(meshOptimizer)/tetMeshOptimisation
+
+symmetryPlaneOptimisation = $(meshOptimizer)/symmetryPlaneOptimisation
+
 simplexSmoother = $(tetMeshOptimisation)/advancedSmoothers/simplexSmoother
 knuppMetric = $(tetMeshOptimisation)/advancedSmoothers/knuppMetric
 meshUntangler = $(tetMeshOptimisation)/advancedSmoothers/meshUntangler
@@ -44,10 +47,12 @@ meshOctreeModifier = utilities/octrees/meshOctree/meshOctreeModifier
 meshOctreeAutoRef = utilities/octrees/meshOctree/meshOctreeAutomaticRefinement
 patchRefinement = utilities/octrees/meshOctree/refinementControls/patchRefinement
 objectRefinement = utilities/octrees/meshOctree/refinementControls/objectRefinement
+
 helperFunctions  =  utilities/helperFunctions
 createFacesFromChain = utilities/helperClasses/createFacesFromChain
 sortEdgesIntoChains = utilities/helperClasses/sortEdgesIntoChains
 trianglePlaneIntersections  =  utilities/helperClasses/trianglePlaneIntersections
+
 tetCreatorOctree = utilities/tetrahedra/tetCreatorOctree
 faceDecomposition = utilities/faceDecomposition
 decomposeCells = utilities/decomposeCells
@@ -60,12 +65,16 @@ checkIrregularSurfaceConnections = $(topology)/checkIrregularSurfaceConnections
 checkNonMappableCellConnections = $(topology)/checkNonMappableCellConnections
 
 triSurfaceTools = utilities/triSurfaceTools
+
+triSurface2DCheck = $(triSurfaceTools)/triSurface2DCheck
 triSurfaceCleanupDuplicates = $(triSurfaceTools)/triSurfaceCleanupDuplicates
+triSurfaceCleanupDuplicateTriangles = $(triSurfaceTools)/triSurfaceCleanupDuplicateTriangles
 triSurfaceCopyParts = $(triSurfaceTools)/triSurfaceCopyParts
 triSurfaceCurvatureEstimator = $(triSurfaceTools)/triSurfaceCurvatureEstimator
 triSurfacePartitioner = $(triSurfaceTools)/triSurfacePartitioner
 triSurfaceDetectFeatureEdges = $(triSurfaceTools)/triSurfaceDetectFeatureEdges
 triSurfaceClassifyEdges = $(triSurfaceTools)/triSurfaceClassifyEdges
+triSurfaceImportSurfaceAsSubset = $(triSurfaceTools)/triSurfaceImportSurfaceAsSubset
 triSurfacePatchManipulator = $(triSurfaceTools)/triSurfacePatchManipulator
 triSurfaceRemoveFacets = $(triSurfaceTools)/triSurfaceRemoveFacets
 triSurfaceExtrude2DEdges = $(triSurfaceTools)/triSurfaceExtrude2DEdges
@@ -272,6 +281,8 @@ $(meshOptimizer)/optimizeMeshFV.C
 $(tetMeshOptimisation)/tetMeshOptimisation.C
 $(tetMeshOptimisation)/tetMeshOptimisationParallel.C
 
+$(symmetryPlaneOptimisation)/symmetryPlaneOptimisation.C
+
 $(simplexSmoother)/simplexSmoother.C
 
 $(knuppMetric)/knuppMetric.C
@@ -343,8 +354,13 @@ $(objectRefinement)/lineRefinement.C
 $(objectRefinement)/coneRefinement.C
 $(objectRefinement)/boxRefinement.C
 
+$(triSurface2DCheck)/triSurface2DCheck.C
+
 $(triSurfaceCleanupDuplicates)/triSurfaceCleanupDuplicates.C
 $(triSurfaceCleanupDuplicates)/triSurfaceCleanupDuplicatesFunctions.C
+
+$(triSurfaceCleanupDuplicateTriangles)/triSurfaceCleanupDuplicateTriangles.C
+$(triSurfaceCleanupDuplicateTriangles)/triSurfaceCleanupDuplicateTrianglesFunctions.C
 
 $(triSurfaceCopyParts)/triSurfaceCopyParts.C
 
@@ -359,6 +375,8 @@ $(triSurfaceDetectFeatureEdges)/triSurfaceDetectFeatureEdgesFunctions.C
 
 $(triSurfaceClassifyEdges)/triSurfaceClassifyEdges.C
 $(triSurfaceClassifyEdges)/triSurfaceClassifyEdgesFunctions.C
+
+$(triSurfaceImportSurfaceAsSubset)/triSurfaceImportSurfaceAsSubset.C
 
 $(triSurfacePatchManipulator)/triSurfacePatchManipulator.C
 $(triSurfacePatchManipulator)/triSurfacePatchManipulatorFunctions.C

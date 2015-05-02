@@ -168,6 +168,7 @@ kEpsilon::kEpsilon
     )
 {
     mut_ = Cmu_*rho_*sqr(k_)/(epsilon_ + epsilonSmall_);
+    mut_ = min(mut_, muRatio()*mu());
     mut_.correctBoundaryConditions();
 
     alphat_ = mut_/Prt_;
@@ -265,6 +266,7 @@ void kEpsilon::correct()
     {
         // Re-calculate viscosity
         mut_ = rho_*Cmu_*sqr(k_)/(epsilon_ + epsilonSmall_);
+        mut_ = min(mut_, muRatio()*mu());
         mut_.correctBoundaryConditions();
 
         // Re-calculate thermal diffusivity
@@ -332,6 +334,7 @@ void kEpsilon::correct()
 
     // Re-calculate viscosity
     mut_ = rho_*Cmu_*sqr(k_)/epsilon_;
+    mut_ = min(mut_, muRatio()*mu());
     mut_.correctBoundaryConditions();
 
     // Re-calculate thermal diffusivity

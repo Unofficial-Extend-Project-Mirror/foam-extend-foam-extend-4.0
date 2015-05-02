@@ -43,7 +43,7 @@ fvVectorMatrix UbEqn(Ub, Ub.dimensions()*dimVol/dimTime);
 
     UbEqn =
     (
-        (scalar(1) + Cvm*rhob*alpha/rhob)*
+        (scalar(1) + Cvm*rhoa*alpha/rhob)*
         (
             fvm::ddt(Ub)
           + fvm::div(phib, Ub, "div(phib,Ub)")
@@ -61,7 +61,7 @@ fvVectorMatrix UbEqn(Ub, Ub.dimensions()*dimVol/dimTime);
     //  g                        // Buoyancy term transfered to p-equation
       - fvm::Sp(alpha/rhob*dragCoef, Ub)
     //+ alpha/rhob*dragCoef*Ua   // Explicit drag transfered to p-equation
-      + alpha/rhob*(liftCoeff + Cvm*rhob*DDtUa)
+      + alpha/rhob*(liftCoeff + Cvm*rhoa*DDtUa)
     );
 
     UbEqn.relax();

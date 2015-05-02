@@ -115,26 +115,31 @@ void Foam::mixedEnthalpyFvPatchScalarField::updateCoeffs()
     if
     (
         dimensionedInternalField().name() == db().mangleFileName("h")
-     || dimensionedInternalField().name() == db().mangleFileName("i")
     )
     {
         refValue() = thermo.h(Tw.refValue(), patchi);
         refGrad() = thermo.Cp(Tw, patchi)*Tw.refGrad()
-        + patch().deltaCoeffs()*
-         (
-            thermo.h(Tw, patchi)
-          - thermo.h(Tw, patch().faceCells())
-         );
+          + patch().deltaCoeffs()*
+            (
+                thermo.h(Tw, patchi)
+              - thermo.h(Tw, patch().faceCells())
+            );
+    }
+    else if
+    (
+        dimensionedInternalField().name() == db().mangleFileName("i")
+    )
+    {
     }
     else
     {
         refValue() = thermo.hs(Tw.refValue(), patchi);
         refGrad() = thermo.Cp(Tw, patchi)*Tw.refGrad()
-        + patch().deltaCoeffs()*
-         (
-            thermo.hs(Tw, patchi)
-          - thermo.hs(Tw, patch().faceCells())
-         );
+          + patch().deltaCoeffs()*
+            (
+                thermo.hs(Tw, patchi)
+              - thermo.hs(Tw, patch().faceCells())
+            );
     }
 
     mixedFvPatchScalarField::updateCoeffs();

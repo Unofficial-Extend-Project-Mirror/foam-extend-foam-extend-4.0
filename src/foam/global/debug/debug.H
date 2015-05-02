@@ -90,7 +90,7 @@ namespace debug
     //- Lookup tolerances switch or add default value.
     double tolerancesFromDict(const char* name, const double defaultValue = 0);
 
-    //- Lookup tolerances switch or add default value.
+    //- Lookup dimensionedConstants switch or add default value.
     double constantsFromDict(const char* name, const double defaultValue = 0);
 
     //- Internal function to lookup a sub-dictionary from controlDict.

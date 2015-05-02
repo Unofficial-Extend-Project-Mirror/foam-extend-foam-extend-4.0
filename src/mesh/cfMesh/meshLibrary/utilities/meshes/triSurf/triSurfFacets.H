@@ -98,6 +98,13 @@ public:
         //- access to patches
         inline const geometricSurfacePatchList& patches() const;
 
+        //- return list of patches in the boundary
+        wordList patchNames() const;
+
+        //- return a list of patch indices corresponding to the given
+        // name, expanding regular expressions
+        labelList findPatches(const word& patchName) const;
+
         //- append a triangle to the end of the list
         inline void appendTriangle(const labelledTri& tria);
 

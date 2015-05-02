@@ -1,0 +1,66 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                |
+| \\      /  F ield         | cfMesh: A library for mesh generation          | 
+|  \\    /   O peration     |                                                |
+|   \\  /    A nd           | Author: Franjo Juretic                         | 
+|    \\/     M anipulation  | E-mail: franjo.juretic@c-fields.com            |
+\*---------------------------------------------------------------------------*/
+
+FoamFile
+{
+    version   2.0;
+    format    ascii;
+    class     dictionary;
+    location  "system";
+    object    fvSchemes;
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+ddtSchemes
+{
+    default Euler;
+}
+
+divSchemes
+{
+    default Gauss linear;
+    div(phi,U)  Gauss limitedLinearV 1;
+}
+
+fluxRequired
+{
+    default no;
+    p   p;
+}
+
+gradSchemes
+{
+    default Gauss linear;
+    grad(U) Gauss linear;
+    grad(p) Gauss linear;
+}
+
+interpolationSchemes
+{
+    default linear;
+    interpolate(HbyA)   linear;
+    interpolate(U)  linear;
+    interpolate(p)  linear;
+}
+
+laplacianSchemes
+{
+    default Gauss linear corrected;
+    laplacian(1|A(U),p) Gauss linear corrected;
+    laplacian(nu,U) Gauss linear corrected;
+}
+
+snGradSchemes
+{
+    default corrected;
+    sngrad(U)   corrected;
+    sngrad(p)   corrected;
+}
+
+// ************************************************************************* //

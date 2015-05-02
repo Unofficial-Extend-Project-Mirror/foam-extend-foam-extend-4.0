@@ -69,7 +69,9 @@ inline Foam::scalar Foam::specieThermo<thermo>::T
                 "scalar (specieThermo<thermo>::*F)(const scalar) const, "
                 "scalar (specieThermo<thermo>::*dFdT)(const scalar) const"
                 ") const"
-            )   << "Maximum number of iterations exceeded.  Rescue by HJ"
+            )   << "Maximum number of iterations exceeded.  T0 = "
+                << T0 << " F = " << (this->*F)(Test)
+                << " dFdT = " << (this->*dFdT)(Test)
                 << endl;
 
             // Use value where dFdT is calculated using T0.  HJ, 11/Oct/2010

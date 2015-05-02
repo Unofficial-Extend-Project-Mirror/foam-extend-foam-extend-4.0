@@ -43,6 +43,7 @@ SourceFiles
 #ifndef lengthScaleEstimator_H
 #define lengthScaleEstimator_H
 
+#include "Tuple2.H"
 #include "polyMesh.H"
 #include "dictionary.H"
 
@@ -108,8 +109,14 @@ class lengthScaleEstimator
         //  are to be avoided
         labelList noModPatchIDs_;
 
+        //- Typedefs for field refinement function pointers
+        typedef scalar (lengthScaleEstimator::*ScaleFn)(const scalar) const;
+        typedef Tuple2<const char*, ScaleFn> ScaleFnPair;
+
         //- Field-based refinement
         word field_;
+        ScaleFn scale_;
+        bool gradient_;
         scalar fieldLength_;
         scalar lowerRefineLevel_;
         scalar upperRefineLevel_;
@@ -117,6 +124,9 @@ class lengthScaleEstimator
         //- Specify limits for refinement criteria
         scalar meanScale_;
         label maxRefineLevel_;
+
+        //- Function pointers for scale methods
+        static ScaleFnPair methods_[];
 
     // Private Member Functions
 
@@ -153,9 +163,19 @@ class lengthScaleEstimator
             labelHashSet& levelCells
         ) const;
 
+        // Use a constant length scale for field-based refinement
+        scalar constantScale(const scalar fieldValue) const;
+
+        // Use a direct-proportion length scale for field-based refinement
+        scalar directScale(const scalar fieldValue) const;
+
+        // Use an inverse-proportion length scale for field-based refinement
+        scalar inverseScale(const scalar fieldValue) const;
+
 public:
 
     // Declare the name of the class and its debug switch
+
         TypeName("lengthScaleEstimator");
 
     // Constructors

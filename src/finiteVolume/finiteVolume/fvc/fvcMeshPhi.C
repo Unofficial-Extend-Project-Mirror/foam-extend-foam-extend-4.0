@@ -88,6 +88,7 @@ void Foam::fvc::makeRelative
     }
 }
 
+
 void Foam::fvc::makeRelative
 (
     surfaceScalarField& phi,
@@ -100,6 +101,7 @@ void Foam::fvc::makeRelative
         phi -= rho*fvc::meshPhi(rho, U);
     }
 }
+
 
 void Foam::fvc::makeRelative
 (
@@ -127,6 +129,7 @@ void Foam::fvc::makeAbsolute
     }
 }
 
+
 void Foam::fvc::makeAbsolute
 (
     surfaceScalarField& phi,
@@ -139,6 +142,7 @@ void Foam::fvc::makeAbsolute
         phi += rho*fvc::meshPhi(rho, U);
     }
 }
+
 
 void Foam::fvc::makeAbsolute
 (

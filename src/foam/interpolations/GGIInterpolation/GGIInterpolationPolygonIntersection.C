@@ -192,7 +192,7 @@ GGIInterpolation<MasterPatch, SlavePatch>::polygonIntersection
             (
                 "GGIInterpolation<MasterPatch, SlavePatch>::"
                 "polygonIntersection"
-            )   << "Intersection might be wrong wrong: clipping side "
+            )   << "Intersection might be wrong.  Clipping side "
                 << intersectionArea/clippingArea << " subject: "
                 << intersectionArea/subjectArea << endl;
         }

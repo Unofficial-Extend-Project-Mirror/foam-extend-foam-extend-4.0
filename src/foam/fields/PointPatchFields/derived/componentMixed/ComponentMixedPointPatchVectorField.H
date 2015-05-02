@@ -196,7 +196,7 @@ public:
             //- Insert boundary value into the internal field
             virtual void evaluate
             (
-                const Pstream::commsTypes commsType=Pstream::blocking
+                const Pstream::commsTypes commsType = Pstream::blocking
             );
 
             //- Set boundary condition to matrix

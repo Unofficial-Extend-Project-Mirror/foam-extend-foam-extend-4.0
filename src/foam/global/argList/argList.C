@@ -74,11 +74,11 @@ Foam::argList::initValidTables::initValidTables()
     validOptions.set("parallel", "");
     validParOptions.set("parallel", "");
     validOptions.set("noFunctionObjects", "");
-    validOptions.set("DebugSwitches", "key=value");
-    validOptions.set("InfoSwitches", "key=value");
-    validOptions.set("OptimisationSwitches", "key=value");
-    validOptions.set("Tolerances", "key=value");
-    validOptions.set("DimensionedConstants", "key=value");
+    validOptions.set("DebugSwitches", "key1=val1,key2=val2,...");
+    validOptions.set("InfoSwitches", "key1=val1,key2=val2,...");
+    validOptions.set("OptimisationSwitches", "key1=val1,key2=val2,...");
+    validOptions.set("Tolerances", "key1=val1,key2=val2,...");
+    validOptions.set("DimensionedConstants", "key1=val1,key2=val2,...");
     Pstream::addValidParOptions(validParOptions);
 }
 

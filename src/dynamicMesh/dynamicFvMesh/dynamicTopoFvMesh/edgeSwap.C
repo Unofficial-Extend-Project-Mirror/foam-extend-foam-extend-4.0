@@ -160,7 +160,7 @@ bool dynamicTopoFvMesh::testDelaunay
         forAll(procIndices_, pI)
         {
             // Fetch non-const reference to subMeshes
-            const coupledInfo& recvMesh = recvMeshes_[pI];
+            const coupledMesh& recvMesh = recvMeshes_[pI];
 
             const coupleMap& cMap = recvMesh.map();
             const dynamicTopoFvMesh& sMesh = recvMesh.subMesh();
@@ -1073,7 +1073,7 @@ const changeMap dynamicTopoFvMesh::swapQuadFace
     topoChangeFlag_ = true;
 
     // Increment the counter
-    statistics_[1]++;
+    status(TOTAL_SWAPS)++;
 
     // Return a successful operation.
     map.type() = 1;
@@ -1853,7 +1853,7 @@ const changeMap dynamicTopoFvMesh::removeEdgeFlips
     map.removeEdge(eIndex);
 
     // Increment the counter
-    statistics_[1]++;
+    status(TOTAL_SWAPS)++;
 
     // Set the flag
     topoChangeFlag_ = true;
@@ -2337,7 +2337,7 @@ const changeMap dynamicTopoFvMesh::swap23
 
         if (debug > 2)
         {
-            Pout<< " On SubMesh: " << Switch::asText(isSubMesh_) << nl;
+            Pout<< " On SubMesh: " << isSubMesh_ << nl;
             Pout<< " coupledModification: " << coupledModification_ << nl;
 
             label bPatch = whichEdgePatch(eIndex);
@@ -2379,7 +2379,7 @@ const changeMap dynamicTopoFvMesh::swap23
               + "_beforeSwap_"
               + Foam::name(numTriangulations) + "_"
               + Foam::name(triangulationIndex),
-                cellsForRemoval,
+                labelList(cellsForRemoval),
                 3, false, true
             );
         }
@@ -2487,7 +2487,8 @@ const changeMap dynamicTopoFvMesh::swap23
             -1,
             tmpTriFace,
             newCellIndex[0],
-            newCellIndex[1]
+            newCellIndex[1],
+            labelList(0)
         )
     );
 
@@ -2509,7 +2510,8 @@ const changeMap dynamicTopoFvMesh::swap23
             -1,
             tmpTriFace,
             newCellIndex[1],
-            newCellIndex[2]
+            newCellIndex[2],
+            labelList(0)
         )
     );
 
@@ -2528,18 +2530,13 @@ const changeMap dynamicTopoFvMesh::swap23
             -1,
             tmpTriFace,
             newCellIndex[0],
-            newCellIndex[2]
+            newCellIndex[2],
+            labelList(0)
         )
     );
 
     // Add this face to the map.
     map.addFace(newFaceIndex[2]);
-
-    // Append three dummy faceEdges entries.
-    for (label i = 0; i < 3; i++)
-    {
-        faceEdges_.append(labelList(0));
-    }
 
     // Add an entry to edgeFaces
     labelList newEdgeFaces(3);
@@ -2901,7 +2898,7 @@ const changeMap dynamicTopoFvMesh::swap23
               + "_afterSwap_"
               + Foam::name(numTriangulations) + "_"
               + Foam::name(triangulationIndex),
-                newCellIndex,
+                labelList(newCellIndex),
                 3, false, true
             );
         }
@@ -2996,7 +2993,7 @@ const changeMap dynamicTopoFvMesh::swap32
 
         if (debug > 2)
         {
-            Pout<< " On SubMesh: " << Switch::asText(isSubMesh_) << nl;
+            Pout<< " On SubMesh: " << isSubMesh_ << nl;
             Pout<< " coupledModification: " << coupledModification_ << nl;
 
             label bPatch = whichEdgePatch(eIndex);
@@ -3082,7 +3079,8 @@ const changeMap dynamicTopoFvMesh::swap32
             -1,
             newTriFace,
             newCellIndex[0],
-            newCellIndex[1]
+            newCellIndex[1],
+            labelList(3, -1)
         )
     );
 
@@ -3091,9 +3089,6 @@ const changeMap dynamicTopoFvMesh::swap32
 
     // Note the triangulation face in index()
     map.index() = newFaceIndex;
-
-    // Add faceEdges for the new face as well.
-    faceEdges_.append(labelList(3));
 
     // Define the three edges to check while building faceEdges:
     FixedList<edge,3> check;
@@ -3208,7 +3203,8 @@ const changeMap dynamicTopoFvMesh::swap32
                 facePatch,
                 newBdyTriFace[0],
                 newCellIndex[1],
-                -1
+                -1,
+                labelList(3, -1)
             )
         );
 
@@ -3223,7 +3219,8 @@ const changeMap dynamicTopoFvMesh::swap32
                 facePatch,
                 newBdyTriFace[1],
                 newCellIndex[0],
-                -1
+                -1,
+                labelList(3, -1)
             )
         );
 
@@ -3286,11 +3283,11 @@ const changeMap dynamicTopoFvMesh::swap32
         }
 
         // Add faceEdges for the two new boundary faces
-        faceEdges_.append(bdyFaceEdges[0]);
-        faceEdges_.append(bdyFaceEdges[1]);
+        faceEdges_[newBdyFaceIndex[0]] = bdyFaceEdges[0];
+        faceEdges_[newBdyFaceIndex[1]] = bdyFaceEdges[1];
 
         // Update the number of surface swaps.
-        statistics_[2]++;
+        status(SURFACE_SWAPS)++;
     }
 
     newTetCell[0][nF0++] = newFaceIndex;
@@ -3520,7 +3517,7 @@ const changeMap dynamicTopoFvMesh::swap32
               + "_afterSwap_"
               + Foam::name(numTriangulations) + "_"
               + Foam::name(triangulationIndex),
-                newCellIndex,
+                labelList(newCellIndex),
                 3, false, true
             );
         }

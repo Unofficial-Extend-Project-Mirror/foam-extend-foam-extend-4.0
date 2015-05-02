@@ -72,11 +72,11 @@ class linearValveFvMesh
         //- Add linearValve zones and modifiers
         void addZonesAndModifiers();
 
-        //- Make sliding modifiers live
-        void makeSlidersDead();
+        //- Make sliding modifiers inactive
+        void deactivateSliders();
 
-        //- Make sliding modifiers live
-        void makeSlidersLive();
+        //- Make sliding modifiers active
+        void activateSliders();
 
         //- Return true if sliders are attached
         bool attached() const;

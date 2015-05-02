@@ -42,6 +42,7 @@ SourceFiles
 #include "BlockLduMatrix.H"
 #include "BlockCoeffNorm.H"
 #include "BlockCoeff.H"
+#include "tolerancesSwitch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -74,6 +75,9 @@ class BlockMatrixAgglomeration
         //- Group size
         label groupSize_;
 
+        //- Number of solo cells
+        label nSolo_;
+
         //- Number of coarse equations
         label nCoarseEqns_;
 
@@ -96,7 +100,7 @@ class BlockMatrixAgglomeration
     // Private Static Data
 
         //- Diagonal scaling factor
-        static const scalar diagFactor_;
+        static const debug::tolerancesSwitch diagFactor_;
 
         //- Weighting factor
         static const scalar weightFactor_;

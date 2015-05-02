@@ -52,7 +52,7 @@ class translatingWallVelocityFvPatchVectorField
 {
     // Private data
 
-        //- Origin of the rotation
+        //- Translating velocity
         vector U_;
 
 

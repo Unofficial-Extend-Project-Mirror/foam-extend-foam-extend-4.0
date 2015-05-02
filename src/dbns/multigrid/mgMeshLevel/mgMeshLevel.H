@@ -90,10 +90,10 @@ public:
         // Coarsening parameters
 
             //- Minimum cluster size
-            static label mgMinClusterSize_;
+            static const Foam::debug::optimisationSwitch mgMinClusterSize_;
 
             //- Maximum cluster size
-            static label mgMaxClusterSize_;
+            static const Foam::debug::optimisationSwitch mgMaxClusterSize_;
 
 
     // Constructor

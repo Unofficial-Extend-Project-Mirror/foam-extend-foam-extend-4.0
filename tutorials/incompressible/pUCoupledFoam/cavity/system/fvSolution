@@ -69,8 +69,16 @@ solvers
 
 blockSolver
 {
+    convergence 1e-6;
+
     pRefCell 0;
     pRefValue 0;
+}
+
+fieldBounds
+{
+    U      500;
+    p      -5e4 5e4;
 }
 
 relaxationFactors

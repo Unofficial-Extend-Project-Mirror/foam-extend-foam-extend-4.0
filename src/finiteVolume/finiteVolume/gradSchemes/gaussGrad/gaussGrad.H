@@ -163,6 +163,8 @@ public:
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
+#include "scalarGaussGrad.H"
+
 #ifdef NoRepository
 #   include "gaussGrad.C"
 #endif

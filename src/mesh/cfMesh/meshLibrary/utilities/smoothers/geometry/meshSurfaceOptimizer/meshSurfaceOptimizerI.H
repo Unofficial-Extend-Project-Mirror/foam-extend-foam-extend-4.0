@@ -90,11 +90,14 @@ inline bool meshSurfaceOptimizer::transformIntoPlane
 ) const
 {
     # ifdef DEBUGSmooth
-    Info << "Transforming boundary node " << bpI << endl;
+    Pout << "Transforming boundary node " << bpI << endl;
     # endif
 
     const partTriMesh& triMesh = this->triMesh();
     const label triPointI = triMesh.meshSurfacePointLabelInTriMesh()[bpI];
+    if( triPointI < 0 )
+        return false;
+
     partTriMeshSimplex simplex(triMesh, triPointI);
 
     const DynList<point, 32>& sPts = simplex.pts();
@@ -124,8 +127,8 @@ inline bool meshSurfaceOptimizer::transformIntoPlane
     trias = simplex.triangles();
 
     # ifdef DEBUGSmooth
-    Info << "VecX " << vecX << endl;
-    Info << "vecY " << vecY << endl;
+    Pout << "VecX " << vecX << endl;
+    Pout << "vecY " << vecY << endl;
     # endif
 
     //- transform the vertices
@@ -178,135 +181,6 @@ inline bool meshSurfaceOptimizer::transformIntoPlane
     # endif
 
     return found;
-}
-
-inline bool meshSurfaceOptimizer::transformIntoPlaneParallel
-(
-    const label bpI,
-    const plane& pl,
-    const std::map<label, DynList<parTriFace> >& m,
-    vector& vecX,
-    vector& vecY,
-    DynList<point>& pts,
-    DynList<triFace>& trias
-) const
-{
-    /*
-    # ifdef DEBUGSmooth
-    Info << "Transforming boundary node at parallel interface " << bpI << endl;
-    # endif
-
-    const pointFieldPMG& points = surfaceEngine_.points();
-    const labelList& bPoints = surfaceEngine_.boundaryPoints();
-
-    const labelList& globalPointLabel =
-        surfaceEngine_.globalBoundaryPointLabel();
-
-    std::map<label, DynList<parTriFace> >::const_iterator
-        pIter = m.find(globalPointLabel[bpI]);
-
-    if( pIter == m.end() )
-    {
-        FatalErrorIn
-        (
-            "(const label, const plane&,"
-            " const std::map<label, DynList<parTriFace> >&,"
-            " vector&, vector&, DynList<point>&, DynList<triFace>&) const"
-        ) << " Cannot find node " << globalPointLabel[bpI]
-          << " in the map" << abort(FatalError);
-    }
-
-    const DynList<parTriFace>& pFcs = pIter->second;
-
-    # ifdef DEBUGSmooth
-    if( globalPointLabel[bpI] != pFcs[0].globalLabelOfPoint(0) )
-        FatalError << "Wrong points supplied!" << abort(FatalError);
-    Info << "Triangles containing this node are " << pFcs << endl;
-    # endif
-
-    //- create vecX and vecY
-    const point& p = points[bPoints[bpI]];
-    pts.setSize(0);
-    bool found(false);
-
-    forAll(pFcs, tI)
-    {
-        const point sp = pl.nearestPoint(pFcs[tI].trianglePoints().centre());
-        const scalar d = mag(sp - p);
-        if( d > VSMALL )
-        {
-            vecX = sp - p;
-            vecX /= d;
-            vecY = pl.normal() ^ vecX;
-            vecY /= mag(vecY);
-            found = true;
-            break;
-        }
-    }
-
-    if( !found )
-        return false;
-
-    # ifdef DEBUGSmooth
-    Info << "VecX " << vecX << endl;
-    Info << "vecY " << vecY << endl;
-    # endif
-
-    //- transform the vertices
-    //label counter(0);
-    Map<label> pointMapping;
-    trias.setSize(pFcs.size());
-
-    //- tranfer triangle from other proc first
-    forAll(pFcs, triI)
-    {
-        const parTriFace& tri = pFcs[triI];
-
-        triFace& tf = trias[triI];
-
-        for(label pI=0;pI<3;++pI)
-        {
-            const Map<label>::iterator fnd =
-                pointMapping.find(tri.globalLabelOfPoint(pI));
-
-            if( fnd != pointMapping.end() )
-            {
-                tf[pI] = fnd();
-            }
-            else
-            {
-                point tp;
-                if( pI == 0 )
-                {
-                    tp = tri.trianglePoints().a();
-                }
-                else if( pI == 1 )
-                {
-                    tp = tri.trianglePoints().b();
-                }
-                else
-                {
-                    tp = tri.trianglePoints().c();
-                }
-
-                const point pt
-                (
-                    ((tp - p) & vecX),
-                    ((tp - p) & vecY),
-                    0.0
-                );
-
-                tf[pI] = pts.size();
-                pointMapping.insert(tri.globalLabelOfPoint(pI), pts.size());
-                pts.append(pt);
-            }
-        }
-    }
-
-    return found;
-    */
-
-    return false;
 }
 
 inline point meshSurfaceOptimizer::newPositionLaplacian
@@ -462,9 +336,9 @@ inline point meshSurfaceOptimizer::newPositionSurfaceOptimizer
     const labelList& bPoints = surfaceEngine_.boundaryPoints();
 
     # ifdef DEBUGSmooth
-    Info << "Smoothing boundary node " << bpI << endl;
-    Info << "Node label in the mesh is " << bPoints[bpI] << endl;
-    Info << "Point coordinates " << points[bPoints[bpI]] << endl;
+    Pout << "Smoothing boundary node " << bpI << endl;
+    Pout << "Node label in the mesh is " << bPoints[bpI] << endl;
+    Pout << "Point coordinates " << points[bPoints[bpI]] << endl;
     # endif
 
     //- project vertices onto the plane
@@ -480,7 +354,7 @@ inline point meshSurfaceOptimizer::newPositionSurfaceOptimizer
     bool success = this->transformIntoPlane(bpI, pl, vecX, vecY, pts, trias);
     if( !success )
     {
-        Warning << "Cannot transform to plane" << endl;
+        //Warning << "Cannot transform to plane" << endl;
         return points[bPoints[bpI]];
     }
 

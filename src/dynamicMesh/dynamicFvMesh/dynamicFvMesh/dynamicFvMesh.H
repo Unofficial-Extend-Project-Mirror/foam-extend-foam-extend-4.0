@@ -46,7 +46,7 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class dynamicFvMesh Declaration
+                        Class dynamicFvMesh Declaration
 \*---------------------------------------------------------------------------*/
 
 class dynamicFvMesh

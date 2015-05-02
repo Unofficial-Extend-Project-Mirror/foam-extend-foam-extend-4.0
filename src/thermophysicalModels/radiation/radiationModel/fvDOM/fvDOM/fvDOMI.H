@@ -92,10 +92,46 @@ inline const Foam::volScalarField& Foam::radiation::fvDOM::Qr() const
 }
 
 
+inline const Foam::volScalarField::GeometricBoundaryField&
+Foam::radiation::fvDOM::Qin(const label lambdaI) const
+{
+    return Qin_[lambdaI];
+}
+
+
+inline const Foam::volScalarField::GeometricBoundaryField&
+Foam::radiation::fvDOM::Qem(const label lambdaI) const
+{
+    return Qem_[lambdaI];
+}
+
+
 inline const Foam::radiation::blackBodyEmission&
 Foam::radiation::fvDOM::blackBody() const
 {
     return blackBody_;
+}
+
+
+inline const Foam::fvScalarMatrix& Foam::radiation::fvDOM::fvRayDiv
+(
+    const label rayId,
+    const label lambdaI
+) const
+{
+    return fvRayDiv_[lambdaI][rayId];
+}
+
+
+inline bool Foam::radiation::fvDOM::cacheDiv() const
+{
+    return cacheDiv_;
+}
+
+
+inline Foam::scalar Foam::radiation::fvDOM::omegaMax() const
+{
+    return omegaMax_;
 }
 
 

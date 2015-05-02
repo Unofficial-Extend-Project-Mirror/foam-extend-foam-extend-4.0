@@ -40,12 +40,13 @@ label boundaryLayers::findNewNodeLabel
     const label pKey
 ) const
 {
-    if( otherVrts_.find(pointI) != otherVrts_.end() )
+    const std::map
+    <
+        label, std::map<std::pair<label, label>, label>
+    >::const_iterator it = otherVrts_.find(pointI);
+
+    if( it != otherVrts_.end() )
     {
-        const std::map
-        <
-            label, std::map<std::pair<label, label>, label>
-        >::const_iterator it = otherVrts_.find(pointI);
         const std::map<std::pair<label, label>, label>& m = it->second;
 
         std::map<std::pair<label, label>, label>::const_iterator mit;
@@ -67,7 +68,7 @@ label boundaryLayers::findNewNodeLabel
                     continue;
                 if( mit->first.first == mit->first.second )
                     continue;
-                
+
                 return mit->second;
             }
         }
@@ -88,22 +89,22 @@ inline void boundaryLayers::createNewCellFromEdge
         otherVrts_.find(e.start())->second;
     const std::map<std::pair<label, label>, label>& me =
         otherVrts_.find(e.end())->second;
-    
+
     # ifdef DEBUGLayer
-    Info << "Creating cell for edge " << edgeI << " with nodes " << e << endl;
+    Info << "Creating cell for edge with nodes " << e << endl;
     Info << "pKeyI " << pKeyI << endl;
     Info << "pKeyJ " << pKeyJ << endl;
     std::map<std::pair<label, label>, label>::const_iterator iter;
     for(iter=ms.begin();iter!=ms.end();++iter)
-        Info << "1. Pair (" << iter->first.first << ", " 
+        Info << "1. Pair (" << iter->first.first << ", "
             << iter->first.second << ") has value " << iter->second << endl;
     for(iter=me.begin();iter!=me.end();++iter)
-        Info << "2. Pair (" << iter->first.first << ", " 
+        Info << "2. Pair (" << iter->first.first << ", "
             << iter->first.second << ") has value " << iter->second << endl;
     # endif
-    
+
     label p0s(-1), p1s(-1), ns(-1), p0e(-1), p1e(-1), ne(-1);
-    
+
     if( ms.size() == 2 )
     {
         p0s = ms.find(std::pair<label, label>(pKeyI, pKeyI))->second;
@@ -172,7 +173,7 @@ inline void boundaryLayers::createNewCellFromEdge
             }
         }
     }
-    
+
     //- F0
     cellFaces[0][0] = e.end();
     cellFaces[0][1] = e.start();
@@ -208,6 +209,22 @@ inline void boundaryLayers::createNewCellFromEdge
     cellFaces[5][1] = p0s;
     cellFaces[5][2] = ns;
     cellFaces[5][3] = p1s;
+
+    # ifdef DEBUGLayer
+    forAll(cellFaces, fI)
+    {
+        forAll(cellFaces[fI], pI)
+        {
+            if
+            (
+                cellFaces[fI][pI] < 0 ||
+                cellFaces[fI][pI] >= mesh_.points().size()
+            )
+                FatalError << "Invalid point indices found!"
+                           << abort(FatalError);
+        }
+    }
+    # endif
 }
 
 inline void boundaryLayers::createNewCellFromNode
@@ -219,7 +236,7 @@ inline void boundaryLayers::createNewCellFromNode
 {
     const std::map<std::pair<label, label>, label>& m =
         otherVrts_.find(pointI)->second;
-    
+
     //- create labels before creating cells
     const label n = newLabelForVertex_[pointI];
     const label p00 =
@@ -238,7 +255,7 @@ inline void boundaryLayers::createNewCellFromNode
         pr.second = pKeys[0];
     }
     const label p01 = m.find(pr)->second;
-    
+
     pr.first = pKeys[0];
     pr.second = pKeys[2];
     if( m.find(pr) == m.end() )
@@ -247,7 +264,7 @@ inline void boundaryLayers::createNewCellFromNode
         pr.second = pKeys[0];
     }
     const label p02 = m.find(pr)->second;
-    
+
     pr.first = pKeys[1];
     pr.second = pKeys[2];
     if( m.find(pr) == m.end() )
@@ -256,9 +273,8 @@ inline void boundaryLayers::createNewCellFromNode
         pr.second = pKeys[1];
     }
     const label p12 = m.find(pr)->second;
-    
+
     //- create the cell and append it
-    
     //- F0
     cellFaces[0][0] = pointI;
     cellFaces[0][1] = p02;

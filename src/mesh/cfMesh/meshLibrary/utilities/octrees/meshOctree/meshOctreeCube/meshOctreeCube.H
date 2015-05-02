@@ -97,9 +97,6 @@ class meshOctreeCube
         //- this is needed for parallel coarsening of the octree
         //inline void reclaimDataFromChild(const label scI);
 
-        //- Disallow default bitwise copy construct
-        meshOctreeCube(const meshOctreeCube&);
-
         //- Disallow copy construct from meshOctreeCubeBasic
         meshOctreeCube(const meshOctreeCubeBasic&);
 
@@ -109,6 +106,9 @@ public:
 
         //- Default constructor
         inline meshOctreeCube();
+
+        //- Copy construct
+        inline meshOctreeCube(const meshOctreeCube&);
 
         //- Construct from coordinates
         meshOctreeCube(const meshOctreeCubeCoordinates&);

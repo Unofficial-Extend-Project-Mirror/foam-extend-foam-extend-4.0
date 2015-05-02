@@ -69,6 +69,7 @@ int main(int argc, char *argv[])
         mesh.update();
 
 #       include "checkVolContinuity.H"
+#       include "meshCourantNo.H"
 
         if
         (

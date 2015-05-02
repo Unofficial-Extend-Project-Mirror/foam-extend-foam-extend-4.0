@@ -53,7 +53,7 @@ GGIInterpolation<MasterPatch, SlavePatch>::faceBoundBoxExtendSpanFraction_
 
 template<class MasterPatch, class SlavePatch>
 const Foam::debug::optimisationSwitch
- GGIInterpolation<MasterPatch, SlavePatch>::octreeSearchMinNLevel_
+GGIInterpolation<MasterPatch, SlavePatch>::octreeSearchMinNLevel_
 (
     "GGIOctreeSearchMinNLevel",
     3

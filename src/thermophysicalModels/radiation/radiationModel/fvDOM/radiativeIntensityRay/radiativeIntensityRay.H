@@ -38,6 +38,7 @@ SourceFiles
 #include "absorptionEmissionModel.H"
 #include "blackBodyEmission.H"
 
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
@@ -78,9 +79,6 @@ private:
         //- Total radiative intensity / [W/m2]
         volScalarField I_;
 
-        //- Total radiative heat flux on boundary
-        volScalarField Qr_;
-
         //- Direction
         vector d_;
 
@@ -104,6 +102,9 @@ private:
 
         //- Global ray id - incremented in constructor
         static label rayId;
+
+        //- My ray Id
+        label myRayId_;
 
 
     // Private member functions
@@ -130,7 +131,8 @@ public:
             const scalar deltaTheta,
             const label lambda,
             const absorptionEmissionModel& absEmmModel_,
-            const blackBodyEmission& blackBody
+            const blackBodyEmission& blackBody,
+            const label rayId
         );
 
 
@@ -156,6 +158,9 @@ public:
             );
 
             //- Add radiative intensities from all the bands
+            void updateBCs();
+
+            //- Add radiative intensities from all the bands
             void addIntensity();
 
 
@@ -163,12 +168,6 @@ public:
 
             //- Return intensity
             inline const volScalarField& I() const;
-
-            //- Return const access to the boundary heat flux
-            inline const volScalarField& Qr() const;
-
-            //- Return non-const access to the boundary heat flux
-            inline volScalarField& Qr();
 
             //- Return direction
             inline const vector& d() const;
@@ -187,6 +186,9 @@ public:
 
             //- Return the solid angle
             inline scalar omega() const;
+
+            //- Return the radiative intensity for a given wavelength
+            inline volScalarField& ILambda(const label lambdaI);
 
             //- Return the radiative intensity for a given wavelength
             inline const volScalarField& ILambda(const label lambdaI) const;

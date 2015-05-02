@@ -123,6 +123,17 @@ wedgeFvsPatchField<Type>::wedgeFvsPatchField
 {}
 
 
+// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+
+// Write
+template<class Type>
+void wedgeFvsPatchField<Type>::write(Ostream& os) const
+{
+    fvsPatchField<Type>::write(os);
+    this->writeEntry("value", os);
+}
+
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam

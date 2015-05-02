@@ -62,6 +62,9 @@ class objectRefinement
         //- cell size for this object
         scalar cellSize_;
 
+        //- refinement thickness fro this object
+        scalar refThickness_;
+
 public:
 
     // Runtime type information
@@ -134,6 +137,18 @@ public:
         scalar cellSize() const
         {
             return cellSize_;
+        }
+
+        //- set refinement thickness
+        void setRefinementThickness(const scalar refThickness)
+        {
+            refThickness_ = refThickness_;
+        }
+
+        //- return refinement thickness for this object
+        scalar refinementThickness() const
+        {
+            return refThickness_;
         }
 
         //- Return as dictionary of entries

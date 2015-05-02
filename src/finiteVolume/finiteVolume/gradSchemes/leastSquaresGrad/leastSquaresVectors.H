@@ -39,6 +39,7 @@ SourceFiles
 #include "fvMesh.H"
 #include "surfaceFieldsFwd.H"
 #include "labelPair.H"
+#include "tolerancesSwitch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -72,6 +73,12 @@ public:
 
     // Declare name of the class and its debug switch
     TypeName("leastSquaresVectors");
+
+
+    // Static data members
+
+        //- Point merge tolerance
+        static const Foam::debug::tolerancesSwitch smallDotProdTol_;
 
 
     // Constructors

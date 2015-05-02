@@ -374,15 +374,17 @@ void meshOctreeAddressing::findUsedBoxes() const
             boolList removeFacets(ts.size(), false);
 
             //- remove facets in patches
-            forAll(ts.patches(), patchI)
+            forAllConstIter(HashSet<word>, patchesToRemove, it)
             {
-                if( patchesToRemove.found(ts.patches()[patchI].name()) )
+                const labelList matchedPatches = ts.findPatches(it.key());
+                boolList activePatch(ts.patches().size(), false);
+                forAll(matchedPatches, ptchI)
+                    activePatch[matchedPatches[ptchI]] = true;
+
+                forAll(ts, triI)
                 {
-                    forAll(ts, triI)
-                    {
-                        if( ts[triI].region() == patchI )
-                            removeFacets[triI] = true;
-                    }
+                    if( activePatch[ts[triI].region()] )
+                        removeFacets[triI] = true;
                 }
             }
 
@@ -441,20 +443,22 @@ void meshOctreeAddressing::findUsedBoxes() const
         const triSurf& ts = octree_.surface();
         boolList keepFacets(ts.size(), false);
 
-        //- remove facets in patches
-        forAll(ts.patches(), patchI)
+        //- keep facets in patches
+        forAllConstIter(HashSet<word>, patchesToKeep, it)
         {
-            if( patchesToKeep.found(ts.patches()[patchI].name()) )
+            const labelList matchedPatches = ts.findPatches(it.key());
+            boolList activePatch(ts.patches().size(), false);
+            forAll(matchedPatches, ptchI)
+                activePatch[matchedPatches[ptchI]] = true;
+
+            forAll(ts, triI)
             {
-                forAll(ts, triI)
-                {
-                    if( ts[triI].region() == patchI )
-                        keepFacets[triI] = true;
-                }
+                if( activePatch[ts[triI].region()] )
+                    keepFacets[triI] = true;
             }
         }
 
-        //- remove facets in subsets
+        //- keep facets in subsets
         forAllConstIter(wordHashSet, patchesToKeep, it)
         {
             const label subsetID = ts.facetSubsetIndex(it.key());
@@ -900,7 +904,11 @@ void meshOctreeAddressing::createOctreeFaces() const
 
     forAll(sum, lfI)
     {
-        if( Pstream::parRun() && octree_.returnLeaf(lfI).procNo() != Pstream::myProcNo() )
+        if
+        (
+            Pstream::parRun() &&
+            octree_.returnLeaf(lfI).procNo() != Pstream::myProcNo()
+        )
             continue;
         if( (boxType[lfI] & MESHCELL) && (mag(sum[lfI]) > SMALL) )
             Info << "Leaf " << lfI << " is not closed " << sum[lfI] << endl;

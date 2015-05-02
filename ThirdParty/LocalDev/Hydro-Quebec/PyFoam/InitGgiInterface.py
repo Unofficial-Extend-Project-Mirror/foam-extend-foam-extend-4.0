@@ -19,15 +19,16 @@ import sys, fnmatch, re
 from os import path, listdir, chmod
 from stat import *
 
-from PyFoamApplication import PyFoamApplication
+from PyFoam.Applications.PyFoamApplication import PyFoamApplication
 from PyFoam.RunDictionary.ParsedParameterFile import ParsedParameterFile
+from PyFoam.ThirdParty.six import print_
 from PyFoam.RunDictionary.TimeDirectory import TimeDirectory
 from PyFoam.Basics.BasicFile import BasicFile
 
 class InitGgiInterface(PyFoamApplication):
     def __init__(self,args=None):
         description="""
-Init GGI boundary condition parameters in boundary file. 
+Init GGI boundary condition parameters in boundary file.
 Init GGI boundary fields in time directories.
 Generate faceSet scripts for ggi zones.
 Modify GGI zones information in decomposeParDict file.
@@ -105,7 +106,7 @@ Modify GGI zones information in decomposeParDict file.
 Create a default definition for a ggi patch, and replace
 the current definition
         """
-        print "Replacing definition of patch: ", patchName, ":", patch
+        print_("Replacing definition of patch: ", patchName, ":", patch)
         newPatch={
             'type'             : ggiType,
             'nFaces'           : patch["nFaces"],
@@ -123,7 +124,7 @@ the current definition
         description="""\
 Modify the definition of a ggi patch
         """
-        print "    Modifying ggi boundary definition in constant/polyMesh/boundary for patch", patchName
+        print_("    Modifying ggi boundary definition in constant/polyMesh/boundary for patch", patchName)
 
         patch["type"]=ggiType
 
@@ -167,12 +168,12 @@ Modify the definition of a ggi patch in the time directories
 
         for timeDir in listdir(caseDir):
             if reobj.match(timeDir):
-                print "    Modifying ggi boundaryFields in timeDir", timeDir, "for patch", patchName
+                print_("    Modifying ggi boundaryFields in timeDir", timeDir, "for patch", patchName)
 
                 td=TimeDirectory(caseDir, timeDir, yieldParsedFiles=True)
 
                 for f in td:
-                    print "        Modifying field", f.name
+                    print_("        Modifying field", f.name)
                     f["boundaryField"][patchName]["type"]=ggiType
                     f.writeFile()
 
@@ -183,10 +184,10 @@ Generate a setSet batch file based on the zone info specified in the ggi interfa
 Generate a bash file for invoking setSet and setsToZones
 Update GGI zone infoprmation in decomposeParDict
         """
-        # Default file: genFaceSetForGgiZones.setSet 
+        # Default file: genFaceSetForGgiZones.setSet
         bfGenFaceSets = BasicFile(path.join(caseDir, self.parser.getOptions().genFaceSetForGgiZonesScriptName))
 
-        print "    Updating file ", bfGenFaceSets.name, " for generating GGI zones faceSet using the setSet command"
+        print_("    Updating file ", bfGenFaceSets.name, " for generating GGI zones faceSet using the setSet command")
 
         bnd=boundary.content
 
@@ -209,8 +210,8 @@ Update GGI zone infoprmation in decomposeParDict
         # Default file: initGgiZones.sh
         bfInitGgiZones = BasicFile(path.join(caseDir, self.parser.getOptions().initGgiZonesScriptName))
 
-        print "    Updating file ", bfInitGgiZones.name, " for inititalizing GGI zones"
-        
+        print_("    Updating file ", bfInitGgiZones.name, " for inititalizing GGI zones")
+
         bfInitGgiZones.writeLine([ "#!/bin/bash" ])
         bfInitGgiZones.writeLine([ "setSet -batch " + self.parser.getOptions().genFaceSetForGgiZonesScriptName ])
         bfInitGgiZones.writeLine([ "setsToZones -noFlipMap" ])
@@ -222,7 +223,7 @@ Update GGI zone infoprmation in decomposeParDict
         # DecomposeParDict
         decomposeParDictPath=path.join(caseDir,"system","decomposeParDict")
         if path.exists(decomposeParDictPath):
-            print "    Updating file ", decomposeParDictPath, " for GGI zones"
+            print_("    Updating file ", decomposeParDictPath, " for GGI zones")
             decomposeParDict=ParsedParameterFile(decomposeParDictPath,debug=False,backup=True)
             dcp=decomposeParDict.content
             dcp["globalFaceZones"]="(\n    " + '\n    '.join(list(listOfGgiZones)) + "\n)"
@@ -232,7 +233,7 @@ Update GGI zone infoprmation in decomposeParDict
         caseDir=self.parser.getArgs()[0]
         masterbName=self.parser.getArgs()[1]
         shadowbName=self.parser.getArgs()[2]
- 
+
         boundary=ParsedParameterFile(path.join(".",caseDir,"constant","polyMesh","boundary"),debug=False,boundaryDict=True,backup=True)
 
         bnd=boundary.content
@@ -249,7 +250,7 @@ Update GGI zone infoprmation in decomposeParDict
             timeDirs=self.parser.getOptions().timeDirs
             updateTimeDirs=True
 
-        ggiType=self.parser.getOptions().ggiType 
+        ggiType=self.parser.getOptions().ggiType
 
         rotationAngle=0.0
         if self.parser.getOptions().rotationAngle!=None:
@@ -287,10 +288,9 @@ Update GGI zone infoprmation in decomposeParDict
             self.error("Boundary patch",shadowbName,"not found in",bnd[::2])
 
         if self.parser.getOptions().test:
-            print boundary
+            print_(boundary)
         else:
             boundary.writeFile()
 
         # Write companion files
         self.generateCompanionFiles(caseDir, boundary)
-

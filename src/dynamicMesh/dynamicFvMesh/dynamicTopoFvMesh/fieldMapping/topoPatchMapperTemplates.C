@@ -32,14 +32,48 @@ namespace Foam
 
 //- Map the patch field
 template <class Type>
-void topoPatchMapper::mapPatchField
+void topoPatchMapper::mapFvPatchField
 (
     const word& fieldName,
-    Field<Type>& pF
+    fvPatchField<Type>& pF
 ) const
 {
     // Specify that mapping is conservative
     conservative_ = true;
+
+    if (fvMesh::debug)
+    {
+        Pout<< " Field: " << fieldName
+            << " Mapping patch: " << pF.patch().name()
+            << " size: " << this->size()
+            << " sizeBeforeMapping: " << this->sizeBeforeMapping()
+            << endl;
+    }
+
+    // Map patchField onto itself
+    pF.autoMap(*this);
+}
+
+
+//- Map the patch field
+template <class Type>
+void topoPatchMapper::mapFvsPatchField
+(
+    const word& fieldName,
+    fvsPatchField<Type>& pF
+) const
+{
+    // Specify that mapping is conservative
+    conservative_ = true;
+
+    if (fvMesh::debug)
+    {
+        Pout<< " Field: " << fieldName
+            << " Mapping patch: " << pF.patch().name()
+            << " size: " << this->size()
+            << " sizeBeforeMapping: " << this->sizeBeforeMapping()
+            << endl;
+    }
 
     // Map patchField onto itself
     pF.autoMap(*this);

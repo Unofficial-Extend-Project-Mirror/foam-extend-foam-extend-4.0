@@ -80,6 +80,9 @@ class fineBlockAmgLevel
         //- Smoother
         autoPtr<BlockLduSmoother<Type> > smootherPtr_;
 
+        //- Ax buffer
+        mutable Field<Type> Ax_;
+
 
     // Private Member Functions
 
@@ -93,8 +96,10 @@ class fineBlockAmgLevel
 public:
 
     //- Runtime type information
-        TypeName("fineBlockAmgLevel");
+    TypeName("fineBlockAmgLevel");
 
+
+    // Constructors
 
         //- Construct from components
         fineBlockAmgLevel

@@ -24,12 +24,11 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "Stack.H"
-#include "objectRegistry.H"
 #include "triFace.H"
 #include "objectMap.H"
 #include "changeMap.H"
-#include "multiThreader.H"
 #include "coupledInfo.H"
+#include "multiThreader.H"
 #include "dynamicTopoFvMesh.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -71,7 +70,7 @@ const changeMap dynamicTopoFvMesh::bisectQuadFace
 
     if
     (
-        (statistics_[0] > maxModifications_) &&
+        (status(TOTAL_MODIFICATIONS) > maxModifications_) &&
         (maxModifications_ > -1)
     )
     {
@@ -306,7 +305,7 @@ const changeMap dynamicTopoFvMesh::bisectQuadFace
             forAll(procIndices_, pI)
             {
                 // Fetch reference to subMesh
-                const coupledInfo& recvMesh = recvMeshes_[pI];
+                const coupledMesh& recvMesh = recvMeshes_[pI];
                 const coupleMap& cMap = recvMesh.map();
 
                 label sIndex = -1;
@@ -323,7 +322,15 @@ const changeMap dynamicTopoFvMesh::bisectQuadFace
 
                     // Check if a lower-ranked processor is
                     // handling this edge
-                    if (procIndices_[pI] < Pstream::myProcNo())
+                    if
+                    (
+                        priority
+                        (
+                            procIndices_[pI],
+                            lessOp<label>(),
+                            Pstream::myProcNo()
+                        )
+                    )
                     {
                         if (debug > 3)
                         {
@@ -398,7 +405,7 @@ const changeMap dynamicTopoFvMesh::bisectQuadFace
         {
             cMapPtr = &(recvMeshes_[pI].map());
 
-            coupledInfo& recvMesh = recvMeshes_[pI];
+            coupledMesh& recvMesh = recvMeshes_[pI];
 
             // First check the slave for bisection feasibility.
             slaveMap =
@@ -480,7 +487,7 @@ const changeMap dynamicTopoFvMesh::bisectQuadFace
         }
         else
         {
-            coupledInfo& recvMesh = recvMeshes_[pI];
+            coupledMesh& recvMesh = recvMeshes_[pI];
 
             // Bisect the slave face
             slaveMap =
@@ -541,7 +548,7 @@ const changeMap dynamicTopoFvMesh::bisectQuadFace
 
         if (debug > 2)
         {
-            Pout<< " On SubMesh: " << Switch::asText(isSubMesh_) << nl;
+            Pout<< " On SubMesh: " << isSubMesh_ << nl;
             Pout<< " coupledModification: " << coupledModification_ << nl;
 
             const polyBoundaryMesh& boundary = boundaryMesh();
@@ -900,12 +907,10 @@ const changeMap dynamicTopoFvMesh::bisectQuadFace
             -1,
             tmpQuadFace,
             c0,
-            newCellIndex[0]
+            newCellIndex[0],
+            tmpQFEdges
         )
     );
-
-    // Add a faceEdges entry as well
-    faceEdges_.append(tmpQFEdges);
 
     // Add this face to the map.
     map.addFace(newFaceIndex[0]);
@@ -952,12 +957,10 @@ const changeMap dynamicTopoFvMesh::bisectQuadFace
             whichPatch(c0BdyIndex[0]),
             tmpTriFace,
             newCellIndex[0],
-            -1
+            -1,
+            tmpTFEdges
         )
     );
-
-    // Add a faceEdges entry as well
-    faceEdges_.append(tmpTFEdges);
 
     // Add this face to the map.
     map.addFace(newFaceIndex[1]);
@@ -981,12 +984,10 @@ const changeMap dynamicTopoFvMesh::bisectQuadFace
             whichPatch(c0BdyIndex[1]),
             tmpTriFace,
             c0,
-            -1
+            -1,
+            tmpTFEdges
         )
     );
-
-    // Add a faceEdges entry as well
-    faceEdges_.append(tmpTFEdges);
 
     // Add this face to the map.
     map.addFace(newFaceIndex[2]);
@@ -1101,12 +1102,10 @@ const changeMap dynamicTopoFvMesh::bisectQuadFace
                 whichPatch(fIndex),
                 tmpQuadFace,
                 newCellIndex[0],
-                -1
+                -1,
+                tmpQFEdges
             )
         );
-
-        // Add a faceEdges entry as well
-        faceEdges_.append(tmpQFEdges);
 
         // Add this face to the map.
         map.addFace(newFaceIndex[3]);
@@ -1393,12 +1392,10 @@ const changeMap dynamicTopoFvMesh::bisectQuadFace
                 -1,
                 tmpQuadFace,
                 newCellIndex[0],
-                newCellIndex[1]
+                newCellIndex[1],
+                tmpQFEdges
             )
         );
-
-        // Add a faceEdges entry as well
-        faceEdges_.append(tmpQFEdges);
 
         // Add this face to the map.
         map.addFace(newFaceIndex[3]);
@@ -1546,12 +1543,10 @@ const changeMap dynamicTopoFvMesh::bisectQuadFace
                 -1,
                 tmpQuadFace,
                 c1,
-                newCellIndex[1]
+                newCellIndex[1],
+                tmpQFEdges
             )
         );
-
-        // Add a faceEdges entry as well
-        faceEdges_.append(tmpQFEdges);
 
         // Add this face to the map.
         map.addFace(newFaceIndex[4]);
@@ -1598,12 +1593,10 @@ const changeMap dynamicTopoFvMesh::bisectQuadFace
                 whichPatch(commonFaceIndex[2]),
                 tmpTriFace,
                 c1,
-                -1
+                -1,
+                tmpTFEdges
             )
         );
-
-        // Add a faceEdges entry as well
-        faceEdges_.append(tmpTFEdges);
 
         // Add this face to the map.
         map.addFace(newFaceIndex[5]);
@@ -1627,12 +1620,10 @@ const changeMap dynamicTopoFvMesh::bisectQuadFace
                 whichPatch(commonFaceIndex[3]),
                 tmpTriFace,
                 newCellIndex[1],
-                -1
+                -1,
+                tmpTFEdges
             )
         );
-
-        // Add a faceEdges entry as well
-        faceEdges_.append(tmpTFEdges);
 
         // Add this face to the map.
         map.addFace(newFaceIndex[6]);
@@ -2341,7 +2332,7 @@ const changeMap dynamicTopoFvMesh::bisectQuadFace
     topoChangeFlag_ = true;
 
     // Increment the counter
-    statistics_[3]++;
+    status(TOTAL_BISECTIONS)++;
 
     // Increment surface-counter
     if (c1 == -1)
@@ -2349,12 +2340,12 @@ const changeMap dynamicTopoFvMesh::bisectQuadFace
         // Do not update stats for processor patches
         if (!processorCoupledEntity(fIndex))
         {
-            statistics_[5]++;
+            status(SURFACE_BISECTIONS)++;
         }
     }
 
     // Increment the number of modifications
-    statistics_[0]++;
+    status(TOTAL_MODIFICATIONS)++;
 
     // Specify that the operation was successful
     map.type() = 1;
@@ -2387,7 +2378,7 @@ const changeMap dynamicTopoFvMesh::bisectEdge
     //      Update faceEdges and edgeFaces information
 
     // For 2D meshes, perform face-bisection
-    if (twoDMesh_)
+    if (is2D())
     {
         return bisectQuadFace(eIndex, changeMap(), checkOnly);
     }
@@ -2402,7 +2393,7 @@ const changeMap dynamicTopoFvMesh::bisectEdge
 
     if
     (
-        (statistics_[0] > maxModifications_) &&
+        (status(TOTAL_MODIFICATIONS) > maxModifications_) &&
         (maxModifications_ > -1)
     )
     {
@@ -2551,15 +2542,23 @@ const changeMap dynamicTopoFvMesh::bisectEdge
             forAll(procIndices_, pI)
             {
                 // Fetch reference to subMeshes
-                const coupledInfo& sendMesh = sendMeshes_[pI];
-                const coupledInfo& recvMesh = recvMeshes_[pI];
+                const coupledMesh& sendMesh = sendMeshes_[pI];
+                const coupledMesh& recvMesh = recvMeshes_[pI];
 
                 const coupleMap& scMap = sendMesh.map();
                 const coupleMap& rcMap = recvMesh.map();
 
                 // If this edge was sent to a lower-ranked
                 // processor, skip it.
-                if (procIndices_[pI] < Pstream::myProcNo())
+                if
+                (
+                    priority
+                    (
+                        procIndices_[pI],
+                        lessOp<label>(),
+                        Pstream::myProcNo()
+                    )
+                )
                 {
                     if (scMap.reverseEntityMap(edgeEnum).found(eIndex))
                     {
@@ -2591,7 +2590,15 @@ const changeMap dynamicTopoFvMesh::bisectEdge
 
                     // Check if a lower-ranked processor is
                     // handling this edge
-                    if (procIndices_[pI] < Pstream::myProcNo())
+                    if
+                    (
+                        priority
+                        (
+                            procIndices_[pI],
+                            lessOp<label>(),
+                            Pstream::myProcNo()
+                        )
+                    )
                     {
                         if (debug > 3)
                         {
@@ -2824,7 +2831,7 @@ const changeMap dynamicTopoFvMesh::bisectEdge
         // Do not update stats for processor patches
         if (!processorCoupledEntity(eIndex))
         {
-            statistics_[5]++;
+            status(SURFACE_BISECTIONS)++;
         }
     }
 
@@ -2871,7 +2878,7 @@ const changeMap dynamicTopoFvMesh::bisectEdge
             << ": " << origEdge
             << " is to be bisected. " << endl;
 
-        Pout<< " On SubMesh: " << Switch::asText(isSubMesh_) << nl;
+        Pout<< " On SubMesh: " << isSubMesh_ << nl;
         Pout<< " coupledModification: " << coupledModification_ << nl;
 
         label epIndex = whichEdgePatch(eIndex);
@@ -3024,12 +3031,10 @@ const changeMap dynamicTopoFvMesh::bisectEdge
                     -1,
                     tmpTriFace,
                     cellHull[indexI],
-                    addedCellIndices[indexI]
+                    addedCellIndices[indexI],
+                    tmpFaceEdges
                 )
             );
-
-            // Add a faceEdges entry as well
-            faceEdges_.append(tmpFaceEdges);
 
             // Add this face to the map.
             map.addFace(addedIntFaceIndices[indexI]);
@@ -3102,7 +3107,8 @@ const changeMap dynamicTopoFvMesh::bisectEdge
                         whichPatch(faceHull[indexI]),
                         tmpTriFace,
                         addedCellIndices[indexI],
-                        -1
+                        -1,
+                        labelList(3, -1)
                     )
                 );
 
@@ -3156,7 +3162,7 @@ const changeMap dynamicTopoFvMesh::bisectEdge
                 );
 
                 // Add the faceEdges entry
-                faceEdges_.append(tmpFaceEdges);
+                faceEdges_[addedFaceIndices[indexI]] = tmpFaceEdges;
 
                 // Add an entry to edgeFaces
                 edgeFaces_[newEdgeIndex][indexI] = addedFaceIndices[indexI];
@@ -3181,7 +3187,8 @@ const changeMap dynamicTopoFvMesh::bisectEdge
                         -1,
                         tmpTriFace,
                         addedCellIndices[prevI],
-                        addedCellIndices[indexI]
+                        addedCellIndices[indexI],
+                        labelList(3, -1)
                     )
                 );
 
@@ -3242,7 +3249,7 @@ const changeMap dynamicTopoFvMesh::bisectEdge
                 );
 
                 // Add the faceEdges entry
-                faceEdges_.append(tmpFaceEdges);
+                faceEdges_[addedFaceIndices[indexI]] = tmpFaceEdges;
 
                 // Add an entry to edgeFaces
                 edgeFaces_[newEdgeIndex][indexI] = addedFaceIndices[indexI];
@@ -3270,7 +3277,8 @@ const changeMap dynamicTopoFvMesh::bisectEdge
                         -1,
                         tmpTriFace,
                         addedCellIndices[0],
-                        addedCellIndices[indexI]
+                        addedCellIndices[indexI],
+                        labelList(3, -1)
                     )
                 );
 
@@ -3331,7 +3339,7 @@ const changeMap dynamicTopoFvMesh::bisectEdge
                 );
 
                 // Add the faceEdges entry
-                faceEdges_.append(tmpFaceEdges);
+                faceEdges_[addedFaceIndices[0]] = tmpFaceEdges;
 
                 // Add an entry to edgeFaces
                 edgeFaces_[newEdgeIndex][0] = addedFaceIndices[0];
@@ -3361,7 +3369,8 @@ const changeMap dynamicTopoFvMesh::bisectEdge
                     whichPatch(faceHull[indexI]),
                     tmpTriFace,
                     addedCellIndices[prevI],
-                    -1
+                    -1,
+                    labelList(3, -1)
                 )
             );
 
@@ -3415,7 +3424,7 @@ const changeMap dynamicTopoFvMesh::bisectEdge
             );
 
             // Add the faceEdges entry
-            faceEdges_.append(tmpFaceEdges);
+            faceEdges_[addedFaceIndices[indexI]] = tmpFaceEdges;
 
             // Add an entry to edgeFaces
             edgeFaces_[newEdgeIndex][indexI] = addedFaceIndices[indexI];
@@ -3557,6 +3566,10 @@ const changeMap dynamicTopoFvMesh::bisectEdge
                 }
             }
         }
+
+        // Prepare a checklist
+        boolList matchedFaces(checkFaces.size(), false);
+        boolList matchedEdges(checkEdges.size(), false);
 
         // Output check entities
         if (debug > 4)
@@ -3704,8 +3717,6 @@ const changeMap dynamicTopoFvMesh::bisectEdge
                     continue;
                 }
 
-                bool matchedFace = false;
-
                 // Fetch edges connected to the slave point
                 const labelList& spEdges = sMesh.pointEdges_[slavePoint];
 
@@ -3720,9 +3731,9 @@ const changeMap dynamicTopoFvMesh::bisectEdge
 
                     const labelList& seFaces = sMesh.edgeFaces_[seIndex];
 
-                    forAll(seFaces, faceI)
+                    forAll(seFaces, faceJ)
                     {
-                        label sfIndex = seFaces[faceI];
+                        label sfIndex = seFaces[faceJ];
 
                         if (sMesh.whichPatch(sfIndex) == -1)
                         {
@@ -3769,25 +3780,25 @@ const changeMap dynamicTopoFvMesh::bisectEdge
                                 faceMap.insert(mfIndex, sfIndex);
                             }
 
-                            matchedFace = true;
+                            matchedFaces[faceI] = true;
 
                             break;
                         }
                     }
 
-                    if (matchedFace)
+                    if (matchedFaces[faceI])
                     {
                         break;
                     }
                 }
 
-                if (!matchedFace)
+                if ((debug > 4) && !matchedFaces[faceI])
                 {
                     sMesh.writeVTK
                     (
                         "failedFacePoints_"
                       + Foam::name(mfIndex),
-                        cF, 0, false, true
+                        labelList(cF), 0, false, true
                     );
 
                     writeVTK
@@ -3800,7 +3811,8 @@ const changeMap dynamicTopoFvMesh::bisectEdge
                         << mfIndex << " :: " << mF
                         << " masterPatch: " << mfPatch
                         << " using comparison face: " << cF
-                        << abort(FatalError);
+                        << " on proc: " << procIndices_[pI]
+                        << endl;
                 }
             }
 
@@ -3817,7 +3829,7 @@ const changeMap dynamicTopoFvMesh::bisectEdge
 
                 const edge& mE = edges_[meIndex];
 
-                label mePatch = whichPatch(meIndex);
+                label mePatch = whichEdgePatch(meIndex);
                 label neiProc = getNeighbourProcessor(mePatch);
 
                 edge cE
@@ -3832,14 +3844,12 @@ const changeMap dynamicTopoFvMesh::bisectEdge
                     continue;
                 }
 
-                bool matchedEdge = false;
-
                 // Fetch edges connected to the slave point
                 const labelList& spEdges = sMesh.pointEdges_[cE[0]];
 
-                forAll(spEdges, edgeI)
+                forAll(spEdges, edgeJ)
                 {
-                    label seIndex = spEdges[edgeI];
+                    label seIndex = spEdges[edgeJ];
 
                     const edge& sE = sMesh.edges_[seIndex];
 
@@ -3851,6 +3861,7 @@ const changeMap dynamicTopoFvMesh::bisectEdge
                                 << " :: " << sE
                                 << " with meIndex: " << meIndex
                                 << " :: " << mE
+                                << " on proc: " << procIndices_[pI]
                                 << endl;
                         }
 
@@ -3874,13 +3885,13 @@ const changeMap dynamicTopoFvMesh::bisectEdge
                             edgeMap.insert(meIndex, seIndex);
                         }
 
-                        matchedEdge = true;
+                        matchedEdges[edgeI] = true;
 
                         break;
                     }
                 }
 
-                if (!matchedEdge)
+                if (!matchedEdges[edgeI])
                 {
                     if (procCouple && !localCouple)
                     {
@@ -3899,18 +3910,18 @@ const changeMap dynamicTopoFvMesh::bisectEdge
                                     << endl;
                             }
 
-                            matchedEdge = true;
+                            matchedEdges[edgeI] = true;
                         }
                     }
                 }
 
-                if (!matchedEdge)
+                if ((debug > 4) && !matchedEdges[edgeI])
                 {
                     sMesh.writeVTK
                     (
                         "failedEdge_"
                       + Foam::name(meIndex),
-                        cE, 0, false, true
+                        labelList(cE), 0, false, true
                     );
 
                     writeVTK
@@ -3922,7 +3933,8 @@ const changeMap dynamicTopoFvMesh::bisectEdge
                     Pout<< " Failed to match edge: "
                         << meIndex << " :: " << mE
                         << " using comparison edge: " << cE
-                        << abort(FatalError);
+                        << " on proc: " << procIndices_[pI]
+                        << endl;
                 }
             }
 
@@ -3935,6 +3947,33 @@ const changeMap dynamicTopoFvMesh::bisectEdge
                     coupleMap::BISECTION
                 );
             }
+        }
+
+        // Ensure that all entities were matched
+        label nFailFace = 0, nFailEdge = 0;
+
+        forAll(matchedFaces, faceI)
+        {
+            if (!matchedFaces[faceI])
+            {
+                ++nFailFace;
+            }
+        }
+
+        forAll(matchedEdges, edgeI)
+        {
+            if (!matchedEdges[edgeI])
+            {
+                ++nFailEdge;
+            }
+        }
+
+        if (nFailFace || nFailEdge)
+        {
+            Pout<< " Failed to match all entities. " << nl
+                << "  Faces: " << nFailFace << nl
+                << "  Edges: " << nFailEdge << nl
+                << abort(FatalError);
         }
     }
 
@@ -4088,1687 +4127,10 @@ const changeMap dynamicTopoFvMesh::bisectEdge
     topoChangeFlag_ = true;
 
     // Increment the counter
-    statistics_[3]++;
+    status(TOTAL_BISECTIONS)++;
 
     // Increment the number of modifications
-    statistics_[0]++;
-
-    // Specify that the operation was successful
-    map.type() = 1;
-
-    // Return the changeMap
-    return map;
-}
-
-
-// Method for the trisection of a face in 3D
-// - Returns a changeMap with a type specifying:
-//     1: Trisection was successful
-//    -1: Trisection failed since max number of topo-changes was reached.
-//    -2: Trisection failed since resulting quality would be really bad.
-// - AddedPoint is the index of the newly added point.
-const changeMap dynamicTopoFvMesh::trisectFace
-(
-    const label fIndex,
-    bool checkOnly,
-    bool forceOp
-)
-{
-    // Face trisection performs the following operations:
-    //      [1] Add a point at middle of the face
-    //      [2] Remove the face and add three new faces in place.
-    //      [3] Add three cells for each trisected cell (remove the originals).
-    //      [4] Create one internal edge for each trisected cell.
-    //      [5] Create three edges for the trisected face.
-    //      [6] Create three internal faces for each trisected cell.
-    //      Update faceEdges and edgeFaces information.
-
-    // Figure out which thread this is...
-    label tIndex = self(), pIndex = -1;
-
-    // Prepare the changeMaps
-    changeMap map, slaveMap;
-    bool trisectingSlave = false;
-
-    if
-    (
-        (statistics_[0] > maxModifications_) &&
-        (maxModifications_ > -1)
-    )
-    {
-        // Reached the max allowable topo-changes.
-        stack(tIndex).clear();
-
-        return map;
-    }
-
-    // Sanity check: Is the index legitimate?
-    if (fIndex < 0)
-    {
-        FatalErrorIn
-        (
-            "const changeMap dynamicTopoFvMesh::trisectFace\n"
-            "(\n"
-            "    const label fIndex,\n"
-            "    bool checkOnly,\n"
-            "    bool forceOp\n"
-            ")\n"
-        )
-            << " Invalid index: " << fIndex
-            << abort(FatalError);
-    }
-
-    if (coupledModification_)
-    {
-        // Is this a locally coupled face (either master or slave)?
-        if (locallyCoupledEntity(fIndex, true))
-        {
-            label sIndex = -1;
-
-            // Loop through master/slave maps
-            // and determine the coupled edge index.
-            forAll(patchCoupling_, patchI)
-            {
-                if (!patchCoupling_(patchI))
-                {
-                    continue;
-                }
-
-                const label faceEnum  = coupleMap::FACE;
-                const coupleMap& cMap = patchCoupling_[patchI].map();
-
-                if ((sIndex = cMap.findSlave(faceEnum, fIndex)) > -1)
-                {
-                    // Keep this index for master/slave mapping.
-                    pIndex = patchI;
-
-                    break;
-                }
-
-                // The following bit happens only during the sliver
-                // exudation process.
-                if ((sIndex = cMap.findMaster(faceEnum, fIndex)) > -1)
-                {
-                    // Keep this index for master/slave mapping.
-                    pIndex = patchI;
-
-                    // Notice that we are trisecting a slave edge.
-                    trisectingSlave = true;
-
-                    break;
-                }
-            }
-
-            if (sIndex == -1)
-            {
-                FatalErrorIn
-                (
-                    "const changeMap dynamicTopoFvMesh::trisectFace\n"
-                    "(\n"
-                    "    const label fIndex,\n"
-                    "    bool checkOnly,\n"
-                    "    bool forceOp\n"
-                    ")\n"
-                )
-                    << "Coupled maps were improperly specified." << nl
-                    << " Slave index not found for: " << nl
-                    << " Face: " << fIndex << nl
-                    << abort(FatalError);
-            }
-
-            if (debug > 1)
-            {
-                Pout<< nl << "Trisecting slave face: " << sIndex
-                    << " for master face: " << fIndex << endl;
-            }
-
-            // Temporarily turn off coupledModification.
-            unsetCoupledModification();
-
-            // First check the slave for trisection feasibility.
-            slaveMap = trisectFace(sIndex, true, forceOp);
-
-            if (slaveMap.type() == 1)
-            {
-                // Can the master be trisected as well?
-                changeMap masterMap = trisectFace(fIndex, true, forceOp);
-
-                // Master couldn't perform trisection
-                if (masterMap.type() != 1)
-                {
-                    setCoupledModification();
-
-                    return masterMap;
-                }
-
-                // Trisect the slave face
-                slaveMap = trisectFace(sIndex, false, forceOp);
-
-                // The final operation has to succeed.
-                if (slaveMap.type() <= 0)
-                {
-                    FatalErrorIn
-                    (
-                        "const changeMap dynamicTopoFvMesh::trisectFace\n"
-                        "(\n"
-                        "    const label fIndex,\n"
-                        "    bool checkOnly,\n"
-                        "    bool forceOp\n"
-                        ")\n"
-                    )
-                        << "Coupled topo-change for slave failed." << nl
-                        << " Type: " << slaveMap.type()
-                        << abort(FatalError);
-                }
-            }
-            else
-            {
-                // Slave couldn't perform trisection.
-                setCoupledModification();
-
-                map.type() = -2;
-
-                return map;
-            }
-
-            // Turn it back on.
-            setCoupledModification();
-        }
-        else
-        if (processorCoupledEntity(fIndex))
-        {
-            // Trisect face on the patchSubMesh.
-
-        }
-    }
-
-    // Before we trisect this face, check whether the operation will
-    // yield an acceptable cell-quality.
-    scalar minQ = 0.0;
-
-    if ((minQ = computeTrisectionQuality(fIndex)) < sliverThreshold_)
-    {
-        // Check if the quality is actually valid before forcing it.
-        if (forceOp && (minQ < 0.0))
-        {
-            FatalErrorIn
-            (
-                "const changeMap dynamicTopoFvMesh::trisectFace\n"
-                "(\n"
-                "    const label fIndex,\n"
-                "    bool checkOnly,\n"
-                "    bool forceOp\n"
-                ")\n"
-            )
-                << " Forcing trisection on face: " << fIndex
-                << " will yield an invalid cell."
-                << abort(FatalError);
-        }
-        else
-        if (!forceOp)
-        {
-            map.type() = -2;
-            return map;
-        }
-    }
-
-    // Are we performing only checks?
-    if (checkOnly)
-    {
-        map.type() = 1;
-        return map;
-    }
-
-    // Update number of surface bisections, if necessary.
-    if (whichPatch(fIndex) > -1)
-    {
-        statistics_[5]++;
-    }
-
-    // Hull variables
-    face tmpTriFace(3);
-    labelList newTriEdgeFaces(3);
-    labelList newQuadEdgeFaces(4);
-
-    FixedList<label,2> apexPoint(-1);
-    FixedList<face, 3> checkFace(face(3));
-    FixedList<label,5> newEdgeIndex(-1);
-    FixedList<label,9> newFaceIndex(-1);
-    FixedList<label,6> newCellIndex(-1);
-    FixedList<cell, 6> newTetCell(cell(4));
-    FixedList<labelList, 9> newFaceEdges(labelList(3));
-
-    // Counters for entities
-    FixedList<label, 9> nE(0);
-    FixedList<label, 6> nF(0);
-
-    // Determine the two cells to be removed
-    FixedList<label,2> cellsForRemoval;
-    cellsForRemoval[0] = owner_[fIndex];
-    cellsForRemoval[1] = neighbour_[fIndex];
-
-    if (debug > 1)
-    {
-        Pout<< nl << nl
-            << "Face: " << fIndex
-            << ": " << faces_[fIndex]
-            << " is to be trisected. " << endl;
-
-        // Write out VTK files prior to change
-        if (debug > 3)
-        {
-            labelList vtkCells;
-
-            if (neighbour_[fIndex] == -1)
-            {
-                vtkCells.setSize(1);
-                vtkCells[0] = owner_[fIndex];
-            }
-            else
-            {
-                vtkCells.setSize(2);
-                vtkCells[0] = owner_[fIndex];
-                vtkCells[1] = neighbour_[fIndex];
-            }
-
-            writeVTK
-            (
-                Foam::name(fIndex)
-              + "Trisect_0",
-                vtkCells
-            );
-        }
-    }
-
-    labelList mP(3, -1);
-
-    // Fill in mapping information
-    mP[0] = faces_[fIndex][0];
-    mP[1] = faces_[fIndex][1];
-    mP[2] = faces_[fIndex][2];
-
-    // Add a new point to the end of the list
-    scalar oT = (1.0/3.0);
-
-    label newPointIndex =
-    (
-        insertPoint
-        (
-            oT * (points_[mP[0]] + points_[mP[1]] + points_[mP[2]]),
-            oT * (oldPoints_[mP[0]] + oldPoints_[mP[1]] + oldPoints_[mP[2]]),
-            mP
-        )
-    );
-
-    // Add this point to the map.
-    map.addPoint(newPointIndex);
-
-    // Add three new cells to the end of the cell list
-    for (label i = 0; i < 3; i++)
-    {
-        scalar parentScale = -1.0;
-
-        if (edgeRefinement_)
-        {
-            parentScale = lengthScale_[cellsForRemoval[0]];
-        }
-
-        newCellIndex[i] = insertCell(newTetCell[i], parentScale);
-
-        // Add cells to the map
-        map.addCell(newCellIndex[i]);
-    }
-
-    // Find the apex point for this cell
-    apexPoint[0] =
-    (
-        meshOps::tetApexPoint
-        (
-            owner_[fIndex],
-            fIndex,
-            faces_,
-            cells_
-        )
-    );
-
-    // Insert three new internal faces
-
-    // First face: Owner: newCellIndex[0], Neighbour: newCellIndex[1]
-    tmpTriFace[0] = newPointIndex;
-    tmpTriFace[1] = faces_[fIndex][0];
-    tmpTriFace[2] = apexPoint[0];
-
-    newFaceIndex[0] =
-    (
-        insertFace
-        (
-            -1,
-            tmpTriFace,
-            newCellIndex[0],
-            newCellIndex[1]
-        )
-    );
-
-    // Second face: Owner: newCellIndex[1], Neighbour: newCellIndex[2]
-    tmpTriFace[0] = newPointIndex;
-    tmpTriFace[1] = faces_[fIndex][1];
-    tmpTriFace[2] = apexPoint[0];
-
-    newFaceIndex[1] =
-    (
-        insertFace
-        (
-            -1,
-            tmpTriFace,
-            newCellIndex[1],
-            newCellIndex[2]
-        )
-    );
-
-    // Third face: Owner: newCellIndex[0], Neighbour: newCellIndex[2]
-    tmpTriFace[0] = newPointIndex;
-    tmpTriFace[1] = apexPoint[0];
-    tmpTriFace[2] = faces_[fIndex][2];
-
-    newFaceIndex[2] =
-    (
-        insertFace
-        (
-            -1,
-            tmpTriFace,
-            newCellIndex[0],
-            newCellIndex[2]
-        )
-    );
-
-    // Add an entry to edgeFaces
-    newTriEdgeFaces[0] = newFaceIndex[0];
-    newTriEdgeFaces[1] = newFaceIndex[1];
-    newTriEdgeFaces[2] = newFaceIndex[2];
-
-    // Add a new internal edge to the mesh
-    newEdgeIndex[0] =
-    (
-        insertEdge
-        (
-            -1,
-            edge
-            (
-               newPointIndex,
-               apexPoint[0]
-            ),
-            newTriEdgeFaces
-        )
-    );
-
-    // Configure faceEdges with the new internal edge
-    newFaceEdges[0][nE[0]++] = newEdgeIndex[0];
-    newFaceEdges[1][nE[1]++] = newEdgeIndex[0];
-    newFaceEdges[2][nE[2]++] = newEdgeIndex[0];
-
-    // Add the newly created faces to cells
-    newTetCell[0][nF[0]++] = newFaceIndex[0];
-    newTetCell[0][nF[0]++] = newFaceIndex[2];
-    newTetCell[1][nF[1]++] = newFaceIndex[0];
-    newTetCell[1][nF[1]++] = newFaceIndex[1];
-    newTetCell[2][nF[2]++] = newFaceIndex[1];
-    newTetCell[2][nF[2]++] = newFaceIndex[2];
-
-    // Define the three faces to check for orientation:
-    checkFace[0][0] = faces_[fIndex][2];
-    checkFace[0][1] = apexPoint[0];
-    checkFace[0][2] = faces_[fIndex][0];
-
-    checkFace[1][0] = faces_[fIndex][0];
-    checkFace[1][1] = apexPoint[0];
-    checkFace[1][2] = faces_[fIndex][1];
-
-    checkFace[2][0] = faces_[fIndex][1];
-    checkFace[2][1] = apexPoint[0];
-    checkFace[2][2] = faces_[fIndex][2];
-
-    // Check the orientation of faces on the first cell.
-    forAll(cells_[owner_[fIndex]], faceI)
-    {
-        label faceIndex = cells_[owner_[fIndex]][faceI];
-
-        if (faceIndex == fIndex)
-        {
-            continue;
-        }
-
-        const face& faceToCheck = faces_[faceIndex];
-        label cellIndex = cellsForRemoval[0];
-        label newIndex = -1;
-
-        // Check against faces.
-        if (triFace::compare(triFace(faceToCheck), triFace(checkFace[0])))
-        {
-            newIndex = newCellIndex[0];
-            newTetCell[0][nF[0]++] = faceIndex;
-        }
-        else
-        if (triFace::compare(triFace(faceToCheck), triFace(checkFace[1])))
-        {
-            newIndex = newCellIndex[1];
-            newTetCell[1][nF[1]++] = faceIndex;
-        }
-        else
-        if (triFace::compare(triFace(faceToCheck), triFace(checkFace[2])))
-        {
-            newIndex = newCellIndex[2];
-            newTetCell[2][nF[2]++] = faceIndex;
-        }
-        else
-        {
-            // Something's terribly wrong.
-            FatalErrorIn
-            (
-                "const changeMap dynamicTopoFvMesh::trisectFace\n"
-                "(\n"
-                "    const label fIndex,\n"
-                "    bool checkOnly,\n"
-                "    bool forceOp\n"
-                ")\n"
-            )
-                << "Failed to determine a face match."
-                << abort(FatalError);
-        }
-
-        // Check if a face-flip is necessary
-        if (owner_[faceIndex] == cellIndex)
-        {
-            if (neighbour_[faceIndex] == -1)
-            {
-                // Change the owner
-                owner_[faceIndex] = newIndex;
-            }
-            else
-            {
-                // Flip this face
-                faces_[faceIndex] = faceToCheck.reverseFace();
-                owner_[faceIndex] = neighbour_[faceIndex];
-                neighbour_[faceIndex] = newIndex;
-
-                setFlip(faceIndex);
-            }
-        }
-        else
-        {
-            // Flip is unnecessary. Just update neighbour
-            neighbour_[faceIndex] = newIndex;
-        }
-    }
-
-    if (cellsForRemoval[1] == -1)
-    {
-        // Boundary face. Determine its patch.
-        label facePatch = whichPatch(fIndex);
-
-        // Add three new boundary faces.
-
-        // Fourth face: Owner: newCellIndex[0], Neighbour: -1
-        tmpTriFace[0] = newPointIndex;
-        tmpTriFace[1] = faces_[fIndex][2];
-        tmpTriFace[2] = faces_[fIndex][0];
-
-        newFaceIndex[3] =
-        (
-            insertFace
-            (
-                facePatch,
-                tmpTriFace,
-                newCellIndex[0],
-                -1
-            )
-        );
-
-        // Fifth face: Owner: newCellIndex[1], Neighbour: -1
-        tmpTriFace[0] = newPointIndex;
-        tmpTriFace[1] = faces_[fIndex][0];
-        tmpTriFace[2] = faces_[fIndex][1];
-
-        newFaceIndex[4] =
-        (
-            insertFace
-            (
-                facePatch,
-                tmpTriFace,
-                newCellIndex[1],
-                -1
-            )
-        );
-
-        // Sixth face: Owner: newCellIndex[2], Neighbour: -1
-        tmpTriFace[0] = newPointIndex;
-        tmpTriFace[1] = faces_[fIndex][1];
-        tmpTriFace[2] = faces_[fIndex][2];
-
-        newFaceIndex[5] =
-        (
-            insertFace
-            (
-                facePatch,
-                tmpTriFace,
-                newCellIndex[2],
-                -1
-            )
-        );
-
-        // Add the newly created faces to cells
-        newTetCell[0][nF[0]++] = newFaceIndex[3];
-        newTetCell[1][nF[1]++] = newFaceIndex[4];
-        newTetCell[2][nF[2]++] = newFaceIndex[5];
-
-        // Configure edgeFaces for three new boundary edges.
-        newTriEdgeFaces[0] = newFaceIndex[4];
-        newTriEdgeFaces[1] = newFaceIndex[0];
-        newTriEdgeFaces[2] = newFaceIndex[3];
-
-        newEdgeIndex[1] =
-        (
-            insertEdge
-            (
-                facePatch,
-                edge
-                (
-                   newPointIndex,
-                   faces_[fIndex][0]
-                ),
-                newTriEdgeFaces
-            )
-        );
-
-        newTriEdgeFaces[0] = newFaceIndex[5];
-        newTriEdgeFaces[1] = newFaceIndex[1];
-        newTriEdgeFaces[2] = newFaceIndex[4];
-
-        newEdgeIndex[2] =
-        (
-            insertEdge
-            (
-                facePatch,
-                edge
-                (
-                   newPointIndex,
-                   faces_[fIndex][1]
-                ),
-                newTriEdgeFaces
-            )
-        );
-
-        newTriEdgeFaces[0] = newFaceIndex[3];
-        newTriEdgeFaces[1] = newFaceIndex[2];
-        newTriEdgeFaces[2] = newFaceIndex[5];
-
-        newEdgeIndex[3] =
-        (
-            insertEdge
-            (
-                facePatch,
-                edge
-                (
-                   newPointIndex,
-                   faces_[fIndex][2]
-                ),
-                newTriEdgeFaces
-            )
-        );
-
-        // Configure faceEdges with the three new edges.
-        newFaceEdges[0][nE[0]++] = newEdgeIndex[1];
-        newFaceEdges[1][nE[1]++] = newEdgeIndex[2];
-        newFaceEdges[2][nE[2]++] = newEdgeIndex[3];
-
-        newFaceEdges[3][nE[3]++] = newEdgeIndex[1];
-        newFaceEdges[3][nE[3]++] = newEdgeIndex[3];
-        newFaceEdges[4][nE[4]++] = newEdgeIndex[1];
-        newFaceEdges[4][nE[4]++] = newEdgeIndex[2];
-        newFaceEdges[5][nE[5]++] = newEdgeIndex[2];
-        newFaceEdges[5][nE[5]++] = newEdgeIndex[3];
-
-        // Define the six edges to check while building faceEdges:
-        FixedList<edge,6> check;
-
-        check[0][0] = apexPoint[0]; check[0][1] = faces_[fIndex][0];
-        check[1][0] = apexPoint[0]; check[1][1] = faces_[fIndex][1];
-        check[2][0] = apexPoint[0]; check[2][1] = faces_[fIndex][2];
-
-        check[3][0] = faces_[fIndex][2]; check[3][1] = faces_[fIndex][0];
-        check[4][0] = faces_[fIndex][0]; check[4][1] = faces_[fIndex][1];
-        check[5][0] = faces_[fIndex][1]; check[5][1] = faces_[fIndex][2];
-
-        // Build a list of cellEdges
-        DynamicList<label> cellEdges(6);
-
-        forAll(cells_[owner_[fIndex]], faceI)
-        {
-            const labelList& fEdges =
-            (
-                faceEdges_[cells_[owner_[fIndex]][faceI]]
-            );
-
-            forAll(fEdges, edgeI)
-            {
-                if (findIndex(cellEdges, fEdges[edgeI]) == -1)
-                {
-                    cellEdges.append(fEdges[edgeI]);
-                }
-            }
-        }
-
-        // Loop through cellEdges, and perform appropriate actions.
-        forAll(cellEdges, edgeI)
-        {
-            const label ceIndex = cellEdges[edgeI];
-            const edge& edgeToCheck = edges_[ceIndex];
-
-            // Check against the specified edges.
-            if (edgeToCheck == check[0])
-            {
-                meshOps::sizeUpList(newFaceIndex[0], edgeFaces_[ceIndex]);
-                newFaceEdges[0][nE[0]++] = ceIndex;
-            }
-
-            if (edgeToCheck == check[1])
-            {
-                meshOps::sizeUpList(newFaceIndex[1], edgeFaces_[ceIndex]);
-                newFaceEdges[1][nE[1]++] = ceIndex;
-            }
-
-            if (edgeToCheck == check[2])
-            {
-                meshOps::sizeUpList(newFaceIndex[2], edgeFaces_[ceIndex]);
-                newFaceEdges[2][nE[2]++] = ceIndex;
-            }
-
-            if (edgeToCheck == check[3])
-            {
-                meshOps::replaceLabel
-                (
-                    fIndex,
-                    newFaceIndex[3],
-                    edgeFaces_[ceIndex]
-                );
-
-                newFaceEdges[3][nE[3]++] = ceIndex;
-            }
-
-            if (edgeToCheck == check[4])
-            {
-                meshOps::replaceLabel
-                (
-                    fIndex,
-                    newFaceIndex[4],
-                    edgeFaces_[ceIndex]
-                );
-
-                newFaceEdges[4][nE[4]++] = ceIndex;
-            }
-
-            if (edgeToCheck == check[5])
-            {
-                meshOps::replaceLabel
-                (
-                    fIndex,
-                    newFaceIndex[5],
-                    edgeFaces_[ceIndex]
-                );
-
-                newFaceEdges[5][nE[5]++] = ceIndex;
-            }
-        }
-
-        // Now that faceEdges has been configured, append them to the list.
-        for (label i = 0; i < 6; i++)
-        {
-            faceEdges_.append(newFaceEdges[i]);
-
-            // Add faces to the map.
-            map.addFace(newFaceIndex[i]);
-        }
-
-        // If modification is coupled, generate mapping info.
-        if (coupledModification_)
-        {
-            // Create a master/slave entry for the new edges/faces on the patch.
-            if (locallyCoupledEntity(fIndex, true))
-            {
-                if (patchCoupling_(pIndex))
-                {
-                    // Add the new point to the coupling map
-                    const coupleMap& cMap = patchCoupling_[pIndex].map();
-
-                    if (trisectingSlave)
-                    {
-                        cMap.mapMaster
-                        (
-                            coupleMap::POINT,
-                            newPointIndex,
-                            slaveMap.addedPointList()[0].index()
-                        );
-
-                        cMap.mapSlave
-                        (
-                            coupleMap::POINT,
-                            slaveMap.addedPointList()[0].index(),
-                            newPointIndex
-                        );
-                    }
-                    else
-                    {
-                        cMap.mapSlave
-                        (
-                            coupleMap::POINT,
-                            newPointIndex,
-                            slaveMap.addedPointList()[0].index()
-                        );
-
-                        cMap.mapMaster
-                        (
-                            coupleMap::POINT,
-                            slaveMap.addedPointList()[0].index(),
-                            newPointIndex
-                        );
-                    }
-                }
-
-                const List<objectMap>& ameList = map.addedEdgeList();
-                const List<objectMap>& aseList = slaveMap.addedEdgeList();
-
-                // Compare with all check entries.
-                forAll(ameList, meI)
-                {
-                    label epIndex = whichEdgePatch(ameList[meI].index());
-
-                    if (epIndex != pIndex && !trisectingSlave)
-                    {
-                        continue;
-                    }
-
-                    if (patchCoupling_(pIndex))
-                    {
-                        const coupleMap& cM = patchCoupling_[pIndex].map();
-
-                        if (trisectingSlave && epIndex != cM.slaveIndex())
-                        {
-                            continue;
-                        }
-                    }
-                    else
-                    {
-                        continue;
-                    }
-
-                    const coupleMap& cMap = patchCoupling_[pIndex].map();
-
-                    // Configure an edge for comparison.
-                    edge cE(-1, -1);
-
-                    const edge& mE = edges_[ameList[meI].index()];
-
-                    if (trisectingSlave)
-                    {
-                        cE[0] = cMap.reverseEntityMap(coupleMap::POINT)[mE[0]];
-                        cE[1] = cMap.reverseEntityMap(coupleMap::POINT)[mE[1]];
-                    }
-                    else
-                    {
-                        cE[0] = cMap.entityMap(coupleMap::POINT)[mE[0]];
-                        cE[1] = cMap.entityMap(coupleMap::POINT)[mE[1]];
-                    }
-
-                    bool matched = false;
-
-                    forAll(aseList, seI)
-                    {
-                        const edge& sE = edges_[aseList[seI].index()];
-
-                        if (cE == sE)
-                        {
-                            if (trisectingSlave)
-                            {
-                                cMap.mapMaster
-                                (
-                                    coupleMap::EDGE,
-                                    ameList[meI].index(),
-                                    aseList[seI].index()
-                                );
-
-                                cMap.mapSlave
-                                (
-                                    coupleMap::EDGE,
-                                    aseList[seI].index(),
-                                    ameList[meI].index()
-                                );
-                            }
-                            else
-                            {
-                                cMap.mapSlave
-                                (
-                                    coupleMap::EDGE,
-                                    ameList[meI].index(),
-                                    aseList[seI].index()
-                                );
-
-                                cMap.mapMaster
-                                (
-                                    coupleMap::EDGE,
-                                    aseList[seI].index(),
-                                    ameList[meI].index()
-                                );
-                            }
-
-                            matched = true;
-
-                            break;
-                        }
-                    }
-
-                    if (!matched)
-                    {
-                        Pout<< "masterEdges: " << nl
-                            << ameList << endl;
-
-                        Pout<< "slaveEdges: " << nl
-                            << aseList << endl;
-
-                        forAll(ameList, meI)
-                        {
-                            Pout<< ameList[meI].index() << ": "
-                                << edges_[ameList[meI].index()]
-                                << endl;
-                        }
-
-                        forAll(aseList, seI)
-                        {
-                            Pout<< aseList[seI].index() << ": "
-                                << edges_[aseList[seI].index()]
-                                << endl;
-                        }
-
-                        FatalErrorIn
-                        (
-                            "const changeMap dynamicTopoFvMesh::trisectFace\n"
-                            "(\n"
-                            "    const label fIndex,\n"
-                            "    bool checkOnly,\n"
-                            "    bool forceOp\n"
-                            ")\n"
-                        )
-                            << "Failed to build coupled edge maps."
-                            << abort(FatalError);
-                    }
-                }
-
-                // Add a mapping entry for three new faces as well.
-                face cF(3);
-
-                const List<objectMap>& amfList = map.addedFaceList();
-                const List<objectMap>& asfList = slaveMap.addedFaceList();
-
-                forAll(amfList, mfI)
-                {
-                    label fpIndex = whichPatch(amfList[mfI].index());
-
-                    if (fpIndex != pIndex && !trisectingSlave)
-                    {
-                        continue;
-                    }
-
-                    if (patchCoupling_(pIndex))
-                    {
-                        const coupleMap& cM = patchCoupling_[pIndex].map();
-
-                        if (trisectingSlave && fpIndex != cM.slaveIndex())
-                        {
-                            continue;
-                        }
-                    }
-                    else
-                    {
-                        continue;
-                    }
-
-                    const coupleMap& cMap = patchCoupling_[pIndex].map();
-
-                    // Configure a face for comparison.
-                    const face& mF = faces_[amfList[mfI].index()];
-
-                    forAll(mF, pI)
-                    {
-                        if (trisectingSlave)
-                        {
-                            cF[pI] =
-                            (
-                                cMap.reverseEntityMap(coupleMap::POINT)[mF[pI]]
-                            );
-                        }
-                        else
-                        {
-                            cF[pI] =
-                            (
-                                cMap.entityMap(coupleMap::POINT)[mF[pI]]
-                            );
-                        }
-                    }
-
-                    bool matched = false;
-
-                    forAll(asfList, sfI)
-                    {
-                        const face& sF = faces_[asfList[sfI].index()];
-
-                        if (triFace::compare(triFace(cF), triFace(sF)))
-                        {
-                            if (trisectingSlave)
-                            {
-                                cMap.mapMaster
-                                (
-                                    coupleMap::FACE,
-                                    amfList[mfI].index(),
-                                    asfList[sfI].index()
-                                );
-
-                                cMap.mapSlave
-                                (
-                                    coupleMap::FACE,
-                                    asfList[sfI].index(),
-                                    amfList[mfI].index()
-                                );
-                            }
-                            else
-                            {
-                                cMap.mapSlave
-                                (
-                                    coupleMap::FACE,
-                                    amfList[mfI].index(),
-                                    asfList[sfI].index()
-                                );
-
-                                cMap.mapMaster
-                                (
-                                    coupleMap::FACE,
-                                    asfList[sfI].index(),
-                                    amfList[mfI].index()
-                                );
-                            }
-
-                            matched = true;
-
-                            break;
-                        }
-                    }
-
-                    if (!matched)
-                    {
-                        Pout<< "masterFaces: " << nl
-                            << amfList << endl;
-
-                        Pout<< "slaveFaces: " << nl
-                            << asfList << endl;
-
-                        forAll(amfList, mfI)
-                        {
-                            Pout<< amfList[mfI].index() << ": "
-                                << faces_[amfList[mfI].index()]
-                                << endl;
-                        }
-
-                        forAll(asfList, sfI)
-                        {
-                            Pout<< asfList[sfI].index() << ": "
-                                << faces_[asfList[sfI].index()]
-                                << endl;
-                        }
-
-                        FatalErrorIn
-                        (
-                            "const changeMap dynamicTopoFvMesh::trisectFace\n"
-                            "(\n"
-                            "    const label fIndex,\n"
-                            "    bool checkOnly,\n"
-                            "    bool forceOp\n"
-                            ")\n"
-                        )
-                            << "Failed to build coupled face maps."
-                            << abort(FatalError);
-                    }
-                }
-            }
-            else
-            if (processorCoupledEntity(fIndex))
-            {
-                // Look for matching slave edges on the patchSubMesh.
-
-            }
-        }
-    }
-    else
-    {
-        // Add three new cells to the end of the cell list
-        for (label i = 3; i < 6; i++)
-        {
-            scalar parentScale = -1.0;
-
-            if (edgeRefinement_)
-            {
-                parentScale = lengthScale_[cellsForRemoval[1]];
-            }
-
-            newCellIndex[i] = insertCell(newTetCell[i], parentScale);
-
-            // Add to the map.
-            map.addCell(newCellIndex[i]);
-        }
-
-        // Find the apex point for this cell
-        apexPoint[1] =
-        (
-            meshOps::tetApexPoint
-            (
-                neighbour_[fIndex],
-                fIndex,
-                faces_,
-                cells_
-            )
-        );
-
-        // Add six new interior faces.
-
-        // Fourth face: Owner: newCellIndex[0], Neighbour: newCellIndex[3]
-        tmpTriFace[0] = newPointIndex;
-        tmpTriFace[1] = faces_[fIndex][2];
-        tmpTriFace[2] = faces_[fIndex][0];
-
-        newFaceIndex[3] =
-        (
-            insertFace
-            (
-                -1,
-                tmpTriFace,
-                newCellIndex[0],
-                newCellIndex[3]
-            )
-        );
-
-        // Fifth face: Owner: newCellIndex[1], Neighbour: newCellIndex[4]
-        tmpTriFace[0] = newPointIndex;
-        tmpTriFace[1] = faces_[fIndex][0];
-        tmpTriFace[2] = faces_[fIndex][1];
-
-        newFaceIndex[4] =
-        (
-            insertFace
-            (
-                -1,
-                tmpTriFace,
-                newCellIndex[1],
-                newCellIndex[4]
-            )
-        );
-
-        // Sixth face: Owner: newCellIndex[2], Neighbour: newCellIndex[5]
-        tmpTriFace[0] = newPointIndex;
-        tmpTriFace[1] = faces_[fIndex][1];
-        tmpTriFace[2] = faces_[fIndex][2];
-
-        newFaceIndex[5] =
-        (
-            insertFace
-            (
-                -1,
-                tmpTriFace,
-                newCellIndex[2],
-                newCellIndex[5]
-            )
-        );
-
-        // Seventh face: Owner: newCellIndex[3], Neighbour: newCellIndex[4]
-        tmpTriFace[0] = newPointIndex;
-        tmpTriFace[1] = apexPoint[1];
-        tmpTriFace[2] = faces_[fIndex][0];
-
-        newFaceIndex[6] =
-        (
-            insertFace
-            (
-                -1,
-                tmpTriFace,
-                newCellIndex[3],
-                newCellIndex[4]
-            )
-        );
-
-        // Eighth face: Owner: newCellIndex[4], Neighbour: newCellIndex[5]
-        tmpTriFace[0] = newPointIndex;
-        tmpTriFace[1] = apexPoint[1];
-        tmpTriFace[2] = faces_[fIndex][1];
-
-        newFaceIndex[7] =
-        (
-            insertFace
-            (
-                -1,
-                tmpTriFace,
-                newCellIndex[4],
-                newCellIndex[5]
-            )
-        );
-
-        // Ninth face: Owner: newCellIndex[3], Neighbour: newCellIndex[5]
-        tmpTriFace[0] = newPointIndex;
-        tmpTriFace[1] = faces_[fIndex][2];
-        tmpTriFace[2] = apexPoint[1];
-
-        newFaceIndex[8] =
-        (
-            insertFace
-            (
-                -1,
-                tmpTriFace,
-                newCellIndex[3],
-                newCellIndex[5]
-            )
-        );
-
-        // Add the newly created faces to cells
-        newTetCell[3][nF[3]++] = newFaceIndex[6];
-        newTetCell[3][nF[3]++] = newFaceIndex[8];
-        newTetCell[4][nF[4]++] = newFaceIndex[6];
-        newTetCell[4][nF[4]++] = newFaceIndex[7];
-        newTetCell[5][nF[5]++] = newFaceIndex[7];
-        newTetCell[5][nF[5]++] = newFaceIndex[8];
-
-        newTetCell[0][nF[0]++] = newFaceIndex[3];
-        newTetCell[1][nF[1]++] = newFaceIndex[4];
-        newTetCell[2][nF[2]++] = newFaceIndex[5];
-
-        newTetCell[3][nF[3]++] = newFaceIndex[3];
-        newTetCell[4][nF[4]++] = newFaceIndex[4];
-        newTetCell[5][nF[5]++] = newFaceIndex[5];
-
-        // Define the three faces to check for orientation:
-        checkFace[0][0] = faces_[fIndex][2];
-        checkFace[0][1] = apexPoint[1];
-        checkFace[0][2] = faces_[fIndex][0];
-
-        checkFace[1][0] = faces_[fIndex][0];
-        checkFace[1][1] = apexPoint[1];
-        checkFace[1][2] = faces_[fIndex][1];
-
-        checkFace[2][0] = faces_[fIndex][1];
-        checkFace[2][1] = apexPoint[1];
-        checkFace[2][2] = faces_[fIndex][2];
-
-        // Check the orientation of faces on the second cell.
-        forAll(cells_[neighbour_[fIndex]], faceI)
-        {
-            label faceIndex = cells_[neighbour_[fIndex]][faceI];
-
-            if (faceIndex == fIndex)
-            {
-                continue;
-            }
-
-            const face& faceToCheck = faces_[faceIndex];
-            label cellIndex = cellsForRemoval[1];
-            label newIndex = -1;
-
-            // Check against faces.
-            if (triFace::compare(triFace(faceToCheck), triFace(checkFace[0])))
-            {
-                newIndex = newCellIndex[3];
-                newTetCell[3][nF[3]++] = faceIndex;
-            }
-            else
-            if (triFace::compare(triFace(faceToCheck), triFace(checkFace[1])))
-            {
-                newIndex = newCellIndex[4];
-                newTetCell[4][nF[4]++] = faceIndex;
-            }
-            else
-            if (triFace::compare(triFace(faceToCheck), triFace(checkFace[2])))
-            {
-                newIndex = newCellIndex[5];
-                newTetCell[5][nF[5]++] = faceIndex;
-            }
-            else
-            {
-                // Something's terribly wrong.
-                FatalErrorIn
-                (
-                    "const changeMap dynamicTopoFvMesh::trisectFace\n"
-                    "(\n"
-                    "    const label fIndex,\n"
-                    "    bool checkOnly,\n"
-                    "    bool forceOp\n"
-                    ")\n"
-                )
-                    << "Failed to determine a face match."
-                    << abort(FatalError);
-            }
-
-            // Check if a face-flip is necessary
-            if (owner_[faceIndex] == cellIndex)
-            {
-                if (neighbour_[faceIndex] == -1)
-                {
-                    // Change the owner
-                    owner_[faceIndex] = newIndex;
-                }
-                else
-                {
-                    // Flip this face
-                    faces_[faceIndex] = faceToCheck.reverseFace();
-                    owner_[faceIndex] = neighbour_[faceIndex];
-                    neighbour_[faceIndex] = newIndex;
-
-                    setFlip(faceIndex);
-                }
-            }
-            else
-            {
-                // Flip is unnecessary. Just update neighbour
-                neighbour_[faceIndex] = newIndex;
-            }
-        }
-
-        // Configure edgeFaces for four new interior edges.
-        newQuadEdgeFaces[0] = newFaceIndex[4];
-        newQuadEdgeFaces[1] = newFaceIndex[0];
-        newQuadEdgeFaces[2] = newFaceIndex[3];
-        newQuadEdgeFaces[3] = newFaceIndex[6];
-
-        newEdgeIndex[1] =
-        (
-            insertEdge
-            (
-                -1,
-                edge
-                (
-                   newPointIndex,
-                   faces_[fIndex][0]
-                ),
-                newQuadEdgeFaces
-            )
-        );
-
-        newQuadEdgeFaces[0] = newFaceIndex[5];
-        newQuadEdgeFaces[1] = newFaceIndex[1];
-        newQuadEdgeFaces[2] = newFaceIndex[4];
-        newQuadEdgeFaces[3] = newFaceIndex[7];
-
-        newEdgeIndex[2] =
-        (
-            insertEdge
-            (
-                -1,
-                edge
-                (
-                   newPointIndex,
-                   faces_[fIndex][1]
-                ),
-                newQuadEdgeFaces
-            )
-        );
-
-        newQuadEdgeFaces[0] = newFaceIndex[3];
-        newQuadEdgeFaces[1] = newFaceIndex[2];
-        newQuadEdgeFaces[2] = newFaceIndex[5];
-        newQuadEdgeFaces[3] = newFaceIndex[8];
-
-        newEdgeIndex[3] =
-        (
-            insertEdge
-            (
-                -1,
-                edge
-                (
-                   newPointIndex,
-                   faces_[fIndex][2]
-                ),
-                newQuadEdgeFaces
-            )
-        );
-
-        newTriEdgeFaces[0] = newFaceIndex[6];
-        newTriEdgeFaces[1] = newFaceIndex[7];
-        newTriEdgeFaces[2] = newFaceIndex[8];
-
-        newEdgeIndex[4] =
-        (
-            insertEdge
-            (
-                -1,
-                edge
-                (
-                   apexPoint[1],
-                   newPointIndex
-                ),
-                newTriEdgeFaces
-            )
-        );
-
-        // Configure faceEdges with the new internal edges
-        newFaceEdges[0][nE[0]++] = newEdgeIndex[1];
-        newFaceEdges[1][nE[1]++] = newEdgeIndex[2];
-        newFaceEdges[2][nE[2]++] = newEdgeIndex[3];
-
-        newFaceEdges[3][nE[3]++] = newEdgeIndex[1];
-        newFaceEdges[3][nE[3]++] = newEdgeIndex[3];
-        newFaceEdges[4][nE[4]++] = newEdgeIndex[1];
-        newFaceEdges[4][nE[4]++] = newEdgeIndex[2];
-        newFaceEdges[5][nE[5]++] = newEdgeIndex[2];
-        newFaceEdges[5][nE[5]++] = newEdgeIndex[3];
-
-        newFaceEdges[6][nE[6]++] = newEdgeIndex[1];
-        newFaceEdges[7][nE[7]++] = newEdgeIndex[2];
-        newFaceEdges[8][nE[8]++] = newEdgeIndex[3];
-
-        newFaceEdges[6][nE[6]++] = newEdgeIndex[4];
-        newFaceEdges[7][nE[7]++] = newEdgeIndex[4];
-        newFaceEdges[8][nE[8]++] = newEdgeIndex[4];
-
-        // Define the nine edges to check while building faceEdges:
-        FixedList<edge,9> check;
-
-        check[0][0] = apexPoint[0]; check[0][1] = faces_[fIndex][0];
-        check[1][0] = apexPoint[0]; check[1][1] = faces_[fIndex][1];
-        check[2][0] = apexPoint[0]; check[2][1] = faces_[fIndex][2];
-
-        check[3][0] = faces_[fIndex][2]; check[3][1] = faces_[fIndex][0];
-        check[4][0] = faces_[fIndex][0]; check[4][1] = faces_[fIndex][1];
-        check[5][0] = faces_[fIndex][1]; check[5][1] = faces_[fIndex][2];
-
-        check[6][0] = apexPoint[1]; check[6][1] = faces_[fIndex][0];
-        check[7][0] = apexPoint[1]; check[7][1] = faces_[fIndex][1];
-        check[8][0] = apexPoint[1]; check[8][1] = faces_[fIndex][2];
-
-        // Build a list of cellEdges
-        DynamicList<label> cellEdges(12);
-
-        forAll(cells_[owner_[fIndex]], faceI)
-        {
-            const labelList& fEdges =
-            (
-                faceEdges_[cells_[owner_[fIndex]][faceI]]
-            );
-
-            forAll(fEdges, edgeI)
-            {
-                if (findIndex(cellEdges, fEdges[edgeI]) == -1)
-                {
-                    cellEdges.append(fEdges[edgeI]);
-                }
-            }
-        }
-
-        forAll(cells_[neighbour_[fIndex]], faceI)
-        {
-            const labelList& fEdges =
-            (
-                faceEdges_[cells_[neighbour_[fIndex]][faceI]]
-            );
-
-            forAll(fEdges, edgeI)
-            {
-                if (findIndex(cellEdges, fEdges[edgeI]) == -1)
-                {
-                    cellEdges.append(fEdges[edgeI]);
-                }
-            }
-        }
-
-        // Loop through cellEdges, and perform appropriate actions.
-        forAll(cellEdges, edgeI)
-        {
-            const label ceIndex = cellEdges[edgeI];
-            const edge& edgeToCheck = edges_[ceIndex];
-
-            // Check against the specified edges.
-            if (edgeToCheck == check[0])
-            {
-                meshOps::sizeUpList(newFaceIndex[0], edgeFaces_[ceIndex]);
-                newFaceEdges[0][nE[0]++] = ceIndex;
-            }
-
-            if (edgeToCheck == check[1])
-            {
-                meshOps::sizeUpList(newFaceIndex[1], edgeFaces_[ceIndex]);
-                newFaceEdges[1][nE[1]++] = ceIndex;
-            }
-
-            if (edgeToCheck == check[2])
-            {
-                meshOps::sizeUpList(newFaceIndex[2], edgeFaces_[ceIndex]);
-                newFaceEdges[2][nE[2]++] = ceIndex;
-            }
-
-            if (edgeToCheck == check[3])
-            {
-                meshOps::replaceLabel
-                (
-                    fIndex,
-                    newFaceIndex[3],
-                    edgeFaces_[ceIndex]
-                );
-
-                newFaceEdges[3][nE[3]++] = ceIndex;
-            }
-
-            if (edgeToCheck == check[4])
-            {
-                meshOps::replaceLabel
-                (
-                    fIndex,
-                    newFaceIndex[4],
-                    edgeFaces_[ceIndex]
-                );
-
-                newFaceEdges[4][nE[4]++] = ceIndex;
-            }
-
-            if (edgeToCheck == check[5])
-            {
-                meshOps::replaceLabel
-                (
-                    fIndex,
-                    newFaceIndex[5],
-                    edgeFaces_[ceIndex]
-                );
-
-                newFaceEdges[5][nE[5]++] = ceIndex;
-            }
-
-            if (edgeToCheck == check[6])
-            {
-                meshOps::sizeUpList(newFaceIndex[6], edgeFaces_[ceIndex]);
-                newFaceEdges[6][nE[6]++] = ceIndex;
-            }
-
-            if (edgeToCheck == check[7])
-            {
-                meshOps::sizeUpList(newFaceIndex[7], edgeFaces_[ceIndex]);
-                newFaceEdges[7][nE[7]++] = ceIndex;
-            }
-
-            if (edgeToCheck == check[8])
-            {
-                meshOps::sizeUpList(newFaceIndex[8], edgeFaces_[ceIndex]);
-                newFaceEdges[8][nE[8]++] = ceIndex;
-            }
-        }
-
-        // Now that faceEdges has been configured, append them to the list.
-        for (label i = 0; i < 9; i++)
-        {
-            faceEdges_.append(newFaceEdges[i]);
-
-            // Add faces to the map.
-            map.addFace(newFaceIndex[i]);
-        }
-    }
-
-    // Added edges are those connected to the new point
-    const labelList& pointEdges = pointEdges_[newPointIndex];
-
-    forAll(pointEdges, edgeI)
-    {
-        map.addEdge(pointEdges[edgeI]);
-    }
-
-    // Now generate mapping info and remove entities.
-    forAll(cellsForRemoval, cellI)
-    {
-        label cIndex = cellsForRemoval[cellI];
-
-        if (cIndex == -1)
-        {
-            continue;
-        }
-
-        // Fill-in mapping information
-        labelList mC(1, cellsForRemoval[cellI]);
-
-        if (cellI == 0)
-        {
-            for (label i = 0; i < 3; i++)
-            {
-                // Update the cell list with newly configured cells.
-                cells_[newCellIndex[i]] = newTetCell[i];
-
-                setCellMapping(newCellIndex[i], mC);
-            }
-        }
-        else
-        {
-            for (label i = 3; i < 6; i++)
-            {
-                // Update the cell list with newly configured cells.
-                cells_[newCellIndex[i]] = newTetCell[i];
-
-                setCellMapping(newCellIndex[i], mC);
-            }
-        }
-
-        removeCell(cIndex);
-    }
-
-    // Set default mapping for interior faces.
-    for (label i = 0; i < 3; i++)
-    {
-        setFaceMapping(newFaceIndex[i]);
-    }
-
-    if (cellsForRemoval[1] == -1)
-    {
-        // Set mapping for boundary faces.
-        for (label i = 3; i < 6; i++)
-        {
-            setFaceMapping(newFaceIndex[i], labelList(1, fIndex));
-        }
-    }
-    else
-    {
-        // Set default mapping for interior faces.
-        for (label i = 3; i < 9; i++)
-        {
-            setFaceMapping(newFaceIndex[i]);
-        }
-    }
-
-    // Now finally remove the face...
-    removeFace(fIndex);
-
-    if (debug > 2)
-    {
-        Pout<< "New Point:: " << newPointIndex << endl;
-
-        const labelList& pEdges = pointEdges_[newPointIndex];
-
-        Pout<< "pointEdges:: " << pEdges << endl;
-
-        Pout<< "Added edges: " << endl;
-
-        forAll(pEdges, edgeI)
-        {
-            Pout<< pEdges[edgeI]
-                << ":: " << edges_[pEdges[edgeI]] << nl
-                << " edgeFaces:: " << edgeFaces_[pEdges[edgeI]] << nl
-                << endl;
-        }
-
-        Pout<< "Added faces: " << endl;
-
-        forAll(newFaceIndex, faceI)
-        {
-            if (newFaceIndex[faceI] == -1)
-            {
-                continue;
-            }
-
-            Pout<< newFaceIndex[faceI] << ":: "
-                << faces_[newFaceIndex[faceI]]
-                << endl;
-        }
-
-        Pout<< "Added cells: " << endl;
-
-        forAll(newCellIndex, cellI)
-        {
-            if (newCellIndex[cellI] == -1)
-            {
-                continue;
-            }
-
-            Pout<< newCellIndex[cellI] << ":: "
-                << cells_[newCellIndex[cellI]]
-                << endl;
-        }
-
-        // Write out VTK files after change
-        if (debug > 3)
-        {
-            labelList vtkCells;
-
-            if (cellsForRemoval[1] == -1)
-            {
-                vtkCells.setSize(3);
-
-                // Fill in cell indices
-                vtkCells[0] = newCellIndex[0];
-                vtkCells[1] = newCellIndex[1];
-                vtkCells[2] = newCellIndex[2];
-            }
-            else
-            {
-                vtkCells.setSize(6);
-
-                // Fill in cell indices
-                forAll(newCellIndex, indexI)
-                {
-                    vtkCells[indexI] = newCellIndex[indexI];
-                }
-            }
-
-            writeVTK
-            (
-                Foam::name(fIndex)
-              + "Trisect_1",
-                vtkCells
-            );
-        }
-    }
-
-    // Set the flag
-    topoChangeFlag_ = true;
-
-    // Increment the counter
-    statistics_[3]++;
-
-    // Increment the number of modifications
-    statistics_[0]++;
+    status(TOTAL_MODIFICATIONS)++;
 
     // Specify that the operation was successful
     map.type() = 1;
@@ -5840,11 +4202,10 @@ scalar dynamicTopoFvMesh::computeBisectionQuality
         {
             const face& checkFace = faces_[checkCell[faceI]];
 
-            if
-            (
-                (findIndex(checkFace, edgeToCheck[0]) == -1) &&
-                (findIndex(checkFace, edgeToCheck[1]) == -1)
-            )
+            bool check0 = (findIndex(checkFace, edgeToCheck[0]) == -1);
+            bool check1 = (findIndex(checkFace, edgeToCheck[1]) == -1);
+
+            if ((check0 && !check1) || (!check0 && check1))
             {
                 // Check orientation
                 if (owner_[checkCell[faceI]] == cellIndex)
@@ -5940,83 +4301,6 @@ scalar dynamicTopoFvMesh::computeBisectionQuality
 }
 
 
-// Utility method to compute the quality of cells
-// around a face after trisection.
-scalar dynamicTopoFvMesh::computeTrisectionQuality
-(
-    const label fIndex
-) const
-{
-    scalar minQuality = GREAT;
-    scalar cQuality = 0.0;
-
-    point midPoint;
-
-    // Fetch the midPoint
-    midPoint = faces_[fIndex].centre(points_);
-
-    FixedList<label,2> apexPoint(-1);
-
-    // Find the apex point
-    apexPoint[0] =
-    (
-        meshOps::tetApexPoint
-        (
-            owner_[fIndex],
-            fIndex,
-            faces_,
-            cells_
-        )
-    );
-
-    const face& faceToCheck = faces_[fIndex];
-
-    forAll(faceToCheck, pointI)
-    {
-        // Pick vertices off the list
-        const point& b = points_[faceToCheck[pointI]];
-        const point& c = points_[apexPoint[0]];
-        const point& d = points_[faceToCheck[faceToCheck.fcIndex(pointI)]];
-
-        // Compute the quality of the upper half.
-        cQuality = tetMetric_(midPoint, b, c, d);
-
-        // Check if the quality is worse
-        minQuality = Foam::min(cQuality, minQuality);
-    }
-
-    if (whichPatch(fIndex) == -1)
-    {
-        apexPoint[1] =
-        (
-            meshOps::tetApexPoint
-            (
-                neighbour_[fIndex],
-                fIndex,
-                faces_,
-                cells_
-            )
-        );
-
-        forAll(faceToCheck, pointI)
-        {
-            // Pick vertices off the list
-            const point& b = points_[faceToCheck[pointI]];
-            const point& c = points_[apexPoint[1]];
-            const point& d = points_[faceToCheck[faceToCheck.rcIndex(pointI)]];
-
-            // Compute the quality of the upper half.
-            cQuality = tetMetric_(midPoint, b, c, d);
-
-            // Check if the quality is worse
-            minQuality = Foam::min(cQuality, minQuality);
-        }
-    }
-
-    return minQuality;
-}
-
-
 // Slice the mesh at a particular location
 void dynamicTopoFvMesh::sliceMesh
 (
@@ -6035,7 +4319,7 @@ void dynamicTopoFvMesh::sliceMesh
     vector gCentre = vector::zero;
     FixedList<vector, 2> fC(vector::zero);
 
-    if (twoDMesh_)
+    if (is2D())
     {
         patchIndex = whichPatch(pointPair.first());
 
@@ -6095,7 +4379,7 @@ void dynamicTopoFvMesh::sliceMesh
     Map<vector> checkPoints, surfFaces;
     Map<edge> checkEdges;
 
-    if (twoDMesh_)
+    if (is2D())
     {
         // Assign plane point / normal
         p = gCentre;
@@ -6371,7 +4655,7 @@ void dynamicTopoFvMesh::sliceMesh
             continue;
         }
 
-        if (twoDMesh_ && faces_[faceI].size() == 3)
+        if (is2D() && faces_[faceI].size() == 3)
         {
             continue;
         }
@@ -6435,7 +4719,7 @@ void dynamicTopoFvMesh::sliceMesh
         // Loop through all points (and associated pointEdges)
         // for this face, and check if connected cells are also
         // present in the checkCells/cellColors list
-        if (twoDMesh_)
+        if (is2D())
         {
             const labelList& fEdges = faceEdges_[fIter.key()];
 
@@ -6657,7 +4941,7 @@ const changeMap dynamicTopoFvMesh::addCellLayer
         addedCells.insert(cIndex, labelPair(newCellIndex, 0));
     }
 
-    FixedList<label, 2> mP(-1);
+    labelList mP(2, -1);
 
     forAll(patchFaces, indexI)
     {
@@ -6942,12 +5226,10 @@ const changeMap dynamicTopoFvMesh::addCellLayer
                     whichPatch(vFaceIndex),
                     newVFace,
                     newOwner,
-                    newNeighbour
+                    newNeighbour,
+                    newVFaceEdges
                 )
             );
-
-            // Add a faceEdges entry
-            faceEdges_.append(newVFaceEdges);
 
             // Update maps
             map.addFace(newVFaceIndex, labelList(1, vFaceIndex));
@@ -6994,12 +5276,10 @@ const changeMap dynamicTopoFvMesh::addCellLayer
                 -1,
                 newHFace,
                 cIndex,
-                addedCells[cIndex].first()
+                addedCells[cIndex].first(),
+                newHFaceEdges
             )
         );
-
-        // Add a faceEdges entry
-        faceEdges_.append(newHFaceEdges);
 
         // Update maps
         map.addFace(newHFaceIndex, labelList(1, faceI));
@@ -7052,7 +5332,7 @@ const changeMap dynamicTopoFvMesh::addCellLayer
         }
 
         // Size down pointEdges
-        if (!twoDMesh_)
+        if (is3D())
         {
             meshOps::sizeDownList
             (
@@ -7189,7 +5469,7 @@ void dynamicTopoFvMesh::splitInternalFaces
 
         pIter() = insertPoint(newPoint, oldPoint, labelList(1, pIter.key()));
 
-        if (!twoDMesh_)
+        if (is3D())
         {
             const labelList& pEdges = pointEdges_[pIter.key()];
 
@@ -7256,7 +5536,7 @@ void dynamicTopoFvMesh::splitInternalFaces
         label i = 0;
         labelList mPoints(mirrorPointLabels.size());
 
-        if (!twoDMesh_)
+        if (is3D())
         {
             forAllIter(Map<label>, mirrorPointLabels, pIter)
             {
@@ -7364,6 +5644,10 @@ void dynamicTopoFvMesh::splitInternalFaces
         // Insert the new boundary faces.
         forAll(newFace, indexI)
         {
+            // Make an identical faceEdges entry.
+            // This will be renumbered once new edges are added.
+            labelList newFaceEdges(faceEdges_[internalFaces[faceI]]);
+
             newFaceIndex[indexI] =
             (
                 insertFace
@@ -7371,15 +5655,10 @@ void dynamicTopoFvMesh::splitInternalFaces
                     patchIndex,
                     newFace[indexI],
                     newOwner[indexI],
-                    -1
+                    -1,
+                    newFaceEdges
                 )
             );
-
-            // Make an identical faceEdges entry.
-            // This will be renumbered once new edges are added.
-            labelList newFaceEdges(faceEdges_[internalFaces[faceI]]);
-
-            faceEdges_.append(newFaceEdges);
 
             // Replace face labels on cells
             meshOps::replaceLabel
@@ -7531,7 +5810,7 @@ void dynamicTopoFvMesh::splitInternalFaces
         }
     }
 
-    if (twoDMesh_)
+    if (is2D())
     {
         // Renumber edges and faces
         forAllIter(Map<label>, mirrorEdgeLabels[0], eIter)

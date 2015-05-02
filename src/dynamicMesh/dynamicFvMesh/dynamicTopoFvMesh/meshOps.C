@@ -34,17 +34,15 @@ Author
 
 \*---------------------------------------------------------------------------*/
 
-#include "objectRegistry.H"
 #include "Time.H"
 #include "meshOps.H"
 #include "ListOps.H"
 #include "Pstream.H"
 #include "triFace.H"
 #include "IOmanip.H"
-#include "HashSet.H"
 #include "polyMesh.H"
+#include "OFstream.H"
 #include "triPointRef.H"
-#include "tetPointRef.H"
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
@@ -56,7 +54,7 @@ namespace meshOps
 
 // Utility method to build a hull of cells
 // connected to the edge (for 2D simplical meshes)
-void constructPrismHull
+inline void constructPrismHull
 (
     const label eIndex,
     const UList<face>& faces,
@@ -126,7 +124,7 @@ void constructPrismHull
 
 // Utility method to build a hull of cells (and faces)
 // around an edge (for 3D simplical meshes)
-void constructHull
+inline void constructHull
 (
     const label eIndex,
     const UList<face>& faces,
@@ -333,7 +331,7 @@ void constructHull
 //    Renaud Waldura
 //    Dijkstra's Shortest Path Algorithm in Java
 //    http://renaud.waldura.com/
-bool Dijkstra
+inline bool Dijkstra
 (
     const Map<point>& points,
     const Map<edge>& edges,
@@ -463,13 +461,47 @@ bool Dijkstra
         }
     }
 
+    /*
+    // Write out the path
+    if (debug > 3)
+    {
+        if (foundEndPoint)
+        {
+            DynamicList<label> pathNodes(50);
+
+            label currentPoint = endPoint;
+
+            while (currentPoint != startPoint)
+            {
+                pathNodes.append(currentPoint);
+
+                currentPoint = pi[currentPoint];
+            }
+
+            pathNodes.append(startPoint);
+
+            pathNodes.shrink();
+
+            writeVTK
+            (
+                "DijkstraPath_"
+              + Foam::name(startPoint)
+              + '_'
+              + Foam::name(endPoint),
+                pathNodes,
+                0
+            );
+        }
+    }
+    */
+
     return foundEndPoint;
 }
 
 
 // Select a list of elements from connectivity,
 // and output to a VTK format
-void writeVTK
+inline void writeVTK
 (
     const polyMesh& mesh,
     const word& name,
@@ -847,7 +879,7 @@ void writeVTK
 
 
 // Actual routine to write out the VTK file
-void writeVTK
+inline void writeVTK
 (
     const polyMesh& mesh,
     const word& name,

@@ -62,10 +62,27 @@ int main(int argc, char *argv[])
         mesh.update();
 
 #       include "checkVolContinuity.H"
+#       include "meshCourantNo.H"
 
         if (runTime.timeIndex() % checkFrequency == 0)
         {
             mesh.checkMesh(true);
+
+            volScalarField magMeshCo
+            (
+                "magMeshCo",
+                fvc::surfaceSum
+                (
+                    mag
+                    (
+                        mesh.phi()*
+                        mesh.surfaceInterpolation::deltaCoeffs()/
+                        mesh.magSf()
+                    )
+                )
+            );
+
+            magMeshCo.write();
         }
 
         runTime.write();

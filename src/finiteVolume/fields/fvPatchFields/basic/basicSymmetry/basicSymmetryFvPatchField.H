@@ -52,6 +52,14 @@ class basicSymmetryFvPatchField
 :
     public transformFvPatchField<Type>
 {
+    // Private Data
+
+        //- Skew correction
+        Switch skewCorrected_;
+
+        //- Second order accuracy correction
+        Switch secondOrder_;
+
 
 public:
 
@@ -76,7 +84,8 @@ public:
             const dictionary&
         );
 
-        //- Construct by mapping given basicSymmetryFvPatchField onto a new patch
+        //- Construct by mapping given basicSymmetryFvPatchField onto a
+        //  new patch
         basicSymmetryFvPatchField
         (
             const basicSymmetryFvPatchField<Type>&,
@@ -137,16 +146,31 @@ public:
 
             //- Return face-gradient transform diagonal
             virtual tmp<Field<Type> > snGradTransformDiag() const;
+
+
+        // I-O
+
+            //- Write
+            virtual void write(Ostream& os) const;
 };
 
 
 // * * * * * * * * * * * Template Specialisations  * * * * * * * * * * * * * //
 
 template<>
-tmp<scalarField > basicSymmetryFvPatchField<scalar>::snGrad() const;
+tmp<scalarField> basicSymmetryFvPatchField<scalar>::snGrad() const;
 
 template<>
 void basicSymmetryFvPatchField<scalar>::evaluate
+(
+    const Pstream::commsTypes commsType
+);
+
+template<>
+tmp<vectorField> basicSymmetryFvPatchField<vector>::snGrad() const;
+
+template<>
+void basicSymmetryFvPatchField<vector>::evaluate
 (
     const Pstream::commsTypes commsType
 );

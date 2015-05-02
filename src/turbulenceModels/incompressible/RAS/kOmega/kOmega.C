@@ -137,6 +137,7 @@ kOmega::kOmega
     )
 {
     nut_ = k_/(omega_ + omegaSmall_);
+    nut_ = min(nut_, nuRatio()*nu());
     nut_.correctBoundaryConditions();
 
     printCoeffs();
@@ -277,6 +278,7 @@ void kOmega::correct()
 
     // Re-calculate viscosity
     nut_ = k_/(omega_ + omegaSmall_);
+    nut_ = min(nut_, nuRatio()*nu());
     nut_.correctBoundaryConditions();
 }
 

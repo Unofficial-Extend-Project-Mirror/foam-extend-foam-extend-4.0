@@ -11,9 +11,10 @@ Author:
 
 """
 
-from PyFoamApplication import PyFoamApplication
+from PyFoam.Applications.PyFoamApplication import PyFoamApplication
 from PyFoam.RunDictionary.ParsedParameterFile import ParsedParameterFile
 from PyFoam.RunDictionary.TimeDirectory import TimeDirectory
+from PyFoam.ThirdParty.six import print_
 from os import path, listdir
 import sys, fnmatch, re
 
@@ -95,7 +96,7 @@ Init MixingPlane boundary condition parameters
 Create a default definition for a mixingPlane patch, and replace
 the current definition
         """
-        print "Replacing definition of patch: ", patchName, ":", patch
+        print_("Replacing definition of patch: ", patchName, ":", patch)
         newPatch={
             'type'        : "mixingPlane",
             'nFaces'      : patch["nFaces"],
@@ -120,7 +121,7 @@ the current definition
         description="""\
 Modify the definition of a mixingPlane patch
         """
-        print "    Modifying mixingPlane boundary definition in constant/polyMesh/boundary for patch", patchName
+        print_("    Modifying mixingPlane boundary definition in constant/polyMesh/boundary for patch", patchName)
 
         patch["shadowPatch"]=shadowName
 
@@ -166,12 +167,12 @@ Modify the definition of a mixingPlane patch in the time directories
 
         for timeDir in listdir(caseDir):
             if reobj.match(timeDir):
-                print "    Modifying mixingPlane boundaryFields in timeDir", timeDir, "for patch", patchName
+                print_("    Modifying mixingPlane boundaryFields in timeDir", timeDir, "for patch", patchName)
 
                 td=TimeDirectory(caseDir, timeDir, yieldParsedFiles=True)
 
                 for f in td:
-                    print "        Modifying field", f.name
+                    print_("        Modifying field", f.name)
                     f["boundaryField"][patchName]["type"]='mixingPlane'
                     f.writeFile()
 
@@ -179,13 +180,13 @@ Modify the definition of a mixingPlane patch in the time directories
         fName=self.parser.getArgs()[0]
         masterbName=self.parser.getArgs()[1]
         shadowbName=self.parser.getArgs()[2]
- 
+
         boundary=ParsedParameterFile(path.join(".",fName,"constant","polyMesh","boundary"),debug=False,boundaryDict=True,backup=True)
 
         bnd=boundary.content
 
         if type(bnd)!=list:
-            print "Problem with boundary file (not a list)"
+            print_("Problem with boundary file (not a list)")
             sys.exit(-1)
 
         masterFound=False
@@ -197,7 +198,7 @@ Modify the definition of a mixingPlane patch in the time directories
             timeDirs=self.parser.getOptions().timeDirs
             updateTimeDirs=True
 
-        print "UpdateTimeDirs: ", updateTimeDirs
+        print_("UpdateTimeDirs: ", updateTimeDirs)
 
         for index in range(len(bnd)):
 
@@ -233,9 +234,6 @@ Modify the definition of a mixingPlane patch in the time directories
             self.error("Boundary patch",shadowbName,"not found in",bnd[::2])
 
         if self.parser.getOptions().test:
-            print boundary
+            print_(boundary)
         else:
             boundary.writeFile()
-
-
-

@@ -390,6 +390,7 @@ void SpalartAllmaras::correct()
     nuTilda_.correctBoundaryConditions();
 
     nut_.internalField() = fv1*nuTilda_.internalField();
+    nut_ = min(nut_, nuRatio()*nu());
     nut_.correctBoundaryConditions();
 }
 

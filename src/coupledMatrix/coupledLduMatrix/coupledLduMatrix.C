@@ -30,9 +30,10 @@ Description
 Author
     Hrvoje Jasak, Wikki Ltd.  All rights reserved
 
-\*----------------------------------------------------------------------------*/
+\*---------------------------------------------------------------------------*/
 
 #include "coupledLduMatrix.H"
+#include "processorLduInterfaceField.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
@@ -40,9 +41,6 @@ namespace Foam
 {
     defineTypeNameAndDebug(coupledLduMatrix, 1);
 }
-
-
-// * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
@@ -202,16 +200,101 @@ void Foam::coupledLduMatrix::initMatrixInterfaces
 {
     const PtrList<lduMatrix>& matrices = *this;
 
+    // Note.  The comms design requires all non-processor interfaces
+    // to be updated first, followed by the update of processor
+    // interfaces.  The reason is that non-processor coupled
+    // interfaces require a complex comms pattern involving more than
+    // pairwise communications.
+    // Under normal circumstances this is achieved naturall, since
+    // processor interfaces come last on the list and other coupled
+    // interfaces execute complex comms at init() level.
+    // For coupled matrices, the update loop needs to be split over
+    // all matrices by hand
+    // Bug fix: Zeljko Tukovic, 7/Apr/2015
+
+    // Init update all non-processor coupled interfaces
     forAll (matrices, rowI)
     {
-        matrices[rowI].initMatrixInterfaces
+        if
         (
-            coupleCoeffs[rowI],
-            interfaces[rowI],
-            x[rowI],
-            result[rowI],
-            cmpt
-        );
+            Pstream::defaultCommsType == Pstream::blocking
+         || Pstream::defaultCommsType == Pstream::nonBlocking
+        )
+        {
+            forAll (interfaces[rowI], interfaceI)
+            {
+                if (interfaces[rowI].set(interfaceI))
+                {
+                    if
+                    (
+                       !isA<processorLduInterfaceField>
+                        (
+                            interfaces[rowI][interfaceI]
+                        )
+                    )
+                    {
+                        interfaces[rowI][interfaceI].initInterfaceMatrixUpdate
+                        (
+                            x[rowI],
+                            result[rowI],
+                            matrices[rowI],
+                            coupleCoeffs[rowI][interfaceI],
+                            cmpt,
+			    static_cast<const Pstream::commsTypes>(Pstream::defaultCommsType()),
+                            false
+                        );
+                    }
+                }
+            }
+        }
+        else
+        {
+            matrices[rowI].initMatrixInterfaces
+            (
+                coupleCoeffs[rowI],
+                interfaces[rowI],
+                x[rowI],
+                result[rowI],
+                cmpt
+            );
+        }
+    }
+
+    // Init update for all processor interfaces
+    forAll (matrices, rowI)
+    {
+        if
+        (
+            Pstream::defaultCommsType == Pstream::blocking
+         || Pstream::defaultCommsType == Pstream::nonBlocking
+        )
+        {
+            forAll (interfaces[rowI], interfaceI)
+            {
+                if (interfaces[rowI].set(interfaceI))
+                {
+                    if
+                    (
+                        isA<processorLduInterfaceField>
+                        (
+                            interfaces[rowI][interfaceI]
+                        )
+                    )
+                    {
+                        interfaces[rowI][interfaceI].initInterfaceMatrixUpdate
+                        (
+                            x[rowI],
+                            result[rowI],
+                            matrices[rowI],
+                            coupleCoeffs[rowI][interfaceI],
+                            cmpt,
+                            static_cast<const Pstream::commsTypes>(Pstream::defaultCommsType()),
+                            false
+                        );
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -239,15 +322,6 @@ void Foam::coupledLduMatrix::updateMatrixInterfaces
         );
     }
 }
-
-
-// * * * * * * * * * * * * * * * Member Operators  * * * * * * * * * * * * * //
-
-
-// * * * * * * * * * * * * * * * Friend Functions  * * * * * * * * * * * * * //
-
-
-// * * * * * * * * * * * * * * * Friend Operators  * * * * * * * * * * * * * //
 
 
 // ************************************************************************* //

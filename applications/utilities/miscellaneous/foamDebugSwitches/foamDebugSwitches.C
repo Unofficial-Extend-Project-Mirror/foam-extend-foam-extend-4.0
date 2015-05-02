@@ -48,6 +48,8 @@ int main(int argc, char *argv[])
     wordList currDebug(debug::debugSwitches().toc());
     wordList currInfo(debug::infoSwitches().toc());
     wordList currOpt(debug::optimisationSwitches().toc());
+    wordList currTol(debug::tolerances().toc());
+    wordList currConst(debug::constants().toc());
 
     if (args.optionFound("old") || args.optionFound("new"))
     {
@@ -66,6 +68,16 @@ int main(int argc, char *argv[])
         wordHashSet oldOpt
         (
             controlDict.subDict("OptimisationSwitches").toc()
+        );
+
+        wordHashSet oldTol
+        (
+            controlDict.subDict("Tolerances").toc()
+        );
+
+        wordHashSet oldConst
+        (
+            controlDict.subDict("DimensionedConstants").toc()
         );
 
 
@@ -100,6 +112,18 @@ int main(int argc, char *argv[])
             listing = hashset.toc();
             sort(listing);
             Info<< "old OptimisationSwitches: " << listing << endl;
+
+            hashset = wordHashSet(oldTol);
+            hashset -= wordHashSet(currTol);
+            listing = hashset.toc();
+            sort(listing);
+            Info<< "old Tolerances: " << listing << endl;
+
+            hashset = wordHashSet(oldConst);
+            hashset -= wordHashSet(currConst);
+            listing = hashset.toc();
+            sort(listing);
+            Info<< "old DimensionedConstants: " << listing << endl;
         }
 
         // list new switches
@@ -125,25 +149,91 @@ int main(int argc, char *argv[])
             listing = hashset.toc();
             sort(listing);
             Info<< "new OptimisationSwitches: " << listing << endl;
+
+            hashset = wordHashSet(currTol);
+            hashset -= wordHashSet(oldTol);
+            listing = hashset.toc();
+            sort(listing);
+            Info<< "new Tolerances: " << listing << endl;
+
+            hashset = wordHashSet(currConst);
+            hashset -= wordHashSet(oldConst);
+            listing = hashset.toc();
+            sort(listing);
+            Info<< "new DimensionedConstants: " << listing << endl;
         }
     }
     else
     {
-        IOobject::writeDivider(Info);
+        //IOobject::writeDivider(Info);
 
         sort(currDebug);
-        Info<< "DebugSwitches: " << currDebug << endl;
+
+        Info << endl << "DebugSwitches: " << endl;
+	forAll(currDebug, dI)
+	{
+	    Info << "  "
+		 << currDebug[dI]
+		 << " : "
+		 << debug::debugSwitchFromDict(currDebug[dI].c_str(), 0)
+		 << endl;
+	}
 
         sort(currInfo);
-        Info<< "InfoSwitches: " << currInfo << endl;
+        Info << endl << "InfoSwitches: " << endl;
+	forAll(currInfo, iI)
+	{
+	    Info << "  "
+		 << currInfo[iI]
+		 << " : "
+		 << debug::infoSwitchFromDict(currInfo[iI].c_str(), 0)
+		 << endl;
+	}
 
         sort(currOpt);
-        Info<< "OptimisationSwitches: " << currOpt << endl;
+        Info << endl << "OptimisationSwitches: " << endl;
+	forAll(currOpt, oI)
+	{
+	    if (currOpt[oI] == "commsType")
+	    {
+		token commsTypeValue;
+		debug::optimisationSwitches().lookup("commsType", false, false).read(commsTypeValue);
+	        Info << "  " << "commsType : " << commsTypeValue << endl;
+	    }
+	    else
+	    {
+		Info << "  "
+		     << currOpt[oI]
+		     << " : "
+		     << debug::optimisationSwitchFromDict(currOpt[oI].c_str(), 0)
+		     << endl;
+	    }
+	}
+
+        sort(currTol);
+        Info << endl << "Tolerances: " << endl;
+	forAll(currTol, tI)
+	{
+	    Info << "  "
+		 << currTol[tI]
+		 << " : "
+		 << debug::tolerancesFromDict(currTol[tI].c_str(), 0)
+		 << endl;
+	}
+
+        sort(currConst);
+        Info << endl << "Dimensioned Constants: " << endl;
+	forAll(currConst, tI)
+	{
+	    Info << "  "
+		 << currConst[tI]
+		 << " : "
+		 << debug::constantsFromDict(currConst[tI].c_str(), 0)
+		 << endl;
+	}
     }
 
-
-
-    Info<< "done" << endl;
+    Info << endl << "Done." << endl;
 
     return 0;
 }

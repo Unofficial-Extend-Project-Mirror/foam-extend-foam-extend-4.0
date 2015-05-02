@@ -151,7 +151,7 @@ class ggiPolyPatch
         // Memory management
 
             //- Clear geometry
-             void clearGeom();
+            void clearGeom();
 
             //- Clear out
             void clearOut();
@@ -279,9 +279,8 @@ public:
         }
 
 
-    // Destructor
-
-        virtual ~ggiPolyPatch();
+    //- Destructor
+    virtual ~ggiPolyPatch();
 
 
     // Member functions

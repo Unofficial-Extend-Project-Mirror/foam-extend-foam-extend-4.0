@@ -250,7 +250,7 @@ double Foam::debug::constantsFromDict
     const double defaultValue
 )
 {
-    return tolerances().lookupOrAddDefault
+    return constants().lookupOrAddDefault
     (
         name, defaultValue, false, false
     );
@@ -299,7 +299,7 @@ void Foam::debug::updateCentralDictVars
 			   )
 			{
 			    Info << endl
-				 << "Warning: Modification of DebugSwitch: "
+				 << "Warning: Modification of DebugSwitches: "
 				 << key << endl
 				 << "    Old value: " << oldDebugValue << endl
 				 << "    New value: " << newDebugValue << endl
@@ -383,7 +383,7 @@ void Foam::debug::updateCentralDictVars
 			   )
 			{
 			    Info << endl
-				 << "Warning: Modification of InfoSwitch: "
+				 << "Warning: Modification of InfoSwitches: "
 				 << key << endl
 				 << "    Old value: " << oldInfoValue << endl
 				 << "    New value: " << newInfoValue << endl
@@ -500,7 +500,7 @@ void Foam::debug::updateCentralDictVars
 			{
 			    Info << endl
 				 << "Warning: Modification of "
-				 << "OptimisationSwitch: "
+				 << "OptimisationSwitches: "
 				 << key << endl
 				 << "    Old value: "
 				 << oldOptimisationValueStr << endl
@@ -587,7 +587,7 @@ void Foam::debug::updateCentralDictVars
 			   )
 			{
 			    Info << endl
-				 << "Warning: Modification of Tolerance: "
+				 << "Warning: Modification of Tolerances: "
 				 << key << endl
 				 << "    Old value: "
 				 << oldTolerancesValue << endl
@@ -673,7 +673,7 @@ void Foam::debug::updateCentralDictVars
 			  )
 			{
 			    Info << endl
-				 << "Warning: Modification of DimensionedConstant: "
+				 << "Warning: Modification of DimensionedConstants: "
 				 << key << endl
 				 << "    Old value: "
 				 << oldDimensionedConstantsValue << endl

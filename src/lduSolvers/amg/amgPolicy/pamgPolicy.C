@@ -181,29 +181,25 @@ void Foam::pamgPolicy::calcChild()
         }
 
         // Collect solo equations
-        label nSolo = 0;
-
         forAll (zeroCluster, eqnI)
         {
             if (zeroCluster[eqnI])
             {
                 // Found solo equation
-                nSolo++;
+                nSolo_++;
 
                 child_[eqnI] = nCoarseEqns_;
             }
         }
 
-        reduce(nSolo, sumOp<label>());
-
-        if (nSolo > 0)
+        if (nSolo_ > 0)
         {
             // Found solo equations
             nCoarseEqns_++;
 
             if (lduMatrix::debug >= 2)
             {
-                Info<< "Found " << nSolo << " weakly connected equations."
+                Pout<< "Found " << nSolo_ << " weakly connected equations."
                     << endl;
             }
         }
@@ -338,6 +334,7 @@ Foam::pamgPolicy::pamgPolicy
     amgPolicy(groupSize, minCoarseEqns),
     matrix_(matrix),
     child_(),
+    nSolo_(0),
     nCoarseEqns_(0),
     coarsen_(false)
 {
@@ -399,6 +396,9 @@ Foam::autoPtr<Foam::amgMatrix> Foam::pamgPolicy::restrictMatrix
 #   endif
 
 
+    // Does the matrix have solo equations
+    bool soloEqns = nSolo_ > 0;
+
     // Storage for block neighbours and coefficients
 
     // Guess initial maximum number of neighbours in block
@@ -413,6 +413,9 @@ Foam::autoPtr<Foam::amgMatrix> Foam::pamgPolicy::restrictMatrix
     scalarList blockCoeffsData(maxNnbrs*nCoarseEqns_, 0.0);
 
     // Create face-restriction addressing
+    // Note: value of coeffRestrictAddr for off-diagonal coefficients
+    // touching solo cells will be invalid
+    // HJ, 7/Apr/2015
     labelList coeffRestrictAddr(nFineCoeffs);
 
     // Initial neighbour array (not in upper-triangle order)
@@ -422,17 +425,24 @@ Foam::autoPtr<Foam::amgMatrix> Foam::pamgPolicy::restrictMatrix
     label nCoarseCoeffs = 0;
 
     // Loop through all fine coeffs
-    forAll (upperAddr, fineCoeffi)
+    forAll (upperAddr, fineCoeffI)
     {
-        label rmUpperAddr = child_[upperAddr[fineCoeffi]];
-        label rmLowerAddr = child_[lowerAddr[fineCoeffi]];
+        label rmUpperAddr = child_[upperAddr[fineCoeffI]];
+        label rmLowerAddr = child_[lowerAddr[fineCoeffI]];
+
+        // If the coefficient touches block zero and solo equations are
+        // present, skip it
+        if (soloEqns && (rmUpperAddr == 0 || rmLowerAddr == 0))
+        {
+            continue;
+        }
 
         if (rmUpperAddr == rmLowerAddr)
         {
             // For each fine coeff inside of a coarse cluster keep the address
             // of the cluster corresponding to the coeff in the
             // coeffRestrictAddr as a negative index
-            coeffRestrictAddr[fineCoeffi] = -(rmUpperAddr + 1);
+            coeffRestrictAddr[fineCoeffI] = -(rmUpperAddr + 1);
         }
         else
         {
@@ -459,7 +469,7 @@ Foam::autoPtr<Foam::amgMatrix> Foam::pamgPolicy::restrictMatrix
                 if (initCoarseNeighb[ccCoeffs[i]] == cNei)
                 {
                     nbrFound = true;
-                    coeffRestrictAddr[fineCoeffi] = ccCoeffs[i];
+                    coeffRestrictAddr[fineCoeffI] = ccCoeffs[i];
                     break;
                 }
             }
@@ -489,7 +499,7 @@ Foam::autoPtr<Foam::amgMatrix> Foam::pamgPolicy::restrictMatrix
 
                 ccCoeffs[ccnCoeffs] = nCoarseCoeffs;
                 initCoarseNeighb[nCoarseCoeffs] = cNei;
-                coeffRestrictAddr[fineCoeffi] = nCoarseCoeffs;
+                coeffRestrictAddr[fineCoeffI] = nCoarseCoeffs;
                 ccnCoeffs++;
 
                 // New coarse coeff created
@@ -522,12 +532,22 @@ Foam::autoPtr<Foam::amgMatrix> Foam::pamgPolicy::restrictMatrix
         }
     }
 
-    forAll(coeffRestrictAddr, fineCoeffi)
+    forAll (coeffRestrictAddr, fineCoeffI)
     {
-        if (coeffRestrictAddr[fineCoeffi] >= 0)
+        label rmUpperAddr = child_[upperAddr[fineCoeffI]];
+        label rmLowerAddr = child_[lowerAddr[fineCoeffI]];
+
+        // If the coefficient touches block zero and solo equations are
+        // present, skip it
+        if (soloEqns && (rmUpperAddr == 0 || rmLowerAddr == 0))
         {
-            coeffRestrictAddr[fineCoeffi] =
-                coarseCoeffMap[coeffRestrictAddr[fineCoeffi]];
+            continue;
+        }
+
+        if (coeffRestrictAddr[fineCoeffI] >= 0)
+        {
+            coeffRestrictAddr[fineCoeffI] =
+                coarseCoeffMap[coeffRestrictAddr[fineCoeffI]];
         }
     }
 
@@ -700,8 +720,18 @@ Foam::autoPtr<Foam::amgMatrix> Foam::pamgPolicy::restrictMatrix
         scalarField& coarseUpper = coarseMatrix.upper();
         scalarField& coarseLower = coarseMatrix.lower();
 
-        forAll(coeffRestrictAddr, fineCoeffI)
+        forAll (coeffRestrictAddr, fineCoeffI)
         {
+            label rmUpperAddr = child_[upperAddr[fineCoeffI]];
+            label rmLowerAddr = child_[lowerAddr[fineCoeffI]];
+
+            // If the coefficient touches block zero and solo equations are
+            // present, skip it
+            if (soloEqns && (rmUpperAddr == 0 || rmLowerAddr == 0))
+            {
+                continue;
+            }
+
             label cCoeff = coeffRestrictAddr[fineCoeffI];
 
             if (cCoeff >= 0)
@@ -725,8 +755,18 @@ Foam::autoPtr<Foam::amgMatrix> Foam::pamgPolicy::restrictMatrix
         // Coarse matrix upper coefficients
         scalarField& coarseUpper = coarseMatrix.upper();
 
-        forAll(coeffRestrictAddr, fineCoeffI)
+        forAll (coeffRestrictAddr, fineCoeffI)
         {
+            label rmUpperAddr = child_[upperAddr[fineCoeffI]];
+            label rmLowerAddr = child_[lowerAddr[fineCoeffI]];
+
+            // If the coefficient touches block zero and solo equations are
+            // present, skip it
+            if (soloEqns && (rmUpperAddr == 0 || rmLowerAddr == 0))
+            {
+                continue;
+            }
+
             label cCoeff = coeffRestrictAddr[fineCoeffI];
 
             if (cCoeff >= 0)

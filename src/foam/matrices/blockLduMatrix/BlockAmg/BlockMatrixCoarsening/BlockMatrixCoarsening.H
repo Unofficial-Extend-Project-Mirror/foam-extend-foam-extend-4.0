@@ -62,7 +62,7 @@ template<class Type>
 class BlockAmgLevel;
 
 /*---------------------------------------------------------------------------*\
-                           Class BlockMatrixCoarsening Declaration
+                   Class BlockMatrixCoarsening Declaration
 \*---------------------------------------------------------------------------*/
 
 template<class Type>
@@ -78,6 +78,7 @@ class BlockMatrixCoarsening
 
         //- Minimum number of coarse level equations
         label minCoarseEqns_;
+
 
     // Private Member Functions
 

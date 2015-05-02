@@ -445,16 +445,24 @@ public:
             virtual void setEndTime(const scalar);
 
             //- Reset time step
-            virtual void setDeltaT(const dimensionedScalar&);
+            virtual void setDeltaT
+            (
+                const dimensionedScalar&,
+                const bool adjustDeltaT = true
+            );
+
+            //- Reset time step
+            virtual void setDeltaT
+            (
+                const scalar,
+                const bool adjustDeltaT = true
+            );
 
             //- Reset write control
             virtual void setWriteControl(const writeControls&);
 
             //- Reset write interval
             virtual void setWriteInterval(const scalar);
-
-            //- Reset time step
-            virtual void setDeltaT(const scalar);
 
             //- Set time to sub-cycle for the given number of steps
             virtual TimeState subCycle(const label nSubCycles);

@@ -37,7 +37,7 @@ FoamFile
     }
     defaultFaces
     {
-        type            wall;
+        type            empty;
         nFaces          3075;
         startFace       10125;
     }

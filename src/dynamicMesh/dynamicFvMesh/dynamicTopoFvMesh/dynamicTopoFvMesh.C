@@ -52,6 +52,7 @@ Author
 #include "motionSolver.H"
 #include "fvPatchFields.H"
 #include "fvsPatchFields.H"
+#include "subMeshLduAddressing.H"
 #include "lengthScaleEstimator.H"
 #include "conservativeMapFields.H"
 
@@ -98,6 +99,7 @@ dynamicTopoFvMesh::dynamicTopoFvMesh(const IOobject& io)
     loadMotionSolver_(true),
     bandWidthReduction_(false),
     coupledModification_(false),
+    lduPtr_(NULL),
     interval_(1),
     eMeshPtr_(NULL),
     mapper_(NULL),
@@ -132,7 +134,7 @@ dynamicTopoFvMesh::dynamicTopoFvMesh(const IOobject& io)
     nOldInternalEdges_(0),
     nInternalEdges_(0),
     maxModifications_(-1),
-    statistics_(0),
+    statistics_(TOTAL_OP_TYPES, 0),
     sliverThreshold_(0.1),
     slicePairs_(0),
     maxTetsPerEdge_(-1),
@@ -174,12 +176,6 @@ dynamicTopoFvMesh::dynamicTopoFvMesh(const IOobject& io)
 
     // Load the field-mapper
     loadFieldMapper();
-
-    // Set sizes for the reverse maps
-    reversePointMap_.setSize(nPoints_, -7);
-    reverseEdgeMap_.setSize(nEdges_, -7);
-    reverseFaceMap_.setSize(nFaces_, -7);
-    reverseCellMap_.setSize(nCells_, -7);
 
     // Load the length-scale estimator,
     // and read refinement options
@@ -227,6 +223,7 @@ dynamicTopoFvMesh::dynamicTopoFvMesh
     loadMotionSolver_(mesh.loadMotionSolver_),
     bandWidthReduction_(mesh.bandWidthReduction_),
     coupledModification_(false),
+    lduPtr_(NULL),
     interval_(1),
     eMeshPtr_(NULL),
     mapper_(NULL),
@@ -261,7 +258,7 @@ dynamicTopoFvMesh::dynamicTopoFvMesh
     nOldInternalEdges_(edgeStarts[0]),
     nInternalEdges_(edgeStarts[0]),
     maxModifications_(mesh.maxModifications_),
-    statistics_(0),
+    statistics_(TOTAL_OP_TYPES, 0),
     sliverThreshold_(mesh.sliverThreshold_),
     slicePairs_(0),
     maxTetsPerEdge_(mesh.maxTetsPerEdge_),
@@ -326,7 +323,7 @@ dynamicTopoFvMesh::dynamicTopoFvMesh
     // Now build edgeFaces and pointEdges information.
     edgeFaces_ = invertManyToMany<labelList, labelList>(nEdges_, faceEdges_);
 
-    if (!twoDMesh_)
+    if (is3D())
     {
         pointEdges_ = invertManyToMany<edge, labelList>(nPoints_, edges_);
     }
@@ -336,7 +333,9 @@ dynamicTopoFvMesh::dynamicTopoFvMesh
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
 dynamicTopoFvMesh::~dynamicTopoFvMesh()
-{}
+{
+    deleteDemandDrivenData(lduPtr_);
+}
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
@@ -469,6 +468,7 @@ label dynamicTopoFvMesh::insertFace
     const face& newFace,
     const label newOwner,
     const label newNeighbour,
+    const labelList& newFaceEdges,
     const label zoneID
 )
 {
@@ -480,6 +480,7 @@ label dynamicTopoFvMesh::insertFace
     faces_.append(newFace);
     owner_.append(newOwner);
     neighbour_.append(newNeighbour);
+    faceEdges_.append(newFaceEdges);
 
     if (debug > 2)
     {
@@ -487,7 +488,8 @@ label dynamicTopoFvMesh::insertFace
             << newFaceIndex << ": "
             << newFace
             << " Owner: " << newOwner
-            << " Neighbour: " << newNeighbour;
+            << " Neighbour: " << newNeighbour
+            << " faceEdges: " << newFaceEdges;
 
         const polyBoundaryMesh& boundary = boundaryMesh();
 
@@ -510,7 +512,7 @@ label dynamicTopoFvMesh::insertFace
 
     // Keep track of added boundary faces in a separate hash-table
     // This information will be required at the reordering stage
-    addedFacePatches_.insert(newFaceIndex,patch);
+    addedFacePatches_.insert(newFaceIndex, patch);
 
     if (newNeighbour == -1)
     {
@@ -814,7 +816,7 @@ label dynamicTopoFvMesh::insertEdge
     }
 
     // Size-up the pointEdges list
-    if (!twoDMesh_)
+    if (is3D())
     {
         meshOps::sizeUpList(newEdgeIndex, pointEdges_[newEdge[0]]);
         meshOps::sizeUpList(newEdgeIndex, pointEdges_[newEdge[1]]);
@@ -833,7 +835,7 @@ void dynamicTopoFvMesh::removeEdge
     const label eIndex
 )
 {
-    if (!twoDMesh_)
+    if (is3D())
     {
         const edge& rEdge = edges_[eIndex];
 
@@ -978,7 +980,7 @@ label dynamicTopoFvMesh::insertPoint
 
     // Add an empty entry to pointEdges as well.
     // This entry can be sized-up appropriately at a later stage.
-    if (!twoDMesh_)
+    if (is3D())
     {
         pointEdges_.append(labelList(0));
     }
@@ -1015,7 +1017,7 @@ void dynamicTopoFvMesh::removePoint
     // oldPoints_[pIndex] = point();
 
     // Remove pointEdges as well
-    if (!twoDMesh_)
+    if (is3D())
     {
         pointEdges_[pIndex].clear();
     }
@@ -1394,7 +1396,7 @@ void dynamicTopoFvMesh::handleMeshSlicing()
 
         bool available = true;
 
-        if (twoDMesh_)
+        if (is2D())
         {
             forAll(pairToCheck, indexI)
             {
@@ -1544,7 +1546,7 @@ scalar dynamicTopoFvMesh::testProximity
     scalar proxDistance = GREAT, testStep = 0.0;
     vector gCentre = vector::zero, gNormal = vector::zero;
 
-    if (twoDMesh_)
+    if (is2D())
     {
         // Obtain the face-normal.
         gNormal = faces_[index].normal(points_);
@@ -1613,7 +1615,7 @@ scalar dynamicTopoFvMesh::testProximity
         labelPair proxPoints(-1, -1);
         bool foundPoint = false;
 
-        if (twoDMesh_)
+        if (is2D())
         {
             proxPoints.first() = index;
             proxPoints.second() = proximityFace;
@@ -1744,16 +1746,58 @@ void dynamicTopoFvMesh::readOptionalParameters(bool reRead)
     // Enable/disable run-time debug level
     if (meshSubDict.found("debug") || mandatory_)
     {
-        // Look for a processor-specific debug flag
-        if (Pstream::parRun() && meshSubDict.found("parDebugProcs"))
+        // Set an attachment point for debugging
+        if
+        (
+            !reRead &&
+            meshSubDict.found("parDebugAttach") &&
+            readBool(meshSubDict.lookup("parDebugAttach"))
+        )
         {
-            labelList procs(meshSubDict.lookup("parDebugProcs"));
+            label wait;
 
-            forAll(procs, procI)
+            if (Pstream::master())
             {
-                if (Pstream::myProcNo() == procs[procI])
+                Info<< nl << "Waiting for debugger attachment..." << endl;
+
+                cin >> wait;
+
+                if (Pstream::parRun())
                 {
-                    debug = readLabel(meshSubDict.lookup("debug"));
+                    for (label i = 1; i < Pstream::nProcs(); i++)
+                    {
+                        meshOps::pWrite(i, wait);
+                    }
+                }
+            }
+            else
+            {
+                meshOps::pRead(Pstream::masterNo(), wait);
+            }
+        }
+
+        // Look for a processor-specific debug flag
+        if
+        (
+            Pstream::parRun() &&
+            meshSubDict.found("parDebugProcs")
+        )
+        {
+            if (!reRead)
+            {
+                labelList procs(meshSubDict.lookup("parDebugProcs"));
+                label pdebug = readLabel(meshSubDict.lookup("debug"));
+
+                if (findIndex(procs, Pstream::myProcNo()) > -1)
+                {
+                    debug = pdebug;
+                }
+                else
+                if (pdebug)
+                {
+                    // Minimal debug information,
+                    // so that synchronizations are successful
+                    debug = 1;
                 }
             }
         }
@@ -1840,7 +1884,7 @@ void dynamicTopoFvMesh::readOptionalParameters(bool reRead)
     }
 
     // For tetrahedral meshes...
-    if (!twoDMesh_)
+    if (is3D())
     {
         // Check if swapping is to be avoided on any patches
         if (meshSubDict.found("noSwapPatches") || mandatory_)
@@ -1892,8 +1936,14 @@ void dynamicTopoFvMesh::readOptionalParameters(bool reRead)
     // Check for load-balancing in parallel
     if (reRead && (meshSubDict.found("loadBalancing") || mandatory_))
     {
+        // Fetch non-const reference
+        dictionary& balanceDict =
+        (
+            dict_.subDict("dynamicTopoFvMesh").subDict("loadBalancing")
+        );
+
         // Execute balancing
-        executeLoadBalancing(meshSubDict.subDict("loadBalancing"));
+        executeLoadBalancing(balanceDict);
     }
 }
 
@@ -1921,7 +1971,7 @@ void dynamicTopoFvMesh::initEdges()
     edgeFaces_ = eMeshPtr_->edgeFaces();
     faceEdges_ = eMeshPtr_->faceEdges();
 
-    if (!twoDMesh_)
+    if (is3D())
     {
         // Invert edges to obtain pointEdges
         pointEdges_ = invertManyToMany<edge, labelList>(nPoints_, edges_);
@@ -1938,7 +1988,7 @@ void dynamicTopoFvMesh::initEdges()
 // Load the mesh-quality metric from the library
 void dynamicTopoFvMesh::loadMetric()
 {
-    if (twoDMesh_)
+    if (is2D())
     {
         return;
     }
@@ -2169,7 +2219,7 @@ void dynamicTopoFvMesh::swap2DEdges(void *argument)
                 );
 
                 Info<< "  Swap Progress: " << percent << "% :"
-                    << "  Total: " << mesh.status(1)
+                    << "  Total: " << mesh.status(TOTAL_SWAPS)
                     << "             \r"
                     << flush;
 
@@ -2206,7 +2256,7 @@ void dynamicTopoFvMesh::swap2DEdges(void *argument)
     if (reported)
     {
         Info<< "  Swap Progress: 100% :"
-            << "  Total: " << mesh.status(1)
+            << "  Total: " << mesh.status(TOTAL_SWAPS)
             << "             \r"
             << endl;
     }
@@ -2275,8 +2325,8 @@ void dynamicTopoFvMesh::swap3DEdges
                 );
 
                 Info<< "  Swap Progress: " << percent << "% :"
-                    << "  Surface: " << mesh.status(2)
-                    << ", Total: " << mesh.status(1)
+                    << "  Surface: " << mesh.status(SURFACE_SWAPS)
+                    << ", Total: " << mesh.status(TOTAL_SWAPS)
                     << "             \r"
                     << flush;
 
@@ -2333,8 +2383,8 @@ void dynamicTopoFvMesh::swap3DEdges
     if (reported)
     {
         Info<< "  Swap Progress: 100% :"
-            << "  Surface: " << mesh.status(2)
-            << ", Total: " << mesh.status(1)
+            << "  Surface: " << mesh.status(SURFACE_SWAPS)
+            << ", Total: " << mesh.status(TOTAL_SWAPS)
             << "             \r"
             << endl;
     }
@@ -2395,9 +2445,9 @@ void dynamicTopoFvMesh::edgeRefinementEngine
                 );
 
                 Info<< "  Refinement Progress: " << percent << "% :"
-                    << "  Bisections: " << mesh.status(3)
-                    << ", Collapses: " << mesh.status(4)
-                    << ", Total: " << mesh.status(0)
+                    << "  Bisections: " << mesh.status(TOTAL_BISECTIONS)
+                    << ", Collapses: " << mesh.status(TOTAL_COLLAPSES)
+                    << ", Total: " << mesh.status(TOTAL_MODIFICATIONS)
                     << "             \r"
                     << flush;
 
@@ -2445,9 +2495,9 @@ void dynamicTopoFvMesh::edgeRefinementEngine
     if (reported)
     {
         Info<< "  Refinement Progress: 100% :"
-            << "  Bisections: " << mesh.status(3)
-            << ", Collapses: " << mesh.status(4)
-            << ", Total: " << mesh.status(0)
+            << "  Bisections: " << mesh.status(TOTAL_BISECTIONS)
+            << ", Collapses: " << mesh.status(TOTAL_COLLAPSES)
+            << ", Total: " << mesh.status(TOTAL_MODIFICATIONS)
             << "             \r"
             << endl;
     }
@@ -2620,7 +2670,7 @@ void dynamicTopoFvMesh::remove2DSlivers()
         {
             if (collapseQuadFace(firstFace).type() > 0)
             {
-                statistics_[7]++;
+                status(TOTAL_SLIVERS)++;
             }
 
             continue;
@@ -2630,7 +2680,7 @@ void dynamicTopoFvMesh::remove2DSlivers()
         {
             if (collapseQuadFace(secondFace).type() > 0)
             {
-                statistics_[7]++;
+                status(TOTAL_SLIVERS)++;
             }
 
             continue;
@@ -2654,7 +2704,7 @@ void dynamicTopoFvMesh::remove2DSlivers()
                 {
                     if (collapseQuadFace(aF[faceI].index()).type() > 0)
                     {
-                        statistics_[7]++;
+                        status(TOTAL_SLIVERS)++;
                     }
 
                     break;
@@ -2682,7 +2732,7 @@ void dynamicTopoFvMesh::remove2DSlivers()
                 {
                     if (collapseQuadFace(aF[faceI].index()).type() > 0)
                     {
-                        statistics_[7]++;
+                        status(TOTAL_SLIVERS)++;
                     }
 
                     break;
@@ -2710,7 +2760,7 @@ void dynamicTopoFvMesh::remove2DSlivers()
                 {
                     if (collapseQuadFace(aF[faceI].index()).type() > 0)
                     {
-                        statistics_[7]++;
+                        status(TOTAL_SLIVERS)++;
                     }
 
                     break;
@@ -3125,7 +3175,7 @@ void dynamicTopoFvMesh::removeSlivers()
     }
 
     // Invoke the 2D sliver removal routine
-    if (twoDMesh_)
+    if (is2D())
     {
         remove2DSlivers();
         return;
@@ -3185,7 +3235,7 @@ void dynamicTopoFvMesh::removeSlivers()
             {
                 label proc = procIndices_[procI];
 
-                if (proc < Pstream::myProcNo())
+                if (priority(proc, lessOp<label>(), Pstream::myProcNo()))
                 {
                     Map<label>& rCellMap =
                     (
@@ -3334,13 +3384,13 @@ void dynamicTopoFvMesh::removeSlivers()
             case 2:
             {
                 // Cap cell.
-                label opposingFace = readLabel(map.lookup("opposingFace"));
+                //label opposingFace = readLabel(map.lookup("opposingFace"));
 
                 // Force trisection of the opposing face.
-                changeMap faceMap =
-                (
-                    trisectFace(opposingFace, false, true)
-                );
+                changeMap faceMap;
+                //(
+                //    trisectFace(opposingFace, false, true)
+                //);
 
                 // Collapse the intermediate edge.
                 // Since we don't know which edge it is, search
@@ -3476,7 +3526,7 @@ void dynamicTopoFvMesh::removeSlivers()
         // Increment the count for successful sliver removal
         if (success)
         {
-            statistics_[7]++;
+            status(TOTAL_SLIVERS)++;
         }
     }
 
@@ -3813,6 +3863,12 @@ scalar dynamicTopoFvMesh::edgeLengthScale
 // MultiThreaded topology modifier
 void dynamicTopoFvMesh::threadedTopoModifier()
 {
+    // Set sizes for the reverse maps
+    reversePointMap_.setSize(nPoints_, -7);
+    reverseEdgeMap_.setSize(nEdges_, -7);
+    reverseFaceMap_.setSize(nFaces_, -7);
+    reverseCellMap_.setSize(nCells_, -7);
+
     // Remove sliver cells first.
     removeSlivers();
 
@@ -3863,7 +3919,7 @@ void dynamicTopoFvMesh::threadedTopoModifier()
     // Execute threads
     if (threader_->multiThreaded())
     {
-        if (twoDMesh_)
+        if (is2D())
         {
             executeThreads(topoSequence, handlerPtr_, &swap2DEdges);
         }
@@ -3874,7 +3930,7 @@ void dynamicTopoFvMesh::threadedTopoModifier()
     }
 
     // Set the master thread to implement modifications
-    if (twoDMesh_)
+    if (is2D())
     {
         swap2DEdges(&(handlerPtr_[0]));
     }
@@ -3901,31 +3957,36 @@ bool dynamicTopoFvMesh::resetMesh()
     // Reduce across processors.
     reduce(topoChangeFlag_, orOp<bool>());
 
+    const dictionary& meshSubDict = dict_.subDict("dynamicTopoFvMesh");
+
     if (topoChangeFlag_)
     {
         // Write out statistics
-        if (Pstream::parRun() && debug)
+        if (Pstream::parRun())
         {
-            Pout<< " Bisections :: Total: " << status(3)
-                << ", Surface: " << status(5) << nl
-                << " Collapses  :: Total: " << status(4)
-                << ", Surface: " << status(6) << nl
-                << " Swaps      :: Total: " << status(1)
-                << ", Surface: " << status(2) << endl;
-        }
-        else
-        {
-            Info<< " Bisections :: Total: " << status(3)
-                << ", Surface: " << status(5) << nl
-                << " Collapses  :: Total: " << status(4)
-                << ", Surface: " << status(6) << nl
-                << " Swaps      :: Total: " << status(1)
-                << ", Surface: " << status(2) << endl;
+            if (debug)
+            {
+                Pout<< " Bisections :: Total: " << status(TOTAL_BISECTIONS)
+                    << ", Surface: " << status(SURFACE_BISECTIONS) << nl
+                    << " Collapses  :: Total: " << status(TOTAL_COLLAPSES)
+                    << ", Surface: " << status(SURFACE_COLLAPSES) << nl
+                    << " Swaps      :: Total: " << status(TOTAL_SWAPS)
+                    << ", Surface: " << status(SURFACE_SWAPS) << endl;
+            }
+
+            reduce(statistics_, sumOp<labelList>());
         }
 
-        if (status(7))
+        Info<< " Bisections :: Total: " << status(TOTAL_BISECTIONS)
+            << ", Surface: " << status(SURFACE_BISECTIONS) << nl
+            << " Collapses  :: Total: " << status(TOTAL_COLLAPSES)
+            << ", Surface: " << status(SURFACE_COLLAPSES) << nl
+            << " Swaps      :: Total: " << status(TOTAL_SWAPS)
+            << ", Surface: " << status(SURFACE_SWAPS) << endl;
+
+        if (status(TOTAL_SLIVERS))
         {
-            Pout<< " Slivers    :: " << status(7) << endl;
+            Pout<< " Slivers    :: " << status(TOTAL_SLIVERS) << endl;
         }
 
         // Fetch reference to mapper
@@ -3934,6 +3995,17 @@ bool dynamicTopoFvMesh::resetMesh()
         // Set information for the mapping stage
         //  - Must be done prior to field-transfers and mesh reset
         fieldMapper.storeMeshInformation();
+
+        // Obtain the number of patches before
+        // any possible boundary reset
+        label nOldPatches = boundaryMesh().size();
+
+        // If the number of patches have changed
+        // at run-time, reset boundaries first
+        if (nPatches_ != nOldPatches)
+        {
+            resetBoundaries();
+        }
 
         // Set up field-transfers before dealing with mapping
         wordList fieldTypes;
@@ -3957,8 +4029,6 @@ bool dynamicTopoFvMesh::resetMesh()
 
         // Determine if mapping is to be skipped
         // Optionally skip mapping for remeshing-only / pre-processing
-        const dictionary& meshSubDict = dict_.subDict("dynamicTopoFvMesh");
-
         bool skipMapping = false;
 
         if (meshSubDict.found("skipMapping") || mandatory_)
@@ -4052,9 +4122,6 @@ bool dynamicTopoFvMesh::resetMesh()
             << reOrderingTimer.elapsedTime() << " s"
             << endl;
 
-        // Obtain the number of patches before mesh reset
-        label nOldPatches = boundaryMesh().size();
-
         // Obtain the patch-point maps before resetting the mesh
         List<Map<label> > oldPatchPointMaps(nOldPatches);
 
@@ -4076,13 +4143,6 @@ bool dynamicTopoFvMesh::resetMesh()
             xferMove(cellWeights_),
             xferMove(cellCentres_)
         );
-
-        // If the number of patches have changed
-        // at run-time, reset boundaries first
-        if (nPatches_ != nOldPatches)
-        {
-            resetBoundaries();
-        }
 
         // Reset the mesh, and specify a non-valid
         // boundary to avoid globalData construction
@@ -4276,11 +4336,11 @@ bool dynamicTopoFvMesh::resetMesh()
         // Clear flipFaces
         flipFaces_.clear();
 
-        // Set new sizes for the reverse maps
-        reversePointMap_.setSize(nPoints_, -7);
-        reverseEdgeMap_.setSize(nEdges_, -7);
-        reverseFaceMap_.setSize(nFaces_, -7);
-        reverseCellMap_.setSize(nCells_, -7);
+        // Clear reverse maps
+        reversePointMap_.clear();
+        reverseEdgeMap_.clear();
+        reverseFaceMap_.clear();
+        reverseCellMap_.clear();
 
         // Update "old" information
         nOldPoints_ = nPoints_;
@@ -4303,6 +4363,7 @@ bool dynamicTopoFvMesh::resetMesh()
         if (Pstream::parRun())
         {
             procIndices_.clear();
+            procPriority_.clear();
             sendMeshes_.clear();
             recvMeshes_.clear();
         }
@@ -4349,6 +4410,31 @@ bool dynamicTopoFvMesh::resetMesh()
     // Dump length-scale to disk, if requested.
     calculateLengthScale(true);
 
+    // Optionally check if decomposition is to be written out
+    if
+    (
+        Pstream::parRun() &&
+        time().outputTime() &&
+        meshSubDict.found("writeDecomposition") &&
+        readBool(meshSubDict.lookup("writeDecomposition"))
+    )
+    {
+        volScalarField
+        (
+            IOobject
+            (
+                "decomposition",
+                time().timeName(),
+                *this,
+                IOobject::NO_READ,
+                IOobject::NO_WRITE,
+                false
+            ),
+            *this,
+            dimensionedScalar("rank", dimless, Pstream::myProcNo())
+        ).write();
+    }
+
     // Reset and return flag
     if (topoChangeFlag_)
     {
@@ -4358,6 +4444,26 @@ bool dynamicTopoFvMesh::resetMesh()
 
     // No changes were made.
     return false;
+}
+
+
+// Return custom lduAddressing
+const lduAddressing& dynamicTopoFvMesh::lduAddr() const
+{
+    // For subMeshes, avoid globalData construction
+    // due to lduAddressing::patchSchedule, using a
+    // customized approach.
+    if (isSubMesh_)
+    {
+        if (!lduPtr_)
+        {
+            lduPtr_ = new subMeshLduAddressing(*this);
+        }
+
+        return *lduPtr_;
+    }
+
+    return fvMesh::lduAddr();
 }
 
 
@@ -4375,14 +4481,8 @@ void dynamicTopoFvMesh::updateMesh(const mapPolyMesh& mpm)
     // Delete oldPoints in polyMesh
     polyMesh::resetMotion();
 
-    // Clear-out fvMesh geometry and addressing
-    fvMesh::clearOut();
-
-    // Update polyMesh.
-    polyMesh::updateMesh(mpm);
-
-    // Map all fields
-    mapFields(mpm);
+    // Update fvMesh and polyMesh, and map all fields
+    fvMesh::updateMesh(mpm);
 }
 
 
@@ -4408,6 +4508,10 @@ void dynamicTopoFvMesh::mapFields(const mapPolyMesh& mpm) const
 
     // Set the mapPolyMesh object in the mapper
     fieldMapper.setMapper(mpm);
+
+    // Deregister gradient fields and centres,
+    // but retain for mapping
+    fieldMapper.deregisterMeshInformation();
 
     // Conservatively map scalar/vector volFields
     conservativeMapVolFields<scalar>(fieldMapper);

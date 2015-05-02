@@ -39,7 +39,6 @@ Author
 #include "topoCellMapper.H"
 #include "topoSurfaceMapper.H"
 #include "topoBoundaryMeshMapper.H"
-#include "fixedValueFvPatchFields.H"
 
 namespace Foam
 {
@@ -49,13 +48,14 @@ namespace Foam
 //- Store gradients prior to mesh reset
 void topoMapper::storeGradients() const
 {
-    storeGradients<scalar>(sGrads_);
-    storeGradients<vector>(vGrads_);
+    // Go in order of highest to lowest rank,
+    // to avoid double storage
+    storeGradients<vector>(gradTable_, vGradPtrs_);
+    storeGradients<scalar>(gradTable_, sGradPtrs_);
 
     if (fvMesh::debug)
     {
-        Info<< "Registered volScalarFields: " << scalarGrads() << endl;
-        Info<< "Registered volVectorFields: " << vectorGrads() << endl;
+        Info<< "Registered gradients: " << gradientTable() << endl;
     }
 }
 
@@ -63,6 +63,10 @@ void topoMapper::storeGradients() const
 //- Store geometric information
 void topoMapper::storeGeometry() const
 {
+    typedef volVectorField::PatchFieldType PatchFieldType;
+    typedef volVectorField::GeometricBoundaryField GeomBdyFieldType;
+    typedef volVectorField::DimensionedInternalField DimInternalField;
+
     // Wipe out existing information
     deleteDemandDrivenData(cellCentresPtr_);
 
@@ -73,26 +77,41 @@ void topoMapper::storeGeometry() const
     label nPatches = mesh_.boundary().size();
 
     // Create field parts
-    PtrList<fvPatchField<vector> > volCentrePatches(nPatches);
+    PtrList<PatchFieldType> volCentrePatches(nPatches);
 
-    // Over-ride and set all patches to fixedValue
-    for (label patchI = 0; patchI < nPatches; patchI++)
+    // Define patch type names
+    word emptyType("empty");
+    word fixedValueType("fixedValue");
+
+    // Create dummy types for initial field creation
+    forAll(volCentrePatches, patchI)
     {
-        volCentrePatches.set
-        (
-            patchI,
-            new fixedValueFvPatchField<vector>
+        if (mesh_.boundary()[patchI].type() == emptyType)
+        {
+            volCentrePatches.set
             (
-                mesh_.boundary()[patchI],
-                DimensionedField<vector, volMesh>::null()
-            )
-        );
-
-        // Slice field to patch (forced assignment)
-        volCentrePatches[patchI] ==
-        (
-            mesh_.boundaryMesh()[patchI].patchSlice(Cf)
-        );
+                patchI,
+                PatchFieldType::New
+                (
+                    emptyType,
+                    mesh_.boundary()[patchI],
+                    DimInternalField::null()
+                )
+            );
+        }
+        else
+        {
+            volCentrePatches.set
+            (
+                patchI,
+                PatchFieldType::New
+                (
+                    fixedValueType,
+                    mesh_.boundary()[patchI],
+                    DimInternalField::null()
+                )
+            );
+        }
     }
 
     // Set the cell-centres pointer.
@@ -107,7 +126,7 @@ void topoMapper::storeGeometry() const
                 mesh_,
                 IOobject::NO_READ,
                 IOobject::NO_WRITE,
-                false
+                true
             ),
             mesh_,
             dimLength,
@@ -115,6 +134,48 @@ void topoMapper::storeGeometry() const
             volCentrePatches
         )
     );
+
+    // Alias for convenience
+    volVectorField& centres = *cellCentresPtr_;
+
+    // Set correct references for patch internal fields
+    GeomBdyFieldType& bf = centres.boundaryField();
+
+    forAll(bf, patchI)
+    {
+        if (mesh_.boundary()[patchI].type() == emptyType)
+        {
+            bf.set
+            (
+                patchI,
+                PatchFieldType::New
+                (
+                    emptyType,
+                    mesh_.boundary()[patchI],
+                    centres.dimensionedInternalField()
+                )
+            );
+        }
+        else
+        {
+            bf.set
+            (
+                patchI,
+                PatchFieldType::New
+                (
+                    fixedValueType,
+                    mesh_.boundary()[patchI],
+                    centres.dimensionedInternalField()
+                )
+            );
+
+            // Slice field to patch (forced assignment)
+            bf[patchI] == mesh_.boundaryMesh()[patchI].patchSlice(Cf);
+        }
+    }
+
+    // Set the cell-volumes pointer
+    cellVolumesPtr_ = new scalarField(mesh_.cellVolumes());
 }
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
@@ -132,6 +193,7 @@ topoMapper::topoMapper
     surfaceMap_(NULL),
     boundaryMap_(NULL),
     fluxCorrector_(fluxCorrector::New(mesh, dict)),
+    cellVolumesPtr_(NULL),
     cellCentresPtr_(NULL)
 {}
 
@@ -339,6 +401,22 @@ const vectorField& topoMapper::internalCentres() const
 }
 
 
+//- Return non-const access to cell volumes
+scalarField& topoMapper::internalVolumes() const
+{
+    if (!cellVolumesPtr_)
+    {
+        FatalErrorIn
+        (
+            "scalarField& topoMapper::internalVolumes() const"
+        ) << nl << " Pointer has not been set. "
+          << abort(FatalError);
+    }
+
+    return *cellVolumesPtr_;
+}
+
+
 //- Return stored patch centre information
 const vectorField& topoMapper::patchCentres(const label i) const
 {
@@ -356,17 +434,10 @@ const vectorField& topoMapper::patchCentres(const label i) const
 }
 
 
-//- Return names of stored scalar gradients
-const wordList topoMapper::scalarGrads() const
+//- Return names of stored gradients
+const wordList topoMapper::gradientTable() const
 {
-    return sGrads_.toc();
-}
-
-
-//- Return names of stored vector gradients
-const wordList topoMapper::vectorGrads() const
-{
-    return vGrads_.toc();
+    return gradTable_.toc();
 }
 
 
@@ -374,7 +445,7 @@ const wordList topoMapper::vectorGrads() const
 template <>
 volVectorField& topoMapper::gradient(const word& name) const
 {
-    if (!sGrads_.found(name))
+    if (!gradTable_.found(name))
     {
         FatalErrorIn
         (
@@ -384,7 +455,7 @@ volVectorField& topoMapper::gradient(const word& name) const
           << abort(FatalError);
     }
 
-    return sGrads_[name]();
+    return sGradPtrs_[gradTable_[name].second()];
 }
 
 
@@ -392,7 +463,7 @@ volVectorField& topoMapper::gradient(const word& name) const
 template <>
 volTensorField& topoMapper::gradient(const word& name) const
 {
-    if (!vGrads_.found(name))
+    if (!gradTable_.found(name))
     {
         FatalErrorIn
         (
@@ -402,7 +473,28 @@ volTensorField& topoMapper::gradient(const word& name) const
           << abort(FatalError);
     }
 
-    return vGrads_[name]();
+    return vGradPtrs_[gradTable_[name].second()];
+}
+
+
+//- Deregister gradient fields and centres,
+//  but retain for mapping
+void topoMapper::deregisterMeshInformation() const
+{
+    // Check out scalar gradients
+    forAll(sGradPtrs_, fieldI)
+    {
+        mesh_.objectRegistry::checkOut(sGradPtrs_[fieldI]);
+    }
+
+    // Check out vector gradients
+    forAll(vGradPtrs_, fieldI)
+    {
+        mesh_.objectRegistry::checkOut(vGradPtrs_[fieldI]);
+    }
+
+    // Check out cell centres
+    mesh_.objectRegistry::checkOut(*cellCentresPtr_);
 }
 
 
@@ -495,11 +587,15 @@ void topoMapper::clear() const
     surfaceMap_.clear();
     boundaryMap_.clear();
 
+    // Clear index maps
+    gradTable_.clear();
+
     // Clear stored gradients
-    sGrads_.clear();
-    vGrads_.clear();
+    sGradPtrs_.clear();
+    vGradPtrs_.clear();
 
     // Wipe out geomtry information
+    deleteDemandDrivenData(cellVolumesPtr_);
     deleteDemandDrivenData(cellCentresPtr_);
 
     // Clear maps

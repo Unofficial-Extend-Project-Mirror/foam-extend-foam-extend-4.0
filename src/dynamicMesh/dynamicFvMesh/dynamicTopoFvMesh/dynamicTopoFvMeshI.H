@@ -47,6 +47,20 @@ namespace Foam
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
+// Return if mesh is 2D
+inline bool dynamicTopoFvMesh::is2D() const
+{
+    return twoDMesh_;
+}
+
+
+// Return if mesh is 3D
+inline bool dynamicTopoFvMesh::is3D() const
+{
+    return !twoDMesh_;
+}
+
+
 // Return a non-const reference to the lengthScaleEstimator
 inline lengthScaleEstimator&
 dynamicTopoFvMesh::lengthEstimator()
@@ -121,7 +135,7 @@ inline label dynamicTopoFvMesh::getEdgeIndex
     const edge& edgeToCheck
 ) const
 {
-    if (twoDMesh_)
+    if (is2D())
     {
         // No efficient search method. Loop through all edges.
         forAll(edges_, edgeI)
@@ -206,7 +220,7 @@ inline bool dynamicTopoFvMesh::checkBisection
 {
     scalar length = 0.0, scale = 0.0;
 
-    if (twoDMesh_)
+    if (is2D())
     {
         // If this entity was deleted, skip it.
         if (faces_[index].empty())
@@ -274,7 +288,7 @@ inline bool dynamicTopoFvMesh::checkCollapse
 {
     scalar length = 0.0, scale = 0.0;
 
-    if (twoDMesh_)
+    if (is2D())
     {
         // If this entity was deleted, skip it.
         if (faces_[index].empty())
@@ -390,7 +404,7 @@ inline void dynamicTopoFvMesh::initStacks
         tID = 0;
     }
 
-    if (twoDMesh_)
+    if (is2D())
     {
         forAll(faces_, faceI)
         {
@@ -447,7 +461,7 @@ inline void dynamicTopoFvMesh::initStacks
                 stackElements[elemI] = stack(0)[elemI];
             }
 
-            label elemType = twoDMesh_ ? 2 : 1;
+            label elemType = is2D() ? 2 : 1;
 
             writeVTK
             (
@@ -568,34 +582,20 @@ inline label dynamicTopoFvMesh::whichEdgePatch
 }
 
 
-// Report topo-modification status
-//  - Enumerants are as follows
-//    [0] nModifications
-//    [1] Total swaps (internal and surface)
-//    [2] Surface swaps
-//    [3] Total bisections
-//    [4] Total collapses
-//    [5] Surface bisections
-//    [6] Surface collapses
-//    [7] Slivers removed
-inline label dynamicTopoFvMesh::status(const label type) const
+// Report or alter topo-modification status
+inline label& dynamicTopoFvMesh::status(const label type)
 {
-    if (type < statistics_.size())
-    {
-        return statistics_[type];
-    }
-    else
+    if (type < 0 || type >= TOTAL_OP_TYPES)
     {
         FatalErrorIn
         (
-            "inline label dynamicTopoFvMesh::status"
-            "(const label type) const"
+            "inline label& dynamicTopoFvMesh::status(const label type)"
         )
             << " Unknown type: " << type << nl
             << abort(FatalError);
     }
 
-    return 0;
+    return statistics_[type];
 }
 
 
@@ -615,6 +615,19 @@ inline void dynamicTopoFvMesh::setFlip(const label fIndex)
             flipFaces_.erase(it);
         }
     }
+}
+
+
+// Check for processor priority
+template <class BinaryOp>
+inline bool dynamicTopoFvMesh::priority
+(
+    const label first,
+    const BinaryOp& bop,
+    const label second
+) const
+{
+    return bop(procPriority_[first], procPriority_[second]);
 }
 
 

@@ -118,6 +118,12 @@ public:
                 new symmetryFvsPatchField<Type>(*this, iF)
             );
         }
+
+
+    // I-O
+
+        //- Write
+        virtual void write(Ostream&) const;
 };
 
 

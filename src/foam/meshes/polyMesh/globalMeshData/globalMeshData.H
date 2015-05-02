@@ -74,7 +74,7 @@ SourceFiles
 #include "polyMesh.H"
 #include "Switch.H"
 #include "processorTopology.H"
-#include "labelPair.H"
+#include "labelPairList.H"
 #include "tolerancesSwitch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -89,7 +89,7 @@ Ostream& operator<<(Ostream&, const globalMeshData&);
 
 
 /*---------------------------------------------------------------------------*\
-                           Class globalMeshData Declaration
+                       Class globalMeshData Declaration
 \*---------------------------------------------------------------------------*/
 
 class globalMeshData
@@ -118,9 +118,6 @@ class globalMeshData
                 }
             }
         };
-
-
-        typedef List<labelPair> labelPairList;
 
 
     // Private data

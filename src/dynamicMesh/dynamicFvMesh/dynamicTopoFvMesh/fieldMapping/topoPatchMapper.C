@@ -313,7 +313,7 @@ void topoPatchMapper::calcAddressing() const
 
         // Do mapped faces. Note that this can already be set by insertedFaces
         // so check if addressing size still zero.
-        const labelList& fm = patch_.patch().patchSlice(mpm_.faceMap());
+        const labelList::subList fm = patch_.patch().patchSlice(mpm_.faceMap());
 
         forAll(fm, faceI)
         {
@@ -367,6 +367,8 @@ void topoPatchMapper::calcAddressing() const
                     continue;
                 }
 
+                label oldFace = (faceI < fm.size() ? fm[faceI] : -1);
+
                 FatalErrorIn
                 (
                     "void topoPatchMapper::calcAddressing() const"
@@ -374,8 +376,11 @@ void topoPatchMapper::calcAddressing() const
                     << "Addressing is missing." << nl
                     << " Patch face index: " << faceI << nl
                     << " nInsertedFaces: " << insertedFaces.size() << nl
-                    << " faceMap: " << fm[faceI] << nl
+                    << " faceMap[faceI]: " << oldFace << nl
+                    << " patch faceMap size: " << fm.size() << nl
                     << " Patch: " << patch_.name() << nl
+                    << " polyPatch: " << nl << patch_.patch() << nl
+                    << " faceMap size: " << mpm_.faceMap().size() << nl
                     << abort(FatalError);
             }
         }

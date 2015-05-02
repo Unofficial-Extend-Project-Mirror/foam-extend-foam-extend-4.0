@@ -60,8 +60,11 @@ class pamgPolicy
         //- Reference to matrix
         const lduMatrix& matrix_;
 
-        //- Child array
+        //- Child array: for each fine equation give coarse cluster index
         labelField child_;
+
+        //- Number of solo cells
+        label nSolo_;
 
         //- Number of coarse equations
         label nCoarseEqns_;

@@ -25,8 +25,8 @@
 #     aliases.sh
 #
 # Description
-#     Aliases for working with OpenFOAM
-#     Sourced from OpenFOAM-??/etc/bashrc and/or ~/.bashrc
+#     Aliases for working with FOAM
+#     Sourced from FOAM-??/etc/bashrc and/or ~/.bashrc
 #
 #------------------------------------------------------------------------------
 
