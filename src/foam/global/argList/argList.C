@@ -33,8 +33,6 @@ License
 #include "JobInfo.H"
 #include "labelList.H"
 #include "SortableList.H"
-//#include "dimensionedConstants.H"
-
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
@@ -44,29 +42,6 @@ Foam::HashTable<Foam::string> Foam::argList::validParOptions;
 Foam::word Foam::argList::appDictName_("");
 bool Foam::argList::bannerEnabled(true);
 
-template<>
-const char*
-Foam::NamedEnum
-<
-    Foam::debug::globalControlDictSwitchSet,
-    5
->::names[] =
-{
-    "DebugSwitches",
-    "InfoSwitches",
-    "OptimisationSwitches",
-    "Tolerances",
-    "DimensionedConstants"
-};
-
-
-const Foam::NamedEnum
-<
-    Foam::debug::globalControlDictSwitchSet,
-    5
->
-Foam::argList::globalControlDictSwitchSetNames_;
-
 
 Foam::argList::initValidTables::initValidTables()
 {
@@ -74,11 +49,24 @@ Foam::argList::initValidTables::initValidTables()
     validOptions.set("parallel", "");
     validParOptions.set("parallel", "");
     validOptions.set("noFunctionObjects", "");
-    validOptions.set("DebugSwitches", "key1=val1,key2=val2,...");
-    validOptions.set("InfoSwitches", "key1=val1,key2=val2,...");
-    validOptions.set("OptimisationSwitches", "key1=val1,key2=val2,...");
-    validOptions.set("Tolerances", "key1=val1,key2=val2,...");
-    validOptions.set("DimensionedConstants", "key1=val1,key2=val2,...");
+
+    // Add the parameters for modifying the controlDict
+    // switches from the command-line
+
+    // Instantiate a NamedEnum for the controlDict switches names
+    const Foam::NamedEnum
+    <
+	Foam::debug::globalControlDictSwitchSet,
+	DIM_GLOBALCONTROLDICTSWITCHSET
+    >
+    globalControlDictSwitchSetNames;
+
+    forAll(globalControlDictSwitchSetNames, gI)
+    {
+	word switchSetName = globalControlDictSwitchSetNames.names[gI];
+	validOptions.set(switchSetName, "key1=val1,key2=val2,...");
+    }
+
     Pstream::addValidParOptions(validParOptions);
 }
 
@@ -354,22 +342,8 @@ Foam::argList::argList
             << "Date     : " << dateString.c_str() << nl
             << "Time     : " << timeString.c_str() << nl
             << "Host     : " << hostName() << nl
-            << "PID      : " << pid() << nl
-            << "CtrlDict : " << ctrlDictString.c_str()
+            << "PID      : " << pid()
             << endl;
-    }
-
-    // Command-line override for central controlDict's variables
-    forAll(globalControlDictSwitchSetNames_, cI)
-    {
-	word switchSetName = globalControlDictSwitchSetNames_.names[cI];
-
-	if( optionFound(switchSetName) )
-	    Foam::debug::updateCentralDictVars
-	    (
-		globalControlDictSwitchSetNames_[switchSetName],
-		option(switchSetName)
-	    );
     }
 
     jobInfo.add("startDate", dateString);
@@ -540,6 +514,62 @@ Foam::argList::argList
         case_ = globalCase_;
     }
 
+    // Managing the overrides for the global control switches:
+    //
+    // Here is the order of precedence for the definition/overriding of the
+    // control switches, from lowest to highest:
+    //  - source code definitions from the various libraries/solvers
+    //  - file specified by the env. variable FOAM_GLOBAL_CONTROLDICT
+    //  - case's system/controlDict file
+    //  - command-line parameters
+    //
+    // First, we allow the users to specify the location of a centralized
+    // global controlDict dictionary using the environment variable
+    // FOAM_GLOBAL_CONTROLDICT.
+    fileName optionalGlobControlDictFileName =
+	getEnv("FOAM_GLOBAL_CONTROLDICT");
+
+    if (optionalGlobControlDictFileName.size() )
+    {
+	debug::updateCentralDictVars
+	(
+	    optionalGlobControlDictFileName,
+	    Pstream::master() && bannerEnabled
+	);
+    }
+
+    // Now that the rootPath_/globalCase_ directory is known (following the call
+    // to getRootCase()), we grab any global control switches overrides from the
+    // current case's controlDict.
+
+    debug::updateCentralDictVars
+    (
+	rootPath_/globalCase_/"system/controlDict",
+	Pstream::master() && bannerEnabled
+    );
+
+    // Finally, a command-line override for central controlDict's variables.
+    // This is the ultimate override for the global control switches.
+
+    // Instantiate a NamedEnum for the controlDict switches names
+    const Foam::NamedEnum
+    <
+	Foam::debug::globalControlDictSwitchSet,
+	DIM_GLOBALCONTROLDICTSWITCHSET
+    >
+    globalControlDictSwitchSetNames;
+
+    forAll(globalControlDictSwitchSetNames, gI)
+    {
+	word switchSetName = globalControlDictSwitchSetNames.names[gI];
+
+	if( optionFound(switchSetName) )
+	    Foam::debug::updateCentralDictVars
+	    (
+		globalControlDictSwitchSetNames[switchSetName],
+		option(switchSetName)
+	    );
+    }
 
     wordList slaveProcs;
 

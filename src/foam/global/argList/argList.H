@@ -126,9 +126,6 @@ public:
 
     // Static data members
 
-        //- Central dictionary switchSet names
-        static const NamedEnum<Foam::debug::globalControlDictSwitchSet, 5> globalControlDictSwitchSetNames_;
-
         //- A list of valid (mandatory) arguments
         static SLList<string> validArgs;
 

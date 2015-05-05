@@ -40,8 +40,15 @@ SourceFiles
 namespace Foam
 {
 
+// Number of global controlDict switches sets
+// Currently, we have:
+//     DebugSwitches, InfoSwitches, OptimisationSwitches, Tolerances,
+//     and DimensionedConstants
+#define DIM_GLOBALCONTROLDICTSWITCHSET 5
+
 // Forward declaration of classes
 class dictionary;
+class fileName;
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -58,8 +65,6 @@ namespace debug
     };
 
     //- The central control dictionary.
-    //  Located in $WM_PROJECT_DIR/etc
-    //  @sa Foam::findEtcFile()
     dictionary& controlDict();
 
     //- The DebugSwitches sub-dictionary in the central controlDict.
@@ -94,14 +99,26 @@ namespace debug
     double constantsFromDict(const char* name, const double defaultValue = 0);
 
     //- Internal function to lookup a sub-dictionary from controlDict.
-    dictionary& switchSet(const char* subDictName, dictionary*& subDictPtr);
+    dictionary& switchSet
+    (
+	const globalControlDictSwitchSet globalControlDictSwitchSetName,
+	dictionary*& subDictPtr
+    );
 
     //- Update central controlDict variables
     //  supported keyValues format: key1=value1,key2=value2
     void updateCentralDictVars
     (
-	globalControlDictSwitchSet centralDictSwitchSetName,
-	Foam::string keyValues
+	const globalControlDictSwitchSet centralDictSwitchSetName,
+	const Foam::string& keyValues,
+	const bool verbose=true
+    );
+
+    //- Update central controlDict variables from a file
+    void updateCentralDictVars
+    (
+	const Foam::fileName& file,
+	const bool verbose=true
     );
 
 } // End namespace debug
