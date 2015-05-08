@@ -39,6 +39,7 @@ Description
 #include "constantsSwitch.H"
 #include "fileName.H"
 #include "NamedEnum.H"
+#include "Pstream.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -70,17 +71,6 @@ dictionary* infoSwitchesPtr_(NULL);
 dictionary* optimisationSwitchesPtr_(NULL);
 dictionary* tolerancesPtr_(NULL);
 dictionary* constantsPtr_(NULL);
-
-// Hashtables to static class attributes addresses holding the
-// runtime debug/info/optimisation/tolerances values
-// This needs to go on the heap so the destructor will not get
-//  called before the object's destructor it is overseeing
-ListDebugControlSwitches* debugSwitchValues_(NULL);
-ListInfoControlSwitches* infoSwitchValues_(NULL);
-ListOptimisationControlSwitches* optimisationSwitchValues_(NULL);
-ListTolerancesControlSwitches* tolerancesSwitchValues_(NULL);
-ListConstantsControlSwitches* constantsSwitchValues_(NULL);
-
 
 // to ensure controlDictPtr_ is deleted at the end of the run
 class deleteControlDictPtr
@@ -870,5 +860,59 @@ void Foam::debug::updateCentralDictVars
 	delete optionalGlobControlDictPtr_;
     }
 }
+
+void Foam::debug::dumpControlSwitchesToConsole()
+{
+    const Foam::NamedEnum
+    <
+	Foam::debug::globalControlDictSwitchSet,
+	DIM_GLOBALCONTROLDICTSWITCHSET
+    >
+    globalControlDictSwitchSetNames;
+
+    Info << endl;
+
+    debug::printControlSwitches
+    (
+	globalControlDictSwitchSetNames[debug::DEBUGSWITCHES],
+	debug::debugSwitchValues_
+    );
+
+    debug::printControlSwitches
+    (
+	globalControlDictSwitchSetNames[debug::INFOSWITCHES],
+	debug::infoSwitchValues_
+    );
+
+    // We are forced to pass the string descriptions of the Pstream::commsTypes
+    // for the optimisationSwitches group because this switch is in fact an enum
+    // but we need to specify its corresponding string equivalent in a controlDict
+    // dictionary. And at the low level we are playing, including Pstream.H is out
+    // of the question.
+    // MB 2015
+    debug::printControlSwitches
+    (
+	globalControlDictSwitchSetNames[debug::OPTIMISATIONSWITCHES],
+	debug::optimisationSwitchValues_,
+	Foam::Pstream::commsTypeNames.names
+    );
+
+    debug::printControlSwitches
+    (
+	globalControlDictSwitchSetNames[debug::TOLERANCES],
+	debug::tolerancesSwitchValues_
+    );
+
+    debug::printControlSwitches
+    (
+	globalControlDictSwitchSetNames[debug::DIMENSIONEDCONSTANTS],
+	debug::constantsSwitchValues_
+    );
+
+    Info << endl;
+
+    return;
+}
+
 
 // ************************************************************************* //

@@ -178,6 +178,24 @@ public:
 };
 
 
+// * * * * * * * * * * * * * * * IOstream Operators  * * * * * * * * * * * * //
+
+// Print the content of a controlSwitches list to the console.
+// We are forced to pass the string descriptions of the Pstream::commsTypes
+// when dealing with the optimisationSwitches group because this switch is in
+// fact an enum but we need to specify its corresponding string equivalent in
+// a controlDict dictionary. And at the low level we are playing, including
+// Pstream.H is out of the question.
+// MB 2015
+template<class T>
+void printControlSwitches
+(
+    const std::string&,
+    const std::map<std::string, std::list<debug::controlSwitches<T> *> >*,
+    const char* commsTypesNames[] = NULL
+
+);
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace debug

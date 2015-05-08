@@ -67,6 +67,8 @@ Foam::argList::initValidTables::initValidTables()
 	validOptions.set(switchSetName, "key1=val1,key2=val2,...");
     }
 
+    validOptions.set("dumpControlSwitches", "");
+
     Pstream::addValidParOptions(validParOptions);
 }
 
@@ -569,6 +571,21 @@ Foam::argList::argList
 		globalControlDictSwitchSetNames[switchSetName],
 		option(switchSetName)
 	    );
+    }
+
+    if( optionFound("dumpControlSwitches") )
+    {
+	if (Pstream::master())
+	{
+            // Dumping the application's control switches.
+	    // We dump the full information to the console using a standard
+	    // dictionary format, so one can copy/paste this information directly
+	    // into a case's system/controlDict file to override some switches
+	    // values without having to always use the command-line options.
+	    Foam::debug::dumpControlSwitchesToConsole();
+	}
+
+        ::exit(0);
     }
 
     wordList slaveProcs;

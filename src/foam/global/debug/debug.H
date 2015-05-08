@@ -121,6 +121,11 @@ namespace debug
 	const bool verbose=true
     );
 
+    //- Dump the central controlDict variables to the console using a standard
+    // dictionary format. If a description is available for a given switch, a
+    // comment will be added just besides the switch name and value.
+    void dumpControlSwitchesToConsole();
+
 } // End namespace debug
 
 

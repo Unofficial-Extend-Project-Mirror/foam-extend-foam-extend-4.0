@@ -3,6 +3,12 @@ global/dimensionedConstants/dimensionedConstants.C
 global/argList/argList.C
 global/clock/clock.C
 
+global/controlSwitches/debugSwitch.C
+global/controlSwitches/infoSwitch.C
+global/controlSwitches/optimisationSwitch.C
+global/controlSwitches/tolerancesSwitch.C
+global/controlSwitches/constantsSwitch.C
+
 global/profiling/profilingInfo.C
 global/profiling/profilingPool.C
 global/profiling/profilingStack.C

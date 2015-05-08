@@ -21,22 +21,12 @@ License
     You should have received a copy of the GNU General Public License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
-Class
-    Foam::debugSwitch
-
 Author
-    Martin Beaudoin, Hydro-Quebec, 2014.  All rights reserved
-
-Description
-    Handling of runtime controlSwitches.
-    Specialization of controlSwitches class for debug switches
+    Martin Beaudoin, Hydro-Quebec, 2015.  All rights reserved
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef debugSwitch_H
-#define debugSwitch_H
-
-#include "controlSwitches.H"
+#include "tolerancesSwitch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -45,53 +35,22 @@ namespace Foam
 
 namespace debug
 {
-
-// Typedefs
-// Hashtable to static class attributes addresses holding the
-// runtime debug switch values
-typedef std::map<std::string, std::list<controlSwitches<int> *> > ListDebugControlSwitches;
-
-extern ListDebugControlSwitches* debugSwitchValues_;
-
-class debugSwitch
-    : public controlSwitches<int>
-{
-public:
-    debugSwitch
-    (
-	const std::string& switchName,
-	const int& switchValue
-    )
-	:
-	controlSwitches<int>
-	(
-	    switchName,
-	    debug::debugSwitchFromDict(switchName.c_str(), switchValue),
-	    debug::DEBUGSWITCHES,
-	    &debugSwitchValues_
-	)
-    {}
-
-    virtual ~debugSwitch()
-    {
-    }
-
-    // Assignement operator
-    void operator=(const int& rhs)
-    {
-	controlSwitches<int>::operator=(rhs);
-    }
-};
-
+    // Hashtables to static class attributes addresses holding the
+    // runtime tolerancesSwitch values.
+    // This needs to go on the heap so the destructor will not get
+    //  called before the objects' destructor it is overseeing
+    ListTolerancesControlSwitches* tolerancesSwitchValues_(NULL);
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace debug
 
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
 } // End namespace Foam
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-#endif
 
 // ************************************************************************* //
