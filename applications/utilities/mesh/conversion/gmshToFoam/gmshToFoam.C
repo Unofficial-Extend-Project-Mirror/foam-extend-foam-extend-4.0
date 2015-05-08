@@ -713,6 +713,48 @@ void readCells
     Info<< endl;
 }
 
+// Simplified version of the function from createPatch utility.
+void removeEmptyPatches(polyMesh& mesh)
+{
+    Info<< "\n";
+
+    const polyBoundaryMesh& patches = mesh.boundaryMesh();
+
+    DynamicList<polyPatch*> nonEmptyPatches(patches.size());
+
+    forAll(patches, idx)
+    {
+        const polyPatch& pp = patches[idx];
+
+        if (pp.size() > 0)
+        {
+            nonEmptyPatches.append
+            (
+                pp.clone
+                (
+                    patches,
+                    nonEmptyPatches.size(),
+                    pp.size(),
+                    pp.start()
+                ).ptr()
+            );
+        }
+        else
+        {
+            Info<< "Removing empty patch " << pp.name() << endl;
+        }
+    }
+
+    if (patches.size() != nonEmptyPatches.size())
+    {
+        nonEmptyPatches.shrink();
+        mesh.removeBoundary();
+        mesh.addPatches(nonEmptyPatches);
+    }
+
+    Info<< "\n";
+}
+
 
 // Main program:
 
@@ -1053,6 +1095,8 @@ int main(int argc, char *argv[])
     {
         mesh.addZones(List<pointZone*>(0), fz, cz);
     }
+    
+    removeEmptyPatches(mesh);
 
     mesh.write();
 
