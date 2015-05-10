@@ -51,7 +51,8 @@ const Foam::debug::tolerancesSwitch
 GGIInterpolation<MasterPatch, SlavePatch>::areaErrorTol_
 (
     "GGIAreaErrorTol",
-    1.0e-8
+    1.0e-8,
+    "Minimum GGI face to face intersection area. The smallest accepted GGI weighting factor."
 );
 
 template<class MasterPatch, class SlavePatch>
@@ -59,7 +60,8 @@ const Foam::debug::tolerancesSwitch
 GGIInterpolation<MasterPatch, SlavePatch>::featureCosTol_
 (
     "GGIFeatureCosTol",
-    0.8
+    0.8,
+    "Minimum cosine value between 2 GGI patch neighbouring facet normals."
 );
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //

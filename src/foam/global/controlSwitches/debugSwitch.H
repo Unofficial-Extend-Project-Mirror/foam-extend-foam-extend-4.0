@@ -60,13 +60,15 @@ public:
     debugSwitch
     (
 	const std::string& switchName,
-	const int& switchValue
+	const int& switchValue,
+	const std::string& switchDescription = ""
     )
 	:
 	controlSwitches<int>
 	(
 	    switchName,
 	    debug::debugSwitchFromDict(switchName.c_str(), switchValue),
+	    switchDescription,
 	    debug::DEBUGSWITCHES,
 	    &debugSwitchValues_
 	)

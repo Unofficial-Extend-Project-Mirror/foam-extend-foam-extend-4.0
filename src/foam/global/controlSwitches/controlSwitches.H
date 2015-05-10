@@ -90,11 +90,11 @@ class controlSwitches
         //- Switch name
         std::string switchName_;
 
-        //- Switch Description
-        std::string switchDescription_;
-
         //- Switch value
         T switchValue_;
+
+        //- Switch Description
+        std::string switchDescription_;
 
         //- Handle to runTime switches list
         std::map<std::string, std::list<controlSwitches<T> *> >* switchValuesTable_ ;
@@ -115,6 +115,7 @@ public:
 	(
 	    const std::string& switchName,
 	    const T& switchValue,
+	    const std::string& switchDescription,
 	    globalControlDictSwitchSet switchSet,
 	    std::map<std::string, std::list<controlSwitches<T> *> >** switchesValues
 	);

@@ -33,7 +33,8 @@ const Foam::debug::constantsSwitch
 Foam::radiation::sigmaSB_
 (
     "sigmaSB",
-    5.670E-08
+    5.670E-08,
+    "Stefan-Boltzmann constant [J/(K4 m2 s)]"
 );
 
 const Foam::dimensionedScalar Foam::radiation::sigmaSB

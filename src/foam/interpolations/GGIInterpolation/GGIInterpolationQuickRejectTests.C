@@ -48,7 +48,8 @@ const Foam::debug::tolerancesSwitch
 GGIInterpolation<MasterPatch, SlavePatch>::faceBoundBoxExtendSpanFraction_
 (
     "GGIFaceBoundBoxExtendSpanFraction",
-    1.0e-2
+    1.0e-2,
+    "GGI faces bounding box expansion factor. Add robustness for quick-search algo. Keep it to a few percent."
 );
 
 template<class MasterPatch, class SlavePatch>
@@ -56,7 +57,8 @@ const Foam::debug::optimisationSwitch
 GGIInterpolation<MasterPatch, SlavePatch>::octreeSearchMinNLevel_
 (
     "GGIOctreeSearchMinNLevel",
-    3
+    3,
+    "GGI neighbouring facets octree-based search: minNlevel parameter for octree"
 );
 
 template<class MasterPatch, class SlavePatch>
@@ -64,7 +66,8 @@ const Foam::debug::optimisationSwitch
 GGIInterpolation<MasterPatch, SlavePatch>::octreeSearchMaxLeafRatio_
 (
     "GGIOctreeSearchMaxLeafRatio",
-    3
+    3,
+    "GGI neighbouring facets octree-based search: maxLeafRatio parameter for octree"
 );
 
 template<class MasterPatch, class SlavePatch>
@@ -72,7 +75,8 @@ const Foam::debug::optimisationSwitch
 GGIInterpolation<MasterPatch, SlavePatch>::octreeSearchMaxShapeRatio_
 (
     "GGIOctreeSearchMaxShapeRatio",
-    1
+    1,
+    "GGI neighbouring facets octree-based search: maxShapeRatio parameter for octree"
 );
 
 

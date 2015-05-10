@@ -133,24 +133,24 @@ public:                                                                       \
 
 
 //- Define the debug information, lookup as @a Name
-#define defineDebugSwitchWithName(Type, Name, DebugSwitch)                    \
+#define defineDebugSwitchWithName(Type, Name, DebugSwitch, SwitchDescr)       \
     ::Foam::debug::debugSwitch                                                \
-    Type::debug(std::string(Name), DebugSwitch)
+    Type::debug(std::string(Name), DebugSwitch, SwitchDescr)
 
 //- Define the debug information
-#define defineDebugSwitch(Type, DebugSwitch)                                  \
-    defineDebugSwitchWithName(Type, Type::typeName_(), DebugSwitch);
+#define defineDebugSwitch(Type, DebugSwitch, SwitchDescr)		      \
+    defineDebugSwitchWithName(Type, Type::typeName_(), DebugSwitch, SwitchDescr);
 
 #ifdef __INTEL_COMPILER
 //- Define the debug information for templates, lookup as @a Name
 # define defineTemplateDebugSwitchWithName(Type, Name, DebugSwitch)           \
-    defineDebugSwitchWithName(Type, Name, DebugSwitch);
+    defineDebugSwitchWithName(Type, Name, DebugSwitch, "");
 
 #else
 //- Define the debug information for templates, lookup as @a Name
 # define defineTemplateDebugSwitchWithName(Type, Name, DebugSwitch)           \
     template<>                                                                \
-    defineDebugSwitchWithName(Type, Name, DebugSwitch);
+    defineDebugSwitchWithName(Type, Name, DebugSwitch, "");
 #endif
 
 //- Define the debug information for templates
@@ -172,7 +172,12 @@ public:                                                                       \
 //- Define the typeName and debug information
 #define defineTypeNameAndDebug(Type, DebugSwitch)                             \
     defineTypeName(Type);                                                     \
-    defineDebugSwitch(Type, DebugSwitch)
+    defineDebugSwitch(Type, DebugSwitch, "")
+
+//- Define the typeName and debug information + description
+#define defineTypeNameAndDebugWithDescription(Type, DebugSwitch, SwitchDescr) \
+    defineTypeName(Type);                                                     \
+    defineDebugSwitch(Type, DebugSwitch, SwitchDescr)
 
 //- Define the typeName and debug information, lookup as @a Name
 #define defineTemplateTypeNameAndDebugWithName(Type, Name, DebugSwitch)       \

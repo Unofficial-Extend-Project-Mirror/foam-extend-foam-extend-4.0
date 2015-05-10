@@ -59,13 +59,15 @@ public:
     infoSwitch
     (
 	const std::string& switchName,
-	const int& switchValue
+	const int& switchValue,
+	const std::string& switchDescription = ""
     )
 	:
 	controlSwitches<int>
 	(
 	    switchName,
 	    debug::infoSwitchFromDict(switchName.c_str(), switchValue),
+	    switchDescription,
 	    debug::INFOSWITCHES,
 	    &infoSwitchValues_
 	)

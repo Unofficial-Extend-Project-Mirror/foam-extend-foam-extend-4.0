@@ -41,7 +41,8 @@ namespace debug
 template<class Type>
 Foam::debug::controlSwitches<Type>::controlSwitches()
 :
-    switchValue_(Type(0))
+    switchValue_(Type(0)),
+    switchDescription_("")
 {
 }
 
@@ -57,13 +58,15 @@ Foam::debug::controlSwitches<T>::controlSwitches
 (
     const std::string& switchName,
     const T& switchValue,
+    const std::string& switchDescription,
     globalControlDictSwitchSet switchSet,
     std::map<std::string, std::list<controlSwitches<T> *> >** switchValuesTable
 )
 :
     switchSet_(switchSet),
     switchName_(switchName),
-    switchValue_(switchValue)
+    switchValue_(switchValue),
+    switchDescription_(switchDescription)
 {
     // Register the switch in its list
     if (*switchValuesTable == NULL)
@@ -92,7 +95,8 @@ template<class T>
 Foam::debug::controlSwitches<T>::controlSwitches(const Foam::debug::controlSwitches<T>& csw)
 :
     switchName_(csw.switchName_),
-    switchValue_(csw.switchValue_)
+    switchValue_(csw.switchValue_),
+    switchDescription_(csw.switchDescription_)
 {}
 
 
@@ -134,6 +138,7 @@ void Foam::debug::controlSwitches<T>::operator=(const Foam::debug::controlSwitch
     else
     {
 	switchValue_ = rhs.switchValue_;
+	switchDescription_ = rhs.switchDescription_;
     }
 }
 
@@ -208,11 +213,32 @@ void printControlSwitches
 		std::cout << value() << ";";
 	    }
 
-	    std::string swDescr = value.switchDescription();
+	    // Now, for the switch description, since numerous switches might
+	    // be defined with identical names, but different descriptions
+	    // eg: ggi debugSwitch, we will concatenate all the non-empty
+	    // switches descriptions for a given switch
 
-	    if( !swDescr.empty() )
+	    std::string switchDescription("");
+
+	    typename std::list<Foam::debug::controlSwitches<T> *>::iterator itL;
+	    for (itL = swList.begin(); itL != swList.end(); itL++)
 	    {
-		std::cout << " // " << swDescr;
+		Foam::debug::controlSwitches<T>& sw = *(*itL);
+		std::string thisSwitchDescr = sw.switchDescription();
+
+		if
+		(
+		    !thisSwitchDescr.empty() &&
+		    switchDescription.find(thisSwitchDescr) == std::string::npos
+		)
+		{
+		    switchDescription += thisSwitchDescr + ". ";
+		}
+	    }
+
+	    if (!switchDescription.empty())
+	    {
+		std::cout << "\t// " << switchDescription;
 	    }
 	    std::cout << std::endl;
 	}

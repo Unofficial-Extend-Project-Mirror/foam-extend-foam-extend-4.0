@@ -37,7 +37,8 @@ const Foam::debug::constantsSwitch
 Foam::specie::RR
 (
     "R",
-    8314.51
+    8314.51,
+    "Universal gas constant [J/(kmol K)]"
 );
 
 
@@ -46,7 +47,8 @@ const Foam::debug::constantsSwitch
 Foam::specie::Pstd
 (
     "Pstd",
-    1.0e5
+    1.0e5,
+    "Standard pressure [Pa]"
 );
 
 //- Standard temperature (default in [K])
@@ -54,7 +56,8 @@ const Foam::debug::constantsSwitch
 Foam::specie::Tstd
 (
     "Tstd",
-    298.15
+    298.15,
+    "Standard temperature [K]"
 );
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //

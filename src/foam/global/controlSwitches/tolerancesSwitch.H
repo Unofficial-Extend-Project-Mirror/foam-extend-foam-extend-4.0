@@ -60,13 +60,15 @@ public:
     tolerancesSwitch
     (
 	const std::string& switchName,
-	const Foam::scalar& switchValue
+	const Foam::scalar& switchValue,
+	const std::string& switchDescription = ""
     )
 	:
 	controlSwitches<Foam::scalar>
 	(
 	    switchName,
 	    debug::tolerancesFromDict(switchName.c_str(), switchValue),
+	    switchDescription,
 	    debug::TOLERANCES,
 	    &tolerancesSwitchValues_
 	)

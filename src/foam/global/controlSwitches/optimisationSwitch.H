@@ -60,13 +60,15 @@ public:
     optimisationSwitch
     (
 	const std::string& switchName,
-	const int& switchValue
+	const int& switchValue,
+	const std::string& switchDescription = ""
     )
 	:
 	controlSwitches<int>
 	(
 	    switchName,
 	    debug::optimisationSwitchFromDict(switchName.c_str(), switchValue),
+	    switchDescription,
 	    debug::OPTIMISATIONSWITCHES,
 	    &optimisationSwitchValues_
 	)
@@ -77,13 +79,15 @@ public:
     optimisationSwitch
     (
 	const std::string& switchName,
-	const std::string& switchValue
+	const std::string& switchValue,
+	const std::string& switchDescription = ""
     )
 	:
 	controlSwitches<int>
 	(
 	    switchName,
 	    debug::optimisationSwitchFromDict(switchName, switchValue),
+	    switchDescription,
 	    debug::OPTIMISATIONSWITCHES,
 	    &optimisationSwitchValues_
 	)
@@ -103,17 +107,6 @@ public:
     {
         return controlSwitches<int>::operator==(rhs);
     }
-
-#if 0
-    // Cannot use a conversion operator for Pstream::commsTypes
-    // since including Pstream.H generates compilation errors.
-    // MB 06/2014
-    operator Pstream::commsTypes () const
-    {
-	return static_cast<Pstream::commsTypes>(operator()());
-    }
-#endif
-
 };
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

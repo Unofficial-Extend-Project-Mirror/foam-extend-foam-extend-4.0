@@ -61,13 +61,15 @@ public:
     constantsSwitch
     (
 	const std::string& switchName,
-	const Foam::scalar& switchValue
+	const Foam::scalar& switchValue,
+	const std::string& switchDescription = ""
     )
 	:
 	controlSwitches<Foam::scalar>
 	(
 	    switchName,
 	    debug::constantsFromDict(switchName.c_str(), switchValue),
+	    switchDescription,
 	    debug::DIMENSIONEDCONSTANTS,
 	    &constantsSwitchValues_
 	)
