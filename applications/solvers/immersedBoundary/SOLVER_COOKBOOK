@@ -1,0 +1,49 @@
+Make/options: add
+
+    -I$(LIB_SRC)/triSurface/lnInclude \
+    -I$(LIB_SRC)/meshTools/lnInclude \
+    -I../immersedBoundary/lnInclude
+
+
+    -ltriSurface \
+    -lmeshTools \
+    -L$(FOAM_USER_LIBBIN) -limmersedBoundary \
+
+
+createFields.H: add
+
+#   include "createIbMasks.H"
+
+
+solver:
+
+1) add immersed boundary headers
+
+#include "immersedBoundaryFvPatch.H"
+#include "immersedBoundaryAdjustPhi.H"
+
+2) on calculation of face fluxes (or their components), mask with faceIbMask
+
+3) before to adjustPhi, add:
+
+        // Adjust immersed boundary fluxes
+        immersedBoundaryAdjustPhi(phi, U);
+
+4) on explicit updates, add correctBoundaryConditions();
+
+eg.
+
+        U = fvc::reconstruct(phi);
+        U.correctBoundaryConditions();
+
+5) On reports of continuity error, add masking:
+
+        Info<< "IB-masked continuity error = "
+            << mag(cellIbMask*fvc::div(phi))().weightedAverage(mesh.V()).value()
+            << endl;
+
+  or use immersedBoundaryContinuityErrs.H
+
+5) Chenge Courant number check to be IB-sensitive, using
+
+  immersedBoundaryCourantNo.H

@@ -1,0 +1,25 @@
+#!/bin/sh
+
+( cd cylinderInSquarePotential ; ./Allrun )
+( cd cylinderInSquareLaplace ; ./Allrun )
+
+( cd cylinderInChannelPotential ; ./Allrun )
+( cd cylinderInChannelScalarTransport ; ./Allrun )
+( cd cylinderInChannelIcoIbFoam ; ./Allrun )
+( cd cylinderInChannelFineIcoIbFoam ; ./Allrun )
+
+( cd thickPlateRefinedMesh ; ./Allrun )
+( cd sphereInChannel ; ./Allrun )
+
+( cd cylBumpinterIbFoam ; ./Allrun )
+
+( cd pitzDailyBodyFitted ; ./Allrun )
+( cd pitzDailyLaminarIcoIbFoam ; ./Allrun )
+( cd simpleSilencerLaminarIcoIbFoam ; ./Allrun )
+
+( cd pitzDailyLaminarSimpleIbFoam ; ./Allrun )
+( cd pitzDailyTurbulentSimpleIbFoam ; ./Allrun )
+( cd backwardStepShortTurbulentSimpleIbFoam ; ./Allrun )
+
+( cd porousBumpChannelBodyFitted ; ./Allrun )
+( cd porousBumpChannelIb ; ./Allrun )
