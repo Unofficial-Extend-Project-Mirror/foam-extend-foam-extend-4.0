@@ -1,0 +1,3 @@
+checkFaMesh.C
+
+EXE = $(FOAM_APPBIN)/checkFaMesh
