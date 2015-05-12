@@ -1,0 +1,104 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM Extend Project: Open Source CFD        |
+|  \\    /   O peration     | Version:  1.6-ext                               |
+|   \\  /    A nd           | Web:      www.extend-project.de                 |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      fvSolution;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+solvers
+{
+    pcorr
+    {
+        solver           PCG;
+        preconditioner   DIC;
+
+        minIter          1;
+        maxIter          1000;
+        tolerance        1e-08;
+        relTol           0.01;
+    }
+
+    pd
+    {
+        solver           PCG;
+        preconditioner   DIC;
+
+        minIter          1;
+        maxIter          1000;
+        tolerance        1e-08;
+        relTol           0.01;
+    }
+
+    pdFinal
+    {
+        solver           PCG;
+        preconditioner   DIC;
+
+        minIter          1;
+        maxIter          1000;
+        tolerance        1e-08;
+        relTol           0.0;
+    }
+
+    U
+    {
+        solver           PBiCG;
+        preconditioner   DILU;
+
+
+        minIter          1;
+        maxIter          100;
+        tolerance        1e-08;
+        relTol           0;
+    }
+
+    alpha1
+    {
+        solver           PBiCG;
+        preconditioner   DILU;
+
+
+        minIter          1;
+        maxIter          100;
+        tolerance        1e-08;
+        relTol           0;
+    }
+}
+
+PISO
+{
+    cAlpha          1;
+}
+
+PIMPLE
+{
+    nOuterCorrectors 2;
+    nCorrectors     6;
+    nNonOrthogonalCorrectors 0;
+
+    pdRefPoint      (-0.9 1.4 0.05);
+    pdRefValue      0;
+
+    pRefPoint      (-0.9 1.4 0.05);
+    pRefValue      0;
+
+    limitMagU      35;
+}
+
+relaxationFactors
+{
+    U          0.9;
+    pd         0.8;
+}
+
+
+// ************************************************************************* //
