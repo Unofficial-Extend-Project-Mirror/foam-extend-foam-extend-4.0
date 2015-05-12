@@ -18,8 +18,8 @@ solvers
 {
     T
     {
-        solver           PCG;
-        preconditioner   DIC;
+        solver           CG;
+        preconditioner   Cholesky;
 
         minIter          1;
         maxIter          1000;

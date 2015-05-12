@@ -37,8 +37,8 @@ solvers
 
     U
     {
-        solver           PBiCG;
-        preconditioner   DILU;
+        solver           BiCGStab;
+        preconditioner   ILU0;
 
         minIter          1;
         maxIter          1000;
