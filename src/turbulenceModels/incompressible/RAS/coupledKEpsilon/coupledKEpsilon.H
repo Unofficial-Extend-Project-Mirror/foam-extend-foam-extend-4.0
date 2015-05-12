@@ -39,6 +39,9 @@ Description
         }
     @endverbatim
 
+Author
+    Hrvoje Jasak, Wikki Ltd.  All rights reserved.
+
 SourceFiles
     coupledKEpsilon.C
 
@@ -83,7 +86,7 @@ class coupledKEpsilon
             volScalarField nut_;
 
        // Block vector field for k-epsilon
-       volVector2Field ke_;
+       volVector2Field kEpsilon_;
 
 
 public:

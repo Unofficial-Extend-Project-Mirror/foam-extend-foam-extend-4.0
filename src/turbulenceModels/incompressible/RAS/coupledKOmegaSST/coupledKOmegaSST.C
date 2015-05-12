@@ -23,7 +23,7 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "coupledKEpsilon.H"
+#include "coupledKOmegaSST.H"
 #include "fvBlockMatrix.H"
 #include "addToRunTimeSelectionTable.H"
 
@@ -40,12 +40,55 @@ namespace RASModels
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-defineTypeNameAndDebug(coupledKEpsilon, 0);
-addToRunTimeSelectionTable(RASModel, coupledKEpsilon, dictionary);
+defineTypeNameAndDebug(coupledKOmegaSST, 0);
+addToRunTimeSelectionTable(RASModel, coupledKOmegaSST, dictionary);
+
+// * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * * //
+
+tmp<volScalarField> coupledKOmegaSST::F1(const volScalarField& CDkOmega) const
+{
+    volScalarField CDkOmegaPlus = max
+    (
+        CDkOmega,
+        dimensionedScalar("1.0e-10", dimless/sqr(dimTime), 1.0e-10)
+    );
+
+    volScalarField arg1 = min
+    (
+        min
+        (
+            max
+            (
+                (scalar(1)/betaStar_)*sqrt(k_)/(omega_*y_),
+                scalar(500)*nu()/(sqr(y_)*omega_)
+            ),
+            (4*alphaOmega2_)*k_/(CDkOmegaPlus*sqr(y_))
+        ),
+        scalar(10)
+    );
+
+    return tanh(pow4(arg1));
+}
+
+tmp<volScalarField> coupledKOmegaSST::F2() const
+{
+    volScalarField arg2 = min
+    (
+        max
+        (
+            (scalar(2)/betaStar_)*sqrt(k_)/(omega_*y_),
+            scalar(500)*nu()/(sqr(y_)*omega_)
+        ),
+        scalar(100)
+    );
+
+    return tanh(sqr(arg2));
+}
+
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-coupledKEpsilon::coupledKEpsilon
+coupledKOmegaSST::coupledKOmegaSST
 (
     const volVectorField& U,
     const surfaceScalarField& phi,
@@ -54,42 +97,107 @@ coupledKEpsilon::coupledKEpsilon
 :
     RASModel(typeName, U, phi, lamTransportModel),
 
-    Cmu_
+    alphaK1_
     (
         dimensioned<scalar>::lookupOrAddToDict
         (
-            "Cmu",
+            "alphaK1",
+            coeffDict_,
+            0.85034
+        )
+    ),
+    alphaK2_
+    (
+        dimensioned<scalar>::lookupOrAddToDict
+        (
+            "alphaK2",
+            coeffDict_,
+            1.0
+        )
+    ),
+    alphaOmega1_
+    (
+        dimensioned<scalar>::lookupOrAddToDict
+        (
+            "alphaOmega1",
+            coeffDict_,
+            0.5
+        )
+    ),
+    alphaOmega2_
+    (
+        dimensioned<scalar>::lookupOrAddToDict
+        (
+            "alphaOmega2",
+            coeffDict_,
+            0.85616
+        )
+    ),
+    gamma1_
+    (
+        dimensioned<scalar>::lookupOrAddToDict
+        (
+            "gamma1",
+            coeffDict_,
+            0.5532
+        )
+    ),
+    gamma2_
+    (
+        dimensioned<scalar>::lookupOrAddToDict
+        (
+            "gamma2",
+            coeffDict_,
+            0.4403
+        )
+    ),
+    beta1_
+    (
+        dimensioned<scalar>::lookupOrAddToDict
+        (
+            "beta1",
+            coeffDict_,
+            0.075
+        )
+    ),
+    beta2_
+    (
+        dimensioned<scalar>::lookupOrAddToDict
+        (
+            "beta2",
+            coeffDict_,
+            0.0828
+        )
+    ),
+    betaStar_
+    (
+        dimensioned<scalar>::lookupOrAddToDict
+        (
+            "betaStar",
             coeffDict_,
             0.09
         )
     ),
-    C1_
+    a1_
     (
         dimensioned<scalar>::lookupOrAddToDict
         (
-            "C1",
+            "a1",
             coeffDict_,
-            1.44
+            0.31
         )
     ),
-    C2_
+    c1_
     (
         dimensioned<scalar>::lookupOrAddToDict
         (
-            "C2",
+            "c1",
             coeffDict_,
-            1.92
+            10.0
         )
     ),
-    sigmaEps_
-    (
-        dimensioned<scalar>::lookupOrAddToDict
-        (
-            "sigmaEps",
-            coeffDict_,
-            1.3
-        )
-    ),
+
+    y_(mesh_),
 
     k_
     (
@@ -101,19 +209,19 @@ coupledKEpsilon::coupledKEpsilon
             IOobject::NO_READ,
             IOobject::AUTO_WRITE
         ),
-        autoCreateK("k", mesh_)
+        autoCreateK("k", mesh_, U_.db())
     ),
-    epsilon_
+    omega_
     (
         IOobject
         (
-            "epsilon",
+            "omega",
             runTime_.timeName(),
             U_.db(),
             IOobject::NO_READ,
             IOobject::AUTO_WRITE
         ),
-        autoCreateEpsilon("epsilon", mesh_)
+        autoCreateOmega("omega", mesh_, U_.db())
     ),
     nut_
     (
@@ -125,13 +233,13 @@ coupledKEpsilon::coupledKEpsilon
             IOobject::NO_READ,
             IOobject::AUTO_WRITE
         ),
-        autoCreateNut("nut", mesh_)
+        autoCreateNut("nut", mesh_, U_.db())
     ),
-    kEpsilon_
+    kOmega_
     (
         IOobject
         (
-            "kEpsilon",
+            "kOmega",
             runTime_.timeName(),
             U_.db(),
             IOobject::NO_READ,
@@ -141,8 +249,9 @@ coupledKEpsilon::coupledKEpsilon
         dimensionedVector2("zero", dimless, vector2::zero)
     )
 {
-    nut_ = Cmu_*sqr(k_)/(epsilon_ + epsilonSmall_);
-    nut_ = min(nut_, nuRatio()*nu());
+    bound(omega_, omega0_);
+
+    nut_ = a1_*k_/max(a1_*omega_, F2()*sqrt(2.0)*mag(symm(fvc::grad(U_))));
     nut_.correctBoundaryConditions();
 
     printCoeffs();
@@ -151,7 +260,7 @@ coupledKEpsilon::coupledKEpsilon
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-tmp<volSymmTensorField> coupledKEpsilon::R() const
+tmp<volSymmTensorField> coupledKOmegaSST::R() const
 {
     return tmp<volSymmTensorField>
     (
@@ -172,7 +281,7 @@ tmp<volSymmTensorField> coupledKEpsilon::R() const
 }
 
 
-tmp<volSymmTensorField> coupledKEpsilon::devReff() const
+tmp<volSymmTensorField> coupledKOmegaSST::devReff() const
 {
     return tmp<volSymmTensorField>
     (
@@ -192,7 +301,7 @@ tmp<volSymmTensorField> coupledKEpsilon::devReff() const
 }
 
 
-tmp<fvVectorMatrix> coupledKEpsilon::divDevReff(volVectorField& U) const
+tmp<fvVectorMatrix> coupledKOmegaSST::divDevReff(volVectorField& U) const
 {
     return
     (
@@ -202,14 +311,21 @@ tmp<fvVectorMatrix> coupledKEpsilon::divDevReff(volVectorField& U) const
 }
 
 
-bool coupledKEpsilon::read()
+bool coupledKOmegaSST::read()
 {
     if (RASModel::read())
     {
-        Cmu_.readIfPresent(coeffDict());
-        C1_.readIfPresent(coeffDict());
-        C2_.readIfPresent(coeffDict());
-        sigmaEps_.readIfPresent(coeffDict());
+        alphaK1_.readIfPresent(coeffDict());
+        alphaK2_.readIfPresent(coeffDict());
+        alphaOmega1_.readIfPresent(coeffDict());
+        alphaOmega2_.readIfPresent(coeffDict());
+        gamma1_.readIfPresent(coeffDict());
+        gamma2_.readIfPresent(coeffDict());
+        beta1_.readIfPresent(coeffDict());
+        beta2_.readIfPresent(coeffDict());
+        betaStar_.readIfPresent(coeffDict());
+        a1_.readIfPresent(coeffDict());
+        c1_.readIfPresent(coeffDict());
 
         return true;
     }
@@ -220,14 +336,14 @@ bool coupledKEpsilon::read()
 }
 
 
-void coupledKEpsilon::correct()
+void coupledKOmegaSST::correct()
 {
     // Bound in case of topological change
     // HJ, 22/Aug/2007
     if (mesh_.changing())
     {
         bound(k_, k0_);
-        bound(epsilon_, epsilon0_);
+        bound(omega_, omega0_);
     }
 
     RASModel::correct();
@@ -237,45 +353,60 @@ void coupledKEpsilon::correct()
         return;
     }
 
-    // Make coupled matrix
-    fvBlockMatrix<vector2> keEqn(kEpsilon_);
-
-    volScalarField G("RASModel::G", nut_*2*magSqr(symm(fvc::grad(U_))));
-
-    // Update epsilon and G at the wall
-    epsilon_.boundaryField().updateCoeffs();
-
-    // Dissipation equation
+    if (mesh_.changing())
     {
-        fvScalarMatrix epsEqn
+        y_.correct();
+    }
+
+    volScalarField S2 = magSqr(symm(fvc::grad(U_)));
+    volScalarField G("RASModel::G", nut_*2*S2);
+
+    // Make coupled matrix
+    fvBlockMatrix<vector2> kOmegaEqn(kOmega_);
+
+    // Update omega and G at the wall
+    omega_.boundaryField().updateCoeffs();
+
+    volScalarField CDkOmega =
+        (2*alphaOmega2_)*(fvc::grad(k_) & fvc::grad(omega_))/omega_;
+
+    volScalarField F1 = this->F1(CDkOmega);
+
+    Info<< "Coupled k-omega" << endl;
+
+    // Turbulent frequency equation
+    {
+        fvScalarMatrix omegaEqn
         (
-            fvm::ddt(epsilon_)
-          + fvm::div(phi_, epsilon_)
-          + fvm::SuSp(-fvc::div(phi_), epsilon_)
-          - fvm::laplacian(DepsilonEff(), epsilon_)
-          + fvm::Sp(C2_*epsilon_/k_, epsilon_)
+            fvm::ddt(omega_)
+          + fvm::div(phi_, omega_)
+          + fvm::SuSp(-fvc::div(phi_), omega_)
+          - fvm::laplacian(DomegaEff(F1), omega_)
+          + fvm::SuSp
+            (
+                beta(F1)*omega_
+              + (F1 - scalar(1))*CDkOmega/omega_,
+                omega_
+            )
          ==
-            C1_*G*epsilon_/k_
+            gamma(F1)*2*S2
         );
 
-        epsEqn.relax();
-        epsEqn.completeAssembly();
+        omegaEqn.relax();
+        omegaEqn.completeAssembly();
 
-        keEqn.insertEquation(1, epsEqn);
+        kOmegaEqn.insertEquation(1, omegaEqn);
 
-        // Add coupling term:
-        // G_epsilon = C1*Cmu*(symm(grad(U))) k
-        // but with wall function corrections: must be calculated from G
-        // HJ, 27/Apr/2015
+        // Add coupling term
         volScalarField coupling
         (
             "coupling",
-            -C1_*G*epsilon_/sqr(k_)
+            -gamma(F1)*2*S2/k_
         );
         scalarField& couplingIn = coupling.internalField();
 
         // Eliminate coupling in wall function cells
-        labelList eliminated = epsEqn.eliminatedEqns().toc();
+        labelList eliminated = omegaEqn.eliminatedEqns().toc();
 
         forAll (eliminated, cellI)
         {
@@ -283,7 +414,7 @@ void coupledKEpsilon::correct()
         }
 
         // Insert coupling
-        keEqn.insertEquationCoupling(1, 0, coupling);
+        kOmegaEqn.insertEquationCoupling(1, 0, coupling);
     }
 
     // Turbulent kinetic energy equation
@@ -293,32 +424,37 @@ void coupledKEpsilon::correct()
             fvm::ddt(k_)
           + fvm::div(phi_, k_)
           + fvm::SuSp(-fvc::div(phi_), k_)
-          - fvm::laplacian(DkEff(), k_)
-          + fvm::SuSp((epsilon_ - G)/k_, k_)
+          - fvm::laplacian(DkEff(F1), k_)
+          + fvm::SuSp
+            (
+                betaStar_*omega_
+              - min(G/k_, c1_*betaStar_*omega_),
+                k_
+            )
         );
 
         kEqn.relax();
 
-        keEqn.insertEquation(0, kEqn);
+        kOmegaEqn.insertEquation(0, kEqn);
     }
 
     // Update source coupling: coupling terms eliminated from source
-    keEqn.updateSourceCoupling();
+    kOmegaEqn.updateSourceCoupling();
 
-    keEqn.solve();
+    kOmegaEqn.solve();
 
     // Retrieve solution
-    keEqn.retrieveSolution(0, k_.internalField());
-    keEqn.retrieveSolution(1, epsilon_.internalField());
+    kOmegaEqn.retrieveSolution(0, k_.internalField());
+    kOmegaEqn.retrieveSolution(1, omega_.internalField());
 
     k_.correctBoundaryConditions();
-    epsilon_.correctBoundaryConditions();
+    omega_.correctBoundaryConditions();
 
-    bound(epsilon_, epsilon0_);
     bound(k_, k0_);
+    bound(omega_, omega0_);
 
     // Re-calculate viscosity
-    nut_ = Cmu_*sqr(k_)/epsilon_;
+    nut_ = a1_*k_/max(a1_*omega_, F2()*sqrt(2*S2));
     nut_ = min(nut_, nuRatio()*nu());
     nut_.correctBoundaryConditions();
 }
