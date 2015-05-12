@@ -81,7 +81,7 @@ label factorial(label n)
     };
 
 #   ifdef FULLDEBUG
-    if (n > 12 && n < 0)
+    if (n > 12 || n < 0)
     {
         FatalErrorIn("factorial(label n)")
             << "n value out of range"
