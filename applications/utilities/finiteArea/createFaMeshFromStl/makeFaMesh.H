@@ -1,0 +1,1 @@
+faMesh aMesh(mesh, faceLabels);
