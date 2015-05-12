@@ -37,6 +37,8 @@ License
 #   define MPI_SCALAR MPI_FLOAT
 #elif defined(WM_DP)
 #   define MPI_SCALAR MPI_DOUBLE
+#elif defined(WM_LDP)
+#   define MPI_SCALAR MPI_LONG_DOUBLE
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

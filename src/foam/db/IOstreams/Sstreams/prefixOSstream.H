@@ -73,8 +73,8 @@ public:
         (
             ostream& os,
             const string& name,
-            streamFormat format=ASCII,
-            versionNumber version=currentVersion,
+            streamFormat format = ASCII,
+            versionNumber version = currentVersion,
             compressionType compression=UNCOMPRESSED
         );
 
@@ -129,6 +129,9 @@ public:
 
             //- Write doubleScalar
             virtual Ostream& write(const doubleScalar);
+
+            //- Write doubleScalar
+            virtual Ostream& write(const longDoubleScalar);
 
             //- Write binary block
             virtual Ostream& write(const char*, std::streamsize);

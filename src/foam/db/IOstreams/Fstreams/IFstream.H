@@ -109,8 +109,8 @@ public:
         IFstream
         (
             const fileName& pathname,
-            streamFormat format=ASCII,
-            versionNumber version=currentVersion
+            streamFormat format = ASCII,
+            versionNumber version = currentVersion
         );
 
 

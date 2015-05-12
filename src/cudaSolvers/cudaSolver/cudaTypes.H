@@ -38,15 +38,19 @@ Author
 #ifndef cudaTypes_H
 #define cudaTypes_H
 
-#if defined(WM_DP)
+#if defined(WM_SP)
 
-    #define MPI_SCALAR MPI_DOUBLE
+#   define MPI_SCALAR MPI_FLOAT
+    typedef float ValueType;
+
+#elif defined(WM_DP)
+
+#   define MPI_SCALAR MPI_DOUBLE
     typedef double ValueType;
 
-#elif defined(WM_SP)
+#elif defined(WM_LDP)
 
-    #define MPI_SCALAR MPI_FLOAT
-    typedef float ValueType;
+#   error Long double not supported in CUDA
 
 #endif
 

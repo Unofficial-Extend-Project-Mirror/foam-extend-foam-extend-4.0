@@ -84,7 +84,7 @@ public:
             const int fromProcNo,
             const label bufSize = 0,
             streamFormat format=BINARY,
-            versionNumber version=currentVersion
+            versionNumber version = currentVersion
         );
 
 
@@ -142,6 +142,9 @@ public:
 
             //- Read a doubleScalar
             Istream& read(doubleScalar&);
+
+            //- Read a longDoubleScalar
+            Istream& read(longDoubleScalar&);
 
             //- Read binary block
             Istream& read(char*, std::streamsize);

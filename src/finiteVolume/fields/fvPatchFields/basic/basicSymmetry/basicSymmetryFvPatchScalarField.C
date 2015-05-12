@@ -50,7 +50,7 @@ void basicSymmetryFvPatchField<scalar>::evaluate(const Pstream::commsTypes)
 {
     // Local typedefs
     typedef scalar Type;
-    typedef typename outerProduct<vector, Type>::type gradType;
+    typedef outerProduct<vector, Type>::type gradType;
     typedef GeometricField<gradType, fvPatchField, volMesh> gradFieldType;
 
     if (!updated())
@@ -140,7 +140,7 @@ tmp<vectorField> basicSymmetryFvPatchField<vector>::snGrad() const
 {
     // Local typedefs
     typedef vector Type;
-    typedef typename outerProduct<vector, Type>::type gradType;
+    typedef outerProduct<vector, Type>::type gradType;
     typedef GeometricField<gradType, fvPatchField, volMesh> gradFieldType;
 
     vectorField nHat = this->patch().nf();
@@ -213,7 +213,7 @@ void basicSymmetryFvPatchField<vector>::evaluate(const Pstream::commsTypes)
 {
     // Local typedefs
     typedef vector Type;
-    typedef typename outerProduct<vector, Type>::type gradType;
+    typedef outerProduct<vector, Type>::type gradType;
     typedef GeometricField<gradType, fvPatchField, volMesh> gradFieldType;
 
     if (!updated())

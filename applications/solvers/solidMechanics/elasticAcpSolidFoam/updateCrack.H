@@ -6,13 +6,15 @@ nCoupledFacesToBreak = 0;
     // scalarField effTraction =
     //   cohesiveZone.internalField() *
     //   mag(traction.internalField());
-  scalarField normalTraction =
-    cohesiveZone.internalField() *
-    ( n.internalField() & traction.internalField() );
-  normalTraction = max(normalTraction, 0.0); // only consider tensile tractions
-  scalarField shearTraction =
-    cohesiveZone.internalField() *
-    mag( (I - Foam::sqr(n.internalField())) & traction.internalField() );
+    scalarField normalTraction =
+        cohesiveZone.internalField()*
+        ( n.internalField() & traction.internalField() );
+
+    // only consider tensile tractions
+    normalTraction = max(normalTraction, scalar(0));
+    scalarField shearTraction =
+        cohesiveZone.internalField() *
+        mag( (I - Foam::sqr(n.internalField())) & traction.internalField() );
 
     // the traction fraction is monitored to decide which faces to break:
     // ie (tN/tNC)^2 + (tS/tSC)^2 >1 to crack a face
@@ -27,16 +29,18 @@ nCoupledFacesToBreak = 0;
     scalarField effTractionFraction(normalTraction.size(), 0.0);
 
     if(cohesivePatchUPtr)
-      {
-	effTractionFraction =
-	  (normalTraction/sigmaMaxI)*(normalTraction/sigmaMaxI) + (shearTraction/tauMaxI)*(shearTraction/tauMaxI);
-      }
+    {
+        effTractionFraction =
+            (normalTraction/sigmaMaxI)*(normalTraction/sigmaMaxI)
+          + (shearTraction/tauMaxI)*(shearTraction/tauMaxI);
+    }
     else
-      {
-	// solidCohesiveFixedModeMix only uses sigmaMax
-	effTractionFraction =
-	  (normalTraction/sigmaMaxI)*(normalTraction/sigmaMaxI) + (shearTraction/sigmaMaxI)*(shearTraction/sigmaMaxI);
-      }
+    {
+        // solidCohesiveFixedModeMix only uses sigmaMax
+        effTractionFraction =
+            (normalTraction/sigmaMaxI)*(normalTraction/sigmaMaxI)
+          + (shearTraction/sigmaMaxI)*(shearTraction/sigmaMaxI);
+    }
     maxEffTractionFraction = gMax(effTractionFraction);
 
     SLList<label> facesToBreakList;
@@ -44,15 +48,21 @@ nCoupledFacesToBreak = 0;
 
     forAll(effTractionFraction, faceI)
     {
-      if (effTractionFraction[faceI] > 1.0)
+        if (effTractionFraction[faceI] > 1.0)
         {
             facesToBreakList.insert(faceI);
-            facesToBreakEffTractionFractionList.insert(effTractionFraction[faceI]);
+            facesToBreakEffTractionFractionList.insert
+            (
+                effTractionFraction[faceI]
+            );
         }
     }
 
     labelList facesToBreak(facesToBreakList);
-    List<scalar> facesToBreakEffTractionFraction(facesToBreakEffTractionFractionList);
+    List<scalar> facesToBreakEffTractionFraction
+    (
+        facesToBreakEffTractionFractionList
+    );
 
     nFacesToBreak = facesToBreak.size();
 
@@ -122,7 +132,7 @@ nCoupledFacesToBreak = 0;
 	  scalarField pNormalTraction =
 	    cohesiveZone.boundaryField()[patchI] *
 	    ( n.boundaryField()[patchI] & traction.boundaryField()[patchI] );
-	  pNormalTraction = max(pNormalTraction, 0.0); // only consider tensile tractions
+	  pNormalTraction = max(pNormalTraction, scalar(0)); // only consider tensile tractions
 	  scalarField pShearTraction =
 	    cohesiveZone.boundaryField()[patchI] *
 	    mag( (I - Foam::sqr(n.boundaryField()[patchI])) & traction.boundaryField()[patchI] );

@@ -151,8 +151,8 @@ public:
         //- Construct and set stream status
         OSHA1stream
         (
-            streamFormat format=ASCII,
-            versionNumber version=currentVersion
+            streamFormat format = ASCII,
+            versionNumber version = currentVersion
         )
         :
             OSstream

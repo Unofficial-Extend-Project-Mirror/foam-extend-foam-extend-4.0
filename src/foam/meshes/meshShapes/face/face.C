@@ -225,7 +225,9 @@ Foam::label Foam::face::split
             splitEdge /= Foam::mag(splitEdge) + VSMALL;
 
             const scalar splitCos = splitEdge & rightEdge;
-            const scalar splitAngle = acos(max(-1.0, min(1.0, splitCos)));
+            const scalar splitAngle =
+                acos(max(scalar(-1), min(scalar(1), splitCos)));
+
             const scalar angleDiff = fabs(splitAngle - bisectAngle);
 
             if (angleDiff < minDiff)

@@ -60,8 +60,8 @@ public:
         IStringStream
         (
             const string& buffer,
-            streamFormat format=ASCII,
-            versionNumber version=currentVersion
+            streamFormat format = ASCII,
+            versionNumber version = currentVersion
         )
         :
             ISstream
@@ -78,8 +78,8 @@ public:
         IStringStream
         (
             const char* buffer,
-            streamFormat format=ASCII,
-            versionNumber version=currentVersion
+            streamFormat format = ASCII,
+            versionNumber version = currentVersion
         )
         :
             ISstream

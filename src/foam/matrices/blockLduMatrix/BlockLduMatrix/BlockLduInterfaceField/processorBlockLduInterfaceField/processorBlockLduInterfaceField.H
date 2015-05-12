@@ -48,7 +48,7 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                  Class processorBlockLduInterfaceField Declaration
+               Class processorBlockLduInterfaceField Declaration
 \*---------------------------------------------------------------------------*/
 
 template<class Type>

@@ -400,7 +400,7 @@ inline scalar triangle<Point, PointRef>::circumRadius() const
     {
         scalar a = (d1 + d2)*(d2 + d3)*(d3 + d1) / denom;
 
-        return 0.5*Foam::sqrt(min(GREAT, max(0, a)));
+        return 0.5*Foam::sqrt(min(GREAT, max(scalar(0), a)));
     }
 }
 
@@ -411,9 +411,7 @@ inline scalar triangle<Point, PointRef>::quality() const
     return
         mag()
        /(
-            mathematicalConstant::pi
-          *Foam::sqr(circumRadius())
-          *0.413497
+            0.413497*mathematicalConstant::pi*sqr(circumRadius())
           + VSMALL
         );
 }
@@ -775,8 +773,8 @@ inline bool triangle<Point, PointRef>::classify
     if (hit)
     {
         // alpha,beta might get negative due to precision errors
-        alpha = max(0.0, min(1.0, alpha));
-        beta = max(0.0, min(1.0, beta));
+        alpha = max(scalar(0), min(scalar(1), alpha));
+        beta = max(scalar(0), min(scalar(1), beta));
     }
 
     nearType = NONE;

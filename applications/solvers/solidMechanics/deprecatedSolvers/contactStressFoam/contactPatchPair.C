@@ -30,18 +30,10 @@ Description
 #include "contactPatchPair.H"
 #include "volFields.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-namespace Foam
-{
-
-// * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
-
-
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 // Construct from components
-contactPatchPair::contactPatchPair
+    Foam::contactPatchPair::contactPatchPair
 (
     const fvMesh& m,
     const label master,
@@ -74,7 +66,5 @@ contactPatchPair::contactPatchPair
     )
 {}
 
-
-} // End namespace Foam
 
 // ************************************************************************* //

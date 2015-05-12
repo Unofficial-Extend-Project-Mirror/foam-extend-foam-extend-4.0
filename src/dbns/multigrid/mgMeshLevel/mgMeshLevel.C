@@ -163,6 +163,8 @@ void Foam::mgMeshLevel::makeChild() const
     child_.setSize(nCells());
     int nMoves = -1;
 
+#   ifdef WM_DP
+
     MGridGen
     (
         nCells(),
@@ -175,9 +177,50 @@ void Foam::mgMeshLevel::makeChild() const
         mgMaxClusterSize_,
         options.begin(),
         &nMoves,
+        &nCoarseCells,
+        child_.begin()
+    );
+
+#   else
+
+    // Conversion of type for MGridGen interface
+    const scalarField& vols = cellVolumes();
+
+    Field<double> dblVols(vols.size());
+    forAll (dblVols, i)
+    {
+        dblVols[i] = vols[i];
+    }
+
+    Field<double> dblAreas(boundaryAreas.size());
+    forAll (dblAreas, i)
+    {
+        dblAreas[i] = boundaryAreas[i];
+    }
+
+    Field<double> dblFaceWeights(faceWeights.size());
+    forAll (dblFaceWeights, i)
+    {
+        dblFaceWeights[i] = faceWeights[i];
+    }
+
+    MGridGen
+    (
+        nCells(),
+        cellCellOffsets.begin(),
+        dblVols.begin(),
+        dblAreas.begin(),
+        cellCells.begin(),
+        dblFaceWeights.begin(),
+        mgMinClusterSize_,
+        mgMaxClusterSize_,
+        options.begin(),
+        &nMoves,
         &nCoarseCells_,
         child_.begin()
     );
+
+#   endif
 
     Info<< "Number of coarse cells = " << nCoarseCells_ << endl;
 }

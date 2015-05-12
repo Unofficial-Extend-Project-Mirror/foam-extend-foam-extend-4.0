@@ -50,20 +50,6 @@ translatingWallVelocityFvPatchVectorField
 translatingWallVelocityFvPatchVectorField::
 translatingWallVelocityFvPatchVectorField
 (
-    const translatingWallVelocityFvPatchVectorField& ptf,
-    const fvPatch& p,
-    const DimensionedField<vector, volMesh>& iF,
-    const fvPatchFieldMapper& mapper
-)
-:
-    fixedValueFvPatchField<vector>(ptf, p, iF, mapper),
-    U_(ptf.U_)
-{}
-
-
-translatingWallVelocityFvPatchVectorField::
-translatingWallVelocityFvPatchVectorField
-(
     const fvPatch& p,
     const DimensionedField<vector, volMesh>& iF,
     const dictionary& dict
@@ -75,6 +61,20 @@ translatingWallVelocityFvPatchVectorField
     // Evaluate the wall velocity
     updateCoeffs();
 }
+
+
+translatingWallVelocityFvPatchVectorField::
+translatingWallVelocityFvPatchVectorField
+(
+    const translatingWallVelocityFvPatchVectorField& ptf,
+    const fvPatch& p,
+    const DimensionedField<vector, volMesh>& iF,
+    const fvPatchFieldMapper& mapper
+)
+:
+    fixedValueFvPatchField<vector>(ptf, p, iF, mapper),
+    U_(ptf.U_)
+{}
 
 
 translatingWallVelocityFvPatchVectorField::

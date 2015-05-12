@@ -729,7 +729,7 @@ void solidCohesiveFvPatchVectorField::updateCoeffs()
                 unloadingDeltaEff_,
                 Foam::sqrt
                 (
-                    max(deltaN_, 0.0)*max(deltaN_, 0.0) + deltaS_*deltaS_
+                    sqr(max(deltaN_, scalar(0))) + sqr(deltaS_)
                 )
             );
 

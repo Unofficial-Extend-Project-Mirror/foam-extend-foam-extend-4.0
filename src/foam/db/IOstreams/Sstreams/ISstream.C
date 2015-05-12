@@ -489,6 +489,14 @@ Foam::Istream& Foam::ISstream::read(doubleScalar& val)
 }
 
 
+Foam::Istream& Foam::ISstream::read(longDoubleScalar& val)
+{
+    is_ >> val;
+    setState(is_.rdstate());
+    return *this;
+}
+
+
 // read binary block
 Foam::Istream& Foam::ISstream::read(char* buf, std::streamsize count)
 {

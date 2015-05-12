@@ -75,8 +75,8 @@ public:
         //- Set stream status
         Istream
         (
-            streamFormat format=ASCII,
-            versionNumber version=currentVersion,
+            streamFormat format = ASCII,
+            versionNumber version = currentVersion,
             compressionType compression=UNCOMPRESSED
         )
         :
@@ -121,6 +121,9 @@ public:
 
             //- Read a doubleScalar
             virtual Istream& read(doubleScalar&) = 0;
+
+            //- Read a longDoubleScalar
+            virtual Istream& read(longDoubleScalar&) = 0;
 
             //- Read binary block
             virtual Istream& read(char*, std::streamsize) = 0;

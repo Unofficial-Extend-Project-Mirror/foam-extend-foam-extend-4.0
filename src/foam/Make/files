@@ -26,6 +26,7 @@ $(ints)/label/label.C
 $(ints)/uLabel/uLabel.C
 
 primitives/Scalar/doubleScalar/doubleScalar.C
+primitives/Scalar/longDoubleScalar/longDoubleScalar.C
 primitives/Scalar/floatScalar/floatScalar.C
 primitives/Scalar/scalar/scalar.C
 primitives/DiagTensor/diagTensor/diagTensor.C

@@ -46,7 +46,7 @@ ersPointSource::ersPointSource
     alpha_(readScalar(dict.lookup("alpha"))),
     direction_(dict.lookup("direction"))
 {
-    q() = -alpha_*qmax_*min(direction_ & p.Sf()/p.magSf(), 0.0);
+    q() = -alpha_*qmax_*min(direction_ & p.Sf()/p.magSf(), scalar(0));
 }
 
 
