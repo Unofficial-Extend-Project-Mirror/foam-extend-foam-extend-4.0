@@ -148,9 +148,9 @@ inline scalar sutherlandTransport<thermo>::alpha(const scalar T) const
     scalar R_ = this->R();
     scalar Cp_ = Cv_ + R_;
 
-    scalar deltaT = T - specie::Tstd;
+    scalar deltaT = T - specie::Tstd();
     scalar CpBar =
-        (deltaT*(this->H(T) - this->H(specie::Tstd)) + Cp_)/(sqr(deltaT) + 1);
+        (deltaT*(this->H(T) - this->H(specie::Tstd())) + Cp_)/(sqr(deltaT) + 1);
 
     return mu(T)*Cv_*(1.32 + 1.77*this->R()/Cv_)/CpBar;
 }

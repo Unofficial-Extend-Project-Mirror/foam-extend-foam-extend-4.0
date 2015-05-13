@@ -38,6 +38,8 @@ SourceFiles
 
 #include "word.H"
 #include "scalar.H"
+#include "debug.H"
+#include "constantsSwitch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -82,13 +84,13 @@ public:
         // Thermodynamic constants
 
             //- Universal gas constant [J/(kmol K)]
-            static const scalar RR;
+            static const Foam::debug::constantsSwitch RR;
 
             //- Standard pressure [Pa]
-            static const scalar Pstd;
+            static const Foam::debug::constantsSwitch Pstd;
 
             //- Standard temperature [K]
-            static const scalar Tstd;
+            static const Foam::debug::constantsSwitch Tstd;
 
 
     // Constructors

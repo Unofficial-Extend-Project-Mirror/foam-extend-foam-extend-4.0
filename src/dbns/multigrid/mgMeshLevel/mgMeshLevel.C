@@ -42,14 +42,16 @@ extern "C"
 defineTypeNameAndDebug(Foam::mgMeshLevel, 0);
 
 
-Foam::label Foam::mgMeshLevel::mgMinClusterSize_
+const Foam::debug::optimisationSwitch Foam::mgMeshLevel::mgMinClusterSize_
 (
-    debug::optimisationSwitch("mgMinClusterSize", 2)
+    "mgMinClusterSize",
+    2
 );
 
-Foam::label Foam::mgMeshLevel::mgMaxClusterSize_
+const Foam::debug::optimisationSwitch Foam::mgMeshLevel::mgMaxClusterSize_
 (
-    debug::optimisationSwitch("mgMaxClusterSize", 8)
+    "mgMaxClusterSize",
+    8
 );
 
 
@@ -173,8 +175,8 @@ void Foam::mgMeshLevel::makeChild() const
         const_cast<scalar*>(boundaryAreas.begin()),
         cellCells.begin(),
         faceWeights.begin(),
-        mgMinClusterSize_,
-        mgMaxClusterSize_,
+        mgMinClusterSize_(),
+        mgMaxClusterSize_(),
         options.begin(),
         &nMoves,
         &nCoarseCells,

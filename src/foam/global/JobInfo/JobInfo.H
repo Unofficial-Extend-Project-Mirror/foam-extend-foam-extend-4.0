@@ -42,6 +42,7 @@ SourceFiles
 #include "dictionary.H"
 #include "fileName.H"
 #include "cpuTime.H"
+#include "infoSwitch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -70,7 +71,7 @@ class JobInfo
 public:
 
     static bool constructed;
-    static bool writeJobInfo;
+    static Foam::debug::infoSwitch writeJobInfo;
 
     // Constructors
 

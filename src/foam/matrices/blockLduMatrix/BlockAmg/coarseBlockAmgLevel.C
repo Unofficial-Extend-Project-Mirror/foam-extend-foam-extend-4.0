@@ -222,7 +222,7 @@ void Foam::coarseBlockAmgLevel<Type>::solve
     }
 
     // Switch of debug in top-level direct solve
-    label oldDebug = BlockLduMatrix<Type>::debug;
+    debug::debugSwitch oldDebug = BlockLduMatrix<Type>::debug;
 
     if (BlockLduMatrix<Type>::debug >= 4)
     {
@@ -278,6 +278,11 @@ void Foam::coarseBlockAmgLevel<Type>::solve
         multiply(x, invDiag, b);
 
         // Print top level correction failure as info for user
+        coarseSolverPerf.print();
+    }
+
+    if (BlockLduMatrix<Type>::debug >= 2)
+    {
         coarseSolverPerf.print();
     }
 }

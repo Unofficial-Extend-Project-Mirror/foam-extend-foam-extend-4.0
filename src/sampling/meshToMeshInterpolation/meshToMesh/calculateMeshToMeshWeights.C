@@ -68,7 +68,7 @@ void meshToMesh::calculateInverseDistanceWeights() const
             // pick up the value
             if
             (
-                m < directHitTol                            // Direct hit
+                m < directHitTol()                            // Direct hit
              || neighbours.empty()
             )
             {

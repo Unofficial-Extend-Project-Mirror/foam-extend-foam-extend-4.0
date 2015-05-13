@@ -40,9 +40,11 @@ Description
 namespace Foam
 {
 
-const scalar meshToMesh::cellCentreDistanceTol
+const Foam::debug::tolerancesSwitch
+meshToMesh::cellCentreDistanceTol
 (
-    debug::tolerances("meshToMeshCellCentreDistanceTol", 1e-3)
+    "meshToMeshCellCentreDistanceTol",
+    1e-3
 );
 
 
@@ -262,7 +264,7 @@ void meshToMesh::cellAddresses
 
     forAll (points, toI)
     {
-        scalar localTol = cellCentreDistanceTol;
+        scalar localTol = cellCentreDistanceTol();
 
         bool isBoundary = false;
 

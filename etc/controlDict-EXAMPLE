@@ -943,7 +943,7 @@ Tolerances
     slidingEdgeEndCutoffTol         0.0001;
     slidingEdgeCoPlanarTol          0.8;
 
-//     GGIAreaErrorTol                 1e-8;
+     GGIAreaErrorTol                 1e-8;
 }
 
 DimensionedConstants
@@ -960,7 +960,7 @@ DimensionedConstants
     Tstd        298.15;
 
     //- Stefan-Boltzmann constant [J/(K4 m2 s)]
-    sigmaSB     sigmaSB [1 0 -3 -4 0 0 0] 5.670e-08;
+    sigmaSB     5.670e-08;
 
     /* USCS units
 

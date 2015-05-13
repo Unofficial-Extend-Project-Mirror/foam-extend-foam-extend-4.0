@@ -209,7 +209,7 @@ void Foam::coarseAmgLevel::solve
     }
 
     // Switch of debug in top-level direct solve
-    label oldDebug = lduMatrix::debug;
+    debug::debugSwitch oldDebug = lduMatrix::debug;
 
     if (matrixPtr_->matrix().symmetric())
     {

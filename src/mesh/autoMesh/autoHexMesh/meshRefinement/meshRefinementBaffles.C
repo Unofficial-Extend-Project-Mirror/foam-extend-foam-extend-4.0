@@ -229,7 +229,7 @@ void Foam::meshRefinement::getBafflePatches
 {
     autoPtr<OFstream> str;
     label vertI = 0;
-    if (debug&OBJINTERSECTIONS)
+    if (debug & OBJINTERSECTIONS)
     {
         str.reset
         (
@@ -1499,13 +1499,13 @@ void Foam::meshRefinement::baffleAndSplitMesh
     Info<< "Created baffles in = "
         << runTime.cpuTimeIncrement() << " s\n" << nl << endl;
 
-    printMeshInfo(debug, "After introducing baffles");
+    printMeshInfo(debug(), "After introducing baffles");
 
     if (debug)
     {
         Pout<< "Writing baffled mesh to time " << timeName()
             << endl;
-        write(debug, runTime.path()/"baffles");
+        write(debug(), runTime.path()/"baffles");
         Pout<< "Dumped debug data in = "
             << runTime.cpuTimeIncrement() << " s\n" << nl << endl;
     }
@@ -1581,13 +1581,13 @@ void Foam::meshRefinement::baffleAndSplitMesh
         Info<< "Created baffles in = "
             << runTime.cpuTimeIncrement() << " s\n" << nl << endl;
 
-        printMeshInfo(debug, "After introducing baffles");
+        printMeshInfo(debug(), "After introducing baffles");
 
         if (debug)
         {
             Pout<< "Writing extra baffled mesh to time "
                 << timeName() << endl;
-            write(debug, runTime.path()/"extraBaffles");
+            write(debug(), runTime.path()/"extraBaffles");
             Pout<< "Dumped debug data in = "
                 << runTime.cpuTimeIncrement() << " s\n" << nl << endl;
         }
@@ -1617,13 +1617,13 @@ void Foam::meshRefinement::baffleAndSplitMesh
     Info<< "Split mesh in = "
         << runTime.cpuTimeIncrement() << " s\n" << nl << endl;
 
-    printMeshInfo(debug, "After subsetting");
+    printMeshInfo(debug(), "After subsetting");
 
     if (debug)
     {
         Pout<< "Writing subsetted mesh to time " << timeName()
             << endl;
-        write(debug, runTime.path()/timeName());
+        write(debug(), runTime.path()/timeName());
         Pout<< "Dumped debug data in = "
             << runTime.cpuTimeIncrement() << " s\n" << nl << endl;
     }

@@ -30,10 +30,9 @@ Description
 Author
     Hrvoje Jasak, Wikki Ltd.  All rights reserved
 
-\*---------------------------------------------------------------------------*/
+\*----------------------------------------------------------------------------*/
 
 #include "coupledLduMatrix.H"
-#include "processorLduInterfaceField.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
@@ -41,6 +40,9 @@ namespace Foam
 {
     defineTypeNameAndDebug(coupledLduMatrix, 1);
 }
+
+
+// * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
@@ -288,7 +290,7 @@ void Foam::coupledLduMatrix::initMatrixInterfaces
                             matrices[rowI],
                             coupleCoeffs[rowI][interfaceI],
                             cmpt,
-                            Pstream::defaultCommsType,
+                            static_cast<const Pstream::commsTypes>(Pstream::defaultCommsType()),
                             false
                         );
                     }
@@ -322,6 +324,15 @@ void Foam::coupledLduMatrix::updateMatrixInterfaces
         );
     }
 }
+
+
+// * * * * * * * * * * * * * * * Member Operators  * * * * * * * * * * * * * //
+
+
+// * * * * * * * * * * * * * * * Friend Functions  * * * * * * * * * * * * * //
+
+
+// * * * * * * * * * * * * * * * Friend Operators  * * * * * * * * * * * * * //
 
 
 // ************************************************************************* //

@@ -213,7 +213,7 @@ void basicSymmetryFvPatchField<vector>::evaluate(const Pstream::commsTypes)
 {
     // Local typedefs
     typedef vector Type;
-    typedef outerProduct<vector, Type>::type gradType;
+    typedef typename outerProduct<vector, Type>::type gradType;
     typedef GeometricField<gradType, fvPatchField, volMesh> gradFieldType;
 
     if (!updated())

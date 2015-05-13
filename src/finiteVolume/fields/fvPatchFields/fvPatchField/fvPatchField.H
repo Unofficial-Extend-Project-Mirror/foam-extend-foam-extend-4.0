@@ -46,6 +46,7 @@ SourceFiles
 
 #include "fvPatch.H"
 #include "DimensionedField.H"
+#include "debugSwitch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -114,7 +115,7 @@ public:
     TypeName("fvPatchField");
 
     //- Debug switch to disallow the use of genericFvPatchField
-    static int disallowGenericFvPatchField;
+    static debug::debugSwitch disallowGenericFvPatchField;
 
 
     // Declare run-time constructor selection tables

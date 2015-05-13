@@ -44,7 +44,7 @@ inline Foam::OSstream::OSstream
     {
         setOpened();
         setGood();
-        os_.precision(precision_);
+        os_.precision(precision_());
     }
     else
     {

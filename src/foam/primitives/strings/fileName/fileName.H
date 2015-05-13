@@ -45,6 +45,7 @@ SourceFiles
 #define fileName_H
 
 #include "word.H"
+#include "debugSwitch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -91,7 +92,7 @@ public:
     // Static data members
 
         static const char* const typeName;
-        static int debug;
+        static debug::debugSwitch debug;
         static const fileName null;
 
 

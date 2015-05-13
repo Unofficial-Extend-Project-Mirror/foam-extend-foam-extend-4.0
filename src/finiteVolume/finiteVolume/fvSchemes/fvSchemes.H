@@ -38,6 +38,7 @@ SourceFiles
 #define fvSchemes_H
 
 #include "IOdictionary.H"
+#include "debugSwitch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -96,7 +97,7 @@ class fvSchemes
 public:
 
     //- Debug switch
-    static int debug;
+        static debug::debugSwitch debug;
 
 
     // Constructors

@@ -130,10 +130,10 @@ void Foam::ReactingParcel<ParcelType>::correctSurfaceValues
     Xinf /= sum(Xinf);
 
     // Molar fraction of far field species at particle surface
-    const scalar Xsff = 1.0 - min(sum(Cs)*specie::RR*this->T_/pc_, 1.0);
+    const scalar Xsff = 1.0 - min(sum(Cs)*specie::RR()*this->T_/pc_, 1.0);
 
     // Surface carrier total molar concentration
-    const scalar CsTot = pc_/(specie::RR*this->T_);
+    const scalar CsTot = pc_/(specie::RR()*this->T_);
 
     // Surface carrier composition (molar fraction)
     scalarField Xs(Xinf.size());
@@ -177,7 +177,7 @@ void Foam::ReactingParcel<ParcelType>::correctSurfaceValues
         sumYiCbrtW += Ys[i]*cbrtW;
     }
 
-    rhos *= pc_/(specie::RR*T);
+    rhos *= pc_/(specie::RR()*T);
     mus /= sumYiSqrtW;
     kappa /= sumYiCbrtW;
     Pr = cps*mus/kappa;
@@ -452,7 +452,7 @@ void Foam::ReactingParcel<ParcelType>::calcPhaseChange
     td.cloud().addToMassPhaseChange(this->nParticle_*dMassTot);
 
     // Average molecular weight of carrier mix - assumes perfect gas
-    scalar Wc = this->rhoc_*specie::RR*this->Tc_/this->pc_;
+    scalar Wc = this->rhoc_*specie::RR()*this->Tc_/this->pc_;
 
     forAll(YComponents, i)
     {

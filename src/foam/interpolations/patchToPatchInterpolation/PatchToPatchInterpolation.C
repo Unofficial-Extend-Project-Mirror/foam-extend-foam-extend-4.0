@@ -38,18 +38,20 @@ namespace Foam
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
 template<class FromPatch, class ToPatch>
-scalar PatchToPatchInterpolation<FromPatch, ToPatch>::directHitTol_
+const Foam::debug::tolerancesSwitch
+PatchToPatchInterpolation<FromPatch, ToPatch>::directHitTol_
 (
-    debug::tolerances("patchToPatchDirectHit", 1e-5)
+    "patchToPatchDirectHit",
+    1e-5
 );
-
 
 template<class FromPatch, class ToPatch>
-scalar PatchToPatchInterpolation<FromPatch, ToPatch>::projectionTol_
+const Foam::debug::tolerancesSwitch
+PatchToPatchInterpolation<FromPatch, ToPatch>::projectionTol_
 (
-    debug::tolerances("patchToPatchProjectionTol", 0.05)
+    "patchToPatchProjectionTol",
+    0.05
 );
-
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
@@ -109,7 +111,8 @@ PatchToPatchInterpolation<FromPatch, ToPatch>::PatchToPatchInterpolation
     faceAddressingPtr_(NULL),
     faceWeightsPtr_(NULL),
     faceDistancePtr_(NULL)
-{}
+{
+}
 
 
 // Construct as copy

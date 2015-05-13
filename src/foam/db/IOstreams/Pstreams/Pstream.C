@@ -227,23 +227,41 @@ Foam::List<Foam::Pstream::commsStruct> Foam::Pstream::treeCommunication_(0);
 // Should compact transfer be used in which floats replace doubles
 // reducing the bandwidth requirement at the expense of some loss
 // in accuracy
-bool Foam::Pstream::floatTransfer
+const Foam::debug::optimisationSwitch
+Foam::Pstream::floatTransfer
 (
-    debug::optimisationSwitch("floatTransfer", 0)
+    "floatTransfer",
+    0
 );
 
 // Number of processors at which the reduce algorithm changes from linear to
 // tree
-int Foam::Pstream::nProcsSimpleSum
+const Foam::debug::optimisationSwitch
+Foam::Pstream::nProcsSimpleSum
 (
-    debug::optimisationSwitch("nProcsSimpleSum", 16)
+    "nProcsSimpleSum",
+    16
 );
 
 // Default commsType
-Foam::Pstream::commsTypes Foam::Pstream::defaultCommsType
+Foam::Pstream::commsTypes Foam::Pstream::defaultCommsType_
 (
-    commsTypeNames.read(debug::optimisationSwitches().lookup("commsType"))
+    commsTypeNames
+    [
+	debug::optimisationSwitches().lookupOrAddDefault
+	(
+	    "commsType",
+	    word("blocking")
+	)
+    ]
 );
 
+const Foam::debug::optimisationSwitch
+Foam::Pstream::defaultCommsType
+(
+    "commsType",
+    "blocking",
+    "blocking, nonBlocking, scheduled"
+);
 
 // ************************************************************************* //

@@ -42,9 +42,11 @@ License
 defineTypeNameAndDebug(Foam::globalMeshData, 0);
 
 // Geometric matching tolerance. Factor of mesh bounding box.
-const Foam::scalar Foam::globalMeshData::matchTol_
+const Foam::debug::tolerancesSwitch
+Foam::globalMeshData::matchTol_
 (
-    debug::tolerances("globalMeshDataMatchTol", 1e-8)
+    "globalMeshDataMatchTol",
+    1e-8
 );
 
 
@@ -661,7 +663,7 @@ Foam::pointField Foam::globalMeshData::geometricSharedPoints() const
     combineReduce(sharedPoints, plusEqOp<pointField>());
 
     // Merge tolerance
-    scalar tolDim = matchTol_*bb_.mag();
+    scalar tolDim = matchTol_()*bb_.mag();
 
     // And see how many are unique
     labelList pMap;
@@ -729,7 +731,7 @@ void Foam::globalMeshData::updateMesh()
     // Note: boundBox does reduce
     bb_ = boundBox(mesh_.points());
 
-    scalar tolDim = matchTol_*bb_.mag();
+    scalar tolDim = matchTol_()*bb_.mag();
 
     if (debug)
     {

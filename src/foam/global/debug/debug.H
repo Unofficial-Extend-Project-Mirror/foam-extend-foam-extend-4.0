@@ -40,16 +40,31 @@ SourceFiles
 namespace Foam
 {
 
+// Number of global controlDict switches sets
+// Currently, we have:
+//     DebugSwitches, InfoSwitches, OptimisationSwitches, Tolerances,
+//     and DimensionedConstants
+#define DIM_GLOBALCONTROLDICTSWITCHSET 5
+
 // Forward declaration of classes
 class dictionary;
+class fileName;
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace debug
 {
+    //- Define central control dictionary switchSet
+    enum globalControlDictSwitchSet
+    {
+	DEBUGSWITCHES,
+	INFOSWITCHES,
+	OPTIMISATIONSWITCHES,
+	TOLERANCES,
+	DIMENSIONEDCONSTANTS
+    };
+
     //- The central control dictionary.
-    //  Located in $WM_PROJECT_DIR/etc
-    //  @sa Foam::findEtcFile()
     dictionary& controlDict();
 
     //- The DebugSwitches sub-dictionary in the central controlDict.
@@ -64,20 +79,52 @@ namespace debug
     //- The Tolerances sub-dictionary in the central controlDict.
     dictionary& tolerances();
 
+    //- The DimensionedConstants sub-dictionary in the central controlDict.
+    dictionary& constants();
+
     //- Lookup debug switch or add default value.
-    int debugSwitch(const char* name, const int defaultValue = 0);
+    int debugSwitchFromDict(const char* name, const int defaultValue = 0);
 
     //- Lookup info switch or add default value.
-    int infoSwitch(const char* name, const int defaultValue = 0);
+    int infoSwitchFromDict(const char* name, const int defaultValue = 0);
 
     //- Lookup optimisation switch or add default value.
-    int optimisationSwitch(const char* name, const int defaultValue = 0);
+    int optimisationSwitchFromDict(const char* name, const int defaultValue = 0);
+    int optimisationSwitchFromDict(const Foam::string name, const Foam::word defaultValue);
 
     //- Lookup tolerances switch or add default value.
-    double tolerances(const char* name, const double defaultValue = 0);
+    double tolerancesFromDict(const char* name, const double defaultValue = 0);
+
+    //- Lookup dimensionedConstants switch or add default value.
+    double constantsFromDict(const char* name, const double defaultValue = 0);
 
     //- Internal function to lookup a sub-dictionary from controlDict.
-    dictionary& switchSet(const char* subDictName, dictionary*& subDictPtr);
+    dictionary& switchSet
+    (
+	const globalControlDictSwitchSet globalControlDictSwitchSetName,
+	dictionary*& subDictPtr
+    );
+
+    //- Update central controlDict variables
+    //  supported keyValues format: key1=value1,key2=value2
+    void updateCentralDictVars
+    (
+	const globalControlDictSwitchSet centralDictSwitchSetName,
+	const Foam::string& keyValues,
+	const bool verbose=true
+    );
+
+    //- Update central controlDict variables from a file
+    void updateCentralDictVars
+    (
+	const Foam::fileName& file,
+	const bool verbose=true
+    );
+
+    //- Dump the central controlDict variables to the console using a standard
+    // dictionary format. If a description is available for a given switch, a
+    // comment will be added just besides the switch name and value.
+    void dumpControlSwitchesToConsole();
 
 } // End namespace debug
 

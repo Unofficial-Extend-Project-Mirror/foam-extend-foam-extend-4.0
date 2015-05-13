@@ -38,6 +38,7 @@ Description
 #include "wedgeFaPatch.H"
 #include "faPatchData.H"
 #include "SortableList.H"
+#include "controlSwitches.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
@@ -48,10 +49,13 @@ namespace Foam
 
 Foam::word Foam::faMesh::meshSubDir = "faMesh";
 
-const bool Foam::faMesh::quadricsFit_
+const Foam::debug::optimisationSwitch
+Foam::faMesh::quadricsFit_
 (
-    debug::optimisationSwitch("quadricsFit", 0) > 0
+    "quadricsFit",
+    0
 );
+
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
@@ -1189,7 +1193,7 @@ const Foam::vectorField& Foam::faMesh::pointAreaNormals() const
     {
         calcPointAreaNormals();
 
-        if (quadricsFit_)
+        if (quadricsFit_() > 0)
         {
             calcPointAreaNormalsByQuadricsFit();
         }

@@ -33,6 +33,7 @@ Description
 #define radiationConstants_H
 
 #include "dimensionedScalar.H"
+#include "constantsSwitch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -41,6 +42,7 @@ namespace Foam
 namespace radiation
 {
     //- Stefan-Boltzmann constant [J/(K4 m2 s)]
+    extern const Foam::debug::constantsSwitch sigmaSB_;
     extern const dimensionedScalar sigmaSB;
 }
 }

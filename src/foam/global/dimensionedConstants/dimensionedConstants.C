@@ -38,7 +38,7 @@ dictionary& dimensionedConstants()
 {
     return debug::switchSet
     (
-        "DimensionedConstants",
+        debug::DIMENSIONEDCONSTANTS,
         dimensionedConstantsPtr_
     );
 }

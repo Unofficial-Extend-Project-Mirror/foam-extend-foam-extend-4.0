@@ -209,7 +209,7 @@ void Foam::processorPolyPatch::calcGeometry()
                 faceNormals[facei] = point(1, 0, 0);
                 nbrFaceNormals[facei] = faceNormals[facei];
             }
-            else if (mag(magSf - nbrMagSf)/avSf > polyPatch::matchTol_)
+            else if (mag(magSf - nbrMagSf)/avSf > polyPatch::matchTol_())
             {
                 FatalErrorIn
                 (
@@ -220,7 +220,7 @@ void Foam::processorPolyPatch::calcGeometry()
                     << "patch: " << name()
                     << " my area: " << magSf
                     << " neighbour area: " << nbrMagSf
-                    << " matching tolerance: " << polyPatch::matchTol_
+                    << " matching tolerance: " << polyPatch::matchTol_()
                     << endl
                     << "Mesh face: " << start()+facei
                     << " vertices: "

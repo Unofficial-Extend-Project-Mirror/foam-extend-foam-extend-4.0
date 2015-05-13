@@ -293,7 +293,10 @@ evaluate()
     {
         forAll(*this, patchi)
         {
-            this->operator[](patchi).initEvaluate(Pstream::defaultCommsType);
+            this->operator[](patchi).initEvaluate
+	    (
+		static_cast<Pstream::commsTypes>(Pstream::defaultCommsType())
+	    );
         }
 
         // Block for any outstanding requests
@@ -305,7 +308,10 @@ evaluate()
 
         forAll(*this, patchi)
         {
-            this->operator[](patchi).evaluate(Pstream::defaultCommsType);
+            this->operator[](patchi).evaluate
+	    (
+		static_cast<Pstream::commsTypes>(Pstream::defaultCommsType())
+	    );
         }
     }
     else if (Pstream::defaultCommsType == Pstream::scheduled)
@@ -331,7 +337,7 @@ evaluate()
     {
         FatalErrorIn("GeometricBoundaryField::evaluate()")
             << "Unsuported communications type "
-            << Pstream::commsTypeNames[Pstream::defaultCommsType]
+            << Pstream::commsTypeNames[Pstream::defaultCommsType()]
             << exit(FatalError);
     }
 }
@@ -360,7 +366,7 @@ evaluateCoupled()
             {
                 this->operator[](patchi).initEvaluate
                 (
-                    Pstream::defaultCommsType
+                    static_cast<Pstream::commsTypes>(Pstream::defaultCommsType())
                 );
             }
         }
@@ -376,7 +382,10 @@ evaluateCoupled()
         {
             if (this->operator[](patchi).coupled())
             {
-                this->operator[](patchi).evaluate(Pstream::defaultCommsType);
+                this->operator[](patchi).evaluate
+		(
+		    static_cast<Pstream::commsTypes>(Pstream::defaultCommsType())
+		);
             }
         }
     }
@@ -415,7 +424,7 @@ evaluateCoupled()
     {
         FatalErrorIn("GeometricBoundaryField::evaluateCoupled()")
             << "Unsuported communications type "
-            << Pstream::commsTypeNames[Pstream::defaultCommsType]
+            << Pstream::commsTypeNames[Pstream::defaultCommsType()]
             << exit(FatalError);
     }
 }

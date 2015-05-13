@@ -44,31 +44,39 @@ namespace Foam
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
 template<class MasterPatch, class SlavePatch>
-const scalar
+const Foam::debug::tolerancesSwitch
 GGIInterpolation<MasterPatch, SlavePatch>::faceBoundBoxExtendSpanFraction_
 (
-    debug::tolerances("GGIFaceBoundBoxExtendSpanFraction", 1.0e-2)
+    "GGIFaceBoundBoxExtendSpanFraction",
+    1.0e-2,
+    "GGI faces bounding box expansion factor. Add robustness for quick-search algo. Keep it to a few percent."
 );
 
 template<class MasterPatch, class SlavePatch>
-const label
+const Foam::debug::optimisationSwitch
 GGIInterpolation<MasterPatch, SlavePatch>::octreeSearchMinNLevel_
 (
-    debug::optimisationSwitch("GGIOctreeSearchMinNLevel", 3)
+    "GGIOctreeSearchMinNLevel",
+    3,
+    "GGI neighbouring facets octree-based search: minNlevel parameter for octree"
 );
 
 template<class MasterPatch, class SlavePatch>
-const scalar
+const Foam::debug::optimisationSwitch
 GGIInterpolation<MasterPatch, SlavePatch>::octreeSearchMaxLeafRatio_
 (
-    debug::optimisationSwitch("GGIOctreeSearchMaxLeafRatio", 3)
+    "GGIOctreeSearchMaxLeafRatio",
+    3,
+    "GGI neighbouring facets octree-based search: maxLeafRatio parameter for octree"
 );
 
 template<class MasterPatch, class SlavePatch>
-const scalar
+const Foam::debug::optimisationSwitch
 GGIInterpolation<MasterPatch, SlavePatch>::octreeSearchMaxShapeRatio_
 (
-    debug::optimisationSwitch("GGIOctreeSearchMaxShapeRatio", 1)
+    "GGIOctreeSearchMaxShapeRatio",
+    1,
+    "GGI neighbouring facets octree-based search: maxShapeRatio parameter for octree"
 );
 
 

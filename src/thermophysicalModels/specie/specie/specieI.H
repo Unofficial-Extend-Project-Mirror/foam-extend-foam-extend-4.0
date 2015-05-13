@@ -96,7 +96,7 @@ inline scalar specie::nMoles() const
 //- Gas constant [J/(kg K)]
 inline scalar specie::R() const
 {
-    return RR/molWeight_;
+    return RR()/molWeight_;
 }
 
 

@@ -38,9 +38,11 @@ Description
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
 template<class Type>
-const Foam::label Foam::BlockLduMatrix<Type>::fixFillIn
+const Foam::debug::optimisationSwitch
+Foam::BlockLduMatrix<Type>::fixFillIn
 (
-    debug::optimisationSwitch("matrixConstraintFillIn", 4)
+    "matrixConstraintFillIn",
+    4
 );
 
 
@@ -56,7 +58,7 @@ Foam::BlockLduMatrix<Type>::BlockLduMatrix(const lduMesh& ldu)
     interfaces_(ldu.interfaces().size()),
     coupleUpper_(ldu.lduAddr().nPatches()),
     coupleLower_(ldu.lduAddr().nPatches()),
-    fixedEqns_(ldu.lduAddr().size()/fixFillIn)
+    fixedEqns_(ldu.lduAddr().size()/fixFillIn())
 {
     const lduAddressing& addr = ldu.lduAddr();
 
@@ -65,6 +67,7 @@ Foam::BlockLduMatrix<Type>::BlockLduMatrix(const lduMesh& ldu)
         coupleUpper_.set(i, new CoeffField<Type>(addr.patchAddr(i).size()));
         coupleLower_.set(i, new CoeffField<Type>(addr.patchAddr(i).size()));
     }
+
 }
 
 

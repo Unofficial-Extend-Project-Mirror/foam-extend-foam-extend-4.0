@@ -37,7 +37,12 @@ const Foam::word Foam::functionEntries::includeEntry::typeName
 
 // Don't lookup the debug switch here as the debug switch dictionary
 // might include includeEntry
-int Foam::functionEntries::includeEntry::debug(0);
+Foam::debug::debugSwitch
+Foam::functionEntries::includeEntry::debug
+(
+    "includeEntry",
+    0
+);
 
 namespace Foam
 {

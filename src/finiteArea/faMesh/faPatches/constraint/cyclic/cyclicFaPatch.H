@@ -38,6 +38,7 @@ SourceFiles
 #include "coupledFaPatch.H"
 #include "cyclicLduInterface.H"
 #include "cyclicPolyPatch.H"
+#include "tolerancesSwitch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -65,7 +66,7 @@ protected:
 
         //- Relative tolerance (for geometric matching). Is factor of
         //  maximum edge length per face.
-        static const scalar matchTol_;
+        static const debug::tolerancesSwitch matchTol_;
 
     // Protected Member functions
 

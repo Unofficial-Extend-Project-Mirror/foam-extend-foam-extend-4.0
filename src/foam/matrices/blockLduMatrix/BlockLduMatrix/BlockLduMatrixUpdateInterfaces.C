@@ -55,7 +55,7 @@ void Foam::BlockLduMatrix<Type>::initInterfaces
                     result,
                     *this,
                     interfaceCoeffs[interfaceI],
-                    Pstream::defaultCommsType,
+                    static_cast<const Pstream::commsTypes>(Pstream::defaultCommsType()),
                     switchToLhs
                 );
             }
@@ -92,7 +92,7 @@ void Foam::BlockLduMatrix<Type>::initInterfaces
     {
         FatalErrorIn("BlockLduMatrix<Type>::initMatrixInterfaces")
             << "Unsuported communications type "
-            << Pstream::commsTypeNames[Pstream::defaultCommsType]
+            << Pstream::commsTypeNames[Pstream::defaultCommsType()]
             << exit(FatalError);
     }
 }
@@ -130,7 +130,7 @@ void Foam::BlockLduMatrix<Type>::updateInterfaces
                     result,
                     *this,
                     interfaceCoeffs[interfaceI],
-                    Pstream::defaultCommsType,
+                    static_cast<Pstream::commsTypes>(Pstream::defaultCommsType()),
                     switchToLhs
                 );
             }
@@ -201,7 +201,7 @@ void Foam::BlockLduMatrix<Type>::updateInterfaces
     {
         FatalErrorIn("BlockLduMatrix<Type>::updateInterfaces")
             << "Unsuported communications type "
-            << Pstream::commsTypeNames[Pstream::defaultCommsType]
+            << Pstream::commsTypeNames[Pstream::defaultCommsType()]
             << exit(FatalError);
     }
 }

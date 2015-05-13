@@ -40,6 +40,7 @@ SourceFiles
 #define scalarRange_H
 
 #include "scalar.H"
+#include "debugSwitch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -82,7 +83,7 @@ class scalarRange
 
 public:
 
-        static int debug;
+        static debug::debugSwitch debug;
 
 
     // Constructors
