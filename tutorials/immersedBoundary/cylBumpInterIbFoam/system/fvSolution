@@ -65,7 +65,7 @@ solvers
         solver           BiCGStab;
         preconditioner   ILU0;
 
-        minIter          1;
+        minIter          0;
         maxIter          100;
         tolerance        1e-08;
         relTol           0;
