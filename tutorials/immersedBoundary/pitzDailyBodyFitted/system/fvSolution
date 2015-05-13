@@ -18,29 +18,29 @@ solvers
 {
     p
     {
-        solver           PCG;
-        preconditioner   DIC;
+        solver           CG;
+        preconditioner   Cholesky;
         tolerance        1e-06;
         relTol           0.01;
     }
     U
     {
-        solver           PBiCG;
-        preconditioner   DILU;
+        solver           BiCGStab;
+        preconditioner   ILU0;
         tolerance        1e-05;
         relTol           0.1;
     }
     k
     {
-        solver           PBiCG;
-        preconditioner   DILU;
+        solver           BiCGStab;
+        preconditioner   ILU0;
         tolerance        1e-05;
         relTol           0.1;
     }
     epsilon
     {
-        solver           PBiCG;
-        preconditioner   DILU;
+        solver           BiCGStab;
+        preconditioner   ILU0;
         tolerance        1e-05;
         relTol           0.1;
     }
