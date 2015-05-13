@@ -16,16 +16,16 @@ FoamFile
 
 solvers
 {
-//     p
-//     {
-//         solver           CG;
-//         preconditioner   Cholesky;
+    p
+    {
+        solver           CG;
+        preconditioner   Cholesky;
 
-//         minIter          1;
-//         maxIter          1000;
-//         tolerance        1e-06;
-//         relTol           0;
-//     }
+        minIter          1;
+        maxIter          1000;
+        tolerance        1e-06;
+        relTol           0;
+    }
 
     // p
     // {
@@ -40,24 +40,24 @@ solvers
     //     mergeLevels     1;
     // }
 
-    p
-    {
-        solver          amgSolver;
-        cycle           W-cycle;
-        policy          PAMG;
-        nPreSweeps      0;
-        nPostSweeps     2;
-        groupSize       4;
-        minCoarseEqns   50;
-        nMaxLevels      100;
-        scale           on;
-        smoother        ILU;
+//     p
+//     {
+//         solver          amgSolver;
+//         cycle           W-cycle;
+//         policy          PAMG;
+//         nPreSweeps      0;
+//         nPostSweeps     2;
+//         groupSize       4;
+//         minCoarseEqns   50;
+//         nMaxLevels      100;
+//         scale           on;
+//         smoother        ILU;
 
-        minIter    1;
-        maxIter    200;
-        tolerance  1e-8;
-        relTol     0.0;
-    }
+//         minIter    1;
+//         maxIter    200;
+//         tolerance  1e-8;
+//         relTol     0.0;
+//     }
 
     U
     {

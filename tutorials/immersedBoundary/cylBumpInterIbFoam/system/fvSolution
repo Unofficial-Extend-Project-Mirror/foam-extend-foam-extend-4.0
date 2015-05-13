@@ -21,7 +21,7 @@ solvers
         solver           CG;
         preconditioner   Cholesky;
 
-        minIter          1;
+        minIter          0;
         maxIter          1000;
         tolerance        1e-08;
         relTol           0.01;
@@ -32,7 +32,7 @@ solvers
         solver           CG;
         preconditioner   Cholesky;
 
-        minIter          1;
+        minIter          0;
         maxIter          1000;
         tolerance        1e-08;
         relTol           0.01;
@@ -43,7 +43,7 @@ solvers
         solver           CG;
         preconditioner   Cholesky;
 
-        minIter          1;
+        minIter          0;
         maxIter          1000;
         tolerance        1e-08;
         relTol           0.0;
@@ -54,8 +54,7 @@ solvers
         solver           BiCGStab;
         preconditioner   ILU0;
 
-
-        minIter          1;
+        minIter          0;
         maxIter          100;
         tolerance        1e-08;
         relTol           0;
@@ -65,7 +64,6 @@ solvers
     {
         solver           BiCGStab;
         preconditioner   ILU0;
-
 
         minIter          1;
         maxIter          100;
