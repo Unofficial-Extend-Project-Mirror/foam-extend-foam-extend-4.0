@@ -18,8 +18,8 @@ solvers
 {
 //     p
 //     {
-//         solver           PCG;
-//         preconditioner   DIC;
+//         solver           CG;
+//         preconditioner   Cholesky;
 
 //         minIter          1;
 //         maxIter          1000;
@@ -54,8 +54,8 @@ solvers
 
     U
     {
-        solver           PBiCG;
-        preconditioner   DILU;
+        solver           BiCGStab;
+        preconditioner   ILU0;
 
         minIter          1;
         maxIter          1000;
@@ -65,8 +65,8 @@ solvers
 
     k
     {
-        solver           PBiCG;
-        preconditioner   DILU;
+        solver           BiCGStab;
+        preconditioner   ILU0;
 
         minIter          1;
         maxIter          1000;
@@ -76,8 +76,8 @@ solvers
 
     epsilon
     {
-        solver           PBiCG;
-        preconditioner   DILU;
+        solver           BiCGStab;
+        preconditioner   ILU0;
 
         minIter          1;
         maxIter          1000;

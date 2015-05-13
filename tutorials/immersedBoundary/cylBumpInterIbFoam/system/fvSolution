@@ -18,8 +18,8 @@ solvers
 {
     pcorr
     {
-        solver           PCG;
-        preconditioner   DIC;
+        solver           CG;
+        preconditioner   Cholesky;
 
         minIter          1;
         maxIter          1000;
@@ -29,8 +29,8 @@ solvers
 
     pd
     {
-        solver           PCG;
-        preconditioner   DIC;
+        solver           CG;
+        preconditioner   Cholesky;
 
         minIter          1;
         maxIter          1000;
@@ -40,8 +40,8 @@ solvers
 
     pdFinal
     {
-        solver           PCG;
-        preconditioner   DIC;
+        solver           CG;
+        preconditioner   Cholesky;
 
         minIter          1;
         maxIter          1000;
@@ -51,8 +51,8 @@ solvers
 
     U
     {
-        solver           PBiCG;
-        preconditioner   DILU;
+        solver           BiCGStab;
+        preconditioner   ILU0;
 
 
         minIter          1;
@@ -63,8 +63,8 @@ solvers
 
     alpha1
     {
-        solver           PBiCG;
-        preconditioner   DILU;
+        solver           BiCGStab;
+        preconditioner   ILU0;
 
 
         minIter          1;

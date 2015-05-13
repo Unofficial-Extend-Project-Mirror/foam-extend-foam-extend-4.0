@@ -71,9 +71,9 @@ wmake libso multiSolver
 wmake libso solidModels
 wmake libso dbns
 
-wmake libso immersedBoundary
-wmake libso immersedBoundaryForce
-wmake libso immersedBoundaryTurbulence
+wmake libso immersedBoundary/immersedBoundary
+wmake libso immersedBoundary/immersedBoundaryForce
+wmake libso immersedBoundary/immersedBoundaryTurbulence
 
 ( cd cudaSolvers ; ./Allwmake )
 

@@ -14,7 +14,7 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-application icoDyMFoam;
+application     potentialIbFoam;
 
 startFrom       startTime;
 
