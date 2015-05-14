@@ -48,7 +48,8 @@ namespace debug
 // Typedefs
 // Hashtable to static class attributes addresses holding the
 // runtime info switch values
-typedef std::map<std::string, std::list<controlSwitches<int> *> > ListInfoControlSwitches;
+typedef std::map<std::string, std::list<controlSwitches<int> *> >
+ListInfoControlSwitches;
 
 extern ListInfoControlSwitches* infoSwitchValues_;
 
@@ -56,32 +57,40 @@ class infoSwitch
     : public controlSwitches<int>
 {
 public:
-    infoSwitch
-    (
-	const std::string& switchName,
-	const int& switchValue,
-	const std::string& switchDescription = ""
-    )
-	:
-	controlSwitches<int>
-	(
-	    switchName,
-	    debug::infoSwitchFromDict(switchName.c_str(), switchValue),
-	    switchDescription,
-	    debug::INFOSWITCHES,
-	    &infoSwitchValues_
-	)
+
+    // Constructors
+
+        //- Construct from name and value
+        infoSwitch
+        (
+            const std::string& switchName,
+            const int& switchValue,
+            const std::string& switchDescription = ""
+        )
+        :
+            controlSwitches<int>
+            (
+                switchName,
+                debug::infoSwitchFromDict(switchName.c_str(), switchValue),
+                switchDescription,
+                debug::INFO_SWITCHES,
+                &infoSwitchValues_
+            )
+        {}
+
+
+    //- Destructor
+    virtual ~infoSwitch()
     {}
 
-    virtual ~infoSwitch()
-    {
-    }
 
-    // Assignement operator
-    void operator=(const int& rhs)
-    {
-	controlSwitches<int>::operator=(rhs);
-    }
+    // Member operators
+
+        //- Assignement operator
+        void operator=(const int& rhs)
+        {
+            controlSwitches<int>::operator=(rhs);
+        }
 };
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

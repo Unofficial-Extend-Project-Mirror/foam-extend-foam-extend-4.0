@@ -35,14 +35,14 @@ Description
     - Tolerances switches
     - DimensionedConstants values
 
-    This class is a specialization of the safe_bool class, where additional
+    This class is a specialization of the safeBool class, where additional
     boolean operators are allowed. This class is also offering access to
     information like the switch name, etc.
 
 Note:
     We will be using std::map and std::list for the containers for this class.
-    In some sections of the code where controlSwitches are being used, we are at
-    a relatively low level, so we cannot use HashTable and DynamicList.
+    In some sections of the code where controlSwitches are being used, we are
+    at a relatively low level, so we cannot use HashTable and DynamicList.
     MB 23/05/2014
 
 SourceFiles
@@ -58,7 +58,7 @@ SourceFiles
 #include <list>
 #include <map>
 #include <string>
-#include "safe_bool.H"
+#include "safeBool.H"
 
 #include "scalar.H"
 #include "debug.H"
@@ -68,19 +68,149 @@ SourceFiles
 namespace Foam
 {
 
+// Forward declaration of classes
+namespace debug
+{
+    template<class T> class controlSwitches;
+}
+
+template<class T>
+inline bool operator==
+(
+    const debug::controlSwitches<T>& lhs,
+    const debug::controlSwitches<T>& rhs
+);
+
+template<class T>
+inline bool operator==
+(
+    const T& lhs,
+    const debug::controlSwitches<T>& rhs
+);
+
+template<class T>
+inline bool operator==
+(
+    const debug::controlSwitches<T>& lhs,
+    const T& rhs
+);
+
+template<class T>
+inline bool operator!=
+(
+    const debug::controlSwitches<T>& lhs,
+    const debug::controlSwitches<T>& rhs
+);
+
+template<class T>
+inline bool operator!=
+(
+    const T& lhs,
+    const debug::controlSwitches<T>& rhs
+);
+
+template<class T>
+inline bool operator!=
+(
+    const debug::controlSwitches<T>& lhs,
+    const T& rhs
+);
+
+template<class T>
+inline bool operator>=
+(
+    const debug::controlSwitches<T>& lhs,
+    const debug::controlSwitches<T>& rhs
+);
+
+template<class T>
+inline bool operator>=
+(
+    const T& lhs,
+    const debug::controlSwitches<T>& rhs
+);
+
+template<class T>
+inline bool operator>=
+(
+    const debug::controlSwitches<T>& lhs,
+    const T& rhs
+);
+
+template<class T>
+inline bool operator>
+(
+    const debug::controlSwitches<T>& lhs,
+    const debug::controlSwitches<T>& rhs
+);
+
+template<class T>
+inline bool operator>
+(
+    const T& lhs,
+    const debug::controlSwitches<T>& rhs
+);
+
+template<class T>
+inline bool operator>
+(
+    const debug::controlSwitches<T>& lhs,
+    const T& rhs
+);
+
+template<class T>
+inline bool operator<=
+(
+    const debug::controlSwitches<T>& lhs,
+    const debug::controlSwitches<T>& rhs
+);
+
+template<class T>
+inline bool operator<=
+(
+    const T& lhs,
+    const debug::controlSwitches<T>& rhs
+);
+
+template<class T>
+inline bool operator<=
+(
+    const debug::controlSwitches<T>& lhs,
+    const T& rhs
+);
+
+template<class T>
+inline bool operator<
+(
+    const debug::controlSwitches<T>& lhs,
+    const debug::controlSwitches<T>& rhs
+);
+
+template<class T>
+inline bool operator<
+(
+    const T& lhs,
+    const debug::controlSwitches<T>& rhs
+);
+
+template<class T>
+inline bool operator<
+(
+    const debug::controlSwitches<T>&lhs,
+    const T& rhs
+);
+
 namespace debug
 {
 
-// Forward declaration of classes
-template<class T> class controlSwitches;
-
 /*---------------------------------------------------------------------------*\
-                          Class controlSwitches Declaration
+                        Class controlSwitches Declaration
 \*---------------------------------------------------------------------------*/
 
 template<class T>
 class controlSwitches
-    : public safe_bool<controlSwitches<T> > // using the CRTP idiom
+:
+    public safeBool<controlSwitches<T> > // using the CRTP idiom
 {
     // Private data
 
@@ -97,9 +227,9 @@ class controlSwitches
         std::string switchDescription_;
 
         //- Handle to runTime switches list
-        std::map<std::string, std::list<controlSwitches<T> *> >* switchValuesTable_ ;
+        std::map<std::string, std::list<controlSwitches<T> *> >*
+            switchValuesTable_;
 
-    // Private Member Functions
 
 public:
 
@@ -109,73 +239,64 @@ public:
         controlSwitches();
 
         //- Construct from components
-        controlSwitches(const T& data);
+        explicit controlSwitches(const T& data);
 
         controlSwitches
-	(
-	    const std::string& switchName,
-	    const T& switchValue,
-	    const std::string& switchDescription,
-	    globalControlDictSwitchSet switchSet,
-	    std::map<std::string, std::list<controlSwitches<T> *> >** switchesValues
-	);
+        (
+            const std::string& switchName,
+            const T& switchValue,
+            const std::string& switchDescription,
+            globalControlDictSwitchSet switchSet,
+            std::map<std::string, std::list<controlSwitches<T> *> >**
+            switchesValues
+        );
 
         //- Construct as copy
         controlSwitches(const controlSwitches&);
 
+
     //- Destructor
-        ~controlSwitches();
+    ~controlSwitches();
 
 
     // Member Functions
-        // Access
 
         // Check
         bool boolean_test() const
-	{
-	    // Perform Boolean logic here
-	    return switchValue_ != 0;
-	}
+        {
+            // Perform Boolean logic here
+            return switchValue_ != 0;
+        }
+
 
     // Member Operators
 
-        // Assignement operator
+        //- Assignement operator
         void operator=(const T&);
 
         //- Assignement operator
         void operator=(const controlSwitches&);
 
-        // & operator
+        //- & operator
         const T operator&(const T&);
 
-        // == operator
-        bool operator==(const T&) const;
-
-        // >= operator
-        bool operator>=(const T&);
-
-        // > operator
-        bool operator>(const T&);
-
-        // < operator
-        bool operator<(const T&);
-
-        // Return value
+        //- Return value
         T operator()() const
-	{
-	    return switchValue_;
-	}
+        {
+            return switchValue_;
+        }
 
         // Return switch name
         std::string switchName()
-	{
-	    return switchName_;
-	}
-        // Return switch description
+        {
+            return switchName_;
+        }
+
+        //- Return switch description
         std::string switchDescription()
-	{
-	    return switchDescription_;
-	}
+        {
+            return switchDescription_;
+        }
 };
 
 

@@ -138,7 +138,7 @@ public:                                                                       \
     Type::debug(std::string(Name), DebugSwitch, SwitchDescr)
 
 //- Define the debug information
-#define defineDebugSwitch(Type, DebugSwitch, SwitchDescr)		      \
+#define defineDebugSwitch(Type, DebugSwitch, SwitchDescr)                     \
     defineDebugSwitchWithName(Type, Type::typeName_(), DebugSwitch, SwitchDescr);
 
 #ifdef __INTEL_COMPILER

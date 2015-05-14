@@ -82,19 +82,19 @@ class immersedBoundaryFvPatch
 
         //- Fitting angle rejection factor (deg)
         //  Cells within the the radius will be used for the fitting function
-        static scalar angleFactor_;
+        static const debug::tolerancesSwitch angleFactor_;
 
         //- Fitting radius factor
         //  Cells within the the radius will be used for the fitting function
-        static scalar radiusFactor_;
+        static const debug::tolerancesSwitch radiusFactor_;
 
         //- Maximum number of rows in cell-cell search
-        static label maxCellCellRows_;
+        static const debug::optimisationSwitch maxCellCellRows_;
 
         //- Sampling point distance factor
         //  Sampling point is located distFactor further away from the wall
         //  from the immersed boundary cell centre
-        static scalar distFactor_;
+        static const debug::tolerancesSwitch distFactor_;
 
 
     // Demand-driven data

@@ -1,3 +1,0 @@
-importSurfaceAsSubset.C
-
-EXE = $(FOAM_APPBIN)/importSurfaceAsSubset

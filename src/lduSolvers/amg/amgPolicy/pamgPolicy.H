@@ -88,7 +88,7 @@ class pamgPolicy
     // Private Static Data
 
         //- Diagonal scaling factor
-        static const Foam::debug::tolerancesSwitch diagFactor_;
+        static const debug::tolerancesSwitch diagFactor_;
 
 
 public:

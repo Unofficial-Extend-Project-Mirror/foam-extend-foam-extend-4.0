@@ -158,10 +158,10 @@ public:
     // Static algorithm control data
 
         //- Number of boundary condition update iterations
-        static label nBcIter_;
+        static const debug::optimisationSwitch nBcIter_;
 
         //- Boundary condition update tolerance
-        static scalar bcTolerance_;
+        static const debug::tolerancesSwitch bcTolerance_;
 
 
     // Constructors

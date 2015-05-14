@@ -1156,7 +1156,7 @@ void GlobalPointPatchField
 
         // Requires global sync points to flush buffers before gather-scatter
         // communications.  Reconsider.  HJ, 29/Mar/2011
-        if (Pstream::defaultCommsType == Pstream::nonBlocking)
+        if (Pstream::defaultCommsType() == Pstream::nonBlocking)
         {
             IPstream::waitRequests();
             OPstream::waitRequests();
@@ -1284,7 +1284,7 @@ void GlobalPointPatchField
 
         // Requires global sync points to flush buffers before gather-scatter
         // communications.  Reconsider.  HJ, 29/Mar/2011
-        if (Pstream::defaultCommsType == Pstream::nonBlocking)
+        if (Pstream::defaultCommsType() == Pstream::nonBlocking)
         {
             IPstream::waitRequests();
             OPstream::waitRequests();

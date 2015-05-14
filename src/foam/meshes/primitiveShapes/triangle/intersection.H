@@ -105,12 +105,7 @@ public:
             // HJ, 7/Sep/2008
             scalar oldTol = planarTol_();
 
-	    // Is this still necessary? If not a const, then it is not a const.
-            // MB 18/05_2014
-            //scalar* ptPtr = const_cast<scalar*>(&planarTol_);
-            //(*ptPtr) = t;
-
-	    planarTol_ = t;
+            planarTol_ = t;
 
             return oldTol;
         }

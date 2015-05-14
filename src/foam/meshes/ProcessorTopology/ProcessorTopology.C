@@ -106,7 +106,7 @@ Foam::ProcessorTopology<Patch, ProcPatch>::ProcessorTopology
         Pstream::scatterList(*this);
     }
 
-    if (Pstream::parRun() && Pstream::defaultCommsType == Pstream::scheduled)
+    if (Pstream::parRun() && Pstream::defaultCommsType() == Pstream::scheduled)
     {
         label patchEvali = 0;
 

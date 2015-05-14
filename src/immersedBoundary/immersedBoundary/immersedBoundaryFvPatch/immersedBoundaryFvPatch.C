@@ -44,30 +44,38 @@ namespace Foam
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-Foam::scalar Foam::immersedBoundaryFvPatch::radiusFactor_
+const Foam::debug::tolerancesSwitch
+Foam::immersedBoundaryFvPatch::radiusFactor_
 (
-    debug::tolerances("immersedBoundaryRadiusFactor", 3.5)
-//     debug::tolerances("immersedBoundaryRadiusFactor", 5)
+    "immersedBoundaryRadiusFactor",
+    3.5
+//     5
 );
 
 
-Foam::scalar Foam::immersedBoundaryFvPatch::angleFactor_
+const Foam::debug::tolerancesSwitch
+Foam::immersedBoundaryFvPatch::angleFactor_
 (
-    debug::tolerances("immersedBoundaryAngleFactor", 80)
-//     debug::tolerances("immersedBoundaryAngleFactor", 170)
+    "immersedBoundaryAngleFactor",
+    80
+//     170
 );
 
 
-Foam::label Foam::immersedBoundaryFvPatch::maxCellCellRows_
+const Foam::debug::optimisationSwitch
+Foam::immersedBoundaryFvPatch::maxCellCellRows_
 (
-    debug::optimisationSwitch("immersedBoundaryMaxCellCellRows", 4)
-//     debug::optimisationSwitch("immersedBoundaryMaxCellCellRows", 5)
+    "immersedBoundaryMaxCellCellRows",
+    4
+//     5
 );
 
 
-Foam::scalar Foam::immersedBoundaryFvPatch::distFactor_
+const Foam::debug::tolerancesSwitch
+Foam::immersedBoundaryFvPatch::distFactor_
 (
-    debug::tolerances("immersedBoundaryDistFactor", 1.5)
+    "immersedBoundaryDistFactor",
+    1.5
 );
 
 
@@ -994,9 +1002,9 @@ void Foam::immersedBoundaryFvPatch::makeIbPointsAndNormals() const
         // Adjust search span if needed.  HJ, 14/Dec/2012
         vector span
         (
-            2*radiusFactor_*delta[cellI],
-            2*radiusFactor_*delta[cellI],
-            2*radiusFactor_*delta[cellI]
+            2*radiusFactor_()*delta[cellI],
+            2*radiusFactor_()*delta[cellI],
+            2*radiusFactor_()*delta[cellI]
         );
 
         pointIndexHit pih = tss.nearest(ibCellCentres[cellI], span);
@@ -1051,7 +1059,7 @@ void Foam::immersedBoundaryFvPatch::makeIbPointsAndNormals() const
     }
 
     // Calculate sampling points locations
-    ibSamplingPoints = ibPoints + distFactor_*(ibCellCentres - ibPoints);
+    ibSamplingPoints = ibPoints + distFactor_()*(ibCellCentres - ibPoints);
 }
 
 
@@ -1113,7 +1121,7 @@ void Foam::immersedBoundaryFvPatch::makeIbCellCells() const
     const vectorField& C = mesh_.cellCentres();
 
     scalarField rM(ibCellSizes());
-    rM *= radiusFactor_;
+    rM *= radiusFactor_();
 
     const vectorField& ibp = ibPoints();
 
@@ -1146,7 +1154,7 @@ void Foam::immersedBoundaryFvPatch::makeIbCellCells() const
             if (r <= rM[cellI])
             {
                 scalar angleLimit =
-                    -Foam::cos(angleFactor_*mathematicalConstant::pi/180);
+                    -Foam::cos(angleFactor_()*mathematicalConstant::pi/180);
 
                 vector dir = (C[curCell] - ibp[cellI]);
                 dir /= mag(dir) + SMALL;
@@ -2016,7 +2024,7 @@ void Foam::immersedBoundaryFvPatch::findCellCells
     labelList curCells = cellSet.toc();
 
     // Second and other rows
-    for (label nRows = 1; nRows < maxCellCellRows_; nRows++)
+    for (label nRows = 1; nRows < maxCellCellRows_(); nRows++)
     {
         curCells = cellSet.toc();
 

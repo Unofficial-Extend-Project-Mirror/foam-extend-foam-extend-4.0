@@ -22,7 +22,7 @@ License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    Foam::safe_bool
+    Foam::safeBool
 
 Description
     Implementation of the Safe Bool Idiom.
@@ -35,8 +35,8 @@ SourceFiles
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef safe_bool_H
-#define safe_bool_H
+#ifndef safeBool_H
+#define safeBool_H
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -44,46 +44,51 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                          Class safe_bool_base Declaration
+                        Class safeBool_base Declaration
 \*---------------------------------------------------------------------------*/
-class safe_bool_base
+
+class safeBoolBase
 {
     public:
-        typedef void (safe_bool_base::*bool_type)() const;
-        void this_type_does_not_support_comparisons() const {}
+        typedef void (safeBoolBase::*boolType)() const;
+        void thisTypeDoesNotSupportComparisons() const {}
 
     protected:
 
-        safe_bool_base() {}
-        safe_bool_base(const safe_bool_base&) {}
-        safe_bool_base& operator=(const safe_bool_base&) {return *this;}
-        ~safe_bool_base() {}
+        safeBoolBase() {}
+        safeBoolBase(const safeBoolBase&) {}
+        safeBoolBase& operator=(const safeBoolBase&) {return *this;}
+        ~safeBoolBase() {}
 };
 
+
 /*---------------------------------------------------------------------------*\
-                          Class safe_bool Declaration
+                        Class safeBool Declaration
 \*---------------------------------------------------------------------------*/
 
 template <typename T=void>
-class safe_bool
+class safeBool
 :
-    private safe_bool_base
+    private safeBoolBase
 {
   // private or protected inheritance is very important here as it triggers the
   // access control violation in main.
 
 public:
-    operator bool_type() const
+
+    operator boolType() const
     {
-	return (static_cast<const T*>(this))->boolean_test()
-	    ? &safe_bool_base::this_type_does_not_support_comparisons : 0;
+        return (static_cast<const T*>(this))->boolean_test()
+            ? &safeBoolBase::thisTypeDoesNotSupportComparisons : 0;
     }
 
 protected:
+
     //- Destructor
-    ~safe_bool()
+    ~safeBool()
     {}
 };
+
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -91,7 +96,7 @@ protected:
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-#include "safe_boolI.H"
+#include "safeBoolI.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

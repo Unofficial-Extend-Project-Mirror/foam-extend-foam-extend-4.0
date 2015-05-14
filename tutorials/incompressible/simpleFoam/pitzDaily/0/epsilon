@@ -33,26 +33,23 @@ boundaryField
     upperWall
     {
         type            epsilonWallFunction;
-        refValue        uniform 0;
-        value           uniform 14.855;
         Cmu             0.09;
         kappa           0.41;
         E               9.8;
+        value           uniform 14.855;
     }
     lowerWall
     {
         type            epsilonWallFunction;
-        refValue        uniform 0;
-        value           uniform 14.855;
         Cmu             0.09;
         kappa           0.41;
         E               9.8;
+        value           uniform 14.855;
     }
     frontAndBack
     {
         type            empty;
     }
 }
-
 
 // ************************************************************************* //

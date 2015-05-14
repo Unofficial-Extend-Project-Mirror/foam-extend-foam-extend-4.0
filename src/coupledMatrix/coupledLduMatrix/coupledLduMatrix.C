@@ -30,9 +30,10 @@ Description
 Author
     Hrvoje Jasak, Wikki Ltd.  All rights reserved
 
-\*----------------------------------------------------------------------------*/
+\*---------------------------------------------------------------------------*/
 
 #include "coupledLduMatrix.H"
+#include "processorLduInterfaceField.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
@@ -40,9 +41,6 @@ namespace Foam
 {
     defineTypeNameAndDebug(coupledLduMatrix, 1);
 }
-
-
-// * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
@@ -219,8 +217,8 @@ void Foam::coupledLduMatrix::initMatrixInterfaces
     {
         if
         (
-            Pstream::defaultCommsType == Pstream::blocking
-         || Pstream::defaultCommsType == Pstream::nonBlocking
+            Pstream::defaultCommsType() == Pstream::blocking
+         || Pstream::defaultCommsType() == Pstream::nonBlocking
         )
         {
             forAll (interfaces[rowI], interfaceI)
@@ -242,7 +240,10 @@ void Foam::coupledLduMatrix::initMatrixInterfaces
                             matrices[rowI],
                             coupleCoeffs[rowI][interfaceI],
                             cmpt,
-                            Pstream::defaultCommsType,
+                            static_cast<const Pstream::commsTypes>
+                            (
+                                Pstream::defaultCommsType()
+                            ),
                             false
                         );
                     }
@@ -267,8 +268,8 @@ void Foam::coupledLduMatrix::initMatrixInterfaces
     {
         if
         (
-            Pstream::defaultCommsType == Pstream::blocking
-         || Pstream::defaultCommsType == Pstream::nonBlocking
+            Pstream::defaultCommsType() == Pstream::blocking
+         || Pstream::defaultCommsType() == Pstream::nonBlocking
         )
         {
             forAll (interfaces[rowI], interfaceI)
@@ -290,7 +291,10 @@ void Foam::coupledLduMatrix::initMatrixInterfaces
                             matrices[rowI],
                             coupleCoeffs[rowI][interfaceI],
                             cmpt,
-                            static_cast<const Pstream::commsTypes>(Pstream::defaultCommsType()),
+                            static_cast<const Pstream::commsTypes>
+                            (
+                                Pstream::defaultCommsType()
+                            ),
                             false
                         );
                     }
@@ -324,15 +328,6 @@ void Foam::coupledLduMatrix::updateMatrixInterfaces
         );
     }
 }
-
-
-// * * * * * * * * * * * * * * * Member Operators  * * * * * * * * * * * * * //
-
-
-// * * * * * * * * * * * * * * * Friend Functions  * * * * * * * * * * * * * //
-
-
-// * * * * * * * * * * * * * * * Friend Operators  * * * * * * * * * * * * * //
 
 
 // ************************************************************************* //

@@ -49,64 +49,77 @@ namespace debug
 // Typedefs
 // Hashtable to static class attributes addresses holding the
 // runtime optimisation switch values
-typedef std::map<std::string, std::list<controlSwitches<int> *> > ListOptimisationControlSwitches;
+typedef std::map<std::string, std::list<controlSwitches<int> *> >
+ListOptimisationControlSwitches;
+
 extern ListOptimisationControlSwitches* optimisationSwitchValues_;
 
 
 class optimisationSwitch
-    : public controlSwitches<int>
+:
+    public controlSwitches<int>
 {
 public:
-    optimisationSwitch
-    (
-	const std::string& switchName,
-	const int& switchValue,
-	const std::string& switchDescription = ""
-    )
-	:
-	controlSwitches<int>
-	(
-	    switchName,
-	    debug::optimisationSwitchFromDict(switchName.c_str(), switchValue),
-	    switchDescription,
-	    debug::OPTIMISATIONSWITCHES,
-	    &optimisationSwitchValues_
-	)
-    {}
+
+    // Constructors
+
+        //- Construct from name and value
+        optimisationSwitch
+        (
+            const std::string& switchName,
+            const int& switchValue,
+            const std::string& switchDescription = ""
+        )
+        :
+            controlSwitches<int>
+            (
+                switchName,
+                debug::optimisationSwitchFromDict
+                (
+                    switchName.c_str(),
+                    switchValue
+                ),
+                switchDescription,
+                debug::OPTIMISATION_SWITCHES,
+                &optimisationSwitchValues_
+            )
+        {}
 
 
-    // This constructor is essentially for 'commsType'
-    optimisationSwitch
-    (
-	const std::string& switchName,
-	const std::string& switchValue,
-	const std::string& switchDescription = ""
-    )
-	:
-	controlSwitches<int>
-	(
-	    switchName,
-	    debug::optimisationSwitchFromDict(switchName, switchValue),
-	    switchDescription,
-	    debug::OPTIMISATIONSWITCHES,
-	    &optimisationSwitchValues_
-	)
-    {}
+        //- This constructor is essentially for 'commsType'
+        optimisationSwitch
+        (
+            const std::string& switchName,
+            const std::string& switchValue,
+            const std::string& switchDescription = ""
+        )
+        :
+            controlSwitches<int>
+            (
+                switchName,
+                debug::optimisationSwitchFromDict
+                (
+                    switchName.c_str(),
+                    switchValue
+                ),
+                switchDescription,
+                debug::OPTIMISATION_SWITCHES,
+                &optimisationSwitchValues_
+            )
+        {}
 
+
+    //- Destructor
     virtual ~optimisationSwitch()
-    {
-    }
+    {}
 
-    // Assignement operator
-    void operator=(const int& rhs)
-    {
-	controlSwitches<int>::operator=(rhs);
-    }
+    // Member operators
 
-    bool operator==(const int& rhs) const
-    {
-        return controlSwitches<int>::operator==(rhs);
-    }
+        // Assignement operator
+        void operator=(const int& rhs)
+        {
+            controlSwitches<int>::operator=(rhs);
+        }
 };
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

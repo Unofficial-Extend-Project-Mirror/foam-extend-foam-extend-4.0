@@ -37,16 +37,19 @@ namespace Foam
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
 template<class Type>
-label immersedBoundaryFvPatchField<Type>::nBcIter_
+const Foam::debug::optimisationSwitch
+immersedBoundaryFvPatchField<Type>::nBcIter_
 (
     debug::optimisationSwitch("immersedBoundaryNBCIter", 5)
 );
 
 
 template<class Type>
-scalar immersedBoundaryFvPatchField<Type>::bcTolerance_
+const Foam::debug::tolerancesSwitch
+immersedBoundaryFvPatchField<Type>::bcTolerance_
 (
-    debug::tolerances("immersedBoundaryBCTolerance", 0.01)
+    "immersedBoundaryBCTolerance",
+    0.01
 );
 
 
@@ -249,9 +252,9 @@ immersedBoundaryFvPatchField<Type>::imposeDirichletCondition() const
 
         reduce(maxError, maxOp<scalar>());
     }
-    while (maxError > bcTolerance_ && counter < nBcIter_);
+    while (maxError > bcTolerance_() && counter < nBcIter_());
 
-    if (counter == nBcIter_ && debug)
+    if (counter == nBcIter_() && debug)
     {
         InfoIn
         (
@@ -435,9 +438,9 @@ immersedBoundaryFvPatchField<Type>::imposeNeumannCondition() const
 
         reduce(maxError, maxOp<scalar>());
     }
-    while (maxError > bcTolerance_ && counter < nBcIter_);
+    while (maxError > bcTolerance_() && counter < nBcIter_());
 
-    if (counter == nBcIter_ && debug)
+    if (counter == nBcIter_() && debug)
     {
         InfoIn
         (

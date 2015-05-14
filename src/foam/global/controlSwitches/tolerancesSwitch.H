@@ -49,41 +49,50 @@ namespace debug
 // Typedefs
 // Hashtable to static class attributes addresses holding the
 // runtime tolerances switch values
-typedef std::map<std::string, std::list<controlSwitches<Foam::scalar> *> > ListTolerancesControlSwitches;
+typedef std::map<std::string, std::list<controlSwitches<Foam::scalar> *> >
+ListTolerancesControlSwitches;
 
 extern ListTolerancesControlSwitches* tolerancesSwitchValues_;
 
 class tolerancesSwitch
-    : public controlSwitches<Foam::scalar>
+:
+    public controlSwitches<scalar>
 {
 public:
-    tolerancesSwitch
-    (
-	const std::string& switchName,
-	const Foam::scalar& switchValue,
-	const std::string& switchDescription = ""
-    )
-	:
-	controlSwitches<Foam::scalar>
-	(
-	    switchName,
-	    debug::tolerancesFromDict(switchName.c_str(), switchValue),
-	    switchDescription,
-	    debug::TOLERANCES,
-	    &tolerancesSwitchValues_
-	)
-    {
-    }
 
+    // Constructors
+
+        //- Construct from name and value
+        tolerancesSwitch
+        (
+            const std::string& switchName,
+            const Foam::scalar& switchValue,
+            const std::string& switchDescription = ""
+        )
+        :
+            controlSwitches<scalar>
+            (
+                switchName,
+                debug::tolerancesFromDict(switchName.c_str(), switchValue),
+                switchDescription,
+                debug::TOLERANCES,
+                &tolerancesSwitchValues_
+            )
+        {}
+
+
+    //- Destructor
     virtual ~tolerancesSwitch()
-    {
-    }
+    {}
 
-   // Assignement operator
-    void operator=(const Foam::scalar& rhs)
-    {
-	controlSwitches<Foam::scalar>::operator=(rhs);
-    }
+
+    // Member operators
+
+        //- Assignement operator
+        void operator=(const Foam::scalar& rhs)
+        {
+            controlSwitches<Foam::scalar>::operator=(rhs);
+        }
 };
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

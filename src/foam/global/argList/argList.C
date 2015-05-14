@@ -54,17 +54,17 @@ Foam::argList::initValidTables::initValidTables()
     // switches from the command-line
 
     // Instantiate a NamedEnum for the controlDict switches names
-    const Foam::NamedEnum
+    const NamedEnum
     <
-	Foam::debug::globalControlDictSwitchSet,
-	DIM_GLOBALCONTROLDICTSWITCHSET
+        debug::globalControlDictSwitchSet,
+        debug::DIM_GLOBAL_CONTROL_DICT_SWITCH_SET
     >
     globalControlDictSwitchSetNames;
 
-    forAll(globalControlDictSwitchSetNames, gI)
+    forAll (globalControlDictSwitchSetNames, gI)
     {
-	word switchSetName = globalControlDictSwitchSetNames.names[gI];
-	validOptions.set(switchSetName, "key1=val1,key2=val2,...");
+        word switchSetName = globalControlDictSwitchSetNames.names[gI];
+        validOptions.set(switchSetName, "key1=val1,key2=val2,...");
     }
 
     validOptions.set("dumpControlSwitches", "");
@@ -529,61 +529,64 @@ Foam::argList::argList
     // global controlDict dictionary using the environment variable
     // FOAM_GLOBAL_CONTROLDICT.
     fileName optionalGlobControlDictFileName =
-	getEnv("FOAM_GLOBAL_CONTROLDICT");
+    getEnv("FOAM_GLOBAL_CONTROLDICT");
 
     if (optionalGlobControlDictFileName.size() )
     {
-	debug::updateCentralDictVars
-	(
-	    optionalGlobControlDictFileName,
-	    Pstream::master() && bannerEnabled
-	);
+        debug::updateCentralDictVars
+        (
+            optionalGlobControlDictFileName,
+            Pstream::master() && bannerEnabled
+        );
     }
 
-    // Now that the rootPath_/globalCase_ directory is known (following the call
-    // to getRootCase()), we grab any global control switches overrides from the
-    // current case's controlDict.
+    // Now that the rootPath_/globalCase_ directory is known (following the
+    // call to getRootCase()), we grab any global control switches overrides
+    // from the current case's controlDict.
 
     debug::updateCentralDictVars
     (
-	rootPath_/globalCase_/"system/controlDict",
-	Pstream::master() && bannerEnabled
+        rootPath_/globalCase_/"system/controlDict",
+        Pstream::master() && bannerEnabled
     );
 
     // Finally, a command-line override for central controlDict's variables.
     // This is the ultimate override for the global control switches.
 
     // Instantiate a NamedEnum for the controlDict switches names
-    const Foam::NamedEnum
+    const NamedEnum
     <
-	Foam::debug::globalControlDictSwitchSet,
-	DIM_GLOBALCONTROLDICTSWITCHSET
+        debug::globalControlDictSwitchSet,
+        debug::DIM_GLOBAL_CONTROL_DICT_SWITCH_SET
     >
     globalControlDictSwitchSetNames;
 
-    forAll(globalControlDictSwitchSetNames, gI)
+    forAll (globalControlDictSwitchSetNames, gI)
     {
-	word switchSetName = globalControlDictSwitchSetNames.names[gI];
+        word switchSetName = globalControlDictSwitchSetNames.names[gI];
 
-	if( optionFound(switchSetName) )
-	    Foam::debug::updateCentralDictVars
-	    (
-		globalControlDictSwitchSetNames[switchSetName],
-		option(switchSetName)
-	    );
+        if (optionFound(switchSetName))
+        {
+            debug::updateCentralDictVars
+            (
+                globalControlDictSwitchSetNames[switchSetName],
+                option(switchSetName)
+            );
+        }
     }
 
-    if( optionFound("dumpControlSwitches") )
+    if ( optionFound("dumpControlSwitches") )
     {
-	if (Pstream::master())
-	{
+        if (Pstream::master())
+        {
             // Dumping the application's control switches.
-	    // We dump the full information to the console using a standard
-	    // dictionary format, so one can copy/paste this information directly
-	    // into a case's system/controlDict file to override some switches
-	    // values without having to always use the command-line options.
-	    Foam::debug::dumpControlSwitchesToConsole();
-	}
+            // We dump the full information to the console using a standard
+            // dictionary format, so one can copy/paste this information
+            //  directly into a case's system/controlDict file to
+            //  override some switches values without having to always
+            // use the command-line options.
+            debug::dumpControlSwitchesToConsole();
+        }
 
         ::exit(0);
     }
@@ -630,8 +633,10 @@ Foam::argList::argList
         {
             Info<< "Slaves : " << slaveProcs << nl
                 << "Pstream initialized with:" << nl
-                << "    floatTransfer     : " << Pstream::floatTransfer << nl
-                << "    nProcsSimpleSum   : " << Pstream::nProcsSimpleSum() << nl
+                << "    floatTransfer     : "
+                << Pstream::floatTransfer << nl
+                << "    nProcsSimpleSum   : "
+                << Pstream::nProcsSimpleSum() << nl
                 << "    commsType         : "
                 << Pstream::commsTypeNames[Pstream::defaultCommsType()]
                 << endl;
@@ -663,9 +668,10 @@ Foam::argList::argList
     // If the macro AppSpecificDictionary is used, one can
     // modify the application-specific dictionnary using the
     // command-line parameter -appDict
-    if(appDictName_ != "")
-      optionReadIfPresent("appDict", appDictName_);
-
+    if (appDictName_ != "")
+    {
+        optionReadIfPresent("appDict", appDictName_);
+    }
 }
 
 
@@ -706,7 +712,7 @@ void Foam::argList::printUsage() const
         Info<< " <" << iter().c_str() << '>';
     }
 
-    int i=0;
+    int i = 0;
     SortableList<Foam::string> sortedValidOptions(validOptions.size());
 
     for
@@ -716,7 +722,7 @@ void Foam::argList::printUsage() const
         ++iter, ++i
     )
     {
-	OStringStream keyValuePair;
+        OStringStream keyValuePair;
         keyValuePair << "[-" << iter.key();
 
         if (iter().size())
@@ -725,12 +731,12 @@ void Foam::argList::printUsage() const
         }
 
         keyValuePair<< ']';
-	sortedValidOptions[i]= keyValuePair.str();
+    sortedValidOptions[i]= keyValuePair.str();
     }
     sortedValidOptions.sort();
 
-    forAll(sortedValidOptions, sI)
-	Info << " " << sortedValidOptions[sI].c_str();
+    forAll (sortedValidOptions, sI)
+    Info << " " << sortedValidOptions[sI].c_str();
 
     // place help/doc/srcDoc options of the way at the end,
     // but with an extra space to separate it a little
@@ -747,7 +753,7 @@ void Foam::argList::displayDoc(bool source) const
     // for source code: change foo_8C.html to foo_8C_source.html
     if (source)
     {
-        forAll(docExts, extI)
+        forAll (docExts, extI)
         {
             docExts[extI].replace(".", "_source.");
         }
@@ -756,9 +762,9 @@ void Foam::argList::displayDoc(bool source) const
     fileName docFile;
     bool found = false;
 
-    forAll(docDirs, dirI)
+    forAll (docDirs, dirI)
     {
-        forAll(docExts, extI)
+        forAll (docExts, extI)
         {
             docFile = docDirs[dirI]/executable_ + docExts[extI];
             docFile.expand();

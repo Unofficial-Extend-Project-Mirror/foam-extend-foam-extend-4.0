@@ -23,8 +23,6 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
 // * * * * * * * * * * * * * * * Member Operators  * * * * * * * * * * * * * //
 
 template<class T>
@@ -33,37 +31,212 @@ inline void Foam::debug::controlSwitches<T>::operator=(const T& rhs)
     switchValue_ = rhs;
 }
 
+
 template<class T>
 inline const T Foam::debug::controlSwitches<T>::operator&(const T& rhs)
 {
     return switchValue_ & rhs;
 }
 
-template<class T>
-inline bool Foam::debug::controlSwitches<T>::operator==(const T& rhs) const
-{
-    return switchValue_ == rhs;
-}
+
+// * * * * * * * * * * * * * * * Global Operators  * * * * * * * * * * * * * //
 
 template<class T>
-inline bool Foam::debug::controlSwitches<T>::operator>=(const T& rhs)
+inline bool Foam::operator==
+(
+    const debug::controlSwitches<T>& lhs,
+    const debug::controlSwitches<T>& rhs
+)
 {
-    return switchValue_ >= rhs;
+    return lhs() == rhs();
 }
+
 
 template<class T>
-inline bool Foam::debug::controlSwitches<T>::operator>(const T& rhs)
+inline bool Foam::operator==
+(
+    const T& lhs,
+    const debug::controlSwitches<T>& rhs
+)
 {
-    return switchValue_ > rhs;
+    return lhs == rhs();
 }
+
 
 template<class T>
-inline bool Foam::debug::controlSwitches<T>::operator<(const T& rhs)
+inline bool Foam::operator==
+(
+    const debug::controlSwitches<T>& lhs,
+    const T& rhs
+)
 {
-    return switchValue_ < rhs;
+    return lhs() == rhs;
 }
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+template<class T>
+inline bool Foam::operator!=
+(
+    const debug::controlSwitches<T>& lhs,
+    const debug::controlSwitches<T>& rhs
+)
+{
+    return lhs() != rhs();
+}
+
+
+template<class T>
+inline bool Foam::operator!=
+(
+    const T& lhs,
+    const debug::controlSwitches<T>& rhs
+)
+{
+    return lhs != rhs();
+}
+
+
+template<class T>
+inline bool Foam::operator!=
+(
+    const debug::controlSwitches<T>& lhs,
+    const T& rhs
+)
+{
+    return lhs() != rhs;
+}
+
+
+template<class T>
+inline bool Foam::operator>=
+(
+    const debug::controlSwitches<T>& lhs,
+    const debug::controlSwitches<T>& rhs
+)
+{
+    return lhs() >= rhs();
+}
+
+
+template<class T>
+inline bool Foam::operator>=
+(
+    const T& lhs,
+    const debug::controlSwitches<T>& rhs
+)
+{
+    return lhs >= rhs();
+}
+
+
+template<class T>
+inline bool Foam::operator>=
+(
+    const debug::controlSwitches<T>& lhs,
+    const T& rhs
+)
+{
+    return lhs() >= rhs;
+}
+
+
+template<class T>
+inline bool Foam::operator>
+(
+    const debug::controlSwitches<T>& lhs,
+    const debug::controlSwitches<T>& rhs
+)
+{
+    return lhs() > rhs();
+}
+
+
+template<class T>
+inline bool Foam::operator>
+(
+    const T& lhs,
+    const debug::controlSwitches<T>& rhs
+)
+{
+    return lhs > rhs();
+}
+
+
+template<class T>
+inline bool Foam::operator>
+(
+    const debug::controlSwitches<T>& lhs,
+    const T& rhs
+)
+{
+    return lhs() > rhs;
+}
+
+
+template<class T>
+inline bool Foam::operator<=
+(
+    const debug::controlSwitches<T>& lhs,
+    const debug::controlSwitches<T>& rhs
+)
+{
+    return lhs() <= rhs();
+}
+
+
+template<class T>
+inline bool Foam::operator<=
+(
+    const T& lhs,
+    const debug::controlSwitches<T>& rhs
+)
+{
+    return lhs <= rhs();
+}
+
+
+template<class T>
+inline bool Foam::operator<=
+(
+    const debug::controlSwitches<T>& lhs,
+    const T& rhs
+)
+{
+    return lhs() <= rhs;
+}
+
+
+template<class T>
+inline bool Foam::operator<
+(
+    const debug::controlSwitches<T>& lhs,
+    const debug::controlSwitches<T>& rhs
+)
+{
+    return lhs() < rhs();
+}
+
+
+template<class T>
+inline bool Foam::operator<
+(
+    const T& lhs,
+    const debug::controlSwitches<T>& rhs
+)
+{
+    return lhs < rhs();
+}
+
+
+template<class T>
+inline bool Foam::operator<
+(
+    const debug::controlSwitches<T>& lhs,
+    const T& rhs
+)
+{
+    return lhs() < rhs;
+}
 
 
 // ************************************************************************* //

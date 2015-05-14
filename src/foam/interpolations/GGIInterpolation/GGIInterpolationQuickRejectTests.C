@@ -49,7 +49,8 @@ GGIInterpolation<MasterPatch, SlavePatch>::faceBoundBoxExtendSpanFraction_
 (
     "GGIFaceBoundBoxExtendSpanFraction",
     1.0e-2,
-    "GGI faces bounding box expansion factor. Add robustness for quick-search algo. Keep it to a few percent."
+    "GGI faces bounding box expansion factor. "
+    "Add robustness for quick-search algo. Keep it to a few percent."
 );
 
 template<class MasterPatch, class SlavePatch>
@@ -448,7 +449,7 @@ void GGIInterpolation<MasterPatch, SlavePatch>::findNeighboursBBOctree
         treeBoundBox bbFaceMaster(facePoints);
 
         lmasterFaceBB[faceMi] =
-            bbFaceMaster.extend(faceBoundBoxExtendSpanFraction_);
+            bbFaceMaster.extend(faceBoundBoxExtendSpanFraction_());
     }
 
     // Initialize the list of slave patch faces bounding box
@@ -492,7 +493,7 @@ void GGIInterpolation<MasterPatch, SlavePatch>::findNeighboursBBOctree
         treeBoundBox bbFaceSlave(facePoints);
 
         lslaveFaceBB[faceSi] =
-            bbFaceSlave.extend(faceBoundBoxExtendSpanFraction_);
+            bbFaceSlave.extend(faceBoundBoxExtendSpanFraction_());
     }
 
     // Create the slave octreeData, using the boundBox flavor
@@ -507,9 +508,9 @@ void GGIInterpolation<MasterPatch, SlavePatch>::findNeighboursBBOctree
     (
         slaveOverallBB,              // overall search domain
         slaveDataBB,
-        octreeSearchMinNLevel_,      // min number of levels
-        octreeSearchMaxLeafRatio_,   // max avg. size of leaves
-        octreeSearchMaxShapeRatio_   // max avg. duplicity.
+        octreeSearchMinNLevel_(),      // min number of levels
+        octreeSearchMaxLeafRatio_(),   // max avg. size of leaves
+        octreeSearchMaxShapeRatio_()   // max avg. duplicity.
     );
 
     const vectorField& masterFaceNormals = masterPatch_.faceNormals();

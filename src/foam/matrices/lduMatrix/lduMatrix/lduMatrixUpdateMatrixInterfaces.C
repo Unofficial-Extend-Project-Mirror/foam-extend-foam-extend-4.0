@@ -132,7 +132,10 @@ void Foam::lduMatrix::updateMatrixInterfaces
                     *this,
                     coupleCoeffs[interfaceI],
                     cmpt,
-                    static_cast<Pstream::commsTypes>(Pstream::defaultCommsType()),
+                    static_cast<Pstream::commsTypes>
+                    (
+                        Pstream::defaultCommsType()
+                    ),
                     switchToLhs
                 );
             }
