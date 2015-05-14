@@ -154,12 +154,6 @@ Foam::immersedBoundaryForces::calcForcesMoment() const
 
         const fvMesh& mesh = U.mesh();
 
-        // Stress from turbulence model.  Note: this does not account
-        // for wall functions on the Immersed Boundary: use wallShearStress
-        // from Immersed Boundary U wall patch instead.
-        // HJ, 11/Aug/2014
-//         volSymmTensorField stress = devRhoReff();
-
         // Scale pRef by density for incompressible simulations
         scalar pRef = pRef_/rho(p);
 
@@ -170,9 +164,9 @@ Foam::immersedBoundaryForces::calcForcesMoment() const
             // Check and cast into immersed boundary type
             if
             (
-                isA<immersedBoundaryFvPatchVectorField>
+                isA<immersedBoundaryFvPatch>
                 (
-                    U.boundaryField()[patchI]
+                    mesh.boundary()[patchI]
                 )
             )
             {
@@ -183,25 +177,6 @@ Foam::immersedBoundaryForces::calcForcesMoment() const
                     (
                         mesh.boundary()[patchI]
                     );
-
-                // Get immersed boundary velocity.  Used to access wall
-                // shear stress
-                const immersedBoundaryVelocityWallFunctionFvPatchVectorField&
-                    UPatch =
-                    refCast
-                    <
-                        const
-                        immersedBoundaryVelocityWallFunctionFvPatchVectorField
-                    >
-                    (
-                        U.boundaryField()[patchI]
-                    );
-
-//                 const immersedBoundaryFvPatchSymmTensorField stressPatch =
-//                     refCast<const immersedBoundaryFvPatchSymmTensorField>
-//                     (
-//                         stress.boundaryField()[patchI]
-//                     );
 
                 const immersedBoundaryFvPatchScalarField pPatch =
                     refCast<const immersedBoundaryFvPatchScalarField>
@@ -223,19 +198,82 @@ Foam::immersedBoundaryForces::calcForcesMoment() const
                 fm.first().first() += rho(p)*sum(pf);
                 fm.second().first() += rho(p)*sum(Md ^ pf);
 
-                // Old treatment:
-                // Shear force is obtained from velocity wall functions
-                // and integrated on triangular faces
-                vectorField vf =
-                    sA*ibPatch.toTriFaces(UPatch.wallShearStress());
+                if
+                (
+                    isA<immersedBoundaryVelocityWallFunctionFvPatchVectorField>
+                    (
+                        U.boundaryField()[patchI]
+                    )
+                )
+                {
+                    // Turbulent wall functions
 
-                // New treatment: normal force calculated on triangles
-                // Damir Rigler, 30/Apr/2014
-//                 vectorField vfOld = (Sfb & stressPatch.triValue());
-//                 Info<< "Force difference " << sumMag(vf - vfOld) << endl;
+                    // Get immersed boundary velocity.  Used to access wall
+                    // shear stress
+                    const
+                    immersedBoundaryVelocityWallFunctionFvPatchVectorField&
+                        UPatch =
+                        refCast
+                        <
+                            const
+                            immersedBoundaryVelocityWallFunctionFvPatchVectorField
+                        >
+                        (
+                            U.boundaryField()[patchI]
+                        );
 
-                fm.first().second() += sum(vf);
-                fm.second().second() += sum(Md ^ vf);
+                    // Shear force is obtained from velocity wall functions
+                    // and integrated on triangular faces
+                    vectorField vf =
+                        sA*ibPatch.toTriFaces(UPatch.wallShearStress());
+
+                    fm.first().second() += sum(vf);
+                    fm.second().second() += sum(Md ^ vf);
+                }
+                else if
+                (
+                    isA<immersedBoundaryFvPatchVectorField>
+                    (
+                        U.boundaryField()[patchI]
+                    )
+                )
+                {
+                    // Laminar flow
+
+                    // Get immersed boundary velocity
+                    const immersedBoundaryFvPatchVectorField& UPatch =
+                        refCast<const immersedBoundaryFvPatchVectorField>
+                        (
+                            U.boundaryField()[patchI]
+                        );
+
+                    // Look up the viscosity
+                    if (mesh.foundObject<dictionary>("transportProperties"))
+                    {
+                        const dictionary& transportProperties =
+                            mesh.lookupObject<dictionary>
+                            (
+                                "transportProperties"
+                            );
+
+                        dimensionedScalar nu(transportProperties.lookup("nu"));
+
+                        vectorField vf =
+                            sA*rho(p)*nu.value()*UPatch.triGrad();
+
+                        fm.first().second() += sum(vf);
+                        fm.second().second() += sum(Md ^ vf);
+                    }
+                    else
+                    {
+                        InfoIn
+                        (
+                            "immersedBoundaryForces::forcesMoments"
+                            "immersedBoundaryForces::calcForcesMoment() const"
+                        )   << "Laminar flow, but cannot find nu.  Skipping"
+                            << endl;
+                    }
+                }
             }
         }
     }
