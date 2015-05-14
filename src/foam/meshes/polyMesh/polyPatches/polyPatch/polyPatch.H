@@ -232,7 +232,7 @@ public:
         //- Relative tolerance (for geometric matching)
         //  Calculated as a factor of maximum edge length per face.
         //  HJ, 21/Dec/2006
-        static const Foam::debug::tolerancesSwitch matchTol_;
+        static const debug::tolerancesSwitch matchTol_;
 
 
     // Declare run-time constructor selection tables

@@ -262,28 +262,28 @@ private:
     // Static data members
 
         //- Point merge tolerance
-        static const Foam::debug::tolerancesSwitch pointMergeTol_;
+        static const debug::tolerancesSwitch pointMergeTol_;
 
         //- Edge merge tolerance
-        static const Foam::debug::tolerancesSwitch edgeMergeTol_;
+        static const debug::tolerancesSwitch edgeMergeTol_;
 
         //- Estimated number of faces an edge goes through
-        static const Foam::label nFacesPerSlaveEdge_;
+        static const label nFacesPerSlaveEdge_;
 
         //- Edge-face interaction escape limit
-        static const Foam::label edgeFaceEscapeLimit_;
+        static const label edgeFaceEscapeLimit_;
 
         //- Integral match point adjustment tolerance
-        static const Foam::debug::tolerancesSwitch integralAdjTol_;
+        static const debug::tolerancesSwitch integralAdjTol_;
 
         //- Edge intersection master catch fraction
-        static const Foam::debug::tolerancesSwitch edgeMasterCatchFraction_;
+        static const debug::tolerancesSwitch edgeMasterCatchFraction_;
 
         //- Edge intersection co-planar tolerance
-        static const Foam::debug::tolerancesSwitch edgeCoPlanarTol_;
+        static const debug::tolerancesSwitch edgeCoPlanarTol_;
 
         //- Edge end cut-off tolerance
-        static const Foam::debug::tolerancesSwitch edgeEndCutoffTol_;
+        static const debug::tolerancesSwitch edgeEndCutoffTol_;
 
 
 public:

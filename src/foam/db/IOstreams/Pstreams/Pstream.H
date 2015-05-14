@@ -225,14 +225,14 @@ public:
         //- Should compact transfer be used in which floats replace doubles
         //  reducing the bandwidth requirement at the expense of some loss
         //  in accuracy
-        static const Foam::debug::optimisationSwitch floatTransfer;
+        static const debug::optimisationSwitch floatTransfer;
 
         //- Number of processors at which the sum algorithm changes from linear
         //  to tree
-        static const Foam::debug::optimisationSwitch nProcsSimpleSum;
+        static const debug::optimisationSwitch nProcsSimpleSum;
 
         //- Default commsType
-        static const Foam::debug::optimisationSwitch defaultCommsType;
+        static const debug::optimisationSwitch defaultCommsType;
 
 
     // Constructors

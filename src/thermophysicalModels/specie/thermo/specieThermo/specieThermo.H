@@ -97,13 +97,13 @@ class specieThermo
     // Private data
 
         //- Convergence tolerance of energy -> temperature inversion functions
-        static const Foam::debug::tolerancesSwitch tol_;
+        static const debug::tolerancesSwitch tol_;
 
         //- Max temperature jump of energy -> temperature inversion functions
-        static const Foam::debug::tolerancesSwitch TJump_;
+        static const debug::tolerancesSwitch TJump_;
 
         //- Max number of iterations in energy->temperature inversion functions
-        static const Foam::debug::optimisationSwitch maxIter_;
+        static const debug::optimisationSwitch maxIter_;
 
 
     // Private member functions

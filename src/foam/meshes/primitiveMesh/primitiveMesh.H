@@ -322,22 +322,22 @@ public:
 
             //- Cell closedness warning threshold
             //  set as the fraction of un-closed area to closed area
-            static const Foam::debug::tolerancesSwitch closedThreshold_;
+            static const debug::tolerancesSwitch closedThreshold_;
 
             //- Aspect ratio warning threshold
-            static const Foam::debug::tolerancesSwitch aspectThreshold_;
+            static const debug::tolerancesSwitch aspectThreshold_;
 
             //- Non-orthogonality warning threshold in deg
             static Foam::debug::tolerancesSwitch nonOrthThreshold_;
 
             //- Skewness warning threshold
-            static const Foam::debug::tolerancesSwitch skewThreshold_;
+            static const debug::tolerancesSwitch skewThreshold_;
 
             //- Face angle threshold
             static Foam::debug::tolerancesSwitch faceAngleThreshold_;
 
             //- Face flatness threshold
-            static const Foam::debug::tolerancesSwitch faceFlatnessThreshold_;
+            static const debug::tolerancesSwitch faceFlatnessThreshold_;
 
 
     // Constructors

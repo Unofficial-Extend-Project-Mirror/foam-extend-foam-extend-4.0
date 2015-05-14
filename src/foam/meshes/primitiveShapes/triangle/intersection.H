@@ -64,7 +64,7 @@ public:
         static Foam::debug::tolerancesSwitch planarTol_;
 
         //- Intersection miss tolerance, of the order of 1e-15
-        static const Foam::debug::tolerancesSwitch missTol_;
+        static const debug::tolerancesSwitch missTol_;
 
 
         enum direction

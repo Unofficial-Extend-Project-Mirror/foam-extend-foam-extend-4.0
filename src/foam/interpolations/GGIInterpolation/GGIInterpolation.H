@@ -220,13 +220,13 @@ class GGIInterpolation
        //
 
        //- Octree search: minNlevel parameter for octree constructor
-       static const Foam::debug::optimisationSwitch octreeSearchMinNLevel_;
+       static const debug::optimisationSwitch octreeSearchMinNLevel_;
 
        //- Octree search: maxLeafRatio parameter for octree constructor
-       static const Foam::debug::optimisationSwitch octreeSearchMaxLeafRatio_;
+       static const debug::optimisationSwitch octreeSearchMaxLeafRatio_;
 
        //- Octree search: maxShapeRatio parameter for octree constructor
-       static const Foam::debug::optimisationSwitch octreeSearchMaxShapeRatio_;
+       static const debug::optimisationSwitch octreeSearchMaxShapeRatio_;
 
 
     // Private Member Functions

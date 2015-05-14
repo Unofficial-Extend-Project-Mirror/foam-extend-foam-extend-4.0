@@ -71,7 +71,7 @@ class JobInfo
 public:
 
     static bool constructed;
-    static Foam::debug::infoSwitch writeJobInfo;
+    static debug::infoSwitch writeJobInfo;
 
     // Constructors
 

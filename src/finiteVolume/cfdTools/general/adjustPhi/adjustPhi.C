@@ -116,11 +116,11 @@ bool Foam::adjustPhi
 
         scalar massCorr = 1.0;
 
-        static const Foam::debug::tolerancesSwitch closedDomainTol
-	(
-	    "closedDomainTol",
-	    1e-10
-	);
+        static const debug::tolerancesSwitch closedDomainTol
+        (
+            "closedDomainTol",
+            1e-10
+        );
 
         if (mag(adjustableMassOut) > SMALL)
         {
@@ -129,7 +129,7 @@ bool Foam::adjustPhi
         else if
         (
             mag(fixedMassOut - massIn)
-	  > closedDomainTol()*Foam::max(1.0, mag(massIn))
+          > closedDomainTol()*Foam::max(1.0, mag(massIn))
         )
         {
             phi.write();

@@ -136,7 +136,7 @@ private:
 
         //- Matrix constraint fill-in
         //  Equals to the estimated fraction of fixed nodes in the matrix
-        static const Foam::debug::optimisationSwitch fixFillIn;
+        static const debug::optimisationSwitch fixFillIn;
 
 
     // Private member functions

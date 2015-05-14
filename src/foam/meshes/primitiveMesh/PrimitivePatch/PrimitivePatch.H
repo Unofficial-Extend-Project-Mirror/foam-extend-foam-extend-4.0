@@ -178,7 +178,8 @@ private:
 
     // Static Private Data
 
-        static const Foam::debug::optimisationSwitch nSquaredProjection_;
+        //- N-squared projection forced
+        static const debug::optimisationSwitch nSquaredProjection_;
 
 
     // Private Member Functions

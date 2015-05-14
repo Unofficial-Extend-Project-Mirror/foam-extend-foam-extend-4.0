@@ -66,8 +66,9 @@ public:
 
         static const char* const typeName;
 
-    //- Debug switch
-        static Foam::debug::debugSwitch debug;
+        //- Debug switch
+        static debug::debugSwitch debug;
+
 
     // Constructors
 

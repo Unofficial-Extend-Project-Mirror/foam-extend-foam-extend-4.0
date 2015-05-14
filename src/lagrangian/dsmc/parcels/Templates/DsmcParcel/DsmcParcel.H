@@ -336,10 +336,10 @@ public:
     template<>                                                                \
     const Foam::word DsmcParcel<Type>::typeName(#Type);                       \
     template<>                                                                \
-    Foam::debug::debugSwitch						      \
-    DsmcParcel<Type>::debug						      \
+    Foam::debug::debugSwitch                                                  \
+    DsmcParcel<Type>::debug                                                   \
     (                                                                         \
-        std::string(#Type), DebugSwitch       				      \
+        std::string(#Type), DebugSwitch                                       \
     );
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

@@ -94,7 +94,8 @@ public:
         //- Runtime type information
         TypeName("regIOobject");
 
-        static const Foam::debug::optimisationSwitch fileModificationSkew;
+        //- File modification skew
+        static const debug::optimisationSwitch fileModificationSkew;
 
 
     // Constructors

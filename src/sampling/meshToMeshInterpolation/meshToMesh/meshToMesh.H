@@ -123,10 +123,10 @@ class meshToMesh
     // Private static data members
 
         //- Direct hit tolerance
-        static const Foam::debug::tolerancesSwitch directHitTol;
+        static const debug::tolerancesSwitch directHitTol;
 
         //- Cell centre distance required to establish a hit
-        static const Foam::debug::tolerancesSwitch cellCentreDistanceTol;
+        static const debug::tolerancesSwitch cellCentreDistanceTol;
 
 
 public:

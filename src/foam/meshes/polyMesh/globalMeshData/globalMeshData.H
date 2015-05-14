@@ -228,7 +228,7 @@ public:
     // Static data members
 
         //- Geomtric tolerance (fraction of bounding box)
-        static const Foam::debug::tolerancesSwitch matchTol_;
+        static const debug::tolerancesSwitch matchTol_;
 
 
     // Constructors

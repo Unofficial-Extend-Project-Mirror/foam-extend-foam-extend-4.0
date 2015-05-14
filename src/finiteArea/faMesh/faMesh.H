@@ -174,7 +174,8 @@ class faMesh
 
     // Static Private Data
 
-        static const Foam::debug::optimisationSwitch quadricsFit_;
+        //- Use quadrics fit
+        static const debug::optimisationSwitch quadricsFit_;
 
 
     // Private Member Functions

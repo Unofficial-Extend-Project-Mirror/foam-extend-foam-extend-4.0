@@ -84,13 +84,13 @@ public:
         // Thermodynamic constants
 
             //- Universal gas constant [J/(kmol K)]
-            static const Foam::debug::constantsSwitch RR;
+            static const debug::constantsSwitch RR;
 
             //- Standard pressure [Pa]
-            static const Foam::debug::constantsSwitch Pstd;
+            static const debug::constantsSwitch Pstd;
 
             //- Standard temperature [K]
-            static const Foam::debug::constantsSwitch Tstd;
+            static const debug::constantsSwitch Tstd;
 
 
     // Constructors

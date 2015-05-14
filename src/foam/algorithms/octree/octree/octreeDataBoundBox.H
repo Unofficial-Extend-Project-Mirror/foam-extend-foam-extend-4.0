@@ -70,7 +70,7 @@ class octreeDataBoundBox
     // Static data
 
         //- Tolerance on linear dimensions
-        static const Foam::debug::tolerancesSwitch tol;
+        static const debug::tolerancesSwitch tol;
 
 
     // Private data

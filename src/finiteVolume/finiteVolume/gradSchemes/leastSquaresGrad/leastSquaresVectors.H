@@ -78,7 +78,7 @@ public:
     // Static data members
 
         //- Point merge tolerance
-        static const Foam::debug::tolerancesSwitch smallDotProdTol_;
+        static const debug::tolerancesSwitch smallDotProdTol_;
 
 
     // Constructors

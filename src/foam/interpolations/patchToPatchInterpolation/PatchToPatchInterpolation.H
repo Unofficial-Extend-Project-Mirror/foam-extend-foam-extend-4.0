@@ -87,10 +87,10 @@ class PatchToPatchInterpolation
 
         //- Relative merge tolerance for projected points missing the target
         //  Expressed as the fraction of min involved edge size
-        static const Foam::debug::tolerancesSwitch projectionTol_;
+        static const debug::tolerancesSwitch projectionTol_;
 
         //- Direct hit tolerance
-        static const Foam::debug::tolerancesSwitch directHitTol_;
+        static const debug::tolerancesSwitch directHitTol_;
 
 
         // Point addressing
