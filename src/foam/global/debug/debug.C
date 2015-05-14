@@ -112,7 +112,7 @@ Foam::dictionary& Foam::debug::controlDict()
         // MB 05/2015
 
         // Make control dict
-        cerr<< "Make control dict\n";
+
         controlDictPtr_ = new dictionary();
         dictionary& cDict = *controlDictPtr_;
 
@@ -127,9 +127,6 @@ Foam::dictionary& Foam::debug::controlDict()
         // Add a subDict for each switch set
         forAll (globalControlDictSwitchSetNames, gI)
         {
-            cerr<< "Adding subdict"
-                << globalControlDictSwitchSetNames.names[gI]
-                << "\n";
             cDict.add(globalControlDictSwitchSetNames.names[gI], dictionary());
         }
     }
