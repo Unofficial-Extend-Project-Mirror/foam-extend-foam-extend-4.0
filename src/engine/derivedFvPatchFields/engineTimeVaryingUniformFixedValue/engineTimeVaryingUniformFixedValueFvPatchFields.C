@@ -140,16 +140,22 @@ void engineTimeVaryingUniformFixedValueFvPatchField<symmTensor>::updateCoeffs()
 template<>
 void engineTimeVaryingUniformFixedValueFvPatchField<symmTensor4thOrder>::updateCoeffs()
 {
-  notImplemented("engineTimeVaryingUniformFixedValueFvPatchField"
-		 "<symmTensor4thOrder>::updateCoeffs()");
+    notImplemented
+    (
+        "engineTimeVaryingUniformFixedValueFvPatchField"
+        "<symmTensor4thOrder>::updateCoeffs()"
+    );
 }
 
 
 template<>
 void engineTimeVaryingUniformFixedValueFvPatchField<diagTensor>::updateCoeffs()
 {
-  notImplemented("engineTimeVaryingUniformFixedValueFvPatchField"
-		 "<diagTensor>::updateCoeffs()");
+    notImplemented
+    (
+        "engineTimeVaryingUniformFixedValueFvPatchField"
+        "<diagTensor>::updateCoeffs()"
+    );
 }
 
 

@@ -116,11 +116,11 @@ bool Foam::slidingInterface::projectPoints() const
             << name() << " : "
             << "Projecting slave points onto master surface using ";
 
-	const Foam::debug::optimisationSwitch nSquaredProjection
-	(
-	    "nSquaredProjection",
-	    0
-	);
+    const Foam::debug::optimisationSwitch nSquaredProjection
+    (
+        "nSquaredProjection",
+        0
+    );
 
         if (nSquaredProjection() > 0)
         {
@@ -1165,8 +1165,8 @@ bool Foam::slidingInterface::projectPoints() const
                     if
                     (
                         cutOnSlave > edgeEndCutoffTol_()
-		     && cutOnSlave < 1.0 - edgeEndCutoffTol_() // check edge cut
-		     && distInEdgePlane < edgeMergeTol_()*edgeMag // merge plane
+                     && cutOnSlave < 1.0 - edgeEndCutoffTol_() // check edge cut
+                     && distInEdgePlane < edgeMergeTol_()*edgeMag // merge plane
                      && edgeLineHit.distance()
                       < min
                         (

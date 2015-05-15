@@ -194,14 +194,14 @@ unset compilerBin compilerLib compilerInstall
 if [ -z "$WM_CC" ]
 then
     case "$WM_COMPILER" in
-	Gcc*)
-	    export WM_CC='gcc'
-	    export WM_CXX='g++'
-	    ;;
-	Icc)
-	    export WM_CC='icc'
-	    export WM_CXX='icpc'
-	    ;;
+    Gcc*)
+        export WM_CC='gcc'
+        export WM_CXX='g++'
+        ;;
+    Icc)
+        export WM_CC='icc'
+        export WM_CXX='icpc'
+        ;;
     esac
 fi
 
@@ -245,24 +245,24 @@ OPENMPI)
     ;;
 
 MACPORTOPENMPI)
-	unset OPAL_PREFIX
+    unset OPAL_PREFIX
 
-	export FOAM_MPI=openmpi-macport-$WM_MACPORT_MPI_VERSION
+    export FOAM_MPI=openmpi-macport-$WM_MACPORT_MPI_VERSION
 
-	# Currently not correctly working on MacPorts
-	#	libDir=`mpicc-openmpi-$WM_MACPORT_MPI_VERSION --showme:libdirs`
-	libDir=/opt/local/lib/openmpi-$WM_MACPORT_MPI_VERSION
+    # Currently not correctly working on MacPorts
+    #    libDir=`mpicc-openmpi-$WM_MACPORT_MPI_VERSION --showme:libdirs`
+    libDir=/opt/local/lib/openmpi-$WM_MACPORT_MPI_VERSION
 
-	export FOAM_MPI_LIBBIN=$FOAM_LIBBIN/$FOAM_MPI
-	_foamAddLib     $libDir
-	unset libDir
+    export FOAM_MPI_LIBBIN=$FOAM_LIBBIN/$FOAM_MPI
+    _foamAddLib     $libDir
+    unset libDir
 
-	which mpirun >/dev/null
-	if [ $? -ne 0 ]
-	then
-	    export WM_MPIRUN_PROG=mpirun-openmpi-$WM_MACPORT_MPI_VERSION
-	fi
- 	;;
+    which mpirun >/dev/null
+    if [ $? -ne 0 ]
+    then
+        export WM_MPIRUN_PROG=mpirun-openmpi-$WM_MACPORT_MPI_VERSION
+    fi
+    ;;
 
 MACPORTMPICH)
     export FOAM_MPI=mpich-macports-$WM_MACPORT_MPI_VERSION
@@ -277,7 +277,7 @@ MACPORTMPICH)
     which mpirun >/dev/null
     if [ $? -ne 0 ]
     then
-	export WM_MPIRUN_PROG=mpirun-mpich-$WM_MACPORT_MPI_VERSION
+        export WM_MPIRUN_PROG=mpirun-mpich-$WM_MACPORT_MPI_VERSION
     fi
     ;;
 

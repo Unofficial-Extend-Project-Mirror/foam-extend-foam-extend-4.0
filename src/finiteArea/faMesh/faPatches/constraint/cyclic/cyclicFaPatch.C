@@ -84,11 +84,7 @@ void Foam::cyclicFaPatch::calcTransforms()
                 half0Normals[edgei] = point(1, 0, 0);
                 half1Normals[edgei] = half0Normals[edgei];
             }
-            else if
-            (
-                mag(magLe - nbrMagLe)/avLe
-	      > matchTol_()
-            )
+            else if(mag(magLe - nbrMagLe)/avLe > matchTol_())
             {
                 // Error in area matching.  Find largest error
                 maxMatchError =
@@ -176,7 +172,7 @@ void cyclicFaPatch::makeWeights(scalarField& w) const
         if
         (
             mag(magL[edgei] - magL[edgei + sizeby2])/avL
-	  > matchTol_()
+      > matchTol_()
         )
         {
             // Found error.  Look for largest matching error

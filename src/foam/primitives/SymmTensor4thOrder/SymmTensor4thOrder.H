@@ -132,11 +132,11 @@ public:
         inline SymmTensor4thOrder
         (
             const Cmpt txxxx, const Cmpt txxyy, const Cmpt txxzz,
-	                          const Cmpt tyyyy, const Cmpt tyyzz,
-	                                            const Cmpt tzzzz,
+                              const Cmpt tyyyy, const Cmpt tyyzz,
+                                                const Cmpt tzzzz,
             const Cmpt txyxy,
                               const Cmpt tyzyz,
-	                                            const Cmpt tzxzx
+                                                const Cmpt tzxzx
         );
 
         //- Construct from Istream

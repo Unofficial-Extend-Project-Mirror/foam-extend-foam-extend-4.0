@@ -64,9 +64,9 @@ boundary
 
     flow
     {
-		type cyclic;
-		faces
-		(
+        type cyclic;
+        faces
+        (
 
             (0 6 7 1)
             (1 7 8 2)

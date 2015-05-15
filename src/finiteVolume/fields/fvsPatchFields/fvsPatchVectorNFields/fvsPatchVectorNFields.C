@@ -40,7 +40,7 @@ Foam::debug::debugSwitch                                                      \
 fvsPatchTypeField::disallowDefaultFvsPatchField                               \
 (                                                                             \
     "disallowDefaultFvsPatchField",                                           \
-    0									      \
+    0                                                                         \
 );                                                                            \
 defineTemplateRunTimeSelectionTable(fvsPatchTypeField, patch);                \
 defineTemplateRunTimeSelectionTable(fvsPatchTypeField, patchMapper);          \

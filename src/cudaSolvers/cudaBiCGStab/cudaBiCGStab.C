@@ -147,7 +147,7 @@ Foam::lduSolverPerformance Foam::cudaBiCGStab::solve
     }
 
     // copy the x vector back to Openfoam
-	thrust::copy(ces.X.begin(), ces.X.end(), x.begin());
+    thrust::copy(ces.X.begin(), ces.X.end(), x.begin());
 
     // Return solver output
     return lduSolverPerformance

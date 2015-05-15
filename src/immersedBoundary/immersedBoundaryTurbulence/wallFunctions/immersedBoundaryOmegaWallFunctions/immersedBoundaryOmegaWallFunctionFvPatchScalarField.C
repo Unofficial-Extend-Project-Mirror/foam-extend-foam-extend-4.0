@@ -258,7 +258,7 @@ void immersedBoundaryOmegaWallFunctionFvPatchScalarField::updateCoeffs()
         {
             // Calculate tauW from log-law using k and U at sampling point
 
-	    tauW = UtanOld[ibCellI]*Cmu25*sqrt(k[ibCellI])*kappa_
+            tauW = UtanOld[ibCellI]*Cmu25*sqrt(k[ibCellI])*kappa_
                   /log(E_*yPlusSample);
         }
         else
@@ -288,11 +288,11 @@ void immersedBoundaryOmegaWallFunctionFvPatchScalarField::updateCoeffs()
                 sqr((nutw + nuLam)*magGradUw[ibCellI])/
                 (Cmu25*sqrt(k[ibCellI])*kappa_*y[ibCellI]);
 
-	    // Compute k at the IB cell
+            // Compute k at the IB cell
             kNew[ibCellI] = tauW/Cmu50;  // equilibrium boundary layer
-	    //            kNew[ibCellI] = k[ibCellI];  // zero-Gradient (less stable)
+            // kNew[ibCellI] = k[ibCellI];  // zero-Gradient (less stable)
 
-	    // Compute omega at the IB cell
+            // Compute omega at the IB cell
             omegaNew[ibCellI] = sqrt(kNew[ibCellI])/(Cmu25*kappa_*y[ibCellI]);
 
             // Log-Law for tangential velocity  - uTau = Cmu25*sqrt(kNew)
@@ -312,7 +312,7 @@ void immersedBoundaryOmegaWallFunctionFvPatchScalarField::updateCoeffs()
             // quadratic fit
             kNew[ibCellI] = k[ibCellI]*sqr(yPlusIB/yPlusLam);
 
-	    // Compute omega at the IB cell
+            // Compute omega at the IB cell
             omegaNew[ibCellI] = 6.0*nu[ibCellI]/(beta1_*sqr(y[ibCellI]));
 
             // Laminar sub-layer for tangential velocity: uPlus = yPlus

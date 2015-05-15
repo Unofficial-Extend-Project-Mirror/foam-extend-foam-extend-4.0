@@ -40,10 +40,10 @@ namespace Foam
 defineNamedTemplateTypeNameAndDebug(faePatchTypeField, 0);                    \
 template<>                                                                    \
 Foam::debug::debugSwitch                                                      \
-faePatchTypeField::disallowDefaultFaePatchField				      \
+faePatchTypeField::disallowDefaultFaePatchField                               \
 (                                                                             \
     "disallowDefaultFaePatchField",                                           \
-    0									      \
+    0                                                                         \
 );                                                                            \
 defineTemplateRunTimeSelectionTable(faePatchTypeField, patch);                \
 defineTemplateRunTimeSelectionTable(faePatchTypeField, patchMapper);          \

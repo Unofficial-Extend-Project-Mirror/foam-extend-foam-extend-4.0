@@ -147,7 +147,7 @@ extern "C" void bicgAinv
 
     while
     (
-    	normR > (solverPerf->tol)
+        normR > (solverPerf->tol)
      && count < (solverPerf->maxIter)
      && normR/normR0 >= (solverPerf->relTol)
      || count < solverPerf->minIter

@@ -17,21 +17,21 @@ FoamFile
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-maxCellSize	0.1;
+maxCellSize 0.1;
 
-surfaceFile	"sBend.fms";
+surfaceFile "sBend.fms";
 
 boundaryLayers
 {
-    nLayers	1;
+    nLayers 1;
 
     patchBoundaryLayers
     {
 
         walls
         {
-             nLayers	3;
-             thicknessRatio	1.2;
+             nLayers 3;
+             thicknessRatio 1.2;
         }
     }
 }
@@ -41,12 +41,12 @@ localRefinement
 
     refFine
     {
-        cellSize	0.025;
+        cellSize 0.025;
     }
 
     walls
     {
-        cellSize	0.05;
+        cellSize 0.05;
     }
 }
 

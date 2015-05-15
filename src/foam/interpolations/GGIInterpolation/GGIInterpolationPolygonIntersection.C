@@ -185,7 +185,7 @@ GGIInterpolation<MasterPatch, SlavePatch>::polygonIntersection
         if
         (
             mag(intersectionArea/clippingArea) < areaErrorTol_()
-	 || mag(intersectionArea/subjectArea)  < areaErrorTol_()
+         || mag(intersectionArea/subjectArea)  < areaErrorTol_()
         )
         {
             WarningIn

@@ -40,7 +40,7 @@ Foam::debug::debugSwitch                                                      \
 faPatchTypeField::disallowDefaultFaPatchField                                 \
 (                                                                             \
     "disallowDefaultFaPatchField",                                            \
-    0									      \
+    0                                                                         \
 );                                                                            \
 defineTemplateRunTimeSelectionTable(faPatchTypeField, patch);                 \
 defineTemplateRunTimeSelectionTable(faPatchTypeField, patchMapper);           \

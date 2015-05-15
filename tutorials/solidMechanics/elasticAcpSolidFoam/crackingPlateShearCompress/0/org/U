@@ -30,8 +30,8 @@ boundaryField
     top
     {
         type           timeVaryingFixedDisplacement;
-	fileName       "$FOAM_CASE/constant/timeVsTopDisp";
-	outOfBounds    clamp;
+        fileName       "$FOAM_CASE/constant/timeVsTopDisp";
+        outOfBounds    clamp;
         value          uniform (0 0 0);
     }
 

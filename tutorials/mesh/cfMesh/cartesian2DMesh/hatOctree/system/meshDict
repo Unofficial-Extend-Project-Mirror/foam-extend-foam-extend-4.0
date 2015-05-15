@@ -8,18 +8,18 @@
 
 FoamFile
 {
-version	2;
-format	ascii;
-class	dictionary;
-location	"system";
-object	meshDict;
+    version 2;
+    format ascii;
+    class dictionary;
+    location "system";
+    object meshDict;
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-maxCellSize	0.01;
+maxCellSize 0.01;
 
-surfaceFile	"geom.fms";
+surfaceFile "geom.fms";
 
 boundaryLayers
 {

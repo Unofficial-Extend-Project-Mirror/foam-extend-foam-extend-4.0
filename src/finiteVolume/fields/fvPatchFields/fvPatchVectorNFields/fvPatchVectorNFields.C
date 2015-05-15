@@ -40,7 +40,7 @@ debug::debugSwitch                                                            \
 fvPatchTypeField::disallowGenericFvPatchField                                 \
 (                                                                             \
     "disallowGenericFvPatchField",                                            \
-    0									      \
+    0                                                                         \
 );                                                                            \
 defineTemplateRunTimeSelectionTable(fvPatchTypeField, patch);                 \
 defineTemplateRunTimeSelectionTable(fvPatchTypeField, patchMapper);           \

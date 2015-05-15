@@ -383,9 +383,9 @@ boundary
         zone B_UPSTREAMZone;
         ribbonPatch
         {
-        	discretisation bothPatches;
-        	stackAxis R;
-        	sweepAxis Theta;
+            discretisation bothPatches;
+            stackAxis R;
+            sweepAxis Theta;
         }
 
         coordinateSystem

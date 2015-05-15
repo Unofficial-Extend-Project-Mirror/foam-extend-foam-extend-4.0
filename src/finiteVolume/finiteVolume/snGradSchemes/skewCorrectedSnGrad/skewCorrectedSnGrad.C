@@ -234,17 +234,17 @@ skewCorrectedSnGrad<Type>::correction
     (
         min
         (
-            limitCoeff_
-           *mag
+            limitCoeff_*
+            mag
             (
-	        uncorrectedSnGrad<Type>::snGrad
-		(
-		    vf,
-		    this->deltaCoeffs(vf),
-		    "orthSnGrad"
-		)
-	      + ssf
-	    )
+                uncorrectedSnGrad<Type>::snGrad
+                (
+                    vf,
+                    this->deltaCoeffs(vf),
+                    "orthSnGrad"
+                )
+              + ssf
+            )
            /(
                 (1 - limitCoeff_)*mag(ssf)
               + dimensionedScalar("small", ssf.dimensions(), SMALL)

@@ -43,8 +43,8 @@ divSchemes
 
 laplacianSchemes
 {
-    default         	none;
-    laplacian(DDU,DU) 	Gauss linear corrected;
+    default             none;
+    laplacian(DDU,DU) Gauss linear corrected;
 }
 
 snGradSchemes

@@ -54,7 +54,7 @@ boundaryLayers
             allowDiscontinuity 0;
         }
 
-    	"fixedWalls.*"
+        "fixedWalls.*"
         {
             nLayers           4;
 
@@ -69,15 +69,15 @@ boundaryLayers
 
 renameBoundary
 {
-    defaultName		fixedWalls;
-    defaultType		wall;
+    defaultName fixedWalls;
+    defaultType wall;
 
     newPatchNames
     {
         "orificeRegion.*"
         {
-            newName	orificeRegion;
-	    newType     wall;
+            newName orificeRegion;
+            newType     wall;
         }
 
         "inlet.*"

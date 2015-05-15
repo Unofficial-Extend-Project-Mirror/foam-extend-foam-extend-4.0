@@ -20,7 +20,7 @@ dictionaryReplacement
     {
         frontAndBackPlanes
         {
-	    type            empty;
+            type            empty;
         }
     }
 }

@@ -136,7 +136,7 @@ coupledSolverPerformance coupledFvMatrix<scalar>::solve
     //HR 17.2.2013: Clear references to internal field without deleting the objects
     forAll (matrices, rowI)
     {
-	psi.set(rowI, NULL).ptr();
+        psi.set(rowI, NULL).ptr();
     }
 
     return solverPerf;

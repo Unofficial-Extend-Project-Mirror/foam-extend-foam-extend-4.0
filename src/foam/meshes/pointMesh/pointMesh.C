@@ -59,9 +59,9 @@ void Foam::pointMesh::mapFields(const mapPolyMesh& mpm) const
     MapGeometricFields
     <
         symmTensor4thOrder,
-	pointPatchField,
-	pointMeshMapper,
-	pointMesh
+        pointPatchField,
+        pointMeshMapper,
+        pointMesh
     >(m);
 
     MapGeometricFields<diagTensor, pointPatchField, pointMeshMapper, pointMesh>

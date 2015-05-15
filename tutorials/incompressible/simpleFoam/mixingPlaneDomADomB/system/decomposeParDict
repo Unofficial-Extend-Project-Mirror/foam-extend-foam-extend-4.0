@@ -8,13 +8,13 @@
 FoamFile
 {
     version     2.0;
-    format      ascii; 	;
-    class       dictionary; 	;
-    object      decomposeParDict; 	;
+    format      ascii;
+    class       dictionary;
+    object      decomposeParDict;
 }
 numberOfSubdomains 4;
 
-method metis; 	//metis; //simple;
+method metis;     //metis; //simple;
 
 globalFaceZones
 (
@@ -38,6 +38,6 @@ simpleCoeffs
 distributed no;
 
 roots
-  (
-  );
+(
+);
 

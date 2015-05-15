@@ -56,7 +56,7 @@ inline SymmTensor4thOrder<Cmpt>::SymmTensor4thOrder
 (
  const Cmpt txxxx, const Cmpt txxyy, const Cmpt txxzz,
                    const Cmpt tyyyy, const Cmpt tyyzz,
-	                             const Cmpt tzzzz,
+                                     const Cmpt tzzzz,
  const Cmpt txyxy,
  const Cmpt tyzyz,
  const Cmpt tzxzx

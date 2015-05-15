@@ -311,7 +311,7 @@ public:
 //    cellSet -appDict cellSetDict.rotorOnly
 //
 #define  AppSpecificDictionary(DefaultAppDict)                            \
-    argList::appDictName_ = (DefaultAppDict);		           \
+    argList::appDictName_ = (DefaultAppDict);                             \
     argList::validOptions.insert("appDict", argList::appDictName_);
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

@@ -299,7 +299,7 @@ Foam::iterativePenaltyFriction::iterativePenaltyFriction
 
         // traction to cause slipping
         //scalar slipTrac =
-	//frictionLawPtr_->slipTraction(magSlavePressure[faceI]);
+        //   frictionLawPtr_->slipTraction(magSlavePressure[faceI]);
         vector& slaveTrac = slaveTraction_[faceI];
 
         // if mag(slaveTrac) is greater than slipTrac and

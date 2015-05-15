@@ -24,16 +24,16 @@ boundaryField
     bottomLoading
     {
         type           timeVaryingFixedDisplacement;
-	fileName       "$FOAM_CASE/constant/timeVsBottomDisp";
-	outOfBounds    clamp;
+        fileName       "$FOAM_CASE/constant/timeVsBottomDisp";
+        outOfBounds    clamp;
         value          uniform (0 0 0);
     }
 
     topLoading
     {
         type           timeVaryingFixedDisplacement;
-	fileName       "$FOAM_CASE/constant/timeVsTopDisp";
-	outOfBounds    clamp;
+        fileName       "$FOAM_CASE/constant/timeVsTopDisp";
+        outOfBounds    clamp;
         value          uniform (0 0 0);
     }
 

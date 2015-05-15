@@ -16,21 +16,21 @@ FoamFile
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-application	;
-deltaT	0.001;
-endTime	2;
-graphFormat	raw;
-purgeWrite	0;
-runTimeModifiable	yes;
-startFrom	latestTime;
-startTime	0;
-stopAt	endTime;
-timeFormat	general;
-timePrecision	6;
-writeCompression	compressed;
-writeControl	timeStep;
-writeFormat	binary;
-writeInterval	100;
-writePrecision	6;
+application    ;
+deltaT 0.001;
+endTime 2;
+graphFormat raw;
+purgeWrite 0;
+runTimeModifiable yes;
+startFrom latestTime;
+startTime 0;
+stopAt endTime;
+timeFormat general;
+timePrecision 6;
+writeCompression compressed;
+writeControl timeStep;
+writeFormat binary;
+writeInterval 100;
+writePrecision 6;
 
 // ************************************************************************* //

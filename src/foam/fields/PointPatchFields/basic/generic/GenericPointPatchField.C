@@ -340,87 +340,87 @@ GenericPointPatchField
                         tensorFields_.insert(iter().keyword(), fPtr);
                     }
                     else if
-		      (
-		       fieldToken.compoundToken().type()
-		       == token::Compound<List<symmTensor4thOrder> >::typeName
-		       )
-		      {
+                    (
+                        fieldToken.compoundToken().type()
+                     == token::Compound<List<symmTensor4thOrder> >::typeName
+                    )
+                    {
                         symmTensor4thOrderField* fPtr = new symmTensor4thOrderField;
                         fPtr->transfer
-			  (
+                        (
                             dynamicCast
                             <
-			    token::Compound<List<symmTensor4thOrder> >
+                                token::Compound<List<symmTensor4thOrder> >
                             >
-			      (
-			       fieldToken.transferCompoundToken()
-			       )
-			   );
+                            (
+                                fieldToken.transferCompoundToken()
+                            )
+                        );
 
                         if (fPtr->size() != this->size())
-			  {
+                        {
                             FatalIOErrorIn
-			      (
+                            (
                                 "GenericPointPatchField<Type>::"
                                 "GenericPointPatchField"
                                 "(const pointPatch&, const Field<Type>&, "
                                 "const dictionary&)",
                                 dict
-			       )   << "\n    size of field " << iter().keyword()
-				   << " (" << fPtr->size() << ')'
-				   << " is not the same size as the patch ("
-				   << this->size() << ')'
-				   << "\n    on patch " << this->patch().name()
-				   << " of field "
-				   << this->dimensionedInternalField().name()
-				   << " in file "
-				   << this->dimensionedInternalField().objectPath()
-				   << exit(FatalIOError);
-			  }
+                            )   << "\n    size of field " << iter().keyword()
+                                << " (" << fPtr->size() << ')'
+                                << " is not the same size as the patch ("
+                                << this->size() << ')'
+                                << "\n    on patch " << this->patch().name()
+                                << " of field "
+                                << this->dimensionedInternalField().name()
+                                << " in file "
+                                << this->dimensionedInternalField().objectPath()
+                                << exit(FatalIOError);
+                        }
 
                         symmTensor4thOrderFields_.insert(iter().keyword(), fPtr);
-		      }
+                    }
                     else if
-		      (
-		       fieldToken.compoundToken().type()
-		       == token::Compound<List<diagTensor> >::typeName
-		       )
-		      {
+                    (
+                        fieldToken.compoundToken().type()
+                     == token::Compound<List<diagTensor> >::typeName
+                    )
+                    {
                         diagTensorField* fPtr = new diagTensorField;
                         fPtr->transfer
-			  (
+                        (
                             dynamicCast
                             <
-			    token::Compound<List<diagTensor> >
+                                token::Compound<List<diagTensor> >
                             >
-			      (
-			       fieldToken.transferCompoundToken()
-			       )
-			   );
+                            (
+                                fieldToken.transferCompoundToken()
+                            )
+                        );
 
                         if (fPtr->size() != this->size())
-			  {
+                        {
                             FatalIOErrorIn
-			      (
+                            (
                                 "GenericPointPatchField<Type>::"
                                 "GenericPointPatchField"
                                 "(const pointPatch&, const Field<Type>&, "
                                 "const dictionary&)",
                                 dict
-			       )   << "\n    size of field " << iter().keyword()
-				   << " (" << fPtr->size() << ')'
-				   << " is not the same size as the patch ("
-				   << this->size() << ')'
-				   << "\n    on patch " << this->patch().name()
-				   << " of field "
-				   << this->dimensionedInternalField().name()
-				   << " in file "
-				   << this->dimensionedInternalField().objectPath()
-				   << exit(FatalIOError);
-			  }
+                            )   << "\n    size of field " << iter().keyword()
+                                << " (" << fPtr->size() << ')'
+                                << " is not the same size as the patch ("
+                                << this->size() << ')'
+                                << "\n    on patch " << this->patch().name()
+                                << " of field "
+                                << this->dimensionedInternalField().name()
+                                << " in file "
+                                << this->dimensionedInternalField().objectPath()
+                                << exit(FatalIOError);
+                        }
 
                         diagTensorFields_.insert(iter().keyword(), fPtr);
-		      }
+                    }
                     else
                     {
                         FatalIOErrorIn
@@ -531,34 +531,34 @@ GenericPointPatchField
     }
 
     for
-      (
+    (
        HashPtrTable<symmTensor4thOrderField>::const_iterator iter =
-	 ptf.symmTensor4thOrderFields_.begin();
+           ptf.symmTensor4thOrderFields_.begin();
        iter != ptf.symmTensor4thOrderFields_.end();
-        ++iter
-       )
-      {
+       ++iter
+    )
+    {
         symmTensor4thOrderFields_.insert
-	  (
-	   iter.key(),
-	   new symmTensor4thOrderField(*iter(), mapper)
-	   );
-      }
+        (
+            iter.key(),
+            new symmTensor4thOrderField(*iter(), mapper)
+        );
+    }
 
     for
-      (
+    (
        HashPtrTable<diagTensorField>::const_iterator iter =
-	 ptf.diagTensorFields_.begin();
+           ptf.diagTensorFields_.begin();
        iter != ptf.diagTensorFields_.end();
-        ++iter
-       )
-      {
+       ++iter
+    )
+    {
         diagTensorFields_.insert
-	  (
-	   iter.key(),
-	   new diagTensorField(*iter(), mapper)
-	   );
-      }
+        (
+           iter.key(),
+           new diagTensorField(*iter(), mapper)
+        );
+    }
 }
 
 

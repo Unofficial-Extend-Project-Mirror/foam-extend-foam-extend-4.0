@@ -19,7 +19,7 @@ The included solvers feature the following capabilities:
     small strain orthotropic elasticity
     large strain orthotropic elasticity
     cohesive zones
-    	predefined crack path
+        predefined crack path
         arbitrary crack propagation
     custom boundary conditions
     Aitken's under-relaation for displacement field

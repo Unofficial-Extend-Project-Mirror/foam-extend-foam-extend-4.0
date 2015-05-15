@@ -48,8 +48,8 @@ boundaryLayers
 
 renameBoundary
 {
-    defaultName		fixedWalls;
-    defaultType		wall;
+    defaultName fixedWalls;
+    defaultType wall;
 
     newPatchNames
     {

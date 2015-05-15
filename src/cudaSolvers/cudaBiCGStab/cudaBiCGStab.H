@@ -48,7 +48,7 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-			     Class cudaBiCGStab Declaration
+                         Class cudaBiCGStab Declaration
 \*---------------------------------------------------------------------------*/
 
 class cudaBiCGStab
@@ -57,11 +57,11 @@ class cudaBiCGStab
 {
     // Private Member Functions
 
-	//- Disallow default bitwise copy construct
-	cudaBiCGStab(const cudaBiCGStab&);
+    //- Disallow default bitwise copy construct
+    cudaBiCGStab(const cudaBiCGStab&);
 
-	//- Disallow default bitwise assignment
-	void operator=(const cudaBiCGStab&);
+    //- Disallow default bitwise assignment
+    void operator=(const cudaBiCGStab&);
 
 
 public:
@@ -72,33 +72,33 @@ public:
 
     // Constructors
 
-	//- Construct from matrix components and solver data stream
-	cudaBiCGStab
-	(
-	    const word& fieldName,
-	    const lduMatrix& matrix,
-	    const FieldField<Field, scalar>& coupleBouCoeffs,
-	    const FieldField<Field, scalar>& coupleIntCoeffs,
-	    const lduInterfaceFieldPtrsList& interfaces,
-	    const dictionary& dict
-	);
+    //- Construct from matrix components and solver data stream
+    cudaBiCGStab
+    (
+        const word& fieldName,
+        const lduMatrix& matrix,
+        const FieldField<Field, scalar>& coupleBouCoeffs,
+        const FieldField<Field, scalar>& coupleIntCoeffs,
+        const lduInterfaceFieldPtrsList& interfaces,
+        const dictionary& dict
+    );
 
 
     // Destructor
 
-	virtual ~cudaBiCGStab()
-	{}
+    virtual ~cudaBiCGStab()
+    {}
 
 
     // Member Functions
 
-	//- Solve the matrix with this solver
-	virtual lduSolverPerformance solve
-	(
-	    scalarField& x,
-	    const scalarField& b,
-	    const direction cmpt = 0
-	) const;
+    //- Solve the matrix with this solver
+    virtual lduSolverPerformance solve
+    (
+        scalarField& x,
+        const scalarField& b,
+        const direction cmpt = 0
+    ) const;
 };
 
 

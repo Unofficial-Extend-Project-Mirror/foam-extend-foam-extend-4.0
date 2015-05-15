@@ -43,7 +43,7 @@ namespace Foam
     polyPatch::disallowGenericPolyPatch
     (
         "disallowGenericPolyPatch",
-	0
+        0
     );
 
     defineRunTimeSelectionTable(polyPatch, word);

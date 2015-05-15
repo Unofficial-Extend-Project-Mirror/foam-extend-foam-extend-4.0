@@ -45,9 +45,9 @@ namespace Foam
 {
     defineTypeNameAndDebugWithDescription
     (
-	ggiPolyPatch,
-	0,
-	"If value > 1, write uncovered GGI patch facets to VTK file"
+        ggiPolyPatch,
+        0,
+        "If value > 1, write uncovered GGI patch facets to VTK file"
     );
 
     addToRunTimeSelectionTable(polyPatch, ggiPolyPatch, word);
