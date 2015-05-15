@@ -73,6 +73,33 @@ setenv WM_PROJECT_USER_DIR $HOME/$WM_PROJECT/$LOGNAME-$WM_PROJECT_VERSION
 #setenv WM_THIRD_PARTY_DIR $WM_PROJECT_INST_DIR/ThirdParty-$WM_PROJECT_VERSION
 setenv WM_THIRD_PARTY_DIR $WM_PROJECT_DIR/ThirdParty
 
+# Enabling the usage of third-party software
+# This can be overriden in prefs.sh
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# For AllMake.stage1
+setenv WM_THIRD_PARTY_USE_CMAKE_2812 1
+
+#
+# For AllMake.stage2
+setenv WM_THIRD_PARTY_USE_OPENMPI_165 1
+
+#
+# For AllMake.stage3
+setenv WM_THIRD_PARTY_USE_METIS_510 1
+setenv WM_THIRD_PARTY_USE_PARMGRIDGEN_10 1
+setenv WM_THIRD_PARTY_USE_LIBCCMIO_261 1
+setenv WM_THIRD_PARTY_USE_MESQUITE_212 1
+setenv WM_THIRD_PARTY_USE_SCOTCH_600 1
+setenv WM_THIRD_PARTY_USE_PARMETIS_403 1
+setenv WM_THIRD_PARTY_USE_PYFOAM_064 1
+setenv WM_THIRD_PARTY_USE_HWLOC_172 1
+
+#
+# For AllMake.stage4
+setenv WM_THIRD_PARTY_USE_QT_486 1
+setenv WM_THIRD_PARTY_USE_PARAVIEW_401 1
+
+
 # Source files, possibly with some verbosity
 alias _foamSource 'if ($?FOAM_VERBOSE && $?prompt) echo "Sourcing: \!*"; source \!*'
 

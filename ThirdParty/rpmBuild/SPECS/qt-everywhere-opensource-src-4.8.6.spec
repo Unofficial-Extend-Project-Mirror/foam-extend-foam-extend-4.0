@@ -28,7 +28,7 @@
 #     RPM spec file for creating a relocatable RPM
 #
 # Author:
-#     Martin Beaudoin, Hydro-Quebec, (2014)
+#     Martin Beaudoin, Hydro-Quebec, (2015)
 #
 #------------------------------------------------------------------------------
 
@@ -75,7 +75,7 @@ License: 		Unkown
 Name: 			%{name}
 Version: 		%{version}
 Release: 		%{release}
-URL:                    http://download.qt-project.org/official_releases/qt/4.8/4.8.6
+URL:                    http://download.qt.io/archive/qt/4.8/4.8.6/qt-everywhere-opensource-src-4.8.6.tar.gz
 Source: 		%url/%{name}-%{version}.tar.gz
 Prefix: 		%{_prefix}
 Group: 			Development/Tools

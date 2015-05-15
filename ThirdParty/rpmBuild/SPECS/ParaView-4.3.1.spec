@@ -77,7 +77,7 @@ URL:                    http://www.paraview.org/files/v4.3/
 Source: 		%url/%{name}-v%{version}-source.tar.gz
 Prefix: 		%{_prefix}
 Group: 			Development/Tools
-Patch0:                 paraview-4.3.1.patch_darwin
+Patch0:                 ParaView-4.3.1.patch_darwin
 
 %define _installPrefix  %{_prefix}/packages/%{name}-%{version}/platforms/%{_WM_OPTIONS}
 
@@ -145,15 +145,15 @@ Patch0:                 paraview-4.3.1.patch_darwin
     set -x
 
     # start with these general settings
-    addCMakeVariable  VTK_USE_TK:BOOL=OFF
-    addCMakeVariable  BUILD_SHARED_LIBS:BOOL=ON  VTK_USE_RPATH:BOOL=OFF
+    addCMakeVariable  BUILD_SHARED_LIBS:BOOL=ON
     addCMakeVariable  CMAKE_BUILD_TYPE:STRING=Release
+    addCMakeVariable  BUILD_TESTING:BOOL=OFF
+
+    # We build with Python. This is ust too useful
+    addCMakeVariable  PARAVIEW_ENABLE_PYTHON:BOOL=ON
 
     # include development files in "make install"
     addCMakeVariable  PARAVIEW_INSTALL_DEVELOPMENT_FILES:BOOL=ON
-
-    # new alternative to "make HTMLDocumentation"
-    addCMakeVariable  PARAVIEW_GENERATE_PROXY_DOCUMENTATION:BOOL=ON
 
  %ifos darwin
     # Additional installation rules for Mac OS X 
@@ -206,7 +206,7 @@ cat << DOT_SH_EOF > $RPM_BUILD_ROOT/%{_installPrefix}/etc/%{name}-%{version}.sh
 export PARAVIEW_DIR=\$WM_THIRD_PARTY_DIR/packages/%{name}-%{version}/platforms/\$WM_OPTIONS
 export PARAVIEW_BIN_DIR=\$PARAVIEW_DIR/bin
 export PARAVIEW_LIB_DIR=\$PARAVIEW_DIR/lib
-export PARAVIEW_INCLUDE_DIR=\$PARAVIEW_DIR/include/paraview-4.2
+export PARAVIEW_INCLUDE_DIR=\$PARAVIEW_DIR/include/paraview-4.3
 
 export PARAVIEW_VERSION=%{version}
 
@@ -217,7 +217,7 @@ export PARAVIEW_VERSION=%{version}
 #     startup of paraview or even make paraview crash on startup.
 export PV_PLUGIN_PATH=\$FOAM_LIBBIN/paraview_plugins
 
-[ -d \$PARAVIEW_LIB_DIR/paraview-4.2 ] && _foamAddLib \$PARAVIEW_LIB_DIR/paraview-4.2
+[ -d \$PARAVIEW_LIB_DIR/paraview-4.3 ] && _foamAddLib \$PARAVIEW_LIB_DIR/paraview-4.3
 
 # Enable access to the package applications if present
 [ -d \$PARAVIEW_BIN_DIR ] && _foamAddPath \$PARAVIEW_BIN_DIR
@@ -236,7 +236,7 @@ cat << DOT_CSH_EOF > $RPM_BUILD_ROOT/%{_installPrefix}/etc/%{name}-%{version}.cs
 setenv PARAVIEW_DIR \$WM_THIRD_PARTY_DIR/packages/%{name}-%{version}/platforms/\$WM_OPTIONS
 setenv PARAVIEW_BIN_DIR \$PARAVIEW_DIR/bin
 setenv PARAVIEW_LIB_DIR \$PARAVIEW_DIR/lib
-setenv PARAVIEW_INCLUDE_DIR \$PARAVIEW_DIR/include/paraview-4.2
+setenv PARAVIEW_INCLUDE_DIR \$PARAVIEW_DIR/include/paraview-4.3
 
 setenv PARAVIEW_VERSION %{version}
 
@@ -251,8 +251,8 @@ if ( -e \$PARAVIEW_BIN_DIR ) then
     _foamAddPath \$PARAVIEW_BIN_DIR
 endif
 
-if ( -e \$PARAVIEW_LIB_DIR/paraview-4.2 ) then
-    _foamAddLib \$PARAVIEW_LIB_DIR/paraview-4.2
+if ( -e \$PARAVIEW_LIB_DIR/paraview-4.3 ) then
+    _foamAddLib \$PARAVIEW_LIB_DIR/paraview-4.3
 endif
 
 

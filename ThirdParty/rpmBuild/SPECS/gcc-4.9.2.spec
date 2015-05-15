@@ -28,7 +28,7 @@
 #     RPM spec file for creating a relocatable RPM
 #
 # Author:
-#     Hrvoje Jasak, Wikki Ltd. (2015)
+#     Martin Beaudoin, Hydro-Quebec, (2015)
 #
 #------------------------------------------------------------------------------
 
@@ -94,21 +94,58 @@ Group: 			Development/Tools
     [ -n "$WM_CXXFLAGS" ]   &&  export CXXFLAGS="$WM_CXXFLAGS"
     [ -n "$WM_LDFLAGS" ]    &&  export LDFLAGS="$WM_LDFLAGS"
 
-    GMP_VERSION=gmp-5.1.2
+    GMP_VERSION=gmp-6.0.0
     MPFR_VERSION=mpfr-3.1.2
-    MPC_VERSION=mpc-1.0.1
+    MPC_VERSION=mpc-1.0.3
+    ISL_VERSION=isl-0.12.2
+    CLOOG_VERSION=cloog-0.18.1
+
+    # Download dependency packages and add them as builtin components for gcc
+    #GMP
+    wget ftp://ftp.gnu.org/gnu/gmp/${GMP_VERSION}a.tar.xz
+    tar -xf ${GMP_VERSION}a.tar.xz
+    mv ${GMP_VERSION} gmp
+
+    #MPFR
+    wget ftp://ftp.gnu.org/gnu/mpfr/$MPFR_VERSION.tar.gz
+    tar -xf $MPFR_VERSION.tar.gz
+    mv ${MPFR_VERSION} mpfr
+
+    #MPC
+    wget ftp://ftp.gnu.org/gnu/mpc/$MPC_VERSION.tar.gz
+    tar -xf $MPC_VERSION.tar.gz
+    mv ${MPC_VERSION} mpc
+    
+    #ISL
+    wget ftp://gcc.gnu.org/pub/gcc/infrastructure/$ISL_VERSION.tar.bz2
+    tar -xf $ISL_VERSION.tar.bz2
+    mv ${ISL_VERSION} isl
+
+    #CLOOG
+    wget ftp://gcc.gnu.org/pub/gcc/infrastructure/$CLOOG_VERSION.tar.gz
+    tar -xf $CLOOG_VERSION.tar.gz
+    mv ${CLOOG_VERSION} cloog
 
     mkdir ./objBuildDir
     cd ./objBuildDir
 
+%ifos darwin
+    # Use 'bootstrap-debug' build configuration to force stripping of object
+    # files prior to comparison during bootstrap (broken by Xcode 6.3).
+    # Fix taken from HomeBrew and MacPorts projects
     ../configure     \
-        --prefix=%{_installPrefix}  \
-        --enable-languages=c,c++  \
-        --enable-shared           \
-        --disable-multilib        \
-	--with-mpc=$WM_THIRD_PARTY_DIR/packages/$MPC_VERSION/platforms/$WM_OPTIONS \
-	--with-gmp=$WM_THIRD_PARTY_DIR/packages/$GMP_VERSION/platforms/$WM_OPTIONS \
-	--with-mpfr=$WM_THIRD_PARTY_DIR/packages/$MPFR_VERSION/platforms/$WM_OPTIONS
+        --prefix=%{_installPrefix} \
+        --enable-languages=c,c++   \
+        --enable-shared            \
+        --with-build-config=bootstrap-debug \
+	--disable-multilib
+%else
+    ../configure     \
+        --prefix=%{_installPrefix} \
+        --enable-languages=c,c++   \
+        --enable-shared            \
+	--disable-multilib
+%endif
 
     [ -z "$WM_NCOMPPROCS" ] && WM_NCOMPPROCS=1
     make -j $WM_NCOMPPROCS
