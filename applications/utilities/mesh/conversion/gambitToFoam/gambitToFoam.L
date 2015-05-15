@@ -33,9 +33,9 @@ Description
 
 #undef yyFlexLexer
 
-/* ------------------------------------------------------------------------- *\
+ /* ------------------------------------------------------------------------- *\
    ------ local definitions
-\* ------------------------------------------------------------------------- */
+ \* ------------------------------------------------------------------------- */
 
 #include "scalarList.H"
 #include "IStringStream.H"
@@ -150,9 +150,9 @@ nFlags                {space}"NFLAGS:"{space}
 mtype                 {space}"MTYPE:"{space}
 
 
-/* ------------------------------------------------------------------------- *\
+ /* ------------------------------------------------------------------------- *\
                       -----  Exclusive start states -----
-\* ------------------------------------------------------------------------- */
+ \* ------------------------------------------------------------------------- */
 
 %option stack
 
@@ -193,11 +193,11 @@ mtype                 {space}"MTYPE:"{space}
 %}
 
 
-/* ------------------------------------------------------------------------- *\
+ /* ------------------------------------------------------------------------- *\
                             ------ Start Lexing ------
-\* ------------------------------------------------------------------------- */
+ \* ------------------------------------------------------------------------- */
 
-/*                      ------ Reading control header ------                 */
+ /*                      ------ Reading control header ------                 */
 
 {controlInfo} {
         BEGIN(readControlHeader);
@@ -289,7 +289,7 @@ mtype                 {space}"MTYPE:"{space}
     }
 
 
-/*                 ------  Reading nodal coordinates ------                 */
+ /*                 ------  Reading nodal coordinates ------                 */
 
 {nodalCoords}{spaceNl} {
 
@@ -317,7 +317,7 @@ mtype                 {space}"MTYPE:"{space}
     }
 
 
-/*                   ------ Reading cells and elements ------                */
+ /*                   ------ Reading cells and elements ------               */
 
 {cellsAndElements}{spaceNl} {
 
@@ -409,7 +409,7 @@ mtype                 {space}"MTYPE:"{space}
     }
 
 
-/*             ------ Reading element group information ------               */
+ /*             ------ Reading element group information ------               */
 
 {cellStreams}{spaceNl} {
         Info<< "Reading cell streams" << endl;
@@ -515,7 +515,7 @@ mtype                 {space}"MTYPE:"{space}
     }
 
 
-/*            ------  Reading end of section and others ------               */
+ /*            ------  Reading end of section and others ------               */
 
 <cellStreamLabels>{endOfSection}\n {
 
@@ -601,19 +601,19 @@ mtype                 {space}"MTYPE:"{space}
     }
 
 
-/*             ------ Reading end of section and others ------               */
+ /*             ------ Reading end of section and others ------               */
 
 <controlInfo,nodalCoords,cellsAndElements>{endOfSection}\n {
         BEGIN(INITIAL);
     }
 
 
-/* ------ Ignore remaining space and \n s.  Any other characters are errors. */
+ /* ------ Ignore remaining space and \n s.  Any other characters are errors. */
 
 .|\n {}
 
 
-/*  ------ On EOF return to previous file, if none exists terminate. ------  */
+ /*  ------ On EOF return to previous file, if none exists terminate. ------  */
 
 <<EOF>> {
             yyterminate();
@@ -869,6 +869,6 @@ int main(int argc, char *argv[])
 }
 
 
-/* ------------------------------------------------------------------------- *\
+ /* ------------------------------------------------------------------------- *\
     ------ End of gambitToFoam.L
-\* ------------------------------------------------------------------------- */
+ \* ------------------------------------------------------------------------- */
