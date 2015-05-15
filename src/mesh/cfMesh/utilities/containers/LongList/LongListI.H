@@ -44,13 +44,13 @@ void Foam::LongList<T, Offset>::initializeParameters()
 {
     unsigned int t = sizeof(T);
     label it(0);
-    
+
     while( t > 1 )
     {
         t >>= 1;
         ++it;
     }
-    
+
     shift_ = Foam::max(10, Offset - it);
     mask_ = 1<<shift_;
     mask_ -= 1;
@@ -64,10 +64,10 @@ inline void Foam::LongList<T, Offset>::allocateSize(const label s)
         clearOut();
         return;
     }
-    
+
     const label numblock1 = ((s-1)>>shift_) + 1;
     const label blockSize = 1<<shift_;
-   
+
     if( numblock1 < numBlocks_ )
     {
         for(register label i=numblock1;i<numBlocks_;++i)
@@ -81,20 +81,20 @@ inline void Foam::LongList<T, Offset>::allocateSize(const label s)
             {
                 numAllocatedBlocks_ += 64;
             } while( numblock1 > numAllocatedBlocks_ );
-            
+
             T** dataptr1 = new T*[numAllocatedBlocks_];
             for(register label i=0;i<numBlocks_;++i)
                 dataptr1[i] = dataPtr_[i];
-            
+
             if( dataPtr_ )
                 delete [] dataPtr_;
             dataPtr_ = dataptr1;
         }
-        
+
         for(register label i=numBlocks_;i<numblock1;++i)
             dataPtr_[i] = new T[blockSize];
     }
-    
+
     numBlocks_ = numblock1;
     N_ = numBlocks_ * blockSize;
 }
@@ -104,13 +104,13 @@ void Foam::LongList<T, Offset>::clearOut()
 {
     for(register label i=0;i<numBlocks_;++i)
         delete [] dataPtr_[i];
-    
+
     if( dataPtr_ )
     {
         delete [] dataPtr_;
         dataPtr_ = NULL;
     }
-    
+
     N_ = 0;
     numBlocks_ = 0;
     numAllocatedBlocks_ = 0;
@@ -243,7 +243,7 @@ inline void Foam::LongList<T, Offset>::transfer(LongList<T, Offset>& ol)
     numAllocatedBlocks_ = ol.numAllocatedBlocks_;
     shift_ = ol.shift_;
     mask_ = ol.mask_;
-    
+
     ol.dataPtr_ = NULL;
     ol.N_ = 0;
     ol.nextFree_ = 0;
@@ -259,7 +259,7 @@ inline void Foam::LongList<T, Offset>::append(const T& e)
     {
         allocateSize(nextFree_+1);
     }
-    
+
     operator[](nextFree_++) = e;
 }
 
@@ -276,7 +276,7 @@ inline bool Foam::LongList<T, Offset>::contains(const T& e) const
     for(register label i=0;i<nextFree_;++i)
         if( (*this)[i] == e )
             return true;
-        
+
     return false;
 }
 
@@ -289,7 +289,7 @@ inline Foam::label Foam::LongList<T, Offset>::containsAtPosition
     for(register label i=0;i<nextFree_;++i)
         if( (*this)[i] == e )
             return i;
-        
+
     return -1;
 }
 
@@ -303,7 +303,7 @@ inline T Foam::LongList<T, Offset>::remove(const label i)
             "void Foam::LongList<T, Offset>::remove()"
         )   << "List is empty" << abort(FatalError);
     }
-    
+
     T el = operator[](i);
     operator[](i) = operator[](nextFree_-1);
     --nextFree_;
@@ -320,7 +320,7 @@ inline T Foam::LongList<T, Offset>::removeLastElement()
             "void Foam::LongList<T, Offset>::remove()"
         )   << "List is empty" << abort(FatalError);
     }
-    
+
     T lastEl = operator[](nextFree_-1);
     --nextFree_;
     return lastEl;
@@ -335,7 +335,7 @@ inline const T& Foam::LongList<T, Offset>::operator[](const label i) const
     #ifdef FULLDEBUG
     checkIndex(i);
     #endif
-        
+
     return dataPtr_[i>>shift_][i&mask_];
 }
 
@@ -345,7 +345,7 @@ inline T& Foam::LongList<T, Offset>::operator[](const label i)
     #ifdef FULLDEBUG
     checkIndex(i);
     #endif
-        
+
     return dataPtr_[i>>shift_][i&mask_];
 }
 

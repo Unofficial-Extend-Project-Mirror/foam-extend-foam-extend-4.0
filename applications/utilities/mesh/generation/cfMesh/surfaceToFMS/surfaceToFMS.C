@@ -22,7 +22,7 @@ License
     along with cfMesh.  If not, see <http://www.gnu.org/licenses/>.
 
 Description
-    Reads the specified surface and writes it in the fms format. 
+    Reads the specified surface and writes it in the fms format.
 
 \*---------------------------------------------------------------------------*/
 

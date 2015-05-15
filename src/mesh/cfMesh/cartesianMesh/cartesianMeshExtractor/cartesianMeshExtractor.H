@@ -42,7 +42,7 @@ SourceFiles
 
 namespace Foam
 {
-    
+
 class IOdictionary;
 
 /*---------------------------------------------------------------------------*\
@@ -54,13 +54,13 @@ class cartesianMeshExtractor
     // Private data
         //- reference to the octree addressing
         meshOctreeAddressing octreeCheck_;
-    
+
         //- reference to the mesh
         polyMeshGen& mesh_;
-    
+
         //- decompose split hex cells
         bool decomposeSplitHexes_;
-    
+
         //- cell label for a given leaf
         labelList* leafCellLabelPtr_;
 
@@ -73,7 +73,7 @@ class cartesianMeshExtractor
 
         //- create mesh data
         void createPolyMesh();
-        
+
         //- decompose split hexes into pyramids and tets
         void decomposeSplitHexesIntoTetsAndPyramids();
 
@@ -105,7 +105,7 @@ public:
 
         //- decompose split hexes into standard cells
         void decomposeSplitHexes();
-        
+
         //- create the mesh with the above options
         void createMesh();
 };

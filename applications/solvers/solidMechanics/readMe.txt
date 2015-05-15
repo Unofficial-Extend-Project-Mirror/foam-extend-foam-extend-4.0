@@ -23,7 +23,7 @@ The included solvers feature the following capabilities:
         arbitrary crack propagation
     custom boundary conditions
     Aitken's under-relaation for displacement field
-    
+
 A number of people have contributed to the development of the solvers,
 mainly within Alojz Ivankovic's research group. The code has been
 assembled and is maintained by Philip Cardiff (University College Dublin),

@@ -219,7 +219,7 @@ public:
                 const bool incrementColumnDir
             );
 
-            //- Insert scalar equation coupling into this fvBlockMatrix 
+            //- Insert scalar equation coupling into this fvBlockMatrix
             //  Source compensation is done in function updateSourceCoupling()
             //  after all coupling terms are added.  HJ, 27/Apr/2015
             void insertEquationCoupling
@@ -228,7 +228,7 @@ public:
                 const direction dirJ,
                 const scalarField& coeffIJ
             );
-            
+
             //- Add field into block field
             void blockAdd
             (
@@ -239,7 +239,7 @@ public:
 
             //- Update coupling of block system.
             //  Subtracts the block-coefficient coupling as specified by the
-            //  user from the source, leaving the implicit update given by 
+            //  user from the source, leaving the implicit update given by
             //  linearisation
             void updateSourceCoupling();
 

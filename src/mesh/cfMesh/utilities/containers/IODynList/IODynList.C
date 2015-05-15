@@ -81,7 +81,7 @@ IODynList<T, IndexType>::IODynList
         readStream(typeName) >> *this;
         close();
     }
-    
+
     DynList<T, IndexType>::operator=(list);
 }
 

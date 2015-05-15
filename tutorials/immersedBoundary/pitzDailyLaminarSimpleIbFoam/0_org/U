@@ -38,7 +38,7 @@ boundaryField
     inlet
     {
         type fixedValue;
-        value           nonuniform List<vector> 
+        value           nonuniform List<vector>
 34
 (
 (0 0 0)

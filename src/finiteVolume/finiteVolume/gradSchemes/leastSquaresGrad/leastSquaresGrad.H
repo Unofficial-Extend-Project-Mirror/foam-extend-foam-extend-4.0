@@ -97,7 +97,7 @@ public:
             const GeometricField<Type, fvPatchField, volMesh>&
         ) const;
 
-        //- Return the BlockLduSystem corresponding to the implicit least 
+        //- Return the BlockLduSystem corresponding to the implicit least
         // quares grad discretization. For block coupled systems.
         tmp
         <

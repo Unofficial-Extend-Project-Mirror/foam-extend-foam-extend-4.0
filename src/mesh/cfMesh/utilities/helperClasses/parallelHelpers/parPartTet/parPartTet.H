@@ -46,19 +46,19 @@ namespace Foam
 /*---------------------------------------------------------------------------*\
                            Class parPartTet Declaration
 \*---------------------------------------------------------------------------*/
-        
+
 class parPartTet
 {
     // Private data
         labelledPoint pts_[4];
-    
+
 public:
-        
+
     // Constructors
-    
+
         inline parPartTet()
         {}
-        
+
         explicit inline parPartTet
         (
             const labelledPoint& p0,
@@ -72,31 +72,31 @@ public:
             pts_[2] = p2;
             pts_[3] = p3;
         }
-        
+
     // Destructor
-        
+
         ~parPartTet()
         {}
-            
+
     // Member functions
-        
+
     // Member operators
-            
+
         inline const labelledPoint& operator[](const label i) const
         {
             return pts_[i];
         }
-        
+
         inline bool operator !=(const parPartTet& ptf) const
         {
             Serr << "Not implemented" << endl;
             ::exit(1);
-            
+
             return true;
         }
-        
+
     // Friend operators
-        
+
         inline friend Ostream& operator<<(Ostream& os, const parPartTet& ppt)
         {
             os << token::BEGIN_LIST;
@@ -110,21 +110,21 @@ public:
             os.check("operator<<(Ostream&, const parPartTet&");
             return os;
         }
-        
+
         inline friend Istream& operator>>(Istream& is, parPartTet& ppt)
         {
             // Read beginning of parPartTet
             is.readBegin("parPartTet");
-        
+
             for(label i=0;i<4;++i)
                 is >> ppt.pts_[i];
-            
+
             // Read end of parHelper
             is.readEnd("parPartTet");
-        
+
             // Check state of Istream
             is.check("operator>>(Istream&, parPartTet");
-            
+
             return is;
         }
 };

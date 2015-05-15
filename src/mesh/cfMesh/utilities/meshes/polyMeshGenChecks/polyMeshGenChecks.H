@@ -50,7 +50,7 @@ namespace Foam
 
 namespace polyMeshGenChecks
 {
-    
+
 // Check geometry
 //- Check boundary closedness
 bool checkClosedBoundary(const polyMeshGen&, const bool report = false);
@@ -193,7 +193,7 @@ bool checkFaceVertices
 //- Check mesh topology for correctness. Returns false for no error.
 bool checkTopology(const polyMeshGen&, const bool report = false);
 
-//- Check mesh geometry (& implicitly topology) for correctness. 
+//- Check mesh geometry (& implicitly topology) for correctness.
 //  Returns false for no error.
 bool checkGeometry(const polyMeshGen&, const bool report = false);
 

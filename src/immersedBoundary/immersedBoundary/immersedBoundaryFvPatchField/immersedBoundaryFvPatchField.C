@@ -651,7 +651,7 @@ void immersedBoundaryFvPatchField<Type>::correctOffDiag
 
                     eqn.internalCoeffs()[patchi][patchFacei] =
                         pTraits<Type>::zero;
-                    
+
                     eqn.boundaryCoeffs()[patchi][patchFacei] =
                         pTraits<Type>::zero;
 
@@ -717,7 +717,7 @@ void immersedBoundaryFvPatchField<Type>::motionUpdate() const
 template<class Type>
 void immersedBoundaryFvPatchField<Type>::setIbCellValues
 (
-    const Field<Type>& ibcValues 
+    const Field<Type>& ibcValues
 ) const
 {
     const labelList& ibc = ibPatch_.ibCells();

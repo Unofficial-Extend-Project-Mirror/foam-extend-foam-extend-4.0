@@ -1095,7 +1095,7 @@ int main(int argc, char *argv[])
     {
         mesh.addZones(List<pointZone*>(0), fz, cz);
     }
-    
+
     removeEmptyPatches(mesh);
 
     mesh.write();

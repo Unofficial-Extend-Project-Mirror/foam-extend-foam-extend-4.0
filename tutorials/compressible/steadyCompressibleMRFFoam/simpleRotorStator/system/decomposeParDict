@@ -13,15 +13,15 @@ FoamFile
     object      decomposeParDict;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
- 
+
 numberOfSubdomains    4;
- 
+
 method           scotch;
- 
-distributed     no; 
- 
+
+distributed     no;
+
 roots
 (
 );
- 
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

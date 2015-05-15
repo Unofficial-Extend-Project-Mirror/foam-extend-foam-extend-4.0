@@ -37,9 +37,9 @@ Description
 
 namespace Foam
 {
-    
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-    
+
 void partTriMesh::createPointsAndTrias
 (
     const List<direction>& useFace
@@ -52,7 +52,7 @@ void partTriMesh::createPointsAndTrias
     const labelList& bPoints = meshSurface.boundaryPoints();
     const labelList& bp = meshSurface.bp();
     const faceList::subList& bFaces = meshSurface.boundaryFaces();
-    
+
     meshSurfacePointLabelInTriMesh_.setSize(bPoints.size());
     meshSurfacePointLabelInTriMesh_ = -1;
     labelList nodeLabelForFace(bFaces.size(), -1);
@@ -128,7 +128,7 @@ void partTriMesh::createPointsAndTrias
             pts[npI] = points[bPoints[bpI]];
             pointType_[npI] |= SMOOTH;
         }
-    
+
     forAll(nodeLabelForFace, bfI)
         if( nodeLabelForFace[bfI] != -1 )
         {
@@ -148,7 +148,7 @@ void partTriMesh::createPointsAndTrias
         if( pI != -1 )
             pointType_[pI] |= FEATUREEDGE;
     }
-    
+
     //- create addressing for parallel runs
     if( Pstream::parRun() )
     {
@@ -157,7 +157,7 @@ void partTriMesh::createPointsAndTrias
             meshSurfacePointLabelInTriMesh_,
             nodeLabelForFace
         );
-        
+
         createBufferLayers();
     }
 }

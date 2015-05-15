@@ -42,7 +42,7 @@ namespace RASModels
 
 void immersedBoundaryVelocityWallFunctionFvPatchVectorField::setIbCellValues
 (
-    const vectorField& ibcValues 
+    const vectorField& ibcValues
 ) const
 {
     const labelList& ibc = ibPatch().ibCells();

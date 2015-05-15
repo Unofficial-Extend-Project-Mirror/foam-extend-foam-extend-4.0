@@ -17,7 +17,7 @@ cd $WM_THIRD_PARTY_DIR
 ./AllMake.stage2  2>&1 | tee --append $BOOTSTRAPLOG
 source $WM_PROJECT_DIR/etc/bashrc
 if [ ! -e $MPI_ARCH_PATH/lib ]
-then 
+then
     # OpenSUSE needs this
     ln -s $MPI_ARCH_PATH/lib64 $MPI_ARCH_PATH/lib
 fi

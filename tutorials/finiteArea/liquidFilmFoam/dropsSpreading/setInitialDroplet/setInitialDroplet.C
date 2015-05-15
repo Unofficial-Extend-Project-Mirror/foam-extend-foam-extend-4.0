@@ -55,7 +55,7 @@ int main(int argc, char *argv[])
         ),
         aMesh
     );
-    
+
     scalar D = 0.000038;
     scalar A = 0.0014;
     scalar R = (sqr(A) + sqr(D))/(2*D);

@@ -20,7 +20,7 @@ FoamFile
     left
     {
         type            patch;
-        edgeLabels      List<label> 
+        edgeLabels      List<label>
 100
 (
 19800
@@ -130,7 +130,7 @@ FoamFile
     right
     {
         type            patch;
-        edgeLabels      List<label> 
+        edgeLabels      List<label>
 100
 (
 20098
@@ -240,7 +240,7 @@ FoamFile
     front
     {
         type            patch;
-        edgeLabels      List<label> 
+        edgeLabels      List<label>
 100
 (
 19801
@@ -350,7 +350,7 @@ FoamFile
     back
     {
         type            patch;
-        edgeLabels      List<label> 
+        edgeLabels      List<label>
 100
 (
 19901

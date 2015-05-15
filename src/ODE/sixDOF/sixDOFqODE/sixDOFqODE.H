@@ -246,7 +246,7 @@ public:
             inline dimensionedScalar rotAngle() const;
 
 
-        // Non-constant access to 
+        // Non-constant access to
 
             //- Set position of origin
             inline void setXrel(const vector& x);

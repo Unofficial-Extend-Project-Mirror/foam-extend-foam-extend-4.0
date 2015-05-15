@@ -39,7 +39,7 @@ namespace Foam
 inline partTet::partTet()
 {
 }
-    
+
 inline partTet::partTet
 (
     const label a,
@@ -90,7 +90,7 @@ inline label partTet::whichPosition(const label pointI) const
     for(label i=0;i<4;++i)
         if( data_[i] == pointI )
             return i;
-        
+
     return -1;
 }
 
@@ -103,7 +103,7 @@ inline vector partTet::Sa(const PointField& points) const
         points[data_[2]],
         points[data_[3]]
     );
-    
+
     return tria.normal();
     //return triangle<point, point>(b_, c_, d_).normal();
 }
@@ -117,7 +117,7 @@ inline vector partTet::Sb(const PointField& points) const
         points[data_[3]],
         points[data_[2]]
     );
-    
+
     return tria.normal();
     //return triangle<point, point>(a_, d_, c_).normal();
 }
@@ -131,7 +131,7 @@ inline vector partTet::Sc(const PointField& points) const
         points[data_[1]],
         points[data_[3]]
     );
-    
+
     return tria.normal();
     //return triangle<point, point>(a_, b_, d_).normal();
 }
@@ -145,7 +145,7 @@ inline vector partTet::Sd(const PointField& points) const
         points[data_[2]],
         points[data_[1]]
     );
-    
+
     return tria.normal();
     //return triangle<point, point>(a_, c_, b_).normal();
 }
@@ -160,7 +160,7 @@ inline scalar partTet::mag(const PointField& points) const
         points[data_[2]],
         points[data_[3]]
     );
-    
+
     return tet.mag();
     //return (1.0/6.0)*(((b_ - a_) ^ (c_ - a_)) & (d_ - a_));
 }
@@ -175,7 +175,7 @@ inline point partTet::crcmCentre(const PointField& points) const
         points[data_[2]],
         points[data_[3]]
     );
-    
+
     return tet.circumCentre();
 }
 
@@ -189,7 +189,7 @@ inline scalar partTet::crcmRadius(const PointField& points) const
         points[data_[2]],
         points[data_[3]]
     );
-    
+
     return tet.circumRadius();
 }
 
@@ -199,7 +199,7 @@ inline point partTet::centroid(const PointField& points) const
     point p = points[data_[0]];
     for(label i=1;i<4;++i)
         p += points[data_[i]];
-    
+
     p /= 4;
     return p;
 }

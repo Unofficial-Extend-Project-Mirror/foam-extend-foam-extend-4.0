@@ -47,18 +47,18 @@ namespace Foam
 /*---------------------------------------------------------------------------*\
                 Class labelledMeshOctreeCubeCoordinates Declaration
 \*---------------------------------------------------------------------------*/
-    
+
 class labelledMeshOctreeCubeCoordinates
 {
     // Private data
         //- label
         label cLabel_;
-    
+
         //- cube coordinates
         meshOctreeCubeCoordinates coordinates_;
-    
+
     public:
-        
+
     // Constructors
         //- Null construct
         labelledMeshOctreeCubeCoordinates()
@@ -66,7 +66,7 @@ class labelledMeshOctreeCubeCoordinates
             cLabel_(-1),
             coordinates_()
         {}
-        
+
         //- Construct from label and cube coordinates
         labelledMeshOctreeCubeCoordinates
         (
@@ -77,32 +77,32 @@ class labelledMeshOctreeCubeCoordinates
             cLabel_(cl),
             coordinates_(cc)
         {}
-            
+
     // Destructor
         ~labelledMeshOctreeCubeCoordinates()
         {}
-            
+
     // Member functions
         //- return cube label
         inline label cubeLabel() const
         {
             return cLabel_;
         }
-        
+
         //- return the value
         inline const meshOctreeCubeCoordinates& coordinates() const
         {
             return coordinates_;
         }
-        
+
     // Member operators
-        
+
         inline void operator=(const labelledMeshOctreeCubeCoordinates& lcc)
         {
             cLabel_ = lcc.cLabel_;
             coordinates_ = lcc.coordinates_;
         }
-        
+
         inline bool operator==
         (
             const labelledMeshOctreeCubeCoordinates& lcc
@@ -110,10 +110,10 @@ class labelledMeshOctreeCubeCoordinates
         {
             if( cLabel_ == lcc.cLabel_ )
                 return true;
-            
+
             return false;
         }
-        
+
         inline bool operator!=
         (
             const labelledMeshOctreeCubeCoordinates& lcc
@@ -121,7 +121,7 @@ class labelledMeshOctreeCubeCoordinates
         {
             return !this->operator==(lcc);
         }
-        
+
     // Friend operators
         friend Ostream& operator<<
         (
@@ -141,7 +141,7 @@ class labelledMeshOctreeCubeCoordinates
 
             return os;
         }
-        
+
         friend Istream& operator>>
         (
             Istream& is,
@@ -150,16 +150,16 @@ class labelledMeshOctreeCubeCoordinates
         {
             // Read beginning of labelledMeshOctreeCubeCoordinates
             is.readBegin("labelledMeshOctreeCubeCoordinates");
-        
+
             is >> lcc.cLabel_;
             is >> lcc.coordinates_;
-            
+
             // Read end of labelledMeshOctreeCubeCoordinates
             is.readEnd("labelledMeshOctreeCubeCoordinates");
-        
+
             // Check state of Istream
             is.check("operator>>(Istream&, labelledMeshOctreeCubeCoordinates");
-            
+
             return is;
         }
 };

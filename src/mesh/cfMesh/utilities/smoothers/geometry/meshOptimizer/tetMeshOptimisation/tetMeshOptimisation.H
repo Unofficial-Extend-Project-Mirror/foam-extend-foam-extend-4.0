@@ -61,22 +61,22 @@ class tetMeshOptimisation
     // Private data
         //- reference to the tet mesh
         partTetMesh& tetMesh_;
-    
+
     // Private member functions needed for parallel runs
         //- make sure that all processors have the same points
         //- marked as negativeNode
         void unifyNegativePoints(boolList& negativeNode) const;
-    
+
         //- exchange data with other processors
         void exchangeData
         (
             std::map<label, DynList<parPartTet> >& m,
             boolList* negativeNodePtr = NULL
         );
-    
+
         //- update buffer layer points
         void updateBufferLayerPoints();
-    
+
         //- make sure that coordinates of moved points remain the same
         //- on all processor containing those points
         void unifyCoordinatesParallel(const boolList* negativeNodePtr = NULL);
@@ -108,7 +108,7 @@ public:
         (
             const bool nonShrinking = false
         );
-        
+
         //- smooth boundary using shrinking surface laplace
         void optimiseBoundarySurfaceLaplace();
 };

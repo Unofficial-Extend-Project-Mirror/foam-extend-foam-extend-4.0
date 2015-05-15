@@ -65,7 +65,7 @@ class meshOctreeAutomaticRefinement
 
         //- use DATA boxes
         bool useDATABoxes_;
-    
+
         //- a flag for activating paired refinement
         bool hexRefinement_;
 
@@ -151,7 +151,7 @@ public:
     // Destructor
 
         ~meshOctreeAutomaticRefinement();
-        
+
     // Member Functions
         //- activate hex refinement
         void activateHexRefinement();

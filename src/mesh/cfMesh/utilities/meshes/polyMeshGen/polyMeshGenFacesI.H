@@ -39,12 +39,12 @@ namespace Foam
 {
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-        
+
 inline const faceListPMG& polyMeshGenFaces::faces() const
 {
     return faces_;
 }
-        
+
 inline label polyMeshGenFaces::nInternalFaces() const
 {
     if( !(ownerPtr_ && neighbourPtr_) )
@@ -79,7 +79,7 @@ inline const labelList& polyMeshGenFaces::owner() const
 
         calculateOwnersAndNeighbours();
     }
-    
+
     return *ownerPtr_;
 }
 
@@ -98,7 +98,7 @@ inline const labelList& polyMeshGenFaces::neighbour() const
 
         calculateOwnersAndNeighbours();
     }
-    
+
     return *neighbourPtr_;
 }
 
@@ -122,7 +122,7 @@ inline void polyMeshGenFaces::addFaceToSubset
     std::map<label, meshSubset>::iterator it = faceSubsets_.find(setID);
     if( it == faceSubsets_.end() )
         return;
-    
+
     it->second.addElement(faceI);
 }
 
@@ -134,7 +134,7 @@ inline void polyMeshGenFaces::removeFaceFromSubset
     std::map<label, meshSubset>::iterator it = faceSubsets_.find(setI);
     if( it == faceSubsets_.end() )
         return;
-    
+
     it->second.removeElement(faceI);
 }
 
@@ -145,7 +145,7 @@ inline void polyMeshGenFaces::faceInSubsets
 ) const
 {
     faceSubsets.clear();
-    
+
     std::map<label, meshSubset>::const_iterator it;
     for
     (
@@ -162,7 +162,7 @@ inline void polyMeshGenFaces::faceInSubsets
 inline void polyMeshGenFaces::faceSubsetIndices(DynList<label>& indices) const
 {
     indices.clear();
-    
+
     std::map<label, meshSubset>::const_iterator it;
     for
     (
@@ -181,12 +181,12 @@ inline void polyMeshGenFaces::facesInSubset
 ) const
 {
     faceLabels.clear();
-    
+
     std::map<label, meshSubset>::const_iterator it =
         faceSubsets_.find(setI);
     if( it == faceSubsets_.end() )
         return;
-    
+
     it->second.containedElements(faceLabels);
 }
 

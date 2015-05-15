@@ -1,8 +1,8 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                |
-| \\      /  F ield         | cfMesh: A library for mesh generation          | 
+| \\      /  F ield         | cfMesh: A library for mesh generation          |
 |  \\    /   O peration     |                                                |
-|   \\  /    A nd           | Author: Franjo Juretic                         | 
+|   \\  /    A nd           | Author: Franjo Juretic                         |
 |    \\/     M anipulation  | E-mail: franjo.juretic@c-fields.com            |
 \*---------------------------------------------------------------------------*/
 
@@ -30,35 +30,35 @@ localRefinement
     patch001
     {
         cellSize 0.625;
-    } 
+    }
     patch002
     {
         cellSize 0.625;
-    } 
+    }
     patch003
     {
         cellSize 0.625;
-    } 
+    }
     patch004
     {
         cellSize 0.625;
-    } 
+    }
     patch005
     {
         cellSize 0.625;
-    } 
+    }
     patch006
     {
         cellSize 0.625;
-    } 
+    }
     patch007
     {
         cellSize 0.625;
-    } 
+    }
     patch008
     {
         cellSize 0.625;
-    } 
+    }
 }
-     
+
 // ************************************************************************* //

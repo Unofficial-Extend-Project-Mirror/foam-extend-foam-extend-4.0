@@ -56,15 +56,15 @@ class meshSurfaceEdgeExtractorNonTopo
     // Private data
         //- mesh
         polyMeshGen& mesh_;
-    
+
         //- octree
         const meshOctree& meshOctree_;
 
     // Private member functions
-    
+
         //- distribute boundary faces into patches
         void distributeBoundaryFaces();
-    
+
         //- re-map points after edges have been extracted
         void remapBoundaryPoints();
 

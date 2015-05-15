@@ -1,5 +1,5 @@
 ################################################################################
-This file contains brief description of the changes introduced by merging 
+This file contains brief description of the changes introduced by merging
 branches
 
 There are two secions: feature and bugfix
@@ -31,7 +31,7 @@ Updated wmake/rules for compilation with ICC 14
 
 * processorPointPatch
 Author: Zeljko Tukovic; Merge: Dominik Christ
-Correct interpolation of point data on processor boundaries after parallel 
+Correct interpolation of point data on processor boundaries after parallel
 topological changes
 
 

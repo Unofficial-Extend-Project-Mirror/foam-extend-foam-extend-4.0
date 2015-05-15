@@ -53,7 +53,7 @@ void immersedBoundaryWallFunctionFvPatchField<Type>::motionUpdate() const
 template<class Type>
 void immersedBoundaryWallFunctionFvPatchField<Type>::setIbCellValues
 (
-    const Field<Type>& ibcValues 
+    const Field<Type>& ibcValues
 ) const
 {
     const labelList& ibc = this->ibPatch().ibCells();

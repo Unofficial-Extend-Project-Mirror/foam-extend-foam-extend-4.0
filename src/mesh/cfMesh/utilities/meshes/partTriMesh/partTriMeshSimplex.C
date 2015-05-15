@@ -49,7 +49,7 @@ partTriMeshSimplex::partTriMeshSimplex
     const pointField& points = tm.points();
     const LongList<labelledTri>& trias = tm.triangles();
     const VRWGraph& pt = tm.pointTriangles();
-    
+
     trias_.setSize(pt.sizeOfRow(pI));
     label counter(0);
 
@@ -68,11 +68,11 @@ partTriMeshSimplex::partTriMeshSimplex
                 ++counter;
             }
         }
-        
+
         # ifdef DEBUGSmooth
         Info << "Tet " << tetI << " is " << tet << endl;
         # endif
-        
+
         label pos(-1);
         for(label i=0;i<3;++i)
             if( tri[i] == pI )
@@ -109,7 +109,7 @@ partTriMeshSimplex::partTriMeshSimplex
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-    
+
 partTriMeshSimplex::~partTriMeshSimplex()
 {}
 

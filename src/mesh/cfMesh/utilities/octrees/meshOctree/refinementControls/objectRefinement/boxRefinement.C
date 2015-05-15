@@ -92,10 +92,10 @@ bool boxRefinement::intersectsObject(const boundBox& bb) const
 {
     vector v(0.5*lengthX_, 0.5*lengthY_, 0.5*lengthZ_);
     boundBox box(centre_ - v, centre_ + v);
-    
+
     if( box.overlaps(bb) )
         return true;
-    
+
     return false;
 }
 
@@ -112,7 +112,7 @@ dictionary boxRefinement::dict(bool ignoreType) const
     dict.add("lengthX", lengthX_);
     dict.add("lengthY", lengthY_);
     dict.add("lengthZ", lengthZ_);
-    
+
     //dict.add("angleX", angleX_);
     //dict.add("angleY", angleY_);
     //dict.add("angleZ", angleZ_);
@@ -138,7 +138,7 @@ void boxRefinement::writeDict(Ostream& os, bool subDict) const
     {
         os << indent << token::BEGIN_BLOCK << incrIndent << nl;
     }
-    
+
     os.writeKeyword("cellSize") << cellSize() << token::END_STATEMENT << nl;
 
     // only write type for derived types
@@ -148,7 +148,7 @@ void boxRefinement::writeDict(Ostream& os, bool subDict) const
     }
 
     os.writeKeyword("centre") << centre_ << token::END_STATEMENT << nl;
-    os.writeKeyword("lengthX") << lengthX_ << token::END_STATEMENT << nl; 
+    os.writeKeyword("lengthX") << lengthX_ << token::END_STATEMENT << nl;
     os.writeKeyword("lengthY") << lengthY_ << token::END_STATEMENT << nl;
     os.writeKeyword("lengthZ") << lengthZ_ << token::END_STATEMENT << nl;
     //os.writeKeyword("angleX") << angleX_ << token::END_STATEMENT << nl;
@@ -198,7 +198,7 @@ void boxRefinement::operator=(const dictionary& d)
         ) << "Entry lengthX is not sopecified!" << exit(FatalError);
         lengthX_ = -1.0;
     }
-    
+
     // specify lengthY
     if( dict.found("lengthY") )
     {
@@ -212,7 +212,7 @@ void boxRefinement::operator=(const dictionary& d)
         ) << "Entry lengthY is not sopecified!" << exit(FatalError);
         lengthY_ = -1.0;
     }
-    
+
     // specify lengthZ
     if( dict.found("lengthZ") )
     {
@@ -226,7 +226,7 @@ void boxRefinement::operator=(const dictionary& d)
         ) << "Entry lengthZ is not sopecified!" << exit(FatalError);
         lengthZ_ = -1.0;
     }
-    
+
     // specify angleX
 /*    if( dict.found("angleX") )
     {
@@ -236,7 +236,7 @@ void boxRefinement::operator=(const dictionary& d)
     {
         angleX_ = -1.0;
     }
-    
+
     // specify angleY
     if( dict.found("angleY") )
     {
@@ -246,7 +246,7 @@ void boxRefinement::operator=(const dictionary& d)
     {
         angleY_ = -1.0;
     }
-    
+
     // specify angleX
     if( dict.found("angleZ") )
     {
@@ -268,9 +268,9 @@ Ostream& boxRefinement::operator<<(Ostream& os) const
     write(os);
     return os;
 }
-        
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-        
+
 } // End namespace Foam
 
 // ************************************************************************* //

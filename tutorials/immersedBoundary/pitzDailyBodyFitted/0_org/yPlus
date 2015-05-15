@@ -34,7 +34,7 @@ boundaryField
     upperWall
     {
         type            calculated;
-        value           nonuniform List<scalar> 
+        value           nonuniform List<scalar>
 223
 (
 7.47386
@@ -266,7 +266,7 @@ boundaryField
     lowerWall
     {
         type            calculated;
-        value           nonuniform List<scalar> 
+        value           nonuniform List<scalar>
 250
 (
 5.2557

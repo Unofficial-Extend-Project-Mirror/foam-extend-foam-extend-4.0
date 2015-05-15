@@ -112,7 +112,7 @@ gradScheme<Type>::fvmGrad
     (
         "tmp<BlockLduSystem> gradScheme<Type>::fvmGrad\n"
         "(\n"
-        "    GeometricField<Type, fvPatchField, volMesh>&" 
+        "    GeometricField<Type, fvPatchField, volMesh>&"
         ")\n"
     )   << "Implicit gradient operator currently defined only for Gauss linear "
         << "and leastSquares (cell and face limiters are optional)."

@@ -17,7 +17,7 @@ FoamFile
 
 dimensions      [0 1 0 0 0 0 0];
 
-internalField   nonuniform List<scalar> 
+internalField   nonuniform List<scalar>
 12225
 (
 0.000156695
@@ -12253,7 +12253,7 @@ boundaryField
     inlet
     {
         type            calculated;
-        value           nonuniform List<scalar> 
+        value           nonuniform List<scalar>
 30
 (
 0.000806782
@@ -12292,7 +12292,7 @@ boundaryField
     outlet
     {
         type            calculated;
-        value           nonuniform List<scalar> 
+        value           nonuniform List<scalar>
 57
 (
 0.00261758

@@ -59,17 +59,17 @@ class meshSurfaceCheckInvertedVertices
     // Private data
         //- mesh surface partitioner
         const meshSurfacePartitioner& surfacePartitioner_;
-    
+
         //- active surface points
         const boolList* activePointsPtr_;
 
         //- set of inverted vertices
         labelHashSet invertedVertices_;
-    
+
     // Private member functions
         //- check vertices by calculating dot products
         void checkVertices();
-        
+
         //- Disallow default bitwise copy construct
         meshSurfaceCheckInvertedVertices
         (

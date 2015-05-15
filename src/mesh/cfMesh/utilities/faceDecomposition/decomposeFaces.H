@@ -50,7 +50,7 @@ class decomposeFaces
     // private data
         //- reference to the mesh
         polyMeshGen& mesh_;
-    
+
         //- number of points
         VRWGraph newFacesForFace_;
 

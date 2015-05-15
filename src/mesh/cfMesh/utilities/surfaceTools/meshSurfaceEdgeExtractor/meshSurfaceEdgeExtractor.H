@@ -56,11 +56,11 @@ class meshSurfaceEdgeExtractor
     // Private data
         //- mesh
         polyMeshGen& mesh_;
-    
+
         label nPoints_;
-    
+
         boolList boundaryCell_;
-    
+
         List<direction> nFacesInCell_;
 
         //- reference to the octree
@@ -72,10 +72,10 @@ class meshSurfaceEdgeExtractor
     // Private member functions
         //- remove old boundary faces
         void removeOldBoundaryFaces();
-    
+
         //- create vertices on surface edges
         void createEdgeVertices();
-    
+
         //- create new boundary faces
         void createBoundaryFaces();
 

@@ -2,7 +2,7 @@ int nCorr = 0;
 
 if (aMesh.solutionDict().found("nOuterCorrectors"))
 {
-    nCorr = 
+    nCorr =
         readInt(aMesh.solutionDict().lookup("nOuterCorrectors"));
 }
 else

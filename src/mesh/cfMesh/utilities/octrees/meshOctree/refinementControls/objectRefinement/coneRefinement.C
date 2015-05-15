@@ -83,22 +83,22 @@ bool coneRefinement::intersectsObject(const boundBox& bb) const
 {
     //- check if the centre is inside the cone
     const point c = (bb.max() + bb.min()) / 2.0;
-    
+
     const vector v = p1_ - p0_;
     const scalar d = magSqr(v);
-    
+
     if( d < VSMALL )
         return false;
-    
+
     const scalar t = ((c - p0_) & v) / d;
     if( (t > 1.0) || (t < 0.0) )
         return false;
-    
+
     const scalar r = r0_ + (r1_ - r0_) * t;
-    
+
     if( mag(p0_ + t * v - c) < r )
         return true;
-    
+
     return false;
 }
 
@@ -134,7 +134,7 @@ void coneRefinement::writeDict(Ostream& os, bool subDict) const
     {
         os << indent << token::BEGIN_BLOCK << incrIndent << nl;
     }
-    
+
     os.writeKeyword("cellSize") << cellSize() << token::END_STATEMENT << nl;
 
     // only write type for derived types
@@ -147,7 +147,7 @@ void coneRefinement::writeDict(Ostream& os, bool subDict) const
     os.writeKeyword("radius0") << r0_ << token::END_STATEMENT << nl;
     os.writeKeyword("p1") << p1_ << token::END_STATEMENT << nl;
     os.writeKeyword("radius1") << r1_ << token::END_STATEMENT << nl;
-    
+
     if( subDict )
     {
         os << decrIndent << indent << token::END_BLOCK << endl;
@@ -191,7 +191,7 @@ void coneRefinement::operator=(const dictionary& d)
         ) << "Entry radius0 is not specified!" << exit(FatalError);
         r0_ = -1.0;
     }
-    
+
     // unspecified centre is (0 0 0)
     if( dict.found("p1") )
     {
@@ -230,9 +230,9 @@ Ostream& coneRefinement::operator<<(Ostream& os) const
     write(os);
     return os;
 }
-        
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-        
+
 } // End namespace Foam
 
 // ************************************************************************* //

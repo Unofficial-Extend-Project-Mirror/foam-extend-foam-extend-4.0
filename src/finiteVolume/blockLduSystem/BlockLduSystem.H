@@ -113,7 +113,7 @@ public:
             {
                 return source_;
             }
-            
+
 
     // Member operators
 

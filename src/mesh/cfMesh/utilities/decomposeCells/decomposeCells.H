@@ -28,7 +28,7 @@ Description
     Decomposes selected cells into pyramids
 
 SourceFiles
-    
+
 
 \*---------------------------------------------------------------------------*/
 
@@ -56,16 +56,16 @@ class decomposeCells
         wordList patchNames_;
         VRWGraph newBoundaryFaces_;
         labelLongList newBoundaryPatches_;
-    
+
         VRWGraphList facesOfNewCells_;
-    
+
     // Private member functions
-    
+
         //- check if the valid pyramids are generated from the split cells
         //- this check splits faces which could
         //- result in multiple inbetween faces
         void checkFaceConnections(const boolList& decomposeCell);
-    
+
         //- create addressing needed to decompose the cell
         void findAddressingForCell
         (
@@ -75,7 +75,7 @@ class decomposeCells
             DynList<DynList<label, 8> >& faceEdges,
             DynList<DynList<label, 2>, 64>& edgeFaces
         ) const;
-    
+
         //- find the apex of the pyramids
         label findTopVertex
         (
@@ -84,15 +84,15 @@ class decomposeCells
             const DynList<edge, 64>& edges,
             const DynList<DynList<label, 2>, 64>& edgeFaces
         );
-    
+
         void decomposeCellIntoPyramids(const label cellI);
-        
+
         void createPointsAndCellFaces(const boolList& decomposeCell);
-        
+
         void storeBoundaryFaces(const boolList& decomposeCell);
-        
+
         void removeDecomposedCells(const boolList& decomposeCell);
-        
+
         void addNewCells();
 
         //- disallows bitwise construct

@@ -12,7 +12,7 @@ nCoupledFacesToBreak = 0;
 
      // only consider tensile tractions
     normalTraction = max(normalTraction, scalar(0));
-    
+
     scalarField shearTraction =
         cohesiveZone.internalField() *
         mag( (I - Foam::sqr(n.internalField())) & traction.internalField() );
@@ -424,7 +424,7 @@ nCoupledFacesToBreak = 0;
     }
 
     faceToBreakTraction *= scaleFactor;
-    
+
     topoChange = true;
     }
 

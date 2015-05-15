@@ -77,7 +77,7 @@ bool lineRefinement::intersectsObject(const boundBox& bb) const
 {
     //- check if the cube contains start point or end point
     const scalar l = bb.max().x() - bb.min().x();
-    
+
     const point min = bb.min() - l * vector(SMALL, SMALL, SMALL);
     const point max = bb.max() + l * vector(SMALL, SMALL, SMALL);
 
@@ -230,7 +230,7 @@ void lineRefinement::writeDict(Ostream& os, bool subDict) const
     {
         os << indent << token::BEGIN_BLOCK << incrIndent << nl;
     }
-    
+
     os.writeKeyword("cellSize") << cellSize() << token::END_STATEMENT << nl;
 
     // only write type for derived types
@@ -296,9 +296,9 @@ Ostream& lineRefinement::operator<<(Ostream& os) const
     write(os);
     return os;
 }
-        
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-        
+
 } // End namespace Foam
 
 // ************************************************************************* //

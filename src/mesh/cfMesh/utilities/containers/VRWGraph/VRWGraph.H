@@ -47,32 +47,32 @@ SourceFiles
 
 namespace Foam
 {
-    
+
 class VRWGraphModifier;
-    
+
 class rowElement
 {
     // Private data
         label start_;
         label size_;
-    
+
     public:
-        
+
         inline rowElement()
         :
             start_(),
             size_()
         {}
-            
+
         inline rowElement(const label i, const label j)
         :
             start_(i),
             size_(j)
         {}
-            
+
         inline ~rowElement()
         {}
-            
+
         inline label start() const
         {
             return start_;
@@ -81,7 +81,7 @@ class rowElement
         {
             return start_;
         }
-        
+
         inline label size() const
         {
             return size_;
@@ -101,7 +101,7 @@ class VRWGraph
     // Private data
         //- list containing the data
         labelLongList data_;
-    
+
         //- number of rows
         LongList<rowElement> rows_;
 
@@ -117,9 +117,9 @@ class VRWGraph
             FREEENTRY=-11,
             FREESTART=-12
         };
-    
+
 public:
-    
+
     // Friend classes
 
         friend class VRWGraphSMPModifier;
@@ -131,7 +131,7 @@ public:
 
         //- Construct given number of rows
         explicit inline VRWGraph(const label size);
-        
+
         //- Construct given number of rows and row size
         explicit inline VRWGraph
         (
@@ -160,7 +160,7 @@ public:
 
             //- Returns the number of rows
             inline label size() const;
-            
+
             //- Returns the number of elements in the given row
             inline label sizeOfRow(const label rowI) const;
 
@@ -168,7 +168,7 @@ public:
 
             //- Reset the number of rows
             inline void setSize(const label);
-            
+
             //- Reset the number of rows. The second argument specifies
             //- the reserved column width
             inline void setSizeAndColumnWidth
@@ -176,11 +176,11 @@ public:
                 const label newNumRows,
                 const label rcWidth
             );
-            
+
             //- Set the number of rows and the size of each row
             template<class ListType>
             inline void setSizeAndRowSize(const ListType&);
-            
+
             //- Reset the size of the given row
             inline void setRowSize(const label rowI, const label newSize);
 
@@ -192,21 +192,21 @@ public:
         //- Append a list as a row at the end of the graph
         template<class ListType>
         inline void appendList(const ListType& l);
-        
+
         //- Append an element to the given row
         inline void append(const label rowI, const label);
-        
+
         //- Append an element to the given row if it does not exist there
         inline void appendIfNotIn(const label rowI, const label);
-        
+
         //- Set row with the list
         template<class ListType>
         inline void setRow(const label rowI, const ListType& l);
-        
+
         //- merge graphs with the identical number of rows
         //- into a single one. Use for SMP parallelisation
         inline void mergeGraphs(const List<VRWGraph>& graphParts);
-        
+
         //- set the graph to the reverse of the original graph.
         //- the rows of such graph store the rows which contain the elements
         //- of the original graph
@@ -216,33 +216,33 @@ public:
             const label nRows,
             const GraphType& origGraph
         );
-        
+
         template<class GraphType>
         inline void reverseAddressing(const GraphType& origGraph);
-        
+
         inline void reverseAddressing
         (
             const label nRows,
             const VRWGraph& origGraph
         );
-        
+
         inline void reverseAddressing(const VRWGraph& origGraph);
-        
+
         //- optimize memory usage
         // this should be used once the graph will not be resized any more
         void optimizeMemoryUsage();
-        
+
         //- check if the element is in the given row (takes linear time)
         inline bool contains(const label rowI, const label e) const;
         inline label containsAtPosition(const label rowI, const label e) const;
-        
+
         //- get and set operators
         inline label operator()(const label i, const label j) const;
         inline label& operator()(const label i, const label j);
-        
+
         inline constRow operator[](const label i) const;
         inline row operator[](const label i);
-        
+
         //- Assignment operator
         inline void operator=(const VRWGraph&);
 

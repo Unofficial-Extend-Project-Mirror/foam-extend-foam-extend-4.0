@@ -40,7 +40,7 @@ scalar velMag = 0.0;
 
 if (aMesh.nInternalEdges())
 {
-    edgeScalarField SfUfbyDelta = 
+    edgeScalarField SfUfbyDelta =
         aMesh.edgeInterpolation::deltaCoeffs()*mag(phis);
 
     CoNum = max(SfUfbyDelta/aMesh.magLe())
@@ -53,7 +53,7 @@ if (aMesh.nInternalEdges())
 }
 
 Info<< "Courant Number mean: " << meanCoNum
-    << " max: " << CoNum 
+    << " max: " << CoNum
     << " velocity magnitude: " << velMag << endl;
 
 // ************************************************************************* //

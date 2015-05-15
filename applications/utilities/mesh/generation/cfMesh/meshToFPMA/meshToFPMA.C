@@ -43,15 +43,15 @@ int main(int argc, char *argv[])
 
     polyMeshGen pmg(runTime);
     pmg.read();
-    
+
     if( Pstream::parRun() )
     {
         polyMeshGenModifier(pmg).addBufferCells();
         createFIRESelections(pmg);
     }
-    
+
     writeMeshFPMA(pmg, "convertedMesh");
-    
+
     Info << "End\n" << endl;
     return 0;
 }

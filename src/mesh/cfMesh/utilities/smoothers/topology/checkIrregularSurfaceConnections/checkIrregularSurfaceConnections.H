@@ -54,7 +54,7 @@ class checkIrregularSurfaceConnections
     // Private data
         //- Reference to polyMeshGen
         polyMeshGen& mesh_;
-    
+
         //- pointer to meshSurfaceEngine
         mutable meshSurfaceEngine* meshSurfacePtr_;
 
@@ -64,16 +64,16 @@ class checkIrregularSurfaceConnections
         {
             if( !meshSurfacePtr_ )
                 meshSurfacePtr_ = new meshSurfaceEngine(mesh_);
-            
+
             return *meshSurfacePtr_;
         }
-        
+
         //- clear meshSurfaceEngine. Used in case if the mesh is modified
         inline void clearMeshEngine()
         {
             deleteDemandDrivenData(meshSurfacePtr_);
         }
-        
+
         //- check if there exist vertices with more than one groups of cells
         //- attached to it
         bool checkAndFixCellGroupsAtBndVertices
@@ -81,7 +81,7 @@ class checkIrregularSurfaceConnections
             labelHashSet& badVertices,
             const bool removeConnections = false
         );
-        
+
         //- check if all boundary edges are connected
         //- to two boundary faces, only!
         bool checkEdgeFaceConnections
@@ -89,7 +89,7 @@ class checkIrregularSurfaceConnections
             labelHashSet& badVertices,
             const bool removeCells = false
         );
-        
+
         //- check if all boundary face connected to a boundary vertex
         //- are connected into a single group of faces that can be visited
         //- over edges

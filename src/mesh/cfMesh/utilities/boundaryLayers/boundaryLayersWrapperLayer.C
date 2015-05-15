@@ -33,21 +33,21 @@ Description
 
 namespace Foam
 {
-    
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 void boundaryLayers::addWrapperLayer()
 {
     createOTopologyLayers();
-    
+
     if( treatedPatch_[0] ) return;
 
     const meshSurfaceEngine& mse = surfaceEngine();
-    
+
     const labelList& bPoints = mse.boundaryPoints();
-    
+
     boolList treatPatches(mesh_.boundaries().size(), true);
-    
+
     labelLongList newLabelForVertex(nPoints_, -1);
 
     pointFieldPMG& points = mesh_.points();
@@ -57,13 +57,13 @@ void boundaryLayers::addWrapperLayer()
         points[nPoints_] = points[bPoints[bpI]];
         newLabelForVertex[bPoints[bpI]] = nPoints_++;
     }
-    
+
     createNewFacesAndCells(treatPatches);
-    
+
     forAll(treatPatches, patchI)
         if( treatPatches[patchI] )
             treatedPatch_[patchI] = true;
-        
+
     //- delete surface engine
     clearOut();
 }

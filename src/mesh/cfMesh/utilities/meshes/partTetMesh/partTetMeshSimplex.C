@@ -49,7 +49,7 @@ partTetMeshSimplex::partTetMeshSimplex
     const LongList<point>& points = tm.points();
     const LongList<partTet>& tets = tm.tets();
     const VRWGraph& pt = tm.pointTets();
-    
+
     tets_.setSize(pt.sizeOfRow(pI));
     label counter(0);
 
@@ -67,11 +67,11 @@ partTetMeshSimplex::partTetMeshSimplex
                 ++counter;
             }
         }
-        
+
         # ifdef DEBUGSmooth
         Info << "Tet " << tetI << " is " << tet << endl;
         # endif
-        
+
         const label pos = tet.whichPosition(pI);
         switch( pos )
         {
@@ -143,12 +143,12 @@ partTetMeshSimplex::partTetMeshSimplex
 {
     tets_.setSize(pt.size());
     label pI(0);
-    
+
     Map<label> addr;
     forAll(pt, tetI)
     {
         const parPartTet& tet = pt[tetI];
-        
+
         label pos(-1);
         for(label i=0;i<4;++i)
         {
@@ -158,11 +158,11 @@ partTetMeshSimplex::partTetMeshSimplex
                 pts_.append(tet[i].coordinates());
                 ++pI;
             }
-            
+
             if( tet[i].pointLabel() == gpI )
                 pos = i;
         }
-        
+
         switch( pos )
         {
             case 0:
@@ -223,7 +223,7 @@ partTetMeshSimplex::partTetMeshSimplex
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-    
+
 partTetMeshSimplex::~partTetMeshSimplex()
 {}
 

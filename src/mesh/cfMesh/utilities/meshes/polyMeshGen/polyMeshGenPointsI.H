@@ -40,7 +40,7 @@ inline const Time& polyMeshGenPoints::returnTime() const
 {
     return runTime_;
 }
-        
+
 inline const pointFieldPMG& polyMeshGenPoints::points() const
 {
     return points_;
@@ -50,7 +50,7 @@ inline pointFieldPMG& polyMeshGenPoints::points()
 {
     return points_;
 }
-        
+
 inline void polyMeshGenPoints::appendVertex(const point& p)
 {
     points_.append(p);
@@ -65,7 +65,7 @@ inline void polyMeshGenPoints::addPointToSubset
     std::map<label, meshSubset>::iterator it = pointSubsets_.find(setI);
     if( it == pointSubsets_.end() )
         return;
-    
+
     it->second.addElement(pointI);
 }
 
@@ -78,7 +78,7 @@ inline void polyMeshGenPoints::removePointFromSubset
     std::map<label, meshSubset>::iterator it = pointSubsets_.find(setI);
     if( it == pointSubsets_.end() )
         return;
-    
+
     it->second.removeElement(pointI);
 }
 
@@ -89,7 +89,7 @@ inline void polyMeshGenPoints::pointInSubsets
 ) const
 {
     pointSubsets.clear();
-    
+
     std::map<label, meshSubset>::const_iterator it;
     for
     (
@@ -106,7 +106,7 @@ inline void polyMeshGenPoints::pointInSubsets
 inline void polyMeshGenPoints::pointSubsetIndices(DynList<label>& indices) const
 {
     indices.clear();
-    
+
     std::map<label, meshSubset>::const_iterator it;
     for
     (
@@ -125,12 +125,12 @@ inline void polyMeshGenPoints::pointsInSubset
 ) const
 {
     pointLabels.clear();
-    
+
     std::map<label, meshSubset>::const_iterator it =
         pointSubsets_.find(setI);
     if( it == pointSubsets_.end() )
         return;
-    
+
     it->second.containedElements(pointLabels);
 }
 

@@ -156,7 +156,7 @@ Foam::immersedBoundaryFvPatch::toIbPoints
 //         const labelledTri& tri = faces[hf[cellI]];
 //         triPointRef triPt = faces[hf[cellI]].tri(triPoints);
 
-//         ibPsi[cellI] = 
+//         ibPsi[cellI] =
 //             triValues[tri[0]]*triPt.Ni(0, p[cellI])
 //           + triValues[tri[1]]*triPt.Ni(1, p[cellI])
 //           + triValues[tri[2]]*triPt.Ni(2, p[cellI]);

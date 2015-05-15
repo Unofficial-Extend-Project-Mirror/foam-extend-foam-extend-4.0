@@ -42,9 +42,9 @@
   December 2004) as release number 3.0.  Visit http://foam-extend.org
   for more information.
 
-  OPENFOAM® is a registered trademark of ESI Group. OpenFOAM-extend and 
+  OPENFOAM® is a registered trademark of ESI Group. OpenFOAM-extend and
   foam-extend are a community effort not endorsed by ESI Group.
- 
+
 ** Installation
    foam-extend-3.1 can be compiled and runs on any linux system
 
@@ -68,7 +68,7 @@
     Binary packages are available for download at
     http://sourceforge.net/projects/openfoam-extend/ for the following
     systems: Ubuntu 14.04, Fedora 20 and Mac OS X.
-    
+
   * Accompanying ThirdParty software:
     - gcc compatibility up to 4.8.2
     - Paraview 4.0.1
@@ -86,7 +86,7 @@
     - bison 2.7
     - hwloc 1.7.2
     - libccmio 2.6.1
-  
+
 ** Compatibility
   Upstream features from the OpenFOAM® code base are merged into
   foam-extend on regular basis. The interface format of
@@ -328,8 +328,8 @@ user@machine> git log 3.0.. > commitLog
     http://sourceforge.net/apps/mantisbt/openfoam-extend
 
 ** How to contribute
-    All your contributions are highly welcome: New solvers, utilities and 
-    models; bug fixes; documentation. The many ways of contributing and the 
+    All your contributions are highly welcome: New solvers, utilities and
+    models; bug fixes; documentation. The many ways of contributing and the
     contribution process are described in detail at:
     http://sourceforge.net/p/openfoam-extend/wiki/HowToContribute/
 

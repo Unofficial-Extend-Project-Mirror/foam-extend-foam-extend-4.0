@@ -312,7 +312,7 @@ void Foam::fvBlockMatrix<Type>::updateCouplingCoeffs
             const Field<matrixType>& icp = matrix.internalCoeffs()[patchI];
             const Field<matrixType>& bcp = matrix.boundaryCoeffs()[patchI];
 
-            if 
+            if
             (
                 this->coupleUpper()[patchI].activeType()
              != blockCoeffBase::SQUARE

@@ -52,7 +52,7 @@ class polyMeshGen
         dictionary metaDict_;
 
 public:
-    
+
     // Constructors
         //- Null constructor
         polyMeshGen(const Time& t);
@@ -77,7 +77,7 @@ public:
             const labelList& patchStart,
             const labelList& nFacesInPatch
         );
-        
+
     // Destructor
 
         ~polyMeshGen();
@@ -97,13 +97,13 @@ public:
 
     // Read mesh
         void read();
-    
+
     // Write mesh
         void write() const;
 };
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-    
+
 } // End namespace Foam
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

@@ -36,7 +36,7 @@ topoSetSources
     // Copy elements from cellSet
     /*cellToCell
     {
-        set c1;     
+        set c1;
     }
 
     // Select based on faceSet
@@ -51,7 +51,7 @@ topoSetSources
     }
 
     // Select based on pointSet
-    pointToCell     
+    pointToCell
     {
         set p0;
         option any;         // cell with any point in pointSet

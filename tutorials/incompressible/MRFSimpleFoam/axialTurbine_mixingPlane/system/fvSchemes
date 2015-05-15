@@ -63,7 +63,7 @@ fluxRequired
 
 mixingPlane
 {
-    default         areaAveraging; 
+    default         areaAveraging;
     U               areaAveraging;
     p               areaAveraging;
     k               fluxAveraging; //Transported variable

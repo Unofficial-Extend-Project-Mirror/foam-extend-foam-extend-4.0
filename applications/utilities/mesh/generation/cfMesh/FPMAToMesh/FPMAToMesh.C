@@ -39,27 +39,27 @@ using namespace Foam;
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 int main(int argc, char *argv[])
-{ 
+{
 
 #   include "setRootCase.H"
 #   include "createTime.H"
 
     fileName inFileName;
-    
+
     Info << "Reading mesh from file " << endl;
     cin >> inFileName;
-    
+
     IFstream file(inFileName);
 
     polyMeshGen pmg(runTime);
     polyMeshGenModifier meshModifier(pmg);
-    
+
     label counter;
-    
+
     //- read the number of vertices
     pointFieldPMG& points = meshModifier.pointsAccess();
     file >> counter;
-    
+
     //- read points from file
     points.setSize(counter);
     forAll(points, pointI)
@@ -68,79 +68,79 @@ int main(int argc, char *argv[])
     file >> p.x();
     file >> p.y();
     file >> p.z();
-    
+
     points[pointI] = p;
     }
-    
+
     //- read the number of faces
     file >> counter;
-    
+
     faceListPMG& faces = meshModifier.facesAccess();
-    
+
     //- read faces from file
     faces.setSize(counter);
     forAll(faces, faceI)
     {
         file >> counter;
-    
+
     face f;
     f.setSize(counter);
-    
+
     forAll(f, pI)
       file >> f[pI];
-    
+
     faces[faceI] = f.reverseFace();
     }
-    
+
     //- read the number of cells
     file >> counter;
-    
+
     //- read cells from file
     cellListPMG& cells = meshModifier.cellsAccess();
     cells.setSize(counter);
-    
+
     forAll(cells, cellI)
     {
     file >> counter;
-    
+
     cell& c = cells[cellI];
-    
+
     c.setSize(counter);
-    
+
     forAll(c, fI)
         file >> c[fI];
     }
-    
+
     //- read selections
     file >> counter;
-    
+
     wordList patchNames;
     Map<label> subsetToPatch;
-    
+
     for(label setI=0;setI<counter;++setI)
     {
     word sName;
     file >> sName;
-    
+
     label type;
     file >> type;
-    
+
     label nEntries;
     file >> nEntries;
-    
+
     switch( type )
     {
         case 3:
         {
         //- face selection
         const label id = pmg.addFaceSubset(sName);
-        
+
         patchNames.setSize(patchNames.size()+1);
         patchNames[patchNames.size()-1] = sName;
         subsetToPatch.insert(id, patchNames.size()-1);
-        
+
         Info << "Reading face selection " << sName << endl;
-        
+
         for(label i=0;i<nEntries;++i)
         {
             label entryI;
@@ -152,7 +152,7 @@ int main(int argc, char *argv[])
         {
         //- cell selection
         const label id = pmg.addCellSubset(sName);
-        
+
         for(label i=0;i<nEntries;++i)
         {
             label entryI;
@@ -164,7 +164,7 @@ int main(int argc, char *argv[])
         {
         //- node selection
         const label id = pmg.addPointSubset(sName);
-        
+
         for(label i=0;i<nEntries;++i)
         {
             label entryI;
@@ -174,31 +174,31 @@ int main(int argc, char *argv[])
         } break;
     };
     }
-    
+
     //- create patches from face selections
     VRWGraph boundaryFaces;
     labelLongList boundaryOwner;
     labelLongList boundaryPatches;
-    
+
     const labelList& owner = pmg.owner();
     DynList<label> faceSubsets;
     pmg.faceSubsetIndices(faceSubsets);
-    
+
     forAll(faceSubsets, setI)
     {
     labelLongList setFaces;
     pmg.facesInSubset(faceSubsets[setI], setFaces);
-    
+
     forAll(setFaces, i)
     {
         boundaryFaces.appendList(faces[setFaces[i]]);
         boundaryOwner.append(owner[setFaces[i]]);
         boundaryPatches.append(subsetToPatch[faceSubsets[setI]]);
     }
-    
+
     pmg.removeFaceSubset(faceSubsets[setI]);
     }
-    
+
     meshModifier.reorderBoundaryFaces();
     meshModifier.replaceBoundary
     (
@@ -207,9 +207,9 @@ int main(int argc, char *argv[])
     boundaryOwner,
     boundaryPatches
     );
-    
+
     pmg.write();
-    
+
     Info << "End\n" << endl;
     return 0;
 }
