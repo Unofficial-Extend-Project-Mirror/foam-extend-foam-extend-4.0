@@ -27,6 +27,7 @@ solver                  mesquiteMotionSolver;
 
 mesquiteOptions
 {
+    standardCellTypes yes;
     // Optimization metric
 //     optMetric               AspectRatioGamma;
     optMetric
