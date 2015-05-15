@@ -161,6 +161,10 @@ void Foam::leastSquaresVectors::makeLeastSquaresVectors() const
 //    invDd = inv(dd);
     invDd = hinv(dd);
 
+    // Evaluate coupled to exchange coupled neighbour field data
+    // across coupled boundaries.  HJ, 18/Mar/2015
+    volInvDd.boundaryField().evaluateCoupled();
+
     // Revisit all faces and calculate the lsP and lsN vectors
     forAll(owner, faceI)
     {
@@ -197,7 +201,7 @@ void Foam::leastSquaresVectors::makeLeastSquaresVectors() const
                    *(invDd[faceCells[patchFaceI]] & d);
 
                 patchLsN[patchFaceI] = - (1.0/magSqr(d))
-                   *(invDdNei[faceCells[patchFaceI]] & d);
+                   *(invDdNei[patchFaceI] & d);
             }
         }
         else
@@ -211,6 +215,195 @@ void Foam::leastSquaresVectors::makeLeastSquaresVectors() const
             }
         }
     }
+
+# if 0
+
+    // Coefficient sign correction on least squares vectors
+    // The sign of the coefficient must be positive to ensure correct
+    // behaviour in coupled systems.  This is checked by evaluating
+    // dot-product of the P/N vectors with the face area vector.
+    // If the dot-product is negative, cell is marked for use with the
+    // Gauss gradient, which is unconditionally positive
+    // HJ, 21/Apr/2015
+    
+    // First loop: detect cells with bad least squares vectors
+    Info<< "NEW LEAST SQUARES VECTORS" << endl;
+    // Use Gauss Gradient field: set to 1 if Gauss is needed
+    volScalarField useGaussGrad
+    (
+        IOobject
+        (
+            "useGaussGrad",
+            mesh().pointsInstance(),
+            mesh(),
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        ),
+        mesh(),
+        dimensionedScalar("zero", dimVolume, 0),
+        zeroGradientFvPatchScalarField::typeName
+    );
+
+    const surfaceVectorField& Sf = mesh().Sf();
+    const surfaceScalarField& w = mesh().weights();
+
+    const vectorField& SfIn = Sf.internalField();
+    const scalarField& wIn = w.internalField();
+    scalarField& uggIn = useGaussGrad.internalField();
+
+    // Check internal faces
+    forAll (owner, faceI)
+    {
+        if
+        (
+            (lsPIn[faceI] & SfIn[faceI])/(mag(lsPIn[faceI])*mag(SfIn[faceI]))
+          < smallDotProdTol_
+        )
+        {
+            // Least square points in the wrong direction for owner
+            // Use Gauss gradient
+            uggIn[owner[faceI]] = 1;
+        }
+
+        if
+        (
+            (lsNIn[faceI] & SfIn[faceI])/(mag(lsNIn[faceI])*mag(SfIn[faceI]))
+          > -smallDotProdTol_
+        )
+        {
+            // Least square points in the wrong direction for owner.
+            // Note that Sf points into neighbour cell
+            // Use Gauss gradient
+            uggIn[neighbour[faceI]] = 1;
+        }
+    }
+
+    forAll (lsP.boundaryField(), patchI)
+    {
+        fvsPatchVectorField& patchLsP = lsP.boundaryField()[patchI];
+        const vectorField& pSf = Sf.boundaryField()[patchI];
+        const fvPatch& p = mesh().boundary()[patchI];
+        const unallocLabelList& fc = p.faceCells();
+
+        // Same check for coupled and uncoupled
+        forAll (patchLsP, pFaceI)
+        {
+            if
+            (
+                (patchLsP[pFaceI] & pSf[pFaceI])/
+                (mag(patchLsP[pFaceI])*mag(pSf[pFaceI]))
+              < smallDotProdTol_
+            )
+            {
+                uggIn[fc[pFaceI]] = 1;
+            }
+        }
+    }
+
+    // Update boundary conditions for coupled boundaries.  This synchronises
+    // the Gauss grad indication field
+    useGaussGrad.boundaryField().evaluateCoupled();
+
+    // Replace least square vectors with weighted Gauss gradient vectors
+    // for marked cells
+
+    // Prepare cell volumes with parallel communications
+    volScalarField cellV
+    (
+        IOobject
+        (
+            "cellV",
+            mesh().pointsInstance(),
+            mesh(),
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        ),
+        mesh(),
+        dimensionedScalar("zero", dimVolume, 0),
+        zeroGradientFvPatchScalarField::typeName
+    );
+    cellV.internalField() = mesh().V();
+
+    // Evaluate coupled to exchange coupled neighbour field data
+    // across coupled boundaries.  HJ, 18/Mar/2015
+    cellV.boundaryField().evaluateCoupled();
+
+    const scalarField& cellVIn = cellV.internalField();
+
+    // Internal faces
+    forAll (owner, faceI)
+    {
+        label own = owner[faceI];
+        label nei = neighbour[faceI];
+
+        if (uggIn[own] > SMALL)
+        {
+            // Gauss gradient for owner cell
+            lsPIn[faceI] = (1 - wIn[faceI])*SfIn[faceI]/cellVIn[own];
+        }
+
+        if (uggIn[nei] > SMALL)
+        {
+            // Gauss gradient for neighbour cell
+            lsNIn[faceI] = -wIn[faceI]*SfIn[faceI]/cellVIn[nei];
+        }
+    }
+
+    // Boundary faces
+    forAll (lsP.boundaryField(), patchI)
+    {
+        fvsPatchVectorField& patchLsP = lsP.boundaryField()[patchI];
+        fvsPatchVectorField& patchLsN = lsN.boundaryField()[patchI];
+        const fvPatch& p = mesh().boundary()[patchI];
+        const unallocLabelList& fc = p.faceCells();
+
+        const fvsPatchScalarField& pw = w.boundaryField()[patchI];
+        const vectorField& pSf = Sf.boundaryField()[patchI];
+
+        // Get indicator for local side
+        const fvPatchScalarField& ugg = useGaussGrad.boundaryField()[patchI];
+        const scalarField pUgg = ugg.patchInternalField();
+
+        if (p.coupled())
+        {
+            const scalarField cellVInNei =
+                cellV.boundaryField()[patchI].patchNeighbourField();
+
+            // Get indicator for neighbour side
+            const scalarField nUgg = ugg.patchNeighbourField();
+
+            forAll (pUgg, pFaceI)
+            {
+                if (pUgg[pFaceI] > SMALL)
+                {
+                    // Gauss grad for owner cell
+                    patchLsP[pFaceI] =
+                        (1 - pw[pFaceI])*pSf[pFaceI]/cellVIn[fc[pFaceI]];
+                }
+
+                if (nUgg[pFaceI] > SMALL)
+                {
+                    // Gauss gradient for neighbour cell
+                    patchLsN[pFaceI] =
+                        -pw[pFaceI]*pSf[pFaceI]/cellVInNei[pFaceI];
+                }
+            }
+        }
+        else
+        {
+            forAll (pUgg, pFaceI)
+            {
+                if (pUgg[pFaceI] > SMALL)
+                {
+                    // Gauss grad for owner cell
+                    patchLsP[pFaceI] =
+                        (1 - pw[pFaceI])*pSf[pFaceI]/cellVIn[fc[pFaceI]];
+                }
+            }
+        }
+    }
+
+#endif
 
     if (debug)
     {
@@ -257,12 +450,15 @@ bool Foam::leastSquaresVectors::movePoints() const
     return true;
 }
 
+
 bool Foam::leastSquaresVectors::updateMesh(const mapPolyMesh& mpm) const
 {
     if (debug)
     {
-        InfoIn("bool leastSquaresVectors::updateMesh(const mapPolyMesh&) const")
-            << "Clearing least square data" << endl;
+        InfoIn
+        (
+            "bool leastSquaresVectors::updateMesh(const mapPolyMesh&) const"
+        )   << "Clearing least square data" << endl;
     }
 
     deleteDemandDrivenData(pVectorsPtr_);
