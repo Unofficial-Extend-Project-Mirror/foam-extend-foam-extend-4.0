@@ -34,6 +34,9 @@ $(slidingInterface)/slidingInterfaceAttachedAddressing.C
 $(slidingInterface)/slidingInterfaceClearCouple.C
 $(slidingInterface)/decoupleSlidingInterface.C
 
+repatchCoverage = $(polyMeshModifiers)/repatchCoverage
+$(repatchCoverage)/repatchCoverage.C
+
 polyTopoChange/polyTopoChange/polyTopoChange.C
 polyTopoChange/polyTopoChange/actions/topoAction/topoActions.C
 
