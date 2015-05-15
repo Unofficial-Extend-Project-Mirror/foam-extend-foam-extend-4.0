@@ -5274,7 +5274,7 @@ void dynamicTopoFvMesh::syncCoupledPatches(labelHashSet& entities)
                                 scalar tol = mag(points_[fCheck[0]] - fC);
                                 scalar dist = mag(fC - newCentre);
 
-                                if (dist < (1e-4 * tol))
+                                if (dist < (geomMatchTol_()*tol))
                                 {
                                     localIndex = faceI;
                                     break;
