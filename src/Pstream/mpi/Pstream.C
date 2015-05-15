@@ -156,7 +156,7 @@ void Foam::reduce(scalar& Value, const sumOp<scalar>& bop)
         return;
     }
 
-    if (Pstream::nProcs() <= Pstream::nProcsSimpleSum)
+    if (Pstream::nProcs() <= Pstream::nProcsSimpleSum())
     {
         if (Pstream::master())
         {

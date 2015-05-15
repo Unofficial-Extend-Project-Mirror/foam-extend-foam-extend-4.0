@@ -112,7 +112,7 @@ void PatchToPatchInterpolation<FromPatch, ToPatch>::calcPointAddressing() const
             // Grab hit point
             hitPoint = curHit.hitPoint();
         }
-        else if (projectionTol_ > SMALL)
+        else if (projectionTol_() > SMALL)
         {
             // Check for a near miss
             pointHit ph =
@@ -162,7 +162,7 @@ void PatchToPatchInterpolation<FromPatch, ToPatch>::calcPointAddressing() const
                     );
             }
 
-            if (dist < minEdgeLength*projectionTol_)
+            if (dist < minEdgeLength*projectionTol_())
             {
                 // This point is being corrected
                 doWeights = true;
@@ -304,7 +304,7 @@ void PatchToPatchInterpolation<FromPatch, ToPatch>::calcFaceAddressing() const
 
             if
             (
-                m < directHitTol_                           // Direct hit
+                m < directHitTol_()                           // Direct hit
              || neighbours.empty()
             )
             {

@@ -180,7 +180,7 @@ void Pstream::gatherList
 template <class T>
 void Pstream::gatherList(List<T>& Values)
 {
-    if (Pstream::nProcs() < Pstream::nProcsSimpleSum)
+    if (Pstream::nProcs() < Pstream::nProcsSimpleSum())
     {
         gatherList(Pstream::linearCommunication(), Values);
     }
@@ -305,7 +305,7 @@ void Pstream::scatterList
 template <class T>
 void Pstream::scatterList(List<T>& Values)
 {
-    if (Pstream::nProcs() < Pstream::nProcsSimpleSum)
+    if (Pstream::nProcs() < Pstream::nProcsSimpleSum())
     {
         scatterList(Pstream::linearCommunication(), Values);
     }

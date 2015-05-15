@@ -36,7 +36,12 @@ const Foam::word Foam::functionEntries::inputModeEntry::typeName
 
 // Don't lookup the debug switch here as the debug switch dictionary
 // might include inputModeEntries
-int Foam::functionEntries::inputModeEntry::debug(0);
+Foam::debug::debugSwitch
+Foam::functionEntries::inputModeEntry::debug
+(
+    "inputModeEntry",
+    0
+);
 
 Foam::functionEntries::inputModeEntry::inputMode
     Foam::functionEntries::inputModeEntry::mode_(MERGE);

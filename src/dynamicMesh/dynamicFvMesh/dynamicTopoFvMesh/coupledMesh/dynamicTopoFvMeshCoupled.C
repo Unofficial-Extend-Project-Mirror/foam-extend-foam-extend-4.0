@@ -67,7 +67,11 @@ defineTypeNameAndDebug(coupleMap, 0);
 
 //! \cond fileScope
 // Geometric relative match tolerance
-static scalar geomMatchTol_ = 1e-4;
+static const Foam::debug::tolerancesSwitch geomMatchTol_
+(
+    "geomMatchTol",
+    1e-4
+);
 
 // Priority scheme enumerants
 enum priorityScheme
@@ -1789,7 +1793,7 @@ const changeMap dynamicTopoFvMesh::insertCells(const label mIndex)
                             {
                                 scalar dist = mag(fC - pts[ptI]);
 
-                                if (dist < (geomMatchTol_ * tol))
+                                if (dist < (geomMatchTol_() * tol))
                                 {
                                     // Face was converted before
                                     if (debug > 3)
@@ -1938,7 +1942,7 @@ const changeMap dynamicTopoFvMesh::insertCells(const label mIndex)
     // Specify a merge tolerance for insertion points
     scalar mergeTol =
     (
-        is2D() ? 0.0 : geomMatchTol_ * magSqr(edges_[mIndex].vec(points_))
+        is2D() ? 0.0 : geomMatchTol_() * magSqr(edges_[mIndex].vec(points_))
     );
 
     // Check for point / edge processor connections
@@ -3228,7 +3232,7 @@ const changeMap dynamicTopoFvMesh::insertCells(const label mIndex)
                 scalar tol = mag(mesh.points_[fCheck[0]] - fC);
                 scalar dist = mag(fC - newCentre);
 
-                if (dist < (geomMatchTol_ * tol))
+                if (dist < (geomMatchTol_() * tol))
                 {
                     replaceFace = faceI;
                     break;
@@ -5270,7 +5274,7 @@ void dynamicTopoFvMesh::syncCoupledPatches(labelHashSet& entities)
                                 scalar tol = mag(points_[fCheck[0]] - fC);
                                 scalar dist = mag(fC - newCentre);
 
-                                if (dist < (geomMatchTol_ * tol))
+                                if (dist < (1e-4 * tol))
                                 {
                                     localIndex = faceI;
                                     break;
@@ -5320,7 +5324,7 @@ void dynamicTopoFvMesh::syncCoupledPatches(labelHashSet& entities)
                         scalar dist = mag(fC - newCentre);
 
                         // Ensure a face-match
-                        if (dist > (geomMatchTol_ * tol))
+                        if (dist > (geomMatchTol_() * tol))
                         {
                             Pout<< " * * * Sync Operations * * * " << nl
                                 << " Convert patch Op failed." << nl
@@ -5330,7 +5334,7 @@ void dynamicTopoFvMesh::syncCoupledPatches(labelHashSet& entities)
                                 << " faceCentre: " << fC << nl
                                 << " Master processor: " << proc << nl
                                 << " procPatch: " << procPatch << nl
-                                << " tolerance: " << (geomMatchTol_ * tol) << nl
+                                << " tolerance: " << (geomMatchTol_() * tol) << nl
                                 << " distance: " << dist << nl
                                 << " pointCounter: " << pointCounter << nl
                                 << " newCentre: " << newCentre << nl
@@ -5695,7 +5699,7 @@ bool dynamicTopoFvMesh::checkCoupledBoundaries(bool report) const
                     scalar rMagSf = mag(half1Areas[faceI]);
                     scalar avSf = 0.5 * (fMagSf + rMagSf);
 
-                    if (mag(fMagSf - rMagSf)/avSf > geomMatchTol_)
+                    if (mag(fMagSf - rMagSf)/avSf > geomMatchTol_())
                     {
                         misMatchError = true;
 
@@ -5713,7 +5717,7 @@ bool dynamicTopoFvMesh::checkCoupledBoundaries(bool report) const
                         Foam::max
                         (
                             pTol,
-                            geomMatchTol_ * mag(lP[lF[faceI][0]] - lC[faceI])
+                            geomMatchTol_() * mag(lP[lF[faceI][0]] - lC[faceI])
                         )
                     );
                 }
@@ -5859,7 +5863,7 @@ bool dynamicTopoFvMesh::checkCoupledBoundaries(bool report) const
             scalar nbrMagSf = mag(fAreas[pI][faceI]);
             scalar avSf = 0.5 * (magSf + nbrMagSf);
 
-            if (mag(magSf - nbrMagSf)/avSf > geomMatchTol_)
+            if (mag(magSf - nbrMagSf)/avSf > geomMatchTol_())
             {
                 misMatchError = true;
 
@@ -5878,7 +5882,7 @@ bool dynamicTopoFvMesh::checkCoupledBoundaries(bool report) const
                 Foam::max
                 (
                     pTol,
-                    geomMatchTol_ *
+                    geomMatchTol_() *
                     mag
                     (
                         myPoints[myFaces[faceI][0]]
@@ -6739,7 +6743,7 @@ void dynamicTopoFvMesh::buildLocalCoupledMaps()
     const boundBox& box = polyMesh::bounds();
 
     // Compute tolerance
-    scalar tol = geomMatchTol_ * box.mag();
+    scalar tol = geomMatchTol_()*box.mag();
 
     const polyBoundaryMesh& boundary = boundaryMesh();
 
@@ -6801,7 +6805,7 @@ void dynamicTopoFvMesh::buildLocalCoupledMaps()
                 FatalErrorIn("void dynamicTopoFvMesh::buildLocalCoupledMaps()")
                     << " Failed to match all points"
                     << " within a tolerance of: " << tol << nl
-                    << " matchTol: " << geomMatchTol_ << nl
+                    << " matchTol: " << geomMatchTol_() << nl
                     << abort(FatalError);
             }
 
@@ -7464,7 +7468,7 @@ void dynamicTopoFvMesh::buildProcessorCoupledMaps()
             const Map<label>& pMap = cMap.entityMap(coupleMap::POINT);
 
             // Compute tolerance
-            scalar tol = geomMatchTol_ * box.mag();
+            scalar tol = geomMatchTol_()*box.mag();
 
             forAllConstIter(Map<label>, pMap, pIter)
             {
@@ -8761,7 +8765,7 @@ bool dynamicTopoFvMesh::syncCoupledBoundaryOrdering
                     maxLen = max(maxLen, mag(points_[sFace[fpI]] - sfc));
                 }
 
-                slaveTols[slavePatch][fI] = geomMatchTol_ * maxLen;
+                slaveTols[slavePatch][fI] = geomMatchTol_()*maxLen;
             }
 
             // For cyclics, additionally test for halves,
@@ -9115,7 +9119,7 @@ bool dynamicTopoFvMesh::syncCoupledBoundaryOrdering
                     maxLen = max(maxLen, mag(points_[checkFace[fpI]] - fc));
                 }
 
-                slaveTols[pI][fI] = geomMatchTol_ * maxLen;
+                slaveTols[pI][fI] = geomMatchTol_()*maxLen;
             }
 
             // Write out my centres to disk

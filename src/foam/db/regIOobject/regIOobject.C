@@ -31,11 +31,12 @@ License
 
 defineTypeNameAndDebug(Foam::regIOobject, 0);
 
-int Foam::regIOobject::fileModificationSkew
+const Foam::debug::optimisationSwitch
+Foam::regIOobject::fileModificationSkew
 (
-    Foam::debug::optimisationSwitch("fileModificationSkew", 30)
+    "fileModificationSkew",
+    30
 );
-
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 

@@ -535,7 +535,7 @@ void Foam::ReactingMultiphaseParcel<ParcelType>::calcDevolatilisation
     Sh -= dMassTot*td.constProps().LDevol()/dt;
 
     // Molar average molecular weight of carrier mix
-    const scalar Wc = this->rhoc_*specie::RR*this->Tc_/this->pc_;
+    const scalar Wc = this->rhoc_*specie::RR()*this->Tc_/this->pc_;
 
     // Update molar emissions
     forAll(dMassDV, i)

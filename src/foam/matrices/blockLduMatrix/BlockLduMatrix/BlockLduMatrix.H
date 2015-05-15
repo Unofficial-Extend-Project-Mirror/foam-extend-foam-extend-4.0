@@ -53,6 +53,7 @@ SourceFiles
 #include "HashSet.H"
 #include "BlockLduInterfaceFieldPtrsList.H"
 #include "Map.H"
+#include "optimisationSwitch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -135,7 +136,7 @@ private:
 
         //- Matrix constraint fill-in
         //  Equals to the estimated fraction of fixed nodes in the matrix
-        static const label fixFillIn;
+        static const debug::optimisationSwitch fixFillIn;
 
 
     // Private member functions

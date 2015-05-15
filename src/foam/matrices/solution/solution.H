@@ -36,6 +36,7 @@ SourceFiles
 #define solution_H
 
 #include "IOdictionary.H"
+#include "debugSwitch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -77,7 +78,7 @@ public:
     static label upgradeSolverDict(dictionary& dict, const bool verbose=true);
 
     //- Debug switch
-    static int debug;
+    static debug::debugSwitch debug;
 
 
     // Constructors

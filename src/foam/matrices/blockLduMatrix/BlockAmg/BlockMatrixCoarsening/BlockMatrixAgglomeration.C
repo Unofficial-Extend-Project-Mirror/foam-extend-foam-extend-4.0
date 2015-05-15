@@ -38,13 +38,16 @@ Author
 #include "addToRunTimeSelectionTable.H"
 #include "BlockGAMGInterfaceField.H"
 #include "processorLduInterfaceField.H"
+#include "tolerancesSwitch.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
 template<class Type>
-const Foam::scalar Foam::BlockMatrixAgglomeration<Type>::diagFactor_
+const Foam::debug::tolerancesSwitch
+Foam::BlockMatrixAgglomeration<Type>::diagFactor_
 (
-    debug::tolerances("aamgDiagFactor", 1e-8)
+    "aamgDiagFactor",
+    1e-8
 );
 
 template<class Type>
@@ -182,7 +185,7 @@ void Foam::BlockMatrixAgglomeration<Type>::calcAgglomeration()
         // Go through all upper and lower coefficients and for the ones
         // larger than threshold mark the equations out of cluster zero
 
-        scalarField magScaledDiag = diagFactor_*magDiag;
+        scalarField magScaledDiag = diagFactor_()*magDiag;
 
         boolList zeroCluster(diag.size(), true);
 

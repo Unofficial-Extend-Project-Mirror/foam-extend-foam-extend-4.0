@@ -37,6 +37,7 @@ SourceFiles
 
 #include "faceList.H"
 #include "oppositeFace.H"
+#include "debugSwitch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -65,8 +66,9 @@ public:
 
         static const char* const typeName;
 
-    //- Debug switch
-        static int debug;
+        //- Debug switch
+        static debug::debugSwitch debug;
+
 
     // Constructors
 

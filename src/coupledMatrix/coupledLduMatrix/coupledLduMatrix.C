@@ -217,8 +217,8 @@ void Foam::coupledLduMatrix::initMatrixInterfaces
     {
         if
         (
-            Pstream::defaultCommsType == Pstream::blocking
-         || Pstream::defaultCommsType == Pstream::nonBlocking
+            Pstream::defaultCommsType() == Pstream::blocking
+         || Pstream::defaultCommsType() == Pstream::nonBlocking
         )
         {
             forAll (interfaces[rowI], interfaceI)
@@ -240,7 +240,10 @@ void Foam::coupledLduMatrix::initMatrixInterfaces
                             matrices[rowI],
                             coupleCoeffs[rowI][interfaceI],
                             cmpt,
-                            Pstream::defaultCommsType,
+                            static_cast<const Pstream::commsTypes>
+                            (
+                                Pstream::defaultCommsType()
+                            ),
                             false
                         );
                     }
@@ -265,8 +268,8 @@ void Foam::coupledLduMatrix::initMatrixInterfaces
     {
         if
         (
-            Pstream::defaultCommsType == Pstream::blocking
-         || Pstream::defaultCommsType == Pstream::nonBlocking
+            Pstream::defaultCommsType() == Pstream::blocking
+         || Pstream::defaultCommsType() == Pstream::nonBlocking
         )
         {
             forAll (interfaces[rowI], interfaceI)
@@ -288,7 +291,10 @@ void Foam::coupledLduMatrix::initMatrixInterfaces
                             matrices[rowI],
                             coupleCoeffs[rowI][interfaceI],
                             cmpt,
-                            Pstream::defaultCommsType,
+                            static_cast<const Pstream::commsTypes>
+                            (
+                                Pstream::defaultCommsType()
+                            ),
                             false
                         );
                     }

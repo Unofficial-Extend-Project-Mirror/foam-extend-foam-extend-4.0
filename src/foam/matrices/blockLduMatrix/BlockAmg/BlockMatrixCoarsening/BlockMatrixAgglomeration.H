@@ -42,6 +42,7 @@ SourceFiles
 #include "BlockLduMatrix.H"
 #include "BlockCoeffNorm.H"
 #include "BlockCoeff.H"
+#include "tolerancesSwitch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -99,7 +100,7 @@ class BlockMatrixAgglomeration
     // Private Static Data
 
         //- Diagonal scaling factor
-        static const scalar diagFactor_;
+        static const debug::tolerancesSwitch diagFactor_;
 
         //- Weighting factor
         static const scalar weightFactor_;

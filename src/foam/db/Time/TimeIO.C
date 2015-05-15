@@ -33,6 +33,9 @@ License
 
 void Foam::Time::readDict()
 {
+    if (debug)
+	Info << "Time::readDict(): reading " << controlDict_.name() << endl;
+
     if (!deltaTchanged_)
     {
         deltaT_ = readScalar(controlDict_.lookup("deltaT"));

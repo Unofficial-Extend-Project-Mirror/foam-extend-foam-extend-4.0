@@ -121,7 +121,7 @@ class polyTopoChange
 
 public:
 
-    static int debug;
+    static debug::debugSwitch debug;
 
 
     // Constructors

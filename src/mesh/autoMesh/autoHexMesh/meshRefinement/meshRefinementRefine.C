@@ -1269,7 +1269,7 @@ Foam::meshRefinement::refineAndBalance
             << " mesh to time " << timeName() << endl;
         write
         (
-            debug,
+            debug(),
             mesh_.time().path()
            /timeName()
         );
@@ -1282,7 +1282,7 @@ Foam::meshRefinement::refineAndBalance
 
     Info<< "Refined mesh in = "
         << mesh_.time().cpuTimeIncrement() << " s" << endl;
-    printMeshInfo(debug, "After refinement " + msg);
+    printMeshInfo(debug(), "After refinement " + msg);
 
 
     // Load balancing
@@ -1324,7 +1324,7 @@ Foam::meshRefinement::refineAndBalance
             Info<< "Balanced mesh in = "
                 << mesh_.time().cpuTimeIncrement() << " s" << endl;
 
-            printMeshInfo(debug, "After balancing " + msg);
+            printMeshInfo(debug(), "After balancing " + msg);
 
 
             if (debug)
@@ -1333,7 +1333,7 @@ Foam::meshRefinement::refineAndBalance
                     << " mesh to time " << timeName() << endl;
                 write
                 (
-                    debug,
+                    debug(),
                     mesh_.time().path()/timeName()
                 );
                 Pout<< "Dumped debug data in = "
@@ -1447,7 +1447,7 @@ Foam::meshRefinement::balanceAndRefine
         //    Info<< endl;
         //}
 
-        printMeshInfo(debug, "After balancing " + msg);
+        printMeshInfo(debug(), "After balancing " + msg);
 
         if (debug)
         {
@@ -1455,7 +1455,7 @@ Foam::meshRefinement::balanceAndRefine
                 << " mesh to time " << timeName() << endl;
             write
             (
-                debug,
+                debug(),
                 mesh_.time().path()/timeName()
             );
             Pout<< "Dumped debug data in = "
@@ -1478,7 +1478,7 @@ Foam::meshRefinement::balanceAndRefine
             << " mesh to time " << timeName() << endl;
         write
         (
-            debug,
+            debug(),
             mesh_.time().path()
            /timeName()
         );
@@ -1504,7 +1504,7 @@ Foam::meshRefinement::balanceAndRefine
     //    Info<< endl;
     //}
 
-    printMeshInfo(debug, "After refinement " + msg);
+    printMeshInfo(debug(), "After refinement " + msg);
 
     return distMap;
 }

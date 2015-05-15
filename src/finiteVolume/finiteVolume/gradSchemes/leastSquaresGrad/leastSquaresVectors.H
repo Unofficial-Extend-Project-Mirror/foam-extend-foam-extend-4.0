@@ -39,6 +39,7 @@ SourceFiles
 #include "fvMesh.H"
 #include "surfaceFieldsFwd.H"
 #include "labelPair.H"
+#include "tolerancesSwitch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -77,7 +78,7 @@ public:
     // Static data members
 
         //- Point merge tolerance
-        static const scalar smallDotProdTol_;
+        static const debug::tolerancesSwitch smallDotProdTol_;
 
 
     // Constructors

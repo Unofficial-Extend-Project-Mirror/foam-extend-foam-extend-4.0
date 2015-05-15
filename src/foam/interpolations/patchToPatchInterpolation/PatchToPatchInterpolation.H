@@ -45,6 +45,7 @@ SourceFiles
 #include "FieldFields.H"
 #include "faceList.H"
 #include "intersection.H"
+#include "tolerancesSwitch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -86,10 +87,10 @@ class PatchToPatchInterpolation
 
         //- Relative merge tolerance for projected points missing the target
         //  Expressed as the fraction of min involved edge size
-        static scalar projectionTol_;
+        static const debug::tolerancesSwitch projectionTol_;
 
         //- Direct hit tolerance
-        static scalar directHitTol_;
+        static const debug::tolerancesSwitch directHitTol_;
 
 
         // Point addressing

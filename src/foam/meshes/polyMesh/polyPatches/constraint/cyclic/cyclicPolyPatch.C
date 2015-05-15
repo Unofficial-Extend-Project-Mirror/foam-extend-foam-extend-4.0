@@ -165,7 +165,7 @@ void Foam::cyclicPolyPatch::calcTransforms() const
             else if
             (
                 mag(magSf - nbrMagSf)/avSf
-             > polyPatch::matchTol_
+             > polyPatch::matchTol_()
             )
             {
                 // Error in area matching.  Find largest error
@@ -280,7 +280,7 @@ void Foam::cyclicPolyPatch::calcTransforms() const
         }
 
         // Check for error in face matching
-        if (maxMatchError > polyPatch::matchTol_)
+        if (maxMatchError > polyPatch::matchTol_())
         {
             label nbrFacei = errorFace + size()/2;
             scalar magSf = mag(half0Normals[errorFace]);
@@ -298,7 +298,7 @@ void Foam::cyclicPolyPatch::calcTransforms() const
                 << "patch:" << name()
                 << " my area:" << magSf
                 << " neighbour area:" << nbrMagSf
-                << " matching tolerance:" << polyPatch::matchTol_
+                << " matching tolerance:" << polyPatch::matchTol_()
                 << endl
                 << "Mesh face:" << start() + errorFace
                 << " vertices:"
@@ -384,7 +384,7 @@ void Foam::cyclicPolyPatch::calcTransforms() const
 
             // Check max distance between face centre and
             // transformed face centre
-            if (maxRelDistance > sqrt(polyPatch::matchTol_))
+            if (maxRelDistance > sqrt(polyPatch::matchTol_()))
             {
                 SeriousErrorIn
                 (
@@ -633,7 +633,7 @@ void Foam::cyclicPolyPatch::getCentresAndAnchors
         }
     }
 
-    if (mag(n0 & n1) < 1 - polyPatch::matchTol_)
+    if (mag(n0 & n1) < 1 - polyPatch::matchTol_())
     {
         if (debug)
         {

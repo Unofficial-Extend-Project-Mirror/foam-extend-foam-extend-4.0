@@ -393,7 +393,7 @@ void Foam::autoRefineDriver::removeInsideCells
     {
         Pout<< "Writing subsetted mesh to time "
             << meshRefiner_.timeName() << '.' << endl;
-        meshRefiner_.write(debug, mesh.time().path()/meshRefiner_.timeName());
+        meshRefiner_.write(debug(), mesh.time().path()/meshRefiner_.timeName());
         Pout<< "Dumped mesh in = "
             << mesh.time().cpuTimeIncrement() << " s\n" << nl << endl;
     }
@@ -645,7 +645,7 @@ void Foam::autoRefineDriver::zonify
                 << meshRefiner_.timeName() << '.' << endl;
             meshRefiner_.write
             (
-                debug,
+                debug(),
                 mesh.time().path()/meshRefiner_.timeName()
             );
         }
@@ -735,7 +735,7 @@ void Foam::autoRefineDriver::splitAndMergeBaffles
     {
         Pout<< "Writing handleProblemCells mesh to time "
             << meshRefiner_.timeName() << '.' << endl;
-        meshRefiner_.write(debug, mesh.time().path()/meshRefiner_.timeName());
+        meshRefiner_.write(debug(), mesh.time().path()/meshRefiner_.timeName());
     }
 }
 

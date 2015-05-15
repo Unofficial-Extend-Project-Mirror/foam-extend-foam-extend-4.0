@@ -53,6 +53,8 @@ SourceFiles
 #include "intersection.H"
 #include "point2D.H"
 #include "NamedEnum.H"
+#include "tolerancesSwitch.H"
+#include "optimisationSwitch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -188,13 +190,13 @@ class GGIInterpolation
     // Private static data
 
         //- Facet area error tolerance
-        static const scalar areaErrorTol_;
+        static const debug::tolerancesSwitch areaErrorTol_;
 
         //- Facet normal featureCos criteria
-        static const scalar featureCosTol_;
+        static const debug::tolerancesSwitch featureCosTol_;
 
-       //- Facet bound box extension factor
-       static const scalar faceBoundBoxExtendSpanFraction_;
+        //- Facet bound box extension factor
+        static const debug::tolerancesSwitch faceBoundBoxExtendSpanFraction_;
 
        //- The next 3 attributes are parameters controlling the creation
        //  of an octree search engine for the GGI facets neighbourhood
@@ -218,13 +220,13 @@ class GGIInterpolation
        //
 
        //- Octree search: minNlevel parameter for octree constructor
-       static const label octreeSearchMinNLevel_;
+       static const debug::optimisationSwitch octreeSearchMinNLevel_;
 
        //- Octree search: maxLeafRatio parameter for octree constructor
-       static const scalar octreeSearchMaxLeafRatio_;
+       static const debug::optimisationSwitch octreeSearchMaxLeafRatio_;
 
        //- Octree search: maxShapeRatio parameter for octree constructor
-       static const scalar octreeSearchMaxShapeRatio_;
+       static const debug::optimisationSwitch octreeSearchMaxShapeRatio_;
 
 
     // Private Member Functions

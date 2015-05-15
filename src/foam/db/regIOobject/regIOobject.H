@@ -41,6 +41,7 @@ SourceFiles
 #include "IOobject.H"
 #include "typeInfo.H"
 #include "OSspecific.H"
+#include "optimisationSwitch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -93,7 +94,8 @@ public:
         //- Runtime type information
         TypeName("regIOobject");
 
-        static int fileModificationSkew;
+        //- File modification skew
+        static const debug::optimisationSwitch fileModificationSkew;
 
 
     // Constructors

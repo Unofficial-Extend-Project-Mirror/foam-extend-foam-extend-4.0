@@ -63,6 +63,7 @@ SourceFiles
 #include "ZoneIDs.H"
 #include "intersection.H"
 #include "Pair.H"
+#include "tolerancesSwitch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -261,10 +262,10 @@ private:
     // Static data members
 
         //- Point merge tolerance
-        static const scalar pointMergeTol_;
+        static const debug::tolerancesSwitch pointMergeTol_;
 
         //- Edge merge tolerance
-        static const scalar edgeMergeTol_;
+        static const debug::tolerancesSwitch edgeMergeTol_;
 
         //- Estimated number of faces an edge goes through
         static const label nFacesPerSlaveEdge_;
@@ -273,16 +274,16 @@ private:
         static const label edgeFaceEscapeLimit_;
 
         //- Integral match point adjustment tolerance
-        static const scalar integralAdjTol_;
+        static const debug::tolerancesSwitch integralAdjTol_;
 
         //- Edge intersection master catch fraction
-        static const scalar edgeMasterCatchFraction_;
+        static const debug::tolerancesSwitch edgeMasterCatchFraction_;
 
         //- Edge intersection co-planar tolerance
-        static const scalar edgeCoPlanarTol_;
+        static const debug::tolerancesSwitch edgeCoPlanarTol_;
 
         //- Edge end cut-off tolerance
-        static const scalar edgeEndCutoffTol_;
+        static const debug::tolerancesSwitch edgeEndCutoffTol_;
 
 
 public:

@@ -43,6 +43,7 @@ SourceFiles
 
 #include "faPatch.H"
 #include "DimensionedField.H"
+#include "debugSwitch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -93,7 +94,7 @@ public:
     TypeName("faePatchField");
 
     //- Debug switch to disallow the use of
-    static int disallowDefaultFaePatchField;
+    static debug::debugSwitch disallowDefaultFaePatchField;
 
 
     // Declare run-time constructor selection tables

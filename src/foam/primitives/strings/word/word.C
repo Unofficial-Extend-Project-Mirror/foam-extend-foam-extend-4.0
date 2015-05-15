@@ -29,7 +29,7 @@ License
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
 const char* const Foam::word::typeName = "word";
-int Foam::word::debug(Foam::debug::debugSwitch(word::typeName, 0));
+int Foam::word::debug(Foam::debug::debugSwitchFromDict(word::typeName, 0));
 const Foam::word Foam::word::null;
 
 // ************************************************************************* //

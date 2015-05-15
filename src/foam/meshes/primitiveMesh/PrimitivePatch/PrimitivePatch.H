@@ -57,6 +57,7 @@ SourceFiles
 #include "point.H"
 #include "intersection.H"
 #include "HashSet.H"
+#include "optimisationSwitch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -177,7 +178,8 @@ private:
 
     // Static Private Data
 
-        static const bool nSquaredProjection_;
+        //- N-squared projection forced
+        static const debug::optimisationSwitch nSquaredProjection_;
 
 
     // Private Member Functions

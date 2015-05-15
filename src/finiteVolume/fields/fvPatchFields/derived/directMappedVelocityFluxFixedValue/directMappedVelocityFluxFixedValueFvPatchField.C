@@ -198,7 +198,7 @@ void directMappedVelocityFluxFixedValueFvPatchField::updateCoeffs()
 
             mapDistribute::distribute
             (
-                Pstream::defaultCommsType,
+                static_cast<Pstream::commsTypes>(Pstream::defaultCommsType()),
                 distMap.schedule(),
                 distMap.constructSize(),
                 distMap.subMap(),
@@ -209,7 +209,7 @@ void directMappedVelocityFluxFixedValueFvPatchField::updateCoeffs()
 
             mapDistribute::distribute
             (
-                Pstream::defaultCommsType,
+                static_cast<Pstream::commsTypes>(Pstream::defaultCommsType()),
                 distMap.schedule(),
                 distMap.constructSize(),
                 distMap.subMap(),
@@ -231,7 +231,7 @@ void directMappedVelocityFluxFixedValueFvPatchField::updateCoeffs()
 
             mapDistribute::distribute
             (
-                Pstream::defaultCommsType,
+                static_cast<Pstream::commsTypes>(Pstream::defaultCommsType()),
                 distMap.schedule(),
                 distMap.constructSize(),
                 distMap.subMap(),
@@ -243,7 +243,7 @@ void directMappedVelocityFluxFixedValueFvPatchField::updateCoeffs()
 
             mapDistribute::distribute
             (
-                Pstream::defaultCommsType,
+                static_cast<Pstream::commsTypes>(Pstream::defaultCommsType()),
                 distMap.schedule(),
                 distMap.constructSize(),
                 distMap.subMap(),

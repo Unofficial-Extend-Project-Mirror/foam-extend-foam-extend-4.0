@@ -63,6 +63,7 @@ T dimensionedConstant
     else
     {
         dimensionedConstants().add(switchName, defaultValue);
+
         return defaultValue;
     }
 }

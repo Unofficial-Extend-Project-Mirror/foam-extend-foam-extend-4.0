@@ -209,40 +209,68 @@ void Foam::Pstream::initCommunicationSchedule()
 // Initialise my process number to 0 (the master)
 int Foam::Pstream::myProcNo_(0);
 
+
 // By default this is not a parallel run
 bool Foam::Pstream::parRun_(false);
+
 
 // List of process IDs
 Foam::List<int> Foam::Pstream::procIDs_(1, 0);
 
+
 // Standard transfer message type
 const int Foam::Pstream::msgType_(1);
+
 
 // Linear communication schedule
 Foam::List<Foam::Pstream::commsStruct> Foam::Pstream::linearCommunication_(0);
 
+
 // Multi level communication schedule
 Foam::List<Foam::Pstream::commsStruct> Foam::Pstream::treeCommunication_(0);
+
 
 // Should compact transfer be used in which floats replace doubles
 // reducing the bandwidth requirement at the expense of some loss
 // in accuracy
-bool Foam::Pstream::floatTransfer
+const Foam::debug::optimisationSwitch
+Foam::Pstream::floatTransfer
 (
-    debug::optimisationSwitch("floatTransfer", 0)
+    "floatTransfer",
+    0
 );
+
 
 // Number of processors at which the reduce algorithm changes from linear to
 // tree
-int Foam::Pstream::nProcsSimpleSum
+const Foam::debug::optimisationSwitch
+Foam::Pstream::nProcsSimpleSum
 (
-    debug::optimisationSwitch("nProcsSimpleSum", 16)
+    "nProcsSimpleSum",
+    16
 );
 
+
 // Default commsType
-Foam::Pstream::commsTypes Foam::Pstream::defaultCommsType
+// Foam::Pstream::commsTypes Foam::Pstream::defaultCommsType
+// (
+//     commsTypeNames
+//     [
+//         debug::optimisationSwitches().lookupOrAddDefault
+//         (
+//             "commsType",
+//             word("blocking")
+//         )
+//     ]
+// );
+
+
+const Foam::debug::optimisationSwitch
+Foam::Pstream::defaultCommsType
 (
-    commsTypeNames.read(debug::optimisationSwitches().lookup("commsType"))
+    "commsType",
+    "blocking",
+    "blocking, nonBlocking, scheduled"
 );
 
 

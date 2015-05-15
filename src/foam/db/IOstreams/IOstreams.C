@@ -36,8 +36,13 @@ namespace Foam
 
 const IOstream::versionNumber IOstream::originalVersion(0.5);
 const IOstream::versionNumber IOstream::currentVersion(2.0);
-unsigned int IOstream::precision_(debug::infoSwitch("writePrecision", 6));
 
+Foam::debug::infoSwitch
+IOstream::precision_
+(
+    "writePrecision",
+    6
+);
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 // Global IO streams

@@ -49,9 +49,11 @@ namespace Foam
 } // End namespace Foam
 
 
-const Foam::scalar Foam::pamgPolicy::diagFactor_
+const Foam::debug::tolerancesSwitch
+Foam::pamgPolicy::diagFactor_
 (
-    debug::tolerances("pamgDiagFactor", 1e-8)
+    "pamgDiagFactor",
+    1e-8
 );
 
 
@@ -161,7 +163,7 @@ void Foam::pamgPolicy::calcChild()
         // Go through all upper and lower coefficients and for the ones
         // larger than threshold mark the equations out of cluster zero
 
-        scalarField magScaledDiag = diagFactor_*mag(diag);
+        scalarField magScaledDiag = diagFactor_()*mag(diag);
 
         boolList zeroCluster(diag.size(), true);
 

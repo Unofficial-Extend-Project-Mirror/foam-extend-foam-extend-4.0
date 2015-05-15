@@ -39,7 +39,12 @@ const Foam::word Foam::functionEntries::removeEntry::typeName
 
 // Don't lookup the debug switch here as the debug switch dictionary
 // might include removeEntry
-int Foam::functionEntries::removeEntry::debug(0);
+Foam::debug::debugSwitch
+Foam::functionEntries::removeEntry::debug
+(
+    "removeEntry",
+    0
+);
 
 namespace Foam
 {

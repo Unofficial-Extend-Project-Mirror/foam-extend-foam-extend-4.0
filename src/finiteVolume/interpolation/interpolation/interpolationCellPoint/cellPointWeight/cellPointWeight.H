@@ -84,7 +84,7 @@ protected:
 public:
 
     //- Debug switch
-    static int debug;
+    static debug::debugSwitch debug;
 
     //- Tolerance used in calculating barycentric co-ordinates
     //  (applied to normailised values)

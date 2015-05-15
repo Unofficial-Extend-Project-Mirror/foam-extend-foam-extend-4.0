@@ -134,13 +134,13 @@ Foam::scalar Foam::COxidationKineticDiffusionLimitedRate<CloudType>::calculate
     const scalar D0 = C1_/d*pow(0.5*(T + Tc), 0.75);
 
     // Kinetic rate
-    const scalar Rk = C2_*exp(-E_/(specie::RR*Tc));
+    const scalar Rk = C2_*exp(-E_/(specie::RR()*Tc));
 
     // Particle surface area
     const scalar Ap = mathematicalConstant::pi*sqr(d);
 
     // Change in C mass [kg]
-    scalar dmC = Ap*rhoc*specie::RR*Tc*YO2/WO2_*D0*Rk/(D0 + Rk);
+    scalar dmC = Ap*rhoc*specie::RR()*Tc*YO2/WO2_*D0*Rk/(D0 + Rk);
 
     // Limit mass transfer by availability of C
     dmC = min(mass*fComb, dmC);

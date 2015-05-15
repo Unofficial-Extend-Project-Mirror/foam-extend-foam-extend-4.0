@@ -489,7 +489,8 @@ public:
     template<>                                                                \
     const Foam::word Particle<Type>::typeName(#Type);                         \
     template<>                                                                \
-    int Particle<Type>::debug(Foam::debug::debugSwitch(#Type, DebugSwitch));
+    Foam::debug::debugSwitch                                                  \
+    Particle<Type>::debug(std::string(#Type), DebugSwitch);
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

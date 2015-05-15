@@ -43,6 +43,7 @@ SourceFiles
 #include "fvPatchMapper.H"
 #include "scalarList.H"
 #include "className.H"
+#include "tolerancesSwitch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -122,10 +123,10 @@ class meshToMesh
     // Private static data members
 
         //- Direct hit tolerance
-        static const scalar directHitTol;
+        static const debug::tolerancesSwitch directHitTol;
 
         //- Cell centre distance required to establish a hit
-        static const scalar cellCentreDistanceTol;
+        static const debug::tolerancesSwitch cellCentreDistanceTol;
 
 
 public:
