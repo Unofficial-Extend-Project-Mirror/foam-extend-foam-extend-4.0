@@ -282,8 +282,10 @@ Darwin)
     ;;
     esac
 
+    # Using MacPorts
+    : ${MACOSX_MACPORTS_ROOT:='/opt/local/etc/macports'}; export MACOSX_MACPORTS_ROOT
     which -s port >/dev/null
-    if [ $? -eq "0" -a -d '/opt/local/etc/macports' ]
+    if [ $? -eq "0" ]  && [ -d "$MACOSX_MACPORTS_ROOT" ]
     then
 	if [ "$FOAM_VERBOSE" -a "$PS1" ]
 	then
@@ -382,8 +384,7 @@ Darwin)
 	    unset ruleDir ruleDirBase
 	fi
     else
-        export WM_COMPILER=Gcc
-        export WM_MPLIB=OPENMPI
+        echo "Warning: You are not using MacPorts. Make sure your compilation and MPI environment is correctly initialized"
     fi
 
     # Make sure that binaries use the best features of the used OS-Version

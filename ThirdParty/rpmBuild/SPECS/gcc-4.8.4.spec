@@ -22,7 +22,7 @@
 #     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 #
 # Script
-#     RPM spec file for gcc-4.9.2
+#     RPM spec file for gcc-4.8.4
 #
 # Description
 #     RPM spec file for creating a relocatable RPM
@@ -62,7 +62,7 @@
 
 %define name		gcc
 %define release		%{_WM_OPTIONS}
-%define version 	4.9.2
+%define version 	4.8.4
 
 %define buildroot       %{_topdir}/BUILD/%{name}-%{version}-root
 
@@ -72,7 +72,7 @@ License: 		Unkown
 Name: 			%{name}
 Version: 		%{version}
 Release: 		%{release}
-URL:                    ftp://ftp.gnu.org/gnu/gcc/gcc-4.9.2
+URL:                    ftp://ftp.gnu.org/gnu/gcc/gcc-4.8.4
 Source: 		%url/%{name}-%{version}.tar.gz
 Prefix: 		%{_prefix}
 Group: 			Development/Tools

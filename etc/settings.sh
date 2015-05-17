@@ -135,18 +135,22 @@ FOAM)
         _foamSource $WM_THIRD_PARTY_DIR/packages/gmp-5.1.2/platforms/$WM_OPTIONS/etc/gmp-5.1.2.sh
         _foamSource $WM_THIRD_PARTY_DIR/packages/mpfr-3.1.2/platforms/$WM_OPTIONS/etc/mpfr-3.1.2.sh
         _foamSource $WM_THIRD_PARTY_DIR/packages/mpc-1.0.1/platforms/$WM_OPTIONS/etc/mpc-1.0.1.sh
-        _foamSource $WM_THIRD_PARTY_DIR/packages/gcc-4.6.4/platforms/$WM_OPTIONS/etc/gcc-4.6.4.csh
+        _foamSource $WM_THIRD_PARTY_DIR/packages/gcc-4.6.4/platforms/$WM_OPTIONS/etc/gcc-4.6.4.sh
         ;;
     Gcc49)
         export WM_COMPILER_DIR=$WM_THIRD_PARTY_DIR/packages/gcc-4.9.2/platforms/$WM_OPTIONS
-        _foamSource $WM_THIRD_PARTY_DIR/packages/gcc-4.9.2/platforms/$WM_OPTIONS/etc/gcc-4.9.2.csh
+        _foamSource $WM_THIRD_PARTY_DIR/packages/gcc-4.9.2/platforms/$WM_OPTIONS/etc/gcc-4.9.2.sh
+        ;;
+    Gcc48)
+        export WM_COMPILER_DIR=$WM_THIRD_PARTY_DIR/packages/gcc-4.8.4/platforms/$WM_OPTIONS
+        _foamSource $WM_THIRD_PARTY_DIR/packages/gcc-4.8.4/platforms/$WM_OPTIONS/etc/gcc-4.8.4.sh
         ;;
     Gcc47)
         export WM_COMPILER_DIR=$WM_THIRD_PARTY_DIR/packages/gcc-4.7.4/platforms/$WM_OPTIONS
         _foamSource $WM_THIRD_PARTY_DIR/packages/gmp-5.1.2/platforms/$WM_OPTIONS/etc/gmp-5.1.2.sh
         _foamSource $WM_THIRD_PARTY_DIR/packages/mpfr-3.1.2/platforms/$WM_OPTIONS/etc/mpfr-3.1.2.sh
         _foamSource $WM_THIRD_PARTY_DIR/packages/mpc-1.0.1/platforms/$WM_OPTIONS/etc/mpc-1.0.1.sh
-        _foamSource $WM_THIRD_PARTY_DIR/packages/gcc-4.7.4/platforms/$WM_OPTIONS/etc/gcc-4.7.4.csh
+        _foamSource $WM_THIRD_PARTY_DIR/packages/gcc-4.7.4/platforms/$WM_OPTIONS/etc/gcc-4.7.4.sh
         ;;
     Gcc45)
         export WM_COMPILER_DIR=$WM_THIRD_PARTY_DIR/packages/gcc-4.5.1/platforms/$WM_OPTIONS

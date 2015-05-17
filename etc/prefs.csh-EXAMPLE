@@ -170,6 +170,11 @@
 # You can override your identifier using this environment variable
 #setenv CDASH_SUBMIT_LOCAL_HOST_ID choose_your_CDash_system_identifer
 
+# Mac OS X MacPorts root directory.
+# The default value is '/opt/local/etc/macports'.
+# In order to disable the usage of MacPorts on Mac OSX, simply initialize this
+# variable to a non-existing directory, or to a dummy value.
+#setenv MACOSX_MACPORTS_ROOT="_not_using_"
 
 # ThirdParty packages: build control variables
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -177,8 +182,8 @@
 # installation of the corresponding ThirdParty package
 #
 # For AllMake.stage1
-#setenv WM_THIRD_PARTY_USE_GCC_49  1
-#setenv WM_THIRD_PARTY_USE_GCC_48  1
+#setenv WM_THIRD_PARTY_USE_GCC_492  1
+#setenv WM_THIRD_PARTY_USE_GCC_484  1
 #setenv WM_THIRD_PARTY_USE_GCC_463 1
 #setenv WM_THIRD_PARTY_USE_GCC_451 1
 #setenv WM_THIRD_PARTY_USE_GCC_445 1
