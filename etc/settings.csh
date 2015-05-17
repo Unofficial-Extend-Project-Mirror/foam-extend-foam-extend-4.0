@@ -481,6 +481,10 @@ endif
 
 # Scotch library if available
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+if ( $?SCOTCH_SYSTEM == 0 && $?WM_THIRD_PARTY_USE_SCOTCH_604 != 0 && -e $WM_THIRD_PARTY_DIR/packages/scotch-6.0.4/platforms/$WM_OPTIONS ) then
+    _foamSource $WM_THIRD_PARTY_DIR/packages/scotch-6.0.4/platforms/$WM_OPTIONS/etc/scotch-6.0.4.csh
+endif
+
 if ( $?SCOTCH_SYSTEM == 0 && $?WM_THIRD_PARTY_USE_SCOTCH_600 != 0 && -e $WM_THIRD_PARTY_DIR/packages/scotch-6.0.0/platforms/$WM_OPTIONS ) then
     _foamSource $WM_THIRD_PARTY_DIR/packages/scotch-6.0.0/platforms/$WM_OPTIONS/etc/scotch-6.0.0.csh
 endif
@@ -495,12 +499,12 @@ endif
 
 # cmake
 # ~~~~~
-if ( $?CMAKE_SYSTEM == 0 && $?WM_THIRD_PARTY_USE_CMAKE_2812 != 0 && -e "$WM_THIRD_PARTY_DIR"/packages/cmake-2.8.12/platforms/$WM_OPTIONS ) then
-    _foamSource $WM_THIRD_PARTY_DIR/packages/cmake-2.8.12/platforms/$WM_OPTIONS/etc/cmake-2.8.12.csh
+if ( $?CMAKE_SYSTEM == 0 && $?WM_THIRD_PARTY_USE_CMAKE_322 != 0 && -e "$WM_THIRD_PARTY_DIR"/packages/cmake-3.2.2/platforms/$WM_OPTIONS ) then
+    _foamSource $WM_THIRD_PARTY_DIR/packages/cmake-3.2.2/platforms/$WM_OPTIONS/etc/cmake-3.2.2.csh
 endif
 
-if ( $?CMAKE_SYSTEM == 0 && $?WM_THIRD_PARTY_USE_CMAKE_311 != 0 && -e "$WM_THIRD_PARTY_DIR"/packages/cmake-3.2.2/platforms/$WM_OPTIONS ) then
-    _foamSource $WM_THIRD_PARTY_DIR/packages/cmake-3.2.2/platforms/$WM_OPTIONS/etc/cmake-3.2.2.csh
+if ( $?CMAKE_SYSTEM == 0 && $?WM_THIRD_PARTY_USE_CMAKE_2812 != 0 && -e "$WM_THIRD_PARTY_DIR"/packages/cmake-2.8.12/platforms/$WM_OPTIONS ) then
+    _foamSource $WM_THIRD_PARTY_DIR/packages/cmake-2.8.12/platforms/$WM_OPTIONS/etc/cmake-2.8.12.csh
 endif
 
 # m4
@@ -546,6 +550,9 @@ endif
 # ~~~~~
 if ( $?HWLOC_SYSTEM == 0 && $?WM_THIRD_PARTY_USE_HWLOC_172 != 0 && -e "$WM_THIRD_PARTY_DIR"/packages/hwloc-1.7.2/platforms/$WM_OPTIONS ) then
     _foamSource $WM_THIRD_PARTY_DIR/packages/hwloc-1.7.2/platforms/$WM_OPTIONS/etc/hwloc-1.7.2.csh
+endif
+if ( $?HWLOC_SYSTEM == 0 && $?WM_THIRD_PARTY_USE_HWLOC_1101 != 0 && -e "$WM_THIRD_PARTY_DIR"/packages/hwloc-1.10.1/platforms/$WM_OPTIONS ) then
+    _foamSource $WM_THIRD_PARTY_DIR/packages/hwloc-1.10.1/platforms/$WM_OPTIONS/etc/hwloc-1.10.1.csh
 endif
 
 # QT

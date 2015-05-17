@@ -22,14 +22,13 @@
 #     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 #
 # Script
-#     RPM spec file for libccmio-2.6.1
+#     RPM spec file for scotch-6.0.4
 #
 # Description
 #     RPM spec file for creating a relocatable RPM
 #
 # Author:
-#     Martin Beaudoin, Hydro-Quebec, (2010)
-#
+#     Martin Beaudoin, Hydro-Quebec, (2015)
 #------------------------------------------------------------------------------
 
 # We grab the value of WM_THIRD_PARTY and WM_OPTIONS from the environment variable
@@ -45,8 +44,8 @@
 
 # Will install the package directly $WM_THIRD_PARTY_DIR
 #   Some comments about package relocation:
-#   By using this prefix for the Prefix:  parameter in this file, you will make this
-#   package relocatable.
+#   By using this prefix for the Prefix:  parameter in this file, you will make this 
+#   package relocatable. 
 #
 #   This is fine, as long as your software is itself relocatable.
 #
@@ -55,28 +54,29 @@
 #   Ref: http://sourceware.org/autobook/autobook/autobook_80.html
 #
 #   In that case, if you ever change the value of the $WM_THIRD_PARTY_DIR, you will
-#   not be able to reutilize this RPM, even though it is relocatable. You will need to
+#   not be able to reutilize this RPM, even though it is relocatable. You will need to 
 #   regenerate the RPM.
 #
 %define _prefix         %{_WM_THIRD_PARTY_DIR}
 
-%define name		libccmio
+%define name		scotch
 %define release		%{_WM_OPTIONS}
-%define version 	2.6.1
+%define version 	6.0.4
 
 %define buildroot       %{_topdir}/BUILD/%{name}-%{version}-root
 
 BuildRoot:	        %{buildroot}
-Summary: 		libccmio
+Summary: 		scotch
 License: 		Unkown
 Name: 			%{name}
 Version: 		%{version}
 Release: 		%{release}
-URL:                    https://wci.llnl.gov/codes/visit/3rd_party
+URL:                    https://gforge.inria.fr/frs/download.php/31831
 Source: 		%url/%{name}-%{version}.tar.gz
 Prefix: 		%{_prefix}
 Group: 			Development/Tools
-Patch0:                 libccmio-2.6.1.patch_0
+Patch0:                 scotch-6.0.4_patch_0
+Patch1:                 scotch-6.0.4_patch_darwin
 
 %define _installPrefix  %{_prefix}/packages/%{name}-%{version}/platforms/%{_WM_OPTIONS}
 
@@ -84,54 +84,38 @@ Patch0:                 libccmio-2.6.1.patch_0
 %{summary}
 
 %prep
-%setup -q
-%patch0 -p1
-
-%build
-    [ -n "$WM_CC" ]         &&  export CC="$WM_CC"
-    [ -n "$WM_FC" ]         &&  export FC="$WM_FC"
-    [ -n "$WM_CXX" ]        &&  export CXX="$WM_CXX"
-    [ -n "$WM_CFLAGS" ]     &&  export CFLAGS="$WM_CFLAGS"
-    [ -n "$WM_FCFLAGS" ]    &&  export FCFLAGS="$WM_FCFLAGS"
-    [ -n "$WM_CXXFLAGS" ]   &&  export CXXFLAGS="$WM_CXXFLAGS"
-    [ -n "$WM_LDFLAGS" ]    &&  export LDFLAGS="$WM_LDFLAGS"
-    [ -z "$WM_NCOMPPROCS" ] && WM_NCOMPPROCS=1
+%setup -q -n %{name}_6.0.0
 
 %ifos darwin
-    # Missing configuration files for Mac OS X
-    [ ! -d config/i386-apple-darwin10 ] && cp -r config/i386-apple-darwin8 config/i386-apple-darwin10
-    [ ! -d config/i386-apple-darwin11 ] && cp -r config/i386-apple-darwin8 config/i386-apple-darwin11
-    [ ! -d config/i386-apple-darwin12 ] && cp -r config/i386-apple-darwin8 config/i386-apple-darwin12
-    [ ! -d config/i386-apple-darwin13 ] && cp -r config/i386-apple-darwin8 config/i386-apple-darwin13
-    [ ! -d config/i386-apple-darwin14 ] && cp -r config/i386-apple-darwin8 config/i386-apple-darwin14
+%patch1 -p1
+%else
+%patch0 -p1
 %endif
-    # Warning:
-    #  1: The name of the ADF library will be renamed to libadf_ccmio since this
-    #     is an old version of ADF, and the author modified the source code
-    #  2: The name of the CGNS library will be renamed to libcgns_ccmio as well
-    #     since this is an old version of CGNS.
-    #
-    #  This way, the libraries libadf_ccmio and libcgns_ccmio will not get in
-    #  conflict with any other packages that might depend on a newer version
-    #  of libadf or libcgns
-    #
-    unset RELEASE
-    unset DEBUG
-    unset STATIC
-    unset SHARED
-    if [ -d libadf ];    then ( cd libadf;    RELEASE=1 SHARED=1 make -f Makefile.qmake all; ) fi
-    if [ -d libccmio ];  then ( cd libccmio;  RELEASE=1 SHARED=1 make -f Makefile.qmake all; ) fi
 
-    # We don't need libcgns_ccmio. We keep it here as a reference
-    #if [ -d libcgns ];    then cd libcgns;   RELEASE=1 SHARED=1 make -f Makefile.qmake all;  fi
+%build
+    # export WM settings in a form that GNU configure recognizes
+   # [ -n "$WM_CC" ]         &&  export CC="$WM_CC"
+   # [ -n "$WM_CXX" ]        &&  export CXX="$WM_CXX"
+   # [ -n "$WM_CFLAGS" ]     &&  export CFLAGS="$WM_CFLAGS *****"
+   # [ -n "$WM_CXXFLAGS" ]   &&  export CXXFLAGS="$WM_CXXFLAGS"
+   # [ -n "$WM_LDFLAGS" ]    &&  export LDFLAGS="$WM_LDFLAGS"
+
+    cd src
+    # Here, unfortunately, some hand tweaking might be necessary if your system is not running Linux or MacOS X
+%ifos darwin
+        ln -s Make.inc/Makefile.inc.i686_mac_darwin10.shlib Makefile.inc
+%else
+        ln -s Make.inc/Makefile.inc.i686_pc_linux2.shlib Makefile.inc
+%endif
+
+    [ -z "$WM_NCOMPPROCS" ] && WM_NCOMPPROCS=1
+    make -j $WM_NCOMPPROCS scotch CC="$WM_CC" CXX="$WM_CXX" CCD="$WM_CC" CCS="$WM_CC" AR="$WM_CC"
+    make -j $WM_NCOMPPROCS ptscotch AR="$WM_CC"
 
 %install
-    # Manual installation
-    mkdir -p $RPM_BUILD_ROOT/%{_installPrefix}/include/libccmio
-    mkdir -p $RPM_BUILD_ROOT/%{_installPrefix}/lib
-    libsdir=`find ./lib -name release-shared`
-    mv ${libsdir}/* $RPM_BUILD_ROOT/%{_installPrefix}/lib
-    cp libccmio/*.h $RPM_BUILD_ROOT/%{_installPrefix}/include/libccmio
+    cd src
+    mkdir -p $RPM_BUILD_ROOT%{_installPrefix}
+    make install prefix=$RPM_BUILD_ROOT%{_installPrefix}
 
     # Creation of foam-extend specific .csh and .sh files"
 
@@ -146,15 +130,14 @@ cat << DOT_SH_EOF > $RPM_BUILD_ROOT/%{_installPrefix}/etc/%{name}-%{version}.sh
 # Load %{name}-%{version} libraries and binaries if available
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-export LIBCCMIO_DIR=\$WM_THIRD_PARTY_DIR/packages/%{name}-%{version}/platforms/\$WM_OPTIONS
-export LIBCCMIO_BIN_DIR=\$LIBCCMIO_DIR/bin
-export LIBCCMIO_LIB_DIR=\$LIBCCMIO_DIR/lib
-export LIBCCMIO_INCLUDE_DIR=\$LIBCCMIO_DIR/include
+export SCOTCH_DIR=\$WM_THIRD_PARTY_DIR/packages/%{name}-%{version}/platforms/\$WM_OPTIONS
+export SCOTCH_BIN_DIR=\$SCOTCH_DIR/bin
+export SCOTCH_LIB_DIR=\$SCOTCH_DIR/lib
+export SCOTCH_INCLUDE_DIR=\$SCOTCH_DIR/include
 
-# Enable access to the package runtime applications and libraries
-[ -d \$LIBCCMIO_BIN_DIR ] && _foamAddPath \$LIBCCMIO_BIN_DIR
-[ -d \$LIBCCMIO_LIB_DIR ] && _foamAddLib  \$LIBCCMIO_LIB_DIR
-
+# Enable access to the runtime package applications and libraries
+[ -d \$SCOTCH_BIN_DIR ] && _foamAddPath \$SCOTCH_BIN_DIR
+[ -d \$SCOTCH_LIB_DIR ] && _foamAddLib  \$SCOTCH_LIB_DIR
 DOT_SH_EOF
 
     #
@@ -163,17 +146,17 @@ DOT_SH_EOF
 cat << DOT_CSH_EOF > $RPM_BUILD_ROOT/%{_installPrefix}/etc/%{name}-%{version}.csh
 # Load %{name}-%{version} libraries and binaries if available
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-setenv LIBCCMIO_DIR \$WM_THIRD_PARTY_DIR/packages/%{name}-%{version}/platforms/\$WM_OPTIONS
-setenv LIBCCMIO_BIN_DIR \$LIBCCMIO_DIR/bin
-setenv LIBCCMIO_LIB_DIR \$LIBCCMIO_DIR/lib
-setenv LIBCCMIO_INCLUDE_DIR \$LIBCCMIO_DIR/include
+setenv SCOTCH_DIR \$WM_THIRD_PARTY_DIR/packages/%{name}-%{version}/platforms/\$WM_OPTIONS
+setenv SCOTCH_BIN_DIR \$SCOTCH_DIR/bin
+setenv SCOTCH_LIB_DIR \$SCOTCH_DIR/lib
+setenv SCOTCH_INCLUDE_DIR \$SCOTCH_DIR/include
 
-if ( -e \$LIBCCMIO_BIN_DIR ) then
-    _foamAddPath \$LIBCCMIO_BIN_DIR
+if ( -e \$SCOTCH_BIN_DIR ) then
+    _foamAddPath \$SCOTCH_BIN_DIR
 endif
 
-if ( -e \$LIBCCMIO_LIB_DIR ) then
-    _foamAddLib \$LIBCCMIO_LIB_DIR
+if ( -e \$SCOTCH_LIB_DIR ) then
+    _foamAddLib \$SCOTCH_LIB_DIR
 endif
 DOT_CSH_EOF
 
@@ -185,6 +168,6 @@ DOT_CSH_EOF
 %clean
 rm -rf %{buildroot}
 
-%Files
+%files
 %defattr(-,root,root)
 %{_installPrefix}/*

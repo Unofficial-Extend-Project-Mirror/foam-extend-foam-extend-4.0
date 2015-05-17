@@ -122,6 +122,12 @@ fi
 # Scotch
 if [ -z "$SCOTCH_SYSTEM" ]
 then
+    # Scotch 6.0.4
+    #
+    [ ! -z "$WM_THIRD_PARTY_USE_SCOTCH_604" ] && {
+	echo "Building Scotch 6.0.0"
+	( rpm_make -p scotch-6.0.4 -s scotch-6.0.4.spec -u http://gforge.inria.fr/frs/download.php/file/34618/scotch_6.0.4.tar.gz )
+    }
     # Scotch 6.0.0
     #
     [ ! -z "$WM_THIRD_PARTY_USE_SCOTCH_600" ] && {
@@ -184,6 +190,12 @@ fi
 # hwloc
 if [ -z "$HWLOC_SYSTEM" ]
 then
+    # hwloc 1.10.1
+    #
+    [ ! -z "$WM_THIRD_PARTY_USE_HWLOC_1101" ] && {
+	echo "Building hwloc 1.10.1"
+	( rpm_make -p hwloc-1.10.1 -s hwloc-1.10.1.spec  -u http://www.open-mpi.org/software/hwloc/v1.10/downloads/hwloc-1.10.1.tar.gz )
+    }
     # hwloc 1.7.2
     #
     [ ! -z "$WM_THIRD_PARTY_USE_HWLOC_172" ] && {

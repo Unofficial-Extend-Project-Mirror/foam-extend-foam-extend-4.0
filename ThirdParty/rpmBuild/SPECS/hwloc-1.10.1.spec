@@ -22,13 +22,13 @@
 #     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 #
 # Script
-#     RPM spec file for libccmio-2.6.1
+#     RPM spec file for hwloc-1.10.1
 #
 # Description
 #     RPM spec file for creating a relocatable RPM
 #
 # Author:
-#     Martin Beaudoin, Hydro-Quebec, (2010)
+#     Martin Beaudoin, Hydro-Quebec, (2015)
 #
 #------------------------------------------------------------------------------
 
@@ -60,23 +60,23 @@
 #
 %define _prefix         %{_WM_THIRD_PARTY_DIR}
 
-%define name		libccmio
+%define name		hwloc
 %define release		%{_WM_OPTIONS}
-%define version 	2.6.1
+%define version 	1.10.1
 
 %define buildroot       %{_topdir}/BUILD/%{name}-%{version}-root
 
 BuildRoot:	        %{buildroot}
-Summary: 		libccmio
-License: 		Unkown
+Summary: 		hwloc
+License: 		the New BSD license
 Name: 			%{name}
 Version: 		%{version}
 Release: 		%{release}
-URL:                    https://wci.llnl.gov/codes/visit/3rd_party
+URL:                    http://www.open-mpi.org/software/hwloc/v1.10/downloads/hwloc-1.10.1.tar.gz
 Source: 		%url/%{name}-%{version}.tar.gz
 Prefix: 		%{_prefix}
 Group: 			Development/Tools
-Patch0:                 libccmio-2.6.1.patch_0
+
 
 %define _installPrefix  %{_prefix}/packages/%{name}-%{version}/platforms/%{_WM_OPTIONS}
 
@@ -85,53 +85,23 @@ Patch0:                 libccmio-2.6.1.patch_0
 
 %prep
 %setup -q
-%patch0 -p1
 
 %build
+    # export WM settings in a form that GNU configure recognizes
     [ -n "$WM_CC" ]         &&  export CC="$WM_CC"
-    [ -n "$WM_FC" ]         &&  export FC="$WM_FC"
     [ -n "$WM_CXX" ]        &&  export CXX="$WM_CXX"
     [ -n "$WM_CFLAGS" ]     &&  export CFLAGS="$WM_CFLAGS"
-    [ -n "$WM_FCFLAGS" ]    &&  export FCFLAGS="$WM_FCFLAGS"
     [ -n "$WM_CXXFLAGS" ]   &&  export CXXFLAGS="$WM_CXXFLAGS"
     [ -n "$WM_LDFLAGS" ]    &&  export LDFLAGS="$WM_LDFLAGS"
+
+    ./configure     \
+        --prefix=%{_installPrefix}
+
     [ -z "$WM_NCOMPPROCS" ] && WM_NCOMPPROCS=1
-
-%ifos darwin
-    # Missing configuration files for Mac OS X
-    [ ! -d config/i386-apple-darwin10 ] && cp -r config/i386-apple-darwin8 config/i386-apple-darwin10
-    [ ! -d config/i386-apple-darwin11 ] && cp -r config/i386-apple-darwin8 config/i386-apple-darwin11
-    [ ! -d config/i386-apple-darwin12 ] && cp -r config/i386-apple-darwin8 config/i386-apple-darwin12
-    [ ! -d config/i386-apple-darwin13 ] && cp -r config/i386-apple-darwin8 config/i386-apple-darwin13
-    [ ! -d config/i386-apple-darwin14 ] && cp -r config/i386-apple-darwin8 config/i386-apple-darwin14
-%endif
-    # Warning:
-    #  1: The name of the ADF library will be renamed to libadf_ccmio since this
-    #     is an old version of ADF, and the author modified the source code
-    #  2: The name of the CGNS library will be renamed to libcgns_ccmio as well
-    #     since this is an old version of CGNS.
-    #
-    #  This way, the libraries libadf_ccmio and libcgns_ccmio will not get in
-    #  conflict with any other packages that might depend on a newer version
-    #  of libadf or libcgns
-    #
-    unset RELEASE
-    unset DEBUG
-    unset STATIC
-    unset SHARED
-    if [ -d libadf ];    then ( cd libadf;    RELEASE=1 SHARED=1 make -f Makefile.qmake all; ) fi
-    if [ -d libccmio ];  then ( cd libccmio;  RELEASE=1 SHARED=1 make -f Makefile.qmake all; ) fi
-
-    # We don't need libcgns_ccmio. We keep it here as a reference
-    #if [ -d libcgns ];    then cd libcgns;   RELEASE=1 SHARED=1 make -f Makefile.qmake all;  fi
+    make -j $WM_NCOMPPROCS
 
 %install
-    # Manual installation
-    mkdir -p $RPM_BUILD_ROOT/%{_installPrefix}/include/libccmio
-    mkdir -p $RPM_BUILD_ROOT/%{_installPrefix}/lib
-    libsdir=`find ./lib -name release-shared`
-    mv ${libsdir}/* $RPM_BUILD_ROOT/%{_installPrefix}/lib
-    cp libccmio/*.h $RPM_BUILD_ROOT/%{_installPrefix}/include/libccmio
+    make install DESTDIR=$RPM_BUILD_ROOT
 
     # Creation of foam-extend specific .csh and .sh files"
 
@@ -146,15 +116,11 @@ cat << DOT_SH_EOF > $RPM_BUILD_ROOT/%{_installPrefix}/etc/%{name}-%{version}.sh
 # Load %{name}-%{version} libraries and binaries if available
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-export LIBCCMIO_DIR=\$WM_THIRD_PARTY_DIR/packages/%{name}-%{version}/platforms/\$WM_OPTIONS
-export LIBCCMIO_BIN_DIR=\$LIBCCMIO_DIR/bin
-export LIBCCMIO_LIB_DIR=\$LIBCCMIO_DIR/lib
-export LIBCCMIO_INCLUDE_DIR=\$LIBCCMIO_DIR/include
+export HWLOC_DIR=\$WM_THIRD_PARTY_DIR/packages/%{name}-%{version}/platforms/\$WM_OPTIONS
+export HWLOC_BIN_DIR=\$HWLOC_DIR/bin
 
-# Enable access to the package runtime applications and libraries
-[ -d \$LIBCCMIO_BIN_DIR ] && _foamAddPath \$LIBCCMIO_BIN_DIR
-[ -d \$LIBCCMIO_LIB_DIR ] && _foamAddLib  \$LIBCCMIO_LIB_DIR
-
+# Enable access to the runtime package applications
+[ -d \$HWLOC_BIN_DIR ] && _foamAddPath \$HWLOC_BIN_DIR
 DOT_SH_EOF
 
     #
@@ -163,17 +129,11 @@ DOT_SH_EOF
 cat << DOT_CSH_EOF > $RPM_BUILD_ROOT/%{_installPrefix}/etc/%{name}-%{version}.csh
 # Load %{name}-%{version} libraries and binaries if available
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-setenv LIBCCMIO_DIR \$WM_THIRD_PARTY_DIR/packages/%{name}-%{version}/platforms/\$WM_OPTIONS
-setenv LIBCCMIO_BIN_DIR \$LIBCCMIO_DIR/bin
-setenv LIBCCMIO_LIB_DIR \$LIBCCMIO_DIR/lib
-setenv LIBCCMIO_INCLUDE_DIR \$LIBCCMIO_DIR/include
+setenv HWLOC_DIR \$WM_THIRD_PARTY_DIR/packages/%{name}-%{version}/platforms/\$WM_OPTIONS
+setenv HWLOC_BIN_DIR \$HWLOC_DIR/bin
 
-if ( -e \$LIBCCMIO_BIN_DIR ) then
-    _foamAddPath \$LIBCCMIO_BIN_DIR
-endif
-
-if ( -e \$LIBCCMIO_LIB_DIR ) then
-    _foamAddLib \$LIBCCMIO_LIB_DIR
+if ( -e \$HWLOC_BIN_DIR ) then
+    _foamAddPath \$HWLOC_BIN_DIR
 endif
 DOT_CSH_EOF
 
@@ -181,10 +141,10 @@ DOT_CSH_EOF
     # as a non-root user might be a problem.
     (mkdir -p  %{_topdir}/TGZS/%{_target_cpu}; cd $RPM_BUILD_ROOT/%{_prefix}; tar -zcvf %{_topdir}/TGZS/%{_target_cpu}/%{name}-%{version}.tgz  packages/%{name}-%{version})
 
-
 %clean
 rm -rf %{buildroot}
 
-%Files
+%files
 %defattr(-,root,root)
-%{_installPrefix}/*
+%{_installPrefix}
+
