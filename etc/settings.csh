@@ -499,8 +499,8 @@ if ( $?CMAKE_SYSTEM == 0 && $?WM_THIRD_PARTY_USE_CMAKE_2812 != 0 && -e "$WM_THIR
     _foamSource $WM_THIRD_PARTY_DIR/packages/cmake-2.8.12/platforms/$WM_OPTIONS/etc/cmake-2.8.12.csh
 endif
 
-if ( $?CMAKE_SYSTEM == 0 && $?WM_THIRD_PARTY_USE_CMAKE_311 != 0 && -e "$WM_THIRD_PARTY_DIR"/packages/cmake-3.1.1/platforms/$WM_OPTIONS ) then
-    _foamSource $WM_THIRD_PARTY_DIR/packages/cmake-3.1.1/platforms/$WM_OPTIONS/etc/cmake-3.1.1.csh
+if ( $?CMAKE_SYSTEM == 0 && $?WM_THIRD_PARTY_USE_CMAKE_311 != 0 && -e "$WM_THIRD_PARTY_DIR"/packages/cmake-3.2.2/platforms/$WM_OPTIONS ) then
+    _foamSource $WM_THIRD_PARTY_DIR/packages/cmake-3.2.2/platforms/$WM_OPTIONS/etc/cmake-3.2.2.csh
 endif
 
 # m4

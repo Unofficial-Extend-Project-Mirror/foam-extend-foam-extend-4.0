@@ -84,7 +84,7 @@ export WM_THIRD_PARTY_DIR=$WM_PROJECT_DIR/ThirdParty
 # This can be overriden in prefs.sh
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # For AllMake.stage1
-export WM_THIRD_PARTY_USE_CMAKE_2812=1
+export WM_THIRD_PARTY_USE_CMAKE_322=1
 
 #
 # For AllMake.stage2

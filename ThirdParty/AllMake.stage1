@@ -148,11 +148,11 @@ echo
     ( rpm_make -p cmake-2.8.12 -s cmake-2.8.12.spec -u http://www.cmake.org/files/v2.8/cmake-2.8.12.tar.gz        )
 }
 
-# cmake 3.1.1
+# cmake 3.2.2
 #
-[ ! -z "$WM_THIRD_PARTY_USE_CMAKE_311" ] && {
-    echo "Building cmake 3.1.1"
-    ( rpm_make -p cmake-3.1.1 -s cmake-3.1.1.spec -u http://www.cmake.org/files/v3.1/cmake-3.1.1.tar.gz        )
+[ ! -z "$WM_THIRD_PARTY_USE_CMAKE_322" ] && {
+    echo "Building cmake 3.2.2"
+    ( rpm_make -p cmake-3.2.2 -s cmake-3.2.2.spec -u http://www.cmake.org/files/v3.2/cmake-3.2.2.tar.gz        )
 }
 
 echo ========================================
