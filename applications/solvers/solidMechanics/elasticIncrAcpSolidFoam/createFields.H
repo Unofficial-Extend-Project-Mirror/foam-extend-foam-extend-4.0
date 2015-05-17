@@ -36,8 +36,8 @@
             IOobject::NO_READ,
             IOobject::NO_WRITE
         ),
-	mesh,
-	dimensionedVector("zero", dimless, vector::zero)
+    mesh,
+    dimensionedVector("zero", dimless, vector::zero)
     );
 
     Info<< "Creating field U\n" << endl;
@@ -59,12 +59,12 @@
     (
         IOobject
         (
-	 "DEpsilon",
-	 runTime.timeName(),
-	 mesh,
-	 IOobject::READ_IF_PRESENT,
-	 IOobject::AUTO_WRITE
-	 ),
+     "DEpsilon",
+     runTime.timeName(),
+     mesh,
+     IOobject::READ_IF_PRESENT,
+     IOobject::AUTO_WRITE
+     ),
         mesh,
         dimensionedSymmTensor("zero", dimless, symmTensor::zero)
      );
@@ -155,7 +155,7 @@ constitutiveModel rheology(sigma, DU);
             IOobject::NO_WRITE
         ),
         mesh,
-	dimensionedVector("zero", dimLength, vector::zero)
+    dimensionedVector("zero", dimLength, vector::zero)
     );
 // aitken relaxation factor
 scalar aitkenInitialRes = 1.0;

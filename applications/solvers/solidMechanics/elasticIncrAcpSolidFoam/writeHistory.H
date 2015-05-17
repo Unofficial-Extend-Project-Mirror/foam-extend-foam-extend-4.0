@@ -2,16 +2,16 @@
 if(historyPatchID != -1)
   {
     Info << "Found patch "<<historyPatchName<<", writing y force and displacement to file"
-	  << endl;
+      << endl;
 
      //- calculate force in specified direction on topClamp patch
      vector direction(0, 1, 0);
 
      //- for small strain or moving mesh
      scalar force = gSum(
-			    direction &
-			    (mesh.boundary()[historyPatchID].Sf() & sigma.boundaryField()[historyPatchID])
-			    );
+                direction &
+                (mesh.boundary()[historyPatchID].Sf() & sigma.boundaryField()[historyPatchID])
+                );
 
      //- for large strain total lagrangian
      // tensorField F = I + gradU.boundaryField()[historyPatchID];
@@ -25,16 +25,16 @@ if(historyPatchID != -1)
      //- be dotted with the surface normal to give the actual traction/force
      //- you cannot just take the component of the sigma tensor
      //scalar forcePatchIntegrateMethod = gSum(
-     //					    mesh.magSf().boundaryField()[historyPatchID]
-     //					    *sigma.boundaryField()[historyPatchID].component(symmTensor::XY)
-     //					    );
+     //                        mesh.magSf().boundaryField()[historyPatchID]
+     //                        *sigma.boundaryField()[historyPatchID].component(symmTensor::XY)
+     //                        );
 
      scalar disp = max(U.boundaryField()[historyPatchID].component(vector::Y));
 
      //- write to file
      if(Pstream::master())
        {
-	 OFstream& forceDispFile = *filePtr;
-	 forceDispFile << disp << "\t" << force << endl;
+     OFstream& forceDispFile = *filePtr;
+     forceDispFile << disp << "\t" << force << endl;
        }
    }

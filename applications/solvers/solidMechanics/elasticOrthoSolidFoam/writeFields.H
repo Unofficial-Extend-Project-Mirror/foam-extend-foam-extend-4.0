@@ -6,33 +6,33 @@ if (runTime.outputTime())
       (
        IOobject
        (
-	"epsilonEq",
-	runTime.timeName(),
-	mesh,
-	IOobject::NO_READ,
-	IOobject::AUTO_WRITE
-	),
+    "epsilonEq",
+    runTime.timeName(),
+    mesh,
+    IOobject::NO_READ,
+    IOobject::AUTO_WRITE
+    ),
        sqrt((2.0/3.0)*magSqr(dev(epsilon)))
        );
 
     Info<< "Max epsilonEq = " << max(epsilonEq).value()
-	<< endl;
+    << endl;
 
     volScalarField sigmaEq
       (
        IOobject
        (
-	"sigmaEq",
-	runTime.timeName(),
-	mesh,
-	IOobject::NO_READ,
-	IOobject::AUTO_WRITE
-	),
+    "sigmaEq",
+    runTime.timeName(),
+    mesh,
+    IOobject::NO_READ,
+    IOobject::AUTO_WRITE
+    ),
        sqrt((3.0/2.0)*magSqr(dev(sigma)))
        );
 
     Info<< "Max sigmaEq = " << max(sigmaEq).value()
-	<< endl;
+    << endl;
 
     runTime.write();
   }

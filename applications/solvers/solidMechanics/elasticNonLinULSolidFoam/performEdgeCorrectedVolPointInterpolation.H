@@ -67,31 +67,31 @@ forAll (ptc, pointI)
   forAll (curFaces, faceI)
     {
       if (!mesh.isInternalFace(curFaces[faceI]))
-	{
-	  // This is a boundary face.  If not in the empty patch
-	  // or coupled calculate the extrapolation vector
-	  label patchID =
-	    mesh.boundaryMesh().whichPatch(curFaces[faceI]);
+    {
+      // This is a boundary face.  If not in the empty patch
+      // or coupled calculate the extrapolation vector
+      label patchID =
+        mesh.boundaryMesh().whichPatch(curFaces[faceI]);
 
-	  if
-	    (
-	     !isA<emptyFvPatch>(mesh.boundary()[patchID])
-	     && !mesh.boundary()[patchID].coupled()
-	     )
-	    {
-	      label faceInPatchID =
-		bm[patchID].patch().whichFace(curFaces[faceI]);
+      if
+        (
+         !isA<emptyFvPatch>(mesh.boundary()[patchID])
+         && !mesh.boundary()[patchID].coupled()
+         )
+        {
+          label faceInPatchID =
+        bm[patchID].patch().whichFace(curFaces[faceI]);
 
-	      pfCorr[curPoint] +=
-		w[pointI][fI]*
-		(
-		 extraVecs[pointI][fI]
-		 & gradDU.boundaryField()[patchID][faceInPatchID]
-		 );
+          pfCorr[curPoint] +=
+        w[pointI][fI]*
+        (
+         extraVecs[pointI][fI]
+         & gradDU.boundaryField()[patchID][faceInPatchID]
+         );
 
-	      fI++;
-	    }
-	}
+          fI++;
+        }
+    }
     }
 }
 

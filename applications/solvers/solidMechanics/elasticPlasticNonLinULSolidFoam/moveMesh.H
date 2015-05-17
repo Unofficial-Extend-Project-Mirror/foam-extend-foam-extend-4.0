@@ -9,7 +9,7 @@ if(moveMeshMethod == "inverseDistance")
  else
    {
      FatalError << "move mesh method " << moveMeshMethod << " not recognised" << nl
-		<< "available methods are:" << nl
-		<< "inverseDistance" << nl
-		<< "leastSquares" << exit(FatalError);
+        << "available methods are:" << nl
+        << "inverseDistance" << nl
+        << "leastSquares" << exit(FatalError);
    }

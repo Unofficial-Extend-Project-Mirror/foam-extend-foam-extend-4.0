@@ -2,7 +2,7 @@
 if(historyPatchID != -1)
   {
     Info << "Found patch "<<historyPatchName<<", writing y force and displacement to file"
-	  << endl;
+      << endl;
 
      //- for small strain or moving mesh
      vector force =
@@ -13,12 +13,12 @@ if(historyPatchID != -1)
      //- write to file
      if(Pstream::master())
        {
-	 OFstream& forceDispFile = *filePtr;
-	 forceDispFile << disp.x() << " "
-		       << disp.y() << " "
-		       << disp.z() << " "
-		       << force.x() << " "
-		       << force.y() << " "
-		       << force.z() << endl;
+     OFstream& forceDispFile = *filePtr;
+     forceDispFile << disp.x() << " "
+               << disp.y() << " "
+               << disp.z() << " "
+               << force.x() << " "
+               << force.y() << " "
+               << force.z() << endl;
        }
    }

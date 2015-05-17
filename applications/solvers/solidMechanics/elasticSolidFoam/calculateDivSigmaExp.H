@@ -10,10 +10,10 @@ if(divSigmaExpMethod == "standard")
    {
      divSigmaExp = fvc::div
        (
-	muf*(mesh.Sf() & fvc::interpolate(gradU.T()))
-	+ lambdaf*(mesh.Sf() & I*fvc::interpolate(tr(gradU)))
-	- (muf + lambdaf)*(mesh.Sf() & fvc::interpolate(gradU))
-	);
+    muf*(mesh.Sf() & fvc::interpolate(gradU.T()))
+    + lambdaf*(mesh.Sf() & I*fvc::interpolate(tr(gradU)))
+    - (muf + lambdaf)*(mesh.Sf() & fvc::interpolate(gradU))
+    );
    }
  else if(divSigmaExpMethod == "decompose")
    {
@@ -24,13 +24,13 @@ if(divSigmaExpMethod == "standard")
 
      divSigmaExp = fvc::div
        (
-	mesh.magSf()
-	*(
-	  - (muf + lambdaf)*(snGradU&(I - n*n))
-	  + lambdaf*tr(shearGradU&(I - n*n))*n
-	  + muf*(shearGradU&n)
-	  )
-	);
+    mesh.magSf()
+    *(
+      - (muf + lambdaf)*(snGradU&(I - n*n))
+      + lambdaf*tr(shearGradU&(I - n*n))*n
+      + muf*(shearGradU&n)
+      )
+    );
    }
  else if(divSigmaExpMethod == "expLaplacian")
    {
@@ -38,10 +38,10 @@ if(divSigmaExpMethod == "standard")
        - fvc::laplacian(mu + lambda, U, "laplacian(DU,U)")
        + fvc::div
        (
-	mu*gradU.T()
-	+ lambda*(I*tr(gradU)),
-	"div(sigma)"
-	);
+    mu*gradU.T()
+    + lambda*(I*tr(gradU)),
+    "div(sigma)"
+    );
    }
  else
    {

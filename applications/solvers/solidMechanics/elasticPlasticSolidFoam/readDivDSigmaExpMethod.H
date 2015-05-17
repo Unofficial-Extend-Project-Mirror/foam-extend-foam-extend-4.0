@@ -4,6 +4,6 @@ Info << "Selecting divSigmaExp calculation method " << divDSigmaExpMethod <<  en
 if(divDSigmaExpMethod != "standard" && divDSigmaExpMethod != "surface" && divDSigmaExpMethod != "decompose" && divDSigmaExpMethod != "laplacian")
   {
     FatalError << "divSigmaExp method " << divDSigmaExpMethod << " not found!" << nl
-	       << "valid methods are:\nstandard\nsurface\ndecompose\nlaplacian"
-	       << exit(FatalError);
+           << "valid methods are:\nstandard\nsurface\ndecompose\nlaplacian"
+           << exit(FatalError);
   }

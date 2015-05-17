@@ -13,11 +13,11 @@
       // with a processor boundary
       //if (U.boundaryField()[patchI].fixesValue())
       if (
-	  U.boundaryField()[patchI].fixesValue()
-	  ||
-	  mesh.boundaryMesh()[patchI].type()
-	  == processorPolyPatch::typeName
-	  )
+      U.boundaryField()[patchI].fixesValue()
+      ||
+      mesh.boundaryMesh()[patchI].type()
+      == processorPolyPatch::typeName
+      )
         {
             const unallocLabelList& curFaceCells =
                 mesh.boundary()[patchI].faceCells();

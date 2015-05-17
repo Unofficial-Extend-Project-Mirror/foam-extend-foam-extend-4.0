@@ -35,9 +35,9 @@ FieldField<Field, scalar> w(ptc.size());
       //w.hook(new scalarField(curFaces.size())); //philipc no hook function
       w.set
        (
-	pointI,
-	new scalarField(curFaces.size())
-	);
+    pointI,
+    new scalarField(curFaces.size())
+    );
 
       scalarField& curWeights = w[pointI];
 
@@ -47,38 +47,38 @@ FieldField<Field, scalar> w(ptc.size());
 
       // Go through all the faces
       forAll (curFaces, faceI)
-	{
-	  if (!mesh.isInternalFace(curFaces[faceI]))
-	    {
-	      // This is a boundary face.  If not in the empty patch
-	      // or coupled calculate the extrapolation vector
-	      label patchID =
-		mesh.boundaryMesh().whichPatch(curFaces[faceI]);
+    {
+      if (!mesh.isInternalFace(curFaces[faceI]))
+        {
+          // This is a boundary face.  If not in the empty patch
+          // or coupled calculate the extrapolation vector
+          label patchID =
+        mesh.boundaryMesh().whichPatch(curFaces[faceI]);
 
-	      if
-		(
-		 !isA<emptyFvPatch>(bm[patchID])
-		 && !(
-		      bm[patchID].coupled()
-		      //&& Pstream::parRun()
-		      //&& !mesh.parallelData().cyclicParallel()
-		      )
-		 )
-		{
-		  curWeights[nFacesAroundPoint] =
-		    1.0/mag
-		    (
-		     pointLoc
-		     - centres.boundaryField()[patchID]
-		     [
-		      bm[patchID].patch().whichFace(curFaces[faceI])
-		      ]
-		     );
+          if
+        (
+         !isA<emptyFvPatch>(bm[patchID])
+         && !(
+              bm[patchID].coupled()
+              //&& Pstream::parRun()
+              //&& !mesh.parallelData().cyclicParallel()
+              )
+         )
+        {
+          curWeights[nFacesAroundPoint] =
+            1.0/mag
+            (
+             pointLoc
+             - centres.boundaryField()[patchID]
+             [
+              bm[patchID].patch().whichFace(curFaces[faceI])
+              ]
+             );
 
-		  nFacesAroundPoint++;
-		}
-	    }
-	}
+          nFacesAroundPoint++;
+        }
+        }
+    }
 
       // Reset the sizes of the local weights
       curWeights.setSize(nFacesAroundPoint);

@@ -93,6 +93,6 @@ if(min(J.internalField()) > 0)
   else
     {
       FatalErrorIn(args.executable())
-	<< "Negative Jacobian"
-	<< exit(FatalError);
+    << "Negative Jacobian"
+    << exit(FatalError);
     }

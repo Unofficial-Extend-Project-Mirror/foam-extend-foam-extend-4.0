@@ -2,13 +2,13 @@
 if(historyPatchID != -1)
   {
     Info << "Writing disp-force to file for patch " << historyPatchName
-	  << endl;
+      << endl;
 
      //- for small strain or moving mesh
      //scalar force = gSum(
-     //		    direction &
-     //		    (mesh.boundary()[historyPatchID].Sf() & sigma.boundaryField()[historyPatchID])
-     //		    );
+     //            direction &
+     //            (mesh.boundary()[historyPatchID].Sf() & sigma.boundaryField()[historyPatchID])
+     //            );
 
      //- for large strain total lagrangian
      tensorField F = I + gradU.boundaryField()[historyPatchID];
@@ -17,7 +17,7 @@ if(historyPatchID != -1)
 
 
     Info << "Writing strain-stress to file for patch " << historyPatchName
-	  << endl;
+      << endl;
 
      // avaerage stress strain
      symmTensor stress = gAverage(sigma.boundaryField()[historyPatchID]);
@@ -27,19 +27,19 @@ if(historyPatchID != -1)
      // write to file
      if(Pstream::master())
        {
-	 OFstream& forceDispFile = *forceFilePtr;
-	 label width = 20;
-	 forceDispFile << disp.x() << " " << disp.y() << " " << disp.z();
-	 forceDispFile.width(width);
-	 forceDispFile << force.x() << " " << force.y() << " " << force.z()
-		       << endl;
+     OFstream& forceDispFile = *forceFilePtr;
+     label width = 20;
+     forceDispFile << disp.x() << " " << disp.y() << " " << disp.z();
+     forceDispFile.width(width);
+     forceDispFile << force.x() << " " << force.y() << " " << force.z()
+               << endl;
 
-	 OFstream& stressStrainFile = *stressFilePtr;
-	 stressStrainFile << strain.xx() << " " << strain.xy() << " " << strain.xz() << " "
-			  << strain.yy() << " " << strain.yz() << " " << strain.zz();
-	 stressStrainFile.width(width);
-	 stressStrainFile << stress.xx() << " " << stress.xy() << " " << stress.xz() << " "
-			  << stress.yy() << " " << stress.yz() << " " << stress.zz()
-			  << endl;
+     OFstream& stressStrainFile = *stressFilePtr;
+     stressStrainFile << strain.xx() << " " << strain.xy() << " " << strain.xz() << " "
+              << strain.yy() << " " << strain.yz() << " " << strain.zz();
+     stressStrainFile.width(width);
+     stressStrainFile << stress.xx() << " " << stress.xy() << " " << stress.xz() << " "
+              << stress.yy() << " " << stress.yz() << " " << stress.zz()
+              << endl;
        }
    }

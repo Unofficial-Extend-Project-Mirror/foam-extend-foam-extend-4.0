@@ -10,15 +10,15 @@ solidInterface* solidInterfacePtr(NULL);
 
     if(solidInterfaceCorr)
       {
-	Info << "Creating solid interface correction" << endl;
-	solidInterfacePtr = new solidInterface(mesh, rheology);
-	solidInterfacePtr->modifyProperties(muf, lambdaf);
+    Info << "Creating solid interface correction" << endl;
+    solidInterfacePtr = new solidInterface(mesh, rheology);
+    solidInterfacePtr->modifyProperties(muf, lambdaf);
 
-	//- solidInterface needs muf and lambdaf to be used for divDSigmaExp
-	if(divDSigmaExpMethod != "surface" && divDSigmaExpMethod != "decompose")
-	  {
-	    FatalError << "divDSigmaExp must be decompose or surface when solidInterface is on"
-		       << exit(FatalError);
-	  }
+    //- solidInterface needs muf and lambdaf to be used for divDSigmaExp
+    if(divDSigmaExpMethod != "surface" && divDSigmaExpMethod != "decompose")
+      {
+        FatalError << "divDSigmaExp must be decompose or surface when solidInterface is on"
+               << exit(FatalError);
+      }
       }
 }

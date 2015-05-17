@@ -4,33 +4,33 @@ if (runTime.outputTime())
       (
        IOobject
        (
-	"epsilonEq",
-	runTime.timeName(),
-	mesh,
-	IOobject::NO_READ,
-	IOobject::AUTO_WRITE
-	),
+    "epsilonEq",
+    runTime.timeName(),
+    mesh,
+    IOobject::NO_READ,
+    IOobject::AUTO_WRITE
+    ),
        sqrt((2.0/3.0)*magSqr(dev(epsilon)))
        );
 
     Info<< "Max epsilonEq = " << max(epsilonEq).value()
-	<< endl;
+    << endl;
 
     volScalarField sigmaEq
       (
        IOobject
        (
-	"sigmaEq",
-	runTime.timeName(),
-	mesh,
-	IOobject::NO_READ,
-	IOobject::AUTO_WRITE
-	),
+    "sigmaEq",
+    runTime.timeName(),
+    mesh,
+    IOobject::NO_READ,
+    IOobject::AUTO_WRITE
+    ),
        sqrt((3.0/2.0)*magSqr(dev(sigma)))
        );
 
     Info<< "Max sigmaEq = " << max(sigmaEq).value()
-	<< endl;
+    << endl;
 
     //- Calculate Cauchy stress
     volTensorField F = I + gradU;
@@ -43,12 +43,12 @@ if (runTime.outputTime())
       (
        IOobject
        (
-	"sigmaCauchy",
-	runTime.timeName(),
-	mesh,
-	IOobject::NO_READ,
-	IOobject::AUTO_WRITE
-	),
+    "sigmaCauchy",
+    runTime.timeName(),
+    mesh,
+    IOobject::NO_READ,
+    IOobject::AUTO_WRITE
+    ),
        (1/J) * symm(F.T() & sigma & F)
        );
 
@@ -57,29 +57,29 @@ if (runTime.outputTime())
       (
        IOobject
        (
-	"sigmaCauchyEq",
-	runTime.timeName(),
-	mesh,
-	IOobject::NO_READ,
-	IOobject::AUTO_WRITE
-	),
+    "sigmaCauchyEq",
+    runTime.timeName(),
+    mesh,
+    IOobject::NO_READ,
+    IOobject::AUTO_WRITE
+    ),
        sqrt((3.0/2.0)*magSqr(dev(sigmaCauchy)))
        );
 
     Info<< "Max sigmaCauchyEq = " << max(sigmaCauchyEq).value()
-	<< endl;
+    << endl;
 
     volTensorField Finv = inv(F);
     volSymmTensorField epsilonAlmansi
       (
        IOobject
        (
-	"epsilonAlmansi",
-	runTime.timeName(),
-	mesh,
-	IOobject::NO_READ,
-	IOobject::AUTO_WRITE
-	),
+    "epsilonAlmansi",
+    runTime.timeName(),
+    mesh,
+    IOobject::NO_READ,
+    IOobject::AUTO_WRITE
+    ),
        symm(Finv & epsilon & Finv.T())
        );
 
@@ -88,21 +88,21 @@ if (runTime.outputTime())
       (
        IOobject
        (
-	"tractionCauchy",
-	runTime.timeName(),
-	mesh,
-	IOobject::NO_READ,
-	IOobject::AUTO_WRITE
-	),
+    "tractionCauchy",
+    runTime.timeName(),
+    mesh,
+    IOobject::NO_READ,
+    IOobject::AUTO_WRITE
+    ),
        mesh,
        dimensionedVector("zero", dimForce/dimArea, vector::zero)
        );
     forAll(traction.boundaryField(), patchi)
       {
-	tensorField Fpatch = I + gradU.boundaryField()[patchi];
+    tensorField Fpatch = I + gradU.boundaryField()[patchi];
 
-	traction.boundaryField()[patchi] =
-	  n.boundaryField()[patchi] & (sigma.boundaryField()[patchi] & Fpatch);
+    traction.boundaryField()[patchi] =
+      n.boundaryField()[patchi] & (sigma.boundaryField()[patchi] & Fpatch);
       }
 
     runTime.write();

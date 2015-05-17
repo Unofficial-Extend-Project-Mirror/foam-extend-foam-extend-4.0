@@ -24,20 +24,20 @@
             IOobject::READ_IF_PRESENT,
             IOobject::AUTO_WRITE
         ),
-	mesh,
-	dimensionedVector("zero", dimLength, vector::zero)
+    mesh,
+    dimensionedVector("zero", dimLength, vector::zero)
     );
 
     volTensorField gradU
     (
         IOobject
         (
-	 "grad(U)",
-	 runTime.timeName(),
-	 mesh,
-	 IOobject::READ_IF_PRESENT,
-	 IOobject::AUTO_WRITE
-	 ),
+     "grad(U)",
+     runTime.timeName(),
+     mesh,
+     IOobject::READ_IF_PRESENT,
+     IOobject::AUTO_WRITE
+     ),
         mesh,
         dimensionedTensor("zero", dimless, tensor::zero)
      );
@@ -53,8 +53,8 @@
             IOobject::READ_IF_PRESENT,
             IOobject::AUTO_WRITE
         ),
-	mesh,
-	dimensionedSymmTensor("zero", dimless, symmTensor::zero)
+    mesh,
+    dimensionedSymmTensor("zero", dimless, symmTensor::zero)
     );
 
     volSymmTensorField epsilon
@@ -67,8 +67,8 @@
             IOobject::READ_IF_PRESENT,
             IOobject::AUTO_WRITE
         ),
-	mesh,
-	dimensionedSymmTensor("zero", dimless, symmTensor::zero)
+    mesh,
+    dimensionedSymmTensor("zero", dimless, symmTensor::zero)
     );
 
     //- plastic strain
@@ -113,20 +113,20 @@
             IOobject::READ_IF_PRESENT,
             IOobject::AUTO_WRITE
         ),
-	mesh,
-	dimensionedSymmTensor("zero", dimForce/dimArea, symmTensor::zero)
+    mesh,
+    dimensionedSymmTensor("zero", dimForce/dimArea, symmTensor::zero)
     );
 
       volVectorField divDSigmaExp
       (
         IOobject
         (
-	 "divDSigmaExp",
-	 runTime.timeName(),
-	 mesh,
-	 IOobject::NO_READ,
-	 IOobject::NO_WRITE
-	 ),
+     "divDSigmaExp",
+     runTime.timeName(),
+     mesh,
+     IOobject::NO_READ,
+     IOobject::NO_WRITE
+     ),
         mesh,
         dimensionedVector("zero", dimensionSet(1,-2,-2,0,0,0,0), vector::zero)
        );
@@ -135,12 +135,12 @@
       (
         IOobject
         (
-	 "divDSigmaNonLinExp",
-	 runTime.timeName(),
-	 mesh,
-	 IOobject::NO_READ,
-	 IOobject::NO_WRITE
-	 ),
+     "divDSigmaNonLinExp",
+     runTime.timeName(),
+     mesh,
+     IOobject::NO_READ,
+     IOobject::NO_WRITE
+     ),
         mesh,
         dimensionedVector("zero", dimensionSet(1,-2,-2,0,0,0,0), vector::zero)
        );
@@ -171,7 +171,7 @@
             IOobject::NO_WRITE
         ),
         mesh,
-	dimensionedVector("zero", dimLength, vector::zero)
+    dimensionedVector("zero", dimLength, vector::zero)
     );
 // aitken relaxation factor
 scalar aitkenInitialRes = 1.0;

@@ -12,13 +12,13 @@ if(divDSigmaNonLinExpMethod == "standard")
    {
      divDSigmaNonLinExp =
        fvc::div(
-		mesh.magSf()
-		*(
-		  ( muf * (n & fvc::interpolate( gradDU & gradDU.T() )) )
-		  + ( 0.5*lambdaf * (n * tr(fvc::interpolate( gradDU & gradDU.T() ))) )
-		  + (n & fvc::interpolate( (sigma + DSigma) & gradDU ))
-		  )
-		);
+        mesh.magSf()
+        *(
+          ( muf * (n & fvc::interpolate( gradDU & gradDU.T() )) )
+          + ( 0.5*lambdaf * (n * tr(fvc::interpolate( gradDU & gradDU.T() ))) )
+          + (n & fvc::interpolate( (sigma + DSigma) & gradDU ))
+          )
+        );
    }
  else
    {

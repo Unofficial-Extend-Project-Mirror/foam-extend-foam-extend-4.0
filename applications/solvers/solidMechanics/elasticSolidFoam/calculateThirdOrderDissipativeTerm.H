@@ -199,33 +199,33 @@ forAll(extrapGradU.internalField(), facei)
 
   tensor deltaOwnDotgradGradUOwn =
     tensor(
-	   deltaOwn.x()*gradGradUXXXOwn + deltaOwn.y()*gradGradUYXXOwn + deltaOwn.z()*gradGradUZXXOwn,
-	   deltaOwn.x()*gradGradUXXYOwn + deltaOwn.y()*gradGradUYXYOwn + deltaOwn.z()*gradGradUZXYOwn,
-	   deltaOwn.x()*gradGradUXXZOwn + deltaOwn.y()*gradGradUYXZOwn + deltaOwn.z()*gradGradUZXZOwn,
+       deltaOwn.x()*gradGradUXXXOwn + deltaOwn.y()*gradGradUYXXOwn + deltaOwn.z()*gradGradUZXXOwn,
+       deltaOwn.x()*gradGradUXXYOwn + deltaOwn.y()*gradGradUYXYOwn + deltaOwn.z()*gradGradUZXYOwn,
+       deltaOwn.x()*gradGradUXXZOwn + deltaOwn.y()*gradGradUYXZOwn + deltaOwn.z()*gradGradUZXZOwn,
 
-	   deltaOwn.x()*gradGradUXYXOwn + deltaOwn.y()*gradGradUYYXOwn + deltaOwn.z()*gradGradUZYXOwn,
-	   deltaOwn.x()*gradGradUXYYOwn + deltaOwn.y()*gradGradUYYYOwn + deltaOwn.z()*gradGradUZYYOwn,
-	   deltaOwn.x()*gradGradUXYZOwn + deltaOwn.y()*gradGradUYYZOwn + deltaOwn.z()*gradGradUZYZOwn,
+       deltaOwn.x()*gradGradUXYXOwn + deltaOwn.y()*gradGradUYYXOwn + deltaOwn.z()*gradGradUZYXOwn,
+       deltaOwn.x()*gradGradUXYYOwn + deltaOwn.y()*gradGradUYYYOwn + deltaOwn.z()*gradGradUZYYOwn,
+       deltaOwn.x()*gradGradUXYZOwn + deltaOwn.y()*gradGradUYYZOwn + deltaOwn.z()*gradGradUZYZOwn,
 
-	   deltaOwn.x()*gradGradUXZXOwn + deltaOwn.y()*gradGradUYZXOwn + deltaOwn.z()*gradGradUZZXOwn,
-	   deltaOwn.x()*gradGradUXZYOwn + deltaOwn.y()*gradGradUYZYOwn + deltaOwn.z()*gradGradUZZYOwn,
-	   deltaOwn.x()*gradGradUXZZOwn + deltaOwn.y()*gradGradUYZZOwn + deltaOwn.z()*gradGradUZZZOwn
-	   );
+       deltaOwn.x()*gradGradUXZXOwn + deltaOwn.y()*gradGradUYZXOwn + deltaOwn.z()*gradGradUZZXOwn,
+       deltaOwn.x()*gradGradUXZYOwn + deltaOwn.y()*gradGradUYZYOwn + deltaOwn.z()*gradGradUZZYOwn,
+       deltaOwn.x()*gradGradUXZZOwn + deltaOwn.y()*gradGradUYZZOwn + deltaOwn.z()*gradGradUZZZOwn
+       );
 
   tensor deltaNeiDotgradGradUNei =
     tensor(
-	   deltaNei.x()*gradGradUXXXNei + deltaNei.y()*gradGradUYXXNei + deltaNei.z()*gradGradUZXXNei,
-	   deltaNei.x()*gradGradUXXYNei + deltaNei.y()*gradGradUYXYNei + deltaNei.z()*gradGradUZXYNei,
-	   deltaNei.x()*gradGradUXXZNei + deltaNei.y()*gradGradUYXZNei + deltaNei.z()*gradGradUZXZNei,
+       deltaNei.x()*gradGradUXXXNei + deltaNei.y()*gradGradUYXXNei + deltaNei.z()*gradGradUZXXNei,
+       deltaNei.x()*gradGradUXXYNei + deltaNei.y()*gradGradUYXYNei + deltaNei.z()*gradGradUZXYNei,
+       deltaNei.x()*gradGradUXXZNei + deltaNei.y()*gradGradUYXZNei + deltaNei.z()*gradGradUZXZNei,
 
-	   deltaNei.x()*gradGradUXYXNei + deltaNei.y()*gradGradUYYXNei + deltaNei.z()*gradGradUZYXNei,
-	   deltaNei.x()*gradGradUXYYNei + deltaNei.y()*gradGradUYYYNei + deltaNei.z()*gradGradUZYYNei,
-	   deltaNei.x()*gradGradUXYZNei + deltaNei.y()*gradGradUYYZNei + deltaNei.z()*gradGradUZYZNei,
+       deltaNei.x()*gradGradUXYXNei + deltaNei.y()*gradGradUYYXNei + deltaNei.z()*gradGradUZYXNei,
+       deltaNei.x()*gradGradUXYYNei + deltaNei.y()*gradGradUYYYNei + deltaNei.z()*gradGradUZYYNei,
+       deltaNei.x()*gradGradUXYZNei + deltaNei.y()*gradGradUYYZNei + deltaNei.z()*gradGradUZYZNei,
 
-	   deltaNei.x()*gradGradUXZXNei + deltaNei.y()*gradGradUYZXNei + deltaNei.z()*gradGradUZZXNei,
-	   deltaNei.x()*gradGradUXZYNei + deltaNei.y()*gradGradUYZYNei + deltaNei.z()*gradGradUZZYNei,
-	   deltaNei.x()*gradGradUXZZNei + deltaNei.y()*gradGradUYZZNei + deltaNei.z()*gradGradUZZZNei
-	   );
+       deltaNei.x()*gradGradUXZXNei + deltaNei.y()*gradGradUYZXNei + deltaNei.z()*gradGradUZZXNei,
+       deltaNei.x()*gradGradUXZYNei + deltaNei.y()*gradGradUYZYNei + deltaNei.z()*gradGradUZZYNei,
+       deltaNei.x()*gradGradUXZZNei + deltaNei.y()*gradGradUYZZNei + deltaNei.z()*gradGradUZZZNei
+       );
 
 
   // get average of extrapolated values
@@ -250,12 +250,12 @@ forAll(extrapGradU.boundaryField(), patchi)
 
 // calculate thirdOrderTerm
 volVectorField divThirdOrderTerm (
-				  "thirdOrderTerm",
-				  fvc::div(
-					   (2*muf+lambdaf)*mesh.Sf()
-					   & (extrapGradU - averageGradU)
-					   )
-				  );
+                  "thirdOrderTerm",
+                  fvc::div(
+                       (2*muf+lambdaf)*mesh.Sf()
+                       & (extrapGradU - averageGradU)
+                       )
+                  );
 
 // if(runTime.outputTime())
 //   {

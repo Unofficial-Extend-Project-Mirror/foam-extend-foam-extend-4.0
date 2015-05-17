@@ -8,11 +8,11 @@ if(divSigmaExpMethod == "standard")
      //- this form seems to have the best convergence
      divSigmaExp =
        fvc::div(mesh.magSf()*
-		(
-		 (n&(Cf && fvc::interpolate(symm(gradU))))
-		 - (n&(Kf & fvc::interpolate(gradU)))
-		 )
-		);
+        (
+         (n&(Cf && fvc::interpolate(symm(gradU))))
+         - (n&(Kf & fvc::interpolate(gradU)))
+         )
+        );
    }
  else if(divSigmaExpMethod == "laplacian")
    {

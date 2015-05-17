@@ -14,10 +14,10 @@ forAll (bm, patchI)
     (
      !isA<emptyFvPatch>(bm[patchI])
      && !(
-	  bm[patchI].coupled()
-	  //&& Pstream::parRun()
-	  //&& !mesh.parallelData().cyclicParallel()
-	  )
+      bm[patchI].coupled()
+      //&& Pstream::parRun()
+      //&& !mesh.parallelData().cyclicParallel()
+      )
      )
     {
       const labelList& bp = bm[patchI].patch().boundaryPoints();
@@ -25,9 +25,9 @@ forAll (bm, patchI)
       const labelList& meshPoints = bm[patchI].patch().meshPoints();
 
       forAll (bp, pointI)
-	{
-	  pointsCorrectionMap.insert(meshPoints[bp[pointI]]);
-	}
+    {
+      pointsCorrectionMap.insert(meshPoints[bp[pointI]]);
+    }
     }
 }
 

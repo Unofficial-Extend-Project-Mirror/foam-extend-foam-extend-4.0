@@ -13,7 +13,7 @@ else if(divDSigmaExpMethod == "surface")
        muf*(mesh.Sf() & fvc::interpolate(gradDU.T()))
      + lambdaf*(mesh.Sf() & I*fvc::interpolate(tr(gradDU)))
      - (muf + lambdaf)*(mesh.Sf() & fvc::interpolate(gradDU))
-	);
+    );
 }
 else if(divDSigmaExpMethod == "decompose")
 {

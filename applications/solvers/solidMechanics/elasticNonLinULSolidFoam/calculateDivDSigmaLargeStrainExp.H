@@ -18,10 +18,10 @@ if(divDSigmaLargeStrainExpMethod == "standard")
      divDSigmaLargeStrainExp =
        fvc::div
        (
-	muf * (mesh.Sf() & fvc::interpolate(gradDU & gradDU.T()))
-	+ 0.5*lambdaf * (mesh.Sf() & (fvc::interpolate(gradDU && gradDU)*I))
-	+ (mesh.Sf() & fvc::interpolate( (sigma + DSigma) & gradDU ))
-	);
+    muf * (mesh.Sf() & fvc::interpolate(gradDU & gradDU.T()))
+    + 0.5*lambdaf * (mesh.Sf() & (fvc::interpolate(gradDU && gradDU)*I))
+    + (mesh.Sf() & fvc::interpolate( (sigma + DSigma) & gradDU ))
+    );
    }
  else
    {

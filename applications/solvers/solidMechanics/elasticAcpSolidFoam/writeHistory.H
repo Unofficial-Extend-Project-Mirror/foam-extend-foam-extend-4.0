@@ -2,7 +2,7 @@
 if(historyPatchID != -1)
   {
     Info << "Writing disp and force of patch "<<historyPatchName<<" to file"
-	  << endl;
+      << endl;
 
      //- for small strain or moving mesh
     vector force = gSum(mesh.boundary()[historyPatchID].Sf() & sigma.boundaryField()[historyPatchID]);
@@ -19,17 +19,17 @@ if(historyPatchID != -1)
      //- be dotted with the surface normal to give the actual traction/force
      //- you cannot just take the component of the sigma tensor
      //scalar forcePatchIntegrateMethod = gSum(
-     //					    mesh.magSf().boundaryField()[historyPatchID]
-     //					    *sigma.boundaryField()[historyPatchID].component(symmTensor::XY)
-     //					    );
+     //                        mesh.magSf().boundaryField()[historyPatchID]
+     //                        *sigma.boundaryField()[historyPatchID].component(symmTensor::XY)
+     //                        );
 
      vector avDisp = gAverage(U.boundaryField()[historyPatchID]);
 
      //- write to file
      if(Pstream::master())
        {
-	 OFstream& forceDispFile = *filePtr;
-	 forceDispFile << avDisp.x() << " " << avDisp.y() << " " << avDisp.z() << " "
-		       << force.x() << " " << force.y() << " " << force.z() << endl;
+     OFstream& forceDispFile = *filePtr;
+     forceDispFile << avDisp.x() << " " << avDisp.y() << " " << avDisp.z() << " "
+               << force.x() << " " << force.y() << " " << force.z() << endl;
        }
    }

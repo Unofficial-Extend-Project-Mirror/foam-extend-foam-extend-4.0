@@ -106,29 +106,29 @@
 
     //- explicit terms in the momentum equation
     volVectorField divDSigmaExp
-	(
-	 IOobject
-	 (
-	  "divDSigmaExp",
-	  runTime.timeName(),
-	  mesh,
-	  IOobject::NO_READ,
-	  IOobject::NO_WRITE
-	  ),
-	 mesh,
- 	 dimensionedVector("zero", dimensionSet(1, -2, -2, 0, 0, 0, 0), vector::zero)
-	 );
+    (
+     IOobject
+     (
+      "divDSigmaExp",
+      runTime.timeName(),
+      mesh,
+      IOobject::NO_READ,
+      IOobject::NO_WRITE
+      ),
+     mesh,
+      dimensionedVector("zero", dimensionSet(1, -2, -2, 0, 0, 0, 0), vector::zero)
+     );
 
       volVectorField divDSigmaNonLinExp
       (
         IOobject
         (
-	 "divDSigmaNonLinExp",
-	 runTime.timeName(),
-	 mesh,
-	 IOobject::NO_READ,
-	 IOobject::NO_WRITE
-	 ),
+     "divDSigmaNonLinExp",
+     runTime.timeName(),
+     mesh,
+     IOobject::NO_READ,
+     IOobject::NO_WRITE
+     ),
         mesh,
         dimensionedVector("zero", dimensionSet(1,-2,-2,0,0,0,0), vector::zero)
        );
@@ -152,15 +152,15 @@
    (
         IOobject
         (
-	 "aitkenDelta",
-	 runTime.timeName(),
-	 mesh,
-	 IOobject::NO_READ,
-	 IOobject::NO_WRITE
-	 ),
+     "aitkenDelta",
+     runTime.timeName(),
+     mesh,
+     IOobject::NO_READ,
+     IOobject::NO_WRITE
+     ),
         mesh,
         dimensionedVector("zero", dimLength, vector::zero)
-	);
+    );
 // aitken relaxation factor
 scalar aitkenInitialRes = 1.0;
 scalar aitkenTheta = 0.1;
@@ -169,12 +169,12 @@ scalar aitkenTheta = 0.1;
 //    (
 //         IOobject
 //         (
-// 	 "resid",
-// 	 runTime.timeName(),
-// 	 mesh,
-// 	 IOobject::NO_READ,
-// 	 IOobject::AUTO_WRITE
-// 	 ),
+//      "resid",
+//      runTime.timeName(),
+//      mesh,
+//      IOobject::NO_READ,
+//      IOobject::AUTO_WRITE
+//      ),
 //         mesh,
 //         dimensionedVector("zero", dimless, vector::zero)
 //     );

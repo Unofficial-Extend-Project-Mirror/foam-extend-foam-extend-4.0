@@ -15,16 +15,16 @@ if (dynamicTimeStep)
         scalar newDeltaT = deltaTmin;
 
         if (newDeltaT/runTime.deltaT().value() < 0.5)
-	  {
+      {
             newDeltaT = 0.5*runTime.deltaT().value();
             Info << "Reducing time step" << nl;
-	  }
+      }
 
         runTime.setDeltaT(newDeltaT);
       }
 
     Pout << "Current time step size: "
-	 << runTime.deltaT().value() << " s" << endl;
+     << runTime.deltaT().value() << " s" << endl;
 
     scalar maxDT = runTime.deltaT().value();
 

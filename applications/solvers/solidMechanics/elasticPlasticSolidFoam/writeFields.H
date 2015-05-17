@@ -28,41 +28,41 @@ if (runTime.outputTime())
        sqrt((2.0/3.0)*magSqr(dev(epsilonP)))
        );
     Info<< "Max epsilonPEq = " << max(epsilonPEq).value()
-	<< endl;
+    << endl;
 
     volScalarField sigmaEq
       (
        IOobject
        (
-	"sigmaEq",
-	runTime.timeName(),
-	mesh,
-	IOobject::NO_READ,
-	IOobject::AUTO_WRITE
-	),
+    "sigmaEq",
+    runTime.timeName(),
+    mesh,
+    IOobject::NO_READ,
+    IOobject::AUTO_WRITE
+    ),
        sqrt((3.0/2.0)*magSqr(dev(sigma)))
        );
     Info<< "Max sigmaEq = " << max(sigmaEq).value()
-	<< endl;
+    << endl;
 
     volScalarField sigmaHyd
       (
        IOobject
        (
-	"sigmaHyd",
-	runTime.timeName(),
-	mesh,
-	IOobject::NO_READ,
-	IOobject::AUTO_WRITE
-	),
+    "sigmaHyd",
+    runTime.timeName(),
+    mesh,
+    IOobject::NO_READ,
+    IOobject::AUTO_WRITE
+    ),
        (
-	sigma.component(symmTensor::XX)
-	+ sigma.component(symmTensor::YY)
-	+ sigma.component(symmTensor::ZZ)
-	)/3
+    sigma.component(symmTensor::XX)
+    + sigma.component(symmTensor::YY)
+    + sigma.component(symmTensor::ZZ)
+    )/3
        );
     Info<< "Max sigmaHyd = " << max(sigmaHyd).value()
-	<< endl;
+    << endl;
 
     runTime.write();
   }

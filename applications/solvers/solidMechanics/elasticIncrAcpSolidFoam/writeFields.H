@@ -88,23 +88,23 @@ if (runTime.outputTime() || topoChange)
 //       (
 //        IOobject
 //        (
-// 	"tractionBoundary",
-// 	runTime.timeName(),
-// 	mesh,
-// 	IOobject::NO_READ,
-// 	IOobject::AUTO_WRITE
-// 	),
+//     "tractionBoundary",
+//     runTime.timeName(),
+//     mesh,
+//     IOobject::NO_READ,
+//     IOobject::AUTO_WRITE
+//     ),
 //        mesh,
 //        dimensionedVector("zero", dimForce/dimArea, vector::zero)
 //        );
 //     surfaceVectorField n = mesh.Sf()/mesh.magSf();
 //     forAll(tractionBoundary.boundaryField(), patchi)
 //       {
-// 	if(mesh.boundaryMesh()[patchi].type() != processorPolyPatch::typeName)
-// 	  {
-// 	    tractionBoundary.boundaryField()[patchi] =
-// 	      n.boundaryField()[patchi] & sigma.boundaryField()[patchi];
-// 	  }
+//     if(mesh.boundaryMesh()[patchi].type() != processorPolyPatch::typeName)
+//       {
+//         tractionBoundary.boundaryField()[patchi] =
+//           n.boundaryField()[patchi] & sigma.boundaryField()[patchi];
+//       }
 //       }
 
 
@@ -113,12 +113,12 @@ if (runTime.outputTime() || topoChange)
       (
        IOobject
        (
-	"damageAndCracks",
-	runTime.timeName(),
-	mesh,
-	IOobject::NO_READ,
-	IOobject::AUTO_WRITE
-	),
+    "damageAndCracks",
+    runTime.timeName(),
+    mesh,
+    IOobject::NO_READ,
+    IOobject::AUTO_WRITE
+    ),
        mesh,
        dimensionedScalar("zero", dimless, 0.0),
        calculatedFvPatchVectorField::typeName
@@ -127,12 +127,12 @@ if (runTime.outputTime() || topoChange)
       (
        IOobject
        (
-	"GI",
-	runTime.timeName(),
-	mesh,
-	IOobject::NO_READ,
-	IOobject::AUTO_WRITE
-	),
+    "GI",
+    runTime.timeName(),
+    mesh,
+    IOobject::NO_READ,
+    IOobject::AUTO_WRITE
+    ),
        mesh,
        dimensionedScalar("zero", dimless, 0.0),
        calculatedFvPatchVectorField::typeName
@@ -141,30 +141,30 @@ if (runTime.outputTime() || topoChange)
       (
        IOobject
        (
-	"GII",
-	runTime.timeName(),
-	mesh,
-	IOobject::NO_READ,
-	IOobject::AUTO_WRITE
-	),
+    "GII",
+    runTime.timeName(),
+    mesh,
+    IOobject::NO_READ,
+    IOobject::AUTO_WRITE
+    ),
        mesh,
        dimensionedScalar("zero", dimless, 0.0),
        calculatedFvPatchVectorField::typeName
        );
     forAll(DU.boundaryField(), patchi)
       {
-	// if(DU.boundaryField()[patchi].type() == cohesiveLawMultiMatFvPatchVectorField::typeName)
-	if(DU.boundaryField()[patchi].type() == solidCohesiveFvPatchVectorField::typeName)
-	  {
-	    // cohesiveLawMultiMatFvPatchVectorField& DUpatch =
-	    //   refCast<cohesiveLawMultiMatFvPatchVectorField>(DU.boundaryField()[patchi]);
-	    solidCohesiveFvPatchVectorField& DUpatch =
-	      refCast<solidCohesiveFvPatchVectorField>(DU.boundaryField()[patchi]);
+    // if(DU.boundaryField()[patchi].type() == cohesiveLawMultiMatFvPatchVectorField::typeName)
+    if(DU.boundaryField()[patchi].type() == solidCohesiveFvPatchVectorField::typeName)
+      {
+        // cohesiveLawMultiMatFvPatchVectorField& DUpatch =
+        //   refCast<cohesiveLawMultiMatFvPatchVectorField>(DU.boundaryField()[patchi]);
+        solidCohesiveFvPatchVectorField& DUpatch =
+          refCast<solidCohesiveFvPatchVectorField>(DU.boundaryField()[patchi]);
 
-	    GI.boundaryField()[patchi] = DUpatch.GI();
-	    GII.boundaryField()[patchi] = DUpatch.GII();
-	    damageAndCracks.boundaryField()[patchi] = DUpatch.crackingAndDamage();
-	  }
+        GI.boundaryField()[patchi] = DUpatch.GI();
+        GII.boundaryField()[patchi] = DUpatch.GII();
+        damageAndCracks.boundaryField()[patchi] = DUpatch.crackingAndDamage();
+      }
       }
 
     //Info << "done" << endl;

@@ -10,7 +10,7 @@ if(iCorr == 0)
     aitkenTheta = 0.01;
 //     if(mesh.relax(U.name()))
 //       {
-// 	aitkenTheta = mesh.relaxationFactor(U.name());
+//     aitkenTheta = mesh.relaxationFactor(U.name());
 //       }
   }
  else
@@ -20,9 +20,9 @@ if(iCorr == 0)
      scalar sumMagB = gSum(magSqr(b));
      if(sumMagB < SMALL)
        {
-	 // Warning << "Aitken under-relaxation: denominator less then SMALL"
-	 // << endl;
-	 sumMagB += SMALL;
+     // Warning << "Aitken under-relaxation: denominator less then SMALL"
+     // << endl;
+     sumMagB += SMALL;
        }
 
      aitkenTheta = -aitkenTheta*

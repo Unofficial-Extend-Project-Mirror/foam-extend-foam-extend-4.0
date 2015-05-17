@@ -6,8 +6,8 @@ label cylinderID = mesh.boundaryMesh().findPatchID("cylinder");
 if(plateID == -1 || cylinderID == -1)
   {
     FatalError << "\n Cannot find the plate patch or the cylinder"
-	       << " patch to calculate lift and drag!"
-	       << exit(FatalError);
+           << " patch to calculate lift and drag!"
+           << exit(FatalError);
   }
 
 scalar lift = 0;

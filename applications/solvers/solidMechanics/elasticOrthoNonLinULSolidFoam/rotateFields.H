@@ -18,8 +18,8 @@
   if(min(J.internalField()) < 0)
     {
       FatalErrorIn(args.executable())
-	<< "Negative Jacobian - a cell volume has become negative!"
-	<< exit(FatalError);
+    << "Negative Jacobian - a cell volume has become negative!"
+    << exit(FatalError);
     }
 
   rho = rho/J;

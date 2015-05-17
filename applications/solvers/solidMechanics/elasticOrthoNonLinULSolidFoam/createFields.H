@@ -111,5 +111,5 @@
 
 //     if(rheology.planeStress())
 //       {
-// 	Info << nl << "Plane stress is set to yes -> the zz stress will be zero" << nl << endl;
+//     Info << nl << "Plane stress is set to yes -> the zz stress will be zero" << nl << endl;
 //       }

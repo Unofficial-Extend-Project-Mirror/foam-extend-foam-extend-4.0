@@ -16,9 +16,9 @@ if(iCorr == 0)
      scalar sumMagB = gSum(magSqr(b));
      if(sumMagB < SMALL)
        {
-	 //Warning << "Aitken under-relaxation: denominator less then SMALL"
-	 //	 << endl;
-	 sumMagB += SMALL;
+     //Warning << "Aitken under-relaxation: denominator less then SMALL"
+     //     << endl;
+     sumMagB += SMALL;
        }
 
      aitkenTheta = -aitkenTheta*

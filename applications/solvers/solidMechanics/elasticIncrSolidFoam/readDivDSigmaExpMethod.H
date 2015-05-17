@@ -17,6 +17,6 @@
     {
         FatalErrorIn(args.executable())
             << "divSigmaExp method " << divDSigmaExpMethod << " not found!  "
-	        << "valid methods are:\nstandard\nsurface\ndecompose\nlaplacian"
-	        << exit(FatalError);
+            << "valid methods are:\nstandard\nsurface\ndecompose\nlaplacian"
+            << exit(FatalError);
     }

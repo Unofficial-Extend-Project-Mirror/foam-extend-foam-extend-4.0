@@ -88,12 +88,12 @@ if (runTime.outputTime() || topoChange)
       (
        IOobject
        (
-	"damageAndCracks",
-	runTime.timeName(),
-	mesh,
-	IOobject::NO_READ,
-	IOobject::AUTO_WRITE
-	),
+    "damageAndCracks",
+    runTime.timeName(),
+    mesh,
+    IOobject::NO_READ,
+    IOobject::AUTO_WRITE
+    ),
        mesh,
        dimensionedScalar("zero", dimless, 0.0),
        calculatedFvPatchVectorField::typeName
@@ -102,12 +102,12 @@ if (runTime.outputTime() || topoChange)
       (
        IOobject
        (
-	"GI",
-	runTime.timeName(),
-	mesh,
-	IOobject::NO_READ,
-	IOobject::AUTO_WRITE
-	),
+    "GI",
+    runTime.timeName(),
+    mesh,
+    IOobject::NO_READ,
+    IOobject::AUTO_WRITE
+    ),
        mesh,
        dimensionedScalar("zero", dimless, 0.0),
        calculatedFvPatchVectorField::typeName
@@ -116,30 +116,30 @@ if (runTime.outputTime() || topoChange)
       (
        IOobject
        (
-	"GII",
-	runTime.timeName(),
-	mesh,
-	IOobject::NO_READ,
-	IOobject::AUTO_WRITE
-	),
+    "GII",
+    runTime.timeName(),
+    mesh,
+    IOobject::NO_READ,
+    IOobject::AUTO_WRITE
+    ),
        mesh,
        dimensionedScalar("zero", dimless, 0.0),
        calculatedFvPatchVectorField::typeName
        );
     forAll(U.boundaryField(), patchi)
       {
-	// if(U.boundaryField()[patchi].type() == cohesiveLawMultiMatFvPatchVectorField::typeName)
-	if(U.boundaryField()[patchi].type() == solidCohesiveFvPatchVectorField::typeName)
-	  {
-	    // cohesiveLawMultiMatFvPatchVectorField& Upatch =
-	    //   refCast<cohesiveLawMultiMatFvPatchVectorField>(U.boundaryField()[patchi]);
-	    solidCohesiveFvPatchVectorField& Upatch =
-	      refCast<solidCohesiveFvPatchVectorField>(U.boundaryField()[patchi]);
+    // if(U.boundaryField()[patchi].type() == cohesiveLawMultiMatFvPatchVectorField::typeName)
+    if(U.boundaryField()[patchi].type() == solidCohesiveFvPatchVectorField::typeName)
+      {
+        // cohesiveLawMultiMatFvPatchVectorField& Upatch =
+        //   refCast<cohesiveLawMultiMatFvPatchVectorField>(U.boundaryField()[patchi]);
+        solidCohesiveFvPatchVectorField& Upatch =
+          refCast<solidCohesiveFvPatchVectorField>(U.boundaryField()[patchi]);
 
-	    GI.boundaryField()[patchi] = Upatch.GI();
-	    GII.boundaryField()[patchi] = Upatch.GII();
-	    damageAndCracks.boundaryField()[patchi] = Upatch.crackingAndDamage();
-	  }
+        GI.boundaryField()[patchi] = Upatch.GI();
+        GII.boundaryField()[patchi] = Upatch.GII();
+        damageAndCracks.boundaryField()[patchi] = Upatch.crackingAndDamage();
+      }
       }
     volScalarField GTotal("GTotal", GI + GII);
     GTotal.write();

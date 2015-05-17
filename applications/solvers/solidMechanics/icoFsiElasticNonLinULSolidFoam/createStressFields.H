@@ -19,13 +19,13 @@
     (
         IOobject
         (
-	 "Usolid",
-	 runTime.timeName(),
-	 stressMesh,
-	 IOobject::READ_IF_PRESENT,
-	 IOobject::AUTO_WRITE
-	 ),
-	DU
+     "Usolid",
+     runTime.timeName(),
+     stressMesh,
+     IOobject::READ_IF_PRESENT,
+     IOobject::AUTO_WRITE
+     ),
+    DU
      );
 
 

@@ -21,10 +21,10 @@
       (
        IOobject
        (
-	"pointDU",
-	runTime.timeName(),
-	mesh
-	),
+    "pointDU",
+    runTime.timeName(),
+    mesh
+    ),
        pMesh,
        dimensionedVector("zero", dimLength, vector::zero),
        types
@@ -48,7 +48,7 @@
 
      forAll (pointDUI, pointI)
        {
- 	newPoints[pointI] += pointDUI[pointI];
+     newPoints[pointI] += pointDUI[pointI];
       }
 
     twoDPointCorrector twoDCorrector(mesh);
@@ -60,6 +60,6 @@
 //   else
 //     {
 //       FatalErrorIn(args.executable())
-// 	<< "Negative Jacobian"
-// 	<< exit(FatalError);
+//     << "Negative Jacobian"
+//     << exit(FatalError);
 //     }

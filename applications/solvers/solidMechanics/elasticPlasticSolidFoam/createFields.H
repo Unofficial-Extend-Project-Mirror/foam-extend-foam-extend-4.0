@@ -33,12 +33,12 @@
     (
         IOobject
         (
-	 "DEpsilon",
-	 runTime.timeName(),
-	 mesh,
-	 IOobject::READ_IF_PRESENT,
-	 IOobject::AUTO_WRITE
-	 ),
+     "DEpsilon",
+     runTime.timeName(),
+     mesh,
+     IOobject::READ_IF_PRESENT,
+     IOobject::AUTO_WRITE
+     ),
         mesh,
         dimensionedSymmTensor("zero", dimless, symmTensor::zero)
      );
@@ -104,12 +104,12 @@
       (
         IOobject
         (
-	 "divDSigmaExp",
-	 runTime.timeName(),
-	 mesh,
-	 IOobject::NO_READ,
-	 IOobject::NO_WRITE
-	 ),
+     "divDSigmaExp",
+     runTime.timeName(),
+     mesh,
+     IOobject::NO_READ,
+     IOobject::NO_WRITE
+     ),
         mesh,
         dimensionedVector("zero", dimensionSet(1,-2,-2,0,0,0,0), vector::zero)
        );
@@ -139,7 +139,7 @@
             IOobject::NO_WRITE
         ),
         mesh,
-	dimensionedVector("zero", dimLength, vector::zero)
+    dimensionedVector("zero", dimLength, vector::zero)
     );
    scalar aitkenInitialRes = 1.0;
    scalar aitkenTheta = 0.1;

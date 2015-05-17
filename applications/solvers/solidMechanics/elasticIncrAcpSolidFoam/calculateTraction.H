@@ -28,14 +28,14 @@
 
     // forAll(traction.boundaryField(), patchi)
     //   {
-    // 	if (mesh.boundary()[patchi].type() == "cohesive")
-    // 	  {
-    // 	    forAll(traction.boundaryField()[patchi], facei)
-    // 	      {
-    // 		Pout << "face " << facei << " with traction magnitude "
-    // 		     << mag(traction.boundaryField()[patchi][facei])/1e6 << " MPa and traction "
-    // 		     << traction.boundaryField()[patchi][facei]/1e6 << " MPa" << endl;
-    // 	      }
-    // 	  }
+    //     if (mesh.boundary()[patchi].type() == "cohesive")
+    //       {
+    //         forAll(traction.boundaryField()[patchi], facei)
+    //           {
+    //         Pout << "face " << facei << " with traction magnitude "
+    //              << mag(traction.boundaryField()[patchi][facei])/1e6 << " MPa and traction "
+    //              << traction.boundaryField()[patchi][facei]/1e6 << " MPa" << endl;
+    //           }
+    //       }
     //   }
 }

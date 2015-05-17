@@ -14,5 +14,5 @@ Switch relaxEqn(stressControl.lookup("relaxEqn"));
 if(relaxEqn && solidInterfaceCorr)
   {
     FatalError << "relaxEqn and solidInterface may not be used concurrently"
-	       << exit(FatalError);
+           << exit(FatalError);
   }
