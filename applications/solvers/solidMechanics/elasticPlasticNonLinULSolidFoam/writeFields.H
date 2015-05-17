@@ -1,83 +1,82 @@
 if (runTime.outputTime())
-  {
+{
     volScalarField epsilonEq
-      (
-       IOobject
-       (
-    "epsilonEq",
-    runTime.timeName(),
-    mesh,
-    IOobject::NO_READ,
-    IOobject::AUTO_WRITE
-    ),
-       sqrt((2.0/3.0)*magSqr(dev(epsilon)))
-       );
+    (
+        IOobject
+        (
+            "epsilonEq",
+            runTime.timeName(),
+            mesh,
+            IOobject::NO_READ,
+            IOobject::AUTO_WRITE
+        ),
+        sqrt((2.0/3.0)*magSqr(dev(epsilon)))
+    );
 
-    Info<< "Max epsilonEq = " << max(epsilonEq).value()
-    << endl;
+    Info<< "Max epsilonEq = " << max(epsilonEq).value() << endl;
 
     volScalarField sigmaEq
-      (
-       IOobject
-       (
-    "sigmaEq",
-    runTime.timeName(),
-    mesh,
-    IOobject::NO_READ,
-    IOobject::AUTO_WRITE
-    ),
-       sqrt((3.0/2.0)*magSqr(dev(sigma)))
-       );
+    (
+        IOobject
+        (
+            "sigmaEq",
+            runTime.timeName(),
+            mesh,
+            IOobject::NO_READ,
+            IOobject::AUTO_WRITE
+        ),
+        sqrt((3.0/2.0)*magSqr(dev(sigma)))
+    );
 
-    Info<< "Max sigmaEq = " << max(sigmaEq).value()
-    << endl;
+    Info<< "Max sigmaEq = " << max(sigmaEq).value() << endl;
 
     pointMesh pMesh(mesh);
     pointScalarField contactPointGap
-      (
-       IOobject
-       (
-    "contactPointGap",
-    runTime.timeName(),
-    mesh,
-    IOobject::NO_READ,
-    IOobject::AUTO_WRITE
-    ),
-       pMesh,
-       dimensionedScalar("zero", dimless, 0.0)
-       );
+    (
+        IOobject
+        (
+            "contactPointGap",
+            runTime.timeName(),
+            mesh,
+           IOobject::NO_READ,
+            IOobject::AUTO_WRITE
+        ),
+        pMesh,
+        dimensionedScalar("zero", dimless, 0.0)
+    );
 
     forAll(mesh.boundary(), patchi)
-      {
-    if(DU.boundaryField()[patchi].type() == solidContactFvPatchVectorField::typeName)
-      {
-        const solidContactFvPatchVectorField& DUpatch =
-          refCast<const solidContactFvPatchVectorField>
-          (DU.boundaryField()[patchi]);
+    {
+        if(DU.boundaryField()[patchi].type() == solidContactFvPatchVectorField::typeName)
+        {
+            const solidContactFvPatchVectorField& DUpatch =
+                refCast<const solidContactFvPatchVectorField>
+                    (DU.boundaryField()[patchi]);
 
-        if(!DUpatch.master())
-          {
-            const labelList& meshPoints = mesh.boundaryMesh()[patchi].meshPoints();
-            const scalarField gap = DUpatch.normalContactModelPtr()->slaveContactPointGap();
-            forAll(meshPoints, pointi)
-              {
-            contactPointGap[meshPoints[pointi]] = gap[pointi];
-              }
-          }
-      }
-      }
+            if(!DUpatch.master())
+            {
+                const labelList& meshPoints = mesh.boundaryMesh()[patchi].meshPoints();
+                const scalarField gap = DUpatch.normalContactModelPtr()->slaveContactPointGap();
+                forAll(meshPoints, pointi)
+                {
+                    contactPointGap[meshPoints[pointi]] = gap[pointi];
+                }
+            }
+        }
+    }
 
 
     //- total force
-    /*    forAll(mesh.boundary(), patchi)
-      {
+/*
+    forAll(mesh.boundary(), patchi)
+    {
         Info << "Patch " << mesh.boundary()[patchi].name() << endl;
         vectorField totalForce = mesh.Sf().boundaryField()[patchi] & sigma.boundaryField()[patchi];
 
-    vector force = sum( totalForce );
+        vector force = sum( totalForce );
         Info << "\ttotal force is " << force << " N" << endl;
 
-    tensorField F = I + gradDU.boundaryField()[patchi];
+        tensorField F = I + gradDU.boundaryField()[patchi];
         tensorField Finv = inv(F);
         //vectorField nCurrent = Finv & n.boundaryField()[patchi];
         //nCurrent /= mag(nCurrent);
@@ -108,7 +107,8 @@ if (runTime.outputTime())
         //      << "SfTLy*sigmayy " << (SfTL[vector::Y]*sigma0[symmTensor::YY]) << nl
         //      << endl;
     //      }
-    }*/
+    }
+*/
 
     runTime.write();
   }

@@ -28,7 +28,7 @@ nCoupledFacesToBreak = 0;
     //scalarField effTractionFraction = effTraction/sigmaMax;
     scalarField effTractionFraction(normalTraction.size(), 0.0);
 
-    if (cohesivePatchUPtr)
+    if(cohesivePatchUPtr)
     {
         effTractionFraction =
             (normalTraction/sigmaMaxI)*(normalTraction/sigmaMaxI)
@@ -41,6 +41,7 @@ nCoupledFacesToBreak = 0;
             (normalTraction/sigmaMaxI)*(normalTraction/sigmaMaxI)
           + (shearTraction/sigmaMaxI)*(shearTraction/sigmaMaxI);
     }
+
     maxEffTractionFraction = gMax(effTractionFraction);
 
     SLList<label> facesToBreakList;
@@ -85,7 +86,6 @@ nCoupledFacesToBreak = 0;
         {
             faceToBreakEffTractionFraction =
                 facesToBreakEffTractionFraction[faceI];
-
             faceToBreakIndex = facesToBreak[faceI];
         }
     }
@@ -135,59 +135,59 @@ nCoupledFacesToBreak = 0;
         if (mesh.boundary()[patchI].coupled())
         {
             // scalarField pEffTraction =
-        //   cohesiveZone.boundaryField()[patchI] *
-        //   mag(traction.boundaryField()[patchI]);
-        // scalarField pEffTractionFraction = pEffTraction/sigmaMax.boundaryField()[patchI];
+            //   cohesiveZone.boundaryField()[patchI]*
+            //   mag(traction.boundaryField()[patchI]);
+            // scalarField pEffTractionFraction = pEffTraction/sigmaMax.boundaryField()[patchI];
 
-      scalarField pNormalTraction =
-        cohesiveZone.boundaryField()[patchI] *
-        ( n.boundaryField()[patchI] & traction.boundaryField()[patchI] );
+            scalarField pNormalTraction =
+                cohesiveZone.boundaryField()[patchI]*
+                ( n.boundaryField()[patchI] & traction.boundaryField()[patchI] );
 
-      // only consider tensile tractions
-      pNormalTraction = max(pNormalTraction, scalar(0));
-      scalarField pShearTraction =
-        cohesiveZone.boundaryField()[patchI] *
-        mag( (I - Foam::sqr(n.boundaryField()[patchI])) & traction.boundaryField()[patchI] );
+            // only consider tensile tractions
+            pNormalTraction = max(pNormalTraction, scalar(0));
 
-      // the traction fraction is monitored to decide which faces to break:
-      // ie (tN/tNC)^2 + (tS/tSC)^2 >1 to crack a face
-      const scalarField& pSigmaMax = sigmaMax.boundaryField()[patchI];
-      const scalarField& pTauMax = tauMax.boundaryField()[patchI];
+            scalarField pShearTraction =
+                cohesiveZone.boundaryField()[patchI]*
+                mag( (I - Foam::sqr(n.boundaryField()[patchI])) & traction.boundaryField()[patchI] );
 
-      scalarField pEffTractionFraction(pNormalTraction.size(), 0);
+            // the traction fraction is monitored to decide which faces to break:
+            // ie (tN/tNC)^2 + (tS/tSC)^2 >1 to crack a face
+            const scalarField& pSigmaMax = sigmaMax.boundaryField()[patchI];
+            const scalarField& pTauMax = tauMax.boundaryField()[patchI];
 
-      if(cohesivePatchUPtr)
-      {
-          pEffTractionFraction =
-              (pNormalTraction/pSigmaMax)*(pNormalTraction/pSigmaMax)
-            + (pShearTraction/pTauMax)*(pShearTraction/pTauMax);
-      }
-      else
-      {
-          // solidCohesiveFixedModeMix only uses sigmaMax
-          pEffTractionFraction =
-              (pNormalTraction/pSigmaMax)*(pNormalTraction/pSigmaMax)
-            + (pShearTraction/pSigmaMax)*(pShearTraction/pSigmaMax);
-      }
+            scalarField pEffTractionFraction(pNormalTraction.size(), 0.0);
+            if(cohesivePatchUPtr)
+            {
+                pEffTractionFraction =
+                    (pNormalTraction/pSigmaMax)*(pNormalTraction/pSigmaMax)
+                  + (pShearTraction/pTauMax)*(pShearTraction/pTauMax);
+            }
+            else
+            {
+                // solidCohesiveFixedModeMix only uses sigmaMax
+                pEffTractionFraction =
+                    (pNormalTraction/pSigmaMax)*(pNormalTraction/pSigmaMax)
+                  + (pShearTraction/pSigmaMax)*(pShearTraction/pSigmaMax);
+            }
 
-      label start = mesh.boundaryMesh()[patchI].start();
+            label start = mesh.boundaryMesh()[patchI].start();
 
-      forAll(pEffTractionFraction, faceI)
-      {
-          if (pEffTractionFraction[faceI] > maxEffTractionFraction)
-          {
-              maxEffTractionFraction = pEffTractionFraction[faceI];
-          }
+            forAll(pEffTractionFraction, faceI)
+            {
+                if (pEffTractionFraction[faceI] > maxEffTractionFraction)
+                {
+                    maxEffTractionFraction = pEffTractionFraction[faceI];
+                }
 
-          if (pEffTractionFraction[faceI] > 1.0)
-          {
-              coupledFacesToBreakList.insert(start + faceI);
-              coupledFacesToBreakEffTractionFractionList.insert
-                  (
-                      pEffTractionFraction[faceI]
-                  );
-          }
-      }
+                if (pEffTractionFraction[faceI] > 1.0)
+                {
+                    coupledFacesToBreakList.insert(start + faceI);
+                    coupledFacesToBreakEffTractionFractionList.insert
+                    (
+                        pEffTractionFraction[faceI]
+                    );
+                }
+            }
         }
     }
 
@@ -274,8 +274,8 @@ nCoupledFacesToBreak = 0;
     labelList index(Pstream::nProcs(), -1);
     if (nCoupledFacesToBreak)
     {
-      label patchID =
-    mesh.boundaryMesh().whichPatch(coupledFaceToBreakIndex);
+        label patchID =
+            mesh.boundaryMesh().whichPatch(coupledFaceToBreakIndex);
 
         label start = mesh.boundaryMesh()[patchID].start();
         label localIndex = coupledFaceToBreakIndex - start;
@@ -333,6 +333,7 @@ nCoupledFacesToBreak = 0;
     vector faceToBreakNormal = vector::zero;
     scalar faceToBreakSigmaMax = 0.0;
     scalar faceToBreakTauMax = 0.0;
+
     // Set faces to break
     if (nFacesToBreak > 0)
     {
@@ -340,31 +341,39 @@ nCoupledFacesToBreak = 0;
         faceToBreakNormal = n.internalField()[faceToBreakIndex];
 
         // Scale broken face traction
-    faceToBreakSigmaMax = sigmaMaxI[faceToBreakIndex];
-    faceToBreakTauMax = tauMaxI[faceToBreakIndex];
-    scalar normalTrac = faceToBreakNormal & faceToBreakTraction;
-    normalTrac = max(normalTrac, 0.0);
-    scalar shearTrac = mag( (I - sqr(faceToBreakNormal)) & faceToBreakTraction );
-    scalar scaleFactor = 1;
-    if(cohesivePatchUPtr)
-      {
-        scaleFactor =
-          ::sqrt(1 / (
-              (normalTrac/faceToBreakSigmaMax)*(normalTrac/faceToBreakSigmaMax)
-              + (shearTrac/faceToBreakTauMax)*(shearTrac/faceToBreakTauMax)
-              ) );
-        }
-      else
+        faceToBreakSigmaMax = sigmaMaxI[faceToBreakIndex];
+        faceToBreakTauMax = tauMaxI[faceToBreakIndex];
+        scalar normalTrac = faceToBreakNormal & faceToBreakTraction;
+        normalTrac = max(normalTrac, 0.0);
+        scalar shearTrac = mag( (I - sqr(faceToBreakNormal)) & faceToBreakTraction );
+        scalar scaleFactor = 1;
+        if(cohesivePatchUPtr)
         {
-          // solidCohesiveFixedModeMix only uses sigmaMax
-        scaleFactor =
-          ::sqrt(1 / (
-              (normalTrac/faceToBreakSigmaMax)*(normalTrac/faceToBreakSigmaMax)
-              + (shearTrac/faceToBreakSigmaMax)*(shearTrac/faceToBreakSigmaMax)
-              ) );
+            scaleFactor =
+                Foam::sqrt
+                (
+                    1 /
+                    (
+                        (normalTrac/faceToBreakSigmaMax)*(normalTrac/faceToBreakSigmaMax)
+                      + (shearTrac/faceToBreakTauMax)*(shearTrac/faceToBreakTauMax)
+                    )
+                );
+        }
+        else
+        {
+            // solidCohesiveFixedModeMix only uses sigmaMax
+            scaleFactor =
+                Foam::sqrt
+                (
+                    1 /
+                    (
+                        (normalTrac/faceToBreakSigmaMax)*(normalTrac/faceToBreakSigmaMax)
+                      + (shearTrac/faceToBreakSigmaMax)*(shearTrac/faceToBreakSigmaMax)
+                    )
+                );
         }
 
-    faceToBreakTraction *= scaleFactor;
+        faceToBreakTraction *= scaleFactor;
 
         topoChange = true;
     }
@@ -379,29 +388,37 @@ nCoupledFacesToBreak = 0;
         faceToBreakNormal = n.boundaryField()[patchID][localIndex];
 
         // Scale broken face traction
-    faceToBreakSigmaMax = sigmaMax.boundaryField()[patchID][localIndex];
-    faceToBreakTauMax = tauMax.boundaryField()[patchID][localIndex];
-    scalar normalTrac = faceToBreakNormal & faceToBreakTraction;
-    normalTrac = max(normalTrac, 0.0);
-    scalar shearTrac = mag( (I - sqr(faceToBreakNormal)) & faceToBreakTraction );
-    scalar scaleFactor = 1;
-    if(cohesivePatchUPtr)
-      {
-        scaleFactor =
-          ::sqrt(1 / (
-              (normalTrac/faceToBreakSigmaMax)*(normalTrac/faceToBreakSigmaMax)
-              + (shearTrac/faceToBreakTauMax)*(shearTrac/faceToBreakTauMax)
-              ) );
-      }
-    else
-      {
-          // solidCohesiveFixedModeMix only uses sigmaMax
-        scaleFactor =
-          ::sqrt(1 / (
-              (normalTrac/faceToBreakSigmaMax)*(normalTrac/faceToBreakSigmaMax)
-              + (shearTrac/faceToBreakSigmaMax)*(shearTrac/faceToBreakSigmaMax)
-              ) );
-      }
+        faceToBreakSigmaMax = sigmaMax.boundaryField()[patchID][localIndex];
+        faceToBreakTauMax = tauMax.boundaryField()[patchID][localIndex];
+        scalar normalTrac = faceToBreakNormal & faceToBreakTraction;
+        normalTrac = max(normalTrac, 0.0);
+        scalar shearTrac = mag( (I - sqr(faceToBreakNormal)) & faceToBreakTraction );
+        scalar scaleFactor = 1;
+        if(cohesivePatchUPtr)
+        {
+            scaleFactor =
+                Foam::sqrt
+                (
+                    1 /
+                    (
+                        (normalTrac/faceToBreakSigmaMax)*(normalTrac/faceToBreakSigmaMax)
+                      + (shearTrac/faceToBreakTauMax)*(shearTrac/faceToBreakTauMax)
+                    )
+                );
+        }
+        else
+        {
+            // solidCohesiveFixedModeMix only uses sigmaMax
+            scaleFactor =
+                Foam::sqrt
+                (
+                    1 /
+                    (
+                        (normalTrac/faceToBreakSigmaMax)*(normalTrac/faceToBreakSigmaMax)
+                      + (shearTrac/faceToBreakSigmaMax)*(shearTrac/faceToBreakSigmaMax)
+                    )
+                );
+        }
 
         faceToBreakTraction *= scaleFactor;
 
@@ -441,20 +458,20 @@ nCoupledFacesToBreak = 0;
         Cf = fvc::interpolate(C);
         Kf = fvc::interpolate(K);
 
-    // we need to modify propertiess after cracking otherwise momentum equation is wrong
-    // but solidInterface seems to hold some information about old mesh
-    // so we will delete it and make another
-    // we could probably add a public clearout function
-    // create new solidInterface
-    //Pout << "Creating new solidInterface" << endl;
-    //delete solidInterfacePtr;
-    //solidInterfacePtr = new solidInterface(mesh, rheology);
-    // delete demand driven data as the mesh has changed
-    if(rheology.solidInterfaceActive())
-      {
-        rheology.solInterface().clearOut();
-        solidInterfacePtr->modifyProperties(Cf, Kf);
-      }
+        // we need to modify propertiess after cracking otherwise momentum equation is wrong
+        // but solidInterface seems to hold some information about old mesh
+        // so we will delete it and make another
+        // we could probably add a public clearout function
+        // create new solidInterface
+        //Pout << "Creating new solidInterface" << endl;
+        //delete solidInterfacePtr;
+        //solidInterfacePtr = new solidInterface(mesh, rheology);
+        // delete demand driven data as the mesh has changed
+        if(rheology.solidInterfaceActive())
+        {
+            rheology.solInterface().clearOut();
+            solidInterfacePtr->modifyProperties(Cf, Kf);
+        }
 
         // Local crack displacement
         vectorField UpI =
@@ -466,21 +483,21 @@ nCoupledFacesToBreak = 0;
         vectorField globalUpI = mesh.globalCrackField(UpI);
         vectorField globalOldUpI = mesh.globalCrackField(oldUpI);
 
-    // C and K field on new crack faces must be updated
+        // C and K field on new crack faces must be updated
         symmTensor4thOrderField CPI = C.boundaryField()[cohesivePatchID].patchInternalField();
         diagTensorField KPI = K.boundaryField()[cohesivePatchID].patchInternalField();
         symmTensor4thOrderField globalCPI = mesh.globalCrackField(CPI);
         diagTensorField globalKPI = mesh.globalCrackField(KPI);
 
-    // cohesivePatchU.size()
-    int cohesivePatchSize(cohesivePatchUPtr ? cohesivePatchUPtr->size() : cohesivePatchUFixedModePtr->size());
+        // cohesivePatchU.size()
+        int cohesivePatchSize(cohesivePatchUPtr ? cohesivePatchUPtr->size() : cohesivePatchUFixedModePtr->size());
 
         // Initialise U for new cohesive face
         const labelList& gcfa = mesh.globalCrackFaceAddressing();
         label globalIndex = mesh.localCrackStart();
         // for (label i=0; i<cohesivePatchU.size(); i++)
         for (label i=0; i<cohesivePatchSize; i++)
-      {
+        {
             label oldFaceIndex = faceMap[start+i];
 
             // If new face
@@ -499,10 +516,10 @@ nCoupledFacesToBreak = 0;
                      + globalOldUpI[gcfa[globalIndex]]
                     );
 
-        // initialise C and K on new faces
-        // set new face value to value of internal cell
-        Cf.boundaryField()[cohesivePatchID][i] = globalCPI[globalIndex];
-        Kf.boundaryField()[cohesivePatchID][i] = globalKPI[globalIndex];
+                // initialise C and K on new faces
+                // set new face value to value of internal cell
+                Cf.boundaryField()[cohesivePatchID][i] = globalCPI[globalIndex];
+                Kf.boundaryField()[cohesivePatchID][i] = globalKPI[globalIndex];
 
                 globalIndex++;
             }
@@ -513,87 +530,85 @@ nCoupledFacesToBreak = 0;
         }
 
         // we must calculate grad using interface
-    // U at the interface has not been calculated yet as interface.correct()
-    // has not been called yet
-    // not really a problem as gradU is correct in second outer iteration
-    // as long as this does not cause convergence problems for the first iterations.
-    // we should be able to calculate the interface displacements without
-    // having to call interface.correct()
-    // todo: add calculateInterfaceU() function
-    // interface grad uses Gauss, we need least squares
-    //gradU = solidInterfacePtr->grad(U);
+        // U at the interface has not been calculated yet as interface.correct()
+        // has not been called yet
+        // not really a problem as gradU is correct in second outer iteration
+        // as long as this does not cause convergence problems for the first iterations.
+        // we should be able to calculate the interface displacements without
+        // having to call interface.correct()
+        // todo: add calculateInterfaceU() function
+        // interface grad uses Gauss, we need least squares
+        //gradU = solidInterfacePtr->grad(U);
         gradU = fvc::grad(U); // leastSquaresSolidInterface grad scheme
         //snGradU = fvc::snGrad(U);
 
 #       include "calculateTraction.H"
-    //if (nFacesToBreak || nCoupledFacesToBreak) mesh.write(); traction.write();
+        //if (nFacesToBreak || nCoupledFacesToBreak) mesh.write(); traction.write();
 
         // Initialise initiation traction for new cohesive patch face
         // for (label i=0; i<cohesivePatchU.size(); i++)
-    for (label i=0; i<cohesivePatchSize; i++)
-    {
-        label oldFaceIndex = faceMap[start+i];
-
-        // If new face
-        if
-        (
-            (oldFaceIndex == faceToBreakIndex)
-         || (oldFaceIndex == coupledFaceToBreakIndex)
-        )
+        for (label i=0; i<cohesivePatchSize; i++)
         {
-            vector n0 =
-                mesh.Sf().boundaryField()[cohesivePatchID][i]
-                /mesh.magSf().boundaryField()[cohesivePatchID][i];
-            //vector n1 = -n0;
+            label oldFaceIndex = faceMap[start+i];
 
-            if ((n0&faceToBreakNormal) > SMALL)
+            // If new face
+            if
+            (
+                (oldFaceIndex == faceToBreakIndex)
+             || (oldFaceIndex == coupledFaceToBreakIndex)
+            )
             {
-                traction.boundaryField()[cohesivePatchID][i] =
-                    faceToBreakTraction;
+                vector n0 =
+                    mesh.Sf().boundaryField()[cohesivePatchID][i]
+                    /mesh.magSf().boundaryField()[cohesivePatchID][i];
+                //vector n1 = -n0;
 
-                traction.oldTime().boundaryField()[cohesivePatchID][i] =
-                    faceToBreakTraction;
-
-                if(cohesivePatchUPtr)
+                if ((n0 & faceToBreakNormal) > SMALL)
                 {
-                    cohesivePatchUPtr->traction()[i] = faceToBreakTraction;
+                    traction.boundaryField()[cohesivePatchID][i] =
+                        faceToBreakTraction;
+
+                    traction.oldTime().boundaryField()[cohesivePatchID][i] =
+                        faceToBreakTraction;
+
+                    if(cohesivePatchUPtr)
+                    {
+                        cohesivePatchUPtr->traction()[i] = faceToBreakTraction;
+                    }
+                    else
+                    {
+                        cohesivePatchUFixedModePtr->traction()[i] =
+                            faceToBreakTraction;
+
+                        cohesivePatchUFixedModePtr->initiationTraction()[i] =
+                            faceToBreakTraction;
+                    }
                 }
                 else
                 {
-                    cohesivePatchUFixedModePtr->traction()[i] =
-                        faceToBreakTraction;
-
-                    cohesivePatchUFixedModePtr->initiationTraction()[i] =
-                        faceToBreakTraction;
-                }
-            }
-            else
-            {
-                traction.boundaryField()[cohesivePatchID][i] =
-                    -faceToBreakTraction;
-
-                traction.oldTime().boundaryField()[cohesivePatchID][i] =
-                    -faceToBreakTraction;
-
-                //cohesivePatchU.traction()[i] = -faceToBreakTraction;
-                if(cohesivePatchUPtr)
-                {
-                    cohesivePatchUPtr->traction()[i] = -faceToBreakTraction;
-                }
-                else
-                {
-                    cohesivePatchUFixedModePtr->traction()[i] =
+                    traction.boundaryField()[cohesivePatchID][i] =
+                        -faceToBreakTraction;
+                    traction.oldTime().boundaryField()[cohesivePatchID][i] =
                         -faceToBreakTraction;
 
-                    cohesivePatchUFixedModePtr->initiationTraction()[i] =
-                        -faceToBreakTraction;
+                    //cohesivePatchU.traction()[i] = -faceToBreakTraction;
+                    if(cohesivePatchUPtr)
+                    {
+                        cohesivePatchUPtr->traction()[i] = -faceToBreakTraction;
+                    }
+                    else
+                    {
+                        cohesivePatchUFixedModePtr->traction()[i] =
+                           -faceToBreakTraction;
+                        cohesivePatchUFixedModePtr->initiationTraction()[i] =
+                            -faceToBreakTraction;
+                    }
                 }
             }
         }
-    }
 
-    // hmmnn we only need a reference for very small groups of cells
-    // turn off for now
-    //#       include "updateReference.H"
+        // hmmnn we only need a reference for very small groups of cells
+        // turn off for now
+        //#       include "updateReference.H"
     }
 }

@@ -63,7 +63,7 @@ int main(int argc, char *argv[])
 
     while(runTime.loop())
     {
-        Info<< "Time: " << runTime.timeName() << nl << endl;
+        Info<< "Time = " << runTime.timeName() << nl << endl;
 
 #       include "readSolidMechanicsControls.H"
 

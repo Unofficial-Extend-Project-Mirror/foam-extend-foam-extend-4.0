@@ -2,7 +2,7 @@
 //- move mesh
 //--------------------------------------------------//
 {
-  //Info << "Moving mesh using least squares interpolation" << endl;
+    //Info << "Moving mesh using least squares interpolation" << endl;
 
     leastSquaresVolPointInterpolation pointInterpolation(mesh);
 
@@ -112,4 +112,4 @@
 
     // Update n
     n = mesh.Sf()/mesh.magSf();
-  }
+}

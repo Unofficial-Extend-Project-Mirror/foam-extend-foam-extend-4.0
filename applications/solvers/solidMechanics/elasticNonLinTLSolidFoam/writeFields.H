@@ -1,36 +1,36 @@
 if (runTime.outputTime())
-  {
+{
     volScalarField epsilonEq
-      (
-       IOobject
-       (
-    "epsilonEq",
-    runTime.timeName(),
-    mesh,
-    IOobject::NO_READ,
-    IOobject::AUTO_WRITE
-    ),
-       sqrt((2.0/3.0)*magSqr(dev(epsilon)))
-       );
+    (
+        IOobject
+        (
+           "epsilonEq",
+           runTime.timeName(),
+           mesh,
+           IOobject::NO_READ,
+           IOobject::AUTO_WRITE
+        ),
+        sqrt((2.0/3.0)*magSqr(dev(epsilon)))
+    );
 
     Info<< "Max epsilonEq = " << max(epsilonEq).value()
-    << endl;
+        << endl;
 
     volScalarField sigmaEq
-      (
-       IOobject
-       (
-    "sigmaEq",
-    runTime.timeName(),
-    mesh,
-    IOobject::NO_READ,
-    IOobject::AUTO_WRITE
-    ),
-       sqrt((3.0/2.0)*magSqr(dev(sigma)))
-       );
+    (
+        IOobject
+        (
+            "sigmaEq",
+            runTime.timeName(),
+            mesh,
+            IOobject::NO_READ,
+            IOobject::AUTO_WRITE
+        ),
+        sqrt((3.0/2.0)*magSqr(dev(sigma)))
+    );
 
     Info<< "Max sigmaEq = " << max(sigmaEq).value()
-    << endl;
+        << endl;
 
     //- Calculate Cauchy stress
     volTensorField F = I + gradU;
@@ -40,49 +40,49 @@ if (runTime.outputTime())
     rho = rho/J;
 
     volSymmTensorField sigmaCauchy
-      (
-       IOobject
-       (
-    "sigmaCauchy",
-    runTime.timeName(),
-    mesh,
-    IOobject::NO_READ,
-    IOobject::AUTO_WRITE
-    ),
-       (1/J) * symm(F.T() & sigma & F)
-       );
+    (
+        IOobject
+        (
+           "sigmaCauchy",
+            runTime.timeName(),
+            mesh,
+            IOobject::NO_READ,
+            IOobject::AUTO_WRITE
+        ),
+        (1/J) * symm(F.T() & sigma & F)
+    );
 
     //- Cauchy von Mises stress
     volScalarField sigmaCauchyEq
-      (
-       IOobject
-       (
-    "sigmaCauchyEq",
-    runTime.timeName(),
-    mesh,
-    IOobject::NO_READ,
-    IOobject::AUTO_WRITE
-    ),
-       sqrt((3.0/2.0)*magSqr(dev(sigmaCauchy)))
-       );
+    (
+        IOobject
+        (
+            "sigmaCauchyEq",
+            runTime.timeName(),
+            mesh,
+            IOobject::NO_READ,
+            IOobject::AUTO_WRITE
+        ),
+        sqrt((3.0/2.0)*magSqr(dev(sigmaCauchy)))
+    );
 
     Info<< "Max sigmaCauchyEq = " << max(sigmaCauchyEq).value()
-    << endl;
+        << endl;
 
 
     volTensorField Finv = inv(F);
     volSymmTensorField epsilonAlmansi
-      (
-       IOobject
-       (
-    "epsilonAlmansi",
-    runTime.timeName(),
-    mesh,
-    IOobject::NO_READ,
-    IOobject::AUTO_WRITE
-    ),
-       symm(Finv & epsilon & Finv.T())
-       );
+    (
+        IOobject
+        (
+            "epsilonAlmansi",
+            runTime.timeName(),
+            mesh,
+            IOobject::NO_READ,
+            IOobject::AUTO_WRITE
+        ),
+        symm(Finv & epsilon & Finv.T())
+    );
 
 //     volVectorField traction
 //       (
@@ -163,4 +163,4 @@ if (runTime.outputTime())
 //    }
 
     runTime.write();
-  }
+}

@@ -60,7 +60,7 @@ int main(int argc, char *argv[])
 
     Info << "\nCalculating displacement field\n" << endl;
 
-    for (runTime++; !runTime.end(); runTime++)
+    while(runTime.loop())
     {
         Info<< "Iteration: " << runTime.timeName() << nl << endl;
 
@@ -80,9 +80,10 @@ int main(int argc, char *argv[])
             << nl << endl;
     }
 
-    Info << "End\n" << endl;
+    Info<< "End\n" << endl;
 
     return(0);
 }
+
 
 // ************************************************************************* //
