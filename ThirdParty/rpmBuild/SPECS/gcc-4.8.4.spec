@@ -116,9 +116,12 @@ Group: 			Development/Tools
     # Use 'bootstrap-debug' build configuration to force stripping of object
     # files prior to comparison during bootstrap (broken by Xcode 6.3).
     # Fix taken from HomeBrew and MacPorts projects
+
+    # Compiling ParaView on MacOSX requires an Objective-C compiler
+
     ../configure     \
         --prefix=%{_installPrefix} \
-        --enable-languages=c,c++   \
+        --enable-languages=c,c++,objc,obj-c++ \
         --enable-shared            \
         --with-build-config=bootstrap-debug \
 	--disable-multilib
