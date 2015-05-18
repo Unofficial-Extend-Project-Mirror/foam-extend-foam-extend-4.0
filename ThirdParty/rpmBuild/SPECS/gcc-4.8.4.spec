@@ -117,11 +117,9 @@ Group: 			Development/Tools
     # files prior to comparison during bootstrap (broken by Xcode 6.3).
     # Fix taken from HomeBrew and MacPorts projects
 
-    # Compiling ParaView on MacOSX requires an Objective-C compiler
-
     ../configure     \
         --prefix=%{_installPrefix} \
-        --enable-languages=c,c++,objc,obj-c++ \
+        --enable-languages=c,c++ \
         --enable-shared            \
         --with-build-config=bootstrap-debug \
 	--disable-multilib
