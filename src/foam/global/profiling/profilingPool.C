@@ -58,7 +58,7 @@ Foam::profilingPool::~profilingPool()
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-void Foam::profilingPool::initprofiling(const IOobject &ob)
+void Foam::profilingPool::initProfiling(const IOobject &ob)
 {
     if (!thePool_)
     {
@@ -67,6 +67,16 @@ void Foam::profilingPool::initprofiling(const IOobject &ob)
         thePool_->map().insert(make_pair(master->description(),master));
         thePool_->stack().push(*master);
         profilingPool::rememberTimer(*master,thePool_->globalTime_);
+    }
+}
+
+void Foam::profilingPool::stopProfiling()
+{
+    if (thePool_)
+    {
+      Info << "Clearing Profiling Pool" << endl;
+        delete thePool_;
+        thePool_=NULL;
     }
 }
 

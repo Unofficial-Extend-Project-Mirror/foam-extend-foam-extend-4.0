@@ -131,7 +131,9 @@ class profilingPool
 
 public:
 
-    static void initprofiling(const IOobject&);
+    static void initProfiling(const IOobject&);
+
+    static void stopProfiling();
 
     static profilingInfo& getInfo(const string& name);
 

@@ -242,7 +242,7 @@ Foam::Time::Time
 {
     setControls();
 
-    profilingPool::initprofiling
+    profilingPool::initProfiling
     (
         IOobject
         (
@@ -399,6 +399,8 @@ Foam::Time::~Time()
 {
     // destroy function objects first
     functionObjects_.clear();
+
+    profilingPool::stopProfiling();
 }
 
 
