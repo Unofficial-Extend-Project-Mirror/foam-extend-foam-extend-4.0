@@ -81,11 +81,14 @@ class profilingPool
 
         clockTime globalTime_;
 
+        const Time &owner_;
 
     // Private Member Functions
 
         //- Disallow default bitwise copy construct
-        profilingPool(const profilingPool&);
+        profilingPool(
+            const profilingPool&
+	);
 
         //- Disallow default bitwise assignment
         void operator=(const profilingPool&);
@@ -100,7 +103,10 @@ class profilingPool
     // Constructors
 
         //- Construct null
-        profilingPool(const IOobject&);
+        profilingPool(
+            const IOobject&,
+            const Time&
+        );
 
 
     //- Destructor
@@ -129,11 +135,23 @@ class profilingPool
             return theStack_;
         }
 
+        const Time& owner() const
+        {
+            return owner_;
+        }
+
+protected:
+
+    static void initProfiling(
+        const IOobject&,
+        const Time&
+    );
+
+    static void stopProfiling(
+        const Time&
+    );
+
 public:
-
-    static void initProfiling(const IOobject&);
-
-    static void stopProfiling();
 
     static profilingInfo& getInfo(const string& name);
 
@@ -142,6 +160,8 @@ public:
     static void rememberTimer(const profilingInfo& info, clockTime& timer);
 
     virtual bool writeData(Ostream&) const;
+
+    friend class Time;
 };
 
 

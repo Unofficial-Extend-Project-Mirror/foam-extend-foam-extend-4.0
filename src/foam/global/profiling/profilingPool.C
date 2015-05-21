@@ -35,10 +35,14 @@ Foam::profilingPool* Foam::profilingPool::thePool_(NULL);
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-Foam::profilingPool::profilingPool(const IOobject &ob)
+Foam::profilingPool::profilingPool(
+    const IOobject &ob,
+    const Time &owner
+)
     :
     regIOobject(ob),
-    globalTime_()
+    globalTime_(),
+    owner_(owner)
 {
 }
 
@@ -58,11 +62,14 @@ Foam::profilingPool::~profilingPool()
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-void Foam::profilingPool::initProfiling(const IOobject &ob)
+void Foam::profilingPool::initProfiling(
+    const IOobject &ob,
+    const Time &owner
+)
 {
     if (!thePool_)
     {
-        thePool_ = new profilingPool(ob);
+        thePool_ = new profilingPool(ob,owner);
         profilingInfo *master=new profilingInfo();
         thePool_->map().insert(make_pair(master->description(),master));
         thePool_->stack().push(*master);
@@ -70,11 +77,12 @@ void Foam::profilingPool::initProfiling(const IOobject &ob)
     }
 }
 
-void Foam::profilingPool::stopProfiling()
+void Foam::profilingPool::stopProfiling(
+    const Time &owner
+)
 {
-    if (thePool_)
+    if (thePool_ && (&owner)==&(thePool_->owner()))
     {
-      Info << "Clearing Profiling Pool" << endl;
         delete thePool_;
         thePool_=NULL;
     }
