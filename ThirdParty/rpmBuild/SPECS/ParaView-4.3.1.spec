@@ -40,6 +40,10 @@
 # Disable the generation of debuginfo packages
 %define debug_package %{nil}
 
+# Turning off the Fascist build policy
+# Useful for debugging the install section
+%define _unpackaged_files_terminate_build 0
+
 # The topdir needs to point to the $WM_THIRD_PARTY/rpmbuild directory
 %define _topdir	 	%{_WM_THIRD_PARTY_DIR}/rpmBuild
 %define _tmppath	%{_topdir}/tmp
@@ -155,9 +159,17 @@ Patch0:                 ParaView-4.3.1.patch_darwin
     # include development files in "make install"
     addCMakeVariable  PARAVIEW_INSTALL_DEVELOPMENT_FILES:BOOL=ON
 
- %ifos darwin
-    # Additional installation rules for Mac OS X 
-    addCMakeVariable  PARAVIEW_EXTRA_INSTALL_RULES_FILE:FILEPATH=%{_topdir}/BUILD/%{name}-%{version}/Applications/ParaView-3.8.1_extra_install_Darwin.cmake
+%ifos darwin
+    # Additional installation rules for Mac OSX 
+    addCMakeVariable  PARAVIEW_EXTRA_INSTALL_RULES_FILE:FILEPATH=%{_topdir}/BUILD/%{name}-v%{version}-source/Applications/ParaView-4.3.1_extra_install_Darwin.cmake
+
+    # We activate the new Unix-style installation for Mac OS X
+    addCMakeVariable PARAVIEW_DO_UNIX_STYLE_INSTALLS:BOOL=ON
+
+    # Recent version of Mac OSX (Yosemite) cannot compile ParaView with the gcc compiler
+    # Using clang instead
+    CC=clang
+    CXX=clang++
 %endif
 
     # Add the value of _qmakePath for QT_QMAKE_EXECUTABLE
@@ -189,6 +201,15 @@ Patch0:                 ParaView-4.3.1.patch_darwin
 
     cd buildObj
     make install DESTDIR=$RPM_BUILD_ROOT
+
+%ifos darwin
+    # Cleaning up some strange install side effect from option
+    # PARAVIEW_DO_UNIX_STYLE_INSTALLS
+    # Need to revisit this section eventually.
+    if [ -d "$RPM_BUILD_ROOT/$RPM_BUILD_ROOT" ]; then
+        mv $RPM_BUILD_ROOT/$RPM_BUILD_ROOT/%{_installPrefix}/bin/* $RPM_BUILD_ROOT/%{_installPrefix}/bin
+    fi
+%endif
 
     # Creation of foam-extend specific .csh and .sh files"
 
@@ -271,4 +292,5 @@ DOT_CSH_EOF
 %files
 %defattr(-,root,root)
 %{_installPrefix}
+
 
