@@ -5,8 +5,8 @@ diff -ruN ParaView-4.3.1_orig/Applications/ParaView-4.3.1_extra_install_Darwin.c
 +#
 +# Additional install rules for Mac OS X platforms 
 +#
-+INSTALL (DIRECTORY ../../buildObj/bin/paraview.app
-+           DESTINATION ${PV_INSTALL_BIN_DIR}
++INSTALL (DIRECTORY buildObj/bin/paraview.app
++           DESTINATION ${CMAKE_INSTALL_PREFIX}/bin
 +	   USE_SOURCE_PERMISSIONS
 +           COMPONENT Runtime)
 +
