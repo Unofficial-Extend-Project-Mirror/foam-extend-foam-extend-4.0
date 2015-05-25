@@ -24,7 +24,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "multiphaseMixture.H"
-#include "alphaContactAngleFvPatchScalarField.H"
+#include "multiphaseAlphaContactAngleFvPatchScalarField.H"
 #include "Time.H"
 #include "subCycle.H"
 #include "fvCFD.H"
@@ -367,10 +367,10 @@ void Foam::multiphaseMixture::correctContactAngle
 
     forAll(boundary, patchi)
     {
-        if (typeid(gbf[patchi]) == typeid(alphaContactAngleFvPatchScalarField))
+        if (typeid(gbf[patchi]) == typeid(multiphaseAlphaContactAngleFvPatchScalarField))
         {
-            const alphaContactAngleFvPatchScalarField& acap =
-                refCast<const alphaContactAngleFvPatchScalarField>(gbf[patchi]);
+            const multiphaseAlphaContactAngleFvPatchScalarField& acap =
+                refCast<const multiphaseAlphaContactAngleFvPatchScalarField>(gbf[patchi]);
 
             vectorField& nHatPatch = nHatb[patchi];
 
@@ -378,7 +378,7 @@ void Foam::multiphaseMixture::correctContactAngle
                 mesh_.Sf().boundaryField()[patchi]
                /mesh_.magSf().boundaryField()[patchi];
 
-            alphaContactAngleFvPatchScalarField::thetaPropsTable::
+            multiphaseAlphaContactAngleFvPatchScalarField::thetaPropsTable::
                 const_iterator tp =
                 acap.thetaProps().find(interfacePair(alpha1, alpha2));
 
