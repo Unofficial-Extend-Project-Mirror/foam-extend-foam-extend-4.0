@@ -188,7 +188,7 @@
 #setenv WM_THIRD_PARTY_USE_GCC_451 1
 #setenv WM_THIRD_PARTY_USE_GCC_445 1
 #setenv WM_THIRD_PARTY_USE_PYTHON_27 1
-#setenv WM_THIRD_PARTY_USE_M4_146 1
+#setenv WM_THIRD_PARTY_USE_M4_1416 1
 #setenv WM_THIRD_PARTY_USE_BISON_27 1
 #setenv WM_THIRD_PARTY_USE_FLEX_2535 1
 setenv WM_THIRD_PARTY_USE_CMAKE_322 1
@@ -220,7 +220,7 @@ setenv WM_THIRD_PARTY_USE_HWLOC_1101 1
 #
 # For AllMake.stage4
 setenv WM_THIRD_PARTY_USE_QT_486 1
-setenv WM_THIRD_PARTY_USE_PARAVIEW_401 1
+setenv WM_THIRD_PARTY_USE_PARAVIEW_431 1
 #setenv WM_THIRD_PARTY_USE_PARAVIEW_410 1
 
 # ----------------------------------------------------------------- end-of-file

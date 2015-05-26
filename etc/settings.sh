@@ -549,7 +549,7 @@ export MPI_BUFFER_SIZE
 #
 # In order to use a pre-installed version of the ThirdParty packages, just set the
 # appropriate XXX_SYSTEM environment variable for a given package in your prefs.sh
-# file in order to disable the sourcing of the ThirdParty version of the same package.
+# file in order to disable the activation of the ThirdParty version of the same package.
 
 # Load Mesquite library
 # ~~~~~~~~~~~~~~~~~~~~~~
@@ -638,8 +638,8 @@ export MPI_BUFFER_SIZE
 
 # Load zoltan
 # ~~~~~~~~~~
-[ -z "$ZOLTAN_SYSTEM" ] && [ ! -z $WM_THIRD_PARTY_USE_ZOLTAN_35 ] && [ -e $WM_THIRD_PARTY_DIR/packages/zoltan_3.5 ] && {
-    _foamSource $WM_THIRD_PARTY_DIR/packages/zoltan_3.5/platforms/$WM_OPTIONS/etc/zoltan_3.5.sh
+[ -z "$ZOLTAN_SYSTEM" ] && [ ! -z $WM_THIRD_PARTY_USE_ZOLTAN_36 ] && [ -e $WM_THIRD_PARTY_DIR/packages/zoltan_3.6 ] && {
+    _foamSource $WM_THIRD_PARTY_DIR/packages/zoltan_3.6/platforms/$WM_OPTIONS/etc/zoltan_3.6.sh
 }
 [ "$FOAM_VERBOSE" -a "$PS1" ] && echo "    ZOLTAN_DIR is initialized to: $ZOLTAN_DIR"
 
