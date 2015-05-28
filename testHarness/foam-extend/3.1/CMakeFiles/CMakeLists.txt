@@ -124,6 +124,13 @@ if(GIT_FOUND)
       OUTPUT_VARIABLE GIT_BRANCH_NAME
     )
     message("Git branch: ${GIT_BRANCH_NAME}")
+
+    # We also add the git rev number to the build name
+    EXEC_PROGRAM(git
+      ARGS rev-parse --short=12 HEAD
+      OUTPUT_VARIABLE GIT_REV_NUMBER
+    )
+    message("Git rev: ${GIT_REV_NUMBER}")
     if (GIT_BRANCH_NAME STREQUAL "")
        message("No git-branch. Mercurial?")
        EXEC_PROGRAM(hg
@@ -136,6 +143,7 @@ if(GIT_FOUND)
        message("Git branch (mercurial): ${GIT_BRANCH_NAME}")
     endif()
     SET(BUILDNAME "${BUILDNAME}-git-branch=${GIT_BRANCH_NAME}")
+    SET(BUILDNAME "${BUILDNAME}-git-rev=${GIT_REV_NUMBER}")
 endif()
 
 # Some last minute cleanup
