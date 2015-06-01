@@ -125,7 +125,7 @@ then
     # Scotch 6.0.4
     #
     [ ! -z "$WM_THIRD_PARTY_USE_SCOTCH_604" ] && {
-	echo "Building Scotch 6.0.0"
+	echo "Building Scotch 6.0.4"
 	( rpm_make -p scotch-6.0.4 -s scotch-6.0.4.spec -u http://gforge.inria.fr/frs/download.php/file/34618/scotch_6.0.4.tar.gz )
     }
     # Scotch 6.0.0

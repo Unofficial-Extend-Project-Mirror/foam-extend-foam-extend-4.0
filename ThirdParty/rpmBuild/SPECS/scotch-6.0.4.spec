@@ -75,8 +75,8 @@ URL:                    https://gforge.inria.fr/frs/download.php/31831
 Source: 		%url/%{name}-%{version}.tar.gz
 Prefix: 		%{_prefix}
 Group: 			Development/Tools
-Patch0:                 scotch-6.0.4_patch_0
-Patch1:                 scotch-6.0.4_patch_darwin
+Patch0:         scotch-6.0.4_patch_0
+Patch1:         scotch-6.0.4_patch_darwin
 
 %define _installPrefix  %{_prefix}/packages/%{name}-%{version}/platforms/%{_WM_OPTIONS}
 
@@ -84,7 +84,7 @@ Patch1:                 scotch-6.0.4_patch_darwin
 %{summary}
 
 %prep
-%setup -q -n %{name}_6.0.0
+%setup -q -n %{name}_%{version}
 
 %ifos darwin
 %patch1 -p1
