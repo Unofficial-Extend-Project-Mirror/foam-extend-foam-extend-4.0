@@ -242,7 +242,7 @@ Foam::Time::Time
 {
     setControls();
 
-    profilingPool::initprofiling
+    profilingPool::initProfiling
     (
         IOobject
         (
@@ -252,7 +252,8 @@ Foam::Time::Time
             *this,
             IOobject::NO_READ,
             IOobject::AUTO_WRITE
-        )
+        ),
+	*this
     );
 }
 
@@ -312,7 +313,7 @@ Foam::Time::Time
 {
     setControls();
 
-    profilingPool::initprofiling
+    profilingPool::initProfiling
     (
         IOobject
         (
@@ -322,7 +323,8 @@ Foam::Time::Time
             *this,
             IOobject::NO_READ,
             IOobject::AUTO_WRITE
-        )
+        ),
+	*this
     );
 }
 
@@ -378,7 +380,7 @@ Foam::Time::Time
     readLibs_(controlDict_, "libs"),
     functionObjects_(*this, enableFunctionObjects)
 {
-    profilingPool::initprofiling
+    profilingPool::initProfiling
     (
         IOobject
         (
@@ -388,7 +390,8 @@ Foam::Time::Time
             *this,
             IOobject::NO_READ,
             IOobject::AUTO_WRITE
-        )
+        ),
+	*this
     );
 }
 
@@ -399,6 +402,8 @@ Foam::Time::~Time()
 {
     // destroy function objects first
     functionObjects_.clear();
+
+    profilingPool::stopProfiling(*this);
 }
 
 
