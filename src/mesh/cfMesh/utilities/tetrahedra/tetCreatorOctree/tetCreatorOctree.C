@@ -1,25 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | cfMesh: A library for mesh generation
-   \\    /   O peration     |
-    \\  /    A nd           | Author: Franjo Juretic (franjo.juretic@c-fields.com)
-     \\/     M anipulation  | Copyright (C) Creative Fields, Ltd.
+  \\      /  F ield         | foam-extend: Open Source CFD
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
-    This file is part of cfMesh.
+    This file is part of foam-extend.
 
-    cfMesh is free software; you can redistribute it and/or modify it
+    foam-extend is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 3 of the License, or (at your
+    Free Software Foundation, either version 3 of the License, or (at your
     option) any later version.
 
-    cfMesh is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with cfMesh.  If not, see <http://www.gnu.org/licenses/>.
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Description
 
@@ -35,9 +35,9 @@ Description
 
 namespace Foam
 {
-    
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-    
+
 const meshOctreeCubeCoordinates tetCreatorOctree::edgeCoordinates_[12][4]=
     {
         {    //- edge 0
@@ -113,7 +113,7 @@ const meshOctreeCubeCoordinates tetCreatorOctree::edgeCoordinates_[12][4]=
             meshOctreeCubeCoordinates(0, 1, 0, 0)
         }
     };
-    
+
 const label tetCreatorOctree::faceCentreHelper_[3][4] =
     {
         {3, 5, 2, 4},
@@ -124,18 +124,18 @@ const label tetCreatorOctree::faceCentreHelper_[3][4] =
 void tetCreatorOctree::createTets()
 {
     createPointsAndAddressing();
-    
+
     createTetsFromFacesWithCentreNode();
-    
+
     createTetsAroundSplitEdges();
-    
+
     createTetsAroundEdges();
-    
+
     createTetsFromSplitFaces();
-    
+
     clearOut();
     sortedLeaves_.setSize(0);
-    
+
     created_ = true;
 }
 
@@ -166,7 +166,7 @@ tetCreatorOctree::tetCreatorOctree
     created_(false)
 {
     createTets();
-    
+
     clearOut();
 }
 

@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -56,7 +56,7 @@ inline SymmTensor4thOrder<Cmpt>::SymmTensor4thOrder
 (
  const Cmpt txxxx, const Cmpt txxyy, const Cmpt txxzz,
                    const Cmpt tyyyy, const Cmpt tyyzz,
-	                             const Cmpt tzzzz,
+                                     const Cmpt tzzzz,
  const Cmpt txyxy,
  const Cmpt tyzyz,
  const Cmpt tzxzx

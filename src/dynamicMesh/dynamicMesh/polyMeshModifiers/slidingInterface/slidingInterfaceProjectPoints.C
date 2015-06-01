@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -116,11 +116,11 @@ bool Foam::slidingInterface::projectPoints() const
             << name() << " : "
             << "Projecting slave points onto master surface using ";
 
-	const Foam::debug::optimisationSwitch nSquaredProjection
-	(
-	    "nSquaredProjection",
-	    0
-	);
+    const Foam::debug::optimisationSwitch nSquaredProjection
+    (
+        "nSquaredProjection",
+        0
+    );
 
         if (nSquaredProjection() > 0)
         {
@@ -1165,8 +1165,8 @@ bool Foam::slidingInterface::projectPoints() const
                     if
                     (
                         cutOnSlave > edgeEndCutoffTol_()
-		     && cutOnSlave < 1.0 - edgeEndCutoffTol_() // check edge cut
-		     && distInEdgePlane < edgeMergeTol_()*edgeMag // merge plane
+                     && cutOnSlave < 1.0 - edgeEndCutoffTol_() // check edge cut
+                     && distInEdgePlane < edgeMergeTol_()*edgeMag // merge plane
                      && edgeLineHit.distance()
                       < min
                         (

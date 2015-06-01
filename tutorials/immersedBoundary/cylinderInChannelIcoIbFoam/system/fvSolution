@@ -1,8 +1,8 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM Extend Project: Open Source CFD        |
-|  \\    /   O peration     | Version:  1.6-ext                               |
-|   \\  /    A nd           | Web:      www.extend-project.de                 |
+| \\      /  F ield         | foam-extend: Open Source CFD                    |
+|  \\    /   O peration     | Version:     3.2                                |
+|   \\  /    A nd           | Web:         http://www.foam-extend.org         |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 FoamFile
@@ -32,7 +32,7 @@ solvers
         minIter         1;
         maxIter         100;
         tolerance       1e-7;
-        relTol          0.01; 
+        relTol          0.01;
     }
 
     U
@@ -64,6 +64,5 @@ PIMPLE
     pRefPoint (0 -0.45 0.05);
     pRefValue 0;
 }
-
 
 // ************************************************************************* //

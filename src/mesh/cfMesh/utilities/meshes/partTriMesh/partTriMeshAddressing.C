@@ -1,25 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | cfMesh: A library for mesh generation
-   \\    /   O peration     |
-    \\  /    A nd           | Author: Franjo Juretic (franjo.juretic@c-fields.com)
-     \\/     M anipulation  | Copyright (C) Creative Fields, Ltd.
+  \\      /  F ield         | foam-extend: Open Source CFD
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
-    This file is part of cfMesh.
+    This file is part of foam-extend.
 
-    cfMesh is free software; you can redistribute it and/or modify it
+    foam-extend is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 3 of the License, or (at your
+    Free Software Foundation, either version 3 of the License, or (at your
     option) any later version.
 
-    cfMesh is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with cfMesh.  If not, see <http://www.gnu.org/licenses/>.
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Description
 
@@ -37,9 +37,9 @@ Description
 
 namespace Foam
 {
-    
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-    
+
 void partTriMesh::createPointsAndTrias
 (
     const List<direction>& useFace
@@ -52,7 +52,7 @@ void partTriMesh::createPointsAndTrias
     const labelList& bPoints = meshSurface.boundaryPoints();
     const labelList& bp = meshSurface.bp();
     const faceList::subList& bFaces = meshSurface.boundaryFaces();
-    
+
     meshSurfacePointLabelInTriMesh_.setSize(bPoints.size());
     meshSurfacePointLabelInTriMesh_ = -1;
     labelList nodeLabelForFace(bFaces.size(), -1);
@@ -128,7 +128,7 @@ void partTriMesh::createPointsAndTrias
             pts[npI] = points[bPoints[bpI]];
             pointType_[npI] |= SMOOTH;
         }
-    
+
     forAll(nodeLabelForFace, bfI)
         if( nodeLabelForFace[bfI] != -1 )
         {
@@ -148,7 +148,7 @@ void partTriMesh::createPointsAndTrias
         if( pI != -1 )
             pointType_[pI] |= FEATUREEDGE;
     }
-    
+
     //- create addressing for parallel runs
     if( Pstream::parRun() )
     {
@@ -157,7 +157,7 @@ void partTriMesh::createPointsAndTrias
             meshSurfacePointLabelInTriMesh_,
             nodeLabelForFace
         );
-        
+
         createBufferLayers();
     }
 }

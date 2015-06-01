@@ -2,9 +2,9 @@
 #----------------------------------*-sh-*--------------------------------------
 # =========                 |
 # \\      /  F ield         | foam-extend: Open Source CFD
-#  \\    /   O peration     |
-#   \\  /    A nd           | For copyright notice see file Copyright
-#    \\/     M anipulation  |
+#  \\    /   O peration     | Version:     3.2
+#   \\  /    A nd           | Web:         http://www.foam-extend.org
+#    \\/     M anipulation  | For copyright notice see file Copyright
 #------------------------------------------------------------------------------
 # License
 #     This file is part of foam-extend.
@@ -288,102 +288,102 @@ Darwin)
     which -s port >/dev/null
     if [ $? -eq "0" ]  && [ -d "$MACOSX_MACPORTS_ROOT" ]
     then
-	if [ "$FOAM_VERBOSE" -a "$PS1" ]
-	then
-	    echo "Using Macports binaries"
-	fi
+    if [ "$FOAM_VERBOSE" -a "$PS1" ]
+    then
+        echo "Using Macports binaries"
+    fi
 
-	export WM_USE_MACPORT=1
-	export WM_BASE_COMPILER=`echo $WM_COMPILER | tr -d "[:digit:]"`
-	export WM_MACPORT_MPI_VERSION=`echo $WM_COMPILER | tr "[:upper:]" "[:lower:]"`
-	export WM_MACPORT_VERSION=`echo $WM_MACPORT_MPI_VERSION | tr -d "[:alpha:]" | sed -e "s/\(.\)\(.\)/\1\.\2/"`
+    export WM_USE_MACPORT=1
+    export WM_BASE_COMPILER=`echo $WM_COMPILER | tr -d "[:digit:]"`
+    export WM_MACPORT_MPI_VERSION=`echo $WM_COMPILER | tr "[:upper:]" "[:lower:]"`
+    export WM_MACPORT_VERSION=`echo $WM_MACPORT_MPI_VERSION | tr -d "[:alpha:]" | sed -e "s/\(.\)\(.\)/\1\.\2/"`
 
-	if [ -z "$WM_CHOSEN_MAC_MPI" ]
-	then
-	    if [ -e '/opt/local/bin/mpicc' ]
-	    then
-		readlink /opt/local/bin/mpicc | grep openmpi >/dev/null
-		if [ $? -eq "0" ]
-		then
-		    export WM_MPLIB=MACPORTOPENMPI
-		    if [ "$FOAM_VERBOSE" -a "$PS1" ]
-		    then
-			echo "Using OpenMPI from MacPorts"
-		    fi
-		else
-		    readlink /opt/local/bin/mpicc | grep mpich >/dev/null
-		    if [ $? -eq "0" ]
-		    then
-			export WM_MPLIB=MACPORTMPICH
-			if [ "$FOAM_VERBOSE" -a "$PS1" ]
-			then
-			    echo "Using MPICH from MacPorts"
-			fi
-		    else
-			echo "/opt/local/bin/mpicc neither OpenMPI nor MPICH. Confused. Defaulting to OPENMPI"
-			export WM_MPLIB=OPENMPI
-		    fi
-		fi
-	    fi
-	else
-	    export WM_MPLIB=$WM_CHOSEN_MAC_MPI
-	    if [ "$FOAM_VERBOSE" -a "$PS1" ]
-	    then
-		echo "User chose WM_CHOSEN_MAC_MPI=$WM_CHOSEN_MAC_MPI"
-	    fi
-	fi
+    if [ -z "$WM_CHOSEN_MAC_MPI" ]
+    then
+        if [ -e '/opt/local/bin/mpicc' ]
+        then
+            readlink /opt/local/bin/mpicc | grep openmpi >/dev/null
+        if [ $? -eq "0" ]
+        then
+            export WM_MPLIB=MACPORTOPENMPI
+            if [ "$FOAM_VERBOSE" -a "$PS1" ]
+            then
+                echo "Using OpenMPI from MacPorts"
+            fi
+        else
+            readlink /opt/local/bin/mpicc | grep mpich >/dev/null
+            if [ $? -eq "0" ]
+            then
+                export WM_MPLIB=MACPORTMPICH
+            if [ "$FOAM_VERBOSE" -a "$PS1" ]
+            then
+                echo "Using MPICH from MacPorts"
+            fi
+            else
+                echo "/opt/local/bin/mpicc neither OpenMPI nor MPICH. Confused. Defaulting to OPENMPI"
+                export WM_MPLIB=OPENMPI
+            fi
+        fi
+        fi
+    else
+        export WM_MPLIB=$WM_CHOSEN_MAC_MPI
+        if [ "$FOAM_VERBOSE" -a "$PS1" ]
+        then
+        echo "User chose WM_CHOSEN_MAC_MPI=$WM_CHOSEN_MAC_MPI"
+        fi
+    fi
 
-	if [ "$WM_MPLIB" == "MACPORTOPENMPI" ]
-	then
-	    if [ ! -e "/opt/local/lib/openmpi-$WM_MACPORT_MPI_VERSION" ]
-	    then
-		export WM_MACPORT_MPI_VERSION=mp
-		if [ ! -e "/opt/local/lib/openmpi-$WM_MACPORT_MPI_VERSION" ]
-		then
-		    echo "Proper OpenMPI not installed. Either do 'port install openmpi-$WM_MACPORT_MPI_VERSION' or 'port install openmpi-default'"
-		fi
-	    fi
-	else
-	    if [ "$WM_MPLIB" == "MACPORTMPICH" ]
-	    then
-		if [ ! -e "/opt/local/lib/mpich-$WM_MACPORT_MPI_VERSION" ]
-		then
-		    echo "MPICH wants the same version as the used compiler. Do 'port install mpich-$WM_MACPORT_MPI_VERSION'"
-		fi
-	    fi
-	fi
+    if [ "$WM_MPLIB" == "MACPORTOPENMPI" ]
+    then
+        if [ ! -e "/opt/local/lib/openmpi-$WM_MACPORT_MPI_VERSION" ]
+        then
+            export WM_MACPORT_MPI_VERSION=mp
+        if [ ! -e "/opt/local/lib/openmpi-$WM_MACPORT_MPI_VERSION" ]
+        then
+            echo "Proper OpenMPI not installed. Either do 'port install openmpi-$WM_MACPORT_MPI_VERSION' or 'port install openmpi-default'"
+        fi
+        fi
+    else
+        if [ "$WM_MPLIB" == "MACPORTMPICH" ]
+        then
+        if [ ! -e "/opt/local/lib/mpich-$WM_MACPORT_MPI_VERSION" ]
+        then
+            echo "MPICH wants the same version as the used compiler. Do 'port install mpich-$WM_MACPORT_MPI_VERSION'"
+        fi
+        fi
+    fi
 
-	if [ "$WM_COMPILER" != "Gcc" ]
-	then
-	    if [ "$WM_BASE_COMPILER" == "Gcc" ]
-	    then
-		export WM_CC="gcc-mp-$WM_MACPORT_VERSION"
-		export WM_CXX="g++-mp-$WM_MACPORT_VERSION"
-		export WM_FC="gfortran-mp-$WM_MACPORT_VERSION"
-	    elif [ "$WM_BASE_COMPILER" == "Clang" ]
-	    then
-		export WM_CC="clang-mp-$WM_MACPORT_VERSION"
-		export WM_CXX="clang++-mp-$WM_MACPORT_VERSION"
-		# Seems like there is no Fortran-frontend for LLVM at thistime
-	    elif [ "$WM_BASE_COMPILER" == "Dragonegg" ]
-	    then
-		export WM_CC="dragonegg-$WM_MACPORT_VERSION-gcc"
-		export WM_CXX="dragonegg-$WM_MACPORT_VERSION-g++"
-		export WM_CXX="dragonegg-$WM_MACPORT_VERSION-gfortran"
-	    else
-		echo "Unknown base compiler $WM_BASE_COMPILER"
-	    fi
+    if [ "$WM_COMPILER" != "Gcc" ]
+    then
+        if [ "$WM_BASE_COMPILER" == "Gcc" ]
+        then
+            export WM_CC="gcc-mp-$WM_MACPORT_VERSION"
+            export WM_CXX="g++-mp-$WM_MACPORT_VERSION"
+            export WM_FC="gfortran-mp-$WM_MACPORT_VERSION"
+        elif [ "$WM_BASE_COMPILER" == "Clang" ]
+        then
+            export WM_CC="clang-mp-$WM_MACPORT_VERSION"
+            export WM_CXX="clang++-mp-$WM_MACPORT_VERSION"
+        # Seems like there is no Fortran-frontend for LLVM at thistime
+        elif [ "$WM_BASE_COMPILER" == "Dragonegg" ]
+        then
+            export WM_CC="dragonegg-$WM_MACPORT_VERSION-gcc"
+            export WM_CXX="dragonegg-$WM_MACPORT_VERSION-g++"
+            export WM_CXX="dragonegg-$WM_MACPORT_VERSION-gfortran"
+        else
+            echo "Unknown base compiler $WM_BASE_COMPILER"
+        fi
 
-	    ruleDirBase=$WM_PROJECT_DIR/wmake/rules/$WM_ARCH
-	    ruleDirTarget=$ruleDirBase$WM_BASE_COMPILER
-	    ruleDir=$ruleDirBase$WM_COMPILER
-	    if [ ! -e $ruleDir ]
-	    then
-		echo "Rule directory $ruleDir not existing. Linking to $ruleDirTarget"
-		ln -s $ruleDirTarget $ruleDir
-	    fi
-	    unset ruleDir ruleDirBase
-	fi
+        ruleDirBase=$WM_PROJECT_DIR/wmake/rules/$WM_ARCH
+        ruleDirTarget=$ruleDirBase$WM_BASE_COMPILER
+        ruleDir=$ruleDirBase$WM_COMPILER
+        if [ ! -e $ruleDir ]
+        then
+            echo "Rule directory $ruleDir not existing. Linking to $ruleDirTarget"
+            ln -s $ruleDirTarget $ruleDir
+        fi
+        unset ruleDir ruleDirBase
+    fi
     else
         echo "Warning: You are not using MacPorts. Make sure your compilation and MPI environment is correctly initialized"
     fi
@@ -475,8 +475,8 @@ fi
 # then
 #     if [[ `ulimit -n` == "unlimited" || `ulimit -n` < 8192 ]]
 #     then
-# 	# higher limit needed for wmkdeps
-# 	ulimit -n 8192
+#     # higher limit needed for wmkdeps
+#     ulimit -n 8192
 #     fi
 # fi
 

@@ -9,7 +9,7 @@ cd cartesianMesh
 cd asmoOctree
     cleanCase
     \rm -rf constant/polyMesh > /dev/null 2>&1
-    \rm -f log.* 
+    \rm -f log.*
 cd ..
 
 cd bunnyOctree

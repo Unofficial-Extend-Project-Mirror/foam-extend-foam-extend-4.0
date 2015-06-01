@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -234,17 +234,17 @@ skewCorrectedSnGrad<Type>::correction
     (
         min
         (
-            limitCoeff_
-           *mag
+            limitCoeff_*
+            mag
             (
-	        uncorrectedSnGrad<Type>::snGrad
-		(
-		    vf,
-		    this->deltaCoeffs(vf),
-		    "orthSnGrad"
-		)
-	      + ssf
-	    )
+                uncorrectedSnGrad<Type>::snGrad
+                (
+                    vf,
+                    this->deltaCoeffs(vf),
+                    "orthSnGrad"
+                )
+              + ssf
+            )
            /(
                 (1 - limitCoeff_)*mag(ssf)
               + dimensionedScalar("small", ssf.dimensions(), SMALL)

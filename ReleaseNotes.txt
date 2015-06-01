@@ -19,7 +19,7 @@ Table of Contents
 9 List of Contributors:
 
 
-1 Overview 
+1 Overview
 -----------
   The foam-extend project is a fork of the OpenFOAM® open source
   library for Computational Fluid Dynamics (CFD). It is an open
@@ -46,11 +46,11 @@ Table of Contents
   December 2004) as release number 3.0.  Visit [http://foam-extend.org]
   for more information.
 
-  OPENFOAM® is a registered trademark of ESI Group. OpenFOAM-extend and 
+  OPENFOAM® is a registered trademark of ESI Group. OpenFOAM-extend and
   foam-extend are a community effort not endorsed by ESI Group.
- 
 
-2 Installation 
+
+2 Installation
 ---------------
    foam-extend-3.1 can be compiled and runs on any linux system
 
@@ -74,7 +74,7 @@ Table of Contents
     Binary packages are available for download at
     [http://sourceforge.net/projects/openfoam-extend/] for the following
     systems: Ubuntu 14.04, Fedora 20 and Mac OS X.
-    
+
   * Accompanying ThirdParty software:
     - gcc compatibility up to 4.8.2
     - Paraview 4.0.1
@@ -92,9 +92,9 @@ Table of Contents
     - bison 2.7
     - hwloc 1.7.2
     - libccmio 2.6.1
-  
 
-3 Compatibility 
+
+3 Compatibility
 ----------------
   Upstream features from the OpenFOAM® code base are merged into
   foam-extend on regular basis. The interface format of
@@ -103,7 +103,7 @@ Table of Contents
   fixes and algorithmic improvements, considered more important than
   inter-operability.
 
-4 Main differentiators between foam-extend and OpenFOAM 
+4 Main differentiators between foam-extend and OpenFOAM
 --------------------------------------------------------
   A large number of features have been lost within the release of
   OpenFOAM since version 1.3, the code base has shrunk by more than
@@ -184,7 +184,7 @@ Table of Contents
   * Approximately 6000 bug fixes in fundamental level libraries and
     discretisation techniques
 
-5 New features in foam-extend-3.1, since foam-extend-3.0 
+5 New features in foam-extend-3.1, since foam-extend-3.0
 ---------------------------------------------------------
   The list of features is a result of the work of numerous
   contributors. The maintainers of foam-extend would formally like to
@@ -307,7 +307,7 @@ Table of Contents
     - Template depth for block matrix support
     - Parallel efficiency improvements
 
-6 Recent successful compilations and tests 
+6 Recent successful compilations and tests
 -------------------------------------------
    * Ubuntu 14.04:
 
@@ -337,18 +337,18 @@ Table of Contents
 
     [http://openfoam-extend.sourceforge.net/CDash/viewTest.php?buildid=743]
 
-7 Reporting bugs 
+7 Reporting bugs
 -----------------
     To report bugs, please use the MantisBT bugtracker at
     [http://sourceforge.net/apps/mantisbt/openfoam-extend]
 
-8 How to contribute 
+8 How to contribute
 --------------------
-    All your contributions are highly welcome: New solvers, utilities and 
-    models; bug fixes; documentation. The many ways of contributing and the 
+    All your contributions are highly welcome: New solvers, utilities and
+    models; bug fixes; documentation. The many ways of contributing and the
     contribution process are described in detail at:
     [http://sourceforge.net/p/openfoam-extend/wiki/HowToContribute/]
 
-9 List of Contributors: 
+9 List of Contributors:
 ------------------------
     See file ListOfContributors

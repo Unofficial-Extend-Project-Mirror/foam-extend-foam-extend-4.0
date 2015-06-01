@@ -1,8 +1,8 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | foam-extend: Open Source CFD                    |
-|  \\    /   O peration     | Version:     3.1                                |
-|   \\  /    A nd           | Web:         http://www.extend-project.de       |
+|  \\    /   O peration     | Version:     3.2                                |
+|   \\  /    A nd           | Web:         http://www.foam-extend.org         |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 FoamFile
@@ -18,51 +18,53 @@ internalField uniform 100;
 
 boundaryField
 {
-  inlet
-  {
+    inlet
+    {
         type            fixedValue;
         value           uniform 500;
-  }
-  outlet
-  {
+    }
+    outlet
+    {
         type            fixedValue;
         value           uniform 100;
-  }
-  wallProlongation
-  {
-    type zeroGradient;
-  }
-  wallDiffuser
-  {
-    type zeroGradient;
-  }
-  statSwirlWallB_C
-  {
-    type zeroGradient;
-  }
-  rotSwirlWallA_BB
-  {
-    type zeroGradient;
-  }
-  B_UPSTREAM
-  {
-    type mixingPlane;
-  }
-  B_DOWNSTREAM
-  {
-    type mixingPlane;
-  }
-  sideWallA_BB_cyclic1
-  {
-    type cyclicGgi;
-  }
-  sideWallA_BB_cyclic2
-  {
-    type cyclicGgi;
-  }
-  defaultFaces
-  {
-    type empty;
-  }
-} 	// ************************************************************************* //
+    }
+    wallProlongation
+    {
+        type zeroGradient;
+    }
+    wallDiffuser
+    {
+        type zeroGradient;
+    }
+    statSwirlWallB_C
+    {
+        type zeroGradient;
+    }
+    rotSwirlWallA_BB
+    {
+        type zeroGradient;
+    }
+    B_UPSTREAM
+    {
+        type mixingPlane;
+    }
+    B_DOWNSTREAM
+    {
+        type mixingPlane;
+    }
+    sideWallA_BB_cyclic1
+    {
+        type cyclicGgi;
+    }
+    sideWallA_BB_cyclic2
+    {
+        type cyclicGgi;
+    }
+    defaultFaces
+    {
+        type empty;
+    }
+}
+
+// ************************************************************************* //
 

@@ -1,8 +1,8 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | foam-extend: Open Source CFD                    |
-|  \\    /   O peration     | Version:     3.1                                |
-|   \\  /    A nd           | Web:         http://www.extend-project.de       |
+|  \\    /   O peration     | Version:     3.2                                |
+|   \\  /    A nd           | Web:         http://www.foam-extend.org         |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 FoamFile
@@ -22,46 +22,46 @@ internalField   uniform (0 0 0);
 boundaryField
 {
     top
-      {
- 	type            solidTraction;
- 	traction        uniform ( 0 2e7 0 );
- 	pressure        uniform 0;
-	orthotropic     yes;
-	value           uniform (0 0 0);
-      }
+    {
+         type            solidTraction;
+         traction        uniform ( 0 2e7 0 );
+         pressure        uniform 0;
+        orthotropic     yes;
+        value           uniform (0 0 0);
+    }
 
     bottom
-      {
-	type            symmetryPlane;
-      }
+    {
+        type            symmetryPlane;
+    }
 
     left
-      {
-	type            symmetryPlane;
-      }
+    {
+        type            symmetryPlane;
+    }
 
     back
-      {
-	type            symmetryPlane;
-      }
+    {
+        type            symmetryPlane;
+    }
 
     right
-      {
- 	type            solidTraction;
- 	traction        uniform ( 0 0 0 );
- 	pressure        uniform 0;
-	orthotropic     yes;
-	value           uniform (0 0 0);
-      }
+    {
+         type            solidTraction;
+         traction        uniform ( 0 0 0 );
+        pressure        uniform 0;
+        orthotropic     yes;
+        value           uniform (0 0 0);
+    }
 
     front
-      {
-	type            solidTraction;
- 	traction        uniform ( 0 0 0 );
- 	pressure        uniform 0;
-	orthotropic     yes;
-	value           uniform (0 0 0);
-      }
+    {
+        type            solidTraction;
+        traction        uniform ( 0 0 0 );
+        pressure        uniform 0;
+        orthotropic     yes;
+        value           uniform (0 0 0);
+    }
 }
 
 // ************************************************************************* //

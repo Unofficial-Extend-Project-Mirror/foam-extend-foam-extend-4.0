@@ -1,25 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | cfMesh: A library for mesh generation
-   \\    /   O peration     |
-    \\  /    A nd           | Author: Franjo Juretic (franjo.juretic@c-fields.com)
-     \\/     M anipulation  | Copyright (C) Creative Fields, Ltd.
+  \\      /  F ield         | foam-extend: Open Source CFD
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
-    This file is part of cfMesh.
+    This file is part of foam-extend.
 
-    cfMesh is free software; you can redistribute it and/or modify it
+    foam-extend is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 3 of the License, or (at your
+    Free Software Foundation, either version 3 of the License, or (at your
     option) any later version.
 
-    cfMesh is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with cfMesh.  If not, see <http://www.gnu.org/licenses/>.
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Description
 
@@ -46,25 +46,25 @@ void boundaryLayers::checkTopologyOfBoundaryFaces(const labelList& patchLabels)
 {
     if( !patchWiseLayers_ )
         return;
-    
+
     Info << "Checking topology of boundary faces" << endl;
-    
+
     labelHashSet usedPatches;
     forAll(patchLabels, i)
         usedPatches.insert(patchLabels[i]);
-    
+
     //- create a set of patch pairs. These are pairs at which the layers
     //- shall be terminated
     std::set<std::pair<label, label> > terminatedPairs;
     forAll(treatPatchesWithPatch_, patchI)
     {
         const DynList<label>& otherPatches = treatPatchesWithPatch_[patchI];
-        
+
         forAll(otherPatches, patchJ)
         {
             if( patchI == otherPatches[patchJ] )
                 continue;
-            
+
             terminatedPairs.insert
             (
                 std::make_pair
@@ -75,48 +75,48 @@ void boundaryLayers::checkTopologyOfBoundaryFaces(const labelList& patchLabels)
             );
         }
     }
-    
+
     bool changed;
     label nDecomposed(0);
     boolList decomposeCell(mesh_.cells().size(), false);
-    
+
     do
     {
         changed = false;
-        
+
         const meshSurfaceEngine& mse = this->surfaceEngine();
         const faceList::subList& bFaces = mse.boundaryFaces();
         const labelList& faceOwner = mse.faceOwners();
         const labelList& facePatches = mse.boundaryFacePatches();
         const VRWGraph& faceEdges = mse.faceEdges();
         const VRWGraph& edgeFaces = mse.edgeFaces();
-        
+
         const Map<label>& otherProcPatch = mse.otherEdgeFacePatch();
-        
+
         VRWGraph newBoundaryFaces;
         labelLongList newBoundaryOwners;
         labelLongList newBoundaryPatches;
-        
+
         forAll(bFaces, bfI)
         {
             const face& bf = bFaces[bfI];
             const label fPatch = facePatches[bfI];
-            
+
             if( !usedPatches.found(fPatch) )
                 continue;
-            
+
             //- find patches of neighbour faces
             labelList neiPatches(bf.size());
             forAll(bf, eI)
             {
                 const label beI = faceEdges(bfI, eI);
-                
+
                 if( edgeFaces.sizeOfRow(beI) == 2 )
                 {
                     label neiFace = edgeFaces(beI, 0);
                     if( neiFace == bfI )
                         neiFace = edgeFaces(beI, 1);
-                    
+
                     neiPatches[eI] = facePatches[neiFace];
                 }
                 else if( edgeFaces.sizeOfRow(beI) == 1 )
@@ -125,7 +125,7 @@ void boundaryLayers::checkTopologyOfBoundaryFaces(const labelList& patchLabels)
                     neiPatches[eI] = otherProcPatch[beI];
                 }
             }
-            
+
             //- find feature edges and check if the patches meeting there
             //- shall be treated together.
             bool storedFace(false);
@@ -133,16 +133,16 @@ void boundaryLayers::checkTopologyOfBoundaryFaces(const labelList& patchLabels)
             {
                 if( neiPatches[eI] == fPatch )
                     continue;
-                
+
                 std::pair<label, label> pp
                 (
                     Foam::min(fPatch, neiPatches[eI]),
                     Foam::max(fPatch, neiPatches[eI])
                 );
-                
+
                 if( terminatedPairs.find(pp) == terminatedPairs.end() )
                     continue;
-                
+
                 //- create a new face from this edge and the neighbouring edges
                 bool usePrev(false), useNext(false);
                 if( neiPatches[neiPatches.rcIndex(eI)] == fPatch )
@@ -156,11 +156,11 @@ void boundaryLayers::checkTopologyOfBoundaryFaces(const labelList& patchLabels)
                         Foam::min(fPatch, neiPatches[neiPatches.rcIndex(eI)]),
                         Foam::max(fPatch, neiPatches[neiPatches.rcIndex(eI)])
                     );
-                    
+
                     if( terminatedPairs.find(ppPrev) == terminatedPairs.end() )
                         usePrev = true;
                 }
-                
+
                 if( neiPatches[neiPatches.fcIndex(eI)] == fPatch )
                 {
                     useNext = true;
@@ -172,11 +172,11 @@ void boundaryLayers::checkTopologyOfBoundaryFaces(const labelList& patchLabels)
                         Foam::min(fPatch, neiPatches[neiPatches.fcIndex(eI)]),
                         Foam::max(fPatch, neiPatches[neiPatches.fcIndex(eI)])
                     );
-                    
+
                     if( terminatedPairs.find(ppNext) == terminatedPairs.end() )
                         useNext = true;
                 }
-                
+
                 DynList<edge> removeEdges;
                 if( useNext && usePrev )
                 {
@@ -197,7 +197,7 @@ void boundaryLayers::checkTopologyOfBoundaryFaces(const labelList& patchLabels)
                     removeEdges[0] = bf.faceEdge(neiPatches.rcIndex(eI));
                     removeEdges[1] = bf.faceEdge(eI);
                 }
-                
+
                 const face cutFace = help::removeEdgesFromFace(bf, removeEdges);
                 if( cutFace.size() > 2 )
                 {
@@ -212,19 +212,19 @@ void boundaryLayers::checkTopologyOfBoundaryFaces(const labelList& patchLabels)
                     newBoundaryOwners.append(faceOwner[bfI]);
                     newBoundaryPatches.append(fPatch);
                 }
-                
+
                 if( (cutFace.size() > 2) && (rFace.size() > 2) )
                 {
                     decomposeCell[faceOwner[bfI]] = true;
                     changed = true;
                     ++nDecomposed;
                 }
-                
+
                 storedFace = true;
-                
+
                 break;
             }
-            
+
             if( !storedFace )
             {
                 newBoundaryFaces.appendList(bf);
@@ -232,10 +232,10 @@ void boundaryLayers::checkTopologyOfBoundaryFaces(const labelList& patchLabels)
                 newBoundaryPatches.append(fPatch);
             }
         }
-        
+
         //- Finally, replace the boundary faces
         reduce(changed, maxOp<bool>());
-        
+
         if( changed )
         {
             polyMeshGenModifier(mesh_).replaceBoundary
@@ -245,24 +245,24 @@ void boundaryLayers::checkTopologyOfBoundaryFaces(const labelList& patchLabels)
                 newBoundaryOwners,
                 newBoundaryPatches
             );
-            
+
             clearOut();
         }
-        
+
     } while( changed );
-    
+
     //- decompose owner cells adjacent to the decomposed faces
     reduce(nDecomposed, sumOp<label>());
-    
+
     if( nDecomposed != 0 )
     {
         FatalError << "Critical. Not tested" << exit(FatalError);
         decomposeCells dc(mesh_);
         dc.decomposeMesh(decomposeCell);
-        
+
         clearOut();
     }
-    
+
     mesh_.write();
     Info << "Finished checking topology" << endl;
 }

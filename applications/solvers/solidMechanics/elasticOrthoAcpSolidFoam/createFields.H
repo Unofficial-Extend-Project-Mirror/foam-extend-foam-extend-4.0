@@ -35,8 +35,8 @@
             IOobject::NO_READ,
             IOobject::NO_WRITE
         ),
-	mesh,
-	dimensionedVector("zero", dimless, vector::zero)
+        mesh,
+        dimensionedVector("zero", dimless, vector::zero)
     );
 
     volVectorField V
@@ -80,19 +80,19 @@
         dimensionedSymmTensor("zero", dimForce/dimArea, symmTensor::zero)
     );
 
-      volVectorField divSigmaExp
-      (
+    volVectorField divSigmaExp
+    (
         IOobject
         (
-         "divSigmaExp",
-         runTime.timeName(),
-         mesh,
-         IOobject::NO_READ,
-         IOobject::NO_WRITE
-         ),
+            "divSigmaExp",
+            runTime.timeName(),
+            mesh,
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        ),
         mesh,
         dimensionedVector("zero", dimForce/dimVolume, vector::zero)
-       );
+    );
 
     constitutiveModel rheology(sigma, U);
 
@@ -122,11 +122,12 @@
             IOobject::NO_WRITE
         ),
         mesh,
-	dimensionedVector("zero", dimLength, vector::zero)
+        dimensionedVector("zero", dimLength, vector::zero)
     );
-// aitken relaxation factor
-scalar aitkenInitialRes = 1.0;
-scalar aitkenTheta = 0.1;
+
+    // aitken relaxation factor
+    scalar aitkenInitialRes = 1.0;
+    scalar aitkenTheta = 0.1;
 
 //    volVectorField resid
 //     (
@@ -139,5 +140,5 @@ scalar aitkenTheta = 0.1;
 //             IOobject::AUTO_WRITE
 //         ),
 //         mesh,
-// 	dimensionedVector("zero", dimless, vector::zero)
+//         dimensionedVector("zero", dimless, vector::zero)
 //     );

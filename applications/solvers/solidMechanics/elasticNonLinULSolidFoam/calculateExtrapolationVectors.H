@@ -15,59 +15,57 @@
 FieldField<Field, vector> extraVecs(ptc.size());
 
 {
-  const labelListList& pfaces = mesh.pointFaces();
+    const labelListList& pfaces = mesh.pointFaces();
 
-  const volVectorField& centres = mesh.C();
+    const volVectorField& centres = mesh.C();
 
-  const fvBoundaryMesh& bm = mesh.boundary();
+    const fvBoundaryMesh& bm = mesh.boundary();
 
-  forAll (ptc, pointI)
+    forAll (ptc, pointI)
     {
-      const label curPoint = ptc[pointI];
+        const label curPoint = ptc[pointI];
 
-      const labelList& curFaces = pfaces[curPoint];
+        const labelList& curFaces = pfaces[curPoint];
 
-      // extraVecs.hook(new vectorField(curFaces.size())); //- no hook function
-       extraVecs.set
-       (
-	pointI,
-	new vectorField(curFaces.size())
-	);
+        // extraVecs.hook(new vectorField(curFaces.size())); //- no hook function
+        extraVecs.set
+        (
+            pointI,
+            new vectorField(curFaces.size())
+        );
 
-      vectorField& curExtraVectors = extraVecs[pointI];
+        vectorField& curExtraVectors = extraVecs[pointI];
 
-      label nFacesAroundPoint = 0;
+        label nFacesAroundPoint = 0;
 
-      const vector& pointLoc = mesh.points()[curPoint];
+        const vector& pointLoc = mesh.points()[curPoint];
 
-      // Go through all the faces
-      forAll (curFaces, faceI)
-	{
-	  if (!mesh.isInternalFace(curFaces[faceI]))
-	    {
-	      // This is a boundary face.  If not in the empty patch
-	      // or coupled calculate the extrapolation vector
-	      label patchID =
-		mesh.boundaryMesh().whichPatch(curFaces[faceI]);
+        // Go through all the faces
+        forAll (curFaces, faceI)
+        {
+            if (!mesh.isInternalFace(curFaces[faceI]))
+            {
+                // This is a boundary face.  If not in the empty patch
+                // or coupled calculate the extrapolation vector
+                label patchID =
+                    mesh.boundaryMesh().whichPatch(curFaces[faceI]);
 
-	      if
-		(
-		 !isA<emptyFvPatch>(bm[patchID])
-		 && !bm[patchID].coupled()
-		 )
-		{
-		  // Found a face for extrapolation
-		  curExtraVectors[nFacesAroundPoint] =
-		    pointLoc
-		    - centres.boundaryField()[patchID]
-		    [bm[patchID].patch().whichFace(curFaces[faceI])];
+                if
+                (
+                    !isA<emptyFvPatch>(bm[patchID]) && !bm[patchID].coupled()
+                )
+                {
+                    // Found a face for extrapolation
+                    curExtraVectors[nFacesAroundPoint] =
+                        pointLoc
+                      - centres.boundaryField()[patchID]
+                        [bm[patchID].patch().whichFace(curFaces[faceI])];
 
-		  nFacesAroundPoint++;
-		}
-	    }
-	}
+                    nFacesAroundPoint++;
+                }
+            }
+        }
 
-      curExtraVectors.setSize(nFacesAroundPoint);
+        curExtraVectors.setSize(nFacesAroundPoint);
     }
-
 }

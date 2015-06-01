@@ -29,6 +29,7 @@
         dimensionedVector("zero", dimLength, vector::zero)
     );
 
+    Info << "Reading accumulated strain field epsilon\n" << endl;
     volSymmTensorField epsilon
     (
         IOobject
@@ -57,6 +58,7 @@
         dimensionedSymmTensor("zero", dimless, symmTensor::zero)
     );
 
+    Info << "Reading accumulated stress field sigma\n" << endl;
     volSymmTensorField sigma
     (
         IOobject
@@ -72,6 +74,7 @@
     );
 
 
+    Info << "Reading incremental stress field DSigma\n" << endl;
     volSymmTensorField DSigma
     (
         IOobject
@@ -86,16 +89,16 @@
         dimensionedSymmTensor("zero", dimForce/dimArea, symmTensor::zero)
     );
 
-   //- material properties
-   constitutiveModel rheology(sigma, DU);
-   volSymmTensor4thOrderField C = rheology.C();
-   volDiagTensorField K = rheology.K();
-   //surfaceSymmTensor4thOrderField Cf = fvc::interpolate(C);
-   //surfaceDiagTensorField Kf = fvc::interpolate(K);
+    //- material properties
+    constitutiveModel rheology(sigma, DU);
+    volSymmTensor4thOrderField C = rheology.C();
+    volDiagTensorField K = rheology.K();
+    //surfaceSymmTensor4thOrderField Cf = fvc::interpolate(C);
+    //surfaceDiagTensorField Kf = fvc::interpolate(K);
 
-   surfaceVectorField n = mesh.Sf()/mesh.magSf();
+    surfaceVectorField n = mesh.Sf()/mesh.magSf();
 
-   //volScalarField rho = rheology.rho();
+    //volScalarField rho = rheology.rho();
     volScalarField rho
     (
         IOobject
@@ -109,7 +112,7 @@
         rheology.rho()
     );
 
-//     if(rheology.planeStress())
-//       {
-// 	Info << nl << "Plane stress is set to yes -> the zz stress will be zero" << nl << endl;
-//       }
+    // if(rheology.planeStress())
+    // {
+    //     Info << nl << "Plane stress is set to yes -> the zz stress will be zero" << nl << endl;
+    // }

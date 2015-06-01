@@ -1,8 +1,8 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | foam-extend: Open Source CFD                    |
-|  \\    /   O peration     | Version:     3.1                                |
-|   \\  /    A nd           | Web:         http://www.extend-project.de       |
+|  \\    /   O peration     | Version:     3.2                                |
+|   \\  /    A nd           | Web:         http://www.foam-extend.org         |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 FoamFile
@@ -20,7 +20,7 @@ FoamFile
     left
     {
         type            patch;
-        edgeLabels      List<label> 
+        edgeLabels      List<label>
 100
 (
 19800
@@ -130,7 +130,7 @@ FoamFile
     right
     {
         type            patch;
-        edgeLabels      List<label> 
+        edgeLabels      List<label>
 100
 (
 20098
@@ -240,7 +240,7 @@ FoamFile
     front
     {
         type            patch;
-        edgeLabels      List<label> 
+        edgeLabels      List<label>
 100
 (
 19801
@@ -350,7 +350,7 @@ FoamFile
     back
     {
         type            patch;
-        edgeLabels      List<label> 
+        edgeLabels      List<label>
 100
 (
 19901

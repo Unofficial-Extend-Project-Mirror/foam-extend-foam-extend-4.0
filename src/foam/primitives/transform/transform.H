@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -302,20 +302,23 @@ inline SymmTensor4thOrder<Cmpt> transform
 template<class Cmpt>
 inline DiagTensor<Cmpt> transform
 (
- const tensor& tt,
- const DiagTensor<Cmpt>& st
- )
+    const tensor& tt,
+    const DiagTensor<Cmpt>& st
+)
 {
-  notImplemented("transform.H\n"
-		 "template<>\n"
-		 "inline DiagTensor<Cmpt> transform\n"
-		 "(\n"
-		 "const tensor& tt,\n"
-		 "const DiagTensor<Cmpt>& st\n"
-		 ")\n"
-		 "not implemented");
+    notImplemented
+    (
+        "transform.H\n"
+        "template<>\n"
+        "inline DiagTensor<Cmpt> transform\n"
+        "(\n"
+        "const tensor& tt,\n"
+        "const DiagTensor<Cmpt>& st\n"
+        ")\n"
+        "not implemented"
+    );
 
-  return st;
+    return st;
 }
 
 
@@ -376,9 +379,9 @@ template<>
 inline symmTensor4thOrder transformMask<symmTensor4thOrder>(const tensor& t)
 {
   notImplemented("transform.H\n"
-		 "template<>\n"
-		 "inline symmTensor4thOrder transformMask<symmTensor4thOrder>(const tensor& t)\n"
-		 "not implemented");
+         "template<>\n"
+         "inline symmTensor4thOrder transformMask<symmTensor4thOrder>(const tensor& t)\n"
+         "not implemented");
 
   return symmTensor4thOrder::zero;
 }

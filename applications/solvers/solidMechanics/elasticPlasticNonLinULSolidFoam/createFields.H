@@ -106,37 +106,36 @@
 
     //- explicit terms in the momentum equation
     volVectorField divDSigmaExp
-	(
-	 IOobject
-	 (
-	  "divDSigmaExp",
-	  runTime.timeName(),
-	  mesh,
-	  IOobject::NO_READ,
-	  IOobject::NO_WRITE
-	  ),
-	 mesh,
- 	 dimensionedVector("zero", dimensionSet(1, -2, -2, 0, 0, 0, 0), vector::zero)
-	 );
-
-      volVectorField divDSigmaNonLinExp
-      (
+    (
         IOobject
         (
-	 "divDSigmaNonLinExp",
-	 runTime.timeName(),
-	 mesh,
-	 IOobject::NO_READ,
-	 IOobject::NO_WRITE
-	 ),
+            "divDSigmaExp",
+            runTime.timeName(),
+            mesh,
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        ),
+        mesh,
+        dimensionedVector("zero", dimensionSet(1, -2, -2, 0, 0, 0, 0), vector::zero)
+    );
+
+    volVectorField divDSigmaNonLinExp
+    (
+        IOobject
+        (
+            "divDSigmaNonLinExp",
+            runTime.timeName(),
+            mesh,
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        ),
         mesh,
         dimensionedVector("zero", dimensionSet(1,-2,-2,0,0,0,0), vector::zero)
-       );
+    );
 
     constitutiveModel rheology(sigma, DU);
 
     volScalarField rho = rheology.rho();
-
     volScalarField mu = rheology.mu();
     volScalarField lambda = rheology.lambda();
     surfaceScalarField muf = fvc::interpolate(rheology.mu());
@@ -144,37 +143,38 @@
 
     surfaceVectorField n = mesh.Sf()/mesh.magSf();
 
-   // plastic strain increment
-   const volSymmTensorField& DEpsilonP = rheology.DEpsilonP();
+    // plastic strain increment
+    const volSymmTensorField& DEpsilonP = rheology.DEpsilonP();
 
-   // for aitken relaxation
-   volVectorField aitkenDelta
-   (
+    // for aitken relaxation
+    volVectorField aitkenDelta
+    (
         IOobject
         (
-	 "aitkenDelta",
-	 runTime.timeName(),
-	 mesh,
-	 IOobject::NO_READ,
-	 IOobject::NO_WRITE
-	 ),
+            "aitkenDelta",
+            runTime.timeName(),
+            mesh,
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        ),
         mesh,
         dimensionedVector("zero", dimLength, vector::zero)
-	);
-// aitken relaxation factor
-scalar aitkenInitialRes = 1.0;
-scalar aitkenTheta = 0.1;
+    );
+
+    // aitken relaxation factor
+    scalar aitkenInitialRes = 1.0;
+    scalar aitkenTheta = 0.1;
 
 //    volVectorField resid
 //    (
-//         IOobject
-//         (
-// 	 "resid",
-// 	 runTime.timeName(),
-// 	 mesh,
-// 	 IOobject::NO_READ,
-// 	 IOobject::AUTO_WRITE
-// 	 ),
-//         mesh,
-//         dimensionedVector("zero", dimless, vector::zero)
-//     );
+//        IOobject
+//        (
+//            "resid",
+//            runTime.timeName(),
+//            mesh,
+//            IOobject::NO_READ,
+//            IOobject::AUTO_WRITE
+//        ),
+//        mesh,
+//        dimensionedVector("zero", dimless, vector::zero)
+//    );

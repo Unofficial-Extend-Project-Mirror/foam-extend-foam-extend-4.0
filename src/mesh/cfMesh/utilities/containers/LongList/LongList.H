@@ -1,25 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | cfMesh: A library for mesh generation
-   \\    /   O peration     |
-    \\  /    A nd           | Author: Franjo Juretic (franjo.juretic@c-fields.com)
-     \\/     M anipulation  | Copyright (C) Creative Fields, Ltd.
+  \\      /  F ield         | foam-extend: Open Source CFD
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
-    This file is part of cfMesh.
+    This file is part of foam-extend.
 
-    cfMesh is free software; you can redistribute it and/or modify it
+    foam-extend is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 3 of the License, or (at your
+    Free Software Foundation, either version 3 of the License, or (at your
     option) any later version.
 
-    cfMesh is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with cfMesh.  If not, see <http://www.gnu.org/licenses/>.
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
     LongList
@@ -78,39 +78,39 @@ class LongList
     // Private data
         //- number of allocated elements
         label N_;
-    
+
         //- number of elements in the list
         label nextFree_;
-    
+
         //- number of used blocks of data
         label numBlocks_;
-    
+
         //- maximum number of blocks that can be allocated
         //- without reallocating the list containing pointers
         //- to the chunks of data
         label numAllocatedBlocks_;
-    
+
         //- size of blocks is calculated by powers of 2
         //- and therefore the access can be done using shift and mask
         label shift_;
         label mask_;
-      
+
         //- array of pointers to the blocks of data, each of the size WIDTH
         T** dataPtr_;
 
     // Private member functions
         //- check index
         void checkIndex(label const i) const;
-    
+
         //- initialize width and mask
         void initializeParameters();
-        
+
         //- Allocate memory for the list
         void allocateSize(const label);
-        
+
         //- delete all elements
         void clearOut();
-    
+
 public:
 
     // Constructors
@@ -137,9 +137,9 @@ public:
 
             //- Size of the active part of the list.
             inline label size() const;
-            
+
             //- Return the binary size in number of characters of the UList
-            //  if the element is a primitive type 
+            //  if the element is a primitive type
             //  i.e. contiguous<T>() == true
             inline label byteSize() const;
 
@@ -154,7 +154,7 @@ public:
 
             //- Shrink the list to the number of elements used
             inline LongList<T, Offset>& shrink();
-            
+
             //- transfer the list from another one without allocating it
             inline void transfer(LongList<T, Offset>&);
 
@@ -163,11 +163,11 @@ public:
 
         //- Append an element at the end of the list
         inline void append(const T& e);
-        
+
         //- Append an element at the end of the list if it is not yet
         //- present in the list (takes linear time)
         inline void appendIfNotIn(const T& e);
-        
+
         //- check if the element is in the list (takes linear time)
         inline bool contains(const T& e) const;
         inline label containsAtPosition(const T& e) const;
@@ -175,7 +175,7 @@ public:
         //- Return and remove the element
         inline T remove(const label i);
         inline T removeLastElement();
-        
+
         //- get and set operators
         inline const T& operator[](const label i) const;
         inline T& operator[](const label i);
@@ -183,14 +183,14 @@ public:
         //- Return non-const access to an element,
         //  resizing the list if necessary
         inline T& operator()(const label);
-        
+
         //- return a non-const access to an element,
         // resize the list if necessary
         inline T& newElmt(const label);
 
         //- Assignment of all entries to the given value
         inline void operator=(const T&);
-        
+
         //- Assignment operator
         inline void operator=(const LongList<T, Offset>&);
 
@@ -198,7 +198,7 @@ public:
     // IOstream operators
         //- Read from stream and append to the current content
         void appendFromStream(Istream&);
-    
+
         //- Write as a dictionary entry.
         void writeEntry(Ostream& os) const;
 

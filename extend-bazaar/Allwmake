@@ -13,11 +13,11 @@ setDestination()
 {
     pkg=$1
     if [ ! -z "$EXTEND_BAZAAR_TO_SITE" ]; then
-	dst="SITE"
-	wrong="USER"
+        dst="SITE"
+        wrong="USER"
     else
-	dst="USER"
-	wrong="SITE"
+        dst="USER"
+        wrong="SITE"
     fi
 
     # remove installation to general binaries

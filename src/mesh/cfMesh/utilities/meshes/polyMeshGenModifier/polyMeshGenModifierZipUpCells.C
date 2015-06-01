@@ -1,25 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | cfMesh: A library for mesh generation
-   \\    /   O peration     |
-    \\  /    A nd           | Author: Franjo Juretic (franjo.juretic@c-fields.com)
-     \\/     M anipulation  | Copyright (C) Creative Fields, Ltd.
+  \\      /  F ield         | foam-extend: Open Source CFD
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
-    This file is part of cfMesh.
+    This file is part of foam-extend.
 
-    cfMesh is free software; you can redistribute it and/or modify it
+    foam-extend is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 3 of the License, or (at your
+    Free Software Foundation, either version 3 of the License, or (at your
     option) any later version.
 
-    cfMesh is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with cfMesh.  If not, see <http://www.gnu.org/licenses/>.
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Description
 
@@ -42,12 +42,12 @@ namespace Foam
 void polyMeshGenModifier::zipUpCells()
 {
     this->clearOut();
-    
+
     Info<< "Zipping up topologically open cells" << endl;
-    
+
     const pointFieldPMG& points = mesh_.points();
     const cellListPMG& cells = mesh_.cells();
-    
+
     faceListPMG& faces = mesh_.faces_;
 
     // Algorithm:
@@ -67,7 +67,7 @@ void polyMeshGenModifier::zipUpCells()
     // pass.  It is therefore essential to discard the addressing
     // after every pass.  The algorithm is completed when the mesh
     // stops changing.
-    // 
+    //
 
     label nChangedFacesInMesh;
     label nCycles(0);
@@ -77,7 +77,7 @@ void polyMeshGenModifier::zipUpCells()
     do
     {
         nChangedFacesInMesh = 0;
-        
+
         //- calculate pointFaces addressing
         # ifdef DEBUG_ZIPUP
         Info << "Starting pointFaces addressing " << endl;
@@ -90,20 +90,20 @@ void polyMeshGenModifier::zipUpCells()
             forAll(f, pI)
                 ++nUsage[f[pI]];
         }
-        
+
         VRWGraph pFaces(points.size());
         forAll(nUsage, pI)
             pFaces.setRowSize(pI, nUsage[pI]);
-        
+
         nUsage = 0;
-        
+
         forAll(faces, fI)
         {
             const face& f = faces[fI];
             forAll(f, pI)
                 pFaces(f[pI], nUsage[f[pI]]++) = fI;
         }
-        
+
         nUsage.clear();
 
         # ifdef DEBUG_ZIPUP
@@ -271,7 +271,7 @@ void polyMeshGenModifier::zipUpCells()
 
             // Go through the points and start from the point used twice
             // check all the edges to find the edges starting from this point
-            // add the 
+            // add the
 
             labelListList edgesToInsert(singleEdges.size());
             label nEdgesToInsert = 0;
@@ -472,7 +472,7 @@ void polyMeshGenModifier::zipUpCells()
                 // Warning: the ordering must be parametric, because in
                 // the case of multiple point insertion onto the same edge
                 // it is possible to get non-cyclic loops
-                // 
+                //
 
                 const labelList& unorderedEdge = edgesToInsert[edgeToInsertI];
 
@@ -552,17 +552,17 @@ void polyMeshGenModifier::zipUpCells()
                 // point-face addressing in two goes.
                 const label start = testEdge.start();
                 const label end = testEdge.end();
-                
+
                 labelList facesSharingEdge
                 (
                     pFaces.sizeOfRow(start) +
                     pFaces.sizeOfRow(end)
                 );
                 label nfse = 0;
-                
+
                 forAllRow(pFaces, start, pfI)
                     facesSharingEdge[nfse++] = pFaces(start, pfI);
-                
+
                 forAllRow(pFaces, end, pfI)
                     facesSharingEdge[nfse++] = pFaces(end, pfI);
 
@@ -708,7 +708,7 @@ void polyMeshGenModifier::zipUpCells()
                                     nNewFacePoints++;
                                 }
                             }
-                            
+
                             forAll(newFace, pI)
                                 pFaces.appendIfNotIn
                                 (
@@ -721,7 +721,7 @@ void polyMeshGenModifier::zipUpCells()
                                 << faces[currentFaceIndex] << nl
                                 << "newFace: " << newFace << endl;
 #                           endif
- 
+
                             // Check for duplicate points in the new face
                             forAll (newFace, checkI)
                             {

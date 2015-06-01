@@ -1,8 +1,8 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | foam-extend: Open Source CFD                    |
-|  \\    /   O peration     | Version:     3.1                                |
-|   \\  /    A nd           | Web:         http://www.extend-project.de       |
+|  \\    /   O peration     | Version:     3.2                                |
+|   \\  /    A nd           | Web:         http://www.foam-extend.org         |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 FoamFile
@@ -28,11 +28,9 @@ flipNormals false;
 // If construct from surface
 surface "movingWall.sMesh";
 
-
 // Do front and back need to be merged? Usually only makes sense for 360
 // degree wedges.
 mergeFaces true;
-
 
 //- Linear extrusion in point-normal direction
 //extrudeModel        linearNormal;
@@ -71,7 +69,6 @@ sigmaRadialCoeffs
     pRef            1;
     pStrat          1;
 }
-
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

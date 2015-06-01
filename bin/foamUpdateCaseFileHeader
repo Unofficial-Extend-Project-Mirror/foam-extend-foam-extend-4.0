@@ -1,7 +1,7 @@
 #!/bin/sh
 #------------------------------------------------------------------------------
 # =========                 |
-# \\      /  F ield         | FOAM-extend: Open Source CFD
+# \\      /  F ield         | foam-extend: Open Source CFD
 #  \\    /   O peration     |
 #   \\  /    A nd           | For copyright notice see file Copyright
 #    \\/     M anipulation  |
@@ -57,7 +57,7 @@ printHeader() {
 | =========                 |                                                 |
 | \\\\      /  F ield         | foam-extend: Open Source CFD                    |
 |  \\\\    /   O peration     | Version:     ${foamVersion}  |
-|   \\\\  /    A nd           | Web:         http://www.extend-project.de       |
+|   \\\\  /    A nd           | Web:         http://www.foam-extend.org         |
 |    \\\\/     M anipulation  |                                                 |
 \\*---------------------------------------------------------------------------*/
 FoamFile

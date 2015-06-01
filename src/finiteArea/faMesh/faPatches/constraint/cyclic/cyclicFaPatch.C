@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -84,11 +84,7 @@ void Foam::cyclicFaPatch::calcTransforms()
                 half0Normals[edgei] = point(1, 0, 0);
                 half1Normals[edgei] = half0Normals[edgei];
             }
-            else if
-            (
-                mag(magLe - nbrMagLe)/avLe
-	      > matchTol_()
-            )
+            else if(mag(magLe - nbrMagLe)/avLe > matchTol_())
             {
                 // Error in area matching.  Find largest error
                 maxMatchError =
@@ -176,7 +172,7 @@ void cyclicFaPatch::makeWeights(scalarField& w) const
         if
         (
             mag(magL[edgei] - magL[edgei + sizeby2])/avL
-	  > matchTol_()
+      > matchTol_()
         )
         {
             // Found error.  Look for largest matching error

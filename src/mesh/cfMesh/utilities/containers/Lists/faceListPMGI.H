@@ -1,25 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | cfMesh: A library for mesh generation
-   \\    /   O peration     |
-    \\  /    A nd           | Author: Franjo Juretic (franjo.juretic@c-fields.com)
-     \\/     M anipulation  | Copyright (C) Creative Fields, Ltd.
+  \\      /  F ield         | foam-extend: Open Source CFD
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
-    This file is part of cfMesh.
+    This file is part of foam-extend.
 
-    cfMesh is free software; you can redistribute it and/or modify it
+    foam-extend is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 3 of the License, or (at your
+    Free Software Foundation, either version 3 of the License, or (at your
     option) any later version.
 
-    cfMesh is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with cfMesh.  If not, see <http://www.gnu.org/licenses/>.
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Description
 
@@ -69,7 +69,7 @@ inline faceListPMG::~faceListPMG()
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-            
+
 inline label faceListPMG::size() const
 {
     return nElmts_;
@@ -85,7 +85,7 @@ inline void faceListPMG::setSize(const label nElmts)
             faceList copy(label(1.5*nElmts));
             for(label i=0;i<nElmts_;++i)
                 copy[i].transfer(this->operator[](i));
-            
+
             faceList::transfer(copy);
         }
         else
@@ -128,11 +128,11 @@ inline void faceListPMG::operator=(const faceList& fcs)
     forAll(fcs, fI)
         this->operator[](fI) = fcs[fI];
 }
-    
+
 inline Ostream& operator<<(Ostream& os, const faceListPMG& fcs)
 {
     SubList<face> f(fcs, fcs.nElmts_, 0);
-    
+
     os << f;
     return os;
 }
@@ -142,7 +142,7 @@ inline Istream& operator>>(Istream& is, faceListPMG& fcs)
     faceList& faces = static_cast<faceList&>(fcs);
     is >> faces;
     fcs.nElmts_  = faces.size();
-    
+
     return is;
 }
 

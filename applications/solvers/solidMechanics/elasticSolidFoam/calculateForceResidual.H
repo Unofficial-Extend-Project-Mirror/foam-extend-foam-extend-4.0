@@ -6,14 +6,14 @@
   forAll(mesh.boundary(), patchi)
     {
       netForce +=
-	sum(
-	    mesh.Sf().boundaryField()[patchi]
-	    &
-	    (
-	     2*mu.boundaryField()[patchi]*symm(gradU.boundaryField()[patchi])
-	     + lambda*tr(gradU.boundaryField()[patchi])*I
-	     )
-	    );
+    sum(
+        mesh.Sf().boundaryField()[patchi]
+        &
+        (
+         2*mu.boundaryField()[patchi]*symm(gradU.boundaryField()[patchi])
+         + lambda*tr(gradU.boundaryField()[patchi])*I
+         )
+        );
     }
   forceResidual = mag(netForce);
 }

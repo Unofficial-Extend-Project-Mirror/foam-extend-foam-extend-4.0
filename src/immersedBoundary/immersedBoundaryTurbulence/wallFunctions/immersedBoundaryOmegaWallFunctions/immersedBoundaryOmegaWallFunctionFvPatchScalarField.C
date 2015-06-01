@@ -1,26 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
-   \\    /   O peration     |
-    \\  /    A nd           | Copyright held by original author
-     \\/     M anipulation  |
+  \\      /  F ield         | foam-extend: Open Source CFD
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of foam-extend.
 
-    OpenFOAM is free software; you can redistribute it and/or modify it
+    foam-extend is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 2 of the License, or (at your
+    Free Software Foundation, either version 3 of the License, or (at your
     option) any later version.
 
-    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenFOAM; if not, write to the Free Software Foundation,
-    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 \*---------------------------------------------------------------------------*/
 
@@ -258,8 +257,8 @@ void immersedBoundaryOmegaWallFunctionFvPatchScalarField::updateCoeffs()
         if (yPlusSample > yPlusLam)
         {
             // Calculate tauW from log-law using k and U at sampling point
-            
-	    tauW = UtanOld[ibCellI]*Cmu25*sqrt(k[ibCellI])*kappa_
+
+            tauW = UtanOld[ibCellI]*Cmu25*sqrt(k[ibCellI])*kappa_
                   /log(E_*yPlusSample);
         }
         else
@@ -288,12 +287,12 @@ void immersedBoundaryOmegaWallFunctionFvPatchScalarField::updateCoeffs()
             G[ibc[ibCellI]] =
                 sqr((nutw + nuLam)*magGradUw[ibCellI])/
                 (Cmu25*sqrt(k[ibCellI])*kappa_*y[ibCellI]);
-            
-	    // Compute k at the IB cell  
-            kNew[ibCellI] = tauW/Cmu50;  // equilibrium boundary layer
-	    //            kNew[ibCellI] = k[ibCellI];  // zero-Gradient (less stable)
 
-	    // Compute omega at the IB cell 
+            // Compute k at the IB cell
+            kNew[ibCellI] = tauW/Cmu50;  // equilibrium boundary layer
+            // kNew[ibCellI] = k[ibCellI];  // zero-Gradient (less stable)
+
+            // Compute omega at the IB cell
             omegaNew[ibCellI] = sqrt(kNew[ibCellI])/(Cmu25*kappa_*y[ibCellI]);
 
             // Log-Law for tangential velocity  - uTau = Cmu25*sqrt(kNew)
@@ -313,7 +312,7 @@ void immersedBoundaryOmegaWallFunctionFvPatchScalarField::updateCoeffs()
             // quadratic fit
             kNew[ibCellI] = k[ibCellI]*sqr(yPlusIB/yPlusLam);
 
-	    // Compute omega at the IB cell 
+            // Compute omega at the IB cell
             omegaNew[ibCellI] = 6.0*nu[ibCellI]/(beta1_*sqr(y[ibCellI]));
 
             // Laminar sub-layer for tangential velocity: uPlus = yPlus

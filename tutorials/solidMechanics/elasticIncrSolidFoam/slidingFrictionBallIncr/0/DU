@@ -1,8 +1,8 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | foam-extend: Open Source CFD                    |
-|  \\    /   O peration     | Version:     3.1                                |
-|   \\  /    A nd           | Web:         http://www.extend-project.de       |
+|  \\    /   O peration     | Version:     3.2                                |
+|   \\  /    A nd           | Web:         http://www.foam-extend.org         |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 FoamFile
@@ -32,53 +32,54 @@ boundaryField
     bottomBrickUp
     {
         type                 solidContact;
-	master               yes;
-	contactActive        yes;
-	rigidMaster          no;
-	shadowPatch          topBrickDown;
-	interpolationMethod  ggi;
-	//interpolationMethod  patchToPatch;
-	projectionAlgo       visible;
-	projectionDir        contactSphere;
-	correctionFrequency  10;
-	normalContactModel   standardPenalty;;
-	standardPenaltyNormalModelDict
-	  {
-	    penaltyScale          1;
-	    relaxationFactor      0.01;
-	    infoFrequency         10;
-	    limitPenetration      no;
-	    penetrationLimit      -0.03;
-	    limitPressure         no;
-	    pressureLimit         1e9;
-	    correctMissedVertices yes;
-	    distanceMethod        point;
-	    oscillationCorrection yes;
-	    smoothingSteps        1;
-	  }
-	frictionContactModel   standardPenalty;
-	standardPenaltyFrictionModelDict
-	  {
-	    penaltyScale          0.5;
-	    relaxationFactor      0.1;
-	    infoFrequency         10;
-	    oscillationCorrection yes;
-	    smoothingSteps        1;
-	    frictionLaw           coulomb;
-	    frictionLawDict
-	      {
-		frictionCoeff  0.3;
-	      }
-	  }
-	value                uniform (0 0 0);
+        master               yes;
+        contactActive        yes;
+        rigidMaster          no;
+        shadowPatch          topBrickDown;
+        interpolationMethod  ggi;
+        //interpolationMethod  patchToPatch;
+        projectionAlgo       visible;
+        projectionDir        contactSphere;
+        correctionFrequency  10;
+        normalContactModel   standardPenalty;;
+        standardPenaltyNormalModelDict
+        {
+            penaltyScale          1;
+            relaxationFactor      0.01;
+            infoFrequency         10;
+            limitPenetration      no;
+            penetrationLimit      -0.03;
+            limitPressure         no;
+            pressureLimit         1e9;
+            correctMissedVertices yes;
+            distanceMethod        point;
+            oscillationCorrection yes;
+            smoothingSteps        1;
+        }
+        frictionContactModel   standardPenalty;
+        standardPenaltyFrictionModelDict
+        {
+            penaltyScale          0.5;
+            relaxationFactor      0.1;
+            infoFrequency         10;
+            oscillationCorrection yes;
+            smoothingSteps        1;
+            frictionLaw           coulomb;
+            frictionLawDict
+            {
+                frictionCoeff  0.3;
+            }
+        }
+
+        value                uniform (0 0 0);
     }
 
     topBrickDown
     {
         type                 solidContact;
-	master               no;
-	contactActive        yes;
-	shadowPatch          bottomBrickUp;
+        master               no;
+        contactActive        yes;
+        shadowPatch          bottomBrickUp;
         value                uniform (0 0 0);
     }
 
@@ -113,7 +114,7 @@ boundaryField
     topBrickRight
     {
         type            solidTraction;
-	traction        uniform ( 0 0 0 );
+        traction        uniform ( 0 0 0 );
         pressure        uniform 0;
         value           uniform (0 0 0);
     }

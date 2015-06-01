@@ -36,8 +36,8 @@
             IOobject::NO_READ,
             IOobject::NO_WRITE
         ),
-	mesh,
-	dimensionedVector("zero", dimless, vector::zero)
+        mesh,
+        dimensionedVector("zero", dimless, vector::zero)
     );
 
     Info<< "Creating field U\n" << endl;
@@ -59,15 +59,15 @@
     (
         IOobject
         (
-	 "DEpsilon",
-	 runTime.timeName(),
-	 mesh,
-	 IOobject::READ_IF_PRESENT,
-	 IOobject::AUTO_WRITE
-	 ),
+            "DEpsilon",
+            runTime.timeName(),
+            mesh,
+            IOobject::READ_IF_PRESENT,
+            IOobject::AUTO_WRITE
+        ),
         mesh,
         dimensionedSymmTensor("zero", dimless, symmTensor::zero)
-     );
+    );
 
     volSymmTensorField DSigma
     (
@@ -111,23 +111,23 @@
         dimensionedSymmTensor("zero", dimForce/dimArea, symmTensor::zero)
     );
 
-      volVectorField divDSigmaExp
-      (
+    volVectorField divDSigmaExp
+    (
         IOobject
         (
-         "divDSigmaExp",
-         runTime.timeName(),
-         mesh,
-         IOobject::NO_READ,
-         IOobject::NO_WRITE
-         ),
+            "divDSigmaExp",
+            runTime.timeName(),
+            mesh,
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        ),
         mesh,
         dimensionedVector("zero", dimForce/dimVolume, vector::zero)
-       );
+    );
 
-constitutiveModel rheology(sigma, DU);
+    constitutiveModel rheology(sigma, DU);
     //solidInterface interface(mesh, rheology);
-//     solidInterface* interfacePtr = new solidInterface(mesh, rheology);
+    //solidInterface* interfacePtr = new solidInterface(mesh, rheology);
 
     surfaceVectorField traction
     (
@@ -143,8 +143,8 @@ constitutiveModel rheology(sigma, DU);
         dimensionedVector("zero", dimForce/dimArea, vector::zero)
     );
 
-  // for aitken relaxation
-   volVectorField aitkenDelta
+    // for aitken relaxation
+    volVectorField aitkenDelta
     (
         IOobject
         (
@@ -155,8 +155,9 @@ constitutiveModel rheology(sigma, DU);
             IOobject::NO_WRITE
         ),
         mesh,
-	dimensionedVector("zero", dimLength, vector::zero)
+        dimensionedVector("zero", dimLength, vector::zero)
     );
-// aitken relaxation factor
-scalar aitkenInitialRes = 1.0;
-scalar aitkenTheta = 0.1;
+
+    // aitken relaxation factor
+    scalar aitkenInitialRes = 1.0;
+    scalar aitkenTheta = 0.1;

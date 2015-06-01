@@ -79,12 +79,12 @@
     // Check mesh motion solver type
     bool feMotionSolver =
         mesh.objectRegistry::foundObject<tetPointVectorField>
-	    (
+        (
             "motionU"
-	    );
+        );
     bool fvMotionSolver =
         mesh.objectRegistry::foundObject<pointVectorField>
-	    (
+        (
             "pointMotionU"
         );
 
@@ -94,7 +94,7 @@
     (
         DU.boundaryField()[solidPatchID].type()
      != solidTractionFvPatchVectorField::typeName
-	//!= tractionDisplacementIncrementFvPatchVectorField::typeName
+    //!= tractionDisplacementIncrementFvPatchVectorField::typeName
     )
     {
         FatalErrorIn(args.executable())
@@ -102,8 +102,8 @@
                 <<  " is "
                 << DU.boundaryField()[solidPatchID].type()
                 << "for fluid -solid interface patch, instead "
-	        << solidTractionFvPatchVectorField::typeName
-	        //<< tractionDisplacementIncrementFvPatchVectorField::typeName
+            << solidTractionFvPatchVectorField::typeName
+            //<< tractionDisplacementIncrementFvPatchVectorField::typeName
                 << abort(FatalError);
     }
 

@@ -1,25 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | cfMesh: A library for mesh generation
-   \\    /   O peration     |
-    \\  /    A nd           | Author: Franjo Juretic (franjo.juretic@c-fields.com)
-     \\/     M anipulation  | Copyright (C) Creative Fields, Ltd.
+  \\      /  F ield         | foam-extend: Open Source CFD
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
-    This file is part of cfMesh.
+    This file is part of foam-extend.
 
-    cfMesh is free software; you can redistribute it and/or modify it
+    foam-extend is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 3 of the License, or (at your
+    Free Software Foundation, either version 3 of the License, or (at your
     option) any later version.
 
-    cfMesh is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with cfMesh.  If not, see <http://www.gnu.org/licenses/>.
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
     partTet
@@ -54,7 +54,7 @@ class Ostream;
 class partTet
 {
 protected:
-    
+
     // Protected data
         label data_[4];
 
@@ -89,9 +89,9 @@ public:
             inline label c() const;
 
             inline label d() const;
-            
+
             inline label size() const;
-            
+
         // Searches
             //- find position of the node in the partTet
             inline label whichPosition(const label) const;
@@ -115,25 +115,25 @@ public:
             //- Return volume
             template<class PointField>
             inline scalar mag(const PointField&) const;
-            
+
             //- Return circum-centre
             template<class PointField>
             inline point crcmCentre(const PointField&) const;
-            
+
             template<class PointField>
             inline scalar crcmRadius(const PointField&) const;
-            
+
             //- Return centroid of the tetrahedron
             template<class PointField>
             inline point centroid(const PointField&) const;
-            
+
             //- Return edges
             edgeList edges() const;
-            
+
     // Member operators
-    
+
             inline label operator[](const label) const;
-            
+
             inline void operator=(const partTet&);
 
     // IOstream operators

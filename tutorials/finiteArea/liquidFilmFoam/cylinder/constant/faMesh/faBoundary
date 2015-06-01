@@ -1,8 +1,8 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | foam-extend: Open Source CFD                    |
-|  \\    /   O peration     | Version:     3.1                                |
-|   \\  /    A nd           | Web:         http://www.extend-project.de       |
+|  \\    /   O peration     | Version:     3.2                                |
+|   \\  /    A nd           | Web:         http://www.foam-extend.org         |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 FoamFile
@@ -20,7 +20,7 @@ FoamFile
     inlet
     {
         type            patch;
-        edgeLabels      List<label> 
+        edgeLabels      List<label>
 30
 (
 4020
@@ -60,7 +60,7 @@ FoamFile
     outlet
     {
         type            patch;
-        edgeLabels      List<label> 
+        edgeLabels      List<label>
 30
 (
 3929
@@ -100,7 +100,7 @@ FoamFile
     side
     {
         type            patch;
-        edgeLabels      List<label> 
+        edgeLabels      List<label>
 60
 (
 3940
@@ -170,7 +170,7 @@ FoamFile
     symmetry
     {
         type            symmetryPlane;
-        edgeLabels      List<label> 
+        edgeLabels      List<label>
 60
 (
 3891
@@ -240,7 +240,7 @@ FoamFile
     cylinder
     {
         type            patch;
-        edgeLabels      List<label> 
+        edgeLabels      List<label>
 40
 (
 3890

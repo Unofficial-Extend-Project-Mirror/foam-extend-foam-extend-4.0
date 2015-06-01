@@ -1,8 +1,8 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                |
-| \\      /  F ield         | cfMesh: A library for mesh generation          | 
+| \\      /  F ield         | cfMesh: A library for mesh generation          |
 |  \\    /   O peration     |                                                |
-|   \\  /    A nd           | Author: Franjo Juretic                         | 
+|   \\  /    A nd           | Author: Franjo Juretic                         |
 |    \\/     M anipulation  | E-mail: franjo.juretic@c-fields.com            |
 \*---------------------------------------------------------------------------*/
 
@@ -30,7 +30,7 @@ localRefinement
     "orifice01.*"
     {
         cellSize 0.1;
-    } 
+    }
 
     "orifice02.*"
     {
@@ -64,7 +64,7 @@ boundaryLayers
             allowDiscontinuity 0;
         }
 
-    	"fixedWalls.*"
+        "fixedWalls.*"
         {
             nLayers           4;
 
@@ -75,7 +75,7 @@ boundaryLayers
             allowDiscontinuity 0;
         }
 
-	"tubes.*"
+        "tubes.*"
         {
             nLayers           4;
 
@@ -90,8 +90,8 @@ boundaryLayers
 
 renameBoundary
 {
-    defaultName		fixedWalls;
-    defaultType		wall;
+    defaultName fixedWalls;
+    defaultType wall;
 
     newPatchNames
     {
@@ -108,6 +108,6 @@ renameBoundary
         }
     }
 }
-               
-     
+
+
 // ************************************************************************* //

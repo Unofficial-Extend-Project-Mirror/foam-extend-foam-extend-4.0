@@ -24,8 +24,8 @@
             IOobject::READ_IF_PRESENT,
             IOobject::AUTO_WRITE
         ),
-	mesh,
-	dimensionedVector("zero", dimLength, vector::zero)
+        mesh,
+        dimensionedVector("zero", dimLength, vector::zero)
     );
 
     volTensorField gradU
@@ -38,8 +38,8 @@
             IOobject::READ_IF_PRESENT,
             IOobject::AUTO_WRITE
         ),
-	mesh,
-	dimensionedTensor("zero", dimless, tensor::zero)
+        mesh,
+        dimensionedTensor("zero", dimless, tensor::zero)
     );
 
     //- increment of Green finite strain tensor
@@ -53,8 +53,8 @@
             IOobject::READ_IF_PRESENT,
             IOobject::AUTO_WRITE
         ),
-	mesh,
-	dimensionedSymmTensor("zero", dimless, symmTensor::zero)
+        mesh,
+        dimensionedSymmTensor("zero", dimless, symmTensor::zero)
     );
 
     //- Green strain tensor
@@ -68,8 +68,8 @@
             IOobject::READ_IF_PRESENT,
             IOobject::AUTO_WRITE
         ),
-	mesh,
-	dimensionedSymmTensor("zero", dimless, symmTensor::zero)
+        mesh,
+        dimensionedSymmTensor("zero", dimless, symmTensor::zero)
     );
 
 
@@ -99,8 +99,8 @@
             IOobject::READ_IF_PRESENT,
             IOobject::AUTO_WRITE
         ),
-	mesh,
-	dimensionedSymmTensor("zero", dimForce/dimArea, symmTensor::zero)
+        mesh,
+        dimensionedSymmTensor("zero", dimForce/dimArea, symmTensor::zero)
     );
 
     constitutiveModel rheology(sigma, DU);

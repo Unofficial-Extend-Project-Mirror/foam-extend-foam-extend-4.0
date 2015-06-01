@@ -1,8 +1,8 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM Extend Project: Open source CFD        |
-|  \\    /   O peration     | Version:  1.6-ext                               |
-|   \\  /    A nd           | Web:      www.extend-project.de                 |
+| \\      /  F ield         | foam-extend: Open Source CFD                    |
+|  \\    /   O peration     | Version:     3.2                                |
+|   \\  /    A nd           | Web:         http://www.foam-extend.org         |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 FoamFile
@@ -34,7 +34,7 @@ boundaryField
     upperWall
     {
         type            calculated;
-        value           nonuniform List<scalar> 
+        value           nonuniform List<scalar>
 223
 (
 7.47386
@@ -266,7 +266,7 @@ boundaryField
     lowerWall
     {
         type            calculated;
-        value           nonuniform List<scalar> 
+        value           nonuniform List<scalar>
 250
 (
 5.2557
@@ -527,6 +527,5 @@ boundaryField
         type            empty;
     }
 }
-
 
 // ************************************************************************* //
