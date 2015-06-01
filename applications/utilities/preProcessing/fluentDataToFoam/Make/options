@@ -1,5 +1,11 @@
+ifneq ($(FLEX_DIR), "")
+EXE_INC = \
+    -I$(FLEX_DIR)/include \
+    -I$(LIB_SRC)/finiteVolume/lnInclude
+else
 EXE_INC = \
     -I$(LIB_SRC)/finiteVolume/lnInclude
+endif
 
 EXE_LIBS = \
     -lfiniteVolume

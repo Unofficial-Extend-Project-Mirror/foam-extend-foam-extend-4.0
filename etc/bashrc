@@ -80,6 +80,34 @@ export WM_PROJECT_USER_DIR=$HOME/$WM_PROJECT/$USER-$WM_PROJECT_VERSION
 #: ${WM_THIRD_PARTY_DIR=$WM_PROJECT_INST_DIR/ThirdParty-$WM_PROJECT_VERSION}; export WM_THIRD_PARTY_DIR
 export WM_THIRD_PARTY_DIR=$WM_PROJECT_DIR/ThirdParty
 
+# Enabling the usage of third-party software
+# This can be overriden in prefs.sh
+# Use 'set' and 'unset' to adjust for your environent
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# For AllMake.stage1
+export WM_THIRD_PARTY_USE_CMAKE_322=1
+
+#
+# For AllMake.stage2
+export WM_THIRD_PARTY_USE_OPENMPI_184=1
+
+#
+# For AllMake.stage3
+export WM_THIRD_PARTY_USE_METIS_510=1
+export WM_THIRD_PARTY_USE_PARMGRIDGEN_10=1
+export WM_THIRD_PARTY_USE_LIBCCMIO_261=1
+export WM_THIRD_PARTY_USE_MESQUITE_212=1
+export WM_THIRD_PARTY_USE_SCOTCH_604=1
+export WM_THIRD_PARTY_USE_PARMETIS_403=1
+export WM_THIRD_PARTY_USE_PYFOAM_064=1
+export WM_THIRD_PARTY_USE_HWLOC_1101=1
+
+#
+# For AllMake.stage4
+#export WM_THIRD_PARTY_USE_QT_486=1
+#export WM_THIRD_PARTY_USE_PARAVIEW_431=1
+
+
 # Source files, possibly with some verbosity
 _foamSource()
 {
@@ -255,8 +283,10 @@ Darwin)
     ;;
     esac
 
+    # Using MacPorts
+    : ${MACOSX_MACPORTS_ROOT:='/opt/local/etc/macports'}; export MACOSX_MACPORTS_ROOT
     which -s port >/dev/null
-    if [ $? -eq "0" -a -d '/opt/local/etc/macports' ]
+    if [ $? -eq "0" ]  && [ -d "$MACOSX_MACPORTS_ROOT" ]
     then
 	if [ "$FOAM_VERBOSE" -a "$PS1" ]
 	then
@@ -355,8 +385,7 @@ Darwin)
 	    unset ruleDir ruleDirBase
 	fi
     else
-        export WM_COMPILER=Gcc
-        export WM_MPLIB=OPENMPI
+        echo "Warning: You are not using MacPorts. Make sure your compilation and MPI environment is correctly initialized"
     fi
 
     # Make sure that binaries use the best features of the used OS-Version

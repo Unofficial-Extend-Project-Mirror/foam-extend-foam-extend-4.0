@@ -28,7 +28,7 @@
 #     RPM spec file for creating a relocatable RPM
 #
 # Author:
-#     Hrvoje Jasak, Wikki Ltd. (2015)
+#     Martin Beaudoin, Hydro-Quebec, (2015)
 #
 #------------------------------------------------------------------------------
 
@@ -94,21 +94,41 @@ Group: 			Development/Tools
     [ -n "$WM_CXXFLAGS" ]   &&  export CXXFLAGS="$WM_CXXFLAGS"
     [ -n "$WM_LDFLAGS" ]    &&  export LDFLAGS="$WM_LDFLAGS"
 
-    GMP_VERSION=gmp-5.1.2
-    MPFR_VERSION=mpfr-3.1.2
-    MPC_VERSION=mpc-1.0.1
+    # Download prequisite libraries
+    ./contrib/download_prerequisites
 
+    # Create working directory
     mkdir ./objBuildDir
     cd ./objBuildDir
 
+%ifos darwin
+    # Couple of fixes for OSX Yosemite and Xcode 6.3.1 
+    # See here : http://lists.gnu.org/archive/html/libtool-patches/2014-09/msg00001.html
+    # and here : https://gcc.gnu.org/bugzilla/show_bug.cgi?id=63610
+    # for the details.
+    # Hopefully, this will all be resolved soon before MACOSX_DEPLOYMENT_TARGET=10.11...
+    if [ "$MACOSX_DEPLOYMENT_TARGET" = "10.10" ]
+    then
+	export MACOSX_DEPLOYMENT_TARGET="10.9"
+    fi
+
+    # Another necessary fix:
+    # Use 'bootstrap-debug' build configuration to force stripping of object
+    # files prior to comparison during bootstrap (broken by Xcode 6.3).
+    # Fix taken from HomeBrew and MacPorts projects
     ../configure     \
-        --prefix=%{_installPrefix}  \
-        --enable-languages=c,c++  \
-        --enable-shared           \
-        --disable-multilib        \
-	--with-mpc=$WM_THIRD_PARTY_DIR/packages/$MPC_VERSION/platforms/$WM_OPTIONS \
-	--with-gmp=$WM_THIRD_PARTY_DIR/packages/$GMP_VERSION/platforms/$WM_OPTIONS \
-	--with-mpfr=$WM_THIRD_PARTY_DIR/packages/$MPFR_VERSION/platforms/$WM_OPTIONS
+        --prefix=%{_installPrefix} \
+        --enable-languages=c,c++   \
+        --enable-shared            \
+        --with-build-config=bootstrap-debug \
+	--disable-multilib
+%else
+    ../configure     \
+        --prefix=%{_installPrefix} \
+        --enable-languages=c,c++   \
+        --enable-shared            \
+	--disable-multilib
+%endif
 
     [ -z "$WM_NCOMPPROCS" ] && WM_NCOMPPROCS=1
     make -j $WM_NCOMPPROCS

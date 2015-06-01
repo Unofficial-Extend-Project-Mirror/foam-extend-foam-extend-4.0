@@ -22,13 +22,13 @@
 #     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 #
 # Script
-#     RPM spec file for ParaView-4.3.1
+#     RPM spec file for ParaView-4.3.1_Server
 #
 # Description
 #     RPM spec file for creating a relocatable RPM
 #
 # Authors:
-#     Martin Beaudoin, Hydro-Quebec, (2010)
+#     Martin Beaudoin, Hydro-Quebec, (2010, 2015)
 #     Andreas Feymark, Chalmers University of Technology, (2013)
 #
 #------------------------------------------------------------------------------
@@ -36,13 +36,11 @@
 # We grab the value of WM_THIRD_PARTY and WM_OPTIONS from the environment variable
 %{expand:%%define _WM_THIRD_PARTY_DIR %(echo $WM_THIRD_PARTY_DIR)}
 %{expand:%%define _WM_OPTIONS         %(echo $WM_OPTIONS)}
+%{expand:%%define _MPI_ARCH_PATH      %(echo $MPI_ARCH_PATH)}
+%{expand:%%define _MESA_DIR           %(echo $MESA_DIR)}
 
 # Disable the generation of debuginfo packages
 %define debug_package %{nil}
-
-# Turning off the Fascist build policy
-# Useful for debugging the install section
-%define _unpackaged_files_terminate_build 0
 
 # The topdir needs to point to the $WM_THIRD_PARTY/rpmbuild directory
 %define _topdir	 	%{_WM_THIRD_PARTY_DIR}/rpmBuild
@@ -67,7 +65,7 @@
 
 %define name		ParaView
 %define release		%{_WM_OPTIONS}
-%define version 	4.3.1
+%define version 	4.3.1_Server
 
 %define buildroot       %{_topdir}/BUILD/%{name}-%{version}-root
 
@@ -78,10 +76,10 @@ Name: 			%{name}
 Version: 		%{version}
 Release: 		%{release}
 URL:                    http://www.paraview.org/files/v4.3/
-Source: 		%url/%{name}-v%{version}-source.tar.gz
+Source: 		%url/%{name}-v4.3.1-source.tar.gz
 Prefix: 		%{_prefix}
 Group: 			Development/Tools
-Patch0:                 ParaView-4.3.1.patch_darwin
+Patch0:                 ParaView-v4.3.1.patch_darwin
 
 %define _installPrefix  %{_prefix}/packages/%{name}-%{version}/platforms/%{_WM_OPTIONS}
 
@@ -107,11 +105,12 @@ Patch0:                 ParaView-4.3.1.patch_darwin
 %{summary}
 
 %prep
-%setup -q -n %{name}-v%{version}-source
+%setup -q -n %{name}-v4.3.1-source
 
 %ifos darwin
 %patch0 -p1
 %endif
+
 
 %build
 #
@@ -119,6 +118,7 @@ Patch0:                 ParaView-4.3.1.patch_darwin
 #
     addCMakeVariable()
     {
+        echo "Adding: $1" 
         while [ -n "$1" ]
         do
             CMAKE_VARIABLES="$CMAKE_VARIABLES -D$1"
@@ -153,23 +153,20 @@ Patch0:                 ParaView-4.3.1.patch_darwin
     addCMakeVariable  CMAKE_BUILD_TYPE:STRING=Release
     addCMakeVariable  BUILD_TESTING:BOOL=OFF
 
-    # We build with Python. This is ust too useful
+    # Setings specific to ParaView server
+    addCMakeVariable  PARAVIEW_USE_MPI=ON
+    addCMakeVariable  PARAVIEW_BUILD_QT_GUI=OFF
+    addCMakeVariable  VTK_USE_X=OFF
+    addCMakeVariable  OPENGL_INCLUDE_DIR=%{_MESA_DIR}
+    addCMakeVariable  OPENGL_gl_LIBRARY=%{_MESA_DIR}/lib/libOSMesa.so
+    addCMakeVariable  VTK_OPENGL_HAS_OSMESA=ON
+
+    # We build with Python. This is just too useful
     addCMakeVariable  PARAVIEW_ENABLE_PYTHON:BOOL=ON
 
-    # include development files in "make install"
-    addCMakeVariable  PARAVIEW_INSTALL_DEVELOPMENT_FILES:BOOL=ON
-
-%ifos darwin
-    # Additional installation rules for Mac OSX 
-    addCMakeVariable  PARAVIEW_EXTRA_INSTALL_RULES_FILE:FILEPATH=%{_topdir}/BUILD/%{name}-v%{version}-source/Applications/ParaView-4.3.1_extra_install_Darwin.cmake
-
-    # We activate the new Unix-style installation for Mac OS X
-    addCMakeVariable PARAVIEW_DO_UNIX_STYLE_INSTALLS:BOOL=ON
-
-    # Recent version of Mac OSX (Yosemite) cannot compile ParaView with the gcc compiler
-    # Using clang instead
-    CC=clang
-    CXX=clang++
+ %ifos darwin
+    # Additional installation rules for Mac OS X 
+    addCMakeVariable  PARAVIEW_EXTRA_INSTALL_RULES_FILE:FILEPATH=%{_topdir}/BUILD/%{name}-%{version}/Applications/ParaView-3.8.1_extra_install_Darwin.cmake
 %endif
 
     # Add the value of _qmakePath for QT_QMAKE_EXECUTABLE
@@ -201,15 +198,6 @@ Patch0:                 ParaView-4.3.1.patch_darwin
 
     cd buildObj
     make install DESTDIR=$RPM_BUILD_ROOT
-
-%ifos darwin
-    # Cleaning up some strange install side effect from option
-    # PARAVIEW_DO_UNIX_STYLE_INSTALLS
-    # Need to revisit this section eventually.
-    if [ -d "$RPM_BUILD_ROOT/$RPM_BUILD_ROOT" ]; then
-        mv $RPM_BUILD_ROOT/$RPM_BUILD_ROOT/%{_installPrefix}/bin/* $RPM_BUILD_ROOT/%{_installPrefix}/bin
-    fi
-%endif
 
     # Creation of foam-extend specific .csh and .sh files"
 
@@ -292,5 +280,4 @@ DOT_CSH_EOF
 %files
 %defattr(-,root,root)
 %{_installPrefix}
-
 

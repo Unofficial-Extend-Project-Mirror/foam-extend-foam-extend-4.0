@@ -51,10 +51,19 @@ echo ========================================
 echo
 
 # QT
+uninstallPackage qt-everywhere-opensource-src-4.8.6 $1
 uninstallPackage qt-everywhere-opensource-src-4.7.4 $1
 
 # ParaView
-uninstallPackage ParaView-3.12.0 $1
+uninstallPackage ParaView-4.0.1 $1
+uninstallPackage ParaView-4.1.0 $1
+uninstallPackage ParaView-4.3.1 $1
+
+# ParaView-Server
+uninstallPackage llvm-3.6.0
+uninstallPackage mesa-git
+uninstallPackage ParaView-4.1.0_Server
+uninstallPackage ParaView-4.3.1_Server
 
 echo
 echo ========================================

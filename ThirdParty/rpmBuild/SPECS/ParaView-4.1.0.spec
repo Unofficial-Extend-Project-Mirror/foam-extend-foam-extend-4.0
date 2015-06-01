@@ -22,7 +22,7 @@
 #     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 #
 # Script
-#     RPM spec file for ParaView-4.3.1
+#     RPM spec file for ParaView-4.1.0
 #
 # Description
 #     RPM spec file for creating a relocatable RPM
@@ -39,10 +39,6 @@
 
 # Disable the generation of debuginfo packages
 %define debug_package %{nil}
-
-# Turning off the Fascist build policy
-# Useful for debugging the install section
-%define _unpackaged_files_terminate_build 0
 
 # The topdir needs to point to the $WM_THIRD_PARTY/rpmbuild directory
 %define _topdir	 	%{_WM_THIRD_PARTY_DIR}/rpmBuild
@@ -67,7 +63,7 @@
 
 %define name		ParaView
 %define release		%{_WM_OPTIONS}
-%define version 	4.3.1
+%define version 	4.1.0
 
 %define buildroot       %{_topdir}/BUILD/%{name}-%{version}-root
 
@@ -77,11 +73,11 @@ License: 		Unkown
 Name: 			%{name}
 Version: 		%{version}
 Release: 		%{release}
-URL:                    http://www.paraview.org/files/v4.3/
+URL:                    http://www.paraview.org/files/v4.1/
 Source: 		%url/%{name}-v%{version}-source.tar.gz
 Prefix: 		%{_prefix}
 Group: 			Development/Tools
-Patch0:                 ParaView-4.3.1.patch_darwin
+Patch0:                 ParaView-4.1.0.patch_darwin
 
 %define _installPrefix  %{_prefix}/packages/%{name}-%{version}/platforms/%{_WM_OPTIONS}
 
@@ -107,7 +103,7 @@ Patch0:                 ParaView-4.3.1.patch_darwin
 %{summary}
 
 %prep
-%setup -q -n %{name}-v%{version}-source
+%setup -q -n %{name}-v%{version}
 
 %ifos darwin
 %patch0 -p1
@@ -149,7 +145,8 @@ Patch0:                 ParaView-4.3.1.patch_darwin
     set -x
 
     # start with these general settings
-    addCMakeVariable  BUILD_SHARED_LIBS:BOOL=ON
+    addCMakeVariable  VTK_USE_TK:BOOL=OFF
+    addCMakeVariable  BUILD_SHARED_LIBS:BOOL=ON  VTK_USE_RPATH:BOOL=OFF
     addCMakeVariable  CMAKE_BUILD_TYPE:STRING=Release
     addCMakeVariable  BUILD_TESTING:BOOL=OFF
 
@@ -159,17 +156,12 @@ Patch0:                 ParaView-4.3.1.patch_darwin
     # include development files in "make install"
     addCMakeVariable  PARAVIEW_INSTALL_DEVELOPMENT_FILES:BOOL=ON
 
-%ifos darwin
-    # Additional installation rules for Mac OSX 
-    addCMakeVariable  PARAVIEW_EXTRA_INSTALL_RULES_FILE:FILEPATH=%{_topdir}/BUILD/%{name}-v%{version}-source/Applications/ParaView-4.3.1_extra_install_Darwin.cmake
+    # new alternative to "make HTMLDocumentation"
+    addCMakeVariable  PARAVIEW_GENERATE_PROXY_DOCUMENTATION:BOOL=ON
 
-    # We activate the new Unix-style installation for Mac OS X
-    addCMakeVariable PARAVIEW_DO_UNIX_STYLE_INSTALLS:BOOL=ON
-
-    # Recent version of Mac OSX (Yosemite) cannot compile ParaView with the gcc compiler
-    # Using clang instead
-    CC=clang
-    CXX=clang++
+ %ifos darwin
+    # Additional installation rules for Mac OS X 
+    addCMakeVariable  PARAVIEW_EXTRA_INSTALL_RULES_FILE:FILEPATH=%{_topdir}/BUILD/%{name}-%{version}/Applications/ParaView-3.8.1_extra_install_Darwin.cmake
 %endif
 
     # Add the value of _qmakePath for QT_QMAKE_EXECUTABLE
@@ -202,15 +194,6 @@ Patch0:                 ParaView-4.3.1.patch_darwin
     cd buildObj
     make install DESTDIR=$RPM_BUILD_ROOT
 
-%ifos darwin
-    # Cleaning up some strange install side effect from option
-    # PARAVIEW_DO_UNIX_STYLE_INSTALLS
-    # Need to revisit this section eventually.
-    if [ -d "$RPM_BUILD_ROOT/$RPM_BUILD_ROOT" ]; then
-        mv $RPM_BUILD_ROOT/$RPM_BUILD_ROOT/%{_installPrefix}/bin/* $RPM_BUILD_ROOT/%{_installPrefix}/bin
-    fi
-%endif
-
     # Creation of foam-extend specific .csh and .sh files"
 
     echo ""
@@ -227,7 +210,7 @@ cat << DOT_SH_EOF > $RPM_BUILD_ROOT/%{_installPrefix}/etc/%{name}-%{version}.sh
 export PARAVIEW_DIR=\$WM_THIRD_PARTY_DIR/packages/%{name}-%{version}/platforms/\$WM_OPTIONS
 export PARAVIEW_BIN_DIR=\$PARAVIEW_DIR/bin
 export PARAVIEW_LIB_DIR=\$PARAVIEW_DIR/lib
-export PARAVIEW_INCLUDE_DIR=\$PARAVIEW_DIR/include/paraview-4.3
+export PARAVIEW_INCLUDE_DIR=\$PARAVIEW_DIR/include/paraview-4.1
 
 export PARAVIEW_VERSION=%{version}
 
@@ -238,7 +221,7 @@ export PARAVIEW_VERSION=%{version}
 #     startup of paraview or even make paraview crash on startup.
 export PV_PLUGIN_PATH=\$FOAM_LIBBIN/paraview_plugins
 
-[ -d \$PARAVIEW_LIB_DIR/paraview-4.3 ] && _foamAddLib \$PARAVIEW_LIB_DIR/paraview-4.3
+[ -d \$PARAVIEW_LIB_DIR/paraview-4.1 ] && _foamAddLib \$PARAVIEW_LIB_DIR/paraview-4.1
 
 # Enable access to the package applications if present
 [ -d \$PARAVIEW_BIN_DIR ] && _foamAddPath \$PARAVIEW_BIN_DIR
@@ -257,7 +240,7 @@ cat << DOT_CSH_EOF > $RPM_BUILD_ROOT/%{_installPrefix}/etc/%{name}-%{version}.cs
 setenv PARAVIEW_DIR \$WM_THIRD_PARTY_DIR/packages/%{name}-%{version}/platforms/\$WM_OPTIONS
 setenv PARAVIEW_BIN_DIR \$PARAVIEW_DIR/bin
 setenv PARAVIEW_LIB_DIR \$PARAVIEW_DIR/lib
-setenv PARAVIEW_INCLUDE_DIR \$PARAVIEW_DIR/include/paraview-4.3
+setenv PARAVIEW_INCLUDE_DIR \$PARAVIEW_DIR/include/paraview-4.1
 
 setenv PARAVIEW_VERSION %{version}
 
@@ -272,8 +255,8 @@ if ( -e \$PARAVIEW_BIN_DIR ) then
     _foamAddPath \$PARAVIEW_BIN_DIR
 endif
 
-if ( -e \$PARAVIEW_LIB_DIR/paraview-4.3 ) then
-    _foamAddLib \$PARAVIEW_LIB_DIR/paraview-4.3
+if ( -e \$PARAVIEW_LIB_DIR/paraview-4.1 ) then
+    _foamAddLib \$PARAVIEW_LIB_DIR/paraview-4.1
 endif
 
 
@@ -292,5 +275,4 @@ DOT_CSH_EOF
 %files
 %defattr(-,root,root)
 %{_installPrefix}
-
 

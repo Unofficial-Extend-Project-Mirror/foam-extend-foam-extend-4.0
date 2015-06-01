@@ -22,13 +22,13 @@
 #     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 #
 # Script
-#     RPM spec file for openmpi-1.6.3
+#     RPM spec file for openmpi-1.8.4
 #
 # Description
 #     RPM spec file for creating a relocatable RPM
 #
 # Author:
-#     Martin Beaudoin, Hydro-Quebec, (2013)
+#     Martin Beaudoin, Hydro-Quebec, (2015)
 #
 #------------------------------------------------------------------------------
 
@@ -62,7 +62,7 @@
 
 %define name		openmpi
 %define release		%{_WM_OPTIONS}
-%define version 	1.6.5
+%define version 	1.8.4
 
 %define buildroot       %{_topdir}/BUILD/%{name}-%{version}-root
 
@@ -72,7 +72,7 @@ License: 		Unkown
 Name: 			%{name}
 Version: 		%{version}
 Release: 		%{release}
-URL:                    http://www.open-mpi.org/software/ompi/v1.6/downloads
+URL:                    http://www.open-mpi.org/software/ompi/v1.8/downloads
 Source: 		%url/%{name}-%{version}.tar.gz
 Prefix: 		%{_prefix}
 Group: 			Development/Tools
@@ -137,10 +137,10 @@ Group: 			Development/Tools
         --enable-mpirun-prefix-by-default \
         --enable-orterun-prefix-by-default \
         --enable-shared \
+        --enable-mpi-cxx \
 	--disable-static \
         --disable-mpi-f77 \
         --disable-mpi-f90 \
-        --disable-mpi-cxx \
         --without-slurm \
         --enable-mpi-profile $mpiWith \
         --disable-vt \
