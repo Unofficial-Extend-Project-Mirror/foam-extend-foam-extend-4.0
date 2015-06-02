@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
-    \\  /    A nd           | Web:         http://www.foam-extend.org
-     \\/     M anipulation  | For copyright notice see file Copyright
+   \\    /   O peration     |
+    \\  /    A nd           | For copyright notice see file Copyright
+     \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -23,16 +23,14 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "alphaContactAngleFvPatchScalarField.H"
+#include "multiphaseAlphaContactAngleFvPatchScalarField.H"
 #include "addToRunTimeSelectionTable.H"
 #include "fvPatchFieldMapper.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-namespace Foam
-{
-
-alphaContactAngleFvPatchScalarField::interfaceThetaProps::interfaceThetaProps
+Foam::multiphaseAlphaContactAngleFvPatchScalarField::
+interfaceThetaProps::interfaceThetaProps
 (
     Istream& is
 )
@@ -44,10 +42,10 @@ alphaContactAngleFvPatchScalarField::interfaceThetaProps::interfaceThetaProps
 {}
 
 
-Istream& operator>>
+Foam::Istream& Foam::operator>>
 (
     Istream& is,
-    alphaContactAngleFvPatchScalarField::interfaceThetaProps& tp
+    multiphaseAlphaContactAngleFvPatchScalarField::interfaceThetaProps& tp
 )
 {
     is >> tp.theta0_ >> tp.uTheta_ >> tp.thetaA_ >> tp.thetaR_;
@@ -55,10 +53,11 @@ Istream& operator>>
 }
 
 
-Ostream& operator<<
+Foam::Ostream& Foam::operator<<
 (
     Ostream& os,
-    const alphaContactAngleFvPatchScalarField::interfaceThetaProps& tp
+    const
+    multiphaseAlphaContactAngleFvPatchScalarField::interfaceThetaProps& tp
 )
 {
     os  << tp.theta0_ << token::SPACE
@@ -72,7 +71,8 @@ Ostream& operator<<
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-alphaContactAngleFvPatchScalarField::alphaContactAngleFvPatchScalarField
+Foam::multiphaseAlphaContactAngleFvPatchScalarField::
+multiphaseAlphaContactAngleFvPatchScalarField
 (
     const fvPatch& p,
     const DimensionedField<scalar, volMesh>& iF
@@ -82,9 +82,10 @@ alphaContactAngleFvPatchScalarField::alphaContactAngleFvPatchScalarField
 {}
 
 
-alphaContactAngleFvPatchScalarField::alphaContactAngleFvPatchScalarField
+Foam::multiphaseAlphaContactAngleFvPatchScalarField::
+multiphaseAlphaContactAngleFvPatchScalarField
 (
-    const alphaContactAngleFvPatchScalarField& gcpsf,
+    const multiphaseAlphaContactAngleFvPatchScalarField& gcpsf,
     const fvPatch& p,
     const DimensionedField<scalar, volMesh>& iF,
     const fvPatchFieldMapper& mapper
@@ -95,7 +96,8 @@ alphaContactAngleFvPatchScalarField::alphaContactAngleFvPatchScalarField
 {}
 
 
-alphaContactAngleFvPatchScalarField::alphaContactAngleFvPatchScalarField
+Foam::multiphaseAlphaContactAngleFvPatchScalarField::
+multiphaseAlphaContactAngleFvPatchScalarField
 (
     const fvPatch& p,
     const DimensionedField<scalar, volMesh>& iF,
@@ -109,9 +111,10 @@ alphaContactAngleFvPatchScalarField::alphaContactAngleFvPatchScalarField
 }
 
 
-alphaContactAngleFvPatchScalarField::alphaContactAngleFvPatchScalarField
+Foam::multiphaseAlphaContactAngleFvPatchScalarField::
+multiphaseAlphaContactAngleFvPatchScalarField
 (
-    const alphaContactAngleFvPatchScalarField& gcpsf,
+    const multiphaseAlphaContactAngleFvPatchScalarField& gcpsf,
     const DimensionedField<scalar, volMesh>& iF
 )
 :
@@ -122,7 +125,11 @@ alphaContactAngleFvPatchScalarField::alphaContactAngleFvPatchScalarField
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-void alphaContactAngleFvPatchScalarField::write(Ostream& os) const
+void
+Foam::multiphaseAlphaContactAngleFvPatchScalarField::write
+(
+    Ostream& os
+) const
 {
     fvPatchScalarField::write(os);
     os.writeKeyword("thetaProperties")
@@ -133,9 +140,14 @@ void alphaContactAngleFvPatchScalarField::write(Ostream& os) const
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-makePatchTypeField(fvPatchScalarField, alphaContactAngleFvPatchScalarField);
+namespace Foam
+{
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+makePatchTypeField
+(
+    fvPatchScalarField,
+    multiphaseAlphaContactAngleFvPatchScalarField
+);
 
 } // End namespace Foam
 

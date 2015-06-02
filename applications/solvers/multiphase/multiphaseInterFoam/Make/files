@@ -1,5 +1,5 @@
 multiphaseMixture/phase/phase.C
-multiphaseMixture/alphaContactAngle/alphaContactAngleFvPatchScalarField.C
+multiphaseMixture/multiphaseAlphaContactAngle/multiphaseAlphaContactAngleFvPatchScalarField.C
 multiphaseMixture/multiphaseMixture.C
 multiphaseInterFoam.C
 

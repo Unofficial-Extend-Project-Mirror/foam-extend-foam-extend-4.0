@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
-    \\  /    A nd           | Web:         http://www.foam-extend.org
-     \\/     M anipulation  | For copyright notice see file Copyright
+   \\    /   O peration     |
+    \\  /    A nd           | For copyright notice see file Copyright
+     \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -22,19 +22,19 @@ License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    Foam::alphaContactAngleFvPatchScalarField
+    Foam::multiphaseAlphaContactAngleFvPatchScalarField
 
 Description
     Contact-angle boundary condition for multi-phase interface-capturing
     simulations.  Used in conjuction with multiphaseMixture.
 
 SourceFiles
-    alphaContactAngleFvPatchScalarField.C
+    multiphaseAlphaContactAngleFvPatchScalarField.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef alphaContactAngleFvPatchScalarField_H
-#define alphaContactAngleFvPatchScalarField_H
+#ifndef multiphaseAlphaContactAngleFvPatchScalarField_H
+#define multiphaseAlphaContactAngleFvPatchScalarField_H
 
 #include "zeroGradientFvPatchFields.H"
 #include "multiphaseMixture.H"
@@ -45,10 +45,10 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class alphaContactAngleFvPatch Declaration
+            Class multiphaseAlphaContactAngleFvPatch Declaration
 \*---------------------------------------------------------------------------*/
 
-class alphaContactAngleFvPatchScalarField
+class multiphaseAlphaContactAngleFvPatchScalarField
 :
     public zeroGradientFvPatchScalarField
 {
@@ -132,31 +132,32 @@ private:
 public:
 
     //- Runtime type information
-    TypeName("alphaContactAngle");
+    TypeName("multiphaseAlphaContactAngle");
 
 
     // Constructors
 
         //- Construct from patch and internal field
-        alphaContactAngleFvPatchScalarField
+        multiphaseAlphaContactAngleFvPatchScalarField
         (
             const fvPatch&,
             const DimensionedField<scalar, volMesh>&
         );
 
         //- Construct from patch, internal field and dictionary
-        alphaContactAngleFvPatchScalarField
+        multiphaseAlphaContactAngleFvPatchScalarField
         (
             const fvPatch&,
             const DimensionedField<scalar, volMesh>&,
             const dictionary&
         );
 
-        //- Construct by mapping given alphaContactAngleFvPatchScalarField
+        //- Construct by mapping given
+        //  multiphaseAlphaContactAngleFvPatchScalarField
         //  onto a new patch
-        alphaContactAngleFvPatchScalarField
+        multiphaseAlphaContactAngleFvPatchScalarField
         (
-            const alphaContactAngleFvPatchScalarField&,
+            const multiphaseAlphaContactAngleFvPatchScalarField&,
             const fvPatch&,
             const DimensionedField<scalar, volMesh>&,
             const fvPatchFieldMapper&
@@ -167,14 +168,14 @@ public:
         {
             return tmp<fvPatchScalarField>
             (
-                new alphaContactAngleFvPatchScalarField(*this)
+                new multiphaseAlphaContactAngleFvPatchScalarField(*this)
             );
         }
 
         //- Construct as copy setting internal field reference
-        alphaContactAngleFvPatchScalarField
+        multiphaseAlphaContactAngleFvPatchScalarField
         (
-            const alphaContactAngleFvPatchScalarField&,
+            const multiphaseAlphaContactAngleFvPatchScalarField&,
             const DimensionedField<scalar, volMesh>&
         );
 
@@ -186,7 +187,7 @@ public:
         {
             return tmp<fvPatchScalarField>
             (
-                new alphaContactAngleFvPatchScalarField(*this, iF)
+                new multiphaseAlphaContactAngleFvPatchScalarField(*this, iF)
             );
         }
 
