@@ -114,7 +114,7 @@ void Foam::leastSquaresVectors::makeLeastSquaresVectors() const
     // Set up temporary storage for the dd tensor (before inversion)
     symmTensorField dd(mesh().nCells(), symmTensor::zero);
 
-    forAll(owner, faceI)
+    forAll (owner, faceI)
     {
         label own = owner[faceI];
         label nei = neighbour[faceI];
@@ -126,18 +126,18 @@ void Foam::leastSquaresVectors::makeLeastSquaresVectors() const
         dd[nei] += wdd;
     }
 
-    forAll(lsP.boundaryField(), patchI)
+    forAll (lsP.boundaryField(), patchI)
     {
         const fvPatch& p = mesh().boundary()[patchI];
-        const unallocLabelList& faceCells = p.patch().faceCells();
+        const unallocLabelList& fc = p.patch().faceCells();
 
         // Better version of d-vectors: Zeljko Tukovic, 25/Apr/2010
         const vectorField pd = p.delta();
 
-        forAll(pd, patchFaceI)
+        forAll (pd, pFaceI)
         {
-            const vector& d = pd[patchFaceI];
-            dd[faceCells[patchFaceI]] += (1.0/magSqr(d))*sqr(d);
+            const vector& d = pd[pFaceI];
+            dd[fc[pFaceI]] += (1.0/magSqr(d))*sqr(d);
         }
     }
 
@@ -155,9 +155,12 @@ void Foam::leastSquaresVectors::makeLeastSquaresVectors() const
         ),
         mesh(),
         dimensionedSymmTensor("zero", dimless, symmTensor::zero),
-        "zeroGradient"
+        zeroGradientFvPatchScalarField::typeName
     );
     symmTensorField& invDd = volInvDd.internalField();
+
+    // Invert least squares matrix using Householder transformations to avoid
+    // badly posed cells
 //    invDd = inv(dd);
     invDd = hinv(dd);
 
@@ -166,7 +169,11 @@ void Foam::leastSquaresVectors::makeLeastSquaresVectors() const
     volInvDd.boundaryField().evaluateCoupled();
 
     // Revisit all faces and calculate the lsP and lsN vectors
-    forAll(owner, faceI)
+    vectorField& lsPIn = lsP.internalField();
+    vectorField& lsNIn = lsN.internalField();
+
+    // Least squares vectors on internal faces
+    forAll (owner, faceI)
     {
         label own = owner[faceI];
         label nei = neighbour[faceI];
@@ -174,16 +181,17 @@ void Foam::leastSquaresVectors::makeLeastSquaresVectors() const
         vector d = C[nei] - C[own];
         scalar magSfByMagSqrd = 1.0/magSqr(d);
 
-        lsP[faceI] = magSfByMagSqrd*(invDd[own] & d);
-        lsN[faceI] = -magSfByMagSqrd*(invDd[nei] & d);
+        lsPIn[faceI] = magSfByMagSqrd*(invDd[own] & d);
+        lsNIn[faceI] = -magSfByMagSqrd*(invDd[nei] & d);
     }
 
-    forAll(lsP.boundaryField(), patchI)
+    // Least squares vectors on boundary faces
+    forAll (lsP.boundaryField(), patchI)
     {
         fvsPatchVectorField& patchLsP = lsP.boundaryField()[patchI];
         fvsPatchVectorField& patchLsN = lsN.boundaryField()[patchI];
         const fvPatch& p = mesh().boundary()[patchI];
-        const unallocLabelList& faceCells = p.faceCells();
+        const unallocLabelList& fc = p.faceCells();
 
         // Better version of d-vectors: Zeljko Tukovic, 25/Apr/2010
         const vectorField pd = p.delta();
@@ -193,25 +201,22 @@ void Foam::leastSquaresVectors::makeLeastSquaresVectors() const
             const symmTensorField invDdNei =
                 volInvDd.boundaryField()[patchI].patchNeighbourField();
 
-            forAll(pd, patchFaceI)
+            forAll (pd, pFaceI)
             {
-                const vector& d = pd[patchFaceI];
+                const vector& d = pd[pFaceI];
 
-                patchLsP[patchFaceI] = (1.0/magSqr(d))
-                   *(invDd[faceCells[patchFaceI]] & d);
+                patchLsP[pFaceI] = (1.0/magSqr(d))*(invDd[fc[pFaceI]] & d);
 
-                patchLsN[patchFaceI] = - (1.0/magSqr(d))
-                   *(invDdNei[patchFaceI] & d);
+                patchLsN[pFaceI] = - (1.0/magSqr(d))*(invDdNei[pFaceI] & d);
             }
         }
         else
         {
-            forAll(pd, patchFaceI)
+            forAll (pd, pFaceI)
             {
-                const vector& d = pd[patchFaceI];
+                const vector& d = pd[pFaceI];
 
-                patchLsP[patchFaceI] = (1.0/magSqr(d))
-                   *(invDd[faceCells[patchFaceI]] & d);
+                patchLsP[pFaceI] = (1.0/magSqr(d))*(invDd[fc[pFaceI]] & d);
             }
         }
     }
