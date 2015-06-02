@@ -1,0 +1,40 @@
+diff -ruN scotch_6.0.4_orig/src/Make.inc/Makefile.inc.i686_mac_darwin10.shlib scotch_6.0.4/src/Make.inc/Makefile.inc.i686_mac_darwin10.shlib
+--- scotch_6.0.4_orig/src/Make.inc/Makefile.inc.i686_mac_darwin10.shlib	1969-12-31 19:00:00.000000000 -0500
++++ scotch_6.0.4/src/Make.inc/Makefile.inc.i686_mac_darwin10.shlib	2015-06-01 23:50:39.279536328 -0400
+@@ -0,0 +1,22 @@
++EXE	=
++LIB	= .dylib
++OBJ	= .o
++
++MAKE	= make
++AR	= gcc
++ARFLAGS	= -shared  -dynamiclib -undefined dynamic_lookup -o
++
++CAT	= cat
++CCS	= gcc
++CCP     = mpicc
++CCD     = mpicc
++CFLAGS	= -O3 -fPIC -DCOMMON_TIMING_OLD -Drestrict=__restrict -DCOMMON_FILE_COMPRESS_GZ -DCOMMON_PTHREAD -DCOMMON_RANDOM_FIXED_SEED -DSCOTCH_PTHREAD -DSCOTCH_RENAME
++LDFLAGS	= -lz -lm
++LIBLDFLAGS	= -dynamiclib -undefined dynamic_lookup
++CP	= cp
++LEX	= flex
++LN	= ln
++MKDIR	= mkdir
++MV	= mv
++RANLIB	= ranlib
++YACC	= bison -y
+diff -ruN scotch_6.0.4_orig/src/Make.inc/Makefile.inc.i686_pc_linux2.shlib scotch_6.0.4/src/Make.inc/Makefile.inc.i686_pc_linux2.shlib
+--- scotch_6.0.4_orig/src/Make.inc/Makefile.inc.i686_pc_linux2.shlib	2014-08-05 08:56:17.000000000 -0400
++++ scotch_6.0.4/src/Make.inc/Makefile.inc.i686_pc_linux2.shlib	2015-06-01 23:58:05.463559948 -0400
+@@ -8,8 +8,8 @@
+ CAT		= cat
+ CCS		= gcc
+ CCP		= mpicc
+-CCD		= gcc
+-CFLAGS		= -O3 -DCOMMON_FILE_COMPRESS_GZ -DCOMMON_PTHREAD -DCOMMON_RANDOM_FIXED_SEED -DSCOTCH_RENAME -DSCOTCH_PTHREAD -Drestrict=__restrict
++CCD		= mpicc -I$(MPI_HOME)/include
++CFLAGS		= -O3 -DCOMMON_FILE_COMPRESS_GZ -DCOMMON_PTHREAD -DCOMMON_RANDOM_FIXED_SEED -DSCOTCH_RENAME -DSCOTCH_PTHREAD -Drestrict=__restrict -Xlinker --no-as-needed
+ CLIBFLAGS	= -shared -fPIC
+ LDFLAGS		= -lz -lm -pthread
+ CP		= cp

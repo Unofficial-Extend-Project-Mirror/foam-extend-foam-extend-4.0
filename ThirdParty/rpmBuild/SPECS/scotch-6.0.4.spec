@@ -72,7 +72,7 @@ Name: 			%{name}
 Version: 		%{version}
 Release: 		%{release}
 URL:                    https://gforge.inria.fr/frs/download.php/31831
-Source: 		%url/%{name}-%{version}.tar.gz
+Source: 		%url/%{name}_%{version}.tar.gz
 Prefix: 		%{_prefix}
 Group: 			Development/Tools
 Patch0:         scotch-6.0.4_patch_0
