@@ -54,8 +54,18 @@ ListInfoControlSwitches;
 extern ListInfoControlSwitches* infoSwitchValues_;
 
 class infoSwitch
-    : public controlSwitches<int>
+:
+    public controlSwitches<int>
 {
+    // Private member functions
+
+        //- Disallow construct as copy
+        infoSwitch(const infoSwitch&);
+
+        //- Disallow default bitwise assignment
+        void operator=(const infoSwitch&);
+
+
 public:
 
     // Constructors

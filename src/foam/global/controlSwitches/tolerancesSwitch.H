@@ -58,6 +58,15 @@ class tolerancesSwitch
 :
     public controlSwitches<scalar>
 {
+    // Private member functions
+
+        //- Disallow construct as copy
+        tolerancesSwitch(const tolerancesSwitch&);
+
+        //- Disallow default bitwise assignment
+        void operator=(const tolerancesSwitch&);
+
+
 public:
 
     // Constructors

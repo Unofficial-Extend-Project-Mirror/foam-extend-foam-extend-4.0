@@ -39,20 +39,6 @@ namespace debug
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-template<class Type>
-Foam::debug::controlSwitches<Type>::controlSwitches()
-:
-    switchValue_(Type(0)),
-    switchDescription_("")
-{}
-
-template<class T>
-Foam::debug::controlSwitches<T>::controlSwitches(const T& switchValue)
-:
-    switchValue_(switchValue)
-{}
-
-
 template<class T>
 Foam::debug::controlSwitches<T>::controlSwitches
 (
@@ -101,19 +87,6 @@ Foam::debug::controlSwitches<T>::controlSwitches
 }
 
 
-template<class T>
-Foam::debug::controlSwitches<T>::controlSwitches
-(
-    const debug::controlSwitches<T>& csw
-)
-:
-    switchName_(csw.switchName_),
-    switchValue_(csw.switchValue_),
-    switchDescription_(csw.switchDescription_)
-{}
-
-
-
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
 template<class T>
@@ -137,37 +110,7 @@ Foam::debug::controlSwitches<T>::~controlSwitches()
 }
 
 
-// * * * * * * * * * * * * * * Member Operators  * * * * * * * * * * * * * * //
-
-template<class T>
-void Foam::debug::controlSwitches<T>::operator=
-(
-    const debug::controlSwitches<T>& rhs
-)
-{
-    // Check for assignment to self
-    if (this == &rhs)
-    {
-        std::cerr
-            << "Foam::debug::controlSwitches<T>::operator="
-            << "(const Foam::controlSwitches<T>&)"
-            << "--> FOAM FATAL ERROR: "
-            << "Attempted assignment to self"
-            << std::endl;
-
-        std::abort();
-
-        exit(-1);
-    }
-    else
-    {
-        switchValue_ = rhs.switchValue_;
-        switchDescription_ = rhs.switchDescription_;
-    }
-}
-
-
-// * * * * * * * * * * * * * * * *  IOStream operators * * * * * * * * * * * //
+// * * * * * * * * * * * * * * * IOstream Operators  * * * * * * * * * * * * //
 
 template<class T>
 void printControlSwitches

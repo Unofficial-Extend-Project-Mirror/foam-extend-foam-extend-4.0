@@ -78,7 +78,7 @@ public:
 
     operator boolType() const
     {
-        return (static_cast<const T*>(this))->boolean_test()
+        return (static_cast<const T*>(this))->test()
             ? &safeBoolBase::thisTypeDoesNotSupportComparisons : 0;
     }
 
