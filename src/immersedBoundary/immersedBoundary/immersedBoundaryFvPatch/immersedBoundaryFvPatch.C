@@ -1127,7 +1127,7 @@ void Foam::immersedBoundaryFvPatch::makeIbCellCells() const
     // Note: the algorithm is originally written with inward-facing normals
     // and subsequently changed: IB surface normals point outwards
     // HJ, 21/May/2012
-    const vectorField& ibn = ibNormals();
+//     const vectorField& ibn = ibNormals();
 
     forAll (cellCells, cellI)
     {
@@ -1152,8 +1152,8 @@ void Foam::immersedBoundaryFvPatch::makeIbCellCells() const
             // Collect the cells within rM of the fitting cell
             if (r <= rM[cellI])
             {
-                scalar angleLimit =
-                    -Foam::cos(angleFactor_()*mathematicalConstant::pi/180);
+//                 scalar angleLimit =
+//                     -Foam::cos(angleFactor_()*mathematicalConstant::pi/180);
 
                 vector dir = (C[curCell] - ibp[cellI]);
                 dir /= mag(dir) + SMALL;
