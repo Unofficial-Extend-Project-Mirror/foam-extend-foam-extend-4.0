@@ -269,7 +269,8 @@ const Foam::debug::optimisationSwitch
 Foam::Pstream::defaultCommsType
 (
     "commsType",
-    "blocking",
+    "scheduled",
+//     "blocking",
     "blocking, nonBlocking, scheduled"
 );
 
