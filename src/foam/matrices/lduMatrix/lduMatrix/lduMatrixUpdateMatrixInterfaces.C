@@ -54,7 +54,10 @@ void Foam::lduMatrix::initMatrixInterfaces
                     *this,
                     coupleCoeffs[interfaceI],
                     cmpt,
-                    static_cast<Pstream::commsTypes>(Pstream::defaultCommsType()),
+                    static_cast<Pstream::commsTypes>
+                    (
+                        Pstream::defaultCommsType()
+                    ),
                     switchToLhs
                 );
             }
@@ -68,8 +71,8 @@ void Foam::lduMatrix::initMatrixInterfaces
         // beyond the end of the schedule which only handles "normal" patches
         for
         (
-            label interfaceI=patchSchedule.size()/2;
-            interfaceI<interfaces.size();
+            label interfaceI = patchSchedule.size()/2;
+            interfaceI < interfaces.size();
             interfaceI++
         )
         {
@@ -185,8 +188,8 @@ void Foam::lduMatrix::updateMatrixInterfaces
         // beyond the end of the schedule which only handles "normal" patches
         for
         (
-            label interfaceI=patchSchedule.size()/2;
-            interfaceI<interfaces.size();
+            label interfaceI = patchSchedule.size()/2;
+            interfaceI < interfaces.size();
             interfaceI++
         )
         {
