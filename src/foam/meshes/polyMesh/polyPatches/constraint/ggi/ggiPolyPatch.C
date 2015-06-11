@@ -902,7 +902,11 @@ void Foam::ggiPolyPatch::calcTransforms() const
 
     if (debug > 1 && master())
     {
-        if (patchToPatch().uncoveredMasterFaces().size() > 0)
+        if
+        (
+            !empty()
+         && patchToPatch().uncoveredMasterFaces().size() > 0
+        )
         {
             // Write uncovered master faces
             Info<< "Writing uncovered master faces for patch "
@@ -925,7 +929,11 @@ void Foam::ggiPolyPatch::calcTransforms() const
             );
         }
 
-        if (patchToPatch().uncoveredSlaveFaces().size() > 0)
+        if
+        (
+            !shadow().empty()
+         && patchToPatch().uncoveredSlaveFaces().size() > 0
+        )
         {
             // Write uncovered master faces
             Info<< "Writing uncovered shadow faces for patch "
@@ -935,7 +943,11 @@ void Foam::ggiPolyPatch::calcTransforms() const
 
             fileName fvPath(mesh.time().path()/"VTK");
             mkDir(fvPath);
-
+            Pout<< "shadow().localFaces(): " << shadow().localFaces().size()
+                << " patchToPatch().uncoveredSlaveFaces().size(): "
+                << patchToPatch().uncoveredSlaveFaces().size()
+                << " shadow().localPoints(): " << shadow().localPoints().size()
+                << endl;
             indirectPrimitivePatch::writeVTK
             (
                 fvPath/fileName("uncoveredGgiFaces" + shadowName()),
@@ -953,11 +965,17 @@ void Foam::ggiPolyPatch::calcTransforms() const
         {
             if
             (
-                patchToPatch().uncoveredMasterFaces().size() > 0
-             || patchToPatch().uncoveredSlaveFaces().size() > 0
+                (
+                    patchToPatch().uncoveredMasterFaces().size() > 0
+                    && !empty()
+                )
+             || (
+                    !shadow().empty()
+                 && patchToPatch().uncoveredSlaveFaces().size() > 0
+                )
             )
             {
-                FatalErrorIn("label ggiPolyPatch::shadowIndex() const")
+                FatalErrorIn("label ggiPolyPatch::calcTransforms() const")
                     << "ggi patch " << name() << " with shadow "
                     << shadowName() << " has "
                     << patchToPatch().uncoveredMasterFaces().size()
@@ -969,14 +987,14 @@ void Foam::ggiPolyPatch::calcTransforms() const
         }
         else
         {
-            InfoIn("label ggiPolyPatch::shadowIndex() const")
+            InfoIn("label ggiPolyPatch::calcTransforms() const")
                 << "ggi patch " << name() << " with shadow "
                 << shadowName() << " has "
                 << patchToPatch().uncoveredMasterFaces().size()
                 << " uncovered master faces and "
                 << patchToPatch().uncoveredSlaveFaces().size()
                 << " uncovered slave faces.  Bridging is switched on. "
-                << abort(FatalError);
+                << endl;
         }
     }
 }
