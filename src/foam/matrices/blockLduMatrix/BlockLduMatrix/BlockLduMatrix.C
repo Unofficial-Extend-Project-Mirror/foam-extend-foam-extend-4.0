@@ -351,35 +351,54 @@ Foam::Ostream& Foam::operator<<(Ostream& os, const BlockLduMatrix<Type>& ldum)
     else
     {
         // Dummy write for consistency
-        os.writeKeyword("diagonal")  << typename BlockLduMatrix<Type>::TypeCoeffField
-            (ldum.lduAddr().size()) << token::END_STATEMENT << nl;
+        os.writeKeyword("diagonal")
+            << typename BlockLduMatrix<Type>::TypeCoeffField
+               (
+                   ldum.lduAddr().size()
+               )
+            << token::END_STATEMENT << nl;
     }
 
     if (ldum.upperPtr_)
     {
-        os.writeKeyword("upper")  << *ldum.upperPtr_ <<  token::END_STATEMENT << nl;
+        os.writeKeyword("upper")
+            << *ldum.upperPtr_
+            << token::END_STATEMENT << nl;
     }
     else
     {
         // Dummy write for consistency
-        os.writeKeyword("upper")  << typename BlockLduMatrix<Type>::TypeCoeffField
-            (ldum.lduAddr().lowerAddr().size()) <<  token::END_STATEMENT << nl;
+        os.writeKeyword("upper")
+            << typename BlockLduMatrix<Type>::TypeCoeffField
+               (
+                   ldum.lduAddr().lowerAddr().size()
+               )
+            <<  token::END_STATEMENT << nl;
     }
 
     if (ldum.lowerPtr_)
     {
-        os.writeKeyword("lower")  << *ldum.lowerPtr_ <<  token::END_STATEMENT << nl;
+        os.writeKeyword("lower")
+            << *ldum.lowerPtr_ <<  token::END_STATEMENT << nl;
     }
     else
     {
         // Dummy write for consistency
-        os.writeKeyword("lower")  << typename BlockLduMatrix<Type>::TypeCoeffField
-            (ldum.lduAddr().lowerAddr().size()) <<  token::END_STATEMENT << nl;
+        os.writeKeyword("lower")
+            << typename BlockLduMatrix<Type>::TypeCoeffField
+               (
+                   ldum.lduAddr().lowerAddr().size()
+               )
+            <<  token::END_STATEMENT << nl;
     }
 
-    os.writeKeyword("coupleUpper") << ldum.coupleUpper_ << token::END_STATEMENT << endl;
+    os.writeKeyword("coupleUpper")
+        << ldum.coupleUpper_
+        << token::END_STATEMENT << endl;
 
-    os.writeKeyword("coupleLower") << ldum.coupleLower_ << token::END_STATEMENT << endl;
+    os.writeKeyword("coupleLower")
+        << ldum.coupleLower_
+        << token::END_STATEMENT << endl;
 
     os.check("Ostream& operator<<(Ostream&, const BlockLduMatrix<Type>&");
 

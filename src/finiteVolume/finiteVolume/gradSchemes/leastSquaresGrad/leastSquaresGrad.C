@@ -94,7 +94,7 @@ leastSquaresGrad<Type>::grad
     const unallocLabelList& own = mesh.owner();
     const unallocLabelList& nei = mesh.neighbour();
 
-    forAll(own, facei)
+    forAll (own, facei)
     {
         register label ownFaceI = own[facei];
         register label neiFaceI = nei[facei];
@@ -106,7 +106,7 @@ leastSquaresGrad<Type>::grad
     }
 
     // Boundary faces
-    forAll(vsf.boundaryField(), patchi)
+    forAll (vsf.boundaryField(), patchi)
     {
         const fvsPatchVectorField& patchOwnLs = ownLs.boundaryField()[patchi];
 
@@ -118,7 +118,7 @@ leastSquaresGrad<Type>::grad
             Field<Type> neiVsf =
                 vsf.boundaryField()[patchi].patchNeighbourField();
 
-            forAll(neiVsf, patchFaceI)
+            forAll (neiVsf, patchFaceI)
             {
                 lsGrad[faceCells[patchFaceI]] +=
                     patchOwnLs[patchFaceI]
@@ -129,7 +129,7 @@ leastSquaresGrad<Type>::grad
         {
             const fvPatchField<Type>& patchVsf = vsf.boundaryField()[patchi];
 
-            forAll(patchVsf, patchFaceI)
+            forAll (patchVsf, patchFaceI)
             {
                 lsGrad[faceCells[patchFaceI]] +=
                      patchOwnLs[patchFaceI]

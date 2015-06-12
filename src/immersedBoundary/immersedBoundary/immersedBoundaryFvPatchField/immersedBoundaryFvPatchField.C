@@ -39,7 +39,8 @@ template<class Type>
 const Foam::debug::optimisationSwitch
 immersedBoundaryFvPatchField<Type>::nBcIter_
 (
-    debug::optimisationSwitch("immersedBoundaryNBCIter", 5)
+    "immersedBoundaryNBCIter",
+    5
 );
 
 
@@ -251,7 +252,7 @@ immersedBoundaryFvPatchField<Type>::imposeDirichletCondition() const
 
         reduce(maxError, maxOp<scalar>());
     }
-    while (maxError > bcTolerance_() && counter < nBcIter_());
+    while (maxError > bcTolerance_ && counter < nBcIter_);
 
     if (counter == nBcIter_() && debug)
     {

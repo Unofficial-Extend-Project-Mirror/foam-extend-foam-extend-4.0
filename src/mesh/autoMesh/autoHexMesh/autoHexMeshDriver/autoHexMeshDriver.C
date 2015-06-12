@@ -158,9 +158,9 @@ Foam::autoHexMeshDriver::autoHexMeshDriver
     {
         meshRefinement::debug = debug_;
         autoHexMeshDriver::debug = debug_;
-        autoRefineDriver::debug = debug;
-        autoSnapDriver::debug = debug;
-        autoLayerDriver::debug = debug;
+        autoRefineDriver::debug = debug_;
+        autoSnapDriver::debug = debug_;
+        autoLayerDriver::debug = debug_;
     }
 
     refinementParameters refineParams(dict, 1);

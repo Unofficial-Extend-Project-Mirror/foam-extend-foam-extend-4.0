@@ -59,6 +59,15 @@ class constantsSwitch
 :
     public controlSwitches<scalar>
 {
+    // Private member functions
+
+        //- Disallow construct as copy
+        constantsSwitch(const constantsSwitch&);
+
+        //- Disallow default bitwise assignment
+        void operator=(const constantsSwitch&);
+
+
 public:
 
     // Constructors

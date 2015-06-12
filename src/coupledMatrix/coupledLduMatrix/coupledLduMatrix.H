@@ -128,7 +128,8 @@ public:
                 const lduInterfaceFieldPtrsListList& interfaces,
                 const FieldField<Field, scalar>& x,
                 FieldField<Field, scalar>& result,
-                const direction cmpt
+                const direction cmpt,
+                const bool switchToLhs = false
             ) const;
 
             //- Update coupled interfaces for matrix operations
@@ -138,7 +139,8 @@ public:
                 const lduInterfaceFieldPtrsListList& interfaces,
                 const FieldField<Field, scalar>& x,
                 FieldField<Field, scalar>& result,
-                const direction cmpt
+                const direction cmpt,
+                const bool switchToLhs = false
             ) const;
 
 };

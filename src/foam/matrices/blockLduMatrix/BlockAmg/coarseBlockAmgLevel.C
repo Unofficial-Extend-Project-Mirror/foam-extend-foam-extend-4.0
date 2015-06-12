@@ -222,7 +222,7 @@ void Foam::coarseBlockAmgLevel<Type>::solve
     }
 
     // Switch of debug in top-level direct solve
-    debug::debugSwitch oldDebug = BlockLduMatrix<Type>::debug;
+    label oldDebug = BlockLduMatrix<Type>::debug();
 
     if (BlockLduMatrix<Type>::debug >= 4)
     {

@@ -340,7 +340,8 @@ void Foam::coupledGaussSeidelPrecon::precondition
                 interfaces_,
                 x,
                 bPrime_,
-                cmpt
+                cmpt,
+                true         // switch to lhs
             );
 
             matrix_.updateMatrixInterfaces
@@ -349,7 +350,8 @@ void Foam::coupledGaussSeidelPrecon::precondition
                 interfaces_,
                 x,
                 bPrime_,
-                cmpt
+                cmpt,
+                true         // switch to lhs
             );
         }
 

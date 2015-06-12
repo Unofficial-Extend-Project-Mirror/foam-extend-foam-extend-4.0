@@ -103,6 +103,11 @@ Foam::labelList Foam::patchConstrainedDecomp::decompose
                 << abort(FatalError);
         }
 
+        Info<< "Putting patch named " << patchConstraints_[i].first()
+            << " index " << patchID
+            << " to processor " << procID
+            << endl;
+
         const labelList fc = mesh_.boundaryMesh()[patchID].faceCells();
 
         forAll (fc, fcI)

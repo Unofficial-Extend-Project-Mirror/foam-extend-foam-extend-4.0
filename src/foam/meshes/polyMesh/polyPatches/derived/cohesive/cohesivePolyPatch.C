@@ -119,7 +119,7 @@ bool cohesivePolyPatch::order
     labelList& rotation
 ) const
 {
-    // Grab faceMap from polyTopoChanger
+    // Grab faceMap
     SortableList<label> topoFaceMap(faceMap);
 
     faceMap.setSize(pp.size());

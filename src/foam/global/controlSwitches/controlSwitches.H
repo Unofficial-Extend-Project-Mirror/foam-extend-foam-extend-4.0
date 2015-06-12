@@ -231,15 +231,18 @@ class controlSwitches
             switchValuesTable_;
 
 
+    // Private member functions
+
+        //- Disallow construct as copy
+        controlSwitches(const controlSwitches<T>&);
+
+        //- Disallow default bitwise assignment
+        void operator=(const controlSwitches<T>&);
+
+
 public:
 
     // Constructors
-
-        //- Construct null
-        controlSwitches();
-
-        //- Construct from components
-        explicit controlSwitches(const T& data);
 
         controlSwitches
         (
@@ -251,9 +254,6 @@ public:
             switchesValues
         );
 
-        //- Construct as copy
-        controlSwitches(const controlSwitches&);
-
 
     //- Destructor
     ~controlSwitches();
@@ -262,7 +262,7 @@ public:
     // Member Functions
 
         // Check
-        bool boolean_test() const
+        bool test() const
         {
             // Perform Boolean logic here
             return switchValue_ != 0;
@@ -273,9 +273,6 @@ public:
 
         //- Assignement operator
         void operator=(const T&);
-
-        //- Assignement operator
-        void operator=(const controlSwitches&);
 
         //- & operator
         const T operator&(const T&);

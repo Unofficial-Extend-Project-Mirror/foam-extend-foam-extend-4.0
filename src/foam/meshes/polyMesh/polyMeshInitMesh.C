@@ -223,9 +223,11 @@ void Foam::polyMesh::initMesh()
 
     string meshInfo =
         "nPoints: " + Foam::name(nPoints())
-      + " nCells: " + Foam::name(this->nCells())
+      + " nAllPoints: " + Foam::name(allPoints().size())
+      + " nInternalFaces: " + Foam::name(nInternalFaces())
       + " nFaces: " + Foam::name(nFaces())
-      + " nInternalFaces: " + Foam::name(nInternalFaces());
+      + " nAllFaces: " + Foam::name(allFaces().size())
+      + " nCells: " + Foam::name(this->nCells());
 
     owner_.note() = meshInfo;
     neighbour_.note() = meshInfo;

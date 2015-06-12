@@ -58,6 +58,15 @@ class debugSwitch
 :
     public controlSwitches<int>
 {
+    // Private member functions
+
+        //- Disallow construct as copy
+        debugSwitch(const debugSwitch&);
+
+        //- Disallow default bitwise assignment
+        void operator=(const debugSwitch&);
+
+
 public:
 
     // Constructors

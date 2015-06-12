@@ -162,7 +162,7 @@ void Foam::ePsiThermo<MixtureType>::correct()
         Info<< "entering ePsiThermo<MixtureType>::correct()" << endl;
     }
 
-    // force the saving of the old-time values
+    // Force the saving of the old-time values
     this->psi_.oldTime();
 
     calculate();

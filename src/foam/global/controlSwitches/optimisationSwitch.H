@@ -59,6 +59,15 @@ class optimisationSwitch
 :
     public controlSwitches<int>
 {
+    // Private member functions
+
+        //- Disallow construct as copy
+        optimisationSwitch(const optimisationSwitch&);
+
+        //- Disallow default bitwise assignment
+        void operator=(const optimisationSwitch&);
+
+
 public:
 
     // Constructors
