@@ -71,7 +71,7 @@ License: 		Unkown
 Name: 			%{name}
 Version: 		%{version}
 Release: 		%{release}
-URL:                    https://gforge.inria.fr/frs/download.php/31831
+URL:            https://gforge.inria.fr/frs/download.php/file/34618/
 Source: 		%url/%{name}_%{version}.tar.gz
 Prefix: 		%{_prefix}
 Group: 			Development/Tools

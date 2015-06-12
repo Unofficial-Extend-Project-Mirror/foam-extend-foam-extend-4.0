@@ -77,8 +77,8 @@ then
     #
     [ ! -z "$WM_THIRD_PARTY_USE_PARMGRIDGEN_10" ] && {
 	echo "Building ParMGridGen 1.0"
-        ( rpm_make -p ParMGridGen-1.0 -s ParMGridGen-1.0.spec -u http://www.mgnet.org/mgnet/Codes/parmgridgen/ParMGridGen-1.0.tar.gz       )
-	#( rpm_make -p ParMGridGen-1.0 -s ParMGridGen-1.0.spec -u http://downloads.sourceforge.net/project/openfoam-extend/foam-extend-3.1/ThirdParty/ParMGridGen-1.0.tar.gz )
+        #( rpm_make -p ParMGridGen-1.0 -s ParMGridGen-1.0.spec -u http://www.mgnet.org/mgnet/Codes/parmgridgen/ParMGridGen-1.0.tar.gz       )
+	    ( rpm_make -p ParMGridGen-1.0 -s ParMGridGen-1.0.spec -u http://downloads.sourceforge.net/project/openfoam-extend/foam-extend-3.1/ThirdParty/ParMGridGen-1.0.tar.gz )
     }
 else
     echo "Using system installed ParMGridGen"
@@ -126,7 +126,8 @@ then
     #
     [ ! -z "$WM_THIRD_PARTY_USE_SCOTCH_604" ] && {
 	echo "Building Scotch 6.0.4"
-	( rpm_make -p scotch-6.0.4 -s scotch-6.0.4.spec -u http://gforge.inria.fr/frs/download.php/file/34618/scotch_6.0.4.tar.gz )
+	#( rpm_make -p scotch-6.0.4 -s scotch-6.0.4.spec -u http://gforge.inria.fr/frs/download.php/file/34618/scotch_6.0.4.tar.gz )
+	( rpm_make -p scotch-6.0.4 -s scotch-6.0.4.spec -u  http://downloads.sourceforge.net/project/openfoam-extend/foam-extend-3.1/ThirdParty/scotch_6.0.4.tar.gz )
     }
     # Scotch 6.0.0
     #
@@ -194,7 +195,8 @@ then
     #
     [ ! -z "$WM_THIRD_PARTY_USE_HWLOC_1101" ] && {
 	echo "Building hwloc 1.10.1"
-	( rpm_make -p hwloc-1.10.1 -s hwloc-1.10.1.spec  -u http://www.open-mpi.org/software/hwloc/v1.10/downloads/hwloc-1.10.1.tar.gz )
+    # ( rpm_make -p hwloc-1.10.1 -s hwloc-1.10.1.spec  -u http://www.open-mpi.org/software/hwloc/v1.10/downloads/hwloc-1.10.1.tar.gz )
+	( rpm_make -p hwloc-1.10.1 -s hwloc-1.10.1.spec  -u http://downloads.sourceforge.net/project/openfoam-extend/foam-extend-3.1/ThirdParty/hwloc-1.10.1.tar.gz )
     }
     # hwloc 1.7.2
     #
