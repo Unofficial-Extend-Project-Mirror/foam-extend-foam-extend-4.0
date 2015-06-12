@@ -4,6 +4,7 @@ crMatrix/crMatrix.C
 lduPrecon = lduPrecon
 $(lduPrecon)/CholeskyPrecon/CholeskyPrecon.C
 $(lduPrecon)/ILU0/ILU0.C
+$(lduPrecon)/ILUC0/ILUC0.C
 $(lduPrecon)/symGaussSeidelPrecon/symGaussSeidelPrecon.C
 $(lduPrecon)/amgPrecon/amgPrecon.C
 
@@ -30,5 +31,6 @@ $(amg)/coarseAmgLevel.C
 amgPolicy = $(amg)/amgPolicy
 $(amgPolicy)/amgPolicy.C
 $(amgPolicy)/pamgPolicy.C
+$(amgPolicy)/aamgPolicy.C
 
 LIB = $(FOAM_LIBBIN)/liblduSolvers
