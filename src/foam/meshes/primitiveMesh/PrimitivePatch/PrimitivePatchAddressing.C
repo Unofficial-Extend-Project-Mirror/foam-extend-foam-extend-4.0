@@ -34,7 +34,7 @@ Description
 
 \*---------------------------------------------------------------------------*/
 
-#include "PrimitivePatch.H"
+#include "PrimitivePatchTemplate.H"
 #include "DynamicList.H"
 
 

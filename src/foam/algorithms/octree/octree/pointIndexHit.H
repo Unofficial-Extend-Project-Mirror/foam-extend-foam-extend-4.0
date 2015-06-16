@@ -32,7 +32,7 @@ Description
 #define pointIndexHit_H
 
 #include "point.H"
-#include "PointIndexHit.H"
+#include "PointIndexHitTemplate.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

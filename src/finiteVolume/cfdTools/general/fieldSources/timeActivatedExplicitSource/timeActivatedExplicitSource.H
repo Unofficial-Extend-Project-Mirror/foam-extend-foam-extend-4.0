@@ -29,7 +29,7 @@ Typedef
 #ifndef timeActivatedExplicitSource_H
 #define timeActivatedExplicitSource_H
 
-#include "TimeActivatedExplicitSource.H"
+#include "TimeActivatedExplicitSourceTemplate.H"
 #include "TimeActivatedExplicitSourceList.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

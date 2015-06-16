@@ -26,7 +26,7 @@ Description
 
 \*---------------------------------------------------------------------------*/
 
-#include "PrimitivePatch.H"
+#include "PrimitivePatchTemplate.H"
 #include "Map.H"
 #include "ListOps.H"
 #include "OFstream.H"

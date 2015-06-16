@@ -23,7 +23,7 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "PrimitivePatch.H"
+#include "PrimitivePatchTemplate.H"
 #include "demandDrivenData.H"
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //

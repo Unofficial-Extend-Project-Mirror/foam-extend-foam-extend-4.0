@@ -38,7 +38,7 @@ Description
 #ifndef mixingPlaneInterpolation_H
 #define mixingPlaneInterpolation_H
 
-#include "MixingPlaneInterpolation.H"
+#include "MixingPlaneInterpolationTemplate.H"
 #include "PrimitivePatch.H"
 #include "face.H"
 #include "SubList.H"

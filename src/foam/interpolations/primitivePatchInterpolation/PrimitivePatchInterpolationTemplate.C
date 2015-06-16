@@ -23,7 +23,7 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "PrimitivePatchInterpolation.H"
+#include "PrimitivePatchInterpolationTemplate.H"
 #include "faceList.H"
 #include "demandDrivenData.H"
 

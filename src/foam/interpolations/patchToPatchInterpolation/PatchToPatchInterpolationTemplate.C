@@ -27,7 +27,7 @@ Description
 
 \*---------------------------------------------------------------------------*/
 
-#include "PatchToPatchInterpolation.H"
+#include "PatchToPatchInterpolationTemplate.H"
 #include "demandDrivenData.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

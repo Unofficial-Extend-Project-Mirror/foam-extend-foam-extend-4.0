@@ -32,7 +32,7 @@ Description
 #ifndef primitivePatchInterpolation_H
 #define primitivePatchInterpolation_H
 
-#include "PrimitivePatchInterpolation.H"
+#include "PrimitivePatchInterpolationTemplate.H"
 #include "PrimitivePatch.H"
 #include "face.H"
 #include "SubList.H"

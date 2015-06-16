@@ -39,7 +39,7 @@ SourceFiles
 #ifndef ComponentMixedPointPatchVectorField_H
 #define ComponentMixedPointPatchVectorField_H
 
-#include "PointPatchField.H"
+#include "PointPatchFieldTemplate.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

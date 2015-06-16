@@ -35,7 +35,7 @@ SourceFiles
 #define CoupledPointPatchField_H
 
 #include "lduInterfaceField.H"
-#include "PointPatchField.H"
+#include "PointPatchFieldTemplate.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

@@ -34,7 +34,7 @@ SourceFiles
 #ifndef ValuePointPatchField_H
 #define ValuePointPatchField_H
 
-#include "PointPatchField.H"
+#include "PointPatchFieldTemplate.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

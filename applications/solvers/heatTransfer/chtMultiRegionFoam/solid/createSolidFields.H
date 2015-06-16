@@ -61,7 +61,7 @@
             (
                 IOobject
                 (
-                    "K",
+                    "Kappa",
                     runTime.timeName(),
                     solidRegions[i],
                     IOobject::MUST_READ,

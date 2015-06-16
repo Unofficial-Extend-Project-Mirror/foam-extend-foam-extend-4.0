@@ -42,7 +42,7 @@ Description
 #include "fvcAverage.H"
 #include "fvcReconstruct.H"
 #include "fvcDdt.H"
-#include "fvcDDt.H"
+#include "fvcDDtTotal.H"
 #include "fvcD2dt2.H"
 #include "fvcDiv.H"
 #include "fvcFlux.H"

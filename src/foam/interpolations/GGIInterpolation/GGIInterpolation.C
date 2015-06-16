@@ -33,7 +33,7 @@ Contributor:
 
 \*---------------------------------------------------------------------------*/
 
-#include "GGIInterpolation.H"
+#include "GGIInterpolationTemplate.H"
 #include "demandDrivenData.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

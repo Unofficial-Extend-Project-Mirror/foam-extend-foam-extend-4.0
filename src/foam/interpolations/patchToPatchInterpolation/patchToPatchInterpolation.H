@@ -26,7 +26,7 @@ License
 #ifndef patchToPatchInterpolation_H
 #define patchToPatchInterpolation_H
 
-#include "PatchToPatchInterpolation.H"
+#include "PatchToPatchInterpolationTemplate.H"
 #include "PrimitivePatch.H"
 #include "face.H"
 #include "SubList.H"

@@ -32,7 +32,7 @@ Contributor:
 
 \*---------------------------------------------------------------------------*/
 
-#include "GGIInterpolation.H"
+#include "GGIInterpolationTemplate.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

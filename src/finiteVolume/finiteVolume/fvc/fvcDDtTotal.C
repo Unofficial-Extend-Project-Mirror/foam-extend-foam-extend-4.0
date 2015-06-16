@@ -26,7 +26,7 @@ Description
 
 \*---------------------------------------------------------------------------*/
 
-#include "fvcDDt.H"
+#include "fvcDDtTotal.H"
 #include "fvcDiv.H"
 #include "fvMesh.H"
 

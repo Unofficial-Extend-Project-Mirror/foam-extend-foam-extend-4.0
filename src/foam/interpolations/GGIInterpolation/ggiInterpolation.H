@@ -35,7 +35,7 @@ Description
 #ifndef ggiInterpolation_H
 #define ggiInterpolation_H
 
-#include "GGIInterpolation.H"
+#include "GGIInterpolationTemplate.H"
 #include "PrimitivePatch.H"
 #include "face.H"
 #include "SubList.H"

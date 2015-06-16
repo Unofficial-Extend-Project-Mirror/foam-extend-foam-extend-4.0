@@ -32,7 +32,7 @@ Contributor
 
 \*---------------------------------------------------------------------------*/
 
-#include "MixingPlaneInterpolation.H"
+#include "MixingPlaneInterpolationTemplate.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

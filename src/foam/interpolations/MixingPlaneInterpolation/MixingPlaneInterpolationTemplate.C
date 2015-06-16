@@ -33,7 +33,7 @@ Contributor
 
 \*---------------------------------------------------------------------------*/
 
-#include "MixingPlaneInterpolation.H"
+#include "MixingPlaneInterpolationTemplate.H"
 #include "demandDrivenData.H"
 #include "PrimitivePatch.H"
 #include "IOmanip.H"

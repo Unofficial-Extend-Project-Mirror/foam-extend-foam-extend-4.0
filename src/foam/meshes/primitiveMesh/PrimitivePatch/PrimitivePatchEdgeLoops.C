@@ -27,7 +27,7 @@ Description
 
 \*---------------------------------------------------------------------------*/
 
-#include "PrimitivePatch.H"
+#include "PrimitivePatchTemplate.H"
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //

@@ -34,7 +34,7 @@ SourceFiles
 #ifndef ZeroGradientPointPatchField_H
 #define ZeroGradientPointPatchField_H
 
-#include "PointPatchField.H"
+#include "PointPatchFieldTemplate.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

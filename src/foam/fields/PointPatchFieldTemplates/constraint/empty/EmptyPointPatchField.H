@@ -34,7 +34,7 @@ SourceFiles
 #ifndef EmptyPointPatchField_H
 #define EmptyPointPatchField_H
 
-#include "PointPatchField.H"
+#include "PointPatchFieldTemplate.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

@@ -33,7 +33,7 @@ Modification by:
 
 \*---------------------------------------------------------------------------*/
 
-#include "GGIInterpolation.H"
+#include "GGIInterpolationTemplate.H"
 #include "objectHit.H"
 #include "boolList.H"
 #include "DynamicList.H"

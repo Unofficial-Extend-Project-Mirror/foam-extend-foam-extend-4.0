@@ -31,7 +31,7 @@ Description
 #ifndef IOpatchToPatchInterpolation_H
 #define IOpatchToPatchInterpolation_H
 
-#include "IOPatchToPatchInterpolation.H"
+#include "IOPatchToPatchInterpolationTemplate.H"
 #include "PrimitivePatch.H"
 #include "face.H"
 #include "SubList.H"
