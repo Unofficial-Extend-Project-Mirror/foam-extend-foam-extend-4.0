@@ -35,7 +35,7 @@ Contributor
 
 #include "MixingPlaneInterpolationTemplate.H"
 #include "demandDrivenData.H"
-#include "PrimitivePatch.H"
+#include "PrimitivePatchTemplate.H"
 #include "IOmanip.H"
 #include "transform.H"
 

@@ -41,7 +41,7 @@ SourceFiles
 #ifndef PatchTools_H
 #define PatchTools_H
 
-#include "PrimitivePatch.H"
+#include "PrimitivePatchTemplate.H"
 #include "HashSet.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

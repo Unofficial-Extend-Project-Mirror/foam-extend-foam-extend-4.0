@@ -28,7 +28,7 @@ Description
 \*---------------------------------------------------------------------------*/
 
 #include "boolList.H"
-#include "PointHit.H"
+#include "PointHitTemplate.H"
 #include "objectHit.H"
 #include "bandCompression.H"
 

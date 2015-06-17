@@ -30,7 +30,7 @@ License
 #include "primitiveMesh.H"
 #include "polyTopoChange.H"
 #include "primitiveFacePatch.H"
-#include "GGIInterpolation.H"
+#include "GGIInterpolationTemplate.H"
 #include "addToRunTimeSelectionTable.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //

@@ -33,7 +33,7 @@ Description
 #define primitivePatchInterpolation_H
 
 #include "PrimitivePatchInterpolationTemplate.H"
-#include "PrimitivePatch.H"
+#include "PrimitivePatchTemplate.H"
 #include "face.H"
 #include "SubList.H"
 #include "pointField.H"

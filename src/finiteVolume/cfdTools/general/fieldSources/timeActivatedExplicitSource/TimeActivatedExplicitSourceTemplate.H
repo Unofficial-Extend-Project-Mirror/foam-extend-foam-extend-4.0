@@ -376,7 +376,7 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-#   include "TimeActivatedExplicitSource.C"
+#   include "TimeActivatedExplicitSourceTemplate.C"
 #   include "TimeActivatedExplicitSourceIO.C"
 #endif
 

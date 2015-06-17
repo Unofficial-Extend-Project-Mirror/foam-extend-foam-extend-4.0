@@ -26,7 +26,7 @@ License
 #include "dirichletNeumannFriction.H"
 #include "addToRunTimeSelectionTable.H"
 #include "zeroGradientFvPatchFields.H"
-#include "PatchToPatchInterpolation.H"
+#include "PatchToPatchInterpolationTemplate.H"
 #include "ggiInterpolation.H"
 #include "tractionBoundaryGradient.H"
 #include "fvc.H"

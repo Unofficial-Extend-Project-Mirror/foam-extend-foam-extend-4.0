@@ -691,7 +691,7 @@ public:
 } // End namespace Foam
 
 #ifdef NoRepository
-#   include "MixingPlaneInterpolation.C"
+#   include "MixingPlaneInterpolationTemplate.C"
 #   include "MixingPlaneProfile.C"
 #   include "MixingPlaneInterpolationPatches.C"
 #   include "MixingPlaneInterpolationAddressing.C"

@@ -243,7 +243,7 @@ public:
 } // End namespace Foam
 
 #ifdef NoRepository
-#   include "PatchToPatchInterpolation.C"
+#   include "PatchToPatchInterpolationTemplate.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

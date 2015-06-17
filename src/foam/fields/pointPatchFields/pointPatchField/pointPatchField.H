@@ -38,7 +38,7 @@ SourceFiles
 #ifndef pointPatchField_H
 #define pointPatchField_H
 
-#include "PointPatchField.H"
+#include "PointPatchFieldTemplate.H"
 #include "pointPatch.H"
 #include "DummyMatrix.H"
 #include "pointMesh.H"

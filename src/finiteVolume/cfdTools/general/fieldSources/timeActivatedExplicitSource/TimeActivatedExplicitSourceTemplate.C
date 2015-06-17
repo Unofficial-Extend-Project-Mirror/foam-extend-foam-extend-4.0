@@ -23,7 +23,7 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "TimeActivatedExplicitSource.H"
+#include "TimeActivatedExplicitSourceTemplate.H"
 #include "fvMesh.H"
 #include "volFields.H"
 

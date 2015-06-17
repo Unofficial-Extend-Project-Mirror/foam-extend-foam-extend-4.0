@@ -36,7 +36,7 @@ Description
 #define ggiInterpolation_H
 
 #include "GGIInterpolationTemplate.H"
-#include "PrimitivePatch.H"
+#include "PrimitivePatchTemplate.H"
 #include "face.H"
 #include "SubList.H"
 #include "pointField.H"

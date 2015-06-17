@@ -476,7 +476,7 @@ $(mapPolyMesh)/mapDistribute/mapDistribute.C
 $(mapPolyMesh)/mapDistribute/mapDistributePolyMesh.C
 $(mapPolyMesh)/mapAddedPolyMesh.C
 
-PrimitivePatch = $(primitiveMesh)/PrimitivePatch
+PrimitivePatch = $(primitiveMesh)/PrimitivePatchTemplate
 $(PrimitivePatch)/PrimitivePatchName.C
 
 pointMesh = meshes/pointMesh

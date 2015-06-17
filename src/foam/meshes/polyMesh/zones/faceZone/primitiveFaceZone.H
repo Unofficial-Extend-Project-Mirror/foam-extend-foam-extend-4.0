@@ -32,7 +32,7 @@ Description
 #define primitiveFaceZone_H
 
 #include "face.H"
-#include "PrimitivePatch.H"
+#include "PrimitivePatchTemplate.H"
 #include "indirectFaceList.H"
 #include "pointField.H"
 

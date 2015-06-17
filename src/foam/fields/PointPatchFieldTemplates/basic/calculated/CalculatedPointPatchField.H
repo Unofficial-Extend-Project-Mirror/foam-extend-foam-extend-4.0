@@ -34,7 +34,7 @@ SourceFiles
 #ifndef CalculatedPointPatchField_H
 #define CalculatedPointPatchField_H
 
-#include "PointPatchField.H"
+#include "PointPatchFieldTemplate.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

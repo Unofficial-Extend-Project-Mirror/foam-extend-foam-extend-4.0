@@ -47,7 +47,7 @@ SourceFiles
 #ifndef MeshedSurface_H
 #define MeshedSurface_H
 
-#include "PrimitivePatch.H"
+#include "PrimitivePatchTemplate.H"
 #include "PatchTools.H"
 #include "pointField.H"
 #include "face.H"

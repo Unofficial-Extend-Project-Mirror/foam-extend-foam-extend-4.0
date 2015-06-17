@@ -585,7 +585,7 @@ operator+
 #include "PointPatchFieldFunctions.H"
 
 #ifdef NoRepository
-#   include "PointPatchField.C"
+#   include "PointPatchFieldTemplate.C"
 #   include "CalculatedPointPatchField.H"
 #endif
 

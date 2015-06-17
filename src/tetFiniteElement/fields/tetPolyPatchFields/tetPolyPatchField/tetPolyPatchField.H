@@ -38,7 +38,7 @@ SourceFiles
 #ifndef tetPolyPatchField_H
 #define tetPolyPatchField_H
 
-#include "PointPatchField.H"
+#include "PointPatchFieldTemplate.H"
 #include "tetPolyPatch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

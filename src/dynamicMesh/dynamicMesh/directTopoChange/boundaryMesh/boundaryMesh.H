@@ -38,7 +38,7 @@ SourceFiles
 
 #include "bMesh.H"
 #include "boundaryPatch.H"
-#include "PrimitivePatch.H"
+#include "PrimitivePatchTemplate.H"
 #include "PtrList.H"
 #include "polyPatchList.H"
 #include "className.H"

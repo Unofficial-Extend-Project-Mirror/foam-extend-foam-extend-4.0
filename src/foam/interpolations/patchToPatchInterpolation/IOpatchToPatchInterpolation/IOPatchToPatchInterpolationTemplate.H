@@ -43,7 +43,7 @@ SourceFiles
 #include "FieldFields.H"
 #include "faceList.H"
 #include "intersection.H"
-#include "PatchToPatchInterpolation.H"
+#include "PatchToPatchInterpolationTemplate.H"
 #include "regIOobject.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -108,7 +108,7 @@ public:
 } // End namespace Foam
 
 #ifdef NoRepository
-#   include "IOPatchToPatchInterpolation.C"
+#   include "IOPatchToPatchInterpolationTemplate.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

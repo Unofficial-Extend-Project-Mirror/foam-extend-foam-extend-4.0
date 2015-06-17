@@ -33,7 +33,7 @@ Description
 #ifndef bMesh_H
 #define bMesh_H
 
-#include "PrimitivePatch.H"
+#include "PrimitivePatchTemplate.H"
 #include "face.H"
 #include "List.H"
 #include "pointField.H"
