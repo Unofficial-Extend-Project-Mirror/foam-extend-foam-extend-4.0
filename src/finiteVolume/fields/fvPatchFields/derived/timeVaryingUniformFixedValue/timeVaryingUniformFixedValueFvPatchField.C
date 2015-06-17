@@ -24,7 +24,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "timeVaryingUniformFixedValueFvPatchField.H"
-#include "Time.H"
+#include "foamTime.H"
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 

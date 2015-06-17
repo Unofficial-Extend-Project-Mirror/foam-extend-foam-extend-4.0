@@ -47,7 +47,7 @@ SourceFiles
 #define messageStream_H
 
 #include "label.H"
-#include "string.H"
+#include "foamString.H"
 #include "debugSwitch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

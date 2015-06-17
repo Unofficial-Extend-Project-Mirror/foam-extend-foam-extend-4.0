@@ -43,7 +43,7 @@ SourceFiles
 #define solidBodyMotionFunction_H
 
 #include "objectRegistry.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "dictionary.H"
 #include "septernion.H"
 #include "autoPtr.H"

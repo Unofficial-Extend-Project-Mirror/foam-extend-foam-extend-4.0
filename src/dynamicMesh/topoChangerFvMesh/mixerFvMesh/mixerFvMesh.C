@@ -24,7 +24,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "mixerFvMesh.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "regionSplit.H"
 #include "slidingInterface.H"
 #include "mapPolyMesh.H"

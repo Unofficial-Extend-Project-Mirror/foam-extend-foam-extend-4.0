@@ -24,7 +24,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "processorFaMeshes.H"
-#include "Time.H"
+#include "foamTime.H"
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 

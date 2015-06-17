@@ -25,7 +25,7 @@ License
 
 #include "Cloud.H"
 #include "Particle.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "IOPosition.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //

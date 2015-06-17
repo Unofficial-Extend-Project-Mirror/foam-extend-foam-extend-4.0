@@ -39,7 +39,7 @@ Author
 #include "triPointRef.H"
 #include "plane.H"
 #include "polyTopoChanger.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "standAlonePatch.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //

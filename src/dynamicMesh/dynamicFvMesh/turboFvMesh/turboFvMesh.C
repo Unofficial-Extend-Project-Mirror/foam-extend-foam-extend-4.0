@@ -29,7 +29,7 @@ Author
 \*---------------------------------------------------------------------------*/
 
 #include "turboFvMesh.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "addToRunTimeSelectionTable.H"
 #include "ZoneIDs.H"
 

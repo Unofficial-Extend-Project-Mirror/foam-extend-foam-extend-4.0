@@ -36,7 +36,7 @@ SourceFiles
 
 #include "FixedValuePointPatchField.H"
 #include "interpolationTable.H"
-#include "Time.H"
+#include "foamTime.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

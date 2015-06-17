@@ -36,7 +36,7 @@ SourceFiles
 #define motionSolver_H
 
 #include "objectRegistry.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "IOdictionary.H"
 #include "pointField.H"
 #include "twoDPointCorrector.H"

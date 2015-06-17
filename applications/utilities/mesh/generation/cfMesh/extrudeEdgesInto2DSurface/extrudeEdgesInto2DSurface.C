@@ -29,7 +29,7 @@ Description
 
 #include "argList.H"
 #include "objectRegistry.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "triSurf.H"
 #include "triSurfaceExtrude2DEdges.H"
 #include "demandDrivenData.H"

@@ -41,7 +41,7 @@ Description
 
 #include "argList.H"
 #include "objectRegistry.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "edgeCollapser.H"
 #include "directTopoChange.H"
 #include "polyMesh.H"

@@ -26,7 +26,7 @@ License
 #include "surfMesh.H"
 #include "MeshedSurfaceProxy.H"
 
-#include "Time.H"
+#include "foamTime.H"
 #include "cellIOList.H"
 #include "SubList.H"
 #include "OSspecific.H"

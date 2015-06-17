@@ -31,7 +31,7 @@ Description
 #include "attachDetach.H"
 #include "polyTopoChanger.H"
 #include "polyMesh.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "primitiveMesh.H"
 #include "polyTopoChange.H"
 #include "addToRunTimeSelectionTable.H"

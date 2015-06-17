@@ -61,7 +61,7 @@ Note
 #include "argList.H"
 #include "timeSelector.H"
 #include "objectRegistry.H"
-#include "Time.H"
+#include "foamTime.H"
 
 #include "MeshedSurfaces.H"
 #include "coordinateSystems.H"

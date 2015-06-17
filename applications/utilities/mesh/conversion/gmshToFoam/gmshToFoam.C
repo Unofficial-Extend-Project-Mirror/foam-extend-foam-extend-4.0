@@ -42,7 +42,7 @@ Description
 
 #include "argList.H"
 #include "polyMesh.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "polyMesh.H"
 #include "IFstream.H"
 #include "cellModeller.H"

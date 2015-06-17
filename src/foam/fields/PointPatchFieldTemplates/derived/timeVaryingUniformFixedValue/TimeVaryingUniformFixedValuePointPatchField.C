@@ -26,7 +26,7 @@ License
 #include "error.H"
 
 #include "TimeVaryingUniformFixedValuePointPatchField.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "IFstream.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

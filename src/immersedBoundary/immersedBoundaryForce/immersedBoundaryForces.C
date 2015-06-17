@@ -30,7 +30,7 @@ License
 #include "volFields.H"
 #include "surfaceFields.H"
 #include "dictionary.H"
-#include "Time.H"
+#include "foamTime.H"
 
 using namespace Foam::incompressible::RASModels;
 

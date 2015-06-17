@@ -47,7 +47,7 @@ Description
 #include "pointSet.H"
 #include "IOdictionary.H"
 #include "objectRegistry.H"
-#include "Time.H"
+#include "foamTime.H"
 # endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

@@ -28,7 +28,7 @@ License
 
 // Foam includes
 #include "fvMesh.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "patchZones.H"
 
 // VTK includes

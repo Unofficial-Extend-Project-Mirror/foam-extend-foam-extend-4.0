@@ -36,7 +36,7 @@ Description
 #include "fieldTypes.H"
 #include "blockLduMatrices.H"
 #include "blockLduSolvers.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "fvMesh.H"
 
 #include "blockVector2Matrix.H"

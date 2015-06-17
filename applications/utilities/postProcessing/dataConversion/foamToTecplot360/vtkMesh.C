@@ -25,7 +25,7 @@ License
 
 #include "vtkMesh.H"
 #include "fvMeshSubset.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "cellSet.H"
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //

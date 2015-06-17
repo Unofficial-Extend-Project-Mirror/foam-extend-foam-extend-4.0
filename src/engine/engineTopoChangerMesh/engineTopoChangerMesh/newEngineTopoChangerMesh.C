@@ -24,7 +24,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "engineTopoChangerMesh.H"
-#include "Time.H"
+#include "foamTime.H"
 
 // * * * * * * * * * * * * * * * * Selectors * * * * * * * * * * * * * * * * //
 

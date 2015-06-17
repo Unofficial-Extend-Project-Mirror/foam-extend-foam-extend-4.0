@@ -24,7 +24,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "fvMesh.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "volFields.H"
 #include "surfaceFields.H"
 #include "slicedVolFields.H"

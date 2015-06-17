@@ -36,7 +36,7 @@ Contributor
 #include "polyPatchID.H"
 #include "RodriguesRotation.H"
 #include "polyMesh.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "standAlonePatch.H"
 #include "indirectPrimitivePatch.H"
 

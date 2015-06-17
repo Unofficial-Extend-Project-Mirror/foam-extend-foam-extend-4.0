@@ -37,7 +37,7 @@ Contributor
 #include "polyBoundaryMesh.H"
 #include "polyMesh.H"
 #include "ZoneIDs.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "SubField.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //

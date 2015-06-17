@@ -36,7 +36,7 @@ SourceFiles
 #define subCycleTime_H
 
 #include "objectRegistry.H"
-#include "Time.H"
+#include "foamTime.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

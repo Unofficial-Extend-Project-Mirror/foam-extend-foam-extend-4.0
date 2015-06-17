@@ -25,7 +25,7 @@ License
 
 #include "ignitionSite.H"
 #include "objectRegistry.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "volFields.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

@@ -26,7 +26,7 @@ License
 #include "probes.H"
 #include "volFields.H"
 #include "dictionary.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "IOmanip.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //

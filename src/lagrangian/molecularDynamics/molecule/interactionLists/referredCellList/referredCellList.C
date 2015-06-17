@@ -27,7 +27,7 @@ License
 #include "interactionLists.H"
 #include "polyBoundaryMeshEntries.H"
 #include "PstreamCombineReduceOps.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "globalMeshData.H"
 #include "processorPolyPatch.H"
 #include "cyclicPolyPatch.H"

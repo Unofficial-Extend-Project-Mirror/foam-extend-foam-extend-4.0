@@ -24,7 +24,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "movingBodyTopoFvMesh.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "mapPolyMesh.H"
 #include "layerAdditionRemoval.H"
 #include "volMesh.H"

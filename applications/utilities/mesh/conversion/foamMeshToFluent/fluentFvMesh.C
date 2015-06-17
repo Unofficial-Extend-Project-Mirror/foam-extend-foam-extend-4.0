@@ -30,7 +30,7 @@ using std::ofstream;
 using std::ios;
 
 #include "objectRegistry.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "fluentFvMesh.H"
 #include "primitiveMesh.H"
 #include "wallFvPatch.H"

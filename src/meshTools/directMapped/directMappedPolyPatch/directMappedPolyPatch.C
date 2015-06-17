@@ -26,7 +26,7 @@ License
 #include "directMappedPolyPatch.H"
 #include "addToRunTimeSelectionTable.H"
 #include "objectRegistry.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "polyMesh.H"
 #include "polyBoundaryMesh.H"
 

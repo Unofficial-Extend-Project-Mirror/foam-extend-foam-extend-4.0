@@ -27,7 +27,7 @@ License
 #include "metisDecomp.H"
 #include "addToRunTimeSelectionTable.H"
 #include "floatScalar.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "labelIOField.H"
 #include "syncTools.H"
 #include "globalIndex.H"

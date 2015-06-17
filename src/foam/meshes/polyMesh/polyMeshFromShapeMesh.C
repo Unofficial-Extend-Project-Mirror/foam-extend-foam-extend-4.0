@@ -27,7 +27,7 @@ Description
 \*---------------------------------------------------------------------------*/
 
 #include "polyMesh.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "primitiveMesh.H"
 #include "DynamicList.H"
 

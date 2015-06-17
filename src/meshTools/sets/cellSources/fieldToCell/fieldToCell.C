@@ -26,7 +26,7 @@ License
 #include "fieldToCell.H"
 #include "polyMesh.H"
 #include "cellSet.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "IFstream.H"
 
 #include "addToRunTimeSelectionTable.H"

@@ -43,7 +43,7 @@ SourceFiles
 #include "labelList.H"
 #include "DynamicList.H"
 #include "HashTable.H"
-#include "string.H"
+#include "foamString.H"
 #include "NamedEnum.H"
 #include "optimisationSwitch.H"
 

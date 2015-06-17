@@ -31,7 +31,7 @@ Description
 
 // Foam includes
 #include "fvMesh.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "IFstream.H"
 
 // VTK includes

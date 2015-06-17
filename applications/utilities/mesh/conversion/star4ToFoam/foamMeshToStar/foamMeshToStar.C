@@ -35,7 +35,7 @@ Description
 \*---------------------------------------------------------------------------*/
 
 #include "argList.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "volFields.H"
 #include "cellModeller.H"
 #include "SortableList.H"

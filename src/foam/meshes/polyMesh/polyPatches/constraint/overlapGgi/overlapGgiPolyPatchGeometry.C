@@ -35,7 +35,7 @@ Author
 #include "demandDrivenData.H"
 #include "polyPatchID.H"
 #include "OFstream.H"
-#include "Time.H"
+#include "foamTime.H"
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 

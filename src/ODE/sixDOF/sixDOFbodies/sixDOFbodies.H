@@ -38,7 +38,7 @@ SourceFiles
 #ifndef sixDOFbodies_H
 #define sixDOFbodies_H
 
-#include "Time.H"
+#include "foamTime.H"
 #include "IOdictionary.H"
 #include "sixDOFqODE.H"
 #include "ODESolver.H"

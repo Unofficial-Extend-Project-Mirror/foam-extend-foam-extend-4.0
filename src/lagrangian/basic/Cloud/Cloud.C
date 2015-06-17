@@ -28,7 +28,7 @@ License
 #include "globalMeshData.H"
 #include "PstreamCombineReduceOps.H"
 #include "mapPolyMesh.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "OFstream.H"
 
 #include "profiling.H"

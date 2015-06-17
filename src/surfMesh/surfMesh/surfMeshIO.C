@@ -24,7 +24,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "surfMesh.H"
-#include "Time.H"
+#include "foamTime.H"
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 

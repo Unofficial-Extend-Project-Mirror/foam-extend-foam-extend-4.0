@@ -47,7 +47,7 @@ Usage
 \*---------------------------------------------------------------------------*/
 
 #include "objectRegistry.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "IOdictionary.H"
 #include "IOPtrList.H"
 

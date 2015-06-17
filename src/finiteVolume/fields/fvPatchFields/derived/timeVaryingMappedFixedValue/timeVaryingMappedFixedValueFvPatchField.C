@@ -24,7 +24,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "timeVaryingMappedFixedValueFvPatchField.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "triSurfaceTools.H"
 #include "triSurface.H"
 #include "vector2D.H"

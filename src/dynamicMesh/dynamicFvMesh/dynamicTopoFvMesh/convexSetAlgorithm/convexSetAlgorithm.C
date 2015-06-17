@@ -34,7 +34,7 @@ Author
 
 \*---------------------------------------------------------------------------*/
 
-#include "Time.H"
+#include "foamTime.H"
 #include "IOMap.H"
 #include "meshOps.H"
 #include "polyMesh.H"

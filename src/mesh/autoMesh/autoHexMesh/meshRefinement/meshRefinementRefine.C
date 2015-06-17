@@ -26,7 +26,7 @@ License
 #include "meshRefinement.H"
 #include "trackedParticle.H"
 #include "syncTools.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "refinementSurfaces.H"
 #include "shellSurfaces.H"
 #include "faceSet.H"

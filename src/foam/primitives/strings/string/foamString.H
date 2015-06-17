@@ -37,13 +37,13 @@ See Also
     configuration directory
 
 SourceFiles
-    string.C
-    stringIO.C
+    foamString.C
+    foamStringIO.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef string_H
-#define string_H
+#ifndef foamString_H
+#define foamString_H
 
 #include "char.H"
 #include "Hasher.H"
@@ -221,7 +221,7 @@ public:
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-#include "stringI.H"
+#include "foamStringI.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

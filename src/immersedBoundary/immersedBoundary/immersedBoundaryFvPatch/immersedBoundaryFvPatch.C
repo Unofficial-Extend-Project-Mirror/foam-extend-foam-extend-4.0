@@ -24,7 +24,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "immersedBoundaryFvPatch.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "fvBoundaryMesh.H"
 #include "fvMesh.H"
 #include "SortableList.H"

@@ -28,7 +28,7 @@ Description
 
 \*----------------------------------------------------------------------------*/
 # include "meshReader.H"
-# include "Time.H"
+# include "foamTime.H"
 # include "OFstream.H"
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //

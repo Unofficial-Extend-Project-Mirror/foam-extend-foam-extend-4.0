@@ -38,7 +38,7 @@ SourceFiles
 #define meshSurfaceCheckEdgeTypes_H
 
 #include "objectRegistry.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "polyMeshGenModifier.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

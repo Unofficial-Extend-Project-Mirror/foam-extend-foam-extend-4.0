@@ -26,7 +26,7 @@ License
 #include "immersedBoundaryPolyPatch.H"
 #include "polyBoundaryMesh.H"
 #include "polyMesh.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "addToRunTimeSelectionTable.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

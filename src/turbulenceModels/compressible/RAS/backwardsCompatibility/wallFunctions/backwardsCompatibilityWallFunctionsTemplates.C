@@ -24,7 +24,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "backwardsCompatibilityWallFunctions.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "OSspecific.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

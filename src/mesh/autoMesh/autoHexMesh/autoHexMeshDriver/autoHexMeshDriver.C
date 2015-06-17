@@ -25,7 +25,7 @@ License
 
 #include "autoHexMeshDriver.H"
 #include "fvMesh.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "boundBox.H"
 #include "wallPolyPatch.H"
 #include "cellSet.H"

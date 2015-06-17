@@ -24,7 +24,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "MRFZones.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "fvMesh.H"
 #include "fvc.H"
 

@@ -27,7 +27,7 @@ Description
 \*---------------------------------------------------------------------------*/
 
 #include "starMesh.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "wallPolyPatch.H"
 #include "cyclicPolyPatch.H"
 #include "symmetryPolyPatch.H"

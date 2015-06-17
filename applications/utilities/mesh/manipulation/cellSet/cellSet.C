@@ -28,7 +28,7 @@ Description
 
 #include "argList.H"
 #include "objectRegistry.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "polyMesh.H"
 #include "topoSetSource.H"
 #include "cellSet.H"

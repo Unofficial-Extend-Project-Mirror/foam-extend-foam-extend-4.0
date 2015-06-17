@@ -24,7 +24,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "porousZones.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "volFields.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //

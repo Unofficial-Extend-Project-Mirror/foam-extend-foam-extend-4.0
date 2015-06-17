@@ -28,7 +28,7 @@ License
 #include "IFstream.H"
 #include "OFstream.H"
 #include "objectRegistry.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "boundBox.H"
 #include "SortableList.H"
 #include "PackedBoolList.H"

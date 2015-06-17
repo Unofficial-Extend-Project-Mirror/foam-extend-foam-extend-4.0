@@ -49,7 +49,7 @@ See Also
 #include "argList.H"
 #include "timeSelector.H"
 #include "objectRegistry.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "polyMesh.H"
 #include "ElmerMeshWriter.H"
 

@@ -37,7 +37,7 @@ SourceFiles
 #define finiteRotation_H
 
 #include "HamiltonRodriguezRot.H"
-#include "Time.H"
+#include "foamTime.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

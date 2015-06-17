@@ -26,7 +26,7 @@ License
 #include "vtkFoam.H"
 
 #include "argList.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "polyBoundaryMeshEntries.H"
 #include "IOobjectList.H"
 #include "wordList.H"

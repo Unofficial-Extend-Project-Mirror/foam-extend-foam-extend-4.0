@@ -24,7 +24,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "objectRegistry.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "PstreamReduceOps.H"
 
 #include "profilingPool.H"

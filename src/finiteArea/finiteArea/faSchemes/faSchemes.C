@@ -27,7 +27,7 @@ Description
 
 #include "error.H"
 #include "objectRegistry.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "faSchemes.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

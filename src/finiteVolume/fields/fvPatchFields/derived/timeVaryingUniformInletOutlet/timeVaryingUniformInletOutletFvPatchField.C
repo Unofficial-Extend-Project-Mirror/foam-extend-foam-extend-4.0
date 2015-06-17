@@ -24,7 +24,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "timeVaryingUniformInletOutletFvPatchField.H"
-#include "Time.H"
+#include "foamTime.H"
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 

@@ -24,7 +24,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "dynamicFvMesh.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "dlLibraryTable.H"
 
 // * * * * * * * * * * * * * * * * Selectors * * * * * * * * * * * * * * * * //

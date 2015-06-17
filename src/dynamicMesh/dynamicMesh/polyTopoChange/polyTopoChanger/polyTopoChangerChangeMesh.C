@@ -28,7 +28,7 @@ Description
 
 #include "polyTopoChanger.H"
 #include "polyMesh.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "faceZone.H"
 #include "polyTopoChange.H"
 #include "pointField.H"

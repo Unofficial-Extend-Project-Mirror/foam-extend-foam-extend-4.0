@@ -36,7 +36,7 @@ Author
 
 #include "dynamicTopoFvMesh.H"
 
-#include "Time.H"
+#include "foamTime.H"
 #include "meshOps.H"
 #include "IOmanip.H"
 #include "triFace.H"

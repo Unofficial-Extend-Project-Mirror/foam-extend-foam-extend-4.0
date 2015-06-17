@@ -26,7 +26,7 @@ License
 #include "polyTopoChanger.H"
 #include "polyMesh.H"
 #include "polyTopoChange.H"
-#include "Time.H"
+#include "foamTime.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 

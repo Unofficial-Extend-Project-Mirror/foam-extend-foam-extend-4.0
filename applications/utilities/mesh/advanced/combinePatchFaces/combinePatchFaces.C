@@ -45,7 +45,7 @@ Description
 #include "PstreamReduceOps.H"
 #include "argList.H"
 #include "objectRegistry.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "directTopoChange.H"
 #include "polyModifyFace.H"
 #include "polyAddFace.H"

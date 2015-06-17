@@ -24,7 +24,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "fvFieldReconstructor.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "PtrList.H"
 #include "fvPatchFields.H"
 #include "emptyFvPatch.H"

@@ -36,7 +36,7 @@ SourceFiles
 #define profilingTrigger_H
 
 #include "clockTime.H"
-#include "string.H"
+#include "foamString.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

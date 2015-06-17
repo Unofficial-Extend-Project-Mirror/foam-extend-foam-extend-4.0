@@ -37,7 +37,7 @@ SourceFiles
 #define readerDatabase_H
 
 #include "wordList.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "polyMesh.H"
 #include "label.H"
 

@@ -58,8 +58,8 @@ primitives/quaternion/quaternion.C
 primitives/septernion/septernion.C
 
 strings = primitives/strings
-$(strings)/string/string.C
-$(strings)/string/stringIO.C
+$(strings)/string/foamString.C
+$(strings)/string/foamStringIO.C
 $(strings)/word/word.C
 $(strings)/word/wordIO.C
 $(strings)/fileName/fileName.C
@@ -198,8 +198,8 @@ db/functionObjects/outputFilterOutputControl/outputFilterOutputControl.C
 Time = db/Time
 $(Time)/TimePaths.C
 $(Time)/TimeState.C
-$(Time)/Time.C
-$(Time)/TimeIO.C
+$(Time)/foamTime.C
+$(Time)/foamTimeIO.C
 $(Time)/findTimes.C
 $(Time)/subCycleTime.C
 $(Time)/findInstance.C

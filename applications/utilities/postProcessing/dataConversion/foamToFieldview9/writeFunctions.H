@@ -35,7 +35,7 @@ SourceFiles
 #define writeFunctions_H
 
 #include "scalar.H"
-#include "string.H"
+#include "foamString.H"
 #include "labelList.H"
 #include <iostream>
 

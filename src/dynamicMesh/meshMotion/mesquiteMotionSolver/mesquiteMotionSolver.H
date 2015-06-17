@@ -37,7 +37,7 @@ SourceFiles
 #define mesquiteMotionSolver_H
 
 #include "motionSolver.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "Map.H"
 #include "Switch.H"
 #include "edgeList.H"

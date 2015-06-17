@@ -26,7 +26,7 @@ License
 #include "searchableSurfaces.H"
 #include "searchableSurfacesQueries.H"
 #include "ListOps.H"
-#include "Time.H"
+#include "foamTime.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

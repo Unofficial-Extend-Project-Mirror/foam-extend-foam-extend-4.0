@@ -39,7 +39,7 @@ SourceFiles
 
 #include "IOdictionary.H"
 #include "objectRegistry.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "autoPtr.H"
 #include "runTimeSelectionTables.H"
 #include "vector.H"

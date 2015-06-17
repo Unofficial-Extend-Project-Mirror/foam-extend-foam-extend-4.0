@@ -24,7 +24,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "globalMeshData.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "Pstream.H"
 #include "PstreamCombineReduceOps.H"
 #include "processorPolyPatch.H"

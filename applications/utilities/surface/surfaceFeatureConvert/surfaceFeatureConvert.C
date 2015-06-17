@@ -32,7 +32,7 @@ Description
 #include "featureEdgeMesh.H"
 #include "argList.H"
 #include "objectRegistry.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "IFstream.H"
 #include "IStringStream.H"
 #include "OFstream.H"

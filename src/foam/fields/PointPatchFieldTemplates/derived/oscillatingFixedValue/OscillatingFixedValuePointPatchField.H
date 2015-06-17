@@ -35,7 +35,7 @@ SourceFiles
 #define OscillatingFixedValuePointPatchField_H
 
 #include "FixedValuePointPatchField.H"
-#include "Time.H"
+#include "foamTime.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

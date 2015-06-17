@@ -25,7 +25,7 @@ License
 
 #include "rhoChemistryModel.H"
 #include "fvMesh.H"
-#include "Time.H"
+#include "foamTime.H"
 
 /* * * * * * * * * * * * * * * Private Static Data * * * * * * * * * * * * * */
 

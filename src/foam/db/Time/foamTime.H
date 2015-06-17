@@ -29,14 +29,14 @@ Description
     top-level objectRegistry.
 
 SourceFiles
-    Time.C
-    TimeIO.C
+    foamTime.C
+    foamTimeIO.C
     findInstance.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef Time_H
-#define Time_H
+#ifndef foamTime_H
+#define foamTime_H
 
 #include "TimePaths.H"
 #include "objectRegistry.H"

@@ -26,7 +26,7 @@ License
 #include "oscillatingVelocityPointPatchVectorField.H"
 #include "pointPatchFields.H"
 #include "addToRunTimeSelectionTable.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "polyMesh.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
