@@ -48,10 +48,10 @@ a) You can set your local system identifier using the environment variable
 b) Install the CMakeLists.txt and CTestConfig.cmake files by executing the following commands:
 
 cp ./CMakeFiles/CMakeLists.txt $WM_PROJECT_DIR
-cp ./CMakeFiles/CTestConfig.cmake.openfoam-extend $WM_PROJECT_DIR/CTestConfig.cmake
+cp ./CMakeFiles/CTestConfig.cmake.foam-extend $WM_PROJECT_DIR/CTestConfig.cmake
 
 
-c) Run the test harness and push your results on the CDash server on openfoam-extend
+c) Run the test harness and push your results on the CDash server on foam-extend
 
 cd ./runDir; ./Allclean; ./Allrun_Experimental
   or
@@ -70,9 +70,9 @@ Both Allrun_Experimental and Allrun_Nightly scripts will submit their results
 to the CDash server of your choice, as specified by the file
 $WM_PROJECT_DIR/CTestConfig.cmake.
 
-To submit your results to the CDash server on openfoam-extend, just use
-the file CTestConfig.cmake.openfoam-extend.
+To submit your results to the CDash server on foam-extend, just use
+the file CTestConfig.cmake.foam-extend.
 
-If submitted to the CDash server on openfoam-extend, your results will be displayed here:
-http://openfoam-extend.sourceforge.net/CDash/index.php?project=foam-extend-3.1
+If submitted to the CDash server on foam-extend, your results will be displayed here:
+http://foam-extend.sourceforge.net/CDash/index.php?project=foam-extend-3.2
 
