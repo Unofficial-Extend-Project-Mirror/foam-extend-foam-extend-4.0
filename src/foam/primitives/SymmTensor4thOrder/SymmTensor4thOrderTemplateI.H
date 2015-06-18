@@ -23,8 +23,8 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "SymmTensor.H"
-#include "Tensor.H"
+#include "SymmTensorTemplate.H"
+#include "TensorTemplate.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -245,7 +245,7 @@ operator&(const SymmTensor4thOrder<Cmpt>& st, const Vector<Cmpt>& v)
     notImplemented
       (
        "operator&(const SymmTensor4thOrder<Cmpt>& st, const Vector<Cmpt>& v)"
-       " not implemented in SymmTensor4thOrderI.H"
+       " not implemented in SymmTensor4thOrderTemplateI.H"
        );
 
     return Vector<Cmpt>
@@ -266,7 +266,7 @@ operator&(const Vector<Cmpt>& v, const SymmTensor4thOrder<Cmpt>& st)
     notImplemented
       (
        "operator&(const Vector<Cmpt>& v, const SymmTensor4thOrder<Cmpt>& st)"
-       " not implemented in SymmTensor4thOrderI.H"
+       " not implemented in SymmTensor4thOrderTemplateI.H"
        );
 
     return Vector<Cmpt>

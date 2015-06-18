@@ -44,18 +44,18 @@ Note:
     HJ, 29/Oct/2013
 
 SourceFiles
-    SymmTensor4thOrderI.H
+    SymmTensor4thOrderTemplateI.H
 
 Author
     Philip Cardiff UCD
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef SymmTensor4thOrder_H
-#define SymmTensor4thOrder_H
+#ifndef SymmTensor4thOrderTemplate_H
+#define SymmTensor4thOrderTemplate_H
 
 #include "VectorSpace.H"
-#include "SymmTensor.H"
+#include "SymmTensorTemplate.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -200,7 +200,7 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 // Include inline implementations
-#include "SymmTensor4thOrderI.H"
+#include "SymmTensor4thOrderTemplateI.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

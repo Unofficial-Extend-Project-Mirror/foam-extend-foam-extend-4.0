@@ -22,24 +22,22 @@ License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    Foam::Tensor2D
+    Foam::SphericalTensor
 
 Description
-    Templated 2D tensor derived from VectorSpace adding construction from
-    4 components, element access using xx(), xy(), yx() and yy() member
-    functions and the iner-product (dot-product) and outer-product of two
-    Vector2Ds (tensor-product) operators.
+    Templated 3D SphericalTensor derived from VectorSpace adding construction
+    from 1 component, element access using th ii() member function and the
+    inner-product (dot-product) and outer-product operators.
 
 SourceFiles
-    Tensor2DI.H
+    SphericalTensorTemplateI.H
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef Tensor2D_H
-#define Tensor2D_H
+#ifndef SphericalTensorTemplate_H
+#define SphericalTensorTemplate_H
 
-#include "Vector2D.H"
-#include "SphericalTensor2D.H"
+#include "VectorSpace.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -47,22 +45,26 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class Tensor2D Declaration
+                           Class SphericalTensor Declaration
 \*---------------------------------------------------------------------------*/
 
-template <class Cmpt>
-class Tensor2D
+template<class Cmpt>
+class SphericalTensor
 :
-    public VectorSpace<Tensor2D<Cmpt>, Cmpt, 4>
+    public VectorSpace<SphericalTensor<Cmpt>, Cmpt, 1>
 {
 
 public:
+
+    //- Equivalent type of labels used for valid component indexing
+    typedef SphericalTensor<label> labelType;
+
 
     // Member constants
 
         enum
         {
-            rank = 2 // Rank of Tensor2D is 2
+            rank = 2 // Rank of SphericalTensor is 2
         };
 
 
@@ -70,88 +72,47 @@ public:
 
         static const char* const typeName;
         static const char* componentNames[];
-
-        static const Tensor2D zero;
-        static const Tensor2D one;
-        static const Tensor2D max;
-        static const Tensor2D min;
+        static const SphericalTensor zero;
+        static const SphericalTensor one;
+        static const SphericalTensor max;
+        static const SphericalTensor min;
+        static const SphericalTensor I;
+        static const SphericalTensor oneThirdI;
+        static const SphericalTensor twoThirdsI;
 
 
     //- Component labeling enumeration
-    enum components { XX, XY, YX, YY };
+    enum components { II };
 
 
     // Constructors
 
         //- Construct null
-        inline Tensor2D();
+        inline SphericalTensor();
 
         //- Construct given VectorSpace
-        inline Tensor2D(const VectorSpace<Tensor2D<Cmpt>, Cmpt, 4>&);
-
-        //- Construct given SphericalTensor2D
-        inline Tensor2D(const SphericalTensor2D<Cmpt>&);
-
-        //- Construct given the two vectors
-        inline Tensor2D
+        inline SphericalTensor
         (
-            const Vector2D<Cmpt>& x,
-            const Vector2D<Cmpt>& y
+            const VectorSpace<SphericalTensor<Cmpt>, Cmpt, 1>&
         );
 
-        //- Construct given the four components
-        inline Tensor2D
-        (
-            const Cmpt txx, const Cmpt txy,
-            const Cmpt tyx, const Cmpt tyy
-        );
+        //- Construct given the component
+        inline SphericalTensor(const Cmpt& tii);
 
         //- Construct from Istream
-        Tensor2D(Istream&);
+        inline SphericalTensor(Istream&);
 
 
     // Member Functions
 
         // Access
 
-            inline const Cmpt& xx() const;
-            inline const Cmpt& xy() const;
-            inline const Cmpt& yx() const;
-            inline const Cmpt& yy() const;
-
-            inline Cmpt& xx();
-            inline Cmpt& xy();
-            inline Cmpt& yx();
-            inline Cmpt& yy();
-
-            // Access vector components.
-
-            inline Vector2D<Cmpt> x() const;
-            inline Vector2D<Cmpt> y() const;
-
-            //- Return (i, j) component.  Consistency with VectorN
-            inline const Cmpt& operator()
-            (
-                const direction i,
-                const direction j
-            ) const;
-
-            //- Return access to (i, j) component.  Consistency with VectorN
-            inline Cmpt& operator()
-            (
-                const direction i,
-                const direction j
-            );
+            inline const Cmpt& ii() const;
+            inline Cmpt& ii();
 
 
         //- Transpose
-        inline Tensor2D<Cmpt> T() const;
-
-
-    // Member Operators
-
-        //- Copy SphericalTensor2D
-        inline void operator=(const SphericalTensor2D<Cmpt>&);
+        inline const SphericalTensor<Cmpt>& T() const;
 };
 
 
@@ -162,7 +123,7 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 // Include inline implementations
-#include "Tensor2DI.H"
+#include "SphericalTensorTemplateI.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

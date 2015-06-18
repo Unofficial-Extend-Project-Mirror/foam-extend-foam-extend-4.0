@@ -22,24 +22,20 @@ License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    Foam::Vector
+    Foam::Vector2D
 
 Description
-    Templated 3D Vector derived from VectorSpace adding construction from
-    3 components, element access using x(), y() and z() member functions and
-    the inner-product (dot-product) and cross product operators.
-
-    A centre() member function which returns the Vector for which it is called
-    is defined so that point which is a typedef to Vector\<scalar\> behaves as
-    other shapes in the shape hierachy.
+    Templated 2D Vector derived from VectorSpace adding construction from
+    2 components, element access using x() and y() member functions and
+    the inner-product (dot-product).
 
 SourceFiles
-    VectorI.H
+    Vector2DTemplateI.H
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef Vector_H
-#define Vector_H
+#ifndef Vector2DTemplate_H
+#define Vector2DTemplate_H
 
 #include "VectorSpace.H"
 
@@ -48,29 +44,23 @@ SourceFiles
 namespace Foam
 {
 
-template<class T> class List;
-
 /*---------------------------------------------------------------------------*\
-                           Class Vector Declaration
+                           Class Vector2D Declaration
 \*---------------------------------------------------------------------------*/
 
 template <class Cmpt>
-class Vector
+class Vector2D
 :
-    public VectorSpace<Vector<Cmpt>, Cmpt, 3>
+    public VectorSpace<Vector2D<Cmpt>, Cmpt, 2>
 {
 
 public:
-
-    //- Equivalent type of labels used for valid component indexing
-    typedef Vector<label> labelType;
-
 
     // Member constants
 
         enum
         {
-            rank = 1 // Rank of Vector is 1
+            rank = 1 // Rank of Vector2D is 1
         };
 
 
@@ -78,29 +68,29 @@ public:
 
         static const char* const typeName;
         static const char* componentNames[];
-        static const Vector zero;
-        static const Vector one;
-        static const Vector max;
-        static const Vector min;
+        static const Vector2D zero;
+        static const Vector2D one;
+        static const Vector2D max;
+        static const Vector2D min;
 
 
     //- Component labeling enumeration
-    enum components { X, Y, Z };
+    enum components { X, Y };
 
 
     // Constructors
 
         //- Construct null
-        inline Vector();
+        inline Vector2D();
 
         //- Construct given VectorSpace
-        inline Vector(const VectorSpace<Vector<Cmpt>, Cmpt, 3>&);
+        inline Vector2D(const VectorSpace<Vector2D<Cmpt>, Cmpt, 2>&);
 
-        //- Construct given three components
-        inline Vector(const Cmpt& vx, const Cmpt& vy, const Cmpt& vz);
+        //- Construct given two components
+        inline Vector2D(const Cmpt& vx, const Cmpt& vy);
 
         //- Construct from Istream
-        inline Vector(Istream&);
+        inline Vector2D(Istream&);
 
 
     // Member Functions
@@ -109,11 +99,9 @@ public:
 
             inline const Cmpt& x() const;
             inline const Cmpt& y() const;
-            inline const Cmpt& z() const;
 
             inline Cmpt& x();
             inline Cmpt& y();
-            inline Cmpt& z();
 
             //- Return i-th component.  Consistency with VectorN
             inline const Cmpt& operator()
@@ -128,29 +116,10 @@ public:
             );
 
 
-        //- Return *this (used for point which is a typedef to Vector<scalar>.
-        inline const Vector<Cmpt>& centre
-        (
-            const Foam::List<Vector<Cmpt> >&
-        ) const;
-};
+        // Operators
 
-
-template<class Cmpt>
-class typeOfRank<Cmpt, 1>
-{
-public:
-
-    typedef Vector<Cmpt> type;
-};
-
-
-template<class Cmpt>
-class symmTypeOfRank<Cmpt, 1>
-{
-public:
-
-    typedef Vector<Cmpt> type;
+            //- perp dot product (dot product with perpendicular vector)
+            inline scalar perp(const Vector2D<Cmpt>& b) const;
 };
 
 
@@ -160,7 +129,8 @@ public:
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-#include "VectorI.H"
+// Include inline implementations
+#include "Vector2DTemplateI.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

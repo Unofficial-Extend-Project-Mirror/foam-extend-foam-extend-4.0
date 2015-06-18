@@ -22,22 +22,24 @@ License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    Foam::SphericalTensor
+    Foam::DiagTensor
 
 Description
-    Templated 3D SphericalTensor derived from VectorSpace adding construction
-    from 1 component, element access using th ii() member function and the
-    inner-product (dot-product) and outer-product operators.
+    Templated 3D DiagTensor derived from VectorSpace.
+
+    Adding construction from 3 components, element access using xx(), yy()
+    and zz() member functions and the inner-product (dot-product) and
+    outer-product operators.
 
 SourceFiles
-    SphericalTensorI.H
+    DiagTensorTemplateI.H
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef SphericalTensor_H
-#define SphericalTensor_H
+#ifndef DiagTensorTemplate_H
+#define DiagTensoTemplater_H
 
-#include "VectorSpace.H"
+#include "TensorTemplate.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -45,26 +47,22 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class SphericalTensor Declaration
+                           Class DiagTensor Declaration
 \*---------------------------------------------------------------------------*/
 
-template<class Cmpt>
-class SphericalTensor
+template <class Cmpt>
+class DiagTensor
 :
-    public VectorSpace<SphericalTensor<Cmpt>, Cmpt, 1>
+    public VectorSpace<DiagTensor<Cmpt>, Cmpt, 3>
 {
 
 public:
-
-    //- Equivalent type of labels used for valid component indexing
-    typedef SphericalTensor<label> labelType;
-
 
     // Member constants
 
         enum
         {
-            rank = 2 // Rank of SphericalTensor is 2
+            rank = 2 // Rank of DiagTensor is 2
         };
 
 
@@ -72,47 +70,42 @@ public:
 
         static const char* const typeName;
         static const char* componentNames[];
-        static const SphericalTensor zero;
-        static const SphericalTensor one;
-        static const SphericalTensor max;
-        static const SphericalTensor min;
-        static const SphericalTensor I;
-        static const SphericalTensor oneThirdI;
-        static const SphericalTensor twoThirdsI;
+        static const DiagTensor zero;
+        static const DiagTensor one;
+        static const DiagTensor max;
+        static const DiagTensor min;
 
 
     //- Component labeling enumeration
-    enum components { II };
+    enum components { XX, YY, ZZ };
 
 
     // Constructors
 
         //- Construct null
-        inline SphericalTensor();
+        inline DiagTensor();
 
         //- Construct given VectorSpace
-        inline SphericalTensor
-        (
-            const VectorSpace<SphericalTensor<Cmpt>, Cmpt, 1>&
-        );
+        inline DiagTensor(const VectorSpace<DiagTensor<Cmpt>, Cmpt, 3>&);
 
-        //- Construct given the component
-        inline SphericalTensor(const Cmpt& tii);
+        //- Construct given three components
+        inline DiagTensor(const Cmpt& txx, const Cmpt& tyy, const Cmpt& tzz);
 
         //- Construct from Istream
-        inline SphericalTensor(Istream&);
+        inline DiagTensor(Istream&);
 
 
     // Member Functions
 
         // Access
 
-            inline const Cmpt& ii() const;
-            inline Cmpt& ii();
+            inline const Cmpt& xx() const;
+            inline const Cmpt& yy() const;
+            inline const Cmpt& zz() const;
 
-
-        //- Transpose
-        inline const SphericalTensor<Cmpt>& T() const;
+            inline Cmpt& xx();
+            inline Cmpt& yy();
+            inline Cmpt& zz();
 };
 
 
@@ -123,7 +116,7 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 // Include inline implementations
-#include "SphericalTensorI.H"
+#include "DiagTensorTemplateI.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

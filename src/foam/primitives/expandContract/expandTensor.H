@@ -33,7 +33,7 @@ Author
 #ifndef expandTensor_H
 #define expandTensor_H
 
-#include "Tensor.H"
+#include "TensorTemplate.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

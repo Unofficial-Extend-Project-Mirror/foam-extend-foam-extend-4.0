@@ -22,20 +22,24 @@ License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    Foam::SphericalTensor2D
+    Foam::Vector
 
 Description
-    Templated 2D sphericalTensor derived from VectorSpace adding construction
-    from 1 component, element access using ii() member function and the
-    inner-product (dot-product) and outer-product operators.
+    Templated 3D Vector derived from VectorSpace adding construction from
+    3 components, element access using x(), y() and z() member functions and
+    the inner-product (dot-product) and cross product operators.
+
+    A centre() member function which returns the Vector for which it is called
+    is defined so that point which is a typedef to Vector\<scalar\> behaves as
+    other shapes in the shape hierachy.
 
 SourceFiles
-    SphericalTensor2DI.H
+    VectorTemplateI.H
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef SphericalTensor2D_H
-#define SphericalTensor2D_H
+#ifndef VectorTemplate_H
+#define VectorTemplate_H
 
 #include "VectorSpace.H"
 
@@ -44,23 +48,29 @@ SourceFiles
 namespace Foam
 {
 
+template<class T> class List;
+
 /*---------------------------------------------------------------------------*\
-                           Class SphericalTensor2D Declaration
+                           Class Vector Declaration
 \*---------------------------------------------------------------------------*/
 
-template<class Cmpt>
-class SphericalTensor2D
+template <class Cmpt>
+class Vector
 :
-    public VectorSpace<SphericalTensor2D<Cmpt>, Cmpt, 1>
+    public VectorSpace<Vector<Cmpt>, Cmpt, 3>
 {
 
 public:
+
+    //- Equivalent type of labels used for valid component indexing
+    typedef Vector<label> labelType;
+
 
     // Member constants
 
         enum
         {
-            rank = 2 // Rank of SphericalTensor2D is 2
+            rank = 1 // Rank of Vector is 1
         };
 
 
@@ -68,43 +78,79 @@ public:
 
         static const char* const typeName;
         static const char* componentNames[];
-        static const SphericalTensor2D zero;
-        static const SphericalTensor2D one;
-        static const SphericalTensor2D max;
-        static const SphericalTensor2D min;
-        static const SphericalTensor2D I;
-        static const SphericalTensor2D oneThirdI;
-        static const SphericalTensor2D twoThirdsI;
+        static const Vector zero;
+        static const Vector one;
+        static const Vector max;
+        static const Vector min;
 
 
     //- Component labeling enumeration
-    enum components { II };
+    enum components { X, Y, Z };
 
 
     // Constructors
 
         //- Construct null
-        inline SphericalTensor2D();
+        inline Vector();
 
         //- Construct given VectorSpace
-        inline SphericalTensor2D
-        (
-            const VectorSpace<SphericalTensor2D<Cmpt>, Cmpt, 1>&
-        );
+        inline Vector(const VectorSpace<Vector<Cmpt>, Cmpt, 3>&);
 
-        //- Construct given the component
-        inline SphericalTensor2D(const Cmpt& tii);
+        //- Construct given three components
+        inline Vector(const Cmpt& vx, const Cmpt& vy, const Cmpt& vz);
 
         //- Construct from Istream
-        inline SphericalTensor2D(Istream&);
+        inline Vector(Istream&);
 
 
     // Member Functions
 
         // Access
 
-            inline const Cmpt& ii() const;
-            inline Cmpt& ii();
+            inline const Cmpt& x() const;
+            inline const Cmpt& y() const;
+            inline const Cmpt& z() const;
+
+            inline Cmpt& x();
+            inline Cmpt& y();
+            inline Cmpt& z();
+
+            //- Return i-th component.  Consistency with VectorN
+            inline const Cmpt& operator()
+            (
+                const direction i
+            ) const;
+
+            //- Return i-th component.  Consistency with VectorN
+            inline  Cmpt& operator()
+            (
+                const direction i
+            );
+
+
+        //- Return *this (used for point which is a typedef to Vector<scalar>.
+        inline const Vector<Cmpt>& centre
+        (
+            const Foam::List<Vector<Cmpt> >&
+        ) const;
+};
+
+
+template<class Cmpt>
+class typeOfRank<Cmpt, 1>
+{
+public:
+
+    typedef Vector<Cmpt> type;
+};
+
+
+template<class Cmpt>
+class symmTypeOfRank<Cmpt, 1>
+{
+public:
+
+    typedef Vector<Cmpt> type;
 };
 
 
@@ -114,8 +160,7 @@ public:
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-// Include inline implementations
-#include "SphericalTensor2DI.H"
+#include "VectorTemplateI.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

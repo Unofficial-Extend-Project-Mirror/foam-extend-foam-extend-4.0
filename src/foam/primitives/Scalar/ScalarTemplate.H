@@ -28,7 +28,7 @@ Description
     Single floating point number
 
 SourceFiles
-    Scalar.C
+    ScalarTemplate.C
 
 \*---------------------------------------------------------------------------*/
 

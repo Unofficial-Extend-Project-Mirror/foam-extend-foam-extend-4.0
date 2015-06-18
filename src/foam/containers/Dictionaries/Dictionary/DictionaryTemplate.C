@@ -25,7 +25,7 @@ Description
 
 \*---------------------------------------------------------------------------*/
 
-#include "Dictionary.H"
+#include "DictionaryTemplate.H"
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 

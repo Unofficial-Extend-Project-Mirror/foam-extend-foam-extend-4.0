@@ -23,7 +23,7 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "ProcessorTopology.H"
+#include "ProcessorTopologyTemplate.H"
 #include "ListOps.H"
 #include "Pstream.H"
 #include "commSchedule.H"

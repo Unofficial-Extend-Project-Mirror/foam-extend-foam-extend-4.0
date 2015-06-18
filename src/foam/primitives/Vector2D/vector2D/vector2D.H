@@ -36,7 +36,7 @@ SourceFiles
 #define vector2D_H
 
 #include "scalar.H"
-#include "Vector2D.H"
+#include "Vector2DTemplate.H"
 #include "contiguous.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

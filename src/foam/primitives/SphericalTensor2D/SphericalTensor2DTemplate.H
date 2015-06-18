@@ -22,20 +22,20 @@ License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    Foam::Vector2D
+    Foam::SphericalTensor2D
 
 Description
-    Templated 2D Vector derived from VectorSpace adding construction from
-    2 components, element access using x() and y() member functions and
-    the inner-product (dot-product).
+    Templated 2D sphericalTensor derived from VectorSpace adding construction
+    from 1 component, element access using ii() member function and the
+    inner-product (dot-product) and outer-product operators.
 
 SourceFiles
-    Vector2DI.H
+    SphericalTensor2DTemplateI.H
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef Vector2D_H
-#define Vector2D_H
+#ifndef SphericalTensor2DTemplate_H
+#define SphericalTensor2DTemplate_H
 
 #include "VectorSpace.H"
 
@@ -45,13 +45,13 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class Vector2D Declaration
+                           Class SphericalTensor2D Declaration
 \*---------------------------------------------------------------------------*/
 
-template <class Cmpt>
-class Vector2D
+template<class Cmpt>
+class SphericalTensor2D
 :
-    public VectorSpace<Vector2D<Cmpt>, Cmpt, 2>
+    public VectorSpace<SphericalTensor2D<Cmpt>, Cmpt, 1>
 {
 
 public:
@@ -60,7 +60,7 @@ public:
 
         enum
         {
-            rank = 1 // Rank of Vector2D is 1
+            rank = 2 // Rank of SphericalTensor2D is 2
         };
 
 
@@ -68,58 +68,43 @@ public:
 
         static const char* const typeName;
         static const char* componentNames[];
-        static const Vector2D zero;
-        static const Vector2D one;
-        static const Vector2D max;
-        static const Vector2D min;
+        static const SphericalTensor2D zero;
+        static const SphericalTensor2D one;
+        static const SphericalTensor2D max;
+        static const SphericalTensor2D min;
+        static const SphericalTensor2D I;
+        static const SphericalTensor2D oneThirdI;
+        static const SphericalTensor2D twoThirdsI;
 
 
     //- Component labeling enumeration
-    enum components { X, Y };
+    enum components { II };
 
 
     // Constructors
 
         //- Construct null
-        inline Vector2D();
+        inline SphericalTensor2D();
 
         //- Construct given VectorSpace
-        inline Vector2D(const VectorSpace<Vector2D<Cmpt>, Cmpt, 2>&);
+        inline SphericalTensor2D
+        (
+            const VectorSpace<SphericalTensor2D<Cmpt>, Cmpt, 1>&
+        );
 
-        //- Construct given two components
-        inline Vector2D(const Cmpt& vx, const Cmpt& vy);
+        //- Construct given the component
+        inline SphericalTensor2D(const Cmpt& tii);
 
         //- Construct from Istream
-        inline Vector2D(Istream&);
+        inline SphericalTensor2D(Istream&);
 
 
     // Member Functions
 
         // Access
 
-            inline const Cmpt& x() const;
-            inline const Cmpt& y() const;
-
-            inline Cmpt& x();
-            inline Cmpt& y();
-
-            //- Return i-th component.  Consistency with VectorN
-            inline const Cmpt& operator()
-            (
-                const direction i
-            ) const;
-
-            //- Return i-th component.  Consistency with VectorN
-            inline  Cmpt& operator()
-            (
-                const direction i
-            );
-
-
-        // Operators
-
-            //- perp dot product (dot product with perpendicular vector)
-            inline scalar perp(const Vector2D<Cmpt>& b) const;
+            inline const Cmpt& ii() const;
+            inline Cmpt& ii();
 };
 
 
@@ -130,7 +115,7 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 // Include inline implementations
-#include "Vector2DI.H"
+#include "SphericalTensor2DTemplateI.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

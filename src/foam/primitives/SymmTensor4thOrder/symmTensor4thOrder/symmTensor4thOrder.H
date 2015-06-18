@@ -35,7 +35,7 @@ SourceFiles
 #ifndef symmTensor4thOrder_H
 #define symmTensor4thOrder_H
 
-#include "SymmTensor4thOrder.H"
+#include "SymmTensor4thOrderTemplate.H"
 #include "vector.H"
 #include "contiguous.H"
 

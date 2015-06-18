@@ -22,51 +22,54 @@ License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    Foam::SymmTensor
+    Foam::Tensor
 
 Description
-    Templated 3D symmetric tensor derived from VectorSpace adding construction
-    from 6 components, element access using xx(), xy() etc. member functions
-    and the inner-product (dot-product) and outer-product of two Vectors
+    Templated 3D tensor derived from VectorSpace adding construction from
+    9 components, element access using xx(), xy() etc. member functions and
+    the inner-product (dot-product) and outer-product of two Vectors
     (tensor-product) operators.
 
 SourceFiles
-    SymmTensorI.H
+    TensorTemplateI.H
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef SymmTensor_H
-#define SymmTensor_H
+#ifndef TensorTemplate_H
+#define TensorTemplate_H
 
-#include "VectorSpace.H"
-#include "SphericalTensor.H"
+#include "VectorTemplate.H"
+#include "SphericalTensorTemplate.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 
+template<class Cmpt>
+class SymmTensor;
+
 /*---------------------------------------------------------------------------*\
-                           Class SymmTensor Declaration
+                           Class Tensor Declaration
 \*---------------------------------------------------------------------------*/
 
 template <class Cmpt>
-class SymmTensor
+class Tensor
 :
-    public VectorSpace<SymmTensor<Cmpt>, Cmpt, 6>
+    public VectorSpace<Tensor<Cmpt>, Cmpt, 9>
 {
 
 public:
 
     //- Equivalent type of labels used for valid component indexing
-    typedef SymmTensor<label> labelType;
+    typedef Tensor<label> labelType;
 
 
     // Member constants
 
         enum
         {
-            rank = 2 // Rank of SymmTensor is 2
+            rank = 2 // Rank of Tensor is 2
         };
 
 
@@ -75,37 +78,48 @@ public:
         static const char* const typeName;
         static const char* componentNames[];
 
-        static const SymmTensor zero;
-        static const SymmTensor one;
-        static const SymmTensor max;
-        static const SymmTensor min;
+        static const Tensor zero;
+        static const Tensor one;
+        static const Tensor max;
+        static const Tensor min;
 
 
     //- Component labeling enumeration
-    enum components { XX, XY, XZ, YY, YZ, ZZ };
+    enum components { XX, XY, XZ, YX, YY, YZ, ZX, ZY, ZZ };
 
 
     // Constructors
 
         //- Construct null
-        inline SymmTensor();
+        inline Tensor();
 
         //- Construct given VectorSpace
-        inline SymmTensor(const VectorSpace<SymmTensor<Cmpt>, Cmpt, 6>&);
+        inline Tensor(const VectorSpace<Tensor<Cmpt>, Cmpt, 9>&);
 
         //- Construct given SphericalTensor
-        inline SymmTensor(const SphericalTensor<Cmpt>&);
+        inline Tensor(const SphericalTensor<Cmpt>&);
 
-        //- Construct given the six components
-        inline SymmTensor
+        //- Construct given SymmTensor
+        inline Tensor(const SymmTensor<Cmpt>&);
+
+        //- Construct given the three vectors
+        inline Tensor
+        (
+            const Vector<Cmpt>& x,
+            const Vector<Cmpt>& y,
+            const Vector<Cmpt>& z
+        );
+
+        //- Construct given the nine components
+        inline Tensor
         (
             const Cmpt txx, const Cmpt txy, const Cmpt txz,
-                            const Cmpt tyy, const Cmpt tyz,
-                                            const Cmpt tzz
+            const Cmpt tyx, const Cmpt tyy, const Cmpt tyz,
+            const Cmpt tzx, const Cmpt tzy, const Cmpt tzz
         );
 
         //- Construct from Istream
-        SymmTensor(Istream&);
+        Tensor(Istream&);
 
 
     // Member Functions
@@ -115,34 +129,65 @@ public:
             inline const Cmpt& xx() const;
             inline const Cmpt& xy() const;
             inline const Cmpt& xz() const;
+            inline const Cmpt& yx() const;
             inline const Cmpt& yy() const;
             inline const Cmpt& yz() const;
+            inline const Cmpt& zx() const;
+            inline const Cmpt& zy() const;
             inline const Cmpt& zz() const;
 
             inline Cmpt& xx();
             inline Cmpt& xy();
             inline Cmpt& xz();
+            inline Cmpt& yx();
             inline Cmpt& yy();
             inline Cmpt& yz();
+            inline Cmpt& zx();
+            inline Cmpt& zy();
             inline Cmpt& zz();
 
+            // Access vector components.
+            // Note: returning const only to find out lhs usage
+
+            inline const Vector<Cmpt> x() const;
+            inline const Vector<Cmpt> y() const;
+            inline const Vector<Cmpt> z() const;
+
+            //- Return (i, j) component.  Consistency with VectorN
+            inline const Cmpt& operator()
+            (
+                const direction i,
+                const direction j
+            ) const;
+
+            //- Return access to (i, j) component.  Consistency with VectorN
+            inline Cmpt& operator()
+            (
+                const direction i,
+                const direction j
+            );
+
+
         //- Transpose
-        inline const SymmTensor<Cmpt>& T() const;
+        inline Tensor<Cmpt> T() const;
 
 
     // Member Operators
 
-        //- Construct given SphericalTensor
+        //- Assign to a SphericalTensor
         inline void operator=(const SphericalTensor<Cmpt>&);
+
+        //- Assign to a SymmTensor
+        inline void operator=(const SymmTensor<Cmpt>&);
 };
 
 
 template<class Cmpt>
-class symmTypeOfRank<Cmpt, 2>
+class typeOfRank<Cmpt, 2>
 {
 public:
 
-    typedef SymmTensor<Cmpt> type;
+    typedef Tensor<Cmpt> type;
 };
 
 
@@ -153,7 +198,7 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 // Include inline implementations
-#include "SymmTensorI.H"
+#include "TensorTemplateI.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

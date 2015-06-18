@@ -32,12 +32,12 @@ Description
     of intrusive doubly-linked list of \<T\>.
 
 SourceFiles
-    Dictionary.C
+    DictionaryTemplate.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef Dictionary_H
-#define Dictionary_H
+#ifndef DictionaryTemplate_H
+#define DictionaryTemplate_H
 
 #include "DictionaryBase.H"
 #include "IDLList.H"
@@ -83,7 +83,7 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-#   include "Dictionary.C"
+#   include "DictionaryTemplate.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

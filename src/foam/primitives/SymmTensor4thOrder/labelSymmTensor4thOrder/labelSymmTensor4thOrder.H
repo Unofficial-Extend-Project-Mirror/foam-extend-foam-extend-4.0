@@ -35,7 +35,7 @@ SourceFiles
 #ifndef labelSymmTensor4thOrder_H
 #define labelSymmTensor4thOrder_H
 
-#include "SymmTensor4thOrder.H"
+#include "SymmTensor4thOrderTemplate.H"
 #include "contiguous.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

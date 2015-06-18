@@ -22,24 +22,24 @@ License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    Foam::DiagTensor
+    Foam::ProcessorTopology
 
 Description
-    Templated 3D DiagTensor derived from VectorSpace.
+    Determines processor-processor connection. After instantiation contains
+    on all processors the processor-processor connection table.
 
-    Adding construction from 3 components, element access using xx(), yy()
-    and zz() member functions and the inner-product (dot-product) and
-    outer-product operators.
+    *this[procI] gives the list of neighbouring processors.
 
 SourceFiles
-    DiagTensorI.H
+    ProcessorTopologyTemplate.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef DiagTensor_H
-#define DiagTensor_H
+#ifndef ProcessorTopologyTemplate_H
+#define ProcessorTopologyTemplate_H
 
-#include "Tensor.H"
+#include "labelList.H"
+#include "lduSchedule.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -47,65 +47,57 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class DiagTensor Declaration
+                       Class ProcessorTopology Declaration
 \*---------------------------------------------------------------------------*/
 
-template <class Cmpt>
-class DiagTensor
+template<class Patch, class ProcPatch>
+class ProcessorTopology
 :
-    public VectorSpace<DiagTensor<Cmpt>, Cmpt, 3>
+    public labelListList
 {
+
+private:
+
+    // Private data
+
+        //- Local map from neighbour proc to patchI. Different per processor!
+        //  -1 or patchI for connection to procID
+        labelList procPatchMap_;
+
+        //- Order in which the patches should be initialised/evaluated
+        //  corresponding to the schedule
+        lduSchedule patchSchedule_;
+
+
+    // Private Member Functions
+
+        //- Return all neighbouring processors of this processor. Set
+        //  procPatchMap_.
+        labelList procNeighbours(const PtrList<Patch>&);
 
 public:
 
-    // Member constants
-
-        enum
-        {
-            rank = 2 // Rank of DiagTensor is 2
-        };
-
-
-    // Static data members
-
-        static const char* const typeName;
-        static const char* componentNames[];
-        static const DiagTensor zero;
-        static const DiagTensor one;
-        static const DiagTensor max;
-        static const DiagTensor min;
-
-
-    //- Component labeling enumeration
-    enum components { XX, YY, ZZ };
-
-
     // Constructors
 
-        //- Construct null
-        inline DiagTensor();
-
-        //- Construct given VectorSpace
-        inline DiagTensor(const VectorSpace<DiagTensor<Cmpt>, Cmpt, 3>&);
-
-        //- Construct given three components
-        inline DiagTensor(const Cmpt& txx, const Cmpt& tyy, const Cmpt& tzz);
-
-        //- Construct from Istream
-        inline DiagTensor(Istream&);
+        //- Construct from boundaryMesh
+        ProcessorTopology(const PtrList<Patch>& patches);
 
 
     // Member Functions
 
-        // Access
+        //- from neighbour processor to index in boundaryMesh. Local information
+        //  (so not same over all processors)
+        const labelList& procPatchMap() const
+        {
+            return procPatchMap_;
+        }
 
-            inline const Cmpt& xx() const;
-            inline const Cmpt& yy() const;
-            inline const Cmpt& zz() const;
-
-            inline Cmpt& xx();
-            inline Cmpt& yy();
-            inline Cmpt& zz();
+        //- Order in which the patches should be initialised/evaluated
+        //  corresponding to the schedule
+        const lduSchedule& patchSchedule() const
+        {
+            return patchSchedule_;
+        }
 };
 
 
@@ -115,8 +107,9 @@ public:
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-// Include inline implementations
-#include "DiagTensorI.H"
+#ifdef NoRepository
+#   include "ProcessorTopologyTemplate.C"
+#endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
