@@ -121,7 +121,12 @@ namespace Foam
 
 } // End namespace Foam
 
+#else
+
+#error "Undefined size for label in label.H"
+
 #endif
+
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
