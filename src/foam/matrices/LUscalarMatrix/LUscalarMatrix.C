@@ -158,7 +158,7 @@ void Foam::LUscalarMatrix::convert
     {
         if (interfaces.set(inti))
         {
-            const lduInterface& interface = interfaces[inti].interface();
+            const lduInterface& interface = interfaces[inti].coupledInterface();
 
             const label* __restrict__ ulPtr = interface.faceCells().begin();
             const scalar* __restrict__ upperLowerPtr =

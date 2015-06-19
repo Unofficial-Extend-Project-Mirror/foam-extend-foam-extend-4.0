@@ -632,7 +632,7 @@ Foam::BlockMatrixAgglomeration<Type>::restrictMatrix() const
     {
         if (interfaceFields.set(intI))
         {
-            interfaceFields[intI].interface().initInternalFieldTransfer
+            interfaceFields[intI].coupledInterface().initInternalFieldTransfer
             (
                 Pstream::blocking,
                 agglomIndex_
@@ -649,7 +649,7 @@ Foam::BlockMatrixAgglomeration<Type>::restrictMatrix() const
         if (interfaceFields.set(intI))
         {
             const lduInterface& fineInterface =
-                interfaceFields[intI].interface();
+                interfaceFields[intI].coupledInterface();
 
             fineInterfaceAddr.set
             (
@@ -672,7 +672,7 @@ Foam::BlockMatrixAgglomeration<Type>::restrictMatrix() const
         if (interfaceFields.set(intI))
         {
             const lduInterface& fineInterface =
-                interfaceFields[intI].interface();
+                interfaceFields[intI].coupledInterface();
 
             coarseInterfaces.set
             (
