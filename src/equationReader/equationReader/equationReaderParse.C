@@ -74,8 +74,8 @@ void Foam::equationReader::parse(label index) const
         tl[tl.size() - 1] = token(rawStream);
 
         // Bug fix - equations ending in brackets read an extra token of type
-        // ERROR at the end, caused by string replace ')' with ' ) ' above
-        if (tl[tl.size() - 1].type() == token::ERROR)
+        // FATALERROR at the end, caused by string replace ')' with ' ) ' above
+        if (tl[tl.size() - 1].type() == token::FATALERROR)
         {
             tl.setSize(tl.size() - 1);
             forceEnd = true;

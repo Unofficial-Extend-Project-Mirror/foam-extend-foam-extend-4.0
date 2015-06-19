@@ -600,7 +600,7 @@ Foam::autoPtr<Foam::amgMatrix> Foam::pamgPolicy::restrictMatrix
     {
         if (interfaceFields.set(intI))
         {
-            interfaceFields[intI].interface().initInternalFieldTransfer
+            interfaceFields[intI].coupledInterface().initInternalFieldTransfer
             (
                 Pstream::blocking,
                 child_
@@ -617,7 +617,7 @@ Foam::autoPtr<Foam::amgMatrix> Foam::pamgPolicy::restrictMatrix
         if (interfaceFields.set(intI))
         {
             const lduInterface& fineInterface =
-                interfaceFields[intI].interface();
+                interfaceFields[intI].coupledInterface();
 
             fineInterfaceAddr.set
             (
@@ -640,7 +640,7 @@ Foam::autoPtr<Foam::amgMatrix> Foam::pamgPolicy::restrictMatrix
         if (interfaceFields.set(intI))
         {
             const lduInterface& fineInterface =
-                interfaceFields[intI].interface();
+                interfaceFields[intI].coupledInterface();
 
             coarseInterfaces.set
             (
