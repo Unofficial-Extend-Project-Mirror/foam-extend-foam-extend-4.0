@@ -88,7 +88,7 @@ int gzstreambuf::underflow() { // used for input buffer only
     memcpy( buffer + (4 - n_putback), gptr() - n_putback, n_putback);
 
     int num = gzread( file, buffer+4, bufferSize-4);
-    if (num <= 0) // ERROR or EOF
+    if (num <= 0) // FATALERROR or EOF
         return EOF;
 
     // reset buffer pointers
