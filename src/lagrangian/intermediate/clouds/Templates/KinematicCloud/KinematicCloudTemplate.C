@@ -23,7 +23,7 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "KinematicCloud.H"
+#include "KinematicCloudTemplate.H"
 #include "IntegrationScheme.H"
 #include "interpolation.H"
 

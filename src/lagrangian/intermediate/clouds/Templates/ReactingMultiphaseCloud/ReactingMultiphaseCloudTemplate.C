@@ -23,49 +23,22 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "ReactingCloud.H"
+#include "ReactingMultiphaseCloudTemplate.H"
 
-#include "CompositionModel.H"
-#include "PhaseChangeModel.H"
+#include "DevolatilisationModel.H"
+#include "SurfaceReactionModel.H"
 
-// * * * * * * * * * * * Protected Member Functions  * * * * * * * * * * * * //
+// * * * * * * * * * * * * * Protected Member Functions  * * * * * * * * * * //
 
 template<class ParcelType>
-void Foam::ReactingCloud<ParcelType>::checkSuppliedComposition
-(
-    const scalarField& YSupplied,
-    const scalarField& Y,
-    const word& YName
-)
+void Foam::ReactingMultiphaseCloud<ParcelType>::preEvolve()
 {
-    if (YSupplied.size() != Y.size())
-    {
-        FatalErrorIn
-        (
-            "ReactingCloud<ParcelType>::checkSuppliedComposition"
-            "("
-                "const scalarField&, "
-                "const scalarField&, "
-                "const word&"
-            ")"
-        )   << YName << " supplied, but size is not compatible with "
-            << "parcel composition: " << nl << "    "
-            << YName << "(" << YSupplied.size() << ") vs required composition "
-            << YName << "(" << Y.size() << ")" << nl
-            << abort(FatalError);
-    }
+    ReactingCloud<ParcelType>::preEvolve();
 }
 
 
 template<class ParcelType>
-void Foam::ReactingCloud<ParcelType>::preEvolve()
-{
-    ThermoCloud<ParcelType>::preEvolve();
-}
-
-
-template<class ParcelType>
-void Foam::ReactingCloud<ParcelType>::evolveCloud()
+void Foam::ReactingMultiphaseCloud<ParcelType>::evolveCloud()
 {
     const volScalarField& T = this->carrierThermo().T();
     const volScalarField cp = this->carrierThermo().Cp();
@@ -132,16 +105,16 @@ void Foam::ReactingCloud<ParcelType>::evolveCloud()
 
 
 template<class ParcelType>
-void Foam::ReactingCloud<ParcelType>::postEvolve()
+void Foam::ReactingMultiphaseCloud<ParcelType>::postEvolve()
 {
-    ThermoCloud<ParcelType>::postEvolve();
+    ReactingCloud<ParcelType>::postEvolve();
 }
 
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 template<class ParcelType>
-Foam::ReactingCloud<ParcelType>::ReactingCloud
+Foam::ReactingMultiphaseCloud<ParcelType>::ReactingMultiphaseCloud
 (
     const word& cloudName,
     const volScalarField& rho,
@@ -151,55 +124,27 @@ Foam::ReactingCloud<ParcelType>::ReactingCloud
     bool readFields
 )
 :
-    ThermoCloud<ParcelType>(cloudName, rho, U, g, thermo, false),
-    reactingCloud(),
+    ReactingCloud<ParcelType>(cloudName, rho, U, g, thermo, false),
+    reactingMultiphaseCloud(),
     constProps_(this->particleProperties()),
-    mcCarrierThermo_
+    devolatilisationModel_
     (
-        dynamic_cast<multiComponentMixture<thermoType>&>(thermo)
-    ),
-    compositionModel_
-    (
-        CompositionModel<ReactingCloud<ParcelType> >::New
+        DevolatilisationModel<ReactingMultiphaseCloud<ParcelType> >::New
         (
             this->particleProperties(),
             *this
         )
     ),
-    phaseChangeModel_
+    surfaceReactionModel_
     (
-        PhaseChangeModel<ReactingCloud<ParcelType> >::New
+        SurfaceReactionModel<ReactingMultiphaseCloud<ParcelType> >::New
         (
             this->particleProperties(),
             *this
         )
     ),
-    rhoTrans_(mcCarrierThermo_.species().size()),
-    dMassPhaseChange_(0.0)
+    dMassDevolatilisation_(0.0)
 {
-    // Set storage for mass source fields and initialise to zero
-    forAll(rhoTrans_, i)
-    {
-        rhoTrans_.set
-        (
-            i,
-            new DimensionedField<scalar, volMesh>
-            (
-                IOobject
-                (
-                    this->name() + "rhoTrans_" + mcCarrierThermo_.species()[i],
-                    this->db().time().timeName(),
-                    this->db(),
-                    IOobject::NO_READ,
-                    IOobject::NO_WRITE,
-                    false
-                ),
-                this->mesh(),
-                dimensionedScalar("zero", dimMass, 0.0)
-            )
-        );
-    }
-
     if (readFields)
     {
         ParcelType::readFields(*this);
@@ -210,59 +155,70 @@ Foam::ReactingCloud<ParcelType>::ReactingCloud
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
 template<class ParcelType>
-Foam::ReactingCloud<ParcelType>::~ReactingCloud()
+Foam::ReactingMultiphaseCloud<ParcelType>::~ReactingMultiphaseCloud()
 {}
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 template<class ParcelType>
-void Foam::ReactingCloud<ParcelType>::checkParcelProperties
+void Foam::ReactingMultiphaseCloud<ParcelType>::checkParcelProperties
 (
     ParcelType& parcel,
     const scalar lagrangianDt,
     const bool fullyDescribed
 )
 {
-    ThermoCloud<ParcelType>::checkParcelProperties
+    ReactingCloud<ParcelType>::checkParcelProperties
     (
         parcel,
         lagrangianDt,
         fullyDescribed
     );
 
+    label idGas = this->composition().idGas();
+    label idLiquid = this->composition().idLiquid();
+    label idSolid = this->composition().idSolid();
+
     if (!fullyDescribed)
     {
-        parcel.Y() = composition().YMixture0();
+        parcel.YGas() = this->composition().Y0(idGas);
+        parcel.YLiquid() = this->composition().Y0(idLiquid);
+        parcel.YSolid() = this->composition().Y0(idSolid);
     }
     else
     {
-        checkSuppliedComposition
+        this->checkSuppliedComposition
         (
-            parcel.Y(),
-            composition().YMixture0(),
-            "YMixture"
+            parcel.YGas(),
+            this->composition().Y0(idGas),
+            "YGas"
+        );
+        this->checkSuppliedComposition
+        (
+            parcel.YLiquid(),
+            this->composition().Y0(idLiquid),
+            "YLiquid"
+        );
+        this->checkSuppliedComposition
+        (
+            parcel.YSolid(),
+            this->composition().Y0(idSolid),
+            "YSolid"
         );
     }
-
-    // derived information - store initial mass
-    parcel.mass0() = parcel.mass();
 }
 
 
 template<class ParcelType>
-void Foam::ReactingCloud<ParcelType>::resetSourceTerms()
+void Foam::ReactingMultiphaseCloud<ParcelType>::resetSourceTerms()
 {
-    ThermoCloud<ParcelType>::resetSourceTerms();
-    forAll(rhoTrans_, i)
-    {
-        rhoTrans_[i].field() = 0.0;
-    }
+    ReactingCloud<ParcelType>::resetSourceTerms();
 }
 
 
 template<class ParcelType>
-void Foam::ReactingCloud<ParcelType>::evolve()
+void Foam::ReactingMultiphaseCloud<ParcelType>::evolve()
 {
     if (this->active())
     {
@@ -279,19 +235,33 @@ void Foam::ReactingCloud<ParcelType>::evolve()
 
 
 template<class ParcelType>
-void Foam::ReactingCloud<ParcelType>::info() const
+void Foam::ReactingMultiphaseCloud<ParcelType>::info() const
 {
-    ThermoCloud<ParcelType>::info();
-
-    Info<< "    Mass transfer phase change      = "
-        << returnReduce(dMassPhaseChange_, sumOp<scalar>()) << nl;
+    ReactingCloud<ParcelType>::info();
+    Info<< "    Mass transfer devolatilisation  = "
+        << returnReduce(dMassDevolatilisation_, sumOp<scalar>()) << nl;
+    Info<< "    Mass transfer surface reaction  = "
+        << returnReduce(dMassSurfaceReaction_, sumOp<scalar>()) << nl;
 }
 
 
 template<class ParcelType>
-void Foam::ReactingCloud<ParcelType>::addToMassPhaseChange(const scalar dMass)
+void Foam::ReactingMultiphaseCloud<ParcelType>::addToMassDevolatilisation
+(
+    const scalar dMass
+)
 {
-    dMassPhaseChange_ += dMass;
+    dMassDevolatilisation_ += dMass;
+}
+
+
+template<class ParcelType>
+void Foam::ReactingMultiphaseCloud<ParcelType>::addToMassSurfaceReaction
+(
+    const scalar dMass
+)
+{
+    dMassSurfaceReaction_ += dMass;
 }
 
 

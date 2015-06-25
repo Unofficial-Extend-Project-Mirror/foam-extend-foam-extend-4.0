@@ -28,13 +28,13 @@ Description
     Templated base class for dsmc cloud
 
 SourceFiles
-    DsmcCloudI.H
-    DsmcCloud.C
+    DsmcCloudTemplateI.H
+    DsmcCloudTemplate.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef DsmcCloud_H
-#define DsmcCloud_H
+#ifndef DsmcCloudTemplate_H
+#define DsmcCloudTemplate_H
 
 #include "Cloud.H"
 #include "DsmcBaseCloud.H"
@@ -476,12 +476,12 @@ public:
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-#include "DsmcCloudI.H"
+#include "DsmcCloudTemplateI.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-#   include "DsmcCloud.C"
+#   include "DsmcCloudTemplate.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

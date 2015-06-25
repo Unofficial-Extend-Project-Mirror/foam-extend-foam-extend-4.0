@@ -28,9 +28,9 @@ Description
     DSMC parcel class
 
 SourceFiles
-    DsmcParcelI.H
-    DsmcParcel.C
-    DsmcParcelIO.C
+    DsmcParcelTemplateI.H
+    DsmcParcelTemplate.C
+    DsmcParcelTemplateIO.C
 
 \*---------------------------------------------------------------------------*/
 
@@ -42,7 +42,7 @@ SourceFiles
 #include "autoPtr.H"
 #include "contiguous.H"
 
-#include "DsmcCloud.H"
+#include "DsmcCloudTemplate.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -328,7 +328,7 @@ public:
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-#include "DsmcParcelI.H"
+#include "DsmcParcelTemplateI.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -345,7 +345,7 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-    #include "DsmcParcel.C"
+    #include "DsmcParcelTemplate.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

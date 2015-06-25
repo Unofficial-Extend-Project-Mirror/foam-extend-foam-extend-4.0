@@ -46,7 +46,7 @@ SourceFiles
 #include "contiguous.H"
 
 #include "KinematicParcel.H"
-#include "ThermoCloud.H"
+#include "ThermoCloudTemplate.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

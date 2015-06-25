@@ -29,14 +29,14 @@ Description
     phase.
 
 SourceFiles
-    ReactingParcelI.H
-    ReactingParcel.C
-    ReactingParcelIO.C
+    ReactingParcelTemplateI.H
+    ReactingParcelTemplate.C
+    ReactingParcelTemplateIO.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef ReactingParcel_H
-#define ReactingParcel_H
+#ifndef ReactingParcelTemplate_H
+#define ReactingParcelTemplate_H
 
 #include "IOstream.H"
 #include "autoPtr.H"
@@ -44,7 +44,7 @@ SourceFiles
 #include "contiguous.H"
 
 #include "ThermoParcel.H"
-#include "ReactingCloud.H"
+#include "ReactingCloudTemplate.H"
 #include "reactingParcel.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -371,12 +371,12 @@ public:
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-#include "ReactingParcelI.H"
+#include "ReactingParcelTemplateI.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-    #include "ReactingParcel.C"
+    #include "ReactingParcelTemplate.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

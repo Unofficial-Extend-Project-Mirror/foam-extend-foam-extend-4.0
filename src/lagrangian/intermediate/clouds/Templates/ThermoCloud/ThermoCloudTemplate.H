@@ -31,15 +31,15 @@ Description
       - Heat transfer
 
 SourceFiles
-    ThermoCloudI.H
-    ThermoCloud.C
+    ThermoCloudTemplateI.H
+    ThermoCloudTemplate.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef ThermoCloud_H
-#define ThermoCloud_H
+#ifndef ThermoCloudTemplate_H
+#define ThermoCloudTemplate_H
 
-#include "KinematicCloud.H"
+#include "KinematicCloudTemplate.H"
 #include "thermoCloud.H"
 #include "basicThermo.H"
 
@@ -236,12 +236,12 @@ public:
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-#include "ThermoCloudI.H"
+#include "ThermoCloudTemplateI.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-#   include "ThermoCloud.C"
+#   include "ThermoCloudTemplate.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

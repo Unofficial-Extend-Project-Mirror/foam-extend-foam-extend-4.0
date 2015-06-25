@@ -28,7 +28,7 @@ License
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-#include "KinematicCloud.H"
+#include "KinematicCloudTemplate.H"
 
 #include "LocalInteraction.H"
 #include "Rebound.H"

@@ -23,7 +23,7 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "ReactingParcel.H"
+#include "ReactingParcelTemplate.H"
 #include "mathematicalConstants.H"
 #include "specie.H"
 
@@ -521,7 +521,7 @@ Foam::ReactingParcel<ParcelType>::ReactingParcel
 
 // * * * * * * * * * * * * * * IOStream operators  * * * * * * * * * * * * * //
 
-#include "ReactingParcelIO.C"
+#include "ReactingParcelTemplateIO.C"
 
 // ************************************************************************* //
 

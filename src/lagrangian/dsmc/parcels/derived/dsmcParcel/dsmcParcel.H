@@ -28,14 +28,14 @@ Description
 
 
 SourceFiles
-    dsmcParcel.C
+    dsmcParcelTemplate.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef dsmcParcel_H
-#define dsmcParcel_H
+#ifndef dsmcParcelTemplate_H
+#define dsmcParcelTemplate_H
 
-#include "DsmcParcel.H"
+#include "DsmcParcelTemplate.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

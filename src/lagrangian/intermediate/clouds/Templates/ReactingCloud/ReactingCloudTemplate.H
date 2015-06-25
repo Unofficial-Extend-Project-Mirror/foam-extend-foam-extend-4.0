@@ -22,27 +22,27 @@ License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    Foam::ReactingMultiphaseCloud
+    Foam::ReactingCloud
 
 Description
-    Templated base class for multiphase reacting cloud
+    Templated base class for reacting cloud
 
-    - Adds to reacting cloud
-      - multiphase composition
-      - devolatilisatsion
-      - surface reactions
+    - Adds to thermodynamic cloud
+      - Variable composition (single phase)
+      - Phase change
 
 SourceFiles
-    ReactingMultiphaseCloudI.H
-    ReactingMultiphaseCloud.C
+    ReactingCloudTemplateI.H
+    ReactingCloudTemplate.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef ReactingMultiphaseCloud_H
-#define ReactingMultiphaseCloud_H
+#ifndef ReactingCloudTemplate_H
+#define ReactingCloudTemplate_H
 
-#include "ReactingCloud.H"
-#include "reactingMultiphaseCloud.H"
+#include "ThermoCloudTemplate.H"
+#include "reactingCloud.H"
+#include "multiComponentMixture.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -52,28 +52,36 @@ namespace Foam
 // Forward declaration of classes
 
 template<class CloudType>
-class DevolatilisationModel;
+class CompositionModel;
 
 template<class CloudType>
-class SurfaceReactionModel;
+class PhaseChangeModel;
 
 /*---------------------------------------------------------------------------*\
-                   Class ReactingMultiphaseCloud Declaration
+                      Class ReactingCloud Declaration
 \*---------------------------------------------------------------------------*/
 
 template<class ParcelType>
-class ReactingMultiphaseCloud
+class ReactingCloud
 :
-    public ReactingCloud<ParcelType>,
-    public reactingMultiphaseCloud
+    public ThermoCloud<ParcelType>,
+    public reactingCloud
 {
-    // Private member functions
+public:
+
+    //- Type of thermodynamics the cloud was instantiated for
+    typedef typename ParcelType::thermoType thermoType;
+
+
+private:
+
+    // Private Member Functions
 
         //- Disallow default bitwise copy construct
-        ReactingMultiphaseCloud(const ReactingMultiphaseCloud&);
+        ReactingCloud(const ReactingCloud&);
 
         //- Disallow default bitwise assignment
-        void operator=(const ReactingMultiphaseCloud&);
+        void operator=(const ReactingCloud&);
 
 
 protected:
@@ -83,35 +91,45 @@ protected:
         //- Parcel constant properties
         typename ParcelType::constantProperties constProps_;
 
+        //- Multi-component carrier phase thermo
+        multiComponentMixture<thermoType>& mcCarrierThermo_;
+
 
         // References to the cloud sub-models
 
-            //- Devolatilisation model
-            autoPtr
-            <
-                DevolatilisationModel<ReactingMultiphaseCloud<ParcelType> >
-            >
-            devolatilisationModel_;
+            //- Reacting composition model
+            autoPtr<CompositionModel<ReactingCloud<ParcelType> > >
+                compositionModel_;
 
-            //- Surface reaction model
-            autoPtr
-            <
-                SurfaceReactionModel<ReactingMultiphaseCloud<ParcelType> >
-            >
-            surfaceReactionModel_;
+            //- Reacting phase change model
+            autoPtr<PhaseChangeModel<ReactingCloud<ParcelType> > >
+                phaseChangeModel_;
+
+
+        // Sources
+
+            //- Mass transfer fields - one per carrier phase specie
+            PtrList<DimensionedField<scalar, volMesh> > rhoTrans_;
 
 
         // Check
 
-            //- Total mass transferred to continuous phase via devolatilisation
-            scalar dMassDevolatilisation_;
-
-            //- Total mass transferred to continuous phase via surface
-            //  reactions
-            scalar dMassSurfaceReaction_;
+            //- Total mass transferred to continuous phase via phase change
+            scalar dMassPhaseChange_;
 
 
-    // Protected member functions
+    // Protected Member Functions
+
+        // New parcel helper functions
+
+            //- Check that size of a composition field is valid
+            void checkSuppliedComposition
+            (
+                const scalarField& YSupplied,
+                const scalarField& Y,
+                const word& YName
+            );
+
 
         // Cloud evolution functions
 
@@ -130,7 +148,7 @@ public:
     // Constructors
 
         //- Construct given carrier gas fields
-        ReactingMultiphaseCloud
+        ReactingCloud
         (
             const word& cloudName,
             const volScalarField& rho,
@@ -142,7 +160,7 @@ public:
 
 
     //- Destructor
-    virtual ~ReactingMultiphaseCloud();
+    virtual ~ReactingCloud();
 
 
     //- Type of parcel the cloud was instantiated for
@@ -157,22 +175,44 @@ public:
             inline const typename ParcelType::constantProperties&
                 constProps() const;
 
+            //- Return const access to multi-component carrier phase thermo
+            inline const multiComponentMixture<thermoType>&
+                mcCarrierThermo() const;
+
+            //- Return access to multi-component carrier phase thermo
+            inline multiComponentMixture<thermoType>& mcCarrierThermo();
+
 
             // Sub-models
 
-                //- Return reference to devolatilisation model
-                inline const DevolatilisationModel
-                <
-                    ReactingMultiphaseCloud<ParcelType>
-                >&
-                devolatilisation() const;
+                //- Return reference to reacting composition model
+                inline const CompositionModel<ReactingCloud<ParcelType> >&
+                    composition() const;
 
-                //- Return reference to reacting surface reaction model
-                inline const SurfaceReactionModel
-                <
-                    ReactingMultiphaseCloud<ParcelType>
-                >&
-                surfaceReaction() const;
+                //- Return reference to reacting phase change model
+                inline const PhaseChangeModel<ReactingCloud<ParcelType> >&
+                    phaseChange() const;
+
+
+            // Sources
+
+                //- Mass
+
+                    //- Return reference to mass source for field i
+                    inline DimensionedField<scalar, volMesh>&
+                        rhoTrans(const label i);
+
+                    //- Return reference to mass source fields
+                    inline PtrList<DimensionedField<scalar, volMesh> >&
+                        rhoTrans();
+
+                    //- Return tmp mass source for field i - fully explicit
+                    inline tmp<DimensionedField<scalar, volMesh> >
+                        Srho(const label i) const;
+
+                    //- Return tmp total mass source for carrier phase
+                    //  - fully explicit
+                    inline tmp<DimensionedField<scalar, volMesh> > Srho() const;
 
 
         // Check
@@ -180,11 +220,8 @@ public:
             //- Print cloud information
             void info() const;
 
-            //- Add to cumulative volatilisation mass transfer
-            void addToMassDevolatilisation(const scalar dMass);
-
-            //- Add to cumulative surface reaction transfer
-            void addToMassSurfaceReaction(const scalar dMass);
+            //- Add to cumulative phase change mass transfer
+            void addToMassPhaseChange(const scalar dMass);
 
 
         // Cloud evolution functions
@@ -211,12 +248,12 @@ public:
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-#include "ReactingMultiphaseCloudI.H"
+#include "ReactingCloudTemplateI.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-#   include "ReactingMultiphaseCloud.C"
+#   include "ReactingCloudTemplate.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

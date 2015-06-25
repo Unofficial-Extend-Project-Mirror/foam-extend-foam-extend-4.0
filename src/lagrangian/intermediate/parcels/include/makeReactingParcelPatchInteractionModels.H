@@ -29,7 +29,7 @@ License
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #include "thermoPhysicsTypes.H"
-#include "KinematicCloud.H"
+#include "KinematicCloudTemplate.H"
 
 #include "LocalInteraction.H"
 #include "Rebound.H"

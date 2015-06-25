@@ -23,7 +23,7 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "DsmcParcel.H"
+#include "DsmcParcelTemplate.H"
 #include "IOstreams.H"
 #include "IOField.H"
 #include "Cloud.H"

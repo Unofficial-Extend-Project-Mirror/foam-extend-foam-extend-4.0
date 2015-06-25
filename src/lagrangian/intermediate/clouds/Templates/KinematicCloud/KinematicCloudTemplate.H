@@ -34,13 +34,13 @@ Description
       - Wall interaction model
 
 SourceFiles
-    KinematicCloudI.H
-    KinematicCloud.C
+    KinematicCloudTemplateI.H
+    KinematicCloudTemplate.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef KinematicCloud_H
-#define KinematicCloud_H
+#ifndef KinematicCloudTemplate_H
+#define KinematicCloudTemplate_H
 
 #include "Cloud.H"
 #include "kinematicCloud.H"
@@ -384,12 +384,12 @@ public:
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-#include "KinematicCloudI.H"
+#include "KinematicCloudTemplateI.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-#   include "KinematicCloud.C"
+#   include "KinematicCloudTemplate.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
