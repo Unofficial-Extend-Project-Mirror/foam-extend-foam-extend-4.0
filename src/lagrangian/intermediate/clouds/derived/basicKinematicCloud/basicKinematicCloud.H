@@ -35,7 +35,7 @@ SourceFiles
 #ifndef basicKinematicCloud_H
 #define basicKinematicCloud_H
 
-#include "KinematicCloud.H"
+#include "KinematicCloudTemplate.H"
 #include "basicKinematicParcel.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

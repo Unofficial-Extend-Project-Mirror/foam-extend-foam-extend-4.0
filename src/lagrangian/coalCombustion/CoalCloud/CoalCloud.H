@@ -32,7 +32,7 @@ Description
 #ifndef CoalCloud_H
 #define CoalCloud_H
 
-#include "ReactingMultiphaseCloud.H"
+#include "ReactingMultiphaseCloudTemplate.H"
 #include "CoalParcel.H"
 #include "thermoPhysicsTypes.H"
 

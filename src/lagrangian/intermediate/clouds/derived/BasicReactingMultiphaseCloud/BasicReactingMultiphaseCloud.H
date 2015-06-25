@@ -33,7 +33,7 @@ Description
 #ifndef BasicReactingMultiphaseCloud_H
 #define BasicReactingMultiphaseCloud_H
 
-#include "ReactingMultiphaseCloud.H"
+#include "ReactingMultiphaseCloudTemplate.H"
 #include "BasicReactingMultiphaseParcel.H"
 #include "thermoPhysicsTypes.H"
 
