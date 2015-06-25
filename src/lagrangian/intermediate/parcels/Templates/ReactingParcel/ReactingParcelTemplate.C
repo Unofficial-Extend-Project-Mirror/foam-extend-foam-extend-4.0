@@ -524,4 +524,3 @@ Foam::ReactingParcel<ParcelType>::ReactingParcel
 #include "ReactingParcelTemplateIO.C"
 
 // ************************************************************************* //
-
