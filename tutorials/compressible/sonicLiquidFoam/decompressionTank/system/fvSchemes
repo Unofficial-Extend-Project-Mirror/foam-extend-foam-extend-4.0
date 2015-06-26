@@ -37,7 +37,7 @@ laplacianSchemes
 {
     default         none;
     laplacian(mu,U) Gauss linear corrected;
-    laplacian((rho*(1|A(U))),p) Gauss linear corrected;
+    laplacian(rhorAUf,p) Gauss linear corrected;
 }
 
 interpolationSchemes
