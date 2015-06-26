@@ -262,7 +262,7 @@ void Foam::leastSquaresVectors::makeLeastSquaresVectors() const
         if
         (
             (lsPIn[faceI] & SfIn[faceI])/(mag(lsPIn[faceI])*mag(SfIn[faceI]))
-          < smallDotProdTol_
+          < smallDotProdTol_()
         )
         {
             // Least square points in the wrong direction for owner
@@ -273,7 +273,7 @@ void Foam::leastSquaresVectors::makeLeastSquaresVectors() const
         if
         (
             (lsNIn[faceI] & SfIn[faceI])/(mag(lsNIn[faceI])*mag(SfIn[faceI]))
-          > -smallDotProdTol_
+          > -smallDotProdTol_()
         )
         {
             // Least square points in the wrong direction for owner.
