@@ -52,6 +52,7 @@ class labelledTri
 {
     // Private data
 
+        //- Region ID
         label region_;
 
 

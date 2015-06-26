@@ -192,7 +192,7 @@ class triSurface
             const label defaultRegion = 0
         );
 
-        //- helper function to print triangle info
+        //- Helper function to print triangle info
         static void printTriangle
         (
             Ostream&,
@@ -282,15 +282,16 @@ public:
         triSurface(const triSurface&);
 
 
-
     // Destructor
+    ~triSurface();
 
-        ~triSurface();
-
+        //- Clear all data
         void clearOut();
 
+        //- Clear topology
         void clearTopology();
 
+        //- Clear patch addressing
         void clearPatchMeshAddr();
 
 
@@ -320,6 +321,7 @@ public:
             //  If >2 neighbours: undetermined.
             const labelList& edgeOwner() const;
 
+
         // Edit
 
             //- Move points
@@ -329,13 +331,13 @@ public:
             virtual void scalePoints(const scalar&);
 
             //- Check/remove duplicate/degenerate triangles
-            void checkTriangles(const bool verbose);
+            void checkTriangles(const bool verbose = false);
 
             //- Check triply (or more) connected edges.
-            void checkEdges(const bool verbose);
+            void checkEdges(const bool verbose = false);
 
             //- Remove non-valid triangles
-            void cleanup(const bool verbose);
+            void cleanup(const bool verbose = false);
 
             //- Fill faceZone with currentZone for every face reachable
             //  from faceI without crossing edge marked in borderEdge.
@@ -376,6 +378,7 @@ public:
                 labelList& pointMap,
                 labelList& faceMap
             ) const;
+
 
         // Write
 

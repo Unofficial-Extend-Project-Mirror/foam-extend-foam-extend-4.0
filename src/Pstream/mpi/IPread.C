@@ -52,7 +52,7 @@ Foam::IPstream::IPstream
 
     MPI_Status status;
 
-    // If the buffer size is not specified, probe the incomming message
+    // If the buffer size is not specified, probe the incoming message
     // and set it
     if (!bufSize)
     {
@@ -108,7 +108,7 @@ Foam::label Foam::IPstream::read
             (
                 "IPstream::read"
                 "(const int fromProcNo, char* buf, std::streamsize bufSize)"
-            )   << "MPI_Recv cannot receive incomming message"
+            )   << "MPI_Recv cannot receive incoming message"
                 << Foam::abort(FatalError);
 
             return 0;
@@ -127,7 +127,7 @@ Foam::label Foam::IPstream::read
                 "IPstream::read"
                 "(const int fromProcNo, char* buf, std::streamsize bufSize)"
             )   << "buffer (" << label(bufSize)
-                << ") not large enough for incomming message ("
+                << ") not large enough for incoming message ("
                 << messageSize << ')'
                 << Foam::abort(FatalError);
         }
@@ -231,7 +231,5 @@ bool Foam::IPstream::finishedRequest(const label i)
     return flag != 0;
 }
 
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 // ************************************************************************* //

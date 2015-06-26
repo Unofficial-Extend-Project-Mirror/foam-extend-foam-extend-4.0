@@ -547,8 +547,6 @@ void Pstream::mapCombineScatter(Container& Values)
 }
 
 
-
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam

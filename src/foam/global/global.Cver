@@ -32,6 +32,7 @@ Description
 \*---------------------------------------------------------------------------*/
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
 #include "foamVersion.H"
 
 const char* const Foam::FOAMversion = "VERSION_STRING";

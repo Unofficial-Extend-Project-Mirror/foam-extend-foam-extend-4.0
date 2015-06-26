@@ -55,7 +55,10 @@ class IPstream
 {
     // Private data
 
+        //- ID of sending processor
         int fromProcNo_;
+
+        //- Message size
         label messageSize_;
 
 
@@ -76,14 +79,14 @@ public:
 
     // Constructors
 
-        //- Construct given process index to read from and optional buffer size,
+        //- Construct given process index to read from, optional buffer size,
         //  read format and IO version
         IPstream
         (
             const commsTypes commsType,
             const int fromProcNo,
             const label bufSize = 0,
-            streamFormat format=BINARY,
+            streamFormat format = BINARY,
             versionNumber version = currentVersion
         );
 
