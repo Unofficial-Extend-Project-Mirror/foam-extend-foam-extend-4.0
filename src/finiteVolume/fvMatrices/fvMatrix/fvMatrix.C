@@ -30,6 +30,11 @@ License
 #include "coupledFvPatchFields.H"
 #include "transformField.H"
 
+// Workaround for "explicit specialization of 'typeName' after
+// instantiation" error if building with native OS X clang++
+template<>
+const Foam::word Foam::zeroGradientFvPatchScalarField::typeName;
+
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
 template<class Type>
