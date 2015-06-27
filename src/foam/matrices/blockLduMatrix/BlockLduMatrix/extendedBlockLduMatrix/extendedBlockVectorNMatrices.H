@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
-    \\  /    A nd           | Web:         http://www.foam-extend.org
-     \\/     M anipulation  | For copyright notice see file Copyright
+   \\    /   O peration     |
+    \\  /    A nd           | For copyright notice see file Copyright
+     \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -21,33 +21,41 @@ License
     You should have received a copy of the GNU General Public License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
+Class
+    extendedBlockLduMatrix
+
 Description
-    Block matrix member static data members
+    Typedefs for extended block matrices
 
 Author
-    Hrvoje Jasak, Wikki Ltd.  All rights reserved.
+    Vuko Vukcevic, FMENA Zagreb. All rights reserved.
 
 \*---------------------------------------------------------------------------*/
 
-#include "coeffFields.H"
-#include "blockVectorNMatrices.H"
+#ifndef blockVectorNMatrices_H
+#define blockVectorNMatrices_H
+
+#include "extendedBlockLduMatrices.H"
+#include "VectorTensorNFieldsFwd.H"
+#include "ExpandTensorNField.H"
+#include "VectorNFieldTypes.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 
-// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
+#define makeTypedef(type, Type, args...)                                      \
+    typedef extendedBlockLduMatrix<type> block##Type##Matrix;
 
-#define makeNamedTemplateTypeNameAndDebug(type, Type, args...)      \
-    defineNamedTemplateTypeNameAndDebug(block##Type##Matrix, 0);
+forAllVectorNTypes(makeTypedef)
 
-forAllVectorNTypes(makeNamedTemplateTypeNameAndDebug);
+#undef makeTypedef
 
-#undef makeNamedTemplateTypeNameAndDebug
+} // End namespace Foam
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-} // End namespace Foam
+#endif
 
 // ************************************************************************* //
