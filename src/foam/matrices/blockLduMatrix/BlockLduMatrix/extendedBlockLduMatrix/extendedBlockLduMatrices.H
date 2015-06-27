@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
-    \\  /    A nd           | Web:         http://www.foam-extend.org
-     \\/     M anipulation  | For copyright notice see file Copyright
+   \\    /   O peration     |
+    \\  /    A nd           | For copyright notice see file Copyright
+     \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -21,33 +21,43 @@ License
     You should have received a copy of the GNU General Public License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
+Class
+    extendedBlockLduMatrix
+
 Description
-    Block matrix member static data members
+    Typedefs for extended block matrices
 
 Author
-    Hrvoje Jasak, Wikki Ltd.  All rights reserved.
+    Vuko Vukcevic, FMENA Zagreb. All rights reserved.
 
 \*---------------------------------------------------------------------------*/
 
-#include "coeffFields.H"
-#include "blockVectorNMatrices.H"
+#ifndef extendedBlockLduMatrices_H
+#define extendedBlockLduMatrices_H
+
+#include "extendedBlockLduMatrix.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 
-// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-#define makeNamedTemplateTypeNameAndDebug(type, Type, args...)      \
-    defineNamedTemplateTypeNameAndDebug(block##Type##Matrix, 0);
+typedef extendedBlockLduMatrix<scalar> extendedBlockScalarMatrix;
+typedef extendedBlockLduMatrix<vector> extendedBlockVectorMatrix;
+typedef extendedBlockLduMatrix<sphericalTensor>
+    extendedBlockSphericalTensorMatrix;
+typedef extendedBlockLduMatrix<symmTensor> extendedBlockSymmTensorMatrix;
+typedef extendedBlockLduMatrix<tensor> extendedBlockTensorMatrix;
 
-forAllVectorNTypes(makeNamedTemplateTypeNameAndDebug);
-
-#undef makeNamedTemplateTypeNameAndDebug
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#endif
 
 // ************************************************************************* //

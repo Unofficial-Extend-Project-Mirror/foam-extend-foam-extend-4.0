@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
-    \\  /    A nd           | Web:         http://www.foam-extend.org
-     \\/     M anipulation  | For copyright notice see file Copyright
+   \\    /   O peration     |
+    \\  /    A nd           | For copyright notice see file Copyright
+     \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -22,15 +22,14 @@ License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Description
-    Block matrix member static data members
+    Extended block matrix static data members
 
 Author
-    Hrvoje Jasak, Wikki Ltd.  All rights reserved.
+    Vuko Vukcevic, FMENA Zagreb. All rights reserved.
 
 \*---------------------------------------------------------------------------*/
 
-#include "coeffFields.H"
-#include "blockVectorNMatrices.H"
+#include "extendedBlockLduMatrices.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -39,12 +38,12 @@ namespace Foam
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-#define makeNamedTemplateTypeNameAndDebug(type, Type, args...)      \
-    defineNamedTemplateTypeNameAndDebug(block##Type##Matrix, 0);
+defineNamedTemplateTypeNameAndDebug(extendedBlockScalarMatrix, 0);
+defineNamedTemplateTypeNameAndDebug(extendedBlockVectorMatrix, 0);
+defineNamedTemplateTypeNameAndDebug(extendedBlockSphericalTensorMatrix, 0);
+defineNamedTemplateTypeNameAndDebug(extendedBlockSymmTensorMatrix, 0);
+defineNamedTemplateTypeNameAndDebug(extendedBlockTensorMatrix, 0);
 
-forAllVectorNTypes(makeNamedTemplateTypeNameAndDebug);
-
-#undef makeNamedTemplateTypeNameAndDebug
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
