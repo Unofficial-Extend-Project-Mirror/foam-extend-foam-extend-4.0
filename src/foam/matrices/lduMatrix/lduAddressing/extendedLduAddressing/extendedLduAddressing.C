@@ -80,7 +80,7 @@ Foam::extendedLduAddressing::extendedLduAddressing
             "extendedLduAddressing::extendedLduAddressing"
         )
             << "Extension level 0 not allowed as it is the same as ordinary "
-            << " lduAddressing."
+            << "lduAddressing."
             << abort(FatalError);
     }
 }

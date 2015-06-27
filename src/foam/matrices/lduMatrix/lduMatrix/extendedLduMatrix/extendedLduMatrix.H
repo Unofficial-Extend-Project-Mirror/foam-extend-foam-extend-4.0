@@ -101,13 +101,13 @@ public:
         // Access
 
             //- Const access to underlying basic lduMatrix
-            const lduMatrix& basicLduMatrix()
+            const lduMatrix& basicLduMatrix() const
             {
                 return basicLduMatrix_;
             };
 
             //- Const access to extendedLduAddressing
-            const extendedLduAddressing& extendedLduAddr()
+            const extendedLduAddressing& extendedLduAddr() const
             {
                 return extLduAddr_;
             };
