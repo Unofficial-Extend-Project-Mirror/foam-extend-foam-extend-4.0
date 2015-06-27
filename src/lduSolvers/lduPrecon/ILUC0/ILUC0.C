@@ -86,7 +86,7 @@ void Foam::ILUC0::calcFactorization()
         // Get number of rows
         const label nRows = preconDiag_.size();
 
-        // Define start and end face of this row/column, and number of nonzero
+        // Define start and end face of this row/column, and number of non zero
         // off diagonal entries
         register label fStart, fEnd, fLsrStart, fLsrEnd;
 
@@ -106,8 +106,10 @@ void Foam::ILUC0::calcFactorization()
             for (register label faceI = fStart; faceI < fEnd; ++faceI)
             {
                 // Note: z addressed by neighbour of face (column index for
-                // upper)
+                // upper), w addressed by neighbour of face (row index for
+                // lower)
                 zPtr[uPtr[faceI]] = upperPtr[faceI];
+                wPtr[uPtr[faceI]] = lowerPtr[faceI];
             }
 
             // Start and end of k-th row (lower) and k-th column (upper)
@@ -144,46 +146,7 @@ void Foam::ILUC0::calcFactorization()
                     ++faceI
                 )
                 {
-                    // Note: z addressed by neighbour of face (column index for
-                    // upper)
                     zPtr[uPtr[faceI]] -= lowerPtr[losortCoeff]*upperPtr[faceI];
-                }
-            }
-
-            for (register label faceI = fStart; faceI < fEnd; ++faceI)
-            {
-                // Note: w addressed by neighbour of face (row index for lower)
-                wPtr[uPtr[faceI]] = lowerPtr[faceI];
-            }
-
-            // Upper coeff loop (second i - loop)
-            for
-            (
-                register label faceLsrI = fLsrStart;
-                faceLsrI < fLsrEnd;
-                ++faceLsrI
-            )
-            {
-                // Get losort coefficient for this face
-                const register label losortCoeff = lsrPtr[faceLsrI];
-
-                // Get corresponding column index for lower (i label)
-                const label i = lPtr[losortCoeff];
-
-                // Get end of column for cell i
-                const register label fEndColumni = ownStartPtr[i + 1];
-
-                // Lower coeff loop (additional loop to avoid checking the
-                // existance of certain lower coeffs)
-                for
-                (
-                    register label faceI = losortCoeff + 1;
-                    faceI < fEndColumni;
-                    ++faceI
-                )
-                {
-                    // Note: w addressed by neighbour of face (row index for
-                    // lower)
                     wPtr[uPtr[faceI]] -= upperPtr[losortCoeff]*lowerPtr[faceI];
                 }
             }
@@ -207,11 +170,36 @@ void Foam::ILUC0::calcFactorization()
             }
 
             // Reset temporary working fields
-            // NOTE: RESET ONLY COEFFS THAT HAVE BEEN TEMPERED WITH
             zDiag_ = 0;
-            for (register label i = 0; i < nRows; ++i)
+
+            // Only reset parts of the working fields that have been updated in
+            // this step (for this row and column)
+            for
+            (
+                register label faceLsrI = fLsrStart;
+                faceLsrI < fLsrEnd;
+                ++faceLsrI
+            )
             {
-                zPtr[i] = wPtr[i] = 0;
+                // Get losort coefficient for this face
+                const register label losortCoeff = lsrPtr[faceLsrI];
+
+                // Get corresponding row index for upper (i label)
+                const label i = lPtr[losortCoeff];
+
+                // Get end of row for cell i
+                const register label fEndRowi = ownStartPtr[i + 1];
+
+                for
+                (
+                    register label faceI = losortCoeff + 1;
+                    faceI < fEndRowi;
+                    ++faceI
+                )
+                {
+                    zPtr[uPtr[faceI]] = 0.0;
+                    wPtr[uPtr[faceI]] = 0.0;
+                }
             }
         }
     }
