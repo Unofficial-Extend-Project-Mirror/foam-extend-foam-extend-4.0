@@ -23,7 +23,7 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "Cloud.H"
+#include "CloudTemplate.H"
 #include "Particle.H"
 #include "foamTime.H"
 #include "IOPosition.H"

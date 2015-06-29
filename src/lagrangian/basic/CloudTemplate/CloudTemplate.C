@@ -23,7 +23,7 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "Cloud.H"
+#include "CloudTemplate.H"
 #include "processorPolyPatch.H"
 #include "globalMeshData.H"
 #include "PstreamCombineReduceOps.H"
@@ -360,6 +360,6 @@ void Foam::Cloud<ParticleType>::writePositions() const
 
 // * * * * * * * * * * * * * * * *  IOStream operators * * * * * * * * * * * //
 
-#include "CloudIO.C"
+#include "CloudTemplateIO.C"
 
 // ************************************************************************* //

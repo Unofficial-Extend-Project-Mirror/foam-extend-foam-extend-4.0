@@ -37,7 +37,7 @@ SourceFiles
 #define meshSearch_H
 
 #include "pointIndexHit.H"
-#include "Cloud.H"
+#include "CloudTemplate.H"
 #include "passiveParticle.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

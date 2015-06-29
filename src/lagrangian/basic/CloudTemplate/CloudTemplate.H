@@ -27,13 +27,13 @@ Class
 Description
 
 SourceFiles
-    Cloud.C
-    CloudIO.C
+    CloudTemplate.C
+    CloudTemplateIO.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef Cloud_H
-#define Cloud_H
+#ifndef CloudTemplate_H
+#define CloudTemplate_H
 
 #include "cloud.H"
 #include "IDLList.H"
@@ -308,7 +308,7 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-#   include "Cloud.C"
+#   include "CloudTemplate.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

@@ -37,7 +37,7 @@ SourceFiles
 #ifndef solidParticleCloud_H
 #define solidParticleCloud_H
 
-#include "Cloud.H"
+#include "CloudTemplate.H"
 #include "solidParticle.H"
 #include "IOdictionary.H"
 

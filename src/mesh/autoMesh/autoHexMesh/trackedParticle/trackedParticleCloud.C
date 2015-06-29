@@ -24,7 +24,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "trackedParticle.H"
-#include "Cloud.H"
+#include "CloudTemplate.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

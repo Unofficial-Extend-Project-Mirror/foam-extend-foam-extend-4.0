@@ -25,7 +25,7 @@ License
 
 #include "reconstructLagrangian.H"
 #include "labelIOList.H"
-#include "Cloud.H"
+#include "CloudTemplate.H"
 #include "passiveParticle.H"
 
 // * * * * * * * * * * * * * * * Global Functions  * * * * * * * * * * * * * //

@@ -35,7 +35,7 @@ License
 #include "directTopoChange.H"
 #include "mapDistributePolyMesh.H"
 #include "featureEdgeMesh.H"
-#include "Cloud.H"
+#include "CloudTemplate.H"
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 

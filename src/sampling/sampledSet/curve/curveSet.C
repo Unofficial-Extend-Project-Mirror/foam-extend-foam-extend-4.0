@@ -28,7 +28,7 @@ License
 #include "DynamicList.H"
 #include "polyMesh.H"
 
-#include "Cloud.H"
+#include "CloudTemplate.H"
 #include "passiveParticle.H"
 #include "IDLList.H"
 

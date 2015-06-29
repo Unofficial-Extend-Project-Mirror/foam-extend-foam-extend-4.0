@@ -25,7 +25,7 @@ License
 
 #include "lagrangianWriter.H"
 #include "writeFuns.H"
-#include "Cloud.H"
+#include "CloudTemplate.H"
 #include "passiveParticle.H"
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //

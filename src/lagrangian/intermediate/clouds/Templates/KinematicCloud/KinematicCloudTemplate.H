@@ -42,7 +42,7 @@ SourceFiles
 #ifndef KinematicCloudTemplate_H
 #define KinematicCloudTemplate_H
 
-#include "Cloud.H"
+#include "CloudTemplate.H"
 #include "kinematicCloud.H"
 #include "IOdictionary.H"
 #include "autoPtr.H"

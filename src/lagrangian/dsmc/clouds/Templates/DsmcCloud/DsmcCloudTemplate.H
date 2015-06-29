@@ -36,7 +36,7 @@ SourceFiles
 #ifndef DsmcCloudTemplate_H
 #define DsmcCloudTemplate_H
 
-#include "Cloud.H"
+#include "CloudTemplate.H"
 #include "DsmcBaseCloud.H"
 #include "IOdictionary.H"
 #include "autoPtr.H"

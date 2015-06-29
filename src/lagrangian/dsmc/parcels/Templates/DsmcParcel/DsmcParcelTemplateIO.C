@@ -26,7 +26,7 @@ License
 #include "DsmcParcelTemplate.H"
 #include "IOstreams.H"
 #include "IOField.H"
-#include "Cloud.H"
+#include "CloudTemplate.H"
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
