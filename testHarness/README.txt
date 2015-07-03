@@ -41,7 +41,7 @@ Martin Beaudoin, Hydro-Quebec, 2010. All rights reserved.
    Still, I recommand always checking that these two important files are up-to-date:
 
    cp ../CMakeFiles/CMakeLists.txt $WM_PROJECT_DIR
-   cp ../CMakeFiles/CTestConfig.cmake.openfoam-extend $WM_PROJECT_DIR/CTestConfig.cmake
+   cp ../CMakeFiles/CTestConfig.cmake.foam-extend $WM_PROJECT_DIR/CTestConfig.cmake
 
 
 7:   Next, running the test loop is pretty simple:
@@ -51,7 +51,7 @@ Martin Beaudoin, Hydro-Quebec, 2010. All rights reserved.
    ./Allrun_Experimental
 
 
-8: The results will be published on the CDash dashboard on openfoam-extend.
+8: The results will be published on the CDash dashboard on foam-extend.
 
    To see your results:
    URL      : http://foam-extend.sourceforge.net/CDash/index.php?project=foam-extend-3.2
