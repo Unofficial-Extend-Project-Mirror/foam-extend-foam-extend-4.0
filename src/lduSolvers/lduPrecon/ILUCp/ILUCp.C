@@ -94,7 +94,7 @@ void Foam::ILUCp::calcFactorization()
         const label nRows = preconDiag_.size();
 
         // Define start and end face ("virtual" face when extended addressing is
-        // used) of this row/column, and number of non zero off diagonal entries
+        // used) of this row/column.
         register label fStart, fEnd, fLsrStart, fLsrEnd;
 
         // Crout LU factorization
@@ -123,7 +123,7 @@ void Foam::ILUCp::calcFactorization()
             fLsrStart = lsrStartPtr[rowI];
             fLsrEnd = lsrStartPtr[rowI + 1];
 
-            // Lower coeff loop (first i - loop)
+            // Lower/upper coeff loop (i - loop)
             for
             (
                 register label faceLsrI = fLsrStart;
@@ -244,7 +244,7 @@ Foam::ILUCp::ILUCp
     (
         matrix,
         p_,
-        matrix.mesh().thisDb().parent().lookupObject
+        matrix.mesh().thisDb().time().lookupObject
         <
             polyMesh
         >(polyMesh::defaultRegion)
