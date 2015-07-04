@@ -30,7 +30,9 @@ License
 template<class Type>
 void Foam::extendedBlockLduMatrix<Type>::mapOffDiagCoeffs
 (
-    const BlockLduMatrix<Type>& blockLdum
+    const blockLduMatrix& blockLdum,
+    const label extensionLevel,
+    const polyMesh& polyMesh
 )
 {
     if (blockLdum.diagonal())
