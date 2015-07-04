@@ -30,7 +30,7 @@ License
 template<class Type>
 Foam::extendedBlockLduMatrix<Type>::extendedBlockLduMatrix
 (
-    const blockLduMatrix& blockLdum,
+    const blockLduMatrix<Type>& blockLdum,
     const label extensionLevel,
     const polyMesh& polyMesh
 )
