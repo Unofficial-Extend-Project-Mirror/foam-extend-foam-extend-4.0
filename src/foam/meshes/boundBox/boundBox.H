@@ -64,6 +64,7 @@ class boundBox
         //  Does parallel communication (doReduce = true)
         void calculate(const pointField&, const bool doReduce = true);
 
+
 public:
 
     // Static data members
