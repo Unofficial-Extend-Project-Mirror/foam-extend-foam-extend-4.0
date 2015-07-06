@@ -89,11 +89,11 @@ int main(int argc, char *argv[])
             // Prepare block system
             fvBlockMatrix<vector2> blockM(blockT);
 
-            //- Inset equations into block Matrix
+            // Insert equations into block Matrix
             blockM.insertEquation(0, TEqn);
             blockM.insertEquation(1, TsEqn);
 
-            //- Add off-diagonal coupling terms
+            // Add off-diagonal coupling terms
             scalarField coupling(mesh.nCells(), -alpha.value());
 
             blockM.insertEquationCoupling(0, 1, coupling);
