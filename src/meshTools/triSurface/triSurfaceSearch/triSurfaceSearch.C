@@ -107,6 +107,7 @@ boolList triSurfaceSearch::calcInside(const pointField& samples) const
             inside[sampleI] = false;
         }
     }
+
     return inside;
 }
 
