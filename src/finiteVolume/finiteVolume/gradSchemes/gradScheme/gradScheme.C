@@ -29,6 +29,7 @@ Description
 #include "fv.H"
 #include "HashTable.H"
 #include "primitiveFields.H"
+#include "objectRegistry.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -97,6 +98,176 @@ gradScheme<Type>::~gradScheme()
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+
+template<class Type>
+Foam::tmp
+<
+    Foam::GeometricField
+    <
+        typename Foam::outerProduct<Foam::vector, Type>::type,
+        Foam::fvPatchField,
+        Foam::volMesh
+    >
+>
+Foam::fv::gradScheme<Type>::grad
+(
+    const GeometricField<Type, fvPatchField, volMesh>& vsf,
+    const word& name
+) const
+{
+    typedef typename outerProduct<vector, Type>::type GradType;
+    typedef GeometricField<GradType, fvPatchField, volMesh> GradFieldType;
+
+    if (!this->mesh().changing() && this->mesh().schemesDict().cache(name))
+    {
+        if (!mesh().objectRegistry::template foundObject<GradFieldType>(name))
+        {
+            if (fvSchemes::debug)
+            {
+                Info << "Cache: Calculating and caching " << name
+                    << " originating from " << vsf.name()
+                    << " event No. " << vsf.eventNo()
+                    << endl;
+            }
+            tmp<GradFieldType> tgGrad = calcGrad(vsf, name);
+            regIOobject::store(tgGrad.ptr());
+        }
+
+        if (fvSchemes::debug)
+        {
+            Info << "Cache: Retrieving " << name
+                << " originating from " << vsf.name()
+                << " event No. " << vsf.eventNo()
+                << endl;
+        }
+        GradFieldType& gGrad = const_cast<GradFieldType&>
+        (
+            mesh().objectRegistry::template lookupObject<GradFieldType>(name)
+        );
+
+        if (gGrad.upToDate(vsf.name()))
+        {
+            return gGrad;
+        }
+        else
+        {
+            if (fvSchemes::debug)
+            {
+                Info << "Cache: Deleting " << name
+                    << " originating from " << vsf.name()
+                    << " event No. " << vsf.eventNo()
+                    << endl;
+            }
+            gGrad.release();
+            delete &gGrad;
+
+            if (fvSchemes::debug)
+            {
+                Info << "Cache: Recalculating " << name
+                    << " originating from " << vsf.name()
+                    << " event No. " << vsf.eventNo()
+                    << endl;
+            }
+            tmp<GradFieldType> tgGrad = calcGrad(vsf, name);
+
+            if (fvSchemes::debug)
+            {
+                Info << "Cache: Storing " << name
+                    << " originating from " << vsf.name()
+                    << " event No. " << vsf.eventNo()
+                    << endl;
+            }
+            regIOobject::store(tgGrad.ptr());
+            GradFieldType& gGrad = const_cast<GradFieldType&>
+            (
+                mesh().objectRegistry::template lookupObject<GradFieldType>
+                (
+                    name
+                )
+            );
+
+            return gGrad;
+        }
+    }
+    else
+    {
+        if (mesh().objectRegistry::template foundObject<GradFieldType>(name))
+        {
+            GradFieldType& gGrad = const_cast<GradFieldType&>
+            (
+                mesh().objectRegistry::template lookupObject<GradFieldType>
+                (
+                    name
+                )
+            );
+
+            if (gGrad.ownedByRegistry())
+            {
+                if (fvSchemes::debug)
+                {
+                    Info << "Cache: Deleting " << name
+                        << " originating from " << vsf.name()
+                        << " event No. " << vsf.eventNo()
+                        << endl;
+                }
+                gGrad.release();
+                delete &gGrad;
+            }
+        }
+
+        if (fvSchemes::debug)
+        {
+            Info << "Cache: Calculating " << name
+                << " originating from " << vsf.name()
+                << " event No. " << vsf.eventNo()
+                << endl;
+        }
+        return calcGrad(vsf, name);
+    }
+}
+
+template<class Type>
+Foam::tmp
+<
+    Foam::GeometricField
+    <
+        typename Foam::outerProduct<Foam::vector, Type>::type,
+        Foam::fvPatchField,
+        Foam::volMesh
+    >
+>
+Foam::fv::gradScheme<Type>::grad
+(
+    const GeometricField<Type, fvPatchField, volMesh>& vsf
+) const
+{
+    return grad(vsf, "grad(" + vsf.name() + ')');
+}
+
+
+template<class Type>
+Foam::tmp
+<
+    Foam::GeometricField
+    <
+        typename Foam::outerProduct<Foam::vector, Type>::type,
+        Foam::fvPatchField,
+        Foam::volMesh
+    >
+>
+Foam::fv::gradScheme<Type>::grad
+(
+    const tmp<GeometricField<Type, fvPatchField, volMesh> >& tvsf
+) const
+{
+    typedef typename outerProduct<vector, Type>::type GradType;
+    typedef GeometricField<GradType, fvPatchField, volMesh> GradFieldType;
+
+    tmp<GradFieldType> tgrad = grad(tvsf());
+    tvsf.clear();
+    return tgrad;
+}
+
 
 template<class Type>
 tmp

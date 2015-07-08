@@ -88,7 +88,7 @@ public:
             tinterpScheme_(new linear<Type>(mesh))
         {}
 
-        //- Construct from Istream
+        //- Construct from mesh and Istream
         gaussGrad(const fvMesh& mesh, Istream& is)
         :
             gradScheme<Type>(mesh),
@@ -122,20 +122,22 @@ public:
         <
             GeometricField
             <typename outerProduct<vector, Type>::type, fvPatchField, volMesh>
-        > grad
+        > gradf
         (
-            const GeometricField<Type, fvsPatchField, surfaceMesh>&
+            const GeometricField<Type, fvsPatchField, surfaceMesh>&,
+            const word& name
         );
 
         //- Return the gradient of the given field calculated
         //  using Gauss' theorem on the interpolated field
-        tmp
+        virtual tmp
         <
             GeometricField
             <typename outerProduct<vector, Type>::type, fvPatchField, volMesh>
-        > grad
+        > calcGrad
         (
-            const GeometricField<Type, fvPatchField, volMesh>&
+            const GeometricField<Type, fvPatchField, volMesh>& vsf,
+            const word& name
         ) const;
 
         //- Return the BlockLduSystem corresponding to the implicit grad

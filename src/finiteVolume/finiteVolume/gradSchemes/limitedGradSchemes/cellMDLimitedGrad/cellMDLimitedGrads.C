@@ -48,9 +48,10 @@ makeFvGradScheme(cellMDLimitedGrad)
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 template<>
-tmp<volVectorField> cellMDLimitedGrad<scalar>::grad
+tmp<volVectorField> cellMDLimitedGrad<scalar>::calcGrad
 (
-    const volScalarField& vsf
+    const volScalarField& vsf,
+    const word& name
 ) const
 {
     const fvMesh& mesh = vsf.mesh();
@@ -189,9 +190,10 @@ tmp<volVectorField> cellMDLimitedGrad<scalar>::grad
 
 
 template<>
-tmp<volTensorField> cellMDLimitedGrad<vector>::grad
+tmp<volTensorField> cellMDLimitedGrad<vector>::calcGrad
 (
-    const volVectorField& vsf
+    const volVectorField& vsf,
+    const word& name
 ) const
 {
     const fvMesh& mesh = vsf.mesh();

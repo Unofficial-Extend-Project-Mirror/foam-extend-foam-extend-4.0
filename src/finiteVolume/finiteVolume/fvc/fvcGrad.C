@@ -53,7 +53,7 @@ grad
     const GeometricField<Type, fvsPatchField, surfaceMesh>& ssf
 )
 {
-    return fv::gaussGrad<Type>::grad(ssf);
+    return fv::gaussGrad<Type>::gradf(ssf, "grad(" + ssf.name() + ')');
 }
 
 
@@ -98,7 +98,7 @@ grad
     (
         vf.mesh(),
         vf.mesh().schemesDict().gradScheme(name)
-    )().grad(vf);
+    )().grad(vf, name);
 }
 
 
