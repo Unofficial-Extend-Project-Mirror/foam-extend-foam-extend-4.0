@@ -30,7 +30,7 @@ License
 template<class Type>
 Foam::extendedBlockLduMatrix<Type>::extendedBlockLduMatrix
 (
-    const blockLduMatrix<Type>& blockLdum,
+    const BlockLduMatrix<Type>& blockLdum,
     const label extensionLevel,
     const polyMesh& polyMesh
 )
@@ -68,24 +68,74 @@ Foam::extendedBlockLduMatrix<Type>::extendedBlockLduMatrix
         const unallocLabelList& faceMap = extLduAddr_.faceMap();
 
         // Avoid assuming it's upper if the matrix is symmetric
-        if (blockLdum.hasUpper())
+        if (blockLdum.thereIsUpper())
         {
             // Allocate extended upper only
             extendedUpperPtr_ = new TypeCoeffField
             (
-                extLduAddr_.extendedUpperAddr().size(),
-                pTraits<Type>::zero
+                extLduAddr_.extendedUpperAddr().size()
             );
             TypeCoeffField& extUpper = *extendedUpperPtr_;
 
             // Get upper coeffs from underlying lduMatrix
             const TypeCoeffField& upper = blockLdum.upper();
 
-            // Copy non-zero coeffs from basic lduMatrix into corresponding
-            // positions
-            forAll (upper, faceI)
+            if (upper.activeType() == blockCoeffBase::SCALAR)
             {
-                extUpper[faceMap[faceI]] = upper[faceI];
+                // Helper type definition
+                typedef typename CoeffField<Type>::scalarTypeField activeType;
+
+                // Get references to fields
+                const activeType& activeUpper = upper.asScalar();
+                activeType& activeExtUpper = extUpper.asScalar();
+
+                // Copy non-zero coeffs from basic lduMatrix into corresponding
+                // positions
+                forAll (upper, faceI)
+                {
+                    activeExtUpper[faceMap[faceI]] = activeUpper[faceI];
+                }
+            }
+            else if (upper.activeType() == blockCoeffBase::LINEAR)
+            {
+                // Helper type definition
+                typedef typename CoeffField<Type>::linearTypeField activeType;
+
+                // Get references to fields
+                const activeType& activeUpper = upper.asLinear();
+                activeType& activeExtUpper = extUpper.asLinear();
+
+                // Copy non-zero coeffs from basic lduMatrix into corresponding
+                // positions
+                forAll (upper, faceI)
+                {
+                    activeExtUpper[faceMap[faceI]] = activeUpper[faceI];
+                }
+            }
+            else if (upper.activeType() == blockCoeffBase::SQUARE)
+            {
+                // Helper type definition
+                typedef typename CoeffField<Type>::squareTypeField activeType;
+
+                // Get references to fields
+                const activeType& activeUpper = upper.asSquare();
+                activeType& activeExtUpper = extUpper.asSquare();
+
+                // Copy non-zero coeffs from basic lduMatrix into corresponding
+                // positions
+                forAll (upper, faceI)
+                {
+                    activeExtUpper[faceMap[faceI]] = activeUpper[faceI];
+                }
+            }
+            else
+            {
+                FatalErrorIn
+                (
+                    "extendedBlockLduMatrix(lduMatrix&, label, polyMesh&)"
+                )   << "Problem between ordinary block matrix and extended"
+                    << " block matrix upper coeffs type morphing."
+                    << abort(FatalError);
             }
         }
         else
@@ -93,19 +143,69 @@ Foam::extendedBlockLduMatrix<Type>::extendedBlockLduMatrix
             // Allocate extended lower only
             extendedLowerPtr_ = new TypeCoeffField
             (
-                extLduAddr_.extendedLowerAddr().size(),
-                pTraits<Type>::zero
+                extLduAddr_.extendedLowerAddr().size()
             );
             TypeCoeffField& extLower = *extendedLowerPtr_;
 
             // Get lower coeffs from underlying lduMatrix
             const TypeCoeffField& lower = blockLdum.lower();
 
-            // Copy non-zero coeffs from basic lduMatrix into corresponding
-            // positions
-            forAll (lower, faceI)
+            if (lower.activeType() == blockCoeffBase::SCALAR)
             {
-                extLower[faceMap[faceI]] = lower[faceI];
+                // Helper type definition
+                typedef typename CoeffField<Type>::scalarTypeField activeType;
+
+                // Get references to fields
+                const activeType& activeLower = lower.asScalar();
+                activeType& activeExtLower = extLower.asScalar();
+
+                // Copy non-zero coeffs from basic lduMatrix into corresponding
+                // positions
+                forAll (lower, faceI)
+                {
+                    activeExtLower[faceMap[faceI]] = activeLower[faceI];
+                }
+            }
+            else if (lower.activeType() == blockCoeffBase::LINEAR)
+            {
+                // Helper type definition
+                typedef typename CoeffField<Type>::linearTypeField activeType;
+
+                // Get references to fields
+                const activeType& activeLower = lower.asLinear();
+                activeType& activeExtLower = extLower.asLinear();
+
+                // Copy non-zero coeffs from basic lduMatrix into corresponding
+                // positions
+                forAll (lower, faceI)
+                {
+                    activeExtLower[faceMap[faceI]] = activeLower[faceI];
+                }
+            }
+            else if (lower.activeType() == blockCoeffBase::SQUARE)
+            {
+                // Helper type definition
+                typedef typename CoeffField<Type>::squareTypeField activeType;
+
+                // Get references to fields
+                const activeType& activeLower = lower.asSquare();
+                activeType& activeExtLower = extLower.asSquare();
+
+                // Copy non-zero coeffs from basic lduMatrix into corresponding
+                // positions
+                forAll (lower, faceI)
+                {
+                    activeExtLower[faceMap[faceI]] = activeLower[faceI];
+                }
+            }
+            else
+            {
+                FatalErrorIn
+                (
+                    "extendedBlockLduMatrix(lduMatrix&, label, polyMesh&)"
+                )   << "Problem between ordinary block matrix and extended"
+                    << " block matrix lower coeffs type morphing."
+                    << abort(FatalError);
             }
         }
     }
@@ -118,22 +218,82 @@ Foam::extendedBlockLduMatrix<Type>::extendedBlockLduMatrix
         const label nExtFaces = extLduAddr_.extendedUpperAddr().size();
 
         // Allocate extended upper and lower
-        extendedUpperPtr_ = new TypeCoeffField(nExtFaces, pTraits<Type>::zero);
+        extendedUpperPtr_ = new TypeCoeffField(nExtFaces);
         TypeCoeffField& extUpper = *extendedUpperPtr_;
 
-        extendedLowerPtr_ = new TypeCoeffField(nExtFaces, pTraits<Type>::zero);
+        extendedLowerPtr_ = new TypeCoeffField(nExtFaces);
         TypeCoeffField& extLower = *extendedLowerPtr_;
 
         // Get upper and lower coeffs from underlying lduMatrix
         const TypeCoeffField& upper = blockLdum.upper();
         const TypeCoeffField& lower = blockLdum.lower();
 
-        // Copy non-zero coeffs from basic lduMatrix into corresponding
-        // positions
-        forAll (upper, faceI)
+        // Assuming lower and upper have the same active type
+        if (upper.activeType() == blockCoeffBase::SCALAR)
         {
-            extUpper[faceMap[faceI]] = upper[faceI];
-            extLower[faceMap[faceI]] = lower[faceI];
+            // Helper type definition
+            typedef typename CoeffField<Type>::scalarTypeField activeType;
+
+            // Get references to fields
+            const activeType& activeUpper = upper.asScalar();
+            activeType& activeExtUpper = extUpper.asScalar();
+            const activeType& activeLower = lower.asScalar();
+            activeType& activeExtLower = extLower.asScalar();
+
+            // Copy non-zero coeffs from basic lduMatrix into corresponding
+            // positions
+            forAll (upper, faceI)
+            {
+                activeExtUpper[faceMap[faceI]] = activeUpper[faceI];
+                activeExtLower[faceMap[faceI]] = activeLower[faceI];
+            }
+        }
+        else if (upper.activeType() == blockCoeffBase::LINEAR)
+        {
+            // Helper type definition
+            typedef typename CoeffField<Type>::linearTypeField activeType;
+
+            // Get references to fields
+            const activeType& activeUpper = upper.asLinear();
+            activeType& activeExtUpper = extUpper.asLinear();
+            const activeType& activeLower = lower.asLinear();
+            activeType& activeExtLower = extLower.asLinear();
+
+            // Copy non-zero coeffs from basic lduMatrix into corresponding
+            // positions
+            forAll (upper, faceI)
+            {
+                activeExtUpper[faceMap[faceI]] = activeUpper[faceI];
+                activeExtLower[faceMap[faceI]] = activeLower[faceI];
+            }
+        }
+        else if (upper.activeType() == blockCoeffBase::SQUARE)
+        {
+            // Helper type definition
+            typedef typename CoeffField<Type>::squareTypeField activeType;
+
+            // Get references to fields
+            const activeType& activeUpper = upper.asSquare();
+            activeType& activeExtUpper = extUpper.asSquare();
+            const activeType& activeLower = lower.asSquare();
+            activeType& activeExtLower = extLower.asSquare();
+
+            // Copy non-zero coeffs from basic lduMatrix into corresponding
+            // positions
+            forAll (upper, faceI)
+            {
+                activeExtUpper[faceMap[faceI]] = activeUpper[faceI];
+                activeExtLower[faceMap[faceI]] = activeLower[faceI];
+            }
+        }
+        else
+        {
+            FatalErrorIn
+            (
+                "extendedBlockLduMatrix(lduMatrix&, label, polyMesh&)"
+            )   << "Problem between ordinary block matrix and extended"
+                << " block matrix upper/lower coeffs type morphing."
+                << abort(FatalError);
         }
     }
 }
@@ -172,8 +332,7 @@ Foam::extendedBlockLduMatrix<Type>::extendedLower()
         {
             extendedLowerPtr_ = new TypeCoeffField
             (
-                extLduAddr_.extendedLowerAddr().size(),
-                pTraits<Type>::zero
+                extLduAddr_.extendedLowerAddr().size()
             );
         }
     }
@@ -196,8 +355,7 @@ Foam::extendedBlockLduMatrix<Type>::extendedUpper()
         {
             extendedUpperPtr_ = new TypeCoeffField
             (
-                extLduAddr_.extendedUpperAddr().size(),
-                pTraits<Type>::zero
+                extLduAddr_.extendedUpperAddr().size()
             );
         }
     }

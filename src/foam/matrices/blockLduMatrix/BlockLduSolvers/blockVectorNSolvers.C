@@ -31,6 +31,7 @@ License
 #include "blockDiagonalPrecons.H"
 #include "blockGaussSeidelPrecons.H"
 #include "BlockCholeskyPrecon.H"
+#include "BlockILUCpPrecon.H"
 
 #include "blockLduSmoothers.H"
 #include "blockGaussSeidelSmoothers.H"
@@ -82,6 +83,9 @@ makeBlockPrecon(block##Type##Precon, block##Type##GaussSeidelPrecon);         \
                                                                               \
 typedef BlockCholeskyPrecon<type > block##Type##CholeskyPrecon;               \
 makeBlockPrecon(block##Type##Precon, block##Type##CholeskyPrecon);            \
+                                                                              \
+typedef BlockILUCpPrecon<type > block##Type##ILUCpPrecon;                     \
+makeBlockPrecon(block##Type##Precon, block##Type##ILUCpPrecon);               \
                                                                               \
 /* Smoothers */                                                               \
 typedef BlockLduSmoother<type > block##Type##Smoother;                        \
