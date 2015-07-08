@@ -54,7 +54,7 @@ void Foam::BlockILUCpPrecon<Type>::calcFactorization
     if (!this->matrix_.diagonal())
     {
         // Create multiplication function object
-        typename BlockCoeff<Type>::multiply mult;
+        typename BlockCoeff<LDUType>::multiply mult;
 
         // Get necessary const access to extended ldu addressing
         const extendedLduAddressing& addr = extBlockMatrix_.extendedLduAddr();
@@ -98,7 +98,6 @@ void Foam::BlockILUCpPrecon<Type>::calcFactorization
             // Start and end of k-th row (upper) and k-th column (lower)
             fStart = ownStartPtr[rowI];
             fEnd = ownStartPtr[rowI + 1];
-
             // Initialize temporary working diagonal
             zDiagI = diagPtr[rowI];
 
@@ -172,7 +171,7 @@ void Foam::BlockILUCpPrecon<Type>::calcFactorization
 
             // Update diagonal entry, inverting it for future use
             LDUType& diagRowI = diagPtr[rowI];
-            diagRowI = mult.inv(zDiagI);
+            diagRowI = mult.inverse(zDiagI);
 
             // Index for updating L and U
             register label zwIndex;
