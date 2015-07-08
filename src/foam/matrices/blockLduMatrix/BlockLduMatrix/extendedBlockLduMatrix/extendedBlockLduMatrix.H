@@ -58,7 +58,7 @@ class extendedBlockLduMatrix
 {
     // Public data type
 
-        typedef typename BlockLduMatrix<Type>::TypeCoeffField TypeCoeffField;
+        typedef CoeffField<Type> TypeCoeffField;
 
 
 private:
@@ -142,6 +142,12 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#ifdef NoRepository
+#   include "extendedBlockLduMatrix.C"
+#endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
