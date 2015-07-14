@@ -34,6 +34,17 @@ boundaryLayers
              thicknessRatio 1.2;
         }
     }
+
+    optimiseLayer 1;
+
+    optimisationParameters
+    {
+        nSmoothNormals 5;
+        relThicknessTol 0.15;
+        featureSizeFactor 0.3;
+        reCalculateNormals 1;
+        maxNumIterations 5;
+    }
 }
 
 localRefinement

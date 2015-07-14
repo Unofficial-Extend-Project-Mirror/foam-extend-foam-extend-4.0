@@ -5,3 +5,4 @@
 runApplication preparePar
 runParallel cartesianMesh 4
 runParallel checkMesh 4
+runApplication reconstructParMesh -zeroTime

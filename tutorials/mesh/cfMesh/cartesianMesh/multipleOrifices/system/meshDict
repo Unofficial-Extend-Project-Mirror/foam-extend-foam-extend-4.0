@@ -86,6 +86,8 @@ boundaryLayers
             allowDiscontinuity 0;
         }
     }
+
+    optimiseLayer 1;
 }
 
 renameBoundary

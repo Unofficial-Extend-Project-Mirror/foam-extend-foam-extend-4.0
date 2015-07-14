@@ -16,7 +16,7 @@ FoamFile
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-application    ;
+application ;
 deltaT 0.001;
 endTime 2;
 graphFormat raw;
