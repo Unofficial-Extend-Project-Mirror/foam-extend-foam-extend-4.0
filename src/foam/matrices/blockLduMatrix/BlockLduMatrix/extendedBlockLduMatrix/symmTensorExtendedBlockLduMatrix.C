@@ -23,14 +23,20 @@ License
 
 \*---------------------------------------------------------------------------*/
 
+#ifndef symmTensorExtendedBlockLduMatrix_H
+#define symmTensorExtendedBlockLduMatrix_H
+
 #include "extendedBlockLduMatrix.H"
 
-// * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-template<class Type>
-void Foam::extendedBlockLduMatrix<Type>::mapOffDiagCoeffs
+namespace Foam
+{
+
+template<>
+void Foam::extendedBlockLduMatrix<Foam::symmTensor>::mapOffDiagCoeffs
 (
-    const BlockLduMatrix<Type>& blockLdum
+    const BlockLduMatrix<symmTensor>& blockLdum
 )
 {
     if (blockLdum.diagonal())
@@ -61,7 +67,8 @@ void Foam::extendedBlockLduMatrix<Type>::mapOffDiagCoeffs
             if (upper.activeType() == blockCoeffBase::SCALAR)
             {
                 // Helper type definition
-                typedef typename CoeffField<Type>::scalarTypeField activeType;
+                typedef typename CoeffField<symmTensor>::scalarTypeField
+                    activeType;
 
                 // Get references to fields
                 const activeType& activeUpper = upper.asScalar();
@@ -77,27 +84,12 @@ void Foam::extendedBlockLduMatrix<Type>::mapOffDiagCoeffs
             else if (upper.activeType() == blockCoeffBase::LINEAR)
             {
                 // Helper type definition
-                typedef typename CoeffField<Type>::linearTypeField activeType;
+                typedef typename CoeffField<symmTensor>::linearTypeField
+                    activeType;
 
                 // Get references to fields
                 const activeType& activeUpper = upper.asLinear();
                 activeType& activeExtUpper = extUpper.asLinear();
-
-                // Copy non-zero coeffs from basic lduMatrix into corresponding
-                // positions
-                forAll (upper, faceI)
-                {
-                    activeExtUpper[faceMap[faceI]] = activeUpper[faceI];
-                }
-            }
-            else if (upper.activeType() == blockCoeffBase::SQUARE)
-            {
-                // Helper type definition
-                typedef typename CoeffField<Type>::squareTypeField activeType;
-
-                // Get references to fields
-                const activeType& activeUpper = upper.asSquare();
-                activeType& activeExtUpper = extUpper.asSquare();
 
                 // Copy non-zero coeffs from basic lduMatrix into corresponding
                 // positions
@@ -131,7 +123,8 @@ void Foam::extendedBlockLduMatrix<Type>::mapOffDiagCoeffs
             if (lower.activeType() == blockCoeffBase::SCALAR)
             {
                 // Helper type definition
-                typedef typename CoeffField<Type>::scalarTypeField activeType;
+                typedef typename CoeffField<symmTensor>::scalarTypeField
+                    activeType;
 
                 // Get references to fields
                 const activeType& activeLower = lower.asScalar();
@@ -147,27 +140,12 @@ void Foam::extendedBlockLduMatrix<Type>::mapOffDiagCoeffs
             else if (lower.activeType() == blockCoeffBase::LINEAR)
             {
                 // Helper type definition
-                typedef typename CoeffField<Type>::linearTypeField activeType;
+                typedef typename CoeffField<symmTensor>::linearTypeField
+                    activeType;
 
                 // Get references to fields
                 const activeType& activeLower = lower.asLinear();
                 activeType& activeExtLower = extLower.asLinear();
-
-                // Copy non-zero coeffs from basic lduMatrix into corresponding
-                // positions
-                forAll (lower, faceI)
-                {
-                    activeExtLower[faceMap[faceI]] = activeLower[faceI];
-                }
-            }
-            else if (lower.activeType() == blockCoeffBase::SQUARE)
-            {
-                // Helper type definition
-                typedef typename CoeffField<Type>::squareTypeField activeType;
-
-                // Get references to fields
-                const activeType& activeLower = lower.asSquare();
-                activeType& activeExtLower = extLower.asSquare();
 
                 // Copy non-zero coeffs from basic lduMatrix into corresponding
                 // positions
@@ -210,7 +188,7 @@ void Foam::extendedBlockLduMatrix<Type>::mapOffDiagCoeffs
         if (upper.activeType() == blockCoeffBase::SCALAR)
         {
             // Helper type definition
-            typedef typename CoeffField<Type>::scalarTypeField activeType;
+            typedef typename CoeffField<symmTensor>::scalarTypeField activeType;
 
             // Get references to fields
             const activeType& activeUpper = upper.asScalar();
@@ -229,32 +207,13 @@ void Foam::extendedBlockLduMatrix<Type>::mapOffDiagCoeffs
         else if (upper.activeType() == blockCoeffBase::LINEAR)
         {
             // Helper type definition
-            typedef typename CoeffField<Type>::linearTypeField activeType;
+            typedef typename CoeffField<symmTensor>::linearTypeField activeType;
 
             // Get references to fields
             const activeType& activeUpper = upper.asLinear();
             activeType& activeExtUpper = extUpper.asLinear();
             const activeType& activeLower = lower.asLinear();
             activeType& activeExtLower = extLower.asLinear();
-
-            // Copy non-zero coeffs from basic lduMatrix into corresponding
-            // positions
-            forAll (upper, faceI)
-            {
-                activeExtUpper[faceMap[faceI]] = activeUpper[faceI];
-                activeExtLower[faceMap[faceI]] = activeLower[faceI];
-            }
-        }
-        else if (upper.activeType() == blockCoeffBase::SQUARE)
-        {
-            // Helper type definition
-            typedef typename CoeffField<Type>::squareTypeField activeType;
-
-            // Get references to fields
-            const activeType& activeUpper = upper.asSquare();
-            activeType& activeExtUpper = extUpper.asSquare();
-            const activeType& activeLower = lower.asSquare();
-            activeType& activeExtLower = extLower.asSquare();
 
             // Copy non-zero coeffs from basic lduMatrix into corresponding
             // positions
@@ -277,155 +236,12 @@ void Foam::extendedBlockLduMatrix<Type>::mapOffDiagCoeffs
 }
 
 
-// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-template<class Type>
-Foam::extendedBlockLduMatrix<Type>::extendedBlockLduMatrix
-(
-    const BlockLduMatrix<Type>& blockLdum,
-    const label extensionLevel,
-    const polyMesh& polyMesh
-)
-:
-    basicBlockLduMatrix_(blockLdum),
-    extLduAddr_
-    (
-        extendedLduAddressing::New
-        (
-            polyMesh,
-            blockLdum.lduAddr(),
-            extensionLevel
-        )
-    ),
-    extendedLowerPtr_(NULL),
-    extendedUpperPtr_(NULL)
-{
-    if (debug)
-    {
-        Info<< "extendedBlockLduMatrix(lduMatrix&, label, polyMesh&) :"
-               "Constructing extendedBlockLduMatrix."
-            << endl;
-    }
+} // End namespace Foam
 
-    // Map off diag coeffs from original block matrix to this extended block
-    // matrix
-    mapOffDiagCoeffs(blockLdum);
-}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-
-// * * * * * * * * * * * * * * * * Destructor* * * * * * * * * * * * * * * * //
-
-template<class Type>
-Foam::extendedBlockLduMatrix<Type>::~extendedBlockLduMatrix()
-{
-    if (extendedLowerPtr_)
-    {
-        delete extendedLowerPtr_;
-    }
-
-    if (extendedUpperPtr_)
-    {
-        delete extendedUpperPtr_;
-    }
-}
-
-
-// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
-
-template<class Type>
-typename Foam::extendedBlockLduMatrix<Type>::TypeCoeffField&
-Foam::extendedBlockLduMatrix<Type>::extendedLower()
-{
-    if (!extendedLowerPtr_)
-    {
-        if (extendedUpperPtr_)
-        {
-            extendedLowerPtr_ = new TypeCoeffField(*extendedUpperPtr_);
-        }
-        else
-        {
-            extendedLowerPtr_ = new TypeCoeffField
-            (
-                extLduAddr_.extendedLowerAddr().size()
-            );
-        }
-    }
-
-    return *extendedLowerPtr_;
-}
-
-
-template<class Type>
-typename Foam::extendedBlockLduMatrix<Type>::TypeCoeffField&
-Foam::extendedBlockLduMatrix<Type>::extendedUpper()
-{
-    if (!extendedUpperPtr_)
-    {
-        if (extendedLowerPtr_)
-        {
-            extendedUpperPtr_ = new TypeCoeffField(*extendedLowerPtr_);
-        }
-        else
-        {
-            extendedUpperPtr_ = new TypeCoeffField
-            (
-                extLduAddr_.extendedUpperAddr().size()
-            );
-        }
-    }
-
-    return *extendedUpperPtr_;
-}
-
-
-template<class Type>
-const typename Foam::extendedBlockLduMatrix<Type>::TypeCoeffField&
-Foam::extendedBlockLduMatrix<Type>::extendedLower() const
-{
-    if (!extendedLowerPtr_ && !extendedUpperPtr_)
-    {
-        FatalErrorIn
-        (
-            "const CoeffField<Type>& "
-            "extendedBlockLduMatrix<Type>::extendedLower() const"
-        )   << "extendedLowerPtr_ or extendedUpperPtr_ unallocated"
-            << abort(FatalError);
-    }
-
-    if (extendedLowerPtr_)
-    {
-        return *extendedLowerPtr_;
-    }
-    else
-    {
-        return *extendedUpperPtr_;
-    }
-}
-
-
-template<class Type>
-const typename Foam::extendedBlockLduMatrix<Type>::TypeCoeffField&
-Foam::extendedBlockLduMatrix<Type>::extendedUpper() const
-{
-    if (!extendedLowerPtr_ && !extendedUpperPtr_)
-    {
-        FatalErrorIn
-        (
-            "const CoeffField<Type>& "
-            "extendedBlockLduMatrix<Type>::extendedLower() const"
-        )   << "extendedLowerPtr_ or extendedUpperPtr_ unallocated"
-            << abort(FatalError);
-    }
-
-    if (extendedUpperPtr_)
-    {
-        return *extendedUpperPtr_;
-    }
-    else
-    {
-        return *extendedLowerPtr_;
-    }
-}
-
+#endif
 
 // ************************************************************************* //

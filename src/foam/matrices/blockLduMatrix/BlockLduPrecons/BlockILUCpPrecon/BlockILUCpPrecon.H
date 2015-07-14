@@ -63,22 +63,13 @@ class BlockILUCpPrecon
     // Private Data
 
         //- Preconditioned diagonal
-        CoeffField<Type> preconDiag_;
+        mutable CoeffField<Type> preconDiag_;
 
         //- Fill in level
         const label p_;
 
         //- Extended lduMarix
-        extendedBlockLduMatrix<Type> extBlockMatrix_;
-
-        //- Temporary working diagonal
-        CoeffField<Type> zDiag_;
-
-        //- Temporary working row field
-        CoeffField<Type> z_;
-
-        //- Temporary working column field
-        CoeffField<Type> w_;
+        mutable extendedBlockLduMatrix<Type> extBlockMatrix_;
 
 
     // Private Member Functions
@@ -89,18 +80,18 @@ class BlockILUCpPrecon
         //- Disallow default bitwise assignment
         void operator=(const BlockILUCpPrecon&);
 
-        //- Calculate LU factorization.
+        //- Calculate active type dependant factorization.
         //  Note: both lower, diag and upper have to be of same type
         template<class LDUType>
-        void calcFactorization
+        void calcActiveTypeFactorization
         (
             Field<LDUType>& preconD,
             Field<LDUType>& extUpper,
-            Field<LDUType>& extLower,
-            Field<LDUType>& zDiag,
-            Field<LDUType>& z,
-            Field<LDUType>& w
-        );
+            Field<LDUType>& extLower
+        ) const;
+
+        //- Calculate LU factorization (constructor helper)
+        void calcFactorization() const;
 
         //- Performs forward/backward LU substitution
         //  Note: both lower, diag and upper have to be of same type

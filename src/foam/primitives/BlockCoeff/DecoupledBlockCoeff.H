@@ -113,6 +113,28 @@ public:
         }
 
 
+        // Coefficient times coefficient multiplication. Needed for BlockILUCp
+        // preconditioner. VV, 12/Jul/2015.
+
+            scalarType activeTypeMultiply
+            (
+                const scalarType& a,
+                const scalarType& b
+            ) const
+            {
+                return a*b;
+            }
+
+            linearType activeTypeMultiply
+            (
+                const linearType& a,
+                const linearType& b
+            ) const
+            {
+                return cmptMultiply(a, b);
+            }
+
+
         // Inverse functions
 
             scalarType inverse(const scalarType& c) const

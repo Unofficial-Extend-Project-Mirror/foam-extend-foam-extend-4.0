@@ -41,20 +41,25 @@ Author
 
 template<class Type>
 template<class LDUType>
-void Foam::BlockILUCpPrecon<Type>::calcFactorization
+void Foam::BlockILUCpPrecon<Type>::calcActiveTypeFactorization
 (
     Field<LDUType>& preconD,
     Field<LDUType>& extUpper,
-    Field<LDUType>& extLower,
-    Field<LDUType>& zDiag,
-    Field<LDUType>& z,
-    Field<LDUType>& w
-)
+    Field<LDUType>& extLower
+) const
 {
     if (!this->matrix_.diagonal())
     {
+        // Get number of rows
+        const label nRows = preconD.size();
+
+        // Allocate working fields
+        Field<LDUType> z(nRows, pTraits<LDUType>::zero);
+        Field<LDUType> w(nRows, pTraits<LDUType>::zero);
+        LDUType zDiag(pTraits<LDUType>::zero);
+
         // Create multiplication function object
-        typename BlockCoeff<LDUType>::multiply mult;
+        typename BlockCoeff<Type>::multiply mult;
 
         // Get necessary const access to extended ldu addressing
         const extendedLduAddressing& addr = extBlockMatrix_.extendedLduAddr();
@@ -81,10 +86,6 @@ void Foam::BlockILUCpPrecon<Type>::calcFactorization
         // Get access to working fields
         LDUType* __restrict__ zPtr = z.begin();
         LDUType* __restrict__ wPtr = w.begin();
-        LDUType& zDiagI = zDiag[0];
-
-        // Get number of rows
-        const label nRows = preconD.size();
 
         // Define start and end face ("virtual" face when extended addressing is
         // used) of this row/column.
@@ -98,8 +99,9 @@ void Foam::BlockILUCpPrecon<Type>::calcFactorization
             // Start and end of k-th row (upper) and k-th column (lower)
             fStart = ownStartPtr[rowI];
             fEnd = ownStartPtr[rowI + 1];
+
             // Initialize temporary working diagonal
-            zDiagI = diagPtr[rowI];
+            zDiag = diagPtr[rowI];
 
             // Initialize temporary working row and column fields
             for (register label faceI = fStart; faceI < fEnd; ++faceI)
@@ -132,7 +134,7 @@ void Foam::BlockILUCpPrecon<Type>::calcFactorization
                 // Update diagonal
                 // WARNING: Not sure about order of multiplication.
                 // Check it. VV, 3/Jul/2015
-                zDiagI -= mult
+                zDiag -= mult.activeTypeMultiply
                 (
                     lowerPtr[losortCoeff],
                     upperPtr[losortCoeff]
@@ -153,7 +155,7 @@ void Foam::BlockILUCpPrecon<Type>::calcFactorization
                 {
                     // WARNING: Not sure about order of multiplication.
                     // Check it. VV, 3/Jul/2015
-                    zPtr[uPtr[faceI]] -= mult
+                    zPtr[uPtr[faceI]] -= mult.activeTypeMultiply
                     (
                         lowerPtr[losortCoeff],
                         upperPtr[faceI]
@@ -161,17 +163,22 @@ void Foam::BlockILUCpPrecon<Type>::calcFactorization
 
                     // WARNING: Not sure about order of multiplication.
                     // Check it. VV, 3/Jul/2015
-                    wPtr[uPtr[faceI]] -= mult
+                    wPtr[uPtr[faceI]] -= mult.activeTypeMultiply
                     (
-                        upperPtr[losortCoeff],
-                        lowerPtr[faceI]
+                        lowerPtr[faceI],
+                        mult.activeTypeMultiply
+                        (
+//                            diagPtr[lPtr[losortCoeff]], // Note: diag already inverted
+                            mult.inverse(zDiag), // Note: diag already inverted
+                            upperPtr[losortCoeff]
+                        )
                     );
                 }
             }
 
             // Update diagonal entry, inverting it for future use
             LDUType& diagRowI = diagPtr[rowI];
-            diagRowI = mult.inverse(zDiagI);
+            diagRowI = mult.inverse(zDiag);
 
             // Index for updating L and U
             register label zwIndex;
@@ -187,15 +194,16 @@ void Foam::BlockILUCpPrecon<Type>::calcFactorization
 
                 // WARNING: Not sure about order of multiplication.
                 // Check it. VV, 3/Jul/2015
-                lowerPtr[faceI] = mult
-                (
-                    diagRowI,
-                    wPtr[zwIndex]
-                );
+//                lowerPtr[faceI] = mult.activeTypeMultiply
+//                (
+//                    diagRowI,
+//                    wPtr[zwIndex]
+//                );
+                lowerPtr[faceI] = wPtr[zwIndex];
             }
 
             // Reset temporary working fields
-            zDiagI = pTraits<LDUType>::zero;
+            zDiag = pTraits<LDUType>::zero;
 
             // Only reset parts of the working fields that have been updated in
             // this step (for this row and column)
@@ -234,7 +242,7 @@ void Foam::BlockILUCpPrecon<Type>::calcFactorization
         (
             "template <class Type>\n"
             "template <class LDUType>\n"
-            "void BlockILUCpPrecon<Type>::calcFactorization\n"
+            "void BlockILUCpPrecon<Type>::calcActiveTypeFactorization\n"
             "(\n"
             "    Field<LDUType>& preconD,\n"
             "    Field<LDUType>& extUpper,\n"
@@ -248,6 +256,109 @@ void Foam::BlockILUCpPrecon<Type>::calcFactorization
             << nl
             << "Use BlockDiagonal preconditioner instead."
             << abort(FatalError);
+    }
+}
+
+
+template<class Type>
+void Foam::BlockILUCpPrecon<Type>::calcFactorization() const
+{
+    // Get upper and lower matrix factors
+    CoeffField<Type>& Lower = extBlockMatrix_.extendedLower();
+    CoeffField<Type>& Upper = extBlockMatrix_.extendedUpper();
+
+    // Calculate factorization
+    // Note: lower, diag and upper must have same type as required by the
+    // algorithm. This is handled by lowest possible promotion
+    if (preconDiag_.activeType() == blockCoeffBase::SCALAR)
+    {
+        if (Upper.activeType() == blockCoeffBase::SCALAR)
+        {
+            calcActiveTypeFactorization
+            (
+                preconDiag_.asScalar(),
+                Upper.asScalar(),
+                Lower.asScalar()
+            );
+        }
+        else if (Upper.activeType() == blockCoeffBase::LINEAR)
+        {
+            calcActiveTypeFactorization
+            (
+                preconDiag_.asLinear(), // Promotes to linear
+                Upper.asLinear(),
+                Lower.asLinear()
+            );
+        }
+        else if (Upper.activeType() == blockCoeffBase::SQUARE)
+        {
+            calcActiveTypeFactorization
+            (
+                preconDiag_.asSquare(), // Promotes to square
+                Upper.asSquare(),
+                Lower.asSquare()
+            );
+        }
+    }
+    else if (preconDiag_.activeType() == blockCoeffBase::LINEAR)
+    {
+        if (Upper.activeType() == blockCoeffBase::SCALAR)
+        {
+            calcActiveTypeFactorization
+            (
+                preconDiag_.asLinear(),
+                Upper.asLinear(), // Promotes to linear
+                Lower.asLinear()  // Promotes to linear
+            );
+        }
+        else if (Upper.activeType() == blockCoeffBase::LINEAR)
+        {
+            calcActiveTypeFactorization
+            (
+                preconDiag_.asLinear(),
+                Upper.asLinear(),
+                Lower.asLinear()
+            );
+        }
+        else if (Upper.activeType() == blockCoeffBase::SQUARE)
+        {
+            calcActiveTypeFactorization
+            (
+                preconDiag_.asSquare(), // Promotes to square
+                Upper.asSquare(),
+                Lower.asSquare()
+            );
+        }
+    }
+    else if (preconDiag_.activeType() == blockCoeffBase::SQUARE)
+    {
+        if (Upper.activeType() == blockCoeffBase::SCALAR)
+        {
+            calcActiveTypeFactorization
+            (
+                preconDiag_.asSquare(),
+                Upper.asSquare(), // Promotes to square
+                Lower.asSquare()  // Promotes to square
+            );
+        }
+        else if (Upper.activeType() == blockCoeffBase::LINEAR)
+        {
+            calcActiveTypeFactorization
+            (
+                preconDiag_.asSquare(),
+                Upper.asSquare(), // Promotes to square
+                Lower.asSquare()  // Promotes to square
+            );
+        }
+        else if (Upper.activeType() == blockCoeffBase::SQUARE)
+        {
+            calcActiveTypeFactorization
+            (
+                preconDiag_.asSquare(),
+                Upper.asSquare(),
+                Lower.asSquare()
+            );
+        }
     }
 }
 
@@ -420,135 +531,9 @@ Foam::BlockILUCpPrecon<Type>::BlockILUCpPrecon
         (
             polyMesh::defaultRegion
         )
-    ),
-    zDiag_(1),
-    z_(preconDiag_.size()),
-    w_(preconDiag_.size())
+    )
 {
-    // Get upper and lower matrix factors
-    CoeffField<Type>& Lower = extBlockMatrix_.extendedLower();
-    CoeffField<Type>& Upper = extBlockMatrix_.extendedUpper();
-
-    // Calculate factorization
-    // Note: lower, diag and upper must have same type as required by the
-    // algorithm. This is handled by lowest possible promotion
-    if (preconDiag_.activeType() == blockCoeffBase::SCALAR)
-    {
-        if (Upper.activeType() == blockCoeffBase::SCALAR)
-        {
-            calcFactorization
-            (
-                preconDiag_.asScalar(),
-                Upper.asScalar(),
-                Lower.asScalar(),
-                zDiag_.asScalar(),
-                z_.asScalar(),
-                w_.asScalar()
-            );
-        }
-        else if (Upper.activeType() == blockCoeffBase::LINEAR)
-        {
-            calcFactorization
-            (
-                preconDiag_.asLinear(), // Promotes to linear
-                Upper.asLinear(),
-                Lower.asLinear(),
-                zDiag_.asLinear(),
-                z_.asLinear(),
-                w_.asLinear()
-            );
-        }
-        else if (Upper.activeType() == blockCoeffBase::SQUARE)
-        {
-            calcFactorization
-            (
-                preconDiag_.asSquare(), // Promotes to square
-                Upper.asSquare(),
-                Lower.asSquare(),
-                zDiag_.asSquare(),
-                z_.asSquare(),
-                w_.asSquare()
-            );
-        }
-    }
-    else if (preconDiag_.activeType() == blockCoeffBase::LINEAR)
-    {
-        if (Upper.activeType() == blockCoeffBase::SCALAR)
-        {
-            calcFactorization
-            (
-                preconDiag_.asLinear(),
-                Upper.asLinear(), // Promotes to linear
-                Lower.asLinear(), // Promotes to linear
-                zDiag_.asLinear(), // Promotes to linear
-                z_.asLinear(), // Promotes to linear
-                w_.asLinear() // Promotes to linear
-            );
-        }
-        else if (Upper.activeType() == blockCoeffBase::LINEAR)
-        {
-            calcFactorization
-            (
-                preconDiag_.asLinear(),
-                Upper.asLinear(),
-                Lower.asLinear(),
-                zDiag_.asLinear(),
-                z_.asLinear(),
-                w_.asLinear()
-            );
-        }
-        else if (Upper.activeType() == blockCoeffBase::SQUARE)
-        {
-            calcFactorization
-            (
-                preconDiag_.asSquare(), // Promotes to square
-                Upper.asSquare(),
-                Lower.asSquare(),
-                zDiag_.asSquare(),
-                z_.asSquare(),
-                w_.asSquare()
-            );
-        }
-    }
-    else if (preconDiag_.activeType() == blockCoeffBase::SQUARE)
-    {
-        if (Upper.activeType() == blockCoeffBase::SCALAR)
-        {
-            calcFactorization
-            (
-                preconDiag_.asSquare(),
-                Upper.asSquare(), // Promotes to square
-                Lower.asSquare(), // Promotes to square
-                zDiag_.asSquare(), // Promotes to square
-                z_.asSquare(), // Promotes to square
-                w_.asSquare() // Promotes to square
-            );
-        }
-        else if (Upper.activeType() == blockCoeffBase::LINEAR)
-        {
-            calcFactorization
-            (
-                preconDiag_.asSquare(),
-                Upper.asSquare(), // Promotes to square
-                Lower.asSquare(), // Promotes to square
-                zDiag_.asSquare(), // Promotes to square
-                z_.asSquare(), // Promotes to square
-                w_.asSquare() // Promotes to square
-            );
-        }
-        else if (Upper.activeType() == blockCoeffBase::SQUARE)
-        {
-            calcFactorization
-            (
-                preconDiag_.asSquare(),
-                Upper.asSquare(),
-                Lower.asSquare(),
-                zDiag_.asSquare(),
-                z_.asSquare(),
-                w_.asSquare()
-            );
-        }
-    }
+    calcFactorization();
 }
 
 
