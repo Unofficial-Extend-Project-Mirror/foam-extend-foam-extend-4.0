@@ -45,20 +45,23 @@ SourceFiles
 namespace Foam
 {
 
-// Calculate factorization
+// Calculate active type factorization
 template<>
 template<>
-void BlockILUCpPrecon<tensor>::calcFactorization
+void BlockILUCpPrecon<tensor>::calcActiveTypeFactorization
 (
     tensorField& preconD,
     tensorField& extUpper,
-    tensorField& extLower,
-    tensorField& zDiag,
-    tensorField& z,
-    tensorField& w
-);
+    tensorField& extLower
+) const;
 
 
+// Calculate factorization (constructor helper)
+template<>
+void BlockILUCpPrecon<tensor>::calcFactorization() const;
+
+
+// Precondition
 template<>
 void BlockILUCpPrecon<tensor>::precondition
 (
@@ -67,6 +70,7 @@ void BlockILUCpPrecon<tensor>::precondition
 ) const;
 
 
+// Precondition transpose
 template<>
 void BlockILUCpPrecon<tensor>::preconditionT
 (

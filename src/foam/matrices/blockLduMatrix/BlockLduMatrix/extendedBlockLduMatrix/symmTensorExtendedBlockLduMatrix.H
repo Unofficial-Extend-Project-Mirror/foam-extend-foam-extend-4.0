@@ -22,61 +22,34 @@ License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    BlockILUCpPrecon
+    extendedBlockLduMatrix
 
 Description
-    Template specialisation for scalar block ILUCp preconditioning
+    Template specialisation for symmTensor extended block matrix
 
 Author
-    Vuko Vukcevic, FMENA Zagreb. All rights reserved.
+    Vuko Vukcevic.  All rights reserved.
 
 SourceFiles
-    scalarBlockILUCpPrecon.C
+    symmTensorExtendedBlockLduMatrix.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef scalarBlockILUCpPrecon_H
-#define scalarBlockILUCpPrecon_H
+#ifndef symmTensorExtendedBlockLduMatrix_H
+#define symmTensorExtendedBlockLduMatrix_H
 
-#include "BlockILUCpPrecon.H"
+#include "extendedBlockLduMatrix.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 
-// Calculate active type factorization
 template<>
-template<>
-void BlockILUCpPrecon<scalar>::calcActiveTypeFactorization
+void extendedBlockLduMatrix<symmTensor>::mapOffDiagCoeffs
 (
-    scalarField& preconD,
-    scalarField& extUpper,
-    scalarField& extLower
-) const;
-
-
-// Calculate factorization (constructor helper)
-template<>
-void BlockILUCpPrecon<scalar>::calcFactorization() const;
-
-
-// Precondition
-template<>
-void BlockILUCpPrecon<scalar>::precondition
-(
-    scalarField& x,
-    const scalarField& b
-) const;
-
-
-// Precondition transpose
-template<>
-void BlockILUCpPrecon<scalar>::preconditionT
-(
-    scalarField& xT,
-    const scalarField& bT
-) const;
+    const BlockLduMatrix<symmTensor>& blockLdum
+);
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

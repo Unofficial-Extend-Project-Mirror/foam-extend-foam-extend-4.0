@@ -43,21 +43,72 @@ Author
 namespace Foam
 {
 
-// Calculate factorization
 template<>
 template<>
-void BlockILUCpPrecon<tensor>::calcFactorization
+void BlockILUCpPrecon<tensor>::calcActiveTypeFactorization
 (
     tensorField& preconD,
     tensorField& extUpper,
-    tensorField& extLower,
-    tensorField& zDiag,
-    tensorField& z,
-    tensorField& w
-)
+    tensorField& extLower
+) const
 {
     // Decoupled version
     notImplemented("void Foam::BlockILUCpPrecon<tensor>::calcFactorization");
+}
+
+
+template<>
+void BlockILUCpPrecon<tensor>::calcFactorization() const
+{
+    // Get upper and lower matrix factors
+    CoeffField<tensor>& Lower = extBlockMatrix_.extendedLower();
+    CoeffField<tensor>& Upper = extBlockMatrix_.extendedUpper();
+
+    // Calculate factorization
+    // Note: lower, diag and upper must have same type as required by the
+    // algorithm. This is handled by lowest possible promotion
+    if (preconDiag_.activeType() == blockCoeffBase::SCALAR)
+    {
+        if (Upper.activeType() == blockCoeffBase::SCALAR)
+        {
+            calcActiveTypeFactorization
+            (
+                preconDiag_.asScalar(),
+                Upper.asScalar(),
+                Lower.asScalar()
+            );
+        }
+        else if (Upper.activeType() == blockCoeffBase::LINEAR)
+        {
+            calcActiveTypeFactorization
+            (
+                preconDiag_.asLinear(), // Promotes to linear
+                Upper.asLinear(),
+                Lower.asLinear()
+            );
+        }
+    }
+    else if (preconDiag_.activeType() == blockCoeffBase::LINEAR)
+    {
+        if (Upper.activeType() == blockCoeffBase::SCALAR)
+        {
+            calcActiveTypeFactorization
+            (
+                preconDiag_.asLinear(),
+                Upper.asLinear(), // Promotes to linear
+                Lower.asLinear()  // Promotes to linear
+            );
+        }
+        else if (Upper.activeType() == blockCoeffBase::LINEAR)
+        {
+            calcActiveTypeFactorization
+            (
+                preconDiag_.asLinear(),
+                Upper.asLinear(),
+                Lower.asLinear()
+            );
+        }
+    }
 }
 
 
