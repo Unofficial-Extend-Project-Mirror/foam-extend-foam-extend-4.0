@@ -86,6 +86,10 @@ private:
         //- Disallow default bitwise assignement
         void operator=(const extendedBlockLduMatrix<Type>&);
 
+        //- Map upper and lower coeffs from ordinary block matrix to extended
+        //  block matrix
+        void mapOffDiagCoeffs(const BlockLduMatrix<Type>&);
+
 
 public:
 

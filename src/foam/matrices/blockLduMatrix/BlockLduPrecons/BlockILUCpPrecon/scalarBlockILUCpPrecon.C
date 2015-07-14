@@ -45,18 +45,23 @@ namespace Foam
 
 template<>
 template<>
-void BlockILUCpPrecon<scalar>::calcFactorization
+void BlockILUCpPrecon<scalar>::calcActiveTypeFactorization
 (
     scalarField& preconD,
     scalarField& extUpper,
-    scalarField& extLower,
-    scalarField& zDiag,
-    scalarField& z,
-    scalarField& w
-)
+    scalarField& extLower
+) const
 {
     if (!matrix_.diagonal())
     {
+        // Get number of rows
+        const label nRows = preconD.size();
+
+        // Allocate working fields
+        scalarField z(nRows, 0.0);
+        scalarField w(nRows, 0.0);
+        scalar zDiag = 0.0;
+
         // Get necessary const access to extended ldu addressing
         const extendedLduAddressing& addr = extBlockMatrix_.extendedLduAddr();
 
@@ -82,10 +87,6 @@ void BlockILUCpPrecon<scalar>::calcFactorization
         // Get access to working fields
         scalar* __restrict__ zPtr = z.begin();
         scalar* __restrict__ wPtr = w.begin();
-        scalar& zDiagI = zDiag[0];
-
-        // Get number of rows
-        const label nRows = preconD.size();
 
         // Define start and end face ("virtual" face when extended addressing is
         // used) of this row/column.
@@ -101,7 +102,7 @@ void BlockILUCpPrecon<scalar>::calcFactorization
             fEnd = ownStartPtr[rowI + 1];
 
             // Initialize temporary working diagonal
-            zDiagI = diagPtr[rowI];
+            zDiag = diagPtr[rowI];
 
             // Initialize temporary working row field
             for (register label faceI = fStart; faceI < fEnd; ++faceI)
@@ -132,7 +133,7 @@ void BlockILUCpPrecon<scalar>::calcFactorization
                 const label i = lPtr[losortCoeff];
 
                 // Update diagonal
-                zDiagI -= lowerPtr[losortCoeff]*upperPtr[losortCoeff];
+                zDiag -= lowerPtr[losortCoeff]*upperPtr[losortCoeff];
 
                 // Get end of row for cell i
                 const register label fEndRowi = ownStartPtr[i + 1];
@@ -154,7 +155,7 @@ void BlockILUCpPrecon<scalar>::calcFactorization
 
             // Update diagonal entry, inverting it for future use
             scalar& diagRowI = diagPtr[rowI];
-            diagRowI = 1.0/zDiagI;
+            diagRowI = 1.0/zDiag;
 
             // Index for updating L and U
             register label zwIndex;
@@ -171,7 +172,7 @@ void BlockILUCpPrecon<scalar>::calcFactorization
             }
 
             // Reset temporary working fields
-            zDiagI = 0;
+            zDiag = 0;
 
             // Only reset parts of the working fields that have been updated in
             // this step (for this row and column)
@@ -225,6 +226,18 @@ void BlockILUCpPrecon<scalar>::calcFactorization
             << "Use BlockDiagonal preconditioner instead."
             << abort(FatalError);
     }
+}
+
+
+template<>
+void BlockILUCpPrecon<scalar>::calcFactorization() const
+{
+    calcActiveTypeFactorization
+    (
+        preconDiag_.asScalar(),
+        extBlockMatrix_.extendedUpper().asScalar(),
+        extBlockMatrix_.extendedLower().asScalar()
+    );
 }
 
 

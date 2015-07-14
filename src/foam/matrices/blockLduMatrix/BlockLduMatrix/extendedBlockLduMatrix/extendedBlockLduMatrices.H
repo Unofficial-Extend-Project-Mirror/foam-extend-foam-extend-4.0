@@ -35,7 +35,9 @@ Author
 #ifndef extendedBlockLduMatrices_H
 #define extendedBlockLduMatrices_H
 
-#include "extendedBlockLduMatrix.H"
+#include "sphericalTensorExtendedBlockLduMatrix.H"
+#include "symmTensorExtendedBlockLduMatrix.H"
+#include "tensorExtendedBlockLduMatrix.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

@@ -39,10 +39,7 @@ namespace Foam
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-// Excluded tensor, need reduced version. VV, 3/Jul/2015.
-makeBlockPrecon(blockScalarPrecon, blockILUCpPreconScalar);
-makeBlockPrecon(blockVectorPrecon, blockILUCpPreconVector);
-//makeBlockPrecon(blockTensorPrecon, blockILUCpPreconTensor);
+makeBlockPrecons(blockILUCpPrecon);
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

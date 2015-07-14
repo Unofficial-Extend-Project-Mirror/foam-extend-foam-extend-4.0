@@ -42,8 +42,6 @@ SourceFiles
 #include "scalarBlockILUCpPrecon.H"
 #include "tensorBlockILUCpPrecon.H"
 
-#include "BlockILUCpPrecon.H"
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
