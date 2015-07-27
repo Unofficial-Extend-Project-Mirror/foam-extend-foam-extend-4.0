@@ -341,7 +341,7 @@ void Foam::sigFpe::set(const bool verbose)
     {
         if (verbose)
         {
-            Info<< "SetNaN : Initialising allocated memory to NaN"
+            Info<< "SetNaN   : Initialising allocated memory to NaN"
                 << " (FOAM_SETNAN)." << endl;
         }
 
