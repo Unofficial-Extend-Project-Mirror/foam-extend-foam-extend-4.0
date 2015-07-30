@@ -87,8 +87,40 @@ $(pointSources)/nearestToPoint/nearestToPoint.C
 
 surfaceSets/surfaceSets.C
 
+triSurfaceInterfaces = triSurface/triSurface/interfaces
+triSurface/triSurface/triSurface.C
+triSurface/triSurface/triSurfaceAddressing.C
+triSurface/triSurface/stitchTriangles.C
+triSurface/triSurface/treeDataTriSurface/treeDataTriSurface.C
+triSurface/faceTriangulation/faceTriangulation.C
+triSurface/meshTriangulation/meshTriangulation.C
+triSurface/triSurface/geometricSurfacePatch/geometricSurfacePatch.C
+triSurface/triSurface/surfacePatch/surfacePatch.C
+triSurface/triSurface/surfacePatch/surfacePatchIOList.C
+triSurface/tools/labelledTri/sortLabelledTri.C
+triSurface/triSurfaceFields/triSurfaceFields.C
+triSurface/triSurfaceFields/triSurfacePointFields/triSurfacePointFields.C
 triSurface/orientedSurface/orientedSurface.C
 triSurface/surfaceLocation/surfaceLocation.C
+$(triSurfaceInterfaces)/STL/writeSTL.C
+$(triSurfaceInterfaces)/STL/readSTL.C
+$(triSurfaceInterfaces)/STL/readSTLASCII.L
+$(triSurfaceInterfaces)/STL/readSTLBINARY.C
+$(triSurfaceInterfaces)/GTS/writeGTS.C
+$(triSurfaceInterfaces)/GTS/readGTS.C
+$(triSurfaceInterfaces)/OBJ/readOBJ.C
+$(triSurfaceInterfaces)/OBJ/writeOBJ.C
+$(triSurfaceInterfaces)/SMESH/writeSMESH.C
+$(triSurfaceInterfaces)/OFF/readOFF.C
+$(triSurfaceInterfaces)/OFF/writeOFF.C
+$(triSurfaceInterfaces)/TRI/writeTRI.C
+$(triSurfaceInterfaces)/TRI/readTRI.C
+$(triSurfaceInterfaces)/DX/writeDX.C
+$(triSurfaceInterfaces)/AC3D/readAC.C
+$(triSurfaceInterfaces)/AC3D/writeAC.C
+$(triSurfaceInterfaces)/VTK/writeVTK.C
+$(triSurfaceInterfaces)/NAS/readNAS.C
+
 
 booleanOps = triSurface/booleanOps
 

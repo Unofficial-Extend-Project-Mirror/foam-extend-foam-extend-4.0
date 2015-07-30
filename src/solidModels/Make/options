@@ -1,7 +1,6 @@
 EXE_INC = \
     -I$(LIB_SRC)/finiteVolume/lnInclude  \
     -I$(LIB_SRC)/meshTools/lnInclude \
-    -I$(FOAM_SRC)/triSurface/lnInclude \
     -I$(LIB_SRC)/finiteArea/lnInclude \
     -I$(LIB_SRC)/lagrangian/lnInclude \
     -I$(LIB_SRC)/dynamicMesh/lnInclude \
@@ -12,7 +11,6 @@ EXE_INC = \
 LIB_LIBS = \
     -lfiniteVolume \
     -lmeshTools \
-    -ltriSurface \
     -lfiniteArea \
     -ldynamicFvMesh \
     -ldynamicMesh \
