@@ -77,23 +77,23 @@ tmp
     const GeometricField<Type, fvPatchField, volMesh>& vf
 ) const
 {
-   FatalErrorIn
-   (
-       "tmp<BlockLduSystem> fvmUDiv\n"
-       "(\n"
-       "    GeometricField<Type, fvPatchField, volMesh>&"
-       ")\n"
-   )   << "Implicit div operator defined only for vector."
-       << abort(FatalError);
+    FatalErrorIn
+    (
+        "tmp<BlockLduSystem> gaussDivScheme<Type>::fvmUDiv\n"
+        "(\n"
+        "    GeometricField<Type, fvPatchField, volMesh>&"
+        ")\n"
+    )   << "Implicit div operator defined only for vector."
+        << abort(FatalError);
 
-   typedef typename innerProduct<vector, Type>::type DivType;
+    typedef typename innerProduct<vector, Type>::type DivType;
 
-   tmp<BlockLduSystem<vector, DivType> > tbs
-   (
-       new BlockLduSystem<vector, DivType>(vf.mesh())
-   );
+    tmp<BlockLduSystem<vector, DivType> > tbs
+    (
+        new BlockLduSystem<vector, DivType>(vf.mesh())
+    );
 
-   return tbs;
+    return tbs;
 }
 
 
@@ -107,24 +107,24 @@ tmp
     const GeometricField<Type, fvPatchField, volMesh>& vf
 ) const
 {
-   FatalErrorIn
-   (
-       "tmp<BlockLduSystem> fvmUDiv\n"
-       "(\n"
-       "    const surfaceScalarField& flux"
-       "    const GeometricField<Type, fvPatchField, volMesh>&"
-       ")\n"
-   )   << "Implicit div operator defined only for vector."
-       << abort(FatalError);
+    FatalErrorIn
+    (
+        "tmp<BlockLduSystem> gaussDivScheme<Type>::fvmUDiv\n"
+        "(\n"
+        "    const surfaceScalarField& flux"
+        "    const GeometricField<Type, fvPatchField, volMesh>&"
+        ")\n"
+    )   << "Implicit div operator defined only for vector."
+        << abort(FatalError);
 
-   typedef typename innerProduct<vector, Type>::type DivType;
+    typedef typename innerProduct<vector, Type>::type DivType;
 
-   tmp<BlockLduSystem<vector, DivType> > tbs
-   (
-       new BlockLduSystem<vector, DivType>(vf.mesh())
-   );
+    tmp<BlockLduSystem<vector, DivType> > tbs
+    (
+        new BlockLduSystem<vector, DivType>(vf.mesh())
+    );
 
-   return tbs;
+    return tbs;
 }
 
 

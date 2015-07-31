@@ -90,13 +90,19 @@ tmp<BlockLduSystem<vector, vector> > leastSquaresGrad<scalar>::fvmGrad
     const surfaceVectorField& ownLs = lsv.pVectors();
     const surfaceVectorField& neiLs = lsv.nVectors();
 
+    // Internal field
+    const vectorField& ownLsIn = ownLs.internalField();
+    const vectorField& neiLsIn = neiLs.internalField();
+
+    register label owner, neighbour;
+
     forAll (nei, faceI)
     {
-        register label owner = own[faceI];
-        register label neighbour = nei[faceI];
+        owner = own[faceI];
+        neighbour = nei[faceI];
 
-        u[faceI] = cellVIn[owner]*ownLs[faceI];
-        l[faceI] = cellVIn[neighbour]*neiLs[faceI];
+        u[faceI] = cellVIn[owner]*ownLsIn[faceI];
+        l[faceI] = cellVIn[neighbour]*neiLsIn[faceI];
 
         // Caution - this is NOT negSumDiag(). VV, 17/July/2014.
         d[owner] -= u[faceI];
@@ -133,11 +139,8 @@ tmp<BlockLduSystem<vector, vector> > leastSquaresGrad<scalar>::fvmGrad
             // Coupling  and diagonal contributions
             forAll (pf, faceI)
             {
-                const vector upper = cellVIn[fc[faceI]]*pownLs[faceI];
-                const vector lower = cellVInNei[faceI]*pneiLs[faceI];
-
-                pcoupleUpper[faceI] -= upper;
-                pcoupleLower[faceI] -= lower;
+                pcoupleUpper[faceI] -= cellVIn[fc[faceI]]*pownLs[faceI];
+                pcoupleLower[faceI] -= cellVInNei[faceI]*pneiLs[faceI];
             }
         }
         else
@@ -149,7 +152,9 @@ tmp<BlockLduSystem<vector, vector> > leastSquaresGrad<scalar>::fvmGrad
             forAll (pf, faceI)
             {
                 const label cellI = fc[faceI];
+
                 d[cellI] += cellVIn[cellI]*pownLs[faceI]*internalCoeffs[faceI];
+
                 source[cellI] -= cellVIn[cellI]*pownLs[faceI]*
                     boundaryCoeffs[faceI];
             }

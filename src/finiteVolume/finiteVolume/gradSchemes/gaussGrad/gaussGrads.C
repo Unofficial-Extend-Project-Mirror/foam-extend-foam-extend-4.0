@@ -27,6 +27,7 @@ Description
 
 #include "fvMesh.H"
 #include "gaussGrad.H"
+#include "scalarGaussGrad.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

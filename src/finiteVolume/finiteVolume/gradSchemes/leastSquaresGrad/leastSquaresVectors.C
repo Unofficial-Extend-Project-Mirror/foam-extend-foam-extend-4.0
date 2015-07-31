@@ -134,10 +134,21 @@ void Foam::leastSquaresVectors::makeLeastSquaresVectors() const
         // Better version of d-vectors: Zeljko Tukovic, 25/Apr/2010
         const vectorField pd = p.delta();
 
-        forAll (pd, pFaceI)
+        if (p.coupled())
         {
-            const vector& d = pd[pFaceI];
-            dd[fc[pFaceI]] += (1.0/magSqr(d))*sqr(d);
+            forAll (pd, pFaceI)
+            {
+                const vector& d = pd[pFaceI];
+                dd[fc[pFaceI]] += (1.0/magSqr(d))*sqr(d);
+            }
+        }
+        else
+        {
+            forAll (pd, pFaceI)
+            {
+                const vector& d = pd[pFaceI];
+                dd[fc[pFaceI]] += (1.0/magSqr(d))*sqr(d);
+            }
         }
     }
 
@@ -220,8 +231,6 @@ void Foam::leastSquaresVectors::makeLeastSquaresVectors() const
             }
         }
     }
-
-# if 0
 
     // Coefficient sign correction on least squares vectors
     // The sign of the coefficient must be positive to ensure correct
@@ -408,7 +417,42 @@ void Foam::leastSquaresVectors::makeLeastSquaresVectors() const
         }
     }
 
-#endif
+    // Manual check of least squares vectors
+
+    vectorField sumLsq(mesh().nCells(), vector::zero);
+    vectorField sumSf(mesh().nCells(), vector::zero);
+
+    const vectorField& sfIn = mesh().Sf().internalField();
+
+    // Least squares vectors on internal faces
+    forAll (owner, faceI)
+    {
+        sumLsq[owner[faceI]] += lsPIn[faceI];
+        sumLsq[neighbour[faceI]] += lsNIn[faceI];
+
+        sumSf[owner[faceI]] += sfIn[faceI];
+        sumSf[neighbour[faceI]] -= sfIn[faceI];
+    }
+
+    // Least squares vectors on boundary faces
+    forAll (lsP.boundaryField(), patchI)
+    {
+        const vectorField& patchLsP = lsP.boundaryField()[patchI];
+        const vectorField& patchSf = mesh().Sf().boundaryField()[patchI];
+
+        const unallocLabelList& fc = mesh().boundary()[patchI].faceCells();
+
+        forAll (fc, pFaceI)
+        {
+            //sumLsq[fc[pFaceI]] += 0.5*patchLsP[pFaceI]; // works!!!
+            sumLsq[fc[pFaceI]] += patchLsP[pFaceI];
+
+            sumSf[fc[pFaceI]] += patchSf[pFaceI];
+        }
+    }
+
+    Info<< "sumLsq min = " << min(sumLsq) << " max = " << max(sumLsq) << endl;
+    Info<< "sumSf min = " << min(sumSf) << " max = " << max(sumSf) << endl;
 
     if (debug)
     {

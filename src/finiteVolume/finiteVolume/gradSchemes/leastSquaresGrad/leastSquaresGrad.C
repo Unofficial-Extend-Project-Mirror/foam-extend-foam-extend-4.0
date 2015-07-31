@@ -94,15 +94,26 @@ leastSquaresGrad<Type>::grad
     const unallocLabelList& own = mesh.owner();
     const unallocLabelList& nei = mesh.neighbour();
 
+    // Get access to internal field
+
+    const Field<Type>& vsfIn = vsf.internalField();
+
+    Field<GradType>& lsGradIn = lsGrad.internalField();
+
+    const vectorField& ownLsIn = ownLs.internalField();
+    const vectorField& neiLsIn = neiLs.internalField();
+
+    register label ownFaceI, neiFaceI;
+
     forAll (own, facei)
     {
-        register label ownFaceI = own[facei];
-        register label neiFaceI = nei[facei];
+        ownFaceI = own[facei];
+        neiFaceI = nei[facei];
 
-        Type deltaVsf = vsf[neiFaceI] - vsf[ownFaceI];
+        Type deltaVsf = vsfIn[neiFaceI] - vsfIn[ownFaceI];
 
-        lsGrad[ownFaceI] += ownLs[facei]*deltaVsf;
-        lsGrad[neiFaceI] -= neiLs[facei]*deltaVsf;
+        lsGradIn[ownFaceI] += ownLsIn[facei]*deltaVsf;
+        lsGradIn[neiFaceI] -= neiLsIn[facei]*deltaVsf;
     }
 
     // Boundary faces
@@ -137,7 +148,6 @@ leastSquaresGrad<Type>::grad
             }
         }
     }
-
 
     lsGrad.correctBoundaryConditions();
     gaussGrad<Type>::correctBoundaryConditions(vsf, lsGrad);
