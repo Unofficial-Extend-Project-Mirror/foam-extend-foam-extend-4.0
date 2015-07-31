@@ -195,8 +195,8 @@ setenv WM_THIRD_PARTY_USE_CMAKE_322 1
 
 #
 # For AllMake.stage2
-setenv WM_THIRD_PARTY_USE_OPENMPI_184 1
-#setenv WM_THIRD_PARTY_USE_OPENMPI_184_ConfigureAdditionalArgs '--enable-mpi-cxx --with-openib=/usr --with-openib-libdir=/usr/lib64'
+setenv WM_THIRD_PARTY_USE_OPENMPI_187 1
+setenv WM_THIRD_PARTY_USE_OPENMPI_187_ConfigureAdditionalArgs '--enable-mpi-cxx --with-openib=/usr --with-openib-libdir=/usr/lib64'
 #setenv WM_THIRD_PARTY_USE_OPENMPI_165 1
 #setenv WM_THIRD_PARTY_USE_OPENMPI_165_ConfigureAdditionalArgs '--enable-mpi-cxx --with-openib=/usr --with-openib-libdir=/usr/lib64'
 #setenv WM_THIRD_PARTY_USE_OPENMPI_15 1
