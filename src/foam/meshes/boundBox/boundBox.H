@@ -138,7 +138,7 @@ public:
             //- The midpoint of the bounding box
             point midpoint() const
             {
-                return 0.5 * (max_ + min_);
+                return 0.5*(max_ + min_);
             }
 
             //- The bounding box span (from minimum to maximum)
@@ -150,7 +150,7 @@ public:
             //- The magnitude of the bounding box span
             scalar mag() const
             {
-                return ::Foam::mag(max_ - min_);
+                return Foam::mag(max_ - min_);
             }
 
             //- Smallest length/height/width dimension
@@ -177,22 +177,37 @@ public:
             //- Overlaps/touches boundingBox?
             bool overlaps(const boundBox& bb) const
             {
+                // New implementation, with tolerances.  HJ, 15/Jun/2015
                 return
                 (
-                    bb.max_.x() >= min_.x() && bb.min_.x() <= max_.x()
-                 && bb.max_.y() >= min_.y() && bb.min_.y() <= max_.y()
-                 && bb.max_.z() >= min_.z() && bb.min_.z() <= max_.z()
+                    (bb.max_.x() - min_.x()) >= -SMALL
+                 && (bb.min_.x() - max_.x()) <= SMALL
+                 && (bb.max_.y() - min_.y()) >= -SMALL
+                 && (bb.min_.y() - max_.y()) <= SMALL
+                 && (bb.max_.z() - min_.z()) >= -SMALL
+                 && (bb.min_.z() - max_.z()) <= SMALL
                 );
+
+                // Original implementation
+//                 return
+//                 (
+//                     bb.max_.x() >= min_.x() && bb.min_.x() <= max_.x()
+//                  && bb.max_.y() >= min_.y() && bb.min_.y() <= max_.y()
+//                  && bb.max_.z() >= min_.z() && bb.min_.z() <= max_.z()
+//                 );
             }
 
-            //- Contains point? (inside or on edge)
+            //- Contains point? (inside or on edge) within precision tolerance
             bool contains(const point& pt) const
             {
                 return
                 (
-                    pt.x() >= min_.x() && pt.x() <= max_.x()
-                 && pt.y() >= min_.y() && pt.y() <= max_.y()
-                 && pt.z() >= min_.z() && pt.z() <= max_.z()
+                    (pt.x() - min_.x()) >= -SMALL
+                 && (pt.x() - max_.x()) <= SMALL
+                 && (pt.y() - min_.y()) >= -SMALL
+                 && (pt.y() - max_.y()) <= SMALL
+                 && (pt.z() - min_.z()) >= -SMALL
+                 && (pt.z() - max_.z()) <= SMALL
                 );
             }
 
@@ -201,9 +216,12 @@ public:
             {
                 return
                 (
-                    pt.x() > min_.x() && pt.x() < max_.x()
-                 && pt.y() > min_.y() && pt.y() < max_.y()
-                 && pt.z() > min_.z() && pt.z() < max_.z()
+                    (pt.x() - min_.x()) > 0
+                 && (pt.x() - max_.x()) < 0
+                 && (pt.y() - min_.y()) > 0
+                 && (pt.y() - max_.y()) < 0
+                 && (pt.z() - min_.z()) > 0
+                 && (pt.z() - max_.z()) < 0
                 );
             }
 
