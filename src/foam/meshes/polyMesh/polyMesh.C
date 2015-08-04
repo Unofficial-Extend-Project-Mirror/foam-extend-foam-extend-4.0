@@ -48,7 +48,7 @@ Foam::word Foam::polyMesh::meshSubDir = "polyMesh";
 
 void Foam::polyMesh::calcDirections() const
 {
-    for (direction cmpt=0; cmpt<vector::nComponents; cmpt++)
+    for (direction cmpt = 0; cmpt < vector::nComponents; cmpt++)
     {
         solutionD_[cmpt] = 1;
     }
@@ -56,19 +56,15 @@ void Foam::polyMesh::calcDirections() const
     // Knock out empty and wedge directions. Note:they will be present on all
     // domains.
 
-    label nEmptyPatches = 0;
-    label nWedgePatches = 0;
-
     vector emptyDirVec = vector::zero;
     vector wedgeDirVec = vector::zero;
 
-    forAll(boundaryMesh(), patchi)
+    forAll (boundaryMesh(), patchi)
     {
         if (boundaryMesh()[patchi].size())
         {
             if (isA<emptyPolyPatch>(boundaryMesh()[patchi]))
             {
-                nEmptyPatches++;
                 emptyDirVec +=
                     sum(cmptMag(boundaryMesh()[patchi].faceAreas()));
             }
@@ -79,19 +75,40 @@ void Foam::polyMesh::calcDirections() const
                     boundaryMesh()[patchi]
                 );
 
-                nWedgePatches++;
                 wedgeDirVec += cmptMag(wpp.centreNormal());
             }
         }
     }
 
-    if (nEmptyPatches)
+    vector globalEmptyDirVec = emptyDirVec;
+    reduce(globalEmptyDirVec, sumOp<vector>());
+
+    if (mag(emptyDirVec) > SMALL)
     {
-        reduce(emptyDirVec, sumOp<vector>());
-
         emptyDirVec /= mag(emptyDirVec);
+    }
 
-        for (direction cmpt=0; cmpt<vector::nComponents; cmpt++)
+    if (Pstream::parRun() && mag(globalEmptyDirVec) > SMALL)
+    {
+        globalEmptyDirVec /= mag(globalEmptyDirVec);
+
+        // Check if all processors see the same 2-D from empty patches
+        if (mag(globalEmptyDirVec - emptyDirVec) > SMALL)
+        {
+            FatalErrorIn
+            (
+                "void polyMesh::calcDirections() const"
+            )   << "Some processors detect different empty (2-D) "
+                << "directions.  Probably using empty patches on a "
+                << "bad parallel decomposition." << nl
+                << "Please check your geometry and empty patches"
+                << abort(FatalError);
+        }
+    }
+
+    if (mag(emptyDirVec) > SMALL)
+    {
+        for (direction cmpt = 0; cmpt < vector::nComponents; cmpt++)
         {
             if (emptyDirVec[cmpt] > 1e-6)
             {
@@ -109,13 +126,35 @@ void Foam::polyMesh::calcDirections() const
 
     geometricD_ = solutionD_;
 
-    if (nWedgePatches)
+    vector globalWedgeDirVec = wedgeDirVec;
+    reduce(globalWedgeDirVec, sumOp<vector>());
+
+    if (mag(wedgeDirVec) > SMALL)
     {
-        reduce(wedgeDirVec, sumOp<vector>());
-
         wedgeDirVec /= mag(wedgeDirVec);
+    }
 
-        for (direction cmpt=0; cmpt<vector::nComponents; cmpt++)
+    if (Pstream::parRun() && mag(globalWedgeDirVec) > SMALL)
+    {
+        globalWedgeDirVec /= mag(globalWedgeDirVec);
+
+        // Check if all processors see the same 2-D from wedge patches
+        if (mag(globalWedgeDirVec - wedgeDirVec) > SMALL)
+        {
+            FatalErrorIn
+            (
+                "void polyMesh::calcDirections() const"
+            )   << "Some processors detect different wedge (2-D) "
+                << "directions.  Probably using wedge patches on a "
+                << "bad parallel decomposition." << nl
+                << "Please check your geometry and wedge patches"
+                << abort(FatalError);
+        }
+    }
+
+    if (mag(wedgeDirVec) > SMALL)
+    {
+        for (direction cmpt = 0; cmpt < vector::nComponents; cmpt++)
         {
             if (wedgeDirVec[cmpt] > 1e-6)
             {
