@@ -1,6 +1,6 @@
 /*
  * IMlib.h
- * 
+ *
  * Irene's library of most frequently used routines
  *
  */
@@ -104,16 +104,16 @@ typedef struct realKeyValueType realKeyValueType;
 * Macros Section
 **************************************************************************/
 /*-------------------------------------------------------------
- * Usefull commands 
+ * Usefull commands
  *-------------------------------------------------------------*/
 #define sign(a, b) ((b) >= 0 ? ((a) >= 0.0 ? a : -a) : ((a) >= 0.0 ? -a : a))
 #define amax(a, b) ((a) >= (b) ? (a) : (b))
 #define amin(a, b) ((a) >= (b) ? (b) : (a))
 #define RandomInRange(u) ((int)(drand48()*((double)(u))))
 #define RandomInRangeFast(u) ((rand()>>3)%(u))
-#define SWAP(a, b, tmp) do {(tmp) = (a); (a) = (b); (b) = (tmp);} while(0) 
+#define SWAP(a, b, tmp) do {(tmp) = (a); (a) = (b); (b) = (tmp);} while(0)
 #define INC_DEC(a, b, val) do {(a) += (val); (b) -= (val);} while(0)
-#define icopy(n, a, b) (int *)memcpy((void *)(b), (void *)(a), sizeof(int)*(n)) 
+#define icopy(n, a, b) (int *)memcpy((void *)(b), (void *)(a), sizeof(int)*(n))
 #define idxcopy(n, a, b) (idxtype *)memcpy((void *)(b), (void *)(a), sizeof(idxtype)*(n))
 #define scopy(n, a, b) (double *)memcpy((void *)(b), (void *)(a), sizeof(double)*(n))
 #define fcopy(n, a, b) (double *)memcpy((void *)(b), (void *)(a), sizeof(double)*(n))
@@ -128,7 +128,7 @@ typedef struct realKeyValueType realKeyValueType;
 #define stoptimer(tmr) (tmr += seconds())
 #define gettimer(tmr) (tmr)
 
- 
+
 /*-------------------------------------------------------------
  * Debuging memory leaks
  *-------------------------------------------------------------*/
@@ -153,7 +153,7 @@ typedef struct realKeyValueType realKeyValueType;
     }
 #else
 #   define MALLOC_CHECK(ptr) ;
-#endif 
+#endif
 
 
 /*-------------------------------------------------------------
@@ -164,7 +164,7 @@ typedef struct realKeyValueType realKeyValueType;
      for (i=1; i<n; i++) a[i] += a[i-1]; \
      for (i=n; i>0; i--) a[i] = a[i-1]; \
      a[0] = 0; \
-   } while(0) 
+   } while(0)
 
 
 /*-------------------------------------------------------------
@@ -179,7 +179,7 @@ typedef struct realKeyValueType realKeyValueType;
     }
 #else
 #   define ASSERT(expr) ;
-#endif 
+#endif
 
 #ifdef DEBUG
 #   define ASSERTP(expr,msg)                                          \
@@ -192,7 +192,7 @@ typedef struct realKeyValueType realKeyValueType;
     }
 #else
 #   define ASSERTP(expr,msg) ;
-#endif 
+#endif
 
 
 /*************************************************************************
@@ -270,7 +270,7 @@ void ikeysort2(int, IKeyValueType *);
 void idxkeysort2(int, idxKeyValueType *);
 
 /*-------------------------------------------------------------
- * sort.c 
+ * sort.c
  *-------------------------------------------------------------*/
 void ikeyvalsort_org(int, IKeyValueType *);
 int IncKeyValueCmp(const void *, const void *);

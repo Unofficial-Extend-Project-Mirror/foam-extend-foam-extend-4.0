@@ -64,4 +64,3 @@ else
     cd $current_dir
     echo "Exported libraries left in directory /tmp/$tmp"
 fi
-

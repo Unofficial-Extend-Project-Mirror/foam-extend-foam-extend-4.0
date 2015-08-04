@@ -65,6 +65,6 @@ sub wanted
             chomp($line);
             print FILE $line . $string;
         }
-        close (FILE);        
+        close (FILE);
     }
 }

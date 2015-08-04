@@ -33,7 +33,7 @@ License
 // Boost http://www.boost.org/libs/regex/doc/
 // GRETA http://research.microsoft.com/projects/greta/
 // Henry Spencer's http://arglist.com/regex/
-// 
+//
 // Chose DEELX http://www.regexlab.com/en/deelx/
 // for its ease of integration - one header file
 #include "deelx.h"
@@ -152,18 +152,18 @@ bool Foam::regExp::match(const string& str, List<string>& groups) const
         const MatchResult results = preg_->MatchExact(str.c_str());
         isMatch = (0 < results.IsMatched());
 
-        if( isMatch ) 
+        if( isMatch )
         {
             int const notFound = -1;
             int start, end;
             const int groupsCount = results.MaxGroupNumber();
             groups.setSize(groupsCount);
-        
+
             for (int i = 0; groupsCount > i; ++i)
             {
                 start = results.GetGroupStart(i);
                 end   = results.GetGroupEnd(i);
-                  
+
                 if ((notFound < start) && (notFound < end))
                 {
                     groups[i] = str.substr(start, end - start);

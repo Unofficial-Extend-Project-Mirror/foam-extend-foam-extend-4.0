@@ -108,15 +108,15 @@ Foam::timer::timer(const unsigned int newTimeOut)
                 << " seconds." << endl;
         }
 
-        const bool success = 
-          ::CreateTimerQueueTimer(&hTimer_, 
-                                  NULL, 
+        const bool success =
+          ::CreateTimerQueueTimer(&hTimer_,
+                                  NULL,
                                   (WAITORTIMERCALLBACK)timerExpired,
-                                  NULL , 
-                                  newTimeOut * 1000, 
+                                  NULL ,
+                                  newTimeOut * 1000,
                                   0, 0);
 
-        if (!success) 
+        if (!success)
         {
             hTimer_ = NULL;
             FatalErrorIn
@@ -124,7 +124,7 @@ Foam::timer::timer(const unsigned int newTimeOut)
                 "Foam::timer::timer(const unsigned int)"
             )   << "CreateTimerQueueTimer, "
                 << MSwindows::getLastError()
-                << abort(FatalError);    
+                << abort(FatalError);
         }
     }
 }
@@ -137,18 +137,18 @@ Foam::timer::~timer()
     if (newTimeOut_ > 0)
     {
         // Reset timer
-        const bool timerSuccess = 
+        const bool timerSuccess =
           ::DeleteTimerQueueTimer(NULL, hTimer_, NULL);
         hTimer_ = NULL;
 
-        if (!timerSuccess) 
+        if (!timerSuccess)
         {
             FatalErrorIn
             (
                 "Foam::timer::~timer() "
             )   << "DeleteTimerQueueTimer, "
                 << MSwindows::getLastError()
-                << abort(FatalError);    
+                << abort(FatalError);
         }
 
         if (debug)

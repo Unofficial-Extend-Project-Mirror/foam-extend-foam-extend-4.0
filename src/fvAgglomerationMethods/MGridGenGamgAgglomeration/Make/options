@@ -24,5 +24,3 @@ EXE_INC = \
 LIB_LIBS = \
     -L$(PARMGRIDGEN_LIB_DIR) -lMGridGen
 endif
-
-

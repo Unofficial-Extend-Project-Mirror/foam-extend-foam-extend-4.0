@@ -13,7 +13,7 @@ static __inline__ long lrand48(void)
 {
         long val = (int)(abs(10000.0*sin(_rand)));
         _rand++;
-        return val;     
+        return val;
 }
 
 #endif //RAND48_H

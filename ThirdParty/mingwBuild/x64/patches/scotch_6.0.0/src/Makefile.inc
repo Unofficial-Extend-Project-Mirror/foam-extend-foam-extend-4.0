@@ -23,14 +23,14 @@ ARFLAGS			= -ruv
 CAT			= cat
 CCS			= gcc
 CCP			= mpicc
-CCD			= mpicc -I$(MPI_ROOTDIR)/include 
+CCD			= mpicc -I$(MPI_ROOTDIR)/include
 
 #--- Compiler/loader flags
 CFLAGS_CPL		= -O0 -g3 --std=c99
-CFLAGS_INC		= 
+CFLAGS_INC		=
 CFLAGS_DEF		= -DCOMMON_RANDOM_FIXED_SEED -DCOMMON_STUB_FORK -DSCOTCH_PTSCOTCH -DSCOTCH_RENAME -D'pipe(pfds)=_pipe(pfds,1024,0x8000)' -DHAVE_STDINT_H=0 -DHAVE_UINT_T=1
 CLIBFLAGS	=
-LDFLAGS   		= 
+LDFLAGS   		=
 
 PGMFILES=$(PROGRAMFILES)
 

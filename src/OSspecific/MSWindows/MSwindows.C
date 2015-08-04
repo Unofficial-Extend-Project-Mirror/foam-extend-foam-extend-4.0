@@ -44,7 +44,7 @@ Description
 
 defineTypeNameAndDebug(Foam::MSwindows, 0);
 
-namespace Foam 
+namespace Foam
 {
 
 // Don't abort under windows, causes abort dialog to
@@ -80,10 +80,10 @@ std::string MSwindows::getLastError()
 
     LPVOID lpMsgBuf;
     LPVOID lpDisplayBuf;
-    DWORD dw = GetLastError(); 
+    DWORD dw = GetLastError();
 
     FormatMessage(
-        FORMAT_MESSAGE_ALLOCATE_BUFFER | 
+        FORMAT_MESSAGE_ALLOCATE_BUFFER |
         FORMAT_MESSAGE_FROM_SYSTEM |
         FORMAT_MESSAGE_IGNORE_INSERTS,
         NULL,
@@ -92,8 +92,8 @@ std::string MSwindows::getLastError()
         (LPTSTR) &lpMsgBuf,
         0, NULL );
 
-    lpDisplayBuf = LocalAlloc(LMEM_ZEROINIT, 
-        (lstrlen(static_cast<LPCTSTR>(lpMsgBuf))+40)*sizeof(TCHAR)); 
+    lpDisplayBuf = LocalAlloc(LMEM_ZEROINIT,
+        (lstrlen(static_cast<LPCTSTR>(lpMsgBuf))+40)*sizeof(TCHAR));
     sprintf(static_cast<LPTSTR>(lpDisplayBuf),
             "Error %d: %s", int(dw), static_cast<LPCTSTR>(lpMsgBuf));
 
@@ -115,10 +115,10 @@ namespace MSwindows
     //- Remove quotes, if any, from std::string
     void removeQuotes(std::string & arg);
 
-    //- Convert windows directory slash (back-slash) to unix (forward-slash). 
+    //- Convert windows directory slash (back-slash) to unix (forward-slash).
     //- Windows is fine with unix like directory slashes.
-    //- Foam's file io (see src/OpenFOAM/db/IOstreams/Sstreams/OSwrite.C) 
-    //- uses back-slash as escape character and continuation, 
+    //- Foam's file io (see src/OpenFOAM/db/IOstreams/Sstreams/OSwrite.C)
+    //- uses back-slash as escape character and continuation,
     //- so not an option to have windows file paths with back-slashes
     void toUnixSlash(string & arg);
 
@@ -144,17 +144,17 @@ namespace MSwindows
       HANDLE findHandle_;
       fileName nextName_;
       bool hasMore_;
-      
+
     public:
       DirectoryIterator(const fileName & directory);
       ~DirectoryIterator();
-      
+
       //- Initialization succeeded
       bool isValid() const;
 
       //- Has more?
       bool hasNext() const;
-      
+
       //- Next item
       const fileName & next();
     }; // class DirectoryIterator
@@ -181,7 +181,7 @@ void MSwindows::toUnixSlash(string & arg)
     const std::string UNC("//");
 
     // Preserve UNC i.e., \\machine-name\...
-    if (0 == arg.find(UNC)) 
+    if (0 == arg.find(UNC))
     {
         arg.replace(UNC, "\\\\");
     }
@@ -201,10 +201,10 @@ std::string MSwindows::getUserName()
     {
         nameAsString = buffer;
     }
-    else 
+    else
     {
         if (ERROR_INSUFFICIENT_BUFFER == ::GetLastError() &&
-            32768 > actualBufferSize) 
+            32768 > actualBufferSize)
         {
             AutoArray<TCHAR> actualBuffer(actualBufferSize);
             ::GetUserName(actualBuffer.get(), &actualBufferSize);
@@ -246,18 +246,18 @@ bool MSwindows::DirectoryIterator::isValid() const
     return valid;
 }
 
-    
+
 MSwindows::DirectoryIterator::DirectoryIterator(const fileName & directory)
 {
     const fileName directoryContents = directory/"*";
     findHandle_ = ::FindFirstFile(directoryContents.c_str(), &findData_);
     hasMore_    = isValid();
 }
-        
+
 
 MSwindows::DirectoryIterator::~DirectoryIterator()
 {
-    if (isValid()) 
+    if (isValid())
     {
         ::FindClose(findHandle_);
     }
@@ -332,7 +332,7 @@ std::string toUnixPath(const std::string & path)
 
 bool env(const word& envName)
 {
-    const DWORD actualBufferSize = 
+    const DWORD actualBufferSize =
       ::GetEnvironmentVariable(envName.c_str(), NULL, 0);
 
     const bool envExists = (0 < actualBufferSize);
@@ -344,10 +344,10 @@ string getEnv(const word& envName)
 {
     std::string envAsString;
 
-    const DWORD actualBufferSize = 
+    const DWORD actualBufferSize =
       ::GetEnvironmentVariable(envName.c_str(), NULL, 0);
 
-    if (0 < actualBufferSize) 
+    if (0 < actualBufferSize)
     {
         MSwindows::AutoArray<TCHAR> actualBuffer(actualBufferSize);
         ::GetEnvironmentVariable(envName.c_str(),
@@ -368,7 +368,7 @@ bool setEnv
     const bool overwrite
 )
 {
-    const bool success = 
+    const bool success =
       ::SetEnvironmentVariable(envName.c_str(), value.c_str());
     return success;
 }
@@ -381,7 +381,7 @@ word hostName()
     TCHAR buffer[bufferSize];
     DWORD actualBufferSize = bufferSize;
 
-    const bool success = 
+    const bool success =
       ::GetComputerName(buffer, &actualBufferSize);
     const string computerName = success ? buffer : string::null;
     return computerName;
@@ -401,7 +401,7 @@ word userName()
 {
     std::string name = getEnv("USERNAME");
 
-    if (name.empty()) 
+    if (name.empty())
     {
         name = MSwindows::getUserName();
     }
@@ -421,7 +421,7 @@ fileName home()
 {
     std::string homeDir = getEnv("HOME");
 
-    if (homeDir.empty()) 
+    if (homeDir.empty())
     {
         homeDir = getEnv("USERPROFILE");
     }
@@ -440,18 +440,18 @@ fileName cwd()
 {
     string currentDirectory;
 
-    const DWORD actualBufferSize = 
+    const DWORD actualBufferSize =
       ::GetCurrentDirectory(0, NULL);
 
-    if (0 < actualBufferSize) 
+    if (0 < actualBufferSize)
     {
         MSwindows::AutoArray<TCHAR> actualBuffer(actualBufferSize);
         ::GetCurrentDirectory(actualBufferSize,
-                              actualBuffer.get());   
+                              actualBuffer.get());
         currentDirectory = actualBuffer.get();
         MSwindows::toUnixSlash(currentDirectory);
     }
-    else 
+    else
     {
         FatalErrorIn("cwd()")
             << "Couldn't get the current working directory"
@@ -465,7 +465,7 @@ fileName cwd()
 bool chDir(const fileName& dir)
 {
     const bool success = ::SetCurrentDirectory(dir.c_str());
-    return success; 
+    return success;
 }
 
 
@@ -690,7 +690,7 @@ bool mkDir(const fileName& pathName, const mode_t mode)
     {
         chMod(pathName, mode);
     }
-    else 
+    else
     {
         const DWORD error = ::GetLastError();
 
@@ -710,12 +710,12 @@ bool mkDir(const fileName& pathName, const mode_t mode)
                 {
                     success = mkDir(pathName, mode);
                 }
-                
+
                 break;
-            }  
+            }
         }
 
-        if (!success) 
+        if (!success)
         {
             FatalErrorIn("mkDir(const fileName&, mode_t)")
               << "Couldn't create directory: " << pathName
@@ -753,7 +753,7 @@ fileName::Type type(const fileName& name)
     fileName::Type fileType = fileName::UNDEFINED;
     const DWORD attrs = ::GetFileAttributes(name.c_str());
 
-    if (attrs != INVALID_FILE_ATTRIBUTES) 
+    if (attrs != INVALID_FILE_ATTRIBUTES)
     {
         fileType = (attrs & FILE_ATTRIBUTE_DIRECTORY) ?
 	  fileName::DIRECTORY :
@@ -765,7 +765,7 @@ fileName::Type type(const fileName& name)
 
 
 static
-bool 
+bool
 isGzFile(const fileName& name)
 {
     std::string gzName(name);
@@ -781,7 +781,7 @@ isGzFile(const fileName& name)
 bool exists(const fileName& name, const bool checkGzip)
 {
     const DWORD attrs = ::GetFileAttributes(name.c_str());
-    const bool success = (attrs != INVALID_FILE_ATTRIBUTES) || 
+    const bool success = (attrs != INVALID_FILE_ATTRIBUTES) ||
                          (checkGzip && isGzFile(name));
 
     return success;
@@ -803,8 +803,8 @@ bool isDir(const fileName& name)
 bool isFile(const fileName& name, const bool checkGzip)
 {
     const DWORD attrs = ::GetFileAttributes(name.c_str());
-    const bool success = ((attrs != INVALID_FILE_ATTRIBUTES) && 
-			  !(attrs & FILE_ATTRIBUTE_DIRECTORY)) || 
+    const bool success = ((attrs != INVALID_FILE_ATTRIBUTES) &&
+			  !(attrs & FILE_ATTRIBUTE_DIRECTORY)) ||
                          (checkGzip && isGzFile(name));
 
     return success;
@@ -913,7 +913,7 @@ fileNameList readDir
 
     // Reset the length of the entries list
     dirEntries.setSize(nEntries);
-    
+
     return dirEntries;
 }
 
@@ -947,16 +947,16 @@ bool cp(const fileName& src, const fileName& dest)
         // Open and check streams.
         // Use binary mode in case we read binary.
         // Causes windows reading to fail if we don't.
-        std::ifstream srcStream(src.c_str(), 
-                                ios_base::in|ios_base::binary);      
-        if (!srcStream) 
+        std::ifstream srcStream(src.c_str(),
+                                ios_base::in|ios_base::binary);
+        if (!srcStream)
         {
             return false;
         }
 
         // Use binary mode in case we write binary.
         // Causes windows reading to fail if we don't.
-        std::ofstream destStream(destFile.c_str(), 
+        std::ofstream destStream(destFile.c_str(),
                                  ios_base::out|ios_base::binary);
         if (!destStream)
         {
@@ -996,7 +996,7 @@ bool cp(const fileName& src, const fileName& dest)
         {
             if (MSwindows::debug)
             {
-                Info<< "Copying : " << src/contents[i] 
+                Info<< "Copying : " << src/contents[i]
                     << " to " << destFile/contents[i] << endl;
             }
 
@@ -1047,13 +1047,13 @@ bool mv(const fileName& srcFile, const fileName& destFile)
         Info<< "Move : " << srcFile << " to " << destFile << endl;
     }
 
-    const fileName destName = 
+    const fileName destName =
       ((destFile.type() == fileName::DIRECTORY)
        && (srcFile.type() != fileName::DIRECTORY)) ?
       destFile/srcFile.name() :
       destFile;
 
-    const bool success = 
+    const bool success =
       (0 == std::rename(srcFile.c_str(), destName.c_str()));
 
     return success;
@@ -1109,7 +1109,7 @@ bool rm(const fileName& file)
     bool success = (0 == std::remove(file.c_str()));
 
     // If deleting plain file name failed try with .gz
-    if (!success) 
+    if (!success)
     {
         const std::string fileGz = file + ".gz";
         success = (0 == std::remove(fileGz.c_str()));
@@ -1137,7 +1137,7 @@ bool rmDir(const fileName& directory)
 
       while (success && dirIt.hasNext())
       {
-          const fileName & fName = dirIt.next(); 
+          const fileName & fName = dirIt.next();
 
           if (fName != "." && fName != "..")
           {
@@ -1170,12 +1170,12 @@ bool rmDir(const fileName& directory)
           }
       }
     }
-        
-    if (success) 
+
+    if (success)
     {
         success = ::RemoveDirectory(directory.c_str());
 
-        if (!success) 
+        if (!success)
         {
             WarningIn("rmdir(const fileName&)")
                 << "failed to remove directory " << directory << endl;
@@ -1207,7 +1207,7 @@ void fdClose(const int fd)
         (
             "Foam::fdClose(const int fd)"
         )   << "close error on " << fd << endl
-            << abort(FatalError);    
+            << abort(FatalError);
     }
 }
 
@@ -1246,7 +1246,7 @@ int system(const string& command)
 
 
 // Explicitly track loaded libraries, rather than use
-// EnumerateLoadedModules64 and have to link against 
+// EnumerateLoadedModules64 and have to link against
 // Dbghelp.dll
 // Details at http://msdn.microsoft.com/en-us/library/ms679316(v=vs.85).aspx
 typedef std::map<void*, std::string> OfLoadedLibs;
@@ -1282,11 +1282,11 @@ void* dlOpen(const fileName& libName, const bool check)
         winLibName = "lib";
         winLibName += libName;
         winLibName += dllExt;
-      
+
         handle = ::LoadLibrary(winLibName.c_str());
     }
 
-    if (NULL != handle) 
+    if (NULL != handle)
     {
         getLoadedLibs()[handle] = libName;
     }
@@ -1317,14 +1317,14 @@ bool dlClose(void* const handle)
             << " : FreeLibrary of handle " << handle << endl;
     }
 
-    const bool success = 
+    const bool success =
       ::FreeLibrary(static_cast<HMODULE>(handle));
-  
+
     if (success)
     {
 	getLoadedLibs().erase(handle);
     }
-    
+
     return success;
 }
 
