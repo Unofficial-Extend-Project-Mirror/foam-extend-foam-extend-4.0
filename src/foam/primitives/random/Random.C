@@ -25,6 +25,10 @@ License
 
 #include "Random.H"
 
+#ifdef mingw
+#include "rand48.h"
+#endif
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam

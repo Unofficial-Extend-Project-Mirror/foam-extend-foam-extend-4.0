@@ -1,0 +1,127 @@
+#!/bin/sh
+#----------------------------------*-sh-*--------------------------------------
+# =========                 |
+# \\      /  F ield         | foam-extend: Open Source CFD
+#  \\    /   O peration     | Version:     3.2
+#   \\  /    A nd           | Web:         http://www.foam-extend.org
+#    \\/     M anipulation  | For copyright notice see file Copyright
+#------------------------------------------------------------------------------
+# License
+#     This file is part of foam-extend.
+#
+#     foam-extend is free software: you can redistribute it and/or modify it
+#     under the terms of the GNU General Public License as published by the
+#     Free Software Foundation, either version 3 of the License, or (at your
+#     option) any later version.
+#
+#     foam-extend is distributed in the hope that it will be useful, but
+#     WITHOUT ANY WARRANTY; without even the implied warranty of
+#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+#     General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
+#
+# Script
+#     etc/bashrc.mingw
+#
+# Description
+#     Startup file for FOAM for use with MSYS shell for MinGW-based builds on Windows.
+#     Calls the main etc/bashrc script.
+#     Sourced from ~/.profile or ~/.bashrc
+#
+# Author:
+#     Cesare Guardino, Alstom Power Ltd., (2015)
+#
+#------------------------------------------------------------------------------
+
+# {{{ DEFINE USER EDITABLE FUNCTIONS
+set_system_paths() {
+    echo "Setting installations directories of required tools ..." 
+    export CMAKE_HOME=/c/Programs/cmake-3.2.3-win32-x86
+    #export GIT_HOME=/c/Programs/Git
+    #export JAVA_HOME="/c/Program Files/Java/jre1.8.0_45"
+    export MINGW_HOME=/c/Programs/x86_64-4.8.2-release-win32-seh-rt_v3-rev3/mingw64
+    export MPI_ROOTDIR=/c/Programs/OpenMPI_v1.6.1-x64
+    export PERL_HOME=/c/Programs/strawberry-perl-5.20.2.1-64bit/perl
+    #export PEXPORTS_HOME=/c/Programs/pexports-0.46-mingw32
+    #export PYTHON_HOME=/c/Programs/Python27
+    #export SUBVERSION_HOME=/c/Programs/svn-win32-1.8.13
+    export WGET_HOME=/c/Programs/wget-1.11.4-1
+    export ZIP_HOME="/c/Program Files/7-Zip"
+}
+
+add_to_path() {
+    echo "Adding required tools to PATH ..." 
+    export PATH=$ZIP_HOME:$PATH
+    export PATH=$WGET_HOME/bin:$PATH
+    #export PATH=$JAVA_HOME/bin:$PATH
+    #export PATH=$PYTHON_HOME:$PATH
+    #export PATH=$SUBVERSION_HOME/bin:$PATH
+    #export PATH=$GIT_HOME/cmd:$PATH
+    export PATH=$PERL_HOME/bin:$PATH
+    export PATH=$CMAKE_HOME/bin:$PATH
+    export PATH=$MPI_ROOTDIR/bin:$PATH
+    #export PATH=$PEXPORTS_HOME/bin:$PATH
+    export PATH=$MINGW_HOME/bin:$PATH
+}
+# }}}
+
+# {{{ DEFINE PROCESS FUNCTIONS
+setup_foam_env() {
+    : ${WM_OSTYPE:=POSIX}; export WM_OSTYPE
+    export export FLEX_DIR=$(echo $WD\.. | sed 's/\\/\//g' | sed 's/\(.*\):/\/\1/')
+    FOAM_ETC_DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+    export FOAM_INST_DIR=$(readlink -f $FOAM_ETC_DIR/../..)
+    . $FOAM_ETC_DIR/bashrc
+    . $FOAM_ETC_DIR/prefs.sh.mingw
+}
+
+set_OMPI_env() {
+    echo "Setting OpenMPI environment settings ..." 
+    export OMPI_MPICC=gcc.exe
+    export OMPI_MPIXX=g++.exe
+    export OMPI_CXXFLAGS==-I$MPI_ROOTDIR/include
+    export OMPI_CFLAGS=-I$MPI_ROOTDIR/include
+    export OMPI_CXXFLAGS=-I$MPI_ROOTDIR/include
+    export OMPI_LDFLAGS=-L$MPI_ROOTDIR/lib
+    export OMPI_LIBS=$OMPI_LDFLAGS
+}
+
+check_versions() {
+    echo "Checking versions of installed system tools (based on PATH) ..."
+    echo "7-Zip:      " `which 7z`    [`(7z --help 2>&1) 2> /dev/null | head -2`]
+    echo "CMake:      " `which cmake`    [`(cmake --version 2>&1) 2> /dev/null | head -1`]
+    echo "G++:        " `which g++`    [`(g++ --version 2>&1) 2> /dev/null | head -1`]
+    echo "GCC:        " `which gcc`    [`(gcc --version 2>&1) 2> /dev/null | head -1`]
+    echo "Git:        " `which git`    [`(git --version 2>&1) 2> /dev/null | head -1`]
+    echo "Java:       " `which java`    [`(java -version 2>&1) 2> /dev/null | head -1`]
+    echo "Make:       " `which make`    [`(make --version 2>&1) 2> /dev/null | head -1`]
+    echo "MinGW-w64:  " $MINGW_HOME
+    echo "OpenMPI:    " `which mpirun`    [`(mpirun --version 2>&1) 2> /dev/null | head -1`]
+    echo "PEexports:  " `which pexports`    [`(pexports -v 2>&1) 2> /dev/null | head -1`]
+    echo "Perl:       " `which perl`    [`(perl -v 2>&1) 2> /dev/null | head -2`]
+    echo "Python:     " `which python`    [`(python --version 2>&1) 2> /dev/null | head -1`]
+    echo "Subversion: " `which svn`    [`(svn --version 2>&1) 2> /dev/null | head -1`]
+    echo "Wget:       " `which wget`    [`(wget --version 2>&1) 2> /dev/null | head -3`]
+}
+
+finish() {
+    echo
+    echo "=========================================================================================="
+    echo "FOAM_INST_DIR=$FOAM_INST_DIR"
+    echo "ENVIRONMENT SETUP COMPLETE."
+    echo "=========================================================================================="
+    echo
+}
+# }}}
+
+# {{{ MAIN EXECUTION
+set_system_paths
+setup_foam_env
+add_to_path
+set_OMPI_env
+check_versions
+finish
+# }}}
+

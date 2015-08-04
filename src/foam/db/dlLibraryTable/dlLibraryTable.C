@@ -76,6 +76,12 @@ bool Foam::dlLibraryTable::open(const fileName& functionLibName)
             functionLibPtr =
                 dlopen(lName.c_str(), RTLD_LAZY|RTLD_GLOBAL);
         }
+#elif defined mingw
+        if(!functionLibPtr && functionLibName.ext()=="so") {
+            fileName lName=functionLibName.lessExt()+".dll";
+            functionLibPtr =
+                dlopen(lName.c_str(), RTLD_LAZY|RTLD_GLOBAL);
+        }
 #endif
         if (!functionLibPtr)
         {

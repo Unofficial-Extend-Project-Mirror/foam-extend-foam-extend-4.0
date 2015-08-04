@@ -8,3 +8,4 @@ LIB_LIBS = \
     -lfiniteVolume \
     -lmeshTools \
     -lsurfMesh \
+    -llagrangian

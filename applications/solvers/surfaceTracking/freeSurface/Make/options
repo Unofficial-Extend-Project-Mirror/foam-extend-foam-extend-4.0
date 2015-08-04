@@ -7,7 +7,7 @@ EXE_INC = \
     -I$(LIB_SRC)/tetFiniteElement/lnInclude \
     -I$(LIB_SRC)/dynamicMesh/meshMotion/tetMotionSolver/lnInclude
 
-EXE_LIBS = \
+LIB_LIBS = \
     -lfiniteArea \
     -lfiniteVolume \
     -lmeshTools \

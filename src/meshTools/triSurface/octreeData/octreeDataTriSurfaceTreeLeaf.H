@@ -45,7 +45,7 @@ namespace Foam
 // Forward declaration of classes
 class octreeDataTriSurface;
 
-template<>
+template<> inline
 bool treeLeaf<octreeDataTriSurface>::findNearest
 (
     const octreeDataTriSurface& shapes,

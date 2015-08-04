@@ -49,7 +49,11 @@ namespace Foam
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 //- Return the PID of this process
+#ifdef mingw
+int pid();
+#else
 pid_t pid();
+#endif
 
 //- Return the parent PID of this process
 pid_t ppid();

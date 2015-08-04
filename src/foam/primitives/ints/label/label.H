@@ -56,6 +56,8 @@ Description
 # define FOAM_LABEL_MAX INT_MAX
 
 # include "int.H"
+# include "long.H"
+# include "longLong.H"
 
 namespace Foam
 {

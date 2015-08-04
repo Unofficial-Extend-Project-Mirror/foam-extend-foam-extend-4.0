@@ -1,0 +1,3 @@
+PFLAGS     = -DOMPI_SKIP_MPICXX
+PINC       = -I/c/Programs/OpenMPI_v1.6.1-x64/include
+PLIBS      = -L/c/Programs/OpenMPI_v1.6.1-x64/lib -lmpi
