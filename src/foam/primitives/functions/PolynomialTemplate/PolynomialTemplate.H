@@ -40,12 +40,12 @@ Description
       the base poly starts at order -1
 
 SourceFiles
-    Polynomial.C
+    PolynomialTemplate.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef Polynomial_H
-#define Polynomial_H
+#ifndef PolynomialTemplate_H
+#define PolynomialTemplate_H
 
 #include "word.H"
 #include "scalar.H"
@@ -151,8 +151,8 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-#   include "Polynomial.C"
-#   include "PolynomialIO.C"
+#   include "PolynomialTemplate.C"
+#   include "PolynomialTemplateIO.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

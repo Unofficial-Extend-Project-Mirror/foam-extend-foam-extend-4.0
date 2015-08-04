@@ -28,12 +28,12 @@ Description
     An ODE solver for chemistry
 
 SourceFiles
-    ode.C
+    odeChemistrySolver.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef ode_H
-#define ode_H
+#ifndef odeChemistrySolver_H
+#define odeChemistrySolver_H
 
 #include "chemistrySolver.H"
 #include "ODESolver.H"
@@ -108,7 +108,7 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-#   include "ode.C"
+#   include "odeChemistrySolver.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

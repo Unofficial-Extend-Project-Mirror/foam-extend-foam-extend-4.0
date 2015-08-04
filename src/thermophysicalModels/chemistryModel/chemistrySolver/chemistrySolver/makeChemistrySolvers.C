@@ -30,7 +30,7 @@ License
 #include "rhoChemistryModel.H"
 
 #include "EulerImplicit.H"
-#include "ode.H"
+#include "odeChemistrySolver.H"
 #include "sequential.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
