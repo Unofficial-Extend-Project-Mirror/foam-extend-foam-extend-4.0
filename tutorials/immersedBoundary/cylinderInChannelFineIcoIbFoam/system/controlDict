@@ -46,16 +46,6 @@ timePrecision   6;
 
 runTimeModifiable yes;
 
-libs
-(
-    "libfoam.so"
-    "libtriSurface.so"
-    "libmeshTools.so"
-    "libsampling.so"
-    "libsurfMesh.so"
-    "libimmersedBoundary.so"
-);
-
 functions
 (
     forces

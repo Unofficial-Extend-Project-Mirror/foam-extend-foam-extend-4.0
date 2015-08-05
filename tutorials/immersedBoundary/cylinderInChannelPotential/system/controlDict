@@ -48,16 +48,6 @@ adjustTimeStep  no;
 
 maxCo           0.2;
 
-libs
-(
-    "libfoam.so"
-    "libtriSurface.so"
-    "libmeshTools.so"
-    "libsampling.so"
-    "libsurfMesh.so"
-    "libimmersedBoundary.so"
-);
-
 // functions
 // (
 //     immersedBoundaryForce

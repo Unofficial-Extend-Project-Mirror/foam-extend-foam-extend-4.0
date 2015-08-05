@@ -71,5 +71,5 @@
     }
 
     // Update thermal conductivity
-    K = thermoFluid[i].Cp()*turb.alphaEff();
+    Kappa = thermoFluid[i].Cp()*turb.alphaEff();
 }

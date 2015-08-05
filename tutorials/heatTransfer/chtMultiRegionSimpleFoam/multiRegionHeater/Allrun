@@ -24,7 +24,7 @@ done
 # remove solid fields from fluid regions (important for post-processing)
 for i in bottomAir topAir
 do
-   rm -f 0*/$i/{cp,K,rho}
+   rm -f 0*/$i/{cp,Kappa,rho}
 done
 
 for i in bottomAir topAir heater leftSolid rightSolid

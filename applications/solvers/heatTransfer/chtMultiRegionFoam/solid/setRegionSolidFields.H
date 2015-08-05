@@ -2,5 +2,5 @@
 
     volScalarField& rho = rhos[i];
     volScalarField& cp = cps[i];
-    volScalarField& K = Ks[i];
+    volScalarField& Kappa = Kappas[i];
     volScalarField& T = Ts[i];

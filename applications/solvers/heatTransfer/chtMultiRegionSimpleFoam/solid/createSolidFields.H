@@ -2,7 +2,7 @@
     PtrList<volScalarField> rhos(solidRegions.size());
     PtrList<volScalarField> cps(solidRegions.size());
     PtrList<volScalarField> rhosCps(solidRegions.size());
-    PtrList<volScalarField> Ks(solidRegions.size());
+    PtrList<volScalarField> Kappas(solidRegions.size());
     PtrList<volScalarField> Ts(solidRegions.size());
 
     // Populate solid field pointer lists
@@ -53,15 +53,15 @@
             new volScalarField("rhosCps", rhos[i]*cps[i])
         );
 
-        Info<< "    Adding to Ks\n" << endl;
-        Ks.set
+        Info<< "    Adding to Kappas\n" << endl;
+        Kappas.set
         (
             i,
             new volScalarField
             (
                 IOobject
                 (
-                    "K",
+                    "Kappa",
                     runTime.timeName(),
                     solidRegions[i],
                     IOobject::MUST_READ,

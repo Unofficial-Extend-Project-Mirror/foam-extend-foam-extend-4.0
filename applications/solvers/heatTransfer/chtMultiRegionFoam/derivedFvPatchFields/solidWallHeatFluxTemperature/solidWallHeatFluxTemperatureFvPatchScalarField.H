@@ -31,7 +31,7 @@ Description
         myWallPatch
         {
             type            solidWallHeatFluxTemperature;
-            K               K;                  // Name of K field
+            Kappa               Kappa;                  // Name of Kappa field
             q               uniform 1000;       // Heat flux / [W/m2]
             value           uniform 300.0;      // Initial temperature / [K]
             gradient        uniform 0.0;        // Initial gradient / [K/m]
@@ -67,7 +67,7 @@ class solidWallHeatFluxTemperatureFvPatchScalarField
         scalarField q_;
 
         //- Name of thermal conductivity field
-        word KName_;
+        word KappaName_;
 
 
 public:
@@ -143,8 +143,8 @@ public:
 
         // Helper
 
-            //- Get K field on this patch
-            tmp<scalarField> K() const;
+            //- Get Kappa field on this patch
+            tmp<scalarField> Kappa() const;
 
         // Evaluation functions
 

@@ -71,7 +71,7 @@ add_to_path() {
 
 # {{{ DEFINE PROCESS FUNCTIONS
 setup_foam_env() {
-    : ${WM_OSTYPE:=POSIX}; export WM_OSTYPE
+    : ${WM_OSTYPE:=MSWindows}; export WM_OSTYPE
     export export FLEX_DIR=$(echo $WD\.. | sed 's/\\/\//g' | sed 's/\(.*\):/\/\1/')
     FOAM_ETC_DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
     export FOAM_INST_DIR=$(readlink -f $FOAM_ETC_DIR/../..)

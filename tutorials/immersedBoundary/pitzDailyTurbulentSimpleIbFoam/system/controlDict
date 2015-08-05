@@ -44,21 +44,6 @@ timePrecision   6;
 
 runTimeModifiable yes;
 
-libs
-(
-    "libfoam.so"
-    "libincompressibleTransportModels.so"
-    "libcompressibleTurbulenceModel.so"
-    "libincompressibleRASModels.so"
-
-    "libtriSurface.so"
-    "libmeshTools.so"
-    "libsampling.so"
-    "libsurfMesh.so"
-    "libimmersedBoundary.so"
-    "libimmersedBoundaryTurbulence.so"
-);
-
 functions
 (
     forces

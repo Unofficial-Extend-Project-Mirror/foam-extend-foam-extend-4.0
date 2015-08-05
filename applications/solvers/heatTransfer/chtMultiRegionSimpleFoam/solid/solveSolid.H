@@ -3,7 +3,7 @@
     {
         fvScalarMatrix tEqn
         (
-            -fvm::laplacian(K, T)
+            -fvm::laplacian(Kappa, T)
         );
         tEqn.relax();
         eqnResidual = tEqn.solve().initialResidual();

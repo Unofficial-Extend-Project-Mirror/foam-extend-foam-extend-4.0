@@ -9,7 +9,7 @@
                 solidRegions[regionI],
                 runTime,
                 rhosCps[regionI],
-                Ks[regionI]
+                Kappas[regionI]
             ),
             DiNum
         );
