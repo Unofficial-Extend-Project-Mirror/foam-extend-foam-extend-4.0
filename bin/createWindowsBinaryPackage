@@ -36,7 +36,7 @@
 cd ${0%/*} || exit 1    # run from this directory
 
 echo
-echo "======================== FOAM-EXTEND WINDOWS STAND-ALONE PACKAGE CREATION SCRIPT ========================"
+echo "=========== FOAM-EXTEND WINDOWS STAND-ALONE PACKAGE CREATION SCRIPT ==========="
 
 if [ "$PWD" != "$WM_PROJECT_DIR" ]
 then
