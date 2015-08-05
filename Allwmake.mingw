@@ -36,7 +36,7 @@
 cd ${0%/*} || exit 1    # run from this directory
 
 echo
-echo "======================== FOAM-EXTEND MINGW WINDOWS TOP-LEVEL BUILD SCRIPT ========================"
+echo "=============== FOAM-EXTEND MINGW WINDOWS TOP-LEVEL BUILD SCRIPT ==============="
 
 if [ "$PWD" != "$WM_PROJECT_DIR" ]
 then
@@ -71,8 +71,8 @@ echo "Copying MinGW dependencies to $FOAM_APPBIN ..."
 cp -p $MINGW_HOME/bin/libgcc_s_seh-1.dll $FOAM_APPBIN
 cp -p $MINGW_HOME/bin/libstdc++-6.dll $FOAM_APPBIN
 cp -p $MINGW_HOME/bin/libwinpthread-1.dll $FOAM_APPBIN
-echo "Creating release package ... (see `pwd`/createReleasePackage.log)"
-./createReleasePackage.mingw > createReleasePackage.log 2>&1
+echo "Creating release package ... (see `pwd`/createWindowsBinaryPackage.log)"
+./bin/createWindowsBinaryPackage > createWindowsBinaryPackage.log 1>&1
 
 echo
 echo "All done!"
