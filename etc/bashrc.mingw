@@ -83,7 +83,7 @@ setup_foam_env() {
 }
 
 set_OMPI_env() {
-    echo "Setting OpenMPI environment settings ..." 
+    echo "Setting OpenMPI environment settings ..."
     export OMPI_MPICC=gcc.exe
     export OMPI_MPIXX=g++.exe
     export OMPI_CXXFLAGS==-I$MPI_ROOTDIR/include
