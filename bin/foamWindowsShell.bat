@@ -1,7 +1,7 @@
 @echo off
 
-set FOAM_ETC=%~dp0
-call %FOAM_ETC%\env.bat
+set FOAM_HOME=%~dp0
+call %FOAM_HOME%\setWindowsEnvironment.bat
 mode 160,40
 color 81
 echo ---------------------------------

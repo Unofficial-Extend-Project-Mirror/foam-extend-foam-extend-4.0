@@ -66,8 +66,8 @@ cp -p $FOAM_MPI_LIBBIN/*.dll $RELEASE_DIR/lib/$MPI_VERSION
 
 echo "Copying extra files from etc directory ..."
 mkdir $RELEASE_DIR/etc
-cp -p $WM_PROJECT_DIR/setWindowsEnvironment.bat $RELEASE_DIR/
-cp -p $WM_PROJECT_DIR/foamWindowsShell.bat $RELEASE_DIR/
+cp -p $WM_PROJECT_DIR/bin/setWindowsEnvironment.bat $RELEASE_DIR/
+cp -p $WM_PROJECT_DIR/bin/foamWindowsShell.bat $RELEASE_DIR/
 cp -p $WM_PROJECT_DIR/etc/controlDict-EXAMPLE $RELEASE_DIR/etc
 cp -p $WM_PROJECT_DIR/etc/cellModels $RELEASE_DIR/etc
 cp -rp $WM_PROJECT_DIR/etc/thermoData $RELEASE_DIR/etc

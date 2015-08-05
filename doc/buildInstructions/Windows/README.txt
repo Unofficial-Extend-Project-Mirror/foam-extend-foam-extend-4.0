@@ -53,9 +53,9 @@ already have some of these system tools.
 
 3) Download and install MSYS (see reference list below).
 
-4) Download the foam-extend source code from as described on http://wikki.gridcore.se
+4) Download the foam-extend source code from http://sourceforge.net/projects/openfoam-extend/
 
-5) Open a new MSYS shell and chdir to your foam-extend-3.1 source directory
+5) Open a new MSYS shell and chdir to your foam-extend-3.1 source directory.
 
 6) Edit the user-modifiable entries in etc/bashrc.mingw to point to the
    locations where you have installed the required system tools in the first two

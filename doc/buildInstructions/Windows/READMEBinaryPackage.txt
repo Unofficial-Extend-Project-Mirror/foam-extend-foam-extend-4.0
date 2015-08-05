@@ -58,11 +58,11 @@ INSTRUCTIONS ON HOW TO INSTALL AND RUN THE WINDOWS VERSION OF FOAM-EXTEND
    installation directory where you install ParaView.
 
 4) Start a new CMD (DOS) prompt, and run the following command:
-       call <PATH_TO_FOAM>\bin\setWindowsEnvironment.bat
+       call <PATH_TO_FOAM>\setWindowsEnvironment.bat
    where <PATH_TO_FOAM> is the full path of the directory where you unzipped the package.
    The foam environment is now configured correctly for use within this CMD prompt only.
 
-   Alternatively, create a desktop shortcut to <PATH_TO_FOAM>\bin\foamWindowsShell.bat
+   Alternatively, create a desktop shortcut to <PATH_TO_FOAM>\foamWindowsShell.bat
    When you double-click this shortcut, a new CMD prompt is open with the foam environment automatically set.
 
 5) From the CMD prompts opened in the previous step, you can now run the usual foam applications, for example:
@@ -87,4 +87,6 @@ NOTES
 1) This version does not fully support runtime selection of extended features. If necessary, you can
    explicitly load the required DLL using the "libs" function in system/controlDict, for example:
        libs ("liblduSolvers.dll");
+
+2) foam-extend is licensed under GPL v3. The source code is available from http://sourceforge.net/projects/openfoam-extend/
 

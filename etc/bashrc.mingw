@@ -39,7 +39,7 @@ export PROGRAMS_HOME=/c/Programs
 
 # {{{ DEFINE USER EDITABLE FUNCTIONS
 set_system_paths() {
-    echo "Setting installations directories of required tools ..." 
+    echo "Setting environment variables for user-defined installed system tools and utilities ..." 
     export CMAKE_HOME=$PROGRAMS_HOME/cmake-3.2.3-win32-x86
     export GIT_HOME=$PROGRAMS_HOME/Git
     export MINGW_HOME=$PROGRAMS_HOME/mingw64
@@ -53,7 +53,8 @@ set_system_paths() {
 }
 
 add_to_path() {
-    echo "Adding required tools to PATH ..." 
+    echo
+    echo "Adding user-defined installed system tools to PATH ..." 
     export PATH=$ZIP_HOME:$PATH
     export PATH=$WGET_HOME/bin:$PATH
     export PATH=$PYTHON_HOME:$PATH
@@ -69,12 +70,14 @@ add_to_path() {
 
 # {{{ DEFINE PROCESS FUNCTIONS
 setup_foam_env() {
-    : ${WM_OSTYPE:=MSWindows}; export WM_OSTYPE
+    echo
     export export FLEX_DIR=$(echo $WD\.. | sed 's/\\/\//g' | sed 's/\(.*\):/\/\1/')
     FOAM_ETC_DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
     export FOAM_INST_DIR=$(readlink -f $FOAM_ETC_DIR/../..)
+    export FOAM_VERBOSE=1
+    export WM_OSTYPE=MSWindows
+    echo "Sourcing: $FOAM_ETC_DIR/bashrc" 
     . $FOAM_ETC_DIR/bashrc
-    . $FOAM_ETC_DIR/prefs.sh.mingw
 }
 
 set_OMPI_env() {
