@@ -38,9 +38,9 @@ cd ${0%/*} || exit 1    # run from this directory
 echo
 echo "=========== FOAM-EXTEND WINDOWS STAND-ALONE PACKAGE CREATION SCRIPT ==========="
 
-if [ "$PWD" != "$WM_PROJECT_DIR" ]
+if [ "$PWD" != "$WM_PROJECT_DIR/bin" ]
 then
-    echo "Error: Current directory is not \$WM_PROJECT_DIR"
+    echo "Error: Current directory is not \$WM_PROJECT_DIR/bin"
     echo "    The environment variable are not consistent with the installation."
     echo "    Check the OpenFOAM entries in your dot-files and source them."
     exit 1

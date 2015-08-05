@@ -72,7 +72,7 @@ cp -p $MINGW_HOME/bin/libgcc_s_seh-1.dll $FOAM_APPBIN
 cp -p $MINGW_HOME/bin/libstdc++-6.dll $FOAM_APPBIN
 cp -p $MINGW_HOME/bin/libwinpthread-1.dll $FOAM_APPBIN
 echo "Creating release package ... (see `pwd`/createWindowsBinaryPackage.log)"
-./bin/createWindowsBinaryPackage > createWindowsBinaryPackage.log 1>&1
+./bin/createWindowsBinaryPackage > createWindowsBinaryPackage.log 2>&1
 
 echo
 echo "All done!"
