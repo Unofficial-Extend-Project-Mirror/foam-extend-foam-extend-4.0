@@ -32,8 +32,6 @@
 #
 #------------------------------------------------------------------------------
 
-export FOAM_VERBOSE=1
-
 # Specify system compiler
 # ~~~~~~~~~~~~~~~~~~~~~~~
 #compilerInstall=System

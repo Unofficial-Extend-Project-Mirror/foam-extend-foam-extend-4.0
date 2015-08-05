@@ -126,7 +126,10 @@ _foamSource()
 }
 
 # Add in preset user or site preferences:
-if [ -e $WM_PROJECT_DIR/etc/prefs.sh ]
+if [ "$WM_OSTYPE" == "MSWindows" ]
+then
+    _foamSource $WM_PROJECT_DIR/etc/prefs.sh.mingw
+elif [ -e $WM_PROJECT_DIR/etc/prefs.sh ]
 then
     _foamSource $WM_PROJECT_DIR/etc/prefs.sh
 else

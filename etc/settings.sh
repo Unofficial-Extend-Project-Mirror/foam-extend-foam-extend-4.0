@@ -250,10 +250,10 @@ OPENMPI)
         _foamSource  $WM_THIRD_PARTY_DIR/packages/$mpi_version/platforms/$WM_OPTIONS/etc/$mpi_version.sh
     fi
 
-    # On windows set mpi_version explicitly
+    # On Windows set mpi_version from value defined in bashrc.mingw:
     if [ "$WM_ARCH_BASE" == "mingw" ]
     then
-        mpi_version=openmpi-1.6.1
+        mpi_version=$MPI_VERSION_MINGW
     fi
 
     export FOAM_MPI_LIBBIN=$FOAM_LIBBIN/$mpi_version

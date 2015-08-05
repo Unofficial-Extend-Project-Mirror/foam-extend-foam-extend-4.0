@@ -23,10 +23,10 @@
 #     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 #
 # Script
-#     Allwmake.mingw
+#     createReleasePackage.mingw
 #
 # Description
-#     Top-level build script for use with MSYS shell for MinGW-based builds on Windows.
+#     Creates stand-alone .zip packages for MinGW-based builds on Windows.
 #
 # Author:
 #     Cesare Guardino, Alstom Power Ltd., (2015)
@@ -36,7 +36,7 @@
 cd ${0%/*} || exit 1    # run from this directory
 
 echo
-echo "======================== FOAM-EXTEND MINGW WINDOWS TOP-LEVEL BUILD SCRIPT ========================"
+echo "======================== FOAM-EXTEND WINDOWS STAND-ALONE PACKAGE CREATION SCRIPT ========================"
 
 if [ "$PWD" != "$WM_PROJECT_DIR" ]
 then
@@ -46,33 +46,43 @@ then
     exit 1
 fi
 
-cd $WM_PROJECT_DIR/ThirdParty/mingwBuild
-echo
-echo "In directory `pwd`"
-echo "Configuring your OpenMPI installation ..."
-./configure_OpenMPI.sh
-PACKAGES_DIR=$WM_PROJECT_DIR/ThirdParty/packages
-if [ -d $PACKAGES_DIR ] ; then
-    echo "Third-party dependencies packages $PACKAGES_DIR already exists."
-else
-    echo "Building third-party dependencies ... (see `pwd`/build.log)"
-    ./build.sh > build.log 2>&1
-    echo "Installing third-party dependencies ..."
-    rm -rf $PACKAGES_DIR
-    mv x64/install $PACKAGES_DIR
+RELEASE_DIR=$WM_PROJECT-$WM_FORK-$WM_PROJECT_VERSION-win-x64
+MPI_VERSION=`basename $FOAM_MPI_LIBBIN`
+if [ -d $RELEASE_DIR ] ; then
+    echo "Removing previous $RELEASE_DIR"
+    rm -rf $RELEASE_DIR
 fi
+mkdir $RELEASE_DIR
 
-cd $WM_PROJECT_DIR
-echo
-echo "In directory `pwd`"
-echo "Build foam-extend ... (see `pwd`/Allwmake.log)"
-./Allwmake > Allwmake.log 2>&1
-echo "Copying MinGW dependencies to $FOAM_APPBIN ..."
-cp -p $MINGW_HOME/bin/libgcc_s_seh-1.dll $FOAM_APPBIN
-cp -p $MINGW_HOME/bin/libstdc++-6.dll $FOAM_APPBIN
-cp -p $MINGW_HOME/bin/libwinpthread-1.dll $FOAM_APPBIN
-echo "Creating release package ... (see `pwd`/createReleasePackage.log)"
-./createReleasePackage.mingw > createReleasePackage.log 2>&1
+echo "Copying bin directory ..."
+cp -rp $FOAM_APPBIN $RELEASE_DIR/bin
 
-echo
-echo "All done!"
+echo "Copying DLLs from lib directory ..."
+mkdir $RELEASE_DIR/lib
+cp -p $FOAM_LIBBIN/*.dll $RELEASE_DIR/lib
+cp -p $FOAM_LIBBIN/*.dll $RELEASE_DIR/lib
+mkdir $RELEASE_DIR/lib/$MPI_VERSION
+cp -p $FOAM_MPI_LIBBIN/*.dll $RELEASE_DIR/lib/$MPI_VERSION
+
+echo "Copying extra files from etc directory ..."
+mkdir $RELEASE_DIR/etc
+cp -p $WM_PROJECT_DIR/setWindowsEnvironment.bat $RELEASE_DIR/
+cp -p $WM_PROJECT_DIR/foamWindowsShell.bat $RELEASE_DIR/
+cp -p $WM_PROJECT_DIR/etc/controlDict-EXAMPLE $RELEASE_DIR/etc
+cp -p $WM_PROJECT_DIR/etc/cellModels $RELEASE_DIR/etc
+cp -rp $WM_PROJECT_DIR/etc/thermoData $RELEASE_DIR/etc
+cp -p $WM_PROJECT_DIR/doc/buildInstructions/Windows/READMEBinaryPackage.txt $RELEASE_DIR/
+cp -p $WM_PROJECT_DIR/bin/paraFoam.bat $RELEASE_DIR/bin
+cp -p $WM_PROJECT_DIR/COPYING $RELEASE_DIR/LICENSE.txt
+unix2dos $RELEASE_DIR/LICENSE.txt
+
+echo "Zipping up $RELEASE_DIR ..."
+PACKAGE_FILE=$RELEASE_DIR.zip
+7z a $PACKAGE_FILE $RELEASE_DIR
+rm -rf $RELEASE_DIR
+
+if [ -f $PACKAGE_FILE ] ; then
+    echo "Successfully created $PACKAGE_FILE"
+else
+    echo "Failed to create $PACKAGE_FILE"
+fi
