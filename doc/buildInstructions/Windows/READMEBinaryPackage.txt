@@ -87,6 +87,3 @@ NOTES
 1) This version does not fully support runtime selection of extended features. If necessary, you can
    explicitly load the required DLL using the "libs" function in system/controlDict, for example:
        libs ("liblduSolvers.dll");
-
-2) foam-extend is licensed under GPL v3. The source code is available from http://sourceforge.net/projects/openfoam-extend/
-
