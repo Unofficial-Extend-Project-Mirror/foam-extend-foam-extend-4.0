@@ -89,11 +89,11 @@ inline TensorN<Cmpt, length> TensorN<Cmpt, length>::T() const
 {
     TensorN<Cmpt, length> transpose;
 
-    int i = 0;
-    for (int row = 0; row < TensorN<Cmpt, length>::rowLength; row++)
+    label i = 0;
+    for (label row = 0; row < TensorN<Cmpt, length>::rowLength; row++)
     {
-        int j=row;
-        for (int col = 0; col < TensorN<Cmpt, length>::rowLength; col++)
+        label j = row;
+        for (label col = 0; col < TensorN<Cmpt, length>::rowLength; col++)
         {
             transpose.v_[i] = this->v_[j];
             i++;
@@ -110,8 +110,8 @@ inline DiagTensorN<Cmpt, length> TensorN<Cmpt, length>::diag() const
 {
     DiagTensorN<Cmpt, length> dt;
 
-    int diagI=0;
-    for (int i = 0; i < TensorN<Cmpt, length>::rowLength; i++)
+    label diagI=0;
+    for (label i = 0; i < TensorN<Cmpt, length>::rowLength; i++)
     {
         dt[i] = this->v_[diagI];
         diagI += TensorN<Cmpt, length>::rowLength + 1;
@@ -127,18 +127,18 @@ inline TensorN<Cmpt, length> TensorN<Cmpt, length>::negSumDiag() const
     TensorN<Cmpt, length> negsumdiag;
 
     // Zero main diagonal
-    int diagI=0;
-    for (int i = 0; i < TensorN<Cmpt, length>::rowLength; i++)
+    label diagI = 0;
+    for (label i = 0; i < TensorN<Cmpt, length>::rowLength; i++)
     {
         negsumdiag.v_[diagI] = 0.0;
         diagI += TensorN<Cmpt, length>::rowLength + 1;
     }
 
-    int k=0;
-    for (int i = 0; i < TensorN<Cmpt, length>::rowLength; i++)
+    label k = 0;
+    for (label i = 0; i < TensorN<Cmpt, length>::rowLength; i++)
     {
         diagI = 0;
-        for (int j = 0; j < TensorN<Cmpt, length>::rowLength; j++)
+        for (label j = 0; j < TensorN<Cmpt, length>::rowLength; j++)
         {
             if (k != diagI)
             {
@@ -158,8 +158,8 @@ template <class Cmpt, int length>
 inline void
 TensorN<Cmpt, length>::operator=(const SphericalTensorN<Cmpt, length>& st)
 {
-    int diag=0;
-    for (int i = 0; i < TensorN<Cmpt, length>::nComponents; i++)
+    label diag = 0;
+    for (label i = 0; i < TensorN<Cmpt, length>::nComponents; i++)
     {
         if (i == diag)
         {
@@ -179,11 +179,11 @@ template <class Cmpt, int length>
 inline void
 TensorN<Cmpt, length>::operator=(const DiagTensorN<Cmpt, length>& dt)
 {
-    int diag=0;
-    int k=0;
-    for (int i = 0; i < TensorN<Cmpt, length>::rowLength; i++)
+    label diag = 0;
+    label k = 0;
+    for (label i = 0; i < TensorN<Cmpt, length>::rowLength; i++)
     {
-        for (int j = 0; j < TensorN<Cmpt, length>::rowLength; j++)
+        for (label j = 0; j < TensorN<Cmpt, length>::rowLength; j++)
         {
             if (j == diag)
             {
@@ -278,17 +278,25 @@ operator&(const TensorN<Cmpt, length>& t1, const TensorN<Cmpt, length>& t2)
 {
     TensorN<Cmpt, length> result(TensorN<Cmpt, length>::zero);
 
-    int i = 0;
-    int j = 0;
-    for (int row = 0; row < TensorN<Cmpt, length>::rowLength; row++)
+    label i = 0;
+    label j = 0;
+
+    label m, n;
+
+    for (label row = 0; row < TensorN<Cmpt, length>::rowLength; row++)
     {
-        for (int col = 0; col < TensorN<Cmpt, length>::rowLength; col++)
+        for (label col = 0; col < TensorN<Cmpt, length>::rowLength; col++)
         {
             Cmpt& r = result.v_[i];
-            int m = j;
-            int n = col;
+            m = j;
+            n = col;
 
-            for (int row2=0; row2 < TensorN<Cmpt, length>::rowLength; row2++)
+            for
+            (
+                label row2 = 0;
+                row2 < TensorN<Cmpt, length>::rowLength;
+                row2++
+            )
             {
                 r += t1.v_[m]*t2.v_[n];
                 m++;
@@ -314,12 +322,12 @@ operator&
 {
     TensorN<Cmpt, length> result;
 
-    int k=0;
-    for (int i = 0; i < TensorN<Cmpt, length>::rowLength; i++)
+    label k = 0;
+    for (label i = 0; i < TensorN<Cmpt, length>::rowLength; i++)
     {
         const Cmpt& xx = dt1.v_[i];
 
-        for (int j = 0; j < TensorN<Cmpt, length>::rowLength; j++)
+        for (label j = 0; j < TensorN<Cmpt, length>::rowLength; j++)
         {
             result.v_[k] = xx*t2.v_[k];
             k++;
@@ -341,10 +349,10 @@ operator&
 {
     TensorN<Cmpt, length> result;
 
-    int k=0;
-    for (int i = 0; i < TensorN<Cmpt, length>::rowLength; i++)
+    label k = 0;
+    for (label i = 0; i < TensorN<Cmpt, length>::rowLength; i++)
     {
-        for (int j = 0; j < TensorN<Cmpt, length>::rowLength; j++)
+        for (label j = 0; j < TensorN<Cmpt, length>::rowLength; j++)
         {
             result.v_[k] = t1.v_[k]*dt2.v_[j];
             k++;
@@ -411,12 +419,12 @@ operator&(const TensorN<Cmpt, length>& t, const VectorN<Cmpt, length>& v)
 {
     VectorN<Cmpt, length> result(VectorN<Cmpt, length>::zero);
 
-    int i=0;
-    for (int row = 0; row < TensorN<Cmpt, length>::rowLength; row++)
+    label i = 0;
+    for (label row = 0; row < TensorN<Cmpt, length>::rowLength; row++)
     {
         Cmpt& r = result.v_[row];
 
-        for (int col = 0; col < TensorN<Cmpt, length>::rowLength; col++)
+        for (label col = 0; col < TensorN<Cmpt, length>::rowLength; col++)
         {
             r += t.v_[i]*v.v_[col];
             i++;
@@ -435,12 +443,12 @@ operator&(const VectorN<Cmpt, length>& v, const TensorN<Cmpt, length>& t)
 {
     VectorN<Cmpt, length> result(VectorN<Cmpt, length>::zero);
 
-    for (int col = 0; col < TensorN<Cmpt, length>::rowLength; col++)
+    for (label col = 0; col < TensorN<Cmpt, length>::rowLength; col++)
     {
-        int j=col;
+        label j = col;
         Cmpt& r = result.v_[col];
 
-        for (int row = 0; row < TensorN<Cmpt, length>::rowLength; row++)
+        for (label row = 0; row < TensorN<Cmpt, length>::rowLength; row++)
         {
             r += v.v_[row]*t.v_[j];
             j += TensorN<Cmpt, length>::rowLength;
@@ -459,10 +467,10 @@ operator*(const VectorN<Cmpt, length>& v1, const VectorN<Cmpt, length>& v2)
 {
     TensorN<Cmpt, length> result(TensorN<Cmpt, length>::zero);
 
-    int i=0;
-    for (int row = 0; row < TensorN<Cmpt, length>::rowLength; row++)
+    label i = 0;
+    for (label row = 0; row < TensorN<Cmpt, length>::rowLength; row++)
     {
-        for (int col = 0; col < TensorN<Cmpt, length>::rowLength; col++)
+        for (label col = 0; col < TensorN<Cmpt, length>::rowLength; col++)
         {
             result.v_[i] = v1.v_[row]*v2.v_[col];
             i++;
@@ -498,8 +506,8 @@ operator+(const TensorN<Cmpt,length>& t1, const DiagTensorN<Cmpt,length>& dt2)
 {
     TensorN<Cmpt, length> result(t1);
 
-    int diag = 0;
-    for (int i = 0; i < TensorN<Cmpt, length>::rowLength; i++)
+    label diag = 0;
+    for (label i = 0; i < TensorN<Cmpt, length>::rowLength; i++)
     {
         result.v_[diag] += dt2.v_[i];
         diag += TensorN<Cmpt, length>::rowLength + 1;
@@ -516,8 +524,8 @@ operator+(const DiagTensorN<Cmpt,length>& dt1, const TensorN<Cmpt,length>& t2)
 {
     TensorN<Cmpt, length> result(t2);
 
-    int diag = 0;
-    for (int i = 0; i < TensorN<Cmpt, length>::rowLength; i++)
+    label diag = 0;
+    for (label i = 0; i < TensorN<Cmpt, length>::rowLength; i++)
     {
         result.v_[diag] += dt1.v_[i];
         diag += TensorN<Cmpt, length>::rowLength + 1;
@@ -539,8 +547,8 @@ operator+
     TensorN<Cmpt, length> result(t1);
 
     const Cmpt& s = st2.v_[0];
-    int diag = 0;
-    for (int i = 0; i < TensorN<Cmpt, length>::rowLength; i++)
+    label diag = 0;
+    for (label i = 0; i < TensorN<Cmpt, length>::rowLength; i++)
     {
         result.v_[diag] += s;
         diag += TensorN<Cmpt, length>::rowLength + 1;
@@ -562,8 +570,8 @@ operator+
     TensorN<Cmpt, length> result(t2);
 
     const Cmpt& s = st1.v_[0];
-    int diag = 0;
-    for (int i = 0; i < TensorN<Cmpt, length>::rowLength; i++)
+    label diag = 0;
+    for (label i = 0; i < TensorN<Cmpt, length>::rowLength; i++)
     {
         result.v_[diag] += s;
         diag += TensorN<Cmpt, length>::rowLength + 1;
@@ -598,8 +606,8 @@ operator-(const TensorN<Cmpt,length>& t1, const DiagTensorN<Cmpt,length>& dt2)
 {
     TensorN<Cmpt, length> result(t1);
 
-    int diag = 0;
-    for (int i = 0; i < TensorN<Cmpt, length>::rowLength; i++)
+    label diag = 0;
+    for (label i = 0; i < TensorN<Cmpt, length>::rowLength; i++)
     {
         result.v_[diag] -= dt2.v_[i];
         diag += TensorN<Cmpt, length>::rowLength + 1;
@@ -616,8 +624,8 @@ operator-(const DiagTensorN<Cmpt,length>& dt1, const TensorN<Cmpt,length>& t2)
 {
     TensorN<Cmpt, length> result(-t2);
 
-    int diag = 0;
-    for (int i = 0; i < TensorN<Cmpt, length>::rowLength; i++)
+    label diag = 0;
+    for (label i = 0; i < TensorN<Cmpt, length>::rowLength; i++)
     {
         result.v_[diag] += dt1.v_[i];
         diag += TensorN<Cmpt, length>::rowLength + 1;
@@ -639,8 +647,8 @@ operator-
     TensorN<Cmpt, length> result(t1);
 
     const Cmpt& s = st2.v_[0];
-    int diag = 0;
-    for (int i = 0; i < TensorN<Cmpt, length>::rowLength; i++)
+    label diag = 0;
+    for (label i = 0; i < TensorN<Cmpt, length>::rowLength; i++)
     {
         result.v_[diag] -= s;
         diag += TensorN<Cmpt, length>::rowLength + 1;
@@ -662,8 +670,8 @@ operator-
     TensorN<Cmpt, length> result(-t2);
 
     const Cmpt& s = st1.v_[0];
-    int diag = 0;
-    for (int i = 0; i < TensorN<Cmpt, length>::rowLength; i++)
+    label diag = 0;
+    for (label i = 0; i < TensorN<Cmpt, length>::rowLength; i++)
     {
         result.v_[diag] += s;
         diag += TensorN<Cmpt, length>::rowLength + 1;
@@ -741,7 +749,7 @@ operator/
     TensorN<Cmpt, length> result;
 
     const Cmpt& s = st2[0];
-    for (int i = 0; i < TensorN<Cmpt, length>::nComponents; i++)
+    for (label i = 0; i < TensorN<Cmpt, length>::nComponents; i++)
     {
         result.v_[i] = t1.v_[i]/s;
     }
@@ -750,109 +758,55 @@ operator/
 }
 
 
-// UNOPTIMIZED VERSION
-/*
-//- Return the inverse of a tensor give the determinant
-//  Uses Gauss-Jordan Elimination with full pivoting
 template <class Cmpt, int length>
-inline TensorN<Cmpt, length> inv(const TensorN<Cmpt, length>& t)
+inline Cmpt det(const TensorN<Cmpt, length>& t)
 {
-    TensorN<Cmpt, length> result(t);
+    // Calculate determinant via sub-determinants
+    Cmpt result = pTraits<Cmpt>::zero;
 
-    label i, j, k, iRow=0, iCol=0;
-    Cmpt bigValue, temp, pivotInv;
+    TensorN<Cmpt, length - 1> subMatrix;
 
-    // Lists used for bookkeeping on the pivoting
-    List<label> indexCol(length), indexRow(length), iPivot(length);
-
-    iPivot=0;
-
-    // Main loop over columns to be reduced
-    for (i=0; i<length; i++)
+    for (label i = 0; i < length; i++)
     {
-        bigValue = pTraits<Cmpt>::zero;
+        label nj = 0;
 
-        //Search for pivot element
-        for (j=0; j<length; j++)
+        // Build sub-matrix, skipping the
+        for (label j = 0; j < length; j++)
         {
-            if (iPivot[j] != 1)
+            // Skip i-th column
+            if (j == i) continue;
+
+            for (label k = 1; k < length; k++)
             {
-                for (k=0; k<length; k++)
-                {
-                    if (iPivot[k] == 0)
-                    {
-                        if (Foam::mag(result(j,k)) >= bigValue)
-                        {
-                            bigValue = Foam::mag(result(j,k));
-                            iRow = j;
-                            iCol = k;
-                        }
-                    }
-                }
+                subMatrix(nj, k) = t(j, k);
             }
-        }
-        ++(iPivot[iCol]);
 
-        // We now have the pivot element
-        // Interchange rows if needed
-        if (iRow != iCol)
-        {
-            for (j=0; j<length; j++)
-            {
-                Swap(result(iRow,j), result(iCol,j));
-            }
-        }
-        indexRow[i] = iRow;
-        indexCol[i] = iCol;
-
-        //Check for singularity
-        if (result(iCol, iCol) == 0.0)
-        {
-            FatalErrorIn("inline TensorN<Cmpt, length> inv(const TensorN<Cmpt, length>& t)")
-                << "Singular tensor" << length << Foam::abort(FatalError);
+            nj++;
         }
 
-        // Divide the pivot row by pivot element
-        pivotInv = pTraits<Cmpt>::one/result(iCol, iCol);
-        result(iCol, iCol) = pTraits<Cmpt>::one;
-
-        // Multiply all row elements by inverse
-        for (j=0; j<length; j++)
-        {
-            result(iCol,j) *= pivotInv;
-        }
-
-        // Reduce the rows
-        for (j=0; j<length; j++)
-        {
-            if (j != iCol)
-            {
-                temp=result(j,iCol);
-                result(j,iCol) = pTraits<Cmpt>::zero;
-
-                for (k=0; k<length; k++)
-                {
-                    result(j,k) -= result(iCol,k)*temp;
-                }
-            }
-        }
-    }
-
-    // Unscamble the solution
-    for (i=length-1; i>=0; i--)
-    {
-        if (indexRow[i] != indexCol[i])
-        {
-            for (j=0; j<length; j++)
-            {
-                Swap(result(j,indexRow[i]), result(j,indexCol[i]));
-            }
-        }
+        // Handle +/- sign switch
+        result += pow(-1, i)*t(i, 0)*det(subMatrix);
     }
 
     return result;
 }
-*/
+
+
+// Determinant: partial specialisation for rank 1
+template<class Cmpt>
+inline Cmpt det(const TensorN<Cmpt, 1>& t)
+{
+    return t(0, 0);
+}
+
+
+// Determinant: partial specialisation for rank 2
+template<class Cmpt>
+inline Cmpt det(const TensorN<Cmpt, 2>& t)
+{
+    return t(0, 0)*t(1, 1) - t(0, 1)*t(1, 0);
+}
+
 
 //- Return the inverse of a tensor give the determinant
 //  Uses Gauss-Jordan Elimination with full pivoting
@@ -861,7 +815,7 @@ inline TensorN<Cmpt, length> inv(const TensorN<Cmpt, length>& t)
 {
     TensorN<Cmpt, length> result(t);
 
-    label iRow=0, iCol=0;
+    label iRow = 0, iCol = 0;
     Cmpt largestCoeff, temp;
     Cmpt* __restrict__ srcIter;
     Cmpt* __restrict__ destIter;
@@ -869,20 +823,23 @@ inline TensorN<Cmpt, length> inv(const TensorN<Cmpt, length>& t)
     // Lists used for bookkeeping on the pivoting
     List<label> indexCol(length), indexRow(length), iPivot(length);
 
-    iPivot=0;
+    iPivot = 0;
+
+    label curRowOffset;
 
     // Main loop over columns to be reduced
-    for (int i=0; i<length; i++)
+    for (label i = 0; i < length; i++)
     {
         largestCoeff = pTraits<Cmpt>::zero;
 
-        //Search for pivot element
-        int curRowOffset = 0;
-        for (int j=0; j<length; j++)
+        // Search for pivot element
+        curRowOffset = 0;
+
+        for (label j = 0; j < length; j++)
         {
             if (iPivot[j] != 1)
             {
-                for (int k=0; k<length; k++)
+                for (int k = 0; k < length; k++)
                 {
                     if (iPivot[k] == 0)
                     {
@@ -907,10 +864,10 @@ inline TensorN<Cmpt, length> inv(const TensorN<Cmpt, length>& t)
         // Interchange rows if needed
         if (iRow != iCol)
         {
-            srcIter = &result(iRow,0);
-            destIter = &result(iCol,0);
+            srcIter = &result(iRow, 0);
+            destIter = &result(iCol, 0);
 
-            for (int j=0; j<length; j++)
+            for (label j = 0; j < length; j++)
             {
                 Swap((*srcIter), (*destIter));
                 srcIter++;
@@ -921,36 +878,39 @@ inline TensorN<Cmpt, length> inv(const TensorN<Cmpt, length>& t)
         indexCol[i] = iCol;
 
         //Check for singularity
-        srcIter = &result(iCol, iCol);  //Dummy pointer to reduce indexing
-        if ((*srcIter) == Cmpt(0.0))
+        srcIter = &result(iCol, iCol);  // Dummy pointer to reduce indexing
+        if ((*srcIter) == Cmpt(0))
         {
-            FatalErrorIn("inline TensorN<Cmpt, length> inv(const TensorN<Cmpt, length>& t)")
-                << "Singular tensor" << length << Foam::abort(FatalError);
+            FatalErrorIn
+            (
+                "inline TensorN<Cmpt, length> inv("
+                "const TensorN<Cmpt, length>& t)"
+            )   << "Singular tensor" << length << Foam::abort(FatalError);
         }
 
         // Divide the pivot row by pivot element
         temp = pTraits<Cmpt>::one/(*srcIter);
         (*srcIter) = pTraits<Cmpt>::one;
 
-        srcIter = &result(iCol,0);
-        for (int j=0; j<length; j++)
+        srcIter = &result(iCol, 0);
+        for (label j = 0; j < length; j++)
         {
             (*srcIter) *= temp;
             srcIter++;
         }
 
         // Reduce the rows, excluding the pivot row
-        for (int j=0; j<length; j++)
+        for (label j = 0; j < length; j++)
         {
             if (j != iCol)
             {
-                destIter = &result(j,0);
-                srcIter = &result(iCol,0);
+                destIter = &result(j, 0);
+                srcIter = &result(iCol, 0);
 
                 temp=destIter[iCol];
                 destIter[iCol] = pTraits<Cmpt>::zero;
 
-                for (int k=0; k<length; k++)
+                for (label k = 0; k < length; k++)
                 {
                     (*destIter) -= (*srcIter)*temp;
                     srcIter++;
@@ -961,13 +921,13 @@ inline TensorN<Cmpt, length> inv(const TensorN<Cmpt, length>& t)
     }
 
     // Unscamble the solution
-    for (int i=length-1; i>=0; i--)
+    for (label i = length - 1; i >= 0; i--)
     {
         if (indexRow[i] != indexCol[i])
         {
             srcIter = &result[indexRow[i]];
             destIter = &result[indexCol[i]];
-            for (int j=0; j<length; j++)
+            for (label j = 0; j < length; j++)
             {
                 Swap((*srcIter), (*destIter));
                 srcIter += length;
@@ -975,6 +935,31 @@ inline TensorN<Cmpt, length> inv(const TensorN<Cmpt, length>& t)
             }
         }
     }
+
+    return result;
+}
+
+
+//- Inverse: partial template specialisation for rank 1
+template <class Cmpt>
+inline TensorN<Cmpt, 1> inv(const TensorN<Cmpt, 1>& t)
+{
+    return TensorN<Cmpt, 1>(1/t(0, 0));
+}
+
+
+//- Inverse: partial template specialisation for rank 2
+template <class Cmpt>
+inline TensorN<Cmpt, 2> inv(const TensorN<Cmpt, 2>& t)
+{
+    TensorN<Cmpt, 2> result(t);
+
+    Cmpt oneOverDet = 1/(t(0, 0)*t(1, 1) - t(0, 1)*t(1, 0));
+
+    result(0, 0) = oneOverDet*t(1, 1);
+    result(0, 1) = -oneOverDet*t(0, 1);
+    result(1, 0) = -oneOverDet*t(1, 0);
+    result(1, 1) = oneOverDet*t(0, 0);
 
     return result;
 }
