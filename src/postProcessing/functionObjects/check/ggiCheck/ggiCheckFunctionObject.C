@@ -126,12 +126,13 @@ bool Foam::ggiCheckFunctionObject::execute()
                         gSumMag(phi.boundaryField()[shadowPatchI]);
 
                     Info<< "GGI pair (" << ggiPatch.name() << ", "
-                        << ggiPatch.shadow().name()
-                        << ") Area: " << localArea << " " << shadowArea
+                        << ggiPatch.shadow().name() << ")" << nl
+                        << "Area: " << localArea << " " << shadowArea
                         << " Diff = " << localArea - shadowArea << " or "
                         << mag(localArea - shadowArea)/
-                        (Foam::max(localArea, shadowArea) + SMALL)*100
-                        << " % Flux: " << localFluxMag << " " << shadowFluxMag
+                           (Foam::max(localArea, shadowArea) + SMALL)*100
+                        << " % " << nl
+                        << "Flux: " << localFluxMag << " " << shadowFluxMag
                         << " Diff = " << localFlux + shadowFlux << " or "
                         << mag(localFlux + shadowFlux)/
                            (localFluxMag + SMALL)*100
