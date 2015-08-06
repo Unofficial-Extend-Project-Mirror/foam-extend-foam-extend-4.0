@@ -81,7 +81,7 @@ setenv WM_THIRD_PARTY_USE_CMAKE_322 1
 
 #
 # For AllMake.stage2
-setenv WM_THIRD_PARTY_USE_OPENMPI_188 1
+setenv WM_THIRD_PARTY_USE_OPENMPI_165 1
 
 #
 # For AllMake.stage3
