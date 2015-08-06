@@ -65,7 +65,7 @@ if [ ! -e $WM_PROJECT_DIR/CTestConfig.cmake ]
 then
     echo "Warning:"
     echo "  Missing file: CTestConfig.cmake under \$WM_PROJECT_DIR. Stopping."
-    echo "  A copy of CTestConfig.cmake for openfoam-extend is available under $FOAM_TEST_HARNESS_DIR/CMakeFiles."
+    echo "  A copy of CTestConfig.cmake for foam-extend is available under $FOAM_TEST_HARNESS_DIR/CMakeFiles."
     echo "  For a copy of CTestConfig.cmake for your local CDash server, contact your local CDash admin."
     echo "  Please make a copy of this file under \$WM_PROJECT_DIR/CTestConfig.cmake."
     exit -1

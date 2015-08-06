@@ -120,7 +120,7 @@ echo
 
 # m4 1.4.16
 #
-[ ! -z "$WM_THIRD_PARTY_USE_M4_146" ] && {
+[ ! -z "$WM_THIRD_PARTY_USE_M4_1416" ] && {
     echo "Building m4 1.4.16"
     # You need a recent version of m4 in order to compile a recent version of bison
     ( rpm_make -p m4-1.4.16  -s m4-1.4.16.spec   -u http://ftp.gnu.org/gnu/m4/m4-1.4.16.tar.gz               )
