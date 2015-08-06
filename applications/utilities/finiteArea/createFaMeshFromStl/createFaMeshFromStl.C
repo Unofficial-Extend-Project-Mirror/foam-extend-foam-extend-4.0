@@ -27,8 +27,9 @@ Application
 \*---------------------------------------------------------------------------*/
 
 #include "argList.H"
-#include "triSurface.H"
+#include "objectRegistry.H"
 #include "foamTime.H"
+#include "triSurface.H"
 #include "polyMesh.H"
 #include "faCFD.H"
 #include "IFstream.H"

@@ -31,8 +31,9 @@ Author
 \*---------------------------------------------------------------------------*/
 
 #include "argList.H"
-#include "autoPtr.H"
+#include "objectRegistry.H"
 #include "foamTime.H"
+#include "autoPtr.H"
 #include "triSurf.H"
 #include "triSurfModifier.H"
 #include "demandDrivenData.H"

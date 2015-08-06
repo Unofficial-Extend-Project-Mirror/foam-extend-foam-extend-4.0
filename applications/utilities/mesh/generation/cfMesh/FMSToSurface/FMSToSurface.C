@@ -27,6 +27,7 @@ Description
 \*---------------------------------------------------------------------------*/
 
 #include "argList.H"
+#include "objectRegistry.H"
 #include "foamTime.H"
 #include "triSurf.H"
 #include "triSurfaceCopyParts.H"

@@ -406,7 +406,6 @@ void Field<Type>::map
         if
         (
             mapper.direct()
-         && &mapper.directAddressing()
          && mapper.directAddressing().size()
         )
         {
@@ -451,7 +450,6 @@ void Field<Type>::autoMap
     (
         (
             mapper.direct()
-         && &mapper.directAddressing()
          && mapper.directAddressing().size()
         )
      || (!mapper.direct() && mapper.addressing().size())
