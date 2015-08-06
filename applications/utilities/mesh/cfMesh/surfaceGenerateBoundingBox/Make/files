@@ -1,3 +1,0 @@
-surfaceGenerateBoundingBox.C
-
-EXE = $(FOAM_APPBIN)/surfaceGenerateBoundingBox

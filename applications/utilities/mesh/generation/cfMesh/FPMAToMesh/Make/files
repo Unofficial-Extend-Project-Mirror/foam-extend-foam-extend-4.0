@@ -1,3 +1,0 @@
-FPMAToMesh.C
-
-EXE = $(FOAM_APPBIN)/FPMAToMesh

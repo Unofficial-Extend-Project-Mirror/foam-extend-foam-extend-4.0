@@ -1,3 +1,0 @@
-tetMesh.C
-
-EXE = $(FOAM_APPBIN)/tetMesh

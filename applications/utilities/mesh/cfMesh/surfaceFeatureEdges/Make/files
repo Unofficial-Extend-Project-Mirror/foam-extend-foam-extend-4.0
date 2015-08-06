@@ -1,3 +1,0 @@
-surfaceFeatureEdges.C
-
-EXE = $(FOAM_APPBIN)/surfaceFeatureEdges

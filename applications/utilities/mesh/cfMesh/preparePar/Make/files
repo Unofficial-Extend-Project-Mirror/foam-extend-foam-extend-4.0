@@ -1,3 +1,0 @@
-preparePar.C
-
-EXE = $(FOAM_APPBIN)/preparePar

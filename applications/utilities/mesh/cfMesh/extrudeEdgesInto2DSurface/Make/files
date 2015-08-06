@@ -1,3 +1,0 @@
-extrudeEdgesInto2DSurface.C
-
-EXE = $(FOAM_APPBIN)/extrudeEdgesInto2DSurface

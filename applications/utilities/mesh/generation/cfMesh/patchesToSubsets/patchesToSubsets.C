@@ -22,7 +22,7 @@ License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Description
-    Reads the AVL's surface mesh
+    Converts specified patches into subsets
 
 \*---------------------------------------------------------------------------*/
 
