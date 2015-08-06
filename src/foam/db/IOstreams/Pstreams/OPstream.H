@@ -55,6 +55,7 @@ class OPstream
 {
     // Private data
 
+         // ID of receiving processor
         int toProcNo_;
 
 
@@ -68,7 +69,12 @@ class OPstream
         inline void writeToBuffer(const char&);
 
         //- Write data to the transfer buffer
-        inline void writeToBuffer(const void* data, size_t count, size_t align);
+        inline void writeToBuffer
+        (
+            const void* data,
+            size_t count,
+            size_t align
+        );
 
 
 public:
@@ -82,7 +88,7 @@ public:
             const commsTypes commsType,
             const int toProcNo,
             const label bufSize = 0,
-            streamFormat format=BINARY,
+            streamFormat format = BINARY,
             versionNumber version = currentVersion
         );
 
@@ -140,7 +146,7 @@ public:
             Ostream& writeQuoted
             (
                 const std::string&,
-                const bool quoted=true
+                const bool quoted = true
             );
 
             //- Write label

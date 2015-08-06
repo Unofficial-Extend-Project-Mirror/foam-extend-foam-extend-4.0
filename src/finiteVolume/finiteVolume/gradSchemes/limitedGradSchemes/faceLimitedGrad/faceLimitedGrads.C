@@ -92,7 +92,7 @@ tmp<volVectorField> faceLimitedGrad<scalar>::grad
     const volVectorField& C = mesh.C();
     const surfaceVectorField& Cf = mesh.Cf();
 
-    // create limiter
+    // Create limiter
     scalarField limiter(vsf.internalField().size(), 1.0);
 
     scalar rk = (1.0/k_ - 1.0);
@@ -157,7 +157,8 @@ tmp<volVectorField> faceLimitedGrad<scalar>::grad
                 limitFace
                 (
                     limiter[own],
-                    maxFace - vsfOwn, minFace - vsfOwn,
+                    maxFace - vsfOwn,
+                    minFace - vsfOwn,
                     (pCf[pFacei] - C[own]) & g[own]
                 );
             }
@@ -180,7 +181,8 @@ tmp<volVectorField> faceLimitedGrad<scalar>::grad
                 limitFace
                 (
                     limiter[own],
-                    maxFace - vsfOwn, minFace - vsfOwn,
+                    maxFace - vsfOwn,
+                    minFace - vsfOwn,
                     (pCf[pFacei] - C[own]) & g[own]
                 );
             }
@@ -339,7 +341,8 @@ tmp<volTensorField> faceLimitedGrad<vector>::grad
                 limitFace
                 (
                     limiter[own],
-                    maxFace - vsfOwn, minFace - vsfOwn,
+                    maxFace - vsfOwn,
+                    minFace - vsfOwn,
                     magSqr(gradf)
                 );
             }
@@ -369,7 +372,7 @@ tmp<BlockLduSystem<vector, vector> > faceLimitedGrad<scalar>::fvmGrad
 ) const
 {
     // Consider doing a calculateLimiter member function since both fvmGrad and
-    // grad use almost the same procedure to calculate limiter. VV, 9/June/2014.
+    // grad use almost the same procedure to calculate limiter. VV, 9/June/2014
     const fvMesh& mesh = vsf.mesh();
 
     tmp<BlockLduSystem<vector, vector> > tbs = basicGradScheme_().fvmGrad(vsf);
@@ -428,7 +431,8 @@ tmp<BlockLduSystem<vector, vector> > faceLimitedGrad<scalar>::fvmGrad
         limitFace
         (
             lfIn[own],
-            maxFace - vsfOwn, minFace - vsfOwn,
+            maxFace - vsfOwn,
+            minFace - vsfOwn,
             (Cf[facei] - C[own]) & g[own]
         );
 
@@ -436,7 +440,8 @@ tmp<BlockLduSystem<vector, vector> > faceLimitedGrad<scalar>::fvmGrad
         limitFace
         (
             lfIn[nei],
-            maxFace - vsfNei, minFace - vsfNei,
+            maxFace - vsfNei,
+            minFace - vsfNei,
             (Cf[facei] - C[nei]) & g[nei]
         );
     }
@@ -538,6 +543,8 @@ tmp<BlockLduSystem<vector, vector> > faceLimitedGrad<scalar>::fvmGrad
         const fvPatchScalarField& pf = vsf.boundaryField()[patchI];
         const fvPatch& patch = pf.patch();
 
+        const labelList& fc = patch.faceCells();
+
         if (patch.coupled())
         {
             CoeffField<vector>::linearTypeField& pcoupleUpper =
@@ -550,15 +557,11 @@ tmp<BlockLduSystem<vector, vector> > faceLimitedGrad<scalar>::fvmGrad
 
             forAll(pf, faceI)
             {
-                label cellI = patch.faceCells()[faceI];
-
-                pcoupleUpper[faceI] *= lfIn[cellI];
+                pcoupleUpper[faceI] *= lfIn[fc[faceI]];
                 pcoupleLower[faceI] *= lfNei[faceI];
             }
         }
     }
-
-    limitField.write();
 
     return tbs;
 }
@@ -593,7 +596,6 @@ faceLimitedGrad<vector>::fvmGrad
 
     return tbs;
 }
-
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

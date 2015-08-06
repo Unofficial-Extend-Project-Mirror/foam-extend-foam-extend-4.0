@@ -93,7 +93,7 @@ public:
             //- Bounding box of this node
             treeBoundBox bb_;
 
-            //- parent node (index into nodes_ of tree)
+            //- Parent node (index into nodes_ of tree)
             label parent_;
 
             //- IDs of the 8 nodes on all sides of the mid point
@@ -165,8 +165,8 @@ private:
 
         // Construction
 
-            //- Split list of indices into 8 bins according to where they are in
-            //  relation to mid.
+            //- Split list of indices into 8 bins according to where they are
+            //  in relation to mid.
             void divide
             (
                 const labelList& indices,
@@ -375,6 +375,8 @@ private:
             }
 
 public:
+
+    // Static functions
 
         //- Get the perturbation tolerance
         static scalar& perturbTol();

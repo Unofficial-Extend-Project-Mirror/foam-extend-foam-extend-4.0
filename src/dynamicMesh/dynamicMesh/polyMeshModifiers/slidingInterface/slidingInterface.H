@@ -175,7 +175,8 @@ private:
             mutable labelList* slavePointPointHitsPtr_;
 
             //- Slave edge hit.  The index of master edge hit by the
-            //  slave point in projection.  For point or no edge  hit, set to -1
+            //  slave point in projection.
+            //  For point or no edge  hit, set to -1
             mutable labelList* slavePointEdgeHitsPtr_;
 
             //- Slave face hit.  The index of master face hit by the

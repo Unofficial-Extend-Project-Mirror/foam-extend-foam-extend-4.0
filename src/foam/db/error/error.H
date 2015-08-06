@@ -69,7 +69,6 @@ class error
     public std::exception,
     public messageStream
 {
-
 protected:
 
     // Protected data
@@ -82,6 +81,7 @@ protected:
 
         bool throwExceptions_;
         OStringStream* messageStreamPtr_;
+
 
 public:
 

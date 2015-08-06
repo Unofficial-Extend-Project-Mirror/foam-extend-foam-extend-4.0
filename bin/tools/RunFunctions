@@ -79,7 +79,7 @@ runParallel ()
     then
         mpirunProg=mpirun
     else
-        # Allow exceentric systems to override the hardcoded mpirun
+        # Allow eccentric systems to override the hardcoded mpirun
         mpirunProg=$WM_MPIRUN_PROG
     fi
         ( $mpirunProg -np $1 $APP_RUN -parallel < /dev/null > $LOG_NAME 2>&1 )

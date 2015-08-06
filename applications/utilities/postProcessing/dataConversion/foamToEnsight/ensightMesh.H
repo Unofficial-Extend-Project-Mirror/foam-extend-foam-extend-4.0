@@ -115,13 +115,13 @@ private:
             OFstream& ensightGeometryFile
         ) const;
 
-        cellShapeList map
+        cellShapeList ensMap
         (
             const cellShapeList& cellShapes,
             const labelList& prims
         ) const;
 
-        cellShapeList map
+        cellShapeList ensMap
         (
             const cellShapeList& cellShapes,
             const labelList& hexes,
@@ -181,7 +181,7 @@ private:
             OFstream& ensightGeometryFile
         ) const;
 
-        faceList map
+        faceList ensMap
         (
             const faceList& patchFaces,
             const labelList& prims

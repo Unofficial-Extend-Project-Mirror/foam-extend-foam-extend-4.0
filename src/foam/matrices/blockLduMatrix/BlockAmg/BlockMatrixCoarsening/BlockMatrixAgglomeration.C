@@ -301,7 +301,7 @@ void Foam::BlockMatrixAgglomeration<Type>::calcAgglomeration()
                     nextEqn = cols[indexUngrouped];
 
                     agglomIndex_[nextEqn] = agglomIndex_[curEqn];
-                    sizeOfGroups[agglomIndex_[curEqn]];
+                    sizeOfGroups[agglomIndex_[curEqn]]++;
 
                     curEqn = nextEqn;
                 }

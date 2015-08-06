@@ -50,7 +50,7 @@ Foam::fileName Foam::triSurface::triSurfInstance(const Time& d)
     instantList ts = d.times();
     label i;
 
-    for (i=ts.size()-1; i>=0; i--)
+    for (i = ts.size() - 1; i >= 0; i--)
     {
         if (ts[i].value() <= d.timeOutputValue())
         {
@@ -61,9 +61,9 @@ Foam::fileName Foam::triSurface::triSurfInstance(const Time& d)
     // Noting that the current directory has already been searched
     // for mesh data, start searching from the previously stored time directory
 
-    if (i>=0)
+    if (i >= 0)
     {
-        for (label j=i; j>=0; j--)
+        for (label j = i; j >= 0; j--)
         {
             if (isFile(d.path()/ts[j].name()/typeName/foamName))
             {
@@ -86,7 +86,8 @@ Foam::fileName Foam::triSurface::triSurfInstance(const Time& d)
             << "reading " << foamName
             << " from constant/" << endl;
     }
-    return "constant";
+
+    return d.constant();
 }
 
 
@@ -98,7 +99,7 @@ Foam::List<Foam::labelledTri> Foam::triSurface::convertToTri
 {
     List<labelledTri> triFaces(faces.size());
 
-    forAll(triFaces, faceI)
+    forAll (triFaces, faceI)
     {
         const face& f = faces[faceI];
 
@@ -133,7 +134,7 @@ Foam::List<Foam::labelledTri> Foam::triSurface::convertToTri
 {
     List<labelledTri> triFaces(faces.size());
 
-    forAll(triFaces, faceI)
+    forAll (triFaces, faceI)
     {
         const triFace& f = faces[faceI];
 
@@ -159,8 +160,7 @@ void Foam::triSurface::printTriangle
     const pointField& points
 )
 {
-    os
-        << pre.c_str() << "vertex numbers:"
+    os  << pre.c_str() << "vertex numbers:"
         << f[0] << ' ' << f[1] << ' ' << f[2] << endl
         << pre.c_str() << "vertex coords :"
         << points[f[0]] << ' ' << points[f[1]] << ' ' << points[f[2]]
@@ -188,7 +188,7 @@ void Foam::triSurface::checkTriangles(const bool verbose)
     // Simple check on indices ok.
     const label maxPointI = points().size() - 1;
 
-    forAll(*this, faceI)
+    forAll (*this, faceI)
     {
         const labelledTri& f = (*this)[faceI];
 
@@ -218,7 +218,7 @@ void Foam::triSurface::checkTriangles(const bool verbose)
 
     const labelListList& fFaces = faceFaces();
 
-    forAll(*this, faceI)
+    forAll (*this, faceI)
     {
         const labelledTri& f = (*this)[faceI];
 
@@ -240,12 +240,12 @@ void Foam::triSurface::checkTriangles(const bool verbose)
         }
         else
         {
-            // duplicate triangle check
+            // Duplicate triangle check
             const labelList& neighbours = fFaces[faceI];
 
             // Check if faceNeighbours use same points as this face.
             // Note: discards normal information - sides of baffle are merged.
-            forAll(neighbours, neighbourI)
+            forAll (neighbours, neighbourI)
             {
                 if (neighbours[neighbourI] <= faceI)
                 {
@@ -291,7 +291,7 @@ void Foam::triSurface::checkTriangles(const bool verbose)
     {
         // Pack
         label newFaceI = 0;
-        forAll(*this, faceI)
+        forAll (*this, faceI)
         {
             if (valid[faceI])
             {
@@ -321,7 +321,7 @@ void Foam::triSurface::checkEdges(const bool verbose)
 {
     const labelListList& eFaces = edgeFaces();
 
-    forAll(eFaces, edgeI)
+    forAll (eFaces, edgeI)
     {
         const labelList& myFaces = eFaces[edgeI];
 
@@ -503,7 +503,7 @@ Foam::surfacePatchList Foam::triSurface::calcPatches(labelList& faceMap) const
     // Sort according to region numbers of labelledTri
     SortableList<label> sortedRegion(size());
 
-    forAll(sortedRegion, faceI)
+    forAll (sortedRegion, faceI)
     {
         sortedRegion[faceI] = operator[](faceI).region();
     }
@@ -527,7 +527,7 @@ Foam::surfacePatchList Foam::triSurface::calcPatches(labelList& faceMap) const
     surfacePatchList newPatches(maxRegion + 1);
 
     // Fill patch sizes
-    forAll(*this, faceI)
+    forAll (*this, faceI)
     {
         label region = operator[](faceI).region();
 
@@ -538,7 +538,7 @@ Foam::surfacePatchList Foam::triSurface::calcPatches(labelList& faceMap) const
     // Fill rest of patch info
 
     label startFaceI = 0;
-    forAll(newPatches, newPatchI)
+    forAll (newPatches, newPatchI)
     {
         surfacePatch& newPatch = newPatches[newPatchI];
 
@@ -551,7 +551,11 @@ Foam::surfacePatchList Foam::triSurface::calcPatches(labelList& faceMap) const
 
 
         // Take over any information from existing patches
-        if ((oldPatchI < patches_.size()) && (patches_[oldPatchI].name() != ""))
+        if
+        (
+            (oldPatchI < patches_.size())
+         && (patches_[oldPatchI].name() != "")
+        )
         {
             newPatch.name() = patches_[oldPatchI].name();
         }
@@ -590,7 +594,7 @@ void Foam::triSurface::setDefaultPatches()
     // Take over names and types (but not size)
     patches_.setSize(newPatches.size());
 
-    forAll(newPatches, patchI)
+    forAll (newPatches, patchI)
     {
         patches_[patchI].index() = patchI;
         patches_[patchI].name() = newPatches[patchI].name();
@@ -845,13 +849,13 @@ void Foam::triSurface::markZone
         // Pick up neighbours of changedFaces
         DynamicList<label> newChangedFaces(2*changedFaces.size());
 
-        forAll(changedFaces, i)
+        forAll (changedFaces, i)
         {
             label faceI = changedFaces[i];
 
             const labelList& fEdges = faceEdges()[faceI];
 
-            forAll(fEdges, i)
+            forAll (fEdges, i)
             {
                 label edgeI = fEdges[i];
 
@@ -859,7 +863,7 @@ void Foam::triSurface::markZone
                 {
                     const labelList& eFaces = edgeFaces()[edgeI];
 
-                    forAll(eFaces, j)
+                    forAll (eFaces, j)
                     {
                         label nbrFaceI = eFaces[j];
 
@@ -965,7 +969,7 @@ void Foam::triSurface::subsetMeshMap
 
     boolList pointHad(nPoints(), false);
 
-    forAll(include, oldFacei)
+    forAll (include, oldFacei)
     {
         if (include[oldFacei])
         {
@@ -1022,7 +1026,7 @@ Foam::triSurface Foam::triSurface::subsetMesh
     // Create compact coordinate list and forward mapping array
     pointField newPoints(pointMap.size());
     labelList oldToNew(locPoints.size());
-    forAll(pointMap, pointi)
+    forAll (pointMap, pointi)
     {
         newPoints[pointi] = locPoints[pointMap[pointi]];
         oldToNew[pointMap[pointi]] = pointi;
@@ -1031,7 +1035,7 @@ Foam::triSurface Foam::triSurface::subsetMesh
     // Renumber triangle node labels and compact
     List<labelledTri> newTriangles(faceMap.size());
 
-    forAll(faceMap, facei)
+    forAll (faceMap, facei)
     {
         // Get old vertex labels
         const labelledTri& tri = locFaces[faceMap[facei]];
@@ -1091,11 +1095,11 @@ void Foam::triSurface::writeStats(Ostream& os) const
     label nPoints = 0;
     boundBox bb = boundBox::invertedBox;
 
-    forAll(*this, triI)
+    forAll (*this, triI)
     {
         const labelledTri& f = operator[](triI);
 
-        forAll(f, fp)
+        forAll (f, fp)
         {
             label pointI = f[fp];
             if (pointIsUsed.set(pointI, 1))

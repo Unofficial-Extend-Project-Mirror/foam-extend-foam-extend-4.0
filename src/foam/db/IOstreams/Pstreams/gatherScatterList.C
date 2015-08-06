@@ -99,7 +99,7 @@ void Pstream::gatherList
                 IPstream fromBelow(Pstream::scheduled, belowID);
                 fromBelow >> Values[belowID];
 
-                if (debug & 2)
+                if (debug > 1)
                 {
                     Pout<< " received through "
                         << belowID << " data from:" << belowID
@@ -112,7 +112,7 @@ void Pstream::gatherList
                     label leafID = belowLeaves[leafI];
                     fromBelow >> Values[leafID];
 
-                    if (debug & 2)
+                    if (debug > 1)
                     {
                         Pout<< " received through "
                             << belowID << " data from:" << leafID
@@ -129,11 +129,11 @@ void Pstream::gatherList
         {
             const labelList& belowLeaves = myComm.allBelow();
 
-            if (debug & 2)
+            if (debug > 1)
             {
                 Pout<< " sending to " << myComm.above()
-                    << " data from me:" << Pstream::myProcNo()
-                    << " data:" << Values[Pstream::myProcNo()] << endl;
+                    << " data from: " << Pstream::myProcNo()
+                    << " data: " << Values[Pstream::myProcNo()] << endl;
             }
 
             if (contiguous<T>())
@@ -163,11 +163,11 @@ void Pstream::gatherList
                 {
                     label leafID = belowLeaves[leafI];
 
-                    if (debug & 2)
+                    if (debug > 1)
                     {
                         Pout<< " sending to "
-                            << myComm.above() << " data from:" << leafID
-                            << " data:" << Values[leafID] << endl;
+                            << myComm.above() << " data from: " << leafID
+                            << " data: " << Values[leafID] << endl;
                     }
                     toAbove << Values[leafID];
                 }

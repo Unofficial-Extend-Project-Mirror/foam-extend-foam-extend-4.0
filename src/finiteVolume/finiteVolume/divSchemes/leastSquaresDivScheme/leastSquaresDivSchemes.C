@@ -23,21 +23,17 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "zeroGradientFvPatchFields.H"
-#include "volFields.H"
-#include "addToRunTimeSelectionTable.H"
+#include "leastSquaresDivScheme.H"
+#include "fvMesh.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
-
-// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
-
-makePatchFields(zeroGradient);
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
+namespace fv
+{
+    makeFvDivScheme(leastSquaresDivScheme)
+}
+}
 
 // ************************************************************************* //

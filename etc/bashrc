@@ -89,7 +89,7 @@ export WM_THIRD_PARTY_USE_CMAKE_322=1
 
 #
 # For AllMake.stage2
-export WM_THIRD_PARTY_USE_OPENMPI_184=1
+export WM_THIRD_PARTY_USE_OPENMPI_188=1
 
 #
 # For AllMake.stage3

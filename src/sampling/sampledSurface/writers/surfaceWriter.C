@@ -32,6 +32,11 @@ License
 #include "HashTable.H"
 #include "word.H"
 
+template<>
+Foam::surfaceWriter<bool>::wordConstructorTable*
+Foam::surfaceWriter<bool>::wordConstructorTablePtr_;
+
+
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
 template<class Type>

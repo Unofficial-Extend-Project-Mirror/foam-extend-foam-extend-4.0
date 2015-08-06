@@ -12,7 +12,7 @@ EXE_INC = \
     -I$(LIB_SRC)/sampling/lnInclude \
     -I$(LIB_SRC)/dynamicMesh/dynamicMesh/lnInclude
 
-EXE_LIBS = \
+LIB_LIBS = \
     -limmersedBoundary \
     -lfiniteVolume \
     -lincompressibleTurbulenceModel \

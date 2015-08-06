@@ -235,7 +235,7 @@ Foam::argList::argList
     regroupArgv(argc, argv);
 
     // Get executable name
-    args_[0]    = fileName(argv[0]);
+    args_[0] = fileName(argv[0]);
     executable_ = fileName(argv[0]).name();
 
     // Check arguments and options, we already have argv[0]
@@ -420,12 +420,12 @@ Foam::argList::argList
                 fileNameList roots;
                 decompDict.lookup("roots") >> roots;
 
-                if (roots.size() != Pstream::nProcs()-1)
+                if (roots.size() != Pstream::nProcs() - 1)
                 {
                     FatalError
                         << "number of entries in decompositionDict::roots"
                         << " is not equal to the number of slaves "
-                        << Pstream::nProcs()-1
+                        << Pstream::nProcs() - 1
                         << exit(FatalError);
                 }
 
@@ -433,8 +433,8 @@ Foam::argList::argList
                 bool hadCaseOpt = options_.found("case");
                 for
                 (
-                    int slave=Pstream::firstSlave();
-                    slave<=Pstream::lastSlave();
+                    int slave = Pstream::firstSlave();
+                    slave <= Pstream::lastSlave();
                     slave++
                 )
                 {
@@ -486,8 +486,8 @@ Foam::argList::argList
                 // Distribute the master's argument list (unaltered)
                 for
                 (
-                    int slave=Pstream::firstSlave();
-                    slave<=Pstream::lastSlave();
+                    int slave = Pstream::firstSlave();
+                    slave <= Pstream::lastSlave();
                     slave++
                 )
                 {
@@ -599,14 +599,14 @@ Foam::argList::argList
         if (Pstream::master())
         {
             slaveProcs.setSize(Pstream::nProcs() - 1);
-            word  slaveMachine;
+            word slaveMachine;
             label slavePid;
 
             label procI = 0;
             for
             (
-                int slave=Pstream::firstSlave();
-                slave<=Pstream::lastSlave();
+                int slave = Pstream::firstSlave();
+                slave <= Pstream::lastSlave();
                 slave++
             )
             {
@@ -731,12 +731,12 @@ void Foam::argList::printUsage() const
         }
 
         keyValuePair<< ']';
-    sortedValidOptions[i]= keyValuePair.str();
+        sortedValidOptions[i]= keyValuePair.str();
     }
     sortedValidOptions.sort();
 
     forAll (sortedValidOptions, sI)
-    Info << " " << sortedValidOptions[sI].c_str();
+    Info<< " " << sortedValidOptions[sI].c_str();
 
     // place help/doc/srcDoc options of the way at the end,
     // but with an extra space to separate it a little

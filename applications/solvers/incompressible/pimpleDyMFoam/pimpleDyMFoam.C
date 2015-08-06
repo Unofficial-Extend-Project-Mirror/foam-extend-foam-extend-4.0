@@ -26,7 +26,7 @@ Application
 
 Description
     Transient solver for incompressible, flow of Newtonian fluids
-    on a moving mesh using the PIMPLE (merged PISO-SIMPLE) algorithm.
+    with dynamic mesh using the PIMPLE (merged PISO-SIMPLE) algorithm.
 
     Turbulence modelling is generic, i.e. laminar, RAS or LES may be selected.
 
@@ -79,6 +79,8 @@ int main(int argc, char *argv[])
         // Mesh motion update
         if (correctPhi && meshChanged)
         {
+            // Fluxes will be corrected to absolute velocity
+            // HJ, 6/Feb/2009
 #           include "correctPhi.H"
         }
 

@@ -47,8 +47,8 @@ tmp<BlockLduSystem<vector, scalar> > gaussDivScheme<vector>::fvmUDiv
     const GeometricField<vector, fvPatchField, volMesh>& vf
 ) const
 {
-    tmp<surfaceScalarField> tweights = this->tinterpScheme_().weights(vf);
-    const scalarField& wIn = tweights().internalField();
+    // Get weights
+    surfaceScalarField weights = this->tinterpScheme_().weights(vf);
 
     const fvMesh& mesh = vf.mesh();
 
@@ -64,7 +64,9 @@ tmp<BlockLduSystem<vector, scalar> > gaussDivScheme<vector>::fvmUDiv
     CoeffField<vector>::linearTypeField& u = bs.upper().asLinear();
     CoeffField<vector>::linearTypeField& l = bs.lower().asLinear();
 
+    // Internal field
     const vectorField& SfIn = mesh.Sf().internalField();
+    const scalarField& wIn = weights.internalField();
 
     l = -wIn*SfIn;
     u = l + SfIn;
@@ -76,7 +78,7 @@ tmp<BlockLduSystem<vector, scalar> > gaussDivScheme<vector>::fvmUDiv
         const fvPatchVectorField& pf = vf.boundaryField()[patchI];
         const fvPatch& patch = pf.patch();
         const vectorField& Sf = patch.Sf();
-        const fvsPatchScalarField& pw = tweights().boundaryField()[patchI];
+        const fvsPatchScalarField& pw = weights.boundaryField()[patchI];
         const unallocLabelList& fc = patch.faceCells();
 
         const vectorField internalCoeffs(pf.valueInternalCoeffs(pw));
@@ -126,8 +128,8 @@ tmp<BlockLduSystem<vector, scalar> > gaussDivScheme<vector>::fvmUDiv
     const GeometricField<vector, fvPatchField, volMesh>& vf
 ) const
 {
-    tmp<surfaceScalarField> tweights = this->tinterpScheme_().weights(vf);
-    const scalarField& wIn = tweights().internalField();
+    // Get weights
+    surfaceScalarField weights = this->tinterpScheme_().weights(vf);
 
     const fvMesh& mesh = vf.mesh();
 
@@ -143,8 +145,9 @@ tmp<BlockLduSystem<vector, scalar> > gaussDivScheme<vector>::fvmUDiv
     CoeffField<vector>::linearTypeField& u = bs.upper().asLinear();
     CoeffField<vector>::linearTypeField& l = bs.lower().asLinear();
 
+    // Internal field
     const vectorField& SfIn = mesh.Sf().internalField();
-
+    const scalarField& wIn = weights.internalField();
     const scalarField& fluxIn = flux.internalField();
 
     l = -wIn*fluxIn*SfIn;
@@ -157,7 +160,7 @@ tmp<BlockLduSystem<vector, scalar> > gaussDivScheme<vector>::fvmUDiv
         const fvPatchVectorField& pf = vf.boundaryField()[patchI];
         const fvPatch& patch = pf.patch();
         const vectorField& Sf = patch.Sf();
-        const fvsPatchScalarField& pw = tweights().boundaryField()[patchI];
+        const fvsPatchScalarField& pw = weights.boundaryField()[patchI];
         const unallocLabelList& fc = patch.faceCells();
 
         const scalarField& pFlux = flux.boundaryField()[patchI];

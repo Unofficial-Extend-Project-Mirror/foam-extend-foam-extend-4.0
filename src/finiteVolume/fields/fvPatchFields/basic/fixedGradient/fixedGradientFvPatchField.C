@@ -149,7 +149,10 @@ tmp<Field<Type> > fixedGradientFvPatchField<Type>::valueInternalCoeffs
     const tmp<scalarField>&
 ) const
 {
-    return tmp<Field<Type> >(new Field<Type>(this->size(), pTraits<Type>::one));
+    return tmp<Field<Type> >
+    (
+        new Field<Type>(this->size(), pTraits<Type>::one)
+    );
 }
 
 

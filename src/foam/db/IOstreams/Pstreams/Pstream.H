@@ -373,7 +373,8 @@ public:
             template <class T, class BinaryOp>
             static void gather(T& Value, const BinaryOp& bop);
 
-            //- Scatter data. Distribute without modification. Reverse of gather
+            //- Scatter data. Distribute without modification.
+            //  Reverse of gather
             template <class T>
             static void scatter(const List<commsStruct>& comms, T& Value);
 
@@ -421,7 +422,11 @@ public:
 
             //- Like above but switches between linear/tree communication
             template <class T, class CombineOp>
-            static void listCombineGather(List<T>& Value, const CombineOp& cop);
+            static void listCombineGather
+            (
+                List<T>& Value,
+                const CombineOp& cop
+            );
 
             //- Scatter data. Reverse of combineGather
             template <class T>

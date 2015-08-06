@@ -269,7 +269,10 @@ public:
 
             //- WIP. From a set of hits (points and
             //  indices) get the specified field. Misses do not get set.
-            virtual void getField(const List<pointIndexHit>&, labelList&) const;
+            virtual void getField
+            (
+                const List<pointIndexHit>&, labelList&
+            ) const;
 
 
         // regIOobject implementation
@@ -277,6 +280,7 @@ public:
             bool writeData(Ostream&) const
             {
                 notImplemented("triSurfaceMesh::writeData(Ostream&) const");
+
                 return false;
             }
 
@@ -287,7 +291,6 @@ public:
                 IOstream::versionNumber ver,
                 IOstream::compressionType cmp
             ) const;
-
 };
 
 

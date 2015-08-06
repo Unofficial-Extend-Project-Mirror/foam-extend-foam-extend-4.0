@@ -97,7 +97,10 @@ bool Foam::meshSearch::findNearer
 
 
 // tree based searching
-Foam::label Foam::meshSearch::findNearestCellTree(const point& location) const
+Foam::label Foam::meshSearch::findNearestCellTree
+(
+    const point& location
+) const
 {
     const indexedOctree<treeDataPoint>& tree = cellCentreTree();
 
@@ -109,12 +112,17 @@ Foam::label Foam::meshSearch::findNearestCellTree(const point& location) const
     {
         info = tree.findNearest(location, Foam::sqr(GREAT));
     }
+
     return info.index();
 }
 
 
 // linear searching
-Foam::label Foam::meshSearch::findNearestCellLinear(const point& location) const
+Foam::label
+Foam::meshSearch::findNearestCellLinear
+(
+    const point& location
+) const
 {
     const vectorField& centres = mesh_.cellCentres();
 

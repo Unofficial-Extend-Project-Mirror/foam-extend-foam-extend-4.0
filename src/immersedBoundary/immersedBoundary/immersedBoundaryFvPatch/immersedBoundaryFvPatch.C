@@ -1248,7 +1248,10 @@ void Foam::immersedBoundaryFvPatch::makeIbCellCells() const
         labelList procIbCells = procIbCellsSet.toc();
         sort(procIbCells);
 
-        // Send and receive num of immersed boundary cells
+        // Note: consider more sophisticated gather-scatter
+        // HJ, 18/Jun/2015
+
+        // Send and receive number  of immersed boundary cells
         // next to processor boundaries
         for (label procI = 0; procI < Pstream::nProcs(); procI++)
         {

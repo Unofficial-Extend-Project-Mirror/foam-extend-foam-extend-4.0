@@ -24,6 +24,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "gaussDivScheme.H"
+#include "vectorGaussDivScheme.H"
 #include "fvMesh.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

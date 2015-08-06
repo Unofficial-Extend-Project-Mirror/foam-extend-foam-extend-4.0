@@ -97,13 +97,11 @@ then
           -f --define '_configureAdditionalArgs "$WM_THIRD_PARTY_USE_OPENMPI_165_ConfigureAdditionalArgs"')
     }
 
-    # openmpi 1.8.4
+    # openmpi 1.8.8
     #
     [ ! -z "$WM_THIRD_PARTY_USE_OPENMPI_1*$" ] && {
-	echo "Building openmpi 1.8.4"
-	#( rpm_make -p openmpi-1.8.4 -s openmpi-1.8.4.spec  -u http://www.open-mpi.org/software/ompi/v1.8/downloads/openmpi-1.8.4.tar.gz \
-    #      -f --define '_configureAdditionalArgs "$WM_THIRD_PARTY_USE_OPENMPI_165_ConfigureAdditionalArgs"')
-	( rpm_make -p openmpi-1.8.4 -s openmpi-1.8.4.spec  -u  http://downloads.sourceforge.net/project/openfoam-extend/foam-extend-3.1/ThirdParty/openmpi-1.8.4.tar.gz \
+	echo "Building openmpi 1.8.8"
+	( rpm_make -p openmpi-1.8.8 -s openmpi-1.8.8.spec  -u http://www.open-mpi.org/software/ompi/v1.8/downloads/openmpi-1.8.8.tar.gz \
           -f --define '_configureAdditionalArgs "$WM_THIRD_PARTY_USE_OPENMPI_165_ConfigureAdditionalArgs"')
     }
 else

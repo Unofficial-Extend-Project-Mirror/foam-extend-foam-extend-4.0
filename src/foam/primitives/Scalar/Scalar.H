@@ -136,7 +136,7 @@ inline bool notEqual(const Scalar s1, const Scalar s2)
 
 inline Scalar limit(const Scalar s1, const Scalar s2)
 {
-    return (mag(s1) < mag(s2)) ? s1: 0.0;
+    return (mag(s1) < mag(s2)) ? s1: 0;
 }
 
 inline Scalar minMod(const Scalar s1, const Scalar s2)
@@ -165,7 +165,7 @@ inline Scalar sqrtSumSqr(const Scalar a, const Scalar b)
     }
     else
     {
-        return magb < ScalarVSMALL ? 0.0 : magb*::sqrt(1.0 + sqr(maga/magb));
+        return magb < ScalarVSMALL ? 0 : magb*::sqrt(1.0 + sqr(maga/magb));
     }
 }
 

@@ -47,6 +47,7 @@ SourceFiles
                                sphericalTensorType,vectorType,CmptType,      \
                                args...)                                      \
                                                                              \
+UNARY_FUNCTION(CmptType, tensorType, det)                                    \
 UNARY_FUNCTION(tensorType, tensorType, inv)                                  \
 UNARY_FUNCTION(diagTensorType, tensorType, diag)                             \
 UNARY_FUNCTION(tensorType, tensorType, negSumDiag)                           \

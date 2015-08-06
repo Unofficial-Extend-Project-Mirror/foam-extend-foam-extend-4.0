@@ -62,7 +62,7 @@ IOPatchToPatchInterpolation<FromPatch, ToPatch>::IOPatchToPatchInterpolation
         labelList* faPtr = new labelList(is);
         FieldField<Field, scalar>* fwPtr = new FieldField<Field, scalar>(is);
         scalarField* fdPtr = new scalarField(is);
-        Info << "Setting weights from file" << endl;
+        Info<< "Setting weights from file" << endl;
         this->setWeights(paPtr, pwPtr, pdPtr, faPtr, fwPtr, fdPtr);
     }
 }
