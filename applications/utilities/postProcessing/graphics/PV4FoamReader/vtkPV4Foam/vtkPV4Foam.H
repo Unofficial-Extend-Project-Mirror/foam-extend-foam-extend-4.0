@@ -67,7 +67,7 @@ SourceFiles
 #include "stringList.H"
 #include "wordList.H"
 #include "primitivePatch.H"
-#include "PrimitivePatchInterpolation.H"
+#include "PrimitivePatchInterpolationTemplate.H"
 #include "volPointInterpolation.H"
 
 #undef VTKPV4FOAM_DUALPORT

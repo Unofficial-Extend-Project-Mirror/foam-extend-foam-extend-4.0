@@ -28,7 +28,7 @@ Description
 #include "vtkPV4Foam.H"
 
 // Foam includes
-#include "Cloud.H"
+#include "CloudTemplate.H"
 #include "fvMesh.H"
 #include "IOobjectList.H"
 #include "passiveParticle.H"
