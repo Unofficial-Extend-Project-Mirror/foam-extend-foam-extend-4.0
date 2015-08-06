@@ -1,25 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
-    \\  /    A nd           | Web:         http://www.foam-extend.org
-     \\/     M anipulation  | For copyright notice see file Copyright
+  \\      /  F ield         | cfMesh: A library for mesh generation
+   \\    /   O peration     |
+    \\  /    A nd           | Author: Franjo Juretic (franjo.juretic@c-fields.com)
+     \\/     M anipulation  | Copyright (C) Creative Fields, Ltd.
 -------------------------------------------------------------------------------
 License
-    This file is part of foam-extend.
+    This file is part of cfMesh.
 
-    foam-extend is free software: you can redistribute it and/or modify it
+    cfMesh is free software; you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation, either version 3 of the License, or (at your
+    Free Software Foundation; either version 3 of the License, or (at your
     option) any later version.
 
-    foam-extend is distributed in the hope that it will be useful, but
-    WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    General Public License for more details.
+    cfMesh is distributed in the hope that it will be useful, but WITHOUT
+    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+    for more details.
 
     You should have received a copy of the GNU General Public License
-    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
+    along with cfMesh.  If not, see <http://www.gnu.org/licenses/>.
 
 Description
 
@@ -34,31 +34,31 @@ Description
 
 namespace Foam
 {
-
+    
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 void tetCreatorOctree::createTetsFromSplitFaces()
 {
     Info << "Creating tets from split faces" << endl;
-
+    
     const labelList& cubeLabel = *cubeLabelPtr_;
     const VRWGraph& subNodeLabels = *subNodeLabelsPtr_;
     const FRWGraph<label, 8>& pLeaves = octreeCheck_.nodeLeaves();
-
+    
     forAll(pLeaves, pointI)
     {
         for(label i=0;i<6;++i)
         {
             const label* fNodes =
                 meshOctreeCubeCoordinates::faceNodes_[i];
-
+            
             const label cLabel = pLeaves(pointI, fNodes[0]);
-
+            
             if( cLabel < 0 )
                 continue;
             if( cubeLabel[cLabel] < 0 )
                 continue;
-
+            
             if(
                 (cLabel == pLeaves(pointI, fNodes[1])) &&
                 (cLabel == pLeaves(pointI, fNodes[2])) &&

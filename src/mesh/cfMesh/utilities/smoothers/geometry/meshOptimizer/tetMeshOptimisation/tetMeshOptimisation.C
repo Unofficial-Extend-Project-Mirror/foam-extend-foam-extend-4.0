@@ -1,25 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
-    \\  /    A nd           | Web:         http://www.foam-extend.org
-     \\/     M anipulation  | For copyright notice see file Copyright
+  \\      /  F ield         | cfMesh: A library for mesh generation
+   \\    /   O peration     |
+    \\  /    A nd           | Author: Franjo Juretic (franjo.juretic@c-fields.com)
+     \\/     M anipulation  | Copyright (C) Creative Fields, Ltd.
 -------------------------------------------------------------------------------
 License
-    This file is part of foam-extend.
+    This file is part of cfMesh.
 
-    foam-extend is free software: you can redistribute it and/or modify it
+    cfMesh is free software; you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation, either version 3 of the License, or (at your
+    Free Software Foundation; either version 3 of the License, or (at your
     option) any later version.
 
-    foam-extend is distributed in the hope that it will be useful, but
-    WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    General Public License for more details.
+    cfMesh is distributed in the hope that it will be useful, but WITHOUT
+    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+    for more details.
 
     You should have received a copy of the GNU General Public License
-    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
+    along with cfMesh.  If not, see <http://www.gnu.org/licenses/>.
 
 Description
 
@@ -64,7 +64,7 @@ tetMeshOptimisation::~tetMeshOptimisation()
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-void tetMeshOptimisation::optimiseUsingKnuppMetric()
+void tetMeshOptimisation::optimiseUsingKnuppMetric(const label nIterations)
 {
     const LongList<point>& points = tetMesh_.points();
     const LongList<partTet>& tets = tetMesh_.tets();
@@ -143,7 +143,11 @@ void tetMeshOptimisation::optimiseUsingKnuppMetric()
             # endif
             forAll(smoothVertex, nodeI)
             {
-                if( !negativeNode[nodeI] )
+                if
+                (
+                    !negativeNode[nodeI] ||
+                    (smoothVertex[nodeI] & partTetMesh::LOCKED)
+                )
                     continue;
 
                 if( smoothVertex[nodeI] & partTetMesh::SMOOTH )
@@ -194,10 +198,10 @@ void tetMeshOptimisation::optimiseUsingKnuppMetric()
         if( nNegative == 0 )
             return;
 
-    } while( (nNegative < nNegativeBefore) || (++nIter < 5) );
+    } while( (nNegative < nNegativeBefore) || (++nIter < nIterations) );
 }
 
-void tetMeshOptimisation::optimiseUsingMeshUntangler()
+void tetMeshOptimisation::optimiseUsingMeshUntangler(const label nIterations)
 {
     const LongList<point>& points = tetMesh_.points();
     const LongList<partTet>& tets = tetMesh_.tets();
@@ -278,6 +282,9 @@ void tetMeshOptimisation::optimiseUsingMeshUntangler()
                 if( !negativeNode[nodeI] )
                     continue;
 
+                if( smoothVertex[nodeI] & partTetMesh::LOCKED )
+                    continue;
+
                 if( smoothVertex[nodeI] & partTetMesh::SMOOTH )
                 {
                     partTetMeshSimplex simplex(tetMesh_, nodeI);
@@ -324,15 +331,15 @@ void tetMeshOptimisation::optimiseUsingMeshUntangler()
             return;
         invertedTets.transfer(helper);
 
-    } while( (nNegative < nNegativeBefore) || (++nIter < 5) );
+    } while( (nNegative < nNegativeBefore) || (++nIter < nIterations) );
 }
 
-void tetMeshOptimisation::optimiseUsingVolumeOptimizer()
+void tetMeshOptimisation::optimiseUsingVolumeOptimizer(const label nIterations)
 {
     const LongList<direction>& smoothVertex = tetMesh_.smoothVertex();
 
     //- use mesh optimizer to improve the result
-    for(label i=0;i<2;++i)
+    for(label i=0;i<nIterations;++i)
     {
         List<LongList<labelledPoint> > newPositions;
 
@@ -358,6 +365,10 @@ void tetMeshOptimisation::optimiseUsingVolumeOptimizer()
             # pragma omp for schedule(dynamic, 10)
             # endif
             forAll(smoothVertex, nodeI)
+            {
+                if( smoothVertex[nodeI] & partTetMesh::LOCKED )
+                    continue;
+
                 if( smoothVertex[nodeI] & partTetMesh::SMOOTH )
                 {
                     partTetMeshSimplex simplex(tetMesh_, nodeI);
@@ -367,6 +378,7 @@ void tetMeshOptimisation::optimiseUsingVolumeOptimizer()
 
                     np.append(labelledPoint(nodeI, simplex.centrePoint()));
                 }
+            }
         }
 
         //- update mesh vertices
@@ -383,6 +395,7 @@ void tetMeshOptimisation::optimiseUsingVolumeOptimizer()
 
 void tetMeshOptimisation::optimiseBoundaryVolumeOptimizer
 (
+    const label nIterations,
     const bool nonShrinking
 )
 {
@@ -397,7 +410,7 @@ void tetMeshOptimisation::optimiseBoundaryVolumeOptimizer
     const label nThreads(1);
     # endif
 
-    for(label i=0;i<3;++i)
+    for(label i=0;i<nIterations;++i)
     {
         List<LongList<labelledPoint> > newPositions(nThreads);
 
@@ -415,6 +428,10 @@ void tetMeshOptimisation::optimiseBoundaryVolumeOptimizer
             # pragma omp for schedule(dynamic, 5)
             # endif
             forAll(smoothVertex, nodeI)
+            {
+                if( smoothVertex[nodeI] & partTetMesh::LOCKED )
+                    continue;
+
                 if( smoothVertex[nodeI] & partTetMesh::BOUNDARY )
                 {
                     partTetMeshSimplex simplex(tetMesh_, nodeI);
@@ -466,9 +483,6 @@ void tetMeshOptimisation::optimiseBoundaryVolumeOptimizer
 
                             vector n = tri.normal();
                             n /= (mag(n) + VSMALL);
-                            for(direction i=0;i<vector::nComponents;++i)
-                                if( Foam::mag(n[i]) < (100. * SMALL) )
-                                    n[i] = 0.0;
 
                             nt += symm(n * n);
                         }
@@ -513,6 +527,7 @@ void tetMeshOptimisation::optimiseBoundaryVolumeOptimizer
                         np.append(labelledPoint(nodeI, simplex.centrePoint()));
                     }
                 }
+            }
         }
 
         //- update tetMesh
@@ -527,7 +542,10 @@ void tetMeshOptimisation::optimiseBoundaryVolumeOptimizer
     }
 }
 
-void tetMeshOptimisation::optimiseBoundarySurfaceLaplace()
+void tetMeshOptimisation::optimiseBoundarySurfaceLaplace
+(
+    const label nIterations
+)
 {
     const LongList<direction>& smoothVertex = tetMesh_.smoothVertex();
 
@@ -539,7 +557,7 @@ void tetMeshOptimisation::optimiseBoundarySurfaceLaplace()
     const label nThreads(1);
     # endif
 
-    for(label i=0;i<3;++i)
+    for(label i=0;i<nIterations;++i)
     {
         List<LongList<labelledPoint> > newPositions(nThreads);
 
@@ -559,6 +577,9 @@ void tetMeshOptimisation::optimiseBoundarySurfaceLaplace()
             # endif
             forAll(smoothVertex, nodeI)
             {
+                if( smoothVertex[nodeI] & partTetMesh::LOCKED )
+                    continue;
+
                 if( smoothVertex[nodeI] & partTetMesh::BOUNDARY )
                 {
                     partTetMeshSimplex simplex(tetMesh_, nodeI);

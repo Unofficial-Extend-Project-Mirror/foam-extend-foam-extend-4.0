@@ -1,25 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
-    \\  /    A nd           | Web:         http://www.foam-extend.org
-     \\/     M anipulation  | For copyright notice see file Copyright
+  \\      /  F ield         | cfMesh: A library for mesh generation
+   \\    /   O peration     |
+    \\  /    A nd           | Author: Franjo Juretic (franjo.juretic@c-fields.com)
+     \\/     M anipulation  | Copyright (C) Creative Fields, Ltd.
 -------------------------------------------------------------------------------
 License
-    This file is part of foam-extend.
+    This file is part of cfMesh.
 
-    foam-extend is free software: you can redistribute it and/or modify it
+    cfMesh is free software; you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation, either version 3 of the License, or (at your
+    Free Software Foundation; either version 3 of the License, or (at your
     option) any later version.
 
-    foam-extend is distributed in the hope that it will be useful, but
-    WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    General Public License for more details.
+    cfMesh is distributed in the hope that it will be useful, but WITHOUT
+    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+    for more details.
 
     You should have received a copy of the GNU General Public License
-    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
+    along with cfMesh.  If not, see <http://www.gnu.org/licenses/>.
 
 Description
 
@@ -204,9 +204,9 @@ inline point partTet::centroid(const PointField& points) const
     return p;
 }
 
-inline edgeList partTet::edges() const
+inline FixedList<edge, 6> partTet::edges() const
 {
-    edgeList edges(6);
+    FixedList<edge, 6> edges;
     edges[0] = edge(data_[0], data_[1]);
     edges[1] = edge(data_[0], data_[2]);
     edges[2] = edge(data_[0], data_[3]);
@@ -215,6 +215,42 @@ inline edgeList partTet::edges() const
     edges[5] = edge(data_[3], data_[2]);
 
     return edges;
+}
+
+inline edge partTet::getEdge(const label eI) const
+{
+    switch( eI )
+    {
+        case 0:
+        {
+            return edge(data_[0], data_[1]);
+        } break;
+        case 1:
+        {
+            return edge(data_[0], data_[2]);
+        } break;
+        case 2:
+        {
+            return edge(data_[0], data_[3]);
+        } break;
+        case 3:
+        {
+            return edge(data_[3], data_[1]);
+        } break;
+        case 4:
+        {
+            return edge(data_[1], data_[2]);
+        } break;
+        case 5:
+        {
+            return edge(data_[3], data_[2]);
+        } break;
+    }
+
+    FatalErrorIn("inline edge partTet::getEdge(const label) const")
+        << "Invalid edge index given " << eI << abort(FatalError);
+
+    return edge();
 }
 
 inline label partTet::operator[](const label i) const
@@ -226,6 +262,25 @@ inline void partTet::operator=(const partTet& tet)
 {
     for(label i=0;i<4;++i)
         data_[i] = tet.data_[i];
+}
+
+inline bool partTet::operator==(const partTet& tet) const
+{
+    if( this->a() != tet.a() )
+        return false;
+    if( this->b() != tet.b() )
+        return false;
+    if( this->c() != tet.c() )
+        return false;
+    if( this->d() != tet.d() )
+        return false;
+
+    return true;
+}
+
+inline bool partTet::operator!=(const partTet& tet) const
+{
+    return !this->operator==(tet);
 }
 
 // * * * * * * * * * * * * * * * Ostream Operator  * * * * * * * * * * * * * //
@@ -240,7 +295,6 @@ inline Ostream& operator<<(Ostream& os, const partTet& t)
 
     return os;
 }
-
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

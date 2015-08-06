@@ -1,0 +1,78 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+|    _ _ _ _    |                                                              |
+| //         \\ | Creative Fields cfMeshPRO                                  |
+| | cfMeshPRO | |                                                              |
+| \\ _ _ _ _ // | Version: 0.0.99                                            |
+|               | Web: www.c-fields.com e-mail: support@c-fields.com           |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+version	2;
+format	ascii;
+class	dictionary;
+location	"system";
+object	meshDict;
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+maxCellSize	40;
+surfaceFile	"bunnyWrapped.stl";
+
+objectRefinements
+{
+
+ear1
+{
+cellSize	20.1;
+p0	( -100 1873 -320 );
+p1	( -560 1400 0 );
+radius0	200;
+radius1	200;
+type	cone;
+}
+
+ear2
+{
+cellSize	20.1;
+p0	( -650 1873 -620 );
+p1	( -670 1300 0 );
+radius0	200;
+radius1	200;
+type	cone;
+}
+
+/*
+insideTheBody
+{
+cellSize	20.1;
+centre	( 0 700 0 );
+radius	50;
+refinementThickness	50;
+type	sphere;
+}
+
+muzzlePiercing
+{
+cellSize	20.1;
+p0	( -750 1000 450 );
+p1	( -750 1500 450 );
+type	line;
+}
+
+tail
+{
+cellSize	20.1;
+centre	( 500 500 150 );
+lengthX	100;
+lengthY	150;
+lengthZ	200;
+type	box;
+}
+*/
+}
+
+workflowControls
+{
+}
+
+// ************************************************************************* //

@@ -1,25 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
-    \\  /    A nd           | Web:         http://www.foam-extend.org
-     \\/     M anipulation  | For copyright notice see file Copyright
+  \\      /  F ield         | cfMesh: A library for mesh generation
+   \\    /   O peration     |
+    \\  /    A nd           | Author: Franjo Juretic (franjo.juretic@c-fields.com)
+     \\/     M anipulation  | Copyright (C) Creative Fields, Ltd.
 -------------------------------------------------------------------------------
 License
-    This file is part of foam-extend.
+    This file is part of cfMesh.
 
-    foam-extend is free software: you can redistribute it and/or modify it
+    cfMesh is free software; you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation, either version 3 of the License, or (at your
+    Free Software Foundation; either version 3 of the License, or (at your
     option) any later version.
 
-    foam-extend is distributed in the hope that it will be useful, but
-    WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    General Public License for more details.
+    cfMesh is distributed in the hope that it will be useful, but WITHOUT
+    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+    for more details.
 
     You should have received a copy of the GNU General Public License
-    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
+    along with cfMesh.  If not, see <http://www.gnu.org/licenses/>.
 
 Description
 
@@ -143,6 +143,10 @@ void triSurfaceRemoveFacets::removeFacets()
 
     //- update feature edges
     const edgeLongList& featureEdges = surf_.featureEdges();
+    const VRWGraph& pointEdges = surf_.pointEdges();
+    const edgeLongList& edges = surf_.edges();
+    const VRWGraph& edgeFacets = surf_.edgeFacets();
+
     label edgeCounter(0);
     labelLongList newFeatureEdgeLabel(featureEdges.size(), -1);
 
@@ -151,6 +155,34 @@ void triSurfaceRemoveFacets::removeFacets()
         const edge& e = featureEdges[feI];
 
         if( (newPointLabel[e.start()] < 0) || (newPointLabel[e.end()] < 0) )
+            continue;
+
+        //- find global edge label
+        label eI(-1);
+        forAllRow(pointEdges, e.start(), peI)
+        {
+            const label eJ = pointEdges(e.start(), peI);
+            if( edges[eJ] == e )
+            {
+                eI = eJ;
+                break;
+            }
+        }
+
+        if( eI < 0 )
+            continue;
+
+        //- check if the edge is attached to at least one triangle
+        bool foundTriangle(false);
+        forAllRow(edgeFacets, eI, efI)
+        {
+            if( newFacetLabel[edgeFacets(eI, efI)] >= 0 )
+            {
+                foundTriangle = true;
+                break;
+            }
+        }
+        if( !foundTriangle )
             continue;
 
         newFeatureEdgeLabel[feI] = edgeCounter++;

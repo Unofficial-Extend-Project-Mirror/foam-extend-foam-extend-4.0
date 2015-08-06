@@ -1,25 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
-    \\  /    A nd           | Web:         http://www.foam-extend.org
-     \\/     M anipulation  | For copyright notice see file Copyright
+  \\      /  F ield         | cfMesh: A library for mesh generation
+   \\    /   O peration     |
+    \\  /    A nd           | Author: Franjo Juretic (franjo.juretic@c-fields.com)
+     \\/     M anipulation  | Copyright (C) Creative Fields, Ltd.
 -------------------------------------------------------------------------------
 License
-    This file is part of foam-extend.
+    This file is part of cfMesh.
 
-    foam-extend is free software: you can redistribute it and/or modify it
+    cfMesh is free software; you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation, either version 3 of the License, or (at your
+    Free Software Foundation; either version 3 of the License, or (at your
     option) any later version.
 
-    foam-extend is distributed in the hope that it will be useful, but
-    WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    General Public License for more details.
+    cfMesh is distributed in the hope that it will be useful, but WITHOUT
+    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+    for more details.
 
     You should have received a copy of the GNU General Public License
-    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
+    along with cfMesh.  If not, see <http://www.gnu.org/licenses/>.
 
 Description
 
@@ -59,6 +59,9 @@ void meshOptimizer::laplaceSmoother::laplacian
         forAll(smoothPoints, i)
         {
             const label pointI = smoothPoints[i];
+
+            if( vertexLocation_[pointI] & LOCKED )
+                continue;
 
             if( vertexLocation_[pointI] & PARALLELBOUNDARY )
             {
@@ -103,6 +106,9 @@ void meshOptimizer::laplaceSmoother::laplacianSurface
         forAll(smoothPoints, i)
         {
             const label pointI = smoothPoints[i];
+
+            if( vertexLocation_[pointI] & LOCKED )
+                continue;
 
             if( vertexLocation_[pointI] & PARALLELBOUNDARY )
             {
@@ -158,6 +164,9 @@ void meshOptimizer::laplaceSmoother::laplacianPC
         {
             const label pointI = smoothPoints[i];
 
+            if( vertexLocation_[pointI] & LOCKED )
+                continue;
+
             if( pointCells.sizeOfRow(pointI) == 0 )
                 continue;
 
@@ -209,6 +218,9 @@ void meshOptimizer::laplaceSmoother::laplacianWPC
         {
             const label pointI = smoothPoints[i];
 
+            if( vertexLocation_[pointI] & LOCKED )
+                continue;
+
             if( pointCells.sizeOfRow(pointI) == 0 )
                 continue;
 
@@ -259,6 +271,9 @@ void meshOptimizer::laplaceSmoother::updateMeshGeometry
     forAll(smoothPoints, i)
     {
         const label pointI = smoothPoints[i];
+
+        if( vertexLocation_[pointI] & LOCKED )
+            continue;
 
         forAllRow(pointCells, pointI, pcI)
         {
@@ -343,8 +358,10 @@ void meshOptimizer::laplaceSmoother::optimizeLaplacian(const label nIterations)
     labelLongList smoothPoints;
 
     forAll(vertexLocation_, pointI)
-    if( vertexLocation_[pointI] & INSIDE )
-        smoothPoints.append(pointI);
+    {
+        if( vertexLocation_[pointI] & INSIDE )
+            smoothPoints.append(pointI);
+    }
 
     laplacian(smoothPoints, nIterations);
 }
@@ -375,8 +392,10 @@ void meshOptimizer::laplaceSmoother::optimizeLaplacianPC
     labelLongList smoothPoints;
 
     forAll(vertexLocation_, pointI)
-    if( vertexLocation_[pointI] & INSIDE )
-        smoothPoints.append(pointI);
+    {
+        if( vertexLocation_[pointI] & INSIDE )
+            smoothPoints.append(pointI);
+    }
 
     laplacianPC(smoothPoints, nIterations);
 }
@@ -398,8 +417,10 @@ void meshOptimizer::laplaceSmoother::optimizeLaplacianWPC
     labelLongList smoothPoints;
 
     forAll(vertexLocation_, pointI)
-    if( vertexLocation_[pointI] & INSIDE )
-        smoothPoints.append(pointI);
+    {
+        if( vertexLocation_[pointI] & INSIDE )
+            smoothPoints.append(pointI);
+    }
 
     laplacianWPC(smoothPoints, nIterations);
 }

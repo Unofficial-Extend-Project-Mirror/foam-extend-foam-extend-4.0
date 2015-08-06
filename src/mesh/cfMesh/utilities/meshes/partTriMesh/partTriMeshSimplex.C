@@ -1,25 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
-    \\  /    A nd           | Web:         http://www.foam-extend.org
-     \\/     M anipulation  | For copyright notice see file Copyright
+  \\      /  F ield         | cfMesh: A library for mesh generation
+   \\    /   O peration     |
+    \\  /    A nd           | Author: Franjo Juretic (franjo.juretic@c-fields.com)
+     \\/     M anipulation  | Copyright (C) Creative Fields, Ltd.
 -------------------------------------------------------------------------------
 License
-    This file is part of foam-extend.
+    This file is part of cfMesh.
 
-    foam-extend is free software: you can redistribute it and/or modify it
+    cfMesh is free software; you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation, either version 3 of the License, or (at your
+    Free Software Foundation; either version 3 of the License, or (at your
     option) any later version.
 
-    foam-extend is distributed in the hope that it will be useful, but
-    WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    General Public License for more details.
+    cfMesh is distributed in the hope that it will be useful, but WITHOUT
+    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+    for more details.
 
     You should have received a copy of the GNU General Public License
-    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
+    along with cfMesh.  If not, see <http://www.gnu.org/licenses/>.
 
 Description
 
@@ -49,8 +49,9 @@ partTriMeshSimplex::partTriMeshSimplex
     const pointField& points = tm.points();
     const LongList<labelledTri>& trias = tm.triangles();
     const VRWGraph& pt = tm.pointTriangles();
-
-    trias_.setSize(pt.sizeOfRow(pI));
+    const LongList<direction>& pType = tm.pointType();
+    
+    //trias_.setSize(pt.sizeOfRow(pI));
     label counter(0);
 
     Map<label> addr(2*pt.sizeOfRow(pI));
@@ -68,11 +69,11 @@ partTriMeshSimplex::partTriMeshSimplex
                 ++counter;
             }
         }
-
+        
         # ifdef DEBUGSmooth
         Info << "Tet " << tetI << " is " << tet << endl;
         # endif
-
+        
         label pos(-1);
         for(label i=0;i<3;++i)
             if( tri[i] == pI )
@@ -81,19 +82,32 @@ partTriMeshSimplex::partTriMeshSimplex
                 break;
             }
 
+        //- avoid using triangle serving as barriers for other points
+        if( !(pType[tri[2]] & partTriMesh::FACECENTRE) && (pos != 0) )
+            continue;
+
         switch( pos )
         {
             case 0:
             {
-                trias_[tI] = triFace(addr[tri[0]], addr[tri[1]], addr[tri[2]]);
+                trias_.append
+                (
+                    triFace(addr[tri[0]], addr[tri[1]], addr[tri[2]])
+                );
             } break;
             case 1:
             {
-                trias_[tI] = triFace(addr[tri[1]], addr[tri[2]], addr[tri[0]]);
+                trias_.append
+                (
+                    triFace(addr[tri[1]], addr[tri[2]], addr[tri[0]])
+                );
             } break;
             case 2:
             {
-                trias_[tI] = triFace(addr[tri[2]], addr[tri[0]], addr[tri[1]]);
+                trias_.append
+                (
+                    triFace(addr[tri[2]], addr[tri[0]], addr[tri[1]])
+                );
             } break;
             default:
             {
@@ -106,10 +120,19 @@ partTriMeshSimplex::partTriMeshSimplex
             }
         }
     }
+
+    # ifdef DEBUGSmooth
+    Info << "Simplex at point " << pI << " points " << pts_ << endl;
+    Info << "Simplex at point " << pI << " triangles " << trias_ << endl;
+    # endif
+
+    if( pts_.size() == 0 || trias_.size() == 0 )
+        FatalError << "Simplex at point " << pI << " is not valid "
+                   << pts_ << " triangles " << trias_ << abort(FatalError);
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
+    
 partTriMeshSimplex::~partTriMeshSimplex()
 {}
 

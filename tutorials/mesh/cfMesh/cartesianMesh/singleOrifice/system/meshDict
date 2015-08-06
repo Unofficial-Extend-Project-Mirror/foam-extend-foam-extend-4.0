@@ -25,6 +25,18 @@ boundaryCellSize 1.0;
 
 minCellSize 0.50;
 
+anisotropicSources
+{
+    Plane 
+    {
+        type plane;
+        origin (0 0 -20);
+	normal (0 0 1);
+	scalingDistance 45;
+        scalingFactor 2;
+    }
+}
+
 localRefinement
 {
     "orificeRegion.*"

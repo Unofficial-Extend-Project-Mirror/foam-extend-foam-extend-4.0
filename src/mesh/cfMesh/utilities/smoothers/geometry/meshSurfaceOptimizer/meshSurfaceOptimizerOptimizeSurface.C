@@ -1,25 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
-    \\  /    A nd           | Web:         http://www.foam-extend.org
-     \\/     M anipulation  | For copyright notice see file Copyright
+  \\      /  F ield         | cfMesh: A library for mesh generation
+   \\    /   O peration     |
+    \\  /    A nd           | Author: Franjo Juretic (franjo.juretic@c-fields.com)
+     \\/     M anipulation  | Copyright (C) Creative Fields, Ltd.
 -------------------------------------------------------------------------------
 License
-    This file is part of foam-extend.
+    This file is part of cfMesh.
 
-    foam-extend is free software: you can redistribute it and/or modify it
+    cfMesh is free software; you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation, either version 3 of the License, or (at your
+    Free Software Foundation; either version 3 of the License, or (at your
     option) any later version.
 
-    foam-extend is distributed in the hope that it will be useful, but
-    WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    General Public License for more details.
+    cfMesh is distributed in the hope that it will be useful, but WITHOUT
+    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+    for more details.
 
     You should have received a copy of the GNU General Public License
-    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
+    along with cfMesh.  If not, see <http://www.gnu.org/licenses/>.
 
 Description
 
@@ -36,6 +36,7 @@ Description
 #include "meshSurfaceMapper2D.H"
 #include "polyMeshGen2DEngine.H"
 #include "polyMeshGenAddressing.H"
+#include "polyMeshGenChecks.H"
 #include "labelledPoint.H"
 #include "FIFOStack.H"
 
@@ -74,7 +75,7 @@ label meshSurfaceOptimizer::findInvertedVertices
 
     //- check the vertices at the surface
     //- mark the ones where the mesh is tangled
-    meshSurfaceCheckInvertedVertices vrtCheck(surfaceEngine_, smoothVertex);
+    meshSurfaceCheckInvertedVertices vrtCheck(*partitionerPtr_, smoothVertex);
     const labelHashSet& inverted = vrtCheck.invertedVertices();
 
     smoothVertex = false;
@@ -160,7 +161,7 @@ void meshSurfaceOptimizer::smoothEdgePoints
     const labelLongList& procEdgePoints
 )
 {
-    DynList<LongList<labelledPoint> > newPositions(1);
+    List<LongList<labelledPoint> > newPositions(1);
     # ifdef USE_OMP
     newPositions.setSize(omp_get_num_procs());
     # endif
@@ -184,7 +185,7 @@ void meshSurfaceOptimizer::smoothEdgePoints
         {
             const label bpI = edgePoints[i];
 
-            if( vertexType_[bpI] & PROCBND )
+            if( vertexType_[bpI] & (PROCBND | LOCKED) )
                 continue;
 
             newPos.append(labelledPoint(bpI, newEdgePositionLaplacian(bpI)));
@@ -217,7 +218,7 @@ void meshSurfaceOptimizer::smoothLaplacianFC
     const bool transform
 )
 {
-    DynList<LongList<labelledPoint> > newPositions(1);
+    List<LongList<labelledPoint> > newPositions(1);
     # ifdef USE_OMP
     newPositions.setSize(omp_get_num_procs());
     # endif
@@ -240,7 +241,7 @@ void meshSurfaceOptimizer::smoothLaplacianFC
         {
             const label bpI = selectedPoints[i];
 
-            if( vertexType_[bpI] & PROCBND )
+            if( vertexType_[bpI] & (PROCBND | LOCKED) )
                 continue;
 
             newPos.append
@@ -280,7 +281,8 @@ void meshSurfaceOptimizer::smoothLaplacianFC
 
 void meshSurfaceOptimizer::smoothSurfaceOptimizer
 (
-    const labelLongList& selectedPoints
+    const labelLongList& selectedPoints,
+    const labelLongList& selectedProcPoints
 )
 {
     //- create partTriMesh is it is not yet present
@@ -312,6 +314,10 @@ void meshSurfaceOptimizer::smoothSurfaceOptimizer
 
         surfaceModifier.moveBoundaryVertexNoUpdate(bpI, newPositions[i]);
     }
+
+    //- ensure that vertices at inter-processor boundaries are at the same
+    //- location at all processors
+    surfaceModifier.syncVerticesAtParallelBoundaries(selectedProcPoints);
 
     //- update geometry addressing for moved points
     surfaceModifier.updateGeometry(selectedPoints);
@@ -349,10 +355,18 @@ bool meshSurfaceOptimizer::untangleSurface
     # pragma omp parallel for schedule(dynamic, 50)
     # endif
     forAll(selectedBoundaryPoints, i)
+    {
+        if( vertexType_[selectedBoundaryPoints[i]] & LOCKED )
+            continue;
+
         smoothVertex[selectedBoundaryPoints[i]] = true;
+    }
 
     meshSurfaceEngineModifier surfaceModifier(surfaceEngine_);
-    meshSurfaceMapper mapper(surfaceEngine_, meshOctree_);
+
+    meshSurfaceMapper* mapperPtr = NULL;
+    if( octreePtr_ )
+        mapperPtr = new meshSurfaceMapper(*partitionerPtr_, *octreePtr_);
 
     bool remapVertex(true);
     label nInvertedTria;
@@ -473,8 +487,8 @@ bool meshSurfaceOptimizer::untangleSurface
 
             //- smooth edge vertices
             smoothEdgePoints(movedEdgePoints, procEdgePoints);
-            if( remapVertex )
-                mapper.mapEdgeNodes(movedEdgePoints);
+            if( remapVertex && mapperPtr )
+                mapperPtr->mapEdgeNodes(movedEdgePoints);
             surfaceModifier.updateGeometry(movedEdgePoints);
 
             //- use laplacian smoothing
@@ -482,10 +496,10 @@ bool meshSurfaceOptimizer::untangleSurface
             surfaceModifier.updateGeometry(movedPoints);
 
             //- use surface optimizer
-            smoothSurfaceOptimizer(movedPoints);
+            smoothSurfaceOptimizer(movedPoints, procBndPoints);
 
-            if( remapVertex )
-                mapper.mapVerticesOntoSurface(movedPoints);
+            if( remapVertex && mapperPtr )
+                mapperPtr->mapVerticesOntoSurface(movedPoints);
 
             //- update normals and other geometric data
             surfaceModifier.updateGeometry(movedPoints);
@@ -494,7 +508,7 @@ bool meshSurfaceOptimizer::untangleSurface
 
         if( nInvertedTria > 0 )
         {
-            //- use the combination with the minimu number of inverted points
+            //- use the combination with the minimum number of inverted points
             meshSurfaceEngineModifier sMod(surfaceEngine_);
             forAll(minInvertedPoints, bpI)
                 sMod.moveBoundaryVertexNoUpdate(bpI, minInvertedPoints[bpI]);
@@ -519,8 +533,8 @@ bool meshSurfaceOptimizer::untangleSurface
 
             smoothLaplacianFC(movedPoints, procBndPoints, false);
 
-            if( remapVertex )
-                mapper.mapVerticesOntoSurface(movedPoints);
+            if( remapVertex && mapperPtr )
+                mapperPtr->mapVerticesOntoSurface(movedPoints);
 
             //- update normals and other geometric data
             surfaceModifier.updateGeometry(movedPoints);
@@ -530,6 +544,25 @@ bool meshSurfaceOptimizer::untangleSurface
         }
 
     } while( nInvertedTria && (++nGlobalIter < 10) );
+
+    deleteDemandDrivenData(mapperPtr);
+
+    if( nInvertedTria != 0 )
+    {
+        //- the procedure has given up without success
+        //- there exist some remaining inverted faces in the mesh
+        polyMeshGen& mesh =
+            const_cast<polyMeshGen&>(surfaceEngine_.mesh());
+
+        label subsetId = mesh.pointSubsetIndex(badPointsSubsetName_);
+        if( subsetId >= 0 )
+            mesh.removePointSubset(subsetId);
+        subsetId = mesh.addPointSubset(badPointsSubsetName_);
+
+        forAll(smoothVertex, bpI)
+            if( smoothVertex[bpI] )
+                mesh.addPointToSubset(subsetId, bPoints[bpI]);
+    }
 
     Info << "Finished untangling the surface of the volume mesh" << endl;
 
@@ -558,9 +591,16 @@ void meshSurfaceOptimizer::optimizeSurface(const label nIterations)
     surfaceEngine_.pointNormals();
     surfaceEngine_.boundaryPointEdges();
 
-    labelLongList procBndPoints, edgePoints;
+    meshSurfaceMapper* mapperPtr = NULL;
+    if( octreePtr_ )
+        mapperPtr = new meshSurfaceMapper(*partitionerPtr_, *octreePtr_);
+
+    labelLongList procBndPoints, edgePoints, partitionPoints, procPoints;
     forAll(bPoints, bpI)
     {
+        if( vertexType_[bpI] & LOCKED )
+            continue;
+
         if( vertexType_[bpI] & EDGE )
         {
             edgePoints.append(bpI);
@@ -568,9 +608,14 @@ void meshSurfaceOptimizer::optimizeSurface(const label nIterations)
             if( vertexType_[bpI] & PROCBND )
                 procBndPoints.append(bpI);
         }
-    }
+        else if( vertexType_[bpI] & PARTITION )
+        {
+            partitionPoints.append(bpI);
 
-    meshSurfaceMapper mapper(*partitionerPtr_, meshOctree_);
+            if( vertexType_[bpI] & PROCBND )
+                procPoints.append(bpI);
+        }
+    }
 
     //- optimize edge vertices
     Info << "Optimizing edges. Iteration:" << flush;
@@ -583,68 +628,26 @@ void meshSurfaceOptimizer::optimizeSurface(const label nIterations)
         smoothEdgePoints(edgePoints, procBndPoints);
 
         //- project vertices back onto the boundary
-        mapper.mapEdgeNodes(edgePoints);
+        if( mapperPtr )
+            mapperPtr->mapEdgeNodes(edgePoints);
 
         //- update the geometry information
         bMod.updateGeometry(edgePoints);
     }
     Info << endl;
 
+    //- delete the mapper
+    deleteDemandDrivenData(mapperPtr);
+
     //- optimize positions of surface vertices which are not on surface edges
     Info << "Optimizing surface vertices. Iteration:";
     for(label i=0;i<nIterations;++i)
     {
-        procBndPoints.clear();
+        smoothLaplacianFC(partitionPoints, procPoints, true);
 
-        pointField newPositions(bPoints.size());
+        smoothSurfaceOptimizer(partitionPoints, procPoints);
 
         Info << "." << flush;
-
-        meshSurfaceEngineModifier bMod(surfaceEngine_);
-        # ifdef USE_OMP
-        # pragma omp parallel if( vertexType_.size() > 100 )
-        # endif
-        {
-            # ifdef USE_OMP
-            # pragma omp for schedule(dynamic, 10)
-            # endif
-            forAll(bPoints, bpI)
-            {
-                if( vertexType_[bpI] & PARTITION )
-                {
-                    if( vertexType_[bpI] & PROCBND )
-                    {
-                        # ifdef USE_OMP
-                        # pragma omp critical
-                        # endif
-                        {
-                            procBndPoints.append(bpI);
-                        }
-
-                        continue;
-                    }
-
-                    newPositions[bpI] = newPositionLaplacianFC(bpI, true);
-                }
-            }
-        }
-
-        if( Pstream::parRun() )
-        {
-            nodeDisplacementLaplacianFCParallel(procBndPoints, true);
-        }
-
-        # ifdef USE_OMP
-        # pragma omp parallel for schedule(dynamic, 100)
-        # endif
-        forAll(newPositions, bpI)
-        {
-            if( vertexType_[bpI] == PARTITION )
-                bMod.moveBoundaryVertexNoUpdate(bpI, newPositions[bpI]);
-        }
-
-        //- update fields calculated from points
-        bMod.updateGeometry();
     }
 
     Info << endl;
@@ -698,7 +701,9 @@ void meshSurfaceOptimizer::optimizeSurface2D(const label nIterations)
         }
     }
 
-    meshSurfaceMapper2D mapper(surfaceEngine_, meshOctree_);
+    meshSurfaceMapper2D* mapperPtr = NULL;
+    if( octreePtr_ )
+        mapperPtr = new meshSurfaceMapper2D(surfaceEngine_, *octreePtr_);
 
     //- optimize edge vertices
     meshSurfaceEngineModifier bMod(surfaceEngine_);
@@ -714,7 +719,7 @@ void meshSurfaceOptimizer::optimizeSurface2D(const label nIterations)
         mesh2DEngine.correctPoints();
 
         //- map boundary edges to the surface
-        mapper.mapVerticesOntoSurfacePatches(activeEdges);
+        mapperPtr->mapVerticesOntoSurfacePatches(activeEdges);
 
         //- update normal, centres, etc, after the surface has been modified
         bMod.updateGeometry(updatePoints);
@@ -737,7 +742,7 @@ void meshSurfaceOptimizer::optimizeSurface2D(const label nIterations)
     {
         Info << "." << flush;
 
-        smoothSurfaceOptimizer(movedPoints);
+        smoothSurfaceOptimizer(movedPoints, procBndPoints);
 
         //- move the points which are not at minimum z coordinate
         mesh2DEngine.correctPoints();
@@ -747,6 +752,8 @@ void meshSurfaceOptimizer::optimizeSurface2D(const label nIterations)
     }
 
     Info << endl;
+
+    deleteDemandDrivenData(mapperPtr);
 }
 
 void meshSurfaceOptimizer::untangleSurface2D()
@@ -777,7 +784,14 @@ void meshSurfaceOptimizer::untangleSurface2D()
     do
     {
         labelHashSet badFaces;
-        const label nBadFaces = findBadFaces(badFaces, changedFace);
+        const label nBadFaces =
+            polyMeshGenChecks::findBadFaces
+            (
+                mesh,
+                badFaces,
+                false,
+                &changedFace
+            );
 
         Info << "Iteration " << iterationI
              << ". Number of bad faces " << nBadFaces << endl;
@@ -884,7 +898,7 @@ void meshSurfaceOptimizer::untangleSurface2D()
 
             bMod.updateGeometry(edgePts);
 
-            smoothSurfaceOptimizer(movedPts);
+            smoothSurfaceOptimizer(movedPts, procBndPts);
 
             bMod.updateGeometry(movedPts);
         }

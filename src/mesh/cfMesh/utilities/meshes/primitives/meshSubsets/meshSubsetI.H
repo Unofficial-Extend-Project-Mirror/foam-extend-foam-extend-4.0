@@ -1,31 +1,32 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
-    \\  /    A nd           | Web:         http://www.foam-extend.org
-     \\/     M anipulation  | For copyright notice see file Copyright
+  \\      /  F ield         | cfMesh: A library for mesh generation
+   \\    /   O peration     |
+    \\  /    A nd           | Author: Franjo Juretic (franjo.juretic@c-fields.com)
+     \\/     M anipulation  | Copyright (C) Creative Fields, Ltd.
 -------------------------------------------------------------------------------
 License
-    This file is part of foam-extend.
+    This file is part of cfMesh.
 
-    foam-extend is free software: you can redistribute it and/or modify it
+    cfMesh is free software; you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation, either version 3 of the License, or (at your
+    Free Software Foundation; either version 3 of the License, or (at your
     option) any later version.
 
-    foam-extend is distributed in the hope that it will be useful, but
-    WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    General Public License for more details.
+    cfMesh is distributed in the hope that it will be useful, but WITHOUT
+    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+    for more details.
 
     You should have received a copy of the GNU General Public License
-    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
+    along with cfMesh.  If not, see <http://www.gnu.org/licenses/>.
 
 Description
 
 \*---------------------------------------------------------------------------*/
 
 #include "meshSubset.H"
+#include "labelList.H"
 #include "IOstreams.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -75,8 +76,7 @@ inline meshSubset::meshSubset(const meshSubset& ms)
     type_(ms.type_),
     data_()
 {
-    forAllConstIter(HashSet<label>, ms.data_, it)
-        data_.insert(it.key());
+    data_ = ms.data_;
 }
 
 inline meshSubset::meshSubset(Istream& is)
@@ -109,8 +109,8 @@ inline void meshSubset::containedElements(ListType& l) const
     l.setSize(data_.size());
 
     label counter(0);
-    forAllConstIter(HashSet<label>, data_, it)
-        l[counter++] = it.key();
+    forAllConstIter(std::set<label>, data_, it)
+        l[counter++] = *it;
 }
 
 inline void meshSubset::addElement(const label elmt)
@@ -126,39 +126,35 @@ inline void meshSubset::removeElement(const label elmt)
 template<class ListType>
 inline void meshSubset::updateSubset(const ListType& newLabels)
 {
-    HashSet<label> newData;
+    std::set<label> newData;
 
-    forAllConstIter(HashSet<label>, data_, it)
+    forAllConstIter(std::set<label>, data_, it)
     {
-        if( newLabels[it.key()] < 0 )
+        if( newLabels[*it] < 0 )
             continue;
 
-        newData.insert(newLabels[it.key()]);
+        newData.insert(newLabels[*it]);
     }
 
-    data_.clear();
-    forAllConstIter(HashSet<label>, newData, it)
-        data_.insert(it.key());
+    data_ = newData;
 }
 
 inline void meshSubset::updateSubset(const VRWGraph& newLabels)
 {
-    HashSet<label> newData;
+    std::set<label> newData;
 
-    forAllConstIter(HashSet<label>, data_, it)
+    forAllConstIter(std::set<label>, data_, it)
     {
-        forAllRow(newLabels, it.key(), i)
-            newData.insert(newLabels(it.key(), i));
+        forAllRow(newLabels, *it, i)
+            newData.insert(newLabels(*it, i));
     }
 
-    data_.clear();
-    forAllConstIter(HashSet<label>, newData, it)
-        data_.insert(it.key());
+    data_ = newData;
 }
 
 inline bool meshSubset::contains(const label elmt) const
 {
-    return data_.found(elmt);
+    return (data_.find(elmt) != data_.end());
 }
 
 inline void meshSubset::operator=(const meshSubset& ms)
@@ -167,8 +163,7 @@ inline void meshSubset::operator=(const meshSubset& ms)
     type_ = ms.type_;
 
     data_.clear();
-    forAllConstIter(HashSet<label>, ms.data_, it)
-        data_.insert(it.key());
+    data_ = ms.data_;
 }
 
 inline bool meshSubset::operator==(const meshSubset& ms) const
@@ -178,8 +173,8 @@ inline bool meshSubset::operator==(const meshSubset& ms) const
     if( ms.type_ != ms.type_ )
         return false;
 
-    forAllConstIter(HashSet<label>, data_, it)
-        if( !ms.data_.found(it.key()) )
+    forAllConstIter(std::set<label>, data_, it)
+        if( ms.data_.find(*it) == ms.data_.end() )
             return false;
 
     return true;
@@ -196,7 +191,14 @@ inline Ostream& operator<<(Ostream& os, const meshSubset& sel)
 {
     os.check("inline Ostream& operator<<(Ostream&, const meshSubset&)");
 
-    os << sel.name_ << nl << sel.type_ << nl << sel.data_;
+    os << sel.name_ << nl << sel.type_;
+
+    labelList data(sel.data_.size());
+    label counter(0);
+    forAllConstIter(std::set<label>, sel.data_, it)
+        data[counter++] = *it;
+
+    os << nl << data;
 
     return os;
 }
@@ -205,7 +207,12 @@ inline Istream& operator>>(Istream& is, meshSubset& sel)
 {
     is.check("friend Istream& operator>>(Istream&, meshSubset&)");
 
-    is >> sel.name_ >> sel.type_ >> sel.data_;
+    labelList data;
+    is >> sel.name_ >> sel.type_ >> data;
+
+    sel.data_.clear();
+    forAll(data, i)
+        sel.data_.insert(data[i]);
 
     is.check("friend Istream& operator>>(Istream&, meshSubset&)");
 

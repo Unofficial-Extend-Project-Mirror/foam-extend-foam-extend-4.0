@@ -1,25 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
-    \\  /    A nd           | Web:         http://www.foam-extend.org
-     \\/     M anipulation  | For copyright notice see file Copyright
+  \\      /  F ield         | cfMesh: A library for mesh generation
+   \\    /   O peration     |
+    \\  /    A nd           | Author: Franjo Juretic (franjo.juretic@c-fields.com)
+     \\/     M anipulation  | Copyright (C) Creative Fields, Ltd.
 -------------------------------------------------------------------------------
 License
-    This file is part of foam-extend.
+    This file is part of cfMesh.
 
-    foam-extend is free software: you can redistribute it and/or modify it
+    cfMesh is free software; you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation, either version 3 of the License, or (at your
+    Free Software Foundation; either version 3 of the License, or (at your
     option) any later version.
 
-    foam-extend is distributed in the hope that it will be useful, but
-    WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    General Public License for more details.
+    cfMesh is distributed in the hope that it will be useful, but WITHOUT
+    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+    for more details.
 
     You should have received a copy of the GNU General Public License
-    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
+    along with cfMesh.  If not, see <http://www.gnu.org/licenses/>.
 
 \*---------------------------------------------------------------------------*/
 
@@ -32,18 +32,18 @@ void Foam::FRWGraph<T, width>::checkIndex(const label i, const label j) const
         (
             "void Foam::FRWGraph<T,width>::"
             "checkIndex(const label i, const label j) const"
-        ) << "Row index " << Foam::label(i)
-            << " is not in range " << Foam::label(0)
+        ) << "Row index " << i
+            << " is not in range " << 0
             << " and " << nRows_ << abort(FatalError);
     }
-
+    
     if( (j < 0) || (j >= width) )
         FatalErrorIn
         (
             "void Foam::FRWGraph<T,width>::"
-            "checkIndex(label const i) const"
-        ) << "Column index " << Foam::label(j)
-            << " is not in range " << Foam::label(0)
+            "checkIndex(const label i, const label j) const"
+        ) << "Column index " << j
+            << " is not in range " << 0
             << " and " << width << abort(FatalError);
 }
 
@@ -55,8 +55,7 @@ inline Foam::FRWGraph<T,width>::FRWGraph()
 :
     data_(),
     nRows_(0)
-{
-}
+{}
 
 //- Construct given size
 template<class T, Foam::label width>
@@ -67,8 +66,7 @@ inline Foam::FRWGraph<T,width>::FRWGraph
 :
     data_(s * width),
     nRows_(s)
-{
-}
+{}
 
 
 //- Construct given size
@@ -81,8 +79,7 @@ inline Foam::FRWGraph<T,width>::FRWGraph
 :
     data_(s * width, t),
     nRows_(s)
-{
-}
+{}
 
 template<class T, Foam::label width>
 inline Foam::FRWGraph<T,width>::FRWGraph
@@ -92,13 +89,11 @@ inline Foam::FRWGraph<T,width>::FRWGraph
 :
     data_(ol.data_),
     nRows_(ol.nRows_)
-{
-}
+{}
 
 template<class T, Foam::label width>
 inline Foam::FRWGraph<T,width>::~FRWGraph()
-{
-}
+{}
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
@@ -163,7 +158,7 @@ inline bool Foam::FRWGraph<T,width>::contains
     for(register label i=0;i<width;++i)
         if( data_[start+i] == e )
             return true;
-
+    
     return false;
 }
 
@@ -178,7 +173,7 @@ inline Foam::label Foam::FRWGraph<T,width>::containsAtPosition
     for(register label i=0;i<width;++i)
         if( data_[start+i] == e )
             return i;
-
+    
     return -1;
 }
 
@@ -193,7 +188,7 @@ inline const T& Foam::FRWGraph<T,width>::operator()
     #ifdef FULLDEBUG
     checkIndex(i, j);
     #endif
-
+        
     return data_[i * width + j];
 }
 
@@ -206,7 +201,7 @@ inline T& Foam::FRWGraph<T,width>::operator()
     #ifdef FULLDEBUG
     checkIndex(i, j);
     #endif
-
+        
     return data_[i * width + j];
 }
 
@@ -217,6 +212,7 @@ inline void Foam::FRWGraph<T,width>::operator=
 )
 {
     data_ = l.data_;
+    nRows_ = l.nRows_;
 }
 
 

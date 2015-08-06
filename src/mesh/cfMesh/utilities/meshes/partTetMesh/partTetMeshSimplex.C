@@ -1,25 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
-    \\  /    A nd           | Web:         http://www.foam-extend.org
-     \\/     M anipulation  | For copyright notice see file Copyright
+  \\      /  F ield         | cfMesh: A library for mesh generation
+   \\    /   O peration     |
+    \\  /    A nd           | Author: Franjo Juretic (franjo.juretic@c-fields.com)
+     \\/     M anipulation  | Copyright (C) Creative Fields, Ltd.
 -------------------------------------------------------------------------------
 License
-    This file is part of foam-extend.
+    This file is part of cfMesh.
 
-    foam-extend is free software: you can redistribute it and/or modify it
+    cfMesh is free software; you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation, either version 3 of the License, or (at your
+    Free Software Foundation; either version 3 of the License, or (at your
     option) any later version.
 
-    foam-extend is distributed in the hope that it will be useful, but
-    WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    General Public License for more details.
+    cfMesh is distributed in the hope that it will be useful, but WITHOUT
+    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+    for more details.
 
     You should have received a copy of the GNU General Public License
-    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
+    along with cfMesh.  If not, see <http://www.gnu.org/licenses/>.
 
 Description
 
@@ -49,7 +49,7 @@ partTetMeshSimplex::partTetMeshSimplex
     const LongList<point>& points = tm.points();
     const LongList<partTet>& tets = tm.tets();
     const VRWGraph& pt = tm.pointTets();
-
+    
     tets_.setSize(pt.sizeOfRow(pI));
     label counter(0);
 
@@ -67,11 +67,11 @@ partTetMeshSimplex::partTetMeshSimplex
                 ++counter;
             }
         }
-
+        
         # ifdef DEBUGSmooth
         Info << "Tet " << tetI << " is " << tet << endl;
         # endif
-
+        
         const label pos = tet.whichPosition(pI);
         switch( pos )
         {
@@ -143,12 +143,12 @@ partTetMeshSimplex::partTetMeshSimplex
 {
     tets_.setSize(pt.size());
     label pI(0);
-
+    
     Map<label> addr;
     forAll(pt, tetI)
     {
         const parPartTet& tet = pt[tetI];
-
+        
         label pos(-1);
         for(label i=0;i<4;++i)
         {
@@ -158,11 +158,11 @@ partTetMeshSimplex::partTetMeshSimplex
                 pts_.append(tet[i].coordinates());
                 ++pI;
             }
-
+            
             if( tet[i].pointLabel() == gpI )
                 pos = i;
         }
-
+        
         switch( pos )
         {
             case 0:
@@ -222,8 +222,84 @@ partTetMeshSimplex::partTetMeshSimplex
     }
 }
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+partTetMeshSimplex::partTetMeshSimplex
+(
+    const DynList<point, 128>& pts,
+    const DynList<partTet, 128>& tets,
+    const label pointI
+)
+:
+    pts_(pts),
+    tets_(tets.size())
+{
+    forAll(tets, tetI)
+    {
+        const partTet& tet = tets[tetI];
 
+        const label pos = tet.whichPosition(pointI);
+
+        switch( pos )
+        {
+            case 0:
+            {
+                tets_[tetI] =
+                    partTet
+                    (
+                        tet.b(),
+                        tet.d(),
+                        tet.c(),
+                        tet.a()
+                    );
+            } break;
+            case 1:
+            {
+                tets_[tetI] =
+                    partTet
+                    (
+                        tet.a(),
+                        tet.c(),
+                        tet.d(),
+                        tet.b()
+                    );
+            } break;
+            case 2:
+            {
+                tets_[tetI] =
+                    partTet
+                    (
+                        tet.a(),
+                        tet.d(),
+                        tet.b(),
+                        tet.c()
+                    );
+            } break;
+            case 3:
+            {
+                tets_[tetI] =
+                    partTet
+                    (
+                        tet.a(),
+                        tet.b(),
+                        tet.c(),
+                        tet.d()
+                    );
+            } break;
+            default:
+            {
+                FatalErrorIn
+                (
+                    "partTetMeshSimplex::partTetMeshSimplex"
+                    "(const DynList<point, 128>& pts,"
+                    "const DynList<partTet, 128>& tets, const label pointI)"
+                ) << "Point " << pointI << " is not present in tet" << tet
+                    << abort(FatalError);
+            }
+        }
+    }
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+    
 partTetMeshSimplex::~partTetMeshSimplex()
 {}
 

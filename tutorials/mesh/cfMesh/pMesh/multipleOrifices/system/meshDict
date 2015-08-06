@@ -1,0 +1,130 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                |
+| \\      /  F ield         | cfMesh: A library for mesh generation          | 
+|  \\    /   O peration     |                                                |
+|   \\  /    A nd           | Author: Franjo Juretic                         | 
+|    \\/     M anipulation  | E-mail: franjo.juretic@c-fields.com            |
+\*---------------------------------------------------------------------------*/
+
+FoamFile
+{
+    version   2.0;
+    format    ascii;
+    class     dictionary;
+    location  "system";
+    object    meshDict;
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+surfaceFile "multipleOrifices.stl";
+
+maxCellSize 5.0;
+
+boundaryCellSize 2.0;
+
+localRefinement
+{
+    "orifice01.*"
+    {
+        cellSize 0.1;
+    } 
+
+    "orifice02.*"
+    {
+        cellSize 0.2;
+    }
+
+    "orifice0[3-6].*"
+    {
+        cellSize 0.3;
+    }
+
+    "tubes.*"
+    {
+        cellSize 0.4;
+    }
+}
+
+boundaryLayers
+{
+    nLayers 1;
+
+    thicknessRatio 1.2;
+
+    patchBoundaryLayers
+    {
+        "orifice.*"
+        {
+            nLayers           4;
+
+            thicknessRatio    1.2;
+
+            maxFirstLayerThickness 0.2;
+
+            allowDiscontinuity 0;
+        }
+
+    	"fixedWalls.*"
+        {
+            nLayers           4;
+
+            thicknessRatio    1.2;
+
+            maxFirstLayerThickness 1.0;
+
+            allowDiscontinuity 0;
+        }
+
+	    "tubes.*"
+        {
+            nLayers           4;
+
+            thicknessRatio    1.2;
+
+            maxFirstLayerThickness 1.0;
+
+            allowDiscontinuity 0;
+        }
+    }
+
+    optimiseLayer 1;
+}
+
+renameBoundary
+{
+    defaultName		fixedWalls;
+    defaultType		wall;
+
+    newPatchNames
+    {
+        "inlet.*"
+        {
+            newName     inlet;
+            newType     patch;
+        }
+
+        "outlet.*"
+        {
+            newName     outlet;
+            newType     patch;
+        }
+    }
+}
+
+
+workflowControls
+{
+//stopAfter templateGeneration;
+//stopAfter surfaceTopology;
+//stopAfter surfaceProjection;
+//stopAfter patchAssignment;
+//stopAfter edgeExtraction;
+//stopAfter boundaryLayerGeneration;
+//stopAfter meshOptimisation;
+//stopAfter boundaryLayerRefinement;
+
+//restartFromLatestStep 1;
+}
+     
+// ************************************************************************* //

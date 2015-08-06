@@ -1,25 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
-    \\  /    A nd           | Web:         http://www.foam-extend.org
-     \\/     M anipulation  | For copyright notice see file Copyright
+  \\      /  F ield         | cfMesh: A library for mesh generation
+   \\    /   O peration     |
+    \\  /    A nd           | Author: Franjo Juretic (franjo.juretic@c-fields.com)
+     \\/     M anipulation  | Copyright (C) Creative Fields, Ltd.
 -------------------------------------------------------------------------------
 License
-    This file is part of foam-extend.
+    This file is part of cfMesh.
 
-    foam-extend is free software: you can redistribute it and/or modify it
+    cfMesh is free software; you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation, either version 3 of the License, or (at your
+    Free Software Foundation; either version 3 of the License, or (at your
     option) any later version.
 
-    foam-extend is distributed in the hope that it will be useful, but
-    WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    General Public License for more details.
+    cfMesh is distributed in the hope that it will be useful, but WITHOUT
+    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+    for more details.
 
     You should have received a copy of the GNU General Public License
-    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
+    along with cfMesh.  If not, see <http://www.gnu.org/licenses/>.
 
 Description
 
@@ -402,6 +402,112 @@ inline bool meshOctreeCubeCoordinates::operator>=
         case 2:
         {
             if( curr.posZ_ >= cctr.posZ_ )
+                return true;
+
+            return false;
+        } break;
+    };
+
+    return false;
+}
+
+inline bool meshOctreeCubeCoordinates::operator<
+(
+    const meshOctreeCubeCoordinates& cc
+) const
+{
+    const direction minL = Foam::min(level_, cc.level_);
+    const meshOctreeCubeCoordinates curr = this->reduceToLevel(minL);
+    const meshOctreeCubeCoordinates cctr = cc.reduceToLevel(minL);
+
+    const label resx = curr.posX_ ^ cctr.posX_;
+    const label resy = curr.posY_ ^ cctr.posY_;
+    const label resz = curr.posZ_ ^ cctr.posZ_;
+
+    label max(resx), dir(0);
+    if( (max <= resy) || ((max ^ resy) < resy) )
+    {
+        max = resy;
+        dir = 1;
+    }
+    if( (max <= resz) || ((max ^ resz) < resz) )
+    {
+        max = resz;
+        dir = 2;
+    }
+
+    switch( dir )
+    {
+        case 0:
+        {
+            if( curr.posX_ < cctr.posX_ )
+                return true;
+
+            return false;
+        } break;
+        case 1:
+        {
+            if( curr.posY_ < cctr.posY_ )
+                return true;
+
+            return false;
+        } break;
+        case 2:
+        {
+            if( curr.posZ_ < cctr.posZ_ )
+                return true;
+
+            return false;
+        } break;
+    };
+
+    return false;
+}
+
+inline bool meshOctreeCubeCoordinates::operator>
+(
+    const meshOctreeCubeCoordinates& cc
+) const
+{
+    const direction minL = Foam::min(level_, cc.level_);
+    const meshOctreeCubeCoordinates curr = this->reduceToLevel(minL);
+    const meshOctreeCubeCoordinates cctr = cc.reduceToLevel(minL);
+
+    const label resx = curr.posX_ ^ cctr.posX_;
+    const label resy = curr.posY_ ^ cctr.posY_;
+    const label resz = curr.posZ_ ^ cctr.posZ_;
+
+    label max(resx), dir(0);
+    if( (max <= resy) || ((max ^ resy) < resy) )
+    {
+        max = resy;
+        dir = 1;
+    }
+    if( (max <= resz) || ((max ^ resz) < resz) )
+    {
+        max = resz;
+        dir = 2;
+    }
+
+    switch( dir )
+    {
+        case 0:
+        {
+            if( curr.posX_ > cctr.posX_ )
+                return true;
+
+            return false;
+        } break;
+        case 1:
+        {
+            if( curr.posY_ > cctr.posY_ )
+                return true;
+
+            return false;
+        } break;
+        case 2:
+        {
+            if( curr.posZ_ > cctr.posZ_ )
                 return true;
 
             return false;

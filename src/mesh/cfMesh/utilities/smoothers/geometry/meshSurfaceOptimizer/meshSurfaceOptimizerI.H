@@ -1,25 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
-    \\  /    A nd           | Web:         http://www.foam-extend.org
-     \\/     M anipulation  | For copyright notice see file Copyright
+  \\      /  F ield         | cfMesh: A library for mesh generation
+   \\    /   O peration     |
+    \\  /    A nd           | Author: Franjo Juretic (franjo.juretic@c-fields.com)
+     \\/     M anipulation  | Copyright (C) Creative Fields, Ltd.
 -------------------------------------------------------------------------------
 License
-    This file is part of foam-extend.
+    This file is part of cfMesh.
 
-    foam-extend is free software: you can redistribute it and/or modify it
+    cfMesh is free software; you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation, either version 3 of the License, or (at your
+    Free Software Foundation; either version 3 of the License, or (at your
     option) any later version.
 
-    foam-extend is distributed in the hope that it will be useful, but
-    WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    General Public License for more details.
+    cfMesh is distributed in the hope that it will be useful, but WITHOUT
+    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+    for more details.
 
     You should have received a copy of the GNU General Public License
-    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
+    along with cfMesh.  If not, see <http://www.gnu.org/licenses/>.
 
 Description
 
@@ -193,6 +193,9 @@ inline point meshSurfaceOptimizer::newPositionLaplacian
     const pointFieldPMG& points = surfaceEngine_.points();
     const labelList& bPoints = surfaceEngine_.boundaryPoints();
 
+    if( vertexType_[bpI] & LOCKED )
+        return points[bPoints[bpI]];
+
     vector newP(vector::zero);
     if( transformIntoPlane )
     {
@@ -235,6 +238,9 @@ inline point meshSurfaceOptimizer::newPositionLaplacianFC
     const pointFieldPMG& points = surfaceEngine_.points();
     const vectorField& faceCentres = surfaceEngine_.faceCentres();
     const labelList& bPoints = surfaceEngine_.boundaryPoints();
+
+    if( vertexType_[bpI] & LOCKED )
+        return points[bPoints[bpI]];
 
     vector newP(vector::zero);
 
@@ -280,6 +286,9 @@ inline point meshSurfaceOptimizer::newPositionLaplacianWFC
     const vectorField& faceAreas = surfaceEngine_.faceNormals();
     const vectorField& faceCentres = surfaceEngine_.faceCentres();
     const labelList& bPoints = surfaceEngine_.boundaryPoints();
+
+    if( vertexType_[bpI] & LOCKED )
+        return points[bPoints[bpI]];
 
     vector newP(vector::zero);
 
@@ -334,6 +343,9 @@ inline point meshSurfaceOptimizer::newPositionSurfaceOptimizer
 {
     const pointFieldPMG& points = surfaceEngine_.points();
     const labelList& bPoints = surfaceEngine_.boundaryPoints();
+
+    if( vertexType_[bpI] & LOCKED )
+        return points[bPoints[bpI]];
 
     # ifdef DEBUGSmooth
     Pout << "Smoothing boundary node " << bpI << endl;
@@ -392,6 +404,9 @@ inline point meshSurfaceOptimizer::newEdgePositionLaplacian
     const VRWGraph& bpEdges = surfaceEngine_.boundaryPointEdges();
     const pointFieldPMG& points = surfaceEngine_.points();
 
+    if( vertexType_[bpI] & LOCKED )
+        return points[bPoints[bpI]];
+
     const labelHashSet& featureEdges = partitionerPtr_->featureEdges();
 
     DynList<label> edgePoints;
@@ -420,6 +435,133 @@ inline point meshSurfaceOptimizer::newEdgePositionLaplacian
     pos /= edgePoints.size();
 
     return pos;
+}
+
+template<class labelListType>
+inline void meshSurfaceOptimizer::lockBoundaryFaces(const labelListType& l)
+{
+    lockedSurfaceFaces_ = l;
+
+    const faceList::subList& bFaces = surfaceEngine_.boundaryFaces();
+    const labelList& bp = surfaceEngine_.bp();
+
+    # ifdef USE_OMP
+    # pragma omp parallel for schedule(dynamic, 20)
+    # endif
+    forAll(lockedSurfaceFaces_, lfI)
+    {
+        const face& bf = bFaces[lockedSurfaceFaces_[lfI]];
+
+        forAll(bf, pI)
+            vertexType_[bp[bf[pI]]] |= LOCKED;
+    }
+
+    if( Pstream::parRun() )
+    {
+        const Map<label>& globalToLocal =
+            surfaceEngine_.globalToLocalBndPointAddressing();
+        const VRWGraph& bpAtProcs = surfaceEngine_.bpAtProcs();
+        const DynList<label>& bpNeiProcs = surfaceEngine_.bpNeiProcs();
+
+        std::map<label, labelLongList> exchangeData;
+        forAll(bpNeiProcs, i)
+            exchangeData[bpNeiProcs[i]].clear();
+
+        //- prepare data which will be sent to other processors
+        forAllConstIter(Map<label>, globalToLocal, it)
+        {
+            const label bpI = it();
+
+            if( vertexType_[bpI] & LOCKED )
+            {
+                forAllRow(bpAtProcs, bpI, i)
+                {
+                    const label neiProc = bpAtProcs(bpI, i);
+
+                    if( neiProc == Pstream::myProcNo() )
+                        continue;
+
+                    exchangeData[neiProc].append(it.key());
+                }
+            }
+        }
+
+        labelLongList receivedData;
+        help::exchangeMap(exchangeData, receivedData);
+
+        forAll(receivedData, i)
+        {
+            const label bpI = globalToLocal[receivedData[i]];
+
+            vertexType_[bpI] |= LOCKED;
+        }
+    }
+}
+
+template<class labelListType>
+inline void meshSurfaceOptimizer::lockBoundaryPoints(const labelListType& l)
+{
+    # ifdef USE_OMP
+    # pragma omp parallel for schedule(dynamic, 50)
+    # endif
+    forAll(l, i)
+    {
+        const label bpI = l[i];
+
+        vertexType_[bpI] |= LOCKED;
+    }
+
+    if( Pstream::parRun() )
+    {
+        const Map<label>& globalToLocal =
+            surfaceEngine_.globalToLocalBndPointAddressing();
+        const VRWGraph& bpAtProcs = surfaceEngine_.bpAtProcs();
+        const DynList<label>& bpNeiProcs = surfaceEngine_.bpNeiProcs();
+
+        std::map<label, labelLongList> exchangeData;
+        forAll(bpNeiProcs, i)
+            exchangeData[bpNeiProcs[i]].clear();
+
+        //- prepare data which will be sent to other processors
+        forAllConstIter(Map<label>, globalToLocal, it)
+        {
+            const label bpI = it();
+
+            if( vertexType_[bpI] & LOCKED )
+            {
+                forAllRow(bpAtProcs, bpI, i)
+                {
+                    const label neiProc = bpAtProcs(bpI, i);
+
+                    if( neiProc == Pstream::myProcNo() )
+                        continue;
+
+                    exchangeData[neiProc].append(it.key());
+                }
+            }
+        }
+
+        labelLongList receivedData;
+        help::exchangeMap(exchangeData, receivedData);
+
+        forAll(receivedData, i)
+        {
+            const label bpI = globalToLocal[receivedData[i]];
+
+            vertexType_[bpI] |= LOCKED;
+        }
+    }
+}
+
+//- lock edge points
+inline void meshSurfaceOptimizer::lockFeatureEdges()
+{
+    # ifdef USE_OMP
+    # pragma omp parallel for schedule(dynamic, 50)
+    # endif
+    forAll(vertexType_, bpI)
+        if( vertexType_[bpI] & (EDGE | CORNER) )
+            vertexType_[bpI] |= LOCKED;
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

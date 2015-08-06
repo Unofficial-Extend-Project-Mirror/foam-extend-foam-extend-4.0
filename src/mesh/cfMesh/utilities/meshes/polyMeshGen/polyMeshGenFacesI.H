@@ -1,25 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
-    \\  /    A nd           | Web:         http://www.foam-extend.org
-     \\/     M anipulation  | For copyright notice see file Copyright
+  \\      /  F ield         | cfMesh: A library for mesh generation
+   \\    /   O peration     |
+    \\  /    A nd           | Author: Franjo Juretic (franjo.juretic@c-fields.com)
+     \\/     M anipulation  | Copyright (C) Creative Fields, Ltd.
 -------------------------------------------------------------------------------
 License
-    This file is part of foam-extend.
+    This file is part of cfMesh.
 
-    foam-extend is free software: you can redistribute it and/or modify it
+    cfMesh is free software; you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation, either version 3 of the License, or (at your
+    Free Software Foundation; either version 3 of the License, or (at your
     option) any later version.
 
-    foam-extend is distributed in the hope that it will be useful, but
-    WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    General Public License for more details.
+    cfMesh is distributed in the hope that it will be useful, but WITHOUT
+    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+    for more details.
 
     You should have received a copy of the GNU General Public License
-    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
+    along with cfMesh.  If not, see <http://www.gnu.org/licenses/>.
 
 Description
 
@@ -39,12 +39,12 @@ namespace Foam
 {
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
+        
 inline const faceListPMG& polyMeshGenFaces::faces() const
 {
     return faces_;
 }
-
+        
 inline label polyMeshGenFaces::nInternalFaces() const
 {
     if( !(ownerPtr_ && neighbourPtr_) )
@@ -79,7 +79,7 @@ inline const labelList& polyMeshGenFaces::owner() const
 
         calculateOwnersAndNeighbours();
     }
-
+    
     return *ownerPtr_;
 }
 
@@ -98,7 +98,7 @@ inline const labelList& polyMeshGenFaces::neighbour() const
 
         calculateOwnersAndNeighbours();
     }
-
+    
     return *neighbourPtr_;
 }
 
@@ -122,7 +122,7 @@ inline void polyMeshGenFaces::addFaceToSubset
     std::map<label, meshSubset>::iterator it = faceSubsets_.find(setID);
     if( it == faceSubsets_.end() )
         return;
-
+    
     it->second.addElement(faceI);
 }
 
@@ -134,7 +134,7 @@ inline void polyMeshGenFaces::removeFaceFromSubset
     std::map<label, meshSubset>::iterator it = faceSubsets_.find(setI);
     if( it == faceSubsets_.end() )
         return;
-
+    
     it->second.removeElement(faceI);
 }
 
@@ -145,7 +145,7 @@ inline void polyMeshGenFaces::faceInSubsets
 ) const
 {
     faceSubsets.clear();
-
+    
     std::map<label, meshSubset>::const_iterator it;
     for
     (
@@ -162,7 +162,7 @@ inline void polyMeshGenFaces::faceInSubsets
 inline void polyMeshGenFaces::faceSubsetIndices(DynList<label>& indices) const
 {
     indices.clear();
-
+    
     std::map<label, meshSubset>::const_iterator it;
     for
     (
@@ -181,12 +181,12 @@ inline void polyMeshGenFaces::facesInSubset
 ) const
 {
     faceLabels.clear();
-
+    
     std::map<label, meshSubset>::const_iterator it =
         faceSubsets_.find(setI);
     if( it == faceSubsets_.end() )
         return;
-
+    
     it->second.containedElements(faceLabels);
 }
 

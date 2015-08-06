@@ -1,25 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
-    \\  /    A nd           | Web:         http://www.foam-extend.org
-     \\/     M anipulation  | For copyright notice see file Copyright
+  \\      /  F ield         | cfMesh: A library for mesh generation
+   \\    /   O peration     |
+    \\  /    A nd           | Author: Franjo Juretic (franjo.juretic@c-fields.com)
+     \\/     M anipulation  | Copyright (C) Creative Fields, Ltd.
 -------------------------------------------------------------------------------
 License
-    This file is part of foam-extend.
+    This file is part of cfMesh.
 
-    foam-extend is free software: you can redistribute it and/or modify it
+    cfMesh is free software; you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation, either version 3 of the License, or (at your
+    Free Software Foundation; either version 3 of the License, or (at your
     option) any later version.
 
-    foam-extend is distributed in the hope that it will be useful, but
-    WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    General Public License for more details.
+    cfMesh is distributed in the hope that it will be useful, but WITHOUT
+    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+    for more details.
 
     You should have received a copy of the GNU General Public License
-    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
+    along with cfMesh.  If not, see <http://www.gnu.org/licenses/>.
 
 Description
 
@@ -28,6 +28,8 @@ Description
 #include "triSurfAddressing.H"
 #include "VRWGraphSMPModifier.H"
 #include "demandDrivenData.H"
+
+#include <set>
 
 # ifdef USE_OMP
 #include <omp.h>
@@ -70,49 +72,42 @@ void triSurfAddressing::calculateEdges() const
         # ifdef USE_OMP
         # pragma omp for schedule(static)
         # endif
-        forAll(facets_, fI)
+        forAll(pFacets, pI)
         {
-            const labelledTri& tri = facets_[fI];
+            std::set<std::pair<label, label> > edgesAtPoint;
 
-            forAll(tri, pI)
+            forAllRow(pFacets, pI, pfI)
             {
-                const edge fe(tri[pI], tri[(pI+1)%3]);
-                const label s = fe.start();
-                const label e = fe.end();
+                const label triI = pFacets(pI, pfI);
+                const labelledTri& tri = facets_[triI];
 
-                DynList<label> edgeFaces;
-
-                bool store(true);
-
-                //- find all faces attached to this edge
-                //- store the edge in case the face faceI is the face
-                //- with the smallest label
-                forAllRow(pFacets, s, pfI)
+                label pos(-1);
+                forAll(tri, i)
                 {
-                    const label ofI = pFacets(s, pfI);
-                    const labelledTri& of = facets_[ofI];
-
-                    label pos(-1);
-                    for(label i=0;i<3;++i)
-                        if( of[i] == e )
-                        {
-                            pos = i;
-                            break;
-                        }
-                    if( pos < 0 )
-                        continue;
-                    if( ofI < fI )
+                    if( tri[i] == pI )
                     {
-                        store = false;
-                        break;
-                    }
+                        pos = i;
 
-                    edgeFaces.append(ofI);
+
+                        if( tri[(pos+1)%3] >= pI )
+                            edgesAtPoint.insert
+                            (
+                                std::make_pair(pI, tri[(pos+1)%3])
+                            );
+                        if( tri[(pos+2)%3] >= pI )
+                            edgesAtPoint.insert
+                            (
+                                std::make_pair(pI, tri[(pos+2)%3])
+                            );
+                    }
                 }
 
-                if( store )
-                    edgesHelper.append(fe);
+
             }
+
+            std::set<std::pair<label, label> >::const_iterator it;
+            for(it=edgesAtPoint.begin();it!=edgesAtPoint.end();++it)
+                edgesHelper.append(edge(it->first, it->second));
         }
 
         //- this enables other threads to see the number of edges
@@ -158,56 +153,58 @@ void triSurfAddressing::calculateFacetEdges() const
     const edgeLongList& edges = this->edges();
     const VRWGraph& pointFaces = this->pointFacets();
 
-    facetEdgesPtr_ = new VRWGraph(facets_.size());
+    facetEdgesPtr_ = new VRWGraph(facets_.size(), 3, -1);
     VRWGraph& faceEdges = *facetEdgesPtr_;
 
-    labelList nfe(facets_.size());
-
     # ifdef USE_OMP
-    const label nThreads = 3 * omp_get_num_procs();
-    # pragma omp parallel num_threads(nThreads)
+    # pragma omp parallel for schedule(dynamic, 100)
     # endif
+    forAll(edges, edgeI)
     {
-        # ifdef USE_OMP
-        # pragma omp for schedule(static)
-        # endif
-        forAll(facets_, fI)
-            nfe[fI] = 3;
+        const edge ee = edges[edgeI];
+        const label pI = ee.start();
 
-        # ifdef USE_OMP
-        # pragma omp barrier
-
-        # pragma omp master
-        # endif
-        VRWGraphSMPModifier(faceEdges).setSizeAndRowSize(nfe);
-
-        # ifdef USE_OMP
-        # pragma omp barrier
-
-        # pragma omp for schedule(static)
-        # endif
-        forAll(edges, edgeI)
+        forAllRow(pointFaces, pI, pfI)
         {
-            const edge ee = edges[edgeI];
-            const label pI = ee.start();
+            const label fI = pointFaces(pI, pfI);
 
-            forAllRow(pointFaces, pI, pfI)
+            const labelledTri& tri = facets_[fI];
+            forAll(tri, eI)
             {
-                const label fI = pointFaces(pI, pfI);
+                const edge e(tri[eI], tri[(eI+1)%3]);
 
-                const labelledTri& tri = facets_[fI];
-                forAll(tri, eI)
+                if( e == ee )
                 {
-                    const edge e(tri[eI], tri[(eI+1)%3]);
-                    if( e == ee )
-                    {
-                        faceEdges(fI, eI) = edgeI;
-                        break;
-                    }
+                    faceEdges(fI, eI) = edgeI;
                 }
             }
         }
     }
+
+    # ifdef DEBUGTriSurfAddressing
+    forAll(faceEdges, triI)
+    {
+        forAllRow(faceEdges, triI, feI)
+        {
+            if( facets_[triI][feI] < 0 || facets_[triI][feI] >= points_.size() )
+                FatalErrorIn
+                (
+                    "void triSurfAddressing::calculateFacetEdges() const"
+                ) << "Invalid entry in triangle " << triI
+                  << " " << facets_[triI] << abort(FatalError);
+
+            const label edgeI = faceEdges(triI, feI);
+
+            if( edgeI < 0 || edgeI >= edges.size() )
+                FatalErrorIn
+                (
+                    "void triSurfAddressing::calculateFacetEdges() const"
+                ) << "Invalid entry in face " << triI << " "
+                     << facets_[triI] << " edges "
+                     << faceEdges[triI] << abort(FatalError);
+        }
+    }
+    # endif
 }
 
 void triSurfAddressing::calculateEdgeFacets() const

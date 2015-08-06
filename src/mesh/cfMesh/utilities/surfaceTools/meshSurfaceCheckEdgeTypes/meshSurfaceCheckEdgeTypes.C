@@ -1,32 +1,34 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
-    \\  /    A nd           | Web:         http://www.foam-extend.org
-     \\/     M anipulation  | For copyright notice see file Copyright
+  \\      /  F ield         | cfMesh: A library for mesh generation
+   \\    /   O peration     |
+    \\  /    A nd           | Author: Franjo Juretic (franjo.juretic@c-fields.com)
+     \\/     M anipulation  | Copyright (C) Creative Fields, Ltd.
 -------------------------------------------------------------------------------
 License
-    This file is part of foam-extend.
+    This file is part of cfMesh.
 
-    foam-extend is free software: you can redistribute it and/or modify it
+    cfMesh is free software; you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation, either version 3 of the License, or (at your
+    Free Software Foundation; either version 3 of the License, or (at your
     option) any later version.
 
-    foam-extend is distributed in the hope that it will be useful, but
-    WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    General Public License for more details.
+    cfMesh is distributed in the hope that it will be useful, but WITHOUT
+    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+    for more details.
 
     You should have received a copy of the GNU General Public License
-    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
+    along with cfMesh.  If not, see <http://www.gnu.org/licenses/>.
 
 Description
 
 \*---------------------------------------------------------------------------*/
 
 #include "meshSurfaceCheckEdgeTypes.H"
+#include "meshSurfaceCheckInvertedVertices.H"
 #include "meshSurfaceEngine.H"
+#include "meshSurfacePartitioner.H"
 #include "boolList.H"
 #include "demandDrivenData.H"
 #include "helperFunctionsPar.H"
@@ -53,18 +55,25 @@ void meshSurfaceCheckEdgeTypes::classifyEdges()
     const VRWGraph& pointFaces = surfaceEngine_.pointFaces();
     const edgeList& edges = surfaceEngine_.edges();
     const VRWGraph& edgeFaces = surfaceEngine_.edgeFaces();
-    const faceList::subList& bFaces = surfaceEngine_.boundaryFaces();
     const labelList& facePatch = surfaceEngine_.boundaryFacePatches();
-    const vectorField& pNormals = surfaceEngine_.pointNormals();
     const vectorField& fCentres = surfaceEngine_.faceCentres();
-    const vectorField& fNormals = surfaceEngine_.faceNormals();
 
-    boolList problematicPoint(pointFaces.size());
+    //- check if there exist tangled parts of mesh surface where
+    //- classification is not reliable
+    boolList problematicPoint(pointFaces.size(), false);
+
+    meshSurfacePartitioner mPart(surfaceEngine_);
+    meshSurfaceCheckInvertedVertices checkInverted(mPart);
+    const labelHashSet& invertedPoints = checkInverted.invertedVertices();
+    forAllConstIter(labelHashSet, invertedPoints, it)
+        problematicPoint[bp[it.key()]] = true;
+
+    //- classify edges
     edgeTypes_.setSize(edges.size());
 
     # ifdef USE_OMP
     label nThreads = 3 * omp_get_num_procs();
-    if( bFaces.size() < 1000 )
+    if( edges.size() < 1000 )
         nThreads = 1;
     # endif
 
@@ -78,59 +87,9 @@ void meshSurfaceCheckEdgeTypes::classifyEdges()
         forAll(edgeTypes_, edgeI)
             edgeTypes_[edgeI] = NONE;
 
-        # ifdef USE_OMP
-        # pragma omp for schedule(static, 1)
-        # endif
-        forAll(problematicPoint, pointI)
-            problematicPoint[pointI] = false;
-
-        # ifdef USE_OMP
-        # pragma omp barrier
-
-        # pragma omp for schedule(static, 1)
-        # endif
-        forAll(bFaces, bfI)
-        {
-            const face& bf = bFaces[bfI];
-
-            //- check if point normal are consistent with face normals
-            forAll(bf, pI)
-            {
-                const label bpI = bp[bf[pI]];
-                const label bpNext = bp[bf.nextLabel(pI)];
-
-                if( (pNormals[bpI] & fNormals[bfI]) < VSMALL )
-                    problematicPoint[bpI] = true;
-
-                //- contruct a triangle from a face edge and centre point
-                const triangle<point, point> tria
-                (
-                    points[bf[pI]],
-                    points[bf.nextLabel(pI)],
-                    fCentres[bfI]
-                );
-
-                //- check if the normal of the triangle is consistent with
-                //- the face normal
-                if( (tria.normal() & fNormals[bfI]) < VSMALL )
-                {
-                    problematicPoint[bpI] = true;
-                    problematicPoint[bpNext] = true;
-                }
-
-                //- check if the face normal is consistent with point normals
-                if( (tria.normal() & pNormals[bpI]) < VSMALL )
-                    problematicPoint[bpI] = true;
-
-                if( (tria.normal() & pNormals[bpNext]) < VSMALL )
-                    problematicPoint[bpNext] = true;
-            }
-        }
-
-        # ifdef USE_OMP
-        # pragma omp barrier
-
+        // TODO: this is not valid for non-manifold meshes
         //- start checking feature edges
+        # ifdef USE_OMP
         # pragma omp for schedule(static, 1)
         # endif
         forAll(edgeFaces, edgeI)
@@ -194,47 +153,7 @@ void meshSurfaceCheckEdgeTypes::classifyEdges()
 
     if( Pstream::parRun() )
     {
-        const labelList& globalPointLabel =
-            surfaceEngine_.globalBoundaryPointLabel();
-        const VRWGraph& bpAtProcs = surfaceEngine_.bpAtProcs();
-        const Map<label>& globalToLocal =
-            surfaceEngine_.globalToLocalBndPointAddressing();
-        const DynList<label>& bpNeiProcs = surfaceEngine_.bpNeiProcs();
-
-        //- make sure that problematic points
-        //- are consistent ove processor boundaries
-        std::map<label, labelLongList> exchangeData;
-        forAll(bpNeiProcs, i)
-            exchangeData.insert
-            (
-                std::make_pair(bpNeiProcs[i], labelLongList())
-            );
-
-        forAllConstIter(Map<label>, globalToLocal, bpIter)
-        {
-            const label bpI = bpIter();
-
-            if( !problematicPoint[bpI] )
-                continue;
-
-            forAllRow(bpAtProcs, bpI, i)
-            {
-                const label neiProcs = bpAtProcs(bpI, i);
-
-                if( neiProcs == Pstream::myProcNo() )
-                    continue;
-
-                exchangeData[neiProcs].append(globalPointLabel[bpI]);
-            }
-        }
-
-        labelLongList receiveData;
-        help::exchangeMap(exchangeData, receiveData);
-
-        forAll(receiveData, i)
-            problematicPoint[globalToLocal[receiveData[i]]] = true;
-
-        //- check if the edge at processor boudandaries are concave or convex
+        //- check if the edge at processor boundaries are concave or convex
         const labelList& globalEdgeLabel =
             surfaceEngine_.globalBoundaryEdgeLabel();
         const Map<label>& otherProc = surfaceEngine_.otherEdgeFaceAtProc();
@@ -259,7 +178,11 @@ void meshSurfaceCheckEdgeTypes::classifyEdges()
                 continue;
 
             const edge& e = edges[eIter.key()];
-            if( problematicPoint[e.start()] || problematicPoint[e.end()] )
+            if
+            (
+                problematicPoint[bp[e.start()]] ||
+                problematicPoint[bp[e.end()]]
+            )
             {
                 edgeTypes_[eIter.key()] |= UNDETERMINED;
                 continue;
@@ -279,10 +202,18 @@ void meshSurfaceCheckEdgeTypes::classifyEdges()
         LongList<labelledPoint> receiveCentres;
         help::exchangeMap(exchangeFaceCentres, receiveCentres);
 
+        # ifdef USE_OMP
+        # pragma omp parallel for schedule(dynamic, 20)
+        # endif
         forAll(receiveCentres, i)
         {
             const labelledPoint& lp = receiveCentres[i];
             const label edgeI = globalToLocalEdge[lp.pointLabel()];
+
+            // TODO: this is valid for manifold meshes, only
+            if( edgeFaces.sizeOfRow(edgeI) != 1 )
+                continue;
+
             const vector fCentre = lp.coordinates();
 
             const edge& e = edges[edgeI];

@@ -1,25 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
-    \\  /    A nd           | Web:         http://www.foam-extend.org
-     \\/     M anipulation  | For copyright notice see file Copyright
+  \\      /  F ield         | cfMesh: A library for mesh generation
+   \\    /   O peration     |
+    \\  /    A nd           | Author: Franjo Juretic (franjo.juretic@c-fields.com)
+     \\/     M anipulation  | Copyright (C) Creative Fields, Ltd.
 -------------------------------------------------------------------------------
 License
-    This file is part of foam-extend.
+    This file is part of cfMesh.
 
-    foam-extend is free software: you can redistribute it and/or modify it
+    cfMesh is free software; you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation, either version 3 of the License, or (at your
+    Free Software Foundation; either version 3 of the License, or (at your
     option) any later version.
 
-    foam-extend is distributed in the hope that it will be useful, but
-    WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    General Public License for more details.
+    cfMesh is distributed in the hope that it will be useful, but WITHOUT
+    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+    for more details.
 
     You should have received a copy of the GNU General Public License
-    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
+    along with cfMesh.  If not, see <http://www.gnu.org/licenses/>.
 
 Description
 
@@ -30,10 +30,10 @@ Description
 #include "demandDrivenData.H"
 #include "Time.H"
 #include "meshOctreeCreator.H"
-#include "meshOctreeAutomaticRefinement.H"
 #include "tetMeshExtractorOctree.H"
 #include "meshSurfaceEngine.H"
 #include "meshSurfaceMapper.H"
+#include "edgeExtractor.H"
 #include "meshSurfaceEdgeExtractorNonTopo.H"
 #include "surfaceMorpherCells.H"
 #include "meshOptimizer.H"
@@ -45,6 +45,8 @@ Description
 #include "triSurfacePatchManipulator.H"
 #include "refineBoundaryLayers.H"
 #include "triSurfaceMetaData.H"
+#include "polyMeshGenGeometryModification.H"
+#include "surfaceMeshGeometryModification.H"
 
 //#define DEBUG
 
@@ -61,11 +63,6 @@ void tetMeshGenerator::createTetMesh()
     tetMeshExtractorOctree tme(*octreePtr_, meshDict_, mesh_);
 
     tme.createMesh();
-
-    # ifdef DEBUG
-    mesh_.write();
-    //::exit(0);
-    # endif
 }
 
 void tetMeshGenerator::surfacePreparation()
@@ -80,11 +77,6 @@ void tetMeshGenerator::surfacePreparation()
         deleteDemandDrivenData(cmPtr);
     }
     while( topologicalCleaner(mesh_).cleanTopology() );
-
-    # ifdef DEBUG
-    mesh_.write();
-    //::exit(0);
-    # endif
 }
 
 void tetMeshGenerator::mapMeshToSurface()
@@ -95,44 +87,34 @@ void tetMeshGenerator::mapMeshToSurface()
     //- map mesh surface on the geometry surface
     meshSurfaceMapper(*msePtr, *octreePtr_).mapVerticesOntoSurface();
 
-    # ifdef DEBUG
-    mesh_.write();
-    //::exit(0);
-    # endif
-
     //- untangle surface faces
     meshSurfaceOptimizer(*msePtr, *octreePtr_).untangleSurface();
 
-    # ifdef DEBUG
-    mesh_.write();
-    //::exit(0);
-    # endif
-
     deleteDemandDrivenData(msePtr);
+}
+
+void tetMeshGenerator::extractPatches()
+{
+    edgeExtractor extractor(mesh_, *octreePtr_);
+
+    Info << "Extracting edges" << endl;
+    extractor.extractEdges();
+
+    extractor.updateMeshPatches();
 }
 
 void tetMeshGenerator::mapEdgesAndCorners()
 {
     meshSurfaceEdgeExtractorNonTopo(mesh_, *octreePtr_);
-
-    # ifdef DEBUG
-    mesh_.write();
-    //::exit(0);
-    # endif
 }
 
 void tetMeshGenerator::optimiseMeshSurface()
 {
     meshSurfaceEngine mse(mesh_);
     meshSurfaceOptimizer(mse, *octreePtr_).optimizeSurface();
-
-    # ifdef DEBUG
-    mesh_.write();
-    //::exit(0);
-    # endif
 }
 
-void tetMeshGenerator::generateBoudaryLayers()
+void tetMeshGenerator::generateBoundaryLayers()
 {
     if( meshDict_.found("boundaryLayers") )
     {
@@ -157,11 +139,6 @@ void tetMeshGenerator::generateBoudaryLayers()
                 bl.addLayerForPatch(createLayers[patchI]);
         }
     }
-
-    # ifdef DEBUG
-    mesh_.write();
-    //::exit(0);
-    # endif
 }
 
 void tetMeshGenerator::optimiseFinalMesh()
@@ -180,16 +157,51 @@ void tetMeshGenerator::optimiseFinalMesh()
 
     optimizer.optimizeSurface(*octreePtr_);
 
-    deleteDemandDrivenData(octreePtr_);
-
     optimizer.optimizeMeshFV();
     optimizer.optimizeLowQualityFaces();
-    optimizer.optimizeMeshFV();
+    optimizer.optimizeBoundaryLayer(false);
+    optimizer.untangleMeshFV();
 
-    # ifdef DEBUG
-    mesh_.write();
-    //::exit(0);
-    # endif
+    deleteDemandDrivenData(octreePtr_);
+
+    mesh_.clearAddressingData();
+
+    if( modSurfacePtr_ )
+    {
+        polyMeshGenGeometryModification meshMod(mesh_, meshDict_);
+
+        //- revert the mesh into the original space
+        meshMod.revertGeometryModification();
+
+        //- delete modified surface mesh
+        deleteDemandDrivenData(modSurfacePtr_);
+    }
+}
+
+void tetMeshGenerator::projectSurfaceAfterBackScaling()
+{
+    if( !meshDict_.found("anisotropicSources") )
+        return;
+
+    deleteDemandDrivenData(octreePtr_);
+    octreePtr_ = new meshOctree(*surfacePtr_);
+
+    meshOctreeCreator
+    (
+        *octreePtr_,
+        meshDict_
+    ).createOctreeWithRefinedBoundary(20, 30);
+
+    //- calculate mesh surface
+    meshSurfaceEngine mse(mesh_);
+
+    //- pre-map mesh surface
+    meshSurfaceMapper mapper(mse, *octreePtr_);
+
+    //- map mesh surface on the geometry surface
+    mapper.mapVerticesOntoSurface();
+
+    optimiseFinalMesh();
 }
 
 void tetMeshGenerator::refBoundaryLayers()
@@ -202,55 +214,82 @@ void tetMeshGenerator::refBoundaryLayers()
 
         refLayers.refineLayers();
 
-        meshOptimizer optimizer(mesh_);
+        labelLongList pointsInLayer;
+        refLayers.pointsInBndLayer(pointsInLayer);
 
-        optimizer.untangleMeshFV();
+        meshOptimizer opt(mesh_);
+        opt.lockPoints(pointsInLayer);
+        opt.untangleBoundaryLayer();
     }
 }
 
 void tetMeshGenerator::replaceBoundaries()
 {
     renameBoundaryPatches rbp(mesh_, meshDict_);
-
-    # ifdef DEBUG
-    mesh_.write();
-    //::exit(0);
-    # endif
 }
 
 void tetMeshGenerator::renumberMesh()
 {
     polyMeshGenModifier(mesh_).renumberMesh();
-
-    # ifdef DEBUG
-    mesh_.write();
-    //::exit(0);
-    # endif
 }
 
 void tetMeshGenerator::generateMesh()
 {
     try
     {
-        createTetMesh();
+        if( controller_.runCurrentStep("templateGeneration") )
+        {
+            createTetMesh();
+        }
 
-        surfacePreparation();
+        if( controller_.runCurrentStep("surfaceTopology") )
+        {
+            surfacePreparation();
+        }
 
-        mapMeshToSurface();
+        if( controller_.runCurrentStep("surfaceProjection") )
+        {
+            mapMeshToSurface();
+        }
 
-        mapEdgesAndCorners();
+        if( controller_.runCurrentStep("patchAssignment") )
+        {
+            extractPatches();
+        }
 
-        optimiseMeshSurface();
+        if( controller_.runCurrentStep("edgeExtraction") )
+        {
+            mapEdgesAndCorners();
 
-        generateBoudaryLayers();
+            optimiseMeshSurface();
+        }
 
-        optimiseFinalMesh();
+        if( controller_.runCurrentStep("boundaryLayerGeneration") )
+        {
+            generateBoundaryLayers();
+        }
 
-        refBoundaryLayers();
+        if( controller_.runCurrentStep("meshOptimisation") )
+        {
+            optimiseFinalMesh();
+
+            projectSurfaceAfterBackScaling();
+        }
+
+        if( controller_.runCurrentStep("boundaryLayerRefinement") )
+        {
+            refBoundaryLayers();
+        }
 
         renumberMesh();
 
         replaceBoundaries();
+
+        controller_.workflowCompleted();
+    }
+    catch(const std::string& message)
+    {
+        Info << message << endl;
     }
     catch(...)
     {
@@ -268,6 +307,7 @@ tetMeshGenerator::tetMeshGenerator(const Time& time)
 :
     runTime_(time),
     surfacePtr_(NULL),
+    modSurfacePtr_(NULL),
     meshDict_
     (
         IOobject
@@ -280,7 +320,8 @@ tetMeshGenerator::tetMeshGenerator(const Time& time)
         )
     ),
     octreePtr_(NULL),
-    mesh_(time)
+    mesh_(time),
+    controller_(mesh_)
 {
     if( true )
     {
@@ -297,8 +338,8 @@ tetMeshGenerator::tetMeshGenerator(const Time& time)
         triSurfaceMetaData sMetaData(*surfacePtr_);
         const dictionary& surfMetaDict = sMetaData.metaData();
 
-        mesh_.metaData().add("surfaceFile", surfaceFile);
-        mesh_.metaData().add("surfaceMeta", surfMetaDict);
+        mesh_.metaData().add("surfaceFile", surfaceFile, true);
+        mesh_.metaData().add("surfaceMeta", surfMetaDict, true);
     }
 
     if( surfacePtr_->featureEdges().size() != 0 )
@@ -315,12 +356,20 @@ tetMeshGenerator::tetMeshGenerator(const Time& time)
         surfacePtr_ = surfaceWithPatches;
     }
 
-    octreePtr_ = new meshOctree(*surfacePtr_);
+    if( meshDict_.found("anisotropicSources") )
+    {
+        surfaceMeshGeometryModification surfMod(*surfacePtr_, meshDict_);
 
-    meshOctreeCreator* octreeCreatorPtr =
-        new meshOctreeCreator(*octreePtr_, meshDict_);
-    octreeCreatorPtr->createOctreeBoxes();
-    deleteDemandDrivenData(octreeCreatorPtr);
+        modSurfacePtr_ = surfMod.modifyGeometry();
+
+        octreePtr_ = new meshOctree(*modSurfacePtr_);
+    }
+    else
+    {
+        octreePtr_ = new meshOctree(*surfacePtr_);
+    }
+
+    meshOctreeCreator(*octreePtr_, meshDict_).createOctreeBoxes();
 
     generateMesh();
 }
@@ -331,6 +380,7 @@ tetMeshGenerator::~tetMeshGenerator()
 {
     deleteDemandDrivenData(surfacePtr_);
     deleteDemandDrivenData(octreePtr_);
+    deleteDemandDrivenData(modSurfacePtr_);
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

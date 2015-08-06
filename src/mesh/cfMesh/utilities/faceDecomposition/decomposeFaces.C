@@ -1,25 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
-    \\  /    A nd           | Web:         http://www.foam-extend.org
-     \\/     M anipulation  | For copyright notice see file Copyright
+  \\      /  F ield         | cfMesh: A library for mesh generation
+   \\    /   O peration     |
+    \\  /    A nd           | Author: Franjo Juretic (franjo.juretic@c-fields.com)
+     \\/     M anipulation  | Copyright (C) Creative Fields, Ltd.
 -------------------------------------------------------------------------------
 License
-    This file is part of foam-extend.
+    This file is part of cfMesh.
 
-    foam-extend is free software: you can redistribute it and/or modify it
+    cfMesh is free software; you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation, either version 3 of the License, or (at your
+    Free Software Foundation; either version 3 of the License, or (at your
     option) any later version.
 
-    foam-extend is distributed in the hope that it will be useful, but
-    WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    General Public License for more details.
+    cfMesh is distributed in the hope that it will be useful, but WITHOUT
+    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+    for more details.
 
     You should have received a copy of the GNU General Public License
-    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
+    along with cfMesh.  If not, see <http://www.gnu.org/licenses/>.
 
 Description
 
@@ -49,7 +49,8 @@ namespace Foam
 decomposeFaces::decomposeFaces(polyMeshGen& mesh)
 :
     mesh_(mesh),
-    newFacesForFace_(mesh_.faces().size())
+    newFacesForFace_(),
+    done_(false)
 {}
 
 //- Destructor
@@ -60,6 +61,12 @@ decomposeFaces::~decomposeFaces()
 
 void decomposeFaces::decomposeMeshFaces(const boolList& decomposeFace)
 {
+    done_ = false;
+
+    newFacesForFace_.setSize(mesh_.faces().size());
+    forAll(newFacesForFace_, fI)
+        newFacesForFace_.setRowSize(fI, 0);
+
     const label nIntFaces = mesh_.nInternalFaces();
     label nFaces(0), nPoints = mesh_.points().size();
     point p;
@@ -314,6 +321,8 @@ void decomposeFaces::decomposeMeshFaces(const boolList& decomposeFace)
 
     meshModifier.clearAll();
 
+    done_ = true;
+
     # ifdef DEBUGDec
     Info << "New cells are " << cells << endl;
     mesh_.write();
@@ -333,6 +342,12 @@ void decomposeFaces::decomposeConcaveInternalFaces
             "(const boolList& concaveVertex)"
         ) << "This procedure is not parallelised!" << exit(FatalError);
     }
+
+    done_ = false;
+
+    newFacesForFace_.setSize(mesh_.faces().size());
+    forAll(newFacesForFace_, fI)
+        newFacesForFace_.setRowSize(fI, 0);
 
     const label nIntFaces = mesh_.nInternalFaces();
 
@@ -499,6 +514,19 @@ void decomposeFaces::decomposeConcaveInternalFaces
     # endif
 
     meshModifier.removeUnusedVertices();
+
+    done_ = true;
+}
+
+const VRWGraph& decomposeFaces::newFacesForFace() const
+{
+    if( !done_ )
+        WarningIn
+        (
+            "const VRWGraph& decomposeFaces::newFacesForFace() const"
+        ) << "Decomposition is not yet performed!" << endl;
+
+    return newFacesForFace_;
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *//

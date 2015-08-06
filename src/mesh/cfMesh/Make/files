@@ -1,8 +1,21 @@
 
 meshSurfaceEngine  =  utilities/surfaceTools/meshSurfaceEngine
 meshSurfacePartitioner = utilities/surfaceTools/meshSurfacePartitioner
-boundaryLayers = utilities/boundaryLayers
+
+bndLayers = utilities/boundaryLayers
+boundaryLayers = $(bndLayers)/boundaryLayers
+detectBoundaryLayers = $(bndLayers)/detectBoundaryLayers
+extrudeLayer = $(bndLayers)/extrudeLayer
+refineBoundaryLayers = $(bndLayers)/refineBoundaryLayers
+triangulateNonPlanarBaseFaces = $(bndLayers)/triangulateNonPlanarBaseFaces
+
 checkMeshDict = utilities/checkMeshDict
+
+anisotropicMeshing = utilities/anisotropicMeshing
+coordinateModification = $(anisotropicMeshing)/coordinateModification
+edgeMeshGeometryModification = $(anisotropicMeshing)/edgeMeshGeometryModification
+surfaceMeshGeometryModification = $(anisotropicMeshing)/surfaceMeshGeometryModification
+polyMeshGenGeometryModification = $(anisotropicMeshing)/polyMeshGenGeometryModification
 
 meshSurfaceCheckInvertedVertices = utilities/surfaceTools/meshSurfaceCheckInvertedVertices
 meshSurfaceCheckEdgeTypes = utilities/surfaceTools/meshSurfaceCheckEdgeTypes
@@ -14,6 +27,13 @@ edgeExtractor = $(edgeExtraction)/edgeExtractor
 meshSurfaceEdgeExtractor = utilities/surfaceTools/meshSurfaceEdgeExtractor
 meshSurfaceEdgeExtractorNonTopo = utilities/surfaceTools/meshSurfaceEdgeExtractorNonTopo
 meshSurfaceEdgeExtractor2D = utilities/surfaceTools/meshSurfaceEdgeExtractor2D
+meshSurfaceEdgeExtractorFUN = utilities/surfaceTools/meshSurfaceEdgeExtractorFUN
+
+createFundamentalSheetsBase = utilities/surfaceTools/createFundamentalSheets
+createFundamentalSheets = $(createFundamentalSheetsBase)/createFundamentalSheets
+createFundamentalSheetsFJ = $(createFundamentalSheetsBase)/createFundamentalSheetsFJ
+createFundamentalSheetsJFS = $(createFundamentalSheetsBase)/createFundamentalSheetsJFS
+
 correctEdgesBetweenPatches = utilities/surfaceTools/correctEdgesBetweenPatches
 
 decomposeCellsNearConcaveEdges = utilities/surfaceTools/decomposeCellsNearConcaveEdges
@@ -24,9 +44,9 @@ findCellsIntersectingSurface = $(intersectionTools)/findCellsIntersectingSurface
 
 meshOptimizer = utilities/smoothers/geometry/meshOptimizer
 tetMeshOptimisation = $(meshOptimizer)/tetMeshOptimisation
+boundaryLayerOptimisation = $(meshOptimizer)/boundaryLayerOptimisation
 
 symmetryPlaneOptimisation = $(meshOptimizer)/symmetryPlaneOptimisation
-
 simplexSmoother = $(tetMeshOptimisation)/advancedSmoothers/simplexSmoother
 knuppMetric = $(tetMeshOptimisation)/advancedSmoothers/knuppMetric
 meshUntangler = $(tetMeshOptimisation)/advancedSmoothers/meshUntangler
@@ -67,6 +87,7 @@ checkNonMappableCellConnections = $(topology)/checkNonMappableCellConnections
 triSurfaceTools = utilities/triSurfaceTools
 
 triSurface2DCheck = $(triSurfaceTools)/triSurface2DCheck
+triSurfaceChecks = $(triSurfaceTools)/triSurfaceChecks
 triSurfaceCleanupDuplicates = $(triSurfaceTools)/triSurfaceCleanupDuplicates
 triSurfaceCleanupDuplicateTriangles = $(triSurfaceTools)/triSurfaceCleanupDuplicateTriangles
 triSurfaceCopyParts = $(triSurfaceTools)/triSurfaceCopyParts
@@ -116,6 +137,11 @@ tetMeshExtractor = tetMesh/tetMeshExtractor
 tetMeshExtractorOctree = tetMesh/tetMeshExtractorOctree
 tetMeshGenerator = tetMesh/tetMeshGenerator
 
+voronoiMeshExtractor = voronoiMesh/voronoiMeshExtractor
+voronoiMeshGenerator = voronoiMesh/voronoiMeshGenerator
+
+workflowControls = utilities/workflowControls
+
 $(checkMeshDict)/checkMeshDict.C
 
 $(lists)/pointFieldPMG.C
@@ -135,6 +161,17 @@ $(polyMeshGen)/polyMeshGenFaces.C
 $(polyMeshGen)/polyMeshGenCells.C
 
 $(polyMeshGen2DEngine)/polyMeshGen2DEngine.C
+
+$(coordinateModification)/coordinateModification.C
+$(coordinateModification)/newCoordinateModification.C
+$(coordinateModification)/planeScaling.C
+$(coordinateModification)/boxScaling.C
+
+$(edgeMeshGeometryModification)/edgeMeshGeometryModification.C
+$(surfaceMeshGeometryModification)/surfaceMeshGeometryModification.C
+$(polyMeshGenGeometryModification)/polyMeshGenGeometryModification.C
+
+$(coordinateModification)/coordinateModifier.C
 
 $(boundaryPatch)/boundaryPatchBase.C
 $(boundaryPatch)/boundaryPatch.C
@@ -231,11 +268,15 @@ $(boundaryLayers)/boundaryLayersFacesAndCells.C
 $(boundaryLayers)/boundaryLayerCells.C
 $(boundaryLayers)/boundaryLayersCheckTopologyOfBndFaces.C
 $(boundaryLayers)/boundaryLayersWrapperLayer.C
-$(boundaryLayers)/extrudeLayer.C
-$(boundaryLayers)/refineBoundaryLayers.C
-$(boundaryLayers)/refineBoundaryLayersFunctions.C
-$(boundaryLayers)/refineBoundaryLayersFaces.C
-$(boundaryLayers)/refineBoundaryLayersCells.C
+$(extrudeLayer)/extrudeLayer.C
+$(detectBoundaryLayers)/detectBoundaryLayers.C
+$(detectBoundaryLayers)/detectBoundaryLayersFunctions.C
+$(refineBoundaryLayers)/refineBoundaryLayers.C
+$(refineBoundaryLayers)/refineBoundaryLayersFunctions.C
+$(refineBoundaryLayers)/refineBoundaryLayersFaces.C
+$(refineBoundaryLayers)/refineBoundaryLayersCells.C
+$(triangulateNonPlanarBaseFaces)/triangulateNonPlanarBaseFaces.C
+$(triangulateNonPlanarBaseFaces)/triangulateNonPlanarBaseFacesFunctions.C
 
 $(meshSurfaceEngine)/meshSurfaceEngine.C
 $(meshSurfaceEngine)/meshSurfaceEngineCalculateBoundaryNodesAndFaces.C
@@ -267,6 +308,13 @@ $(meshSurfaceEdgeExtractorNonTopo)/meshSurfaceEdgeExtractorNonTopoDistributeFace
 $(meshSurfaceEdgeExtractor2D)/meshSurfaceEdgeExtractor2D.C
 $(meshSurfaceEdgeExtractor2D)/meshSurfaceEdgeExtractor2DDistributeFaces.C
 
+$(meshSurfaceEdgeExtractorFUN)/meshSurfaceEdgeExtractorFUN.C
+$(meshSurfaceEdgeExtractorFUN)/meshSurfaceEdgeExtractorFUNDistributeFaces.C
+
+$(createFundamentalSheets)/createFundamentalSheets.C
+$(createFundamentalSheetsFJ)/createFundamentalSheetsFJ.C
+$(createFundamentalSheetsJFS)/createFundamentalSheetsJFS.C
+
 $(correctEdgesBetweenPatches)/correctEdgesBetweenPatches.C
 $(correctEdgesBetweenPatches)/correctEdgesBetweenPatchesDistributeFaces.C
 
@@ -282,6 +330,11 @@ $(tetMeshOptimisation)/tetMeshOptimisation.C
 $(tetMeshOptimisation)/tetMeshOptimisationParallel.C
 
 $(symmetryPlaneOptimisation)/symmetryPlaneOptimisation.C
+
+$(boundaryLayerOptimisation)/boundaryLayerOptimisation.C
+$(boundaryLayerOptimisation)/boundaryLayerOptimisationFunctions.C
+$(boundaryLayerOptimisation)/boundaryLayerOptimisationNormals.C
+$(boundaryLayerOptimisation)/boundaryLayerOptimisationThickness.C
 
 $(simplexSmoother)/simplexSmoother.C
 
@@ -353,8 +406,11 @@ $(objectRefinement)/sphereRefinement.C
 $(objectRefinement)/lineRefinement.C
 $(objectRefinement)/coneRefinement.C
 $(objectRefinement)/boxRefinement.C
+$(objectRefinement)/hollowConeRefinement.C
 
 $(triSurface2DCheck)/triSurface2DCheck.C
+
+$(triSurfaceChecks)/triSurfaceChecks.C
 
 $(triSurfaceCleanupDuplicates)/triSurfaceCleanupDuplicates.C
 $(triSurfaceCleanupDuplicates)/triSurfaceCleanupDuplicatesFunctions.C
@@ -401,7 +457,15 @@ $(tetMeshExtractorOctree)/tetMeshExtractorOctree.C
 
 $(tetMeshGenerator)/tetMeshGenerator.C
 
+$(voronoiMeshExtractor)/voronoiMeshExtractor.C
+$(voronoiMeshExtractor)/voronoiMeshExtractorAddressing.C
+$(voronoiMeshExtractor)/voronoiMeshExtractorCreateMesh.C
+
+$(voronoiMeshGenerator)/voronoiMeshGenerator.C
+
 $(writeAsFPMA)/writeMeshFPMA.C
 $(writeAsFPMA)/fpmaMesh.C
 
-LIB = $(FOAM_LIBBIN)/libcfMesh
+$(workflowControls)/workflowControls.C
+
+LIB = $(FOAM_LIBBIN)/libmeshLibrary

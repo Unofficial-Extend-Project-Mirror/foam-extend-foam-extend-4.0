@@ -1,25 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
-    \\  /    A nd           | Web:         http://www.foam-extend.org
-     \\/     M anipulation  | For copyright notice see file Copyright
+  \\      /  F ield         | cfMesh: A library for mesh generation
+   \\    /   O peration     |
+    \\  /    A nd           | Author: Franjo Juretic (franjo.juretic@c-fields.com)
+     \\/     M anipulation  | Copyright (C) Creative Fields, Ltd.
 -------------------------------------------------------------------------------
 License
-    This file is part of foam-extend.
+    This file is part of cfMesh.
 
-    foam-extend is free software: you can redistribute it and/or modify it
+    cfMesh is free software; you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation, either version 3 of the License, or (at your
+    Free Software Foundation; either version 3 of the License, or (at your
     option) any later version.
 
-    foam-extend is distributed in the hope that it will be useful, but
-    WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    General Public License for more details.
+    cfMesh is distributed in the hope that it will be useful, but WITHOUT
+    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+    for more details.
 
     You should have received a copy of the GNU General Public License
-    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
+    along with cfMesh.  If not, see <http://www.gnu.org/licenses/>.
 
 InNamespace
     Foam::help
@@ -41,11 +41,11 @@ SourceFiles
 #include "triSurf.H"
 #include "triangle.H"
 #include "tetrahedron.H"
+#include "boolList.H"
+#include "HashSet.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-class boolList;
-class labelHashSet;
 class boundBox;
 
 namespace Foam
@@ -181,6 +181,16 @@ namespace help
         const boundBox&
     );
 
+    //- check if the line and the face intersect
+    inline bool lineFaceIntersection
+    (
+        const point&,
+        const point&,
+        const face&,
+        const pointField& fp,
+        point& intersection
+    );
+
     //- check if the surface triangle and the face intersect
     inline bool doFaceAndTriangleIntersect
     (
@@ -188,6 +198,13 @@ namespace help
         const label triI,
         const face& f,
         const pointField& facePoints
+    );
+
+    //- find the nearest point on the triangle to the given point
+    inline point nearestPointOnTheTriangle
+    (
+        const triangle<point, point>& tri,
+        const point&
     );
 
     //- find the nearest vertex on the surface triangle to the given point
@@ -198,13 +215,51 @@ namespace help
         const point&
     );
 
-    //- check if the point is inside or outside the face
-    inline bool pointInsideFace
+    //- find the minimiser point from a point and the given planes
+    //- returns true if the minimizer exists
+    inline bool findMinimizerPoint
     (
-        const point& p,
-        const face& f,
-        const vector& n,
-        const pointField& fp
+        const DynList<point>& origins,
+        const DynList<vector>& normals,
+        point& pMin
+    );
+
+    //- check the existence of overlap between the two edges
+    inline bool doEdgesOverlap
+    (
+        const point& e0p0,
+        const point& e0p1,
+        const point& e1p0,
+        const point& e1p1,
+        FixedList<point, 2>& overlappingPart,
+        const scalar distTol = -1.0,
+        const scalar cosTol = Foam::cos(5.0*(M_PI/180.0)) // cosine tolerance
+    );
+
+    //- check the existence of overlap between the two triangles
+    inline bool doTrianglesOverlap
+    (
+        const triangle<point, point>& tri0,
+        const triangle<point, point>& tri1,
+        DynList<point>& overlappingPolygon,
+        const scalar distTol = -1.0,
+        const scalar cosTol = Foam::cos(5.0*(M_PI/180.0)) // cosine tolerance
+    );
+
+    //- check the existence of intersection between the two triangles
+    inline bool doTrianglesIntersect
+    (
+        const triangle<point, point> &tri0,
+        const triangle<point, point> &tri1,
+        const scalar distTol = -1.0
+    );
+
+    inline bool doTrianglesIntersect
+    (
+        const triangle<point, point>& tri0,
+        const triangle<point, point>& tri1,
+        DynList<point>& intersectionPoints,
+        const scalar distTol = -1.0
     );
 
     //- check if the point is inside or outside the face
@@ -212,7 +267,26 @@ namespace help
     (
         const point& p,
         const face& f,
-        const pointField& fp
+        const vector& n,
+        const pointField& fp,
+        const scalar distTol = SMALL
+    );
+
+    //- check if the point is inside or outside the face
+    inline bool pointInsideFace
+    (
+        const point& p,
+        const face& f,
+        const pointField& fp,
+        const scalar distTol = SMALL
+    );
+
+    //- check if the face is convex. Concave points are flagged false
+    inline bool isFaceConvexAndOk
+    (
+        const face& f,
+        const pointField& fp,
+        DynList<bool>& OkPoints
     );
 
     //- check if the vertex is on the positive side of the face plane

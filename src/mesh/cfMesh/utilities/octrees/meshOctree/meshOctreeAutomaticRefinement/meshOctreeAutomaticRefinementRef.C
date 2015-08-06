@@ -1,25 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
-    \\  /    A nd           | Web:         http://www.foam-extend.org
-     \\/     M anipulation  | For copyright notice see file Copyright
+  \\      /  F ield         | cfMesh: A library for mesh generation
+   \\    /   O peration     |
+    \\  /    A nd           | Author: Franjo Juretic (franjo.juretic@c-fields.com)
+     \\/     M anipulation  | Copyright (C) Creative Fields, Ltd.
 -------------------------------------------------------------------------------
 License
-    This file is part of foam-extend.
+    This file is part of cfMesh.
 
-    foam-extend is free software: you can redistribute it and/or modify it
+    cfMesh is free software; you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation, either version 3 of the License, or (at your
+    Free Software Foundation; either version 3 of the License, or (at your
     option) any later version.
 
-    foam-extend is distributed in the hope that it will be useful, but
-    WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    General Public License for more details.
+    cfMesh is distributed in the hope that it will be useful, but WITHOUT
+    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+    for more details.
 
     You should have received a copy of the GNU General Public License
-    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
+    along with cfMesh.  If not, see <http://www.gnu.org/licenses/>.
 
 Description
 
@@ -78,7 +78,7 @@ void meshOctreeAutomaticRefinement::automaticRefinement()
 
 bool meshOctreeAutomaticRefinement::curvatureRefinement()
 {
-    List<direction> refineBox(octree_.numberOfLeaves(), direction(0));
+    labelList refineBox(octree_.numberOfLeaves(), direction(0));
     labelLongList refinementCandidates;
     forAll(refineBox, i)
         refinementCandidates.append(i);
@@ -93,7 +93,7 @@ bool meshOctreeAutomaticRefinement::curvatureRefinement()
 bool meshOctreeAutomaticRefinement::proximityRefinement()
 {
     bool refine(false);
-    List<direction> refineBox(octree_.numberOfLeaves(), direction(0));
+    labelList refineBox(octree_.numberOfLeaves(), direction(0));
     labelLongList refinementCandidates;
     forAll(refineBox, i)
         refinementCandidates.append(i);
@@ -126,7 +126,7 @@ bool meshOctreeAutomaticRefinement::proximityRefinement()
 
 bool meshOctreeAutomaticRefinement::refineBasedOnContainedCorners
 (
-    List<direction>& refineBox,
+    labelList& refineBox,
     const labelLongList& refCandidates
 )
 {
@@ -220,7 +220,7 @@ bool meshOctreeAutomaticRefinement::refineBasedOnContainedCorners
 
 bool meshOctreeAutomaticRefinement::refineBasedOnContainedPartitions
 (
-    List<direction>& refineBox,
+    labelList& refineBox,
     const labelLongList& refCandidates
 )
 {
@@ -326,7 +326,7 @@ bool meshOctreeAutomaticRefinement::refineBasedOnContainedPartitions
 
 bool meshOctreeAutomaticRefinement::refineBasedOnCurvature
 (
-    List<direction>& refineBox,
+    labelList& refineBox,
     const labelLongList& refCandidates
 )
 {
@@ -398,7 +398,7 @@ bool meshOctreeAutomaticRefinement::refineBasedOnCurvature
 
 bool meshOctreeAutomaticRefinement::refineBasedOnProximityTests
 (
-    List<direction>& refineBox,
+    labelList& refineBox,
     const labelLongList& refCandidates
 )
 {
@@ -462,7 +462,7 @@ bool meshOctreeAutomaticRefinement::refineBasedOnProximityTests
 
 void meshOctreeAutomaticRefinement::refineSelectedBoxes
 (
-    List<direction>& refineBox,
+    labelList& refineBox,
     labelLongList& refCandidates
 )
 {

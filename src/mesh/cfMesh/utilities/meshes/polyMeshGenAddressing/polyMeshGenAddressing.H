@@ -1,25 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
-    \\  /    A nd           | Web:         http://www.foam-extend.org
-     \\/     M anipulation  | For copyright notice see file Copyright
+  \\      /  F ield         | cfMesh: A library for mesh generation
+   \\    /   O peration     |
+    \\  /    A nd           | Author: Franjo Juretic (franjo.juretic@c-fields.com)
+     \\/     M anipulation  | Copyright (C) Creative Fields, Ltd.
 -------------------------------------------------------------------------------
 License
-    This file is part of foam-extend.
+    This file is part of cfMesh.
 
-    foam-extend is free software: you can redistribute it and/or modify it
+    cfMesh is free software; you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation, either version 3 of the License, or (at your
+    Free Software Foundation; either version 3 of the License, or (at your
     option) any later version.
 
-    foam-extend is distributed in the hope that it will be useful, but
-    WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    General Public License for more details.
+    cfMesh is distributed in the hope that it will be useful, but WITHOUT
+    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+    for more details.
 
     You should have received a copy of the GNU General Public License
-    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
+    along with cfMesh.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
     polyMeshGenAddressing
@@ -126,38 +126,38 @@ class polyMeshGenAddressing
 
         //- Face areas
         mutable vectorField* faceAreasPtr_;
-
+        
     // Parallel demand driven data
-
+        
         //- global point labels
         mutable labelLongList* globalPointLabelPtr_;
-
+        
         //- global face labels
         mutable labelLongList* globalFaceLabelPtr_;
-
+        
         //- global cell labels
         mutable labelLongList* globalCellLabelPtr_;
-
+        
         //- global edge labels
         mutable labelLongList* globalEdgeLabelPtr_;
-
+        
     // Parallel addressing
-
+    
         //- processors containing a vertex
         mutable VRWGraph* pProcsPtr_;
-
+        
         //- global to local point adressing
         mutable Map<label>* globalToLocalPointAddressingPtr_;
-
+        
         //- neighbour processors sharing a point with this processor
         mutable DynList<label>* pointNeiProcsPtr_;
-
+        
         //- processors containing an edge
         mutable VRWGraph* eProcsPtr_;
-
+        
         //- global to local edge addressing
         mutable Map<label>* globalToLocalEdgeAddressingPtr_;
-
+        
         //- neighbour processors sharing an edge with the current processor
         mutable DynList<label>* edgeNeiProcsPtr_;
 
@@ -186,7 +186,7 @@ class polyMeshGenAddressing
 
         //- Calculate edge-face addressing
         void calcEdgeFaces() const;
-
+        
         //- Calculate face-edge addressing
         void calcFaceEdges() const;
 
@@ -211,16 +211,16 @@ class polyMeshGenAddressing
         void clearOutEdges();
 
     // Parallel calculations
-
+    
         //- calculate global point labels
         void calcGlobalPointLabels() const;
-
+        
         //- calculate global face labels
         void calcGlobalFaceLabels() const;
-
+        
         //- calculate global cell labels
         void calcGlobalCellLabels() const;
-
+        
         //- calculate global edge labels
         void calcGlobalEdgeLabels() const;
 
@@ -247,7 +247,7 @@ class polyMeshGenAddressing
 
         //- Calculate edge vectors
         void calcEdgeVectors() const;
-
+        
     // Disallow bitwise construct
         //- Default constructor
         polyMeshGenAddressing();
@@ -325,12 +325,12 @@ public:
             const VRWGraph& cellPoints() const;
 
         // Parallel addressing
-
+        
             const labelLongList& globalPointLabel() const;
             const labelLongList& globalFaceLabel() const;
             const labelLongList& globalCellLabel() const;
             const labelLongList& globalEdgeLabel() const;
-
+            
             const VRWGraph& pointAtProcs() const;
             const Map<label>& globalToLocalPointAddressing() const;
             const DynList<label>& pointNeiProcs() const;
@@ -355,7 +355,7 @@ public:
 
         //- Clear topological data
         void clearAddressing();
-
+        
         //- Clear parallel addressing
         void clearParallelAddressing();
 
@@ -364,7 +364,7 @@ public:
 
         //- Clear everything primitive, geometry and addressing
         void clearAll();
-
+        
     // Update geometry data
         void updateGeometry(const boolList& changedFace);
 };
