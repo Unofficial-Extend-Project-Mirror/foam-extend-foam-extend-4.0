@@ -22,7 +22,7 @@
 #     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 #
 # Script
-#     RPM spec file for openmpi-1.8.7
+#     RPM spec file for openmpi-1.8.8
 #
 # Description
 #     RPM spec file for creating a relocatable RPM
@@ -62,7 +62,7 @@
 
 %define name		openmpi
 %define release		%{_WM_OPTIONS}
-%define version 	1.8.7
+%define version 	1.8.8
 
 %define buildroot       %{_topdir}/BUILD/%{name}-%{version}-root
 
