@@ -1,25 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
-    \\  /    A nd           | Web:         http://www.foam-extend.org
-     \\/     M anipulation  | For copyright notice see file Copyright
+  \\      /  F ield         | cfMesh: A library for mesh generation
+   \\    /   O peration     |
+    \\  /    A nd           | Author: Franjo Juretic (franjo.juretic@c-fields.com)
+     \\/     M anipulation  | Copyright (C) Creative Fields, Ltd.
 -------------------------------------------------------------------------------
 License
-    This file is part of foam-extend.
+    This file is part of cfMesh.
 
-    foam-extend is free software: you can redistribute it and/or modify it
+    cfMesh is free software; you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation, either version 3 of the License, or (at your
+    Free Software Foundation; either version 3 of the License, or (at your
     option) any later version.
 
-    foam-extend is distributed in the hope that it will be useful, but
-    WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    General Public License for more details.
+    cfMesh is distributed in the hope that it will be useful, but WITHOUT
+    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+    for more details.
 
     You should have received a copy of the GNU General Public License
-    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
+    along with cfMesh.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
     partTetMesh
@@ -106,7 +106,11 @@ class partTetMesh
     // Private member functions
 
         //- create points and tets
-        void createPointsAndTets(const List<direction>&);
+        void createPointsAndTets
+        (
+            const List<direction>& usedCells,
+            const boolList& lockedPoints
+        );
 
         //- create parallel addressing
         void createParallelAddressing
@@ -128,14 +132,24 @@ class partTetMesh
 public:
 
     // Constructors
-        //- construct from polyMeshGen
-        partTetMesh(polyMeshGen& mesh);
+        //- construct from polyMeshGen and locked points
+        partTetMesh(polyMeshGen& mesh, const labelLongList& lockedPoints);
+
+        //- construct from polyMeshGen, locked points and the number of layers
+        //- from the boundary
+        partTetMesh
+        (
+            polyMeshGen& mesh,
+            const labelLongList& lockedPoints,
+            const direction nLayers = 2
+        );
 
         //- construct from polyMeshGen, bad faces and the number
         //- of additional layers
         partTetMesh
         (
             polyMeshGen& mesh,
+            const labelLongList& lockedPoints,
             labelHashSet& badFaces,
             const direction additionalLayers = 0
         );
@@ -149,7 +163,8 @@ public:
             FACECENTRE = 2,
             CELLCENTRE = 4,
             PARALLELBOUNDARY = 8,
-            BOUNDARY = 16
+            BOUNDARY = 16,
+            LOCKED = 32
         };
 
     // Destructor
@@ -255,6 +270,14 @@ public:
 
         //- creates polyMeshGen from this partTetMesh
         void createPolyMesh(polyMeshGen& pmg) const;
+
+        //- add the LOCKED flag to mesh points which shall not move
+        template<class labelListType>
+        void lockPoints(const labelListType& l)
+        {
+            forAll(l, pI)
+                smoothVertex_[l[pI]] |= LOCKED;
+        }
 };
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

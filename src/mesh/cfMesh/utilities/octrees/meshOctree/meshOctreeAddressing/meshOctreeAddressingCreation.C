@@ -1,25 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
-    \\  /    A nd           | Web:         http://www.foam-extend.org
-     \\/     M anipulation  | For copyright notice see file Copyright
+  \\      /  F ield         | cfMesh: A library for mesh generation
+   \\    /   O peration     |
+    \\  /    A nd           | Author: Franjo Juretic (franjo.juretic@c-fields.com)
+     \\/     M anipulation  | Copyright (C) Creative Fields, Ltd.
 -------------------------------------------------------------------------------
 License
-    This file is part of foam-extend.
+    This file is part of cfMesh.
 
-    foam-extend is free software: you can redistribute it and/or modify it
+    cfMesh is free software; you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation, either version 3 of the License, or (at your
+    Free Software Foundation; either version 3 of the License, or (at your
     option) any later version.
 
-    foam-extend is distributed in the hope that it will be useful, but
-    WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    General Public License for more details.
+    cfMesh is distributed in the hope that it will be useful, but WITHOUT
+    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+    for more details.
 
     You should have received a copy of the GNU General Public License
-    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
+    along with cfMesh.  If not, see <http://www.gnu.org/licenses/>.
 
 Description
 
@@ -39,12 +39,86 @@ Description
 
 //#define DEBUGVrt
 
+# ifdef DEBUGVrt
+#include "OFstream.H"
+# endif
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+# ifdef DEBUGVrt
+void writeOctreeToVTK
+(
+    const fileName& fName,
+    const meshOctree& octree,
+    const List<direction>& boxTypes,
+    const direction bType
+)
+{
+    OFstream file(fName);
+
+    //- write the header
+    file << "# vtk DataFile Version 3.0\n";
+    file << "vtk output\n";
+    file << "ASCII\n";
+    file << "DATASET UNSTRUCTURED_GRID\n";
+
+    label nBoxes(0);
+    forAll(boxTypes, leafI)
+        if( boxTypes[leafI] & bType )
+            ++nBoxes;
+
+    //- write points
+    file << "POINTS " << 8*nBoxes << " float\n";
+    forAll(boxTypes, leafI)
+    {
+        if( boxTypes[leafI] & bType )
+        {
+            FixedList<point, 8> vertices;
+            octree.returnLeaf(leafI).vertices(octree.rootBox(), vertices);
+
+            forAll(vertices, vI)
+            {
+                const point& p = vertices[vI];
+
+                file << p.x() << ' ' << p.y() << ' ' << p.z() << nl;
+            }
+        }
+    }
+
+    //- write boxes
+    file << "\nCELLS " << nBoxes
+         << " " << 9 * nBoxes << nl;
+
+    nBoxes = 0;
+    forAll(boxTypes, leafI)
+    {
+        if( boxTypes[leafI] & bType )
+        {
+            const label start = 8 * nBoxes;
+            file << 8 << " " << start << " " << start+1
+                      << " " << start+3 << " " << start+2
+                      << " " << start+4 << " " << start+5
+                      << " " << start+7 << " " << start+6 << nl;
+
+            ++nBoxes;
+        }
+    }
+
+    file << nl;
+
+    //- write cell types
+    file << "CELL_TYPES " << nBoxes << nl;
+    for(label i=0;i<nBoxes;++i)
+        file << 12 << nl;
+
+    file << nl;
+}
+# endif
 
 void meshOctreeAddressing::createOctreePoints() const
 {
@@ -56,7 +130,7 @@ void meshOctreeAddressing::createOctreePoints() const
 
     const label nLeaves = nodeLabels.size();
     # ifdef USE_OMP
-    # pragma omp parallel for schedule(guided)
+    # pragma omp parallel for schedule(guided, 100)
     # endif
     for(label cubeI=0;cubeI<nLeaves;++cubeI)
     {
@@ -66,10 +140,12 @@ void meshOctreeAddressing::createOctreePoints() const
         FixedList<point, 8> vertices;
         const meshOctreeCubeBasic& oc = octree_.returnLeaf(cubeI);
         oc.vertices(rootBox, vertices);
-        forAllRow(nodeLabels, cubeI, pI)
+
+        forAllRow(nodeLabels, cubeI, nI)
         {
-            forAllRow(nodeLabels, cubeI, nI)
-                octreePoints[nodeLabels(cubeI, nI)] = vertices[nI];
+            const label nodeI = nodeLabels(cubeI, nI);
+
+            octreePoints[nodeI] = vertices[nI];
         }
     }
 }
@@ -97,7 +173,7 @@ void meshOctreeAddressing::createNodeLabels() const
     nNodes_ = 0;
     DynList<label> numLocalNodes;
     # ifdef USE_OMP
-    # pragma omp parallel //num_threads(Foam::max(nodeLabels.size() / 1000, 1))
+    # pragma omp parallel
     # endif
     {
         # ifdef USE_OMP
@@ -162,7 +238,7 @@ void meshOctreeAddressing::createNodeLabels() const
                     }
                 }
 
-                if( minLeaf == leafI && validLeaf[7-nI] )
+                if( (minLeaf == leafI) && validLeaf[7-nI] )
                 {
                     forAll(pLeaves, plI)
                         if( validLeaf[plI] )
@@ -251,6 +327,74 @@ void meshOctreeAddressing::createNodeLabels() const
             nNodes_ = Foam::max(nNodes_, startNode);
         }
     }
+
+    # ifdef DEBUGVrt
+    List<direction> badLeaves(nodeLabels.size(), direction(0));
+    forAll(nodeLabels, leafI)
+        forAllRow(nodeLabels, leafI, i)
+            if( nodeLabels(leafI, i) < 0 )
+                badLeaves[leafI] |= 1;
+    writeOctreeToVTK("badLeaves.vtk", octree_, badLeaves, 1);
+
+    writeOctreeToVTK("meshCells.vtk", octree_, boxType, MESHCELL);
+    writeOctreeToVTK("boundaryCells.vtk", octree_, boxType, BOUNDARY);
+
+    Info << "Checking for existence of negative node labels" << endl;
+    forAll(nodeLabels, leafI)
+    {
+        forAllRow(nodeLabels, leafI, nI)
+        {
+            if( nodeLabels(leafI, nI) < 0 )
+            {
+                FixedList<label, 8> pLeaves;
+                octree_.findLeavesForCubeVertex(leafI, nI, pLeaves);
+
+                FixedList<bool, 8> validLeaf(true);
+                label minLeaf(leafI);
+                forAll(pLeaves, plI)
+                {
+                    if( pLeaves[plI] > -1 )
+                    {
+                        for(label i=plI+1;i<8;++i)
+                            if( pLeaves[plI] == pLeaves[i] )
+                            {
+                                validLeaf[plI] = false;
+                                validLeaf[i] = false;
+                            }
+
+                        if( !boxType[pLeaves[plI]] )
+                        {
+                            validLeaf[plI] = false;
+                            pLeaves[plI] = -1;
+                        }
+
+                        if( validLeaf[plI] )
+                            minLeaf = Foam::min(minLeaf, pLeaves[plI]);
+                    }
+                    else
+                    {
+                        validLeaf[plI] = false;
+                    }
+                }
+
+                Info << "Min leaf " << minLeaf << endl;
+                Info << "Valid leaf " << validLeaf << endl;
+                Info << "pLeaves " << pLeaves << endl;
+                Info << "Node position " << nI << endl;
+
+                Info << "1.Leaf " << leafI << " node labels "
+                      << nodeLabels[leafI] << endl;
+
+                forAll(validLeaf, i)
+                    if( validLeaf[i] )
+                        Info << "Leaf at position " << i << " has node labels "
+                             << nodeLabels[pLeaves[i]]
+                             << " at level "
+                             << octree_.returnLeaf(pLeaves[i]).level() << endl;
+            }
+        }
+    }
+    # endif
 }
 
 void meshOctreeAddressing::createNodeLeaves() const
@@ -891,8 +1035,8 @@ void meshOctreeAddressing::createOctreeFaces() const
     {
         face f(octreeFacesPtr_->sizeOfRow(faceI));
         forAll(f, pI)
-            f[pI] = octreeFacesPtr->operator()(faceI, pI);
-        const vector n = (*octreeFacesPtr_)[faceI].normal(this->octreePoints());
+            f[pI] = octreeFacesPtr_->operator()(faceI, pI);
+        const vector n = f.normal(this->octreePoints());
 
         sum[(*octreeFacesOwnersPtr_)[faceI]] += n;
         const label nei = (*octreeFacesNeighboursPtr_)[faceI];

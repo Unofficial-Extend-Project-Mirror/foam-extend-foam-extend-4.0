@@ -1,25 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
-    \\  /    A nd           | Web:         http://www.foam-extend.org
-     \\/     M anipulation  | For copyright notice see file Copyright
+  \\      /  F ield         | cfMesh: A library for mesh generation
+   \\    /   O peration     |
+    \\  /    A nd           | Author: Franjo Juretic (franjo.juretic@c-fields.com)
+     \\/     M anipulation  | Copyright (C) Creative Fields, Ltd.
 -------------------------------------------------------------------------------
 License
-    This file is part of foam-extend.
+    This file is part of cfMesh.
 
-    foam-extend is free software: you can redistribute it and/or modify it
+    cfMesh is free software; you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation, either version 3 of the License, or (at your
+    Free Software Foundation; either version 3 of the License, or (at your
     option) any later version.
 
-    foam-extend is distributed in the hope that it will be useful, but
-    WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    General Public License for more details.
+    cfMesh is distributed in the hope that it will be useful, but WITHOUT
+    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+    for more details.
 
     You should have received a copy of the GNU General Public License
-    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
+    along with cfMesh.  If not, see <http://www.gnu.org/licenses/>.
 
 Description
 
@@ -30,6 +30,7 @@ Description
 #include "PtrList.H"
 #include "LongList.H"
 #include "objectRefinement.H"
+#include "coordinateModification.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -185,7 +186,7 @@ void checkMeshDict::checkLocalRefinementLevel() const
                     const label nLevels =
                         readLabel(dict.lookup("additionalRefinementLevels"));
 
-                    if( nLevels > 0 )
+                    if( nLevels < 0 )
                     {
                         WarningIn
                         (
@@ -320,15 +321,6 @@ void checkMeshDict::checkObjectRefinements() const
 
         forAll(refObjects, oI)
         {
-            if( refObjects[oI].cellSize() < 0.0 )
-            {
-                WarningIn
-                (
-                    "void checkMeshDict::checkObjectRefinements() const"
-                ) << "Cell size specified for object " << refObjects[oI].name()
-                  << " is negative!!" << endl;
-            }
-
             if( refObjects[oI].refinementThickness() < 0.0 )
             {
                 WarningIn
@@ -336,6 +328,38 @@ void checkMeshDict::checkObjectRefinements() const
                     "void checkMeshDict::checkObjectRefinements() const"
                 ) << "Refinement thickness specified for object "
                   << refObjects[oI].name() << " is negative!!" << endl;
+            }
+        }
+    }
+}
+
+void checkMeshDict::checkAnisotropicSources() const
+{
+    if( meshDict_.found("anisotropicSources") )
+    {
+        PtrList<coordinateModification> anisotropicObjects;
+
+        if( meshDict_.isDict("anisotropicSources") )
+        {
+            const dictionary& dict = meshDict_.subDict("anisotropicSources");
+            const wordList objectNames = dict.toc();
+
+            anisotropicObjects.setSize(objectNames.size());
+
+            forAll(anisotropicObjects, objectI)
+            {
+                const entry& objectEntry =
+                    dict.lookupEntry(objectNames[objectI], false, false);
+
+                anisotropicObjects.set
+                (
+                    objectI,
+                    coordinateModification::New
+                    (
+                        objectEntry.keyword(),
+                        objectEntry.dict()
+                    )
+                );
             }
         }
     }
@@ -444,6 +468,109 @@ void checkMeshDict::checkSurfaceRefinements() const
     }
 }
 
+void checkMeshDict::checkEdgeMeshRefinements() const
+{
+    if( meshDict_.found("edgeMeshRefinement") )
+    {
+        const dictionary& edgeMeshes = meshDict_.subDict("edgeMeshRefinement");
+
+        const wordList edgeMeshSources = edgeMeshes.toc();
+
+        forAll(edgeMeshSources, emI)
+        {
+            if( edgeMeshes.isDict(edgeMeshSources[emI]) )
+            {
+                const dictionary& dict =
+                    edgeMeshes.subDict(edgeMeshSources[emI]);
+
+                if( dict.found("edgeFile") )
+                {
+                    const fileName fName(dict.lookup("edgeFile"));
+
+                    if( !isFile(fName) )
+                        FatalErrorIn
+                        (
+                        "void checkMeshDict::checkEdgeMeshRefinements() const"
+                        ) << "Edge mesh file " << fName
+                          << " does not exist or is not readable!!"
+                          << exit(FatalError);
+                }
+                else
+                {
+                    FatalErrorIn
+                    (
+                        "void checkMeshDict::checkEdgeMeshRefinements() const"
+                    ) << "Missing edgeFilw for entry "
+                      << edgeMeshSources[emI] << exit(FatalError);
+                }
+
+                if( dict.found("cellSize") )
+                {
+                    const scalar cs = readScalar(dict.lookup("cellSize"));
+
+                    if( cs < VSMALL )
+                        FatalErrorIn
+                        (
+                            "void checkMeshDict::"
+                            "checkEdgeMeshRefinements() const"
+                        ) << "Cell size for entry " << edgeMeshSources[emI]
+                          << " is extremely small or negative!!"
+                          << exit(FatalError);
+                }
+                else if( dict.found("additionalRefinementLevels") )
+                {
+                    const label nLev =
+                        readLabel(dict.lookup("additionalRefinementLevels"));
+
+                    if( nLev < 0 )
+                    {
+                        FatalErrorIn
+                        (
+                            "void checkMeshDict::"
+                            "checkEdgeMeshRefinements() const"
+                        ) << "Number refinement levels for entry "
+                          << edgeMeshSources[emI] << " is negative!!"
+                          << exit(FatalError);
+                    }
+                }
+                else
+                {
+                    FatalErrorIn
+                    (
+                        "void checkMeshDict::checkEdgeMeshRefinements() const"
+                    ) << "Missing cellSize or additionalRefinementLevels"
+                      << " for entry " << edgeMeshSources[emI]
+                      << exit(FatalError);
+                }
+
+                if( dict.found("refinementThickness") )
+                {
+                    const scalar cs =
+                        readScalar(dict.lookup("refinementThickness"));
+
+                    if( cs < VSMALL )
+                        WarningIn
+                        (
+                            "void checkMeshDict::"
+                            "checkEdgeMeshRefinements() const"
+                        ) << "Refinement thickness for entry "
+                          << edgeMeshSources[emI]
+                          << " is extremely small or negative!!" << endl;
+                }
+            }
+            else
+            {
+                FatalErrorIn
+                (
+                    "void checkMeshDict::checkEdgeMeshRefinements() const"
+                ) << "Dictionary " << edgeMeshSources[emI]
+                  << " does not exist!!"
+                  << exit(FatalError);
+            }
+        }
+    }
+}
+
 void checkMeshDict::checkBoundaryLayers() const
 {
     if( meshDict_.found("boundaryLayers") )
@@ -502,6 +629,75 @@ void checkMeshDict::checkBoundaryLayers() const
                     Warning << "Cannot refine layer for patch "
                         << patchNames[patchI] << endl;
                 }
+            }
+        }
+
+        //- check for existence of boundary layer smoothing
+        if( bndLayers.found("optimiseLayer") )
+        {
+            readBool(bndLayers.lookup("optimiseLayer"));
+        }
+
+        if( bndLayers.found("optimisationParameters") )
+        {
+            const dictionary& optParams =
+                bndLayers.subDict("optimisationParameters");
+
+            if( optParams.found("reCalculateNormals") )
+            {
+                readBool(optParams.lookup("reCalculateNormals"));
+            }
+
+            if( optParams.found("nSmoothNormals") )
+            {
+                const label nSmoothNormals =
+                    readLabel(optParams.lookup("nSmoothNormals"));
+
+                if( nSmoothNormals < 0 )
+                    FatalErrorIn
+                    (
+                        "void checkMeshDict::checkBoundaryLayers() const"
+                    ) << "nSmoothNormals must not be negative!"
+                      << exit(FatalError);
+            }
+
+            if( optParams.found("featureSizeFactor") )
+            {
+                const scalar featureSizeFactor =
+                    readScalar(optParams.lookup("featureSizeFactor"));
+
+                if( featureSizeFactor >= 1.0 || featureSizeFactor < 0.0 )
+                    FatalErrorIn
+                    (
+                        "void checkMeshDict::checkBoundaryLayers() const"
+                    ) << "Feature size factor is out"
+                      << " of a valid range 0 to 1" << exit(FatalError);
+            }
+
+            if( optParams.found("relThicknessTol") )
+            {
+                const scalar relThicknessTol =
+                    readScalar(optParams.lookup("relThicknessTol"));
+
+                if( relThicknessTol >= 1.0 || relThicknessTol < 0.0 )
+                    FatalErrorIn
+                    (
+                        "void checkMeshDict::checkBoundaryLayers() const"
+                    ) << "Relative thickness tolerance is out"
+                      << " of a valid range 0 to 1" << exit(FatalError);
+            }
+
+            if( optParams.found("maxNumIterations") )
+            {
+                const label maxNumIterations =
+                    readLabel(optParams.lookup("maxNumIterations"));
+
+                if( maxNumIterations < 0 )
+                    FatalErrorIn
+                    (
+                        "void checkMeshDict::checkBoundaryLayers() const"
+                    ) << "maxNumIterations must not be negative!"
+                      << exit(FatalError);
             }
         }
     }
@@ -583,6 +779,8 @@ void checkMeshDict::checkEntries() const
     checkRemoveCellsIntersectingPatches();
 
     checkObjectRefinements();
+
+    checkAnisotropicSources();
 
     checkBoundaryLayers();
 
@@ -668,7 +866,7 @@ void checkMeshDict::updateSubsetCellSize
 
 }
 
-void checkMeshDict::updateLocalRefinementLevel
+void checkMeshDict::updateLocalRefinement
 (
     const std::map<word, wordList>& patchesFromPatch
 )
@@ -693,20 +891,7 @@ void checkMeshDict::updateLocalRefinementLevel
                 const wordList& updatedPatchNames = it->second;
 
                 const dictionary& pDict = dict.subDict(pName);
-                dictionary copy;
-                if( pDict.found("additionalRefinementLevels") )
-                {
-                    const label nLevels =
-                        readLabel(pDict.lookup("additionalRefinementLevels"));
-
-                    copy.add("additionalRefinementLevels", nLevels);
-                }
-                else if( pDict.found("cellSize") )
-                {
-                    const scalar cs = readScalar(pDict.lookup("cellSize"));
-
-                    copy.add("cellSize", cs);
-                }
+                dictionary copy = pDict;
 
                 //- add new patches
                 forAll(updatedPatchNames, nameI)
@@ -741,7 +926,10 @@ void checkMeshDict::updateKeepCellsIntersectingPatches
                     patchesFromPatch.find(pName);
 
                 if( it == patchesFromPatch.end() )
+                {
                     updatedPatchNames.append(pName);
+                    continue;
+                }
 
                 const wordList& newPatchNames = it->second;
 
@@ -797,7 +985,10 @@ void checkMeshDict::updateRemoveCellsIntersectingPatches
                     patchesFromPatch.find(pName);
 
                 if( it == patchesFromPatch.end() )
+                {
                     updatedPatchNames.append(pName);
+                    continue;
+                }
 
                 const wordList& newPatchNames = it->second;
 
@@ -904,20 +1095,12 @@ void checkMeshDict::updateRenameBoundary
             const word name(dict.lookup("defaultName"));
             newDict.add("defaultName", name);
         }
-        else
-        {
-            newDict.add("defaultName", "walls");
-        }
 
         //- transfer or generate the defaultType entry
         if( dict.found("defaultType") )
         {
             const word type(dict.lookup("defaultType"));
             newDict.add("defaultType", type);
-        }
-        else
-        {
-            newDict.add("defaultType", "wall");
         }
 
         if( dict.found("newPatchNames") )
@@ -1052,9 +1235,6 @@ void checkMeshDict::updateRenameBoundary
     else
     {
         //- create the dictionary if it has not existed before
-        newDict.add("defaultName", "walls");
-        newDict.add("defaultType", "wall");
-
         dictionary& newPatchesDict = newDict.subDict("newPatchNames");
 
         std::map<word, wordList>::const_iterator it;
@@ -1109,7 +1289,7 @@ void checkMeshDict::updateDictionaries
 
     updateSubsetCellSize(patchesFromPatch);
 
-    updateLocalRefinementLevel(patchesFromPatch);
+    updateLocalRefinement(patchesFromPatch);
 
     updateKeepCellsIntersectingPatches(patchesFromPatch);
 

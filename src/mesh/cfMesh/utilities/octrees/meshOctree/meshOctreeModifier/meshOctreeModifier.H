@@ -1,25 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
-    \\  /    A nd           | Web:         http://www.foam-extend.org
-     \\/     M anipulation  | For copyright notice see file Copyright
+  \\      /  F ield         | cfMesh: A library for mesh generation
+   \\    /   O peration     |
+    \\  /    A nd           | Author: Franjo Juretic (franjo.juretic@c-fields.com)
+     \\/     M anipulation  | Copyright (C) Creative Fields, Ltd.
 -------------------------------------------------------------------------------
 License
-    This file is part of foam-extend.
+    This file is part of cfMesh.
 
-    foam-extend is free software: you can redistribute it and/or modify it
+    cfMesh is free software; you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation, either version 3 of the License, or (at your
+    Free Software Foundation; either version 3 of the License, or (at your
     option) any later version.
 
-    foam-extend is distributed in the hope that it will be useful, but
-    WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    General Public License for more details.
+    cfMesh is distributed in the hope that it will be useful, but WITHOUT
+    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+    for more details.
 
     You should have received a copy of the GNU General Public License
-    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
+    along with cfMesh.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
     meshOctreeModifier
@@ -54,11 +54,11 @@ class meshOctreeModifier
 
     // Private member functions
         //- correct refinement such that it produces 1-irregular octree
-        void ensureCorrectRegularity(List<direction>& refineBox);
+        void ensureCorrectRegularity(labelList& refineBox);
 
         //- add additional refinement with the following rule. If a son
         //- of a father box is refined, then refine all other sons
-        bool ensureCorrectRegularitySons(List<direction>& refineBox);
+        bool ensureCorrectRegularitySons(labelList& refineBox);
 
     // Private copy constructor
         //- Disallow default bitwise copy construct
@@ -126,8 +126,15 @@ public:
         //- mark additional layers around the leaves selected for refinement
         void markAdditionalLayers
         (
-            List<direction>& refineBox,
-            const direction nLayers = 1
+            labelList& refineBox,
+            const label nLayers = 1
+        ) const;
+
+        //- mark additional layers around the leaves selected for refinement
+        void markAdditionalLayersOfFaceNeighbours
+        (
+            labelList& refineBox,
+            const label nLayers = 1
         ) const;
 
         //- mark additional layers around the leaves selected for refinement
@@ -135,7 +142,7 @@ public:
         //- returns the number of boxes selected for refinement
         label markAdditionalLayers
         (
-            List<direction>& refineBox,
+            labelList& refineBox,
             labelList& nLayers,
             List<direction>& targetRefLevel
         ) const;
@@ -145,8 +152,15 @@ public:
         //- sons of the same father, if a single son gets marked for refinement
         void refineSelectedBoxes
         (
-            List<direction>& refineBox,
+            labelList& refineBox,
             const bool hexRefinement = false
+        );
+
+        //- refine selected boxes and the boxes within the given range
+        void refineSelectedBoxesAndAdditionalLayers
+        (
+            labelList& refineBox,
+            const scalarList& refThickness
         );
 
     // functions for parallel runs

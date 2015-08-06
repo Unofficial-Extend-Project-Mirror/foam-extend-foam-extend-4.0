@@ -1,25 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
-    \\  /    A nd           | Web:         http://www.foam-extend.org
-     \\/     M anipulation  | For copyright notice see file Copyright
+  \\      /  F ield         | cfMesh: A library for mesh generation
+   \\    /   O peration     |
+    \\  /    A nd           | Author: Franjo Juretic (franjo.juretic@c-fields.com)
+     \\/     M anipulation  | Copyright (C) Creative Fields, Ltd.
 -------------------------------------------------------------------------------
 License
-    This file is part of foam-extend.
+    This file is part of cfMesh.
 
-    foam-extend is free software: you can redistribute it and/or modify it
+    cfMesh is free software; you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation, either version 3 of the License, or (at your
+    Free Software Foundation; either version 3 of the License, or (at your
     option) any later version.
 
-    foam-extend is distributed in the hope that it will be useful, but
-    WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    General Public License for more details.
+    cfMesh is distributed in the hope that it will be useful, but WITHOUT
+    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+    for more details.
 
     You should have received a copy of the GNU General Public License
-    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
+    along with cfMesh.  If not, see <http://www.gnu.org/licenses/>.
 
 Description
 
@@ -47,7 +47,7 @@ namespace Foam
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-partTetMesh::partTetMesh(polyMeshGen& mesh)
+partTetMesh::partTetMesh(polyMeshGen& mesh, const labelLongList& lockedPoints)
 :
     origMesh_(mesh),
     points_(),
@@ -57,6 +57,7 @@ partTetMesh::partTetMesh(polyMeshGen& mesh)
     pointTets_(),
     internalPointsOrderPtr_(NULL),
     boundaryPointsOrderPtr_(NULL),
+    globalPointLabelPtr_(NULL),
     pAtProcsPtr_(NULL),
     globalToLocalPointAddressingPtr_(NULL),
     neiProcsPtr_(NULL),
@@ -65,12 +66,144 @@ partTetMesh::partTetMesh(polyMeshGen& mesh)
 {
     List<direction> useCell(mesh.cells().size(), direction(1));
 
-    createPointsAndTets(useCell);
+    boolList lockedPoint(mesh.points().size(), false);
+    forAll(lockedPoints, i)
+        lockedPoint[lockedPoints[i]] = true;
+
+    createPointsAndTets(useCell, lockedPoint);
 }
 
 partTetMesh::partTetMesh
 (
     polyMeshGen& mesh,
+    const labelLongList& lockedPoints,
+    const direction nLayers
+)
+:
+    origMesh_(mesh),
+    points_(),
+    tets_(),
+    nodeLabelInOrigMesh_(),
+    smoothVertex_(),
+    pointTets_(),
+    internalPointsOrderPtr_(NULL),
+    boundaryPointsOrderPtr_(NULL),
+    globalPointLabelPtr_(NULL),
+    pAtProcsPtr_(NULL),
+    globalToLocalPointAddressingPtr_(NULL),
+    neiProcsPtr_(NULL),
+    pAtParallelBoundariesPtr_(NULL),
+    pAtBufferLayersPtr_(NULL)
+{
+    const faceListPMG& faces = mesh.faces();
+    const cellListPMG& cells = mesh.cells();
+    const labelList& owner = mesh.owner();
+    const PtrList<boundaryPatch>& boundaries = mesh.boundaries();
+    const VRWGraph& pointCells = mesh.addressingData().pointCells();
+
+    List<direction> useCell(cells.size(), direction(0));
+
+    //- select cells containing at least one vertex of the bad faces
+    forAll(boundaries, patchI)
+    {
+        const label start = boundaries[patchI].patchStart();
+        const label size = boundaries[patchI].patchSize();
+
+        for(label fI=0;fI<size;++fI)
+        {
+            useCell[owner[start+fI]] = 1;
+        }
+    }
+
+    //- add additional layer of cells
+    for(direction layerI=1;layerI<(nLayers+1);++layerI)
+    {
+        forAll(useCell, cI)
+            if( useCell[cI] == layerI )
+            {
+                const cell& c = cells[cI];
+
+                forAll(c, fI)
+                {
+                    const face& f = faces[c[fI]];
+
+                    forAll(f, pI)
+                    {
+                        forAllRow(pointCells, f[pI], pcI)
+                        {
+                            const label cLabel = pointCells(f[pI], pcI);
+                            if( !useCell[cLabel] )
+                                useCell[cLabel] = layerI + 1;
+                        }
+                    }
+                }
+            }
+
+        if( Pstream::parRun() )
+        {
+            const labelLongList& globalPointLabel =
+                mesh.addressingData().globalPointLabel();
+            const VRWGraph& pProcs = mesh.addressingData().pointAtProcs();
+            const Map<label>& globalToLocal =
+                mesh.addressingData().globalToLocalPointAddressing();
+
+            std::map<label, LongList<label> > eData;
+            forAllConstIter(Map<label>, globalToLocal, iter)
+            {
+                const label pointI = iter();
+
+                forAllRow(pProcs, pointI, procI)
+                {
+                    const label neiProc = pProcs(pointI, procI);
+                    if( neiProc == Pstream::myProcNo() )
+                        continue;
+
+                    if( eData.find(neiProc) == eData.end() )
+                    {
+                        eData.insert
+                        (
+                            std::make_pair(neiProc, LongList<label>())
+                        );
+                    }
+
+                    forAllRow(pointCells, pointI, pcI)
+                        if( useCell[pointCells(pointI, pcI)] == layerI )
+                        {
+                            eData[neiProc].append(globalPointLabel[pointI]);
+                            break;
+                        }
+                }
+            }
+
+            //- exchange data with other processors
+            labelLongList receivedData;
+            help::exchangeMap(eData, receivedData);
+
+            forAll(receivedData, i)
+            {
+                const label pointI = globalToLocal[receivedData[i]];
+
+                forAllRow(pointCells, pointI, pcI)
+                {
+                    const label cLabel = pointCells(pointI, pcI);
+                    if( !useCell[cLabel] )
+                        useCell[cLabel] = layerI + 1;
+                }
+            }
+        }
+    }
+
+    boolList lockedPoint(mesh.points().size(), false);
+    forAll(lockedPoints, i)
+        lockedPoint[lockedPoints[i]] = true;
+
+    createPointsAndTets(useCell, lockedPoint);
+}
+
+partTetMesh::partTetMesh
+(
+    polyMeshGen& mesh,
+    const labelLongList& lockedPoints,
     labelHashSet& badFaces,
     const direction additionalLayers
 )
@@ -187,7 +320,11 @@ partTetMesh::partTetMesh
         }
     }
 
-    createPointsAndTets(useCell);
+    boolList lockedPoint(mesh.points().size(), false);
+    forAll(lockedPoints, i)
+        lockedPoint[lockedPoints[i]] = true;
+
+    createPointsAndTets(useCell, lockedPoint);
 }
 
 partTetMesh::~partTetMesh()

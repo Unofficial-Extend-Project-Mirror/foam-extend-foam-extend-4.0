@@ -1,25 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
-    \\  /    A nd           | Web:         http://www.foam-extend.org
-     \\/     M anipulation  | For copyright notice see file Copyright
+  \\      /  F ield         | cfMesh: A library for mesh generation
+   \\    /   O peration     |
+    \\  /    A nd           | Author: Franjo Juretic (franjo.juretic@c-fields.com)
+     \\/     M anipulation  | Copyright (C) Creative Fields, Ltd.
 -------------------------------------------------------------------------------
 License
-    This file is part of foam-extend.
+    This file is part of cfMesh.
 
-    foam-extend is free software: you can redistribute it and/or modify it
+    cfMesh is free software; you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation, either version 3 of the License, or (at your
+    Free Software Foundation; either version 3 of the License, or (at your
     option) any later version.
 
-    foam-extend is distributed in the hope that it will be useful, but
-    WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    General Public License for more details.
+    cfMesh is distributed in the hope that it will be useful, but WITHOUT
+    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+    for more details.
 
     You should have received a copy of the GNU General Public License
-    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
+    along with cfMesh.  If not, see <http://www.gnu.org/licenses/>.
 
 Description
 
@@ -37,7 +37,18 @@ namespace Foam
 polyMeshGen::polyMeshGen(const Time& t)
 :
     polyMeshGenCells(t),
-    metaDict_()
+    metaDict_
+    (
+        IOobject
+        (
+            "meshMetaDict",
+            runTime_.constant(),
+            "polyMesh",
+            runTime_,
+            IOobject::READ_IF_PRESENT,
+            IOobject::NO_WRITE
+        )
+    )
 {}
 
 //- Construct from components without the boundary
@@ -50,7 +61,18 @@ polyMeshGen::polyMeshGen
 )
 :
     polyMeshGenCells(t, points, faces, cells),
-    metaDict_()
+    metaDict_
+    (
+        IOobject
+        (
+            "meshMetaDict",
+            runTime_.constant(),
+            "polyMesh",
+            runTime_,
+            IOobject::READ_IF_PRESENT,
+            IOobject::NO_WRITE
+        )
+    )
 {}
 
 //- Construct from components with the boundary
@@ -75,7 +97,18 @@ polyMeshGen::polyMeshGen
         patchStart,
         nFacesInPatch
     ),
-    metaDict_()
+    metaDict_
+    (
+        IOobject
+        (
+            "meshMetaDict",
+            runTime_.constant(),
+            "polyMesh",
+            runTime_,
+            IOobject::READ_IF_PRESENT,
+            IOobject::NO_WRITE
+        )
+    )
 {}
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -88,20 +121,6 @@ polyMeshGen::~polyMeshGen()
 void polyMeshGen::read()
 {
     polyMeshGenCells::read();
-
-    metaDict_ =
-        IOdictionary
-        (
-            IOobject
-            (
-                "meshMetaDict",
-                runTime_.constant(),
-                "polyMesh",
-                runTime_,
-                IOobject::READ_IF_PRESENT,
-                IOobject::NO_WRITE
-            )
-        );
 }
 
 void polyMeshGen::write() const
@@ -133,22 +152,9 @@ void polyMeshGen::write() const
 
     //- write meta data
     OFstream fName(meshDir/"meshMetaDict");
-    IOdictionary writeMeta
-    (
-        IOobject
-        (
-            "meshMetaDict",
-            runTime_.constant(),
-            "polyMesh",
-            runTime_,
-            IOobject::NO_READ,
-            IOobject::AUTO_WRITE
-        ),
-        metaDict_
-    );
 
-    writeMeta.writeHeader(fName);
-    writeMeta.writeData(fName);
+    metaDict_.writeHeader(fName);
+    metaDict_.writeData(fName);
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

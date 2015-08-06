@@ -1,25 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
-    \\  /    A nd           | Web:         http://www.foam-extend.org
-     \\/     M anipulation  | For copyright notice see file Copyright
+  \\      /  F ield         | cfMesh: A library for mesh generation
+   \\    /   O peration     |
+    \\  /    A nd           | Author: Franjo Juretic (franjo.juretic@c-fields.com)
+     \\/     M anipulation  | Copyright (C) Creative Fields, Ltd.
 -------------------------------------------------------------------------------
 License
-    This file is part of foam-extend.
+    This file is part of cfMesh.
 
-    foam-extend is free software: you can redistribute it and/or modify it
+    cfMesh is free software; you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation, either version 3 of the License, or (at your
+    Free Software Foundation; either version 3 of the License, or (at your
     option) any later version.
 
-    foam-extend is distributed in the hope that it will be useful, but
-    WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    General Public License for more details.
+    cfMesh is distributed in the hope that it will be useful, but WITHOUT
+    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+    for more details.
 
     You should have received a copy of the GNU General Public License
-    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
+    along with cfMesh.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
     meshSurfaceOptimizer
@@ -54,6 +54,7 @@ namespace Foam
 
 // Forward declarations
 class meshOctree;
+class meshSurfaceMapper;
 class plane;
 
 /*---------------------------------------------------------------------------*\
@@ -66,15 +67,18 @@ class meshSurfaceOptimizer
         //- const reference to the mesh surface
         const meshSurfaceEngine& surfaceEngine_;
 
-        //- const reference to the octree
-        const meshOctree& meshOctree_;
-
         //- type of surface vertex
         List<direction> vertexType_;
+
+        //- locked faces which shall not be changed
+        labelLongList lockedSurfaceFaces_;
 
         //- surface partitioner
         const meshSurfacePartitioner* partitionerPtr_;
         const bool deletePartitioner_;
+
+        //- pointer to mesh octree
+        const meshOctree* octreePtr_;
 
         //- mesh of surface triangles needed for some smoothers
         mutable partTriMesh* triMeshPtr_;
@@ -193,7 +197,11 @@ class meshSurfaceOptimizer
         );
 
         //- smooth selected points using surface optimizer
-        void smoothSurfaceOptimizer(const labelLongList& selectedPoints);
+        void smoothSurfaceOptimizer
+        (
+            const labelLongList& selectedPoints,
+            const labelLongList& selectedProcPoints
+        );
 
     // Functions needed for parallel runs
 
@@ -225,9 +233,6 @@ class meshSurfaceOptimizer
             const labelLongList& nodesToSmooth
         );
 
-        //- find invalid faces in the mesh
-        label findBadFaces(labelHashSet&, boolList&) const;
-
         //- Disallow default bitwise copy construct
         meshSurfaceOptimizer(const meshSurfaceOptimizer&);
 
@@ -240,18 +245,29 @@ class meshSurfaceOptimizer
             PARTITION = 1,
             EDGE = 2,
             CORNER = 4,
-            PROCBND = 8
+            PROCBND = 8,
+            LOCKED = 16
         };
 
 public:
 
     // Constructors
 
+        //- Construct from mesh surface
+        meshSurfaceOptimizer(const meshSurfaceEngine&);
+
+        //- Construct from partitioner
+        meshSurfaceOptimizer(const meshSurfacePartitioner&);
+
         //- Construct from mesh surface and octree
         meshSurfaceOptimizer(const meshSurfaceEngine&, const meshOctree&);
 
         //- Construct from partitioner and octree
-        meshSurfaceOptimizer(const meshSurfacePartitioner&, const meshOctree&);
+        meshSurfaceOptimizer
+        (
+            const meshSurfacePartitioner&,
+            const meshOctree&
+        );
 
 
     // Destructor
@@ -259,6 +275,20 @@ public:
         ~meshSurfaceOptimizer();
 
     // Member Functions
+        //- lock the boundary faces which shall not be modified
+        template<class labelListType>
+        inline void lockBoundaryFaces(const labelListType&);
+
+        //- lock boundary points. They are not be moved.
+        template<class labelListType>
+        inline void lockBoundaryPoints(const labelListType&);
+
+        //- lock edge points
+        inline void lockFeatureEdges();
+
+        //- reset to default constraints
+        void removeUserConstraints();
+
         //- Flag stopping the meshing process if it is not possible
         //- to untangle the surface without sacrificing geometry constraints
         //- Points which must be moved away from the required position are

@@ -1,25 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
-    \\  /    A nd           | Web:         http://www.foam-extend.org
-     \\/     M anipulation  | For copyright notice see file Copyright
+  \\      /  F ield         | cfMesh: A library for mesh generation
+   \\    /   O peration     |
+    \\  /    A nd           | Author: Franjo Juretic (franjo.juretic@c-fields.com)
+     \\/     M anipulation  | Copyright (C) Creative Fields, Ltd.
 -------------------------------------------------------------------------------
 License
-    This file is part of foam-extend.
+    This file is part of cfMesh.
 
-    foam-extend is free software: you can redistribute it and/or modify it
+    cfMesh is free software; you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation, either version 3 of the License, or (at your
+    Free Software Foundation; either version 3 of the License, or (at your
     option) any later version.
 
-    foam-extend is distributed in the hope that it will be useful, but
-    WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    General Public License for more details.
+    cfMesh is distributed in the hope that it will be useful, but WITHOUT
+    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+    for more details.
 
     You should have received a copy of the GNU General Public License
-    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
+    along with cfMesh.  If not, see <http://www.gnu.org/licenses/>.
 
 Description
 
@@ -30,6 +30,7 @@ Description
 #include "decomposeFaces.H"
 #include "triSurface.H"
 #include "meshSurfaceEngine.H"
+#include "meshSurfaceCheckEdgeTypes.H"
 #include "meshSurfacePartitioner.H"
 #include "helperFunctions.H"
 #include "helperFunctionsPar.H"
@@ -253,13 +254,186 @@ void correctEdgesBetweenPatches::decomposeProblematicFaces()
         Info << nDecomposedFaces << " faces decomposed into triangles" << endl;
 
         decompose_ = true;
-        decomposeFaces df(const_cast<polyMeshGen&>(mesh));
+        decomposeFaces df(mesh_);
         df.decomposeMeshFaces(decomposeFace);
 
         clearMeshSurface();
+        mesh_.clearAddressingData();
     }
 
     Info << "Finished decomposing problematic faces" << endl;
+}
+
+void correctEdgesBetweenPatches::decomposeConcaveFaces()
+{
+    const meshSurfaceEngine& mse = meshSurface();
+    const labelList& bPoints = mse.boundaryPoints();
+    const labelList& bp = mse.bp();
+    const edgeList& edges = mse.edges();
+    const VRWGraph& edgeFaces = mse.edgeFaces();
+    const VRWGraph& bpEdges = mse.boundaryPointEdges();
+    const labelList& facePatch = mse.boundaryFacePatches();
+
+    //- classify edges at the surface
+    meshSurfaceCheckEdgeTypes edgeChecker(mse);
+    const List<direction>& edgeType = edgeChecker.edgeTypes();
+
+    //- find concave points
+    boolList concavePoint(bPoints.size(), false);
+
+    labelList edgeInPatch(edges.size(), -1);
+
+    direction problematicTypes = 0;
+    problematicTypes |= meshSurfaceCheckEdgeTypes::CONCAVEEDGE;
+    problematicTypes |= meshSurfaceCheckEdgeTypes::UNDETERMINED;
+
+    # ifdef USE_OMP
+    # pragma omp parallel for schedule(dynamic, 100)
+    # endif
+    forAll(edgeType, eI)
+    {
+        if( edgeType[eI] & meshSurfaceCheckEdgeTypes::PATCHEDGE )
+        {
+            if( edgeFaces.sizeOfRow(eI) )
+                edgeInPatch[eI] = facePatch[edgeFaces(eI, 0)];
+
+            continue;
+        }
+
+        if( edgeType[eI] & problematicTypes)
+        {
+            const edge& e = edges[eI];
+
+            concavePoint[bp[e.start()]] = true;
+            concavePoint[bp[e.end()]] = true;
+        }
+    }
+
+    if( Pstream::parRun() )
+    {
+        const Map<label>& globalToLocal =
+            mse.globalToLocalBndEdgeAddressing();
+        const VRWGraph& beAtProcs = mse.beAtProcs();
+
+        std::map<label, labelLongList> exchangeData;
+        forAll(mse.beNeiProcs(), i)
+            exchangeData[mse.beNeiProcs()[i]].clear();
+
+        forAllConstIter(Map<label>, globalToLocal, it)
+        {
+            const label beI = it();
+
+            if( edgeInPatch[beI] < 0 )
+                continue;
+
+            forAllRow(beAtProcs, beI, i)
+            {
+                const label neiProc = beAtProcs(beI, i);
+
+                if( neiProc == Pstream::myProcNo() )
+                    continue;
+
+                labelLongList& dts = exchangeData[neiProc];
+
+                dts.append(it.key());
+                dts.append(edgeInPatch[beI]);
+            }
+        }
+
+        labelLongList receivedData;
+        help::exchangeMap(exchangeData, receivedData);
+
+        for(label i=0;i<receivedData.size();)
+        {
+            const label beI = globalToLocal[receivedData[i++]];
+            const label patchI = receivedData[i++];
+            if( edgeInPatch[beI] == -1 )
+            {
+                edgeInPatch[beI] = patchI;
+            }
+            else if( edgeInPatch[beI] != patchI )
+            {
+                FatalErrorIn
+                (
+                    "void correctEdgesBetweenPatches::decomposeConcaveFaces()"
+                ) << "Invalid patch!" << abort(FatalError);
+            }
+        }
+    }
+
+    //- decompose internal faces attached to concave vertices which have two
+    //- or more edges at the boundary
+    const faceListPMG& faces = mesh_.faces();
+    const labelList& owner = mesh_.owner();
+    const labelList& neighbour = mesh_.neighbour();
+
+    boolList decomposeFace(faces.size(), false);
+    label nDecomposed(0);
+
+    # ifdef USE_OMP
+    # pragma omp parallel for schedule(dynamic, 100) \
+    reduction(+ : nDecomposed)
+    # endif
+    for(label faceI=0;faceI<mesh_.nInternalFaces();++faceI)
+    {
+        const face& f = faces[faceI];
+
+        bool hasConcave(false);
+        label nBndEdges(0);
+        DynList<label> bndEdgePatches;
+
+        forAll(f, pI)
+        {
+            const label bpI = bp[f[pI]];
+
+            if( bpI < 0 )
+                continue;
+
+            if( concavePoint[bpI] )
+                hasConcave = true;
+
+            //- points is at a concave edge
+            //- count the number of boundary edge
+            const edge e = f.faceEdge(pI);
+
+            forAllRow(bpEdges, bpI, bpeI)
+            {
+                const label beI = bpEdges(bpI, bpeI);
+                const edge& ee = edges[beI];
+
+                if( e == ee )
+                {
+                    ++nBndEdges;
+                    bndEdgePatches.appendIfNotIn(edgeInPatch[beI]);
+                    break;
+                }
+            }
+        }
+
+        if( hasConcave && (nBndEdges > 1) && (bndEdgePatches.size() > 1) )
+        {
+            //- the face has two or more edges at the boundary
+            //- Hence, it is marked for decomposition
+            decomposeFace[faceI] = true;
+
+            decomposeCell_[owner[faceI]] = true;
+            decomposeCell_[neighbour[faceI]] = true;
+
+            ++nDecomposed;
+        }
+    }
+
+    //- finally, perform decomposition of marked faces
+    if( returnReduce(nDecomposed, sumOp<label>()) != 0 )
+    {
+        Info << "Decomposing " << nDecomposed << " internal faces" << endl;
+        decomposeFaces(mesh_).decomposeMeshFaces(decomposeFace);
+
+        decompose_ = true;
+
+        clearMeshSurface();
+        mesh_.clearAddressingData();
+    }
 }
 
 void correctEdgesBetweenPatches::patchCorrection()
@@ -400,7 +574,11 @@ void correctEdgesBetweenPatches::patchCorrection()
     reduce(decompose_, maxOp<bool>());
 
     if( returnReduce(nDecomposedFaces, sumOp<label>()) != 0 )
+    {
         replaceBoundary();
+        clearMeshSurface();
+        mesh_.clearAddressingData();
+    }
 
     Info << "Finished with patch correction" << endl;
 }

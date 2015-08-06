@@ -1,25 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
-    \\  /    A nd           | Web:         http://www.foam-extend.org
-     \\/     M anipulation  | For copyright notice see file Copyright
+  \\      /  F ield         | cfMesh: A library for mesh generation
+   \\    /   O peration     |
+    \\  /    A nd           | Author: Franjo Juretic (franjo.juretic@c-fields.com)
+     \\/     M anipulation  | Copyright (C) Creative Fields, Ltd.
 -------------------------------------------------------------------------------
 License
-    This file is part of foam-extend.
+    This file is part of cfMesh.
 
-    foam-extend is free software: you can redistribute it and/or modify it
+    cfMesh is free software; you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation, either version 3 of the License, or (at your
+    Free Software Foundation; either version 3 of the License, or (at your
     option) any later version.
 
-    foam-extend is distributed in the hope that it will be useful, but
-    WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    General Public License for more details.
+    cfMesh is distributed in the hope that it will be useful, but WITHOUT
+    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+    for more details.
 
     You should have received a copy of the GNU General Public License
-    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
+    along with cfMesh.  If not, see <http://www.gnu.org/licenses/>.
 
 Description
 
@@ -876,6 +876,7 @@ void edgeExtractor::distributeBoundaryFaces()
         }
         else
         {
+            pointPatch_[bpI] = nPatches;
             FatalErrorIn
             (
                 "void meshSurfaceEdgeExtractorNonTopo::"
@@ -909,6 +910,8 @@ void edgeExtractor::distributeBoundaryFaces()
         }
         else
         {
+            facePatch_[bfI] = nPatches;
+
             FatalErrorIn
             (
                 "void meshSurfaceEdgeExtractorNonTopo::"
@@ -2089,11 +2092,14 @@ bool edgeExtractor::checkFacePatchesGeometry()
         );
 
         //- stop after a certain number of iterations
-        if( iter++ > 3 )
+        if( ++iter > 3 )
             break;
 
+        //- update surface geometry data
+        meshSurfaceEngineModifier(mse).updateGeometry();
+
         //- check if there exist any inverted faces
-        meshSurfaceCheckInvertedVertices surfCheck(mse, activePoints);
+        meshSurfaceCheckInvertedVertices surfCheck(mPart, activePoints);
         const labelHashSet& invertedPoints = surfCheck.invertedVertices();
 
         if( returnReduce(invertedPoints.size(), sumOp<label>()) == 0 )
@@ -2108,16 +2114,15 @@ bool edgeExtractor::checkFacePatchesGeometry()
 
         //- untangle the surface
         activePointLabel.clear();
-        forAllConstIter(labelHashSet, invertedPoints, it)
-            activePointLabel.append(bp[it.key()]);
-
-        //- update active points
         activePoints = false;
-        forAll(activePointLabel, i)
-            activePoints[activePointLabel[i]] = true;
+        forAllConstIter(labelHashSet, invertedPoints, it)
+        {
+            activePointLabel.append(bp[it.key()]);
+            activePoints[bp[it.key()]] = true;
+        }
 
         //- untangle the surface
-        meshSurfaceOptimizer mso(*surfaceEnginePtr_, meshOctree_);
+        meshSurfaceOptimizer mso(mPart, meshOctree_);
         mso.untangleSurface(activePointLabel, 1);
 
         nCorrected = 0;
@@ -2535,7 +2540,8 @@ const triSurf* edgeExtractor::surfaceWithPatches(const label bpI) const
 void edgeExtractor::updateMeshPatches()
 {
     const triSurf& surface = meshOctree_.surface();
-    const label nPatches = surface.patches().size();
+    const geometricSurfacePatchList& surfPatches = surface.patches();
+    const label nPatches = surfPatches.size();
 
     const meshSurfaceEngine& mse = this->surfaceEngine();
     const faceList::subList& bFaces = mse.boundaryFaces();
@@ -2559,13 +2565,20 @@ void edgeExtractor::updateMeshPatches()
     }
 
     //- replace the boundary with the new patches
-    polyMeshGenModifier(mesh_).replaceBoundary
+    polyMeshGenModifier meshModifier(mesh_);
+    meshModifier.replaceBoundary
     (
         patchNames,
         newBoundaryFaces,
         newBoundaryOwners,
         newBoundaryPatches
     );
+
+    //- set the new patch types
+    PtrList<boundaryPatch>& boundaries = meshModifier.boundariesAccess();
+
+    forAll(surfPatches, patchI)
+        boundaries[patchI].patchType() = surfPatches[patchI].geometricType();
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *//

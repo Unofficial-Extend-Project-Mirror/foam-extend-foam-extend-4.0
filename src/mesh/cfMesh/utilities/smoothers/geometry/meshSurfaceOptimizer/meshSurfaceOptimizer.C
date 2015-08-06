@@ -1,25 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
-    \\  /    A nd           | Web:         http://www.foam-extend.org
-     \\/     M anipulation  | For copyright notice see file Copyright
+  \\      /  F ield         | cfMesh: A library for mesh generation
+   \\    /   O peration     |
+    \\  /    A nd           | Author: Franjo Juretic (franjo.juretic@c-fields.com)
+     \\/     M anipulation  | Copyright (C) Creative Fields, Ltd.
 -------------------------------------------------------------------------------
 License
-    This file is part of foam-extend.
+    This file is part of cfMesh.
 
-    foam-extend is free software: you can redistribute it and/or modify it
+    cfMesh is free software; you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation, either version 3 of the License, or (at your
+    Free Software Foundation; either version 3 of the License, or (at your
     option) any later version.
 
-    foam-extend is distributed in the hope that it will be useful, but
-    WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    General Public License for more details.
+    cfMesh is distributed in the hope that it will be useful, but WITHOUT
+    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+    for more details.
 
     You should have received a copy of the GNU General Public License
-    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
+    along with cfMesh.  If not, see <http://www.gnu.org/licenses/>.
 
 Description
 
@@ -29,6 +29,7 @@ Description
 #include "meshSurfaceOptimizer.H"
 #include "meshSurfaceEngine.H"
 #include "meshSurfacePartitioner.H"
+#include "meshSurfaceMapper.H"
 #include "polyMeshGenChecks.H"
 
 #include <map>
@@ -71,49 +72,35 @@ void meshSurfaceOptimizer::classifySurfaceVertices()
     }
 }
 
-label meshSurfaceOptimizer::findBadFaces
-(
-    labelHashSet& badFaces,
-    boolList& changedFace
-) const
+// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
+
+meshSurfaceOptimizer::meshSurfaceOptimizer(const meshSurfaceEngine& surface)
+:
+    surfaceEngine_(surface),
+    vertexType_(surface.boundaryPoints().size()),
+    partitionerPtr_(new meshSurfacePartitioner(surface)),
+    deletePartitioner_(true),
+    octreePtr_(NULL),
+    triMeshPtr_(NULL),
+    enforceConstraints_(false),
+    badPointsSubsetName_("invertedBoundaryPoints")
 {
-    badFaces.clear();
-
-    const polyMeshGen& mesh = surfaceEngine_.mesh();
-
-    polyMeshGenChecks::checkFacePyramids
-    (
-        mesh,
-        false,
-        VSMALL,
-        &badFaces,
-        &changedFace
-    );
-
-    polyMeshGenChecks::checkCellPartTetrahedra
-    (
-        mesh,
-        false,
-        VSMALL,
-        &badFaces,
-        &changedFace
-    );
-
-    polyMeshGenChecks::checkFaceAreas
-    (
-        mesh,
-        false,
-        VSMALL,
-        &badFaces,
-        &changedFace
-    );
-
-    const label nBadFaces = returnReduce(badFaces.size(), sumOp<label>());
-
-    return nBadFaces;
+    classifySurfaceVertices();
 }
 
-// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
+meshSurfaceOptimizer::meshSurfaceOptimizer(const meshSurfacePartitioner& mPart)
+:
+    surfaceEngine_(mPart.surfaceEngine()),
+    vertexType_(surfaceEngine_.boundaryPoints().size()),
+    partitionerPtr_(&mPart),
+    deletePartitioner_(true),
+    octreePtr_(NULL),
+    triMeshPtr_(NULL),
+    enforceConstraints_(false),
+    badPointsSubsetName_("invertedBoundaryPoints")
+{
+    classifySurfaceVertices();
+}
 
 meshSurfaceOptimizer::meshSurfaceOptimizer
 (
@@ -122,13 +109,13 @@ meshSurfaceOptimizer::meshSurfaceOptimizer
 )
 :
     surfaceEngine_(surface),
-    meshOctree_(octree),
     vertexType_(surface.boundaryPoints().size()),
     partitionerPtr_(new meshSurfacePartitioner(surface)),
     deletePartitioner_(true),
+    octreePtr_(&octree),
     triMeshPtr_(NULL),
     enforceConstraints_(false),
-    badPointsSubsetName_()
+    badPointsSubsetName_("invertedBoundaryPoints")
 {
     classifySurfaceVertices();
 }
@@ -140,13 +127,13 @@ meshSurfaceOptimizer::meshSurfaceOptimizer
 )
 :
     surfaceEngine_(partitioner.surfaceEngine()),
-    meshOctree_(octree),
     vertexType_(surfaceEngine_.boundaryPoints().size()),
     partitionerPtr_(&partitioner),
     deletePartitioner_(false),
+    octreePtr_(&octree),
     triMeshPtr_(NULL),
     enforceConstraints_(false),
-    badPointsSubsetName_()
+    badPointsSubsetName_("invertedBoundaryPoints")
 {
     classifySurfaceVertices();
 }
@@ -162,6 +149,16 @@ meshSurfaceOptimizer::~meshSurfaceOptimizer()
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+void meshSurfaceOptimizer::removeUserConstraints()
+{
+    # ifdef USE_OMP
+    # pragma omp parallel for schedule(dynamic, 100)
+    # endif
+    forAll(vertexType_, bpI)
+        if( vertexType_[bpI] & LOCKED )
+            vertexType_[bpI] ^= LOCKED;
+}
 
 void meshSurfaceOptimizer::enforceConstraints(const word subsetName)
 {

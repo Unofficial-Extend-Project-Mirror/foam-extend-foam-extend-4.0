@@ -1,25 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
-    \\  /    A nd           | Web:         http://www.foam-extend.org
-     \\/     M anipulation  | For copyright notice see file Copyright
+  \\      /  F ield         | cfMesh: A library for mesh generation
+   \\    /   O peration     |
+    \\  /    A nd           | Author: Franjo Juretic (franjo.juretic@c-fields.com)
+     \\/     M anipulation  | Copyright (C) Creative Fields, Ltd.
 -------------------------------------------------------------------------------
 License
-    This file is part of foam-extend.
+    This file is part of cfMesh.
 
-    foam-extend is free software: you can redistribute it and/or modify it
+    cfMesh is free software; you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation, either version 3 of the License, or (at your
+    Free Software Foundation; either version 3 of the License, or (at your
     option) any later version.
 
-    foam-extend is distributed in the hope that it will be useful, but
-    WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    General Public License for more details.
+    cfMesh is distributed in the hope that it will be useful, but WITHOUT
+    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+    for more details.
 
     You should have received a copy of the GNU General Public License
-    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
+    along with cfMesh.  If not, see <http://www.gnu.org/licenses/>.
 
 Description
 
@@ -79,6 +79,102 @@ void meshOctreeCube::leavesInBox
 
                     if( bb.overlaps(searchingBox) )
                         leaves.append(this);
+                }
+            }
+        }
+    }
+}
+
+void meshOctreeCube::leavesInSphere
+(
+    const boundBox& rootBox,
+    const point& c,
+    const scalar r,
+    DynList<label>& containedLeaves
+) const
+{
+    const point cubeCentre = this->centre(rootBox);
+    const scalar size = 1.732 * this->size(rootBox);
+
+    if( magSqr(cubeCentre - c) < sqr(r+size) )
+    {
+        if( this->isLeaf() )
+        {
+            containedLeaves.append(this->cubeLabel());
+        }
+        else
+        {
+            for(label scI=0;scI<8;++scI)
+            {
+                meshOctreeCube* scPtr = subCubesPtr_[scI];
+
+                if( scPtr )
+                {
+                    scPtr->leavesInSphere
+                    (
+                        rootBox,
+                        c,
+                        r,
+                        containedLeaves
+                    );
+                }
+                else if( Pstream::parRun() )
+                {
+                    meshOctreeCubeCoordinates cc = refineForPosition(scI);
+                    const point sc = cc.centre(rootBox);
+
+                    if( magSqr(sc - c) < sqr(r+size) )
+                        containedLeaves.append(meshOctreeCube::OTHERPROC);
+                }
+            }
+        }
+    }
+}
+
+void meshOctreeCube::markLeavesInSphere
+(
+    const boundBox& rootBox,
+    const point& c,
+    const scalar r,
+    labelList& markedLeaves,
+    bool& atProcessorBnd
+) const
+{
+    const point cubeCentre = this->centre(rootBox);
+    const scalar size = 1.732 * this->size(rootBox);
+
+    if( magSqr(cubeCentre - c) < sqr(r+size) )
+    {
+        if( this->isLeaf() )
+        {
+            markedLeaves[this->cubeLabel()] |= 2;
+        }
+        else
+        {
+            for(label scI=0;scI<8;++scI)
+            {
+                meshOctreeCube* scPtr = subCubesPtr_[scI];
+
+                if( scPtr )
+                {
+                    scPtr->markLeavesInSphere
+                    (
+                        rootBox,
+                        c,
+                        r,
+                        markedLeaves,
+                        atProcessorBnd
+                    );
+                }
+                else if( Pstream::parRun() )
+                {
+                    meshOctreeCubeCoordinates cc = refineForPosition(scI);
+                    const point sc = cc.centre(rootBox);
+
+                    if( magSqr(sc - c) < sqr(r+size) )
+                    {
+                        atProcessorBnd = true;
+                    }
                 }
             }
         }

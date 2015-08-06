@@ -1,25 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
-    \\  /    A nd           | Web:         http://www.foam-extend.org
-     \\/     M anipulation  | For copyright notice see file Copyright
+  \\      /  F ield         | cfMesh: A library for mesh generation
+   \\    /   O peration     |
+    \\  /    A nd           | Author: Franjo Juretic (franjo.juretic@c-fields.com)
+     \\/     M anipulation  | Copyright (C) Creative Fields, Ltd.
 -------------------------------------------------------------------------------
 License
-    This file is part of foam-extend.
+    This file is part of cfMesh.
 
-    foam-extend is free software: you can redistribute it and/or modify it
+    cfMesh is free software; you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation, either version 3 of the License, or (at your
+    Free Software Foundation; either version 3 of the License, or (at your
     option) any later version.
 
-    foam-extend is distributed in the hope that it will be useful, but
-    WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    General Public License for more details.
+    cfMesh is distributed in the hope that it will be useful, but WITHOUT
+    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+    for more details.
 
     You should have received a copy of the GNU General Public License
-    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
+    along with cfMesh.  If not, see <http://www.gnu.org/licenses/>.
 
 \*---------------------------------------------------------------------------*/
 
@@ -31,8 +31,8 @@ inline void Foam::VRWGraph::checkIndex(const label i, const label j) const
         (
             "void Foam::VRWGraph<T,width>::"
             "checkIndex(const label i, const label j) const"
-        ) << "Row index " << Foam::label(i)
-            << " is not in range " << Foam::label(0)
+        ) << "Row index " << i
+            << " is not in range " << 0
             << " and " << rows_.size() << abort(FatalError);
     }
 
@@ -40,9 +40,9 @@ inline void Foam::VRWGraph::checkIndex(const label i, const label j) const
         FatalErrorIn
         (
             "void Foam::VRWGraph<T,width>::"
-            "checkIndex(label const i) const"
-        ) << "Column index " << Foam::label(j)
-            << " is not in range " << Foam::label(0)
+            "checkIndex(label const, const label) const"
+        ) << "Column index " << j
+            << " is not in range " << 0
             << " and " << rows_[i].size() << abort(FatalError);
 }
 
@@ -53,8 +53,7 @@ inline Foam::VRWGraph::VRWGraph()
 :
     data_(),
     rows_()
-{
-}
+{}
 
 //- Construct given size
 inline Foam::VRWGraph::VRWGraph
@@ -83,7 +82,7 @@ inline Foam::VRWGraph::VRWGraph
 {
     for(label rowI=0;rowI<nRows;++rowI)
     {
-        rows_[rowI].start() = rowI*nColumnsInRow;
+        rows_[rowI].start() = rowI * nColumnsInRow;
         rows_[rowI].size() = nColumnsInRow;
     }
 }
@@ -100,7 +99,7 @@ inline Foam::VRWGraph::VRWGraph
 {
     for(label rowI=0;rowI<nRows;++rowI)
     {
-        rows_[rowI].start() = rowI*nColumnsInRow;
+        rows_[rowI].start() = rowI * nColumnsInRow;
         rows_[rowI].size() = nColumnsInRow;
     }
 }
@@ -112,12 +111,10 @@ inline Foam::VRWGraph::VRWGraph
 :
     data_(ol.data_),
     rows_(ol.rows_)
-{
-}
+{}
 
 inline Foam::VRWGraph::~VRWGraph()
-{
-}
+{}
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //

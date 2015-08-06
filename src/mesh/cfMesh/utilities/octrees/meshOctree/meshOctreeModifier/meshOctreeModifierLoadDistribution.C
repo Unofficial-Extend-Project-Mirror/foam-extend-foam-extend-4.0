@@ -1,25 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
-    \\  /    A nd           | Web:         http://www.foam-extend.org
-     \\/     M anipulation  | For copyright notice see file Copyright
+  \\      /  F ield         | cfMesh: A library for mesh generation
+   \\    /   O peration     |
+    \\  /    A nd           | Author: Franjo Juretic (franjo.juretic@c-fields.com)
+     \\/     M anipulation  | Copyright (C) Creative Fields, Ltd.
 -------------------------------------------------------------------------------
 License
-    This file is part of foam-extend.
+    This file is part of cfMesh.
 
-    foam-extend is free software: you can redistribute it and/or modify it
+    cfMesh is free software; you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation, either version 3 of the License, or (at your
+    Free Software Foundation; either version 3 of the License, or (at your
     option) any later version.
 
-    foam-extend is distributed in the hope that it will be useful, but
-    WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    General Public License for more details.
+    cfMesh is distributed in the hope that it will be useful, but WITHOUT
+    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+    for more details.
 
     You should have received a copy of the GNU General Public License
-    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
+    along with cfMesh.  If not, see <http://www.gnu.org/licenses/>.
 
 Description
 
@@ -205,11 +205,36 @@ void meshOctreeModifier::loadDistribution(const direction usedType)
             if( sendToProcesssors[procI][neiI] == Pstream::myProcNo() )
                 receiveFrom.insert(procI);
 
-    //- send the coordinates of the boxes to other processors
+    //- receive coordinates from processors with lower labels
+    LongList<meshOctreeCubeBasic> migratedCubes;
+    forAllConstIter(labelHashSet, receiveFrom, iter)
+    {
+        if( iter.key() >= Pstream::myProcNo() )
+            continue;
+
+        List<meshOctreeCubeBasic> mc;
+
+        IPstream fromOtherProc(Pstream::blocking, iter.key());
+
+        fromOtherProc >> mc;
+
+        label currSize = migratedCubes.size();
+        migratedCubes.setSize(currSize+mc.size());
+        forAll(mc, mcI)
+        {
+            migratedCubes[currSize] = mc[mcI];
+            ++currSize;
+        }
+    }
+
+    //- send the coordinates of the boxes to processors with greater label
     const labelList& sendToProcs = sendToProcesssors[Pstream::myProcNo()];
     forAll(sendToProcs, i)
     {
         const label procI = sendToProcs[i];
+
+        if( procI <= Pstream::myProcNo() )
+            continue;
 
         List<meshOctreeCubeBasic> sendCoordinates
         (
@@ -237,10 +262,12 @@ void meshOctreeModifier::loadDistribution(const direction usedType)
         toOtherProc << sendCoordinates;
     }
 
-    //- receive data sent from other processors
-    LongList<meshOctreeCubeBasic> migratedCubes;
+    //- receive data sent from processors with greater label
     forAllConstIter(labelHashSet, receiveFrom, iter)
     {
+        if( iter.key() <= Pstream::myProcNo() )
+            continue;
+
         List<meshOctreeCubeBasic> mc;
 
         IPstream fromOtherProc(Pstream::blocking, iter.key());
@@ -254,6 +281,40 @@ void meshOctreeModifier::loadDistribution(const direction usedType)
             migratedCubes[currSize] = mc[mcI];
             ++currSize;
         }
+    }
+
+    //- send the coordinates of the boxes to processors with lower label
+    forAll(sendToProcs, i)
+    {
+        const label procI = sendToProcs[i];
+
+        if( procI >= Pstream::myProcNo() )
+            continue;
+
+        List<meshOctreeCubeBasic> sendCoordinates
+        (
+            leavesToSend[procI].size()
+        );
+
+        forAll(leavesToSend[procI], lI)
+        {
+            const meshOctreeCube& oc = *leaves[leavesToSend[procI][lI]];
+            sendCoordinates[lI] =
+                meshOctreeCubeBasic
+                (
+                    oc.coordinates(),
+                    oc.cubeType()
+                );
+        }
+
+        OPstream toOtherProc
+        (
+            Pstream::blocking,
+            procI,
+            sendCoordinates.byteSize()
+        );
+
+        toOtherProc << sendCoordinates;
     }
 
     # ifdef OCTREETiming

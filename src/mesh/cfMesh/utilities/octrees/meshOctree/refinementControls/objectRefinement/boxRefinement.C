@@ -1,25 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
-    \\  /    A nd           | Web:         http://www.foam-extend.org
-     \\/     M anipulation  | For copyright notice see file Copyright
+  \\      /  F ield         | cfMesh: A library for mesh generation
+   \\    /   O peration     |
+    \\  /    A nd           | Author: Franjo Juretic (franjo.juretic@c-fields.com)
+     \\/     M anipulation  | Copyright (C) Creative Fields, Ltd.
 -------------------------------------------------------------------------------
 License
-    This file is part of foam-extend.
+    This file is part of cfMesh.
 
-    foam-extend is free software: you can redistribute it and/or modify it
+    cfMesh is free software; you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation, either version 3 of the License, or (at your
+    Free Software Foundation; either version 3 of the License, or (at your
     option) any later version.
 
-    foam-extend is distributed in the hope that it will be useful, but
-    WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    General Public License for more details.
+    cfMesh is distributed in the hope that it will be useful, but WITHOUT
+    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+    for more details.
 
     You should have received a copy of the GNU General Public License
-    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
+    along with cfMesh.  If not, see <http://www.gnu.org/licenses/>.
 
 \*---------------------------------------------------------------------------*/
 
@@ -44,22 +44,17 @@ boxRefinement::boxRefinement()
     lengthX_(-1.0),
     lengthY_(-1.0),
     lengthZ_(-1.0)
-    //angleX_(0.0),
-    //angleY_(0.0),
-    //angleZ_(0.0)
 {}
 
 boxRefinement::boxRefinement
 (
     const word& name,
     const scalar cellSize,
+    const direction additionalRefLevels,
     const point& centre,
     const scalar lengthX,
     const scalar lengthY,
     const scalar lengthZ
-    //const scalar angleX,
-    //const scalar angleY,
-    //const scalar angleZ
 )
 :
     objectRefinement(),
@@ -67,12 +62,10 @@ boxRefinement::boxRefinement
     lengthX_(lengthX),
     lengthY_(lengthY),
     lengthZ_(lengthZ)
-    //angleX_(angleX),
-    //angleY_(angleY),
-    //angleZ_(angleZ)
 {
     setName(name);
     setCellSize(cellSize);
+    setAdditionalRefinementLevels(additionalRefLevels);
 }
 
 boxRefinement::boxRefinement
@@ -105,17 +98,21 @@ dictionary boxRefinement::dict(bool ignoreType) const
 {
     dictionary dict;
 
-    dict.add("cellSize", cellSize());
+    if( additionalRefinementLevels() == 0 && cellSize() >= 0.0 )
+    {
+        dict.add("cellSize", cellSize());
+    }
+    else
+    {
+        dict.add("additionalRefinementLevels", additionalRefinementLevels());
+    }
+
     dict.add("type", type());
 
     dict.add("centre", centre_);
     dict.add("lengthX", lengthX_);
     dict.add("lengthY", lengthY_);
     dict.add("lengthZ", lengthZ_);
-
-    //dict.add("angleX", angleX_);
-    //dict.add("angleY", angleY_);
-    //dict.add("angleZ", angleZ_);
 
     return dict;
 }
@@ -127,9 +124,6 @@ void boxRefinement::write(Ostream& os) const
         << " lengthX: " << lengthX_
         << " lengthY: " << lengthY_
         << " lengthZ: " << lengthZ_;
-        //<< " angleX:  " << angleX_
-        //<< " angleY:  " << angleY_
-        //<< " angleZ:  " << angleZ_;
 }
 
 void boxRefinement::writeDict(Ostream& os, bool subDict) const
@@ -139,7 +133,16 @@ void boxRefinement::writeDict(Ostream& os, bool subDict) const
         os << indent << token::BEGIN_BLOCK << incrIndent << nl;
     }
 
-    os.writeKeyword("cellSize") << cellSize() << token::END_STATEMENT << nl;
+    if( additionalRefinementLevels() == 0 && cellSize() >= 0.0 )
+    {
+        os.writeKeyword("cellSize") << cellSize() << token::END_STATEMENT << nl;
+    }
+    else
+    {
+        os.writeKeyword("additionalRefinementLevels")
+                << additionalRefinementLevels()
+                << token::END_STATEMENT << nl;
+    }
 
     // only write type for derived types
     if( type() != typeName_() )
@@ -151,9 +154,6 @@ void boxRefinement::writeDict(Ostream& os, bool subDict) const
     os.writeKeyword("lengthX") << lengthX_ << token::END_STATEMENT << nl;
     os.writeKeyword("lengthY") << lengthY_ << token::END_STATEMENT << nl;
     os.writeKeyword("lengthZ") << lengthZ_ << token::END_STATEMENT << nl;
-    //os.writeKeyword("angleX") << angleX_ << token::END_STATEMENT << nl;
-    //os.writeKeyword("angleY") << angleY_ << token::END_STATEMENT << nl;
-    //os.writeKeyword("angleZ") << angleZ_ << token::END_STATEMENT << nl;
 
     if( subDict )
     {
@@ -181,7 +181,7 @@ void boxRefinement::operator=(const dictionary& d)
         FatalErrorIn
         (
             "void boxRefinement::operator=(const dictionary& d)"
-        ) << "Entry centre is not sopecified!" << exit(FatalError);
+        ) << "Entry centre is not specified!" << exit(FatalError);
         centre_ = vector::zero;
     }
 
@@ -195,7 +195,7 @@ void boxRefinement::operator=(const dictionary& d)
         FatalErrorIn
         (
             "void boxRefinement::operator=(const dictionary& d)"
-        ) << "Entry lengthX is not sopecified!" << exit(FatalError);
+        ) << "Entry lengthX is not specified!" << exit(FatalError);
         lengthX_ = -1.0;
     }
 
@@ -209,7 +209,7 @@ void boxRefinement::operator=(const dictionary& d)
         FatalErrorIn
         (
             "void boxRefinement::operator=(const dictionary& d)"
-        ) << "Entry lengthY is not sopecified!" << exit(FatalError);
+        ) << "Entry lengthY is not specified!" << exit(FatalError);
         lengthY_ = -1.0;
     }
 
@@ -223,40 +223,9 @@ void boxRefinement::operator=(const dictionary& d)
         FatalErrorIn
         (
             "void boxRefinement::operator=(const dictionary& d)"
-        ) << "Entry lengthZ is not sopecified!" << exit(FatalError);
+        ) << "Entry lengthZ is not specified!" << exit(FatalError);
         lengthZ_ = -1.0;
     }
-
-    // specify angleX
-/*    if( dict.found("angleX") )
-    {
-        angleX_ = readScalar(dict.lookup("angleX"));
-    }
-    else
-    {
-        angleX_ = -1.0;
-    }
-
-    // specify angleY
-    if( dict.found("angleY") )
-    {
-        angleY_ = readScalar(dict.lookup("angleY"));
-    }
-    else
-    {
-        angleY_ = -1.0;
-    }
-
-    // specify angleX
-    if( dict.found("angleZ") )
-    {
-        angleZ_ = readScalar(dict.lookup("angleZ"));
-    }
-    else
-    {
-        angleZ_ = -1.0;
-    }
-*/
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -265,6 +234,8 @@ Ostream& boxRefinement::operator<<(Ostream& os) const
 {
     os << "name " << name() << nl;
     os << "cell size " << cellSize() << nl;
+    os << "additionalRefinementLevels " << additionalRefinementLevels() << endl;
+
     write(os);
     return os;
 }

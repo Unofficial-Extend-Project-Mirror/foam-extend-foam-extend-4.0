@@ -1,25 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
-    \\  /    A nd           | Web:         http://www.foam-extend.org
-     \\/     M anipulation  | For copyright notice see file Copyright
+  \\      /  F ield         | cfMesh: A library for mesh generation
+   \\    /   O peration     |
+    \\  /    A nd           | Author: Franjo Juretic (franjo.juretic@c-fields.com)
+     \\/     M anipulation  | Copyright (C) Creative Fields, Ltd.
 -------------------------------------------------------------------------------
 License
-    This file is part of foam-extend.
+    This file is part of cfMesh.
 
-    foam-extend is free software: you can redistribute it and/or modify it
+    cfMesh is free software; you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation, either version 3 of the License, or (at your
+    Free Software Foundation; either version 3 of the License, or (at your
     option) any later version.
 
-    foam-extend is distributed in the hope that it will be useful, but
-    WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    General Public License for more details.
+    cfMesh is distributed in the hope that it will be useful, but WITHOUT
+    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+    for more details.
 
     You should have received a copy of the GNU General Public License
-    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
+    along with cfMesh.  If not, see <http://www.gnu.org/licenses/>.
 
 Description
 
@@ -30,7 +30,7 @@ Description
 #include "boolList.H"
 #include "demandDrivenData.H"
 #include "refLabelledPoint.H"
-#include "helperFunctionsPar.H"
+#include "helperFunctions.H"
 
 #include <map>
 
@@ -50,6 +50,7 @@ void meshSurfaceCheckInvertedVertices::checkVertices()
     const labelList& facePatch = surfacePartitioner_.boundaryFacePatches();
     const meshSurfaceEngine& mse = surfacePartitioner_.surfaceEngine();
     const pointFieldPMG& points = mse.points();
+    const labelList& bp = mse.bp();
     const VRWGraph& pointFaces = mse.pointFaces();
     const VRWGraph& pointInFaces = mse.pointInFaces();
     const faceList::subList& bFaces = mse.boundaryFaces();
@@ -330,12 +331,41 @@ void meshSurfaceCheckInvertedVertices::checkVertices()
         }
     }
 
+    //- check if there exist concave faces
+    # ifdef USE_OMP
+    # pragma omp parallel for schedule(dynamic, 50)
+    # endif
+    forAll(bFaces, bfI)
+    {
+        const face& bf = bFaces[bfI];
+
+        DynList<bool> OkPoints;
+        if( !help::isFaceConvexAndOk(bf, points, OkPoints) )
+        {
+            forAll(OkPoints, pI)
+            {
+                if( activePointsPtr_ && !(*activePointsPtr_)[bp[bf[pI]]] )
+                    continue;
+
+                if( !OkPoints[pI] )
+                {
+                    # ifdef USE_OMP
+                    # pragma omp critical
+                    # endif
+                    {
+                        invertedVertices_.insert(bf[pI]);
+                    }
+                }
+            }
+        }
+    }
+
     if( Pstream::parRun() )
     {
         //- exchange global labels of inverted points
         const labelList& bPoints = mse.boundaryPoints();
-        const labelList& globalPointLabel = mse.globalBoundaryPointLabel();
-        const Map<label>& globalToLocal = mse.globalToLocalBndPointAddressing();
+        const Map<label>& globalToLocal =
+            mse.globalToLocalBndPointAddressing();
         const VRWGraph& bpAtProcs = mse.bpAtProcs();
         const DynList<label>& neiProcs = mse.bpNeiProcs();
 
@@ -357,7 +387,7 @@ void meshSurfaceCheckInvertedVertices::checkVertices()
                 if( neiProc == Pstream::myProcNo() )
                     continue;
 
-                shareData[neiProc].append(globalPointLabel[bpI]);
+                shareData[neiProc].append(iter.key());
             }
         }
 

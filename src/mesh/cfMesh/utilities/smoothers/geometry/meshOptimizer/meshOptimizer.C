@@ -1,25 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
-    \\  /    A nd           | Web:         http://www.foam-extend.org
-     \\/     M anipulation  | For copyright notice see file Copyright
+  \\      /  F ield         | cfMesh: A library for mesh generation
+   \\    /   O peration     |
+    \\  /    A nd           | Author: Franjo Juretic (franjo.juretic@c-fields.com)
+     \\/     M anipulation  | Copyright (C) Creative Fields, Ltd.
 -------------------------------------------------------------------------------
 License
-    This file is part of foam-extend.
+    This file is part of cfMesh.
 
-    foam-extend is free software: you can redistribute it and/or modify it
+    cfMesh is free software; you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation, either version 3 of the License, or (at your
+    Free Software Foundation; either version 3 of the License, or (at your
     option) any later version.
 
-    foam-extend is distributed in the hope that it will be useful, but
-    WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    General Public License for more details.
+    cfMesh is distributed in the hope that it will be useful, but WITHOUT
+    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+    for more details.
 
     You should have received a copy of the GNU General Public License
-    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
+    along with cfMesh.  If not, see <http://www.gnu.org/licenses/>.
 
 Description
 
@@ -31,8 +31,9 @@ Description
 #include "meshSurfacePartitioner.H"
 #include "polyMeshGenAddressing.H"
 #include "polyMeshGenChecks.H"
+#include "labelLongList.H"
 
-// #define DEBUGSearch
+// #define DEBUGSmoothing
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -132,17 +133,11 @@ label meshOptimizer::findLowQualityFaces
     return nBadFaces;
 }
 
-// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
-
-// Construct from mesh
-meshOptimizer::meshOptimizer(polyMeshGen& mesh)
-:
-    mesh_(mesh),
-    vertexLocation_(mesh.points().size(), INSIDE),
-    msePtr_(NULL),
-    enforceConstraints_(false),
-    badPointsSubsetName_()
+void meshOptimizer::calculatePointLocations()
 {
+    vertexLocation_.setSize(mesh_.points().size());
+    vertexLocation_ = INSIDE;
+
     const meshSurfaceEngine& mse = meshSurface();
     const labelList& bPoints = mse.boundaryPoints();
 
@@ -170,6 +165,21 @@ meshOptimizer::meshOptimizer(polyMeshGen& mesh)
     }
 }
 
+// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
+
+// Construct from mesh
+meshOptimizer::meshOptimizer(polyMeshGen& mesh)
+:
+    mesh_(mesh),
+    vertexLocation_(),
+    lockedFaces_(),
+    msePtr_(NULL),
+    enforceConstraints_(false),
+    badPointsSubsetName_()
+{
+    calculatePointLocations();
+}
+
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
 meshOptimizer::~meshOptimizer()
@@ -184,6 +194,75 @@ void meshOptimizer::enforceConstraints(const word subsetName)
     enforceConstraints_ = true;
 
     badPointsSubsetName_ = subsetName;
+}
+
+void meshOptimizer::lockCellsInSubset(const word& subsetName)
+{
+    //- lock the points in the cell subset with the given name
+    label subsetI = mesh_.cellSubsetIndex(subsetName);
+    if( subsetI >= 0 )
+    {
+        labelLongList lc;
+        mesh_.cellsInSubset(subsetI, lc);
+
+        lockCells(lc);
+    }
+    else
+    {
+        Warning << "Subset " << subsetName << " is not a cell subset!"
+            << " Cannot lock cells!" << endl;
+    }
+}
+
+void meshOptimizer::lockFacesInSubset(const word& subsetName)
+{
+    //- lock the points in the face subset with the given name
+    label subsetI = mesh_.faceSubsetIndex(subsetName);
+    if( subsetI >= 0 )
+    {
+        labelLongList lf;
+        mesh_.facesInSubset(subsetI, lf);
+
+        lockFaces(lf);
+    }
+    else
+    {
+        Warning << "Subset " << subsetName << " is not a face subset!"
+            << " Cannot lock faces!" << endl;
+    }
+}
+
+void meshOptimizer::lockPointsInSubset(const word& subsetName)
+{
+    //- lock the points in the point subset with the given name
+    label subsetI = mesh_.pointSubsetIndex(subsetName);
+    if( subsetI >= 0 )
+    {
+        labelLongList lp;
+        mesh_.pointsInSubset(subsetI, lp);
+
+        lockCells(lp);
+    }
+    else
+    {
+        Warning << "Subset " << subsetName << " is not a point subset!"
+            << " Cannot lock points!" << endl;
+    }
+}
+
+void meshOptimizer::removeUserConstraints()
+{
+    lockedFaces_.setSize(0);
+
+    //- unlock points
+    # ifdef USE_OMP
+    # pragma omp parallel for schedule(dynamic, 50)
+    # endif
+    forAll(vertexLocation_, i)
+    {
+        if( vertexLocation_[i] & LOCKED )
+            vertexLocation_[i] ^= LOCKED;
+    }
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

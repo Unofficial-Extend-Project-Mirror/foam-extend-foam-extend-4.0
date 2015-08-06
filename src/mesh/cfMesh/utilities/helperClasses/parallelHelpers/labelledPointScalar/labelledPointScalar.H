@@ -1,25 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
-    \\  /    A nd           | Web:         http://www.foam-extend.org
-     \\/     M anipulation  | For copyright notice see file Copyright
+  \\      /  F ield         | cfMesh: A library for mesh generation
+   \\    /   O peration     |
+    \\  /    A nd           | Author: Franjo Juretic (franjo.juretic@c-fields.com)
+     \\/     M anipulation  | Copyright (C) Creative Fields, Ltd.
 -------------------------------------------------------------------------------
 License
-    This file is part of foam-extend.
+    This file is part of cfMesh.
 
-    foam-extend is free software: you can redistribute it and/or modify it
+    cfMesh is free software; you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation, either version 3 of the License, or (at your
+    Free Software Foundation; either version 3 of the License, or (at your
     option) any later version.
 
-    foam-extend is distributed in the hope that it will be useful, but
-    WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    General Public License for more details.
+    cfMesh is distributed in the hope that it will be useful, but WITHOUT
+    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+    for more details.
 
     You should have received a copy of the GNU General Public License
-    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
+    along with cfMesh.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
     labelledPointScalar
@@ -47,21 +47,21 @@ namespace Foam
 /*---------------------------------------------------------------------------*\
                     Class labelledPointScalar Declaration
 \*---------------------------------------------------------------------------*/
-
+    
 class labelledPointScalar
 {
     // Private data
         //- point label
         label pLabel_;
-
+    
         //- point coordinates
         point coords_;
-
+    
         //- scalar data
         scalar weight_;
-
+    
     public:
-
+        
     // Constructors
         //- Null construct
         labelledPointScalar()
@@ -70,7 +70,7 @@ class labelledPointScalar
             coords_(vector::zero),
             weight_(0.0)
         {}
-
+        
         //- Construct from point and label
         labelledPointScalar(const label pl, const point& p, const scalar s)
         :
@@ -78,67 +78,67 @@ class labelledPointScalar
             coords_(p),
             weight_(s)
         {}
-
+            
     // Destructor
         ~labelledPointScalar()
         {}
-
+            
     // Member functions
         //- return point label
         inline label pointLabel() const
         {
             return pLabel_;
         }
-
+        
         inline label& pointLabel()
         {
             return pLabel_;
         }
-
+        
         //- return point coordinates
         inline const point& coordinates() const
         {
             return coords_;
         }
-
+        
         inline point& coordinates()
         {
             return coords_;
         }
-
+        
         //- return scalar value
         inline const scalar& scalarValue() const
         {
             return weight_;
         }
-
+        
         inline scalar& scalarValue()
         {
             return weight_;
         }
-
+        
     // Member operators
-
+        
         inline void operator=(const labelledPointScalar& lps)
         {
             pLabel_ = lps.pLabel_;
             coords_ = lps.coords_;
             weight_ = lps.weight_;
         }
-
+        
         inline bool operator==(const labelledPointScalar& lps) const
         {
             if( pLabel_ == lps.pLabel_ )
                 return true;
-
+            
             return false;
         }
-
+        
         inline bool operator!=(const labelledPointScalar& lps) const
         {
             return !this->operator==(lps);
         }
-
+        
     // Friend operators
         friend Ostream& operator<<(Ostream& os, const labelledPointScalar& lps)
         {
@@ -152,22 +152,22 @@ class labelledPointScalar
 
             return os;
         }
-
+        
         friend Istream& operator>>(Istream& is, labelledPointScalar& lps)
         {
             // Read beginning of labelledPointScalar
             is.readBegin("labelledPointScalar");
-
+        
             is >> lps.pLabel_;
             is >> lps.coords_;
             is >> lps.weight_;
-
+            
             // Read end of labelledPointScalar
             is.readEnd("labelledPointScalar");
-
+        
             // Check state of Istream
             is.check("operator>>(Istream&, labelledPointScalar");
-
+            
             return is;
         }
 };

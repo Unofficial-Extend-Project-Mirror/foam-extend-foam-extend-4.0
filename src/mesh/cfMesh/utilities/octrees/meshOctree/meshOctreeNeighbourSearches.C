@@ -1,25 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
-    \\  /    A nd           | Web:         http://www.foam-extend.org
-     \\/     M anipulation  | For copyright notice see file Copyright
+  \\      /  F ield         | cfMesh: A library for mesh generation
+   \\    /   O peration     |
+    \\  /    A nd           | Author: Franjo Juretic (franjo.juretic@c-fields.com)
+     \\/     M anipulation  | Copyright (C) Creative Fields, Ltd.
 -------------------------------------------------------------------------------
 License
-    This file is part of foam-extend.
+    This file is part of cfMesh.
 
-    foam-extend is free software: you can redistribute it and/or modify it
+    cfMesh is free software; you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation, either version 3 of the License, or (at your
+    Free Software Foundation; either version 3 of the License, or (at your
     option) any later version.
 
-    foam-extend is distributed in the hope that it will be useful, but
-    WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    General Public License for more details.
+    cfMesh is distributed in the hope that it will be useful, but WITHOUT
+    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+    for more details.
 
     You should have received a copy of the GNU General Public License
-    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
+    along with cfMesh.  If not, see <http://www.gnu.org/licenses/>.
 
 Description
 
@@ -54,6 +54,14 @@ label meshOctree::findLeafContainingVertex
         # ifdef OCTREE_DEBUG
         Info << "Vertex " << p << " is not in the initial cube" << endl;
         # endif
+
+        FatalErrorIn
+        (
+            "label meshOctree::findLeafContainingVertex(const point&) const"
+        ) << "Point " << p << " is not inside the initial cube" << endl;
+
+        throw "Found invalid locations of points";
+
         return -1;
     }
 
@@ -89,6 +97,18 @@ label meshOctree::findLeafContainingVertex
     }
 
     return meshOctreeCubeBasic::OTHERPROC;
+}
+
+void meshOctree::findLeavesInSphere
+(
+    const point& c,
+    const scalar r,
+    DynList<label>& containedLeaves
+) const
+{
+    containedLeaves.clear();
+
+    initialCubePtr_->leavesInSphere(rootBox_, c, r, containedLeaves);
 }
 
 label meshOctree::findNeighbourOverNode
@@ -168,7 +188,7 @@ void meshOctree::findNeighboursOverEdge
     DynList<label>& neighbourLeaves
 ) const
 {
-    if( isQuadtree_ && (eI >= 8) )
+    if( isQuadtree_ && (eI < 8) )
     {
         neighbourLeaves.append(-1);
         return;
@@ -376,17 +396,26 @@ void meshOctree::findAllLeafNeighbours
     {
         for(label i=0;i<8;++i)
             neighbourLeaves.append(findNeighbourOverNode(cc, i));
+
+        //- neighbours over edges
+        for(label i=0;i<12;++i)
+            findNeighboursOverEdge(cc, i, neighbourLeaves);
+
+        //- neighbours over faces
+        for(label i=0;i<6;++i)
+            findNeighboursInDirection(cc, i, neighbourLeaves);
     }
+    else
+    {
+        //- neighbours of an quadtree leaf
+        //- neighbours over edges
+        for(label i=8;i<12;++i)
+            findNeighboursOverEdge(cc, i, neighbourLeaves);
 
-    //- neighbours over edges
-    const label nCubeEdges = isQuadtree_?8:12;
-    for(label i=0;i<nCubeEdges;++i)
-        findNeighboursOverEdge(cc, i, neighbourLeaves);
-
-    //- neighbours over faces
-    const label nCubeFaces = isQuadtree_?4:6;
-    for(label i=0;i<nCubeFaces;++i)
-        findNeighboursInDirection(cc, i, neighbourLeaves);
+        //- neighbours over faces
+        for(label i=0;i<4;++i)
+            findNeighboursInDirection(cc, i, neighbourLeaves);
+    }
 }
 
 void meshOctree::findLeavesForCubeVertex

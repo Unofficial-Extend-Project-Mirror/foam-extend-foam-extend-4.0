@@ -1,25 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
-    \\  /    A nd           | Web:         http://www.foam-extend.org
-     \\/     M anipulation  | For copyright notice see file Copyright
+  \\      /  F ield         | cfMesh: A library for mesh generation
+   \\    /   O peration     |
+    \\  /    A nd           | Author: Franjo Juretic (franjo.juretic@c-fields.com)
+     \\/     M anipulation  | Copyright (C) Creative Fields, Ltd.
 -------------------------------------------------------------------------------
 License
-    This file is part of foam-extend.
+    This file is part of cfMesh.
 
-    foam-extend is free software: you can redistribute it and/or modify it
+    cfMesh is free software; you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation, either version 3 of the License, or (at your
+    Free Software Foundation; either version 3 of the License, or (at your
     option) any later version.
 
-    foam-extend is distributed in the hope that it will be useful, but
-    WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    General Public License for more details.
+    cfMesh is distributed in the hope that it will be useful, but WITHOUT
+    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+    for more details.
 
     You should have received a copy of the GNU General Public License
-    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
+    along with cfMesh.  If not, see <http://www.gnu.org/licenses/>.
 
 Description
 
@@ -34,7 +34,7 @@ Description
 #include "meshSurfacePartitioner.H"
 #include "labelledScalar.H"
 
-#include "helperFunctionsPar.H"
+#include "helperFunctions.H"
 
 # ifdef USE_OMP
 #include <omp.h>
@@ -138,11 +138,64 @@ void meshSurfaceMapper::findMappingDistance
     }
 }
 
+scalar meshSurfaceMapper::faceMetricInPatch
+(
+    const label bfI,
+    const label patchI
+) const
+{
+    const face& bf = surfaceEngine_.boundaryFaces()[bfI];
+
+    const pointFieldPMG& points = surfaceEngine_.points();
+
+    const point centre = bf.centre(points);
+    const vector area = bf.normal(points);
+
+    point projCentre;
+    scalar dSq;
+    label nt;
+
+    meshOctree_.findNearestSurfacePointInRegion
+    (
+        projCentre,
+        dSq,
+        nt,
+        patchI,
+        centre
+    );
+
+    DynList<point> projPoints(bf.size());
+    forAll(bf, pI)
+    {
+        meshOctree_.findNearestSurfacePointInRegion
+        (
+            projPoints[pI],
+            dSq,
+            nt,
+            patchI,
+            points[bf[pI]]
+        );
+    }
+
+    vector projArea(vector::zero);
+    forAll(bf, pI)
+    {
+        projArea +=
+            triPointRef
+            (
+                projPoints[pI],
+                projPoints[bf.fcIndex(pI)],
+                projCentre
+            ).normal();
+    }
+
+    return magSqr(centre - projCentre) + mag(mag(projArea) - mag(area));
+}
+
 void meshSurfaceMapper::mapCorners(const labelLongList& nodesToMap)
 {
     const triSurfacePartitioner& sPartitioner = surfacePartitioner();
     const labelList& surfCorners = sPartitioner.corners();
-    const pointField& sPoints = meshOctree_.surface().points();
     const List<DynList<label> >& cornerPatches = sPartitioner.cornerPatches();
 
     const meshSurfacePartitioner& mPart = meshPartitioner();
@@ -151,6 +204,9 @@ void meshSurfaceMapper::mapCorners(const labelLongList& nodesToMap)
 
     const pointFieldPMG& points = surfaceEngine_.points();
     const labelList& bPoints = surfaceEngine_.boundaryPoints();
+
+    const triSurf& surf = meshOctree_.surface();
+    const pointField& sPoints = surf.points();
 
     //std::map<label, scalar> mappingDistance;
     scalarList mappingDistance;
@@ -203,6 +259,7 @@ void meshSurfaceMapper::mapCorners(const labelLongList& nodesToMap)
             }
 
             newP /= patches.size();
+
             if( magSqr(newP - mapPointApprox) < 1e-8 * maxDist )
                 break;
 
@@ -259,6 +316,9 @@ void meshSurfaceMapper::mapEdgeNodes(const labelLongList& nodesToMap)
     const meshSurfacePartitioner& mPart = meshPartitioner();
     const VRWGraph& pPatches = mPart.pointPatches();
 
+    //const triSurf& surf = meshOctree_.surface();
+    //const pointField& sPoints = surf.points();
+
     //- find mapping distance for selected vertices
     scalarList mappingDistance;
     findMappingDistance(nodesToMap, mappingDistance);
@@ -292,6 +352,7 @@ void meshSurfaceMapper::mapEdgeNodes(const labelLongList& nodesToMap)
         while( iter++ < 20 )
         {
             point newP(vector::zero);
+
             forAll(patches, patchI)
             {
                 point np;
@@ -309,6 +370,7 @@ void meshSurfaceMapper::mapEdgeNodes(const labelLongList& nodesToMap)
             }
 
             newP /= patches.size();
+
             if( magSqr(newP - mapPointApprox) < 1e-8 * maxDist )
                 break;
 
