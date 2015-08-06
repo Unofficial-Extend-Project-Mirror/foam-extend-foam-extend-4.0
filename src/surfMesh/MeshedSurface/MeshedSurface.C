@@ -437,7 +437,7 @@ void Foam::MeshedSurface<Face>::remapFaces
 )
 {
     // recalculate the zone start/size
-    if (&faceMap && faceMap.size())
+    if (!faceMap.empty())
     {
         surfZoneList& zones = storedZones();
 
@@ -525,26 +525,26 @@ void Foam::MeshedSurface<Face>::scalePoints(const scalar& scaleFactor)
 template<class Face>
 void Foam::MeshedSurface<Face>::reset
 (
-    const Xfer< pointField >& pointLst,
-    const Xfer< List<Face> >& faceLst,
-    const Xfer< surfZoneList >& zoneLst
+    const Xfer<pointField>& pointLst,
+    const Xfer<List<Face> >& faceLst,
+    const Xfer<surfZoneList>& zoneLst
 )
 {
     ParentType::clearOut();
 
     // Take over new primitive data.
     // Optimized to avoid overwriting data at all
-    if (&pointLst)
+    if (!pointLst().empty())
     {
         storedPoints().transfer(pointLst());
     }
 
-    if (&faceLst)
+    if (!faceLst().empty())
     {
         storedFaces().transfer(faceLst());
     }
 
-    if (&zoneLst)
+    if (!zoneLst().empty())
     {
         storedZones().transfer(zoneLst());
     }
@@ -563,17 +563,17 @@ void Foam::MeshedSurface<Face>::reset
 
     // Take over new primitive data.
     // Optimized to avoid overwriting data at all
-    if (&pointLst)
+    if (!pointLst().empty())
     {
         storedPoints().transfer(pointLst());
     }
 
-    if (&faceLst)
+    if (!faceLst().empty())
     {
         storedFaces().transfer(faceLst());
     }
 
-    if (&zoneLst)
+    if (!zoneLst().empty())
     {
         storedZones().transfer(zoneLst());
     }
@@ -867,7 +867,7 @@ Foam::label Foam::MeshedSurface<Face>::triangulate
     // nothing to do
     if (nTri <= faceLst.size())
     {
-        if (&faceMapOut)
+        if (!faceMapOut.empty())
         {
             faceMapOut.clear();
         }
@@ -878,7 +878,7 @@ Foam::label Foam::MeshedSurface<Face>::triangulate
     List<label> faceMap;
 
     // reuse storage from optional faceMap
-    if (&faceMapOut)
+    if (!faceMapOut.empty())
     {
         faceMap.transfer(faceMapOut);
     }
@@ -935,10 +935,7 @@ Foam::label Foam::MeshedSurface<Face>::triangulate
     remapFaces(faceMap);
 
     // optionally return the faceMap
-    if (&faceMapOut)
-    {
-        faceMapOut.transfer(faceMap);
-    }
+    faceMapOut.transfer(faceMap);
     faceMap.clear();
 
     // Topology can change because of renumbering
