@@ -241,7 +241,7 @@ void Foam::leastSquaresVectors::makeLeastSquaresVectors() const
     // HJ, 21/Apr/2015
     
     // First loop: detect cells with bad least squares vectors
-    Info<< "NEW LEAST SQUARES VECTORS" << endl;
+
     // Use Gauss Gradient field: set to 1 if Gauss is needed
     volScalarField useGaussGrad
     (
@@ -450,9 +450,6 @@ void Foam::leastSquaresVectors::makeLeastSquaresVectors() const
             sumSf[fc[pFaceI]] += patchSf[pFaceI];
         }
     }
-
-    Info<< "sumLsq min = " << min(sumLsq) << " max = " << max(sumLsq) << endl;
-    Info<< "sumSf min = " << min(sumSf) << " max = " << max(sumSf) << endl;
 
     if (debug)
     {
