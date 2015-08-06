@@ -28,7 +28,7 @@ Description
 \*---------------------------------------------------------------------------*/
 
 #include "argList.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "triSurf.H"
 #include "triSurfaceRemoveFacets.H"
 

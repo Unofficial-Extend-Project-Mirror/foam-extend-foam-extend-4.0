@@ -6,4 +6,4 @@ EXE_INC = \
 EXE_LIBS = \
     -lmeshTools \
     -ledgeMesh \
-    -lmeshLibrary
+    -lcfMesh

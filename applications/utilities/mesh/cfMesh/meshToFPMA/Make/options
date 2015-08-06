@@ -4,6 +4,6 @@ EXE_INC = \
     -I$(LIB_SRC)/edgeMesh/lnInclude
 
 EXE_LIBS = \
-    -lmeshLibrary \
+    -lcfMesh \
     -ledgeMesh \
     -lmeshTools
