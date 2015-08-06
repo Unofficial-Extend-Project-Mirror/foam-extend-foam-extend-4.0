@@ -32,7 +32,7 @@ SourceFiles
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef coupledFfvScalarMatrix_H
+#ifndef coupledFvScalarMatrix_H
 #define coupledFvScalarMatrix_H
 
 #include "coupledFvMatrix.H"
