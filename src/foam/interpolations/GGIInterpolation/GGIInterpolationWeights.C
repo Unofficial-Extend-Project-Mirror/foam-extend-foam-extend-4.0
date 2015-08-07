@@ -99,12 +99,12 @@ void GGIInterpolation<MasterPatch, SlavePatch>::calcAddressing() const
     // Create the dynamic lists to hold the addressing
 
     // The final master/slave list, after filtering out the "false" neighbours
-    List<DynamicList<label> > masterNeighbors(masterPatch_.size());
-    List<DynamicList<label> > slaveNeighbors(slavePatch_.size());
+    List<DynamicList<label, 8> > masterNeighbors(masterPatch_.size());
+    List<DynamicList<label, 8> > slaveNeighbors(slavePatch_.size());
 
     // The weights
-    List<DynamicList<scalar> > masterNeighborsWeights(masterPatch_.size());
-    List<DynamicList<scalar> > slaveNeighborsWeights(slavePatch_.size());
+    List<DynamicList<scalar, 8> > masterNeighborsWeights(masterPatch_.size());
+    List<DynamicList<scalar, 8> > slaveNeighborsWeights(slavePatch_.size());
 
     // First, find a rough estimate of each slave and master facet
     // neighborhood by filtering out all the faces located outside of
