@@ -34,6 +34,7 @@ Author
 
 \*---------------------------------------------------------------------------*/
 
+#include "objectRegistry.H"
 #include "foamTime.H"
 #include "meshOps.H"
 #include "ListOps.H"

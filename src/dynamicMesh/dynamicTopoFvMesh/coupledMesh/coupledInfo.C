@@ -23,6 +23,7 @@ License
 
 \*---------------------------------------------------------------------------*/
 
+#include "objectRegistry.H"
 #include "foamTime.H"
 #include "coupledInfo.H"
 #include "emptyPolyPatch.H"
