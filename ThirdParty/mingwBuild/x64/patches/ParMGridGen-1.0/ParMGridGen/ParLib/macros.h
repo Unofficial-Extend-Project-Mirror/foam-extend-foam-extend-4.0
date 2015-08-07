@@ -13,7 +13,7 @@
 /*************************************************************************
 * This macro is used to normalize the weights of two nodes
 **************************************************************************/
-#define ARATIO1(dim, surf, vol) ((dim == 2) ? (pow((surf), 2)/(vol)) : (pow((surf), 1.5)/(vol))) 
+#define ARATIO1(dim, surf, vol) ((dim == 2) ? (pow((surf), 2)/(vol)) : (pow((surf), 1.5)/(vol)))
 #define ARATIO(dim, surf, vol) ((dim == 2) ? ((surf)*(surf)/(vol)) : (sqrt((surf)*(surf)*(surf))/(vol)))
 #define ARATIO2(dim, surf, vol) ((dim == 2) ? ((surf)*(surf)*(surf)*(surf)/(vol)*(vol)) : ((surf)*(surf)*(surf)/((vol)*(vol))))
 
@@ -31,7 +31,7 @@
 #define XOR(a, b) ((a) < 0 ? -((-(a))^(b)) : ((a)^(b)))
 
 #define SWAP(a, b, tmp)  \
-                 do {(tmp) = (a); (a) = (b); (b) = (tmp);} while(0) 
+                 do {(tmp) = (a); (a) = (b); (b) = (tmp);} while(0)
 
 #define INC_DEC(a, b, val) \
                  do {(a) += (val); (b) -= (val);} while(0)
@@ -70,7 +70,7 @@
     }
 #else
 #   define ASSERT(ctrl, expr) ;
-#endif 
+#endif
 
 #ifdef DEBUG
 #   define ASSERTP(ctrl, expr,msg)                                          \
@@ -82,7 +82,7 @@
     }
 #else
 #   define ASSERTP(ctrl, expr,msg) ;
-#endif 
+#endif
 
 #ifdef DEBUGS
 #   define ASSERTS(expr)                                          \
@@ -93,7 +93,7 @@
     }
 #else
 #   define ASSERTS(expr) ;
-#endif 
+#endif
 
 #ifdef DEBUGS
 #   define ASSERTSP(expr, msg)                                          \
@@ -105,4 +105,4 @@
     }
 #else
 #   define ASSERTSP(expr, msg) ;
-#endif 
+#endif

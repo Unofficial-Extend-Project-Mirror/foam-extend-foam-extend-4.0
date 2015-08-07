@@ -84,8 +84,8 @@ void Foam::betaFlux::evaluateFlux
     const scalar magULeft  = mag(ULeft);
     const scalar magURight = mag(URight);
 
-    const scalar MLeft = abs(magULeft/cLeft);
-    const scalar MRight = abs(magURight/cRight);
+    const scalar MLeft = mag(magULeft/cLeft);
+    const scalar MRight = mag(magURight/cRight);
 
     // Compute beta parameter - this should be done in multidimensional way
     // similarly to multidimensional limiters

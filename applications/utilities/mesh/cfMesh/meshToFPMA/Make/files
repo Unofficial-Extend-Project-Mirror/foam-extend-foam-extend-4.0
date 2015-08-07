@@ -1,3 +1,0 @@
-meshToFPMA.C
-
-EXE = $(FOAM_APPBIN)/meshToFPMA

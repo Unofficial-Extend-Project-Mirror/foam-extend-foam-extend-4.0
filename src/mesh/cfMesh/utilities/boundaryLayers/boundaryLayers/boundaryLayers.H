@@ -36,7 +36,7 @@ SourceFiles
 #define boundaryLayers_H
 
 #include "objectRegistry.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "polyMeshGenModifier.H"
 #include "meshSurfaceEngine.H"
 #include "meshSurfacePartitioner.H"

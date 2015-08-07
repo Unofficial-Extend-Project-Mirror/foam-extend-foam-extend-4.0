@@ -268,7 +268,7 @@ bool Foam::repatchCoverage::changeTopology() const
 
     if
     (
-        Pstream::parRun
+        Pstream::parRun()
      && (
             (masterSide.empty() && !slaveSide.empty())
          || (!masterSide.empty() && slaveSide.empty())

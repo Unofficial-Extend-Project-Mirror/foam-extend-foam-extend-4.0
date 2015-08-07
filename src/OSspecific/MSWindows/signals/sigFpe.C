@@ -58,7 +58,7 @@ void Foam::sigFpe::sigFpeHandler(int)
         (
             "Foam::sigSegv::sigFpeHandler()"
         )   << "Cannot reset SIGFPE trapping"
-            << abort(FatalError);    
+            << abort(FatalError);
     }
 
     // Update jobInfo file
@@ -99,7 +99,7 @@ Foam::sigFpe::~sigFpe()
             (
                 "Foam::sigFpe::~sigFpe()"
             )   << "Cannot reset SIGFPE trapping"
-                << abort(FatalError);    
+                << abort(FatalError);
         }
     }
 
@@ -134,11 +134,11 @@ void Foam::sigFpe::set(const bool verbose)
         }
 /*
         fpOld_ = _controlfp(0, 0);
-        const unsigned int fpNew = 
+        const unsigned int fpNew =
           fpOld_ & ~(_EM_ZERODIVIDE | _EM_INVALID | _EM_OVERFLOW);
         _controlfp(fpNew, _MCW_EM);
 
-        oldAction_ = ::signal(SIGFPE, &Foam::sigFpe::sigFpeHandler);        
+        oldAction_ = ::signal(SIGFPE, &Foam::sigFpe::sigFpeHandler);
 
         if( SIG_ERR == oldAction_ )
         {
@@ -148,7 +148,7 @@ void Foam::sigFpe::set(const bool verbose)
             (
                 "Foam::sigFpe::set()"
             )   << "Cannot set SIGFPE trapping"
-                << abort(FatalError);    
+                << abort(FatalError);
         }
 */
     }

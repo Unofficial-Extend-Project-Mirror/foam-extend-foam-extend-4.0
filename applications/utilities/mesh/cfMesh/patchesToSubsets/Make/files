@@ -1,3 +1,0 @@
-patchesToSubsets.C
-
-EXE = $(FOAM_APPBIN)/patchesToSubsets

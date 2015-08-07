@@ -28,6 +28,7 @@ Description
 \*---------------------------------------------------------------------------*/
 
 #include "argList.H"
+#include "objectRegistry.H"
 #include "foamTime.H"
 #include "polyMeshGenModifier.H"
 #include "symmetryPlaneOptimisation.H"

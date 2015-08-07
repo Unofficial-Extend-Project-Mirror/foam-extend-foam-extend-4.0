@@ -400,7 +400,7 @@ void Foam::UnsortedMeshedSurface<Face>::remapFaces
 )
 {
     // re-assign the zone Ids
-    if (&faceMap && faceMap.size())
+    if (!faceMap.empty())
     {
         if (zoneToc_.empty())
         {
@@ -611,7 +611,7 @@ void Foam::UnsortedMeshedSurface<Face>::reset
         Xfer<surfZoneList>()
     );
 
-    if (&zoneIds)
+    if (!zoneIds().empty())
     {
         zoneIds_.transfer(zoneIds());
     }
@@ -633,7 +633,7 @@ void Foam::UnsortedMeshedSurface<Face>::reset
         Xfer<surfZoneList>()
     );
 
-    if (&zoneIds)
+    if (!zoneIds().empty())
     {
         zoneIds_.transfer(zoneIds());
     }

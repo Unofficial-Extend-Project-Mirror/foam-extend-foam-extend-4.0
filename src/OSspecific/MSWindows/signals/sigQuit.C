@@ -46,7 +46,7 @@ void Foam::sigQuit::sigQuitHandler(int)
         (
             "Foam::sigQuit::sigQuitHandler()"
         )   << "Cannot reset SIGQUIT trapping"
-            << abort(FatalError);    
+            << abort(FatalError);
     }
 
     // Update jobInfo file
@@ -81,7 +81,7 @@ Foam::sigQuit::~sigQuit()
         {
             FatalErrorIn("Foam::sigQuit::~sigQuit()")
                 << "Cannot reset SIGBREAK trapping"
-                << abort(FatalError);    
+                << abort(FatalError);
         }
     }
 }
@@ -100,7 +100,7 @@ void Foam::sigQuit::set(const bool verbose)
             << abort(FatalError);
     }
 
-    oldAction_ = ::signal(SIGBREAK, &Foam::sigQuit::sigQuitHandler);        
+    oldAction_ = ::signal(SIGBREAK, &Foam::sigQuit::sigQuitHandler);
 
     if( SIG_ERR == oldAction_ )
     {
@@ -110,7 +110,7 @@ void Foam::sigQuit::set(const bool verbose)
         (
             "Foam::sigQuit::set()"
         )   << "Cannot set SIGQUIT trapping"
-            << abort(FatalError);    
+            << abort(FatalError);
     }
 }
 

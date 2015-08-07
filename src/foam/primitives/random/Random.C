@@ -26,7 +26,7 @@ License
 #include "Random.H"
 
 #ifdef mingw
-#include "rand48.h"
+#   include "rand48.h"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

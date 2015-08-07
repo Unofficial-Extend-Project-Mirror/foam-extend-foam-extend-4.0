@@ -1,3 +1,0 @@
-mergeSurfacePatches.C
-
-EXE = $(FOAM_APPBIN)/mergeSurfacePatches

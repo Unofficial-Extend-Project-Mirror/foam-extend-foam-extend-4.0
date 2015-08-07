@@ -44,20 +44,6 @@ setDestination FluidStructureInteraction
     ./Allwmake
 )
 
-# Install cfMesh mesh generation package
-if [ ! -d "cfMesh-v1.0" ]; then
-    wget http://www.c-fields.com/Media/Default/Repository/cfMesh-v1.0.tgz
-    tar zxvf cfMesh-v1.0.tgz
-    rm cfMesh-v1.0.tgz
-fi
-
-setDestination cfMesh-v1.0
-
-(
-    cd cfMesh-v1.0
-    ./Allwmake
-)
-
 # Install the makeAxialMesh utilitiy
 if [ ! -d "MakeAxialMesh" ]; then
     svn export svn://svn.code.sf.net/p/openfoam-extend/svn/trunk/Breeder_1.6/utilities/mesh/manipulation/MakeAxialMesh MakeAxialMesh

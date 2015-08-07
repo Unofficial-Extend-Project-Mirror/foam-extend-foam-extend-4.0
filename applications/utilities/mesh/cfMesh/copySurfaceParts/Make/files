@@ -1,3 +1,0 @@
-copySurfaceParts.C
-
-EXE = $(FOAM_APPBIN)/copySurfaceParts

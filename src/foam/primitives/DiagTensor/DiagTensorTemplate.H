@@ -37,7 +37,7 @@ SourceFiles
 \*---------------------------------------------------------------------------*/
 
 #ifndef DiagTensorTemplate_H
-#define DiagTensoTemplater_H
+#define DiagTensorTemplate_H
 
 #include "TensorTemplate.H"
 

@@ -29,7 +29,7 @@ Description
 #include "argList.H"
 #include "IFstream.H"
 #include "fileName.H"
-#include "triSurface.H"
+#include "triSurfModifier.H"
 #include "boundBox.H"
 #include "OFstream.H"
 #include <cstdlib>
@@ -67,8 +67,9 @@ int main(int argc, char *argv[])
             << exit(FatalError);
     }
 
-    triSurface origSurface(inFileName);
-    const pointField& points = origSurface.points();
+    triSurf origSurface(inFileName);
+    triSurfModifier sMod(origSurface);
+    pointField& points = sMod.pointsAccess();
 
     const boundBox bb(points);
 
@@ -100,36 +101,33 @@ int main(int argc, char *argv[])
 
     //- generate bounding box points
     const label nPoints = points.size();
-    pointField newPoints(nPoints+8);
-    forAll(points, pointI)
-        newPoints[pointI] = points[pointI];
+    points.setSize(nPoints + 8);
 
-    newPoints[nPoints] = newBB.min();
-    newPoints[nPoints+1] =
+    points[nPoints] = newBB.min();
+    points[nPoints+1] =
         point(newBB.max().x(), newBB.min().y(), newBB.min().z());
-    newPoints[nPoints+2] =
+    points[nPoints+2] =
         point(newBB.min().x(), newBB.max().y(), newBB.min().z());
-    newPoints[nPoints+3] =
+    points[nPoints+3] =
         point(newBB.max().x(), newBB.max().y(), newBB.min().z());
-    newPoints[nPoints+4] =
+    points[nPoints+4] =
         point(newBB.min().x(), newBB.min().y(), newBB.max().z());
-    newPoints[nPoints+5] =
+    points[nPoints+5] =
         point(newBB.max().x(), newBB.min().y(), newBB.max().z());
-    newPoints[nPoints+6] =
+    points[nPoints+6] =
         point(newBB.min().x(), newBB.max().y(), newBB.max().z());
-    newPoints[nPoints+7] = newBB.max();
+    points[nPoints+7] = newBB.max();
 
     //- generate bounding bound triangles
     const label nTriangles = origSurface.size();
-    List<labelledTri> newTriangles(nTriangles+12);
-    forAll(origSurface, triI)
-        newTriangles[triI] = origSurface[triI];
+    LongList<labelledTri>& newTriangles = sMod.facetsAccess();
+    newTriangles.setSize(nTriangles + 12);
 
     //- create patches
+    geometricSurfacePatchList& newPatches = sMod.patchesAccess();
     const label nPatches = origSurface.patches().size();
-    geometricSurfacePatchList newPatches(nPatches+6);
-    forAll(origSurface.patches(), patchI)
-        newPatches[patchI] = origSurface.patches()[patchI];
+    newPatches.setSize(nPatches + 6);
+
     newPatches[nPatches].name() = "xMin";
     newPatches[nPatches+1].name() = "xMax";
     newPatches[nPatches+2].name() = "yMin";
@@ -169,8 +167,7 @@ int main(int argc, char *argv[])
         labelledTri(nPoints+4, nPoints+5, nPoints+7, nPatches+5);
 
     //- write the surface
-    triSurface newSurface(newTriangles, newPatches, newPoints);
-    newSurface.write(outFileName);
+    origSurface.writeSurface(outFileName);
 
     Info << "End\n" << endl;
 

@@ -29,7 +29,7 @@ Description
 #include "triSurf.H"
 #include "demandDrivenData.H"
 #include "objectRegistry.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "meshOctreeCreator.H"
 #include "voronoiMeshExtractor.H"
 #include "meshSurfaceEngine.H"

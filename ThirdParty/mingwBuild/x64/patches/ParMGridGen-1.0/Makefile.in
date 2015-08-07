@@ -1,5 +1,5 @@
 #--------------------------------------------------------------------------
-# Which make to use 
+# Which make to use
 make = gmake
 
 # Which compiler to use
@@ -12,7 +12,7 @@ PARCC = gcc
 OPTFLAGS = -O3
 
 # What options to be used by the compiler
-COPTIONS = 
+COPTIONS =
 
 # Which loader to use
 LD = gcc
@@ -21,7 +21,7 @@ PARLD = gcc
 # What options to be used by the loader
 LDOPTIONS = -O3
 
-# Where to put the executable 
+# Where to put the executable
 BINDIR = ../..
 
 # Additional libraries
@@ -51,7 +51,7 @@ AR = ar rv
 RANLIB = ar -ts
 
 #--------------------------------------------------------------------------
-# 
+#
 # Do not change any of the following
 #
 VERNUM = 1.0

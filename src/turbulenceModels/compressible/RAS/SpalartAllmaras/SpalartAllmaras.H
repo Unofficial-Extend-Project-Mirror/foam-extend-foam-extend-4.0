@@ -66,7 +66,7 @@ SourceFiles
 \*---------------------------------------------------------------------------*/
 
 #ifndef compressibleSpalartAllmaras_H
-#define combressibleSpalartAllmaras_H
+#define compressibleSpalartAllmaras_H
 
 #include "RASModel.H"
 #include "wallDist.H"

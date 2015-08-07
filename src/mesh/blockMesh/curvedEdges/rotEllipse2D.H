@@ -37,7 +37,7 @@ Authors
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef rotEllipse1D_H
+#ifndef rotEllipse2D_H
 #define rotEllipse2D_H
 
 #include "mathematicalConstants.H"

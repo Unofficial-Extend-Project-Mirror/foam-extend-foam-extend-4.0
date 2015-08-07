@@ -47,9 +47,9 @@ set_system_paths() {
     export PARAVIEW_HOME=$PROGRAMS_HOME/ParaView-4.3.1
     #export PERL_HOME=$PROGRAMS_HOME/strawberry-perl-5.20.2.1-64bit/perl
     export PEXPORTS_HOME=$PROGRAMS_HOME/pexports
-    export PYTHON_HOME=$PROGRAMS_HOME/Python27
-    export SUBVERSION_HOME=$PROGRAMS_HOME/svn-win32-1.8.13
-    export WGET_HOME=$PROGRAMS_HOME/wget
+    #export PYTHON_HOME=$PROGRAMS_HOME/Python27
+    #export SUBVERSION_HOME=$PROGRAMS_HOME/svn-win32-1.8.13
+    export WGET_HOME=$PROGRAMS_HOME/wget-1.11.4-1
     export ZIP_HOME="/c/Program Files/7-Zip"
 }
 
@@ -58,13 +58,13 @@ add_to_path() {
     echo "Adding user-defined installed system tools to PATH ..." 
     export PATH=$ZIP_HOME:$PATH
     export PATH=$WGET_HOME/bin:$PATH
-    export PATH=$PYTHON_HOME:$PATH
-    export PATH=$SUBVERSION_HOME/bin:$PATH
+    #export PATH=$PYTHON_HOME:$PATH
+    #export PATH=$SUBVERSION_HOME/bin:$PATH
     export PATH=$GIT_HOME/cmd:$PATH
     #export PATH=$PERL_HOME/bin:$PATH
     export PATH=$CMAKE_HOME/bin:$PATH
     export PATH=$MPI_ROOTDIR/bin:$PATH
-    export PATH=$PEXPORTS_HOME:$PATH
+    export PATH=$PEXPORTS_HOME/bin:$PATH
     export PATH=$MINGW_HOME/bin:$PATH
 }
 # }}}
@@ -78,12 +78,12 @@ setup_foam_env() {
     export FOAM_VERBOSE=1
     export MPI_VERSION_MINGW=openmpi-1.6.1
     export WM_OSTYPE=MSWindows
-    echo "Sourcing: $FOAM_ETC_DIR/bashrc" 
+    echo "Sourcing: $FOAM_ETC_DIR/bashrc"
     . $FOAM_ETC_DIR/bashrc
 }
 
 set_OMPI_env() {
-    echo "Setting OpenMPI environment settings ..." 
+    echo "Setting OpenMPI environment settings ..."
     export OMPI_MPICC=gcc.exe
     export OMPI_MPIXX=g++.exe
     export OMPI_CXXFLAGS==-I$MPI_ROOTDIR/include

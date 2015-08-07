@@ -43,14 +43,13 @@ Description
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-namespace Foam
-{
-namespace debug
-{
-
 template<>
 const char*
-Foam::NamedEnum<Foam::debug::globalControlDictSwitchSet, 5>::names[] =
+Foam::NamedEnum
+<
+    Foam::debug::globalControlDictSwitchSet,
+    Foam::debug::DIM_GLOBAL_CONTROL_DICT_SWITCH_SET
+>::names[] =
 {
     "DebugSwitches",
     "InfoSwitches",
@@ -59,6 +58,13 @@ Foam::NamedEnum<Foam::debug::globalControlDictSwitchSet, 5>::names[] =
     "DimensionedConstants"
 };
 
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+namespace Foam
+{
+namespace debug
+{
 
 //! @cond ignoreDocumentation - local scope
 dictionary* controlDictPtr_(NULL);

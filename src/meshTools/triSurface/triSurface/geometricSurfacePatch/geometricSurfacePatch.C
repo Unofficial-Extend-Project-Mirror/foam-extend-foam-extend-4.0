@@ -40,7 +40,7 @@ defineTypeNameAndDebug(geometricSurfacePatch, 0);
 // Construct null
 geometricSurfacePatch::geometricSurfacePatch()
 :
-    geometricType_("empty"),
+    geometricType_("patch"),
     name_("patch"),
     index_(0)
 {}
@@ -61,7 +61,7 @@ geometricSurfacePatch::geometricSurfacePatch
 {
     if (geometricType_.empty())
     {
-        geometricType_ = "empty";
+        geometricType_ = "patch";
     }
 }
 
@@ -75,7 +75,7 @@ geometricSurfacePatch::geometricSurfacePatch(Istream& is, const label index)
 {
     if (geometricType_.empty())
     {
-        geometricType_ = "empty";
+        geometricType_ = "patch";
     }
 }
 
@@ -94,7 +94,7 @@ geometricSurfacePatch::geometricSurfacePatch
 {
     if (geometricType_.empty())
     {
-        geometricType_ = "empty";
+        geometricType_ = "patch";
     }
 }
 

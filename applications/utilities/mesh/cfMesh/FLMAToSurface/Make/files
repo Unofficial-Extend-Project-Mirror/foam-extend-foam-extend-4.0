@@ -1,3 +1,0 @@
-FLMAToSurface.C
-
-EXE = $(FOAM_APPBIN)/FLMAToSurface

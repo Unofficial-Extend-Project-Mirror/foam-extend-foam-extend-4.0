@@ -27,7 +27,7 @@ void MGridGen(int nvtxs, idxtype *xadj, realtype *vvol, realtype *vsurf,
   srand48(7654321L);
 
   /*------------------------------------------------------------
-   * Set up the various control structures 
+   * Set up the various control structures
    *------------------------------------------------------------*/
   ctrl.CType = options[OPTION_CTYPE];
   ctrl.RType = options[OPTION_RTYPE];
@@ -68,7 +68,7 @@ void MGridGenRefine(int nvtxs, idxtype *xadj, realtype *vvol, realtype *vsurf,
   srand48(7654321L);
 
   /*------------------------------------------------------------
-   * Set up the various control structures 
+   * Set up the various control structures
    *------------------------------------------------------------*/
   ctrl.CType = options[OPTION_CTYPE];
   ctrl.RType = options[OPTION_RTYPE];

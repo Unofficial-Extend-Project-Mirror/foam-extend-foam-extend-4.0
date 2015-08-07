@@ -167,11 +167,11 @@ void printSourceFileAndLine
 // After an idea published by Rush Manbert at http://lists.apple.com/archives/xcode-users/2006/Apr/msg00528.html
 
 template<int level>
-void *getStackAddress() 
+void *getStackAddress()
 {
     const unsigned int stackLevel=level;
     return (
-        __builtin_frame_address(level) 
+        __builtin_frame_address(level)
         ? __builtin_return_address(stackLevel)
         : (void *)0
     );
@@ -212,7 +212,7 @@ void *getStackAddress(int level)
     }
 }
 
-unsigned backtrace(void **bt, unsigned maxAddrs) 
+unsigned backtrace(void **bt, unsigned maxAddrs)
 {
     unsigned valid=0;
     bool ok=true;
@@ -220,7 +220,7 @@ unsigned backtrace(void **bt, unsigned maxAddrs)
     for(int level=0;level<maxAddrs;level++) {
         if(ok) {
             bt[level]=getStackAddress(level);
-            
+
             if(bt[level]!=(void *)0) {
                 valid=level;
             } else {
@@ -235,7 +235,7 @@ unsigned backtrace(void **bt, unsigned maxAddrs)
 }
 
 // This function is a potential memory leak. But I don't care because the program is terminating anyway
-char **backtrace_symbols(void **bt,unsigned nr) 
+char **backtrace_symbols(void **bt,unsigned nr)
 {
     char **strings=(char **)malloc(sizeof(char *)*nr);
 

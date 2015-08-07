@@ -69,7 +69,7 @@ already have some of these system tools.
    (notice the dot "." command to source a file). This action sources other
    files as required, and also performs a check on the versions of the installed
    system tools.  An example output is shown at the end of this file.
-   
+
 8) If "mpirun.exe" failed to run due to a missing DLL (eg. msvcr100.dll), you
    may need to install the Microsoft Visual C++ 2010 Redistributable Package (see
    reference list below).
@@ -84,12 +84,12 @@ already have some of these system tools.
    (a). From the MSYS shell. This allows use of the utility programs and shell
         scripts in the bin directory (such as paraFoam). This is the recommended
         approach for developers.
-        
+
    (b). From a standard Windows CMD.exe command prompt using the created
         foam-extend-3.1-win-x64.zip stand-alone package. This can be used on any
         Windows machine without access to MSYS shells or compilers. See the README.txt
         contained within the package for further details.
-        
+
 
 3. EXTERNAL PACKAGE REFERENCE
 =============================
@@ -109,7 +109,7 @@ Version: 1.9.5
 URL    : https://git-scm.com/download/win
 For    : Version control system. Choose "Use Git from the Windows command prompt" and "Check out as-is. Commit as-is" in installer.
 
-Name   : Microsoft Visual C++ 2010 Redistributable Package (x64) 
+Name   : Microsoft Visual C++ 2010 Redistributable Package (x64)
 Version: 2010
 URL    : http://www.microsoft.com/en-us/download/details.aspx?id=14632
 For    : msvcr100.dll required by OpenMPI
@@ -151,7 +151,7 @@ Version: 1.11.4-1 (or above)
 URL    : http://downloads.sourceforge.net/gnuwin32/wget-1.11.4-1-bin.zip, http://downloads.sourceforge.net/gnuwin32/wget-1.11.4-1-dep.zip, http://downloads.sourceforge.net/gnuwin32/wget-1.11.4-1-doc.zip
 For    : Automatically downloading files from internet (eg. for use in automated build scripts)
 
-git clone --branch nameClashesForWinPort   git://git.code.sf.net/u/dominikchrist/foam-extend-3.1-dc foam-extend-3.1-win 
+git clone --branch nameClashesForWinPort   git://git.code.sf.net/u/dominikchrist/foam-extend-3.1-dc foam-extend-3.1-win
 
 
 4. EXAMPLE OUTPUT FROM SOUCING etc/bashrc.mingw
@@ -215,4 +215,3 @@ FOAM_INST_DIR=/c/Users/UserName/Git
 WM_PROJECT_DIR=/c/Users/UserName/Git/foam-extend-3.1
 WM_OSTYPE=MSWindows
 ENVIRONMENT SETUP COMPLETE.
-

@@ -418,8 +418,8 @@ void cartesianMeshExtractor::createPolyMesh()
             newFacePatch
         );
 
-        meshModifier.boundariesAccess()[1].patchType() = "empty";
-        meshModifier.boundariesAccess()[2].patchType() = "empty";
+        meshModifier.boundariesAccess()[1].patchType() = "patch";
+        meshModifier.boundariesAccess()[2].patchType() = "patch";
     }
 
     Info << "Finished creating polyMesh" << endl;

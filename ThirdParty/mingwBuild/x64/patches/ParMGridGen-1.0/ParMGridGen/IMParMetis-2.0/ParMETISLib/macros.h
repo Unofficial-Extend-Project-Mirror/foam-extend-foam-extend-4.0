@@ -24,7 +24,7 @@
 #define XOR(a, b) ((a) < 0 ? -((-(a))^(b)) : ((a)^(b)))
 
 #define SWAP(a, b, tmp)  \
-                 do {(tmp) = (a); (a) = (b); (b) = (tmp);} while(0) 
+                 do {(tmp) = (a); (a) = (b); (b) = (tmp);} while(0)
 
 #define INC_DEC(a, b, val) \
                  do {(a) += (val); (b) -= (val);} while(0)
@@ -75,7 +75,7 @@
     }
 #else
 #   define MALLOC_CHECK(ptr) ;
-#endif 
+#endif
 
 /*************************************************************************
 * This macro converts a length array in a CSR one
@@ -85,7 +85,7 @@
      for (i=1; i<n; i++) a[i] += a[i-1]; \
      for (i=n; i>0; i--) a[i] = a[i-1]; \
      a[0] = 0; \
-   } while(0) 
+   } while(0)
 
 
 
@@ -99,7 +99,7 @@
     }
 #else
 #   define ASSERT(ctrl, expr) ;
-#endif 
+#endif
 
 #ifdef DEBUG
 #   define ASSERTP(ctrl, expr,msg)                                          \
@@ -111,7 +111,7 @@
     }
 #else
 #   define ASSERTP(ctrl, expr,msg) ;
-#endif 
+#endif
 
 #ifdef DEBUGS
 #   define ASSERTS(expr)                                          \
@@ -122,7 +122,7 @@
     }
 #else
 #   define ASSERTS(expr) ;
-#endif 
+#endif
 
 #ifdef DEBUGS
 #   define ASSERTSP(expr, msg)                                          \
@@ -134,4 +134,4 @@
     }
 #else
 #   define ASSERTSP(expr, msg) ;
-#endif 
+#endif
