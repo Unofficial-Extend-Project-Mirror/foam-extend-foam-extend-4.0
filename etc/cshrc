@@ -98,7 +98,7 @@ setenv WM_THIRD_PARTY_USE_HWLOC_1101 1
 #
 # For AllMake.stage4
 #setenv WM_THIRD_PARTY_USE_QT_486 1
-#setenv WM_THIRD_PARTY_USE_PARAVIEW_431 1
+setenv WM_THIRD_PARTY_USE_PARAVIEW_431 1
 
 
 # Source files, possibly with some verbosity
