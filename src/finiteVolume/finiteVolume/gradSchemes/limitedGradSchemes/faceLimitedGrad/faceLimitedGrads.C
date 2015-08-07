@@ -70,9 +70,10 @@ inline void faceLimitedGrad<Type>::limitFace
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 template<>
-tmp<volVectorField> faceLimitedGrad<scalar>::grad
+tmp<volVectorField> faceLimitedGrad<scalar>::calcGrad
 (
-    const volScalarField& vsf
+    const volScalarField& vsf,
+    const word& name
 ) const
 {
     const fvMesh& mesh = vsf.mesh();
@@ -206,9 +207,10 @@ tmp<volVectorField> faceLimitedGrad<scalar>::grad
 
 
 template<>
-tmp<volTensorField> faceLimitedGrad<vector>::grad
+tmp<volTensorField> faceLimitedGrad<vector>::calcGrad
 (
-    const volVectorField& vvf
+    const volVectorField& vvf,
+    const word& name
 ) const
 {
     const fvMesh& mesh = vvf.mesh();

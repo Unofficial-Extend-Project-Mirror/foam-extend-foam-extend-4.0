@@ -91,9 +91,10 @@ inline void cellLimitedGrad<Type>::limitFace
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 template<>
-tmp<volVectorField> cellLimitedGrad<scalar>::grad
+tmp<volVectorField> cellLimitedGrad<scalar>::calcGrad
 (
-    const volScalarField& vsf
+    const volScalarField& vsf,
+    const word& name
 ) const
 {
     const fvMesh& mesh = vsf.mesh();
@@ -243,9 +244,10 @@ tmp<volVectorField> cellLimitedGrad<scalar>::grad
 
 
 template<>
-tmp<volTensorField> cellLimitedGrad<vector>::grad
+tmp<volTensorField> cellLimitedGrad<vector>::calcGrad
 (
-    const volVectorField& vsf
+    const volVectorField& vsf,
+    const word& name
 ) const
 {
     const fvMesh& mesh = vsf.mesh();

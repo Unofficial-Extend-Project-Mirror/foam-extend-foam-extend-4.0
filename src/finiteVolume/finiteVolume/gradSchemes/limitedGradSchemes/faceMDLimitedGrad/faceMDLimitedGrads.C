@@ -50,9 +50,10 @@ makeFvGradScheme(faceMDLimitedGrad)
 
 // FaceLimited scalar gradient
 template<>
-tmp<volVectorField> faceMDLimitedGrad<scalar>::grad
+tmp<volVectorField> faceMDLimitedGrad<scalar>::calcGrad
 (
-    const volScalarField& vsf
+    const volScalarField& vsf,
+    const word& name
 ) const
 {
     const fvMesh& mesh = vsf.mesh();
@@ -188,9 +189,10 @@ tmp<volVectorField> faceMDLimitedGrad<scalar>::grad
 
 
 template<>
-tmp<volTensorField> faceMDLimitedGrad<vector>::grad
+tmp<volTensorField> faceMDLimitedGrad<vector>::calcGrad
 (
-    const volVectorField& vvf
+    const volVectorField& vvf,
+    const word& name
 ) const
 {
     const fvMesh& mesh = vvf.mesh();

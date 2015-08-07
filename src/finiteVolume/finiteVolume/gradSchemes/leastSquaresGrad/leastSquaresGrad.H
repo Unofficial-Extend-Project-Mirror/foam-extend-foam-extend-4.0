@@ -88,13 +88,16 @@ public:
 
     // Member Functions
 
-        tmp
+        //- Return the gradient of the given field to the gradScheme::grad
+        //  for optional caching
+        virtual tmp
         <
             GeometricField
             <typename outerProduct<vector, Type>::type, fvPatchField, volMesh>
-        > grad
+        > calcGrad
         (
-            const GeometricField<Type, fvPatchField, volMesh>&
+            const GeometricField<Type, fvPatchField, volMesh>& vsf,
+            const word& name
         ) const;
 
         //- Return the BlockLduSystem corresponding to the implicit least

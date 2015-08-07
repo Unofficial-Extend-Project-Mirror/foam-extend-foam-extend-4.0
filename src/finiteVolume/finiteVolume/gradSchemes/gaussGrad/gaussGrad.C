@@ -46,9 +46,10 @@ tmp
         typename outerProduct<vector, Type>::type, fvPatchField, volMesh
     >
 >
-gaussGrad<Type>::grad
+gaussGrad<Type>::gradf
 (
-    const GeometricField<Type, fvsPatchField, surfaceMesh>& ssf
+    const GeometricField<Type, fvsPatchField, surfaceMesh>& ssf,
+    const word& name
 )
 {
     typedef typename outerProduct<vector, Type>::type GradType;
@@ -61,7 +62,7 @@ gaussGrad<Type>::grad
         (
             IOobject
             (
-                "grad("+ssf.name()+')',
+                name,
                 ssf.instance(),
                 mesh,
                 IOobject::NO_READ,
@@ -125,16 +126,17 @@ tmp
         typename outerProduct<vector, Type>::type, fvPatchField, volMesh
     >
 >
-gaussGrad<Type>::grad
+gaussGrad<Type>::calcGrad
 (
-    const GeometricField<Type, fvPatchField, volMesh>& vsf
+    const GeometricField<Type, fvPatchField, volMesh>& vsf,
+    const word& name
 ) const
 {
     typedef typename outerProduct<vector, Type>::type GradType;
 
     tmp<GeometricField<GradType, fvPatchField, volMesh> > tgGrad
     (
-        grad(tinterpScheme_().interpolate(vsf))
+        gradf(tinterpScheme_().interpolate(vsf), name)
     );
     GeometricField<GradType, fvPatchField, volMesh>& gGrad = tgGrad();
 

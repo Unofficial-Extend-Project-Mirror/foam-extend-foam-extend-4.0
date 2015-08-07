@@ -54,9 +54,10 @@ tmp
         typename outerProduct<vector, Type>::type, fvPatchField, volMesh
     >
 >
-leastSquaresSolidInterfaceGrad<Type>::grad
+leastSquaresSolidInterfaceGrad<Type>::calcGrad
 (
-    const GeometricField<Type, fvPatchField, volMesh>& vsf
+    const GeometricField<Type, fvPatchField, volMesh>& vsf,
+    const word& name
 ) const
 {
     typedef typename outerProduct<vector, Type>::type GradType;
@@ -69,7 +70,7 @@ leastSquaresSolidInterfaceGrad<Type>::grad
         (
             IOobject
             (
-                "grad("+vsf.name()+')',
+                name,
                 vsf.instance(),
                 mesh,
                 IOobject::NO_READ,

@@ -46,9 +46,10 @@ tmp
         typename outerProduct<vector, Type>::type, fvPatchField, volMesh
     >
 >
-beGaussGrad<Type>::grad
+beGaussGrad<Type>::calcGrad
 (
-    const GeometricField<Type, fvPatchField, volMesh>& vsf
+    const GeometricField<Type, fvPatchField, volMesh>& vsf,
+    const word& name
 ) const
 {
     typedef typename outerProduct<vector, Type>::type GradType;
@@ -68,7 +69,7 @@ beGaussGrad<Type>::grad
         (
             IOobject
             (
-                "grad("+ssf.name()+')',
+                name,
                 ssf.instance(),
                 mesh,
                 IOobject::NO_READ,
