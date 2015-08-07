@@ -38,8 +38,8 @@ SourceFiles
 #ifndef ReactingMultiphaseParcel_H
 #define ReactingMultiphaseParcel_H
 
-#include "ReactingParcel.H"
-#include "ReactingMultiphaseCloud.H"
+#include "ReactingParcelTemplate.H"
+#include "ReactingMultiphaseCloudTemplate.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

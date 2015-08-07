@@ -40,7 +40,7 @@ SourceFiles
 #include "OFstream.H"
 #include "areaFields.H"
 #include "indirectPrimitivePatch.H"
-#include "PrimitivePatchInterpolation.H"
+#include "PrimitivePatchInterpolationTemplate.H"
 
 using namespace Foam;
 

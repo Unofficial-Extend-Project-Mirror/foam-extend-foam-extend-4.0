@@ -38,7 +38,7 @@ SourceFiles
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #include "objectRegistry.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "meshSubset.H"
 #include "pointFieldPMG.H"
 #include "DynList.H"

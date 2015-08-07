@@ -27,7 +27,7 @@ License
 
 #include "regExp.H"
 #include "label.H"
-#include "string.H"
+#include "foamString.H"
 #include "List.H"
 #include "IOstreams.H"
 

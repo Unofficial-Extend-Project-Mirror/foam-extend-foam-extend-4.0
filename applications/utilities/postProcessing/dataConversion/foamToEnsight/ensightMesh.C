@@ -25,7 +25,7 @@ License
 
 #include "argList.H"
 #include "objectRegistry.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "ensightMesh.H"
 #include "fvMesh.H"
 #include "globalMeshData.H"

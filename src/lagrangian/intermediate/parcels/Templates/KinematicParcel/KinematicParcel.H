@@ -49,7 +49,7 @@ SourceFiles
 #include "interpolationCellPoint.H"
 #include "contiguous.H"
 
-#include "KinematicCloud.H"
+#include "KinematicCloudTemplate.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

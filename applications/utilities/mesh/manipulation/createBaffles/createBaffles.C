@@ -34,7 +34,7 @@ Description
 
 #include "syncTools.H"
 #include "argList.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "faceSet.H"
 #include "directTopoChange.H"
 #include "polyModifyFace.H"

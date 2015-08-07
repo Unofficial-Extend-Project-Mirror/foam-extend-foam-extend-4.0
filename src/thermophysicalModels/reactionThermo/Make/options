@@ -12,4 +12,6 @@ EXE_INC = \
 endif
 
 LIB_LIBS = \
-    -lfiniteVolume
+    -lbasicThermophysicalModels \
+    -lfiniteVolume \
+    -lspecie

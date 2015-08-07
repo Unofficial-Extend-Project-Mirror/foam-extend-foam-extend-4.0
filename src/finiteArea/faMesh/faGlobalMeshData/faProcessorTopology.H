@@ -32,7 +32,7 @@ Description
 #ifndef faProcessorTopology_H
 #define faProcessorTopology_H
 
-#include "ProcessorTopology.H"
+#include "ProcessorTopologyTemplate.H"
 #include "processorFaPatch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

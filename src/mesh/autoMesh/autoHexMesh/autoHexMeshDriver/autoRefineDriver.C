@@ -26,7 +26,7 @@ License
 #include "autoRefineDriver.H"
 #include "meshRefinement.H"
 #include "fvMesh.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "cellSet.H"
 #include "syncTools.H"
 #include "refinementParameters.H"

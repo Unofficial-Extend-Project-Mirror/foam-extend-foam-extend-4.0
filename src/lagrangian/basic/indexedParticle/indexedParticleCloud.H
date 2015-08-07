@@ -35,7 +35,7 @@ SourceFiles
 #ifndef indexedParticleCloud_H
 #define indexedParticleCloud_H
 
-#include "Cloud.H"
+#include "CloudTemplate.H"
 #include "indexedParticle.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

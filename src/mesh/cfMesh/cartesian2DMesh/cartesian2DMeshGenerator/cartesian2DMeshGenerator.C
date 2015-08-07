@@ -32,7 +32,7 @@ Description
 #include "triSurfacePatchManipulator.H"
 #include "triSurfaceCleanupDuplicateTriangles.H"
 #include "demandDrivenData.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "meshOctreeCreator.H"
 #include "cartesianMeshExtractor.H"
 #include "meshSurfaceEngine.H"

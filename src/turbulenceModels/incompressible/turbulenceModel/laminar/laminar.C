@@ -24,7 +24,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "laminar.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "volFields.H"
 #include "fvcGrad.H"
 #include "fvcDiv.H"

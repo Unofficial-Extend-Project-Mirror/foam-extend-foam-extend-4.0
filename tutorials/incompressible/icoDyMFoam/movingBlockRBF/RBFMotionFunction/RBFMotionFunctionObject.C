@@ -29,7 +29,7 @@ Author
 #include "RBFMotionFunctionObject.H"
 #include "addToRunTimeSelectionTable.H"
 #include "objectRegistry.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "RBFMotionSolver.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //

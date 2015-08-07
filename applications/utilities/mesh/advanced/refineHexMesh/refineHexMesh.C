@@ -29,7 +29,7 @@ Description
 #include "fvMesh.H"
 #include "pointMesh.H"
 #include "argList.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "hexRef8.H"
 #include "cellSet.H"
 #include "OFstream.H"

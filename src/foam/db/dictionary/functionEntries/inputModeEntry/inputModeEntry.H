@@ -73,7 +73,7 @@ class inputModeEntry
             OVERWRITE,
             PROTECT,
             WARN,
-            ERROR
+            FATALERROR
         };
 
         //- The current input mode

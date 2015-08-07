@@ -43,7 +43,7 @@ SourceFiles
 #include "mathematicalConstants.H"
 #include "radiationConstants.H"
 #include "interpolationTable.H"
-#include "Vector2D.H"
+#include "Vector2DTemplate.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

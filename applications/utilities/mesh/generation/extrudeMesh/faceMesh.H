@@ -34,7 +34,7 @@ SourceFiles
 #ifndef faceMesh_H
 #define faceMesh_H
 
-#include "PrimitivePatch.H"
+#include "PrimitivePatchTemplate.H"
 #include "faceList.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

@@ -35,7 +35,7 @@ SourceFiles
 #ifndef BasicReactingCloud_H
 #define BasicReactingCloud_H
 
-#include "ReactingCloud.H"
+#include "ReactingCloudTemplate.H"
 #include "BasicReactingParcel.H"
 #include "thermoPhysicsTypes.H"
 

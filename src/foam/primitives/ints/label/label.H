@@ -56,6 +56,8 @@ Description
 # define FOAM_LABEL_MAX INT_MAX
 
 # include "int.H"
+# include "long.H"
+# include "longLong.H"
 
 namespace Foam
 {
@@ -121,7 +123,12 @@ namespace Foam
 
 } // End namespace Foam
 
+#else
+
+#error "Undefined size for label in label.H"
+
 #endif
+
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

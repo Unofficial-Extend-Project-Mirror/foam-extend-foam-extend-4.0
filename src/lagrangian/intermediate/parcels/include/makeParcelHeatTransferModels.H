@@ -28,7 +28,7 @@ License
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-#include "ThermoCloud.H"
+#include "ThermoCloudTemplate.H"
 
 #include "NoHeatTransfer.H"
 #include "RanzMarshall.H"

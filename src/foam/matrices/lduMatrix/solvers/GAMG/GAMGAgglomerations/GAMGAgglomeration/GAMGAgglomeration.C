@@ -26,7 +26,7 @@ License
 #include "GAMGAgglomeration.H"
 #include "lduMesh.H"
 #include "lduMatrix.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "dlLibraryTable.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //

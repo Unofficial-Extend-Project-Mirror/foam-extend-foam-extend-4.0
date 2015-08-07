@@ -27,7 +27,7 @@ Description
 \*---------------------------------------------------------------------------*/
 
 #include "objectRegistry.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "tetFemScalarMatrix.H"
 #include "tetPointFields.H"
 #include "tetPolyPatchFields.H"

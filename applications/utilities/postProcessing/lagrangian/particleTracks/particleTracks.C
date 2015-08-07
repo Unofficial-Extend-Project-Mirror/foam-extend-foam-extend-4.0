@@ -31,10 +31,10 @@ Description
 \*---------------------------------------------------------------------------*/
 
 #include "argList.H"
-#include "Cloud.H"
+#include "CloudTemplate.H"
 #include "IOdictionary.H"
 #include "fvMesh.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "timeSelector.H"
 #include "OFstream.H"
 #include "passiveParticleCloud.H"

@@ -34,7 +34,7 @@ License
 #include "syncTools.H"
 #include "OFstream.H"
 #include "indirectPrimitivePatch.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "faceSet.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //

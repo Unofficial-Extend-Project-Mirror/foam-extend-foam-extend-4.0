@@ -25,7 +25,7 @@ License
 
 #include "cellCuts.H"
 #include "polyMesh.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "ListOps.H"
 #include "cellLooper.H"
 #include "refineCell.H"

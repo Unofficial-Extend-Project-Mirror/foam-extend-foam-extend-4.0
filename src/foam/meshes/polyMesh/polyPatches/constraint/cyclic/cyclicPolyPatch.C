@@ -32,7 +32,7 @@ License
 #include "patchZones.H"
 #include "matchPoints.H"
 #include "EdgeMap.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "RodriguesRotation.H"
 #include "standAlonePatch.H"
 

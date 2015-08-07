@@ -31,6 +31,7 @@ boundaryField
 
         setDeadCellValue   yes;
         deadCellValue      (0 0 0);
+        value uniform (0 0 0);
     }
 
     inlet

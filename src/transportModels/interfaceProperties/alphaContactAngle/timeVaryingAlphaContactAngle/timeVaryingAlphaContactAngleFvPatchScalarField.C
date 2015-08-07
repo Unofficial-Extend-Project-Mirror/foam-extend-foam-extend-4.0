@@ -27,7 +27,7 @@ License
 #include "timeVaryingAlphaContactAngleFvPatchScalarField.H"
 #include "addToRunTimeSelectionTable.H"
 #include "volMesh.H"
-#include "Time.H"
+#include "foamTime.H"
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 

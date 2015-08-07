@@ -26,7 +26,7 @@ License
 #include "forces.H"
 #include "volFields.H"
 #include "dictionary.H"
-#include "Time.H"
+#include "foamTime.H"
 
 #include "incompressible/singlePhaseTransportModel/singlePhaseTransportModel.H"
 #include "incompressible/RAS/RASModel/RASModel.H"

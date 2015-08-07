@@ -25,7 +25,7 @@ License
 
 #include "sampledSets.H"
 #include "dictionary.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "volFields.H"
 #include "ListListOps.H"
 #include "SortableList.H"

@@ -27,13 +27,13 @@ Description
 \*----------------------------------------------------------------------------*/
 
 #include "autoSnapDriver.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "motionSmoother.H"
 #include "directTopoChange.H"
 #include "OFstream.H"
 #include "syncTools.H"
 #include "fvMesh.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "OFstream.H"
 #include "mapPolyMesh.H"
 #include "motionSmoother.H"

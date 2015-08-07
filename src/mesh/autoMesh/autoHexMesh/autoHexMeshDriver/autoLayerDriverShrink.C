@@ -28,7 +28,7 @@ Description
 
 #include "autoLayerDriver.H"
 #include "fvMesh.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "pointFields.H"
 #include "motionSmoother.H"
 #include "pointData.H"

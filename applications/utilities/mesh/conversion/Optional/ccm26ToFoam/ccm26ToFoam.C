@@ -34,7 +34,7 @@ Description
 
 #include "ListOps.H"
 #include "argList.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "fvMesh.H"
 #include "volFields.H"
 #include "emptyPolyPatch.H"

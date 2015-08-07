@@ -37,7 +37,7 @@ SourceFiles
 
 #include "PtrList.H"
 #include "objectRegistry.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "tetPolyMesh.H"
 #include "tetPointMesh.H"
 #include "elementMesh.H"

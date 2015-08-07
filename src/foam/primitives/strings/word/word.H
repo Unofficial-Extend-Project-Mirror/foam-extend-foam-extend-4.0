@@ -40,7 +40,7 @@ SourceFiles
 #ifndef word_H
 #define word_H
 
-#include "string.H"
+#include "foamString.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

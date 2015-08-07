@@ -26,11 +26,11 @@ License
 #include "repatchCoverage.H"
 #include "polyTopoChanger.H"
 #include "polyMesh.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "primitiveMesh.H"
 #include "polyTopoChange.H"
 #include "primitiveFacePatch.H"
-#include "GGIInterpolation.H"
+#include "GGIInterpolationTemplate.H"
 #include "addToRunTimeSelectionTable.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //

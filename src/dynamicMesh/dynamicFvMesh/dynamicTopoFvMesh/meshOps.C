@@ -34,7 +34,7 @@ Author
 
 \*---------------------------------------------------------------------------*/
 
-#include "Time.H"
+#include "foamTime.H"
 #include "meshOps.H"
 #include "ListOps.H"
 #include "Pstream.H"

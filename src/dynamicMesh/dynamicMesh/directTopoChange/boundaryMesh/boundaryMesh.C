@@ -25,7 +25,7 @@ License
 
 #include "boundaryMesh.H"
 #include "objectRegistry.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "polyMesh.H"
 #include "repatchPolyTopoChanger.H"
 #include "faceList.H"

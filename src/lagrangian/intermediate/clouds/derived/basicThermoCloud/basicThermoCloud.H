@@ -35,7 +35,7 @@ SourceFiles
 #ifndef basicThermoCloud_H
 #define basicThermoCloud_H
 
-#include "ThermoCloud.H"
+#include "ThermoCloudTemplate.H"
 #include "basicThermoParcel.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

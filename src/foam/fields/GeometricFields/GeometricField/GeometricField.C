@@ -24,7 +24,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "GeometricField.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "demandDrivenData.H"
 #include "dictionary.H"
 

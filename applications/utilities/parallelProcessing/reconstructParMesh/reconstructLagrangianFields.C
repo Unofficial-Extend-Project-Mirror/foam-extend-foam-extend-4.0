@@ -24,7 +24,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "IOField.H"
-#include "Time.H"
+#include "foamTime.H"
 
 // * * * * * * * * * * * * * * * Global Functions  * * * * * * * * * * * * * //
 

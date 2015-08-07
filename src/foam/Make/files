@@ -58,8 +58,8 @@ primitives/quaternion/quaternion.C
 primitives/septernion/septernion.C
 
 strings = primitives/strings
-$(strings)/string/string.C
-$(strings)/string/stringIO.C
+$(strings)/string/foamString.C
+$(strings)/string/foamStringIO.C
 $(strings)/word/word.C
 $(strings)/word/wordIO.C
 $(strings)/fileName/fileName.C
@@ -141,8 +141,11 @@ $(StringStreams)/StringStreamsPrint.C
 Pstreams = $(Streams)/Pstreams
 $(Pstreams)/Pstream.C
 $(Pstreams)/PstreamCommsStruct.C
+$(Pstreams)/PstreamGlobals.C
 $(Pstreams)/IPstream.C
 $(Pstreams)/OPstream.C
+$(Pstreams)/IPread.C
+$(Pstreams)/OPwrite.C
 $(Pstreams)/PstreamsPrint.C
 
 dictionary = db/dictionary
@@ -198,8 +201,8 @@ db/functionObjects/outputFilterOutputControl/outputFilterOutputControl.C
 Time = db/Time
 $(Time)/TimePaths.C
 $(Time)/TimeState.C
-$(Time)/Time.C
-$(Time)/TimeIO.C
+$(Time)/foamTime.C
+$(Time)/foamTimeIO.C
 $(Time)/findTimes.C
 $(Time)/subCycleTime.C
 $(Time)/findInstance.C
@@ -476,7 +479,7 @@ $(mapPolyMesh)/mapDistribute/mapDistribute.C
 $(mapPolyMesh)/mapDistribute/mapDistributePolyMesh.C
 $(mapPolyMesh)/mapAddedPolyMesh.C
 
-PrimitivePatch = $(primitiveMesh)/PrimitivePatch
+PrimitivePatch = $(primitiveMesh)/PrimitivePatchTemplate
 $(PrimitivePatch)/PrimitivePatchName.C
 
 pointMesh = meshes/pointMesh

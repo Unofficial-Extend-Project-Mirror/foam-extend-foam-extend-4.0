@@ -38,8 +38,8 @@ Description
 #ifndef mixingPlaneInterpolation_H
 #define mixingPlaneInterpolation_H
 
-#include "MixingPlaneInterpolation.H"
-#include "PrimitivePatch.H"
+#include "MixingPlaneInterpolationTemplate.H"
+#include "PrimitivePatchTemplate.H"
 #include "face.H"
 #include "SubList.H"
 #include "pointField.H"

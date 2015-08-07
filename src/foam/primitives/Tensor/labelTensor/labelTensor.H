@@ -35,7 +35,7 @@ SourceFiles
 #ifndef labelTensor_H
 #define labelTensor_H
 
-#include "Tensor.H"
+#include "TensorTemplate.H"
 #include "contiguous.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

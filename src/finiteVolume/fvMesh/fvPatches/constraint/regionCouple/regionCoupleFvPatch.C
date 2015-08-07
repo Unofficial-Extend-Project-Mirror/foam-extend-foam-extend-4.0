@@ -33,7 +33,7 @@ Author
 #include "addToRunTimeSelectionTable.H"
 #include "fvMesh.H"
 #include "fvBoundaryMesh.H"
-#include "Time.H"
+#include "foamTime.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

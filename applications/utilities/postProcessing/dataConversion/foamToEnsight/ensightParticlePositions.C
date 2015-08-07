@@ -26,7 +26,7 @@ License
 #include "ensightParticlePositions.H"
 #include "fvMesh.H"
 #include "passiveParticle.H"
-#include "Cloud.H"
+#include "CloudTemplate.H"
 #include "OFstream.H"
 #include "IOmanip.H"
 #include "itoa.H"

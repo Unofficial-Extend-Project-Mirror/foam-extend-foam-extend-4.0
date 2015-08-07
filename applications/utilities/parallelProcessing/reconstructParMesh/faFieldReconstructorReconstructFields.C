@@ -24,7 +24,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "faFieldReconstructor.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "PtrList.H"
 #include "faPatchFields.H"
 #include "emptyFaPatch.H"

@@ -37,7 +37,7 @@ License
 #include "cellSet.H"
 #include "pointSet.H"
 #include "OFstream.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "FaceCellWave.H"
 #include "mapDistributePolyMesh.H"
 #include "refinementData.H"

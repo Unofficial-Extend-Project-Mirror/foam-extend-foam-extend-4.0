@@ -46,7 +46,7 @@ Description
 
 #include "argList.H"
 #include "objectRegistry.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "syncTools.H"
 #include "faceSet.H"
 #include "pointSet.H"

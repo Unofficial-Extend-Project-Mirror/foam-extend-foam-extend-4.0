@@ -24,7 +24,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "clock.H"
-#include "string.H"
+#include "foamString.H"
 
 #include <sstream>
 #include <iomanip>

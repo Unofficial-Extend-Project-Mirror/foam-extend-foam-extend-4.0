@@ -26,7 +26,7 @@ License
 #include "iterativePenaltyFriction.H"
 #include "addToRunTimeSelectionTable.H"
 #include "zeroGradientFvPatchFields.H"
-#include "PatchToPatchInterpolation.H"
+#include "PatchToPatchInterpolationTemplate.H"
 #include "ggiInterpolation.H"
 #include "constitutiveModel.H"
 #include "fvc.H"

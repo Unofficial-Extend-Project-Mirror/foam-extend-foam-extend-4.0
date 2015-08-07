@@ -1,0 +1,97 @@
+#!/bin/sh
+#----------------------------------*-sh-*--------------------------------------
+# =========                 |
+# \\      /  F ield         | foam-extend: Open Source CFD
+#  \\    /   O peration     | Version:     3.2
+#   \\  /    A nd           | Web:         http://www.foam-extend.org
+#    \\/     M anipulation  | For copyright notice see file Copyright
+#------------------------------------------------------------------------------
+# License
+#     This file is part of foam-extend.
+#
+#     foam-extend is free software: you can redistribute it and/or modify it
+#     under the terms of the GNU General Public License as published by the
+#     Free Software Foundation, either version 3 of the License, or (at your
+#     option) any later version.
+#
+#     foam-extend is distributed in the hope that it will be useful, but
+#     WITHOUT ANY WARRANTY; without even the implied warranty of
+#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+#     General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
+#
+# Script
+#     createReleasePackage.mingw
+#
+# Description
+#     Creates stand-alone .zip packages for MinGW-based builds on Windows.
+#
+# Author:
+#     Cesare Guardino, Alstom Power Ltd., (2015)
+#
+#------------------------------------------------------------------------------
+
+cd ${0%/*} || exit 1    # run from this directory
+
+create_package() {
+    RELEASE_DIR=$1
+    TYPE=$2
+
+    PACKAGE_FILE=$RELEASE_DIR.$TYPE
+    echo ""
+    echo "Creating $PACKAGE_FILE ..."
+    7z -t$TYPE a $PACKAGE_FILE $RELEASE_DIR
+    
+    if [ -f $PACKAGE_FILE ] ; then
+        echo "Successfully created $PACKAGE_FILE"
+    else
+        echo "Failed to create $PACKAGE_FILE"
+    fi
+}
+
+echo
+echo "=========== FOAM-EXTEND WINDOWS STAND-ALONE PACKAGE CREATION SCRIPT ==========="
+
+if [ "$PWD" != "$WM_PROJECT_DIR/bin" ]
+then
+    echo "Error: Current directory is not \$WM_PROJECT_DIR/bin"
+    echo "    The environment variable are not consistent with the installation."
+    echo "    Check the OpenFOAM entries in your dot-files and source them."
+    exit 1
+fi
+
+RELEASE_DIR=$WM_PROJECT-$WM_FORK-$WM_PROJECT_VERSION-win-x64
+MPI_VERSION=`basename $FOAM_MPI_LIBBIN`
+if [ -d $RELEASE_DIR ] ; then
+    echo "Removing previous $RELEASE_DIR"
+    rm -rf $RELEASE_DIR
+fi
+mkdir $RELEASE_DIR
+
+echo "Copying bin directory ..."
+cp -rp $FOAM_APPBIN $RELEASE_DIR/bin
+
+echo "Copying DLLs from lib directory ..."
+mkdir $RELEASE_DIR/lib
+cp -p $FOAM_LIBBIN/*.dll $RELEASE_DIR/lib
+mkdir $RELEASE_DIR/lib/$MPI_VERSION
+cp -p $FOAM_MPI_LIBBIN/*.dll $RELEASE_DIR/lib/$MPI_VERSION
+
+echo "Copying extra files from etc directory ..."
+mkdir $RELEASE_DIR/etc
+cp -p $WM_PROJECT_DIR/bin/setWindowsEnvironment.bat $RELEASE_DIR/
+cp -p $WM_PROJECT_DIR/bin/foamWindowsShell.bat $RELEASE_DIR/
+cp -p $WM_PROJECT_DIR/etc/controlDict-EXAMPLE $RELEASE_DIR/etc
+cp -p $WM_PROJECT_DIR/etc/cellModels $RELEASE_DIR/etc
+cp -rp $WM_PROJECT_DIR/etc/thermoData $RELEASE_DIR/etc
+cp -p $WM_PROJECT_DIR/doc/buildInstructions/Windows/READMEBinaryPackage.txt $RELEASE_DIR/
+cp -p $WM_PROJECT_DIR/bin/paraFoam.bat $RELEASE_DIR/bin
+cp -p $WM_PROJECT_DIR/COPYING $RELEASE_DIR/LICENSE.txt
+unix2dos $RELEASE_DIR/LICENSE.txt
+
+create_package $RELEASE_DIR zip
+#create_package $RELEASE_DIR 7z
+
+rm -rf $RELEASE_DIR

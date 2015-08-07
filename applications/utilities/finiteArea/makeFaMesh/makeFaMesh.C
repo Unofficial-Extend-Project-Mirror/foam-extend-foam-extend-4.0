@@ -30,7 +30,7 @@ Description
 \*---------------------------------------------------------------------------*/
 
 #include "objectRegistry.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "argList.H"
 #include "OSspecific.H"
 #include "faMesh.H"

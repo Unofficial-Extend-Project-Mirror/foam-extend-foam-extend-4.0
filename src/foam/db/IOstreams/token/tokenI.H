@@ -112,7 +112,7 @@ inline token::token(const token& t)
             compoundTokenPtr_->refCount::operator++();
         break;
 
-        case token::ERROR:
+        case token::FATALERROR:
         break;
     }
 }
@@ -193,7 +193,7 @@ inline token::tokenType token::type() const
 
 inline bool token::good() const
 {
-    return (type_ != ERROR && type_ != UNDEFINED);
+    return (type_ != FATALERROR && type_ != UNDEFINED);
 }
 
 inline bool token::undefined() const
@@ -203,7 +203,7 @@ inline bool token::undefined() const
 
 inline bool token::error() const
 {
-    return (type_ == ERROR);
+    return (type_ == FATALERROR);
 }
 
 inline bool token::isPunctuation() const
@@ -423,7 +423,7 @@ inline label& token::lineNumber()
 inline void token::setBad()
 {
     clear();
-    type_ = ERROR;
+    type_ = FATALERROR;
 }
 
 
@@ -472,7 +472,7 @@ inline void token::operator=(const token& t)
             compoundTokenPtr_->refCount::operator++();
         break;
 
-        case token::ERROR:
+        case token::FATALERROR:
         break;
     }
 
@@ -583,7 +583,7 @@ inline bool token::operator==(const token& t) const
         case COMPOUND:
             return compoundTokenPtr_ == t.compoundTokenPtr_;
 
-        case token::ERROR:
+        case token::FATALERROR:
             return true;
     }
 

@@ -26,7 +26,7 @@ License
 #include "sampledSurfaces.H"
 #include "volFields.H"
 #include "dictionary.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "IOmanip.H"
 #include "ListListOps.H"
 #include "mergePoints.H"

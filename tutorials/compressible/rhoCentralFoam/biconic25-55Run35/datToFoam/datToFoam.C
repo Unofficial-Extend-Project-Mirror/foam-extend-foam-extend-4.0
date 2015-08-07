@@ -32,7 +32,7 @@ Description
 
 #include "argList.H"
 #include "objectRegistry.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "IFstream.H"
 #include "OFstream.H"
 #include "meshTools.H"

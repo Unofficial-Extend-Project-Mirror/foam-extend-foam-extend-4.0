@@ -26,7 +26,7 @@ License
 #include "meshRefinement.H"
 #include "trackedParticle.H"
 #include "syncTools.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "refinementSurfaces.H"
 #include "shellSurfaces.H"
 #include "faceSet.H"
@@ -35,7 +35,7 @@ License
 #include "directTopoChange.H"
 #include "mapDistributePolyMesh.H"
 #include "featureEdgeMesh.H"
-#include "Cloud.H"
+#include "CloudTemplate.H"
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 

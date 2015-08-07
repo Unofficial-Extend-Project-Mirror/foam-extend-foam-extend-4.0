@@ -250,6 +250,12 @@ OPENMPI)
         _foamSource  $WM_THIRD_PARTY_DIR/packages/$mpi_version/platforms/$WM_OPTIONS/etc/$mpi_version.sh
     fi
 
+    # On Windows set mpi_version from value defined in bashrc.mingw:
+    if [ "$WM_ARCH_BASE" == "mingw" ]
+    then
+        mpi_version=$MPI_VERSION_MINGW
+    fi
+
     export FOAM_MPI_LIBBIN=$FOAM_LIBBIN/$mpi_version
     unset mpi_version
     ;;
@@ -497,6 +503,13 @@ esac
 
 _foamAddLib $FOAM_MPI_LIBBIN
 
+
+# Add DLLs on PATH for Windows (cannot use LD_LIBRARY_PATH)
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+if [ "$WM_ARCH_BASE" == "mingw" ]
+then
+    _foamAddPath $FOAM_LIBBIN $FOAM_LIBBIN/$mpi_version
+fi
 
 # Set the minimum MPI buffer size (used by all platforms except SGI MPI)
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

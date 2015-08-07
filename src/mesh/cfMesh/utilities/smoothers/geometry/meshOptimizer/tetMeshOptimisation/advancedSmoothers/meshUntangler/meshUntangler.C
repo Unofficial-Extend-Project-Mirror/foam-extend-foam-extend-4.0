@@ -32,7 +32,7 @@ Description
 //#define DEBUGSmooth
 
 #ifdef DEBUGSmooth
-#include "Time.H"
+#include "foamTime.H"
 #include "objectRegistry.H"
 #endif
 

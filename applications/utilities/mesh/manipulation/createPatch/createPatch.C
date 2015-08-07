@@ -37,7 +37,7 @@ Description
 #include "syncTools.H"
 #include "argList.H"
 #include "polyMesh.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "SortableList.H"
 #include "OFstream.H"
 #include "meshTools.H"

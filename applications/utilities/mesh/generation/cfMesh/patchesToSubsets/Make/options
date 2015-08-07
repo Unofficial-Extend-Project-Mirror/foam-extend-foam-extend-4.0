@@ -1,7 +1,7 @@
 EXE_INC = \
     -I$(LIB_SRC)/mesh/cfMesh/lnInclude \
-    -I$(FOAM_SRC)/triSurface/lnInclude \
     -I$(LIB_SRC)/meshTools/lnInclude
 
 EXE_LIBS = \
-    -ltriSurface -lcfMesh -lmeshTools
+    -lcfMesh \
+    -lmeshTools

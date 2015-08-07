@@ -35,7 +35,7 @@ SourceFiles
 #ifndef treeDataPrimitivePatch_H
 #define treeDataPrimitivePatch_H
 
-#include "PrimitivePatch.H"
+#include "PrimitivePatchTemplate.H"
 //#include "indexedOctree.H"
 #include "treeBoundBoxList.H"
 

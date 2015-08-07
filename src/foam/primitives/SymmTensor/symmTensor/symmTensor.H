@@ -35,7 +35,7 @@ SourceFiles
 #ifndef symmTensor_H
 #define symmTensor_H
 
-#include "SymmTensor.H"
+#include "SymmTensorTemplate.H"
 #include "vector.H"
 #include "contiguous.H"
 

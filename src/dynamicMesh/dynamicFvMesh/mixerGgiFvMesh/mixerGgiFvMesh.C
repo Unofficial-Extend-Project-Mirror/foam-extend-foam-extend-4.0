@@ -24,7 +24,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "mixerGgiFvMesh.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "regionSplit.H"
 #include "ggiPolyPatch.H"
 #include "polyPatchID.H"

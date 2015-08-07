@@ -28,7 +28,7 @@ Description
 #include "tetMeshGenerator.H"
 #include "triSurf.H"
 #include "demandDrivenData.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "meshOctreeCreator.H"
 #include "tetMeshExtractorOctree.H"
 #include "meshSurfaceEngine.H"

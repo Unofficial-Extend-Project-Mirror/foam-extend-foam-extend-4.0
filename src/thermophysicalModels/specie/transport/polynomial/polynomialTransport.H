@@ -36,7 +36,7 @@ SourceFiles
 #ifndef polynomialTransport_H
 #define polynomialTransport_H
 
-#include "Polynomial.H"
+#include "PolynomialTemplate.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

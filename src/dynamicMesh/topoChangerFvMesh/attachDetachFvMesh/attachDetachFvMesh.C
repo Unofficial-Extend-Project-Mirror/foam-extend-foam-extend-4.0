@@ -24,7 +24,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "attachDetachFvMesh.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "attachDetach.H"
 #include "mapPolyMesh.H"
 #include "polyTopoChange.H"

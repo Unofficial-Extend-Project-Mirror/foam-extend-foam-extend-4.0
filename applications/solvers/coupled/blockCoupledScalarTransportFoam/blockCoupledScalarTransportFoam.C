@@ -36,7 +36,7 @@ Description
 
 #include "fvCFD.H"
 #include "fieldTypes.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "fvMesh.H"
 #include "fvBlockMatrix.H"
 

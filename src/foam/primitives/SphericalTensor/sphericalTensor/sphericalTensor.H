@@ -35,7 +35,7 @@ SourceFiles
 #ifndef sphericalTensor_H
 #define sphericalTensor_H
 
-#include "SphericalTensor.H"
+#include "SphericalTensorTemplate.H"
 #include "contiguous.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

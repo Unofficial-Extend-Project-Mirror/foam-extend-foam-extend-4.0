@@ -27,7 +27,7 @@ License
 #include "regionSplit.H"
 #include "polyTopoChanger.H"
 #include "slidingInterface.H"
-#include "Time.H"
+#include "foamTime.H"
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 

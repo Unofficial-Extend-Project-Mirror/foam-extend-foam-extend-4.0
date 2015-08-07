@@ -31,8 +31,8 @@ Description
 #ifndef IOpatchToPatchInterpolation_H
 #define IOpatchToPatchInterpolation_H
 
-#include "IOPatchToPatchInterpolation.H"
-#include "PrimitivePatch.H"
+#include "IOPatchToPatchInterpolationTemplate.H"
+#include "PrimitivePatchTemplate.H"
 #include "face.H"
 #include "SubList.H"
 #include "pointField.H"

@@ -37,7 +37,7 @@ SourceFiles
 
 #include "polyMesh.H"
 #include "IOdictionary.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "pairPotentialList.H"
 #include "electrostaticPotential.H"
 #include "tetherPotentialList.H"

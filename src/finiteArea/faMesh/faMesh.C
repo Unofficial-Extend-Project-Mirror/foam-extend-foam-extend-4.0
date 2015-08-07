@@ -27,7 +27,7 @@ Description
 
 #include "faMesh.H"
 #include "faGlobalMeshData.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "polyMesh.H"
 #include "primitiveMesh.H"
 #include "demandDrivenData.H"

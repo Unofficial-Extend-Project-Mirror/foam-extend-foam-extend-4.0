@@ -26,7 +26,7 @@ Description
 \*---------------------------------------------------------------------------*/
 
 #include "tetPolyMesh.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "PstreamCombineReduceOps.H"
 #include "processorTetPolyPatch.H"
 #include "globalTetPolyPatch.H"

@@ -96,6 +96,10 @@ namespace Foam
     scalar readScalar(Istream& is);
 }
 
+#else
+
+#error "Undefined precision for scalar in scalar.H"
+
 #endif
 
 

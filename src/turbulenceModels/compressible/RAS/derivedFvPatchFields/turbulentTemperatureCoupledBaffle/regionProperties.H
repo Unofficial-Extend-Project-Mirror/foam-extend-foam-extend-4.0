@@ -36,7 +36,7 @@ SourceFiles
 #define regionProperties_H
 
 #include "IOdictionary.H"
-#include "Time.H"
+#include "foamTime.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

@@ -103,7 +103,7 @@ dictionaryReplacement
             {
                 type            solidWallMixedTemperatureCoupled;
                 neighbourFieldName T;
-                K               K;
+                Kappa               Kappa;
                 value           $internalField;
 
             }
@@ -111,14 +111,14 @@ dictionaryReplacement
             {
                 type            solidWallMixedTemperatureCoupled;
                 neighbourFieldName T;
-                K               K;
+                Kappa               Kappa;
                 value           $internalField;
             }
             topAir_to_rightSolid
             {
                 type            solidWallMixedTemperatureCoupled;
                 neighbourFieldName T;
-                K               K;
+                Kappa               Kappa;
                 value           $internalField;
             }
         }

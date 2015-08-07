@@ -24,7 +24,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "basicThermoParcel.H"
-#include "ThermoCloud.H"
+#include "ThermoCloudTemplate.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

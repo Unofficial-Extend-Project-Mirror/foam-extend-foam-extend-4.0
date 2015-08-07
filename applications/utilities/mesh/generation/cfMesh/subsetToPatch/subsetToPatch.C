@@ -28,7 +28,7 @@ Description
 
 #include "argList.H"
 #include "objectRegistry.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "triSurf.H"
 #include "demandDrivenData.H"
 

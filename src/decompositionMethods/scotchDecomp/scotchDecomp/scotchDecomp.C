@@ -107,7 +107,7 @@ License
 #include "scotchDecomp.H"
 #include "addToRunTimeSelectionTable.H"
 #include "floatScalar.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "OFstream.H"
 
 extern "C"

@@ -24,7 +24,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "Particle.H"
-#include "Cloud.H"
+#include "CloudTemplate.H"
 #include "wedgePolyPatch.H"
 #include "symmetryPolyPatch.H"
 #include "cyclicPolyPatch.H"

@@ -29,7 +29,7 @@ License
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #include "thermoPhysicsTypes.H"
-#include "ReactingMultiphaseCloud.H"
+#include "ReactingMultiphaseCloudTemplate.H"
 
 #include "NoSurfaceReaction.H"
 

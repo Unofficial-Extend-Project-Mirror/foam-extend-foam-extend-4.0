@@ -84,7 +84,7 @@ public:
         LONG_DOUBLE_SCALAR,
         COMPOUND,
 
-        ERROR
+        FATALERROR
     };
 
 

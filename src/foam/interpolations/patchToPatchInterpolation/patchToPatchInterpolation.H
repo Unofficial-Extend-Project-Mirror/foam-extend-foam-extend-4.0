@@ -26,8 +26,8 @@ License
 #ifndef patchToPatchInterpolation_H
 #define patchToPatchInterpolation_H
 
-#include "PatchToPatchInterpolation.H"
-#include "PrimitivePatch.H"
+#include "PatchToPatchInterpolationTemplate.H"
+#include "PrimitivePatchTemplate.H"
 #include "face.H"
 #include "SubList.H"
 #include "pointField.H"

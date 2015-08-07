@@ -28,7 +28,7 @@ Application
 
 #include "argList.H"
 #include "triSurface.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "polyMesh.H"
 #include "faCFD.H"
 #include "IFstream.H"

@@ -29,7 +29,7 @@ License
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #include "thermoPhysicsTypes.H"
-#include "ReactingCloud.H"
+#include "ReactingCloudTemplate.H"
 
 #include "SinglePhaseMixture.H"
 

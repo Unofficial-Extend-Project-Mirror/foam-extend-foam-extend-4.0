@@ -6,7 +6,6 @@ EXE_INC = \
 EXE_LIBS = \
     $(FOAM_LIBBIN)/postCalc.o \
     -lfiniteVolume \
-    -ltriSurface \
     -lmeshTools \
     -lsurfMesh \
     -lsampling \

@@ -57,7 +57,7 @@ class lduInterfaceField
     // Private data
 
         //- Reference to the coupled patch this field is defined for
-        const lduInterface& interface_;
+        const lduInterface& coupledInterface_;
 
 
     // Private Member Functions
@@ -80,7 +80,7 @@ public:
         //- Construct given coupled patch
         lduInterfaceField(const lduInterface& patch)
         :
-            interface_(patch)
+            coupledInterface_(patch)
         {}
 
 
@@ -94,9 +94,9 @@ public:
         // Access
 
             //- Return the interface
-            const lduInterface& interface() const
+            const lduInterface& coupledInterface() const
             {
-                return interface_;
+                return coupledInterface_;
             }
 
             //- Return the interface type

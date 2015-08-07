@@ -116,7 +116,7 @@ Note
 #include "symmTensorIOField.H"
 #include "tensorIOField.H"
 #include "faceZoneMesh.H"
-#include "Cloud.H"
+#include "CloudTemplate.H"
 #include "passiveParticle.H"
 
 #include "faCFD.H"

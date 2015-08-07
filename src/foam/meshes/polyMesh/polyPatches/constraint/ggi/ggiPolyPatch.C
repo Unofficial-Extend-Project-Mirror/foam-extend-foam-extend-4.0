@@ -36,7 +36,7 @@ Contributor
 #include "polyPatchID.H"
 #include "ZoneIDs.H"
 #include "SubField.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "indirectPrimitivePatch.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //

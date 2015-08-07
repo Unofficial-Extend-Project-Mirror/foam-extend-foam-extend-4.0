@@ -26,7 +26,7 @@ License
 #include "fieldMinMax.H"
 #include "volFields.H"
 #include "dictionary.H"
-#include "Time.H"
+#include "foamTime.H"
 
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //

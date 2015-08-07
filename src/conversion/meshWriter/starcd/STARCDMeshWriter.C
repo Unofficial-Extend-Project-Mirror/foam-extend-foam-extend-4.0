@@ -25,7 +25,7 @@ License
 
 #include "STARCDMeshWriter.H"
 
-#include "Time.H"
+#include "foamTime.H"
 #include "SortableList.H"
 #include "OFstream.H"
 

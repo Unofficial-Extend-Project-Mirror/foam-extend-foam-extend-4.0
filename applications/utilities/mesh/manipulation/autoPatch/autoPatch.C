@@ -29,7 +29,7 @@ Description
 
 #include "argList.H"
 #include "polyMesh.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "boundaryMesh.H"
 #include "repatchPolyTopoChanger.H"
 #include "mathematicalConstants.H"

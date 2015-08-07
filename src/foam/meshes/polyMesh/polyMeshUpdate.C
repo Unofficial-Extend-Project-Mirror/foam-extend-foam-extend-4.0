@@ -28,7 +28,7 @@ Description
 
 #include "polyMesh.H"
 #include "mapPolyMesh.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "globalMeshData.H"
 #include "meshObjectBase.H"
 

@@ -28,7 +28,7 @@ Description
 
 #include "autoLayerDriver.H"
 #include "fvMesh.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "meshRefinement.H"
 #include "removePoints.H"
 #include "pointFields.H"

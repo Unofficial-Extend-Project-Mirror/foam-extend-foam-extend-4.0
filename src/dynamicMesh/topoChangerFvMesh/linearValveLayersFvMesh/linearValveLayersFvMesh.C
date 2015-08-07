@@ -24,7 +24,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "linearValveLayersFvMesh.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "slidingInterface.H"
 #include "layerAdditionRemoval.H"
 #include "pointField.H"

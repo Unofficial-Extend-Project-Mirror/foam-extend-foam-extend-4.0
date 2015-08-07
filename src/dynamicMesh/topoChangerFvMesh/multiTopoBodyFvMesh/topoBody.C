@@ -28,7 +28,7 @@ License
 #include "cellSet.H"
 #include "polyTopoChanger.H"
 #include "layerAdditionRemoval.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "transformField.H"
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //

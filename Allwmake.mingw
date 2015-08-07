@@ -1,0 +1,78 @@
+#!/bin/sh
+#----------------------------------*-sh-*--------------------------------------
+# =========                 |
+# \\      /  F ield         | foam-extend: Open Source CFD
+#  \\    /   O peration     | Version:     3.2
+#   \\  /    A nd           | Web:         http://www.foam-extend.org
+#    \\/     M anipulation  | For copyright notice see file Copyright
+#------------------------------------------------------------------------------
+# License
+#     This file is part of foam-extend.
+#
+#     foam-extend is free software: you can redistribute it and/or modify it
+#     under the terms of the GNU General Public License as published by the
+#     Free Software Foundation, either version 3 of the License, or (at your
+#     option) any later version.
+#
+#     foam-extend is distributed in the hope that it will be useful, but
+#     WITHOUT ANY WARRANTY; without even the implied warranty of
+#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+#     General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
+#
+# Script
+#     Allwmake.mingw
+#
+# Description
+#     Top-level build script for use with MSYS shell for MinGW-based builds on Windows.
+#
+# Author:
+#     Cesare Guardino, Alstom Power Ltd., (2015)
+#
+#------------------------------------------------------------------------------
+
+cd ${0%/*} || exit 1    # run from this directory
+
+echo
+echo "=============== FOAM-EXTEND MINGW WINDOWS TOP-LEVEL BUILD SCRIPT ==============="
+
+if [ "$PWD" != "$WM_PROJECT_DIR" ]
+then
+    echo "Error: Current directory is not \$WM_PROJECT_DIR"
+    echo "    The environment variable are not consistent with the installation."
+    echo "    Check the OpenFOAM entries in your dot-files and source them."
+    exit 1
+fi
+
+cd $WM_PROJECT_DIR/ThirdParty/mingwBuild
+echo
+echo "In directory `pwd`"
+echo "Configuring your OpenMPI installation ..."
+./configure_OpenMPI.sh
+PACKAGES_DIR=$WM_PROJECT_DIR/ThirdParty/packages
+if [ -d $PACKAGES_DIR ] ; then
+    echo "Third-party dependencies packages $PACKAGES_DIR already exists."
+else
+    echo "Building third-party dependencies ... (see `pwd`/build.log)"
+    ./build.sh > build.log 2>&1
+    echo "Installing third-party dependencies ..."
+    rm -rf $PACKAGES_DIR
+    mv x64/install $PACKAGES_DIR
+fi
+
+cd $WM_PROJECT_DIR
+echo
+echo "In directory `pwd`"
+echo "Build foam-extend ... (see `pwd`/Allwmake.log)"
+./Allwmake > Allwmake.log 2>&1
+echo "Copying MinGW dependencies to $FOAM_APPBIN ..."
+cp -p $MINGW_HOME/bin/libgcc_s_seh-1.dll $FOAM_APPBIN
+cp -p $MINGW_HOME/bin/libstdc++-6.dll $FOAM_APPBIN
+cp -p $MINGW_HOME/bin/libwinpthread-1.dll $FOAM_APPBIN
+echo "Creating release package ... (see `pwd`/createWindowsBinaryPackage.log)"
+./bin/createWindowsBinaryPackage > createWindowsBinaryPackage.log 2>&1
+
+echo
+echo "All done!"

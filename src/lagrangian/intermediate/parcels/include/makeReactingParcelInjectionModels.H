@@ -29,7 +29,7 @@ License
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #include "thermoPhysicsTypes.H"
-#include "KinematicCloud.H"
+#include "KinematicCloudTemplate.H"
 
 #include "ConeInjection.H"
 #include "ConeInjectionMP.H"

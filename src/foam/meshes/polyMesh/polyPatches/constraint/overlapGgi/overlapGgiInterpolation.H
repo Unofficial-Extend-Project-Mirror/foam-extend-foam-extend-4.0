@@ -37,8 +37,8 @@ Description
 #ifndef overlapGgiInterpolation_H
 #define overlapGgiInterpolation_H
 
-#include "GGIInterpolation.H"
-#include "PrimitivePatch.H"
+#include "GGIInterpolationTemplate.H"
+#include "PrimitivePatchTemplate.H"
 #include "face.H"
 #include "List.H"
 #include "pointField.H"

@@ -32,8 +32,8 @@ Description
 #ifndef primitivePatchInterpolation_H
 #define primitivePatchInterpolation_H
 
-#include "PrimitivePatchInterpolation.H"
-#include "PrimitivePatch.H"
+#include "PrimitivePatchInterpolationTemplate.H"
+#include "PrimitivePatchTemplate.H"
 #include "face.H"
 #include "SubList.H"
 #include "pointField.H"

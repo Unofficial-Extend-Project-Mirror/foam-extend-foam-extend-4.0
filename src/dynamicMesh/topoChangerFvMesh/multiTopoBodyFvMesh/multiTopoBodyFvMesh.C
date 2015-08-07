@@ -24,7 +24,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "multiTopoBodyFvMesh.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "mapPolyMesh.H"
 #include "volMesh.H"
 #include "addToRunTimeSelectionTable.H"

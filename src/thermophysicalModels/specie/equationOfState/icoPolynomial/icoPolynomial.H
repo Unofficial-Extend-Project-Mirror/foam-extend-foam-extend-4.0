@@ -39,7 +39,7 @@ SourceFiles
 
 #include "specie.H"
 #include "autoPtr.H"
-#include "Polynomial.H"
+#include "PolynomialTemplate.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

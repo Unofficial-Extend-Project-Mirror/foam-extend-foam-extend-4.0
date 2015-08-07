@@ -36,7 +36,7 @@ SourceFiles
 #define TimeActivatedExplicitSourceList_H
 
 #include "IOPtrList.H"
-#include "TimeActivatedExplicitSource.H"
+#include "TimeActivatedExplicitSourceTemplate.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

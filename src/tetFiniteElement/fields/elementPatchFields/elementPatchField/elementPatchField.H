@@ -35,7 +35,7 @@ SourceFiles
 #ifndef elementPatchField_H
 #define elementPatchField_H
 
-#include "PointPatchField.H"
+#include "PointPatchFieldTemplate.H"
 #include "tetPolyPatch.H"
 #include "DummyMatrix.H"
 

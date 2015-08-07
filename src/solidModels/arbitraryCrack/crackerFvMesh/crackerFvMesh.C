@@ -24,7 +24,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "crackerFvMesh.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "addToRunTimeSelectionTable.H"
 #include "mapPolyMesh.H"
 

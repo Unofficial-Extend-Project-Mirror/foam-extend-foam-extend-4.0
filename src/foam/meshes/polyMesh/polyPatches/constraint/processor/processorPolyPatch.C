@@ -31,7 +31,7 @@ License
 #include "matchPoints.H"
 #include "OFstream.H"
 #include "polyMesh.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "transformList.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

@@ -35,7 +35,7 @@ SourceFiles
 #ifndef labelDiagTensor_H
 #define labelDiagTensor_H
 
-#include "DiagTensor.H"
+#include "DiagTensorTemplate.H"
 #include "contiguous.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
