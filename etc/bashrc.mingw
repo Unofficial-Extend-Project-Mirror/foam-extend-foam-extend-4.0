@@ -78,7 +78,7 @@ setup_foam_env() {
     export FOAM_VERBOSE=1
     export MPI_VERSION_MINGW=openmpi-1.6.1
     export WM_OSTYPE=MSWindows
-    echo "Sourcing: $FOAM_ETC_DIR/bashrc" 
+    echo "Sourcing: $FOAM_ETC_DIR/bashrc"
     . $FOAM_ETC_DIR/bashrc
 }
 
