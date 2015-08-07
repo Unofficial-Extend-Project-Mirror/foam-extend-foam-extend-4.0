@@ -123,7 +123,7 @@ void GGIInterpolation<MasterPatch, SlavePatch>::findNeighbours3D
     labelListList& result
 ) const
 {
-    List<DynamicList<label> > candidateMasterNeighbors(masterPatch_.size());
+    List<DynamicList<label, 8> > candidateMasterNeighbors(masterPatch_.size());
 
     // First, compute the face center and the sphere radius (squared)
     // of the slave patch faces so we will not have to recompute this
@@ -276,7 +276,7 @@ void GGIInterpolation<MasterPatch, SlavePatch>::findNeighboursAABB
     labelListList& result
 ) const
 {
-    List<DynamicList<label> > candidateMasterNeighbors(masterPatch_.size());
+    List<DynamicList<label, 8> > candidateMasterNeighbors(masterPatch_.size());
 
     // Grab the master patch faces bounding boxes
     List<boundBox> masterPatchBB(masterPatch_.size());
@@ -431,7 +431,7 @@ void GGIInterpolation<MasterPatch, SlavePatch>::findNeighboursBBOctree
     labelListList& result
 ) const
 {
-    List<DynamicList<label> > candidateMasterNeighbors(masterPatch_.size());
+    List<DynamicList<label, 8> > candidateMasterNeighbors(masterPatch_.size());
 
     // Initialize the list of master patch faces bounding box
     treeBoundBoxList lmasterFaceBB(masterPatch_.size());
