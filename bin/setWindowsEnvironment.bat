@@ -6,6 +6,7 @@ rem set PARAVIEW_HOME=C:\Programs\ParaView-4.3.1
 rem ==============================================
 
 set FOAM_HOME=%~dp0
+set FOAM_HOME=%FOAM_HOME:~0,-1%
 set WM_PROJECT_DIR=%FOAM_HOME%
 
 set MPI_BUFFER_SIZE=20000000

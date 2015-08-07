@@ -42,7 +42,7 @@
 
 INSTRUCTIONS ON HOW TO INSTALL AND RUN THE WINDOWS VERSION OF FOAM-EXTEND
 -------------------------------------------------------------------------
-1) Unzip the package .zip to any suitable location on your computer.
+1) Unzip the package file to any suitable directory (with no whitespaces) on your computer.
 
 2) Install OpenMPI if you do not already have it. You can download this from:
        http://www.open-mpi.org/software/ompi/v1.6/downloads/OpenMPI_v1.6.1-1_win64.exe

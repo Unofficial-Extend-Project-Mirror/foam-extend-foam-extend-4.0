@@ -44,6 +44,7 @@ set_system_paths() {
     export GIT_HOME=$PROGRAMS_HOME/Git
     export MINGW_HOME=$PROGRAMS_HOME/mingw64
     export MPI_ROOTDIR=$PROGRAMS_HOME/OpenMPI_v1.6.1-x64
+    export PARAVIEW_HOME=$PROGRAMS_HOME/ParaView-4.3.1
     #export PERL_HOME=$PROGRAMS_HOME/strawberry-perl-5.20.2.1-64bit/perl
     export PEXPORTS_HOME=$PROGRAMS_HOME/pexports
     export PYTHON_HOME=$PROGRAMS_HOME/Python27
@@ -75,6 +76,7 @@ setup_foam_env() {
     FOAM_ETC_DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
     export FOAM_INST_DIR=$(readlink -f $FOAM_ETC_DIR/../..)
     export FOAM_VERBOSE=1
+    export MPI_VERSION_MINGW=openmpi-1.6.1
     export WM_OSTYPE=MSWindows
     echo "Sourcing: $FOAM_ETC_DIR/bashrc" 
     . $FOAM_ETC_DIR/bashrc

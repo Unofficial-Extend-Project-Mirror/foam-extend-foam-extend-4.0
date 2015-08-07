@@ -35,6 +35,22 @@
 
 cd ${0%/*} || exit 1    # run from this directory
 
+create_package() {
+    RELEASE_DIR=$1
+    TYPE=$2
+
+    PACKAGE_FILE=$RELEASE_DIR.$TYPE
+    echo ""
+    echo "Creating $PACKAGE_FILE ..."
+    7z -t$TYPE a $PACKAGE_FILE $RELEASE_DIR
+    
+    if [ -f $PACKAGE_FILE ] ; then
+        echo "Successfully created $PACKAGE_FILE"
+    else
+        echo "Failed to create $PACKAGE_FILE"
+    fi
+}
+
 echo
 echo "=========== FOAM-EXTEND WINDOWS STAND-ALONE PACKAGE CREATION SCRIPT ==========="
 
@@ -60,7 +76,6 @@ cp -rp $FOAM_APPBIN $RELEASE_DIR/bin
 echo "Copying DLLs from lib directory ..."
 mkdir $RELEASE_DIR/lib
 cp -p $FOAM_LIBBIN/*.dll $RELEASE_DIR/lib
-cp -p $FOAM_LIBBIN/*.dll $RELEASE_DIR/lib
 mkdir $RELEASE_DIR/lib/$MPI_VERSION
 cp -p $FOAM_MPI_LIBBIN/*.dll $RELEASE_DIR/lib/$MPI_VERSION
 
@@ -76,13 +91,7 @@ cp -p $WM_PROJECT_DIR/bin/paraFoam.bat $RELEASE_DIR/bin
 cp -p $WM_PROJECT_DIR/COPYING $RELEASE_DIR/LICENSE.txt
 unix2dos $RELEASE_DIR/LICENSE.txt
 
-echo "Zipping up $RELEASE_DIR ..."
-PACKAGE_FILE=$RELEASE_DIR.zip
-7z a $PACKAGE_FILE $RELEASE_DIR
-rm -rf $RELEASE_DIR
+create_package $RELEASE_DIR zip
+#create_package $RELEASE_DIR 7z
 
-if [ -f $PACKAGE_FILE ] ; then
-    echo "Successfully created $PACKAGE_FILE"
-else
-    echo "Failed to create $PACKAGE_FILE"
-fi
+rm -rf $RELEASE_DIR
