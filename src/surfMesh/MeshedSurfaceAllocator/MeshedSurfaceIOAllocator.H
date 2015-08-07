@@ -54,10 +54,10 @@ class MeshedSurfaceIOAllocator
     // Private data
 
         //- Points
-        pointIOField   points_;
+        pointIOField points_;
 
         //- Faces
-        faceIOList     faces_;
+        faceIOList faces_;
 
         //- Surface zones
         surfZoneIOList zones_;
