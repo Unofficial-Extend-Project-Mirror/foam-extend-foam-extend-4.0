@@ -107,8 +107,6 @@ export FOAM_RUN=$WM_PROJECT_USER_DIR/run
 export PATH=$WM_DIR:$WM_PROJECT_DIR/bin:$PATH
 
 _foamAddPath $FOAM_APPBIN $FOAM_SITE_APPBIN $FOAM_USER_APPBIN
- # Make sure to pick up dummy versions of external libraries last
-_foamAddLib  $FOAM_LIBBIN/dummy
 _foamAddLib  $FOAM_LIBBIN $FOAM_SITE_LIBBIN $FOAM_USER_LIBBIN
 
 
@@ -256,7 +254,6 @@ OPENMPI)
         mpi_version=$MPI_VERSION_MINGW
     fi
 
-    export FOAM_MPI_LIBBIN=$FOAM_LIBBIN/$mpi_version
     unset mpi_version
     ;;
 
@@ -269,7 +266,6 @@ MACPORTOPENMPI)
     #    libDir=`mpicc-openmpi-$WM_MACPORT_MPI_VERSION --showme:libdirs`
     libDir=/opt/local/lib/openmpi-$WM_MACPORT_MPI_VERSION
 
-    export FOAM_MPI_LIBBIN=$FOAM_LIBBIN/$FOAM_MPI
     _foamAddLib     $libDir
     unset libDir
 
@@ -284,7 +280,6 @@ MACPORTMPICH)
     export FOAM_MPI=mpich-macports-$WM_MACPORT_MPI_VERSION
     export MPI_HOME=$WM_THIRD_PARTY_DIR/$FOAM_MPI
 
-    export FOAM_MPI_LIBBIN=$FOAM_LIBBIN/$FOAM_MPI
     libDir=/opt/local/lib/mpich-$WM_MACPORT_MPI_VERSION
 
     _foamAddLib     $libDir
@@ -375,7 +370,6 @@ SYSTEMOPENMPI)
         echo "    PLIBS                 : $PLIBS"
     fi
 
-    export FOAM_MPI_LIBBIN=$FOAM_LIBBIN/$mpi_version
     unset mpi_version
     ;;
 
@@ -411,7 +405,6 @@ MVAPICH2)
         echo "    PLIBS                 : $PLIBS"
     fi
 
-    export FOAM_MPI_LIBBIN=$FOAM_LIBBIN/$mpi_version
     unset mpi_version
     ;;
 
@@ -424,7 +417,6 @@ MPICH)
     _foamAddPath $MPI_ARCH_PATH/bin
     _foamAddLib  $MPI_ARCH_PATH/lib
 
-    export FOAM_MPI_LIBBIN=$FOAM_LIBBIN/$mpi_version
     unset mpi_version
     ;;
 
@@ -438,7 +430,6 @@ MPICH-GM)
     _foamAddLib  $MPI_ARCH_PATH/lib
     _foamAddLib  $GM_LIB_PATH
 
-    export FOAM_MPI_LIBBIN=$FOAM_LIBBIN/mpich-gm
     ;;
 
 HPMPI)
@@ -464,22 +455,18 @@ HPMPI)
         ;;
     esac
 
-    export FOAM_MPI_LIBBIN=$FOAM_LIBBIN/hpmpi
     ;;
 
 GAMMA)
     export MPI_ARCH_PATH=/usr
-    export FOAM_MPI_LIBBIN=$FOAM_LIBBIN/gamma
     ;;
 
 MPI)
     export MPI_ARCH_PATH=/opt/mpi
-    export FOAM_MPI_LIBBIN=$FOAM_LIBBIN/mpi
     ;;
 
 FJMPI)
     export MPI_ARCH_PATH=/opt/FJSVmpi2
-    export FOAM_MPI_LIBBIN=$FOAM_LIBBIN/mpi
 
     _foamAddPath $MPI_ARCH_PATH/bin
     _foamAddLib  $MPI_ARCH_PATH/lib/sparcv9
@@ -489,7 +476,6 @@ FJMPI)
 
 QSMPI)
     export MPI_ARCH_PATH=/usr/lib/mpi
-    export FOAM_MPI_LIBBIN=$FOAM_LIBBIN/qsmpi
 
     _foamAddPath $MPI_ARCH_PATH/bin
     _foamAddLib $MPI_ARCH_PATH/lib
@@ -497,11 +483,10 @@ QSMPI)
     ;;
 
 *)
-    export FOAM_MPI_LIBBIN=$FOAM_LIBBIN/dummy
     ;;
 esac
 
-_foamAddLib $FOAM_MPI_LIBBIN
+# Removed $FOAM_MPI_LIBBIN.  HJ, 8/Aug/2015
 
 
 # Set the minimum MPI buffer size (used by all platforms except SGI MPI)

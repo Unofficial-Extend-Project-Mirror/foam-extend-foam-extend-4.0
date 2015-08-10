@@ -194,7 +194,6 @@ case OPENMPI:
         _foamSource  $WM_THIRD_PARTY_DIR/packages/$mpi_version/platforms/$WM_OPTIONS/etc/$mpi_version.csh
     endif
 
-    setenv FOAM_MPI_LIBBIN $FOAM_LIBBIN/$mpi_version
     unset mpi_version
     breaksw
 
@@ -291,7 +290,6 @@ case SYSTEMOPENMPI:
         echo "    PLIBS                 : $PLIBS"
     endif
 
-    setenv FOAM_MPI_LIBBIN $FOAM_LIBBIN/$mpi_version
     unset mpi_version
     breaksw
 
@@ -321,7 +319,6 @@ case MVAPICH2:
         echo "    PLIBS                 : $PLIBS"
     endif
 
-    setenv FOAM_MPI_LIBBIN $FOAM_LIBBIN/$mpi_version
     unset mpi_version
     breaksw
 
@@ -334,7 +331,6 @@ case MPICH:
     _foamAddPath $MPI_ARCH_PATH/bin
     _foamAddLib  $MPI_ARCH_PATH/lib
 
-    setenv FOAM_MPI_LIBBIN $FOAM_LIBBIN/$mpi_version
     unset mpi_version
     breaksw
 
@@ -347,8 +343,6 @@ case MPICH-GM:
     _foamAddPath $MPI_ARCH_PATH/bin
     _foamAddLib  $MPI_ARCH_PATH/lib
     _foamAddLib  $GM_LIB_PATH
-
-    setenv FOAM_MPI_LIBBIN $FOAM_LIBBIN/mpich-gm
     breaksw
 
 case HPMPI:
@@ -372,23 +366,18 @@ case HPMPI:
         echo Unknown processor type `uname -m` for Linux
         breaksw
     endsw
-
-    setenv FOAM_MPI_LIBBIN $FOAM_LIBBIN/hpmpi
     breaksw
 
 case GAMMA:
     setenv MPI_ARCH_PATH /usr
-    setenv FOAM_MPI_LIBBIN $FOAM_LIBBIN/gamma
     breaksw
 
 case MPI:
     setenv MPI_ARCH_PATH /opt/mpi
-    setenv FOAM_MPI_LIBBIN $FOAM_LIBBIN/mpi
     breaksw
 
 case FJMPI:
     setenv MPI_ARCH_PATH /opt/FJSVmpi2
-    setenv FOAM_MPI_LIBBIN $FOAM_LIBBIN/mpi
     _foamAddPath $MPI_ARCH_PATH/bin
     _foamAddLib  $MPI_ARCH_PATH/lib/sparcv9
     _foamAddLib  /opt/FSUNf90/lib/sparcv9
@@ -397,20 +386,14 @@ case FJMPI:
 
 case QSMPI:
     setenv MPI_ARCH_PATH /usr/lib/mpi
-    setenv FOAM_MPI_LIBBIN FOAM_LIBBIN/qsmpi
-
     _foamAddPath $MPI_ARCH_PATH/bin
     _foamAddLib $MPI_ARCH_PATH/lib
 
     breaksw
 
 default:
-    setenv FOAM_MPI_LIBBIN $FOAM_LIBBIN/dummy
     breaksw
 endsw
-
-_foamAddLib $FOAM_MPI_LIBBIN
-
 
 # Set the minimum MPI buffer size (used by all platforms except SGI MPI)
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
