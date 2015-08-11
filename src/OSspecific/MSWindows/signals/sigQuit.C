@@ -104,7 +104,7 @@ void Foam::sigQuit::set(const bool verbose)
 
     if( SIG_ERR == oldAction_ )
     {
-		oldAction_ = SIG_DFL;
+        oldAction_ = SIG_DFL;
 
         FatalErrorIn
         (

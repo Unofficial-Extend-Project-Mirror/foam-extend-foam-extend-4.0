@@ -86,9 +86,7 @@ class profilingPool
     // Private Member Functions
 
         //- Disallow default bitwise copy construct
-        profilingPool(
-            const profilingPool&
-	);
+        profilingPool(const profilingPool&);
 
         //- Disallow default bitwise assignment
         void operator=(const profilingPool&);
@@ -103,7 +101,8 @@ class profilingPool
     // Constructors
 
         //- Construct null
-        profilingPool(
+        profilingPool
+        (
             const IOobject&,
             const Time&
         );
@@ -142,14 +141,13 @@ class profilingPool
 
 protected:
 
-    static void initProfiling(
+    static void initProfiling
+    (
         const IOobject&,
         const Time&
     );
 
-    static void stopProfiling(
-        const Time&
-    );
+    static void stopProfiling(const Time&);
 
 public:
 

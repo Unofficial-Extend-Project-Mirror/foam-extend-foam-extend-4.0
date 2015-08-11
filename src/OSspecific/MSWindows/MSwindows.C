@@ -354,7 +354,7 @@ string getEnv(const word& envName)
                                  actualBuffer.get(),
                                  actualBufferSize);
         envAsString = actualBuffer.get();
-		toUnixPath(envAsString);
+        toUnixPath(envAsString);
     }
 
     return envAsString;
@@ -376,7 +376,7 @@ bool setEnv
 
 word hostName()
 {
-	const bool full = true;
+    const bool full = true;
     const DWORD bufferSize = MAX_COMPUTERNAME_LENGTH + 1;
     TCHAR buffer[bufferSize];
     DWORD actualBufferSize = bufferSize;
@@ -756,8 +756,8 @@ fileName::Type type(const fileName& name)
     if (attrs != INVALID_FILE_ATTRIBUTES)
     {
         fileType = (attrs & FILE_ATTRIBUTE_DIRECTORY) ?
-	  fileName::DIRECTORY :
-	  fileName::FILE;
+        fileName::DIRECTORY :
+        fileName::FILE;
     }
 
     return fileType;
@@ -804,7 +804,7 @@ bool isFile(const fileName& name, const bool checkGzip)
 {
     const DWORD attrs = ::GetFileAttributes(name.c_str());
     const bool success = ((attrs != INVALID_FILE_ATTRIBUTES) &&
-			  !(attrs & FILE_ATTRIBUTE_DIRECTORY)) ||
+                         !(attrs & FILE_ATTRIBUTE_DIRECTORY)) ||
                          (checkGzip && isGzFile(name));
 
     return success;
@@ -1322,7 +1322,7 @@ bool dlClose(void* const handle)
 
     if (success)
     {
-	getLoadedLibs().erase(handle);
+        getLoadedLibs().erase(handle);
     }
 
     return success;
@@ -1342,8 +1342,8 @@ void* dlSym(void* handle, const std::string& symbol)
     if (NULL == fun)
     {
         WarningIn("dlSym(void*, const std::string&)")
-	  << "Cannot lookup symbol " << symbol << " : " << MSwindows::getLastError()
-          << endl;
+            << "Cannot lookup symbol " << symbol << " : " << MSwindows::getLastError()
+            << endl;
     }
 
     return fun;
@@ -1360,10 +1360,10 @@ bool dlSymFound(void* handle, const std::string& symbol)
                 << " : GetProcAddress of " << symbol << endl;
         }
 
-       // get address of symbol
-	void* fun = (void*) ::GetProcAddress(static_cast<HMODULE>(handle), symbol.c_str());
+        // get address of symbol
+        void* fun = (void*) ::GetProcAddress(static_cast<HMODULE>(handle), symbol.c_str());
 
-	return (NULL != fun);
+        return (NULL != fun);
     }
     else
     {
@@ -1375,17 +1375,17 @@ bool dlSymFound(void* handle, const std::string& symbol)
 fileNameList dlLoaded()
 {
     fileNameList libs;
-	int counter(0);
+    int counter(0);
     OfLoadedLibs & loadedLibs = getLoadedLibs();
 
     for
-	(
-		OfLoadedLibs::const_iterator it = loadedLibs.begin();
-		it != loadedLibs.end();
-		++it
-	)
+    (
+        OfLoadedLibs::const_iterator it = loadedLibs.begin();
+        it != loadedLibs.end();
+        ++it
+    )
     {
-		libs.newElmt(counter++) = it->second;
+        libs.newElmt(counter++) = it->second;
     }
 
     if (MSwindows::debug)

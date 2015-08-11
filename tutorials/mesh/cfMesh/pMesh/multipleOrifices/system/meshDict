@@ -65,7 +65,7 @@ boundaryLayers
             allowDiscontinuity 0;
         }
 
-    	"fixedWalls.*"
+        "fixedWalls.*"
         {
             nLayers           4;
 
@@ -76,7 +76,7 @@ boundaryLayers
             allowDiscontinuity 0;
         }
 
-	    "tubes.*"
+        "tubes.*"
         {
             nLayers           4;
 
@@ -93,8 +93,8 @@ boundaryLayers
 
 renameBoundary
 {
-    defaultName		fixedWalls;
-    defaultType		wall;
+    defaultName        fixedWalls;
+    defaultType        wall;
 
     newPatchNames
     {

@@ -31,8 +31,8 @@ anisotropicSources
     {
         type plane;
         origin (0 0 -20);
-	normal (0 0 1);
-	scalingDistance 45;
+        normal (0 0 1);
+        scalingDistance 45;
         scalingFactor 2;
     }
 }

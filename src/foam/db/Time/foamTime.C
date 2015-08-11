@@ -253,7 +253,7 @@ Foam::Time::Time
             IOobject::NO_READ,
             IOobject::AUTO_WRITE
         ),
-	*this
+        *this
     );
 }
 
@@ -324,7 +324,7 @@ Foam::Time::Time
             IOobject::NO_READ,
             IOobject::AUTO_WRITE
         ),
-	*this
+        *this
     );
 }
 
@@ -391,7 +391,7 @@ Foam::Time::Time
             IOobject::NO_READ,
             IOobject::AUTO_WRITE
         ),
-	*this
+        *this
     );
 }
 
