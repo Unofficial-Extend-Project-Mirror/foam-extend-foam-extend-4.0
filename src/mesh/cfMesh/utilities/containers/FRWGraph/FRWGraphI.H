@@ -36,7 +36,7 @@ void Foam::FRWGraph<T, width>::checkIndex(const label i, const label j) const
             << " is not in range " << 0
             << " and " << nRows_ << abort(FatalError);
     }
-    
+
     if( (j < 0) || (j >= width) )
         FatalErrorIn
         (
@@ -158,7 +158,7 @@ inline bool Foam::FRWGraph<T,width>::contains
     for(register label i=0;i<width;++i)
         if( data_[start+i] == e )
             return true;
-    
+
     return false;
 }
 
@@ -173,7 +173,7 @@ inline Foam::label Foam::FRWGraph<T,width>::containsAtPosition
     for(register label i=0;i<width;++i)
         if( data_[start+i] == e )
             return i;
-    
+
     return -1;
 }
 
@@ -188,7 +188,7 @@ inline const T& Foam::FRWGraph<T,width>::operator()
     #ifdef FULLDEBUG
     checkIndex(i, j);
     #endif
-        
+
     return data_[i * width + j];
 }
 
@@ -201,7 +201,7 @@ inline T& Foam::FRWGraph<T,width>::operator()
     #ifdef FULLDEBUG
     checkIndex(i, j);
     #endif
-        
+
     return data_[i * width + j];
 }
 

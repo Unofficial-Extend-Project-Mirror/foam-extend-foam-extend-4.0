@@ -43,7 +43,7 @@ SourceFiles
 
 namespace Foam
 {
-    
+
 class VRWGraph;
 
 template<class graphType> class graphRow;
@@ -60,14 +60,14 @@ class graphRow
     // Private data
         //- reference to the graph
         graphType& data_;
-    
+
         //- row number
         const label rowI_;
 
     // Private member functions
         //- check index
         inline void checkIndex(const label i) const;
-    
+
 public:
 
     // Constructors
@@ -94,21 +94,21 @@ public:
         inline void clear();
 
     // Member Operators
-        
+
         //- Append an element to the given row
         inline void append(const label);
-        
+
         //- Append an element to the given row if it does not exist there
         inline void appendIfNotIn(const label);
-        
+
         //- check if the element is in the given row (takes linear time)
         inline bool contains(const label e) const;
         inline label containsAtPosition(const label e) const;
-        
+
         //- set and get operators
         inline label operator[](const label) const;
         inline label& operator[](const label);
-        
+
         //- Assignment operator
         inline void operator=(const graphRow<graphType>&);
         template<class listType>

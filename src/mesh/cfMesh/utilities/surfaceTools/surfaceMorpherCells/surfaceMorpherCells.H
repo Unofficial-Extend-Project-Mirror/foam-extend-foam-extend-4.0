@@ -57,18 +57,18 @@ class surfaceMorpherCells
 
         //- number of internal faces
         label nIntFaces_;
-    
+
         //- true for vertices which are at the boundary
         boolList boundaryVertex_;
-    
+
         //- true for cells which are at the boundary
         List<direction> cellFlags_;
-    
+
         //- new boundary faces and owner cells
         VRWGraph newBoundaryFaces_;
         labelLongList newBoundaryOwners_;
         labelLongList newBoundaryPatches_;
-    
+
     // Private enumerators
         enum cellTypes
         {
@@ -80,19 +80,19 @@ class surfaceMorpherCells
     // Private member functions
         //- find surface vertices
         void findBoundaryVertices();
-        
+
         //- find boundary cells
         void findBoundaryCells();
-        
+
         //- remove cells with all vertices at the boundary
         bool removeCellsWithAllVerticesAtTheBoundary();
-        
+
         //- morph boundary faces
         bool morphBoundaryFaces();
-        
+
         //- morph internal faces
         bool morphInternalFaces();
-        
+
         //- replace the boundary of the mesh with the newly created one
         void replaceMeshBoundary();
 

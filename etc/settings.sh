@@ -756,14 +756,14 @@ fi
 [ "$FOAM_VERBOSE" -a "$PS1" ] && echo "    PARAVIEW_DIR is initialized to: $PARAVIEW_DIR"
 
 
-# Load llvm 
+# Load llvm
 # ~~~~~~~~~~~~~~~~~~~~~~
 [ -z "$LLVM_SYSTEM" ] && [ ! -z $WM_THIRD_PARTY_USE_LLVM_360 ] && [ -e $WM_THIRD_PARTY_DIR/packages/llvm-3.6.0/platforms/$WM_OPTIONS ] && {
     _foamSource $WM_THIRD_PARTY_DIR/packages/llvm-3.6.0/platforms/$WM_OPTIONS/etc/llvm-3.6.0.sh
 }
 [ "$FOAM_VERBOSE" -a "$PS1" ] && echo "    LLVM_DIR is initialized to: $LLVM_DIR"
 
-# Load mesa 
+# Load mesa
 # ~~~~~~~~~~~~~~~~~~~~~~
 [ -z "$MESA_SYSTEM" ] && [ ! -z $WM_THIRD_PARTY_USE_MESA_GIT ] && [ -e $WM_THIRD_PARTY_DIR/packages/mesa-git/platforms/$WM_OPTIONS ] && {
     _foamSource $WM_THIRD_PARTY_DIR/packages/mesa-git/platforms/$WM_OPTIONS/etc/mesa-git.sh

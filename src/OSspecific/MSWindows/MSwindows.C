@@ -1,26 +1,34 @@
 /*---------------------------------------------------------------------------*\
-    Copyright            : (C) 2011 Symscape
-    Website              : www.symscape.com
+  =========                 |
+  \\      /  F ield         | foam-extend: Open Source CFD
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of foam-extend.
 
-    OpenFOAM is free software: you can redistribute it and/or modify it
-    under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+    foam-extend is free software: you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by the
+    Free Software Foundation, either version 3 of the License, or (at your
+    option) any later version.
 
-    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Description
     MS Windows specific functions
 
+\*---------------------------------------------------------------------------*/
+
+/*---------------------------------------------------------------------------*\
+    Copyright            : (C) 2011 Symscape
+    Website              : www.symscape.com
 \*---------------------------------------------------------------------------*/
 
 #include "OSspecific.H"
@@ -354,7 +362,7 @@ string getEnv(const word& envName)
                                  actualBuffer.get(),
                                  actualBufferSize);
         envAsString = actualBuffer.get();
-		toUnixPath(envAsString);
+        toUnixPath(envAsString);
     }
 
     return envAsString;
@@ -376,7 +384,7 @@ bool setEnv
 
 word hostName()
 {
-	const bool full = true;
+    const bool full = true;
     const DWORD bufferSize = MAX_COMPUTERNAME_LENGTH + 1;
     TCHAR buffer[bufferSize];
     DWORD actualBufferSize = bufferSize;
@@ -756,8 +764,8 @@ fileName::Type type(const fileName& name)
     if (attrs != INVALID_FILE_ATTRIBUTES)
     {
         fileType = (attrs & FILE_ATTRIBUTE_DIRECTORY) ?
-	  fileName::DIRECTORY :
-	  fileName::FILE;
+        fileName::DIRECTORY :
+        fileName::FILE;
     }
 
     return fileType;
@@ -804,7 +812,7 @@ bool isFile(const fileName& name, const bool checkGzip)
 {
     const DWORD attrs = ::GetFileAttributes(name.c_str());
     const bool success = ((attrs != INVALID_FILE_ATTRIBUTES) &&
-			  !(attrs & FILE_ATTRIBUTE_DIRECTORY)) ||
+                         !(attrs & FILE_ATTRIBUTE_DIRECTORY)) ||
                          (checkGzip && isGzFile(name));
 
     return success;
@@ -1322,7 +1330,7 @@ bool dlClose(void* const handle)
 
     if (success)
     {
-	getLoadedLibs().erase(handle);
+        getLoadedLibs().erase(handle);
     }
 
     return success;
@@ -1342,8 +1350,8 @@ void* dlSym(void* handle, const std::string& symbol)
     if (NULL == fun)
     {
         WarningIn("dlSym(void*, const std::string&)")
-	  << "Cannot lookup symbol " << symbol << " : " << MSwindows::getLastError()
-          << endl;
+            << "Cannot lookup symbol " << symbol << " : " << MSwindows::getLastError()
+            << endl;
     }
 
     return fun;
@@ -1360,10 +1368,10 @@ bool dlSymFound(void* handle, const std::string& symbol)
                 << " : GetProcAddress of " << symbol << endl;
         }
 
-       // get address of symbol
-	void* fun = (void*) ::GetProcAddress(static_cast<HMODULE>(handle), symbol.c_str());
+        // get address of symbol
+        void* fun = (void*) ::GetProcAddress(static_cast<HMODULE>(handle), symbol.c_str());
 
-	return (NULL != fun);
+        return (NULL != fun);
     }
     else
     {
@@ -1375,17 +1383,17 @@ bool dlSymFound(void* handle, const std::string& symbol)
 fileNameList dlLoaded()
 {
     fileNameList libs;
-	int counter(0);
+    int counter(0);
     OfLoadedLibs & loadedLibs = getLoadedLibs();
 
     for
-	(
-		OfLoadedLibs::const_iterator it = loadedLibs.begin();
-		it != loadedLibs.end();
-		++it
-	)
+    (
+        OfLoadedLibs::const_iterator it = loadedLibs.begin();
+        it != loadedLibs.end();
+        ++it
+    )
     {
-		libs.newElmt(counter++) = it->second;
+        libs.newElmt(counter++) = it->second;
     }
 
     if (MSwindows::debug)

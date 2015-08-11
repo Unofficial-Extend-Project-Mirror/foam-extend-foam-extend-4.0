@@ -2,7 +2,7 @@ cfMesh Example Case
 Date: 02 October 2014
 Application: cartesianMesh
 
-Goal: Demonstration of the regular expressions feature available within 
+Goal: Demonstration of the regular expressions feature available within
 cfMesh for specifying patch names in the meshDict file.
 
 STL File: singleOrifice.stl

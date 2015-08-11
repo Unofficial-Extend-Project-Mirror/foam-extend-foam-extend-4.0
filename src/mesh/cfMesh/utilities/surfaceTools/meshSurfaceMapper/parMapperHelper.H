@@ -56,9 +56,9 @@ class parMapperHelper
         scalar movingDist_;
         label globalLabel_;
         label patch_;
-    
+
     public:
-        
+
     // Constructors
         explicit inline parMapperHelper()
         :
@@ -67,7 +67,7 @@ class parMapperHelper
             globalLabel_(-1),
             patch_(-1)
         {};
-        
+
         explicit inline parMapperHelper
         (
             const point& p,
@@ -81,7 +81,7 @@ class parMapperHelper
             globalLabel_(globalLabel),
             patch_(patchLabel)
         {}
-    
+
     // Destructor
         ~parMapperHelper()
         {};
@@ -92,27 +92,27 @@ class parMapperHelper
         {
             return p_;
         }
-        
+
         //- return moving distance
         inline const scalar& movingDistance() const
         {
             return movingDist_;
         }
-        
+
         //- return global label
         inline label globalLabel() const
         {
             return globalLabel_;
         }
-        
+
         //- return patch the point is mapped to
         inline label pointPatch() const
         {
             return patch_;
         }
-        
+
     // Operators
-        
+
         inline void operator=(const parMapperHelper& h)
         {
             p_ = h.p_;
@@ -120,15 +120,15 @@ class parMapperHelper
             globalLabel_ = h.globalLabel_;
             patch_ = h.patch_;
         }
-        
+
         inline bool operator!=(const parMapperHelper& h) const
         {
             if( globalLabel_ != h.globalLabel_ )
                 return true;
-            
+
             return false;
         }
-        
+
     // Friend operators
         friend Ostream& operator<<(Ostream& os, const parMapperHelper& h)
         {
@@ -142,23 +142,23 @@ class parMapperHelper
             os.check("operator<<(Ostream&, const parMapperHelper&");
             return os;
         }
-        
+
         friend Istream& operator>>(Istream& is, parMapperHelper& h)
         {
             // Read beginning of parMapperHelper
             is.readBegin("parMapperHelper");
-        
+
             is >> h.p_;
             is >> h.movingDist_;
             is >> h.globalLabel_;
             is >> h.patch_;
-            
+
             // Read end of parMapperHelper
             is.readEnd("parMapperHelper");
-        
+
             // Check state of Istream
             is.check("operator>>(Istream&, parMapperHelper");
-            
+
             return is;
         }
 };

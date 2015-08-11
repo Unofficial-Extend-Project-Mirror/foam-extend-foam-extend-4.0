@@ -60,11 +60,11 @@ class fpmaMesh
         void operator=(const fpmaMesh&);
 
         void writePoints(OFstream& fpmaGeometryFile) const;
-    
+
         void writeFaces(OFstream& fpmaGeometryFile) const;
 
         void writeCells(OFstream& fpmaGeometryFile) const;
-        
+
         void writeSubsets(OFstream& fpmaGeometryFile) const;
 
 public:

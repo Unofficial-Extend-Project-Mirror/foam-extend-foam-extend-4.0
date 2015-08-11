@@ -45,50 +45,50 @@ SourceFiles
 
 namespace Foam
 {
-    
+
 // Forward declarations
 class partTetMeshSimplex;
 
 /*---------------------------------------------------------------------------*\
                     Class simplexSmoother Declaration
 \*---------------------------------------------------------------------------*/
-    
+
 //- class for volume optimizer
 class simplexSmoother
 {
     protected:
-    
+
     // Protected data
         //- mesh points
         DynList<point, 128>& points_;
-    
+
         //- list tets around the given vertex
         const DynList<partTet, 128>& tets_;
-    
+
         //- label of the point
         const label pointI_;
 
         //- bound box
         boundBox bb_;
-    
+
 private:
-        
+
     // Private member functions
         //- Disallow default bitwise copy construct
         simplexSmoother(const simplexSmoother&);
-        
+
         //- Disallow default bitwise assignment
         void operator=(const simplexSmoother&);
-    
+
     public:
-    
+
     // Constructor
         //- construct from partTetMeshSimplex
         simplexSmoother(partTetMeshSimplex& simplex);
-    
+
     // Destructor
         virtual ~simplexSmoother();
-    
+
     // Member functions
         //- improve the position of the centre node
         virtual void optimizeNodePosition(const scalar tol = 0.001) = 0;

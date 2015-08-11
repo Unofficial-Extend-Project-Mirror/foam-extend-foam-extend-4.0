@@ -49,60 +49,60 @@ namespace Foam
 class meshOctreeInsideOutside
 {
     // Private data
-    
+
         //- meshOctreeAddressing
         meshOctreeModifier octreeModifier_;
-    
+
         //- group for a given leaf
         labelLongList cubeGroup_;
-    
+
         //- cubes belonging to each group of octree boxes
         VRWGraph cubesInGroup_;
-    
+
         //- type for a group
         std::map<label, direction> groupType_;
-    
+
         //- boundary DATA boxes for a given group
         VRWGraph boundaryDATACubes_;
-    
+
         //- flag for DATA boxes next to the OUTSIDE boxes
         boolList hasOutsideNeighbour_;
-    
+
         //- label of cubes at processor boundaries
         labelLongList communicationCubes_;
-    
+
         //- labels of cubes marked by different threads
         VRWGraph neighbouringGroups_;
-    
+
     // Private member functions
-    
+
         //- initialise octree boxes
         void initialiseBoxes();
-    
+
         //- frontal marking algorithm
         void frontalMarking();
-        
+
         //- mark OUTSIDE octree boxes
         void markOutsideCubes();
-        
+
         //- revise DATA boxes
         void reviseDataBoxes();
-        
+
         //- mark INSIDE octree boxes
         void markInsideCubes();
-    
+
     public:
-        
+
     // Constructor
-    
+
         //- Construct from octree
         meshOctreeInsideOutside
         (
             meshOctree& octree
         );
-    
+
     // Destructor
-    
+
         ~meshOctreeInsideOutside();
 };
 

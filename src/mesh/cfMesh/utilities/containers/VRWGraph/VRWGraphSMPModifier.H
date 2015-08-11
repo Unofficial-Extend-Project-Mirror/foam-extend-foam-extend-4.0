@@ -27,7 +27,7 @@ Class
 Description
     This class is a modifier for VRWGraph which allows for multi-threaded
     execution of most time-consuimg functions
-    
+
 SourceFiles
     VRWGraphSMPModifier.H
     VRWGraphSMPModifier.C
@@ -64,7 +64,7 @@ class VRWGraphSMPModifier
 
         //- Disallow bitwise assignment
         void operator=(const VRWGraphSMPModifier&);
-    
+
 public:
 
     // Constructor
@@ -81,27 +81,27 @@ public:
         //- set the size and row sizes
         template<class ListType>
         void setSizeAndRowSize(const ListType&);
-        
+
         //- merge graphs with the identical number of rows
         //- into a single one. Use for SMP parallelisation
         void mergeGraphs(const List<VRWGraph>& graphParts);
-        
+
         //- set the graph to the reverse of the original graph.
         //- the rows of such graph store the rows which contain the elements
         //- of the original graph
         template<class GraphType>
         void reverseAddressing(const GraphType& origGraph);
-        
+
         void reverseAddressing(const VRWGraph& origGraph);
-        
+
         //- set the graph to the reverse of the original graph and mapped
         //- to another space.
         template<class ListType, class GraphType>
         void reverseAddressing(const ListType&, const GraphType&);
-        
+
         template<class ListType>
         void reverseAddressing(const ListType&, const VRWGraph&);
-        
+
         //- optimize memory usage
         // this should be used once the graph will not be resized any more
         void optimizeMemoryUsage();

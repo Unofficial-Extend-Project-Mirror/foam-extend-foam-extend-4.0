@@ -36,12 +36,12 @@ Foam::Ostream& Foam::operator<<
 )
 {
     os << DL.size() << nl << token::BEGIN_LIST;
-    
+
     for(register label i=0;i<DL.size();++i)
     {
         os << nl << DL[i];
     }
-    
+
     os << nl << token::END_LIST;
     return os;
 }

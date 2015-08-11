@@ -239,7 +239,7 @@ void Foam::leastSquaresVectors::makeLeastSquaresVectors() const
     // If the dot-product is negative, cell is marked for use with the
     // Gauss gradient, which is unconditionally positive
     // HJ, 21/Apr/2015
-    
+
     // First loop: detect cells with bad least squares vectors
 
     // Use Gauss Gradient field: set to 1 if Gauss is needed

@@ -39,9 +39,9 @@ Foam::DynList<T, staticSize>::DynList(Istream& is)
         "template<class T, Foam::label staticSize>"
         "\nFoam::DynList<T, staticSize>::DynList(Istream& is)"
     ) << "Not implemented" << exit(FatalError);
-    
+
     List<T> helper(is);
-    
+
     nextFree_ = helper.size();
     UList<T>::swap(helper);
 }
@@ -74,7 +74,7 @@ Foam::Istream& Foam::operator>>
         "\nFoam::Istream& Foam::operator>>"
         "(Foam::Istream& is, Foam::DynList<T, staticSize>& DL)"
     ) << "Not implemented" << exit(FatalError);
-    
+
     is >> static_cast<List<T>&>(DL);
     DL.nextFree_ = DL.List<T>::size();
 

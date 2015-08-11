@@ -56,12 +56,12 @@ class checkNonMappableCellConnections
     // Private data
         //- Reference to polyMeshGen
         polyMeshGen& mesh_;
-    
+
         //- type of cell
         labelList cellType_;
-    
+
     // Enumerations
-    
+
         enum cellTypes_
         {
             NONE = 0,

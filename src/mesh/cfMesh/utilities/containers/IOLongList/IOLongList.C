@@ -81,7 +81,7 @@ IOLongList<T, Offset>::IOLongList
         readStream(typeName) >> *this;
         close();
     }
-    
+
     LongList<T, Offset>::operator=(list);
 }
 

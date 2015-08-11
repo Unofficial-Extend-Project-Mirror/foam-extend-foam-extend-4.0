@@ -46,7 +46,7 @@ SourceFiles
 
 namespace Foam
 {
-    
+
 // Forward declarations
 class meshSurfaceEngine;
 
@@ -59,39 +59,39 @@ class checkBoundaryFacesSharingTwoEdges
     // Private data
         //- Reference to polyMeshGen
         polyMeshGen& mesh_;
-    
+
         //- pointer to meshSurfaceEngine
         mutable meshSurfaceEngine* meshSurfacePtr_;
-    
+
         //- number of boundary faces attached to a boundary vertex
         labelList nBndFacesAtBndPoint_;
-    
+
         //- a list of boundary points which can be removed from the mesh
         boolList removeBndPoint_;
-    
+
     // Private member functions
         //- creates meshSurfaceEngine
         void createMeshSurface() const;
-    
+
         //- returns mesh surface
         inline const meshSurfaceEngine& meshSurface() const
         {
             if( !meshSurfacePtr_ )
                 createMeshSurface();
-            
+
             return *meshSurfacePtr_;
         }
-    
+
         //- find the faces connected to each boundary edge
         //- mark the points which can be removed
         void findFacesAtBndEdge();
-        
+
         //- find the number of faces connected to the boundary vertex
         void findBndFacesAtBndVertex();
-        
+
         //- remove vertices from the faces
         void removeExcessiveVertices();
-        
+
         //- find boundary faces which shall be decomposed into triangles
         label findBndFacesForDecomposition(boolList& decomposeFace);
 
