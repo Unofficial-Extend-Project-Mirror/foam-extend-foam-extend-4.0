@@ -52,41 +52,41 @@ class sortEdgesIntoChains
 {
     // Members
         const DynList<edge>& bEdges_;
-    
+
         bool openEdges_;
-    
+
         Map<label> newNodeLabel_;
-    
+
         List<DynList<label> > edgesAtPoint_;
-    
+
         DynList<labelList> createdChains_;
-    
+
     // Private member functions
         void createNodeLabels();
-    
+
         bool findPointsBelongingToTheChain
         (
             const label currPos,
             boolList& chainEdges
         ) const;
-    
+
         void shrinkEdges(const boolList& chainEdges);
-        
+
         void createChainFromEdges(const boolList& chainEdges);
-        
+
         void sortEdges();
-    
+
     public:
-        
+
         sortEdgesIntoChains
         (
             const DynList<edge>& bEdges
         );
-    
+
         ~sortEdgesIntoChains();
-    
+
     // Member functions
-        
+
         //- a list of points which have not yet been resolved
         const DynList<labelList>& sortedChains() const;
 };

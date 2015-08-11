@@ -69,7 +69,7 @@ inline faceListPMG::~faceListPMG()
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-            
+
 inline label faceListPMG::size() const
 {
     return nElmts_;
@@ -85,7 +85,7 @@ inline void faceListPMG::setSize(const label nElmts)
             faceList copy(label(1.5*nElmts));
             for(label i=0;i<nElmts_;++i)
                 copy[i].transfer(this->operator[](i));
-            
+
             faceList::transfer(copy);
         }
         else
@@ -128,11 +128,11 @@ inline void faceListPMG::operator=(const faceList& fcs)
     forAll(fcs, fI)
         this->operator[](fI) = fcs[fI];
 }
-    
+
 inline Ostream& operator<<(Ostream& os, const faceListPMG& fcs)
 {
     SubList<face> f(fcs, fcs.nElmts_, 0);
-    
+
     os << f;
     return os;
 }
@@ -142,7 +142,7 @@ inline Istream& operator>>(Istream& is, faceListPMG& fcs)
     faceList& faces = static_cast<faceList&>(fcs);
     is >> faces;
     fcs.nElmts_  = faces.size();
-    
+
     return is;
 }
 

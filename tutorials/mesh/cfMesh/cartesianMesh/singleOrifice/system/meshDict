@@ -27,7 +27,7 @@ minCellSize 0.50;
 
 anisotropicSources
 {
-    Plane 
+    Plane
     {
         type plane;
         origin (0 0 -20);

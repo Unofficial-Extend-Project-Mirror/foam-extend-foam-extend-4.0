@@ -93,23 +93,23 @@ bool hollowConeRefinement::intersectsObject(const boundBox& bb) const
 {
     //- check if the centre is inside the cone
     const point c = (bb.max() + bb.min()) / 2.0;
-    
+
     const vector v = p1_ - p0_;
     const scalar d = magSqr(v);
-    
+
     if( d < VSMALL )
         return false;
-    
+
     const scalar t = ((c - p0_) & v) / d;
     if( (t > 1.0) || (t < 0.0) )
         return false;
-    
+
     const scalar rOuter = r0Outer_ + (r1Outer_ - r0Outer_) * t;
     const scalar rInner = r0Inner_ + (r1Inner_ - r0Inner_) * t;
-    
+
     if(( mag(p0_ + t * v - c) < rOuter ) && ( mag(p0_ + t * v - c) > rInner ))
         return true;
-    
+
     return false;
 }
 
@@ -157,7 +157,7 @@ void hollowConeRefinement::writeDict(Ostream& os, bool subDict) const
     {
         os << indent << token::BEGIN_BLOCK << incrIndent << nl;
     }
-    
+
     if( additionalRefinementLevels() == 0 && cellSize() >= 0.0 )
     {
         os.writeKeyword("cellSize") << cellSize() << token::END_STATEMENT << nl;
@@ -181,7 +181,7 @@ void hollowConeRefinement::writeDict(Ostream& os, bool subDict) const
     os.writeKeyword("p1") << p1_ << token::END_STATEMENT << nl;
     os.writeKeyword("radius1_Outer") << r1Outer_ << token::END_STATEMENT << nl;
     os.writeKeyword("radius1_Inner") << r1Inner_ << token::END_STATEMENT << nl;
-    
+
     if( subDict )
     {
         os << decrIndent << indent << token::END_BLOCK << endl;
@@ -240,7 +240,7 @@ void hollowConeRefinement::operator=(const dictionary& d)
         r0Inner_ = -1.0;
     }
 
-    
+
     // unspecified centre is (0 0 0)
     if( dict.found("p1") )
     {
@@ -295,9 +295,9 @@ Ostream& hollowConeRefinement::operator<<(Ostream& os) const
     write(os);
     return os;
 }
-        
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-        
+
 } // End namespace Foam
 
 // ************************************************************************* //

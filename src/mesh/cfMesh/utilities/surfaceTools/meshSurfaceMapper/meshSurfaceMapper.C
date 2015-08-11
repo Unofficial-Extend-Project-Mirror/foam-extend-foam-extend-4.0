@@ -39,7 +39,7 @@ Description
 
 namespace Foam
 {
-    
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 void meshSurfaceMapper::createMeshSurfacePartitioner() const
@@ -51,7 +51,7 @@ void meshSurfaceMapper::createTriSurfacePartitioner() const
 {
     surfPartitionerPtr_ = new triSurfacePartitioner(meshOctree_.surface());
 }
-    
+
 void meshSurfaceMapper::clearOut()
 {
     if( deletePartitioner_ )

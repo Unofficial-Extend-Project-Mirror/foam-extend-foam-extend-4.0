@@ -4,7 +4,7 @@ body {
     margin: 0px;
     font-family: verdana, arial, helvetica, sans-serif;
     text-decoration: none;
-    font-size: 12px; 
+    font-size: 12px;
 }
 a:link { text-decoration: none; color: #0000ff ; }
 a:link:hover { text-decoration: none; color: #0000ff ; }
@@ -21,7 +21,7 @@ td.leftmenu {
     text-align: left;
     font-size: 14px;
     height: 20px;
-    width: 200px; 
+    width: 200px;
 }
 
 a.menuTopoff { color: #000000; font-size: 14px; }
@@ -33,7 +33,7 @@ td.topmenu {
     text-align: center;
     font-size: 16px;
     width: 150px;
-    font-weight: bold; 
+    font-weight: bold;
 }
 h1 { font-size: 18px; }
 h2 { font-size: 16px; }

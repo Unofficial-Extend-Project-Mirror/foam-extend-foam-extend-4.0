@@ -55,7 +55,7 @@ class boxRefinement
     // Private data
         //- centre of the box
         point centre_;
-    
+
         //- length of box sides
         scalar lengthX_;
         scalar lengthY_;
@@ -86,7 +86,7 @@ public:
 
         //- Construct from dictionary
         boxRefinement(const word& name, const dictionary& dict);
-        
+
         //- Construct and return a clone
         virtual autoPtr<objectRefinement> clone
         (
@@ -107,12 +107,12 @@ public:
                 )
             );
         }
-    
+
     // Member Functions
-    
+
         //- check if a boundBox intersects or is inside the object
         bool intersectsObject(const boundBox&) const;
-        
+
     //- Return as dictionary of entries
         dictionary dict(bool ignoreType = false) const;
 
@@ -123,7 +123,7 @@ public:
 
         //- Write dictionary
         void writeDict(Ostream&, bool subDict = true) const;
-        
+
     // Member Operators
 
         //- assign from dictionary

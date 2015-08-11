@@ -56,7 +56,7 @@ label faceDecomposition::concaveVertex() const
         evn /= mag(evn);
 
         const vector prod = (ev ^ evn);
-            
+
         if( (prod & n) < -SMALL )
         {
             if( concaveVrt != -1 )
@@ -134,7 +134,7 @@ bool faceDecomposition::isFacePlanar() const
     const point c = f_.centre(points_);
     forAll(f_, pI)
         tol = Foam::max(tol, Foam::mag(c - points_[f_[pI]]));
-    
+
     tol *= 0.05;
 
     return isFacePlanar(tol);
@@ -191,7 +191,7 @@ faceList faceDecomposition::decomposeFace() const
             if( il == ir - 1 )
                 storage.newElmt(fI++) = rf;
         }
-          
+
         il++;
         ir--;
 
@@ -256,7 +256,7 @@ faceList faceDecomposition::decomposeFaceIntoTriangles(const label cv) const
             add[0] = f_[start];
             add[1] = edg[i].start();
             add[2] = edg[i].end();
-            
+
             fcs.newElmt(fI++) = add;
         }
 
@@ -266,12 +266,12 @@ faceList faceDecomposition::decomposeFaceIntoTriangles(const label cv) const
         Info << "face " << faceNo << "  " << f_
             << " is decomposed into " << fcs << endl;
         # endif
-        
+
         return fcs;
     }
-    
+
     faceList fcs(1, f_);
-    
+
     return fcs;
 }
 

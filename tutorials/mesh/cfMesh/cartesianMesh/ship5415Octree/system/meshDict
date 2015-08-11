@@ -47,7 +47,7 @@ anisotropicSources
         scaleY 1;
         scaleZ 0.3;
     }
-    
+
 /*
     planeUpper
     {
@@ -57,7 +57,7 @@ anisotropicSources
         scalingDistance 125;
         scalingFactor 0.5;
     }
-    
+
     planeLower
     {
         type plane;
@@ -68,7 +68,7 @@ anisotropicSources
     }
 */
 }
-     
+
 
 boundaryLayers
 {
@@ -80,7 +80,7 @@ boundaryLayers
             thicknessRatio 1.1;
         }
     }
-    
+
     optimiseLayer 1;
 
     optimisationParameters

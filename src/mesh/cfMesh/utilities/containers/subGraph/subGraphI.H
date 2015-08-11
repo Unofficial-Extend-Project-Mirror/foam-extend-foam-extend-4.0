@@ -137,7 +137,7 @@ inline Foam::label Foam::subGraph<graphType>::operator()
     # ifdef FULLDEBUG
     checkIndex(i);
     # endif
-    
+
     return data_(start_+i, j);
 }
 
@@ -183,13 +183,13 @@ inline Foam::Ostream& operator<<
         for(Foam::label j=0;j<sg.sizeOfRow(i);++j)
         {
             if( j > 0 ) os << " ";
-            
+
             os << sg(i, j);
         }
-        
+
         os << ")";
     }
-    
+
     os << "\n" << ")";
 
     return os;

@@ -67,7 +67,7 @@ inline pointFieldPMG::~pointFieldPMG()
 {}
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-            
+
 inline label pointFieldPMG::size() const
 {
     return nElmts_;
@@ -121,11 +121,11 @@ inline void pointFieldPMG::operator=(const pointField& pts)
     forAll(pts, pI)
         this->operator[](pI) = pts[pI];
 }
-    
+
 inline Ostream& operator<<(Ostream& os, const pointFieldPMG& pts)
 {
     SubList<point> p(pts, pts.nElmts_, 0);
-    
+
     os << p;
     return os;
 }
@@ -135,7 +135,7 @@ inline Istream& operator>>(Istream& is, pointFieldPMG& pts)
     pointField& points = static_cast<pointField&>(pts);
     is >> points;
     pts.nElmts_  = points.size();
-    
+
     return is;
 }
 
