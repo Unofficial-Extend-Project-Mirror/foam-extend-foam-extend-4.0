@@ -51,7 +51,13 @@ already have some of these system tools.
    may already be available in other packages (such as Strawberry Perl), although
    you need to be careful of the version numbers.
 
-3) Download and install MSYS (see reference list below).
+3) Download and install MSYS (see reference list below).  If this is your first
+   use of MSYS, create a file fstab in cMinGW/1.0/etc with single-line contents:
+
+   c/mingw /mingw
+
+   to mount your home directory.  From Windows, you will find your home directory
+   under c:/MinGW/msys/1.0/home/<user name>
 
 4) Download the foam-extend source code from http://sourceforge.net/projects/openfoam-extend/
 
