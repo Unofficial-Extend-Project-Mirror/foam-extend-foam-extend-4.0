@@ -213,7 +213,7 @@ export WM_THIRD_PARTY_USE_CMAKE_322=1
 #
 # For AllMake.stage2
 export WM_THIRD_PARTY_USE_OPENMPI_188=1
-export WM_THIRD_PARTY_USE_OPENMPI_188_ConfigureAdditionalArgs='--enable-mpi-cxx --with-openib=/usr --with-openib-libdir=/usr/lib64'
+#export WM_THIRD_PARTY_USE_OPENMPI_188_ConfigureAdditionalArgs='--enable-mpi-cxx --with-openib=/usr --with-openib-libdir=/usr/lib64'
 #export WM_THIRD_PARTY_USE_OPENMPI_165=1
 #export WM_THIRD_PARTY_USE_OPENMPI_165_ConfigureAdditionalArgs='--enable-mpi-cxx --with-openib=/usr --with-openib-libdir=/usr/lib64'
 #export WM_THIRD_PARTY_USE_OPENMPI_15=1
