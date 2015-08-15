@@ -8,7 +8,6 @@ EXE_INC = \
     -I../scotchDecomp/lnInclude
 
 LIB_LIBS = \
-    -L$(FOAM_MPI_LIBBIN) \
     -L$(METIS_LIB_DIR) -lmetis \
     -L$(PARMETIS_LIB_DIR) -lmetis -lparmetis \
     -ldecompositionMethods \
