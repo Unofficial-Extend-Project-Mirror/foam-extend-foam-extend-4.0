@@ -67,7 +67,7 @@ SET(
 
 #Grab the FOAM installation directory.
 SET(
-    OF_ROOT $ENV{WM_PROJECT_DIR}
+    FOAM_ROOT $ENV{WM_PROJECT_DIR}
     CACHE INTERNAL  "FOAM root directory."
 )
 
@@ -77,6 +77,22 @@ SET(
 SET(
     BUILDNAME $ENV{WM_OPTIONS}
     CACHE STRING "Build ID"
+)
+
+# We allow overriding the git branch and revision information with some 
+# user-supplied information using the CDASH_SCM_INFO environment variable.
+#
+# Mercurial or other SCM users should be using this environment variable 
+# in order to provide branch and revision information for the buildname.
+#
+# Git users should use this environment variable in order to provide
+# additionnal information instead of just the branch and revision number.
+#
+# Otherwise, the buildname will be appended with the following information:
+# -git-branch=the_git_branch_name-git-rev=the_git_revision_number
+SET(
+    BUILDNAME_SCM_INFO $ENV{CDASH_SCM_INFO}
+    CACHE STRING "SCM info for CDash buildname"
 )
 
 # Find out the version of the compiler being used.
@@ -115,48 +131,63 @@ set (UPDATE_TYPE git)
 # Using GIT as SCM
 #
 find_package(Git)
-if(GIT_FOUND)
-    message("Git was found: ${GIT_EXECUTABLE}")
 
-    # Adding the name of the git branch to the build name
-    EXEC_PROGRAM(git
-      ARGS branch --no-color 2> /dev/null | grep '*'| awk '{print $2}'
-      OUTPUT_VARIABLE GIT_BRANCH_NAME
-    )
-    message("Git branch: ${GIT_BRANCH_NAME}")
+if(NOT BUILDNAME_SCM_INFO STREQUAL "")
+  SET(BUILDNAME "${BUILDNAME}-${BUILDNAME_SCM_INFO}")
 
-    # We also add the git rev number to the build name
-    EXEC_PROGRAM(git
-      ARGS rev-parse --short=12 HEAD
-      OUTPUT_VARIABLE GIT_REV_NUMBER
+elseif(GIT_FOUND)
+    message("The git command was found: ${GIT_EXECUTABLE}")
+  
+    # Check if the source code is under a valid git repository
+    execute_process(
+      COMMAND           git status
+      WORKING_DIRECTORY ${FOAM_ROOT}
+      OUTPUT_VARIABLE   GIT_STATUS
+      RESULT_VARIABLE   GIT_ECODE
+      ERROR_QUIET
     )
-    message("Git rev: ${GIT_REV_NUMBER}")
-    if (GIT_BRANCH_NAME STREQUAL "")
-       message("No git-branch. Mercurial?")
-       EXEC_PROGRAM(hg
-     ARGS id
-         OUTPUT_VARIABLE GIT_BRANCH_NAME
-       )
-       string(REPLACE " " "_" GIT_BRANCH_NAME ${GIT_BRANCH_NAME})
-       string(REPLACE "+" "_modified" GIT_BRANCH_NAME ${GIT_BRANCH_NAME})
-       SET(GIT_BRANCH_NAME "hg_${GIT_BRANCH_NAME}")
-       message("Git branch (mercurial): ${GIT_BRANCH_NAME}")
-    endif()
-    SET(BUILDNAME "${BUILDNAME}-git-branch=${GIT_BRANCH_NAME}")
-    SET(BUILDNAME "${BUILDNAME}-git-rev=${GIT_REV_NUMBER}")
+
+    if(NOT GIT_ECODE)
+        # We have a valid git repository. Grab the branch and revision info.
+        # Add to the build name
+        exec_program(git
+          ARGS branch --no-color 2> /dev/null | grep '*'| awk '{print $2}'
+          OUTPUT_VARIABLE GIT_BRANCH_NAME
+          )
+        message("Git branch: ${GIT_BRANCH_NAME}")
+
+        execute_process(
+          COMMAND         git rev-parse --short=12 HEAD
+          OUTPUT_VARIABLE GIT_REV_NUMBER
+          )
+        message("Git revision: ${GIT_REV_NUMBER}")
+
+        SET(BUILDNAME "${BUILDNAME}-git-branch=${GIT_BRANCH_NAME}")
+        SET(BUILDNAME "${BUILDNAME}-git-rev=${GIT_REV_NUMBER}")
+	else()
+        # Not a git repository: no branch nor revision information available
+		SET(BUILDNAME "${BUILDNAME}-git-branch=unknown")
+		SET(BUILDNAME "${BUILDNAME}-git-rev=unknown")
+	endif()	
+else()
+    # Git is not available: no branch nor revision information supplied
+    SET(BUILDNAME "${BUILDNAME}-git-branch=unknown")
+    SET(BUILDNAME "${BUILDNAME}-git-rev=unknown")
 endif()
 
 # Some last minute cleanup
-# Seems like no '/' are allowed in the BUILDNAME or in the SITE name
+# Seems like no '/' or ' 'are allowed in the BUILDNAME or in the SITE name
 string(REPLACE "/" "_" BUILDNAME ${BUILDNAME})
+string(REPLACE " " "_" BUILDNAME ${BUILDNAME})
 string(REPLACE "/" "_" SITE ${SITE})
+string(REPLACE " " "_" SITE ${SITE})
 
 # Build section
 #-----------------------------------------------------------------------------
 
 # Compile FOAM, libs and apps
 add_custom_target (foam-extend-$ENV{WM_PROJECT_VERSION} ALL
-  ${OF_ROOT}/Allwmake
+  ${FOAM_ROOT}/Allwmake
 )
 
 set_property(
@@ -168,7 +199,7 @@ set_property(
 # This part will not be compiled and run by default.
 # This would be a good candidate for a sub-project
 add_custom_target (foam-extend-$ENV{WM_PROJECT_VERSION}_unitTests
-  wmake all ${OF_ROOT}/applications/test
+  wmake all ${FOAM_ROOT}/applications/test
 )
 
 # Test section

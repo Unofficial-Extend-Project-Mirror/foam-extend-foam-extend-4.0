@@ -180,6 +180,13 @@ export FOAM_VERBOSE=1
 # You can override your identifier using this environment variable
 #export CDASH_SUBMIT_LOCAL_HOST_ID=choose_your_CDash_system_identifer
 
+# Buildname suffix for the FOAM CDash test harness on foam-extend 
+# By default, the git branch name and git revision number will be
+# appended to the CDash build name.
+# Otherwise, for users not using git, or wanting to provide additionnal
+# information, simply initialize the CDASH_SCM_INFO with the proper information
+#export CDASH_SCM_INFO=your_SCM_information
+
 # Mac OS X MacPorts root directory.
 # The default value is '/opt/local/etc/macports'.
 # In order to disable the usage of MacPorts on Mac OSX, simply initialize this
