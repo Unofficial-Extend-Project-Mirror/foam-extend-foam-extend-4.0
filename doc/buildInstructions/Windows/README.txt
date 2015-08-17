@@ -157,7 +157,7 @@ Version: 1.11.4-1 (or above)
 URL    : http://downloads.sourceforge.net/gnuwin32/wget-1.11.4-1-bin.zip, http://downloads.sourceforge.net/gnuwin32/wget-1.11.4-1-dep.zip, http://downloads.sourceforge.net/gnuwin32/wget-1.11.4-1-doc.zip
 For    : Automatically downloading files from internet (eg. for use in automated build scripts)
 
-git clone --branch nameClashesForWinPort   git://git.code.sf.net/u/dominikchrist/foam-extend-3.1-dc foam-extend-3.1-win
+git clone --branch nextRelease git://git.code.sf.net/p/openfoam-extend/foam-extend-3.1
 
 
 4. EXAMPLE OUTPUT FROM SOUCING etc/bashrc.mingw
@@ -199,14 +199,14 @@ Checking versions of installed system tools (based on PATH) ...
 Bison:       /bin/bison.exe [bison (GNU Bison) 2.4.2]
 CMake:       /c/Programs/cmake-3.2.3-win32-x86/bin/cmake.exe [cmake version 3.2.3]
 Flex:        /bin/flex.exe [flex 2.5.35]
-G++:         /c/Programs/x86_64-4.8.2-release-win32-seh-rt_v3-rev3/mingw64/bin/g++.exe [g++.exe (x86_64-win32-seh-rev3, Built by MinGW-W64 project) 4.8.2]
-GCC:         /c/Programs/x86_64-4.8.2-release-win32-seh-rt_v3-rev3/mingw64/bin/gcc.exe [gcc.exe (x86_64-win32-seh-rev3, Built by MinGW-W64 project) 4.8.2]
+G++:         /c/Programs/mingw64/bin/g++.exe [g++.exe (x86_64-win32-seh-rev3, Built by MinGW-W64 project) 4.8.2]
+GCC:         /c/Programs/mingw64/bin/gcc.exe [gcc.exe (x86_64-win32-seh-rev3, Built by MinGW-W64 project) 4.8.2]
 GMake:       /c/Programs/strawberry-perl-5.20.2.1-64bit/c/bin/gmake.exe [GNU Make 4.0.90]
 Git:         /c/Programs/Git/cmd/git.exe [git version 1.9.5.msysgit.1]
 Java:        /c/ProgramData/Oracle/Java/javapath/java.exe [java version "1.8.0_45"]
 M4:          /bin/m4.exe [m4 (GNU M4) 1.4.16]
 Make:        /bin/make.exe [GNU Make 3.81]
-MinGW-w64:   /c/Programs/x86_64-4.8.2-release-win32-seh-rt_v3-rev3/mingw64
+MinGW-w64:   /c/Programs/mingw64
 OpenMPI:     /c/Programs/OpenMPI_v1.6.1-x64/bin/mpirun.exe [mpirun.exe (OpenRTE) 1.6.1]
 PEexports:   /c/Programs/strawberry-perl-5.20.2.1-64bit/c/bin/pexports.exe [PExports 0.44 Copyright 1998, Anders Norlander]
 ParaView:    /c/Programs/ParaView-4.3.1
