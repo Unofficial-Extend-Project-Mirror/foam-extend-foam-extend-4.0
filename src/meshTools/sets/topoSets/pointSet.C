@@ -62,7 +62,8 @@ pointSet::pointSet
 :
     topoSet(mesh, typeName, name, r, w)
 {
-    check(mesh.nPoints());
+    // Sets can contain retired points.  HJ, 17/Aug/2015
+    check(mesh.allPoints().size());
 }
 
 
@@ -147,7 +148,7 @@ void pointSet::sync(const polyMesh& mesh)
 
 label pointSet::maxSize(const polyMesh& mesh) const
 {
-    return mesh.nPoints();
+    return mesh.allPoints().size();
 }
 
 

@@ -63,7 +63,8 @@ faceSet::faceSet
 :
     topoSet(mesh, typeName, name, r, w)
 {
-    check(mesh.nFaces());
+    // Sets can also contain retired faces.  HJ, 17/Aug/2015
+    check(mesh.allFaces().size());
 }
 
 
@@ -228,7 +229,7 @@ void faceSet::sync(const polyMesh& mesh)
 
 label faceSet::maxSize(const polyMesh& mesh) const
 {
-    return mesh.nFaces();
+    return mesh.allFaces().size();
 }
 
 

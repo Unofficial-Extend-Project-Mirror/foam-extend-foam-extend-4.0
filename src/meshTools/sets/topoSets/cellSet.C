@@ -61,7 +61,7 @@ cellSet::cellSet
 :
     topoSet(mesh, typeName, name, r, w)
 {
-    // Make sure set within valid range
+    // Make sure set within valid range: there are no retired cells
     check(mesh.nCells());
 }
 
