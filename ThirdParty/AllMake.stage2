@@ -102,7 +102,7 @@ then
     [ ! -z "$WM_THIRD_PARTY_USE_OPENMPI_188" ] && {
 	echo "Building openmpi 1.8.8"
 	( rpm_make -p openmpi-1.8.8 -s openmpi-1.8.8.spec  -u http://www.open-mpi.org/software/ompi/v1.8/downloads/openmpi-1.8.8.tar.gz \
-          -f --define '_configureAdditionalArgs "$WM_THIRD_PARTY_USE_OPENMPI_165_ConfigureAdditionalArgs"')
+          -f --define '_configureAdditionalArgs "$WM_THIRD_PARTY_USE_OPENMPI_188_ConfigureAdditionalArgs"')
     }
 else
     echo "Using system installed OpenMPI"
