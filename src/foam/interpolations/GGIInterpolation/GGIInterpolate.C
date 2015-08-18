@@ -145,8 +145,11 @@ void GGIInterpolation<MasterPatch, SlavePatch>::maskedBridge
             {
                 // Gone beyond my index: my face is not present in the mask
                 // Go one back and check for next uncovered face
+                if (maskAddrI > 0)
+                {
+                    maskAddrI--;
+                }
 
-                maskAddrI--;
                 break;
             }
         }
