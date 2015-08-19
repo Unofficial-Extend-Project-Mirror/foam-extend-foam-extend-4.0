@@ -29,7 +29,7 @@ chown -R vagrant:vagrant $OFDIR
 # for distros that don't have group vagrant
 chown -R vagrant $OFDIR
 
-OFClone=$OFDIR/foam-extend-3.1
+OFClone=$OFDIR/foam-extend-3.2
 OFReference=$OFClone-parent
 
 OFParent=/FOAM-sources
