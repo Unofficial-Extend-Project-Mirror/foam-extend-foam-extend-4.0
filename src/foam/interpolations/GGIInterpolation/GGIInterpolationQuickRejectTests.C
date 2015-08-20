@@ -181,7 +181,7 @@ void GGIInterpolation<MasterPatch, SlavePatch>::findNeighbours3D
 
         scalar tmpValue = Foam::magSqr(bbSlave.max() - bbSlave.min())/4.0;
 
-        // We will compare squared distances, so save the sqrt() if value > 1.0.
+        // We compare squared distances, so save the sqrt() if value > 1.0.
         if (tmpValue < 1.0)
         {
             // Take the sqrt, otherwise, we underestimate the radius
@@ -564,7 +564,6 @@ void GGIInterpolation<MasterPatch, SlavePatch>::findNeighboursBBOctree
 
     return;
 }
-
 
 
 // Projects a list of points onto a plane located at planeOrig,
