@@ -220,6 +220,9 @@ void Foam::BlockCholeskyPrecon<Type>::calcPreconDiag()
             }
         }
     }
+
+    // Invert the diagonal
+    preconDiag_ = inv(preconDiag_);
 }
 
 
@@ -249,12 +252,6 @@ void Foam::BlockCholeskyPrecon<Type>::diagMultiply
                 dDiag[lowerAddr[coeffI]],
                 upper[coeffI]
             );
-    }
-
-    // Invert the diagonal for future use
-    forAll (dDiag, i)
-    {
-        dDiag[i] = mult.inverse(dDiag[i]);
     }
 }
 
@@ -286,12 +283,6 @@ void Foam::BlockCholeskyPrecon<Type>::diagMultiplyCoeffT
                 upper[coeffI]
             );
     }
-
-    // Invert the diagonal for future use
-    forAll (dDiag, i)
-    {
-        dDiag[i] = mult.inverse(dDiag[i]);
-    }
 }
 
 
@@ -322,12 +313,6 @@ void Foam::BlockCholeskyPrecon<Type>::diagMultiply
                 dDiag[lowerAddr[coeffI]],
                 upper[coeffI]
             );
-    }
-
-    // Invert the diagonal for future use
-    forAll (dDiag, i)
-    {
-        dDiag[i] = mult.inverse(dDiag[i]);
     }
 }
 

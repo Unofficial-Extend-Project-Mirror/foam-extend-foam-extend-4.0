@@ -43,25 +43,7 @@ namespace Foam
 {
 
 template<>
-template<>
-void BlockGaussSeidelPrecon<scalar>::BlockSweep
-(
-    scalarField& x,
-    const scalarField& dD,
-    const scalarField& upper,
-    const scalarField& b
-) const;
-
-template<>
-template<>
-void BlockGaussSeidelPrecon<scalar>::BlockSweep
-(
-    scalarField& x,
-    const scalarField& dD,
-    const scalarField& upper,
-    const scalarField& lower,
-    const scalarField& b
-) const;
+void BlockGaussSeidelPrecon<scalar>::calcInvDiag();
 
 
 template<>

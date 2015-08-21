@@ -126,6 +126,11 @@ void Foam::BlockCholeskyPrecon<Type>::calcDecoupledPreconDiag()
             }
         }
     }
+
+    // Invert the diagonal
+    // Note: since square diag type does not exist, simple inversion
+    // covers all cases
+    preconDiag_ = inv(preconDiag_);
 }
 
 

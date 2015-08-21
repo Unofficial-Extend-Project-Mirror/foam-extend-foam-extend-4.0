@@ -44,38 +44,11 @@ namespace Foam
 {
 
 template<>
-template<>
-void BlockGaussSeidelPrecon<scalar>::BlockSweep
-(
-    Field<scalar>& x,
-    const Field<scalar>& dD,
-    const Field<scalar>& upper,
-    const Field<scalar>& b
-) const
+void BlockGaussSeidelPrecon<scalar>::calcInvDiag()
 {
-    FatalErrorIn
-    (
-        "BlockGaussSeidelPrecon<scalar>::BlockSweep(...)"
-    )   << "Function not implemented for Type=scalar. " << endl
-        << abort(FatalError);
-}
-
-template<>
-template<>
-void BlockGaussSeidelPrecon<scalar>::BlockSweep
-(
-    Field<scalar>& x,
-    const Field<scalar>& dD,
-    const Field<scalar>& upper,
-    const Field<scalar>& lower,
-    const Field<scalar>& b
-) const
-{
-    FatalErrorIn
-    (
-        "BlockGaussSeidelPrecon<scalar>::BlockSweep(...)"
-    )   << "Function not implemented for Type=scalar. " << endl
-        << abort(FatalError);
+    // Direct inversion of diagonal is sufficient, as the diagonal
+    // is linear.  HJ, 20/Aug/2015
+    invDiag_ = inv(this->matrix_.diag());
 }
 
 

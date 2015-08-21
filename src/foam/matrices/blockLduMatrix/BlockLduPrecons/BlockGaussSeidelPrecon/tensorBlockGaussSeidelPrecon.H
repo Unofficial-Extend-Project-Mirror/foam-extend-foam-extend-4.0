@@ -43,26 +43,7 @@ namespace Foam
 {
 
 template<>
-template<>
-void BlockGaussSeidelPrecon<tensor>::BlockSweep
-(
-    Field<tensor>& x,
-    const Field<tensor>& dD,
-    const Field<tensor>& upper,
-    const Field<tensor>& b
-) const;
-
-
-template<>
-template<>
-void BlockGaussSeidelPrecon<tensor>::BlockSweep
-(
-    Field<tensor>& x,
-    const Field<tensor>& dD,
-    const Field<tensor>& upper,
-    const Field<tensor>& lower,
-    const Field<tensor>& b
-) const;
+void BlockGaussSeidelPrecon<tensor>::calcInvDiag();
 
 
 template<>

@@ -47,39 +47,9 @@ namespace Foam
 {
 
 template<>
-template<>
-void BlockGaussSeidelPrecon<tensor>::BlockSweep
-(
-    Field<tensor>& x,
-    const Field<tensor>& dD,
-    const Field<tensor>& upper,
-    const Field<tensor>& b
-) const
+void BlockGaussSeidelPrecon<tensor>::calcInvDiag()
 {
-    FatalErrorIn
-    (
-        "Foam::BlockGaussSeidelPrecon<tensor>::BlockSweep(...)"
-    )   << "Function not implemented for Type=tensor. " << endl
-        << abort(FatalError);
-}
-
-
-template<>
-template<>
-void BlockGaussSeidelPrecon<tensor>::BlockSweep
-(
-    Field<tensor>& x,
-    const Field<tensor>& dD,
-    const Field<tensor>& upper,
-    const Field<tensor>& lower,
-    const Field<tensor>& b
-) const
-{
-    FatalErrorIn
-    (
-        "Foam::BlockGaussSeidelPrecon<tensor>::BlockSweep(...)"
-    )   << "Function not implemented for Type=tensor. " << endl
-        << abort(FatalError);
+    calcDecoupledInvDiag();
 }
 
 
@@ -91,7 +61,7 @@ void BlockGaussSeidelPrecon<tensor>::precondition
 ) const
 {
     // Decoupled version
-//     decoupledPrecondition(x, b);
+    decoupledPrecondition(x, b);
 }
 
 
@@ -103,7 +73,7 @@ void BlockGaussSeidelPrecon<tensor>::preconditionT
 ) const
 {
     // Decoupled version
-//     decoupledPreconditionT(xT, bT);
+    decoupledPreconditionT(xT, bT);
 }
 
 
