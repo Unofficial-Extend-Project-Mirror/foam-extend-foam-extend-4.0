@@ -107,8 +107,7 @@ void Foam::BlockILUCpPrecon<Type>::calcActiveTypeFactorization
             for (register label faceI = fStart; faceI < fEnd; ++faceI)
             {
                 // Note: z addressed by neighbour of face (column index for
-                // upper), w addressed by neighbour of face (row index for
-                // lower)
+                // upper)
                 zPtr[uPtr[faceI]] = upperPtr[faceI];
                 wPtr[uPtr[faceI]] = lowerPtr[faceI];
             }
@@ -132,8 +131,6 @@ void Foam::BlockILUCpPrecon<Type>::calcActiveTypeFactorization
                 const label i = lPtr[losortCoeff];
 
                 // Update diagonal
-                // WARNING: Not sure about order of multiplication.
-                // Check it. VV, 3/Jul/2015
                 zDiag -= mult.activeTypeMultiply
                 (
                     lowerPtr[losortCoeff],
@@ -153,25 +150,16 @@ void Foam::BlockILUCpPrecon<Type>::calcActiveTypeFactorization
                     ++faceI
                 )
                 {
-                    // WARNING: Not sure about order of multiplication.
-                    // Check it. VV, 3/Jul/2015
                     zPtr[uPtr[faceI]] -= mult.activeTypeMultiply
                     (
                         lowerPtr[losortCoeff],
                         upperPtr[faceI]
                     );
 
-                    // WARNING: Not sure about order of multiplication.
-                    // Check it. VV, 3/Jul/2015
                     wPtr[uPtr[faceI]] -= mult.activeTypeMultiply
                     (
                         lowerPtr[faceI],
-                        mult.activeTypeMultiply
-                        (
-//                            diagPtr[lPtr[losortCoeff]], // Note: diag already inverted
-                            mult.inverse(zDiag), // Note: diag already inverted
-                            upperPtr[losortCoeff]
-                        )
+                        upperPtr[losortCoeff]
                     );
                 }
             }
@@ -191,15 +179,11 @@ void Foam::BlockILUCpPrecon<Type>::calcActiveTypeFactorization
 
                 // Update L and U decomposition for this row (column)
                 upperPtr[faceI] = zPtr[zwIndex];
-
-                // WARNING: Not sure about order of multiplication.
-                // Check it. VV, 3/Jul/2015
-//                lowerPtr[faceI] = mult.activeTypeMultiply
-//                (
-//                    diagRowI,
-//                    wPtr[zwIndex]
-//                );
-                lowerPtr[faceI] = wPtr[zwIndex];
+                lowerPtr[faceI] = mult.activeTypeMultiply
+                (
+                    wPtr[zwIndex],
+                    diagRowI
+                );
             }
 
             // Reset temporary working fields
