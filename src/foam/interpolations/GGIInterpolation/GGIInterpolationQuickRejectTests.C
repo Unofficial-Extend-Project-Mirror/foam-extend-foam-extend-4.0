@@ -561,8 +561,6 @@ void GGIInterpolation<MasterPatch, SlavePatch>::findNeighboursBBOctree
     {
         result[i].transfer(candidateMasterNeighbors[i].shrink());
     }
-
-    return;
 }
 
 
