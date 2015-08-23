@@ -32,15 +32,24 @@ Description
 #include "makeBasicMixture.H"
 
 #include "perfectGas.H"
+#include "redlichKwong.H"
+#include "pengRobinson.H"
+#include "aungierRedlichKwong.H"
+#include "soaveRedlichKwong.H"
 
 #include "eConstThermo.H"
 
 #include "hConstThermo.H"
 #include "janafThermo.H"
+#include "nasaHeatCapacityPolynomial.H"
+#include "constantHeatCapacity.H"
 #include "specieThermo.H"
+#include "realGasSpecieThermo.H"
 
 #include "constTransport.H"
 #include "sutherlandTransport.H"
+#include "constRealGasTransport.H"
+#include "sutherlandRealGasTransport.H"
 
 #include "pureMixture.H"
 
@@ -91,6 +100,151 @@ makeBasicMixture
     sutherlandTransport,
     janafThermo,
     perfectGas
+);
+
+//CL: Real Gas Mixtures
+makeBasicRealFluidMixture
+(
+    pureMixture,
+    sutherlandRealGasTransport,
+    realGasSpecieThermo,
+    nasaHeatCapacityPolynomial,
+    redlichKwong
+);
+
+makeBasicRealFluidMixture
+(
+    pureMixture,
+    sutherlandRealGasTransport,
+    realGasSpecieThermo,
+    nasaHeatCapacityPolynomial,
+    pengRobinson
+);
+
+makeBasicRealFluidMixture
+(
+    pureMixture,
+    sutherlandRealGasTransport,
+    realGasSpecieThermo,
+    nasaHeatCapacityPolynomial,
+    aungierRedlichKwong
+);
+
+makeBasicRealFluidMixture
+(
+    pureMixture,
+    sutherlandRealGasTransport,
+    realGasSpecieThermo,
+    nasaHeatCapacityPolynomial,
+    soaveRedlichKwong
+);
+
+makeBasicRealFluidMixture
+(
+    pureMixture,
+    constRealGasTransport,
+    realGasSpecieThermo,
+    nasaHeatCapacityPolynomial,
+    redlichKwong
+);
+
+makeBasicRealFluidMixture
+(
+    pureMixture,
+    constRealGasTransport,
+    realGasSpecieThermo,
+    nasaHeatCapacityPolynomial,
+    pengRobinson
+);
+
+makeBasicRealFluidMixture
+(
+    pureMixture,
+    constRealGasTransport,
+    realGasSpecieThermo,
+    nasaHeatCapacityPolynomial,
+    aungierRedlichKwong
+);
+
+makeBasicRealFluidMixture
+(
+    pureMixture,
+    constRealGasTransport,
+    realGasSpecieThermo,
+    nasaHeatCapacityPolynomial,
+    soaveRedlichKwong
+);
+
+makeBasicRealFluidMixture
+(
+    pureMixture,
+    sutherlandRealGasTransport,
+    realGasSpecieThermo,
+    constantHeatCapacity,
+    redlichKwong
+);
+
+makeBasicRealFluidMixture
+(
+    pureMixture,
+    sutherlandRealGasTransport,
+    realGasSpecieThermo,
+    constantHeatCapacity,
+    pengRobinson
+);
+
+makeBasicRealFluidMixture
+(
+    pureMixture,
+    sutherlandRealGasTransport,
+    realGasSpecieThermo,
+    constantHeatCapacity,
+    aungierRedlichKwong
+);
+
+makeBasicRealFluidMixture
+(
+    pureMixture,
+    sutherlandRealGasTransport,
+    realGasSpecieThermo,
+    constantHeatCapacity,
+    soaveRedlichKwong
+);
+
+makeBasicRealFluidMixture
+(
+    pureMixture,
+    constRealGasTransport,
+    realGasSpecieThermo,
+    constantHeatCapacity,
+    redlichKwong
+);
+
+makeBasicRealFluidMixture
+(
+    pureMixture,
+    constRealGasTransport,
+    realGasSpecieThermo,
+    constantHeatCapacity,
+    pengRobinson
+);
+
+makeBasicRealFluidMixture
+(
+    pureMixture,
+    constRealGasTransport,
+    realGasSpecieThermo,
+    constantHeatCapacity,
+    aungierRedlichKwong
+);
+
+makeBasicRealFluidMixture
+(
+    pureMixture,
+    constRealGasTransport,
+    realGasSpecieThermo,
+    constantHeatCapacity,
+    soaveRedlichKwong
 );
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

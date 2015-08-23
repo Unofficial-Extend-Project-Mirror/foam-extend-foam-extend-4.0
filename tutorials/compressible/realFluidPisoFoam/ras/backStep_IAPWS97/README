@@ -1,0 +1,48 @@
+This tutorial is to show how the IAPWSThermo work in foam 
+
+//***********************INFORMATION TO TEST CASE*******************************//
+
+Important files in this case:
+
+1. thermophysicalProperties 
+
+--> see thermotype
+
+2. controlDict: 
+
+the dynamic libraries used for the IAPWS 97 water properties are not directly link into foam.
+Therefore, the dynamic libraries need to be defined in controlDict
+
+
+//************************NEW CODE NEEDED FOR THIS CASE*************************//
+
+1. Code in foam: $WM_PROJECT_DIR/src/thermophysicalModels/externalMedia/
+   just run wmake libso in the folder
+
+2. FreeSteam: download the code @ http://freesteam.sourceforge.net/example.php
+
+//***********************Problems*******************************//
+
+If problems occur using the IAPWS 97 water properties, please check the following points
+
+1. have you successfully compiled freeSteam? 
+
+      a: If no, have you installed gsl, scons and so on (see README.txt in the freeSteam)
+      b: If yes, is the libfreesteam.so in a folder where foam finds it e.g. $WM_PROJECT_DIR/lib/...
+
+2. have you compiled the thermophysical models that connect freeSteam to foam. They can be found in this folder: $WM_PROJECT_DIR/src/
+     thermophysicalModels/externalMedia/
+
+
+3. IS THE SOLVER STARTING TO RUN THE CASE? NO
+ 
+   check b23.c file at line 39 (or at least somewhere in the code:
+
+   if you find the following code:
+       return B23_N[4] + sqrt((pi - B23_N[5])/B23_N[3]) /* * 1{K} */;
+
+   change it to this:
+       return B23_N[4] + sqrt(fabs(pi - B23_N[5])/B23_N[3]) /* * 1{K} */;
+
+
+

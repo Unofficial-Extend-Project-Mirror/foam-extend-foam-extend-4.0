@@ -46,6 +46,17 @@ defineTemplateTypeNameAndDebugWithName                                        \
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
+#define makeBasicRealFluidMixture(Mixture,Transport,SpecieThermo,Thermo,EqnOfState)                 \
+                                                                              \
+typedef Mixture<Transport<SpecieThermo<Thermo<EqnOfState> > > >               \
+    Mixture##Transport##SpecieThermo##Thermo##EqnOfState;                     \
+                                                                              \
+defineTemplateTypeNameAndDebugWithName                                        \
+    (Mixture##Transport##SpecieThermo##Thermo##EqnOfState,                    \
+    #Mixture"<"#Transport"<"#SpecieThermo"<"#Thermo"<"#EqnOfState">>>>", 0)
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
 #endif
 
 // ************************************************************************* //

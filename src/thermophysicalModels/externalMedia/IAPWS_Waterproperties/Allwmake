@@ -1,0 +1,26 @@
+#!/bin/bash
+cd ${0%/*} || exit 1    # run from this directory
+
+
+# Installing freeSteam 2.1
+if [ ! -d "freesteam-2.1" ]; then
+    wget http://sourceforge.net/projects/freesteam/files/freesteam/2.1/freesteam-2.1.tar.bz2
+    tar xjvf freesteam-2.1.tar.bz2
+    rm freesteam-2.1.tar.bz2
+fi 
+
+#installing required packages for freesteam
+sudo apt-get install subversion scons libgsl0-dev python-dev swig ipython python-matplotlib
+
+#compiling freesteam
+cd freesteam-2.1
+scons
+cd -
+
+#copy dynamic library to $WM_PROJECT_DIR/lib/
+cp freesteam-2.1/libfreesteam.so $WM_PROJECT_DIR/lib/$WM_ARCH$WM_COMPILER$WM_PRECISION_OPTION$WM_COMPILE_OPTION
+
+#compiling classes to connect freesteam to foam
+wmake libso 
+
+# ----------------------------------------------------------------- end-of-file
