@@ -22,60 +22,38 @@ License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    BlockGaussSeidelPrecon
+    BlockDiagCholeskyPrecon
 
 Description
-    Template specialisation for tensor block Gauss-Seidel preconditioning
+    Typedefs for Incomplete Cholesky preconditioning with no fill-in,
+    using the diagonal-of-diagonal for ILU decomposition.
+    Currently broken
+
 
 Author
-    Hrvoje Jasak, Wikki Ltd.  All rights reserved
+    Hrvoje Jasak, Wikki Ltd.  All rights reserved.
 
 SourceFiles
-    tensorBlockGaussSeidelPrecon.C
+    blockDiagCholeskyPrecons.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef tensorBlockGaussSeidelPrecon_H
-#define tensorBlockGaussSeidelPrecon_H
+#ifndef blockDiagCholeskyPrecons_H
+#define blockDiagCholeskyPrecons_H
 
-#include "BlockGaussSeidelPrecon.H"
-#include "tensorBlockGaussSeidelPrecon.H"
+#include "scalarBlockDiagCholeskyPrecon.H"
+#include "tensorBlockDiagCholeskyPrecon.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 
-template<>
-void BlockGaussSeidelPrecon<tensor>::calcInvDiag()
-{
-    calcDecoupledInvDiag();
-}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-
-template<>
-void BlockGaussSeidelPrecon<tensor>::precondition
-(
-    tensorField& x,
-    const tensorField& b
-) const
-{
-    // Decoupled version
-    decoupledPrecondition(x, b);
-}
-
-
-template<>
-void BlockGaussSeidelPrecon<tensor>::preconditionT
-(
-    tensorField& xT,
-    const tensorField& bT
-) const
-{
-    // Decoupled version
-    decoupledPreconditionT(xT, bT);
-}
-
+typedef BlockDiagCholeskyPrecon<scalar> blockDiagCholeskyPreconScalar;
+typedef BlockDiagCholeskyPrecon<vector> blockDiagCholeskyPreconVector;
+typedef BlockDiagCholeskyPrecon<tensor> blockDiagCholeskyPreconTensor;
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

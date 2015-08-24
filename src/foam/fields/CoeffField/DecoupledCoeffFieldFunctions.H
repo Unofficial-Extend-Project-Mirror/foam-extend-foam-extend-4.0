@@ -37,7 +37,10 @@ namespace Foam
 /* * * * * * * * * * * * * * * * Global functions  * * * * * * * * * * * * * */
 
 template<class Type>
-tmp<DecoupledCoeffField<Type> > inv(const DecoupledCoeffField<Type>& f);
+tmp<DecoupledCoeffField<Type> > inv
+(
+    const DecoupledCoeffField<Type>& f
+);
 
 
 template<class Type>

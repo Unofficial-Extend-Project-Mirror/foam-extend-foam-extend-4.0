@@ -22,23 +22,24 @@ License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    BlockGaussSeidelPrecon
+    BlockDiagCholeskyPrecon
 
 Description
-    Gauss-Seidel preconditioning
+    Incomplete Cholesky preconditioning with no fill-in,
+    using the diagonal-of-diagonal for ILU decomposition.
+    Currently broken
 
 Author
     Hrvoje Jasak, Wikki Ltd.  All rights reserved.
 
 SourceFiles
-    BlockGaussSeidelPrecon.C
-    BlockGaussSeidelPrecon.C
-    BlockGaussSeidelPreconDecoupled.C
+    BlockDiagCholeskyPrecon.C
+    BlockDiagCholeskyPreconDecoupled.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef BlockGaussSeidelPrecon_H
-#define BlockGaussSeidelPrecon_H
+#ifndef BlockDiagCholeskyPrecon_H
+#define BlockDiagCholeskyPrecon_H
 
 #include "BlockLduPrecon.H"
 
@@ -48,18 +49,18 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                      Class BlockGaussSeidelPrecon Declaration
+                      Class BlockDiagCholeskyPrecon Declaration
 \*---------------------------------------------------------------------------*/
 
 template<class Type>
-class BlockGaussSeidelPrecon
+class BlockDiagCholeskyPrecon
 :
     public BlockLduPrecon<Type>
 {
     // Private Data
 
-        //- Inverse of diagonal diagonal
-        CoeffField<Type> invDiag_;
+        //- Preconditioned diagonal
+        mutable CoeffField<Type> preconDiag_;
 
         //- Off-diag part of diagonal
         CoeffField<Type> LUDiag_;
@@ -68,41 +69,82 @@ class BlockGaussSeidelPrecon
         //  Initialised with zero size and resized on first use
         mutable Field<Type> bPlusLU_;
 
-        //- Temporary space for solution intermediate
-        mutable Field<Type> bPrime_;
-
-        //- Number of sweeps
-        const label nSweeps_;
-
 
     // Private Member Functions
 
         //- Disallow default bitwise copy construct
-        BlockGaussSeidelPrecon(const BlockGaussSeidelPrecon&);
+        BlockDiagCholeskyPrecon(const BlockDiagCholeskyPrecon&);
 
         //- Disallow default bitwise assignment
-        void operator=(const BlockGaussSeidelPrecon&);
+        void operator=(const BlockDiagCholeskyPrecon&);
 
+        //- Precondition the diagonal
+        void calcPreconDiag();
 
-        //- Calculate inverse diagonal
-        void calcInvDiag();
-
-        // Block Gauss-Seidel sweep, symetric matrix
+        // Diagonal multiplication, symmetric matrix
         template<class DiagType, class ULType>
-        void BlockSweep
+        void diagMultiply
+        (
+            Field<DiagType>& dDiag,
+            const Field<ULType>& upper
+        );
+
+        //- Diagonal multiplication with transpose upper square coeff
+        //  for the symmetric matrix
+        template<class DiagType, class ULType>
+        void diagMultiplyCoeffT
+        (
+            Field<DiagType>& dDiag,
+            const Field<ULType>& upper
+        );
+
+        //- Diagonal multiplication, asymmetric matrix
+        template<class DiagType, class ULType>
+        void diagMultiply
+        (
+            Field<DiagType>& dDiag,
+            const Field<ULType>& lower,
+            const Field<ULType>& upper
+        );
+
+        //- ILU multiplication, symmetric matrix
+        template<class DiagType, class ULType>
+        void ILUmultiply
         (
             Field<Type>& x,
-            const Field<DiagType>& dD,
+            const Field<DiagType>& dDiag,
             const Field<ULType>& upper,
             const Field<Type>& b
         ) const;
 
-        // Block Gauss-Seidel sweep, asymmetric matrix
+        //- ILU multiplication, with transpose upper square coeff
+        //  for a symmetric matrix
         template<class DiagType, class ULType>
-        void BlockSweep
+        void ILUmultiplyCoeffT
         (
             Field<Type>& x,
-            const Field<DiagType>& dD,
+            const Field<DiagType>& dDiag,
+            const Field<ULType>& upper,
+            const Field<Type>& b
+        ) const;
+
+        //- ILU multiplication, asymmetric matrix
+        template<class DiagType, class ULType>
+        void ILUmultiply
+        (
+            Field<Type>& x,
+            const Field<DiagType>& dDiag,
+            const Field<ULType>& lower,
+            const Field<ULType>& upper,
+            const Field<Type>& b
+        ) const;
+
+        //- ILU multiplication transposed asymmetric matrix
+        template<class DiagType, class ULType>
+        void ILUmultiplyTranspose
+        (
+            Field<Type>& x,
+            const Field<DiagType>& dDiag,
             const Field<ULType>& lower,
             const Field<ULType>& upper,
             const Field<Type>& b
@@ -111,8 +153,8 @@ class BlockGaussSeidelPrecon
 
         // Decoupled operations, used in template specialisation
 
-           //- Calculate inverse diagonal, decoupled version
-           void calcDecoupledInvDiag();
+            //- Precondition the diagonal, decoupled version
+            void calcDecoupledPreconDiag();
 
             //- Execute preconditioning, decoupled version
             void decoupledPrecondition
@@ -133,19 +175,19 @@ class BlockGaussSeidelPrecon
 public:
 
     //- Runtime type information
-    TypeName("GaussSeidel");
+    TypeName("Cholesky");
 
 
     // Constructors
 
         //- Construct from matrix for smoother use
-        BlockGaussSeidelPrecon
+        BlockDiagCholeskyPrecon
         (
             const BlockLduMatrix<Type>& matrix
         );
 
         //- Construct from components
-        BlockGaussSeidelPrecon
+        BlockDiagCholeskyPrecon
         (
             const BlockLduMatrix<Type>& matrix,
             const dictionary& dict
@@ -154,8 +196,7 @@ public:
 
     // Destructor
 
-        virtual ~BlockGaussSeidelPrecon()
-        {}
+        virtual ~BlockDiagCholeskyPrecon();
 
 
     // Member Functions
@@ -183,8 +224,8 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-#   include "BlockGaussSeidelPrecon.C"
-#   include "BlockGaussSeidelPreconDecoupled.C"
+#   include "BlockDiagCholeskyPrecon.C"
+#   include "BlockDiagCholeskyPreconDecoupled.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

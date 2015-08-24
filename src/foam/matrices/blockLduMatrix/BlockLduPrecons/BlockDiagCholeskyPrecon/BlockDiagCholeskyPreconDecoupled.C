@@ -24,12 +24,12 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "error.H"
-#include "BlockCholeskyPrecon.H"
+#include "BlockDiagCholeskyPrecon.H"
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
 template<class Type>
-void Foam::BlockCholeskyPrecon<Type>::calcDecoupledPreconDiag()
+void Foam::BlockDiagCholeskyPrecon<Type>::calcDecoupledPreconDiag()
 {
     typedef CoeffField<Type> TypeCoeffField;
 
@@ -135,7 +135,7 @@ void Foam::BlockCholeskyPrecon<Type>::calcDecoupledPreconDiag()
 
 
 template<class Type>
-void Foam::BlockCholeskyPrecon<Type>::decoupledPrecondition
+void Foam::BlockDiagCholeskyPrecon<Type>::decoupledPrecondition
 (
     Field<Type>& x,
     const Field<Type>& b
@@ -256,7 +256,7 @@ void Foam::BlockCholeskyPrecon<Type>::decoupledPrecondition
 
 
 template<class Type>
-void Foam::BlockCholeskyPrecon<Type>::decoupledPreconditionT
+void Foam::BlockDiagCholeskyPrecon<Type>::decoupledPreconditionT
 (
     Field<Type>& xT,
     const Field<Type>& bT

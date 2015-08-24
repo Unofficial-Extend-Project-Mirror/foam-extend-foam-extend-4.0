@@ -21,68 +21,22 @@ License
     You should have received a copy of the GNU General Public License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
-Class
-    BlockGaussSeidelPrecon
-
-Description
-    Template specialisation for tensor block Gauss-Seidel preconditioning
-
-Author
-    Hrvoje Jasak, Wikki Ltd.  All rights reserved
-
-SourceFiles
-    tensorBlockGaussSeidelPrecon.C
-
 \*---------------------------------------------------------------------------*/
 
-#ifndef tensorBlockGaussSeidelPrecon_H
-#define tensorBlockGaussSeidelPrecon_H
-
-#include "BlockGaussSeidelPrecon.H"
-#include "tensorBlockGaussSeidelPrecon.H"
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+#include "blockLduMatrices.H"
+#include "blockLduPrecons.H"
+#include "blockDiagCholeskyPrecons.H"
+#include "addToRunTimeSelectionTable.H"
 
 namespace Foam
 {
 
-template<>
-void BlockGaussSeidelPrecon<tensor>::calcInvDiag()
-{
-    calcDecoupledInvDiag();
-}
+// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-
-template<>
-void BlockGaussSeidelPrecon<tensor>::precondition
-(
-    tensorField& x,
-    const tensorField& b
-) const
-{
-    // Decoupled version
-    decoupledPrecondition(x, b);
-}
-
-
-template<>
-void BlockGaussSeidelPrecon<tensor>::preconditionT
-(
-    tensorField& xT,
-    const tensorField& bT
-) const
-{
-    // Decoupled version
-    decoupledPreconditionT(xT, bT);
-}
-
+makeBlockPrecons(blockDiagCholeskyPrecon);
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-#endif
 
 // ************************************************************************* //

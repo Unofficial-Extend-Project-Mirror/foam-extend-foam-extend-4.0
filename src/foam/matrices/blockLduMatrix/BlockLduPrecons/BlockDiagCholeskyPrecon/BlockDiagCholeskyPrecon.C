@@ -24,16 +24,16 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "error.H"
-#include "BlockCholeskyPrecon.H"
+#include "BlockDiagCholeskyPrecon.H"
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
 template<class Type>
-void Foam::BlockCholeskyPrecon<Type>::calcPreconDiag()
+void Foam::BlockDiagCholeskyPrecon<Type>::calcPreconDiag()
 {
-    typedef CoeffField<Type> TypeCoeffField;
-
     // Note: Assuming lower and upper triangle have the same active type
+
+    typedef CoeffField<Type> TypeCoeffField;
 
     if (this->matrix_.symmetric())
     {
@@ -222,13 +222,56 @@ void Foam::BlockCholeskyPrecon<Type>::calcPreconDiag()
     }
 
     // Invert the diagonal
-    preconDiag_ = inv(preconDiag_);
+//     if (preconDiag_.activeType() == blockCoeffBase::SQUARE)
+//     {
+//         typedef typename TypeCoeffField::linearTypeField linearTypeField;
+//         typedef typename TypeCoeffField::linearType valueType;
+
+//         typedef typename TypeCoeffField::squareTypeField squareTypeField;
+
+//         // Special practice: invert only diagonal of diag coefficient
+//         Info<< "Special preconDiag" << endl;
+
+//         // Get reference to active diag
+//         const squareTypeField& activeDiag = preconDiag_.asSquare();
+
+//         // Get reference to LU: remove diagonal from active diag
+//         squareTypeField& luDiag = LUDiag_.asSquare();
+
+//         linearTypeField lf(preconDiag_.size());
+
+//         // Take out the diagonal from the diag as a linear type
+//         contractLinear(lf, activeDiag);
+
+//         expandLinear(luDiag, lf);
+
+//         // Keep only off-diagonal in luDiag
+//         // Note change of sign to avoid multiplication with -1 when moving
+//         // to the other side.  HJ, 20/Aug/2015
+//         luDiag -= activeDiag;
+
+//         // Store inverse of diagonal
+//         preconDiag_.clear();
+
+//         // Invert the diagonal part into lf
+//         preconDiag_.asLinear() =
+//             cmptDivide
+//             (
+//                 linearTypeField(lf.size(), pTraits<valueType>::one),
+//                 lf
+//             );
+//     }
+//     else
+    {
+        preconDiag_ = inv(preconDiag_);
+        LUDiag_.asScalar() = 0;
+    }
 }
 
 
 template<class Type>
 template<class DiagType, class ULType>
-void Foam::BlockCholeskyPrecon<Type>::diagMultiply
+void Foam::BlockDiagCholeskyPrecon<Type>::diagMultiply
 (
     Field<DiagType>& dDiag,
     const Field<ULType>& upper
@@ -258,7 +301,7 @@ void Foam::BlockCholeskyPrecon<Type>::diagMultiply
 
 template<class Type>
 template<class DiagType, class ULType>
-void Foam::BlockCholeskyPrecon<Type>::diagMultiplyCoeffT
+void Foam::BlockDiagCholeskyPrecon<Type>::diagMultiplyCoeffT
 (
     Field<DiagType>& dDiag,
     const Field<ULType>& upper
@@ -288,7 +331,7 @@ void Foam::BlockCholeskyPrecon<Type>::diagMultiplyCoeffT
 
 template<class Type>
 template<class DiagType, class ULType>
-void Foam::BlockCholeskyPrecon<Type>::diagMultiply
+void Foam::BlockDiagCholeskyPrecon<Type>::diagMultiply
 (
     Field<DiagType>& dDiag,
     const Field<ULType>& lower,
@@ -319,7 +362,7 @@ void Foam::BlockCholeskyPrecon<Type>::diagMultiply
 
 template<class Type>
 template<class DiagType, class ULType>
-void Foam::BlockCholeskyPrecon<Type>::ILUmultiply
+void Foam::BlockDiagCholeskyPrecon<Type>::ILUmultiply
 (
     Field<Type>& x,
     const Field<DiagType>& dDiag,
@@ -362,7 +405,7 @@ void Foam::BlockCholeskyPrecon<Type>::ILUmultiply
 
 template<class Type>
 template<class DiagType, class ULType>
-void Foam::BlockCholeskyPrecon<Type>::ILUmultiplyCoeffT
+void Foam::BlockDiagCholeskyPrecon<Type>::ILUmultiplyCoeffT
 (
     Field<Type>& x,
     const Field<DiagType>& dDiag,
@@ -405,7 +448,7 @@ void Foam::BlockCholeskyPrecon<Type>::ILUmultiplyCoeffT
 
 template<class Type>
 template<class DiagType, class ULType>
-void Foam::BlockCholeskyPrecon<Type>::ILUmultiply
+void Foam::BlockDiagCholeskyPrecon<Type>::ILUmultiply
 (
     Field<Type>& x,
     const Field<DiagType>& dDiag,
@@ -454,7 +497,7 @@ void Foam::BlockCholeskyPrecon<Type>::ILUmultiply
 
 template<class Type>
 template<class DiagType, class ULType>
-void Foam::BlockCholeskyPrecon<Type>::ILUmultiplyTranspose
+void Foam::BlockDiagCholeskyPrecon<Type>::ILUmultiplyTranspose
 (
     Field<Type>& x,
     const Field<DiagType>& dDiag,
@@ -506,27 +549,31 @@ void Foam::BlockCholeskyPrecon<Type>::ILUmultiplyTranspose
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 template<class Type>
-Foam::BlockCholeskyPrecon<Type>::BlockCholeskyPrecon
+Foam::BlockDiagCholeskyPrecon<Type>::BlockDiagCholeskyPrecon
 (
     const BlockLduMatrix<Type>& matrix
 )
 :
     BlockLduPrecon<Type>(matrix),
-    preconDiag_(matrix.diag())
+    preconDiag_(matrix.diag()),
+    LUDiag_(matrix.lduAddr().size()),
+    bPlusLU_()
 {
     calcPreconDiag();
 }
 
 
 template<class Type>
-Foam::BlockCholeskyPrecon<Type>::BlockCholeskyPrecon
+Foam::BlockDiagCholeskyPrecon<Type>::BlockDiagCholeskyPrecon
 (
     const BlockLduMatrix<Type>& matrix,
     const dictionary& dict
 )
 :
     BlockLduPrecon<Type>(matrix),
-    preconDiag_(matrix.diag())
+    preconDiag_(matrix.diag()),
+    LUDiag_(matrix.lduAddr().size()),
+    bPlusLU_()
 {
     calcPreconDiag();
 }
@@ -535,14 +582,14 @@ Foam::BlockCholeskyPrecon<Type>::BlockCholeskyPrecon
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
 template<class Type>
-Foam::BlockCholeskyPrecon<Type>::~BlockCholeskyPrecon()
+Foam::BlockDiagCholeskyPrecon<Type>::~BlockDiagCholeskyPrecon()
 {}
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 template<class Type>
-void Foam::BlockCholeskyPrecon<Type>::precondition
+void Foam::BlockDiagCholeskyPrecon<Type>::precondition
 (
     Field<Type>& x,
     const Field<Type>& b
@@ -554,9 +601,10 @@ void Foam::BlockCholeskyPrecon<Type>::precondition
 
     if (this->matrix_.symmetric())
     {
+        const TypeCoeffField& DiagCoeff = this->matrix_.diag();
         const TypeCoeffField& UpperCoeff = this->matrix_.upper();
 
-        if (preconDiag_.activeType() == blockCoeffBase::SCALAR)
+        if (DiagCoeff.activeType() == blockCoeffBase::SCALAR)
         {
             if (UpperCoeff.activeType() == blockCoeffBase::SCALAR)
             {
@@ -590,7 +638,7 @@ void Foam::BlockCholeskyPrecon<Type>::precondition
                 );
             }
         }
-        else if (preconDiag_.activeType() == blockCoeffBase::LINEAR)
+        else if (DiagCoeff.activeType() == blockCoeffBase::LINEAR)
         {
             if (UpperCoeff.activeType() == blockCoeffBase::SCALAR)
             {
@@ -624,47 +672,63 @@ void Foam::BlockCholeskyPrecon<Type>::precondition
                 );
             }
         }
-        else if (preconDiag_.activeType() == blockCoeffBase::SQUARE)
+        else if (DiagCoeff.activeType() == blockCoeffBase::SQUARE)
         {
+            // Add diag coupling to b
+            if (bPlusLU_.empty())
+            {
+                bPlusLU_.setSize(b.size(), pTraits<Type>::zero);
+            }
+
+            // Multiply overwrites bPlusLU_: no need to initialise
+            // Change of sign accounted via change of sign of bPlusLU_
+            // HJ, 20/Aug/2015
+            multiply(bPlusLU_, LUDiag_, x);
+            bPlusLU_ += b;
+
             if (UpperCoeff.activeType() == blockCoeffBase::SCALAR)
             {
+                // Note linear preconDiag due to decoupling
                 ILUmultiply
                 (
                     x,
-                    preconDiag_.asSquare(),
+                    preconDiag_.asLinear(),
                     UpperCoeff.asScalar(),
-                    b
+                    bPlusLU_
                 );
             }
             else if (UpperCoeff.activeType() == blockCoeffBase::LINEAR)
             {
+                // Note linear preconDiag due to decoupling
                 ILUmultiply
                 (
                     x,
-                    preconDiag_.asSquare(),
+                    preconDiag_.asLinear(),
                     UpperCoeff.asLinear(),
-                    b
+                    bPlusLU_
                 );
             }
             else if (UpperCoeff.activeType() == blockCoeffBase::SQUARE)
             {
                 // Multiplication using transposed upper square coefficient
+                // Note linear preconDiag due to decoupling
                 ILUmultiplyCoeffT
                 (
                     x,
-                    preconDiag_.asSquare(),
+                    preconDiag_.asLinear(),
                     UpperCoeff.asSquare(),
-                    b
+                    bPlusLU_
                 );
             }
         }
     }
     else // Asymmetric matrix
     {
+        const TypeCoeffField& DiagCoeff = this->matrix_.diag();
         const TypeCoeffField& LowerCoeff = this->matrix_.lower();
         const TypeCoeffField& UpperCoeff = this->matrix_.upper();
 
-        if (preconDiag_.activeType() == blockCoeffBase::SCALAR)
+        if (DiagCoeff.activeType() == blockCoeffBase::SCALAR)
         {
             if (UpperCoeff.activeType() == blockCoeffBase::SCALAR)
             {
@@ -700,7 +764,7 @@ void Foam::BlockCholeskyPrecon<Type>::precondition
                 );
             }
         }
-        else if (preconDiag_.activeType() == blockCoeffBase::LINEAR)
+        else if (DiagCoeff.activeType() == blockCoeffBase::LINEAR)
         {
             if (UpperCoeff.activeType() == blockCoeffBase::SCALAR)
             {
@@ -736,39 +800,54 @@ void Foam::BlockCholeskyPrecon<Type>::precondition
                 );
             }
         }
-        else if (preconDiag_.activeType() == blockCoeffBase::SQUARE)
+        else if (DiagCoeff.activeType() == blockCoeffBase::SQUARE)
         {
+            // Add diag coupling to b
+            if (bPlusLU_.empty())
+            {
+                bPlusLU_.setSize(b.size(), pTraits<Type>::zero);
+            }
+
+            // Multiply overwrites bPlusLU_: no need to initialise
+            // Change of sign accounted via change of sign of bPlusLU_
+            // HJ, 20/Aug/2015
+            multiply(bPlusLU_, LUDiag_, x);
+            bPlusLU_ += b;
+
             if (UpperCoeff.activeType() == blockCoeffBase::SCALAR)
             {
+                // Note linear preconDiag due to decoupling
                 ILUmultiply
                 (
                     x,
-                    preconDiag_.asSquare(),
+                    preconDiag_.asLinear(),
                     LowerCoeff.asScalar(),
                     UpperCoeff.asScalar(),
-                    b
+                    bPlusLU_
                 );
             }
             else if (UpperCoeff.activeType() == blockCoeffBase::LINEAR)
             {
+                // Note linear preconDiag due to decoupling
                 ILUmultiply
                 (
                     x,
-                    preconDiag_.asSquare(),
+                    preconDiag_.asLinear(),
                     LowerCoeff.asLinear(),
                     UpperCoeff.asLinear(),
-                    b
+                    bPlusLU_
                 );
             }
             else if (UpperCoeff.activeType() == blockCoeffBase::SQUARE)
             {
+                // Note linear preconDiag due to decoupling
                 ILUmultiply
                 (
                     x,
-                    preconDiag_.asSquare(),
+                    preconDiag_.asLinear(),
                     LowerCoeff.asSquare(),
                     UpperCoeff.asSquare(),
-                    b
+                    bPlusLU_
                 );
             }
         }
@@ -777,7 +856,7 @@ void Foam::BlockCholeskyPrecon<Type>::precondition
 
 
 template<class Type>
-void Foam::BlockCholeskyPrecon<Type>::preconditionT
+void Foam::BlockDiagCholeskyPrecon<Type>::preconditionT
 (
     Field<Type>& xT,
     const Field<Type>& bT
@@ -793,10 +872,11 @@ void Foam::BlockCholeskyPrecon<Type>::preconditionT
     }
     else // Asymmetric matrix
     {
+        const TypeCoeffField& DiagCoeff = this->matrix_.diag();
         const TypeCoeffField& LowerCoeff = this->matrix_.lower();
         const TypeCoeffField& UpperCoeff = this->matrix_.upper();
 
-        if (preconDiag_.activeType() == blockCoeffBase::SCALAR)
+        if (DiagCoeff.activeType() == blockCoeffBase::SCALAR)
         {
             if (UpperCoeff.activeType() == blockCoeffBase::SCALAR)
             {
@@ -832,7 +912,7 @@ void Foam::BlockCholeskyPrecon<Type>::preconditionT
                 );
             }
         }
-        else if (preconDiag_.activeType() == blockCoeffBase::LINEAR)
+        else if (DiagCoeff.activeType() == blockCoeffBase::LINEAR)
         {
             if (UpperCoeff.activeType() == blockCoeffBase::SCALAR)
             {
@@ -868,39 +948,54 @@ void Foam::BlockCholeskyPrecon<Type>::preconditionT
                 );
             }
         }
-        else if (preconDiag_.activeType() == blockCoeffBase::SQUARE)
+        else if (DiagCoeff.activeType() == blockCoeffBase::SQUARE)
         {
+            // Add diag coupling to b
+            if (bPlusLU_.empty())
+            {
+                bPlusLU_.setSize(bT.size(), pTraits<Type>::zero);
+            }
+
+            // Multiply overwrites bPlusLU_: no need to initialise
+            // Change of sign accounted via change of sign of bPlusLU_
+            // HJ, 20/Aug/2015
+            multiply(bPlusLU_, LUDiag_, xT);
+            bPlusLU_ += bT;
+
             if (UpperCoeff.activeType() == blockCoeffBase::SCALAR)
             {
+                // Note linear preconDiag due to decoupling
                 ILUmultiplyTranspose
                 (
                     xT,
-                    preconDiag_.asSquare(),
+                    preconDiag_.asLinear(),
                     LowerCoeff.asScalar(),
                     UpperCoeff.asScalar(),
-                    bT
+                    bPlusLU_
                 );
             }
             else if (UpperCoeff.activeType() == blockCoeffBase::LINEAR)
             {
+                // Note linear preconDiag due to decoupling
                 ILUmultiplyTranspose
                 (
                     xT,
-                    preconDiag_.asSquare(),
+                    preconDiag_.asLinear(),
                     LowerCoeff.asLinear(),
                     UpperCoeff.asLinear(),
-                    bT
+                    bPlusLU_
                 );
             }
             else if (UpperCoeff.activeType() == blockCoeffBase::SQUARE)
             {
+                // Note linear preconDiag due to decoupling
                 ILUmultiplyTranspose
                 (
                     xT,
-                    preconDiag_.asSquare(),
+                    preconDiag_.asLinear(),
                     LowerCoeff.asSquare(),
                     UpperCoeff.asSquare(),
-                    bT
+                    bPlusLU_
                 );
             }
         }

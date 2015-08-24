@@ -483,11 +483,11 @@ operator*(const VectorN<Cmpt, length>& v1, const VectorN<Cmpt, length>& v2)
 
 //- Addition of TensorN and TensorN
 template <class Cmpt, int length>
-inline TensorN<Cmpt,length>
-operator+(const TensorN<Cmpt,length>& t1, const TensorN<Cmpt,length>& t2)
+inline TensorN<Cmpt, length>
+operator+(const TensorN<Cmpt, length>& t1, const TensorN<Cmpt, length>& t2)
 {
-    TensorN<Cmpt,length> res;
-    VectorSpaceOps<TensorN<Cmpt,length>::nComponents,0>::op
+    TensorN<Cmpt, length> res;
+    VectorSpaceOps<TensorN<Cmpt, length>::nComponents,0>::op
     (
         res,
         t1,
@@ -501,8 +501,8 @@ operator+(const TensorN<Cmpt,length>& t1, const TensorN<Cmpt,length>& t2)
 
 //- Addition of TensorN and DiagTensorN
 template <class Cmpt, int length>
-inline TensorN<Cmpt,length>
-operator+(const TensorN<Cmpt,length>& t1, const DiagTensorN<Cmpt,length>& dt2)
+inline TensorN<Cmpt, length>
+operator+(const TensorN<Cmpt, length>& t1, const DiagTensorN<Cmpt, length>& dt2)
 {
     TensorN<Cmpt, length> result(t1);
 
@@ -519,8 +519,8 @@ operator+(const TensorN<Cmpt,length>& t1, const DiagTensorN<Cmpt,length>& dt2)
 
 //- Addition of DiagTensorN and TensorN
 template <class Cmpt, int length>
-inline TensorN<Cmpt,length>
-operator+(const DiagTensorN<Cmpt,length>& dt1, const TensorN<Cmpt,length>& t2)
+inline TensorN<Cmpt, length>
+operator+(const DiagTensorN<Cmpt, length>& dt1, const TensorN<Cmpt, length>& t2)
 {
     TensorN<Cmpt, length> result(t2);
 
@@ -537,11 +537,11 @@ operator+(const DiagTensorN<Cmpt,length>& dt1, const TensorN<Cmpt,length>& t2)
 
 //- Addition of TensorN and SphericalTensorN
 template <class Cmpt, int length>
-inline TensorN<Cmpt,length>
+inline TensorN<Cmpt, length>
 operator+
 (
-    const TensorN<Cmpt,length>& t1,
-    const SphericalTensorN<Cmpt,length>& st2
+    const TensorN<Cmpt, length>& t1,
+    const SphericalTensorN<Cmpt, length>& st2
 )
 {
     TensorN<Cmpt, length> result(t1);
@@ -560,11 +560,11 @@ operator+
 
 //- Addition of SphericalTensorN and TensorN
 template <class Cmpt, int length>
-inline TensorN<Cmpt,length>
+inline TensorN<Cmpt, length>
 operator+
 (
-    const SphericalTensorN<Cmpt,length>& st1,
-    const TensorN<Cmpt,length>& t2
+    const SphericalTensorN<Cmpt, length>& st1,
+    const TensorN<Cmpt, length>& t2
 )
 {
     TensorN<Cmpt, length> result(t2);
@@ -583,11 +583,11 @@ operator+
 
 //- Subtraction of TensorN and TensorN
 template <class Cmpt, int length>
-inline TensorN<Cmpt,length>
-operator-(const TensorN<Cmpt,length>& t1, const TensorN<Cmpt,length>& t2)
+inline TensorN<Cmpt, length>
+operator-(const TensorN<Cmpt, length>& t1, const TensorN<Cmpt, length>& t2)
 {
-    TensorN<Cmpt,length> res;
-    VectorSpaceOps<TensorN<Cmpt,length>::nComponents,0>::op
+    TensorN<Cmpt, length> res;
+    VectorSpaceOps<TensorN<Cmpt, length>::nComponents,0>::op
     (
         res,
         t1,
@@ -601,8 +601,8 @@ operator-(const TensorN<Cmpt,length>& t1, const TensorN<Cmpt,length>& t2)
 
 //- Subtraction of TensorN and DiagTensorN
 template <class Cmpt, int length>
-inline TensorN<Cmpt,length>
-operator-(const TensorN<Cmpt,length>& t1, const DiagTensorN<Cmpt,length>& dt2)
+inline TensorN<Cmpt, length>
+operator-(const TensorN<Cmpt, length>& t1, const DiagTensorN<Cmpt, length>& dt2)
 {
     TensorN<Cmpt, length> result(t1);
 
@@ -619,8 +619,8 @@ operator-(const TensorN<Cmpt,length>& t1, const DiagTensorN<Cmpt,length>& dt2)
 
 //- Subtraction of DiagTensorN and TensorN
 template <class Cmpt, int length>
-inline TensorN<Cmpt,length>
-operator-(const DiagTensorN<Cmpt,length>& dt1, const TensorN<Cmpt,length>& t2)
+inline TensorN<Cmpt, length>
+operator-(const DiagTensorN<Cmpt, length>& dt1, const TensorN<Cmpt, length>& t2)
 {
     TensorN<Cmpt, length> result(-t2);
 
@@ -637,11 +637,11 @@ operator-(const DiagTensorN<Cmpt,length>& dt1, const TensorN<Cmpt,length>& t2)
 
 //- Subtraction of TensorN and SphericalTensorN
 template <class Cmpt, int length>
-inline TensorN<Cmpt,length>
+inline TensorN<Cmpt, length>
 operator-
 (
-    const TensorN<Cmpt,length>& t1,
-    const SphericalTensorN<Cmpt,length>& st2
+    const TensorN<Cmpt, length>& t1,
+    const SphericalTensorN<Cmpt, length>& st2
 )
 {
     TensorN<Cmpt, length> result(t1);
@@ -660,11 +660,11 @@ operator-
 
 //- Subtraction of SphericalTensorN and TensorN
 template <class Cmpt, int length>
-inline TensorN<Cmpt,length>
+inline TensorN<Cmpt, length>
 operator-
 (
-    const SphericalTensorN<Cmpt,length>& st1,
-    const TensorN<Cmpt,length>& t2
+    const SphericalTensorN<Cmpt, length>& st1,
+    const TensorN<Cmpt, length>& t2
 )
 {
     TensorN<Cmpt, length> result(-t2);
@@ -683,24 +683,24 @@ operator-
 
 //- Division of a scalar by a TensorN
 template <class Cmpt, int length>
-inline TensorN<Cmpt,length>
-operator/(const scalar s, const TensorN<Cmpt,length>& t)
+inline TensorN<Cmpt, length>
+operator/(const scalar s, const TensorN<Cmpt, length>& t)
 {
     return s*inv(t);
 }
 
 //- Inner Product of a VectorN by an inverse TensorN
 template <class Cmpt, int length>
-inline VectorN<Cmpt,length>
-operator/(const VectorN<Cmpt,length>& v, const TensorN<Cmpt,length>& t)
+inline VectorN<Cmpt, length>
+operator/(const VectorN<Cmpt, length>& v, const TensorN<Cmpt, length>& t)
 {
     return v & inv(t);
 }
 
 //- Inner Product of a TensorN by an inverse TensorN
 template <class Cmpt, int length>
-inline TensorN<Cmpt,length>
-operator/(const TensorN<Cmpt,length>& t1, const TensorN<Cmpt,length>& t2)
+inline TensorN<Cmpt, length>
+operator/(const TensorN<Cmpt, length>& t1, const TensorN<Cmpt, length>& t2)
 {
     return t1 & inv(t2);
 }
@@ -708,8 +708,8 @@ operator/(const TensorN<Cmpt,length>& t1, const TensorN<Cmpt,length>& t2)
 
 //- Inner Product of a DiagTensorN and an inverse TensorN
 template <class Cmpt, int length>
-inline TensorN<Cmpt,length>
-operator/(const DiagTensorN<Cmpt,length>& dt1, const TensorN<Cmpt,length>& t2)
+inline TensorN<Cmpt, length>
+operator/(const DiagTensorN<Cmpt, length>& dt1, const TensorN<Cmpt, length>& t2)
 {
     return dt1 & inv(t2);
 }
@@ -717,8 +717,8 @@ operator/(const DiagTensorN<Cmpt,length>& dt1, const TensorN<Cmpt,length>& t2)
 
 //- Inner Product of a TensorN and an inverse DiagTensorN
 template <class Cmpt, int length>
-inline TensorN<Cmpt,length>
-operator/(const TensorN<Cmpt,length>& t1, const DiagTensorN<Cmpt,length>& dt2)
+inline TensorN<Cmpt, length>
+operator/(const TensorN<Cmpt, length>& t1, const DiagTensorN<Cmpt, length>& dt2)
 {
     return t1 & inv(dt2);
 }
@@ -726,11 +726,11 @@ operator/(const TensorN<Cmpt,length>& t1, const DiagTensorN<Cmpt,length>& dt2)
 
 //- Inner Product of a SphericalTensorN and an inverse TensorN
 template <class Cmpt, int length>
-inline TensorN<Cmpt,length>
+inline TensorN<Cmpt, length>
 operator/
 (
-    const SphericalTensorN<Cmpt,length>& st1,
-    const TensorN<Cmpt,length>& t2
+    const SphericalTensorN<Cmpt, length>& st1,
+    const TensorN<Cmpt, length>& t2
 )
 {
     return st1.v_[0] * inv(t2);
@@ -739,11 +739,11 @@ operator/
 
 //- Inner Product of a TensorN and an inverse SphericalTensorN
 template <class Cmpt, int length>
-inline TensorN<Cmpt,length>
+inline TensorN<Cmpt, length>
 operator/
 (
-    const TensorN<Cmpt,length>& t1,
-    const SphericalTensorN<Cmpt,length>& st2
+    const TensorN<Cmpt, length>& t1,
+    const SphericalTensorN<Cmpt, length>& st2
 )
 {
     TensorN<Cmpt, length> result;
