@@ -97,6 +97,17 @@ Group: 			Development/Tools
     # Download prequisite libraries
     ./contrib/download_prerequisites
 
+    # Fixing an old bug related to gmp and m4 and gcc
+    # See https://gmplib.org/list-archives/gmp-bugs/2008-August/001114.html
+    # This bug will occur when compiling gmp as an internal gcc package.
+    # This bug will occur on Centos 6.2. and probably on other OSes as well
+    cp gmp/configure.in gmp/configure.in.orig
+    cp gmp/configure gmp/configure.orig
+    sed "s/m4-not-needed/m4/g" gmp/configure.in > gmp/configure.in.patched 
+    sed "s/m4-not-needed/m4/g" gmp/configure > gmp/configure.patched 
+    mv gmp/configure.in.patched gmp/configure.in
+    mv gmp/configure.patched gmp/configure
+
     # Create working directory
     mkdir ./objBuildDir
     cd ./objBuildDir
