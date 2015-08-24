@@ -79,10 +79,10 @@ SET(
     CACHE STRING "Build ID"
 )
 
-# We allow overriding the git branch and revision information with some 
+# We allow overriding the git branch and revision information with some
 # user-supplied information using the CDASH_SCM_INFO environment variable.
 #
-# Mercurial or other SCM users should be using this environment variable 
+# Mercurial or other SCM users should be using this environment variable
 # in order to provide branch and revision information for the buildname.
 #
 # Git users should use this environment variable in order to provide
@@ -137,7 +137,7 @@ if(NOT BUILDNAME_SCM_INFO STREQUAL "")
 
 elseif(GIT_FOUND)
     message("The git command was found: ${GIT_EXECUTABLE}")
-  
+
     # Check if the source code is under a valid git repository
     execute_process(
       COMMAND           git status
@@ -164,11 +164,43 @@ elseif(GIT_FOUND)
 
         SET(BUILDNAME "${BUILDNAME}-git-branch=${GIT_BRANCH_NAME}")
         SET(BUILDNAME "${BUILDNAME}-git-rev=${GIT_REV_NUMBER}")
-	else()
-        # Not a git repository: no branch nor revision information available
-		SET(BUILDNAME "${BUILDNAME}-git-branch=unknown")
-		SET(BUILDNAME "${BUILDNAME}-git-rev=unknown")
-	endif()	
+    else()
+        execute_process(
+          COMMAND           hg id
+          WORKING_DIRECTORY ${FOAM_ROOT}
+          OUTPUT_VARIABLE   HG_STATUS
+          RESULT_VARIABLE   HG_ECODE
+          ERROR_QUIET
+          )
+        if(NOT HG_ECODE)
+          # We have a valid git repository. Grab the branch and revision info.
+          # Add to the build name
+          message("No git-branch. Mercurial?")
+          EXEC_PROGRAM(hg
+            ARGS id --bookmarks
+            OUTPUT_VARIABLE GIT_BRANCH_NAME
+            )
+          EXEC_PROGRAM(hg
+            ARGS id --id
+            OUTPUT_VARIABLE GIT_REV_NUMBER
+            )
+          EXEC_PROGRAM(hg
+            ARGS log --template='git_{gitnode|short}' -l 1
+            OUTPUT_VARIABLE GIT_REAL_REV_NUMBER
+            )
+          string(REPLACE " " "_" GIT_BRANCH_NAME ${GIT_BRANCH_NAME})
+          string(REPLACE "+" ":modified" GIT_REV_NUMBER ${GIT_REV_NUMBER})
+          SET(GIT_REV_NUMBER "${GIT_REV_NUMBER}_${GIT_REAL_REV_NUMBER}")
+          message("Git branch (mercurial): ${GIT_BRANCH_NAME} Revision: ${GIT_REV_NUMBER}")
+
+          SET(BUILDNAME "${BUILDNAME}-hg-branch=${GIT_BRANCH_NAME}")
+          SET(BUILDNAME "${BUILDNAME}-hg-rev=${GIT_REV_NUMBER}")
+        else()
+          # Not a git or mercurial repository: no branch nor revision information available
+	  SET(BUILDNAME "${BUILDNAME}-git-branch=unknown")
+	  SET(BUILDNAME "${BUILDNAME}-git-rev=unknown")
+        endif()
+    endif()
 else()
     # Git is not available: no branch nor revision information supplied
     SET(BUILDNAME "${BUILDNAME}-git-branch=unknown")
@@ -181,6 +213,8 @@ string(REPLACE "/" "_" BUILDNAME ${BUILDNAME})
 string(REPLACE " " "_" BUILDNAME ${BUILDNAME})
 string(REPLACE "/" "_" SITE ${SITE})
 string(REPLACE " " "_" SITE ${SITE})
+
+message("Build name: ${BUILDNAME}")
 
 # Build section
 #-----------------------------------------------------------------------------
