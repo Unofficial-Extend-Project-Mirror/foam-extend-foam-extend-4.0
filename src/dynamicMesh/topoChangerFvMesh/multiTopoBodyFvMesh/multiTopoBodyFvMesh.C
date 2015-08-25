@@ -236,7 +236,9 @@ bool Foam::multiTopoBodyFvMesh::update()
 //         pointField mappedOldPointsNew(allPoints().size());
 //         mappedOldPointsNew.map(oldPointsNew, topoChangeMap->pointMap());
 
-//         movePoints(mappedOldPointsNew);
+//         // Note: using setOldPoints instead of movePoints.
+//         // HJ, 23/Aug/2015
+//         setOldPoints(mappedOldPointsNew);
 //         resetMotion();
 //         setV0();
 
