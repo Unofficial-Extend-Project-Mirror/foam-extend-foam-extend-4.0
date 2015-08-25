@@ -477,7 +477,9 @@ bool Foam::mixerFvMesh::update()
             pointField mappedOldPointsNew(allPoints().size());
             mappedOldPointsNew.map(oldPointsNew, topoChangeMap->pointMap());
 
-            movePoints(mappedOldPointsNew);
+            // Note: using setOldPoints instead of movePoints.
+            // HJ, 23/Aug/2015
+            setOldPoints(mappedOldPointsNew);
 
             resetMotion();
             setV0();
@@ -488,7 +490,10 @@ bool Foam::mixerFvMesh::update()
         else
         {
             pointField newPoints = allPoints();
-            movePoints(oldPointsNew);
+
+            // Note: using setOldPoints instead of movePoints.
+            // HJ, 23/Aug/2015
+            setOldPoints(oldPointsNew);
 
             resetMotion();
             setV0();

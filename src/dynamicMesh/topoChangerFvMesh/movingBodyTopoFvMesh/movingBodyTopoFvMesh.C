@@ -276,7 +276,9 @@ bool Foam::movingBodyTopoFvMesh::update()
 //         pointField mappedOldPointsNew(allPoints().size());
 //         mappedOldPointsNew.map(oldPointsNew, topoChangeMap->pointMap());
 
-//         movePoints(mappedOldPointsNew);
+//         // Note: using setOldPoints instead of movePoints.
+//         // HJ, 23/Aug/2015
+//         setOldPoints(mappedOldPointsNew);
 //         resetMotion();
 //         setV0();
 
@@ -286,7 +288,9 @@ bool Foam::movingBodyTopoFvMesh::update()
 //     else
 //     {
 //         // No change, use old points
-//         movePoints(oldPointsNew);
+//         // Note: using setOldPoints instead of movePoints.
+//         // HJ, 23/Aug/2015
+//         setOldPoints(oldPointsNew);
 //         resetMotion();
 //         setV0();
 //     }
