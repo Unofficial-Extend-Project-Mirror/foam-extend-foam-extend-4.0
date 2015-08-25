@@ -110,7 +110,6 @@ public:
 
     typedef fvPatch Patch;
 
-
     //- Runtime type information
     TypeName("fvPatchField");
 
