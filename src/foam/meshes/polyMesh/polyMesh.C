@@ -1243,7 +1243,6 @@ void Foam::polyMesh::setOldPoints
     const pointField& setPoints
 )
 {
-
     if(setPoints.size() != allPoints_.size())
     {
             FatalErrorIn
