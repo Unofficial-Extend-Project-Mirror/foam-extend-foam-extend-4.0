@@ -19,16 +19,13 @@ FoamFile
 
 surfaceFile "5415Joined3.ftr";
 
-maxCellSize 100;
-
-boundaryCellSize    50;
-//boundaryCellSizeRefinementThickness 50;
+maxCellSize 150;
 
 surfaceMeshRefinement
 {
     hull
     {
-        additionalRefinementLevels  3;
+        additionalRefinementLevels  1;
         surfaceFile "5415Joined1.stl";
         refinementThickness 50;
     }
@@ -86,7 +83,7 @@ boundaryLayers
     optimisationParameters
     {
         nSmoothNormals 3;
-        maxNumIterations 5;
+        maxNumIterations 2;
         featureSizeFactor 0.4;
         reCalculateNormals 1;
         relThicknessTol 0.1;

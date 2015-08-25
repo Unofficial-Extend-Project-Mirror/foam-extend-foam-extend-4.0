@@ -21,23 +21,21 @@ surfaceFile "geom.stl";
 
 maxCellSize 0.2;
 
-boundaryCellSize 0.025;
-
-minCellSize 0.0125;
+boundaryCellSize 0.1;
 
 localRefinement
 {
     defaultFaces0006
     {
-        cellSize 0.005;
+        cellSize 0.01;
     }
     defaultFaces0007
     {
-        cellSize 0.0025;
+        cellSize 0.005;
     }
     defaultFaces0009
     {
-        cellSize 0.0025;
+        cellSize 0.005;
     }
 }
 
