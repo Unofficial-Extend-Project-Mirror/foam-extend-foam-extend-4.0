@@ -195,8 +195,7 @@ void Foam::ggiPolyPatch::calcPatchToPatch() const
         if (debug)
         {
             InfoIn("void ggiPolyPatch::calcPatchToPatch() const")
-                << "Calculating patch to patch interpolation for patch" 
-                << name() << endl;
+                << "Calculating patch to patch interpolation" << endl;
         }
 
         // Create interpolation for zones
@@ -257,13 +256,6 @@ void Foam::ggiPolyPatch::calcReconFaceCellCentres() const
             "void ggiPolyPatch::calcReconFaceCellCentres() const"
         )   << "Reconstructed cell centres already calculated"
             << abort(FatalError);
-    }
-
-    if (debug)
-    {
-        InfoIn("void ggiPolyPatch::calcReconFaceCellCentres() const")
-            << "Calculating recon centres for patch" 
-            << name() << endl;
     }
 
     // Create neighbouring face centres using interpolation
@@ -374,7 +366,7 @@ void Foam::ggiPolyPatch::calcSendReceive() const
     if (debug)
     {
         Pout<< "ggiPolyPatch::calcSendReceive() const for patch "
-            << name() << endl;
+            << index() << endl;
     }
 
     if (!Pstream::parRun())
