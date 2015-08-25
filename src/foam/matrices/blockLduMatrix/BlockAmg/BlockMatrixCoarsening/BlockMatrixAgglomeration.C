@@ -34,11 +34,12 @@ Author
 
 #include "BlockMatrixAgglomeration.H"
 #include "boolList.H"
+#include "tolerancesSwitch.H"
 #include "coeffFields.H"
 #include "addToRunTimeSelectionTable.H"
 #include "BlockGAMGInterfaceField.H"
 #include "processorLduInterfaceField.H"
-#include "tolerancesSwitch.H"
+#include "coarseBlockAmgLevel.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
@@ -397,14 +398,14 @@ Foam::BlockMatrixAgglomeration<Type>::~BlockMatrixAgglomeration()
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 template<class Type>
-Foam::autoPtr<Foam::BlockLduMatrix<Type> >
+Foam::autoPtr<Foam::BlockAmgLevel<Type> >
 Foam::BlockMatrixAgglomeration<Type>::restrictMatrix() const
 {
     if (!coarsen_)
     {
         FatalErrorIn
         (
-            "autoPtr<amgMatrix> "
+            "autoPtr<BlockAmgLevel<Type> > "
             "BlockMatrixAgglomeration<Type>::restrictMatrix() const"
         )   << "Requesting coarse matrix when it cannot be created"
             << abort(FatalError);
@@ -434,8 +435,8 @@ Foam::BlockMatrixAgglomeration<Type>::restrictMatrix() const
     {
         FatalErrorIn
         (
-            "autoPtr<BlockLduMatrix<Type> > BlockMatrixAgglomeration<Type>::"
-            "restrictMatrix() const"
+            "autoPtr<BlockLduMatrix<Type> >"
+            "BlockMatrixAgglomeration<Type>::restrictMatrix() const"
         )   << "agglomIndex array does not correspond to fine level. " << endl
             << " Size: " << agglomIndex_.size()
             << " number of equations: " << matrix_.lduAddr().size()
@@ -609,23 +610,23 @@ Foam::BlockMatrixAgglomeration<Type>::restrictMatrix() const
         const_cast<BlockLduMatrix<Type>&>(matrix_).interfaces();
 
     // Set the coarse interfaces and coefficients
-    lduInterfacePtrsList* coarseInterfacesPtr =
-        new lduInterfacePtrsList(interfaceSize);
-    lduInterfacePtrsList& coarseInterfaces = *coarseInterfacesPtr;
+    lduInterfacePtrsList coarseInterfaces(interfaceSize);
 
     labelListList coarseInterfaceAddr(interfaceSize);
 
     // Add the coarse level
 
     // Set the coarse ldu addressing onto the list
-    lduPrimitiveMesh* coarseAddrPtr =
+    autoPtr<lduPrimitiveMesh> coarseAddrPtr
+    (
         new lduPrimitiveMesh
         (
             nCoarseEqns_,
             coarseOwner,
             coarseNeighbour,
             true
-        );
+        )
+    );
 
     // Initialise transfer of restrict addressing on the interface
     forAll (interfaceFields, intI)
@@ -679,7 +680,7 @@ Foam::BlockMatrixAgglomeration<Type>::restrictMatrix() const
                 intI,
                 GAMGInterface::New
                 (
-                    *coarseAddrPtr,
+                    coarseAddrPtr(),
                     fineInterface,
                     fineInterface.interfaceInternalField(agglomIndex_),
                     fineInterfaceAddr[intI]
@@ -702,15 +703,17 @@ Foam::BlockMatrixAgglomeration<Type>::restrictMatrix() const
     // Add interfaces
     coarseAddrPtr->addInterfaces
     (
-        *coarseInterfacesPtr,
+        coarseInterfaces,
         coarseInterfaceAddr,
         matrix_.patchSchedule()
     );
 
     // Set the coarse level matrix
-    BlockLduMatrix<Type>* coarseMatrixPtr =
-        new BlockLduMatrix<Type>(*coarseAddrPtr);
-    BlockLduMatrix<Type>& coarseMatrix = *coarseMatrixPtr;
+    autoPtr<BlockLduMatrix<Type> > coarseMatrixPtr
+    (
+        new BlockLduMatrix<Type>(coarseAddrPtr())
+    );
+    BlockLduMatrix<Type>& coarseMatrix = coarseMatrixPtr();
 
     typename BlockLduInterfaceFieldPtrsList<Type>::Type&
         coarseInterfaceFieldsTransfer =
@@ -818,7 +821,7 @@ Foam::BlockMatrixAgglomeration<Type>::restrictMatrix() const
             {
                 FatalErrorIn
                 (
-                    "autoPtr<amgMatrix>"
+                    "autoPtr<BlockAmgLevel<Type> >"
                     "BlockMatrixAgglomeration<Type>::restrictMatrix() const"
                 )   << "Matrix diagonal of square type and upper of "
                     << "linear type is not implemented"
@@ -828,7 +831,7 @@ Foam::BlockMatrixAgglomeration<Type>::restrictMatrix() const
             {
                 FatalErrorIn
                 (
-                    "autoPtr<amgMatrix>"
+                    "autoPtr<BlockAmgLevel<Type> >"
                     "BlockMatrixAgglomeration<Type>::restrictMatrix() const"
                 )   << "Matrix diagonal of square type and upper of "
                     << "scalar type is not implemented"
@@ -839,7 +842,7 @@ Foam::BlockMatrixAgglomeration<Type>::restrictMatrix() const
         {
                 FatalErrorIn
                 (
-                    "autoPtr<amgMatrix>"
+                    "autoPtr<BlockAmgLevel<Type> >"
                     "BlockMatrixAgglomeration<Type>::restrictMatrix() const"
                 )   << "Matrix diagonal of linear type not implemented"
                     << abort(FatalError);
@@ -848,7 +851,7 @@ Foam::BlockMatrixAgglomeration<Type>::restrictMatrix() const
         {
                 FatalErrorIn
                 (
-                    "autoPtr<amgMatrix>"
+                    "autoPtr<BlockAmgLevel<Type> >"
                     "BlockMatrixAgglomeration<Type>::restrictMatrix() const"
                 )   << "Matrix diagonal of scalar type not implemented"
                     << abort(FatalError);
@@ -900,7 +903,7 @@ Foam::BlockMatrixAgglomeration<Type>::restrictMatrix() const
             {
                 FatalErrorIn
                 (
-                    "autoPtr<amgMatrix>"
+                    "autoPtr<BlockAmgLevel<Type> >"
                     "BlockMatrixAgglomeration<Type>::restrictMatrix() const"
                 )   << "Matrix diagonal of square type and upper of "
                     << "linear type is not implemented"
@@ -910,7 +913,7 @@ Foam::BlockMatrixAgglomeration<Type>::restrictMatrix() const
             {
                 FatalErrorIn
                 (
-                    "autoPtr<amgMatrix>"
+                    "autoPtr<BlockAmgLevel<Type> >"
                     "BlockMatrixAgglomeration<Type>::restrictMatrix() const"
                 )   << "Matrix diagonal of square type and upper of "
                     << "scalar type is not implemented"
@@ -922,8 +925,8 @@ Foam::BlockMatrixAgglomeration<Type>::restrictMatrix() const
         {
                 FatalErrorIn
                 (
-                    "autoPtr<amgMatrix> BlockMatrixAgglomeration<Type>::"
-                    "restrictMatrix() const"
+                    "autoPtr<BlockAmgLevel<Type> > "
+                    "BlockMatrixAgglomeration<Type>::restrictMatrix() const"
                 )   << "Matrix diagonal of linear type not implemented"
                     << abort(FatalError);
         }
@@ -931,14 +934,25 @@ Foam::BlockMatrixAgglomeration<Type>::restrictMatrix() const
         {
                 FatalErrorIn
                 (
-                    "autoPtr<amgMatrix> BlockMatrixAgglomeration<Type>::"
-                    "restrictMatrix() const"
+                    "autoPtr<BlockAmgLevel<Type> > "
+                    "BlockMatrixAgglomeration<Type>::restrictMatrix() const"
                 )   << "Matrix diagonal of scalar type not implemented"
                     << abort(FatalError);
         }
     }
 
-    return autoPtr<BlockLduMatrix<Type> >(coarseMatrixPtr);
+    return autoPtr<BlockAmgLevel<Type> >
+    (
+        new coarseBlockAmgLevel<Type>
+        (
+            coarseAddrPtr,
+            coarseMatrixPtr,
+            this->dict(),
+            this->type(),
+            this->groupSize(),
+            this->minCoarseEqns()
+        )
+    );
 }
 
 

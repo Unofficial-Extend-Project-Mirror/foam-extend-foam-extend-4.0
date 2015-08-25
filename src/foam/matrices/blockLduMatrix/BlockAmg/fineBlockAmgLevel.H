@@ -108,8 +108,7 @@ public:
             const dictionary& dict,
             const word& coarseningType,
             const label groupSize,
-            const label minCoarseEqns,
-            const word& smootherType
+            const label minCoarseEqns
         );
 
 

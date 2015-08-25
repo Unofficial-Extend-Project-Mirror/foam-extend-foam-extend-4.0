@@ -47,14 +47,15 @@ Author
 template<class Type>
 Foam::coarseBlockAmgLevel<Type>::coarseBlockAmgLevel
 (
+    autoPtr<lduPrimitiveMesh> addrPtr,
     autoPtr<BlockLduMatrix<Type> > matrixPtr,
     const dictionary& dict,
     const word& coarseningType,
     const label groupSize,
-    const label minCoarseEqns,
-    const word& smootherType
+    const label minCoarseEqns
 )
 :
+    addrPtr_(addrPtr),
     matrixPtr_(matrixPtr),
     x_(matrixPtr_->diag().size(),pTraits<Type>::zero),
     b_(matrixPtr_->diag().size(),pTraits<Type>::zero),
@@ -388,23 +389,12 @@ Foam::coarseBlockAmgLevel<Type>::makeNextLevel() const
 {
     if (coarseningPtr_->coarsen())
     {
-        return autoPtr<Foam::BlockAmgLevel<Type> >
-        (
-            new coarseBlockAmgLevel
-            (
-                coarseningPtr_->restrictMatrix(),
-                dict(),
-                coarseningPtr_->type(),
-                coarseningPtr_->groupSize(),
-                coarseningPtr_->minCoarseEqns(),
-                smootherPtr_->type()
-            )
-        );
+        return coarseningPtr_->restrictMatrix();
     }
     else
     {
         // Final level: cannot coarsen
-        return autoPtr<Foam::BlockAmgLevel<Type> >();
+        return autoPtr<BlockAmgLevel<Type> >();
     }
 }
 

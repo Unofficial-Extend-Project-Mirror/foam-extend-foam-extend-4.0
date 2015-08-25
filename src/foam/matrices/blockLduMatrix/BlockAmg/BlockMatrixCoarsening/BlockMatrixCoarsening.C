@@ -31,7 +31,8 @@ Class
 // * * * * * * * * * * * * * * * * Selectors * * * * * * * * * * * * * * * * //
 
 template<class Type>
-Foam::autoPtr<Foam::BlockMatrixCoarsening<Type> > Foam::BlockMatrixCoarsening<Type>::New
+Foam::autoPtr<Foam::BlockMatrixCoarsening<Type> >
+Foam::BlockMatrixCoarsening<Type>::New
 (
     const word& coarseningType,
     const BlockLduMatrix<Type>& matrix,
@@ -47,7 +48,8 @@ Foam::autoPtr<Foam::BlockMatrixCoarsening<Type> > Foam::BlockMatrixCoarsening<Ty
     {
         FatalErrorIn
         (
-            "autoPtr<BlockMatrixCoarsening<Type> > BlockMatrixCoarsening<Type>::New\n"
+            "autoPtr<BlockMatrixCoarsening<Type> > "
+            "BlockMatrixCoarsening<Type>::New\n"
             "(\n"
             "    const word& coarseningType,\n"
             "    const lduMatrix& matrix,\n"
