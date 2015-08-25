@@ -46,25 +46,25 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                        Class BlockMatrixAgglomeration Declaration
+                   Class BlockMatrixAgglomeration Declaration
 \*---------------------------------------------------------------------------*/
 
 //- Restrict matrix
 
 template<>
-inline autoPtr<BlockLduMatrix<vector> >
+inline autoPtr<BlockAmgLevel<vector> >
 BlockMatrixAgglomeration<vector>::restrictMatrix
 () const
 {
     FatalErrorIn
     (
-        "autoPtr<BlockLduMatrix<vector> > BlockMatrixAgglomeration<Type>::"
+        "autoPtr<BlockAmgLevel<vector> > BlockMatrixAgglomeration<Type>::"
         "restrictMatrix() const"
     )   << "Function not implemented for Type=vector. " << endl
         << abort(FatalError);
 
     // Dummy return to keep compiler happy
-    return autoPtr<BlockLduMatrix<vector> >(NULL);
+    return autoPtr<BlockAmgLevel<vector> >(NULL);
 }
 
 

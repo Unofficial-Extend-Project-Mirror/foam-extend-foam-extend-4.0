@@ -50,8 +50,7 @@ Foam::fineBlockAmgLevel<Type>::fineBlockAmgLevel
     const dictionary& dict,
     const word& coarseningType,
     const label groupSize,
-    const label minCoarseEqns,
-    const word& smootherType
+    const label minCoarseEqns
 )
 :
     matrix_(matrix),
@@ -314,18 +313,7 @@ Foam::fineBlockAmgLevel<Type>::makeNextLevel() const
 {
     if (coarseningPtr_->coarsen())
     {
-        return autoPtr<Foam::BlockAmgLevel<Type> >
-        (
-            new coarseBlockAmgLevel<Type>
-            (
-                coarseningPtr_->restrictMatrix(),
-                dict(),
-                coarseningPtr_->type(),
-                coarseningPtr_->groupSize(),
-                coarseningPtr_->minCoarseEqns(),
-                smootherPtr_->type()
-            )
-        );
+        return coarseningPtr_->restrictMatrix();
     }
     else
     {
