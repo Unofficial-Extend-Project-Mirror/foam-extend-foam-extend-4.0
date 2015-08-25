@@ -41,6 +41,7 @@ SourceFiles
 #include "BlockAmgLevel.H"
 #include "BlockLduSmoother.H"
 #include "BlockLduMatrix.H"
+#include "lduPrimitiveMesh.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -57,6 +58,9 @@ class coarseBlockAmgLevel
     public BlockAmgLevel<Type>
 {
     // Private data
+
+        //- Matrix addressing object.  This also contains coupling interfaces
+        autoPtr<lduPrimitiveMesh> addrPtr_;
 
         //- Matrix
         autoPtr<BlockLduMatrix<Type> > matrixPtr_;
@@ -100,12 +104,12 @@ public:
         //- Construct from components
         coarseBlockAmgLevel
         (
+            autoPtr<lduPrimitiveMesh> addrPtr,
             autoPtr<BlockLduMatrix<Type> > matrixPtr,
             const dictionary& dict,
             const word& coarseningType,
             const label groupSize,
-            const label minCoarseEqns,
-            const word& smootherType
+            const label minCoarseEqns
         );
 
 

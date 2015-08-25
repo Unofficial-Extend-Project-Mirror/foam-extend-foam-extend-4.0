@@ -25,6 +25,7 @@ License
 
 #include "blockMatrixAgglomerations.H"
 #include "blockMatrixCoarsenings.H"
+#include "coarseBlockAmgLevel.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
