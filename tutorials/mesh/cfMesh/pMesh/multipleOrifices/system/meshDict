@@ -21,7 +21,7 @@ surfaceFile "multipleOrifices.stl";
 
 maxCellSize 5.0;
 
-boundaryCellSize 2.0;
+//boundaryCellSize 2.0;
 
 localRefinement
 {
@@ -49,46 +49,6 @@ localRefinement
 boundaryLayers
 {
     nLayers 1;
-
-    thicknessRatio 1.2;
-
-    patchBoundaryLayers
-    {
-        "orifice.*"
-        {
-            nLayers           4;
-
-            thicknessRatio    1.2;
-
-            maxFirstLayerThickness 0.2;
-
-            allowDiscontinuity 0;
-        }
-
-        "fixedWalls.*"
-        {
-            nLayers           4;
-
-            thicknessRatio    1.2;
-
-            maxFirstLayerThickness 1.0;
-
-            allowDiscontinuity 0;
-        }
-
-        "tubes.*"
-        {
-            nLayers           4;
-
-            thicknessRatio    1.2;
-
-            maxFirstLayerThickness 1.0;
-
-            allowDiscontinuity 0;
-        }
-    }
-
-    optimiseLayer 1;
 }
 
 renameBoundary
@@ -126,5 +86,6 @@ workflowControls
 
 //restartFromLatestStep 1;
 }
+
 
 // ************************************************************************* //

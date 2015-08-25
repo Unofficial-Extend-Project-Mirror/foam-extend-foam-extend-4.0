@@ -19,15 +19,15 @@ FoamFile
 
 surfaceFile "bunnyWrapped.stl";
 
-maxCellSize 30.0;
+maxCellSize 100.0;
 
-boundaryCellSize 7.5;
+boundaryCellSize 25;
 
 objectRefinements
 {
     ear1
     {
-        cellSize 3.75;
+        cellSize 10;
         type cone;
         p0   (-100 1873 -320);
         radius0  200;
@@ -36,7 +36,7 @@ objectRefinements
     }
     ear2
     {
-        cellSize 3.75;
+        cellSize 10;
         type cone;
         p0   (-650 1873 -620);
         radius0  200;
@@ -45,7 +45,7 @@ objectRefinements
     }
     tail
     {
-        cellSize 3.75;
+        cellSize 10;
         type box;
         centre  (500 500 150);
         lengthX  100;
@@ -54,14 +54,14 @@ objectRefinements
     }
     insideTheBody
     {
-        cellSize 3.75;
+        cellSize 10;
         type sphere;
         centre  (0 700 0);
         radius  50;
     }
     muzzlePiercing
     {
-        cellSize 3.75;
+        cellSize 10;
         type line;
         p0      (-750 1000 450);
         p1      (-750 1500 450);
