@@ -64,8 +64,17 @@ EXECUTE_PROCESS(
 #
 
 #First, add a global cleanup of the cases
-SET(testId "Allclean_cases${testIdSuffix}")
-ADD_TEST(${testId} bash -c "cd ${TEST_CASE_DIR}; ./Allclean")
+#This will always run and complete first, even in paralel
+SET(cleanCasesTestId "Allclean_cases${testIdSuffix}")
+ADD_TEST(${cleanCasesTestId} bash -c "cd ${TEST_CASE_DIR}; ./Allclean")
+
+# Add a dummy test (/bin/true, just for debugging)
+SET(dummyTestId "foam-extend-$ENV{WM_PROJECT_VERSION}_Dummy_Test")
+ADD_TEST(${dummyTestId} true)
+
+# Add a dependency on the global clean-up target, even for the dummy test
+SET_TESTS_PROPERTIES(${dummyTestId} PROPERTIES DEPENDS ${cleanCasesTestId})
+
 
 # Next, recurse through the test cases root directory,
 # find all the Allrun files, and add them as a new CTest test case
@@ -90,6 +99,11 @@ FOREACH(caseWithAllrun ${listofCasesWithAllrun})
     # Add the test to the test harness
     MESSAGE("Adding test: ${testId}")
     ADD_TEST(${testId} bash -c "cd ${thisCasePath}; ./Allrun")
+
+    # Add a dependency on the global clean-up target
+    # When running in parallel, you need to wait for the cleanup to finish first
+    SET_TESTS_PROPERTIES(${testId} PROPERTIES DEPENDS ${cleanCasesTestId})
+
     # Use this following entry instead for testing purpose
     #ADD_TEST(${testId} bash -c "cd ${thisCasePath}; true")
 
