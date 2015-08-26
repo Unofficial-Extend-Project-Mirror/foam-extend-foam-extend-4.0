@@ -138,7 +138,7 @@ public:
         }
 
         //- Restrict matrix
-        virtual autoPtr<BlockLduMatrix<Type> > restrictMatrix() const;
+        virtual autoPtr<BlockAmgLevel<Type> > restrictMatrix() const;
 
         //- Restrict residual
         virtual void restrictResidual

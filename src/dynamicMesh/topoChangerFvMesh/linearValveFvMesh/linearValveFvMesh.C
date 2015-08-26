@@ -363,26 +363,52 @@ bool Foam::linearValveFvMesh::update()
 
         Info << "Moving points post slider attach" << endl;
 
-        if (topoChangeMap3->morphing())
+        bool localMorphing3 = topoChangeMap3->morphing();
+        bool globalMorphing3 = localMorphing3;
+
+        reduce(globalMorphing3, orOp<bool>());
+
+        if (globalMorphing3)
         {
-            msPtr_->updateMesh(topoChangeMap3());
-
-            if (debug)
-            {
-                Info << "Moving points post slider attach" << endl;
-            }
-
             pointField newPoints = allPoints();
-            pointField mappedOldPointsNew(newPoints.size());
 
-            mappedOldPointsNew.map(oldPointsNew, topoChangeMap3->pointMap());
+            if (localMorphing3)
+            {
+                msPtr_->updateMesh(topoChangeMap3());
 
-            // Solve the correct mesh motion to make sure motion fluxes
-            // are solved for and not mapped
-            movePoints(mappedOldPointsNew);
-            resetMotion();
-            setV0();
-            movePoints(newPoints);
+                pointField mappedOldPointsNew(newPoints.size());
+
+                mappedOldPointsNew.map
+                (
+                    oldPointsNew,
+                    topoChangeMap3->pointMap()
+                );
+
+                // Solve the correct mesh motion to make sure motion fluxes
+                // are solved for and not mapped
+                // Note: using setOldPoints instead of movePoints.
+                // HJ, 23/Aug/2015
+                setOldPoints(mappedOldPointsNew);
+
+                resetMotion();
+                setV0();
+
+                fvMesh::movePoints(newPoints);
+            }
+            else
+            {
+                // No local topological change.  Execute double motion for
+                // sync with topological changes
+                // Note: using setOldPoints instead of movePoints.
+                // HJ, 23/Aug/2015
+                setOldPoints(oldPointsNew);
+
+                resetMotion();
+                setV0();
+
+                // Set new point motion
+                fvMesh::movePoints(newPoints);
+            }
         }
     }
 

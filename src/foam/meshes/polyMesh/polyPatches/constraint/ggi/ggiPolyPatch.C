@@ -114,7 +114,7 @@ void Foam::ggiPolyPatch::calcRemoteZoneAddressing() const
     if (debug)
     {
         Pout<< "ggiPolyPatch::calcRemoteZoneAddressing() const for patch "
-            << index() << endl;
+            << name() << endl;
     }
 
     // Once zone addressing is established, visit the opposite side and find

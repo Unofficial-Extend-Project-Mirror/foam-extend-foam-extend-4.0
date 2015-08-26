@@ -532,12 +532,16 @@ bool Foam::linearValveLayersFvMesh::update()
         if (localMorphing2)
         {
             Info << "Topology change; executing pre-motion" << endl;
-            movePoints(topoChangeMap2->preMotionPoints());
+            // Note: using setOldPoints instead of movePoints.
+            // HJ, 23/Aug/2015
+            setOldPoints(topoChangeMap2->preMotionPoints());
             newPoints = topoChangeMap2->preMotionPoints();
         }
         else
         {
-            movePoints(newPoints);
+            // Note: using setOldPoints instead of movePoints.
+            // HJ, 23/Aug/2015
+            setOldPoints(newPoints);
         }
 
         setV0();
@@ -589,7 +593,9 @@ bool Foam::linearValveLayersFvMesh::update()
 
                 // Solve the correct mesh motion to make sure motion fluxes
                 // are solved for and not mapped
-                movePoints(mappedOldPointsNew);
+                // Note: using setOldPoints instead of movePoints.
+                // HJ, 23/Aug/2015
+                setOldPoints(mappedOldPointsNew);
 
                 resetMotion();
                 setV0();
@@ -601,7 +607,9 @@ bool Foam::linearValveLayersFvMesh::update()
             {
                 // No local topological change.  Execute double motion for
                 // sync with topological changes
-                movePoints(oldPointsNew);
+                // Note: using setOldPoints instead of movePoints.
+                // HJ, 23/Aug/2015
+                setOldPoints(oldPointsNew);
 
                 resetMotion();
                 setV0();

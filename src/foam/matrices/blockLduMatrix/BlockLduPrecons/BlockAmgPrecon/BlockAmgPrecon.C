@@ -70,8 +70,7 @@ Foam::BlockAmgPrecon<Type>::BlockAmgPrecon
                     dict,
                     dict.lookup("coarseningType"),
                     readLabel(dict.lookup("groupSize")),
-                    readLabel(dict.lookup("minCoarseEqns")),
-                    dict.lookup("smoother")
+                    readLabel(dict.lookup("minCoarseEqns"))
                 )
             )
         )
