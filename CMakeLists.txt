@@ -40,6 +40,13 @@ PROJECT(foam-extend-3.2)
 
 #-----------------------------------------------------------------------------
 # Initialization of CTest specific variables
+#
+## Run ctest in parallel if environment variable WM_NCOMPPROCS is set
+IF (NOT $ENV{WM_NCOMPPROCS} STREQUAL "")
+    # Will run ctest in parallel over $WM_NCOMPPROCS processors
+    set(CMAKE_CTEST_COMMAND ${CMAKE_CTEST_COMMAND} --parallel $ENV{WM_NCOMPPROCS})
+    MESSAGE("Running tests in parallel using $ENV{WM_NCOMPPROCS} processors")
+ENDIF ()
 
 # Initialize the site name
 
@@ -271,11 +278,6 @@ IF(BUILD_TESTING)
     # Add the suite of FOAM tutorials
     #
     INCLUDE($ENV{FOAM_TEST_HARNESS_DIR}/CMakeFiles/FOAM_Tutorials.cmake)
-
-    # Add a dummy test (/bin/true, just for debugging)
-    ADD_TEST(
-        foam-extend-$ENV{WM_PROJECT_VERSION}_Dummy_Test true
-    )
 
     IF(RUN_FROM_ONE_TIMESTEP)
         # Modify the cases controlDict file in order to run for only one time step
