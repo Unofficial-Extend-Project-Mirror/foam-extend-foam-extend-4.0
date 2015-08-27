@@ -46,7 +46,7 @@ set_system_paths() {
     export MPI_ROOTDIR=$PROGRAMS_HOME/OpenMPI_v1.6.1-x64
     export PARAVIEW_HOME=$PROGRAMS_HOME/ParaView-4.3.1
     #export PERL_HOME=$PROGRAMS_HOME/strawberry-perl-5.20.2.1-64bit/perl
-    export PEXPORTS_HOME=$PROGRAMS_HOME/pexports
+    export PEXPORTS_HOME=$PROGRAMS_HOME/pexports-0.46
     export PYTHON_HOME=$PROGRAMS_HOME/Python27
     export SUBVERSION_HOME=$PROGRAMS_HOME/svn-win32-1.8.13
     export WGET_HOME=$PROGRAMS_HOME/wget-1.11.4-1
