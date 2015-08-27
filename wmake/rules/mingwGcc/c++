@@ -1,0 +1,22 @@
+.SUFFIXES: .C .cxx .cc .cpp
+
+c++WARN     = -Wall -Wextra -Wno-unused-parameter -Wold-style-cast -Wnon-virtual-dtor
+
+CC          = g++
+
+include $(RULES)/c++$(WM_COMPILE_OPTION)
+
+ptFLAGS     = -DNoRepository -ftemplate-depth-200
+
+GFLAGS     = -DWM_$(WM_PRECISION_OPTION)
+c++FLAGS    = $(GFLAGS) $(c++WARN) $(c++OPT) $(c++DBUG) $(ptFLAGS) $(LIB_HEADER_DIRS) -I$(OPENMPI_DIR)/include -I$(WM_THIRD_PARTY_DIR)/packages/system/include -Dmingw -DBIG_ENDIAN=0 -DLITTLE_ENDIAN=1 -DBYTE_ORDER=BIG_ENDIAN
+
+Ctoo        = $(WM_SCHEDULER) $(CC) $(c++FLAGS) -c $$SOURCE -o $@
+cxxtoo      = $(Ctoo)
+cctoo       = $(Ctoo)
+cpptoo      = $(Ctoo)
+
+LINK_LIBS   = $(c++DBUG) -L$(OPENMPI_DIR)/lib -lmpi -lpthread -lz -L$(WM_THIRD_PARTY_DIR)/packages/system/lib -ldl -lpsapi
+
+LINKLIBSO   = $(CC) $(c++FLAGS) -shared -Xlinker --add-needed -Xlinker --no-as-needed
+LINKEXE     = $(CC) $(c++FLAGS) -Xlinker --add-needed -Xlinker --no-as-needed $(FOAM_LIBBIN)/libOSspecific.o
