@@ -1,11 +1,15 @@
 ParMGridGen = $(WM_THIRD_PARTY_DIR)/packages/ParMGridGen-1.0
 
 TYPE_REAL=
+
 #if defined(WM_SP)
+
 TYPE_REAL=-DTYPE_REAL
+
 #endif
 
-ifeq ($(WM_ARCH_BASE), mingw)
+#if defined(mingw)
+
 EXE_INC = \
     -I$(LIB_SRC)/finiteVolume/lnInclude \
     -I$(PARMGRIDGEN_INCLUDE_DIR) \
@@ -14,7 +18,8 @@ EXE_INC = \
 LIB_LIBS = \
     -lfiniteVolume \
     -L$(PARMGRIDGEN_LIB_DIR) -lmgrid
-else
+#else
+
 EXE_INC = \
     -I$(LIB_SRC)/finiteVolume/lnInclude \
     -I$(PARMGRIDGEN_INCLUDE_DIR)/Lib    \
@@ -23,4 +28,5 @@ EXE_INC = \
 
 LIB_LIBS = \
     -L$(PARMGRIDGEN_LIB_DIR) -lMGridGen
-endif
+
+#endif

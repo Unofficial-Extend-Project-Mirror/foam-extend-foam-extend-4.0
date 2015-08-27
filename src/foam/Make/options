@@ -3,7 +3,8 @@ include $(RULES)/mplib$(WM_MPLIB)
 EXE_INC = $(PFLAGS) $(PINC)\
     -I$(WM_THIRD_PARTY_DIR)/zlib-1.2.3
 
-ifeq ($(WM_ARCH_BASE), mingw)
+#if defined(mingw)
+
 LIB_LIBS = $(PLIBS)\
     $(FOAM_LIBBIN)/libOSspecific.o \
     -lz \
@@ -11,11 +12,14 @@ LIB_LIBS = $(PLIBS)\
     -ldl \
     -lpsapi \
     -lpthread
-else
+
+#else
+
 LIB_LIBS = $(PLIBS)\
     $(FOAM_LIBBIN)/libOSspecific.o \
     -lz
-endif
+
+#endif
 
 $(OBJECTS_DIR)/global.o: FORCE
 
