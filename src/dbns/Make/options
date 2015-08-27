@@ -1,5 +1,6 @@
-ifeq ($(WM_ARCH_BASE), mingw)
-EXE_INC = -g \
+#if defined(mingw)
+
+EXE_INC = \
     -I$(LIB_SRC)/finiteVolume/lnInclude \
     -I$(LIB_SRC)/meshTools/lnInclude \
     -I$(LIB_SRC)/thermophysicalModels/basic/lnInclude \
@@ -9,8 +10,10 @@ EXE_INC = -g \
 LIB_LIBS = \
     -lfiniteVolume \
     -L$(PARMGRIDGEN_LIB_DIR) -lIMlib -lmgrid
-else
-EXE_INC = -g \
+
+#else
+
+EXE_INC = \
     -I$(LIB_SRC)/finiteVolume/lnInclude \
     -I$(LIB_SRC)/meshTools/lnInclude \
     -I$(LIB_SRC)/thermophysicalModels/basic/lnInclude \
@@ -21,4 +24,5 @@ EXE_INC = -g \
 LIB_LIBS = \
     -lfiniteVolume \
     -L$(PARMGRIDGEN_LIB_DIR) -lIMlib -lMGridGen
-endif
+
+#endif
