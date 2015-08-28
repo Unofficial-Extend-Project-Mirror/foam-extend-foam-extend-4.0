@@ -1,4 +1,4 @@
-CPP        = cpp -traditional-cpp
+CPP        = cpp -traditional-cpp -Dmingw
 LD         = ld
 
 PROJECT_LIBS = -l$(WM_PROJECT) -liberty

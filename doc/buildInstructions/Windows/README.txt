@@ -145,7 +145,7 @@ For    : Graphically visualising foam results.
 Name   : PExports
 Version: 0.44 (or above)
 URL    : http://sourceforge.net/projects/mingw/files/MinGW/Extension/pexports/pexports-0.46/pexports-0.46-mingw32-bin.tar.xz/download
-For    : Extracting symbols from OpenMPI DLLs to pass to dlltool.exe (supplied in MinGW-w64 package). Rename directory "bin" to "pexports" after unpacking.
+For    : Extracting symbols from OpenMPI DLLs to pass to dlltool.exe (supplied in MinGW-w64 package). Move directory "bin" to "pexports-0.46" after unpacking.
 
 Name   : Strawberry Perl
 Version: 5.20.2.1 (or above)
@@ -208,9 +208,9 @@ M4:          /bin/m4.exe [m4 (GNU M4) 1.4.16]
 Make:        /bin/make.exe [GNU Make 3.81]
 MinGW-w64:   /c/Programs/mingw64
 OpenMPI:     /c/Programs/OpenMPI_v1.6.1-x64/bin/mpirun.exe [mpirun.exe (OpenRTE) 1.6.1]
-PEexports:   /c/Programs/strawberry-perl-5.20.2.1-64bit/c/bin/pexports.exe [PExports 0.44 Copyright 1998, Anders Norlander]
+PEexports:   /c/Programs/pexports-0.46/bin/pexports.exe [PExports 0.44 Copyright 1998, Anders Norlander]
 ParaView:    /c/Programs/ParaView-4.3.1
-Perl:        /c/Programs/strawberry-perl-5.20.2.1-64bit/perl/bin/perl.exe [ This is perl 5, version 20, subversion 2 (v5.20.2) built for MSWin32-x64-multi-thread]
+Perl:        /bin/perl.exe [ This is perl, v5.8.8 built for msys-64int]
 Python:      /c/Programs/Python27/python.exe [Python 2.7.9]
 Subversion:  /c/Programs/svn-win32-1.8.13/bin/svn.exe [svn, version 1.8.13 (r1667537)]
 Vim:         /bin/vim.exe [VIM - Vi IMproved 7.3 (2010 Aug 15, compiled Mar 19 2011 15:37:04)]
