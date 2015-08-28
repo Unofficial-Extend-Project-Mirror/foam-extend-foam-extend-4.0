@@ -22,7 +22,8 @@
 
 #elif defined(mingw)
 
-    TECIO_FLAGS = -DMAKEARCHIVE -DMSWIN -DUSEENUM -DTHREED -U_WIN32 -DENGINE
+#   warning "MSWin mingw architecture detected"
+    TECIO_FLAGS = -DMAKEARCHIVE -DLINUX -DUSEENUM -DTHREED -DENGINE
 
 #else
 
