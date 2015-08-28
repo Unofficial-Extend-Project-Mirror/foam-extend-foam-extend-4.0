@@ -595,10 +595,14 @@ Foam::labelList Foam::parMetisDecomp::decompose
 
     // Copy back to labelList
     labelList decomp(finalDecomp.size());
+
     forAll(decomp, i)
     {
         decomp[i] = finalDecomp[i];
     }
+
+    fixCyclics(mesh_, decomp);
+
     return decomp;
 }
 
@@ -738,6 +742,8 @@ Foam::labelList Foam::parMetisDecomp::decompose
         cellDistribution[cellI] = regionDecomp[cellToRegion[cellI]];
     }
 
+    fixCyclics(mesh_, cellDistribution);
+
     return cellDistribution;
 }
 
@@ -868,10 +874,14 @@ Foam::labelList Foam::parMetisDecomp::decompose
 
     // Copy back to labelList
     labelList decomp(finalDecomp.size());
+
     forAll(decomp, i)
     {
         decomp[i] = finalDecomp[i];
     }
+
+    fixCyclics(mesh_, decomp);
+
     return decomp;
 }
 

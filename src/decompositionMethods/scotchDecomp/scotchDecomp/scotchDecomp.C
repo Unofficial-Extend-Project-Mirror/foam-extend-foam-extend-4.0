@@ -453,10 +453,14 @@ Foam::labelList Foam::scotchDecomp::decompose
 
     // Copy back to labelList
     labelList decomp(finalDecomp.size());
+
     forAll(decomp, i)
     {
         decomp[i] = finalDecomp[i];
     }
+
+    fixCyclics(mesh_, decomp);
+
     return decomp;
 }
 
@@ -510,6 +514,8 @@ Foam::labelList Foam::scotchDecomp::decompose
         fineDistribution[i] = finalDecomp[fineToCoarse[i]];
     }
 
+    fixCyclics(mesh_, fineDistribution);
+
     return fineDistribution;
 }
 
@@ -552,6 +558,8 @@ Foam::labelList Foam::scotchDecomp::decompose
     {
         decomp[i] = finalDecomp[i];
     }
+
+    fixCyclics(mesh_, decomp);
 
     return decomp;
 }

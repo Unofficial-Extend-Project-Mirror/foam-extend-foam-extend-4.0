@@ -116,6 +116,8 @@ Foam::labelList Foam::patchConstrainedDecomp::decompose
         }
     }
 
+    fixCyclics(mesh_, finalDecomp);
+
     return finalDecomp;
 }
 
