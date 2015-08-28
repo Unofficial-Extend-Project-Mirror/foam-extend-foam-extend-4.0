@@ -41,7 +41,7 @@ lnInclude
 # build folders - anywhere
 linux*Gcc*/
 linux*Icc*/
-MINGW32*Gcc*/
+mingw*Gcc*/
 darwin*Gcc*/
 darwin*Intel*/
 linuxming*/
