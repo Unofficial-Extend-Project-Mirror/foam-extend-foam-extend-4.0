@@ -102,7 +102,7 @@ FOREACH(caseWithAllrun ${listofCasesWithAllrun})
 
     # Add a dependency on the global clean-up target
     # When running in parallel, you need to wait for the cleanup to finish first
-    SET_TESTS_PROPERTIES(${testId} PROPERTIES DEPENDS ${cleanCasesTestId})
+    SET_TESTS_PROPERTIES(${testId} PROPERTIES DEPENDS ${cleanCasesTestId} LABELS Tutorials)
 
     # Use this following entry instead for testing purpose
     #ADD_TEST(${testId} bash -c "cd ${thisCasePath}; true")
@@ -116,5 +116,14 @@ EXECUTE_PROCESS(
     COMMAND $ENV{FOAM_TEST_HARNESS_DIR}/scripts/prepareCasesForTestHarness.sh ${TEST_CASE_DIR} $ENV{FOAM_TEST_HARNESS_DIR}/scripts/AdditionalRunFunctions
     WORKING_DIRECTORY .
     )
+
+# Configure the various ctest -S Dashboard drivers
+
+# Driver for the tutorials
+configure_file(
+  "$ENV{FOAM_TEST_HARNESS_DIR}/CMakeFiles/Dashboard_Tutorials.cmake.in"
+  "$ENV{FOAM_TEST_HARNESS_DIR}/runDir/Dashboard_Tutorials.cmake"
+  @ONLY)
+  
 
 # That's it.
