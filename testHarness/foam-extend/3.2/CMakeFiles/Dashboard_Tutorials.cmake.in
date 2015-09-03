@@ -1,0 +1,104 @@
+# /*-------------------------------------------------------------------------*\
+#   =========                 |
+#   \\      /  F ield         | foam-extend: Open Source CFD
+#    \\    /   O peration     |
+#     \\  /    A nd           | For copyright notice see file Copyright
+#      \\/     M anipulation  |
+# -----------------------------------------------------------------------------
+# License
+#     This file is part of foam-extend.
+#
+#     foam-extend is free software: you can redistribute it and/or modify it
+#     under the terms of the GNU General Public License as published by the
+#     Free Software Foundation, either version 3 of the License, or (at your
+#     option) any later version.
+#
+#     foam-extend is distributed in the hope that it will be useful, but
+#     WITHOUT ANY WARRANTY; without even the implied warranty of
+#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+#     General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
+#
+# Description
+#        "ctest -S" script configured to drive the Experimental, Nightly and
+#        Continuous dashboards for the FOAM tutorials
+#
+# Author
+#        Martin Beaudoin, Hydro-Quebec, 2015. All rights reserved
+#
+# \*-------------------------------------------------------------------------*/
+#
+set(THIS_SUBPROJECT "Tutorials")
+set(CTEST_SOURCE_DIRECTORY $ENV{WM_PROJECT_DIR})
+set(CTEST_BINARY_DIRECTORY "@binary_dir@")
+set(CTEST_BUILD_NAME "@BUILDNAME@")
+set(CTEST_SITE "@SITE@")
+set(PROCESSOR_COUNT $ENV{WM_NCOMPPROCS})
+set(CTEST_CMAKE_GENERATOR "Unix Makefiles")
+
+# We add the current script as a Build note.
+set(CTEST_NOTES_FILES "${CTEST_SCRIPT_DIRECTORY}/${CTEST_SCRIPT_NAME}")
+
+# Run in parallel
+if(PROCESSOR_COUNT)
+  set(CTEST_BUILD_FLAGS "-j${PROCESSOR_COUNT}")
+endif()
+
+
+# We will be using a CDash subproject if the required subproject is defined
+# on the remote CDash server.
+# Otherwise, the results will still get submitted, but under the global
+# "Project" Dashboard, not under the "SubProjects" section.
+# This way, we keep on supporting CDash sites where subprojects are 
+# still not defined.
+
+# Get the CTEST_PROJECT_SUBPROJECTS definition:
+include(${CTEST_SOURCE_DIRECTORY}/CTestConfig.cmake)
+
+list(FIND CTEST_PROJECT_SUBPROJECTS ${THIS_SUBPROJECT} subProjectIsSupported)
+
+if (NOT subProjectIsSupported EQUAL -1)
+  message("Dashboard: Using SubProject: ${THIS_SUBPROJECT}")
+  set_property(GLOBAL PROPERTY SubProject ${THIS_SUBPROJECT})
+  set_property(GLOBAL PROPERTY Label ${THIS_SUBPROJECT})
+endif()
+
+# Select the required model : Experimental, Nightly, Continuous
+# Default model: Experimental
+set(DASHBOARD_MODEL Experimental)
+if(${CTEST_SCRIPT_ARG} MATCHES Nightly)
+  set(DASHBOARD_MODEL Nightly)
+elseif(${CTEST_SCRIPT_ARG} MATCHES Continuous)
+  set(DASHBOARD_MODEL Continuous)
+endif()
+
+# Starting the various tests for the specified dashboard model
+ctest_start(${DASHBOARD_MODEL})
+
+# No need to configure, cmake took care of it already
+#ctest_configure()    
+
+
+# Intentionally no ctest_update() step in this script when running the 
+# Experimental dashboard. 
+# We do not want the source code to get updated since we actually want to test 
+# the current instance of this source code. So we can test without having to 
+# commit the source code
+
+if(${DASHBOARD_MODEL} MATCHES Experimental)
+  message("Experimental dashboard: We skip the repository update.")
+else()
+  # Updating the repository for the Nightly and Continuous dashboards
+  ctest_update()
+endif()
+
+# We compile the source code 
+ctest_build()
+
+# We run the tests
+ctest_test()
+
+# We submit the results to the CDash service
+ctest_submit()

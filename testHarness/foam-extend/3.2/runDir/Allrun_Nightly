@@ -86,11 +86,16 @@ cmake $WM_PROJECT_DIR
 # Invoke make help for the complete list of available commands.
 #
 # User-demand testing.
-# Will do: ExperimentalConfigure + ExperimentalBuild + ExperimentalTest + ExperimentalSubmit
-# make Experimental
-
+#
+# The old way. Still valid, but not supporting subprojects
+# Will do: ExperimentalBuild + ExperimentalTest + ExperimentalSubmit
+#make Experimental
+#
 # Nightly testing
-# Will do: NightlyUpdate + NightylConfigure + NightlyBuild + NightlyTest + NightlySubmit
-make Nightly
+# Will do: NightlyUpdate + NightlyBuild + NightlyTest + NightlySubmit
+# make Nightly
+
+# The new way. With support for subprojects
+ctest -V -S ./Dashboard_Tutorials.cmake,Nightly
 
 # That's it
