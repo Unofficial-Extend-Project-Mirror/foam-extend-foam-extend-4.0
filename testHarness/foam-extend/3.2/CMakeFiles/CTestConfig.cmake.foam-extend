@@ -20,8 +20,14 @@ set(CTEST_DROP_SITE_CDASH TRUE)
 
 # We can override those variables for local sites so you can use
 # your own site CDash service
-include($ENV{FOAM_SITE_DIR}/etc/CTestConfig.cmake OPTIONAL)
+# This optional file will be located here:
+# $FOAM_SITE_DIR/etc/CTestConfig.site.cmake
+#
+include($ENV{FOAM_SITE_DIR}/etc/CTestConfig.site.cmake OPTIONAL)
 
 # We can override those variables from user space so you can use
 # your own personal CDash service
-include($ENV{WM_PROJECT_USER_DIR}/etc/CTestConfig.cmake OPTIONAL)
+# This optional file will be located here:
+# $WM_PROJECT_USER_DIR/etc/CTestConfig.user.cmake
+#
+include($ENV{WM_PROJECT_USER_DIR}/etc/CTestConfig.user.cmake OPTIONAL)
