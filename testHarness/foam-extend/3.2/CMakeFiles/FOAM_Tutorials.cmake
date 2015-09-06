@@ -100,9 +100,22 @@ FOREACH(caseWithAllrun ${listofCasesWithAllrun})
     MESSAGE("Adding test: ${testId}")
     ADD_TEST(${testId} bash -c "cd ${thisCasePath}; ./Allrun")
 
+    # We extract a label name from the top level tutorial directories 
+    # (eg: basic, incompressible, immersedBoundary, etc). We will use this 
+    # label in order to categorize the various test cases under a more 'generic
+    # topic', so we can for instance limit the testharness to the 
+    # 'incompressible' test cases, etc., simply by using the ctest -L command.
+    #
+    # ctest --print-labels will print the list of all available labels.
+    #
+    string(REPLACE ${TEST_CASE_DIR}/ ""  tmpLabel ${caseWithAllrun})
+    string(FIND ${tmpLabel} "/" indexFirstSlash)
+    string(SUBSTRING ${tmpLabel} 0 ${indexFirstSlash} testLabel)
+
     # Add a dependency on the global clean-up target
     # When running in parallel, you need to wait for the cleanup to finish first
-    SET_TESTS_PROPERTIES(${testId} PROPERTIES DEPENDS ${cleanCasesTestId} LABELS Tutorials)
+    message("    This test case will have the following labels: Tutorials, ${testLabel}")
+    SET_TESTS_PROPERTIES(${testId} PROPERTIES DEPENDS ${cleanCasesTestId} LABELS "Tutorials;${testLabel}")
 
     # Use this following entry instead for testing purpose
     #ADD_TEST(${testId} bash -c "cd ${thisCasePath}; true")
