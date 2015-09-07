@@ -46,7 +46,7 @@ already have some of these system tools.
 1) Download and install 7-Zip (see reference list below). This is necessary to
    be able to unzip the rest of the required packages mentioned in later steps.
 
-2) Download and install wget, CMake, Git, MinGW-w64, ParaView and PExports (see
+2) Download and install wget, CMake, Git, MinGW-w64, ParaView, PExports, Java, Subversion, Python (see
    reference list below). Note that some components (example PExports and GMake)
    may already be available in other packages (such as Strawberry Perl), although
    you need to be careful of the version numbers.
@@ -115,6 +115,11 @@ Version: 1.9.5
 URL    : https://git-scm.com/download/win
 For    : Version control system. Choose "Use Git from the Windows command prompt" and "Check out as-is. Commit as-is" in installer.
 
+Name   : Java
+Version: Version 8 Update 60
+URL    : http://www.java.com
+For    : Not essential
+
 Name   : Microsoft Visual C++ 2010 Redistributable Package (x64)
 Version: 2010
 URL    : http://www.microsoft.com/en-us/download/details.aspx?id=14632
@@ -147,10 +152,20 @@ Version: 0.44 (or above)
 URL    : http://sourceforge.net/projects/mingw/files/MinGW/Extension/pexports/pexports-0.46/pexports-0.46-mingw32-bin.tar.xz/download
 For    : Extracting symbols from OpenMPI DLLs to pass to dlltool.exe (supplied in MinGW-w64 package). Move directory "bin" to "pexports-0.46" after unpacking.
 
+Name   : Pyhton
+Version: 2.7
+URL    : https://www.python.org/download/releases/2.7/
+For    : Not essential
+
 Name   : Strawberry Perl
 Version: 5.20.2.1 (or above)
 URL    : http://strawberryperl.com/download/5.20.2.1/strawberry-perl-5.20.2.1-64bit.msi
 For    : Running Perl scripts, "pexports.exe" and "gmake.exe" utilities
+
+Name   : Subversion
+Version: 1.8.13
+URL    : http://sourceforge.net/projects/win32svn/files/1.8.13/
+For    : ??????????
 
 Name   : wget
 Version: 1.11.4-1 (or above)
