@@ -32,6 +32,8 @@ License
 #include "polyBoundaryMesh.H"
 #include "polyMesh.H"
 #include "surfMesh.H"
+#include "Xfer.H"
+#include "surfZone.H"
 #include "primitivePatch.H"
 #include "addToRunTimeSelectionTable.H"
 
@@ -170,9 +172,9 @@ Foam::MeshedSurface<Face>::MeshedSurface()
 template<class Face>
 Foam::MeshedSurface<Face>::MeshedSurface
 (
-    const Xfer< pointField >& pointLst,
-    const Xfer< List<Face> >& faceLst,
-    const Xfer< surfZoneList >& zoneLst
+    const Xfer<pointField >& pointLst,
+    const Xfer<List<Face> >& faceLst,
+    const Xfer<surfZoneList>& zoneLst
 )
 :
     ParentType(List<Face>(), pointField()),
@@ -185,8 +187,8 @@ Foam::MeshedSurface<Face>::MeshedSurface
 template<class Face>
 Foam::MeshedSurface<Face>::MeshedSurface
 (
-    const Xfer< pointField >& pointLst,
-    const Xfer< List<Face> >& faceLst,
+    const Xfer<pointField>& pointLst,
+    const Xfer<List<Face> >& faceLst,
     const UList<label>& zoneSizes,
     const UList<word>& zoneNames
 )
@@ -534,17 +536,17 @@ void Foam::MeshedSurface<Face>::reset
 
     // Take over new primitive data.
     // Optimized to avoid overwriting data at all
-    if (!pointLst().empty())
+    if (!pointLst->empty())
     {
         storedPoints().transfer(pointLst());
     }
 
-    if (!faceLst().empty())
+    if (!faceLst->empty())
     {
         storedFaces().transfer(faceLst());
     }
 
-    if (!zoneLst().empty())
+    if (!zoneLst->empty())
     {
         storedZones().transfer(zoneLst());
     }
@@ -554,26 +556,26 @@ void Foam::MeshedSurface<Face>::reset
 template<class Face>
 void Foam::MeshedSurface<Face>::reset
 (
-    const Xfer< List<point> >& pointLst,
-    const Xfer< List<Face> >& faceLst,
-    const Xfer< surfZoneList >& zoneLst
+    const Xfer<List<point> >& pointLst,
+    const Xfer<List<Face> >& faceLst,
+    const Xfer<surfZoneList>& zoneLst
 )
 {
     ParentType::clearOut();
 
     // Take over new primitive data.
     // Optimized to avoid overwriting data at all
-    if (!pointLst().empty())
+    if (!pointLst->empty())
     {
         storedPoints().transfer(pointLst());
     }
 
-    if (!faceLst().empty())
+    if (!faceLst->empty())
     {
         storedFaces().transfer(faceLst());
     }
 
-    if (!zoneLst().empty())
+    if (!zoneLst->empty())
     {
         storedZones().transfer(zoneLst());
     }
