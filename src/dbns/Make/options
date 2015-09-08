@@ -9,6 +9,7 @@ EXE_INC = \
 
 LIB_LIBS = \
     -lfiniteVolume \
+    -lmeshTools \
     -L$(PARMGRIDGEN_LIB_DIR) -lIMlib -lmgrid
 
 #else
@@ -23,6 +24,8 @@ EXE_INC = \
 
 LIB_LIBS = \
     -lfiniteVolume \
+    -lmeshTools \
     -L$(PARMGRIDGEN_LIB_DIR) -lIMlib -lMGridGen
 
 #endif
+
