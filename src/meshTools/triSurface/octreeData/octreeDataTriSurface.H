@@ -50,7 +50,7 @@ namespace Foam
 template<class Type> class octree;
 
 /*---------------------------------------------------------------------------*\
-                           Class octreeDataTriSurface Declaration
+                  Class octreeDataTriSurface Declaration
 \*---------------------------------------------------------------------------*/
 
 class octreeDataTriSurface
@@ -96,10 +96,12 @@ class octreeDataTriSurface
         //- Calculate bounding boxes for triangles
         static treeBoundBoxList calcBb(const triSurface&);
 
+
     // Private Member Functions
 
         //- nearest point in xyz coord system
         point nearestPoint(const label index, const point& P) const;
+
 
 public:
 
@@ -136,6 +138,7 @@ public:
             {
                 return allBb_.size();
             }
+
 
         // Search
 
@@ -229,6 +232,8 @@ public:
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
+
+#include "octreeDataTriSurfaceTreeLeaf.H"
 
 #endif
 
