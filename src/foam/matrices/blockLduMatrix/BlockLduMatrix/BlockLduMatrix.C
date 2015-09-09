@@ -295,7 +295,19 @@ bool Foam::BlockLduMatrix<Type>::symmetric() const
             << abort(FatalError);
     }
 
-    return (diagPtr_ && (!lowerPtr_ && upperPtr_));
+    // Assuming that the matrix is not symmetric if diag or upper are square
+    // type coefficients. VV and HJ, 9/Sep/2015.
+    bool activeSquare = false;
+    if
+    (
+        diagPtr_->activeType() == blockCoeffBase::SQUARE
+     || upperPtr_->activeType() == blockCoeffBase::SQUARE
+    )
+    {
+        activeSquare = true;
+    }
+
+    return (diagPtr_ && (!lowerPtr_ && upperPtr_) && !activeSquare);
 }
 
 
