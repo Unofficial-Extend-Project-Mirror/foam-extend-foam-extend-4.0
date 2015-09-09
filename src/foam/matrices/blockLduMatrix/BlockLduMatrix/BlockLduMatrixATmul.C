@@ -237,7 +237,8 @@ void Foam::BlockLduMatrix<Type>::TmulCore
 
         for (register label coeffI = 0; coeffI < u.size(); coeffI++)
         {
-            Tx[u[coeffI]] += mult(activeUpper[coeffI], x[l[coeffI]]);
+            // Bug fix: Missing transpose. VV, 31/Aug/2015.
+            Tx[u[coeffI]] += mult(activeUpper[coeffI].T(), x[l[coeffI]]);
         }
     }
 
@@ -303,7 +304,8 @@ void Foam::BlockLduMatrix<Type>::TmulCore
 
             for (register label coeffI = 0; coeffI < u.size(); coeffI++)
             {
-                Tx[l[coeffI]] += mult(activeLower[coeffI], x[u[coeffI]]);
+                // Bug fix: Missing transpose. VV, 31/Aug/2015.
+                Tx[l[coeffI]] += mult(activeLower[coeffI].T(), x[u[coeffI]]);
             }
         }
     }
