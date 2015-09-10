@@ -96,8 +96,8 @@ void Foam::ILUCp::calcFactorization()
         // Get number of rows
         const label nRows = preconDiag_.size();
 
-        // Define start and end face ("virtual" face when extended addressing is
-        // used) of this row/column, and number of non zero off diagonal entries
+        // Define start and end face ("virtual" face when extended addressing
+        // is used) of this row/column.
         register label fStart, fEnd, fLsrStart, fLsrEnd;
 
         // Crout LU factorization
@@ -244,11 +244,10 @@ Foam::ILUCp::ILUCp
     extMatrix_
     (
         matrix,
-        p_,
-        matrix.mesh().thisDb().parent().lookupObject
-        <
-            polyMesh
-        >(polyMesh::defaultRegion)
+        matrix.mesh().lduAddr().extendedAddr
+        (
+            readLabel(dict.lookup("fillInLevel"))
+        )
     ),
     preconDiag_(matrix_.diag()),
     zDiag_(0),
