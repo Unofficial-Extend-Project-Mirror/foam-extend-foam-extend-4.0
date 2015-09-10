@@ -204,13 +204,7 @@ void Foam::BlockGaussSeidelPrecon<Type>::BlockSweep
             // Finish current x
             curX = mult(dD[rowI], curX);
 
-            // Distribute the neighbour side using current x
-            for (curCoeff = fStart; curCoeff < fEnd; curCoeff++)
-            {
-                // lower = upper transposed
-                bPrime_[u[curCoeff]] -=
-                    mult(mult.transpose(upper[curCoeff]), curX);
-            }
+            // No need to update bPrime on reverse sweep. VV, 10/Sep/2015.
         }
     }
 }
@@ -312,11 +306,7 @@ void Foam::BlockGaussSeidelPrecon<Type>::BlockSweep
             // Finish current x
             curX = mult(dD[rowI], curX);
 
-            // Distribute the neighbour side using current x
-            for (curCoeff = fStart; curCoeff < fEnd; curCoeff++)
-            {
-                bPrime_[u[curCoeff]] -= mult(lower[curCoeff], curX);
-            }
+            // No need to update bPrime on reverse sweep. VV, 10/Sep/2015.
         }
     }
 }
