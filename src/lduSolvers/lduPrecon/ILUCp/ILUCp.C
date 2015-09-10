@@ -49,8 +49,9 @@ namespace Foam
         addasymMatrixConstructorToTable<ILUCp>
         addILUCpPreconditionerAsymMatrixConstructorToTable_;
 
-    // Add to symmetric constructor table as well until we implement Choleskyp
-    // preconditioner. VV, 27/Jun/2015.
+    // Add to symmetric constructor table as well. Cholesky with fill in would
+    // yield the same sparseness pattern as the original matrix, hence it is not
+    // implemented. VV, 10/Sep/2015.
     lduPreconditioner::
         addsymMatrixConstructorToTable<ILUCp>
         addILUCpPreconditionerSymMatrixConstructorToTable_;
