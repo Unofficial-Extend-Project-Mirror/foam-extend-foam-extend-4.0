@@ -74,46 +74,23 @@ Foam::extendedLduMatrix::extendedLduMatrix
         // Get reference to faceMap in extended addressing
         const unallocLabelList& faceMap = extLduAddr_.faceMap();
 
-        // Avoid assuming it's upper if the matrix is symmetric
-        if (ldum.hasUpper())
+        // Matrix is considered symmetric if the upper is allocated and lower
+        // is not allocated. Allocating extended upper only.
+        extendedUpperPtr_ = new scalarField
+        (
+            extLduAddr_.extendedUpperAddr().size(),
+            0.0
+        );
+        scalarField& extUpper = *extendedUpperPtr_;
+
+        // Get upper coeffs from underlying lduMatrix
+        const scalarField& upper = ldum.upper();
+
+        // Copy non-zero coeffs from basic lduMatrix into corresponding
+        // positions
+        forAll (upper, faceI)
         {
-            // Allocate extended upper only
-            extendedUpperPtr_ = new scalarField
-            (
-                extLduAddr_.extendedUpperAddr().size(),
-                0.0
-            );
-            scalarField& extUpper = *extendedUpperPtr_;
-
-            // Get upper coeffs from underlying lduMatrix
-            const scalarField& upper = ldum.upper();
-
-            // Copy non-zero coeffs from basic lduMatrix into corresponding
-            // positions
-            forAll (upper, faceI)
-            {
-                extUpper[faceMap[faceI]] = upper[faceI];
-            }
-        }
-        else
-        {
-            // Allocate extended lower only
-            extendedLowerPtr_ = new scalarField
-            (
-                extLduAddr_.extendedLowerAddr().size(),
-                0.0
-            );
-            scalarField& extLower = *extendedLowerPtr_;
-
-            // Get lower coeffs from underlying lduMatrix
-            const scalarField& lower = ldum.lower();
-
-            // Copy non-zero coeffs from basic lduMatrix into corresponding
-            // positions
-            forAll (lower, faceI)
-            {
-                extLower[faceMap[faceI]] = lower[faceI];
-            }
+            extUpper[faceMap[faceI]] = upper[faceI];
         }
     }
     else
