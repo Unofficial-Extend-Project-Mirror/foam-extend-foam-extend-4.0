@@ -96,6 +96,12 @@ protected:
             labelListList& cellCells
         );
 
+        static void fixCyclics
+        (
+            const polyMesh& mesh,
+            labelList& decomp
+        );
+
 
 private:
 
