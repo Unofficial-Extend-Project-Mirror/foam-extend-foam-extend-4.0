@@ -446,7 +446,7 @@ void LaunderGibsonRSTM::correct()
         // Change for consistency with Fluent implementation.
         // Emil Baric, NUMAP-FOAM 2011
         // HJ, 13/Dec/2011
-      - Clg2_*(dev(P) - dev(C))
+      - Clg2_*(rho_*dev(P) - dev(C))
 
         // wall reflection terms
       + symm

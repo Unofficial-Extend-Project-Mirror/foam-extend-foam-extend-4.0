@@ -236,6 +236,9 @@ public:
             //- Return average velocity of origin for the previous time-step
             inline const dimensionedVector& Uaverage() const;
 
+            //- Return finite rotation
+            inline const finiteRotation& rotation() const;
+
             //- Return acceleration of origin
             inline dimensionedVector A() const;
 
@@ -246,7 +249,7 @@ public:
             inline dimensionedScalar rotAngle() const;
 
 
-        // Non-constant access to
+        // Non-constant access
 
             //- Set position of origin
             inline void setXrel(const vector& x);

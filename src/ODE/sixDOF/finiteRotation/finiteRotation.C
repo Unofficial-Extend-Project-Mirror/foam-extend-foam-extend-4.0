@@ -70,6 +70,33 @@ Foam::scalar Foam::finiteRotation::rotAngle(const tensor& rotT)
 }
 
 
+Foam::vector Foam::finiteRotation::eulerAngles(const tensor& rotT)
+{
+    // Define a vector containing euler angles (x = roll, y = pitch, z = yaw)
+    vector eulerAngles;
+
+    scalar& rollAngle = eulerAngles.x();
+    scalar& pitchAngle = eulerAngles.y();
+    scalar& yawAngle = eulerAngles.z();
+
+    // Calculate roll angle
+    rollAngle = atan2(rotT.yz(), rotT.zz());
+
+    const scalar c2 = sqrt(rotT.xx() + rotT.xy());
+
+    // Calculate pitch angle
+    pitchAngle = atan2(-rotT.xz(), c2);
+
+    const scalar s1 = sin(rollAngle);
+    const scalar c1 = cos(rollAngle);
+
+    // Calculate yaw angle
+    yawAngle = atan2(s1*rotT.zx() - c1*rotT.yx(), c1*rotT.yy() - s1*rotT.zy());
+
+    return eulerAngles;
+}
+
+
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 Foam::finiteRotation::finiteRotation(const HamiltonRodriguezRot& rot)
@@ -136,6 +163,12 @@ Foam::vector Foam::finiteRotation::rotVector() const
 Foam::scalar Foam::finiteRotation::rotAngle() const
 {
     return rotAngle(rotTensor_);
+}
+
+
+Foam::vector Foam::finiteRotation::eulerAngles() const
+{
+    return eulerAngles(rotTensor_);
 }
 
 

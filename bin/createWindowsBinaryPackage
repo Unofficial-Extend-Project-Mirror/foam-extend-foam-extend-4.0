@@ -23,7 +23,7 @@
 #     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 #
 # Script
-#     createReleasePackage.mingw
+#     createWindowsBinaryPackage
 #
 # Description
 #     Creates stand-alone .zip packages for MinGW-based builds on Windows.
@@ -36,13 +36,19 @@
 cd ${0%/*} || exit 1    # run from this directory
 
 create_package() {
-    RELEASE_DIR=$1
+    PACKAGE_DIR=$1
     TYPE=$2
 
-    PACKAGE_FILE=$RELEASE_DIR.$TYPE
     echo ""
+
+    PACKAGE_FILE=$PACKAGE_DIR.$TYPE
+    if [ -f $PACKAGE_FILE ] ; then
+        echo "Removing previous $PACKAGE_FILE ..."
+        rm -f $PACKAGE_FILE
+    fi
+
     echo "Creating $PACKAGE_FILE ..."
-    7z -t$TYPE a $PACKAGE_FILE $RELEASE_DIR
+    7z -t$TYPE a $PACKAGE_FILE $PACKAGE_DIR
     
     if [ -f $PACKAGE_FILE ] ; then
         echo "Successfully created $PACKAGE_FILE"
@@ -52,7 +58,7 @@ create_package() {
 }
 
 echo
-echo "=========== FOAM-EXTEND WINDOWS STAND-ALONE PACKAGE CREATION SCRIPT ==========="
+echo "=========== FOAM-EXTEND STAND-ALONE PACKAGE CREATION SCRIPT FOR WINDOWS ==========="
 
 if [ "$PWD" != "$WM_PROJECT_DIR/bin" ]
 then
@@ -62,36 +68,43 @@ then
     exit 1
 fi
 
-RELEASE_DIR=$WM_PROJECT-$WM_FORK-$WM_PROJECT_VERSION-win-x64
-MPI_VERSION=`basename $FOAM_MPI_LIBBIN`
-if [ -d $RELEASE_DIR ] ; then
-    echo "Removing previous $RELEASE_DIR"
-    rm -rf $RELEASE_DIR
+RELEASE_DIR=$WM_PROJECT_DIR/releasePackages
+if [ ! -d $RELEASE_DIR ] ; then
+    echo "Creating $RELEASE_DIR ..."
+    mkdir $RELEASE_DIR
 fi
-mkdir $RELEASE_DIR
+
+PACKAGE_DIR=$RELEASE_DIR/$WM_PROJECT-$WM_FORK-$WM_PROJECT_VERSION-win-x64
+if [ -d $PACKAGE_DIR ] ; then
+    echo "Removing previous $PACKAGE_DIR ..."
+    rm -rf $PACKAGE_DIR
+fi
+echo "Creating $PACKAGE_DIR ..."
+mkdir $PACKAGE_DIR
 
 echo "Copying bin directory ..."
-cp -rp $FOAM_APPBIN $RELEASE_DIR/bin
+cp -rp $FOAM_APPBIN $PACKAGE_DIR/bin
 
 echo "Copying DLLs from lib directory ..."
-mkdir $RELEASE_DIR/lib
-cp -p $FOAM_LIBBIN/*.dll $RELEASE_DIR/lib
-mkdir $RELEASE_DIR/lib/$MPI_VERSION
-cp -p $FOAM_MPI_LIBBIN/*.dll $RELEASE_DIR/lib/$MPI_VERSION
+mkdir $PACKAGE_DIR/lib
+cp -p $FOAM_LIBBIN/*.dll $PACKAGE_DIR/lib
+
+echo "Copying extra files from bin directory ..."
+cp -p $WM_PROJECT_DIR/bin/setWindowsEnvironment.bat $PACKAGE_DIR/
+cp -p $WM_PROJECT_DIR/bin/foamWindowsShell.bat $PACKAGE_DIR/
+cp -p $WM_PROJECT_DIR/bin/paraFoam.bat $PACKAGE_DIR/bin
 
 echo "Copying extra files from etc directory ..."
-mkdir $RELEASE_DIR/etc
-cp -p $WM_PROJECT_DIR/bin/setWindowsEnvironment.bat $RELEASE_DIR/
-cp -p $WM_PROJECT_DIR/bin/foamWindowsShell.bat $RELEASE_DIR/
-cp -p $WM_PROJECT_DIR/etc/controlDict-EXAMPLE $RELEASE_DIR/etc
-cp -p $WM_PROJECT_DIR/etc/cellModels $RELEASE_DIR/etc
-cp -rp $WM_PROJECT_DIR/etc/thermoData $RELEASE_DIR/etc
-cp -p $WM_PROJECT_DIR/doc/buildInstructions/Windows/READMEBinaryPackage.txt $RELEASE_DIR/
-cp -p $WM_PROJECT_DIR/bin/paraFoam.bat $RELEASE_DIR/bin
-cp -p $WM_PROJECT_DIR/COPYING $RELEASE_DIR/LICENSE.txt
-unix2dos $RELEASE_DIR/LICENSE.txt
+mkdir $PACKAGE_DIR/etc
+cp -p $WM_PROJECT_DIR/etc/cellModels $PACKAGE_DIR/etc
+cp -rp $WM_PROJECT_DIR/etc/thermoData $PACKAGE_DIR/etc
 
-create_package $RELEASE_DIR zip
-#create_package $RELEASE_DIR 7z
+echo "Copying doc and license files ..."
+cp -p $WM_PROJECT_DIR/doc/buildInstructions/Windows/READMEBinaryPackage.txt $PACKAGE_DIR/
+cp -p $WM_PROJECT_DIR/COPYING $PACKAGE_DIR/LICENSE.txt
+unix2dos $PACKAGE_DIR/LICENSE.txt
 
-rm -rf $RELEASE_DIR
+create_package $PACKAGE_DIR zip
+create_package $PACKAGE_DIR 7z
+
+rm -rf $PACKAGE_DIR

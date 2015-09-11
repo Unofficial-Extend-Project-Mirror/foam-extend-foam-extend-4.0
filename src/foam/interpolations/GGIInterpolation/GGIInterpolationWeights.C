@@ -270,11 +270,6 @@ void GGIInterpolation<MasterPatch, SlavePatch>::calcAddressing() const
                 << "This is strange..."  << endl;
         }
 
-        // The master face neighbours polygons projected in the plane UV
-        // We will only keep the ones with some area overlap
-        DynamicList<List<point2D> > masterNeighFace2DPolygonInUV;
-        DynamicList<scalarField> masterNeighFace2DPolygonInUVErrorProjection;
-
         // Next, project the candidate master neighbours faces points
         // onto the same plane using the new orthonormal basis
         const labelList& curCMN = candidateMasterNeighbors[faceMi];
@@ -614,7 +609,7 @@ GGIInterpolation<MasterPatch, SlavePatch>::findNonOverlappingFaces
     tmp<labelField> tpatchFaceNonOverlapAddr(new labelField());
     labelField& patchFaceNonOverlapAddr = tpatchFaceNonOverlapAddr();
 
-    DynamicList<label> patchFaceNonOverlap(patchWeights.size());
+    DynamicList<label, 64> patchFaceNonOverlap(patchWeights.size());
 
     // Scan the list of patch weights, looking for empty lists
     forAll (patchWeights, paWi)

@@ -23,10 +23,11 @@
 #     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 #
 # Script
-#     build.sh
+#     clean.sh
 #
 # Description
-#     Removes previous thirdy-party dependencies build directories (does not remove installed packages directory)
+#     Removes previous thirdy-party dependencies build directories
+#     (does not remove installed packages directory)
 #
 # Author:
 #     Cesare Guardino, Alstom Power Ltd., (2015)

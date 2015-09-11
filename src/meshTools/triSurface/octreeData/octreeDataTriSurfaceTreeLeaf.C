@@ -25,8 +25,8 @@ Description
 
 \*---------------------------------------------------------------------------*/
 
-#include "octreeDataTriSurfaceTreeLeaf.H"
 #include "octreeDataTriSurface.H"
+#include "octreeDataTriSurfaceTreeLeaf.H"
 
 // * * * * * * * * * * * * * Template Specialisations  * * * * * * * * * * * //
 

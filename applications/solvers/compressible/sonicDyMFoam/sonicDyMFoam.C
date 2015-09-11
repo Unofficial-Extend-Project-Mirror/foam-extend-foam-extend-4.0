@@ -85,9 +85,9 @@ int main(int argc, char *argv[])
         // Mesh motion update
         if (meshChanged)
         {
-            T = max(T, TMin);
-            p = max(p, pMin);
-            e = max(e, thermo.Cv()*TMin);
+            T.max(TMin);
+            p.max(pMin);
+            e == max(e, thermo.Cv()*TMin);
 
             thermo.correct();
             rho = thermo.rho();

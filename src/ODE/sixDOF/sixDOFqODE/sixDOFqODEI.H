@@ -172,6 +172,12 @@ const Foam::dimensionedVector& Foam::sixDOFqODE::Uaverage() const
 }
 
 
+const Foam::finiteRotation& Foam::sixDOFqODE::rotation() const
+{
+    return rotation_;
+}
+
+
 Foam::vector Foam::sixDOFqODE::rotVectorAverage() const
 {
     return rotation_.rotVectorAverage();
