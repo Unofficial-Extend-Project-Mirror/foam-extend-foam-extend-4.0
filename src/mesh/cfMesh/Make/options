@@ -1,5 +1,5 @@
 #if defined(__GNUC__)
-#   if defined(darwinIntel64)
+#   if defined(darwin)
         OMP_FLAGS =
 #   else
         OMP_FLAGS = -DUSE_OMP -fopenmp
