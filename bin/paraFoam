@@ -48,6 +48,9 @@ USAGE
 
 unset regionName touchOnly useNativeReader
 
+# This is needed for systems that are using comma as the decimal separator
+export LC_NUMERIC=C
+
 # parse options
 while [ "$#" -gt 0 ]
 do
