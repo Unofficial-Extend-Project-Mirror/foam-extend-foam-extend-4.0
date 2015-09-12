@@ -1,0 +1,6 @@
+# Generate the ASCII version of testHarness.org
+pandoc testHarness.org -N -s -S -f org -t asciidoc -o testHarness.txt
+
+# Generate the Mediawiki version of testHarness.org
+pandoc testHarness.org -s -S -f org -t mediawiki -o testHarness.mediawiki
+
