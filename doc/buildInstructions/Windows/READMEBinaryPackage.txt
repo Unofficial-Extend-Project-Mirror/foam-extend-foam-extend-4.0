@@ -22,7 +22,7 @@
 #     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 #
 # File
-#     README_Windows.txt
+#     READMEBinaryPackage.txt
 #
 # Description
 #     Installation and usage instructions for stand-alone Windows builds.

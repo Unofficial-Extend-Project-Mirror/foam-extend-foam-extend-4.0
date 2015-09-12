@@ -37,7 +37,7 @@
 
 It is strongly recommended to install all required systems tools and utilities
 in a directory with no embedded white spaces. You can skip some steps if you
-already have some of these system tools.
+already have the correct tools installed on your system.
 
 
 2. INSTRUCTIONS FOR BUILDING ON WINDOWS
@@ -46,22 +46,32 @@ already have some of these system tools.
 1) Download and install 7-Zip (see reference list below). This is necessary to
    be able to unzip the rest of the required packages mentioned in later steps.
 
-2) Download and install wget, CMake, Git, MinGW-w64, ParaView and PExports (see
-   reference list below). Note that some components (example PExports and GMake)
-   may already be available in other packages (such as Strawberry Perl), although
-   you need to be careful of the version numbers.
+2) Download and install wget, CMake, Git, MinGW-w64, ParaView, PExports, Java,
+   Subversion, Python (see reference list below). Note that some components
+   (for example PExports and GMake) may already be available in other packages
+   (such as Strawberry Perl), although you need to be careful of the
+    version numbers.
 
 3) Download and install MSYS (see reference list below).  If this is your first
-   use of MSYS, create a file fstab in cMinGW/1.0/etc with single-line contents:
+   use of MSYS, create a file fstab in c/MinGW/msys/1.0/etc with single-line
+   contents:
 
-   c/mingw /mingw
+   c:/mingw /mingw
 
-   to mount your home directory.  From Windows, you will find your home directory
-   under c:/MinGW/msys/1.0/home/<user name>
+   to mount your home directory (this assumes you have installed MSYS to the default
+   c:/MinGW directory).
+   From Windows, you will find your home directory under
+   c:/MinGW/msys/1.0/home/<user name>
 
-4) Download the foam-extend source code from http://sourceforge.net/projects/openfoam-extend/
+4) Download the foam-extend source code from
 
-5) Open a new MSYS shell and chdir to your foam-extend-3.1 source directory.
+   http://sourceforge.net/projects/openfoam-extend/
+
+   using the command:
+
+   git clone --branch nextRelease git://git.code.sf.net/p/openfoam-extend/foam-extend-3.1 foam-extend-3.2
+
+5) Open a new MSYS shell and chdir to your foam-extend-3.2 source directory.
 
 6) Edit the user-modifiable entries in etc/bashrc.mingw to point to the
    locations where you have installed the required system tools in the first two
@@ -92,9 +102,9 @@ already have some of these system tools.
         approach for developers.
 
    (b). From a standard Windows CMD.exe command prompt using the created
-        foam-extend-3.1-win-x64.zip stand-alone package. This can be used on any
-        Windows machine without access to MSYS shells or compilers. See the README.txt
-        contained within the package for further details.
+        foam-extend-3.2-win-x64.zip stand-alone package. This can be used on any
+        Windows machine without access to MSYS shells or compilers. See the
+        READMEBinaryPackage.txt contained within the package for further details.
 
 
 3. EXTERNAL PACKAGE REFERENCE
@@ -114,6 +124,11 @@ Name   : Git
 Version: 1.9.5
 URL    : https://git-scm.com/download/win
 For    : Version control system. Choose "Use Git from the Windows command prompt" and "Check out as-is. Commit as-is" in installer.
+
+Name   : Java
+Version: Version 8 Update 60
+URL    : http://www.java.com
+For    : Not essential
 
 Name   : Microsoft Visual C++ 2010 Redistributable Package (x64)
 Version: 2010
@@ -147,10 +162,20 @@ Version: 0.44 (or above)
 URL    : http://sourceforge.net/projects/mingw/files/MinGW/Extension/pexports/pexports-0.46/pexports-0.46-mingw32-bin.tar.xz/download
 For    : Extracting symbols from OpenMPI DLLs to pass to dlltool.exe (supplied in MinGW-w64 package). Move directory "bin" to "pexports-0.46" after unpacking.
 
+Name   : Pyhton
+Version: 2.7
+URL    : https://www.python.org/download/releases/2.7/
+For    : Not essential
+
 Name   : Strawberry Perl
 Version: 5.20.2.1 (or above)
 URL    : http://strawberryperl.com/download/5.20.2.1/strawberry-perl-5.20.2.1-64bit.msi
 For    : Running Perl scripts, "pexports.exe" and "gmake.exe" utilities
+
+Name   : Subversion
+Version: 1.8.13
+URL    : http://sourceforge.net/projects/win32svn/files/1.8.13/
+For    : ??????????
 
 Name   : wget
 Version: 1.11.4-1 (or above)
@@ -160,22 +185,22 @@ For    : Automatically downloading files from internet (eg. for use in automated
 git clone --branch nextRelease git://git.code.sf.net/p/openfoam-extend/foam-extend-3.1
 
 
-4. EXAMPLE OUTPUT FROM SOUCING etc/bashrc.mingw
-===============================================
+4. EXAMPLE OUTPUT FROM SOURCING etc/bashrc.mingw
+================================================
 
 $ . etc/bashrc.mingw
 Setting environment variables for user-defined installed system tools and utilities ...
 
-Sourcing: /c/Users/UserName/Git/foam-extend-3.1/etc/bashrc
-Sourcing: /c/Users/UserName/Git/foam-extend-3.1/etc/prefs.sh.mingw
-Sourcing: /c/Users/UserName/Git/foam-extend-3.1/etc/settings.sh
-    MESQUITE_DIR is initialized to: /c/Users/UserName/Git/foam-extend-3.1/ThirdParty/packages/mesquite-2.1.2
-    METIS_DIR is initialized to: /c/Users/UserName/Git/foam-extend-3.1/ThirdParty/packages/metis-5.1.0
-    PARMETIS_DIR is initialized to: /c/Users/UserName/Git/foam-extend-3.1/ThirdParty/packages/parmetis-4.0.3
-    PARMGRIDGEN_DIR is initialized to: /c/Users/UserName/Git/foam-extend-3.1/ThirdParty/packages/ParMGridGen-1.0
+Sourcing: /c/Users/UserName/Git/foam-extend-3.2/etc/bashrc
+Sourcing: /c/Users/UserName/Git/foam-extend-3.2/etc/prefs.sh.mingw
+Sourcing: /c/Users/UserName/Git/foam-extend-3.2/etc/settings.sh
+    MESQUITE_DIR is initialized to: /c/Users/UserName/Git/foam-extend-3.2/ThirdParty/packages/mesquite-2.1.2
+    METIS_DIR is initialized to: /c/Users/UserName/Git/foam-extend-3.2/ThirdParty/packages/metis-5.1.0
+    PARMETIS_DIR is initialized to: /c/Users/UserName/Git/foam-extend-3.2/ThirdParty/packages/parmetis-4.0.3
+    PARMGRIDGEN_DIR is initialized to: /c/Users/UserName/Git/foam-extend-3.2/ThirdParty/packages/ParMGridGen-1.0
     LIBCCMIO_DIR is initialized to:
-    SCOTCH_DIR is initialized to: /c/Users/UserName/Git/foam-extend-3.1/ThirdParty/packages/scotch_6.0.0
-    SCOTCH_DIR is initialized to: /c/Users/UserName/Git/foam-extend-3.1/ThirdParty/packages/scotch_6.0.0
+    SCOTCH_DIR is initialized to: /c/Users/UserName/Git/foam-extend-3.2/ThirdParty/packages/scotch_6.0.0
+    SCOTCH_DIR is initialized to: /c/Users/UserName/Git/foam-extend-3.2/ThirdParty/packages/scotch_6.0.0
     CMAKE_DIR is initialized to:
     M4_DIR is initialized to:
     BISON_DIR is initialized to:
@@ -183,13 +208,13 @@ Sourcing: /c/Users/UserName/Git/foam-extend-3.1/etc/settings.sh
     ZOLTAN_DIR is initialized to:
     PYTHON_DIR is initialized to:
     PYFOAM_DIR is initialized to:
-    PYFOAM_SITE_DIR is initialized to: /c/Users/UserName/Git/foam-extend-3.1/ThirdParty/PyFoamSiteScripts
+    PYFOAM_SITE_DIR is initialized to: /c/Users/UserName/Git/foam-extend-3.2/ThirdParty/PyFoamSiteScripts
     HWLOC_DIR is initialized to:
     QT_DIR is initialized to:
     PARAVIEW_DIR is initialized to:
     LLVM_DIR is initialized to:
     MESA_DIR is initialized to:
-Sourcing: /c/Users/UserName/Git/foam-extend-3.1/etc/aliases.sh
+Sourcing: /c/Users/UserName/Git/foam-extend-3.2/etc/aliases.sh
 
 Adding user-defined installed system tools to PATH ...
 Setting OpenMPI environment settings ...
@@ -218,6 +243,6 @@ Wget:        /c/Programs/wget-1.11.4-1/bin/wget.exe [GNU Wget 1.11.4 Copyright (
 
 
 FOAM_INST_DIR=/c/Users/UserName/Git
-WM_PROJECT_DIR=/c/Users/UserName/Git/foam-extend-3.1
+WM_PROJECT_DIR=/c/Users/UserName/Git/foam-extend-3.2
 WM_OSTYPE=MSWindows
 ENVIRONMENT SETUP COMPLETE.

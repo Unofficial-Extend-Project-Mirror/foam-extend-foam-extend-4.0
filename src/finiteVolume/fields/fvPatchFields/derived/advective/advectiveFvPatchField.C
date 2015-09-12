@@ -172,7 +172,10 @@ template<class Type>
 tmp<scalarField> advectiveFvPatchField<Type>::advectionSpeed() const
 {
     const surfaceScalarField& phi =
-        this->db().objectRegistry::template lookupObject<surfaceScalarField>(phiName_);
+        this->db().objectRegistry::template lookupObject<surfaceScalarField>
+        (
+            phiName_
+        );
 
     fvsPatchField<scalar> phip = this->lookupPatchField
     (

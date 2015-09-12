@@ -369,6 +369,61 @@ void Foam::decompositionMethod::calcCellCells
 }
 
 
+void Foam::decompositionMethod::fixCyclics
+(
+    const polyMesh& mesh,
+    labelList& decomp
+)
+{
+    const polyBoundaryMesh& pbm = mesh.boundaryMesh();
+
+    label nFixedCyclics = 0;
+
+    // Coupled faces. Only cyclics done.
+    do
+    {
+        nFixedCyclics = 0;
+
+        forAll(pbm, patchi)
+        {
+            if (isA<cyclicPolyPatch>(pbm[patchi]))
+            {
+                const unallocLabelList& faceCells = pbm[patchi].faceCells();
+
+                const label sizeby2 = faceCells.size()/2;
+
+                for (label facei=0; facei<sizeby2; facei++)
+                {
+                    const label own = faceCells[facei];
+                    const label nei = faceCells[facei + sizeby2];
+
+                    if(decomp[own] < decomp[nei])
+                    {
+                        decomp[own] = decomp[nei];
+                        nFixedCyclics++;
+                    }
+                    else if(decomp[own] > decomp[nei])
+                    {
+                        decomp[nei] = decomp[own];
+                        nFixedCyclics++;
+                    }
+                }
+            }
+        }
+
+        if(nFixedCyclics > 0)
+        {
+            WarningIn
+            (
+                "decompositionMethod::fixCyclics"
+                "(const polyMesh& mesh, labelList& decomp)"
+            )   << "Fixed " << nFixedCyclics << " disconnected cyclic faces";
+        }
+    }
+	while (nFixedCyclics > 0);
+}
+
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 Foam::autoPtr<Foam::decompositionMethod> Foam::decompositionMethod::New

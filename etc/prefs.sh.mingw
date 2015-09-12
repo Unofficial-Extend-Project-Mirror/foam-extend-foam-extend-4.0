@@ -22,10 +22,11 @@
 #     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 #
 # File
-#     etc/prefs.sh
+#     etc/prefs.sh.mingw
 #
 # Description
-#     Preset variables for the FOAM configuration - POSIX shell syntax.
+#     Preset variables for the FOAM configuration - POSIX shell syntax
+#     for MS Windows
 #
 #     The prefs.sh file will be sourced by the FOAM etc/bashrc when it is
 #     found

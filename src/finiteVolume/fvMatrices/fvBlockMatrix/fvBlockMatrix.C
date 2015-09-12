@@ -26,11 +26,16 @@ License
 #include "fvBlockMatrix.H"
 #include "IOstreams.H"
 
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+namespace Foam
+{
+
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
 template<class Type>
 template<class fieldType>
-void Foam::fvBlockMatrix<Type>::insertSolutionVector
+void fvBlockMatrix<Type>::insertSolutionVector
 (
     const direction dir,
     const Field<fieldType>& xSingle
@@ -59,7 +64,7 @@ void Foam::fvBlockMatrix<Type>::insertSolutionVector
 
 template<class Type>
 template<class matrixType>
-void Foam::fvBlockMatrix<Type>::insertDiagSource
+void fvBlockMatrix<Type>::insertDiagSource
 (
     const direction dir,
     fvMatrix<matrixType>& matrix
@@ -162,7 +167,7 @@ void Foam::fvBlockMatrix<Type>::insertDiagSource
 
 template<class Type>
 template<class matrixType>
-void Foam::fvBlockMatrix<Type>::insertUpperLower
+void fvBlockMatrix<Type>::insertUpperLower
 (
     const direction dir,
     const fvMatrix<matrixType>& matrix
@@ -290,7 +295,7 @@ void Foam::fvBlockMatrix<Type>::insertUpperLower
 
 template<class Type>
 template<class matrixType>
-void Foam::fvBlockMatrix<Type>::updateCouplingCoeffs
+void fvBlockMatrix<Type>::updateCouplingCoeffs
 (
     const direction dir,
     const fvMatrix<matrixType>& matrix
@@ -563,7 +568,7 @@ void Foam::fvBlockMatrix<Type>::insertBoundaryContributions
 
 
 template<class Type>
-void Foam::fvBlockMatrix<Type>::insertCouplingDiag
+void fvBlockMatrix<Type>::insertCouplingDiag
 (
     const direction dirI,
     const direction dirJ,
@@ -586,7 +591,7 @@ void Foam::fvBlockMatrix<Type>::insertCouplingDiag
 
 
 template<class Type>
-void Foam::fvBlockMatrix<Type>::insertCouplingUpperLower
+void fvBlockMatrix<Type>::insertCouplingUpperLower
 (
     const direction dirI,
     const direction dirJ,
@@ -673,7 +678,7 @@ void Foam::fvBlockMatrix<Type>::insertCouplingUpperLower
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 template<class Type>
-Foam::fvBlockMatrix<Type>::fvBlockMatrix
+fvBlockMatrix<Type>::fvBlockMatrix
 (
     GeometricField<Type, fvPatchField, volMesh>& psi
 )
@@ -686,7 +691,7 @@ Foam::fvBlockMatrix<Type>::fvBlockMatrix
 
 
 template<class Type>
-Foam::fvBlockMatrix<Type>::fvBlockMatrix
+fvBlockMatrix<Type>::fvBlockMatrix
 (
     const fvBlockMatrix<Type>& bxs
 )
@@ -700,7 +705,7 @@ Foam::fvBlockMatrix<Type>::fvBlockMatrix
 
 template<class Type>
 template<class fieldType>
-void Foam::fvBlockMatrix<Type>::retrieveSolution
+void fvBlockMatrix<Type>::retrieveSolution
 (
     const direction dir,
     Field<fieldType>& xSingle
@@ -729,7 +734,7 @@ void Foam::fvBlockMatrix<Type>::retrieveSolution
 
 template<class Type>
 template<class matrixType>
-void Foam::fvBlockMatrix<Type>::insertEquation
+void fvBlockMatrix<Type>::insertEquation
 (
     const direction dir,
     fvMatrix<matrixType>& matrix
@@ -744,7 +749,7 @@ void Foam::fvBlockMatrix<Type>::insertEquation
 
 template<class Type>
 template<class blockType, class fieldType>
-void Foam::fvBlockMatrix<Type>::insertBlockCoupling
+void fvBlockMatrix<Type>::insertBlockCoupling
 (
     const direction dirI,
     const direction dirJ,
@@ -773,7 +778,7 @@ void Foam::fvBlockMatrix<Type>::insertEquationCoupling
 
 
 template<class Type>
-void Foam::fvBlockMatrix<Type>::blockAdd
+void fvBlockMatrix<Type>::blockAdd
 (
     const direction dir,
     const scalarField& xSingle,
@@ -822,7 +827,7 @@ void Foam::fvBlockMatrix<Type>::updateSourceCoupling()
 
 
 template<class Type>
-Foam::BlockSolverPerformance<Type> Foam::fvBlockMatrix<Type>::solve
+BlockSolverPerformance<Type> fvBlockMatrix<Type>::solve
 (
     const dictionary& solverControls
 )
@@ -844,7 +849,7 @@ Foam::BlockSolverPerformance<Type> Foam::fvBlockMatrix<Type>::solve
 
 
 template<class Type>
-Foam::BlockSolverPerformance<Type> Foam::fvBlockMatrix<Type>::solve()
+BlockSolverPerformance<Type> fvBlockMatrix<Type>::solve()
 {
     return solve(psi_.mesh().solutionDict().solverDict(psi_.name()));
 }
@@ -853,7 +858,7 @@ Foam::BlockSolverPerformance<Type> Foam::fvBlockMatrix<Type>::solve()
 // * * * * * * * * * * * * * * * IOstream Operators  * * * * * * * * * * * * //
 
 template<class Type>
-Foam::Ostream& Foam::operator<<
+Ostream& operator<<
 (
     Ostream& os,
     const fvBlockMatrix<Type>& bxs
@@ -865,5 +870,9 @@ Foam::Ostream& Foam::operator<<
     return os;
 }
 
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+} // End namespace Foam
 
 // ************************************************************************* //

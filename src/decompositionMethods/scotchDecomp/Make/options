@@ -2,7 +2,7 @@ EXE_INC = \
     -I$(SCOTCH_INCLUDE_DIR) \
     -I../decompositionMethods/lnInclude
 
-#if defined(darwinIntel)
+#if defined(darwin)
 
 /* No librt for Mac OS X */
 LIB_LIBS = \
