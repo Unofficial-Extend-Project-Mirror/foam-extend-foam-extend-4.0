@@ -124,7 +124,9 @@ The foam-extend test harness is currently built from the following files:
   under the test harness.
 
 ** Configuring your $WM\_PROJECT\_DIR/etc/prefs.sh file for the test harness
-The following environment variables are used for configuring the test harness:
+The following environment variables are used for configuring the test
+harness. You should use your $WM\_PROJECT\_DIR/etc/prefs.sh file to initialize
+these variables.
 
 - =CDASH_SUBMIT_LOCAL_HOST_ID= :: System identifier for the FOAM CDash test harness
   on foam-extend. By default, your system FQN/hostname will be used as the
