@@ -221,9 +221,9 @@ build_library() {
             export EXTRA_SYSTEM_HOME=
             ;;
 
-        scotch_6.0.0)
+        scotch_6.0.4)
             export PTHREADS_HOME=$BUILD_DIR/pthreads-w32-2-9-1-release
-            download $PACKAGE.tar.gz https://gforge.inria.fr/frs/download.php/31831 > $LOG_FILE 2>&1
+            download $PACKAGE.tar.gz https://gforge.inria.fr/frs/download.php/34618 > $LOG_FILE 2>&1
             extract "$PACKAGE.tar.gz" gzip >> $LOG_FILE 2>&1
             patch $PACKAGE
             cd $PACKAGE/src
@@ -263,7 +263,7 @@ build_libraries() {
     build_library metis-5.1.0
     build_library parmetis-4.0.3
     build_library ParMGridGen-1.0
-    build_library scotch_6.0.0
+    build_library scotch_6.0.4
     build_library mesquite-2.1.2
 }
 
