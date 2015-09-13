@@ -26,7 +26,8 @@
 #     etc/bashrc.mingw
 #
 # Description
-#     Startup file for FOAM for use with MSYS shell for MinGW-based builds on Windows.
+#     Startup file for FOAM for use with MSYS shell for MinGW-based build
+#     on Microsoft Windows 7 and 8.1.
 #     Calls the main etc/bashrc script.
 #     Sourced from ~/.profile or ~/.bashrc
 #
@@ -62,11 +63,12 @@ add_to_path() {
     export PATH=$SUBVERSION_HOME/bin:$PATH
     export PATH=$GIT_HOME/cmd:$PATH
     #export PATH=$PERL_HOME/bin:$PATH
+    export PATH=$PARAVIEW_HOME/bin:$PATH
     export PATH=$CMAKE_HOME/bin:$PATH
-    export PATH=$MPI_ROOTDIR/bin:$PATH
     export PATH=$PEXPORTS_HOME/bin:$PATH
     export PATH=$MINGW_HOME/bin:$PATH
-    export PATH=$PARAVIEW_HOME/bin:$PATH
+#   MPI comes last to enforce the path
+    export PATH=$MPI_ROOTDIR/bin:$PATH
 }
 # }}}
 
