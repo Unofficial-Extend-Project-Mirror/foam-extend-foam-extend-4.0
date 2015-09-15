@@ -103,6 +103,7 @@ export FOAM_TUTORIALS=$WM_PROJECT_DIR/tutorials
 export FOAM_UTILITIES=$FOAM_APP/utilities
 export FOAM_SOLVERS=$FOAM_APP/solvers
 export FOAM_RUN=$WM_PROJECT_USER_DIR/run
+export FOAM_TEST_HARNESS_DIR=$WM_PROJECT_DIR/testHarness/foam-extend/$WM_PROJECT_VERSION
 
 # add FOAM scripts and wmake to the path
 export PATH=$WM_DIR:$WM_PROJECT_DIR/bin:$PATH
