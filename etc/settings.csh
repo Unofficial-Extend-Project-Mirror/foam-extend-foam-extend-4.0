@@ -65,6 +65,7 @@ setenv FOAM_TUTORIALS $WM_PROJECT_DIR/tutorials
 setenv FOAM_UTILITIES $FOAM_APP/utilities
 setenv FOAM_SOLVERS $FOAM_APP/solvers
 setenv FOAM_RUN $WM_PROJECT_USER_DIR/run
+setenv FOAM_TEST_HARNESS_DIR $WM_PROJECT_DIR/testHarness/foam-extend/$WM_PROJECT_VERSION
 
 # add FOAM scripts and wmake to the path
 set path=($WM_DIR $WM_PROJECT_DIR/bin $path)
