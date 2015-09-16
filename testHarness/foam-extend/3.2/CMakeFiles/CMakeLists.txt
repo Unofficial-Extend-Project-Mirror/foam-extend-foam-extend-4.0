@@ -379,10 +379,18 @@ IF(BUILD_TESTING)
     IF(RUN_FROM_ONE_TIMESTEP)
         # Modify the cases controlDict file in order to run for only one time step
         MESSAGE("${testRunTimeDirectory}: Modifying the controlDict files for running only one time step in directory: ${TEST_CASE_DIR}")
-        EXECUTE_PROCESS(
+	if(CMAKE_HOST_WIN32)
+          # Need to supply a bash shell to run the script under Windows
+          EXECUTE_PROCESS(
+            COMMAND bash -c "$ENV{FOAM_TEST_HARNESS_DIR}/scripts/prepareCasesForOneTimeStep.sh ${TEST_CASE_DIR}"
+            WORKING_DIRECTORY .
+            )
+	else()
+          EXECUTE_PROCESS(
             COMMAND $ENV{FOAM_TEST_HARNESS_DIR}/scripts/prepareCasesForOneTimeStep.sh ${TEST_CASE_DIR}
             WORKING_DIRECTORY .
             )
+	endif()
     ENDIF(RUN_FROM_ONE_TIMESTEP)
 
 ENDIF(BUILD_TESTING)
