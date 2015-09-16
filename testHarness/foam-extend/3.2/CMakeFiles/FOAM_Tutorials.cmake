@@ -90,14 +90,14 @@ FOREACH(caseWithAllrun ${listofCasesWithAllrun})
     MESSAGE("Found Allrun file in directory: ${thisCasePath}")
 
     # Grab the parent name of the case directory
-    string(REPLACE ${TEST_CASE_DIR}/ "" caseParentPath ${caseWithAllrun})
+    string(REPLACE ${TEST_CASE_DIR}/ "" caseParentPath ${thisCasePath})
 
     # Construct the testId
     string(REPLACE "/" "_" testId ${caseParentPath})
-    SET(testId ${testId}${testIdSuffix})
+    SET(testId ${testId}_Allrun${testIdSuffix})
 
     # Add the test to the test harness
-    MESSAGE("Adding test: ${testId}")
+    MESSAGE("    Adding test: ${testId}")
     ADD_TEST(${testId} bash -c "cd ${thisCasePath}; ./Allrun")
 
     # We extract a label name from the top level tutorial directories 
@@ -120,7 +120,7 @@ FOREACH(caseWithAllrun ${listofCasesWithAllrun})
     # Use this following entry instead for testing purpose
     #ADD_TEST(${testId} bash -c "cd ${thisCasePath}; true")
 
-  ENDIF(NOT ${thisCasePath} STREQUAL ${TEST_CASE_DIR})
+  ENDIF()
 ENDFOREACH(caseWithAllrun)
 
 # Modify the cases Allrun files to incorporate additional shell functions
