@@ -46,7 +46,7 @@ LDFLAGS    	+= -L$(MPI_ROOTDIR)/bin -lm -lmpi -lmpid
 #PTHREAD_ROOTDIR		= $(PGMFILES)/pthread-win32
 #CFLAGS_INC		+= -I$(PTHREAD_ROOTDIR)/include
 #CLIBFLAGS	=
-LDFLAGS		+= -L$(PTHREADS_HOME)/Pre-built.2/lib/x64 -lpthread
+LDFLAGS		+= -L$(PTHREADS_HOME)/Pre-built.2/lib/x64 -lpthreadGC2
 
 #--- zlib: Uncomment for compressed files
 #ZLIB_ROOTDIR		= $(PGMFILES)/zlib-1.2.3
