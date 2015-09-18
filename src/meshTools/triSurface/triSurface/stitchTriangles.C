@@ -46,17 +46,12 @@ bool triSurface::stitchTriangles
     pointField newPoints;
     bool hasMerged = mergePoints(rawPoints, tol, verbose, pointMap, newPoints);
 
-    pointField& ps = storedPoints();
-
-    // Set the coordinates to the merged ones
-    ps.transfer(newPoints);
-
     if (hasMerged)
     {
         if (verbose)
         {
             Pout<< "stitchTriangles : Merged from " << rawPoints.size()
-                << " points down to " << ps.size() << endl;
+                << " points down to " << newPoints.size() << endl;
         }
 
         // Reset the triangle point labels to the unique points array
@@ -72,7 +67,12 @@ bool triSurface::stitchTriangles
                 tri.region()
             );
 
-            if ((newTri[0] != newTri[1]) && (newTri[0] != newTri[2]) && (newTri[1] != newTri[2]))
+            if
+            (
+                (newTri[0] != newTri[1])
+             && (newTri[0] != newTri[2])
+             && (newTri[1] != newTri[2])
+            )
             {
                 operator[](newTriangleI++) = newTri;
             }
@@ -82,11 +82,12 @@ bool triSurface::stitchTriangles
                     << "Removing triangle " << i
                     << " with non-unique vertices." << endl
                     << "    vertices   :" << newTri << endl
-                    << "    coordinates:" << newTri.points(ps)
+                    << "    coordinates:" << newTri.points(newPoints)
                     << endl;
             }
         }
 
+        // If empty triangles are detected, remove them from the list
         if (newTriangleI != size())
         {
             if (verbose)
@@ -97,12 +98,12 @@ bool triSurface::stitchTriangles
             }
             setSize(newTriangleI);
 
-            // And possibly compact out any unused points (since used only
+            // Possibly compact out any unused points (since used only
             // by triangles that have just been deleted)
             // Done in two passes to save memory (pointField)
 
             // 1. Detect only
-            PackedBoolList pointIsUsed(ps.size());
+            PackedBoolList pointIsUsed(newPoints.size());
 
             label nPoints = 0;
 
@@ -120,20 +121,20 @@ bool triSurface::stitchTriangles
                 }
             }
 
-            if (nPoints != ps.size())
+            if (nPoints != newPoints.size())
             {
                 // 2. Compact.
-                pointMap.setSize(ps.size());
+                pointMap.setSize(newPoints.size());
                 label newPointI = 0;
                 forAll(pointIsUsed, pointI)
                 {
                     if (pointIsUsed[pointI])
                     {
-                        ps[newPointI] = ps[pointI];
+                        newPoints[newPointI] = newPoints[pointI];
                         pointMap[pointI] = newPointI++;
                     }
                 }
-                ps.setSize(newPointI);
+                newPoints.setSize(newPointI);
 
                 newTriangleI = 0;
                 forAll(*this, i)
@@ -149,6 +150,9 @@ bool triSurface::stitchTriangles
                 }
             }
         }
+
+        // Set the coordinates to the merged ones
+        storedPoints().transfer(newPoints);
     }
 
     return hasMerged;
