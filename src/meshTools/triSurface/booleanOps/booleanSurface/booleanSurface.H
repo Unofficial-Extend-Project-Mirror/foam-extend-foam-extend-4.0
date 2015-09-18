@@ -25,7 +25,8 @@ Class
     Foam::booleanSurface
 
 Description
-    Surface-surface intersection. Given two surfaces construct combined surface.
+    Surface-surface intersection.
+    Given two surfaces construct a combined surface.
 
     Called 'boolean' since the volume of resulting surface will encompass
     the volumes of the original surface according to some boolean operation:
