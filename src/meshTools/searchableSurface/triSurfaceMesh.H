@@ -249,6 +249,7 @@ public:
                 List<volumeType>&
             ) const;
 
+
         // Other
 
             //- Set bounds of surface. Bounds currently set as list of
@@ -271,7 +272,8 @@ public:
             //  indices) get the specified field. Misses do not get set.
             virtual void getField
             (
-                const List<pointIndexHit>&, labelList&
+                const List<pointIndexHit>&,
+                labelList&
             ) const;
 
 
