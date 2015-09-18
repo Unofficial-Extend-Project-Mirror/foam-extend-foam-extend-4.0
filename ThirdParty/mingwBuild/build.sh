@@ -151,13 +151,14 @@ build_library() {
 
         system)
             cd $INSTALL_DIR
-            patch system
+            patch $PACKAGE
             ;;
 
         pthreads-w32-2-9-1-release)
             download $PACKAGE.zip ftp://sourceware.org/pub/pthreads-win32/pthreads-w32-2-9-1-release.zip > $LOG_FILE 2>&1
             unzip_dir $PACKAGE >> $LOG_FILE 2>&1
             patch $PACKAGE
+            mv $PACKAGE $INSTALL_DIR
             ;;
 
         metis-5.1.0)
@@ -222,7 +223,7 @@ build_library() {
             ;;
 
         scotch_6.0.4)
-            export PTHREADS_HOME=$BUILD_DIR/pthreads-w32-2-9-1-release
+            export PTHREADS_HOME=$INSTALL_DIR/pthreads-w32-2-9-1-release
             download $PACKAGE.tar.gz https://gforge.inria.fr/frs/download.php/34618 > $LOG_FILE 2>&1
             extract "$PACKAGE.tar.gz" gzip >> $LOG_FILE 2>&1
             patch $PACKAGE
