@@ -1,13 +1,13 @@
 #                            -*- mode: org; -*-
 #
-#+TITLE:             *Release notes for foam-extend-3.1*
+#+TITLE:             *Release notes for foam-extend-3.2*
 #+AUTHOR:                foam-extend administrators:
 #+AUTHOR:                        Hrvoje Jasak
 #+AUTHOR:                       Håkan Nilsson
 #+AUTHOR:                       Henrik Rusche
 #+AUTHOR:                      Martin Beaudoin
 #+AUTHOR:                     Bernhard Gschaider
-#+DATE:                          8 June 2014
+#+DATE:                          August 2015
 #+LINK:                     http://foam-extend.org
 #+OPTIONS: author:nil
 #+OPTIONS: toc:2
@@ -20,20 +20,20 @@
   The foam-extend project is a fork of the OpenFOAM® open source
   library for Computational Fluid Dynamics (CFD). It is an open
   project welcoming and integrating contributions from all users and
-  developers. Previously known as OpenFOAM®-dev and OpenFOAM®-extend,
+  developers. Previously known as OpenFOAM-dev and OpenFOAM-extend,
   it contains bug fixes and performance improvements, as well as
   extensions and additional features provided by community
   contributors (see file ListOfContributors), such as dynamic mesh and
   topological change support, turbomachinery extensions including
   general grid interpolation (GGI), cyclic GGI and mixing plane,
   block-coupled matrix support, implicitly coupled conjugate heat
-  transfer and other pyshics coupling, finite area method,
+  transfer and other physics coupling, finite area method,
   comprehensive dynamic mesh (motion and topological changes)
   capability and GPU support. For a full list, see below and previous
   release notes at:
   http://sourceforge.net/p/openfoam-extend/wiki/Home/
 
-  Version 3.1, nicknamed "Zagreb", is the current version of
+  Version 3.2, nicknamed "Ann Arbor", is the current version of
   foam-extend. The release continues the tradition and spirit of the
   original FOAM code developed by prof. Jasak and Mr. Weller during
   their time at Imperial College and released as the general purpose
@@ -42,16 +42,19 @@
   December 2004) as release number 3.0.  Visit http://foam-extend.org
   for more information.
 
-  OPENFOAM® is a registered trademark of ESI Group. OpenFOAM-extend and 
+  OPENFOAM is a registered trademark of ESI Group. OpenFOAM-extend and
   foam-extend are a community effort not endorsed by ESI Group.
- 
+
+
 ** Installation
-   foam-extend-3.1 can be compiled and runs on any linux system
+   foam-extend-3.2 can be compiled and runs on a large variety of Linux, Mac or Windows
+   systems
 
   * Main supported OSs:
     - Ubuntu 14.04
     - Fedora 20
     - Mac OS X
+    - Microsoft Windows 7 and 8.1
 
   * Compile from source:
 
@@ -68,32 +71,33 @@
     Binary packages are available for download at
     http://sourceforge.net/projects/openfoam-extend/ for the following
     systems: Ubuntu 14.04, Fedora 20 and Mac OS X.
-    
+
   * Accompanying ThirdParty software:
-    - gcc compatibility up to 4.8.2
-    - Paraview 4.0.1
-    - qt 4.8.5
-    - openmpi 1.6.5
-    - cmake 2.8.12
-    - metis 5.1.0
-    - parmetis 4.0.3
-    - scotch 6.0.0
-    - ParMGridGen 1.0
-    - mesquite 2.1.2
-    - PyFoam 0.6.3
-    - swak4Foam 0.3.1
-    - zoltan 3.6
+    - gcc compatibility up to 4.9.2
     - bison 2.7
-    - hwloc 1.7.2
+    - cmake 3.2.2
+    - flex-2.5.35
+    - hwloc 1.10.1
     - libccmio 2.6.1
-  
+    - mesquite 2.1.2
+    - metis 5.1.0
+    - openmpi 1.6.5
+    - Paraview 4.3.1
+    - parmetis 4.0.3
+    - ParMGridGen 1.0
+    - PyFoam 0.6.4
+    - qt 4.8.6
+    - scotch 6.0.4
+    - swak4Foam 0.3.2
+
+
 ** Compatibility
   Upstream features from the OpenFOAM® code base are merged into
   foam-extend on regular basis. The interface format of
-  foam-extend-3.1 is largely compatible to OpenFOAM-1.6-ext and
-  OpenFOAM-1.7.x. In some cases, the differences are caused by bug
-  fixes and algorithmic improvements, considered more important than
-  inter-operability.
+  foam-extend-3.2 is largely compatible to foam-extend-3.1, to
+  OpenFOAM-1.6-ext and OpenFOAM-1.7.x. In some cases, the
+  differences are caused by bug fixes and algorithmic improvements,
+  considered more important than inter-operability.
 
 ** Main differentiators between foam-extend and OpenFOAM
   A large number of features have been lost within the release of
@@ -131,7 +135,7 @@
     dynamic mesh classes
 
   * Finite Area Method providing support for FVM-like discretisation
-    on a curved surface in 3-D, with examples of liquid film modelling
+    on a curved surface in 3-D, with examples of liquid film modeling
 
   * Block-coupled matrix support, allowing fully implicit
     multi-equation solution of NxN equation sets, with full
@@ -168,168 +172,106 @@
 
   * Algebraic multigrid solver framework
 
-  * 210 tutorials with automated run scripts
+  * 243 tutorials with automated run scripts
 
   * Automatic test harness
 
   * Approximately 6000 bug fixes in fundamental level libraries and
     discretisation techniques
 
-** New features in foam-extend-3.1, since foam-extend-3.0
+** New features in foam-extend-3.2, since foam-extend-3.1
   The list of features is a result of the work of numerous
   contributors. The maintainers of foam-extend would formally like to
   thank them all.
 
   Get a full log of the updates by (either):
 #+BEGIN_SRC bash
-user@machine> git log 3.0.. > commitLog
+    user@machine> git log 3.1.. > commitLog
 #+END_SRC
 #+BEGIN_SRC bash
-    user@machine> git log 3.0.. --oneline > commitLog
+    user@machine> git log 3.1.. --oneline > commitLog
 #+END_SRC
 #+BEGIN_SRC bash
-    user@machine> gitg 3.0..
+    user@machine> gitg 3.1..
 #+END_SRC
 
   * Major new features:
-    - Pressure-based compressible turbo functionalities
-    - Pressure-based coupled solver (block-coupling p and U)
-    - Density-based coupled Roe flux solver dbnsFoam and dbnsTurbFoam
-    - Major update and validation of mixing plane boundary
-    - Full deployment of block matrix, including block-AMG solverse
-    - Further parallel dynamic mesh capability: all topological changes
-      supported in parallel execution
-    - Major upgrade of solid mechanics solvers
-    - Support for CLang-based compilers
+    - Immersed Boundary method: full release
+    - Liquid film method, based on finite area infrastructure
+    - Global controlDict switches controlled from command line
+    - Integration of cfMesh automatic mesh solvers
+    - Update to block coupled solvers: Performance, Coupled RAS, MRF
+    - Rewrite of block-coupled matrix assembly and analysis tools
+    - New solver: potentialDyMFoam
+    - Rothalpy in compressible MRF solvers for turbomachinery
+    - Symmetry 2nd order accurate boundary condition
+    - Generation of config files (e.g. csh, tcsh, fishshell, zsh) from bashrc
+    - Overhaul of fvDOM radiation model: symmetry plane and fast convergence
+    - New compilers: GCC new versions, Icc 14 and Icc 16, Clang
+    - Long long support
+    - Long double support
+    - SuperBee01 and SuperBee01DC
+    - wallShearStress also for compressible flow (backport)
+    - Version updates of 3rd Party, PyFOAM, swak4Foam
+    - Extend-bazaar: Added makeAxialMesh
+    - Added limiters on turbulence viscosity
+    - Initial version of block-coupled turbulence models
+    - New ThirdParty app: ParaView server for parallel rendering
 
   * Licence: GPLv3
 
+  * Software
+    - File name changes resolving name clashes on non-case-sensitive filing
+      systems
+    - Unified code base for Windows, Mac OS X and Linux compilation
+    - Parallel execution of automated test loops
+
   * Installation:
+    - Native port to Microsoft Windows 7 and 8.1
     - Updated and bug-fixed installation procedures
-    - Removed need for gmake link in Ubuntu
-    - Scripts for minimizing installation after compilation
-      - ThirdParty/Allclean alsoPackage - new option
-      - wcleanAllButLibBinLnInclude
-    - Fixed problem with ParaView reader for Ubuntu 14.04
-    - foamToTecplot360: building tecio doesn't require X.org
-      development files
+    - Improved ThirdParty packages selection mechanism
 
   * Solvers:
-    - compressible/dbnsFoam
-    - compressible/dbnsTurbFoam
-    - compressible/steadyCompressibleFoam
-    - compressible/steadyCompressibleMRFFoam
-    - compressible/steadyCompressibleSRFFoam
-    - coupled/pUCoupledFoam (incl. core library changes)
-
-    - Update and cleanup of solvers/solidMechanics
-    - Update for segregated FEM matrix,
-      solvers/solidMechanics/stressFemFoam
-
-  * Utilities:
-    - convertPhi (for steadyCompressible solvers)
-    - foamMeshToElmer, fluent3DMeshToElmer
-    - transformPoints -cylToCart "origin axis direction" - new option
-    - blockMesh syntax update (see commit a78b12074)
-
-  * Libraries:
-    - General:
-      - Added Gauss-Seidel as asymmetric solver
-      - Block matrix agglomeration (for pUCoupledFoam)
-      - Block AMG solver
-      - dbns library (src/dbns)
-    - Boundary conditions:
-      - cfdTools/general/SRF/derivedFvPatchFields/SRFFlowRateInletVelocity
-      - cfdTools/general/SRF/derivedFvPatchFields/SRFSurfaceNormalVelocity
-      - cfdTools/general/SRF/derivedFvPatchFields/SRFTotalPressure
-      - cfdTools/general/SRF/derivedFvPatchFields/SRFTotalTemperature
-      - cfdTools/general/SRF/derivedFvPatchFields/pulseFixedValue
-      - cfdTools/general/SRF/derivedFvPatchFields/waveTransmissiveInlet
-      - thermophysicalModels/basic/derivedFvPatchFields/isentropicTotalTemperature
-      - thermophysicalModels/basic/derivedFvPatchFields/temperatureDirectedInletOutletVelocity
-      - fvMesh/fvPatches/constraint/mixingPlane
-    - Turbulence modeling:
-      - Removed kOmegaSST_lowRe - use standard kOmegaSST
-
-  * Tutorial updates (settings, initial conditions, bug fixes etc.):
-    - incompressible/icoDyMFoam/mixerGgi
-    - incompressible/icoDyMFoam/movingConeMotion
-    - incompressible/icoDyMFoam/movingConeTopo
-    - solidMechanics/elasticNonLinTLSolidFoam/largeStrainCantileverBeam
-    - solidMechanics/elasticNonLinTLSolidFoam/nonLinBlock
-    - solidMechanics/elasticNonLinTLSolidFoam/rotateSphereTL
-    - solidMechanics/elasticThermalSolidFoam/hotCylinder
-    - solidMechanics/stressFemFoam/plateHole
-    - Many other updates due to blockMesh syntax update
+    - potentialDyMFoam
+    - sonicDyMFoam
+    - sonicFoamAutoMotion
+    - MRFPorousFoam
+    - liquidFilmFoam
+    - surfactantFoam
+    - icoIbFoam
+    - interIbFoam
+    - porousSimpleIbFoam
+    - potentialIbFoam
+    - simpleIbFoam
 
   * New tutorials:
-    - compressible/dbnsFoam/forwardStep
-    - compressible/dbnsFoam/shockTube
-    - compressible/dbnsTurbFoam/naca0012
-    - compressible/steadyCompressibleFoam/2bump
-    - compressible/steadyCompressibleFoam/bumpBlockMesh
-    - compressible/steadyCompressibleFoam/bumpFine05
-    - compressible/steadyCompressibleMRFFoam/bentRotorStator
-    - compressible/steadyCompressibleMRFFoam/simpleRotorStator
-    - compressible/steadyCompressibleSRFFoam/bentBlade
-    - compressible/steadyCompressibleSRFFoam/simpleBlade
-    - coupled/pUCoupledFoam/cavity
-    - incompressible/MRFSimpleFoam/axialTurbine_ggi
-    - incompressible/MRFSimpleFoam/axialTurbine_mixingPlane
-    - incompressible/pimpleDyMFoam/axialTurbine
-    - incompressible/pimpleDyMFoam/movingCylinders
-    - incompressible/pUCoupledFoam/backwardFacingStepLaminar
-    - incompressible/pUCoupledFoam/backwardFacingStepTurbulent
-    - incompressible/pUCoupledFoam/cavity
-    - incompressible/simpleSRFFoam/axialTurbine
-    - mesh/moveDynamicMesh/movingCylinders
+    - Mesquite mesh movement
+    - Immersed boundary method
+    - Liquid film examples
 
-  * Bug fixes:
-    - Correct snGrad on coupled boundaries
-    - Handling of static null pointers: safe to dereference
-    - LinearUpwind no longer hangs in parallel execution on empty patches
-    - Mesh update on parallel topo changes: zones before boundaries
-    - GGI interpolation updates on topologically changing meshes
-    - Cell layering issues off complex surfaces
-    - Template depth for block matrix support
-    - Parallel efficiency improvements
+  * Bug fixes: see git log for details
 
 ** Recent successful compilations and tests
-   * Ubuntu 14.04:
+   * CentOS 6.6:
 
-     http://openfoam-extend.sourceforge.net/CDash/viewTest.php?buildid=736
+     http://foam-extend.sourceforge.net/CDash/buildSummary.php?buildid=49
+     http://foam-extend.sourceforge.net/CDash/buildSummary.php?buildid=48
 
-   * Ubuntu 12.04:
+   * Ubuntu 14.04
 
-     http://openfoam-extend.sourceforge.net/CDash/viewTest.php?buildid=738
+     http://foam-extend.sourceforge.net/CDash/buildSummary.php?buildid=47
 
-   * CentOS 6.4:
+   * Mac OS X 10.10
 
-     http://openfoam-extend.sourceforge.net/CDash/viewTest.php?buildid=734
-
-   * Mac OX X 10.9.3 Maverick & CLang (XCode compiler):
-
-     http://openfoam-extend.sourceforge.net/CDash/viewTest.php?buildid=733
-
-   * Mac OX X & gcc (Macports)
-
-     http://openfoam-extend.sourceforge.net/CDash/viewTest.php?buildid=737
-
-  * Linux PPC ppc64 (Blue Gene)
-
-    http://openfoam-extend.sourceforge.net/CDash/viewTest.php?buildid=742
-
-  * Red Hat Enterprise Linux Server release 5.2 (Tikanga), Intel CC 11.1
-
-    http://openfoam-extend.sourceforge.net/CDash/viewTest.php?buildid=743
+    http://foam-extend.sourceforge.net/CDash/buildSummary.php?buildid=46
 
 ** Reporting bugs
-    To report bugs, please use the MantisBT bugtracker at
-    http://sourceforge.net/apps/mantisbt/openfoam-extend
+    To report bugs, please use the bugtracker at
+    http://sourceforge.net/p/openfoam-extend/ticketsfoamextendrelease/
 
 ** How to contribute
-    All your contributions are highly welcome: New solvers, utilities and 
-    models; bug fixes; documentation. The many ways of contributing and the 
+    All your contributions are highly welcome: New solvers, utilities and
+    models; bug fixes; documentation. The many ways of contributing and the
     contribution process are described in detail at:
     http://sourceforge.net/p/openfoam-extend/wiki/HowToContribute/
 

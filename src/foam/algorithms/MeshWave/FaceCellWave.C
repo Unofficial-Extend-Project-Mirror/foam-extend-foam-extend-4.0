@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -36,15 +36,17 @@ License
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
 template <class Type>
-Foam::scalar Foam::FaceCellWave<Type>::geomTol_
+Foam::debug::tolerancesSwitch Foam::FaceCellWave<Type>::geomTol_
 (
-    debug::tolerances("FaceCellWaveGeomTol", 1e-6)
+    "FaceCellWaveGeomTol",
+    1e-6
 );
 
 template <class Type>
-Foam::scalar Foam::FaceCellWave<Type>::propagationTol_
+Foam::debug::tolerancesSwitch Foam::FaceCellWave<Type>::propagationTol_
 (
-    debug::tolerances("FaceCellWavePropagationTol", 0.01)
+    "FaceCellWavePropagationTol",
+    0.01
 );
 
 // Write to ostream
@@ -264,7 +266,7 @@ void Foam::FaceCellWave<Type>::checkCyclic(const polyPatch& patch) const
         label i1 = patch.start() + patchFaceI;
         label i2 = i1 + cycOffset;
 
-        if (!allFaceInfo_[i1].sameGeometry(mesh_, allFaceInfo_[i2], geomTol_))
+        if (!allFaceInfo_[i1].sameGeometry(mesh_, allFaceInfo_[i2], geomTol_()))
         {
             FatalErrorIn("FaceCellWave<Type>::checkCyclic(const polyPatch&)")
                 << "problem: i:" << i1 << "  otheri:" << i2
@@ -359,7 +361,7 @@ void Foam::FaceCellWave<Type>::mergeFaceInfo
             (
                 meshFaceI,
                 neighbourWallInfo,
-                propagationTol_,
+                propagationTol_(),
                 currentWallInfo
             );
         }
@@ -934,7 +936,7 @@ Foam::label Foam::FaceCellWave<Type>::faceToCell()
                 cellI,
                 faceI,
                 neighbourWallInfo,
-                propagationTol_,
+                propagationTol_(),
                 currentWallInfo
             );
         }
@@ -952,7 +954,7 @@ Foam::label Foam::FaceCellWave<Type>::faceToCell()
                     cellI,
                     faceI,
                     neighbourWallInfo,
-                    propagationTol_,
+                    propagationTol_(),
                     currentWallInfo2
                 );
             }
@@ -1018,7 +1020,7 @@ Foam::label Foam::FaceCellWave<Type>::cellToFace()
                     faceI,
                     cellI,
                     neighbourWallInfo,
-                    propagationTol_,
+                    propagationTol_(),
                     currentWallInfo
                 );
             }

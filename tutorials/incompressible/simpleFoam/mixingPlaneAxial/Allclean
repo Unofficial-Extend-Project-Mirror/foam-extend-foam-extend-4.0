@@ -4,5 +4,5 @@
 . $WM_PROJECT_DIR/bin/tools/CleanFunctions
 
 cleanCase
-\rm constant/polyMesh/blockMeshDict constant/polyMesh/boundary
+\rm -f constant/polyMesh/blockMeshDict constant/polyMesh/boundary
 \rm -rf 0 ; cp -r save 0

@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -366,6 +366,61 @@ void Foam::decompositionMethod::calcCellCells
     {
         cellCells[coarseI].transfer(dynCellCells[coarseI]);
     }
+}
+
+
+void Foam::decompositionMethod::fixCyclics
+(
+    const polyMesh& mesh,
+    labelList& decomp
+)
+{
+    const polyBoundaryMesh& pbm = mesh.boundaryMesh();
+
+    label nFixedCyclics = 0;
+
+    // Coupled faces. Only cyclics done.
+    do
+    {
+        nFixedCyclics = 0;
+
+        forAll(pbm, patchi)
+        {
+            if (isA<cyclicPolyPatch>(pbm[patchi]))
+            {
+                const unallocLabelList& faceCells = pbm[patchi].faceCells();
+
+                const label sizeby2 = faceCells.size()/2;
+
+                for (label facei=0; facei<sizeby2; facei++)
+                {
+                    const label own = faceCells[facei];
+                    const label nei = faceCells[facei + sizeby2];
+
+                    if(decomp[own] < decomp[nei])
+                    {
+                        decomp[own] = decomp[nei];
+                        nFixedCyclics++;
+                    }
+                    else if(decomp[own] > decomp[nei])
+                    {
+                        decomp[nei] = decomp[own];
+                        nFixedCyclics++;
+                    }
+                }
+            }
+        }
+
+        if(nFixedCyclics > 0)
+        {
+            WarningIn
+            (
+                "decompositionMethod::fixCyclics"
+                "(const polyMesh& mesh, labelList& decomp)"
+            )   << "Fixed " << nFixedCyclics << " disconnected cyclic faces";
+        }
+    }
+	while (nFixedCyclics > 0);
 }
 
 

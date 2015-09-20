@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -114,7 +114,7 @@ void parcel::setRelaxationTimes
     // Assume equilibrium at drop-surface => pressure @ surface
     // = vapour pressure to calculate fuel-vapour density @ surface
     scalar pressureAtSurface = fuels.pv(pressure, T(), X());
-    scalar rhoFuelVap = pressureAtSurface*fuels.W(X())/(specie::RR*Tf);
+    scalar rhoFuelVap = pressureAtSurface*fuels.W(X())/(specie::RR()*Tf);
 
     scalarField Xs(sDB.fuels().Xs(pressure, temperature, T(), Xf, X()));
     scalarField Ys(Nf, 0.0);

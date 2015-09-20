@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -86,12 +86,6 @@ class fvDOM
         //- Total absorption coefficient [1/m]
         volScalarField a_;
 
-        //- Total emission coefficient [1/m]
-        volScalarField e_;
-
-        //- Emission contribution [Kg/m/s^3]
-        volScalarField E_;
-
         //- Number of solid angles in theta
         label nTheta_;
 
@@ -113,14 +107,32 @@ class fvDOM
         //- List of pointers to radiative intensity rays
         PtrList<radiativeIntensityRay> IRay_;
 
+        //- Emmited radiative heat flux [W/m2], per band
+        PtrList<volScalarField::GeometricBoundaryField> Qem_;
+
+        //- Incidet radiative heat flux [W/m2], per band
+        PtrList<volScalarField::GeometricBoundaryField> Qin_;
+
         //- Convergence criterion
         scalar convergence_;
 
         //- Maximum number of iterations
         scalar maxIter_;
 
+        //- List of cached fvMatrices for rays
+        List<PtrList<fvScalarMatrix> >fvRayDiv_;
+
+        //- Cache convection div matrix
+        bool cacheDiv_;
+
+        //- Maximum omega weight
+        scalar omegaMax_;
+
 
     // Private member functions
+
+        //- Initialise
+        void initialise();
 
         //- Disallow default bitwise copy construct
         fvDOM(const fvDOM&);
@@ -143,6 +155,12 @@ public:
         //- Construct from components
         fvDOM(const volScalarField& T);
 
+        //- Construct from components
+        fvDOM(const word& type, const volScalarField& T);
+
+        //- Construct from components
+        fvDOM(const dictionary& dict, const volScalarField& T);
+
 
     //- Destructor
     virtual ~fvDOM();
@@ -156,7 +174,7 @@ public:
             void calculate();
 
             //- Read radiation properties dictionary
-            bool read();
+            virtual bool read();
 
             //- Update G and calculate total heat flux on boundary
             void updateG();
@@ -213,14 +231,46 @@ public:
             //- Const access to total radiative heat flux field
             inline const volScalarField& Qr() const;
 
+            //- Const access to band wise emitted radiative heat flux field
+            inline const volScalarField::GeometricBoundaryField& Qem
+            (
+                const label lambda
+            ) const;
+
+            //- Const access to band wise incident radiative heat flux field
+            inline const volScalarField::GeometricBoundaryField& Qin
+            (
+                const label lambda
+            ) const;
+
+            //- Total incident radiative heat flux field
+            tmp<volScalarField::GeometricBoundaryField> Qin() const;
+
+            //- Total emitted radiative heat flux field
+            tmp<volScalarField::GeometricBoundaryField> Qem() const;
+
             //- Const access to black body
             inline const blackBodyEmission& blackBody() const;
+
+            //- Const access to cached fvMatrix
+            inline const fvScalarMatrix& fvRayDiv
+            (
+                const label lambdaI,
+                const label rayId
+            ) const;
+
+            //- Caching div(Ji, Ilamda)
+            inline bool cacheDiv() const;
+
+            //- Return omegaMax
+            inline scalar omegaMax() const;
 };
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #include "fvDOMI.H"
+
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

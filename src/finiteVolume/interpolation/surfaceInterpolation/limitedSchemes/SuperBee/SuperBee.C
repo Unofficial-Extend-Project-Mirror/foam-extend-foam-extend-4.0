@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -24,6 +24,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "LimitedScheme.H"
+#include "Limited01.H"
 #include "SuperBee.H"
 
 #include "DeferredCorrectionLimitedScheme.H"
@@ -35,9 +36,30 @@ namespace Foam
     makeLimitedSurfaceInterpolationScheme(SuperBee, SuperBeeLimiter)
     makeLimitedVSurfaceInterpolationScheme(SuperBeeV, SuperBeeLimiter)
 
+    makeLLimitedSurfaceInterpolationTypeScheme
+    (
+        SuperBee01,
+        Limited01Limiter,
+        SuperBeeLimiter,
+        NVDTVD,
+        magSqr,
+        scalar
+    )
+
+
     // Deferred correction schemes
     makeDeferredSurfaceInterpolationScheme(SuperBeeDC, SuperBeeLimiter)
     makeDeferredVSurfaceInterpolationScheme(SuperBeeVDC, SuperBeeLimiter)
+
+    makeLDeferredSurfaceInterpolationTypeScheme
+    (
+        SuperBee01DC,
+        Limited01Limiter,
+        SuperBeeLimiter,
+        NVDTVD,
+        magSqr,
+        scalar
+    )
 }
 
 // ************************************************************************* //

@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -33,14 +33,32 @@ Description
 /* * * * * * * * * * * * * public constants  * * * * * * * * * * * * */
 
 //- Universal gas constant (default in [J/(kmol K)])
-const Foam::scalar Foam::specie::RR = dimensionedConstant("R", 8314.51);
+const Foam::debug::constantsSwitch
+Foam::specie::RR
+(
+    "R",
+    8314.51,
+    "Universal gas constant [J/(kmol K)]"
+);
+
 
 //- Standard pressure (default in [Pa])
-const Foam::scalar Foam::specie::Pstd = dimensionedConstant("Pstd", 1.0e5);
+const Foam::debug::constantsSwitch
+Foam::specie::Pstd
+(
+    "Pstd",
+    1.0e5,
+    "Standard pressure [Pa]"
+);
 
 //- Standard temperature (default in [K])
-const Foam::scalar Foam::specie::Tstd = dimensionedConstant("Tstd", 298.15);
-
+const Foam::debug::constantsSwitch
+Foam::specie::Tstd
+(
+    "Tstd",
+    298.15,
+    "Standard temperature [K]"
+);
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 

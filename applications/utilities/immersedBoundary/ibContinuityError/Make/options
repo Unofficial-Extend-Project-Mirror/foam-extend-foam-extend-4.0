@@ -1,0 +1,13 @@
+EXE_INC = \
+    -I$(LIB_SRC)/postProcessing/postCalc \
+    -I$(LIB_SRC)/finiteVolume/lnInclude \
+    -I$(LIB_SRC)/immersedBoundary/lnInclude
+
+EXE_LIBS = \
+    $(FOAM_LIBBIN)/postCalc.o \
+    -lfiniteVolume \
+    -lmeshTools \
+    -lsurfMesh \
+    -lsampling \
+    -ldynamicMesh \
+    -limmersedBoundary

@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -202,7 +202,7 @@ Foam::radiation::blackBodyEmission::EbDeltaLambdaT
     const Vector2D<scalar>& band
 ) const
 {
-    tmp<volScalarField> Eb
+    tmp<volScalarField> tEb
     (
         new volScalarField
         (
@@ -217,28 +217,32 @@ Foam::radiation::blackBodyEmission::EbDeltaLambdaT
             radiation::sigmaSB*pow4(T)
         )
     );
+    volScalarField& Eb = tEb();
 
-
-    if (band == Vector2D<scalar>::one)
+    if (magSqr(band - Vector2D<scalar>::one) > SMALL) // Multiple bands?
     {
-        return Eb;
-    }
-    else
-    {
-        forAll(T, i)
+        forAll(Eb.internalField(), cellI)
         {
-            scalar T1 = fLambdaT(band[1]*T[i]);
-            scalar T2 = fLambdaT(band[0]*T[i]);
-            dimensionedScalar fLambdaDelta
-            (
-                "fLambdaDelta",
-                dimless,
-                T1 - T2
-            );
-            Eb()[i] = Eb()[i]*fLambdaDelta.value();
+            scalar percentileUpper = fLambdaT(band[1]*T.internalField()[cellI]);
+            scalar percentileLower = fLambdaT(band[0]*T.internalField()[cellI]);
+            Eb.internalField()[cellI] *= (percentileUpper - percentileLower);
         }
-        return Eb;
+
+        forAll(Eb.boundaryField(), patchI)
+        {
+            forAll(Eb.boundaryField()[patchI], faceI)
+            {
+                scalar percentileUpper =
+                    fLambdaT(band[1]*T.boundaryField()[patchI][faceI]);
+                scalar percentileLower =
+                    fLambdaT(band[0]*T.boundaryField()[patchI][faceI]);
+                Eb.boundaryField()[patchI][faceI] *=
+                    (percentileUpper - percentileLower);
+            }
+        }
     }
+
+    return tEb;
 }
 
 

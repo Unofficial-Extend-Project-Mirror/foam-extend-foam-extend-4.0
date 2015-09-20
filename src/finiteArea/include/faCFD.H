@@ -3,7 +3,7 @@
 
 #include "parRun.H"
 
-#include "Time.H"
+#include "foamTime.H"
 #include "faMesh.H"
 #include "areaFields.H"
 #include "edgeFields.H"

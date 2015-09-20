@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -98,8 +98,12 @@ div
     return Div;
 }
 
+
 template<class Type>
-tmp<BlockLduMatrix<vector> > div
+tmp
+<
+    BlockLduSystem<vector, typename innerProduct<vector, Type>::type>
+> UDiv
 (
     GeometricField<Type, fvPatchField, volMesh>& vf,
     const word& name
@@ -109,21 +113,103 @@ tmp<BlockLduMatrix<vector> > div
     (
         vf.mesh(),
         vf.mesh().schemesDict().divScheme(name)
-    )().fvmDiv(vf);
+    )().fvmUDiv(vf);
 }
 
 
 template<class Type>
-tmp<BlockLduMatrix<vector> > div
+tmp
+<
+    BlockLduSystem<vector, typename innerProduct<vector, Type>::type>
+> UDiv
+(
+    const surfaceScalarField& flux,
+    GeometricField<Type, fvPatchField, volMesh>& vf,
+    const word& name
+)
+{
+    return fv::divScheme<Type>::New
+    (
+        vf.mesh(),
+        vf.mesh().schemesDict().divScheme(name)
+    )().fvmUDiv(flux, vf);
+}
+
+
+template<class Type>
+tmp
+<
+    BlockLduSystem<vector, typename innerProduct<vector, Type>::type>
+> UDiv
+(
+    const tmp<surfaceScalarField>& tflux,
+    GeometricField<Type, fvPatchField, volMesh>& vf,
+    const word& name
+)
+{
+    tmp
+    <
+        BlockLduSystem<vector, typename innerProduct<vector, Type>::type>
+    >
+    Div(fvm::UDiv(tflux(), vf, name));
+    tflux.clear();
+    return Div;
+}
+
+
+template<class Type>
+tmp
+<
+    BlockLduSystem<vector, typename innerProduct<vector, Type>::type>
+> UDiv
 (
     GeometricField<Type, fvPatchField, volMesh>& vf
 )
 {
-    return fvm::div
+    return fvm::UDiv
     (
         vf,
         "div(" + vf.name() + ')'
     );
+}
+
+
+template<class Type>
+tmp
+<
+    BlockLduSystem<vector, typename innerProduct<vector, Type>::type>
+> UDiv
+(
+    const surfaceScalarField& flux,
+    GeometricField<Type, fvPatchField, volMesh>& vf
+)
+{
+    return fvm::UDiv
+    (
+        flux,
+        vf,
+        "div(" + vf.name() + ')'
+    );
+}
+
+
+template<class Type>
+tmp
+<
+    BlockLduSystem<vector, typename innerProduct<vector, Type>::type>
+> UDiv
+(
+    const tmp<surfaceScalarField>& tflux,
+    GeometricField<Type, fvPatchField, volMesh>& vf
+)
+{
+    tmp
+    <
+        BlockLduSystem<vector, typename innerProduct<vector, Type>::type>
+    >
+    Div(fvm::UDiv(tflux(), vf));
+    tflux.clear();
+    return Div;
 }
 
 

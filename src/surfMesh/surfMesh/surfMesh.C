@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -26,7 +26,7 @@ License
 #include "surfMesh.H"
 #include "MeshedSurfaceProxy.H"
 
-#include "Time.H"
+#include "foamTime.H"
 #include "cellIOList.H"
 #include "SubList.H"
 #include "OSspecific.H"
@@ -207,7 +207,7 @@ Foam::surfMesh::surfMesh
     }
 
     // We can also send Xfer<..>::null just to initialize without allocating
-    if (&surf)
+    if (!surf().empty())
     {
         transfer(surf());
     }

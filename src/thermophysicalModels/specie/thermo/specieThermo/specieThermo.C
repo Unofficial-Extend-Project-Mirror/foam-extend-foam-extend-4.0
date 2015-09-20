@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -34,25 +34,30 @@ Description
 /* * * * * * * * * * * * * * * Private Static Data * * * * * * * * * * * * * */
 
 template<class thermo>
-const Foam::scalar Foam::specieThermo<thermo>::tol_
+const Foam::debug::tolerancesSwitch
+Foam::specieThermo<thermo>::tol_
 (
-    debug::tolerances("speciesThermoTol", 1e-4)
+    "speciesThermoTol",
+    1e-4
 );
 
 
 template<class thermo>
-const Foam::scalar Foam::specieThermo<thermo>::TJump_
+const Foam::debug::tolerancesSwitch
+Foam::specieThermo<thermo>::TJump_
 (
-    debug::tolerances("speciesThermoTJump", 20)
+    "speciesThermoTJump",
+    20
 );
 
 
 template<class thermo>
-const int Foam::specieThermo<thermo>::maxIter_
+const Foam::debug::optimisationSwitch
+Foam::specieThermo<thermo>::maxIter_
 (
-    debug::optimisationSwitch("speciesThermoMaxIter", 100)
+    "speciesThermoMaxIter",
+    100
 );
-
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 

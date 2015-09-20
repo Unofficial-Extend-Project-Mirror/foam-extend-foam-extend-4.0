@@ -2,7 +2,7 @@
 
     basicPsiThermo& thermo = thermoFluid[i];
     volScalarField& rho = rhoFluid[i];
-    volScalarField& K = KFluid[i];
+    volScalarField& Kappa = KappaFluid[i];
     volVectorField& U = UFluid[i];
     surfaceScalarField& phi = phiFluid[i];
     const dimensionedVector& g = gFluid[i];

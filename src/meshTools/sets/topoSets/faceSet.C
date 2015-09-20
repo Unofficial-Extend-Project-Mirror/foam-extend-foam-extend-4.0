@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -63,7 +63,8 @@ faceSet::faceSet
 :
     topoSet(mesh, typeName, name, r, w)
 {
-    check(mesh.nFaces());
+    // Sets can also contain retired faces.  HJ, 17/Aug/2015
+    check(mesh.allFaces().size());
 }
 
 
@@ -228,7 +229,7 @@ void faceSet::sync(const polyMesh& mesh)
 
 label faceSet::maxSize(const polyMesh& mesh) const
 {
-    return mesh.nFaces();
+    return mesh.allFaces().size();
 }
 
 

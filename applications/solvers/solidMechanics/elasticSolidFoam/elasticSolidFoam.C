@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -49,129 +49,130 @@ Author
 
 int main(int argc, char *argv[])
 {
-# include "setRootCase.H"
-# include "createTime.H"
-# include "createMesh.H"
-# include "createFields.H"
-# include "createHistory.H"
-# include "readDivSigmaExpMethod.H"
-# include "createSolidInterfaceNoModify.H"
+#   include "setRootCase.H"
+#   include "createTime.H"
+#   include "createMesh.H"
+#   include "createFields.H"
+#   include "createHistory.H"
+#   include "readDivSigmaExpMethod.H"
+#   include "createSolidInterfaceNoModify.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-  Info<< "\nStarting time loop\n" << endl;
+    Info<< "\nStarting time loop\n" << endl;
 
   while(runTime.loop())
-  {
-      Info<< "Time: " << runTime.timeName() << nl << endl;
+    {
+        Info<< "Time = " << runTime.timeName() << nl << endl;
 
-#     include "readSolidMechanicsControls.H"
+#       include "readSolidMechanicsControls.H"
 
-      int iCorr = 0;
-      lduMatrix::solverPerformance solverPerf;
-      scalar initialResidual = 1.0;
-      scalar relativeResidual = 1.0;
-      lduMatrix::debug = 0;
+        int iCorr = 0;
+        lduMatrix::solverPerformance solverPerf;
+        scalar initialResidual = 1.0;
+        scalar relativeResidual = 1.0;
+        lduMatrix::debug = 0;
 
-      if (predictor)
-      {
-          Info<< "\nPredicting U, gradU and snGradU based on V,"
-              << "gradV and snGradV\n" << endl;
-          U += V*runTime.deltaT();
-          gradU += gradV*runTime.deltaT();
-          snGradU += snGradV*runTime.deltaT();
-      }
+        if (predictor)
+        {
+            Info<< "\nPredicting U, gradU and snGradU based on V,"
+                << "gradV and snGradV\n" << endl;
+            U += V*runTime.deltaT();
+            gradU += gradV*runTime.deltaT();
+            snGradU += snGradV*runTime.deltaT();
+        }
 
-      do
-      {
-          U.storePrevIter();
+        do
+        {
+            U.storePrevIter();
 
-#         include "calculateDivSigmaExp.H"
+#           include "calculateDivSigmaExp.H"
 
-          // linear momentum equation
-          fvVectorMatrix UEqn
-          (
-              rho*fvm::d2dt2(U)
-           ==
-              fvm::laplacian(2*muf + lambdaf, U, "laplacian(DU,U)")
-            + divSigmaExp
-          );
+            // linear momentum equation
+            fvVectorMatrix UEqn
+            (
+                rho*fvm::d2dt2(U)
+             ==
+                fvm::laplacian(2*muf + lambdaf, U, "laplacian(DU,U)")
+              + divSigmaExp
+            );
 
-          if (solidInterfaceCorr)
-          {
-              solidInterfacePtr->correct(UEqn);
-          }
+            if (solidInterfaceCorr)
+            {
+                solidInterfacePtr->correct(UEqn);
+            }
 
-          solverPerf = UEqn.solve();
+            solverPerf = UEqn.solve();
 
-          if (iCorr == 0)
-          {
-              initialResidual = solverPerf.initialResidual();
-              aitkenInitialRes = gMax(mag(U.internalField()));
-          }
+            if (iCorr == 0)
+            {
+                initialResidual = solverPerf.initialResidual();
+                aitkenInitialRes = gMax(mag(U.internalField()));
+            }
 
-          if (aitkenRelax)
-          {
-#             include "aitkenRelaxation.H"
-          }
-          else
-          {
-              U.relax();
-          }
+            if (aitkenRelax)
+            {
+#               include "aitkenRelaxation.H"
+            }
+            else
+            {
+                U.relax();
+            }
 
-          gradU = fvc::grad(U);
+            gradU = fvc::grad(U);
 
-#         include "calculateRelativeResidual.H"
+#           include "calculateRelativeResidual.H"
 
-          if (iCorr % infoFrequency == 0)
-          {
-              Info<< "\tTime " << runTime.value()
-                  << ", Corrector " << iCorr
-                  << ", Solving for " << U.name()
-                  << " using " << solverPerf.solverName()
-                  << ", res = " << solverPerf.initialResidual()
-                  << ", rel res = " << relativeResidual;
+            if (iCorr % infoFrequency == 0)
+            {
+                Info<< "\tTime " << runTime.value()
+                    << ", Corrector " << iCorr
+                    << ", Solving for " << U.name()
+                    << " using " << solverPerf.solverName()
+                    << ", res = " << solverPerf.initialResidual()
+                    << ", rel res = " << relativeResidual;
 
-              if (aitkenRelax)
-              {
-                  Info<< ", aitken = " << aitkenTheta;
-              }
-              Info<< ", inner iters = " << solverPerf.nIterations() << endl;
-          }
-      }
-      while
-      (
-          iCorr++ == 0
-       || (
-              solverPerf.initialResidual() > convergenceTolerance
-              //relativeResidual > convergenceTolerance
-           && iCorr < nCorr
-          )
-      );
+                if (aitkenRelax)
+                {
+                    Info<< ", aitken = " << aitkenTheta;
+                }
+                Info<< ", inner iters = " << solverPerf.nIterations() << endl;
+            }
+        }
+        while
+        (
+            iCorr++ == 0
+            ||
+            (
+                solverPerf.initialResidual() > convergenceTolerance
+                //relativeResidual > convergenceTolerance
+             && iCorr < nCorr
+            )
+        );
 
-      Info<< nl << "Time " << runTime.value() << ", Solving for " << U.name()
-          << ", Initial residual = " << initialResidual
-          << ", Final residual = " << solverPerf.initialResidual()
-          << ", Relative residual = " << relativeResidual
-          << ", No outer iterations " << iCorr
-          << nl << "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
-          << "  ClockTime = " << runTime.elapsedClockTime() << " s"
-          << endl;
+        Info<< nl << "Time " << runTime.value() << ", Solving for " << U.name()
+            << ", Initial residual = " << initialResidual
+            << ", Final residual = " << solverPerf.initialResidual()
+            << ", Relative residual = " << relativeResidual
+            << ", No outer iterations " << iCorr
+            << nl << "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
+            << "  ClockTime = " << runTime.elapsedClockTime() << " s"
+            << endl;
 
-      if (predictor)
-      {
-          V = fvc::ddt(U);
-          gradV = fvc::ddt(gradU);
-          snGradV = (snGradU - snGradU.oldTime())/runTime.deltaT();
-      }
+        if (predictor)
+        {
+            V = fvc::ddt(U);
+            gradV = fvc::ddt(gradU);
+            snGradV = (snGradU - snGradU.oldTime())/runTime.deltaT();
+        }
 
-#     include "calculateEpsilonSigma.H"
-#     include "writeFields.H"
-#     include "writeHistory.H"
+#       include "calculateEpsilonSigma.H"
+#       include "writeFields.H"
+#       include "writeHistory.H"
 
-      Info<< "ExecutionTime = "
-          << runTime.elapsedCpuTime()
-          << " s\n\n" << endl;
+        Info<< "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
+            << "  ClockTime = " << runTime.elapsedClockTime() << " s"
+            << endl << endl;
     }
 
     Info<< "End\n" << endl;

@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -35,7 +35,24 @@ namespace Foam
     namespace radiation
     {
         defineTypeNameAndDebug(radiationModel, 0);
+        defineRunTimeSelectionTable(radiationModel, T);
         defineRunTimeSelectionTable(radiationModel, dictionary);
+    }
+}
+
+
+// * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
+
+void Foam::radiation::radiationModel::initialise()
+{
+    if (radiation_)
+    {
+        solverFreq_ = max(1, lookupOrDefault<label>("solverFreq", 1));
+
+        absorptionEmission_.reset
+        (
+            absorptionEmissionModel::New(*this, mesh_).ptr()
+        );
     }
 }
 
@@ -89,10 +106,44 @@ Foam::radiation::radiationModel::radiationModel
     radiation_(lookup("radiation")),
     coeffs_(subDict(type + "Coeffs")),
     solverFreq_(readLabel(lookup("solverFreq"))),
-    absorptionEmission_(absorptionEmissionModel::New(*this, mesh_)),
+    absorptionEmission_(NULL),
     scatter_(scatterModel::New(*this, mesh_))
 {
-    solverFreq_ = max(1, solverFreq_);
+    initialise();
+}
+
+
+Foam::radiation::radiationModel::radiationModel
+(
+    const word& type,
+    const dictionary& dict,
+    const volScalarField& T
+)
+:
+    IOdictionary
+    (
+        IOobject
+        (
+            "radiationProperties",
+            T.time().constant(),
+            T.mesh(),
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        ),
+        dict
+    ),
+    mesh_(T.mesh()),
+    time_(T.time()),
+    T_(T),
+    radiation_(lookup("radiation")),
+    coeffs_(subOrEmptyDict(type + "Coeffs")),
+    solverFreq_(1),
+    firstIter_(true),
+    absorptionEmission_(NULL),
+    scatter_(NULL)
+
+{
+    initialise();
 }
 
 
@@ -109,7 +160,10 @@ bool Foam::radiation::radiationModel::read()
     if (regIOobject::read())
     {
         lookup("radiation") >> radiation_;
-        coeffs_ = subDict(type() + "Coeffs");
+        coeffs_ = subOrEmptyDict(type() + "Coeffs");
+
+        solverFreq_ = lookupOrDefault<label>("solverFreq", 1);
+        solverFreq_ = max(1, solverFreq_);
 
         return true;
     }
@@ -127,9 +181,10 @@ void Foam::radiation::radiationModel::correct()
         return;
     }
 
-    if (time_.timeIndex() % solverFreq_ == 0)
+    if (firstIter_ || (time_.timeIndex() % solverFreq_ == 0))
     {
         calculate();
+        firstIter_ = false;
     }
 }
 

@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -116,6 +116,13 @@ public:
 
         //- Return the name of the given enumeration element
         const char* operator[](const Enum e) const
+        {
+            return names[e];
+        }
+
+        //- Return the name of the given enumeration element
+        //  where e is specified as a int
+        const char* operator[](const int e) const
         {
             return names[e];
         }

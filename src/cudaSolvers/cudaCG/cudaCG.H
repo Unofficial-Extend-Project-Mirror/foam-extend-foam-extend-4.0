@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -48,7 +48,7 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-			     Class cudaCG Declaration
+                           Class cudaCG Declaration
 \*---------------------------------------------------------------------------*/
 
 class cudaCG
@@ -57,11 +57,11 @@ class cudaCG
 {
     // Private Member Functions
 
-	//- Disallow default bitwise copy construct
-	cudaCG(const cudaCG&);
+    //- Disallow default bitwise copy construct
+    cudaCG(const cudaCG&);
 
-	//- Disallow default bitwise assignment
-	void operator=(const cudaCG&);
+    //- Disallow default bitwise assignment
+    void operator=(const cudaCG&);
 
 
 public:
@@ -72,33 +72,33 @@ public:
 
     // Constructors
 
-	//- Construct from matrix components and solver data stream
-	cudaCG
-	(
-	    const word& fieldName,
-	    const lduMatrix& matrix,
-	    const FieldField<Field, scalar>& coupleBouCoeffs,
-	    const FieldField<Field, scalar>& coupleIntCoeffs,
-	    const lduInterfaceFieldPtrsList& interfaces,
-	    const dictionary& dict
-	);
+    //- Construct from matrix components and solver data stream
+    cudaCG
+    (
+        const word& fieldName,
+        const lduMatrix& matrix,
+        const FieldField<Field, scalar>& coupleBouCoeffs,
+        const FieldField<Field, scalar>& coupleIntCoeffs,
+        const lduInterfaceFieldPtrsList& interfaces,
+        const dictionary& dict
+    );
 
 
     // Destructor
 
-	virtual ~cudaCG()
-	{}
+    virtual ~cudaCG()
+    {}
 
 
     // Member Functions
 
-	//- Solve the matrix with this solver
-	virtual lduSolverPerformance solve
-	(
-	    scalarField& x,
-	    const scalarField& b,
-	    const direction cmpt = 0
-	) const;
+    //- Solve the matrix with this solver
+    virtual lduSolverPerformance solve
+    (
+        scalarField& x,
+        const scalarField& b,
+        const direction cmpt = 0
+    ) const;
 };
 
 

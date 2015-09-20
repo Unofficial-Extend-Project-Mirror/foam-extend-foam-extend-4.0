@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -37,7 +37,7 @@ SourceFiles
 #define finiteRotation_H
 
 #include "HamiltonRodriguezRot.H"
-#include "Time.H"
+#include "foamTime.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -68,6 +68,11 @@ class finiteRotation
 
         //- Calculate rotation angle from given rotation tensor
         static scalar rotAngle(const tensor& rotT);
+
+        //- Calculate Euler angles (x-y-z (roll-pitch-yaw) convenction) from
+        //  given rotation tensor. Reference: Mike Day, Insomniac Games,
+        //  Extracting Euler Angles from a Rotation Matrix.
+        static vector eulerAngles(const tensor& rotT);
 
 
 public:
@@ -109,6 +114,9 @@ public:
 
         //- Return rotation angle
         scalar rotAngle() const;
+
+        //- Return Euler angles (see static function eulerAngles for convention)
+        vector eulerAngles() const;
 
         // Transformations between new and previous rotation
         const tensor& rotIncrementTensor() const;

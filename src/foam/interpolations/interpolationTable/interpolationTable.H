@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -70,7 +70,7 @@ public:
         //- Enumeration for handling out-of-bound values
         enum boundsHandling
         {
-            ERROR,          /*!< Exit with a FatalError */
+            EXIT,          /*!< Exit with a FatalError */
             WARN,           /*!< Issue warning and clamp value (default) */
             CLAMP,          /*!< Clamp value to the start/end value */
             REPEAT          /*!< Treat as a repeating list */

@@ -1,12 +1,18 @@
 #                            -*- mode: org; -*-
 #
-#+TITLE:          *Cumulative List of Contributors for foam-extend-3.1*
-#+AUTHOR:                      Hrvoje Jasak
-#+DATE:                        8 June 2014
+#+TITLE:          *Cumulative List of Contributors for foam-extend-3.0*
+#+AUTHOR:                      Hrvoje Jasak.
+#+DATE:                       10 January 2014
 #+LINK:                  http://foam-extend.org
 #+OPTIONS: author:nil
 
 ################################################################################
+
+Contents:
+* List of Contributors
+
+################################################################################
+
 
 * List of Contributors
 
@@ -43,6 +49,7 @@
     Peter Janas
     Mattijs Janssens
     Klas Jareteg
+    Franjo Juretic
     Aleksandar Karac
     Dennis Kingsley
     Nikola Kornev
@@ -67,6 +74,7 @@
     David Schmidt
     Daniel Schmode
     Hua Shan
+    Richard Smith (Symscape)
     Hilary Spencer
     Darrin Stephens
     Gavin Tabor
@@ -76,3 +84,4 @@
     Vanja Skuric
     Alexander Vakhrushev
     Inno Gatin
+    Alexey Matveichev

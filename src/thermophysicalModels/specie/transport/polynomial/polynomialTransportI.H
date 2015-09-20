@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -116,9 +116,9 @@ inline Foam::scalar Foam::polynomialTransport<Thermo, PolySize>::alpha
     const scalar T
 ) const
 {
-    scalar deltaT = T - specie::Tstd;
+    scalar deltaT = T - specie::Tstd();
     scalar CpBar =
-        (deltaT*(this->H(T) - this->H(specie::Tstd)) + this->Cp(T))
+        (deltaT*(this->H(T) - this->H(specie::Tstd())) + this->Cp(T))
        /(sqr(deltaT) + 1);
 
     return kappa(T)/CpBar;

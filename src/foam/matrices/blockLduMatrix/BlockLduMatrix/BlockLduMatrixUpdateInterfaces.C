@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -41,8 +41,8 @@ void Foam::BlockLduMatrix<Type>::initInterfaces
 {
     if
     (
-        Pstream::defaultCommsType == Pstream::blocking
-     || Pstream::defaultCommsType == Pstream::nonBlocking
+        Pstream::defaultCommsType() == Pstream::blocking
+     || Pstream::defaultCommsType() == Pstream::nonBlocking
     )
     {
         forAll (interfaces_, interfaceI)
@@ -55,13 +55,13 @@ void Foam::BlockLduMatrix<Type>::initInterfaces
                     result,
                     *this,
                     interfaceCoeffs[interfaceI],
-                    Pstream::defaultCommsType,
+                    static_cast<const Pstream::commsTypes>(Pstream::defaultCommsType()),
                     switchToLhs
                 );
             }
         }
     }
-    else if (Pstream::defaultCommsType == Pstream::scheduled)
+    else if (Pstream::defaultCommsType() == Pstream::scheduled)
     {
         const lduSchedule& patchSchedule = this->patchSchedule();
 
@@ -92,7 +92,7 @@ void Foam::BlockLduMatrix<Type>::initInterfaces
     {
         FatalErrorIn("BlockLduMatrix<Type>::initMatrixInterfaces")
             << "Unsuported communications type "
-            << Pstream::commsTypeNames[Pstream::defaultCommsType]
+            << Pstream::commsTypeNames[Pstream::defaultCommsType()]
             << exit(FatalError);
     }
 }
@@ -109,12 +109,12 @@ void Foam::BlockLduMatrix<Type>::updateInterfaces
 {
     if
     (
-        Pstream::defaultCommsType == Pstream::blocking
-     || Pstream::defaultCommsType == Pstream::nonBlocking
+        Pstream::defaultCommsType() == Pstream::blocking
+     || Pstream::defaultCommsType() == Pstream::nonBlocking
     )
     {
         // Block until all sends/receives have been finished
-        if (Pstream::defaultCommsType == Pstream::nonBlocking)
+        if (Pstream::defaultCommsType() == Pstream::nonBlocking)
         {
             IPstream::waitRequests();
             OPstream::waitRequests();
@@ -130,13 +130,13 @@ void Foam::BlockLduMatrix<Type>::updateInterfaces
                     result,
                     *this,
                     interfaceCoeffs[interfaceI],
-                    Pstream::defaultCommsType,
+                    static_cast<Pstream::commsTypes>(Pstream::defaultCommsType()),
                     switchToLhs
                 );
             }
         }
     }
-    else if (Pstream::defaultCommsType == Pstream::scheduled)
+    else if (Pstream::defaultCommsType() == Pstream::scheduled)
     {
         const lduSchedule& patchSchedule = this->patchSchedule();
 
@@ -201,7 +201,7 @@ void Foam::BlockLduMatrix<Type>::updateInterfaces
     {
         FatalErrorIn("BlockLduMatrix<Type>::updateInterfaces")
             << "Unsuported communications type "
-            << Pstream::commsTypeNames[Pstream::defaultCommsType]
+            << Pstream::commsTypeNames[Pstream::defaultCommsType()]
             << exit(FatalError);
     }
 }

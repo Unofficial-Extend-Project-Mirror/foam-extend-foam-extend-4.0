@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -53,7 +53,7 @@ turbulentTemperatureCoupledBaffleMixedFvPatchScalarField
 :
     mixedFvPatchScalarField(p, iF),
     neighbourFieldName_("undefined-neighbourFieldName"),
-    KName_("undefined-K")
+    KappaName_("undefined-Kappa")
 {
     this->refValue() = 0.0;
     this->refGrad() = 0.0;
@@ -72,7 +72,7 @@ turbulentTemperatureCoupledBaffleMixedFvPatchScalarField
 :
     mixedFvPatchScalarField(ptf, p, iF, mapper),
     neighbourFieldName_(ptf.neighbourFieldName_),
-    KName_(ptf.KName_)
+    KappaName_(ptf.KappaName_)
 {}
 
 
@@ -86,7 +86,7 @@ turbulentTemperatureCoupledBaffleMixedFvPatchScalarField
 :
     mixedFvPatchScalarField(p, iF),
     neighbourFieldName_(dict.lookup("neighbourFieldName")),
-    KName_(dict.lookup("K"))
+    KappaName_(dict.lookup("Kappa"))
 {
     if (!isA<directMappedPatchBase>(this->patch().patch()))
     {
@@ -135,18 +135,18 @@ turbulentTemperatureCoupledBaffleMixedFvPatchScalarField
 :
     mixedFvPatchScalarField(wtcsf, iF),
     neighbourFieldName_(wtcsf.neighbourFieldName_),
-    KName_(wtcsf.KName_)
+    KappaName_(wtcsf.KappaName_)
 {}
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 tmp<scalarField>
-turbulentTemperatureCoupledBaffleMixedFvPatchScalarField::K() const
+turbulentTemperatureCoupledBaffleMixedFvPatchScalarField::Kappa() const
 {
     const fvMesh& mesh = patch().boundaryMesh().mesh();
 
-    if (KName_ == "none")
+    if (KappaName_ == "none")
     {
         const compressible::RASModel& model =
             db().lookupObject<compressible::RASModel>("RASProperties");
@@ -160,29 +160,29 @@ turbulentTemperatureCoupledBaffleMixedFvPatchScalarField::K() const
             talpha().boundaryField()[patch().index()]
            *thermo.Cp()().boundaryField()[patch().index()];
     }
-    else if (mesh.objectRegistry::foundObject<volScalarField>(KName_))
+    else if (mesh.objectRegistry::foundObject<volScalarField>(KappaName_))
     {
-        return lookupPatchField<volScalarField, scalar>(KName_);
+        return lookupPatchField<volScalarField, scalar>(KappaName_);
     }
-    else if (mesh.objectRegistry::foundObject<volSymmTensorField>(KName_))
+    else if (mesh.objectRegistry::foundObject<volSymmTensorField>(KappaName_))
     {
-        const symmTensorField& KWall =
-            lookupPatchField<volSymmTensorField, scalar>(KName_);
+        const symmTensorField& KappaWall =
+            lookupPatchField<volSymmTensorField, scalar>(KappaName_);
 
         vectorField n = patch().nf();
 
-        return n & KWall & n;
+        return n & KappaWall & n;
     }
     else
     {
         FatalErrorIn
         (
-            "turbulentTemperatureCoupledBaffleMixedFvPatchScalarField::K()"
+            "turbulentTemperatureCoupledBaffleMixedFvPatchScalarField::Kappa()"
             " const"
-        )   << "Did not find field " << KName_
+        )   << "Did not find field " << KappaName_
             << " on mesh " << mesh.name() << " patch " << patch().name()
             << endl
-            << "Please set 'K' to 'none', a valid volScalarField"
+            << "Please set 'Kappa' to 'none', a valid volScalarField"
             << " or a valid volSymmTensorField." << exit(FatalError);
 
         return scalarField(0);
@@ -233,7 +233,7 @@ void turbulentTemperatureCoupledBaffleMixedFvPatchScalarField::updateCoeffs()
     scalarField nbrIntFld = nbrField.patchInternalField();
     mapDistribute::distribute
     (
-        Pstream::defaultCommsType,
+        static_cast<Pstream::commsTypes>(Pstream::defaultCommsType()),
         distMap.schedule(),
         distMap.constructSize(),
         distMap.subMap(),           // what to send
@@ -241,23 +241,23 @@ void turbulentTemperatureCoupledBaffleMixedFvPatchScalarField::updateCoeffs()
         nbrIntFld
     );
 
-    // Swap to obtain full local values of neighbour K*delta
-    scalarField nbrKDelta = nbrField.K()*nbrPatch.deltaCoeffs();
+    // Swap to obtain full local values of neighbour Kappa*delta
+    scalarField nbrKappaDelta = nbrField.Kappa()*nbrPatch.deltaCoeffs();
     mapDistribute::distribute
     (
-        Pstream::defaultCommsType,
+        static_cast<Pstream::commsTypes>(Pstream::defaultCommsType()),
         distMap.schedule(),
         distMap.constructSize(),
         distMap.subMap(),           // what to send
         distMap.constructMap(),     // what to receive
-        nbrKDelta
+        nbrKappaDelta
     );
 
-    tmp<scalarField> myKDelta = K()*patch().deltaCoeffs();
+    tmp<scalarField> myKappaDelta = Kappa()*patch().deltaCoeffs();
 
 
     // Both sides agree on
-    // - temperature : (myKDelta*fld + nbrKDelta*nbrFld)/(myKDelta+nbrKDelta)
+    // - temperature : (myKappaDelta*fld + nbrKappaDelta*nbrFld)/(myKappaDelta+nbrKappaDelta)
     // - gradient    : (temperature-fld)*delta
     // We've got a degree of freedom in how to implement this in a mixed bc.
     // (what gradient, what fixedValue and mixing coefficient)
@@ -269,21 +269,21 @@ void turbulentTemperatureCoupledBaffleMixedFvPatchScalarField::updateCoeffs()
     //    same on both sides. This leads to the choice of
     //    - refGradient = zero gradient
     //    - refValue = neighbour value
-    //    - mixFraction = nbrKDelta / (nbrKDelta + myKDelta())
+    //    - mixFraction = nbrKappaDelta / (nbrKappaDelta + myKappaDelta())
 
 
     this->refValue() = nbrIntFld;
 
     this->refGrad() = 0.0;
 
-    this->valueFraction() = nbrKDelta / (nbrKDelta + myKDelta());
+    this->valueFraction() = nbrKappaDelta / (nbrKappaDelta + myKappaDelta());
 
     mixedFvPatchScalarField::updateCoeffs();
 
 
     if (debug)
     {
-        scalar Q = gSum(K()*patch().magSf()*snGrad());
+        scalar Q = gSum(Kappa()*patch().magSf()*snGrad());
 
         Info<< patch().boundaryMesh().mesh().name() << ':'
             << patch().name() << ':'
@@ -309,7 +309,7 @@ void turbulentTemperatureCoupledBaffleMixedFvPatchScalarField::write
     mixedFvPatchScalarField::write(os);
     os.writeKeyword("neighbourFieldName")<< neighbourFieldName_
         << token::END_STATEMENT << nl;
-    os.writeKeyword("K") << KName_ << token::END_STATEMENT << nl;
+    os.writeKeyword("Kappa") << KappaName_ << token::END_STATEMENT << nl;
 }
 
 

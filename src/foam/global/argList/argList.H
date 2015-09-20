@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -135,6 +135,9 @@ public:
         //- A list of valid parallel options
         static HashTable<string> validParOptions;
 
+        //- Name of the application-specific dictionary
+        static word appDictName_;
+
         //! @cond ignoreDocumentation
         class initValidTables
         {
@@ -263,6 +266,11 @@ public:
                 return readList<T>(optionLookup(opt)());
             }
 
+            //- Return appDictName_
+            const word appDictName() const
+            {
+                return appDictName_;
+            }
 
         // Edit
 
@@ -290,8 +298,21 @@ public:
 
             //- Check root path and case path
             bool checkRootCase() const;
+
 };
 
+// Allow overriding the application-specific dictionary using the command-line
+// parameter -appDict. The dictionary file must still be located in the case's
+// "system" directory, or accessible using a path relative to the case's
+// "system" directory.
+// Example:
+//    cellSet                                     # Default will be cellSetDict
+//    cellSet -appDict cellSetDict                # Same as above
+//    cellSet -appDict cellSetDict.rotorOnly
+//
+#define  AppSpecificDictionary(DefaultAppDict)                            \
+    argList::appDictName_ = (DefaultAppDict);                             \
+    argList::validOptions.insert("appDict", argList::appDictName_);
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

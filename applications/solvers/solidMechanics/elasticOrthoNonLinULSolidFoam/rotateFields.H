@@ -2,47 +2,47 @@
 //- rotate fields
 //--------------------------------------------------//
 {
-  Info << "Rotating fields" << endl;
+    Info << "Rotating fields" << endl;
 
-  volTensorField F = I + gradDU;
+    volTensorField F = I + gradDU;
 
-  U += DU;
+    U += DU;
 
-  epsilon += DEpsilon;
+    epsilon += DEpsilon;
 
-  sigma += DSigma;
+    sigma += DSigma;
 
-  volTensorField Finv = inv(F);
+    volTensorField Finv = inv(F);
 
-  volScalarField J = det(F);
-  if(min(J.internalField()) < 0)
+    volScalarField J = det(F);
+    if(min(J.internalField()) < 0)
     {
-      FatalErrorIn(args.executable())
-	<< "Negative Jacobian - a cell volume has become negative!"
-	<< exit(FatalError);
+        FatalErrorIn(args.executable())
+            << "Negative Jacobian - a cell volume has become negative!"
+            << exit(FatalError);
     }
 
-  rho = rho/J;
+    rho = rho/J;
 
-  n = mesh.Sf()/mesh.magSf();
+    n = mesh.Sf()/mesh.magSf();
 
-  //- rotate strain
-  //epsilon = symm(Finv & epsilon & Finv.T());
-  epsilon = transform(Finv, epsilon);
+    //- rotate strain
+    //epsilon = symm(Finv & epsilon & Finv.T());
+    epsilon = transform(Finv, epsilon);
 
-  //- rotate stress
-  //sigma  = 1/J * symm(F.T() & sigma & F);
-  sigma = (1/J) * transform(F.T(), sigma);
+    //- rotate stress
+    //sigma  = 1/J * symm(F.T() & sigma & F);
+    sigma = (1/J) * transform(F.T(), sigma);
 
-  //- rotate elastic constitutive tensor
-  C = transform(F.T(), C);
+    //- rotate elastic constitutive tensor
+    C = transform(F.T(), C);
 
-  // - update implicit stiffness tensor
-  forAll(K, celli)
+    // - update implicit stiffness tensor
+    forAll(K, celli)
     {
-      K[celli].xx() = C[celli].xxxx();
-      K[celli].yy() = C[celli].yyyy();
-      K[celli].zz() = C[celli].zzzz();
+        K[celli].xx() = C[celli].xxxx();
+        K[celli].yy() = C[celli].yyyy();
+        K[celli].zz() = C[celli].zzzz();
     }
-  K.correctBoundaryConditions();
+    K.correctBoundaryConditions();
 }

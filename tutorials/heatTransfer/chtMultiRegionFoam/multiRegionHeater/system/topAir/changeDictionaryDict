@@ -1,8 +1,8 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | foam-extend: Open Source CFD                    |
-|  \\    /   O peration     | Version:     3.1                                |
-|   \\  /    A nd           | Web:         http://www.extend-project.de       |
+|  \\    /   O peration     | Version:     3.2                                |
+|   \\  /    A nd           | Web:         http://www.foam-extend.org         |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 FoamFile
@@ -66,7 +66,7 @@ dictionaryReplacement
                 neighbourRegionName leftSolid;
                 neighbourPatchName leftSolid_to_topAir;
                 neighbourFieldName T;
-                K               K;
+                Kappa           Kappa;
                 value           uniform 300;
 
             }
@@ -76,7 +76,7 @@ dictionaryReplacement
                 neighbourRegionName heater;
                 neighbourPatchName heater_to_topAir;
                 neighbourFieldName T;
-                K               K;
+                Kappa           Kappa;
                 value           uniform 300;
             }
             topAir_to_rightSolid
@@ -85,7 +85,7 @@ dictionaryReplacement
                 neighbourRegionName rightSolid;
                 neighbourPatchName rightSolid_to_topAir;
                 neighbourFieldName T;
-                K               K;
+                Kappa           Kappa;
                 value           uniform 300;
             }
         }

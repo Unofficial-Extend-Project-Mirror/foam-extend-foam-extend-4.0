@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -26,7 +26,7 @@ License
 #include "autoRefineDriver.H"
 #include "meshRefinement.H"
 #include "fvMesh.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "cellSet.H"
 #include "syncTools.H"
 #include "refinementParameters.H"
@@ -393,7 +393,7 @@ void Foam::autoRefineDriver::removeInsideCells
     {
         Pout<< "Writing subsetted mesh to time "
             << meshRefiner_.timeName() << '.' << endl;
-        meshRefiner_.write(debug, mesh.time().path()/meshRefiner_.timeName());
+        meshRefiner_.write(debug(), mesh.time().path()/meshRefiner_.timeName());
         Pout<< "Dumped mesh in = "
             << mesh.time().cpuTimeIncrement() << " s\n" << nl << endl;
     }
@@ -645,7 +645,7 @@ void Foam::autoRefineDriver::zonify
                 << meshRefiner_.timeName() << '.' << endl;
             meshRefiner_.write
             (
-                debug,
+                debug(),
                 mesh.time().path()/meshRefiner_.timeName()
             );
         }
@@ -735,7 +735,7 @@ void Foam::autoRefineDriver::splitAndMergeBaffles
     {
         Pout<< "Writing handleProblemCells mesh to time "
             << meshRefiner_.timeName() << '.' << endl;
-        meshRefiner_.write(debug, mesh.time().path()/meshRefiner_.timeName());
+        meshRefiner_.write(debug(), mesh.time().path()/meshRefiner_.timeName());
     }
 }
 

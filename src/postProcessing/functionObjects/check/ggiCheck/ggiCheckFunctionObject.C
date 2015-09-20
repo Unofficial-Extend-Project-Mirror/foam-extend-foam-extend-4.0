@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -83,83 +83,111 @@ bool Foam::ggiCheckFunctionObject::execute()
     const objectRegistry& mesh =
         time_.lookupObject<objectRegistry>(regionName_);
 
-    const surfaceScalarField& phi =
-        mesh.lookupObject<surfaceScalarField>(phiName_);
-
-    boolList visited(phi.boundaryField().size(), false);
-
-    forAll (phi.boundaryField(), patchI)
+    if (mesh.foundObject<surfaceScalarField>(phiName_))
     {
-        if (isA<ggiFvsPatchScalarField>(phi.boundaryField()[patchI]))
+        const surfaceScalarField& phi =
+            mesh.lookupObject<surfaceScalarField>(phiName_);
+
+        boolList visited(phi.boundaryField().size(), false);
+
+        forAll (phi.boundaryField(), patchI)
         {
-            if (!visited[patchI])
+            if (isA<ggiFvsPatchScalarField>(phi.boundaryField()[patchI]))
             {
-                visited[patchI] = true;
+                if (!visited[patchI])
+                {
+                    visited[patchI] = true;
 
-                // Calculate local and shadow flux
-                scalar localFlux = gSum(phi.boundaryField()[patchI]);
-                scalar localFluxMag = gSumMag(phi.boundaryField()[patchI]);
+                    // Calculate local and shadow flux
 
-                const ggiPolyPatch& ggiPatch =
-                    refCast<const ggiPolyPatch>
-                    (
-                        phi.boundaryField()[patchI].patch().patch()
-                    );
+                    scalar localArea =
+                        gSum(phi.mesh().magSf().boundaryField()[patchI]);
 
-                const label shadowPatchI = ggiPatch.shadowIndex();
+                    scalar localFlux = gSum(phi.boundaryField()[patchI]);
+                    scalar localFluxMag = gSumMag(phi.boundaryField()[patchI]);
 
-                visited[shadowPatchI] = true;
+                    const ggiPolyPatch& ggiPatch =
+                        refCast<const ggiPolyPatch>
+                        (
+                            phi.boundaryField()[patchI].patch().patch()
+                        );
 
-                scalar shadowFlux = gSum(phi.boundaryField()[shadowPatchI]);
-                scalar shadowFluxMag =
-                    gSumMag(phi.boundaryField()[shadowPatchI]);
+                    const label shadowPatchI = ggiPatch.shadowIndex();
 
-                Info<< "GGI pair (" << ggiPatch.name() << ", "
-                    << ggiPatch.shadow().name()
-                    << ") : " << localFluxMag << " " << shadowFluxMag
-                    << " Diff = " << localFlux + shadowFlux << " or "
-                    << mag(localFlux + shadowFlux)/(localFluxMag + SMALL)*100
-                    << " %" << endl;
+                    visited[shadowPatchI] = true;
+
+                    scalar shadowArea =
+                        gSum(phi.mesh().magSf().boundaryField()[shadowPatchI]);
+
+                    scalar shadowFlux =
+                        gSum(phi.boundaryField()[shadowPatchI]);
+
+                    scalar shadowFluxMag =
+                        gSumMag(phi.boundaryField()[shadowPatchI]);
+
+                    Info<< "GGI pair (" << ggiPatch.name() << ", "
+                        << ggiPatch.shadow().name() << ")" << nl
+                        << "Area: " << localArea << " " << shadowArea
+                        << " Diff = " << localArea - shadowArea << " or "
+                        << mag(localArea - shadowArea)/
+                           (Foam::max(localArea, shadowArea) + SMALL)*100
+                        << " % " << nl
+                        << "Flux: " << localFluxMag << " " << shadowFluxMag
+                        << " Diff = " << localFlux + shadowFlux << " or "
+                        << mag(localFlux + shadowFlux)/
+                           (localFluxMag + SMALL)*100
+                        << " %" << endl;
+                }
+            }
+            else if
+            (
+                isA<cyclicGgiFvsPatchScalarField>(phi.boundaryField()[patchI])
+            )
+            {
+                if (!visited[patchI])
+                {
+                    visited[patchI] = true;
+
+                    // Calculate local and shadow flux
+                    scalar localFlux = gSum(phi.boundaryField()[patchI]);
+                    scalar localFluxMag = gSumMag(phi.boundaryField()[patchI]);
+
+                    const cyclicGgiPolyPatch& ggiPatch =
+                        refCast<const cyclicGgiPolyPatch>
+                        (
+                            phi.boundaryField()[patchI].patch().patch()
+                        );
+
+                    const label shadowPatchI = ggiPatch.shadowIndex();
+
+                    visited[shadowPatchI] = true;
+
+                    scalar shadowFlux =
+                        gSum(phi.boundaryField()[shadowPatchI]);
+
+                    scalar shadowFluxMag =
+                        gSumMag(phi.boundaryField()[shadowPatchI]);
+
+                    Info<< "Cyclic GGI pair (" << ggiPatch.name() << ", "
+                        << ggiPatch.shadow().name()
+                        << ") : " << localFluxMag << " " << shadowFluxMag
+                        << " Diff = " << localFlux + shadowFlux << " or "
+                        << mag(localFlux + shadowFlux)/
+                           (localFluxMag + SMALL)*100
+                        << " %" << endl;
+                }
             }
         }
-        else if
-        (
-            isA<cyclicGgiFvsPatchScalarField>(phi.boundaryField()[patchI])
-        )
-        {
-            if (!visited[patchI])
-            {
-                visited[patchI] = true;
-
-                // Calculate local and shadow flux
-                scalar localFlux = gSum(phi.boundaryField()[patchI]);
-                scalar localFluxMag = gSumMag(phi.boundaryField()[patchI]);
-
-                const cyclicGgiPolyPatch& ggiPatch =
-                    refCast<const cyclicGgiPolyPatch>
-                    (
-                        phi.boundaryField()[patchI].patch().patch()
-                    );
-
-                const label shadowPatchI = ggiPatch.shadowIndex();
-
-                visited[shadowPatchI] = true;
-
-                scalar shadowFlux = gSum(phi.boundaryField()[shadowPatchI]);
-                scalar shadowFluxMag =
-                    gSumMag(phi.boundaryField()[shadowPatchI]);
-
-                Info<< "Cyclic GGI pair (" << ggiPatch.name() << ", "
-                    << ggiPatch.shadow().name()
-                    << ") : " << localFluxMag << " " << shadowFluxMag
-                    << " Diff = " << localFlux + shadowFlux << " or "
-                    << mag(localFlux + shadowFlux)/(localFluxMag + SMALL)*100
-                    << " %" << endl;
-            }
-        }
+        return true;
     }
+    else
+    {
+        InfoIn("bool ggiCheckFunctionObject::execute()")
+            << "Cannot find flux field phi"
+            << endl;
 
-    return true;
+        return false;
+    }
 }
 
 

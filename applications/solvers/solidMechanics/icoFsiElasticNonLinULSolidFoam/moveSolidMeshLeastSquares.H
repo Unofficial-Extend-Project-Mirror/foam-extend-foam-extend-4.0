@@ -2,7 +2,7 @@
 //- move mesh
 //--------------------------------------------------//
 if(min(J.internalField()) > 0)
-  {
+{
     Info << "Moving mesh using least squares interpolation" << endl;
 
     leastSquaresVolPointInterpolation pointInterpolation(stressMesh);
@@ -11,41 +11,41 @@ if(min(J.internalField()) > 0)
     pointMesh pMesh(stressMesh);
 
     wordList types
-      (
-       pMesh.boundary().size(),
-       calculatedFvPatchVectorField::typeName
-       );
+    (
+        pMesh.boundary().size(),
+        calculatedFvPatchVectorField::typeName
+    );
 
     pointVectorField pointDU
-      (
-       IOobject
-       (
-        "pointDU",
-        runTime.timeName(),
-        stressMesh
+    (
+        IOobject
+        (
+            "pointDU",
+            runTime.timeName(),
+            stressMesh
         ),
-       pMesh,
-       dimensionedVector("zero", dimLength, vector::zero),
-       types
-       );
+        pMesh,
+        dimensionedVector("zero", dimLength, vector::zero),
+        types
+    );
 
     pointInterpolation.interpolate(DU, pointDU);
 
     const vectorField& pointDUI =
-      pointDU.internalField();
+        pointDU.internalField();
 
     //- Move mesh
     vectorField newPoints = stressMesh.allPoints();
 
     forAll (pointDUI, pointI)
-      {
+    {
         newPoints[pointI] += pointDUI[pointI];
-      }
+    }
 
     // Correct symmetryPlane points
 
     forAll(stressMesh.boundaryMesh(), patchI)
-      {
+    {
         if (isA<symmetryPolyPatch>(stressMesh.boundaryMesh()[patchI]))
         {
             const labelList& meshPoints =
@@ -89,10 +89,10 @@ if(min(J.internalField()) > 0)
     stressMesh.movePoints(newPoints);
     stressMesh.V00();
     stressMesh.moving(false);
-  }
-  else
-    {
-      FatalErrorIn(args.executable())
-	<< "Negative Jacobian"
-	<< exit(FatalError);
-    }
+}
+else
+{
+    FatalErrorIn(args.executable())
+        << "Negative Jacobian"
+        << exit(FatalError);
+}

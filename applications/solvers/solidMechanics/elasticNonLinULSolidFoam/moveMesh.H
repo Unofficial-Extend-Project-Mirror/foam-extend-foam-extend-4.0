@@ -10,7 +10,7 @@ else
 {
     FatalErrorIn(args.executable())
         << "move mesh method " << moveMeshMethod << " not recognised" << nl
-		<< "available methods are:" << nl
-		<< "inverseDistance" << nl
-		<< "leastSquares" << exit(FatalError);
+        << "available methods are:" << nl
+        << "inverseDistance" << nl
+        << "leastSquares" << exit(FatalError);
 }

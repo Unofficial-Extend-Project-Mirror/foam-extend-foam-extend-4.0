@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -37,7 +37,7 @@ SourceFiles
 #define mesquiteMotionSolver_H
 
 #include "motionSolver.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "Map.H"
 #include "Switch.H"
 #include "edgeList.H"
@@ -49,9 +49,17 @@ SourceFiles
 // Have gcc ignore certain warnings while including mesquite headers
 #if defined(__GNUC__) && !defined(__INTEL_COMPILER)
 #   pragma GCC diagnostic ignored "-Wold-style-cast"
+#   pragma GCC diagnostic ignored "-Wnon-virtual-dtor"
+#   pragma GCC diagnostic ignored "-Wunused-but-set-variable"
 #endif
 
 #include "Mesquite_all_headers.hpp"
+
+#if defined(__GNUC__) && !defined(__INTEL_COMPILER)
+#   pragma GCC diagnostic warning "-Wold-style-cast"
+#   pragma GCC diagnostic warning "-Wnon-virtual-dtor"
+#   pragma GCC diagnostic warning "-Wunused-but-set-variable"
+#endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -88,6 +96,17 @@ class mesquiteMotionSolver
         //- Number of elements
         unsigned long nCells_;
 
+        //- Polyhedra decomposition type
+        //  1: for cell, 2: for face
+        label decompType_;
+
+        //- Number of points from poly decomposition
+        unsigned long nDecompPoints_;
+
+        //- List of decomposition centres
+        List<labelPair> decompCellCentres_;
+        List<labelPair> decompFaceCentres_;
+
         //- Number of auxiliary points
         labelList nAuxPoints_;
 
@@ -106,7 +125,7 @@ class mesquiteMotionSolver
         //- Specify max volume correction iterations
         label volCorrMaxIter_;
 
-        // Specify tolerance for the CG solver
+        //- Specify tolerance for the CG solver
         scalar tolerance_;
 
         //- Specify multiple mesh-motion sweeps
@@ -159,6 +178,7 @@ class mesquiteMotionSolver
         List<vectorField> gradEdge_;
         List<vectorField> localPts_;
         List<scalarField> edgeMarker_;
+        List<scalarField> edgeConstant_;
 
         //- Data for the auxiliary entities
         labelList procIndices_;
@@ -219,7 +239,7 @@ class mesquiteMotionSolver
         scalar cmptSumMag(const vectorField& field);
 
         // Transfer buffers for surface point fields
-        void transferBuffers(vectorField &field);
+        void transferBuffers(vectorField &field, bool fix = false);
 
         // Apply boundary conditions
         void applyBCs(vectorField &field);
@@ -253,6 +273,14 @@ class mesquiteMotionSolver
         // Prepare mesquite connectivity for parallel runs
         void initMesquiteParallelArrays();
 
+        // Compute centroids based on up-to-date point positions
+        void computeCentroids
+        (
+            const pointField& points,
+            pointField& faceCentres,
+            pointField& cellCentres
+        );
+
         // Copy auxiliary points to/from buffers
         void copyAuxiliaryPoints(bool firstCopy);
 
@@ -285,6 +313,9 @@ class mesquiteMotionSolver
 
         // Prepare point-normals with updated point positions
         void preparePointNormals();
+
+        // Prepare non-uniform edge constants with updated point positions
+        void prepareEdgeConstants(const vectorField& p);
 
         // Utility method to check validity of cells connected to a point.
         bool checkValidity

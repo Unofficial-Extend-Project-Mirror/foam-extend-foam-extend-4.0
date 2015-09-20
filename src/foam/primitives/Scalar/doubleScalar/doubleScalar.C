@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -34,7 +34,7 @@ License
 #define ScalarVGREAT doubleScalarVGREAT
 #define ScalarVSMALL doubleScalarVSMALL
 #define readScalar readDoubleScalar
-#include "Scalar.C"
+#include "ScalarTemplate.C"
 #undef Scalar
 #undef ScalarVGREAT
 #undef ScalarVSMALL

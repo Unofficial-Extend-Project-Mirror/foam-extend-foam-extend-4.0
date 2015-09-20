@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -68,12 +68,12 @@ class triSurfaceSearch
 
     // Private Member Functions
 
-
         //- Disallow default bitwise copy construct
         triSurfaceSearch(const triSurfaceSearch&);
 
         //- Disallow default bitwise assignment
         void operator=(const triSurfaceSearch&);
+
 
 public:
 
@@ -86,8 +86,7 @@ public:
     // Constructors
 
         //- Construct from surface. Holds reference to surface!
-        triSurfaceSearch(const triSurface&);
-
+        explicit triSurfaceSearch(const triSurface&);
 
 
     // Member Functions

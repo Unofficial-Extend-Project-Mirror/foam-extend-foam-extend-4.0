@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -80,6 +80,9 @@ class fineBlockAmgLevel
         //- Smoother
         autoPtr<BlockLduSmoother<Type> > smootherPtr_;
 
+        //- Ax buffer
+        mutable Field<Type> Ax_;
+
 
     // Private Member Functions
 
@@ -93,8 +96,10 @@ class fineBlockAmgLevel
 public:
 
     //- Runtime type information
-        TypeName("fineBlockAmgLevel");
+    TypeName("fineBlockAmgLevel");
 
+
+    // Constructors
 
         //- Construct from components
         fineBlockAmgLevel
@@ -103,8 +108,7 @@ public:
             const dictionary& dict,
             const word& coarseningType,
             const label groupSize,
-            const label minCoarseEqns,
-            const word& smootherType
+            const label minCoarseEqns
         );
 
 

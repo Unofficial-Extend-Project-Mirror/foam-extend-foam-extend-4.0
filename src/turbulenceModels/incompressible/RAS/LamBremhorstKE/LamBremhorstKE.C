@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -140,6 +140,7 @@ LamBremhorstKE::LamBremhorstKE
     )
 {
     nut_ = Cmu_*fMu_*sqr(k_)/(epsilon_ + epsilonSmall_);
+    nut_ = min(nut_, nuRatio()*nu());
     nut_.correctBoundaryConditions();
 
     printCoeffs();
@@ -290,6 +291,7 @@ void LamBremhorstKE::correct()
 
     // Re-calculate viscosity
     nut_ == Cmu_*fMu_*sqr(k_)/epsilon_;
+    nut_ == min(nut_, nuRatio()*nu());
 }
 
 

@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -49,8 +49,12 @@ SourceFiles
 #include "scalar.H"
 #include "fileName.H"
 #include "InfoProxy.H"
+#include "infoSwitch.H"
+
+#include "debug.H"
 
 #include <iostream>
+
 
 #if __GNUC__ < 3
 #   define ios_base ios
@@ -211,8 +215,7 @@ public:
         static const versionNumber currentVersion;
 
         //- Default precision
-        static unsigned int precision_;
-
+        static Foam::debug::infoSwitch precision_;
 
 private:
 
@@ -466,13 +469,13 @@ public:
             //- Return the default precision
             static unsigned int defaultPrecision()
             {
-                return precision_;
+                return precision_();
             }
 
             //- Reset the default precision (and return old precision)
             static unsigned int defaultPrecision(unsigned int p)
             {
-                unsigned int precision0 = precision_;
+                unsigned int precision0 = precision_();
                 precision_ = p;
                 return precision0;
             }

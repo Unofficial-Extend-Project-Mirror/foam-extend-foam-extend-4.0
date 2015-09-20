@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -31,35 +31,46 @@ License
 
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
-
-Foam::scalar Foam::primitiveMesh::closedThreshold_
+const Foam::debug::tolerancesSwitch
+Foam::primitiveMesh::closedThreshold_
 (
-    debug::tolerances("primitiveMeshClosedThreshold", 1e-6)
+    "primitiveMeshClosedThreshold",
+    1e-6
 );
 
-Foam::scalar Foam::primitiveMesh::aspectThreshold_
+const Foam::debug::tolerancesSwitch
+Foam::primitiveMesh::aspectThreshold_
 (
-    debug::tolerances("primitiveMeshAspectThreshold", 1000)
+    "primitiveMeshAspectThreshold",
+    1000
 );
 
-Foam::scalar Foam::primitiveMesh::nonOrthThreshold_ // deg
+Foam::debug::tolerancesSwitch
+Foam::primitiveMesh::nonOrthThreshold_ // deg
 (
-    debug::tolerances("primitiveMeshNonOrthThreshold", 70)
+    "primitiveMeshNonOrthThreshold",
+    70
 );
 
-Foam::scalar Foam::primitiveMesh::skewThreshold_
+const Foam::debug::tolerancesSwitch
+Foam::primitiveMesh::skewThreshold_
 (
-    debug::tolerances("primitiveMeshSkewThreshold", 4)
+    "primitiveMeshSkewThreshold",
+    4
 );
 
-Foam::scalar Foam::primitiveMesh::faceAngleThreshold_
+Foam::debug::tolerancesSwitch
+Foam::primitiveMesh::faceAngleThreshold_
 (
-    debug::tolerances("primitiveMeshFaceAngleThreshold", 10)
+    "primitiveMeshFaceAngleThreshold",
+    10
 );
 
-Foam::scalar Foam::primitiveMesh::faceFlatnessThreshold_
+const Foam::debug::tolerancesSwitch
+Foam::primitiveMesh::faceFlatnessThreshold_
 (
-    debug::tolerances("primitiveMeshFaceFlatnessThreshold", 0.8)
+    "primitiveMeshFaceFlatnessThreshold",
+    0.8
 );
 
 
@@ -93,12 +104,12 @@ bool Foam::primitiveMesh::checkClosedBoundary(const bool report) const
 
     vector openness = sumClosed/(sumMagClosedBoundary + VSMALL);
 
-    if (cmptMax(cmptMag(openness)) > closedThreshold_)
+    if (cmptMax(cmptMag(openness)) > closedThreshold_())
     {
         if (debug || report)
         {
             Info<< " ***Boundary openness " << openness
-                << " Threshold = " << closedThreshold_
+                << " Threshold = " << closedThreshold_()
                 << " possible hole in boundary description."
                 << endl;
         }
@@ -110,7 +121,7 @@ bool Foam::primitiveMesh::checkClosedBoundary(const bool report) const
         if (debug || report)
         {
             Info<< "    Boundary openness " << openness
-                << " Threshold = " << closedThreshold_
+                << " Threshold = " << closedThreshold_()
                 << " OK."
                 << endl;
         }
@@ -245,7 +256,7 @@ bool Foam::primitiveMesh::checkClosedCells
 
         maxOpennessCell = max(maxOpennessCell, maxOpenness);
 
-        if (maxOpenness > closedThreshold_)
+        if (maxOpenness > closedThreshold_())
         {
             if (setPtr)
             {
@@ -267,7 +278,7 @@ bool Foam::primitiveMesh::checkClosedCells
 
         maxAspectRatio = max(maxAspectRatio, aspectRatio);
 
-        if (aspectRatio > aspectThreshold_)
+        if (aspectRatio > aspectThreshold_())
         {
             if (aspectSetPtr)
             {
@@ -291,7 +302,7 @@ bool Foam::primitiveMesh::checkClosedCells
         {
             Info<< " ***Open cells found, max cell openness: "
                 << maxOpennessCell << ", number of open cells " << nOpen
-                << " Threshold = " << closedThreshold_
+                << " Threshold = " << closedThreshold_()
                 << endl;
         }
 
@@ -305,7 +316,7 @@ bool Foam::primitiveMesh::checkClosedCells
             Info<< " ***High aspect ratio cells found, Max aspect ratio: "
                 << maxAspectRatio
                 << ", number of cells " << nAspect
-                << " Threshold = " << aspectThreshold_
+                << " Threshold = " << aspectThreshold_()
                 << endl;
         }
 
@@ -471,7 +482,7 @@ bool Foam::primitiveMesh::checkFaceOrthogonality
 
     // Severe nonorthogonality threshold
     const scalar severeNonorthogonalityThreshold =
-        ::cos(nonOrthThreshold_/180.0*mathematicalConstant::pi);
+        ::cos(nonOrthThreshold_()/180.0*mathematicalConstant::pi);
 
     scalar minDDotS = GREAT;
 
@@ -536,7 +547,7 @@ bool Foam::primitiveMesh::checkFaceOrthogonality
                     << ::acos(minDDotS)/mathematicalConstant::pi*180.0
                     << " average: " <<
                     ::acos(sumDDotS/neiSize)/mathematicalConstant::pi*180.0
-                    << " Threshold = " << nonOrthThreshold_
+                    << " Threshold = " << nonOrthThreshold_()
                     << endl;
             }
         }
@@ -707,7 +718,7 @@ bool Foam::primitiveMesh::checkFaceSkewness
 
         // Check if the skewness vector is greater than the PN vector.
         // This does not cause trouble but is a good indication of a poor mesh.
-        if (skewness > skewThreshold_)
+        if (skewness > skewThreshold_())
         {
             if (setPtr)
             {
@@ -755,7 +766,7 @@ bool Foam::primitiveMesh::checkFaceSkewness
 
         // Check if the skewness vector is greater than the PN vector.
         // This does not cause trouble but is a good indication of a poor mesh.
-        if (skewness > skewThreshold_)
+        if (skewness > skewThreshold_())
         {
             if (setPtr)
             {
@@ -781,7 +792,7 @@ bool Foam::primitiveMesh::checkFaceSkewness
         {
             Info<< " ***Max skewness = " << maxSkew
                 << ", " << nWarnSkew << " highly skew faces detected"
-                << " Threshold = " << skewThreshold_
+                << " Threshold = " << skewThreshold_()
                 << endl;
         }
 
@@ -890,18 +901,18 @@ bool Foam::primitiveMesh::checkFaceAngles
             << "checking face angles" << endl;
     }
 
-    if (faceAngleThreshold_ < -SMALL || faceAngleThreshold_ > 180 + SMALL)
+    if (faceAngleThreshold_() < -SMALL || faceAngleThreshold_() > 180 + SMALL)
     {
         FatalErrorIn
         (
             "primitiveMesh::checkFaceAngles(const bool, labelHashSet*)"
         )   << "faceAngleThreshold_ should be [0..180] but is now "
-            << faceAngleThreshold_
+            << faceAngleThreshold_()
             << exit(FatalError);
     }
 
     const scalar maxSin =
-        Foam::sin(faceAngleThreshold_/180.0*mathematicalConstant::pi);
+        Foam::sin(faceAngleThreshold_()/180.0*mathematicalConstant::pi);
 
     const pointField& p = points();
     const faceList& fcs = faces();
@@ -1018,14 +1029,14 @@ bool Foam::primitiveMesh::checkFaceFlatness
             << "checking face flatness" << endl;
     }
 
-    if (faceFlatnessThreshold_ < 0 || faceFlatnessThreshold_ > 1)
+    if (faceFlatnessThreshold_() < 0 || faceFlatnessThreshold_() > 1)
     {
         FatalErrorIn
         (
             "primitiveMesh::checkFaceFlatness"
             "(const bool, labelHashSet*)"
         )   << "faceFlatnessThreshold_ should be [0..1] but is now "
-            << faceFlatnessThreshold_
+            << faceFlatnessThreshold_()
             << exit(FatalError);
     }
 
@@ -1074,7 +1085,7 @@ bool Foam::primitiveMesh::checkFaceFlatness
 
             minFlatness = min(minFlatness, flatness);
 
-            if (flatness < faceFlatnessThreshold_)
+            if (flatness < faceFlatnessThreshold_())
             {
                 nWarped++;
 
@@ -1109,7 +1120,7 @@ bool Foam::primitiveMesh::checkFaceFlatness
         {
             Info<< "   *There are " << nWarped
                 << " faces with ratio between projected and actual area < "
-                << faceFlatnessThreshold_ << endl;
+                << faceFlatnessThreshold_() << endl;
 
             Info<< "    Minimum ratio (minimum flatness, maximum warpage) = "
                 << minFlatness << endl;

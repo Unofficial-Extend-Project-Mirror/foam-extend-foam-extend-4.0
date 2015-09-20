@@ -4,20 +4,21 @@
 
     forAll(U.boundaryField(), patchI)
     {
-      // philipc - this used to set a reference on
-      // processors which did not have a patch that fixesValue
-      // so processor in the centre of the domain all had
-      // a referece set causing stress peaks and resulting
-      // in an incorrect solution
-      // so a quick fix is to not set a reference on regions
-      // with a processor boundary
-      //if (U.boundaryField()[patchI].fixesValue())
-      if (
-	  U.boundaryField()[patchI].fixesValue()
-	  ||
-	  mesh.boundaryMesh()[patchI].type()
-	  == processorPolyPatch::typeName
-	  )
+        // philipc - this used to set a reference on
+        // processors which did not have a patch that fixesValue
+        // so processor in the centre of the domain all had
+        // a referece set causing stress peaks and resulting
+        // in an incorrect solution
+        // so a quick fix is to not set a reference on regions
+        // with a processor boundary
+        //if (U.boundaryField()[patchI].fixesValue())
+        if
+        (
+            U.boundaryField()[patchI].fixesValue()
+            ||
+            mesh.boundaryMesh()[patchI].type()
+            == processorPolyPatch::typeName
+        )
         {
             const unallocLabelList& curFaceCells =
                 mesh.boundary()[patchI].faceCells();

@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -55,7 +55,10 @@ class IPstream
 {
     // Private data
 
+        //- ID of sending processor
         int fromProcNo_;
+
+        //- Message size
         label messageSize_;
 
 
@@ -76,15 +79,15 @@ public:
 
     // Constructors
 
-        //- Construct given process index to read from and optional buffer size,
+        //- Construct given process index to read from, optional buffer size,
         //  read format and IO version
         IPstream
         (
             const commsTypes commsType,
             const int fromProcNo,
             const label bufSize = 0,
-            streamFormat format=BINARY,
-            versionNumber version=currentVersion
+            streamFormat format = BINARY,
+            versionNumber version = currentVersion
         );
 
 
@@ -142,6 +145,9 @@ public:
 
             //- Read a doubleScalar
             Istream& read(doubleScalar&);
+
+            //- Read a longDoubleScalar
+            Istream& read(longDoubleScalar&);
 
             //- Read binary block
             Istream& read(char*, std::streamsize);

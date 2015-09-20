@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -36,15 +36,10 @@ Description
 
 #include "fvCFD.H"
 #include "fieldTypes.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "fvMesh.H"
+#include "fvBlockMatrix.H"
 
-#include "blockLduSolvers.H"
-#include "VectorNFieldTypes.H"
-#include "volVectorNFields.H"
-#include "blockVectorNMatrices.H"
-
-#include "blockMatrixTools.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -92,53 +87,27 @@ int main(int argc, char *argv[])
             TsEqn.relax();
 
             // Prepare block system
-            BlockLduMatrix<vector2> blockM(mesh);
+            fvBlockMatrix<vector2> blockM(blockT);
 
-            //- Transfer the coupled interface list for processor/cyclic/etc.
-            // boundaries
-            blockM.interfaces() = blockT.boundaryField().blockInterfaces();
+            // Insert equations into block Matrix
+            blockM.insertEquation(0, TEqn);
+            blockM.insertEquation(1, TsEqn);
 
-            // Grab block diagonal and set it to zero
-            Field<tensor2>& d = blockM.diag().asSquare();
-            d = tensor2::zero;
+            // Add off-diagonal coupling terms
+            scalarField coupling(mesh.nCells(), -alpha.value());
 
-            // Grab linear off-diagonal and set it to zero
-            Field<vector2>& l = blockM.lower().asLinear();
-            Field<vector2>& u = blockM.upper().asLinear();
-            u = vector2::zero;
-            l = vector2::zero;
+            blockM.insertEquationCoupling(0, 1, coupling);
+            blockM.insertEquationCoupling(1, 0, coupling);
 
-            vector2Field& blockX = blockT.internalField();
-            vector2Field blockB(mesh.nCells(), vector2::zero);
-
-            //- Inset equations into block Matrix
-            blockMatrixTools::insertEquation(0, TEqn, blockM, blockX, blockB);
-            blockMatrixTools::insertEquation(1, TsEqn, blockM, blockX, blockB);
-
-            //- Add off-diagonal terms and remove from block source
-            forAll(d, i)
-            {
-                d[i](0, 1) = -alpha.value()*mesh.V()[i];
-                d[i](1, 0) = -alpha.value()*mesh.V()[i];
-
-                blockB[i][0] -= alpha.value()*blockX[i][1]*mesh.V()[i];
-                blockB[i][1] -= alpha.value()*blockX[i][0]*mesh.V()[i];
-            }
+            // Update source coupling: coupling terms eliminated from source
+            blockM.updateSourceCoupling();
 
             //- Block coupled solver call
-            BlockSolverPerformance<vector2> solverPerf =
-                BlockLduSolver<vector2>::New
-                (
-                    blockT.name(),
-                    blockM,
-                    mesh.solutionDict().solver(blockT.name())
-                )->solve(blockX, blockB);
-
-            solverPerf.print();
+            blockM.solve();
 
             // Retrieve solution
-            blockMatrixTools::blockRetrieve(0, T.internalField(), blockX);
-            blockMatrixTools::blockRetrieve(1, Ts.internalField(), blockX);
+            blockM.retrieveSolution(0, T.internalField());
+            blockM.retrieveSolution(1, Ts.internalField());
 
             T.correctBoundaryConditions();
             Ts.correctBoundaryConditions();

@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -23,7 +23,7 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "PatchToPatchInterpolation.H"
+#include "PatchToPatchInterpolationTemplate.H"
 #include "objectHit.H"
 #include "pointHit.H"
 
@@ -112,7 +112,7 @@ void PatchToPatchInterpolation<FromPatch, ToPatch>::calcPointAddressing() const
             // Grab hit point
             hitPoint = curHit.hitPoint();
         }
-        else if (projectionTol_ > SMALL)
+        else if (projectionTol_() > SMALL)
         {
             // Check for a near miss
             pointHit ph =
@@ -162,7 +162,7 @@ void PatchToPatchInterpolation<FromPatch, ToPatch>::calcPointAddressing() const
                     );
             }
 
-            if (dist < minEdgeLength*projectionTol_)
+            if (dist < minEdgeLength*projectionTol_())
             {
                 // This point is being corrected
                 doWeights = true;
@@ -304,7 +304,7 @@ void PatchToPatchInterpolation<FromPatch, ToPatch>::calcFaceAddressing() const
 
             if
             (
-                m < directHitTol_                           // Direct hit
+                m < directHitTol_()                           // Direct hit
              || neighbours.empty()
             )
             {

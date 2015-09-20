@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -195,7 +195,8 @@ void Foam::coupledLduMatrix::initMatrixInterfaces
     const lduInterfaceFieldPtrsListList& interfaces,
     const FieldField<Field, scalar>& x,
     FieldField<Field, scalar>& result,
-    const direction cmpt
+    const direction cmpt,
+    const bool switchToLhs
 ) const
 {
     const PtrList<lduMatrix>& matrices = *this;
@@ -205,7 +206,7 @@ void Foam::coupledLduMatrix::initMatrixInterfaces
     // interfaces.  The reason is that non-processor coupled
     // interfaces require a complex comms pattern involving more than
     // pairwise communications.
-    // Under normal circumstances this is achieved naturall, since
+    // Under normal circumstances this is achieved naturally, since
     // processor interfaces come last on the list and other coupled
     // interfaces execute complex comms at init() level.
     // For coupled matrices, the update loop needs to be split over
@@ -217,8 +218,8 @@ void Foam::coupledLduMatrix::initMatrixInterfaces
     {
         if
         (
-            Pstream::defaultCommsType == Pstream::blocking
-         || Pstream::defaultCommsType == Pstream::nonBlocking
+            Pstream::defaultCommsType() == Pstream::blocking
+         || Pstream::defaultCommsType() == Pstream::nonBlocking
         )
         {
             forAll (interfaces[rowI], interfaceI)
@@ -240,23 +241,70 @@ void Foam::coupledLduMatrix::initMatrixInterfaces
                             matrices[rowI],
                             coupleCoeffs[rowI][interfaceI],
                             cmpt,
-                            Pstream::defaultCommsType,
-                            false
+                            static_cast<const Pstream::commsTypes>
+                            (
+                                Pstream::defaultCommsType()
+                            ),
+                            switchToLhs
                         );
+                    }
+                }
+            }
+        }
+        else if (Pstream::defaultCommsType() == Pstream::scheduled)
+        {
+            // ERROR: Does not work with scheduled comms.
+            // To investigate.  HJ, 11/Jun/2015
+            forAll (matrices, rowI)
+            {
+                const lduSchedule& patchSchedule =
+                    matrices[rowI].patchSchedule();
+
+                // Loop over the "global" patches are on the list of
+                // interfaces but beyond the end of the schedule
+                // which only handles "normal" patches
+                for
+                (
+                    label interfaceI = patchSchedule.size()/2;
+                    interfaceI < interfaces.size();
+                    interfaceI++
+                )
+                {
+                    if (interfaces[rowI].set(interfaceI))
+                    {
+                        if
+                        (
+                            !isA<processorLduInterfaceField>
+                            (
+                                interfaces[rowI][interfaceI]
+                            )
+                        )
+                        {
+                            interfaces[rowI][interfaceI].
+                                initInterfaceMatrixUpdate
+                                (
+                                    x[rowI],
+                                    result[rowI],
+                                    matrices[rowI],
+                                    coupleCoeffs[rowI][interfaceI],
+                                    cmpt,
+                                    static_cast<const Pstream::commsTypes>
+                                    (
+                                        Pstream::defaultCommsType()
+                                    ),
+                                    switchToLhs
+                                );
+                        }
                     }
                 }
             }
         }
         else
         {
-            matrices[rowI].initMatrixInterfaces
-            (
-                coupleCoeffs[rowI],
-                interfaces[rowI],
-                x[rowI],
-                result[rowI],
-                cmpt
-            );
+            FatalErrorIn("void coupledLduMatrix::initMatrixInterfaces")
+                << "Unsuported communications type "
+                << Pstream::commsTypeNames[Pstream::defaultCommsType()]
+                << exit(FatalError);
         }
     }
 
@@ -265,8 +313,8 @@ void Foam::coupledLduMatrix::initMatrixInterfaces
     {
         if
         (
-            Pstream::defaultCommsType == Pstream::blocking
-         || Pstream::defaultCommsType == Pstream::nonBlocking
+            Pstream::defaultCommsType() == Pstream::blocking
+         || Pstream::defaultCommsType() == Pstream::nonBlocking
         )
         {
             forAll (interfaces[rowI], interfaceI)
@@ -288,12 +336,70 @@ void Foam::coupledLduMatrix::initMatrixInterfaces
                             matrices[rowI],
                             coupleCoeffs[rowI][interfaceI],
                             cmpt,
-                            Pstream::defaultCommsType,
-                            false
+                            static_cast<const Pstream::commsTypes>
+                            (
+                                Pstream::defaultCommsType()
+                            ),
+                            switchToLhs
                         );
                     }
                 }
             }
+        }
+        else if (Pstream::defaultCommsType() == Pstream::scheduled)
+        {
+            // ERROR: Does not work with scheduled comms.
+            // To investigate.  HJ, 11/Jun/2015
+            forAll (matrices, rowI)
+            {
+                const lduSchedule& patchSchedule =
+                    matrices[rowI].patchSchedule();
+
+                // Loop over the "global" patches are on the list of
+                // interfaces but beyond the end of the schedule
+                // which only handles "normal" patches
+                for
+                (
+                    label interfaceI = patchSchedule.size()/2;
+                    interfaceI < interfaces.size();
+                    interfaceI++
+                )
+                {
+                    if (interfaces[rowI].set(interfaceI))
+                    {
+                        if
+                        (
+                            isA<processorLduInterfaceField>
+                            (
+                                interfaces[rowI][interfaceI]
+                            )
+                        )
+                        {
+                            interfaces[rowI][interfaceI].
+                                initInterfaceMatrixUpdate
+                                (
+                                    x[rowI],
+                                    result[rowI],
+                                    matrices[rowI],
+                                    coupleCoeffs[rowI][interfaceI],
+                                    cmpt,
+                                    static_cast<const Pstream::commsTypes>
+                                    (
+                                        Pstream::defaultCommsType()
+                                    ),
+                                    switchToLhs
+                                );
+                        }
+                    }
+                }
+            }
+        }
+        else
+        {
+            FatalErrorIn("void coupledLduMatrix::initMatrixInterfaces")
+                << "Unsuported communications type "
+                << Pstream::commsTypeNames[Pstream::defaultCommsType()]
+                << exit(FatalError);
         }
     }
 }
@@ -305,7 +411,8 @@ void Foam::coupledLduMatrix::updateMatrixInterfaces
     const lduInterfaceFieldPtrsListList& interfaces,
     const FieldField<Field, scalar>& x,
     FieldField<Field, scalar>& result,
-    const direction cmpt
+    const direction cmpt,
+    const bool switchToLhs
 ) const
 {
     const PtrList<lduMatrix>& matrices = *this;
@@ -318,7 +425,8 @@ void Foam::coupledLduMatrix::updateMatrixInterfaces
             interfaces[rowI],
             x[rowI],
             result[rowI],
-            cmpt
+            cmpt,
+            switchToLhs
         );
     }
 }

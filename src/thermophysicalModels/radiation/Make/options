@@ -4,4 +4,5 @@ EXE_INC = \
 
 LIB_LIBS = \
     -lfiniteVolume \
+    -lbasicThermophysicalModels \
     -lspecie

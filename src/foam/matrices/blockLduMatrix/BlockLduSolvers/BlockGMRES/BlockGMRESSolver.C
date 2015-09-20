@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -112,9 +112,6 @@ Foam::BlockGMRESSolver<Type>::solve
     );
 
     scalar norm = this->normFactor(x, b);
-
-    // Multiplication helper
-    typename BlockCoeff<Type>::multiply mult;
 
     Field<Type> wA(x.size());
 

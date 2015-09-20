@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -35,10 +35,14 @@ Foam::profilingPool* Foam::profilingPool::thePool_(NULL);
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-Foam::profilingPool::profilingPool(const IOobject &ob)
+Foam::profilingPool::profilingPool(
+    const IOobject &ob,
+    const Time &owner
+)
     :
     regIOobject(ob),
-    globalTime_()
+    globalTime_(),
+    owner_(owner)
 {
 }
 
@@ -58,15 +62,29 @@ Foam::profilingPool::~profilingPool()
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-void Foam::profilingPool::initprofiling(const IOobject &ob)
+void Foam::profilingPool::initProfiling(
+    const IOobject &ob,
+    const Time &owner
+)
 {
     if (!thePool_)
     {
-        thePool_ = new profilingPool(ob);
+        thePool_ = new profilingPool(ob,owner);
         profilingInfo *master=new profilingInfo();
         thePool_->map().insert(make_pair(master->description(),master));
         thePool_->stack().push(*master);
         profilingPool::rememberTimer(*master,thePool_->globalTime_);
+    }
+}
+
+void Foam::profilingPool::stopProfiling(
+    const Time &owner
+)
+{
+    if (thePool_ && (&owner)==&(thePool_->owner()))
+    {
+        delete thePool_;
+        thePool_=NULL;
     }
 }
 

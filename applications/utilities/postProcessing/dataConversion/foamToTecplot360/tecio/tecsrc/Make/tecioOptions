@@ -20,6 +20,11 @@
 
     TECIO_FLAGS = -DMAKEARCHIVE -DLINUX -DLINUX64 -DUSEENUM -DTHREED -U_WIN32 -DENGINE
 
+#elif defined(mingw)
+
+#   warning "MSWin mingw architecture detected"
+    TECIO_FLAGS = -DMAKEARCHIVE -DLINUX -DUSEENUM -DTHREED -DENGINE
+
 #else
 
 #error "architecture not supported for compiling tecio."

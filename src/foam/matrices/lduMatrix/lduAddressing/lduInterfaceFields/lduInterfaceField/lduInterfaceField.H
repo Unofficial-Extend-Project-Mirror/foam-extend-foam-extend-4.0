@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -57,7 +57,7 @@ class lduInterfaceField
     // Private data
 
         //- Reference to the coupled patch this field is defined for
-        const lduInterface& interface_;
+        const lduInterface& coupledInterface_;
 
 
     // Private Member Functions
@@ -80,7 +80,7 @@ public:
         //- Construct given coupled patch
         lduInterfaceField(const lduInterface& patch)
         :
-            interface_(patch)
+            coupledInterface_(patch)
         {}
 
 
@@ -94,9 +94,9 @@ public:
         // Access
 
             //- Return the interface
-            const lduInterface& interface() const
+            const lduInterface& coupledInterface() const
             {
-                return interface_;
+                return coupledInterface_;
             }
 
             //- Return the interface type

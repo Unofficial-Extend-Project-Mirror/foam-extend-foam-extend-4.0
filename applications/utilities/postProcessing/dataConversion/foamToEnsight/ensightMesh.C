@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -25,7 +25,7 @@ License
 
 #include "argList.H"
 #include "objectRegistry.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "ensightMesh.H"
 #include "fvMesh.H"
 #include "globalMeshData.H"
@@ -308,7 +308,7 @@ void Foam::ensightMesh::writePoints
 }
 
 
-Foam::cellShapeList Foam::ensightMesh::map
+Foam::cellShapeList Foam::ensightMesh::ensMap
 (
     const cellShapeList& cellShapes,
     const labelList& prims
@@ -325,7 +325,7 @@ Foam::cellShapeList Foam::ensightMesh::map
 }
 
 
-Foam::cellShapeList Foam::ensightMesh::map
+Foam::cellShapeList Foam::ensightMesh::ensMap
 (
     const cellShapeList& cellShapes,
     const labelList& hexes,
@@ -932,7 +932,7 @@ void Foam::ensightMesh::writeFacePrimsBinary
 }
 
 
-Foam::faceList Foam::ensightMesh::map
+Foam::faceList Foam::ensightMesh::ensMap
 (
     const faceList& patchFaces,
     const labelList& prims
@@ -970,7 +970,7 @@ void Foam::ensightMesh::writeAllFacePrims
             {
                 writeFacePrims
                 (
-                    map(patchFaces, prims),
+                    ensMap(patchFaces, prims),
                     0,
                     ensightGeometryFile
                 );
@@ -996,7 +996,7 @@ void Foam::ensightMesh::writeAllFacePrims
         else if (&prims != NULL)
         {
             OPstream toMaster(Pstream::scheduled, Pstream::masterNo());
-            toMaster<< map(patchFaces, prims);
+            toMaster<< ensMap(patchFaces, prims);
         }
     }
 }
@@ -1057,7 +1057,7 @@ void Foam::ensightMesh::writeAllNSided
             {
                 writeNSidedNPointsPerFace
                 (
-                    map(patchFaces, prims),
+                    ensMap(patchFaces, prims),
                     ensightGeometryFile
                 );
             }
@@ -1081,7 +1081,7 @@ void Foam::ensightMesh::writeAllNSided
         else if (&prims != NULL)
         {
             OPstream toMaster(Pstream::scheduled, Pstream::masterNo());
-            toMaster<< map(patchFaces, prims);
+            toMaster<< ensMap(patchFaces, prims);
         }
 
         // List of points id for each face
@@ -1091,7 +1091,7 @@ void Foam::ensightMesh::writeAllNSided
             {
                 writeNSidedPoints
                 (
-                    map(patchFaces, prims),
+                    ensMap(patchFaces, prims),
                     0,
                     ensightGeometryFile
                 );
@@ -1117,7 +1117,7 @@ void Foam::ensightMesh::writeAllNSided
         else if (&prims != NULL)
         {
             OPstream toMaster(Pstream::scheduled, Pstream::masterNo());
-            toMaster<< map(patchFaces, prims);
+            toMaster<< ensMap(patchFaces, prims);
         }
     }
 }
@@ -1181,7 +1181,7 @@ void Foam::ensightMesh::writeAllNSidedBinary
             {
                 writeNSidedNPointsPerFaceBinary
                 (
-                    map(patchFaces, prims),
+                    ensMap(patchFaces, prims),
                     ensightGeometryFile
                 );
             }
@@ -1205,7 +1205,7 @@ void Foam::ensightMesh::writeAllNSidedBinary
         else if (&prims != NULL)
         {
             OPstream toMaster(Pstream::scheduled, Pstream::masterNo());
-            toMaster<< map(patchFaces, prims);
+            toMaster<< ensMap(patchFaces, prims);
         }
 
         // List of points id for each face
@@ -1215,7 +1215,7 @@ void Foam::ensightMesh::writeAllNSidedBinary
             {
                 writeNSidedPointsBinary
                 (
-                    map(patchFaces, prims),
+                    ensMap(patchFaces, prims),
                     0,
                     ensightGeometryFile
                 );
@@ -1241,7 +1241,7 @@ void Foam::ensightMesh::writeAllNSidedBinary
         else if (&prims != NULL)
         {
             OPstream toMaster(Pstream::scheduled, Pstream::masterNo());
-            toMaster<< map(patchFaces, prims);
+            toMaster<< ensMap(patchFaces, prims);
         }
     }
 }
@@ -1269,7 +1269,7 @@ void Foam::ensightMesh::writeAllFacePrimsBinary
             {
                 writeFacePrimsBinary
                 (
-                    map(patchFaces, prims),
+                    ensMap(patchFaces, prims),
                     0,
                     ensightGeometryFile
                 );
@@ -1295,7 +1295,7 @@ void Foam::ensightMesh::writeAllFacePrimsBinary
         else if (&prims != NULL)
         {
             OPstream toMaster(Pstream::scheduled, Pstream::masterNo());
-            toMaster<< map(patchFaces, prims);
+            toMaster<< ensMap(patchFaces, prims);
         }
     }
 }
@@ -1424,7 +1424,7 @@ void Foam::ensightMesh::writeAscii
         (
             "hexa8",
             meshCellSets_.nHexesWedges,
-            map(cellShapes, meshCellSets_.hexes, meshCellSets_.wedges),
+            ensMap(cellShapes, meshCellSets_.hexes, meshCellSets_.wedges),
             pointOffsets,
             ensightGeometryFile
         );
@@ -1433,7 +1433,7 @@ void Foam::ensightMesh::writeAscii
         (
             "penta6",
             meshCellSets_.nPrisms,
-            map(cellShapes, meshCellSets_.prisms),
+            ensMap(cellShapes, meshCellSets_.prisms),
             pointOffsets,
             ensightGeometryFile
         );
@@ -1442,7 +1442,7 @@ void Foam::ensightMesh::writeAscii
         (
             "pyramid5",
             meshCellSets_.nPyrs,
-            map(cellShapes, meshCellSets_.pyrs),
+            ensMap(cellShapes, meshCellSets_.pyrs),
             pointOffsets,
             ensightGeometryFile
         );
@@ -1451,7 +1451,7 @@ void Foam::ensightMesh::writeAscii
         (
             "tetra4",
             meshCellSets_.nTets,
-            map(cellShapes, meshCellSets_.tets),
+            ensMap(cellShapes, meshCellSets_.tets),
             pointOffsets,
             ensightGeometryFile
         );
@@ -1710,7 +1710,7 @@ void Foam::ensightMesh::writeBinary
         (
             "hexa8",
             meshCellSets_.nHexesWedges,
-            map(cellShapes, meshCellSets_.hexes, meshCellSets_.wedges),
+            ensMap(cellShapes, meshCellSets_.hexes, meshCellSets_.wedges),
             pointOffsets,
             ensightGeometryFile
         );
@@ -1719,7 +1719,7 @@ void Foam::ensightMesh::writeBinary
         (
             "penta6",
             meshCellSets_.nPrisms,
-            map(cellShapes, meshCellSets_.prisms),
+            ensMap(cellShapes, meshCellSets_.prisms),
             pointOffsets,
             ensightGeometryFile
         );
@@ -1728,7 +1728,7 @@ void Foam::ensightMesh::writeBinary
         (
             "pyramid5",
             meshCellSets_.nPyrs,
-            map(cellShapes, meshCellSets_.pyrs),
+            ensMap(cellShapes, meshCellSets_.pyrs),
             pointOffsets,
             ensightGeometryFile
         );
@@ -1737,7 +1737,7 @@ void Foam::ensightMesh::writeBinary
         (
             "tetra4",
             meshCellSets_.nTets,
-            map(cellShapes, meshCellSets_.tets),
+            ensMap(cellShapes, meshCellSets_.tets),
             pointOffsets,
             ensightGeometryFile
         );

@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -33,11 +33,10 @@ Modification by:
 
 \*---------------------------------------------------------------------------*/
 
-#include "GGIInterpolation.H"
+#include "GGIInterpolationTemplate.H"
 #include "objectHit.H"
 #include "boolList.H"
 #include "DynamicList.H"
-
 #include "dimensionedConstants.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -48,18 +47,22 @@ namespace Foam
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
 template<class MasterPatch, class SlavePatch>
-const scalar GGIInterpolation<MasterPatch, SlavePatch>::areaErrorTol_
+const Foam::debug::tolerancesSwitch
+GGIInterpolation<MasterPatch, SlavePatch>::areaErrorTol_
 (
-    debug::tolerances("GGIAreaErrorTol", 1.0e-8)
+    "GGIAreaErrorTol",
+    1.0e-8,
+    "Minimum GGI face to face intersection area. The smallest accepted GGI weighting factor."
 );
-
 
 template<class MasterPatch, class SlavePatch>
-const scalar GGIInterpolation<MasterPatch, SlavePatch>::featureCosTol_
+const Foam::debug::tolerancesSwitch
+GGIInterpolation<MasterPatch, SlavePatch>::featureCosTol_
 (
-    debug::tolerances("GGIFeatureCosTol", 0.8)
+    "GGIFeatureCosTol",
+    0.8,
+    "Minimum cosine value between 2 GGI patch neighbouring facet normals."
 );
-
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
@@ -96,12 +99,12 @@ void GGIInterpolation<MasterPatch, SlavePatch>::calcAddressing() const
     // Create the dynamic lists to hold the addressing
 
     // The final master/slave list, after filtering out the "false" neighbours
-    List<DynamicList<label> > masterNeighbors(masterPatch_.size());
-    List<DynamicList<label> > slaveNeighbors(slavePatch_.size());
+    List<DynamicList<label, 8> > masterNeighbors(masterPatch_.size());
+    List<DynamicList<label, 8> > slaveNeighbors(slavePatch_.size());
 
     // The weights
-    List<DynamicList<scalar> > masterNeighborsWeights(masterPatch_.size());
-    List<DynamicList<scalar> > slaveNeighborsWeights(slavePatch_.size());
+    List<DynamicList<scalar, 8> > masterNeighborsWeights(masterPatch_.size());
+    List<DynamicList<scalar, 8> > slaveNeighborsWeights(slavePatch_.size());
 
     // First, find a rough estimate of each slave and master facet
     // neighborhood by filtering out all the faces located outside of
@@ -267,11 +270,6 @@ void GGIInterpolation<MasterPatch, SlavePatch>::calcAddressing() const
                 << "This is strange..."  << endl;
         }
 
-        // The master face neighbours polygons projected in the plane UV
-        // We will only keep the ones with some area overlap
-        DynamicList<List<point2D> > masterNeighFace2DPolygonInUV;
-        DynamicList<scalarField> masterNeighFace2DPolygonInUVErrorProjection;
-
         // Next, project the candidate master neighbours faces points
         // onto the same plane using the new orthonormal basis
         const labelList& curCMN = candidateMasterNeighbors[faceMi];
@@ -354,7 +352,7 @@ void GGIInterpolation<MasterPatch, SlavePatch>::calcAddressing() const
                 (
                     masterPointsInUV,
                     neighbPointsInUV,
-                    sqrt(areaErrorTol_) // distErrorTol
+                    sqrt(areaErrorTol_()) // distErrorTol
                 )
             )
             {
@@ -611,7 +609,7 @@ GGIInterpolation<MasterPatch, SlavePatch>::findNonOverlappingFaces
     tmp<labelField> tpatchFaceNonOverlapAddr(new labelField());
     labelField& patchFaceNonOverlapAddr = tpatchFaceNonOverlapAddr();
 
-    DynamicList<label> patchFaceNonOverlap(patchWeights.size());
+    DynamicList<label, 64> patchFaceNonOverlap(patchWeights.size());
 
     // Scan the list of patch weights, looking for empty lists
     forAll (patchWeights, paWi)

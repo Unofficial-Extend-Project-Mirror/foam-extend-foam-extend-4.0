@@ -1,20 +1,20 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | foam-extend: Open Source CFD                    |
-|  \\    /   O peration     | Version:     3.1                                |
-|   \\  /    A nd           | Web:         http://www.extend-project.de       |
+|  \\    /   O peration     | Version:     3.2                                |
+|   \\  /    A nd           | Web:         http://www.foam-extend.org         |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 FoamFile
 {
     version     2.0;
-    format      ascii; 	;
-    class       dictionary; 	;
-    object      decomposeParDict; 	;
+    format      ascii;
+    class       dictionary;
+    object      decomposeParDict;
 }
 numberOfSubdomains 4;
 
-method manual; 	//metis; //simple;
+method manual;     //metis; //simple;
 
 globalFaceZones (
     ggi1DomAZone
@@ -35,6 +35,6 @@ simpleCoeffs
 distributed no;
 
 roots
-  (
-  );
+(
+);
 

@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -263,7 +263,9 @@ void Foam::fineAmgLevel::scaleX
     // Scale x
     if
     (
-        scalingVector[0]*scalingVector[1] <= 0
+        mag(scalingVector[0]) > GREAT
+     || mag(scalingVector[1]) > GREAT
+     || scalingVector[0]*scalingVector[1] <= 0
      || mag(scalingVector[0]) < mag(scalingVector[1])
     )
     {

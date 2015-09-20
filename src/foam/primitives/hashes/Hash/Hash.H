@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -32,6 +32,8 @@ Description
 
 #ifndef Hash_H
 #define Hash_H
+
+#include <inttypes.h>
 
 #include "label.H"
 #include "uLabel.H"
@@ -71,7 +73,7 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 //- Hash specialization for hashing pointer addresses.
-//  Treat a pointer like a long.
+//  Treat a pointer like a intptr_t.
 //  This should work for both 32-bit and 64-bit pointers.
 template<>
 class Hash<void*>
@@ -83,12 +85,12 @@ public:
 
     unsigned operator()(const void* const& p, unsigned seed) const
     {
-        return Hash<long>()(long(p), seed);
+        return Hash<intptr_t>()(intptr_t(p), seed);
     }
 
     unsigned operator()(const void* const& p) const
     {
-        return Hash<long>()(long(p));
+        return Hash<intptr_t>()(intptr_t(p));
     }
 
 };

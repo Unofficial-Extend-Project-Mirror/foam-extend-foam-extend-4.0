@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -52,58 +52,71 @@ int main(int argc, char *argv[])
     {
         Info<< "Time = " << runTime.timeName() << nl << endl;
 
-#       include "readPISOControls.H"
+#       include "readPIMPLEControls.H"
 #       include "compressibleCourantNo.H"
 
 #       include "rhoEqn.H"
 
-        fvVectorMatrix UEqn
-        (
-            fvm::ddt(rho, U)
-          + fvm::div(phi, U)
-          - fvm::laplacian(mu, U)
-        );
-
-        solve(UEqn == -fvc::grad(p));
-
-
-        // --- PISO loop
-
-        for (int corr = 0; corr < nCorr; corr++)
+        // --- PIMPLE loop
+        label oCorr = 0;
+        do
         {
-            volScalarField rUA = 1.0/UEqn.A();
-            U = rUA*UEqn.H();
-
-            surfaceScalarField phid
+            fvVectorMatrix UEqn
             (
-                "phid",
-                psi*
+                fvm::ddt(rho, U)
+              + fvm::div(phi, U)
+              - fvm::laplacian(mu, U)
+            );
+
+            solve(UEqn == -fvc::grad(p));
+
+            // --- PISO loop
+            for (int corr = 0; corr < nCorr; corr++)
+            {
+                volScalarField rAU("rAU", 1.0/UEqn.A());
+                surfaceScalarField rhorAUf
                 (
-                    (fvc::interpolate(U) & mesh.Sf())
-                  + fvc::ddtPhiCorr(rUA, rho, U, phi)
-                )
-            );
+                    "rhorAUf",
+                    fvc::interpolate(rho*rAU)
+                );
 
-            phi = (rhoO/psi)*phid;
+                U = rAU*UEqn.H();
 
-            fvScalarMatrix pEqn
-            (
-                fvm::ddt(psi, p)
-              + fvc::div(phi)
-              + fvm::div(phid, p)
-              - fvm::laplacian(rho*rUA, p)
-            );
+                surfaceScalarField phid
+                (
+                    "phid",
+                    psi*
+                    (
+                        (fvc::interpolate(U) & mesh.Sf())
+                      + fvc::ddtPhiCorr(rAU, rho, U, phi)
+                    )
+                );
 
-            pEqn.solve();
+                phi = (rhoO/psi)*phid;
 
-            phi += pEqn.flux();
+                fvScalarMatrix pEqn
+                (
+                    fvm::ddt(psi, p)
+                  + fvc::div(phi)
+                  + fvm::div(phid, p)
+                  - fvm::laplacian(rhorAUf, p)
+                );
 
-#           include "compressibleContinuityErrs.H"
+                pEqn.solve();
 
-            U -= rUA*fvc::grad(p);
-            U.correctBoundaryConditions();
-        }
+                phi += pEqn.flux();
 
+#               include "rhoEqn.H"
+#               include "compressibleContinuityErrs.H"
+
+                // Correct velocity
+                U -= rAU*fvc::grad(p);
+                U.correctBoundaryConditions();
+            }
+        } while (++oCorr < nOuterCorr);
+
+
+        // Correct density
         rho = rhoO + psi*p;
 
         runTime.write();
@@ -115,7 +128,7 @@ int main(int argc, char *argv[])
 
     Info<< "End\n" << endl;
 
-    return 0;
+    return(0);
 }
 
 

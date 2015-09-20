@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -49,7 +49,7 @@ SourceFiles
 #include "interpolationCellPoint.H"
 #include "contiguous.H"
 
-#include "KinematicCloud.H"
+#include "KinematicCloudTemplate.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -549,9 +549,10 @@ public:
     template<>                                                                \
     const Foam::word KinematicParcel<Type>::typeName(#Type);                  \
     template<>                                                                \
-    int KinematicParcel<Type>::debug                                          \
+    Foam::debug::debugSwitch                                                  \
+    KinematicParcel<Type>::debug                                              \
     (                                                                         \
-        Foam::debug::debugSwitch(#Type, DebugSwitch)                          \
+        std::string(#Type), DebugSwitch                                       \
     );
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

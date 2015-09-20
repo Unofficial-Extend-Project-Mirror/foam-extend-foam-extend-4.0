@@ -70,5 +70,5 @@
         << max(rho).value() << endl;
 
     // Update thermal conductivity
-    K = thermo.Cp()*turb.alphaEff();
+    Kappa = thermo.Cp()*turb.alphaEff();
 }

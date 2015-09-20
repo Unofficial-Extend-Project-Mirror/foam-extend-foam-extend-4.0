@@ -1,0 +1,92 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | foam-extend: Open Source CFD                    |
+|  \\    /   O peration     | Version:     3.2                                |
+|   \\  /    A nd           | Web:         http://www.foam-extend.org         |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      fvSolution;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+solvers
+{
+    p
+    {
+        solver           CG;
+        preconditioner   Cholesky;
+
+        minIter          1;
+        maxIter          1000;
+        tolerance        1e-06;
+        relTol           0;
+    }
+
+    // p
+    // {
+    //     solver          GAMG;
+    //     tolerance       1e-07;
+    //     relTol          0;
+    //     minIter 1;
+    //     smoother        GaussSeidel;
+    //     cacheAgglomeration true;
+    //     nCellsInCoarsestLevel 10;
+    //     agglomerator    faceAreaPair;
+    //     mergeLevels     1;
+    // }
+
+//     p
+//     {
+//         solver          amgSolver;
+//         cycle           W-cycle;
+//         policy          PAMG;
+//         nPreSweeps      0;
+//         nPostSweeps     2;
+//         groupSize       4;
+//         minCoarseEqns   50;
+//         nMaxLevels      100;
+//         scale           on;
+//         smoother        ILU;
+
+//         minIter    1;
+//         maxIter    200;
+//         tolerance  1e-8;
+//         relTol     0.0;
+//     }
+
+    U
+    {
+        solver           BiCGStab;
+        preconditioner   ILU0;
+
+        minIter          1;
+        maxIter          1000;
+        tolerance        1e-08;
+        relTol           0;
+    };
+}
+
+SIMPLE
+{
+    nNonOrthogonalCorrectors 2;
+
+    // pRefPoint (0 -0.45 0.05);
+    // pRefValue 0;
+}
+
+PIMPLE
+{
+    nOuterCorrectors 1;
+    nCorrectors     4;
+    nNonOrthogonalCorrectors 0;
+
+    // pRefPoint (0 -0.45 0.05);
+    // pRefValue 0;
+}
+
+// ************************************************************************* //

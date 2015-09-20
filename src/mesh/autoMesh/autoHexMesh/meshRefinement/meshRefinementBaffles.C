@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -26,7 +26,7 @@ License
 #include "meshRefinement.H"
 #include "fvMesh.H"
 #include "syncTools.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "refinementSurfaces.H"
 #include "pointSet.H"
 #include "faceSet.H"
@@ -229,7 +229,7 @@ void Foam::meshRefinement::getBafflePatches
 {
     autoPtr<OFstream> str;
     label vertI = 0;
-    if (debug&OBJINTERSECTIONS)
+    if (debug & OBJINTERSECTIONS)
     {
         str.reset
         (
@@ -1499,13 +1499,13 @@ void Foam::meshRefinement::baffleAndSplitMesh
     Info<< "Created baffles in = "
         << runTime.cpuTimeIncrement() << " s\n" << nl << endl;
 
-    printMeshInfo(debug, "After introducing baffles");
+    printMeshInfo(debug(), "After introducing baffles");
 
     if (debug)
     {
         Pout<< "Writing baffled mesh to time " << timeName()
             << endl;
-        write(debug, runTime.path()/"baffles");
+        write(debug(), runTime.path()/"baffles");
         Pout<< "Dumped debug data in = "
             << runTime.cpuTimeIncrement() << " s\n" << nl << endl;
     }
@@ -1581,13 +1581,13 @@ void Foam::meshRefinement::baffleAndSplitMesh
         Info<< "Created baffles in = "
             << runTime.cpuTimeIncrement() << " s\n" << nl << endl;
 
-        printMeshInfo(debug, "After introducing baffles");
+        printMeshInfo(debug(), "After introducing baffles");
 
         if (debug)
         {
             Pout<< "Writing extra baffled mesh to time "
                 << timeName() << endl;
-            write(debug, runTime.path()/"extraBaffles");
+            write(debug(), runTime.path()/"extraBaffles");
             Pout<< "Dumped debug data in = "
                 << runTime.cpuTimeIncrement() << " s\n" << nl << endl;
         }
@@ -1617,13 +1617,13 @@ void Foam::meshRefinement::baffleAndSplitMesh
     Info<< "Split mesh in = "
         << runTime.cpuTimeIncrement() << " s\n" << nl << endl;
 
-    printMeshInfo(debug, "After subsetting");
+    printMeshInfo(debug(), "After subsetting");
 
     if (debug)
     {
         Pout<< "Writing subsetted mesh to time " << timeName()
             << endl;
-        write(debug, runTime.path()/timeName());
+        write(debug(), runTime.path()/timeName());
         Pout<< "Dumped debug data in = "
             << runTime.cpuTimeIncrement() << " s\n" << nl << endl;
     }

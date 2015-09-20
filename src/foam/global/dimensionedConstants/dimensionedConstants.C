@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -24,6 +24,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "dimensionedConstants.H"
+#include "NamedEnum.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -36,12 +37,20 @@ dictionary* dimensionedConstantsPtr_(NULL);
 
 dictionary& dimensionedConstants()
 {
-    return debug::switchSet
+    // Cannot use static NamedEnum in static initialisation
+    // Making local copy
+    const NamedEnum
+    <
+        debug::globalControlDictSwitchSet,
+        debug::DIM_GLOBAL_CONTROL_DICT_SWITCH_SET
+    > globalControlDictSwitchSetNames;
+
+    return debug::controlDict().subDict
     (
-        "DimensionedConstants",
-        dimensionedConstantsPtr_
+        globalControlDictSwitchSetNames[debug::DIMENSIONED_CONSTANTS]
     );
 }
+
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

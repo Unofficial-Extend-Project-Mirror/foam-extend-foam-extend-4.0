@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -126,6 +126,11 @@ void Foam::BlockCholeskyPrecon<Type>::calcDecoupledPreconDiag()
             }
         }
     }
+
+    // Invert the diagonal
+    // Note: since square diag type does not exist, simple inversion
+    // covers all cases
+    preconDiag_ = inv(preconDiag_);
 }
 
 

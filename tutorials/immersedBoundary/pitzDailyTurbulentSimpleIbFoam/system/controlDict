@@ -1,0 +1,93 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | foam-extend: Open Source CFD                    |
+|  \\    /   O peration     | Version:     3.2                                |
+|   \\  /    A nd           | Web:         http://www.foam-extend.org         |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      controlDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+application     simpleIbFoam;
+
+startFrom       startTime;
+
+startTime       0;
+
+stopAt          endTime;
+
+endTime         2500;
+
+deltaT          1;
+
+writeControl    timeStep;
+
+writeInterval   50;
+
+purgeWrite      0;
+
+writeFormat     ascii;
+
+writePrecision  6;
+
+writeCompression compressed;
+
+timeFormat      general;
+
+timePrecision   6;
+
+runTimeModifiable yes;
+
+functions
+(
+    forces
+    {
+        type               immersedBoundaryForces;
+        functionObjectLibs ("libimmersedBoundaryForceFunctionObject.so");
+
+        outputControl timeStep;
+        outputInterval 1;
+        patches ( pitzDailyIB );
+
+        pName       p;
+        UName       U;
+        rhoName     rhoInf;
+        rhoInf      1;
+
+        log         true;
+        CofR        ( 0 0 0 );
+
+        Aref 0.05;
+        Uref 1;
+    }
+
+    minMaxP
+    {
+        type minMaxField;
+        functionObjectLibs ("libfieldFunctionObjects.so");
+        name p;
+    }
+
+    minMaxU
+    {
+        type minMaxField;
+        functionObjectLibs ("libfieldFunctionObjects.so");
+        name U;
+    }
+
+    maxEpsilon
+    {
+        type maxFieldCell;
+        functionObjectLibs ("libfieldFunctionObjects.so");
+        name epsilon;
+    }
+
+);
+
+// ************************************************************************* //

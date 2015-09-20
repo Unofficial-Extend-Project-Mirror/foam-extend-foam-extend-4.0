@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -126,9 +126,9 @@ Foam::word Foam::interpolationTable<Type>::boundsHandlingToWord
 
     switch (bound)
     {
-        case interpolationTable::ERROR:
+        case interpolationTable::EXIT:
         {
-            enumName = "error";
+            enumName = "exit";
             break;
         }
         case interpolationTable::WARN:
@@ -159,9 +159,9 @@ Foam::interpolationTable<Type>::wordToBoundsHandling
     const word& bound
 ) const
 {
-    if (bound == "error")
+    if (bound == "exit")
     {
-        return interpolationTable::ERROR;
+        return interpolationTable::EXIT;
     }
     else if (bound == "warn")
     {
@@ -253,7 +253,7 @@ Foam::interpolationTable<Type>::operator[](const label i) const
     {
         switch (boundsHandling_)
         {
-            case interpolationTable::ERROR:
+            case interpolationTable::EXIT:
             {
                 FatalErrorIn
                 (
@@ -293,7 +293,7 @@ Foam::interpolationTable<Type>::operator[](const label i) const
     {
         switch (boundsHandling_)
         {
-            case interpolationTable::ERROR:
+            case interpolationTable::EXIT:
             {
                 FatalErrorIn
                 (
@@ -352,7 +352,7 @@ Type Foam::interpolationTable<Type>::operator()(const scalar value) const
     {
         switch (boundsHandling_)
         {
-            case interpolationTable::ERROR:
+            case interpolationTable::EXIT:
             {
                 FatalErrorIn
                 (
@@ -393,7 +393,7 @@ Type Foam::interpolationTable<Type>::operator()(const scalar value) const
     {
         switch (boundsHandling_)
         {
-            case interpolationTable::ERROR:
+            case interpolationTable::EXIT:
             {
                 FatalErrorIn
                 (

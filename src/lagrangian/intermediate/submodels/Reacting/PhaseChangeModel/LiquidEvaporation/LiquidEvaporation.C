@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -177,10 +177,10 @@ void Foam::LiquidEvaporation<CloudType>::calculate
         scalar kc = Sh*Dab/(d + ROOTVSMALL);
 
         // vapour concentration at droplet surface [kmol/m3] at film temperature
-        scalar Cs = pSat/(specie::RR*Ts);
+        scalar Cs = pSat/(specie::RR()*Ts);
 
         // vapour concentration in bulk gas [kmol/m3] at film temperature
-        scalar Cinf = Xc[gid]*pc/(specie::RR*Ts);
+        scalar Cinf = Xc[gid]*pc/(specie::RR()*Ts);
 
         // molar flux of vapour [kmol/m2/s]
         scalar Ni = max(kc*(Cs - Cinf), 0.0);

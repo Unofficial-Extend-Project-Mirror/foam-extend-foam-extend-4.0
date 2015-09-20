@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -26,6 +26,9 @@ License
 #include "radiativeIntensityRay.H"
 #include "fvm.H"
 #include "fvDOM.H"
+#include "mathematicalConstants.H"
+
+using namespace Foam::mathematicalConstant;
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
@@ -47,7 +50,8 @@ Foam::radiation::radiativeIntensityRay::radiativeIntensityRay
     const scalar deltaTheta,
     const label nLambda,
     const absorptionEmissionModel& absorptionEmission,
-    const blackBodyEmission& blackBody
+    const blackBodyEmission& blackBody,
+    const label rayId
 )
 :
     dom_(dom),
@@ -67,26 +71,14 @@ Foam::radiation::radiativeIntensityRay::radiativeIntensityRay
         mesh_,
         dimensionedScalar("I", dimMass/pow3(dimTime), 0.0)
     ),
-    Qr_
-    (
-        IOobject
-        (
-            "Qr" + name(rayId),
-            mesh_.time().timeName(),
-            mesh_,
-            IOobject::NO_READ,
-            IOobject::NO_WRITE
-        ),
-        mesh_,
-        dimensionedScalar("Qr", dimMass/pow3(dimTime), 0.0)
-    ),
     d_(vector::zero),
     dAve_(vector::zero),
     theta_(theta),
     phi_(phi),
     omega_(0.0),
     nLambda_(nLambda),
-    ILambda_(nLambda)
+    ILambda_(nLambda),
+    myRayId_(rayId)
 {
     scalar sinTheta = Foam::sin(theta);
     scalar cosTheta = Foam::cos(theta);
@@ -108,6 +100,7 @@ Foam::radiation::radiativeIntensityRay::radiativeIntensityRay
         0.5*deltaPhi*Foam::sin(2.0*theta)*Foam::sin(deltaTheta)
     );
 
+//    dAve_ /= mag(dAve_);
 
     autoPtr<volScalarField> IDefaultPtr;
 
@@ -164,7 +157,6 @@ Foam::radiation::radiativeIntensityRay::radiativeIntensityRay
             );
         }
     }
-    rayId++;
 }
 
 
@@ -178,25 +170,33 @@ Foam::radiation::radiativeIntensityRay::~radiativeIntensityRay()
 
 Foam::scalar Foam::radiation::radiativeIntensityRay::correct()
 {
-    // reset boundary heat flux to zero
-    //Qr_ = dimensionedScalar("zero", dimMass/pow3(dimTime), 0.0);
-    Qr_.boundaryField() = 0.0;
-
     scalar maxResidual = -GREAT;
 
     forAll(ILambda_, lambdaI)
     {
         const volScalarField& k = dom_.aLambda(lambdaI);
 
-        surfaceScalarField Ji = dAve_ & mesh_.Sf();
+        tmp<fvScalarMatrix> divJiILambda;
+
+        // Retrieve advection term from cache or create from scratch
+        if (!dom_.cacheDiv())
+        {
+            const surfaceScalarField Ji(dAve_ & mesh_.Sf());
+
+            divJiILambda = fvm::div(Ji, ILambda_[lambdaI], "div(Ji,Ii_h)");
+        }
+        else
+        {
+            divJiILambda = dom_.fvRayDiv(myRayId_, lambdaI);
+        }
 
         fvScalarMatrix IiEq
         (
-            fvm::div(Ji, ILambda_[lambdaI], "div(Ji,Ii_h)")
+            divJiILambda()
           + fvm::Sp(k*omega_, ILambda_[lambdaI])
-         ==
-            1.0/Foam::mathematicalConstant::pi*omega_
-           *(
+        ==
+            1.0/pi*omega_
+          * (
                 k*blackBody_.bLambda(lambdaI)
               + absorptionEmission_.ECont(lambdaI)/4
             )
@@ -209,11 +209,19 @@ Foam::scalar Foam::radiation::radiativeIntensityRay::correct()
             IiEq,
             mesh_.solutionDict().solver("Ii")
         ).initialResidual();
-
         maxResidual = max(eqnResidual, maxResidual);
     }
 
     return maxResidual;
+}
+
+
+void Foam::radiation::radiativeIntensityRay::updateBCs()
+{
+    forAll(ILambda_, lambdaI)
+    {
+        ILambda_[lambdaI].boundaryField().updateCoeffs();
+    }
 }
 
 

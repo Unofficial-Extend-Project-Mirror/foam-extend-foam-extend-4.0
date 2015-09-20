@@ -1,5 +1,5 @@
 #!/usr/bin/env python
 
-from PyFoam.Applications.InitMixingPlaneInterface import InitMixingPlaneInterface
+from PyFoam.Site.InitMixingPlaneInterface import InitMixingPlaneInterface
 
 InitMixingPlaneInterface()

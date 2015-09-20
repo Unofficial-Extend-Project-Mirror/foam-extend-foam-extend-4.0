@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -43,6 +43,7 @@ SourceFiles
 #include "fvPatchMapper.H"
 #include "scalarList.H"
 #include "className.H"
+#include "tolerancesSwitch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -122,10 +123,10 @@ class meshToMesh
     // Private static data members
 
         //- Direct hit tolerance
-        static const scalar directHitTol;
+        static const debug::tolerancesSwitch directHitTol;
 
         //- Cell centre distance required to establish a hit
-        static const scalar cellCentreDistanceTol;
+        static const debug::tolerancesSwitch cellCentreDistanceTol;
 
 
 public:

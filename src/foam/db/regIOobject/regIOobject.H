@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -41,6 +41,7 @@ SourceFiles
 #include "IOobject.H"
 #include "typeInfo.H"
 #include "OSspecific.H"
+#include "optimisationSwitch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -93,7 +94,8 @@ public:
         //- Runtime type information
         TypeName("regIOobject");
 
-        static int fileModificationSkew;
+        //- File modification skew
+        static const debug::optimisationSwitch fileModificationSkew;
 
 
     // Constructors

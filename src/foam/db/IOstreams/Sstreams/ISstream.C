@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -482,6 +482,14 @@ Foam::Istream& Foam::ISstream::read(floatScalar& val)
 
 
 Foam::Istream& Foam::ISstream::read(doubleScalar& val)
+{
+    is_ >> val;
+    setState(is_.rdstate());
+    return *this;
+}
+
+
+Foam::Istream& Foam::ISstream::read(longDoubleScalar& val)
 {
     is_ >> val;
     setState(is_.rdstate());

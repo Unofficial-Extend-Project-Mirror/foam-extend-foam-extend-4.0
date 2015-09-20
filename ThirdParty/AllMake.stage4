@@ -36,7 +36,7 @@
 #     3: AllMake.stage2 if you are overriding your system comm. libraries
 #
 # Author:
-#     Martin Beaudoin, Hydro-Quebec, (2010)
+#     Martin Beaudoin, Hydro-Quebec, (2015)
 #
 #------------------------------------------------------------------------------
 # run from third-party directory only
@@ -59,7 +59,12 @@ echo
 # qt-everywhere-opensource-src-4.8.6
 if [ ! -z "$QT_THIRD_PARTY" ]
 then
-    ( rpm_make -p qt-everywhere-opensource-src-4.8.6 -s qt-everywhere-opensource-src-4.8.6.spec -u http://download.qt-project.org/official_releases/qt/4.8/4.8.6/qt-everywhere-opensource-src-4.8.6.tar.gz )
+    # Qt 4.8.6
+    #
+    [ ! -z "$WM_THIRD_PARTY_USE_QT_486" ] && {
+	echo "Building Qt 4.8.6"
+	( rpm_make -p qt-everywhere-opensource-src-4.8.6 -s qt-everywhere-opensource-src-4.8.6.spec -u http://download.qt.io/archive/qt/4.8/4.8.6/qt-everywhere-opensource-src-4.8.6.tar.gz )
+    }
 else
     echo "Using system installed QT"
     echo ""
@@ -73,16 +78,33 @@ then
 
     if [ -d "$QT_BIN_DIR" -a -r "$QT_BIN_DIR"/qmake ]
     then
-        ( rpm_make -p ParaView-4.0.1 -s ParaView-4.0.1.spec -u http://downloads.sourceforge.net/project/openfoam-extend/foam-extend-3.1/ThirdParty/ParaView-v4.0.1-source.tgz \
-            -f --define='_qmakePath $QT_BIN_DIR/qmake'
-#        ( rpm_make -p ParaView-4.2.0 -s ParaView-4.2.0.spec -u http://www.paraview.org/files/v4.2/ParaView-v4.2.0-source.tar.gz \
-#            -f --define='_qmakePath $QT_BIN_DIR/qmake'
-#        ( rpm_make -p ParaView-4.2.0 -s ParaView-4.2.0.spec -u http://downloads.sourceforge.net/project/openfoam-extend/foam-extend-3.1/ThirdParty/ParaView-v4.2.0-source.tgz \
-#            -f --define='_qmakePath $QT_BIN_DIR/qmake'
-        )
+        # ParaView 4.0.1
+        #
+	[ ! -z "$WM_THIRD_PARTY_USE_PARAVIEW_401" ] && {
+	    echo "Building ParaView 4.0.1"
+            ( rpm_make -p ParaView-4.0.1 -s ParaView-4.0.1.spec -u http://downloads.sourceforge.net/project/openfoam-extend/foam-extend-3.1/ThirdParty/ParaView-v4.0.1-source.tgz \
+		-f --define='_qmakePath $QT_BIN_DIR/qmake'
+            )
+	}
+        # ParaView 4.1.0
+        #
+	[ ! -z "$WM_THIRD_PARTY_USE_PARAVIEW_410" ] && {
+	    echo "Building ParaView 4.1.0"
+            ( rpm_make -p ParaView-4.1.0 -s ParaView-4.1.0.spec -u http://downloads.sourceforge.net/project/openfoam-extend/foam-extend-3.1/ThirdParty/ParaView-v4.1.0-source.tar.gz \
+		-f --define='_qmakePath $QT_BIN_DIR/qmake'
+            )
+	}
+        # ParaView 4.3.1
+        #
+	[ ! -z "$WM_THIRD_PARTY_USE_PARAVIEW_431" ] && {
+	    echo "Building ParaView 4.3.1"
+            ( rpm_make -p ParaView-4.3.1 -s ParaView-4.3.1.spec -u http://downloads.sourceforge.net/project/openfoam-extend/foam-extend-3.1/ThirdParty/ParaView-v4.3.1-source.tar.gz \
+		-f --define='_qmakePath $QT_BIN_DIR/qmake'
+            )
+	}
     else
         echo "WARNING: "
-        echo "WARNING: Skipping the installation of ParaView-4.2.0."
+        echo "WARNING: Skipping the installation of ParaView-4.x.x."
         echo "WARNING: Please make sure the QT_BIN_DIR environment variable properly"
         echo "WARNING: initialized in the file prefs.sh or prefs.csh"
         echo "WARNING: The command \$QT_BIN_DIR/qmake needs to be valid"
@@ -92,6 +114,35 @@ else
     echo "Using system installed ParaView"
     echo ""
 fi
+
+# ParaView Server
+if [ -z "$PARAVIEW_SERVER_THIRD_PARTY" ]
+then
+    # ParaView 4.1.0: Server-only
+    #
+    [ ! -z "$WM_THIRD_PARTY_USE_PARAVIEW_SERVER_410" ] && {
+	echo "Building ParaView Server 4.1.0"
+	( rpm_make -p llvm-3.6.0 -s llvm-3.6.0.spec -u http://llvm.org/releases/3.6.0/llvm-3.6.0.src.tar.xz )
+	( rpm_make -p mesa-git -s mesa-git.spec -u ftp://ftp.freedesktop.org/pub/mesa/10.5.3/mesa-10.5.3.tar.gz )
+	( rpm_make -p ParaView-4.1.0_Server -s ParaView-4.1.0_Server.spec -u http://www.paraview.org/files/v4.1/ParaView-v4.1.0-source.tar.gz  \
+		-f --define='_qmakePath $QT_BIN_DIR/qmake'
+	)
+    }
+    # ParaView 4.3.1: Server-only
+    #
+    [ ! -z "$WM_THIRD_PARTY_USE_PARAVIEW_SERVER_431" ] && {
+	echo "Building ParaView Server 4.3.1"
+	( rpm_make -p llvm-3.6.0 -s llvm-3.6.0.spec -u http://llvm.org/releases/3.6.0/llvm-3.6.0.src.tar.xz )
+	( rpm_make -p mesa-git -s mesa-git.spec -u ftp://ftp.freedesktop.org/pub/mesa/10.5.3/mesa-10.5.3.tar.gz )
+	( rpm_make -p ParaView-4.3.1_Server -s ParaView-4.3.1_Server.spec -u http://www.paraview.org/files/v4.3/ParaView-v4.3.1-source.tar.gz  \
+		-f --define='_qmakePath $QT_BIN_DIR/qmake'
+	)
+    }
+else
+    echo "Using system installed ParaView Server"
+    echo ""
+fi
+
 
 echo ========================================
 echo Done ThirdParty AllMake: Stage4

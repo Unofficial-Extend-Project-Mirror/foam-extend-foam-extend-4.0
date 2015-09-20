@@ -38,9 +38,10 @@
 #
 # Requirements:
 #     1: Your foam-extend environment must be properly initialized
-#
+#     2: The file etc/prefs.sh should be used for setting the variables enabling
+#        the compilation of the various packages
 # Author:
-#     Martin Beaudoin, Hydro-Quebec, (2010)
+#     Martin Beaudoin, Hydro-Quebec, (2015)
 #
 #------------------------------------------------------------------------------
 # run from third-party directory only
@@ -60,40 +61,99 @@ echo Starting ThirdParty AllMake: Stage1
 echo ========================================
 echo
 
-# Gcc and companion libraries
+# Gcc 4.4.5 and companion libraries
 #
-# Uncomment the following 3 lines for gcc-4.4.5. You need gmp and mpfr for gcc-4.4.5
-#( rpm_make -p gmp-5.0.1   -s gmp-5.0.1.spec  -u ftp://ftp.gnu.org/gnu/gmp/gmp-5.0.1.tar.gz                  )
-#( rpm_make -p mpfr-3.0.1  -s mpfr-3.0.1.spec -u ftp://ftp.gnu.org/gnu/mpfr/mpfr-3.0.1.tar.gz                )
-#( rpm_make -p gcc-4.4.5   -s gcc-4.4.5.spec  -u ftp://ftp.gnu.org/gnu/gcc/gcc-4.4.5/gcc-4.4.5.tar.gz        )
+[ ! -z "$WM_THIRD_PARTY_USE_GCC_445" ] && {
+    echo "Building gmp-5.0.1 mpfr-3.0.1 gcc-4.4.5"
+    ( rpm_make -p gmp-5.0.1   -s gmp-5.0.1.spec  -u ftp://ftp.gnu.org/gnu/gmp/gmp-5.0.1.tar.gz                  )
+    ( rpm_make -p mpfr-3.0.1  -s mpfr-3.0.1.spec -u ftp://ftp.gnu.org/gnu/mpfr/mpfr-3.0.1.tar.gz                )
+    ( rpm_make -p gcc-4.4.5   -s gcc-4.4.5.spec  -u ftp://ftp.gnu.org/gnu/gcc/gcc-4.4.5/gcc-4.4.5.tar.gz        )
+}
+
+# Gcc 4.5.1 and companion libraries
 #
-# Uncomment the following 4 lines for gcc-4.5.1. You need gmp, mpfr and mpc for gcc-4.5.1
-#( rpm_make -p gmp-5.0.1  -s gmp-5.0.1.spec  -u ftp://ftp.gnu.org/gnu/gmp/gmp-5.0.1.tar.gz                  )
-#( rpm_make -p mpfr-3.0.1 -s mpfr-3.0.1.spec -u ftp://ftp.gnu.org/gnu/mpfr/mpfr-3.0.1.tar.gz                )
-#( rpm_make -p mpc-0.8.2  -s mpc-0.8.2.spec  -u http://www.multiprecision.org/mpc/download/mpc-0.8.2.tar.gz )
-#( rpm_make -p gcc-4.5.1  -s gcc-4.5.1.spec  -u ftp://ftp.gnu.org/gnu/gcc/gcc-4.5.1/gcc-4.5.1.tar.gz        )
+[ ! -z "$WM_THIRD_PARTY_USE_GCC_451" ] && {
+    echo "Building gmp-5.0.1 mpfr-3.0.1 mpc-0.8.2 gcc-4.5.1"
+    ( rpm_make -p gmp-5.0.1  -s gmp-5.0.1.spec  -u ftp://ftp.gnu.org/gnu/gmp/gmp-5.0.1.tar.gz                  )
+    ( rpm_make -p mpfr-3.0.1 -s mpfr-3.0.1.spec -u ftp://ftp.gnu.org/gnu/mpfr/mpfr-3.0.1.tar.gz                )
+    ( rpm_make -p mpc-0.8.2  -s mpc-0.8.2.spec  -u http://www.multiprecision.org/mpc/download/mpc-0.8.2.tar.gz )
+    ( rpm_make -p gcc-4.5.1  -s gcc-4.5.1.spec  -u ftp://ftp.gnu.org/gnu/gcc/gcc-4.5.1/gcc-4.5.1.tar.gz        )
+}
 
-# Uncomment the following 4 lines for gcc-4.6.3. You need gmp, mpfr and mpc for gcc-4.6.3
-#( rpm_make -p gmp-5.0.5  -s gmp-5.0.5.spec  -u ftp://ftp.gnu.org/gnu/gmp/gmp-5.0.5.tar.bz2                 )
-#( rpm_make -p mpfr-3.1.0 -s mpfr-3.1.0.spec -u ftp://ftp.gnu.org/gnu/mpfr/mpfr-3.1.0.tar.gz                )
-#( rpm_make -p mpc-0.9    -s mpc-0.9.spec    -u http://www.multiprecision.org/mpc/download/mpc-0.9.tar.gz   )
-#( rpm_make -p gcc-4.6.3  -s gcc-4.6.3.spec  -u ftp://ftp.gnu.org/gnu/gcc/gcc-4.6.3/gcc-4.6.3.tar.gz        )
+# Gcc 4.6.3 and companion libraries
+#
+[ ! -z "$WM_THIRD_PARTY_USE_GCC_463" ] && {
+    echo "Building gmp-5.0.5 mpfr-3.1.0 mpc-0.9 gcc-4.6.3"
+    ( rpm_make -p gmp-5.0.5  -s gmp-5.0.5.spec  -u ftp://ftp.gnu.org/gnu/gmp/gmp-5.0.5.tar.bz2                 )
+    ( rpm_make -p mpfr-3.1.0 -s mpfr-3.1.0.spec -u ftp://ftp.gnu.org/gnu/mpfr/mpfr-3.1.0.tar.gz                )
+    ( rpm_make -p mpc-0.9    -s mpc-0.9.spec    -u http://www.multiprecision.org/mpc/download/mpc-0.9.tar.gz   )
+    ( rpm_make -p gcc-4.6.3  -s gcc-4.6.3.spec  -u ftp://ftp.gnu.org/gnu/gcc/gcc-4.6.3/gcc-4.6.3.tar.gz        )
+}
 
-# Python
-#( rpm_make -p Python-2.7  -s Python-2.7.spec -u http://www.python.org/ftp/python/2.7/Python-2.7.tgz        )
+# Gcc 4.8.4 and companion libraries
+#
+[ ! -z "$WM_THIRD_PARTY_USE_GCC_484" ] && {
+    echo "Building gcc-4.8.4"
+    ( rpm_make -p gcc-4.8.4  -s gcc-4.8.4.spec  -u ftp://ftp.gnu.org/gnu/gcc/gcc-4.8.4/gcc-4.8.4.tar.gz      )
+}
 
-# m4
-# You need a recent version of m4 in order to compile a recent version of bison
-#( rpm_make -p m4-1.4.16  -s m4-1.4.16.spec   -u http://ftp.gnu.org/gnu/m4/m4-1.4.16.tar.gz               )
+# Gcc 4.9.2 and companion libraries
+#
+[ ! -z "$WM_THIRD_PARTY_USE_GCC_492" ] && {
+    echo "Building gcc-4.9.2"
+    ( rpm_make -p gcc-4.9.2  -s gcc-4.9.2.spec  -u ftp://ftp.gnu.org/gnu/gcc/gcc-4.9.2/gcc-4.9.2.tar.gz      )
+}
 
-# bison
-( rpm_make -p bison-2.7 -s bison-2.7.spec -u http://ftp.gnu.org/gnu/bison/bison-2.7.tar.gz           )
+# Clang 3.6.0
+#
+[ ! -z "$WM_THIRD_PARTY_USE_LLVM_360" ] && {
+    echo "Building llvm and clang 3.6.0"
+    ( rpm_make -p llvm-3.6.0 -s llvm-3.6.0.spec -u http://llvm.org/releases/3.6.0/llvm-3.6.0.src.tar.xz    )
+}
 
-# flex
-#( rpm_make -p flex-2.5.35 -s flex-2.5.35.spec -u http://downloads.sourceforge.net/project/flex/flex/flex-2.5.35/flex-2.5.35.tar.gz )
+# Python 2.7
+#
+[ ! -z "$WM_THIRD_PARTY_USE_PYTHON_27" ] && {
+    echo "Building python 2.7"
+    ( rpm_make -p Python-2.7  -s Python-2.7.spec -u http://www.python.org/ftp/python/2.7/Python-2.7.tgz        )
+}
 
-# cmake
-#( rpm_make -p cmake-2.8.12 -s cmake-2.8.12.spec -u http://www.cmake.org/files/v2.8/cmake-2.8.12.tar.gz        )
+# m4 1.4.16
+#
+[ ! -z "$WM_THIRD_PARTY_USE_M4_1416" ] && {
+    echo "Building m4 1.4.16"
+    # You need a recent version of m4 in order to compile a recent version of bison
+    ( rpm_make -p m4-1.4.16  -s m4-1.4.16.spec   -u http://ftp.gnu.org/gnu/m4/m4-1.4.16.tar.gz               )
+}
+
+# bison 2.7
+#
+[ ! -z "$WM_THIRD_PARTY_USE_BISON_27" ] && {
+    echo "Building bison 2.7"
+    # You need a recent version of m4 in order to compile a recent version of bison
+    ( rpm_make -p bison-2.7 -s bison-2.7.spec -u http://ftp.gnu.org/gnu/bison/bison-2.7.tar.gz           )
+}
+
+# flex 2.5.35
+#
+[ ! -z "$WM_THIRD_PARTY_USE_FLEX_2535" ] && {
+    echo "Building flex 2.5.35"
+    ( rpm_make -p flex-2.5.35 -s flex-2.5.35.spec -u http://downloads.sourceforge.net/project/flex/flex/flex-2.5.35/flex-2.5.35.tar.gz )
+}
+
+# cmake 2.8.12
+#
+[ ! -z "$WM_THIRD_PARTY_USE_CMAKE_2812" ] && {
+    echo "Building cmake 2.8.12"
+    ( rpm_make -p cmake-2.8.12 -s cmake-2.8.12.spec -u http://www.cmake.org/files/v2.8/cmake-2.8.12.tar.gz        )
+}
+
+# cmake 3.2.2
+#
+[ ! -z "$WM_THIRD_PARTY_USE_CMAKE_322" ] && {
+    echo "Building cmake 3.2.2"
+    ( rpm_make -p cmake-3.2.2 -s cmake-3.2.2.spec -u http://www.cmake.org/files/v3.2/cmake-3.2.2.tar.gz        )
+}
 
 echo ========================================
 echo Done ThirdParty AllMake: Stage1

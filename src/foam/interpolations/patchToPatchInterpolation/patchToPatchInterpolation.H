@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -26,8 +26,8 @@ License
 #ifndef patchToPatchInterpolation_H
 #define patchToPatchInterpolation_H
 
-#include "PatchToPatchInterpolation.H"
-#include "PrimitivePatch.H"
+#include "PatchToPatchInterpolationTemplate.H"
+#include "PrimitivePatchTemplate.H"
 #include "face.H"
 #include "SubList.H"
 #include "pointField.H"

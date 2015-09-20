@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -46,7 +46,7 @@ ersPointSource::ersPointSource
     alpha_(readScalar(dict.lookup("alpha"))),
     direction_(dict.lookup("direction"))
 {
-    q() = -alpha_*qmax_*min(direction_ & p.Sf()/p.magSf(), 0.0);
+    q() = -alpha_*qmax_*min(direction_ & p.Sf()/p.magSf(), scalar(0));
 }
 
 

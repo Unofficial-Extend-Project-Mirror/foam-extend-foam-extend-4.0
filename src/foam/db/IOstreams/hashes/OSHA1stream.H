@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -151,8 +151,8 @@ public:
         //- Construct and set stream status
         OSHA1stream
         (
-            streamFormat format=ASCII,
-            versionNumber version=currentVersion
+            streamFormat format = ASCII,
+            versionNumber version = currentVersion
         )
         :
             OSstream

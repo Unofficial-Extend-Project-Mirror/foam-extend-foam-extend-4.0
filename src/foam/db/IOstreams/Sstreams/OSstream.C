@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -188,6 +188,14 @@ Foam::Ostream& Foam::OSstream::write(const floatScalar val)
 
 
 Foam::Ostream& Foam::OSstream::write(const doubleScalar val)
+{
+    os_ << val;
+    setState(os_.rdstate());
+    return *this;
+}
+
+
+Foam::Ostream& Foam::OSstream::write(const longDoubleScalar val)
 {
     os_ << val;
     setState(os_.rdstate());

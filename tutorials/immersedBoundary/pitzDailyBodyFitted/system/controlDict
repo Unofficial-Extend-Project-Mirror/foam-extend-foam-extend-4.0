@@ -1,0 +1,92 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | foam-extend: Open Source CFD                    |
+|  \\    /   O peration     | Version:     3.2                                |
+|   \\  /    A nd           | Web:         http://www.foam-extend.org         |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      controlDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+application simpleFoam;
+
+startFrom       startTime;
+
+startTime       0;
+
+stopAt          endTime;
+
+endTime         1000;
+
+deltaT          1;
+
+writeControl    timeStep;
+
+writeInterval   50;
+
+purgeWrite      0;
+
+writeFormat     ascii;
+
+writePrecision  6;
+
+writeCompression compressed;
+
+timeFormat      general;
+
+timePrecision   6;
+
+runTimeModifiable yes;
+
+adjustTimeStep  no;
+
+maxCo           0.2;
+
+libs ("libforces.so");
+
+functions
+(
+    forces
+    {
+        type                forces;
+        functionObjectLibs  ( "libforces.so" );
+        outputControl       timeStep;
+        outputInterval      1;
+        patches             (upperWall lowerWall);
+        pName               p;
+        UName               U;
+        rhoName             rhoInf;
+        log                 true;
+        rhoInf              1;
+        CofR                (0 0 0);
+    }
+
+    minMaxP
+    {
+        type minMaxField;
+        functionObjectLibs ("libfieldFunctionObjects.so");
+        name p;
+    }
+
+    minMaxU
+    {
+        type minMaxField;
+        functionObjectLibs ("libfieldFunctionObjects.so");
+        name U;
+    }
+
+    maxEpsilon
+    {
+        type maxFieldCell;
+        functionObjectLibs ("libfieldFunctionObjects.so");
+        name epsilon;
+    }
+);
+
+// ************************************************************************* //

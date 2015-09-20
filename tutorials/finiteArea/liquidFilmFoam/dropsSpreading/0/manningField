@@ -1,0 +1,45 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | foam-extend: Open Source CFD                    |
+|  \\    /   O peration     | Version:     3.2                                |
+|   \\  /    A nd           | Web:         http://www.foam-extend.org         |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       areaScalarField;
+    location    "0";
+    object      manningField;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+dimensions          [0 1 0 0 0 0 0];
+
+internalField       uniform 0.01;
+
+boundaryField
+{
+    left
+    {
+        type zeroGradient;
+    }
+
+    right
+    {
+        type zeroGradient;
+    }
+
+    front
+    {
+        type zeroGradient;
+    }
+
+    back
+    {
+        type zeroGradient;
+    }
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

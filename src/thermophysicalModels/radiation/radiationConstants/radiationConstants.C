@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -29,19 +29,19 @@ License
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 //- Stefan-Boltzmann constant (default in [J/(K4 m2 s)])
-const Foam::dimensionedScalar Foam::radiation::sigmaSB
+const Foam::debug::constantsSwitch
+Foam::radiation::sigmaSB_
 (
-    Foam::dimensionedConstant
-    (
-        "sigmaSB",
-        dimensionedScalar
-        (
-            "sigmaSB",
-            dimensionSet(1, 0, -3, -4, 0, 0, 0),
-            5.670E-08
-        )
-    )
+    "sigmaSB",
+    5.670E-08,
+    "Stefan-Boltzmann constant [J/(K4 m2 s)]"
 );
 
+const Foam::dimensionedScalar Foam::radiation::sigmaSB
+(
+    "sigmaSB",
+    dimensionSet(1, 0, -3, -4, 0, 0, 0),
+    sigmaSB_()
+);
 
 // ************************************************************************* //

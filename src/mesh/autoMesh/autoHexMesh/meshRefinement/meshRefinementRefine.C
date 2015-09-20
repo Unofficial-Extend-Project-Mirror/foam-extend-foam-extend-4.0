@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -26,7 +26,7 @@ License
 #include "meshRefinement.H"
 #include "trackedParticle.H"
 #include "syncTools.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "refinementSurfaces.H"
 #include "shellSurfaces.H"
 #include "faceSet.H"
@@ -35,7 +35,7 @@ License
 #include "directTopoChange.H"
 #include "mapDistributePolyMesh.H"
 #include "featureEdgeMesh.H"
-#include "Cloud.H"
+#include "CloudTemplate.H"
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
@@ -1269,7 +1269,7 @@ Foam::meshRefinement::refineAndBalance
             << " mesh to time " << timeName() << endl;
         write
         (
-            debug,
+            debug(),
             mesh_.time().path()
            /timeName()
         );
@@ -1282,7 +1282,7 @@ Foam::meshRefinement::refineAndBalance
 
     Info<< "Refined mesh in = "
         << mesh_.time().cpuTimeIncrement() << " s" << endl;
-    printMeshInfo(debug, "After refinement " + msg);
+    printMeshInfo(debug(), "After refinement " + msg);
 
 
     // Load balancing
@@ -1324,7 +1324,7 @@ Foam::meshRefinement::refineAndBalance
             Info<< "Balanced mesh in = "
                 << mesh_.time().cpuTimeIncrement() << " s" << endl;
 
-            printMeshInfo(debug, "After balancing " + msg);
+            printMeshInfo(debug(), "After balancing " + msg);
 
 
             if (debug)
@@ -1333,7 +1333,7 @@ Foam::meshRefinement::refineAndBalance
                     << " mesh to time " << timeName() << endl;
                 write
                 (
-                    debug,
+                    debug(),
                     mesh_.time().path()/timeName()
                 );
                 Pout<< "Dumped debug data in = "
@@ -1447,7 +1447,7 @@ Foam::meshRefinement::balanceAndRefine
         //    Info<< endl;
         //}
 
-        printMeshInfo(debug, "After balancing " + msg);
+        printMeshInfo(debug(), "After balancing " + msg);
 
         if (debug)
         {
@@ -1455,7 +1455,7 @@ Foam::meshRefinement::balanceAndRefine
                 << " mesh to time " << timeName() << endl;
             write
             (
-                debug,
+                debug(),
                 mesh_.time().path()/timeName()
             );
             Pout<< "Dumped debug data in = "
@@ -1478,7 +1478,7 @@ Foam::meshRefinement::balanceAndRefine
             << " mesh to time " << timeName() << endl;
         write
         (
-            debug,
+            debug(),
             mesh_.time().path()
            /timeName()
         );
@@ -1504,7 +1504,7 @@ Foam::meshRefinement::balanceAndRefine
     //    Info<< endl;
     //}
 
-    printMeshInfo(debug, "After refinement " + msg);
+    printMeshInfo(debug(), "After refinement " + msg);
 
     return distMap;
 }

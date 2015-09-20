@@ -6,7 +6,7 @@ This part of the repository is for FOAM test harnesses.
 Directory Structure
 ===================
 
-foam-extend-3.1    : Test harness for foam-extend version 3.1. See the file foam-extend-3.1/README.txt for more information
+foam-extend-3.2    : Test harness for foam-extend version 3.2. See the file foam-extend-3.2/README.txt for more information
 
 OSIG                : CMake/CTest scripts for FOAM Special Interest Group (OSIG) test harness
 OSIG/TurboMachinery : Test harness for the TurboMachinery OSIG. See the file OSIG/Turbomachinery/README.txt for more information.
@@ -34,27 +34,27 @@ Martin Beaudoin, Hydro-Quebec, 2010. All rights reserved.
 
 5: move to the runDir directory for the FOAM test harness
 
-   cd $WM_PROJECT_DIR/testHarness/foam-extend/3.1/runDir
+   cd $WM_PROJECT_DIR/testHarness/foam-extend/3.2/runDir
 
 
 6: Normally, if using the master branch, everything should already be setup for you to run the test harness.
    Still, I recommand always checking that these two important files are up-to-date:
 
    cp ../CMakeFiles/CMakeLists.txt $WM_PROJECT_DIR
-   cp ../CMakeFiles/CTestConfig.cmake.openfoam-extend $WM_PROJECT_DIR/CTestConfig.cmake
+   cp ../CMakeFiles/CTestConfig.cmake.foam-extend $WM_PROJECT_DIR/CTestConfig.cmake
 
 
 7:   Next, running the test loop is pretty simple:
 
-   cd $WM_PROJECT_DIR/testHarness/foam-extend/3.1/runDir # you should already be there...
+   cd $WM_PROJECT_DIR/testHarness/foam-extend/3.2/runDir # you should already be there...
    ./Allclean
    ./Allrun_Experimental
 
 
-8: The results will be published on the CDash dashboard on openfoam-extend.
+8: The results will be published on the CDash dashboard on foam-extend.
 
    To see your results:
-   URL      : http://openfoam-extend.sourceforge.net/CDash/index.php?project=foam-extend-3.1
+   URL      : http://foam-extend.sourceforge.net/CDash/index.php?project=foam-extend-3.2
 
 
 9: You can customize your system identifier on the dashboard using the environment variable $CDASH_SUBMIT_LOCAL_HOST_ID.
@@ -66,7 +66,7 @@ Martin Beaudoin, Hydro-Quebec, 2010. All rights reserved.
    NB: Please no "forward slash" or "/" in the system ID; it looks like CDash will choke on this.
 
 
-10: In general, see the file $WM_PROJECT_DIR/testHarness/foam-extend/3.1/README.txt for the necessary information about running the
+10: In general, see the file $WM_PROJECT_DIR/testHarness/foam-extend/3.2/README.txt for the necessary information about running the
     test loop.
 
 

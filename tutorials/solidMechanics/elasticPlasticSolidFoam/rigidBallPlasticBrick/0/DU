@@ -1,8 +1,8 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | foam-extend: Open Source CFD                    |
-|  \\    /   O peration     | Version:     3.1                                |
-|   \\  /    A nd           | Web:         http://www.extend-project.de       |
+|  \\    /   O peration     | Version:     3.2                                |
+|   \\  /    A nd           | Web:         http://www.foam-extend.org         |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 FoamFile
@@ -32,57 +32,57 @@ boundaryField
     topBrickDown
     {
         type                 solidContact;
-	master               yes;
-	contactActive        yes;
-	rigidMaster          yes;
-	shadowPatch          bottomBrickUp;
-	interpolationMethod  ggi;
-	//interpolationMethod  patchToPatch;
-	projectionAlgo       visible;
-	projectionDir        contactSphere;
-	correctionFrequency  50;
-	normalContactModel    dirichletNeumann;
-	dirichletNeumannNormalModelDict
-	{
-	    relaxationFactor      0.9;
-	    contactGapTol         1e-10;
-	    limitPenetration      no;
+        master               yes;
+        contactActive        yes;
+        rigidMaster          yes;
+        shadowPatch          bottomBrickUp;
+        interpolationMethod  ggi;
+        //interpolationMethod  patchToPatch;
+        projectionAlgo       visible;
+        projectionDir        contactSphere;
+        correctionFrequency  50;
+        normalContactModel    dirichletNeumann;
+        dirichletNeumannNormalModelDict
+        {
+            relaxationFactor      0.9;
+            contactGapTol         1e-10;
+            limitPenetration      no;
             settleContact         no;
             settleIterationNumber 100;
-	    penetrationLimit      -0.03;
-	    limitPressure         no;
-	    pressureLimit         1e9;
-	    correctMissedVertices no;
-	    distanceMethod        point;
-	    aitkenRelaxation      no;
-	    infoFrequency         10;
-	    oscillationCorrection yes;
-	    smoothingSteps        1;
-	  }
-	//frictionContactModel   frictionless;
-	frictionContactModel   dirichletNeumann;
-	dirichletNeumannFrictionModelDict
-	  {
-	    relaxationFactor      0.2;
-	    infoFrequency         10;
-	    oscillationCorrection yes;
-	    smoothingSteps        1;
+            penetrationLimit      -0.03;
+            limitPressure         no;
+            pressureLimit         1e9;
+            correctMissedVertices no;
+            distanceMethod        point;
+            aitkenRelaxation      no;
+            infoFrequency         10;
+            oscillationCorrection yes;
+            smoothingSteps        1;
+        }
+        //frictionContactModel   frictionless;
+        frictionContactModel   dirichletNeumann;
+        dirichletNeumannFrictionModelDict
+        {
+            relaxationFactor      0.2;
+            infoFrequency         10;
+            oscillationCorrection yes;
+            smoothingSteps        1;
 
-	    frictionLaw           coulomb;
-	    frictionLawDict
-	      {
-		frictionCoeff         0.01;
-	      }
-	  }
-	value                uniform (0 0 0);
+            frictionLaw           coulomb;
+            frictionLawDict
+            {
+                frictionCoeff         0.01;
+            }
+        }
+        value                uniform (0 0 0);
     }
 
     bottomBrickUp
     {
         type                 solidContact;
-	master               no;
-	contactActive        yes;
-	shadowPatch          topBrickDown;
+        master               no;
+        contactActive        yes;
+        shadowPatch          topBrickDown;
         value                uniform (0 0 0);
     }
 
@@ -117,7 +117,7 @@ boundaryField
     topBrickRight
     {
         type            solidTraction;
-	traction        uniform ( 0 0 0 );
+        traction        uniform ( 0 0 0 );
         pressure        uniform 0;
         value           uniform (0 0 0);
     }

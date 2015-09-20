@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -52,7 +52,8 @@ Foam::tmp<Foam::fvPatchField<Type> > Foam::fvPatchField<Type>::New
             "fvPatchField<Type>::New(const word&, const fvPatch&, "
             "const DimensionedField<Type, volMesh>&)"
         )   << "Unknown patch field type " << patchFieldType
-            << endl << endl
+            << " for field " << iF.name() << " on patch " << p.name()
+            << nl << nl
             << "Valid patchField types are :" << endl
             << patchConstructorTablePtr_->sortedToc()
             << exit(FatalError);
@@ -86,7 +87,7 @@ Foam::tmp<Foam::fvPatchField<Type> > Foam::fvPatchField<Type>::New
     {
         Info<< "fvPatchField<Type>::New(const fvPatch&, "
                "const DimensionedField<Type, volMesh>&, "
-               "const dictionary&) : patchFieldType="  << patchFieldType
+               "const dictionary&) : patchFieldType = "  << patchFieldType
             << endl;
     }
 
@@ -109,6 +110,7 @@ Foam::tmp<Foam::fvPatchField<Type> > Foam::fvPatchField<Type>::New
                 "const dictionary&)",
                 dict
             )   << "Unknown patch field type " << patchFieldType
+                << " for field " << iF.name() << " on patch " << p.name()
                 << " for patch type " << p.type() << endl << endl
                 << "Valid patch field types are :" << endl
                 << dictionaryConstructorTablePtr_->sortedToc()
@@ -137,8 +139,8 @@ Foam::tmp<Foam::fvPatchField<Type> > Foam::fvPatchField<Type>::New
                 "const DimensionedField<Type, volMesh>&, "
                 "const dictionary&)",
                 dict
-            )   << "inconsistent patch and patchField types for field "
-                << iF.name() << "\n"
+            )   << "Inconsistent patch and patchField types for field "
+                << iF.name() << " on patch " << p.name() << "\n"
                 << "    patch type " << p.type()
                 << " and patchField type " << patchFieldType
                 << exit(FatalIOError);
@@ -177,7 +179,9 @@ Foam::tmp<Foam::fvPatchField<Type> > Foam::fvPatchField<Type>::New
             "fvPatchField<Type>::New(const fvPatchField<Type>&, "
             "const fvPatch&, const DimensionedField<Type, volMesh>&, "
             "const fvPatchFieldMapper&)"
-        )   << "unknown patch field type " << ptf.type() << endl << endl
+        )   << "unknown patch field type " << ptf.type()
+            << " for field " << iF.name() << " on patch " << p.name()
+            << nl << nl
             << "Valid patchField types are :" << endl
             << patchMapperConstructorTablePtr_->sortedToc()
             << exit(FatalError);

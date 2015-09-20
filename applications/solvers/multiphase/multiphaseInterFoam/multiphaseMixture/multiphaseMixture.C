@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -24,8 +24,8 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "multiphaseMixture.H"
-#include "alphaContactAngleFvPatchScalarField.H"
-#include "Time.H"
+#include "multiphaseAlphaContactAngleFvPatchScalarField.H"
+#include "foamTime.H"
 #include "subCycle.H"
 #include "fvCFD.H"
 
@@ -361,16 +361,20 @@ void Foam::multiphaseMixture::correctContactAngle
     surfaceVectorField::GeometricBoundaryField& nHatb
 ) const
 {
-    const volScalarField::GeometricBoundaryField& gbf = refPhase_.boundaryField();
+    const volScalarField::GeometricBoundaryField& gbf =
+        refPhase_.boundaryField();
 
     const fvBoundaryMesh& boundary = mesh_.boundary();
 
     forAll(boundary, patchi)
     {
-        if (typeid(gbf[patchi]) == typeid(alphaContactAngleFvPatchScalarField))
+        if (isA<multiphaseAlphaContactAngleFvPatchScalarField>(gbf[patchi]))
         {
-            const alphaContactAngleFvPatchScalarField& acap =
-                refCast<const alphaContactAngleFvPatchScalarField>(gbf[patchi]);
+            const multiphaseAlphaContactAngleFvPatchScalarField& acap =
+                refCast<const multiphaseAlphaContactAngleFvPatchScalarField>
+                (
+                    gbf[patchi]
+                );
 
             vectorField& nHatPatch = nHatb[patchi];
 
@@ -378,7 +382,7 @@ void Foam::multiphaseMixture::correctContactAngle
                 mesh_.Sf().boundaryField()[patchi]
                /mesh_.magSf().boundaryField()[patchi];
 
-            alphaContactAngleFvPatchScalarField::thetaPropsTable::
+            multiphaseAlphaContactAngleFvPatchScalarField::thetaPropsTable::
                 const_iterator tp =
                 acap.thetaProps().find(interfacePair(alpha1, alpha2));
 
@@ -389,7 +393,8 @@ void Foam::multiphaseMixture::correctContactAngle
                     "multiphaseMixture::correctContactAngle"
                     "(const phase& alpha1, const phase& alpha2, "
                     "fvPatchVectorFieldField& nHatb) const"
-                )   << "Cannot find interface " << interfacePair(alpha1, alpha2)
+                )   << "Cannot find interface "
+                    << interfacePair(alpha1, alpha2)
                     << "\n    in table of theta properties for patch "
                     << acap.patch().name()
                     << exit(FatalError);
@@ -408,7 +413,8 @@ void Foam::multiphaseMixture::correctContactAngle
                 scalar thetaA = convertToRad*tp().thetaA(matched);
                 scalar thetaR = convertToRad*tp().thetaR(matched);
 
-                // Calculated the component of the velocity parallel to the wall
+                // Calculated the component of the velocity parallel
+                // to the wall
                 vectorField Uwall =
                     U_.boundaryField()[patchi].patchInternalField()
                   - U_.boundaryField()[patchi];

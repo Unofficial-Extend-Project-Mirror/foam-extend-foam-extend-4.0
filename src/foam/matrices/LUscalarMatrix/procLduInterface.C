@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -36,20 +36,20 @@ Foam::procLduInterface::procLduInterface
     const scalarField& coeffs
 )
 :
-    faceCells_(interface.interface().faceCells()),
+    faceCells_(interface.coupledInterface().faceCells()),
     coeffs_(coeffs),
     myProcNo_(-1),
     neighbProcNo_(-1)
 {
-    if (isA<processorLduInterface>(interface.interface()))
+    if (isA<processorLduInterface>(interface.coupledInterface()))
     {
         const processorLduInterface& pldui =
-            refCast<const processorLduInterface>(interface.interface());
+            refCast<const processorLduInterface>(interface.coupledInterface());
 
         myProcNo_ = pldui.myProcNo();
         neighbProcNo_ = pldui.neighbProcNo();
     }
-    else if (isA<cyclicLduInterface>(interface.interface()))
+    else if (isA<cyclicLduInterface>(interface.coupledInterface()))
     {
     }
     else
@@ -58,7 +58,8 @@ Foam::procLduInterface::procLduInterface
         (
             "procLduInterface::procLduInterface"
             "(const lduInterfaceField&, const scalarField&"
-        )   << "unknown lduInterface type " << interface.interface().type()
+        )   << "unknown lduInterface type "
+                << interface.coupledInterface().type()
             << exit(FatalError);
     }
 }

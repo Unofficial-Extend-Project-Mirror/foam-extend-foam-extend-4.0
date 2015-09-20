@@ -35,8 +35,8 @@
             IOobject::NO_READ,
             IOobject::NO_WRITE
         ),
-	mesh,
-	dimensionedVector("zero", dimless, vector::zero)
+        mesh,
+        dimensionedVector("zero", dimless, vector::zero)
     );
 
     volVectorField V
@@ -122,7 +122,7 @@
             IOobject::NO_WRITE
         ),
         mesh,
-	dimensionedVector("zero", dimLength, vector::zero)
+        dimensionedVector("zero", dimLength, vector::zero)
     );
 // aitken relaxation factor
 scalar aitkenInitialRes = 1.0;
@@ -140,5 +140,5 @@ scalar aitkenTheta = 0.1;
 //             IOobject::AUTO_WRITE
 //         ),
 //         mesh,
-// 	dimensionedVector("zero", dimless, vector::zero)
+//         dimensionedVector("zero", dimless, vector::zero)
 //     );

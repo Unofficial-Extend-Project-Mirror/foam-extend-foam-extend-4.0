@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -45,7 +45,7 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class fixedFluxPressureFvPatch Declaration
+                   Class fixedFluxPressureFvPatch Declaration
 \*---------------------------------------------------------------------------*/
 
 class fixedFluxPressureFvPatchScalarField
@@ -63,6 +63,9 @@ class fixedFluxPressureFvPatchScalarField
         //- Name of the density field used to normalise the mass flux
         //  if neccessary
         word rhoName_;
+
+        //- Name of the pressure diffusivity factor
+        word rAUName_;
 
         //- Is the pressure adjoint, i.e. has the opposite sign
         Switch adjoint_;

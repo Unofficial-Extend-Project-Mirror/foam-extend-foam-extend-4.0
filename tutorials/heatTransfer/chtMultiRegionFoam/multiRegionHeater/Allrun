@@ -4,9 +4,9 @@
 #------------------------------------------------------------------------------
 # =========                 |
 # \\      /  F ield         | foam-extend: Open Source CFD
-#  \\    /   O peration     |
-#   \\  /    A nd           | For copyright notice see file Copyright
-#    \\/     M anipulation  |
+#  \\    /   O peration     | Version:     3.2
+#   \\  /    A nd           | Web:         http://www.foam-extend.org
+#    \\/     M anipulation  | For copyright notice see file Copyright
 #------------------------------------------------------------------------------
 # License
 #     This file is part of foam-extend.
@@ -94,11 +94,16 @@ cp 0/* 0.001/heater/
 cp 0/* 0.001/leftSolid/
 cp 0/* 0.001/rightSolid/
 cp 0/* 0.001/topAir/
-changeDictionary -region bottomAir
-changeDictionary -region topAir
-changeDictionary -region heater
-changeDictionary -region leftSolid
-changeDictionary -region rightSolid
+runApplication changeDictionary -region bottomAir
+mv log.changeDictionary log.changeDictionary_bottomAir
+runApplication changeDictionary -region topAir
+mv log.changeDictionary log.changeDictionary_topAir
+runApplication changeDictionary -region heater
+mv log.changeDictionary log.changeDictionary_heater
+runApplication changeDictionary -region leftSolid
+mv log.changeDictionary log.changeDictionary_leftSolid
+runApplication changeDictionary -region rightSolid
+mv log.changeDictionary log.changeDictionary_rightSolid
 runApplicationAndReportOnError chtMultiRegionFoam
 
 

@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -33,6 +33,7 @@ Description
 #define radiationConstants_H
 
 #include "dimensionedScalar.H"
+#include "constantsSwitch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -41,6 +42,7 @@ namespace Foam
 namespace radiation
 {
     //- Stefan-Boltzmann constant [J/(K4 m2 s)]
+    extern const Foam::debug::constantsSwitch sigmaSB_;
     extern const dimensionedScalar sigmaSB;
 }
 }

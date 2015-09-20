@@ -66,19 +66,28 @@
 
 %define buildroot       %{_topdir}/BUILD/%{name}-%{version}-root
 
-BuildRoot:	    %{buildroot}
+BuildRoot:	        %{buildroot}
 Summary: 		openmpi
 License: 		Unkown
 Name: 			%{name}
 Version: 		%{version}
 Release: 		%{release}
-URL:            http://www.open-mpi.org/software/ompi/v1.6/downloads
+URL:                    http://www.open-mpi.org/software/ompi/v1.6/downloads
 Source: 		%url/%{name}-%{version}.tar.gz
 Prefix: 		%{_prefix}
 Group: 			Development/Tools
 
 
 %define _installPrefix  %{_prefix}/packages/%{name}-%{version}/platforms/%{_WM_OPTIONS}
+
+#--------------------------------------------------------------------------
+#
+# Here, we define default compiling options for openmpi
+#
+# One can override the option on the commande line : --define='MACRO EXPR'
+#
+%{!?_configureAdditionalArgs: %define _configureAdditionalArgs Undefined}
+
 
 %description
 %{summary}
@@ -94,6 +103,13 @@ Group: 			Development/Tools
     [ -n "$WM_CFLAGS" ]     &&  export CFLAGS="$WM_CFLAGS"
     [ -n "$WM_CXXFLAGS" ]   &&  export CXXFLAGS="$WM_CXXFLAGS"
     [ -n "$WM_LDFLAGS" ]    &&  export LDFLAGS="$WM_LDFLAGS"
+
+    set +x
+    echo ""
+    echo "Compilation options:"
+    echo "     _configureAdditionalArgs : %{_configureAdditionalArgs}"
+    echo ""
+    set -x
 
     unset mpiWith
     # Enable GridEngine if it appears to be in use
@@ -127,7 +143,8 @@ Group: 			Development/Tools
         --disable-mpi-cxx \
         --without-slurm \
         --enable-mpi-profile $mpiWith \
-        --disable-vt
+        --disable-vt \
+	`echo %{?_configureAdditionalArgs}`
 
     [ -z "$WM_NCOMPPROCS" ] && WM_NCOMPPROCS=1
     make -j $WM_NCOMPPROCS

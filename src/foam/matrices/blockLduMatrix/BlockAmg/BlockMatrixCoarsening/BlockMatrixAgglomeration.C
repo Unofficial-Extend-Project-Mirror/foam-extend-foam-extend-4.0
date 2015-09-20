@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -34,17 +34,21 @@ Author
 
 #include "BlockMatrixAgglomeration.H"
 #include "boolList.H"
+#include "tolerancesSwitch.H"
 #include "coeffFields.H"
 #include "addToRunTimeSelectionTable.H"
 #include "BlockGAMGInterfaceField.H"
 #include "processorLduInterfaceField.H"
+#include "coarseBlockAmgLevel.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
 template<class Type>
-const Foam::scalar Foam::BlockMatrixAgglomeration<Type>::diagFactor_
+const Foam::debug::tolerancesSwitch
+Foam::BlockMatrixAgglomeration<Type>::diagFactor_
 (
-    debug::tolerances("aamgDiagFactor", 1e-8)
+    "aamgDiagFactor",
+    1e-8
 );
 
 template<class Type>
@@ -182,7 +186,7 @@ void Foam::BlockMatrixAgglomeration<Type>::calcAgglomeration()
         // Go through all upper and lower coefficients and for the ones
         // larger than threshold mark the equations out of cluster zero
 
-        scalarField magScaledDiag = diagFactor_*magDiag;
+        scalarField magScaledDiag = diagFactor_()*magDiag;
 
         boolList zeroCluster(diag.size(), true);
 
@@ -200,29 +204,25 @@ void Foam::BlockMatrixAgglomeration<Type>::calcAgglomeration()
         }
 
         // Collect solo equations
-        label nSolo = 0;
-
         forAll (zeroCluster, eqnI)
         {
             if (zeroCluster[eqnI])
             {
                 // Found solo equation
-                nSolo++;
+                nSolo_++;
 
                 agglomIndex_[eqnI] = nCoarseEqns_;
             }
         }
 
-        reduce(nSolo, sumOp<label>());
-
-        if (nSolo > 0)
+        if (nSolo_ > 0)
         {
             // Found solo equations
             nCoarseEqns_++;
 
-            if (BlockLduMatrix<Type>::debug >= 2)
+            if (BlockLduMatrix<Type>::debug >= 3)
             {
-                Info<< "Found " << nSolo << " weakly connected equations."
+                Pout<< "Found " << nSolo_ << " weakly connected equations."
                     << endl;
             }
         }
@@ -302,7 +302,7 @@ void Foam::BlockMatrixAgglomeration<Type>::calcAgglomeration()
                     nextEqn = cols[indexUngrouped];
 
                     agglomIndex_[nextEqn] = agglomIndex_[curEqn];
-                    sizeOfGroups[agglomIndex_[curEqn]];
+                    sizeOfGroups[agglomIndex_[curEqn]]++;
 
                     curEqn = nextEqn;
                 }
@@ -349,7 +349,7 @@ void Foam::BlockMatrixAgglomeration<Type>::calcAgglomeration()
 
     reduce(coarsen_, andOp<bool>());
 
-    if (BlockLduMatrix<Type>::debug >= 2)
+    if (BlockLduMatrix<Type>::debug >= 3)
     {
         Pout << "Coarse level size: " << nCoarseEqns_;
 
@@ -381,6 +381,7 @@ Foam::BlockMatrixAgglomeration<Type>::BlockMatrixAgglomeration
     normPtr_(BlockCoeffNorm<Type>::New(dict)),
     agglomIndex_(matrix_.lduAddr().size()),
     groupSize_(groupSize),
+    nSolo_(0),
     nCoarseEqns_(0),
     coarsen_(false)
 {
@@ -397,14 +398,14 @@ Foam::BlockMatrixAgglomeration<Type>::~BlockMatrixAgglomeration()
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 template<class Type>
-Foam::autoPtr<Foam::BlockLduMatrix<Type> >
+Foam::autoPtr<Foam::BlockAmgLevel<Type> >
 Foam::BlockMatrixAgglomeration<Type>::restrictMatrix() const
 {
     if (!coarsen_)
     {
         FatalErrorIn
         (
-            "autoPtr<amgMatrix> "
+            "autoPtr<BlockAmgLevel<Type> > "
             "BlockMatrixAgglomeration<Type>::restrictMatrix() const"
         )   << "Requesting coarse matrix when it cannot be created"
             << abort(FatalError);
@@ -434,8 +435,8 @@ Foam::BlockMatrixAgglomeration<Type>::restrictMatrix() const
     {
         FatalErrorIn
         (
-            "autoPtr<BlockLduMatrix<Type> > BlockMatrixAgglomeration<Type>::"
-            "restrictMatrix() const"
+            "autoPtr<BlockLduMatrix<Type> >"
+            "BlockMatrixAgglomeration<Type>::restrictMatrix() const"
         )   << "agglomIndex array does not correspond to fine level. " << endl
             << " Size: " << agglomIndex_.size()
             << " number of equations: " << matrix_.lduAddr().size()
@@ -443,6 +444,8 @@ Foam::BlockMatrixAgglomeration<Type>::restrictMatrix() const
     }
 #   endif
 
+    // Does the matrix have solo equations
+    bool soloEqns = nSolo_ > 0;
 
     // Storage for block neighbours and coefficients
 
@@ -469,6 +472,13 @@ Foam::BlockMatrixAgglomeration<Type>::restrictMatrix() const
     {
         label rmUpperAddr = agglomIndex_[upperAddr[fineCoeffi]];
         label rmLowerAddr = agglomIndex_[lowerAddr[fineCoeffi]];
+
+        // If the coefficient touches block zero and solo equations are
+        // present, skip it
+        if (soloEqns && (rmUpperAddr == 0 || rmLowerAddr == 0))
+        {
+            continue;
+        }
 
         if (rmUpperAddr == rmLowerAddr)
         {
@@ -565,6 +575,16 @@ Foam::BlockMatrixAgglomeration<Type>::restrictMatrix() const
 
     forAll(coeffRestrictAddr, fineCoeffi)
     {
+        label rmUpperAddr = agglomIndex_[upperAddr[fineCoeffi]];
+        label rmLowerAddr = agglomIndex_[lowerAddr[fineCoeffi]];
+
+        // If the coefficient touches block zero and solo equations are
+        // present, skip it
+        if (soloEqns && (rmUpperAddr == 0 || rmLowerAddr == 0))
+        {
+            continue;
+        }
+
         if (coeffRestrictAddr[fineCoeffi] >= 0)
         {
             coeffRestrictAddr[fineCoeffi] =
@@ -590,30 +610,30 @@ Foam::BlockMatrixAgglomeration<Type>::restrictMatrix() const
         const_cast<BlockLduMatrix<Type>&>(matrix_).interfaces();
 
     // Set the coarse interfaces and coefficients
-    lduInterfacePtrsList* coarseInterfacesPtr =
-        new lduInterfacePtrsList(interfaceSize);
-    lduInterfacePtrsList& coarseInterfaces = *coarseInterfacesPtr;
+    lduInterfacePtrsList coarseInterfaces(interfaceSize);
 
     labelListList coarseInterfaceAddr(interfaceSize);
 
     // Add the coarse level
 
     // Set the coarse ldu addressing onto the list
-    lduPrimitiveMesh* coarseAddrPtr =
+    autoPtr<lduPrimitiveMesh> coarseAddrPtr
+    (
         new lduPrimitiveMesh
         (
             nCoarseEqns_,
             coarseOwner,
             coarseNeighbour,
             true
-        );
+        )
+    );
 
     // Initialise transfer of restrict addressing on the interface
     forAll (interfaceFields, intI)
     {
         if (interfaceFields.set(intI))
         {
-            interfaceFields[intI].interface().initInternalFieldTransfer
+            interfaceFields[intI].coupledInterface().initInternalFieldTransfer
             (
                 Pstream::blocking,
                 agglomIndex_
@@ -630,7 +650,7 @@ Foam::BlockMatrixAgglomeration<Type>::restrictMatrix() const
         if (interfaceFields.set(intI))
         {
             const lduInterface& fineInterface =
-                interfaceFields[intI].interface();
+                interfaceFields[intI].coupledInterface();
 
             fineInterfaceAddr.set
             (
@@ -653,14 +673,14 @@ Foam::BlockMatrixAgglomeration<Type>::restrictMatrix() const
         if (interfaceFields.set(intI))
         {
             const lduInterface& fineInterface =
-                interfaceFields[intI].interface();
+                interfaceFields[intI].coupledInterface();
 
             coarseInterfaces.set
             (
                 intI,
                 GAMGInterface::New
                 (
-                    *coarseAddrPtr,
+                    coarseAddrPtr(),
                     fineInterface,
                     fineInterface.interfaceInternalField(agglomIndex_),
                     fineInterfaceAddr[intI]
@@ -683,15 +703,17 @@ Foam::BlockMatrixAgglomeration<Type>::restrictMatrix() const
     // Add interfaces
     coarseAddrPtr->addInterfaces
     (
-        *coarseInterfacesPtr,
+        coarseInterfaces,
         coarseInterfaceAddr,
         matrix_.patchSchedule()
     );
 
     // Set the coarse level matrix
-    BlockLduMatrix<Type>* coarseMatrixPtr =
-        new BlockLduMatrix<Type>(*coarseAddrPtr);
-    BlockLduMatrix<Type>& coarseMatrix = *coarseMatrixPtr;
+    autoPtr<BlockLduMatrix<Type> > coarseMatrixPtr
+    (
+        new BlockLduMatrix<Type>(coarseAddrPtr())
+    );
+    BlockLduMatrix<Type>& coarseMatrix = coarseMatrixPtr();
 
     typename BlockLduInterfaceFieldPtrsList<Type>::Type&
         coarseInterfaceFieldsTransfer =
@@ -767,6 +789,16 @@ Foam::BlockMatrixAgglomeration<Type>::restrictMatrix() const
 
                 forAll(coeffRestrictAddr, fineCoeffI)
                 {
+                    label rmUpperAddr = agglomIndex_[upperAddr[fineCoeffI]];
+                    label rmLowerAddr = agglomIndex_[lowerAddr[fineCoeffI]];
+
+                    // If the coefficient touches block zero and
+                    //  solo equations are present, skip it
+                    if (soloEqns && (rmUpperAddr == 0 || rmLowerAddr == 0))
+                    {
+                        continue;
+                    }
+
                     label cCoeff = coeffRestrictAddr[fineCoeffI];
 
                     if (cCoeff >= 0)
@@ -789,7 +821,7 @@ Foam::BlockMatrixAgglomeration<Type>::restrictMatrix() const
             {
                 FatalErrorIn
                 (
-                    "autoPtr<amgMatrix>"
+                    "autoPtr<BlockAmgLevel<Type> >"
                     "BlockMatrixAgglomeration<Type>::restrictMatrix() const"
                 )   << "Matrix diagonal of square type and upper of "
                     << "linear type is not implemented"
@@ -799,7 +831,7 @@ Foam::BlockMatrixAgglomeration<Type>::restrictMatrix() const
             {
                 FatalErrorIn
                 (
-                    "autoPtr<amgMatrix>"
+                    "autoPtr<BlockAmgLevel<Type> >"
                     "BlockMatrixAgglomeration<Type>::restrictMatrix() const"
                 )   << "Matrix diagonal of square type and upper of "
                     << "scalar type is not implemented"
@@ -810,7 +842,7 @@ Foam::BlockMatrixAgglomeration<Type>::restrictMatrix() const
         {
                 FatalErrorIn
                 (
-                    "autoPtr<amgMatrix>"
+                    "autoPtr<BlockAmgLevel<Type> >"
                     "BlockMatrixAgglomeration<Type>::restrictMatrix() const"
                 )   << "Matrix diagonal of linear type not implemented"
                     << abort(FatalError);
@@ -819,7 +851,7 @@ Foam::BlockMatrixAgglomeration<Type>::restrictMatrix() const
         {
                 FatalErrorIn
                 (
-                    "autoPtr<amgMatrix>"
+                    "autoPtr<BlockAmgLevel<Type> >"
                     "BlockMatrixAgglomeration<Type>::restrictMatrix() const"
                 )   << "Matrix diagonal of scalar type not implemented"
                     << abort(FatalError);
@@ -839,6 +871,16 @@ Foam::BlockMatrixAgglomeration<Type>::restrictMatrix() const
 
                 forAll(coeffRestrictAddr, fineCoeffI)
                 {
+                    label rmUpperAddr = agglomIndex_[upperAddr[fineCoeffI]];
+                    label rmLowerAddr = agglomIndex_[lowerAddr[fineCoeffI]];
+
+                    // If the coefficient touches block zero and
+                    //  solo equations are present, skip it
+                    if (soloEqns && (rmUpperAddr == 0 || rmLowerAddr == 0))
+                    {
+                        continue;
+                    }
+
                     label cCoeff = coeffRestrictAddr[fineCoeffI];
 
                     if (cCoeff >= 0)
@@ -861,7 +903,7 @@ Foam::BlockMatrixAgglomeration<Type>::restrictMatrix() const
             {
                 FatalErrorIn
                 (
-                    "autoPtr<amgMatrix>"
+                    "autoPtr<BlockAmgLevel<Type> >"
                     "BlockMatrixAgglomeration<Type>::restrictMatrix() const"
                 )   << "Matrix diagonal of square type and upper of "
                     << "linear type is not implemented"
@@ -871,7 +913,7 @@ Foam::BlockMatrixAgglomeration<Type>::restrictMatrix() const
             {
                 FatalErrorIn
                 (
-                    "autoPtr<amgMatrix>"
+                    "autoPtr<BlockAmgLevel<Type> >"
                     "BlockMatrixAgglomeration<Type>::restrictMatrix() const"
                 )   << "Matrix diagonal of square type and upper of "
                     << "scalar type is not implemented"
@@ -883,8 +925,8 @@ Foam::BlockMatrixAgglomeration<Type>::restrictMatrix() const
         {
                 FatalErrorIn
                 (
-                    "autoPtr<amgMatrix> BlockMatrixAgglomeration<Type>::"
-                    "restrictMatrix() const"
+                    "autoPtr<BlockAmgLevel<Type> > "
+                    "BlockMatrixAgglomeration<Type>::restrictMatrix() const"
                 )   << "Matrix diagonal of linear type not implemented"
                     << abort(FatalError);
         }
@@ -892,14 +934,25 @@ Foam::BlockMatrixAgglomeration<Type>::restrictMatrix() const
         {
                 FatalErrorIn
                 (
-                    "autoPtr<amgMatrix> BlockMatrixAgglomeration<Type>::"
-                    "restrictMatrix() const"
+                    "autoPtr<BlockAmgLevel<Type> > "
+                    "BlockMatrixAgglomeration<Type>::restrictMatrix() const"
                 )   << "Matrix diagonal of scalar type not implemented"
                     << abort(FatalError);
         }
     }
 
-    return autoPtr<BlockLduMatrix<Type> >(coarseMatrixPtr);
+    return autoPtr<BlockAmgLevel<Type> >
+    (
+        new coarseBlockAmgLevel<Type>
+        (
+            coarseAddrPtr,
+            coarseMatrixPtr,
+            this->dict(),
+            this->type(),
+            this->groupSize(),
+            this->minCoarseEqns()
+        )
+    );
 }
 
 

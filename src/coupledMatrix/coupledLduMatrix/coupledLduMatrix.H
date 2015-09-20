@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -128,7 +128,8 @@ public:
                 const lduInterfaceFieldPtrsListList& interfaces,
                 const FieldField<Field, scalar>& x,
                 FieldField<Field, scalar>& result,
-                const direction cmpt
+                const direction cmpt,
+                const bool switchToLhs = false
             ) const;
 
             //- Update coupled interfaces for matrix operations
@@ -138,7 +139,8 @@ public:
                 const lduInterfaceFieldPtrsListList& interfaces,
                 const FieldField<Field, scalar>& x,
                 FieldField<Field, scalar>& result,
-                const direction cmpt
+                const direction cmpt,
+                const bool switchToLhs = false
             ) const;
 
 };

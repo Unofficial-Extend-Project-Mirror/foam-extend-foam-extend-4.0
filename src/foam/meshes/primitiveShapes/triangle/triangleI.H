@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -100,20 +100,20 @@ bool triangle<Point, PointRef>::intersection
 
     // User-controlled projection tolerance
     // HJ, 23/Oct/2007
-    if (Foam::mag(u1) < intersection::missTol_)
+    if (Foam::mag(u1) < intersection::missTol_())
     {
         beta = u0/u2;
         if
         (
-            (beta > -intersection::missTol_)
-         && (beta < 1 + intersection::missTol_)
+            (beta > -intersection::missTol_())
+         && (beta < 1 + intersection::missTol_())
         )
         {
             alpha = (v0 - beta*v2)/v1;
             hit =
             (
-                (alpha > -intersection::missTol_)
-             && ((alpha + beta) < 1 + intersection::missTol_)
+                (alpha > -intersection::missTol_())
+             && ((alpha + beta) < 1 + intersection::missTol_())
             );
         }
     }
@@ -122,15 +122,15 @@ bool triangle<Point, PointRef>::intersection
         beta = (v0*u1 - u0*v1)/det;
         if
         (
-            (beta > -intersection::missTol_)
-         && (beta < 1 + intersection::missTol_)
+            (beta > -intersection::missTol_())
+         && (beta < 1 + intersection::missTol_())
         )
         {
             alpha = (u0 - beta*u2)/u1;
             hit =
             (
-                (alpha > -intersection::missTol_)
-             && ((alpha + beta) < 1 + intersection::missTol_)
+                (alpha > -intersection::missTol_())
+             && ((alpha + beta) < 1 + intersection::missTol_())
             );
         }
     }
@@ -400,7 +400,7 @@ inline scalar triangle<Point, PointRef>::circumRadius() const
     {
         scalar a = (d1 + d2)*(d2 + d3)*(d3 + d1) / denom;
 
-        return 0.5*Foam::sqrt(min(GREAT, max(0, a)));
+        return 0.5*Foam::sqrt(min(GREAT, max(scalar(0), a)));
     }
 }
 
@@ -411,9 +411,7 @@ inline scalar triangle<Point, PointRef>::quality() const
     return
         mag()
        /(
-            mathematicalConstant::pi
-          *Foam::sqr(circumRadius())
-          *0.413497
+            0.413497*mathematicalConstant::pi*sqr(circumRadius())
           + VSMALL
         );
 }
@@ -552,7 +550,7 @@ inline pointHit triangle<Point, PointRef>::ray
                 Foam::mag(E1)
             ),
             Foam::mag(c_ - b_)
-        )*intersection::planarTol_;
+        )*intersection::planarTol_();
 
     bool eligible =
         alg == intersection::FULL_RAY
@@ -775,8 +773,8 @@ inline bool triangle<Point, PointRef>::classify
     if (hit)
     {
         // alpha,beta might get negative due to precision errors
-        alpha = max(0.0, min(1.0, alpha));
-        beta = max(0.0, min(1.0, beta));
+        alpha = max(scalar(0), min(scalar(1), alpha));
+        beta = max(scalar(0), min(scalar(1), beta));
     }
 
     nearType = NONE;

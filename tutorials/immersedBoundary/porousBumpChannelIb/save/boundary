@@ -1,0 +1,55 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | foam-extend: Open Source CFD                    |
+|  \\    /   O peration     | Version:     3.2                                |
+|   \\  /    A nd           | Web:         http://www.foam-extend.org         |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       polyBoundaryMesh;
+    location    "constant/polyMesh";
+    object      boundary;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+5
+(
+    porousBumpChannel
+    {
+        type            immersedBoundary;
+        nFaces          0;
+        startFace       25735;
+
+        internalFlow    yes;
+    }
+    topAndBottom
+    {
+        type            wall;
+        nFaces          400;
+        startFace       25735
+;
+    }
+    inlet
+    {
+        type            patch;
+        nFaces          65;
+        startFace       26135;
+    }
+    outlet
+    {
+        type            patch;
+        nFaces          65;
+        startFace       26200;
+    }
+    defaultFaces
+    {
+        type            empty;
+        nFaces          26000;
+        startFace       26265;
+    }
+)
+
+// ************************************************************************* //

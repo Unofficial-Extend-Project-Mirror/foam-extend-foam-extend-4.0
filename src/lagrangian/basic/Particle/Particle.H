@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -489,7 +489,8 @@ public:
     template<>                                                                \
     const Foam::word Particle<Type>::typeName(#Type);                         \
     template<>                                                                \
-    int Particle<Type>::debug(Foam::debug::debugSwitch(#Type, DebugSwitch));
+    Foam::debug::debugSwitch                                                  \
+    Particle<Type>::debug(std::string(#Type), DebugSwitch);
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

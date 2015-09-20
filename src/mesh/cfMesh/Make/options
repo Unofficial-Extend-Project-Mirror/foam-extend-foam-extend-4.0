@@ -1,0 +1,18 @@
+#if defined(__GNUC__)
+#   if defined(darwin)
+        OMP_FLAGS =
+#   else
+        OMP_FLAGS = -DUSE_OMP -fopenmp
+#   endif
+#else
+   OMP_FLAGS =
+#endif
+
+EXE_INC = \
+    $(OMP_FLAGS) \
+    -I$(LIB_SRC)/edgeMesh/lnInclude \
+    -I$(LIB_SRC)/meshTools/lnInclude
+
+LIB_LIBS = \
+    -ledgeMesh \
+    -lmeshTools

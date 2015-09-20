@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -33,9 +33,9 @@ Contributor
 
 \*---------------------------------------------------------------------------*/
 
-#include "MixingPlaneInterpolation.H"
+#include "MixingPlaneInterpolationTemplate.H"
 #include "demandDrivenData.H"
-#include "PrimitivePatch.H"
+#include "PrimitivePatchTemplate.H"
 #include "IOmanip.H"
 #include "transform.H"
 #include "RodriguesRotation.H"

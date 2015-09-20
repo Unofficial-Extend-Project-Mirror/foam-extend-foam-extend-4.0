@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -39,6 +39,8 @@ SourceFiles
 #define specieThermo_H
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+#include "optimisationSwitch.H"
+#include "tolerancesSwitch.H"
 
 namespace Foam
 {
@@ -95,13 +97,13 @@ class specieThermo
     // Private data
 
         //- Convergence tolerance of energy -> temperature inversion functions
-        static const scalar tol_;
+        static const debug::tolerancesSwitch tol_;
 
         //- Max temperature jump of energy -> temperature inversion functions
-        static const scalar TJump_;
+        static const debug::tolerancesSwitch TJump_;
 
         //- Max number of iterations in energy->temperature inversion functions
-        static const int maxIter_;
+        static const debug::optimisationSwitch maxIter_;
 
 
     // Private member functions

@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -39,7 +39,7 @@ solidWallHeatFluxTemperatureFvPatchScalarField
 :
     fixedGradientFvPatchScalarField(p, iF),
     q_(p.size(), 0.0),
-    KName_("undefined-K")
+    KappaName_("undefined-Kappa")
 {}
 
 
@@ -54,7 +54,7 @@ solidWallHeatFluxTemperatureFvPatchScalarField
 :
     fixedGradientFvPatchScalarField(ptf, p, iF, mapper),
     q_(ptf.q_, mapper),
-    KName_(ptf.KName_)
+    KappaName_(ptf.KappaName_)
 {}
 
 
@@ -68,7 +68,7 @@ solidWallHeatFluxTemperatureFvPatchScalarField
 :
     fixedGradientFvPatchScalarField(p, iF, dict),
     q_("q", dict, p.size()),
-    KName_(dict.lookup("K"))
+    KappaName_(dict.lookup("Kappa"))
 {}
 
 
@@ -80,7 +80,7 @@ solidWallHeatFluxTemperatureFvPatchScalarField
 :
     fixedGradientFvPatchScalarField(tppsf),
     q_(tppsf.q_),
-    KName_(tppsf.KName_)
+    KappaName_(tppsf.KappaName_)
 {}
 
 
@@ -93,7 +93,7 @@ solidWallHeatFluxTemperatureFvPatchScalarField
 :
     fixedGradientFvPatchScalarField(tppsf, iF),
     q_(tppsf.q_),
-    KName_(tppsf.KName_)
+    KappaName_(tppsf.KappaName_)
 {}
 
 
@@ -131,12 +131,12 @@ void Foam::solidWallHeatFluxTemperatureFvPatchScalarField::updateCoeffs()
         return;
     }
 
-    const scalarField& Kw = lookupPatchField<volScalarField, scalar>
+    const scalarField& Kappaw = lookupPatchField<volScalarField, scalar>
     (
-        KName_
+        KappaName_
     );
 
-    gradient() = q_/Kw;
+    gradient() = q_/Kappaw;
 
     fixedGradientFvPatchScalarField::updateCoeffs();
 }
@@ -149,7 +149,7 @@ void Foam::solidWallHeatFluxTemperatureFvPatchScalarField::write
 {
     fixedGradientFvPatchScalarField::write(os);
     q_.writeEntry("q", os);
-    os.writeKeyword("K") << KName_ << token::END_STATEMENT << nl;
+    os.writeKeyword("Kappa") << KappaName_ << token::END_STATEMENT << nl;
     this->writeEntry("value", os);
 }
 

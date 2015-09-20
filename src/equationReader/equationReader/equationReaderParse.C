@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -74,8 +74,8 @@ void Foam::equationReader::parse(label index) const
         tl[tl.size() - 1] = token(rawStream);
 
         // Bug fix - equations ending in brackets read an extra token of type
-        // ERROR at the end, caused by string replace ')' with ' ) ' above
-        if (tl[tl.size() - 1].type() == token::ERROR)
+        // FATALERROR at the end, caused by string replace ')' with ' ) ' above
+        if (tl[tl.size() - 1].type() == token::FATALERROR)
         {
             tl.setSize(tl.size() - 1);
             forceEnd = true;

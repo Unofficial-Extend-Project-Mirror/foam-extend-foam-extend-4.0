@@ -7,7 +7,10 @@ wmake libso dynamicMesh
 # Make meshMotion solvers
 meshMotion/Allwmake
 
+# Make libraries in dynamicFvMesh
 wmake libso dynamicFvMesh
+wmake libso dynamicTopoFvMesh
+
 wmake libso topoChangerFvMesh
 
 # ----------------------------------------------------------------- end-of-file

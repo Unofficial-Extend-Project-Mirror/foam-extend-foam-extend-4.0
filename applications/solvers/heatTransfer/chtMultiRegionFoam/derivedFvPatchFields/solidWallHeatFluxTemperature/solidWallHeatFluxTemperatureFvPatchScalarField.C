@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -39,7 +39,7 @@ solidWallHeatFluxTemperatureFvPatchScalarField
 :
     fixedGradientFvPatchScalarField(p, iF),
     q_(p.size(), 0.0),
-    KName_("undefined-K")
+    KappaName_("undefined-Kappa")
 {}
 
 
@@ -54,7 +54,7 @@ solidWallHeatFluxTemperatureFvPatchScalarField
 :
     fixedGradientFvPatchScalarField(ptf, p, iF, mapper),
     q_(ptf.q_, mapper),
-    KName_(ptf.KName_)
+    KappaName_(ptf.KappaName_)
 {}
 
 
@@ -68,7 +68,7 @@ solidWallHeatFluxTemperatureFvPatchScalarField
 :
     fixedGradientFvPatchScalarField(p, iF, dict),
     q_("q", dict, p.size()),
-    KName_(dict.lookup("K"))
+    KappaName_(dict.lookup("Kappa"))
 {}
 
 
@@ -80,7 +80,7 @@ solidWallHeatFluxTemperatureFvPatchScalarField
 :
     fixedGradientFvPatchScalarField(tppsf),
     q_(tppsf.q_),
-    KName_(tppsf.KName_)
+    KappaName_(tppsf.KappaName_)
 {}
 
 
@@ -93,7 +93,7 @@ solidWallHeatFluxTemperatureFvPatchScalarField
 :
     fixedGradientFvPatchScalarField(tppsf, iF),
     q_(tppsf.q_),
-    KName_(tppsf.KName_)
+    KappaName_(tppsf.KappaName_)
 {}
 
 
@@ -125,33 +125,33 @@ void Foam::solidWallHeatFluxTemperatureFvPatchScalarField::rmap
 
 
 Foam::tmp<Foam::scalarField>
-Foam::solidWallHeatFluxTemperatureFvPatchScalarField::K() const
+Foam::solidWallHeatFluxTemperatureFvPatchScalarField::Kappa() const
 {
     const fvMesh& mesh = patch().boundaryMesh().mesh();
 
-    if (mesh.objectRegistry::foundObject<volScalarField>(KName_))
+    if (mesh.objectRegistry::foundObject<volScalarField>(KappaName_))
     {
-        return lookupPatchField<volScalarField, scalar>(KName_);
+        return lookupPatchField<volScalarField, scalar>(KappaName_);
     }
-    else if (mesh.objectRegistry::foundObject<volSymmTensorField>(KName_))
+    else if (mesh.objectRegistry::foundObject<volSymmTensorField>(KappaName_))
     {
-        const symmTensorField& KWall =
-            lookupPatchField<volSymmTensorField, scalar>(KName_);
+        const symmTensorField& KappaWall =
+            lookupPatchField<volSymmTensorField, scalar>(KappaName_);
 
         vectorField n = patch().nf();
 
-        return n & KWall & n;
+        return n & KappaWall & n;
     }
     else
     {
         FatalErrorIn
         (
-            "solidWallHeatFluxTemperatureFvPatchScalarField::K()"
+            "solidWallHeatFluxTemperatureFvPatchScalarField::Kappa()"
             " const"
-        )   << "Did not find field " << KName_
+        )   << "Did not find field " << KappaName_
             << " on mesh " << mesh.name() << " patch " << patch().name()
             << endl
-            << "Please set 'K' to a valid volScalarField"
+            << "Please set 'Kappa' to a valid volScalarField"
             << " or a valid volSymmTensorField." << exit(FatalError);
 
         return scalarField(0);
@@ -166,13 +166,13 @@ void Foam::solidWallHeatFluxTemperatureFvPatchScalarField::updateCoeffs()
         return;
     }
 
-    gradient() = q_/K();
+    gradient() = q_/Kappa();
 
     fixedGradientFvPatchScalarField::updateCoeffs();
 
     if (debug)
     {
-        scalar Q = gSum(K()*patch().magSf()*snGrad());
+        scalar Q = gSum(Kappa()*patch().magSf()*snGrad());
 
         Info<< patch().boundaryMesh().mesh().name() << ':'
             << patch().name() << ':'
@@ -194,7 +194,7 @@ void Foam::solidWallHeatFluxTemperatureFvPatchScalarField::write
 {
     fixedGradientFvPatchScalarField::write(os);
     q_.writeEntry("q", os);
-    os.writeKeyword("K") << KName_ << token::END_STATEMENT << nl;
+    os.writeKeyword("Kappa") << KappaName_ << token::END_STATEMENT << nl;
     this->writeEntry("value", os);
 }
 

@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -36,8 +36,13 @@ namespace Foam
 
 const IOstream::versionNumber IOstream::originalVersion(0.5);
 const IOstream::versionNumber IOstream::currentVersion(2.0);
-unsigned int IOstream::precision_(debug::infoSwitch("writePrecision", 6));
 
+Foam::debug::infoSwitch
+IOstream::precision_
+(
+    "writePrecision",
+    6
+);
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 // Global IO streams

@@ -28,7 +28,7 @@
                     fvc::interpolate(interface.sigmaK())*fvc::snGrad(alpha1)
                   - ghf*fvc::snGrad(rho)
                   - fvc::snGrad(pd)
-                ) * mesh.magSf()
+                )*mesh.magSf()
             )
         );
     }

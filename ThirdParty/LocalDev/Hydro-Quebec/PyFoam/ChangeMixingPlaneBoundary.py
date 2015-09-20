@@ -9,8 +9,9 @@ Author:
 
 """
 
-from PyFoamApplication import PyFoamApplication
+from PyFoam.Applications.PyFoamApplication import PyFoamApplication
 from PyFoam.RunDictionary.ParsedParameterFile import ParsedParameterFile
+from PyFoam.ThirdParty.six import print_
 from os import path
 import sys
 
@@ -37,7 +38,7 @@ Change MixingPlane boundary condition parameters
                                action="store",
                                dest="zone",
                                default=None,
-                               help='Name of the zone for mixingPlanePatch')                                     
+                               help='Name of the zone for mixingPlanePatch')
         self.parser.add_option("--coordinateSystemName",
                                action="store",
                                dest="coordinateSystemName",
@@ -78,7 +79,7 @@ Change MixingPlane boundary condition parameters
                                dest="ribbonPatchDiscretisation",
                                default=None,
                                help='ribbonPatch discretisation (masterPatch|slavePatch|bothPatches|uniform|userDefined)')
-        
+
         self.parser.add_option("--test",
                                action="store_true",
                                default=False,
@@ -88,13 +89,13 @@ Change MixingPlane boundary condition parameters
     def run(self):
         fName=self.parser.getArgs()[0]
         bName=self.parser.getArgs()[1]
- 
+
         boundary=ParsedParameterFile(path.join(".",fName,"constant","polyMesh","boundary"),debug=False,boundaryDict=True)
 
         bnd=boundary.content
 
         if type(bnd)!=list:
-            print "Problem with boundary file (not a list)"
+            print_("Problem with boundary file (not a list)")
             sys.exit(-1)
 
         found=False
@@ -143,11 +144,10 @@ Change MixingPlane boundary condition parameters
                 break
 
         if not found:
-            print "Boundary",bName,"not found in",bnd[::2]
+            print_("Boundary",bName,"not found in",bnd[::2])
             sys.exit(-1)
 
         if self.parser.getOptions().test:
-            print boundary
+            print_(boundary)
         else:
             boundary.writeFile()
-

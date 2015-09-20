@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -52,100 +52,101 @@ Author
 
 int main(int argc, char *argv[])
 {
-# include "setRootCase.H"
-# include "createTime.H"
-# include "createMesh.H"
-# include "createFields.H"
-# include "readDivDSigmaExpMethod.H"
-# include "readDivDSigmaLargeStrainExpMethod.H"
-# include "readMoveMeshMethod.H"
-# include "createSolidInterfaceNonLin.H"
-# include "findGlobalFaceZones.H"
+#   include "setRootCase.H"
+#   include "createTime.H"
+#   include "createMesh.H"
+#   include "createFields.H"
+#   include "readDivDSigmaExpMethod.H"
+#   include "readDivDSigmaLargeStrainExpMethod.H"
+#   include "readMoveMeshMethod.H"
+#   include "createSolidInterfaceNonLin.H"
+#   include "findGlobalFaceZones.H"
 
-//* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-  Info << "\nStarting time loop\n" << endl;
+    Info<< "\nStarting time loop\n" << endl;
 
-  for (runTime++; !runTime.end(); runTime++)
+    while(runTime.loop())
     {
-      Info<< "Time = " << runTime.timeName() << nl << endl;
+        Info<< "Time = " << runTime.timeName() << nl << endl;
 
-#     include "readSolidMechanicsControls.H"
+#       include "readSolidMechanicsControls.H"
 
-      int iCorr = 0;
-      lduMatrix::solverPerformance solverPerf;
-      scalar initialResidual = 1.0;
-      scalar relativeResidual = 1.0;
-      lduMatrix::debug = 0;
+        int iCorr = 0;
+        lduMatrix::solverPerformance solverPerf;
+        scalar initialResidual = 1.0;
+        scalar relativeResidual = 1.0;
+        lduMatrix::debug = 0;
 
-      do
-      {
-          DU.storePrevIter();
+        do
+        {
+            DU.storePrevIter();
 
-#         include "calculateDivDSigmaExp.H"
-#         include "calculateDivDSigmaLargeStrainExp.H"
+#           include "calculateDivDSigmaExp.H"
+#           include "calculateDivDSigmaLargeStrainExp.H"
 
-          //- Updated lagrangian momentum equation
-          fvVectorMatrix DUEqn
-              (
-                  fvm::d2dt2(rho,DU)
-                  ==
-                  fvm::laplacian(2*muf + lambdaf, DU, "laplacian(DDU,DU)")
-                  + divDSigmaExp
-                  + divDSigmaLargeStrainExp
-                  );
+            //- Updated lagrangian momentum equation
+            fvVectorMatrix DUEqn
+            (
+                fvm::d2dt2(rho,DU)
+             ==
+                fvm::laplacian(2*muf + lambdaf, DU, "laplacian(DDU,DU)")
+              + divDSigmaExp
+              + divDSigmaLargeStrainExp
+            );
 
-          if (solidInterfaceCorr)
-          {
-              solidInterfacePtr->correct(DUEqn);
-          }
+            if (solidInterfaceCorr)
+            {
+                solidInterfacePtr->correct(DUEqn);
+            }
 
-          solverPerf = DUEqn.solve();
+            solverPerf = DUEqn.solve();
 
-          if (iCorr == 0)
-          {
-              initialResidual = solverPerf.initialResidual();
-          }
+            if (iCorr == 0)
+            {
+                initialResidual = solverPerf.initialResidual();
+            }
 
-          DU.relax();
+            DU.relax();
 
-          gradDU = fvc::grad(DU);
+            gradDU = fvc::grad(DU);
 
-#         include "calculateDEpsilonDSigma.H"
-#         include "calculateRelativeResidual.H"
+#           include "calculateDEpsilonDSigma.H"
+#           include "calculateRelativeResidual.H"
 
-          Info << "\tTime " << runTime.value()
-               << ", Corrector " << iCorr
-               << ", Solving for " << DU.name()
-               << " using " << solverPerf.solverName()
-               << ", res = " << solverPerf.initialResidual()
-               << ", rel res = " << relativeResidual
-               << ", inner iters " << solverPerf.nIterations() << endl;
-      }
-      while
+            Info<< "\tTime " << runTime.value()
+                << ", Corrector " << iCorr
+                << ", Solving for " << DU.name()
+                << " using " << solverPerf.solverName()
+                << ", res = " << solverPerf.initialResidual()
+                << ", rel res = " << relativeResidual
+                << ", inner iters " << solverPerf.nIterations() << endl;
+        }
+        while
         (
             //solverPerf.initialResidual() > convergenceTolerance
             relativeResidual > convergenceTolerance
-            && ++iCorr < nCorr
-            );
+         && ++iCorr < nCorr
+        );
 
       Info << nl << "Time " << runTime.value() << ", Solving for " << DU.name()
            << ", Initial residual = " << initialResidual
            << ", Final residual = " << solverPerf.initialResidual()
            << ", No outer iterations " << iCorr << endl;
 
-#     include "moveMesh.H"
-#     include "rotateFields.H"
-#     include "writeFields.H"
+#       include "moveMesh.H"
+#       include "rotateFields.H"
+#       include "writeFields.H"
 
-      Info<< nl << "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
-          << "  ClockTime = " << runTime.elapsedClockTime() << " s"
-          << endl;
+        Info<< nl << "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
+            << "  ClockTime = " << runTime.elapsedClockTime() << " s"
+            << endl;
     }
 
-  Info<< "End\n" << endl;
+    Info<< "End\n" << endl;
 
-  return(0);
+    return(0);
 }
+
 
 // ************************************************************************* //

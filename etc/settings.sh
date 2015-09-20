@@ -2,9 +2,9 @@
 #----------------------------------*-sh-*--------------------------------------
 # =========                 |
 # \\      /  F ield         | foam-extend: Open Source CFD
-#  \\    /   O peration     |
-#   \\  /    A nd           | For copyright notice see file Copyright
-#    \\/     M anipulation  |
+#  \\    /   O peration     | Version:     3.2
+#   \\  /    A nd           | Web:         http://www.foam-extend.org
+#    \\/     M anipulation  | For copyright notice see file Copyright
 #------------------------------------------------------------------------------
 # License
 #     This file is part of foam-extend.
@@ -26,8 +26,8 @@
 #     etc/settings.sh
 #
 # Description
-#     Startup file for OpenFOAM
-#     Sourced from OpenFOAM-??/etc/bashrc
+#     Startup file for FOAM
+#     Sourced from FOAM-??/etc/bashrc
 #
 #------------------------------------------------------------------------------
 
@@ -89,7 +89,7 @@ export FOAM_LIB=$WM_PROJECT_DIR/lib
 export FOAM_LIBBIN=$WM_PROJECT_DIR/lib/$WM_OPTIONS
 export FOAM_SRC=$WM_PROJECT_DIR/src
 
-# shared site configuration - similar naming convention as ~OpenFOAM expansion
+# shared site configuration - similar naming convention as ~FOAM expansion
 export FOAM_SITE_APPBIN=$WM_PROJECT_INST_DIR/site/$WM_PROJECT_VERSION/bin/$WM_OPTIONS
 export FOAM_SITE_LIBBIN=$WM_PROJECT_INST_DIR/site/$WM_PROJECT_VERSION/lib/$WM_OPTIONS
 
@@ -103,12 +103,10 @@ export FOAM_UTILITIES=$FOAM_APP/utilities
 export FOAM_SOLVERS=$FOAM_APP/solvers
 export FOAM_RUN=$WM_PROJECT_USER_DIR/run
 
-# add OpenFOAM scripts and wmake to the path
+# add FOAM scripts and wmake to the path
 export PATH=$WM_DIR:$WM_PROJECT_DIR/bin:$PATH
 
 _foamAddPath $FOAM_APPBIN $FOAM_SITE_APPBIN $FOAM_USER_APPBIN
- # Make sure to pick up dummy versions of external libraries last
-_foamAddLib  $FOAM_LIBBIN/dummy
 _foamAddLib  $FOAM_LIBBIN $FOAM_SITE_LIBBIN $FOAM_USER_LIBBIN
 
 
@@ -118,43 +116,52 @@ unset compilerBin compilerLib
 
 # Select compiler installation
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# compilerInstall = OpenFOAM | System
+# compilerInstall = FOAM | System
 #
 # We can override the value of compilerInstall from prefs.sh
 : ${compilerInstall:=System}
 
 # Or we can force it right here
-#compilerInstall=OpenFOAM
+#compilerInstall=FOAM
 #compilerInstall=System
 
-case "${compilerInstall:-OpenFOAM}" in
-OpenFOAM)
+case "${compilerInstall}" in
+FOAM)
     case "$WM_COMPILER" in
     Gcc)
-        export WM_COMPILER_DIR=$WM_THIRD_PARTY_DIR/gcc-4.3.3/platforms/$WM_ARCH$WM_COMPILER_ARCH
-        _foamAddLib $WM_THIRD_PARTY_DIR/mpfr-2.4.1/platforms/$WM_ARCH$WM_COMPILER_ARCH/lib
-        _foamAddLib $WM_THIRD_PARTY_DIR/gmp-4.2.4/platforms/$WM_ARCH$WM_COMPILER_ARCH/lib
+        export WM_COMPILER_DIR=$WM_THIRD_PARTY_DIR/packages/gcc-4.6.4/platforms/$WM_OPTIONS
+        _foamSource $WM_THIRD_PARTY_DIR/packages/gmp-5.1.2/platforms/$WM_OPTIONS/etc/gmp-5.1.2.sh
+        _foamSource $WM_THIRD_PARTY_DIR/packages/mpfr-3.1.2/platforms/$WM_OPTIONS/etc/mpfr-3.1.2.sh
+        _foamSource $WM_THIRD_PARTY_DIR/packages/mpc-1.0.1/platforms/$WM_OPTIONS/etc/mpc-1.0.1.sh
+        _foamSource $WM_THIRD_PARTY_DIR/packages/gcc-4.6.4/platforms/$WM_OPTIONS/etc/gcc-4.6.4.sh
+        ;;
+    Gcc49)
+        export WM_COMPILER_DIR=$WM_THIRD_PARTY_DIR/packages/gcc-4.9.2/platforms/$WM_OPTIONS
+        _foamSource $WM_THIRD_PARTY_DIR/packages/gcc-4.9.2/platforms/$WM_OPTIONS/etc/gcc-4.9.2.sh
+        ;;
+    Gcc48)
+        export WM_COMPILER_DIR=$WM_THIRD_PARTY_DIR/packages/gcc-4.8.4/platforms/$WM_OPTIONS
+        _foamSource $WM_THIRD_PARTY_DIR/packages/gcc-4.8.4/platforms/$WM_OPTIONS/etc/gcc-4.8.4.sh
+        ;;
+    Gcc47)
+        export WM_COMPILER_DIR=$WM_THIRD_PARTY_DIR/packages/gcc-4.7.4/platforms/$WM_OPTIONS
+        _foamSource $WM_THIRD_PARTY_DIR/packages/gmp-5.1.2/platforms/$WM_OPTIONS/etc/gmp-5.1.2.sh
+        _foamSource $WM_THIRD_PARTY_DIR/packages/mpfr-3.1.2/platforms/$WM_OPTIONS/etc/mpfr-3.1.2.sh
+        _foamSource $WM_THIRD_PARTY_DIR/packages/mpc-1.0.1/platforms/$WM_OPTIONS/etc/mpc-1.0.1.sh
+        _foamSource $WM_THIRD_PARTY_DIR/packages/gcc-4.7.4/platforms/$WM_OPTIONS/etc/gcc-4.7.4.sh
         ;;
     Gcc45)
         export WM_COMPILER_DIR=$WM_THIRD_PARTY_DIR/packages/gcc-4.5.1/platforms/$WM_OPTIONS
-        _foamSource  $WM_THIRD_PARTY_DIR/packages/gmp-5.0.1/platforms/$WM_OPTIONS/etc/gmp-5.0.1.sh
-        _foamSource  $WM_THIRD_PARTY_DIR/packages/mpfr-3.0.1/platforms/$WM_OPTIONS/etc/mpfr-3.0.1.sh
-        _foamSource  $WM_THIRD_PARTY_DIR/packages/mpc-0.8.2/platforms/$WM_OPTIONS/etc/mpc-0.8.2.sh
-        _foamSource  $WM_THIRD_PARTY_DIR/packages/gcc-4.5.1/platforms/$WM_OPTIONS/etc/gcc-4.5.1.sh
-    ;;
+        _foamSource $WM_THIRD_PARTY_DIR/packages/gmp-5.0.1/platforms/$WM_OPTIONS/etc/gmp-5.0.1.sh
+        _foamSource $WM_THIRD_PARTY_DIR/packages/mpfr-3.0.1/platforms/$WM_OPTIONS/etc/mpfr-3.0.1.sh
+        _foamSource $WM_THIRD_PARTY_DIR/packages/mpc-0.8.2/platforms/$WM_OPTIONS/etc/mpc-0.8.2.sh
+        _foamSource $WM_THIRD_PARTY_DIR/packages/gcc-4.5.1/platforms/$WM_OPTIONS/etc/gcc-4.5.1.sh
+        ;;
     Gcc44)
         export WM_COMPILER_DIR=$WM_THIRD_PARTY_DIR/packages/gcc-4.4.5/platforms/$WM_OPTIONS
-        _foamSource  $WM_THIRD_PARTY_DIR/packages/mpfr-3.0.1/platforms/$WM_OPTIONS/etc/mpfr-3.0.1.sh
-        _foamSource  $WM_THIRD_PARTY_DIR/packages/gmp-5.0.1/platforms/$WM_OPTIONS/etc/gmp-5.0.1.sh
-        _foamSource  $WM_THIRD_PARTY_DIR/packages/gcc-4.4.5/platforms/$WM_OPTIONS/etc/gcc-4.4.5.sh
-        ;;
-    Gcc43)
-        export WM_COMPILER_DIR=$WM_THIRD_PARTY_DIR/gcc-4.3.3/platforms/$WM_ARCH$WM_COMPILER_ARCH
-        _foamAddLib $WM_THIRD_PARTY_DIR/mpfr-2.4.1/platforms/$WM_ARCH$WM_COMPILER_ARCH/lib
-        _foamAddLib $WM_THIRD_PARTY_DIR/gmp-4.2.4/platforms/$WM_ARCH$WM_COMPILER_ARCH/lib
-        ;;
-    Gcc42)
-        export WM_COMPILER_DIR=$WM_THIRD_PARTY_DIR/gcc-4.2.4/platforms/$WM_ARCH$WM_COMPILER_ARCH
+        _foamSource $WM_THIRD_PARTY_DIR/packages/gmp-5.0.1/platforms/$WM_OPTIONS/etc/gmp-5.0.1.sh
+        _foamSource $WM_THIRD_PARTY_DIR/packages/mpfr-3.0.1/platforms/$WM_OPTIONS/etc/mpfr-3.0.1.sh
+        _foamSource $WM_THIRD_PARTY_DIR/packages/gcc-4.4.5/platforms/$WM_OPTIONS/etc/gcc-4.4.5.sh
         ;;
     esac
 
@@ -186,14 +193,14 @@ unset compilerBin compilerLib compilerInstall
 if [ -z "$WM_CC" ]
 then
     case "$WM_COMPILER" in
-	Gcc*)
-	    export WM_CC='gcc'
-	    export WM_CXX='g++'
-	    ;;
-	Icc)
-	    export WM_CC='icc'
-	    export WM_CXX='icpc'
-	    ;;
+    Gcc*)
+        export WM_CC='gcc'
+        export WM_CXX='g++'
+        ;;
+    Icc)
+        export WM_CC='icc'
+        export WM_CXX='icpc'
+        ;;
     esac
 fi
 
@@ -204,7 +211,16 @@ unset MPI_ARCH_PATH
 mpi_version=unknown
 case "$WM_MPLIB" in
 OPENMPI)
-    if [ -e $WM_THIRD_PARTY_DIR/packages/openmpi-1.6.5/platforms/$WM_OPTIONS ]
+    if [ ! -z $WM_THIRD_PARTY_USE_OPENMPI_188 ] && [ -e $WM_THIRD_PARTY_DIR/packages/openmpi-1.8.8/platforms/$WM_OPTIONS ]
+        then
+        mpi_version=openmpi-1.8.8
+        if [ "$FOAM_VERBOSE" -a "$PS1" ]
+        then
+            echo "Using openmpi-1.8.8 from the ThirdParty package: $WM_THIRD_PARTY_DIR/packages/$mpi_version"
+        fi
+        _foamSource  $WM_THIRD_PARTY_DIR/packages/$mpi_version/platforms/$WM_OPTIONS/etc/$mpi_version.sh
+
+    elif [ ! -z $WM_THIRD_PARTY_USE_OPENMPI_165 ] && [ -e $WM_THIRD_PARTY_DIR/packages/openmpi-1.6.5/platforms/$WM_OPTIONS ]
         then
         mpi_version=openmpi-1.6.5
         if [ "$FOAM_VERBOSE" -a "$PS1" ]
@@ -213,7 +229,7 @@ OPENMPI)
         fi
         _foamSource  $WM_THIRD_PARTY_DIR/packages/$mpi_version/platforms/$WM_OPTIONS/etc/$mpi_version.sh
 
-    elif [ -e $WM_THIRD_PARTY_DIR/packages/openmpi-1.4.3/platforms/$WM_OPTIONS ]
+    elif [ ! -z $WM_THIRD_PARTY_USE_OPENMPI_143 ] && [ -e $WM_THIRD_PARTY_DIR/packages/openmpi-1.4.3/platforms/$WM_OPTIONS ]
         then
         mpi_version=openmpi-1.4.3
         if [ "$FOAM_VERBOSE" -a "$PS1" ]
@@ -222,7 +238,7 @@ OPENMPI)
         fi
         _foamSource  $WM_THIRD_PARTY_DIR/packages/$mpi_version/platforms/$WM_OPTIONS/etc/$mpi_version.sh
 
-    elif [ -e $WM_THIRD_PARTY_DIR/packages/openmpi-1.5/platforms/$WM_OPTIONS ]
+    elif [ ! -z $WM_THIRD_PARTY_USE_OPENMPI_15 ] && [ -e $WM_THIRD_PARTY_DIR/packages/openmpi-1.5/platforms/$WM_OPTIONS ]
         then
         mpi_version=openmpi-1.5
         if [ "$FOAM_VERBOSE" -a "$PS1" ]
@@ -232,35 +248,38 @@ OPENMPI)
         _foamSource  $WM_THIRD_PARTY_DIR/packages/$mpi_version/platforms/$WM_OPTIONS/etc/$mpi_version.sh
     fi
 
-    export FOAM_MPI_LIBBIN=$FOAM_LIBBIN/$mpi_version
+    # On Windows set mpi_version from value defined in bashrc.mingw:
+    if [ "$WM_ARCH_BASE" == "mingw" ]
+    then
+        mpi_version=$MPI_VERSION_MINGW
+    fi
+
     unset mpi_version
     ;;
 
 MACPORTOPENMPI)
-	unset OPAL_PREFIX
+    unset OPAL_PREFIX
 
-	export FOAM_MPI=openmpi-macport-$WM_MACPORT_MPI_VERSION
+    export FOAM_MPI=openmpi-macport-$WM_MACPORT_MPI_VERSION
 
-	# Currently not correctly working on MacPorts
-	#	libDir=`mpicc-openmpi-$WM_MACPORT_MPI_VERSION --showme:libdirs`
-	libDir=/opt/local/lib/openmpi-$WM_MACPORT_MPI_VERSION
+    # Currently not correctly working on MacPorts
+    #    libDir=`mpicc-openmpi-$WM_MACPORT_MPI_VERSION --showme:libdirs`
+    libDir=/opt/local/lib/openmpi-$WM_MACPORT_MPI_VERSION
 
-	export FOAM_MPI_LIBBIN=$FOAM_LIBBIN/$FOAM_MPI
-	_foamAddLib     $libDir
-	unset libDir
+    _foamAddLib     $libDir
+    unset libDir
 
-	which mpirun >/dev/null
-	if [ $? -ne 0 ]
-	then
-	    export WM_MPIRUN_PROG=mpirun-openmpi-$WM_MACPORT_MPI_VERSION
-	fi
- 	;;
+    which mpirun >/dev/null
+    if [ $? -ne 0 ]
+    then
+        export WM_MPIRUN_PROG=mpirun-openmpi-$WM_MACPORT_MPI_VERSION
+    fi
+    ;;
 
 MACPORTMPICH)
     export FOAM_MPI=mpich-macports-$WM_MACPORT_MPI_VERSION
     export MPI_HOME=$WM_THIRD_PARTY_DIR/$FOAM_MPI
 
-    export FOAM_MPI_LIBBIN=$FOAM_LIBBIN/$FOAM_MPI
     libDir=/opt/local/lib/mpich-$WM_MACPORT_MPI_VERSION
 
     _foamAddLib     $libDir
@@ -269,7 +288,7 @@ MACPORTMPICH)
     which mpirun >/dev/null
     if [ $? -ne 0 ]
     then
-	export WM_MPIRUN_PROG=mpirun-mpich-$WM_MACPORT_MPI_VERSION
+        export WM_MPIRUN_PROG=mpirun-mpich-$WM_MACPORT_MPI_VERSION
     fi
     ;;
 
@@ -351,7 +370,6 @@ SYSTEMOPENMPI)
         echo "    PLIBS                 : $PLIBS"
     fi
 
-    export FOAM_MPI_LIBBIN=$FOAM_LIBBIN/$mpi_version
     unset mpi_version
     ;;
 
@@ -387,7 +405,6 @@ MVAPICH2)
         echo "    PLIBS                 : $PLIBS"
     fi
 
-    export FOAM_MPI_LIBBIN=$FOAM_LIBBIN/$mpi_version
     unset mpi_version
     ;;
 
@@ -400,7 +417,6 @@ MPICH)
     _foamAddPath $MPI_ARCH_PATH/bin
     _foamAddLib  $MPI_ARCH_PATH/lib
 
-    export FOAM_MPI_LIBBIN=$FOAM_LIBBIN/$mpi_version
     unset mpi_version
     ;;
 
@@ -414,7 +430,6 @@ MPICH-GM)
     _foamAddLib  $MPI_ARCH_PATH/lib
     _foamAddLib  $GM_LIB_PATH
 
-    export FOAM_MPI_LIBBIN=$FOAM_LIBBIN/mpich-gm
     ;;
 
 HPMPI)
@@ -440,22 +455,18 @@ HPMPI)
         ;;
     esac
 
-    export FOAM_MPI_LIBBIN=$FOAM_LIBBIN/hpmpi
     ;;
 
 GAMMA)
     export MPI_ARCH_PATH=/usr
-    export FOAM_MPI_LIBBIN=$FOAM_LIBBIN/gamma
     ;;
 
 MPI)
     export MPI_ARCH_PATH=/opt/mpi
-    export FOAM_MPI_LIBBIN=$FOAM_LIBBIN/mpi
     ;;
 
 FJMPI)
     export MPI_ARCH_PATH=/opt/FJSVmpi2
-    export FOAM_MPI_LIBBIN=$FOAM_LIBBIN/mpi
 
     _foamAddPath $MPI_ARCH_PATH/bin
     _foamAddLib  $MPI_ARCH_PATH/lib/sparcv9
@@ -465,19 +476,74 @@ FJMPI)
 
 QSMPI)
     export MPI_ARCH_PATH=/usr/lib/mpi
-    export FOAM_MPI_LIBBIN=$FOAM_LIBBIN/qsmpi
 
     _foamAddPath $MPI_ARCH_PATH/bin
     _foamAddLib $MPI_ARCH_PATH/lib
+    ;;
 
+SGIMPI)
+    # no trailing slash
+    [ "${MPI_ROOT%/}" = "${MPI_ROOT}" ] || MPI_ROOT="${MPI_ROOT%/}"
+
+    export FOAM_MPI="${MPI_ROOT##*/}"
+    export MPI_ARCH_PATH=$MPI_ROOT
+
+    if [ ! -d "$MPI_ROOT" -o -z "$MPI_ARCH_PATH" ]
+    then
+        echo "Warning in $WM_PROJECT_DIR/etc/config/settings.sh:" 1>&2
+        echo "    MPI_ROOT not a valid mpt installation directory or ending" \
+             " in a '/'." 1>&2
+        echo "    Please set MPI_ROOT to the mpt installation directory." 1>&2
+        echo "    MPI_ROOT currently set to '$MPI_ROOT'" 1>&2
+    fi
+
+    if [ "$FOAM_VERBOSE" -a "$PS1" ]
+    then
+        echo "Using SGI MPT:" 1>&2
+        echo "    MPI_ROOT : $MPI_ROOT" 1>&2
+        echo "    FOAM_MPI : $FOAM_MPI" 1>&2
+    fi
+
+    _foamAddPath    $MPI_ARCH_PATH/bin
+    _foamAddLib     $MPI_ARCH_PATH/lib
+
+    export FOAM_MPI_LIBBIN=$FOAM_LIBBIN/sgimpi
+    ;;
+
+INTELMPI)
+    # no trailing slash
+    [ "${MPI_ROOT%/}" = "${MPI_ROOT}" ] || MPI_ROOT="${MPI_ROOT%/}"
+
+    export FOAM_MPI="${MPI_ROOT##*/}"
+    export MPI_ARCH_PATH=$MPI_ROOT
+
+    if [ ! -d "$MPI_ROOT" -o -z "$MPI_ARCH_PATH" ]
+    then
+        echo "Warning in $WM_PROJECT_DIR/etc/config/settings.sh:" 1>&2
+        echo "    MPI_ROOT not a valid mpt installation directory or ending" \
+             " in a '/'." 1>&2
+        echo "    Please set MPI_ROOT to the mpt installation directory." 1>&2
+        echo "    MPI_ROOT currently set to '$MPI_ROOT'" 1>&2
+    fi
+
+    if [ "$FOAM_VERBOSE" -a "$PS1" ]
+    then
+        echo "Using INTEL MPI:" 1>&2
+        echo "    MPI_ROOT : $MPI_ROOT" 1>&2
+        echo "    FOAM_MPI : $FOAM_MPI" 1>&2
+    fi
+
+    _foamAddPath    $MPI_ARCH_PATH/intel64/bin
+    _foamAddLib     $MPI_ARCH_PATH/intel64/lib
+
+    export FOAM_MPI_LIBBIN=$FOAM_LIBBIN/intelmpi
     ;;
 
 *)
-    export FOAM_MPI_LIBBIN=$FOAM_LIBBIN/dummy
     ;;
 esac
 
-_foamAddLib $FOAM_MPI_LIBBIN
+# Removed $FOAM_MPI_LIBBIN.  HJ, 8/Aug/2015
 
 
 # Set the minimum MPI buffer size (used by all platforms except SGI MPI)
@@ -531,11 +597,11 @@ export MPI_BUFFER_SIZE
 #
 # In order to use a pre-installed version of the ThirdParty packages, just set the
 # appropriate XXX_SYSTEM environment variable for a given package in your prefs.sh
-# file in order to disable the sourcing of the ThirdParty version of the same package.
+# file in order to disable the activation of the ThirdParty version of the same package.
 
 # Load Mesquite library
 # ~~~~~~~~~~~~~~~~~~~~~~
-[ -z "$MESQUITE_SYSTEM" ] && [ -e $WM_THIRD_PARTY_DIR/packages/mesquite-2.1.2/platforms/$WM_OPTIONS ] && {
+[ -z "$MESQUITE_SYSTEM" ] && [ ! -z $WM_THIRD_PARTY_USE_MESQUITE_212 ] && [ -e $WM_THIRD_PARTY_DIR/packages/mesquite-2.1.2/platforms/$WM_OPTIONS ] && {
     _foamSource $WM_THIRD_PARTY_DIR/packages/mesquite-2.1.2/platforms/$WM_OPTIONS/etc/mesquite-2.1.2.sh
 }
 [ "$FOAM_VERBOSE" -a "$PS1" ] && echo "    MESQUITE_DIR is initialized to: $MESQUITE_DIR"
@@ -543,7 +609,7 @@ export MPI_BUFFER_SIZE
 
 # Load Metis library
 # ~~~~~~~~~~~~~~~~~~
-[ -z "$METIS_SYSTEM" ] && [ -e $WM_THIRD_PARTY_DIR/packages/metis-5.1.0/platforms/$WM_OPTIONS ] && {
+[ -z "$METIS_SYSTEM" ] && [ ! -z $WM_THIRD_PARTY_USE_METIS_510 ] && [ -e $WM_THIRD_PARTY_DIR/packages/metis-5.1.0/platforms/$WM_OPTIONS ] && {
     _foamSource $WM_THIRD_PARTY_DIR/packages/metis-5.1.0/platforms/$WM_OPTIONS/etc/metis-5.1.0.sh
 }
 [ "$FOAM_VERBOSE" -a "$PS1" ] && echo "    METIS_DIR is initialized to: $METIS_DIR"
@@ -551,7 +617,7 @@ export MPI_BUFFER_SIZE
 
 # Load ParMetis library
 # ~~~~~~~~~~~~~~~~~~~~~
-[ -z "$PARMETIS_SYSTEM" ] && [ -e $WM_THIRD_PARTY_DIR/packages/parmetis-4.0.3/platforms/$WM_OPTIONS ] && {
+[ -z "$PARMETIS_SYSTEM" ] && [ ! -z $WM_THIRD_PARTY_USE_PARMETIS_403 ] && [ -e $WM_THIRD_PARTY_DIR/packages/parmetis-4.0.3/platforms/$WM_OPTIONS ] && {
     _foamSource $WM_THIRD_PARTY_DIR/packages/parmetis-4.0.3/platforms/$WM_OPTIONS/etc/parmetis-4.0.3.sh
 }
 [ "$FOAM_VERBOSE" -a "$PS1" ] && echo "    PARMETIS_DIR is initialized to: $PARMETIS_DIR"
@@ -559,7 +625,7 @@ export MPI_BUFFER_SIZE
 
 # Load ParMGridGen library
 # ~~~~~~~~~~~~~~~~~~~~~~~~~
-[ -z "$PARMGRIDGEN_SYSTEM" ] && [ -e $WM_THIRD_PARTY_DIR/packages/ParMGridGen-1.0/platforms/$WM_OPTIONS ] && {
+[ -z "$PARMGRIDGEN_SYSTEM" ] && [ ! -z $WM_THIRD_PARTY_USE_PARMGRIDGEN_10 ] && [ -e $WM_THIRD_PARTY_DIR/packages/ParMGridGen-1.0/platforms/$WM_OPTIONS ] && {
     _foamSource $WM_THIRD_PARTY_DIR/packages/ParMGridGen-1.0/platforms/$WM_OPTIONS/etc/ParMGridGen-1.0.sh
 }
 [ "$FOAM_VERBOSE" -a "$PS1" ] && echo "    PARMGRIDGEN_DIR is initialized to: $PARMGRIDGEN_DIR"
@@ -567,7 +633,7 @@ export MPI_BUFFER_SIZE
 
 # Load Libccmio library
 # ~~~~~~~~~~~~~~~~~~~~~
-[ -z "$LIBCCMIO_SYSTEM" ] && [ -e $WM_THIRD_PARTY_DIR/packages/libccmio-2.6.1/platforms/$WM_OPTIONS ] && {
+[ -z "$LIBCCMIO_SYSTEM" ] && [ ! -z $WM_THIRD_PARTY_USE_LIBCCMIO_261 ] && [ -e $WM_THIRD_PARTY_DIR/packages/libccmio-2.6.1/platforms/$WM_OPTIONS ] && {
     _foamSource $WM_THIRD_PARTY_DIR/packages/libccmio-2.6.1/platforms/$WM_OPTIONS/etc/libccmio-2.6.1.sh
 }
 [ "$FOAM_VERBOSE" -a "$PS1" ] && echo "    LIBCCMIO_DIR is initialized to: $LIBCCMIO_DIR"
@@ -575,7 +641,12 @@ export MPI_BUFFER_SIZE
 
 # Load Scotch library
 # ~~~~~~~~~~~~~~~~~~~
-[ -z "$SCOTCH_SYSTEM" ] && [ -e $WM_THIRD_PARTY_DIR/packages/scotch-6.0.0/platforms/$WM_OPTIONS ] && {
+[ -z "$SCOTCH_SYSTEM" ] && [ ! -z $WM_THIRD_PARTY_USE_SCOTCH_604 ] && [ -e $WM_THIRD_PARTY_DIR/packages/scotch-6.0.4/platforms/$WM_OPTIONS ] && {
+    _foamSource $WM_THIRD_PARTY_DIR/packages/scotch-6.0.4/platforms/$WM_OPTIONS/etc/scotch-6.0.4.sh
+}
+[ "$FOAM_VERBOSE" -a "$PS1" ] && echo "    SCOTCH_DIR is initialized to: $SCOTCH_DIR"
+
+[ -z "$SCOTCH_SYSTEM" ] && [ ! -z $WM_THIRD_PARTY_USE_SCOTCH_600 ] && [ -e $WM_THIRD_PARTY_DIR/packages/scotch-6.0.0/platforms/$WM_OPTIONS ] && {
     _foamSource $WM_THIRD_PARTY_DIR/packages/scotch-6.0.0/platforms/$WM_OPTIONS/etc/scotch-6.0.0.sh
 }
 [ "$FOAM_VERBOSE" -a "$PS1" ] && echo "    SCOTCH_DIR is initialized to: $SCOTCH_DIR"
@@ -583,28 +654,31 @@ export MPI_BUFFER_SIZE
 
 # Load cmake
 # ~~~~~~~~~~
-[ -z "$CMAKE_SYSTEM" ] && [ -e $WM_THIRD_PARTY_DIR/packages/cmake-2.8.12/platforms/$WM_OPTIONS ] && {
+[ -z "$CMAKE_SYSTEM" ] && [ ! -z $WM_THIRD_PARTY_USE_CMAKE_322 ] && [ -e $WM_THIRD_PARTY_DIR/packages/cmake-3.2.2/platforms/$WM_OPTIONS ] && {
+    _foamSource $WM_THIRD_PARTY_DIR/packages/cmake-3.2.2/platforms/$WM_OPTIONS/etc/cmake-3.2.2.sh
+}
+[ -z "$CMAKE_SYSTEM" ] && [ ! -z $WM_THIRD_PARTY_USE_CMAKE_2812 ] && [ -e $WM_THIRD_PARTY_DIR/packages/cmake-2.8.12/platforms/$WM_OPTIONS ] && {
     _foamSource $WM_THIRD_PARTY_DIR/packages/cmake-2.8.12/platforms/$WM_OPTIONS/etc/cmake-2.8.12.sh
 }
 [ "$FOAM_VERBOSE" -a "$PS1" ] && echo "    CMAKE_DIR is initialized to: $CMAKE_DIR"
 
 # Load m4
 # ~~~~~~~~~~
-[ -z "$M4_SYSTEM" ] && [ -e $WM_THIRD_PARTY_DIR/packages/m4-1.4.16/platforms/$WM_OPTIONS ] && {
+[ -z "$M4_SYSTEM" ] && [ ! -z $WM_THIRD_PARTY_USE_M4_1416 ] && [ -e $WM_THIRD_PARTY_DIR/packages/m4-1.4.16/platforms/$WM_OPTIONS ] && {
     _foamSource $WM_THIRD_PARTY_DIR/packages/m4-1.4.16/platforms/$WM_OPTIONS/etc/m4-1.4.16.sh
 }
 [ "$FOAM_VERBOSE" -a "$PS1" ] && echo "    M4_DIR is initialized to: $M4_DIR"
 
 # Load bison
 # ~~~~~~~~~~
-[ -z "$BISON_SYSTEM" ] && [ -e $WM_THIRD_PARTY_DIR/packages/bison-2.7/platforms/$WM_OPTIONS ] && {
+[ -z "$BISON_SYSTEM" ] && [ ! -z $WM_THIRD_PARTY_USE_BISON_27 ] && [ -e $WM_THIRD_PARTY_DIR/packages/bison-2.7/platforms/$WM_OPTIONS ] && {
     _foamSource $WM_THIRD_PARTY_DIR/packages/bison-2.7/platforms/$WM_OPTIONS/etc/bison-2.7.sh
 }
 [ "$FOAM_VERBOSE" -a "$PS1" ] && echo "    BISON_DIR is initialized to: $BISON_DIR"
 
 # Load flex
 # ~~~~~~~~~~
-[ -z "$FLEX_SYSTEM" ] && [ -e $WM_THIRD_PARTY_DIR/packages/flex-2.5.35/platforms/$WM_OPTIONS ] && {
+[ -z "$FLEX_SYSTEM" ] && [ ! -z $WM_THIRD_PARTY_USE_FLEX_2535 ] && [ -e $WM_THIRD_PARTY_DIR/packages/flex-2.5.35/platforms/$WM_OPTIONS ] && {
     _foamSource $WM_THIRD_PARTY_DIR/packages/flex-2.5.35/platforms/$WM_OPTIONS/etc/flex-2.5.35.sh
 }
 [ "$FOAM_VERBOSE" -a "$PS1" ] && echo "    FLEX_DIR is initialized to: $FLEX_DIR"
@@ -612,51 +686,89 @@ export MPI_BUFFER_SIZE
 
 # Load zoltan
 # ~~~~~~~~~~
-[ -z "$ZOLTAN_SYSTEM" ] && [ -e $WM_THIRD_PARTY_DIR/packages/zoltan_3.5 ] && {
-    _foamSource $WM_THIRD_PARTY_DIR/packages/zoltan_3.5/platforms/$WM_OPTIONS/etc/zoltan_3.5.sh
+[ -z "$ZOLTAN_SYSTEM" ] && [ ! -z $WM_THIRD_PARTY_USE_ZOLTAN_36 ] && [ -e $WM_THIRD_PARTY_DIR/packages/zoltan_3.6 ] && {
+    _foamSource $WM_THIRD_PARTY_DIR/packages/zoltan_3.6/platforms/$WM_OPTIONS/etc/zoltan_3.6.sh
 }
 [ "$FOAM_VERBOSE" -a "$PS1" ] && echo "    ZOLTAN_DIR is initialized to: $ZOLTAN_DIR"
 
 
 # Load Python
 # ~~~~~~~~~~~
-[ -z "$PYTHON_SYSTEM" ] && [ -e $WM_THIRD_PARTY_DIR/packages/Python-2.7/platforms/$WM_OPTIONS ] && {
+[ -z "$PYTHON_SYSTEM" ] && [ ! -z $WM_THIRD_PARTY_USE_PYTHON_27 ] && [ -e $WM_THIRD_PARTY_DIR/packages/Python-2.7/platforms/$WM_OPTIONS ] && {
     _foamSource $WM_THIRD_PARTY_DIR/packages/Python-2.7/platforms/$WM_OPTIONS/etc/Python-2.7.sh
 }
 [ "$FOAM_VERBOSE" -a "$PS1" ] && echo "    PYTHON_DIR is initialized to: $PYTHON_DIR"
 
 # Load PyFoam
 # ~~~~~~~~~~~
-[ -z "$PYFOAM_SYSTEM" ] && [ -e $WM_THIRD_PARTY_DIR/packages/PyFoam-0.6.3/platforms/noarch ] && {
+[ -z "$PYFOAM_SYSTEM" ] && [ ! -z $WM_THIRD_PARTY_USE_PYFOAM_063 ] && [ -e $WM_THIRD_PARTY_DIR/packages/PyFoam-0.6.3/platforms/noarch ] && {
     _foamSource $WM_THIRD_PARTY_DIR/packages/PyFoam-0.6.3/platforms/noarch/etc/PyFoam-0.6.3.sh
+}
+[ -z "$PYFOAM_SYSTEM" ] && [ ! -z $WM_THIRD_PARTY_USE_PYFOAM_064 ] && [ -e $WM_THIRD_PARTY_DIR/packages/PyFoam-0.6.4/platforms/noarch ] && {
+    _foamSource $WM_THIRD_PARTY_DIR/packages/PyFoam-0.6.4/platforms/noarch/etc/PyFoam-0.6.4.sh
 }
 [ "$FOAM_VERBOSE" -a "$PS1" ] && echo "    PYFOAM_DIR is initialized to: $PYFOAM_DIR"
 
+# Make sure that there is a special directory for special PyFoam-scripts
+[ -z "$PYFOAM_SITE_DIR" ] && export PYFOAM_SITE_DIR=$WM_THIRD_PARTY_DIR/PyFoamSiteScripts
+if [ -d $PYFOAM_SITE_DIR/bin ]
+then
+    _foamAddPath $PYFOAM_SITE_DIR/bin
+fi
+
+[ "$FOAM_VERBOSE" -a "$PS1" ] && echo "    PYFOAM_SITE_DIR is initialized to: $PYFOAM_SITE_DIR"
+
 # Load hwloc
 # ~~~~~~~~~~~
-[ -z "$HWLOC_SYSTEM" ] && [ -e $WM_THIRD_PARTY_DIR/packages/hwloc-1.7.2/platforms/$WM_OPTIONS ] && {
+[ -z "$HWLOC_SYSTEM" ] && [ ! -z $WM_THIRD_PARTY_USE_HWLOC_1101 ] && [ -e $WM_THIRD_PARTY_DIR/packages/hwloc-1.10.1/platforms/$WM_OPTIONS ] && {
+    _foamSource $WM_THIRD_PARTY_DIR/packages/hwloc-1.10.1/platforms/$WM_OPTIONS/etc/hwloc-1.10.1.sh
+}
+[ -z "$HWLOC_SYSTEM" ] && [ ! -z $WM_THIRD_PARTY_USE_HWLOC_172 ] && [ -e $WM_THIRD_PARTY_DIR/packages/hwloc-1.7.2/platforms/$WM_OPTIONS ] && {
     _foamSource $WM_THIRD_PARTY_DIR/packages/hwloc-1.7.2/platforms/$WM_OPTIONS/etc/hwloc-1.7.2.sh
 }
 [ "$FOAM_VERBOSE" -a "$PS1" ] && echo "    HWLOC_DIR is initialized to: $HWLOC_DIR"
 
 # Load QT
 # ~~~~~~~
-[ ! -z "$QT_THIRD_PARTY" ] && [ -e $WM_THIRD_PARTY_DIR/packages/qt-everywhere-opensource-src-4.8.5/platforms/$WM_OPTIONS ] && {
-    _foamSource $WM_THIRD_PARTY_DIR/packages/qt-everywhere-opensource-src-4.8.5/platforms/$WM_OPTIONS/etc/qt-everywhere-opensource-src-4.8.5.sh
+[ ! -z "$QT_THIRD_PARTY" ] && [ ! -z $WM_THIRD_PARTY_USE_QT_486 ] && [ -e $WM_THIRD_PARTY_DIR/packages/qt-everywhere-opensource-src-4.8.6/platforms/$WM_OPTIONS ] && {
+    _foamSource $WM_THIRD_PARTY_DIR/packages/qt-everywhere-opensource-src-4.8.6/platforms/$WM_OPTIONS/etc/qt-everywhere-opensource-src-4.8.6.sh
 }
 [ "$FOAM_VERBOSE" -a "$PS1" ] && echo "    QT_DIR is initialized to: $QT_DIR"
 
 
 # Load ParaView
 # ~~~~~~~~~~~~~
-[ -z "$PARAVIEW_SYSTEM" ] && [ -e $WM_THIRD_PARTY_DIR/packages/ParaView-4.0.1/platforms/$WM_OPTIONS ] && {
+[ -z "$PARAVIEW_SYSTEM" ] && [ ! -z $WM_THIRD_PARTY_USE_PARAVIEW_431 ] && [ -e $WM_THIRD_PARTY_DIR/packages/ParaView-4.3.1/platforms/$WM_OPTIONS ] && {
+    _foamSource $WM_THIRD_PARTY_DIR/packages/ParaView-4.3.1/platforms/$WM_OPTIONS/etc/ParaView-4.3.1.sh
+}
+[ -z "$PARAVIEW_SYSTEM" ] && [ ! -z $WM_THIRD_PARTY_USE_PARAVIEW_410 ] && [ -e $WM_THIRD_PARTY_DIR/packages/ParaView-4.1.0/platforms/$WM_OPTIONS ] && {
+    _foamSource $WM_THIRD_PARTY_DIR/packages/ParaView-4.1.0/platforms/$WM_OPTIONS/etc/ParaView-4.1.0.sh
+}
+[ -z "$PARAVIEW_SYSTEM" ] && [ ! -z $WM_THIRD_PARTY_USE_PARAVIEW_401 ] && [ -e $WM_THIRD_PARTY_DIR/packages/ParaView-4.0.1/platforms/$WM_OPTIONS ] && {
     _foamSource $WM_THIRD_PARTY_DIR/packages/ParaView-4.0.1/platforms/$WM_OPTIONS/etc/ParaView-4.0.1.sh
-#[ -z "$PARAVIEW_SYSTEM" ] && [ -e $WM_THIRD_PARTY_DIR/packages/ParaView-3.14.1/platforms/$WM_OPTIONS ] && {
-#    _foamSource $WM_THIRD_PARTY_DIR/packages/ParaView-3.14.1/platforms/$WM_OPTIONS/etc/ParaView-3.14.1.sh
-#[ -z "$PARAVIEW_SYSTEM" ] && [ -e $WM_THIRD_PARTY_DIR/packages/ParaView-3.8.1/platforms/$WM_OPTIONS ] && {
-#    _foamSource $WM_THIRD_PARTY_DIR/packages/ParaView-3.8.1/platforms/$WM_OPTIONS/etc/ParaView-3.8.1.sh
+}
+[ -z "$PARAVIEW_SYSTEM" ] && [ ! -z $WM_THIRD_PARTY_USE_PARAVIEW_3141 ] && [ -e $WM_THIRD_PARTY_DIR/packages/ParaView-3.14.1/platforms/$WM_OPTIONS ] && {
+    _foamSource $WM_THIRD_PARTY_DIR/packages/ParaView-3.14.1/platforms/$WM_OPTIONS/etc/ParaView-3.14.1.sh
+}
+[ -z "$PARAVIEW_SYSTEM" ] && [ ! -z $WM_THIRD_PARTY_USE_PARAVIEW_381 ] && [ -e $WM_THIRD_PARTY_DIR/packages/ParaView-3.8.1/platforms/$WM_OPTIONS ] && {
+    _foamSource $WM_THIRD_PARTY_DIR/packages/ParaView-3.8.1/platforms/$WM_OPTIONS/etc/ParaView-3.8.1.sh
 }
 [ "$FOAM_VERBOSE" -a "$PS1" ] && echo "    PARAVIEW_DIR is initialized to: $PARAVIEW_DIR"
+
+
+# Load llvm
+# ~~~~~~~~~~~~~~~~~~~~~~
+[ -z "$LLVM_SYSTEM" ] && [ ! -z $WM_THIRD_PARTY_USE_LLVM_360 ] && [ -e $WM_THIRD_PARTY_DIR/packages/llvm-3.6.0/platforms/$WM_OPTIONS ] && {
+    _foamSource $WM_THIRD_PARTY_DIR/packages/llvm-3.6.0/platforms/$WM_OPTIONS/etc/llvm-3.6.0.sh
+}
+[ "$FOAM_VERBOSE" -a "$PS1" ] && echo "    LLVM_DIR is initialized to: $LLVM_DIR"
+
+# Load mesa
+# ~~~~~~~~~~~~~~~~~~~~~~
+[ -z "$MESA_SYSTEM" ] && [ ! -z $WM_THIRD_PARTY_USE_MESA_GIT ] && [ -e $WM_THIRD_PARTY_DIR/packages/mesa-git/platforms/$WM_OPTIONS ] && {
+    _foamSource $WM_THIRD_PARTY_DIR/packages/mesa-git/platforms/$WM_OPTIONS/etc/mesa-git.sh
+}
+[ "$FOAM_VERBOSE" -a "$PS1" ] && echo "    MESA_DIR is initialized to: $MESA_DIR"
 
 
 # cleanup environment:

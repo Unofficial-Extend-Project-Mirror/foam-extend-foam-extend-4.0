@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -25,7 +25,7 @@ License
 
 #include "autoHexMeshDriver.H"
 #include "fvMesh.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "boundBox.H"
 #include "wallPolyPatch.H"
 #include "cellSet.H"
@@ -158,9 +158,9 @@ Foam::autoHexMeshDriver::autoHexMeshDriver
     {
         meshRefinement::debug = debug_;
         autoHexMeshDriver::debug = debug_;
-        autoRefineDriver::debug = debug;
-        autoSnapDriver::debug = debug;
-        autoLayerDriver::debug = debug;
+        autoRefineDriver::debug = debug_;
+        autoSnapDriver::debug = debug_;
+        autoLayerDriver::debug = debug_;
     }
 
     refinementParameters refineParams(dict, 1);

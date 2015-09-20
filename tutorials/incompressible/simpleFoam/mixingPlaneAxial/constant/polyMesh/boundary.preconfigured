@@ -1,0 +1,138 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | foam-extend: Open Source CFD                    |
+|  \\    /   O peration     | Version:     3.2                                |
+|   \\  /    A nd           | Web:         http://www.foam-extend.org         |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       polyBoundaryMesh;
+    location    "constant/polyMesh";
+    object      boundary;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+10
+(
+    outflow
+    {
+        type patch;
+        nFaces 27;
+        startFace 2106;
+    }
+    inflow
+    {
+        type patch;
+        nFaces 17;
+        startFace 2133;
+    }
+    upstreamPerio1
+    {
+        type cyclicGgi;
+        nFaces 25;
+        startFace 2150;
+        shadowPatch upstreamPerio2;
+        zone upstreamPerio1Zone;
+        bridgeOverlap no;
+        rotationAxis (0 0 1);
+        rotationAngle 36;
+        separationOffset (0 0 0);
+    }
+    upstreamPerio2
+    {
+        type cyclicGgi;
+        nFaces 25;
+        startFace 2175;
+        shadowPatch upstreamPerio1;
+        zone upstreamPerio2Zone;
+        bridgeOverlap no;
+        rotationAxis (0 0 1);
+        rotationAngle -36;
+        separationOffset (0 0 0);
+    }
+    upstreamMixingPlanePatch
+    {
+        type mixingPlane;
+        nFaces 27;
+        startFace 2200;
+        shadowPatch downstreamMixingPlanePatch;
+        zone upstreamMixingPlaneZone;
+        coordinateSystem
+        {
+            type cylindrical;
+            name mixingCS;
+            origin (0 0 0);
+            e1 (1 0 0);
+            e3 (0 0 1);
+        }
+        ribbonPatch
+        {
+            sweepAxis Theta;
+            stackAxis Z;
+            discretisation bothPatches;
+        }
+    }
+    downstreamMixingPlanePatch
+    {
+        type mixingPlane;
+        nFaces 17;
+        startFace 2227;
+        shadowPatch upstreamMixingPlanePatch;
+        zone downstreamMixingPlaneZone;
+        coordinateSystem
+        {
+            e1 (1 0 0);
+            e3 (0 0 1);
+            name mixingCS;
+            origin (0 0 0);
+            type cylindrical;
+        }
+        ribbonPatch
+        {
+            discretisation bothPatches;
+            stackAxis Z;
+            sweepAxis Theta;
+        }
+    }
+    downstreamWall
+    {
+        type symmetryPlane;
+        nFaces 850;
+        startFace 2244;
+    }
+    upstreamWall
+    {
+        type symmetryPlane;
+        nFaces 1350;
+        startFace 3094;
+    }
+    downstreamPerio1
+    {
+        type cyclicGgi;
+        nFaces 25;
+        startFace 4444;
+        shadowPatch downstreamPerio2;
+        zone downstreamPerio1Zone;
+        bridgeOverlap no;
+        rotationAxis (0 0 1);
+        rotationAngle 90;
+        separationOffset (0 0 0);
+    }
+    downstreamPerio2
+    {
+        type cyclicGgi;
+        nFaces 25;
+        startFace 4469;
+        shadowPatch downstreamPerio1;
+        zone downstreamPerio2Zone;
+        bridgeOverlap no;
+        rotationAxis (0 0 1);
+        rotationAngle -90;
+        separationOffset (0 0 0);
+    }
+);
+
+// ************************************************************************* //

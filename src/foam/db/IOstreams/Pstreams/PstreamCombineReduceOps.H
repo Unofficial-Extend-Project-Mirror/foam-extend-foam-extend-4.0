@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -62,7 +62,7 @@ void combineReduce
 template <class T, class CombineOp>
 void combineReduce(T& Value, const CombineOp& cop)
 {
-    if (Pstream::nProcs() < Pstream::nProcsSimpleSum)
+    if (Pstream::nProcs() < Pstream::nProcsSimpleSum())
     {
         Pstream::combineGather(Pstream::linearCommunication(), Value, cop);
         Pstream::combineScatter(Pstream::linearCommunication(), Value);

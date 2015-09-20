@@ -1,0 +1,96 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | foam-extend: Open Source CFD                    |
+|  \\    /   O peration     | Version:     3.2                                |
+|   \\  /    A nd           | Web:         http://www.foam-extend.org         |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      blockMeshDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+// block definition for a porosity with an angled inlet/outlet
+// the porosity is not aligned with the main axes
+//
+
+convertToMeters 0.01;
+
+vertices
+(
+    // Back plane
+    ( -5 -1 -0.1)
+    ( -2 -1 -0.1)
+    (  2 -1 -0.1)
+    (  5 -1 -0.1)
+
+    ( -5  1 -0.1)
+    ( -2  1 -0.1)
+    (  2  1 -0.1)
+    (  5  1 -0.1)
+
+    // Front plane
+    ( -5 -1  0.1)
+    ( -2 -1  0.1)
+    (  2 -1  0.1)
+    (  5 -1  0.1)
+
+    ( -5  1  0.1)
+    ( -2  1  0.1)
+    (  2  1  0.1)
+    (  5  1  0.1)
+);
+
+blocks
+(
+    // inlet block
+    hex (0 1 5 4 8 9 13 12) (30 20 1) simpleGrading (0.2 1 1)
+
+    // porosity block
+    hex (1 2 6 5 9 10 14 13) (70 20 1) simpleGrading (1 1 1)
+
+    // outlet block
+    hex (2 3 7 6 10 11 15 14) (30 20 1) simpleGrading (5 1 1)
+);
+
+edges
+(
+    arc  1  2 (0  -1.8  -0.1)
+    arc  5  6 (0   1.8  -0.1)
+
+    arc  9 10 (0 -1.8   0.1)
+    arc 13 14 (0  1.8   0.1)
+);
+
+patches
+(
+    wall topAndBottom
+    (
+        (0 1 9 8)
+        (1 2 10 9)
+        (2 3 11 10)
+
+        (4 12 13 5)
+        (5 13 14 6)
+        (6 14 15 7)
+    )
+
+    patch inlet
+    (
+        (0 8 12 4)
+    )
+
+    patch outlet
+    (
+        (3 7 15 11)
+    )
+);
+
+mergePatchPairs
+(
+);
+
+// ************************************************************************* //

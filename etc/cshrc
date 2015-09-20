@@ -1,9 +1,9 @@
 #----------------------------------*-sh-*--------------------------------------
 # =========                 |
 # \\      /  F ield         | foam-extend: Open Source CFD
-#  \\    /   O peration     |
-#   \\  /    A nd           | For copyright notice see file Copyright
-#    \\/     M anipulation  |
+#  \\    /   O peration     | Version:     3.2
+#   \\  /    A nd           | Web:         http://www.foam-extend.org
+#    \\/     M anipulation  | For copyright notice see file Copyright
 #------------------------------------------------------------------------------
 # License
 #     This file is part of foam-extend.
@@ -25,14 +25,14 @@
 #     etc/cshrc
 #
 # Description
-#     Startup file for OpenFOAM
+#     Startup file for FOAM
 #     Sourced from ~/.login or ~/.cshrc
 #
 #------------------------------------------------------------------------------
 
 setenv WM_PROJECT foam
 setenv WM_FORK extend
-setenv WM_PROJECT_VERSION 3.1
+setenv WM_PROJECT_VERSION 3.2
 
 # helps to easily write #ifdefs to detect a foam-extend version
 setenv FOAM_DEV 1
@@ -72,6 +72,33 @@ setenv WM_PROJECT_USER_DIR $HOME/$WM_PROJECT/$LOGNAME-$WM_PROJECT_VERSION
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #setenv WM_THIRD_PARTY_DIR $WM_PROJECT_INST_DIR/ThirdParty-$WM_PROJECT_VERSION
 setenv WM_THIRD_PARTY_DIR $WM_PROJECT_DIR/ThirdParty
+
+# Enabling the usage of third-party software
+# This can be overriden in prefs.sh
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# For AllMake.stage1
+setenv WM_THIRD_PARTY_USE_CMAKE_322 1
+
+#
+# For AllMake.stage2
+setenv WM_THIRD_PARTY_USE_OPENMPI_165 1
+
+#
+# For AllMake.stage3
+setenv WM_THIRD_PARTY_USE_METIS_510 1
+setenv WM_THIRD_PARTY_USE_PARMGRIDGEN_10 1
+setenv WM_THIRD_PARTY_USE_LIBCCMIO_261 1
+setenv WM_THIRD_PARTY_USE_MESQUITE_212 1
+setenv WM_THIRD_PARTY_USE_SCOTCH_604 1
+setenv WM_THIRD_PARTY_USE_PARMETIS_403 1
+setenv WM_THIRD_PARTY_USE_PYFOAM_064 1
+setenv WM_THIRD_PARTY_USE_HWLOC_1101 1
+
+#
+# For AllMake.stage4
+#setenv WM_THIRD_PARTY_USE_QT_486 1
+setenv WM_THIRD_PARTY_USE_PARAVIEW_431 1
+
 
 # Source files, possibly with some verbosity
 alias _foamSource 'if ($?FOAM_VERBOSE && $?prompt) echo "Sourcing: \!*"; source \!*'
@@ -120,7 +147,7 @@ setenv WM_COMPILER_LIB_ARCH
 # WM_ARCH_OPTION = 32 | 64
 if ( ! $?WM_ARCH_OPTION ) setenv WM_ARCH_OPTION 64
 
-# WM_PRECISION_OPTION = DP | SP
+# WM_PRECISION_OPTION = LDP | DP | SP
 if ( ! $?WM_PRECISION_OPTION ) setenv WM_PRECISION_OPTION DP
 
 # WM_COMPILE_OPTION = Opt | Debug | Prof

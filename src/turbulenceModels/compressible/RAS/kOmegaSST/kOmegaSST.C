@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -85,6 +85,31 @@ tmp<volScalarField> kOmegaSST::F2() const
 }
 
 
+tmp<volScalarField> kOmegaSST::F3() const
+{
+    tmp<volScalarField> arg3 = min
+    (
+        150*(mu()/rho_)/(omega_*sqr(y_)),
+        scalar(10)
+    );
+
+    return 1 - tanh(pow4(arg3));
+}
+
+
+tmp<volScalarField> kOmegaSST::F23() const
+{
+    tmp<volScalarField> f23(F2());
+
+    if (F3_)
+    {
+        f23() *= F3();
+    }
+
+    return f23;
+}
+
+
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 kOmegaSST::kOmegaSST
@@ -103,7 +128,7 @@ kOmegaSST::kOmegaSST
         (
             "alphaK1",
             coeffDict_,
-            0.85034
+            0.85
         )
     ),
     alphaK2_
@@ -130,7 +155,7 @@ kOmegaSST::kOmegaSST
         (
             "alphaOmega2",
             coeffDict_,
-            0.85616
+            0.856
         )
     ),
     Prt_
@@ -148,7 +173,7 @@ kOmegaSST::kOmegaSST
         (
             "gamma1",
             coeffDict_,
-            0.5532
+            5.0/9.0
         )
     ),
     gamma2_
@@ -157,7 +182,7 @@ kOmegaSST::kOmegaSST
         (
             "gamma2",
             coeffDict_,
-            0.4403
+            0.44
         )
     ),
     beta1_
@@ -196,6 +221,15 @@ kOmegaSST::kOmegaSST
             0.31
         )
     ),
+    b1_
+    (
+        dimensioned<scalar>::lookupOrAddToDict
+        (
+            "b1",
+            coeffDict_,
+            1.0
+        )
+    ),
     c1_
     (
         dimensioned<scalar>::lookupOrAddToDict
@@ -203,6 +237,15 @@ kOmegaSST::kOmegaSST
             "c1",
             coeffDict_,
             10.0
+        )
+    ),
+    F3_
+    (
+        Switch::lookupOrAddToDict
+        (
+            "F3",
+            coeffDict_,
+            false
         )
     ),
 
@@ -257,6 +300,7 @@ kOmegaSST::kOmegaSST
         autoCreateAlphat("alphat", mesh_)
     )
 {
+    bound(k_, k0_);
     bound(omega_, omega0_);
 
     mut_ =
@@ -265,9 +309,10 @@ kOmegaSST::kOmegaSST
         max
         (
             a1_*omega_,
-            F2()*sqrt(2*magSqr(symm(fvc::grad(U_))))
+            b1_*F23()*sqrt(2.0)*mag(symm(fvc::grad(U_)))
         )
     );
+    mut_ = min(mut_, muRatio()*mu());
     mut_.correctBoundaryConditions();
 
     alphat_ = mut_/Prt_;
@@ -344,7 +389,9 @@ bool kOmegaSST::read()
         beta2_.readIfPresent(coeffDict());
         betaStar_.readIfPresent(coeffDict());
         a1_.readIfPresent(coeffDict());
+        b1_.readIfPresent(coeffDict());
         c1_.readIfPresent(coeffDict());
+        F3_.readIfPresent("F3", coeffDict());
 
         return true;
     }
@@ -370,7 +417,8 @@ void kOmegaSST::correct()
         // Re-calculate viscosity
         mut_ =
             a1_*rho_*k_
-           /max(a1_*omega_, F2()*sqrt(2*magSqr(symm(fvc::grad(U_)))));
+           /max(a1_*omega_, F2()*sqrt(2.0)*mag(symm(fvc::grad(U_))));
+        mut_ = min(mut_, muRatio()*mu());
         mut_.correctBoundaryConditions();
 
         // Re-calculate thermal diffusivity
@@ -382,7 +430,7 @@ void kOmegaSST::correct()
 
     RASModel::correct();
 
-    volScalarField divU = fvc::div(phi_/fvc::interpolate(rho_));
+    volScalarField divU(fvc::div(phi_/fvc::interpolate(rho_)));
 
     if (mesh_.changing())
     {
@@ -395,19 +443,21 @@ void kOmegaSST::correct()
     }
 
     tmp<volTensorField> tgradU = fvc::grad(U_);
-    volScalarField S2 = magSqr(symm(tgradU()));
-    volScalarField GbyMu = (tgradU() && dev(twoSymm(tgradU())));
+    volScalarField S2(2*magSqr(symm(tgradU())));
+    volScalarField GbyMu((tgradU() && dev(twoSymm(tgradU()))));
     volScalarField G("RASModel::G", mut_*GbyMu);
     tgradU.clear();
 
     // Update omega and G at the wall
     omega_.boundaryField().updateCoeffs();
 
-    volScalarField CDkOmega =
-        (2*alphaOmega2_)*(fvc::grad(k_) & fvc::grad(omega_))/omega_;
+    volScalarField CDkOmega
+    (
+        (2*alphaOmega2_)*(fvc::grad(k_) & fvc::grad(omega_))/omega_
+    );
 
-    volScalarField F1 = this->F1(CDkOmega);
-    volScalarField rhoGammaF1 = rho_*gamma(F1);
+    volScalarField F1(this->F1(CDkOmega));
+    volScalarField rhoGammaF1(rho_*gamma(F1));
 
     // Turbulent frequency equation
     tmp<fvScalarMatrix> omegaEqn
@@ -416,7 +466,12 @@ void kOmegaSST::correct()
       + fvm::div(phi_, omega_)
       - fvm::laplacian(DomegaEff(F1), omega_)
      ==
-        rhoGammaF1*GbyMu
+        rhoGammaF1
+       *min
+        (
+            GbyMu,
+            (c1_/a1_)*betaStar_*omega_*max(a1_*omega_, b1_*F23()*sqrt(S2))
+        )
       - fvm::SuSp((2.0/3.0)*rhoGammaF1*divU, omega_)
       - fvm::Sp(rho_*beta(F1)*omega_, omega_)
       - fvm::SuSp
@@ -453,7 +508,9 @@ void kOmegaSST::correct()
 
 
     // Re-calculate viscosity
-    mut_ = a1_*rho_*k_/max(a1_*omega_, F2()*sqrt(2*S2));
+    // Fixed sqrt(2) error.  HJ, 10/Jun/2015
+    mut_ = a1_*rho_*k_/max(a1_*omega_, b1_*F23()*sqrt(S2));
+    mut_ = min(mut_, muRatio()*mu());
     mut_.correctBoundaryConditions();
 
     // Re-calculate thermal diffusivity

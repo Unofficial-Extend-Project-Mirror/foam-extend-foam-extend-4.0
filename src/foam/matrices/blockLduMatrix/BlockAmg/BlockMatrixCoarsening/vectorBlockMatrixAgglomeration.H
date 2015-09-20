@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -46,25 +46,25 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                        Class BlockMatrixAgglomeration Declaration
+                   Class BlockMatrixAgglomeration Declaration
 \*---------------------------------------------------------------------------*/
 
 //- Restrict matrix
 
 template<>
-inline autoPtr<BlockLduMatrix<vector> >
+inline autoPtr<BlockAmgLevel<vector> >
 BlockMatrixAgglomeration<vector>::restrictMatrix
 () const
 {
     FatalErrorIn
     (
-        "autoPtr<BlockLduMatrix<vector> > BlockMatrixAgglomeration<Type>::"
+        "autoPtr<BlockAmgLevel<vector> > BlockMatrixAgglomeration<Type>::"
         "restrictMatrix() const"
     )   << "Function not implemented for Type=vector. " << endl
         << abort(FatalError);
 
     // Dummy return to keep compiler happy
-    return autoPtr<BlockLduMatrix<vector> >(NULL);
+    return autoPtr<BlockAmgLevel<vector> >(NULL);
 }
 
 

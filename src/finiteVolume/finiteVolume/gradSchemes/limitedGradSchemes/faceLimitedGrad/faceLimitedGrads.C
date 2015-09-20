@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -70,9 +70,10 @@ inline void faceLimitedGrad<Type>::limitFace
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 template<>
-tmp<volVectorField> faceLimitedGrad<scalar>::grad
+tmp<volVectorField> faceLimitedGrad<scalar>::calcGrad
 (
-    const volScalarField& vsf
+    const volScalarField& vsf,
+    const word& name
 ) const
 {
     const fvMesh& mesh = vsf.mesh();
@@ -92,7 +93,7 @@ tmp<volVectorField> faceLimitedGrad<scalar>::grad
     const volVectorField& C = mesh.C();
     const surfaceVectorField& Cf = mesh.Cf();
 
-    // create limiter
+    // Create limiter
     scalarField limiter(vsf.internalField().size(), 1.0);
 
     scalar rk = (1.0/k_ - 1.0);
@@ -157,7 +158,8 @@ tmp<volVectorField> faceLimitedGrad<scalar>::grad
                 limitFace
                 (
                     limiter[own],
-                    maxFace - vsfOwn, minFace - vsfOwn,
+                    maxFace - vsfOwn,
+                    minFace - vsfOwn,
                     (pCf[pFacei] - C[own]) & g[own]
                 );
             }
@@ -180,7 +182,8 @@ tmp<volVectorField> faceLimitedGrad<scalar>::grad
                 limitFace
                 (
                     limiter[own],
-                    maxFace - vsfOwn, minFace - vsfOwn,
+                    maxFace - vsfOwn,
+                    minFace - vsfOwn,
                     (pCf[pFacei] - C[own]) & g[own]
                 );
             }
@@ -204,9 +207,10 @@ tmp<volVectorField> faceLimitedGrad<scalar>::grad
 
 
 template<>
-tmp<volTensorField> faceLimitedGrad<vector>::grad
+tmp<volTensorField> faceLimitedGrad<vector>::calcGrad
 (
-    const volVectorField& vvf
+    const volVectorField& vvf,
+    const word& name
 ) const
 {
     const fvMesh& mesh = vvf.mesh();
@@ -339,7 +343,8 @@ tmp<volTensorField> faceLimitedGrad<vector>::grad
                 limitFace
                 (
                     limiter[own],
-                    maxFace - vsfOwn, minFace - vsfOwn,
+                    maxFace - vsfOwn,
+                    minFace - vsfOwn,
                     magSqr(gradf)
                 );
             }
@@ -359,6 +364,239 @@ tmp<volTensorField> faceLimitedGrad<vector>::grad
     gaussGrad<vector>::correctBoundaryConditions(vvf, g);
 
     return tGrad;
+}
+
+
+template<>
+tmp<BlockLduSystem<vector, vector> > faceLimitedGrad<scalar>::fvmGrad
+(
+    const volScalarField& vsf
+) const
+{
+    // Consider doing a calculateLimiter member function since both fvmGrad and
+    // grad use almost the same procedure to calculate limiter. VV, 9/June/2014
+    const fvMesh& mesh = vsf.mesh();
+
+    tmp<BlockLduSystem<vector, vector> > tbs = basicGradScheme_().fvmGrad(vsf);
+
+    if (k_ < SMALL)
+    {
+        return tbs;
+    }
+
+    BlockLduSystem<vector, vector>& bs = tbs();
+
+    // Calculate current gradient for explicit limiting
+    tmp<volVectorField> tGrad = basicGradScheme_().grad(vsf);
+    const volVectorField& g = tGrad();
+
+    const unallocLabelList& owner = mesh.owner();
+    const unallocLabelList& neighbour = mesh.neighbour();
+
+    const volVectorField& C = mesh.C();
+    const surfaceVectorField& Cf = mesh.Cf();
+
+    // Create limiter as volScalarField for proper update of coupling coeffs
+    volScalarField limitField
+    (
+        IOobject
+        (
+            "limitField",
+            vsf.instance(),
+            mesh,
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        ),
+        mesh,
+        dimensionedScalar("one", dimless, 1),
+        "zeroGradient"
+    );
+    scalarField& lfIn = limitField.internalField();
+
+    scalar rk = (1.0/k_ - 1.0);
+
+    forAll(owner, facei)
+    {
+        label own = owner[facei];
+        label nei = neighbour[facei];
+
+        scalar vsfOwn = vsf[own];
+        scalar vsfNei = vsf[nei];
+
+        scalar maxFace = max(vsfOwn, vsfNei);
+        scalar minFace = min(vsfOwn, vsfNei);
+        scalar maxMinFace = rk*(maxFace - minFace);
+        maxFace += maxMinFace;
+        minFace -= maxMinFace;
+
+        // owner side
+        limitFace
+        (
+            lfIn[own],
+            maxFace - vsfOwn,
+            minFace - vsfOwn,
+            (Cf[facei] - C[own]) & g[own]
+        );
+
+        // neighbour side
+        limitFace
+        (
+            lfIn[nei],
+            maxFace - vsfNei,
+            minFace - vsfNei,
+            (Cf[facei] - C[nei]) & g[nei]
+        );
+    }
+
+    const volScalarField::GeometricBoundaryField& bsf = vsf.boundaryField();
+
+    forAll(bsf, patchi)
+    {
+        const fvPatchScalarField& psf = bsf[patchi];
+
+        const unallocLabelList& pOwner = mesh.boundary()[patchi].faceCells();
+        const vectorField& pCf = Cf.boundaryField()[patchi];
+
+        if (psf.coupled())
+        {
+            scalarField psfNei = psf.patchNeighbourField();
+
+            forAll(pOwner, pFacei)
+            {
+                label own = pOwner[pFacei];
+
+                scalar vsfOwn = vsf[own];
+                scalar vsfNei = psfNei[pFacei];
+
+                scalar maxFace = max(vsfOwn, vsfNei);
+                scalar minFace = min(vsfOwn, vsfNei);
+                scalar maxMinFace = rk*(maxFace - minFace);
+                maxFace += maxMinFace;
+                minFace -= maxMinFace;
+
+                limitFace
+                (
+                    lfIn[own],
+                    maxFace - vsfOwn, minFace - vsfOwn,
+                    (pCf[pFacei] - C[own]) & g[own]
+                );
+            }
+        }
+        else if (psf.fixesValue())
+        {
+            forAll(pOwner, pFacei)
+            {
+                label own = pOwner[pFacei];
+
+                scalar vsfOwn = vsf[own];
+                scalar vsfNei = psf[pFacei];
+
+                scalar maxFace = max(vsfOwn, vsfNei);
+                scalar minFace = min(vsfOwn, vsfNei);
+                scalar maxMinFace = rk*(maxFace - minFace);
+                maxFace += maxMinFace;
+                minFace -= maxMinFace;
+
+                limitFace
+                (
+                    lfIn[own],
+                    maxFace - vsfOwn, minFace - vsfOwn,
+                    (pCf[pFacei] - C[own]) & g[own]
+                );
+            }
+        }
+    }
+
+    if (fv::debug)
+    {
+        Info<< "gradient limiter for: " << vsf.name()
+            << " max = " << gMax(lfIn)
+            << " min = " << gMin(lfIn)
+            << " average: " << gAverage(lfIn) << endl;
+    }
+
+    vectorField& source = bs.source();
+
+    // Grab ldu parts of block matrix as linear always
+    CoeffField<vector>::linearTypeField& d = bs.diag().asLinear();
+    CoeffField<vector>::linearTypeField& u = bs.upper().asLinear();
+    CoeffField<vector>::linearTypeField& l = bs.lower().asLinear();
+
+    // Limit upper and lower coeffs
+    forAll(u, faceI)
+    {
+        label own = owner[faceI];
+        label nei = neighbour[faceI];
+
+        u[faceI] *= lfIn[own];
+        l[faceI] *= lfIn[nei];
+    }
+
+    // Limit diag and source coeffs
+    forAll(d, cellI)
+    {
+        d[cellI] *= lfIn[cellI];
+        source[cellI] *= lfIn[cellI];
+    }
+
+    // Limit coupling coeffs
+    forAll(vsf.boundaryField(), patchI)
+    {
+        const fvPatchScalarField& pf = vsf.boundaryField()[patchI];
+        const fvPatch& patch = pf.patch();
+
+        const labelList& fc = patch.faceCells();
+
+        if (patch.coupled())
+        {
+            CoeffField<vector>::linearTypeField& pcoupleUpper =
+                bs.coupleUpper()[patchI].asLinear();
+            CoeffField<vector>::linearTypeField& pcoupleLower =
+                bs.coupleLower()[patchI].asLinear();
+
+            const scalarField lfNei =
+                limitField.boundaryField()[patchI].patchNeighbourField();
+
+            forAll(pf, faceI)
+            {
+                pcoupleUpper[faceI] *= lfIn[fc[faceI]];
+                pcoupleLower[faceI] *= lfNei[faceI];
+            }
+        }
+    }
+
+    return tbs;
+}
+
+
+template<>
+tmp
+<
+    BlockLduSystem<vector, outerProduct<vector, vector>::type>
+>
+faceLimitedGrad<vector>::fvmGrad
+(
+    const volVectorField& vsf
+) const
+{
+    FatalErrorIn
+    (
+        "tmp<BlockLduSystem> faceLimitedGrad<vector>::fvmGrad\n"
+        "(\n"
+        "    GeometricField<vector, fvPatchField, volMesh>&"
+        ")\n"
+    )   << "Implicit gradient operators with face limiters defined only for "
+        << "scalar."
+        << abort(FatalError);
+
+    typedef outerProduct<vector, vector>::type GradType;
+
+    tmp<BlockLduSystem<vector, GradType> > tbs
+    (
+        new BlockLduSystem<vector, GradType>(vsf.mesh())
+    );
+
+    return tbs;
 }
 
 

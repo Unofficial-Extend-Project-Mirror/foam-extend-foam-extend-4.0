@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -32,13 +32,14 @@ License
 #include "IOobject.H"
 #include "JobInfo.H"
 #include "labelList.H"
-
+#include "SortableList.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
 Foam::SLList<Foam::string> Foam::argList::validArgs;
 Foam::HashTable<Foam::string> Foam::argList::validOptions;
 Foam::HashTable<Foam::string> Foam::argList::validParOptions;
+Foam::word Foam::argList::appDictName_("");
 bool Foam::argList::bannerEnabled(true);
 
 
@@ -48,6 +49,25 @@ Foam::argList::initValidTables::initValidTables()
     validOptions.set("parallel", "");
     validParOptions.set("parallel", "");
     validOptions.set("noFunctionObjects", "");
+
+    // Add the parameters for modifying the controlDict
+    // switches from the command-line
+
+    // Instantiate a NamedEnum for the controlDict switches names
+    const NamedEnum
+    <
+        debug::globalControlDictSwitchSet,
+        debug::DIM_GLOBAL_CONTROL_DICT_SWITCH_SET
+    >
+    globalControlDictSwitchSetNames;
+
+    forAll (globalControlDictSwitchSetNames, gI)
+    {
+        word switchSetName = globalControlDictSwitchSetNames.names[gI];
+        validOptions.set(switchSetName, "key1=val1,key2=val2,...");
+    }
+
+    validOptions.set("dumpControlSwitches", "");
 
     Pstream::addValidParOptions(validParOptions);
 }
@@ -215,7 +235,7 @@ Foam::argList::argList
     regroupArgv(argc, argv);
 
     // Get executable name
-    args_[0]    = fileName(argv[0]);
+    args_[0] = fileName(argv[0]);
     executable_ = fileName(argv[0]).name();
 
     // Check arguments and options, we already have argv[0]
@@ -308,6 +328,7 @@ Foam::argList::argList
         FatalError.exit();
     }
 
+    // From here, we consider the command-line arguments to be valid
 
     string dateString = clock::date();
     string timeString = clock::clockTime();
@@ -323,8 +344,7 @@ Foam::argList::argList
             << "Date     : " << dateString.c_str() << nl
             << "Time     : " << timeString.c_str() << nl
             << "Host     : " << hostName() << nl
-            << "PID      : " << pid() << nl
-            << "CtrlDict : " << ctrlDictString.c_str()
+            << "PID      : " << pid()
             << endl;
     }
 
@@ -400,12 +420,12 @@ Foam::argList::argList
                 fileNameList roots;
                 decompDict.lookup("roots") >> roots;
 
-                if (roots.size() != Pstream::nProcs()-1)
+                if (roots.size() != Pstream::nProcs() - 1)
                 {
                     FatalError
                         << "number of entries in decompositionDict::roots"
                         << " is not equal to the number of slaves "
-                        << Pstream::nProcs()-1
+                        << Pstream::nProcs() - 1
                         << exit(FatalError);
                 }
 
@@ -413,8 +433,8 @@ Foam::argList::argList
                 bool hadCaseOpt = options_.found("case");
                 for
                 (
-                    int slave=Pstream::firstSlave();
-                    slave<=Pstream::lastSlave();
+                    int slave = Pstream::firstSlave();
+                    slave <= Pstream::lastSlave();
                     slave++
                 )
                 {
@@ -466,8 +486,8 @@ Foam::argList::argList
                 // Distribute the master's argument list (unaltered)
                 for
                 (
-                    int slave=Pstream::firstSlave();
-                    slave<=Pstream::lastSlave();
+                    int slave = Pstream::firstSlave();
+                    slave <= Pstream::lastSlave();
                     slave++
                 )
                 {
@@ -496,6 +516,80 @@ Foam::argList::argList
         case_ = globalCase_;
     }
 
+    // Managing the overrides for the global control switches:
+    //
+    // Here is the order of precedence for the definition/overriding of the
+    // control switches, from lowest to highest:
+    //  - source code definitions from the various libraries/solvers
+    //  - file specified by the env. variable FOAM_GLOBAL_CONTROLDICT
+    //  - case's system/controlDict file
+    //  - command-line parameters
+    //
+    // First, we allow the users to specify the location of a centralized
+    // global controlDict dictionary using the environment variable
+    // FOAM_GLOBAL_CONTROLDICT.
+    fileName optionalGlobControlDictFileName =
+    getEnv("FOAM_GLOBAL_CONTROLDICT");
+
+    if (optionalGlobControlDictFileName.size() )
+    {
+        debug::updateCentralDictVars
+        (
+            optionalGlobControlDictFileName,
+            Pstream::master() && bannerEnabled
+        );
+    }
+
+    // Now that the rootPath_/globalCase_ directory is known (following the
+    // call to getRootCase()), we grab any global control switches overrides
+    // from the current case's controlDict.
+
+    debug::updateCentralDictVars
+    (
+        rootPath_/globalCase_/"system/controlDict",
+        Pstream::master() && bannerEnabled
+    );
+
+    // Finally, a command-line override for central controlDict's variables.
+    // This is the ultimate override for the global control switches.
+
+    // Instantiate a NamedEnum for the controlDict switches names
+    const NamedEnum
+    <
+        debug::globalControlDictSwitchSet,
+        debug::DIM_GLOBAL_CONTROL_DICT_SWITCH_SET
+    >
+    globalControlDictSwitchSetNames;
+
+    forAll (globalControlDictSwitchSetNames, gI)
+    {
+        word switchSetName = globalControlDictSwitchSetNames.names[gI];
+
+        if (optionFound(switchSetName))
+        {
+            debug::updateCentralDictVars
+            (
+                globalControlDictSwitchSetNames[switchSetName],
+                option(switchSetName)
+            );
+        }
+    }
+
+    if ( optionFound("dumpControlSwitches") )
+    {
+        if (Pstream::master())
+        {
+            // Dumping the application's control switches.
+            // We dump the full information to the console using a standard
+            // dictionary format, so one can copy/paste this information
+            //  directly into a case's system/controlDict file to
+            //  override some switches values without having to always
+            // use the command-line options.
+            debug::dumpControlSwitchesToConsole();
+        }
+
+        ::exit(0);
+    }
 
     wordList slaveProcs;
 
@@ -505,14 +599,14 @@ Foam::argList::argList
         if (Pstream::master())
         {
             slaveProcs.setSize(Pstream::nProcs() - 1);
-            word  slaveMachine;
+            word slaveMachine;
             label slavePid;
 
             label procI = 0;
             for
             (
-                int slave=Pstream::firstSlave();
-                slave<=Pstream::lastSlave();
+                int slave = Pstream::firstSlave();
+                slave <= Pstream::lastSlave();
                 slave++
             )
             {
@@ -539,10 +633,12 @@ Foam::argList::argList
         {
             Info<< "Slaves : " << slaveProcs << nl
                 << "Pstream initialized with:" << nl
-                << "    floatTransfer     : " << Pstream::floatTransfer << nl
-                << "    nProcsSimpleSum   : " << Pstream::nProcsSimpleSum << nl
+                << "    floatTransfer     : "
+                << Pstream::floatTransfer << nl
+                << "    nProcsSimpleSum   : "
+                << Pstream::nProcsSimpleSum() << nl
                 << "    commsType         : "
-                << Pstream::commsTypeNames[Pstream::defaultCommsType]
+                << Pstream::commsTypeNames[Pstream::defaultCommsType()]
                 << endl;
         }
     }
@@ -567,6 +663,14 @@ Foam::argList::argList
     {
         Info<< endl;
         IOobject::writeDivider(Info);
+    }
+
+    // If the macro AppSpecificDictionary is used, one can
+    // modify the application-specific dictionnary using the
+    // command-line parameter -appDict
+    if (appDictName_ != "")
+    {
+        optionReadIfPresent("appDict", appDictName_);
     }
 }
 
@@ -608,22 +712,31 @@ void Foam::argList::printUsage() const
         Info<< " <" << iter().c_str() << '>';
     }
 
+    int i = 0;
+    SortableList<Foam::string> sortedValidOptions(validOptions.size());
+
     for
     (
         HashTable<string>::iterator iter = validOptions.begin();
         iter != validOptions.end();
-        ++iter
+        ++iter, ++i
     )
     {
-        Info<< " [-" << iter.key();
+        OStringStream keyValuePair;
+        keyValuePair << "[-" << iter.key();
 
         if (iter().size())
         {
-            Info<< ' ' << iter().c_str();
+            keyValuePair<< ' ' << iter().c_str();
         }
 
-        Info<< ']';
+        keyValuePair<< ']';
+        sortedValidOptions[i]= keyValuePair.str();
     }
+    sortedValidOptions.sort();
+
+    forAll (sortedValidOptions, sI)
+    Info<< " " << sortedValidOptions[sI].c_str();
 
     // place help/doc/srcDoc options of the way at the end,
     // but with an extra space to separate it a little
@@ -640,7 +753,7 @@ void Foam::argList::displayDoc(bool source) const
     // for source code: change foo_8C.html to foo_8C_source.html
     if (source)
     {
-        forAll(docExts, extI)
+        forAll (docExts, extI)
         {
             docExts[extI].replace(".", "_source.");
         }
@@ -649,9 +762,9 @@ void Foam::argList::displayDoc(bool source) const
     fileName docFile;
     bool found = false;
 
-    forAll(docDirs, dirI)
+    forAll (docDirs, dirI)
     {
-        forAll(docExts, extI)
+        forAll (docExts, extI)
         {
             docFile = docDirs[dirI]/executable_ + docExts[extI];
             docFile.expand();

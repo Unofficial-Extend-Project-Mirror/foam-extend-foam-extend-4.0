@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -287,17 +287,20 @@ evaluate()
 
     if
     (
-        Pstream::defaultCommsType == Pstream::blocking
-     || Pstream::defaultCommsType == Pstream::nonBlocking
+        Pstream::defaultCommsType() == Pstream::blocking
+     || Pstream::defaultCommsType() == Pstream::nonBlocking
     )
     {
         forAll(*this, patchi)
         {
-            this->operator[](patchi).initEvaluate(Pstream::defaultCommsType);
+            this->operator[](patchi).initEvaluate
+            (
+                static_cast<Pstream::commsTypes>(Pstream::defaultCommsType())
+            );
         }
 
         // Block for any outstanding requests
-        if (Pstream::defaultCommsType == Pstream::nonBlocking)
+        if (Pstream::defaultCommsType() == Pstream::nonBlocking)
         {
             IPstream::waitRequests();
             OPstream::waitRequests();
@@ -305,10 +308,13 @@ evaluate()
 
         forAll(*this, patchi)
         {
-            this->operator[](patchi).evaluate(Pstream::defaultCommsType);
+            this->operator[](patchi).evaluate
+            (
+                static_cast<Pstream::commsTypes>(Pstream::defaultCommsType())
+            );
         }
     }
-    else if (Pstream::defaultCommsType == Pstream::scheduled)
+    else if (Pstream::defaultCommsType() == Pstream::scheduled)
     {
         const lduSchedule& patchSchedule =
             bmesh_.mesh().globalData().patchSchedule();
@@ -331,7 +337,7 @@ evaluate()
     {
         FatalErrorIn("GeometricBoundaryField::evaluate()")
             << "Unsuported communications type "
-            << Pstream::commsTypeNames[Pstream::defaultCommsType]
+            << Pstream::commsTypeNames[Pstream::defaultCommsType()]
             << exit(FatalError);
     }
 }
@@ -350,8 +356,8 @@ evaluateCoupled()
 
     if
     (
-        Pstream::defaultCommsType == Pstream::blocking
-     || Pstream::defaultCommsType == Pstream::nonBlocking
+        Pstream::defaultCommsType() == Pstream::blocking
+     || Pstream::defaultCommsType() == Pstream::nonBlocking
     )
     {
         forAll(*this, patchi)
@@ -360,13 +366,16 @@ evaluateCoupled()
             {
                 this->operator[](patchi).initEvaluate
                 (
-                    Pstream::defaultCommsType
+                    static_cast<Pstream::commsTypes>
+                    (
+                        Pstream::defaultCommsType()
+                    )
                 );
             }
         }
 
         // Block for any outstanding requests
-        if (Pstream::defaultCommsType == Pstream::nonBlocking)
+        if (Pstream::defaultCommsType() == Pstream::nonBlocking)
         {
             IPstream::waitRequests();
             OPstream::waitRequests();
@@ -376,11 +385,17 @@ evaluateCoupled()
         {
             if (this->operator[](patchi).coupled())
             {
-                this->operator[](patchi).evaluate(Pstream::defaultCommsType);
+                this->operator[](patchi).evaluate
+                (
+                    static_cast<Pstream::commsTypes>
+                    (
+                        Pstream::defaultCommsType()
+                    )
+                );
             }
         }
     }
-    else if (Pstream::defaultCommsType == Pstream::scheduled)
+    else if (Pstream::defaultCommsType() == Pstream::scheduled)
     {
         const lduSchedule& patchSchedule =
             bmesh_.mesh().globalData().patchSchedule();
@@ -415,7 +430,7 @@ evaluateCoupled()
     {
         FatalErrorIn("GeometricBoundaryField::evaluateCoupled()")
             << "Unsuported communications type "
-            << Pstream::commsTypeNames[Pstream::defaultCommsType]
+            << Pstream::commsTypeNames[Pstream::defaultCommsType()]
             << exit(FatalError);
     }
 }

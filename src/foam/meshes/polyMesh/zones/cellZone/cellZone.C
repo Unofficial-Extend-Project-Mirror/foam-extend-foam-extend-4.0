@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -262,12 +262,12 @@ void Foam::cellZone::write(Ostream& os) const
 
 void Foam::cellZone::writeDict(Ostream& os) const
 {
-    os  << nl << name() << nl << token::BEGIN_BLOCK << nl
-        << "    type " << type() << token::END_STATEMENT << nl;
+    os  << nl << name() << nl << token::BEGIN_BLOCK << incrIndent << nl
+        << indent << "type " << type() << token::END_STATEMENT << nl;
 
     writeEntry("cellLabels", os);
 
-    os  << token::END_BLOCK << endl;
+    os  << decrIndent << token::END_BLOCK << endl;
 }
 
 

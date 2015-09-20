@@ -7,18 +7,20 @@ if(leftPatchID == -1)
   }
 
 //- calculate force in x direction on leftClamp patch
-scalar leftForce = gSum(
-			vector(1, 0, 0) &
-			(mesh.boundary()[leftPatchID].Sf() & sigma.boundaryField()[leftPatchID])
-			);
+scalar leftForce = gSum
+(
+    vector(1, 0, 0) &
+    (mesh.boundary()[leftPatchID].Sf() & sigma.boundaryField()[leftPatchID])
+);
 
 //- patchIntegrate utility integrates it this way but this is worng because the sigma tensor should
 //- be dotted with the surface normal to give the actual traction/force
 //- you cannot just take the component of the sigma tensor
-//scalar leftForcePatchIntegrateMethod = gSum(
-//					    mesh.magSf().boundaryField()[leftPatchID]
-//					    *sigma.boundaryField()[leftPatchID].component(symmTensor::XY)
-//					    );
+//scalar leftForcePatchIntegrateMethod = gSum
+//(
+//    mesh.magSf().boundaryField()[leftPatchID]*
+//    sigma.boundaryField()[leftPatchID].component(symmTensor::XY)
+//);
 
 vector gaugeU1 = vector::zero;
 vector gaugeU2 = vector::zero;

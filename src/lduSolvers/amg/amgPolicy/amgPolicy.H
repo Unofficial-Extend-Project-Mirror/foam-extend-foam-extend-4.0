@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -77,24 +77,24 @@ class amgPolicy
 
 public:
 
-        //- Runtime type information
-        virtual const word& type() const = 0;
+    //- Runtime type information
+    virtual const word& type() const = 0;
 
 
-        // Declare run-time constructor selection tables
+    // Declare run-time constructor selection tables
 
-            declareRunTimeSelectionTable
+        declareRunTimeSelectionTable
+        (
+            autoPtr,
+            amgPolicy,
+            matrix,
             (
-                autoPtr,
-                amgPolicy,
-                matrix,
-                (
-                    const lduMatrix& matrix,
-                    const label groupSize,
-                    const label minCoarseEqns
-                ),
-                (matrix, groupSize, minCoarseEqns)
-            );
+                const lduMatrix& matrix,
+                const label groupSize,
+                const label minCoarseEqns
+            ),
+            (matrix, groupSize, minCoarseEqns)
+        );
 
 
     // Selectors

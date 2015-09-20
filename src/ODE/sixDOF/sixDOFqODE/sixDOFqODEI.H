@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -169,6 +169,12 @@ void Foam::sixDOFqODE::setOmega(const vector& omega)
 const Foam::dimensionedVector& Foam::sixDOFqODE::Uaverage() const
 {
     return Uaverage_;
+}
+
+
+const Foam::finiteRotation& Foam::sixDOFqODE::rotation() const
+{
+    return rotation_;
 }
 
 

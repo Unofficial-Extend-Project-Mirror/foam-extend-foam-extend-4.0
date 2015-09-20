@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -24,7 +24,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "linearValveFvMesh.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "slidingInterface.H"
 #include "mapPolyMesh.H"
 #include "polyTopoChange.H"
@@ -178,7 +178,7 @@ void Foam::linearValveFvMesh::addZonesAndModifiers()
 }
 
 
-void Foam::linearValveFvMesh::makeSlidersDead()
+void Foam::linearValveFvMesh::deactivateSliders()
 {
     const polyTopoChanger& topoChanges = topoChanger_;
 
@@ -191,7 +191,7 @@ void Foam::linearValveFvMesh::makeSlidersDead()
         }
         else
         {
-            FatalErrorIn("void Foam::linearValveFvMesh::makeSlidersDead()")
+            FatalErrorIn("void Foam::linearValveFvMesh::deactivateSliders()")
                 << "Don't know what to do with mesh modifier "
                 << modI << " of type " << topoChanges[modI].type()
                 << abort(FatalError);
@@ -200,7 +200,7 @@ void Foam::linearValveFvMesh::makeSlidersDead()
 }
 
 
-void Foam::linearValveFvMesh::makeSlidersLive()
+void Foam::linearValveFvMesh::activateSliders()
 {
     const polyTopoChanger& topoChanges = topoChanger_;
 
@@ -213,7 +213,7 @@ void Foam::linearValveFvMesh::makeSlidersLive()
         }
         else
         {
-            FatalErrorIn("void Foam::linearValveFvMesh::makeLayersLive()")
+            FatalErrorIn("void Foam::linearValveFvMesh::activateSliders()")
                 << "Don't know what to do with mesh modifier "
                 << modI << " of type " << topoChanges[modI].type()
                 << abort(FatalError);
@@ -250,7 +250,8 @@ bool Foam::linearValveFvMesh::attached() const
             )
             {
                 FatalErrorIn("bool linearValveFvMesh::attached() const")
-                    << "Slider " << modI << " named " << topoChanges[modI].name()
+                    << "Slider " << modI << " named "
+                    << topoChanges[modI].name()
                     << " out of sync: Should be" << result
                     << abort(FatalError);
             }
@@ -310,7 +311,7 @@ bool Foam::linearValveFvMesh::update()
     if (attached())
     {
         Info << "Decoupling sliding interfaces" << endl;
-        makeSlidersLive();
+        activateSliders();
 
         // Changing topology by hand
         autoPtr<mapPolyMesh> topoChangeMap1 = topoChanger_.changeMesh();
@@ -326,7 +327,7 @@ bool Foam::linearValveFvMesh::update()
     }
 
     // Perform mesh motion
-    makeSlidersDead();
+    deactivateSliders();
 
     // Changing topology by hand
     {
@@ -351,7 +352,7 @@ bool Foam::linearValveFvMesh::update()
 
     // Attach the interface
     Info << "Coupling sliding interfaces" << endl;
-    makeSlidersLive();
+    activateSliders();
 
     // Changing topology by hand
     {
@@ -362,26 +363,52 @@ bool Foam::linearValveFvMesh::update()
 
         Info << "Moving points post slider attach" << endl;
 
-        if (topoChangeMap3->morphing())
+        bool localMorphing3 = topoChangeMap3->morphing();
+        bool globalMorphing3 = localMorphing3;
+
+        reduce(globalMorphing3, orOp<bool>());
+
+        if (globalMorphing3)
         {
-            msPtr_->updateMesh(topoChangeMap3());
-
-            if (debug)
-            {
-                Info << "Moving points post slider attach" << endl;
-            }
-
             pointField newPoints = allPoints();
-            pointField mappedOldPointsNew(newPoints.size());
 
-            mappedOldPointsNew.map(oldPointsNew, topoChangeMap3->pointMap());
+            if (localMorphing3)
+            {
+                msPtr_->updateMesh(topoChangeMap3());
 
-            // Solve the correct mesh motion to make sure motion fluxes
-            // are solved for and not mapped
-            movePoints(mappedOldPointsNew);
-            resetMotion();
-            setV0();
-            movePoints(newPoints);
+                pointField mappedOldPointsNew(newPoints.size());
+
+                mappedOldPointsNew.map
+                (
+                    oldPointsNew,
+                    topoChangeMap3->pointMap()
+                );
+
+                // Solve the correct mesh motion to make sure motion fluxes
+                // are solved for and not mapped
+                // Note: using setOldPoints instead of movePoints.
+                // HJ, 23/Aug/2015
+                setOldPoints(mappedOldPointsNew);
+
+                resetMotion();
+                setV0();
+
+                fvMesh::movePoints(newPoints);
+            }
+            else
+            {
+                // No local topological change.  Execute double motion for
+                // sync with topological changes
+                // Note: using setOldPoints instead of movePoints.
+                // HJ, 23/Aug/2015
+                setOldPoints(oldPointsNew);
+
+                resetMotion();
+                setV0();
+
+                // Set new point motion
+                fvMesh::movePoints(newPoints);
+            }
         }
     }
 

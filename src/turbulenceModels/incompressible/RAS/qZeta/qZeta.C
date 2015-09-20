@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -193,6 +193,7 @@ qZeta::qZeta
     )
 {
     nut_ = Cmu_*fMu()*sqr(k_)/(epsilon_ + epsilonSmall_);
+    nut_ = min(nut_, nuRatio()*nu());
     nut_.correctBoundaryConditions();
 
     printCoeffs();
@@ -340,6 +341,7 @@ void qZeta::correct()
 
     // Re-calculate viscosity
     nut_ = Cmu_*fMu()*sqr(k_)/epsilon_;
+    nut_ = min(nut_, nuRatio()*nu());
     nut_.correctBoundaryConditions();
 }
 

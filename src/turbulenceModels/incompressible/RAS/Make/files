@@ -18,6 +18,9 @@ NonlinearKEShih/NonlinearKEShih.C
 LienLeschzinerLowRe/LienLeschzinerLowRe.C
 LamBremhorstKE/LamBremhorstKE.C
 
+coupledKEpsilon/coupledKEpsilon.C
+coupledKOmegaSST/coupledKOmegaSST.C
+
 /* Wall functions */
 wallFunctions = derivedFvPatchFields/wallFunctions
 

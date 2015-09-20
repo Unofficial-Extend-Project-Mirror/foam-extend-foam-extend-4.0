@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -52,9 +52,10 @@ tmp
         typename outerProduct<vector, Type>::type, fvPatchField, volMesh
     >
 >
-fourthGrad<Type>::grad
+fourthGrad<Type>::calcGrad
 (
-    const GeometricField<Type, fvPatchField, volMesh>& vsf
+    const GeometricField<Type, fvPatchField, volMesh>& vsf,
+    const word& name
 ) const
 {
     // The fourth-order gradient is calculated in two passes.  First,
@@ -79,7 +80,7 @@ fourthGrad<Type>::grad
         (
             IOobject
             (
-                "grad("+vsf.name()+')',
+                name,
                 vsf.instance(),
                 mesh,
                 IOobject::NO_READ,

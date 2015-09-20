@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -136,7 +136,7 @@ coupledSolverPerformance coupledFvMatrix<scalar>::solve
     //HR 17.2.2013: Clear references to internal field without deleting the objects
     forAll (matrices, rowI)
     {
-	psi.set(rowI, NULL).ptr();
+        psi.set(rowI, NULL).ptr();
     }
 
     return solverPerf;

@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -90,8 +90,8 @@ public:
         (
             ostream& os,
             const string& name,
-            streamFormat format=ASCII,
-            versionNumber version=currentVersion,
+            streamFormat format = ASCII,
+            versionNumber version = currentVersion,
             compressionType compression=UNCOMPRESSED
         );
 
@@ -154,6 +154,9 @@ public:
 
             //- Write doubleScalar
             virtual Ostream& write(const doubleScalar);
+
+            //- Write longDoubleScalar
+            virtual Ostream& write(const longDoubleScalar);
 
             //- Write binary block
             virtual Ostream& write(const char*, std::streamsize);

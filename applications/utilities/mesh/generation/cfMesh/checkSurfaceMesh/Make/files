@@ -1,0 +1,3 @@
+checkSurfaceMesh.C
+
+EXE = $(FOAM_APPBIN)/checkSurfaceMesh

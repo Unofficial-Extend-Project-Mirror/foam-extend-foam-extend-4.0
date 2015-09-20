@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -44,31 +44,40 @@ namespace Foam
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
 template<class MasterPatch, class SlavePatch>
-const scalar
+const Foam::debug::tolerancesSwitch
 GGIInterpolation<MasterPatch, SlavePatch>::faceBoundBoxExtendSpanFraction_
 (
-    debug::tolerances("GGIFaceBoundBoxExtendSpanFraction", 1.0e-2)
+    "GGIFaceBoundBoxExtendSpanFraction",
+    1.0e-2,
+    "GGI faces bounding box expansion factor. "
+    "Add robustness for quick-search algo. Keep it to a few percent."
 );
 
 template<class MasterPatch, class SlavePatch>
-const label
+const Foam::debug::optimisationSwitch
 GGIInterpolation<MasterPatch, SlavePatch>::octreeSearchMinNLevel_
 (
-    debug::optimisationSwitch("GGIOctreeSearchMinNLevel", 3)
+    "GGIOctreeSearchMinNLevel",
+    3,
+    "GGI neighbouring facets octree-based search: minNlevel parameter for octree"
 );
 
 template<class MasterPatch, class SlavePatch>
-const scalar
+const Foam::debug::optimisationSwitch
 GGIInterpolation<MasterPatch, SlavePatch>::octreeSearchMaxLeafRatio_
 (
-    debug::optimisationSwitch("GGIOctreeSearchMaxLeafRatio", 3)
+    "GGIOctreeSearchMaxLeafRatio",
+    3,
+    "GGI neighbouring facets octree-based search: maxLeafRatio parameter for octree"
 );
 
 template<class MasterPatch, class SlavePatch>
-const scalar
+const Foam::debug::optimisationSwitch
 GGIInterpolation<MasterPatch, SlavePatch>::octreeSearchMaxShapeRatio_
 (
-    debug::optimisationSwitch("GGIOctreeSearchMaxShapeRatio", 1)
+    "GGIOctreeSearchMaxShapeRatio",
+    1,
+    "GGI neighbouring facets octree-based search: maxShapeRatio parameter for octree"
 );
 
 
@@ -114,7 +123,7 @@ void GGIInterpolation<MasterPatch, SlavePatch>::findNeighbours3D
     labelListList& result
 ) const
 {
-    List<DynamicList<label> > candidateMasterNeighbors(masterPatch_.size());
+    List<DynamicList<label, 8> > candidateMasterNeighbors(masterPatch_.size());
 
     // First, compute the face center and the sphere radius (squared)
     // of the slave patch faces so we will not have to recompute this
@@ -172,7 +181,7 @@ void GGIInterpolation<MasterPatch, SlavePatch>::findNeighbours3D
 
         scalar tmpValue = Foam::magSqr(bbSlave.max() - bbSlave.min())/4.0;
 
-        // We will compare squared distances, so save the sqrt() if value > 1.0.
+        // We compare squared distances, so save the sqrt() if value > 1.0.
         if (tmpValue < 1.0)
         {
             // Take the sqrt, otherwise, we underestimate the radius
@@ -267,7 +276,7 @@ void GGIInterpolation<MasterPatch, SlavePatch>::findNeighboursAABB
     labelListList& result
 ) const
 {
-    List<DynamicList<label> > candidateMasterNeighbors(masterPatch_.size());
+    List<DynamicList<label, 8> > candidateMasterNeighbors(masterPatch_.size());
 
     // Grab the master patch faces bounding boxes
     List<boundBox> masterPatchBB(masterPatch_.size());
@@ -422,7 +431,7 @@ void GGIInterpolation<MasterPatch, SlavePatch>::findNeighboursBBOctree
     labelListList& result
 ) const
 {
-    List<DynamicList<label> > candidateMasterNeighbors(masterPatch_.size());
+    List<DynamicList<label, 8> > candidateMasterNeighbors(masterPatch_.size());
 
     // Initialize the list of master patch faces bounding box
     treeBoundBoxList lmasterFaceBB(masterPatch_.size());
@@ -440,7 +449,7 @@ void GGIInterpolation<MasterPatch, SlavePatch>::findNeighboursBBOctree
         treeBoundBox bbFaceMaster(facePoints);
 
         lmasterFaceBB[faceMi] =
-            bbFaceMaster.extend(faceBoundBoxExtendSpanFraction_);
+            bbFaceMaster.extend(faceBoundBoxExtendSpanFraction_());
     }
 
     // Initialize the list of slave patch faces bounding box
@@ -484,7 +493,7 @@ void GGIInterpolation<MasterPatch, SlavePatch>::findNeighboursBBOctree
         treeBoundBox bbFaceSlave(facePoints);
 
         lslaveFaceBB[faceSi] =
-            bbFaceSlave.extend(faceBoundBoxExtendSpanFraction_);
+            bbFaceSlave.extend(faceBoundBoxExtendSpanFraction_());
     }
 
     // Create the slave octreeData, using the boundBox flavor
@@ -499,9 +508,9 @@ void GGIInterpolation<MasterPatch, SlavePatch>::findNeighboursBBOctree
     (
         slaveOverallBB,              // overall search domain
         slaveDataBB,
-        octreeSearchMinNLevel_,      // min number of levels
-        octreeSearchMaxLeafRatio_,   // max avg. size of leaves
-        octreeSearchMaxShapeRatio_   // max avg. duplicity.
+        octreeSearchMinNLevel_(),      // min number of levels
+        octreeSearchMaxLeafRatio_(),   // max avg. size of leaves
+        octreeSearchMaxShapeRatio_()   // max avg. duplicity.
     );
 
     const vectorField& masterFaceNormals = masterPatch_.faceNormals();
@@ -552,10 +561,7 @@ void GGIInterpolation<MasterPatch, SlavePatch>::findNeighboursBBOctree
     {
         result[i].transfer(candidateMasterNeighbors[i].shrink());
     }
-
-    return;
 }
-
 
 
 // Projects a list of points onto a plane located at planeOrig,

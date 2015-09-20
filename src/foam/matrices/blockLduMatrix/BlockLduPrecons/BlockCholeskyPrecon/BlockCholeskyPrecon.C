@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -220,6 +220,9 @@ void Foam::BlockCholeskyPrecon<Type>::calcPreconDiag()
             }
         }
     }
+
+    // Invert the diagonal
+    preconDiag_ = inv(preconDiag_);
 }
 
 
@@ -249,12 +252,6 @@ void Foam::BlockCholeskyPrecon<Type>::diagMultiply
                 dDiag[lowerAddr[coeffI]],
                 upper[coeffI]
             );
-    }
-
-    // Invert the diagonal for future use
-    forAll (dDiag, i)
-    {
-        dDiag[i] = mult.inverse(dDiag[i]);
     }
 }
 
@@ -286,12 +283,6 @@ void Foam::BlockCholeskyPrecon<Type>::diagMultiplyCoeffT
                 upper[coeffI]
             );
     }
-
-    // Invert the diagonal for future use
-    forAll (dDiag, i)
-    {
-        dDiag[i] = mult.inverse(dDiag[i]);
-    }
 }
 
 
@@ -322,12 +313,6 @@ void Foam::BlockCholeskyPrecon<Type>::diagMultiply
                 dDiag[lowerAddr[coeffI]],
                 upper[coeffI]
             );
-    }
-
-    // Invert the diagonal for future use
-    forAll (dDiag, i)
-    {
-        dDiag[i] = mult.inverse(dDiag[i]);
     }
 }
 

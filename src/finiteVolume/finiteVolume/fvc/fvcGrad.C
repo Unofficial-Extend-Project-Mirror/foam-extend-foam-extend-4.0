@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -53,7 +53,7 @@ grad
     const GeometricField<Type, fvsPatchField, surfaceMesh>& ssf
 )
 {
-    return fv::gaussGrad<Type>::grad(ssf);
+    return fv::gaussGrad<Type>::gradf(ssf, "grad(" + ssf.name() + ')');
 }
 
 
@@ -98,7 +98,7 @@ grad
     (
         vf.mesh(),
         vf.mesh().schemesDict().gradScheme(name)
-    )().grad(vf);
+    )().grad(vf, name);
 }
 
 

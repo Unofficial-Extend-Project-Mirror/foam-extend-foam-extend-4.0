@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -51,88 +51,6 @@ void Foam::fvMatrix<Foam::scalar>::setComponentReference
                *value;
         }
     }
-}
-
-
-template<>
-Foam::autoPtr<Foam::fvMatrix<Foam::scalar>::fvSolver>
-Foam::fvMatrix<Foam::scalar>::solver
-(
-    const dictionary& solverControls
-)
-{
-    if (debug)
-    {
-        Info<< "fvMatrix<scalar>::solver(const dictionary& solverControls) : "
-               "solver for fvMatrix<scalar>"
-            << endl;
-    }
-
-    scalarField saveDiag = diag();
-    addBoundaryDiag(diag(), 0);
-
-    // Make a copy of interfaces: no longer a reference
-    // HJ, 20/Nov/2007
-    lduInterfaceFieldPtrsList interfaces = psi_.boundaryField().interfaces();
-
-    autoPtr<fvMatrix<scalar>::fvSolver> solverPtr
-    (
-        new fvMatrix<scalar>::fvSolver
-        (
-            *this,
-            lduSolver::New
-            (
-                psi_.name(),
-                *this,
-                boundaryCoeffs_,
-                internalCoeffs_,
-                interfaces,
-                solverControls
-            )
-        )
-    );
-
-    diag() = saveDiag;
-
-    return solverPtr;
-}
-
-
-template<>
-Foam::lduMatrix::solverPerformance
-Foam::fvMatrix<Foam::scalar>::fvSolver::solve
-(
-    const dictionary& solverControls
-)
-{
-    if (debug)
-    {
-        Info<< "fvScalarMatrix::solve(const dictionary&) : "
-               "solving fvScalarMatrix"
-            << endl;
-    }
-
-    // Complete matrix assembly.  HJ, 17/Apr/2012
-    fvMat_.completeAssembly();
-
-    scalarField saveDiag = fvMat_.diag();
-    fvMat_.addBoundaryDiag(fvMat_.diag(), 0);
-
-    scalarField totalSource = fvMat_.source();
-    fvMat_.addBoundarySource(totalSource, false);
-
-    // assign new solver controls
-    solver_->read(solverControls);
-    lduSolverPerformance solverPerf =
-        solver_->solve(fvMat_.psi().internalField(), totalSource);
-
-    solverPerf.print();
-
-    fvMat_.diag() = saveDiag;
-
-    fvMat_.psi().correctBoundaryConditions();
-
-    return solverPerf;
 }
 
 
@@ -193,10 +111,18 @@ Foam::tmp<Foam::scalarField> Foam::fvMatrix<Foam::scalar>::residual() const
     fvMatrix<scalar>& m = const_cast<fvMatrix<scalar>&>(*this);
     m.completeAssembly();
 
+    // To avoid copying the diagonal, execute boundary diag multiplication
+    // separately.  See source provided to lduMatrix::residual
+    // HJ, 26/Jun/2015
     scalarField boundaryDiag(psi_.size(), 0.0);
     addBoundaryDiag(boundaryDiag, 0);
 
-    // Make a copy of interfaces: no longer a reference
+    // Bug fix: boundary source must be added on rhs
+    // HJ, 26/Jun/2015
+    scalarField totalSource = source_;
+    addBoundarySource(totalSource, false);
+
+   // Make a copy of interfaces: no longer a reference
     // HJ, 20/Nov/2007
     lduInterfaceFieldPtrsList interfaces = psi_.boundaryField().interfaces();
 
@@ -205,14 +131,12 @@ Foam::tmp<Foam::scalarField> Foam::fvMatrix<Foam::scalar>::residual() const
         lduMatrix::residual
         (
             psi_.internalField(),
-            source_ - boundaryDiag*psi_.internalField(),
+            totalSource - boundaryDiag*psi_.internalField(),
             boundaryCoeffs_,
             interfaces,
             0
         )
     );
-
-    addBoundarySource(tres());
 
     return tres;
 }

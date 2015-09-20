@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -50,6 +50,7 @@ SourceFiles
 #include "boolList.H"
 #include "labelList.H"
 #include "primitiveFieldsFwd.H"
+#include "tolerancesSwitch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -267,9 +268,8 @@ class FaceCellWave
 
       // Private static data
 
-            static scalar geomTol_;
-            static scalar propagationTol_;
-
+            static debug::tolerancesSwitch geomTol_;
+            static debug::tolerancesSwitch propagationTol_;
 
 public:
 
@@ -278,7 +278,7 @@ public:
         //- Access to tolerance
         static scalar propagationTol()
         {
-            return propagationTol_;
+            return propagationTol_();
         }
 
         //- Change tolerance

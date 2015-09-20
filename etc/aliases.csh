@@ -1,9 +1,9 @@
 #----------------------------------*-sh-*--------------------------------------
 # =========                 |
 # \\      /  F ield         | foam-extend: Open Source CFD
-#  \\    /   O peration     |
-#   \\  /    A nd           | For copyright notice see file Copyright
-#    \\/     M anipulation  |
+#  \\    /   O peration     | Version:     3.2
+#   \\  /    A nd           | Web:         http://www.foam-extend.org
+#    \\/     M anipulation  | For copyright notice see file Copyright
 #------------------------------------------------------------------------------
 # License
 #     This file is part of foam-extend.
@@ -25,8 +25,8 @@
 #     aliases.csh
 #
 # Description
-#     Aliases for working with OpenFOAM
-#     Sourced from OpenFOAM-??/etc/cshrc and/or ~/.cshrc
+#     Aliases for working with FOAM
+#     Sourced from FOAM-??/etc/cshrc and/or ~/.cshrc
 #
 #------------------------------------------------------------------------------
 

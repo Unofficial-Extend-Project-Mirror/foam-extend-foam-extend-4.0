@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -205,7 +205,8 @@ public:
         //  A null pointer is treated like an empty dictionary.
         dictionary(const dictionary*);
 
-        //- Construct by transferring parameter contents given parent dictionary
+        //- Construct by transferring parameter contents from
+        //  given parent dictionary
         dictionary(const dictionary& parentDict, const Xfer<dictionary>&);
 
         //- Construct top-level dictionary by transferring parameter contents
@@ -245,7 +246,7 @@ public:
 
             //- Search dictionary for given keyword
             //  If recursive, search parent dictionaries
-            bool found(const word&, bool recursive=false) const;
+            bool found(const word&, bool recursive = false) const;
 
             //- Find and return an entry data stream pointer if present
             //  otherwise return NULL.
@@ -269,7 +270,8 @@ public:
                 bool patternMatch
             );
 
-            //- Find and return an entry data stream if present otherwise error.
+            //- Find and return an entry data stream
+            //  if present otherwise error.
             //  If recursive, search parent dictionaries.
             //  If patternMatch, use regular expressions.
             const entry& lookupEntry
@@ -285,8 +287,8 @@ public:
             ITstream& lookup
             (
                 const word&,
-                bool recursive=false,
-                bool patternMatch=true
+                bool recursive = false,
+                bool patternMatch = true
             ) const;
 
             //- Find and return a T,
@@ -298,8 +300,8 @@ public:
             (
                 const word&,
                 const T&,
-                bool recursive=false,
-                bool patternMatch=true
+                bool recursive = false,
+                bool patternMatch = true
             ) const;
 
             //- Find and return a T, if not found return the given
@@ -311,8 +313,8 @@ public:
             (
                 const word&,
                 const T&,
-                bool recursive=false,
-                bool patternMatch=true
+                bool recursive = false,
+                bool patternMatch = true
             );
 
             //- Find an entry if present, and assign to T
@@ -324,8 +326,8 @@ public:
             (
                 const word&,
                 T&,
-                bool recursive=false,
-                bool patternMatch=true
+                bool recursive = false,
+                bool patternMatch = true
             ) const;
 
             //- Check if entry is a sub-dictionary
@@ -349,7 +351,7 @@ public:
             wordList toc() const;
 
             //- Return the list of available keys or patterns
-            List<keyType> keys(bool patterns=false) const;
+            List<keyType> keys(bool patterns = false) const;
 
 
         // Editing
@@ -361,28 +363,28 @@ public:
             //- Add a new entry
             //  With the merge option, dictionaries are interwoven and
             //  primitive entries are overwritten
-            bool add(entry*, bool mergeEntry=false);
+            bool add(entry*, bool mergeEntry = false);
 
             //- Add an entry
             //  With the merge option, dictionaries are interwoven and
             //  primitive entries are overwritten
-            void add(const entry&, bool mergeEntry=false);
+            void add(const entry&, bool mergeEntry = false);
 
             //- Add a word entry
             //  optionally overwrite an existing entry
-            void add(const keyType&, const word&, bool overwrite=false);
+            void add(const keyType&, const word&, bool overwrite = false);
 
             //- Add a string entry
             //  optionally overwrite an existing entry
-            void add(const keyType&, const string&, bool overwrite=false);
+            void add(const keyType&, const string&, bool overwrite = false);
 
             //- Add a label entry
             //  optionally overwrite an existing entry
-            void add(const keyType&, const label, bool overwrite=false);
+            void add(const keyType&, const label, bool overwrite = false);
 
             //- Add a scalar entry
             //  optionally overwrite an existing entry
-            void add(const keyType&, const scalar, bool overwrite=false);
+            void add(const keyType&, const scalar, bool overwrite = false);
 
             //- Add a dictionary entry
             //  optionally merge with an existing sub-dictionary
@@ -390,13 +392,13 @@ public:
             (
                 const keyType&,
                 const dictionary&,
-                bool mergeEntry=false
+                bool mergeEntry = false
             );
 
             //- Add a T entry
             //  optionally overwrite an existing entry
             template<class T>
-            void add(const keyType&, const T&, bool overwrite=false);
+            void add(const keyType&, const T&, bool overwrite = false);
 
             //- Assign a new entry, overwrite any existing entry
             void set(entry*);
@@ -420,7 +422,7 @@ public:
             (
                 const keyType& oldKeyword,
                 const keyType& newKeyword,
-                bool forceOverwrite=false
+                bool forceOverwrite = false
             );
 
             //- Merge entries from the given dictionary.
@@ -445,7 +447,7 @@ public:
 
         // Write
 
-            void write(Ostream&, bool subDict=true) const;
+            void write(Ostream&, bool subDict = true) const;
 
 
     // Member Operators

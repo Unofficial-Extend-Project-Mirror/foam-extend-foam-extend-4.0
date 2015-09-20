@@ -1,0 +1,3 @@
+scaleMesh.C
+
+EXE = $(FOAM_APPBIN)/scaleMesh

@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -225,7 +225,9 @@ Foam::label Foam::face::split
             splitEdge /= Foam::mag(splitEdge) + VSMALL;
 
             const scalar splitCos = splitEdge & rightEdge;
-            const scalar splitAngle = acos(max(-1.0, min(1.0, splitCos)));
+            const scalar splitAngle =
+                acos(max(scalar(-1), min(scalar(1), splitCos)));
+
             const scalar angleDiff = fabs(splitAngle - bisectAngle);
 
             if (angleDiff < minDiff)

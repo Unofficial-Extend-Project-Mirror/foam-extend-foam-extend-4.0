@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -36,7 +36,12 @@ const Foam::word Foam::functionEntries::inputModeEntry::typeName
 
 // Don't lookup the debug switch here as the debug switch dictionary
 // might include inputModeEntries
-int Foam::functionEntries::inputModeEntry::debug(0);
+Foam::debug::debugSwitch
+Foam::functionEntries::inputModeEntry::debug
+(
+    "inputModeEntry",
+    0
+);
 
 Foam::functionEntries::inputModeEntry::inputMode
     Foam::functionEntries::inputModeEntry::mode_(MERGE);
@@ -81,7 +86,7 @@ void Foam::functionEntries::inputModeEntry::setMode(Istream& is)
     }
     else if (mode == "error")
     {
-        mode_ = ERROR;
+        mode_ = FATALERROR;
     }
     else
     {
@@ -131,7 +136,7 @@ bool Foam::functionEntries::inputModeEntry::protect()
 
 bool Foam::functionEntries::inputModeEntry::error()
 {
-    return mode_ == ERROR;
+    return mode_ == FATALERROR;
 }
 
 

@@ -2,15 +2,28 @@ EXE_INC = \
     -I$(SCOTCH_INCLUDE_DIR) \
     -I../decompositionMethods/lnInclude
 
-ifeq ($(WM_ARCH_BASE), darwin)
+#if defined(darwin)
+
 /* No librt for Mac OS X */
 LIB_LIBS = \
     -lfoam \
     -L$(SCOTCH_LIB_DIR) -lscotch \
     -L$(SCOTCH_LIB_DIR) -lscotcherrexit
-else
+
+#elif defined(mingw)
+
+/* No librt for MinGW */
+LIB_LIBS = \
+    -ldecompositionMethods \
+    -L$(SCOTCH_LIB_DIR) -lscotch \
+    -L$(SCOTCH_LIB_DIR) -lscotcherrexit \
+    -L$(OPENMPI_DIR)/lib -lmpi
+
+#else
+
 LIB_LIBS = \
     -L$(SCOTCH_LIB_DIR) -lscotch \
     -L$(SCOTCH_LIB_DIR) -lscotcherrexit \
     -lrt
-endif
+
+#endif

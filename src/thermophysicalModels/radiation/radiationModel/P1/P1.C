@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -39,13 +39,7 @@ namespace Foam
     namespace radiation
     {
         defineTypeNameAndDebug(P1, 0);
-
-        addToRunTimeSelectionTable
-        (
-            radiationModel,
-            P1,
-            dictionary
-        );
+        addToRadiationRunTimeSelectionTables(P1);
     }
 }
 
@@ -122,6 +116,76 @@ Foam::radiation::P1::P1(const volScalarField& T)
 {}
 
 
+Foam::radiation::P1::P1(const dictionary& dict, const volScalarField& T)
+:
+    radiationModel(typeName, dict, T),
+    G_
+    (
+        IOobject
+        (
+            "G",
+            mesh_.time().timeName(),
+            T.db(),
+            IOobject::MUST_READ,
+            IOobject::AUTO_WRITE
+        ),
+        mesh_
+    ),
+    Qr_
+    (
+        IOobject
+        (
+            "Qr",
+            mesh_.time().timeName(),
+            T.db(),
+            IOobject::NO_READ,
+            IOobject::AUTO_WRITE
+        ),
+        mesh_,
+        dimensionedScalar("Qr", dimMass/pow3(dimTime), 0.0)
+    ),
+    a_
+    (
+        IOobject
+        (
+            "a",
+            mesh_.time().timeName(),
+            T.db(),
+            IOobject::NO_READ,
+            IOobject::AUTO_WRITE
+        ),
+        mesh_,
+        dimensionedScalar("a", dimless/dimLength, 0.0)
+    ),
+    e_
+    (
+        IOobject
+        (
+            "e",
+            mesh_.time().timeName(),
+            T.db(),
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        ),
+        mesh_,
+        dimensionedScalar("a", dimless/dimLength, 0.0)
+    ),
+    E_
+    (
+        IOobject
+        (
+            "E",
+            mesh_.time().timeName(),
+            T.db(),
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        ),
+        mesh_,
+        dimensionedScalar("E", dimMass/dimLength/pow3(dimTime), 0.0)
+    )
+{}
+
+
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
 Foam::radiation::P1::~P1()
@@ -150,7 +214,9 @@ void Foam::radiation::P1::calculate()
     a_ = absorptionEmission_->a();
     e_ = absorptionEmission_->e();
     E_ = absorptionEmission_->E();
-    const volScalarField sigmaEff = scatter_->sigmaEff();
+    const volScalarField sigmaEff(scatter_->sigmaEff());
+
+    const dimensionedScalar a0 ("a0", a_.dimensions(), ROOTVSMALL);
 
     // Construct diffusion
     const volScalarField gamma
@@ -163,7 +229,7 @@ void Foam::radiation::P1::calculate()
             IOobject::NO_READ,
             IOobject::NO_WRITE
         ),
-        1.0/(3.0*a_ + sigmaEff)
+        1.0/(3.0*a_ + sigmaEff + a0)
     );
 
     // Solve G transport equation
@@ -210,10 +276,8 @@ Foam::radiation::P1::Ru() const
 {
     const DimensionedField<scalar, volMesh>& G =
         G_.dimensionedInternalField();
-
     const DimensionedField<scalar, volMesh> E =
         absorptionEmission_->ECont()().dimensionedInternalField();
-
     const DimensionedField<scalar, volMesh> a =
         absorptionEmission_->aCont()().dimensionedInternalField();
 

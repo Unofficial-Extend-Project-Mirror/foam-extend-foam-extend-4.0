@@ -8,7 +8,7 @@ if(divDSigmaNonLinExpMethod == "standard")
                 (gradDU & gradU.T())
               + (gradU & gradDU.T())
               + (gradDU & gradDU.T())
-	        )
+            )
         )
       + (
             0.5*lambda*
@@ -68,23 +68,23 @@ else if(divDSigmaNonLinExpMethod == "surface")
      // divDSigmaNonLinExp =
      //   fvc::div
      //   (
-     // 	( muf * mesh.Sf()
-     // 	  & fvc::interpolate(
-     // 			     (gradDU & gradU.T())
-     // 			     + (gradU & gradDU.T())
-     // 			     + (gradDU & gradDU.T())
-     // 			     ) )
-     // 	+ ( lambdaf * 0.5* tr(
-     // 			      fvc::interpolate(
-     // 					       (gradDU & gradU.T())
-     // 					       + (gradU & gradDU.T())
-     // 					       + (gradDU & gradDU.T())
-     // 					       )
-     // 			      ) * mesh.Sf() )
-     // 	+ (mesh.Sf() & fvc::interpolate( (DSigma & gradU )
-     // 					 + ( (sigma + DSigma) & gradDU )
-     // 					 ) )
-     // 	);
+     //     ( muf * mesh.Sf()
+     //       & fvc::interpolate(
+     //                  (gradDU & gradU.T())
+     //                  + (gradU & gradDU.T())
+     //                  + (gradDU & gradDU.T())
+     //                  ) )
+     //     + ( lambdaf * 0.5* tr(
+     //                   fvc::interpolate(
+     //                            (gradDU & gradU.T())
+     //                            + (gradU & gradDU.T())
+     //                            + (gradDU & gradDU.T())
+     //                            )
+     //                   ) * mesh.Sf() )
+     //     + (mesh.Sf() & fvc::interpolate( (DSigma & gradU )
+     //                      + ( (sigma + DSigma) & gradDU )
+     //                      ) )
+     //     );
 }
 else
 {

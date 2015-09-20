@@ -1,0 +1,37 @@
+################################################################################
+This file contains brief description of the changes introduced by merging
+branches
+
+There are two secions: feature and bugfix
+
+The general format should be:
+Branchname (sans "bugfix/" of "feature/" prefix)
+Author: Contributor name; Merge: Code maintainer name
+One or two lines describing the bugfix or feature
+
+################################################################################
+
+** Feature
+
+
+
+** Bugfix
+* updatePreconfiguredBoundaryTuts
+Author: Hrvoje Jasak; Merge: Dominik Christ
+Updated tutorials which use mixing plane and had broken preconfigured boundary
+files
+
+* ReleaseNotesInstallationVersionNumber
+Author: Hrvoje Jasak; Merge: Dominik Christ
+Bumped version number in ReleaseNotes and updated links to SourceForce pages
+
+* Intel14Port
+Author: Hrvoje Jasak; Merge: Dominik Christ
+Updated wmake/rules for compilation with ICC 14
+
+* processorPointPatch
+Author: Zeljko Tukovic; Merge: Dominik Christ
+Correct interpolation of point data on processor boundaries after parallel
+topological changes
+
+

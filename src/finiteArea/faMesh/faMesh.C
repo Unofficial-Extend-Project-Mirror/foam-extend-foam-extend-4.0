@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -27,7 +27,7 @@ Description
 
 #include "faMesh.H"
 #include "faGlobalMeshData.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "polyMesh.H"
 #include "primitiveMesh.H"
 #include "demandDrivenData.H"
@@ -38,6 +38,7 @@ Description
 #include "wedgeFaPatch.H"
 #include "faPatchData.H"
 #include "SortableList.H"
+#include "controlSwitches.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
@@ -48,10 +49,13 @@ namespace Foam
 
 Foam::word Foam::faMesh::meshSubDir = "faMesh";
 
-const bool Foam::faMesh::quadricsFit_
+const Foam::debug::optimisationSwitch
+Foam::faMesh::quadricsFit_
 (
-    debug::optimisationSwitch("quadricsFit", 0) > 0
+    "quadricsFit",
+    0
 );
+
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
@@ -1189,7 +1193,7 @@ const Foam::vectorField& Foam::faMesh::pointAreaNormals() const
     {
         calcPointAreaNormals();
 
-        if (quadricsFit_)
+        if (quadricsFit_() > 0)
         {
             calcPointAreaNormalsByQuadricsFit();
         }

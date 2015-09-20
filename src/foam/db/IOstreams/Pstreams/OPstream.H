@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -55,6 +55,7 @@ class OPstream
 {
     // Private data
 
+         // ID of receiving processor
         int toProcNo_;
 
 
@@ -68,7 +69,12 @@ class OPstream
         inline void writeToBuffer(const char&);
 
         //- Write data to the transfer buffer
-        inline void writeToBuffer(const void* data, size_t count, size_t align);
+        inline void writeToBuffer
+        (
+            const void* data,
+            size_t count,
+            size_t align
+        );
 
 
 public:
@@ -82,8 +88,8 @@ public:
             const commsTypes commsType,
             const int toProcNo,
             const label bufSize = 0,
-            streamFormat format=BINARY,
-            versionNumber version=currentVersion
+            streamFormat format = BINARY,
+            versionNumber version = currentVersion
         );
 
 
@@ -140,7 +146,7 @@ public:
             Ostream& writeQuoted
             (
                 const std::string&,
-                const bool quoted=true
+                const bool quoted = true
             );
 
             //- Write label
@@ -151,6 +157,9 @@ public:
 
             //- Write doubleScalar
             Ostream& write(const doubleScalar);
+
+            //- Write longDoubleScalar
+            Ostream& write(const longDoubleScalar);
 
             //- Write binary block
             Ostream& write(const char*, std::streamsize);

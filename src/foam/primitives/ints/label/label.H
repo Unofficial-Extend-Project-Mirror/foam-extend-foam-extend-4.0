@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -56,6 +56,8 @@ Description
 # define FOAM_LABEL_MAX INT_MAX
 
 # include "int.H"
+# include "long.H"
+# include "longLong.H"
 
 namespace Foam
 {
@@ -121,7 +123,12 @@ namespace Foam
 
 } // End namespace Foam
 
+#else
+
+#error "Undefined size for label in label.H"
+
 #endif
+
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

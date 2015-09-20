@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -158,7 +158,7 @@ void Foam::LUscalarMatrix::convert
     {
         if (interfaces.set(inti))
         {
-            const lduInterface& interface = interfaces[inti].interface();
+            const lduInterface& interface = interfaces[inti].coupledInterface();
 
             const label* __restrict__ ulPtr = interface.faceCells().begin();
             const scalar* __restrict__ upperLowerPtr =

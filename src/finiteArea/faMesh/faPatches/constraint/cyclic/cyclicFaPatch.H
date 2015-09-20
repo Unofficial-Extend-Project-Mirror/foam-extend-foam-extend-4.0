@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -38,6 +38,7 @@ SourceFiles
 #include "coupledFaPatch.H"
 #include "cyclicLduInterface.H"
 #include "cyclicPolyPatch.H"
+#include "tolerancesSwitch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -65,7 +66,7 @@ protected:
 
         //- Relative tolerance (for geometric matching). Is factor of
         //  maximum edge length per face.
-        static const scalar matchTol_;
+        static const debug::tolerancesSwitch matchTol_;
 
     // Protected Member functions
 

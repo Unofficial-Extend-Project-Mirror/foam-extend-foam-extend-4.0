@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -257,6 +257,7 @@ LaunderGibsonRSTM::LaunderGibsonRSTM
     }
 
     mut_ = Cmu_*rho_*sqr(k_)/(epsilon_ + epsilonSmall_);
+    mut_ = min(mut_, muRatio()*mu());
     mut_.correctBoundaryConditions();
 
     alphat_ = mut_/Prt_;
@@ -364,6 +365,7 @@ void LaunderGibsonRSTM::correct()
     {
         // Re-calculate viscosity
         mut_ = rho_*Cmu_*sqr(k_)/(epsilon_ + epsilonSmall_);
+        mut_ = min(mut_, muRatio()*mu());
         mut_.correctBoundaryConditions();
 
         // Re-calculate thermal diffusivity
@@ -444,7 +446,7 @@ void LaunderGibsonRSTM::correct()
         // Change for consistency with Fluent implementation.
         // Emil Baric, NUMAP-FOAM 2011
         // HJ, 13/Dec/2011
-      - Clg2_*(dev(P) - dev(C))
+      - Clg2_*(rho_*dev(P) - dev(C))
 
         // wall reflection terms
       + symm
@@ -479,6 +481,7 @@ void LaunderGibsonRSTM::correct()
 
     // Re-calculate turbulent viscosity
     mut_ = Cmu_*rho_*sqr(k_)/epsilon_;
+    mut_ = min(mut_, muRatio()*mu());
     mut_.correctBoundaryConditions();
 
     // Re-calculate thermal diffusivity

@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -34,7 +34,23 @@ inline Foam::IndirectList<T>::IndirectList
 :
     completeList_(const_cast<UList<T>&>(completeList)),
     addressing_(addr)
-{}
+{
+#   ifdef FULLDEBUG
+    if (completeList_.empty() && !addressing_.empty())
+    {
+        FatalErrorIn
+        (
+            "inline Foam::IndirectList<T>::IndirectList\n"
+            "(\n"
+            "    const UList<T>& completeList,\n"
+            "    const UList<label>& addr\n"
+            ")"
+        )   << "Incorrect definition of indirect list.  "
+            << "Complete list is empty and addressing is not"
+            << abort(FatalError);
+    }
+#   endif
+}
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //

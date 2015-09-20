@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -261,8 +261,8 @@ void dirichletNeumann::correct
        slaveDispMag =
      localSlaveInterpolator.pointToFaceInterpolate<scalar>
      (
-      min(slavePointPenetration, 0.0)
-      );
+         min(slavePointPenetration, scalar(0))
+     );
 
        // for visualisation
        slaveContactPointGap() = slavePointPenetration;
@@ -277,11 +277,14 @@ void dirichletNeumann::correct
      = mesh.boundaryMesh()[slavePatchIndex].start();
        forAll(slaveDispMag, facei)
      {
-       slaveDispMag[facei] =
-         globalSlavePenetration
-         [
-          mesh.faceZones()[slaveFaceZoneID()].whichFace(slavePatchStart + facei)
-          ];
+         slaveDispMag[facei] =
+             globalSlavePenetration
+             [
+                 mesh.faceZones()[slaveFaceZoneID()].whichFace
+                 (
+                     slavePatchStart + facei
+                 )
+             ];
 
        //- when the master surface surrounds the slave (like the pelvis
        // and femur head) then
@@ -317,7 +320,7 @@ void dirichletNeumann::correct
        slaveContactPointGap() = slavePointPenetration;
 
        // set all positive penetrations to zero
-       slaveDispMag = min(slaveDispMag,0.0);
+       slaveDispMag = min(slaveDispMag, scalar(0));
 
        minSlavePointPenetration = min(slavePointPenetration);
        reduce(minSlavePointPenetration, minOp<scalar>());

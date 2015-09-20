@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -121,7 +121,19 @@ public:
         <
             GeometricField
             <typename outerProduct<vector, Type>::type, fvPatchField, volMesh>
-        > grad
+        > calcGrad
+        (
+            const GeometricField<Type, fvPatchField, volMesh>& vsf,
+            const word& name
+        ) const;
+
+
+        //- Return the BlockLduSystem corresponding to the implicit cell
+        // limted grad discretization. For block coupled systems.
+        tmp
+        <
+            BlockLduSystem<vector, typename outerProduct<vector, Type>::type>
+        > fvmGrad
         (
             const GeometricField<Type, fvPatchField, volMesh>&
         ) const;

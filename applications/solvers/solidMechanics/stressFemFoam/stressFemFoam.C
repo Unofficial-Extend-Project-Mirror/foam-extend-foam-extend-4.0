@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -60,7 +60,7 @@ int main(int argc, char *argv[])
 
     Info << "\nCalculating displacement field\n" << endl;
 
-    for (runTime++; !runTime.end(); runTime++)
+    while(runTime.loop())
     {
         Info<< "Iteration: " << runTime.timeName() << nl << endl;
 
@@ -80,9 +80,10 @@ int main(int argc, char *argv[])
             << nl << endl;
     }
 
-    Info << "End\n" << endl;
+    Info<< "End\n" << endl;
 
     return(0);
 }
+
 
 // ************************************************************************* //

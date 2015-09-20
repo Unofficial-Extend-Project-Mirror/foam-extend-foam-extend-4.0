@@ -1,8 +1,8 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | foam-extend: Open Source CFD                    |
-|  \\    /   O peration     | Version:     3.1                                |
-|   \\  /    A nd           | Web:         http://www.extend-project.de       |
+|  \\    /   O peration     | Version:     3.2                                |
+|   \\  /    A nd           | Web:         http://www.foam-extend.org         |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 FoamFile
@@ -34226,19 +34226,19 @@ boundaryField
 {
     leftWall
     {
-        type            alphaContactAngle;
+        type            multiphaseAlphaContactAngle;
         thetaProperties ( ( water air ) 90 0 0 0 ( oil air ) 90 0 0 0 ( mercury air ) 90 0 0 0 ( water oil ) 90 0 0 0 ( water mercury ) 90 0 0 0 ( oil mercury ) 90 0 0 0 );
         value           uniform 0;
     }
     rightWall
     {
-        type            alphaContactAngle;
+        type            multiphaseAlphaContactAngle;
         thetaProperties ( ( water air ) 90 0 0 0 ( oil air ) 90 0 0 0 ( mercury air ) 90 0 0 0 ( water oil ) 90 0 0 0 ( water mercury ) 90 0 0 0 ( oil mercury ) 90 0 0 0 );
         value           uniform 0;
     }
     lowerWall
     {
-        type            alphaContactAngle;
+        type            multiphaseAlphaContactAngle;
         thetaProperties ( ( water air ) 90 0 0 0 ( oil air ) 90 0 0 0 ( mercury air ) 90 0 0 0 ( water oil ) 90 0 0 0 ( water mercury ) 90 0 0 0 ( oil mercury ) 90 0 0 0 );
         value           uniform 0;
     }

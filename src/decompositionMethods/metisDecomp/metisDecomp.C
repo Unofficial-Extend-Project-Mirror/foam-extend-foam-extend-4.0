@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -26,7 +26,7 @@ License
 #include "metisDecomp.H"
 #include "addToRunTimeSelectionTable.H"
 #include "floatScalar.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "scotchDecomp.H"
 
 extern "C"
@@ -316,10 +316,14 @@ Foam::labelList Foam::metisDecomp::decompose
 
     // Copy back to labelList
     labelList decomp(finalDecomp.size());
+
     forAll(decomp, i)
     {
         decomp[i] = finalDecomp[i];
     }
+
+    fixCyclics(mesh_, decomp);
+
     return decomp;
 }
 
@@ -374,6 +378,8 @@ Foam::labelList Foam::metisDecomp::decompose
         fineDistribution[i] = finalDecomp[fineToCoarse[i]];
     }
 
+    fixCyclics(mesh_, fineDistribution);
+
     return fineDistribution;
 }
 
@@ -416,6 +422,8 @@ Foam::labelList Foam::metisDecomp::decompose
     {
         decomp[i] = finalDecomp[i];
     }
+
+    fixCyclics(mesh_, decomp);
 
     return decomp;
 }

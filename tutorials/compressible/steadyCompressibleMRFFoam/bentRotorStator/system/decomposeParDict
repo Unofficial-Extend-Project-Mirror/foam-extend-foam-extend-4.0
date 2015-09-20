@@ -1,27 +1,27 @@
-/*--------------------------------*- C++-*-----------------------------------*\
+/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  1.7                                   |
-|   \\  /    A nd           | Web:      www.OpenFOAM.com                      |
+| \\      /  F ield         | foam-extend: Open Source CFD                    |
+|  \\    /   O peration     | Version:     3.2                                |
+|   \\  /    A nd           | Web:         http://www.foam-extend.org         |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 FoamFile
 {
-    version     1.7;
+    version     2.0;
     format      ascii;
     class       dictionary;
     object      decomposeParDict;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
- 
+
 numberOfSubdomains    4;
- 
+
 method           scotch;
- 
-distributed     no; 
- 
+
+distributed     no;
+
 roots
 (
 );
- 
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

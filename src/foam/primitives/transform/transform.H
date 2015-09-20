@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -146,171 +146,179 @@ inline SphericalTensor<Cmpt> transform
 
 
 template<class Cmpt>
-inline SymmTensor4thOrder<Cmpt> transform(const tensor& L, const SymmTensor4thOrder<Cmpt>& C)
+inline SymmTensor4thOrder<Cmpt> transform
+(
+    const tensor& L,
+    const SymmTensor4thOrder<Cmpt>& C
+)
 {
-  //- represent fourth order tensors in 6x6 notation then rotation is given by
-  //- C_rotated_af = A_ba * C_cd * A_ef
-  //- where A is a function of L
+    //- represent fourth order tensors in 6x6 notation.  Rotation is given by
+    //- C_rotated_af = A_ba * C_cd * A_ef
+    //- where A is a function of L
 
-  const double s = ::sqrt(2);
-  const double A[6][6] =
+    const scalar s = ::sqrt(2);
+    const scalar A[6][6] =
     {
-      { L.xx()*L.xx(), L.xy()*L.xy(), L.xz()*L.xz(), s*L.xx()*L.xy(), s*L.xy()*L.xz(), s*L.xz()*L.xx() },
-      { L.yx()*L.yx(), L.yy()*L.yy(), L.yz()*L.yz(), s*L.yx()*L.yy(), s*L.yy()*L.yz(), s*L.yz()*L.yx() },
-      { L.zx()*L.zx(), L.zy()*L.zy(), L.zz()*L.zz(), s*L.zx()*L.zy(), s*L.zy()*L.zz(), s*L.zz()*L.zx() },
-      { s*L.xx()*L.yx(), s*L.xy()*L.yy(), s*L.xz()*L.yz(), (L.xy()*L.yx()+L.xx()*L.yy()), (L.xz()*L.yy()+L.xy()*L.yz()), (L.xx()*L.yz()+L.xz()*L.yx()) },
-      { s*L.yx()*L.zx(), s*L.yy()*L.zy(), s*L.yz()*L.zz(), (L.yy()*L.zx()+L.yx()*L.zy()), (L.yz()*L.zy()+L.yy()*L.zz()), (L.yx()*L.zz()+L.yz()*L.zx()) },
-      { s*L.zx()*L.xx(), s*L.zy()*L.xy(), s*L.zz()*L.xz(), (L.zy()*L.xx()+L.zx()*L.xy()), (L.zz()*L.xy()+L.zy()*L.xz()), (L.zx()*L.xz()+L.zz()*L.xx()) }
+        {
+            L.xx()*L.xx(), L.xy()*L.xy(), L.xz()*L.xz(), s*L.xx()*L.xy(), s*L.xy()*L.xz(), s*L.xz()*L.xx() },
+        { L.yx()*L.yx(), L.yy()*L.yy(), L.yz()*L.yz(), s*L.yx()*L.yy(), s*L.yy()*L.yz(), s*L.yz()*L.yx() },
+        { L.zx()*L.zx(), L.zy()*L.zy(), L.zz()*L.zz(), s*L.zx()*L.zy(), s*L.zy()*L.zz(), s*L.zz()*L.zx() },
+        { s*L.xx()*L.yx(), s*L.xy()*L.yy(), s*L.xz()*L.yz(), (L.xy()*L.yx()+L.xx()*L.yy()), (L.xz()*L.yy()+L.xy()*L.yz()), (L.xx()*L.yz()+L.xz()*L.yx()) },
+        { s*L.yx()*L.zx(), s*L.yy()*L.zy(), s*L.yz()*L.zz(), (L.yy()*L.zx()+L.yx()*L.zy()), (L.yz()*L.zy()+L.yy()*L.zz()), (L.yx()*L.zz()+L.yz()*L.zx()) },
+        { s*L.zx()*L.xx(), s*L.zy()*L.xy(), s*L.zz()*L.xz(), (L.zy()*L.xx()+L.zx()*L.xy()), (L.zz()*L.xy()+L.zy()*L.xz()), (L.zx()*L.xz()+L.zz()*L.xx()) }
     };
 
-  return symmTensor4thOrder
+    return symmTensor4thOrder
     (
-     // xxxx
-     A[0][0] * C.xxxx() * A[0][0] +
-     A[1][0] * C.xxyy() * A[0][0] +
-     A[2][0] * C.xxzz() * A[0][0] +
-     A[0][0] * C.xxyy() * A[1][0] +
-     A[1][0] * C.yyyy() * A[1][0] +
-     A[2][0] * C.yyzz() * A[1][0] +
-     A[0][0] * C.xxzz() * A[2][0] +
-     A[1][0] * C.yyzz() * A[2][0] +
-     A[2][0] * C.zzzz() * A[2][0] +
-     A[3][0] * C.xyxy() * A[3][0] +
-     A[4][0] * C.yzyz() * A[4][0] +
-     A[5][0] * C.zxzx() * A[5][0],
+        // xxxx
+        A[0][0] * C.xxxx() * A[0][0] +
+        A[1][0] * C.xxyy() * A[0][0] +
+        A[2][0] * C.xxzz() * A[0][0] +
+        A[0][0] * C.xxyy() * A[1][0] +
+        A[1][0] * C.yyyy() * A[1][0] +
+        A[2][0] * C.yyzz() * A[1][0] +
+        A[0][0] * C.xxzz() * A[2][0] +
+        A[1][0] * C.yyzz() * A[2][0] +
+        A[2][0] * C.zzzz() * A[2][0] +
+        A[3][0] * C.xyxy() * A[3][0] +
+        A[4][0] * C.yzyz() * A[4][0] +
+        A[5][0] * C.zxzx() * A[5][0],
 
-     // xxyy
-     A[0][0] * C.xxxx() * A[0][1] +
-     A[1][0] * C.xxyy() * A[0][1] +
-     A[2][0] * C.xxzz() * A[0][1] +
-     A[0][0] * C.xxyy() * A[1][1] +
-     A[1][0] * C.yyyy() * A[1][1] +
-     A[2][0] * C.yyzz() * A[1][1] +
-     A[0][0] * C.xxzz() * A[2][1] +
-     A[1][0] * C.yyzz() * A[2][1] +
-     A[2][0] * C.zzzz() * A[2][1] +
-     A[3][0] * C.xyxy() * A[3][1] +
-     A[4][0] * C.yzyz() * A[4][1] +
-     A[5][0] * C.zxzx() * A[5][1],
+        // xxyy
+        A[0][0] * C.xxxx() * A[0][1] +
+        A[1][0] * C.xxyy() * A[0][1] +
+        A[2][0] * C.xxzz() * A[0][1] +
+        A[0][0] * C.xxyy() * A[1][1] +
+        A[1][0] * C.yyyy() * A[1][1] +
+        A[2][0] * C.yyzz() * A[1][1] +
+        A[0][0] * C.xxzz() * A[2][1] +
+        A[1][0] * C.yyzz() * A[2][1] +
+        A[2][0] * C.zzzz() * A[2][1] +
+        A[3][0] * C.xyxy() * A[3][1] +
+        A[4][0] * C.yzyz() * A[4][1] +
+        A[5][0] * C.zxzx() * A[5][1],
 
-     // xzz
-     A[0][0] * C.xxxx() * A[0][2] +
-     A[1][0] * C.xxyy() * A[0][2] +
-     A[2][0] * C.xxzz() * A[0][2] +
-     A[0][0] * C.xxyy() * A[1][2] +
-     A[1][0] * C.yyyy() * A[1][2] +
-     A[2][0] * C.yyzz() * A[1][2] +
-     A[0][0] * C.xxzz() * A[2][2] +
-     A[1][0] * C.yyzz() * A[2][2] +
-     A[2][0] * C.zzzz() * A[2][2] +
-     A[3][0] * C.xyxy() * A[3][2] +
-     A[4][0] * C.yzyz() * A[4][2] +
-     A[5][0] * C.zxzx() * A[5][2],
+        // xzz
+        A[0][0] * C.xxxx() * A[0][2] +
+        A[1][0] * C.xxyy() * A[0][2] +
+        A[2][0] * C.xxzz() * A[0][2] +
+        A[0][0] * C.xxyy() * A[1][2] +
+        A[1][0] * C.yyyy() * A[1][2] +
+        A[2][0] * C.yyzz() * A[1][2] +
+        A[0][0] * C.xxzz() * A[2][2] +
+        A[1][0] * C.yyzz() * A[2][2] +
+        A[2][0] * C.zzzz() * A[2][2] +
+        A[3][0] * C.xyxy() * A[3][2] +
+        A[4][0] * C.yzyz() * A[4][2] +
+        A[5][0] * C.zxzx() * A[5][2],
 
-     // yyyy
-     A[0][1] * C.xxxx() * A[0][1] +
-     A[1][1] * C.xxyy() * A[0][1] +
-     A[2][1] * C.xxzz() * A[0][1] +
-     A[0][1] * C.xxyy() * A[1][1] +
-     A[1][1] * C.yyyy() * A[1][1] +
-     A[2][1] * C.yyzz() * A[1][1] +
-     A[0][1] * C.xxzz() * A[2][1] +
-     A[1][1] * C.yyzz() * A[2][1] +
-     A[2][1] * C.zzzz() * A[2][1] +
-     A[3][1] * C.xyxy() * A[3][1] +
-     A[4][1] * C.yzyz() * A[4][1] +
-     A[5][1] * C.zxzx() * A[5][1],
+        // yyyy
+        A[0][1] * C.xxxx() * A[0][1] +
+        A[1][1] * C.xxyy() * A[0][1] +
+        A[2][1] * C.xxzz() * A[0][1] +
+        A[0][1] * C.xxyy() * A[1][1] +
+        A[1][1] * C.yyyy() * A[1][1] +
+        A[2][1] * C.yyzz() * A[1][1] +
+        A[0][1] * C.xxzz() * A[2][1] +
+        A[1][1] * C.yyzz() * A[2][1] +
+        A[2][1] * C.zzzz() * A[2][1] +
+        A[3][1] * C.xyxy() * A[3][1] +
+        A[4][1] * C.yzyz() * A[4][1] +
+        A[5][1] * C.zxzx() * A[5][1],
 
-     // yyzz
-     A[0][1] * C.xxxx() * A[0][2] +
-     A[1][1] * C.xxyy() * A[0][2] +
-     A[2][1] * C.xxzz() * A[0][2] +
-     A[0][1] * C.xxyy() * A[1][2] +
-     A[1][1] * C.yyyy() * A[1][2] +
-     A[2][1] * C.yyzz() * A[1][2] +
-     A[0][1] * C.xxzz() * A[2][2] +
-     A[1][1] * C.yyzz() * A[2][2] +
-     A[2][1] * C.zzzz() * A[2][2] +
-     A[3][1] * C.xyxy() * A[3][2] +
-     A[4][1] * C.yzyz() * A[4][2] +
-     A[5][1] * C.zxzx() * A[5][2],
+        // yyzz
+        A[0][1] * C.xxxx() * A[0][2] +
+        A[1][1] * C.xxyy() * A[0][2] +
+        A[2][1] * C.xxzz() * A[0][2] +
+        A[0][1] * C.xxyy() * A[1][2] +
+        A[1][1] * C.yyyy() * A[1][2] +
+        A[2][1] * C.yyzz() * A[1][2] +
+        A[0][1] * C.xxzz() * A[2][2] +
+        A[1][1] * C.yyzz() * A[2][2] +
+        A[2][1] * C.zzzz() * A[2][2] +
+        A[3][1] * C.xyxy() * A[3][2] +
+        A[4][1] * C.yzyz() * A[4][2] +
+        A[5][1] * C.zxzx() * A[5][2],
 
-     // zzzz
-     A[0][2] * C.xxxx() * A[0][2] +
-     A[1][2] * C.xxyy() * A[0][2] +
-     A[2][2] * C.xxzz() * A[0][2] +
-     A[0][2] * C.xxyy() * A[1][2] +
-     A[1][2] * C.yyyy() * A[1][2] +
-     A[2][2] * C.yyzz() * A[1][2] +
-     A[0][2] * C.xxzz() * A[2][2] +
-     A[1][2] * C.yyzz() * A[2][2] +
-     A[2][2] * C.zzzz() * A[2][2] +
-     A[3][2] * C.xyxy() * A[3][2] +
-     A[4][2] * C.yzyz() * A[4][2] +
-     A[5][2] * C.zxzx() * A[5][2],
+        // zzzz
+        A[0][2] * C.xxxx() * A[0][2] +
+        A[1][2] * C.xxyy() * A[0][2] +
+        A[2][2] * C.xxzz() * A[0][2] +
+        A[0][2] * C.xxyy() * A[1][2] +
+        A[1][2] * C.yyyy() * A[1][2] +
+        A[2][2] * C.yyzz() * A[1][2] +
+        A[0][2] * C.xxzz() * A[2][2] +
+        A[1][2] * C.yyzz() * A[2][2] +
+        A[2][2] * C.zzzz() * A[2][2] +
+        A[3][2] * C.xyxy() * A[3][2] +
+        A[4][2] * C.yzyz() * A[4][2] +
+        A[5][2] * C.zxzx() * A[5][2],
 
-     // xyxy
-     A[0][3] * C.xxxx() * A[0][3] +
-     A[1][3] * C.xxyy() * A[0][3] +
-     A[2][3] * C.xxzz() * A[0][3] +
-     A[0][3] * C.xxyy() * A[1][3] +
-     A[1][3] * C.yyyy() * A[1][3] +
-     A[2][3] * C.yyzz() * A[1][3] +
-     A[0][3] * C.xxzz() * A[2][3] +
-     A[1][3] * C.yyzz() * A[2][3] +
-     A[2][3] * C.zzzz() * A[2][3] +
-     A[3][3] * C.xyxy() * A[3][3] +
-     A[4][3] * C.yzyz() * A[4][3] +
-     A[5][3] * C.zxzx() * A[5][3],
+        // xyxy
+        A[0][3] * C.xxxx() * A[0][3] +
+        A[1][3] * C.xxyy() * A[0][3] +
+        A[2][3] * C.xxzz() * A[0][3] +
+        A[0][3] * C.xxyy() * A[1][3] +
+        A[1][3] * C.yyyy() * A[1][3] +
+        A[2][3] * C.yyzz() * A[1][3] +
+        A[0][3] * C.xxzz() * A[2][3] +
+        A[1][3] * C.yyzz() * A[2][3] +
+        A[2][3] * C.zzzz() * A[2][3] +
+        A[3][3] * C.xyxy() * A[3][3] +
+        A[4][3] * C.yzyz() * A[4][3] +
+        A[5][3] * C.zxzx() * A[5][3],
 
-     // yzyz
-     A[0][4] * C.xxxx() * A[0][4] +
-     A[1][4] * C.xxyy() * A[0][4] +
-     A[2][4] * C.xxzz() * A[0][4] +
-     A[0][4] * C.xxyy() * A[1][4] +
-     A[1][4] * C.yyyy() * A[1][4] +
-     A[2][4] * C.yyzz() * A[1][4] +
-     A[0][4] * C.xxzz() * A[2][4] +
-     A[1][4] * C.yyzz() * A[2][4] +
-     A[2][4] * C.zzzz() * A[2][4] +
-     A[3][4] * C.xyxy() * A[3][4] +
-     A[4][4] * C.yzyz() * A[4][4] +
-     A[5][4] * C.zxzx() * A[5][4],
+        // yzyz
+        A[0][4] * C.xxxx() * A[0][4] +
+        A[1][4] * C.xxyy() * A[0][4] +
+        A[2][4] * C.xxzz() * A[0][4] +
+        A[0][4] * C.xxyy() * A[1][4] +
+        A[1][4] * C.yyyy() * A[1][4] +
+        A[2][4] * C.yyzz() * A[1][4] +
+        A[0][4] * C.xxzz() * A[2][4] +
+        A[1][4] * C.yyzz() * A[2][4] +
+        A[2][4] * C.zzzz() * A[2][4] +
+        A[3][4] * C.xyxy() * A[3][4] +
+        A[4][4] * C.yzyz() * A[4][4] +
+        A[5][4] * C.zxzx() * A[5][4],
 
-     // zxzx
-     A[0][5] * C.xxxx() * A[0][5] +
-     A[1][5] * C.xxyy() * A[0][5] +
-     A[2][5] * C.xxzz() * A[0][5] +
-     A[0][5] * C.xxyy() * A[1][5] +
-     A[1][5] * C.yyyy() * A[1][5] +
-     A[2][5] * C.yyzz() * A[1][5] +
-     A[0][5] * C.xxzz() * A[2][5] +
-     A[1][5] * C.yyzz() * A[2][5] +
-     A[2][5] * C.zzzz() * A[2][5] +
-     A[3][5] * C.xyxy() * A[3][5] +
-     A[4][5] * C.yzyz() * A[4][5] +
-     A[5][5] * C.zxzx() * A[5][5]
-     );
+        // zxzx
+        A[0][5] * C.xxxx() * A[0][5] +
+        A[1][5] * C.xxyy() * A[0][5] +
+        A[2][5] * C.xxzz() * A[0][5] +
+        A[0][5] * C.xxyy() * A[1][5] +
+        A[1][5] * C.yyyy() * A[1][5] +
+        A[2][5] * C.yyzz() * A[1][5] +
+        A[0][5] * C.xxzz() * A[2][5] +
+        A[1][5] * C.yyzz() * A[2][5] +
+        A[2][5] * C.zzzz() * A[2][5] +
+        A[3][5] * C.xyxy() * A[3][5] +
+        A[4][5] * C.yzyz() * A[4][5] +
+        A[5][5] * C.zxzx() * A[5][5]
+    );
 }
 
 
 template<class Cmpt>
 inline DiagTensor<Cmpt> transform
 (
- const tensor& tt,
- const DiagTensor<Cmpt>& st
- )
+    const tensor& tt,
+    const DiagTensor<Cmpt>& st
+)
 {
-  notImplemented("transform.H\n"
-		 "template<>\n"
-		 "inline DiagTensor<Cmpt> transform\n"
-		 "(\n"
-		 "const tensor& tt,\n"
-		 "const DiagTensor<Cmpt>& st\n"
-		 ")\n"
-		 "not implemented");
+    notImplemented
+    (
+        "transform.H\n"
+        "template<>\n"
+        "inline DiagTensor<Cmpt> transform\n"
+        "(\n"
+        "const tensor& tt,\n"
+        "const DiagTensor<Cmpt>& st\n"
+        ")\n"
+        "not implemented"
+    );
 
-  return st;
+    return st;
 }
 
 
@@ -371,9 +379,9 @@ template<>
 inline symmTensor4thOrder transformMask<symmTensor4thOrder>(const tensor& t)
 {
   notImplemented("transform.H\n"
-		 "template<>\n"
-		 "inline symmTensor4thOrder transformMask<symmTensor4thOrder>(const tensor& t)\n"
-		 "not implemented");
+         "template<>\n"
+         "inline symmTensor4thOrder transformMask<symmTensor4thOrder>(const tensor& t)\n"
+         "not implemented");
 
   return symmTensor4thOrder::zero;
 }

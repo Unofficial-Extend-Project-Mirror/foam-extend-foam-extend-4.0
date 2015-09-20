@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -42,7 +42,7 @@ Description
 #include "fvcAverage.H"
 #include "fvcReconstruct.H"
 #include "fvcDdt.H"
-#include "fvcDDt.H"
+#include "fvcDDtTotal.H"
 #include "fvcD2dt2.H"
 #include "fvcDiv.H"
 #include "fvcFlux.H"

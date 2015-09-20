@@ -5,6 +5,5 @@ wclean freeSurface
 
 wclean interTrackFoam
 wclean bubbleInterTrackFoam
-wclean surfactantFoam
 
 wclean ./utilities/setFluidIndicator

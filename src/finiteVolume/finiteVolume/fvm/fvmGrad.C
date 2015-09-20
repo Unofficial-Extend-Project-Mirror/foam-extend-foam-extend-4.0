@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -39,7 +39,10 @@ namespace fvm
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 template<class Type>
-tmp<blockVectorMatrix> grad
+tmp
+<
+    BlockLduSystem<vector, typename outerProduct<vector, Type>::type>
+> grad
 (
     GeometricField<Type, fvPatchField, volMesh>& vf,
     const word& name
@@ -54,7 +57,10 @@ tmp<blockVectorMatrix> grad
 
 
 template<class Type>
-tmp<blockVectorMatrix> grad
+tmp
+<
+    BlockLduSystem<vector, typename outerProduct<vector, Type>::type>
+> grad
 (
     GeometricField<Type, fvPatchField, volMesh>& vf
 )

@@ -1,8 +1,8 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | foam-extend: Open Source CFD                    |
-|  \\    /   O peration     | Version:     3.1                                |
-|   \\  /    A nd           | Web:         http://www.extend-project.de       |
+|  \\    /   O peration     | Version:     3.2                                |
+|   \\  /    A nd           | Web:         http://www.foam-extend.org         |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 FoamFile
@@ -43,7 +43,7 @@ dictionaryReplacement
                 neighbourRegionName bottomAir;
                 neighbourPatchName bottomAir_to_heater;
                 neighbourFieldName T;
-                K               K;
+                Kappa           Kappa;
                 value           uniform 300;
 
             }
@@ -53,7 +53,7 @@ dictionaryReplacement
                 neighbourRegionName leftSolid;
                 neighbourPatchName leftSolid_to_heater;
                 neighbourFieldName T;
-                K               K;
+                Kappa           Kappa;
                 value           uniform 300;
             }
             heater_to_rightSolid
@@ -62,7 +62,7 @@ dictionaryReplacement
                 neighbourRegionName rightSolid;
                 neighbourPatchName rightSolid_to_heater;
                 neighbourFieldName T;
-                K               K;
+                Kappa           Kappa;
                 value           uniform 300;
             }
             heater_to_topAir
@@ -71,7 +71,7 @@ dictionaryReplacement
                 neighbourRegionName topAir;
                 neighbourPatchName topAir_to_heater;
                 neighbourFieldName T;
-                K               K;
+                Kappa           Kappa;
                 value           uniform 300;
             }
         }
@@ -114,7 +114,7 @@ dictionaryReplacement
         }
     }
 
-    K
+    Kappa
     {
         internalField   uniform 80;
 

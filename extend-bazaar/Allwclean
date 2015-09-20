@@ -2,15 +2,12 @@
 cd ${0%/*} || exit 1    # run from this directory
 
 # Clean compilation in Fluid-Structure Interaction package
-cd FluidStructureInteraction/src/
-./Allwclean
-cd -
+(
+    cd FluidStructureInteraction/src/
+    ./Allwclean
+)
 
-# Clean compilation in cfMesh mesh generation package
-cd cfMesh-v1.0/
-wclean libso meshLibrary
-wclean all executables
-wclean all utilities
-cd -
+#Clean makeAxialMesh
+wclean MakeAxialMesh/makeAxialMesh
 
 # ----------------------------------------------------------------- end-of-file

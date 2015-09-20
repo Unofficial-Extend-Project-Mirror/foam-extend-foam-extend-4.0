@@ -1,8 +1,8 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anispulation  |
 -------------------------------------------------------------------------------
 License
@@ -32,7 +32,7 @@ Description
 #include "argList.H"
 #include "timeSelector.H"
 #include "objectRegistry.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "fvMesh.H"
 #include "volFields.H"
 #include "surfaceFields.H"

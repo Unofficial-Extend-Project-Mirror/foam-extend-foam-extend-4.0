@@ -1,9 +1,9 @@
 #----------------------------------*-sh-*--------------------------------------
 # =========                 |
 # \\      /  F ield         | foam-extend: Open Source CFD
-#  \\    /   O peration     |
-#   \\  /    A nd           | For copyright notice see file Copyright
-#    \\/     M anipulation  |
+#  \\    /   O peration     | Version:     3.2
+#   \\  /    A nd           | Web:         http://www.foam-extend.org
+#    \\/     M anipulation  | For copyright notice see file Copyright
 #------------------------------------------------------------------------------
 # License
 #     This file is part of foam-extend.
@@ -25,9 +25,9 @@
 #     etc/prefs.sh
 #
 # Description
-#     Preset variables for the OpenFOAM configuration - POSIX shell syntax.
+#     Preset variables for the FOAM configuration - POSIX shell syntax.
 #
-#     The prefs.sh file will be sourced by the OpenFOAM etc/bashrc when it is
+#     The prefs.sh file will be sourced by the FOAM etc/bashrc when it is
 #     found
 #
 #------------------------------------------------------------------------------
@@ -36,7 +36,8 @@ export FOAM_VERBOSE=1
 
 # Specify system compiler
 # ~~~~~~~~~~~~~~~~~~~~~~~
-compilerInstall=System
+#compilerInstall=System
+#compilerInstall=FOAM
 
 # Specify system openmpi
 # ~~~~~~~~~~~~~~~~~~~~~~
@@ -171,12 +172,78 @@ compilerInstall=System
 #export ParaView_MAJOR=3.7
 
 
-# System identifier for the OpenFOAM CDash test harness on openfoam-extend
+# System identifier for the FOAM CDash test harness on foam-extend
 #
 # By default, your system FQN/hostname will be used as the system identifier
-# when publishing your test harness results on the OpenFOAM CDash server
-# on openfoam-extend.
+# when publishing your test harness results on the FOAM CDash server
+# on foam-extend.
 # You can override your identifier using this environment variable
 #export CDASH_SUBMIT_LOCAL_HOST_ID=choose_your_CDash_system_identifer
 
+# Buildname suffix for the FOAM CDash test harness on foam-extend 
+# By default, the git branch name and git revision number will be
+# appended to the CDash build name.
+# Otherwise, for users not using git, or wanting to provide additionnal
+# information, simply initialize the CDASH_SCM_INFO with the proper information
+#export CDASH_SCM_INFO=your_SCM_information
+
+# Mac OS X MacPorts root directory.
+# The default value is '/opt/local/etc/macports'.
+# In order to disable the usage of MacPorts on Mac OSX, simply initialize this
+# variable to a non-existing directory, or to a dummy value.
+#export MACOSX_MACPORTS_ROOT="_not_using_"
+
+# ThirdParty packages: build control variables
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# By enabling any of these variables, you will active the compilation and
+# installation of the corresponding ThirdParty package
+#
+# For AllMake.stage1
+#export WM_THIRD_PARTY_USE_GCC_492=1
+#export WM_THIRD_PARTY_USE_GCC_484=1
+#export WM_THIRD_PARTY_USE_GCC_463=1
+#export WM_THIRD_PARTY_USE_GCC_451=1
+#export WM_THIRD_PARTY_USE_GCC_445=1
+#export WM_THIRD_PARTY_USE_PYTHON_27=1
+#export WM_THIRD_PARTY_USE_M4_1416=1
+#export WM_THIRD_PARTY_USE_BISON_27=1
+#export WM_THIRD_PARTY_USE_FLEX_2535=1
+export WM_THIRD_PARTY_USE_CMAKE_322=1
+
+#
+# For AllMake.stage2
+export WM_THIRD_PARTY_USE_OPENMPI_188=1
+#export WM_THIRD_PARTY_USE_OPENMPI_188_ConfigureAdditionalArgs='--enable-mpi-cxx --with-openib=/usr --with-openib-libdir=/usr/lib64'
+#export WM_THIRD_PARTY_USE_OPENMPI_165=1
+#export WM_THIRD_PARTY_USE_OPENMPI_165_ConfigureAdditionalArgs='--enable-mpi-cxx --with-openib=/usr --with-openib-libdir=/usr/lib64'
+#export WM_THIRD_PARTY_USE_OPENMPI_15=1
+#export WM_THIRD_PARTY_USE_OPENMPI_143=1
+#export WM_THIRD_PARTY_USE_OPENMPI_141=1
+
+#
+# For AllMake.stage3
+export WM_THIRD_PARTY_USE_METIS_510=1
+export WM_THIRD_PARTY_USE_PARMGRIDGEN_10=1
+export WM_THIRD_PARTY_USE_LIBCCMIO_261=1
+export WM_THIRD_PARTY_USE_MESQUITE_212=1
+export WM_THIRD_PARTY_USE_SCOTCH_604=1
+#export WM_THIRD_PARTY_USE_SCOTCH_600=1
+export WM_THIRD_PARTY_USE_PARMETIS_403=1
+#export WM_THIRD_PARTY_USE_ZOLTAN_36=1
+export WM_THIRD_PARTY_USE_PYFOAM_064=1
+export WM_THIRD_PARTY_USE_HWLOC_1101=1
+#export WM_THIRD_PARTY_USE_HWLOC_172=1
+
+#
+# For AllMake.stage4
+export WM_THIRD_PARTY_USE_QT_486=1
+export WM_THIRD_PARTY_USE_PARAVIEW_431=1
+#export WM_THIRD_PARTY_USE_PARAVIEW_410=1
+
+
+# Add in preset user preferences: will override site preferences
+if [ -e $WM_PROJECT_USER_DIR/etc/prefs.sh ]
+then
+    _foamSource $WM_PROJECT_USER_DIR/etc/prefs.sh
+fi
 # ----------------------------------------------------------------- end-of-file

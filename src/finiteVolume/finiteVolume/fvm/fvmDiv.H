@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -39,7 +39,7 @@ SourceFiles
 #include "surfaceFieldsFwd.H"
 #include "surfaceInterpolationScheme.H"
 #include "fvMatrices.H"
-#include "blockLduMatrices.H"
+#include "BlockLduSystem.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -68,7 +68,6 @@ namespace fvm
         const word& name
     );
 
-
     template<class Type>
     tmp<fvMatrix<Type> > div
     (
@@ -83,17 +82,65 @@ namespace fvm
         GeometricField<Type, fvPatchField, volMesh>&
     );
 
-    // Implicit div operator for block systems
+    // Implicit div operators for block systems
     template<class Type>
-    tmp<blockVectorMatrix> div
+    tmp
+    <
+        BlockLduSystem<vector, typename innerProduct<vector, Type>::type>
+    > UDiv
     (
         GeometricField<Type, fvPatchField, volMesh>&,
         const word&
     );
 
     template<class Type>
-    tmp<blockVectorMatrix> div
+    tmp
+    <
+        BlockLduSystem<vector, typename innerProduct<vector, Type>::type>
+    > UDiv
     (
+        const surfaceScalarField&,
+        GeometricField<Type, fvPatchField, volMesh>&,
+        const word&
+    );
+
+    template<class Type>
+    tmp
+    <
+        BlockLduSystem<vector, typename innerProduct<vector, Type>::type>
+    > UDiv
+    (
+        const tmp<surfaceScalarField>&,
+        GeometricField<Type, fvPatchField, volMesh>&,
+        const word&
+    );
+
+    template<class Type>
+    tmp
+    <
+        BlockLduSystem<vector, typename innerProduct<vector, Type>::type>
+    > UDiv
+    (
+        GeometricField<Type, fvPatchField, volMesh>&
+    );
+
+    template<class Type>
+    tmp
+    <
+        BlockLduSystem<vector, typename innerProduct<vector, Type>::type>
+    > UDiv
+    (
+        const surfaceScalarField&,
+        GeometricField<Type, fvPatchField, volMesh>&
+    );
+
+    template<class Type>
+    tmp
+    <
+        BlockLduSystem<vector, typename innerProduct<vector, Type>::type>
+    > UDiv
+    (
+        const tmp<surfaceScalarField>&,
         GeometricField<Type, fvPatchField, volMesh>&
     );
 }

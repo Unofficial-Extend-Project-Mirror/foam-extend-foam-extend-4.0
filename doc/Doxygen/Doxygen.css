@@ -1,4 +1,11 @@
-body { color: #000000 ; background: #ffffff; margin: 0px; font-family: verdana, arial, helvetica, sans-serif; text-decoration: none; font-size: 12px; }
+body {
+    color: #000000 ;
+    background: #ffffff;
+    margin: 0px;
+    font-family: verdana, arial, helvetica, sans-serif;
+    text-decoration: none;
+    font-size: 12px;
+}
 a:link { text-decoration: none; color: #0000ff ; }
 a:link:hover { text-decoration: none; color: #0000ff ; }
 a:visited { text-decoration: none; color: #0000ff ; }
@@ -7,11 +14,27 @@ a:link img { border: 0; }
 a:visited img { border: 0; }
 a:active img { border: 0; }
 a.menuLefton { color: #0000ff; font-size: 12px; font-weight: bold; }
-td.leftmenu { font-family: verdana, arial, helvetica, sans-serif; text-decoration: none; background: #ddddff; text-align: left; font-size: 14px; height: 20px; width: 200px; }
+td.leftmenu {
+    font-family: verdana, arial, helvetica, sans-serif;
+    text-decoration: none;
+    background: #ddddff;
+    text-align: left;
+    font-size: 14px;
+    height: 20px;
+    width: 200px;
+}
+
 a.menuTopoff { color: #000000; font-size: 14px; }
 a.menuTopoff:visited { color: #000000; font-size: 14px; }
 a.menuTopoff:hover { color: #0000ff; font-size: 14px; }
-td.topmenu { font-family: verdana, arial, helvetica, sans-serif; background: #ddddff; text-align: center; font-size: 16px; width: 150px; font-weight: bold; }
+td.topmenu {
+    font-family: verdana, arial, helvetica, sans-serif;
+    background: #ddddff;
+    text-align: center;
+    font-size: 16px;
+    width: 150px;
+    font-weight: bold;
+}
 h1 { font-size: 18px; }
 h2 { font-size: 16px; }
 h3 { font-size: 14px; }
@@ -21,6 +44,31 @@ h3 { font-size: 14px; }
  * just looks terrible.
  * Give a slightly different background to make it easier to find.
 */
+div.line {
+    font-family: monospace, fixed;
+    font-size: 13px;
+    line-height: 1.0;
+    text-wrap: unrestricted;
+    white-space: -moz-pre-wrap; /* Moz */
+    white-space: -pre-wrap;     /* Opera 4-6 */
+    white-space: -o-pre-wrap;   /* Opera 7 */
+    white-space: pre-wrap;      /* CSS3  */
+    word-wrap: break-word;      /* IE 5.5+ */
+    text-indent: -53px;
+    padding-left: 53px;
+    padding-bottom: 0px;
+    margin: 0px;
+}
+
+span.lineno {
+    padding-right: 4px;
+    text-align: right;
+    border-right: 2px solid #ddddff;
+    background-color: #ddddff;
+    white-space: pre;
+}
+
+
 .memitem {
     padding: 4px;
     background-color: #eef3f5;

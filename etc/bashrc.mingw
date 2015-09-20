@@ -1,0 +1,143 @@
+#!/bin/sh
+#----------------------------------*-sh-*--------------------------------------
+# =========                 |
+# \\      /  F ield         | foam-extend: Open Source CFD
+#  \\    /   O peration     | Version:     3.2
+#   \\  /    A nd           | Web:         http://www.foam-extend.org
+#    \\/     M anipulation  | For copyright notice see file Copyright
+#------------------------------------------------------------------------------
+# License
+#     This file is part of foam-extend.
+#
+#     foam-extend is free software: you can redistribute it and/or modify it
+#     under the terms of the GNU General Public License as published by the
+#     Free Software Foundation, either version 3 of the License, or (at your
+#     option) any later version.
+#
+#     foam-extend is distributed in the hope that it will be useful, but
+#     WITHOUT ANY WARRANTY; without even the implied warranty of
+#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+#     General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
+#
+# Script
+#     etc/bashrc.mingw
+#
+# Description
+#     Startup file for FOAM for use with MSYS shell for MinGW-based build
+#     on Microsoft Windows 7 and 8.1.
+#     Calls the main etc/bashrc script.
+#     Sourced from ~/.profile or ~/.bashrc
+#
+# Author:
+#     Cesare Guardino, Alstom Power Ltd., (2015)
+#
+#------------------------------------------------------------------------------
+
+export PROGRAMS_HOME=/c/Programs
+
+# {{{ DEFINE USER EDITABLE FUNCTIONS
+set_system_paths() {
+    echo "Setting environment variables for user-defined installed system tools and utilities ..."
+    export CMAKE_HOME=$PROGRAMS_HOME/cmake-3.2.3-win32-x86
+    export GIT_HOME=$PROGRAMS_HOME/Git
+    export MINGW_HOME=$PROGRAMS_HOME/mingw64
+    export MPI_ROOTDIR=$PROGRAMS_HOME/OpenMPI_v1.6.1-x64
+    export PARAVIEW_HOME=$PROGRAMS_HOME/ParaView-4.3.1
+    #export PERL_HOME=$PROGRAMS_HOME/strawberry-perl-5.20.2.1-64bit/perl
+    export PEXPORTS_HOME=$PROGRAMS_HOME/pexports-0.46
+    export PYTHON_HOME=$PROGRAMS_HOME/Python27
+    export SUBVERSION_HOME=$PROGRAMS_HOME/svn-win32-1.8.13
+    export WGET_HOME=$PROGRAMS_HOME/wget-1.11.4-1
+    export ZIP_HOME="/c/Program Files/7-Zip"
+}
+
+add_to_path() {
+    echo
+    echo "Adding user-defined installed system tools to PATH ..."
+    export PATH=$ZIP_HOME:$PATH
+    export PATH=$WGET_HOME/bin:$PATH
+    export PATH=$PYTHON_HOME:$PATH
+    export PATH=$SUBVERSION_HOME/bin:$PATH
+    export PATH=$GIT_HOME/cmd:$PATH
+    #export PATH=$PERL_HOME/bin:$PATH
+    export PATH=$PARAVIEW_HOME/bin:$PATH
+    export PATH=$CMAKE_HOME/bin:$PATH
+    export PATH=$PEXPORTS_HOME/bin:$PATH
+    export PATH=$MINGW_HOME/bin:$PATH
+#   MPI comes last to enforce the path
+    export PATH=$MPI_ROOTDIR/bin:$PATH
+}
+# }}}
+
+# {{{ DEFINE PROCESS FUNCTIONS
+setup_foam_env() {
+    echo
+    export export FLEX_DIR=$(echo $WD\.. | sed 's/\\/\//g' | sed 's/\(.*\):/\/\1/')
+    FOAM_ETC_DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+    export FOAM_INST_DIR=$(readlink -f $FOAM_ETC_DIR/../..)
+    export FOAM_VERBOSE=1
+    export MPI_VERSION_MINGW=openmpi-1.6.1
+    export WM_OSTYPE=MSWindows
+    echo "Sourcing: $FOAM_ETC_DIR/bashrc"
+    . $FOAM_ETC_DIR/bashrc
+}
+
+set_OMPI_env() {
+    echo "Setting OpenMPI environment settings ..."
+    export OMPI_MPICC=gcc.exe
+    export OMPI_MPIXX=g++.exe
+    export OMPI_CXXFLAGS==-I$MPI_ROOTDIR/include
+    export OMPI_CFLAGS=-I$MPI_ROOTDIR/include
+    export OMPI_CXXFLAGS=-I$MPI_ROOTDIR/include
+    export OMPI_LDFLAGS=-L$MPI_ROOTDIR/lib
+    export OMPI_LIBS=$OMPI_LDFLAGS
+}
+
+check_versions() {
+    echo
+    echo "Checking versions of installed system tools (based on PATH) ..."
+    echo "7-Zip:      " `which 7z`       [`(7z --help 2>&1) 2> /dev/null | head -2`]
+    echo "Bison:      " `which bison`    [`(bison --version 2>&1) 2> /dev/null | head -1`]
+    echo "CMake:      " `which cmake`    [`(cmake --version 2>&1) 2> /dev/null | head -1`]
+    echo "Flex:       " `which flex`     [`(flex --version 2>&1) 2> /dev/null | head -1`]
+    echo "G++:        " `which g++`      [`(g++ --version 2>&1) 2> /dev/null | head -1`]
+    echo "GCC:        " `which gcc`      [`(gcc --version 2>&1) 2> /dev/null | head -1`]
+    echo "GMake:      " `which gmake`    [`(gmake --version 2>&1) 2> /dev/null | head -1`]
+    echo "Git:        " `which git`      [`(git --version 2>&1) 2> /dev/null | head -1`]
+    echo "Java:       " `which java`     [`(java -version 2>&1) 2> /dev/null | head -1`]
+    echo "M4:         " `which m4`       [`(m4 --version 2>&1) 2> /dev/null | head -1`]
+    echo "Make:       " `which make`     [`(make --version 2>&1) 2> /dev/null | head -1`]
+    echo "MinGW-w64:  " $MINGW_HOME
+    echo "OpenMPI:    " `which mpirun`   [`(mpirun --version 2>&1) 2> /dev/null | head -1`]
+    echo "PEexports:  " `which pexports` [`(pexports -v 2>&1) 2> /dev/null | head -1`]
+    echo "ParaView:   " $PARAVIEW_HOME
+    echo "Perl:       " `which perl`     [`(perl -v 2>&1) 2> /dev/null | head -2`]
+    echo "Python:     " `which python`   [`(python --version 2>&1) 2> /dev/null | head -1`]
+    echo "Subversion: " `which svn`      [`(svn --version 2>&1) 2> /dev/null | head -1`]
+    echo "Vim:        " `which vim`      [`(vim --version 2>&1) 2> /dev/null | head -1`]
+    echo "Wget:       " `which wget`     [`(wget --version 2>&1) 2> /dev/null | head -3`]
+}
+
+finish() {
+    export PATH=$PATH:$LD_LIBRARY_PATH
+    echo
+    echo
+    echo "FOAM_INST_DIR=$FOAM_INST_DIR"
+    echo "WM_PROJECT_DIR=$WM_PROJECT_DIR"
+    echo "WM_OSTYPE=$WM_OSTYPE"
+    echo "ENVIRONMENT SETUP COMPLETE."
+}
+# }}}
+
+# {{{ MAIN EXECUTION
+set_system_paths
+setup_foam_env
+add_to_path
+set_OMPI_env
+check_versions
+finish
+# }}}
+

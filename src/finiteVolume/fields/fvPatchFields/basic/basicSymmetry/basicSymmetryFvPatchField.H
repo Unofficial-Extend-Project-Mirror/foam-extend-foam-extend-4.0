@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -52,6 +52,14 @@ class basicSymmetryFvPatchField
 :
     public transformFvPatchField<Type>
 {
+    // Private Data
+
+        //- Skew correction
+        Switch skewCorrected_;
+
+        //- Second order accuracy correction
+        Switch secondOrder_;
+
 
 public:
 
@@ -76,7 +84,8 @@ public:
             const dictionary&
         );
 
-        //- Construct by mapping given basicSymmetryFvPatchField onto a new patch
+        //- Construct by mapping given basicSymmetryFvPatchField onto a
+        //  new patch
         basicSymmetryFvPatchField
         (
             const basicSymmetryFvPatchField<Type>&,
@@ -137,16 +146,31 @@ public:
 
             //- Return face-gradient transform diagonal
             virtual tmp<Field<Type> > snGradTransformDiag() const;
+
+
+        // I-O
+
+            //- Write
+            virtual void write(Ostream& os) const;
 };
 
 
 // * * * * * * * * * * * Template Specialisations  * * * * * * * * * * * * * //
 
 template<>
-tmp<scalarField > basicSymmetryFvPatchField<scalar>::snGrad() const;
+tmp<scalarField> basicSymmetryFvPatchField<scalar>::snGrad() const;
 
 template<>
 void basicSymmetryFvPatchField<scalar>::evaluate
+(
+    const Pstream::commsTypes commsType
+);
+
+template<>
+tmp<vectorField> basicSymmetryFvPatchField<vector>::snGrad() const;
+
+template<>
+void basicSymmetryFvPatchField<vector>::evaluate
 (
     const Pstream::commsTypes commsType
 );

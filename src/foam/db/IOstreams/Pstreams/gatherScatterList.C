@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -99,7 +99,7 @@ void Pstream::gatherList
                 IPstream fromBelow(Pstream::scheduled, belowID);
                 fromBelow >> Values[belowID];
 
-                if (debug & 2)
+                if (debug > 1)
                 {
                     Pout<< " received through "
                         << belowID << " data from:" << belowID
@@ -112,7 +112,7 @@ void Pstream::gatherList
                     label leafID = belowLeaves[leafI];
                     fromBelow >> Values[leafID];
 
-                    if (debug & 2)
+                    if (debug > 1)
                     {
                         Pout<< " received through "
                             << belowID << " data from:" << leafID
@@ -129,11 +129,11 @@ void Pstream::gatherList
         {
             const labelList& belowLeaves = myComm.allBelow();
 
-            if (debug & 2)
+            if (debug > 1)
             {
                 Pout<< " sending to " << myComm.above()
-                    << " data from me:" << Pstream::myProcNo()
-                    << " data:" << Values[Pstream::myProcNo()] << endl;
+                    << " data from: " << Pstream::myProcNo()
+                    << " data: " << Values[Pstream::myProcNo()] << endl;
             }
 
             if (contiguous<T>())
@@ -163,11 +163,11 @@ void Pstream::gatherList
                 {
                     label leafID = belowLeaves[leafI];
 
-                    if (debug & 2)
+                    if (debug > 1)
                     {
                         Pout<< " sending to "
-                            << myComm.above() << " data from:" << leafID
-                            << " data:" << Values[leafID] << endl;
+                            << myComm.above() << " data from: " << leafID
+                            << " data: " << Values[leafID] << endl;
                     }
                     toAbove << Values[leafID];
                 }
@@ -180,7 +180,7 @@ void Pstream::gatherList
 template <class T>
 void Pstream::gatherList(List<T>& Values)
 {
-    if (Pstream::nProcs() < Pstream::nProcsSimpleSum)
+    if (Pstream::nProcs() < Pstream::nProcsSimpleSum())
     {
         gatherList(Pstream::linearCommunication(), Values);
     }
@@ -305,7 +305,7 @@ void Pstream::scatterList
 template <class T>
 void Pstream::scatterList(List<T>& Values)
 {
-    if (Pstream::nProcs() < Pstream::nProcsSimpleSum)
+    if (Pstream::nProcs() < Pstream::nProcsSimpleSum())
     {
         scatterList(Pstream::linearCommunication(), Values);
     }

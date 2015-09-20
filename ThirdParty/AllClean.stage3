@@ -63,8 +63,8 @@ uninstallPackage libccmio-2.6.1 $1
 uninstallPackage mesquite-2.1.2 $1
 
 # Scotch/PtScotch
+uninstallPackage scotch-6.0.4 $1
 uninstallPackage scotch-6.0.0 $1
-uninstallPackage scotch_6.0.0 $1
 
 # ParMertis
 uninstallPackage parmetis-4.0.3 $1
@@ -73,9 +73,11 @@ uninstallPackage parmetis-4.0.3 $1
 # uninstallPackage zoltan-3.6 $1
 
 # PyFoam
-uninstallPackage PyFoam-0.6.1 $1
+uninstallPackage PyFoam-0.6.3 $1
+uninstallPackage PyFoam-0.6.4 $1
 
 # hwloc
+uninstallPackage hwloc-1.10.1 $1
 uninstallPackage hwloc-1.7.2 $1
 
 echo

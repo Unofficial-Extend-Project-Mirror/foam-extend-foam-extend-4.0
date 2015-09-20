@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -35,6 +35,19 @@ Author
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
 template<class Type>
+void Foam::BlockGaussSeidelPrecon<Type>::calcDecoupledInvDiag()
+{
+    // Get reference to diagonal and obtain inverse by casting
+    typedef CoeffField<Type> TypeCoeffField;
+
+    const TypeCoeffField& d = this->matrix_.diag();
+    const DecoupledCoeffField<Type>& dd = d;
+
+    invDiag_ = CoeffField<Type>(inv(dd)());
+}
+
+
+template<class Type>
 void Foam::BlockGaussSeidelPrecon<Type>::decoupledPrecondition
 (
     Field<Type>& x,
@@ -45,14 +58,17 @@ void Foam::BlockGaussSeidelPrecon<Type>::decoupledPrecondition
 
     if (this->matrix_.diagonal())
     {
-        TypeCoeffField dDCoeff = inv(this->matrix_.diag());
-
-        multiply(x, dDCoeff, b);
+        if (invDiag_.activeType() == blockCoeffBase::SCALAR)
+        {
+            x = invDiag_.asScalar()*b;
+        }
+        else if (invDiag_.activeType() == blockCoeffBase::LINEAR)
+        {
+            x = cmptMultiply(invDiag_.asLinear(), b);
+        }
     }
     else if (this->matrix_.symmetric() || this->matrix_.asymmetric())
     {
-        TypeCoeffField dDCoeff = inv(this->matrix_.diag());
-
         const TypeCoeffField& LowerCoeff = this->matrix_.lower();
         const TypeCoeffField& UpperCoeff = this->matrix_.upper();
 
@@ -65,16 +81,16 @@ void Foam::BlockGaussSeidelPrecon<Type>::decoupledPrecondition
         // to be enforced without the per-element if-condition, which
         // makes for ugly code.  HJ, 19/May/2005
 
-        //Note: Assuming lower and upper triangle have the same active type
+        // Note: Assuming lower and upper triangle have the same active type
 
-        if (dDCoeff.activeType() == blockCoeffBase::SCALAR)
+        if (invDiag_.activeType() == blockCoeffBase::SCALAR)
         {
             if (UpperCoeff.activeType() == blockCoeffBase::SCALAR)
             {
                 BlockSweep
                 (
                     x,
-                    dDCoeff.asScalar(),
+                    invDiag_.asScalar(),
                     LowerCoeff.asScalar(),
                     UpperCoeff.asScalar(),
                     b
@@ -85,21 +101,21 @@ void Foam::BlockGaussSeidelPrecon<Type>::decoupledPrecondition
                 BlockSweep
                 (
                     x,
-                    dDCoeff.asScalar(),
+                    invDiag_.asScalar(),
                     LowerCoeff.asLinear(),
                     UpperCoeff.asLinear(),
                     b
                 );
             }
         }
-        else if (dDCoeff.activeType() == blockCoeffBase::LINEAR)
+        else if (invDiag_.activeType() == blockCoeffBase::LINEAR)
         {
             if (UpperCoeff.activeType() == blockCoeffBase::SCALAR)
             {
                 BlockSweep
                 (
                     x,
-                    dDCoeff.asLinear(),
+                    invDiag_.asLinear(),
                     LowerCoeff.asScalar(),
                     UpperCoeff.asScalar(),
                     b
@@ -110,7 +126,7 @@ void Foam::BlockGaussSeidelPrecon<Type>::decoupledPrecondition
                 BlockSweep
                 (
                     x,
-                    dDCoeff.asLinear(),
+                    invDiag_.asLinear(),
                     LowerCoeff.asLinear(),
                     UpperCoeff.asLinear(),
                     b
@@ -156,14 +172,17 @@ void Foam::BlockGaussSeidelPrecon<Type>::decoupledPreconditionT
 
     if (this->matrix_.diagonal())
     {
-        TypeCoeffField dDCoeff = inv(this->matrix_.diag());
-
-        multiply(xT, dDCoeff, bT);
+        if (invDiag_.activeType() == blockCoeffBase::SCALAR)
+        {
+            xT = invDiag_.asScalar()*bT;
+        }
+        else if (invDiag_.activeType() == blockCoeffBase::LINEAR)
+        {
+            xT = cmptMultiply(invDiag_.asLinear(), bT);
+        }
     }
     else if (this->matrix_.symmetric() || this->matrix_.asymmetric())
     {
-        TypeCoeffField dDCoeff = inv(this->matrix_.diag());
-
         const TypeCoeffField& LowerCoeff = this->matrix_.lower();
         const TypeCoeffField& UpperCoeff = this->matrix_.upper();
 
@@ -176,9 +195,9 @@ void Foam::BlockGaussSeidelPrecon<Type>::decoupledPreconditionT
         // to be enforced without the per-element if-condition, which
         // makes for ugly code.  HJ, 19/May/2005
 
-        //Note: Assuming lower and upper triangle have the same active type
+        // Note: Assuming lower and upper triangle have the same active type
 
-        if (dDCoeff.activeType() == blockCoeffBase::SCALAR)
+        if (invDiag_.activeType() == blockCoeffBase::SCALAR)
         {
             if (UpperCoeff.activeType() == blockCoeffBase::SCALAR)
             {
@@ -186,7 +205,7 @@ void Foam::BlockGaussSeidelPrecon<Type>::decoupledPreconditionT
                 BlockSweep
                 (
                     xT,
-                    dDCoeff.asScalar(),
+                    invDiag_.asScalar(),
                     UpperCoeff.asScalar(),
                     LowerCoeff.asScalar(),
                     bT
@@ -198,14 +217,14 @@ void Foam::BlockGaussSeidelPrecon<Type>::decoupledPreconditionT
                 BlockSweep
                 (
                     xT,
-                    dDCoeff.asScalar(),
+                    invDiag_.asScalar(),
                     UpperCoeff.asLinear(),
                     LowerCoeff.asLinear(),
                     bT
                 );
             }
         }
-        else if (dDCoeff.activeType() == blockCoeffBase::LINEAR)
+        else if (invDiag_.activeType() == blockCoeffBase::LINEAR)
         {
             if (UpperCoeff.activeType() == blockCoeffBase::SCALAR)
             {
@@ -213,7 +232,7 @@ void Foam::BlockGaussSeidelPrecon<Type>::decoupledPreconditionT
                 BlockSweep
                 (
                     xT,
-                    dDCoeff.asLinear(),
+                    invDiag_.asLinear(),
                     UpperCoeff.asScalar(),
                     LowerCoeff.asScalar(),
                     bT
@@ -225,7 +244,7 @@ void Foam::BlockGaussSeidelPrecon<Type>::decoupledPreconditionT
                 BlockSweep
                 (
                     xT,
-                    dDCoeff.asLinear(),
+                    invDiag_.asLinear(),
                     UpperCoeff.asLinear(),
                     LowerCoeff.asLinear(),
                     bT

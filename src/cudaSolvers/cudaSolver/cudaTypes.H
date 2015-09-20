@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -38,15 +38,19 @@ Author
 #ifndef cudaTypes_H
 #define cudaTypes_H
 
-#if defined(WM_DP)
+#if defined(WM_SP)
 
-    #define MPI_SCALAR MPI_DOUBLE
+#   define MPI_SCALAR MPI_FLOAT
+    typedef float ValueType;
+
+#elif defined(WM_DP)
+
+#   define MPI_SCALAR MPI_DOUBLE
     typedef double ValueType;
 
-#elif defined(WM_SP)
+#elif defined(WM_LDP)
 
-    #define MPI_SCALAR MPI_FLOAT
-    typedef float ValueType;
+#   error Long double not supported in CUDA
 
 #endif
 

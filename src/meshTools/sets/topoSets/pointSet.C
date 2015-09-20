@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -62,7 +62,8 @@ pointSet::pointSet
 :
     topoSet(mesh, typeName, name, r, w)
 {
-    check(mesh.nPoints());
+    // Sets can contain retired points.  HJ, 17/Aug/2015
+    check(mesh.allPoints().size());
 }
 
 
@@ -147,7 +148,7 @@ void pointSet::sync(const polyMesh& mesh)
 
 label pointSet::maxSize(const polyMesh& mesh) const
 {
-    return mesh.nPoints();
+    return mesh.allPoints().size();
 }
 
 

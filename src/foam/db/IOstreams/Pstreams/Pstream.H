@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -43,8 +43,9 @@ SourceFiles
 #include "labelList.H"
 #include "DynamicList.H"
 #include "HashTable.H"
-#include "string.H"
+#include "foamString.H"
 #include "NamedEnum.H"
+#include "optimisationSwitch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -224,14 +225,14 @@ public:
         //- Should compact transfer be used in which floats replace doubles
         //  reducing the bandwidth requirement at the expense of some loss
         //  in accuracy
-        static bool floatTransfer;
+        static const debug::optimisationSwitch floatTransfer;
 
         //- Number of processors at which the sum algorithm changes from linear
         //  to tree
-        static int nProcsSimpleSum;
+        static const debug::optimisationSwitch nProcsSimpleSum;
 
         //- Default commsType
-        static commsTypes defaultCommsType;
+        static const debug::optimisationSwitch defaultCommsType;
 
 
     // Constructors
@@ -372,7 +373,8 @@ public:
             template <class T, class BinaryOp>
             static void gather(T& Value, const BinaryOp& bop);
 
-            //- Scatter data. Distribute without modification. Reverse of gather
+            //- Scatter data. Distribute without modification.
+            //  Reverse of gather
             template <class T>
             static void scatter(const List<commsStruct>& comms, T& Value);
 
@@ -420,7 +422,11 @@ public:
 
             //- Like above but switches between linear/tree communication
             template <class T, class CombineOp>
-            static void listCombineGather(List<T>& Value, const CombineOp& cop);
+            static void listCombineGather
+            (
+                List<T>& Value,
+                const CombineOp& cop
+            );
 
             //- Scatter data. Reverse of combineGather
             template <class T>

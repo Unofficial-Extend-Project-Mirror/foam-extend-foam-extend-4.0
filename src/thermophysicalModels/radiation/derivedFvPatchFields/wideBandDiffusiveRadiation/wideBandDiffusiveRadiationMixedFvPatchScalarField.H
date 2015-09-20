@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -25,7 +25,9 @@ Class
     Foam::wideBandDiffusiveRadiationMixedFvPatchScalarField
 
 Description
-    Radiation temperature specified
+    Radiation boundary will diffusive reflection and black body emission.
+    See Modest "Radiative heat transfer", Capter 16.6 "The finite volume method"
+    Eq.16.63
 
 SourceFiles
     wideBandDiffusiveRadiationMixedFvPatchScalarField.C
@@ -58,6 +60,15 @@ class wideBandDiffusiveRadiationMixedFvPatchScalarField
 
         //- Emissivity
         scalar emissivity_;
+
+        //- Sum of cosine factors of all outgoing rays (lazy evaluated)
+        mutable scalarField *sumOutgoingAnglesPtr_;
+
+
+    // Private member functions
+
+        //- Calculate sum of cosine factors of all outgoing rays
+        void calcSumOutgoingAngles() const;
 
 
 public:
@@ -156,6 +167,9 @@ public:
             {
                 return emissivity_;
             }
+
+            //- Return sum of cosine factors of all outgoing rays
+            const scalarField& sumOutgoingAngles() const;
 
 
         // Evaluation functions

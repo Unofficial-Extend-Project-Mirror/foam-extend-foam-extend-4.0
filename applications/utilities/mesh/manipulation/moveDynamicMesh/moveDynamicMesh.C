@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -67,6 +67,22 @@ int main(int argc, char *argv[])
         if (runTime.timeIndex() % checkFrequency == 0)
         {
             mesh.checkMesh(true);
+
+            volScalarField magMeshCo
+            (
+                "magMeshCo",
+                fvc::surfaceSum
+                (
+                    mag
+                    (
+                        mesh.phi()*
+                        mesh.surfaceInterpolation::deltaCoeffs()/
+                        mesh.magSf()
+                    )
+                )
+            );
+
+            magMeshCo.write();
         }
 
         runTime.write();

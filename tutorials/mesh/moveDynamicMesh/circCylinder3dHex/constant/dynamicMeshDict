@@ -1,8 +1,8 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | foam-extend: Open Source CFD                    |
-|  \\    /   O peration     | Version:     3.1                                |
-|   \\  /    A nd           | Web:         http://www.extend-project.de       |
+|  \\    /   O peration     | Version:     3.2                                |
+|   \\  /    A nd           | Web:         http://www.foam-extend.org         |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 FoamFile
@@ -15,18 +15,14 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-// Select the type of dynamicFvMesh, and load custom library
 dynamicFvMesh           dynamicMotionSolverFvMesh;
 
 solver                  mesquiteMotionSolver;
-//solver                  laplace;
-//diffusivity             uniform 1.0;
-//diffusivity             quadratic;
-//distancePatches         (topWall);
-//frozenDiffusion         off;
 
 mesquiteOptions
 {
+    standardCellTypes yes;
+
     // Optimization metric
 //     optMetric               AspectRatioGamma;
     optMetric
@@ -44,7 +40,8 @@ mesquiteOptions
     optAlgorithm            FeasibleNewton;
 //     optAlgorithm            ConjugateGradient;
 
-    // Termination criteria sub-dictionary (takes default values if not specified)
+    // Termination criteria sub-dictionary
+    // (takes default values if not specified)
     // Specifying an empty sub-dictionary terminates with available options
     tcInner
     {

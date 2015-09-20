@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -513,34 +513,34 @@ Foam::genericFvPatchField<Type>::genericFvPatchField
     }
 
     for
-      (
-       HashPtrTable<symmTensor4thOrderField>::const_iterator iter =
-	 ptf.symmTensor4thOrderFields_.begin();
-       iter != ptf.symmTensor4thOrderFields_.end();
+    (
+        HashPtrTable<symmTensor4thOrderField>::const_iterator iter =
+            ptf.symmTensor4thOrderFields_.begin();
+        iter != ptf.symmTensor4thOrderFields_.end();
         ++iter
-       )
-      {
+    )
+    {
         symmTensor4thOrderFields_.insert
-	  (
-	   iter.key(),
-	   new symmTensor4thOrderField(*iter(), mapper)
-	   );
-      }
+        (
+            iter.key(),
+            new symmTensor4thOrderField(*iter(), mapper)
+        );
+    }
 
     for
-      (
-       HashPtrTable<diagTensorField>::const_iterator iter =
-	 ptf.diagTensorFields_.begin();
-       iter != ptf.diagTensorFields_.end();
+    (
+        HashPtrTable<diagTensorField>::const_iterator iter =
+            ptf.diagTensorFields_.begin();
+        iter != ptf.diagTensorFields_.end();
         ++iter
-       )
-      {
+    )
+    {
         diagTensorFields_.insert
-	  (
-	   iter.key(),
-	   new diagTensorField(*iter(), mapper)
-	   );
-      }
+        (
+            iter.key(),
+            new diagTensorField(*iter(), mapper)
+        );
+    }
 
     for
     (

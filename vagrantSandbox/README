@@ -24,11 +24,11 @@
   One can then connect to the virtual machine with
 : vagrant ssh <machinName>
   and will be in the =$HOME= directory of the user =vagrant= where in
-  the directory =~/foam/foam-extend-3.1= the sources are
+  the directory =~/foam/foam-extend-3.2= the sources are
   available. Modifications can be pushed "outside" the virtual machine
   with
 : hg push
-  There is also a symbolic link =~/foam/foam-extend-3.1-parent=
+  There is also a symbolic link =~/foam/foam-extend-3.2-parent=
   to the sources if you want to edit there directly. Use with care
   and don't compile in that directory unless you know what you're
   doing
@@ -60,16 +60,24 @@
   - freebsd92 :: FreeBSD 9.2 64-bit machine. Currently this machine
                  does not provision automatically. After the first
                  failure log in and do
+  - centos70 :: A CentOS 7.0 machine with preinstalled development
+                tools
 : sudo pkg_add -r rsync
 : sudo pkg_add -r bash
                  then halt the machine and bring it up again (with the
                  =--provision=-option)
   - freebsd10 :: FreeBSD 10.0 32-big machine. Tries to set up shared
-                 folders via NFS. Currently not working
+                 folders via NFS. Needs user interaction during
+                 creation (password to get root privileges to
+                 manipulate the =/etc/exports=-file to allow the
+                 NFS-sharing)
   - opensuse12 :: OpenSUSE 12.3 machine. Currently not completely
                   compiling Foam
   - opensuse13 ::  OpenSUSE 13.1 machine. The current LTS-version of
                    OpenSUSE
+  - archlinux :: An ArchLinux-machine. Might take a long time during
+                 provisioning as the script updated the full
+                 OS.
   Some machines (read: the BSD-boxes) need the =VirtualBox Extension
   Pack= installed (because they have USB 2.0)
 * Scripts in the machine

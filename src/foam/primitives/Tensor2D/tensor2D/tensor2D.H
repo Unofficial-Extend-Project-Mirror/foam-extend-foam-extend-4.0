@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -35,7 +35,7 @@ SourceFiles
 #ifndef tensor2D_H
 #define tensor2D_H
 
-#include "Tensor2D.H"
+#include "Tensor2DTemplate.H"
 #include "vector2D.H"
 #include "contiguous.H"
 

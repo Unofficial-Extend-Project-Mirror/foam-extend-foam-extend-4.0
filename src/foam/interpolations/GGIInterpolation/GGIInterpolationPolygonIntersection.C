@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -184,8 +184,8 @@ GGIInterpolation<MasterPatch, SlavePatch>::polygonIntersection
 
         if
         (
-            mag(intersectionArea/clippingArea) < areaErrorTol_
-         || mag(intersectionArea/subjectArea)  < areaErrorTol_
+            mag(intersectionArea/clippingArea) < areaErrorTol_()
+         || mag(intersectionArea/subjectArea)  < areaErrorTol_()
         )
         {
             WarningIn
@@ -232,7 +232,7 @@ GGIInterpolation<MasterPatch, SlavePatch>::isVertexInsidePolygon
     // We use distErrorTol_ to evaluate a distance factor called
     // epsilon.  That epsilon factor will be used to detect if a point
     // is on a vertex or an edge.
-    const scalar distErrorTol = sqrt(areaErrorTol_);
+    const scalar distErrorTol = sqrt(areaErrorTol_());
 
     HormannAgathos pip(clippingPolygon, distErrorTol);
 
@@ -303,7 +303,7 @@ GGIInterpolation<MasterPatch, SlavePatch>::clipPolygon2DSutherlandHodgman
     (
         clippingPolygon,
         subjectPolygon,
-        sqrt(areaErrorTol_) // = distErrorTol
+        sqrt(areaErrorTol_()) // = distErrorTol
     ).evaluate();
 }
 

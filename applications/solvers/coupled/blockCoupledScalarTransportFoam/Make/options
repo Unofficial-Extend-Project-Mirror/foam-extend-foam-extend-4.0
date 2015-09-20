@@ -4,5 +4,4 @@ EXE_INC = \
     -I$(LIB_SRC)/VectorN/lnInclude
 
 EXE_LIBS = \
-    -lfiniteVolume \
-    -lVectorN
+    -lfiniteVolume

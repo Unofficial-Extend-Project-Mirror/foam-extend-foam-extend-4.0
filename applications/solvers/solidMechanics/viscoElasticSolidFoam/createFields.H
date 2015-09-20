@@ -14,8 +14,8 @@
 
     volTensorField gradDU = fvc::grad(DU);
 
-// gradDU.checkOut();
-// gradDU.checkIn();
+    // gradDU.checkOut();
+    // gradDU.checkIn();
 
     Info<< "Reading velocity increment field DV\n" << endl;
     volVectorField DV

@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -24,7 +24,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "multiMixerFvMesh.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "regionSplit.H"
 #include "slidingInterface.H"
 #include "mapPolyMesh.H"
@@ -284,7 +284,10 @@ bool Foam::multiMixerFvMesh::update()
             pointField mappedOldPointsNew(allPoints().size());
             mappedOldPointsNew.map(oldPointsNew, topoChangeMap->pointMap());
 
-            movePoints(mappedOldPointsNew);
+            // Note: using setOldPoints instead of movePoints.
+            // HJ, 23/Aug/2015
+            setOldPoints(mappedOldPointsNew);
+
             resetMotion();
             setV0();
 

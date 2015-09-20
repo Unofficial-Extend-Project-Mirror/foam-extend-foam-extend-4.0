@@ -1,8 +1,8 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | foam-extend: Open Source CFD                    |
-|  \\    /   O peration     | Version:     3.1                                |
-|   \\  /    A nd           | Web:         http://www.extend-project.de       |
+|  \\    /   O peration     | Version:     3.2                                |
+|   \\  /    A nd           | Web:         http://www.foam-extend.org         |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 FoamFile
@@ -24,7 +24,7 @@ boundaryField
     plate
     {
         type solidTraction;
-	nonLinear updatedLagrangian;
+        nonLinear updatedLagrangian;
         traction uniform ( 0 0 0 );
         pressure uniform 0;
         value uniform (0 0 0);

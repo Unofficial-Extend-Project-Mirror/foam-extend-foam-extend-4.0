@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -129,7 +129,7 @@ void Pstream::combineGather
 template <class T, class CombineOp>
 void Pstream::combineGather(T& Value, const CombineOp& cop)
 {
-    if (Pstream::nProcs() < Pstream::nProcsSimpleSum)
+    if (Pstream::nProcs() < Pstream::nProcsSimpleSum())
     {
         combineGather(Pstream::linearCommunication(), Value, cop);
     }
@@ -207,7 +207,7 @@ void Pstream::combineScatter(const List<Pstream::commsStruct>& comms, T& Value)
 template <class T>
 void Pstream::combineScatter(T& Value)
 {
-    if (Pstream::nProcs() < Pstream::nProcsSimpleSum)
+    if (Pstream::nProcs() < Pstream::nProcsSimpleSum())
     {
         combineScatter(Pstream::linearCommunication(), Value);
     }
@@ -313,7 +313,7 @@ void Pstream::listCombineGather
 template <class T, class CombineOp>
 void Pstream::listCombineGather(List<T>& Values, const CombineOp& cop)
 {
-    if (Pstream::nProcs() < Pstream::nProcsSimpleSum)
+    if (Pstream::nProcs() < Pstream::nProcsSimpleSum())
     {
         listCombineGather(Pstream::linearCommunication(), Values, cop);
     }
@@ -395,7 +395,7 @@ void Pstream::listCombineScatter
 template <class T>
 void Pstream::listCombineScatter(List<T>& Values)
 {
-    if (Pstream::nProcs() < Pstream::nProcsSimpleSum)
+    if (Pstream::nProcs() < Pstream::nProcsSimpleSum())
     {
         listCombineScatter(Pstream::linearCommunication(), Values);
     }
@@ -480,7 +480,7 @@ void Pstream::mapCombineGather
 template <class Container, class CombineOp>
 void Pstream::mapCombineGather(Container& Values, const CombineOp& cop)
 {
-    if (Pstream::nProcs() < Pstream::nProcsSimpleSum)
+    if (Pstream::nProcs() < Pstream::nProcsSimpleSum())
     {
         mapCombineGather(Pstream::linearCommunication(), Values, cop);
     }
@@ -536,7 +536,7 @@ void Pstream::mapCombineScatter
 template <class Container>
 void Pstream::mapCombineScatter(Container& Values)
 {
-    if (Pstream::nProcs() < Pstream::nProcsSimpleSum)
+    if (Pstream::nProcs() < Pstream::nProcsSimpleSum())
     {
         mapCombineScatter(Pstream::linearCommunication(), Values);
     }
@@ -545,8 +545,6 @@ void Pstream::mapCombineScatter(Container& Values)
         mapCombineScatter(Pstream::treeCommunication(), Values);
     }
 }
-
-
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

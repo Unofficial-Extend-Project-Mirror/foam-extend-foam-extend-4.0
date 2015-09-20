@@ -14,6 +14,7 @@
 
     volTensorField gradDU = fvc::grad(DU);
 
+    Info<< "Creating field U\n" << endl;
     volVectorField U
     (
         IOobject
@@ -24,23 +25,23 @@
             IOobject::READ_IF_PRESENT,
             IOobject::AUTO_WRITE
         ),
-	mesh,
-	dimensionedVector("zero", dimLength, vector::zero)
+        mesh,
+        dimensionedVector("zero", dimLength, vector::zero)
     );
 
     volTensorField gradU
     (
         IOobject
         (
-	 "grad(U)",
-	 runTime.timeName(),
-	 mesh,
-	 IOobject::READ_IF_PRESENT,
-	 IOobject::AUTO_WRITE
-	 ),
+            "grad(U)",
+            runTime.timeName(),
+            mesh,
+            IOobject::READ_IF_PRESENT,
+            IOobject::AUTO_WRITE
+        ),
         mesh,
         dimensionedTensor("zero", dimless, tensor::zero)
-     );
+    );
 
     //- Increment of Green finite strain tensor
     volSymmTensorField DEpsilon
@@ -53,8 +54,8 @@
             IOobject::READ_IF_PRESENT,
             IOobject::AUTO_WRITE
         ),
-	mesh,
-	dimensionedSymmTensor("zero", dimless, symmTensor::zero)
+        mesh,
+        dimensionedSymmTensor("zero", dimless, symmTensor::zero)
     );
 
     volSymmTensorField epsilon
@@ -67,8 +68,8 @@
             IOobject::READ_IF_PRESENT,
             IOobject::AUTO_WRITE
         ),
-	mesh,
-	dimensionedSymmTensor("zero", dimless, symmTensor::zero)
+        mesh,
+        dimensionedSymmTensor("zero", dimless, symmTensor::zero)
     );
 
     //- plastic strain
@@ -113,42 +114,41 @@
             IOobject::READ_IF_PRESENT,
             IOobject::AUTO_WRITE
         ),
-	mesh,
-	dimensionedSymmTensor("zero", dimForce/dimArea, symmTensor::zero)
+        mesh,
+        dimensionedSymmTensor("zero", dimForce/dimArea, symmTensor::zero)
     );
 
-      volVectorField divDSigmaExp
-      (
+    volVectorField divDSigmaExp
+    (
         IOobject
         (
-	 "divDSigmaExp",
-	 runTime.timeName(),
-	 mesh,
-	 IOobject::NO_READ,
-	 IOobject::NO_WRITE
-	 ),
+            "divDSigmaExp",
+            runTime.timeName(),
+            mesh,
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        ),
         mesh,
-        dimensionedVector("zero", dimensionSet(1,-2,-2,0,0,0,0), vector::zero)
-       );
+        dimensionedVector("zero", dimensionSet(1, -2, -2, 0, 0, 0, 0), vector::zero)
+    );
 
-      volVectorField divDSigmaNonLinExp
-      (
+    volVectorField divDSigmaNonLinExp
+    (
         IOobject
         (
-	 "divDSigmaNonLinExp",
-	 runTime.timeName(),
-	 mesh,
-	 IOobject::NO_READ,
-	 IOobject::NO_WRITE
-	 ),
+            "divDSigmaNonLinExp",
+            runTime.timeName(),
+            mesh,
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        ),
         mesh,
         dimensionedVector("zero", dimensionSet(1,-2,-2,0,0,0,0), vector::zero)
-       );
+    );
 
     constitutiveModel rheology(sigma, DU);
 
     volScalarField rho = rheology.rho();
-
     volScalarField mu = rheology.mu();
     volScalarField lambda = rheology.lambda();
     surfaceScalarField muf = fvc::interpolate(mu, "mu");
@@ -156,11 +156,11 @@
 
     surfaceVectorField n = mesh.Sf()/mesh.magSf();
 
-   // plastic strain increment
-   const volSymmTensorField& DEpsilonP = rheology.DEpsilonP();
+    // plastic strain increment
+    const volSymmTensorField& DEpsilonP = rheology.DEpsilonP();
 
-   // for aitken relaxation
-   volVectorField aitkenDelta
+    // for aitken relaxation
+    volVectorField aitkenDelta
     (
         IOobject
         (
@@ -171,22 +171,23 @@
             IOobject::NO_WRITE
         ),
         mesh,
-	dimensionedVector("zero", dimLength, vector::zero)
+        dimensionedVector("zero", dimLength, vector::zero)
     );
-// aitken relaxation factor
-scalar aitkenInitialRes = 1.0;
-scalar aitkenTheta = 0.1;
+
+    // aitken relaxation factor
+    scalar aitkenInitialRes = 1.0;
+    scalar aitkenTheta = 0.1;
 
 //    volVectorField resid
 //    (
-//         IOobject
-//         (
-//          "resid",
-//          runTime.timeName(),
-//          mesh,
-//          IOobject::NO_READ,
-//          IOobject::AUTO_WRITE
-//          ),
-//         mesh,
-//         dimensionedVector("zero", dimless, vector::zero)
-//     );
+//        IOobject
+//        (
+//            "resid",
+//            runTime.timeName(),
+//            mesh,
+//            IOobject::NO_READ,
+//            IOobject::AUTO_WRITE
+//        ),
+//        mesh,
+//        dimensionedVector("zero", dimless, vector::zero)
+//    );

@@ -8,26 +8,26 @@ const fvBoundaryMesh& bm = mesh.boundary();
 
 forAll (bm, patchI)
 {
-  // If the patch is empty, skip it
-  // If the patch is coupled, and there are no cyclic parallels, skip it
-  if
+    // If the patch is empty, skip it
+    // If the patch is coupled, and there are no cyclic parallels, skip it
+    if
     (
-     !isA<emptyFvPatch>(bm[patchI])
-     && !(
-	  bm[patchI].coupled()
-	  //&& Pstream::parRun()
-	  //&& !mesh.parallelData().cyclicParallel()
-	  )
-     )
+        !isA<emptyFvPatch>(bm[patchI])
+        && !(
+            bm[patchI].coupled()
+            //&& Pstream::parRun()
+            //&& !mesh.parallelData().cyclicParallel()
+        )
+    )
     {
-      const labelList& bp = bm[patchI].patch().boundaryPoints();
+        const labelList& bp = bm[patchI].patch().boundaryPoints();
 
-      const labelList& meshPoints = bm[patchI].patch().meshPoints();
+        const labelList& meshPoints = bm[patchI].patch().meshPoints();
 
-      forAll (bp, pointI)
-	{
-	  pointsCorrectionMap.insert(meshPoints[bp[pointI]]);
-	}
+        forAll (bp, pointI)
+        {
+            pointsCorrectionMap.insert(meshPoints[bp[pointI]]);
+        }
     }
 }
 

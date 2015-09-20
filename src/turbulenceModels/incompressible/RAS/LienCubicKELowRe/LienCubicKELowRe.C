@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -292,6 +292,7 @@ LienCubicKELowRe::LienCubicKELowRe
             dimensionedScalar("0", C5viscosity_.dimensions(), 0.0)
         );
 
+    nut_ = min(nut_, nuRatio()*nu());
     nut_.correctBoundaryConditions();
 
     printCoeffs();
@@ -482,6 +483,8 @@ void LienCubicKELowRe::correct()
             C5viscosity_,
             dimensionedScalar("0", C5viscosity_.dimensions(), 0.0)
         );
+    nut_ = min(nut_, nuRatio()*nu());
+    nut_.correctBoundaryConditions();
 
     nonlinearStress_ = symm
     (

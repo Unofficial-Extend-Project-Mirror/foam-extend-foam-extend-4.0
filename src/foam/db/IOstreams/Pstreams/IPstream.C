@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -211,6 +211,21 @@ Foam::Istream& Foam::IPstream::read(token& t)
             return *this;
         }
 
+        // longDoubleScalar
+        case token::LONG_DOUBLE_SCALAR :
+        {
+            longDoubleScalar val;
+            if (read(val))
+            {
+                t = val;
+            }
+            else
+            {
+                t.setBad();
+            }
+            return *this;
+        }
+
         // Character (returned as a single character word) or error
         default:
         {
@@ -275,6 +290,13 @@ Foam::Istream& Foam::IPstream::read(floatScalar& val)
 
 
 Foam::Istream& Foam::IPstream::read(doubleScalar& val)
+{
+    readFromBuffer(val);
+    return *this;
+}
+
+
+Foam::Istream& Foam::IPstream::read(longDoubleScalar& val)
 {
     readFromBuffer(val);
     return *this;
