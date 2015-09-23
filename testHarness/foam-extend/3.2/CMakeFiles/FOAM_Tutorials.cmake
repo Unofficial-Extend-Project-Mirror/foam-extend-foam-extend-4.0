@@ -53,11 +53,18 @@ file(COPY $ENV{FOAM_TUTORIALS}/ DESTINATION ${TEST_CASE_DIR})
 # The test harness relies on the presence of an Allrun file for
 # running the case
 MESSAGE("${testRunTimeDirectory}: Checking for missing Allrun file in tutorials")
-EXECUTE_PROCESS(
+if(CMAKE_HOST_WIN32)
+  # Need to supply a bash shell to run the script under Windows
+  EXECUTE_PROCESS(
+    COMMAND bash -c "$ENV{FOAM_TEST_HARNESS_DIR}/scripts/addMissingAllrunFileToTutorial.sh ${TEST_CASE_DIR} $ENV{FOAM_TEST_HARNESS_DIR}/scripts/Allrun.default"
+    WORKING_DIRECTORY .
+    )
+else()
+  EXECUTE_PROCESS(
     COMMAND $ENV{FOAM_TEST_HARNESS_DIR}/scripts/addMissingAllrunFileToTutorial.sh ${TEST_CASE_DIR} $ENV{FOAM_TEST_HARNESS_DIR}/scripts/Allrun.default
     WORKING_DIRECTORY .
     )
-
+endif()
 # Iterate over each tutorial case:
 # We are looking for tutorial cases with an Allrun file.
 # If this file is present, (and it should), we add this case to the list of cases to run.
@@ -90,31 +97,61 @@ FOREACH(caseWithAllrun ${listofCasesWithAllrun})
     MESSAGE("Found Allrun file in directory: ${thisCasePath}")
 
     # Grab the parent name of the case directory
-    string(REPLACE ${TEST_CASE_DIR}/ "" caseParentPath ${caseWithAllrun})
+    string(REPLACE ${TEST_CASE_DIR}/ "" caseParentPath ${thisCasePath})
 
     # Construct the testId
     string(REPLACE "/" "_" testId ${caseParentPath})
-    SET(testId ${testId}${testIdSuffix})
+    SET(testId ${testId}_Allrun${testIdSuffix})
 
     # Add the test to the test harness
-    MESSAGE("Adding test: ${testId}")
+    MESSAGE("    Adding test: ${testId}")
     ADD_TEST(${testId} bash -c "cd ${thisCasePath}; ./Allrun")
+
+    # We extract a label name from the top level tutorial directories
+    # (eg: basic, incompressible, immersedBoundary, etc). We will use this
+    # label in order to categorize the various test cases under a more 'generic
+    # topic', so we can for instance limit the testharness to the
+    # 'incompressible' test cases, etc., simply by using the ctest -L command.
+    #
+    # ctest --print-labels will print the list of all available labels.
+    #
+    string(REPLACE ${TEST_CASE_DIR}/ ""  tmpLabel ${caseWithAllrun})
+    string(FIND ${tmpLabel} "/" indexFirstSlash)
+    string(SUBSTRING ${tmpLabel} 0 ${indexFirstSlash} testLabel)
 
     # Add a dependency on the global clean-up target
     # When running in parallel, you need to wait for the cleanup to finish first
-    SET_TESTS_PROPERTIES(${testId} PROPERTIES DEPENDS ${cleanCasesTestId})
+    message("    This test case will have the following labels: Tutorials, ${testLabel}")
+    SET_TESTS_PROPERTIES(${testId} PROPERTIES DEPENDS ${cleanCasesTestId} LABELS "Tutorials;${testLabel}")
 
     # Use this following entry instead for testing purpose
     #ADD_TEST(${testId} bash -c "cd ${thisCasePath}; true")
 
-  ENDIF(NOT ${thisCasePath} STREQUAL ${TEST_CASE_DIR})
+  ENDIF()
 ENDFOREACH(caseWithAllrun)
 
 # Modify the cases Allrun files to incorporate additional shell functions
 MESSAGE("${testRunTimeDirectory}: Modifying the Allrun files for additional shell functions in directory: ${TEST_CASE_DIR}")
-EXECUTE_PROCESS(
+if(CMAKE_HOST_WIN32)
+  # Need to supply a bash shell to run the script under Windows
+  EXECUTE_PROCESS(
+    COMMAND bash -c "$ENV{FOAM_TEST_HARNESS_DIR}/scripts/prepareCasesForTestHarness.sh ${TEST_CASE_DIR} $ENV{FOAM_TEST_HARNESS_DIR}/scripts/AdditionalRunFunctions"
+    WORKING_DIRECTORY .
+    )
+else()
+  EXECUTE_PROCESS(
     COMMAND $ENV{FOAM_TEST_HARNESS_DIR}/scripts/prepareCasesForTestHarness.sh ${TEST_CASE_DIR} $ENV{FOAM_TEST_HARNESS_DIR}/scripts/AdditionalRunFunctions
     WORKING_DIRECTORY .
     )
+endif()
+
+# Configure the various ctest -S Dashboard drivers
+
+# Driver for the tutorials
+configure_file(
+  "$ENV{FOAM_TEST_HARNESS_DIR}/CMakeFiles/Dashboard_Tutorials.cmake.in"
+  "$ENV{FOAM_TEST_HARNESS_DIR}/runDir/Dashboard_Tutorials.cmake"
+  @ONLY)
+
 
 # That's it.

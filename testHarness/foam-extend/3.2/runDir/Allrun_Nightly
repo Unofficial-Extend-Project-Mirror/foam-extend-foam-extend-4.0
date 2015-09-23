@@ -79,18 +79,28 @@ fi
 
 # Make sure the CMake and tutorials runtime files are updated
 # We need cmake version 2.8.0 at least
-cmake $WM_PROJECT_DIR
+if [ "$WM_ARCH_BASE" == "mingw" ]
+then
+    cmake $WM_PROJECT_DIR -G "MSYS Makefiles"
+else
+    cmake $WM_PROJECT_DIR -G "Unix Makefiles"
+fi
 
 # All set. Now we can run the available test harness
 #
 # Invoke make help for the complete list of available commands.
 #
 # User-demand testing.
-# Will do: ExperimentalConfigure + ExperimentalBuild + ExperimentalTest + ExperimentalSubmit
-# make Experimental
-
+#
+# The old way. Still valid, but not supporting subprojects
+# Will do: ExperimentalBuild + ExperimentalTest + ExperimentalSubmit
+#make Experimental
+#
 # Nightly testing
-# Will do: NightlyUpdate + NightylConfigure + NightlyBuild + NightlyTest + NightlySubmit
-make Nightly
+# Will do: NightlyUpdate + NightlyBuild + NightlyTest + NightlySubmit
+# make Nightly
+
+# The new way. With support for subprojects
+ctest -V -S ./Dashboard_Tutorials.cmake,Nightly
 
 # That's it
