@@ -8,10 +8,10 @@ application="icoIbFoam"
 compileApplication refineThickPlateMesh
 
 mkdir constant/polyMesh
-cp -f save/blockMeshDict constant/polyMesh
+\cp -f save/blockMeshDict constant/polyMesh
 
 runApplication blockMesh
-cp -f save/boundary constant/polyMesh/
+\cp -f save/boundary constant/polyMesh/
 
 runApplication refineThickPlateMesh
 
