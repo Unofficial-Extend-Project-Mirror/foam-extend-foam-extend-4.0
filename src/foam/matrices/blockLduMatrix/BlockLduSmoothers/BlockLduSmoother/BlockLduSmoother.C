@@ -44,10 +44,14 @@ Foam::autoPtr<Foam::BlockLduSmoother<Type> > Foam::BlockLduSmoother<Type>::New
 )
 {
 <<<<<<< HEAD
+<<<<<<< HEAD
     word smootherName = getName(dict);
 =======
     word smootherName = this->getName(dict);
 >>>>>>> ac8bcf5... Clean-up of smoother selection
+=======
+    word smootherName = getName(dict);
+>>>>>>> 3afcca2... Compilation fix
 
     // Not (yet?) needed:
     // const dictionary& controls = e.isDict() ? e.dict() : dictionary::null;
