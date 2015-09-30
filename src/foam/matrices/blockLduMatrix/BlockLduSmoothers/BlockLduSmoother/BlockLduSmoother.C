@@ -43,18 +43,7 @@ Foam::autoPtr<Foam::BlockLduSmoother<Type> > Foam::BlockLduSmoother<Type>::New
     const dictionary& dict
 )
 {
-    word smootherName;
-
-    // Handle primitive or dictionary entry
-    const entry& e = dict.lookupEntry("smoother", false, false);
-    if (e.isDict())
-    {
-        e.dict().lookup("smoother") >> smootherName;
-    }
-    else
-    {
-        e.stream() >> smootherName;
-    }
+    word smootherName = this->getName(dict);
 
     // Not (yet?) needed:
     // const dictionary& controls = e.isDict() ? e.dict() : dictionary::null;
