@@ -77,6 +77,7 @@ wmake libso dbns
 wmake libso immersedBoundary/immersedBoundary
 wmake libso immersedBoundary/immersedBoundaryTurbulence
 wmake libso immersedBoundary/immersedBoundaryForce
+wmake libso immersedBoundary/immersedBoundaryDynamicMesh
 
 ( cd cudaSolvers ; ./Allwmake )
 

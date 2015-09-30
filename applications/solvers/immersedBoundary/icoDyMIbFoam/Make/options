@@ -1,0 +1,16 @@
+EXE_INC = \
+    -I$(LIB_SRC)/finiteVolume/lnInclude \
+    -I$(LIB_SRC)/meshTools/lnInclude \
+    -I$(LIB_SRC)/immersedBoundary/immersedBoundary/lnInclude \
+    -I$(LIB_SRC)/dynamicMesh/dynamicFvMesh/lnInclude \
+    -I$(LIB_SRC)/dynamicMesh/dynamicMesh/lnInclude \
+    -I./lnInclude
+
+EXE_LIBS = \
+    -lfiniteVolume \
+    -lmeshTools \
+    -limmersedBoundary \
+    -ldynamicFvMesh \
+    -ldynamicMesh \
+    -L$(FOAM_USER_LIBBIN) -loversetMesh \
+    -llduSolvers
