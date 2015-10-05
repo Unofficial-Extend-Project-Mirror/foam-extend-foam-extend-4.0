@@ -12,5 +12,4 @@ EXE_LIBS = \
     -limmersedBoundary \
     -ldynamicFvMesh \
     -ldynamicMesh \
-    -L$(FOAM_USER_LIBBIN) -loversetMesh \
     -llduSolvers
