@@ -69,7 +69,7 @@ already have the correct tools installed on your system.
 
    using the command:
 
-   git clone --branch nextRelease git://git.code.sf.net/p/openfoam-extend/foam-extend-3.1 foam-extend-3.2
+   git clone --branch nextRelease git://git.code.sf.net/p/foam-extend/foam-extend-3.2
 
 5) Open a new MSYS shell and chdir to your foam-extend-3.2 source directory.
 
