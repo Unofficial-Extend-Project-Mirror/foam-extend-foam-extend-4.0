@@ -302,16 +302,6 @@ void coupledKEpsilon::correct()
         keEqn.insertEquation(0, kEqn);
     }
 
-    // Add coupling term: C1*Cmu*(symm(grad(U))) k but with wall function
-    // corrections: must be calculated from G.  HJ, 27/Apr/2015
-
-    // Add coupling term: epsilon source depends on k
-    // k, e sink terms cannot be changed because of boundedness
-    keEqn.insertEquationCoupling
-    (
-        1, 0, -C1_*G*epsilon_/sqr(k_)
-    );
-
     // Update source coupling: coupling terms eliminated from source
     keEqn.updateSourceCoupling();
 
