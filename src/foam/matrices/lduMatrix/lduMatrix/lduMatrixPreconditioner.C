@@ -36,28 +36,6 @@ namespace Foam
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-Foam::word Foam::lduMatrix::preconditioner::getName
-(
-    const dictionary& dict
-)
-{
-    word name;
-
-    // handle primitive or dictionary entry
-    const entry& e = dict.lookupEntry("preconditioner", false, false);
-    if (e.isDict())
-    {
-        e.dict().lookup("preconditioner") >> name;
-    }
-    else
-    {
-        e.stream() >> name;
-    }
-
-    return name;
-}
-
-
 Foam::autoPtr<Foam::lduPreconditioner>
 Foam::lduPreconditioner::New
 (
@@ -65,16 +43,17 @@ Foam::lduPreconditioner::New
     const FieldField<Field, scalar>& coupleBouCoeffs,
     const FieldField<Field, scalar>& coupleIntCoeffs,
     const lduInterfaceFieldPtrsList& interfaces,
-    const dictionary& dict
+    const dictionary& dict,
+    const word keyword
 )
 {
     word preconName;
 
     // handle primitive or dictionary entry
-    const entry& e = dict.lookupEntry("preconditioner", false, false);
+    const entry& e = dict.lookupEntry(keyword, false, false);
     if (e.isDict())
     {
-        e.dict().lookup("preconditioner") >> preconName;
+        e.dict().lookup(keyword) >> preconName;
     }
     else
     {
@@ -98,7 +77,8 @@ Foam::lduPreconditioner::New
                 "    const FieldField<Field, scalar>& coupleBouCoeffs,\n"
                 "    const FieldField<Field, scalar>& coupleIntCoeffs,\n"
                 "    const lduInterfaceFieldPtrsList& interfaces,\n"
-                "    const dictionary& dict\n"
+                "    const dictionary& dict,\n"
+                "    const word keyword\n"
                 ")",
                 dict
             )   << "Unknown symmetric matrix preconditioner "
