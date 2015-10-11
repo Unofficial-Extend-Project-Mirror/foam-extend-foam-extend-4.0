@@ -70,12 +70,7 @@ Foam::lduSolverPerformance Foam::PBiCG::solve
 ) const
 {
     // --- Setup class containing solver performance data
-    lduSolverPerformance solverPerf
-    (
-        lduMatrix::preconditioner::getName(dict()) + typeName,
-        fieldName()
-    );
-
+    lduSolverPerformance solverPerf(typeName, fieldName());
 
     register label nCells = x.size();
 
@@ -133,6 +128,9 @@ Foam::lduSolverPerformance Foam::PBiCG::solve
                 interfaces_,
                 dict()
             );
+
+        // Rename the solver pefformance to include precon name
+        solverPerf.solverName() = preconPtr->type() + typeName;
 
         // Solver iteration
         do
