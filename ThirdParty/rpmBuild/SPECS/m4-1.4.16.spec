@@ -72,7 +72,7 @@ License: 		Unkown
 Name: 			%{name}
 Version: 		%{version}
 Release: 		%{release}
-URL:                    http://ftp.gnu.org/gnu/m4
+URL:                    http://ftpmirror.gnu.org/m4
 Source: 		%url/%{name}-%{version}.tar.gz
 Prefix: 		%{_prefix}
 Group: 			Development/Tools
