@@ -711,6 +711,7 @@ matrices/blockLduMatrix/BlockLduPrecons/BlockILUCpPrecon/blockILUCpPrecons.C
 matrices/blockLduMatrix/BlockLduSmoothers/BlockLduSmoother/blockLduSmoothers.C
 matrices/blockLduMatrix/BlockLduSmoothers/BlockGaussSeidelSmoother/blockGaussSeidelSmoothers.C
 matrices/blockLduMatrix/BlockLduSmoothers/BlockILUSmoother/blockILUSmoothers.C
+matrices/blockLduMatrix/BlockLduSmoothers/BlockILUCpSmoother/blockILUCpSmoothers.C
 
 /* compile blockVectorNSolvers earlier to exploit parallelismn */
 matrices/blockLduMatrix/BlockLduSolvers/blockVectorNSolvers.C

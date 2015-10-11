@@ -42,7 +42,8 @@ solvers
         minCoarseEqns   4;
         nMaxLevels      100;
         scale           on;
-        smoother        ILU;
+        coarseSmoother  ILU;
+        fineSmoother    ILU;
 
         minIter         0;
         maxIter         100;

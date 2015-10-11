@@ -127,7 +127,8 @@ class BlockILUCpPrecon
                 const Field<Type>& b
             ) const;
 
-            //- Execute preconditioning with matrix transpose, decoupled version
+            //- Execute preconditioning with matrix transpose,
+            //  decoupled version
             void decoupledPreconditionT
             (
                 Field<Type>& xT,
