@@ -91,12 +91,29 @@ Foam::dimensionedVector Foam::sixDOFqODE::OmegaDot
     const dimensionedVector& omega
 ) const
 {
+    // Fix the global moment for global rotation constraints
+    dimensionedVector mAbs = moment();
+    vector& mAbsVal = mAbs.value();
+
+    if (fixedRoll_)
+    {
+        mAbsVal.x() = 0;
+    }
+    if (fixedPitch_)
+    {
+        mAbsVal.y() = 0;
+    }
+    if (fixedYaw_)
+    {
+        mAbsVal.z() = 0;
+    }
+
     return
         inv(momentOfInertia_)
       & (
             E(omega)
             // To relative
-          + (rotation.R() & moment())
+          + (rotation.R() & mAbs)
           + momentRelative()
         );
 }
@@ -321,18 +338,15 @@ void Foam::sixDOFqODE::derivatives
     // Add rotational constraints by setting RHS of given components to zero
     if (fixedRoll_)
     {
-        dydx[6] = 0; // Roll angular acceleration
-        dydx[10] = 0; // Roll angular velocity (roll quaternion evolution RHS)
+        dydx[10] = 0; // Roll axis (roll quaternion evolution RHS)
     }
     if (fixedPitch_)
     {
-        dydx[7] = 0; // Pitch angular acceleration
-        dydx[11] = 0; // Pitch angular velocity (pitch quaternion evolution RHS)
+        dydx[11] = 0; // Pitch axis (pitch quaternion evolution RHS)
     }
     if (fixedYaw_)
     {
-        dydx[8] = 0; // Yaw angular acceleration
-        dydx[12] = 0; // Yaw angular velocity (yaw quaternion evolution RHS)
+        dydx[12] = 0; // Yaw axis (yaw quaternion evolution RHS)
     }
 }
 
@@ -389,7 +403,23 @@ void Foam::sixDOFqODE::update(const scalar delta)
     );
 
     omegaAverage_.value() = rotation_.omegaAverage(delta);
-    omegaAverageAbsolute_.value() = rotation_.omegaAverageAbsolute(delta);
+
+    // Calculate and constrain omegaAverageAbsolute appropriately
+    vector& omegaAverageAbsoluteValue = omegaAverageAbsolute_.value();
+    omegaAverageAbsoluteValue = rotation_.omegaAverageAbsolute(delta);
+
+    if (fixedRoll_)
+    {
+        omegaAverageAbsoluteValue.x() = 0;
+    }
+    if (fixedPitch_)
+    {
+        omegaAverageAbsoluteValue.y() = 0;
+    }
+    if (fixedYaw_)
+    {
+        omegaAverageAbsoluteValue.z() = 0;
+    }
 }
 
 
