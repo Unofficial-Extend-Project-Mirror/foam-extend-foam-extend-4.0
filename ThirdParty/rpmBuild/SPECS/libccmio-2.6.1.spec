@@ -134,6 +134,14 @@ Patch0:                 libccmio-2.6.1.patch_0
     mv ${libsdir}/* $RPM_BUILD_ROOT/%{_installPrefix}/lib
     cp libccmio/*.h $RPM_BUILD_ROOT/%{_installPrefix}/include/libccmio
 
+%ifos darwin
+    # Making sure to set the shared library identification name to the full path
+    # System Integrity Protection (SIP) enabled systems (OS X El Capitan)
+    # require this
+    install_name_tool -id %{_installPrefix}/lib/libadf_ccmio.dylib $RPM_BUILD_ROOT/%{_installPrefix}/lib/libadf_ccmio.dylib
+    install_name_tool -id %{_installPrefix}/lib/libccmio.dylib     $RPM_BUILD_ROOT/%{_installPrefix}/lib/libccmio.dylib
+%endif
+
     # Creation of foam-extend specific .csh and .sh files"
 
     echo ""
