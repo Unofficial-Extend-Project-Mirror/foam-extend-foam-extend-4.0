@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
-    \\  /    A nd           | Web:         http://www.foam-extend.org
-     \\/     M anipulation  | For copyright notice see file Copyright
+   \\    /   O peration     |
+    \\  /    A nd           | For copyright notice see file Copyright
+     \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -69,7 +69,7 @@ class finiteRotation
         //- Calculate rotation angle from given rotation tensor
         static scalar rotAngle(const tensor& rotT);
 
-        //- Calculate Euler angles (x-y-z (roll-pitch-yaw) convenction) from
+        //- Calculate Euler angles (x-y-z (roll-pitch-yaw) convention) from
         //  given rotation tensor. Reference: Mike Day, Insomniac Games,
         //  Extracting Euler Angles from a Rotation Matrix.
         static vector eulerAngles(const tensor& rotT);
