@@ -1,0 +1,3 @@
+icoDyMIbFoam.C  
+
+EXE = $(FOAM_APPBIN)/icoDyMIbFoam

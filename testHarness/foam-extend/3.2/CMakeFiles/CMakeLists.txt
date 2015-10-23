@@ -39,6 +39,117 @@ cmake_minimum_required (VERSION 2.8)
 PROJECT(foam-extend-3.2)
 
 #-----------------------------------------------------------------------------
+# Utility functions
+#
+# GetHostName(var)
+#
+# Set the variable named ${var} to the host hostname
+#
+function(GetHostName var)
+    set( thisHostName "unknown")
+
+    if(CMAKE_HOST_WIN32)
+        execute_process(
+            COMMAND         hostname
+            OUTPUT_VARIABLE thisHostname
+        )
+    else()
+        execute_process(
+            COMMAND         hostname -f
+            OUTPUT_VARIABLE thisHostname
+        )
+    endif()
+    set(${var} ${thisHostname} PARENT_SCOPE)
+endfunction()
+
+#
+# GetGitStatus(status ecode)
+#
+# Get the git status for the local git repository of the source code
+# The variable named ${status} will get the git status
+# The variable named ${ecode} will get the command error code
+#
+function(GetGitStatus _status _ecode)
+    set( git_status "unknown")
+    set( git_ecode "1")
+
+    execute_process(
+      COMMAND           git status
+      WORKING_DIRECTORY ${FOAM_ROOT}
+      OUTPUT_VARIABLE   git_status
+      RESULT_VARIABLE   git_ecode
+      ERROR_QUIET
+    )
+    set(${_status} ${git_status} PARENT_SCOPE)
+    set(${_ecode} ${git_ecode} PARENT_SCOPE)
+endfunction()
+
+#
+# GetGitBranchName(var)
+#
+# Set the variable named ${var} to the git branch name of the source code
+#
+function(GetGitBranchName var)
+    set( retValue "unknown")
+
+    execute_process(
+        COMMAND         git branch --no-color
+        WORKING_DIRECTORY ${FOAM_ROOT}
+        OUTPUT_VARIABLE listOfGitBranches
+    )
+    # Create list of strings
+    string(REPLACE "\n" ";" listOfGitBranches ${listOfGitBranches})
+
+    # Iterate over list, find the string beginning with "* "
+    foreach(branch ${listOfGitBranches})
+        string(REGEX MATCH "\\* .*$" matchString ${branch})
+        string(LENGTH "${matchString}" lengthMatchString)
+	if(lengthMatchString GREATER 0)
+	    # We have  match. Cleanup and set retValue
+	    string(REPLACE "* " "" retValue ${matchString})
+        endif()
+    endforeach()
+
+    set(${var} ${retValue} PARENT_SCOPE)
+endfunction()
+
+#
+# GetGitRevNumber(var)
+#
+# Set the variable named ${var} to the git revision number of the source code
+#
+function(GetGitRevNumber var)
+    set( retValue "unknown")
+
+    execute_process(
+	COMMAND         git rev-parse --short=12 HEAD
+        WORKING_DIRECTORY ${FOAM_ROOT}
+        OUTPUT_VARIABLE git_rev_number
+    )
+
+    # Minimal check that we do have a valid string
+    string(LENGTH "${git_rev_number}" lengthString)
+    if(lengthString GREATER 0)
+        set(retValue ${git_rev_number})
+    endif()
+
+    set(${var} ${retValue} PARENT_SCOPE)
+endfunction()
+
+# CleanUpStringForCDash(var)
+#
+# Cleanup the variable named ${value} for characters not supported
+# for CDash identifiers. Return the modified value in retVar
+#
+function(CleanUpStringForCDash value retVar)
+    string(REPLACE "/" "_" value "${value}")
+    string(REPLACE " " "_" value ${value})
+    set(${retVar} ${value} PARENT_SCOPE)
+endfunction()
+
+#-----------------------------------------------------------------------------
+#
+#
 # Initialization of CTest specific variables
 #
 ## Run ctest in parallel if environment variable WM_NCOMPPROCS is set
@@ -57,13 +168,11 @@ IF (NOT $ENV{CDASH_SUBMIT_LOCAL_HOST_ID} STREQUAL "")
           SITENAME $ENV{CDASH_SUBMIT_LOCAL_HOST_ID}
           CACHE STRING "Name of the local site"
     )
-ELSE (NOT $ENV{CDASH_SUBMIT_LOCAL_HOST_ID} STREQUAL "")
+ELSE ()
     # Grab the hostname FQN; will be used for the sitename
-    execute_process(
-        COMMAND         hostname -f
-        OUTPUT_VARIABLE SITENAME
-    )
-ENDIF  (NOT $ENV{CDASH_SUBMIT_LOCAL_HOST_ID} STREQUAL "")
+    GetHostName(SITENAME)
+
+ENDIF()
 
 MESSAGE("Initializing the name of this local site to:  ${SITENAME}")
 
@@ -146,27 +255,15 @@ elseif(GIT_FOUND)
     message("The git command was found: ${GIT_EXECUTABLE}")
 
     # Check if the source code is under a valid git repository
-    execute_process(
-      COMMAND           git status
-      WORKING_DIRECTORY ${FOAM_ROOT}
-      OUTPUT_VARIABLE   GIT_STATUS
-      RESULT_VARIABLE   GIT_ECODE
-      ERROR_QUIET
-    )
+    GetGitStatus(GIT_STATUS GIT_ECODE)
 
     if(NOT GIT_ECODE)
-        # We have a valid git repository. Grab the branch and revision info.
-        # Add to the build name
-        exec_program(git
-          ARGS branch --no-color 2> /dev/null | grep '*'| awk '{print $2}'
-          OUTPUT_VARIABLE GIT_BRANCH_NAME
-          )
+        # We have a valid git repository.
+	# Grab the branch and revision info. Add to the build name
+	GetGitBranchName(GIT_BRANCH_NAME)
         message("Git branch: ${GIT_BRANCH_NAME}")
 
-        execute_process(
-          COMMAND         git rev-parse --short=12 HEAD
-          OUTPUT_VARIABLE GIT_REV_NUMBER
-          )
+	GetGitRevNumber(GIT_REV_NUMBER)
         message("Git revision: ${GIT_REV_NUMBER}")
 
         SET(BUILDNAME "${BUILDNAME}-git-branch=${GIT_BRANCH_NAME}")
@@ -216,13 +313,13 @@ endif()
 
 # Some last minute cleanup
 # Seems like no '/' or ' 'are allowed in the BUILDNAME or in the SITE name
-string(REPLACE "/" "_" BUILDNAME ${BUILDNAME})
-string(REPLACE " " "_" BUILDNAME ${BUILDNAME})
-string(REPLACE "/" "_" SITE ${SITE})
-string(REPLACE " " "_" SITE ${SITE})
+CleanUpStringForCDash(${BUILDNAME} BUILDNAME)
+CleanUpStringForCDash(${SITE} SITE)
 
 message("Build name: ${BUILDNAME}")
+message("Site name: ${SITE}")
 
+#
 # Build section
 #-----------------------------------------------------------------------------
 
@@ -282,10 +379,18 @@ IF(BUILD_TESTING)
     IF(RUN_FROM_ONE_TIMESTEP)
         # Modify the cases controlDict file in order to run for only one time step
         MESSAGE("${testRunTimeDirectory}: Modifying the controlDict files for running only one time step in directory: ${TEST_CASE_DIR}")
-        EXECUTE_PROCESS(
+	if(CMAKE_HOST_WIN32)
+          # Need to supply a bash shell to run the script under Windows
+          EXECUTE_PROCESS(
+            COMMAND bash -c "$ENV{FOAM_TEST_HARNESS_DIR}/scripts/prepareCasesForOneTimeStep.sh ${TEST_CASE_DIR}"
+            WORKING_DIRECTORY .
+            )
+	else()
+          EXECUTE_PROCESS(
             COMMAND $ENV{FOAM_TEST_HARNESS_DIR}/scripts/prepareCasesForOneTimeStep.sh ${TEST_CASE_DIR}
             WORKING_DIRECTORY .
             )
+	endif()
     ENDIF(RUN_FROM_ONE_TIMESTEP)
 
 ENDIF(BUILD_TESTING)

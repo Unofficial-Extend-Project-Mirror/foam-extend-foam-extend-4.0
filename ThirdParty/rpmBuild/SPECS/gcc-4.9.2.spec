@@ -72,7 +72,7 @@ License: 		Unkown
 Name: 			%{name}
 Version: 		%{version}
 Release: 		%{release}
-URL:                    ftp://ftp.gnu.org/gnu/gcc/gcc-4.9.2
+URL:                    http://ftpmirror.gnu.org/gcc/gcc-4.9.2
 Source: 		%url/%{name}-%{version}.tar.gz
 Prefix: 		%{_prefix}
 Group: 			Development/Tools

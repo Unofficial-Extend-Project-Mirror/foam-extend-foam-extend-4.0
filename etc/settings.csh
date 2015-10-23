@@ -52,8 +52,9 @@ setenv FOAM_LIBBIN $WM_PROJECT_DIR/lib/$WM_OPTIONS
 setenv FOAM_SRC $WM_PROJECT_DIR/src
 
 # shared site configuration - similar naming convention as ~FOAM expansion
-setenv FOAM_SITE_APPBIN $WM_PROJECT_INST_DIR/site/$WM_PROJECT_VERSION/bin/$WM_OPTIONS
-setenv FOAM_SITE_LIBBIN $WM_PROJECT_INST_DIR/site/$WM_PROJECT_VERSION/lib/$WM_OPTIONS
+setenv FOAM_SITE_DIR $WM_PROJECT_INST_DIR/site/$WM_PROJECT_VERSION
+setenv FOAM_SITE_APPBIN $FOAM_SITE_DIR/bin/$WM_OPTIONS
+setenv FOAM_SITE_LIBBIN $FOAM_SITE_DIR/lib/$WM_OPTIONS
 
 # user configuration
 setenv FOAM_USER_APPBIN $WM_PROJECT_USER_DIR/applications/bin/$WM_OPTIONS
@@ -64,6 +65,7 @@ setenv FOAM_TUTORIALS $WM_PROJECT_DIR/tutorials
 setenv FOAM_UTILITIES $FOAM_APP/utilities
 setenv FOAM_SOLVERS $FOAM_APP/solvers
 setenv FOAM_RUN $WM_PROJECT_USER_DIR/run
+setenv FOAM_TEST_HARNESS_DIR $WM_PROJECT_DIR/testHarness/foam-extend/$WM_PROJECT_VERSION
 
 # add FOAM scripts and wmake to the path
 set path=($WM_DIR $WM_PROJECT_DIR/bin $path)
