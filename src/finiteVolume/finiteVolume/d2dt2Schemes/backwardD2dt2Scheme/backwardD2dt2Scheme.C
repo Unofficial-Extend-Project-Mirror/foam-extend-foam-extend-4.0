@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -268,10 +268,10 @@ backwardD2dt2Scheme<Type>::fvmD2dt2
         (
             coefft0
            *backwardDdtScheme<Type>(mesh()).fvcDdt(vf.oldTime())
-	    ().internalField()
+            ().internalField()
           - coefft00
            *backwardDdtScheme<Type>(mesh()).fvcDdt(vf.oldTime().oldTime())
-	    ().internalField()
+            ().internalField()
         );
     }
 

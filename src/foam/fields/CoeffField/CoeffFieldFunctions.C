@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -143,7 +143,7 @@ void multiply
 #define UNARY_OPERATOR(op, opFunc)                                            \
                                                                               \
 template<class Type>                                                          \
-void opFunc                                                             \
+void opFunc                                                                   \
 (                                                                             \
     CoeffField<Type>& f,                                                      \
     const CoeffField<Type>& f1                                                \
@@ -176,7 +176,7 @@ void opFunc                                                             \
 }                                                                             \
                                                                               \
 template<class Type>                                                          \
-tmp<CoeffField<Type> > operator op                          \
+tmp<CoeffField<Type> > operator op                                            \
 (                                                                             \
     const CoeffField<Type>& f1                                                \
 )                                                                             \
@@ -187,7 +187,7 @@ tmp<CoeffField<Type> > operator op                          \
 }                                                                             \
                                                                               \
 template<class Type>                                                          \
-tmp<CoeffField<Type> > operator op                          \
+tmp<CoeffField<Type> > operator op                                            \
 (                                                                             \
     const tmp<CoeffField<Type> >& tf1                                         \
 )                                                                             \
@@ -205,7 +205,7 @@ UNARY_OPERATOR(-, negate)
 #define BINARY_OPERATOR_FF(Type1, Type2, op, opFunc)                          \
                                                                               \
 template<class Type>                                                          \
-tmp<Field<Type> > operator op                               \
+tmp<Field<Type> > operator op                                                 \
 (                                                                             \
     const CoeffField<Type1>& f1,                                              \
     const Type2& f2                                                           \
@@ -218,7 +218,7 @@ tmp<Field<Type> > operator op                               \
                                                                               \
                                                                               \
 template<class Type>                                                          \
-tmp<Field<Type> > operator op                               \
+tmp<Field<Type> > operator op                                                 \
 (                                                                             \
     const CoeffField<Type1>& f1,                                              \
     const Field<Type2>& f2                                                    \
@@ -231,7 +231,7 @@ tmp<Field<Type> > operator op                               \
                                                                               \
                                                                               \
 template<class Type>                                                          \
-tmp<Field<Type> > operator op                               \
+tmp<Field<Type> > operator op                                                 \
 (                                                                             \
     const Field<Type2>& f1,                                                   \
     const CoeffField<Type1>& f2                                               \
@@ -244,7 +244,7 @@ tmp<Field<Type> > operator op                               \
 
 #define BINARY_OPERATOR_FTR(Type1, Type2, op, opFunc)                         \
 template<class Type>                                                          \
-tmp<Field<Type> > operator op                               \
+tmp<Field<Type> > operator op                                                 \
 (                                                                             \
     const CoeffField<Type1>& f1,                                              \
     const tmp<Field<Type2> >& tf2                                             \
@@ -257,7 +257,7 @@ tmp<Field<Type> > operator op                               \
 
 #define BINARY_OPERATOR_FT(Type1, Type2, op, opFunc)                          \
 template<class Type>                                                          \
-tmp<Field<Type> > operator op                               \
+tmp<Field<Type> > operator op                                                 \
 (                                                                             \
     const Field<Type1>& f1,                                                   \
     const tmp<CoeffField<Type2> >& tf2                                        \
@@ -270,7 +270,7 @@ tmp<Field<Type> > operator op                               \
 
 #define BINARY_OPERATOR_TRF(Type1, Type2, op, opFunc)                         \
 template<class Type>                                                          \
-tmp<Field<Type> > operator op                               \
+tmp<Field<Type> > operator op                                                 \
 (                                                                             \
     const tmp<CoeffField<Type1> >& tf1,                                       \
     const Field<Type2>& f2                                                    \
@@ -283,7 +283,7 @@ tmp<Field<Type> > operator op                               \
 
 #define BINARY_OPERATOR_TF(Type1, Type2, op, opFunc)                          \
 template<class Type>                                                          \
-tmp<Field<Type> > operator op                               \
+tmp<Field<Type> > operator op                                                 \
 (                                                                             \
     const tmp<CoeffField<Type1> >& tf1,                                       \
     const Field<Type2>& f2                                                    \
@@ -296,7 +296,7 @@ tmp<Field<Type> > operator op                               \
 
 #define BINARY_OPERATOR_TRT(Type1, Type2, op, opFunc)                         \
 template<class Type>                                                          \
-tmp<Field<Type> > operator op                               \
+tmp<Field<Type> > operator op                                                 \
 (                                                                             \
     const tmp<CoeffField<Type1> >& tf1,                                       \
     const tmp<Field<Type2> >& tf2                                             \
@@ -310,7 +310,7 @@ tmp<Field<Type> > operator op                               \
 
 #define BINARY_OPERATOR_TTR(Type1, Type2, op, opFunc)                         \
 template<class Type>                                                          \
-tmp<Field<Type> > operator op                               \
+tmp<Field<Type> > operator op                                                 \
 (                                                                             \
     const tmp<Field<Type1> >& tf1,                                            \
     const tmp<CoeffField<Type2> >& tf2                                        \

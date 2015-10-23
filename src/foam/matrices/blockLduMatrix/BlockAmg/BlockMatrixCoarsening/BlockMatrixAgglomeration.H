@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -42,6 +42,7 @@ SourceFiles
 #include "BlockLduMatrix.H"
 #include "BlockCoeffNorm.H"
 #include "BlockCoeff.H"
+#include "tolerancesSwitch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -74,6 +75,9 @@ class BlockMatrixAgglomeration
         //- Group size
         label groupSize_;
 
+        //- Number of solo cells
+        label nSolo_;
+
         //- Number of coarse equations
         label nCoarseEqns_;
 
@@ -96,7 +100,7 @@ class BlockMatrixAgglomeration
     // Private Static Data
 
         //- Diagonal scaling factor
-        static const scalar diagFactor_;
+        static const debug::tolerancesSwitch diagFactor_;
 
         //- Weighting factor
         static const scalar weightFactor_;
@@ -134,7 +138,7 @@ public:
         }
 
         //- Restrict matrix
-        virtual autoPtr<BlockLduMatrix<Type> > restrictMatrix() const;
+        virtual autoPtr<BlockAmgLevel<Type> > restrictMatrix() const;
 
         //- Restrict residual
         virtual void restrictResidual

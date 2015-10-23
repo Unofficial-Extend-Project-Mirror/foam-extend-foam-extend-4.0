@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -41,6 +41,7 @@ SourceFiles
 #include "BlockAmgLevel.H"
 #include "BlockLduSmoother.H"
 #include "BlockLduMatrix.H"
+#include "lduPrimitiveMesh.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -57,6 +58,9 @@ class coarseBlockAmgLevel
     public BlockAmgLevel<Type>
 {
     // Private data
+
+        //- Matrix addressing object.  This also contains coupling interfaces
+        autoPtr<lduPrimitiveMesh> addrPtr_;
 
         //- Matrix
         autoPtr<BlockLduMatrix<Type> > matrixPtr_;
@@ -76,6 +80,9 @@ class coarseBlockAmgLevel
         //- Smoother
         autoPtr<BlockLduSmoother<Type> > smootherPtr_;
 
+        //- Ax buffer
+        mutable Field<Type> Ax_;
+
 
     // Private Member Functions
 
@@ -91,15 +98,18 @@ public:
     //- Runtime type information
         TypeName("coarseBlockAmgLevel");
 
+
+    // Constructors
+
         //- Construct from components
         coarseBlockAmgLevel
         (
+            autoPtr<lduPrimitiveMesh> addrPtr,
             autoPtr<BlockLduMatrix<Type> > matrixPtr,
             const dictionary& dict,
             const word& coarseningType,
             const label groupSize,
-            const label minCoarseEqns,
-            const word& smootherType
+            const label minCoarseEqns
         );
 
 

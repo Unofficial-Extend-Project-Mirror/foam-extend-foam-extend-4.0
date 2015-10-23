@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -54,9 +54,10 @@ tmp
         typename outerProduct<vector, Type>::type, fvPatchField, volMesh
     >
 >
-leastSquaresSolidInterfaceGrad<Type>::grad
+leastSquaresSolidInterfaceGrad<Type>::calcGrad
 (
-    const GeometricField<Type, fvPatchField, volMesh>& vsf
+    const GeometricField<Type, fvPatchField, volMesh>& vsf,
+    const word& name
 ) const
 {
     typedef typename outerProduct<vector, Type>::type GradType;
@@ -69,7 +70,7 @@ leastSquaresSolidInterfaceGrad<Type>::grad
         (
             IOobject
             (
-                "grad("+vsf.name()+')',
+                name,
                 vsf.instance(),
                 mesh,
                 IOobject::NO_READ,

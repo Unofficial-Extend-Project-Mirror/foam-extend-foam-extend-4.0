@@ -1,30 +1,56 @@
 #!/bin/bash
 cd ${0%/*} || exit 1    # run from this directory
 
+echo
+if [ ! -z "$EXTEND_BAZAAR_TO_SITE" ]; then
+    echo "Bazaar stuff installed to $FOAM_SITE_APPBIN and $FOAM_SITE_LIBBIN and will be accessible to everyone. To change this unset variable EXTEND_BAZAAR_TO_SITE"
+else
+    echo "Bazaar stuff installed to $FOAM_USER_APPBIN and $FOAM_USER_LIBBIN and will be accessible only for the current user. To change this set variable EXTEND_BAZAAR_TO_SITE"
+fi
+    echo
+
+setDestination()
+{
+    pkg=$1
+    if [ ! -z "$EXTEND_BAZAAR_TO_SITE" ]; then
+        dst="SITE"
+        wrong="USER"
+    else
+        dst="USER"
+        wrong="SITE"
+    fi
+
+    # remove installation to general binaries
+    find $pkg -type f | grep "Make/files" | grep -v bak | xargs sed -i.bak -e s/FOAM_LIBBIN/FOAM_${dst}_LIBBIN/g
+    find $pkg -type f | grep "Make/files" | grep -v bak | xargs sed -i.bak -e s/FOAM_APPBIN/FOAM_${dst}_APPBIN/g
+
+    # revert installation to the "other" destination
+    find $pkg -type f | grep "Make/files" | grep -v bak | xargs sed -i.bak -e s/FOAM_${wrong}_LIBBIN/FOAM_${dst}_LIBBIN/g
+    find $pkg -type f | grep "Make/files" | grep -v bak | xargs sed -i.bak -e s/FOAM_${wrong}_APPBIN/FOAM_${dst}_APPBIN/g
+
+}
 
 # Install Fluid-Structure Interaction package
 if [ ! -d "FluidStructureInteraction" ]; then
     wget http://openfoamwiki.net/images/5/52/Fsi_31.tar.gz
     tar zxvf Fsi_31.tar.gz
     rm Fsi_31.tar.gz
-fi 
+fi
 
-cd FluidStructureInteraction/src/
-./Allwmake
-cd -
+setDestination FluidStructureInteraction
 
-# Install cfMesh mesh generation package
-if [ ! -d "cfMesh-v1.0" ]; then
-    wget http://www.c-fields.com/Media/Default/Repository/cfMesh-v1.0.tgz
-    tar zxvf cfMesh-v1.0.tgz
-    rm cfMesh-v1.0.tgz
-fi 
-# Change FOAM_LIBBIN to FOAM_USER_LIBBIN
-find cfMesh-v1.0/ -type f | grep "Make/files" | xargs sed -i s/FOAM_LIBBIN/FOAM_USER_LIBBIN/g
-find cfMesh-v1.0/ -type f | grep "Make/files" | xargs sed -i s/FOAM_APPBIN/FOAM_USER_APPBIN/g
+(
+    cd FluidStructureInteraction/src
+    ./Allwmake
+)
 
-cd cfMesh-v1.0/
-./Allwmake
-cd -
+# Install the makeAxialMesh utilitiy
+if [ ! -d "MakeAxialMesh" ]; then
+    svn export svn://svn.code.sf.net/p/openfoam-extend/svn/trunk/Breeder_1.6/utilities/mesh/manipulation/MakeAxialMesh MakeAxialMesh
+fi
+
+setDestination MakeAxialMesh
+
+wmake MakeAxialMesh/makeAxialMesh
 
 # ----------------------------------------------------------------- end-of-file

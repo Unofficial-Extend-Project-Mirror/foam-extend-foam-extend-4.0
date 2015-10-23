@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -26,136 +26,212 @@ Description
 
 \*---------------------------------------------------------------------------*/
 
+#include "mpi.h"
+
 #include "IPstream.H"
-#include "error.H"
-#include "int.H"
+#include "PstreamGlobals.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * * * Constructor * * * * * * * * * * * * * * * //
 
-namespace Foam
+Foam::IPstream::IPstream
+(
+    const commsTypes commsType,
+    const int fromProcNo,
+    const label bufSize,
+    streamFormat format,
+    versionNumber version
+)
+:
+    Pstream(commsType, bufSize),
+    Istream(format, version),
+    fromProcNo_(fromProcNo),
+    messageSize_(0)
 {
+    setOpened();
+    setGood();
 
-// * * * * * * * * * * * * * Private member functions  * * * * * * * * * * * //
+    MPI_Status status;
 
-inline void IPstream::checkEof()
-{
-    if (bufPosition_ == messageSize_)
+    // If the buffer size is not specified, probe the incomming message
+    // and set it
+    if (!bufSize)
     {
-        setEof();
+        MPI_Probe(procID(fromProcNo_), msgType(), MPI_COMM_WORLD, &status);
+        MPI_Get_count(&status, MPI_BYTE, &messageSize_);
+
+        buf_.setSize(messageSize_);
+    }
+
+    messageSize_ = read(commsType, fromProcNo_, buf_.begin(), buf_.size());
+
+    if (!messageSize_)
+    {
+        FatalErrorIn
+        (
+            "IPstream::IPstream(const int fromProcNo, "
+            "const label bufSize, streamFormat format, versionNumber version)"
+        )   << "read failed"
+            << Foam::abort(FatalError);
     }
 }
 
 
-template<class T>
-inline void IPstream::readFromBuffer(T& t)
+// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+
+Foam::label Foam::IPstream::read
+(
+    const commsTypes commsType,
+    const int fromProcNo,
+    char* buf,
+    const std::streamsize bufSize
+)
 {
-    const size_t align = sizeof(T);
-    bufPosition_ = align + ((bufPosition_ - 1) & ~(align - 1));
-
-    t = reinterpret_cast<T&>(buf_[bufPosition_]);
-    bufPosition_ += sizeof(T);
-    checkEof();
-}
-
-
-inline void IPstream::readFromBuffer(void* data, size_t count, size_t align)
-{
-    if (align > 1)
+    if (commsType == blocking || commsType == scheduled)
     {
-        bufPosition_ = align + ((bufPosition_ - 1) & ~(align - 1));
+        MPI_Status status;
+
+        if
+        (
+            MPI_Recv
+            (
+                buf,
+                bufSize,
+                MPI_PACKED,
+                procID(fromProcNo),
+                msgType(),
+                MPI_COMM_WORLD,
+                &status
+            )
+        )
+        {
+            FatalErrorIn
+            (
+                "IPstream::read"
+                "(const int fromProcNo, char* buf, std::streamsize bufSize)"
+            )   << "MPI_Recv cannot receive incomming message"
+                << Foam::abort(FatalError);
+
+            return 0;
+        }
+
+
+        // Check size of message read
+
+        label messageSize;
+        MPI_Get_count(&status, MPI_BYTE, &messageSize);
+
+        if (messageSize > bufSize)
+        {
+            FatalErrorIn
+            (
+                "IPstream::read"
+                "(const int fromProcNo, char* buf, std::streamsize bufSize)"
+            )   << "buffer (" << label(bufSize)
+                << ") not large enough for incomming message ("
+                << messageSize << ')'
+                << Foam::abort(FatalError);
+        }
+
+        return messageSize;
     }
-
-    register const char* bufPtr = &buf_[bufPosition_];
-
-    register char* dataPtr = reinterpret_cast<char*>(data);
-    register size_t i = count;
-    while (i--) *dataPtr++ = *bufPtr++;
-    bufPosition_ += count;
-    checkEof();
-}
-
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-IPstream::~IPstream()
-{}
-
-
-Istream& IPstream::read(char& c)
-{
-    c = buf_[bufPosition_];
-    bufPosition_++;
-    checkEof();
-    return *this;
-}
-
-
-Istream& IPstream::read(word& w)
-{
-    size_t ws;
-    readFromBuffer(ws);
-    w = &buf_[bufPosition_];
-    bufPosition_ += ws + 1;
-    checkEof();
-    return *this;
-}
-
-
-Istream& IPstream::read(string& s)
-{
-    size_t ss;
-    readFromBuffer(ss);
-    s = &buf_[bufPosition_];
-    bufPosition_ += ss + 1;
-    checkEof();
-    return *this;
-}
-
-
-Istream& IPstream::read(label& l)
-{
-    readFromBuffer(l);
-    return *this;
-}
-
-
-Istream& IPstream::read(floatScalar& s)
-{
-    readFromBuffer(s);
-    return *this;
-}
-
-
-Istream& IPstream::read(doubleScalar& s)
-{
-    readFromBuffer(s);
-    return *this;
-}
-
-
-Istream& IPstream::read(char* data, std::streamsize count)
-{
-    if (format() != BINARY)
+    else if (commsType == nonBlocking)
     {
-        FatalErrorIn("IPstream::read(char*, std::streamsize)")
-            << "stream format not binary"
+        MPI_Request request;
+
+        if
+        (
+            MPI_Irecv
+            (
+                buf,
+                bufSize,
+                MPI_PACKED,
+                procID(fromProcNo),
+                msgType(),
+                MPI_COMM_WORLD,
+                &request
+            )
+        )
+        {
+            FatalErrorIn
+            (
+                "IPstream::read"
+                "(const int fromProcNo, char* buf, std::streamsize bufSize)"
+            )   << "MPI_Recv cannot start non-blocking receive"
+                << Foam::abort(FatalError);
+
+            return 0;
+        }
+
+        PstreamGlobals::IPstream_outstandingRequests_.append(request);
+
+        return 1;
+    }
+    else
+    {
+        FatalErrorIn
+        (
+            "IPstream::read"
+            "(const int fromProcNo, char* buf, std::streamsize bufSize)"
+        )   << "Unsupported communications type " << commsType
+            << Foam::abort(FatalError);
+
+        return 0;
+    }
+}
+
+
+void Foam::IPstream::waitRequests()
+{
+    if (PstreamGlobals::IPstream_outstandingRequests_.size())
+    {
+        if
+        (
+            MPI_Waitall
+            (
+                PstreamGlobals::IPstream_outstandingRequests_.size(),
+                PstreamGlobals::IPstream_outstandingRequests_.begin(),
+                MPI_STATUSES_IGNORE
+            )
+        )
+        {
+            FatalErrorIn
+            (
+                "IPstream::waitRequests()"
+            )   << "MPI_Waitall returned with error" << endl;
+        }
+
+        PstreamGlobals::IPstream_outstandingRequests_.clear();
+    }
+}
+
+
+bool Foam::IPstream::finishedRequest(const label i)
+{
+    if (i >= PstreamGlobals::IPstream_outstandingRequests_.size())
+    {
+        FatalErrorIn
+        (
+            "IPstream::finishedRequest(const label)"
+        )   << "There are "
+            << PstreamGlobals::IPstream_outstandingRequests_.size()
+            << " outstanding send requests and you are asking for i=" << i
+            << nl
+            << "Maybe you are mixing blocking/non-blocking comms?"
             << Foam::abort(FatalError);
     }
 
-    readFromBuffer(data, count, 8);
-    return *this;
-}
+    int flag;
+    MPI_Test
+    (
+        &PstreamGlobals::IPstream_outstandingRequests_[i],
+        &flag,
+        MPI_STATUS_IGNORE
+    );
 
-
-Istream& IPstream::rewind()
-{
-    bufPosition_ = 0;
-    return *this;
+    return flag != 0;
 }
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // ************************************************************************* //

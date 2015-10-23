@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -45,8 +45,8 @@ void Foam::BlockLduMatrix<scalar>::initInterfaces
 {
     if
     (
-        Pstream::defaultCommsType == Pstream::blocking
-     || Pstream::defaultCommsType == Pstream::nonBlocking
+        Pstream::defaultCommsType() == Pstream::blocking
+     || Pstream::defaultCommsType() == Pstream::nonBlocking
     )
     {
         forAll (interfaces, interfaceI)
@@ -65,7 +65,7 @@ void Foam::BlockLduMatrix<scalar>::initInterfaces
             }
         }
     }
-    else if (Pstream::defaultCommsType == Pstream::scheduled)
+    else if (Pstream::defaultCommsType() == Pstream::scheduled)
     {
         const lduSchedule& patchSchedule = this->patchSchedule();
 
@@ -113,12 +113,12 @@ void Foam::BlockLduMatrix<scalar>::updateInterfaces
 {
     if
     (
-        Pstream::defaultCommsType == Pstream::blocking
-     || Pstream::defaultCommsType == Pstream::nonBlocking
+        Pstream::defaultCommsType() == Pstream::blocking
+     || Pstream::defaultCommsType() == Pstream::nonBlocking
     )
     {
         // Block until all sends/receives have been finished
-        if (Pstream::defaultCommsType == Pstream::nonBlocking)
+        if (Pstream::defaultCommsType() == Pstream::nonBlocking)
         {
             IPstream::waitRequests();
             OPstream::waitRequests();
@@ -140,7 +140,7 @@ void Foam::BlockLduMatrix<scalar>::updateInterfaces
             }
         }
     }
-    else if (Pstream::defaultCommsType == Pstream::scheduled)
+    else if (Pstream::defaultCommsType() == Pstream::scheduled)
     {
         const lduSchedule& patchSchedule = this->patchSchedule();
 

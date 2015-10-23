@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -36,9 +36,11 @@ namespace Foam
                                                                               \
 defineNamedTemplateTypeNameAndDebug(fvsPatchTypeField, 0);                    \
 template<>                                                                    \
-int fvsPatchTypeField::disallowDefaultFvsPatchField                           \
+Foam::debug::debugSwitch                                                      \
+fvsPatchTypeField::disallowDefaultFvsPatchField                               \
 (                                                                             \
-    debug::debugSwitch("disallowDefaultFvsPatchField", 0)                     \
+    "disallowDefaultFvsPatchField",                                           \
+    0                                                                         \
 );                                                                            \
 defineTemplateRunTimeSelectionTable(fvsPatchTypeField, patch);                \
 defineTemplateRunTimeSelectionTable(fvsPatchTypeField, patchMapper);          \

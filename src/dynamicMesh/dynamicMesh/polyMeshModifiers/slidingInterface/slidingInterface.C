@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -631,8 +631,8 @@ void Foam::slidingInterface::modifyMotionPoints(pointField& motionPoints) const
 
                     if
                     (
-                        cutOnMaster > edgeEndCutoffTol_
-                     && cutOnMaster < 1.0 - edgeEndCutoffTol_
+                        cutOnMaster > edgeEndCutoffTol_()
+                     && cutOnMaster < 1.0 - edgeEndCutoffTol_()
                     )
                     {
                         // Master is cut, check the slave
@@ -658,12 +658,12 @@ void Foam::slidingInterface::modifyMotionPoints(pointField& motionPoints) const
                             // Calculate merge tolerance from the
                             // target edge length
                             scalar mergeTol =
-                                edgeCoPlanarTol_*mag(b - a);
+                                edgeCoPlanarTol_()*mag(b - a);
 
                             if
                             (
-                                cutOnSlave > edgeEndCutoffTol_
-                             && cutOnSlave < 1.0 - edgeEndCutoffTol_
+                                cutOnSlave > edgeEndCutoffTol_()
+                             && cutOnSlave < 1.0 - edgeEndCutoffTol_()
                              && slaveCut.distance() < mergeTol
                             )
                             {

@@ -29,7 +29,7 @@
 
     // Bound the energy using TMin and TMax
     {
-        dimensionedScalar Tstd("Tstd", dimTemperature, specie::Tstd);
+        dimensionedScalar Tstd("Tstd", dimTemperature, specie::Tstd());
 
         volScalarField Cv = thermo.Cv();
         volScalarField R = thermo.Cp() - Cv;

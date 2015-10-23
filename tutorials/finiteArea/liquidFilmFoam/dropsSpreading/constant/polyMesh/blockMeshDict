@@ -1,0 +1,74 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | foam-extend: Open Source CFD                    |
+|  \\    /   O peration     | Version:     3.2                                |
+|   \\  /    A nd           | Web:         http://www.foam-extend.org         |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "constant/faMesh";
+    object      blockMeshDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+convertToMeters 1;
+
+vertices
+(
+    (-0.005 -0.005 0)
+    ( 0.005 -0.005 0)
+    ( 0.005  0.005 0)
+    (-0.005  0.005 0)
+
+    (-0.005 -0.005 0.001)
+    ( 0.005 -0.005 0.001)
+    ( 0.005  0.005 0.001)
+    (-0.005  0.005 0.001)
+);
+
+blocks
+(
+    hex (0 1 2 3 4 5 6 7) (100 100 1) simpleGrading (1 1 1)
+);
+
+edges
+(
+);
+
+patches
+(
+    wall film
+    (
+        (3 2 1 0)
+    )
+    wall left
+    (
+        (4 7 3 0)
+    )
+    wall right
+    (
+        (1 2 6 5)
+    )
+    wall front
+    (
+        (0 1 5 4)
+    )
+    wall back
+    (
+        (2 3 7 6)
+    )
+    wall top
+    (
+        (4 5 6 7)
+    )
+);
+
+mergePatchPairs
+(
+);
+
+// ************************************************************************* //

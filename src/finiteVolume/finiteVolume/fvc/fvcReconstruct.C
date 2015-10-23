@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -68,8 +68,8 @@ reconstruct
                 IOobject::NO_READ,
                 IOobject::NO_WRITE
             ),
-            inv(surfaceSum(sqr(mesh.Sf())/mesh.magSf()))
-          & surfaceSum((mesh.Sf()/mesh.magSf())*ssf),
+            mesh,
+            ssf.dimensions()/dimArea,
             zeroGradientFvPatchField<GradType>::typeName
         )
     );
@@ -87,9 +87,15 @@ reconstruct
     GeometricField<GradType, fvPatchField, volMesh> fluxTimesNormal =
         surfaceSum((mesh.Sf()/mesh.magSf())*ssf);
 
+    // Note: hinv inverse must be used to stabilise the inverse on bad meshes
+    // but it gives strange failures
+    // HJ, 19/Aug/2015
     reconField.internalField() =
     (
-        inv(surfaceSum(sqr(mesh.Sf())/mesh.magSf())().internalField())
+        inv
+        (
+            surfaceSum(sqr(mesh.Sf())/mesh.magSf())().internalField()
+        )
       & fluxTimesNormal.internalField()
     );
 

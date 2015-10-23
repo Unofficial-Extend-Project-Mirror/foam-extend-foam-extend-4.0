@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -62,7 +62,7 @@ template<class Type>
 class BlockAmgLevel;
 
 /*---------------------------------------------------------------------------*\
-                           Class BlockMatrixCoarsening Declaration
+                   Class BlockMatrixCoarsening Declaration
 \*---------------------------------------------------------------------------*/
 
 template<class Type>
@@ -79,6 +79,7 @@ class BlockMatrixCoarsening
         //- Minimum number of coarse level equations
         label minCoarseEqns_;
 
+
     // Private Member Functions
 
         //- Disallow default bitwise copy construct
@@ -90,29 +91,25 @@ class BlockMatrixCoarsening
 
 public:
 
-        //- Runtime type information
-        TypeName("BlockMatrixCoarsening");
-
-        // KRJ: 2012-12-15: Replaced by the above function
-        //- Runtime type information
-        //virtual const word& type() const = 0;
+    //- Runtime type information
+    TypeName("BlockMatrixCoarsening");
 
 
-        // Declare run-time constructor selection tables
+    // Declare run-time constructor selection tables
 
-            declareRunTimeSelectionTable
+        declareRunTimeSelectionTable
+        (
+            autoPtr,
+            BlockMatrixCoarsening,
+            matrix,
             (
-                autoPtr,
-                BlockMatrixCoarsening,
-                matrix,
-                (
-                    const BlockLduMatrix<Type>& matrix,
-                    const dictionary& dict,
-                    const label groupSize,
-                    const label minCoarseEqns
-                ),
-                (matrix, dict, groupSize, minCoarseEqns)
-            );
+                const BlockLduMatrix<Type>& matrix,
+                const dictionary& dict,
+                const label groupSize,
+                const label minCoarseEqns
+            ),
+            (matrix, dict, groupSize, minCoarseEqns)
+        );
 
 
     // Selectors
@@ -153,6 +150,12 @@ public:
 
     // Member Functions
 
+        //- Return access to dictionary
+        const dictionary& dict() const
+        {
+            return dict_;
+        }
+
         //- Return group size
         label groupSize() const
         {
@@ -169,7 +172,7 @@ public:
         virtual bool coarsen() const = 0;
 
         //- Restrict matrix
-        virtual autoPtr<BlockLduMatrix<Type> > restrictMatrix
+        virtual autoPtr<BlockAmgLevel<Type> > restrictMatrix
         () const = 0;
 
         //- Restrict residual

@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -58,6 +58,16 @@ class BlockGaussSeidelPrecon
 {
     // Private Data
 
+        //- Inverse of diagonal diagonal
+        CoeffField<Type> invDiag_;
+
+        //- Off-diag part of diagonal
+        CoeffField<Type> LUDiag_;
+
+        //- Temporary space for updated decoupled source
+        //  Initialised with zero size and resized on first use
+        mutable Field<Type> bPlusLU_;
+
         //- Temporary space for solution intermediate
         mutable Field<Type> bPrime_;
 
@@ -73,6 +83,9 @@ class BlockGaussSeidelPrecon
         //- Disallow default bitwise assignment
         void operator=(const BlockGaussSeidelPrecon&);
 
+
+        //- Calculate inverse diagonal
+        void calcInvDiag();
 
         // Block Gauss-Seidel sweep, symetric matrix
         template<class DiagType, class ULType>
@@ -97,6 +110,9 @@ class BlockGaussSeidelPrecon
 
 
         // Decoupled operations, used in template specialisation
+
+           //- Calculate inverse diagonal, decoupled version
+           void calcDecoupledInvDiag();
 
             //- Execute preconditioning, decoupled version
             void decoupledPrecondition
@@ -126,24 +142,14 @@ public:
         BlockGaussSeidelPrecon
         (
             const BlockLduMatrix<Type>& matrix
-        )
-        :
-            BlockLduPrecon<Type>(matrix),
-            bPrime_(matrix.lduAddr().size()),
-            nSweeps_(1)
-        {}
+        );
 
         //- Construct from components
         BlockGaussSeidelPrecon
         (
             const BlockLduMatrix<Type>& matrix,
             const dictionary& dict
-        )
-        :
-            BlockLduPrecon<Type>(matrix),
-            bPrime_(matrix.lduAddr().size()),
-            nSweeps_(readLabel(dict.lookup("nSweeps")))
-        {}
+        );
 
 
     // Destructor

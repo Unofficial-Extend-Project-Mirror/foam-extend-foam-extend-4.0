@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -31,9 +31,11 @@ License
 
 defineTypeNameAndDebug(Foam::regIOobject, 0);
 
-int Foam::regIOobject::fileModificationSkew
+const Foam::debug::optimisationSwitch
+Foam::regIOobject::fileModificationSkew
 (
-    Foam::debug::optimisationSwitch("fileModificationSkew", 30)
+    "fileModificationSkew",
+    30
 );
 
 

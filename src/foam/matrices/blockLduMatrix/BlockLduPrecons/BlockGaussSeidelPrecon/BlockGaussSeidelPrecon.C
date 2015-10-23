@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -34,6 +34,79 @@ Author
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
+template<class Type>
+void Foam::BlockGaussSeidelPrecon<Type>::calcInvDiag()
+{
+    typedef CoeffField<Type> TypeCoeffField;
+    typedef typename TypeCoeffField::linearTypeField linearTypeField;
+    typedef typename TypeCoeffField::linearType valueType;
+
+    typedef typename TypeCoeffField::squareTypeField squareTypeField;
+
+    // Note: Cannot use inv since the square coefficient requires
+    // special treatment.  HJ, 20/Aug/2015
+
+    // Get reference to diagonal
+    const TypeCoeffField& d = this->matrix_.diag();
+
+    if (d.activeType() == blockCoeffBase::SCALAR)
+    {
+        invDiag_.asScalar() = 1/d.asScalar();
+    }
+    else if (d.activeType() == blockCoeffBase::LINEAR)
+    {
+        invDiag_.asLinear() =
+            cmptDivide
+            (
+                linearTypeField(d.size(), pTraits<valueType>::one),
+                d.asLinear()
+            );
+    }
+    else if (d.activeType() == blockCoeffBase::SQUARE)
+    {
+        // For square diagonal invert diagonal only and store the rest
+        // info LUDiag coefficient.  This avoids full inverse of the
+        // diagonal matrix.  HJ, 20/Aug/2015
+        Info<< "Square diag inverse" << endl;
+
+        // Get reference to active diag
+        const squareTypeField& activeDiag = d.asSquare();
+
+        // Get reference to LU: remove diagonal from active diag
+        squareTypeField& luDiag = LUDiag_.asSquare();
+
+        linearTypeField lf(activeDiag.size());
+
+        // Take out the diagonal from the diag as a linear type
+        contractLinear(lf, activeDiag);
+
+        // Expand diagonal only to full square type and store into luDiag
+        expandLinear(luDiag, lf);
+
+        // Keep only off-diagonal in ldDiag.
+        // Note change of sign to avoid multiplication with -1 when moving
+        // to the other side.  HJ, 20/Aug/2015
+        luDiag -= activeDiag;
+
+        // Inverse is the inverse of diagonal only
+        invDiag_.asLinear() =
+            cmptDivide
+            (
+                linearTypeField(lf.size(), pTraits<valueType>::one),
+                lf
+            );
+    }
+    else
+    {
+        FatalErrorIn
+        (
+            "void BlockGaussSeidelPrecon<Type>::calcInvDiag()"
+        )   << "Problem with coefficient type morphing."
+            << abort(FatalError);
+    }
+}
+
+
 // Block sweep, symmetric matrix
 template<class Type>
 template<class DiagType, class ULType>
@@ -46,7 +119,8 @@ void Foam::BlockGaussSeidelPrecon<Type>::BlockSweep
 ) const
 {
     const unallocLabelList& u = this->matrix_.lduAddr().upperAddr();
-    const unallocLabelList& ownStart = this->matrix_.lduAddr().ownerStartAddr();
+    const unallocLabelList& ownStart =
+        this->matrix_.lduAddr().ownerStartAddr();
 
     const label nRows = ownStart.size() - 1;
 
@@ -155,7 +229,8 @@ void Foam::BlockGaussSeidelPrecon<Type>::BlockSweep
 ) const
 {
     const unallocLabelList& u = this->matrix_.lduAddr().upperAddr();
-    const unallocLabelList& ownStart = this->matrix_.lduAddr().ownerStartAddr();
+    const unallocLabelList& ownStart =
+        this->matrix_.lduAddr().ownerStartAddr();
 
     const label nRows = ownStart.size() - 1;
 
@@ -247,6 +322,43 @@ void Foam::BlockGaussSeidelPrecon<Type>::BlockSweep
 }
 
 
+// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
+
+template<class Type>
+Foam::BlockGaussSeidelPrecon<Type>::BlockGaussSeidelPrecon
+(
+    const BlockLduMatrix<Type>& matrix
+)
+:
+    BlockLduPrecon<Type>(matrix),
+    invDiag_(matrix.lduAddr().size()),
+    LUDiag_(matrix.lduAddr().size()),
+    bPlusLU_(),
+    bPrime_(matrix.lduAddr().size()),
+    nSweeps_(1)
+{
+    calcInvDiag();
+}
+
+
+template<class Type>
+Foam::BlockGaussSeidelPrecon<Type>::BlockGaussSeidelPrecon
+(
+    const BlockLduMatrix<Type>& matrix,
+    const dictionary& dict
+)
+:
+    BlockLduPrecon<Type>(matrix),
+    invDiag_(matrix.lduAddr().size()),
+    LUDiag_(matrix.lduAddr().size()),
+    bPlusLU_(),
+    bPrime_(matrix.lduAddr().size()),
+    nSweeps_(readLabel(dict.lookup("nSweeps")))
+{
+    calcInvDiag();
+}
+
+
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 template<class Type>
@@ -260,14 +372,11 @@ void Foam::BlockGaussSeidelPrecon<Type>::precondition
 
     if (this->matrix_.diagonal())
     {
-        TypeCoeffField dDCoeff = inv(this->matrix_.diag());
-
-        multiply(x, dDCoeff, b);
+        multiply(x, invDiag_, b);
     }
     else if (this->matrix_.symmetric())
     {
-        TypeCoeffField dDCoeff = inv(this->matrix_.diag());
-
+        const TypeCoeffField& DiagCoeff = this->matrix_.diag();
         const TypeCoeffField& UpperCoeff = this->matrix_.upper();
 
         // Note
@@ -279,16 +388,16 @@ void Foam::BlockGaussSeidelPrecon<Type>::precondition
         // to be enforced without the per-element if-condition, which
         // makes for ugly code.  HJ, 19/May/2005
 
-        //Note: Assuming lower and upper triangle have the same active type
+        // Note: Assuming lower and upper triangle have the same active type
 
-        if (dDCoeff.activeType() == blockCoeffBase::SCALAR)
+        if (DiagCoeff.activeType() == blockCoeffBase::SCALAR)
         {
             if (UpperCoeff.activeType() == blockCoeffBase::SCALAR)
             {
                 BlockSweep
                 (
                     x,
-                    dDCoeff.asScalar(),
+                    invDiag_.asScalar(),
                     UpperCoeff.asScalar(),
                     b
                 );
@@ -298,7 +407,7 @@ void Foam::BlockGaussSeidelPrecon<Type>::precondition
                 BlockSweep
                 (
                     x,
-                    dDCoeff.asScalar(),
+                    invDiag_.asScalar(),
                     UpperCoeff.asLinear(),
                     b
                 );
@@ -308,20 +417,20 @@ void Foam::BlockGaussSeidelPrecon<Type>::precondition
                 BlockSweep
                 (
                     x,
-                    dDCoeff.asScalar(),
+                    invDiag_.asScalar(),
                     UpperCoeff.asSquare(),
                     b
                 );
             }
         }
-        else if (dDCoeff.activeType() == blockCoeffBase::LINEAR)
+        else if (DiagCoeff.activeType() == blockCoeffBase::LINEAR)
         {
             if (UpperCoeff.activeType() == blockCoeffBase::SCALAR)
             {
                 BlockSweep
                 (
                     x,
-                    dDCoeff.asLinear(),
+                    invDiag_.asLinear(),
                     UpperCoeff.asScalar(),
                     b
                 );
@@ -331,7 +440,7 @@ void Foam::BlockGaussSeidelPrecon<Type>::precondition
                 BlockSweep
                 (
                     x,
-                    dDCoeff.asLinear(),
+                    invDiag_.asLinear(),
                     UpperCoeff.asLinear(),
                     b
                 );
@@ -341,42 +450,57 @@ void Foam::BlockGaussSeidelPrecon<Type>::precondition
                 BlockSweep
                 (
                     x,
-                    dDCoeff.asLinear(),
+                    invDiag_.asLinear(),
                     UpperCoeff.asSquare(),
                     b
                 );
             }
         }
-        else if (dDCoeff.activeType() == blockCoeffBase::SQUARE)
+        else if (DiagCoeff.activeType() == blockCoeffBase::SQUARE)
         {
+            // Add diag coupling to b
+            if (bPlusLU_.empty())
+            {
+                bPlusLU_.setSize(b.size(), pTraits<Type>::zero);
+            }
+
+            // Multiply overwrites bPlusLU_: no need to initialise
+            // Change of sign accounted via change of sign of bPlusLU_
+            // HJ, 20/Aug/2015
+            multiply(bPlusLU_, LUDiag_, x);
+            bPlusLU_ += b;
+
             if (UpperCoeff.activeType() == blockCoeffBase::SCALAR)
             {
+                // Note linear diag inversed due to decoupling
                 BlockSweep
                 (
                     x,
-                    dDCoeff.asSquare(),
+                    invDiag_.asLinear(),
                     UpperCoeff.asScalar(),
-                    b
+                    bPlusLU_
                 );
             }
             else if (UpperCoeff.activeType() == blockCoeffBase::LINEAR)
             {
+                // Note linear diag inversed due to decoupling
                 BlockSweep
                 (
                     x,
-                    dDCoeff.asSquare(),
+                    invDiag_.asLinear(),
                     UpperCoeff.asLinear(),
-                    b
+                    bPlusLU_
                 );
             }
             else if (UpperCoeff.activeType() == blockCoeffBase::SQUARE)
             {
+                // Note linear diag inversed due to decoupling
                 BlockSweep
                 (
                     x,
-                    dDCoeff.asSquare(),
+                    invDiag_.asLinear(),
                     UpperCoeff.asSquare(),
-                    b
+                    bPlusLU_
                 );
             }
         }
@@ -395,8 +519,7 @@ void Foam::BlockGaussSeidelPrecon<Type>::precondition
     }
     else if (this->matrix_.asymmetric())
     {
-        TypeCoeffField dDCoeff = inv(this->matrix_.diag());
-
+        const TypeCoeffField& DiagCoeff = this->matrix_.diag();
         const TypeCoeffField& LowerCoeff = this->matrix_.lower();
         const TypeCoeffField& UpperCoeff = this->matrix_.upper();
 
@@ -411,14 +534,14 @@ void Foam::BlockGaussSeidelPrecon<Type>::precondition
 
         //Note: Assuming lower and upper triangle have the same active type
 
-        if (dDCoeff.activeType() == blockCoeffBase::SCALAR)
+        if (DiagCoeff.activeType() == blockCoeffBase::SCALAR)
         {
             if (UpperCoeff.activeType() == blockCoeffBase::SCALAR)
             {
                 BlockSweep
                 (
                     x,
-                    dDCoeff.asScalar(),
+                    invDiag_.asScalar(),
                     LowerCoeff.asScalar(),
                     UpperCoeff.asScalar(),
                     b
@@ -429,7 +552,7 @@ void Foam::BlockGaussSeidelPrecon<Type>::precondition
                 BlockSweep
                 (
                     x,
-                    dDCoeff.asScalar(),
+                    invDiag_.asScalar(),
                     LowerCoeff.asLinear(),
                     UpperCoeff.asLinear(),
                     b
@@ -440,21 +563,21 @@ void Foam::BlockGaussSeidelPrecon<Type>::precondition
                 BlockSweep
                 (
                     x,
-                    dDCoeff.asScalar(),
+                    invDiag_.asScalar(),
                     LowerCoeff.asSquare(),
                     UpperCoeff.asSquare(),
                     b
                 );
             }
         }
-        else if (dDCoeff.activeType() == blockCoeffBase::LINEAR)
+        else if (DiagCoeff.activeType() == blockCoeffBase::LINEAR)
         {
             if (UpperCoeff.activeType() == blockCoeffBase::SCALAR)
             {
                 BlockSweep
                 (
                     x,
-                    dDCoeff.asLinear(),
+                    invDiag_.asLinear(),
                     LowerCoeff.asScalar(),
                     UpperCoeff.asScalar(),
                     b
@@ -465,7 +588,7 @@ void Foam::BlockGaussSeidelPrecon<Type>::precondition
                 BlockSweep
                 (
                     x,
-                    dDCoeff.asLinear(),
+                    invDiag_.asLinear(),
                     LowerCoeff.asLinear(),
                     UpperCoeff.asLinear(),
                     b
@@ -476,46 +599,61 @@ void Foam::BlockGaussSeidelPrecon<Type>::precondition
                 BlockSweep
                 (
                     x,
-                    dDCoeff.asLinear(),
+                    invDiag_.asLinear(),
                     LowerCoeff.asSquare(),
                     UpperCoeff.asSquare(),
                     b
                 );
             }
         }
-        else if (dDCoeff.activeType() == blockCoeffBase::SQUARE)
+        else if (DiagCoeff.activeType() == blockCoeffBase::SQUARE)
         {
+            // Add diag coupling to b
+            if (bPlusLU_.empty())
+            {
+                bPlusLU_.setSize(b.size(), pTraits<Type>::zero);
+            }
+
+            // Multiply overwrites bPlusLU_: no need to initialise
+            // Change of sign accounted via change of sign of bPlusLU_
+            // HJ, 20/Aug/2015
+            multiply(bPlusLU_, LUDiag_, x);
+            bPlusLU_ += b;
+
             if (UpperCoeff.activeType() == blockCoeffBase::SCALAR)
             {
+                // Note linear diag inversed due to decoupling
                 BlockSweep
                 (
                     x,
-                    dDCoeff.asSquare(),
+                    invDiag_.asLinear(),
                     LowerCoeff.asScalar(),
                     UpperCoeff.asScalar(),
-                    b
+                    bPlusLU_
                 );
             }
             else if (UpperCoeff.activeType() == blockCoeffBase::LINEAR)
             {
+                // Note linear diag inversed due to decoupling
                 BlockSweep
                 (
                     x,
-                    dDCoeff.asSquare(),
+                    invDiag_.asLinear(),
                     LowerCoeff.asLinear(),
                     UpperCoeff.asLinear(),
-                    b
+                    bPlusLU_
                 );
             }
             else if (UpperCoeff.activeType() == blockCoeffBase::SQUARE)
             {
+                // Note linear diag inversed due to decoupling
                 BlockSweep
                 (
                     x,
-                    dDCoeff.asSquare(),
+                    invDiag_.asLinear(),
                     LowerCoeff.asSquare(),
                     UpperCoeff.asSquare(),
-                    b
+                    bPlusLU_
                 );
             }
         }
@@ -558,14 +696,11 @@ void Foam::BlockGaussSeidelPrecon<Type>::preconditionT
 
     if (this->matrix_.diagonal())
     {
-        TypeCoeffField dDCoeff = inv(this->matrix_.diag());
-
-        multiply(xT, dDCoeff, bT);
+        multiply(xT, invDiag_, bT);
     }
     else if (this->matrix_.symmetric() || this->matrix_.asymmetric())
     {
-        TypeCoeffField dDCoeff = inv(this->matrix_.diag());
-
+        const TypeCoeffField& DiagCoeff = this->matrix_.lower();
         const TypeCoeffField& LowerCoeff = this->matrix_.lower();
         const TypeCoeffField& UpperCoeff = this->matrix_.upper();
 
@@ -580,7 +715,7 @@ void Foam::BlockGaussSeidelPrecon<Type>::preconditionT
 
         //Note: Assuming lower and upper triangle have the same active type
 
-        if (dDCoeff.activeType() == blockCoeffBase::SCALAR)
+        if (DiagCoeff.activeType() == blockCoeffBase::SCALAR)
         {
             if (UpperCoeff.activeType() == blockCoeffBase::SCALAR)
             {
@@ -588,7 +723,7 @@ void Foam::BlockGaussSeidelPrecon<Type>::preconditionT
                 BlockSweep
                 (
                     xT,
-                    dDCoeff.asScalar(),
+                    invDiag_.asScalar(),
                     UpperCoeff.asScalar(),
                     LowerCoeff.asScalar(),
                     bT
@@ -600,7 +735,7 @@ void Foam::BlockGaussSeidelPrecon<Type>::preconditionT
                 BlockSweep
                 (
                     xT,
-                    dDCoeff.asScalar(),
+                    invDiag_.asScalar(),
                     UpperCoeff.asLinear(),
                     LowerCoeff.asLinear(),
                     bT
@@ -612,14 +747,14 @@ void Foam::BlockGaussSeidelPrecon<Type>::preconditionT
                 BlockSweep
                 (
                     xT,
-                    dDCoeff.asScalar(),
+                    invDiag_.asScalar(),
                     UpperCoeff.asSquare(),
                     LowerCoeff.asSquare(),
                     bT
                 );
             }
         }
-        else if (dDCoeff.activeType() == blockCoeffBase::LINEAR)
+        else if (DiagCoeff.activeType() == blockCoeffBase::LINEAR)
         {
             if (UpperCoeff.activeType() == blockCoeffBase::SCALAR)
             {
@@ -627,7 +762,7 @@ void Foam::BlockGaussSeidelPrecon<Type>::preconditionT
                 BlockSweep
                 (
                     xT,
-                    dDCoeff.asLinear(),
+                    invDiag_.asLinear(),
                     UpperCoeff.asScalar(),
                     LowerCoeff.asScalar(),
                     bT
@@ -639,7 +774,7 @@ void Foam::BlockGaussSeidelPrecon<Type>::preconditionT
                 BlockSweep
                 (
                     xT,
-                    dDCoeff.asLinear(),
+                    invDiag_.asLinear(),
                     UpperCoeff.asLinear(),
                     LowerCoeff.asLinear(),
                     bT
@@ -651,49 +786,64 @@ void Foam::BlockGaussSeidelPrecon<Type>::preconditionT
                 BlockSweep
                 (
                     xT,
-                    dDCoeff.asLinear(),
+                    invDiag_.asLinear(),
                     UpperCoeff.asSquare(),
                     LowerCoeff.asSquare(),
                     bT
                 );
             }
         }
-        else if (dDCoeff.activeType() == blockCoeffBase::SQUARE)
+        else if (DiagCoeff.activeType() == blockCoeffBase::SQUARE)
         {
+            // Add diag coupling to b
+            if (bPlusLU_.empty())
+            {
+                bPlusLU_.setSize(bT.size(), pTraits<Type>::zero);
+            }
+
+            // Multiply overwrites bPlusLU_: no need to initialise
+            // Change of sign accounted via change of sign of bPlusLU_
+            // HJ, 20/Aug/2015
+            multiply(bPlusLU_, LUDiag_, xT);
+            bPlusLU_ += bT;
+
             if (UpperCoeff.activeType() == blockCoeffBase::SCALAR)
             {
                 // Transpose multiplication - swap lower and upper coeff arrays
+                // Note linear diag inversed due to decoupling
                 BlockSweep
                 (
                     xT,
-                    dDCoeff.asSquare(),
+                    invDiag_.asLinear(),
                     UpperCoeff.asScalar(),
                     LowerCoeff.asScalar(),
-                    bT
+                    bPlusLU_
                 );
             }
             else if (UpperCoeff.activeType() == blockCoeffBase::LINEAR)
             {
                 // Transpose multiplication - swap lower and upper coeff arrays
+                // Note linear diag inversed due to decoupling
                 BlockSweep
                 (
                     xT,
-                    dDCoeff.asSquare(),
+                    invDiag_.asLinear(),
                     UpperCoeff.asLinear(),
                     LowerCoeff.asLinear(),
-                    bT
+                    bPlusLU_
                 );
             }
             else if (UpperCoeff.activeType() == blockCoeffBase::SQUARE)
             {
                 // Transpose multiplication - swap lower and upper coeff arrays
+                // Note linear diag inversed due to decoupling
                 BlockSweep
                 (
                     xT,
-                    dDCoeff.asSquare(),
+                    invDiag_.asLinear(),
                     UpperCoeff.asSquare(),
                     LowerCoeff.asSquare(),
-                    bT
+                    bPlusLU_
                 );
             }
         }

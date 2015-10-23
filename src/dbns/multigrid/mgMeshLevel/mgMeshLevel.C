@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -42,14 +42,16 @@ extern "C"
 defineTypeNameAndDebug(Foam::mgMeshLevel, 0);
 
 
-Foam::label Foam::mgMeshLevel::mgMinClusterSize_
+const Foam::debug::optimisationSwitch Foam::mgMeshLevel::mgMinClusterSize_
 (
-    debug::optimisationSwitch("mgMinClusterSize", 2)
+    "mgMinClusterSize",
+    2
 );
 
-Foam::label Foam::mgMeshLevel::mgMaxClusterSize_
+const Foam::debug::optimisationSwitch Foam::mgMeshLevel::mgMaxClusterSize_
 (
-    debug::optimisationSwitch("mgMaxClusterSize", 8)
+    "mgMaxClusterSize",
+    8
 );
 
 
@@ -163,6 +165,8 @@ void Foam::mgMeshLevel::makeChild() const
     child_.setSize(nCells());
     int nMoves = -1;
 
+#   ifdef WM_DP
+
     MGridGen
     (
         nCells(),
@@ -171,6 +175,45 @@ void Foam::mgMeshLevel::makeChild() const
         const_cast<scalar*>(boundaryAreas.begin()),
         cellCells.begin(),
         faceWeights.begin(),
+        mgMinClusterSize_(),
+        mgMaxClusterSize_(),
+        options.begin(),
+        &nMoves,
+        &nCoarseCells,
+        child_.begin()
+    );
+
+#   else
+
+    // Conversion of type for MGridGen interface
+    const scalarField& vols = cellVolumes();
+
+    Field<double> dblVols(vols.size());
+    forAll (dblVols, i)
+    {
+        dblVols[i] = vols[i];
+    }
+
+    Field<double> dblAreas(boundaryAreas.size());
+    forAll (dblAreas, i)
+    {
+        dblAreas[i] = boundaryAreas[i];
+    }
+
+    Field<double> dblFaceWeights(faceWeights.size());
+    forAll (dblFaceWeights, i)
+    {
+        dblFaceWeights[i] = faceWeights[i];
+    }
+
+    MGridGen
+    (
+        nCells(),
+        cellCellOffsets.begin(),
+        dblVols.begin(),
+        dblAreas.begin(),
+        cellCells.begin(),
+        dblFaceWeights.begin(),
         mgMinClusterSize_,
         mgMaxClusterSize_,
         options.begin(),
@@ -178,6 +221,8 @@ void Foam::mgMeshLevel::makeChild() const
         &nCoarseCells_,
         child_.begin()
     );
+
+#   endif
 
     Info<< "Number of coarse cells = " << nCoarseCells_ << endl;
 }

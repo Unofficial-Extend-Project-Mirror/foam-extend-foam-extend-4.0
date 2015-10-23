@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -31,6 +31,7 @@ Description
 
 #include "word.H"
 #include "debug.H"
+#include "debugSwitch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -72,13 +73,13 @@ public:                                                                       \
 //  Also declares debug information.
 #define ClassName(TypeNameString)                                             \
     ClassNameNoDebug(TypeNameString);                                         \
-    static int debug
+    static Foam::debug::debugSwitch debug;
 
 //- Add typeName information from argument @a TypeNameString to a namespace.
 //  Also declares debug information.
 #define NamespaceName(TypeNameString)                                         \
     NamespaceNameNoDebug(TypeNameString);                                     \
-    extern int debug
+    extern Foam::debug::debugSwitch debug;
 
 //- Add typeName information from argument @a TypeNameString to a template class.
 //  Also declares debug information.
@@ -132,22 +133,24 @@ public:                                                                       \
 
 
 //- Define the debug information, lookup as @a Name
-#define defineDebugSwitchWithName(Type, Name, DebugSwitch)                    \
-    int Type::debug(::Foam::debug::debugSwitch(Name, DebugSwitch))
+#define defineDebugSwitchWithName(Type, Name, DebugSwitch, SwitchDescr)       \
+    ::Foam::debug::debugSwitch                                                \
+    Type::debug(std::string(Name), DebugSwitch, SwitchDescr)
 
 //- Define the debug information
-#define defineDebugSwitch(Type, DebugSwitch)                                  \
-    defineDebugSwitchWithName(Type, Type::typeName_(), DebugSwitch)
+#define defineDebugSwitch(Type, DebugSwitch, SwitchDescr)                     \
+    defineDebugSwitchWithName(Type, Type::typeName_(), DebugSwitch, SwitchDescr);
 
 #ifdef __INTEL_COMPILER
 //- Define the debug information for templates, lookup as @a Name
 # define defineTemplateDebugSwitchWithName(Type, Name, DebugSwitch)           \
-    defineDebugSwitchWithName(Type, Name, DebugSwitch)
+    defineDebugSwitchWithName(Type, Name, DebugSwitch, "");
+
 #else
 //- Define the debug information for templates, lookup as @a Name
 # define defineTemplateDebugSwitchWithName(Type, Name, DebugSwitch)           \
     template<>                                                                \
-    defineDebugSwitchWithName(Type, Name, DebugSwitch)
+    defineDebugSwitchWithName(Type, Name, DebugSwitch, "");
 #endif
 
 //- Define the debug information for templates
@@ -169,7 +172,12 @@ public:                                                                       \
 //- Define the typeName and debug information
 #define defineTypeNameAndDebug(Type, DebugSwitch)                             \
     defineTypeName(Type);                                                     \
-    defineDebugSwitch(Type, DebugSwitch)
+    defineDebugSwitch(Type, DebugSwitch, "")
+
+//- Define the typeName and debug information + description
+#define defineTypeNameAndDebugWithDescription(Type, DebugSwitch, SwitchDescr) \
+    defineTypeName(Type);                                                     \
+    defineDebugSwitch(Type, DebugSwitch, SwitchDescr)
 
 //- Define the typeName and debug information, lookup as @a Name
 #define defineTemplateTypeNameAndDebugWithName(Type, Name, DebugSwitch)       \

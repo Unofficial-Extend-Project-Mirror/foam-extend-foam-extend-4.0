@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -59,9 +59,9 @@ int main(int argc, char *argv[])
     scalar m = 0.5;
     surfaceVectorField n = mesh.Sf()/mesh.magSf();
 
-    for (runTime++; !runTime.end(); runTime++)
+    while(runTime.loop())
     {
-        Info<< "Time: " << runTime.timeName() << nl << endl;
+        Info<< "Time = " << runTime.timeName() << nl << endl;
 
 #       include "readSolidMechanicsControls.H"
 
@@ -78,92 +78,92 @@ int main(int argc, char *argv[])
         scalar residual = 1.0;
         surfaceSymmTensorField DSigmaCorrf = fvc::interpolate(DSigmaCorr);
 
-    //label nCrackedFaces = 0;
-    // cracking loop if you use cohesive boundaries
-    //do
-    //{
-    do
-    {
-        surfaceTensorField sGradDU =
-            (I - n*n)&fvc::interpolate(gradDU);
+        //label nCrackedFaces = 0;
+        // cracking loop if you use cohesive boundaries
+        //do
+        //{
+        do
+        {
+            surfaceTensorField sGradDU =
+                (I - n*n)&fvc::interpolate(gradDU);
 
-        DU.storePrevIter();
+            DU.storePrevIter();
 
-        fvVectorMatrix DUEqn
+            fvVectorMatrix DUEqn
             (
                 rho*fvm::d2dt2(DU)
                 ==
                 fvm::laplacian(2*muf+lambdaf, DU, "laplacian(DDU,DU)")
                 + fvc::div
                 (
-                    mesh.magSf()
-                    *(
-                        - (muf + lambdaf)*(fvc::snGrad(DU)&(I - n*n))
-                        + lambdaf*tr(sGradDU&(I - n*n))*n
-                        + muf*(sGradDU&n)
-                        + (n&DSigmaCorrf)
-                        )
+                    mesh.magSf()*
+                    (
+                       - (muf + lambdaf)*(fvc::snGrad(DU)&(I - n*n))
+                       + lambdaf*tr(sGradDU&(I - n*n))*n
+                       + muf*(sGradDU&n)
+                       + (n&DSigmaCorrf)
                     )
-                );
+                )
+            );
 
-//          // add an increment of gravity on the first time-step
-//          if (runTime.timeIndex() == 1)
+//            // add an increment of gravity on the first time-step
+//            if (runTime.timeIndex() == 1)
 //            {
-//              DUEqn -= (rho*g);
+//                DUEqn -= (rho*g);
 //            }
 
-        solverPerf = DUEqn.solve();
+            solverPerf = DUEqn.solve();
 
-        DU.relax();
+            DU.relax();
 
-        if (iCorr == 0)
-        {
-            initialResidual = solverPerf.initialResidual();
+            if (iCorr == 0)
+            {
+                initialResidual = solverPerf.initialResidual();
+            }
+
+            gradDU = fvc::grad(DU);
+
+#           include "calculateDSigma.H"
+#           include "calcResidual.H"
+
+            if (iCorr % infoFrequency == 0)
+            {
+                Info<< "\tTime " << runTime.value()
+                    << ", Corrector " << iCorr
+                    << ", Solving for " << U.name()
+                    << " using " << solverPerf.solverName()
+                    << ", res = " << solverPerf.initialResidual()
+                    << ", rel res = " << residual
+                    << ", inner iters = " << solverPerf.nIterations() << endl;
+            }
         }
-
-        gradDU = fvc::grad(DU);
-
-#       include "calculateDSigma.H"
-#       include "calcResidual.H"
-
-        if (iCorr % infoFrequency == 0)
-        {
-            Info<< "\tTime " << runTime.value()
-                << ", Corrector " << iCorr
-                << ", Solving for " << U.name()
-                << " using " << solverPerf.solverName()
-                << ", res = " << solverPerf.initialResidual()
-                << ", rel res = " << residual
-                << ", inner iters = " << solverPerf.nIterations() << endl;
-        }
-    }
-    while
+        while
         (
             // solverPerf.initialResidual() > convergenceTolerance
             residual > convergenceTolerance
-            && ++iCorr < nCorr
-            );
+         && ++iCorr < nCorr
+        );
 
-    Info<< "Solving for " << DU.name() << " using "
-        << solverPerf.solverName() << " solver"
-        << ", Initial residula = " << initialResidual
-        << ", Final residual = " << solverPerf.initialResidual()
-        << ", No outer iterations " << iCorr
-        << ", Relative error: " << residual << endl;
+        Info<< "Solving for " << DU.name() << " using "
+            << solverPerf.solverName() << " solver"
+            << ", Initial residula = " << initialResidual
+            << ", Final residual = " << solverPerf.initialResidual()
+            << ", No outer iterations " << iCorr
+            << ", Relative error: " << residual << endl;
 
-    //#           include "updateCrack.H"
-    //}
-    //while(nCrackedFaces > 0);
+        //#           include "updateCrack.H"
+        //}
+        //while(nCrackedFaces > 0);
 
-    U += DU;
+        U += DU;
 
-#   include "calculateSigma.H"
-#   include "writeFields.H"
-#   include "writeHistory.H"
+#       include "calculateSigma.H"
+#       include "writeFields.H"
+#       include "writeHistory.H"
 
-    Info<< "ExecutionTime = "
-        << runTime.elapsedCpuTime()
-        << " s\n\n" << endl;
+        Info<< "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
+            << "  ClockTime = " << runTime.elapsedClockTime() << " s"
+            << nl << endl;
     }
 
     Info<< "End\n" << endl;

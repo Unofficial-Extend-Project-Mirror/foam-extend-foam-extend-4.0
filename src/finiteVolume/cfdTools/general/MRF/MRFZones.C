@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -24,7 +24,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "MRFZones.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "fvMesh.H"
 #include "fvc.H"
 
@@ -85,6 +85,7 @@ Foam::tmp<Foam::surfaceScalarField> Foam::MRFZones::fluxCorrection() const
     return tMRFZonesPhiCorr;
 }
 
+
 Foam::tmp<Foam::surfaceVectorField> Foam::MRFZones::meshPhi() const
 {
     tmp<surfaceVectorField> tMRFZonesPhiCorr
@@ -112,6 +113,7 @@ Foam::tmp<Foam::surfaceVectorField> Foam::MRFZones::meshPhi() const
 
     return tMRFZonesPhiCorr;
 }
+
 
 void Foam::MRFZones::addCoriolis(fvVectorMatrix& UEqn) const
 {
@@ -274,5 +276,6 @@ Foam::tmp<Foam::volVectorField> Foam::MRFZones::Su
 
     return tPhiSource;
 }
+
 
 // ************************************************************************* //

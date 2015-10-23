@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -36,14 +36,19 @@ Contributor
 #include "polyPatchID.H"
 #include "ZoneIDs.H"
 #include "SubField.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "indirectPrimitivePatch.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
 namespace Foam
 {
-    defineTypeNameAndDebug(ggiPolyPatch, 0);
+    defineTypeNameAndDebugWithDescription
+    (
+        ggiPolyPatch,
+        0,
+        "If value > 1, write uncovered GGI patch facets to VTK file"
+    );
 
     addToRunTimeSelectionTable(polyPatch, ggiPolyPatch, word);
     addToRunTimeSelectionTable(polyPatch, ggiPolyPatch, dictionary);
@@ -109,7 +114,7 @@ void Foam::ggiPolyPatch::calcRemoteZoneAddressing() const
     if (debug)
     {
         Pout<< "ggiPolyPatch::calcRemoteZoneAddressing() const for patch "
-            << index() << endl;
+            << name() << endl;
     }
 
     // Once zone addressing is established, visit the opposite side and find
@@ -190,7 +195,8 @@ void Foam::ggiPolyPatch::calcPatchToPatch() const
         if (debug)
         {
             InfoIn("void ggiPolyPatch::calcPatchToPatch() const")
-                << "Calculating patch to patch interpolation" << endl;
+                << "Calculating patch to patch interpolation for patch"
+                << name() << endl;
         }
 
         // Create interpolation for zones
@@ -251,6 +257,13 @@ void Foam::ggiPolyPatch::calcReconFaceCellCentres() const
             "void ggiPolyPatch::calcReconFaceCellCentres() const"
         )   << "Reconstructed cell centres already calculated"
             << abort(FatalError);
+    }
+
+    if (debug)
+    {
+        InfoIn("void ggiPolyPatch::calcReconFaceCellCentres() const")
+            << "Calculating recon centres for patch"
+            << name() << endl;
     }
 
     // Create neighbouring face centres using interpolation
@@ -361,7 +374,7 @@ void Foam::ggiPolyPatch::calcSendReceive() const
     if (debug)
     {
         Pout<< "ggiPolyPatch::calcSendReceive() const for patch "
-            << index() << endl;
+            << name() << endl;
     }
 
     if (!Pstream::parRun())
@@ -897,7 +910,11 @@ void Foam::ggiPolyPatch::calcTransforms() const
 
     if (debug > 1 && master())
     {
-        if (patchToPatch().uncoveredMasterFaces().size() > 0)
+        if
+        (
+            !empty()
+         && patchToPatch().uncoveredMasterFaces().size() > 0
+        )
         {
             // Write uncovered master faces
             Info<< "Writing uncovered master faces for patch "
@@ -920,7 +937,11 @@ void Foam::ggiPolyPatch::calcTransforms() const
             );
         }
 
-        if (patchToPatch().uncoveredSlaveFaces().size() > 0)
+        if
+        (
+            !shadow().empty()
+         && patchToPatch().uncoveredSlaveFaces().size() > 0
+        )
         {
             // Write uncovered master faces
             Info<< "Writing uncovered shadow faces for patch "
@@ -930,7 +951,11 @@ void Foam::ggiPolyPatch::calcTransforms() const
 
             fileName fvPath(mesh.time().path()/"VTK");
             mkDir(fvPath);
-
+            Pout<< "shadow().localFaces(): " << shadow().localFaces().size()
+                << " patchToPatch().uncoveredSlaveFaces().size(): "
+                << patchToPatch().uncoveredSlaveFaces().size()
+                << " shadow().localPoints(): " << shadow().localPoints().size()
+                << endl;
             indirectPrimitivePatch::writeVTK
             (
                 fvPath/fileName("uncoveredGgiFaces" + shadowName()),
@@ -948,11 +973,17 @@ void Foam::ggiPolyPatch::calcTransforms() const
         {
             if
             (
-                patchToPatch().uncoveredMasterFaces().size() > 0
-             || patchToPatch().uncoveredSlaveFaces().size() > 0
+                (
+                    patchToPatch().uncoveredMasterFaces().size() > 0
+                    && !empty()
+                )
+             || (
+                    !shadow().empty()
+                 && patchToPatch().uncoveredSlaveFaces().size() > 0
+                )
             )
             {
-                FatalErrorIn("label ggiPolyPatch::shadowIndex() const")
+                FatalErrorIn("label ggiPolyPatch::calcTransforms() const")
                     << "ggi patch " << name() << " with shadow "
                     << shadowName() << " has "
                     << patchToPatch().uncoveredMasterFaces().size()
@@ -964,14 +995,14 @@ void Foam::ggiPolyPatch::calcTransforms() const
         }
         else
         {
-            InfoIn("label ggiPolyPatch::shadowIndex() const")
+            InfoIn("label ggiPolyPatch::calcTransforms() const")
                 << "ggi patch " << name() << " with shadow "
                 << shadowName() << " has "
                 << patchToPatch().uncoveredMasterFaces().size()
                 << " uncovered master faces and "
                 << patchToPatch().uncoveredSlaveFaces().size()
                 << " uncovered slave faces.  Bridging is switched on. "
-                << abort(FatalError);
+                << endl;
         }
     }
 }

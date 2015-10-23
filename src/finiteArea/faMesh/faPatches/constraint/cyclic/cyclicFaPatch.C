@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -38,9 +38,10 @@ namespace Foam
 defineTypeNameAndDebug(cyclicFaPatch, 0);
 addToRunTimeSelectionTable(faPatch, cyclicFaPatch, dictionary);
 
-const scalar cyclicFaPatch::matchTol_
+const Foam::debug::tolerancesSwitch cyclicFaPatch::matchTol_
 (
-    debug::tolerances("patchFaceMatchTol", 1e-3)
+    "patchFaceMatchTol",
+    1e-3
 );
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
@@ -83,11 +84,7 @@ void Foam::cyclicFaPatch::calcTransforms()
                 half0Normals[edgei] = point(1, 0, 0);
                 half1Normals[edgei] = half0Normals[edgei];
             }
-            else if
-            (
-                mag(magLe - nbrMagLe)/avLe
-              > matchTol_
-            )
+            else if(mag(magLe - nbrMagLe)/avLe > matchTol_())
             {
                 // Error in area matching.  Find largest error
                 maxMatchError =
@@ -102,7 +99,7 @@ void Foam::cyclicFaPatch::calcTransforms()
         }
 
         // Check for error in edge matching
-        if (maxMatchError > matchTol_)
+        if (maxMatchError > matchTol_())
         {
             label nbrEdgei = errorEdge + size()/2;
             scalar magLe = mag(half0Normals[errorEdge]);
@@ -120,7 +117,7 @@ void Foam::cyclicFaPatch::calcTransforms()
                 << "patch:" << name()
                 << " my area:" << magLe
                 << " neighbour area:" << nbrMagLe
-                << " matching tolerance:" << matchTol_
+                << " matching tolerance:" << matchTol_()
                 << endl
                 << "Mesh edge:" << start() + errorEdge
                 << endl
@@ -175,7 +172,7 @@ void cyclicFaPatch::makeWeights(scalarField& w) const
         if
         (
             mag(magL[edgei] - magL[edgei + sizeby2])/avL
-          > matchTol_
+      > matchTol_()
         )
         {
             // Found error.  Look for largest matching error
@@ -197,7 +194,7 @@ void cyclicFaPatch::makeWeights(scalarField& w) const
     }
 
     // Check for error in matching
-    if (maxMatchError > polyPatch::matchTol_)
+    if (maxMatchError > polyPatch::matchTol_())
     {
         scalar avL = (magL[errorEdge] + magL[errorEdge + sizeby2])/2.0;
 
@@ -207,7 +204,7 @@ void cyclicFaPatch::makeWeights(scalarField& w) const
             << 100*mag(magL[errorEdge] - magL[errorEdge + sizeby2])/avL
             << "% -- possible edge ordering problem." << nl
             << "Cyclic area match tolerance = "
-            << polyPatch::matchTol_ << " patch: " << name()
+            << polyPatch::matchTol_() << " patch: " << name()
             << abort(FatalError);
     }
 }

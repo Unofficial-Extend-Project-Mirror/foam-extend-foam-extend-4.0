@@ -1,0 +1,28 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | foam-extend: Open Source CFD                    |
+|  \\    /   O peration     | Version:     3.2                                |
+|   \\  /    A nd           | Web:         http://www.foam-extend.org         |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      transportProperties;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+mug mug [0 2 -1 0 0 0 0] 0;
+mul mul [0 2 -1 0 0 0 0] 1e-3;
+
+rhog rhog [ 1 -3  0 0 0 0 0 ] 1;
+rhol rhol [ 1 -3  0 0 0 0 0 ] 100;
+
+sigma sigma [ 1 0 -2 0 0 0 0 ] 0.1;
+
+h0 h0 [ 0 1 0 0 0 0 0] 1e-10;
+
+// ************************************************************************* //

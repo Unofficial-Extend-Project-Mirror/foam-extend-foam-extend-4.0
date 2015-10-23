@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -163,10 +163,16 @@ scalar RASModel::yPlusLam(const scalar kappa, const scalar E) const
 
 tmp<volScalarField> RASModel::nuEff() const
 {
-    return tmp<volScalarField>
+    tmp<volScalarField> tnuEff
     (
         new volScalarField("nuEff", nut() + nu())
     );
+
+    // Apply nut limiter
+    tnuEff().internalField() =
+        Foam::min(tnuEff().internalField(), nuRatio_*nu().internalField());
+
+    return tnuEff;
 }
 
 

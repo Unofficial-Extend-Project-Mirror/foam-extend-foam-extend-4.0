@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -41,23 +41,8 @@ Foam::fixedFluxPressureFvPatchScalarField::fixedFluxPressureFvPatchScalarField
     UName_("U"),
     phiName_("phi"),
     rhoName_("rho"),
+    rAUName_("(1|A(" + UName_ + "))"),
     adjoint_(false)
-{}
-
-
-Foam::fixedFluxPressureFvPatchScalarField::fixedFluxPressureFvPatchScalarField
-(
-    const fixedFluxPressureFvPatchScalarField& ptf,
-    const fvPatch& p,
-    const DimensionedField<scalar, volMesh>& iF,
-    const fvPatchFieldMapper& mapper
-)
-:
-    fixedGradientFvPatchScalarField(ptf, p, iF, mapper),
-    UName_(ptf.UName_),
-    phiName_(ptf.phiName_),
-    rhoName_(ptf.rhoName_),
-    adjoint_(ptf.adjoint_)
 {}
 
 
@@ -72,7 +57,8 @@ Foam::fixedFluxPressureFvPatchScalarField::fixedFluxPressureFvPatchScalarField
     UName_(dict.lookupOrDefault<word>("U", "U")),
     phiName_(dict.lookupOrDefault<word>("phi", "phi")),
     rhoName_(dict.lookupOrDefault<word>("rho", "rho")),
-    adjoint_(dict.lookup("adjoint"))
+    rAUName_(dict.lookupOrDefault<word>("rAU", "(1|A(" + UName_ + "))")),
+    adjoint_(dict.lookupOrDefault<Switch>("adjoint", false))
 {
     if (dict.found("gradient"))
     {
@@ -90,28 +76,47 @@ Foam::fixedFluxPressureFvPatchScalarField::fixedFluxPressureFvPatchScalarField
 
 Foam::fixedFluxPressureFvPatchScalarField::fixedFluxPressureFvPatchScalarField
 (
-    const fixedFluxPressureFvPatchScalarField& wbppsf
+    const fixedFluxPressureFvPatchScalarField& ptf,
+    const fvPatch& p,
+    const DimensionedField<scalar, volMesh>& iF,
+    const fvPatchFieldMapper& mapper
 )
 :
-    fixedGradientFvPatchScalarField(wbppsf),
-    UName_(wbppsf.UName_),
-    phiName_(wbppsf.phiName_),
-    rhoName_(wbppsf.rhoName_),
-    adjoint_(wbppsf.adjoint_)
+    fixedGradientFvPatchScalarField(ptf, p, iF, mapper),
+    UName_(ptf.UName_),
+    phiName_(ptf.phiName_),
+    rhoName_(ptf.rhoName_),
+    rAUName_(ptf.rAUName_),
+    adjoint_(ptf.adjoint_)
 {}
 
 
 Foam::fixedFluxPressureFvPatchScalarField::fixedFluxPressureFvPatchScalarField
 (
-    const fixedFluxPressureFvPatchScalarField& wbppsf,
+    const fixedFluxPressureFvPatchScalarField& ptf
+)
+:
+    fixedGradientFvPatchScalarField(ptf),
+    UName_(ptf.UName_),
+    phiName_(ptf.phiName_),
+    rhoName_(ptf.rhoName_),
+    rAUName_(ptf.rAUName_),
+    adjoint_(ptf.adjoint_)
+{}
+
+
+Foam::fixedFluxPressureFvPatchScalarField::fixedFluxPressureFvPatchScalarField
+(
+    const fixedFluxPressureFvPatchScalarField& ptf,
     const DimensionedField<scalar, volMesh>& iF
 )
 :
-    fixedGradientFvPatchScalarField(wbppsf, iF),
-    UName_(wbppsf.UName_),
-    phiName_(wbppsf.phiName_),
-    rhoName_(wbppsf.rhoName_),
-    adjoint_(wbppsf.adjoint_)
+    fixedGradientFvPatchScalarField(ptf, iF),
+    UName_(ptf.UName_),
+    phiName_(ptf.phiName_),
+    rhoName_(ptf.rhoName_),
+    rAUName_(ptf.rAUName_),
+    adjoint_(ptf.adjoint_)
 {}
 
 
@@ -141,8 +146,30 @@ void Foam::fixedFluxPressureFvPatchScalarField::updateCoeffs()
         phip /= rhop;
     }
 
-    const fvPatchField<scalar>& rAp =
-        lookupPatchField<volScalarField, scalar>("(1|A("+UName_+"))");
+    // Collect diffusivity from the pressure equation
+    scalarField rAp;
+
+    if (this->db().objectRegistry::foundObject<volScalarField>(rAUName_))
+    {
+        rAp = lookupPatchField<volScalarField, scalar>(rAUName_);
+    }
+    else if
+    (
+        this->db().objectRegistry::foundObject<surfaceScalarField>(rAUName_)
+    )
+    {
+        rAp = lookupPatchField<surfaceScalarField, scalar>(rAUName_);
+    }
+    else
+    {
+        FatalErrorIn
+        (
+            "void fixedFluxPressureFvPatchScalarField::updateCoeffs()"
+        )   << " Field " << rAUName_ << " not found for patch "
+            << patch().name() << " and field "
+            << dimensionedInternalField().name()
+            << abort(FatalError);
+    }
 
     if (adjoint_)
     {
@@ -160,19 +187,12 @@ void Foam::fixedFluxPressureFvPatchScalarField::updateCoeffs()
 void Foam::fixedFluxPressureFvPatchScalarField::write(Ostream& os) const
 {
     fvPatchScalarField::write(os);
-    if (UName_ != "U")
-    {
-        os.writeKeyword("U") << UName_ << token::END_STATEMENT << nl;
-    }
-    if (phiName_ != "phi")
-    {
-        os.writeKeyword("phi") << phiName_ << token::END_STATEMENT << nl;
-    }
-    if (rhoName_ != "rho")
-    {
-        os.writeKeyword("rho") << rhoName_ << token::END_STATEMENT << nl;
-    }
-    os.writeKeyword("adjoint") << adjoint_ << token::END_STATEMENT << nl;
+    writeEntryIfDifferent<word>(os, "U", "U", UName_);
+    writeEntryIfDifferent<word>(os, "phi", "phi", phiName_);
+    writeEntryIfDifferent<word>(os, "rho", "rho", rhoName_);
+    writeEntryIfDifferent<word>(os, "rAU", "rAU", rAUName_);
+    writeEntryIfDifferent<Switch>(os, "adjoint", false, adjoint_);
+
     gradient().writeEntry("gradient", os);
 }
 

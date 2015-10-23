@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -40,6 +40,7 @@ SourceFiles
 
 #include "amgPolicy.H"
 #include "lduMatrix.H"
+#include "tolerancesSwitch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -59,8 +60,11 @@ class pamgPolicy
         //- Reference to matrix
         const lduMatrix& matrix_;
 
-        //- Child array
+        //- Child array: for each fine equation give coarse cluster index
         labelField child_;
+
+        //- Number of solo cells
+        label nSolo_;
 
         //- Number of coarse equations
         label nCoarseEqns_;
@@ -84,7 +88,7 @@ class pamgPolicy
     // Private Static Data
 
         //- Diagonal scaling factor
-        static const scalar diagFactor_;
+        static const debug::tolerancesSwitch diagFactor_;
 
 
 public:

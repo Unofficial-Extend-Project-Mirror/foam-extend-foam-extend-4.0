@@ -1,0 +1,61 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | foam-extend: Open Source CFD                    |
+|  \\    /   O peration     | Version:     3.2                                |
+|   \\  /    A nd           | Web:         http://www.foam-extend.org         |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      binary;
+    class       volScalarField;
+    location    "0";
+    object      epsilon;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+dimensions      [ 0 2 -3 0 0 0 0 ];
+
+internalField   uniform 10;
+
+boundaryField
+{
+    porousBumpChannel
+    {
+        type            immersedBoundaryEpsilonWallFunction;
+        patchType       immersedBoundary;
+        refValue        uniform 1e-10;
+        refGradient     uniform 0;
+        fixesValue      false;
+        setDeadCellValue yes;
+        deadCellValue   1e-10;
+        value           nonuniform 0();
+        Cmu             0.09;
+        kappa           0.41;
+        E               9.8;
+    }
+    topAndBottom
+    {
+        type            epsilonWallFunction;
+        value           uniform 10;
+    }
+    inlet
+    {
+        type            turbulentMixingLengthDissipationRateInlet;
+        mixingLength    0.005;
+        value           uniform 10;
+    }
+    outlet
+    {
+        type            inletOutlet;
+        inletValue      uniform 10;
+        value           uniform 10;
+    }
+    defaultFaces
+    {
+        type            empty;
+    }
+}
+
+// ************************************************************************* //

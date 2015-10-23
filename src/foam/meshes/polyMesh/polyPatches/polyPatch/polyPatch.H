@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -51,6 +51,8 @@ SourceFiles
 #include "primitivePatch.H"
 #include "typeInfo.H"
 #include "runTimeSelectionTables.H"
+#include "debugSwitch.H"
+#include "tolerancesSwitch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -225,13 +227,12 @@ public:
     // Static data
 
         //- Debug switch to disallow the use of genericPolyPatch
-        static int disallowGenericPolyPatch;
+        static debug::debugSwitch disallowGenericPolyPatch;
 
         //- Relative tolerance (for geometric matching)
         //  Calculated as a factor of maximum edge length per face.
         //  HJ, 21/Dec/2006
-        static const scalar matchTol_;
-
+        static const debug::tolerancesSwitch matchTol_;
 
 
     // Declare run-time constructor selection tables

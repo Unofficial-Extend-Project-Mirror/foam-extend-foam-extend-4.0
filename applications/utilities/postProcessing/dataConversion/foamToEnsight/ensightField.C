@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -52,7 +52,7 @@ void writeData(const scalarField& sf, OFstream& ensightFile)
 
 
 template<class Type>
-scalarField map
+scalarField ensMap
 (
     const Field<Type>& vf,
     const labelList& map,
@@ -71,7 +71,7 @@ scalarField map
 
 
 template<class Type>
-scalarField map
+scalarField ensMap
 (
     const Field<Type>& vf,
     const labelList& map1,
@@ -115,7 +115,7 @@ void writeAllData
 
             for (direction cmpt=0; cmpt<pTraits<Type>::nComponents; cmpt++)
             {
-                writeData(map(vf, prims, cmpt), ensightFile);
+                writeData(ensMap(vf, prims, cmpt), ensightFile);
 
                 for (int slave=1; slave<Pstream::nProcs(); slave++)
                 {
@@ -130,7 +130,7 @@ void writeAllData
             for (direction cmpt=0; cmpt<pTraits<Type>::nComponents; cmpt++)
             {
                 OPstream toMaster(Pstream::scheduled, Pstream::masterNo());
-                toMaster<< map(vf, prims, cmpt);
+                toMaster<< ensMap(vf, prims, cmpt);
             }
         }
     }
@@ -155,7 +155,7 @@ void writeAllDataBinary
 
             for (direction cmpt=0; cmpt<pTraits<Type>::nComponents; cmpt++)
             {
-                writeEnsDataBinary(map(vf, prims, cmpt), ensightFile);
+                writeEnsDataBinary(ensMap(vf, prims, cmpt), ensightFile);
 
                 for (int slave=1; slave<Pstream::nProcs(); slave++)
                 {
@@ -170,7 +170,7 @@ void writeAllDataBinary
             for (direction cmpt=0; cmpt<pTraits<Type>::nComponents; cmpt++)
             {
                 OPstream toMaster(Pstream::scheduled, Pstream::masterNo());
-                toMaster<< map(vf, prims, cmpt);
+                toMaster<< ensMap(vf, prims, cmpt);
             }
         }
     }
@@ -196,7 +196,7 @@ void writeAllFaceData
 
             for (direction cmpt=0; cmpt<pTraits<Type>::nComponents; cmpt++)
             {
-                writeData(map(pf, prims, cmpt), ensightFile);
+                writeData(ensMap(pf, prims, cmpt), ensightFile);
 
                 forAll (patchProcessors, i)
                 {
@@ -216,7 +216,7 @@ void writeAllFaceData
             for (direction cmpt=0; cmpt<pTraits<Type>::nComponents; cmpt++)
             {
                 OPstream toMaster(Pstream::scheduled, Pstream::masterNo());
-                toMaster<< map(pf, prims, cmpt);
+                toMaster<< ensMap(pf, prims, cmpt);
             }
         }
     }
@@ -242,7 +242,7 @@ void writeAllFaceDataBinary
 
             for (direction cmpt=0; cmpt<pTraits<Type>::nComponents; cmpt++)
             {
-                writeEnsDataBinary(map(pf, prims, cmpt), ensightFile);
+                writeEnsDataBinary(ensMap(pf, prims, cmpt), ensightFile);
 
                 forAll (patchProcessors, i)
                 {
@@ -262,7 +262,7 @@ void writeAllFaceDataBinary
             for (direction cmpt=0; cmpt<pTraits<Type>::nComponents; cmpt++)
             {
                 OPstream toMaster(Pstream::scheduled, Pstream::masterNo());
-                toMaster<< map(pf, prims, cmpt);
+                toMaster<< ensMap(pf, prims, cmpt);
             }
         }
     }
@@ -587,7 +587,7 @@ void ensightFieldAscii
                 {
                     writeData
                     (
-                        map(vf, hexes, wedges, cmpt),
+                        ensMap(vf, hexes, wedges, cmpt),
                         ensightFile
                     );
 
@@ -604,7 +604,7 @@ void ensightFieldAscii
                 for (direction cmpt=0; cmpt<pTraits<Type>::nComponents; cmpt++)
                 {
                     OPstream toMaster(Pstream::scheduled, Pstream::masterNo());
-                    toMaster<< map(vf, hexes, wedges, cmpt);
+                    toMaster<< ensMap(vf, hexes, wedges, cmpt);
                 }
             }
         }
@@ -756,7 +756,7 @@ void ensightFieldBinary
                 {
                     writeEnsDataBinary
                     (
-                        map(vf, hexes, wedges, cmpt),
+                        ensMap(vf, hexes, wedges, cmpt),
                         ensightFile
                     );
 
@@ -773,7 +773,7 @@ void ensightFieldBinary
                 for (direction cmpt=0; cmpt<pTraits<Type>::nComponents; cmpt++)
                 {
                     OPstream toMaster(Pstream::scheduled, Pstream::masterNo());
-                    toMaster<< map(vf, hexes, wedges, cmpt);
+                    toMaster<< ensMap(vf, hexes, wedges, cmpt);
                 }
             }
         }

@@ -72,7 +72,7 @@ License: 		Unkown
 Name: 			%{name}
 Version: 		%{version}
 Release: 		%{release}
-URL:                    ftp://ftp.gnu.org/gnu/mpfr
+URL:                    http://ftpmirror.gnu.org/mpfr
 Source: 		%url/%{name}-%{version}.tar.gz
 Prefix: 		%{_prefix}
 Group: 			Development/Tools

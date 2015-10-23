@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -38,6 +38,7 @@ SourceFiles
 #include "coupledFvPatchField.H"
 #include "cyclicLduInterfaceField.H"
 #include "cyclicFvPatch.H"
+#include "transformField.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -159,11 +160,41 @@ public:
             //- Transform neighbour field
             virtual void transformCoupleField
             (
-                scalarField& f,
+                scalarField& pnf,
                 const direction cmpt
             ) const
             {
-                cyclicLduInterfaceField::transformCoupleField(f, cmpt);
+                // See comments in cyclicLduInterfaceField
+                // HJ, 3/Sep/2015
+//                 cyclicLduInterfaceField::transformCoupleField(pnf, cmpt);
+                if (doTransform())
+                {
+                    label sizeby2 = pnf.size()/2;
+
+                    Type powFwdTransform = transform
+                    (
+                        this->forwardT()[0],
+                        pTraits<Type>::one
+                    );
+
+                    scalar forwardScale =
+                        pow(component(powFwdTransform, cmpt), rank());
+
+                    Type powRevTransform = transform
+                    (
+                        this->reverseT()[0],
+                        pTraits<Type>::one
+                    );
+
+                    scalar reverseScale =
+                        pow(component(powRevTransform, cmpt), rank());
+
+                    for (label facei = 0; facei < sizeby2; facei++)
+                    {
+                        pnf[facei] *= forwardScale;
+                        pnf[facei + sizeby2] *= reverseScale;
+                    }
+                }
             }
 
             //- Update result field based on interface functionality

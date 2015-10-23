@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -72,11 +72,11 @@ class linearValveFvMesh
         //- Add linearValve zones and modifiers
         void addZonesAndModifiers();
 
-        //- Make sliding modifiers live
-        void makeSlidersDead();
+        //- Make sliding modifiers inactive
+        void deactivateSliders();
 
-        //- Make sliding modifiers live
-        void makeSlidersLive();
+        //- Make sliding modifiers active
+        void activateSliders();
 
         //- Return true if sliders are attached
         bool attached() const;

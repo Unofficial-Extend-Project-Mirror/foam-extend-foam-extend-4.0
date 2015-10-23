@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -24,6 +24,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "processorBlockGAMGInterfaceField.H"
+#include "processorLduInterfaceField.H"
 #include "addToRunTimeSelectionTable.H"
 #include "lduMatrix.H"
 
@@ -52,6 +53,14 @@ Foam::processorBlockGAMGInterfaceField<Type>::processorBlockGAMGInterfaceField
             (
                 fineInterfaceField
             );
+
+        doTransform_ = p.doTransform();
+        rank_ = p.rank();
+    }
+    else if (isA<processorLduInterfaceField>(fineInterfaceField))
+    {
+        const processorLduInterfaceField& p =
+            refCast<const processorLduInterfaceField >(fineInterfaceField);
 
         doTransform_ = p.doTransform();
         rank_ = p.rank();

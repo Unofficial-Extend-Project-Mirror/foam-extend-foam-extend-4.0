@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -49,10 +49,10 @@ Foam::hPolynomialThermo<EquationOfState, PolySize>::hPolynomialThermo
     sPolynomial_ = cpPolynomial_.integrateMinus1();
 
     // Offset h poly so that it is relative to the enthalpy at Tstd
-    hPolynomial_[0] += Hf_ - hPolynomial_.evaluate(specie::Tstd);
+    hPolynomial_[0] += Hf_ - hPolynomial_.evaluate(specie::Tstd());
 
     // Offset s poly so that it is relative to the entropy at Tstd
-    sPolynomial_[0] += Sf_ - sPolynomial_.evaluate(specie::Tstd);
+    sPolynomial_[0] += Sf_ - sPolynomial_.evaluate(specie::Tstd());
 }
 
 

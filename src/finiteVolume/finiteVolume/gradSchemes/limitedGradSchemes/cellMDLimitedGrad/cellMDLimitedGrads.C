@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -48,9 +48,10 @@ makeFvGradScheme(cellMDLimitedGrad)
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 template<>
-tmp<volVectorField> cellMDLimitedGrad<scalar>::grad
+tmp<volVectorField> cellMDLimitedGrad<scalar>::calcGrad
 (
-    const volScalarField& vsf
+    const volScalarField& vsf,
+    const word& name
 ) const
 {
     const fvMesh& mesh = vsf.mesh();
@@ -189,9 +190,10 @@ tmp<volVectorField> cellMDLimitedGrad<scalar>::grad
 
 
 template<>
-tmp<volTensorField> cellMDLimitedGrad<vector>::grad
+tmp<volTensorField> cellMDLimitedGrad<vector>::calcGrad
 (
-    const volVectorField& vsf
+    const volVectorField& vsf,
+    const word& name
 ) const
 {
     const fvMesh& mesh = vsf.mesh();

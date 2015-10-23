@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -103,12 +103,16 @@ inline token::token(const token& t)
             doubleScalarToken_ = t.doubleScalarToken_;
         break;
 
+        case LONG_DOUBLE_SCALAR:
+            longDoubleScalarToken_ = t.longDoubleScalarToken_;
+        break;
+
         case COMPOUND:
             compoundTokenPtr_ = t.compoundTokenPtr_;
             compoundTokenPtr_->refCount::operator++();
         break;
 
-        case token::ERROR:
+        case token::FATALERROR:
         break;
     }
 }
@@ -162,6 +166,15 @@ inline token::token(const doubleScalar s, label lineNumber)
 {}
 
 
+// Construct longDoubleScalar token
+inline token::token(const longDoubleScalar s, label lineNumber)
+:
+    type_(LONG_DOUBLE_SCALAR),
+    longDoubleScalarToken_(s),
+    lineNumber_(lineNumber)
+{}
+
+
 // * * * * * * * * * * * * * * * * Destructors * * * * * * * * * * * * * * * //
 
 // Delete token clearing the storage used by word or string
@@ -180,7 +193,7 @@ inline token::tokenType token::type() const
 
 inline bool token::good() const
 {
-    return (type_ != ERROR && type_ != UNDEFINED);
+    return (type_ != FATALERROR && type_ != UNDEFINED);
 }
 
 inline bool token::undefined() const
@@ -190,7 +203,7 @@ inline bool token::undefined() const
 
 inline bool token::error() const
 {
-    return (type_ == ERROR);
+    return (type_ == FATALERROR);
 }
 
 inline bool token::isPunctuation() const
@@ -289,6 +302,7 @@ inline bool token::isDoubleScalar() const
     return (type_ == DOUBLE_SCALAR);
 }
 
+
 inline doubleScalar token::doubleScalarToken() const
 {
     if (type_ == DOUBLE_SCALAR)
@@ -303,9 +317,34 @@ inline doubleScalar token::doubleScalarToken() const
 }
 
 
+inline bool token::isLongDoubleScalar() const
+{
+    return (type_ == LONG_DOUBLE_SCALAR);
+}
+
+
+inline longDoubleScalar token::longDoubleScalarToken() const
+{
+    if (type_ == LONG_DOUBLE_SCALAR)
+    {
+        return longDoubleScalarToken_;
+    }
+    else
+    {
+        parseError("longDoubleScalar");
+        return 0.0;
+    }
+}
+
+
 inline bool token::isScalar() const
 {
-    return (type_ == FLOAT_SCALAR || type_ == DOUBLE_SCALAR);
+    return
+    (
+        type_ == FLOAT_SCALAR
+     || type_ == DOUBLE_SCALAR
+     || type_ == LONG_DOUBLE_SCALAR
+    );
 }
 
 inline scalar token::scalarToken() const
@@ -317,6 +356,10 @@ inline scalar token::scalarToken() const
     else if (type_ == DOUBLE_SCALAR)
     {
         return doubleScalarToken_;
+    }
+    else if (type_ == LONG_DOUBLE_SCALAR)
+    {
+        return longDoubleScalarToken_;
     }
     else
     {
@@ -380,7 +423,7 @@ inline label& token::lineNumber()
 inline void token::setBad()
 {
     clear();
-    type_ = ERROR;
+    type_ = FATALERROR;
 }
 
 
@@ -420,17 +463,22 @@ inline void token::operator=(const token& t)
             doubleScalarToken_ = t.doubleScalarToken_;
         break;
 
+        case LONG_DOUBLE_SCALAR:
+            longDoubleScalarToken_ = t.longDoubleScalarToken_;
+        break;
+
         case COMPOUND:
             compoundTokenPtr_ = t.compoundTokenPtr_;
             compoundTokenPtr_->refCount::operator++();
         break;
 
-        case token::ERROR:
+        case token::FATALERROR:
         break;
     }
 
     lineNumber_ = t.lineNumber_;
 }
+
 
 inline void token::operator=(const punctuationToken p)
 {
@@ -484,6 +532,13 @@ inline void token::operator=(const doubleScalar s)
     doubleScalarToken_ = s;
 }
 
+inline void token::operator=(const longDoubleScalar s)
+{
+    clear();
+    type_ = LONG_DOUBLE_SCALAR;
+    longDoubleScalarToken_ = s;
+}
+
 inline void token::operator=(token::compound* cPtr)
 {
     clear();
@@ -522,10 +577,13 @@ inline bool token::operator==(const token& t) const
         case DOUBLE_SCALAR:
             return equal(doubleScalarToken_, t.doubleScalarToken_);
 
+        case LONG_DOUBLE_SCALAR:
+            return equal(longDoubleScalarToken_, t.longDoubleScalarToken_);
+
         case COMPOUND:
             return compoundTokenPtr_ == t.compoundTokenPtr_;
 
-        case token::ERROR:
+        case token::FATALERROR:
             return true;
     }
 
@@ -562,6 +620,11 @@ inline bool token::operator==(const doubleScalar s) const
     return (type_ == DOUBLE_SCALAR && equal(doubleScalarToken_, s));
 }
 
+inline bool token::operator==(const longDoubleScalar s) const
+{
+    return (type_ == LONG_DOUBLE_SCALAR && equal(longDoubleScalarToken_, s));
+}
+
 inline bool token::operator!=(const token& t) const
 {
     return !operator==(t);
@@ -588,6 +651,11 @@ inline bool token::operator!=(const floatScalar s) const
 }
 
 inline bool token::operator!=(const doubleScalar s) const
+{
+    return !operator==(s);
+}
+
+inline bool token::operator!=(const longDoubleScalar s) const
 {
     return !operator==(s);
 }

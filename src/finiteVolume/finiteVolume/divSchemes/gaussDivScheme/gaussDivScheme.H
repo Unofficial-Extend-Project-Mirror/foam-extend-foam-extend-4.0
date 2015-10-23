@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -97,10 +97,22 @@ public:
             const GeometricField<Type, fvPatchField, volMesh>&
         );
 
-        //- Return the blockLduMatrix<vector> corresponding to the implicit
-        // div discretization. For block coupled system.
-        tmp<blockVectorMatrix> fvmDiv
+        //- Return the BlockLduSystem corresponding to the implicit div
+        // discretization. For block coupled system.
+        tmp
+        <
+            BlockLduSystem<vector, typename innerProduct<vector, Type>::type>
+        > fvmUDiv
         (
+            const GeometricField<Type, fvPatchField, volMesh>&
+        ) const;
+
+        tmp
+        <
+            BlockLduSystem<vector, typename innerProduct<vector, Type>::type>
+        > fvmUDiv
+        (
+            const surfaceScalarField& flux,
             const GeometricField<Type, fvPatchField, volMesh>&
         ) const;
 };

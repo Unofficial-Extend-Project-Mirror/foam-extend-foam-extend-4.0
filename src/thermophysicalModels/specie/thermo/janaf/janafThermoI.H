@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -125,7 +125,7 @@ inline Foam::scalar Foam::janafThermo<equationOfState>::cp
 ) const
 {
     const coeffArray& a = coeffs(T);
-    return this->RR*((((a[4]*T + a[3])*T + a[2])*T + a[1])*T + a[0]);
+    return this->RR()*((((a[4]*T + a[3])*T + a[2])*T + a[1])*T + a[0]);
 }
 
 
@@ -136,7 +136,7 @@ inline Foam::scalar Foam::janafThermo<equationOfState>::h
 ) const
 {
     const coeffArray& a = coeffs(T);
-    return this->RR*
+    return this->RR()*
     (
         ((((a[4]/5.0*T + a[3]/4.0)*T + a[2]/3.0)*T + a[1]/2.0)*T + a[0])*T
       + a[5]
@@ -158,8 +158,8 @@ template<class equationOfState>
 inline Foam::scalar Foam::janafThermo<equationOfState>::hc() const
 {
     const coeffArray& a = lowCpCoeffs_;
-    const scalar& Tstd = specie::Tstd;
-    return this->RR*
+    const scalar& Tstd = specie::Tstd();
+    return this->RR()*
     (
         (
             (((a[4]/5.0*Tstd + a[3]/4.0)*Tstd + a[2]/3.0)*Tstd + a[1]/2.0)*Tstd
@@ -180,7 +180,7 @@ inline Foam::scalar Foam::janafThermo<equationOfState>::s
 
     const coeffArray& a = coeffs(T);
     return
-    this->RR*
+    this->RR()*
     (
         (((a[4]/4.0*T + a[3]/3.0)*T + a[2]/2.0)*T + a[1])*T + a[0]*::log(T)
       + a[6]

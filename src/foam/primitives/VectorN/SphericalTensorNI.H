@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -79,14 +79,16 @@ inline SphericalTensorN<Cmpt, length>::SphericalTensorN(Istream& is)
 
 //- Return diagonal tensor diagonal
 template <class Cmpt, int length>
-inline SphericalTensorN<Cmpt, length> SphericalTensorN<Cmpt, length>::diag() const
+inline SphericalTensorN<Cmpt, length>
+SphericalTensorN<Cmpt, length>::diag() const
 {
     return *this;
 }
 
 //- Return spherical tensor transpose
 template <class Cmpt, int length>
-inline SphericalTensorN<Cmpt, length> SphericalTensorN<Cmpt, length>::T() const
+inline SphericalTensorN<Cmpt, length>
+SphericalTensorN<Cmpt, length>::T() const
 {
     return *this;
 }
@@ -111,8 +113,12 @@ inline SphericalTensorN<Cmpt, length> transform
 
 //- Addition of SphericalTensorN and SphericalTensorN
 template <class Cmpt, int length>
-inline SphericalTensorN<Cmpt,length>
-operator+(const SphericalTensorN<Cmpt,length>& st1, const SphericalTensorN<Cmpt,length>& st2)
+inline SphericalTensorN<Cmpt, length>
+operator+
+(
+    const SphericalTensorN<Cmpt, length>& st1,
+    const SphericalTensorN<Cmpt, length>& st2
+)
 {
     return SphericalTensorN<Cmpt, length>(st1.v_[0] + st2.v_[0]);
 }
@@ -120,8 +126,12 @@ operator+(const SphericalTensorN<Cmpt,length>& st1, const SphericalTensorN<Cmpt,
 
 //- Subtraction of SphericalTensorN and SphericalTensorN
 template <class Cmpt, int length>
-inline SphericalTensorN<Cmpt,length>
-operator-(const SphericalTensorN<Cmpt,length>& st1, const SphericalTensorN<Cmpt,length>& st2)
+inline SphericalTensorN<Cmpt, length>
+operator-
+(
+    const SphericalTensorN<Cmpt, length>& st1,
+    const SphericalTensorN<Cmpt, length>& st2
+)
 {
     return SphericalTensorN<Cmpt, length>(st1.v_[0] - st2.v_[0]);
 }
@@ -130,8 +140,16 @@ operator-(const SphericalTensorN<Cmpt,length>& st1, const SphericalTensorN<Cmpt,
 //- Inner-product between spherical tensor and spherical tensor
 template <class Cmpt, int length>
 inline typename
-innerProduct<SphericalTensorN<Cmpt, length>, SphericalTensorN<Cmpt, length> >::type
-operator&(const SphericalTensorN<Cmpt, length>& st1, const SphericalTensorN<Cmpt, length>& st2)
+innerProduct
+<
+    SphericalTensorN<Cmpt, length>,
+    SphericalTensorN<Cmpt, length>
+>::type
+operator&
+(
+    const SphericalTensorN<Cmpt, length>& st1,
+    const SphericalTensorN<Cmpt, length>& st2
+)
 {
     return SphericalTensorN<Cmpt, length>(st1.v_[0]*st2.v_[0]);
 }
@@ -141,11 +159,22 @@ operator&(const SphericalTensorN<Cmpt, length>& st1, const SphericalTensorN<Cmpt
 template <class Cmpt, int length>
 inline typename
 innerProduct<SphericalTensorN<Cmpt, length>, VectorN<Cmpt, length> >::type
-operator&(const SphericalTensorN<Cmpt, length>& st, const VectorN<Cmpt, length>& v)
+operator&
+(
+    const SphericalTensorN<Cmpt, length>& st,
+    const VectorN<Cmpt, length>& v
+)
 {
     const Cmpt& s = st.v_[0];
     VectorN<Cmpt, length> res;
-    VectorSpaceOps<VectorN<Cmpt, length>::nComponents,0>::opSV(res, s, v, multiplyOp<Cmpt>());
+    VectorSpaceOps<VectorN<Cmpt, length>::nComponents,0>::opSV
+    (
+        res,
+        s,
+        v,
+        multiplyOp<Cmpt>()
+    );
+
     return res;
 }
 
@@ -154,11 +183,22 @@ operator&(const SphericalTensorN<Cmpt, length>& st, const VectorN<Cmpt, length>&
 template <class Cmpt, int length>
 inline typename
 innerProduct<VectorN<Cmpt, length>, SphericalTensorN<Cmpt, length> >::type
-operator&(const VectorN<Cmpt, length>& v, const SphericalTensorN<Cmpt, length>& st)
+operator&
+(
+    const VectorN<Cmpt, length>& v,
+    const SphericalTensorN<Cmpt, length>& st
+)
 {
     const Cmpt& s = st.v_[0];
     VectorN<Cmpt, length> res;
-    VectorSpaceOps<VectorN<Cmpt, length>::nComponents,0>::opVS(res, v, s, multiplyOp<Cmpt>());
+    VectorSpaceOps<VectorN<Cmpt, length>::nComponents,0>::opVS
+    (
+        res,
+        v,
+        s,
+        multiplyOp<Cmpt>()
+    );
+
     return res;
 }
 
@@ -183,8 +223,12 @@ operator/(const scalar s, const SphericalTensorN<Cmpt, length>& st)
 
 //- Inner Product of a VectorN by an inverse SphericalTensorN
 template <class Cmpt, int length>
-inline VectorN<Cmpt,length>
-operator/(const VectorN<Cmpt,length>& v, const SphericalTensorN<Cmpt,length>& st)
+inline VectorN<Cmpt, length>
+operator/
+(
+    const VectorN<Cmpt, length>& v,
+    const SphericalTensorN<Cmpt, length>& st
+)
 {
     return v/st.v_[0];
 }
@@ -192,8 +236,12 @@ operator/(const VectorN<Cmpt,length>& v, const SphericalTensorN<Cmpt,length>& st
 
 //- Inner Product of a SphericalTensorN and an inverse SphericalTensorN
 template <class Cmpt, int length>
-inline SphericalTensorN<Cmpt,length>
-operator/(const SphericalTensorN<Cmpt,length>& st1, const SphericalTensorN<Cmpt,length>& st2)
+inline SphericalTensorN<Cmpt, length>
+operator/
+(
+    const SphericalTensorN<Cmpt, length>& st1,
+    const SphericalTensorN<Cmpt, length>& st2
+)
 {
     return SphericalTensorN<Cmpt, length>(st1.v_[0]/st2.v_[0]);
 }
@@ -201,7 +249,10 @@ operator/(const SphericalTensorN<Cmpt,length>& st1, const SphericalTensorN<Cmpt,
 
 //- Return the inverse of a spherical tensor
 template <class Cmpt, int length>
-inline SphericalTensorN<Cmpt, length> inv(const SphericalTensorN<Cmpt, length>& st)
+inline SphericalTensorN<Cmpt, length> inv
+(
+    const SphericalTensorN<Cmpt, length>& st
+)
 {
     return SphericalTensorN<Cmpt, length>(pTraits<Cmpt>::one/st.v_[0]);
 }
@@ -209,7 +260,10 @@ inline SphericalTensorN<Cmpt, length> inv(const SphericalTensorN<Cmpt, length>& 
 
 //- Return tensor diagonal
 template <class Cmpt, int length>
-inline SphericalTensorN<Cmpt, length> diag(const SphericalTensorN<Cmpt, length>& st)
+inline SphericalTensorN<Cmpt, length> diag
+(
+    const SphericalTensorN<Cmpt, length>& st
+)
 {
     return st;
 }
@@ -258,7 +312,11 @@ public:
 };
 
 template<class Cmpt, int length>
-class innerProduct<SphericalTensorN<Cmpt, length>, SphericalTensorN<Cmpt, length> >
+class innerProduct
+<
+    SphericalTensorN<Cmpt, length>,
+    SphericalTensorN<Cmpt, length>
+>
 {
 public:
 

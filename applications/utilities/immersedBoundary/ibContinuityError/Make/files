@@ -1,0 +1,3 @@
+ibContinuityError.C
+
+EXE = $(FOAM_APPBIN)/ibContinuityError

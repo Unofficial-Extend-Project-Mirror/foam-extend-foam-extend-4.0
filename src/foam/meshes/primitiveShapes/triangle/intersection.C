@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -29,17 +29,21 @@ Description
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-const Foam::scalar Foam::intersection::planarTol_
+//Foam::debug::controlSwitches<Foam::scalar>
+Foam::debug::tolerancesSwitch
+Foam::intersection::planarTol_
 (
-    debug::tolerances("intersectionPlanarTol", 0.2)
+    "intersectionPlanarTol",
+    0.2
 );
 
-
-const Foam::scalar Foam::intersection::missTol_
+//const Foam::debug::controlSwitches<Foam::scalar>
+const Foam::debug::tolerancesSwitch
+Foam::intersection::missTol_
 (
-    debug::tolerances("intersectionMissTol", SMALL)
+    "intersectionMissTol",
+    SMALL
 );
-
 
 template<>
 const char* Foam::NamedEnum<Foam::intersection::direction, 2>::names[] =

@@ -1,0 +1,25 @@
+--- scotch_6.0.0_orig/src/Make.inc/Makefile.inc.i686_mac_darwin10.shlib	1970-01-01 01:00:00.000000000 +0100
++++ scotch_6.0.0/src/Make.inc/Makefile.inc.i686_mac_darwin10.shlib	2013-11-26 17:28:43.000000000 +0000
+@@ -0,0 +1,22 @@
++EXE		=
++LIB		= .dylib
++OBJ		= .o
++
++MAKE		= make
++AR		= gcc
++ARFLAGS		= -shared -dynamiclib -undefined dynamic_lookup -o
++CAT		= cat
++CCS		= gcc
++CCP		= mpicc
++CCD		= mpicc
++CFLAGS		= -O3 -Drestrict=__restrict -DCOMMON_TIMING_OLD -DCOMMON_FILE_COMPRESS_GZ -DCOMMON_PTHREAD -DCOMMON_RANDOM_FIXED_SEED -DSCOTCH_PTHREAD -DSCOTCH_RENAME -DCOMMON_PTHREAD_BARRIER
++CLIBFLAGS	=
++LDFLAGS		= -lz -lm
++LIBLDFLAGS	= -dynamiclib -undefined dynamic_lookup 
++CP		= cp
++LEX		= flex
++LN		= ln
++MKDIR		= mkdir
++MV		= mv
++RANLIB		= ranlib
++YACC		= bison -y

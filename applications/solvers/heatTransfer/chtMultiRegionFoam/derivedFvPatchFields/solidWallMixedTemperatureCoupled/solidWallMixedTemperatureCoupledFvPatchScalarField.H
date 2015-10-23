@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -34,7 +34,7 @@ Description
         {
             type                solidWallMixedTemperatureCoupled;
             neighbourFieldName  T;
-            K                   K;
+            Kappa                   Kappa;
             value               uniform 300;
         }
 
@@ -72,7 +72,7 @@ class solidWallMixedTemperatureCoupledFvPatchScalarField
         const word neighbourFieldName_;
 
         //- Name of thermal conductivity field
-        const word KName_;
+        const word KappaName_;
 
 public:
 
@@ -142,8 +142,8 @@ public:
 
     // Member functions
 
-        //- Get corresponding K field
-        const fvPatchScalarField& K() const;
+        //- Get corresponding Kappa field
+        const fvPatchScalarField& Kappa() const;
 
         //- Update the coefficients associated with the patch field
         virtual void updateCoeffs();

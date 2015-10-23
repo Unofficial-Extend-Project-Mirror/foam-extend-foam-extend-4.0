@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -42,16 +42,17 @@ Author
 #include "triPointRef.H"
 #include "plane.H"
 #include "polyTopoChanger.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "standAlonePatch.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-const Foam::scalar Foam::slidingInterface::edgeCoPlanarTol_
+const Foam::debug::tolerancesSwitch
+Foam::slidingInterface::edgeCoPlanarTol_
 (
-    debug::tolerances("slidingEdgeCoPlanarTol", 0.8)
+    "slidingEdgeCoPlanarTol",
+    0.8
 );
-
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
@@ -636,8 +637,8 @@ void Foam::slidingInterface::coupleInterface(polyTopoChange& ref) const
 
                     if
                     (
-                        cutOnMaster > edgeEndCutoffTol_
-                     && cutOnMaster < 1.0 - edgeEndCutoffTol_
+                        cutOnMaster > edgeEndCutoffTol_()
+                     && cutOnMaster < 1.0 - edgeEndCutoffTol_()
                     )
                     {
                         // Master is cut, check the slave
@@ -663,7 +664,7 @@ void Foam::slidingInterface::coupleInterface(polyTopoChange& ref) const
                             // Calculate merge tolerance from the
                             // target edge length
                             scalar mergeTol =
-                                edgeCoPlanarTol_*mag(b - a);
+                                edgeCoPlanarTol_()*mag(b - a);
 //                             Pout<< "cutOnMaster: " << cutOnMaster
 //                                 << " masterCutPoint: " << masterCutPoint
 //                                 << " slaveCutPoint: " << slaveCut.hitPoint()
@@ -676,8 +677,8 @@ void Foam::slidingInterface::coupleInterface(polyTopoChange& ref) const
 //                                 << endl;
                             if
                             (
-                                cutOnSlave > edgeEndCutoffTol_
-                             && cutOnSlave < 1.0 - edgeEndCutoffTol_
+                                cutOnSlave > edgeEndCutoffTol_()
+                             && cutOnSlave < 1.0 - edgeEndCutoffTol_()
                              && slaveCut.distance() < mergeTol
                             )
                             {

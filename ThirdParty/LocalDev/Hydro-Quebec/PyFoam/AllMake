@@ -36,43 +36,46 @@
 command -v python -V >/dev/null
 if [ ! $? -eq 0 ];
 then
-    echo "Error: You need to install python in order to run these PyFoam scripts" 
+    echo "Error: You need to install python in order to run these PyFoam scripts"
     exit -1
 fi
 
-if [ -z "$PYFOAM_DIR" ] 
+if [ -z "$PYFOAM_SITE_DIR" ]
 then
-    echo "Error: Missing environment variable \$PYFOAM_DIR."
-    echo "       Please execute the script ThirdParty/AllMake.stage5 to install PyFoam."  
+    echo "Error: Missing environment variable \$PYFOAM_SITE_DIR."
+    echo "       Please execute the script ThirdParty/AllMake.stage5 to install PyFoam."
     echo "       Then, make sure to freshen your foam-extend environment by sourcing your main"
     echo "       foam-extend configuration file."
     exit -1
 fi
 
-pythonVersion=$(python -V 2>&1 | awk -F ' ' {'print $2'} |  awk -F \. {'print $1 "." $2'})
-
-set -x 
+if [ ! -d $PYFOAM_SITE_DIR/lib -o ! -d $PYFOAM_SITE_DIR/bin ]
+then
+    echo "Directory $PYFOAM_SITE_DIR/lib or $PYFOAM_SITE_DIR/bin missing"
+    exit -1
+fi
+set -x
 
 # pyFoamChangeMixingPlaneBoundary.py
-cp pyFoamChangeMixingPlaneBoundary.py $PYFOAM_DIR/bin
-cp ChangeMixingPlaneBoundary.py $PYFOAM_DIR/lib/python$pythonVersion/site-packages/PyFoam/Applications
+cp pyFoamChangeMixingPlaneBoundary.py $PYFOAM_SITE_DIR/bin
+cp ChangeMixingPlaneBoundary.py $PYFOAM_SITE_DIR/lib
 
 # pyFoamChangeGGIBoundary.py
 # Same as pyFoamModifyGGIBoundary.py. We just harmonize the name with rest of PyFoam
-cp pyFoamChangeGGIBoundary.py $PYFOAM_DIR/bin
-cp ChangeGGIBoundary.py $PYFOAM_DIR/lib/python$pythonVersion/site-packages/PyFoam/Applications
+cp pyFoamChangeGGIBoundary.py $PYFOAM_SITE_DIR/bin
+cp ChangeGGIBoundary.py $PYFOAM_SITE_DIR/lib
 
 # pyFoamInitializeMixingPlane.py
-cp pyFoamInitMixingPlaneInterface.py $PYFOAM_DIR/bin
-cp InitMixingPlaneInterface.py $PYFOAM_DIR/lib/python$pythonVersion/site-packages/PyFoam/Applications
+cp pyFoamInitMixingPlaneInterface.py $PYFOAM_SITE_DIR/bin
+cp InitMixingPlaneInterface.py $PYFOAM_SITE_DIR/lib
 
 # pyFoamInitializeGGI.py
-cp pyFoamInitGgiInterface.py $PYFOAM_DIR/bin
-cp InitGgiInterface.py $PYFOAM_DIR/lib/python$pythonVersion/site-packages/PyFoam/Applications
+cp pyFoamInitGgiInterface.py $PYFOAM_SITE_DIR/bin
+cp InitGgiInterface.py $PYFOAM_SITE_DIR/lib
 
 # pyFoamConvertMixingPlaneBoundaryToNewSyntax.py
-cp pyFoamConvertMixingPlaneBoundaryToNewSyntax.py $PYFOAM_DIR/bin
-cp ConvertMixingPlaneBoundaryToNewSyntax.py $PYFOAM_DIR/lib/python$pythonVersion/site-packages/PyFoam/Applications
+cp pyFoamConvertMixingPlaneBoundaryToNewSyntax.py $PYFOAM_SITE_DIR/bin
+cp ConvertMixingPlaneBoundaryToNewSyntax.py $PYFOAM_SITE_DIR/lib
 
 set +x
 echo ========================================
@@ -81,5 +84,3 @@ echo ========================================
 echo
 
 # ----------------------------------------------------------------- end-of-file
-
-

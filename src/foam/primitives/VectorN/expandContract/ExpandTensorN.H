@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -40,15 +40,15 @@ Author
 
 #define UNARY_TEMPLATE_FUNCTION(ReturnType, Type, Func)                      \
 template<class Cmpt, int length>                                             \
-inline void Func(ReturnType<Cmpt,length>&, const Type<Cmpt,length>&);
+inline void Func(ReturnType<Cmpt, length>&, const Type<Cmpt, length>&);
 
 #define UNARY_TEMPLATE_FUNCTION_VS(ReturnType, Func)                         \
 template<class Cmpt, int length>                                             \
-inline void Func(ReturnType<Cmpt,length>&, const Cmpt&);
+inline void Func(ReturnType<Cmpt, length>&, const Cmpt&);
 
 #define UNARY_TEMPLATE_FUNCTION_SV(Type, Func)                               \
 template<class Cmpt, int length>                                             \
-inline void Func(Cmpt&, const Type<Cmpt,length>&);
+inline void Func(Cmpt&, const Type<Cmpt, length>&);
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

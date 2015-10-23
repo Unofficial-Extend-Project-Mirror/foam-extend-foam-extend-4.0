@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -223,9 +223,11 @@ void Foam::polyMesh::initMesh()
 
     string meshInfo =
         "nPoints: " + Foam::name(nPoints())
-      + " nCells: " + Foam::name(this->nCells())
+      + " nAllPoints: " + Foam::name(allPoints().size())
+      + " nInternalFaces: " + Foam::name(nInternalFaces())
       + " nFaces: " + Foam::name(nFaces())
-      + " nInternalFaces: " + Foam::name(nInternalFaces());
+      + " nAllFaces: " + Foam::name(allFaces().size())
+      + " nCells: " + Foam::name(this->nCells());
 
     owner_.note() = meshInfo;
     neighbour_.note() = meshInfo;

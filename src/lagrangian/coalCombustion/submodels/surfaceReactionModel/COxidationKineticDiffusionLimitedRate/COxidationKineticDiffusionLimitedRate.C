@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -134,13 +134,13 @@ Foam::scalar Foam::COxidationKineticDiffusionLimitedRate<CloudType>::calculate
     const scalar D0 = C1_/d*pow(0.5*(T + Tc), 0.75);
 
     // Kinetic rate
-    const scalar Rk = C2_*exp(-E_/(specie::RR*Tc));
+    const scalar Rk = C2_*exp(-E_/(specie::RR()*Tc));
 
     // Particle surface area
     const scalar Ap = mathematicalConstant::pi*sqr(d);
 
     // Change in C mass [kg]
-    scalar dmC = Ap*rhoc*specie::RR*Tc*YO2/WO2_*D0*Rk/(D0 + Rk);
+    scalar dmC = Ap*rhoc*specie::RR()*Tc*YO2/WO2_*D0*Rk/(D0 + Rk);
 
     // Limit mass transfer by availability of C
     dmC = min(mass*fComb, dmC);

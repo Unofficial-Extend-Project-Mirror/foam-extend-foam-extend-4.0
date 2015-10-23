@@ -17,9 +17,13 @@ wmakePrintBuild -check || /bin/rm -f foam/Make/$WM_OPTIONS/global.? 2>/dev/null
 wmakeLnInclude foam
 wmakeLnInclude meshTools
 wmakeLnInclude OSspecific/$WM_OSTYPE
-Pstream/Allwmake
 
 wmake libo  OSspecific/$WM_OSTYPE
+
+set +x
+echo
+echo "Note: ignore spurious warnings about missing mpicxx.h headers"
+set -x
 wmake libso foam
 
 # Decomposition methods needed by meshTools
@@ -28,7 +32,6 @@ decompositionMethods/Allwmake
 
 wmake libso lagrangian/basic
 
-wmake libso triSurface
 wmake libso edgeMesh
 wmake libso surfMesh
 
@@ -37,7 +40,6 @@ wmake libso finiteVolume
 wmake libso finiteArea
 
 wmake libso lduSolvers
-wmake libso VectorN
 
 wmake libso tetFiniteElement
 
@@ -71,6 +73,10 @@ wmake libso multiSolver
 
 wmake libso solidModels
 wmake libso dbns
+
+wmake libso immersedBoundary/immersedBoundary
+wmake libso immersedBoundary/immersedBoundaryTurbulence
+wmake libso immersedBoundary/immersedBoundaryForce
 
 ( cd cudaSolvers ; ./Allwmake )
 

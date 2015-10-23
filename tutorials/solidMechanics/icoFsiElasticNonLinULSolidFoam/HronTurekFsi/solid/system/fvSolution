@@ -1,8 +1,8 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | foam-extend: Open Source CFD                    |
-|  \\    /   O peration     | Version:     3.1                                |
-|   \\  /    A nd           | Web:         http://www.extend-project.de       |
+|  \\    /   O peration     | Version:     3.2                                |
+|   \\  /    A nd           | Web:         http://www.foam-extend.org         |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 FoamFile
@@ -19,7 +19,7 @@ solvers
 {
     DU
     {
-	solver GAMG;
+        solver GAMG;
         tolerance        1e-8;
         relTol           0.01;
         minIter          1;
@@ -30,9 +30,8 @@ solvers
         nPostSweeps      2;
         nFinestSweeps    2;
 
-	scaleCorrection true;
+        scaleCorrection true;
         directSolveCoarsest false;
-
 
         cacheAgglomeration true;
 
@@ -43,7 +42,7 @@ solvers
 
 //    DU
 //    {
-//	  solver amgSolver;
+//        solver amgSolver;
 //        cycle           W-cycle;
 //        policy          AAMG;
 //        nPreSweeps      0;
@@ -66,9 +65,9 @@ solvers
 
 solidMechanics
 {
-    nCorrectors     	1000;
-    DU               	1e-06;
-    historyPointID	62;
+    nCorrectors       1000;
+    DU                1e-06;
+    historyPointID    62;
 }
 
 relaxationFactors

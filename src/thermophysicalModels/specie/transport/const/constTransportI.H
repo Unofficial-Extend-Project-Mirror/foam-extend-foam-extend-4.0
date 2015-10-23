@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -109,9 +109,9 @@ inline scalar constTransport<thermo>::alpha(const scalar T) const
 {
     scalar Cp_ = this->Cp(T);
 
-    scalar deltaT = T - specie::Tstd;
+    scalar deltaT = T - specie::Tstd();
     scalar CpBar =
-        (deltaT*(this->H(T) - this->H(specie::Tstd)) + Cp_)/(sqr(deltaT) + 1);
+        (deltaT*(this->H(T) - this->H(specie::Tstd())) + Cp_)/(sqr(deltaT) + 1);
 
     return Cp_*mu(T)*rPr/CpBar;
 }

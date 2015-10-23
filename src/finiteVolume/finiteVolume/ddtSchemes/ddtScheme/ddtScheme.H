@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -257,7 +257,7 @@ makeFvDdtTypeScheme(SS, sphericalTensor)                                       \
 makeFvDdtTypeScheme(SS, symmTensor)                                            \
 makeFvDdtTypeScheme(SS, symmTensor4thOrder)                                    \
 makeFvDdtTypeScheme(SS, diagTensor)                                            \
-makeFvDdtTypeScheme(SS, tensor)	                                               \
+makeFvDdtTypeScheme(SS, tensor)                                                \
                                                                                \
 template<>                                                                     \
 tmp<surfaceScalarField> SS<scalar>::fvcDdtPhiCorr                              \

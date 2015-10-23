@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -69,38 +69,62 @@ gaussDivScheme<Type>::fvcDiv
 
 
 template<class Type>
-tmp<blockVectorMatrix> gaussDivScheme<Type>::fvmDiv
+tmp
+<
+    BlockLduSystem<vector, typename innerProduct<vector, Type>::type>
+> gaussDivScheme<Type>::fvmUDiv
 (
     const GeometricField<Type, fvPatchField, volMesh>& vf
 ) const
 {
-    tmp<surfaceScalarField> tweights = this->tinterpScheme_().weights(vf);
-    const scalarField& wIn = tweights().internalField();
-
-    const fvMesh& mesh = vf.mesh();
-
-    tmp<blockVectorMatrix> tbm
+    FatalErrorIn
     (
-        new blockVectorMatrix
-        (
-           mesh
-        )
+        "tmp<BlockLduSystem> gaussDivScheme<Type>::fvmUDiv\n"
+        "(\n"
+        "    GeometricField<Type, fvPatchField, volMesh>&"
+        ")\n"
+    )   << "Implicit div operator defined only for vector."
+        << abort(FatalError);
+
+    typedef typename innerProduct<vector, Type>::type DivType;
+
+    tmp<BlockLduSystem<vector, DivType> > tbs
+    (
+        new BlockLduSystem<vector, DivType>(vf.mesh())
     );
-    blockVectorMatrix& bm = tbm();
 
-    // Grab ldu parts of block matrix as linear always
-    typename CoeffField<vector>::linearTypeField& u = bm.upper().asLinear();
-    typename CoeffField<vector>::linearTypeField& l = bm.lower().asLinear();
+    return tbs;
+}
 
-    const vectorField& SfIn = mesh.Sf().internalField();
 
-    l = -wIn*SfIn;
-    u = l + SfIn;
-    bm.negSumDiag();
+template<class Type>
+tmp
+<
+    BlockLduSystem<vector, typename innerProduct<vector, Type>::type>
+> gaussDivScheme<Type>::fvmUDiv
+(
+    const surfaceScalarField& flux,
+    const GeometricField<Type, fvPatchField, volMesh>& vf
+) const
+{
+    FatalErrorIn
+    (
+        "tmp<BlockLduSystem> gaussDivScheme<Type>::fvmUDiv\n"
+        "(\n"
+        "    const surfaceScalarField& flux"
+        "    const GeometricField<Type, fvPatchField, volMesh>&"
+        ")\n"
+    )   << "Implicit div operator defined only for vector."
+        << abort(FatalError);
 
-    // Interpolation schemes with corrections not accounted for
+    typedef typename innerProduct<vector, Type>::type DivType;
 
-    return tbm;
+    tmp<BlockLduSystem<vector, DivType> > tbs
+    (
+        new BlockLduSystem<vector, DivType>(vf.mesh())
+    );
+
+    return tbs;
 }
 
 

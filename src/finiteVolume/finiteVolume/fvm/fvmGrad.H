@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -25,9 +25,12 @@ InNamespace
     Foam::fvm
 
 Description
-    Calculate the blockLduMatrx for the gradient of the field.
-    BlockLduMatrix will always be of type <vector>. Intended use: block
-    coupled solvers. i.e. implicit grad(p) in momentum equation.
+    Calculate the BlockLduSystem (matrix & source) for the gradient of the field
+    Intended use: block coupled solvers. i.e. implicit grad(p) in momentum
+    equation.
+
+Author
+    Vuko Vukcevic, FMENA Zagreb.
 
 SourceFiles
     fvmGrad.C
@@ -38,7 +41,7 @@ SourceFiles
 #define fvmGrad_H
 
 #include "volFieldsFwd.H"
-#include "blockLduMatrices.H"
+#include "BlockLduSystem.H"
 #include "geometricOneField.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -53,14 +56,20 @@ namespace Foam
 namespace fvm
 {
     template<class Type>
-    tmp<blockVectorMatrix> grad
+    tmp
+    <
+        BlockLduSystem<vector, typename outerProduct<vector, Type>::type>
+    > grad
     (
         GeometricField<Type, fvPatchField, volMesh>&,
         const word&
     );
 
     template<class Type>
-    tmp<blockVectorMatrix> grad
+    tmp
+    <
+        BlockLduSystem<vector, typename outerProduct<vector, Type>::type>
+    > grad
     (
         GeometricField<Type, fvPatchField, volMesh>&
     );

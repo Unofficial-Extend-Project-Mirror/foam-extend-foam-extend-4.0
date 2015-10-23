@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -37,7 +37,6 @@ Author
 #include "vector2D.H"
 #include "coeffFields.H"
 #include "BlockSolverPerformance.H"
-// #include "BlockGaussSeidelSolver.H"
 // #include "BlockBiCGStabSolver.H"
 // #include "BlockCGSolver.H"
 #include "BlockGMRESSolver.H"
@@ -48,14 +47,15 @@ Author
 template<class Type>
 Foam::coarseBlockAmgLevel<Type>::coarseBlockAmgLevel
 (
+    autoPtr<lduPrimitiveMesh> addrPtr,
     autoPtr<BlockLduMatrix<Type> > matrixPtr,
     const dictionary& dict,
     const word& coarseningType,
     const label groupSize,
-    const label minCoarseEqns,
-    const word& smootherType
+    const label minCoarseEqns
 )
 :
+    addrPtr_(addrPtr),
     matrixPtr_(matrixPtr),
     x_(matrixPtr_->diag().size(),pTraits<Type>::zero),
     b_(matrixPtr_->diag().size(),pTraits<Type>::zero),
@@ -78,7 +78,8 @@ Foam::coarseBlockAmgLevel<Type>::coarseBlockAmgLevel
             matrixPtr_,
             dict
         )
-    )
+    ),
+    Ax_()
 {}
 
 
@@ -221,12 +222,23 @@ void Foam::coarseBlockAmgLevel<Type>::solve
         return;
     }
 
+    // Switch of debug in top-level direct solve
+    label oldDebug = BlockLduMatrix<Type>::debug();
+
+    if (BlockLduMatrix<Type>::debug >= 4)
+    {
+        BlockLduMatrix<Type>::debug = 1;
+    }
+    else
+    {
+        BlockLduMatrix<Type>::debug = 0;
+    }
+
     if (matrixPtr_->symmetric())
     {
         topLevelDict.add("preconditioner", "Cholesky");
 
         coarseSolverPerf =
-        //BlockGaussSeidelSolver<Type>
 //         BlockCGSolver<Type>
         BlockGMRESSolver<Type>
         (
@@ -240,7 +252,6 @@ void Foam::coarseBlockAmgLevel<Type>::solve
         topLevelDict.add("preconditioner", "Cholesky");
 
         coarseSolverPerf =
-        //BlockGaussSeidelSolver<Type>
 //         BlockBiCGStabSolver<Type>
         BlockGMRESSolver<Type>
         (
@@ -249,6 +260,9 @@ void Foam::coarseBlockAmgLevel<Type>::solve
             topLevelDict
         ).solve(x, b);
     }
+
+    // Restore debug
+    BlockLduMatrix<Type>::debug = oldDebug;
 
     // Escape cases of top-level solver divergence
     if
@@ -283,18 +297,22 @@ void Foam::coarseBlockAmgLevel<Type>::scaleX
     Field<Type>& xBuffer
 ) const
 {
+    // KRJ: 2013-02-05: Removed subfield, creating a new field
+    // Initialise and size buffer to avoid multiple allocation.
+    // Buffer is created as private data of AMG level
+    // HJ, 26/Feb/2015
+    if (Ax_.empty())
+    {
+        Ax_.setSize(x.size());
+    }
 
-    // KRJ: 2013-02-05: Creating a new field not re-using
-    Field<Type> Ax(x.size());
+    matrixPtr_->Amul(Ax_, x);
 
-    matrixPtr_->Amul
-    (
-        reinterpret_cast<Field<Type>&>(Ax),
-        x
-    );
+#if 0
 
+    // Variant 1 (old): scale complete x with a single scaling factor
     scalar scalingFactorNum = sumProd(x, b);
-    scalar scalingFactorDenom = sumProd(x, Ax);
+    scalar scalingFactorDenom = sumProd(x, Ax_);
 
     vector2D scalingVector(scalingFactorNum, scalingFactorDenom);
     reduce(scalingVector, sumOp<vector2D>());
@@ -318,8 +336,50 @@ void Foam::coarseBlockAmgLevel<Type>::scaleX
     else
     {
         // Regular scaling
-        x *= scalingVector[0]/stabilise(scalingVector[1], SMALL);
+        x *= scalingVector[0]/stabilise(scalingVector[1], VSMALL);
     }
+
+#else
+
+    // Variant 2: scale each x individually
+    // HJ, 25/Feb/2015
+    Type scalingFactorNum = sumCmptProd(x, b);
+    Type scalingFactorDenom = sumCmptProd(x, Ax_);
+
+    Vector2D<Type> scalingVector(scalingFactorNum, scalingFactorDenom);
+    reduce(scalingVector, sumOp<Vector2D<Type> >());
+
+    Type scalingFactor = pTraits<Type>::one;
+
+    // Scale x
+    for (direction dir = 0; dir < pTraits<Type>::nComponents; dir++)
+    {
+        scalar num = component(scalingVector[0], dir);
+        scalar denom = component(scalingVector[1], dir);
+
+        if
+        (
+            mag(num) > GREAT || mag(denom) > GREAT
+         || num*denom <= 0 || mag(num) < mag(denom)
+        )
+        {
+            // Factor = 1.0, no scaling
+        }
+        else if (mag(num) > 2*mag(denom))
+        {
+            setComponent(scalingFactor, dir) = 2;
+        }
+        else
+        {
+            // Regular scaling
+            setComponent(scalingFactor, dir) = num/stabilise(denom, VSMALL);
+        }
+    }
+
+    // Scale X
+    cmptMultiply(x, x, scalingFactor);
+
+#endif
 }
 
 
@@ -329,23 +389,12 @@ Foam::coarseBlockAmgLevel<Type>::makeNextLevel() const
 {
     if (coarseningPtr_->coarsen())
     {
-        return autoPtr<Foam::BlockAmgLevel<Type> >
-        (
-            new coarseBlockAmgLevel
-            (
-                coarseningPtr_->restrictMatrix(),
-                dict(),
-                coarseningPtr_->type(),
-                coarseningPtr_->groupSize(),
-                coarseningPtr_->minCoarseEqns(),
-                smootherPtr_->type()
-            )
-        );
+        return coarseningPtr_->restrictMatrix();
     }
     else
     {
         // Final level: cannot coarsen
-        return autoPtr<Foam::BlockAmgLevel<Type> >();
+        return autoPtr<BlockAmgLevel<Type> >();
     }
 }
 

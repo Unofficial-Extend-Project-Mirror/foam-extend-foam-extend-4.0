@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -38,11 +38,12 @@ namespace Foam
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-defineNamedTemplateTypeNameAndDebug(blockScalarMatrix, 0);
-defineNamedTemplateTypeNameAndDebug(blockVectorMatrix, 0);
-defineNamedTemplateTypeNameAndDebug(blockSphericalTensorMatrix, 0);
-defineNamedTemplateTypeNameAndDebug(blockSymmTensorMatrix, 0);
-defineNamedTemplateTypeNameAndDebug(blockTensorMatrix, 0);
+// Note: Matrix debug level defaults to 1.  HJ, 4/Jun/2015
+defineNamedTemplateTypeNameAndDebug(blockScalarMatrix, 1);
+defineNamedTemplateTypeNameAndDebug(blockVectorMatrix, 1);
+defineNamedTemplateTypeNameAndDebug(blockSphericalTensorMatrix, 1);
+defineNamedTemplateTypeNameAndDebug(blockSymmTensorMatrix, 1);
+defineNamedTemplateTypeNameAndDebug(blockTensorMatrix, 1);
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

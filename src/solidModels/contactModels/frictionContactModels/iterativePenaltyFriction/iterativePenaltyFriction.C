@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -26,7 +26,7 @@ License
 #include "iterativePenaltyFriction.H"
 #include "addToRunTimeSelectionTable.H"
 #include "zeroGradientFvPatchFields.H"
-#include "PatchToPatchInterpolation.H"
+#include "PatchToPatchInterpolationTemplate.H"
 #include "ggiInterpolation.H"
 #include "constitutiveModel.H"
 #include "fvc.H"
@@ -299,7 +299,7 @@ Foam::iterativePenaltyFriction::iterativePenaltyFriction
 
         // traction to cause slipping
         //scalar slipTrac =
-	//frictionLawPtr_->slipTraction(magSlavePressure[faceI]);
+        //   frictionLawPtr_->slipTraction(magSlavePressure[faceI]);
         vector& slaveTrac = slaveTraction_[faceI];
 
         // if mag(slaveTrac) is greater than slipTrac and

@@ -44,15 +44,6 @@
         dimensionedVector2("zero", dimless, vector2::zero)
     );
 
-    {
-        vector2Field& blockX = blockT.internalField();
-
-        blockMatrixTools::blockInsert(0, T.internalField(), blockX);
-        blockMatrixTools::blockInsert(1, Ts.internalField(), blockX);
-    }
-
-    blockT.write();
-
     Info<< "Reading field U\n" << endl;
 
     volVectorField U

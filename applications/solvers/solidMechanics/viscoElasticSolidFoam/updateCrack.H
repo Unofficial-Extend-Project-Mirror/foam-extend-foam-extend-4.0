@@ -14,7 +14,7 @@
                 );
 
             nCrackedFaces = cohesivePatchDU.updateCrack();
-	    Info << "nCrackedFaces is " << nCrackedFaces << endl;
+            Info << "nCrackedFaces is " << nCrackedFaces << endl;
         }
     }
 }

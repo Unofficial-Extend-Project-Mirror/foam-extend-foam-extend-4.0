@@ -72,7 +72,7 @@ License: 		Unkown
 Name: 			%{name}
 Version: 		%{version}
 Release: 		%{release}
-URL:                    http://ftp.gnu.org/gnu/bison
+URL:                    http://ftpmirror.gnu.org/bison
 Source: 		%url/%{name}-%{version}.tar.gz
 Prefix: 		%{_prefix}
 Group: 			Development/Tools

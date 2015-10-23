@@ -8,4 +8,6 @@ wmake blockCoupledScalarTransportFoam
 wmake conjugateHeatFoam
 wmake conjugateHeatSimpleFoam
 wmake pUCoupledFoam
+wmake MRFPorousFoam
+
 # ----------------------------------------------------------------- end-of-file

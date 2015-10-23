@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -47,39 +47,9 @@ namespace Foam
 {
 
 template<>
-template<>
-void BlockGaussSeidelPrecon<tensor>::BlockSweep
-(
-    Field<tensor>& x,
-    const Field<tensor>& dD,
-    const Field<tensor>& upper,
-    const Field<tensor>& b
-) const
+void BlockGaussSeidelPrecon<tensor>::calcInvDiag()
 {
-    FatalErrorIn
-    (
-        "Foam::BlockGaussSeidelPrecon<tensor>::BlockSweep(...)"
-    )   << "Function not implemented for Type=tensor. " << endl
-        << abort(FatalError);
-}
-
-
-template<>
-template<>
-void BlockGaussSeidelPrecon<tensor>::BlockSweep
-(
-    Field<tensor>& x,
-    const Field<tensor>& dD,
-    const Field<tensor>& upper,
-    const Field<tensor>& lower,
-    const Field<tensor>& b
-) const
-{
-    FatalErrorIn
-    (
-        "Foam::BlockGaussSeidelPrecon<tensor>::BlockSweep(...)"
-    )   << "Function not implemented for Type=tensor. " << endl
-        << abort(FatalError);
+    calcDecoupledInvDiag();
 }
 
 
@@ -91,7 +61,7 @@ void BlockGaussSeidelPrecon<tensor>::precondition
 ) const
 {
     // Decoupled version
-//     decoupledPrecondition(x, b);
+    decoupledPrecondition(x, b);
 }
 
 
@@ -103,7 +73,7 @@ void BlockGaussSeidelPrecon<tensor>::preconditionT
 ) const
 {
     // Decoupled version
-//     decoupledPreconditionT(xT, bT);
+    decoupledPreconditionT(xT, bT);
 }
 
 

@@ -1,6 +1,6 @@
 #include "checkTopology.H"
 #include "polyMesh.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "regionSplit.H"
 #include "cellSet.H"
 #include "faceSet.H"

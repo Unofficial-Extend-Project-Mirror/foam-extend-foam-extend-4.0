@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -86,10 +86,17 @@ class leastSquaresVolPointInterpolation
         void calcA(List<scalarSquareMatrix>& A) const;
 
         //- calc B source for each point
-       void calcB(List<Field<vector> >& B, const GeometricField<vector, fvPatchField, volMesh>&) const;
+       void calcB
+       (
+           List<Field<vector> >& B,
+           const GeometricField<vector, fvPatchField, volMesh>&
+       ) const;
 
         //- Disallow default bitwise copy construct
-        leastSquaresVolPointInterpolation(const leastSquaresVolPointInterpolation&);
+        leastSquaresVolPointInterpolation
+        (
+            const leastSquaresVolPointInterpolation&
+        );
 
         //- Disallow default bitwise assignment
         void operator=(const leastSquaresVolPointInterpolation&);
@@ -121,13 +128,13 @@ public:
 
             virtual bool movePoints() const
             {
-	      return true;
-	    }
+                return true;
+            }
 
             virtual bool updateMesh(const mapPolyMesh&) const
             {
-	      return true;
-	    }
+                return true;
+            }
 
 
     // Interpolation functions
@@ -137,7 +144,7 @@ public:
         void interpolate
         (
             const GeometricField<vector, fvPatchField, volMesh>& vf,
-	    GeometricField<vector, pointPatchField, pointMesh>& pf
+            GeometricField<vector, pointPatchField, pointMesh>& pf
         ) const;
 
 };

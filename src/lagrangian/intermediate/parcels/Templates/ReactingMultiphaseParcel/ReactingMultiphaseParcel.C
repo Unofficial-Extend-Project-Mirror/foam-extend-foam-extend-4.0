@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -535,7 +535,7 @@ void Foam::ReactingMultiphaseParcel<ParcelType>::calcDevolatilisation
     Sh -= dMassTot*td.constProps().LDevol()/dt;
 
     // Molar average molecular weight of carrier mix
-    const scalar Wc = this->rhoc_*specie::RR*this->Tc_/this->pc_;
+    const scalar Wc = this->rhoc_*specie::RR()*this->Tc_/this->pc_;
 
     // Update molar emissions
     forAll(dMassDV, i)

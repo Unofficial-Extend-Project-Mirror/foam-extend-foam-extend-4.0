@@ -1,8 +1,8 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | foam-extend: Open Source CFD                    |
-|  \\    /   O peration     | Version:     3.1                                |
-|   \\  /    A nd           | Web:         http://www.extend-project.de       |
+|  \\    /   O peration     | Version:     3.2                                |
+|   \\  /    A nd           | Web:         http://www.foam-extend.org         |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 FoamFile
@@ -33,18 +33,18 @@ rheology
 
         composite
         {
-	  type            orthotropicLinearElastic;
-	  rho             rho [1 -3 0 0 0 0 0] 7854;
-	  Ex              Ex [1 -1 -2 0 0 0 0] 200e+9;
-	  Ey              Ey [1 -1 -2 0 0 0 0] 200e+9;
-	  Ez              Ez [1 -1 -2 0 0 0 0] 200e+9;
-	  nuxy            nuxy [0 0 0 0 0 0 0] 0.3;
-	  nuyz            nuyz [0 0 0 0 0 0 0] 0.3;
-	  nuzx            nuzx [0 0 0 0 0 0 0] 0.3;
-	  Gxy             Gxy [1 -1 -2 0 0 0 0] 76.923076923e9;
-	  Gyz             Gyz [1 -1 -2 0 0 0 0] 76.923076923e9;
-	  Gzx             Gzx [1 -1 -2 0 0 0 0] 76.923076923e9;
-	}
+            type            orthotropicLinearElastic;
+            rho             rho [1 -3 0 0 0 0 0] 7854;
+            Ex              Ex [1 -1 -2 0 0 0 0] 200e+9;
+            Ey              Ey [1 -1 -2 0 0 0 0] 200e+9;
+            Ez              Ez [1 -1 -2 0 0 0 0] 200e+9;
+            nuxy            nuxy [0 0 0 0 0 0 0] 0.3;
+            nuyz            nuyz [0 0 0 0 0 0 0] 0.3;
+            nuzx            nuzx [0 0 0 0 0 0 0] 0.3;
+            Gxy             Gxy [1 -1 -2 0 0 0 0] 76.923076923e9;
+            Gyz             Gyz [1 -1 -2 0 0 0 0] 76.923076923e9;
+            Gzx             Gzx [1 -1 -2 0 0 0 0] 76.923076923e9;
+        }
     );
 }
 

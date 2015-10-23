@@ -1,4 +1,4 @@
-CPP        = cpp --traditional-cpp $(GFLAGS)
+CPP        = cpp --traditional-cpp $(GFLAGS) -Ddarwin
 LD         = ld
 # LD         = /opt/local/libexec/llvm-3.3/bin/ld
 

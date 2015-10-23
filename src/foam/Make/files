@@ -3,6 +3,12 @@ global/dimensionedConstants/dimensionedConstants.C
 global/argList/argList.C
 global/clock/clock.C
 
+global/controlSwitches/debugSwitch.C
+global/controlSwitches/infoSwitch.C
+global/controlSwitches/optimisationSwitch.C
+global/controlSwitches/tolerancesSwitch.C
+global/controlSwitches/constantsSwitch.C
+
 global/profiling/profilingInfo.C
 global/profiling/profilingPool.C
 global/profiling/profilingStack.C
@@ -26,6 +32,7 @@ $(ints)/label/label.C
 $(ints)/uLabel/uLabel.C
 
 primitives/Scalar/doubleScalar/doubleScalar.C
+primitives/Scalar/longDoubleScalar/longDoubleScalar.C
 primitives/Scalar/floatScalar/floatScalar.C
 primitives/Scalar/scalar/scalar.C
 primitives/DiagTensor/diagTensor/diagTensor.C
@@ -51,8 +58,8 @@ primitives/quaternion/quaternion.C
 primitives/septernion/septernion.C
 
 strings = primitives/strings
-$(strings)/string/string.C
-$(strings)/string/stringIO.C
+$(strings)/string/foamString.C
+$(strings)/string/foamStringIO.C
 $(strings)/word/word.C
 $(strings)/word/wordIO.C
 $(strings)/fileName/fileName.C
@@ -134,8 +141,11 @@ $(StringStreams)/StringStreamsPrint.C
 Pstreams = $(Streams)/Pstreams
 $(Pstreams)/Pstream.C
 $(Pstreams)/PstreamCommsStruct.C
+$(Pstreams)/PstreamGlobals.C
 $(Pstreams)/IPstream.C
 $(Pstreams)/OPstream.C
+$(Pstreams)/IPread.C
+$(Pstreams)/OPwrite.C
 $(Pstreams)/PstreamsPrint.C
 
 dictionary = db/dictionary
@@ -191,8 +201,8 @@ db/functionObjects/outputFilterOutputControl/outputFilterOutputControl.C
 Time = db/Time
 $(Time)/TimePaths.C
 $(Time)/TimeState.C
-$(Time)/Time.C
-$(Time)/TimeIO.C
+$(Time)/foamTime.C
+$(Time)/foamTimeIO.C
 $(Time)/findTimes.C
 $(Time)/subCycleTime.C
 $(Time)/findInstance.C
@@ -212,6 +222,7 @@ dimensionedTypes/dimensionedDiagTensor/dimensionedDiagTensor.C
 dimensionedTypes/dimensionedSymmTensor/dimensionedSymmTensor.C
 dimensionedTypes/dimensionedSymmTensor4thOrder/dimensionedSymmTensor4thOrder.C
 dimensionedTypes/dimensionedTensor/dimensionedTensor.C
+dimensionedTypes/dimensionedVectorTensorN/dimensionedVectorTensorN.C
 
 matrices/solution/solution.C
 matrices/constraint/scalarConstraint.C
@@ -468,7 +479,7 @@ $(mapPolyMesh)/mapDistribute/mapDistribute.C
 $(mapPolyMesh)/mapDistribute/mapDistributePolyMesh.C
 $(mapPolyMesh)/mapAddedPolyMesh.C
 
-PrimitivePatch = $(primitiveMesh)/PrimitivePatch
+PrimitivePatch = $(primitiveMesh)/PrimitivePatchTemplate
 $(PrimitivePatch)/PrimitivePatchName.C
 
 pointMesh = meshes/pointMesh
@@ -678,6 +689,11 @@ matrices/blockLduMatrix/BlockLduPrecons/BlockGaussSeidelPrecon/blockGaussSeidelP
 matrices/blockLduMatrix/BlockLduPrecons/BlockCholeskyPrecon/scalarBlockCholeskyPrecon.C
 matrices/blockLduMatrix/BlockLduPrecons/BlockCholeskyPrecon/tensorBlockCholeskyPrecon.C
 matrices/blockLduMatrix/BlockLduPrecons/BlockCholeskyPrecon/blockCholeskyPrecons.C
+
+matrices/blockLduMatrix/BlockLduPrecons/BlockDiagCholeskyPrecon/scalarBlockDiagCholeskyPrecon.C
+matrices/blockLduMatrix/BlockLduPrecons/BlockDiagCholeskyPrecon/tensorBlockDiagCholeskyPrecon.C
+matrices/blockLduMatrix/BlockLduPrecons/BlockDiagCholeskyPrecon/blockDiagCholeskyPrecons.C
+
 matrices/blockLduMatrix/BlockLduPrecons/BlockAmgPrecon/blockAmgPrecons.C
 
 matrices/blockLduMatrix/BlockLduSmoothers/BlockLduSmoother/blockLduSmoothers.C

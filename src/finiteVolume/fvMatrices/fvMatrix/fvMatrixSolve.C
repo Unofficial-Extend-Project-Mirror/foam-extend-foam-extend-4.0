@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -167,27 +167,6 @@ Foam::lduMatrix::solverPerformance Foam::fvMatrix<Type>::solve
     psi_.correctBoundaryConditions();
 
     return solverPerfVec;
-}
-
-
-template<class Type>
-Foam::autoPtr<typename Foam::fvMatrix<Type>::fvSolver>
-Foam::fvMatrix<Type>::solver()
-{
-    return solver(psi_.mesh().solutionDict().solverDict(psi_.name()));
-}
-
-
-template<class Type>
-Foam::lduMatrix::solverPerformance Foam::fvMatrix<Type>::fvSolver::solve()
-{
-    return solve
-    (
-        fvMat_.psi().mesh().solutionDict().solverDict
-        (
-            fvMat_.psi().name()
-        )
-    );
 }
 
 

@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -37,8 +37,8 @@ Description
 #ifndef overlapGgiInterpolation_H
 #define overlapGgiInterpolation_H
 
-#include "GGIInterpolation.H"
-#include "PrimitivePatch.H"
+#include "GGIInterpolationTemplate.H"
+#include "PrimitivePatchTemplate.H"
 #include "face.H"
 #include "List.H"
 #include "pointField.H"

@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -54,10 +54,10 @@ class MeshedSurfaceIOAllocator
     // Private data
 
         //- Points
-        pointIOField   points_;
+        pointIOField points_;
 
         //- Faces
-        faceIOList     faces_;
+        faceIOList faces_;
 
         //- Surface zones
         surfZoneIOList zones_;

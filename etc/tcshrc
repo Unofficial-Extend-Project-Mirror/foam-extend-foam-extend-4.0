@@ -1,0 +1,69 @@
+#! /usr/bin/env tcsh
+#---------------------------------*-tcsh-*-------------------------------------
+# =========                 |
+# \\      /  F ield         | foam-extend: Open Source CFD
+#  \\    /   O peration     | Version:     3.2
+#   \\  /    A nd           | Web:         http://www.foam-extend.org
+#    \\/     M anipulation  | For copyright notice see file Copyright
+#------------------------------------------------------------------------------
+# License
+#     This file is part of foam-extend.
+#
+#     foam-extend is free software: you can redistribute it and/or modify it
+#     under the terms of the GNU General Public License as published by the
+#     Free Software Foundation, either version 3 of the License, or (at your
+#     option) any later version.
+#
+#     foam-extend is distributed in the hope that it will be useful, but
+#     WITHOUT ANY WARRANTY; without even the implied warranty of
+#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+#     General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
+#
+# Script
+#     etc/zshrc
+#
+# Description
+#     Startup file for OpenFOAM
+#     Sourced from ~/.login or ~/.cshrc
+#
+#------------------------------------------------------------------------------
+
+if ( $?FOAM_SOURCED_FROM_ALIAS ) then
+    # Sourced from an alias or .tcshrc
+    set sourced=($_)
+
+    set thisScript=$FOAM_SOURCED_FROM_ALIAS
+
+    if ( $?sourced ) then
+       # sourced from .tcshrc
+       set sourced=($FOAM_SOURCED_FROM_ALIAS)
+    endif
+    shift sourced
+
+    # Clear the variable to make sure regular sourcing still works
+    unsetenv FOAM_SOURCED_FROM_ALIAS
+else
+    # regular sourcing
+    set sourced=($_)
+    if ( $#sourced == 0 ) then
+        echo "Seems you sourced this script (etc/tcshrc from your foam-extend-installation) from .tcshrc."
+        echo "In that case tcsh has no way of telling where this script is located and is not able to set up the environment correctly"
+        echo "So before sourcing it set the location with 'setenv FOAM_SOURCED_FROM_ALIAS <path to the script>'"
+        echo "Or consider using a different shell"
+    endif
+    set thisScript=($sourced[2])
+
+    shift sourced
+    shift sourced
+endif
+
+set thisDir=`python -c "from os.path import *;import sys;sys.stdout.write(dirname(abspath(join(curdir,'$thisScript'))))"`
+
+$thisDir/getVariables.py tcsh $sourced | source /dev/stdin
+
+unset thisScript thisDir sourced
+
+# -----------------------------------------------------------------------------

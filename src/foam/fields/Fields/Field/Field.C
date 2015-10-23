@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -406,7 +406,6 @@ void Field<Type>::map
         if
         (
             mapper.direct()
-         && &mapper.directAddressing()
          && mapper.directAddressing().size()
         )
         {
@@ -451,7 +450,6 @@ void Field<Type>::autoMap
     (
         (
             mapper.direct()
-         && &mapper.directAddressing()
          && mapper.directAddressing().size()
         )
      || (!mapper.direct() && mapper.addressing().size())

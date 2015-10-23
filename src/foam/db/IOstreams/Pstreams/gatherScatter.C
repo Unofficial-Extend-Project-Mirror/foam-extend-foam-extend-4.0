@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -103,7 +103,7 @@ void Pstream::gather
 template <class T, class BinaryOp>
 void Pstream::gather(T& Value, const BinaryOp& bop)
 {
-    if (Pstream::nProcs() < Pstream::nProcsSimpleSum)
+    if (Pstream::nProcs() < Pstream::nProcsSimpleSum())
     {
         gather(Pstream::linearCommunication(), Value, bop);
     }
@@ -168,7 +168,7 @@ void Pstream::scatter(const List<Pstream::commsStruct>& comms, T& Value)
 template <class T>
 void Pstream::scatter(T& Value)
 {
-    if (Pstream::nProcs() < Pstream::nProcsSimpleSum)
+    if (Pstream::nProcs() < Pstream::nProcsSimpleSum())
     {
         scatter(Pstream::linearCommunication(), Value);
     }

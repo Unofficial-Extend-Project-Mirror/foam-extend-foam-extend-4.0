@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -77,7 +77,6 @@ Foam::tmp<Foam::fvVectorMatrix> Foam::Maxwell::divTau(volVectorField& U) const
       - fvc::laplacian(etaPEff/rho_, U, "laplacian(etaPEff,U)")
       + fvm::laplacian( (etaPEff + etaS_)/rho_, U, "laplacian(etaPEff+etaS,U)")
     );
-
 }
 
 
@@ -86,6 +85,9 @@ void Foam::Maxwell::correct()
     // Velocity gradient tensor
     volTensorField L = fvc::grad(U());
 
+    // Convected derivate term
+    volTensorField C = tau_ & L;
+
     // Twice the rate of deformation tensor
     volSymmTensorField twoD = twoSymm(L);
 
@@ -93,9 +95,11 @@ void Foam::Maxwell::correct()
     fvSymmTensorMatrix tauEqn
     (
         fvm::ddt(tau_)
+      + fvm::div(phi(), tau_)
      ==
         etaP_/lambda_*twoD
-      - fvm::Sp( 1/lambda_, tau_ )
+      + twoSymm(C)
+      - fvm::Sp( 1/lambda_, tau_)
     );
 
     tauEqn.relax();

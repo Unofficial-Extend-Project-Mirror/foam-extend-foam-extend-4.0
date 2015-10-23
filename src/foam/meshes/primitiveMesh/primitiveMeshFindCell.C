@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -25,39 +25,18 @@ License
 
 #include "primitiveMesh.H"
 #include "cell.H"
-
+#include "boundBox.H"
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 // Is the point in the cell bounding box
 bool Foam::primitiveMesh::pointInCellBB(const point& p, label celli) const
 {
-    const pointField& points = this->points();
-    const faceList& f = faces();
-    const vectorField& centres = cellCentres();
-    const cellList& cf = cells();
+    // Make bounding box for check.  All points are local, so no reduce is
+    // needed
+    boundBox bb(cells()[celli].points(faces(), points()), false);
 
-    labelList cellVertices = cf[celli].labels(f);
-
-    vector bbmax = -GREAT*vector::one;
-    vector bbmin = GREAT*vector::one;
-
-    forAll (cellVertices, vertexI)
-    {
-        bbmax = max(bbmax, points[cellVertices[vertexI]]);
-        bbmin = min(bbmin, points[cellVertices[vertexI]]);
-    }
-
-    scalar distance = mag(centres[celli] - p);
-
-    if ((distance - mag(bbmax - bbmin)) < SMALL)
-    {
-        return true;
-    }
-    else
-    {
-        return false;
-    }
+    return bb.contains(p);
 }
 
 

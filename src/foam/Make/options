@@ -1,10 +1,25 @@
-EXE_INC = \
+include $(RULES)/mplib$(WM_MPLIB)
+
+EXE_INC = $(PFLAGS) $(PINC)\
     -I$(WM_THIRD_PARTY_DIR)/zlib-1.2.3
 
-LIB_LIBS = \
+#if defined(mingw)
+
+LIB_LIBS = $(PLIBS)\
     $(FOAM_LIBBIN)/libOSspecific.o \
-    -L$(FOAM_LIBBIN)/dummy -lPstream \
+    -lz \
+    -L$(WM_THIRD_PARTY_DIR)/packages/system/lib \
+    -ldl \
+    -lpsapi \
+    -lpthread
+
+#else
+
+LIB_LIBS = $(PLIBS)\
+    $(FOAM_LIBBIN)/libOSspecific.o \
     -lz
+
+#endif
 
 $(OBJECTS_DIR)/global.o: FORCE
 

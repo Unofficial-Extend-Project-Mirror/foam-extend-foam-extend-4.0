@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -94,7 +94,7 @@ void blobsSheetAtomization::atomizeParcel
     {
         Winv += Y[i][cellI]/spray_.gasProperties()[i].W();
     }
-    scalar R = specie::RR*Winv;
+    scalar R = specie::RR()*Winv;
 
     // ideal gas law to evaluate density
     scalar rhoAverage = pressure/R/Taverage;

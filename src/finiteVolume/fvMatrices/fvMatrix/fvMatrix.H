@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -178,37 +178,7 @@ class fvMatrix
 
 public:
 
-    //- Solver class returned by the solver function
-    //  used for systems in which it is useful to cache the solver for reuse
-    class fvSolver
-    {
-        fvMatrix<Type>& fvMat_;
-
-        autoPtr<lduSolver> solver_;
-
-    public:
-
-        // Constructors
-
-            fvSolver(fvMatrix<Type>& fvMat, autoPtr<lduSolver> sol)
-            :
-                fvMat_(fvMat),
-                solver_(sol)
-            {}
-
-
-        // Member functions
-
-            //- Solve returning the solution statistics.
-            //  Use the given solver controls
-            lduSolverPerformance solve(const dictionary&);
-
-            //- Solve returning the solution statistics.
-            //  Solver controls read from fvSolution
-            lduSolverPerformance solve();
-    };
-
-
+    // Declare name of the class
     ClassName("fvMatrix");
 
 
@@ -391,14 +361,6 @@ public:
             //- Complete matrix assembly for solution:
             //  Manipulate based on a boundary field
             void completeAssembly();
-
-            //- Construct and return the solver
-            //  Use the given solver controls
-            autoPtr<fvSolver> solver(const dictionary&);
-
-            //- Construct and return the solver
-            //  Solver controls read from fvSolution
-            autoPtr<fvSolver> solver();
 
             //- Solve returning the solution statistics.
             //  Use the given solver controls

@@ -40,9 +40,11 @@
 # Requirements:
 #     1: Your foam-extend environment must be properly initialized
 #     2: AllMake.stage1 if you are overriding your system compiler
+#     3: The file etc/prefs.sh should be used for setting the variables enabling
+#        the compilation of the various packages
 #
 # Author:
-#     Martin Beaudoin, Hydro-Quebec, (2010)
+#     Martin Beaudoin, Hydro-Quebec, (2015)
 # 
 #------------------------------------------------------------------------------
 # run from third-party directory only
@@ -65,10 +67,43 @@ echo
 if [ "$WM_MPLIB" != "SYSTEMOPENMPI" ]
 then
     # MPI
-    #( rpm_make -p openmpi-1.4.1 -s openmpi-1.4.1.spec  -u http://www.open-mpi.org/software/ompi/v1.4/downloads/openmpi-1.4.1.tar.gz )
-    #( rpm_make -p openmpi-1.5   -s openmpi-1.5.spec    -u http://www.open-mpi.org/software/ompi/v1.5/downloads/openmpi-1.5.tar.gz   )
-    #( rpm_make -p openmpi-1.4.3 -s openmpi-1.4.3.spec  -u http://www.open-mpi.org/software/ompi/v1.4/downloads/openmpi-1.4.3.tar.gz )
-     ( rpm_make -p openmpi-1.6.5 -s openmpi-1.6.5.spec  -u http://downloads.sourceforge.net/project/openfoam-extend/foam-extend-3.1/ThirdParty/openmpi-1.6.5.tar.gz )
+
+    # openmpi 1.4.1
+    #
+    [ ! -z "$WM_THIRD_PARTY_USE_OPENMPI_141" ] && {
+	echo "Building openmpi 1.4.1"
+	( rpm_make -p openmpi-1.4.1 -s openmpi-1.4.1.spec  -u http://www.open-mpi.org/software/ompi/v1.4/downloads/openmpi-1.4.1.tar.gz )
+    }
+
+    # openmpi 1.4.3
+    #
+    [ ! -z "$WM_THIRD_PARTY_USE_OPENMPI_143" ] && {
+	echo "Building openmpi 1.4.3"
+	( rpm_make -p openmpi-1.4.3 -s openmpi-1.4.3.spec  -u http://www.open-mpi.org/software/ompi/v1.4/downloads/openmpi-1.4.3.tar.gz )
+    }
+
+    # openmpi 1.5
+    #
+    [ ! -z "$WM_THIRD_PARTY_USE_OPENMPI_15" ] && {
+	echo "Building openmpi 1.5"
+	( rpm_make -p openmpi-1.5   -s openmpi-1.5.spec    -u http://www.open-mpi.org/software/ompi/v1.5/downloads/openmpi-1.5.tar.gz   )
+    }
+
+    # openmpi 1.6.5
+    #
+    [ ! -z "$WM_THIRD_PARTY_USE_OPENMPI_165" ] && {
+	echo "Building openmpi 1.6.5"
+	( rpm_make -p openmpi-1.6.5 -s openmpi-1.6.5.spec  -u http://www.open-mpi.org/software/ompi/v1.6/downloads/openmpi-1.6.5.tar.gz \
+          -f --define '_configureAdditionalArgs "$WM_THIRD_PARTY_USE_OPENMPI_165_ConfigureAdditionalArgs"')
+    }
+
+    # openmpi 1.8.8
+    #
+    [ ! -z "$WM_THIRD_PARTY_USE_OPENMPI_188" ] && {
+	echo "Building openmpi 1.8.8"
+	( rpm_make -p openmpi-1.8.8 -s openmpi-1.8.8.spec  -u http://www.open-mpi.org/software/ompi/v1.8/downloads/openmpi-1.8.8.tar.gz \
+          -f --define '_configureAdditionalArgs "$WM_THIRD_PARTY_USE_OPENMPI_188_ConfigureAdditionalArgs"')
+    }
 else
     echo "Using system installed OpenMPI"
     echo ""

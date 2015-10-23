@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -34,6 +34,14 @@ namespace Foam
 {
     defineTypeNameAndDebug(leastSquaresVectors, 0);
 }
+
+
+const Foam::debug::tolerancesSwitch
+Foam::leastSquaresVectors::smallDotProdTol_
+(
+    "leastSquaresSmallDotProdTol",
+    0.1
+);
 
 
 // * * * * * * * * * * * * * * * * Constructors * * * * * * * * * * * * * * //
@@ -106,7 +114,7 @@ void Foam::leastSquaresVectors::makeLeastSquaresVectors() const
     // Set up temporary storage for the dd tensor (before inversion)
     symmTensorField dd(mesh().nCells(), symmTensor::zero);
 
-    forAll(owner, faceI)
+    forAll (owner, faceI)
     {
         label own = owner[faceI];
         label nei = neighbour[faceI];
@@ -118,18 +126,29 @@ void Foam::leastSquaresVectors::makeLeastSquaresVectors() const
         dd[nei] += wdd;
     }
 
-    forAll(lsP.boundaryField(), patchI)
+    forAll (lsP.boundaryField(), patchI)
     {
         const fvPatch& p = mesh().boundary()[patchI];
-        const unallocLabelList& faceCells = p.patch().faceCells();
+        const unallocLabelList& fc = p.patch().faceCells();
 
         // Better version of d-vectors: Zeljko Tukovic, 25/Apr/2010
         const vectorField pd = p.delta();
 
-        forAll(pd, patchFaceI)
+        if (p.coupled())
         {
-            const vector& d = pd[patchFaceI];
-            dd[faceCells[patchFaceI]] += (1.0/magSqr(d))*sqr(d);
+            forAll (pd, pFaceI)
+            {
+                const vector& d = pd[pFaceI];
+                dd[fc[pFaceI]] += (1.0/magSqr(d))*sqr(d);
+            }
+        }
+        else
+        {
+            forAll (pd, pFaceI)
+            {
+                const vector& d = pd[pFaceI];
+                dd[fc[pFaceI]] += (1.0/magSqr(d))*sqr(d);
+            }
         }
     }
 
@@ -147,9 +166,12 @@ void Foam::leastSquaresVectors::makeLeastSquaresVectors() const
         ),
         mesh(),
         dimensionedSymmTensor("zero", dimless, symmTensor::zero),
-        "zeroGradient"
+        zeroGradientFvPatchScalarField::typeName
     );
     symmTensorField& invDd = volInvDd.internalField();
+
+    // Invert least squares matrix using Householder transformations to avoid
+    // badly posed cells
 //    invDd = inv(dd);
     invDd = hinv(dd);
 
@@ -158,7 +180,11 @@ void Foam::leastSquaresVectors::makeLeastSquaresVectors() const
     volInvDd.boundaryField().evaluateCoupled();
 
     // Revisit all faces and calculate the lsP and lsN vectors
-    forAll(owner, faceI)
+    vectorField& lsPIn = lsP.internalField();
+    vectorField& lsNIn = lsN.internalField();
+
+    // Least squares vectors on internal faces
+    forAll (owner, faceI)
     {
         label own = owner[faceI];
         label nei = neighbour[faceI];
@@ -166,16 +192,17 @@ void Foam::leastSquaresVectors::makeLeastSquaresVectors() const
         vector d = C[nei] - C[own];
         scalar magSfByMagSqrd = 1.0/magSqr(d);
 
-        lsP[faceI] = magSfByMagSqrd*(invDd[own] & d);
-        lsN[faceI] = -magSfByMagSqrd*(invDd[nei] & d);
+        lsPIn[faceI] = magSfByMagSqrd*(invDd[own] & d);
+        lsNIn[faceI] = -magSfByMagSqrd*(invDd[nei] & d);
     }
 
-    forAll(lsP.boundaryField(), patchI)
+    // Least squares vectors on boundary faces
+    forAll (lsP.boundaryField(), patchI)
     {
         fvsPatchVectorField& patchLsP = lsP.boundaryField()[patchI];
         fvsPatchVectorField& patchLsN = lsN.boundaryField()[patchI];
         const fvPatch& p = mesh().boundary()[patchI];
-        const unallocLabelList& faceCells = p.faceCells();
+        const unallocLabelList& fc = p.faceCells();
 
         // Better version of d-vectors: Zeljko Tukovic, 25/Apr/2010
         const vectorField pd = p.delta();
@@ -185,26 +212,242 @@ void Foam::leastSquaresVectors::makeLeastSquaresVectors() const
             const symmTensorField invDdNei =
                 volInvDd.boundaryField()[patchI].patchNeighbourField();
 
-            forAll(pd, patchFaceI)
+            forAll (pd, pFaceI)
             {
-                const vector& d = pd[patchFaceI];
+                const vector& d = pd[pFaceI];
 
-                patchLsP[patchFaceI] = (1.0/magSqr(d))
-                   *(invDd[faceCells[patchFaceI]] & d);
+                patchLsP[pFaceI] = (1.0/magSqr(d))*(invDd[fc[pFaceI]] & d);
 
-                patchLsN[patchFaceI] = - (1.0/magSqr(d))
-                   *(invDdNei[patchFaceI] & d);
+                patchLsN[pFaceI] = - (1.0/magSqr(d))*(invDdNei[pFaceI] & d);
             }
         }
         else
         {
-            forAll(pd, patchFaceI)
+            forAll (pd, pFaceI)
             {
-                const vector& d = pd[patchFaceI];
+                const vector& d = pd[pFaceI];
 
-                patchLsP[patchFaceI] = (1.0/magSqr(d))
-                   *(invDd[faceCells[patchFaceI]] & d);
+                patchLsP[pFaceI] = (1.0/magSqr(d))*(invDd[fc[pFaceI]] & d);
             }
+        }
+    }
+
+    // Coefficient sign correction on least squares vectors
+    // The sign of the coefficient must be positive to ensure correct
+    // behaviour in coupled systems.  This is checked by evaluating
+    // dot-product of the P/N vectors with the face area vector.
+    // If the dot-product is negative, cell is marked for use with the
+    // Gauss gradient, which is unconditionally positive
+    // HJ, 21/Apr/2015
+
+    // First loop: detect cells with bad least squares vectors
+
+    // Use Gauss Gradient field: set to 1 if Gauss is needed
+    volScalarField useGaussGrad
+    (
+        IOobject
+        (
+            "useGaussGrad",
+            mesh().pointsInstance(),
+            mesh(),
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        ),
+        mesh(),
+        dimensionedScalar("zero", dimVolume, 0),
+        zeroGradientFvPatchScalarField::typeName
+    );
+
+    const surfaceVectorField& Sf = mesh().Sf();
+    const surfaceScalarField& w = mesh().weights();
+
+    const vectorField& SfIn = Sf.internalField();
+    const scalarField& wIn = w.internalField();
+    scalarField& uggIn = useGaussGrad.internalField();
+
+    // Check internal faces
+    forAll (owner, faceI)
+    {
+        if
+        (
+            (lsPIn[faceI] & SfIn[faceI])/(mag(lsPIn[faceI])*mag(SfIn[faceI]))
+          < smallDotProdTol_()
+        )
+        {
+            // Least square points in the wrong direction for owner
+            // Use Gauss gradient
+            uggIn[owner[faceI]] = 1;
+        }
+
+        if
+        (
+            (lsNIn[faceI] & SfIn[faceI])/(mag(lsNIn[faceI])*mag(SfIn[faceI]))
+          > -smallDotProdTol_()
+        )
+        {
+            // Least square points in the wrong direction for owner.
+            // Note that Sf points into neighbour cell
+            // Use Gauss gradient
+            uggIn[neighbour[faceI]] = 1;
+        }
+    }
+
+    forAll (lsP.boundaryField(), patchI)
+    {
+        fvsPatchVectorField& patchLsP = lsP.boundaryField()[patchI];
+        const vectorField& pSf = Sf.boundaryField()[patchI];
+        const fvPatch& p = mesh().boundary()[patchI];
+        const unallocLabelList& fc = p.faceCells();
+
+        // Same check for coupled and uncoupled
+        forAll (patchLsP, pFaceI)
+        {
+            if
+            (
+                (patchLsP[pFaceI] & pSf[pFaceI])/
+                (mag(patchLsP[pFaceI])*mag(pSf[pFaceI]))
+              < smallDotProdTol_
+            )
+            {
+                uggIn[fc[pFaceI]] = 1;
+            }
+        }
+    }
+
+    // Update boundary conditions for coupled boundaries.  This synchronises
+    // the Gauss grad indication field
+    useGaussGrad.boundaryField().evaluateCoupled();
+
+    // Replace least square vectors with weighted Gauss gradient vectors
+    // for marked cells
+
+    // Prepare cell volumes with parallel communications
+    volScalarField cellV
+    (
+        IOobject
+        (
+            "cellV",
+            mesh().pointsInstance(),
+            mesh(),
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        ),
+        mesh(),
+        dimensionedScalar("zero", dimVolume, 0),
+        zeroGradientFvPatchScalarField::typeName
+    );
+    cellV.internalField() = mesh().V();
+
+    // Evaluate coupled to exchange coupled neighbour field data
+    // across coupled boundaries.  HJ, 18/Mar/2015
+    cellV.boundaryField().evaluateCoupled();
+
+    const scalarField& cellVIn = cellV.internalField();
+
+    // Internal faces
+    forAll (owner, faceI)
+    {
+        label own = owner[faceI];
+        label nei = neighbour[faceI];
+
+        if (uggIn[own] > SMALL)
+        {
+            // Gauss gradient for owner cell
+            lsPIn[faceI] = (1 - wIn[faceI])*SfIn[faceI]/cellVIn[own];
+        }
+
+        if (uggIn[nei] > SMALL)
+        {
+            // Gauss gradient for neighbour cell
+            lsNIn[faceI] = -wIn[faceI]*SfIn[faceI]/cellVIn[nei];
+        }
+    }
+
+    // Boundary faces
+    forAll (lsP.boundaryField(), patchI)
+    {
+        fvsPatchVectorField& patchLsP = lsP.boundaryField()[patchI];
+        fvsPatchVectorField& patchLsN = lsN.boundaryField()[patchI];
+        const fvPatch& p = mesh().boundary()[patchI];
+        const unallocLabelList& fc = p.faceCells();
+
+        const fvsPatchScalarField& pw = w.boundaryField()[patchI];
+        const vectorField& pSf = Sf.boundaryField()[patchI];
+
+        // Get indicator for local side
+        const fvPatchScalarField& ugg = useGaussGrad.boundaryField()[patchI];
+        const scalarField pUgg = ugg.patchInternalField();
+
+        if (p.coupled())
+        {
+            const scalarField cellVInNei =
+                cellV.boundaryField()[patchI].patchNeighbourField();
+
+            // Get indicator for neighbour side
+            const scalarField nUgg = ugg.patchNeighbourField();
+
+            forAll (pUgg, pFaceI)
+            {
+                if (pUgg[pFaceI] > SMALL)
+                {
+                    // Gauss grad for owner cell
+                    patchLsP[pFaceI] =
+                        (1 - pw[pFaceI])*pSf[pFaceI]/cellVIn[fc[pFaceI]];
+                }
+
+                if (nUgg[pFaceI] > SMALL)
+                {
+                    // Gauss gradient for neighbour cell
+                    patchLsN[pFaceI] =
+                        -pw[pFaceI]*pSf[pFaceI]/cellVInNei[pFaceI];
+                }
+            }
+        }
+        else
+        {
+            forAll (pUgg, pFaceI)
+            {
+                if (pUgg[pFaceI] > SMALL)
+                {
+                    // Gauss grad for owner cell
+                    patchLsP[pFaceI] =
+                        (1 - pw[pFaceI])*pSf[pFaceI]/cellVIn[fc[pFaceI]];
+                }
+            }
+        }
+    }
+
+    // Manual check of least squares vectors
+
+    vectorField sumLsq(mesh().nCells(), vector::zero);
+    vectorField sumSf(mesh().nCells(), vector::zero);
+
+    const vectorField& sfIn = mesh().Sf().internalField();
+
+    // Least squares vectors on internal faces
+    forAll (owner, faceI)
+    {
+        sumLsq[owner[faceI]] += lsPIn[faceI];
+        sumLsq[neighbour[faceI]] += lsNIn[faceI];
+
+        sumSf[owner[faceI]] += sfIn[faceI];
+        sumSf[neighbour[faceI]] -= sfIn[faceI];
+    }
+
+    // Least squares vectors on boundary faces
+    forAll (lsP.boundaryField(), patchI)
+    {
+        const vectorField& patchLsP = lsP.boundaryField()[patchI];
+        const vectorField& patchSf = mesh().Sf().boundaryField()[patchI];
+
+        const unallocLabelList& fc = mesh().boundary()[patchI].faceCells();
+
+        forAll (fc, pFaceI)
+        {
+            //sumLsq[fc[pFaceI]] += 0.5*patchLsP[pFaceI]; // works!!!
+            sumLsq[fc[pFaceI]] += patchLsP[pFaceI];
+
+            sumSf[fc[pFaceI]] += patchSf[pFaceI];
         }
     }
 

@@ -37,7 +37,7 @@
     (
         fluidMesh.boundaryMesh()[fluidInterfacePatchID],
         mesh.boundaryMesh()[interfacePatchID],
-	intersection::VISIBLE
+        intersection::VISIBLE
     );
 
     scalarField error =

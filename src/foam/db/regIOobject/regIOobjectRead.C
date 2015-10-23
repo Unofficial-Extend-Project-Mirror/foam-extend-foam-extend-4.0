@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -154,7 +154,7 @@ bool Foam::regIOobject::modified() const
     return
     (
         lastModified_
-     && lastModified(filePath()) > (lastModified_ + fileModificationSkew)
+     && lastModified(filePath()) > (lastModified_ + fileModificationSkew())
     );
 }
 
@@ -167,7 +167,7 @@ bool Foam::regIOobject::readIfModified()
 
         bool readFile = false;
 
-        if (newTimeStamp > (lastModified_ + fileModificationSkew))
+        if (newTimeStamp > (lastModified_ + fileModificationSkew()))
         {
             readFile = true;
         }

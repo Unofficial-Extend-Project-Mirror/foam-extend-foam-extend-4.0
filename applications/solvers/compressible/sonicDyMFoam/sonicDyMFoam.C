@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -25,11 +25,14 @@ Application
     sonicDyMFoam
 
 Description
-    Transient solver for trans-sonic/supersonic for laminar or flow of a
-    compressible gas with support for mesh motion and topological changes
+    Transient solver for trans-sonic/supersonic for laminar or turbulent
+    flow of a compressible gas with support for mesh motion and
+    topological changes
 
     Uses the flexible PIMPLE (PISO-SIMPLE) solution for time-resolved and
     pseudo-transient simulations.
+
+    Turbulence modelling is generic, i.e. laminar, RAS or LES may be selected.
 
     Updated from sonicFoamAutoMotion by Hrvoje Jasak
 
@@ -82,9 +85,10 @@ int main(int argc, char *argv[])
         // Mesh motion update
         if (meshChanged)
         {
-            T.correctBoundaryConditions();
-            p.correctBoundaryConditions();
-            e.correctBoundaryConditions();
+            T.max(TMin);
+            p.max(pMin);
+            e == max(e, thermo.Cv()*TMin);
+
             thermo.correct();
             rho = thermo.rho();
 

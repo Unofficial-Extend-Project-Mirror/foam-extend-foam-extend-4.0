@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -35,11 +35,12 @@ License
 
 defineTypeNameAndDebug(Foam::octreeDataBoundBox, 0);
 
-Foam::scalar Foam::octreeDataBoundBox::tol
+const Foam::debug::tolerancesSwitch
+Foam::octreeDataBoundBox::tol
 (
-    debug::tolerances("octreeDataBoundBoxTol", 1e-6)
+    "octreeDataBoundBoxTol",
+    1e-6
 );
-
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 

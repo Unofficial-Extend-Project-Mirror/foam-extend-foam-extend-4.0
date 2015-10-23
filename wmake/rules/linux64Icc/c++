@@ -18,4 +18,4 @@ cpptoo      = $(Ctoo)
 LINK_LIBS   = $(c++DBUG) -lrt
 
 LINKLIBSO   = $(CC) $(c++FLAGS) -shared
-LINKEXE     = $(CC) $(c++FLAGS) -L$(FOAM_MPI_LIBBIN) -lPstream
+LINKEXE     = $(CC) $(c++FLAGS)

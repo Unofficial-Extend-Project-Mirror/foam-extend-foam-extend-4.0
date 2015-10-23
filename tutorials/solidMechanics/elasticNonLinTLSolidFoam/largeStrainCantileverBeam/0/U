@@ -1,8 +1,8 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | foam-extend: Open Source CFD                    |
-|  \\    /   O peration     | Version:     3.1                                |
-|   \\  /    A nd           | Web:         http://www.extend-project.de       |
+|  \\    /   O peration     | Version:     3.2                                |
+|   \\  /    A nd           | Web:         http://www.foam-extend.org         |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 FoamFile
@@ -22,42 +22,42 @@ internalField   uniform (0 0 0);
 boundaryField
 {
     left
-      {
-	type     fixedDisplacement;
-	value    uniform (0 0 0);
-      }
+    {
+        type     fixedDisplacement;
+        value    uniform (0 0 0);
+    }
 
     right
-      {
-	type      solidTraction;
-	nonLinear totalLagrangian;
-	traction  uniform (0 -1e8 0);
-	pressure  uniform 0;
-	value     uniform (0 0 0);
-      }
+    {
+        type      solidTraction;
+        nonLinear totalLagrangian;
+        traction  uniform (0 -1e8 0);
+        pressure  uniform 0;
+        value     uniform (0 0 0);
+    }
 
     top
-      {
-	type      solidTraction;
-	nonLinear totalLagrangian;
-	traction  uniform (0 0 0);
-	pressure  uniform 0;
-	value     uniform (0 0 0);
-      }
+    {
+        type      solidTraction;
+        nonLinear totalLagrangian;
+        traction  uniform (0 0 0);
+        pressure  uniform 0;
+        value     uniform (0 0 0);
+    }
 
     bottom
-      {
-	type      solidTraction;
-	nonLinear totalLagrangian;
-	traction  uniform (0 0 0);
-	pressure  uniform 0;
-	value     uniform (0 0 0);
-      }
+    {
+        type      solidTraction;
+        nonLinear totalLagrangian;
+        traction  uniform (0 0 0);
+        pressure  uniform 0;
+        value     uniform (0 0 0);
+    }
 
     frontAndBack
-      {
-	type empty;
-      }
+    {
+        type empty;
+    }
 }
 
 // ************************************************************************* //

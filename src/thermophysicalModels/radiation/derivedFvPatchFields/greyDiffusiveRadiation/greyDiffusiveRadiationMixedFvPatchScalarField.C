@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -29,13 +29,64 @@ License
 #include "volFields.H"
 
 #include "fvDOM.H"
-#include "radiationConstants.H"
-#include "mathematicalConstants.H"
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+namespace Foam
+{
+namespace radiation
+{
+// * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
+
+void
+greyDiffusiveRadiationMixedFvPatchScalarField::calcSumOutgoingAngles() const
+{
+    if (sumOutgoingAnglesPtr_)
+    {
+        FatalErrorIn
+        (
+            "wideBandDiffusiveRadiationMixedFvPatchScalarField"
+            "::calcSumOutgoingAngles()"
+        )   << "sumOutgoingAnglesPtr_ already calculated"
+            << abort(FatalError);
+    }
+
+    sumOutgoingAnglesPtr_ = new scalarField(this->size(), 0.);
+    scalarField& sumOutgoingAngles = *sumOutgoingAnglesPtr_;
+
+
+    // Get access to radiation model, and recast as fvDOM
+    const radiationModel& radiation =
+        db().lookupObject<radiationModel>("radiationProperties");
+
+    const fvDOM& dom = dynamic_cast<const fvDOM&>(radiation);
+
+
+    for(label rayI = 0; rayI < dom.nRay(); rayI++)
+    {
+        // Calculate cosine of angle between face and ray
+        scalarField outgoingAngles = this->patch().nf() & dom.IRay(rayI).dAve();
+
+        // For outgoing rays, outgoingAngles will be negative
+        sumOutgoingAngles += neg(outgoingAngles)*(-outgoingAngles);
+    }
+}
+
+const Foam::scalarField&
+greyDiffusiveRadiationMixedFvPatchScalarField::sumOutgoingAngles() const
+{
+    if (!sumOutgoingAnglesPtr_)
+    {
+        calcSumOutgoingAngles();
+    }
+
+    return *sumOutgoingAnglesPtr_;
+}
 
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-Foam::radiation::greyDiffusiveRadiationMixedFvPatchScalarField::
+greyDiffusiveRadiationMixedFvPatchScalarField::
 greyDiffusiveRadiationMixedFvPatchScalarField
 (
     const fvPatch& p,
@@ -44,7 +95,8 @@ greyDiffusiveRadiationMixedFvPatchScalarField
 :
     mixedFvPatchScalarField(p, iF),
     TName_("undefinedT"),
-    emissivity_(0.0)
+    emissivity_(0.0),
+    sumOutgoingAnglesPtr_(NULL)
 {
     refValue() = 0.0;
     refGrad() = 0.0;
@@ -52,7 +104,7 @@ greyDiffusiveRadiationMixedFvPatchScalarField
 }
 
 
-Foam::radiation::greyDiffusiveRadiationMixedFvPatchScalarField::
+greyDiffusiveRadiationMixedFvPatchScalarField::
 greyDiffusiveRadiationMixedFvPatchScalarField
 (
     const greyDiffusiveRadiationMixedFvPatchScalarField& ptf,
@@ -63,11 +115,12 @@ greyDiffusiveRadiationMixedFvPatchScalarField
 :
     mixedFvPatchScalarField(ptf, p, iF, mapper),
     TName_(ptf.TName_),
-    emissivity_(ptf.emissivity_)
+    emissivity_(ptf.emissivity_),
+    sumOutgoingAnglesPtr_(NULL)
 {}
 
 
-Foam::radiation::greyDiffusiveRadiationMixedFvPatchScalarField::
+greyDiffusiveRadiationMixedFvPatchScalarField::
 greyDiffusiveRadiationMixedFvPatchScalarField
 (
     const fvPatch& p,
@@ -77,7 +130,8 @@ greyDiffusiveRadiationMixedFvPatchScalarField
 :
     mixedFvPatchScalarField(p, iF),
     TName_(dict.lookup("T")),
-    emissivity_(readScalar(dict.lookup("emissivity")))
+    emissivity_(readScalar(dict.lookup("emissivity"))),
+    sumOutgoingAnglesPtr_(NULL)
 {
     if (dict.found("refValue"))
     {
@@ -110,7 +164,7 @@ greyDiffusiveRadiationMixedFvPatchScalarField
 }
 
 
-Foam::radiation::greyDiffusiveRadiationMixedFvPatchScalarField::
+greyDiffusiveRadiationMixedFvPatchScalarField::
 greyDiffusiveRadiationMixedFvPatchScalarField
 (
     const greyDiffusiveRadiationMixedFvPatchScalarField& ptf
@@ -118,11 +172,12 @@ greyDiffusiveRadiationMixedFvPatchScalarField
 :
     mixedFvPatchScalarField(ptf),
     TName_(ptf.TName_),
-    emissivity_(ptf.emissivity_)
+    emissivity_(ptf.emissivity_),
+    sumOutgoingAnglesPtr_(NULL)
 {}
 
 
-Foam::radiation::greyDiffusiveRadiationMixedFvPatchScalarField::
+greyDiffusiveRadiationMixedFvPatchScalarField::
 greyDiffusiveRadiationMixedFvPatchScalarField
 (
     const greyDiffusiveRadiationMixedFvPatchScalarField& ptf,
@@ -131,100 +186,88 @@ greyDiffusiveRadiationMixedFvPatchScalarField
 :
     mixedFvPatchScalarField(ptf, iF),
     TName_(ptf.TName_),
-    emissivity_(ptf.emissivity_)
+    emissivity_(ptf.emissivity_),
+    sumOutgoingAnglesPtr_(NULL)
 {}
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-void Foam::radiation::greyDiffusiveRadiationMixedFvPatchScalarField::
-updateCoeffs()
+void greyDiffusiveRadiationMixedFvPatchScalarField::updateCoeffs()
 {
     if (this->updated())
     {
         return;
     }
 
-    const scalarField& Tp =
-        lookupPatchField<volScalarField, scalar>(TName_);
 
+
+
+    const label patchI = this->patch().index();
+
+    // Access radiation model
     const radiationModel& radiation =
         db().lookupObject<radiationModel>("radiationProperties");
 
-    const fvDOM& dom(refCast<const fvDOM>(radiation));
+    const fvDOM& dom = dynamic_cast<const fvDOM&>(radiation);
 
+    if (dom.nLambda() == 0)
+    {
+        FatalErrorIn
+        (
+            ""
+            "wideBandDiffusiveRadiationMixedFvPatchScalarField::updateCoeffs"
+        )   << " a non-grey boundary condition is used with a grey "
+            << "absorption model" << nl << exit(FatalError);
+    }
+
+    // Get rayId and lambda Id for this ray
     label rayId = -1;
     label lambdaId = -1;
     dom.setRayIdLambdaId(dimensionedInternalField().name(), rayId, lambdaId);
 
-    const label patchI = patch().index();
+    // Make shortcut to ray belonging to this field
+    const radiativeIntensityRay& ray = dom.IRay(rayId);
 
-    if (dom.nLambda() != 1)
-    {
-        FatalErrorIn
+    // Access incoming radiation for this patch for this band
+    const scalarField& Qin = dom.Qin(lambdaId)[patchI];
+
+    // Access black body radiation for this patch for this band
+    const scalarField& Eb =
+        dom.blackBody().bLambda(lambdaId).boundaryField()[patchI];
+
+    // Get face normals
+    vectorField nHat = patch().nf();
+
+    // Calculate cos of incoming angle of current ray with every face
+    scalarField incomingAngle = this->patch().nf() & ray.dAve();
+
+    // Set to zeroGradient (=0; incomingAngle > 0) for faces with incoming rays
+    // and to fixedValue (=1; incomingAngle < 0) for outgoing rays
+    this->valueFraction() = neg(incomingAngle);
+
+    // Set intensity value for fixedValue part (see reference in header file)
+    this->refValue() =
+        emissivity_*Eb + ((1 - emissivity_)*Qin)/sumOutgoingAngles();
+
+    // Update boundary field now, so values for incoming and outgoing rays
+    // are in balance
+    scalarField::operator=
+    (
+        this->valueFraction()*this->refValue()
+      +
+        (1.0 - this->valueFraction())*
         (
-            "Foam::radiation::"
-            "greyDiffusiveRadiationMixedFvPatchScalarField::updateCoeffs"
-        )   << " a grey boundary condition is used with a non-grey "
-            << "absorption model" << nl << exit(FatalError);
-    }
-
-    scalarField& Iw = *this;
-    vectorField n = patch().Sf()/patch().magSf();
-
-    radiativeIntensityRay& ray =
-        const_cast<radiativeIntensityRay&>(dom.IRay(rayId));
-
-    ray.Qr().boundaryField()[patchI] += Iw*(n & ray.dAve());
-
-    forAll(Iw, faceI)
-    {
-        scalar Ir = 0.0;
-
-        for (label rayI=0; rayI < dom.nRay(); rayI++)
-        {
-            const vector& d = dom.IRay(rayI).d();
-
-            const scalarField& IFace =
-                dom.IRay(rayI).ILambda(lambdaId).boundaryField()[patchI];
-
-            if ((-n[faceI] & d) < 0.0)
-            {
-                // q into the wall
-                const vector& dAve = dom.IRay(rayI).dAve();
-                Ir += IFace[faceI]*mag(n[faceI] & dAve);
-            }
-        }
-
-        const vector& d = dom.IRay(rayId).d();
-
-        if ((-n[faceI] & d) > 0.0)
-        {
-            // direction out of the wall
-            refGrad()[faceI] = 0.0;
-            valueFraction()[faceI] = 1.0;
-            refValue()[faceI] =
-                (
-                    Ir*(1.0 - emissivity_)
-                  + emissivity_*radiation::sigmaSB.value()*pow4(Tp[faceI])
-                )
-               /mathematicalConstant::pi;
-
-        }
-        else
-        {
-            // direction into the wall
-            valueFraction()[faceI] = 0.0;
-            refGrad()[faceI] = 0.0;
-            refValue()[faceI] = 0.0; //not used
-        }
-    }
+            this->patchInternalField()
+          + this->refGrad()/this->patch().deltaCoeffs()
+        )
+    );
 
     mixedFvPatchScalarField::updateCoeffs();
 }
 
 
-void Foam::radiation::greyDiffusiveRadiationMixedFvPatchScalarField::write
+void greyDiffusiveRadiationMixedFvPatchScalarField::write
 (
     Ostream& os
 ) const
@@ -237,17 +280,13 @@ void Foam::radiation::greyDiffusiveRadiationMixedFvPatchScalarField::write
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-namespace Foam
-{
-namespace radiation
-{
-    makePatchTypeField
-    (
-        fvPatchScalarField,
-        greyDiffusiveRadiationMixedFvPatchScalarField
-    );
-}
-}
+makePatchTypeField
+(
+    fvPatchScalarField,
+    greyDiffusiveRadiationMixedFvPatchScalarField
+);
 
+} // End namespace radiation
+} // End namespace Foam
 
 // ************************************************************************* //

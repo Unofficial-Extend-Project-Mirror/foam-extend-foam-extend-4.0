@@ -1,0 +1,3 @@
+potentialIbFoam.C
+
+EXE = $(FOAM_APPBIN)/potentialIbFoam

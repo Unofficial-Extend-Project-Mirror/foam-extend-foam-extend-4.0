@@ -1,7 +1,7 @@
 #!/bin/bash
 
 perl -0777 -p -i -e '
-s!(([#%]*) *)License\n.*?\n[#%]*\n.*?\n[#%]*\n.*?\n[#%]*\n.*?\n[#%]*\n!$1License
+s!(([#% ]*) *)License\n.*?\n[#%]*\n.*?\n[#%]*\n.*?\n[#%]*\n.*?\n[#%]*\n!$1License
 $1    This file is part of foam-extend.
 $2
 $1    foam-extend is free software: you can redistribute it and/or modify it
@@ -18,17 +18,11 @@ $1    You should have received a copy of the GNU General Public License
 $1    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 $2
 !s;
-s!OpenFOAM: The Open Source CFD Toolbox$!foam-extend: Open Source CFD!m;
-s!\| Copyright(.*?)\n!| For copyright notice see file Copyright\n!s;
-s!\| OpenFOAM: The Open Source CFD Toolbox           \|!| foam-extend: Open Source CFD                    |!;
-s!\| OpenFOAM Extend Project: Open [sS]ource CFD        \|!| foam-extend: Open Source CFD                    |!;
-s!\| Version:  [1-9].[0-9][. -][ex ][x ][t ]                               \|!| Version:     3.1                                |!;
-s!\| Version:     3.0                                \|!| Version:     3.1                                |!;
-s!\| Web:      http://www.OpenFOAM.org               \|!| Web:         http://www.extend-project.de       |!;
-s!\| Web:      www.OpenFOAM.org                      \|!| Web:         http://www.extend-project.de       |!;
-s!\| Web:      www.extend-project.de                 \|!| Web:         http://www.extend-project.de       |!;
-s!\| \\\\      /  F ield         \| foam-extend Project: Open source CFD        \|!| \\\\      /  F ield         | foam-extend: Open Source CFD                    |!;
-s!\|  \\\\    /   O peration     \| Version:  3.0                               \|!|  \\\\    /   O peration     | Version:     3.1                                |!;
-s!README file for version 3.0\*!README file for version 3.1*!;
+s!^(([#%]*) *)\\\\      /  F ield         \|.*!$1\\\\      /  F ield         | foam-extend: Open Source CFD!m;
+s!^(([#%]*) *) \\\\    /   O peration     \|.*!$1 \\\\    /   O peration     | Version:     3.2!m;
+s!^(([#%]*) *)  \\\\  /    A nd           \|.*!$1  \\\\  /    A nd           | Web:         http://www.foam-extend.org!m;
+s!^(([#%]*) *)   \\\\/     M anipulation  \|.*!$1   \\\\/     M anipulation  | For copyright notice see file Copyright!m;
+s!README file for version 3.[01]\*!README file for version 3.2*!;
+s/[ \t]+$//mg;
 ' $1
 

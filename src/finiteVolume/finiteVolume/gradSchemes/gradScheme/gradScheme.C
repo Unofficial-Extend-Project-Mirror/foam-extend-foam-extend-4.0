@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -29,6 +29,7 @@ Description
 #include "fv.H"
 #include "HashTable.H"
 #include "primitiveFields.H"
+#include "objectRegistry.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -99,29 +100,203 @@ gradScheme<Type>::~gradScheme()
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 template<class Type>
-tmp<blockVectorMatrix> gradScheme<Type>::fvmGrad
+Foam::tmp
+<
+    Foam::GeometricField
+    <
+        typename Foam::outerProduct<Foam::vector, Type>::type,
+        Foam::fvPatchField,
+        Foam::volMesh
+    >
+>
+Foam::fv::gradScheme<Type>::grad
+(
+    const GeometricField<Type, fvPatchField, volMesh>& vsf,
+    const word& name
+) const
+{
+    typedef typename outerProduct<vector, Type>::type GradType;
+    typedef GeometricField<GradType, fvPatchField, volMesh> GradFieldType;
+
+    if (!this->mesh().changing() && this->mesh().schemesDict().cache(name))
+    {
+        if (!mesh().objectRegistry::template foundObject<GradFieldType>(name))
+        {
+            if (fvSchemes::debug)
+            {
+                Info << "Cache: Calculating and caching " << name
+                    << " originating from " << vsf.name()
+                    << " event No. " << vsf.eventNo()
+                    << endl;
+            }
+            tmp<GradFieldType> tgGrad = calcGrad(vsf, name);
+            regIOobject::store(tgGrad.ptr());
+        }
+
+        if (fvSchemes::debug)
+        {
+            Info << "Cache: Retrieving " << name
+                << " originating from " << vsf.name()
+                << " event No. " << vsf.eventNo()
+                << endl;
+        }
+        GradFieldType& gGrad = const_cast<GradFieldType&>
+        (
+            mesh().objectRegistry::template lookupObject<GradFieldType>(name)
+        );
+
+        if (gGrad.upToDate(vsf.name()))
+        {
+            return gGrad;
+        }
+        else
+        {
+            if (fvSchemes::debug)
+            {
+                Info << "Cache: Deleting " << name
+                    << " originating from " << vsf.name()
+                    << " event No. " << vsf.eventNo()
+                    << endl;
+            }
+            gGrad.release();
+            delete &gGrad;
+
+            if (fvSchemes::debug)
+            {
+                Info << "Cache: Recalculating " << name
+                    << " originating from " << vsf.name()
+                    << " event No. " << vsf.eventNo()
+                    << endl;
+            }
+            tmp<GradFieldType> tgGrad = calcGrad(vsf, name);
+
+            if (fvSchemes::debug)
+            {
+                Info << "Cache: Storing " << name
+                    << " originating from " << vsf.name()
+                    << " event No. " << vsf.eventNo()
+                    << endl;
+            }
+            regIOobject::store(tgGrad.ptr());
+            GradFieldType& gGrad = const_cast<GradFieldType&>
+            (
+                mesh().objectRegistry::template lookupObject<GradFieldType>
+                (
+                    name
+                )
+            );
+
+            return gGrad;
+        }
+    }
+    else
+    {
+        if (mesh().objectRegistry::template foundObject<GradFieldType>(name))
+        {
+            GradFieldType& gGrad = const_cast<GradFieldType&>
+            (
+                mesh().objectRegistry::template lookupObject<GradFieldType>
+                (
+                    name
+                )
+            );
+
+            if (gGrad.ownedByRegistry())
+            {
+                if (fvSchemes::debug)
+                {
+                    Info << "Cache: Deleting " << name
+                        << " originating from " << vsf.name()
+                        << " event No. " << vsf.eventNo()
+                        << endl;
+                }
+                gGrad.release();
+                delete &gGrad;
+            }
+        }
+
+        if (fvSchemes::debug)
+        {
+            Info << "Cache: Calculating " << name
+                << " originating from " << vsf.name()
+                << " event No. " << vsf.eventNo()
+                << endl;
+        }
+        return calcGrad(vsf, name);
+    }
+}
+
+template<class Type>
+Foam::tmp
+<
+    Foam::GeometricField
+    <
+        typename Foam::outerProduct<Foam::vector, Type>::type,
+        Foam::fvPatchField,
+        Foam::volMesh
+    >
+>
+Foam::fv::gradScheme<Type>::grad
+(
+    const GeometricField<Type, fvPatchField, volMesh>& vsf
+) const
+{
+    return grad(vsf, "grad(" + vsf.name() + ')');
+}
+
+
+template<class Type>
+Foam::tmp
+<
+    Foam::GeometricField
+    <
+        typename Foam::outerProduct<Foam::vector, Type>::type,
+        Foam::fvPatchField,
+        Foam::volMesh
+    >
+>
+Foam::fv::gradScheme<Type>::grad
+(
+    const tmp<GeometricField<Type, fvPatchField, volMesh> >& tvsf
+) const
+{
+    typedef typename outerProduct<vector, Type>::type GradType;
+    typedef GeometricField<GradType, fvPatchField, volMesh> GradFieldType;
+
+    tmp<GradFieldType> tgrad = grad(tvsf());
+    tvsf.clear();
+    return tgrad;
+}
+
+
+template<class Type>
+tmp
+<
+    BlockLduSystem<vector, typename outerProduct<vector, Type>::type>
+>
+gradScheme<Type>::fvmGrad
 (
     const GeometricField<Type, fvPatchField, volMesh>& vf
 ) const
 {
-    FatalIOErrorIn
+    FatalErrorIn
     (
-        "tmp<blockVectorMatrix> fvmGrad\n",
+        "tmp<BlockLduSystem> gradScheme<Type>::fvmGrad\n"
         "(\n"
         "    GeometricField<Type, fvPatchField, volMesh>&"
         ")\n"
-    )   << "Implicit gradient operator currently defined only for Gauss grad."
-        << abort(FatalIOError);
+    )   << "Implicit gradient operator currently defined only for Gauss linear "
+        << "and leastSquares (cell and face limiters are optional)."
+        << abort(FatalError);
 
-    tmp<blockVectorMatrix> tbm
+    typedef typename outerProduct<vector, Type>::type GradType;
+
+    tmp<BlockLduSystem<vector, GradType> > tbs
     (
-        new blockVectorMatrix
-        (
-           vf.mesh()
-        )
+        new BlockLduSystem<vector, GradType>(vf.mesh())
     );
 
-    return tbm;
+    return tbs;
 }
 
 

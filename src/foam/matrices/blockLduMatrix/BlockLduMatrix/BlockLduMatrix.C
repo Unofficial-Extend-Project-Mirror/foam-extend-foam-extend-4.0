@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -38,9 +38,11 @@ Description
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
 template<class Type>
-const Foam::label Foam::BlockLduMatrix<Type>::fixFillIn
+const Foam::debug::optimisationSwitch
+Foam::BlockLduMatrix<Type>::fixFillIn
 (
-    debug::optimisationSwitch("matrixConstraintFillIn", 4)
+    "matrixConstraintFillIn",
+    4
 );
 
 
@@ -56,7 +58,7 @@ Foam::BlockLduMatrix<Type>::BlockLduMatrix(const lduMesh& ldu)
     interfaces_(ldu.interfaces().size()),
     coupleUpper_(ldu.lduAddr().nPatches()),
     coupleLower_(ldu.lduAddr().nPatches()),
-    fixedEqns_(ldu.lduAddr().size()/fixFillIn)
+    fixedEqns_(ldu.lduAddr().size()/fixFillIn())
 {
     const lduAddressing& addr = ldu.lduAddr();
 
@@ -65,6 +67,7 @@ Foam::BlockLduMatrix<Type>::BlockLduMatrix(const lduMesh& ldu)
         coupleUpper_.set(i, new CoeffField<Type>(addr.patchAddr(i).size()));
         coupleLower_.set(i, new CoeffField<Type>(addr.patchAddr(i).size()));
     }
+
 }
 
 
@@ -348,35 +351,54 @@ Foam::Ostream& Foam::operator<<(Ostream& os, const BlockLduMatrix<Type>& ldum)
     else
     {
         // Dummy write for consistency
-        os.writeKeyword("diagonal")  << typename BlockLduMatrix<Type>::TypeCoeffField
-            (ldum.lduAddr().size()) << token::END_STATEMENT << nl;
+        os.writeKeyword("diagonal")
+            << typename BlockLduMatrix<Type>::TypeCoeffField
+               (
+                   ldum.lduAddr().size()
+               )
+            << token::END_STATEMENT << nl;
     }
 
     if (ldum.upperPtr_)
     {
-        os.writeKeyword("upper")  << *ldum.upperPtr_ <<  token::END_STATEMENT << nl;
+        os.writeKeyword("upper")
+            << *ldum.upperPtr_
+            << token::END_STATEMENT << nl;
     }
     else
     {
         // Dummy write for consistency
-        os.writeKeyword("upper")  << typename BlockLduMatrix<Type>::TypeCoeffField
-            (ldum.lduAddr().lowerAddr().size()) <<  token::END_STATEMENT << nl;
+        os.writeKeyword("upper")
+            << typename BlockLduMatrix<Type>::TypeCoeffField
+               (
+                   ldum.lduAddr().lowerAddr().size()
+               )
+            <<  token::END_STATEMENT << nl;
     }
 
     if (ldum.lowerPtr_)
     {
-        os.writeKeyword("lower")  << *ldum.lowerPtr_ <<  token::END_STATEMENT << nl;
+        os.writeKeyword("lower")
+            << *ldum.lowerPtr_ <<  token::END_STATEMENT << nl;
     }
     else
     {
         // Dummy write for consistency
-        os.writeKeyword("lower")  << typename BlockLduMatrix<Type>::TypeCoeffField
-            (ldum.lduAddr().lowerAddr().size()) <<  token::END_STATEMENT << nl;
+        os.writeKeyword("lower")
+            << typename BlockLduMatrix<Type>::TypeCoeffField
+               (
+                   ldum.lduAddr().lowerAddr().size()
+               )
+            <<  token::END_STATEMENT << nl;
     }
 
-    os.writeKeyword("coupleUpper") << ldum.coupleUpper_ << token::END_STATEMENT << endl;
+    os.writeKeyword("coupleUpper")
+        << ldum.coupleUpper_
+        << token::END_STATEMENT << endl;
 
-    os.writeKeyword("coupleLower") << ldum.coupleLower_ << token::END_STATEMENT << endl;
+    os.writeKeyword("coupleLower")
+        << ldum.coupleLower_
+        << token::END_STATEMENT << endl;
 
     os.check("Ostream& operator<<(Ostream&, const BlockLduMatrix<Type>&");
 

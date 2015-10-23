@@ -127,6 +127,7 @@ rpm_make()
 
         echo "Making package $_PACKAGE using RPM."
 	rpm_build ${_PACKAGE} ${_SPECFILE} ${_ADDITIONALFLAGS} "$@"
+	#rpm_build_install_stage_only ${_PACKAGE} ${_SPECFILE} ${_ADDITIONALFLAGS} "$@"
     fi
 
     # Install RPM package if not done already
@@ -176,6 +177,31 @@ rpm_build()
     #
     # Let's keep the compilation directory alive for now in order to facilitate postmortems of failed compilations
     rpmbuild --define "_topdir $buildBase" --dbpath $buildBase/rpmDB -bb ./SPECS/$specFile "$@"
+}
+
+#
+# Build a RPM file using the package SPEC file. This function will only call the "%install" stage.
+# Useful for debugging the "%install" stage.
+#
+rpm_build_install_stage_only()
+{
+    package="$1"
+    specFile="$2"
+    shift 2
+
+    cd $buildBase
+
+    [ -e ./SPECS/$specFile ] || {
+        echo "rpm_build: Error: missing SPEC file for package $package. Aborting."
+        exit -1
+    }
+
+    #Build RPM package
+    echo "Building package $package using SPEC file : $specFile. Optional args: $@"
+    #rpmbuild --define "_topdir $buildBase" --dbpath $buildBase/rpmDB --clean -bb ./SPECS/$specFile "$@"
+    #
+    # Let's keep the compilation directory alive for now in order to facilitate postmortems of failed compilations
+    rpmbuild --define "_topdir $buildBase" --dbpath $buildBase/rpmDB --short-circuit -bi ./SPECS/$specFile "$@"
 }
 
 #

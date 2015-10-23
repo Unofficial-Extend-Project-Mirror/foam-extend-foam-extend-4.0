@@ -1,0 +1,69 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | foam-extend: Open Source CFD                    |
+|  \\    /   O peration     | Version:     3.2                                |
+|   \\  /    A nd           | Web:         http://www.foam-extend.org         |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      blockMeshDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+// block definition for a porosity with an angled inlet/outlet
+// the porosity is not aligned with the main axes
+//
+
+convertToMeters 0.01;
+
+vertices
+(
+    // Back plane
+    ( -4.99 -2 -0.1)
+    (  4.99 -2 -0.1)
+    (  4.99  2 -0.1)
+    ( -4.99  2 -0.1)
+
+    // Front plane
+    ( -4.99 -2  0.1)
+    (  4.99 -2  0.1)
+    (  4.99  2  0.1)
+    ( -4.99  2  0.1)
+);
+
+blocks
+(
+    hex (0 1 2 3 4 5 6 7) (200 65 1) simpleGrading (1 1 1)
+);
+
+edges
+(
+);
+
+patches
+(
+    wall topAndBottom
+    (
+        (0 1 5 4)
+        (2 3 7 6)
+    )
+
+    patch inlet
+    (
+        (0 4 7 3)
+    )
+
+    patch outlet
+    (
+        (1 2 6 5)
+    )
+);
+
+mergePatchPairs
+(
+);
+
+// ************************************************************************* //

@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -45,6 +45,7 @@ int main(int argc, char *argv[])
 
     // Add option to write empty sets
     argList::validOptions.insert("writeEmptySets", "");
+    argList::validOptions.insert("liveObjectsOnly", "");
 
 #   include "setRootCase.H"
 #   include "createTime.H"
@@ -52,6 +53,7 @@ int main(int argc, char *argv[])
     Info<< "Time = " << runTime.timeName() << endl;
 
     bool writeEmptySets = args.optionFound("writeEmptySets");
+    bool liveObjectsOnly = args.optionFound("liveObjectsOnly");
 
     // Determine the processor count directly
     label nProcs = 0;
@@ -128,10 +130,18 @@ int main(int argc, char *argv[])
         {
             const labelList& addr = procMeshes.pointProcAddressing()[procI];
 
+            const label nProcPoints = procMeshes.meshes()[procI].nPoints();
+
             labelHashSet procSet;
 
             forAll (addr, pointI)
             {
+                // Skip list when nPoints is reached
+                if (liveObjectsOnly && pointI >= nProcPoints)
+                {
+                    break;
+                }
+
                 if (set.found(addr[pointI]))
                 {
                     procSet.insert(pointI);
@@ -143,14 +153,14 @@ int main(int argc, char *argv[])
                 // Set created, write it
                 Info<< "Writing point set " << set.name()
                     << " on processor " << procI << endl;
-                pointSet cs
+                pointSet ps
                 (
                     procMeshes.meshes()[procI],
                     set.name(),
                     procSet,
                     IOobject::NO_WRITE
                 );
-                cs.write();
+                ps.write();
             }
         }
     }
@@ -172,10 +182,18 @@ int main(int argc, char *argv[])
         {
             const labelList& addr = procMeshes.faceProcAddressing()[procI];
 
+            const label nProcFaces = procMeshes.meshes()[procI].nFaces();
+
             labelHashSet procSet;
 
             forAll (addr, faceI)
             {
+                // Skip list when nPoints is reached
+                if (liveObjectsOnly && faceI >= nProcFaces)
+                {
+                    break;
+                }
+
                 // Note faceProcAddressing peculiarity:
                 // change of sign and offset.  HJ, 7/Mar/2011
                 if (set.found(mag(addr[faceI]) - 1))
@@ -189,14 +207,14 @@ int main(int argc, char *argv[])
                 // Set created, write it
                 Info<< "Writing face set " << set.name()
                     << " on processor " << procI << endl;
-                faceSet cs
+                faceSet fs
                 (
                     procMeshes.meshes()[procI],
                     set.name(),
                     procSet,
                     IOobject::NO_WRITE
                 );
-                cs.write();
+                fs.write();
             }
         }
     }
@@ -217,6 +235,8 @@ int main(int argc, char *argv[])
         forAll (procMeshes.meshes(), procI)
         {
             const labelList& addr = procMeshes.cellProcAddressing()[procI];
+
+            // There are no retired cells: no special handling required
 
             labelHashSet procSet;
 

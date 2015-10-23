@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -46,9 +46,10 @@ tmp
         typename outerProduct<vector, Type>::type, fvPatchField, volMesh
     >
 >
-gaussGrad<Type>::grad
+gaussGrad<Type>::gradf
 (
-    const GeometricField<Type, fvsPatchField, surfaceMesh>& ssf
+    const GeometricField<Type, fvsPatchField, surfaceMesh>& ssf,
+    const word& name
 )
 {
     typedef typename outerProduct<vector, Type>::type GradType;
@@ -61,7 +62,7 @@ gaussGrad<Type>::grad
         (
             IOobject
             (
-                "grad("+ssf.name()+')',
+                name,
                 ssf.instance(),
                 mesh,
                 IOobject::NO_READ,
@@ -125,16 +126,17 @@ tmp
         typename outerProduct<vector, Type>::type, fvPatchField, volMesh
     >
 >
-gaussGrad<Type>::grad
+gaussGrad<Type>::calcGrad
 (
-    const GeometricField<Type, fvPatchField, volMesh>& vsf
+    const GeometricField<Type, fvPatchField, volMesh>& vsf,
+    const word& name
 ) const
 {
     typedef typename outerProduct<vector, Type>::type GradType;
 
     tmp<GeometricField<GradType, fvPatchField, volMesh> > tgGrad
     (
-        grad(tinterpScheme_().interpolate(vsf))
+        gradf(tinterpScheme_().interpolate(vsf), name)
     );
     GeometricField<GradType, fvPatchField, volMesh>& gGrad = tgGrad();
 
@@ -144,40 +146,32 @@ gaussGrad<Type>::grad
     return tgGrad;
 }
 
-
 template<class Type>
-tmp<blockVectorMatrix> gaussGrad<Type>::fvmGrad
+tmp
+<
+    BlockLduSystem<vector, typename outerProduct<vector, Type>::type>
+> gaussGrad<Type>::fvmGrad
 (
     const GeometricField<Type, fvPatchField, volMesh>& vf
 ) const
 {
-    tmp<surfaceScalarField> tweights = this->tinterpScheme_().weights(vf);
-    const scalarField& wIn = tweights().internalField();
-
-    const fvMesh& mesh = vf.mesh();
-
-    tmp<blockVectorMatrix> tbm
+    FatalErrorIn
     (
-        new blockVectorMatrix
-        (
-           mesh
-        )
+        "tmp<BlockLduSystem> fvmGrad\n"
+        "(\n"
+        "    GeometricField<Type, fvPatchField, volMesh>&"
+        ")\n"
+    )   << "Implicit gradient operator defined only for scalar."
+        << abort(FatalError);
+
+    typedef typename outerProduct<vector, Type>::type GradType;
+
+    tmp<BlockLduSystem<vector, GradType> > tbs
+    (
+        new BlockLduSystem<vector, GradType>(vf.mesh())
     );
-    blockVectorMatrix& bm = tbm();
 
-    // Grab ldu parts of block matrix as linear always
-    typename CoeffField<vector>::linearTypeField& u = bm.upper().asLinear();
-    typename CoeffField<vector>::linearTypeField& l = bm.lower().asLinear();
-
-    const vectorField& SfIn = mesh.Sf().internalField();
-
-    l = -wIn*SfIn;
-    u = l + SfIn;
-    bm.negSumDiag();
-
-    // Interpolation schemes with corrections not accounted for
-
-    return tbm;
+    return tbs;
 }
 
 

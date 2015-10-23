@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -52,9 +52,10 @@ tmp
         typename outerProduct<vector, Type>::type, fvPatchField, volMesh
     >
 >
-leastSquaresGrad<Type>::grad
+leastSquaresGrad<Type>::calcGrad
 (
-    const GeometricField<Type, fvPatchField, volMesh>& vsf
+    const GeometricField<Type, fvPatchField, volMesh>& vsf,
+    const word& name
 ) const
 {
     typedef typename outerProduct<vector, Type>::type GradType;
@@ -67,7 +68,7 @@ leastSquaresGrad<Type>::grad
         (
             IOobject
             (
-                "grad("+vsf.name()+')',
+                name,
                 vsf.instance(),
                 mesh,
                 IOobject::NO_READ,
@@ -94,19 +95,30 @@ leastSquaresGrad<Type>::grad
     const unallocLabelList& own = mesh.owner();
     const unallocLabelList& nei = mesh.neighbour();
 
-    forAll(own, facei)
+    // Get access to internal field
+
+    const Field<Type>& vsfIn = vsf.internalField();
+
+    Field<GradType>& lsGradIn = lsGrad.internalField();
+
+    const vectorField& ownLsIn = ownLs.internalField();
+    const vectorField& neiLsIn = neiLs.internalField();
+
+    register label ownFaceI, neiFaceI;
+
+    forAll (own, facei)
     {
-        register label ownFaceI = own[facei];
-        register label neiFaceI = nei[facei];
+        ownFaceI = own[facei];
+        neiFaceI = nei[facei];
 
-        Type deltaVsf = vsf[neiFaceI] - vsf[ownFaceI];
+        Type deltaVsf = vsfIn[neiFaceI] - vsfIn[ownFaceI];
 
-        lsGrad[ownFaceI] += ownLs[facei]*deltaVsf;
-        lsGrad[neiFaceI] -= neiLs[facei]*deltaVsf;
+        lsGradIn[ownFaceI] += ownLsIn[facei]*deltaVsf;
+        lsGradIn[neiFaceI] -= neiLsIn[facei]*deltaVsf;
     }
 
     // Boundary faces
-    forAll(vsf.boundaryField(), patchi)
+    forAll (vsf.boundaryField(), patchi)
     {
         const fvsPatchVectorField& patchOwnLs = ownLs.boundaryField()[patchi];
 
@@ -118,31 +130,58 @@ leastSquaresGrad<Type>::grad
             Field<Type> neiVsf =
                 vsf.boundaryField()[patchi].patchNeighbourField();
 
-            forAll(neiVsf, patchFaceI)
+            forAll (neiVsf, patchFaceI)
             {
                 lsGrad[faceCells[patchFaceI]] +=
-                    patchOwnLs[patchFaceI]*
-                    (neiVsf[patchFaceI] - vsf[faceCells[patchFaceI]]);
+                    patchOwnLs[patchFaceI]
+                   *(neiVsf[patchFaceI] - vsf[faceCells[patchFaceI]]);
             }
         }
         else
         {
             const fvPatchField<Type>& patchVsf = vsf.boundaryField()[patchi];
 
-            forAll(patchVsf, patchFaceI)
+            forAll (patchVsf, patchFaceI)
             {
                 lsGrad[faceCells[patchFaceI]] +=
-                     patchOwnLs[patchFaceI]*
-                    (patchVsf[patchFaceI] - vsf[faceCells[patchFaceI]]);
+                     patchOwnLs[patchFaceI]
+                    *(patchVsf[patchFaceI] - vsf[faceCells[patchFaceI]]);
             }
         }
     }
-
 
     lsGrad.correctBoundaryConditions();
     gaussGrad<Type>::correctBoundaryConditions(vsf, lsGrad);
 
     return tlsGrad;
+}
+
+template<class Type>
+tmp
+<
+    BlockLduSystem<vector, typename outerProduct<vector, Type>::type>
+> leastSquaresGrad<Type>::fvmGrad
+(
+   const GeometricField<Type, fvPatchField, volMesh>& vf
+) const
+{
+   FatalErrorIn
+   (
+       "tmp<BlockLduSystem> fvmGrad\n"
+       "(\n"
+       "    GeometricField<Type, fvPatchField, volMesh>&"
+       ")\n"
+   )   << "Implicit gradient operator defined only for scalar."
+       << abort(FatalError);
+
+   typedef typename outerProduct<vector, Type>::type GradType;
+
+   tmp<BlockLduSystem<vector, GradType> > tbs
+   (
+       new BlockLduSystem<vector, GradType>(vf.mesh())
+   );
+
+   return tbs;
 }
 
 

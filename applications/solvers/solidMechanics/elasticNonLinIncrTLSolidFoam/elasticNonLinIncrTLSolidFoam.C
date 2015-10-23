@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -43,105 +43,108 @@ Author
 
 int main(int argc, char *argv[])
 {
-# include "setRootCase.H"
-# include "createTime.H"
-# include "createMesh.H"
-# include "createFields.H"
+#   include "setRootCase.H"
+#   include "createTime.H"
+#   include "createMesh.H"
+#   include "createFields.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-  Info<< "\nStarting time loop\n" << endl;
+    Info<< "\nStarting time loop\n" << endl;
 
-  while(runTime.loop())
+    while(runTime.loop())
     {
-      Info<< "Time: " << runTime.timeName() << nl << endl;
+        Info<< "Time = " << runTime.timeName() << nl << endl;
 
-#     include "readSolidMechanicsControls.H"
+#       include "readSolidMechanicsControls.H"
 
-      int iCorr = 0;
-      scalar initialResidual = 0;
-      lduMatrix::solverPerformance solverPerf;
-      scalar relativeResidual = 1.0;
-      lduMatrix::debug=0;
+        int iCorr = 0;
+        scalar initialResidual = 0;
+        lduMatrix::solverPerformance solverPerf;
+        scalar relativeResidual = 1.0;
+        lduMatrix::debug=0;
 
-      do
+        do
         {
-      DU.storePrevIter();
+            DU.storePrevIter();
 
-      fvVectorMatrix DUEqn
+            fvVectorMatrix DUEqn
             (
-         fvm::d2dt2(rho, DU)
-         ==
-         fvm::laplacian(2*mu + lambda, DU, "laplacian(DDU,DU)")
-         + fvc::div(
-            -( (mu + lambda) * gradDU )
-            + ( mu * (
-                  gradDU.T()
-                  + (gradDU & gradU.T())
-                  + (gradU & gradDU.T())
-                  + (gradDU & gradDU.T())
-                  ) )
-            + ( lambda * tr(DEpsilon) * I )
-            + ( DSigma & gradU )
-            + ( (sigma + DSigma) & gradDU ),
-            "div(sigma)"
-            )
-         );
+                fvm::d2dt2(rho, DU)
+             ==
+                fvm::laplacian(2*mu + lambda, DU, "laplacian(DDU,DU)")
+              + fvc::div
+                (
+                  - ( (mu + lambda) * gradDU )
+                  + (
+                        mu *
+                        (
+                            gradDU.T()
+                          + (gradDU & gradU.T())
+                          + (gradU & gradDU.T())
+                          + (gradDU & gradDU.T())
+                        )
+                    )
+                  + ( lambda * tr(DEpsilon) * I )
+                  + ( DSigma & gradU )
+                  + ( (sigma + DSigma) & gradDU ),
+                    "div(sigma)"
+                )
+            );
 
-      solverPerf = DUEqn.solve();
+            solverPerf = DUEqn.solve();
 
-      if (iCorr == 0)
-        {
-          initialResidual = solverPerf.initialResidual();
+            if (iCorr == 0)
+            {
+                initialResidual = solverPerf.initialResidual();
+            }
+
+            DU.relax();
+
+            gradDU = fvc::grad(DU);
+
+#           include "calculateDEpsilonDSigma.H"
+#           include "calculateRelativeResidual.H"
+
+            Info<< "\tTime " << runTime.value()
+                << ", Corrector " << iCorr
+                << ", Solving for " << DU.name()
+                << " using " << solverPerf.solverName()
+                << ", residual = " << solverPerf.initialResidual()
+                << ", relative residual = " << relativeResidual
+                << ", inner iterations = " << solverPerf.nIterations() << endl;
         }
+        while
+        (
+            solverPerf.initialResidual() > convergenceTolerance
+            //relativeResidual > convergenceTolerance
+         && ++iCorr < nCorr
+        );
 
-      DU.relax();
+        Info<< nl << "Time " << runTime.value() << ", Solving for " << DU.name()
+            << ", Initial residual = " << initialResidual
+            << ", Final residual = " << solverPerf.initialResidual()
+            << ", Relative residual = " << relativeResidual
+            << ", No outer iterations " << iCorr
+            << nl << "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
+            << "  ClockTime = " << runTime.elapsedClockTime() << " s"
+            << endl;
 
-      gradDU = fvc::grad(DU);
+        U += DU;
+        gradU += gradDU;
+        epsilon += DEpsilon;
+        sigma += DSigma;
 
-#         include "calculateDEpsilonDSigma.H"
-#         include "calculateRelativeResidual.H"
+#       include "writeFields.H"
 
-      Info << "\tTime " << runTime.value()
-           << ", Corrector " << iCorr
-           << ", Solving for " << DU.name()
-           << " using " << solverPerf.solverName()
-           << ", residual = " << solverPerf.initialResidual()
-           << ", relative residual = " << relativeResidual
-           << ", inner iterations = " << solverPerf.nIterations() << endl;
-    }
-      while
-    (
-     solverPerf.initialResidual() > convergenceTolerance
-     //relativeResidual > convergenceTolerance
-     &&
-     ++iCorr < nCorr
-     );
-
-      Info << nl << "Time " << runTime.value() << ", Solving for " << DU.name()
-       << ", Initial residual = " << initialResidual
-       << ", Final residual = " << solverPerf.initialResidual()
-       << ", Relative residual = " << relativeResidual
-       << ", No outer iterations " << iCorr
-       << nl << "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
-       << "  ClockTime = " << runTime.elapsedClockTime() << " s"
-       << endl;
-
-      U += DU;
-      gradU += gradDU;
-      epsilon += DEpsilon;
-      sigma += DSigma;
-
-#     include "writeFields.H"
-
-      Info<< "ExecutionTime = "
-      << runTime.elapsedCpuTime()
-      << " s\n\n" << endl;
+        Info<< "ExecutionTime = "
+            << runTime.elapsedCpuTime()
+            << " s\n\n" << endl;
     }
 
-  Info<< "End\n" << endl;
+    Info<< "End\n" << endl;
 
-  return(0);
+    return(0);
 }
 
 

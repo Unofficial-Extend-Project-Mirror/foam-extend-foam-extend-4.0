@@ -1,0 +1,3 @@
+writeIbMasks.C
+
+EXE = $(FOAM_APPBIN)/writeIbMasks

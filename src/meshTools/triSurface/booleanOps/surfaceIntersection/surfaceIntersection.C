@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -598,7 +598,7 @@ void Foam::surfaceIntersection::doCutEdges
     forAll(surf1PointTol, pointI)
     {
         surf1PointTol[pointI] =
-            intersection::planarTol_
+            intersection::planarTol_()
           * minEdgeLen(surf1, pointI);
     }
 
@@ -611,7 +611,7 @@ void Foam::surfaceIntersection::doCutEdges
         point pStart = surf1Pts[e.start()];
         const point& pEnd = surf1Pts[e.end()];
 
-        const point tolVec = intersection::planarTol_*(pEnd-pStart);
+        const point tolVec = intersection::planarTol_()*(pEnd-pStart);
         const scalar tolDim = mag(tolVec);
 
         bool doTrack = false;
@@ -666,7 +666,7 @@ void Foam::surfaceIntersection::doCutEdges
                                     << "  hit:" << pHit.hitPoint()
                                     << "  tolDim:" << tolDim
                                     << "  planarTol:"
-                                    << intersection::planarTol_
+                                    << intersection::planarTol_()
                                     << endl;
                             }
                             allCutPoints.append(pHit.hitPoint());
@@ -1074,7 +1074,7 @@ Foam::surfaceIntersection::surfaceIntersection
     bool hasMerged = mergePoints
     (
         cutPoints_,
-        minEdgeLen*intersection::planarTol_,
+        minEdgeLen*intersection::planarTol_(),
         false,
         pointMap,
         newPoints
@@ -1085,7 +1085,7 @@ Foam::surfaceIntersection::surfaceIntersection
         if (debug)
         {
             Pout<< "Merged:" << hasMerged
-                << "  mergeDist:" << minEdgeLen*intersection::planarTol_
+                << "  mergeDist:" << minEdgeLen*intersection::planarTol_()
                 << "  cutPoints:" << cutPoints_.size()
                 << "  newPoints:" << newPoints.size()
                 << endl;
@@ -1102,7 +1102,7 @@ Foam::surfaceIntersection::surfaceIntersection
             e.start() = pointMap[e.start()];
             e.end() = pointMap[e.end()];
 
-            if (e.mag(cutPoints_) < minEdgeLen*intersection::planarTol_)
+            if (e.mag(cutPoints_) < minEdgeLen*intersection::planarTol_())
             {
                 if (debug)
                 {

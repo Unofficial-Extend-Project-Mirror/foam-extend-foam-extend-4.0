@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -83,7 +83,7 @@ Foam::scalar Foam::SingleKineticRateDevolatilisation<CloudType>::calculate
     }
 
     // Kinetic rate
-    const scalar kappa = A1_*exp(-E_/(specie::RR*T));
+    const scalar kappa = A1_*exp(-E_/(specie::RR()*T));
 
     // Volatile devolatilisation from particle to carrier gas phase
     const scalar dMass = min(dt*kappa*massVolatile, massVolatile);

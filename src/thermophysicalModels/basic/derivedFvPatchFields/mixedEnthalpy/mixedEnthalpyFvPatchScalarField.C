@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -115,26 +115,31 @@ void Foam::mixedEnthalpyFvPatchScalarField::updateCoeffs()
     if
     (
         dimensionedInternalField().name() == db().mangleFileName("h")
-     || dimensionedInternalField().name() == db().mangleFileName("i")
     )
     {
         refValue() = thermo.h(Tw.refValue(), patchi);
         refGrad() = thermo.Cp(Tw, patchi)*Tw.refGrad()
-        + patch().deltaCoeffs()*
-         (
-            thermo.h(Tw, patchi)
-          - thermo.h(Tw, patch().faceCells())
-         );
+          + patch().deltaCoeffs()*
+            (
+                thermo.h(Tw, patchi)
+              - thermo.h(Tw, patch().faceCells())
+            );
+    }
+    else if
+    (
+        dimensionedInternalField().name() == db().mangleFileName("i")
+    )
+    {
     }
     else
     {
         refValue() = thermo.hs(Tw.refValue(), patchi);
         refGrad() = thermo.Cp(Tw, patchi)*Tw.refGrad()
-        + patch().deltaCoeffs()*
-         (
-            thermo.hs(Tw, patchi)
-          - thermo.hs(Tw, patch().faceCells())
-         );
+          + patch().deltaCoeffs()*
+            (
+                thermo.hs(Tw, patchi)
+              - thermo.hs(Tw, patch().faceCells())
+            );
     }
 
     mixedFvPatchScalarField::updateCoeffs();

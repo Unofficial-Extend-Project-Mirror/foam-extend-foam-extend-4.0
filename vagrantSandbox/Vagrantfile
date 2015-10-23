@@ -27,6 +27,7 @@ Vagrant.configure("2") do |config|
     vb.cpus=nrCPU
     # make sure each CPU has enough memory (at least .5 Gig per CPU. 2.5 Gig Minimum to run the testHarness)
     vb.memory=512*[(1+nrCPU),5].max
+    vb.gui=false
   end
 
   config.vm.define :trusty do |trusty|
@@ -60,6 +61,16 @@ Vagrant.configure("2") do |config|
       s.path   = "initCentOSRHELScript.sh"
     end
     centos65.vm.hostname="centos65."+config.vm.hostname
+  end
+
+  config.vm.define :centos70 do |centos70|
+    centos70.vm.box = "matyunin/centos7"
+    centos70.vm.box_check_update = true
+    centos70.vm.provision :shell do |s|
+      s.args   = "centos70"
+      s.path   = "initCentOSRHELScript.sh"
+    end
+    centos70.vm.hostname="centos70."+config.vm.hostname
   end
 
   # legacy
@@ -101,13 +112,17 @@ Vagrant.configure("2") do |config|
 
   # legacy/experimental
   config.vm.define :freebsd10 do |freebsd10|
-    freebsd10.vm.box = "freebsd10"
+    freebsd10.vm.box = "chef/freebsd-10.0"
+    #    freebsd10.vm.box = "arkadi/freebsd-10.0-i386"
+    freebsd10.vm.box_check_update = true
+    # freebsd10.vm.box = "freebsd10"
 #     freebsd10.vm.box_url = "https://wunki.org/files/freebsd-10.0-amd64-wunki.box"
-    freebsd10.vm.box_url = "http://iris.hosting.lv/freebsd-10.0-i386.box"
+#    freebsd10.vm.box_url = "http://iris.hosting.lv/freebsd-10.0-i386.box"
     freebsd10.vm.provision :shell do |s|
       s.args   = "freebsd10"
       s.path   = "initFreeBSDScript.sh"
     end
+
     freebsd10.vm.network :private_network, ip: "10.0.0.2"
 
     # configure the NICs
@@ -118,6 +133,7 @@ Vagrant.configure("2") do |config|
 
     # use NFS for the synced folder
     freebsd10.vm.synced_folder "..", "/FOAM-sources", :nfs => true
+    freebsd10.vm.synced_folder '.', '/vagrant', :nfs => true
 
     freebsd10.vm.hostname="freebsd10."+config.vm.hostname
   end
@@ -141,6 +157,16 @@ Vagrant.configure("2") do |config|
       s.path   = "initOpenSUSEScript.sh"
     end
     opensuse13.vm.hostname="opensuse13."+config.vm.hostname
+  end
+
+  config.vm.define :archlinux do |archlinux|
+    archlinux.vm.box = "terrywang/archlinux"
+    archlinux.vm.box_check_update = true
+    archlinux.vm.provision :shell do |s|
+      s.args   = "archlinux"
+      s.path   = "initArchlinuxScript.sh"
+    end
+    archlinux.vm.hostname="archlinux."+config.vm.hostname
   end
 
 end

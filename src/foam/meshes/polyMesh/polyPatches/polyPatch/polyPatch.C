@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -39,9 +39,11 @@ namespace Foam
 {
     defineTypeNameAndDebug(polyPatch, 0);
 
-    int polyPatch::disallowGenericPolyPatch
+    debug::debugSwitch
+    polyPatch::disallowGenericPolyPatch
     (
-        debug::debugSwitch("disallowGenericPolyPatch", 0)
+        "disallowGenericPolyPatch",
+        0
     );
 
     defineRunTimeSelectionTable(polyPatch, word);
@@ -52,11 +54,12 @@ namespace Foam
 }
 
 
-const Foam::scalar Foam::polyPatch::matchTol_
+const Foam::debug::tolerancesSwitch
+Foam::polyPatch::matchTol_
 (
-    debug::tolerances("patchFaceMatchTol", 1e-3)
+    "patchFaceMatchTol",
+    1e-3
 );
-
 
 // * * * * * * * * * * * * Protected Member Functions  * * * * * * * * * * * //
 
@@ -253,7 +256,7 @@ Foam::scalarField Foam::polyPatch::calcFaceTol
             maxLen = max(maxLen, mag(points[f[fp]] - cc));
         }
 
-        tols[faceI] = matchTol_*maxLen;
+        tols[faceI] = matchTol_()*maxLen;
     }
 
     return tols;

@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -28,7 +28,7 @@ Description
 
 #include "polyTopoChanger.H"
 #include "polyMesh.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "faceZone.H"
 #include "polyTopoChange.H"
 #include "pointField.H"
@@ -276,8 +276,8 @@ Foam::autoPtr<Foam::mapPolyMesh> Foam::polyTopoChanger::changeMesh
     const labelHashSet& removedFaces = ref.removedFaces();
     const labelHashSet& removedCells = ref.removedCells();
 
-    // Grab the untouched points.
-    forAll (points, pointI)
+    // Grab the untouched live points
+    for (label pointI = 0; pointI < nOldPoints; pointI++)
     {
         // Check if the point has been removed; if not add it to the list
         if (!removedPoints.found(pointI))
@@ -369,6 +369,32 @@ Foam::autoPtr<Foam::mapPolyMesh> Foam::polyTopoChanger::changeMesh
         Pout<< " added = " << nNewPoints - debugPointCounter
             << ".  Point count = "
             << nNewPoints << endl;
+
+        debugPointCounter = nNewPoints;
+    }
+
+    // Grab the untouched auxiliary points
+    for (label pointI = nOldPoints; pointI < points.size(); pointI++)
+    {
+        // Check if the point has been removed; if not add it to the list
+        if (!removedPoints.found(pointI))
+        {
+            // Grab a point
+            newPointsZeroVol[nNewPoints] = points[pointI];
+            newPointsMotion[nNewPoints] = points[pointI];
+
+            // Grab addressing
+            renumberPoints[pointI] = nNewPoints;
+            pointMap[nNewPoints] = pointI;
+
+            nNewPoints++;
+        }
+    }
+
+    if (debug)
+    {
+        Pout<< "Added retired points: untouched = "
+            << nNewPoints - debugPointCounter;
 
         debugPointCounter = nNewPoints;
     }
@@ -922,6 +948,29 @@ Foam::autoPtr<Foam::mapPolyMesh> Foam::polyTopoChanger::changeMesh
     }
 
     // Add freely-standing faces to the back of the list
+
+    // Freely-standing faces from the original mesh
+    // Insert untouched internal faces
+    for (label faceI = nOldFaces; faceI < faces.size(); faceI++)
+    {
+        if (!removedFaces.found(faceI))
+        {
+            newFaces[nNewFaces] = faces[faceI];
+            renumberFaces[faceI] = nNewFaces;
+            faceMap[nNewFaces]= faceI;
+            nNewFaces++;
+        }
+    }
+
+    if (debug)
+    {
+        Pout<< "Added zone-only faces: untouched = "
+            << nNewFaces - debugFaceCounter;
+
+            debugFaceCounter = nNewFaces;
+    }
+
+    // Freely-standing modified faces
     forAll (mf, mfI)
     {
         if (mf[mfI].onlyInZone())
@@ -935,12 +984,12 @@ Foam::autoPtr<Foam::mapPolyMesh> Foam::polyTopoChanger::changeMesh
 
     if (debug)
     {
-        Pout<< "Added zone-only faces: modified = "
-            << nNewFaces - debugFaceCounter;
+        Pout<< " modified = " << nNewFaces - debugFaceCounter;
 
             debugFaceCounter = nNewFaces;
     }
 
+    // Freely-standing added faces
     forAll (af, afI)
     {
         if (af[afI].onlyInZone())

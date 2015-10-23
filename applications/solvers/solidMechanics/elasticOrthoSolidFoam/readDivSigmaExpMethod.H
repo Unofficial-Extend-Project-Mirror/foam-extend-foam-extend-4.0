@@ -2,8 +2,8 @@
 word divSigmaExpMethod(mesh.solutionDict().subDict("solidMechanics").lookup("divSigmaExp"));
 Info << "Calculation of divSigmaExp Method: " << divSigmaExpMethod << endl;
 if(divSigmaExpMethod != "standard" && divSigmaExpMethod != "surface" && divSigmaExpMethod != "laplacian")
-  {
+{
     FatalError << "divSigmaExp method " << divSigmaExpMethod << " not found!" << nl
-	       << "valid methods are:\nstandard\nsurface\nlaplacian"
-	       << exit(FatalError);
-  }
+         << "valid methods are:\nstandard\nsurface\nlaplacian"
+         << exit(FatalError);
+}

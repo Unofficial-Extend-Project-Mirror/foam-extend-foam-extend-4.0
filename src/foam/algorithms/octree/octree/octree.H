@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -140,7 +140,8 @@ class octree
         const treeBoundBox octreeBb_;
 
         //- Refinement crit: size of leaves. Average number of entries per
-        //  leaf. Should be fine enough for efficient searching at lowest level.
+        //  leaf.  Should be fine enough for efficient searching
+        //  at lowest level.
         const scalar maxLeafRatio_;
 
         //- Refinement crit: multiplicity of entries (so in how many leaves
@@ -165,7 +166,8 @@ class octree
 
 
     // Static data members
-        //- Refinement crit: max number of level
+
+        //- Refinement criterion max number of level
         static const label maxNLevels = 20;
 
 
@@ -325,8 +327,8 @@ public:
             //- Find nearest to line. Returns -1 or index of shape and
             //  sets:
             //  - tightest (is both input and output).
-            //  - linePoint : point on line (-GREAT,-GREAT,-GREAT if not found)
-            //  - shapePoint : point on shape (GREAT, GREAT, GREAT if not found)
+            //  - linePoint: point on line (-GREAT,-GREAT,-GREAT if not found)
+            //  - shapePoint: point on shape (GREAT, GREAT, GREAT if not found)
             //  Uses Type::calcNearest.
             label findNearest
             (

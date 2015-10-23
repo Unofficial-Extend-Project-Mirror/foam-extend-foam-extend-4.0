@@ -1,1 +1,1 @@
-find . ! -name 'All*' | xargs rm -rf 
+find . ! -name 'All*' | xargs rm -rf

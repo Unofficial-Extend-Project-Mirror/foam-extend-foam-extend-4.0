@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -27,7 +27,7 @@ Description
 
 #include "error.H"
 #include "objectRegistry.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "faSchemes.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -35,7 +35,12 @@ Description
 namespace Foam
 {
 
-int faSchemes::debug(Foam::debug::debugSwitch("faSchemes", false));
+Foam::debug::debugSwitch
+faSchemes::debug
+(
+    "faSchemes",
+    false
+);
 
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //

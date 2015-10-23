@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -205,7 +205,10 @@ mixingPlaneFvPatchField<Type>::mixingPlaneFvPatchField
     phiName_("phi"),
     fluxMask_(),
     fluxWeights_(p.size(), 0)
-{}
+{
+    // Cannot read mixing type here: internal field may not be set
+    // HJ, 3/Jun/2015
+}
 
 
 template<class Type>
@@ -246,7 +249,7 @@ mixingPlaneFvPatchField<Type>::mixingPlaneFvPatchField
     }
 
     // Read mixing type
-    readMixingType();
+    this->readMixingType();
 }
 
 
@@ -387,6 +390,12 @@ tmp<Field<Type> > mixingPlaneFvPatchField<Type>::patchNeighbourField() const
     // Get shadow patch internalField field
     Field<Type> sField = this->shadowPatchField().patchInternalField();
 
+    // If mixing type is unknown, read it
+    if (mixing_ == mixingPlaneInterpolation::MIXING_UNKNOWN)
+    {
+        this->readMixingType();
+    }
+
     if (mixing_ == mixingPlaneInterpolation::AREA_AVERAGING)
     {
         // Area-weighted averaging
@@ -454,6 +463,12 @@ void mixingPlaneFvPatchField<Type>::initEvaluate
 
     const scalarField& w = this->patch().weights();
 
+    // If mixing type is unknown, read it
+    if (mixing_ == mixingPlaneInterpolation::MIXING_UNKNOWN)
+    {
+        this->readMixingType();
+    }
+
     if
     (
         mixing_ == mixingPlaneInterpolation::AREA_AVERAGING
@@ -505,6 +520,12 @@ tmp<Field<Type> > mixingPlaneFvPatchField<Type>::valueInternalCoeffs
     const tmp<scalarField>& w
 ) const
 {
+    // If mixing type is unknown, read it
+    if (mixing_ == mixingPlaneInterpolation::MIXING_UNKNOWN)
+    {
+        this->readMixingType();
+    }
+
     if (mixing_ == mixingPlaneInterpolation::AREA_AVERAGING)
     {
         return pTraits<Type>::one*w;
@@ -560,6 +581,12 @@ tmp<Field<Type> > mixingPlaneFvPatchField<Type>::valueBoundaryCoeffs
     const tmp<scalarField>& w
 ) const
 {
+    // If mixing type is unknown, read it
+    if (mixing_ == mixingPlaneInterpolation::MIXING_UNKNOWN)
+    {
+        this->readMixingType();
+    }
+
     if (mixing_ == mixingPlaneInterpolation::AREA_AVERAGING)
     {
         return pTraits<Type>::one*(1.0 - w);
@@ -606,6 +633,12 @@ tmp<Field<Type> > mixingPlaneFvPatchField<Type>::valueBoundaryCoeffs
 // tmp<Field<Type> >
 // mixingPlaneFvPatchField<Type>::gradientInternalCoeffs() const
 // {
+//     // If mixing type is unknown, read it
+//     if (mixing_ == mixingPlaneInterpolation::MIXING_UNKNOWN)
+//     {
+//         this->readMixingType();
+//     }
+//
 //     if
 //     (
 //         mixing_ == mixingPlaneInterpolation::AREA_AVERAGING
@@ -645,6 +678,12 @@ tmp<Field<Type> > mixingPlaneFvPatchField<Type>::valueBoundaryCoeffs
 // tmp<Field<Type> >
 // mixingPlaneFvPatchField<Type>::gradientBoundaryCoeffs() const
 // {
+//     // If mixing type is unknown, read it
+//     if (mixing_ == mixingPlaneInterpolation::MIXING_UNKNOWN)
+//     {
+//         this->readMixingType();
+//     }
+//
 //     if
 //     (
 //         mixing_ == mixingPlaneInterpolation::AREA_AVERAGING
@@ -691,8 +730,11 @@ void mixingPlaneFvPatchField<Type>::patchInterpolate
     // HJ, 13/Jun/2013
     const label patchI = this->patch().index();
 
-    // Read mixing type
-    readMixingType();
+    // If mixing type is unknown, read it
+    if (mixing_ == mixingPlaneInterpolation::MIXING_UNKNOWN)
+    {
+        this->readMixingType();
+    }
 
     // Use circumferential average of internal field when interpolating to
     // patch.  HJ and MB, 13/Jun/2013
@@ -742,8 +784,11 @@ void mixingPlaneFvPatchField<Type>::patchInterpolate
     // HJ, 13/Jun/2013
     const label patchI = this->patch().index();
 
-    // Read mixing type
-    readMixingType();
+    // If mixing type is unknown, read it
+    if (mixing_ == mixingPlaneInterpolation::MIXING_UNKNOWN)
+    {
+        this->readMixingType();
+    }
 
     // Use circumferential average of internal field when interpolating to
     // patch.  HJ and MB, 13/Jun/2013
@@ -791,8 +836,11 @@ void mixingPlaneFvPatchField<Type>::patchFlux
 {
     const label patchI = this->patch().index();
 
-    // Read mixing type
-    readMixingType();
+    // If mixing type is unknown, read it
+    if (mixing_ == mixingPlaneInterpolation::MIXING_UNKNOWN)
+    {
+        this->readMixingType();
+    }
 
     if
     (
@@ -866,6 +914,12 @@ void mixingPlaneFvPatchField<Type>::initInterfaceMatrixUpdate
 {
     // Communication is allowed either before or after processor
     // patch comms.  HJ, 11/Jul/2011
+
+    // If mixing type is unknown, read it
+    if (mixing_ == mixingPlaneInterpolation::MIXING_UNKNOWN)
+    {
+        this->readMixingType();
+    }
 
     if
     (

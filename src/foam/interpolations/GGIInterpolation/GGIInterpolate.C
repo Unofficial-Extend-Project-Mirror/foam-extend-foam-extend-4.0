@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -145,8 +145,11 @@ void GGIInterpolation<MasterPatch, SlavePatch>::maskedBridge
             {
                 // Gone beyond my index: my face is not present in the mask
                 // Go one back and check for next uncovered face
+                if (maskAddrI > 0)
+                {
+                    maskAddrI--;
+                }
 
-                maskAddrI--;
                 break;
             }
         }

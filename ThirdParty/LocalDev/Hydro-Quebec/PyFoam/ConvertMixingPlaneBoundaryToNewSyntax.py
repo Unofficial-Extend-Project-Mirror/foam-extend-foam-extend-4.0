@@ -9,8 +9,9 @@ Author:
 
 """
 
-from PyFoamApplication import PyFoamApplication
+from PyFoam.Applications.PyFoamApplication import PyFoamApplication
 from PyFoam.RunDictionary.ParsedParameterFile import ParsedParameterFile
+from PyFoam.ThirdParty.six import print_
 from os import path
 import sys
 
@@ -46,7 +47,7 @@ class switch(object):
         """Return the match method once, then stop"""
         yield self.match
         raise StopIteration
-    
+
     def match(self, *args):
         """Indicate whether or not to enter a case suite"""
         if self.fall or not args:
@@ -87,13 +88,13 @@ Change MixingPlane boundary condition parameters
 
     def run(self):
         fName=self.parser.getArgs()[0]
- 
+
         boundary=ParsedParameterFile(path.join(".",fName,"constant","polyMesh","boundary"),debug=False,boundaryDict=True)
 
         bnd=boundary.content
 
         if type(bnd)!=list:
-            print "Problem with boundary file (not a list)"
+            print_("Problem with boundary file (not a list)")
             sys.exit(-1)
 
         found=False
@@ -107,23 +108,23 @@ Change MixingPlane boundary condition parameters
 
             if bnd[indexDefPatch]["type"]=="mixingPlane":
                 if bnd[indexDefPatch].has_key("assembly"):
-                    print "    Replacing the parameter 'assembly' for patch", bnd[index]
+                    print_("    Replacing the parameter 'assembly' for patch", bnd[index])
                     oldAssembly=bnd[indexDefPatch]["assembly"]
                     del bnd[indexDefPatch]["assembly"]
 
                 if bnd[indexDefPatch].has_key("orientation"):
-                    print "    Replacing the parameter 'orientation' for patch", bnd[index]
+                    print_("    Replacing the parameter 'orientation' for patch", bnd[index])
                     oldOrientation=bnd[indexDefPatch]["orientation"]
                     del bnd[indexDefPatch]["orientation"]
 
                 if bnd[indexDefPatch].has_key("ribbonPatch")==False:
                     bnd[indexDefPatch]["ribbonPatch"]={}
-                    
+
                 if bnd[indexDefPatch].has_key("zone")==False:
                     bnd[indexDefPatch]["zone"]=bnd[index] + "Zone"
 
                 if oldAssembly != "":
-                    # Converting "assembly" to ribbonPatch/discretisation    
+                    # Converting "assembly" to ribbonPatch/discretisation
                     for case in switch(oldAssembly):
                         if case('master'):
                             bnd[indexDefPatch]["ribbonPatch"]["discretisation"]="masterPatch"
@@ -138,7 +139,7 @@ Change MixingPlane boundary condition parameters
                             bnd[indexDefPatch]["ribbonPatch"]["discretisation"]="userDefined"
                             break
                         if case(): # default
-                            print "Unsupported assembly type: ", oldAssembly
+                            print_("Unsupported assembly type: ", oldAssembly)
 
                 if oldOrientation != "":
                     # Converting "orientation" to ribbonPatch/ribbonPatchSweepAxis and
@@ -194,10 +195,9 @@ Change MixingPlane boundary condition parameters
                             bnd[indexDefPatch]["ribbonPatch"]["sweepAxis"]="R"
                             break
                         if case(): # default
-                            print "Unsupported orientation type: ", oldOrientation
+                            print_("Unsupported orientation type: ", oldOrientation)
 
         if self.parser.getOptions().test:
-            print boundary
+            print_(boundary)
         else:
             boundary.writeFile()
-

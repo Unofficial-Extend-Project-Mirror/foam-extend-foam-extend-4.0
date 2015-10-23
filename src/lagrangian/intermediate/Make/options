@@ -29,5 +29,6 @@ LIB_LIBS = \
     -lspecie \
     -lbasicThermophysicalModels \
     -lreactionThermophysicalModels \
+    -lradiation \
     -lcompressibleRASModels \
     -lcompressibleLESModels

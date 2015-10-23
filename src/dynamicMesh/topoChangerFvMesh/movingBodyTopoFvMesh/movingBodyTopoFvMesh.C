@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -24,7 +24,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "movingBodyTopoFvMesh.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "mapPolyMesh.H"
 #include "layerAdditionRemoval.H"
 #include "volMesh.H"
@@ -276,7 +276,9 @@ bool Foam::movingBodyTopoFvMesh::update()
 //         pointField mappedOldPointsNew(allPoints().size());
 //         mappedOldPointsNew.map(oldPointsNew, topoChangeMap->pointMap());
 
-//         movePoints(mappedOldPointsNew);
+//         // Note: using setOldPoints instead of movePoints.
+//         // HJ, 23/Aug/2015
+//         setOldPoints(mappedOldPointsNew);
 //         resetMotion();
 //         setV0();
 
@@ -286,7 +288,9 @@ bool Foam::movingBodyTopoFvMesh::update()
 //     else
 //     {
 //         // No change, use old points
-//         movePoints(oldPointsNew);
+//         // Note: using setOldPoints instead of movePoints.
+//         // HJ, 23/Aug/2015
+//         setOldPoints(oldPointsNew);
 //         resetMotion();
 //         setV0();
 //     }

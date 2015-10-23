@@ -64,8 +64,8 @@ thrust::sequence
 thrust::copy
 (
     A.values.begin() + ces->nCells,
-	A.values.begin() + ces->nCells + ces->nFaces,
-	A.values.begin() + ces->nCells + ces->nFaces
+    A.values.begin() + ces->nCells + ces->nFaces,
+    A.values.begin() + ces->nCells + ces->nFaces
 );
 
 // Copy row indices of lower to columns of upper into A COO matrix

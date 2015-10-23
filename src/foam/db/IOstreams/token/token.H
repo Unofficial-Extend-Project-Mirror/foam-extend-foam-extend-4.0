@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -81,9 +81,10 @@ public:
         LABEL,
         FLOAT_SCALAR,
         DOUBLE_SCALAR,
+        LONG_DOUBLE_SCALAR,
         COMPOUND,
 
-        ERROR
+        FATALERROR
     };
 
 
@@ -258,6 +259,7 @@ private:
             label labelToken_;
             floatScalar floatScalarToken_;
             doubleScalar doubleScalarToken_;
+            longDoubleScalar longDoubleScalarToken_;
             mutable compound* compoundTokenPtr_;
         };
 
@@ -307,6 +309,9 @@ public:
         //- Construct doubleScalar token
         inline token(const doubleScalar, label lineNumber=0);
 
+        //- Construct longDoubleScalar token
+        inline token(const longDoubleScalar, label lineNumber=0);
+
         //- Construct from Istream
         token(Istream&);
 
@@ -343,6 +348,9 @@ public:
 
             inline bool isDoubleScalar() const;
             inline doubleScalar doubleScalarToken() const;
+
+            inline bool isLongDoubleScalar() const;
+            inline longDoubleScalar longDoubleScalarToken() const;
 
             inline bool isScalar() const;
             inline scalar scalarToken() const;
@@ -391,6 +399,7 @@ public:
             inline void operator=(const label);
             inline void operator=(const floatScalar);
             inline void operator=(const doubleScalar);
+            inline void operator=(const longDoubleScalar);
 
             inline void operator=(compound*);
 
@@ -404,6 +413,7 @@ public:
             inline bool operator==(const label) const;
             inline bool operator==(const floatScalar) const;
             inline bool operator==(const doubleScalar) const;
+            inline bool operator==(const longDoubleScalar) const;
 
 
         // Inequality
@@ -415,6 +425,7 @@ public:
             inline bool operator!=(const label) const;
             inline bool operator!=(const floatScalar) const;
             inline bool operator!=(const doubleScalar) const;
+            inline bool operator!=(const longDoubleScalar) const;
 
 
     // IOstream operators

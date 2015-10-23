@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -75,7 +75,7 @@ public:
         //  These also correspond to the entries in names.
         enum switchType
         {
-            FALSE = 0,  TRUE  = 1,
+            FOAM_FALSE = 0,  FOAM_TRUE  = 1,
             OFF   = 2,  ON    = 3,
             NO    = 4,  YES   = 5,
             NO_1  = 6,  YES_1 = 7,
@@ -127,7 +127,7 @@ public:
         //- Construct null as false
         Switch()
         :
-            switch_(Switch::FALSE)
+            switch_(Switch::FOAM_FALSE)
         {}
 
         //- Construct from bool
@@ -178,7 +178,7 @@ public:
         //- Assignment from bool
         const Switch& operator=(const bool b)
         {
-            switch_ = (b ? Switch::TRUE : Switch::FALSE);
+            switch_ = (b ? Switch::FOAM_TRUE : Switch::FOAM_FALSE);
             return *this;
         }
 

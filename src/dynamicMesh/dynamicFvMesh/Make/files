@@ -17,42 +17,4 @@ turboFvMesh/turboFvMesh.C
 fvMeshAdder/fvMeshAdder.C
 fvMeshDistribute/fvMeshDistribute.C
 
-tetMetrics = dynamicTopoFvMesh/tetMetrics
-$(tetMetrics)/tetMetric.C
-$(tetMetrics)/tetMetrics.C
-
-lengthScaleEstimator = dynamicTopoFvMesh/lengthScaleEstimator
-$(lengthScaleEstimator)/lengthScaleEstimator.C
-
-eMesh = dynamicTopoFvMesh/eMesh
-$(eMesh)/eMesh.C
-$(eMesh)/eMeshDemandDrivenData.C
-$(eMesh)/eBoundaryMesh/eBoundaryMesh.C
-ePatches = $(eMesh)/ePatches
-$(ePatches)/ePatch/ePatch.C
-$(ePatches)/ePatch/newEPatch.C
-dynamicTopoFvMesh/meshOps.C
-dynamicTopoFvMesh/dynamicTopoFvMesh.C
-dynamicTopoFvMesh/dynamicTopoFvMeshCheck.C
-dynamicTopoFvMesh/dynamicTopoFvMeshReOrder.C
-dynamicTopoFvMesh/dynamicTopoFvMeshMapping.C
-dynamicTopoFvMesh/dynamicTopoFvMeshCoupled.C
-dynamicTopoFvMesh/edgeSwap.C
-dynamicTopoFvMesh/edgeBisect.C
-dynamicTopoFvMesh/edgeCollapse.C
-
-dynamicTopoFvMesh/coupleMap.C
-
-convexSetAlgorithm = dynamicTopoFvMesh/convexSetAlgorithm
-$(convexSetAlgorithm)/convexSetAlgorithm.C
-$(convexSetAlgorithm)/faceSetAlgorithm.C
-$(convexSetAlgorithm)/cellSetAlgorithm.C
-
-fieldMapping = dynamicTopoFvMesh/fieldMapping
-$(fieldMapping)/topoMapper.C
-$(fieldMapping)/fluxCorrector.C
-$(fieldMapping)/topoCellMapper.C
-$(fieldMapping)/topoPatchMapper.C
-$(fieldMapping)/topoSurfaceMapper.C
-
 LIB = $(FOAM_LIBBIN)/libdynamicFvMesh

@@ -1,0 +1,17 @@
+.SUFFIXES: .cu
+
+NVCC        = nvcc -m64 -arch $(CUDA_ARCH)
+
+NVCC_ptFLAGS = -DNoRepository
+
+NVCC_FLAGS  =   $(NVCC_ptFLAGS)  -Xcompiler -fPIC $(LIB_HEADER_DIRS) $(GFLAGS) $(c++OPT) $(c++DBUG)
+
+cutoo       = $(WM_SCHEDULER) $(NVCC) $(NVCC_FLAGS) -c $$SOURCE -o $@
+
+LINK_LIBS   = $(c++DBUG)
+
+LINKLIBSO   = $(CC) $(c++FLAGS) -shared -Xlinker --add-needed -Xlinker --no-as-needed
+LINKEXE     = $(CC) $(c++FLAGS) -Xlinker --add-needed -Xlinker --no-as-needed
+
+.cu.dep:
+	$(MAKE_DEP)

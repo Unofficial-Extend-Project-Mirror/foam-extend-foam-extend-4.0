@@ -4,7 +4,7 @@
         tmp<fvScalarMatrix> TEqn
         (
             fvm::ddt(rho*cp, T)
-          - fvm::laplacian(K, T)
+          - fvm::laplacian(Kappa, T)
         );
         TEqn().relax();
         TEqn().solve();

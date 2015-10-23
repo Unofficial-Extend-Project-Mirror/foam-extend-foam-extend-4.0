@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -36,13 +36,7 @@ namespace Foam
     namespace radiation
     {
         defineTypeNameAndDebug(noRadiation, 0);
-
-        addToRunTimeSelectionTable
-        (
-            radiationModel,
-            noRadiation,
-            dictionary
-        );
+        addToRadiationRunTimeSelectionTables(noRadiation);
     }
 }
 
@@ -50,6 +44,16 @@ namespace Foam
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 Foam::radiation::noRadiation::noRadiation(const volScalarField& T)
+:
+    radiationModel(T)
+{}
+
+
+Foam::radiation::noRadiation::noRadiation
+(
+    const dictionary& dict,
+    const volScalarField& T
+)
 :
     radiationModel(T)
 {}

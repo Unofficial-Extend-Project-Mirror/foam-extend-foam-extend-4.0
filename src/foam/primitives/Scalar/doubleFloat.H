@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -84,6 +84,13 @@ inline double pow(const type1 s, const type2 e)   \
     return ::pow(double(s), double(e));           \
 }
 
+MAXMINPOW(long double, long double, long double)
+MAXMINPOW(long double, long double, double)
+MAXMINPOW(long double, long double, float)
+MAXMINPOW(long double, long double, int)
+MAXMINPOW(long double, double, long double)
+MAXMINPOW(long double, float, long double)
+MAXMINPOW(long double, int, long double)
 
 MAXMINPOW(double, double, double)
 MAXMINPOW(double, double, float)

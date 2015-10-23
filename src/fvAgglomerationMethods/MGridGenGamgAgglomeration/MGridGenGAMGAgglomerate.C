@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -146,6 +146,8 @@ Foam::tmp<Foam::labelField> Foam::MGridGenGAMGAgglomeration::agglomerate
     List<int> finalAgglom(nFineCells);
     int nMoves = -1;
 
+#   ifdef WM_DP
+
     MGridGen
     (
         nFineCells,
@@ -161,6 +163,46 @@ Foam::tmp<Foam::labelField> Foam::MGridGenGAMGAgglomeration::agglomerate
         &nCoarseCells,
         finalAgglom.begin()
     );
+
+#   else
+
+    // Conversion of type for MGridGen interface
+
+    Field<realtype> dblVols(V.size());
+    forAll (dblVols, i)
+    {
+        dblVols[i] = V[i];
+    }
+
+    Field<realtype> dblAreas(Sb.size());
+    forAll (dblAreas, i)
+    {
+        dblAreas[i] = Sb[i];
+    }
+
+    Field<realtype> dblFaceWeights(faceWeights.size());
+    forAll (dblFaceWeights, i)
+    {
+        dblFaceWeights[i] = faceWeights[i];
+    }
+
+    MGridGen
+    (
+        nFineCells,
+        cellCellOffsets.begin(),
+        dblVols.begin(),
+        dblAreas.begin(),
+        cellCells.begin(),
+        dblFaceWeights.begin(),
+        minSize,
+        maxSize,
+        options.begin(),
+        &nMoves,
+        &nCoarseCells,
+        finalAgglom.begin()
+    );
+
+#   endif
 
     return tmp<labelField>(new labelField(finalAgglom));
 }

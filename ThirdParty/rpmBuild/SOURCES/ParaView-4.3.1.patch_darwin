@@ -1,0 +1,12 @@
+diff -ruN ParaView-4.3.1_orig/Applications/ParaView-4.3.1_extra_install_Darwin.cmake ParaView-4.3.1/Applications/ParaView-4.3.1_extra_install_Darwin.cmake
+--- ParaView-4.3.1_orig/Applications/ParaView-4.3.1_extra_install_Darwin.cmake	1969-12-31 19:00:00.000000000 -0500
++++ ParaView-4.3.1/Applications/ParaView-4.3.1_extra_install_Darwin.cmake	2013-10-02 19:00:00.000000000 -0400
+@@ -0,0 +1,8 @@
++#
++# Additional install rules for Mac OS X platforms 
++#
++INSTALL (DIRECTORY buildObj/bin/paraview.app
++           DESTINATION ${CMAKE_INSTALL_PREFIX}/bin
++	   USE_SOURCE_PERMISSIONS
++           COMPONENT Runtime)
++

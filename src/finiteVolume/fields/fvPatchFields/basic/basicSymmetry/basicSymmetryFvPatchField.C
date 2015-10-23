@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -40,7 +40,9 @@ basicSymmetryFvPatchField<Type>::basicSymmetryFvPatchField
     const DimensionedField<Type, volMesh>& iF
 )
 :
-    transformFvPatchField<Type>(p, iF)
+    transformFvPatchField<Type>(p, iF),
+    skewCorrected_(false),
+    secondOrder_(false)
 {}
 
 
@@ -53,7 +55,9 @@ basicSymmetryFvPatchField<Type>::basicSymmetryFvPatchField
     const fvPatchFieldMapper& mapper
 )
 :
-    transformFvPatchField<Type>(ptf, p, iF, mapper)
+    transformFvPatchField<Type>(ptf, p, iF, mapper),
+    skewCorrected_(ptf.skewCorrected_),
+    secondOrder_(ptf.secondOrder_)
 {}
 
 
@@ -65,7 +69,9 @@ basicSymmetryFvPatchField<Type>::basicSymmetryFvPatchField
     const dictionary& dict
 )
 :
-    transformFvPatchField<Type>(p, iF, dict)
+    transformFvPatchField<Type>(p, iF, dict),
+    skewCorrected_(dict.lookupOrDefault<Switch>("skewCorrected", false)),
+    secondOrder_(dict.lookupOrDefault<Switch>("secondOrder", false))
 {
     this->evaluate();
 }
@@ -77,7 +83,9 @@ basicSymmetryFvPatchField<Type>::basicSymmetryFvPatchField
     const basicSymmetryFvPatchField<Type>& ptf
 )
 :
-    transformFvPatchField<Type>(ptf)
+    transformFvPatchField<Type>(ptf),
+    skewCorrected_(ptf.skewCorrected_),
+    secondOrder_(ptf.secondOrder_)
 {}
 
 
@@ -88,26 +96,34 @@ basicSymmetryFvPatchField<Type>::basicSymmetryFvPatchField
     const DimensionedField<Type, volMesh>& iF
 )
 :
-    transformFvPatchField<Type>(ptf, iF)
+    transformFvPatchField<Type>(ptf, iF),
+    skewCorrected_(ptf.skewCorrected_),
+    secondOrder_(ptf.secondOrder_)
 {}
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-// return gradient at boundary
+// Return gradient at boundary
+// Note: see template specialisations for second order behaviour
+// HJ, 18/Mar/2015
 template<class Type>
 tmp<Field<Type> > basicSymmetryFvPatchField<Type>::snGrad() const
 {
     vectorField nHat = this->patch().nf();
+
+    const Field<Type> pif = this->patchInternalField();
+
     return
     (
-        transform(I - 2.0*sqr(nHat), this->patchInternalField())
-      - this->patchInternalField()
+        transform(I - 2.0*sqr(nHat), pif) - pif
     )*(this->patch().deltaCoeffs()/2.0);
 }
 
 
 // Evaluate the field on the patch
+// Note: see template specialisations for second order behaviour
+// HJ, 18/Mar/2015
 template<class Type>
 void basicSymmetryFvPatchField<Type>::evaluate(const Pstream::commsTypes)
 {
@@ -119,6 +135,7 @@ void basicSymmetryFvPatchField<Type>::evaluate(const Pstream::commsTypes)
     vectorField nHat = this->patch().nf();
 
     Field<Type> pif = this->patchInternalField();
+
     Field<Type>::operator=
     (
         0.5*(pif + transform(I - 2.0*sqr(nHat), pif))
@@ -140,6 +157,32 @@ tmp<Field<Type> > basicSymmetryFvPatchField<Type>::snGradTransformDiag() const
     diag.replace(vector::Z, mag(nHat.component(vector::Z)));
 
     return transformFieldMask<Type>(pow<vector, pTraits<Type>::rank>(diag));
+}
+
+
+template<class Type>
+void basicSymmetryFvPatchField<Type>::write(Ostream& os) const
+{
+    fvPatchField<Type>::write(os);
+
+    this->writeEntryIfDifferent
+    (
+        os,
+        "skewCorrected",
+        Switch(false),
+        skewCorrected_
+    );
+
+    this->writeEntryIfDifferent
+    (
+        os,
+        "secondOrder",
+        Switch(false),
+        secondOrder_
+    );
+
+    // Write values.  HJ, 18/Mar/2015
+    this->writeEntry("value", os);
 }
 
 

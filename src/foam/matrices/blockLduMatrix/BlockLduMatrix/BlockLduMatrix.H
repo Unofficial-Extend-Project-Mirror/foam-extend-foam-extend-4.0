@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -53,6 +53,7 @@ SourceFiles
 #include "HashSet.H"
 #include "BlockLduInterfaceFieldPtrsList.H"
 #include "Map.H"
+#include "optimisationSwitch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -135,7 +136,7 @@ private:
 
         //- Matrix constraint fill-in
         //  Equals to the estimated fraction of fixed nodes in the matrix
-        static const label fixFillIn;
+        static const debug::optimisationSwitch fixFillIn;
 
 
     // Private member functions

@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -38,6 +38,7 @@ SourceFiles
 
 #include "floatScalar.H"
 #include "doubleScalar.H"
+#include "longDoubleScalar.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -76,6 +77,28 @@ namespace Foam
 
     scalar readScalar(Istream& is);
 }
+
+#elif defined(WM_LDP)
+
+// Define scalar as a long double
+
+namespace Foam
+{
+    typedef longDoubleScalar scalar;
+
+    static const scalar GREAT = longDoubleScalarGREAT;
+    static const scalar VGREAT = longDoubleScalarVGREAT;
+    static const scalar ROOTVGREAT = longDoubleScalarROOTVGREAT;
+    static const scalar SMALL = longDoubleScalarSMALL;
+    static const scalar VSMALL = longDoubleScalarVSMALL;
+    static const scalar ROOTVSMALL = longDoubleScalarROOTVSMALL;
+
+    scalar readScalar(Istream& is);
+}
+
+#else
+
+#error "Undefined precision for scalar in scalar.H"
 
 #endif
 

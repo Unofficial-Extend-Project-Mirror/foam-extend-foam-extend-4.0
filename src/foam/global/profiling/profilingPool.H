@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -81,6 +81,7 @@ class profilingPool
 
         clockTime globalTime_;
 
+        const Time &owner_;
 
     // Private Member Functions
 
@@ -100,7 +101,11 @@ class profilingPool
     // Constructors
 
         //- Construct null
-        profilingPool(const IOobject&);
+        profilingPool
+        (
+            const IOobject&,
+            const Time&
+        );
 
 
     //- Destructor
@@ -129,9 +134,22 @@ class profilingPool
             return theStack_;
         }
 
-public:
+        const Time& owner() const
+        {
+            return owner_;
+        }
 
-    static void initprofiling(const IOobject&);
+protected:
+
+    static void initProfiling
+    (
+        const IOobject&,
+        const Time&
+    );
+
+    static void stopProfiling(const Time&);
+
+public:
 
     static profilingInfo& getInfo(const string& name);
 
@@ -140,6 +158,8 @@ public:
     static void rememberTimer(const profilingInfo& info, clockTime& timer);
 
     virtual bool writeData(Ostream&) const;
+
+    friend class Time;
 };
 
 

@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -63,6 +63,7 @@ SourceFiles
 #include "ZoneIDs.H"
 #include "intersection.H"
 #include "Pair.H"
+#include "tolerancesSwitch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -174,7 +175,8 @@ private:
             mutable labelList* slavePointPointHitsPtr_;
 
             //- Slave edge hit.  The index of master edge hit by the
-            //  slave point in projection.  For point or no edge  hit, set to -1
+            //  slave point in projection.
+            //  For point or no edge  hit, set to -1
             mutable labelList* slavePointEdgeHitsPtr_;
 
             //- Slave face hit.  The index of master face hit by the
@@ -261,10 +263,10 @@ private:
     // Static data members
 
         //- Point merge tolerance
-        static const scalar pointMergeTol_;
+        static const debug::tolerancesSwitch pointMergeTol_;
 
         //- Edge merge tolerance
-        static const scalar edgeMergeTol_;
+        static const debug::tolerancesSwitch edgeMergeTol_;
 
         //- Estimated number of faces an edge goes through
         static const label nFacesPerSlaveEdge_;
@@ -273,16 +275,16 @@ private:
         static const label edgeFaceEscapeLimit_;
 
         //- Integral match point adjustment tolerance
-        static const scalar integralAdjTol_;
+        static const debug::tolerancesSwitch integralAdjTol_;
 
         //- Edge intersection master catch fraction
-        static const scalar edgeMasterCatchFraction_;
+        static const debug::tolerancesSwitch edgeMasterCatchFraction_;
 
         //- Edge intersection co-planar tolerance
-        static const scalar edgeCoPlanarTol_;
+        static const debug::tolerancesSwitch edgeCoPlanarTol_;
 
         //- Edge end cut-off tolerance
-        static const scalar edgeEndCutoffTol_;
+        static const debug::tolerancesSwitch edgeEndCutoffTol_;
 
 
 public:

@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -85,12 +85,16 @@ Foam::Ostream& Foam::operator<<(Ostream& os, const token& t)
             os << t.doubleScalarToken_;
         break;
 
+        case token::LONG_DOUBLE_SCALAR:
+            os << t.longDoubleScalarToken_;
+        break;
+
         case token::COMPOUND:
             os << *t.compoundTokenPtr_;
         break;
 
-        case token::ERROR:
-            os << "ERROR";
+        case token::FATALERROR:
+            os << "FATALERROR";
             WarningIn("Ostream& operator<<(Ostream&, const token&)")
                 << "Error token" << endl;
         break;
@@ -168,6 +172,10 @@ ostream& Foam::operator<<(ostream& os, const InfoProxy<token>& ip)
             os  << " the doubleScalar " << t.doubleScalarToken();
         break;
 
+        case token::LONG_DOUBLE_SCALAR:
+            os  << " the longDoubleScalar " << t.doubleScalarToken();
+        break;
+
         case token::COMPOUND:
         {
             if (t.compoundToken().empty())
@@ -183,7 +191,7 @@ ostream& Foam::operator<<(ostream& os, const InfoProxy<token>& ip)
         }
         break;
 
-        case token::ERROR:
+        case token::FATALERROR:
             os  << " an error";
         break;
 
@@ -238,6 +246,10 @@ Ostream& operator<<(Ostream& os, const InfoProxy<token>& ip)
             os  << " the doubleScalar " << t.doubleScalarToken();
         break;
 
+        case token::LONG_DOUBLE_SCALAR:
+            os  << " the longDoubleScalar " << t.longDoubleScalarToken();
+        break;
+
         case token::COMPOUND:
         {
             if (t.compoundToken().empty())
@@ -253,7 +265,7 @@ Ostream& operator<<(Ostream& os, const InfoProxy<token>& ip)
         }
         break;
 
-        case token::ERROR:
+        case token::FATALERROR:
             os  << " an error";
         break;
 

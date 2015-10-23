@@ -4,7 +4,7 @@
 #include "parRun.H"
 
 #include "objectRegistry.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "fvMesh.H"
 #include "fvc.H"
 #include "fvMatrices.H"

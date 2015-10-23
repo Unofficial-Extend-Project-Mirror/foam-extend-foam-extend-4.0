@@ -1,0 +1,64 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | foam-extend: Open Source CFD                    |
+|  \\    /   O peration     | Version:     3.2                                |
+|   \\  /    A nd           | Web:         http://www.foam-extend.org         |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       volScalarField;
+    object      pd;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+dimensions [1 -1 -2 0 0 0 0];
+
+internalField uniform 0;
+
+boundaryField
+{
+    ibCylinder
+    {
+        type immersedBoundary;
+        refValue uniform 0;
+        refGradient  uniform 0;
+        fixesValue no;
+
+        setDeadCellValue   yes;
+        deadCellValue      0;
+
+        value uniform 0;
+    }
+    left
+    {
+        type zeroGradient;
+    }
+    right
+    {
+        type zeroGradient;
+    }
+    top
+    {
+        type            totalPressure;
+        p0              uniform 0;
+        U               U;
+        phi             phi;
+        rho             rho;
+        psi             none;
+        gamma           1;
+        value           uniform 0;
+    }
+    bottom
+    {
+        type zeroGradient;
+    }
+    frontAndBack
+    {
+        type empty;
+    }
+}
+
+// ************************************************************************* //

@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -107,15 +107,20 @@ void Foam::gradientEnthalpyFvPatchScalarField::updateCoeffs()
     if
     (
         dimensionedInternalField().name() == db().mangleFileName("h")
-     || dimensionedInternalField().name() == db().mangleFileName("i")
     )
     {
         gradient() = thermo.Cp(Tw, patchi)*Tw.snGrad()
-        + patch().deltaCoeffs()*
-        (
-            thermo.h(Tw, patchi)
-          - thermo.h(Tw, patch().faceCells())
-        );
+          + patch().deltaCoeffs()*
+            (
+                thermo.h(Tw, patchi)
+              - thermo.h(Tw, patch().faceCells())
+            );
+    }
+    else if
+    (
+        dimensionedInternalField().name() == db().mangleFileName("i")
+    )
+    {
     }
     else
     {

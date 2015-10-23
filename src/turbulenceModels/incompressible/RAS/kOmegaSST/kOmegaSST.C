@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -69,6 +69,7 @@ tmp<volScalarField> kOmegaSST::F1(const volScalarField& CDkOmega) const
     return tanh(pow4(arg1));
 }
 
+
 tmp<volScalarField> kOmegaSST::F2() const
 {
     volScalarField arg2 = min
@@ -82,6 +83,31 @@ tmp<volScalarField> kOmegaSST::F2() const
     );
 
     return tanh(sqr(arg2));
+}
+
+
+tmp<volScalarField> kOmegaSST::F3() const
+{
+    tmp<volScalarField> arg3 = min
+    (
+        150*nu()/(omega_*sqr(y_)),
+        scalar(10)
+    );
+
+    return 1 - tanh(pow4(arg3));
+}
+
+
+tmp<volScalarField> kOmegaSST::F23() const
+{
+    tmp<volScalarField> f23(F2());
+
+    if (F3_)
+    {
+        f23() *= F3();
+    }
+
+    return f23;
 }
 
 
@@ -102,7 +128,7 @@ kOmegaSST::kOmegaSST
         (
             "alphaK1",
             coeffDict_,
-            0.85034
+            0.85
         )
     ),
     alphaK2_
@@ -129,7 +155,7 @@ kOmegaSST::kOmegaSST
         (
             "alphaOmega2",
             coeffDict_,
-            0.85616
+            0.856
         )
     ),
     gamma1_
@@ -138,7 +164,7 @@ kOmegaSST::kOmegaSST
         (
             "gamma1",
             coeffDict_,
-            0.5532
+            5.0/9.0
         )
     ),
     gamma2_
@@ -147,7 +173,7 @@ kOmegaSST::kOmegaSST
         (
             "gamma2",
             coeffDict_,
-            0.4403
+            0.44
         )
     ),
     beta1_
@@ -186,6 +212,15 @@ kOmegaSST::kOmegaSST
             0.31
         )
     ),
+    b1_
+    (
+        dimensioned<scalar>::lookupOrAddToDict
+        (
+            "b1",
+            coeffDict_,
+            1.0
+        )
+    ),
     c1_
     (
         dimensioned<scalar>::lookupOrAddToDict
@@ -193,6 +228,15 @@ kOmegaSST::kOmegaSST
             "c1",
             coeffDict_,
             10.0
+        )
+    ),
+    F3_
+    (
+        Switch::lookupOrAddToDict
+        (
+            "F3",
+            coeffDict_,
+            false
         )
     ),
 
@@ -235,9 +279,18 @@ kOmegaSST::kOmegaSST
         autoCreateNut("nut", mesh_, U_.db())
     )
 {
+    bound(k_, k0_);
     bound(omega_, omega0_);
 
-    nut_ = a1_*k_/max(a1_*omega_, F2()*sqrt(2.0)*mag(symm(fvc::grad(U_))));
+    nut_ =
+    (
+        a1_*k_/
+        max
+        (
+            a1_*omega_,
+            b1_*F23()*sqrt(2.0)*mag(symm(fvc::grad(U_)))
+        )
+    );
     nut_.correctBoundaryConditions();
 
     printCoeffs();
@@ -311,7 +364,9 @@ bool kOmegaSST::read()
         beta2_.readIfPresent(coeffDict());
         betaStar_.readIfPresent(coeffDict());
         a1_.readIfPresent(coeffDict());
+        b1_.readIfPresent(coeffDict());
         c1_.readIfPresent(coeffDict());
+        F3_.readIfPresent("F3", coeffDict());
 
         return true;
     }
@@ -344,16 +399,18 @@ void kOmegaSST::correct()
         y_.correct();
     }
 
-    volScalarField S2 = magSqr(symm(fvc::grad(U_)));
-    volScalarField G("RASModel::G", nut_*2*S2);
+    const volScalarField S2(2*magSqr(symm(fvc::grad(U_))));
+    volScalarField G("RASModel::G", nut_*S2);
 
     // Update omega and G at the wall
     omega_.boundaryField().updateCoeffs();
 
-    volScalarField CDkOmega =
-        (2*alphaOmega2_)*(fvc::grad(k_) & fvc::grad(omega_))/omega_;
+    const volScalarField CDkOmega
+    (
+        (2*alphaOmega2_)*(fvc::grad(k_) & fvc::grad(omega_))/omega_
+    );
 
-    volScalarField F1 = this->F1(CDkOmega);
+    const volScalarField F1(this->F1(CDkOmega));
 
     // Turbulent frequency equation
     tmp<fvScalarMatrix> omegaEqn
@@ -363,7 +420,8 @@ void kOmegaSST::correct()
       + fvm::SuSp(-fvc::div(phi_), omega_)
       - fvm::laplacian(DomegaEff(F1), omega_)
      ==
-        gamma(F1)*2*S2
+        gamma(F1)
+       *min(S2, (c1_/a1_)*betaStar_*omega_*max(a1_*omega_, b1_*F23()*sqrt(S2)))
       - fvm::Sp(beta(F1)*omega_, omega_)
       - fvm::SuSp
         (
@@ -399,7 +457,8 @@ void kOmegaSST::correct()
 
 
     // Re-calculate viscosity
-    nut_ = a1_*k_/max(a1_*omega_, F2()*sqrt(2*S2));
+    // Fixed sqrt(2) error.  HJ, 10/Jun/2015
+    nut_ = a1_*k_/max(a1_*omega_, b1_*F23()*sqrt(S2));
     nut_ = min(nut_, nuRatio()*nu());
     nut_.correctBoundaryConditions();
 }

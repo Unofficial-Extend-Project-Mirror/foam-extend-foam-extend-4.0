@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -31,7 +31,7 @@ Description
         myWallPatch
         {
             type            solidWallHeatFluxTemperature;
-            K               K;                 // Name of K field
+            Kappa               Kappa;                 // Name of Kappa field
             q               uniform 1000;      // Heat flux / [W/m2]
             value           300.0;             // Initial temperature / [K]
         }
@@ -66,7 +66,7 @@ class solidWallHeatFluxTemperatureFvPatchScalarField
         scalarField q_;
 
         //- Name of thermal conductivity field
-        word KName_;
+        word KappaName_;
 
 
 public:

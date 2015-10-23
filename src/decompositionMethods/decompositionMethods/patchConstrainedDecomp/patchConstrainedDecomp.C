@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -103,6 +103,11 @@ Foam::labelList Foam::patchConstrainedDecomp::decompose
                 << abort(FatalError);
         }
 
+        Info<< "Putting patch named " << patchConstraints_[i].first()
+            << " index " << patchID
+            << " to processor " << procID
+            << endl;
+
         const labelList fc = mesh_.boundaryMesh()[patchID].faceCells();
 
         forAll (fc, fcI)
@@ -110,6 +115,8 @@ Foam::labelList Foam::patchConstrainedDecomp::decompose
             finalDecomp[fc[fcI]] = procID;
         }
     }
+
+    fixCyclics(mesh_, finalDecomp);
 
     return finalDecomp;
 }

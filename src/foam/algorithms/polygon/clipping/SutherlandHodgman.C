@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -24,7 +24,7 @@ License
 Author
     Martin Beaudoin, Hydro-Quebec, (2008)
 
-\*----------------------------------------------------------------------------*/
+\*---------------------------------------------------------------------------*/
 
 #include "SutherlandHodgman.H"
 
@@ -157,8 +157,8 @@ Foam::SutherlandHodgman::SutherlandHodgman
 
 Foam::List<Foam::point2D> Foam::SutherlandHodgman::evaluate()
 {
-    DynamicList<point2D> clippedPolygon(0);
-    DynamicList<bool> clippedVertexInside(0);
+    DynamicList<point2D, 8> clippedPolygon(0);
+    DynamicList<bool, 8> clippedVertexInside(0);
     point2D interSectPt;
 
     label S = subjectPolygon_.size() - 1;
@@ -249,7 +249,7 @@ Foam::List<Foam::point2D> Foam::SutherlandHodgman::evaluate()
     // Are we done?
     if (currentClipEdgeP2_ < clippingPolygon_.size())
     {
-        //clip against next edge, re-entrant.
+        // Clip against next edge, re-entrant.
         evaluate();
     }
 

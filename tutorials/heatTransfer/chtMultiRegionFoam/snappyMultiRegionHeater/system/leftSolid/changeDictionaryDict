@@ -1,8 +1,8 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | foam-extend: Open Source CFD                    |
-|  \\    /   O peration     | Version:     3.1                                |
-|   \\  /    A nd           | Web:         http://www.extend-project.de       |
+|  \\    /   O peration     | Version:     3.2                                |
+|   \\  /    A nd           | Web:         http://www.foam-extend.org         |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 FoamFile
@@ -41,7 +41,7 @@ dictionaryReplacement
             {
                 type            solidWallMixedTemperatureCoupled;
                 neighbourFieldName T;
-                K               K;
+                Kappa               Kappa;
                 value           $internalField;
 
             }
@@ -49,14 +49,14 @@ dictionaryReplacement
             {
                 type            solidWallMixedTemperatureCoupled;
                 neighbourFieldName T;
-                K               K;
+                Kappa               Kappa;
                 value           $internalField;
             }
             leftSolid_to_topAir
             {
                 type            solidWallMixedTemperatureCoupled;
                 neighbourFieldName T;
-                K               K;
+                Kappa               Kappa;
                 value           $internalField;
             }
         }
@@ -101,7 +101,7 @@ dictionaryReplacement
         }
     }
 
-    K
+    Kappa
     {
         internalField   uniform 80;
 

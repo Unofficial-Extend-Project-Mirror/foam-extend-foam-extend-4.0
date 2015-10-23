@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -41,7 +41,7 @@ SourceFiles
 #include "linear.H"
 #include "typeInfo.H"
 #include "runTimeSelectionTables.H"
-#include "blockLduMatrices.H"
+#include "BlockLduSystem.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -152,12 +152,24 @@ public:
             const GeometricField<Type, fvPatchField, volMesh>&
         ) = 0;
 
-        //- Return the blockLduMatrix<vector> corresponding to the implicit
-        // div discretization. For block coupled system.
-        virtual tmp<blockVectorMatrix> fvmDiv
+        //- Return the BlockLduSystem corresponding to the implicit div
+        // discretization. For block coupled system.
+        virtual tmp
+        <
+            BlockLduSystem<vector, typename innerProduct<vector, Type>::type>
+        > fvmUDiv
         (
             const GeometricField<Type, fvPatchField, volMesh>&
-        ) const = 0;
+        ) const;
+
+        virtual tmp
+        <
+            BlockLduSystem<vector, typename innerProduct<vector, Type>::type>
+        > fvmUDiv
+        (
+            const surfaceScalarField&,
+            const GeometricField<Type, fvPatchField, volMesh>&
+        ) const;
 };
 
 

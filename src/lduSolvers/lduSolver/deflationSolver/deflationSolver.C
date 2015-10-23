@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -188,7 +188,7 @@ Foam::lduSolverPerformance Foam::deflationSolver::solve
         scalarFieldField Q(2);
         forAll (Q, i)
         {
-            Q.set(i, new scalarField(x.size()));
+            Q.set(i, new scalarField(x.size(), 0));
         }
 
         // Create stable (q) and unstable (p) solution
@@ -236,7 +236,10 @@ Foam::lduSolverPerformance Foam::deflationSolver::solve
                     if
                     (
                         nDirs < maxDirs_
-                     && R[qI][qI] > 1e-3*Foam::max(R[0][0], R[1][1])
+                     && (
+                            R[qI][qI] > GREAT
+                         || R[qI][qI] > 1e-3*Foam::max(R[0][0], R[1][1])
+                        )
                     )
                     {
                         Z.set(nDirs, new scalarField(Q[qI]));

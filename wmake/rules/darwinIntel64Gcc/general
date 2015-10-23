@@ -1,4 +1,4 @@
-CPP        = cpp $(GFLAGS)
+CPP        = cpp --traditional-cpp $(GFLAGS) -Ddarwin
 LD         = ld
 
 PROJECT_LIBS = -l$(WM_PROJECT)

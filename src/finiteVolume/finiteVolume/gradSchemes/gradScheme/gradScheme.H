@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -40,7 +40,7 @@ SourceFiles
 #include "surfaceFieldsFwd.H"
 #include "typeInfo.H"
 #include "runTimeSelectionTables.H"
-#include "blockLduMatrices.H"
+#include "BlockLduSystem.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -127,20 +127,61 @@ public:
             return mesh_;
         }
 
-        //- Calculate and return the grad of the given field
+        //- Calculate and return the grad of the given field.
+        //  Used by grad either to recalculate the cached gradient when it is
+        //  out of date with respect to the field or when it is not cached.
         virtual tmp
+        <
+            GeometricField
+            <typename outerProduct<vector, Type>::type, fvPatchField, volMesh>
+        > calcGrad
+        (
+            const GeometricField<Type, fvPatchField, volMesh>&,
+            const word& name
+        ) const = 0;
+
+        //- Calculate and return the grad of the given field
+        //  which may have been cached
+        tmp
+        <
+            GeometricField
+            <typename outerProduct<vector, Type>::type, fvPatchField, volMesh>
+        > grad
+        (
+            const GeometricField<Type, fvPatchField, volMesh>&,
+            const word& name
+        ) const;
+
+        //- Calculate and return the grad of the given field
+        //  with the default name
+        //  which may have been cached
+        tmp
         <
             GeometricField
             <typename outerProduct<vector, Type>::type, fvPatchField, volMesh>
         > grad
         (
             const GeometricField<Type, fvPatchField, volMesh>&
-        ) const = 0;
+        ) const;
 
+        //- Calculate and return the grad of the given field
+        //  with the default name
+        //  which may have been cached
+        tmp
+        <
+            GeometricField
+            <typename outerProduct<vector, Type>::type, fvPatchField, volMesh>
+        > grad
+        (
+            const tmp<GeometricField<Type, fvPatchField, volMesh> >&
+        ) const;
 
-        //- Return the blockLduMatrix<vector> corresponding to the implicit
-        // grad discretization. For block coupled systems.
-        virtual tmp<blockVectorMatrix> fvmGrad
+        //- Return the BlockLduSystem corresponding to the implicit grad
+        // discretization. For block coupled systems.
+        virtual tmp
+        <
+            BlockLduSystem<vector, typename outerProduct<vector, Type>::type>
+        > fvmGrad
         (
             const GeometricField<Type, fvPatchField, volMesh>&
         ) const;

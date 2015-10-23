@@ -91,32 +91,32 @@
 
     //- explicit terms in the momentum equation
     volVectorField divDSigmaExp
-	(
-	 IOobject
-	 (
-	  "divDSigmaExp",
-	  runTime.timeName(),
-	  mesh,
-	  IOobject::NO_READ,
-	  IOobject::NO_WRITE
-	  ),
-	 mesh,
- 	 dimensionedVector("zero", dimensionSet(1, -2, -2, 0, 0, 0, 0), vector::zero)
-	 );
+    (
+        IOobject
+        (
+            "divDSigmaExp",
+            runTime.timeName(),
+            mesh,
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        ),
+        mesh,
+        dimensionedVector("zero", dimensionSet(1, -2, -2, 0, 0, 0, 0), vector::zero)
+    );
 
-     volVectorField divDSigmaLargeStrainExp
-	(
-	 IOobject
-	 (
-	  "divDSigmaLargeStrainExp",
-	  runTime.timeName(),
-	  mesh,
-	  IOobject::NO_READ,
-	  IOobject::NO_WRITE
-	  ),
-	 mesh,
- 	 dimensionedVector("zero", dimensionSet(1, -2, -2, 0, 0, 0, 0), vector::zero)
-	 );
+    volVectorField divDSigmaLargeStrainExp
+    (
+        IOobject
+        (
+            "divDSigmaLargeStrainExp",
+            runTime.timeName(),
+            mesh,
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        ),
+        mesh,
+        dimensionedVector("zero", dimensionSet(1, -2, -2, 0, 0, 0, 0), vector::zero)
+    );
 
     constitutiveModel rheology(sigma, DU);
 

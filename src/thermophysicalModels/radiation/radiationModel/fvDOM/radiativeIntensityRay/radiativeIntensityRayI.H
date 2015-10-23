@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -26,18 +26,6 @@ License
 inline const Foam::volScalarField& Foam::radiation::radiativeIntensityRay::I() const
 {
     return I_;
-}
-
-
-inline const Foam::volScalarField& Foam::radiation::radiativeIntensityRay::Qr() const
-{
-    return Qr_;
-}
-
-
-inline Foam::volScalarField& Foam::radiation::radiativeIntensityRay::Qr()
-{
-    return Qr_;
 }
 
 
@@ -76,8 +64,17 @@ inline Foam::scalar Foam::radiation::radiativeIntensityRay::omega() const
     return omega_;
 }
 
+inline Foam::volScalarField&
+Foam::radiation::radiativeIntensityRay::ILambda
+(
+    const label lambdaI
+)
+{
+    return ILambda_[lambdaI];
+}
 
-inline const Foam::volScalarField& Foam::radiation::radiativeIntensityRay::ILambda
+inline const Foam::volScalarField&
+Foam::radiation::radiativeIntensityRay::ILambda
 (
     const label lambdaI
 ) const

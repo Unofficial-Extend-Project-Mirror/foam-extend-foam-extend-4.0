@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -96,7 +96,7 @@ class MRFZone
         //- Divide faces in frame according to patch
         void setMRFFaces();
 
-        //- Make the given absolute mass/vol flux relative within the MRF region
+        //- Make the given absolute mass/vol flux relative within MRF region
         template<class RhoFieldType>
         void relativeRhoFlux
         (
@@ -104,7 +104,7 @@ class MRFZone
             surfaceScalarField& phi
         ) const;
 
-        //- Make the given relative mass/vol flux absolute within the MRF region
+        //- Make the given relative mass/vol flux absolute within MRF region
         template<class RhoFieldType>
         void absoluteRhoFlux
         (

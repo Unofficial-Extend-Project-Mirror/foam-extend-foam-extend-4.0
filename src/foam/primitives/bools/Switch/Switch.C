@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -46,7 +46,7 @@ const char* Foam::Switch::names[Foam::Switch::INVALID+1] =
 
 Foam::Switch::switchType Foam::Switch::asEnum(const bool b)
 {
-    return b ? Switch::TRUE : Switch::FALSE;
+    return b ? Switch::FOAM_TRUE : Switch::FOAM_FALSE;
 }
 
 
@@ -122,7 +122,7 @@ bool Foam::Switch::asBool
 
 const char* Foam::Switch::asText(const bool b)
 {
-    return b ? names[Switch::TRUE] : names[Switch::FALSE];
+    return b ? names[Switch::FOAM_TRUE] : names[Switch::FOAM_FALSE];
 }
 
 

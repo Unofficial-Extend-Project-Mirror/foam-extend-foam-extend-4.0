@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -36,9 +36,11 @@ namespace Foam
 
 defineTypeNameAndDebug(meshToMesh, 0);
 
-const scalar meshToMesh::directHitTol
+const Foam::debug::tolerancesSwitch
+meshToMesh::directHitTol
 (
-    debug::tolerances("meshToMeshdirectHitTol", 1e-5)
+    "meshToMeshdirectHitTol",
+    1e-5
 );
 
 

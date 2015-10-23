@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -29,7 +29,7 @@ License
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
 const char* const Foam::word::typeName = "word";
-int Foam::word::debug(Foam::debug::debugSwitch(word::typeName, 0));
+int Foam::word::debug(Foam::debug::debugSwitchFromDict(word::typeName, 0));
 const Foam::word Foam::word::null;
 
 // ************************************************************************* //

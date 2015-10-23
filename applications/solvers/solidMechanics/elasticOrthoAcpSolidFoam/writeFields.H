@@ -85,62 +85,62 @@ if (runTime.outputTime() || topoChange)
 
     //- cohesive damage and cracking, and GII and GII
     volScalarField damageAndCracks
-      (
-       IOobject
-       (
-	"damageAndCracks",
-	runTime.timeName(),
-	mesh,
-	IOobject::NO_READ,
-	IOobject::AUTO_WRITE
-	),
-       mesh,
-       dimensionedScalar("zero", dimless, 0.0),
-       calculatedFvPatchVectorField::typeName
-       );
+    (
+        IOobject
+        (
+            "damageAndCracks",
+            runTime.timeName(),
+            mesh,
+            IOobject::NO_READ,
+            IOobject::AUTO_WRITE
+        ),
+        mesh,
+        dimensionedScalar("zero", dimless, 0.0),
+        calculatedFvPatchVectorField::typeName
+    );
     volScalarField GI
-      (
-       IOobject
-       (
-	"GI",
-	runTime.timeName(),
-	mesh,
-	IOobject::NO_READ,
-	IOobject::AUTO_WRITE
-	),
-       mesh,
-       dimensionedScalar("zero", dimless, 0.0),
-       calculatedFvPatchVectorField::typeName
-       );
+    (
+        IOobject
+        (
+            "GI",
+            runTime.timeName(),
+            mesh,
+            IOobject::NO_READ,
+            IOobject::AUTO_WRITE
+        ),
+        mesh,
+        dimensionedScalar("zero", dimless, 0.0),
+        calculatedFvPatchVectorField::typeName
+    );
     volScalarField GII
-      (
-       IOobject
-       (
-	"GII",
-	runTime.timeName(),
-	mesh,
-	IOobject::NO_READ,
-	IOobject::AUTO_WRITE
-	),
-       mesh,
-       dimensionedScalar("zero", dimless, 0.0),
-       calculatedFvPatchVectorField::typeName
-       );
+    (
+        IOobject
+        (
+            "GII",
+            runTime.timeName(),
+            mesh,
+            IOobject::NO_READ,
+            IOobject::AUTO_WRITE
+        ),
+        mesh,
+        dimensionedScalar("zero", dimless, 0.0),
+        calculatedFvPatchVectorField::typeName
+    );
     forAll(U.boundaryField(), patchi)
-      {
-	// if(U.boundaryField()[patchi].type() == cohesiveLawMultiMatFvPatchVectorField::typeName)
-	if(U.boundaryField()[patchi].type() == solidCohesiveFvPatchVectorField::typeName)
-	  {
-	    // cohesiveLawMultiMatFvPatchVectorField& Upatch =
-	    //   refCast<cohesiveLawMultiMatFvPatchVectorField>(U.boundaryField()[patchi]);
-	    solidCohesiveFvPatchVectorField& Upatch =
-	      refCast<solidCohesiveFvPatchVectorField>(U.boundaryField()[patchi]);
+    {
+        // if(U.boundaryField()[patchi].type() == cohesiveLawMultiMatFvPatchVectorField::typeName)
+        if(U.boundaryField()[patchi].type() == solidCohesiveFvPatchVectorField::typeName)
+        {
+            // cohesiveLawMultiMatFvPatchVectorField& Upatch =
+            //   refCast<cohesiveLawMultiMatFvPatchVectorField>(U.boundaryField()[patchi]);
+            solidCohesiveFvPatchVectorField& Upatch =
+                refCast<solidCohesiveFvPatchVectorField>(U.boundaryField()[patchi]);
 
-	    GI.boundaryField()[patchi] = Upatch.GI();
-	    GII.boundaryField()[patchi] = Upatch.GII();
-	    damageAndCracks.boundaryField()[patchi] = Upatch.crackingAndDamage();
-	  }
-      }
+            GI.boundaryField()[patchi] = Upatch.GI();
+            GII.boundaryField()[patchi] = Upatch.GII();
+            damageAndCracks.boundaryField()[patchi] = Upatch.crackingAndDamage();
+        }
+    }
     volScalarField GTotal("GTotal", GI + GII);
     GTotal.write();
 

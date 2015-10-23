@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -38,14 +38,14 @@ Description
         {
             type        compressible::turbulentTemperatureCoupledBaffleMixed;
             neighbourFieldName  T;
-            K           K; // or none
+            Kappa           Kappa; // or none
             value       uniform 300;
         }
 
     Needs to be on underlying directMapped(Wall)FvPatch.
 
-    Note: if K is "none" looks up RASModel and basicThermo, otherwise expects
-    the solver to calculate a 'K' field.
+    Note: if Kappa is "none" looks up RASModel and basicThermo, otherwise expects
+    the solver to calculate a 'Kappa' field.
 
     Note: runs in parallel with arbitrary decomposition. Uses directMapped
     functionality to calculate exchange.
@@ -87,7 +87,7 @@ class turbulentTemperatureCoupledBaffleMixedFvPatchScalarField
         const word neighbourFieldName_;
 
         //- Name of thermal conductivity field
-        const word KName_;
+        const word KappaName_;
 
 
 public:
@@ -162,8 +162,8 @@ public:
 
     // Member functions
 
-        //- Get corresponding K field
-        tmp<scalarField> K() const;
+        //- Get corresponding Kappa field
+        tmp<scalarField> Kappa() const;
 
         //- Update the coefficients associated with the patch field
         virtual void updateCoeffs();

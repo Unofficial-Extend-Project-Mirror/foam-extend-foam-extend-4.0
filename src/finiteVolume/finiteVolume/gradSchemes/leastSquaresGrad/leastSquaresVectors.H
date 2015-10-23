@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -39,6 +39,7 @@ SourceFiles
 #include "fvMesh.H"
 #include "surfaceFieldsFwd.H"
 #include "labelPair.H"
+#include "tolerancesSwitch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -72,6 +73,12 @@ public:
 
     // Declare name of the class and its debug switch
     TypeName("leastSquaresVectors");
+
+
+    // Static data members
+
+        //- Point merge tolerance
+        static const debug::tolerancesSwitch smallDotProdTol_;
 
 
     // Constructors

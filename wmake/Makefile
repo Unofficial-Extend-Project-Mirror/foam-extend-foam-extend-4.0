@@ -1,9 +1,9 @@
 #------------------------------------------------------------------------------
 # =========                 |
 # \\      /  F ield         | foam-extend: Open Source CFD
-#  \\    /   O peration     |
-#   \\  /    A nd           | For copyright notice see file Copyright
-#    \\/     M anipulation  |
+#  \\    /   O peration     | Version:     3.2
+#   \\  /    A nd           | Web:         http://www.foam-extend.org
+#    \\/     M anipulation  | For copyright notice see file Copyright
 #------------------------------------------------------------------------------
 # License
 #     This file is part of foam-extend.
@@ -92,6 +92,9 @@ LIB             = libNULL
 ifeq ($(WM_ARCH_BASE),darwin)
 # Using Mac OSX
 SO              = dylib
+else ifeq ($(WM_ARCH_BASE),mingw)
+# Using MinGW-w64 compiler on Windows
+SO              = dll
 else
 SO              = so
 endif
@@ -166,6 +169,12 @@ $(SEXE): $(OBJECTS)
 # define link statements for libraries
 #------------------------------------------------------------------------------
 
+ifneq (,$(findstring libfoam,$(LIB)))
+EXTRA_LIBS=
+else
+EXTRA_LIBS=-lfoam
+endif
+
 libso:   $(LIB).$(SO)
 	     @echo \'$(LIB).$(SO)\' is up to date.
 
@@ -175,6 +184,9 @@ $(LIB).$(SO): $(OBJECTS)
 ifeq ($(WM_ARCH_BASE),darwin)
 	     @cd $(OBJECTS_DIR) ; \
 	     $(LINKLIBSO) $(LOCAL_OBJECTS) -L$(LIB_WM_OPTIONS_DIR) $(LIB_LIBS) $(GLIB_LIBS) -install_name $(notdir $(LIB)).$(SO) -o $(LIB).$(SO)
+else ifeq ($(WM_ARCH_BASE),mingw)
+	     @cd $(OBJECTS_DIR) ; \
+	     $(LINKLIBSO) $(LOCAL_OBJECTS) -L$(LIB_WM_OPTIONS_DIR) $(LIB_LIBS) $(GLIB_LIBS) $(EXTRA_LIBS) -o $(LIB).$(SO) -Wl,--out-implib,$(LIB).a
 else
 	     @cd $(OBJECTS_DIR) ; \
 	     $(LINKLIBSO) $(LOCAL_OBJECTS) -L$(LIB_WM_OPTIONS_DIR) $(LIB_LIBS) $(GLIB_LIBS) -o $(LIB).$(SO)

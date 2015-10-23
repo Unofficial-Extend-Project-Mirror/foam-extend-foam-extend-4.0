@@ -52,16 +52,25 @@ echo
 
 # gmp
 uninstallPackage gmp-5.0.1 $1
+uninstallPackage gmp-5.0.5 $1
 
 # mpfr
 uninstallPackage mpfr-3.0.1 $1
+uninstallPackage mpfr-3.1.0 $1
+
+# mpc
+uninstallPackage mpc-0.8.2 $1
+uninstallPackage mpc-0.9   $1
 
 # gcc
 uninstallPackage gcc-4.4.5 $1
 uninstallPackage gcc-4.5.1 $1
+uninstallPackage gcc-4.6.3 $1
+uninstallPackage gcc-4.8.4 $1
+uninstallPackage gcc-4.9.2 $1
 
-# mpc
-uninstallPackage mpc-0.8.2 $1
+#LLVM
+uninstallPackage llvm-3.6.0 $1
 
 #Python
 uninstallPackage Python-2.7 $1
@@ -70,13 +79,14 @@ uninstallPackage Python-2.7 $1
 uninstallPackage m4-1.4.16 $1
 
 # bison
-uninstallPackage bison-2.4.3 $1
+uninstallPackage bison-2.7 $1
 
 # flex
 uninstallPackage flex-2.5.35 $1
 
 # cmake
 uninstallPackage cmake-2.8.12 $1
+uninstallPackage cmake-3.2.2 $1
 
 
 echo

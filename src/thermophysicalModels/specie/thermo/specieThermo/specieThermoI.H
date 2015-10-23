@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -48,7 +48,7 @@ inline Foam::scalar Foam::specieThermo<thermo>::T
 {
     scalar Test = T0;
     scalar Tnew = T0;
-    scalar Ttol = T0*tol_;
+    scalar Ttol = T0*tol_();
     int iter = 0;
 
     do
@@ -58,9 +58,9 @@ inline Foam::scalar Foam::specieThermo<thermo>::T
 
         Test = Tnew;
         Tnew = Test
-            - Foam::min(((this->*F)(Test) - f)/(this->*dFdT)(Test), TJump_);
+            - Foam::min(((this->*F)(Test) - f)/(this->*dFdT)(Test), TJump_());
 
-        if (iter++ > maxIter_)
+        if (iter++ > maxIter_())
         {
             // Improvements: graceful exit with recovery.  HJ, 11/Oct/2010
             InfoIn
@@ -104,7 +104,7 @@ inline Foam::specieThermo<thermo>::specieThermo
 template<class thermo>
 inline Foam::scalar Foam::specieThermo<thermo>::cv(const scalar T) const
 {
-    return this->cp(T) - this->RR;
+    return this->cp(T) - this->RR();
 }
 
 
@@ -112,21 +112,21 @@ template<class thermo>
 inline Foam::scalar Foam::specieThermo<thermo>::gamma(const scalar T) const
 {
     scalar CP = this->cp(T);
-    return CP/(CP - this->RR);
+    return CP/(CP - this->RR());
 }
 
 
 template<class thermo>
 inline Foam::scalar Foam::specieThermo<thermo>::e(const scalar T) const
 {
-    return this->h(T) - this->RR*(T - this->Tstd);
+    return this->h(T) - this->RR()*(T - this->Tstd());
 }
 
 
 template<class thermo>
 inline Foam::scalar Foam::specieThermo<thermo>::es(const scalar T) const
 {
-    return this->hs(T) - this->RR*(T - this->Tstd);
+    return this->hs(T) - this->RR()*(T - this->Tstd());
 }
 
 
@@ -210,7 +210,7 @@ inline Foam::scalar Foam::specieThermo<thermo>::A(const scalar T) const
 template<class thermo>
 inline Foam::scalar Foam::specieThermo<thermo>::K(const scalar T) const
 {
-    scalar arg = -this->nMoles()*this->g(T)/(this->RR*T);
+    scalar arg = -this->nMoles()*this->g(T)/(this->RR()*T);
 
     if (arg < 600.0)
     {
@@ -239,7 +239,7 @@ inline Foam::scalar Foam::specieThermo<thermo>::Kc(const scalar T) const
     }
     else
     {
-        return Kp(T)*pow(this->Pstd/(this->RR*T), this->nMoles());
+        return Kp(T)*pow(this->Pstd()/(this->RR()*T), this->nMoles());
     }
 }
 
@@ -257,7 +257,7 @@ inline Foam::scalar Foam::specieThermo<thermo>::Kx
     }
     else
     {
-        return Kp(T)*pow(this->Pstd/p, this->nMoles());
+        return Kp(T)*pow(this->Pstd()/p, this->nMoles());
     }
 }
 
@@ -276,7 +276,7 @@ inline Foam::scalar Foam::specieThermo<thermo>::Kn
     }
     else
     {
-        return Kp(T)*pow(n*this->Pstd/p, this->nMoles());
+        return Kp(T)*pow(n*this->Pstd()/p, this->nMoles());
     }
 }
 

@@ -1,8 +1,8 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | foam-extend: Open Source CFD                    |
-|  \\    /   O peration     | Version:     3.1                                |
-|   \\  /    A nd           | Web:         http://www.extend-project.de       |
+|  \\    /   O peration     | Version:     3.2                                |
+|   \\  /    A nd           | Web:         http://www.foam-extend.org         |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 FoamFile
@@ -68,11 +68,19 @@ solvers
 }
 
 blockSolver
-{}
+{
+    convergence 1e-6;
+}
 
 SIMPLE
 {
     nNonOrthoCorrectors 0;
+}
+
+fieldBounds
+{
+    U      500;
+    p      -5e4 5e4;
 }
 
 relaxationFactors

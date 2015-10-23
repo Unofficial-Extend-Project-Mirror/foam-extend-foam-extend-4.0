@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -28,14 +28,14 @@ Description
 
 
 SourceFiles
-    dsmcParcel.C
+    dsmcParcelTemplate.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef dsmcParcel_H
-#define dsmcParcel_H
+#ifndef dsmcParcelTemplate_H
+#define dsmcParcelTemplate_H
 
-#include "DsmcParcel.H"
+#include "DsmcParcelTemplate.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

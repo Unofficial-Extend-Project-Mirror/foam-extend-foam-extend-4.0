@@ -172,7 +172,19 @@ $(derivedFvPatchFields)/uniformDensityHydrostaticPressure/uniformDensityHydrosta
 $(derivedFvPatchFields)/pulseFixedValue/pulseFixedValueFvPatchFields.C
 $(derivedFvPatchFields)/waveTransmissiveInlet/waveTransmissiveInletFvPatchFields.C
 
-
+fvPatchVectorNFields = $(fvPatchFields)/fvPatchVectorNFields
+$(fvPatchVectorNFields)/fvPatchVectorNFields.C
+$(fvPatchVectorNFields)/genericFvPatchVectorNFields.C
+$(fvPatchVectorNFields)/calculatedFvPatchVectorNFields.C
+$(fvPatchVectorNFields)/emptyFvPatchVectorNFields.C
+$(fvPatchVectorNFields)/transformFvPatchVectorNFields.C
+$(fvPatchVectorNFields)/wedgeFvPatchVectorNFields.C
+$(fvPatchVectorNFields)/coupledFvPatchVectorNFields.C
+$(fvPatchVectorNFields)/processorFvPatchVectorNFields.C
+$(fvPatchVectorNFields)/cyclicFvPatchVectorNFields.C
+$(fvPatchVectorNFields)/fixedValueFvPatchVectorNFields.C
+$(fvPatchVectorNFields)/zeroGradientFvPatchVectorNFields.C
+$(fvPatchVectorNFields)/fixedGradientFvPatchVectorNFields.C
 
 fvsPatchFields = fields/fvsPatchFields
 $(fvsPatchFields)/fvsPatchField/fvsPatchFields.C
@@ -195,8 +207,18 @@ $(constraintFvsPatchFields)/overlapGgi/overlapGgiFvsPatchFields.C
 $(constraintFvsPatchFields)/mixingPlane/mixingPlaneFvsPatchFields.C
 $(constraintFvsPatchFields)/regionCoupling/regionCouplingFvsPatchFields.C
 
+fvsPatchVectorNFields = $(fvsPatchFields)/fvsPatchVectorNFields
+$(fvsPatchVectorNFields)/fvsPatchVectorNFields.C
+$(fvsPatchVectorNFields)/calculatedFvsPatchVectorNFields.C
+$(fvsPatchVectorNFields)/emptyFvsPatchVectorNFields.C
+$(fvsPatchVectorNFields)/wedgeFvsPatchVectorNFields.C
+$(fvsPatchVectorNFields)/coupledFvsPatchVectorNFields.C
+$(fvsPatchVectorNFields)/processorFvsPatchVectorNFields.C
+
 fields/volFields/volFields.C
+fields/volFields/volVectorNFields.C
 fields/surfaceFields/surfaceFields.C
+fields/surfaceFields/surfaceVectorNFields.C
 
 fvMatrices/fvMatrices.C
 fvMatrices/fvScalarMatrix/fvScalarMatrix.C
@@ -224,6 +246,7 @@ $(pointVolInterpolation)/pointVolInterpolation.C
 surfaceInterpolation = interpolation/surfaceInterpolation
 $(surfaceInterpolation)/surfaceInterpolation/surfaceInterpolation.C
 $(surfaceInterpolation)/surfaceInterpolationScheme/surfaceInterpolationSchemes.C
+$(surfaceInterpolation)/VectorNSurfaceInterpolationSchemes/VectorNSurfaceInterpolationSchemes.C
 
 schemes = $(surfaceInterpolation)/schemes
 $(schemes)/linear/linear.C
@@ -305,7 +328,7 @@ $(ddtSchemes)/SLTSDdtScheme/SLTSDdtSchemes.C
 $(ddtSchemes)/backwardDdtScheme/backwardDdtSchemes.C
 $(ddtSchemes)/boundedBackwardDdtScheme/boundedBackwardDdtScheme.C
 $(ddtSchemes)/boundedBackwardDdtScheme/boundedBackwardDdtSchemes.C
-$(ddtSchemes)/CrankNicholsonDdtScheme/CrankNicholsonDdtSchemes.C
+$(ddtSchemes)/CrankNicolsonDdtScheme/CrankNicolsonDdtSchemes.C
 $(ddtSchemes)/steadyInertialDdtScheme/steadyInertialDdtSchemes.C
 
 d2dt2Schemes = finiteVolume/d2dt2Schemes
@@ -317,12 +340,15 @@ $(d2dt2Schemes)/backwardD2dt2Scheme/backwardD2dt2Schemes.C
 divSchemes = finiteVolume/divSchemes
 $(divSchemes)/divScheme/divSchemes.C
 $(divSchemes)/gaussDivScheme/gaussDivSchemes.C
+$(divSchemes)/gaussDivScheme/vectorGaussDivScheme.C
 
 gradSchemes = finiteVolume/gradSchemes
 $(gradSchemes)/gradScheme/gradSchemes.C
+$(gradSchemes)/gaussGrad/scalarGaussGrad.C
 $(gradSchemes)/gaussGrad/gaussGrads.C
 $(gradSchemes)/beGaussGrad/beGaussGrads.C
 $(gradSchemes)/leastSquaresGrad/leastSquaresVectors.C
+$(gradSchemes)/leastSquaresGrad/scalarLeastSquaresGrad.C
 $(gradSchemes)/leastSquaresGrad/leastSquaresGrads.C
 $(gradSchemes)/extendedLeastSquaresGrad/extendedLeastSquaresVectors.C
 $(gradSchemes)/extendedLeastSquaresGrad/extendedLeastSquaresGrads.C

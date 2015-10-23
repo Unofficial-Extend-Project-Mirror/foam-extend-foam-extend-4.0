@@ -1,0 +1,3 @@
+porousSimpleIbFoam.C
+
+EXE = $(FOAM_APPBIN)/porousSimpleIbFoam

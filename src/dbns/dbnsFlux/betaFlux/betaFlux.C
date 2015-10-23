@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -84,8 +84,8 @@ void Foam::betaFlux::evaluateFlux
     const scalar magULeft  = mag(ULeft);
     const scalar magURight = mag(URight);
 
-    const scalar MLeft = abs(magULeft/cLeft);
-    const scalar MRight = abs(magURight/cRight);
+    const scalar MLeft = mag(magULeft/cLeft);
+    const scalar MRight = mag(magURight/cRight);
 
     // Compute beta parameter - this should be done in multidimensional way
     // similarly to multidimensional limiters

@@ -1,7 +1,4 @@
 {
-#   include "rhoEqn.H"
-}
-{
     scalar sumLocalContErr =
         (sum(mag(rho - rho0 - psi*(p - p0)))/sum(rho)).value();
 

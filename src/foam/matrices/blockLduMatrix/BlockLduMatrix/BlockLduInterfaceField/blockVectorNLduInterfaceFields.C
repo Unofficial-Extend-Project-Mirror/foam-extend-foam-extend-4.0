@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -28,7 +28,7 @@ Description
 
 Author
 
-\*----------------------------------------------------------------------------*/
+\*---------------------------------------------------------------------------*/
 
 #include "BlockLduInterfaceField.H"
 #include "processorBlockLduInterfaceField.H"
@@ -41,10 +41,10 @@ namespace Foam
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-#define makeTemplateTypeNameAndDebug(type, Type, args...)                      \
-    defineTemplateTypeNameAndDebug(BlockLduInterfaceField<type>, 0);           \
-                                                                               \
-    defineTemplateTypeNameAndDebug(processorBlockLduInterfaceField<type>, 0);  \
+#define makeTemplateTypeNameAndDebug(type, Type, args...)                     \
+    defineTemplateTypeNameAndDebug(BlockLduInterfaceField<type>, 0);          \
+                                                                              \
+    defineTemplateTypeNameAndDebug(processorBlockLduInterfaceField<type>, 0);
 
 forAllVectorNTypes(makeTemplateTypeNameAndDebug);
 

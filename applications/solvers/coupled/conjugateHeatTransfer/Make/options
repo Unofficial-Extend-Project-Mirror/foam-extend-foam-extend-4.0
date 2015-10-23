@@ -8,6 +8,4 @@ LIB_LIBS = \
     -lfiniteVolume \
     -lspecie \
     -lbasicThermophysicalModels \
-    -lradiation \
-    -lVectorN
-
+    -lradiation

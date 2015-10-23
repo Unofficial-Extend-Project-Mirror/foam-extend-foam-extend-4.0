@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -208,6 +208,9 @@ void Foam::coarseAmgLevel::solve
         return;
     }
 
+    // Switch of debug in top-level direct solve
+    label oldDebug = lduMatrix::debug();
+
     if (matrixPtr_->matrix().symmetric())
     {
         topLevelDict.add("preconditioner", "Cholesky");
@@ -236,6 +239,9 @@ void Foam::coarseAmgLevel::solve
             topLevelDict
         ).solve(x, b, cmpt);
     }
+
+    // Restore debug
+    lduMatrix::debug = oldDebug;
 
     // Escape cases of top-level solver divergence
     if

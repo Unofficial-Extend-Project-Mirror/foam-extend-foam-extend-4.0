@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -26,7 +26,7 @@ License
 #include "cellSet.H"
 #include "mapPolyMesh.H"
 #include "polyMesh.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "addToRunTimeSelectionTable.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -61,7 +61,7 @@ cellSet::cellSet
 :
     topoSet(mesh, typeName, name, r, w)
 {
-    // Make sure set within valid range
+    // Make sure set within valid range: there are no retired cells
     check(mesh.nCells());
 }
 

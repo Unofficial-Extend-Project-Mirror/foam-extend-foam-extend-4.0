@@ -1,6 +1,13 @@
+ifneq ($(FLEX_DIR), "")
+EXE_INC = \
+    -I$(FLEX_DIR)/include \
+    -I$(LIB_SRC)/thermophysicalModels/specie/lnInclude \
+    -I$(LIB_SRC)/thermophysicalModels/reactionThermo/lnInclude
+else
 EXE_INC = \
     -I$(LIB_SRC)/thermophysicalModels/specie/lnInclude \
     -I$(LIB_SRC)/thermophysicalModels/reactionThermo/lnInclude
+endif
 
 EXE_LIBS = \
     -lreactionThermophysicalModels \

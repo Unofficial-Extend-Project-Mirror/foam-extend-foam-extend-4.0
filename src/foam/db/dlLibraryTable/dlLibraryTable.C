@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -73,6 +73,12 @@ bool Foam::dlLibraryTable::open(const fileName& functionLibName)
 #ifdef darwin
         if(!functionLibPtr && functionLibName.ext()=="so") {
             fileName lName=functionLibName.lessExt()+".dylib";
+            functionLibPtr =
+                dlopen(lName.c_str(), RTLD_LAZY|RTLD_GLOBAL);
+        }
+#elif defined mingw
+        if(!functionLibPtr && functionLibName.ext()=="so") {
+            fileName lName=functionLibName.lessExt()+".dll";
             functionLibPtr =
                 dlopen(lName.c_str(), RTLD_LAZY|RTLD_GLOBAL);
         }

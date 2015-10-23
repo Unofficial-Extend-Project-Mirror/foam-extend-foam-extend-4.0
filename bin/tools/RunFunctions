@@ -75,13 +75,13 @@ runParallel ()
         echo "$APP_NAME already run on $PWD: remove log file to run"
     else
         echo "Running $APP_NAME in parallel on $PWD using $1 processes"
-	if [ -z "$WM_MPIRUN_PROG" ]
-	then
-	    mpirunProg=mpirun
-	else
-	    # Allow exceentric systems to override the hardcoded mpirun
-	    mpirunProg=$WM_MPIRUN_PROG
-	fi
+    if [ -z "$WM_MPIRUN_PROG" ]
+    then
+        mpirunProg=mpirun
+    else
+        # Allow eccentric systems to override the hardcoded mpirun
+        mpirunProg=$WM_MPIRUN_PROG
+    fi
         ( $mpirunProg -np $1 $APP_RUN -parallel < /dev/null > $LOG_NAME 2>&1 )
     fi
 }
@@ -89,7 +89,27 @@ runParallel ()
 compileApplication ()
 {
     echo "Compiling $1 application"
-    wmake $1
+
+    if ! [ -x "$(command -v lockfile)" ]; then
+        # Missing lockfile command. Tough luck.
+        # Without a proper lockfile command, we cannot properly serialize
+        # wmake commands. Some tutorials might fail when many are run
+        # simultaneously, and some of them depend on the compilation of a
+        # common application.
+        echo "Warning: Missing lockfile command. Your compilation may fail."
+        wmake $1
+    else
+        # We make sure to serialize the compilation in case we are called simultaneously
+        lockFilename="./compileApplication.lock"
+        if [ -d "$1" ]; then
+            lockFilename=$1/$lockFilename
+        fi
+
+        # We wait for the lock release at most 10 x 10 seconds = 100 seconds
+        lockfile -10 -r 10 $lockFilename
+        wmake $1
+        rm -rf $lockFilename
+    fi
 }
 
 compileLibrary ()

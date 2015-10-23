@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -90,10 +90,10 @@ public:
         // Coarsening parameters
 
             //- Minimum cluster size
-            static label mgMinClusterSize_;
+            static const debug::optimisationSwitch mgMinClusterSize_;
 
             //- Maximum cluster size
-            static label mgMaxClusterSize_;
+            static const debug::optimisationSwitch mgMaxClusterSize_;
 
 
     // Constructor

@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -35,7 +35,7 @@ Description
 #include "wallFvPatch.H"
 
 #include "EulerDdtScheme.H"
-#include "CrankNicholsonDdtScheme.H"
+#include "CrankNicolsonDdtScheme.H"
 #include "backwardDdtScheme.H"
 
 #include "tetFemMatrices.H"
@@ -480,7 +480,7 @@ bool freeSurface::movePoints(const scalarField& interfacePhi)
     if
     (
         ddtScheme
-     == fv::CrankNicholsonDdtScheme<vector>::typeName
+     == fv::CrankNicolsonDdtScheme<vector>::typeName
     )
     {
         sweptVolCorr *= (1.0/2.0)*DB().deltaT().value();
@@ -890,7 +890,7 @@ bool freeSurface::moveMeshPoints()
         if
         (
             ddtScheme
-         == fv::CrankNicholsonDdtScheme<vector>::typeName
+         == fv::CrankNicolsonDdtScheme<vector>::typeName
         )
         {
             sweptVolCorr *= (1.0/2.0)*DB().deltaT().value();

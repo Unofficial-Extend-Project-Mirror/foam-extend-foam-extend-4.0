@@ -1,0 +1,331 @@
+#                            -*- mode: org; -*-
+#
+#+TITLE:             *foam-extend-3.2: A guide to test harness*
+#+AUTHOR:                      Martin Beaudoin
+#+DATE:                        5 September 2015
+#+LINK: foam-extend  https://sourceforge.net/projects/openfoam-extend/
+#+OPTIONS: author:t
+#+OPTIONS: toc:2
+#+OPTIONS: ^:{}
+#+OPTIONS: _:{}
+
+###############################################################################
+
+* A guide to the foam-extend test harness
+This file is a guide to the foam-extend test harness.
+
+The test harness from foam-extend version 3.2 was used as a reference
+implementation for this documentation.
+
+The original version of this file is located at
+$WM\_PROJECT\_DIR/doc/testHarness/testHarness.org.
+
+A plain text version of this file is located at
+$WM\_PROJECT\_DIR/doc/testHarness/testHarness.txt.
+
+A MediaWiki version of this file is located at
+
+In case any converted versions (text, MediaWiki, etc.) of this file differ from
+the original testHarness.org file, the latter should always be considered the
+reference version. But we do appreciate your feedback and comments for improving
+this text.
+
+For instance, if you ever decide to improve the Mediawiki version only, please
+consider contributing your changes back to the testHarness.org file as
+well. Otherwise, your Mediawiki changes might get overwritten by an updated
+version of the .org reference file.
+
+** Introduction
+The foam-extend test harness scripts are based mainly on Kitware CMake/CTest
+utilities http://www.cmake.org/.
+
+In its current version, the test harness is designed for running the full suite
+of foam-extend tutorials, and report the fail/success results to a CDash Web
+service one can consult using a simple browser.
+
+The CDash Web service for foam-extend 3.2 is available here:
+http://foam-extend.sourceforge.net/CDash/index.php
+
+For a quick introduction of CMake/CTest, see here:
+http://www.cmake.org/Wiki/CMake/Testing_With_CTest
+
+For a more complete introduction to CMake and CTest, one can also refer to the
+Kitware book `Mastering CMake: A Cross-Platform Build System`
+http://www.kitware.com/products/books.php
+
+For more information on Kitware CDash, see here: http://www.cdash.org/
+
+The rest of this document will provide suficient information so you can run the
+foam-extend test harness on your own.
+
+** Files location and a short description
+The foam-extend test harness is currently built from the following files:
+
+- =$WM_PROJECT_DIR/CMakeLists.txt=  :: This is the main CMake file driving the
+     configuration of the test harness. When processed though the cmake
+     utility, all the necessary Makefiles and CTest scripts will get
+     generated.
+
+- =$WM_PROJECT_DIR/CTestConfig.cmake= :: This file contains the various variables
+     and definitions necessary to publish your test harness results over the
+     CDash Web service for foam-extend 3.2.
+
+- =$FOAM_SITE_DIR/etc/CTestConfig.site.cmake= :: This file allow you to override
+     the values from the main $WM\_PROJECT\_DIR/CTestConfig.cmake. This file
+     should be used if you are hosting your own site CDash Web
+     service.
+
+- =$WM_PROJECT_USER_DIR/etc/CTestConfig.user.cmake= :: This file allow you to
+     override the values from the main $WM\_PROJECT\_DIR/CTestConfig.cmake and the
+     site file $FOAM\_SITE\_DIR/etc/CTestConfig.site.cmake. This file should be
+     used if you are hosting your own user space personal CDash Web service.
+
+- =$WM_PROJECT_DIR/testHarness/foam-extend/3.2/CMakeFiles/CMakeLists.txt= ::
+     This file is a copy of the main $WM\_PROJECT\_DIR/CMakeLists.txt file.
+
+- =$WM_PROJECT_DIR/testHarness/foam-extend/3.2/CMakeFiles/CTestConfig.cmake.foam-extend= :: This file is a copy of the main $WM\_PROJECT\_DIR/CTestConfig.cmake file.
+
+- =$WM_PROJECT_DIR/testHarness/foam-extend/3.2/CMakeFiles/Dashboard_Tutorials.cmake.in=  :: This file is a template for generating the file `ctest -S` file
+  $WM\_PROJECT\_DIR/testHarness/foam-extend/3.2/runDir/Dashboard\_Tutorials.cmake
+  CMake will take care of automatically generating the Dashboard\_Tutorials.cmake file.
+
+- =$WM_PROJECT_DIR/testHarness/foam-extend/3.2/CMakeFiles/FOAM_Tutorials.cmake= :: This file will configure a copy the foam-extend tutorials for running
+  under the test harness. The copy will be made under
+  $WM\_PROJECT\_DIR/testHarness/foam-extend/3.2/runDir.
+
+- =$WM_PROJECT_DIR/testHarness/foam-extend/3.2/runDir/Allclean= :: Cleanup
+     script. Will remove all the automatically generated files and directories
+     for the test harness. Should be called prior to running the Allrun\_\* scripts.
+
+- =$WM_PROJECT_DIR/testHarness/foam-extend/3.2/runDir/Allrun_CMakeOnly= :: This
+     script will generate all the necessary files for running the test harness
+     on the foam-extend tutorials. One can then invoke `make help` to see all
+     the available make options.
+
+- =$WM_PROJECT_DIR/testHarness/foam-extend/3.2/runDir/Allrun_Experimental= ::
+     Same script as `Allrun\_CMakeOnly`, but will also call `make
+     Experimental`.
+
+- =$WM_PROJECT_DIR/testHarness/foam-extend/3.2/runDir/Allrun_Nightly= :: Same
+     script as `Allrun\_CMakeOnly`, but will also call `make Nightly`.
+
+- =$WM_PROJECT_DIR/testHarness/foam-extend/3.2/scripts/AdditionalRunFunctions= :: Additional `bash` macros for the tutorial Allrun files.
+
+- =$WM_PROJECT_DIR/testHarness/foam-extend/3.2/scripts/Allrun.default= ::
+     Default Allrun script for the tutorial when none are provided.
+
+- =$WM_PROJECT_DIR/testHarness/foam-extend/3.2/scripts/addMissingAllrunFileToTutorial.sh= :: Bash script for adding a default Allrun file to the tutorials that do not
+  have one. The test harness only run tutorials with an existing Allrun file
+
+- =$WM_PROJECT_DIR/testHarness/foam-extend/3.2/scripts/prepareCasesForOneTimeStep.sh= :: This script will modify the test cases system/controlDict in order for the
+  case to run for only 1 time step
+
+- =$WM_PROJECT_DIR/testHarness/foam-extend/3.2/scripts/prepareCasesForTestHarness.sh= :: This script will modify the test cases Allrun file so it can run properly
+  under the test harness.
+
+** Configuring your $WM\_PROJECT\_DIR/etc/prefs.sh file for the test harness
+The following environment variables are used for configuring the test
+harness. You should use your $WM\_PROJECT\_DIR/etc/prefs.sh file to initialize
+these variables.
+
+- =CDASH_SUBMIT_LOCAL_HOST_ID= :: System identifier for the FOAM CDash test harness
+  on foam-extend. By default, your system FQN/hostname will be used as the
+  system identifier when publishing your test harness results on the FOAM CDash
+  server on foam-extend. You can override your identifier using this environment
+  variable.
+
+- =CDASH_SCM_INFO= :: Buildname suffix for the FOAM CDash test harness on foam-extend.
+  By default, the git branch name and git revision number will be appended to the CDash build name.
+  Otherwise, for users not using git, or wanting to provide additionnal
+  information, simply initialize the CDASH\_SCM\_INFO with the proper information.
+
+- =WM_NCOMPPROCS= :: Specify the number of cores to use for the parallel execution
+  of the test harness.
+
+- =FOAM_TUTORIALS= :: Directory where the original test cases are located. For
+  foam-extend, this would be by default $WM\_PROJECT\_DIR/tutorials.
+
+** The main dashboards : Experimental, Nightly and Continuous
+The result of a test run, reformatted for easy review, is called a
+`dashboard`. A dashboard can be submitted to a central server, like CDash. Once
+properly configured, the test harness will offer 3 main dashboards.
+
+- =Experimental= :: Will test the current state of the project. An experimental
+     submission can be performed at any time, usually interactively from the
+     current working copy of a developer.
+- =Nightly= :: Is similar to Experimental, except that the source tree will be set
+     to the state it was in at a specific nightly time. This ensures that all
+     `nightly` submissions correspond to the state of the project at the same
+     point in time. `Nightly` builds are usually done automatically at a preset
+     time of day. Nightly build will also update your source code to the latest
+     available revision. So it is best not to run a Nightly dashboard on source
+     code that is not yet committed.
+- =Continuous= :: Means that the source tree is updated to the latest revision,
+     and a build / test cycle is performed only if any files were actually
+     updated. Like `Nightly` builds, `Continuous` ones are usually done
+     automatically and repeatedly in intervals.
+
+There are also `intermediary dashboards` that allow you to select a specific
+test harness intermediary step. The command `make help` will show you that list:
+
+#+BEGIN_SRC
+... ContinuousBuild
+... ContinuousConfigure
+... ContinuousCoverage
+... ContinuousMemCheck
+... ContinuousStart
+... ContinuousSubmit
+... ContinuousTest
+... ContinuousUpdate
+... ExperimentalBuild
+... ExperimentalConfigure
+... ExperimentalCoverage
+... ExperimentalMemCheck
+... ExperimentalStart
+... ExperimentalSubmit
+... ExperimentalTest
+... ExperimentalUpdate
+... NightlyBuild
+... NightlyConfigure
+... NightlyCoverage
+... NightlyMemCheck
+... NightlyMemoryCheck
+... NightlyStart
+... NightlySubmit
+... NightlyTest
+... NightlyUpdate
+#+END_SRC
+
+- Note :: For foam-extend, the MemCheck and Coverage dashboards are not supported.
+
+** Running the test harness
+   Running the test harness is pretty simple:
+
+   These commands will configure and run the `Experimental` version of the test harness:
+
+#+BEGIN_SRC
+   cd $WM_PROJECT_DIR/testHarness/foam-extend/3.2/runDir
+   ./Allclean
+   ./Allrun_Experimental
+#+END_SRC
+
+   To run the `Nightly` version of the test harness:
+
+#+BEGIN_SRC
+   cd $WM_PROJECT_DIR/testHarness/foam-extend/3.2/runDir
+   ./Allclean
+   ./Allrun_Nightly
+#+END_SRC
+
+   To see the full range of available options, run the command:
+
+#+BEGIN_SRC
+make help
+#+END_SRC
+
+** Selecting a subset of test cases to run
+Instead of using the `make` command to run the test harness, one can also use
+command `ctest`. The commmand `ctest` offers additionnal options to select or limit the number
+of tests to run.
+
+The following command will provide all the available options for ctest:
+
+#+BEGIN_SRC
+ctest -N
+#+END_SRC
+
+Here is a list of useful ctest options:
+
+- =ctest -N= :: this command will list the available tests by their name and
+     number. By default, all the tests are run in succession following the
+     numerical order shown.
+
+- =ctest -R <regex>= :: run all the tests whose name are matching the supplied
+     regular expression. For instance, to run all the tests related to cfMesh,
+     one can use the following command: `ctest -R cfMesh`
+
+- =ctest -E <regex>= :: run all the tests, but exclude the ones whose name is
+     matching the supplied regular expression. For instance, to run all the
+     tests except those for cfMesh, one can use the following command: `ctest -E
+     cfMesh`
+
+- =ctest -I [Start,End,Stride,test#,test#]=  :: run individual tests by
+     number. `ctest -I 3,5` will run test 3, 4 and 5. `ctest -I 4,4,,4,7,13`
+     will run tests 4, 7 and 13.
+
+- =ctest -D dashboard= :: run a specific dashboard test. For example, the command
+     `make Experimental` can be replaced by the following suite of ctest
+     commands:
+#+BEGIN_SRC
+ctest -D ExperimentalStart
+ctest -D ExperimentalConfigure
+ctest -D ExperimentalBuild
+ctest -D ExperimentalTest
+ctest -D ExperimentalSubmit
+#+END_SRC
+
+Here is a more complete example where we will configure, build, test and submit the test
+harness results, but only for the incompressible tutorials:
+#+BEGIN_SRC
+ctest -D Experimental -R incompressible
+#+END_SRC
+
+
+** Browsing the CDash service
+
+   The results of the test harness run will be published on the CDash dashboard on foam-extend.
+
+   To see your results:
+   URL      : http://foam-extend.sourceforge.net/CDash/index.php?project=foam-extend-3.2
+
+   On this interactive Web site, one can then point and click various buttons
+   and menus to explore the various reports uploaded from your test harness runs.
+
+** Configuring the test harness for using your own site or personal CDash service
+The foam-extend source code comes with a set pre-configured parameters for
+uploading your dashboards results on the main project CDash server. One can also
+choose to host their own CDash service, either as a site service, or as a
+personnal service running in your own user space. Your CDash administrator can
+generate a file similar to $WM\_PROJECT\_DIR/CTestConfig.cmake where all the
+necessary parameters for connecting to your local service are specified.
+
+In order to use your site CDash service, simply copy your site CTestConfig.cmake
+file to $FOAM\_SITE\_DIR/etc/CTestConfig.site.cmake
+
+In order to use your personnal CDash service, simply copy your personnal CTestConfig.cmake
+file to $WM\_PROJECT\_USER\_DIR/etc/CTestConfig.user.cmake
+
+As usual, your site configuration will override the default parameters from the
+main configuration file $WM\_PROJECT\_DIR/CTestConfig.cmake.
+
+Likewise, your personnal configuration will override the default parameters from the
+main configuration file $WM\_PROJECT\_DIR/CTestConfig.cmake and the default
+parameters from the site file $FOAM\_SITE\_DIR/etc/CTestConfig.site.cmake.
+
+
+** New features for the test harness (foam-extend 3.2):
+   - =Running the test harness in parallel= :: It is now possible to run the test
+        harness in parallel over a single node or computer. The environment
+        variable WM\_NCOMPPROCS will specify the number of cores to use for
+        running the test harness. For `n` cores specified, `n` tutorials will
+        be running in parallel on your computer. Since all the tests will
+        still run on the same computer, make sure you have enough ressources to
+        run `n` tutorials in parallel. Depending on the number of cores
+        available, one might have to tweak some of the shell `limits`
+        values. The command `ulimit -a` will show you the actual limits values
+        imposed on your shell. Some limit values like `open files` (ulimit -n)
+        or `max user processes` (ulimit -u) might need to be adjusted to some
+        higher values. In doubt, consult with your local sysadmin.
+
+** Notes
+The MediaWiki version of this file was generated using the following command:
+
+#+BEGIN_SRC
+   pandoc testHarness.org -s -S -f org -t mediawiki -o testHarness.mediawiki
+#+END_SRC
+
+The ASCII version of this file was generated using the following command:
+
+#+BEGIN_SRC
+   pandoc testHarness.org -N -s -S -f org -t asciidoc -o testHarness.txt
+#+END_SRC

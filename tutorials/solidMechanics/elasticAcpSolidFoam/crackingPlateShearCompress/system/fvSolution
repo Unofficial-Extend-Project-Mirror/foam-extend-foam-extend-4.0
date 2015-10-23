@@ -1,8 +1,8 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | foam-extend: Open Source CFD                    |
-|  \\    /   O peration     | Version:     3.1                                |
-|   \\  /    A nd           | Web:         http://www.extend-project.de       |
+|  \\    /   O peration     | Version:     3.2                                |
+|   \\  /    A nd           | Web:         http://www.foam-extend.org         |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 FoamFile
@@ -40,8 +40,8 @@ solidMechanics
     infoFrequency         100;
     aitkenRelaxation      yes;
     crackLimitingBoxes    1(
-			    (0 -1e-5 0)(0.06 1e-5 1)
-			    );
+                (0 -1e-5 0)(0.06 1e-5 1)
+                );
     crackPropagationFromSpecifiedPatches no;
     crackPropagationPatches 1(crack);
     dynamicTimeStep       no;

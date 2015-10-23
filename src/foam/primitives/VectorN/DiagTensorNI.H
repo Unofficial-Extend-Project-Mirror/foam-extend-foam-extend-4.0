@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -40,6 +40,7 @@ const DiagTensorN<Cmpt, length> DiagTensorN<Cmpt, length>::zero(0);
 template <class Cmpt, int length>
 const DiagTensorN<Cmpt, length> DiagTensorN<Cmpt, length>::one(1);
 
+
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 // Construct null
@@ -63,7 +64,12 @@ inline DiagTensorN<Cmpt, length>::DiagTensorN
 template <class Cmpt, int length>
 inline DiagTensorN<Cmpt, length>::DiagTensorN(const Cmpt& tx)
 {
-    VectorSpaceOps<DiagTensorN<Cmpt, length>::nComponents,0>::eqOpS(*this, tx, eqOp<Cmpt>());
+    VectorSpaceOps<DiagTensorN<Cmpt, length>::nComponents,0>::eqOpS
+    (
+        *this,
+        tx,
+        eqOp<Cmpt>()
+    );
 }
 
 
@@ -94,80 +100,154 @@ inline DiagTensorN<Cmpt, length> DiagTensorN<Cmpt, length>::T() const
 
 //- Assign to a SphericalTensorN
 template <class Cmpt, int length>
-inline void DiagTensorN<Cmpt, length>::operator=(const SphericalTensorN<Cmpt, length>& st)
+inline void DiagTensorN<Cmpt, length>::operator=
+(
+    const SphericalTensorN<Cmpt, length>& st
+)
 {
     const Cmpt& s = st.v_[0];
-    VectorSpaceOps<DiagTensorN<Cmpt, length>::nComponents,0>::eqOpS(*this, s, eqOp<Cmpt>());
+    VectorSpaceOps<DiagTensorN<Cmpt, length>::nComponents,0>::eqOpS
+    (
+        *this,
+        s,
+        eqOp<Cmpt>()
+    );
 }
 
 // * * * * * * * * * * * * * * * Global Operators  * * * * * * * * * * * * * //
 
 //- Addition of DiagTensorN and DiagTensorN
 template <class Cmpt, int length>
-inline DiagTensorN<Cmpt,length>
-operator+(const DiagTensorN<Cmpt,length>& dt1, const DiagTensorN<Cmpt,length>& dt2)
+inline DiagTensorN<Cmpt, length>
+operator+
+(
+    const DiagTensorN<Cmpt, length>& dt1,
+    const DiagTensorN<Cmpt, length>& dt2
+)
 {
     DiagTensorN<Cmpt, length> res;
-    VectorSpaceOps<DiagTensorN<Cmpt,length>::nComponents,0>::op(res, dt1, dt2, plusOp<Cmpt>());
+    VectorSpaceOps<DiagTensorN<Cmpt, length>::nComponents,0>::op
+    (
+        res,
+        dt1,
+        dt2,
+        plusOp<Cmpt>()
+    );
+
     return res;
 }
 
 
 //- Addition of DiagTensorN and SphericalTensorN
 template <class Cmpt, int length>
-inline DiagTensorN<Cmpt,length>
-operator+(const DiagTensorN<Cmpt,length>& dt1, const SphericalTensorN<Cmpt,length>& st2)
+inline DiagTensorN<Cmpt, length>
+operator+
+(
+    const DiagTensorN<Cmpt, length>& dt1,
+    const SphericalTensorN<Cmpt, length>& st2
+)
 {
     const Cmpt& s = st2.v_[0];
     DiagTensorN<Cmpt, length> res;
-    VectorSpaceOps<DiagTensorN<Cmpt,length>::nComponents,0>::opVS(res, dt1, s, plusOp<Cmpt>());
+    VectorSpaceOps<DiagTensorN<Cmpt, length>::nComponents,0>::opVS
+    (
+        res,
+        dt1,
+        s,
+        plusOp<Cmpt>()
+    );
+
     return res;
 }
 
 
 //- Addition of SphericalTensorN and DiagTensorN
 template <class Cmpt, int length>
-inline DiagTensorN<Cmpt,length>
-operator+(const SphericalTensorN<Cmpt,length>& st1, const DiagTensorN<Cmpt,length>& dt2)
+inline DiagTensorN<Cmpt, length>
+operator+
+(
+    const SphericalTensorN<Cmpt, length>& st1,
+    const DiagTensorN<Cmpt, length>& dt2
+)
 {
     const Cmpt& s = st1.v_[0];
     DiagTensorN<Cmpt, length> res;
-    VectorSpaceOps<DiagTensorN<Cmpt,length>::nComponents,0>::opSV(res, s, dt2, plusOp<Cmpt>());
+    VectorSpaceOps<DiagTensorN<Cmpt, length>::nComponents,0>::opSV
+    (
+        res,
+        s,
+        dt2,
+        plusOp<Cmpt>()
+    );
+
     return res;
 }
 
 
 //- Subtraction of DiagTensorN and DiagTensorN
 template <class Cmpt, int length>
-inline DiagTensorN<Cmpt,length>
-operator-(const DiagTensorN<Cmpt,length>& dt1, const DiagTensorN<Cmpt,length>& dt2)
+inline DiagTensorN<Cmpt, length>
+operator-
+(
+    const DiagTensorN<Cmpt, length>& dt1,
+    const DiagTensorN<Cmpt, length>& dt2
+)
 {
     DiagTensorN<Cmpt, length> res;
-    VectorSpaceOps<DiagTensorN<Cmpt,length>::nComponents,0>::op(res, dt1, dt2, minusOp<Cmpt>());
+    VectorSpaceOps<DiagTensorN<Cmpt, length>::nComponents,0>::op
+    (
+        res,
+        dt1,
+        dt2,
+        minusOp<Cmpt>()
+    );
+
     return res;
 }
 
 
 //- Subtraction of DiagTensorN and SphericalTensorN
 template <class Cmpt, int length>
-inline DiagTensorN<Cmpt,length>
-operator-(const DiagTensorN<Cmpt,length>& dt1, const SphericalTensorN<Cmpt,length>& st2)
+inline DiagTensorN<Cmpt, length>
+operator-
+(
+    const DiagTensorN<Cmpt, length>& dt1,
+    const SphericalTensorN<Cmpt, length>& st2
+)
 {
     const Cmpt& s = st2.v_[0];
     DiagTensorN<Cmpt, length> res;
-    VectorSpaceOps<DiagTensorN<Cmpt,length>::nComponents,0>::opVS(res, dt1, s, minusOp<Cmpt>());
+    VectorSpaceOps<DiagTensorN<Cmpt, length>::nComponents,0>::opVS
+    (
+        res,
+        dt1,
+        s,
+        minusOp<Cmpt>()
+    );
+
     return res;
 }
 
 
 //- Subtraction of SphericalTensorN and DiagTensorN
 template <class Cmpt, int length>
-inline DiagTensorN<Cmpt,length>
-operator-(const SphericalTensorN<Cmpt,length>& st1, const DiagTensorN<Cmpt,length>& dt2)
+inline DiagTensorN<Cmpt, length>
+operator-
+(
+    const SphericalTensorN<Cmpt, length>& st1,
+    const DiagTensorN<Cmpt, length>& dt2
+)
 {
     const Cmpt& s = st1.v_[0];
     DiagTensorN<Cmpt, length> res;
-    VectorSpaceOps<DiagTensorN<Cmpt,length>::nComponents,0>::opSV(res, s, dt2, minusOp<Cmpt>());
+    VectorSpaceOps<DiagTensorN<Cmpt, length>::nComponents,0>::opSV
+    (
+        res,
+        s,
+        dt2,
+        minusOp<Cmpt>()
+    );
+
     return res;
 }
 
@@ -176,10 +256,21 @@ operator-(const SphericalTensorN<Cmpt,length>& st1, const DiagTensorN<Cmpt,lengt
 template <class Cmpt, int length>
 inline typename
 innerProduct<DiagTensorN<Cmpt, length>, DiagTensorN<Cmpt, length> >::type
-operator&(const DiagTensorN<Cmpt, length>& dt1, const DiagTensorN<Cmpt, length>& dt2)
+operator&
+(
+    const DiagTensorN<Cmpt, length>& dt1,
+    const DiagTensorN<Cmpt, length>& dt2
+)
 {
     DiagTensorN<Cmpt, length> res;
-    VectorSpaceOps<VectorN<Cmpt, length>::nComponents,0>::op(res, dt1, dt2, multiplyOp<Cmpt>());
+    VectorSpaceOps<VectorN<Cmpt, length>::nComponents,0>::op
+    (
+        res,
+        dt1,
+        dt2,
+        multiplyOp<Cmpt>()
+    );
+
     return res;
 }
 
@@ -188,11 +279,22 @@ operator&(const DiagTensorN<Cmpt, length>& dt1, const DiagTensorN<Cmpt, length>&
 template <class Cmpt, int length>
 inline typename
 innerProduct<SphericalTensorN<Cmpt, length>, DiagTensorN<Cmpt, length> >::type
-operator&(const SphericalTensorN<Cmpt, length>& st1, const DiagTensorN<Cmpt, length>& dt2)
+operator&
+(
+    const SphericalTensorN<Cmpt, length>& st1,
+    const DiagTensorN<Cmpt, length>& dt2
+)
 {
     const Cmpt& s = st1.v_[0];
     DiagTensorN<Cmpt, length> res;
-    VectorSpaceOps<VectorN<Cmpt, length>::nComponents,0>::opSV(res, s, dt2, multiplyOp<Cmpt>());
+    VectorSpaceOps<VectorN<Cmpt, length>::nComponents,0>::opSV
+    (
+        res,
+        s,
+        dt2,
+        multiplyOp<Cmpt>()
+    );
+
     return res;
 }
 
@@ -201,11 +303,22 @@ operator&(const SphericalTensorN<Cmpt, length>& st1, const DiagTensorN<Cmpt, len
 template <class Cmpt, int length>
 inline typename
 innerProduct<DiagTensorN<Cmpt, length>, SphericalTensorN<Cmpt, length> >::type
-operator&(const DiagTensorN<Cmpt, length>& dt1, const SphericalTensorN<Cmpt, length>& st2)
+operator&
+(
+    const DiagTensorN<Cmpt, length>& dt1,
+    const SphericalTensorN<Cmpt, length>& st2
+)
 {
     const Cmpt& s = st2.v_[0];
     DiagTensorN<Cmpt, length> res;
-    VectorSpaceOps<VectorN<Cmpt, length>::nComponents,0>::opVS(res, dt1, s, multiplyOp<Cmpt>());
+    VectorSpaceOps<VectorN<Cmpt, length>::nComponents,0>::opVS
+    (
+        res,
+        dt1,
+        s,
+        multiplyOp<Cmpt>()
+    );
+
     return res;
 }
 
@@ -214,10 +327,21 @@ operator&(const DiagTensorN<Cmpt, length>& dt1, const SphericalTensorN<Cmpt, len
 template <class Cmpt, int length>
 inline typename
 innerProduct<DiagTensorN<Cmpt, length>, VectorN<Cmpt, length> >::type
-operator&(const DiagTensorN<Cmpt, length>& dt, const VectorN<Cmpt, length>& v)
+operator&
+(
+    const DiagTensorN<Cmpt, length>& dt,
+    const VectorN<Cmpt, length>& v
+)
 {
     VectorN<Cmpt, length> res;
-    VectorSpaceOps<VectorN<Cmpt, length>::nComponents,0>::opVV(res, dt, v, multiplyOp<Cmpt>());
+    VectorSpaceOps<VectorN<Cmpt, length>::nComponents,0>::opVV
+    (
+        res,
+        dt,
+        v,
+        multiplyOp<Cmpt>()
+    );
+
     return res;
 }
 
@@ -227,10 +351,21 @@ operator&(const DiagTensorN<Cmpt, length>& dt, const VectorN<Cmpt, length>& v)
 template <class Cmpt, int length>
 inline typename
 innerProduct<VectorN<Cmpt, length>, DiagTensorN<Cmpt, length> >::type
-operator&(const VectorN<Cmpt, length>& v, const DiagTensorN<Cmpt, length>& dt)
+operator&
+(
+    const VectorN<Cmpt, length>& v,
+    const DiagTensorN<Cmpt, length>& dt
+)
 {
     VectorN<Cmpt, length> res;
-    VectorSpaceOps<VectorN<Cmpt, length>::nComponents,0>::opVV(res, v, dt, multiplyOp<Cmpt>());
+    VectorSpaceOps<VectorN<Cmpt, length>::nComponents,0>::opVV
+    (
+        res,
+        v,
+        dt,
+        multiplyOp<Cmpt>()
+    );
+
     return res;
 }
 
@@ -241,53 +376,99 @@ inline DiagTensorN<Cmpt, length>
 operator/(const scalar s, const DiagTensorN<Cmpt, length>& dt)
 {
     DiagTensorN<Cmpt, length> res;
-    VectorSpaceOps<DiagTensorN<Cmpt, length>::nComponents,0>::opSV(res, s, dt, divideOp3<Cmpt, scalar, Cmpt>());
+    VectorSpaceOps<DiagTensorN<Cmpt, length>::nComponents,0>::opSV
+    (
+        res,
+        s,
+        dt,
+        divideOp3<Cmpt, scalar, Cmpt>()
+    );
+
     return res;
 }
 
 
 //- Inner Product of a VectorN by an inverse diagonalTensor
 template <class Cmpt, int length>
-inline VectorN<Cmpt,length>
-operator/(const VectorN<Cmpt,length>& v, const DiagTensorN<Cmpt,length>& dt)
+inline VectorN<Cmpt, length>
+operator/(const VectorN<Cmpt, length>& v, const DiagTensorN<Cmpt, length>& dt)
 {
     VectorN<Cmpt, length> res(v);
-    VectorSpaceOps<DiagTensorN<Cmpt, length>::nComponents,0>::eqOp(res, dt, divideEqOp<Cmpt>());
+    VectorSpaceOps<DiagTensorN<Cmpt, length>::nComponents,0>::eqOp
+    (
+        res,
+        dt,
+        divideEqOp<Cmpt>()
+    );
+
     return res;
 }
 
 
 //- Inner Product of a DiagTensorN and an inverse DiagTensorN
 template <class Cmpt, int length>
-inline DiagTensorN<Cmpt,length>
-operator/(const DiagTensorN<Cmpt,length>& dt1, const DiagTensorN<Cmpt,length>& dt2)
+inline DiagTensorN<Cmpt, length>
+operator/
+(
+    const DiagTensorN<Cmpt, length>& dt1,
+    const DiagTensorN<Cmpt, length>& dt2
+)
 {
     DiagTensorN<Cmpt, length> res;
-    VectorSpaceOps<DiagTensorN<Cmpt, length>::nComponents,0>::op(res, dt1, dt2, divideOp<Cmpt>());
+    VectorSpaceOps<DiagTensorN<Cmpt, length>::nComponents,0>::op
+    (
+        res,
+        dt1,
+        dt2,
+        divideOp<Cmpt>()
+    );
+
     return res;
 }
 
 
 //- Inner Product of a SphericalTensorN and an inverse DiagTensorN
 template <class Cmpt, int length>
-inline DiagTensorN<Cmpt,length>
-operator/(const SphericalTensorN<Cmpt,length>& st1, const DiagTensorN<Cmpt,length>& dt2)
+inline DiagTensorN<Cmpt, length>
+operator/
+(
+    const SphericalTensorN<Cmpt, length>& st1,
+    const DiagTensorN<Cmpt, length>& dt2
+)
 {
     const Cmpt& s = st1.v_[0];
     DiagTensorN<Cmpt, length> res;
-    VectorSpaceOps<DiagTensorN<Cmpt, length>::nComponents,0>::opSV(res, s, dt2, divideOp<Cmpt>());
+    VectorSpaceOps<DiagTensorN<Cmpt, length>::nComponents,0>::opSV
+    (
+        res,
+        s,
+        dt2,
+        divideOp<Cmpt>()
+    );
+
     return res;
 }
 
 
 //- Inner Product of a DiagTensorN and an inverse SphericalTensorN
 template <class Cmpt, int length>
-inline DiagTensorN<Cmpt,length>
-operator/(const DiagTensorN<Cmpt,length>& dt1, const SphericalTensorN<Cmpt,length>& st2)
+inline DiagTensorN<Cmpt, length>
+operator/
+(
+    const DiagTensorN<Cmpt, length>& dt1,
+    const SphericalTensorN<Cmpt, length>& st2
+)
 {
     const Cmpt& s = st2.v_[0];
     DiagTensorN<Cmpt, length> res;
-    VectorSpaceOps<DiagTensorN<Cmpt, length>::nComponents,0>::opVS(res, dt1, s, divideOp<Cmpt>());
+    VectorSpaceOps<DiagTensorN<Cmpt, length>::nComponents,0>::opVS
+    (
+        res,
+        dt1,
+        s,
+        divideOp<Cmpt>()
+    );
+
     return res;
 }
 
@@ -297,7 +478,14 @@ template <class Cmpt, int length>
 inline DiagTensorN<Cmpt, length> inv(const DiagTensorN<Cmpt, length>& dt)
 {
     DiagTensorN<Cmpt, length> res;
-    VectorSpaceOps<DiagTensorN<Cmpt, length>::nComponents,0>::opSV(res, 1.0, dt, divideOp<Cmpt>());
+    VectorSpaceOps<DiagTensorN<Cmpt, length>::nComponents,0>::opSV
+    (
+        res,
+        1.0,
+        dt,
+        divideOp<Cmpt>()
+    );
+
     return res;
 }
 

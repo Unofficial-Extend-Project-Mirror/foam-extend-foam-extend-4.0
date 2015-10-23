@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -28,7 +28,7 @@ License
 #include "fvPatchFieldMapper.H"
 #include "volFields.H"
 #include "EulerDdtScheme.H"
-#include "CrankNicholsonDdtScheme.H"
+#include "CrankNicolsonDdtScheme.H"
 #include "backwardDdtScheme.H"
 #include "steadyStateDdtScheme.H"
 
@@ -172,7 +172,10 @@ template<class Type>
 tmp<scalarField> advectiveFvPatchField<Type>::advectionSpeed() const
 {
     const surfaceScalarField& phi =
-        this->db().objectRegistry::template lookupObject<surfaceScalarField>(phiName_);
+        this->db().objectRegistry::template lookupObject<surfaceScalarField>
+        (
+            phiName_
+        );
 
     fvsPatchField<scalar> phip = this->lookupPatchField
     (
@@ -270,7 +273,7 @@ void advectiveFvPatchField<Type>::updateCoeffs()
         if
         (
             ddtScheme == fv::EulerDdtScheme<Type>::typeName
-         || ddtScheme == fv::CrankNicholsonDdtScheme<Type>::typeName
+         || ddtScheme == fv::CrankNicolsonDdtScheme<Type>::typeName
         )
         {
             this->refValue() =
@@ -318,7 +321,7 @@ void advectiveFvPatchField<Type>::updateCoeffs()
         if
         (
             ddtScheme == fv::EulerDdtScheme<Type>::typeName
-         || ddtScheme == fv::CrankNicholsonDdtScheme<Type>::typeName
+         || ddtScheme == fv::CrankNicolsonDdtScheme<Type>::typeName
         )
         {
             this->refValue() = field.oldTime().boundaryField()[patchi];

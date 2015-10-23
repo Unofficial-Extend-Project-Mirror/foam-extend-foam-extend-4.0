@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -26,7 +26,7 @@ Application
 
 Description
     Transient solver for incompressible, flow of Newtonian fluids
-    on a moving mesh using the PIMPLE (merged PISO-SIMPLE) algorithm.
+    with dynamic mesh using the PIMPLE (merged PISO-SIMPLE) algorithm.
 
     Turbulence modelling is generic, i.e. laminar, RAS or LES may be selected.
 
@@ -79,6 +79,8 @@ int main(int argc, char *argv[])
         // Mesh motion update
         if (correctPhi && meshChanged)
         {
+            // Fluxes will be corrected to absolute velocity
+            // HJ, 6/Feb/2009
 #           include "correctPhi.H"
         }
 

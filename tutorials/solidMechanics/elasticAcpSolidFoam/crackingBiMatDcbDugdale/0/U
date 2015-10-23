@@ -1,8 +1,8 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | foam-extend: Open Source CFD                    |
-|  \\    /   O peration     | Version:     3.1                                |
-|   \\  /    A nd           | Web:         http://www.extend-project.de       |
+|  \\    /   O peration     | Version:     3.2                                |
+|   \\  /    A nd           | Web:         http://www.foam-extend.org         |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 FoamFile
@@ -24,16 +24,16 @@ boundaryField
     bottomLoading
     {
         type           timeVaryingFixedDisplacement;
-	fileName       "$FOAM_CASE/constant/timeVsBottomDisp";
-	outOfBounds    clamp;
+        fileName       "$FOAM_CASE/constant/timeVsBottomDisp";
+        outOfBounds    clamp;
         value          uniform (0 0 0);
     }
 
     topLoading
     {
         type           timeVaryingFixedDisplacement;
-	fileName       "$FOAM_CASE/constant/timeVsTopDisp";
-	outOfBounds    clamp;
+        fileName       "$FOAM_CASE/constant/timeVsTopDisp";
+        outOfBounds    clamp;
         value          uniform (0 0 0);
     }
 

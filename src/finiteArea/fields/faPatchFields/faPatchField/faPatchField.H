@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -43,6 +43,7 @@ SourceFiles
 
 #include "faPatch.H"
 #include "DimensionedField.H"
+#include "debugSwitch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -96,7 +97,7 @@ public:
     TypeName("faPatchField");
 
     //- Debug switch to disallow the use of
-    static int disallowDefaultFaPatchField;
+    static debug::debugSwitch disallowDefaultFaPatchField;
 
 
     // Declare run-time constructor selection tables

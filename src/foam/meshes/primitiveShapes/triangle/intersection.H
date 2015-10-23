@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     3.2
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -37,6 +37,7 @@ SourceFiles
 
 #include "scalar.H"
 #include "NamedEnum.H"
+#include "tolerancesSwitch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -59,10 +60,11 @@ public:
         //  intersects the triangle or not.
         //  Adjusting the tolerance from the code does not allow it to be const
         //  HJ, 5/Jan/2008
-        static const scalar planarTol_;
+        //static Foam::debug::controlSwitches<scalar> planarTol_;
+        static Foam::debug::tolerancesSwitch planarTol_;
 
         //- Intersection miss tolerance, of the order of 1e-15
-        static const scalar missTol_;
+        static const debug::tolerancesSwitch missTol_;
 
 
         enum direction
@@ -101,9 +103,9 @@ public:
 
             // Ugly violence to allow tolerance to remain a const scalar
             // HJ, 7/Sep/2008
-            scalar oldTol = planarTol_;
-            scalar* ptPtr = const_cast<scalar*>(&planarTol_);
-            (*ptPtr) = t;
+            scalar oldTol = planarTol_();
+
+            planarTol_ = t;
 
             return oldTol;
         }
