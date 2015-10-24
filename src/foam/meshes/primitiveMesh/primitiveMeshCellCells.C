@@ -75,7 +75,7 @@ void Foam::primitiveMesh::calcCellCells() const
 
 
 
-        // 2. Size and fill cellFaceAddr
+        // 2. Size and fill cellCellAddr
 
         forAll (cellCellAddr, cellI)
         {
