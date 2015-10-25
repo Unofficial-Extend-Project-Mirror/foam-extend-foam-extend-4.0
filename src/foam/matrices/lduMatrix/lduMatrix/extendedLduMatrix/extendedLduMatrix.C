@@ -57,8 +57,8 @@ Foam::extendedLduMatrix::extendedLduMatrix
 {
     if (debug)
     {
-        Info<< "extendedLduMatrix(lduMatrix&, label, polyMesh&) :"
-               "Constructing extendedLduMatrix."
+        InfoIn("extendedLduMatrix(lduMatrix&, label, polyMesh&)")
+            << "Constructing extendedLduMatrix."
             << endl;
     }
 
