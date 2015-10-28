@@ -227,9 +227,8 @@ public:
         BlockLduMatrix(BlockLduMatrix<Type>&, bool reUse);
 
 
-    // Destructor
-
-        virtual ~BlockLduMatrix();
+    //- Destructor
+    virtual ~BlockLduMatrix();
 
 
     // Member functions

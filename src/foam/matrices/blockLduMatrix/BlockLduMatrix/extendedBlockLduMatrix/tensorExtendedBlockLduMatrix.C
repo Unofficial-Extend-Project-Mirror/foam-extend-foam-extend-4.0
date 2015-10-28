@@ -41,8 +41,13 @@ void Foam::extendedBlockLduMatrix<Foam::tensor>::mapOffDiagCoeffs
 {
     if (blockLdum.diagonal())
     {
-        WarningIn("extendedBlockLduMatrix(lduMatrix&, label, polyMesh&)")
-            << "Attempted to create extended lower/upper coeffs for block "
+        WarningIn
+        (
+            "void extendedBlockLduMatrix<tensor>::mapOffDiagCoeffs\n"
+            "(\n"
+            "    const BlockLduMatrix<tensor>& blockLdum\n"
+            ")"
+        )   << "Attempted to create extended lower/upper coeffs for block "
             << "matrix that is diagonal."
             << nl << endl;
     }
@@ -67,7 +72,8 @@ void Foam::extendedBlockLduMatrix<Foam::tensor>::mapOffDiagCoeffs
             if (upper.activeType() == blockCoeffBase::SCALAR)
             {
                 // Helper type definition
-                typedef typename CoeffField<tensor>::scalarTypeField activeType;
+                typedef typename CoeffField<tensor>::scalarTypeField
+                    activeType;
 
                 // Get references to fields
                 const activeType& activeUpper = upper.asScalar();
@@ -83,7 +89,8 @@ void Foam::extendedBlockLduMatrix<Foam::tensor>::mapOffDiagCoeffs
             else if (upper.activeType() == blockCoeffBase::LINEAR)
             {
                 // Helper type definition
-                typedef typename CoeffField<tensor>::linearTypeField activeType;
+                typedef typename CoeffField<tensor>::linearTypeField
+                    activeType;
 
                 // Get references to fields
                 const activeType& activeUpper = upper.asLinear();
@@ -100,7 +107,10 @@ void Foam::extendedBlockLduMatrix<Foam::tensor>::mapOffDiagCoeffs
             {
                 FatalErrorIn
                 (
-                    "extendedBlockLduMatrix(lduMatrix&, label, polyMesh&)"
+                    "void extendedBlockLduMatrix<tensor>::mapOffDiagCoeffs\n"
+                    "(\n"
+                    "    const BlockLduMatrix<tensor>& blockLdum\n"
+                    ")"
                 )   << "Problem between ordinary block matrix and extended"
                     << " block matrix upper coeffs type morphing."
                     << abort(FatalError);
@@ -121,7 +131,8 @@ void Foam::extendedBlockLduMatrix<Foam::tensor>::mapOffDiagCoeffs
             if (lower.activeType() == blockCoeffBase::SCALAR)
             {
                 // Helper type definition
-                typedef typename CoeffField<tensor>::scalarTypeField activeType;
+                typedef typename CoeffField<tensor>::scalarTypeField
+                    activeType;
 
                 // Get references to fields
                 const activeType& activeLower = lower.asScalar();
@@ -137,7 +148,8 @@ void Foam::extendedBlockLduMatrix<Foam::tensor>::mapOffDiagCoeffs
             else if (lower.activeType() == blockCoeffBase::LINEAR)
             {
                 // Helper type definition
-                typedef typename CoeffField<tensor>::linearTypeField activeType;
+                typedef typename CoeffField<tensor>::linearTypeField
+                    activeType;
 
                 // Get references to fields
                 const activeType& activeLower = lower.asLinear();
@@ -154,7 +166,10 @@ void Foam::extendedBlockLduMatrix<Foam::tensor>::mapOffDiagCoeffs
             {
                 FatalErrorIn
                 (
-                    "extendedBlockLduMatrix(lduMatrix&, label, polyMesh&)"
+                    "void extendedBlockLduMatrix<tensor>::mapOffDiagCoeffs\n"
+                    "(\n"
+                    "    const BlockLduMatrix<tensor>& blockLdum\n"
+                    ")"
                 )   << "Problem between ordinary block matrix and extended"
                     << " block matrix lower coeffs type morphing."
                     << abort(FatalError);
@@ -223,7 +238,10 @@ void Foam::extendedBlockLduMatrix<Foam::tensor>::mapOffDiagCoeffs
         {
             FatalErrorIn
             (
-                "extendedBlockLduMatrix(lduMatrix&, label, polyMesh&)"
+                "void extendedBlockLduMatrix<tensor>::mapOffDiagCoeffs\n"
+                "(\n"
+                "    const BlockLduMatrix<tensor>& blockLdum\n"
+                ")"
             )   << "Problem between ordinary block matrix and extended"
                 << " block matrix upper/lower coeffs type morphing."
                 << abort(FatalError);

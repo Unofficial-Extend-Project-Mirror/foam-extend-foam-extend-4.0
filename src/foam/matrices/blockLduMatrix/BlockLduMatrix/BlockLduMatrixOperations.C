@@ -307,9 +307,14 @@ void Foam::BlockLduMatrix<Type>::check() const
     typedef typename TypeCoeffField::linearTypeField linearTypeField;
     typedef typename TypeCoeffField::squareTypeField squareTypeField;
 
-    // Copy the diagonal
-    TypeCoeffField DiagCopy(this->diag().size());
-//     TypeCoeffField DiagCopy = this->diag();
+    // TODO: Account for coupled boundary patch coeffs
+    // HJ, 29/Oct/2015
+
+    // Get original diag
+    const TypeCoeffField& d = this->diag();
+
+    // Copy the diagonal.  It is initialised to zero
+    TypeCoeffField SumOffDiag(d.size());
 
     const unallocLabelList& l = lduAddr().lowerAddr();
     const unallocLabelList& u = lduAddr().upperAddr();
@@ -323,67 +328,110 @@ void Foam::BlockLduMatrix<Type>::check() const
         if
         (
             Upper.activeType() == blockCoeffBase::SQUARE
-         || DiagCopy.activeType() == blockCoeffBase::SQUARE
+         || d.activeType() == blockCoeffBase::SQUARE
         )
         {
+            // Note: For a square coefficient, the matrix needs to be analysed
+            // row-by-row, including the contribution of the off-diagonal
+            // elements in the diagonal matrix
+
+            // Get result as linear
+            linearTypeField& activeSumOffDiag = SumOffDiag.asLinear();
+
+            // Do diagonal elements
+
+            // Create the diagonal matrix element without the diagonal
+            const squareTypeField& activeDiag = d.asSquare();
+
+            linearTypeField diagDiag(activeDiag.size());
+            squareTypeField luDiag(activeDiag.size());
+
+            // Take out the diagonal from the diag as a linear type
+            contractLinear(diagDiag, activeDiag);
+
+            // Expand diagonal only to full square type and store into luDiag
+            expandLinear(luDiag, diagDiag);
+
+            // Keep only off-diagonal in luDiag
+            luDiag = activeDiag - luDiag;
+
+            sumMagToDiag(activeSumOffDiag, luDiag);
+
+            // Do the off-diagonal elements by collapsing each row
+            // into the linear form
+
             const squareTypeField& activeUpper = Upper.asSquare();
-            squareTypeField& activeDiagCopy = DiagCopy.asSquare();
 
             for (register label coeffI = 0; coeffI < l.size(); coeffI++)
             {
-                activeDiagCopy[l[coeffI]] += activeUpper[coeffI].T();
-                activeDiagCopy[u[coeffI]] += activeUpper[coeffI];
+                activeSumOffDiag[l[coeffI]] +=
+                    sumMagToDiag(activeUpper[coeffI].T());
+
+                activeSumOffDiag[u[coeffI]] +=
+                    sumMagToDiag(activeUpper[coeffI]);
             }
 
-            Info<< "void BlockLduMatrix<Type>::check() const : "
-                << "Symmetric matrix: raw matrix difference: "
-                << sum(mag(activeDiagCopy))
-                << " scaled: "
-                << sum(mag(activeDiagCopy))/sum(mag(this->diag().asSquare()))
+            // Check diagonal dominance
+
+            diagDiag = cmptMag(diagDiag);
+
+            // Divide diagonal with sum of off-diagonals
+            cmptDivide(diagDiag, diagDiag, activeSumOffDiag);
+
+            InfoIn("void BlockLduMatrix<Type>::check() const)")
+                << "Symmetric matrix: " << activeDiag.size()
+                << " diagonal dominance sym square: "
+                << Foam::min(diagDiag)
                 << endl;
         }
         else if
         (
             Upper.activeType() == blockCoeffBase::LINEAR
-         || DiagCopy.activeType() == blockCoeffBase::LINEAR
+         || d.activeType() == blockCoeffBase::LINEAR
         )
         {
+            const linearTypeField& activeDiag = d.asLinear();
+
             const linearTypeField& activeUpper = Upper.asLinear();
-            linearTypeField& activeDiagCopy = DiagCopy.asLinear();
+            linearTypeField& activeSumOffDiag = SumOffDiag.asLinear();
 
             for (register label coeffI = 0; coeffI < l.size(); coeffI++)
             {
-                activeDiagCopy[l[coeffI]] += activeUpper[coeffI];
-                activeDiagCopy[u[coeffI]] += activeUpper[coeffI];
+                activeSumOffDiag[l[coeffI]] += cmptMag(activeUpper[coeffI]);
+                activeSumOffDiag[u[coeffI]] += cmptMag(activeUpper[coeffI]);
             }
 
-            Info<< "void BlockLduMatrix<Type>::check() const : "
-                << "Symmetric matrix: raw matrix difference: "
-                << sum(mag(activeDiagCopy))
-                << " scaled: "
-                << sum(mag(activeDiagCopy))/sum(mag(this->diag().asLinear()))
+            linearTypeField diagDiag = cmptMag(activeDiag);
+
+            cmptDivide(diagDiag, diagDiag, activeSumOffDiag);
+
+            InfoIn("void BlockLduMatrix<Type>::check() const)")
+                << "Symmetric matrix: " << activeDiag.size()
+                << " diagonal dominance sym linear: "
+                << Foam::min(diagDiag)
                 << endl;
         }
         else if
         (
             Upper.activeType() == blockCoeffBase::SCALAR
-         || DiagCopy.activeType() == blockCoeffBase::SCALAR
+         || d.activeType() == blockCoeffBase::SCALAR
         )
         {
+            const scalarTypeField& activeDiag = d.asScalar();
+
             const scalarTypeField& activeUpper = Upper.asScalar();
-            scalarTypeField& activeDiagCopy = DiagCopy.asScalar();
+            scalarTypeField& activeSumOffDiag = SumOffDiag.asScalar();
 
             for (register label coeffI = 0; coeffI < l.size(); coeffI++)
             {
-                activeDiagCopy[l[coeffI]] += activeUpper[coeffI];
-                activeDiagCopy[u[coeffI]] += activeUpper[coeffI];
+                activeSumOffDiag[l[coeffI]] += cmptMag(activeUpper[coeffI]);
+                activeSumOffDiag[u[coeffI]] += cmptMag(activeUpper[coeffI]);
             }
 
-            Info<< "void BlockLduMatrix<Type>::check() const : "
-                << "Symmetric matrix: raw matrix difference: "
-                << sum(mag(activeDiagCopy))
-                << " scaled: "
-                << sum(mag(activeDiagCopy))/sum(mag(this->diag().asScalar()))
+            InfoIn("void BlockLduMatrix<Type>::check() const)")
+                << "Symmetric matrix: " << activeDiag.size()
+                << " diagonal dominance sym scalar: "
+                << Foam::min(mag(activeDiag)/activeSumOffDiag)
                 << endl;
         }
     }
@@ -398,78 +446,121 @@ void Foam::BlockLduMatrix<Type>::check() const
         (
             Lower.activeType() == blockCoeffBase::SQUARE
          || Upper.activeType() == blockCoeffBase::SQUARE
-         || DiagCopy.activeType() == blockCoeffBase::SQUARE
+         || d.activeType() == blockCoeffBase::SQUARE
         )
         {
+            // Note: For a square coefficient, the matrix needs to be analysed
+            // row-by-row, including the contribution of the off-diagonal
+            // elements in the diagonal matrix
+
+            // Get result as linear
+            linearTypeField& activeSumOffDiag = SumOffDiag.asLinear();
+
+            // Do diagonal elements
+
+            // Create the diagonal matrix element without the diagonal
+            const squareTypeField& activeDiag = d.asSquare();
+
+            linearTypeField diagDiag(activeDiag.size());
+            squareTypeField luDiag(activeDiag.size());
+
+            // Take out the diagonal from the diag as a linear type
+            contractLinear(diagDiag, activeDiag);
+
+            // Expand diagonal only to full square type and store into luDiag
+            expandLinear(luDiag, diagDiag);
+
+            // Keep only off-diagonal in luDiag
+            luDiag = activeDiag - luDiag;
+
+            sumMagToDiag(activeSumOffDiag, luDiag);
+
+            // Do the off-diagonal elements by collapsing each row
+            // into the linear form
+
             const squareTypeField& activeLower = Lower.asSquare();
             const squareTypeField& activeUpper = Upper.asSquare();
-            squareTypeField& activeDiagCopy = DiagCopy.asSquare();
 
             for (register label coeffI = 0; coeffI < l.size(); coeffI++)
             {
-                activeDiagCopy[l[coeffI]] += activeLower[coeffI];
-                activeDiagCopy[u[coeffI]] += activeUpper[coeffI];
+                activeSumOffDiag[l[coeffI]] +=
+                    sumMagToDiag(activeLower[coeffI]);
+
+                activeSumOffDiag[u[coeffI]] +=
+                    sumMagToDiag(activeUpper[coeffI]);
             }
 
-            Info<< "void BlockLduMatrix<Type>::check() const : "
-                << "Asymmetric matrix: raw matrix difference: "
-                << sum(mag(activeDiagCopy))
-                << " scaled: "
-                << sum(mag(activeDiagCopy))/sum(mag(this->diag().asSquare()))
+            // Check diagonal dominance
+
+            diagDiag = cmptMag(diagDiag);
+
+            // Divide diagonal with sum of off-diagonals
+            cmptDivide(diagDiag, diagDiag, activeSumOffDiag);
+
+            InfoIn("void BlockLduMatrix<Type>::check() const)")
+                << "Asymmetric matrix: " << activeDiag.size()
+                << " diagonal dominance assym square: "
+                << Foam::min(diagDiag)
                 << endl;
         }
         else if
         (
             Lower.activeType() == blockCoeffBase::LINEAR
          || Upper.activeType() == blockCoeffBase::LINEAR
-         || DiagCopy.activeType() == blockCoeffBase::LINEAR
+         || d.activeType() == blockCoeffBase::LINEAR
         )
         {
+            const linearTypeField& activeDiag = d.asLinear();
+
             const linearTypeField& activeLower = Lower.asLinear();
             const linearTypeField& activeUpper = Upper.asLinear();
-            linearTypeField& activeDiagCopy = DiagCopy.asLinear();
+            linearTypeField& activeSumOffDiag = SumOffDiag.asLinear();
 
             for (register label coeffI = 0; coeffI < l.size(); coeffI++)
             {
-                activeDiagCopy[l[coeffI]] += activeLower[coeffI];
-                activeDiagCopy[u[coeffI]] += activeUpper[coeffI];
+                activeSumOffDiag[l[coeffI]] += cmptMag(activeLower[coeffI]);
+                activeSumOffDiag[u[coeffI]] += cmptMag(activeUpper[coeffI]);
             }
 
-            Info<< "void BlockLduMatrix<Type>::check() const : "
-                << "Asymmetric matrix: raw matrix difference: "
-                << sum(mag(activeDiagCopy))
-                << " scaled: "
-                << sum(mag(activeDiagCopy))/sum(mag(this->diag().asLinear()))
+            linearTypeField diagDiag = cmptMag(activeDiag);
+
+            cmptDivide(diagDiag, diagDiag, activeSumOffDiag);
+
+            InfoIn("void BlockLduMatrix<Type>::check() const)")
+                << "Asymmetric matrix: " << activeDiag.size()
+                << " diagonal dominance assym linear: "
+                << Foam::min(diagDiag)
                 << endl;
         }
         else if
         (
             Lower.activeType() == blockCoeffBase::SCALAR
          || Upper.activeType() == blockCoeffBase::SCALAR
-         || DiagCopy.activeType() == blockCoeffBase::SCALAR
+         || d.activeType() == blockCoeffBase::SCALAR
         )
         {
+            const scalarTypeField& activeDiag = d.asScalar();
+
             const scalarTypeField& activeLower = Lower.asScalar();
             const scalarTypeField& activeUpper = Upper.asScalar();
-            scalarTypeField& activeDiagCopy = DiagCopy.asScalar();
+            scalarTypeField& activeSumOffDiag = SumOffDiag.asScalar();
 
             for (register label coeffI = 0; coeffI < l.size(); coeffI++)
             {
-                activeDiagCopy[l[coeffI]] += activeLower[coeffI];
-                activeDiagCopy[u[coeffI]] += activeUpper[coeffI];
+                activeSumOffDiag[l[coeffI]] += cmptMag(activeLower[coeffI]);
+                activeSumOffDiag[u[coeffI]] += cmptMag(activeUpper[coeffI]);
             }
 
-            Info<< "void BlockLduMatrix<Type>::check() const : "
-                << "Asymmetric matrix: raw matrix difference: "
-                << sum(mag(activeDiagCopy))
-                << " scaled: "
-                << sum(mag(activeDiagCopy))/sum(mag(this->diag().asScalar()))
+            InfoIn("void BlockLduMatrix<Type>::check() const)")
+                << "Asymmetric matrix: "  << activeDiag.size()
+                << " diagonal dominance assym scalar: "
+                << Foam::min(mag(activeDiag)/activeSumOffDiag)
                 << endl;
         }
     }
     else
     {
-        Info<< "void BlockLduMatrix<Type>::check() const : "
+        InfoIn("void BlockLduMatrix<Type>::check() const)")
             << "Diagonal matrix" << endl;
     }
 }

@@ -41,8 +41,13 @@ void Foam::extendedBlockLduMatrix<Foam::symmTensor>::mapOffDiagCoeffs
 {
     if (blockLdum.diagonal())
     {
-        WarningIn("extendedBlockLduMatrix(lduMatrix&, label, polyMesh&)")
-            << "Attempted to create extended lower/upper coeffs for block "
+        WarningIn
+        (
+            "void extendedBlockLduMatrix<symmTensor>::mapOffDiagCoeffs\n"
+            "(\n"
+            "    const BlockLduMatrix<symmTensor>& blockLdum\n"
+            ")"
+        )   << "Attempted to create extended lower/upper coeffs for block "
             << "matrix that is diagonal."
             << nl << endl;
     }
@@ -102,7 +107,11 @@ void Foam::extendedBlockLduMatrix<Foam::symmTensor>::mapOffDiagCoeffs
             {
                 FatalErrorIn
                 (
-                    "extendedBlockLduMatrix(lduMatrix&, label, polyMesh&)"
+                    "void extendedBlockLduMatrix<symmTensor>::"
+                    "mapOffDiagCoeffs\n"
+                    "(\n"
+                    "    const BlockLduMatrix<symmTensor>& blockLdum\n"
+                    ")"
                 )   << "Problem between ordinary block matrix and extended"
                     << " block matrix upper coeffs type morphing."
                     << abort(FatalError);
@@ -158,7 +167,11 @@ void Foam::extendedBlockLduMatrix<Foam::symmTensor>::mapOffDiagCoeffs
             {
                 FatalErrorIn
                 (
-                    "extendedBlockLduMatrix(lduMatrix&, label, polyMesh&)"
+                    "void extendedBlockLduMatrix<symmTensor>::"
+                    "mapOffDiagCoeffs\n"
+                    "(\n"
+                    "    const BlockLduMatrix<symmTensor>& blockLdum\n"
+                    ")"
                 )   << "Problem between ordinary block matrix and extended"
                     << " block matrix lower coeffs type morphing."
                     << abort(FatalError);
@@ -188,7 +201,8 @@ void Foam::extendedBlockLduMatrix<Foam::symmTensor>::mapOffDiagCoeffs
         if (upper.activeType() == blockCoeffBase::SCALAR)
         {
             // Helper type definition
-            typedef typename CoeffField<symmTensor>::scalarTypeField activeType;
+            typedef typename CoeffField<symmTensor>::scalarTypeField
+                activeType;
 
             // Get references to fields
             const activeType& activeUpper = upper.asScalar();
@@ -207,7 +221,8 @@ void Foam::extendedBlockLduMatrix<Foam::symmTensor>::mapOffDiagCoeffs
         else if (upper.activeType() == blockCoeffBase::LINEAR)
         {
             // Helper type definition
-            typedef typename CoeffField<symmTensor>::linearTypeField activeType;
+            typedef typename CoeffField<symmTensor>::linearTypeField
+                activeType;
 
             // Get references to fields
             const activeType& activeUpper = upper.asLinear();
@@ -227,7 +242,10 @@ void Foam::extendedBlockLduMatrix<Foam::symmTensor>::mapOffDiagCoeffs
         {
             FatalErrorIn
             (
-                "extendedBlockLduMatrix(lduMatrix&, label, polyMesh&)"
+                "void extendedBlockLduMatrix<symmTensor>::mapOffDiagCoeffs\n"
+                "(\n"
+                "    const BlockLduMatrix<symmTensor>& blockLdum\n"
+                ")"
             )   << "Problem between ordinary block matrix and extended"
                 << " block matrix upper/lower coeffs type morphing."
                 << abort(FatalError);

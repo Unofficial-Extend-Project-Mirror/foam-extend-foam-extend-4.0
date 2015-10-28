@@ -65,8 +65,10 @@ void Foam::BlockILUCpPrecon<Type>::calcActiveTypeFactorization
         const extendedLduAddressing& addr = extBlockMatrix_.extendedLduAddr();
 
         // Get upper/lower extended addressing
-        const label* const __restrict__ uPtr = addr.extendedUpperAddr().begin();
-        const label* const __restrict__ lPtr = addr.extendedLowerAddr().begin();
+        const label* const __restrict__ uPtr =
+            addr.extendedUpperAddr().begin();
+        const label* const __restrict__ lPtr =
+            addr.extendedLowerAddr().begin();
 
         // Get extended owner start addressing
         const label* const __restrict__ ownStartPtr =
@@ -87,8 +89,8 @@ void Foam::BlockILUCpPrecon<Type>::calcActiveTypeFactorization
         LDUType* __restrict__ zPtr = z.begin();
         LDUType* __restrict__ wPtr = w.begin();
 
-        // Define start and end face ("virtual" face when extended addressing is
-        // used) of this row/column.
+        // Define start and end face ("virtual" face when extended addressing
+        // is used) of this row/column.
         register label fStart, fEnd, fLsrStart, fLsrEnd;
 
         // Crout LU factorization
@@ -505,17 +507,15 @@ Foam::BlockILUCpPrecon<Type>::BlockILUCpPrecon
 )
 :
     BlockLduPrecon<Type>(matrix),
-    preconDiag_(matrix.diag()),
-    p_(readLabel(dict.lookup("fillInLevel"))),
     extBlockMatrix_
     (
         matrix,
-        p_,
-        matrix.mesh().thisDb().time().template lookupObject<polyMesh>
+        matrix.mesh().lduAddr().extendedAddr
         (
-            polyMesh::defaultRegion
+            readLabel(dict.lookup("fillInLevel"))
         )
-    )
+    ),
+    preconDiag_(matrix.diag())
 {
     calcFactorization();
 }

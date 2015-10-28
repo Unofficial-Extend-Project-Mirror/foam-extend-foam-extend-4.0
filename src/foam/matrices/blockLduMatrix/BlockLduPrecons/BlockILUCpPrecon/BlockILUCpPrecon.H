@@ -62,14 +62,11 @@ class BlockILUCpPrecon
 {
     // Private Data
 
+        //- Extended ldu matrix
+        mutable extendedBlockLduMatrix<Type> extBlockMatrix_;
+
         //- Preconditioned diagonal
         mutable CoeffField<Type> preconDiag_;
-
-        //- Fill in level
-        const label p_;
-
-        //- Extended lduMarix
-        mutable extendedBlockLduMatrix<Type> extBlockMatrix_;
 
 
     // Private Member Functions

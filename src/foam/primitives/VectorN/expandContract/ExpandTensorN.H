@@ -75,6 +75,9 @@ UNARY_TEMPLATE_FUNCTION(TensorN, VectorN, expandLinear)
 UNARY_TEMPLATE_FUNCTION(DiagTensorN, VectorN, expandLinear)
 UNARY_TEMPLATE_FUNCTION(SphericalTensorN, VectorN, expandLinear)
 
+UNARY_TEMPLATE_FUNCTION(VectorN, TensorN, sumToDiag)
+UNARY_TEMPLATE_FUNCTION(VectorN, TensorN, sumMagToDiag)
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam
