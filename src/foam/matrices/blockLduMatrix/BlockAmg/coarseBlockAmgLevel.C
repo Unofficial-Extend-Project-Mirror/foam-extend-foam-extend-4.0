@@ -81,10 +81,7 @@ Foam::coarseBlockAmgLevel<Type>::coarseBlockAmgLevel
         )
     ),
     Ax_()
-{
-    Info<< "Coarse AMG level check" << endl;
-    matrixPtr_->check();
-}
+{}
 
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
