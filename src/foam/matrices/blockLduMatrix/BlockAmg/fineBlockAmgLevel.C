@@ -76,10 +76,7 @@ Foam::fineBlockAmgLevel<Type>::fineBlockAmgLevel
         )
     ),
     Ax_()
-{
-    Info<< "Fine AMG level check" << endl;
-    matrix_.check();
-}
+{}
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
