@@ -42,13 +42,16 @@ solvers
         minCoarseEqns   4;
         nMaxLevels      100;
         scale           on;
-        coarseSmoother  ILU;
-        fineSmoother    ILU;
+        smoother
+        {
+            smoother        ILUCp;
+            fillInLevel     1;
+        }
 
         minIter         0;
         maxIter         100;
         tolerance       1e-7;
-        relTol          0.005;
+        relTol          0.0;
     }
 
     // Segregated
@@ -86,7 +89,7 @@ fieldBounds
 
 relaxationFactors
 {
-    U    0.95;
+//     U    0.95;
 }
 
 // ************************************************************************* //
