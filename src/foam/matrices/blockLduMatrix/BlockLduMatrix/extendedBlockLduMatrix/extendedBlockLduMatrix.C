@@ -35,8 +35,13 @@ void Foam::extendedBlockLduMatrix<Type>::mapOffDiagCoeffs
 {
     if (blockLdum.diagonal())
     {
-        WarningIn("extendedBlockLduMatrix(lduMatrix&, label, polyMesh&)")
-            << "Attempted to create extended lower/upper coeffs for block "
+        WarningIn
+        (
+            "void extendedBlockLduMatrix<Type>::mapOffDiagCoeffs\n"
+            "(\n"
+            "    const BlockLduMatrix<Type>& blockLdum\n"
+            ")"
+        )   << "Attempted to create extended lower/upper coeffs for block "
             << "matrix that is diagonal."
             << nl << endl;
     }
@@ -108,7 +113,10 @@ void Foam::extendedBlockLduMatrix<Type>::mapOffDiagCoeffs
         {
             FatalErrorIn
             (
-                "extendedBlockLduMatrix(lduMatrix&, label, polyMesh&)"
+                "void extendedBlockLduMatrix<Type>::mapOffDiagCoeffs\n"
+                "(\n"
+                "    const BlockLduMatrix<Type>& blockLdum\n"
+                ")"
             )   << "Problem between ordinary block matrix and extended"
                 << " block matrix upper coeffs type morphing."
                 << abort(FatalError);
@@ -195,7 +203,10 @@ void Foam::extendedBlockLduMatrix<Type>::mapOffDiagCoeffs
         {
             FatalErrorIn
             (
-                "extendedBlockLduMatrix(lduMatrix&, label, polyMesh&)"
+                "void extendedBlockLduMatrix<Type>::mapOffDiagCoeffs\n"
+                "(\n"
+                "    const BlockLduMatrix<Type>& blockLdum\n"
+                ")"
             )   << "Problem between ordinary block matrix and extended"
                 << " block matrix upper/lower coeffs type morphing."
                 << abort(FatalError);
@@ -210,27 +221,24 @@ template<class Type>
 Foam::extendedBlockLduMatrix<Type>::extendedBlockLduMatrix
 (
     const BlockLduMatrix<Type>& blockLdum,
-    const label extensionLevel,
-    const polyMesh& polyMesh
+    const extendedLduAddressing& extLduAddr
 )
 :
     basicBlockLduMatrix_(blockLdum),
-    extLduAddr_
-    (
-        extendedLduAddressing::New
-        (
-            polyMesh,
-            blockLdum.lduAddr(),
-            extensionLevel
-        )
-    ),
+    extLduAddr_(extLduAddr),
     extendedLowerPtr_(NULL),
     extendedUpperPtr_(NULL)
 {
     if (debug)
     {
-        Info<< "extendedBlockLduMatrix(lduMatrix&, label, polyMesh&) :"
-               "Constructing extendedBlockLduMatrix."
+        InfoIn
+        (
+            "extendedBlockLduMatrix<Type>::extendedBlockLduMatrix\n"
+            "(\n"
+            "    const BlockLduMatrix<Type>& blockLdum,\n"
+            "    const extendedLduAddressing& extLduAddr\n"
+            ")"
+        )   << "Constructing extendedBlockLduMatrix."
             << endl;
     }
 

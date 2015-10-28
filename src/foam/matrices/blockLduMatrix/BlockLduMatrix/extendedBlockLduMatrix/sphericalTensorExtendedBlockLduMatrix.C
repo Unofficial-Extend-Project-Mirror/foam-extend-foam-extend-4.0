@@ -41,8 +41,13 @@ void Foam::extendedBlockLduMatrix<Foam::sphericalTensor>::mapOffDiagCoeffs
 {
     if (blockLdum.diagonal())
     {
-        WarningIn("extendedBlockLduMatrix(lduMatrix&, label, polyMesh&)")
-            << "Attempted to create extended lower/upper coeffs for block "
+        WarningIn
+        (
+            "void extendedBlockLduMatrix<sphericalTensor>::mapOffDiagCoeffs\n"
+            "(\n"
+            "    const BlockLduMatrix<sphericalTensor>& blockLdum\n"
+            ")"
+        )   << "Attempted to create extended lower/upper coeffs for block "
             << "matrix that is diagonal."
             << nl << endl;
     }
@@ -102,7 +107,11 @@ void Foam::extendedBlockLduMatrix<Foam::sphericalTensor>::mapOffDiagCoeffs
             {
                 FatalErrorIn
                 (
-                    "extendedBlockLduMatrix(lduMatrix&, label, polyMesh&)"
+                    "void extendedBlockLduMatrix<sphericalTensor>::"
+                    "mapOffDiagCoeffs\n"
+                    "(\n"
+                    "    const BlockLduMatrix<sphericalTensor>& blockLdum\n"
+                    ")"
                 )   << "Problem between ordinary block matrix and extended"
                     << " block matrix upper coeffs type morphing."
                     << abort(FatalError);
@@ -158,7 +167,11 @@ void Foam::extendedBlockLduMatrix<Foam::sphericalTensor>::mapOffDiagCoeffs
             {
                 FatalErrorIn
                 (
-                    "extendedBlockLduMatrix(lduMatrix&, label, polyMesh&)"
+                    "void extendedBlockLduMatrix<sphericalTensor>::"
+                    "mapOffDiagCoeffs\n"
+                    "(\n"
+                    "    const BlockLduMatrix<sphericalTensor>& blockLdum\n"
+                    ")"
                 )   << "Problem between ordinary block matrix and extended"
                     << " block matrix lower coeffs type morphing."
                     << abort(FatalError);
@@ -229,7 +242,11 @@ void Foam::extendedBlockLduMatrix<Foam::sphericalTensor>::mapOffDiagCoeffs
         {
             FatalErrorIn
             (
-                "extendedBlockLduMatrix(lduMatrix&, label, polyMesh&)"
+                "void extendedBlockLduMatrix<sphericalTensor>::"
+                "mapOffDiagCoeffs\n"
+                "(\n"
+                "    const BlockLduMatrix<sphericalTensor>& blockLdum\n"
+                ")"
             )   << "Problem between ordinary block matrix and extended"
                 << " block matrix upper/lower coeffs type morphing."
                 << abort(FatalError);

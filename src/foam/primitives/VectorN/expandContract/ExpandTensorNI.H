@@ -37,7 +37,7 @@ namespace Foam
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-//- Return the Average of a vector of as a scalar
+//- Return the average of a vector of as a scalar
 template <class Cmpt, int length>
 inline void contractScalar(Cmpt& result, const VectorN<Cmpt, length>& t)
 {
@@ -48,7 +48,7 @@ inline void contractScalar(Cmpt& result, const VectorN<Cmpt, length>& t)
         result += t[i];
     }
 
-//- Modified 2009/11/3 by I. Clifford
+    // Modified 2009/11/3 by I. Clifford
     result *= 1.0/VectorN<Cmpt, length>::nComponents;
 }
 
@@ -76,7 +76,7 @@ inline void contractScalar(Cmpt& result, const TensorN<Cmpt, length>& t)
         j += TensorN<Cmpt, length>::rowLength+1;
     }
 
-//- Modified 2009/11/3 by I. Clifford
+    // Modified 2009/11/3 by I. Clifford
     result *= 1.0/TensorN<Cmpt, length>::rowLength;
 }
 
@@ -118,7 +118,11 @@ inline Cmpt contractScalar(const DiagTensorN<Cmpt, length>& t)
 
 //- Return the diagonal of a SphericalTensorN as a scalar
 template <class Cmpt, int length>
-inline void contractScalar(Cmpt& result, const SphericalTensorN<Cmpt, length>& t)
+inline void contractScalar
+(
+    Cmpt& result,
+    const SphericalTensorN<Cmpt, length>& t
+)
 {
     result = t[0];
 }
@@ -134,7 +138,7 @@ inline Cmpt contractScalar(const SphericalTensorN<Cmpt, length>& t)
 }
 
 
-//- Return the diagonal of a TensorN as a vector
+//- Return the diagonal of a TensorN as a vectorN
 template <class Cmpt, int length>
 inline void contractLinear
 (
@@ -142,16 +146,16 @@ inline void contractLinear
     const TensorN<Cmpt, length>& t
 )
 {
-    int j=0;
+    int j = 0;
     for (int i = 0; i < TensorN<Cmpt, length>::rowLength; i++)
     {
         result[i] = t[j];
-        j += TensorN<Cmpt, length>::rowLength+1;
+        j += TensorN<Cmpt, length>::rowLength + 1;
     }
 }
 
 
-//- Return the diagonal of a TensorN as a vector
+//- Return the diagonal of a TensorN as a vectorN
 template <class Cmpt, int length>
 inline VectorN<Cmpt, length> contractLinear(const TensorN<Cmpt, length>& t)
 {
@@ -161,7 +165,7 @@ inline VectorN<Cmpt, length> contractLinear(const TensorN<Cmpt, length>& t)
 }
 
 
-//- Return the diagonal of a DiagTensorN as a vector
+//- Return the diagonal of a DiagTensorN as a vectorN
 template <class Cmpt, int length>
 inline void contractLinear
 (
@@ -176,7 +180,7 @@ inline void contractLinear
 }
 
 
-//- Return the diagonal of a DiagTensorN as a vector
+//- Return the diagonal of a DiagTensorN as a vectorN
 template <class Cmpt, int length>
 inline VectorN<Cmpt, length> contractLinear(const DiagTensorN<Cmpt, length>& t)
 {
@@ -186,7 +190,7 @@ inline VectorN<Cmpt, length> contractLinear(const DiagTensorN<Cmpt, length>& t)
 }
 
 
-//- Return the diagonal of a SphericalTensorN as a vector
+//- Return the diagonal of a SphericalTensorN as a vectorN
 template <class Cmpt, int length>
 inline void contractLinear
 (
@@ -201,7 +205,7 @@ inline void contractLinear
 }
 
 
-//- Return the diagonal of a SphericalTensorN as a vector
+//- Return the diagonal of a SphericalTensorN as a vectorN
 template <class Cmpt, int length>
 inline VectorN<Cmpt, length> contractLinear
 (
@@ -308,6 +312,64 @@ inline void expandLinear
     }
 
     result[0] *= 1.0/DiagTensorN<Cmpt, length>::rowLength;
+}
+
+
+//- Sum row elements of a TensorN as a vectorN
+template <class Cmpt, int length>
+inline void sumToDiag
+(
+    VectorN<Cmpt, length>& result,
+    const TensorN<Cmpt, length>& t
+)
+{
+    result = VectorN<Cmpt, length>::zero;
+
+    for (int i = 0; i < TensorN<Cmpt, length>::rowLength; i++)
+    {
+        for (int j = 0; j < TensorN<Cmpt, length>::rowLength; j++)
+        {
+            result[i] += t(i, j);
+        }
+    }
+}
+
+
+//- Sum row elements of a TensorN as a vectorN
+template <class Cmpt, int length>
+inline VectorN<Cmpt, length> sumToDiag(const TensorN<Cmpt, length>& t)
+{
+    VectorN<Cmpt, length> result;
+    sumToDiag(result, t);
+    return result;
+}
+
+
+//- Sum magnitudes of row elements of a TensorN as a vectorN
+template <class Cmpt, int length>
+inline void sumMagToDiag
+(
+    VectorN<Cmpt, length>& result,
+    const TensorN<Cmpt, length>& t
+)
+{
+    for (int i = 0; i < TensorN<Cmpt, length>::rowLength; i++)
+    {
+        for (int j = 0; j < TensorN<Cmpt, length>::rowLength; j++)
+        {
+            result[i] += Foam::mag(t(i, j));
+        }
+    }
+}
+
+
+//- Sum magnitudes of row elements of a TensorN as a vectorN
+template <class Cmpt, int length>
+inline VectorN<Cmpt, length> sumMagToDiag(const TensorN<Cmpt, length>& t)
+{
+    VectorN<Cmpt, length> result;
+    sumMagToDiag(result, t);
+    return result;
 }
 
 

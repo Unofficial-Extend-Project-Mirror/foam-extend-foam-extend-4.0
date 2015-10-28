@@ -50,8 +50,8 @@ namespace Foam
         addILUCpPreconditionerAsymMatrixConstructorToTable_;
 
     // Add to symmetric constructor table as well. Cholesky with fill in would
-    // yield the same sparseness pattern as the original matrix, hence it is not
-    // implemented. VV, 10/Sep/2015.
+    // yield the same sparseness pattern as the original matrix,
+    // hence it is not implemented. VV, 10/Sep/2015.
     lduPreconditioner::
         addsymMatrixConstructorToTable<ILUCp>
         addILUCpPreconditionerSymMatrixConstructorToTable_;
@@ -69,8 +69,10 @@ void Foam::ILUCp::calcFactorization()
         const extendedLduAddressing& addr = extMatrix_.extendedLduAddr();
 
         // Get upper/lower extended addressing
-        const label* const __restrict__ uPtr = addr.extendedUpperAddr().begin();
-        const label* const __restrict__ lPtr = addr.extendedLowerAddr().begin();
+        const label* const __restrict__ uPtr =
+            addr.extendedUpperAddr().begin();
+        const label* const __restrict__ lPtr =
+            addr.extendedLowerAddr().begin();
 
         // Get extended owner start addressing
         const label* const __restrict__ ownStartPtr =
@@ -94,8 +96,8 @@ void Foam::ILUCp::calcFactorization()
         // Get number of rows
         const label nRows = preconDiag_.size();
 
-        // Define start and end face ("virtual" face when extended addressing is
-        // used) of this row/column.
+        // Define start and end face ("virtual" face when extended addressing
+        // is used) of this row/column.
         register label fStart, fEnd, fLsrStart, fLsrEnd;
 
         // Crout LU factorization
@@ -239,17 +241,15 @@ Foam::ILUCp::ILUCp
         coupleIntCoeffs,
         interfaces
     ),
-    preconDiag_(matrix_.diag()),
-    p_(readLabel(dict.lookup("fillInLevel"))),
     extMatrix_
     (
         matrix,
-        p_,
-        matrix.mesh().thisDb().time().lookupObject
-        <
-            polyMesh
-        >(polyMesh::defaultRegion)
+        matrix.mesh().lduAddr().extendedAddr
+        (
+            readLabel(dict.lookup("fillInLevel"))
+        )
     ),
+    preconDiag_(matrix_.diag()),
     zDiag_(0),
     z_(preconDiag_.size(), 0),
     w_(preconDiag_.size(), 0)

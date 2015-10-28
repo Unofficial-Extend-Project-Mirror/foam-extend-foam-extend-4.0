@@ -25,15 +25,15 @@ Class
     Foam::extendedLduAddressing
 
 Description
-    The class contains data and calculates demand driven extended ldu addressing
-    of arbitrary level. Level 0 is not allowed as it is the same as ordinary
-    lduAddressing. Level 1 considers neighbours of neighbours for a given cell,
-    etc.
+    The class contains data and calculates demand driven extended ldu
+    addressing of arbitrary level. Level 0 is not allowed as it is the same
+    as ordinary lduAddressing. Level 1 considers neighbours of neighbours
+    for a given cell, etc.
 
     The addressing is completely defined with extended variants of:
-    owner/neighbour, losort, ownerStart and losortStart: all being demand-driven
-    data. In order to define extended owner/neighbour lists, additional
-    "virtual" faces are assumed between cells not sharing a face.
+    owner/neighbour, losort, ownerStart and losortStart: all being
+    demand-driven data. In order to define extended owner/neighbour lists,
+    additional "virtual" faces are assumed between cells not sharing a face.
 
 Author
     Vuko Vukcevic, FMENA Zagreb. All rights reserved
@@ -46,9 +46,8 @@ SourceFiles
 #ifndef extendedLduAddressing_H
 #define extendedLduAddressing_H
 
-#include "MeshObject.H"
-#include "polyMesh.H"
 #include "lduAddressing.H"
+#include "HashSet.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -62,16 +61,8 @@ class mapPolyMesh;
 \*---------------------------------------------------------------------------*/
 
 class extendedLduAddressing
-:
-    public MeshObject<polyMesh, extendedLduAddressing>
 {
     // Private data
-
-        //- Lower as a subList of allOwner
-        labelList::subList lowerAddr_;
-
-        //- Upper as a reference to neighbour
-        const labelList& upperAddr_;
 
         //- Reference to basic lduAddressing
         const lduAddressing& lduAddr_;
@@ -121,7 +112,7 @@ class extendedLduAddressing
             //  Parameters:
             //  masterCellI - searching for extended neighbours of this cell
             //  nbrCells - neighbouring cells of a cell (based on level)
-            //  cellCells - mesh data to avoid function calls
+            //  cellCells - passing as a parameter for minor optimisation
             //  extendedNbrs - HashSet containing labels of extended neighbours
             //  curLevel - current level needed for recursion control
             void markNeighbours
@@ -135,6 +126,10 @@ class extendedLduAddressing
 
 
         // Calculation of demand driven data
+
+            //- Calculate cells cells using lower/upper addressing
+            //  into provided storage
+            void calcCellCells(labelListList& cc) const;
 
             //- Calculate extended lower/upper
             void calcExtendedLowerUpper() const;
@@ -160,10 +155,9 @@ public:
 
     // Constructors
 
-        //- Construct given polyMesh
+        //- Construct given lduAddressing
         extendedLduAddressing
         (
-            const polyMesh& mesh,
             const lduAddressing& lduAddr,
             const label extensionLevel
         );
@@ -178,22 +172,22 @@ public:
 
         // Access
 
+            //- Return basic lduAddressing
+            const lduAddressing& lduAddr() const
+            {
+                return lduAddr_;
+            }
+
             //- Return lower addressing (i.e. lower label = upper triangle)
             const unallocLabelList& lowerAddr() const
             {
-                return lowerAddr_;
+                return lduAddr_.lowerAddr();
             }
 
             //- Return upper addressing (i.e. upper label)
             const unallocLabelList& upperAddr() const
             {
-                return upperAddr_;
-            }
-
-            //- Return basic lduAddressing
-            const lduAddressing& lduAddr() const
-            {
-                return lduAddr_;
+                return lduAddr_.upperAddr();
             }
 
             //- Return extended lower addressing

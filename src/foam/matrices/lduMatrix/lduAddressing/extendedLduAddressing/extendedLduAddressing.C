@@ -25,6 +25,7 @@ License
 
 #include "extendedLduAddressing.H"
 #include "mapPolyMesh.H"
+#include "demandDrivenData.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
@@ -38,21 +39,10 @@ namespace Foam
 
 Foam::extendedLduAddressing::extendedLduAddressing
 (
-    const polyMesh& mesh,
     const lduAddressing& lduAddr,
     const label extensionLevel
 )
 :
-    MeshObject<polyMesh, extendedLduAddressing>(mesh),
-    lowerAddr_
-    (
-        labelList::subList
-        (
-            mesh.faceOwner(),
-            mesh.nInternalFaces()
-        )
-    ),
-    upperAddr_(mesh.faceNeighbour()),
     lduAddr_(lduAddr),
     p_(extensionLevel),
     extendedLowerPtr_(NULL),
@@ -146,6 +136,44 @@ void Foam::extendedLduAddressing::markNeighbours
 }
 
 
+void Foam::extendedLduAddressing::calcCellCells
+(
+    labelListList& cellCellAddr
+) const
+{
+    // Algorithm taken from primiteMeshCellCells.C in calcCellCells() member
+    // function.
+    labelList ncc(lduAddr_.size(), 0);
+
+    const unallocLabelList& own = lowerAddr();
+    const unallocLabelList& nei = upperAddr();
+
+    forAll (nei, faceI)
+    {
+        ncc[own[faceI]]++;
+        ncc[nei[faceI]]++;
+    }
+
+    // Size the list
+    cellCellAddr.setSize(ncc.size());
+
+    forAll (cellCellAddr, cellI)
+    {
+        cellCellAddr[cellI].setSize(ncc[cellI]);
+    }
+    ncc = 0;
+
+    forAll (nei, faceI)
+    {
+        label ownCellI = own[faceI];
+        label neiCellI = nei[faceI];
+
+        cellCellAddr[ownCellI][ncc[ownCellI]++] = neiCellI;
+        cellCellAddr[neiCellI][ncc[neiCellI]++] = ownCellI;
+    }
+}
+
+
 void Foam::extendedLduAddressing::calcExtendedLowerUpper() const
 {
     if (extendedLowerPtr_ && extendedUpperPtr_)
@@ -168,19 +196,16 @@ void Foam::extendedLduAddressing::calcExtendedLowerUpper() const
             << abort(FatalError);
     }
 
-    // Get polyMesh reference
-    const polyMesh& mesh = this->mesh();
-
-    // Allocate dynamic lists for extended owner/neighbour, which are later used
-    // to define ordinary labelLists (extendedLower, extendedUpper)
+    // Allocate dynamic lists for extended owner/neighbour, which are later
+    // used to define ordinary labelLists (extendedLower, extendedUpper)
     // Helper type definition
     typedef DynamicList<label> DynamicLabelList;
 
     // Get the number of faces
-    const label nFaces = upperAddr_.size();;
+    const label nFaces = upperAddr().size();
 
-    // Allocate extended owner/neighbour with 4*nFaces*extensionLevel as a guess
-    // (based on hex mesh assumption) to prevent excessive resizing
+    // Allocate extended owner/neighbour with 4*nFaces*extensionLevel as a
+    // guess (based on hex mesh assumption) to prevent excessive resizing
     DynamicLabelList dExtOwn(4*nFaces*p_);
     DynamicLabelList dExtNei(4*nFaces*p_);
 
@@ -188,10 +213,12 @@ void Foam::extendedLduAddressing::calcExtendedLowerUpper() const
     HashSet<label> extCellNbrs(32*p_);
 
     // Get number of cells in the mesh
-    const label nCells = mesh.nCells();
+    const label nCells = lduAddr_.size();
 
-    // Get a list of cells neighbouring each cell
-    const labelListList& cellCells = mesh.cellCells();
+    // Get a list of cells neighbouring each cell.
+    // Note optimisation to avoid a copy
+    labelListList cellCells;
+    calcCellCells(cellCells);
 
     // Loop through cells
     for (label cellI = 0; cellI < nCells; ++cellI)
@@ -234,8 +261,8 @@ void Foam::extendedLduAddressing::calcFaceMap() const
     }
 
     // Get reference to ordinary owner/neighbour addressing
-    const unallocLabelList& own = lduAddr().lowerAddr();
-    const unallocLabelList& nbr = lduAddr().upperAddr();
+    const unallocLabelList& own = lowerAddr();
+    const unallocLabelList& nbr = upperAddr();
 
     // Allocate memory for faceMap
     faceMapPtr_ = new labelList(own.size(), -1);
@@ -289,7 +316,7 @@ void Foam::extendedLduAddressing::calcExtendedLosort() const
     // Scan the extended neighbour list to find out how many times the cell
     // appears as a neighbour of the face. Done this way to avoid guessing
     // and resizing list
-    const label matrixSize = mesh().nCells();
+    const label matrixSize = lduAddr_.size();
     labelList nNbrOfFace(matrixSize, 0);
 
     const unallocLabelList& nbr = extendedUpperAddr();
@@ -429,7 +456,7 @@ void Foam::extendedLduAddressing::calcExtendedLosortStart() const
     }
 
     // Set up last lookup by hand
-    lsrtStart[this->mesh().nCells()] = nbr.size();
+    lsrtStart[lduAddr_.size()] = nbr.size();
 }
 
 
