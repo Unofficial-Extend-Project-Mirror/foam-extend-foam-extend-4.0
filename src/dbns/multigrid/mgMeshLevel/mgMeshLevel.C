@@ -161,7 +161,7 @@ void Foam::mgMeshLevel::makeChild() const
     options[3] = nGeometricD();       // Dimensionality of the grid
 
     // Output: cell to coarse clusted addressing
-    label nCoarseCells = 0;
+    int nCoarseCells = 0;
     child_.setSize(nCells());
     int nMoves = -1;
 
@@ -214,8 +214,8 @@ void Foam::mgMeshLevel::makeChild() const
         dblAreas.begin(),
         cellCells.begin(),
         dblFaceWeights.begin(),
-        mgMinClusterSize_,
-        mgMaxClusterSize_,
+        mgMinClusterSize_(),
+        mgMaxClusterSize_(),
         options.begin(),
         &nMoves,
         &nCoarseCells_,
