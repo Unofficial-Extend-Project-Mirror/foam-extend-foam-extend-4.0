@@ -71,12 +71,15 @@ Foam::fineBlockAmgLevel<Type>::fineBlockAmgLevel
         BlockLduSmoother<Type>::New
         (
             matrix,
-            dict,
-            "fineSmoother"
+            dict
+//             ,"fineSmoother"
         )
     ),
     Ax_()
-{}
+{
+    Info<< "Fine AMG level check" << endl;
+    matrix_.check();
+}
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //

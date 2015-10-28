@@ -51,7 +51,7 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                       Class ILUCp Declaration
+                           Class ILUCp Declaration
 \*---------------------------------------------------------------------------*/
 
 class ILUCp
@@ -60,14 +60,11 @@ class ILUCp
 {
     // Private Data
 
+        //- Extended ldu matrix
+        extendedLduMatrix extMatrix_;
+
         //- Preconditioned diagonal
         scalarField preconDiag_;
-
-        //- Fill in level
-        const label p_;
-
-        //- Extended lduMatrix
-        extendedLduMatrix extMatrix_;
 
         //- Temporary working diagonal
         scalar zDiag_;

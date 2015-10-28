@@ -67,7 +67,6 @@ void Foam::BlockGaussSeidelPrecon<Type>::calcInvDiag()
         // For square diagonal invert diagonal only and store the rest
         // info LUDiag coefficient.  This avoids full inverse of the
         // diagonal matrix.  HJ, 20/Aug/2015
-        Info<< "Square diag inverse" << endl;
 
         // Get reference to active diag
         const squareTypeField& activeDiag = d.asSquare();
@@ -83,7 +82,7 @@ void Foam::BlockGaussSeidelPrecon<Type>::calcInvDiag()
         // Expand diagonal only to full square type and store into luDiag
         expandLinear(luDiag, lf);
 
-        // Keep only off-diagonal in ldDiag.
+        // Keep only off-diagonal in luDiag.
         // Note change of sign to avoid multiplication with -1 when moving
         // to the other side.  HJ, 20/Aug/2015
         luDiag -= activeDiag;

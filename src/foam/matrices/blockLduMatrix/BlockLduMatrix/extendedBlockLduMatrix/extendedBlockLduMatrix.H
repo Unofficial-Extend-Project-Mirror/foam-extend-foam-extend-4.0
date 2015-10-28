@@ -39,9 +39,8 @@ SourceFiles
 #define extendedBlockLduMatrix_H
 
 #include "extendedLduAddressing.H"
-#include "polyMesh.H"
-#include "className.H"
 #include "BlockLduMatrix.H"
+#include "className.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -103,8 +102,7 @@ public:
         extendedBlockLduMatrix
         (
             const BlockLduMatrix<Type>&,
-            const label,
-            const polyMesh&
+            const extendedLduAddressing&
         );
 
 

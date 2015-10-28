@@ -65,7 +65,10 @@ UNARY_FUNCTION(sphericalTensorType, cmptType, expandScalar)                   \
                                                                               \
 UNARY_FUNCTION(tensorType, vectorType, expandLinear)                          \
 UNARY_FUNCTION(diagTensorType, vectorType, expandLinear)                      \
-UNARY_FUNCTION(sphericalTensorType, vectorType, expandLinear)
+UNARY_FUNCTION(sphericalTensorType, vectorType, expandLinear)                 \
+                                                                              \
+UNARY_FUNCTION(vectorType, tensorType, sumToDiag)                             \
+UNARY_FUNCTION(vectorType, tensorType, sumMagToDiag)
 
 
 // * * * * * * * * * * * * * * * Global Functions  * * * * * * * * * * * * * //

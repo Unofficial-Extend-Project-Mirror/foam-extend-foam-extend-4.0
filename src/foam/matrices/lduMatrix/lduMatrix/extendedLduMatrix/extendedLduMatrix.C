@@ -38,20 +38,11 @@ namespace Foam
 Foam::extendedLduMatrix::extendedLduMatrix
 (
     const lduMatrix& ldum,
-    const label extensionLevel,
-    const polyMesh& polyMesh
+    const extendedLduAddressing& extLduAddr
 )
 :
     basicLduMatrix_(ldum),
-    extLduAddr_
-    (
-        extendedLduAddressing::New
-        (
-            polyMesh,
-            ldum.lduAddr(),
-            extensionLevel
-        )
-    ),
+    extLduAddr_(extLduAddr),
     extendedLowerPtr_(NULL),
     extendedUpperPtr_(NULL)
 {
@@ -102,10 +93,10 @@ Foam::extendedLduMatrix::extendedLduMatrix
         const label nExtFaces = extLduAddr_.extendedUpperAddr().size();
 
         // Allocate extended upper and lower
-        extendedUpperPtr_ = new scalarField(nExtFaces, 0.0);
+        extendedUpperPtr_ = new scalarField(nExtFaces, scalar(0));
         scalarField& extUpper = *extendedUpperPtr_;
 
-        extendedLowerPtr_ = new scalarField(nExtFaces, 0.0);
+        extendedLowerPtr_ = new scalarField(nExtFaces, scalar(0));
         scalarField& extLower = *extendedLowerPtr_;
 
         // Get upper and lower coeffs from underlying lduMatrix
@@ -154,7 +145,7 @@ Foam::scalarField& Foam::extendedLduMatrix::extendedLower()
             extendedLowerPtr_ = new scalarField
             (
                 extLduAddr_.extendedLowerAddr().size(),
-                0.0
+                scalar(0)
             );
         }
     }
@@ -176,7 +167,7 @@ Foam::scalarField& Foam::extendedLduMatrix::extendedUpper()
             extendedUpperPtr_ = new scalarField
             (
                 extLduAddr_.extendedUpperAddr().size(),
-                0.0
+                scalar(0)
             );
         }
     }

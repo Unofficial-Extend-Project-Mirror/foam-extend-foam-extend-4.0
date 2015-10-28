@@ -39,9 +39,8 @@ SourceFiles
 #define extendedLduMatrix_H
 
 #include "extendedLduAddressing.H"
-#include "polyMesh.H"
-#include "className.H"
 #include "lduMatrix.H"
+#include "className.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -88,12 +87,15 @@ public:
     // Constructors
 
         //- Construct given lduMatrix, extension level and polyMesh
-        extendedLduMatrix(const lduMatrix&, const label, const polyMesh&);
+        extendedLduMatrix
+        (
+            const lduMatrix&,
+            const extendedLduAddressing&
+        );
 
 
-    // Destructor
-
-        ~extendedLduMatrix();
+    //- Destructor
+    ~extendedLduMatrix();
 
 
     // Member functions
