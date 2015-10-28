@@ -58,6 +58,9 @@ for line in lines:
 
 outfile=open('residual.dat','w')
 
+print 'hits = ', ikomega
+
+#HJ need better way of combining lists
 if ikomega > 0:
         for data in zip(tUp,Ux,Uy,Uz,p,k,omega):
                 outfile.write(' '.join([str(d) for d in data])+'\n')
@@ -65,8 +68,8 @@ elif ikepsilon > 0:
         for data in zip(tUp,Ux,Uy,Uz,p,k,epsilon):
                 outfile.write(' '.join([str(d) for d in data])+'\n')
 elif iUp > 0:
-        for data in zip(tUp,Ux,Uy,Uz,p):
-                outfile.write(' '.join([str(d) for d in data])+'\n')
+        for index in range(0,iUp):
+                outfile.write(str(tUp[index])+' '+str(Ux[index])+' '+str(Uy[index])+' '+str(Uz[index])+' '+str(p[index])+'\n')
 
 outfile.close()
 
