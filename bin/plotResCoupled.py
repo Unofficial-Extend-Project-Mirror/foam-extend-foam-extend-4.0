@@ -10,6 +10,7 @@ print 'Reading file', logfilename
 
 import re
 UpRegex=r"([A-Z,a-z]*):*.*Solving for Up, Initial residual = \(([0-9.Ee\-+]*)\s([0-9.Ee\-+]*)\s([0-9.Ee\-+]*)\s([0-9.Ee\-+]*)\), Final residual = \(([0-9.Ee\-+]*)\s([0-9.Ee\-+]*)\s([0-9.Ee\-+]*)\s([0-9.Ee\-+]*)\), No Iterations ([0-9]*)"
+kepsilonRegex=r"([A-Z,a-z]*):*.*Solving for kEpsilon, Initial residual = \(([0-9.Ee\-+]*)\s([0-9.Ee\-+]*)\), Final residual = \(([0-9.Ee\-+]*)\s([0-9.Ee\-+]*)\), No Iterations ([0-9]*)"
 komegaRegex=r"([A-Z,a-z]*):*.*Solving for kOmega, Initial residual = \(([0-9.Ee\-+]*)\s([0-9.Ee\-+]*)\), Final residual = \(([0-9.Ee\-+]*)\s([0-9.Ee\-+]*)\), No Iterations ([0-9]*)"
 
 tUp = []
@@ -24,6 +25,11 @@ k = []
 omega = []
 ikomega = 0
 
+tkepsilon = []
+k = []
+epsilon = []
+ikepsilon = 0
+
 #HJ take name of log file as script argument
 pipefile=open(logfilename,'r')
 lines = pipefile.readlines()
@@ -37,6 +43,12 @@ for line in lines:
                 Uy.append(float(matchUp.group(3)))
                 Uz.append(float(matchUp.group(4)))
                 p.append(float(matchUp.group(5)))
+        matchkepsilon=re.search(kepsilonRegex,line)
+        if matchkepsilon:
+                ikepsilon = ikepsilon + 1
+                tkepsilon.append(ikepsilon)
+                k.append(float(matchkepsilon.group(2)))
+                epsilon.append(float(matchkepsilon.group(3)))
         matchkomega=re.search(komegaRegex,line)
         if matchkomega:
                 ikomega = ikomega + 1
@@ -46,15 +58,17 @@ for line in lines:
 
 outfile=open('residual.dat','w')
 
-print 'hits = ', ikomega
-
 #HJ need better way of combining lists
+if iUp > 0:
+        for index in range(0,iUp):
+                outfile.write(str(tUp[index])+' '+str(Ux[index])+' '+str(Uy[index])+' '+str(Uz[index])+' '+str(p[index])+'\n')
+
+if ikepsilon > 0:
+        for index in range(0,ikepsilon):
+                outfile.write(str(tUp[index])+' '+str(Ux[index])+' '+str(Uy[index])+' '+str(Uz[index])+' '+str(p[index])+' '+str(k[index])+' '+str(epsilon[index])+'\n')
 if ikomega > 0:
         for index in range(0,ikomega):
                 outfile.write(str(tUp[index])+' '+str(Ux[index])+' '+str(Uy[index])+' '+str(Uz[index])+' '+str(p[index])+' '+str(k[index])+' '+str(omega[index])+'\n')
-elif iUp > 0:
-        for index in range(0,iUp):
-                outfile.write(str(tUp[index])+' '+str(Ux[index])+' '+str(Uy[index])+' '+str(Uz[index])+' '+str(p[index])+'\n')
 
 outfile.close()
 
@@ -70,6 +84,10 @@ if iUp > 0:
         pylab.semilogy(tUp,Uy,'-',label="Uy")
         pylab.semilogy(tUp,Uz,'-',label="Uz")
         pylab.semilogy(tUp,p,'-',label="p")
+
+if ikepsilon > 0:
+        pylab.semilogy(tkepsilon,k,'-',label="k")
+        pylab.semilogy(tkepsilon,epsilon,'-',label="epsilon")
 
 if ikomega > 0:
         pylab.semilogy(tkomega,k,'-',label="k")
