@@ -253,9 +253,10 @@ void coupledKEpsilon::correct()
           + fvm::div(phi_, epsilon_)
           + fvm::SuSp(-fvc::div(phi_), epsilon_)
           - fvm::laplacian(DepsilonEff(), epsilon_)
-          + fvm::Sp(C2_*epsilon_/k_, epsilon_)
+          + fvm::Sp(2*C2_*epsilon_/k_, epsilon_)
          ==
-            C1_*G*epsilon_/k_
+            2*C1_*Cmu_*magSqr(symm(fvc::grad(U_)))*k_
+          + C2_*sqr(epsilon_)/k_
         );
 
         epsEqn.relax();
@@ -263,14 +264,12 @@ void coupledKEpsilon::correct()
 
         keEqn.insertEquation(1, epsEqn);
 
-        // Add coupling term:
-        // G_epsilon = C1*Cmu*(symm(grad(U))) k
-        // but with wall function corrections: must be calculated from G
-        // HJ, 27/Apr/2015
+        // Coupling term
         volScalarField coupling
         (
             "coupling",
-            -C1_*G*epsilon_/sqr(k_)
+            -2*C1_*Cmu_*magSqr(symm(fvc::grad(U_)))
+           - C2_*sqr(epsilon_/k_)
         );
         scalarField& couplingIn = coupling.internalField();
 
@@ -294,7 +293,8 @@ void coupledKEpsilon::correct()
           + fvm::div(phi_, k_)
           + fvm::SuSp(-fvc::div(phi_), k_)
           - fvm::laplacian(DkEff(), k_)
-          + fvm::SuSp((epsilon_ - G)/k_, k_)
+          + fvm::Sp(Cmu_*k_/(nut_ + nutSmall_), k_)
+          - G
         );
 
         kEqn.relax();
@@ -305,6 +305,7 @@ void coupledKEpsilon::correct()
     // Update source coupling: coupling terms eliminated from source
     keEqn.updateSourceCoupling();
 
+    // Solve the block matrix
     keEqn.solve();
 
     // Retrieve solution
