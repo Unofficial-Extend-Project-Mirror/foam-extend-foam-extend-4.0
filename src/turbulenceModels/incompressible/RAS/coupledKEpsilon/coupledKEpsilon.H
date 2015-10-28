@@ -40,6 +40,7 @@ Description
     @endverbatim
 
 Author
+    Robert Keser, FAMENA.  All rights reserved.
     Hrvoje Jasak, Wikki Ltd.  All rights reserved.
 
 SourceFiles
