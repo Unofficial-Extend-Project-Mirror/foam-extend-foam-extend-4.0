@@ -35,4 +35,13 @@ moment              m           [1 2 -2 0 0 0 0]     (0 0 0);
 forceRelative       fRel        [1 1 -2 0 0 0 0]     (0 0 0);
 momentRelative      mRel        [1 2 -2 0 0 0 0]     (0 0 0);
 
+
+// Motion constraints
+fixedSurge          no;
+fixedSway           no;
+fixedHeave          no;
+fixedRoll           no;
+fixedPitch          no;
+fixedYaw            no;
+
 // ************************************************************************* //

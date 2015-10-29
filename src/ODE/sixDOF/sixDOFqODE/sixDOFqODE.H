@@ -131,6 +131,27 @@ class sixDOFqODE
         scalarField coeffs_;
 
 
+        //- Motion constraints (given as fixed motion components)
+
+            //- Fixed surge (x-translation)
+            Switch fixedSurge_;
+
+            //- Fixed sway (y-translation)
+            Switch fixedSway_;
+
+            //- Fixed heave (z-translation)
+            Switch fixedHeave_;
+
+            //- Fixed roll (rotation around x)
+            Switch fixedRoll_;
+
+            //- Fixed pitch (rotation around y)
+            Switch fixedPitch_;
+
+            //- Fixed yaw (rotation around z)
+            Switch fixedYaw_;
+
+
     // Private Member Functions
 
         //- Disallow default bitwise copy construct

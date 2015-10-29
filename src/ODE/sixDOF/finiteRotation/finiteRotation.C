@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
-    \\  /    A nd           | Web:         http://www.foam-extend.org
-     \\/     M anipulation  | For copyright notice see file Copyright
+   \\    /   O peration     |
+    \\  /    A nd           | For copyright notice see file Copyright
+     \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -72,7 +72,7 @@ Foam::scalar Foam::finiteRotation::rotAngle(const tensor& rotT)
 
 Foam::vector Foam::finiteRotation::eulerAngles(const tensor& rotT)
 {
-    // Define a vector containing euler angles (x = roll, y = pitch, z = yaw)
+    // Create a vector containing euler angles (x = roll, y = pitch, z = yaw)
     vector eulerAngles;
 
     scalar& rollAngle = eulerAngles.x();
