@@ -44,8 +44,8 @@
 
 # Will install the package directly $WM_THIRD_PARTY_DIR
 #   Some comments about package relocation:
-#   By using this prefix for the Prefix:  parameter in this file, you will make this 
-#   package relocatable. 
+#   By using this prefix for the Prefix:  parameter in this file, you will make this
+#   package relocatable.
 #
 #   This is fine, as long as your software is itself relocatable.
 #
@@ -54,7 +54,7 @@
 #   Ref: http://sourceware.org/autobook/autobook/autobook_80.html
 #
 #   In that case, if you ever change the value of the $WM_THIRD_PARTY_DIR, you will
-#   not be able to reutilize this RPM, even though it is relocatable. You will need to 
+#   not be able to reutilize this RPM, even though it is relocatable. You will need to
 #   regenerate the RPM.
 #
 %define _prefix         %{_WM_THIRD_PARTY_DIR}
@@ -113,6 +113,12 @@ Patch1:         scotch-6.0.4_patch_darwin
     make -j $WM_NCOMPPROCS ptscotch AR="$WM_CC"
 
 %install
+%ifos darwin
+    # Making sure to set the shared library identification name to the full path
+    # System Integrity Protection (SIP) enabled systems (OS X El Capitan)
+    # require this
+    find . -name \*.dylib | xargs -I{} -n 1 bash -c 'bn=$(basename $1) ; install_name_tool -id %{_installPrefix}/lib/${bn} $1' -- {}
+%endif
     cd src
     mkdir -p $RPM_BUILD_ROOT%{_installPrefix}
     make install prefix=$RPM_BUILD_ROOT%{_installPrefix}

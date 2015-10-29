@@ -104,6 +104,7 @@ Patch0:                 libccmio-2.6.1.patch_0
     [ ! -d config/i386-apple-darwin12 ] && cp -r config/i386-apple-darwin8 config/i386-apple-darwin12
     [ ! -d config/i386-apple-darwin13 ] && cp -r config/i386-apple-darwin8 config/i386-apple-darwin13
     [ ! -d config/i386-apple-darwin14 ] && cp -r config/i386-apple-darwin8 config/i386-apple-darwin14
+    [ ! -d config/i386-apple-darwin15 ] && cp -r config/i386-apple-darwin8 config/i386-apple-darwin15
 %endif
     # Warning:
     #  1: The name of the ADF library will be renamed to libadf_ccmio since this
@@ -132,6 +133,14 @@ Patch0:                 libccmio-2.6.1.patch_0
     libsdir=`find ./lib -name release-shared`
     mv ${libsdir}/* $RPM_BUILD_ROOT/%{_installPrefix}/lib
     cp libccmio/*.h $RPM_BUILD_ROOT/%{_installPrefix}/include/libccmio
+
+%ifos darwin
+    # Making sure to set the shared library identification name to the full path
+    # System Integrity Protection (SIP) enabled systems (OS X El Capitan)
+    # require this
+    install_name_tool -id %{_installPrefix}/lib/libadf_ccmio.dylib $RPM_BUILD_ROOT/%{_installPrefix}/lib/libadf_ccmio.dylib
+    install_name_tool -id %{_installPrefix}/lib/libccmio.dylib     $RPM_BUILD_ROOT/%{_installPrefix}/lib/libccmio.dylib
+%endif
 
     # Creation of foam-extend specific .csh and .sh files"
 
