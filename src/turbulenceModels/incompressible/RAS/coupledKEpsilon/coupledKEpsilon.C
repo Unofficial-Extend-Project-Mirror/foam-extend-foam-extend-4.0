@@ -287,13 +287,15 @@ void coupledKEpsilon::correct()
 
     // Turbulent kinetic energy equation
     {
+        dimensionedScalar nutSmall("nutSmall", nut_.dimensions(), SMALL);
+
         fvScalarMatrix kEqn
         (
             fvm::ddt(k_)
           + fvm::div(phi_, k_)
           + fvm::SuSp(-fvc::div(phi_), k_)
           - fvm::laplacian(DkEff(), k_)
-          + fvm::Sp(Cmu_*k_/(nut_ + nutSmall_), k_)
+          + fvm::Sp(Cmu_*k_/(nut_ + nutSmall), k_)
           - G
         );
 
