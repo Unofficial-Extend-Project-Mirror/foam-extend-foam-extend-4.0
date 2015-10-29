@@ -91,12 +91,29 @@ Foam::dimensionedVector Foam::sixDOFqODE::OmegaDot
     const dimensionedVector& omega
 ) const
 {
+    // Fix the global moment for global rotation constraints
+    dimensionedVector mAbs = moment();
+    vector& mAbsVal = mAbs.value();
+
+    if (fixedRoll_)
+    {
+        mAbsVal.x() = 0;
+    }
+    if (fixedPitch_)
+    {
+        mAbsVal.y() = 0;
+    }
+    if (fixedYaw_)
+    {
+        mAbsVal.z() = 0;
+    }
+
     return
         inv(momentOfInertia_)
       & (
             E(omega)
             // To relative
-          + (rotation.R() & moment())
+          + (rotation.R() & mAbs)
           + momentRelative()
         );
 }
@@ -118,11 +135,14 @@ Foam::dimensionedVector Foam::sixDOFqODE::E
 Foam::sixDOFqODE::sixDOFqODE(const IOobject& io)
 :
     IOdictionary(io),
+
     mass_(lookup("mass")),
     momentOfInertia_(lookup("momentOfInertia")),
+
     Xequilibrium_(lookup("equilibriumPosition")),
     linSpringCoeffs_(lookup("linearSpring")),
     linDampingCoeffs_(lookup("linearDamping")),
+
     Xrel_(lookup("Xrel")),
     U_(lookup("U")),
     Uaverage_(U_),
@@ -134,11 +154,20 @@ Foam::sixDOFqODE::sixDOFqODE(const IOobject& io)
     omega_(lookup("omega")),
     omegaAverage_(omega_),
     omegaAverageAbsolute_(omega_),
+
     force_(lookup("force")),
     moment_(lookup("moment")),
     forceRelative_(lookup("forceRelative")),
     momentRelative_(lookup("momentRelative")),
-    coeffs_(13, 0.0)
+
+    coeffs_(13, 0.0),
+
+    fixedSurge_(lookup("fixedSurge")),
+    fixedSway_(lookup("fixedSway")),
+    fixedHeave_(lookup("fixedHeave")),
+    fixedRoll_(lookup("fixedRoll")),
+    fixedPitch_(lookup("fixedPitch")),
+    fixedYaw_(lookup("fixedYaw"))
 {
     setCoeffs();
 }
@@ -163,11 +192,14 @@ Foam::sixDOFqODE::sixDOFqODE
             IOobject::NO_WRITE
         )
     ),
+
     mass_(sd.mass_.name(), sd.mass_),
     momentOfInertia_(sd.momentOfInertia_.name(), sd.momentOfInertia_),
+
     Xequilibrium_(sd.Xequilibrium_.name(), sd.Xequilibrium_),
     linSpringCoeffs_(sd.linSpringCoeffs_.name(), sd.linSpringCoeffs_),
     linDampingCoeffs_(sd.linDampingCoeffs_.name(), sd.linDampingCoeffs_),
+
     Xrel_(sd.Xrel_.name(), sd.Xrel_),
     U_(sd.U_.name(), sd.U_),
     Uaverage_(sd.Uaverage_.name(), sd.Uaverage_),
@@ -179,11 +211,20 @@ Foam::sixDOFqODE::sixDOFqODE
         sd.omegaAverageAbsolute_.name(),
         sd.omegaAverageAbsolute_
     ),
+
     force_(sd.force_.name(), sd.force_),
     moment_(sd.moment_.name(), sd.moment_),
     forceRelative_(sd.forceRelative_.name(), sd.forceRelative_),
     momentRelative_(sd.momentRelative_.name(), sd.momentRelative_),
-    coeffs_(sd.coeffs_)
+
+    coeffs_(sd.coeffs_),
+
+    fixedSurge_(sd.fixedSurge_),
+    fixedSway_(sd.fixedSway_),
+    fixedHeave_(sd.fixedHeave_),
+    fixedRoll_(sd.fixedRoll_),
+    fixedPitch_(sd.fixedPitch_),
+    fixedYaw_(sd.fixedYaw_)
 {}
 
 
@@ -199,9 +240,11 @@ void Foam::sixDOFqODE::setState(const sixDOFqODE& sd)
 {
     mass_ = sd.mass_;
     momentOfInertia_ = sd.momentOfInertia_;
+
     Xequilibrium_ = sd.Xequilibrium_;
     linSpringCoeffs_ = sd.linSpringCoeffs_;
     linDampingCoeffs_ = sd.linDampingCoeffs_;
+
     Xrel_ = sd.Xrel_;
     U_ = sd.U_;
     Uaverage_ = sd.Uaverage_;
@@ -209,6 +252,7 @@ void Foam::sixDOFqODE::setState(const sixDOFqODE& sd)
     omega_ = sd.omega_;
     omegaAverage_ = sd.omegaAverage_;
     omegaAverageAbsolute_ = sd.omegaAverageAbsolute_;
+
     force_ = sd.force_;
     moment_ = sd.moment_;
     forceRelative_ = sd.forceRelative_;
@@ -217,6 +261,13 @@ void Foam::sixDOFqODE::setState(const sixDOFqODE& sd)
     // Copy ODE coefficients: this carries actual ODE state
     // HJ, 23/Mar/2015
     coeffs_ = sd.coeffs_;
+
+    fixedSurge_ = sd.fixedSurge_;
+    fixedSway_ = sd.fixedSway_;
+    fixedHeave_ = sd.fixedHeave_;
+    fixedRoll_ = sd.fixedRoll_;
+    fixedPitch_ = sd.fixedPitch_;
+    fixedYaw_ = sd.fixedYaw_;
 }
 
 
@@ -248,6 +299,23 @@ void Foam::sixDOFqODE::derivatives
     dydx[4] = accel.y();
     dydx[5] = accel.z();
 
+    // Add translational constraints by setting RHS of given components to zero
+    if (fixedSurge_)
+    {
+        dydx[0] = 0; // Surge velocity
+        dydx[3] = 0; // Surge acceleration
+    }
+    if (fixedSway_)
+    {
+        dydx[1] = 0; // Sway velocity
+        dydx[4] = 0; // Sway acceleration
+    }
+    if (fixedHeave_)
+    {
+        dydx[2] = 0; // Heave velocity
+        dydx[5] = 0; // Heave acceleration
+    }
+
     // Set the derivatives for rotation
     dimensionedVector curOmega
     (
@@ -258,7 +326,7 @@ void Foam::sixDOFqODE::derivatives
 
     const vector omegaDot = OmegaDot(curRotation, curOmega).value();
 
-    dydx[6]  = omegaDot.x();
+    dydx[6] = omegaDot.x();
     dydx[7] = omegaDot.y();
     dydx[8] = omegaDot.z();
 
@@ -266,6 +334,20 @@ void Foam::sixDOFqODE::derivatives
     dydx[10] = curRotation.eDot(curOmega.value(), 1);
     dydx[11] = curRotation.eDot(curOmega.value(), 2);
     dydx[12] = curRotation.eDot(curOmega.value(), 3);
+
+    // Add rotational constraints by setting RHS of given components to zero
+    if (fixedRoll_)
+    {
+        dydx[10] = 0; // Roll axis (roll quaternion evolution RHS)
+    }
+    if (fixedPitch_)
+    {
+        dydx[11] = 0; // Pitch axis (pitch quaternion evolution RHS)
+    }
+    if (fixedYaw_)
+    {
+        dydx[12] = 0; // Yaw axis (yaw quaternion evolution RHS)
+    }
 }
 
 
@@ -321,7 +403,23 @@ void Foam::sixDOFqODE::update(const scalar delta)
     );
 
     omegaAverage_.value() = rotation_.omegaAverage(delta);
-    omegaAverageAbsolute_.value() = rotation_.omegaAverageAbsolute(delta);
+
+    // Calculate and constrain omegaAverageAbsolute appropriately
+    vector& omegaAverageAbsoluteValue = omegaAverageAbsolute_.value();
+    omegaAverageAbsoluteValue = rotation_.omegaAverageAbsolute(delta);
+
+    if (fixedRoll_)
+    {
+        omegaAverageAbsoluteValue.x() = 0;
+    }
+    if (fixedPitch_)
+    {
+        omegaAverageAbsoluteValue.y() = 0;
+    }
+    if (fixedYaw_)
+    {
+        omegaAverageAbsoluteValue.z() = 0;
+    }
 }
 
 
@@ -366,6 +464,19 @@ Foam::Ostream& Foam::operator<<(Ostream& os, const sixDOFqODE& sds)
         << token::END_STATEMENT << nl;
     os.writeKeyword("momentRelative") << tab << sds.momentRelative()
         << token::END_STATEMENT << endl;
+
+    os.writeKeyword("fixedSurge") << tab << sds.fixedSurge_ <<
+        token::END_STATEMENT << endl;
+    os.writeKeyword("fixedSway") << tab << sds.fixedSway_ <<
+        token::END_STATEMENT << endl;
+    os.writeKeyword("fixedHeave") << tab << sds.fixedHeave_ <<
+        token::END_STATEMENT << endl;
+    os.writeKeyword("fixedRoll") << tab << sds.fixedRoll_ <<
+        token::END_STATEMENT << endl;
+    os.writeKeyword("fixedPitch") << tab << sds.fixedPitch_ <<
+        token::END_STATEMENT << endl;
+    os.writeKeyword("fixedYaw") << tab << sds.fixedYaw_ <<
+        token::END_STATEMENT << endl;
 
     return os;
 }
