@@ -234,6 +234,15 @@ public:
         //- Default commsType
         static const debug::optimisationSwitch defaultCommsType;
 
+        //- Default comms with a cast
+        inline static Pstream::commsTypes defaultComms()
+        {
+            return static_cast<Pstream::commsTypes>
+            (
+                Pstream::defaultCommsType()
+            );
+        }
+
 
     // Constructors
 
