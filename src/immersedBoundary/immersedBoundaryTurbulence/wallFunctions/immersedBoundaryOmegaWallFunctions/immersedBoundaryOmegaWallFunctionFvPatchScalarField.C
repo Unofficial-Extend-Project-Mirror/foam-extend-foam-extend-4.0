@@ -118,7 +118,8 @@ immersedBoundaryOmegaWallFunctionFvPatchScalarField
     nutName_(owfpsf.nutName_),
     Cmu_(owfpsf.Cmu_),
     kappa_(owfpsf.kappa_),
-    E_(owfpsf.E_)
+    E_(owfpsf.E_),
+    beta1_(owfpsf.beta1_)
 {}
 
 
@@ -137,7 +138,8 @@ immersedBoundaryOmegaWallFunctionFvPatchScalarField
     nutName_(owfpsf.nutName_),
     Cmu_(owfpsf.Cmu_),
     kappa_(owfpsf.kappa_),
-    E_(owfpsf.E_)
+    E_(owfpsf.E_),
+    beta1_(owfpsf.beta1_)
 {}
 
 
@@ -190,10 +192,15 @@ void immersedBoundaryOmegaWallFunctionFvPatchScalarField::updateCoeffs()
         );
 
     // Calculate tangential component, taking into account wall velocity
-    const scalarField UtanOld =
-        mag((I - sqr(n)) & (Uw.ibSamplingPointValue() - Uw.ibValue()));
+    const vectorField UtanOld =
+        (I - sqr(n)) & (Uw.ibSamplingPointValue() - Uw.ibValue());
+    const scalarField magUtanOld = mag(UtanOld);
 
+    // Tangential velocity component
     scalarField& UTangentialNew = Uw.wallTangentialValue();
+
+    // Wall shear stress
+    vectorField& tauWall = Uw.tauWall();
 
     // Turbulence kinetic energy
     const fvPatchScalarField& kg =
@@ -247,7 +254,6 @@ void immersedBoundaryOmegaWallFunctionFvPatchScalarField::updateCoeffs()
     // Calculate wall function conditions
     forAll (ibc, ibCellI)
     {
-        const scalar nuLam = nu[ibCellI];
 
         // Calculate yPlus from k and laminar viscosity for the IB point
         const scalar yPlusSample = ypd[ibCellI];
@@ -258,17 +264,19 @@ void immersedBoundaryOmegaWallFunctionFvPatchScalarField::updateCoeffs()
         {
             // Calculate tauW from log-law using k and U at sampling point
 
-            tauW = UtanOld[ibCellI]*Cmu25*sqrt(k[ibCellI])*kappa_
+            tauW = magUtanOld[ibCellI]*Cmu25*sqrt(k[ibCellI])*kappa_
                   /log(E_*yPlusSample);
         }
         else
         {
             // Sampling point is in laminar sublayer
-            tauW = UtanOld[ibCellI]*Cmu25*sqrt(k[ibCellI])/yPlusSample;
+            tauW = magUtanOld[ibCellI]*Cmu25*sqrt(k[ibCellI])/yPlusSample;
         }
 
         // friction velocity computed from k and U at sampling point
         uTau = sqrt(tauW);
+
+        tauWall[ibCellI] = tauW*UtanOld[ibCellI]/(magUtanOld[ibCellI] + SMALL);
 
         // Calculate yPlus for IB point
 
@@ -277,6 +285,7 @@ void immersedBoundaryOmegaWallFunctionFvPatchScalarField::updateCoeffs()
         // Calculate wall function data in the immersed boundary point
         if (yPlusIB > yPlusLam)
         {
+            const scalar nuLam = nu[ibCellI];
             // Logarithmic region
             wf[ibCellI] = true;
 
@@ -315,12 +324,19 @@ void immersedBoundaryOmegaWallFunctionFvPatchScalarField::updateCoeffs()
             // Compute omega at the IB cell
             omegaNew[ibCellI] = 6.0*nu[ibCellI]/(beta1_*sqr(y[ibCellI]));
 
+            // Bugfix - set zeroGradient bc for large omega values at ib boundary 
+            // to avoid k unboundedness (IG 30/OCT/2015), not
+            // sure if this is a good criteria
+            if(omegaNew[ibCellI] > 10.0)
+            {
+                wf[ibCellI] = true;
+            }
+
             // Laminar sub-layer for tangential velocity: uPlus = yPlus
             UTangentialNew[ibCellI] = uTau*yPlusIB;
 
             // Turbulent viscosity is zero
             nutNew[ibCellI] = SMALL;
-
         }
     }
 

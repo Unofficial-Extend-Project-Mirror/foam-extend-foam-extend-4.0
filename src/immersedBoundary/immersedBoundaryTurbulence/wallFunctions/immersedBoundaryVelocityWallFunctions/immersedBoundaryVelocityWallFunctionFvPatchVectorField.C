@@ -205,6 +205,77 @@ immersedBoundaryVelocityWallFunctionFvPatchVectorField::wallShearStress() const
     return tauWall_;
 }
 
+Foam::scalarField&
+immersedBoundaryVelocityWallFunctionFvPatchVectorField::wallTangentialValue() const
+{
+    // Bugfix 30/OCT/2015 - check if the mesh is moving
+
+    const immersedBoundaryFvPatch& ibFvP =
+        immersedBoundaryFvPatchVectorField::ibPatch();
+    if 
+    (
+        wallTangentialValue_.empty() 
+     || (ibFvP.movingIb() || ibFvP.boundaryMesh().mesh().moving())
+    )
+    {
+        wallTangentialValue_.setSize
+        (
+            this->ibPatch().ibCells().size(),
+            0            
+        );
+    }
+    
+    return wallTangentialValue_;
+}
+
+
+Foam::vectorField&
+immersedBoundaryVelocityWallFunctionFvPatchVectorField::tauWall() const
+{
+    // Bugfix 30/OCT/2015 - check if the mesh is moving
+
+    const immersedBoundaryFvPatch& ibFvP =
+        immersedBoundaryFvPatchVectorField::ibPatch();
+    if 
+    (
+        tauWall_.empty() 
+     || (ibFvP.movingIb() || ibFvP.boundaryMesh().mesh().moving())
+    )
+    {
+        tauWall_.setSize
+        (
+            this->ibPatch().ibCells().size(),
+            vector::zero
+        );
+    }
+    
+    return tauWall_;
+}
+
+
+Foam::boolList&
+immersedBoundaryVelocityWallFunctionFvPatchVectorField::wallMask() const
+{
+    // Bugfix 30/OCT/2015 - check if the mesh is moving
+
+    const immersedBoundaryFvPatch& ibFvP =
+        immersedBoundaryFvPatchVectorField::ibPatch();
+    if 
+    (
+        wallMask_.empty() 
+     || (ibFvP.movingIb() || ibFvP.boundaryMesh().mesh().moving())
+    )
+    {
+        wallMask_.setSize
+        (
+            this->ibPatch().ibCells().size(),
+            false
+        );
+    }
+    
+    return wallMask_;
+}
+
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
