@@ -1,5 +1,5 @@
     // Momentum equation
-    fvVectorMatrix UEqn
+    tmp<fvVectorMatrix> UEqn
     (
         fvm::ddt(U)
       + fvm::div(phi, U)
@@ -7,9 +7,9 @@
     );
 
     // Add MRF and porous sources
-    mrfZones.addCoriolis(UEqn);
-    pZones.addResistance(UEqn);
+    mrfZones.addCoriolis(UEqn());
+    pZones.addResistance(UEqn());
 
-    UEqn.relax();
+    UEqn().relax();
 
-    UpEqn.insertEquation(0, UEqn);
+    UpEqn.insertEquation(0, UEqn());

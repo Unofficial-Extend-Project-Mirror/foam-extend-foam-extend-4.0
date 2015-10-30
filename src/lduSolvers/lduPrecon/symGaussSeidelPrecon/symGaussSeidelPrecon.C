@@ -203,11 +203,7 @@ void Foam::symGaussSeidelPrecon::precondition
             // Finish current x
             curX /= diagPtr[rowI];
 
-            // Distribute the neighbour side using current x
-            for (register label curCoeff = fStart; curCoeff < fEnd; curCoeff++)
-            {
-                bPrimePtr[uPtr[curCoeff]] -= lowerPtr[curCoeff]*curX;
-            }
+            // No need to update bPrime on reverse sweep. VV, 20/May/2015.
         }
     }
 }
@@ -325,12 +321,7 @@ void Foam::symGaussSeidelPrecon::preconditionT
             // Finish current x
             curX /= diagPtr[rowI];
 
-            // Distribute the neighbour side using current x
-            for (register label curCoeff = fStart; curCoeff < fEnd; curCoeff++)
-            {
-                // Transpose multiplication.  HJ, 10/Jul/2007
-                bPrimePtr[uPtr[curCoeff]] -= upperPtr[curCoeff]*curX;
-            }
+            // No need to update bPrime on reverse sweep. VV, 20/May/2015.
         }
     }
 }

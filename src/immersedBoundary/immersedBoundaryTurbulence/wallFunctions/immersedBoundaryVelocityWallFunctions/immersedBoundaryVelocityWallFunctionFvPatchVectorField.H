@@ -165,53 +165,17 @@ public:
 
             //- Access to tangential velocity value to fix in IB cell
             //  Note non-const access
-            scalarField& wallTangentialValue() const
-            {
-                if (wallTangentialValue_.empty())
-                {
-                    wallTangentialValue_.setSize
-                    (
-                        this->ibPatch().ibCells().size(),
-                        0
-                    );
-                }
-
-                return wallTangentialValue_;
-            }
+            scalarField& wallTangentialValue() const;
 
             //- Return wall shear stress
             const vectorField& wallShearStress() const;
 
             //- Access to wall shear stress in IB cell
             //  Note non-const access
-            vectorField& tauWall() const
-            {
-                if (tauWall_.empty())
-                {
-                    tauWall_.setSize
-                    (
-                        this->ibPatch().ibCells().size(),
-                        vector::zero
-                    );
-                }
-
-                return tauWall_;
-            }
+            vectorField& tauWall() const;
 
             //- Access to indicator on fixed values.  Note non-const access
-            boolList& wallMask() const
-            {
-                if (wallMask_.empty())
-                {
-                    wallMask_.setSize
-                    (
-                        this->ibPatch().ibCells().size(),
-                        false
-                    );
-                }
-
-                return wallMask_;
-            }
+            boolList& wallMask() const;
 };
 
 
