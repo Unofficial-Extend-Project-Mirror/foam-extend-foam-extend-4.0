@@ -86,9 +86,6 @@ protected:
 
     // Protected Member Functions
 
-        //- Execute immersed boundary patch field motion update
-        virtual void motionUpdate() const;
-
         //- Set IB cell values: contains data manipulation
         virtual void setIbCellValues(const Field<Type>&) const;
 
@@ -172,38 +169,10 @@ public:
         // Access
 
             //- Access to value to fix in IB cell.  Note non-const access
-            Field<Type>& wallValue() const
-            {
-                // Note: on a moving mesh, the intersection has changed and
-                // wallValue fields should be cleared and recalculated.
-                // This should happen only once, but I cannot see the mechanism
-                // HJ, 17/Oct/2012
-                if (wallValue_.empty())
-                {
-                    wallValue_.setSize
-                    (
-                        this->ibPatch().ibCells().size(),
-                        pTraits<Type>::zero
-                    );
-                }
-
-                return wallValue_;
-            }
+            Field<Type>& wallValue() const;
 
             //- Access to indicator on fixed values.  Note non-const access
-            boolList& wallMask() const
-            {
-                if (wallMask_.empty())
-                {
-                    wallMask_.setSize
-                    (
-                        this->ibPatch().ibCells().size(),
-                        false
-                    );
-                }
-
-                return wallMask_;
-            }
+            boolList& wallMask() const;
 };
 
 
