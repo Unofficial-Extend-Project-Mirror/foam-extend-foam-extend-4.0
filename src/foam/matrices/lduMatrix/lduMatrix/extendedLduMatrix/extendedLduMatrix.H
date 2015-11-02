@@ -78,6 +78,12 @@ class extendedLduMatrix
         void operator=(const extendedLduMatrix&);
 
 
+        // Helper functions
+
+            //- Clear all demand driven data - helper function
+            void clearOut();
+
+
 public:
 
 

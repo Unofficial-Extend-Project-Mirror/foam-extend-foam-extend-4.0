@@ -28,6 +28,14 @@ License
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
 template<class Type>
+void Foam::extendedBlockLduMatrix<Type>::clearOut()
+{
+    deleteDemandDrivenData(extendedLowerPtr_);
+    deleteDemandDrivenData(extendedUpperPtr_);
+}
+
+
+template<class Type>
 void Foam::extendedBlockLduMatrix<Type>::mapOffDiagCoeffs
 (
     const BlockLduMatrix<Type>& blockLdum
@@ -253,15 +261,7 @@ Foam::extendedBlockLduMatrix<Type>::extendedBlockLduMatrix
 template<class Type>
 Foam::extendedBlockLduMatrix<Type>::~extendedBlockLduMatrix()
 {
-    if (extendedLowerPtr_)
-    {
-        delete extendedLowerPtr_;
-    }
-
-    if (extendedUpperPtr_)
-    {
-        delete extendedUpperPtr_;
-    }
+    clearOut();
 }
 
 

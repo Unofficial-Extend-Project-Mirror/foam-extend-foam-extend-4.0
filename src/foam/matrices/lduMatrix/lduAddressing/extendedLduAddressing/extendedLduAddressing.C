@@ -35,58 +35,9 @@ namespace Foam
 }
 
 
-// * * * * * * * * * * * * * * * * Constructors * * * * * * * * * * * * * * //
-
-Foam::extendedLduAddressing::extendedLduAddressing
-(
-    const lduAddressing& lduAddr,
-    const label extensionLevel
-)
-:
-    lduAddr_(lduAddr),
-    p_(extensionLevel),
-    extendedLowerPtr_(NULL),
-    extendedUpperPtr_(NULL),
-    faceMapPtr_(NULL),
-    extendedLosortPtr_(NULL),
-    extendedOwnerStartPtr_(NULL),
-    extendedLosortStartPtr_(NULL)
-{
-    // Issue an error if a negative extension level is selected
-    if (p_ < 0)
-    {
-        FatalErrorIn
-        (
-            "extendedLduAddressing::extendedLduAddressing"
-        )
-            << "Negative extension level not allowed."
-            << abort(FatalError);
-    }
-    // Disallow extension level 0 as it is the same as ordinary lduAddressing
-    else if (p_ == 0)
-    {
-        FatalErrorIn
-        (
-            "extendedLduAddressing::extendedLduAddressing"
-        )
-            << "Extension level 0 not allowed as it is the same as ordinary "
-            << "lduAddressing."
-            << abort(FatalError);
-    }
-}
-
-
-// * * * * * * * * * * * * * * * * Destructor * * * * * * * * * * * * * * * /
-
-Foam::extendedLduAddressing::~extendedLduAddressing()
-{
-    clearAllDemandDrivenData();
-}
-
-
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
-void Foam::extendedLduAddressing::clearAllDemandDrivenData() const
+void Foam::extendedLduAddressing::clearOut() const
 {
     deleteDemandDrivenData(extendedLowerPtr_);
     deleteDemandDrivenData(extendedUpperPtr_);
@@ -460,6 +411,55 @@ void Foam::extendedLduAddressing::calcExtendedLosortStart() const
 }
 
 
+// * * * * * * * * * * * * * * * * Constructors * * * * * * * * * * * * * * //
+
+Foam::extendedLduAddressing::extendedLduAddressing
+(
+    const lduAddressing& lduAddr,
+    const label extensionLevel
+)
+:
+    lduAddr_(lduAddr),
+    p_(extensionLevel),
+    extendedLowerPtr_(NULL),
+    extendedUpperPtr_(NULL),
+    faceMapPtr_(NULL),
+    extendedLosortPtr_(NULL),
+    extendedOwnerStartPtr_(NULL),
+    extendedLosortStartPtr_(NULL)
+{
+    // Issue an error if a negative extension level is selected
+    if (p_ < 0)
+    {
+        FatalErrorIn
+        (
+            "extendedLduAddressing::extendedLduAddressing"
+        )
+            << "Negative extension level not allowed."
+            << abort(FatalError);
+    }
+    // Disallow extension level 0 as it is the same as ordinary lduAddressing
+    else if (p_ == 0)
+    {
+        FatalErrorIn
+        (
+            "extendedLduAddressing::extendedLduAddressing"
+        )
+            << "Extension level 0 not allowed as it is the same as ordinary "
+            << "lduAddressing."
+            << abort(FatalError);
+    }
+}
+
+
+// * * * * * * * * * * * * * * * * Destructor * * * * * * * * * * * * * * * /
+
+Foam::extendedLduAddressing::~extendedLduAddressing()
+{
+    clearOut();
+}
+
+
 // * * * * * * * * * * * * Public Member Functions  * * * * * * * * * * * * * //
 
 const Foam::unallocLabelList&
@@ -591,7 +591,7 @@ bool Foam::extendedLduAddressing::updateMesh(const mapPolyMesh& mpm) const
         )   << "Clearing extendedLduAddressing data" << endl;
     }
 
-    clearAllDemandDrivenData();
+    clearOut();
 
     return true;
 }

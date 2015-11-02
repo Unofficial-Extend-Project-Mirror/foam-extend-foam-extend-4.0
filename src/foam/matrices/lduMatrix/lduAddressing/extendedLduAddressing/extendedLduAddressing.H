@@ -106,7 +106,7 @@ class extendedLduAddressing
         // Helper functions
 
             //- Clear all demand driven data - helper function
-            void clearAllDemandDrivenData() const;
+            void clearOut() const;
 
             //- Recursive function that inserts cell neighbours in a hash set
             //  Parameters:

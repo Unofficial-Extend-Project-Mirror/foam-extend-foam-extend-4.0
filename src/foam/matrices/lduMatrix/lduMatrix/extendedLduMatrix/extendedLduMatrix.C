@@ -24,12 +24,22 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "extendedLduMatrix.H"
+#include "demandDrivenData.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
 namespace Foam
 {
     defineTypeNameAndDebug(extendedLduMatrix, 0);
+}
+
+
+// * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
+
+void Foam::extendedLduMatrix::clearOut()
+{
+    deleteDemandDrivenData(extendedLowerPtr_);
+    deleteDemandDrivenData(extendedUpperPtr_);
 }
 
 
@@ -118,15 +128,7 @@ Foam::extendedLduMatrix::extendedLduMatrix
 
 Foam::extendedLduMatrix::~extendedLduMatrix()
 {
-    if (extendedLowerPtr_)
-    {
-        delete extendedLowerPtr_;
-    }
-
-    if (extendedUpperPtr_)
-    {
-        delete extendedUpperPtr_;
-    }
+    clearOut();
 }
 
 
