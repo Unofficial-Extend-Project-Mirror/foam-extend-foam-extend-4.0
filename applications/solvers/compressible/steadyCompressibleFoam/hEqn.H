@@ -34,4 +34,5 @@
     h.correctBoundaryConditions();
 
     thermo.correct();
+    psis = thermo.psi()/thermo.Cp()*thermo.Cv();
 }

@@ -58,11 +58,9 @@ PIMPLE
 relaxationFactors
 {
     // Note: under-relaxation factors used in wave-transmissive schemes
-    U               0.5;
-    p               0.2;
-    h               0.5;
-    rho             0.5;
-    T               1;
+    U               0.7;
+    p               0.7;
+    h               0.7;
 }
 
 fieldBounds
