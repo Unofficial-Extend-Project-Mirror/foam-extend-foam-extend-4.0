@@ -11,13 +11,17 @@
     {
         U = rUA*UEqn.H();
 
-        phi = rhoReff*(fvc::interpolate(U) & mesh.Sf());
+        // Calculate phi for boundary conditions
+        phi = rhof*fvc::interpolate(U) & mesh.Sf();
 
-        surfaceScalarField phid("phid", psisf/rhoReff*phi);
+        surfaceScalarField phid2 = rhoReff/rhof*phi;
+
+        surfaceScalarField phid("phid", psisf/rhof*phi);
 
         // Make fluxes relative within the MRF zone
-        mrfZones.relativeFlux(psisf, phid);
         mrfZones.relativeFlux(rhoReff, phi);
+        mrfZones.relativeFlux(psisf, phid);
+        mrfZones.relativeFlux(rhoReff, phid2);
 
         p.storePrevIter();
 
@@ -27,7 +31,7 @@
             (
                 fvm::ddt(psis, p)
               + fvm::div(phid, p)
-              + fvc::div(phi)
+              + fvc::div(phid2)
               - fvm::laplacian(rho*rUA, p)
             );
 
@@ -42,13 +46,13 @@
             // Calculate the flux
             if (nonOrth == nNonOrthCorr)
             {
-                phi += pEqn.flux();
+                phi = phid2 + pEqn.flux();
             }
         }
 
 #       include "compressibleContinuityErrs.H"
 
-        // Explicitly relax the pressure for momentum corrector
+        // Relax the pressure
         p.relax();
 
         U -= rUA*fvc::grad(p);

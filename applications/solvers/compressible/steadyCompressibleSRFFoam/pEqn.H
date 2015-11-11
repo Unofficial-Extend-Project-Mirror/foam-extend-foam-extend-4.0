@@ -1,24 +1,22 @@
 {
     volScalarField rUrelA = 1.0/UrelEqn.A();
 
+    surfaceScalarField psisf = fvc::interpolate(psis);
+    surfaceScalarField rhof = fvc::interpolate(rho);
+
+    // Needs to be outside of loop since p is changing, but psi and rho are not.
+    surfaceScalarField rhoReff = rhof - psisf*fvc::interpolate(p);
+
     for (int corr = 0; corr < nCorr; corr++)
     {
         Urel = rUrelA*UrelEqn.H();
 
-        // Execute ddtPhiCorr before recalculating flux
-        // HJ, 27/Apr/2010
-        surfaceScalarField phid
-        (
-            "phid",
-            fvc::interpolate(thermo.psi())*
-            (
-                (fvc::interpolate(Urel) & mesh.Sf())
-              + fvc::ddtPhiCorr(rUrelA, rho, Urel, phi)
-            )
-        );
-
         // Calculate phi for boundary conditions
-        phi = fvc::interpolate(rho*Urel) & mesh.Sf();
+        phi = rhof*fvc::interpolate(Urel) & mesh.Sf();
+
+        surfaceScalarField phid2 = rhoReff/rhof*phi;
+
+        surfaceScalarField phid("phid", psisf/rhof*phi);
 
         p.storePrevIter();
 
@@ -26,8 +24,9 @@
         {
             fvScalarMatrix pEqn
             (
-                fvm::ddt(psi, p)
+                fvm::ddt(psis, p)
               + fvm::div(phid, p)
+              + fvc::div(phid2)
               - fvm::laplacian(rho*rUrelA, p)
             );
 
@@ -42,14 +41,13 @@
             // Calculate the flux
             if (nonOrth == nNonOrthCorr)
             {
-                phi = pEqn.flux();
+                phi = phid2 + pEqn.flux();
             }
         }
 
 #       include "compressibleContinuityErrs.H"
 
-
-        // Explicitly relax the pressure for momentum corrector
+        // Relax the pressure
         p.relax();
 
         Urel -= rUrelA*fvc::grad(p);

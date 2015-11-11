@@ -1,5 +1,5 @@
 {
-    // Solve the enthalpy equation
+    // Solve the rothalpy equation
     T.storePrevIter();
 
     // Calculate face velocity from flux
@@ -38,4 +38,5 @@
 
     // Bounding of enthalpy taken out
     thermo.correct();
+    psis = thermo.psi()/thermo.Cp()*thermo.Cv();
 }

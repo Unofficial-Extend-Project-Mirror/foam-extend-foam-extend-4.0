@@ -29,4 +29,5 @@
 
     // Bounding of enthalpy taken out
     thermo.correct();
+    psis = thermo.psi()/thermo.Cp()*thermo.Cv();
 }
