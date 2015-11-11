@@ -1,5 +1,5 @@
 {
-    // Solve the enthalpy equation
+    // Solve the rothalpy equation
     T.storePrevIter();
 
     // Calculate face velocity from flux
@@ -44,4 +44,5 @@
     i = h - 0.5*magSqr(Urot);
 
     thermo.correct();
+    psis = thermo.psi()/thermo.Cp()*thermo.Cv();
 }

@@ -184,6 +184,59 @@ void Foam::isentropicTotalPressureFvPatchScalarField::updateCoeffs
 }
 
 
+Foam::tmp<Foam::scalarField>
+Foam::isentropicTotalPressureFvPatchScalarField::snGrad() const
+{
+    return tmp<scalarField>
+    (
+        new scalarField(this->size(), 0.0)
+    );
+}
+
+
+Foam::tmp<Foam::scalarField>
+Foam::isentropicTotalPressureFvPatchScalarField::valueInternalCoeffs
+(
+    const tmp<scalarField>&
+) const
+{
+    return tmp<scalarField>
+    (
+        new scalarField(this->size(), 0.0)
+    );
+}
+
+
+Foam::tmp<Foam::scalarField>
+Foam::isentropicTotalPressureFvPatchScalarField::valueBoundaryCoeffs
+(
+    const tmp<scalarField>&
+) const
+{
+    return *this;
+}
+
+
+Foam::tmp<Foam::scalarField>
+Foam::isentropicTotalPressureFvPatchScalarField::gradientInternalCoeffs() const
+{
+    return tmp<scalarField>
+    (
+        new scalarField(this->size(), 0.0)
+    );
+}
+
+
+Foam::tmp<Foam::scalarField>
+Foam::isentropicTotalPressureFvPatchScalarField::gradientBoundaryCoeffs() const
+{
+    return tmp<scalarField>
+    (
+        new scalarField(this->size(), 0.0)
+    );
+}
+
+
 void Foam::isentropicTotalPressureFvPatchScalarField::write
 (
     Ostream& os
