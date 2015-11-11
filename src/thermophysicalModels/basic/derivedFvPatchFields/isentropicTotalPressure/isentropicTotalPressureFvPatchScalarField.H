@@ -134,6 +134,31 @@ public:
 
         // Access
 
+            //- Return the name of the velocity field
+            const word& UName() const
+            {
+                return UName_;
+            }
+
+            //- Return reference to the name of the velocity field
+            //  to allow adjustment
+            word& UName()
+            {
+                return UName_;
+            }
+
+            //- Return the heat capacity ratio
+            scalar gamma() const
+            {
+                return gamma_;
+            }
+
+            //- Return reference to the heat capacity ratio to allow adjustment
+            scalar& gamma()
+            {
+                return gamma_;
+            }
+
             //- Return the total pressure
             const scalarField& p0() const
             {

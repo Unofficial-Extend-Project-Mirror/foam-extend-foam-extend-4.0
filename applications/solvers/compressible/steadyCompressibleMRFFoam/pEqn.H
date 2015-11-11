@@ -1,29 +1,23 @@
 {
     volScalarField rUA = 1.0/UEqn.A();
 
+    surfaceScalarField psisf = fvc::interpolate(psis);
+    surfaceScalarField rhof = fvc::interpolate(rho);
+
+    // Needs to be outside of loop since p is changing, but psi and rho are not.
+    surfaceScalarField rhoReff = rhof - psisf*fvc::interpolate(p);
+
     for (int corr = 0; corr < nCorr; corr++)
     {
         U = rUA*UEqn.H();
 
-        surfaceScalarField psif = fvc::interpolate(psi);
-        surfaceScalarField rhof = fvc::interpolate(rho);
+        phi = rhoReff*(fvc::interpolate(U) & mesh.Sf());
 
-        // Execute ddtPhiCorr before recalculating flux
-        // HJ, 27/Apr/2010
-        surfaceScalarField phid
-        (
-            "phid",
-            psif*(fvc::interpolate(U) & mesh.Sf())
-        );
+        surfaceScalarField phid("phid", psisf/rhoReff*phi);
 
-        // Make flux relative within the MRF zone
-        mrfZones.relativeFlux(psif, phid);
-
-        // Calculate phi for boundary conditions
-        phi = fvc::interpolate(rho*U) & mesh.Sf();
-
-        // Make flux relative within the MRF zone
-        mrfZones.relativeFlux(rhof, phi);
+        // Make fluxes relative within the MRF zone
+        mrfZones.relativeFlux(psisf, phid);
+        mrfZones.relativeFlux(rhoReff, phi);
 
         p.storePrevIter();
 
@@ -31,8 +25,9 @@
         {
             fvScalarMatrix pEqn
             (
-                fvm::ddt(psi, p)
+                fvm::ddt(psis, p)
               + fvm::div(phid, p)
+              + fvc::div(phi)
               - fvm::laplacian(rho*rUA, p)
             );
 
@@ -47,7 +42,7 @@
             // Calculate the flux
             if (nonOrth == nNonOrthCorr)
             {
-                phi = pEqn.flux();
+                phi += pEqn.flux();
             }
         }
 
