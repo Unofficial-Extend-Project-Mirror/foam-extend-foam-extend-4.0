@@ -86,6 +86,31 @@ tmp<volScalarField> coupledKOmegaSST::F2() const
 }
 
 
+tmp<volScalarField> coupledKOmegaSST::F3() const
+{
+    tmp<volScalarField> arg3 = min
+    (
+        150*nu()/(omega_*sqr(y_)),
+        scalar(10)
+    );
+
+    return 1 - tanh(pow4(arg3));
+}
+
+
+tmp<volScalarField> coupledKOmegaSST::F23() const
+{
+    tmp<volScalarField> f23(F2());
+
+    if (F3_)
+    {
+        f23() *= F3();
+    }
+
+    return f23;
+}
+
+
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 coupledKOmegaSST::coupledKOmegaSST
@@ -99,16 +124,16 @@ coupledKOmegaSST::coupledKOmegaSST
 
     alphaK1_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "alphaK1",
             coeffDict_,
-            0.85034
+            0.85
         )
     ),
     alphaK2_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "alphaK2",
             coeffDict_,
@@ -117,7 +142,7 @@ coupledKOmegaSST::coupledKOmegaSST
     ),
     alphaOmega1_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "alphaOmega1",
             coeffDict_,
@@ -126,34 +151,34 @@ coupledKOmegaSST::coupledKOmegaSST
     ),
     alphaOmega2_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "alphaOmega2",
             coeffDict_,
-            0.85616
+            0.856
         )
     ),
     gamma1_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "gamma1",
             coeffDict_,
-            0.5532
+            5.0/9.0
         )
     ),
     gamma2_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "gamma2",
             coeffDict_,
-            0.4403
+            0.44
         )
     ),
     beta1_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "beta1",
             coeffDict_,
@@ -162,7 +187,7 @@ coupledKOmegaSST::coupledKOmegaSST
     ),
     beta2_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "beta2",
             coeffDict_,
@@ -171,7 +196,7 @@ coupledKOmegaSST::coupledKOmegaSST
     ),
     betaStar_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "betaStar",
             coeffDict_,
@@ -180,20 +205,38 @@ coupledKOmegaSST::coupledKOmegaSST
     ),
     a1_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "a1",
             coeffDict_,
             0.31
         )
     ),
+    b1_
+    (
+        dimensionedScalar::lookupOrAddToDict
+        (
+            "b1",
+            coeffDict_,
+            1.0
+        )
+    ),
     c1_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "c1",
             coeffDict_,
             10.0
+        )
+    ),
+    F3_
+    (
+        Switch::lookupOrAddToDict
+        (
+            "F3",
+            coeffDict_,
+            false
         )
     ),
 
@@ -249,9 +292,18 @@ coupledKOmegaSST::coupledKOmegaSST
         dimensionedVector2("zero", dimless, vector2::zero)
     )
 {
+    bound(k_, k0_);
     bound(omega_, omega0_);
 
-    nut_ = a1_*k_/max(a1_*omega_, F2()*sqrt(2.0)*mag(symm(fvc::grad(U_))));
+    nut_ =
+    (
+        a1_*k_/
+        max
+        (
+            a1_*omega_,
+            b1_*F23()*sqrt(2.0)*mag(symm(fvc::grad(U_)))
+        )
+    );
     nut_.correctBoundaryConditions();
 
     printCoeffs();
@@ -325,7 +377,9 @@ bool coupledKOmegaSST::read()
         beta2_.readIfPresent(coeffDict());
         betaStar_.readIfPresent(coeffDict());
         a1_.readIfPresent(coeffDict());
+        b1_.readIfPresent(coeffDict());
         c1_.readIfPresent(coeffDict());
+        F3_.readIfPresent("F3", coeffDict());
 
         return true;
     }
@@ -358,8 +412,8 @@ void coupledKOmegaSST::correct()
         y_.correct();
     }
 
-    volScalarField S2 = magSqr(symm(fvc::grad(U_)));
-    volScalarField G("RASModel::G", nut_*2*S2);
+    const volScalarField S2(2*magSqr(symm(fvc::grad(U_))));
+    volScalarField G("RASModel::G", nut_*S2);
 
     // Make coupled matrix
     fvBlockMatrix<vector2> kOmegaEqn(kOmega_);
@@ -367,12 +421,17 @@ void coupledKOmegaSST::correct()
     // Update omega and G at the wall
     omega_.boundaryField().updateCoeffs();
 
-    volScalarField CDkOmega =
-        (2*alphaOmega2_)*(fvc::grad(k_) & fvc::grad(omega_))/omega_;
+    const volScalarField CDkOmega
+    (
+        (2*alphaOmega2_)*(fvc::grad(k_) & fvc::grad(omega_))/omega_
+    );
 
-    volScalarField F1 = this->F1(CDkOmega);
+    const volScalarField F1(this->F1(CDkOmega));
 
-    Info<< "Coupled k-omega" << endl;
+    // Record coupling equations when omega is set.  Same equations
+    // will be eliminated from k coupling as well due to wall functions
+    // HJ, 13/Nov/2015
+    labelList eliminated;
 
     // Turbulent frequency equation
     {
@@ -382,14 +441,20 @@ void coupledKOmegaSST::correct()
           + fvm::div(phi_, omega_)
           + fvm::SuSp(-fvc::div(phi_), omega_)
           - fvm::laplacian(DomegaEff(F1), omega_)
-          + fvm::SuSp
+         ==
+            gamma(F1)
+           *min
             (
-                beta(F1)*omega_
-              + (F1 - scalar(1))*CDkOmega/omega_,
+                S2,
+                (c1_/a1_)*betaStar_*omega_*max(a1_*omega_, b1_*F23()*sqrt(S2))
+            )
+          - fvm::Sp(2*beta(F1)*omega_, omega_)
+          + beta(F1)*sqr(omega_)
+          - fvm::SuSp
+            (
+                (F1 - scalar(1))*CDkOmega/omega_,
                 omega_
             )
-         ==
-            gamma(F1)*2*S2
         );
 
         omegaEqn.relax();
@@ -398,24 +463,26 @@ void coupledKOmegaSST::correct()
         kOmegaEqn.insertEquation(1, omegaEqn);
 
         // Add coupling term
-        volScalarField coupling
+        volScalarField couplingOmega
         (
-            "coupling",
-            -gamma(F1)*2*S2/k_
+            "couplingOmega",
+            -beta(F1)*sqr(omega_)/k_
         );
-        scalarField& couplingIn = coupling.internalField();
+        scalarField& couplingOmegaIn = couplingOmega.internalField();
 
-        // Eliminate coupling in wall function cells
-        labelList eliminated = omegaEqn.eliminatedEqns().toc();
+        // Collect cell indices where wall functions are active from the
+        // omega wall functions
+        eliminated = omegaEqn.eliminatedEqns().toc();
 
+        // Eliminate coupling in wall function cells for omega
         forAll (eliminated, cellI)
         {
-            couplingIn[eliminated[cellI]] *= 0;
+            couplingOmegaIn[eliminated[cellI]] *= 0;
         }
 
         // Insert coupling
-        kOmegaEqn.insertEquationCoupling(1, 0, coupling);
-    }
+        kOmegaEqn.insertEquationCoupling(1, 0, couplingOmega);
+   }
 
     // Turbulent kinetic energy equation
     {
@@ -425,17 +492,32 @@ void coupledKOmegaSST::correct()
           + fvm::div(phi_, k_)
           + fvm::SuSp(-fvc::div(phi_), k_)
           - fvm::laplacian(DkEff(F1), k_)
-          + fvm::SuSp
-            (
-                betaStar_*omega_
-              - min(G/k_, c1_*betaStar_*omega_),
-                k_
-            )
+         ==
+            min(G, c1_*betaStar_*k_*omega_)
+          - fvm::Sp(betaStar_*omega_, k_)
         );
 
         kEqn.relax();
+        kEqn.completeAssembly();
 
         kOmegaEqn.insertEquation(0, kEqn);
+
+        // Add coupling term
+        volScalarField couplingK
+        (
+            "couplingK",
+           betaStar_*k_
+        );
+        scalarField& couplingKIn = couplingK.internalField();
+
+        // Eliminate coupling in wall function cells for k
+        forAll (eliminated, cellI)
+        {
+            couplingKIn[eliminated[cellI]] *= 0;
+        }
+
+        // Insert coupling
+//         kOmegaEqn.insertEquationCoupling(0, 1, couplingK);
     }
 
     // Update source coupling: coupling terms eliminated from source
@@ -447,14 +529,16 @@ void coupledKOmegaSST::correct()
     kOmegaEqn.retrieveSolution(0, k_.internalField());
     kOmegaEqn.retrieveSolution(1, omega_.internalField());
 
-    k_.correctBoundaryConditions();
-    omega_.correctBoundaryConditions();
-
     bound(k_, k0_);
     bound(omega_, omega0_);
 
+    k_.correctBoundaryConditions();
+    omega_.correctBoundaryConditions();
+
+
     // Re-calculate viscosity
-    nut_ = a1_*k_/max(a1_*omega_, F2()*sqrt(2*S2));
+    // Fixed sqrt(2) error.  HJ, 10/Jun/2015
+    nut_ = a1_*k_/max(a1_*omega_, b1_*F23()*sqrt(S2));
     nut_ = min(nut_, nuRatio()*nu());
     nut_.correctBoundaryConditions();
 }
