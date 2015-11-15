@@ -51,7 +51,7 @@ GenEddyVisc::GenEddyVisc
 
     ce_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "ce",
             coeffDict_,
@@ -61,7 +61,7 @@ GenEddyVisc::GenEddyVisc
 
     Prt_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "Prt",
             coeffDict_,

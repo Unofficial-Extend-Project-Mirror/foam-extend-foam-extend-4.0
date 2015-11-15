@@ -124,7 +124,7 @@ kOmegaSST::kOmegaSST
 
     alphaK1_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "alphaK1",
             coeffDict_,
@@ -133,7 +133,7 @@ kOmegaSST::kOmegaSST
     ),
     alphaK2_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "alphaK2",
             coeffDict_,
@@ -142,7 +142,7 @@ kOmegaSST::kOmegaSST
     ),
     alphaOmega1_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "alphaOmega1",
             coeffDict_,
@@ -151,7 +151,7 @@ kOmegaSST::kOmegaSST
     ),
     alphaOmega2_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "alphaOmega2",
             coeffDict_,
@@ -160,7 +160,7 @@ kOmegaSST::kOmegaSST
     ),
     gamma1_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "gamma1",
             coeffDict_,
@@ -169,7 +169,7 @@ kOmegaSST::kOmegaSST
     ),
     gamma2_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "gamma2",
             coeffDict_,
@@ -178,7 +178,7 @@ kOmegaSST::kOmegaSST
     ),
     beta1_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "beta1",
             coeffDict_,
@@ -187,7 +187,7 @@ kOmegaSST::kOmegaSST
     ),
     beta2_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "beta2",
             coeffDict_,
@@ -196,7 +196,7 @@ kOmegaSST::kOmegaSST
     ),
     betaStar_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "betaStar",
             coeffDict_,
@@ -205,7 +205,7 @@ kOmegaSST::kOmegaSST
     ),
     a1_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "a1",
             coeffDict_,
@@ -214,7 +214,7 @@ kOmegaSST::kOmegaSST
     ),
     b1_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "b1",
             coeffDict_,
@@ -223,7 +223,7 @@ kOmegaSST::kOmegaSST
     ),
     c1_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "c1",
             coeffDict_,
@@ -413,7 +413,7 @@ void kOmegaSST::correct()
     const volScalarField F1(this->F1(CDkOmega));
 
     // Turbulent frequency equation
-    tmp<fvScalarMatrix> omegaEqn
+    fvScalarMatrix omegaEqn
     (
         fvm::ddt(omega_)
       + fvm::div(phi_, omega_)
@@ -421,7 +421,11 @@ void kOmegaSST::correct()
       - fvm::laplacian(DomegaEff(F1), omega_)
      ==
         gamma(F1)
-       *min(S2, (c1_/a1_)*betaStar_*omega_*max(a1_*omega_, b1_*F23()*sqrt(S2)))
+       *min
+        (
+            S2,
+            (c1_/a1_)*betaStar_*omega_*max(a1_*omega_, b1_*F23()*sqrt(S2))
+        )
       - fvm::Sp(beta(F1)*omega_, omega_)
       - fvm::SuSp
         (
@@ -430,17 +434,17 @@ void kOmegaSST::correct()
         )
     );
 
-    omegaEqn().relax();
+    omegaEqn.relax();
 
     // No longer needed: matrix completes at the point of solution
     // HJ, 17/Apr/2012
-//     omegaEqn().completeAssembly();
+//     omegaEqn.completeAssembly();
 
     solve(omegaEqn);
     bound(omega_, omega0_);
 
     // Turbulent kinetic energy equation
-    tmp<fvScalarMatrix> kEqn
+    fvScalarMatrix kEqn
     (
         fvm::ddt(k_)
       + fvm::div(phi_, k_)
@@ -451,10 +455,10 @@ void kOmegaSST::correct()
       - fvm::Sp(betaStar_*omega_, k_)
     );
 
-    kEqn().relax();
+    kEqn.relax();
     solve(kEqn);
     bound(k_, k0_);
-
+    bound(omega_, omega0_);
 
     // Re-calculate viscosity
     // Fixed sqrt(2) error.  HJ, 10/Jun/2015

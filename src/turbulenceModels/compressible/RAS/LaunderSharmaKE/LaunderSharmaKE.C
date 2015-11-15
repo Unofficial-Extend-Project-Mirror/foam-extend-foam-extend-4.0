@@ -72,7 +72,7 @@ LaunderSharmaKE::LaunderSharmaKE
 
     Cmu_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "Cmu",
             coeffDict_,
@@ -81,7 +81,7 @@ LaunderSharmaKE::LaunderSharmaKE
     ),
     C1_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "C1",
             coeffDict_,
@@ -90,7 +90,7 @@ LaunderSharmaKE::LaunderSharmaKE
     ),
     C2_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "C2",
             coeffDict_,
@@ -99,7 +99,7 @@ LaunderSharmaKE::LaunderSharmaKE
     ),
     C3_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "C3",
             coeffDict_,
@@ -108,7 +108,7 @@ LaunderSharmaKE::LaunderSharmaKE
     ),
     sigmak_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "sigmak",
             coeffDict_,
@@ -117,7 +117,7 @@ LaunderSharmaKE::LaunderSharmaKE
     ),
     sigmaEps_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "sigmaEps",
             coeffDict_,
@@ -126,7 +126,7 @@ LaunderSharmaKE::LaunderSharmaKE
     ),
     Prt_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "Prt",
             coeffDict_,
