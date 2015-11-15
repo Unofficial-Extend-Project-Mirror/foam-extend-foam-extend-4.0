@@ -56,7 +56,7 @@ LienCubicKELowRe::LienCubicKELowRe
 
     C1_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "C1",
             coeffDict_,
@@ -65,7 +65,7 @@ LienCubicKELowRe::LienCubicKELowRe
     ),
     C2_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "C2",
             coeffDict_,
@@ -74,7 +74,7 @@ LienCubicKELowRe::LienCubicKELowRe
     ),
     sigmak_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "sigmak",
             coeffDict_,
@@ -83,7 +83,7 @@ LienCubicKELowRe::LienCubicKELowRe
     ),
     sigmaEps_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "sigmaEps",
             coeffDict_,
@@ -92,7 +92,7 @@ LienCubicKELowRe::LienCubicKELowRe
     ),
     A1_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "A1",
             coeffDict_,
@@ -101,7 +101,7 @@ LienCubicKELowRe::LienCubicKELowRe
     ),
     A2_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "A2",
             coeffDict_,
@@ -110,7 +110,7 @@ LienCubicKELowRe::LienCubicKELowRe
     ),
     Ctau1_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "Ctau1",
             coeffDict_,
@@ -119,7 +119,7 @@ LienCubicKELowRe::LienCubicKELowRe
     ),
     Ctau2_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "Ctau2",
             coeffDict_,
@@ -128,7 +128,7 @@ LienCubicKELowRe::LienCubicKELowRe
     ),
     Ctau3_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "Ctau3",
             coeffDict_,
@@ -137,7 +137,7 @@ LienCubicKELowRe::LienCubicKELowRe
     ),
     alphaKsi_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "alphaKsi",
             coeffDict_,
@@ -146,7 +146,7 @@ LienCubicKELowRe::LienCubicKELowRe
     ),
     CmuWall_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "Cmu",
             coeffDict_,
@@ -155,7 +155,7 @@ LienCubicKELowRe::LienCubicKELowRe
     ),
     kappa_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "kappa",
             coeffDict_,
@@ -164,7 +164,7 @@ LienCubicKELowRe::LienCubicKELowRe
     ),
     Am_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "Am",
             coeffDict_,
@@ -173,7 +173,7 @@ LienCubicKELowRe::LienCubicKELowRe
     ),
     Aepsilon_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "Aepsilon",
             coeffDict_,
@@ -182,7 +182,7 @@ LienCubicKELowRe::LienCubicKELowRe
     ),
     Amu_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "Amu",
             coeffDict_,

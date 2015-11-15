@@ -63,7 +63,7 @@ Smagorinsky::Smagorinsky
 
     ck_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "ck",
             coeffDict_,

@@ -56,7 +56,7 @@ coupledKEpsilon::coupledKEpsilon
 
     Cmu_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "Cmu",
             coeffDict_,
@@ -65,7 +65,7 @@ coupledKEpsilon::coupledKEpsilon
     ),
     C1_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "C1",
             coeffDict_,
@@ -74,7 +74,7 @@ coupledKEpsilon::coupledKEpsilon
     ),
     C2_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "C2",
             coeffDict_,
@@ -83,7 +83,7 @@ coupledKEpsilon::coupledKEpsilon
     ),
     sigmaEps_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "sigmaEps",
             coeffDict_,
@@ -314,11 +314,11 @@ void coupledKEpsilon::correct()
     keEqn.retrieveSolution(0, k_.internalField());
     keEqn.retrieveSolution(1, epsilon_.internalField());
 
-    k_.correctBoundaryConditions();
-    epsilon_.correctBoundaryConditions();
-
     bound(epsilon_, epsilon0_);
     bound(k_, k0_);
+
+    k_.correctBoundaryConditions();
+    epsilon_.correctBoundaryConditions();
 
     // Re-calculate viscosity
     nut_ = Cmu_*sqr(k_)/epsilon_;
