@@ -174,6 +174,38 @@ void Foam::isentropicTotalTemperatureFvPatchScalarField::updateCoeffs
 }
 
 
+Foam::tmp<Foam::scalarField>
+Foam::isentropicTotalTemperatureFvPatchScalarField::snGrad() const
+{
+    return tmp<scalarField>
+    (
+        new scalarField(this->size(), 0.0)
+    );
+}
+
+
+Foam::tmp<Foam::scalarField>
+Foam::isentropicTotalTemperatureFvPatchScalarField::
+gradientInternalCoeffs() const
+{
+    return tmp<scalarField>
+    (
+        new scalarField(this->size(), 0.0)
+    );
+}
+
+
+Foam::tmp<Foam::scalarField>
+Foam::isentropicTotalTemperatureFvPatchScalarField::
+gradientBoundaryCoeffs() const
+{
+    return tmp<scalarField>
+    (
+        new scalarField(this->size(), 0.0)
+    );
+}
+
+
 void Foam::isentropicTotalTemperatureFvPatchScalarField::write
 (
     Ostream& os
