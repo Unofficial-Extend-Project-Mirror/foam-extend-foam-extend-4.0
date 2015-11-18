@@ -64,14 +64,14 @@ Foam::totalPressureFvPatchScalarField::totalPressureFvPatchScalarField
 {
     if (dict.found("value"))
     {
-        fvPatchField<scalar>::operator=
+        fvPatchScalarField::operator=
         (
             scalarField("value", dict, p.size())
         );
     }
     else
     {
-        fvPatchField<scalar>::operator=(p0_);
+        fvPatchScalarField::operator=(p0_);
     }
 }
 
@@ -251,36 +251,6 @@ void Foam::totalPressureFvPatchScalarField::updateCoeffs(const vectorField& Up)
 void Foam::totalPressureFvPatchScalarField::updateCoeffs()
 {
     updateCoeffs(lookupPatchField<volVectorField, vector>(UName_));
-}
-
-
-Foam::tmp<Foam::scalarField>
-Foam::totalPressureFvPatchScalarField::snGrad() const
-{
-    return tmp<scalarField>
-    (
-        new scalarField(this->size(), 0.0)
-    );
-}
-
-
-Foam::tmp<Foam::scalarField>
-Foam::totalPressureFvPatchScalarField::gradientInternalCoeffs() const
-{
-    return tmp<scalarField>
-    (
-        new scalarField(this->size(), 0.0)
-    );
-}
-
-
-Foam::tmp<Foam::scalarField>
-Foam::totalPressureFvPatchScalarField::gradientBoundaryCoeffs() const
-{
-    return tmp<scalarField>
-    (
-        new scalarField(this->size(), 0.0)
-    );
 }
 
 
