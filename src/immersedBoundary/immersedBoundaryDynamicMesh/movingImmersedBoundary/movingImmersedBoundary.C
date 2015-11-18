@@ -90,9 +90,6 @@ void Foam::movingImmersedBoundary::movePoints() const
             U.boundaryField()[patchID]    
         );
 
-    // Set refValue_ to moving boundary velocity
-    ibPatchField.refValue() = 
-        transform(sbmfPtr_->velocity(), refIbSurface_.points());
 
     const immersedBoundaryPolyPatch& cibPatch =
         refCast<const immersedBoundaryPolyPatch>
@@ -103,6 +100,10 @@ void Foam::movingImmersedBoundary::movePoints() const
     // Get non-const reference to patch
     immersedBoundaryPolyPatch& ibPatch =
         const_cast<immersedBoundaryPolyPatch&>(cibPatch);
+
+    // Set refValue_ to moving boundary velocity
+    ibPatchField.refValue() = 
+        transform(sbmfPtr_->velocity(), ibPatch.ibMesh().coordinates());
 
     // Move points
     ibPatch.moveTriSurfacePoints
