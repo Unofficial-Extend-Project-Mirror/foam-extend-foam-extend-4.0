@@ -669,8 +669,8 @@ void Foam::immersedBoundaryFvPatch::makeIbFaces() const
         ibCellIndicator[ibc[ibcI]] = ibcI;
     }
 
-    DynamicList<label> ibF(2*ibc.size());
-    DynamicList<label> ibFC(2*ibc.size());
+    dynamicLabelList ibF(2*ibc.size());
+    dynamicLabelList ibFC(2*ibc.size());
     DynamicList<bool> ibFF(2*ibc.size());
 
     const unallocLabelList& owner = mesh_.owner();
@@ -2569,6 +2569,43 @@ const Foam::vectorField& Foam::immersedBoundaryFvPatch::triSf() const
 const Foam::vectorField& Foam::immersedBoundaryFvPatch::triCf() const
 {
     return ibMesh().faceCentres();
+}
+
+
+const Foam::dynamicLabelList&
+Foam::immersedBoundaryFvPatch::triFacesInMesh() const
+{
+    // Check if triFacesInMesh has been updated this time step
+    if(ibUpdateTimeIndex_ != mesh_.time().timeIndex())
+    {
+        const vectorField& triCf = this->triCf();
+
+        triFacesInMesh_.clear();
+        triFacesInMesh_.setCapacity(triCf.size()/2);
+    
+        // Find tri faces with centre inside the processor mesh
+        forAll(triCf, fI)
+        {
+            const vector curTriCf = triCf[fI];
+
+            if(!mesh_.bounds().containsInside(curTriCf))
+            {
+                // Face centre is not inside the mesh
+                continue;
+            }
+            else
+            {
+                if(mesh_.findCell(curTriCf) != -1)
+                {
+                    triFacesInMesh_.append(fI);
+                }
+            }
+        }
+
+        ibUpdateTimeIndex_ = mesh_.time().timeIndex();
+    }
+
+    return triFacesInMesh_;
 }
 
 
