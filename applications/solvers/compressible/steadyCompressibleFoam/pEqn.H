@@ -1,6 +1,15 @@
 {
     volScalarField rUA = 1.0/UEqn.A();
 
+<<<<<<< HEAD
+=======
+    surfaceScalarField psisf = fvc::interpolate(psis);
+    surfaceScalarField rhof = fvc::interpolate(rho);
+
+    // Needs to be outside of loop since p is changing, but psi and rho are not
+    surfaceScalarField rhoReff = rhof - psisf*fvc::interpolate(p);
+
+>>>>>>> 07efd81... Updated enthalpy equation
     for (int corr = 0; corr < nCorr; corr++)
     {
         U = rUA*UEqn.H();

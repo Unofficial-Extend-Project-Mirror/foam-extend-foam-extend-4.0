@@ -2,19 +2,19 @@
     dictionary fieldBounds = mesh.solutionDict().subDict("fieldBounds");
 
     // Pressure bounds
-    dimensionedScalar pMin("pMin", dimPressure, 0);
-    dimensionedScalar pMax("pMax", dimPressure, GREAT);
+    dimensionedScalar pMin("pMin", p.dimensions(), 0);
+    dimensionedScalar pMax("pMax", p.dimensions(), GREAT);
 
-    fieldBounds.lookup("p") >> pMin.value() >> pMax.value();
+    fieldBounds.lookup(p.name()) >> pMin.value() >> pMax.value();
 
     // Temperature bounds
-    dimensionedScalar TMin("TMin", dimTemperature, 0);
-    dimensionedScalar TMax("TMax", dimTemperature, GREAT);
+    dimensionedScalar TMin("TMin", T.dimensions(), 0);
+    dimensionedScalar TMax("TMax", T.dimensions(), GREAT);
 
-    fieldBounds.lookup("T") >> TMin.value() >> TMax.value();
+    fieldBounds.lookup(T.name()) >> TMin.value() >> TMax.value();
 
     // Velocity bound
-    dimensionedScalar UrelMax("UrelMax", dimVelocity, GREAT);
+    dimensionedScalar UrelMax("UrelMax", Urel.dimensions(), GREAT);
 
     fieldBounds.lookup(Urel.name()) >> UrelMax.value();
     dimensionedScalar smallUrel("smallUrel", dimVelocity, 1e-10);
