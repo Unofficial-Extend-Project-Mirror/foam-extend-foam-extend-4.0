@@ -4,7 +4,7 @@
     surfaceScalarField psisf = fvc::interpolate(psis);
     surfaceScalarField rhof = fvc::interpolate(rho);
 
-    // Needs to be outside of loop since p is changing, but psi and rho are not.
+    // Needs to be outside of loop since p is changing, but psi and rho are not
     surfaceScalarField rhoReff = rhof - psisf*fvc::interpolate(p);
 
     for (int corr = 0; corr < nCorr; corr++)
