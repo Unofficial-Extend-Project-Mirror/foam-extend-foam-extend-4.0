@@ -46,7 +46,7 @@ SourceFiles
 #include "OSspecific.H"
 #include <signal.h>
 
-#if defined(linux) || defined(linuxAMD64) || defined(linuxIA64)
+#if defined(linux) || defined(linuxAMD64) || defined(linuxIA64) || defined(linuxARM7)
 #    define LINUX
 #endif
 
