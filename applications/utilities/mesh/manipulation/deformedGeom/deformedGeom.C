@@ -30,40 +30,40 @@ Description
 
 \*---------------------------------------------------------------------------*/
 
-#include "argList.H"
-#include "fvMesh.H"
+#include "fvCFD.H"
 #include "pointFields.H"
 #include "IStringStream.H"
 #include "volPointInterpolation.H"
-
-using namespace Foam;
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 int main(int argc, char *argv[])
 {
+    timeSelector::addOptions();
+
+#   include "addRegionOption.H"
+
     argList::validArgs.append("scaling factor");
 
 #   include "setRootCase.H"
+#   include "createTime.H"
+#   include "createNamedMesh.H"
 
     scalar scaleFactor(readScalar(IStringStream(args.additionalArgs()[0])()));
 
-#   include "createTime.H"
-#   include "createMesh.H"
+    instantList timeDirs = timeSelector::select0(runTime, args);
 
     volPointInterpolation pInterp(mesh);
 
-    // Get times list
-    instantList Times = runTime.times();
-
     pointField zeroPoints(mesh.points());
 
-    // skip "constant" time
-    for (label timeI = 1; timeI < Times.size(); ++timeI)
+    forAll(timeDirs, timeI)
     {
-        runTime.setTime(Times[timeI], timeI);
+        runTime.setTime(timeDirs[timeI], timeI);
 
         Info<< "Time = " << runTime.timeName() << endl;
+
+        fvMesh::readUpdateState state = mesh.readUpdate();
 
         IOobject Uheader
         (
