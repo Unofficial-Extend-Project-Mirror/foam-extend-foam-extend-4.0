@@ -357,7 +357,7 @@ Foam::labelList Foam::undoableMeshCutter::getSplitFaces() const
             << abort(FatalError);
     }
 
-    DynamicList<label> liveSplitFaces(liveSplitCells_.size());
+    dynamicLabelList liveSplitFaces(liveSplitCells_.size());
 
     forAllConstIter(Map<splitCell*>, liveSplitCells_, iter)
     {

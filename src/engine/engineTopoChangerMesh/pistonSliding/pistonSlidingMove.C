@@ -477,7 +477,7 @@ bool Foam::pistonSliding::update()
 
 #        include "setValveMotionBoundaryConditionPistonSliding.H"
 
-        DynamicList<label> constrainedPoints(mSolver.curPoints()().size()/100);
+        dynamicLabelList constrainedPoints(mSolver.curPoints()().size()/100);
         DynamicList<vector> constrainedVelocity
         (
             mSolver.curPoints()().size()/100

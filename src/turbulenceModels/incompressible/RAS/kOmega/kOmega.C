@@ -55,7 +55,7 @@ kOmega::kOmega
 
     Cmu_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "betaStar",
             coeffDict_,
@@ -64,7 +64,7 @@ kOmega::kOmega
     ),
     beta_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "beta",
             coeffDict_,
@@ -73,7 +73,7 @@ kOmega::kOmega
     ),
     alpha_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "alpha",
             coeffDict_,
@@ -82,7 +82,7 @@ kOmega::kOmega
     ),
     alphaK_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "alphaK",
             coeffDict_,
@@ -91,7 +91,7 @@ kOmega::kOmega
     ),
     alphaOmega_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "alphaOmega",
             coeffDict_,

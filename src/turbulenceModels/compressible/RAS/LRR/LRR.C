@@ -56,7 +56,7 @@ LRR::LRR
 
     Cmu_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "Cmu",
             coeffDict_,
@@ -65,7 +65,7 @@ LRR::LRR
     ),
     Clrr1_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "Clrr1",
             coeffDict_,
@@ -74,7 +74,7 @@ LRR::LRR
     ),
     Clrr2_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "Clrr2",
             coeffDict_,
@@ -83,7 +83,7 @@ LRR::LRR
     ),
     C1_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "C1",
             coeffDict_,
@@ -92,7 +92,7 @@ LRR::LRR
     ),
     C2_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "C2",
             coeffDict_,
@@ -101,7 +101,7 @@ LRR::LRR
     ),
     Cs_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "Cs",
             coeffDict_,
@@ -110,7 +110,7 @@ LRR::LRR
     ),
     Ceps_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "Ceps",
             coeffDict_,
@@ -119,7 +119,7 @@ LRR::LRR
     ),
     couplingFactor_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "couplingFactor",
             coeffDict_,
@@ -128,7 +128,7 @@ LRR::LRR
     ),
     sigmaR_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "sigmaR",
             coeffDict_,
@@ -137,7 +137,7 @@ LRR::LRR
     ),
     sigmaEps_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "sigmaEps",
             coeffDict_,
@@ -146,7 +146,7 @@ LRR::LRR
     ),
     Prt_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "Prt",
             coeffDict_,

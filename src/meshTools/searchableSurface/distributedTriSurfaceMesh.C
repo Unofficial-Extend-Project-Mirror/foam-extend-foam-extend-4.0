@@ -113,8 +113,8 @@ bool Foam::distributedTriSurfaceMesh::isLocal
 //    const treeBoundBox& bb,
 //
 //    DynamicList<segment>& allSegments,
-//    DynamicList<label>& allSegmentMap,
-//    DynamicList<label> sendMap
+//    dynamicLabelList& allSegmentMap,
+//    dynamicLabelList sendMap
 //) const
 //{
 //    // Work points
@@ -174,8 +174,8 @@ void Foam::distributedTriSurfaceMesh::distributeSegment
     const point& end,
 
     DynamicList<segment>& allSegments,
-    DynamicList<label>& allSegmentMap,
-    List<DynamicList<label> >& sendMap
+    dynamicLabelList& allSegmentMap,
+    List<dynamicLabelList >& sendMap
 ) const
 {
     // Work points
@@ -271,9 +271,9 @@ Foam::distributedTriSurfaceMesh::distributeSegments
         // Segments to test
         DynamicList<segment> dynAllSegments(start.size());
         // Original index of segment
-        DynamicList<label> dynAllSegmentMap(start.size());
+        dynamicLabelList dynAllSegmentMap(start.size());
         // Per processor indices into allSegments to send
-        List<DynamicList<label> > dynSendMap(Pstream::nProcs());
+        List<dynamicLabelList > dynSendMap(Pstream::nProcs());
 
         forAll(start, segmentI)
         {
@@ -725,9 +725,9 @@ Foam::distributedTriSurfaceMesh::calcLocalQueries
         DynamicList<point> dynAllCentres(centres.size());
         DynamicList<scalar> dynAllRadiusSqr(centres.size());
         // Original index of segment
-        DynamicList<label> dynAllSegmentMap(centres.size());
+        dynamicLabelList dynAllSegmentMap(centres.size());
         // Per processor indices into allSegments to send
-        List<DynamicList<label> > dynSendMap(Pstream::nProcs());
+        List<dynamicLabelList > dynSendMap(Pstream::nProcs());
 
         // Work array - whether processor bb overlaps the bounding sphere.
         boolList procBbOverlaps(Pstream::nProcs());

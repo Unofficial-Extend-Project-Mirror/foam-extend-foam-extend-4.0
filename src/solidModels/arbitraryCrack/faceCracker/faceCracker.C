@@ -174,7 +174,7 @@ void Foam::faceCracker::setBreak
     if (debug)
     {
         // Check faces to break
-        DynamicList<label> bouFacesInZone(facesToBreak.size());
+        dynamicLabelList bouFacesInZone(facesToBreak.size());
 
         forAll (facesToBreak, faceI)
         {
@@ -185,7 +185,7 @@ void Foam::faceCracker::setBreak
         }
 
 //         // Check faces to open
-//         DynamicList<label> facesNotOnCrack(facesToOpen.size());
+//         dynamicLabelList facesNotOnCrack(facesToOpen.size());
 
 //         forAll (facesToOpen, faceI)
 //         {

@@ -111,12 +111,18 @@ Foam::immersedBoundaryForces::calcForcesMoment() const
                         fD.boundaryField()[patchI]
                     );
 
-                // Get face area vectors for triangles
+                // Get ibPatch data on the whole surface mesh
+                const tmp<vectorField> fDTriF = fDpatch.triValue();
+                const vectorField& triCf = ibPatch.triCf();
                 const vectorField& Sfb = ibPatch.triSf();
-                scalarField sA = mag(Sfb);
+
+                // Get triangular surface area vectors
+                const tmp<vectorField> tSfbTriFInM = ibPatch.renumberField(Sfb);
+                const vectorField& SfbTriFInM = tSfbTriFInM();
+                const scalarField sA = mag(SfbTriFInM);
 
                 // Calculate distance for triangles
-                vectorField Md = ibPatch.triCf() - CofR_;
+                vectorField Md = ibPatch.renumberField(triCf) - CofR_;
 
                 // Old treatment:
                 // Normal force =
@@ -133,13 +139,15 @@ Foam::immersedBoundaryForces::calcForcesMoment() const
 
                 // New treatment: normal force calculated on triangles
                 // Damir Rigler, 30/Apr/2014
-                vectorField fN = Sfb/sA*(Sfb & fDpatch.triValue());
+                vectorField fN =
+                    SfbTriFInM/sA*
+                    (SfbTriFInM & ibPatch.renumberField(fDTriF()));
 
                 fm.first().first() += sum(fN);
                 fm.second().first() += sum(Md ^ fN);
 
                 // Tangential force (total force minus normal fN)
-                vectorField fT = sA*fDpatch.triValue() - fN;
+                vectorField fT = sA*ibPatch.renumberField(fDTriF()) - fN;
 
                 fm.first().second() += sum(fT);
                 fm.second().second() += sum(Md ^ fT);
@@ -171,28 +179,31 @@ Foam::immersedBoundaryForces::calcForcesMoment() const
             {
                 // Found immersed boundary patch and field.
                 // Cast into immersed boundary type
-                const immersedBoundaryFvPatch& ibPatch =
-                    refCast<const immersedBoundaryFvPatch>
-                    (
-                        mesh.boundary()[patchI]
-                    );
-
-                const immersedBoundaryFvPatchScalarField pPatch =
+                const immersedBoundaryFvPatchScalarField& pPatch =
                     refCast<const immersedBoundaryFvPatchScalarField>
                     (
                         p.boundaryField()[patchI]
                     );
 
-                // Get face area vectors for triangles
+                const immersedBoundaryFvPatch& ibPatch = pPatch.ibPatch();
+
+                // Get ibPatch data on the whole surface mesh
+                const tmp<scalarField> pTriF = pPatch.triValue();
+                const vectorField& triCf = ibPatch.triCf();
                 const vectorField& Sfb = ibPatch.triSf();
-                scalarField sA = mag(Sfb);
+
+                // Get triangular surface area vectors
+                const tmp<vectorField> tSfbTriFInM = ibPatch.renumberField(Sfb);
+                const vectorField& SfbTriFInM = tSfbTriFInM();
+                const scalarField sA = mag(SfbTriFInM);
 
                 // Calculate distance for triangles
-                vectorField Md = ibPatch.triCf() - CofR_;
+                vectorField Md = ibPatch.renumberField(triCf) - CofR_;
 
                 // Pressure force is an integral of interpolated pressure
                 // on triangular faces
-                vectorField pf = Sfb*(pPatch.triValue() - pRef);
+                vectorField pf =
+                    SfbTriFInM*(ibPatch.renumberField(pTriF()) - pRef);
 
                 fm.first().first() += rho(p)*sum(pf);
                 fm.second().first() += rho(p)*sum(Md ^ pf);
@@ -211,8 +222,7 @@ Foam::immersedBoundaryForces::calcForcesMoment() const
                     // shear stress
                     const
                     immersedBoundaryVelocityWallFunctionFvPatchVectorField&
-                        UPatch =
-                        refCast
+                        UPatch = refCast
                         <
                             const
                             immersedBoundaryVelocityWallFunctionFvPatchVectorField
@@ -221,10 +231,15 @@ Foam::immersedBoundaryForces::calcForcesMoment() const
                             U.boundaryField()[patchI]
                         );
 
+                    // Integrate wall shear stress on triangular faces and get
+                    // the part inside the mesh
+                    const tmp<vectorField> wallShearStress =
+                        ibPatch.toTriFaces(UPatch.wallShearStress());
+
                     // Shear force is obtained from velocity wall functions
                     // and integrated on triangular faces
                     vectorField vf =
-                        sA*ibPatch.toTriFaces(UPatch.wallShearStress());
+                        sA*ibPatch.renumberField(wallShearStress());
 
                     fm.first().second() += sum(vf);
                     fm.second().second() += sum(Md ^ vf);
@@ -257,8 +272,12 @@ Foam::immersedBoundaryForces::calcForcesMoment() const
 
                         dimensionedScalar nu(transportProperties.lookup("nu"));
 
+                        // Integrate wall shear stress on triangular
+                        // faces and get the part inside the mesh
+                        const tmp<vectorField> grad = UPatch.triGrad();
+
                         vectorField vf =
-                            sA*rho(p)*nu.value()*UPatch.triGrad();
+                            sA*rho(p)*nu.value()*ibPatch.renumberField(grad());
 
                         fm.first().second() += sum(vf);
                         fm.second().second() += sum(Md ^ vf);

@@ -78,7 +78,7 @@ class cellFeatures
         mutable faceList* facesPtr_;
 
         //- New to old face mapping
-        mutable List<DynamicList<label> > faceMap_;
+        mutable List<dynamicLabelList > faceMap_;
 
 
     // Private Member Functions
@@ -148,7 +148,7 @@ public:
             }
 
             //- New to old faceMap. Guaranteed to be shrunk.
-            const List<DynamicList<label> >& faceMap() const
+            const List<dynamicLabelList >& faceMap() const
             {
                 if (!facesPtr_)
                 {

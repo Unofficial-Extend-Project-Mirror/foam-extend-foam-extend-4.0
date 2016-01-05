@@ -161,8 +161,8 @@ class globalPoints
             const primitivePatch&,
             const label patchPointI,
             const procPointList&,
-            DynamicList<label>& patchFaces,
-            DynamicList<label>& indexInFace,
+            dynamicLabelList& patchFaces,
+            dynamicLabelList& indexInFace,
             DynamicList<procPointList>& allInfo
         );
 

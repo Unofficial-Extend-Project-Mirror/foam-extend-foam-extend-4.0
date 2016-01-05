@@ -186,10 +186,10 @@ void Foam::noEngineMesh::addZonesAndModifiers()
 
 
         // Points which don't move (= cylinder head)
-        DynamicList<label> headPoints(nPoints() / 10);
+        dynamicLabelList headPoints(nPoints() / 10);
 
         // Points below the piston which moves with the piston displacement
-        DynamicList<label> pistonPoints(nPoints() / 10);
+        dynamicLabelList pistonPoints(nPoints() / 10);
 
         label nHeadPoints = 0;
 
@@ -263,10 +263,10 @@ void Foam::noEngineMesh::addZonesAndModifiers()
             max(boundary()[pistonPatchID].patch().localPoints()).z();
 
         // Points which don't move (= cylinder head)
-        DynamicList<label> headPoints(nPoints() / 10);
+        dynamicLabelList headPoints(nPoints() / 10);
 
         // Points below the piston which moves with the piston displacement
-        DynamicList<label> pistonPoints(nPoints() / 10);
+        dynamicLabelList pistonPoints(nPoints() / 10);
 
         label nHeadPoints = 0;
 

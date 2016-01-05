@@ -46,6 +46,26 @@ namespace solidBodyMotionFunctions
 };
 
 
+// * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
+
+Foam::scalar Foam::solidBodyMotionFunctions::translation::rampFactor() const
+{
+    if (rampTime_ > 0)
+    {
+        // Calculate ramp-up factor
+        const scalar t = time_.value();
+
+        return sin(2*pi/(4*rampTime_)*Foam::min(rampTime_, t));
+    }
+    else
+    {
+        return 1;
+    }
+}
+
+
+
+
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 Foam::solidBodyMotionFunctions::translation::translation
@@ -55,7 +75,8 @@ Foam::solidBodyMotionFunctions::translation::translation
 )
 :
     solidBodyMotionFunction(SBMFCoeffs, runTime),
-    velocity_(SBMFCoeffs_.lookup("velocity"))
+    velocity_(SBMFCoeffs_.lookup("velocity")),
+    rampTime_(readScalar(SBMFCoeffs_.lookup("rampTime")))
 {}
 
 
@@ -72,10 +93,12 @@ Foam::solidBodyMotionFunctions::translation::transformation() const
 {
     scalar time = time_.value();
 
-    septernion TR(velocity_*time, quaternion::I);
+    septernion TR(rampFactor()*velocity_*time, quaternion::I);
 
     Info<< "solidBodyMotionFunctions::translation::transformation(): "
-        << "Time = " << time << " transformation: " << TR << endl;
+        << "Time = " << time << " velocity = " << rampFactor()*velocity_
+        << " transformation = " << TR
+        << endl;
 
     return TR;
 }
@@ -86,7 +109,7 @@ Foam::solidBodyMotionFunctions::translation::velocity() const
 {
     scalar time = time_.value();
 
-    septernion TV(velocity_, quaternion::zero);
+    septernion TV(rampFactor()*velocity_, quaternion::zero);
 
     Info<< "solidBodyMotionFunctions::translation::transformation(): "
         << "Time = " << time << " velocity: " << TV << endl;
@@ -102,7 +125,7 @@ bool Foam::solidBodyMotionFunctions::translation::read
 {
     solidBodyMotionFunction::read(SBMFCoeffs);
 
-    SBMFCoeffs_.lookup("velocity") >> velocity_;
+    rampTime_ = readScalar(SBMFCoeffs_.lookup("rampTime"));
 
     return true;
 }

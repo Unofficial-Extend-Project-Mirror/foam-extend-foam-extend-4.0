@@ -75,8 +75,8 @@ void Foam::enrichedPatch::calcCutFaces() const
 
     // Prepare the storage
     DynamicList<face> cf(2*lf.size());
-    DynamicList<label> cfMaster(2*lf.size());
-    DynamicList<label> cfSlave(2*lf.size());
+    dynamicLabelList cfMaster(2*lf.size());
+    dynamicLabelList cfSlave(2*lf.size());
 
     // Algorithm
     // Go through all the faces
@@ -184,8 +184,8 @@ void Foam::enrichedPatch::calcCutFaces() const
 //             Pout << "Trying new edge (" << mp[curEdge.start()] << ", " << mp[curEdge.end()] << ") seed: " << curEdge << " used: " << edgesUsedTwice.found(curEdge) << endl;
 
             // Estimate the size of cut face as twice the size of original face
-            DynamicList<label> cutFaceGlobalPoints(2*curLocalFace.size());
-            DynamicList<label> cutFaceLocalPoints(2*curLocalFace.size());
+            dynamicLabelList cutFaceGlobalPoints(2*curLocalFace.size());
+            dynamicLabelList cutFaceLocalPoints(2*curLocalFace.size());
 
             // Found unused edge.
             label prevPointLabel = curEdge.start();

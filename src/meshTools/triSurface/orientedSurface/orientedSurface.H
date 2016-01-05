@@ -46,7 +46,7 @@ namespace Foam
 // Forward declaration of classes
 
 /*---------------------------------------------------------------------------*\
-                           Class orientedSurface Declaration
+                       Class orientedSurface Declaration
 \*---------------------------------------------------------------------------*/
 
 class orientedSurface
@@ -148,8 +148,12 @@ public:
         //- Flip faces such that normals are consistent with point:
         //  orientOutside=true : point outside surface
         //  orientOutside=false : point inside surface
-        static bool orient(triSurface&, const point&, const bool orientOutside);
-
+        static bool orient
+        (
+            triSurface&,
+            const point&,
+            const bool orientOutside
+        );
 };
 
 

@@ -10,10 +10,9 @@
       + fvm::div(phi, h)
       - fvm::laplacian(turbulence->alphaEff(), h)
      ==
-        // Note: potential issue with reconstructed relative velocity.
-        // HJ, 12/Dec/2009
-//         fvc::div(faceU, p, "div(U,p)")
         fvc::div(faceU + mrfZones.fluxCorrection(), p, "div(U,p)")
+        // Note: div flux correction is zero so there is no need to
+        // carry it.  HJ, 4/Dec/2015
       - p*fvc::div(faceU)
         // Viscous heating: note sign (devRhoReff has a minus in it)
       - (turbulence->devRhoReff() && fvc::grad(U))
@@ -24,12 +23,7 @@
     eqnResidual = hEqn.solve().initialResidual();
     maxResidual = max(eqnResidual, maxResidual);
 
-    // Bound the enthalpy using TMin and TMax
-    volScalarField Cp = thermo.Cp();
-
-    h = Foam::min(h, TMax*Cp);
-    h = Foam::max(h, TMin*Cp);
-    h.correctBoundaryConditions();
-
+    // Bounding of enthalpy taken out
     thermo.correct();
+    psis = thermo.psi()/thermo.Cp()*thermo.Cv();
 }

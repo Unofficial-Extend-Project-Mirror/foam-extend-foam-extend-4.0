@@ -124,7 +124,7 @@ void Foam::CFCFaceToCellStencil::calcCellStencil(labelListList& globalCellFaces)
     // Determine faces of cellCells in global numbering
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    DynamicList<label> allGlobalFaces(100);
+    dynamicLabelList allGlobalFaces(100);
 
     globalCellFaces.setSize(mesh().nCells());
     forAll(globalCellFaces, cellI)

@@ -137,7 +137,7 @@ Group: 			Development/Tools
         --enable-mpirun-prefix-by-default \
         --enable-orterun-prefix-by-default \
         --enable-shared \
-	--disable-static \
+	    --disable-static \
         --disable-mpi-f77 \
         --disable-mpi-f90 \
         --disable-mpi-cxx \

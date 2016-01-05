@@ -287,20 +287,20 @@ evaluate()
 
     if
     (
-        Pstream::defaultCommsType() == Pstream::blocking
-     || Pstream::defaultCommsType() == Pstream::nonBlocking
+        Pstream::defaultComms() == Pstream::blocking
+     || Pstream::defaultComms() == Pstream::nonBlocking
     )
     {
         forAll(*this, patchi)
         {
             this->operator[](patchi).initEvaluate
             (
-                static_cast<Pstream::commsTypes>(Pstream::defaultCommsType())
+                Pstream::defaultComms()
             );
         }
 
         // Block for any outstanding requests
-        if (Pstream::defaultCommsType() == Pstream::nonBlocking)
+        if (Pstream::defaultComms() == Pstream::nonBlocking)
         {
             IPstream::waitRequests();
             OPstream::waitRequests();
@@ -310,11 +310,11 @@ evaluate()
         {
             this->operator[](patchi).evaluate
             (
-                static_cast<Pstream::commsTypes>(Pstream::defaultCommsType())
+                Pstream::defaultComms()
             );
         }
     }
-    else if (Pstream::defaultCommsType() == Pstream::scheduled)
+    else if (Pstream::defaultComms() == Pstream::scheduled)
     {
         const lduSchedule& patchSchedule =
             bmesh_.mesh().globalData().patchSchedule();
@@ -356,8 +356,8 @@ evaluateCoupled()
 
     if
     (
-        Pstream::defaultCommsType() == Pstream::blocking
-     || Pstream::defaultCommsType() == Pstream::nonBlocking
+        Pstream::defaultComms() == Pstream::blocking
+     || Pstream::defaultComms() == Pstream::nonBlocking
     )
     {
         forAll(*this, patchi)
@@ -366,16 +366,13 @@ evaluateCoupled()
             {
                 this->operator[](patchi).initEvaluate
                 (
-                    static_cast<Pstream::commsTypes>
-                    (
-                        Pstream::defaultCommsType()
-                    )
+                    Pstream::defaultComms()
                 );
             }
         }
 
         // Block for any outstanding requests
-        if (Pstream::defaultCommsType() == Pstream::nonBlocking)
+        if (Pstream::defaultComms() == Pstream::nonBlocking)
         {
             IPstream::waitRequests();
             OPstream::waitRequests();
@@ -387,15 +384,12 @@ evaluateCoupled()
             {
                 this->operator[](patchi).evaluate
                 (
-                    static_cast<Pstream::commsTypes>
-                    (
-                        Pstream::defaultCommsType()
-                    )
+                    Pstream::defaultComms()
                 );
             }
         }
     }
-    else if (Pstream::defaultCommsType() == Pstream::scheduled)
+    else if (Pstream::defaultComms() == Pstream::scheduled)
     {
         const lduSchedule& patchSchedule =
             bmesh_.mesh().globalData().patchSchedule();

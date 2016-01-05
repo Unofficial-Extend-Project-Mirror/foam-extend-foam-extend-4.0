@@ -45,9 +45,9 @@ namespace Foam
 void Foam::cloudSet::calcSamples
 (
     DynamicList<point>& samplingPts,
-    DynamicList<label>& samplingCells,
-    DynamicList<label>& samplingFaces,
-    DynamicList<label>& samplingSegments,
+    dynamicLabelList& samplingCells,
+    dynamicLabelList& samplingFaces,
+    dynamicLabelList& samplingSegments,
     DynamicList<scalar>& samplingCurveDist
 ) const
 {
@@ -71,9 +71,9 @@ void Foam::cloudSet::genSamples()
 {
     // Storage for sample points
     DynamicList<point> samplingPts;
-    DynamicList<label> samplingCells;
-    DynamicList<label> samplingFaces;
-    DynamicList<label> samplingSegments;
+    dynamicLabelList samplingCells;
+    dynamicLabelList samplingFaces;
+    dynamicLabelList samplingSegments;
     DynamicList<scalar> samplingCurveDist;
 
     calcSamples

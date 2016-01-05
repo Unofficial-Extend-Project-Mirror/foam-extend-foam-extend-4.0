@@ -144,7 +144,7 @@ bool Foam::fileFormats::STLsurfaceFormatCore::readBINARY
     zoneIds_.setSize(nTris);
 
     Map<label> lookup;
-    DynamicList<label> dynSizes;
+    dynamicLabelList dynSizes;
 
     label ptI = 0;
     label zoneI = -1;

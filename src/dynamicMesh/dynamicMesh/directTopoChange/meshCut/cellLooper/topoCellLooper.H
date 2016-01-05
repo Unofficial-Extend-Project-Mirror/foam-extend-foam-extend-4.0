@@ -139,7 +139,7 @@ class topoCellLooper
             const label fromEdgeI,
             const label fromVertI,
 
-            DynamicList<label>& loop,
+            dynamicLabelList& loop,
             DynamicList<scalar>& loopWeights
         ) const;
 

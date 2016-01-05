@@ -150,7 +150,7 @@ Foam::Map<Foam::label> Foam::meshRefinement::findEdgeConnectedProblemCells
     // 1. Collect faces to test
     // ~~~~~~~~~~~~~~~~~~~~~~~~
 
-    DynamicList<label> candidateFaces(pp.size()/20);
+    dynamicLabelList candidateFaces(pp.size()/20);
 
     const labelListList& edgeFaces = pp.edgeFaces();
 
@@ -612,8 +612,8 @@ Foam::labelList Foam::meshRefinement::markFacesOnProblemCells
     labelHashSet nonBoundaryAnchors(mesh_.nCells()/10000);
 
     // On-the-fly addressing storage.
-    DynamicList<label> dynFEdges;
-    DynamicList<label> dynCPoints;
+    dynamicLabelList dynFEdges;
+    dynamicLabelList dynCPoints;
 
     forAll(cellLevel, cellI)
     {
@@ -726,7 +726,7 @@ Foam::labelList Foam::meshRefinement::markFacesOnProblemCells
     // with 7 anchor points on the boundary set those cell's non-boundary faces
     // to baffles
 
-    DynamicList<label> dynPCells;
+    dynamicLabelList dynPCells;
 
     forAllConstIter(labelHashSet, nonBoundaryAnchors, iter)
     {

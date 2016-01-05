@@ -42,7 +42,7 @@ namespace Foam
 class fvMesh;
 
 /*---------------------------------------------------------------------------*\
-                           Class interpolationCell Declaration
+                      Class interpolationCell Declaration
 \*---------------------------------------------------------------------------*/
 
 template<class Type>

@@ -38,7 +38,7 @@ SourceFiles
 #define edgeCollapser_H
 
 #include "labelList.H"
-#include "DynamicList.H"
+#include "dynamicLabelList.H"
 #include "typeInfo.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -67,7 +67,7 @@ class edgeCollapser
         labelList pointRegion_;
 
         //- -1 or master vertex for region number
-        DynamicList<label> pointRegionMaster_;
+        dynamicLabelList pointRegionMaster_;
 
         //- Stack of free region numbers. Corresponds to -1 in pointRegionMaster
         SLList<label> freeRegions_;
@@ -139,7 +139,7 @@ public:
 
             //- For every region the master (i.e. the point the region will
             //  be replaced by)
-            const DynamicList<label>& pointRegionMaster() const
+            const dynamicLabelList& pointRegionMaster() const
             {
                 return pointRegionMaster_;
             }

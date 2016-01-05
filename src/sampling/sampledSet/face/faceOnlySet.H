@@ -73,8 +73,8 @@ class faceOnlySet
         (
             Particle<passiveParticle>& singleParticle,
             DynamicList<point>& samplingPts,
-            DynamicList<label>& samplingCells,
-            DynamicList<label>& samplingFaces,
+            dynamicLabelList& samplingCells,
+            dynamicLabelList& samplingFaces,
             DynamicList<scalar>& samplingCurve
         ) const;
 
@@ -83,9 +83,9 @@ class faceOnlySet
         void calcSamples
         (
             DynamicList<point>& samplingPts,
-            DynamicList<label>& samplingCells,
-            DynamicList<label>& samplingFaces,
-            DynamicList<label>& samplingSegments,
+            dynamicLabelList& samplingCells,
+            dynamicLabelList& samplingFaces,
+            dynamicLabelList& samplingSegments,
             DynamicList<scalar>& samplingCurveDist
         ) const;
 

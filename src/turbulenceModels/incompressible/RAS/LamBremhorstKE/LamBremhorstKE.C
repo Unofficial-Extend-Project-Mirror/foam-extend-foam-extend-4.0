@@ -55,7 +55,7 @@ LamBremhorstKE::LamBremhorstKE
 
     Cmu_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "Cmu",
             coeffDict_,
@@ -64,7 +64,7 @@ LamBremhorstKE::LamBremhorstKE
     ),
     C1_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "C1",
             coeffDict_,
@@ -73,7 +73,7 @@ LamBremhorstKE::LamBremhorstKE
     ),
     C2_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "C2",
             coeffDict_,
@@ -82,7 +82,7 @@ LamBremhorstKE::LamBremhorstKE
     ),
     sigmaEps_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "alphaEps",
             coeffDict_,

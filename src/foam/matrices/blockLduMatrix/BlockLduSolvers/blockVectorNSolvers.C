@@ -132,12 +132,12 @@ makeBlockSolverTypeName(block##Type##GMRESSolver);                            \
 addSolverToBlockMatrix(Type, block##Type##GMRESSolver, symMatrix);            \
 addSolverToBlockMatrix(Type, block##Type##GMRESSolver, asymMatrix);           \
                                                                               \
-typedef BlockMatrixCoarsening<type > block##Type##MatrixCoarsening;                         \
-defineNamedTemplateTypeNameAndDebug(block##Type##MatrixCoarsening, 0);               \
-defineTemplateRunTimeSelectionTable(block##Type##MatrixCoarsening, matrix);          \
+typedef BlockMatrixCoarsening<type > block##Type##MatrixCoarsening;           \
+defineNamedTemplateTypeNameAndDebug(block##Type##MatrixCoarsening, 0);        \
+defineTemplateRunTimeSelectionTable(block##Type##MatrixCoarsening, matrix);   \
                                                                               \
-typedef BlockMatrixAgglomeration<type > block##Type##MatrixAgglomeration;                       \
-makeBlockMatrixCoarsening(block##Type##MatrixCoarsening, block##Type##MatrixAgglomeration);          \
+typedef BlockMatrixAgglomeration<type > block##Type##MatrixAgglomeration;     \
+makeBlockMatrixCoarsening(block##Type##MatrixCoarsening, block##Type##MatrixAgglomeration); \
                                                                               \
 typedef BlockCoeffNorm<type > block##Type##CoeffNorm;                         \
 defineNamedTemplateTypeNameAndDebug(block##Type##CoeffNorm, 0);               \

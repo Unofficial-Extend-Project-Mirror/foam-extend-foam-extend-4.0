@@ -514,6 +514,19 @@ void checkMethod
     const char*
 );
 
+//- Relax and return a copy of the matrix giver relaxation factor
+template<class Type>
+tmp<fvMatrix<Type> > relax
+(
+    const fvMatrix<Type>&,
+    const scalar
+);
+
+
+//- Relax and return a copy of the matrix
+template<class Type>
+tmp<fvMatrix<Type> > relax(const fvMatrix<Type>&);
+
 
 //- Solve returning the solution statistics given convergence tolerance
 //  Use the given solver controls

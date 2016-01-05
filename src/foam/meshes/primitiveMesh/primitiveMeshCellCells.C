@@ -75,7 +75,7 @@ void Foam::primitiveMesh::calcCellCells() const
 
 
 
-        // 2. Size and fill cellFaceAddr
+        // 2. Size and fill cellCellAddr
 
         forAll (cellCellAddr, cellI)
         {
@@ -111,7 +111,7 @@ const Foam::labelListList& Foam::primitiveMesh::cellCells() const
 const Foam::labelList& Foam::primitiveMesh::cellCells
 (
     const label cellI,
-    DynamicList<label>& storage
+    dynamicLabelList& storage
 ) const
 {
     if (hasCellCells())

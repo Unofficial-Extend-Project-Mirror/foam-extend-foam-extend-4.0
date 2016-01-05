@@ -437,7 +437,7 @@ bool Foam::engineValveSliding::update()
 
 #        include "setMotionBoundaryConditionEngineValveSliding.H"
 
-        DynamicList<label> constrainedPoints(mSolver.curPoints()().size()/100);
+        dynamicLabelList constrainedPoints(mSolver.curPoints()().size()/100);
         DynamicList<vector> constrainedVelocity
         (
             mSolver.curPoints()().size()/100

@@ -339,7 +339,7 @@ void Foam::removeFaces::mergeFaces
     }
 
 
-    DynamicList<label> faceVerts(edgeLoop.size());
+    dynamicLabelList faceVerts(edgeLoop.size());
 
     forAll(edgeLoop, i)
     {
@@ -740,7 +740,7 @@ Foam::label Foam::removeFaces::compatibleRemoves
     }
 
     // Recreate facesToRemove to be consistent with the cellRegions.
-    DynamicList<label> allFacesToRemove(facesToRemove.size());
+    dynamicLabelList allFacesToRemove(facesToRemove.size());
 
     for (label faceI = 0; faceI < mesh_.nInternalFaces(); faceI++)
     {

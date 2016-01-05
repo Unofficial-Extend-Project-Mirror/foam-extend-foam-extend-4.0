@@ -108,7 +108,8 @@ public:
 
         // Search
 
-            //- Get type (inside,outside,mixed,unknown) of point w.r.t. surface.
+            //- Get type (inside, outside, mixed, unknown) of point
+            //  with respect to a surface.
             //  Only makes sense for closed surfaces.
             label getVolumeType
             (

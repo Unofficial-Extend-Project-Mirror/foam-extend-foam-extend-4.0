@@ -74,7 +74,7 @@ private:
         (
             const labelList& map,
             const labelList& lst,
-            DynamicList<label>&
+            dynamicLabelList&
         );
 
         //- Index of patch in allPatches. Add if nonexisting.
@@ -139,7 +139,7 @@ private:
             const labelList& masterToCutPoints,
             const face& masterFace,
 
-            DynamicList<label>& workFace,
+            dynamicLabelList& workFace,
             face& f
         );
 
@@ -180,7 +180,7 @@ private:
 
             DynamicList<word>& zoneNames,
             labelList& from1ToAll,
-            List<DynamicList<label> >& pzPoints
+            List<dynamicLabelList >& pzPoints
         );
 
         //- Merge face zones
@@ -193,7 +193,7 @@ private:
 
             DynamicList<word>& zoneNames,
             labelList& from1ToAll,
-            List<DynamicList<label> >& fzFaces,
+            List<dynamicLabelList >& fzFaces,
             List<DynamicList<bool> >& fzFlips
         );
 
@@ -206,7 +206,7 @@ private:
 
             DynamicList<word>& zoneNames,
             labelList& from1ToAll,
-            List<DynamicList<label> >& czCells
+            List<dynamicLabelList >& czCells
         );
 
         //- Merge point/face/cell zone information
@@ -221,28 +221,28 @@ private:
             const labelList& from1ToAllCells,
 
             DynamicList<word>& pointZoneNames,
-            List<DynamicList<label> >& pzPoints,
+            List<dynamicLabelList >& pzPoints,
 
             DynamicList<word>& faceZoneNames,
-            List<DynamicList<label> >& fzFaces,
+            List<dynamicLabelList >& fzFaces,
             List<DynamicList<bool> >& fzFlips,
 
             DynamicList<word>& cellZoneNames,
-            List<DynamicList<label> >& czCells
+            List<dynamicLabelList >& czCells
         );
 
         //- Create new zones and add to new mesh.
         static void addZones
         (
             const DynamicList<word>& pointZoneNames,
-            const List<DynamicList<label> >& pzPoints,
+            const List<dynamicLabelList >& pzPoints,
 
             const DynamicList<word>& faceZoneNames,
-            const List<DynamicList<label> >& fzFaces,
+            const List<dynamicLabelList >& fzFaces,
             const List<DynamicList<bool> >& fzFlips,
 
             const DynamicList<word>& cellZoneNames,
-            const List<DynamicList<label> >& czCells,
+            const List<dynamicLabelList >& czCells,
 
             polyMesh& mesh
         );

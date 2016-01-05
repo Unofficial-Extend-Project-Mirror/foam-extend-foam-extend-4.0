@@ -78,10 +78,10 @@ Type interpolationCellPointFace<Type>::interpolate
         vector projection = position - cellCentre;
         tetPoints[3] = cellCentre;
 
-        // *********************************************************************
+        // ********************************************************************
         // project the cell-center through the point onto the face
         // and get the closest face, ...
-        // *********************************************************************
+        // ********************************************************************
 
         bool foundTet = false;
         label closestFace = -1;
@@ -99,7 +99,8 @@ Type interpolationCellPointFace<Type>::interpolate
             scalar multiplierNumerator = (faceCentreTmp - cellCentre) & normal;
             scalar multiplierDenominator = projection & normal;
 
-            // if normal and projection are not orthogonal this could be the one...
+            // if normal and projection are not orthogonal this could be
+            // the one...
             if (mag(multiplierDenominator) > SMALL)
             {
                 scalar multiplier = multiplierNumerator/multiplierDenominator;
@@ -114,11 +115,11 @@ Type interpolationCellPointFace<Type>::interpolate
             }
         }
 
-        // *********************************************************************
+        // ********************************************************************
         // find the tetrahedron containing 'position'
         // from the cell center, face center and
         // two other points on the face
-        // *********************************************************************
+        // ********************************************************************
 
         minDistance = GREAT;
         if (closestFace != -1)
@@ -153,9 +154,9 @@ Type interpolationCellPointFace<Type>::interpolate
             }
         }
 
-        // *********************************************************************
+        // ********************************************************************
         // if the search failed check all the cell-faces
-        // *********************************************************************
+        // ********************************************************************
 
         if (!foundTet)
         {
@@ -200,10 +201,10 @@ Type interpolationCellPointFace<Type>::interpolate
             }
         }
 
-        // *********************************************************************
+        // ********************************************************************
         // if the tet was found do the interpolation,
         // otherwise use the closest face value
-        // *********************************************************************
+        // ********************************************************************
 
         if (foundTet)
         {
@@ -218,14 +219,18 @@ Type interpolationCellPointFace<Type>::interpolate
             }
             else
             {
-                label patchi = this->pMesh_.boundaryMesh().whichPatch(closestFace);
+                label patchi =
+                    this->pMesh_.boundaryMesh().whichPatch(closestFace);
 
                 // If the boundary patch is not empty use the face value
                 // else use the cell value
                 if (this->psi_.boundaryField()[patchi].size())
                 {
                     ts[2] = this->psi_.boundaryField()[patchi]
-                        [this->pMesh_.boundaryMesh()[patchi].whichFace(closestFace)];
+                        [
+                            this->pMesh_.boundaryMesh()[patchi].
+                            whichFace(closestFace)
+                        ];
                 }
                 else
                 {
@@ -235,7 +240,7 @@ Type interpolationCellPointFace<Type>::interpolate
 
             ts[3] = this->psi_[nCell];
 
-            for (label n=0; n<4; n++)
+            for (label n = 0; n<4; n++)
             {
                 phi[n] = min(1.0, phi[n]);
                 phi[n] = max(0.0, phi[n]);
@@ -257,14 +262,18 @@ Type interpolationCellPointFace<Type>::interpolate
             }
             else
             {
-                label patchi = this->pMesh_.boundaryMesh().whichPatch(closestFace);
+                label patchi =
+                    this->pMesh_.boundaryMesh().whichPatch(closestFace);
 
                 // If the boundary patch is not empty use the face value
                 // else use the cell value
                 if (this->psi_.boundaryField()[patchi].size())
                 {
                     t = this->psi_.boundaryField()[patchi]
-                        [this->pMesh_.boundaryMesh()[patchi].whichFace(closestFace)];
+                        [
+                            this->pMesh_.boundaryMesh()[patchi].
+                            whichFace(closestFace)
+                        ];
                 }
                 else
                 {

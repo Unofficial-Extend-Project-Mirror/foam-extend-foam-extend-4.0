@@ -78,7 +78,7 @@ class Cloud
         mutable label particleCount_;
 
         //- Temporary storage for addressing. Used in findFaces.
-        mutable DynamicList<label> labels_;
+        mutable dynamicLabelList labels_;
 
 
     // Private member functions

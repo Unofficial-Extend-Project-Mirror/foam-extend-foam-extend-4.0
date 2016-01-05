@@ -52,17 +52,17 @@ int main(int argc, char *argv[])
     {
         Info<< "Time = " << runTime.timeName() << nl << endl;
 
-        #include "readSIMPLEControls.H"
-        #include "initConvergenceCheck.H"
+#       include "readSIMPLEControls.H"
+#       include "initConvergenceCheck.H"
 
         p.storePrevIter();
         rho.storePrevIter();
 
         // Pressure-velocity SIMPLE corrector
         {
-            #include "UEqn.H"
-            #include "hEqn.H"
-            #include "pEqn.H"
+#           include "UEqn.H"
+#           include "hEqn.H"
+#           include "pEqn.H"
         }
 
         turbulence->correct();

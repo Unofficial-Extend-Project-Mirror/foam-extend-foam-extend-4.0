@@ -80,6 +80,10 @@ void Foam::immersedBoundaryFvPatch::makeTriAddressing() const
     // Get addressing from the triangular patch
     const labelListList& pf = triPatch.pointFaces();
 
+    const dynamicLabelList& triFacesInMesh = this->triFacesInMesh();
+    label faceIndex = 0;
+    label counter = 0;
+
     forAll (triPatch, triI)
     {
         if (hitTris[triI] > -1)
@@ -150,6 +154,22 @@ void Foam::immersedBoundaryFvPatch::makeTriAddressing() const
             addr[triI] = ibPointsToUse.toc();
             w[triI].setSize(addr[triI].size());
 
+            // Raise counter if the face is inside the mesh and
+            // has no ib points in the neighbouring tri faces
+            if
+            (
+                (!triFacesInMesh.empty())
+             && (triI == triFacesInMesh[faceIndex])
+            )
+            {
+                faceIndex++;
+
+                if (addr[triI].size() == 0)
+                {
+                    counter++;
+                }
+            }
+
             labelList& curAddr = addr[triI];
             scalarList& curW = w[triI];
 
@@ -169,6 +189,20 @@ void Foam::immersedBoundaryFvPatch::makeTriAddressing() const
                 curW[ibI] /= sumW;
             }
         }
+    }
+
+    // Issue a warning if there are triangular faces inside the mesh without
+    // neighbouring faces containing ibPoints
+    if (counter > 0)
+    {
+        WarningIn
+        (
+            "immersedBoundaryFvPatch::makeTriAddressing() const"
+        )   << "Not all triangular faces have neighbours with ibPoints" << nl
+            << "Number of faces:" << counter << nl
+            << "This might cause false force calculation," << nl
+            << "consider coarsening the triangular mesh"
+            << endl;
     }
 }
 

@@ -44,7 +44,7 @@ Description
     invoke the correct List\<T\>::transfer(DynamicList\<T\>&) method.
 
     @code
-        DynamicList<label> dynLst;
+        dynamicLabelList dynLst;
         ...
         labelList plainLst( xferMoveTo<labelList>(dynLst) );
     @endcode
@@ -54,7 +54,7 @@ Description
     It would thus be simpler (and clearer) just to use the following code:
 
     @code
-        DynamicList<label> dynLst;
+        dynamicLabelList dynLst;
         ...
         labelList plainLst(dynLst.xfer());
     @endcode
@@ -183,7 +183,7 @@ inline Xfer<To> xferCopyTo(const From&);
  *
  * @par Example Use
  * @code
- *     DynamicList<label> dynLst;
+ *     dynamicLabelList dynLst;
  *     ...
  *     labelList plainLst( xferMoveTo<labelList>(dynLst) );
  * @endcode

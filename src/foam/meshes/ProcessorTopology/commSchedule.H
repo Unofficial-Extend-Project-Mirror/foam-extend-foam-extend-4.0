@@ -50,7 +50,7 @@ SourceFiles
 #ifndef commSchedule_H
 #define commSchedule_H
 
-#include "DynamicList.H"
+#include "dynamicLabelList.H"
 #include "labelPair.H"
 #include "labelList.H"
 
@@ -77,7 +77,7 @@ class commSchedule
 
         //- Count the number of outstanding communications for a single
         //  processor
-        label outstandingComms(const labelList&, DynamicList<label>&) const;
+        label outstandingComms(const labelList&, dynamicLabelList&) const;
 
 
 public:

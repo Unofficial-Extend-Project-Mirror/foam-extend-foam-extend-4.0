@@ -299,7 +299,7 @@ void Foam::singleCellFvMesh::agglomerateMesh
         {
             const cellZone& oldFz = mesh.cellZones()[zoneI];
 
-            DynamicList<label> newAddressing;
+            dynamicLabelList newAddressing;
 
             //Note: uncomment if you think it makes sense. Note that value
             // of cell0 is the average.
@@ -329,7 +329,7 @@ void Foam::singleCellFvMesh::agglomerateMesh
         {
             const faceZone& oldFz = mesh.faceZones()[zoneI];
 
-            DynamicList<label> newAddressing(oldFz.size());
+            dynamicLabelList newAddressing(oldFz.size());
             DynamicList<bool> newFlipMap(oldFz.size());
 
             forAll(oldFz, i)
@@ -365,7 +365,7 @@ void Foam::singleCellFvMesh::agglomerateMesh
         {
             const pointZone& oldFz = mesh.pointZones()[zoneI];
 
-            DynamicList<label> newAddressing(oldFz.size());
+            dynamicLabelList newAddressing(oldFz.size());
 
             forAll(oldFz, i)
             {

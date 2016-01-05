@@ -1,7 +1,7 @@
 {
     // Calculate density from pressure
     rho.storePrevIter();
-    rho = thermo.rho();
+    rho = thermo.rho()();
 
     // Bound rho
     volScalarField R = thermo.Cp() - thermo.Cv();

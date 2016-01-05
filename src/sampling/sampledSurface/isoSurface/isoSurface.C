@@ -1039,7 +1039,7 @@ Foam::triSurface Foam::isoSurface::stitchTriPoints
     {
         DynamicList<labelledTri> dynTris(nTris);
         label rawPointI = 0;
-        DynamicList<label> newToOldTri(nTris);
+        dynamicLabelList newToOldTri(nTris);
 
         for (label oldTriI = 0; oldTriI < nTris; oldTriI++)
         {
@@ -1075,7 +1075,7 @@ Foam::triSurface Foam::isoSurface::stitchTriPoints
         invertManyToMany(newPoints.size(), tris, pointFaces);
 
         // Filter out duplicates.
-        DynamicList<label> newToOldTri(tris.size());
+        dynamicLabelList newToOldTri(tris.size());
 
         forAll(tris, triI)
         {
@@ -1453,13 +1453,13 @@ void Foam::isoSurface::walkOrientation
 )
 {
     // Do walk for consistent orientation.
-    DynamicList<label> changedFaces(surf.size());
+    dynamicLabelList changedFaces(surf.size());
 
     changedFaces.append(seedTriI);
 
     while (changedFaces.size())
     {
-        DynamicList<label> newChangedFaces(changedFaces.size());
+        dynamicLabelList newChangedFaces(changedFaces.size());
 
         forAll(changedFaces, i)
         {
@@ -2001,7 +2001,7 @@ Foam::isoSurface::isoSurface
 
 
     DynamicList<point> triPoints(nCutCells_);
-    DynamicList<label> triMeshCells(nCutCells_);
+    dynamicLabelList triMeshCells(nCutCells_);
 
     generateTriPoints
     (

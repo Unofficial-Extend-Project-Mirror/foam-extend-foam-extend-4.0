@@ -19,11 +19,11 @@
 
             const vectorField& areas = Sf().internalField();
 
-            DynamicList<label> df;
+            dynamicLabelList df;
 
             {
                 label ndf = 0;
-                DynamicList<label> headList;
+                dynamicLabelList headList;
                 label nHead = 0;
 
                 const polyPatch& detachPatch =
@@ -119,12 +119,12 @@
 
             const vectorField& areas = Sf().internalField();
 
-            DynamicList<label> df;
+            dynamicLabelList df;
 
             {
                 label headFaces = 0;
                 label ndf = 0;
-                DynamicList<label> headList;
+                dynamicLabelList headList;
                 label nHead = 0;
 
                 const polyPatch& detachPatch =

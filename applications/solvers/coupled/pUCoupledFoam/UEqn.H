@@ -1,11 +1,11 @@
 // Momentum equation
-fvVectorMatrix UEqn
+tmp<fvVectorMatrix> UEqn
 (
     fvm::ddt(U)
   + fvm::div(phi, U)
   + turbulence->divDevReff(U)
 );
 
-UEqn.relax();
+UEqn().relax();
 
-UpEqn.insertEquation(0, UEqn);
+UpEqn.insertEquation(0, UEqn());

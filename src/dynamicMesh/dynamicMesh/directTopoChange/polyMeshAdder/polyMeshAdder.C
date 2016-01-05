@@ -43,7 +43,7 @@ void Foam::polyMeshAdder::append
 (
     const labelList& map,
     const labelList& lst,
-    DynamicList<label>& dynLst
+    dynamicLabelList& dynLst
 )
 {
     dynLst.setSize(dynLst.size() + lst.size());
@@ -427,7 +427,7 @@ void Foam::polyMeshAdder::insertVertices
     const labelList& masterToCutPoints,
     const face& masterF,
 
-    DynamicList<label>& workFace,
+    dynamicLabelList& workFace,
     face& allF
 )
 {
@@ -797,7 +797,7 @@ void Foam::polyMeshAdder::mergePrimitives
             masterCutFaces.insert(meshFaceI);
         }
 
-        DynamicList<label> workFace(100);
+        dynamicLabelList workFace(100);
 
         forAll(from0ToAllFaces, face0)
         {
@@ -896,7 +896,7 @@ void Foam::polyMeshAdder::mergePointZones
 
     DynamicList<word>& zoneNames,
     labelList& from1ToAll,
-    List<DynamicList<label> >& pzPoints
+    List<dynamicLabelList >& pzPoints
 )
 {
     zoneNames.setSize(pz0.size() + pz1.size());
@@ -917,7 +917,7 @@ void Foam::polyMeshAdder::mergePointZones
 
     forAll(pz0, zoneI)
     {
-        DynamicList<label>& newZone = pzPoints[zoneI];
+        dynamicLabelList& newZone = pzPoints[zoneI];
 
         newZone.setSize(pz0[zoneI].size());
 
@@ -928,7 +928,7 @@ void Foam::polyMeshAdder::mergePointZones
     forAll(pz1, zoneI)
     {
         // Relabel all points of zone and add to correct pzPoints.
-        DynamicList<label>& newZone = pzPoints[from1ToAll[zoneI]];
+        dynamicLabelList& newZone = pzPoints[from1ToAll[zoneI]];
 
         newZone.setSize(newZone.size() + pz1[zoneI].size());
 
@@ -951,7 +951,7 @@ void Foam::polyMeshAdder::mergeFaceZones
 
     DynamicList<word>& zoneNames,
     labelList& from1ToAll,
-    List<DynamicList<label> >& fzFaces,
+    List<dynamicLabelList >& fzFaces,
     List<DynamicList<bool> >& fzFlips
 )
 {
@@ -973,7 +973,7 @@ void Foam::polyMeshAdder::mergeFaceZones
     fzFlips.setSize(zoneNames.size());
     forAll(fz0, zoneI)
     {
-        DynamicList<label>& newZone = fzFaces[zoneI];
+        dynamicLabelList& newZone = fzFaces[zoneI];
         DynamicList<bool>& newFlip = fzFlips[zoneI];
 
         newZone.setSize(fz0[zoneI].size());
@@ -997,7 +997,7 @@ void Foam::polyMeshAdder::mergeFaceZones
     // Now we have full addressing for faces so do the faceZones of mesh1.
     forAll(fz1, zoneI)
     {
-        DynamicList<label>& newZone = fzFaces[from1ToAll[zoneI]];
+        dynamicLabelList& newZone = fzFaces[from1ToAll[zoneI]];
         DynamicList<bool>& newFlip = fzFlips[from1ToAll[zoneI]];
 
         newZone.setSize(newZone.size() + fz1[zoneI].size());
@@ -1034,7 +1034,7 @@ void Foam::polyMeshAdder::mergeCellZones
 
     DynamicList<word>& zoneNames,
     labelList& from1ToAll,
-    List<DynamicList<label> >& czCells
+    List<dynamicLabelList >& czCells
 )
 {
     zoneNames.setSize(cz0.size() + cz1.size());
@@ -1062,7 +1062,7 @@ void Foam::polyMeshAdder::mergeCellZones
     // Cell mapping is trivial.
     forAll(cz1, zoneI)
     {
-        DynamicList<label>& newZone = czCells[from1ToAll[zoneI]];
+        dynamicLabelList& newZone = czCells[from1ToAll[zoneI]];
 
         newZone.setSize(newZone.size() + cz1[zoneI].size());
 
@@ -1088,14 +1088,14 @@ void Foam::polyMeshAdder::mergeZones
     const labelList& from1ToAllCells,
 
     DynamicList<word>& pointZoneNames,
-    List<DynamicList<label> >& pzPoints,
+    List<dynamicLabelList >& pzPoints,
 
     DynamicList<word>& faceZoneNames,
-    List<DynamicList<label> >& fzFaces,
+    List<dynamicLabelList >& fzFaces,
     List<DynamicList<bool> >& fzFlips,
 
     DynamicList<word>& cellZoneNames,
-    List<DynamicList<label> >& czCells
+    List<dynamicLabelList >& czCells
 )
 {
     labelList from1ToAllPZones;
@@ -1142,14 +1142,14 @@ void Foam::polyMeshAdder::mergeZones
 void Foam::polyMeshAdder::addZones
 (
     const DynamicList<word>& pointZoneNames,
-    const List<DynamicList<label> >& pzPoints,
+    const List<dynamicLabelList >& pzPoints,
 
     const DynamicList<word>& faceZoneNames,
-    const List<DynamicList<label> >& fzFaces,
+    const List<dynamicLabelList >& fzFaces,
     const List<DynamicList<bool> >& fzFlips,
 
     const DynamicList<word>& cellZoneNames,
-    const List<DynamicList<label> >& czCells,
+    const List<dynamicLabelList >& czCells,
 
     polyMesh& mesh
 )
@@ -1295,14 +1295,14 @@ Foam::autoPtr<Foam::polyMesh> Foam::polyMeshAdder::add
     // ~~~~~
 
     DynamicList<word> pointZoneNames;
-    List<DynamicList<label> > pzPoints;
+    List<dynamicLabelList > pzPoints;
 
     DynamicList<word> faceZoneNames;
-    List<DynamicList<label> > fzFaces;
+    List<dynamicLabelList > fzFaces;
     List<DynamicList<bool> > fzFlips;
 
     DynamicList<word> cellZoneNames;
-    List<DynamicList<label> > czCells;
+    List<dynamicLabelList > czCells;
 
     mergeZones
     (
@@ -1508,14 +1508,14 @@ Foam::autoPtr<Foam::mapAddedPolyMesh> Foam::polyMeshAdder::add
     // ~~~~~
 
     DynamicList<word> pointZoneNames;
-    List<DynamicList<label> > pzPoints;
+    List<dynamicLabelList > pzPoints;
 
     DynamicList<word> faceZoneNames;
-    List<DynamicList<label> > fzFaces;
+    List<dynamicLabelList > fzFaces;
     List<DynamicList<bool> > fzFlips;
 
     DynamicList<word> cellZoneNames;
-    List<DynamicList<label> > czCells;
+    List<dynamicLabelList > czCells;
 
     mergeZones
     (

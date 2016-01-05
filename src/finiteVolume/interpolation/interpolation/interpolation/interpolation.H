@@ -47,7 +47,7 @@ namespace Foam
 class polyMesh;
 
 /*---------------------------------------------------------------------------*\
-                           Class interpolation Declaration
+                       Class interpolation Declaration
 \*---------------------------------------------------------------------------*/
 
 template<class Type>
@@ -143,22 +143,22 @@ public:
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-#define makeInterpolationType(SS, Type)                                        \
-                                                                               \
-defineNamedTemplateTypeNameAndDebug(SS<Type>, 0);                              \
-                                                                               \
-interpolation<Type>::adddictionaryConstructorToTable<SS<Type> >                \
+#define makeInterpolationType(SS, Type)                                       \
+                                                                              \
+defineNamedTemplateTypeNameAndDebug(SS<Type>, 0);                             \
+                                                                              \
+interpolation<Type>::adddictionaryConstructorToTable<SS<Type> >               \
     add##SS##Type##ConstructorToTable_;
 
 
-#define makeInterpolation(SS)                                                  \
-                                                                               \
-makeInterpolationType(SS, scalar)                                              \
-makeInterpolationType(SS, vector)                                              \
-makeInterpolationType(SS, sphericalTensor)                                     \
-makeInterpolationType(SS, symmTensor)                                          \
-makeInterpolationType(SS, symmTensor4thOrder)                                  \
-makeInterpolationType(SS, diagTensor)                                          \
+#define makeInterpolation(SS)                                                 \
+                                                                              \
+makeInterpolationType(SS, scalar)                                             \
+makeInterpolationType(SS, vector)                                             \
+makeInterpolationType(SS, sphericalTensor)                                    \
+makeInterpolationType(SS, symmTensor)                                         \
+makeInterpolationType(SS, symmTensor4thOrder)                                 \
+makeInterpolationType(SS, diagTensor)                                         \
 makeInterpolationType(SS, tensor)
 
 
