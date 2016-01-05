@@ -1,0 +1,2 @@
+c++DBUG     =
+c++OPT      = -O3 -floop-optimize -falign-loops -falign-labels -falign-functions -falign-jumps -fprefetch-loop-arrays -mcpu=cortex-a7 -mfpu=neon-vfpv4 -mfloat-abi=hard
