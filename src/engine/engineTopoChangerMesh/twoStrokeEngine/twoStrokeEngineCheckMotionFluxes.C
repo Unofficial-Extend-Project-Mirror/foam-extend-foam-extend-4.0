@@ -107,7 +107,7 @@ void Foam::twoStrokeEngine::checkMotionFluxes()
 
     sumMeshPhi /= V();
 
-    DynamicList<label> checkMeshPhi;
+    dynamicLabelList checkMeshPhi;
     label checkMeshPhiSize = 0;
 
     forAll(calculatedMeshPhi, i)

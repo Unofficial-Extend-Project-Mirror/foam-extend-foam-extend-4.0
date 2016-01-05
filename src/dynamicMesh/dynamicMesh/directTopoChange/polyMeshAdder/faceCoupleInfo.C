@@ -562,7 +562,7 @@ void Foam::faceCoupleInfo::setCutEdgeToPoints(const labelList& cutToMasterEdges)
             // String up the edges between e[0] and e[1]. Store the points
             // inbetween e[0] and e[1] (all in cutFaces() labels)
 
-            DynamicList<label> splitPoints(stringedEdges.size()-1);
+            dynamicLabelList splitPoints(stringedEdges.size()-1);
 
             // Unsplit edge endpoints
             const edge unsplitEdge
@@ -766,7 +766,7 @@ bool Foam::faceCoupleInfo::matchPointsThroughFaces
     // Compaction list for cut points: either -1 or index into master which
     // gives the point to compact to.
     labelList cutPointRegion(cutPoints.size(), -1);
-    DynamicList<label> cutPointRegionMaster;
+    dynamicLabelList cutPointRegionMaster;
 
     forAll(patchFaces, patchFaceI)
     {
@@ -1327,7 +1327,7 @@ Foam::label Foam::faceCoupleInfo::matchEdgeFaces
                         // the current set of master faces.
                         const labelList& masterFaces = fnd();
 
-                        DynamicList<label> newCandidates(masterFaces.size());
+                        dynamicLabelList newCandidates(masterFaces.size());
 
                         forAll(masterEFaces, j)
                         {

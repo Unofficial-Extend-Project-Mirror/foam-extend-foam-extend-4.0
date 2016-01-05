@@ -60,7 +60,7 @@ const Foam::point Foam::directTopoChange::greatPoint
 void Foam::directTopoChange::renumber
 (
     const labelList& map,
-    DynamicList<label>& elems
+    dynamicLabelList& elems
 )
 {
     forAll (elems, elemI)
@@ -77,7 +77,7 @@ void Foam::directTopoChange::renumber
 void Foam::directTopoChange::renumberReverseMap
 (
     const labelList& map,
-    DynamicList<label>& elems
+    dynamicLabelList& elems
 )
 {
     forAll (elems, elemI)

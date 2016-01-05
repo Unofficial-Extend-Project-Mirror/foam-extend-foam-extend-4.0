@@ -296,7 +296,7 @@ void Foam::DsmcCloud<ParcelType>::collisions()
     buildCellOccupancy();
 
     // Temporary storage for subCells
-    List<DynamicList<label> > subCells(8);
+    List<dynamicLabelList > subCells(8);
 
     scalar deltaT = mesh().time().deltaTValue();
 

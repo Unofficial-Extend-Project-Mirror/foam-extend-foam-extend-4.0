@@ -38,7 +38,7 @@ template<class ParticleType>
 void Foam::Particle<ParticleType>::findFaces
 (
     const vector& position,
-    DynamicList<label>& faceList
+    dynamicLabelList& faceList
 ) const
 {
     const polyMesh& mesh = cloud_.polyMesh_;
@@ -65,7 +65,7 @@ void Foam::Particle<ParticleType>::findFaces
     const vector& position,
     const label celli,
     const scalar stepFraction,
-    DynamicList<label>& faceList
+    dynamicLabelList& faceList
 ) const
 {
     const polyMesh& mesh = cloud_.pMesh();
@@ -235,7 +235,7 @@ Foam::scalar Foam::Particle<ParticleType>::trackToFace
 {
     const polyMesh& mesh = cloud_.polyMesh_;
 
-    DynamicList<label>& faces = cloud_.labels_;
+    dynamicLabelList& faces = cloud_.labels_;
     findFaces(endPosition, faces);
 
     facei_ = -1;

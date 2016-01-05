@@ -41,7 +41,7 @@ defineTypeNameAndDebug(Foam::commSchedule, 0);
 Foam::label Foam::commSchedule::outstandingComms
 (
     const labelList& commToSchedule,
-    DynamicList<label>& procComms
+    dynamicLabelList& procComms
 ) const
 {
     label nOutstanding = 0;
@@ -70,7 +70,7 @@ Foam::commSchedule::commSchedule
     procSchedule_(nProcs)
 {
     // Determine comms per processor.
-    List<DynamicList<label> > procToComms(nProcs);
+    List<dynamicLabelList > procToComms(nProcs);
 
     forAll(comms, commI)
     {

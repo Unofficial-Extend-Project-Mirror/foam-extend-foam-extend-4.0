@@ -327,7 +327,7 @@ Foam::immersedBoundaryFvPatch::renumberField
     const   Field<Type>& f
 ) const
 {
-    const DynamicList<label>& triFInM = this->triFacesInMesh();
+    const dynamicLabelList& triFInM = this->triFacesInMesh();
     
     tmp<Field<Type> > trf(new Field<Type>(triFInM.size()));
     Field<Type>& rf = trf();

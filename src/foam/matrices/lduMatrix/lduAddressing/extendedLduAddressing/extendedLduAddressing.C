@@ -150,7 +150,7 @@ void Foam::extendedLduAddressing::calcExtendedLowerUpper() const
     // Allocate dynamic lists for extended owner/neighbour, which are later
     // used to define ordinary labelLists (extendedLower, extendedUpper)
     // Helper type definition
-    typedef DynamicList<label> DynamicLabelList;
+    typedef dynamicLabelList DynamicLabelList;
 
     // Get the number of faces
     const label nFaces = upperAddr().size();

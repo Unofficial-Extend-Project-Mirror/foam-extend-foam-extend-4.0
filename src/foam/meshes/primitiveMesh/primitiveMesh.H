@@ -150,7 +150,7 @@ class primitiveMesh
         // On-the-fly edge addresing storage
 
             //- Temporary storage for addressing.
-            mutable DynamicList<label> labels_;
+            mutable dynamicLabelList labels_;
 
             //- Temporary storage for addressing
             mutable labelHashSet labelSet_;
@@ -214,7 +214,7 @@ class primitiveMesh
             //  return (after optional creation) edge between two points
             static label getEdge
             (
-                List<DynamicList<label> >&,
+                List<dynamicLabelList >&,
                 DynamicList<edge>&,
                 const label,
                 const label
@@ -687,7 +687,7 @@ public:
             const labelList& cellCells
             (
                 const label cellI,
-                DynamicList<label>&
+                dynamicLabelList&
             ) const;
 
             const labelList& cellCells(const label cellI) const;
@@ -696,7 +696,7 @@ public:
             const labelList& cellPoints
             (
                 const label cellI,
-                DynamicList<label>&
+                dynamicLabelList&
             ) const;
 
             const labelList& cellPoints(const label cellI) const;
@@ -705,7 +705,7 @@ public:
             const labelList& pointCells
             (
                 const label pointI,
-                DynamicList<label>&
+                dynamicLabelList&
             ) const;
 
             const labelList& pointCells(const label pointI) const;
@@ -714,7 +714,7 @@ public:
             const labelList& pointPoints
             (
                 const label pointI,
-                DynamicList<label>&
+                dynamicLabelList&
             ) const;
 
             const labelList& pointPoints(const label pointI) const;
@@ -723,7 +723,7 @@ public:
             const labelList& faceEdges
             (
                 const label faceI,
-                DynamicList<label>&
+                dynamicLabelList&
             ) const;
 
             const labelList& faceEdges(const label faceI) const;
@@ -732,7 +732,7 @@ public:
             const labelList& edgeFaces
             (
                 const label edgeI,
-                DynamicList<label>&
+                dynamicLabelList&
             ) const;
 
             const labelList& edgeFaces(const label edgeI) const;
@@ -741,7 +741,7 @@ public:
             const labelList& edgeCells
             (
                 const label edgeI,
-                DynamicList<label>&
+                dynamicLabelList&
             ) const;
 
             const labelList& edgeCells(const label edgeI) const;
@@ -750,7 +750,7 @@ public:
             const labelList& cellEdges
             (
                 const label cellI,
-                DynamicList<label>&
+                dynamicLabelList&
             ) const;
 
             const labelList& cellEdges(const label cellI) const;

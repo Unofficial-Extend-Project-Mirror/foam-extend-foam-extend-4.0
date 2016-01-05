@@ -40,6 +40,7 @@ Description
 namespace Foam
 {
     typedef DynamicList<label> dynamicLabelList;
+    typedef List<dynamicLabelList> dynamicLabelListList;
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

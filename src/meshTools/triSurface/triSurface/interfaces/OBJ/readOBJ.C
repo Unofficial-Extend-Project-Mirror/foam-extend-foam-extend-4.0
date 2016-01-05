@@ -101,7 +101,7 @@ bool triSurface::readOBJ(const fileName& OBJfileName)
         }
         else if (cmd == "f")
         {
-            DynamicList<label> verts;
+            dynamicLabelList verts;
 
             // Assume 'f' is followed by space.
             string::size_type endNum = 1;

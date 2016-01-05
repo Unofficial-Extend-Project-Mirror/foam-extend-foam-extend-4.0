@@ -72,6 +72,7 @@ SourceFiles
 #define refinementHistory_H
 
 #include "DynamicList.H"
+#include "dynamicLabelList.H"
 #include "labelList.H"
 #include "FixedList.H"
 #include "SLList.H"
@@ -182,7 +183,7 @@ private:
         DynamicList<splitCell8> splitCells_;
 
         //- Unused indices in splitCells
-        DynamicList<label> freeSplitCells_;
+        dynamicLabelList freeSplitCells_;
 
         //- Currently visible cells. Indices into splitCells.
         labelList visibleCells_;
@@ -271,7 +272,7 @@ public:
         }
 
         //- Cache of unused indices in splitCells
-        const DynamicList<label>& freeSplitCells() const
+        const dynamicLabelList& freeSplitCells() const
         {
             return freeSplitCells_;
         }

@@ -233,7 +233,7 @@ class isoSurfaceCell
             const labelList& snappedPoint,
 
             DynamicList<Type>& triPoints,
-            DynamicList<label>& triMeshCells
+            dynamicLabelList& triMeshCells
         ) const;
 
         triSurface stitchTriPoints

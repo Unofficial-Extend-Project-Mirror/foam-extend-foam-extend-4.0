@@ -62,11 +62,11 @@ bool Foam::fileFormats::NASsurfaceFormat<Face>::read
     }
 
     // Nastran index of points
-    DynamicList<label>  pointId;
+    dynamicLabelList  pointId;
     DynamicList<point>  dynPoints;
     DynamicList<Face>   dynFaces;
-    DynamicList<label>  dynZones;
-    DynamicList<label>  dynSizes;
+    dynamicLabelList  dynZones;
+    dynamicLabelList  dynSizes;
     Map<label>          lookup;
 
     // assume the types are not intermixed

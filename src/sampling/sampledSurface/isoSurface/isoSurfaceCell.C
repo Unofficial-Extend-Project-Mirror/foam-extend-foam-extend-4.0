@@ -840,7 +840,7 @@ Foam::triSurface Foam::isoSurfaceCell::stitchTriPoints
     {
         DynamicList<labelledTri> dynTris(nTris);
         label rawPointI = 0;
-        DynamicList<label> newToOldTri(nTris);
+        dynamicLabelList newToOldTri(nTris);
 
         for (label oldTriI = 0; oldTriI < nTris; oldTriI++)
         {
@@ -905,7 +905,7 @@ Foam::triSurface Foam::isoSurfaceCell::stitchTriPoints
         {
             // Filter out duplicates.
             label newTriI = 0;
-            DynamicList<label> newToOldTri(tris.size());
+            dynamicLabelList newToOldTri(tris.size());
             labelList newToMaster(mergedCentres.size(), -1);
             forAll(tris, triI)
             {
@@ -1121,13 +1121,13 @@ void Foam::isoSurfaceCell::walkOrientation
 )
 {
     // Do walk for consistent orientation.
-    DynamicList<label> changedFaces(surf.size());
+    dynamicLabelList changedFaces(surf.size());
 
     changedFaces.append(seedTriI);
 
     while (changedFaces.size())
     {
-        DynamicList<label> newChangedFaces(changedFaces.size());
+        dynamicLabelList newChangedFaces(changedFaces.size());
 
         forAll(changedFaces, i)
         {
@@ -1512,7 +1512,7 @@ Foam::isoSurfaceCell::isoSurfaceCell
 
 
     DynamicList<point> triPoints(nCutCells_);
-    DynamicList<label> triMeshCells(nCutCells_);
+    dynamicLabelList triMeshCells(nCutCells_);
 
     generateTriPoints
     (
@@ -1643,7 +1643,7 @@ Foam::isoSurfaceCell::isoSurfaceCell
 //    if (size())
 //    {
 //        DynamicList<labelledTri> newTris(size());
-//        DynamicList<label> newTriToCell(size());
+//        dynamicLabelList newTriToCell(size());
 //
 //        label startTriI = 0;
 //

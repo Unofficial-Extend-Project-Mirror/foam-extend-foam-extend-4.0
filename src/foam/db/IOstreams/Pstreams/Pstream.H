@@ -45,6 +45,7 @@ SourceFiles
 #include "HashTable.H"
 #include "foamString.H"
 #include "NamedEnum.H"
+#include "dynamicLabelList.H"
 #include "optimisationSwitch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -185,8 +186,8 @@ private:
         static void collectReceives
         (
             const label procID,
-            const List<DynamicList<label> >& receives,
-            DynamicList<label>& allReceives
+            const dynamicLabelListList& receives,
+            dynamicLabelList& allReceives
         );
 
         //- Initialize all communication schedules. Callback from

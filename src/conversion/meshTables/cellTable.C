@@ -446,7 +446,7 @@ void Foam::cellTable::addCellZones
 ) const
 {
     Map<label> typeToZone = zoneMap();
-    List<DynamicList<label> > zoneCells(size());
+    List<dynamicLabelList > zoneCells(size());
 
     forAll(tableIds, cellI)
     {

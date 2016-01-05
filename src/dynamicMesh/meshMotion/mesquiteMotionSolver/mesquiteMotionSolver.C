@@ -2398,12 +2398,12 @@ void mesquiteMotionSolver::initMesquiteParallelArrays()
 
     // Make a rough estimate for cellToNode
     Map<label> addedCells;
-    DynamicList<label> myCellToNode(50);
+    dynamicLabelList myCellToNode(50);
     labelList nSharedPoints(procIndices_.size(), 0);
     List<labelList> myFixFlags(procIndices_.size());
     List<labelList> neiFixFlags(procIndices_.size());
     List<labelList> neiTypes(procIndices_.size());
-    List<DynamicList<label> > myTypes(procIndices_.size());
+    List<dynamicLabelList > myTypes(procIndices_.size());
 
     const dictionary& optionsDict = subDict("mesquiteOptions");
 
@@ -4127,7 +4127,7 @@ void mesquiteMotionSolver::correctInvalidCells()
     // Obtain point-positions after smoothing
     pointField newField = refPoints_;
 
-    DynamicList<label> invCells(50);
+    dynamicLabelList invCells(50);
 
     forAll(pIDs_, patchI)
     {

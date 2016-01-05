@@ -209,7 +209,7 @@ void Foam::simpleTwoStroke::addZonesAndModifiers()
         nFaceZones++;
 
         // Points which don't move (= cylinder head)
-        DynamicList<label> headPoints(nPoints() / 10);
+        dynamicLabelList headPoints(nPoints() / 10);
 
         label nHeadPoints = 0;
         forAll (points(), pointI)

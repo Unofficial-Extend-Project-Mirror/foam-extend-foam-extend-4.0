@@ -657,8 +657,8 @@ Foam::List<Foam::labelPair> Foam::meshRefinement::filterDuplicateFaces
     }
 
 
-    DynamicList<label> fe0;
-    DynamicList<label> fe1;
+    dynamicLabelList fe0;
+    dynamicLabelList fe1;
 
 
     // Count number of duplicate boundary faces per edge
@@ -1914,7 +1914,7 @@ Foam::autoPtr<Foam::mapPolyMesh> Foam::meshRefinement::splitMesh
     // ~~~~~~
 
     // Get cells to remove
-    DynamicList<label> cellsToRemove(mesh_.nCells());
+    dynamicLabelList cellsToRemove(mesh_.nCells());
     forAll(cellRegion, cellI)
     {
         if (cellRegion[cellI] != keepRegionI)

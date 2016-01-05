@@ -58,7 +58,7 @@ const Foam::labelListList& Foam::primitiveMesh::edgeFaces() const
 const Foam::labelList& Foam::primitiveMesh::edgeFaces
 (
     const label edgeI,
-    DynamicList<label>& storage
+    dynamicLabelList& storage
 ) const
 {
     if (hasEdgeFaces())

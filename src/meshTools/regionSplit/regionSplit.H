@@ -70,7 +70,7 @@ class regionSplit
             const label otherFaceI,
 
             labelList& faceRegion,
-            DynamicList<label>& newChangedFaces
+            dynamicLabelList& newChangedFaces
         ) const;
 
         //- Given a seed cell label, fill cellRegion/faceRegion with markValue

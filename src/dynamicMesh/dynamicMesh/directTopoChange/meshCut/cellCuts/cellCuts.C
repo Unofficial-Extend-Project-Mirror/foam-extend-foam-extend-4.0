@@ -1352,8 +1352,8 @@ bool Foam::cellCuts::calcAnchors
     walkEdges(cellI, cPoints[uncutIndex], 2, edgeStatus, pointStatus);
 
     // Collect both sets in lists.
-    DynamicList<label> connectedPoints(cPoints.size());
-    DynamicList<label> otherPoints(cPoints.size());
+    dynamicLabelList connectedPoints(cPoints.size());
+    dynamicLabelList otherPoints(cPoints.size());
 
     forAllConstIter(Map<label>, pointStatus, iter)
     {
@@ -2238,7 +2238,7 @@ void Foam::cellCuts::setFromCellCutter
     scalarField cellLoopWeights;
 
     // For debugging purposes
-    DynamicList<label> invalidCutCells(2);
+    dynamicLabelList invalidCutCells(2);
     DynamicList<labelList> invalidCutLoops(2);
     DynamicList<scalarField> invalidCutLoopWeights(2);
 
@@ -2355,7 +2355,7 @@ void Foam::cellCuts::setFromCellCutter
     scalarField cellLoopWeights;
 
     // For debugging purposes
-    DynamicList<label> invalidCutCells(2);
+    dynamicLabelList invalidCutCells(2);
     DynamicList<labelList> invalidCutLoops(2);
     DynamicList<scalarField> invalidCutLoopWeights(2);
 

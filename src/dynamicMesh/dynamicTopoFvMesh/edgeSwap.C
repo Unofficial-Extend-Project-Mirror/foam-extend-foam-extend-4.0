@@ -2948,7 +2948,7 @@ const changeMap dynamicTopoFvMesh::swap32
 
     // Determine the three faces to be removed
     FixedList<label,3> facesForRemoval;
-    DynamicList<label> cellRemovalList(3);
+    dynamicLabelList cellRemovalList(3);
 
     forAll(facesForRemoval, faceI)
     {

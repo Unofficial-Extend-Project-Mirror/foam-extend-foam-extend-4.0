@@ -47,7 +47,7 @@ void Foam::regionSplit::transferCoupledFaceRegion
     const label otherFaceI,
 
     labelList& faceRegion,
-    DynamicList<label>& newChangedFaces
+    dynamicLabelList& newChangedFaces
 ) const
 {
     if (faceRegion[faceI] >= 0)
@@ -138,7 +138,7 @@ void Foam::regionSplit::fillSeedMask
         //        << changedFaces.size() << endl;
         //}
 
-        DynamicList<label> changedCells(changedFaces.size());
+        dynamicLabelList changedCells(changedFaces.size());
 
         forAll(changedFaces, i)
         {
@@ -172,7 +172,7 @@ void Foam::regionSplit::fillSeedMask
         //}
 
         // Loop over changedCells and collect faces
-        DynamicList<label> newChangedFaces(changedCells.size());
+        dynamicLabelList newChangedFaces(changedCells.size());
 
         forAll(changedCells, i)
         {

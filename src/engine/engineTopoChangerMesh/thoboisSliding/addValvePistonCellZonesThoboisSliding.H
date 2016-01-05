@@ -51,7 +51,7 @@
                 nCellZones++;
 
                 // valve top points (move all with valve displacement)
-                DynamicList<label> valveTopPoints(nPoints() / 10);
+                dynamicLabelList valveTopPoints(nPoints() / 10);
                 List<bool> valveTopPoint(nPoints(), false);
                 bool foundOne = false;
 
@@ -169,7 +169,7 @@
 
 
                 // valve bottom points (move all with valve displacement)
-                DynamicList<label> valveBottomPoints(nPoints() / 10);
+                dynamicLabelList valveBottomPoints(nPoints() / 10);
                 List<bool> valveBottomPoint(nPoints(), false);
                 bool foundOne = false;
 
