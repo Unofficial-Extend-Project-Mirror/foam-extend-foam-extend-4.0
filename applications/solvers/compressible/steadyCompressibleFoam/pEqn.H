@@ -1,33 +1,23 @@
 {
     volScalarField rUA = 1.0/UEqn.A();
 
-<<<<<<< HEAD
-=======
     surfaceScalarField psisf = fvc::interpolate(psis);
     surfaceScalarField rhof = fvc::interpolate(rho);
 
     // Needs to be outside of loop since p is changing, but psi and rho are not
     surfaceScalarField rhoReff = rhof - psisf*fvc::interpolate(p);
 
->>>>>>> 07efd81... Updated enthalpy equation
+    // --- PISO loop
     for (int corr = 0; corr < nCorr; corr++)
     {
         U = rUA*UEqn.H();
 
-        // Execute ddtPhiCorr before recalculating flux
-        // HJ, 27/Apr/2010
-        surfaceScalarField phid
-        (
-            "phid",
-            fvc::interpolate(psi)*
-            (
-                (fvc::interpolate(U) & mesh.Sf())
-              + fvc::ddtPhiCorr(rUA, rho, U, phi)
-            )
-        );
-
         // Calculate phi for boundary conditions
-        phi = fvc::interpolate(rho*U) & mesh.Sf();
+        phi = rhof*fvc::interpolate(U) & mesh.Sf();
+
+        surfaceScalarField phid2 = rhoReff/rhof*phi;
+
+        surfaceScalarField phid("phid", psisf/rhof*phi);
 
         p.storePrevIter();
 
@@ -35,8 +25,9 @@
         {
             fvScalarMatrix pEqn
             (
-                fvm::ddt(psi, p)
+                fvm::ddt(psis, p)
               + fvm::div(phid, p)
+              + fvc::div(phid2)
               - fvm::laplacian(rho*rUA, p)
             );
 
@@ -51,7 +42,7 @@
             // Calculate the flux
             if (nonOrth == nNonOrthCorr)
             {
-                phi = pEqn.flux();
+                phi = phid2 + pEqn.flux();
             }
         }
 

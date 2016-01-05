@@ -25,8 +25,17 @@ Application
     sonicFoam
 
 Description
-    Transient solver for trans-sonic/supersonic, laminar or turbulent flow
-    of a compressible gas.
+    Transient solver for trans-sonic/supersonic for laminar or turbulent
+    flow of a compressible gas.
+
+    Uses the flexible PIMPLE (PISO-SIMPLE) solution for time-resolved and
+    pseudo-transient simulations.  The pressure-energy coupling is done
+    using the Rusche manoeuvre (isentropic compression/expansion).
+
+    Turbulence modelling is generic, i.e. laminar, RAS or LES may be selected.
+
+Author
+    Hrvoje Jasak, Wikki Ltd.  All rights reserved.
 
 \*---------------------------------------------------------------------------*/
 
@@ -48,30 +57,42 @@ int main(int argc, char *argv[])
 
     Info<< "\nStarting time loop\n" << endl;
 
-    while (runTime.loop())
+    while (runTime.run())
     {
+#       include "readTimeControls.H"
+#       include "readPIMPLEControls.H"
+#       include "compressibleCourantNo.H"
+#       include "setDeltaT.H"
+
+        runTime++;
+        Info<< "deltaT = " << runTime.deltaT().value() << nl << endl;
         Info<< "Time = " << runTime.timeName() << nl << endl;
 
-#       include "readPISOControls.H"
-#       include "compressibleCourantNo.H"
-
-#       include "rhoEqn.H"
-
-#       include "UEqn.H"
-
-#       include "eEqn.H"
-
-
-        // --- PISO loop
-
-        for (int corr = 0; corr < nCorr; corr++)
+        // --- PIMPLE loop
+        label oCorr = 0;
+        do
         {
-#           include "pEqn.H"
-        }
+#           include "rhoEqn.H"
+#           include "eEqn.H"
+#           include "UEqn.H"
 
-        turbulence->correct();
+            // --- PISO loop
+            volScalarField rUA = 1.0/UEqn.A();
 
-        rho = thermo.rho();
+            surfaceScalarField psisf = fvc::interpolate(psis);
+            surfaceScalarField rhof = fvc::interpolate(rho);
+
+            // Needs to be outside of loop since p is changing,
+            // but psi and rho are not
+            surfaceScalarField rhoReff = rhof - psisf*fvc::interpolate(p);
+
+            for (int corr = 0; corr < nCorr; corr++)
+            {
+#               include "pEqn.H"
+            }
+
+            turbulence->correct();
+        } while (++oCorr < nOuterCorr);
 
         runTime.write();
 
@@ -82,7 +103,7 @@ int main(int argc, char *argv[])
 
     Info<< "End\n" << endl;
 
-    return 0;
+    return(0);
 }
 
 

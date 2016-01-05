@@ -9,7 +9,9 @@
     volScalarField& T = const_cast<volScalarField&>(thermo.T());
     volScalarField& p = thermo.p();
     volScalarField& e = thermo.e();
-    const volScalarField& psi = thermo.psi();
+
+    volScalarField psis("psi", thermo.psi()/thermo.Cp()*thermo.Cv());
+    psis.oldTime();
 
     volScalarField rho
     (
@@ -37,20 +39,6 @@
     );
 
 #   include "compressibleCreatePhi.H"
-
-    // Store energy source term for under-relaxation
-    volScalarField pDivU
-    (
-        IOobject
-        (
-            "pDivU",
-            runTime.timeName(),
-            mesh,
-            IOobject::NO_READ,
-            IOobject::NO_WRITE
-        ),
-        p*fvc::div(phi/fvc::interpolate(rho))
-    );
 
     Info<< "Creating turbulence model\n" << endl;
     autoPtr<compressible::turbulenceModel> turbulence

@@ -17,7 +17,7 @@
      ==
         // ddt(p) term removed: steady-state.  HJ, 27/Apr/2010
         fvc::div(faceU, p, "div(U,p)")
-      - p*fvc::div(faceU))
+      - p*fvc::div(faceU)
         // Viscous heating: note sign (devRhoReff has a minus in it)
       - (turbulence->devRhoReff() && fvc::grad(Urel))
     );

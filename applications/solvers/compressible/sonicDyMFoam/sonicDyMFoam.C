@@ -27,10 +27,11 @@ Application
 Description
     Transient solver for trans-sonic/supersonic for laminar or turbulent
     flow of a compressible gas with support for mesh motion and
-    topological changes
+    topological changes.
 
     Uses the flexible PIMPLE (PISO-SIMPLE) solution for time-resolved and
-    pseudo-transient simulations.
+    pseudo-transient simulations.  The pressure-energy coupling is done
+    using the Rusche manoeuvre (isentropic compression/expansion).
 
     Turbulence modelling is generic, i.e. laminar, RAS or LES may be selected.
 
@@ -107,30 +108,24 @@ int main(int argc, char *argv[])
         label oCorr = 0;
         do
         {
-            // Under-relax pDivU term
-            pDivU.storePrevIter();
-
-            pDivU =
-                p*fvc::div
-                (
-                    phi/fvc::interpolate(rho)
-                  + fvc::meshPhi(rho, U)
-                );
-
-            pDivU.relax();
-
 #           include "rhoEqn.H"
 #           include "eEqn.H"
 #           include "UEqn.H"
 
             // --- PISO loop
+            volScalarField rUA = 1.0/UEqn.A();
+
+            surfaceScalarField psisf = fvc::interpolate(psis);
+            surfaceScalarField rhof = fvc::interpolate(rho);
+
+            // Needs to be outside of loop since p is changing,
+            // but psi and rho are not
+            surfaceScalarField rhoReff = rhof - psisf*fvc::interpolate(p);
+
             for (int corr = 0; corr < nCorr; corr++)
             {
 #               include "pEqn.H"
             }
-
-            // Recalculate density
-            rho = thermo.rho();
 
             turbulence->correct();
         } while (++oCorr < nOuterCorr);

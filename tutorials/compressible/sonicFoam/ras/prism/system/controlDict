@@ -23,9 +23,9 @@ startTime       0;
 
 stopAt          endTime;
 
-endTime         0.0004;
+endTime         0.005;
 
-deltaT          5e-07;
+deltaT          1e-06;
 
 writeControl    runTime;
 
@@ -37,12 +37,67 @@ writeFormat     ascii;
 
 writePrecision  6;
 
-writeCompression uncompressed;
+writeCompression compressed;
 
 timeFormat      general;
 
 timePrecision   6;
 
 runTimeModifiable yes;
+
+adjustTimeStep   no;
+maxCo            10;
+
+functions
+(
+    Mach
+    {
+        type        MachNumber;
+        UName       U;
+
+        functionObjectLibs ("libutilityFunctionObjects.so");
+    }
+
+    minMaxU
+    {
+        type        minMaxField;
+
+        // Where to load it from (if not already in solver)
+        functionObjectLibs ("libfieldFunctionObjects.so");
+
+        name U;
+    }
+
+    minMaxP
+    {
+        type        minMaxField;
+
+        // Where to load it from (if not already in solver)
+        functionObjectLibs ("libfieldFunctionObjects.so");
+
+        name p;
+    }
+
+    minMaxRho
+    {
+        type        minMaxField;
+
+        // Where to load it from (if not already in solver)
+        functionObjectLibs ("libfieldFunctionObjects.so");
+
+        name rho;
+    }
+
+    minMaxT
+    {
+        type        minMaxField;
+
+        // Where to load it from (if not already in solver)
+        functionObjectLibs ("libfieldFunctionObjects.so");
+
+        name T;
+    }
+);
+
 
 // ************************************************************************* //
