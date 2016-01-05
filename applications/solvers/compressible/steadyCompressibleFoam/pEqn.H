@@ -7,6 +7,7 @@
     // Needs to be outside of loop since p is changing, but psi and rho are not
     surfaceScalarField rhoReff = rhof - psisf*fvc::interpolate(p);
 
+    // --- PISO loop
     for (int corr = 0; corr < nCorr; corr++)
     {
         U = rUA*UEqn.H();

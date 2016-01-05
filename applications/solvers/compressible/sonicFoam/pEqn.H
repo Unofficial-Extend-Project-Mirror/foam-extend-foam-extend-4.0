@@ -1,37 +1,52 @@
-rho = thermo.rho();
-
-volScalarField rUA = 1.0/UEqn.A();
-U = rUA*UEqn.H();
-
-surfaceScalarField phid
-(
-    "phid",
-    fvc::interpolate(psi)
-   *(
-        (fvc::interpolate(U) & mesh.Sf())
-      + fvc::ddtPhiCorr(rUA, rho, U, phi)
-    )
-);
-
-for (int nonOrth=0; nonOrth<=nNonOrthCorr; nonOrth++)
 {
-    fvScalarMatrix pEqn
-    (
-        fvm::ddt(psi, p)
-      + fvm::div(phid, p)
-      - fvm::laplacian(rho*rUA, p)
-    );
+    U = UEqn.H()/UEqn.A();
 
-    pEqn.solve();
-
-    if (nonOrth == nNonOrthCorr)
+    for (int nonOrth = 0; nonOrth <= nNonOrthCorr; nonOrth++)
     {
-        phi = pEqn.flux();
+        // Calculate phi for boundary conditions
+        phi = rhof*
+        (
+            (fvc::interpolate(U) & mesh.Sf())
+        );
+
+        surfaceScalarField phid2 = rhoReff/rhof*phi;
+
+        surfaceScalarField phid("phid", psisf/rhof*phi);
+
+        // Store pressure for under-relaxation
+        p.storePrevIter();
+
+        volScalarField divPhid
+        (
+            "divPhid",
+            fvc::div(phid)
+        );
+
+        fvScalarMatrix pEqn
+        (
+            fvm::ddt(psis, p)
+          + fvm::div(phid, p)
+            // Convective flux relaxation terms
+          + fvm::SuSp(-divPhid, p)
+          + divPhid*p
+          + fvc::div(phid2)
+          - fvm::laplacian(rho*rUA, p)
+        );
+
+        pEqn.solve();
+
+        // Calculate the flux
+        if (nonOrth == nNonOrthCorr)
+        {
+            phi = phid2 + pEqn.flux();
+        }
+
+        // Relax the pressure
+        p.relax();
     }
+
+#   include "compressibleContinuityErrs.H"
+
+    U -= fvc::grad(p)/UEqn.A();
+    U.correctBoundaryConditions();
 }
-
-#include "rhoEqn.H"
-#include "compressibleContinuityErrs.H"
-
-U -= rUA*fvc::grad(p);
-U.correctBoundaryConditions();

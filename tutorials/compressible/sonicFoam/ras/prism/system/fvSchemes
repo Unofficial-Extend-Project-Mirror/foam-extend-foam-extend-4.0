@@ -22,32 +22,26 @@ ddtSchemes
 
 gradSchemes
 {
-    default         Gauss linear;
+    default         cellLimited Gauss linear 1;
 }
 
 divSchemes
 {
     default         none;
-    div(phi,U)      Gauss limitedLinearV 1;
+    div(phi,U)      Gauss upwind;
+    div(phid,p)     Gauss upwind;
+    div(phi,e)      Gauss upwind;
+    div((muEff*dev2(grad(U).T()))) Gauss linear;
+
     div(phi,k)      Gauss upwind;
     div(phi,epsilon) Gauss upwind;
     div(phi,R)      Gauss upwind;
     div(R)          Gauss linear;
-    div(phid,p)     Gauss limitedLinear 1;
-    div(phiU,p)     Gauss limitedLinear 1;
-    div(phi,e)      Gauss limitedLinear 1;
-    div((muEff*dev2(grad(U).T()))) Gauss linear;
 }
 
 laplacianSchemes
 {
-    default         none;
-    laplacian(muEff,U) Gauss linear corrected;
-    laplacian(DkEff,k) Gauss linear corrected;
-    laplacian(DREff,R) Gauss linear corrected;
-    laplacian(DepsilonEff,epsilon) Gauss linear corrected;
-    laplacian((rho*(1|A(U))),p) Gauss linear corrected;
-    laplacian(alphaEff,e) Gauss linear corrected;
+    default         Gauss linear limited 0.5;
 }
 
 interpolationSchemes
