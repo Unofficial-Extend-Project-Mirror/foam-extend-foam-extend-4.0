@@ -35,7 +35,6 @@ License
 #include "blockLduSmoothers.H"
 #include "blockGaussSeidelSmoothers.H"
 #include "BlockILUSmoother.H"
-#include "BlockILUCpSmoother.H"
 
 #include "blockLduSolvers.H"
 #include "BlockDiagonalSolver.H"
@@ -94,9 +93,6 @@ makeBlockSmoother(block##Type##Smoother, block##Type##GaussSeidelSmoother);   \
                                                                               \
 typedef BlockILUSmoother<type > block##Type##ILUSmoother;                     \
 makeBlockSmoother(block##Type##Smoother, block##Type##ILUSmoother);           \
-                                                                              \
-typedef BlockILUCpSmoother<type > block##Type##ILUCpSmoother;                 \
-makeBlockSmoother(block##Type##Smoother, block##Type##ILUCpSmoother);         \
                                                                               \
                                                                               \
 /* Solvers */                                                                 \
