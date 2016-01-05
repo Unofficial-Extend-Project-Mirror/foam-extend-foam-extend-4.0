@@ -97,7 +97,7 @@ class cuttingPlane
             const UList<label>& edgePoint,
             const label cellI,
             const label startEdgeI,
-            DynamicList<label>& faceVerts
+            dynamicLabelList& faceVerts
         );
 
         //- Determine cuts for all cut cells.

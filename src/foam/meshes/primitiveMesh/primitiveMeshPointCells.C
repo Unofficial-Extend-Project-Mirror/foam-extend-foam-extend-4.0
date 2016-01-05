@@ -119,7 +119,7 @@ const Foam::labelListList& Foam::primitiveMesh::pointCells() const
 const Foam::labelList& Foam::primitiveMesh::pointCells
 (
     const label pointI,
-    DynamicList<label>& storage
+    dynamicLabelList& storage
 ) const
 {
     if (hasPointCells())

@@ -111,7 +111,7 @@ const Foam::labelListList& Foam::primitiveMesh::cellCells() const
 const Foam::labelList& Foam::primitiveMesh::cellCells
 (
     const label cellI,
-    DynamicList<label>& storage
+    dynamicLabelList& storage
 ) const
 {
     if (hasCellCells())

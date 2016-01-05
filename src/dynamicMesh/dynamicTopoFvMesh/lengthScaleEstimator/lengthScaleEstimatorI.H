@@ -235,7 +235,7 @@ inline bool lengthScaleEstimator::testProximity
     // Reset input
     proxDistance = GREAT;
 
-    DynamicList<label> posIndices(20);
+    dynamicLabelList posIndices(20);
     scalar minDeviation = -0.9;
     label nD = spatialRes_, binSize = proximityBins_.size();
 

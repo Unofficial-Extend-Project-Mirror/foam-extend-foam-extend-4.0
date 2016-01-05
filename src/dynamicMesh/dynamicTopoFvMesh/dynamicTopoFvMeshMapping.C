@@ -655,7 +655,7 @@ void dynamicTopoFvMesh::setCellMapping
     }
 
     // Update cell-parents information
-    DynamicList<label> masterCells(5);
+    dynamicLabelList masterCells(5);
 
     forAll(mapCells, cellI)
     {
@@ -801,7 +801,7 @@ void dynamicTopoFvMesh::setFaceMapping
     }
 
     // Update face-parents information
-    DynamicList<label> masterFaces(5);
+    dynamicLabelList masterFaces(5);
 
     forAll(mapFaces, faceI)
     {

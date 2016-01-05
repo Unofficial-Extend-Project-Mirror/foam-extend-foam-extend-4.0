@@ -76,6 +76,7 @@ Foam::label Foam::sampledSet::getCell
                 << ". But cell does not contain point " << sample
                 << abort(FatalError);
         }
+
         return cellI;
     }
     else
@@ -170,6 +171,7 @@ Foam::label Foam::sampledSet::findNearFace
             return myFaces[myFaceI];
         }
     }
+
     return -1;
 }
 
@@ -199,8 +201,6 @@ Foam::point Foam::sampledSet::pushIn
             << "Please change your starting point"
             << abort(FatalError);
     }
-    //Info<< "pushIn : moved " << facePt << " to " << newSample
-    //    << endl;
 
     return newSample;
 }
@@ -354,6 +354,7 @@ void Foam::sampledSet::setSamples
     {
         operator[](sampleI) = samplingPts[sampleI];
     }
+
     cells_ = samplingCells;
     faces_ = samplingFaces;
     segments_ = samplingSegments;

@@ -38,7 +38,7 @@ void Foam::interactionLists::buildCellReferralLists()
 
     const referredCellList& refIntL(ril());
 
-    DynamicList<label> referralProcs;
+    dynamicLabelList referralProcs;
 
     // Run through all referredCells to build list of interacting processors
 
@@ -56,9 +56,9 @@ void Foam::interactionLists::buildCellReferralLists()
 
 //     Pout << "referralProcs: " << nl << referralProcs << endl;
 
-    List<DynamicList<label> > cellSendingReferralLists(referralProcs.size());
+    List<dynamicLabelList > cellSendingReferralLists(referralProcs.size());
 
-    List<DynamicList<DynamicList<label> > >
+    List<DynamicList<dynamicLabelList > >
         cellReceivingReferralLists(referralProcs.size());
 
     // Run through all referredCells again building up send and receive info
@@ -69,9 +69,9 @@ void Foam::interactionLists::buildCellReferralLists()
 
         label rPI = findIndex(referralProcs, rC.sourceProc());
 
-        DynamicList<DynamicList<label> >& rRL(cellReceivingReferralLists[rPI]);
+        DynamicList<dynamicLabelList >& rRL(cellReceivingReferralLists[rPI]);
 
-        DynamicList<label>& sRL(cellSendingReferralLists[rPI]);
+        dynamicLabelList& sRL(cellSendingReferralLists[rPI]);
 
         label existingSource = findIndex(sRL, rC.sourceCell());
 
@@ -89,7 +89,7 @@ void Foam::interactionLists::buildCellReferralLists()
 
             rRL.append
             (
-                DynamicList<label> (labelList(1,rIL))
+                dynamicLabelList (labelList(1,rIL))
             );
         }
         else
@@ -102,9 +102,9 @@ void Foam::interactionLists::buildCellReferralLists()
 
     forAll(referralProcs, rPI)
     {
-        DynamicList<DynamicList<label> >& rRL(cellReceivingReferralLists[rPI]);
+        DynamicList<dynamicLabelList >& rRL(cellReceivingReferralLists[rPI]);
 
-        DynamicList<label>& sRL(cellSendingReferralLists[rPI]);
+        dynamicLabelList& sRL(cellSendingReferralLists[rPI]);
 
         sRL.shrink();
 
@@ -120,7 +120,7 @@ void Foam::interactionLists::buildCellReferralLists()
 
     forAll(referralProcs, rPI)
     {
-        DynamicList<DynamicList<label> >& rRL(cellReceivingReferralLists[rPI]);
+        DynamicList<dynamicLabelList >& rRL(cellReceivingReferralLists[rPI]);
 
         labelListList translLL(rRL.size());
 
@@ -141,7 +141,7 @@ void Foam::interactionLists::buildCellReferralLists()
     forAll(referralProcs, rPI)
     {
 
-        DynamicList<label>& sRL(cellSendingReferralLists[rPI]);
+        dynamicLabelList& sRL(cellSendingReferralLists[rPI]);
 
         if (referralProcs[rPI] != Pstream::myProcNo())
         {
@@ -509,7 +509,7 @@ const Foam::labelList Foam::interactionLists::realCellsInRangeOfSegment
     const labelList& segmentPoints
 ) const
 {
-    DynamicList<label> realCellsFoundInRange;
+    dynamicLabelList realCellsFoundInRange;
 
     forAll(segmentFaces, sF)
     {
@@ -601,7 +601,7 @@ const Foam::labelList Foam::interactionLists::referredCellsInRangeOfSegment
     const labelList& segmentPoints
 ) const
 {
-    DynamicList<label> referredCellsFoundInRange;
+    dynamicLabelList referredCellsFoundInRange;
 
     forAll(segmentFaces, sF)
     {

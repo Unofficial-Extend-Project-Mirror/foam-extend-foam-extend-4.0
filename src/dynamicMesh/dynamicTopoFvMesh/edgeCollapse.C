@@ -1652,7 +1652,7 @@ const changeMap dynamicTopoFvMesh::collapseQuadFace
     FixedList<label,4> edgeToKeep(-1), edgeToThrow(-1);
 
     // Maintain a list of modified faces for mapping
-    DynamicList<label> modifiedFaces(10);
+    dynamicLabelList modifiedFaces(10);
 
     // Case 2 & 3 use identical connectivity,
     // but different point locations
@@ -4493,7 +4493,7 @@ const changeMap dynamicTopoFvMesh::collapseEdge
                 {
                     // Point-based coupling
                     scalar slaveCollapseQuality(GREAT);
-                    DynamicList<label> cellsChecked(10);
+                    dynamicLabelList cellsChecked(10);
 
                     // Check cells connected to coupled point
                     const labelList& pEdges = sMesh.pointEdges_[mag(sIndex)];
@@ -4995,7 +4995,7 @@ const changeMap dynamicTopoFvMesh::collapseEdge
     // Also, keep track of resulting cell quality,
     // if collapse is indeed feasible
     scalar collapseQuality(GREAT);
-    DynamicList<label> cellsChecked(10);
+    dynamicLabelList cellsChecked(10);
 
     // Add all hull cells as 'checked',
     // and therefore, feasible
@@ -5284,7 +5284,7 @@ const changeMap dynamicTopoFvMesh::collapseEdge
     }
 
     // Maintain a list of modified faces for mapping
-    DynamicList<label> modifiedFaces(10);
+    dynamicLabelList modifiedFaces(10);
 
     // Renumber all hull faces and edges
     forAll(faceHull, indexI)
@@ -5999,7 +5999,7 @@ const changeMap dynamicTopoFvMesh::collapseEdge
     // Check for duplicate edges connected to the replacePoint
     const labelList& rpEdges = pointEdges_[replacePoint];
 
-    DynamicList<label> mergeFaces(10);
+    dynamicLabelList mergeFaces(10);
 
     forAll(rpEdges, edgeI)
     {
@@ -6199,7 +6199,7 @@ const changeMap dynamicTopoFvMesh::collapseEdge
     if (coupledModification_)
     {
         // Build a list of boundary edges / faces for mapping
-        DynamicList<label> checkEdges(10), checkFaces(10);
+        dynamicLabelList checkEdges(10), checkFaces(10);
 
         const labelList& pEdges = pointEdges_[replacePoint];
 
@@ -7321,7 +7321,7 @@ const changeMap dynamicTopoFvMesh::removeCellLayer
     labelHashSet edgesToRemove, facesToRemove;
     Map<labelPair> pointsToRemove, edgesToKeep;
 
-    DynamicList<label> patchFaces(patchSizes_[patchID]);
+    dynamicLabelList patchFaces(patchSizes_[patchID]);
     DynamicList<labelPair> cellsToRemove(patchSizes_[patchID]);
     DynamicList<labelPair> hFacesToRemove(patchSizes_[patchID]);
 
@@ -7847,7 +7847,7 @@ const changeMap dynamicTopoFvMesh::mergeBoundaryFaces
         Pout<< " mergePairs: " << mergePairs << endl;
     }
 
-    DynamicList<label> checkEdges(10);
+    dynamicLabelList checkEdges(10);
 
     forAll(mergePairs, pairI)
     {

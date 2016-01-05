@@ -695,7 +695,7 @@ labelList dynamicRefineFvMesh::selectRefineCells
     label nCandidates = returnReduce(count(candidateCell, 1), sumOp<label>());
 
     // Collect all cells
-    DynamicList<label> candidates(nCells());
+    dynamicLabelList candidates(nCells());
 
     if (nCandidates < nTotToRefine)
     {
@@ -771,7 +771,7 @@ labelList dynamicRefineFvMesh::selectUnrefinePoints
     // All points that can be unrefined
     const labelList splitPoints(meshCutter_.getSplitPoints());
 
-    DynamicList<label> newSplitPoints(splitPoints.size());
+    dynamicLabelList newSplitPoints(splitPoints.size());
 
     forAll(splitPoints, i)
     {

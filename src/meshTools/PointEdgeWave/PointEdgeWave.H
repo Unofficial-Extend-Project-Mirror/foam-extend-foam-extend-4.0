@@ -215,9 +215,9 @@ class PointEdgeWave
             (
                 const primitivePatch& patch,
                 DynamicList<Type>& patchInfo,
-                DynamicList<label>& patchPoints,
-                DynamicList<label>& owner,
-                DynamicList<label>& ownerIndex
+                dynamicLabelList& patchPoints,
+                dynamicLabelList& owner,
+                dynamicLabelList& ownerIndex
             ) const;
 
             //- Merge data from patch into overall data

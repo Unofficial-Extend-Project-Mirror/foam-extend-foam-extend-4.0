@@ -89,8 +89,8 @@ bool Foam::uniformSet::trackToBoundary
     point& samplePt,
     label& sampleI,
     DynamicList<point>& samplingPts,
-    DynamicList<label>& samplingCells,
-    DynamicList<label>& samplingFaces,
+    dynamicLabelList& samplingCells,
+    dynamicLabelList& samplingFaces,
     DynamicList<scalar>& samplingCurveDist
 ) const
 {
@@ -213,9 +213,9 @@ bool Foam::uniformSet::trackToBoundary
 void Foam::uniformSet::calcSamples
 (
     DynamicList<point>& samplingPts,
-    DynamicList<label>& samplingCells,
-    DynamicList<label>& samplingFaces,
-    DynamicList<label>& samplingSegments,
+    dynamicLabelList& samplingCells,
+    dynamicLabelList& samplingFaces,
+    dynamicLabelList& samplingSegments,
     DynamicList<scalar>& samplingCurveDist
 ) const
 {
@@ -398,9 +398,9 @@ void Foam::uniformSet::genSamples()
 {
     // Storage for sample points
     DynamicList<point> samplingPts;
-    DynamicList<label> samplingCells;
-    DynamicList<label> samplingFaces;
-    DynamicList<label> samplingSegments;
+    dynamicLabelList samplingCells;
+    dynamicLabelList samplingFaces;
+    dynamicLabelList samplingSegments;
     DynamicList<scalar> samplingCurveDist;
 
     calcSamples

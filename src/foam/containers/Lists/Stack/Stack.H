@@ -41,7 +41,7 @@ SourceFiles
 #define Stack_H
 
 #include "label.H"
-#include "DynamicList.H"
+#include "dynamicLabelList.H"
 #include "multiThreader.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -58,7 +58,7 @@ class Stack
     // Private data
 
         //- Internal list
-        DynamicList<label> stack_;
+        dynamicLabelList stack_;
 
         //- Mutex for multi-threading
         Mutex stackMutex_;

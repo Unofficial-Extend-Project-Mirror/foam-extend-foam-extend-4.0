@@ -125,11 +125,11 @@ class directTopoChange
             DynamicList<point> points_;
 
             //- Original point label (or masterpoint for added points)
-            DynamicList<label> pointMap_;
+            dynamicLabelList pointMap_;
 
             //- For all original and added points contains new point label.
             //  (used to map return value of addPoint to new mesh point)
-            DynamicList<label> reversePointMap_;
+            dynamicLabelList reversePointMap_;
 
             //- Zone of point
             Map<label> pointZone_;
@@ -144,21 +144,21 @@ class directTopoChange
             DynamicList<face> faces_;
 
             //- Patch for every external face (-1 for internal faces)
-            DynamicList<label> region_;
+            dynamicLabelList region_;
 
             //- Owner for all faces
-            DynamicList<label> faceOwner_;
+            dynamicLabelList faceOwner_;
 
             //- Neighbour for internal faces (-1 for external faces)
-            DynamicList<label> faceNeighbour_;
+            dynamicLabelList faceNeighbour_;
 
             //- Original face label. Or master face for added-from-faces;
             //  -1 for faces added-from-edge or added-from-point)
-            DynamicList<label> faceMap_;
+            dynamicLabelList faceMap_;
 
             //- For all original and added faces contains new face label
             //  (used to map return value of addFace to new mesh face)
-            DynamicList<label> reverseFaceMap_;
+            dynamicLabelList reverseFaceMap_;
 
             //- Faces added from point (corresponding faceMap_ will
             //  be -1)
@@ -185,11 +185,11 @@ class directTopoChange
 
             //- Original cell label or master cell for added-from-cell;
             //  -1 for cells added from face or edge.
-            DynamicList<label> cellMap_;
+            dynamicLabelList cellMap_;
 
             //- For all original and added cells contains new cell label
             //  (used to map return value of addCell to new mesh cell)
-            DynamicList<label> reverseCellMap_;
+            dynamicLabelList reverseCellMap_;
 
             //- Cells added from point
             Map<label> cellFromPoint_;
@@ -201,7 +201,7 @@ class directTopoChange
             Map<label> cellFromFace_;
 
             //- Zone of cell
-            DynamicList<label> cellZone_;
+            dynamicLabelList cellZone_;
 
 
     // Private Member Functions
@@ -215,10 +215,10 @@ class directTopoChange
         static void renumberKey(const labelList& map, Map<T>&);
 
         //- Renumber elements of list according to map
-        static void renumber(const labelList&, DynamicList<label>&);
+        static void renumber(const labelList&, dynamicLabelList&);
         static void renumber(const labelList&, labelHashSet&);
         //- Special handling of reverse maps which have <-1 in them
-        static void renumberReverseMap(const labelList&, DynamicList<label>&);
+        static void renumberReverseMap(const labelList&, dynamicLabelList&);
 
         //- Renumber & compact elements of list according to map
         static void renumberCompact(const labelList&, labelList&);
@@ -430,19 +430,19 @@ public:
                 return faces_;
             }
 
-            const DynamicList<label>& region() const
+            const dynamicLabelList& region() const
             {
                 return region_;
             }
 
             //- Owner
-            const DynamicList<label>& faceOwner() const
+            const dynamicLabelList& faceOwner() const
             {
                 return faceOwner_;
             }
 
             //- Neighbour
-            const DynamicList<label>& faceNeighbour()const
+            const dynamicLabelList& faceNeighbour()const
             {
                 return faceNeighbour_;
             }

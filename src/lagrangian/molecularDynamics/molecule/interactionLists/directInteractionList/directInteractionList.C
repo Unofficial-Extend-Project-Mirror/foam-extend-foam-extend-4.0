@@ -37,7 +37,7 @@ void Foam::directInteractionList::buildDirectInteractionList
 
     const polyMesh& mesh(il_.mesh());
 
-    List<DynamicList<label> > directInteractionList(mesh.nCells());
+    List<dynamicLabelList > directInteractionList(mesh.nCells());
 
     if (pointPointListBuild)
     {

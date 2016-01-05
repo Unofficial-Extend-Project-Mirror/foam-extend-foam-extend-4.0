@@ -57,6 +57,9 @@ class translation
         //- Velocity
         vector velocity_;
 
+        //- Ramping time scale
+        scalar rampTime_;
+
 
     // Private Member Functions
 
@@ -65,6 +68,10 @@ class translation
 
         //- Disallow default bitwise assignment
         void operator=(const translation&);
+
+
+        //- Ramping factor resulting from rampTime_ value
+        scalar rampFactor() const;
 
 
 public:

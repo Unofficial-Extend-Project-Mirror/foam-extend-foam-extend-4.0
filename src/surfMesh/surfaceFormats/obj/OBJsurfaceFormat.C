@@ -70,9 +70,9 @@ bool Foam::fileFormats::OBJsurfaceFormat<Face>::read
 
     DynamicList<point> dynPoints;
     DynamicList<Face>  dynFaces;
-    DynamicList<label> dynZones;
+    dynamicLabelList dynZones;
     DynamicList<word>  dynNames;
-    DynamicList<label> dynSizes;
+    dynamicLabelList dynSizes;
     HashTable<label>   lookup;
 
     // place faces without a group in zone0
@@ -128,7 +128,7 @@ bool Foam::fileFormats::OBJsurfaceFormat<Face>::read
         }
         else if (cmd == "f")
         {
-            DynamicList<label> dynVertices;
+            dynamicLabelList dynVertices;
 
             // Assume 'f' is followed by space.
             string::size_type endNum = 1;

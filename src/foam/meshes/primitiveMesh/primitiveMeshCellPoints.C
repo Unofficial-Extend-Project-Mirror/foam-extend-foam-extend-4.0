@@ -58,7 +58,7 @@ const Foam::labelListList& Foam::primitiveMesh::cellPoints() const
 const Foam::labelList& Foam::primitiveMesh::cellPoints
 (
     const label cellI,
-    DynamicList<label>& storage
+    dynamicLabelList& storage
 ) const
 {
     if (hasCellPoints())

@@ -132,7 +132,7 @@ void faceSet::sync(const polyMesh& mesh)
                     refCast<const processorPolyPatch>(pp);
 
                 // Convert faceSet locally to labelList.
-                DynamicList<label> setFaces(pp.size());
+                dynamicLabelList setFaces(pp.size());
 
                 forAll(pp, i)
                 {

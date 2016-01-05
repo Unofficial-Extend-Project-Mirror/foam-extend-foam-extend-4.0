@@ -98,7 +98,7 @@ void Foam::enrichedPatch::calcEnrichedFaces
 //             << oldLocalFace.points(slavePatch_.localPoints()) << endl;
         const labelList& curEdges = slaveFaceEdges[faceI];
 
-        DynamicList<label> newFace(oldFace.size()*enrichedFaceRatio_);
+        dynamicLabelList newFace(oldFace.size()*enrichedFaceRatio_);
 
         // Note: The number of points and edges in a face is always identical
         // so both can be done is the same loop
@@ -265,7 +265,7 @@ void Foam::enrichedPatch::calcEnrichedFaces
 //         Pout << "old master face: " << oldFace << endl;
         const labelList& curEdges = masterFaceEdges[faceI];
 
-        DynamicList<label> newFace(oldFace.size()*enrichedFaceRatio_);
+        dynamicLabelList newFace(oldFace.size()*enrichedFaceRatio_);
 
         // Note: The number of points and edges in a face is always identical
         // so both can be done is the same loop

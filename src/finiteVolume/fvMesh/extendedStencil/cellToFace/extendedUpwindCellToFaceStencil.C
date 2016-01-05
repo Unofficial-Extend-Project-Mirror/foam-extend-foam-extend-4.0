@@ -36,7 +36,7 @@ void Foam::extendedUpwindCellToFaceStencil::selectOppositeFaces
     const scalar minOpposedness,
     const label faceI,
     const label cellI,
-    DynamicList<label>& oppositeFaces
+    dynamicLabelList& oppositeFaces
 ) const
 {
     const vectorField& areas = mesh_.faceAreas();
@@ -111,7 +111,7 @@ void Foam::extendedUpwindCellToFaceStencil::transportStencil
     const label cellI,
     const bool stencilHasNeighbour,
 
-    DynamicList<label>& oppositeFaces,
+    dynamicLabelList& oppositeFaces,
     labelHashSet& faceStencilSet,
     labelList& transportedStencil
 ) const
@@ -213,7 +213,7 @@ void Foam::extendedUpwindCellToFaceStencil::transportStencils
     const labelList& nei = mesh_.faceNeighbour();
 
     // Work arrays
-    DynamicList<label> oppositeFaces;
+    dynamicLabelList oppositeFaces;
     labelHashSet faceStencilSet;
 
 
@@ -453,7 +453,7 @@ Foam::extendedUpwindCellToFaceStencil::extendedUpwindCellToFaceStencil
             const List<point>& points = stencilPoints[faceI];
             const labelList& stencil = ownStencil_[faceI];
 
-            DynamicList<label> newStencil(stencil.size());
+            dynamicLabelList newStencil(stencil.size());
             forAll(points, i)
             {
                 if (((points[i]-fc) & fArea) < 0)
@@ -482,7 +482,7 @@ Foam::extendedUpwindCellToFaceStencil::extendedUpwindCellToFaceStencil
             const List<point>& points = stencilPoints[faceI];
             const labelList& stencil = neiStencil_[faceI];
 
-            DynamicList<label> newStencil(stencil.size());
+            dynamicLabelList newStencil(stencil.size());
             forAll(points, i)
             {
                 if (((points[i]-fc) & fArea) > 0)
@@ -537,8 +537,8 @@ Foam::extendedUpwindCellToFaceStencil::extendedUpwindCellToFaceStencil
         const List<point>& points = stencilPoints[faceI];
         const labelList& stencil = ownStencil_[faceI];
 
-        DynamicList<label> newOwnStencil(stencil.size());
-        DynamicList<label> newNeiStencil(stencil.size());
+        dynamicLabelList newOwnStencil(stencil.size());
+        dynamicLabelList newNeiStencil(stencil.size());
         forAll(points, i)
         {
             if (((points[i]-fc) & fArea) > 0)

@@ -847,7 +847,7 @@ void Foam::triSurface::markZone
     while(true)
     {
         // Pick up neighbours of changedFaces
-        DynamicList<label> newChangedFaces(2*changedFaces.size());
+        dynamicLabelList newChangedFaces(2*changedFaces.size());
 
         forAll (changedFaces, i)
         {

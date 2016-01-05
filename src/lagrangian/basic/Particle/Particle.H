@@ -160,7 +160,7 @@ protected:
         void findFaces
         (
             const vector& position,
-            DynamicList<label>& faceList
+            dynamicLabelList& faceList
         ) const;
 
         //- Find the faces between position and cell centre
@@ -169,7 +169,7 @@ protected:
             const vector& position,
             const label celli,
             const scalar stepFraction,
-            DynamicList<label>& faceList
+            dynamicLabelList& faceList
         ) const;
 
 

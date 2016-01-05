@@ -398,7 +398,7 @@ Foam::label Foam::isoSurface::generateFaceTriPoints
     const Type& neiSnapPt,
 
     DynamicList<Type>& triPoints,
-    DynamicList<label>& triMeshCells
+    dynamicLabelList& triMeshCells
 ) const
 {
     label own = mesh_.faceOwner()[faceI];
@@ -475,7 +475,7 @@ void Foam::isoSurface::generateTriPoints
     const labelList& snappedPoint,
 
     DynamicList<Type>& triPoints,
-    DynamicList<label>& triMeshCells
+    dynamicLabelList& triMeshCells
 ) const
 {
     const polyBoundaryMesh& patches = mesh_.boundaryMesh();
@@ -708,7 +708,7 @@ Foam::isoSurface::interpolate
 
 
     DynamicList<Type> triPoints(nCutCells_);
-    DynamicList<label> triMeshCells(nCutCells_);
+    dynamicLabelList triMeshCells(nCutCells_);
 
     // Dummy snap data
     DynamicList<Type> snappedPoints;

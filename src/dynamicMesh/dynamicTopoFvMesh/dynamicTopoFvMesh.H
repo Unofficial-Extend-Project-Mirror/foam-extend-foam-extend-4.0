@@ -524,7 +524,7 @@ class dynamicTopoFvMesh
             const point& oldPoint,
             const label pointIndex,
             const label cellIndex,
-            DynamicList<label>& cellsChecked,
+            dynamicLabelList& cellsChecked,
             scalar& collapseQuality,
             bool forceOp = false
         ) const;

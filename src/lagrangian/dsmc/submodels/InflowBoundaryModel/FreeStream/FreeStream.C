@@ -42,7 +42,7 @@ Foam::FreeStream<CloudType>::FreeStream
 {
     // Identify which patches to use
 
-    DynamicList<label> patches;
+    dynamicLabelList patches;
 
     forAll(cloud.mesh().boundaryMesh(), p)
     {

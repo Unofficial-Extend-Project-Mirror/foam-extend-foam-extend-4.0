@@ -65,10 +65,10 @@ class walkPatch
 
 
         // Faces visited
-        DynamicList<label> visitOrder_;
+        dynamicLabelList visitOrder_;
 
         // Index in face of vertex it was visited through
-        DynamicList<label> indexInFace_;
+        dynamicLabelList indexInFace_;
 
 
     // Private Member Functions
@@ -122,12 +122,12 @@ public:
 
     // Member Functions
 
-        const DynamicList<label>& visitOrder() const
+        const dynamicLabelList& visitOrder() const
         {
             return visitOrder_;
         }
 
-        const DynamicList<label>& indexInFace() const
+        const dynamicLabelList& indexInFace() const
         {
             return indexInFace_;
         }
