@@ -1,4 +1,4 @@
-if(divSigmaExpMethod == "standard")
+if (divSigmaExpMethod == "standard")
 {
     divSigmaExp = fvc::div
     (
