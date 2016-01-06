@@ -85,6 +85,25 @@ void expandLinear(Field<tensor>& res, const UList<vector>& f)
     }
 }
 
+
+void sumToDiag(Field<vector>& res, const UList<tensor>& f)
+{
+    forAll (res, i)
+    {
+        sumToDiag(res[i], f[i]);
+    }
+}
+
+
+void sumMagToDiag(Field<vector>& res, const UList<tensor>& f)
+{
+    forAll (res, i)
+    {
+        sumMagToDiag(res[i], f[i]);
+    }
+}
+
+
 } // End namespace Foam
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

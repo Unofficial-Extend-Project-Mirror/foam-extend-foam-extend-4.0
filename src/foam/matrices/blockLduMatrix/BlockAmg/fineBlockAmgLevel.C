@@ -71,8 +71,8 @@ Foam::fineBlockAmgLevel<Type>::fineBlockAmgLevel
         BlockLduSmoother<Type>::New
         (
             matrix,
-            dict,
-            "fineSmoother"
+            dict
+//             ,"fineSmoother"
         )
     ),
     Ax_()

@@ -104,13 +104,14 @@ inline TensorN<Cmpt, length> TensorN<Cmpt, length>::T() const
     return transpose;
 }
 
+
 //- Return tensor diagonal
 template <class Cmpt, int length>
 inline DiagTensorN<Cmpt, length> TensorN<Cmpt, length>::diag() const
 {
     DiagTensorN<Cmpt, length> dt;
 
-    label diagI=0;
+    label diagI = 0;
     for (label i = 0; i < TensorN<Cmpt, length>::rowLength; i++)
     {
         dt[i] = this->v_[diagI];
@@ -119,6 +120,7 @@ inline DiagTensorN<Cmpt, length> TensorN<Cmpt, length>::diag() const
 
     return dt;
 }
+
 
 //- Negative sum the vertical off-diagonal components
 template <class Cmpt, int length>
@@ -152,6 +154,7 @@ inline TensorN<Cmpt, length> TensorN<Cmpt, length>::negSumDiag() const
 
     return negsumdiag;
 }
+
 
 //- Assign to a SphericalTensorN
 template <class Cmpt, int length>
@@ -502,7 +505,11 @@ operator+(const TensorN<Cmpt, length>& t1, const TensorN<Cmpt, length>& t2)
 //- Addition of TensorN and DiagTensorN
 template <class Cmpt, int length>
 inline TensorN<Cmpt, length>
-operator+(const TensorN<Cmpt, length>& t1, const DiagTensorN<Cmpt, length>& dt2)
+operator+
+(
+    const TensorN<Cmpt, length>& t1,
+    const DiagTensorN<Cmpt, length>& dt2
+)
 {
     TensorN<Cmpt, length> result(t1);
 
@@ -520,7 +527,11 @@ operator+(const TensorN<Cmpt, length>& t1, const DiagTensorN<Cmpt, length>& dt2)
 //- Addition of DiagTensorN and TensorN
 template <class Cmpt, int length>
 inline TensorN<Cmpt, length>
-operator+(const DiagTensorN<Cmpt, length>& dt1, const TensorN<Cmpt, length>& t2)
+operator+
+(
+    const DiagTensorN<Cmpt, length>& dt1,
+    const TensorN<Cmpt, length>& t2
+)
 {
     TensorN<Cmpt, length> result(t2);
 
@@ -602,7 +613,11 @@ operator-(const TensorN<Cmpt, length>& t1, const TensorN<Cmpt, length>& t2)
 //- Subtraction of TensorN and DiagTensorN
 template <class Cmpt, int length>
 inline TensorN<Cmpt, length>
-operator-(const TensorN<Cmpt, length>& t1, const DiagTensorN<Cmpt, length>& dt2)
+operator-
+(
+    const TensorN<Cmpt, length>& t1,
+    const DiagTensorN<Cmpt, length>& dt2
+)
 {
     TensorN<Cmpt, length> result(t1);
 
@@ -620,7 +635,11 @@ operator-(const TensorN<Cmpt, length>& t1, const DiagTensorN<Cmpt, length>& dt2)
 //- Subtraction of DiagTensorN and TensorN
 template <class Cmpt, int length>
 inline TensorN<Cmpt, length>
-operator-(const DiagTensorN<Cmpt, length>& dt1, const TensorN<Cmpt, length>& t2)
+operator-
+(
+    const DiagTensorN<Cmpt, length>& dt1,
+    const TensorN<Cmpt, length>& t2
+)
 {
     TensorN<Cmpt, length> result(-t2);
 
@@ -709,7 +728,11 @@ operator/(const TensorN<Cmpt, length>& t1, const TensorN<Cmpt, length>& t2)
 //- Inner Product of a DiagTensorN and an inverse TensorN
 template <class Cmpt, int length>
 inline TensorN<Cmpt, length>
-operator/(const DiagTensorN<Cmpt, length>& dt1, const TensorN<Cmpt, length>& t2)
+operator/
+(
+    const DiagTensorN<Cmpt, length>& dt1,
+    const TensorN<Cmpt, length>& t2
+)
 {
     return dt1 & inv(t2);
 }
@@ -718,7 +741,11 @@ operator/(const DiagTensorN<Cmpt, length>& dt1, const TensorN<Cmpt, length>& t2)
 //- Inner Product of a TensorN and an inverse DiagTensorN
 template <class Cmpt, int length>
 inline TensorN<Cmpt, length>
-operator/(const TensorN<Cmpt, length>& t1, const DiagTensorN<Cmpt, length>& dt2)
+operator/
+(
+    const TensorN<Cmpt, length>& t1,
+    const DiagTensorN<Cmpt, length>& dt2
+)
 {
     return t1 & inv(dt2);
 }
@@ -971,6 +998,7 @@ inline DiagTensorN<Cmpt, length> diag(const TensorN<Cmpt, length>& t)
 {
     return t.diag();
 }
+
 
 //- Return tensor diagonal
 template <class Cmpt, int length>
