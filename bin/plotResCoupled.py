@@ -58,7 +58,6 @@ for line in lines:
 
 outfile=open('residual.dat','w')
 
-#HJ need better way of combining lists
 if ikomega > 0:
         for data in zip(tUp,Ux,Uy,Uz,p,k,omega):
                 outfile.write(' '.join([str(d) for d in data])+'\n')
