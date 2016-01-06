@@ -36,44 +36,23 @@ namespace Foam
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-Foam::word Foam::lduMatrix::smoother::getName
-(
-    const dictionary& dict
-)
-{
-    word name;
-
-    // handle primitive or dictionary entry
-    const entry& e = dict.lookupEntry("smoother", false, false);
-    if (e.isDict())
-    {
-        e.dict().lookup("smoother") >> name;
-    }
-    else
-    {
-        e.stream() >> name;
-    }
-
-    return name;
-}
-
-
 Foam::autoPtr<Foam::lduMatrix::smoother> Foam::lduMatrix::smoother::New
 (
     const lduMatrix& matrix,
     const FieldField<Field, scalar>& coupleBouCoeffs,
     const FieldField<Field, scalar>& coupleIntCoeffs,
     const lduInterfaceFieldPtrsList& interfaces,
-    const dictionary& dict
+    const dictionary& dict,
+    const word keyword
 )
 {
     word smootherName;
 
     // Handle primitive or dictionary entry
-    const entry& e = dict.lookupEntry("smoother", false, false);
+    const entry& e = dict.lookupEntry(keyword, false, false);
     if (e.isDict())
     {
-        e.dict().lookup("smoother") >> smootherName;
+        e.dict().lookup(keyword) >> smootherName;
     }
     else
     {

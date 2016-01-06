@@ -173,7 +173,7 @@ void Foam::surfaceFeatures::setFromStatus(const List<edgeStatus>& edgeStat)
 //construct feature points where more than 2 feature edges meet
 void Foam::surfaceFeatures::calcFeatPoints(const List<edgeStatus>& edgeStat)
 {
-    DynamicList<label> featurePoints(surf_.nPoints()/1000);
+    dynamicLabelList featurePoints(surf_.nPoints()/1000);
 
     const labelListList& pointEdges = surf_.pointEdges();
 
@@ -452,7 +452,7 @@ Foam::labelList Foam::surfaceFeatures::selectFeatureEdges
     const bool internalEdges
 ) const
 {
-    DynamicList<label> selectedEdges;
+    dynamicLabelList selectedEdges;
 
     if (regionEdges)
     {

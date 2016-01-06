@@ -51,8 +51,8 @@ bool Foam::faceOnlySet::trackToBoundary
 (
     Particle<passiveParticle>& singleParticle,
     DynamicList<point>& samplingPts,
-    DynamicList<label>& samplingCells,
-    DynamicList<label>& samplingFaces,
+    dynamicLabelList& samplingCells,
+    dynamicLabelList& samplingFaces,
     DynamicList<scalar>& samplingCurveDist
 ) const
 {
@@ -96,9 +96,9 @@ bool Foam::faceOnlySet::trackToBoundary
 void Foam::faceOnlySet::calcSamples
 (
     DynamicList<point>& samplingPts,
-    DynamicList<label>& samplingCells,
-    DynamicList<label>& samplingFaces,
-    DynamicList<label>& samplingSegments,
+    dynamicLabelList& samplingCells,
+    dynamicLabelList& samplingFaces,
+    dynamicLabelList& samplingSegments,
     DynamicList<scalar>& samplingCurveDist
 ) const
 {
@@ -296,9 +296,9 @@ void Foam::faceOnlySet::genSamples()
 {
     // Storage for sample points
     DynamicList<point> samplingPts;
-    DynamicList<label> samplingCells;
-    DynamicList<label> samplingFaces;
-    DynamicList<label> samplingSegments;
+    dynamicLabelList samplingCells;
+    dynamicLabelList samplingFaces;
+    dynamicLabelList samplingSegments;
     DynamicList<scalar> samplingCurveDist;
 
     calcSamples

@@ -416,7 +416,7 @@ void Foam::debug::updateCentralDictVars
                             }
                             sortedValidKeys.sort();
 
-                            FatalErrorIn
+                            WarningIn
                             (
                                 "debug::updateCentralDictVars\n"
                                 "(\n"
@@ -425,10 +425,10 @@ void Foam::debug::updateCentralDictVars
                                 "    const bool verbose\n"
                                 ")"
                             )   << "Usage of non-existent DebugSwitches name: "
-                                << key << nl << nl
+                                << key << ".  Cannot be changed." << nl << nl
                                 << "Valid entries for this application are: "
                                 << sortedValidKeys
-                                << exit(FatalError);
+                                << endl;
                         }
                     }
                     else
@@ -514,19 +514,19 @@ void Foam::debug::updateCentralDictVars
                             }
                             sortedValidKeys.sort();
 
-                        FatalErrorIn
-                        (
-                            "debug::updateCentralDictVars\n"
-                            "(\n"
-                            "    const globalControlDictSwitchSet,\n"
-                            "    const string& keyValues,\n"
-                            "    const bool verbose\n"
-                            ")"
-                        )   << "Usage of non-existent InfoSwitches name: "
-                            << key << nl << nl
-                            << "Valid entries for this application are: "
-                            << sortedValidKeys
-                            << exit(FatalError);
+                            WarningIn
+                            (
+                                "debug::updateCentralDictVars\n"
+                                "(\n"
+                                "    const globalControlDictSwitchSet,\n"
+                                "    const string& keyValues,\n"
+                                "    const bool verbose\n"
+                                ")"
+                            )   << "Usage of non-existent InfoSwitches name: "
+                                << key << ".  Cannot change." << nl << nl
+                                << "Valid entries for this application are: "
+                                << sortedValidKeys
+                                << endl;
                         }
                     }
                     else
@@ -673,7 +673,7 @@ void Foam::debug::updateCentralDictVars
                             }
                             sortedValidKeys.sort();
 
-                            FatalErrorIn
+                            WarningIn
                             (
                                 "debug::updateCentralDictVars\n"
                                 "(\n"
@@ -683,10 +683,10 @@ void Foam::debug::updateCentralDictVars
                                 ")"
                             )   << "Usage of non-existent "
                                 << " OptimisationSwitches name: " << key
-                                << endl << endl
+                                << ".  Cannot change." << endl << endl
                                 << "Valid entries for this application are: "
                                 << sortedValidKeys
-                                << exit(FatalError);
+                                << endl;
                         }
                     }
                     else
@@ -784,7 +784,7 @@ void Foam::debug::updateCentralDictVars
                             }
                             sortedValidKeys.sort();
 
-                            FatalErrorIn
+                            WarningIn
                             (
                                 "debug::updateCentralDictVars\n"
                                 "(\n"
@@ -793,10 +793,10 @@ void Foam::debug::updateCentralDictVars
                                 "    const bool verbose\n"
                                 ")"
                             )   << "Usage of non-existent Tolerances name: "
-                                << key << nl << nl
+                                << key << ".  Cannot change." << nl << nl
                                 << "Valid entries for this application are: "
                                 << sortedValidKeys
-                                << exit(FatalError);
+                                << endl;
                         }
                     }
                     else
@@ -896,7 +896,7 @@ void Foam::debug::updateCentralDictVars
                             }
                             sortedValidKeys.sort();
 
-                            FatalErrorIn
+                            WarningIn
                             (
                                 "debug::updateCentralDictVars\n"
                                 "(\n"
@@ -906,10 +906,10 @@ void Foam::debug::updateCentralDictVars
                                 ")"
                             )   << "Usage of non-existent "
                                 << "DimensionedConstants name: "
-                                << key << nl << nl
+                                << key << "Cannot change." << nl << nl
                                 << "Valid entries for this application are: "
                                 << sortedValidKeys
-                                << exit(FatalError);
+                                << endl;
                         }
                     }
                     else

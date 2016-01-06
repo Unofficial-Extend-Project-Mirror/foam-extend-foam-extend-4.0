@@ -112,7 +112,7 @@ calcEdgeLoops() const
         }
 
         // Temporary storage for vertices of current loop
-        DynamicList<label> loop(nBdryEdges);
+        dynamicLabelList loop(nBdryEdges);
 
         // Walk from first all the way round, assigning loops
         label currentVertI = patchEdges[currentEdgeI].start();

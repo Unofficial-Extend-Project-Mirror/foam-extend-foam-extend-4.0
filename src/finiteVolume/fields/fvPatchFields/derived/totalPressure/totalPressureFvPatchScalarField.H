@@ -25,7 +25,7 @@ Class
     Foam::totalPressureFvPatchScalarField
 
 Description
-    Foam::totalPressureFvPatchScalarField
+    Total pressure boundary condition
 
 SourceFiles
     totalPressureFvPatchScalarField.C

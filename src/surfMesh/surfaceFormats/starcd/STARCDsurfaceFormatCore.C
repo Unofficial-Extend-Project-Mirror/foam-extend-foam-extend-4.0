@@ -112,7 +112,7 @@ bool Foam::fileFormats::STARCDsurfaceFormatCore::readPoints
 
     DynamicList<point> dynPoints;
     // STAR-CD index of points
-    DynamicList<label> dynPointId;
+    dynamicLabelList dynPointId;
 
     label lineLabel;
     while ((is >> lineLabel).good())

@@ -71,8 +71,8 @@ void Foam::globalPoints::addToSend
     const label patchPointI,
     const procPointList& knownInfo,
 
-    DynamicList<label>& patchFaces,
-    DynamicList<label>& indexInFace,
+    dynamicLabelList& patchFaces,
+    dynamicLabelList& indexInFace,
     DynamicList<procPointList>& allInfo
 )
 {
@@ -105,7 +105,7 @@ bool Foam::globalPoints::mergeInfo
 )
 {
     // Indices of entries in nbrInfo not yet in myInfo.
-    DynamicList<label> newInfo(nbrInfo.size());
+    dynamicLabelList newInfo(nbrInfo.size());
 
     forAll(nbrInfo, i)
     {
@@ -275,9 +275,9 @@ void Foam::globalPoints::sendPatchPoints(const labelHashSet& changedPoints)
         {
             // Information to send:
             // patch face
-            DynamicList<label> patchFaces(pp.nPoints());
+            dynamicLabelList patchFaces(pp.nPoints());
             // index in patch face
-            DynamicList<label> indexInFace(pp.nPoints());
+            dynamicLabelList indexInFace(pp.nPoints());
             // all information I currently hold about this patchPoint
             DynamicList<procPointList> allInfo(pp.nPoints());
 

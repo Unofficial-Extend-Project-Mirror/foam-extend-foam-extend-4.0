@@ -143,10 +143,13 @@ public:
 
     // Member operators
 
-        inline constTransport& operator=
-        (
-            const constTransport&
-        );
+        inline constTransport& operator=(const constTransport&);
+
+        inline void operator+=(const constTransport&);
+
+        inline void operator-=(const constTransport&);
+
+        inline void operator*=(const scalar);
 
 
     // Friend operators

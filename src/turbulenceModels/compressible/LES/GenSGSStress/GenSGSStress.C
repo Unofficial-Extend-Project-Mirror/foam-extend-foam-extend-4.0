@@ -55,7 +55,7 @@ GenSGSStress::GenSGSStress
 
     ce_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "ce",
             coeffDict_,
@@ -65,7 +65,7 @@ GenSGSStress::GenSGSStress
 
     Prt_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "Prt",
             coeffDict_,

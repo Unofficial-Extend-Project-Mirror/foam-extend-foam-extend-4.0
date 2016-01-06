@@ -39,6 +39,8 @@ SourceFiles
 #include "fvMesh.H"
 #include "solidBodyMotionFunction.H"
 #include "triSurfaceMesh.H"
+#include "fvPatchFields.H"
+#include "immersedBoundaryFvPatchFields.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

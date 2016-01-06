@@ -54,7 +54,7 @@ NonlinearKEShih::NonlinearKEShih
 
     C1_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "C1",
             coeffDict_,
@@ -63,7 +63,7 @@ NonlinearKEShih::NonlinearKEShih
     ),
     C2_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "C2",
             coeffDict_,
@@ -72,7 +72,7 @@ NonlinearKEShih::NonlinearKEShih
     ),
     sigmak_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "sigmak",
             coeffDict_,
@@ -81,7 +81,7 @@ NonlinearKEShih::NonlinearKEShih
     ),
     sigmaEps_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "sigmaEps",
             coeffDict_,
@@ -90,7 +90,7 @@ NonlinearKEShih::NonlinearKEShih
     ),
     A1_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "A1",
             coeffDict_,
@@ -99,7 +99,7 @@ NonlinearKEShih::NonlinearKEShih
     ),
     A2_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "A2",
             coeffDict_,
@@ -108,7 +108,7 @@ NonlinearKEShih::NonlinearKEShih
     ),
     Ctau1_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "Ctau1",
             coeffDict_,
@@ -117,7 +117,7 @@ NonlinearKEShih::NonlinearKEShih
     ),
     Ctau2_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "Ctau2",
             coeffDict_,
@@ -126,7 +126,7 @@ NonlinearKEShih::NonlinearKEShih
     ),
     Ctau3_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "Ctau3",
             coeffDict_,
@@ -135,7 +135,7 @@ NonlinearKEShih::NonlinearKEShih
     ),
     alphaKsi_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "alphaKsi",
             coeffDict_,
@@ -145,7 +145,7 @@ NonlinearKEShih::NonlinearKEShih
 
     kappa_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "kappa_",
             coeffDict_,
@@ -154,7 +154,7 @@ NonlinearKEShih::NonlinearKEShih
     ),
     E_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "E",
             coeffDict_,

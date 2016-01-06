@@ -8,7 +8,9 @@
 
     volScalarField& p = thermo.p();
     volScalarField& e = thermo.e();
-    const volScalarField& psi = thermo.psi();
+
+    volScalarField psis("psi", thermo.psi()/thermo.Cp()*thermo.Cv());
+    psis.oldTime();
 
     volScalarField rho
     (
@@ -35,8 +37,7 @@
         mesh
     );
 
-    #include "compressibleCreatePhi.H"
-
+#   include "compressibleCreatePhi.H"
 
     Info<< "Creating turbulence model\n" << endl;
     autoPtr<compressible::turbulenceModel> turbulence

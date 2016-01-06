@@ -92,7 +92,7 @@ Foam::face Foam::boundaryCutter::addEdgeCutsToFace
     const labelList& fEdges = mesh_.faceEdges()[faceI];
 
     // Storage for face
-    DynamicList<label> newFace(2 * f.size());
+    dynamicLabelList newFace(2 * f.size());
 
     forAll(f, fp)
     {
@@ -339,7 +339,7 @@ bool Foam::boundaryCutter::splitFace
 
 
         // Storage for new face
-        DynamicList<label> newFace(extendedFace.size());
+        dynamicLabelList newFace(extendedFace.size());
 
         label fp = startFp;
 
@@ -683,7 +683,7 @@ void Foam::boundaryCutter::setRefinement
         // Replace existing face by newFace from fp0 to fp1 and add new one
         // from fp1 to fp0.
 
-        DynamicList<label> newVerts(newFace.size());
+        dynamicLabelList newVerts(newFace.size());
 
         // Get vertices from fp0 to (and including) fp1
         label fp = fp0;

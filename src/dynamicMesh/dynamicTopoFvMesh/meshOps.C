@@ -408,7 +408,7 @@ inline bool Dijkstra
 
         // Step 2: Build a list of points adjacent to pointIndex
         //         but not in the visited list
-        DynamicList<label> adjacentPoints(10);
+        dynamicLabelList adjacentPoints(10);
 
         const labelList& pEdges = localPointEdges[pointIndex];
 
@@ -468,7 +468,7 @@ inline bool Dijkstra
     {
         if (foundEndPoint)
         {
-            DynamicList<label> pathNodes(50);
+            dynamicLabelList pathNodes(50);
 
             label currentPoint = endPoint;
 

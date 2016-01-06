@@ -25,7 +25,8 @@ Class
     Foam::isentropicTotalPressureFvPatchScalarField
 
 Description
-    Foam::isentropicTotalPressureFvPatchScalarField
+    Isentropic total pressure boundary condition.  The snGrad is set to
+    zero to stop back-diffusion
 
 SourceFiles
     isentropicTotalPressureFvPatchScalarField.C
@@ -134,6 +135,19 @@ public:
 
         // Access
 
+            //- Return the name of the velocity field
+            const word& UName() const
+            {
+                return UName_;
+            }
+
+            //- Return reference to the name of the velocity field
+            //  to allow adjustment
+            word& UName()
+            {
+                return UName_;
+            }
+
             //- Return the total pressure
             const scalarField& p0() const
             {
@@ -171,6 +185,18 @@ public:
 
             //- Update the coefficients associated with the patch field
             virtual void updateCoeffs();
+
+            //- Return patch-normal gradient: set to zero
+            virtual tmp<scalarField> snGrad() const;
+
+            //- Return the matrix diagonal coefficients corresponding to the
+            //  evaluation of the gradient of this patchField
+            //  Removed gradient contribution
+            virtual tmp<scalarField> gradientInternalCoeffs() const;
+
+            //- Return the matrix source coefficients corresponding to the
+            //  evaluation of the gradient of this patchField
+            virtual tmp<scalarField> gradientBoundaryCoeffs() const;
 
 
         //- Write

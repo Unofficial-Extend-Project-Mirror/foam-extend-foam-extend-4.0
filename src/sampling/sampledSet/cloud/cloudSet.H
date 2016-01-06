@@ -66,9 +66,9 @@ class cloudSet
         void calcSamples
         (
             DynamicList<point>& samplingPts,
-            DynamicList<label>& samplingCells,
-            DynamicList<label>& samplingFaces,
-            DynamicList<label>& samplingSegments,
+            dynamicLabelList& samplingCells,
+            dynamicLabelList& samplingFaces,
+            dynamicLabelList& samplingSegments,
             DynamicList<scalar>& samplingCurveDist
         ) const;
 

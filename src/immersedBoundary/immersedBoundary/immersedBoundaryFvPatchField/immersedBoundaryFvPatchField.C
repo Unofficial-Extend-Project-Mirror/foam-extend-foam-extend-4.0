@@ -69,6 +69,12 @@ void immersedBoundaryFvPatchField<Type>::updateIbValues() const
     {
         ibValue_ = ibPatch_.toIbPoints(refValue_);
         ibGrad_ = (ibValue_ - ibcv)/ibPatch_.ibDelta();
+
+        // Reverse normals for external flow
+        if (!ibPatch_.internalFlow())
+        {
+            ibGrad_ *= -1;
+        }
     }
     else
     {

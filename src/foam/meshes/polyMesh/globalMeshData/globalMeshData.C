@@ -361,8 +361,8 @@ void Foam::globalMeshData::calcSharedEdges() const
 
     nGlobalEdges_ = globalShared.size();
 
-    DynamicList<label> dynSharedEdgeLabels(globalShared.size());
-    DynamicList<label> dynSharedEdgeAddr(globalShared.size());
+    dynamicLabelList dynSharedEdgeLabels(globalShared.size());
+    dynamicLabelList dynSharedEdgeAddr(globalShared.size());
 
     for
     (

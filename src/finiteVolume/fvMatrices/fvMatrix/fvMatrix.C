@@ -1352,6 +1352,30 @@ void Foam::checkMethod
 
 
 template<class Type>
+Foam::tmp<Foam::fvMatrix<Type> > Foam::relax
+(
+    const fvMatrix<Type>& m,
+    const scalar alpha
+)
+{
+    tmp<fvMatrix<Type> > tmatrix(new fvMatrix<Type>(m));
+    tmatrix().relax(alpha);
+
+    return tmatrix;
+}
+
+
+template<class Type>
+Foam::tmp<Foam::fvMatrix<Type> > Foam::relax(const fvMatrix<Type>& m)
+{
+    tmp<fvMatrix<Type> > tmatrix(new fvMatrix<Type>(m));
+    tmatrix().relax();
+
+    return tmatrix;
+}
+
+
+template<class Type>
 Foam::lduMatrix::solverPerformance Foam::solve
 (
     fvMatrix<Type>& fvm,

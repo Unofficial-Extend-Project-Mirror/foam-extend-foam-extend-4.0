@@ -162,8 +162,8 @@ Foam::edgeSurface::edgeSurface
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     DynamicList<edge> allEdges(surf.nEdges() + inter.cutEdges().size());
-    DynamicList<label> allParentEdges(surf.nEdges());
-    List<DynamicList<label> > allFaceEdges(surf.size());
+    dynamicLabelList allParentEdges(surf.nEdges());
+    List<dynamicLabelList > allFaceEdges(surf.size());
 
 
     // Copy surface edges (can be split!)

@@ -25,7 +25,7 @@ Class
     BlockILUSmoother
 
 Description
-    Gauss-Seidel smoother
+    ILU smoother
 
 SourceFiles
     blockILUSmoothers.C
@@ -44,7 +44,7 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                   Class BlockILUSmoother Declaration
+                       Class BlockILUSmoother Declaration
 \*---------------------------------------------------------------------------*/
 
 template<class Type>

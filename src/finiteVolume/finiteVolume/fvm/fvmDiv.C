@@ -44,7 +44,7 @@ template<class Type>
 tmp<fvMatrix<Type> >
 div
 (
-    const surfaceScalarField& flux,
+    const surfaceScalarField& rho,
     GeometricField<Type, fvPatchField, volMesh>& vf,
     const word& name
 )
@@ -52,9 +52,9 @@ div
     return fv::convectionScheme<Type>::New
     (
         vf.mesh(),
-        flux,
+        rho,
         vf.mesh().schemesDict().divScheme(name)
-    )().fvmDiv(flux, vf);
+    )().fvmDiv(rho, vf);
 }
 
 
@@ -62,13 +62,13 @@ template<class Type>
 tmp<fvMatrix<Type> >
 div
 (
-    const tmp<surfaceScalarField>& tflux,
+    const tmp<surfaceScalarField>& trho,
     GeometricField<Type, fvPatchField, volMesh>& vf,
     const word& name
 )
 {
-    tmp<fvMatrix<Type> > Div(fvm::div(tflux(), vf, name));
-    tflux.clear();
+    tmp<fvMatrix<Type> > Div(fvm::div(trho(), vf, name));
+    trho.clear();
     return Div;
 }
 
@@ -77,11 +77,11 @@ template<class Type>
 tmp<fvMatrix<Type> >
 div
 (
-    const surfaceScalarField& flux,
+    const surfaceScalarField& rho,
     GeometricField<Type, fvPatchField, volMesh>& vf
 )
 {
-    return fvm::div(flux, vf, "div("+flux.name()+','+vf.name()+')');
+    return fvm::div(rho, vf, "div(" + rho.name() + ',' + vf.name() + ')');
 }
 
 
@@ -89,12 +89,12 @@ template<class Type>
 tmp<fvMatrix<Type> >
 div
 (
-    const tmp<surfaceScalarField>& tflux,
+    const tmp<surfaceScalarField>& trho,
     GeometricField<Type, fvPatchField, volMesh>& vf
 )
 {
-    tmp<fvMatrix<Type> > Div(fvm::div(tflux(), vf));
-    tflux.clear();
+    tmp<fvMatrix<Type> > Div(fvm::div(trho(), vf));
+    trho.clear();
     return Div;
 }
 
@@ -123,7 +123,7 @@ tmp
     BlockLduSystem<vector, typename innerProduct<vector, Type>::type>
 > UDiv
 (
-    const surfaceScalarField& flux,
+    const surfaceScalarField& rho,
     GeometricField<Type, fvPatchField, volMesh>& vf,
     const word& name
 )
@@ -132,7 +132,7 @@ tmp
     (
         vf.mesh(),
         vf.mesh().schemesDict().divScheme(name)
-    )().fvmUDiv(flux, vf);
+    )().fvmUDiv(rho, vf);
 }
 
 
@@ -142,7 +142,7 @@ tmp
     BlockLduSystem<vector, typename innerProduct<vector, Type>::type>
 > UDiv
 (
-    const tmp<surfaceScalarField>& tflux,
+    const tmp<surfaceScalarField>& trho,
     GeometricField<Type, fvPatchField, volMesh>& vf,
     const word& name
 )
@@ -151,8 +151,8 @@ tmp
     <
         BlockLduSystem<vector, typename innerProduct<vector, Type>::type>
     >
-    Div(fvm::UDiv(tflux(), vf, name));
-    tflux.clear();
+    Div(fvm::UDiv(trho(), vf, name));
+    trho.clear();
     return Div;
 }
 
@@ -180,15 +180,15 @@ tmp
     BlockLduSystem<vector, typename innerProduct<vector, Type>::type>
 > UDiv
 (
-    const surfaceScalarField& flux,
+    const surfaceScalarField& rho,
     GeometricField<Type, fvPatchField, volMesh>& vf
 )
 {
     return fvm::UDiv
     (
-        flux,
+        rho,
         vf,
-        "div(" + vf.name() + ')'
+        "div(" + rho.name() + ',' + vf.name() + ')'
     );
 }
 
@@ -199,7 +199,7 @@ tmp
     BlockLduSystem<vector, typename innerProduct<vector, Type>::type>
 > UDiv
 (
-    const tmp<surfaceScalarField>& tflux,
+    const tmp<surfaceScalarField>& trho,
     GeometricField<Type, fvPatchField, volMesh>& vf
 )
 {
@@ -207,8 +207,8 @@ tmp
     <
         BlockLduSystem<vector, typename innerProduct<vector, Type>::type>
     >
-    Div(fvm::UDiv(tflux(), vf));
-    tflux.clear();
+    Div(fvm::UDiv(trho(), vf));
+    trho.clear();
     return Div;
 }
 

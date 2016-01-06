@@ -3499,7 +3499,7 @@ const changeMap dynamicTopoFvMesh::bisectEdge
     if (coupledModification_)
     {
         // Build a list of boundary edges / faces for mapping
-        DynamicList<label> checkEdges(8), checkFaces(4);
+        dynamicLabelList checkEdges(8), checkFaces(4);
 
         const labelList& oeFaces = edgeFaces_[eIndex];
         const labelList& neFaces = edgeFaces_[newEdgeIndex];
@@ -4164,7 +4164,7 @@ scalar dynamicTopoFvMesh::computeBisectionQuality
     point midPoint = 0.5 * (a + c);
     point oldPoint = 0.5 * (aOld + cOld);
 
-    DynamicList<label> eCells(10);
+    dynamicLabelList eCells(10);
 
     const labelList& eFaces = edgeFaces_[eIndex];
 
@@ -4902,7 +4902,7 @@ const changeMap dynamicTopoFvMesh::addCellLayer
     Map<labelPair> addedCells;
 
     // Allocate a list of patch faces
-    DynamicList<label> patchFaces(patchSizes_[patchID]);
+    dynamicLabelList patchFaces(patchSizes_[patchID]);
 
     // Loop through all patch faces and create a cell for each
     for (label faceI = nOldInternalFaces_; faceI < faces_.size(); faceI++)

@@ -66,7 +66,7 @@ static const longDoubleScalar longDoubleScalarROOTVSMALL = 1.0e-150;
 
 inline Scalar mag(const Scalar s)
 {
-    return std::abs(s);
+    return ::fabsl(s);
 }
 
 #define transFunc(func)            \

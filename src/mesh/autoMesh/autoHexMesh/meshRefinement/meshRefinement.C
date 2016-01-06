@@ -1807,7 +1807,7 @@ Foam::autoPtr<Foam::mapPolyMesh> Foam::meshRefinement::splitMeshRegions
     // ~~~~~~
 
     // Get cells to remove
-    DynamicList<label> cellsToRemove(mesh_.nCells());
+    dynamicLabelList cellsToRemove(mesh_.nCells());
     forAll(cellRegion, cellI)
     {
         if (cellRegion[cellI] != regionI)

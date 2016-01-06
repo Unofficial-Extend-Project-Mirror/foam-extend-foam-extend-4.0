@@ -56,7 +56,7 @@ RNGkEpsilon::RNGkEpsilon
 
     Cmu_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "Cmu",
             coeffDict_,
@@ -65,7 +65,7 @@ RNGkEpsilon::RNGkEpsilon
     ),
     C1_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "C1",
             coeffDict_,
@@ -74,7 +74,7 @@ RNGkEpsilon::RNGkEpsilon
     ),
     C2_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "C2",
             coeffDict_,
@@ -83,7 +83,7 @@ RNGkEpsilon::RNGkEpsilon
     ),
     C3_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "C3",
             coeffDict_,
@@ -92,7 +92,7 @@ RNGkEpsilon::RNGkEpsilon
     ),
     sigmak_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "sigmak",
             coeffDict_,
@@ -101,7 +101,7 @@ RNGkEpsilon::RNGkEpsilon
     ),
     sigmaEps_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "sigmaEps",
             coeffDict_,
@@ -110,7 +110,7 @@ RNGkEpsilon::RNGkEpsilon
     ),
     Prt_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "Prt",
             coeffDict_,
@@ -119,7 +119,7 @@ RNGkEpsilon::RNGkEpsilon
     ),
     eta0_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "eta0",
             coeffDict_,
@@ -128,7 +128,7 @@ RNGkEpsilon::RNGkEpsilon
     ),
     beta_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "beta",
             coeffDict_,

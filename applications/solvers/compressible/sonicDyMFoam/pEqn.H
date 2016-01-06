@@ -3,26 +3,37 @@
 
 #   include "limitU.H"
 
-    surfaceScalarField phid
-    (
-        "phid",
-        fvc::interpolate(psi)*
+    for (int nonOrth = 0; nonOrth <= nNonOrthCorr; nonOrth++)
+    {
+        // Calculate phi for boundary conditions
+        phi = rhof*
         (
             (fvc::interpolate(U) & mesh.Sf())
           - fvc::meshPhi(rho, U)
-        )
-    );
+        );
 
-    for (int nonOrth=0; nonOrth<=nNonOrthCorr; nonOrth++)
-    {
+        surfaceScalarField phid2 = rhoReff/rhof*phi;
+
+        surfaceScalarField phid("phid", psisf/rhof*phi);
+
         // Store pressure for under-relaxation
         p.storePrevIter();
 
+        volScalarField divPhid
+        (
+            "divPhid",
+            fvc::div(phid)
+        );
+
         fvScalarMatrix pEqn
         (
-            fvm::ddt(psi, p)
+            fvm::ddt(psis, p)
           + fvm::div(phid, p)
-          - fvm::laplacian(rho/UEqn.A(), p)
+            // Convective flux relaxation terms
+          + fvm::SuSp(-divPhid, p)
+          + divPhid*p
+          + fvc::div(phid2)
+          - fvm::laplacian(rho*rUA, p)
         );
 
         if
@@ -42,9 +53,10 @@
             pEqn.solve(mesh.solutionDict().solver(p.name()));
         }
 
+        // Calculate the flux
         if (nonOrth == nNonOrthCorr)
         {
-            phi = pEqn.flux();
+            phi = phid2 + pEqn.flux();
         }
 
 

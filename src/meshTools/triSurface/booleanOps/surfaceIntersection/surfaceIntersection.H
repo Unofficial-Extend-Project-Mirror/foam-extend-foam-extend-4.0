@@ -216,7 +216,7 @@ class surfaceIntersection
 
             DynamicList<edge>& allCutEdges,
             DynamicList<point>& allCutPoints,
-            List<DynamicList<label> >& surfEdgeCuts
+            List<dynamicLabelList >& surfEdgeCuts
         );
 
         //- Cut edges of surf1 with surface 2.
@@ -229,7 +229,7 @@ class surfaceIntersection
 
             DynamicList<edge>& allCutEdges,
             DynamicList<point>& allCutPoints,
-            List<DynamicList<label> >& surfEdgeCuts
+            List<dynamicLabelList >& surfEdgeCuts
         );
 
 public:

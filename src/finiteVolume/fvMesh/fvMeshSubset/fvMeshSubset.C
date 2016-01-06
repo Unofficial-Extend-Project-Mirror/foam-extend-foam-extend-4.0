@@ -910,7 +910,7 @@ void Foam::fvMeshSubset::setLargeCellSubset
     // 3: face coupled and used by one cell only (so should become normal,
     //    non-coupled patch face)
     //
-    // Note that this is not really nessecary - but means we can size things
+    // Note that this is not really necessary - but means we can size things
     // correctly. Also makes handling coupled faces much easier.
 
     labelList nCellsUsingFace(oldFaces.size(), 0);

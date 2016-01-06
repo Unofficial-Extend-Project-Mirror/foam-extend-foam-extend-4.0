@@ -105,7 +105,7 @@ calcAddressing() const
 
     // faceFaces created using a dynamic list.  Cannot guess size because
     // of multiple connections
-    List<DynamicList<label> > ff(locFcs.size());
+    List<dynamicLabelList > ff(locFcs.size());
 
     faceEdgesPtr_ = new labelListList(locFcs.size());
     labelListList& faceEdges = *faceEdgesPtr_;
@@ -148,8 +148,8 @@ calcAddressing() const
         const edgeList& curEdges = faceIntoEdges[faceI];
 
         // Record the neighbour face.  Multiple connectivity allowed
-        List<DynamicList<label> > neiFaces(curF.size());
-        List<DynamicList<label> > edgeOfNeiFace(curF.size());
+        List<dynamicLabelList > neiFaces(curF.size());
+        List<dynamicLabelList > edgeOfNeiFace(curF.size());
 
         label nNeighbours = 0;
 
@@ -234,8 +234,8 @@ calcAddressing() const
                 // Set face-edge and face-neighbour-edge to current face label
                 faceEdges[faceI][nextNei] = nEdges;
 
-                DynamicList<label>& cnf = neiFaces[nextNei];
-                DynamicList<label>& eonf = edgeOfNeiFace[nextNei];
+                dynamicLabelList& cnf = neiFaces[nextNei];
+                dynamicLabelList& eonf = edgeOfNeiFace[nextNei];
 
                 // Set edge-face addressing
                 labelList& curEf = edgeFaces[nEdges];

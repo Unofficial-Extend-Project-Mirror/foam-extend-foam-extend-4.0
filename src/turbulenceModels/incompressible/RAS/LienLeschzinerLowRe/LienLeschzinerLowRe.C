@@ -56,7 +56,7 @@ LienLeschzinerLowRe::LienLeschzinerLowRe
 
     C1_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "C1",
             coeffDict_,
@@ -65,7 +65,7 @@ LienLeschzinerLowRe::LienLeschzinerLowRe
     ),
     C2_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "C2",
             coeffDict_,
@@ -74,7 +74,7 @@ LienLeschzinerLowRe::LienLeschzinerLowRe
     ),
     sigmak_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "sigmak",
             coeffDict_,
@@ -83,7 +83,7 @@ LienLeschzinerLowRe::LienLeschzinerLowRe
     ),
     sigmaEps_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "sigmaEps",
             coeffDict_,
@@ -92,7 +92,7 @@ LienLeschzinerLowRe::LienLeschzinerLowRe
     ),
     Cmu_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "Cmu",
             coeffDict_,
@@ -101,7 +101,7 @@ LienLeschzinerLowRe::LienLeschzinerLowRe
     ),
     kappa_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "kappa",
             coeffDict_,
@@ -110,7 +110,7 @@ LienLeschzinerLowRe::LienLeschzinerLowRe
     ),
     Am_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "Am",
             coeffDict_,
@@ -119,7 +119,7 @@ LienLeschzinerLowRe::LienLeschzinerLowRe
     ),
     Aepsilon_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "Aepsilon",
             coeffDict_,
@@ -128,7 +128,7 @@ LienLeschzinerLowRe::LienLeschzinerLowRe
     ),
     Amu_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "Amu",
             coeffDict_,

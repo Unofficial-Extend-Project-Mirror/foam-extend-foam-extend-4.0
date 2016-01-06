@@ -5,7 +5,15 @@
       + fvm::div(phi, e)
       - fvm::laplacian(turbulence->alphaEff(), e)
      ==
-      - fvm::SuSp(pDivU/e, e)
+      - fvm::SuSp
+        (
+            p*fvc::div
+            (
+                phi/fvc::interpolate(rho)
+              + fvc::meshPhi(rho, U)
+            )/e,
+            e
+        )
         // viscous heating?
     );
 
@@ -40,4 +48,10 @@
     }
 
     thermo.correct();
+
+    // Recalculate compressibility
+    psis = thermo.psi()/thermo.Cp()*thermo.Cv();
+
+    // Recalculate density
+    rho = thermo.rho();
 }

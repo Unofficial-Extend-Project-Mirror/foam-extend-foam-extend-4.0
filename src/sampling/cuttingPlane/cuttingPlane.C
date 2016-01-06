@@ -181,7 +181,7 @@ bool Foam::cuttingPlane::walkCell
     const UList<label>& edgePoint,
     const label cellI,
     const label startEdgeI,
-    DynamicList<label>& faceVerts
+    dynamicLabelList& faceVerts
 )
 {
     label faceI = -1;
@@ -277,10 +277,10 @@ void Foam::cuttingPlane::walkCellCuts
 
     // use dynamic lists to handle triangulation and/or missed cuts
     DynamicList<face>  dynCutFaces(cutCells_.size());
-    DynamicList<label> dynCutCells(cutCells_.size());
+    dynamicLabelList dynCutCells(cutCells_.size());
 
     // scratch space for calculating the face vertices
-    DynamicList<label> faceVerts(10);
+    dynamicLabelList faceVerts(10);
 
     forAll(cutCells_, i)
     {

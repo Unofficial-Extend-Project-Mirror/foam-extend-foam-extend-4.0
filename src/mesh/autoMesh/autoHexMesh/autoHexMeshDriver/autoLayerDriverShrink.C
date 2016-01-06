@@ -800,7 +800,7 @@ void Foam::autoLayerDriver::medialAxisSmoothingInfo
 
         // Seed point data.
         DynamicList<pointData> maxInfo(meshPoints.size());
-        DynamicList<label> maxPoints(meshPoints.size());
+        dynamicLabelList maxPoints(meshPoints.size());
 
         // 1. Medial axis points
 

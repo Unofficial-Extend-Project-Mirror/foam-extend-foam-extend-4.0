@@ -230,7 +230,7 @@ Foam::labelList Foam::polyDualMesh::collectPatchSideFace
     label meshPointI = patch.meshPoints()[pointI];
     const labelList& pFaces = patch.pointFaces()[pointI];
 
-    DynamicList<label> dualFace;
+    dynamicLabelList dualFace;
 
     if (pointToDualPoint[meshPointI] >= 0)
     {
@@ -345,9 +345,9 @@ void Foam::polyDualMesh::collectPatchInternalFace
     const labelList& pFaces = patch.pointFaces()[pointI];
 
     // Vertices of dualFace
-    DynamicList<label> dualFace(pFaces.size());
+    dynamicLabelList dualFace(pFaces.size());
     // Indices in dualFace of vertices added because of feature edge
-    DynamicList<label> featEdgeIndices(dualFace.size());
+    dynamicLabelList featEdgeIndices(dualFace.size());
 
 
     label edgeI = startEdgeI;
@@ -440,9 +440,9 @@ void Foam::polyDualMesh::splitFace
     const labelList& featEdgeIndices,
 
     DynamicList<face>& dualFaces,
-    DynamicList<label>& dualOwner,
-    DynamicList<label>& dualNeighbour,
-    DynamicList<label>& dualRegion
+    dynamicLabelList& dualOwner,
+    dynamicLabelList& dualNeighbour,
+    dynamicLabelList& dualRegion
 )
 {
 
@@ -522,7 +522,7 @@ void Foam::polyDualMesh::splitFace
             // number of feature edges > 2.
 
             // Storage for new face
-            DynamicList<label> subFace(dualFace.size());
+            dynamicLabelList subFace(dualFace.size());
 
             forAll(featEdgeIndices, featI)
             {
@@ -587,9 +587,9 @@ void Foam::polyDualMesh::dualPatch
     const pointField& dualPoints,
 
     DynamicList<face>& dualFaces,
-    DynamicList<label>& dualOwner,
-    DynamicList<label>& dualNeighbour,
-    DynamicList<label>& dualRegion
+    dynamicLabelList& dualOwner,
+    dynamicLabelList& dualNeighbour,
+    dynamicLabelList& dualRegion
 )
 {
     const labelList& meshEdges = patch.meshEdges();
@@ -885,9 +885,9 @@ void Foam::polyDualMesh::calcDual
     // Dynamic sized since we don't know size.
 
     DynamicList<face> dynDualFaces(mesh.nEdges());
-    DynamicList<label> dynDualOwner(mesh.nEdges());
-    DynamicList<label> dynDualNeighbour(mesh.nEdges());
-    DynamicList<label> dynDualRegion(mesh.nEdges());
+    dynamicLabelList dynDualOwner(mesh.nEdges());
+    dynamicLabelList dynDualNeighbour(mesh.nEdges());
+    dynamicLabelList dynDualRegion(mesh.nEdges());
 
 
     // Generate faces from edges on the boundary
@@ -950,7 +950,7 @@ void Foam::polyDualMesh::calcDual
 
         // Now walk from startFaceI to cell to face to cell etc. until endFaceI
 
-        DynamicList<label> dualFace;
+        dynamicLabelList dualFace;
 
         if (edgeToDualPoint[edgeI] >= 0)
         {
@@ -1084,7 +1084,7 @@ void Foam::polyDualMesh::calcDual
             }
 
             // Walk face-cell-face until starting face reached.
-            DynamicList<label> dualFace(mesh.edgeCells()[edgeI].size());
+            dynamicLabelList dualFace(mesh.edgeCells()[edgeI].size());
 
             label faceI = startFaceI;
 
@@ -1566,7 +1566,7 @@ void Foam::polyDualMesh::calcFeatures
 
     const labelListList& pointEdges = allBoundary.pointEdges();
 
-    DynamicList<label> allFeaturePoints(pointEdges.size());
+    dynamicLabelList allFeaturePoints(pointEdges.size());
 
     forAll(pointEdges, pointI)
     {
@@ -1620,7 +1620,7 @@ void Foam::polyDualMesh::calcFeatures
         )
     );
 
-    DynamicList<label> allFeatureEdges(isFeatureEdge.size());
+    dynamicLabelList allFeatureEdges(isFeatureEdge.size());
     forAll(isFeatureEdge, edgeI)
     {
         if (isFeatureEdge[edgeI])

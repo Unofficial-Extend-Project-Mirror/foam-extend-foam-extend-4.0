@@ -153,7 +153,7 @@ void Foam::indexedOctree<Type>::divide
     labelListList& result
 ) const
 {
-    List<DynamicList<label> > subIndices(8);
+    List<dynamicLabelList > subIndices(8);
     for (label octant = 0; octant < subIndices.size(); octant++)
     {
         subIndices[octant].setCapacity(indices.size()/8);

@@ -66,12 +66,6 @@ protected:
         const BlockLduMatrix<Type>& matrix_;
 
 
-    // Protected member functions
-
-        //- Find the smoother name (directly or from a sub-dictionary)
-        static word getName(const dictionary&);
-
-
 public:
 
     //- Runtime type information
@@ -111,7 +105,8 @@ public:
         static autoPtr<BlockLduSmoother<Type> > New
         (
             const BlockLduMatrix<Type>& matrix,
-            const dictionary& dict
+            const dictionary& dict,
+            const word keyword = word("smoother")
         );
 
 

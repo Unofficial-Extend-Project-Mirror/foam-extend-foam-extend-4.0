@@ -55,7 +55,7 @@ LienCubicKE::LienCubicKE
 
     C1_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "C1",
             coeffDict_,
@@ -64,7 +64,7 @@ LienCubicKE::LienCubicKE
     ),
     C2_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "C2",
             coeffDict_,
@@ -73,7 +73,7 @@ LienCubicKE::LienCubicKE
     ),
     sigmak_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "sigmak",
             coeffDict_,
@@ -82,7 +82,7 @@ LienCubicKE::LienCubicKE
     ),
     sigmaEps_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "sigmaEps",
             coeffDict_,
@@ -91,7 +91,7 @@ LienCubicKE::LienCubicKE
     ),
     A1_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "A1",
             coeffDict_,
@@ -100,7 +100,7 @@ LienCubicKE::LienCubicKE
     ),
     A2_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "A2",
             coeffDict_,
@@ -109,7 +109,7 @@ LienCubicKE::LienCubicKE
     ),
     Ctau1_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "Ctau1",
             coeffDict_,
@@ -118,7 +118,7 @@ LienCubicKE::LienCubicKE
     ),
     Ctau2_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "Ctau2",
             coeffDict_,
@@ -127,7 +127,7 @@ LienCubicKE::LienCubicKE
     ),
     Ctau3_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "Ctau3",
             coeffDict_,
@@ -136,7 +136,7 @@ LienCubicKE::LienCubicKE
     ),
     alphaKsi_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "alphaKsi",
             coeffDict_,

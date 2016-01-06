@@ -47,7 +47,7 @@ SourceFiles
 #include "immersedBoundaryPolyPatch.H"
 #include "volFieldsFwd.H"
 #include "surfaceFieldsFwd.H"
-
+#include "dynamicLabelList.H"
 #include "labelPair.H"
 #include "FieldFields.H"
 #include "scalarMatrices.H"
@@ -75,6 +75,9 @@ class immersedBoundaryFvPatch
 
         //- Finite volume mesh reference
         const fvMesh& mesh_;
+
+        //- Time index for last update of mesh or moving boundary
+        mutable label ibUpdateTimeIndex_;
 
 
     // Static data
@@ -211,6 +214,9 @@ class immersedBoundaryFvPatch
 
             //- Tri surface face area vectors
             mutable vectorField* triSfPtr_;
+
+            //- Tri surface face labels contained in this mesh
+            mutable dynamicLabelList triFacesInMesh_;
 
 
     // Private Member Functions
@@ -498,6 +504,9 @@ public:
             //- Return triangular surface face centres
             const vectorField& triCf() const;
 
+            //- Return labels of triangular faces which are inside the mesh
+            const dynamicLabelList&  triFacesInMesh() const;
+
 
         // Parallel communication
 
@@ -550,6 +559,14 @@ public:
         (
             const Field<Type>& cellValues
         ) const;
+
+
+        // Helper functions
+            
+            //- Renumber Field to corespond to triangular faces contained
+            //  inside the mesh
+            template<class Type>
+            const tmp<Field<Type> > renumberField(const Field<Type>& f) const;
 
 };
 

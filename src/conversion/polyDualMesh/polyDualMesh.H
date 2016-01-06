@@ -119,9 +119,9 @@ class polyDualMesh
             const labelList& featEdgeIndices,
 
             DynamicList<face>& dualFaces,
-            DynamicList<label>& dualOwner,
-            DynamicList<label>& dualNeighbour,
-            DynamicList<label>& dualRegion
+            dynamicLabelList& dualOwner,
+            dynamicLabelList& dualNeighbour,
+            dynamicLabelList& dualRegion
         );
 
         static void dualPatch
@@ -134,9 +134,9 @@ class polyDualMesh
             const pointField& dualPoints,
 
             DynamicList<face>& dualFaces,
-            DynamicList<label>& dualOwner,
-            DynamicList<label>& dualNeighbour,
-            DynamicList<label>& dualRegion
+            dynamicLabelList& dualOwner,
+            dynamicLabelList& dualNeighbour,
+            dynamicLabelList& dualRegion
         );
 
         void calcDual

@@ -158,7 +158,7 @@ void Foam::edgeIntersections::intersectEdges
         // Get all intersections of the edge with the surface
 
         DynamicList<pointIndexHit> currentIntersections(100);
-        DynamicList<label> currentIntersectionTypes(100);
+        dynamicLabelList currentIntersectionTypes(100);
 
         while (true)
         {

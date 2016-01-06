@@ -64,14 +64,14 @@ Foam::totalPressureFvPatchScalarField::totalPressureFvPatchScalarField
 {
     if (dict.found("value"))
     {
-        fvPatchField<scalar>::operator=
+        fvPatchScalarField::operator=
         (
             scalarField("value", dict, p.size())
         );
     }
     else
     {
-        fvPatchField<scalar>::operator=(p0_);
+        fvPatchScalarField::operator=(p0_);
     }
 }
 

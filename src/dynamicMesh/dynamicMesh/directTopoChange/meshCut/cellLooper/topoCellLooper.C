@@ -386,7 +386,7 @@ void Foam::topoCellLooper::walkSplitHex
     const label fromEdgeI,
     const label fromVertI,
 
-    DynamicList<label>& loop,
+    dynamicLabelList& loop,
     DynamicList<scalar>& loopWeights
 ) const
 {
@@ -770,7 +770,7 @@ bool Foam::topoCellLooper::cut
 
             label nEstCuts = 2*mesh().cells()[cellI].size();
 
-            DynamicList<label> localLoop(nEstCuts);
+            dynamicLabelList localLoop(nEstCuts);
             DynamicList<scalar> localLoopWeights(nEstCuts);
 
             walkSplitHex

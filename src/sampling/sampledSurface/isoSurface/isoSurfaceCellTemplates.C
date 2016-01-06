@@ -212,7 +212,7 @@ void Foam::isoSurfaceCell::generateTriPoints
     const labelList& snappedPoint,
 
     DynamicList<Type>& triPoints,
-    DynamicList<label>& triMeshCells
+    dynamicLabelList& triMeshCells
 ) const
 {
     tetMatcher tet;
@@ -337,7 +337,7 @@ Foam::isoSurfaceCell::interpolate
 ) const
 {
     DynamicList<Type> triPoints(nCutCells_);
-    DynamicList<label> triMeshCells(nCutCells_);
+    dynamicLabelList triMeshCells(nCutCells_);
 
     // Dummy snap data
     DynamicList<Type> snappedPoints;
