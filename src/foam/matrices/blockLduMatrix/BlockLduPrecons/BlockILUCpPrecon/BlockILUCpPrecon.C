@@ -168,7 +168,7 @@ void Foam::BlockILUCpPrecon<Type>::calcActiveTypeFactorization
 
             // Update diagonal entry, inverting it for future use
             LDUType& diagRowI = diagPtr[rowI];
-            diagRowI = mult.inv(zDiagI);
+            diagRowI = mult.inverse(zDiag);
 
             // Index for updating L and U
             register label zwIndex;

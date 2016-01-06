@@ -295,7 +295,7 @@ void coupledKEpsilon::correct()
           + fvm::div(phi_, k_)
           + fvm::SuSp(-fvc::div(phi_), k_)
           - fvm::laplacian(DkEff(), k_)
-          + fvm::Sp(Cmu_*k_/(nut_ + nutSmall_), k_)
+          + fvm::Sp(Cmu_*k_/(nut_ + nutSmall), k_)
           - G
         );
 
