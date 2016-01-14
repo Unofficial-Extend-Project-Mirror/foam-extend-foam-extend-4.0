@@ -1,6 +1,7 @@
 solidBodyMotionFunction/solidBodyMotionFunction.C
 solidBodyMotionFunction/newSolidBodyMotionFunction.C
 
+noMotion/noMotion.C
 translation/translation.C
 linearOscillation/linearOscillation.C
 rotatingOscillation/rotatingOscillation.C
