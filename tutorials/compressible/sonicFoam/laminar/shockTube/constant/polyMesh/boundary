@@ -15,43 +15,19 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-6
+2
 (
-    topAndBottom
+    sides
     {
         type            patch;
-        nFaces          150;
-        startFace       71816;
+        nFaces          2;
+        startFace       999;
     }
-    inlet
-    {
-        type            patch;
-        nFaces          48;
-        startFace       71966;
-    }
-    outlet
-    {
-        type            patch;
-        nFaces          48;
-        startFace       72014;
-    }
-    wing
-    {
-        type            wall;
-        nFaces          778;
-        startFace       72062;
-    }
-    symBack
+    empty
     {
         type            empty;
-        nFaces          35801;
-        startFace       72840;
-    }
-    symFront
-    {
-        type            empty;
-        nFaces          35801;
-        startFace       108641;
+        nFaces          4000;
+        startFace       1001;
     }
 )
 
