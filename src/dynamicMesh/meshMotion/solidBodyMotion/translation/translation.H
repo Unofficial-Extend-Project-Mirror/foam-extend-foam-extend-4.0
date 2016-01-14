@@ -25,7 +25,7 @@ Class
     Foam::solidBodyMotionFunctions::translation
 
 Description
-    translation motion function
+    Translation motion function with sine law ramping for velocity.
 
 SourceFiles
     translation.C
@@ -70,7 +70,7 @@ class translation
         void operator=(const translation&);
 
 
-        //- Ramping factor resulting from rampTime_ value
+        //- Velocity ramping factor resulting from rampTime_ value
         scalar rampFactor() const;
 
 

@@ -48,22 +48,22 @@ namespace solidBodyMotionFunctions
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
-Foam::scalar Foam::solidBodyMotionFunctions::translation::rampFactor() const
+Foam::scalar
+Foam::solidBodyMotionFunctions::translation::rampFactor() const
 {
-    if (rampTime_ > 0)
-    {
-        // Calculate ramp-up factor
-        const scalar t = time_.value();
+    const scalar t = time_.value();
 
-        return sin(2*pi/(4*rampTime_)*Foam::min(rampTime_, t));
+    if (t < rampTime_)
+    {
+        // Ramping region
+        return sin(pi/(2*rampTime_)*t);
     }
     else
     {
+        // Past ramping region
         return 1;
     }
 }
-
-
 
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
@@ -77,7 +77,17 @@ Foam::solidBodyMotionFunctions::translation::translation
     solidBodyMotionFunction(SBMFCoeffs, runTime),
     velocity_(SBMFCoeffs_.lookup("velocity")),
     rampTime_(readScalar(SBMFCoeffs_.lookup("rampTime")))
-{}
+{
+    if (rampTime_ < 0)
+    {
+        FatalIOErrorIn
+        (
+            "solidBodyMotionFunctions::translation::translation",
+            SBMFCoeffs_
+        )   << "Negative rampTime not allowed."
+            << abort(FatalIOError);
+    }
+}
 
 
 // * * * * * * * * * * * * * * * * Destructors * * * * * * * * * * * * * * * //
@@ -91,12 +101,39 @@ Foam::solidBodyMotionFunctions::translation::~translation()
 Foam::septernion
 Foam::solidBodyMotionFunctions::translation::transformation() const
 {
-    scalar time = time_.value();
+    const scalar t = time_.value();
 
-    septernion TR(rampFactor()*velocity_*time, quaternion::I);
+    septernion TR;
+
+    if (t < rampTime_)
+    {
+        // Ramping region
+        // Account for ramping using analytical integration from ramped velocity
+        // distribution in this region
+        TR = septernion
+        (
+            velocity_*2*rampTime_/pi*(1 - cos(pi/(2*rampTime_)*t)),
+            quaternion::I
+        );
+    }
+    else
+    {
+        // Past ramping region
+        TR = septernion
+        (
+            velocity_*
+            (
+                // Displacement during the ramping region
+                2*rampTime_/pi
+                // Displacement during constant velocity after ramping region
+              + (t - rampTime_)
+            ),
+            quaternion::I
+        );
+    }
 
     Info<< "solidBodyMotionFunctions::translation::transformation(): "
-        << "Time = " << time << " velocity = " << rampFactor()*velocity_
+        << "Time = " << t << " velocity = " << rampFactor()*velocity_
         << " transformation = " << TR
         << endl;
 
@@ -107,12 +144,10 @@ Foam::solidBodyMotionFunctions::translation::transformation() const
 Foam::septernion
 Foam::solidBodyMotionFunctions::translation::velocity() const
 {
-    scalar time = time_.value();
-
     septernion TV(rampFactor()*velocity_, quaternion::zero);
 
     Info<< "solidBodyMotionFunctions::translation::transformation(): "
-        << "Time = " << time << " velocity: " << TV << endl;
+        << "Time = " << time_.value() << " velocity: " << TV << endl;
 
     return TV;
 }
