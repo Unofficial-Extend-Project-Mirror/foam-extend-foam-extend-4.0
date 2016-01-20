@@ -151,6 +151,12 @@ class sixDOFqODE
             //- Fixed yaw (rotation around z)
             Switch fixedYaw_;
 
+            //- Restraints in referent coordinate system
+            Switch referentMotionConstraints_;
+
+            //- Rotation of referent coordinate system
+            HamiltonRodriguezRot referentRotation_;
+
 
     // Private Member Functions
 
@@ -190,6 +196,14 @@ class sixDOFqODE
             (
                 const dimensionedVector& omega
             ) const;
+
+            //- Constrain rotation vector in referent or global coordinate
+            //  system
+            vector constrainRotation(vector& vec) const;
+
+            //- Constrain translation vector in referent or global coordinate
+            //  system
+            vector constrainTranslation(vector& vec) const;
 
 
 public:
@@ -285,6 +299,9 @@ public:
             //- Set rotational velocity in relative
             //  coordinate system
             inline void setOmega(const vector& omega);
+
+            //- Set referent coordinate system to apply constraints
+            inline void setReferentRotation(const HamiltonRodriguezRot& rot);
 
 
         // Average motion per time-step
