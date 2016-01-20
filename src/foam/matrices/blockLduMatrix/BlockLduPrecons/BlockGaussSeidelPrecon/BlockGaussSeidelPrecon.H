@@ -87,7 +87,7 @@ class BlockGaussSeidelPrecon
         //- Calculate inverse diagonal
         void calcInvDiag();
 
-        // Block Gauss-Seidel sweep, symetric matrix
+        //- Block Gauss-Seidel sweep, symetric matrix
         template<class DiagType, class ULType>
         void BlockSweep
         (
@@ -97,7 +97,7 @@ class BlockGaussSeidelPrecon
             const Field<Type>& b
         ) const;
 
-        // Block Gauss-Seidel sweep, asymmetric matrix
+        //- Block Gauss-Seidel sweep, asymmetric matrix
         template<class DiagType, class ULType>
         void BlockSweep
         (
