@@ -22,18 +22,20 @@ License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    firstOrderLimiter
+    MinModLimiter
 
 Description
-    First order limiter: all second order terms are removed
+    Non-differentiable cell limiter.  The limiter limits the gradient such
+    that the extrapolated face value does not under- or over-shoot the
+    neighbouring cell values
 
 Author
     Hrvoje Jasak
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef firstOrderLimiter_H
-#define firstOrderLimiter_H
+#ifndef MinModLimiter_H
+#define MinModLimiter_H
 
 #include "vector.H"
 
@@ -43,17 +45,17 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                      Class firstOrderLimiter Declaration
+                         Class MinModLimiter Declaration
 \*---------------------------------------------------------------------------*/
 
-class firstOrderLimiter
+class MinModLimiter
 {
 public:
 
-    // Constructor
+    // Constructors
 
         //- Construct null
-        firstOrderLimiter()
+        MinModLimiter()
         {}
 
 
@@ -69,10 +71,24 @@ public:
             const scalar& cellVolume,
             const scalar& deltaOneMax,
             const scalar& deltaOneMin,
-            const scalar& deltaTwo
+            const scalar& extrapolate
         )
         {
-            lim = 0;
+            if (mag(extrapolate) < SMALL)
+            {
+                lim = 1;
+            }
+            else
+            {
+                if (extrapolate > deltaOneMax + VSMALL)
+                {
+                    lim = min(1, deltaOneMax/extrapolate);
+                }
+                else if (extrapolate < deltaOneMin - VSMALL)
+                {
+                    lim = min(1, deltaOneMin/extrapolate);
+                }
+            }
         }
 
         //- Set Type limiter
@@ -86,7 +102,17 @@ public:
             const Type& extrapolate
         )
         {
-            lim = pTraits<Type>::zero;
+            for (direction cmpt = 0; cmpt < Type::nComponents; cmpt++)
+            {
+                limiter
+                (
+                    lim.component(cmpt),
+                    cellVolume,
+                    deltaOneMax.component(cmpt),
+                    deltaOneMin.component(cmpt),
+                    extrapolate.component(cmpt)
+                );
+            }
         }
 };
 

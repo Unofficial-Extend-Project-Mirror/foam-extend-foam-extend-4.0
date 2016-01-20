@@ -21,80 +21,69 @@ License
     You should have received a copy of the GNU General Public License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
-Class
-    firstOrderLimiter
-
-Description
-    First order limiter: all second order terms are removed
-
-Author
-    Hrvoje Jasak
-
 \*---------------------------------------------------------------------------*/
 
-#ifndef firstOrderLimiter_H
-#define firstOrderLimiter_H
-
-#include "vector.H"
+#include "barthJespersenGrad.H"
+#include "fvMesh.H"
+#include "volMesh.H"
+#include "surfaceMesh.H"
+#include "volFields.H"
+#include "fixedValueFvPatchFields.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 
-/*---------------------------------------------------------------------------*\
-                      Class firstOrderLimiter Declaration
-\*---------------------------------------------------------------------------*/
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-class firstOrderLimiter
+namespace fv
 {
-public:
 
-    // Constructor
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-        //- Construct null
-        firstOrderLimiter()
-        {}
+makeFvGradScheme(barthJespersenGrad)
 
-
-    // Destructor - default
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 
-    // Member functions
+template<>
+tmp
+<
+    BlockLduSystem<vector, outerProduct<vector, vector>::type>
+>
+barthJespersenGrad<vector>::fvmGrad
+(
+    const volVectorField& vf
+) const
+{
+    FatalErrorIn
+    (
+        "tmp<BlockLduSystem> barthJespersenGrad<vector>::fvmGrad\n"
+        "(\n"
+        "    GeometricField<vector, fvPatchField, volMesh>&"
+        ")\n"
+    )   << "Implicit gradient operators with cell limiters defined only for "
+        << "scalar."
+        << abort(FatalError);
 
-        //- Set scalar limiter value
-        inline void limiter
-        (
-            scalar& lim,
-            const scalar& cellVolume,
-            const scalar& deltaOneMax,
-            const scalar& deltaOneMin,
-            const scalar& deltaTwo
-        )
-        {
-            lim = 0;
-        }
+    typedef outerProduct<vector, vector>::type GradType;
 
-        //- Set Type limiter
-        template<class Type>
-        inline void limiter
-        (
-            Type& lim,
-            const scalar& cellVolume,
-            const Type& deltaOneMax,
-            const Type& deltaOneMin,
-            const Type& extrapolate
-        )
-        {
-            lim = pTraits<Type>::zero;
-        }
-};
+    tmp<BlockLduSystem<vector, GradType> > tbs
+    (
+        new BlockLduSystem<vector, GradType>(vf.mesh())
+    );
+
+    return tbs;
+}
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-} // End namespace Foam
+} // End namespace fv
 
-#endif
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+} // End namespace Foam
 
 // ************************************************************************* //

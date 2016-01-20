@@ -191,9 +191,7 @@ public:
             const GradFieldType& gradPhiIn = gradPhi.internalField();
 
             // Compute limiter values, internal faces
-
-            // Dummy flux
-            scalar upwindFlux = 1;
+            Type phiOwnerLimiter, phiNeighbourLimiter;
 
             forAll (owner, faceI)
             {
@@ -203,29 +201,27 @@ public:
                 vector deltaRLeft = faceCentre[faceI] - cellCentre[own];
                 vector deltaRRight = faceCentre[faceI] - cellCentre[nei];
 
-                Type phiOwnerLimiter = limitFunction.limiter
+                // Owner side
+                limitFunction.limiter
                 (
+                    phiOwnerLimiter,
                     cellVolume[own],
-                    upwindFlux,
                     phiMaxIn[own] - phi_[own],
                     phiMinIn[own] - phi_[own],
-                    gradPhiIn[own],
-                    gradPhiIn[nei],
-                    deltaRLeft
+                    (deltaRLeft & gradPhiIn[own])
                 );
 
-                Type phiNeighbourLimiter = limitFunction.limiter
+                // Neighbour side
+                limitFunction.limiter
                 (
+                    phiNeighbourLimiter,
                     cellVolume[nei],
-                    upwindFlux,
                     phiMaxIn[nei] - phi_[nei],
                     phiMinIn[nei] - phi_[nei],
-                    gradPhiIn[nei],
-                    gradPhiIn[own],
-                    deltaRRight
+                    (deltaRRight & gradPhiIn[nei])                    
                 );
 
-                // find minimal limiter value in each cell
+                // Find minimal limiter value in each cell
                 phiLimiterIn[own] =
                     min(phiLimiterIn[own], phiOwnerLimiter);
 
@@ -255,19 +251,19 @@ public:
                     const GradFieldType gradPhiRight =
                         gradPhi.boundaryField()[patchI].patchNeighbourField();
 
+                    Type phiFCLimiter;
+
                     forAll (fc, faceI)
                     {
                         const label& curFC = fc[faceI];
 
-                        Type phiFCLimiter = limitFunction.limiter
+                        limitFunction.limiter
                         (
+                            phiFCLimiter,
                             cellVolume[curFC],
-                            upwindFlux,
                             phiMaxIn[curFC] - phi_[curFC],
                             phiMinIn[curFC] - phi_[curFC],
-                            gradPhiLeft[faceI],
-                            gradPhiRight[faceI],
-                            deltaR[faceI]
+                            (deltaR[faceI] & gradPhiLeft[faceI])
                         );
 
                         // Find minimal limiter value in each cell

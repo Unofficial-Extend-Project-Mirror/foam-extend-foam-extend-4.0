@@ -22,18 +22,18 @@ License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    firstOrderLimiter
+    BarthJespersenLimiter
 
 Description
-    First order limiter: all second order terms are removed
+    Barth-Jespersen limiter
 
 Author
-    Hrvoje Jasak
+    Aleksandar Jemcov, Hrvoje Jasak
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef firstOrderLimiter_H
-#define firstOrderLimiter_H
+#ifndef BarthJespersenLimiter_H
+#define BarthJespersenLimiter_H
 
 #include "vector.H"
 
@@ -43,17 +43,17 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                      Class firstOrderLimiter Declaration
+                    Class BarthJespersenLimiter Declaration
 \*---------------------------------------------------------------------------*/
 
-class firstOrderLimiter
+class BarthJespersenLimiter
 {
 public:
 
-    // Constructor
+    // Constructors
 
         //- Construct null
-        firstOrderLimiter()
+        BarthJespersenLimiter()
         {}
 
 
@@ -69,10 +69,25 @@ public:
             const scalar& cellVolume,
             const scalar& deltaOneMax,
             const scalar& deltaOneMin,
-            const scalar& deltaTwo
+            const scalar& extrapolate
         )
         {
-            lim = 0;
+            if (mag(extrapolate) < SMALL)
+            {
+                lim = 1;
+            }
+            else
+            {
+                lim = min
+                (
+                    max
+                    (
+                        max(deltaOneMax/extrapolate, 0),
+                        max(deltaOneMin/extrapolate, 0)
+                    ),
+                    1
+                );
+            }
         }
 
         //- Set Type limiter
@@ -86,7 +101,17 @@ public:
             const Type& extrapolate
         )
         {
-            lim = pTraits<Type>::zero;
+            for (direction cmpt = 0; cmpt < Type::nComponents; cmpt++)
+            {
+                limiter
+                (
+                    lim.component(cmpt),
+                    cellVolume,
+                    deltaOneMax.component(cmpt),
+                    deltaOneMin.component(cmpt),
+                    extrapolate.component(cmpt)
+                );
+            }
         }
 };
 
