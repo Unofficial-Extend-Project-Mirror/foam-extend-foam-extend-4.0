@@ -35,7 +35,7 @@ License
 namespace Foam
 {
 
-// * * * * * * * * * * * * * * * global functions  * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * * Global Functions  * * * * * * * * * * * * * //
 
 UNARY_FUNCTION(scalar, tensor, tr)
 UNARY_FUNCTION(sphericalTensor, tensor, sph)
@@ -160,7 +160,11 @@ tmp<Field<tensor> > transformFieldMask<tensor>
 }
 
 
-// * * * * * * * * * * * * * * * global operators  * * * * * * * * * * * * * //
+BINARY_FUNCTION(tensor, tensor, vector, scaleRow)
+BINARY_TYPE_FUNCTION(tensor, tensor, vector, scaleRow)
+
+
+// * * * * * * * * * * * * * * * Global Operators  * * * * * * * * * * * * * //
 
 UNARY_OPERATOR(vector, tensor, *, hdual)
 UNARY_OPERATOR(tensor, vector, *, hdual)

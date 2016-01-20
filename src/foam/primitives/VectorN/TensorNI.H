@@ -1007,6 +1007,29 @@ inline TensorN<Cmpt, length> negSumDiag(const TensorN<Cmpt, length>& t)
     return t.negSumDiag();
 }
 
+
+//- Scale tensor row with a VectorN
+template <class Cmpt, int length>
+inline TensorN<Cmpt, length> scaleRow
+(
+    const TensorN<Cmpt, length>& t,
+    const VectorN<Cmpt, length>& v
+)
+{
+    TensorN<Cmpt, length> result;
+
+    for (label i = 0; i < TensorN<Cmpt, length>::rowLength; i++)
+    {
+        for (label j = 0; j < TensorN<Cmpt, length>::rowLength; j++)
+        {
+            result(i, j) = t(i, j)*v(j);
+        }
+    }
+
+    return result;
+}
+
+
 //- Return the component sum
 // template <class Cmpt, int length>
 // inline Cmpt sum(const TensorN<Cmpt, length>& t)

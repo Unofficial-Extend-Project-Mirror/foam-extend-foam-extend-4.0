@@ -21,35 +21,17 @@ License
     You should have received a copy of the GNU General Public License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
-Typedef
-    Foam::vectorField
-
-Description
-    Specialisation of Field\<T\> for vector.
-
-SourceFiles
-    vectorField.C
-
 \*---------------------------------------------------------------------------*/
 
-#ifndef vectorField_H
-#define vectorField_H
-
-#include "scalarField.H"
-#include "vector.H"
+#include "vectorField.H"
 
 #define TEMPLATE
-#include "FieldFunctionsM.H"
+#include "FieldFunctionsM.C"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-typedef Field<vector> vectorField;
-
 
 // * * * * * * * * * * * * * * * Global Functions  * * * * * * * * * * * * * //
 
@@ -64,9 +46,5 @@ BINARY_TYPE_FUNCTION(vector, vector, scalar, scaleRow)
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #include "undefFieldFunctionsM.H"
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-#endif
 
 // ************************************************************************* //

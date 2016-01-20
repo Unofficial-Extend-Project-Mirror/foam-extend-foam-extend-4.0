@@ -52,6 +52,9 @@ UNARY_FUNCTION(CmptType, vectorType, cmptSum)                                \
 BINARY_FUNCTION(vectorType, vectorType, vectorType, cmptMultiply)            \
 BINARY_TYPE_FUNCTION(vectorType, vectorType, vectorType, cmptMultiply)       \
                                                                              \
+BINARY_FUNCTION(vectorType, vectorType, CmptType, scaleRow)                  \
+BINARY_TYPE_FUNCTION(vectorType, vectorType, CmptType, scaleRow)             \
+                                                                             \
 BINARY_OPERATOR(vectorType, CmptType, vectorType, /, divide)                 \
 BINARY_TYPE_OPERATOR(vectorType, CmptType, vectorType, /, divide)            \
                                                                              \
