@@ -102,7 +102,7 @@ Foam::solidBodyMotionFunctions::linearOscillation::velocity() const
 
     septernion TV
     (
-        (calcPosition(t + dt) - calcPosition(t))/dt,
+        (calcPosition(t) - calcPosition(t - dt))/dt,
         quaternion::zero
     );
 

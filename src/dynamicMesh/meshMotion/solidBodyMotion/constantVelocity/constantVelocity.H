@@ -1,39 +1,43 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
-    \\  /    A nd           | Web:         http://www.foam-extend.org
-     \\/     M anipulation  | For copyright notice see file Copyright
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     |
+    \\  /    A nd           | Copyright held by original author
+     \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
-    This file is part of foam-extend.
+    This file is part of OpenFOAM.
 
-    foam-extend is free software: you can redistribute it and/or modify it
+    OpenFOAM is free software; you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation, either version 3 of the License, or (at your
+    Free Software Foundation; either version 2 of the License, or (at your
     option) any later version.
 
-    foam-extend is distributed in the hope that it will be useful, but
-    WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    General Public License for more details.
+    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
+    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+    for more details.
 
     You should have received a copy of the GNU General Public License
-    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
+    along with OpenFOAM; if not, write to the Free Software Foundation,
+    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 Class
-    Foam::solidBodyMotionFunctions::rotatingOscillation
+    Foam::solidBodyMotionFunction::constantVelocity
 
 Description
-    Rotating oscillation motion function
+    Prescribed constant translational and angular velocity.
 
 SourceFiles
-    rotatingOscillation.C
+    constantVelocity.C
+
+Author
+    Vuko Vukcevic, FMENA Zagreb.  All rights reserved.
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef rotatingOscillation_H
-#define rotatingOscillation_H
+#ifndef constantVelocity_H
+#define constantVelocity_H
 
 #include "solidBodyMotionFunction.H"
 #include "primitiveFields.H"
@@ -47,10 +51,10 @@ namespace solidBodyMotionFunctions
 {
 
 /*---------------------------------------------------------------------------*\
-                          Class rotatingOscillation Declaration
+                         Class constantVelocity Declaration
 \*---------------------------------------------------------------------------*/
 
-class rotatingOscillation
+class constantVelocity
 :
     public solidBodyMotionFunction
 {
@@ -59,24 +63,26 @@ class rotatingOscillation
         //- Centre of gravity
         point origin_;
 
-        //- Amplitude
-        vector amplitude_;
+        //- Translational velocity vector
+        vector transVelocity_;
 
-        //- Motion period
-        scalar period_;
+        //- Rotational velocity vector
+        vector rotVelocity_;
+
+        //- Start motion time
+        scalar startMotionTime_;
+
+        //- Is the rotational velocity given in degrees/sec
+        Switch inDegrees_;
 
 
     // Private Member Functions
 
         //- Disallow copy construct
-        rotatingOscillation(const rotatingOscillation&);
+        constantVelocity(const constantVelocity&);
 
         //- Disallow default bitwise assignment
-        void operator=(const rotatingOscillation&);
-
-
-        //- Calculate position
-        vector calcPosition(const scalar t) const;
+        void operator=(const constantVelocity&);
 
         //- Calculate tranformation
         septernion calcTransformation(const scalar t) const;
@@ -85,34 +91,22 @@ class rotatingOscillation
 public:
 
     //- Runtime type information
-    TypeName("rotatingOscillation");
+    TypeName("constantVelocity");
 
 
     // Constructors
 
         //- Construct from components
-        rotatingOscillation
+        constantVelocity
         (
             const dictionary& SBMFCoeffs,
             const Time& runTime
         );
 
- /*       //- Construct and return a clone
-        virtual autoPtr<solidBodyMotionFunction> clone() const
-        {
-            return autoPtr<solidBodyMotionFunction>
-            (
-                new rotatingOscillation
-                (
-                    SBMFCoeffs_,
-                    time_
-                )
-            );
-        }
-*/
 
     //- Destructor
-    virtual ~rotatingOscillation();
+    virtual ~constantVelocity()
+    {}
 
 
     // Member Functions
@@ -120,7 +114,7 @@ public:
         //- Return the solid-body motion transformation septernion
         virtual septernion transformation() const;
 
-	//- Return the solid-body motion velocity
+	    //- Return the solid-body motion velocity
         virtual septernion velocity() const;
 
         //- Update properties from given dictionary
