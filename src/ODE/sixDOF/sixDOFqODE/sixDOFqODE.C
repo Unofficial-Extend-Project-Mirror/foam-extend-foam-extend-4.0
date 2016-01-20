@@ -76,9 +76,10 @@ Foam::dimensionedVector Foam::sixDOFqODE::A
 {
     // Fix the global force for global rotation constraints
     dimensionedVector fAbs = force();
+    vector& fAbsVal = fAbs.value();
 
-    // Constrain translation
-    constrainTranslation(fAbs.value());
+    // Constrain rotation
+    fAbsVal = constrainTranslation(fAbsVal);
 
     return
     (
@@ -99,9 +100,9 @@ Foam::dimensionedVector Foam::sixDOFqODE::OmegaDot
 {
     // Fix the global moment for global rotation constraints
     dimensionedVector mAbs = moment();
+    vector& mAbsVal = mAbs.value();
 
-    // Constrain rotation
-    constrainRotation(mAbs.value());
+    mAbsVal = constrainRotation(mAbsVal);
 
     return
         inv(momentOfInertia_)
@@ -123,7 +124,7 @@ Foam::dimensionedVector Foam::sixDOFqODE::E
 }
 
 
-void Foam::sixDOFqODE::constrainRotation(vector& vec) const
+Foam::vector Foam::sixDOFqODE::constrainRotation(vector& vec) const
 {
     vector consVec(vector::zero);
 
@@ -164,10 +165,12 @@ void Foam::sixDOFqODE::constrainRotation(vector& vec) const
             consVec.z() = 0;
         }
     }
+
+    return consVec;
 }
 
 
-void Foam::sixDOFqODE::constrainTranslation(vector& vec) const
+Foam::vector Foam::sixDOFqODE::constrainTranslation(vector& vec) const
 {
     vector consVec(vector::zero);
 
@@ -208,6 +211,8 @@ void Foam::sixDOFqODE::constrainTranslation(vector& vec) const
             consVec.z() = 0;
         }
     }
+
+    return consVec;
 }
 
 
@@ -258,7 +263,7 @@ Foam::sixDOFqODE::sixDOFqODE(const IOobject& io)
             false
         )
     ),
-    referentRotation_(vector(1, 0, 0), 0)
+    referentRotation_(vector::zero, 0)
 {
     setCoeffs();
 }
@@ -447,20 +452,19 @@ void Foam::sixDOFqODE::derivatives
     dydx[11] = curRotation.eDot(curOmega.value(), 2);
     dydx[12] = curRotation.eDot(curOmega.value(), 3);
 
-
-//    // Add rotational constraints by setting RHS of given components to zero
-//    if (fixedRoll_)
-//    {
-//        dydx[10] = 0; // Roll axis (roll quaternion evolution RHS)
-//    }
-//    if (fixedPitch_)
-//    {
-//        dydx[11] = 0; // Pitch axis (pitch quaternion evolution RHS)
-//    }
-//    if (fixedYaw_)
-//    {
-//        dydx[12] = 0; // Yaw axis (yaw quaternion evolution RHS)
-//    }
+    // Add rotational constraints by setting RHS of given components to zero
+    if (fixedRoll_)
+    {
+        dydx[10] = 0; // Roll axis (roll quaternion evolution RHS)
+    }
+    if (fixedPitch_)
+    {
+        dydx[11] = 0; // Pitch axis (pitch quaternion evolution RHS)
+    }
+    if (fixedYaw_)
+    {
+        dydx[12] = 0; // Yaw axis (yaw quaternion evolution RHS)
+    }
 }
 
 
@@ -498,7 +502,7 @@ void Foam::sixDOFqODE::update(const scalar delta)
     Uval.z() = coeffs_[5];
 
     // Constrain velocity
-    constrainTranslation(Uval);
+    Uval = constrainTranslation(Uval);
     coeffs_[3] = Uval.x();
     coeffs_[4] = Uval.y();
     coeffs_[5] = Uval.z();
@@ -511,7 +515,7 @@ void Foam::sixDOFqODE::update(const scalar delta)
     omegaVal.z() = coeffs_[8];
 
     // Constrain omega
-    constrainRotation(omegaVal);
+    omegaVal = constrainRotation(omegaVal);
     coeffs_[6] = omegaVal.x();
     coeffs_[7] = omegaVal.y();
     coeffs_[8] = omegaVal.z();
