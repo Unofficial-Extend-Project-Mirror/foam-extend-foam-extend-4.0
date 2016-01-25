@@ -197,6 +197,14 @@ class sixDOFqODE
                 const dimensionedVector& omega
             ) const;
 
+            //- Constrain rotation vector in referent or global coordinate
+            //  system
+            void constrainRotation(vector& vec) const;
+
+            //- Constrain translation vector in referent or global coordinate
+            //  system
+            void constrainTranslation(vector& vec) const;
+
 
 public:
 
@@ -291,6 +299,9 @@ public:
             //- Set rotational velocity in relative
             //  coordinate system
             inline void setOmega(const vector& omega);
+
+            //- Set referent coordinate system to apply constraints
+            inline void setReferentRotation(const HamiltonRodriguezRot& rot);
 
 
         // Average motion per time-step
