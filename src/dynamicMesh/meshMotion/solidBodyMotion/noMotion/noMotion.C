@@ -74,7 +74,7 @@ Foam::solidBodyMotionFunctions::noMotion::transformation() const
 Foam::septernion
 Foam::solidBodyMotionFunctions::noMotion::velocity() const
 {
-    return septernion(vector::zero, quaternion::zero);
+    return septernion(vector::zero, quaternion::I)/time_.deltaT().value();
 }
 
 
