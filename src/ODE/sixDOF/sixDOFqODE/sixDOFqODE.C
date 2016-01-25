@@ -76,10 +76,9 @@ Foam::dimensionedVector Foam::sixDOFqODE::A
 {
     // Fix the global force for global rotation constraints
     dimensionedVector fAbs = force();
-    vector& fAbsVal = fAbs.value();
 
-    // Constrain rotation
-    fAbsVal = constrainTranslation(fAbsVal);
+    // Constrain translation
+    constrainTranslation(fAbs.value());
 
     return
     (
@@ -100,9 +99,9 @@ Foam::dimensionedVector Foam::sixDOFqODE::OmegaDot
 {
     // Fix the global moment for global rotation constraints
     dimensionedVector mAbs = moment();
-    vector& mAbsVal = mAbs.value();
 
-    mAbsVal = constrainRotation(mAbsVal);
+    // Constrain rotation
+    constrainRotation(mAbs.value());
 
     return
         inv(momentOfInertia_)
@@ -124,7 +123,7 @@ Foam::dimensionedVector Foam::sixDOFqODE::E
 }
 
 
-Foam::vector Foam::sixDOFqODE::constrainRotation(vector& vec) const
+void Foam::sixDOFqODE::constrainRotation(vector& vec) const
 {
     vector consVec(vector::zero);
 
@@ -165,12 +164,10 @@ Foam::vector Foam::sixDOFqODE::constrainRotation(vector& vec) const
             consVec.z() = 0;
         }
     }
-
-    return consVec;
 }
 
 
-Foam::vector Foam::sixDOFqODE::constrainTranslation(vector& vec) const
+void Foam::sixDOFqODE::constrainTranslation(vector& vec) const
 {
     vector consVec(vector::zero);
 
@@ -211,8 +208,6 @@ Foam::vector Foam::sixDOFqODE::constrainTranslation(vector& vec) const
             consVec.z() = 0;
         }
     }
-
-    return consVec;
 }
 
 
@@ -263,7 +258,7 @@ Foam::sixDOFqODE::sixDOFqODE(const IOobject& io)
             false
         )
     ),
-    referentRotation_(vector::zero, 0)
+    referentRotation_(vector(1, 0, 0), 0)
 {
     setCoeffs();
 }
@@ -503,7 +498,7 @@ void Foam::sixDOFqODE::update(const scalar delta)
     Uval.z() = coeffs_[5];
 
     // Constrain velocity
-    Uval = constrainTranslation(Uval);
+    constrainTranslation(Uval);
     coeffs_[3] = Uval.x();
     coeffs_[4] = Uval.y();
     coeffs_[5] = Uval.z();
@@ -516,7 +511,7 @@ void Foam::sixDOFqODE::update(const scalar delta)
     omegaVal.z() = coeffs_[8];
 
     // Constrain omega
-    omegaVal = constrainRotation(omegaVal);
+    constrainRotation(omegaVal);
     coeffs_[6] = omegaVal.x();
     coeffs_[7] = omegaVal.y();
     coeffs_[8] = omegaVal.z();

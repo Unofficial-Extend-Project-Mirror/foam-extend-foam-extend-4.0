@@ -199,11 +199,11 @@ class sixDOFqODE
 
             //- Constrain rotation vector in referent or global coordinate
             //  system
-            vector constrainRotation(vector& vec) const;
+            void constrainRotation(vector& vec) const;
 
             //- Constrain translation vector in referent or global coordinate
             //  system
-            vector constrainTranslation(vector& vec) const;
+            void constrainTranslation(vector& vec) const;
 
 
 public:
