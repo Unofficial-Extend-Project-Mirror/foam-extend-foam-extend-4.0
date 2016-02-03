@@ -166,6 +166,14 @@ void Foam::sixDOFqODE::setOmega(const vector& omega)
 }
 
 
+void Foam::sixDOFqODE::setReferentRotation(const HamiltonRodriguezRot& rot)
+{
+    referentRotation_ = rot;
+
+    referentMotionConstraints_ = true;
+}
+
+
 const Foam::dimensionedVector& Foam::sixDOFqODE::Uaverage() const
 {
     return Uaverage_;

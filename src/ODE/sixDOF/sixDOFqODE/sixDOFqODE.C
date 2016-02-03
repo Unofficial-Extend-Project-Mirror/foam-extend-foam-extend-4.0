@@ -74,11 +74,17 @@ Foam::dimensionedVector Foam::sixDOFqODE::A
     const HamiltonRodriguezRot& rotation
 ) const
 {
+    // Fix the global force for global rotation constraints
+    dimensionedVector fAbs = force();
+
+    // Constrain translation
+    constrainTranslation(fAbs.value());
+
     return
     (
        - (linSpringCoeffs_ & xR)    // spring
        - (linDampingCoeffs_ & uR)   // damping
-       + force()
+       + fAbs
          // To absolute
        + (rotation.invR() & forceRelative())
     )/mass_;
@@ -93,20 +99,9 @@ Foam::dimensionedVector Foam::sixDOFqODE::OmegaDot
 {
     // Fix the global moment for global rotation constraints
     dimensionedVector mAbs = moment();
-    vector& mAbsVal = mAbs.value();
 
-    if (fixedRoll_)
-    {
-        mAbsVal.x() = 0;
-    }
-    if (fixedPitch_)
-    {
-        mAbsVal.y() = 0;
-    }
-    if (fixedYaw_)
-    {
-        mAbsVal.z() = 0;
-    }
+    // Constrain rotation
+    constrainRotation(mAbs.value());
 
     return
         inv(momentOfInertia_)
@@ -127,6 +122,93 @@ Foam::dimensionedVector Foam::sixDOFqODE::E
     return (*(momentOfInertia_ & omega) & omega);
 }
 
+
+void Foam::sixDOFqODE::constrainRotation(vector& vec) const
+{
+    vector consVec(vector::zero);
+
+    // Constrain the vector in respect to referent or global coordinate system
+    if (referentMotionConstraints_)
+    {
+        consVec = referentRotation_.R() & vec;
+
+        if (fixedRoll_)
+        {
+            consVec.x() = 0;
+        }
+        if (fixedPitch_)
+        {
+            consVec.y() = 0;
+        }
+        if (fixedYaw_)
+        {
+            consVec.z() = 0;
+        }
+
+        consVec = referentRotation_.invR() & consVec;
+    }
+    else
+    {
+        consVec = vec;
+
+        if (fixedRoll_)
+        {
+            consVec.x() = 0;
+        }
+        if (fixedPitch_)
+        {
+            consVec.y() = 0;
+        }
+        if (fixedYaw_)
+        {
+            consVec.z() = 0;
+        }
+    }
+}
+
+
+void Foam::sixDOFqODE::constrainTranslation(vector& vec) const
+{
+    vector consVec(vector::zero);
+
+    // Constrain the vector in respect to referent or global coordinate system
+    if (referentMotionConstraints_)
+    {
+        consVec = referentRotation_.R() & vec;
+
+        if (fixedSurge_)
+        {
+            consVec.x() = 0;
+        }
+        if (fixedSway_)
+        {
+            consVec.y() = 0;
+        }
+        if (fixedHeave_)
+        {
+            consVec.z() = 0;
+        }
+
+        consVec = referentRotation_.invR() & consVec;
+    }
+    else
+    {
+        consVec = vec;
+
+        if (fixedSurge_)
+        {
+            consVec.x() = 0;
+        }
+        if (fixedSway_)
+        {
+            consVec.y() = 0;
+        }
+        if (fixedHeave_)
+        {
+            consVec.z() = 0;
+        }
+    }
+}
 
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
@@ -167,7 +249,16 @@ Foam::sixDOFqODE::sixDOFqODE(const IOobject& io)
     fixedHeave_(lookup("fixedHeave")),
     fixedRoll_(lookup("fixedRoll")),
     fixedPitch_(lookup("fixedPitch")),
-    fixedYaw_(lookup("fixedYaw"))
+    fixedYaw_(lookup("fixedYaw")),
+    referentMotionConstraints_
+    (
+        lookupOrDefault<Switch>
+        (
+            "referentMotionConstraints",
+            false
+        )
+    ),
+    referentRotation_(vector(1, 0, 0), 0)
 {
     setCoeffs();
 }
@@ -224,7 +315,9 @@ Foam::sixDOFqODE::sixDOFqODE
     fixedHeave_(sd.fixedHeave_),
     fixedRoll_(sd.fixedRoll_),
     fixedPitch_(sd.fixedPitch_),
-    fixedYaw_(sd.fixedYaw_)
+    fixedYaw_(sd.fixedYaw_),
+    referentMotionConstraints_(sd.referentMotionConstraints_),
+    referentRotation_(sd.referentRotation_)
 {}
 
 
@@ -299,22 +392,22 @@ void Foam::sixDOFqODE::derivatives
     dydx[4] = accel.y();
     dydx[5] = accel.z();
 
-    // Add translational constraints by setting RHS of given components to zero
-    if (fixedSurge_)
-    {
-        dydx[0] = 0; // Surge velocity
-        dydx[3] = 0; // Surge acceleration
-    }
-    if (fixedSway_)
-    {
-        dydx[1] = 0; // Sway velocity
-        dydx[4] = 0; // Sway acceleration
-    }
-    if (fixedHeave_)
-    {
-        dydx[2] = 0; // Heave velocity
-        dydx[5] = 0; // Heave acceleration
-    }
+//    // Add translational constraints by setting RHS of given components to zero
+//    if (fixedSurge_)
+//    {
+//        dydx[0] = 0; // Surge velocity
+//        dydx[3] = 0; // Surge acceleration
+//    }
+//    if (fixedSway_)
+//    {
+//        dydx[1] = 0; // Sway velocity
+//        dydx[4] = 0; // Sway acceleration
+//    }
+//    if (fixedHeave_)
+//    {
+//        dydx[2] = 0; // Heave velocity
+//        dydx[5] = 0; // Heave acceleration
+//    }
 
     // Set the derivatives for rotation
     dimensionedVector curOmega
@@ -323,6 +416,25 @@ void Foam::sixDOFqODE::derivatives
         dimless/dimTime,
         vector(y[6], y[7], y[8])
     );
+
+//    dimensionedVector curGlobalOmega = curRotation.invR() & curOmega;
+//
+//    // Add rotational constraints by setting RHS of given components to zero
+//    if (fixedRoll_)
+//    {
+//        curGlobalOmega.value().x() = 0;
+//    }
+//    if (fixedPitch_)
+//    {
+//        curGlobalOmega.value().y() = 0;
+//    }
+//    if (fixedYaw_)
+//    {
+//        curGlobalOmega.value().z() = 0;
+//    }
+//
+//
+//    curOmega = curRotation.R() & curGlobalOmega;
 
     const vector omegaDot = OmegaDot(curRotation, curOmega).value();
 
@@ -335,19 +447,20 @@ void Foam::sixDOFqODE::derivatives
     dydx[11] = curRotation.eDot(curOmega.value(), 2);
     dydx[12] = curRotation.eDot(curOmega.value(), 3);
 
-    // Add rotational constraints by setting RHS of given components to zero
-    if (fixedRoll_)
-    {
-        dydx[10] = 0; // Roll axis (roll quaternion evolution RHS)
-    }
-    if (fixedPitch_)
-    {
-        dydx[11] = 0; // Pitch axis (pitch quaternion evolution RHS)
-    }
-    if (fixedYaw_)
-    {
-        dydx[12] = 0; // Yaw axis (yaw quaternion evolution RHS)
-    }
+
+//    // Add rotational constraints by setting RHS of given components to zero
+//    if (fixedRoll_)
+//    {
+//        dydx[10] = 0; // Roll axis (roll quaternion evolution RHS)
+//    }
+//    if (fixedPitch_)
+//    {
+//        dydx[11] = 0; // Pitch axis (pitch quaternion evolution RHS)
+//    }
+//    if (fixedYaw_)
+//    {
+//        dydx[12] = 0; // Yaw axis (yaw quaternion evolution RHS)
+//    }
 }
 
 
@@ -384,12 +497,24 @@ void Foam::sixDOFqODE::update(const scalar delta)
     Uval.y() = coeffs_[4];
     Uval.z() = coeffs_[5];
 
+    // Constrain velocity
+    constrainTranslation(Uval);
+    coeffs_[3] = Uval.x();
+    coeffs_[4] = Uval.y();
+    coeffs_[5] = Uval.z();
+
     // Update omega
     vector& omegaVal = omega_.value();
 
     omegaVal.x() = coeffs_[6];
     omegaVal.y() = coeffs_[7];
     omegaVal.z() = coeffs_[8];
+
+    // Constrain omega
+    constrainRotation(omegaVal);
+    coeffs_[6] = omegaVal.x();
+    coeffs_[7] = omegaVal.y();
+    coeffs_[8] = omegaVal.z();
 
     rotation_.updateRotation
     (

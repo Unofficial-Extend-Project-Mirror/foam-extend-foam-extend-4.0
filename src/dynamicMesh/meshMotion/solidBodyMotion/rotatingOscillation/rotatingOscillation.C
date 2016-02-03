@@ -57,7 +57,7 @@ Foam::solidBodyMotionFunctions::rotatingOscillation::calcPosition
 }
 
 
-Foam::septernion 
+Foam::septernion
 Foam::solidBodyMotionFunctions::rotatingOscillation::calcTransformation
 (
     const scalar t
@@ -114,14 +114,22 @@ transformation() const
     return TR;
 }
 
+
 Foam::septernion
 Foam::solidBodyMotionFunctions::rotatingOscillation::velocity() const
 {
     scalar t = time_.value();
     scalar dt = time_.deltaT().value();
-    
-    return (calcTransformation(t + dt) - calcTransformation(t))/dt;
+
+    const septernion velocity
+    (
+        (calcTransformation(t).t() - calcTransformation(t - dt).t())/dt,
+        (calcTransformation(t).r()/calcTransformation(t - dt).r())/dt
+    );
+
+    return velocity;
 }
+
 
 bool Foam::solidBodyMotionFunctions::rotatingOscillation::read
 (
@@ -136,5 +144,6 @@ bool Foam::solidBodyMotionFunctions::rotatingOscillation::read
 
     return true;
 }
+
 
 // ************************************************************************* //
