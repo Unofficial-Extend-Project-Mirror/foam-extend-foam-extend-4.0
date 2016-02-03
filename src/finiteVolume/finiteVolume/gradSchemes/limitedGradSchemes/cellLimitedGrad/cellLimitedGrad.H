@@ -117,6 +117,8 @@ public:
         );
 
 
+        //- Return the gradient of the given field to the gradScheme::grad
+        //  for optional caching
         tmp
         <
             GeometricField
@@ -129,7 +131,7 @@ public:
 
 
         //- Return the BlockLduSystem corresponding to the implicit cell
-        // limted grad discretization. For block coupled systems.
+        //  limited grad discretization.  For block coupled systems.
         tmp
         <
             BlockLduSystem<vector, typename outerProduct<vector, Type>::type>
