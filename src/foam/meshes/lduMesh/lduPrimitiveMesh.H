@@ -25,7 +25,8 @@ Class
     Foam::lduPrimitiveMesh
 
 Description
-    Simplest contrete lduMesh which stores the addressing needed bu lduMatrix.
+    Simplest contrete lduMesh which stores the addressing needed by the
+    lduMatrix.  Addressing is contained locally
 
 \*---------------------------------------------------------------------------*/
 
@@ -115,7 +116,18 @@ public:
     // Destructor
 
         virtual ~lduPrimitiveMesh()
-        {}
+        {
+            // Clear interface pointers: they are not deleted
+            // by the lduInterfacePtrsList (derived from UPtrList)
+            // HJ, 5/Feb/2016
+            forAll (interfaces_, i)
+            {
+                if (interfaces_.set(i))
+                {
+                    delete interfaces_(i);
+                }
+            }
+        }
 
 
     // Member Functions
