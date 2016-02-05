@@ -16,19 +16,6 @@ FoamFile
 
 solvers
 {
-    // Coupled
-    Up
-    {
-        solver BiCGStab;
-        preconditioner Cholesky;
-
-        tolerance 1e-09;
-        relTol  0.0;
-
-        minIter 1;
-        maxIter 500;
-    }
-
     // Segregated
     p
     {
