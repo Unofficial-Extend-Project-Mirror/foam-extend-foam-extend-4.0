@@ -208,7 +208,7 @@ void Foam::coarseAmgLevel::solve
         return;
     }
 
-    // Switch of debug in top-level direct solve
+    // Switch off debug in top-level direct solve
     label oldDebug = lduMatrix::debug();
 
     if (matrixPtr_->matrix().symmetric())
@@ -261,7 +261,7 @@ void Foam::coarseAmgLevel::solve
         coarseSolverPerf.print();
     }
 
-    if (lduMatrix::debug >= 2)
+    if (lduMatrix::debug >= 3)
     {
         coarseSolverPerf.print();
     }
