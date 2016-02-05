@@ -2,7 +2,12 @@
     // Solve the enthalpy equation
     T.storePrevIter();
 
-    surfaceScalarField faceU = phi/fvc::interpolate(rho);
+    // Calculate face velocity from flux
+    surfaceScalarField faceU
+    (
+        "faceU",
+        phi/fvc::interpolate(rho)
+    );
 
     fvScalarMatrix hEqn
     (
