@@ -13,6 +13,9 @@
 # file-browser settings - anywhere
 .directory
 
+# KDevelop include-path files - anywhere
+.kdev_include_paths
+
 # CVS recovered versions - anywhere
 .#*
 
@@ -104,8 +107,8 @@ etc/cshrc
 etc/bashrc
 etc/settings.csh
 etc/settings.sh
-etc/pref.csh
-etc/pref.sh
+etc/prefs.csh
+etc/prefs.sh
 
 # make sure that this settings file is not used
 etc/bashrc.preset
