@@ -145,23 +145,21 @@ void Foam::sixDOFqODE::constrainRotation(vector& vec) const
             consVec.z() = 0;
         }
 
-        consVec = referentRotation_.invR() & consVec;
+        vec = referentRotation_.invR() & consVec;
     }
     else
     {
-        consVec = vec;
-
         if (fixedRoll_)
         {
-            consVec.x() = 0;
+            vec.x() = 0;
         }
         if (fixedPitch_)
         {
-            consVec.y() = 0;
+            vec.y() = 0;
         }
         if (fixedYaw_)
         {
-            consVec.z() = 0;
+            vec.z() = 0;
         }
     }
 }
@@ -189,23 +187,21 @@ void Foam::sixDOFqODE::constrainTranslation(vector& vec) const
             consVec.z() = 0;
         }
 
-        consVec = referentRotation_.invR() & consVec;
+        vec = referentRotation_.invR() & consVec;
     }
     else
     {
-        consVec = vec;
-
         if (fixedSurge_)
         {
-            consVec.x() = 0;
+            vec.x() = 0;
         }
         if (fixedSway_)
         {
-            consVec.y() = 0;
+            vec.y() = 0;
         }
         if (fixedHeave_)
         {
-            consVec.z() = 0;
+            vec.z() = 0;
         }
     }
 }
