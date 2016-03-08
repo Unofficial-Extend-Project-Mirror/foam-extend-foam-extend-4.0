@@ -121,15 +121,61 @@ void Foam::gradientEnthalpyFvPatchScalarField::updateCoeffs()
         dimensionedInternalField().name() == db().mangleFileName("i")
     )
     {
+        // Get access to relative and rotational velocity
+        const word UrelName("Urel");
+        const word UrotName("Urot");
+
+        if
+        (
+            !this->db().objectRegistry::found(UrelName)
+         || !this->db().objectRegistry::found(UrotName)
+        )
+        {
+             // Velocities not available, do not update
+            InfoIn
+            (
+                "void gradientEnthalpyFvPatchScalarField::"
+                "updateCoeffs(const vectorField& Up)"
+            )   << "Velocity fields " << UrelName << " or "
+                << UrotName << " not found.  "
+                << "Performing enthalpy value update for field "
+                << this->dimensionedInternalField().name()
+                << " and patch " << patchi
+                << endl;
+
+            gradient() = thermo.Cp(Tw, patchi)*Tw.snGrad()
+              + patch().deltaCoeffs()*
+                (
+                    thermo.h(Tw, patchi)
+                  - thermo.h(Tw, patch().faceCells())
+                );
+        }
+        else
+        {
+            const fvPatchVectorField& Urelp =
+                lookupPatchField<volVectorField, vector>(UrelName);
+
+            const fvPatchVectorField& Urotp =
+                lookupPatchField<volVectorField, vector>(UrotName);
+
+            gradient() = thermo.Cp(Tw, patchi)*Tw.snGrad()
+              + patch().deltaCoeffs()*
+                (
+                    thermo.h(Tw, patchi)
+                  - thermo.h(Tw, patch().faceCells())
+                )
+              - mag(Urotp)*mag(Urotp.snGrad())
+              + mag(Urelp)*mag(Urelp.snGrad());
+        }
     }
     else
     {
         gradient() = thermo.Cp(Tw, patchi)*Tw.snGrad()
-        + patch().deltaCoeffs()*
-        (
-            thermo.hs(Tw, patchi)
-          - thermo.hs(Tw, patch().faceCells())
-        );
+          + patch().deltaCoeffs()*
+            (
+                thermo.hs(Tw, patchi)
+              - thermo.hs(Tw, patch().faceCells())
+            );
     }
 
     fixedGradientFvPatchScalarField::updateCoeffs();
