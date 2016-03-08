@@ -144,7 +144,11 @@ Foam::solidBodyMotionFunctions::translation::transformation() const
 Foam::septernion
 Foam::solidBodyMotionFunctions::translation::velocity() const
 {
-    septernion TV(rampFactor()*velocity_, quaternion::zero);
+    septernion TV
+    (
+        rampFactor()*velocity_,
+        quaternion::I/time_.deltaT().value()
+    );
 
     Info<< "solidBodyMotionFunctions::translation::transformation(): "
         << "Time = " << time_.value() << " velocity: " << TV << endl;
