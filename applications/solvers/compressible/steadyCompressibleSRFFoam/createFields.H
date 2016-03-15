@@ -73,6 +73,9 @@
         SRF::SRFModel::New(Urel)
     );
 
+    // Create rotational velocity
+    volVectorField Urot("Urot", SRF->U());
+
     // Create absolute velocity field
     volVectorField Uabs
     (
@@ -84,7 +87,7 @@
             IOobject::NO_READ,
             IOobject::AUTO_WRITE
         ),
-        Urel + SRF->U()
+        Urel + Urot
     );
 
     // Create rothalpy, in two steps to preserve boundary conditions
@@ -100,4 +103,4 @@
         ),
         h
     );
-    i -= 0.5*magSqr(SRF->U());
+    i == h - 0.5*(magSqr(Urot) - magSqr(Urel));

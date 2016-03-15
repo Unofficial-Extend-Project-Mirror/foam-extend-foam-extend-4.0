@@ -40,6 +40,13 @@
         mesh
     );
 
+    // Store kinetic energy for total enthalpy equation
+    volScalarField K
+    (
+        "K",
+        0.5*(magSqr(U))
+    );
+
 #   include "compressibleCreatePhi.H"
 
     Info<< "Creating turbulence model\n" << endl;

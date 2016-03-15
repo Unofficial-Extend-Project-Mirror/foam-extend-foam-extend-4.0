@@ -22,7 +22,7 @@ boundaryField
 {
     inlet
     {
-        type            totalPressure;
+        type            isentropicTotalPressure;
         phi             phi;
         rho             none;
         psi             psi;

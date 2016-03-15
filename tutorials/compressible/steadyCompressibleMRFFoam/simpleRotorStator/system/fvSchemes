@@ -20,7 +20,7 @@ ddtSchemes
 
     ddt(rho,U)      steadyState;
     ddt(rho,i)      steadyState;
-    ddt(psi,p)      steadyInertial phi rho 0.25;
+    ddt(psi,p)      steadyState;
 
     ddt(rho,k)        steadyState;
     ddt(rho,epsilon)  steadyState;

@@ -32,19 +32,18 @@ solvers
         solver           BiCGStab;
         preconditioner   DILU;
 
-        minIter           0;
-        maxIter           1000;
+        minIter          0;
+        maxIter          1000;
         tolerance        1e-8;
         relTol           0.0;
     }
-
     h
     {
         solver           BiCGStab;
         preconditioner   DILU;
 
-        minIter           0;
-        maxIter           1000;
+        minIter          0;
+        maxIter          1000;
         tolerance        1e-8;
         relTol           0.0;
     }
@@ -53,16 +52,16 @@ solvers
 PIMPLE
 {
     nOuterCorrectors         1;
-    nCorrectors              3;
+    nCorrectors              2;
     nNonOrthogonalCorrectors 0;
 }
 
 relaxationFactors
 {
     // Note: under-relaxation factors used in wave-transmissive schemes
-    U               0.1;
-    p               0.25;
-    h               0.1;
+    U               0.4;
+    p               0.3;
+    h               0.5;
 }
 
 fieldBounds
