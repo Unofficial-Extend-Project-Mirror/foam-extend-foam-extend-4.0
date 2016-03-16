@@ -156,7 +156,7 @@ Foam::lduSolverPerformance Foam::bicgSolver::solve
 
             // Update preconditioned residual
             matrix_.Amul(wA, pA, coupleBouCoeffs_, interfaces_, cmpt);
-            matrix_.Amul(wT, pT, coupleIntCoeffs_, interfaces_, cmpt);
+            matrix_.Tmul(wT, pT, coupleIntCoeffs_, interfaces_, cmpt);
 
             wApT = gSumProd(wA, pT);
 
