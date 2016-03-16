@@ -1,0 +1,3 @@
+consistentSimpleFoam.C
+
+EXE = $(FOAM_APPBIN)/consistentSimpleFoam
