@@ -28,15 +28,12 @@ Description
     Wang differentiable limiter
 
 Author
-    Aleksandar Jemcov
-    Updated by Hrvoje Jasak
+    Hrvoje Jasak
 
 \*---------------------------------------------------------------------------*/
 
 #ifndef WangLimiter_H
 #define WangLimiter_H
-
-#include "vector.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -78,10 +75,11 @@ public:
             scalar epsilonSquare =
                 sqr(epsilonPrime_*(deltaOneMax - deltaOneMin));
 
-            if (extrapolate > SMALL)
+            if (extrapolate > VSMALL)
             {
                 lim = max
                 (
+                    0,
                     min
                     (
                         (
@@ -93,21 +91,21 @@ public:
                             extrapolate*
                             (
                                 sqr(deltaOneMax)
-                              + 2.0*sqr(extrapolate)
+                              + 2*sqr(extrapolate)
                               + deltaOneMax*extrapolate
                               + epsilonSquare
                             ),
                             SMALL
                         ),
-                        1
-                    ),
-                    0
+                        lim
+                    )
                 );
             }
-            else if (extrapolate < SMALL)
+            else if (extrapolate < VSMALL)
             {
                 lim = max
                 (
+                    0,
                     min
                     (
                         (
@@ -119,19 +117,19 @@ public:
                             extrapolate*
                             (
                                 sqr(deltaOneMin)
-                              + 2.0*sqr(extrapolate) + deltaOneMin*extrapolate
+                              + 2*sqr(extrapolate)
+                              + deltaOneMin*extrapolate
                               + epsilonSquare
                             ),
                             SMALL
                         ),
-                        1
-                    ),
-                    0
+                        lim
+                    )
                 );
             }
             else
             {
-                lim = 1;
+                // Limiter remains unchanged
             }
         }
 

@@ -26,7 +26,7 @@ Class
 
 Description
     Venkatakrishnan gradient limiter applied to a runTime selected
-     base gradient scheme.
+    base gradient scheme.
 
 SourceFiles
     venkatakrishnanGrad.C

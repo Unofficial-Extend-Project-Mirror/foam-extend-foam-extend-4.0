@@ -67,16 +67,13 @@ LimitedGrad<Type, GradientLimiter>::limiter
         label own = owner[faceI];
         label nei = neighbour[faceI];
 
-        const Type& vfOwn = vfIn[own];
-        const Type& vfNei = vfIn[nei];
-
         // Owner side
-        maxVf[own] = max(maxVf[own], vfNei);
-        minVf[own] = min(minVf[own], vfNei);
+        maxVf[own] = Foam::max(maxVf[own], vfIn[nei]);
+        minVf[own] = Foam::min(minVf[own], vfIn[nei]);
 
         // Neighbour side
-        maxVf[nei] = max(maxVf[nei], vfOwn);
-        minVf[nei] = min(minVf[nei], vfOwn);
+        maxVf[nei] = Foam::max(maxVf[nei], vfIn[own]);
+        minVf[nei] = Foam::min(minVf[nei], vfIn[own]);
     }
 
     const GeoBoundaryFieldType& bf = vf.boundaryField();
@@ -96,10 +93,9 @@ LimitedGrad<Type, GradientLimiter>::limiter
             forAll (pOwner, pFaceI)
             {
                 label own = pOwner[pFaceI];
-                Type vfNei = psfNei[pFaceI];
 
-                maxVf[own] = max(maxVf[own], vfNei);
-                minVf[own] = min(minVf[own], vfNei);
+                maxVf[own] = Foam::max(maxVf[own], psfNei[pFaceI]);
+                minVf[own] = Foam::min(minVf[own], psfNei[pFaceI]);
             }
         }
         else
@@ -108,18 +104,20 @@ LimitedGrad<Type, GradientLimiter>::limiter
             forAll (pOwner, pFaceI)
             {
                 label own = pOwner[pFaceI];
-                Type vfNei = psf[pFaceI];
+                const Type& vfNei = psf[pFaceI];
 
-                maxVf[own] = max(maxVf[own], vfNei);
-                minVf[own] = min(minVf[own], vfNei);
+                maxVf[own] = Foam::max(maxVf[own], vfNei);
+                minVf[own] = Foam::min(minVf[own], vfNei);
             }
         }
     }
 
     // Subtract the cell value to get differences
-    maxVf -= vf;
-    minVf -= vf;
-
+    // Stabilise differences for round-off error, since maxVf must be
+    // positive or zero and minVf must be negative or zero
+    // HJ, 1/Feb/2016
+    maxVf = Foam::max(maxVf - vf, pTraits<Type>::zero);
+    minVf = Foam::min(minVf - vf, pTraits<Type>::zero);
 
     // Create a limiter
     tmp<GeoFieldType> tlimitField
@@ -135,14 +133,18 @@ LimitedGrad<Type, GradientLimiter>::limiter
                 IOobject::NO_WRITE
             ),
             mesh,
-            dimensioned<Type>("zero", dimless, pTraits<Type>::zero),
+            dimensioned<Type>("zero", dimless, pTraits<Type>::one),
             zeroGradientFvPatchField<Type>::typeName
         )
     );
     GeoFieldType& limitField = tlimitField();
 
     const volVectorField& C = mesh.C();
+    const vectorField& CIn = C.internalField();
+
     const surfaceVectorField& Cf = mesh.Cf();
+    const vectorField& CfIn = Cf.internalField();
+
     const scalarField& vols = mesh.V().field();
 
     Field<Type>& lfIn = limitField.internalField();
@@ -164,7 +166,7 @@ LimitedGrad<Type, GradientLimiter>::limiter
             vols[own],
             maxVf[own],
             minVf[own],
-            (Cf[faceI] - C[own]) & g[own]
+            (CfIn[faceI] - CIn[own]) & g[own]
         );
 
         // Neighbour side
@@ -174,7 +176,7 @@ LimitedGrad<Type, GradientLimiter>::limiter
             vols[nei],
             maxVf[nei],
             minVf[nei],
-            (Cf[faceI] - C[nei]) & g[nei]
+            (CfIn[faceI] - CIn[nei]) & g[nei]
         );
     }
 
@@ -199,7 +201,7 @@ LimitedGrad<Type, GradientLimiter>::limiter
     }
 
     // Update coupled boundaries for patchNeighbourField
-    limitField.boundaryField().evaluateCoupled();
+    limitField.correctBoundaryConditions();
 
     if (fv::debug)
     {
@@ -234,7 +236,7 @@ LimitedGrad<Type, GradientLimiter>::gradientField
     GeoGradFieldType& gradVf = tGrad();
 
     // Apply the limiter
-    GeoFieldType limitField = this->limiter(vf, gradVf);
+    GeoFieldType limitField(this->limiter(vf, gradVf));
 
     gradVf.internalField() =
         scaleRow(gradVf.internalField(), limitField.internalField());
@@ -261,11 +263,15 @@ LimitedGrad<Type, GradientLimiter>::gradientMatrix
     GradMatrixType& bs = tbs();
 
     // Calculate limiter.  Using explicit gradient
-    GeoFieldType limitField = this->limiter
+    GeoFieldType limitField
     (
-        vf,
-        basicGradScheme_().grad(vf)()
+        this->limiter
+        (
+            vf,
+            basicGradScheme_().grad(vf)()
+        )
     );
+
     const Field<Type>& lfIn = limitField.internalField();
 
     typedef typename CoeffField<vector>::linearTypeField
@@ -288,14 +294,14 @@ LimitedGrad<Type, GradientLimiter>::gradientMatrix
     const unallocLabelList& owner = mesh.owner();
     const unallocLabelList& neighbour = mesh.neighbour();
 
-    forAll(u, faceI)
+    forAll (u, faceI)
     {
         u[faceI] = scaleRow(u[faceI], lfIn[owner[faceI]]);
         l[faceI] = scaleRow(l[faceI], lfIn[neighbour[faceI]]);
     }
 
     // Limit diag and source coeffs
-    forAll(d, cellI)
+    forAll (d, cellI)
     {
         d[cellI] = scaleRow(d[cellI], lfIn[cellI]);
 
@@ -303,7 +309,7 @@ LimitedGrad<Type, GradientLimiter>::gradientMatrix
     }
 
     // Limit coupling coeffs
-    forAll(vf.boundaryField(), patchI)
+    forAll (vf.boundaryField(), patchI)
     {
         const fvPatchField<Type>& pf = vf.boundaryField()[patchI];
         const fvPatch& patch = pf.patch();
@@ -321,7 +327,7 @@ LimitedGrad<Type, GradientLimiter>::gradientMatrix
             const Field<Type> lfNei =
                 limitField.boundaryField()[patchI].patchNeighbourField();
 
-            forAll(pf, faceI)
+            forAll (pf, faceI)
             {
                 pcoupleUpper[faceI] =
                     scaleRow(pcoupleUpper[faceI], lfIn[fc[faceI]]);

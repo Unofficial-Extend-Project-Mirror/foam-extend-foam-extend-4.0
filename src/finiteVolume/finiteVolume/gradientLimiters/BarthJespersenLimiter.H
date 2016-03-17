@@ -28,14 +28,13 @@ Description
     Barth-Jespersen limiter
 
 Author
-    Aleksandar Jemcov, Hrvoje Jasak
+    Aleksandar Jemcov
+    Rewrite by Hrvoje Jasak
 
 \*---------------------------------------------------------------------------*/
 
 #ifndef BarthJespersenLimiter_H
 #define BarthJespersenLimiter_H
-
-#include "vector.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -74,19 +73,16 @@ public:
         {
             if (mag(extrapolate) < SMALL)
             {
-                lim = 1;
+                return;
             }
-            else
+
+            if (extrapolate - deltaOneMax > SMALL)
             {
-                lim = min
-                (
-                    max
-                    (
-                        max(deltaOneMax/extrapolate, 0),
-                        max(deltaOneMin/extrapolate, 0)
-                    ),
-                    1
-                );
+                lim = min(lim, deltaOneMax/extrapolate);
+            }
+            else if (extrapolate - deltaOneMin < -SMALL)
+            {
+                lim = min(lim, deltaOneMin/extrapolate);
             }
         }
 

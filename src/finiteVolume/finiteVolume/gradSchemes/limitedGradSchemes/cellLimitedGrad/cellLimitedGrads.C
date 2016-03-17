@@ -66,6 +66,7 @@ inline void cellLimitedGrad<scalar>::limitFace
     }
 }
 
+
 template<class Type>
 inline void cellLimitedGrad<Type>::limitFace
 (
@@ -229,7 +230,7 @@ tmp<volVectorField> cellLimitedGrad<scalar>::calcGrad
 
     if (fv::debug)
     {
-        Info<< "gradient limiter for: " << vsf.name()
+        Info<< "Explicit scalar gradient limiter for: " << vsf.name()
             << " max = " << gMax(limiter)
             << " min = " << gMin(limiter)
             << " average: " << gAverage(limiter) << endl;
@@ -381,7 +382,7 @@ tmp<volTensorField> cellLimitedGrad<vector>::calcGrad
 
     if (fv::debug)
     {
-        Info<< "gradient limiter for: " << vsf.name()
+        Info<< "Explicit vector gradient limiter for: " << vsf.name()
             << " max = " << gMax(limiter)
             << " min = " << gMin(limiter)
             << " average: " << gAverage(limiter) << endl;
@@ -563,7 +564,7 @@ tmp<BlockLduSystem<vector, vector> > cellLimitedGrad<scalar>::fvmGrad
 
     if (fv::debug)
     {
-        Info<< "gradient limiter for: " << vsf.name()
+        Info<< "Implicit scalar gradient limiter for: " << vsf.name()
             << " max = " << gMax(lfIn)
             << " min = " << gMin(lfIn)
             << " average: " << gAverage(lfIn) << endl;

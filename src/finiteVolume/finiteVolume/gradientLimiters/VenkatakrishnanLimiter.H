@@ -29,14 +29,12 @@ Description
 
 Author
     Aleksandar Jemcov
-    Updated by Hrvoje Jasak
+    Rewrite by Hrvoje Jasak
 
 \*---------------------------------------------------------------------------*/
 
 #ifndef VenkatakrishnanLimiter_H
 #define VenkatakrishnanLimiter_H
-
-#include "vector.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -77,10 +75,16 @@ public:
         {
             scalar epsilonSquare = pow3(k_)*cellVolume;
 
-            if (extrapolate > SMALL)
+            if (mag(extrapolate) < SMALL)
+            {
+                // Limiter remains unchanged
+                return;
+            }
+            else if (extrapolate > VSMALL)
             {
                 lim = max
                 (
+                    0,
                     min
                     (
                         (
@@ -92,21 +96,21 @@ public:
                             extrapolate*
                             (
                                 sqr(deltaOneMax)
-                              + 2.0*sqr(extrapolate)
+                              + 2*sqr(extrapolate)
                               + deltaOneMax*extrapolate
                               + epsilonSquare
                             ),
                             SMALL
                         ),
-                        1
-                    ),
-                    0
+                        lim
+                    )
                 );
             }
-            else if (extrapolate < SMALL)
+            else if (extrapolate < VSMALL)
             {
                 lim = max
                 (
+                    0,
                     min
                     (
                         (
@@ -118,19 +122,15 @@ public:
                             extrapolate*
                             (
                                 sqr(deltaOneMin)
-                              + 2.0*sqr(extrapolate) + deltaOneMin*extrapolate
+                              + 2*sqr(extrapolate)
+                              + deltaOneMin*extrapolate
                               + epsilonSquare
                             ),
                             SMALL
                         ),
-                        1
-                    ),
-                    0
+                        lim
+                    )
                 );
-            }
-            else
-            {
-                lim = 1;
             }
         }
 

@@ -191,8 +191,6 @@ public:
             const GradFieldType& gradPhiIn = gradPhi.internalField();
 
             // Compute limiter values, internal faces
-            Type phiOwnerLimiter, phiNeighbourLimiter;
-
             forAll (owner, faceI)
             {
                 const label& own = owner[faceI];
@@ -201,10 +199,12 @@ public:
                 vector deltaRLeft = faceCentre[faceI] - cellCentre[own];
                 vector deltaRRight = faceCentre[faceI] - cellCentre[nei];
 
+                // Find minimal limiter value in each cell
+
                 // Owner side
                 limitFunction.limiter
                 (
-                    phiOwnerLimiter,
+                    phiLimiterIn[own],
                     cellVolume[own],
                     phiMaxIn[own] - phi_[own],
                     phiMinIn[own] - phi_[own],
@@ -214,19 +214,12 @@ public:
                 // Neighbour side
                 limitFunction.limiter
                 (
-                    phiNeighbourLimiter,
+                    phiLimiterIn[nei],
                     cellVolume[nei],
                     phiMaxIn[nei] - phi_[nei],
                     phiMinIn[nei] - phi_[nei],
                     (deltaRRight & gradPhiIn[nei])                    
                 );
-
-                // Find minimal limiter value in each cell
-                phiLimiterIn[own] =
-                    min(phiLimiterIn[own], phiOwnerLimiter);
-
-                phiLimiterIn[nei] =
-                    min(phiLimiterIn[nei], phiNeighbourLimiter);
             }
 
             // Coupled boundaries
@@ -251,24 +244,19 @@ public:
                     const GradFieldType gradPhiRight =
                         gradPhi.boundaryField()[patchI].patchNeighbourField();
 
-                    Type phiFCLimiter;
-
+                    // Find minimal limiter value in each cell
                     forAll (fc, faceI)
                     {
                         const label& curFC = fc[faceI];
 
                         limitFunction.limiter
                         (
-                            phiFCLimiter,
+                            phiLimiterIn[curFC],
                             cellVolume[curFC],
                             phiMaxIn[curFC] - phi_[curFC],
                             phiMinIn[curFC] - phi_[curFC],
                             (deltaR[faceI] & gradPhiLeft[faceI])
                         );
-
-                        // Find minimal limiter value in each cell
-                        phiLimiterIn[curFC] =
-                            min(phiLimiterIn[curFC], phiFCLimiter);
                     }
                 }
             }
