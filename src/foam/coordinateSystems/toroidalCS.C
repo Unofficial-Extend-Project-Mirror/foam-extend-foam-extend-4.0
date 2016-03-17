@@ -196,7 +196,7 @@ Foam::tmp<Foam::vectorField> Foam::toroidalCS::globalToLocal
 void Foam::toroidalCS::write(Ostream& os) const
 {
     coordinateSystem::write(os);
-    os << "radius: " << radius() << endl;
+    os << " radius: " << radius() << " inDegrees: " << inDegrees() << endl;
 }
 
 
@@ -210,6 +210,7 @@ void Foam::toroidalCS::writeDict(Ostream& os, bool subDict) const
 
     coordinateSystem::writeDict(os, false);
     os.writeKeyword("radius") << radius() << token::END_STATEMENT << nl;
+    os.writeKeyword("inDegrees") << inDegrees_ << token::END_STATEMENT << nl;
 
     if (subDict)
     {
