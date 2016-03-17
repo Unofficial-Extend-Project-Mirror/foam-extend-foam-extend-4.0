@@ -116,18 +116,7 @@ public:
     // Destructor
 
         virtual ~lduPrimitiveMesh()
-        {
-            // Clear interface pointers: they are not deleted
-            // by the lduInterfacePtrsList (derived from UPtrList)
-            // HJ, 5/Feb/2016
-            forAll (interfaces_, i)
-            {
-                if (interfaces_.set(i))
-                {
-                    delete interfaces_(i);
-                }
-            }
-        }
+        {}
 
 
     // Member Functions
@@ -143,6 +132,21 @@ public:
             interfaces_ = interfaces;
             patchAddr_ = pa;
             patchSchedule_ = ps;
+        }
+
+        //- Clear interfaces
+        void clearInterfaces()
+        {
+            // Clear interface pointers: they are not deleted
+            // by the lduInterfacePtrsList (derived from UPtrList)
+            // HJ, 5/Feb/2016
+            forAll (interfaces_, i)
+            {
+                if (interfaces_.set(i))
+                {
+                    delete interfaces_(i);
+                }
+            }
         }
 
         //- Return number of interfaces
