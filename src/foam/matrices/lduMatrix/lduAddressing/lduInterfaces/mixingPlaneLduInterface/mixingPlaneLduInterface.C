@@ -21,62 +21,28 @@ License
     You should have received a copy of the GNU General Public License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
-Class
-    regionCoupleLduInterfaceField
-
-Description
-    Abstract base class for regionCouple coupled interface fields.
-
 Author
     Hrvoje Jasak, Wikki Ltd.  All rights reserved
 
-SourceFiles
-    regionCoupleLduInterfaceField.C
+Contributor
+    Martin Beaudoin, Hydro-Quebec, 2009.
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef regionCoupleLduInterfaceField_H
-#define regionCoupleLduInterfaceField_H
+#include "mixingPlaneLduInterface.H"
+#include "diagTensorField.H"
 
-#include "primitiveFieldsFwd.H"
-#include "typeInfo.H"
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
 namespace Foam
 {
+    defineTypeNameAndDebug(mixingPlaneLduInterface, 0);
+}
 
-/*---------------------------------------------------------------------------*\
-               Class regionCoupleLduInterfaceField Declaration
-\*---------------------------------------------------------------------------*/
+// * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
-class regionCoupleLduInterfaceField
-{
+Foam::mixingPlaneLduInterface::~mixingPlaneLduInterface()
+{}
 
-public:
-
-    //- Runtime type information
-    TypeName("regionCoupleLduInterfaceField");
-
-
-    // Constructors
-
-        //- Construct given coupled patch
-        regionCoupleLduInterfaceField()
-        {}
-
-
-    //-Destructor
-    virtual ~regionCoupleLduInterfaceField();
-};
-
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-#endif
 
 // ************************************************************************* //

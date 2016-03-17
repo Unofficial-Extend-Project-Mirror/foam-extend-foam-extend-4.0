@@ -47,12 +47,11 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                  Class ggiLduInterfaceField Declaration
+                     Class ggiLduInterfaceField Declaration
 \*---------------------------------------------------------------------------*/
 
 class ggiLduInterfaceField
 {
-
 public:
 
     //- Runtime type information
@@ -66,9 +65,8 @@ public:
         {}
 
 
-    // Destructor
-
-        virtual ~ggiLduInterfaceField();
+    //- Destructor
+    virtual ~ggiLduInterfaceField();
 
 
     // Member Functions

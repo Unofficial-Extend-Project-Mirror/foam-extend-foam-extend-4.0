@@ -22,21 +22,24 @@ License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    Foam::cyclicLduInterfaceField
+    overlapGGILduInterface
 
 Description
-    Abstract base class for cyclic coupled interfaces.
+    An abstract base class for overlapGgi coupled interfaces.
+
+Author
+    Hrvoje Jasak, Wikki Ltd.  All rights reserved.
 
 SourceFiles
-    cyclicLduInterfaceField.C
+    overlapGGILduInterface.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef cyclicLduInterfaceField_H
-#define cyclicLduInterfaceField_H
+#ifndef overlapGGILduInterface_H
+#define overlapGGILduInterface_H
 
+#include "lduInterface.H"
 #include "primitiveFieldsFwd.H"
-#include "typeInfo.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -44,52 +47,26 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                  Class cyclicLduInterfaceField Declaration
+                       Class overlapGGILduInterface Declaration
 \*---------------------------------------------------------------------------*/
 
-class cyclicLduInterfaceField
+class overlapGGILduInterface
 {
 
 public:
 
     //- Runtime type information
-    TypeName("cyclicLduInterfaceField");
-
+    TypeName("overlapGGILduInterface");
 
     // Constructors
 
-        //- Construct given coupled patch
-        cyclicLduInterfaceField()
-        {}
+    // Destructor
 
-
-    //- Destructor
-    virtual ~cyclicLduInterfaceField();
+        virtual ~overlapGGILduInterface();
 
 
     // Member Functions
-
-        // Access
-
-            //- Is the transform required
-            virtual bool doTransform() const = 0;
-
-            //- Return face transformation tensor
-            virtual const tensorField& forwardT() const = 0;
-
-            //- Return neighbour-cell transformation tensor
-            virtual const tensorField& reverseT() const = 0;
-
-            //- Return rank of component for transform
-            virtual int rank() const = 0;
-
-
-        //- Transform given patch internal field
-        void transformCoupleField
-        (
-            scalarField& psiInternal,
-            const direction cmpt
-        ) const;
+    // Not currently needed.  HJ, 14/Jan/2009
 };
 
 

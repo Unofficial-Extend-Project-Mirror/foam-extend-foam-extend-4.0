@@ -22,21 +22,23 @@ License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    Foam::cyclicLduInterfaceField
+    regionCoupleLduInterface
 
 Description
-    Abstract base class for cyclic coupled interfaces.
+    An abstract base class for regionCouple coupled interfaces.
+
+Author
+    Hrvoje Jasak, Wikki Ltd.  All rights reserved
 
 SourceFiles
-    cyclicLduInterfaceField.C
+    regionCoupleLduInterface.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef cyclicLduInterfaceField_H
-#define cyclicLduInterfaceField_H
+#ifndef regionCoupleLduInterface_H
+#define regionCoupleLduInterface_H
 
-#include "primitiveFieldsFwd.H"
-#include "typeInfo.H"
+#include "lduInterface.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -44,52 +46,23 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                  Class cyclicLduInterfaceField Declaration
+                  Class regionCoupleLduInterface Declaration
 \*---------------------------------------------------------------------------*/
 
-class cyclicLduInterfaceField
+class regionCoupleLduInterface
 {
 
 public:
 
     //- Runtime type information
-    TypeName("cyclicLduInterfaceField");
-
+    TypeName("regionCoupleLduInterface");
 
     // Constructors
 
-        //- Construct given coupled patch
-        cyclicLduInterfaceField()
-        {}
+    // Destructor
 
+        virtual ~regionCoupleLduInterface();
 
-    //- Destructor
-    virtual ~cyclicLduInterfaceField();
-
-
-    // Member Functions
-
-        // Access
-
-            //- Is the transform required
-            virtual bool doTransform() const = 0;
-
-            //- Return face transformation tensor
-            virtual const tensorField& forwardT() const = 0;
-
-            //- Return neighbour-cell transformation tensor
-            virtual const tensorField& reverseT() const = 0;
-
-            //- Return rank of component for transform
-            virtual int rank() const = 0;
-
-
-        //- Transform given patch internal field
-        void transformCoupleField
-        (
-            scalarField& psiInternal,
-            const direction cmpt
-        ) const;
 };
 
 

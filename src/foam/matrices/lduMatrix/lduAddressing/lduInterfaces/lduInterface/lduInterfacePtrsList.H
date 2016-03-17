@@ -21,62 +21,30 @@ License
     You should have received a copy of the GNU General Public License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
-Class
-    regionCoupleLduInterfaceField
+Typedef
+    Foam::lduInterfacePtrsList
 
 Description
-    Abstract base class for regionCouple coupled interface fields.
-
-Author
-    Hrvoje Jasak, Wikki Ltd.  All rights reserved
-
-SourceFiles
-    regionCoupleLduInterfaceField.C
+    List of coupled interface fields to be used in coupling.
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef regionCoupleLduInterfaceField_H
-#define regionCoupleLduInterfaceField_H
+#ifndef lduInterfacePtrsList_H
+#define lduInterfacePtrsList_H
 
-#include "primitiveFieldsFwd.H"
-#include "typeInfo.H"
+#include "lduInterface.H"
+#include "UPtrList.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
-
-/*---------------------------------------------------------------------------*\
-               Class regionCoupleLduInterfaceField Declaration
-\*---------------------------------------------------------------------------*/
-
-class regionCoupleLduInterfaceField
-{
-
-public:
-
-    //- Runtime type information
-    TypeName("regionCoupleLduInterfaceField");
-
-
-    // Constructors
-
-        //- Construct given coupled patch
-        regionCoupleLduInterfaceField()
-        {}
-
-
-    //-Destructor
-    virtual ~regionCoupleLduInterfaceField();
-};
-
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
+    typedef UPtrList<const lduInterface> lduInterfacePtrsList;
+}
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #endif
 
 // ************************************************************************* //
+

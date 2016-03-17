@@ -21,62 +21,48 @@ License
     You should have received a copy of the GNU General Public License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
-Class
-    regionCoupleLduInterfaceField
-
-Description
-    Abstract base class for regionCouple coupled interface fields.
-
 Author
-    Hrvoje Jasak, Wikki Ltd.  All rights reserved
-
-SourceFiles
-    regionCoupleLduInterfaceField.C
+    Hrvoje Jasak, Wikki Ltd.  All rights reserved.
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef regionCoupleLduInterfaceField_H
-#define regionCoupleLduInterfaceField_H
+#include "overlapGGILduInterfaceField.H"
+#include "diagTensorField.H"
 
-#include "primitiveFieldsFwd.H"
-#include "typeInfo.H"
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
 namespace Foam
 {
+    defineTypeNameAndDebug(overlapGGILduInterfaceField, 0);
+}
 
-/*---------------------------------------------------------------------------*\
-               Class regionCoupleLduInterfaceField Declaration
-\*---------------------------------------------------------------------------*/
 
-class regionCoupleLduInterfaceField
+// * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
+
+Foam::overlapGGILduInterfaceField::~overlapGGILduInterfaceField()
+{}
+
+
+// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+
+void Foam::overlapGGILduInterfaceField::transformCoupleField
+(
+    scalarField& pnf,
+    const direction cmpt
+) const
 {
+    if (doTransform())
+    {
+        if (forwardT().size() == 1)
+        {
+            pnf *= pow(diag(forwardT()[0]).component(cmpt), rank());
+        }
+        else
+        {
+            pnf *= pow(diag(forwardT())().component(cmpt), rank());
+        }
+    }
+}
 
-public:
-
-    //- Runtime type information
-    TypeName("regionCoupleLduInterfaceField");
-
-
-    // Constructors
-
-        //- Construct given coupled patch
-        regionCoupleLduInterfaceField()
-        {}
-
-
-    //-Destructor
-    virtual ~regionCoupleLduInterfaceField();
-};
-
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-#endif
 
 // ************************************************************************* //

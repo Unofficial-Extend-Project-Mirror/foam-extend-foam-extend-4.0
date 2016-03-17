@@ -22,21 +22,27 @@ License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    Foam::processorLduInterfaceField
+    mixingPlaneLduInterface
 
 Description
-    Abstract base class for processor coupled interfaces.
+    An abstract base class for mixingPlane coupled interfaces.
+
+Author
+    Martin Beaudoin, Hydro-Quebec, 2009.  All rights reserved
+
+Contributor
+    Hrvoje Jasak, Wikki Ltd.
 
 SourceFiles
-    processorLduInterfaceField.C
+    mixingPlaneLduInterface.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef processorLduInterfaceField_H
-#define processorLduInterfaceField_H
+#ifndef mixingPlaneLduInterface_H
+#define mixingPlaneLduInterface_H
 
+#include "lduInterface.H"
 #include "primitiveFieldsFwd.H"
-#include "typeInfo.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -44,55 +50,79 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                  Class processorLduInterfaceField Declaration
+                   Class mixingPlaneLduInterface Declaration
 \*---------------------------------------------------------------------------*/
 
-class processorLduInterfaceField
+class mixingPlaneLduInterface
 {
+protected:
+
+    // Protected data
+
+        //- Transfer buffer
+        mutable labelField labelTransferBuffer_;
+
+        //- Field transfer buffer
+        mutable scalarField fieldTransferBuffer_;
+
+
 public:
 
     //- Runtime type information
-    TypeName("processorLduInterfaceField");
-
+    TypeName("mixingPlaneLduInterface");
 
     // Constructors
 
-        //- Construct given coupled patch
-        processorLduInterfaceField()
+        //- Construct null
+        mixingPlaneLduInterface()
+        :
+            labelTransferBuffer_(),
+            fieldTransferBuffer_()
         {}
 
 
     // Destructor
 
-        virtual ~processorLduInterfaceField();
+        virtual ~mixingPlaneLduInterface();
 
 
     // Member Functions
 
-        // Access
+        //- Is this the master side?
+        virtual bool master() const = 0;
 
-            //- Return processor number
-            virtual int myProcNo() const = 0;
+        //- Return shadow interface index
+        virtual label shadowIndex() const = 0;
 
-            //- Return neigbour processor number
-            virtual int neighbProcNo() const = 0;
+        //- Return shadow interface
+        virtual const mixingPlaneLduInterface& shadowInterface() const = 0;
 
-            //- Is the transform required
-            virtual bool doTransform() const = 0;
+        //- Return fine level addressing
+        virtual const labelListList& addressing() const = 0;
 
-            //- Return face transformation tensor
-            virtual const tensorField& forwardT() const = 0;
+        //- Return weights
+        virtual const scalarListList& weights() const = 0;
 
-            //- Return rank of component for transform
-            virtual int rank() const = 0;
+        //- Return face transformation tensor
+        virtual const tensorField& forwardT() const = 0;
+
+        //- Return face reverse transformation tensor
+        virtual const tensorField& reverseT() const = 0;
 
 
-        //- Transform given patch component field
-        void transformCoupleField
-        (
-            scalarField& f,
-            const direction cmpt
-        ) const;
+        // Transfer buffer access
+
+            //- Return contents of the label transfer buffer
+            const labelField& labelTransferBuffer() const
+            {
+                return labelTransferBuffer_;
+            }
+
+            //- Return contents of the field transfer buffer
+            const scalarField& fieldTransferBuffer() const
+            {
+                return fieldTransferBuffer_;
+            }
 };
 
 

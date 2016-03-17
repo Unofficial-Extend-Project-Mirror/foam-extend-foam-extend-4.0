@@ -22,18 +22,21 @@ License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    Foam::cyclicLduInterfaceField
+    overlapGGILduInterfaceField
 
 Description
-    Abstract base class for cyclic coupled interfaces.
+    Abstract base class for overlapGgi coupled interface fields.
+
+Author:
+    Hrvoje Jasak, Wikki Ltd.  All rights reserved.
 
 SourceFiles
-    cyclicLduInterfaceField.C
+    overlapGGILduInterfaceField.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef cyclicLduInterfaceField_H
-#define cyclicLduInterfaceField_H
+#ifndef overlapGGILduInterfaceField_H
+#define overlapGGILduInterfaceField_H
 
 #include "primitiveFieldsFwd.H"
 #include "typeInfo.H"
@@ -44,27 +47,27 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                  Class cyclicLduInterfaceField Declaration
+                  Class overlapGGILduInterfaceField Declaration
 \*---------------------------------------------------------------------------*/
 
-class cyclicLduInterfaceField
+class overlapGGILduInterfaceField
 {
 
 public:
 
     //- Runtime type information
-    TypeName("cyclicLduInterfaceField");
+    TypeName("overlapGGILduInterfaceField");
 
 
     // Constructors
 
         //- Construct given coupled patch
-        cyclicLduInterfaceField()
+        overlapGGILduInterfaceField()
         {}
 
 
     //- Destructor
-    virtual ~cyclicLduInterfaceField();
+    virtual ~overlapGGILduInterfaceField();
 
 
     // Member Functions

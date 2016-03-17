@@ -21,62 +21,46 @@ License
     You should have received a copy of the GNU General Public License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
-Class
-    regionCoupleLduInterfaceField
-
-Description
-    Abstract base class for regionCouple coupled interface fields.
-
-Author
-    Hrvoje Jasak, Wikki Ltd.  All rights reserved
-
-SourceFiles
-    regionCoupleLduInterfaceField.C
-
 \*---------------------------------------------------------------------------*/
 
-#ifndef regionCoupleLduInterfaceField_H
-#define regionCoupleLduInterfaceField_H
+#include "processorLduInterface.H"
 
-#include "primitiveFieldsFwd.H"
-#include "typeInfo.H"
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
 namespace Foam
 {
+    defineTypeNameAndDebug(processorLduInterface, 0);
+}
 
-/*---------------------------------------------------------------------------*\
-               Class regionCoupleLduInterfaceField Declaration
-\*---------------------------------------------------------------------------*/
 
-class regionCoupleLduInterfaceField
+// * * * * * * * * * * * * * Private Member Functions *  * * * * * * * * * * //
+
+void Foam::processorLduInterface::resizeBuf
+(
+    List<char>& buf,
+    const label size
+) const
 {
-
-public:
-
-    //- Runtime type information
-    TypeName("regionCoupleLduInterfaceField");
-
-
-    // Constructors
-
-        //- Construct given coupled patch
-        regionCoupleLduInterfaceField()
-        {}
+    if (buf.size() < size)
+    {
+        buf.setSize(size);
+    }
+}
 
 
-    //-Destructor
-    virtual ~regionCoupleLduInterfaceField();
-};
+// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
+
+Foam::processorLduInterface::processorLduInterface()
+:
+    sendBuf_(0),
+    receiveBuf_(0)
+{}
 
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
-} // End namespace Foam
+Foam::processorLduInterface::~processorLduInterface()
+{}
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-#endif
 
 // ************************************************************************* //

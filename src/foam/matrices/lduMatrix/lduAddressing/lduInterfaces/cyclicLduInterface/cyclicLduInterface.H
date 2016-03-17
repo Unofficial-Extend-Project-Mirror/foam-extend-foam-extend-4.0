@@ -22,24 +22,21 @@ License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    overlapGgiLduInterfaceField
+    Foam::cyclicLduInterface
 
 Description
-    Abstract base class for overlapGgi coupled interface fields.
-
-Author:
-    Hrvoje Jasak, Wikki Ltd.  All rights reserved.
+    An abstract base class for cyclic coupled interfaces.
 
 SourceFiles
-    overlapGgiLduInterfaceField.C
+    cyclicLduInterface.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef overlapGgiLduInterfaceField_H
-#define overlapGgiLduInterfaceField_H
+#ifndef cyclicLduInterface_H
+#define cyclicLduInterface_H
 
+#include "lduInterface.H"
 #include "primitiveFieldsFwd.H"
-#include "typeInfo.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -47,53 +44,33 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                  Class overlapGgiLduInterfaceField Declaration
+                       Class cyclicLduInterface Declaration
 \*---------------------------------------------------------------------------*/
 
-class overlapGgiLduInterfaceField
+class cyclicLduInterface
 {
 
 public:
 
     //- Runtime type information
-    TypeName("overlapGgiLduInterfaceField");
-
+    TypeName("cyclicLduInterface");
 
     // Constructors
 
-        //- Construct given coupled patch
-        overlapGgiLduInterfaceField()
-        {}
-
-
     // Destructor
 
-        virtual ~overlapGgiLduInterfaceField();
+        virtual ~cyclicLduInterface();
 
 
     // Member Functions
 
         // Access
 
-            //- Is the transform required
-            virtual bool doTransform() const = 0;
-
             //- Return face transformation tensor
             virtual const tensorField& forwardT() const = 0;
 
-            //- Return neighbour-cell transformation tensor
+            //- Return face reverse transformation tensor
             virtual const tensorField& reverseT() const = 0;
-
-            //- Return rank of component for transform
-            virtual int rank() const = 0;
-
-
-        //- Transform given patch internal field
-        void transformCoupleField
-        (
-            scalarField& psiInternal,
-            const direction cmpt
-        ) const;
 };
 
 

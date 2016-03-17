@@ -21,48 +21,22 @@ License
     You should have received a copy of the GNU General Public License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
-Author
-    Hrvoje Jasak, Wikki Ltd.  All rights reserved.
-
 \*---------------------------------------------------------------------------*/
 
-#include "overlapGgiLduInterfaceField.H"
+#include "regionCoupleLduInterface.H"
 #include "diagTensorField.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
 namespace Foam
 {
-    defineTypeNameAndDebug(overlapGgiLduInterfaceField, 0);
+    defineTypeNameAndDebug(regionCoupleLduInterface, 0);
 }
-
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
-Foam::overlapGgiLduInterfaceField::~overlapGgiLduInterfaceField()
+Foam::regionCoupleLduInterface::~regionCoupleLduInterface()
 {}
-
-
-// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
-
-void Foam::overlapGgiLduInterfaceField::transformCoupleField
-(
-    scalarField& pnf,
-    const direction cmpt
-) const
-{
-    if (doTransform())
-    {
-        if (forwardT().size() == 1)
-        {
-            pnf *= pow(diag(forwardT()[0]).component(cmpt), rank());
-        }
-        else
-        {
-            pnf *= pow(diag(forwardT())().component(cmpt), rank());
-        }
-    }
-}
 
 
 // ************************************************************************* //
