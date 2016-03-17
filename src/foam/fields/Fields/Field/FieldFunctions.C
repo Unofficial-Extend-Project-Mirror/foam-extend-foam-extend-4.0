@@ -297,6 +297,30 @@ tmp<Field<Type> > cmptMag(const tmp<Field<Type> >& tf)
 }
 
 
+template<class Type>
+void cmptSign(Field<Type>& res, const UList<Type>& f)
+{
+    TFOR_ALL_F_OP_FUNC_F(Type, res, =, cmptSign, Type, f)
+}
+
+template<class Type>
+tmp<Field<Type> > cmptSign(const UList<Type>& f)
+{
+    tmp<Field<Type> > tRes(new Field<Type>(f.size()));
+    cmptSign(tRes(), f);
+    return tRes;
+}
+
+template<class Type>
+tmp<Field<Type> > cmptSign(const tmp<Field<Type> >& tf)
+{
+    tmp<Field<Type> > tRes = reuseTmp<Type, Type>::New(tf);
+    cmptSign(tRes(), tf());
+    reuseTmp<Type, Type>::clear(tf);
+    return tRes;
+}
+
+
 #define TMP_UNARY_FUNCTION(ReturnType, Func)                                  \
                                                                               \
 template<class Type>                                                          \
