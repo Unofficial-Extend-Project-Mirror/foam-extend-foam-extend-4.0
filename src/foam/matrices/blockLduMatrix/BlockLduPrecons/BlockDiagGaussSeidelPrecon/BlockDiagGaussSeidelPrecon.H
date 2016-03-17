@@ -22,23 +22,23 @@ License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    BlockGaussSeidelPrecon
+    BlockDiagGaussSeidelPrecon
 
 Description
-    Gauss-Seidel preconditioning
+    Diagonally-corrected block Gauss-Seidel preconditioning
 
 Author
     Hrvoje Jasak, Wikki Ltd.  All rights reserved.
 
 SourceFiles
-    BlockGaussSeidelPrecon.C
-    BlockGaussSeidelPrecon.C
-    BlockGaussSeidelPreconDecoupled.C
+    BlockDiagGaussSeidelPrecon.C
+    BlockDiagGaussSeidelPrecon.C
+    BlockDiagGaussSeidelPreconDecoupled.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef BlockGaussSeidelPrecon_H
-#define BlockGaussSeidelPrecon_H
+#ifndef BlockDiagGaussSeidelPrecon_H
+#define BlockDiagGaussSeidelPrecon_H
 
 #include "BlockLduPrecon.H"
 
@@ -48,11 +48,11 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                      Class BlockGaussSeidelPrecon Declaration
+                 Class BlockDiagGaussSeidelPrecon Declaration
 \*---------------------------------------------------------------------------*/
 
 template<class Type>
-class BlockGaussSeidelPrecon
+class BlockDiagGaussSeidelPrecon
 :
     public BlockLduPrecon<Type>
 {
@@ -78,10 +78,10 @@ class BlockGaussSeidelPrecon
     // Private Member Functions
 
         //- Disallow default bitwise copy construct
-        BlockGaussSeidelPrecon(const BlockGaussSeidelPrecon&);
+        BlockDiagGaussSeidelPrecon(const BlockDiagGaussSeidelPrecon&);
 
         //- Disallow default bitwise assignment
-        void operator=(const BlockGaussSeidelPrecon&);
+        void operator=(const BlockDiagGaussSeidelPrecon&);
 
 
         //- Calculate inverse diagonal
@@ -111,8 +111,8 @@ class BlockGaussSeidelPrecon
 
         // Decoupled operations, used in template specialisation
 
-           //- Calculate inverse diagonal, decoupled version
-           void calcDecoupledInvDiag();
+            //- Calculate inverse diagonal, decoupled version
+            void calcDecoupledInvDiag();
 
             //- Execute preconditioning, decoupled version
             void decoupledPrecondition
@@ -133,19 +133,19 @@ class BlockGaussSeidelPrecon
 public:
 
     //- Runtime type information
-    TypeName("GaussSeidel");
+    TypeName("DiagGaussSeidel");
 
 
     // Constructors
 
         //- Construct from matrix for smoother use
-        BlockGaussSeidelPrecon
+        BlockDiagGaussSeidelPrecon
         (
             const BlockLduMatrix<Type>& matrix
         );
 
         //- Construct from components
-        BlockGaussSeidelPrecon
+        BlockDiagGaussSeidelPrecon
         (
             const BlockLduMatrix<Type>& matrix,
             const dictionary& dict
@@ -154,7 +154,7 @@ public:
 
     // Destructor
 
-        virtual ~BlockGaussSeidelPrecon()
+        virtual ~BlockDiagGaussSeidelPrecon()
         {}
 
 
@@ -183,8 +183,8 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-#   include "BlockGaussSeidelPrecon.C"
-#   include "BlockGaussSeidelPreconDecoupled.C"
+#   include "BlockDiagGaussSeidelPrecon.C"
+#   include "BlockDiagGaussSeidelPreconDecoupled.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

@@ -22,92 +22,35 @@ License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    BlockGaussSeidelPrecon
+    BlockDiagGaussSeidelSolvers
 
 Description
-    Template specialisation for scalar block Gauss-Seidel preconditioning
+    Typedefs for BlockDiagGaussSeidelSolvers
 
 Author
     Hrvoje Jasak, Wikki Ltd.  All rights reserved
 
+SourceFiles
+    blockDiagGaussSeidelSolvers.C
+
 \*---------------------------------------------------------------------------*/
 
-#ifndef scalarBlockGaussSeidelPrecon_H
-#define scalarBlockGaussSeidelPrecon_H
+#ifndef blockDiagGaussSeidelSolvers_H
+#define blockDiagGaussSeidelSolvers_H
 
-#include "BlockGaussSeidelPrecon.H"
-#include "scalarBlockGaussSeidelPrecon.H"
+#include "BlockDiagGaussSeidelSolver.H"
+#include "fieldTypes.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 
-template<>
-void BlockGaussSeidelPrecon<scalar>::calcInvDiag()
-{
-    // Direct inversion of diagonal is sufficient, as the diagonal
-    // is linear.  HJ, 20/Aug/2015
-    invDiag_ = 1/this->matrix_.diag();
-}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-
-template<>
-void BlockGaussSeidelPrecon<scalar>::precondition
-(
-    scalarField& x,
-    const scalarField& b
-) const
-{
-    if (matrix_.diagonal())
-    {
-        x = b*invDiag_;
-    }
-    else if (matrix_.symmetric() || matrix_.asymmetric())
-    {
-        const scalarField& LowerCoeff = matrix_.lower();
-        const scalarField& UpperCoeff = matrix_.upper();
-
-        BlockSweep
-        (
-            x,
-            invDiag_,
-            LowerCoeff,
-            UpperCoeff,
-            b
-        );
-    }
-}
-
-
-template<>
-void BlockGaussSeidelPrecon<scalar>::preconditionT
-(
-    scalarField& xT,
-    const scalarField& bT
-) const
-{
-    if (matrix_.diagonal())
-    {
-        xT = bT*invDiag_;
-    }
-    else if (matrix_.symmetric() || matrix_.asymmetric())
-    {
-        const scalarField& LowerCoeff = matrix_.lower();
-        const scalarField& UpperCoeff = matrix_.upper();
-
-        // Swap lower and upper coefficients, transposed matrix
-        BlockSweep
-        (
-            xT,
-            invDiag_,
-            UpperCoeff,
-            LowerCoeff,
-            bT
-        );
-    }
-}
-
+typedef BlockDiagGaussSeidelSolver<scalar> blockDiagGaussSeidelSolverScalar;
+typedef BlockDiagGaussSeidelSolver<vector> blockDiagGaussSeidelSolverVector;
+typedef BlockDiagGaussSeidelSolver<tensor> blockDiagGaussSeidelSolverTensor;
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

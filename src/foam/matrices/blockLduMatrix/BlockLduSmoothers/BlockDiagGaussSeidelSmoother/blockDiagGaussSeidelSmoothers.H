@@ -22,92 +22,39 @@ License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    BlockGaussSeidelPrecon
+    BlockDiagGaussSeidelSmoother
 
 Description
-    Template specialisation for scalar block Gauss-Seidel preconditioning
+    Typedefs for diagonally-corrected block Gauss-Seidel smoother
 
 Author
-    Hrvoje Jasak, Wikki Ltd.  All rights reserved
+    Hrvoje Jasak, Wikki Ltd.  All rights reserved.
+
+SourceFiles
+    blockDiagGaussSeidelSmoothers.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef scalarBlockGaussSeidelPrecon_H
-#define scalarBlockGaussSeidelPrecon_H
+#ifndef blockDiagGaussSeidelSmoothers_H
+#define blockDiagGaussSeidelSmoothers_H
 
-#include "BlockGaussSeidelPrecon.H"
-#include "scalarBlockGaussSeidelPrecon.H"
+#include "BlockDiagGaussSeidelSmoother.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 
-template<>
-void BlockGaussSeidelPrecon<scalar>::calcInvDiag()
-{
-    // Direct inversion of diagonal is sufficient, as the diagonal
-    // is linear.  HJ, 20/Aug/2015
-    invDiag_ = 1/this->matrix_.diag();
-}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
+typedef BlockDiagGaussSeidelSmoother<scalar>
+blockDiagGaussSeidelSmootherScalar;
 
-template<>
-void BlockGaussSeidelPrecon<scalar>::precondition
-(
-    scalarField& x,
-    const scalarField& b
-) const
-{
-    if (matrix_.diagonal())
-    {
-        x = b*invDiag_;
-    }
-    else if (matrix_.symmetric() || matrix_.asymmetric())
-    {
-        const scalarField& LowerCoeff = matrix_.lower();
-        const scalarField& UpperCoeff = matrix_.upper();
+typedef BlockDiagGaussSeidelSmoother<vector>
+blockDiagGaussSeidelSmootherVector;
 
-        BlockSweep
-        (
-            x,
-            invDiag_,
-            LowerCoeff,
-            UpperCoeff,
-            b
-        );
-    }
-}
-
-
-template<>
-void BlockGaussSeidelPrecon<scalar>::preconditionT
-(
-    scalarField& xT,
-    const scalarField& bT
-) const
-{
-    if (matrix_.diagonal())
-    {
-        xT = bT*invDiag_;
-    }
-    else if (matrix_.symmetric() || matrix_.asymmetric())
-    {
-        const scalarField& LowerCoeff = matrix_.lower();
-        const scalarField& UpperCoeff = matrix_.upper();
-
-        // Swap lower and upper coefficients, transposed matrix
-        BlockSweep
-        (
-            xT,
-            invDiag_,
-            UpperCoeff,
-            LowerCoeff,
-            bT
-        );
-    }
-}
-
+typedef BlockDiagGaussSeidelSmoother<tensor>
+blockDiagGaussSeidelSmootherTensor;
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

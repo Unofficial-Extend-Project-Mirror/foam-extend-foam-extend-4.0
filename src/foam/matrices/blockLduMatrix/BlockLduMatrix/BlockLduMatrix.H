@@ -312,6 +312,13 @@ public:
                 return coupleLower_;
             }
 
+            //- Return coupled interfaces
+            const typename BlockLduInterfaceFieldPtrsList<Type>::Type&
+            interfaces() const
+            {
+                return interfaces_;
+            }
+
             //- Access to coupled interfaces
             typename BlockLduInterfaceFieldPtrsList<Type>::Type& interfaces()
             {

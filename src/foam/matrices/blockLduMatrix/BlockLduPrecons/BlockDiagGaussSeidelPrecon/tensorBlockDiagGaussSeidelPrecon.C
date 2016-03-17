@@ -22,21 +22,25 @@ License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    BlockGaussSeidelPrecon
+    BlockDiagGaussSeidelPrecon
 
 Description
-    Template specialisation for scalar block Gauss-Seidel preconditioning
+    Template specialisation for tensor block diagonally-corrected
+    Gauss-Seidel preconditioning
 
 Author
     Hrvoje Jasak, Wikki Ltd.  All rights reserved
 
+SourceFiles
+    tensorBlockDiagGaussSeidelPrecon.C
+
 \*---------------------------------------------------------------------------*/
 
-#ifndef scalarBlockGaussSeidelPrecon_H
-#define scalarBlockGaussSeidelPrecon_H
+#ifndef tensorBlockDiagGaussSeidelPrecon_H
+#define tensorBlockDiagGaussSeidelPrecon_H
 
-#include "BlockGaussSeidelPrecon.H"
-#include "scalarBlockGaussSeidelPrecon.H"
+#include "BlockDiagGaussSeidelPrecon.H"
+#include "tensorBlockDiagGaussSeidelPrecon.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -44,68 +48,33 @@ namespace Foam
 {
 
 template<>
-void BlockGaussSeidelPrecon<scalar>::calcInvDiag()
+void BlockDiagGaussSeidelPrecon<tensor>::calcInvDiag()
 {
-    // Direct inversion of diagonal is sufficient, as the diagonal
-    // is linear.  HJ, 20/Aug/2015
-    invDiag_ = 1/this->matrix_.diag();
+    calcDecoupledInvDiag();
 }
 
 
 template<>
-void BlockGaussSeidelPrecon<scalar>::precondition
+void BlockDiagGaussSeidelPrecon<tensor>::precondition
 (
-    scalarField& x,
-    const scalarField& b
+    tensorField& x,
+    const tensorField& b
 ) const
 {
-    if (matrix_.diagonal())
-    {
-        x = b*invDiag_;
-    }
-    else if (matrix_.symmetric() || matrix_.asymmetric())
-    {
-        const scalarField& LowerCoeff = matrix_.lower();
-        const scalarField& UpperCoeff = matrix_.upper();
-
-        BlockSweep
-        (
-            x,
-            invDiag_,
-            LowerCoeff,
-            UpperCoeff,
-            b
-        );
-    }
+    // Decoupled version
+    decoupledPrecondition(x, b);
 }
 
 
 template<>
-void BlockGaussSeidelPrecon<scalar>::preconditionT
+void BlockDiagGaussSeidelPrecon<tensor>::preconditionT
 (
-    scalarField& xT,
-    const scalarField& bT
+    tensorField& xT,
+    const tensorField& bT
 ) const
 {
-    if (matrix_.diagonal())
-    {
-        xT = bT*invDiag_;
-    }
-    else if (matrix_.symmetric() || matrix_.asymmetric())
-    {
-        const scalarField& LowerCoeff = matrix_.lower();
-        const scalarField& UpperCoeff = matrix_.upper();
-
-        // Swap lower and upper coefficients, transposed matrix
-        BlockSweep
-        (
-            xT,
-            invDiag_,
-            UpperCoeff,
-            LowerCoeff,
-            bT
-        );
-    }
+    // Decoupled version
+    decoupledPreconditionT(xT, bT);
 }
 
 

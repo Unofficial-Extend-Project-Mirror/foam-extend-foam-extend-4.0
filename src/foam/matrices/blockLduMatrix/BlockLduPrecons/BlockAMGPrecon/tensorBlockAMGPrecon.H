@@ -22,21 +22,23 @@ License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    BlockGaussSeidelPrecon
+    BlockAMGPrecon
 
 Description
-    Template specialisation for scalar block Gauss-Seidel preconditioning
+    Template specialisation for tensor block AMG preconditioning
 
 Author
-    Hrvoje Jasak, Wikki Ltd.  All rights reserved
+    Hrvoje Jasak, Wikki Ltd.  All rights reserved.
+
+SourceFiles
+    tensorBlockAMGPrecon.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef scalarBlockGaussSeidelPrecon_H
-#define scalarBlockGaussSeidelPrecon_H
+#ifndef tensorBlockAMGPrecon_H
+#define tensorBlockAMGPrecon_H
 
-#include "BlockGaussSeidelPrecon.H"
-#include "scalarBlockGaussSeidelPrecon.H"
+#include "BlockAMGPrecon.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -44,69 +46,19 @@ namespace Foam
 {
 
 template<>
-void BlockGaussSeidelPrecon<scalar>::calcInvDiag()
-{
-    // Direct inversion of diagonal is sufficient, as the diagonal
-    // is linear.  HJ, 20/Aug/2015
-    invDiag_ = 1/this->matrix_.diag();
-}
-
-
-template<>
-void BlockGaussSeidelPrecon<scalar>::precondition
+void Foam::BlockAMGPrecon<tensor>::precondition
 (
-    scalarField& x,
-    const scalarField& b
-) const
-{
-    if (matrix_.diagonal())
-    {
-        x = b*invDiag_;
-    }
-    else if (matrix_.symmetric() || matrix_.asymmetric())
-    {
-        const scalarField& LowerCoeff = matrix_.lower();
-        const scalarField& UpperCoeff = matrix_.upper();
-
-        BlockSweep
-        (
-            x,
-            invDiag_,
-            LowerCoeff,
-            UpperCoeff,
-            b
-        );
-    }
-}
+    tensorField& x,
+    const tensorField& b
+) const;
 
 
-template<>
-void BlockGaussSeidelPrecon<scalar>::preconditionT
-(
-    scalarField& xT,
-    const scalarField& bT
-) const
-{
-    if (matrix_.diagonal())
-    {
-        xT = bT*invDiag_;
-    }
-    else if (matrix_.symmetric() || matrix_.asymmetric())
-    {
-        const scalarField& LowerCoeff = matrix_.lower();
-        const scalarField& UpperCoeff = matrix_.upper();
-
-        // Swap lower and upper coefficients, transposed matrix
-        BlockSweep
-        (
-            xT,
-            invDiag_,
-            UpperCoeff,
-            LowerCoeff,
-            bT
-        );
-    }
-}
+// template<>
+// void Foam::BlockAMGPrecon<tensor>::preconditionT
+// (
+//     tensorField& xT,
+//     const tensorField& bT
+// ) const;
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

@@ -22,19 +22,19 @@ License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Description
-    Gauss-Seidel solver for symmetric and asymmetric matrices.  In
-    order to improve efficiency, the residual is evaluated after every
-    nSweeps sweeps.
+    Algebraic Multigrid solver with run-time selection of coarsening and cycle
+
+Author
+    Klas Jareteg, 2013-04-15
 
 \*---------------------------------------------------------------------------*/
 
-#include "BlockGaussSeidelSolver.H"
+#include "BlockAMGSolver.H"
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-// Construct from matrix and solver data stream
 template<class Type>
-Foam::BlockGaussSeidelSolver<Type>::BlockGaussSeidelSolver
+Foam::BlockAMGSolver<Type>::BlockAMGSolver
 (
     const word& fieldName,
     const BlockLduMatrix<Type>& matrix,
@@ -47,8 +47,11 @@ Foam::BlockGaussSeidelSolver<Type>::BlockGaussSeidelSolver
         matrix,
         dict
     ),
-    gs_(matrix),
-    nSweeps_(readLabel(this->dict().lookup("nSweeps")))
+    amg_
+    (
+        matrix,
+        dict
+    )
 {}
 
 
@@ -56,15 +59,12 @@ Foam::BlockGaussSeidelSolver<Type>::BlockGaussSeidelSolver
 
 template<class Type>
 typename Foam::BlockSolverPerformance<Type>
-Foam::BlockGaussSeidelSolver<Type>::solve
+Foam::BlockAMGSolver<Type>::solve
 (
     Field<Type>& x,
     const Field<Type>& b
 )
 {
-    // Create local references to avoid the spread this-> ugliness
-    const BlockLduMatrix<Type>& matrix = this->matrix_;
-
     // Prepare solver performance
     BlockSolverPerformance<Type> solverPerf
     (
@@ -74,36 +74,41 @@ Foam::BlockGaussSeidelSolver<Type>::solve
 
     scalar norm = this->normFactor(x, b);
 
-    Field<Type> wA(x.size());
-
-    // Calculate residual.  Note: sign of residual swapped for efficiency
-    matrix.Amul(wA, x);
-    wA -= b;
-
-    solverPerf.initialResidual() = gSum(cmptMag(wA))/norm;
+    // Calculate initial residual
+    solverPerf.initialResidual() = gSum(cmptMag(amg_.residual(x, b)))/norm;
     solverPerf.finalResidual() = solverPerf.initialResidual();
 
-    // Check convergence, solve if not converged
+    // Stop solver on divergence
+    Type minResidual = solverPerf.initialResidual();
+    scalar divergenceThreshold = 2;
 
     if (!this->stop(solverPerf))
     {
-        // Iteration loop
-
         do
         {
-            for (label i = 0; i < nSweeps_; i++)
-            {
-                gs_.precondition(x, b);
+            amg_.cycle(x, b);
 
-                solverPerf.nIterations()++;
+            solverPerf.finalResidual() =
+                gSum(cmptMag(amg_.residual(x, b)))/norm;
+
+            solverPerf.nIterations()++;
+
+            // Divergence check
+            if
+            (
+                cmptMax
+                (
+                    solverPerf.finalResidual()
+                  - divergenceThreshold*minResidual
+                ) > 0
+             && solverPerf.nIterations() > 5
+            )
+            {
+                break;
             }
 
-            // Re-calculate residual.  Note: sign of residual swapped
-            // for efficiency
-            matrix.Amul(wA, x);
-            wA -= b;
+            minResidual = Foam::min(minResidual, solverPerf.finalResidual());
 
-            solverPerf.finalResidual() = gSum(cmptMag(wA))/norm;
         } while (!this->stop(solverPerf));
     }
 

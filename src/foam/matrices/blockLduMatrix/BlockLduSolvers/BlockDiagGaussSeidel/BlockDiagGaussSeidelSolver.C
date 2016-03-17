@@ -28,13 +28,13 @@ Description
 
 \*---------------------------------------------------------------------------*/
 
-#include "BlockGaussSeidelSolver.H"
+#include "BlockDiagGaussSeidelSolver.H"
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 // Construct from matrix and solver data stream
 template<class Type>
-Foam::BlockGaussSeidelSolver<Type>::BlockGaussSeidelSolver
+Foam::BlockDiagGaussSeidelSolver<Type>::BlockDiagGaussSeidelSolver
 (
     const word& fieldName,
     const BlockLduMatrix<Type>& matrix,
@@ -56,7 +56,7 @@ Foam::BlockGaussSeidelSolver<Type>::BlockGaussSeidelSolver
 
 template<class Type>
 typename Foam::BlockSolverPerformance<Type>
-Foam::BlockGaussSeidelSolver<Type>::solve
+Foam::BlockDiagGaussSeidelSolver<Type>::solve
 (
     Field<Type>& x,
     const Field<Type>& b

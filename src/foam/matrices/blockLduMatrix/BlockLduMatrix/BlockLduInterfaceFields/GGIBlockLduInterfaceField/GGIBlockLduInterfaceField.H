@@ -22,91 +22,82 @@ License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    BlockGaussSeidelPrecon
+    Foam::GGIBlockLduInterfaceField
 
 Description
-    Template specialisation for scalar block Gauss-Seidel preconditioning
+    Abstract base class for GGI coupled interfaces.
 
 Author
-    Hrvoje Jasak, Wikki Ltd.  All rights reserved
+    Hrvoje Jasak, Wikki Ltd
+
+SourceFiles
+    GGIBlockLduInterfaceField.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef scalarBlockGaussSeidelPrecon_H
-#define scalarBlockGaussSeidelPrecon_H
+#ifndef GGIBlockLduInterfaceField_H
+#define GGIBlockLduInterfaceField_H
 
-#include "BlockGaussSeidelPrecon.H"
-#include "scalarBlockGaussSeidelPrecon.H"
+#include "primitiveFieldsFwd.H"
+#include "typeInfo.H"
+#include "Field.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 
-template<>
-void BlockGaussSeidelPrecon<scalar>::calcInvDiag()
+/*---------------------------------------------------------------------------*\
+                   Class GGIBlockLduInterfaceField Declaration
+\*---------------------------------------------------------------------------*/
+
+template<class Type>
+class GGIBlockLduInterfaceField
 {
-    // Direct inversion of diagonal is sufficient, as the diagonal
-    // is linear.  HJ, 20/Aug/2015
-    invDiag_ = 1/this->matrix_.diag();
-}
+public:
+
+    //- Runtime type information
+    TypeName("GGIBlockLduInterfaceField");
 
 
-template<>
-void BlockGaussSeidelPrecon<scalar>::precondition
-(
-    scalarField& x,
-    const scalarField& b
-) const
-{
-    if (matrix_.diagonal())
-    {
-        x = b*invDiag_;
-    }
-    else if (matrix_.symmetric() || matrix_.asymmetric())
-    {
-        const scalarField& LowerCoeff = matrix_.lower();
-        const scalarField& UpperCoeff = matrix_.upper();
+    // Constructors
 
-        BlockSweep
+        //- Construct given coupled patch
+        GGIBlockLduInterfaceField()
+        {}
+
+
+    //- Destructor
+    virtual ~GGIBlockLduInterfaceField();
+
+
+    // Member Functions
+
+        // Access
+
+            //- Is the transform required
+            virtual bool doTransform() const = 0;
+
+            //- Return face transformation tensor
+            virtual const tensorField& forwardT() const = 0;
+
+            //- Return rank of component for transform
+            virtual int rank() const = 0;
+
+
+        //- Transform given patch component field
+        void transformCoupleField
         (
-            x,
-            invDiag_,
-            LowerCoeff,
-            UpperCoeff,
-            b
-        );
-    }
-}
+            scalarField& f,
+            const direction cmpt
+        ) const;
 
-
-template<>
-void BlockGaussSeidelPrecon<scalar>::preconditionT
-(
-    scalarField& xT,
-    const scalarField& bT
-) const
-{
-    if (matrix_.diagonal())
-    {
-        xT = bT*invDiag_;
-    }
-    else if (matrix_.symmetric() || matrix_.asymmetric())
-    {
-        const scalarField& LowerCoeff = matrix_.lower();
-        const scalarField& UpperCoeff = matrix_.upper();
-
-        // Swap lower and upper coefficients, transposed matrix
-        BlockSweep
+        //- Transform given patch field
+        void transformCoupleField
         (
-            xT,
-            invDiag_,
-            UpperCoeff,
-            LowerCoeff,
-            bT
-        );
-    }
-}
+            Field<Type>& f
+        ) const;
+};
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -114,6 +105,12 @@ void BlockGaussSeidelPrecon<scalar>::preconditionT
 } // End namespace Foam
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#ifdef NoRepository
+#   include "GGIBlockLduInterfaceField.C"
+#endif
+
+// ************************************************************************* //
 
 #endif
 

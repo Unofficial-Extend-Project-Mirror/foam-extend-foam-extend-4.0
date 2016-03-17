@@ -22,21 +22,22 @@ License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    BlockGaussSeidelPrecon
+    BlockDiagGaussSeidelPrecon
 
 Description
-    Template specialisation for scalar block Gauss-Seidel preconditioning
+    Template specialisation for scalar block diagonally-corrected
+    Gauss-Seidel preconditioning
 
 Author
     Hrvoje Jasak, Wikki Ltd.  All rights reserved
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef scalarBlockGaussSeidelPrecon_H
-#define scalarBlockGaussSeidelPrecon_H
+#ifndef scalarBlockDiagGaussSeidelPrecon_H
+#define scalarBlockDiagGaussSeidelPrecon_H
 
-#include "BlockGaussSeidelPrecon.H"
-#include "scalarBlockGaussSeidelPrecon.H"
+#include "BlockDiagGaussSeidelPrecon.H"
+#include "scalarBlockDiagGaussSeidelPrecon.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -44,24 +45,83 @@ namespace Foam
 {
 
 template<>
-void BlockGaussSeidelPrecon<scalar>::calcInvDiag()
+void BlockDiagGaussSeidelPrecon<scalar>::calcInvDiag()
 {
+    const unallocLabelList& l = this->matrix_.lduAddr().lowerAddr();
+    const unallocLabelList& u = this->matrix_.lduAddr().upperAddr();
+
+    // Get diagonal
+    const scalarField& d = matrix_.diag();
+
+    scalarField sumMagOffDiag(d.size(), 0);
+
+    // Sum up off-diagonal part of the matrix
+
+    if (matrix_.symmetric())
+    {
+        // Symmetric matrix
+
+        const scalarField& upper = matrix_.upper();
+
+        for (register label coeffI = 0; coeffI < l.size(); coeffI++)
+        {
+            sumMagOffDiag[l[coeffI]] += upper[coeffI];
+            sumMagOffDiag[u[coeffI]] += upper[coeffI];
+        }
+    }
+    else if (matrix_.asymmetric())
+    {
+        const scalarField& lower = matrix_.lower();
+        const scalarField& upper = matrix_.upper();
+    
+        for (register label coeffI = 0; coeffI < l.size(); coeffI++)
+        {
+            sumMagOffDiag[l[coeffI]] += lower[coeffI];
+            sumMagOffDiag[u[coeffI]] += upper[coeffI];
+        }
+    }
+
+    // Compare sum off-diag with diagonal and take larger for the inverse
+    // The difference between the two is stored in LUDiag_ for correction
+
+    scalarField signActiveDiag = sign(d);
+    scalarField magActiveDiag = mag(d);
+
+    scalarField magNewDiag = Foam::max(magActiveDiag, sumMagOffDiag);
+
     // Direct inversion of diagonal is sufficient, as the diagonal
     // is linear.  HJ, 20/Aug/2015
-    invDiag_ = 1/this->matrix_.diag();
+    invDiag_ = signActiveDiag/magActiveDiag;
+
+    // Store correction into LUDiag_
+    LUDiag_ = signActiveDiag*Foam::max(magNewDiag - magActiveDiag, scalar(0));
 }
 
 
 template<>
-void BlockGaussSeidelPrecon<scalar>::precondition
+void BlockDiagGaussSeidelPrecon<scalar>::precondition
 (
     scalarField& x,
     const scalarField& b
 ) const
 {
+    // Prepare correction
+    if (bPlusLU_.empty())
+    {
+        bPlusLU_.setSize(b.size(), 0);
+    }
+
+    // Add diag coupling to b
+
+    // Multiply overwrites bPlusLU_: no need to initialise
+    // Change of sign accounted via change of sign of bPlusLU_
+    // HJ, 10/Jan/2016
+    multiply(bPlusLU_, LUDiag_, x);
+    bPlusLU_ += b;
+
     if (matrix_.diagonal())
     {
-        x = b*invDiag_;
+        x = bPlusLU_*invDiag_;
     }
     else if (matrix_.symmetric() || matrix_.asymmetric())
     {
@@ -74,22 +134,36 @@ void BlockGaussSeidelPrecon<scalar>::precondition
             invDiag_,
             LowerCoeff,
             UpperCoeff,
-            b
+            bPlusLU_
         );
     }
 }
 
 
 template<>
-void BlockGaussSeidelPrecon<scalar>::preconditionT
+void BlockDiagGaussSeidelPrecon<scalar>::preconditionT
 (
     scalarField& xT,
     const scalarField& bT
 ) const
 {
+    // Prepare correction
+    if (bPlusLU_.empty())
+    {
+        bPlusLU_.setSize(bT.size(), 0);
+    }
+
+    // Add diag coupling to b
+
+    // Multiply overwrites bPlusLU_: no need to initialise
+    // Change of sign accounted via change of sign of bPlusLU_
+    // HJ, 10/Jan/2016
+    multiply(bPlusLU_, LUDiag_, xT);
+    bPlusLU_ += bT;
+
     if (matrix_.diagonal())
     {
-        xT = bT*invDiag_;
+        xT = bPlusLU_*invDiag_;
     }
     else if (matrix_.symmetric() || matrix_.asymmetric())
     {
@@ -103,7 +177,7 @@ void BlockGaussSeidelPrecon<scalar>::preconditionT
             invDiag_,
             UpperCoeff,
             LowerCoeff,
-            bT
+            bPlusLU_
         );
     }
 }

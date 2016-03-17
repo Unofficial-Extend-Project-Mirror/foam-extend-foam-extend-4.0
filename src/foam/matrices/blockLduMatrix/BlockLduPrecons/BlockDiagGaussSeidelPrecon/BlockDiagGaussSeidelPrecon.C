@@ -22,7 +22,7 @@ License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Description
-    Gauss-Seidel sweep as a preconditioner.
+    Diagonally-corrected block Gauss-Seidel sweep as a preconditioner.
 
 Author
     Hrvoje Jasak, Wikki Ltd.  All rights reserved
@@ -30,36 +30,242 @@ Author
 \*---------------------------------------------------------------------------*/
 
 #include "error.H"
-#include "BlockGaussSeidelPrecon.H"
+#include "BlockDiagGaussSeidelPrecon.H"
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
 template<class Type>
-void Foam::BlockGaussSeidelPrecon<Type>::calcInvDiag()
+void Foam::BlockDiagGaussSeidelPrecon<Type>::calcInvDiag()
 {
     typedef CoeffField<Type> TypeCoeffField;
+    typedef typename TypeCoeffField::scalarTypeField scalarTypeField;
+    typedef typename TypeCoeffField::scalarType scalarType;
+
     typedef typename TypeCoeffField::linearTypeField linearTypeField;
     typedef typename TypeCoeffField::linearType linearType;
 
     typedef typename TypeCoeffField::squareTypeField squareTypeField;
 
-    // Note: Cannot use inv since the square coefficient requires
-    // special treatment.  HJ, 20/Aug/2015
+    const unallocLabelList& l = this->matrix_.lduAddr().lowerAddr();
+    const unallocLabelList& u = this->matrix_.lduAddr().upperAddr();
 
     // Get reference to diagonal
     const TypeCoeffField& d = this->matrix_.diag();
 
+    TypeCoeffField sumMagOffDiag(d.size());
+
+    // Sum up off-diagonal part of the matrix
+
+    if (this->matrix_.symmetric())
+    {
+        // Symmetric matrix
+
+        const TypeCoeffField& Upper = this->matrix_.upper();
+
+        if (Upper.activeType() == blockCoeffBase::SQUARE)
+        {
+            // magOffDiag is always scalar or linear type
+            linearTypeField& activeDiag = sumMagOffDiag.asLinear();
+
+            // Use lower as transpose of upper
+            linearTypeField activeLower
+            (
+                Upper.size(),
+                pTraits<linearType>::zero
+            );
+
+            sumMagToDiag(activeLower, Upper.asSquare().T()());
+
+            linearTypeField activeUpper
+            (
+                Upper.size(),
+                pTraits<linearType>::zero
+            );
+
+            sumMagToDiag(activeUpper, Upper.asSquare());
+
+            for (register label coeffI = 0; coeffI < l.size(); coeffI++)
+            {
+                activeDiag[l[coeffI]] += activeLower[coeffI];
+                activeDiag[u[coeffI]] += activeUpper[coeffI];
+            }
+        }
+        else if (Upper.activeType() == blockCoeffBase::LINEAR)
+        {
+            // magOffDiag is always scalar or linear type
+            linearTypeField& activeDiag = sumMagOffDiag.asLinear();
+
+            // Lower is identical to upper
+            const linearTypeField& activeUpper = Upper.asLinear();
+
+            for (register label coeffI = 0; coeffI < l.size(); coeffI++)
+            {
+                activeDiag[l[coeffI]] += activeUpper[coeffI];
+                activeDiag[u[coeffI]] += activeUpper[coeffI];
+            }
+        }
+        else if (Upper.activeType() == blockCoeffBase::SCALAR)
+        {
+            // magOffDiag is always scalar or linear type
+            scalarTypeField& activeDiag = sumMagOffDiag.asScalar();
+
+            // Lower is identical to upper
+            const scalarTypeField& activeUpper = Upper.asScalar();
+
+            for (register label coeffI = 0; coeffI < l.size(); coeffI++)
+            {
+                activeDiag[l[coeffI]] += activeUpper[coeffI];
+                activeDiag[u[coeffI]] += activeUpper[coeffI];
+            }
+        }
+    }
+    else if (this->matrix_.asymmetric())
+    {
+        // Assymetric matrix
+
+        const TypeCoeffField& Lower = this->matrix_.lower();
+        const TypeCoeffField& Upper = this->matrix_.upper();
+
+        if (Upper.activeType() == blockCoeffBase::SQUARE)
+        {
+            // magOffDiag is always scalar or linear type
+            linearTypeField& activeDiag = sumMagOffDiag.asLinear();
+
+            linearTypeField activeLower
+            (
+                Lower.size(),
+                pTraits<linearType>::zero
+            );
+
+            sumMagToDiag(activeLower, Lower.asSquare());
+
+            linearTypeField activeUpper
+            (
+                Upper.size(),
+                pTraits<linearType>::zero
+            );
+
+            sumMagToDiag(activeUpper, Upper.asSquare());
+
+            for (register label coeffI = 0; coeffI < l.size(); coeffI++)
+            {
+                activeDiag[l[coeffI]] += activeLower[coeffI];
+                activeDiag[u[coeffI]] += activeUpper[coeffI];
+            }
+        }
+        else if (Upper.activeType() == blockCoeffBase::LINEAR)
+        {
+            // magOffDiag is always scalar or linear type
+            linearTypeField& activeDiag = sumMagOffDiag.asLinear();
+
+            const linearTypeField& activeLower = Lower.asLinear();
+            const linearTypeField& activeUpper = Upper.asLinear();
+
+            for (register label coeffI = 0; coeffI < l.size(); coeffI++)
+            {
+                activeDiag[l[coeffI]] += activeLower[coeffI];
+                activeDiag[u[coeffI]] += activeUpper[coeffI];
+            }
+        }
+        else if (Upper.activeType() == blockCoeffBase::SCALAR)
+        {
+            scalarTypeField& activeDiag = sumMagOffDiag.asScalar();
+
+            const scalarTypeField& activeLower = Lower.asScalar();
+            const scalarTypeField& activeUpper = Upper.asScalar();
+
+            for (register label coeffI = 0; coeffI < l.size(); coeffI++)
+            {
+                activeDiag[l[coeffI]] += activeLower[coeffI];
+                activeDiag[u[coeffI]] += activeUpper[coeffI];
+            }
+        }
+    }
+
+
+    // Compare sum off-diag with diagonal and take larger for the inverse
+    // The difference between the two is stored in LUDiag_ for correction
+
     if (d.activeType() == blockCoeffBase::SCALAR)
     {
-        invDiag_.asScalar() = 1/d.asScalar();
+        if (sumMagOffDiag.activeType() == blockCoeffBase::SCALAR)
+        {
+            const scalarTypeField& activeDiag = d.asScalar();
+            const scalarTypeField& activeCorrDiag = sumMagOffDiag.asScalar();
+
+            scalarTypeField signActiveDiag = sign(activeDiag);
+            scalarTypeField magActiveDiag = mag(activeDiag);
+
+            scalarTypeField magNewDiag =
+                Foam::max(magActiveDiag, activeCorrDiag);
+
+            // Calculate inverse with corrected diagonal
+            invDiag_.asScalar() = signActiveDiag/magNewDiag;
+
+            // Store correction into LUDiag_
+            LUDiag_.asScalar() = signActiveDiag*
+                Foam::max
+                (
+                    magNewDiag - magActiveDiag,
+                    pTraits<scalarType>::zero
+                );
+        }
+        else if (sumMagOffDiag.activeType() == blockCoeffBase::LINEAR)
+        {
+            const scalarTypeField& activeDiag = d.asScalar();
+            const linearTypeField& activeCorrDiag = sumMagOffDiag.asLinear();
+
+            scalarTypeField signActiveDiag = sign(activeDiag);
+            linearTypeField magActiveDiag =
+                mag(activeDiag)*pTraits<linearType>::one;
+
+            linearTypeField magNewDiag =
+                Foam::max(magActiveDiag, activeCorrDiag);
+
+            invDiag_.asLinear() = signActiveDiag*
+                cmptDivide
+                (
+                    pTraits<linearType>::one,
+                    magNewDiag
+                );
+
+            // Store correction into LUDiag_
+            LUDiag_.asLinear() = signActiveDiag*
+                max
+                (
+                    magNewDiag - magActiveDiag,
+                    pTraits<linearType>::zero
+                );
+        }
     }
     else if (d.activeType() == blockCoeffBase::LINEAR)
     {
+        const linearTypeField& activeDiag = d.asLinear();
+        const linearTypeField& activeCorrDiag = sumMagOffDiag.asLinear();
+
+        linearTypeField signActiveDiag = cmptSign(activeDiag);
+        linearTypeField magActiveDiag = cmptMag(activeDiag);
+
+        linearTypeField magNewDiag =
+            Foam::max(magActiveDiag, activeCorrDiag);
+
         invDiag_.asLinear() =
             cmptDivide
             (
-                linearTypeField(d.size(), pTraits<linearType>::one),
-                d.asLinear()
+                signActiveDiag,
+                magNewDiag
+            );
+
+        // Store correction into LUDiag_
+        LUDiag_.asLinear() =
+            cmptMultiply
+            (
+                signActiveDiag,
+                max
+                (
+                    magNewDiag - magActiveDiag,
+                    pTraits<linearType>::zero
+                )
             );
     }
     else if (d.activeType() == blockCoeffBase::SQUARE)
@@ -74,32 +280,59 @@ void Foam::BlockGaussSeidelPrecon<Type>::calcInvDiag()
         // Get reference to LU: remove diagonal from active diag
         squareTypeField& luDiag = LUDiag_.asSquare();
 
-        linearTypeField lf(activeDiag.size());
+        linearTypeField diagDiag(activeDiag.size());
 
         // Take out the diagonal from the diag as a linear type
-        contractLinear(lf, activeDiag);
+        contractLinear(diagDiag, activeDiag);
 
         // Expand diagonal only to full square type and store into luDiag
-        expandLinear(luDiag, lf);
+        expandLinear(luDiag, diagDiag);
 
         // Keep only off-diagonal in luDiag.
         // Note change of sign to avoid multiplication with -1 when moving
         // to the other side.  HJ, 20/Aug/2015
         luDiag -= activeDiag;
 
-        // Inverse is the inverse of diagonal only
+        // The diagonal is now in diagDiag
+
+        const linearTypeField& activeCorrDiag = sumMagOffDiag.asLinear();
+        linearTypeField signActiveDiag = cmptSign(diagDiag);
+        linearTypeField magActiveDiag = cmptMag(diagDiag);
+
+        linearTypeField magNewDiag =
+            Foam::max(magActiveDiag, activeCorrDiag);
+
         invDiag_.asLinear() =
             cmptDivide
             (
-                linearTypeField(lf.size(), pTraits<linearType>::one),
-                lf
+                signActiveDiag,
+                magNewDiag
             );
+
+        // Inverse is the inverse of diagonal only
+        linearTypeField diagDiagCorr =
+            cmptMultiply
+            (
+                signActiveDiag,
+                Foam::max
+                (
+                    magNewDiag - magActiveDiag,
+                    pTraits<linearType>::zero
+                )
+            );
+
+        // Add correction to luDiag
+        squareTypeField corr(d.size());
+
+        expandLinear(corr, diagDiagCorr);
+
+        luDiag += corr;
     }
     else
     {
         FatalErrorIn
         (
-            "void BlockGaussSeidelPrecon<Type>::calcInvDiag()"
+            "void BlockDiagGaussSeidelPrecon<Type>::calcInvDiag()"
         )   << "Problem with coefficient type morphing."
             << abort(FatalError);
     }
@@ -109,7 +342,7 @@ void Foam::BlockGaussSeidelPrecon<Type>::calcInvDiag()
 // Block sweep, symmetric matrix
 template<class Type>
 template<class DiagType, class ULType>
-void Foam::BlockGaussSeidelPrecon<Type>::BlockSweep
+void Foam::BlockDiagGaussSeidelPrecon<Type>::BlockSweep
 (
     Field<Type>& x,
     const Field<DiagType>& dD,
@@ -128,7 +361,7 @@ void Foam::BlockGaussSeidelPrecon<Type>::BlockSweep
 
     // Klas Jareteg: 2013-02-10:
     // Must transfer data between the different CPUs. Notes on the Jacobi
-    // iteration style can be seen in GaussSeidelSolver.C
+    // iteration style can be seen in DiagGaussSeidelSolver.C
 
     bPrime_ = b;
 
@@ -209,7 +442,7 @@ void Foam::BlockGaussSeidelPrecon<Type>::BlockSweep
 // Block sweep, asymmetric matrix
 template<class Type>
 template<class DiagType, class ULType>
-void Foam::BlockGaussSeidelPrecon<Type>::BlockSweep
+void Foam::BlockDiagGaussSeidelPrecon<Type>::BlockSweep
 (
     Field<Type>& x,
     const Field<DiagType>& dD,
@@ -229,7 +462,7 @@ void Foam::BlockGaussSeidelPrecon<Type>::BlockSweep
 
     // Klas Jareteg: 2013-02-10:
     // Must transfer data between the different CPUs. Notes on the Jacobi
-    // iteration style can be seen in GaussSeidelSolver.C
+    // iteration style can be seen in DiagGaussSeidelSolver.C
 
     bPrime_ = b;
 
@@ -308,7 +541,7 @@ void Foam::BlockGaussSeidelPrecon<Type>::BlockSweep
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 template<class Type>
-Foam::BlockGaussSeidelPrecon<Type>::BlockGaussSeidelPrecon
+Foam::BlockDiagGaussSeidelPrecon<Type>::BlockDiagGaussSeidelPrecon
 (
     const BlockLduMatrix<Type>& matrix
 )
@@ -325,7 +558,7 @@ Foam::BlockGaussSeidelPrecon<Type>::BlockGaussSeidelPrecon
 
 
 template<class Type>
-Foam::BlockGaussSeidelPrecon<Type>::BlockGaussSeidelPrecon
+Foam::BlockDiagGaussSeidelPrecon<Type>::BlockDiagGaussSeidelPrecon
 (
     const BlockLduMatrix<Type>& matrix,
     const dictionary& dict
@@ -345,13 +578,19 @@ Foam::BlockGaussSeidelPrecon<Type>::BlockGaussSeidelPrecon
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 template<class Type>
-void Foam::BlockGaussSeidelPrecon<Type>::precondition
+void Foam::BlockDiagGaussSeidelPrecon<Type>::precondition
 (
     Field<Type>& x,
     const Field<Type>& b
 ) const
 {
     typedef CoeffField<Type> TypeCoeffField;
+
+    // Prepare correction
+    if (bPlusLU_.empty())
+    {
+        bPlusLU_.setSize(b.size(), pTraits<Type>::zero);
+    }
 
     if (this->matrix_.diagonal())
     {
@@ -379,12 +618,16 @@ void Foam::BlockGaussSeidelPrecon<Type>::precondition
             {
                 for (label sweep = 0; sweep < nSweeps_; sweep++)
                 {
+                    // Add diag coupling to b
+                    multiply(bPlusLU_, LUDiag_, x);
+                    bPlusLU_ += b;
+
                     BlockSweep
                     (
                         x,
                         invDiag_.asScalar(),
                         UpperCoeff.asScalar(),
-                        b
+                        bPlusLU_
                     );
                 }
             }
@@ -392,12 +635,16 @@ void Foam::BlockGaussSeidelPrecon<Type>::precondition
             {
                 for (label sweep = 0; sweep < nSweeps_; sweep++)
                 {
+                    // Add diag coupling to b
+                    multiply(bPlusLU_, LUDiag_, x);
+                    bPlusLU_ += b;
+
                     BlockSweep
                     (
                         x,
                         invDiag_.asScalar(),
                         UpperCoeff.asLinear(),
-                        b
+                        bPlusLU_
                     );
                 }
             }
@@ -405,12 +652,16 @@ void Foam::BlockGaussSeidelPrecon<Type>::precondition
             {
                 for (label sweep = 0; sweep < nSweeps_; sweep++)
                 {
+                    // Add diag coupling to b
+                    multiply(bPlusLU_, LUDiag_, x);
+                    bPlusLU_ += b;
+
                     BlockSweep
                     (
                         x,
                         invDiag_.asScalar(),
                         UpperCoeff.asSquare(),
-                        b
+                        bPlusLU_
                     );
                 }
             }
@@ -421,12 +672,16 @@ void Foam::BlockGaussSeidelPrecon<Type>::precondition
             {
                 for (label sweep = 0; sweep < nSweeps_; sweep++)
                 {
+                    // Add diag coupling to b
+                    multiply(bPlusLU_, LUDiag_, x);
+                    bPlusLU_ += b;
+
                     BlockSweep
                     (
                         x,
                         invDiag_.asLinear(),
                         UpperCoeff.asScalar(),
-                        b
+                        bPlusLU_
                     );
                 }
             }
@@ -434,12 +689,16 @@ void Foam::BlockGaussSeidelPrecon<Type>::precondition
             {
                 for (label sweep = 0; sweep < nSweeps_; sweep++)
                 {
+                    // Add diag coupling to b
+                    multiply(bPlusLU_, LUDiag_, x);
+                    bPlusLU_ += b;
+
                     BlockSweep
                     (
                         x,
                         invDiag_.asLinear(),
                         UpperCoeff.asLinear(),
-                        b
+                        bPlusLU_
                     );
                 }
             }
@@ -447,34 +706,30 @@ void Foam::BlockGaussSeidelPrecon<Type>::precondition
             {
                 for (label sweep = 0; sweep < nSweeps_; sweep++)
                 {
+                    // Add diag coupling to b
+                    multiply(bPlusLU_, LUDiag_, x);
+                    bPlusLU_ += b;
+
                     BlockSweep
                     (
                         x,
                         invDiag_.asLinear(),
                         UpperCoeff.asSquare(),
-                        b
+                        bPlusLU_
                     );
                 }
             }
         }
         else if (DiagCoeff.activeType() == blockCoeffBase::SQUARE)
         {
-            // Add diag coupling to b
-            if (bPlusLU_.empty())
-            {
-                bPlusLU_.setSize(b.size(), pTraits<Type>::zero);
-            }
-
-            // Multiply overwrites bPlusLU_: no need to initialise
-            // Change of sign accounted via change of sign of bPlusLU_
-            // HJ, 20/Aug/2015
-            multiply(bPlusLU_, LUDiag_, x);
-            bPlusLU_ += b;
-
             if (UpperCoeff.activeType() == blockCoeffBase::SCALAR)
             {
                 for (label sweep = 0; sweep < nSweeps_; sweep++)
                 {
+                    // Add diag coupling to b
+                    multiply(bPlusLU_, LUDiag_, x);
+                    bPlusLU_ += b;
+
                     // Note linear diag inversed due to decoupling
                     BlockSweep
                     (
@@ -489,6 +744,10 @@ void Foam::BlockGaussSeidelPrecon<Type>::precondition
             {
                 for (label sweep = 0; sweep < nSweeps_; sweep++)
                 {
+                    // Add diag coupling to b
+                    multiply(bPlusLU_, LUDiag_, x);
+                    bPlusLU_ += b;
+
                     // Note linear diag inversed due to decoupling
                     BlockSweep
                     (
@@ -503,6 +762,10 @@ void Foam::BlockGaussSeidelPrecon<Type>::precondition
             {
                 for (label sweep = 0; sweep < nSweeps_; sweep++)
                 {
+                    // Add diag coupling to b
+                    multiply(bPlusLU_, LUDiag_, x);
+                    bPlusLU_ += b;
+
                     // Note linear diag inversed due to decoupling
                     BlockSweep
                     (
@@ -550,13 +813,17 @@ void Foam::BlockGaussSeidelPrecon<Type>::precondition
             {
                 for (label sweep = 0; sweep < nSweeps_; sweep++)
                 {
+                    // Add diag coupling to b
+                    multiply(bPlusLU_, LUDiag_, x);
+                    bPlusLU_ += b;
+
                     BlockSweep
                     (
                         x,
                         invDiag_.asScalar(),
                         LowerCoeff.asScalar(),
                         UpperCoeff.asScalar(),
-                        b
+                        bPlusLU_
                     );
                 }
             }
@@ -564,13 +831,17 @@ void Foam::BlockGaussSeidelPrecon<Type>::precondition
             {
                 for (label sweep = 0; sweep < nSweeps_; sweep++)
                 {
+                    // Add diag coupling to b
+                    multiply(bPlusLU_, LUDiag_, x);
+                    bPlusLU_ += b;
+
                     BlockSweep
                     (
                         x,
                         invDiag_.asScalar(),
                         LowerCoeff.asLinear(),
                         UpperCoeff.asLinear(),
-                        b
+                        bPlusLU_
                     );
                 }
             }
@@ -578,13 +849,17 @@ void Foam::BlockGaussSeidelPrecon<Type>::precondition
             {
                 for (label sweep = 0; sweep < nSweeps_; sweep++)
                 {
+                    // Add diag coupling to b
+                    multiply(bPlusLU_, LUDiag_, x);
+                    bPlusLU_ += b;
+
                     BlockSweep
                     (
                         x,
                         invDiag_.asScalar(),
                         LowerCoeff.asSquare(),
                         UpperCoeff.asSquare(),
-                        b
+                        bPlusLU_
                     );
                 }
             }
@@ -595,13 +870,17 @@ void Foam::BlockGaussSeidelPrecon<Type>::precondition
             {
                 for (label sweep = 0; sweep < nSweeps_; sweep++)
                 {
+                    // Add diag coupling to b
+                    multiply(bPlusLU_, LUDiag_, x);
+                    bPlusLU_ += b;
+
                     BlockSweep
                     (
                         x,
                         invDiag_.asLinear(),
                         LowerCoeff.asScalar(),
                         UpperCoeff.asScalar(),
-                        b
+                        bPlusLU_
                     );
                 }
             }
@@ -609,40 +888,46 @@ void Foam::BlockGaussSeidelPrecon<Type>::precondition
             {
                 for (label sweep = 0; sweep < nSweeps_; sweep++)
                 {
+                    // Add diag coupling to b
+                    multiply(bPlusLU_, LUDiag_, x);
+                    bPlusLU_ += b;
+
                     BlockSweep
                     (
                         x,
                         invDiag_.asLinear(),
                         LowerCoeff.asLinear(),
                         UpperCoeff.asLinear(),
-                        b
+                        bPlusLU_
                     );
                 }
             }
             else if (UpperCoeff.activeType() == blockCoeffBase::SQUARE)
             {
-                BlockSweep
-                (
-                    x,
-                    invDiag_.asLinear(),
-                    LowerCoeff.asSquare(),
-                    UpperCoeff.asSquare(),
-                    b
-                );
+                for (label sweep = 0; sweep < nSweeps_; sweep++)
+                {
+                    // Add diag coupling to b
+                    multiply(bPlusLU_, LUDiag_, x);
+                    bPlusLU_ += b;
+
+                    BlockSweep
+                    (
+                        x,
+                        invDiag_.asLinear(),
+                        LowerCoeff.asSquare(),
+                        UpperCoeff.asSquare(),
+                        bPlusLU_
+                    );
+                }
             }
         }
         else if (DiagCoeff.activeType() == blockCoeffBase::SQUARE)
         {
-            // Add diag coupling to b
-            if (bPlusLU_.empty())
-            {
-                bPlusLU_.setSize(b.size(), pTraits<Type>::zero);
-            }
-
             if (UpperCoeff.activeType() == blockCoeffBase::SCALAR)
             {
                 for (label sweep = 0; sweep < nSweeps_; sweep++)
                 {
+                    // Add diag coupling to b
                     multiply(bPlusLU_, LUDiag_, x);
                     bPlusLU_ += b;
 
@@ -661,6 +946,7 @@ void Foam::BlockGaussSeidelPrecon<Type>::precondition
             {
                 for (label sweep = 0; sweep < nSweeps_; sweep++)
                 {
+                    // Add diag coupling to b
                     multiply(bPlusLU_, LUDiag_, x);
                     bPlusLU_ += b;
 
@@ -677,12 +963,9 @@ void Foam::BlockGaussSeidelPrecon<Type>::precondition
             }
             else if (UpperCoeff.activeType() == blockCoeffBase::SQUARE)
             {
-//                 Info<< "Diag: " << DiagCoeff.asSquare()[50] << nl
-//                     << "LUDiag: " << LUDiag_.asSquare()[50] << nl
-//                     << "invDiag: " << invDiag_.asLinear()[50] << nl
-//                     << endl;
                 for (label sweep = 0; sweep < nSweeps_; sweep++)
                 {
+                    // Add diag coupling to b
                     multiply(bPlusLU_, LUDiag_, x);
                     bPlusLU_ += b;
 
@@ -702,7 +985,7 @@ void Foam::BlockGaussSeidelPrecon<Type>::precondition
         {
             FatalErrorIn
             (
-                "void BlockGaussSeidelPrecon<Type>::precondition\n"
+                "void BlockDiagGaussSeidelPrecon<Type>::precondition\n"
                 "(\n"
                 "    Field<Type>& x,\n"
                 "    const Field<Type>& b\n"
@@ -715,7 +998,7 @@ void Foam::BlockGaussSeidelPrecon<Type>::precondition
     {
         FatalErrorIn
         (
-            "void BlockGaussSeidelPrecon<Type>::precondition\n"
+            "void BlockDiagGaussSeidelPrecon<Type>::precondition\n"
             "(\n"
             "    Field<Type>& x,\n"
             "    const Field<Type>& b\n"
@@ -727,13 +1010,18 @@ void Foam::BlockGaussSeidelPrecon<Type>::precondition
 
 
 template<class Type>
-void Foam::BlockGaussSeidelPrecon<Type>::preconditionT
+void Foam::BlockDiagGaussSeidelPrecon<Type>::preconditionT
 (
     Field<Type>& xT,
     const Field<Type>& bT
 ) const
 {
     typedef CoeffField<Type> TypeCoeffField;
+
+    if (bPlusLU_.empty())
+    {
+        bPlusLU_.setSize(bT.size(), pTraits<Type>::zero);
+    }
 
     if (this->matrix_.diagonal())
     {
@@ -762,6 +1050,10 @@ void Foam::BlockGaussSeidelPrecon<Type>::preconditionT
             {
                 for (label sweep = 0; sweep < nSweeps_; sweep++)
                 {
+                    // Add diag coupling to b
+                    multiply(bPlusLU_, LUDiag_, xT);
+                    bPlusLU_ += bT;
+
                     // Transpose multiplication - swap lower and upper coeff
                     BlockSweep
                     (
@@ -769,7 +1061,7 @@ void Foam::BlockGaussSeidelPrecon<Type>::preconditionT
                         invDiag_.asScalar(),
                         UpperCoeff.asScalar(),
                         LowerCoeff.asScalar(),
-                        bT
+                        bPlusLU_
                     );
                 }
             }
@@ -777,6 +1069,10 @@ void Foam::BlockGaussSeidelPrecon<Type>::preconditionT
             {
                 for (label sweep = 0; sweep < nSweeps_; sweep++)
                 {
+                    // Add diag coupling to b
+                    multiply(bPlusLU_, LUDiag_, xT);
+                    bPlusLU_ += bT;
+
                     // Transpose multiplication - swap lower and upper coeff
                     BlockSweep
                     (
@@ -784,7 +1080,7 @@ void Foam::BlockGaussSeidelPrecon<Type>::preconditionT
                         invDiag_.asScalar(),
                         UpperCoeff.asLinear(),
                         LowerCoeff.asLinear(),
-                        bT
+                        bPlusLU_
                     );
                 }
             }
@@ -792,6 +1088,10 @@ void Foam::BlockGaussSeidelPrecon<Type>::preconditionT
             {
                 for (label sweep = 0; sweep < nSweeps_; sweep++)
                 {
+                    // Add diag coupling to b
+                    multiply(bPlusLU_, LUDiag_, xT);
+                    bPlusLU_ += bT;
+
                     // Transpose multiplication - swap lower and upper coeff
                     BlockSweep
                     (
@@ -799,7 +1099,7 @@ void Foam::BlockGaussSeidelPrecon<Type>::preconditionT
                         invDiag_.asScalar(),
                         UpperCoeff.asSquare(),
                         LowerCoeff.asSquare(),
-                        bT
+                        bPlusLU_
                     );
                 }
             }
@@ -810,6 +1110,10 @@ void Foam::BlockGaussSeidelPrecon<Type>::preconditionT
             {
                 for (label sweep = 0; sweep < nSweeps_; sweep++)
                 {
+                    // Add diag coupling to b
+                    multiply(bPlusLU_, LUDiag_, xT);
+                    bPlusLU_ += bT;
+
                     // Transpose multiplication - swap lower and upper coeff
                     BlockSweep
                     (
@@ -817,7 +1121,7 @@ void Foam::BlockGaussSeidelPrecon<Type>::preconditionT
                         invDiag_.asLinear(),
                         UpperCoeff.asScalar(),
                         LowerCoeff.asScalar(),
-                        bT
+                        bPlusLU_
                     );
                 }
             }
@@ -825,6 +1129,10 @@ void Foam::BlockGaussSeidelPrecon<Type>::preconditionT
             {
                 for (label sweep = 0; sweep < nSweeps_; sweep++)
                 {
+                    // Add diag coupling to b
+                    multiply(bPlusLU_, LUDiag_, xT);
+                    bPlusLU_ += bT;
+
                     // Transpose multiplication - swap lower and upper coeff
                     BlockSweep
                     (
@@ -832,7 +1140,7 @@ void Foam::BlockGaussSeidelPrecon<Type>::preconditionT
                         invDiag_.asLinear(),
                         UpperCoeff.asLinear(),
                         LowerCoeff.asLinear(),
-                        bT
+                        bPlusLU_
                     );
                 }
             }
@@ -840,6 +1148,10 @@ void Foam::BlockGaussSeidelPrecon<Type>::preconditionT
             {
                 for (label sweep = 0; sweep < nSweeps_; sweep++)
                 {
+                    // Add diag coupling to b
+                    multiply(bPlusLU_, LUDiag_, xT);
+                    bPlusLU_ += bT;
+
                     // Transpose multiplication - swap lower and upper coeff
                     BlockSweep
                     (
@@ -847,23 +1159,18 @@ void Foam::BlockGaussSeidelPrecon<Type>::preconditionT
                         invDiag_.asLinear(),
                         UpperCoeff.asSquare(),
                         LowerCoeff.asSquare(),
-                        bT
+                        bPlusLU_
                     );
                 }
             }
         }
         else if (DiagCoeff.activeType() == blockCoeffBase::SQUARE)
         {
-            // Add diag coupling to b
-            if (bPlusLU_.empty())
-            {
-                bPlusLU_.setSize(bT.size(), pTraits<Type>::zero);
-            }
-
             if (UpperCoeff.activeType() == blockCoeffBase::SCALAR)
             {
                 for (label sweep = 0; sweep < nSweeps_; sweep++)
                 {
+                    // Add diag coupling to b
                     multiply(bPlusLU_, LUDiag_, xT);
                     bPlusLU_ += bT;
 
@@ -883,6 +1190,7 @@ void Foam::BlockGaussSeidelPrecon<Type>::preconditionT
             {
                 for (label sweep = 0; sweep < nSweeps_; sweep++)
                 {
+                    // Add diag coupling to b
                     multiply(bPlusLU_, LUDiag_, xT);
                     bPlusLU_ += bT;
 
@@ -902,6 +1210,7 @@ void Foam::BlockGaussSeidelPrecon<Type>::preconditionT
             {
                 for (label sweep = 0; sweep < nSweeps_; sweep++)
                 {
+                    // Add diag coupling to b
                     multiply(bPlusLU_, LUDiag_, xT);
                     bPlusLU_ += bT;
 
@@ -922,7 +1231,7 @@ void Foam::BlockGaussSeidelPrecon<Type>::preconditionT
         {
             FatalErrorIn
             (
-                "void BlockGaussSeidelPrecon<Type>::preconditionT\n"
+                "void BlockDiagGaussSeidelPrecon<Type>::preconditionT\n"
                 "(\n"
                 "    Field<Type>& xT,\n"
                 "    const Field<Type>& bT\n"
@@ -935,7 +1244,7 @@ void Foam::BlockGaussSeidelPrecon<Type>::preconditionT
     {
         FatalErrorIn
         (
-            "void BlockGaussSeidelPrecon<Type>::preconditionT\n"
+            "void BlockDiagGaussSeidelPrecon<Type>::preconditionT\n"
             "(\n"
             "    Field<Type>& xT,\n"
             "    const Field<Type>& bT\n"
