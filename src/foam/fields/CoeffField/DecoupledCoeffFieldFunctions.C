@@ -38,7 +38,7 @@ Foam::tmp<Foam::DecoupledCoeffField<Type> > Foam::inv
     // type is introduced.  HJ, 24/May/2005
 
     typedef typename DecoupledCoeffField<Type>::linearTypeField fieldType;
-    typedef typename DecoupledCoeffField<Type>::linearType valueType;
+    typedef typename DecoupledCoeffField<Type>::linearType linearType;
 
     // Create result
     tmp<DecoupledCoeffField<Type> > tresult
@@ -58,7 +58,7 @@ Foam::tmp<Foam::DecoupledCoeffField<Type> > Foam::inv
         fieldType inverse =
             cmptDivide
             (
-                fieldType(lf.size(), pTraits<valueType>::one),
+                fieldType(lf.size(), pTraits<linearType>::one),
                 lf
             );
 

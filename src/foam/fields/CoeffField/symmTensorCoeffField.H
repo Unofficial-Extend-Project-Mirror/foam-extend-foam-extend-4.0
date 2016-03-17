@@ -82,12 +82,49 @@ public:
         void operator=(const linearTypeField&);
         void operator=(const tmp<linearTypeField>&);
 
+    // IOstream operators
+
+        friend Ostream& operator<<
+        (
+            Ostream&,
+            const CoeffField<symmTensor>&
+        );
+
+        friend Ostream& operator<<
+        (
+            Ostream&,
+            const tmp<CoeffField<symmTensor> >&
+        );
 };
 
 
 /* * * * * * * * * * * * * * * * Global functions  * * * * * * * * * * * * * */
 
 tmp<CoeffField<symmTensor> > inv(const CoeffField<symmTensor>& f);
+
+template<>
+void multiply
+(
+    Field<symmTensor>& f,
+    const CoeffField<symmTensor>& f1,
+    const symmTensor& f2
+);
+
+template<>
+void multiply
+(
+    Field<symmTensor>& f,
+    const CoeffField<symmTensor>& f1,
+    const Field<symmTensor>& f2
+);
+
+template<>
+void multiply
+(
+    Field<symmTensor>& f,
+    const Field<symmTensor>& f1,
+    const CoeffField<symmTensor>& f2
+);
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
