@@ -22,107 +22,57 @@ License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    BlockCoeffTwoNorm
+    BlockCoeff
 
 Description
-    Class for two norm of block coeffs.
+    Template specialisation for the terminal class.  It is designed to avoid
+    endless expansion of tensor order by excluding block coupling at the
+    terminal type level.
 
 Author
-    Klas Jareteg, 2013-01-30
-
-SourceFiles
-    BlockCoeffTwoNorm.C
+    Hrvoje Jasak, Wikki Ltd.  All rights reserved
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef BlockCoeffTwoNorm_H
-#define BlockCoeffTwoNorm_H
+#ifndef symmTensorBlockCoeff_H
+#define symmTensorBlockCoeff_H
 
-#include "blockCoeffs.H"
-#include "blockCoeffNorms.H"
-#include "BlockCoeffNorm.H"
-#include "coeffFields.H"
-#include "runTimeSelectionTables.H"
+#include "BlockCoeff.H"
+#include "DecoupledBlockCoeff.H"
+#include "symmTensor4thOrder.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 
-// * * * * * * Forward declaration of template friend fuctions * * * * * * * //
-
-
 /*---------------------------------------------------------------------------*\
-                        Class BlockCoeffTwoNorm Declaration
+                          Class BlockCoeff Declaration
 \*---------------------------------------------------------------------------*/
 
-template<class Type>
-class BlockCoeffTwoNorm
+template<>
+class BlockCoeff<symmTensor4thOrder>
 :
-    public BlockCoeffNorm<Type>
+    public DecoupledBlockCoeff<symmTensor4thOrder>
 {
-    // Private data
-
-        //- Control data dictionary
-        dictionary dict_;
-
-
-protected:
-
-    // Protected Member Functions
-
-        //- Return dictionary
-        const dictionary& dict() const
-        {
-            return dict_;
-        }
-
-
 public:
-
-    //- Runtime type information
-    TypeName("twoNorm");
-
 
     // Constructors
 
-        //- Construct from dictionary
-        BlockCoeffTwoNorm
-        (
-            const dictionary& dict
-        );
+        //- Construct null
+        explicit BlockCoeff();
 
-    // Destructor
+        //- Construct as copy
+        BlockCoeff(const BlockCoeff<symmTensor4thOrder>&);
 
-        virtual ~BlockCoeffTwoNorm()
-        {}
-
-
-    // Member functions
-
-        //- Solve
-        virtual scalar normalize
-        (
-            const BlockCoeff<Type>& a
-        );
-
-        virtual void coeffMag
-        (
-            const CoeffField<Type>& a,
-            Field<scalar>& b
-        );
+        //- Construct from Istream
+        BlockCoeff(Istream&);
 };
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-#ifdef NoRepository
-#   include "BlockCoeffTwoNorm.C"
-#endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

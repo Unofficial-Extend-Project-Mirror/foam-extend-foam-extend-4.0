@@ -41,7 +41,7 @@ SourceFiles
 #include "blockCoeffs.H"
 #include "blockCoeffNorms.H"
 #include "BlockCoeffNorm.H"
-#include "CoeffField.H"
+#include "coeffFields.H"
 #include "runTimeSelectionTables.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
