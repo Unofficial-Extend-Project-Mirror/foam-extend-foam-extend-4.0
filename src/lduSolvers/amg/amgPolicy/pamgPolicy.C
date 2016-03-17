@@ -36,7 +36,7 @@ Author
 #include "amgMatrix.H"
 #include "boolList.H"
 #include "addToRunTimeSelectionTable.H"
-#include "GAMGInterfaceField.H"
+#include "AMGInterfaceField.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
@@ -634,7 +634,7 @@ Foam::autoPtr<Foam::amgMatrix> Foam::pamgPolicy::restrictMatrix
         }
     }
 
-    // Create GAMG interfaces
+    // Create AMG interfaces
     forAll (interfaceFields, intI)
     {
         if (interfaceFields.set(intI))
@@ -645,7 +645,7 @@ Foam::autoPtr<Foam::amgMatrix> Foam::pamgPolicy::restrictMatrix
             coarseInterfaces.set
             (
                 intI,
-                GAMGInterface::New
+                AMGInterface::New
                 (
                     *coarseAddrPtr,
                     fineInterface,
@@ -660,19 +660,23 @@ Foam::autoPtr<Foam::amgMatrix> Foam::pamgPolicy::restrictMatrix
     {
         if (interfaceFields.set(intI))
         {
-            const GAMGInterface& coarseInterface =
-                refCast<const GAMGInterface>(coarseInterfaces[intI]);
+            const AMGInterface& coarseInterface =
+                refCast<const AMGInterface>(coarseInterfaces[intI]);
 
             coarseInterfaceFields.set
             (
                 intI,
-                GAMGInterfaceField::New
+                AMGInterfaceField::New
                 (
                     coarseInterface,
                     interfaceFields[intI]
                 ).ptr()
             );
 
+            // Note: scalar agglomeration is done by the interface
+            // (always scalar) but in the block matrix it is done by a
+            // templated block interface field
+            // HJ, 16/Mar/2016
             coarseBouCoeffs.set
             (
                 intI,
