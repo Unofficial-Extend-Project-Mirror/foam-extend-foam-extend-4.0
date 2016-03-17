@@ -84,32 +84,45 @@ $(faceToCell)/MeshObjects/centredCFCFaceToCellStencilObject.C
 
 fvPatchFields = fields/fvPatchFields
 $(fvPatchFields)/fvPatchField/fvPatchFields.C
+$(fvPatchFields)/fvPatchField/fvPatchVectorNFields.C
 
 basicFvPatchFields = $(fvPatchFields)/basic
 $(basicFvPatchFields)/basicSymmetry/basicSymmetryFvPatchFields.C
 $(basicFvPatchFields)/basicSymmetry/basicSymmetryFvPatchScalarField.C
 $(basicFvPatchFields)/calculated/calculatedFvPatchFields.C
+$(basicFvPatchFields)/calculated/calculatedFvPatchVectorNFields.C
 $(basicFvPatchFields)/coupled/coupledFvPatchFields.C
+$(basicFvPatchFields)/coupled/coupledFvPatchVectorNFields.C
 $(basicFvPatchFields)/directionMixed/directionMixedFvPatchFields.C
 $(basicFvPatchFields)/fixedGradient/fixedGradientFvPatchFields.C
+$(basicFvPatchFields)/fixedGradient/fixedGradientFvPatchVectorNFields.C
 $(basicFvPatchFields)/fixedValue/fixedValueFvPatchFields.C
+$(basicFvPatchFields)/fixedValue/fixedValueFvPatchVectorNFields.C
 $(basicFvPatchFields)/generic/genericFvPatchFields.C
+$(basicFvPatchFields)/generic/genericFvPatchVectorNFields.C
 $(basicFvPatchFields)/mixed/mixedFvPatchFields.C
 $(basicFvPatchFields)/sliced/slicedFvPatchFields.C
 $(basicFvPatchFields)/transform/transformFvPatchFields.C
 $(basicFvPatchFields)/transform/transformFvPatchScalarField.C
+$(basicFvPatchFields)/transform/transformFvPatchVectorNFields.C
 $(basicFvPatchFields)/zeroGradient/zeroGradientFvPatchFields.C
+$(basicFvPatchFields)/zeroGradient/zeroGradientFvPatchVectorNFields.C
 
 constraintFvPatchFields = $(fvPatchFields)/constraint
 $(constraintFvPatchFields)/cyclic/cyclicFvPatchFields.C
+$(constraintFvPatchFields)/cyclic/cyclicFvPatchVectorNFields.C
 $(constraintFvPatchFields)/empty/emptyFvPatchFields.C
+$(constraintFvPatchFields)/empty/emptyFvPatchVectorNFields.C
 $(constraintFvPatchFields)/jumpCyclic/jumpCyclicFvPatchFields.C
 $(constraintFvPatchFields)/processor/processorFvPatchFields.C
 $(constraintFvPatchFields)/processor/processorFvPatchScalarField.C
+$(constraintFvPatchFields)/processor/processorFvPatchVectorNFields.C
 $(constraintFvPatchFields)/symmetry/symmetryFvPatchFields.C
 $(constraintFvPatchFields)/wedge/wedgeFvPatchFields.C
 $(constraintFvPatchFields)/wedge/wedgeFvPatchScalarField.C
+$(constraintFvPatchFields)/wedge/wedgeFvPatchVectorNFields.C
 $(constraintFvPatchFields)/ggi/ggiFvPatchFields.C
+$(constraintFvPatchFields)/ggi/ggiFvPatchVectorNFields.C
 $(constraintFvPatchFields)/cyclicGgi/cyclicGgiFvPatchFields.C
 $(constraintFvPatchFields)/overlapGgi/overlapGgiFvPatchFields.C
 $(constraintFvPatchFields)/mixingPlane/mixingPlaneFvPatchFields.C
@@ -171,20 +184,6 @@ $(derivedFvPatchFields)/waveTransmissive/waveTransmissiveFvPatchFields.C
 $(derivedFvPatchFields)/uniformDensityHydrostaticPressure/uniformDensityHydrostaticPressureFvPatchScalarField.C
 $(derivedFvPatchFields)/pulseFixedValue/pulseFixedValueFvPatchFields.C
 $(derivedFvPatchFields)/waveTransmissiveInlet/waveTransmissiveInletFvPatchFields.C
-
-fvPatchVectorNFields = $(fvPatchFields)/fvPatchVectorNFields
-$(fvPatchVectorNFields)/fvPatchVectorNFields.C
-$(fvPatchVectorNFields)/genericFvPatchVectorNFields.C
-$(fvPatchVectorNFields)/calculatedFvPatchVectorNFields.C
-$(fvPatchVectorNFields)/emptyFvPatchVectorNFields.C
-$(fvPatchVectorNFields)/transformFvPatchVectorNFields.C
-$(fvPatchVectorNFields)/wedgeFvPatchVectorNFields.C
-$(fvPatchVectorNFields)/coupledFvPatchVectorNFields.C
-$(fvPatchVectorNFields)/processorFvPatchVectorNFields.C
-$(fvPatchVectorNFields)/cyclicFvPatchVectorNFields.C
-$(fvPatchVectorNFields)/fixedValueFvPatchVectorNFields.C
-$(fvPatchVectorNFields)/zeroGradientFvPatchVectorNFields.C
-$(fvPatchVectorNFields)/fixedGradientFvPatchVectorNFields.C
 
 fvsPatchFields = fields/fvsPatchFields
 $(fvsPatchFields)/fvsPatchField/fvsPatchFields.C
@@ -359,10 +358,6 @@ $(limitedGradSchemes)/faceLimitedGrad/faceLimitedGrads.C
 $(limitedGradSchemes)/cellLimitedGrad/cellLimitedGrads.C
 $(limitedGradSchemes)/faceMDLimitedGrad/faceMDLimitedGrads.C
 $(limitedGradSchemes)/cellMDLimitedGrad/cellMDLimitedGrads.C
-$(limitedGradSchemes)/minModGrad/minModGrads.C
-$(limitedGradSchemes)/barthJespersenGrad/barthJespersenGrads.C
-$(limitedGradSchemes)/venkatakrishnanGrad/venkatakrishnanGrads.C
-$(limitedGradSchemes)/wangGrad/wangGrads.C
 
 snGradSchemes = finiteVolume/snGradSchemes
 $(snGradSchemes)/snGradScheme/snGradSchemes.C
