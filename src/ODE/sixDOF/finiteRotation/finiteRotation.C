@@ -82,7 +82,9 @@ Foam::vector Foam::finiteRotation::eulerAngles(const tensor& rotT)
     // Calculate roll angle
     rollAngle = atan2(rotT.yz(), rotT.zz());
 
-    const scalar c2 = sqrt(rotT.xx() + rotT.xy());
+    // Use mag to avoid negative value due to round-off
+    // HJ, 24/Feb/2016
+    const scalar c2 = sqrt(Foam::max(0, rotT.xx() + rotT.xy()));
 
     // Calculate pitch angle
     pitchAngle = atan2(-rotT.xz(), c2);
