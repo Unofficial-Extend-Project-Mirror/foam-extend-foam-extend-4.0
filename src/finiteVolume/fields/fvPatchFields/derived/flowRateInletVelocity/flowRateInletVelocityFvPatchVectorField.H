@@ -81,6 +81,9 @@ class flowRateInletVelocityFvPatchVectorField
         //- Name of the density field used to normalize the mass flux
         word rhoName_;
 
+        //- Sum areas.  Note: not correctly updated on mesh motion
+        scalar gSumArea_;
+
 
 public:
 

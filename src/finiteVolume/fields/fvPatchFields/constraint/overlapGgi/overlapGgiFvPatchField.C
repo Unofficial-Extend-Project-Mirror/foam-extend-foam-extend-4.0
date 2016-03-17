@@ -121,7 +121,7 @@ overlapGgiFvPatchField<Type>::overlapGgiFvPatchField
     const DimensionedField<Type, volMesh>& iF
 )
 :
-    overlapGgiLduInterfaceField(),
+    overlapGGILduInterfaceField(),
     coupledFvPatchField<Type>(ptf, iF),
     overlapGgiPatch_(refCast<const overlapGgiFvPatch>(ptf.patch()))
 {
