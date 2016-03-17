@@ -22,7 +22,7 @@ License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    BlockAmgLevel
+    BlockAMGLevel
 
 Description
     Algebraic multigrid level virtual base class for BlockLduMatrix
@@ -31,12 +31,12 @@ Author
     Klas Jareteg, 2012-12-13
 
 SourceFiles
-    BlockAmgLevel.C
+    BlockAMGLevel.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef BlockAmgLevel_H
-#define BlockAmgLevel_H
+#ifndef BlockAMGLevel_H
+#define BlockAMGLevel_H
 
 #include "BlockLduMatrix.H"
 #include "BlockMatrixCoarsening.H"
@@ -49,39 +49,39 @@ namespace Foam
 // * * * * * * Forward declaration of template friend fuctions * * * * * * * //
 
 template<class Type>
-class fineBlockAmgLevel;
+class fineBlockAMGLevel;
 
 template<class Type>
-class coarseBlockAmgLevel;
+class coarseBlockAMGLevel;
 
 template<class Type>
-class BlockAmgCycle;
+class BlockAMGCycle;
 
 template<class Type>
 class BlockMatrixCoarsening;
 
 template<class Type>
-class BlockAmgSolver;
+class BlockAMGSolver;
 
 template<class Type>
-class BlockAmgPrecon;
+class BlockAMGPrecon;
 
 /*---------------------------------------------------------------------------*\
-                           Class BlockAmgLevel Declaration
+                           Class BlockAMGLevel Declaration
 \*---------------------------------------------------------------------------*/
 
 template<class Type>
-class BlockAmgLevel
+class BlockAMGLevel
 {
 public:
-    //- Runtime type information
-        TypeName("BlockAmgLevel");
+
+    // Runtime type information
+    TypeName("BlockAMGLevel");
 
 
-    // Destructor
-
-        virtual ~BlockAmgLevel()
-        {}
+    //- Destructor
+    virtual ~BlockAMGLevel()
+    {}
 
 
     // Member Functions
@@ -143,16 +143,13 @@ public:
         ) const = 0;
 
         //- Create next level from current level
-        virtual autoPtr<BlockAmgLevel> makeNextLevel() const = 0;
+        virtual autoPtr<BlockAMGLevel> makeNextLevel() const = 0;
 };
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

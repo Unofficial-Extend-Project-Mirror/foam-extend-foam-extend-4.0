@@ -22,7 +22,7 @@ License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    coarseBlockAmgLevel
+    coarseBlockAMGLevel
 
 Description
     Coarse AMG level stores matrix, x and b locally, for BlockLduMatrix
@@ -32,7 +32,7 @@ Author
 
 \*---------------------------------------------------------------------------*/
 
-#include "coarseBlockAmgLevel.H"
+#include "coarseBlockAMGLevel.H"
 #include "SubField.H"
 #include "vector2D.H"
 #include "coeffFields.H"
@@ -45,7 +45,7 @@ Author
 
 // Construct from components
 template<class Type>
-Foam::coarseBlockAmgLevel<Type>::coarseBlockAmgLevel
+Foam::coarseBlockAMGLevel<Type>::coarseBlockAMGLevel
 (
     autoPtr<lduPrimitiveMesh> addrPtr,
     autoPtr<BlockLduMatrix<Type> > matrixPtr,
@@ -87,28 +87,33 @@ Foam::coarseBlockAmgLevel<Type>::coarseBlockAmgLevel
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
 template<class Type>
-Foam::coarseBlockAmgLevel<Type>::~coarseBlockAmgLevel()
-{}
+Foam::coarseBlockAMGLevel<Type>::~coarseBlockAMGLevel()
+{
+    if (addrPtr_.valid())
+    {
+        addrPtr_().clearInterfaces();
+    }
+}
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 template<class Type>
-Foam::Field<Type>& Foam::coarseBlockAmgLevel<Type>::x()
+Foam::Field<Type>& Foam::coarseBlockAMGLevel<Type>::x()
 {
     return x_;
 }
 
 
 template<class Type>
-Foam::Field<Type>& Foam::coarseBlockAmgLevel<Type>::b()
+Foam::Field<Type>& Foam::coarseBlockAMGLevel<Type>::b()
 {
     return b_;
 }
 
 
 template<class Type>
-void Foam::coarseBlockAmgLevel<Type>::residual
+void Foam::coarseBlockAMGLevel<Type>::residual
 (
     const Field<Type>& x,
     const Field<Type>& b,
@@ -131,7 +136,7 @@ void Foam::coarseBlockAmgLevel<Type>::residual
 
 
 template<class Type>
-void Foam::coarseBlockAmgLevel<Type>::restrictResidual
+void Foam::coarseBlockAMGLevel<Type>::restrictResidual
 (
     const Field<Type>& x,
     const Field<Type>& b,
@@ -161,7 +166,7 @@ void Foam::coarseBlockAmgLevel<Type>::restrictResidual
 
 
 template<class Type>
-void Foam::coarseBlockAmgLevel<Type>::prolongateCorrection
+void Foam::coarseBlockAMGLevel<Type>::prolongateCorrection
 (
     Field<Type>& x,
     const Field<Type>& coarseX
@@ -172,7 +177,7 @@ void Foam::coarseBlockAmgLevel<Type>::prolongateCorrection
 
 
 template<class Type>
-void Foam::coarseBlockAmgLevel<Type>::smooth
+void Foam::coarseBlockAMGLevel<Type>::smooth
 (
     Field<Type>& x,
     const Field<Type>& b,
@@ -184,7 +189,7 @@ void Foam::coarseBlockAmgLevel<Type>::smooth
 
 
 template<class Type>
-void Foam::coarseBlockAmgLevel<Type>::solve
+void Foam::coarseBlockAMGLevel<Type>::solve
 (
     Field<Type>& x,
     const Field<Type>& b,
@@ -198,7 +203,7 @@ void Foam::coarseBlockAmgLevel<Type>::solve
         "topLevelCorr"
     );
 
-    label maxIter = Foam::min(2*coarseningPtr_->minCoarseEqns(), 1000);
+    label maxIter = Foam::min(2*coarseningPtr_->minCoarseEqns(), 100);
 
     // Create artificial dictionary for top-level solution
     dictionary topLevelDict;
@@ -213,7 +218,6 @@ void Foam::coarseBlockAmgLevel<Type>::solve
     // Create multiplication function object
     typename BlockCoeff<Type>::multiply mult;
 
-//     x = inverse(diag) & b
     CoeffField<Type> invDiag = inv(matrixPtr_->diag());
     multiply(x, invDiag, b);
 
@@ -283,7 +287,7 @@ void Foam::coarseBlockAmgLevel<Type>::solve
         coarseSolverPerf.print();
     }
 
-    if (BlockLduMatrix<Type>::debug >= 2)
+    if (BlockLduMatrix<Type>::debug >= 3)
     {
         coarseSolverPerf.print();
     }
@@ -291,7 +295,7 @@ void Foam::coarseBlockAmgLevel<Type>::solve
 
 
 template<class Type>
-void Foam::coarseBlockAmgLevel<Type>::scaleX
+void Foam::coarseBlockAMGLevel<Type>::scaleX
 (
     Field<Type>& x,
     const Field<Type>& b,
@@ -309,9 +313,9 @@ void Foam::coarseBlockAmgLevel<Type>::scaleX
 
     matrixPtr_->Amul(Ax_, x);
 
-#if 0
+#if 1
 
-    // Variant 1 (old): scale complete x with a single scaling factor
+    // Variant 1: scale complete x with a single scaling factor
     scalar scalingFactorNum = sumProd(x, b);
     scalar scalingFactorDenom = sumProd(x, Ax_);
 
@@ -321,23 +325,23 @@ void Foam::coarseBlockAmgLevel<Type>::scaleX
     // Scale x
     if
     (
-        mag(scalingVector[0]) > GREAT
-     || mag(scalingVector[1]) > GREAT
-     || scalingVector[0]*scalingVector[1] <= 0
-     || mag(scalingVector[0]) < mag(scalingVector[1])
+        mag(scalingVector[0]) > SMALL
+     && mag(scalingVector[0]) < GREAT
+     && mag(scalingVector[0]) > SMALL
+     && mag(scalingVector[1]) < GREAT
+     && scalingVector[0]*scalingVector[1] > 0
     )
     {
-        // Factor = 1.0, no scaling
-    }
-    else if (mag(scalingVector[0]) > 2*mag(scalingVector[1]))
-    {
-        // Max factor = 2
-        x *= 2.0;
-    }
-    else
-    {
         // Regular scaling
-        x *= scalingVector[0]/stabilise(scalingVector[1], VSMALL);
+        x *= Foam::max
+        (
+            0.01,
+            Foam::min
+            (
+                scalingVector[0]/scalingVector[1],
+                100
+            )
+        );
     }
 
 #else
@@ -360,20 +364,23 @@ void Foam::coarseBlockAmgLevel<Type>::scaleX
 
         if
         (
-            mag(num) > GREAT || mag(denom) > GREAT
-         || num*denom <= 0 || mag(num) < mag(denom)
+            mag(num) > SMALL
+         && mag(num) < GREAT
+         && mag(denom) > SMALL
+         && mag(denom) < GREAT
+         && num*denom > 0
         )
         {
-            // Factor = 1.0, no scaling
-        }
-        else if (mag(num) > 2*mag(denom))
-        {
-            setComponent(scalingFactor, dir) = 2;
-        }
-        else
-        {
             // Regular scaling
-            setComponent(scalingFactor, dir) = num/stabilise(denom, VSMALL);
+            setComponent(scalingFactor, dir) = Foam::max
+            (
+                0.01,
+                Foam::min
+                (
+                    num/denom
+                    100
+                )
+            );
         }
     }
 
@@ -385,8 +392,8 @@ void Foam::coarseBlockAmgLevel<Type>::scaleX
 
 
 template<class Type>
-Foam::autoPtr<Foam::BlockAmgLevel<Type> >
-Foam::coarseBlockAmgLevel<Type>::makeNextLevel() const
+Foam::autoPtr<Foam::BlockAMGLevel<Type> >
+Foam::coarseBlockAMGLevel<Type>::makeNextLevel() const
 {
     if (coarseningPtr_->coarsen())
     {
@@ -395,7 +402,7 @@ Foam::coarseBlockAmgLevel<Type>::makeNextLevel() const
     else
     {
         // Final level: cannot coarsen
-        return autoPtr<BlockAmgLevel<Type> >();
+        return autoPtr<BlockAMGLevel<Type> >();
     }
 }
 

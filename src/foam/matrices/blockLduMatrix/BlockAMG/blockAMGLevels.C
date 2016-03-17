@@ -21,64 +21,49 @@ License
     You should have received a copy of the GNU General Public License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
-Class
-    BlockMatrixAgglomeration
-
-Description
-    Specialisation of the BlockMatrixAgglomeration for tensors.
-
-Author
-    Klas Jareteg, 2013-01-31
-
 \*---------------------------------------------------------------------------*/
 
-#ifndef tensorBlockMatrixAgglomeration_H
-#define tensorBlockMatrixAgglomeration_H
-
-#include "blockMatrixCoarsenings.H"
-#include "blockMatrixAgglomerations.H"
-#include "BlockMatrixAgglomeration.H"
-#include "runTimeSelectionTables.H"
+#include "blockAMGLevels.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 
-/*---------------------------------------------------------------------------*\
-                        Class BlockMatrixAgglomeration Declaration
-\*---------------------------------------------------------------------------*/
+// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-//- Restrict matrix
+defineNamedTemplateTypeNameAndDebug(blockAmgScalarLevel, 0);
+defineNamedTemplateTypeNameAndDebug(blockAmgVectorLevel, 0);
+defineNamedTemplateTypeNameAndDebug(blockAmgTensorLevel, 0);
+#define makeNamedTemplateTypeNameAndDebug(type, Type, args...)      \
+    defineNamedTemplateTypeNameAndDebug(blockAmg##Type##Level, 0);
 
-template<>
-inline autoPtr<BlockAmgLevel<tensor> >
-BlockMatrixAgglomeration<tensor>::restrictMatrix
-() const
-{
-    FatalErrorIn
-    (
-        "autoPtr<BlockAmgLevel<tensor> > "
-        "BlockMatrixAgglomeration<Type>::"
-        "restrictMatrix() const"
-    )   << "Function not implemented for Type=tensor. " << endl
-        << abort(FatalError);
+    forAllVectorNTypes(makeNamedTemplateTypeNameAndDebug);
 
-    // Dummy return to keep compiler happy
-    return autoPtr<BlockAmgLevel<tensor> >(NULL);
-}
+#undef makeNamedTemplateTypeNameAndDebug
 
+defineNamedTemplateTypeNameAndDebug(coarseblockAmgScalarLevel, 0);
+defineNamedTemplateTypeNameAndDebug(coarseblockAmgVectorLevel, 0);
+defineNamedTemplateTypeNameAndDebug(coarseblockAmgTensorLevel, 0);
+#define makeNamedTemplateTypeNameAndDebug(type, Type, args...)      \
+    defineNamedTemplateTypeNameAndDebug(coarseblockAmg##Type##Level, 0);
 
+    forAllVectorNTypes(makeNamedTemplateTypeNameAndDebug);
+
+#undef makeNamedTemplateTypeNameAndDebug
+
+defineNamedTemplateTypeNameAndDebug(fineblockAmgScalarLevel, 0);
+defineNamedTemplateTypeNameAndDebug(fineblockAmgVectorLevel, 0);
+defineNamedTemplateTypeNameAndDebug(fineblockAmgTensorLevel, 0);
+#define makeNamedTemplateTypeNameAndDebug(type, Type, args...)      \
+    defineNamedTemplateTypeNameAndDebug(fineblockAmg##Type##Level, 0);
+
+    forAllVectorNTypes(makeNamedTemplateTypeNameAndDebug);
+
+#undef makeNamedTemplateTypeNameAndDebug
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-#endif
 
 // ************************************************************************* //

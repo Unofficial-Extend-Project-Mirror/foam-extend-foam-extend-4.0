@@ -38,9 +38,7 @@ SourceFiles
 #ifndef blockMatrixAgglomerations_H
 #define blockMatrixAgglomerations_H
 
-// Disabled instantiation for primitive types by force. HJ, 15/Apr/2013
 #include "scalarBlockMatrixAgglomeration.H"
-#include "vectorBlockMatrixAgglomeration.H"
 #include "tensorBlockMatrixAgglomeration.H"
 #include "BlockMatrixAgglomeration.H"
 

@@ -22,7 +22,7 @@ License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    fineBlockAmgLevel
+    fineBlockAMGLevel
 
 Description
     Finest AMG level container, using matrix and field references
@@ -32,8 +32,8 @@ Author
 
 \*---------------------------------------------------------------------------*/
 
-#include "fineBlockAmgLevel.H"
-#include "coarseBlockAmgLevel.H"
+#include "fineBlockAMGLevel.H"
+#include "coarseBlockAMGLevel.H"
 #include "BlockSolverPerformance.H"
 #include "BlockCoeffNorm.H"
 #include "BlockCoeffTwoNorm.H"
@@ -44,7 +44,7 @@ Author
 
 // Construct from components
 template<class Type>
-Foam::fineBlockAmgLevel<Type>::fineBlockAmgLevel
+Foam::fineBlockAMGLevel<Type>::fineBlockAMGLevel
 (
     const BlockLduMatrix<Type>& matrix,
     const dictionary& dict,
@@ -82,9 +82,9 @@ Foam::fineBlockAmgLevel<Type>::fineBlockAmgLevel
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 template<class Type>
-Foam::Field<Type>& Foam::fineBlockAmgLevel<Type>::x()
+Foam::Field<Type>& Foam::fineBlockAMGLevel<Type>::x()
 {
-    FatalErrorIn("Field<Type>& Foam::fineBlockAmgLevel<Type>::x()")
+    FatalErrorIn("Field<Type>& Foam::fineBlockAMGLevel<Type>::x()")
         << "x is not available."
         << abort(FatalError);
 
@@ -94,9 +94,9 @@ Foam::Field<Type>& Foam::fineBlockAmgLevel<Type>::x()
 
 
 template<class Type>
-Foam::Field<Type>& Foam::fineBlockAmgLevel<Type>::b()
+Foam::Field<Type>& Foam::fineBlockAMGLevel<Type>::b()
 {
-    FatalErrorIn("Field<Type>& Foam::fineBlockAmgLevel<Type>::b()")
+    FatalErrorIn("Field<Type>& Foam::fineBlockAMGLevel<Type>::b()")
         << "b is not available."
         << abort(FatalError);
 
@@ -106,7 +106,7 @@ Foam::Field<Type>& Foam::fineBlockAmgLevel<Type>::b()
 
 
 template<class Type>
-void Foam::fineBlockAmgLevel<Type>::residual
+void Foam::fineBlockAMGLevel<Type>::residual
 (
     const Field<Type>& x,
     const Field<Type>& b,
@@ -128,7 +128,7 @@ void Foam::fineBlockAmgLevel<Type>::residual
 
 
 template<class Type>
-void Foam::fineBlockAmgLevel<Type>::restrictResidual
+void Foam::fineBlockAMGLevel<Type>::restrictResidual
 (
     const Field<Type>& x,
     const Field<Type>& b,
@@ -150,7 +150,7 @@ void Foam::fineBlockAmgLevel<Type>::restrictResidual
 
 
 template<class Type>
-void Foam::fineBlockAmgLevel<Type>::prolongateCorrection
+void Foam::fineBlockAMGLevel<Type>::prolongateCorrection
 (
     Field<Type>& x,
     const Field<Type>& coarseX
@@ -161,7 +161,7 @@ void Foam::fineBlockAmgLevel<Type>::prolongateCorrection
 
 
 template<class Type>
-void Foam::fineBlockAmgLevel<Type>::smooth
+void Foam::fineBlockAMGLevel<Type>::smooth
 (
     Field<Type>& x,
     const Field<Type>& b,
@@ -173,7 +173,7 @@ void Foam::fineBlockAmgLevel<Type>::smooth
 
 
 template<class Type>
-void Foam::fineBlockAmgLevel<Type>::solve
+void Foam::fineBlockAMGLevel<Type>::solve
 (
     Field<Type>& x,
     const Field<Type>& b,
@@ -218,7 +218,7 @@ void Foam::fineBlockAmgLevel<Type>::solve
 
 
 template<class Type>
-void Foam::fineBlockAmgLevel<Type>::scaleX
+void Foam::fineBlockAMGLevel<Type>::scaleX
 (
     Field<Type>& x,
     const Field<Type>& b,
@@ -236,7 +236,7 @@ void Foam::fineBlockAmgLevel<Type>::scaleX
 
     matrix_.Amul(Ax_, x);
 
-#if 0
+#if 1
 
     scalar scalingFactorNum = sumProd(x, b);
     scalar scalingFactorDenom = sumProd(x, Ax_);
@@ -247,27 +247,29 @@ void Foam::fineBlockAmgLevel<Type>::scaleX
     // Scale x
     if
     (
-        mag(scalingVector[0]) > GREAT
-     || mag(scalingVector[1]) > GREAT
-     || scalingVector[0]*scalingVector[1] <= 0
-     || mag(scalingVector[0]) < mag(scalingVector[1])
+        mag(scalingVector[0]) > SMALL
+     && mag(scalingVector[0]) < GREAT
+     && mag(scalingVector[0]) > SMALL
+     && mag(scalingVector[1]) < GREAT
+     && scalingVector[0]*scalingVector[1] > 0
     )
     {
-        // Factor = 1.0, no scaling
-    }
-    else if (mag(scalingVector[0]) > 2*mag(scalingVector[1]))
-    {
-        // Max factor = 2
-        x *= 2.0;
-    }
-    else
-    {
         // Regular scaling
-        x *= scalingVector[0]/stabilise(scalingVector[1], VSMALL);
+        x *= Foam::max
+        (
+            0.01,
+            Foam::min
+            (
+                scalingVector[0]/scalingVector[1],
+                100
+            )
+        );
     }
 
 #else
 
+    // Variant 2: scale each x individually
+    // HJ, 25/Feb/2015
     Type scalingFactorNum = sumCmptProd(x, b);
     Type scalingFactorDenom = sumCmptProd(x, Ax_);
 
@@ -284,20 +286,23 @@ void Foam::fineBlockAmgLevel<Type>::scaleX
 
         if
         (
-            mag(num) > GREAT || mag(denom) > GREAT
-         || num*denom <= 0 || mag(num) < mag(denom)
+            mag(num) > SMALL
+         && mag(num) < GREAT
+         && mag(denom) > SMALL
+         && mag(denom) < GREAT
+         && num*denom > 0
         )
         {
-            // Factor = 1.0, no scaling
-        }
-        else if (mag(num) > 2*mag(denom))
-        {
-            setComponent(scalingFactor, dir) = 2;
-        }
-        else
-        {
             // Regular scaling
-            setComponent(scalingFactor, dir) = num/stabilise(denom, VSMALL);
+            setComponent(scalingFactor, dir) = Foam::max
+            (
+                0.01,
+                Foam::min
+                (
+                    num/denom
+                    100
+                )
+            );
         }
     }
 
@@ -309,8 +314,8 @@ void Foam::fineBlockAmgLevel<Type>::scaleX
 
 
 template<class Type>
-Foam::autoPtr<Foam::BlockAmgLevel<Type> >
-Foam::fineBlockAmgLevel<Type>::makeNextLevel() const
+Foam::autoPtr<Foam::BlockAMGLevel<Type> >
+Foam::fineBlockAMGLevel<Type>::makeNextLevel() const
 {
     if (coarseningPtr_->coarsen())
     {
@@ -319,7 +324,7 @@ Foam::fineBlockAmgLevel<Type>::makeNextLevel() const
     else
     {
         // Final level: cannot coarsen
-        return autoPtr<Foam::BlockAmgLevel<Type> >();
+        return autoPtr<Foam::BlockAMGLevel<Type> >();
     }
 }
 

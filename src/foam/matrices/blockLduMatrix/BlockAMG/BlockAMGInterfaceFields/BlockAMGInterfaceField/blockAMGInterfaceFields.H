@@ -22,63 +22,39 @@ License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    BlockMatrixAgglomeration
+    BlockAMGInterfaceField
 
 Description
-    Specialisation of the BlockMatrixAgglomeration for scalars.
+    Typedefs for block AMG interface fields.
 
 Author
-    Klas Jareteg, 2013-01-31
+    Klas Jareteg, 2013-02-08
+
+SourceFiles
+    blockAMGInterfaceFields.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef scalarBlockMatrixAgglomeration_H
-#define scalarBlockMatrixAgglomeration_H
+#ifndef blockAMGInterfaceFields_H
+#define blockAMGInterfaceFields_H
 
-#include "blockMatrixCoarsenings.H"
-#include "blockMatrixAgglomerations.H"
-#include "BlockMatrixAgglomeration.H"
-#include "BlockMatrixCoarsening.H"
-#include "runTimeSelectionTables.H"
-#include "scalarBlockLduMatrix.H"
-#include "scalarBlockConstraint.H"
+#include "BlockAMGInterfaceField.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 
-// * * * * * * Forward declaration of template friend fuctions * * * * * * * //
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-
-/*---------------------------------------------------------------------------*\
-                        Class BlockMatrixAgglomeration Declaration
-\*---------------------------------------------------------------------------*/
-
-//- Restrict matrix
-
-template<>
-inline autoPtr<BlockAmgLevel<scalar> >
-BlockMatrixAgglomeration<scalar>::restrictMatrix() const
-{
-    FatalErrorIn
-    (
-        "autoPtr<BlockAmgLevel<scalar> > "
-        "BlockMatrixAgglomeration<Type>::restrictMatrix() const"
-    )   << "Function not implemented for Type=scalar. " << endl
-        << abort(FatalError);
-
-    // Dummy return to keep compiler happy
-    return autoPtr<BlockAmgLevel<scalar> >(NULL);
-}
+typedef BlockAMGInterfaceField<scalar> blockScalarAMGInterfaceField;
+typedef BlockAMGInterfaceField<vector> blockVectorAMGInterfaceField;
+typedef BlockAMGInterfaceField<tensor> blockTensorAMGInterfaceField;
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

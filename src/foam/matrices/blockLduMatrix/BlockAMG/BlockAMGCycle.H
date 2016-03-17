@@ -22,7 +22,7 @@ License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    BlockAmgCycle
+    BlockAMGCycle
 
 Description
     Algebraic multigrid fixed cycle class for the BlockLduMatrix
@@ -31,14 +31,14 @@ Author
     Klas Jareteg, 2012-12-12
 
 SourceFiles
-    BlockAmgCycle.C
+    BlockAMGCycle.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef BlockAmgCycle_H
-#define BlockAmgCycle_H
+#ifndef BlockAMGCycle_H
+#define BlockAMGCycle_H
 
-#include "BlockAmgLevel.H"
+#include "BlockAMGLevel.H"
 #include "NamedEnum.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -49,23 +49,23 @@ namespace Foam
 // * * * * * * Forward declaration of template friend fuctions * * * * * * * //
 
 template<class Type>
-class fineBlockAmgLevel;
+class fineBlockAMGLevel;
 
 template<class Type>
-class coarseBlockAmgLevel;
+class coarseBlockAMGLevel;
 
 template<class Type>
 class BlockMatrixCoarsening;
 
 template<class Type>
-class BlockAmgLevel;
+class BlockAMGLevel;
 
 
 /*---------------------------------------------------------------------------*\
-                   Class blockAmgCycleName Declaration
+                      Class blockAMGCycleName Declaration
 \*---------------------------------------------------------------------------*/
 
-class blockAmgCycleName
+class blockAMGCycleName
 {
 public:
 
@@ -87,21 +87,21 @@ public:
 
 
 /*---------------------------------------------------------------------------*\
-                           Class BlockAmgCycle Declaration
+                           Class BlockAMGCycle Declaration
 \*---------------------------------------------------------------------------*/
 
 template<class Type>
-class BlockAmgCycle
+class BlockAMGCycle
 :
-    public blockAmgCycleName
+    public blockAMGCycleName
 {
     // Private data
 
         //- Pointer to current AMG level
-        autoPtr<BlockAmgLevel<Type> > levelPtr_;
+        autoPtr<BlockAMGLevel<Type> > levelPtr_;
 
         //- Pointer to coarse AMG cycle
-        BlockAmgCycle<Type>* coarseLevelPtr_;
+        BlockAMGCycle<Type>* coarseLevelPtr_;
 
         //- Number of coarse levels
         label nLevels_;
@@ -110,27 +110,27 @@ class BlockAmgCycle
     // Private Member Functions
 
         //- Disallow default bitwise copy construct
-        BlockAmgCycle(const BlockAmgCycle<Type>&);
+        BlockAMGCycle(const BlockAMGCycle<Type>&);
 
         //- Disallow default bitwise assignment
-        void operator=(const BlockAmgCycle<Type>&);
+        void operator=(const BlockAMGCycle<Type>&);
 
 
 public:
 
     //- Runtime type information
-    TypeName("BlockAmgCycle");
+    TypeName("BlockAMGCycle");
 
 
     // Constructors
 
         //- Construct from AMG level
-        BlockAmgCycle(autoPtr<BlockAmgLevel<Type> > levelPtr);
+        BlockAMGCycle(autoPtr<BlockAMGLevel<Type> > levelPtr);
 
 
     // Destructor
 
-        virtual ~BlockAmgCycle();
+        virtual ~BlockAMGCycle();
 
 
     // Member Functions
@@ -162,7 +162,7 @@ public:
             Field<Type>& x,
             const Field<Type>& b,
             Field<Type>& xBuffer,
-            const BlockAmgCycle::cycleType cycle,
+            const BlockAMGCycle::cycleType cycle,
             const label nPreSweeps,
             const label nPostSweeps,
             const bool scale
@@ -177,7 +177,7 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-#   include "BlockAmgCycle.C"
+#   include "BlockAMGCycle.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

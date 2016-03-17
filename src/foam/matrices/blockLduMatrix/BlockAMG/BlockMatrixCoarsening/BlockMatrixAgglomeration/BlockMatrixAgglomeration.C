@@ -37,11 +37,19 @@ Author
 #include "tolerancesSwitch.H"
 #include "coeffFields.H"
 #include "addToRunTimeSelectionTable.H"
-#include "BlockGAMGInterfaceField.H"
-#include "processorLduInterfaceField.H"
-#include "coarseBlockAmgLevel.H"
+#include "BlockAMGInterfaceField.H"
+#include "coarseBlockAMGLevel.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
+
+template<class Type>
+const Foam::debug::tolerancesSwitch
+Foam::BlockMatrixAgglomeration<Type>::weightFactor_
+(
+    "aamgWeightFactor",
+    0.65
+);
+
 
 template<class Type>
 const Foam::debug::tolerancesSwitch
@@ -50,9 +58,6 @@ Foam::BlockMatrixAgglomeration<Type>::diagFactor_
     "aamgDiagFactor",
     1e-8
 );
-
-template<class Type>
-const Foam::scalar Foam::BlockMatrixAgglomeration<Type>::weightFactor_ = 0.65;
 
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
@@ -267,7 +272,8 @@ void Foam::BlockMatrixAgglomeration<Type>::calcAgglomeration()
 
                     magColDiag = magDiag[colI];
 
-                    weight = magOffDiag[cIndex[rowCoeffI]]/max(magRowDiag, magColDiag);
+                    weight = magOffDiag[cIndex[rowCoeffI]]/
+                        max(magRowDiag, magColDiag);
 
                     if (agglomIndex_[colI] == -1)
                     {
@@ -292,7 +298,7 @@ void Foam::BlockMatrixAgglomeration<Type>::calcAgglomeration()
                     indexUngrouped != -1
                  && (
                         indexGrouped == -1
-                     || weightUngrouped >= weightFactor_*weightGrouped
+                     || weightUngrouped >= weightFactor_()*weightGrouped
                     )
                 )
                 {
@@ -365,6 +371,255 @@ void Foam::BlockMatrixAgglomeration<Type>::calcAgglomeration()
 }
 
 
+template<class Type>
+void Foam::BlockMatrixAgglomeration<Type>::restrictDiag
+(
+    const CoeffField<Type>& Coeff,
+    CoeffField<Type>& coarseCoeff
+) const
+{
+    typedef CoeffField<Type> TypeCoeffField;
+
+    if
+    (
+        Coeff.activeType() == blockCoeffBase::SQUARE
+     && coarseCoeff.activeType() == blockCoeffBase::SQUARE
+    )
+    {
+        typedef typename TypeCoeffField::squareType squareType;
+        typedef typename TypeCoeffField::squareTypeField squareTypeField;
+
+        squareTypeField& activeCoarseCoeff = coarseCoeff.asSquare();
+        const squareTypeField& activeCoeff = Coeff.asSquare();
+
+        forAll (coarseCoeff, i)
+        {
+            activeCoarseCoeff[i] = pTraits<squareType>::zero;
+        }
+
+        forAll (Coeff, i)
+        {
+            activeCoarseCoeff[agglomIndex_[i]] += activeCoeff[i];
+        }
+    }
+    else if
+    (
+        Coeff.activeType() == blockCoeffBase::LINEAR
+     && coarseCoeff.activeType() == blockCoeffBase::LINEAR
+    )
+    {
+        typedef typename TypeCoeffField::linearType linearType;
+        typedef typename TypeCoeffField::linearTypeField linearTypeField;
+
+        linearTypeField& activeCoarseCoeff = coarseCoeff.asLinear();
+        const linearTypeField& activeCoeff = Coeff.asLinear();
+
+        forAll (coarseCoeff, i)
+        {
+            activeCoarseCoeff[i] = pTraits<linearType>::zero;
+        }
+
+        forAll (Coeff, i)
+        {
+            activeCoarseCoeff[agglomIndex_[i]] += activeCoeff[i];
+        }
+    }
+    else if
+    (
+        Coeff.activeType() == blockCoeffBase::SCALAR
+     && coarseCoeff.activeType() == blockCoeffBase::SCALAR
+    )
+    {
+        typedef typename TypeCoeffField::scalarType scalarType;
+        typedef typename TypeCoeffField::scalarTypeField scalarTypeField;
+
+        scalarTypeField& activeCoarseCoeff = coarseCoeff.asScalar();
+        const scalarTypeField& activeCoeff = Coeff.asScalar();
+
+        forAll (coarseCoeff, i)
+        {
+            activeCoarseCoeff[i] = pTraits<scalarType>::zero;
+        }
+
+        forAll (Coeff, i)
+        {
+            activeCoarseCoeff[agglomIndex_[i]] += activeCoeff[i];
+        }
+    }
+    else
+    {
+        FatalErrorIn
+        (
+            "void  BlockMatrixAgglomeration<Type>::restrictDiag() const"
+        )   << "Problem in coeff type morphing"
+            << abort(FatalError);
+    }
+}
+
+
+template<class Type>
+template<class DiagType, class ULType>
+void Foam::BlockMatrixAgglomeration<Type>::agglomerateCoeffs
+(
+    const labelList& coeffRestrictAddr,
+    Field<DiagType>& activeCoarseDiag,
+    Field<ULType>& activeCoarseUpper,
+    const Field<ULType>& activeFineUpper,
+    const Field<ULType>& activeFineUpperTranspose
+) const
+{
+    // Does the matrix have solo equations
+    bool soloEqns = nSolo_ > 0;
+
+    // Get addressing
+    const unallocLabelList& upperAddr = matrix_.lduAddr().upperAddr();
+    const unallocLabelList& lowerAddr = matrix_.lduAddr().lowerAddr();
+
+    forAll(coeffRestrictAddr, fineCoeffI)
+    {
+        label rmUpperAddr = agglomIndex_[upperAddr[fineCoeffI]];
+        label rmLowerAddr = agglomIndex_[lowerAddr[fineCoeffI]];
+
+        // If the coefficient touches block zero and
+        //  solo equations are present, skip it
+        if (soloEqns && (rmUpperAddr == 0 || rmLowerAddr == 0))
+        {
+            continue;
+        }
+
+        label cCoeff = coeffRestrictAddr[fineCoeffI];
+
+        if (cCoeff >= 0)
+        {
+            activeCoarseUpper[cCoeff] += activeFineUpper[fineCoeffI];
+        }
+        else
+        {
+            // Add the fine face coefficient into the diagonal
+            // Note: upper and lower coeffs are transpose of
+            // each other.  HJ, 28/May/2014
+            activeCoarseDiag[-1 - cCoeff] +=
+                activeFineUpper[fineCoeffI]
+              + activeFineUpperTranspose[fineCoeffI];
+        }
+    }
+}
+
+
+template<class Type>
+template<class DiagType, class ULType>
+void Foam::BlockMatrixAgglomeration<Type>::agglomerateCoeffs
+(
+    const labelList& coeffRestrictAddr,
+    Field<DiagType>& activeCoarseDiag,
+    Field<ULType>& activeCoarseUpper,
+    const Field<ULType>& activeFineUpper,
+    Field<ULType>& activeCoarseLower,
+    const Field<ULType>& activeFineLower
+) const
+{
+    // Does the matrix have solo equations
+    bool soloEqns = nSolo_ > 0;
+
+    // Get addressing
+    const unallocLabelList& upperAddr = matrix_.lduAddr().upperAddr();
+    const unallocLabelList& lowerAddr = matrix_.lduAddr().lowerAddr();
+
+    forAll(coeffRestrictAddr, fineCoeffI)
+    {
+        label rmUpperAddr = agglomIndex_[upperAddr[fineCoeffI]];
+        label rmLowerAddr = agglomIndex_[lowerAddr[fineCoeffI]];
+
+        // If the coefficient touches block zero and
+        //  solo equations are present, skip it
+        if (soloEqns && (rmUpperAddr == 0 || rmLowerAddr == 0))
+        {
+            continue;
+        }
+
+        label cCoeff = coeffRestrictAddr[fineCoeffI];
+
+        if (cCoeff >= 0)
+        {
+            activeCoarseUpper[cCoeff] += activeFineUpper[fineCoeffI];
+            activeCoarseLower[cCoeff] += activeFineLower[fineCoeffI];
+        }
+        else
+        {
+            // Add the fine face coefficients into the diagonal.
+            activeCoarseDiag[-1 - cCoeff] +=
+                activeFineUpper[fineCoeffI]
+              + activeFineLower[fineCoeffI];
+        }
+    }
+}
+
+
+template<class Type>
+void Foam::BlockMatrixAgglomeration<Type>::restrictDiagDecoupled
+(
+    const CoeffField<Type>& Coeff,
+    CoeffField<Type>& coarseCoeff
+) const
+{
+    typedef CoeffField<Type> TypeCoeffField;
+
+    if
+    (
+        Coeff.activeType() == blockCoeffBase::LINEAR
+     && coarseCoeff.activeType() == blockCoeffBase::LINEAR
+    )
+    {
+        typedef typename TypeCoeffField::linearType linearType;
+        typedef typename TypeCoeffField::linearTypeField linearTypeField;
+
+        linearTypeField& activeCoarseCoeff = coarseCoeff.asLinear();
+        const linearTypeField& activeCoeff = Coeff.asLinear();
+
+        forAll (coarseCoeff, i)
+        {
+            activeCoarseCoeff[i] = pTraits<linearType>::zero;
+        }
+
+        forAll (Coeff, i)
+        {
+            activeCoarseCoeff[agglomIndex_[i]] += activeCoeff[i];
+        }
+    }
+    else if
+    (
+        Coeff.activeType() == blockCoeffBase::SCALAR
+     && coarseCoeff.activeType() == blockCoeffBase::SCALAR
+    )
+    {
+        typedef typename TypeCoeffField::scalarType scalarType;
+        typedef typename TypeCoeffField::scalarTypeField scalarTypeField;
+
+        scalarTypeField& activeCoarseCoeff = coarseCoeff.asScalar();
+        const scalarTypeField& activeCoeff = Coeff.asScalar();
+
+        forAll (coarseCoeff, i)
+        {
+            activeCoarseCoeff[i] = pTraits<scalarType>::zero;
+        }
+
+        forAll (Coeff, i)
+        {
+            activeCoarseCoeff[agglomIndex_[i]] += activeCoeff[i];
+        }
+    }
+    else
+    {
+        FatalErrorIn
+        (
+            "void BlockMatrixAgglomeration<Type>::restrictDiagDecoupled()"
+            " const"
+        )   << "Problem in coeff type morphing"
+            << abort(FatalError);
+    }
+}
+
+
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 template<class Type>
@@ -388,6 +643,7 @@ Foam::BlockMatrixAgglomeration<Type>::BlockMatrixAgglomeration
     calcAgglomeration();
 }
 
+
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
 template<class Type>
@@ -398,14 +654,14 @@ Foam::BlockMatrixAgglomeration<Type>::~BlockMatrixAgglomeration()
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 template<class Type>
-Foam::autoPtr<Foam::BlockAmgLevel<Type> >
+Foam::autoPtr<Foam::BlockAMGLevel<Type> >
 Foam::BlockMatrixAgglomeration<Type>::restrictMatrix() const
 {
     if (!coarsen_)
     {
         FatalErrorIn
         (
-            "autoPtr<BlockAmgLevel<Type> > "
+            "autoPtr<BlockAMGLevel<Type> > "
             "BlockMatrixAgglomeration<Type>::restrictMatrix() const"
         )   << "Requesting coarse matrix when it cannot be created"
             << abort(FatalError);
@@ -667,7 +923,7 @@ Foam::BlockMatrixAgglomeration<Type>::restrictMatrix() const
         }
     }
 
-    // Create GAMG interfaces
+    // Create AMG interfaces
     forAll (interfaceFields, intI)
     {
         if (interfaceFields.set(intI))
@@ -678,7 +934,7 @@ Foam::BlockMatrixAgglomeration<Type>::restrictMatrix() const
             coarseInterfaces.set
             (
                 intI,
-                GAMGInterface::New
+                AMGInterface::New
                 (
                     coarseAddrPtr(),
                     fineInterface,
@@ -693,8 +949,8 @@ Foam::BlockMatrixAgglomeration<Type>::restrictMatrix() const
     {
         if (interfaceFields.set(intI))
         {
-            const GAMGInterface& coarseInterface =
-                refCast<const GAMGInterface>(coarseInterfaces[intI]);
+            const AMGInterface& coarseInterface =
+                refCast<const AMGInterface>(coarseInterfaces[intI]);
 
             coarseInterfaceAddr[intI] = coarseInterface.faceCells();
         }
@@ -715,32 +971,49 @@ Foam::BlockMatrixAgglomeration<Type>::restrictMatrix() const
     );
     BlockLduMatrix<Type>& coarseMatrix = coarseMatrixPtr();
 
+    // Get interfaces from coarse matrix
     typename BlockLduInterfaceFieldPtrsList<Type>::Type&
-        coarseInterfaceFieldsTransfer =
-          coarseMatrix.interfaces();
+        coarseInterfaceFieldsTransfer = coarseMatrix.interfaces();
 
     // Aggolmerate the upper and lower coupled coefficients
     forAll (interfaceFields, intI)
     {
         if (interfaceFields.set(intI))
         {
-            const GAMGInterface& coarseInterface =
-                refCast<const GAMGInterface>(coarseInterfaces[intI]);
+            const AMGInterface& coarseInterface =
+                refCast<const AMGInterface>(coarseInterfaces[intI]);
 
             coarseInterfaceFieldsTransfer.set
             (
                 intI,
-                BlockGAMGInterfaceField<Type>::New
+                BlockAMGInterfaceField<Type>::New
                 (
                     coarseInterface,
-                    (interfaceFields[intI])
+                    interfaceFields[intI]
                 ).ptr()
             );
+
+            // Since the type of agglomeration is now templated, agglomeration
+            // of block coefficients must be done by a FIELD (not interface)
+            // via a new set of virtual functions
+            // HJ, 16/Mar/2016
+                
+            // Note: in the scalar AMG, agglomeration is done by the interface
+            // (always scalar) but in the block matrix it is done by a
+            // templated block interface field
+            // HJ, 16/Mar/2016
+
+            // Cast the interface into AMG type
+            const BlockAMGInterfaceField<Type>& coarseField =
+                refCast<const BlockAMGInterfaceField<Type> >
+                (
+                    coarseInterfaceFieldsTransfer[intI]
+                );
 
             coarseMatrix.coupleUpper().set
             (
                 intI,
-                coarseInterface.agglomerateBlockCoeffs
+                coarseField.agglomerateBlockCoeffs
                 (
                     matrix_.coupleUpper()[intI]
                 )
@@ -749,7 +1022,7 @@ Foam::BlockMatrixAgglomeration<Type>::restrictMatrix() const
             coarseMatrix.coupleLower().set
             (
                 intI,
-                coarseInterface.agglomerateBlockCoeffs
+                coarseField.agglomerateBlockCoeffs
                 (
                     matrix_.coupleLower()[intI]
                 )
@@ -762,6 +1035,8 @@ Foam::BlockMatrixAgglomeration<Type>::restrictMatrix() const
     typedef CoeffField<Type> TypeCoeffField;
 
     typedef typename TypeCoeffField::squareTypeField squareTypeField;
+    typedef typename TypeCoeffField::linearTypeField linearTypeField;
+    typedef typename TypeCoeffField::scalarTypeField scalarTypeField;
 
     TypeCoeffField& coarseUpper = coarseMatrix.upper();
     TypeCoeffField& coarseDiag = coarseMatrix.diag();
@@ -769,181 +1044,194 @@ Foam::BlockMatrixAgglomeration<Type>::restrictMatrix() const
     const TypeCoeffField& fineDiag = matrix_.diag();
 
     // KRJ: 2013-01-31: Many cases needed as there are different combinations
-    if (matrix_.asymmetric())
+
+    // Note:
+    // In coarsening, the off-diagonal coefficient type should be preserved
+    // and the case of taking out of off-diag from diag may need to be handled
+    // separately (expand the off-diag coeff to diag type before removing it
+    // from the diag coefficient).  Since this has not been encountered yet
+    // only matching diag/off-diag types are handled.
+    // HJ, 15/Feb/2016
+    if (matrix_.symmetric())
+    {
+        if
+        (
+            fineDiag.activeType() == blockCoeffBase::SQUARE
+         || fineUpper.activeType() == blockCoeffBase::SQUARE
+        )
+        {
+            squareTypeField& activeCoarseDiag = coarseDiag.asSquare();
+
+            squareTypeField& activeCoarseUpper = coarseUpper.asSquare();
+            const squareTypeField& activeFineUpper = fineUpper.asSquare();
+
+            // Use lower as transpose of upper
+            squareTypeField activeFineUpperTranspose =
+                activeFineUpper.T();
+
+            restrictDiag(fineDiag, coarseDiag);
+
+            agglomerateCoeffs
+            (
+                coeffRestrictAddr,
+                activeCoarseDiag,
+                activeCoarseUpper,
+                activeFineUpper,
+                activeFineUpperTranspose
+            );
+        }
+        else if
+        (
+            fineDiag.activeType() == blockCoeffBase::LINEAR
+         || fineUpper.activeType() == blockCoeffBase::LINEAR
+        )
+        {
+            linearTypeField& activeCoarseDiag = coarseDiag.asLinear();
+
+            linearTypeField& activeCoarseUpper = coarseUpper.asLinear();
+            const linearTypeField& activeFineUpper = fineUpper.asLinear();
+
+            restrictDiag(fineDiag, coarseDiag);
+
+            agglomerateCoeffs
+            (
+                coeffRestrictAddr,
+                activeCoarseDiag,
+                activeCoarseUpper,
+                activeFineUpper,
+                activeFineUpper
+            );
+        }
+        else if
+        (
+            fineDiag.activeType() == blockCoeffBase::SCALAR
+         || fineUpper.activeType() == blockCoeffBase::SCALAR
+        )
+        {
+            scalarTypeField& activeCoarseDiag = coarseDiag.asScalar();
+
+            scalarTypeField& activeCoarseUpper = coarseUpper.asScalar();
+            const scalarTypeField& activeFineUpper = fineUpper.asScalar();
+
+            restrictDiag(fineDiag, coarseDiag);
+
+            agglomerateCoeffs
+            (
+                coeffRestrictAddr,
+                activeCoarseDiag,
+                activeCoarseUpper,
+                activeFineUpper,
+                activeFineUpper
+            );
+        }
+        else
+        {
+            FatalErrorIn
+            (
+                "autoPtr<BlockAMGLevel<Type> >"
+                "BlockMatrixAgglomeration<Type>::restrictMatrix() const"
+            )   << "Matrix coeff type morphing error, symmetric matrix"
+                << abort(FatalError);
+        }
+    }
+    else // asymmetric matrix
     {
         TypeCoeffField& coarseLower = coarseMatrix.lower();
         const TypeCoeffField& fineLower = matrix_.lower();
 
-        if (fineDiag.activeType() == blockCoeffBase::SQUARE)
+        if
+        (
+            fineDiag.activeType() == blockCoeffBase::SQUARE
+         || fineUpper.activeType() == blockCoeffBase::SQUARE
+        )
         {
-            if (fineUpper.activeType() == blockCoeffBase::SQUARE)
-            {
-                squareTypeField& activeCoarseUpper = coarseUpper.asSquare();
-                squareTypeField& activeCoarseDiag = coarseDiag.asSquare();
-                const squareTypeField& activeFineUpper = fineUpper.asSquare();
+            squareTypeField& activeCoarseDiag = coarseDiag.asSquare();
 
-                squareTypeField& activeCoarseLower = coarseLower.asSquare();
-                const squareTypeField& activeFineLower = fineLower.asSquare();
+            squareTypeField& activeCoarseUpper = coarseUpper.asSquare();
+            const squareTypeField& activeFineUpper = fineUpper.asSquare();
 
-                restrictDiag(fineDiag, coarseDiag);
+            squareTypeField& activeCoarseLower = coarseLower.asSquare();
+            const squareTypeField& activeFineLower = fineLower.asSquare();
 
-                forAll(coeffRestrictAddr, fineCoeffI)
-                {
-                    label rmUpperAddr = agglomIndex_[upperAddr[fineCoeffI]];
-                    label rmLowerAddr = agglomIndex_[lowerAddr[fineCoeffI]];
+            restrictDiag(fineDiag, coarseDiag);
 
-                    // If the coefficient touches block zero and
-                    //  solo equations are present, skip it
-                    if (soloEqns && (rmUpperAddr == 0 || rmLowerAddr == 0))
-                    {
-                        continue;
-                    }
-
-                    label cCoeff = coeffRestrictAddr[fineCoeffI];
-
-                    if (cCoeff >= 0)
-                    {
-                        activeCoarseUpper[cCoeff]
-                            += activeFineUpper[fineCoeffI];
-                        activeCoarseLower[cCoeff]
-                            += activeFineLower[fineCoeffI];
-                    }
-                    else
-                    {
-                        // Add the fine face coefficients into the diagonal.
-                        activeCoarseDiag[-1 - cCoeff] +=
-                            activeFineUpper[fineCoeffI]
-                          + activeFineLower[fineCoeffI];
-                    }
-                }
-            }
-            else if (fineUpper.activeType() == blockCoeffBase::LINEAR)
-            {
-                FatalErrorIn
-                (
-                    "autoPtr<BlockAmgLevel<Type> >"
-                    "BlockMatrixAgglomeration<Type>::restrictMatrix() const"
-                )   << "Matrix diagonal of square type and upper of "
-                    << "linear type is not implemented"
-                    << abort(FatalError);
-            }
-            else
-            {
-                FatalErrorIn
-                (
-                    "autoPtr<BlockAmgLevel<Type> >"
-                    "BlockMatrixAgglomeration<Type>::restrictMatrix() const"
-                )   << "Matrix diagonal of square type and upper of "
-                    << "scalar type is not implemented"
-                    << abort(FatalError);
-            }
+            agglomerateCoeffs
+            (
+                coeffRestrictAddr,
+                activeCoarseDiag,
+                activeCoarseUpper,
+                activeFineUpper,
+                activeCoarseLower,
+                activeFineLower
+            );
         }
-        else if (fineDiag.activeType() == blockCoeffBase::LINEAR)
+        else if
+        (
+            fineDiag.activeType() == blockCoeffBase::LINEAR
+         || fineUpper.activeType() == blockCoeffBase::LINEAR
+        )
         {
-                FatalErrorIn
-                (
-                    "autoPtr<BlockAmgLevel<Type> >"
-                    "BlockMatrixAgglomeration<Type>::restrictMatrix() const"
-                )   << "Matrix diagonal of linear type not implemented"
-                    << abort(FatalError);
+            linearTypeField& activeCoarseDiag = coarseDiag.asLinear();
+
+            linearTypeField& activeCoarseUpper = coarseUpper.asLinear();
+            const linearTypeField& activeFineUpper = fineUpper.asLinear();
+
+            linearTypeField& activeCoarseLower = coarseLower.asLinear();
+            const linearTypeField& activeFineLower = fineLower.asLinear();
+
+            restrictDiag(fineDiag, coarseDiag);
+
+            agglomerateCoeffs
+            (
+                coeffRestrictAddr,
+                activeCoarseDiag,
+                activeCoarseUpper,
+                activeFineUpper,
+                activeCoarseLower,
+                activeFineLower
+            );
         }
-        else
+        else if
+        (
+            fineDiag.activeType() == blockCoeffBase::SCALAR
+         || fineUpper.activeType() == blockCoeffBase::SCALAR
+        )
         {
-                FatalErrorIn
-                (
-                    "autoPtr<BlockAmgLevel<Type> >"
-                    "BlockMatrixAgglomeration<Type>::restrictMatrix() const"
-                )   << "Matrix diagonal of scalar type not implemented"
-                    << abort(FatalError);
-        }
-    }
-    else
-    {
-        if (fineDiag.activeType() == blockCoeffBase::SQUARE)
-        {
-            if (fineUpper.activeType() == blockCoeffBase::SQUARE)
-            {
-                squareTypeField& activeCoarseUpper = coarseUpper.asSquare();
-                squareTypeField& activeCoarseDiag = coarseDiag.asSquare();
-                const squareTypeField& activeFineUpper = fineUpper.asSquare();
+            scalarTypeField& activeCoarseDiag = coarseDiag.asScalar();
 
-                restrictDiag(fineDiag, coarseDiag);
+            scalarTypeField& activeCoarseUpper = coarseUpper.asScalar();
+            const scalarTypeField& activeFineUpper = fineUpper.asScalar();
 
-                forAll(coeffRestrictAddr, fineCoeffI)
-                {
-                    label rmUpperAddr = agglomIndex_[upperAddr[fineCoeffI]];
-                    label rmLowerAddr = agglomIndex_[lowerAddr[fineCoeffI]];
+            scalarTypeField& activeCoarseLower = coarseLower.asScalar();
+            const scalarTypeField& activeFineLower = fineLower.asScalar();
 
-                    // If the coefficient touches block zero and
-                    //  solo equations are present, skip it
-                    if (soloEqns && (rmUpperAddr == 0 || rmLowerAddr == 0))
-                    {
-                        continue;
-                    }
+            restrictDiag(fineDiag, coarseDiag);
 
-                    label cCoeff = coeffRestrictAddr[fineCoeffI];
-
-                    if (cCoeff >= 0)
-                    {
-                        activeCoarseUpper[cCoeff] +=
-                            activeFineUpper[fineCoeffI];
-                    }
-                    else
-                    {
-                        // Add the fine face coefficient into the diagonal
-                        // Note: upper and lower coeffs are transpose of
-                        // each other.  HJ, 28/May/2014
-                        activeCoarseDiag[-1 - cCoeff] +=
-                            activeFineUpper[fineCoeffI]
-                          + activeFineUpper[fineCoeffI].T();
-                    }
-                }
-            }
-            else if (fineUpper.activeType() == blockCoeffBase::LINEAR)
-            {
-                FatalErrorIn
-                (
-                    "autoPtr<BlockAmgLevel<Type> >"
-                    "BlockMatrixAgglomeration<Type>::restrictMatrix() const"
-                )   << "Matrix diagonal of square type and upper of "
-                    << "linear type is not implemented"
-                    << abort(FatalError);
-            }
-            else
-            {
-                FatalErrorIn
-                (
-                    "autoPtr<BlockAmgLevel<Type> >"
-                    "BlockMatrixAgglomeration<Type>::restrictMatrix() const"
-                )   << "Matrix diagonal of square type and upper of "
-                    << "scalar type is not implemented"
-                    << abort(FatalError);
-            }
-
-        }
-        else if (fineDiag.activeType() == blockCoeffBase::LINEAR)
-        {
-                FatalErrorIn
-                (
-                    "autoPtr<BlockAmgLevel<Type> > "
-                    "BlockMatrixAgglomeration<Type>::restrictMatrix() const"
-                )   << "Matrix diagonal of linear type not implemented"
-                    << abort(FatalError);
+            agglomerateCoeffs
+            (
+                coeffRestrictAddr,
+                activeCoarseDiag,
+                activeCoarseUpper,
+                activeFineUpper,
+                activeCoarseLower,
+                activeFineLower
+            );
         }
         else
         {
-                FatalErrorIn
-                (
-                    "autoPtr<BlockAmgLevel<Type> > "
-                    "BlockMatrixAgglomeration<Type>::restrictMatrix() const"
-                )   << "Matrix diagonal of scalar type not implemented"
-                    << abort(FatalError);
+            FatalErrorIn
+            (
+                "autoPtr<BlockAMGLevel<Type> >"
+                "BlockMatrixAgglomeration<Type>::restrictMatrix() const"
+            )   << "Matrix coeff type morphing error, asymmetric matrix"
+                << abort(FatalError);
         }
     }
 
-    return autoPtr<BlockAmgLevel<Type> >
+    // Create and return BlockAMGLevel
+    return autoPtr<BlockAMGLevel<Type> >
     (
-        new coarseBlockAmgLevel<Type>
+        new coarseBlockAMGLevel<Type>
         (
             coarseAddrPtr,
             coarseMatrixPtr,
@@ -953,48 +1241,6 @@ Foam::BlockMatrixAgglomeration<Type>::restrictMatrix() const
             this->minCoarseEqns()
         )
     );
-}
-
-
-template<class Type>
-void Foam::BlockMatrixAgglomeration<Type>::restrictDiag
-(
-    const CoeffField<Type>& Coeff,
-    CoeffField<Type>& coarseCoeff
-) const
-{
-    typedef CoeffField<Type> TypeCoeffField;
-
-    if
-    (
-        Coeff.activeType() == blockCoeffBase::SQUARE
-     && coarseCoeff.activeType() == blockCoeffBase::SQUARE
-    )
-    {
-        typedef typename TypeCoeffField::squareType squareType;
-        typedef typename TypeCoeffField::squareTypeField squareTypeField;
-
-        squareTypeField& activeCoarseCoeff = coarseCoeff.asSquare();
-        const squareTypeField& activeCoeff = Coeff.asSquare();
-
-        forAll (coarseCoeff, i)
-        {
-            activeCoarseCoeff[i] = pTraits<squareType>::zero;
-        }
-
-        forAll (Coeff, i)
-        {
-            activeCoarseCoeff[agglomIndex_[i]] += activeCoeff[i];
-        }
-    }
-    else
-    {
-        FatalErrorIn
-        (
-            "void  BlockMatrixAgglomeration<Type>::restrictDiag() const"
-        )   << "Only present for square type coeff type"
-            << abort(FatalError);
-    }
 }
 
 

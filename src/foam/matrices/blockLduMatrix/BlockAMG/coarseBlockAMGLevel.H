@@ -22,54 +22,54 @@ License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    fineBlockAmgLevel
+    coarseBlockAMGLevel
 
 Description
-    Fine AMG level refers to matrix, x and b data from the solver or
-    preconditioner, implemented for the BlockLduMatrix
+    Coarse AMG level stores matrix, x and b locally, for BlockLduMatrix
 
 Author
     Klas Jareteg, 2012-12-13
 
 SourceFiles
-    fineBlockAmgLevel.C
+    coarseBlockAMGLevel.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef fineBlockAmgLevel_H
-#define fineBlockAmgLevel_H
+#ifndef coarseBlockAMGLevel_H
+#define coarseBlockAMGLevel_H
 
-#include "BlockAmgLevel.H"
+#include "BlockAMGLevel.H"
 #include "BlockLduSmoother.H"
 #include "BlockLduMatrix.H"
-
+#include "lduPrimitiveMesh.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-template<class Type>
-class coarseBlockAmgLevel;
-
-template<class Type>
-class BlockMatrixCoarsening;
-
 /*---------------------------------------------------------------------------*\
-                        Class fineBlockAmgLevel Declaration
+                        Class coarseBlockAMGLevel Declaration
 \*---------------------------------------------------------------------------*/
 
 template<class Type>
-class fineBlockAmgLevel
+class coarseBlockAMGLevel
 :
-    public BlockAmgLevel<Type>
+    public BlockAMGLevel<Type>
 {
     // Private data
 
-         //- Reference to matrix
-        const BlockLduMatrix<Type>& matrix_;
+        //- Matrix addressing object.  This also contains coupling interfaces
+        autoPtr<lduPrimitiveMesh> addrPtr_;
+
+        //- Matrix
+        autoPtr<BlockLduMatrix<Type> > matrixPtr_;
+
+        //- Solution field
+        Field<Type> x_;
+
+        //- RHS field
+        Field<Type> b_;
 
         //- Dictionary
         const dictionary& dict_;
@@ -87,24 +87,25 @@ class fineBlockAmgLevel
     // Private Member Functions
 
         //- Disallow default bitwise copy construct
-        fineBlockAmgLevel(const fineBlockAmgLevel<Type>&);
+        coarseBlockAMGLevel(const coarseBlockAMGLevel<Type>&);
 
         //- Disallow default bitwise assignment
-        void operator=(const fineBlockAmgLevel<Type>&);
+        void operator=(const coarseBlockAMGLevel<Type>&);
 
 
 public:
 
     //- Runtime type information
-    TypeName("fineBlockAmgLevel");
+        TypeName("coarseBlockAMGLevel");
 
 
     // Constructors
 
         //- Construct from components
-        fineBlockAmgLevel
+        coarseBlockAMGLevel
         (
-            const BlockLduMatrix<Type>& matrix,
+            autoPtr<lduPrimitiveMesh> addrPtr,
+            autoPtr<BlockLduMatrix<Type> > matrixPtr,
             const dictionary& dict,
             const word& coarseningType,
             const label groupSize,
@@ -114,23 +115,22 @@ public:
 
     // Destructor
 
-        virtual ~fineBlockAmgLevel()
-        {}
+        virtual ~coarseBlockAMGLevel();
 
 
     // Member Functions
-
-        //- Return reference to dictionary
-        const dictionary& dict() const
-        {
-            return dict_;
-        }
 
         //- Return reference to x
         virtual Field<Type>& x();
 
         //- Return reference to b
         virtual Field<Type>& b();
+
+        //- Return reference to dictionary
+        const dictionary& dict() const
+        {
+            return dict_;
+        }
 
         //- Calculate residual
         virtual void residual
@@ -182,8 +182,9 @@ public:
             Field<Type>& xBuffer
         ) const;
 
+
         //- Create next level from current level
-        virtual autoPtr<BlockAmgLevel<Type> > makeNextLevel() const;
+        virtual autoPtr<BlockAMGLevel<Type> > makeNextLevel() const;
 };
 
 
@@ -194,7 +195,7 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-#   include "fineBlockAmgLevel.C"
+#   include "coarseBlockAMGLevel.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

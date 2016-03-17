@@ -53,13 +53,13 @@ namespace Foam
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 template<class Type>
-class coarseBlockAmgLevel;
+class coarseBlockAMGLevel;
 
 template<class Type>
-class fineBlockAmgLevel;
+class fineBlockAMGLevel;
 
 template<class Type>
-class BlockAmgLevel;
+class BlockAMGLevel;
 
 /*---------------------------------------------------------------------------*\
                    Class BlockMatrixCoarsening Declaration
@@ -172,7 +172,7 @@ public:
         virtual bool coarsen() const = 0;
 
         //- Restrict matrix
-        virtual autoPtr<BlockAmgLevel<Type> > restrictMatrix
+        virtual autoPtr<BlockAMGLevel<Type> > restrictMatrix
         () const = 0;
 
         //- Restrict residual

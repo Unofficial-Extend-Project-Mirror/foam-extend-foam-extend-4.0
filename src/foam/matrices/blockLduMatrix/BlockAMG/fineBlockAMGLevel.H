@@ -22,27 +22,27 @@ License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    BlockMatrixAgglomeration
+    fineBlockAMGLevel
 
 Description
-    Agglomerative block matrix AMG coarsening
+    Fine AMG level refers to matrix, x and b data from the solver or
+    preconditioner, implemented for the BlockLduMatrix
 
 Author
-    Klas Jareteg, 2013-04-15
+    Klas Jareteg, 2012-12-13
 
 SourceFiles
-    BlockMatrixAgglomeration.C
+    fineBlockAMGLevel.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef BlockMatrixAgglomeration_H
-#define BlockMatrixAgglomeration_H
+#ifndef fineBlockAMGLevel_H
+#define fineBlockAMGLevel_H
 
-#include "BlockMatrixCoarsening.H"
+#include "BlockAMGLevel.H"
+#include "BlockLduSmoother.H"
 #include "BlockLduMatrix.H"
-#include "BlockCoeffNorm.H"
-#include "BlockCoeff.H"
-#include "tolerancesSwitch.H"
+
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -51,74 +51,62 @@ namespace Foam
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
+template<class Type>
+class coarseBlockAMGLevel;
+
+template<class Type>
+class BlockMatrixCoarsening;
+
 /*---------------------------------------------------------------------------*\
-                           Class BlockMatrixAgglomeration Declaration
+                        Class fineBlockAMGLevel Declaration
 \*---------------------------------------------------------------------------*/
 
 template<class Type>
-class BlockMatrixAgglomeration
+class fineBlockAMGLevel
 :
-    public BlockMatrixCoarsening<Type>
+    public BlockAMGLevel<Type>
 {
-    // Private Data
+    // Private data
 
-        //- Reference to matrix
+         //- Reference to matrix
         const BlockLduMatrix<Type>& matrix_;
 
-        //- Reference to a templated norm calculator
-        autoPtr<BlockCoeffNorm<Type> > normPtr_;
+        //- Dictionary
+        const dictionary& dict_;
 
-        //- Child array: for each fine equation give agglomeration cluster
-        //  index
-        labelField agglomIndex_;
+        //- AMG coarsening
+        autoPtr<BlockMatrixCoarsening<Type> > coarseningPtr_;
 
-        //- Group size
-        label groupSize_;
+        //- Smoother
+        autoPtr<BlockLduSmoother<Type> > smootherPtr_;
 
-        //- Number of solo cells
-        label nSolo_;
-
-        //- Number of coarse equations
-        label nCoarseEqns_;
-
-        //- Can a coarse level be constructed?
-        bool coarsen_;
+        //- Ax buffer
+        mutable Field<Type> Ax_;
 
 
     // Private Member Functions
 
         //- Disallow default bitwise copy construct
-        BlockMatrixAgglomeration(const BlockMatrixAgglomeration<Type>&);
+        fineBlockAMGLevel(const fineBlockAMGLevel<Type>&);
 
-        // Disallow default bitwise assignment
-        void operator=(const BlockMatrixAgglomeration<Type>&);
-
-        //- Calculate agglomeration index (child)
-        void calcAgglomeration();
-
-
-    // Private Static Data
-
-        //- Diagonal scaling factor
-        static const debug::tolerancesSwitch diagFactor_;
-
-        //- Weighting factor
-        static const scalar weightFactor_;
+        //- Disallow default bitwise assignment
+        void operator=(const fineBlockAMGLevel<Type>&);
 
 
 public:
 
     //- Runtime type information
-    TypeName("AAMG");
+    TypeName("fineBlockAMGLevel");
 
 
     // Constructors
 
-        //- Construct from matrix and group size
-        BlockMatrixAgglomeration
+        //- Construct from components
+        fineBlockAMGLevel
         (
             const BlockLduMatrix<Type>& matrix,
             const dictionary& dict,
+            const word& coarseningType,
             const label groupSize,
             const label minCoarseEqns
         );
@@ -126,32 +114,40 @@ public:
 
     // Destructor
 
-        virtual ~BlockMatrixAgglomeration();
+        virtual ~fineBlockAMGLevel()
+        {}
 
 
     // Member Functions
 
-        //- Can a coarse level be constructed?
-        virtual bool coarsen() const
+        //- Return reference to dictionary
+        const dictionary& dict() const
         {
-            return coarsen_;
+            return dict_;
         }
 
-        //- Restrict matrix
-        virtual autoPtr<BlockAmgLevel<Type> > restrictMatrix() const;
+        //- Return reference to x
+        virtual Field<Type>& x();
+
+        //- Return reference to b
+        virtual Field<Type>& b();
+
+        //- Calculate residual
+        virtual void residual
+        (
+            const Field<Type>& x,
+            const Field<Type>& b,
+            Field<Type>& res
+        ) const;
 
         //- Restrict residual
         virtual void restrictResidual
         (
-            const Field<Type>& res,
-            Field<Type>& coarseRes
-        ) const;
-
-        //- Restrict CoeffField.  Used for diag coefficient
-        void restrictDiag
-        (
-            const CoeffField<Type>& Coeff,
-            CoeffField<Type>& coarseCoeff
+            const Field<Type>& x,
+            const Field<Type>& b,
+            Field<Type>& xBuffer,
+            Field<Type>& coarseRes,
+            bool preSweepsDone
         ) const;
 
         //- Prolongate correction
@@ -160,6 +156,34 @@ public:
             Field<Type>& x,
             const Field<Type>& coarseX
         ) const;
+
+        //- Smooth level
+        virtual void smooth
+        (
+            Field<Type>& x,
+            const Field<Type>& b,
+            const label nSweeps
+        ) const;
+
+        //- Solve level
+        virtual void solve
+        (
+            Field<Type>& x,
+            const Field<Type>& b,
+            const scalar tolerance,
+            const scalar relTol
+        ) const;
+
+        //- Scale x
+        virtual void scaleX
+        (
+            Field<Type>& x,
+            const Field<Type>& b,
+            Field<Type>& xBuffer
+        ) const;
+
+        //- Create next level from current level
+        virtual autoPtr<BlockAMGLevel<Type> > makeNextLevel() const;
 };
 
 
@@ -170,7 +194,7 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-#   include "BlockMatrixAgglomeration.C"
+#   include "fineBlockAMGLevel.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

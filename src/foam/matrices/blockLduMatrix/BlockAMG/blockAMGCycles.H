@@ -23,9 +23,7 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "BlockAmgLevel.H"
-#include "fineBlockAmgLevel.H"
-#include "coarseBlockAmgLevel.H"
+#include "BlockAMGCycle.H"
 
 // KRJ included to make the different types
 #include "VectorTensorNFieldsFwd.H"
@@ -41,32 +39,16 @@ namespace Foam
 
 // KRJ: 2012-12-15: Is this enough to have the templating?
 
-typedef BlockAmgLevel<scalar> blockAmgScalarLevel;
-typedef BlockAmgLevel<vector> blockAmgVectorLevel;
-typedef BlockAmgLevel<tensor> blockAmgTensorLevel;
+typedef BlockAMGCycle<scalar> blockAMGScalarCycle;
+typedef BlockAMGCycle<vector> blockAMGVectorCycle;
+typedef BlockAMGCycle<tensor> blockAMGTensorCycle;
 
 #define makeTypedef(type, Type, args...)                \
-    typedef BlockAmgLevel<type > blockAmg##Type##Level;
+    typedef BlockAMGCycle<type > blockAMG##Type##Cycle;
+
 forAllVectorNTypes(makeTypedef)
 #undef makeTypedef
 
-typedef coarseBlockAmgLevel<scalar> coarseblockAmgScalarLevel;
-typedef coarseBlockAmgLevel<vector> coarseblockAmgVectorLevel;
-typedef coarseBlockAmgLevel<tensor> coarseblockAmgTensorLevel;
-
-#define makeTypedef(type, Type, args...)                \
-    typedef coarseBlockAmgLevel<type > coarseblockAmg##Type##Level;
-forAllVectorNTypes(makeTypedef)
-#undef makeTypedef
-
-typedef fineBlockAmgLevel<scalar> fineblockAmgScalarLevel;
-typedef fineBlockAmgLevel<vector> fineblockAmgVectorLevel;
-typedef fineBlockAmgLevel<tensor> fineblockAmgTensorLevel;
-
-#define makeTypedef(type, Type, args...)                \
-    typedef fineBlockAmgLevel<type > fineblockAmg##Type##Level;
-forAllVectorNTypes(makeTypedef)
-#undef makeTypedef
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

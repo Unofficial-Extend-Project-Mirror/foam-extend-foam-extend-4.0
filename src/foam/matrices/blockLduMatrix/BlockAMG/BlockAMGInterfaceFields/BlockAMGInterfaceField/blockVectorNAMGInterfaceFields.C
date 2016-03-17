@@ -21,11 +21,22 @@ License
     You should have received a copy of the GNU General Public License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
+Class
+    blockVectorNAMGInterfaceFields
+
+Description
+    Macros for VectorN types for AMG interface fields with block coeffs
+
+Author
+    Klas Jareteg, 2013-02-08
+
 \*---------------------------------------------------------------------------*/
 
-#include "blockMatrixAgglomerations.H"
-#include "blockMatrixCoarsenings.H"
-#include "coarseBlockAmgLevel.H"
+#include "BlockAMGInterfaceField.H"
+#include "ProcessorBlockAMGInterfaceField.H"
+#include "GGIBlockAMGInterfaceField.H"
+#include "VectorNFieldTypes.H"
+#include "ExpandTensorNField.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -34,7 +45,20 @@ namespace Foam
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-makeBlockMatrixCoarsenings(blockMatrixAgglomeration);
+#define makeTemplateTypeNameAndDebug(type, Type, args...)                     \
+                                                                              \
+typedef BlockAMGInterfaceField<type > block##Type##AMGInterfaceField;         \
+defineNamedTemplateTypeNameAndDebug(block##Type##AMGInterfaceField, 0);       \
+defineTemplateRunTimeSelectionTable(block##Type##AMGInterfaceField, lduInterface); \
+                                                                              \
+typedef ProcessorBlockAMGInterfaceField<type > block##Type##ProcessorAMGInterfaceField;  \
+makeBlockAMGInterfaceField(block##Type##AMGInterfaceField, block##Type##ProcessorAMGInterfaceField); \
+typedef GGIBlockAMGInterfaceField<type > block##Type##GGIAMGInterfaceField;  \
+makeBlockAMGInterfaceField(block##Type##AMGInterfaceField, block##Type##GGIAMGInterfaceField); \
+
+forAllVectorNTypes(makeTemplateTypeNameAndDebug);
+
+#undef makeTemplateTypeNameAndDebug
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

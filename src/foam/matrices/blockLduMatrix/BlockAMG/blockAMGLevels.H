@@ -23,7 +23,14 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "blockAmgCycles.H"
+#include "BlockAMGLevel.H"
+#include "fineBlockAMGLevel.H"
+#include "coarseBlockAMGLevel.H"
+
+// KRJ included to make the different types
+#include "VectorTensorNFieldsFwd.H"
+#include "ExpandTensorNField.H"
+#include "VectorNFieldTypes.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -32,30 +39,34 @@ namespace Foam
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-template<>
-const char* Foam::NamedEnum<Foam::blockAmgCycleName::cycleType, 3>::names[] =
-{
-    "V-cycle",
-    "W-cycle",
-    "F-cycle"
-};
-
-
-const Foam::NamedEnum<Foam::blockAmgCycleName::cycleType, 3>
-Foam::blockAmgCycleName::cycleNames_;
-
-
 // KRJ: 2012-12-15: Is this enough to have the templating?
 
-defineNamedTemplateTypeNameAndDebug(blockAmgScalarCycle, 0);
-defineNamedTemplateTypeNameAndDebug(blockAmgVectorCycle, 0);
-defineNamedTemplateTypeNameAndDebug(blockAmgTensorCycle, 0);
-#define makeNamedTemplateTypeNameAndDebug(type, Type, args...)      \
-    defineNamedTemplateTypeNameAndDebug(blockAmg##Type##Cycle, 0);
+typedef BlockAMGLevel<scalar> blockAmgScalarLevel;
+typedef BlockAMGLevel<vector> blockAmgVectorLevel;
+typedef BlockAMGLevel<tensor> blockAmgTensorLevel;
 
-    forAllVectorNTypes(makeNamedTemplateTypeNameAndDebug);
+#define makeTypedef(type, Type, args...)                \
+    typedef BlockAMGLevel<type > blockAmg##Type##Level;
+forAllVectorNTypes(makeTypedef)
+#undef makeTypedef
 
-#undef makeNamedTemplateTypeNameAndDebug
+typedef coarseBlockAMGLevel<scalar> coarseblockAmgScalarLevel;
+typedef coarseBlockAMGLevel<vector> coarseblockAmgVectorLevel;
+typedef coarseBlockAMGLevel<tensor> coarseblockAmgTensorLevel;
+
+#define makeTypedef(type, Type, args...)                \
+    typedef coarseBlockAMGLevel<type > coarseblockAmg##Type##Level;
+forAllVectorNTypes(makeTypedef)
+#undef makeTypedef
+
+typedef fineBlockAMGLevel<scalar> fineblockAmgScalarLevel;
+typedef fineBlockAMGLevel<vector> fineblockAmgVectorLevel;
+typedef fineBlockAMGLevel<tensor> fineblockAmgTensorLevel;
+
+#define makeTypedef(type, Type, args...)                \
+    typedef fineBlockAMGLevel<type > fineblockAmg##Type##Level;
+forAllVectorNTypes(makeTypedef)
+#undef makeTypedef
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

@@ -23,12 +23,7 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "BlockAmgCycle.H"
-
-// KRJ included to make the different types
-#include "VectorTensorNFieldsFwd.H"
-#include "ExpandTensorNField.H"
-#include "VectorNFieldTypes.H"
+#include "blockAMGInterfaceFields.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -37,17 +32,27 @@ namespace Foam
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-// KRJ: 2012-12-15: Is this enough to have the templating?
+defineNamedTemplateTypeNameAndDebug(blockScalarAMGInterfaceField, 0);
+defineNamedTemplateTypeNameAndDebug(blockVectorAMGInterfaceField, 0);
+defineNamedTemplateTypeNameAndDebug(blockTensorAMGInterfaceField, 0);
 
-typedef BlockAmgCycle<scalar> blockAmgScalarCycle;
-typedef BlockAmgCycle<vector> blockAmgVectorCycle;
-typedef BlockAmgCycle<tensor> blockAmgTensorCycle;
+defineTemplateRunTimeSelectionTable
+(
+    blockScalarAMGInterfaceField,
+    lduInterface
+);
 
-#define makeTypedef(type, Type, args...)                \
-    typedef BlockAmgCycle<type > blockAmg##Type##Cycle;
-forAllVectorNTypes(makeTypedef)
-#undef makeTypedef
+defineTemplateRunTimeSelectionTable
+(
+    blockVectorAMGInterfaceField,
+    lduInterface
+);
 
+defineTemplateRunTimeSelectionTable
+(
+    blockTensorAMGInterfaceField,
+    lduInterface
+);
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

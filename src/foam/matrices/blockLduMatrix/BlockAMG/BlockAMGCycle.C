@@ -22,7 +22,7 @@ License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    BlockAmgCycle
+    BlockAMGCycle
 
 Description
     Algebraic multigrid cycle class for BlockLduMatrix
@@ -32,7 +32,7 @@ Author
 
 \*---------------------------------------------------------------------------*/
 
-#include "BlockAmgCycle.H"
+#include "BlockAMGCycle.H"
 #include "demandDrivenData.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
@@ -43,9 +43,9 @@ Author
 
 // Construct from AMG level
 template<class Type>
-Foam::BlockAmgCycle<Type>::BlockAmgCycle
+Foam::BlockAMGCycle<Type>::BlockAMGCycle
 (
-    autoPtr<BlockAmgLevel<Type> > levelPtr
+    autoPtr<BlockAMGLevel<Type> > levelPtr
 )
 :
     levelPtr_(levelPtr),
@@ -56,7 +56,7 @@ Foam::BlockAmgCycle<Type>::BlockAmgCycle
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
 template<class Type>
-Foam::BlockAmgCycle<Type>::~BlockAmgCycle()
+Foam::BlockAMGCycle<Type>::~BlockAMGCycle()
 {
     deleteDemandDrivenData(coarseLevelPtr_);
 }
@@ -65,20 +65,20 @@ Foam::BlockAmgCycle<Type>::~BlockAmgCycle()
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 template<class Type>
-void Foam::BlockAmgCycle<Type>::makeCoarseLevels(const label nMaxLevels)
+void Foam::BlockAMGCycle<Type>::makeCoarseLevels(const label nMaxLevels)
 {
     // Make coarse levels
     if (nLevels_ == 0)
     {
         bool addCoarse = true;
-        BlockAmgCycle<Type>* curCyclePtr = this;
+        BlockAMGCycle<Type>* curCyclePtr = this;
 
         // Do forever
         for (;;)
         {
             nLevels_++;
 
-            autoPtr<BlockAmgLevel<Type> > coarsePtr =
+            autoPtr<BlockAMGLevel<Type> > coarsePtr =
                 curCyclePtr->levelPtr_->makeNextLevel();
 
             // Check if a coarse level is valid and allowed
@@ -92,7 +92,7 @@ void Foam::BlockAmgCycle<Type>::makeCoarseLevels(const label nMaxLevels)
             if (addCoarse)
             {
                 curCyclePtr->coarseLevelPtr_ =
-                    new BlockAmgCycle<Type>(coarsePtr);
+                    new BlockAMGCycle<Type>(coarsePtr);
 
                 // Point to the next coarse level
                 curCyclePtr = curCyclePtr->coarseLevelPtr_;
@@ -112,12 +112,12 @@ void Foam::BlockAmgCycle<Type>::makeCoarseLevels(const label nMaxLevels)
 
 
 template<class Type>
-void Foam::BlockAmgCycle<Type>::fixedCycle
+void Foam::BlockAMGCycle<Type>::fixedCycle
 (
     Field<Type>& x,
     const Field<Type>& b,
     Field<Type>& xBuffer,
-    const blockAmgCycleName::cycleType cycle,
+    const blockAMGCycleName::cycleType cycle,
     const label nPreSweeps,
     const label nPostSweeps,
     const bool scale

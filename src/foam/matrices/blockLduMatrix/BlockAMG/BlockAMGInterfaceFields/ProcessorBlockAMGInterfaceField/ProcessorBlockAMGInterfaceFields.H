@@ -22,59 +22,39 @@ License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    BlockMatrixAgglomeration
+    ProcessorBlockAMGInterfaceField
 
 Description
-    Specialisation of the BlockMatrixAgglomeration for vectors.
+    Typedefs for block coefficient processor AMG interface fields
 
 Author
-    Klas Jareteg, 2013-01-31
+    Klas Jareteg, 2013-02-08
+
+SourceFiles
+    ProcessorBlockAMGInterfaceFields.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef vectorBlockMatrixAgglomeration_H
-#define vectorBlockMatrixAgglomeration_H
+#ifndef ProcessorBlockAMGInterfaceFields_H
+#define ProcessorBlockAMGInterfaceFields_H
 
-#include "blockMatrixCoarsenings.H"
-#include "blockMatrixAgglomerations.H"
-#include "BlockMatrixAgglomeration.H"
-#include "runTimeSelectionTables.H"
+#include "ProcessorBlockAMGInterfaceField.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 
-/*---------------------------------------------------------------------------*\
-                   Class BlockMatrixAgglomeration Declaration
-\*---------------------------------------------------------------------------*/
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-//- Restrict matrix
-
-template<>
-inline autoPtr<BlockAmgLevel<vector> >
-BlockMatrixAgglomeration<vector>::restrictMatrix
-() const
-{
-    FatalErrorIn
-    (
-        "autoPtr<BlockAmgLevel<vector> > BlockMatrixAgglomeration<Type>::"
-        "restrictMatrix() const"
-    )   << "Function not implemented for Type=vector. " << endl
-        << abort(FatalError);
-
-    // Dummy return to keep compiler happy
-    return autoPtr<BlockAmgLevel<vector> >(NULL);
-}
-
+typedef ProcessorBlockAMGInterfaceField<scalar> ProcessorBlockAMGInterfaceFieldScalar;
+typedef ProcessorBlockAMGInterfaceField<vector> ProcessorBlockAMGInterfaceFieldVector;
+typedef ProcessorBlockAMGInterfaceField<tensor> ProcessorBlockAMGInterfaceFieldTensor;
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
