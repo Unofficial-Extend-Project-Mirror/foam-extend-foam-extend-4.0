@@ -8,7 +8,7 @@
 FoamFile
 {
     version     2.0;
-    format      binary;
+    format      ascii;
     class       dictionary;
     location    "system";
     object      controlDict;
@@ -33,7 +33,7 @@ writeInterval   5e-06;
 
 purgeWrite      0;
 
-writeFormat     binary;
+writeFormat     ascii;
 
 writePrecision  6;
 

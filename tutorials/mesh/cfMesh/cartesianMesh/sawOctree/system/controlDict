@@ -35,7 +35,7 @@ writeInterval       100;
 
 cycleWrite          0;
 
-writeFormat         binary;
+writeFormat         ascii;
 
 writeCompression    compressed;
 
