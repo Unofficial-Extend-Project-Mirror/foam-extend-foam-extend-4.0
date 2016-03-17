@@ -64,7 +64,6 @@ class SRFModel
 :
     public IOdictionary
 {
-
 protected:
 
     // Protected data
@@ -168,10 +167,10 @@ public:
             //- Return velocity vector from positions
             vectorField velocity(const vectorField& positions) const;
 
-            //- Return velocity of SRF for complete mesh
+            //- Return rotational velocity of SRF for complete mesh
             tmp<volVectorField> U() const;
 
-            //- Return face velocity of SRF for complete mesh
+            //- Return rotational face velocity of SRF for complete mesh
             tmp<surfaceVectorField> faceU() const;
 
             //- Return absolute velocity for complete mesh
