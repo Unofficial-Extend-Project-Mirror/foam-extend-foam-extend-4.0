@@ -145,23 +145,21 @@ void Foam::sixDOFqODE::constrainRotation(vector& vec) const
             consVec.z() = 0;
         }
 
-        consVec = referentRotation_.invR() & consVec;
+        vec = referentRotation_.invR() & consVec;
     }
     else
     {
-        consVec = vec;
-
         if (fixedRoll_)
         {
-            consVec.x() = 0;
+            vec.x() = 0;
         }
         if (fixedPitch_)
         {
-            consVec.y() = 0;
+            vec.y() = 0;
         }
         if (fixedYaw_)
         {
-            consVec.z() = 0;
+            vec.z() = 0;
         }
     }
 }
@@ -189,23 +187,21 @@ void Foam::sixDOFqODE::constrainTranslation(vector& vec) const
             consVec.z() = 0;
         }
 
-        consVec = referentRotation_.invR() & consVec;
+        vec = referentRotation_.invR() & consVec;
     }
     else
     {
-        consVec = vec;
-
         if (fixedSurge_)
         {
-            consVec.x() = 0;
+            vec.x() = 0;
         }
         if (fixedSway_)
         {
-            consVec.y() = 0;
+            vec.y() = 0;
         }
         if (fixedHeave_)
         {
-            consVec.z() = 0;
+            vec.z() = 0;
         }
     }
 }
@@ -447,20 +443,19 @@ void Foam::sixDOFqODE::derivatives
     dydx[11] = curRotation.eDot(curOmega.value(), 2);
     dydx[12] = curRotation.eDot(curOmega.value(), 3);
 
-
-//    // Add rotational constraints by setting RHS of given components to zero
-//    if (fixedRoll_)
-//    {
-//        dydx[10] = 0; // Roll axis (roll quaternion evolution RHS)
-//    }
-//    if (fixedPitch_)
-//    {
-//        dydx[11] = 0; // Pitch axis (pitch quaternion evolution RHS)
-//    }
-//    if (fixedYaw_)
-//    {
-//        dydx[12] = 0; // Yaw axis (yaw quaternion evolution RHS)
-//    }
+    // Add rotational constraints by setting RHS of given components to zero
+    if (fixedRoll_)
+    {
+        dydx[10] = 0; // Roll axis (roll quaternion evolution RHS)
+    }
+    if (fixedPitch_)
+    {
+        dydx[11] = 0; // Pitch axis (pitch quaternion evolution RHS)
+    }
+    if (fixedYaw_)
+    {
+        dydx[12] = 0; // Yaw axis (yaw quaternion evolution RHS)
+    }
 }
 
 

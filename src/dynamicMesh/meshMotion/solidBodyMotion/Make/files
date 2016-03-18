@@ -1,6 +1,7 @@
 solidBodyMotionFunction/solidBodyMotionFunction.C
 solidBodyMotionFunction/newSolidBodyMotionFunction.C
 
+noMotion/noMotion.C
 translation/translation.C
 graphMotion/graphMotion.C
 
