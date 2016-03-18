@@ -44,13 +44,6 @@ void Foam::lduMatrix::Amul
     // HJ, 5/Nov/2007
     Ax = 0;
 
-    // AmulCore must be additive to account for initialisation step
-    // in ldu interfaces.  HJ, 6/Nov/2007
-    AmulCore(Ax, x);
-
-    // Note: changed order of interface update: init after core
-    // HJ, 14/Mar/2016
-
     // Initialise the update of coupled interfaces
     initMatrixInterfaces
     (
@@ -60,6 +53,10 @@ void Foam::lduMatrix::Amul
         Ax,
         cmpt
     );
+
+    // AmulCore must be additive to account for initialisation step
+    // in ldu interfaces.  HJ, 6/Nov/2007
+    AmulCore(Ax, x);
 
     // Update coupled interfaces
     updateMatrixInterfaces
@@ -132,13 +129,6 @@ void Foam::lduMatrix::Tmul
     // HJ, 5/Nov/2007
     Tx = 0;
 
-    // TmulCore must be additive to account for initialisation step
-    // in ldu interfaces.  HJ, 6/Nov/2007
-    TmulCore(Tx, x);
-
-    // Note: changed order of interface update: init after core
-    // HJ, 14/Mar/2016
-
     // Initialise the update of coupled interfaces
     initMatrixInterfaces
     (
@@ -148,6 +138,10 @@ void Foam::lduMatrix::Tmul
         Tx,
         cmpt
     );
+
+    // TmulCore must be additive to account for initialisation step
+    // in ldu interfaces.  HJ, 6/Nov/2007
+    TmulCore(Tx, x);
 
     // Update coupled interfaces
     updateMatrixInterfaces
