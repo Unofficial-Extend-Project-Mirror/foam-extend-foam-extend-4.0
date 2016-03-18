@@ -50,3 +50,18 @@ volVector4Field Up
     mesh,
     dimensionedVector4("zero", dimless, vector4::zero)
 );
+
+Info<< "Creating field rAU\n" << endl;
+volScalarField rAU
+(
+    IOobject
+    (
+        "rAU",
+        runTime.timeName(),
+        mesh,
+        IOobject::NO_READ,
+        IOobject::NO_WRITE
+    ),
+    mesh,
+    runTime.deltaT()
+);

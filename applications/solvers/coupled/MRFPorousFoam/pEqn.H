@@ -1,25 +1,48 @@
 // Pressure parts of the continuity equation
-surfaceScalarField rUAf
-(
-    "rUAf",
-    fvc::interpolate(1.0/UEqn().A())
-);
+tmp<fvScalarMatrix> tpEqn;
+tmp<surfaceScalarField> tpresSource;
 
-UEqn.clear();
+if (addPorosity)
+{
+    // Collect pressure source with tensorial 1/Ap
+    const volTensorField& rTU = trTU();
 
-surfaceScalarField presSource
-(
-    "presSource",
-    rUAf*(fvc::interpolate(fvc::grad(p, "grad(pSource)")) & mesh.Sf())
-);
+    tpresSource =
+    (
+        (mesh.Sf() & fvc::interpolate(rTU))
+        & fvc::interpolate(fvc::grad(p, "grad(pSource)"))
+    );
+    const surfaceScalarField& presSource = tpresSource();
 
-fvScalarMatrix pEqn
-(
-  - fvm::laplacian(rUAf, p)
- ==
-  - fvc::div(presSource)
-);
+    // Assemble pressure matrix with tensorial 1/Ap
+    tpEqn =
+    (
+      - fvm::laplacian(rTU, p)
+     ==
+      - fvc::div(presSource)
+    );
+}
+else
+{
+    // Collect pressure source with scalar 1/Ap
+    const volScalarField& rAU = trAU();
 
-pEqn.setReference(pRefCell, pRefValue);
+    tpresSource =
+    (
+        fvc::interpolate(rAU)*
+        (mesh.Sf() & fvc::interpolate(fvc::grad(p, "grad(pSource)")))
+    );
+    const surfaceScalarField& presSource = tpresSource();
 
-UpEqn.insertEquation(3, pEqn);
+    // Assemble pressure matrix with tensorial 1/Ap
+    tpEqn =
+    (
+        - fvm::laplacian(rAU, p)
+       ==
+        - fvc::div(presSource)
+    );
+}
+
+tpEqn().setReference(pRefCell, pRefValue);
+
+UpEqn.insertEquation(3, tpEqn());
