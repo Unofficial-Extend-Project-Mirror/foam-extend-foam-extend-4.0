@@ -105,7 +105,7 @@ export PARMGRIDGEN_INCLUDE_DIR=$PARMGRIDGEN_DIR/include
 
 # System installed Scotch
 #export SCOTCH_SYSTEM=1
-export SCOTCH_DIR=$WM_THIRD_PARTY_DIR/packages/scotch_6.0.0
+export SCOTCH_DIR=$WM_THIRD_PARTY_DIR/packages/scotch_6.0.4
 export SCOTCH_BIN_DIR=$SCOTCH_DIR/bin
 export SCOTCH_LIB_DIR=$SCOTCH_DIR/lib
 export SCOTCH_INCLUDE_DIR=$SCOTCH_DIR/include

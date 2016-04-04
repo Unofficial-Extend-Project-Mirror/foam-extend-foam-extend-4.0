@@ -55,7 +55,7 @@ LaunderGibsonRSTM::LaunderGibsonRSTM
 
     Cmu_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "Cmu",
             coeffDict_,
@@ -64,7 +64,7 @@ LaunderGibsonRSTM::LaunderGibsonRSTM
     ),
     kappa_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "kappa",
             coeffDict_,
@@ -73,7 +73,7 @@ LaunderGibsonRSTM::LaunderGibsonRSTM
     ),
     Clg1_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "Clg1",
             coeffDict_,
@@ -82,7 +82,7 @@ LaunderGibsonRSTM::LaunderGibsonRSTM
     ),
     Clg2_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "Clg2",
             coeffDict_,
@@ -91,7 +91,7 @@ LaunderGibsonRSTM::LaunderGibsonRSTM
     ),
     C1_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "C1",
             coeffDict_,
@@ -100,7 +100,7 @@ LaunderGibsonRSTM::LaunderGibsonRSTM
     ),
     C2_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "C2",
             coeffDict_,
@@ -109,7 +109,7 @@ LaunderGibsonRSTM::LaunderGibsonRSTM
     ),
     Cs_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "Cs",
             coeffDict_,
@@ -118,7 +118,7 @@ LaunderGibsonRSTM::LaunderGibsonRSTM
     ),
     Ceps_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "Ceps",
             coeffDict_,
@@ -127,7 +127,7 @@ LaunderGibsonRSTM::LaunderGibsonRSTM
     ),
     sigmaR_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "sigmaR",
             coeffDict_,
@@ -136,7 +136,7 @@ LaunderGibsonRSTM::LaunderGibsonRSTM
     ),
     sigmaEps_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "sigmaEps",
             coeffDict_,
@@ -145,7 +145,7 @@ LaunderGibsonRSTM::LaunderGibsonRSTM
     ),
     C1Ref_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "C1Ref",
             coeffDict_,
@@ -154,7 +154,7 @@ LaunderGibsonRSTM::LaunderGibsonRSTM
     ),
     C2Ref_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "C2Ref",
             coeffDict_,
@@ -163,7 +163,7 @@ LaunderGibsonRSTM::LaunderGibsonRSTM
     ),
     couplingFactor_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "couplingFactor",
             coeffDict_,

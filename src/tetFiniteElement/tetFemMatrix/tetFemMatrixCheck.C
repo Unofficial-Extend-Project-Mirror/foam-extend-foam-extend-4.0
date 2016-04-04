@@ -127,10 +127,7 @@ void tetFemMatrix<Type>::check()
                     *this,
                     coupledBouCoeffs[interfaceI],
                     0,
-                    static_cast<Pstream::commsTypes>
-                    (
-                        Pstream::defaultCommsType()
-                    ),
+                    Pstream::defaultComms(),
                     false                       // Do not switch to lhs
                 );
             }
@@ -148,7 +145,7 @@ void tetFemMatrix<Type>::check()
                     *this,
                     coupledBouCoeffs[interfaceI],
                     0,
-                    static_cast<Pstream::commsTypes>(Pstream::defaultCommsType()),
+                    Pstream::defaultComms(),
                     false                       // Do not switch to lhs
                 );
             }

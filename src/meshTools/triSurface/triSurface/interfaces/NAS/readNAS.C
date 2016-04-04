@@ -83,7 +83,7 @@ bool triSurface::readNAS(const fileName& fName)
     // coordinates of point
     DynamicList<point> points;
     // Nastran index of point
-    DynamicList<label> indices;
+    dynamicLabelList indices;
     // Faces in terms of Nastran point indices
     DynamicList<labelledTri> faces;
     // From face group to patch

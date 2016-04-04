@@ -1303,7 +1303,7 @@ void dynamicTopoFvMesh::buildVertexHull
     if (failMode)
     {
         // Prepare edgeCells
-        DynamicList<label> eCells(10);
+        dynamicLabelList eCells(10);
 
         forAll(eFaces, faceI)
         {

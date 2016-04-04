@@ -59,6 +59,10 @@ class lduInterfaceField
         //- Reference to the coupled patch this field is defined for
         const lduInterface& coupledInterface_;
 
+        //- Update index used so that updateInterfaceMatrix is called only once
+        //  during the construction of the matrix
+        bool updatedMatrix_;
+
 
     // Private Member Functions
 
@@ -80,13 +84,13 @@ public:
         //- Construct given coupled patch
         lduInterfaceField(const lduInterface& patch)
         :
-            coupledInterface_(patch)
+            coupledInterface_(patch),
+            updatedMatrix_(false)
         {}
 
 
-    // Destructor
-
-        virtual ~lduInterfaceField();
+    //- Destructor
+    virtual ~lduInterfaceField();
 
 
     // Member Functions
@@ -107,6 +111,24 @@ public:
 
 
         // Coupled interface matrix update
+
+            //- Whether matrix has been updated
+            bool updatedMatrix() const
+            {
+                return updatedMatrix_;
+            }
+
+            //- Whether matrix has been updated
+            bool& updatedMatrix()
+            {
+                return updatedMatrix_;
+            }
+
+            //- Is all data available
+            virtual bool ready() const
+            {
+                return true;
+            }
 
             //- Transform neighbour field
             virtual void transformCoupleField

@@ -257,6 +257,8 @@ public:
                 const CoeffField<Type>& f,
                 const labelList& addr
             );
+
+
     // Member operators
 
         void operator=(const CoeffField<Type>&);

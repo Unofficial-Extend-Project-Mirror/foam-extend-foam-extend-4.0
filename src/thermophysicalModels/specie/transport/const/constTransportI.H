@@ -134,6 +134,52 @@ inline constTransport<thermo>& constTransport<thermo>::operator=
 }
 
 
+template<class thermo>
+inline void Foam::constTransport<thermo>::operator+=
+(
+    const constTransport<thermo>& st
+)
+{
+    scalar molr1 = this->nMoles();
+
+    thermo::operator+=(st);
+
+    molr1 /= this->nMoles();
+    scalar molr2 = st.nMoles()/this->nMoles();
+
+    Mu = molr1*Mu + molr2*st.Mu;
+    rPr = 1.0/(molr1/rPr + molr2/st.rPr);
+}
+
+
+template<class thermo>
+inline void Foam::constTransport<thermo>::operator-=
+(
+    const constTransport<thermo>& st
+)
+{
+    scalar molr1 = this->nMoles();
+
+    thermo::operator-=(st);
+
+    molr1 /= this->nMoles();
+    scalar molr2 = st.nMoles()/this->nMoles();
+
+    Mu = molr1*Mu - molr2*st.Mu;
+    rPr = 1.0/(molr1/rPr - molr2/st.rPr);
+}
+
+
+template<class thermo>
+inline void Foam::constTransport<thermo>::operator*=
+(
+    const scalar s
+)
+{
+    thermo::operator*=(s);
+}
+
+
 // * * * * * * * * * * * * * * * Friend Operators  * * * * * * * * * * * * * //
 
 template<class thermo>

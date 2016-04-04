@@ -42,7 +42,20 @@ typedef Mixture<Transport<specieThermo<Thermo<EqnOfState> > > >               \
                                                                               \
 defineTemplateTypeNameAndDebugWithName                                        \
     (Mixture##Transport##Thermo##EqnOfState,                                  \
-    #Mixture"<"#Transport"<specieThermo<"#Thermo"<"#EqnOfState">>>>", 0)
+    #Mixture"<"#Transport"<specieThermo<"#Thermo"<"#EqnOfState">>>>", 0);
+
+
+#define makeBasicMixturePhys(Mixture,ThermoPhys)                              \
+                                                                              \
+typedef Mixture<ThermoPhys>   Mixture##ThermoPhys;                            \
+                                                                              \
+defineTemplateTypeNameAndDebugWithName                                        \
+(                                                                             \
+    Mixture##ThermoPhys,                                                      \
+    #Mixture"<"#ThermoPhys">",                                                \
+    0                                                                         \
+);
+
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

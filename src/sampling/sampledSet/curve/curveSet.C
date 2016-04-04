@@ -45,14 +45,14 @@ namespace Foam
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
-// Sample till hits boundary.
+// Sample till hits boundary
 bool Foam::curveSet::trackToBoundary
 (
     Particle<passiveParticle>& singleParticle,
     label& sampleI,
     DynamicList<point>& samplingPts,
-    DynamicList<label>& samplingCells,
-    DynamicList<label>& samplingFaces,
+    dynamicLabelList& samplingCells,
+    dynamicLabelList& samplingFaces,
     DynamicList<scalar>& samplingCurveDist
 ) const
 {
@@ -62,7 +62,9 @@ bool Foam::curveSet::trackToBoundary
     while(true)
     {
         // Local geometry info
-        const vector offset = sampleCoords_[sampleI+1] - sampleCoords_[sampleI];
+        const vector offset =
+            sampleCoords_[sampleI + 1] - sampleCoords_[sampleI];
+
         const scalar smallDist = mag(tol*offset);
 
         point oldPos = trackPt;
@@ -80,8 +82,6 @@ bool Foam::curveSet::trackToBoundary
 
         if (singleParticle.onBoundary())
         {
-            //Info<< "trackToBoundary : reached boundary"
-            //    << "  trackPt:" << trackPt << endl;
             if
             (
                 mag(trackPt - sampleCoords_[sampleI+1])
@@ -89,9 +89,6 @@ bool Foam::curveSet::trackToBoundary
             )
             {
                 // Reached samplePt on boundary
-                //Info<< "trackToBoundary : boundary. also sampling."
-                //    << "  trackPt:" << trackPt << " sampleI+1:" << sampleI+1
-                //    << endl;
                 samplingPts.append(trackPt);
                 samplingCells.append(singleParticle.cell());
                 samplingFaces.append(facei);
@@ -119,8 +116,6 @@ bool Foam::curveSet::trackToBoundary
         if (sampleI == sampleCoords_.size() - 1)
         {
             // no more samples.
-            //Info<< "trackToBoundary : Reached end : sampleI now:" << sampleI
-            //    << endl;
             return false;
         }
     }
@@ -130,9 +125,9 @@ bool Foam::curveSet::trackToBoundary
 void Foam::curveSet::calcSamples
 (
     DynamicList<point>& samplingPts,
-    DynamicList<label>& samplingCells,
-    DynamicList<label>& samplingFaces,
-    DynamicList<label>& samplingSegments,
+    dynamicLabelList& samplingCells,
+    dynamicLabelList& samplingFaces,
+    dynamicLabelList& samplingSegments,
     DynamicList<scalar>& samplingCurveDist
 ) const
 {
@@ -314,9 +309,9 @@ void Foam::curveSet::genSamples()
 {
     // Storage for sample points
     DynamicList<point> samplingPts;
-    DynamicList<label> samplingCells;
-    DynamicList<label> samplingFaces;
-    DynamicList<label> samplingSegments;
+    dynamicLabelList samplingCells;
+    dynamicLabelList samplingFaces;
+    dynamicLabelList samplingSegments;
     DynamicList<scalar> samplingCurveDist;
 
     calcSamples

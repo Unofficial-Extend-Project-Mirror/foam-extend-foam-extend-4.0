@@ -25,7 +25,17 @@ Class
     Foam::processorFvPatchField
 
 Description
-    Foam::processorFvPatchField
+    This boundary condition enables processor communication across patches.
+
+    \heading Patch usage
+
+    Example of the boundary condition specification:
+    \verbatim
+    myPatch
+    {
+        type            processor;
+    }
+    \endverbatim
 
 SourceFiles
     processorFvPatchField.C
@@ -45,7 +55,7 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                      Class processorFvPatchField Declaration
+                    Class processorFvPatchField Declaration
 \*---------------------------------------------------------------------------*/
 
 template<class Type>
@@ -132,9 +142,8 @@ public:
         }
 
 
-    // Destructor
-
-        ~processorFvPatchField();
+    //- Destructor
+    ~processorFvPatchField();
 
 
     // Member functions

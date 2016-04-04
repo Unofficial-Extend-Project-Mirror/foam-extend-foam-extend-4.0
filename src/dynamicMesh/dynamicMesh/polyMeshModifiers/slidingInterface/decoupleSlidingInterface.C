@@ -188,7 +188,7 @@ void Foam::slidingInterface::decoupleInterface
 
         const face& oldFace = faces[curFaceID];
 
-        DynamicList<label> newFaceLabels(oldFace.size());
+        dynamicLabelList newFaceLabels(oldFace.size());
 
         bool changed = false;
 
@@ -305,7 +305,7 @@ void Foam::slidingInterface::decoupleInterface
 
         const face& oldFace = faces[curFaceID];
 
-        DynamicList<label> newFaceLabels(oldFace.size());
+        dynamicLabelList newFaceLabels(oldFace.size());
 
         bool changed = false;
 

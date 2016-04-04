@@ -33,6 +33,14 @@ License
 
 // * * * * * * * * * * * * * * * Global Functions  * * * * * * * * * * * * * //
 
+// Note: all tolerances need to be global statics: closedDomainTol
+// taken outside of the function.  HJ, 25/Dec/2015
+static const Foam::debug::tolerancesSwitch closedDomainTol
+(
+    "closedDomainTol",
+    1e-10
+);
+
 bool Foam::adjustPhi
 (
     surfaceScalarField& phi,
@@ -115,12 +123,6 @@ bool Foam::adjustPhi
         reduce(adjustableMassOut, sumOp<scalar>());
 
         scalar massCorr = 1.0;
-
-        static const debug::tolerancesSwitch closedDomainTol
-        (
-            "closedDomainTol",
-            1e-10
-        );
 
         if (mag(adjustableMassOut) > SMALL)
         {

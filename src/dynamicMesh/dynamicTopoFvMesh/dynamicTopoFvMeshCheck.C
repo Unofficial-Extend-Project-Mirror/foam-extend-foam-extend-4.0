@@ -710,7 +710,7 @@ void dynamicTopoFvMesh::writeEdgeConnectivity
         2, false, true
     );
 
-    DynamicList<label> edgeCells(10);
+    dynamicLabelList edgeCells(10);
 
     forAll(eFaces, faceI)
     {
@@ -896,7 +896,7 @@ void dynamicTopoFvMesh::writeVTK
             meshSubDict.subDict("spatialDebug").lookup("debugBoundBox")
         );
 
-        DynamicList<label> cSubList(10);
+        dynamicLabelList cSubList(10);
 
         forAll(cList, cellI)
         {
@@ -1464,7 +1464,7 @@ void dynamicTopoFvMesh::checkConnectivity(const label maxErrors) const
     }
 
     label nInternalEdges = 0;
-    DynamicList<label> bPatchIDs(10);
+    dynamicLabelList bPatchIDs(10);
     labelList patchInfo(boundaryMesh().size(), 0);
 
     forAll(edgeFaces_, edgeI)
@@ -2189,7 +2189,7 @@ bool dynamicTopoFvMesh::checkCollapse
     const point& oldPoint,
     const label pointIndex,
     const label cellIndex,
-    DynamicList<label>& cellsChecked,
+    dynamicLabelList& cellsChecked,
     scalar& collapseQuality,
     bool forceOp
 ) const

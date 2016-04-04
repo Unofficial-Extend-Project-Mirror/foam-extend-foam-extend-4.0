@@ -67,7 +67,6 @@ void Foam::BlockGaussSeidelPrecon<Type>::calcInvDiag()
         // For square diagonal invert diagonal only and store the rest
         // info LUDiag coefficient.  This avoids full inverse of the
         // diagonal matrix.  HJ, 20/Aug/2015
-        Info<< "Square diag inverse" << endl;
 
         // Get reference to active diag
         const squareTypeField& activeDiag = d.asSquare();
@@ -83,7 +82,7 @@ void Foam::BlockGaussSeidelPrecon<Type>::calcInvDiag()
         // Expand diagonal only to full square type and store into luDiag
         expandLinear(luDiag, lf);
 
-        // Keep only off-diagonal in ldDiag.
+        // Keep only off-diagonal in luDiag.
         // Note change of sign to avoid multiplication with -1 when moving
         // to the other side.  HJ, 20/Aug/2015
         luDiag -= activeDiag;
@@ -204,13 +203,7 @@ void Foam::BlockGaussSeidelPrecon<Type>::BlockSweep
             // Finish current x
             curX = mult(dD[rowI], curX);
 
-            // Distribute the neighbour side using current x
-            for (curCoeff = fStart; curCoeff < fEnd; curCoeff++)
-            {
-                // lower = upper transposed
-                bPrime_[u[curCoeff]] -=
-                    mult(mult.transpose(upper[curCoeff]), curX);
-            }
+            // No need to update bPrime on reverse sweep. VV, 10/Sep/2015.
         }
     }
 }
@@ -312,11 +305,7 @@ void Foam::BlockGaussSeidelPrecon<Type>::BlockSweep
             // Finish current x
             curX = mult(dD[rowI], curX);
 
-            // Distribute the neighbour side using current x
-            for (curCoeff = fStart; curCoeff < fEnd; curCoeff++)
-            {
-                bPrime_[u[curCoeff]] -= mult(lower[curCoeff], curX);
-            }
+            // No need to update bPrime on reverse sweep. VV, 10/Sep/2015.
         }
     }
 }

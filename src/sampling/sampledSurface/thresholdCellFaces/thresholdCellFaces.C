@@ -83,7 +83,7 @@ void Foam::thresholdCellFaces::calculate
     meshCells_.clear();
 
     DynamicList<face>  surfFaces(0.5 * mesh_.nFaces());
-    DynamicList<label> surfCells(surfFaces.size());
+    dynamicLabelList surfCells(surfFaces.size());
 
     labelList oldToNewPoints(origPoints.size(), -1);
 

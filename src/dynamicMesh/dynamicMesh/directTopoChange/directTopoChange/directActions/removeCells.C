@@ -144,7 +144,7 @@ Foam::labelList Foam::removeCells::getExposedFaces
     // 2 : unaffected internal face
     //     unaffected coupled boundary face
 
-    DynamicList<label> exposedFaces(mesh_.nFaces()/10);
+    dynamicLabelList exposedFaces(mesh_.nFaces()/10);
 
     for (label faceI = 0; faceI < mesh_.nInternalFaces(); faceI++)
     {

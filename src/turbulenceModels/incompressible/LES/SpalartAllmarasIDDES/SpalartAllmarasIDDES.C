@@ -150,7 +150,7 @@ SpalartAllmarasIDDES::SpalartAllmarasIDDES
 
     fwStar_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "fwStar",
             coeffDict_,
@@ -159,7 +159,7 @@ SpalartAllmarasIDDES::SpalartAllmarasIDDES
     ),
     cl_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "cl",
             coeffDict_,
@@ -168,7 +168,7 @@ SpalartAllmarasIDDES::SpalartAllmarasIDDES
     ),
     ct_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "ct",
             coeffDict_,

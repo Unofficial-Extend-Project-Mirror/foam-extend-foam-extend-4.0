@@ -107,7 +107,9 @@ void Foam::overlapGgiFvPatch::makeCorrVecs(vectorField& cv) const
 
 const Foam::overlapGgiFvPatch& Foam::overlapGgiFvPatch::shadow() const
 {
-    const fvPatch& p = this->boundaryMesh()[overlapGgiPolyPatch_.shadowIndex()];
+    const fvPatch& p =
+        this->boundaryMesh()[overlapGgiPolyPatch_.shadowIndex()];
+
     return refCast<const overlapGgiFvPatch>(p);
 }
 
@@ -128,7 +130,8 @@ Foam::tmp<Foam::vectorField> Foam::overlapGgiFvPatch::delta() const
 
         return interpolate
         (
-            shadow().Cn() - overlapGgiPolyPatch_.shadow().reconFaceCellCentres()
+            shadow().Cn()
+          - overlapGgiPolyPatch_.shadow().reconFaceCellCentres()
         );
     }
 }

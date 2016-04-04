@@ -123,7 +123,7 @@
 
 
         // Points below the piston which moves with the piston displacement
-        DynamicList<label> pistonPoints(nPoints() / 10);
+        dynamicLabelList pistonPoints(nPoints() / 10);
 
         forAll (points(), pointI)
         {
@@ -187,7 +187,7 @@
         scalar zPistV = max(boundary()[pistonPatchID].patch().localPoints()).z();
 
         // Points below the piston which moves with the piston displacement
-        DynamicList<label> pistonPoints(nPoints() / 10);
+        dynamicLabelList pistonPoints(nPoints() / 10);
 
         forAll (points(), pointI)
         {

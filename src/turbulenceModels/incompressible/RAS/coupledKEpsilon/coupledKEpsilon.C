@@ -56,7 +56,7 @@ coupledKEpsilon::coupledKEpsilon
 
     Cmu_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "Cmu",
             coeffDict_,
@@ -65,7 +65,7 @@ coupledKEpsilon::coupledKEpsilon
     ),
     C1_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "C1",
             coeffDict_,
@@ -74,7 +74,7 @@ coupledKEpsilon::coupledKEpsilon
     ),
     C2_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "C2",
             coeffDict_,
@@ -83,7 +83,7 @@ coupledKEpsilon::coupledKEpsilon
     ),
     sigmaEps_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "sigmaEps",
             coeffDict_,
@@ -253,9 +253,10 @@ void coupledKEpsilon::correct()
           + fvm::div(phi_, epsilon_)
           + fvm::SuSp(-fvc::div(phi_), epsilon_)
           - fvm::laplacian(DepsilonEff(), epsilon_)
-          + fvm::Sp(C2_*epsilon_/k_, epsilon_)
+          + fvm::Sp(2*C2_*epsilon_/k_, epsilon_)
          ==
-            C1_*G*epsilon_/k_
+            2*C1_*Cmu_*magSqr(symm(fvc::grad(U_)))*k_
+          + C2_*sqr(epsilon_)/k_
         );
 
         epsEqn.relax();
@@ -263,14 +264,12 @@ void coupledKEpsilon::correct()
 
         keEqn.insertEquation(1, epsEqn);
 
-        // Add coupling term:
-        // G_epsilon = C1*Cmu*(symm(grad(U))) k
-        // but with wall function corrections: must be calculated from G
-        // HJ, 27/Apr/2015
+        // Coupling term
         volScalarField coupling
         (
             "coupling",
-            -C1_*G*epsilon_/sqr(k_)
+            -2*C1_*Cmu_*magSqr(symm(fvc::grad(U_)))
+           - C2_*sqr(epsilon_/k_)
         );
         scalarField& couplingIn = coupling.internalField();
 
@@ -288,13 +287,16 @@ void coupledKEpsilon::correct()
 
     // Turbulent kinetic energy equation
     {
+        dimensionedScalar nutSmall("nutSmall", nut_.dimensions(), SMALL);
+
         fvScalarMatrix kEqn
         (
             fvm::ddt(k_)
           + fvm::div(phi_, k_)
           + fvm::SuSp(-fvc::div(phi_), k_)
           - fvm::laplacian(DkEff(), k_)
-          + fvm::SuSp((epsilon_ - G)/k_, k_)
+          + fvm::Sp(Cmu_*k_/(nut_ + nutSmall), k_)
+          - G
         );
 
         kEqn.relax();
@@ -302,30 +304,21 @@ void coupledKEpsilon::correct()
         keEqn.insertEquation(0, kEqn);
     }
 
-    // Add coupling term: C1*Cmu*(symm(grad(U))) k but with wall function
-    // corrections: must be calculated from G.  HJ, 27/Apr/2015
-
-    // Add coupling term: epsilon source depends on k
-    // k, e sink terms cannot be changed because of boundedness
-    keEqn.insertEquationCoupling
-    (
-        1, 0, -C1_*G*epsilon_/sqr(k_)
-    );
-
     // Update source coupling: coupling terms eliminated from source
     keEqn.updateSourceCoupling();
 
+    // Solve the block matrix
     keEqn.solve();
 
     // Retrieve solution
     keEqn.retrieveSolution(0, k_.internalField());
     keEqn.retrieveSolution(1, epsilon_.internalField());
 
-    k_.correctBoundaryConditions();
-    epsilon_.correctBoundaryConditions();
-
     bound(epsilon_, epsilon0_);
     bound(k_, k0_);
+
+    k_.correctBoundaryConditions();
+    epsilon_.correctBoundaryConditions();
 
     // Re-calculate viscosity
     nut_ = Cmu_*sqr(k_)/epsilon_;

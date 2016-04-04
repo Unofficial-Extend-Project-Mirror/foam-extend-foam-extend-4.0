@@ -128,7 +128,7 @@ public:
         ) const;
 
         //- Return the BlockLduSystem corresponding to the implicit face
-        // limted grad discretization. For block coupled systems.
+        // limited grad discretization. For block coupled systems.
         tmp
         <
             BlockLduSystem<vector, typename outerProduct<vector, Type>::type>

@@ -57,7 +57,7 @@ void smoothDelta::setChangedFaces
 (
     const polyMesh& mesh,
     const volScalarField& delta,
-    DynamicList<label>& changedFaces,
+    dynamicLabelList& changedFaces,
     DynamicList<deltaData>& changedFacesInfo
 )
 {
@@ -112,7 +112,7 @@ void smoothDelta::calcDelta()
     const volScalarField& geometricDelta = geometricDelta_();
 
     // Fill changed faces with info
-    DynamicList<label> changedFaces(mesh_.nFaces()/100 + 100);
+    dynamicLabelList changedFaces(mesh_.nFaces()/100 + 100);
     DynamicList<deltaData> changedFacesInfo(changedFaces.size());
 
     setChangedFaces(mesh_, geometricDelta, changedFaces, changedFacesInfo);

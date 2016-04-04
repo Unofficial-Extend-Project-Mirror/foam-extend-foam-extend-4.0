@@ -246,6 +246,7 @@ $(lduMatrix)/lduMatrix/lduMatrixUpdateMatrixInterfaces.C
 $(lduMatrix)/lduMatrix/lduMatrixSolver.C
 $(lduMatrix)/lduMatrix/lduMatrixSmoother.C
 $(lduMatrix)/lduMatrix/lduMatrixPreconditioner.C
+$(lduMatrix)/lduMatrix/extendedLduMatrix/extendedLduMatrix.C
 
 $(lduMatrix)/solvers/diagonalSolver/diagonalSolver.C
 $(lduMatrix)/solvers/smoothSolver/smoothSolver.C
@@ -269,6 +270,7 @@ $(lduMatrix)/preconditioners/GAMGPreconditioner/GAMGPreconditioner.C
 
 lduAddressing = $(lduMatrix)/lduAddressing
 $(lduAddressing)/lduAddressing.C
+$(lduAddressing)/extendedLduAddressing/extendedLduAddressing.C
 $(lduAddressing)/lduInterface/lduInterface.C
 $(lduAddressing)/lduInterface/processorLduInterface.C
 $(lduAddressing)/lduInterface/cyclicLduInterface.C
@@ -662,6 +664,12 @@ matrices/blockLduMatrix/BlockLduMatrix/tensorBlockLduMatrix.C
 matrices/blockLduMatrix/BlockLduMatrix/blockVectorNMatrices.C
 matrices/blockLduMatrix/BlockLduMatrix/BlockConstraint/scalarBlockConstraint.C
 
+matrices/blockLduMatrix/BlockLduMatrix/extendedBlockLduMatrix/extendedBlockLduMatrices.C
+matrices/blockLduMatrix/BlockLduMatrix/extendedBlockLduMatrix/sphericalTensorExtendedBlockLduMatrix.C
+matrices/blockLduMatrix/BlockLduMatrix/extendedBlockLduMatrix/symmTensorExtendedBlockLduMatrix.C
+matrices/blockLduMatrix/BlockLduMatrix/extendedBlockLduMatrix/tensorExtendedBlockLduMatrix.C
+matrices/blockLduMatrix/BlockLduMatrix/extendedBlockLduMatrix/extendedBlockVectorNMatrices.C
+
 BlockLduInterfaceField = matrices/blockLduMatrix/BlockLduMatrix/BlockLduInterfaceField
 $(BlockLduInterfaceField)/BlockLduInterfaceFields.C
 $(BlockLduInterfaceField)/processorBlockLduInterfaceField/processorBlockLduInterfaceFields.C
@@ -696,9 +704,14 @@ matrices/blockLduMatrix/BlockLduPrecons/BlockDiagCholeskyPrecon/blockDiagCholesk
 
 matrices/blockLduMatrix/BlockLduPrecons/BlockAmgPrecon/blockAmgPrecons.C
 
+matrices/blockLduMatrix/BlockLduPrecons/BlockILUCpPrecon/scalarBlockILUCpPrecon.C
+matrices/blockLduMatrix/BlockLduPrecons/BlockILUCpPrecon/tensorBlockILUCpPrecon.C
+matrices/blockLduMatrix/BlockLduPrecons/BlockILUCpPrecon/blockILUCpPrecons.C
+
 matrices/blockLduMatrix/BlockLduSmoothers/BlockLduSmoother/blockLduSmoothers.C
 matrices/blockLduMatrix/BlockLduSmoothers/BlockGaussSeidelSmoother/blockGaussSeidelSmoothers.C
 matrices/blockLduMatrix/BlockLduSmoothers/BlockILUSmoother/blockILUSmoothers.C
+matrices/blockLduMatrix/BlockLduSmoothers/BlockILUCpSmoother/blockILUCpSmoothers.C
 
 /* compile blockVectorNSolvers earlier to exploit parallelismn */
 matrices/blockLduMatrix/BlockLduSolvers/blockVectorNSolvers.C

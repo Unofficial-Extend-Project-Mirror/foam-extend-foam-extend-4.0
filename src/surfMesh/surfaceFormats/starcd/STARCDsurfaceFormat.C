@@ -120,9 +120,9 @@ bool Foam::fileFormats::STARCDsurfaceFormat<Face>::read
     readHeader(is, "PROSTAR_CELL");
 
     DynamicList<Face>  dynFaces;
-    DynamicList<label> dynZones;
+    dynamicLabelList dynZones;
     DynamicList<word>  dynNames;
-    DynamicList<label> dynSizes;
+    dynamicLabelList dynSizes;
     Map<label> lookup;
 
     // assume the cellTableIds are not intermixed
@@ -130,7 +130,7 @@ bool Foam::fileFormats::STARCDsurfaceFormat<Face>::read
     label zoneI = 0;
 
     label lineLabel, shapeId, nLabels, cellTableId, typeId;
-    DynamicList<label> vertexLabels(64);
+    dynamicLabelList vertexLabels(64);
 
     while ((is >> lineLabel).good())
     {

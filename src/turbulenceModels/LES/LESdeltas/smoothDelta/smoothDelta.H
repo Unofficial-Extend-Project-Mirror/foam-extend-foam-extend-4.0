@@ -213,7 +213,7 @@ class smoothDelta
         (
             const polyMesh& mesh,
             const volScalarField& delta,
-            DynamicList<label>& changedFaces,
+            dynamicLabelList& changedFaces,
             DynamicList<deltaData>& changedFacesInfo
         );
 

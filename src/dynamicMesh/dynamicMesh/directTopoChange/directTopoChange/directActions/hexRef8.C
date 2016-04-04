@@ -881,7 +881,7 @@ void Foam::hexRef8::insertEdgeSplit
     const labelList& edgeMidPoint,
     const label p0,
     const label p1,
-    DynamicList<label>& verts
+    dynamicLabelList& verts
 ) const
 {
     if (p0 < mesh_.nPoints() && p1 < mesh_.nPoints())
@@ -994,7 +994,7 @@ Foam::label Foam::hexRef8::storeMidPointInfo
         // might be marked for splitting. Note that these edge splits cannot
         // be between cellMid and face mids.
 
-        DynamicList<label> newFaceVerts(4);
+        dynamicLabelList newFaceVerts(4);
         if (faceOrder == (mesh_.faceOwner()[faceI] == cellI))
         {
             newFaceVerts.append(faceMidPointI);
@@ -1388,7 +1388,7 @@ void Foam::hexRef8::walkFaceToMid
     const label cLevel,
     const label faceI,
     const label startFp,
-    DynamicList<label>& faceVerts
+    dynamicLabelList& faceVerts
 ) const
 {
     const face& f = mesh_.faces()[faceI];
@@ -1437,7 +1437,7 @@ void Foam::hexRef8::walkFaceFromMid
     const label cLevel,
     const label faceI,
     const label startFp,
-    DynamicList<label>& faceVerts
+    dynamicLabelList& faceVerts
 ) const
 {
     const face& f = mesh_.faces()[faceI];
@@ -2104,7 +2104,7 @@ Foam::labelList Foam::hexRef8::consistentSlowRefinement
 
 
     // Labels of seed faces
-    DynamicList<label> seedFaces(mesh_.nFaces()/100);
+    dynamicLabelList seedFaces(mesh_.nFaces()/100);
     // refinementLevel data on seed faces
     DynamicList<refinementData> seedFacesInfo(mesh_.nFaces()/100);
 
@@ -2597,7 +2597,7 @@ Foam::labelList Foam::hexRef8::consistentSlowRefinement2
 
 
     // Labels of seed faces
-    DynamicList<label> seedFaces(mesh_.nFaces()/100);
+    dynamicLabelList seedFaces(mesh_.nFaces()/100);
     // refinementLevel data on seed faces
     DynamicList<refinementDistanceData> seedFacesInfo(mesh_.nFaces()/100);
 
@@ -2988,12 +2988,12 @@ Foam::labelListList Foam::hexRef8::setRefinement
 
 
     // New point/cell level. Copy of pointLevel for existing points.
-    DynamicList<label> newCellLevel(cellLevel_.size());
+    dynamicLabelList newCellLevel(cellLevel_.size());
     forAll(cellLevel_, cellI)
     {
         newCellLevel.append(cellLevel_[cellI]);
     }
-    DynamicList<label> newPointLevel(pointLevel_.size());
+    dynamicLabelList newPointLevel(pointLevel_.size());
     forAll(pointLevel_, pointI)
     {
         newPointLevel.append(pointLevel_[pointI]);
@@ -3608,7 +3608,7 @@ Foam::labelListList Foam::hexRef8::setRefinement
                 {
                     // point is anchor. Start collecting face.
 
-                    DynamicList<label> faceVerts(4);
+                    dynamicLabelList faceVerts(4);
 
                     faceVerts.append(pointI);
 
@@ -3740,7 +3740,7 @@ Foam::labelListList Foam::hexRef8::setRefinement
                     const face& f = mesh_.faces()[faceI];
                     const labelList& fEdges = mesh_.faceEdges()[faceI];
 
-                    DynamicList<label> newFaceVerts(f.size());
+                    dynamicLabelList newFaceVerts(f.size());
 
                     forAll(f, fp)
                     {

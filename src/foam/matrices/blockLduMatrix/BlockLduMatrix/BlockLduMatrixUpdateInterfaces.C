@@ -41,8 +41,8 @@ void Foam::BlockLduMatrix<Type>::initInterfaces
 {
     if
     (
-        Pstream::defaultCommsType() == Pstream::blocking
-     || Pstream::defaultCommsType() == Pstream::nonBlocking
+        Pstream::defaultComms() == Pstream::blocking
+     || Pstream::defaultComms() == Pstream::nonBlocking
     )
     {
         forAll (interfaces_, interfaceI)
@@ -55,13 +55,13 @@ void Foam::BlockLduMatrix<Type>::initInterfaces
                     result,
                     *this,
                     interfaceCoeffs[interfaceI],
-                    static_cast<const Pstream::commsTypes>(Pstream::defaultCommsType()),
+                    Pstream::defaultComms(),
                     switchToLhs
                 );
             }
         }
     }
-    else if (Pstream::defaultCommsType() == Pstream::scheduled)
+    else if (Pstream::defaultComms() == Pstream::scheduled)
     {
         const lduSchedule& patchSchedule = this->patchSchedule();
 
@@ -107,18 +107,29 @@ void Foam::BlockLduMatrix<Type>::updateInterfaces
     const bool switchToLhs
 ) const
 {
-    if
-    (
-        Pstream::defaultCommsType() == Pstream::blocking
-     || Pstream::defaultCommsType() == Pstream::nonBlocking
-    )
+    if (Pstream::defaultComms() == Pstream::blocking)
+    {
+        forAll (interfaces_, interfaceI)
+        {
+            if (interfaces_.set(interfaceI))
+            {
+                interfaces_[interfaceI].updateInterfaceMatrix
+                (
+                    psi,
+                    result,
+                    *this,
+                    interfaceCoeffs[interfaceI],
+                    Pstream::defaultComms(),
+                    switchToLhs
+                );
+            }
+        }
+    }
+    else if (Pstream::defaultComms() == Pstream::nonBlocking)
     {
         // Block until all sends/receives have been finished
-        if (Pstream::defaultCommsType() == Pstream::nonBlocking)
-        {
-            IPstream::waitRequests();
-            OPstream::waitRequests();
-        }
+        IPstream::waitRequests();
+        OPstream::waitRequests();
 
         forAll (interfaces_, interfaceI)
         {
@@ -130,13 +141,13 @@ void Foam::BlockLduMatrix<Type>::updateInterfaces
                     result,
                     *this,
                     interfaceCoeffs[interfaceI],
-                    static_cast<Pstream::commsTypes>(Pstream::defaultCommsType()),
+                    Pstream::defaultComms(),
                     switchToLhs
                 );
             }
         }
     }
-    else if (Pstream::defaultCommsType() == Pstream::scheduled)
+    else if (Pstream::defaultComms() == Pstream::scheduled)
     {
         const lduSchedule& patchSchedule = this->patchSchedule();
 

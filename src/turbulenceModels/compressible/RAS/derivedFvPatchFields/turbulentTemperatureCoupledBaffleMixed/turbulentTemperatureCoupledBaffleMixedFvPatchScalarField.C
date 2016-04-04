@@ -233,7 +233,7 @@ void turbulentTemperatureCoupledBaffleMixedFvPatchScalarField::updateCoeffs()
     scalarField nbrIntFld = nbrField.patchInternalField();
     mapDistribute::distribute
     (
-        static_cast<Pstream::commsTypes>(Pstream::defaultCommsType()),
+        Pstream::defaultComms(),
         distMap.schedule(),
         distMap.constructSize(),
         distMap.subMap(),           // what to send
@@ -245,7 +245,7 @@ void turbulentTemperatureCoupledBaffleMixedFvPatchScalarField::updateCoeffs()
     scalarField nbrKappaDelta = nbrField.Kappa()*nbrPatch.deltaCoeffs();
     mapDistribute::distribute
     (
-        static_cast<Pstream::commsTypes>(Pstream::defaultCommsType()),
+        Pstream::defaultComms(),
         distMap.schedule(),
         distMap.constructSize(),
         distMap.subMap(),           // what to send

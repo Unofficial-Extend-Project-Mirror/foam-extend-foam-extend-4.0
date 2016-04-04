@@ -22,7 +22,7 @@ License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Description
-     Block matrix member static data members
+    Block matrix member static data members
 
 Author
     Hrvoje Jasak, Wikki Ltd.  All rights reserved.

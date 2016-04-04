@@ -73,7 +73,7 @@ bool Foam::accordionEngineMesh::update()
 #       include "setPistonMotionBoundaryConditionAccordionEngineMesh.H"
         Info << "piston motion" << endl;
 
-        DynamicList<label> constrainedPoints(mSolver.curPoints()().size()/100);
+        dynamicLabelList constrainedPoints(mSolver.curPoints()().size()/100);
         DynamicList<vector> constrainedVelocity
         (
             mSolver.curPoints()().size()/100

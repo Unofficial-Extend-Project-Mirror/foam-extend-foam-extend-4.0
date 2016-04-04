@@ -82,10 +82,10 @@ class changeMap
     DynamicList<objectMap> addedCells_;
 
     // Entities that were removed during the operation
-    DynamicList<label> removedPoints_;
-    DynamicList<label> removedEdges_;
-    DynamicList<label> removedFaces_;
-    DynamicList<label> removedCells_;
+    dynamicLabelList removedPoints_;
+    dynamicLabelList removedEdges_;
+    dynamicLabelList removedFaces_;
+    dynamicLabelList removedCells_;
 
 public:
 

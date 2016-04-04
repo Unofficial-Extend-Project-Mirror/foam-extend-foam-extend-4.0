@@ -350,7 +350,7 @@ bool Foam::thoboisMesh::update()
         motionU.correctBoundaryConditions();
 
 
-        DynamicList<label> constrainedPoints(mSolver.curPoints()().size()/100);
+        dynamicLabelList constrainedPoints(mSolver.curPoints()().size()/100);
         DynamicList<vector> constrainedVelocity
         (
             mSolver.curPoints()().size()/100
@@ -404,7 +404,7 @@ bool Foam::thoboisMesh::update()
     {
 #       include "setValveMotionBoundaryConditionThobois.H"
 #       include "setPistonMotionBoundaryConditionThobois.H"
-        DynamicList<label> constrainedPoints(mSolver.curPoints()().size()/100);
+        dynamicLabelList constrainedPoints(mSolver.curPoints()().size()/100);
         DynamicList<vector> constrainedVelocity
         (
             mSolver.curPoints()().size()/100

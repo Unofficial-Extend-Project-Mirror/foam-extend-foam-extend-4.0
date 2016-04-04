@@ -229,7 +229,7 @@ Foam::label Foam::autoLayerDriver::mergePatchFacesUndo
             // Check any master cells for using any of the error faces
             // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-            DynamicList<label> mastersToRestore(allFaceSets.size());
+            dynamicLabelList mastersToRestore(allFaceSets.size());
 
             forAll(allFaceSets, setI)
             {
@@ -3276,7 +3276,7 @@ void Foam::autoLayerDriver::doLayers
     const labelList& numLayers = layerParams.numLayers();
 
     // Patches that need to get a layer
-    DynamicList<label> patchIDs(numLayers.size());
+    dynamicLabelList patchIDs(numLayers.size());
     label nFacesWithLayers = 0;
     forAll(numLayers, patchI)
     {

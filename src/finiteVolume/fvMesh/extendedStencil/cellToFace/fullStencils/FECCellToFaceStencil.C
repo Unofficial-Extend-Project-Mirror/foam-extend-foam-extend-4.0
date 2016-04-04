@@ -168,8 +168,8 @@ void Foam::FECCellToFaceStencil::calcFaceStencil
     // Do remaining edges by looping over all faces
 
     // Work arrays
-    DynamicList<label> fEdgesSet;
-    DynamicList<label> eFacesSet;
+    dynamicLabelList fEdgesSet;
+    dynamicLabelList eFacesSet;
     labelHashSet faceStencilSet;
 
     for (label faceI = 0; faceI < mesh().nInternalFaces(); faceI++)

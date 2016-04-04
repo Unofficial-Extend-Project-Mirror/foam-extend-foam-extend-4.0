@@ -40,7 +40,7 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class interpolationCellPointFace Declaration
+                   Class interpolationCellPointFace Declaration
 \*---------------------------------------------------------------------------*/
 
 template<class Type>

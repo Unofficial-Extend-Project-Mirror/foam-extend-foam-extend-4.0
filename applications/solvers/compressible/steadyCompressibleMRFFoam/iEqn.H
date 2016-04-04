@@ -53,4 +53,5 @@
     i = h - 0.5*magSqr(Urot);
 
     thermo.correct();
+    psis = thermo.psi()/thermo.Cp()*thermo.Cv();
 }

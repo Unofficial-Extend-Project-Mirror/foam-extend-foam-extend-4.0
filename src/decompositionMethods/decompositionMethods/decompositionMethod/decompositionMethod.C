@@ -341,7 +341,7 @@ void Foam::decompositionMethod::calcCellCells
         )   << "Only valid for mesh agglomeration." << exit(FatalError);
     }
 
-    List<DynamicList<label> > dynCellCells(nCoarse);
+    List<dynamicLabelList > dynCellCells(nCoarse);
 
     forAll(mesh.faceNeighbour(), faceI)
     {

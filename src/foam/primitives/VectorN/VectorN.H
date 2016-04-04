@@ -70,6 +70,8 @@ public:
         static const char* const typeName;
         static const VectorN zero;
         static const VectorN one;
+        static const VectorN max;
+        static const VectorN min;
 
 
     // Constructors

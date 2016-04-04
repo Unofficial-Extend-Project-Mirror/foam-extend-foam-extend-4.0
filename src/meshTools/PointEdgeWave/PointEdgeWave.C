@@ -343,9 +343,9 @@ void Foam::PointEdgeWave<Type>::getChangedPatchPoints
     const primitivePatch& patch,
 
     DynamicList<Type>& patchInfo,
-    DynamicList<label>& patchPoints,
-    DynamicList<label>& owner,
-    DynamicList<label>& ownerIndex
+    dynamicLabelList& patchPoints,
+    dynamicLabelList& owner,
+    dynamicLabelList& ownerIndex
 ) const
 {
     const labelList& meshPoints = patch.meshPoints();
@@ -446,9 +446,9 @@ void Foam::PointEdgeWave<Type>::handleProcPatches()
             // Get all changed points in relative addressing
 
             DynamicList<Type> patchInfo(patch.nPoints());
-            DynamicList<label> patchPoints(patch.nPoints());
-            DynamicList<label> owner(patch.nPoints());
-            DynamicList<label> ownerIndex(patch.nPoints());
+            dynamicLabelList patchPoints(patch.nPoints());
+            dynamicLabelList owner(patch.nPoints());
+            dynamicLabelList ownerIndex(patch.nPoints());
 
             getChangedPatchPoints
             (
@@ -594,9 +594,9 @@ void Foam::PointEdgeWave<Type>::handleCyclicPatches()
             // HalfA : get all changed points in relative addressing
 
             DynamicList<Type> halfAInfo(halfA.nPoints());
-            DynamicList<label> halfAPoints(halfA.nPoints());
-            DynamicList<label> halfAOwner(halfA.nPoints());
-            DynamicList<label> halfAIndex(halfA.nPoints());
+            dynamicLabelList halfAPoints(halfA.nPoints());
+            dynamicLabelList halfAOwner(halfA.nPoints());
+            dynamicLabelList halfAIndex(halfA.nPoints());
 
             getChangedPatchPoints
             (
@@ -610,9 +610,9 @@ void Foam::PointEdgeWave<Type>::handleCyclicPatches()
             // HalfB : get all changed points in relative addressing
 
             DynamicList<Type> halfBInfo(halfB.nPoints());
-            DynamicList<label> halfBPoints(halfB.nPoints());
-            DynamicList<label> halfBOwner(halfB.nPoints());
-            DynamicList<label> halfBIndex(halfB.nPoints());
+            dynamicLabelList halfBPoints(halfB.nPoints());
+            dynamicLabelList halfBOwner(halfB.nPoints());
+            dynamicLabelList halfBIndex(halfB.nPoints());
 
             getChangedPatchPoints
             (
@@ -793,11 +793,11 @@ void Foam::PointEdgeWave<Type>::handleGgiPatches()
             {
                 // 1. Collect all point info on master side
                 DynamicList<Type> masterInfo(master.nPoints());
-                DynamicList<label> masterOwner(master.nPoints());
-                DynamicList<label> masterOwnerIndex(master.nPoints());
+                dynamicLabelList masterOwner(master.nPoints());
+                dynamicLabelList masterOwnerIndex(master.nPoints());
 
                 {
-                    DynamicList<label> patchPoints(master.nPoints());
+                    dynamicLabelList patchPoints(master.nPoints());
 
                     // Get all changed points in relative addressing
                     getChangedPatchPoints
@@ -827,11 +827,11 @@ void Foam::PointEdgeWave<Type>::handleGgiPatches()
 
                 // 2. Collect all point info on slave side
                 DynamicList<Type> slaveInfo(slave.nPoints());
-                DynamicList<label> slaveOwner(slave.nPoints());
-                DynamicList<label> slaveOwnerIndex(slave.nPoints());
+                dynamicLabelList slaveOwner(slave.nPoints());
+                dynamicLabelList slaveOwnerIndex(slave.nPoints());
 
                 {
-                    DynamicList<label> patchPoints(slave.nPoints());
+                    dynamicLabelList patchPoints(slave.nPoints());
 
                     // Get all changed points in relative addressing
                     getChangedPatchPoints

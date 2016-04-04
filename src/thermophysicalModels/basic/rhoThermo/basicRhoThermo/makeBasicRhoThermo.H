@@ -58,6 +58,25 @@ addToRunTimeSelectionTable                                                    \
 )
 
 
+#define makeBasicRhoThermoPhys(CThermo,Mixture,ThermoPhys)                    \
+                                                                              \
+typedef CThermo<Mixture<ThermoPhys> >                                         \
+    CThermo##Mixture##ThermoPhys;                                             \
+                                                                              \
+defineTemplateTypeNameAndDebugWithName                                        \
+(                                                                             \
+    CThermo##Mixture##ThermoPhys,                                             \
+    #CThermo"<"#Mixture"<"#ThermoPhys">>",                                    \
+    0                                                                         \
+);                                                                            \
+                                                                              \
+addToRunTimeSelectionTable                                                    \
+(                                                                             \
+    basicRhoThermo,                                                           \
+    CThermo##Mixture##ThermoPhys,                                             \
+    fvMesh                                                                    \
+);
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #endif

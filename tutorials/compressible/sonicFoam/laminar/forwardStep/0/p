@@ -28,17 +28,17 @@ boundaryField
 
     outlet
     {
-        type            waveTransmissive;
-        field           p;
-        phi             phi;
-        rho             rho;
-        psi             psi;
-        gamma           1.4;
-        fieldInf        1;
-        lInf            3;
-        inletOutlet     off;
-        correctSupercritical off;
-        value           uniform 1;
+        type            zeroGradient;
+//         field           p;
+//         phi             phi;
+//         rho             rho;
+//         psi             psi;
+//         gamma           1.4;
+//         fieldInf        1;
+//         lInf            3;
+//         inletOutlet     off;
+//         correctSupercritical on;
+//         value           uniform 1;
     }
 
     bottom

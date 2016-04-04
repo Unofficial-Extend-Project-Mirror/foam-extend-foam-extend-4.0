@@ -316,7 +316,7 @@ class isoSurface
             const Type& neiSnapPt,
 
             DynamicList<Type>& triPoints,
-            DynamicList<label>& triMeshCells
+            dynamicLabelList& triMeshCells
         ) const;
 
         template<class Type>
@@ -333,7 +333,7 @@ class isoSurface
             const labelList& snappedPoint,
 
             DynamicList<Type>& triPoints,
-            DynamicList<label>& triMeshCells
+            dynamicLabelList& triMeshCells
         ) const;
 
         triSurface stitchTriPoints

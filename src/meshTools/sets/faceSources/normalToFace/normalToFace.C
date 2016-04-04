@@ -148,7 +148,7 @@ void Foam::normalToFace::applyToSet
             << normal_ << " (to within " << tol_ << ") ..." << endl;
 
 
-        DynamicList<label> toBeRemoved(set.size()/10);
+        dynamicLabelList toBeRemoved(set.size()/10);
 
         forAllIter(topoSet, set, iter)
         {

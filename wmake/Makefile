@@ -183,7 +183,7 @@ $(LIB).$(SO): $(OBJECTS)
 	     @rm -f so_locations
 ifeq ($(WM_ARCH_BASE),darwin)
 	     @cd $(OBJECTS_DIR) ; \
-	     $(LINKLIBSO) $(LOCAL_OBJECTS) -L$(LIB_WM_OPTIONS_DIR) $(LIB_LIBS) $(GLIB_LIBS) -install_name $(notdir $(LIB)).$(SO) -o $(LIB).$(SO)
+	     $(LINKLIBSO) $(LOCAL_OBJECTS) -L$(LIB_WM_OPTIONS_DIR) $(LIB_LIBS) $(GLIB_LIBS) -install_name $(LIB).$(SO) -o $(LIB).$(SO)
 else ifeq ($(WM_ARCH_BASE),mingw)
 	     @cd $(OBJECTS_DIR) ; \
 	     $(LINKLIBSO) $(LOCAL_OBJECTS) -L$(LIB_WM_OPTIONS_DIR) $(LIB_LIBS) $(GLIB_LIBS) $(EXTRA_LIBS) -o $(LIB).$(SO) -Wl,--out-implib,$(LIB).a

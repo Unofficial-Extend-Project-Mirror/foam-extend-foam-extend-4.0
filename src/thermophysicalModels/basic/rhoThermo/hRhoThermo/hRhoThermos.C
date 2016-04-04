@@ -37,6 +37,8 @@ License
 #include "hRhoThermo.H"
 #include "pureMixture.H"
 
+#include "thermoPhysicsTypes.H"
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
@@ -69,6 +71,13 @@ makeBasicRhoThermo
     sutherlandTransport,
     janafThermo,
     perfectGas
+);
+
+makeBasicRhoThermoPhys
+(
+    hRhoThermo,
+    pureMixture,
+    icoPoly8ThermoPhysics
 );
 
 

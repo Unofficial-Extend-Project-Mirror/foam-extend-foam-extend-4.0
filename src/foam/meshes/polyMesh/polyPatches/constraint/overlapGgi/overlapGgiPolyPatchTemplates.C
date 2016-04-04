@@ -62,18 +62,18 @@ Foam::overlapGgiPolyPatch::expandData(const Field<Type>& pf) const
 
     Field<Type>& expandField = texpandField();
 
-    label nFaces = 0;
-
     for (label copyI = 0; copyI < ncp; copyI++)
     {
         // Calculate transform
         const tensor curRotation =
-            RodriguesRotation(rotationAxis_,  copyI*myAngle);
+            RodriguesRotation(rotationAxis_, copyI*myAngle);
+
+        const label offset = copyI*zone().size();
 
         forAll (pf, faceI)
         {
-            expandField[nFaces] = transform(curRotation, pf[faceI]);
-            nFaces++;
+            const label zId = zone().whichFace(start() + faceI);
+            expandField[offset + zId] = transform(curRotation, pf[faceI]);
         }
     }
 

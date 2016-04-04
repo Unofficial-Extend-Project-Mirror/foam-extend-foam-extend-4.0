@@ -665,7 +665,7 @@ Foam::labelList Foam::parMetisDecomp::decompose
 
     labelListList globalRegionRegions;
     {
-        List<DynamicList<label> > dynRegionRegions(regionPoints.size());
+        List<dynamicLabelList > dynRegionRegions(regionPoints.size());
 
         // Internal faces first
         forAll(faceNeighbour, faceI)

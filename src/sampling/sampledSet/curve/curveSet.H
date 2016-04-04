@@ -70,8 +70,8 @@ class curveSet
             Particle<passiveParticle>& singleParticle,
             label& sampleI,
             DynamicList<point>& samplingPts,
-            DynamicList<label>& samplingCells,
-            DynamicList<label>& samplingFaces,
+            dynamicLabelList& samplingCells,
+            dynamicLabelList& samplingFaces,
             DynamicList<scalar>& samplingCurveDist
         ) const;
 
@@ -80,9 +80,9 @@ class curveSet
         void calcSamples
         (
             DynamicList<point>& samplingPts,
-            DynamicList<label>& samplingCells,
-            DynamicList<label>& samplingFaces,
-            DynamicList<label>& samplingSegments,
+            dynamicLabelList& samplingCells,
+            dynamicLabelList& samplingFaces,
+            dynamicLabelList& samplingSegments,
             DynamicList<scalar>& samplingCurveDist
         ) const;
 

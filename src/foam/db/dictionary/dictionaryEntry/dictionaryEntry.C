@@ -79,7 +79,7 @@ Foam::label Foam::dictionaryEntry::endLineNumber() const
 
 Foam::ITstream& Foam::dictionaryEntry::stream() const
 {
-    FatalIOErrorIn("ITstream& primitiveEntry::stream() const", *this)
+    FatalIOErrorIn("ITstream& dictionaryEntry::stream() const", *this)
         << "Attempt to return dictionary entry as a primitive"
         << abort(FatalIOError);
 

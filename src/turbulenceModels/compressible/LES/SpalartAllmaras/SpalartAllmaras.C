@@ -113,7 +113,7 @@ SpalartAllmaras::SpalartAllmaras
 
     sigmaNut_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "sigmaNut",
             coeffDict_,
@@ -122,7 +122,7 @@ SpalartAllmaras::SpalartAllmaras
     ),
     Prt_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "Prt",
             coeffDict_,
@@ -132,7 +132,7 @@ SpalartAllmaras::SpalartAllmaras
 
     Cb1_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "Cb1",
             coeffDict_,
@@ -141,7 +141,7 @@ SpalartAllmaras::SpalartAllmaras
     ),
     Cb2_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "Cb2",
             coeffDict_,
@@ -150,7 +150,7 @@ SpalartAllmaras::SpalartAllmaras
     ),
     Cv1_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "Cv1",
             coeffDict_,
@@ -159,7 +159,7 @@ SpalartAllmaras::SpalartAllmaras
     ),
     Cv2_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "Cv2",
             coeffDict_,
@@ -168,7 +168,7 @@ SpalartAllmaras::SpalartAllmaras
     ),
     CDES_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "CDES",
             coeffDict_,
@@ -177,7 +177,7 @@ SpalartAllmaras::SpalartAllmaras
     ),
     ck_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "ck",
             coeffDict_,
@@ -186,7 +186,7 @@ SpalartAllmaras::SpalartAllmaras
     ),
     kappa_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "kappa",
             *this,
@@ -196,7 +196,7 @@ SpalartAllmaras::SpalartAllmaras
     Cw1_(Cb1_/sqr(kappa_) + (1.0 + Cb2_)/sigmaNut_),
     Cw2_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "Cw2",
             coeffDict_,
@@ -205,7 +205,7 @@ SpalartAllmaras::SpalartAllmaras
     ),
     Cw3_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "Cw3",
             coeffDict_,

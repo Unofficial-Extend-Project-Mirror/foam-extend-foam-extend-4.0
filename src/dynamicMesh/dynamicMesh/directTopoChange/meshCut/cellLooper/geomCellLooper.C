@@ -280,7 +280,7 @@ bool Foam::geomCellLooper::cut
     // Size overly big.
     label nEstCuts = 2*mesh().cells()[cellI].size();
 
-    DynamicList<label> localLoop(nEstCuts);
+    dynamicLabelList localLoop(nEstCuts);
     DynamicList<scalar> localLoopWeights(nEstCuts);
 
     // Points checked. Used to make sure we don't cut edge and edge endpoints

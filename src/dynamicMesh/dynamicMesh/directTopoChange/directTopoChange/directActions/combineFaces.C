@@ -235,7 +235,7 @@ bool Foam::combineFaces::faceNeighboursValid
             // to be 3 or more.
 
             // Unregioned neighbouring faces
-            DynamicList<label> neighbourFaces(cFaces.size());
+            dynamicLabelList neighbourFaces(cFaces.size());
             // Regioned neighbouring faces
             labelHashSet neighbourRegions;
 
