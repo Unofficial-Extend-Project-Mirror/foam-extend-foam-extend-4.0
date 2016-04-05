@@ -40,3 +40,19 @@ autoPtr<incompressible::turbulenceModel> turbulence
 (
     incompressible::turbulenceModel::New(U, phi, laminarTransport)
 );
+
+Info<< "Reading field aU if present\n" << endl;
+volScalarField aU
+(
+    IOobject
+    (
+        "aU",
+        runTime.timeName(),
+        mesh,
+        IOobject::READ_IF_PRESENT,
+        IOobject::AUTO_WRITE
+    ),
+    mesh,
+    1/runTime.deltaT(),
+    zeroGradientFvPatchScalarField::typeName
+);

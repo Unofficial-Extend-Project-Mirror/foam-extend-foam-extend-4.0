@@ -1,53 +1,67 @@
-U = rUA*UEqn().H();
-
-if (nCorr <= 1)
 {
-    UEqn.clear();
-}
+    p.boundaryField().updateCoeffs();
 
-phi = (fvc::interpolate(U) & mesh.Sf())
-    + fvc::ddtPhiCorr(rUA, U, phi);
+    // Prepare clean Ap without time derivative contribution and
+    // without contribution from under-relaxation
+    // HJ, 26/Oct/2015
+    aU = HUEqn.A();
 
-adjustPhi(phi, U, p);
+    // Store velocity under-relaxation point before using U for the flux
+    // precursor
+    U.storePrevIter();
 
-// Non-orthogonal pressure corrector loop
-for (int nonOrth=0; nonOrth<=nNonOrthCorr; nonOrth++)
-{
-    // Pressure corrector
-    fvScalarMatrix pEqn
-    (
-        fvm::laplacian(rUA, p) == fvc::div(phi)
-    );
+    U = HUEqn.H()/aU;
+    phi = (fvc::interpolate(U) & mesh.Sf());
 
-    pEqn.setReference(pRefCell, pRefValue);
+    // Global flux balance
+    adjustPhi(phi, U, p);
 
-    if
-    (
-        oCorr == nOuterCorr - 1
-     && corr == nCorr - 1
-     && nonOrth == nNonOrthCorr
-    )
+    for (int nonOrth = 0; nonOrth <= nNonOrthCorr; nonOrth++)
     {
-        pEqn.solve(mesh.solutionDict().solver("pFinal"));
+        fvScalarMatrix pEqn
+        (
+            fvm::laplacian(1/aU, p) == fvc::div(phi)
+        );
+
+        pEqn.setReference(pRefCell, pRefValue);
+
+        if
+        (
+            corr == nCorr - 1
+         && nonOrth == nNonOrthCorr
+        )
+        {
+            pEqn.solve
+            (
+                mesh.solutionDict().solver(p.name() + "Final")
+            );
+        }
+        else
+        {
+            pEqn.solve(mesh.solutionDict().solver(p.name()));
+        }
+
+        if (nonOrth == nNonOrthCorr)
+        {
+            phi -= pEqn.flux();
+        }
     }
-    else
+
+    // Explicitly relax pressure for momentum corrector
+    if (oCorr != nOuterCorr - 1)
     {
-        pEqn.solve();
+        p.relax();
     }
 
-    if (nonOrth == nNonOrthCorr)
-    {
-        phi -= pEqn.flux();
-    }
+#   include "movingMeshContinuityErrs.H"
+
+    U = UUrf*
+        (
+            1.0/(aU + ddtUEqn.A())*
+            (
+                U*aU - fvc::grad(p) + ddtUEqn.H()
+            )
+        )
+      + (1 - UUrf)*U.prevIter();
+    U.correctBoundaryConditions();
 }
-
-#include "continuityErrs.H"
-
-// Explicitly relax pressure for momentum corrector except for last corrector
-if (oCorr != nOuterCorr-1)
-{
-    p.relax();
-}
-
-U -= rUA*fvc::grad(p);
-U.correctBoundaryConditions();
