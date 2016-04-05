@@ -1,27 +1,33 @@
-    fvVectorMatrix UEqn
+    // Convection-diffusion matrix
+    fvVectorMatrix HUEqn
     (
-        fvm::ddt(U)
-      + fvm::div(phi, U)
+        fvm::div(phi, U)
       + turbulence->divDevReff(U)
     );
+
+    // Time derivative matrix
+    fvVectorMatrix ddtUEqn(fvm::ddt(U));
+
+    // Get under-relaxation factor
+    scalar UUrf = mesh.solutionDict().relaxationFactor(U.name());
 
     if (oCorr == nOuterCorr - 1)
     {
         if (mesh.solutionDict().relax("UFinal"))
         {
-            UEqn.relax(mesh.solutionDict().relaxationFactor("UFinal"));
+            UUrf = mesh.solutionDict().relaxationFactor("UFinal");
         }
         else
         {
-            UEqn.relax(1);
+            UUrf = 1;
         }
     }
-    else
-    {
-        UEqn.relax();
-    }
 
-    if (momentumPredictor)
-    {
-        solve(UEqn == -fvc::grad(p));
-    }
+    // Solve momentum predictor
+    solve
+    (
+        ddtUEqn
+      + relax(HUEqn, UUrf)
+     ==
+      - fvc::grad(p)
+    );
