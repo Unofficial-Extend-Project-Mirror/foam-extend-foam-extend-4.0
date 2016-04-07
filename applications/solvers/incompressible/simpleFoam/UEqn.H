@@ -1,16 +1,20 @@
     // Solve the momentum equation
 
-    tmp<fvVectorMatrix> UEqn
+    tmp<fvVectorMatrix> HUEqn
     (
         fvm::div(phi, U)
       + turbulence->divDevReff(U)
     );
 
-    UEqn().relax();
+    // Get under-relaxation factor
+    const scalar UUrf = mesh.solutionDict().relaxationFactor(U.name());
 
+    // Momentum solution
     eqnResidual = solve
     (
-        UEqn() == -fvc::grad(p)
+        relax(HUEqn(), UUrf)
+     ==
+        -fvc::grad(p)
     ).initialResidual();
 
     maxResidual = max(eqnResidual, maxResidual);
