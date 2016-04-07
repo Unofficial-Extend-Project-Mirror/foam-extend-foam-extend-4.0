@@ -26,16 +26,11 @@ License
 #include "fvBlockMatrix.H"
 #include "IOstreams.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-namespace Foam
-{
-
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
 template<class Type>
 template<class fieldType>
-void fvBlockMatrix<Type>::insertSolutionVector
+void Foam::fvBlockMatrix<Type>::insertSolutionVector
 (
     const direction dir,
     const Field<fieldType>& xSingle
@@ -64,7 +59,7 @@ void fvBlockMatrix<Type>::insertSolutionVector
 
 template<class Type>
 template<class matrixType>
-void fvBlockMatrix<Type>::insertDiagSource
+void Foam::fvBlockMatrix<Type>::insertDiagSource
 (
     const direction dir,
     fvMatrix<matrixType>& matrix
@@ -167,7 +162,7 @@ void fvBlockMatrix<Type>::insertDiagSource
 
 template<class Type>
 template<class matrixType>
-void fvBlockMatrix<Type>::insertUpperLower
+void Foam::fvBlockMatrix<Type>::insertUpperLower
 (
     const direction dir,
     const fvMatrix<matrixType>& matrix
@@ -295,7 +290,7 @@ void fvBlockMatrix<Type>::insertUpperLower
 
 template<class Type>
 template<class matrixType>
-void fvBlockMatrix<Type>::updateCouplingCoeffs
+void Foam::fvBlockMatrix<Type>::updateCouplingCoeffs
 (
     const direction dir,
     const fvMatrix<matrixType>& matrix
@@ -568,7 +563,7 @@ void Foam::fvBlockMatrix<Type>::insertBoundaryContributions
 
 
 template<class Type>
-void fvBlockMatrix<Type>::insertCouplingDiag
+void Foam::fvBlockMatrix<Type>::insertCouplingDiag
 (
     const direction dirI,
     const direction dirJ,
@@ -591,7 +586,39 @@ void fvBlockMatrix<Type>::insertCouplingDiag
 
 
 template<class Type>
-void fvBlockMatrix<Type>::insertCouplingUpperLower
+void Foam::fvBlockMatrix<Type>::insertCouplingDiagSource
+(
+    const direction dirI,
+    const direction dirJ,
+    const fvScalarMatrix& matrix
+)
+{
+    // Prepare the diagonal and source
+    scalarField diag = matrix.diag();
+    scalarField source = matrix.source();
+
+    // Add boundary source contribution
+    matrix.addBoundaryDiag(diag, 0);
+    matrix.addBoundarySource(source, false);
+
+    // Get reference to block diagonal of the block system
+    typename CoeffField<Type>::squareTypeField& blockDiag =
+        this->diag().asSquare();
+
+    // Get reference to this source field of the block system
+    Field<Type>& b = this->source();
+
+    // Set off-diagonal coefficient
+    forAll(diag, cellI)
+    {
+        blockDiag[cellI](dirI, dirJ) += diag[cellI];
+        b[cellI](dirI) += source[cellI];
+    }
+}
+
+
+template<class Type>
+void Foam::fvBlockMatrix<Type>::insertCouplingUpperLower
 (
     const direction dirI,
     const direction dirJ,
@@ -678,7 +705,7 @@ void fvBlockMatrix<Type>::insertCouplingUpperLower
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 template<class Type>
-fvBlockMatrix<Type>::fvBlockMatrix
+Foam::fvBlockMatrix<Type>::fvBlockMatrix
 (
     GeometricField<Type, fvPatchField, volMesh>& psi
 )
@@ -691,7 +718,7 @@ fvBlockMatrix<Type>::fvBlockMatrix
 
 
 template<class Type>
-fvBlockMatrix<Type>::fvBlockMatrix
+Foam::fvBlockMatrix<Type>::fvBlockMatrix
 (
     const fvBlockMatrix<Type>& bxs
 )
@@ -705,7 +732,7 @@ fvBlockMatrix<Type>::fvBlockMatrix
 
 template<class Type>
 template<class fieldType>
-void fvBlockMatrix<Type>::retrieveSolution
+void Foam::fvBlockMatrix<Type>::retrieveSolution
 (
     const direction dir,
     Field<fieldType>& xSingle
@@ -734,7 +761,7 @@ void fvBlockMatrix<Type>::retrieveSolution
 
 template<class Type>
 template<class matrixType>
-void fvBlockMatrix<Type>::insertEquation
+void Foam::fvBlockMatrix<Type>::insertEquation
 (
     const direction dir,
     fvMatrix<matrixType>& matrix
@@ -749,7 +776,7 @@ void fvBlockMatrix<Type>::insertEquation
 
 template<class Type>
 template<class blockType, class fieldType>
-void fvBlockMatrix<Type>::insertBlockCoupling
+void Foam::fvBlockMatrix<Type>::insertBlockCoupling
 (
     const direction dirI,
     const direction dirJ,
@@ -778,7 +805,20 @@ void Foam::fvBlockMatrix<Type>::insertEquationCoupling
 
 
 template<class Type>
-void fvBlockMatrix<Type>::blockAdd
+void Foam::fvBlockMatrix<Type>::insertEquationCoupling
+(
+    const direction dirI,
+    const direction dirJ,
+    const fvScalarMatrix& matrix
+)
+{
+    insertCouplingDiagSource(dirI, dirJ, matrix);
+    insertCouplingUpperLower(dirI, dirJ, matrix);
+}
+
+
+template<class Type>
+void Foam::fvBlockMatrix<Type>::blockAdd
 (
     const direction dir,
     const scalarField& xSingle,
@@ -827,7 +867,226 @@ void Foam::fvBlockMatrix<Type>::updateSourceCoupling()
 
 
 template<class Type>
-BlockSolverPerformance<Type> fvBlockMatrix<Type>::solve
+void Foam::fvBlockMatrix<Type>::insertPicardTensor
+(
+    const direction UEqnDir,
+    const volVectorField& U,
+    const surfaceScalarField& phi
+)
+{
+    const direction nCmpts = pTraits<vector>::nComponents;
+    direction localDirI = UEqnDir;
+    direction localDirJ = UEqnDir;
+
+    // Sanity check
+    {
+        const direction blockMatrixSize = pTraits<Type>::nComponents;
+
+        if (nCmpts > blockMatrixSize)
+        {
+            FatalErrorIn
+            (
+                "void fvBlockMatrix<Type>::insertPicardTensor\n"
+                "(\n"
+                "    const direction UEqnDir,\n"
+                "    const volVectorField& U,\n"
+                "    const surfaceScalarField& phi\n"
+                ")"
+            )   << "Trying to insert Picard tensor term into smaller "
+                << "fvBlockMatrix. Do you have momentum equation?"
+                << abort(FatalError);
+        }
+    }
+
+    // Get weights for U which makes the implicit flux part
+    const fvMesh& mesh = U.mesh();
+
+    tmp<surfaceInterpolationScheme<vector> > tinterpScheme =
+        fvc::scheme<vector>(mesh, U.name());
+
+    tmp<surfaceScalarField> tweights = tinterpScheme().weights(U);
+    const scalarField& wIn = tweights().internalField();
+
+    // Calculate the Pi tensor. Consider hard coding the interpolation scheme to
+    // correspond to the div(phi, U) interpolation scheme for consistency.
+    // VV, 21/July/2014.
+    const surfaceTensorField pi
+    (
+        fvc::interpolate(U, -phi, "Uconvection")*mesh.Sf()
+    );
+    const tensorField& piIn = pi.internalField();
+
+    BlockLduSystem<vector, vector> piSystem(mesh);
+
+    // Get references to ldu fields of pi block system always as square
+    typename CoeffField<vector>::squareTypeField& piDiag =
+         piSystem.diag().asSquare();
+    typename CoeffField<vector>::squareTypeField& piUpper =
+         piSystem.upper().asSquare();
+    typename CoeffField<vector>::squareTypeField& piLower =
+         piSystem.lower().asSquare();
+
+    vectorField& piSource = piSystem.source();
+
+    piLower = -wIn*piIn;
+    piUpper = piLower + piIn;
+    piSystem.negSumDiag();
+
+    // Boundary contributions - hard coded or explicit because of the problem
+    // with inconsistent return type of internalCoeffs. VV, 21/July/2014.
+    forAll(U.boundaryField(), patchI)
+    {
+        const fvPatchVectorField& Ub = U.boundaryField()[patchI];
+        const fvPatch& patch = Ub.patch();
+        const fvsPatchTensorField& pib = pi.boundaryField()[patchI];
+        const fvsPatchScalarField& wb = tweights().boundaryField()[patchI];
+        const unallocLabelList& fc = patch.faceCells();
+
+        // Check for empty patches. Needed since the boundary conditions are
+        // hard coded. VV. 18/Sep/2014.
+        if (patch.type() == "empty")
+        {
+            continue;
+        }
+
+        // Hard coded zeroGradient if patch does not fix value
+        if (!Ub.fixesValue())
+        {
+            forAll(Ub, faceI)
+            {
+                piDiag[fc[faceI]] += pib[faceI];
+            }
+        }
+        // Coupled patches
+        else if (patch.coupled())
+        {
+            typename CoeffField<vector>::squareTypeField& pipCoupleUpper =
+                piSystem.coupleUpper()[patchI].asSquare();
+            typename CoeffField<vector>::squareTypeField& pipCoupleLower =
+                piSystem.coupleLower()[patchI].asSquare();
+
+            const tensorField pcl = -wb*pib;
+            const tensorField pcu = pcl + pib;
+
+            // Coupling  contributions
+            pipCoupleLower -= pcl;
+            pipCoupleUpper -= pcu;
+        }
+        else if (Ub.fixesValue())
+        {
+            const vectorField boundaryCoeffs(Ub.valueBoundaryCoeffs(wb));
+
+            // Boundary contribution
+            forAll(Ub, faceI)
+            {
+                piSource[fc[faceI]] -= pib[faceI] & boundaryCoeffs[faceI];
+            }
+        }
+        else
+        {
+            FatalErrorIn
+            (
+                "void fvBlockMatrix<Type, matrixType>::insertPicardTensor\n"
+                "(\n"
+                "    const direction UEqnDir,\n"
+                "    const volVectorField& U,\n"
+                "    const surfaceScalarField& phi\n"
+                ")"
+            )   << "Patch does not fix value, nor doesn't fix value nor is"
+                << " coupled."
+                << abort(FatalError);
+        }
+    }
+
+    // Consider chucking the above code into fvm::picardTensor operator.
+    // VV, 21/July/2014.
+
+    // Finally add Picard piSystem into this fvBlockMatrix
+    typename CoeffField<Type>::squareTypeField& blockDiag =
+         this->diag().asSquare();
+    typename CoeffField<Type>::squareTypeField& blockUpper =
+         this->upper().asSquare();
+    typename CoeffField<Type>::squareTypeField& blockLower =
+         this->lower().asSquare();
+
+    Field<Type>& blockSource = this->source();
+
+    // Add diagonal, source, lower and upper
+    for (direction cmptI = 0; cmptI < nCmpts; cmptI++)
+    {
+        for (direction cmptJ = 0; cmptJ < nCmpts; cmptJ++)
+        {
+            forAll(piDiag, cellI)
+            {
+                blockDiag[cellI](localDirI, localDirJ) +=
+                    piDiag[cellI](cmptI, cmptJ);
+            }
+
+            forAll(piUpper, faceI)
+            {
+                blockUpper[faceI](localDirI, localDirJ) +=
+                    piUpper[faceI](cmptI, cmptJ);
+                blockLower[faceI](localDirI, localDirJ) +=
+                    piLower[faceI](cmptI, cmptJ);
+            }
+
+            localDirJ++;
+        }
+
+        forAll(piSource, cellI)
+        {
+            blockSource[cellI](localDirI) += piSource[cellI](cmptI);
+        }
+
+        localDirI++;
+
+        // Reset localDirJ
+        localDirJ = UEqnDir;
+    }
+
+    // Reset local direction for coupling contributions
+    localDirI = UEqnDir;
+    localDirJ = UEqnDir;
+
+    // Add coupling contributions
+    forAll(U.boundaryField(), patchI)
+    {
+        if (U.boundaryField()[patchI].patch().coupled())
+        {
+            typename CoeffField<Type>::squareTypeField& pcoupleUpper =
+                this->coupleUpper()[patchI].asSquare();
+            typename CoeffField<Type>::squareTypeField& pcoupleLower =
+                this->coupleLower()[patchI].asSquare();
+
+            const typename CoeffField<vector>::squareTypeField& pipcu =
+                piSystem.coupleUpper()[patchI].asSquare();
+            const typename CoeffField<vector>::squareTypeField& pipcl =
+                piSystem.coupleLower()[patchI].asSquare();
+
+            for (direction cmptI = 0; cmptI < nCmpts; cmptI++)
+            {
+                for (direction cmptJ = 0; cmptJ < nCmpts; cmptJ++)
+                {
+                    forAll(pipcu, faceI)
+                    {
+                        pcoupleUpper[faceI](localDirI, localDirJ) +=
+                              pipcu[faceI](cmptI, cmptJ);
+                        pcoupleLower[faceI](localDirI, localDirJ) +=
+                              pipcl[faceI](cmptI, cmptJ);
+                    }
+                }
+            }
+
+            // Reset local directions for other patches
+            localDirI = UEqnDir;
+            localDirJ = UEqnDir;
+        }
+    }
+}
+
+
+template<class Type>
+Foam::BlockSolverPerformance<Type> Foam::fvBlockMatrix<Type>::solve
 (
     const dictionary& solverControls
 )
@@ -849,7 +1108,7 @@ BlockSolverPerformance<Type> fvBlockMatrix<Type>::solve
 
 
 template<class Type>
-BlockSolverPerformance<Type> fvBlockMatrix<Type>::solve()
+Foam::BlockSolverPerformance<Type> Foam::fvBlockMatrix<Type>::solve()
 {
     return solve(psi_.mesh().solutionDict().solverDict(psi_.name()));
 }
@@ -858,7 +1117,7 @@ BlockSolverPerformance<Type> fvBlockMatrix<Type>::solve()
 // * * * * * * * * * * * * * * * IOstream Operators  * * * * * * * * * * * * //
 
 template<class Type>
-Ostream& operator<<
+Foam::Ostream& Foam::operator<<
 (
     Ostream& os,
     const fvBlockMatrix<Type>& bxs
@@ -870,9 +1129,5 @@ Ostream& operator<<
     return os;
 }
 
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // ************************************************************************* //
