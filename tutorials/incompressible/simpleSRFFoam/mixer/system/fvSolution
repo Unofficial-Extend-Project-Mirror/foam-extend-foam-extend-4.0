@@ -25,8 +25,8 @@ solvers
     };
     Urel
     {
-        solver           PBiCG;
-        preconditioner   DILU;
+        solver           smoothSolver;
+        smoother         GaussSeidel;
         tolerance        1e-05;
         relTol           0.1;
     };
@@ -75,7 +75,7 @@ SIMPLE
 relaxationFactors
 {
     p               0.3;
-    Urel            0.7;
+    Urel            0.5;
     k               0.7;
     epsilon         0.7;
     omega           0.7;
