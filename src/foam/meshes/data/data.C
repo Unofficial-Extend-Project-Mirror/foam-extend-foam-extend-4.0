@@ -24,11 +24,11 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "data.H"
-#include "Time.H"
+#include "foamTime.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-int Foam::data::debug(Foam::debug::debugSwitch("data", false));
+int Foam::data::debug(Foam::debug::debugSwitchFromDict("data", false));
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 

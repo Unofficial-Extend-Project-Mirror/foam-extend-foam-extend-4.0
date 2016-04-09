@@ -24,7 +24,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "data.H"
-#include "Time.H"
+#include "foamTime.H"
 #include "solverPerformance.H"
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
