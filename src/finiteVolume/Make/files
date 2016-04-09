@@ -396,6 +396,12 @@ $(general)/findRefCell/findRefCell.C
 $(general)/adjustPhi/adjustPhi.C
 $(general)/bound/bound.C
 
+solutionControl = $(general)/solutionControl
+$(solutionControl)/solutionControl/solutionControl.C
+$(solutionControl)/simpleControl/simpleControl.C
+$(solutionControl)/pimpleControl/pimpleControl.C
+$(solutionControl)/pisoControl/pisoControl.C
+
 porousMedia = $(general)/porousMedia
 $(porousMedia)/porousZone.C
 $(porousMedia)/porousZones.C
