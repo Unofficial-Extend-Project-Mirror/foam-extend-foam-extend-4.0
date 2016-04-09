@@ -637,6 +637,8 @@ $(writers)/gnuplotGraph/gnuplotGraph.C
 $(writers)/xmgrGraph/xmgrGraph.C
 $(writers)/jplotGraph/jplotGraph.C
 
+meshes/data/data.C
+
 primitives/BlockCoeff/blockCoeffBase.C
 primitives/BlockCoeff/scalarBlockCoeff.C
 primitives/BlockCoeff/sphericalTensorBlockCoeff.C

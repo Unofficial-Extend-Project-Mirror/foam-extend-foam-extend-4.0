@@ -23,39 +23,24 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "data.H"
-#include "Time.H"
+#include "solverPerformance.H"
+#include "fieldTypes.H"
 
-// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
-
-int Foam::data::debug(Foam::debug::debugSwitch("data", false));
-
-// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
-
-Foam::data::data(const objectRegistry& obr)
-:
-    IOdictionary
-    (
-        IOobject
-        (
-            "data",
-            obr.time().system(),
-            obr,
-            IOobject::NO_READ,
-            IOobject::NO_WRITE
-        )
-    ),
-    prevTimeIndex_(0)
+namespace Foam
 {
-    set("solverPerformance", dictionary());
-}
+    makeSolverPerformance(scalar);
+    makeSolverPerformance(vector);
+    makeSolverPerformance(sphericalTensor);
+    makeSolverPerformance(symmTensor);
+    makeSolverPerformance(tensor);
+};
 
 
-// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
-
-const Foam::dictionary& Foam::data::solverPerformanceDict() const
+template<>
+Foam::SolverPerformance<Foam::scalar>
+Foam::SolverPerformance<Foam::scalar>::max()
 {
-    return subDict("solverPerformance");
+    return *this;
 }
 
 

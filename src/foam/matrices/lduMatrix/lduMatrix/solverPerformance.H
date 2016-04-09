@@ -21,42 +21,36 @@ License
     You should have received a copy of the GNU General Public License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
+Typedef
+    Foam::solverPerformance
+
+Description
+    SolverPerformance instantiated for a scalar
+
+SourceFiles
+    solverPerformance.C
+
 \*---------------------------------------------------------------------------*/
 
-#include "data.H"
-#include "Time.H"
+#ifndef solverPerformance_H
+#define solverPerformance_H
 
-// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
+#include "SolverPerformance.H"
 
-int Foam::data::debug(Foam::debug::debugSwitch("data", false));
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
-
-Foam::data::data(const objectRegistry& obr)
-:
-    IOdictionary
-    (
-        IOobject
-        (
-            "data",
-            obr.time().system(),
-            obr,
-            IOobject::NO_READ,
-            IOobject::NO_WRITE
-        )
-    ),
-    prevTimeIndex_(0)
+namespace Foam
 {
-    set("solverPerformance", dictionary());
+    typedef SolverPerformance<scalar> solverPerformance;
+
+    // Specialization of the max function for scalar object
+    template<>
+    SolverPerformance<scalar> SolverPerformance<scalar>::max();
 }
 
 
-// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-const Foam::dictionary& Foam::data::solverPerformanceDict() const
-{
-    return subDict("solverPerformance");
-}
-
+#endif
 
 // ************************************************************************* //
