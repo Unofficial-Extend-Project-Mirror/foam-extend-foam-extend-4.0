@@ -7,7 +7,7 @@
         zeroGradientFvPatchScalarField::typeName
     );
 
-    for (label i = 0; i < p.boundaryField().size(); i++)
+    for (label i=0; i<p.boundaryField().size(); i++)
     {
         if (p.boundaryField()[i].fixesValue())
         {
@@ -26,7 +26,7 @@
             IOobject::NO_WRITE
         ),
         mesh,
-        dimensionedScalar("pcorr", p.dimensions(), 0),
+        dimensionedScalar("pcorr", p.dimensions(), 0.0),
         pcorrTypes
     );
 
@@ -35,7 +35,9 @@
 
     adjustPhi(phi, U, pcorr);
 
-    for(int nonOrth = 0; nonOrth <= nNonOrthCorr; nonOrth++)
+    mesh.setFluxRequired(pcorr.name());
+
+    for(int nonOrth=0; nonOrth<=nNonOrthCorr; nonOrth++)
     {
         fvScalarMatrix pcorrEqn
         (
@@ -53,6 +55,6 @@
         // Fluxes are corrected to absolute velocity and further corrected
         // later.  HJ, 6/Feb/2009
     }
-
 #   include "continuityErrs.H"
 }
+

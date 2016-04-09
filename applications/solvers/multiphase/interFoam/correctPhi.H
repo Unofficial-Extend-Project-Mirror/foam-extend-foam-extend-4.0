@@ -34,6 +34,8 @@
 
     adjustPhi(phi, U, pcorr);
 
+    mesh.setFluxRequired(pcorr.name());
+
     for(int nonOrth=0; nonOrth<=nNonOrthCorr; nonOrth++)
     {
         fvScalarMatrix pcorrEqn
