@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
-    \\  /    A nd           | Web:         http://www.foam-extend.org
-     \\/     M anipulation  | For copyright notice see file Copyright
+   \\    /   O peration     |
+    \\  /    A nd           | For copyright notice see file Copyright
+     \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -72,7 +72,7 @@ Foam::scalar Foam::finiteRotation::rotAngle(const tensor& rotT)
 
 Foam::vector Foam::finiteRotation::eulerAngles(const tensor& rotT)
 {
-    // Define a vector containing euler angles (x = roll, y = pitch, z = yaw)
+    // Create a vector containing euler angles (x = roll, y = pitch, z = yaw)
     vector eulerAngles;
 
     scalar& rollAngle = eulerAngles.x();
@@ -82,7 +82,9 @@ Foam::vector Foam::finiteRotation::eulerAngles(const tensor& rotT)
     // Calculate roll angle
     rollAngle = atan2(rotT.yz(), rotT.zz());
 
-    const scalar c2 = sqrt(rotT.xx() + rotT.xy());
+    // Use mag to avoid negative value due to round-off
+    // HJ, 24/Feb/2016
+    const scalar c2 = sqrt(Foam::max(0, rotT.xx() + rotT.xy()));
 
     // Calculate pitch angle
     pitchAngle = atan2(-rotT.xz(), c2);

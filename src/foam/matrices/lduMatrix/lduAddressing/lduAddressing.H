@@ -104,8 +104,11 @@ SourceFiles
 namespace Foam
 {
 
+// Forward declaration of classes
+class extendedLduAddressing;
+
 /*---------------------------------------------------------------------------*\
-                           Class lduAddressing Declaration
+                       Class lduAddressing Declaration
 \*---------------------------------------------------------------------------*/
 
 class lduAddressing
@@ -126,6 +129,9 @@ class lduAddressing
 
         //- Losort start addressing
         mutable labelList* losortStartPtr_;
+
+        //- Extended addressing with p-order fill-in
+        mutable PtrList<extendedLduAddressing> extendedAddr_;
 
 
     // Private Member Functions
@@ -149,18 +155,11 @@ class lduAddressing
 public:
 
     // Constructor
-    lduAddressing(const label nEqns)
-    :
-        size_(nEqns),
-        losortPtr_(NULL),
-        ownerStartPtr_(NULL),
-        losortStartPtr_(NULL)
-    {}
+    lduAddressing(const label nEqns);
 
 
-    // Destructor
-
-        virtual ~lduAddressing();
+    //- Destructor
+    virtual ~lduAddressing();
 
 
     // Member Functions
@@ -200,6 +199,9 @@ public:
 
         //- Return off-diagonal index given owner and neighbour label
         label triIndex(const label a, const label b) const;
+
+        //- Return extended addressing given p index
+        const extendedLduAddressing& extendedAddr(const label p) const;
 };
 
 

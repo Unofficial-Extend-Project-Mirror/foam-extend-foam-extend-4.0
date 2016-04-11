@@ -40,24 +40,24 @@ template<class Type>
 Foam::autoPtr<Foam::BlockLduSmoother<Type> > Foam::BlockLduSmoother<Type>::New
 (
     const BlockLduMatrix<Type>& matrix,
-    const dictionary& dict
+    const dictionary& dict,
+    const word keyword
 )
 {
     word smootherName;
 
     // Handle primitive or dictionary entry
-    const entry& e = dict.lookupEntry("smoother", false, false);
+    const entry& e = dict.lookupEntry(keyword, false, false);
     if (e.isDict())
     {
-        e.dict().lookup("smoother") >> smootherName;
+        e.dict().lookup(keyword) >> smootherName;
     }
     else
     {
         e.stream() >> smootherName;
     }
 
-    // Not (yet?) needed:
-    // const dictionary& controls = e.isDict() ? e.dict() : dictionary::null;
+    const dictionary& controls = e.isDict() ? e.dict() : dictionary::null;
 
     typename dictionaryConstructorTable::iterator constructorIter =
         dictionaryConstructorTablePtr_->find(smootherName);
@@ -69,7 +69,8 @@ Foam::autoPtr<Foam::BlockLduSmoother<Type> > Foam::BlockLduSmoother<Type>::New
             "autoPtr<BlockLduSmoother> BlockLduSmoother::New\n"
             "(\n"
             "    const BlockLduMatrix<Type>& matrix,\n"
-            "    const dictionary& dict\n"
+            "    const dictionary& dict,\n"
+            "    const word keyword\n"
             ")",
             dict
         )   << "Unknown matrix smoother " << smootherName
@@ -84,31 +85,9 @@ Foam::autoPtr<Foam::BlockLduSmoother<Type> > Foam::BlockLduSmoother<Type>::New
         constructorIter()
         (
             matrix,
-            dict
+            controls
         )
     );
-}
-
-
-// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
-
-template<class Type>
-Foam::word Foam::BlockLduSmoother<Type>::getName(const dictionary& dict)
-{
-    word name;
-
-    // handle primitive or dictionary entry
-    const entry& e = dict.lookupEntry("preconditioner", false, false);
-    if (e.isDict())
-    {
-        e.dict().lookup("preconditioner") >> name;
-    }
-    else
-    {
-        e.stream() >> name;
-    }
-
-    return name;
 }
 
 

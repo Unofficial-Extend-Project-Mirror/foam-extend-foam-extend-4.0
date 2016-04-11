@@ -174,8 +174,11 @@ tmp<pointField> triSurfaceSearch::calcNearest
 }
 
 
-pointIndexHit triSurfaceSearch::nearest(const point& pt, const vector& span)
- const
+pointIndexHit triSurfaceSearch::nearest
+(
+    const point& pt,
+    const vector& span
+) const
 {
     const scalar nearestDistSqr = 0.25*magSqr(span);
 

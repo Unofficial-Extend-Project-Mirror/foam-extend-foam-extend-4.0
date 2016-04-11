@@ -203,7 +203,6 @@ void Foam::sampledSets::combineSampledSets
             refPt = vector::zero;
         }
 
-
         masterSampledSets.set
         (
             seti,

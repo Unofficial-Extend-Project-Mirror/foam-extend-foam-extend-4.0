@@ -58,7 +58,7 @@ const Foam::labelListList& Foam::primitiveMesh::edgeCells() const
 const Foam::labelList& Foam::primitiveMesh::edgeCells
 (
     const label edgeI,
-    DynamicList<label>& storage
+    dynamicLabelList& storage
 ) const
 {
     if (hasEdgeCells())
@@ -71,7 +71,7 @@ const Foam::labelList& Foam::primitiveMesh::edgeCells
         const labelList& nei = faceNeighbour();
 
         // Construct edgeFaces
-        DynamicList<label> eFacesStorage;
+        dynamicLabelList eFacesStorage;
         const labelList& eFaces = edgeFaces(edgeI, eFacesStorage);
 
         storage.clear();

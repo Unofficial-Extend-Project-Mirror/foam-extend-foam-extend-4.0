@@ -124,7 +124,7 @@ kOmegaSST::kOmegaSST
 
     alphaK1_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "alphaK1",
             coeffDict_,
@@ -133,7 +133,7 @@ kOmegaSST::kOmegaSST
     ),
     alphaK2_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "alphaK2",
             coeffDict_,
@@ -142,7 +142,7 @@ kOmegaSST::kOmegaSST
     ),
     alphaOmega1_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "alphaOmega1",
             coeffDict_,
@@ -151,7 +151,7 @@ kOmegaSST::kOmegaSST
     ),
     alphaOmega2_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "alphaOmega2",
             coeffDict_,
@@ -160,7 +160,7 @@ kOmegaSST::kOmegaSST
     ),
     Prt_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "Prt",
             coeffDict_,
@@ -169,7 +169,7 @@ kOmegaSST::kOmegaSST
     ),
     gamma1_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "gamma1",
             coeffDict_,
@@ -178,7 +178,7 @@ kOmegaSST::kOmegaSST
     ),
     gamma2_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "gamma2",
             coeffDict_,
@@ -187,7 +187,7 @@ kOmegaSST::kOmegaSST
     ),
     beta1_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "beta1",
             coeffDict_,
@@ -196,7 +196,7 @@ kOmegaSST::kOmegaSST
     ),
     beta2_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "beta2",
             coeffDict_,
@@ -205,7 +205,7 @@ kOmegaSST::kOmegaSST
     ),
     betaStar_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "betaStar",
             coeffDict_,
@@ -214,7 +214,7 @@ kOmegaSST::kOmegaSST
     ),
     a1_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "a1",
             coeffDict_,
@@ -223,7 +223,7 @@ kOmegaSST::kOmegaSST
     ),
     b1_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "b1",
             coeffDict_,
@@ -232,7 +232,7 @@ kOmegaSST::kOmegaSST
     ),
     c1_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "c1",
             coeffDict_,

@@ -43,6 +43,12 @@ const VectorN<Cmpt, length> VectorN<Cmpt, length>::zero(0);
 template <class Cmpt, int length>
 const VectorN<Cmpt, length> VectorN<Cmpt, length>::one(1);
 
+template <class Cmpt, int length>
+const VectorN<Cmpt, length> VectorN<Cmpt, length>::max(VGREAT);
+
+template <class Cmpt, int length>
+const VectorN<Cmpt, length> VectorN<Cmpt, length>::min(-VGREAT);
+
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 

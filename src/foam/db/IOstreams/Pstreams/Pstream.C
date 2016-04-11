@@ -111,11 +111,11 @@ void Foam::Pstream::calcLinearComm(const label nProcs)
 void Foam::Pstream::collectReceives
 (
     const label procID,
-    const List<DynamicList<label> >& receives,
-    DynamicList<label>& allReceives
+    const List<dynamicLabelList >& receives,
+    dynamicLabelList& allReceives
 )
 {
-    const DynamicList<label>& myChildren = receives[procID];
+    const dynamicLabelList& myChildren = receives[procID];
 
     forAll(myChildren, childI)
     {
@@ -159,7 +159,7 @@ void Foam::Pstream::calcTreeComm(label nProcs)
         nLevels++;
     }
 
-    List<DynamicList<label> > receives(nProcs);
+    List<dynamicLabelList > receives(nProcs);
     labelList sends(nProcs, -1);
 
     // Info<< "Using " << nLevels << " communication levels" << endl;
@@ -190,7 +190,7 @@ void Foam::Pstream::calcTreeComm(label nProcs)
 
     // For all processors find the processors it receives data from
     // (and the processors they receive data from etc.)
-    List<DynamicList<label> > allReceives(nProcs);
+    List<dynamicLabelList > allReceives(nProcs);
     for (label procID = 0; procID < nProcs; procID++)
     {
         collectReceives(procID, receives, allReceives[procID]);
@@ -625,17 +625,6 @@ Foam::List<Foam::Pstream::commsStruct> Foam::Pstream::linearCommunication_(0);
 Foam::List<Foam::Pstream::commsStruct> Foam::Pstream::treeCommunication_(0);
 
 
-// Should compact transfer be used in which floats replace doubles
-// reducing the bandwidth requirement at the expense of some loss
-// in accuracy
-const Foam::debug::optimisationSwitch
-Foam::Pstream::floatTransfer
-(
-    "floatTransfer",
-    0
-);
-
-
 // Number of processors at which the reduce algorithm changes from linear to
 // tree
 const Foam::debug::optimisationSwitch
@@ -644,20 +633,6 @@ Foam::Pstream::nProcsSimpleSum
     "nProcsSimpleSum",
     16
 );
-
-
-// Default commsType
-// Foam::Pstream::commsTypes Foam::Pstream::defaultCommsType
-// (
-//     commsTypeNames
-//     [
-//         debug::optimisationSwitches().lookupOrAddDefault
-//         (
-//             "commsType",
-//             word("blocking")
-//         )
-//     ]
-// );
 
 
 const Foam::debug::optimisationSwitch

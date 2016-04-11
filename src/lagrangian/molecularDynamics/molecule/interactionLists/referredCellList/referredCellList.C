@@ -46,16 +46,16 @@ void Foam::referredCellList::buildReferredCellList
     DynamicList<referredCell> referredInteractionList;
 
     // realCellsWithinRCutMaxOfAnyReferringPatch
-    DynamicList<label> rCellsWRRP;
+    dynamicLabelList rCellsWRRP;
 
     // realFacesWithinRCutMaxOfAnyReferringPatch
-    DynamicList<label> rFacesWRRP;
+    dynamicLabelList rFacesWRRP;
 
     // realEdgesWithinRCutMaxOfAnyReferringPatch
-    DynamicList<label> rEdgesWRRP;
+    dynamicLabelList rEdgesWRRP;
 
     // realPointsWithinRCutMaxOfAnyReferringPatch
-    DynamicList<label> rPointsWRRP;
+    dynamicLabelList rPointsWRRP;
 
     labelListList processorPatchSegmentMapping
     (
@@ -446,7 +446,7 @@ void Foam::referredCellList::buildReferredCellList
 
                     label faceI;
 
-                    DynamicList<label> meshFacesOnThisSegment;
+                    dynamicLabelList meshFacesOnThisSegment;
 
                     for (faceI = 0; faceI < patch.size()/2; faceI++)
                     {
@@ -459,9 +459,9 @@ void Foam::referredCellList::buildReferredCellList
 
                     meshFacesOnThisSegment.shrink();
 
-                    DynamicList<label> meshEdgesOnThisSegment;
+                    dynamicLabelList meshEdgesOnThisSegment;
 
-                    DynamicList<label> meshPointsOnThisSegment;
+                    dynamicLabelList meshPointsOnThisSegment;
 
                     forAll(meshFacesOnThisSegment, mFOTS)
                     {
@@ -942,7 +942,7 @@ void Foam::referredCellList::buildReferredCellList
 
                     label faceT = -1;
 
-                    DynamicList<label> meshFacesOnThisSegment;
+                    dynamicLabelList meshFacesOnThisSegment;
 
                     forAll (patch, faceI)
                     {
@@ -962,9 +962,9 @@ void Foam::referredCellList::buildReferredCellList
 
                     meshFacesOnThisSegment.shrink();
 
-                    DynamicList<label> meshEdgesOnThisSegment;
+                    dynamicLabelList meshEdgesOnThisSegment;
 
-                    DynamicList<label> meshPointsOnThisSegment;
+                    dynamicLabelList meshPointsOnThisSegment;
 
                     forAll(meshFacesOnThisSegment, mFOTS)
                     {
@@ -1301,7 +1301,7 @@ void Foam::referredCellList::buildReferredCellList
 
         referredCell& refCell = (*this)[rC];
 
-        DynamicList<label> realCellsFoundInRange;
+        dynamicLabelList realCellsFoundInRange;
 
         const vectorList& refCellPoints = refCell.vertexPositions();
 

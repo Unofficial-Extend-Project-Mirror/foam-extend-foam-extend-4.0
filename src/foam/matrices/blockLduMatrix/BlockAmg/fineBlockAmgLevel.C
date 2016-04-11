@@ -72,6 +72,7 @@ Foam::fineBlockAmgLevel<Type>::fineBlockAmgLevel
         (
             matrix,
             dict
+//             ,"fineSmoother"
         )
     ),
     Ax_()

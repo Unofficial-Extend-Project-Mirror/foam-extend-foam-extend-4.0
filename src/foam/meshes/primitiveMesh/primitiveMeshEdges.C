@@ -34,7 +34,7 @@ License
 // Returns edgeI between two points.
 Foam::label Foam::primitiveMesh::getEdge
 (
-    List<DynamicList<label> >& pe,
+    List<dynamicLabelList >& pe,
     DynamicList<edge>& es,
 
     const label pointI,
@@ -388,7 +388,7 @@ void Foam::primitiveMesh::clearOutEdges()
 const Foam::labelList& Foam::primitiveMesh::faceEdges
 (
     const label faceI,
-    DynamicList<label>& storage
+    dynamicLabelList& storage
 ) const
 {
     if (hasFaceEdges())
@@ -432,7 +432,7 @@ const Foam::labelList& Foam::primitiveMesh::faceEdges(const label faceI) const
 const Foam::labelList& Foam::primitiveMesh::cellEdges
 (
     const label cellI,
-    DynamicList<label>& storage
+    dynamicLabelList& storage
 ) const
 {
     if (hasCellEdges())

@@ -633,8 +633,6 @@ Foam::argList::argList
         {
             Info<< "Slaves : " << slaveProcs << nl
                 << "Pstream initialized with:" << nl
-                << "    floatTransfer     : "
-                << Pstream::floatTransfer << nl
                 << "    nProcsSimpleSum   : "
                 << Pstream::nProcsSimpleSum() << nl
                 << "    commsType         : "

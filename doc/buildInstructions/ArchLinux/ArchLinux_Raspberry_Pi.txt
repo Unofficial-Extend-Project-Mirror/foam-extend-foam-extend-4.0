@@ -1,0 +1,146 @@
+Below are the build instructions for Arch Linux over the Raspberry Pi
+
+These instructions assume that your Arch Linux installation is up and running on
+the Raspberry Pi with full network access. If not, please visit the following
+Web sites for further instructions. As always, Google will also be your friend.
+https://www.raspberrypi.org/documentation/
+https://wiki.archlinux.org/index.php/Raspberry_Pi
+
+
+* Update your Arch Linux installation:
+
+    sudo pacman -Syu
+
+* Install required packages:
+
+    pacman -S git gcc cmake bison flex make openmpi --needed base-devel 
+
+* Create the foam-extend installation directory:
+
+These instructions assume that you install in the default location, which is
+~/foam/ . Create this folder with:
+
+    mkdir ~/foam
+
+* Obtain and unpack source code (if you read this, you probably already have):
+
+The recommended way is to get the source code through git source code
+management system. This way, you can get updates and bugfixes easily by running
+"git pull". To install into the default location run:
+
+    cd ~/foam
+    git clone git://git.code.sf.net/p/foam-extend/foam-extend-3.2
+
+* For Arch Linux, you need to customize your file etc/prefs.sh in order to enable
+  the usage of system-provided packages, and to enable the compilation of other.
+
+  Here is a list of commands that will do just that. You can copy/paste
+  the following block of commands in a control terminal in order to make
+  the necessary adjustments. You will need to be located at the root of your
+  foam-extend-3.2 installation for those commands to work.
+
+  ### - Start to copy commands here ###########################################
+  #
+cd ~/foam/foam-extend-3.2
+
+  # Create a prefs.sh file
+cp etc/prefs.sh-EXAMPLE etc/prefs.sh
+
+  # Create a patch file
+cat <<'EOF' >> patch.txt
+--- etc/prefs.sh-EXAMPLE        2015-11-23 22:54:50.341631348 -0500
++++ etc/prefs.sh        2015-12-05 13:31:02.967676779 -0500
+@@ -36,7 +36,7 @@
+ 
+ # Specify system compiler
+ # ~~~~~~~~~~~~~~~~~~~~~~~
+-#compilerInstall=System
++compilerInstall=System
+ #compilerInstall=FOAM
+ 
+ # Specify system openmpi
+@@ -46,14 +46,14 @@
+ # The other openmpi related variables will be initialized using
+ # the command mpicc --showme:
+ #
+-#export WM_MPLIB=SYSTEMOPENMPI
+-#export OPENMPI_DIR=path_to_system_installed_openmpi
+-#export OPENMPI_BIN_DIR=$OPENMPI_DIR/bin
+-#
+-#export OPENMPI_LIB_DIR="`$OPENMPI_BIN_DIR/mpicc --showme:libdirs`"
+-#export OPENMPI_INCLUDE_DIR="`$OPENMPI_BIN_DIR/mpicc --showme:incdirs`"
+-#export OPENMPI_COMPILE_FLAGS="`$OPENMPI_BIN_DIR/mpicc --showme:compile`"
+-#export OPENMPI_LINK_FLAGS="`$OPENMPI_BIN_DIR/mpicc --showme:link`"
++export WM_MPLIB=SYSTEMOPENMPI
++export OPENMPI_DIR=/usr
++export OPENMPI_BIN_DIR=$OPENMPI_DIR/bin
++#
++export OPENMPI_LIB_DIR="`$OPENMPI_BIN_DIR/mpicc --showme:libdirs`"
++export OPENMPI_INCLUDE_DIR="`$OPENMPI_BIN_DIR/mpicc --showme:incdirs`"
++export OPENMPI_COMPILE_FLAGS="`$OPENMPI_BIN_DIR/mpicc --showme:compile`"
++export OPENMPI_LINK_FLAGS="`$OPENMPI_BIN_DIR/mpicc --showme:link`"
+ 
+ # Specify system installed ThirdParty packages/libraries
+ # NB: The packages installed under $WM_THIRD_PARTY_DIR
+@@ -201,7 +201,6 @@
+ # For AllMake.stage1
+ #export WM_THIRD_PARTY_USE_GCC_492=1
+ #export WM_THIRD_PARTY_USE_GCC_484=1
+-#export WM_THIRD_PARTY_USE_GCC_474=1
+ #export WM_THIRD_PARTY_USE_GCC_463=1
+ #export WM_THIRD_PARTY_USE_GCC_451=1
+ #export WM_THIRD_PARTY_USE_GCC_445=1
+@@ -209,7 +208,8 @@
+ #export WM_THIRD_PARTY_USE_M4_1416=1
+ #export WM_THIRD_PARTY_USE_BISON_27=1
+ #export WM_THIRD_PARTY_USE_FLEX_2535=1
+-export WM_THIRD_PARTY_USE_CMAKE_322=1
++#export WM_THIRD_PARTY_USE_CMAKE_322=1
++unset WM_THIRD_PARTY_USE_CMAKE_322
+ 
+ #
+ # For AllMake.stage2
+EOF
+
+ # Patch the file prefs.sh  
+patch -p0 < patch.txt
+
+ # Cleanup
+rm patch.txt
+
+  # You are done
+  #
+  ### - Stop to copy commands here ###########################################
+  ############################################################################
+
+
+* Set environment variables:
+
+    cd ~/foam/foam-extend-3.2
+    . etc/bashrc
+
+* Before compiling on the Raspberry Pi 2:
+
+Even though the Raspberry Pi2 has a more onboard RAM memory (1 GB), it cannot
+compile some parts of foam-extend in parallel without borrowing some virtual
+memory (swap). Depending on your system configuration and the amount of enabled
+services on your Raspberry Pi, you might even ran out of memory completely. So
+it is recommended not to compile foam-extend in parallel unless you keep an eye
+regularly on the compilation process and adjust your environment variable
+WM_NCOMPPROCS accordingly so you can compile some libraries/applications in
+parallel and some others using just 1 core. 
+
+   export WM_NCOMPPROCS=1    # or maybe 2
+
+* Compile:
+
+    # This will take a very long time but it will compile completely
+    ./Allwmake.firstInstall
+
+
+* Create user directory:
+
+    mkdir -p $FOAM_RUN
+
+
+And you are ready to start.

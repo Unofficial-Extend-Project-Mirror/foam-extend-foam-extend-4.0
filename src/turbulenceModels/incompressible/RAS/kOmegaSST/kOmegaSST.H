@@ -144,6 +144,7 @@ class kOmegaSST
         //  Note: different to wall distance in parent RASModel
         wallDist y_;
 
+
         // Fields
 
             volScalarField k_;

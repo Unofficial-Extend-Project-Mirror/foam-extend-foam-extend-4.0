@@ -39,14 +39,6 @@ namespace RASModels
 
 // * * * * * * * * * * * * * Protected Member Functions  * * * * * * * * * * //
 
-template<class Type>
-void immersedBoundaryWallFunctionFvPatchField<Type>::motionUpdate() const
-{
-    wallValue_.clear();
-    wallMask_.clear();
-
-    immersedBoundaryFvPatchField<Type>::motionUpdate();
-}
 
 
 template<class Type>
@@ -171,6 +163,65 @@ immersedBoundaryWallFunctionFvPatchField
     wallValue_(),
     wallMask_()
 {}
+
+
+// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+
+template<class Type>
+Foam::Field<Type>& immersedBoundaryWallFunctionFvPatchField<Type>::wallValue() const
+{
+    // Note: on a moving mesh, the intersection has changed and
+    // wallValue fields should be cleared and recalculated.
+    // This should happen only once, but I cannot see the mechanism
+    // HJ, 17/Oct/2012
+    // Bugfix 30/OCT/2015 - check if the mesh is moving
+
+    const immersedBoundaryFvPatch& ibFvP =
+        immersedBoundaryFvPatchField<Type>::ibPatch();
+
+    if 
+    (
+        wallValue_.empty() 
+     || (ibFvP.movingIb() || ibFvP.boundaryMesh().mesh().moving())
+    )
+    {
+        wallValue_.setSize
+        (
+            this->ibPatch().ibCells().size(),
+            pTraits<Type>::zero
+        );
+    }
+    
+    return wallValue_;
+}
+
+
+template<class Type>
+Foam::boolList& immersedBoundaryWallFunctionFvPatchField<Type>::wallMask() const
+{
+    // Note: on a moving mesh, the intersection has changed and
+    // wallValue fields should be cleared and recalculated.
+    // This should happen only once, but I cannot see the mechanism
+    // HJ, 17/Oct/2012
+    // Bugfix 30/OCT/2015 - check if the mesh is moving
+    const immersedBoundaryFvPatch& ibFvP =
+        immersedBoundaryFvPatchField<Type>::ibPatch();
+
+    if 
+    (
+        wallMask_.empty() 
+     || (ibFvP.movingIb() || ibFvP.boundaryMesh().mesh().moving())
+    )
+    {
+        wallMask_.setSize
+        (
+            this->ibPatch().ibCells().size(),
+            false
+        );
+    }
+    
+    return wallMask_;
+}
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

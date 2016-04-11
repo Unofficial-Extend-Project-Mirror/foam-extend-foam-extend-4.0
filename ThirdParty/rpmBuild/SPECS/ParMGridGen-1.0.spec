@@ -45,8 +45,8 @@
 
 # Will install the package directly $WM_THIRD_PARTY_DIR
 #   Some comments about package relocation:
-#   By using this prefix for the Prefix:  parameter in this file, you will make this 
-#   package relocatable. 
+#   By using this prefix for the Prefix:  parameter in this file, you will make this
+#   package relocatable.
 #
 #   This is fine, as long as your software is itself relocatable.
 #
@@ -55,7 +55,7 @@
 #   Ref: http://sourceware.org/autobook/autobook/autobook_80.html
 #
 #   In that case, if you ever change the value of the $WM_THIRD_PARTY_DIR, you will
-#   not be able to reutilize this RPM, even though it is relocatable. You will need to 
+#   not be able to reutilize this RPM, even though it is relocatable. You will need to
 #   regenerate the RPM.
 #
 %define _prefix         %{_WM_THIRD_PARTY_DIR}
@@ -115,6 +115,14 @@ Patch1:                 ParMGridGen-1.0.patch
     cp ./MGridGen/IMlib/libIMlib.*  $RPM_BUILD_ROOT/%{_installPrefix}/lib
     cp ./MGridGen/Lib/libMGridGen.* $RPM_BUILD_ROOT/%{_installPrefix}/lib
 
+%ifos darwin
+    # Making sure to set the shared library identification name to the full path
+    # System Integrity Protection (SIP) enabled systems (OS X El Capitan)
+    # require this
+    install_name_tool -id %{_installPrefix}/lib/libIMlib.dylib    $RPM_BUILD_ROOT/%{_installPrefix}/lib/libIMlib.dylib
+    install_name_tool -id %{_installPrefix}/lib/libMGridGen.dylib $RPM_BUILD_ROOT/%{_installPrefix}/lib/libMGridGen.dylib
+%endif
+
     # Creation of foam-extend specific .csh and .sh files"
 
     echo ""
@@ -161,7 +169,7 @@ DOT_CSH_EOF
     #finally, generate a .tgz file for systems where using rpm for installing packages
     # as a non-root user might be a problem.
     (mkdir -p  %{_topdir}/TGZS/%{_target_cpu}; cd $RPM_BUILD_ROOT/%{_prefix}; tar -zcvf %{_topdir}/TGZS/%{_target_cpu}/%{name}-%{version}.tgz  packages/%{name}-%{version})
- 
+
 
 %clean
 rm -rf %{buildroot}

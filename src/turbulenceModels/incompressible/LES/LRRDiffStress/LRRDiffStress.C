@@ -63,7 +63,7 @@ LRRDiffStress::LRRDiffStress
 
     ck_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "ck",
             coeffDict_,
@@ -72,7 +72,7 @@ LRRDiffStress::LRRDiffStress
     ),
     c1_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "c1",
             coeffDict_,
@@ -81,7 +81,7 @@ LRRDiffStress::LRRDiffStress
     ),
     c2_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensionedScalar::lookupOrAddToDict
         (
             "c2",
             coeffDict_,

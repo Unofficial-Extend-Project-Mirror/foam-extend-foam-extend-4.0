@@ -103,7 +103,7 @@ void Foam::faceCollapser::filterFace
     const labelList& fEdges = mesh_.faceEdges()[faceI];
 
     // Space for replaced vertices and split edges.
-    DynamicList<label> newFace(10 * f.size());
+    dynamicLabelList newFace(10 * f.size());
 
     forAll(f, fp)
     {
@@ -416,7 +416,7 @@ void Foam::faceCollapser::setRefinement
             label sorted1 = sortedFp[fp1];
 
             // Get indices in increasing order
-            DynamicList<label> edgePoints(f.size());
+            dynamicLabelList edgePoints(f.size());
 
             // Whether edgePoints are from fp to fp1
             bool fpToFp1;

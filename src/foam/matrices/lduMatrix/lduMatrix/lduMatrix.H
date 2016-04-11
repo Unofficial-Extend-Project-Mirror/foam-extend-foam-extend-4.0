@@ -165,6 +165,12 @@ public:
                 return solverName_;
             }
 
+            //- Return access to solver name
+            word& solverName()
+            {
+                return solverName_;
+            }
+
             //- Return initial residual
             scalar initialResidual() const
             {
@@ -485,9 +491,6 @@ public:
 
     public:
 
-        //- Find the smoother name (directly or from a sub-dictionary)
-        static word getName(const dictionary&);
-
         //- Runtime type information
         virtual const word& type() const = 0;
 
@@ -553,7 +556,8 @@ public:
                 const FieldField<Field, scalar>& coupleBouCoeffs,
                 const FieldField<Field, scalar>& coupleIntCoeffs,
                 const lduInterfaceFieldPtrsList& interfaces,
-                const dictionary& dict
+                const dictionary& dict,
+                const word keyword = word("smoother")
             );
 
 
@@ -620,9 +624,6 @@ public:
 
 
     public:
-
-        //- Find the preconditioner name (directly or from a sub-dictionary)
-        static word getName(const dictionary&);
 
         //- Runtime type information
         virtual const word& type() const = 0;
@@ -693,7 +694,8 @@ public:
                 const FieldField<Field, scalar>& coupleBouCoeffs,
                 const FieldField<Field, scalar>& coupleIntCoeffs,
                 const lduInterfaceFieldPtrsList& interfaces,
-                const dictionary& dict
+                const dictionary& dict,
+                const word keyword = word("preconditioner")
             );
 
 

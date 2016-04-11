@@ -1,5 +1,5 @@
 {
-    // Solve the enthalpy equation
+    // Solve the rothalpy equation
     T.storePrevIter();
 
     // Calculate face velocity from flux
@@ -14,10 +14,10 @@
         fvm::ddt(rho, i)
       + fvm::div(phi, i)
       - fvm::laplacian(turbulence->alphaEff(), i)
-        // u & gradP term (steady-state formulation)
-      + fvm::SuSp((fvc::div(faceU, p, "div(U,p)") - p*fvc::div(faceU))/i, i)
      ==
         // ddt(p) term removed: steady-state.  HJ, 27/Apr/2010
+        fvc::div(faceU, p, "div(U,p)")
+      - p*fvc::div(faceU)
         // Viscous heating: note sign (devRhoReff has a minus in it)
       - (turbulence->devRhoReff() && fvc::grad(Urel))
     );
@@ -33,15 +33,10 @@
     h = i + 0.5*magSqr(Urot);
     h.correctBoundaryConditions();
 
-    // Bound the enthalpy using TMin and TMax
-    volScalarField Cp = thermo.Cp();
-
-    h = Foam::min(h, TMax*Cp);
-    h = Foam::max(h, TMin*Cp);
-    h.correctBoundaryConditions();
-
     // Re-initialise rothalpy based on limited enthalpy
     i = h - 0.5*magSqr(Urot);
 
+    // Bounding of enthalpy taken out
     thermo.correct();
+    psis = thermo.psi()/thermo.Cp()*thermo.Cv();
 }

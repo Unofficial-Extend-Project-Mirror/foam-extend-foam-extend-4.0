@@ -297,7 +297,7 @@ void Foam::surfaceIntersection::classifyHit
 
     DynamicList<edge>& allCutEdges,
     DynamicList<point>& allCutPoints,
-    List<DynamicList<label> >& surfEdgeCuts
+    List<dynamicLabelList >& surfEdgeCuts
 )
 {
     const edge& e = surf1.edges()[edgeI];
@@ -585,7 +585,7 @@ void Foam::surfaceIntersection::doCutEdges
 
     DynamicList<edge>& allCutEdges,
     DynamicList<point>& allCutPoints,
-    List<DynamicList<label> >& surfEdgeCuts
+    List<dynamicLabelList >& surfEdgeCuts
 )
 {
     scalar oldTol = intersection::setPlanarTol(1E-3);
@@ -759,7 +759,7 @@ Foam::surfaceIntersection::surfaceIntersection
 
 
     // From edge to cut index on surface1
-    List<DynamicList<label> > edgeCuts1(query1.surface().nEdges());
+    List<dynamicLabelList > edgeCuts1(query1.surface().nEdges());
 
     doCutEdges
     (
@@ -786,7 +786,7 @@ Foam::surfaceIntersection::surfaceIntersection
     }
 
     // From edge to cut index
-    List<DynamicList<label> > edgeCuts2(query2.surface().nEdges());
+    List<dynamicLabelList > edgeCuts2(query2.surface().nEdges());
 
     doCutEdges
     (
@@ -863,7 +863,7 @@ Foam::surfaceIntersection::surfaceIntersection
 
     {
         // From edge to cut index on surface1
-        List<DynamicList<label> > edgeCuts1(surf1.nEdges());
+        List<dynamicLabelList > edgeCuts1(surf1.nEdges());
 
         forAll(intersections1, edgeI)
         {
@@ -904,7 +904,7 @@ Foam::surfaceIntersection::surfaceIntersection
 
     {
         // From edge to cut index on surface2
-        List<DynamicList<label> > edgeCuts2(surf2.nEdges());
+        List<dynamicLabelList > edgeCuts2(surf2.nEdges());
 
         forAll(intersections2, edgeI)
         {
@@ -1021,7 +1021,7 @@ Foam::surfaceIntersection::surfaceIntersection
     DynamicList<point> allCutPoints;
 
     // From edge to cut index on surface1
-    List<DynamicList<label> > edgeCuts1(query1.surface().nEdges());
+    List<dynamicLabelList > edgeCuts1(query1.surface().nEdges());
 
     doCutEdges
     (

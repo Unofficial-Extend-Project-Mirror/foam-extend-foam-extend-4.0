@@ -76,8 +76,8 @@ bool Foam::fileFormats::TRIsurfaceFormatCore::read
     // uses similar structure as STL, just some points
     // the rest of the reader resembles the STL binary reader
     DynamicList<point> dynPoints;
-    DynamicList<label> dynZones;
-    DynamicList<label> dynSizes;
+    dynamicLabelList dynZones;
+    dynamicLabelList dynSizes;
     HashTable<label>   lookup;
 
     // place faces without a group in zone0

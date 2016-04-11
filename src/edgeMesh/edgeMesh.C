@@ -125,7 +125,7 @@ Foam::label Foam::edgeMesh::regions(labelList& edgeRegion) const
         while (edgesToVisit.size())
         {
             // neighbours of current edgesToVisit
-            DynamicList<label> newEdgesToVisit(edgesToVisit.size());
+            dynamicLabelList newEdgesToVisit(edgesToVisit.size());
 
             // Mark all point connected edges with current region.
             forAll(edgesToVisit, i)

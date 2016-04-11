@@ -2217,7 +2217,7 @@ const changeMap dynamicTopoFvMesh::insertCells(const label mIndex)
     }
 
     // Build a list of mapping entities on this processor
-    DynamicList<label> mapCells(10);
+    dynamicLabelList mapCells(10);
 
     if (is2D())
     {
@@ -3197,7 +3197,7 @@ const changeMap dynamicTopoFvMesh::insertCells(const label mIndex)
             // Accumulate stats in case of failure
             scalar minDist = GREAT;
             vector minPoint = vector::zero;
-            DynamicList<label> checkedFaces;
+            dynamicLabelList checkedFaces;
 
             if (debug > 2)
             {
@@ -4943,7 +4943,7 @@ void dynamicTopoFvMesh::syncCoupledPatches(labelHashSet& entities)
     }
 
     // Buffer for cell-removal
-    DynamicList<label> rCellList(10);
+    dynamicLabelList rCellList(10);
 
     forAll(procIndices_, pI)
     {
@@ -5238,7 +5238,7 @@ void dynamicTopoFvMesh::syncCoupledPatches(labelHashSet& entities)
                             // Accumulate stats in case of failure
                             scalar minDist = GREAT;
                             vector minPoint = vector::zero;
-                            DynamicList<label> checkedFaces;
+                            dynamicLabelList checkedFaces;
 
                             if (debug > 2)
                             {
@@ -9540,7 +9540,7 @@ bool dynamicTopoFvMesh::coupledFillTables
         // Need to build alternate addressing / point-list
         // for swaps across processors.
         DynamicList<point> parPts(10);
-        DynamicList<label> parVtx(10);
+        dynamicLabelList parVtx(10);
 
         bool closed = true;
         label nPoints = 0, nProcs = 0;
@@ -9897,7 +9897,7 @@ void dynamicTopoFvMesh::computeCoupledWeights
 
     if (dimension == 2)
     {
-        DynamicList<label> faceParents(10);
+        dynamicLabelList faceParents(10);
 
         label patchIndex = whichPatch(index);
 
@@ -9995,7 +9995,7 @@ void dynamicTopoFvMesh::computeCoupledWeights
     else
     if (dimension == 3)
     {
-        DynamicList<label> cellParents(10);
+        dynamicLabelList cellParents(10);
 
         forAll(procIndices_, pI)
         {

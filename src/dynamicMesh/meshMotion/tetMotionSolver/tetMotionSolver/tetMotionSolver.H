@@ -66,7 +66,7 @@ class tetMotionSolver
         tetPointVectorField motionU_;
 
         //- List of constrained points
-        DynamicList<label> fixedPoints_;
+        dynamicLabelList fixedPoints_;
 
         //- List of constrained velocities
         DynamicList<vector> fixedVelocity_;

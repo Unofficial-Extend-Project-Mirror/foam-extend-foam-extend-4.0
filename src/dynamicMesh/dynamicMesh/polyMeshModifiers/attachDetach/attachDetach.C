@@ -110,7 +110,7 @@ void Foam::attachDetach::checkDefinition()
         {
             const labelList& addr = mesh.faceZones()[faceZoneID_.index()];
 
-            DynamicList<label> bouFacesInZone(addr.size());
+            dynamicLabelList bouFacesInZone(addr.size());
 
             forAll (addr, faceI)
             {
@@ -178,7 +178,7 @@ void Foam::attachDetach::checkDefinition()
         {
             const labelList& addr = mesh.faceZones()[faceZoneID_.index()];
 
-            DynamicList<label> zoneProblemFaces(addr.size());
+            dynamicLabelList zoneProblemFaces(addr.size());
 
             forAll (addr, faceI)
             {

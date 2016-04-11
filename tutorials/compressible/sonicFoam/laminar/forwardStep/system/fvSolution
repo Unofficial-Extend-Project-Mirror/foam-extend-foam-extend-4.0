@@ -17,42 +17,38 @@ FoamFile
 
 solvers
 {
+    rho
+    {}
+
     p
     {
-        solver          PBiCG;
+        solver          BiCGStab;
         preconditioner  DILU;
-        tolerance       1e-06;
+        tolerance       1e-07;
         relTol          0;
     }
 
     U
     {
-        solver          PBiCG;
+        solver          BiCGStab;
         preconditioner  DILU;
-        tolerance       1e-05;
-        relTol          0;
-    }
-
-    rho
-    {
-        solver          PCG;
-        preconditioner  DIC;
-        tolerance       1e-05;
+        tolerance       1e-07;
         relTol          0;
     }
 
     e
     {
-        solver          PBiCG;
+        solver          BiCGStab;
         preconditioner  DILU;
-        tolerance       1e-05;
+        tolerance       1e-07;
         relTol          0;
     }
 }
 
-PISO
+PIMPLE
 {
-    nCorrectors     2;
+    nOuterCorrectors 1;
+    nCorrectors      2;
     nNonOrthogonalCorrectors 0;
 }
 

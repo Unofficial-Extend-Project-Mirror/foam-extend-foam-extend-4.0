@@ -85,7 +85,7 @@ class extendedUpwindCellToFaceStencil
             const scalar minOpposedness,
             const label faceI,
             const label cellI,
-            DynamicList<label>& oppositeFaces
+            dynamicLabelList& oppositeFaces
         ) const;
 
         //- Transport (centred) face stencil to 'opposite' face.
@@ -98,7 +98,7 @@ class extendedUpwindCellToFaceStencil
             const label cellI,
             const bool stencilHasNeighbour,
 
-            DynamicList<label>& oppositeFaces,
+            dynamicLabelList& oppositeFaces,
             labelHashSet& faceStencilSet,
             labelList& transportedStencil
         ) const;

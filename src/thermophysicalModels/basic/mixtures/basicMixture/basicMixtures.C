@@ -44,6 +44,8 @@ Description
 
 #include "pureMixture.H"
 
+#include "thermoPhysicsTypes.H"
+
 #include "addToRunTimeSelectionTable.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -92,6 +94,13 @@ makeBasicMixture
     janafThermo,
     perfectGas
 );
+
+makeBasicMixturePhys
+(
+    pureMixture,
+    icoPoly8ThermoPhysics
+);
+
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

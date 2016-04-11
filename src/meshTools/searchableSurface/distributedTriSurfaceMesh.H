@@ -138,8 +138,8 @@ private:
             //    const treeBoundBox& bb,
             //
             //    DynamicList<segment>& allSegments,
-            //    DynamicList<label>& allSegmentMap,
-            //    DynamicList<label> sendMap
+            //    dynamicLabelList& allSegmentMap,
+            //    dynamicLabelList sendMap
             //) const
 
             //- Distribute segments into overlapping processor
@@ -151,8 +151,8 @@ private:
                 const point& end,
 
                 DynamicList<segment>&,
-                DynamicList<label>&,
-                List<DynamicList<label> >&
+                dynamicLabelList&,
+                List<dynamicLabelList >&
             ) const;
 
             //- Divide edges into local and remote segments. Construct map to

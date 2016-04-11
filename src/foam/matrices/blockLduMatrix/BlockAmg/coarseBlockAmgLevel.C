@@ -77,6 +77,7 @@ Foam::coarseBlockAmgLevel<Type>::coarseBlockAmgLevel
         (
             matrixPtr_,
             dict
+//             ,"coarseSmoother"
         )
     ),
     Ax_()

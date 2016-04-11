@@ -307,7 +307,7 @@ void Foam::cellFeatures::calcSuperFaces() const
             {
                 // Walk point-edge-point along feature edges
 
-                DynamicList<label> superFace(10*mesh_.faces()[faceI].size());
+                dynamicLabelList superFace(10*mesh_.faces()[faceI].size());
 
                 const edge& e = mesh_.edges()[startEdgeI];
 

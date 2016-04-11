@@ -99,7 +99,7 @@ tmp<volVectorField> cellLimitedGrad<scalar>::calcGrad
 {
     const fvMesh& mesh = vsf.mesh();
 
-    tmp<volVectorField> tGrad = basicGradScheme_().grad(vsf);
+    tmp<volVectorField> tGrad = basicGradScheme_().grad(vsf, name);
 
     if (k_ < SMALL)
     {
@@ -237,7 +237,7 @@ tmp<volVectorField> cellLimitedGrad<scalar>::calcGrad
 
     g.internalField() *= limiter;
     g.correctBoundaryConditions();
-    gaussGrad<scalar>::correctBoundaryConditions(vsf, g);
+    gradScheme<scalar>::correctBoundaryConditions(vsf, g);
 
     return tGrad;
 }
@@ -252,7 +252,7 @@ tmp<volTensorField> cellLimitedGrad<vector>::calcGrad
 {
     const fvMesh& mesh = vsf.mesh();
 
-    tmp<volTensorField> tGrad = basicGradScheme_().grad(vsf);
+    tmp<volTensorField> tGrad = basicGradScheme_().grad(vsf, name);
 
     if (k_ < SMALL)
     {
@@ -400,7 +400,7 @@ tmp<volTensorField> cellLimitedGrad<vector>::calcGrad
     }
 
     g.correctBoundaryConditions();
-    gaussGrad<vector>::correctBoundaryConditions(vsf, g);
+    gradScheme<vector>::correctBoundaryConditions(vsf, g);
 
     return tGrad;
 }

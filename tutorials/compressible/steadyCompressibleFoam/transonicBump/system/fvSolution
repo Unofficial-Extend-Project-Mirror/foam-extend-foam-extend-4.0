@@ -76,8 +76,6 @@ relaxationFactors
     U               0.1;
     p               0.25;
     h               0.1;
-    rho             0.5;
-    T               0.5;
 }
 
 fieldBounds

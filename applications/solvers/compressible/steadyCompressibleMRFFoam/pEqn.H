@@ -1,29 +1,27 @@
 {
     volScalarField rUA = 1.0/UEqn.A();
 
+    surfaceScalarField psisf = fvc::interpolate(psis);
+    surfaceScalarField rhof = fvc::interpolate(rho);
+
+    // Needs to be outside of loop since p is changing, but psi and rho are not.
+    surfaceScalarField rhoReff = rhof - psisf*fvc::interpolate(p);
+
     for (int corr = 0; corr < nCorr; corr++)
     {
         U = rUA*UEqn.H();
 
-        surfaceScalarField psif = fvc::interpolate(psi);
-        surfaceScalarField rhof = fvc::interpolate(rho);
-
-        // Execute ddtPhiCorr before recalculating flux
-        // HJ, 27/Apr/2010
-        surfaceScalarField phid
-        (
-            "phid",
-            psif*(fvc::interpolate(U) & mesh.Sf())
-        );
-
-        // Make flux relative within the MRF zone
-        mrfZones.relativeFlux(psif, phid);
-
         // Calculate phi for boundary conditions
-        phi = fvc::interpolate(rho*U) & mesh.Sf();
+        phi = rhof*fvc::interpolate(U) & mesh.Sf();
 
-        // Make flux relative within the MRF zone
-        mrfZones.relativeFlux(rhof, phi);
+        surfaceScalarField phid2 = rhoReff/rhof*phi;
+
+        surfaceScalarField phid("phid", psisf/rhof*phi);
+
+        // Make fluxes relative within the MRF zone
+        mrfZones.relativeFlux(rhoReff, phi);
+        mrfZones.relativeFlux(psisf, phid);
+        mrfZones.relativeFlux(rhoReff, phid2);
 
         p.storePrevIter();
 
@@ -31,8 +29,9 @@
         {
             fvScalarMatrix pEqn
             (
-                fvm::ddt(psi, p)
+                fvm::ddt(psis, p)
               + fvm::div(phid, p)
+              + fvc::div(phid2)
               - fvm::laplacian(rho*rUA, p)
             );
 
@@ -47,13 +46,13 @@
             // Calculate the flux
             if (nonOrth == nNonOrthCorr)
             {
-                phi = pEqn.flux();
+                phi = phid2 + pEqn.flux();
             }
         }
 
 #       include "compressibleContinuityErrs.H"
 
-        // Explicitly relax the pressure for momentum corrector
+        // Relax the pressure
         p.relax();
 
         U -= rUA*fvc::grad(p);

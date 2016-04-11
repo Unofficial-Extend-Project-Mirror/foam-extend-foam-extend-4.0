@@ -45,6 +45,7 @@ SourceFiles
 #include "HashTable.H"
 #include "foamString.H"
 #include "NamedEnum.H"
+#include "dynamicLabelList.H"
 #include "optimisationSwitch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -185,8 +186,8 @@ private:
         static void collectReceives
         (
             const label procID,
-            const List<DynamicList<label> >& receives,
-            DynamicList<label>& allReceives
+            const dynamicLabelListList& receives,
+            dynamicLabelList& allReceives
         );
 
         //- Initialize all communication schedules. Callback from
@@ -222,17 +223,21 @@ public:
 
     // Static data
 
-        //- Should compact transfer be used in which floats replace doubles
-        //  reducing the bandwidth requirement at the expense of some loss
-        //  in accuracy
-        static const debug::optimisationSwitch floatTransfer;
-
         //- Number of processors at which the sum algorithm changes from linear
         //  to tree
         static const debug::optimisationSwitch nProcsSimpleSum;
 
         //- Default commsType
         static const debug::optimisationSwitch defaultCommsType;
+
+        //- Default comms with a cast
+        inline static Pstream::commsTypes defaultComms()
+        {
+            return static_cast<Pstream::commsTypes>
+            (
+                Pstream::defaultCommsType()
+            );
+        }
 
 
     // Constructors

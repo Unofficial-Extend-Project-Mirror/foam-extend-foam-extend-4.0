@@ -25,11 +25,11 @@ stopAt          endTime;
 
 endTime         0.01;
 
-deltaT          4e-08;
+deltaT          5e-08;
 
 writeControl    runTime;
 
-writeInterval   2e-04;
+writeInterval   1e-05;
 
 purgeWrite      0;
 
@@ -45,8 +45,11 @@ timePrecision   6;
 
 runTimeModifiable yes;
 
+adjustTimeStep   no;
+maxCo            10;
+
 functions
-{
+(
     forces
     {
         type        forceCoeffs;
@@ -69,6 +72,54 @@ functions
         lRef        1;
         Aref        1;
     }
-}
+
+    Mach
+    {
+        type        MachNumber;
+        UName       U;
+
+        functionObjectLibs ("libutilityFunctionObjects.so");
+    }
+
+    minMaxU
+    {
+        type        minMaxField;
+
+        // Where to load it from (if not already in solver)
+        functionObjectLibs ("libfieldFunctionObjects.so");
+
+        name U;
+    }
+
+    minMaxP
+    {
+        type        minMaxField;
+
+        // Where to load it from (if not already in solver)
+        functionObjectLibs ("libfieldFunctionObjects.so");
+
+        name p;
+    }
+
+    minMaxRho
+    {
+        type        minMaxField;
+
+        // Where to load it from (if not already in solver)
+        functionObjectLibs ("libfieldFunctionObjects.so");
+
+        name rho;
+    }
+
+    minMaxT
+    {
+        type        minMaxField;
+
+        // Where to load it from (if not already in solver)
+        functionObjectLibs ("libfieldFunctionObjects.so");
+
+        name T;
+    }
+);
 
 // ************************************************************************* //

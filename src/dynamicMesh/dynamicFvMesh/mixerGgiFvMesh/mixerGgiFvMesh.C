@@ -322,8 +322,9 @@ bool Foam::mixerGgiFvMesh::update()
         )
     );
 
-    // The mesh is not morphing
-    return false;
+    // The mesh is not morphing, but flux re-calculation is required
+    // HJ, 25/Jan/2016
+    return true;
 }
 
 

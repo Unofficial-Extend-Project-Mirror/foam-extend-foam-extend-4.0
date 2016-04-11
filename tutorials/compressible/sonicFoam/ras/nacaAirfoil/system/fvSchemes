@@ -41,13 +41,7 @@ divSchemes
 
 laplacianSchemes
 {
-    default         none;
-    laplacian(muEff,U) Gauss linear limited 0.5;
-    laplacian(DkEff,k) Gauss linear limited 0.5;
-    laplacian(DREff,R) Gauss linear limited 0.5;
-    laplacian(DepsilonEff,epsilon) Gauss linear limited 0.5;
-    laplacian((rho*(1|A(U))),p) Gauss linear limited 0.5;
-    laplacian(alphaEff,e) Gauss linear limited 0.5;
+    default         Gauss linear limited 0.5;
 }
 
 interpolationSchemes

@@ -173,6 +173,52 @@ inline sutherlandTransport<thermo>& sutherlandTransport<thermo>::operator=
 }
 
 
+template<class thermo>
+inline void Foam::sutherlandTransport<thermo>::operator+=
+(
+    const sutherlandTransport<thermo>& st
+)
+{
+    scalar molr1 = this->nMoles();
+
+    thermo::operator+=(st);
+
+    molr1 /= this->nMoles();
+    scalar molr2 = st.nMoles()/this->nMoles();
+
+    As = molr1*As + molr2*st.As;
+    Ts = molr1*Ts + molr2*st.Ts;
+}
+
+
+template<class thermo>
+inline void Foam::sutherlandTransport<thermo>::operator-=
+(
+    const sutherlandTransport<thermo>& st
+)
+{
+    scalar molr1 = this->nMoles();
+
+    thermo::operator-=(st);
+
+    molr1 /= this->nMoles();
+    scalar molr2 = st.nMoles()/this->nMoles();
+
+    As = molr1*As - molr2*st.As;
+    Ts = molr1*Ts - molr2*st.Ts;
+}
+
+
+template<class thermo>
+inline void Foam::sutherlandTransport<thermo>::operator*=
+(
+    const scalar s
+)
+{
+    thermo::operator*=(s);
+}
+
+
 // * * * * * * * * * * * * * * * Friend Operators  * * * * * * * * * * * * * //
 
 template<class thermo>

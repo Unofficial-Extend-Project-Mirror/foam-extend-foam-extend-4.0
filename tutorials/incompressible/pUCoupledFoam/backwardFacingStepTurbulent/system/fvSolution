@@ -18,37 +18,29 @@ solvers
 {
     Up
     {
-        solver BiCGStab;
-        preconditioner Cholesky;
+        solver          AMG;
+        cycle           V-cycle;
+        coarseningType  AAMG;
+        norm            componentNorm;
+        normComponent   0;
 
-        tolerance 1e-09;
-        relTol  0.0;
+        nPreSweeps      2;
+        nPostSweeps     2;
+        groupSize       2;
+        minCoarseEqns   4;
+        nMaxLevels      100;
+        scale           on;
+        smoother
+        {
+            smoother    ILUCp;
+            fillInLevel 1;
+        }
 
-        minIter 1;
-        maxIter 500;
+        minIter         0;
+        maxIter         100;
+        tolerance       1e-7;
+        relTol          0.001;
     }
-
-//     Up
-//     {
-//         solver          AMG;
-//         cycle           V-cycle;
-//         coarseningType  AAMG;
-//         norm            componentNorm;
-//         normComponent   0;
-
-//         nPreSweeps      2;
-//         nPostSweeps     2;
-//         groupSize       2;
-//         minCoarseEqns   4;
-//         nMaxLevels      100;
-//         scale           on;
-//         smoother        ILU;
-
-//         minIter         0;
-//         maxIter         100;
-//         tolerance       1e-7;
-//         relTol          0.001;
-//     }
 
     // Segregated
     p

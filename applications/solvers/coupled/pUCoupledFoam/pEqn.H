@@ -2,8 +2,10 @@
 surfaceScalarField rUAf
 (
     "rUAf",
-    fvc::interpolate(1.0/UEqn.A())
+    fvc::interpolate(1.0/UEqn().A())
 );
+
+UEqn.clear();
 
 surfaceScalarField presSource
 (

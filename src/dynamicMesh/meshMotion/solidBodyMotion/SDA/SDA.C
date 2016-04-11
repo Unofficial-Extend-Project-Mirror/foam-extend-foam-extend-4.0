@@ -116,7 +116,13 @@ Foam::septernion Foam::solidBodyMotionFunctions::SDA::velocity() const
     scalar t = time_.value();
     scalar dt = time_.deltaT().value();
 
-    return (calcTransformation(t + dt) - calcTransformation(t))/dt;
+    const septernion velocity
+    (
+        (calcTransformation(t).t() - calcTransformation(t - dt).t())/dt,
+        (calcTransformation(t).r()/calcTransformation(t - dt).r())/dt
+    );
+
+    return velocity;
 }
 
 

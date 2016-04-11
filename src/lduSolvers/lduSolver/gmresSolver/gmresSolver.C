@@ -125,7 +125,10 @@ Foam::lduSolverPerformance Foam::gmresSolver::solve
 ) const
 {
     // Prepare solver performance
-    lduSolverPerformance solverPerf(typeName, fieldName());
+    lduSolverPerformance solverPerf
+    (
+        preconPtr_->type() + typeName, fieldName()
+    );
 
     scalarField wA(x.size());
     scalarField rA(x.size());

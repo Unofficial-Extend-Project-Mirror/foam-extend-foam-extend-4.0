@@ -31,8 +31,7 @@ License
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-Foam::
-flowRateInletVelocityFvPatchVectorField::
+Foam::flowRateInletVelocityFvPatchVectorField::
 flowRateInletVelocityFvPatchVectorField
 (
     const fvPatch& p,
@@ -42,12 +41,28 @@ flowRateInletVelocityFvPatchVectorField
     fixedValueFvPatchField<vector>(p, iF),
     flowRate_(0),
     phiName_("phi"),
-    rhoName_("rho")
+    rhoName_("rho"),
+    gSumArea_(gSum(p.magSf()))
 {}
 
 
-Foam::
-flowRateInletVelocityFvPatchVectorField::
+Foam::flowRateInletVelocityFvPatchVectorField::
+flowRateInletVelocityFvPatchVectorField
+(
+    const fvPatch& p,
+    const DimensionedField<vector, volMesh>& iF,
+    const dictionary& dict
+)
+:
+    fixedValueFvPatchField<vector>(p, iF, dict),
+    flowRate_(readScalar(dict.lookup("flowRate"))),
+    phiName_(dict.lookupOrDefault<word>("phi", "phi")),
+    rhoName_(dict.lookupOrDefault<word>("rho", "rho")),
+    gSumArea_(gSum(p.magSf()))
+{}
+
+
+Foam::flowRateInletVelocityFvPatchVectorField::
 flowRateInletVelocityFvPatchVectorField
 (
     const flowRateInletVelocityFvPatchVectorField& ptf,
@@ -59,28 +74,12 @@ flowRateInletVelocityFvPatchVectorField
     fixedValueFvPatchField<vector>(ptf, p, iF, mapper),
     flowRate_(ptf.flowRate_),
     phiName_(ptf.phiName_),
-    rhoName_(ptf.rhoName_)
+    rhoName_(ptf.rhoName_),
+    gSumArea_(gSum(p.magSf()))
 {}
 
 
-Foam::
-flowRateInletVelocityFvPatchVectorField::
-flowRateInletVelocityFvPatchVectorField
-(
-    const fvPatch& p,
-    const DimensionedField<vector, volMesh>& iF,
-    const dictionary& dict
-)
-:
-    fixedValueFvPatchField<vector>(p, iF, dict),
-    flowRate_(readScalar(dict.lookup("flowRate"))),
-    phiName_(dict.lookupOrDefault<word>("phi", "phi")),
-    rhoName_(dict.lookupOrDefault<word>("rho", "rho"))
-{}
-
-
-Foam::
-flowRateInletVelocityFvPatchVectorField::
+Foam::flowRateInletVelocityFvPatchVectorField::
 flowRateInletVelocityFvPatchVectorField
 (
     const flowRateInletVelocityFvPatchVectorField& ptf
@@ -89,12 +88,12 @@ flowRateInletVelocityFvPatchVectorField
     fixedValueFvPatchField<vector>(ptf),
     flowRate_(ptf.flowRate_),
     phiName_(ptf.phiName_),
-    rhoName_(ptf.rhoName_)
+    rhoName_(ptf.rhoName_),
+    gSumArea_(gSum(ptf.patch().magSf()))
 {}
 
 
-Foam::
-flowRateInletVelocityFvPatchVectorField::
+Foam::flowRateInletVelocityFvPatchVectorField::
 flowRateInletVelocityFvPatchVectorField
 (
     const flowRateInletVelocityFvPatchVectorField& ptf,
@@ -104,7 +103,8 @@ flowRateInletVelocityFvPatchVectorField
     fixedValueFvPatchField<vector>(ptf, iF),
     flowRate_(ptf.flowRate_),
     phiName_(ptf.phiName_),
-    rhoName_(ptf.rhoName_)
+    rhoName_(ptf.rhoName_),
+    gSumArea_(gSum(ptf.patch().magSf()))
 {}
 
 
@@ -117,8 +117,17 @@ void Foam::flowRateInletVelocityFvPatchVectorField::updateCoeffs()
         return;
     }
 
+    if (patch().boundaryMesh().mesh().moving())
+    {
+        WarningIn
+        (
+            "void flowRateInletVelocityFvPatchVectorField::updateCoeffs()"
+        )   << "Patch area not correctly updated on mesh motion"
+            << endl;
+    }
+
     // A simpler way of doing this would be nice
-    scalar avgU = -flowRate_/gSum(patch().magSf());
+    scalar avgU = -flowRate_/(gSumArea_ + SMALL);
 
     vectorField n = patch().nf();
 

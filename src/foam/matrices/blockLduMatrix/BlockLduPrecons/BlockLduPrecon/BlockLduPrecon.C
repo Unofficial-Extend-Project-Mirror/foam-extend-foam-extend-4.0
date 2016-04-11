@@ -35,16 +35,17 @@ template<class Type>
 Foam::autoPtr<Foam::BlockLduPrecon<Type> > Foam::BlockLduPrecon<Type>::New
 (
     const BlockLduMatrix<Type>& matrix,
-    const dictionary& dict
+    const dictionary& dict,
+    const word keyword
 )
 {
     word preconName;
 
-    // handle primitive or dictionary entry
-    const entry& e = dict.lookupEntry("preconditioner", false, false);
+    // Handle primitive or dictionary entry
+    const entry& e = dict.lookupEntry(keyword, false, false);
     if (e.isDict())
     {
-        e.dict().lookup("preconditioner") >> preconName;
+        e.dict().lookup(keyword) >> preconName;
     }
     else
     {
@@ -96,28 +97,6 @@ Foam::autoPtr<Foam::BlockLduPrecon<Type> > Foam::BlockLduPrecon<Type>::New
             )
         );
     }
-}
-
-
-// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
-
-template<class Type>
-Foam::word Foam::BlockLduPrecon<Type>::getName(const dictionary& dict)
-{
-    word name;
-
-    // handle primitive or dictionary entry
-    const entry& e = dict.lookupEntry("preconditioner", false, false);
-    if (e.isDict())
-    {
-        e.dict().lookup("preconditioner") >> name;
-    }
-    else
-    {
-        e.stream() >> name;
-    }
-
-    return name;
 }
 
 

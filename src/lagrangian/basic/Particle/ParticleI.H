@@ -230,7 +230,7 @@ inline Foam::scalar Foam::Particle<ParticleType>::lambda
 template<class ParticleType>
 inline bool Foam::Particle<ParticleType>::inCell() const
 {
-    DynamicList<label>& faces = cloud_.labels_;
+    dynamicLabelList& faces = cloud_.labels_;
     findFaces(position_, faces);
 
     return (!faces.size());
@@ -245,7 +245,7 @@ inline bool Foam::Particle<ParticleType>::inCell
     const scalar stepFraction
 ) const
 {
-    DynamicList<label>& faces = cloud_.labels_;
+    dynamicLabelList& faces = cloud_.labels_;
     findFaces(position, celli, stepFraction, faces);
 
     return (!faces.size());
