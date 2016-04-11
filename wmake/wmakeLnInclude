@@ -148,9 +148,15 @@ find -L . -type l -exec rm {} \;
 # create links, avoid recreating links unless necessary
 # things placed in the 'noLink' directory are skipped
 #
+if [ "$WM_ARCH_BASE" == "mingw" ] ; then
+    lnCmd="genInclude.pl"
+else
+    lnCmd="ln $lnOpt"
+fi
+
 find .. $findOpt \
     \( -name lnInclude -o -name Make -o -name config -o -name noLink \) -prune \
  -o \( -name '*.[CHh]' -o -name '*.[ch]xx' -o -name '*.[ch]pp' -o -name '*.type' \)  \
- -exec ln $lnOpt {} . \;
+ -exec $lnCmd {} . \;
 
 #------------------------------------------------------------------------------
