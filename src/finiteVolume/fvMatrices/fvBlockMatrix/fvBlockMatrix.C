@@ -867,6 +867,272 @@ void Foam::fvBlockMatrix<Type>::updateSourceCoupling()
 
 
 template<class Type>
+void Foam::fvBlockMatrix<Type>::insertAdjointConvection
+(
+    const direction UEqnDir,
+    const volVectorField& U,
+    const volVectorField& UStar
+)
+{
+    const direction nCmpts = pTraits<vector>::nComponents;
+    direction localDirI = UEqnDir;
+    direction localDirJ = UEqnDir;
+
+    // Sanity check
+    {
+        const direction blockMatrixSize = pTraits<Type>::nComponents;
+
+        if (nCmpts > blockMatrixSize)
+        {
+            FatalErrorIn
+            (
+                "void fvBlockMatrix<Type>::insertAdjointConvection\n"
+                "(\n"
+                "    const direction UEqnDir,\n"
+                "    const volVectorField& U,\n"
+                "    const volVectorField& UStar\n"
+                ")"
+            )   << "Trying to insert adjoint convection term into smaller "
+                << "fvBlockMatrix. Do you have momentum equation?"
+                << abort(FatalError);
+        }
+    }
+
+    const fvMesh& mesh = UStar.mesh();
+
+    // Get owner/neighbour addressing
+    const unallocLabelList& owner = mesh.owner();
+    const unallocLabelList& neighbour = mesh.neighbour();
+
+    // Get surface area vectors
+    const surfaceVectorField& Sf = mesh.Sf();
+    const vectorField& SfIn = Sf.internalField();
+
+    // Get reference to primal internal velocity field
+    const vectorField& UIn = U.internalField();
+
+    // Get weights for UStar needed for implicit discretisation
+    tmp<surfaceInterpolationScheme<vector> > tinterpScheme =
+        fvc::scheme<vector>(mesh, UStar.name());
+    tmp<surfaceScalarField> tweights = tinterpScheme().weights(U);
+    const scalarField& wIn = tweights().internalField();
+
+    // Initialise the block system for adjoint convection
+    BlockLduSystem<vector, vector> acSystem(mesh);
+
+    // Get references to ldu fields of adjoint convection block system always as
+    // square
+    typename CoeffField<vector>::squareTypeField& acDiag =
+         acSystem.diag().asSquare();
+    typename CoeffField<vector>::squareTypeField& acUpper =
+         acSystem.upper().asSquare();
+    typename CoeffField<vector>::squareTypeField& acLower =
+         acSystem.lower().asSquare();
+
+    vectorField& acSource = acSystem.source();
+
+    // Note: not sure about the signs for both implicit and explicit
+    // (boundary) contributions - need to check. VV, 7/Apr/2016.
+
+    // Loop through faces
+    register label own, nei;
+    forAll (neighbour, faceI)
+    {
+        own = owner[faceI];
+        nei = neighbour[faceI];
+
+        // Get references
+        const scalar& wf = wIn[faceI];
+        const vector& Sff = SfIn[faceI];
+
+        // Calculate tensorial helper variables
+        const tensor acOwn = Sff*UIn[own];
+        const tensor acNei = Sff*UIn[nei];
+
+        // Add lower/upper contributions
+        acUpper[faceI] = (1 - wf)*acOwn;
+        acLower[faceI] = -wf*acNei;
+
+        // Warning: this is not negSumDiag(). VV, 7/Apr/2016
+        acDiag[own] += wf*acOwn;
+        acDiag[nei] -= (1 - wf)*acNei;
+    }
+
+    // Boundary contributions - hard coded or explicit because of the problem
+    // with inconsistent return type of internalCoeffs. VV, 7/Apr/2016.
+    forAll(UStar.boundaryField(), patchI)
+    {
+        // Get references to velocity field and the patch
+        const fvPatchVectorField& UStarp = UStar.boundaryField()[patchI];
+        const fvPatch& patch = UStarp.patch();
+
+        // Check for empty patches. Needed since the boundary conditions are
+        // hard coded. VV. 7/Apr/2016.
+        if (patch.type() == "empty")
+        {
+            continue;
+        }
+
+        // Get additional references
+        const fvsPatchScalarField& wp = tweights().boundaryField()[patchI];
+        const unallocLabelList& fc = patch.faceCells();
+        const fvsPatchVectorField Sfp = Sf.boundaryField()[patchI];
+        const fvPatchVectorField& Up = U.boundaryField()[patchI];
+
+        // Hard coded implicit zeroGradient if patch does not fix value
+        if (!UStarp.fixesValue())
+        {
+            // Get velocity patch internal field (primal, not adjoint)
+            const vectorField UpIn = Up.patchInternalField();
+
+            forAll(UpIn, faceI)
+            {
+                acDiag[fc[faceI]] += Sfp[faceI]*UpIn[faceI];
+            }
+        }
+        // Coupled patches
+        else if (patch.coupled())
+        {
+            typename CoeffField<vector>::squareTypeField& acpCoupleUpper =
+                acSystem.coupleUpper()[patchI].asSquare();
+            typename CoeffField<vector>::squareTypeField& acpCoupleLower =
+                acSystem.coupleLower()[patchI].asSquare();
+
+            // Get velocity patch internal field (primal, not adjoint)
+            const vectorField UpIn = Up.patchInternalField();
+
+            // Loop through boundary faces
+            forAll (acpCoupleUpper, faceI)
+            {
+                // Get reference to this weight
+                const scalar& wpf = wp[faceI];
+
+                // Calculate tensorial helper variable
+                const tensor acOwn = Sfp[faceI]*UpIn[faceI];
+
+                // Add upper and diagonal (lower) contributions
+                acpCoupleUpper[faceI] -= (1 - wpf)*acOwn;
+                acpCoupleLower[faceI] -= wpf*acOwn;
+            }
+        }
+        else if (UStarp.fixesValue())
+        {
+            // Get velocity patch internal field (primal, not adjoint)
+            const vectorField UpIn = Up.patchInternalField();
+
+            // Get boundary coeffs for the UStarp fieldi
+            const vectorField boundaryCoeffs(UStarp.valueBoundaryCoeffs(wp));
+
+            // Boundary contribution
+            forAll(boundaryCoeffs, faceI)
+            {
+                acSource[fc[faceI]] -= Sfp[faceI]*
+                    (UpIn[faceI] & boundaryCoeffs[faceI]);
+//                    (UpIn[faceI] & UStarp[faceI]);
+            }
+        }
+        else
+        {
+            FatalErrorIn
+            (
+                "void fvBlockMatrix<Type, matrixType>"
+                "::insertAdjointConvection\n"
+                "(\n"
+                "    const direction UEqnDir,\n"
+                "    const volVectorField& U,\n"
+                "    const volVectorField& UStar\n"
+                ")"
+            )   << "Patch does not fix value, nor doesn't fix value nor is"
+                << " coupled."
+                << abort(FatalError);
+        }
+    }
+
+    // Finally add adjoint convection system into this fvBlockMatrix
+    typename CoeffField<Type>::squareTypeField& blockDiag =
+         this->diag().asSquare();
+    typename CoeffField<Type>::squareTypeField& blockUpper =
+         this->upper().asSquare();
+    typename CoeffField<Type>::squareTypeField& blockLower =
+         this->lower().asSquare();
+
+    Field<Type>& blockSource = this->source();
+
+    // Add diagonal, source, lower and upper
+    for (direction cmptI = 0; cmptI < nCmpts; cmptI++)
+    {
+        for (direction cmptJ = 0; cmptJ < nCmpts; cmptJ++)
+        {
+            forAll(acDiag, cellI)
+            {
+                blockDiag[cellI](localDirI, localDirJ) +=
+                    acDiag[cellI](cmptI, cmptJ);
+            }
+
+            forAll(acUpper, faceI)
+            {
+                blockUpper[faceI](localDirI, localDirJ) +=
+                    acUpper[faceI](cmptI, cmptJ);
+                blockLower[faceI](localDirI, localDirJ) +=
+                    acLower[faceI](cmptI, cmptJ);
+            }
+
+            localDirJ++;
+        }
+
+        forAll(acSource, cellI)
+        {
+            blockSource[cellI](localDirI) += acSource[cellI](cmptI);
+        }
+
+        localDirI++;
+
+        // Reset localDirJ
+        localDirJ = UEqnDir;
+    }
+
+    // Reset local direction for coupling contributions
+    localDirI = UEqnDir;
+    localDirJ = UEqnDir;
+
+    // Add coupling contributions
+    forAll(UStar.boundaryField(), patchI)
+    {
+        if (UStar.boundaryField()[patchI].patch().coupled())
+        {
+            typename CoeffField<Type>::squareTypeField& pcoupleUpper =
+                this->coupleUpper()[patchI].asSquare();
+            typename CoeffField<Type>::squareTypeField& pcoupleLower =
+                this->coupleLower()[patchI].asSquare();
+
+            const typename CoeffField<vector>::squareTypeField& acpcu =
+                acSystem.coupleUpper()[patchI].asSquare();
+            const typename CoeffField<vector>::squareTypeField& acpcl =
+                acSystem.coupleLower()[patchI].asSquare();
+
+            for (direction cmptI = 0; cmptI < nCmpts; cmptI++)
+            {
+                for (direction cmptJ = 0; cmptJ < nCmpts; cmptJ++)
+                {
+                    forAll(acpcu, faceI)
+                    {
+                        pcoupleUpper[faceI](localDirI, localDirJ) +=
+                              acpcu[faceI](cmptI, cmptJ);
+                        pcoupleLower[faceI](localDirI, localDirJ) +=
+                              acpcl[faceI](cmptI, cmptJ);
+                    }
+                }
+            }
+
+            // Reset local directions for other patches
+            localDirI = UEqnDir;
+            localDirJ = UEqnDir;
+        }
+    }
+}
+
+
+template<class Type>
 void Foam::fvBlockMatrix<Type>::insertPicardTensor
 (
     const direction UEqnDir,

@@ -259,6 +259,16 @@ public:
             //  linearisation
             void updateSourceCoupling();
 
+            //- Insert adjoint convection tensor term. Hard coded to correspond
+            //  to Gauss gradient discretisation with linear interpolation. This
+            //  needs to be reorganised. VV, 7/Apr/2016.
+            void insertAdjointConvection
+            (
+                const direction UEqnDir,
+                const volVectorField& U,
+                const volVectorField& UStar
+            );
+
             //- Insert Picard tensor term that comes from Picard linearisation
             // of convection term in momentum equation. VV, 21/July/2014.
             void insertPicardTensor
