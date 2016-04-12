@@ -35,7 +35,6 @@ Description
 #include "singlePhaseTransportModel.H"
 #include "turbulenceModel.H"
 #include "pisoControl.H"
-#include "fvOptions.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
