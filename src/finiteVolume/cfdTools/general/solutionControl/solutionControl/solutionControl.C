@@ -81,8 +81,11 @@ void Foam::solutionControl::read(const bool absTolOnly)
                 }
                 else
                 {
-                    FatalErrorInFunction
-                        << "Residual data for " << iter().keyword()
+                    FatalErrorIn
+                    (
+                        "void Foam::solutionControl::read"
+                        "(const bool absTolOnly)"
+                    )   << "Residual data for " << iter().keyword()
                         << " must be specified as a dictionary"
                         << exit(FatalError);
                 }
@@ -107,8 +110,11 @@ void Foam::solutionControl::read(const bool absTolOnly)
                 }
                 else
                 {
-                    FatalErrorInFunction
-                        << "Residual data for " << iter().keyword()
+                    FatalErrorIn
+                    (
+                        "void Foam::solutionControl::read"
+                        "(const bool absTolOnly)"
+                    )   << "Residual data for " << iter().keyword()
                         << " must be specified as a dictionary"
                         << exit(FatalError);
                 }

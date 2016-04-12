@@ -33,6 +33,10 @@ Description
 #define solutionControl_H
 
 #include "fvMesh.H"
+#include "surfaceMesh.H"
+#include "fvsPatchField.H"
+#include "fvMatrices.H"
+#include "wordRe.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -216,13 +220,13 @@ public:
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-#ifdef NoRepository
-    #include "solutionControlTemplates.C"
-#endif
+#include "solutionControlI.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-#include "solutionControlI.H"
+#ifdef NoRepository
+    #include "solutionControlTemplates.C"
+#endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

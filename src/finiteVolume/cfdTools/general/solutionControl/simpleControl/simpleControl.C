@@ -24,7 +24,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "simpleControl.H"
-#include "Time.H"
+#include "foamTime.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 

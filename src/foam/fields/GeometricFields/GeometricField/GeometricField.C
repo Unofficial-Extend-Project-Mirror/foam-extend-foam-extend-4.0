@@ -27,6 +27,7 @@ License
 #include "foamTime.H"
 #include "demandDrivenData.H"
 #include "dictionary.H"
+#include "data.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

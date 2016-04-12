@@ -34,18 +34,18 @@ void Foam::solutionControl::storePrevIter() const
 {
     typedef GeometricField<Type, fvPatchField, volMesh> GeoField;
 
-    HashTable<GeoField*>
+    HashTable<const GeoField*>
         flds(mesh_.objectRegistry::lookupClass<GeoField>());
 
-    forAllIter(typename HashTable<GeoField*>, flds, iter)
+    forAllIter(typename HashTable<const GeoField*>, flds, iter)
     {
-        GeoField& fld = *iter();
+        const GeoField& fld = *iter();
 
         const word& fName = fld.name();
 
         size_t prevIterField = fName.find("PrevIter");
 
-        if ((prevIterField == word::npos) && mesh_.relaxField(fName))
+        if ((prevIterField == word::npos) && mesh_.solutionDict().relax(fName))
         {
             if (debug)
             {
