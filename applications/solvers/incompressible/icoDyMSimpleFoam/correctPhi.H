@@ -24,7 +24,7 @@
         pcorrTypes
     );
 
-    mesh.setFluxRequired(pcorr.name());
+    mesh.schemesDict().setFluxRequired(pcorr.name());
 
     for(int nonOrth=0; nonOrth<=nNonOrthCorr; nonOrth++)
     {
