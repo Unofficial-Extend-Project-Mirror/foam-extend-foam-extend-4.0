@@ -26,7 +26,7 @@
 
     mesh.setFluxRequired(pcorr.name());
 
-    for(int nonOrth=0; nonOrth<=nNonOrthCorr; nonOrth++)
+    while (piso.correctNonOrthogonal())
     {
         fvScalarMatrix pcorrEqn
         (
@@ -36,7 +36,7 @@
         pcorrEqn.setReference(pRefCell, pRefValue);
         pcorrEqn.solve();
 
-        if (nonOrth == nNonOrthCorr)
+        if (piso.finalNonOrthogonalIter())
         {
             phi -= pcorrEqn.flux();
         }
