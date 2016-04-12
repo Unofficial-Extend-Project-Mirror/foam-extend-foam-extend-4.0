@@ -34,7 +34,7 @@
         fvc::makeAbsolute(phi, U);
     }
 
-    mesh.setFluxRequired(pcorr.name());
+    mesh.schemesDict().setFluxRequired(pcorr.name());
 
     while (piso.correctNonOrthogonal())
     {

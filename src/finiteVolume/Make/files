@@ -365,6 +365,7 @@ $(snGradSchemes)/snGradScheme/snGradSchemes.C
 $(snGradSchemes)/correctedSnGrad/correctedSnGrads.C
 $(snGradSchemes)/limitedSnGrad/limitedSnGrads.C
 $(snGradSchemes)/uncorrectedSnGrad/uncorrectedSnGrads.C
+$(snGradSchemes)/orthogonalSnGrad/orthogonalSnGrads.C
 $(snGradSchemes)/skewCorrectedSnGrad/skewCorrectedSnGrads.C
 $(snGradSchemes)/fourthSnGrad/fourthSnGrads.C
 /*

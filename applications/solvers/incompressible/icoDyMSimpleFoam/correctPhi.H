@@ -24,7 +24,7 @@
         pcorrTypes
     );
 
-    mesh.setFluxRequired(pcorr.name());
+    mesh.schemesDict().setFluxRequired(pcorr.name());
 
     while (piso.correctNonOrthogonal())
     {
