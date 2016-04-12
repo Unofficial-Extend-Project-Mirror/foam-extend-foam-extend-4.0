@@ -69,16 +69,9 @@
         zeroGradientFvPatchScalarField::typeName
     );
 
+    bool momentumPredictor = piso.momentumPredictor();
 
     {
-        const dictionary& piso = mesh.solutionDict().subDict("PISO");
-
-        bool momentumPredictor = true;
-        if (piso.found("momentumPredictor"))
-        {
-            momentumPredictor = Switch(piso.lookup("momentumPredictor"));
-        }
-
         bool momentumPredictorSave = momentumPredictor;
         momentumPredictor = false;
 #       include "UEqn.H"

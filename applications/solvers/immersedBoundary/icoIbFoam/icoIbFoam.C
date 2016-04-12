@@ -36,6 +36,7 @@ Author
 #include "fvCFD.H"
 #include "immersedBoundaryFvPatch.H"
 #include "immersedBoundaryAdjustPhi.H"
+#include "pimpleControl.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -45,6 +46,9 @@ int main(int argc, char *argv[])
 
 #   include "createTime.H"
 #   include "createMesh.H"
+
+    pimpleControl pimple(mesh);
+
 #   include "createIbMasks.H"
 #   include "createFields.H"
 #   include "initContinuityErrs.H"
@@ -57,12 +61,10 @@ int main(int argc, char *argv[])
     {
         Info<< "Time = " << runTime.timeName() << nl << endl;
 
-#       include "readPIMPLEControls.H"
 #       include "CourantNo.H"
 
         // Pressure-velocity corrector
-        int oCorr = 0;
-        do
+        while (pimple.loop())
         {
             fvVectorMatrix UEqn
             (
@@ -74,7 +76,7 @@ int main(int argc, char *argv[])
             solve(UEqn == -fvc::grad(p));
 
             // --- PISO loop
-            for (int corr = 0; corr < nCorr; corr++)
+            while (pimple.correct())
             {
                 volScalarField rUA = 1.0/UEqn.A();
 
@@ -88,7 +90,8 @@ int main(int argc, char *argv[])
                 immersedBoundaryAdjustPhi(phi, U);
                 adjustPhi(phi, U, p);
 
-                for (int nonOrth = 0; nonOrth <= nNonOrthCorr; nonOrth++)
+                // Non-orthogonal pressure corrector loop
+                while (pimple.correctNonOrthogonal())
                 {
                     fvScalarMatrix pEqn
                     (
@@ -98,7 +101,7 @@ int main(int argc, char *argv[])
                     pEqn.setReference(pRefCell, pRefValue);
                     pEqn.solve();
 
-                    if (nonOrth == nNonOrthCorr)
+                    if (pimple.finalNonOrthogonalIter())
                     {
                         phi -= pEqn.flux();
                     }
@@ -109,7 +112,7 @@ int main(int argc, char *argv[])
                 U -= rUA*fvc::grad(p);
                 U.correctBoundaryConditions();
             }
-        } while (++oCorr < nOuterCorr);
+        }
 
         runTime.write();
 

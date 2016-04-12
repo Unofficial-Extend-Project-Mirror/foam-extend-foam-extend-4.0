@@ -36,6 +36,7 @@ Author
 #include "fvCFD.H"
 #include "dynamicFvMesh.H"
 #include "engineTime.H"
+#include "pisoControl.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -45,6 +46,9 @@ int main(int argc, char *argv[])
 #   include "setRootCase.H"
 #   include "createEngineTime.H"
 #   include "createDynamicFvMesh.H"
+
+    pisoControl piso(mesh);
+
 #   include "initContinuityErrs.H"
 #   include "createFields.H"
 
@@ -89,7 +93,7 @@ int main(int argc, char *argv[])
 
         // --- PISO loop
 
-        for (int corr = 0; corr < nCorr; corr++)
+        while (piso.correct())
         {
             rUA = 1.0/UEqn.A();
 
@@ -99,7 +103,8 @@ int main(int argc, char *argv[])
 
             adjustPhi(phi, U, p);
 
-            for (int nonOrth=0; nonOrth<=nNonOrthCorr; nonOrth++)
+            // Non-orthogonal pressure corrector loop
+            while (piso.correctNonOrthogonal())
             {
                 fvScalarMatrix pEqn
                 (
@@ -108,7 +113,7 @@ int main(int argc, char *argv[])
 
                 pEqn.setReference(pRefCell, pRefValue);
 
-                if (corr == nCorr - 1 && nonOrth == nNonOrthCorr)
+                if (piso.finalInnerIter())
                 {
                     pEqn.solve(mesh.solutionDict().solver(p.name() + "Final"));
                 }
@@ -117,7 +122,7 @@ int main(int argc, char *argv[])
                     pEqn.solve(mesh.solutionDict().solver(p.name()));
                 }
 
-                if (nonOrth == nNonOrthCorr)
+                if (piso.finalNonOrthogonalIter())
                 {
                     phi -= pEqn.flux();
                 }
