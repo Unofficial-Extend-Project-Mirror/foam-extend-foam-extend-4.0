@@ -56,6 +56,8 @@ int main(int argc, char *argv[])
 
 #       include "CourantNo.H"
 
+        // Momentum predictor
+
         fvVectorMatrix UEqn
         (
             fvm::ddt(U)
@@ -63,9 +65,13 @@ int main(int argc, char *argv[])
           - fvm::laplacian(nu, U)
         );
 
-        solve(UEqn == -fvc::grad(p));
+        if (piso.momentumPredictor())
+        {
+            solve(UEqn == -fvc::grad(p));
+        }
 
         // --- PISO loop
+
         while (piso.correct())
         {
             volScalarField rUA = 1.0/UEqn.A();
@@ -85,15 +91,10 @@ int main(int argc, char *argv[])
                 );
 
                 pEqn.setReference(pRefCell, pRefValue);
-                    
-                if (piso.finalInnerIter())
-                {
-                    pEqn.solve(mesh.solutionDict().solver("pFinal"));
-                }
-                else
-                {
-                    pEqn.solve();
-                }
+                pEqn.solve
+                (
+                    mesh.solutionDict().solver(p.select(piso.finalInnerIter()))
+                );
 
                 if (piso.finalNonOrthogonalIter())
                 {

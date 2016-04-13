@@ -84,7 +84,10 @@ int main(int argc, char *argv[])
               - fvm::laplacian(nu, U)
             );
 
-            solve(UEqn == -fvc::grad(p));
+            if (pimple.momentumPredictor())
+            {
+                solve(UEqn == -fvc::grad(p));
+            }
 
             // --- PISO loop
             while (pimple.correct())
@@ -110,7 +113,13 @@ int main(int argc, char *argv[])
                     );
 
                     pEqn.setReference(pRefCell, pRefValue);
-                    pEqn.solve();
+                    pEqn.solve
+                    (
+                        mesh.solutionDict().solver
+                        (
+                            p.select(pimple.finalInnerIter())
+                        )
+                    );
 
                     if (pimple.finalNonOrthogonalIter())
                     {

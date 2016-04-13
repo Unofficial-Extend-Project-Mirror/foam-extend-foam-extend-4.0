@@ -113,15 +113,10 @@ int main(int argc, char *argv[])
                 );
 
                 pEqn.setReference(pRefCell, pRefValue);
-
-                if (piso.finalInnerIter())
-                {
-                    pEqn.solve(mesh.solutionDict().solver(p.name() + "Final"));
-                }
-                else
-                {
-                    pEqn.solve(mesh.solutionDict().solver(p.name()));
-                }
+                pEqn.solve
+                (
+                    mesh.solutionDict().solver(p.select(piso.finalInnerIter()))
+                );
 
                 if (piso.finalNonOrthogonalIter())
                 {
