@@ -17,6 +17,7 @@
         transportProperties.lookup("nu")
     );
 
+
     Info<< "Reading field p\n" << endl;
     volScalarField p
     (
@@ -45,7 +46,6 @@
         ),
         mesh
     );
-
 
 #   include "createPhi.H"
 
