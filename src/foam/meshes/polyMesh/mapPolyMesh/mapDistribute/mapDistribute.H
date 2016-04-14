@@ -38,7 +38,6 @@ Note:
     Note2: number of items send on one processor have to equal the number
     of items received on the other processor.
 
-
 SourceFiles
     mapDistribute.C
 
@@ -60,7 +59,7 @@ namespace Foam
 class mapPolyMesh;
 
 /*---------------------------------------------------------------------------*\
-                           Class mapDistribute Declaration
+                        Class mapDistribute Declaration
 \*---------------------------------------------------------------------------*/
 
 class mapDistribute

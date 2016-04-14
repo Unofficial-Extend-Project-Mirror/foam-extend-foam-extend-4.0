@@ -52,7 +52,7 @@ class mapPolyMesh;
 class polyMesh;
 
 /*---------------------------------------------------------------------------*\
-                           Class mapDistributePolyMesh Declaration
+                    Class mapDistributePolyMesh Declaration
 \*---------------------------------------------------------------------------*/
 
 class mapDistributePolyMesh
