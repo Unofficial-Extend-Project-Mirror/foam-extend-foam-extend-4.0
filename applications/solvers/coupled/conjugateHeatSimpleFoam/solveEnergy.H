@@ -30,8 +30,6 @@
           + fvm::SuSp(-solidThermo.S()/Tsolid, Tsolid)
         );
 
-        //Called automatically in 1.6.1-ext
-        //TSolidEqn->boundaryManipulate(Tsolid.boundaryField());
         TSolidEqn->relax();
 
 
