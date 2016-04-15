@@ -345,7 +345,7 @@ tmp<fvVectorMatrix> kOmegaSST::divDevReff(volVectorField& U) const
     return
     (
       - fvm::laplacian(nuEff(), U)
-      - fvc::div(nuEff()*dev(fvc::grad(U)().T()))
+      - fvc::div(nuEff()*dev2(T(fvc::grad(U_))))
     );
 }
 

@@ -317,7 +317,7 @@ tmp<fvVectorMatrix> SpalartAllmaras::divDevReff(volVectorField& U) const
     return
     (
       - fvm::laplacian(nuEff_, U)
-      - fvc::div(nuEff_*dev(fvc::grad(U)().T()))
+      - fvc::div(nuEff_*dev2(T(fvc::grad(U)())))
     );
 }
 

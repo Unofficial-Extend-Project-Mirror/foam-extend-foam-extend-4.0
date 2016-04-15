@@ -425,7 +425,7 @@ tmp<volSymmTensorField> kOmegaSSTSAS::B() const
 
 tmp<volSymmTensorField> kOmegaSSTSAS::devBeff() const
 {
-    return -nuEff()*dev(twoSymm(fvc::grad(U())));
+    return -nuEff()*dev(symm(fvc::grad(U())));
 }
 
 
@@ -433,7 +433,7 @@ tmp<fvVectorMatrix> kOmegaSSTSAS::divDevBeff(volVectorField& U) const
 {
     return
     (
-      - fvm::laplacian(nuEff(), U) - fvc::div(nuEff()*dev(fvc::grad(U)().T()))
+      - fvm::laplacian(nuEff(), U) - fvc::div(nuEff()*dev2(T(fvc::grad(U)())))
     );
 }
 
