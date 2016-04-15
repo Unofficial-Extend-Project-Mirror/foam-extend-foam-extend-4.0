@@ -68,7 +68,7 @@ tmp<edgeInterpolationScheme<Type> > edgeInterpolationScheme<Type>::New
             << exit(FatalIOError);
     }
 
-    word schemeName(schemeData);
+    const word schemeName(schemeData);
 
     typename MeshConstructorTable::iterator constructorIter =
         MeshConstructorTablePtr_->find(schemeName);
@@ -79,8 +79,8 @@ tmp<edgeInterpolationScheme<Type> > edgeInterpolationScheme<Type>::New
         (
             "edgeInterpolationScheme<Type>::New(const faMesh&, Istream&)",
             schemeData
-        )   << "Unknown discretisation scheme " << schemeName
-            << endl << endl
+        )   << "Unknown discretisation scheme "
+            << schemeName << nl << nl
             << "Valid schemes are :" << endl
             << MeshConstructorTablePtr_->sortedToc()
             << exit(FatalIOError);
@@ -121,7 +121,7 @@ tmp<edgeInterpolationScheme<Type> > edgeInterpolationScheme<Type>::New
             << exit(FatalIOError);
     }
 
-    word schemeName(schemeData);
+    const word schemeName(schemeData);
 
     typename MeshFluxConstructorTable::iterator constructorIter =
         MeshFluxConstructorTablePtr_->find(schemeName);
@@ -133,8 +133,8 @@ tmp<edgeInterpolationScheme<Type> > edgeInterpolationScheme<Type>::New
             "edgeInterpolationScheme<Type>::New"
             "(const faMesh&, const edgeScalarField&, Istream&)",
             schemeData
-        )   << "Unknown discretisation scheme " << schemeName
-            << endl << endl
+        )   << "Unknown discretisation scheme "
+            << schemeName << nl << nl
             << "Valid schemes are :" << endl
             << MeshFluxConstructorTablePtr_->sortedToc()
             << exit(FatalIOError);
@@ -170,7 +170,10 @@ edgeInterpolationScheme<Type>::interpolate
                "(const GeometricField<Type, faPatchField, areaMesh>&, "
                "const tmp<edgeScalarField>&, "
                "const tmp<edgeScalarField>&) : "
-               "interpolating areaTypeField from cells to faces "
+               "interpolating "
+            << vf.type() << " "
+            << vf.name()
+            << " from areas to edges "
                "without explicit correction"
             << endl;
     }
@@ -290,7 +293,10 @@ edgeInterpolationScheme<Type>::interpolate
         Info<< "edgeInterpolationScheme<Type>::interpolate"
                "(const GeometricField<Type, faPatchField, areaMesh>&, "
                "const tmp<edgeScalarField>&) : "
-               "interpolating areaTypeField from cells to faces "
+               "interpolating "
+            << vf.type() << " "
+            << vf.name()
+            << " from area to edges "
                "without explicit correction"
             << endl;
     }
@@ -406,7 +412,10 @@ edgeInterpolationScheme<Type>::euclidianInterpolate
         Info<< "edgeInterpolationScheme<Type>::euclidianInterpolate"
                "(const GeometricField<Type, faPatchField, areaMesh>&, "
                "const tmp<edgeScalarField>&) : "
-               "interpolating areaTypeField from cells to faces "
+            << "interpolating "
+            << vf.type() << " "
+            << vf.name()
+            << " from area to edges "
                "without explicit correction"
             << endl;
     }
@@ -481,7 +490,10 @@ edgeInterpolationScheme<Type>::interpolate
     {
         Info<< "edgeInterpolationScheme<Type>::interpolate"
                "(const GeometricField<Type, faPatchField, areaMesh>&) : "
-            << "interpolating areaTypeField from cells to faces"
+               "interpolating "
+            << vf.type() << " "
+            << vf.name()
+            << " from areas to edges"
             << endl;
     }
 
@@ -509,7 +521,10 @@ edgeInterpolationScheme<Type>::euclidianInterpolate
     {
         Info<< "edgeInterpolationScheme<Type>::interpolate"
                "(const GeometricField<Type, faPatchField, areaMesh>&) : "
-            << "interpolating areaTypeField from cells to faces"
+            << "interpolating "
+            << vf.type() << " "
+            << vf.name()
+            << " from area to edges "
             << endl;
     }
 

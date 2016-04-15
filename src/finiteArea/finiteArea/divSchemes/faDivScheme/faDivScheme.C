@@ -68,7 +68,7 @@ tmp<divScheme<Type> > divScheme<Type>::New
             << exit(FatalIOError);
     }
 
-    word schemeName(schemeData);
+    const word schemeName(schemeData);
 
     typename IstreamConstructorTable::iterator cstrIter =
         IstreamConstructorTablePtr_->find(schemeName);
@@ -79,7 +79,8 @@ tmp<divScheme<Type> > divScheme<Type>::New
         (
             "divScheme<Type>::New(const faMesh&, Istream&)",
             schemeData
-        )   << "unknown div scheme " << schemeName << endl << endl
+        )   << "Unknown div scheme "
+            << schemeName << nl << nl
             << "Valid div schemes are :" << endl
             << IstreamConstructorTablePtr_->sortedToc()
             << exit(FatalIOError);

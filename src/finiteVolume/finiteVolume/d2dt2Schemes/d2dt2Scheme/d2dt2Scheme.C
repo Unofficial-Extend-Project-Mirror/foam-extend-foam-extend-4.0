@@ -67,7 +67,7 @@ tmp<d2dt2Scheme<Type> > d2dt2Scheme<Type>::New
             << exit(FatalIOError);
     }
 
-    word schemeName(schemeData);
+    const word schemeName(schemeData);
 
     typename IstreamConstructorTable::iterator cstrIter =
         IstreamConstructorTablePtr_->find(schemeName);
@@ -78,7 +78,7 @@ tmp<d2dt2Scheme<Type> > d2dt2Scheme<Type>::New
         (
             "d2dt2Scheme<Type>::New(const fvMesh&, Istream&)",
             schemeData
-        )   << "unknown d2dt2 scheme " << schemeName << endl << endl
+        )   << "Unknown d2dt2 scheme " << schemeName << nl << nl
             << "Valid d2dt2 schemes are :" << endl
             << IstreamConstructorTablePtr_->sortedToc()
             << exit(FatalIOError);

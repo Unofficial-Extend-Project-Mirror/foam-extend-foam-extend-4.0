@@ -59,13 +59,13 @@ tmp<ddtScheme<Type> > ddtScheme<Type>::New
         (
             "ddtScheme<Type>::New(const fvMesh&, Istream&)",
             schemeData
-        )   << "Ddt scheme not specified" << endl << endl
+        )   << "Ddt scheme not specified" << nl << nl
             << "Valid ddt schemes are :" << endl
             << IstreamConstructorTablePtr_->sortedToc()
             << exit(FatalIOError);
     }
 
-    word schemeName(schemeData);
+    const word schemeName(schemeData);
 
     typename IstreamConstructorTable::iterator cstrIter =
         IstreamConstructorTablePtr_->find(schemeName);
@@ -76,7 +76,7 @@ tmp<ddtScheme<Type> > ddtScheme<Type>::New
         (
             "ddtScheme<Type>::New(const fvMesh&, Istream&)",
             schemeData
-        )   << "unknown ddt scheme " << schemeName << endl << endl
+        )   << "Unknown ddt scheme " << schemeName << nl << nl
             << "Valid ddt schemes are :" << endl
             << IstreamConstructorTablePtr_->sortedToc()
             << exit(FatalIOError);

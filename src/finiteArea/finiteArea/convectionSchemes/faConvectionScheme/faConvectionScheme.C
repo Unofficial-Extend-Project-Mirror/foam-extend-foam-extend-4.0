@@ -72,7 +72,7 @@ tmp<convectionScheme<Type> > convectionScheme<Type>::New
             << exit(FatalIOError);
     }
 
-    word schemeName(schemeData);
+    const word schemeName(schemeData);
 
     typename IstreamConstructorTable::iterator cstrIter =
         IstreamConstructorTablePtr_->find(schemeName);
@@ -84,7 +84,7 @@ tmp<convectionScheme<Type> > convectionScheme<Type>::New
             "convectionScheme<Type>::New"
             "(const faMesh&, const edgeScalarField&, Istream&)",
             schemeData
-        )   << "unknown convection scheme " << schemeName << endl << endl
+        )   << "Unknown convection scheme " << schemeName << nl << nl
             << "Valid convection schemes are :" << endl
             << IstreamConstructorTablePtr_->sortedToc()
             << exit(FatalIOError);
