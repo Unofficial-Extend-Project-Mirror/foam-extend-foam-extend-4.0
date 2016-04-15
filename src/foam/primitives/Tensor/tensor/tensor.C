@@ -76,6 +76,14 @@ const tensor tensor::min
     -VGREAT, -VGREAT, -VGREAT
 );
 
+template<>
+const tensor tensor::I
+(
+    1, 0, 0,
+    0, 1, 0,
+    0, 0, 1
+);
+
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -221,9 +229,8 @@ vector eigenVector(const tensor& t, const scalar lambda)
             (A.yz()*A.zx() - A.zz()*A.yx())/sd0,
             (A.zy()*A.yx() - A.yy()*A.zx())/sd0
         );
-        ev /= mag(ev);
 
-        return ev;
+        return ev/mag(ev);
     }
     else if (magSd1 > magSd2 && magSd1 > SMALL)
     {
@@ -233,9 +240,8 @@ vector eigenVector(const tensor& t, const scalar lambda)
             1,
             (A.zx()*A.xy() - A.xx()*A.zy())/sd1
         );
-        ev /= mag(ev);
 
-        return ev;
+        return ev/mag(ev);
     }
     else if (magSd2 > SMALL)
     {
@@ -245,9 +251,8 @@ vector eigenVector(const tensor& t, const scalar lambda)
             (A.yx()*A.xz() - A.xx()*A.yz())/sd2,
             1
         );
-        ev /= mag(ev);
 
-        return ev;
+        return ev/mag(ev);
     }
     else
     {

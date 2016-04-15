@@ -47,6 +47,7 @@ SourceFiles
 #define TensorN_FieldFunctions(tensorType, diagTensorType, sphericalTensorType,     \
     vectorType, CmptType, args...)                                                  \
                                                                                     \
+UNARY_FUNCTION(tensorType, tensorType,T,transform)                                  \
 UNARY_FUNCTION(tensorType, tensorType,inv,inv)                                      \
 UNARY_FUNCTION(diagTensorType, tensorType,diag,diag)                                \
 UNARY_FUNCTION(tensorType, tensorType,negSumDiag,negSumDiag)                        \

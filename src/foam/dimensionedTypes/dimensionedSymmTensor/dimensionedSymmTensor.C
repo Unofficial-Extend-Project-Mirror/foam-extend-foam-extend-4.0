@@ -58,6 +58,17 @@ dimensionedSymmTensor sqr(const dimensionedVector& dv)
 }
 
 
+dimensionedSymmTensor innerSqr(const dimensionedSymmTensor& dt)
+{
+    return dimensionedSymmTensor
+    (
+        "innerSqr("+dt.name()+')',
+        sqr(dt.dimensions()),
+        innerSqr(dt.value())
+    );
+}
+
+
 dimensionedScalar tr(const dimensionedSymmTensor& dt)
 {
     return dimensionedScalar
@@ -129,7 +140,7 @@ dimensionedSymmTensor cof(const dimensionedSymmTensor& dt)
     return dimensionedSymmTensor
     (
         "cof("+dt.name()+')',
-        dt.dimensions(),
+        pow(dt.dimensions(), symmTensor::dim - 1),
         cof(dt.value())
     );
 }
