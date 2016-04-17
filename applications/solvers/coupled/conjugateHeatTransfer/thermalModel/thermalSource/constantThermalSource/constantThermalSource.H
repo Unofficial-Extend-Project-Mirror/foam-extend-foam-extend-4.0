@@ -25,7 +25,9 @@ Class
     constantThermalSource
 
 Description
-    Constant thermal properties
+    Constant thermal source, given in Watts for the component
+    consisting of face zones.  Therefore, S from dictionary is divided by
+    total volume of the component
 
 Author
     Henrik Rusche, Wikki GmbH.  All rights reserved.
@@ -46,7 +48,7 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                         Class constantThermalSource Declaration
+                    Class constantThermalSource Declaration
 \*---------------------------------------------------------------------------*/
 
 class constantThermalSource
@@ -58,8 +60,9 @@ class constantThermalSource
         //- Strengh of the source
         dimensionedScalar S_;
 
-        //- list of cell zones
+        //- List of cell zones
         const wordList zones_;
+
 
     // Private Member Functions
 
