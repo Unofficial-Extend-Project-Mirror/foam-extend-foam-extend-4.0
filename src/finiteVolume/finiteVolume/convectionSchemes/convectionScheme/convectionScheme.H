@@ -204,37 +204,36 @@ public:
 
 // Add the patch constructor functions to the hash tables
 
-#define makeFvConvectionTypeScheme(SS, Type)                                   \
-                                                                               \
-defineNamedTemplateTypeNameAndDebug(SS<Type>, 0);                              \
-                                                                               \
-convectionScheme<Type>::addIstreamConstructorToTable<SS<Type> >                \
+#define makeFvConvectionTypeScheme(SS, Type)                                  \
+                                                                              \
+defineNamedTemplateTypeNameAndDebug(SS<Type>, 0);                             \
+                                                                              \
+convectionScheme<Type>::addIstreamConstructorToTable<SS<Type> >               \
     add##SS##Type##IstreamConstructorToTable_;
 
-
-#define makeFvConvectionScheme(SS)                                             \
-                                                                               \
-makeFvConvectionTypeScheme(SS, scalar)                                         \
-makeFvConvectionTypeScheme(SS, vector)                                         \
-makeFvConvectionTypeScheme(SS, sphericalTensor)                                \
-makeFvConvectionTypeScheme(SS, symmTensor)                                     \
+#define makeFvConvectionScheme(SS)                                            \
+                                                                              \
+makeFvConvectionTypeScheme(SS, scalar)                                        \
+makeFvConvectionTypeScheme(SS, vector)                                        \
+makeFvConvectionTypeScheme(SS, sphericalTensor)                               \
+makeFvConvectionTypeScheme(SS, symmTensor)                                    \
 makeFvConvectionTypeScheme(SS, tensor)
 
 
-#define makeMultivariateFvConvectionTypeScheme(SS, Type)                       \
-                                                                               \
-defineNamedTemplateTypeNameAndDebug(SS<Type>, 0);                              \
-                                                                               \
-convectionScheme<Type>::addMultivariateConstructorToTable<SS<Type> >           \
+#define makeMultivariateFvConvectionTypeScheme(SS, Type)                      \
+                                                                              \
+defineNamedTemplateTypeNameAndDebug(SS<Type>, 0);                             \
+                                                                              \
+convectionScheme<Type>::addMultivariateConstructorToTable<SS<Type> >          \
     add##SS##Type##MultivariateConstructorToTable_;
 
 
-#define makeMultivariateFvConvectionScheme(SS)                                 \
-                                                                               \
-makeMultivariateFvConvectionTypeScheme(SS, scalar)                             \
-makeMultivariateFvConvectionTypeScheme(SS, vector)                             \
-makeMultivariateFvConvectionTypeScheme(SS, sphericalTensor)                    \
-makeMultivariateFvConvectionTypeScheme(SS, symmTensor)                         \
+#define makeMultivariateFvConvectionScheme(SS)                                \
+                                                                              \
+makeMultivariateFvConvectionTypeScheme(SS, scalar)                            \
+makeMultivariateFvConvectionTypeScheme(SS, vector)                            \
+makeMultivariateFvConvectionTypeScheme(SS, sphericalTensor)                   \
+makeMultivariateFvConvectionTypeScheme(SS, symmTensor)                        \
 makeMultivariateFvConvectionTypeScheme(SS, tensor)
 
 
