@@ -130,7 +130,7 @@ public:
                 fv::gradScheme<Type>::New
                 (
                     mesh,
-                    mesh.schemesDict.gradScheme(gradSchemeName_)
+                    mesh.schemesDict().gradScheme(gradSchemeName_)
                 )
             )
         {}
