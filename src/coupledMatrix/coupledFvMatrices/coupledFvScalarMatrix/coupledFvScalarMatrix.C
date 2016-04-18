@@ -70,7 +70,8 @@ coupledSolverPerformance coupledFvMatrix<scalar>::solve
 
         saveDiag.set(rowI, new scalarField(curMatrix.diag()));
         // HR 17/Feb/2013
-        // Need to be able to compare references to support hacks such as in jumpCyclic
+        // Need to be able to compare references to support hacks
+        // such as in jumpCyclic
         // psi.set(rowI, new scalarField(curMatrix.psi()));
         psi.set(rowI, &curMatrix.psi());
         source.set(rowI, new scalarField(curMatrix.source()));

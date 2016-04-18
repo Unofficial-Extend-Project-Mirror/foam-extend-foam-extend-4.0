@@ -58,7 +58,7 @@ Foam::word Foam::coupledFvMatrix<Type>::coupledPsiName() const
 
         if (rowI < matrices.size() - 1)
         {
-            cpn += "+";
+            cpn += "_";
         }
     }
 
