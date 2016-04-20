@@ -100,7 +100,9 @@
         (
             "rhok",
             runTime.timeName(),
-            mesh
+            mesh,
+            IOobject::READ_IF_PRESENT,
+            IOobject::AUTO_WRITE
         ),
         1.0 - beta*(T - TRef)
     );

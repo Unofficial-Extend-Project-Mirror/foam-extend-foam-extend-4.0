@@ -20,18 +20,15 @@
           + 3.0*radiation->Rp()*pow4(T)
         );
 
-        //Called automatically in 1.6.1-ext
-        //TFluidEqn->boundaryManipulate(T.boundaryField());
         TFluidEqn->relax();
 
         fvScalarMatrix* TSolidEqn = new fvScalarMatrix
         (
-          - fvm::laplacian(ksolidf, Tsolid, "laplacian(k,T)")
+          - fvm::laplacian(kSolidf, Tsolid, "laplacian(k,T)")
           + fvm::SuSp(-solidThermo.S()/Tsolid, Tsolid)
         );
 
         TSolidEqn->relax();
-
 
         // Add fluid equation
         TEqns.set(0, TFluidEqn);
