@@ -1,0 +1,3 @@
+cellSet solidBlock new boxToCell (0 0.1 0) (1 0.2 0.01)
+faceSet bottomZone new patchToFace bottom
+quit
