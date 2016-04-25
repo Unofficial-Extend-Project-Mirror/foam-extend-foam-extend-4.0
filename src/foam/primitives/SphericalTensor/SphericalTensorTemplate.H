@@ -45,7 +45,7 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class SphericalTensor Declaration
+                       Class SphericalTensor Declaration
 \*---------------------------------------------------------------------------*/
 
 template<class Cmpt>
