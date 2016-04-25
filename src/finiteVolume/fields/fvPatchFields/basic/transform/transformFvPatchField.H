@@ -43,7 +43,7 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                        Class transformFvPatch Declaration
+                   Class transformFvPatchField Declaration
 \*---------------------------------------------------------------------------*/
 
 template<class Type>

@@ -116,7 +116,7 @@ Foam::tmp<Foam::fvVectorMatrix> Foam::Feta_PTT::divTau(volVectorField& U) const
 void Foam::Feta_PTT::correct()
 {
     // Velocity gradient tensor
-    volTensorField L = fvc::grad(U());
+    const tmp<volTensorField> L = fvc::grad(U());
 
     // Convected derivate term
     volTensorField C = tau_ & L;

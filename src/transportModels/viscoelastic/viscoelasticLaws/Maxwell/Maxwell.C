@@ -83,7 +83,7 @@ Foam::tmp<Foam::fvVectorMatrix> Foam::Maxwell::divTau(volVectorField& U) const
 void Foam::Maxwell::correct()
 {
     // Velocity gradient tensor
-    volTensorField L = fvc::grad(U());
+    const tmp<volTensorField> L = fvc::grad(U());
 
     // Convected derivate term
     volTensorField C = tau_ & L;

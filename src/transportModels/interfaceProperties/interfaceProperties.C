@@ -101,7 +101,7 @@ void Foam::interfaceProperties::calculateK()
     const surfaceVectorField& Sf = mesh.Sf();
 
     // Cell gradient of alpha
-    volVectorField gradAlpha = fvc::grad(alpha1_);
+    const tmp<volVectorField> gradAlpha = fvc::grad(alpha1_);
 
     // Interpolated face-gradient of alpha
     surfaceVectorField gradAlphaf = fvc::interpolate(gradAlpha);

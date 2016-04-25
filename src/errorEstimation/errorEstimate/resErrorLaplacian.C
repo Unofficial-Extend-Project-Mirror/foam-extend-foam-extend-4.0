@@ -136,11 +136,24 @@ laplacian
     Field<Type> res(vols.size(), pTraits<Type>::zero);
     scalarField aNorm(vols.size(), 0.0);
 
-    // Calculate gradient of the solution
-    GeometricField
+    // Calculate gradient of the solution.
+    // Change of return type due to gradient cacheing.  HJ, 22/Apr/2016
+    const tmp
     <
-        typename outerProduct<vector, Type>::type, fvPatchField, volMesh
-    > gradVf = fvc::grad(vf);
+        GeometricField
+        <
+            typename outerProduct<vector, Type>::type,
+            fvPatchField,
+            volMesh
+        >
+    > tgradVf = fvc::grad(vf);
+
+    const GeometricField
+    <
+        typename outerProduct<vector, Type>::type,
+        fvPatchField,
+        volMesh
+    >& gradVf = tgradVf();
 
     // Internal faces
     forAll (owner, faceI)

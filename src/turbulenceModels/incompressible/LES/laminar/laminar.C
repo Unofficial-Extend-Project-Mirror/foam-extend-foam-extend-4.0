@@ -144,7 +144,7 @@ tmp<fvVectorMatrix> laminar::divDevBeff(volVectorField& U) const
 {
     return
     (
-      - fvm::laplacian(nu(), U) - fvc::div(nu()*dev(fvc::grad(U)().T()))
+      - fvm::laplacian(nu(), U) - fvc::div(nu()*dev(T(fvc::grad(U))))
     );
 }
 

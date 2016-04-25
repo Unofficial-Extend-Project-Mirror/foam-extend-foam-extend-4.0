@@ -55,6 +55,10 @@ class linearUpwind
 {
     // Private Data
 
+        //- Name of grad scheme
+        word gradSchemeName_;
+
+        //- Grad scheme
         tmp<fv::gradScheme<Type> > gradScheme_;
 
 

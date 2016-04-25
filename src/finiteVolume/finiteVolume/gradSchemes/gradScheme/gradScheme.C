@@ -124,7 +124,7 @@ Foam::fv::gradScheme<Type>::grad
         {
             if (fvSchemes::debug)
             {
-                Info << "Cache: Calculating and caching " << name
+                Info<< "Cache: Calculating and caching " << name
                     << " originating from " << vsf.name()
                     << " event No. " << vsf.eventNo()
                     << endl;
@@ -135,11 +135,11 @@ Foam::fv::gradScheme<Type>::grad
 
         if (fvSchemes::debug)
         {
-            Info << "Cache: Retrieving " << name
+            Info<< "Cache: Retrieving " << name
                 << " originating from " << vsf.name()
-                << " event No. " << vsf.eventNo()
-                << endl;
+                << " event No. " << vsf.eventNo();
         }
+
         GradFieldType& gGrad = const_cast<GradFieldType&>
         (
             mesh().objectRegistry::template lookupObject<GradFieldType>(name)
@@ -147,13 +147,19 @@ Foam::fv::gradScheme<Type>::grad
 
         if (gGrad.upToDate(vsf.name()))
         {
+            if (fvSchemes::debug)
+            {
+                Info<< ": up-to-date." << endl;
+            }
+
             return gGrad;
         }
         else
         {
             if (fvSchemes::debug)
             {
-                Info << "Cache: Deleting " << name
+                Info<< ": not up-to-date." << nl
+                    << "Cache: Deleting " << name
                     << " originating from " << vsf.name()
                     << " event No. " << vsf.eventNo()
                     << endl;
@@ -163,16 +169,22 @@ Foam::fv::gradScheme<Type>::grad
 
             if (fvSchemes::debug)
             {
-                Info << "Cache: Recalculating " << name
+                Info<< "Cache: Recalculating " << name
                     << " originating from " << vsf.name()
                     << " event No. " << vsf.eventNo()
                     << endl;
             }
             tmp<GradFieldType> tgGrad = calcGrad(vsf, name);
 
+            // Note: in order for the patchNeighbourField to be
+            // correct on coupled boundaries,
+            // correctBoundaryConditions needs to be called.  The call
+            // shall be moved into the library fvc operators
+            tgGrad().correctBoundaryConditions();
+
             if (fvSchemes::debug)
             {
-                Info << "Cache: Storing " << name
+                Info<< "Cache: Storing " << name
                     << " originating from " << vsf.name()
                     << " event No. " << vsf.eventNo()
                     << endl;
@@ -205,7 +217,7 @@ Foam::fv::gradScheme<Type>::grad
             {
                 if (fvSchemes::debug)
                 {
-                    Info << "Cache: Deleting " << name
+                    Info<< "Cache: Deleting " << name
                         << " originating from " << vsf.name()
                         << " event No. " << vsf.eventNo()
                         << endl;
@@ -217,7 +229,7 @@ Foam::fv::gradScheme<Type>::grad
 
         if (fvSchemes::debug)
         {
-            Info << "Cache: Calculating " << name
+            Info<< "Cache: Calculating " << name
                 << " originating from " << vsf.name()
                 << " event No. " << vsf.eventNo()
                 << endl;

@@ -99,7 +99,7 @@ Description
                         *magFaceGradU[facei]
                         *Cmu25*sqrt(k_[faceCelli])
                         /(kappa_.value()*y_[patchi][facei])
-                      - (nonlinearStress_[faceCelli] && gradU_[faceCelli]);
+                      - (nonlinearStress_[faceCelli] && gradU[faceCelli]);
                 }
             }
         }

@@ -101,7 +101,7 @@ Foam::tmp<Foam::fvVectorMatrix> Foam::S_MDCPP::divTau(volVectorField& U) const
 void Foam::S_MDCPP::correct()
 {
     // Velocity gradient tensor
-    volTensorField L = fvc::grad(U());
+    const tmp<volTensorField> L = fvc::grad(U());
 
     // Convected derivate term
     volTensorField C = tau_ & L;

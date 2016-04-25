@@ -78,10 +78,7 @@ Foam::numericFlux<Flux, Limiter>::numericFlux
             IOobject::NO_WRITE
         ),
         rhoFlux_*linearInterpolate(thermo.Cv()*T_ + 0.5*magSqr(U_))
-    ),
-    gradP_(fvc::grad(p_)),
-    gradU_(fvc::grad(U_)),
-    gradT_(fvc::grad(T_))
+    )
 {}
 
 
@@ -105,31 +102,36 @@ void Foam::numericFlux<Flux, Limiter>::computeFlux()
     const volScalarField Cv = thermo_.Cv();
     const volScalarField R  = thermo_.Cp() - Cv;
 
-    gradP_ = fvc::grad(p_);
-    gradP_.correctBoundaryConditions();
+    // Get gradients
+    // Coupled patch update on gradients moved into gradScheme.C
+    // HJ, 22/Apr/2016;
 
-    gradU_ = fvc::grad(U_);
-    gradU_.correctBoundaryConditions();
+    // Changed return type for gradient cacheing.  HJ, 22/Apr/2016
+    const tmp<volVectorField> tgradP = fvc::grad(p_);
+    const volVectorField& gradP = tgradP();
 
-    gradT_ = fvc::grad(T_);
-    gradT_.correctBoundaryConditions();
+    const tmp<volTensorField> tgradU = fvc::grad(U_);
+    const volTensorField& gradU = tgradU();
+
+    const tmp<volVectorField> tgradT = fvc::grad(T_);
+    const volVectorField& gradT = tgradT();
 
     MDLimiter<scalar, Limiter> scalarPLimiter
     (
         this->p_,
-        this->gradP_
+        this->gradP
     );
 
     MDLimiter<vector, Limiter> vectorULimiter
     (
         this->U_,
-        this->gradU_
+        this->gradU
     );
 
     MDLimiter<scalar, Limiter> scalarTLimiter
     (
         this->T_,
-        this->gradT_
+        this->gradT
     );
 
     // Get limiters
@@ -152,12 +154,12 @@ void Foam::numericFlux<Flux, Limiter>::computeFlux()
             rhoFlux_[faceI],
             rhoUFlux_[faceI],
             rhoEFlux_[faceI],
-            p_[own] + pLimiter[own]*(deltaRLeft & gradP_[own]),
-            p_[nei] + pLimiter[nei]*(deltaRRight & gradP_[nei]),
-            U_[own] + cmptMultiply(ULimiter[own], (deltaRLeft & gradU_[own])),
-            U_[nei] + cmptMultiply(ULimiter[nei], (deltaRRight & gradU_[nei])),
-            T_[own] + TLimiter[own]*(deltaRLeft & gradT_[own]),
-            T_[nei] + TLimiter[nei]*(deltaRRight & gradT_[nei]),
+            p_[own] + pLimiter[own]*(deltaRLeft & gradP[own]),
+            p_[nei] + pLimiter[nei]*(deltaRRight & gradP[nei]),
+            U_[own] + cmptMultiply(ULimiter[own], (deltaRLeft & gradU[own])),
+            U_[nei] + cmptMultiply(ULimiter[nei], (deltaRRight & gradU[nei])),
+            T_[own] + TLimiter[own]*(deltaRLeft & gradT[own]),
+            T_[nei] + TLimiter[nei]*(deltaRRight & gradT[nei]),
             R[own],
             R[nei],
             Cv[own],
@@ -186,9 +188,9 @@ void Foam::numericFlux<Flux, Limiter>::computeFlux()
         const scalarField& pR = R.boundaryField()[patchi];
 
         // Gradients
-        const fvPatchVectorField& pGradP = gradP_.boundaryField()[patchi];
-        const fvPatchTensorField& pGradU = gradU_.boundaryField()[patchi];
-        const fvPatchVectorField& pGradT = gradT_.boundaryField()[patchi];
+        const fvPatchVectorField& pGradP = gradP.boundaryField()[patchi];
+        const fvPatchTensorField& pGradU = gradU.boundaryField()[patchi];
+        const fvPatchVectorField& pGradT = gradT.boundaryField()[patchi];
 
         // Limiters
         const fvPatchScalarField& pPatchLim = pLimiter.boundaryField()[patchi];

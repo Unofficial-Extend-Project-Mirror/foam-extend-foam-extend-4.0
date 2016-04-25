@@ -98,7 +98,7 @@ void Foam::WhiteMetznerCarreauYasuda::correct()
 {
 
     // Velocity gradient tensor
-    volTensorField L = fvc::grad(U());
+    const tmp<volTensorField> L = fvc::grad(U());
 
     // Convected derivate term
     volTensorField C = tau_ & L;

@@ -188,9 +188,8 @@ NonlinearKEShih::NonlinearKEShih
         mesh_
     ),
 
-    gradU_(fvc::grad(U)),
-    eta_(k_/epsilon_*sqrt(2.0*magSqr(0.5*(gradU_ + gradU_.T())))),
-    ksi_(k_/epsilon_*sqrt(2.0*magSqr(0.5*(gradU_ - gradU_.T())))),
+    eta_(k_/epsilon_*sqrt(2.0*magSqr(symm(fvc::grad(U_))))),
+    ksi_(k_/epsilon_*sqrt(2.0*magSqr(skew(fvc::grad(U_))))),
     Cmu_(2.0/(3.0*(A1_ + eta_ + alphaKsi_*ksi_))),
     fEta_(A2_ + pow(eta_, 3.0)),
 
@@ -205,11 +204,11 @@ NonlinearKEShih::NonlinearKEShih
            *(
                 Ctau1_/fEta_
                *(
-                    (gradU_ & gradU_)
-                  + (gradU_ & gradU_)().T()
+                    (fvc::grad(U_) & fvc::grad(U_))
+                  + T(fvc::grad(U_) & fvc::grad(U_))
                 )
-              + Ctau2_/fEta_*(gradU_ & gradU_.T())
-              + Ctau3_/fEta_*(gradU_.T() & gradU_)
+              + Ctau2_/fEta_*(fvc::grad(U_) & T(fvc::grad(U_)))
+              + Ctau3_/fEta_*(T(fvc::grad(U_)) & fvc::grad(U_))
             )
         )
     )
@@ -224,8 +223,6 @@ NonlinearKEShih::NonlinearKEShih
 
 tmp<volSymmTensorField> NonlinearKEShih::R() const
 {
-    volTensorField gradU_ = fvc::grad(U_);
-
     return tmp<volSymmTensorField>
     (
         new volSymmTensorField
@@ -238,7 +235,7 @@ tmp<volSymmTensorField> NonlinearKEShih::R() const
                 IOobject::NO_READ,
                 IOobject::NO_WRITE
             ),
-            ((2.0/3.0)*I)*k_ - nut_*twoSymm(gradU_) + nonlinearStress_,
+            ((2.0/3.0)*I)*k_ - nut_*twoSymm(fvc::grad(U_)) + nonlinearStress_,
             k_.boundaryField().types()
         )
     );
@@ -271,7 +268,7 @@ tmp<fvVectorMatrix> NonlinearKEShih::divDevReff(volVectorField& U) const
     (
         fvc::div(nonlinearStress_)
       - fvm::laplacian(nuEff(), U)
-      - fvc::div(nuEff()*dev(fvc::grad(U)().T()))
+      - fvc::div(nuEff()*dev(T(fvc::grad(U))))
     );
 }
 
@@ -320,16 +317,18 @@ void NonlinearKEShih::correct()
         return;
     }
 
-    gradU_ = fvc::grad(U_);
+    // Changed return type for gradient cacheing.  HJ, 22/Apr/2016
+    const tmp<volTensorField> tgradU = fvc::grad(U_);
+    const volTensorField& gradU = tgradU();
 
     // generation term
-    volScalarField S2 = symm(gradU_) && gradU_;
+    volScalarField S2 = symm(gradU) && gradU;
 
     volScalarField G
     (
         "RASModel::G",
         Cmu_*sqr(k_)/epsilon_*S2
-      - (nonlinearStress_ && gradU_)
+      - (nonlinearStress_ && gradU)
     );
 
 #   include "nonLinearWallFunctionsI.H"
@@ -374,8 +373,8 @@ void NonlinearKEShih::correct()
 
     // Re-calculate viscosity
 
-    eta_ = k_/epsilon_*sqrt(2.0*magSqr(0.5*(gradU_ + gradU_.T())));
-    ksi_ = k_/epsilon_*sqrt(2.0*magSqr(0.5*(gradU_ - gradU_.T())));
+    eta_ = k_/epsilon_*sqrt(2.0*magSqr(symm(gradU)));
+    ksi_ = k_/epsilon_*sqrt(2.0*magSqr(skew(gradU)));
     Cmu_ = 2.0/(3.0*(A1_ + eta_ + alphaKsi_*ksi_));
     fEta_ = A2_ + pow(eta_, 3.0);
 
@@ -389,11 +388,11 @@ void NonlinearKEShih::correct()
        *(
             Ctau1_/fEta_
            *(
-                (gradU_ & gradU_)
-              + (gradU_ & gradU_)().T()
+                (gradU & gradU)
+              + T(gradU & gradU)
             )
-          + Ctau2_/fEta_*(gradU_ & gradU_.T())
-          + Ctau3_/fEta_*(gradU_.T() & gradU_)
+          + Ctau2_/fEta_*(gradU & gradU.T())
+          + Ctau3_/fEta_*(gradU.T() & gradU)
         )
     );
 }
