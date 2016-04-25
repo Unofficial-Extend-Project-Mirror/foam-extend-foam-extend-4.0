@@ -84,7 +84,8 @@ Foam::vector Foam::finiteRotation::eulerAngles(const tensor& rotT)
 
     // Use mag to avoid negative value due to round-off
     // HJ, 24/Feb/2016
-    const scalar c2 = sqrt(Foam::max(0, rotT.xx() + rotT.xy()));
+    // Bugfix: sqr. SS, 18/Apr/2016
+    const scalar c2 = sqrt(sqr(rotT.xx()) + sqr(rotT.xy())));
 
     // Calculate pitch angle
     pitchAngle = atan2(-rotT.xz(), c2);
