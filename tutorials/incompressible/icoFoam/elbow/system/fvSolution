@@ -22,20 +22,25 @@ solvers
         preconditioner   DIC;
         tolerance        1e-06;
         relTol           0;
-    };
+    }
     U
     {
         solver           PBiCG;
         preconditioner   DILU;
         tolerance        1e-05;
         relTol           0;
-    };
+    }
+}
+
+SIMPLE
+{
+    nNonOrthogonalCorrectors 1;
 }
 
 PISO
 {
     nCorrectors     2;
-    nNonOrthogonalCorrectors 2;
+    nNonOrthogonalCorrectors 1;
 }
 
 // ************************************************************************* //
