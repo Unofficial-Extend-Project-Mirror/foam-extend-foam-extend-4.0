@@ -81,19 +81,19 @@ void Foam::fineNumericFlux<Flux, Limiter>::computeInteriorFlux()
     MDLimiter<scalar, Limiter> scalarPLimiter
     (
         this->p_,
-        this->gradP
+        gradP
     );
 
     MDLimiter<vector, Limiter> vectorULimiter
     (
         this->U_,
-        this->gradU
+        gradU
     );
 
     MDLimiter<scalar, Limiter> scalarTLimiter
     (
         this->T_,
-        this->gradT
+        gradT
     );
 
     // Get limiters
