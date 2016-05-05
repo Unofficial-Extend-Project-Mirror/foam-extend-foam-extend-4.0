@@ -4,5 +4,6 @@
 . $WM_PROJECT_DIR/bin/tools/CleanFunctions
 
 cleanCase
-rm -f 0/motionGamma
+rm -f 0/motionGamma*
+rm -f constant/polyMesh/boundary
 ( cd setMotionMovingCone ; wclean )
