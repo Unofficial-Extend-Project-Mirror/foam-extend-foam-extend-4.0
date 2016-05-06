@@ -8,7 +8,7 @@ loseCases="cavityFine cavityHighRe"
 
 for case in $keepCases
 do
-    (cd $case && foamCleanTutorials)
+    (cd $case && foamCleanTutorials && rm -f constant/polyMesh/boundary)
 
     if [ "$case" = "elbow" ]
     then
