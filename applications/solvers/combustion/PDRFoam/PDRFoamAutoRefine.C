@@ -80,7 +80,7 @@ int main(int argc, char *argv[])
 #   include "createFields.H"
 #   include "readPISOControls.H"
 #   include "initContinuityErrs.H"
-#   include "readTimeControls.H"
+#   include "createTimeControls.H"
 #   include "setInitialDeltaT.H"
 
     scalar StCoNum = 0.0;

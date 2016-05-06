@@ -56,7 +56,7 @@ int main(int argc, char *argv[])
 #   include "createStressFields.H"
 #   include "readMechanicalProperties.H"
 #   include "readCouplingProperties.H"
-#   include "readTimeControls.H"
+#   include "createTimeControls.H"
 
 #   include "initContinuityErrs.H"
 

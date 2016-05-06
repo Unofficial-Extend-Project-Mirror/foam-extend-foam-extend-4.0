@@ -49,6 +49,7 @@ int main(int argc, char *argv[])
 
 #   include "createFields.H"
 #   include "initContinuityErrs.H"
+#   include "createTimeControls.H"
 
     Info<< "\nStarting time loop\n" << endl;
 

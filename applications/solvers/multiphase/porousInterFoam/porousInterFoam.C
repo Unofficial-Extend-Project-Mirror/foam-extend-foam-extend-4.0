@@ -58,7 +58,7 @@ int main(int argc, char *argv[])
 #   include "initContinuityErrs.H"
 #   include "createFields.H"
 #   include "createPorousZones.H"
-#   include "readTimeControls.H"
+#   include "createTimeControls.H"
 #   include "correctPhi.H"
 #   include "CourantNo.H"
 #   include "setInitialDeltaT.H"

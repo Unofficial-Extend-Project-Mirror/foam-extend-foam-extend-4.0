@@ -54,7 +54,7 @@ int main(int argc, char *argv[])
 #   include "createFields.H"
 #   include "readPPProperties.H"
 #   include "initContinuityErrs.H"
-#   include "readTimeControls.H"
+#   include "createTimeControls.H"
 #   include "CourantNo.H"
 #   include "setInitialDeltaT.H"
 

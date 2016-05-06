@@ -52,6 +52,7 @@ int main(int argc, char *argv[])
 #   include "readPIMPLEControls.H"
 #   include "createFields.H"
 #   include "initContinuityErrs.H"
+#   include "createTimeControls.H"
 #   include "readEngineTimeControls.H"
 #   include "CourantNo.H"
 #   include "setInitialDeltaT.H"

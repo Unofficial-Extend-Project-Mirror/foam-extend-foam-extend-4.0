@@ -1,11 +1,5 @@
-#   include "readTimeControls.H"
+#include "readTimeControls.H"
 
-    bool correctPhi
-    (
-        piso.dict().lookupOrDefault("correctPhi", false)
-    );
+correctPhi = piso.dict().lookupOrDefault("correctPhi", false);
 
-    bool checkMeshCourantNo
-    (
-        piso.dict().lookupOrDefault("checkMeshCourantNo", false)
-    );
+checkMeshCourantNo = piso.dict().lookupOrDefault("checkMeshCourantNo", false);

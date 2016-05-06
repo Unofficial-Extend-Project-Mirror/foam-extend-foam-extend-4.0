@@ -55,7 +55,7 @@ int main(int argc, char *argv[])
 
     #include "initContinuityErrs.H"
 
-    #include "readTimeControls.H"
+    #include "createTimeControls.H"
     #include "readSolidTimeControls.H"
 
 

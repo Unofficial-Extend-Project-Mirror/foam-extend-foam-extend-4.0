@@ -1,7 +1,7 @@
-#   include "readTimeControls.H"
+#   include "createTimeControls.H"
 #   include "readPISOControls.H"
 
-    checkMeshCourantNo = false;
+    bool checkMeshCourantNo = false;
     if (piso.found("checkMeshCourantNo"))
     {
         checkMeshCourantNo = Switch(piso.lookup("checkMeshCourantNo"));

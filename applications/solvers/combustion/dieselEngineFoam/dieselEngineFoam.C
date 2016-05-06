@@ -55,6 +55,7 @@ int main(int argc, char *argv[])
 #   include "readCombustionProperties.H"
 #   include "createSpray.H"
 #   include "initContinuityErrs.H"
+#   include "createTimeControls.H"
 #   include "readEngineTimeControls.H"
 #   include "compressibleCourantNo.H"
 #   include "setInitialDeltaT.H"

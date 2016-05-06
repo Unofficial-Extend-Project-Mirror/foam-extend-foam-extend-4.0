@@ -47,7 +47,7 @@ int main(int argc, char *argv[])
 #   include "readGravitationalAcceleration.H"
 #   include "createFields.H"
 #   include "initContinuityErrs.H"
-#   include "readTimeControls.H"
+#   include "createTimeControls.H"
 #   include "compressibleCourantNo.H"
 #   include "setInitialDeltaT.H"
 

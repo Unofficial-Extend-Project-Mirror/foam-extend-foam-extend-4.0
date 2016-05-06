@@ -51,7 +51,7 @@ int main(int argc, char *argv[])
 #   include "createFields.H"
 #   include "createSolidFields.H"
 #   include "initContinuityErrs.H"
-#   include "readTimeControls.H"
+#   include "createTimeControls.H"
 #   include "CourantNo.H"
 #   include "setInitialDeltaT.H"
 

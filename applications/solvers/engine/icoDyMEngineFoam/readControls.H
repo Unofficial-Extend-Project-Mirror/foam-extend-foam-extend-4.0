@@ -1,6 +1,4 @@
 #   include "readTimeControls.H"
 
-    bool checkMeshCourantNo
-    (
-        piso.dict().lookupOrDefault("checkMeshCourantNo", false)
-    );
+    checkMeshCourantNo =
+        piso.dict().lookupOrDefault("checkMeshCourantNo", false);

@@ -1,7 +1,10 @@
    #include "readPISOControls.H"
-   #include "readTimeControls.H"
+   #include "createTimeControls.H"
 
-    nAlphaSubCycles = readLabel(piso.lookup("nAlphaSubCycles"));
+    label nAlphaSubCycles
+    (
+        readLabel(piso.lookup("nAlphaSubCycles"))
+    );
 
     if (nAlphaSubCycles > 1 && nOuterCorr != 1)
     {
@@ -11,13 +14,13 @@
             << exit(FatalError);
     }
 
-    correctPhi = true;
+    bool correctPhi = true;
     if (piso.found("correctPhi"))
     {
         correctPhi = Switch(piso.lookup("correctPhi"));
     }
 
-    checkMeshCourantNo = false;
+    bool checkMeshCourantNo = false;
     if (piso.found("checkMeshCourantNo"))
     {
         checkMeshCourantNo = Switch(piso.lookup("checkMeshCourantNo"));

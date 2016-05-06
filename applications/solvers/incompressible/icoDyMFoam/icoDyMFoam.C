@@ -50,6 +50,7 @@ int main(int argc, char *argv[])
 #   include "initContinuityErrs.H"
 #   include "initTotalVolume.H"
 #   include "createFields.H"
+#   include "createControls.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
