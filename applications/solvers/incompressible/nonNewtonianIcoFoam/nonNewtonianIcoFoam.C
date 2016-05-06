@@ -31,6 +31,7 @@ Description
 
 #include "fvCFD.H"
 #include "singlePhaseTransportModel.H"
+#include "pisoControl.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -40,6 +41,9 @@ int main(int argc, char *argv[])
 
 #   include "createTime.H"
 #   include "createMeshNoClear.H"
+
+    pisoControl piso(mesh);
+
 #   include "createFields.H"
 #   include "initContinuityErrs.H"
 
@@ -51,10 +55,11 @@ int main(int argc, char *argv[])
     {
         Info<< "Time = " << runTime.timeName() << nl << endl;
 
-#       include "readPISOControls.H"
 #       include "CourantNo.H"
 
         fluid.correct();
+
+        // Momentum predictor
 
         fvVectorMatrix UEqn
         (
@@ -63,11 +68,13 @@ int main(int argc, char *argv[])
           - fvm::laplacian(fluid.nu(), U)
         );
 
-        solve(UEqn == -fvc::grad(p));
+        if (piso.momentumPredictor())
+        {
+            solve(UEqn == -fvc::grad(p));
+        }
 
         // --- PISO loop
-
-        for (int corr = 0; corr < nCorr; corr++)
+        while (piso.correct())
         {
             volScalarField rUA = 1.0/UEqn.A();
 
@@ -77,17 +84,23 @@ int main(int argc, char *argv[])
 
             adjustPhi(phi, U, p);
 
-            for (int nonOrth=0; nonOrth<=nNonOrthCorr; nonOrth++)
+            // Non-orthogonal pressure corrector loop
+            while (piso.correctNonOrthogonal())
             {
+                // Pressure corrector
+
                 fvScalarMatrix pEqn
                 (
                     fvm::laplacian(rUA, p) == fvc::div(phi)
                 );
 
                 pEqn.setReference(pRefCell, pRefValue);
-                pEqn.solve();
+                pEqn.solve
+                (
+                    mesh.solutionDict().solver(p.select(piso.finalInnerIter()))
+                );
 
-                if (nonOrth == nNonOrthCorr)
+                if (piso.finalNonOrthogonalIter())
                 {
                     phi -= pEqn.flux();
                 }
