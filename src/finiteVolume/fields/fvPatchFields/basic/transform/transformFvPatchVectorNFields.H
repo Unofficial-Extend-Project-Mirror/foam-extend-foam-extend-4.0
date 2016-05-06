@@ -31,7 +31,7 @@ License
 #include "VectorNFieldTypes.H"
 
 #include "transformFvPatchVectorNFieldsFwd.H"
-#include "transformFvPatchField.H"
+#include "transformFvPatchFields.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
