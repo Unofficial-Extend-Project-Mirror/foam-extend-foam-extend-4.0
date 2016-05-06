@@ -1,6 +1,6 @@
 U = rUA*UEqn().H();
 
-if (nCorr <= 1)
+if (pimple.nCorrPISO() <= 1)
 {
     UEqn.clear();
 }
@@ -11,7 +11,7 @@ phi = (fvc::interpolate(U) & mesh.Sf())
 adjustPhi(phi, U, p);
 
 // Non-orthogonal pressure corrector loop
-for (int nonOrth=0; nonOrth<=nNonOrthCorr; nonOrth++)
+while (pimple.correctNonOrthogonal())
 {
     // Pressure corrector
     fvScalarMatrix pEqn
@@ -20,22 +20,12 @@ for (int nonOrth=0; nonOrth<=nNonOrthCorr; nonOrth++)
     );
 
     pEqn.setReference(pRefCell, pRefValue);
-
-    if
+    pEqn.solve
     (
-        oCorr == nOuterCorr - 1
-     && corr == nCorr - 1
-     && nonOrth == nNonOrthCorr
-    )
-    {
-        pEqn.solve(mesh.solutionDict().solver("pFinal"));
-    }
-    else
-    {
-        pEqn.solve();
-    }
+        mesh.solutionDict().solver(p.select(pimple.finalInnerIter()))
+    );
 
-    if (nonOrth == nNonOrthCorr)
+    if (pimple.finalNonOrthogonalIter())
     {
         phi -= pEqn.flux();
     }
@@ -44,7 +34,7 @@ for (int nonOrth=0; nonOrth<=nNonOrthCorr; nonOrth++)
 #include "continuityErrs.H"
 
 // Explicitly relax pressure for momentum corrector except for last corrector
-if (oCorr != nOuterCorr-1)
+if (!pimple.finalIter())
 {
     p.relax();
 }
