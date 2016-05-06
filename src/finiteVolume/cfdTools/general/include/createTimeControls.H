@@ -29,13 +29,13 @@ Description
 
 \*---------------------------------------------------------------------------*/
 
-adjustTimeStep =
+bool adjustTimeStep =
     runTime.controlDict().lookupOrDefault("adjustTimeStep", false);
 
-maxCo =
+scalar maxCo =
     runTime.controlDict().lookupOrDefault<scalar>("maxCo", 1.0);
 
-maxDeltaT =
+scalar maxDeltaT =
     runTime.controlDict().lookupOrDefault<scalar>("maxDeltaT", GREAT);
 
 // ************************************************************************* //

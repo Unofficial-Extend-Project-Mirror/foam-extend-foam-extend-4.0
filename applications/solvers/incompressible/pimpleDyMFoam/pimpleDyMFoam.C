@@ -36,6 +36,7 @@ Description
 #include "singlePhaseTransportModel.H"
 #include "turbulenceModel.H"
 #include "dynamicFvMesh.H"
+#include "pimpleControl.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -45,10 +46,12 @@ int main(int argc, char *argv[])
 
 #   include "createTime.H"
 #   include "createDynamicFvMesh.H"
-#   include "readPIMPLEControls.H"
+
+    pimpleControl pimple(mesh);
+
 #   include "initContinuityErrs.H"
 #   include "createFields.H"
-#   include "readTimeControls.H"
+#   include "createControls.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -93,10 +96,9 @@ int main(int argc, char *argv[])
         fvc::makeRelative(phi, U);
 
         // --- PIMPLE loop
-        label oCorr = 0;
-        do
+        while (pimple.loop())
         {
-            if (nOuterCorr != 1)
+            if (!pimple.firstIter())
             {
                 p.storePrevIter();
             }
@@ -104,7 +106,7 @@ int main(int argc, char *argv[])
 #           include "UEqn.H"
 
             // --- PISO loop
-            for (int corr = 0; corr < nCorr; corr++)
+            while (pimple.correct())
             {
                 rAU = 1.0/UEqn.A();
 
@@ -114,7 +116,7 @@ int main(int argc, char *argv[])
 
                 adjustPhi(phi, U, p);
 
-                for (int nonOrth=0; nonOrth<=nNonOrthCorr; nonOrth++)
+                while (pimple.correctNonOrthogonal())
                 {
                     fvScalarMatrix pEqn
                     (
@@ -123,24 +125,15 @@ int main(int argc, char *argv[])
 
                     pEqn.setReference(pRefCell, pRefValue);
 
-                    if
+                    pEqn.solve
                     (
-//                         oCorr == nOuterCorr - 1
-                        corr == nCorr - 1
-                     && nonOrth == nNonOrthCorr
-                    )
-                    {
-                        pEqn.solve
+                        mesh.solutionDict().solver
                         (
-                            mesh.solutionDict().solver(p.name() + "Final")
-                        );
-                    }
-                    else
-                    {
-                        pEqn.solve(mesh.solutionDict().solver(p.name()));
-                    }
+                            p.select(pimple.finalInnerIter())
+                        )
+                    );
 
-                    if (nonOrth == nNonOrthCorr)
+                    if (pimple.finalNonOrthogonalIter())
                     {
                         phi -= pEqn.flux();
                     }
@@ -149,7 +142,7 @@ int main(int argc, char *argv[])
 #               include "continuityErrs.H"
 
                 // Explicitly relax pressure for momentum corrector
-                if (oCorr != nOuterCorr - 1)
+                if (!pimple.finalIter())
                 {
                     p.relax();
                 }
@@ -164,7 +157,7 @@ int main(int argc, char *argv[])
             }
 
             turbulence->correct();
-        } while (++oCorr < nOuterCorr);
+        }
 
         runTime.write();
 
