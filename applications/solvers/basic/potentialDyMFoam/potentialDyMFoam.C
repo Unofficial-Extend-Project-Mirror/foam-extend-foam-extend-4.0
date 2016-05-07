@@ -34,6 +34,7 @@ Author
 
 #include "fvCFD.H"
 #include "dynamicFvMesh.H"
+#include "pisoControl.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -45,6 +46,9 @@ int main(int argc, char *argv[])
 #   include "setRootCase.H"
 #   include "createTime.H"
 #   include "createDynamicFvMesh.H"
+
+    pisoControl piso(mesh);
+
 #   include "createFields.H"
 #   include "initTotalVolume.H"
 
@@ -54,7 +58,6 @@ int main(int argc, char *argv[])
 
     while (runTime.loop())
     {
-#       include "readPISOControls.H"
 #       include "checkTotalVolume.H"
 
         Info<< "Time = " << runTime.timeName() << nl << endl;
@@ -75,7 +78,7 @@ int main(int argc, char *argv[])
         // Solve potential flow equations
         adjustPhi(phi, U, p);
 
-        for (int nonOrth = 0; nonOrth <= nNonOrthCorr; nonOrth++)
+        while (piso.correctNonOrthogonal())
         {
             p.storePrevIter();
 
@@ -98,7 +101,7 @@ int main(int argc, char *argv[])
             pEqn.setReference(pRefCell, pRefValue);
             pEqn.solve();
 
-            if (nonOrth == nNonOrthCorr)
+            if (piso.finalNonOrthogonalIter())
             {
                 phi -= pEqn.flux();
             }
