@@ -34,6 +34,7 @@ Description
 #include "singlePhaseTransportModel.H"
 #include "RASModel.H"
 #include "porousZones.H"
+#include "simpleControl.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -42,6 +43,9 @@ int main(int argc, char *argv[])
     #include "setRootCase.H"
     #include "createTime.H"
     #include "createMesh.H"
+
+    simpleControl simple(mesh);
+
     #include "createFields.H"
     #include "initContinuityErrs.H"
 
@@ -52,9 +56,6 @@ int main(int argc, char *argv[])
     while (runTime.loop())
     {
         Info<< "Time = " << runTime.timeName() << nl << endl;
-
-        #include "readSIMPLEControls.H"
-        #include "initConvergenceCheck.H"
 
         p.storePrevIter();
 
@@ -71,8 +72,6 @@ int main(int argc, char *argv[])
         Info<< "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
             << "  ClockTime = " << runTime.elapsedClockTime() << " s"
             << nl << endl;
-
-        #include "convergenceCheck.H"
     }
 
     Info<< "End\n" << endl;
