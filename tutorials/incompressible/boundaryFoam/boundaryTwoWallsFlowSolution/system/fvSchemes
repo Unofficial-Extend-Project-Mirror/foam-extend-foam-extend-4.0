@@ -37,7 +37,7 @@ divSchemes
     div(phi,epsilon) Gauss linear;
     div(phi,R)      Gauss linear;
     div(phi,nuTilda) Gauss linear;
-    div((nuEff*dev(grad(U).T()))) Gauss linear;
+    div((nuEff*dev2(T(grad(U))))) Gauss linear;
 }
 
 // Laplacian discretisation schemes
