@@ -122,7 +122,7 @@ solvers
     }
 }
 
-PISO
+PIMPLE
 {
     nOuterCorrectors 2;
     nCorrectors     1;

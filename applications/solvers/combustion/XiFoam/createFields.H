@@ -132,3 +132,5 @@
     fields.add(b);
     fields.add(h);
     fields.add(hu);
+
+    mesh.schemesDict().setFluxRequired(p.name());

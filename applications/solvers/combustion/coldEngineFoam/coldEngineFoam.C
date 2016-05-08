@@ -35,6 +35,7 @@ Description
 #include "basicPsiThermo.H"
 #include "turbulenceModel.H"
 #include "OFstream.H"
+#include "pisoControl.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -44,6 +45,9 @@ int main(int argc, char *argv[])
 
 #   include "createEngineTime.H"
 #   include "createEngineMesh.H"
+
+    pisoControl piso(mesh);
+
 #   include "createFields.H"
 #   include "initContinuityErrs.H"
 #   include "createTimeControls.H"
@@ -58,7 +62,6 @@ int main(int argc, char *argv[])
 
     while (runTime.run())
     {
-#       include "readPISOControls.H"
 #       include "readEngineTimeControls.H"
 #       include "compressibleCourantNo.H"
 #       include "setDeltaT.H"
@@ -75,7 +78,7 @@ int main(int argc, char *argv[])
 #       include "UEqn.H"
 
         // --- PISO loop
-        for (int corr=1; corr<=nCorr; corr++)
+        while (piso.correct())
         {
 #           include "hEqn.H"
 #           include "pEqn.H"
