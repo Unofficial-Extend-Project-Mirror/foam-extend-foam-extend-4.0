@@ -41,7 +41,7 @@ solvers
     }
 }
 
-PISO
+PIMPLE
 {
     nCorrectors     2;
     nNonOrthogonalCorrectors 0;

@@ -7,30 +7,14 @@ fvVectorMatrix UEqn
 
 UEqn.relax();
 
-if (oCorr == nOuterCorr - 1)
-{
-    solve
+solve
+(
+    UEqn
+  ==
+    fvc::reconstruct
     (
-        UEqn
-      ==
-        fvc::reconstruct
-        (
-            fvc::interpolate(rho)*(g & mesh.Sf())
-          - fvc::snGrad(p)*mesh.magSf()
-        ),
-        mesh.solutionDict().solver("UFinal")
-    );
-}
-else
-{
-    solve
-    (
-        UEqn
-      ==
-        fvc::reconstruct
-        (
-            fvc::interpolate(rho)*(g & mesh.Sf())
-          - fvc::snGrad(p)*mesh.magSf()
-        )
-    );
-}
+        fvc::interpolate(rho)*(g & mesh.Sf())
+      - fvc::snGrad(p)*mesh.magSf()
+    ),
+    mesh.solutionDict().solver((U.select(pimple.finalIter())))
+);

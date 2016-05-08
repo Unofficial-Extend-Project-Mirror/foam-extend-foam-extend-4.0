@@ -20,12 +20,37 @@ internalField   uniform 0;
 
 boundaryField
 {
-    ".*"
+    outlet
     {
         type            MarshakRadiation;
         T               T;
         emissivity      1;
         value           uniform 0;
+    }
+    sides
+    {
+        type            MarshakRadiation;
+        T               T;
+        emissivity      1;
+        value           uniform 0;
+    }
+    base
+    {
+        type            MarshakRadiation;
+        T               T;
+        emissivity      1;
+        value           uniform 0;
+    }
+    inlet
+    {
+        type            MarshakRadiation;
+        T               T;
+        emissivity      1;
+        value           uniform 0;
+    }
+    frontAndBack
+    {
+        type        empty;
     }
 }
 

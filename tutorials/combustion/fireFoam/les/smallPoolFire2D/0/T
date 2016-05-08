@@ -42,7 +42,7 @@ boundaryField
         type            fixedValue;
         value           uniform 300;
     }
-    frontBack
+    frontAndBack
     {
         type            empty;
     }
