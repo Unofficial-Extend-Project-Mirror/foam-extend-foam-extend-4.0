@@ -35,7 +35,6 @@ divSchemes
     div(phi,R)      Gauss upwind;
     div(R)          Gauss linear;
     div(phi,nuTilda) Gauss upwind;
-    div((nuEff*dev(grad(U).T()))) Gauss linear;
 }
 
 laplacianSchemes
@@ -60,12 +59,6 @@ interpolationSchemes
 snGradSchemes
 {
     default         corrected;
-}
-
-fluxRequired
-{
-    default         no;
-    p;
 }
 
 mixingPlane
