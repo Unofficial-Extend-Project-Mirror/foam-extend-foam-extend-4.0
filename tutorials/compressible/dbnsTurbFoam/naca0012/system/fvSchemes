@@ -32,8 +32,6 @@ divSchemes
     div(phi,epsilon) Gauss upwind;
     div(devRhoReff) Gauss linear;
     div((devRhoReff&U)) Gauss linear;
-
-    div((muEff*dev2(grad(U).T()))) Gauss linear;
 }
 
 laplacianSchemes
@@ -54,11 +52,6 @@ interpolationSchemes
 snGradSchemes
 {
     default         corrected;
-}
-
-fluxRequired
-{
-    default         no;
 }
 
 relaxationFactors
