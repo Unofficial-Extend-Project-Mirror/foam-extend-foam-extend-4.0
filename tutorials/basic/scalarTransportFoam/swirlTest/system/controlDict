@@ -22,9 +22,9 @@ startTime       0;
 
 stopAt          endTime;
 
-endTime         10;
+endTime         6;
 
-deltaT          0.1;
+deltaT          0.05;
 
 writeControl    timeStep;
 
@@ -36,7 +36,7 @@ writeFormat     ascii;
 
 writePrecision  6;
 
-writeCompression uncompressed;
+writeCompression compressed;
 
 timeFormat      general;
 
