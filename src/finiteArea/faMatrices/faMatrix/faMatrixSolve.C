@@ -75,6 +75,10 @@ lduSolverPerformance faMatrix<Type>::solve(const dictionary& solverControls)
     // HJ, 20/Nov/2007
     lduInterfaceFieldPtrsList interfaces = psi_.boundaryField().interfaces();
 
+    // Cast into a non-const to solve.  HJ, 6/May/2016
+    GeometricField<Type, faPatchField, areaMesh>& psi =
+       const_cast<GeometricField<Type, faPatchField, areaMesh>&>(psi_);
+
     for (direction cmpt = 0; cmpt < Type::nComponents; cmpt++)
     {
         // copy field and source
@@ -139,11 +143,11 @@ lduSolverPerformance faMatrix<Type>::solve(const dictionary& solverControls)
             solverPerfVec = solverPerf;
         }
 
-        psi_.internalField().replace(cmpt, psiCmpt);
+        psi.internalField().replace(cmpt, psiCmpt);
         diag() = saveDiag;
     }
 
-    psi_.correctBoundaryConditions();
+    psi.correctBoundaryConditions();
 
     return solverPerfVec;
 }

@@ -1,5 +1,4 @@
-    p.boundaryField().updateCoeffs();
-
+{
     // Prepare clean 1/Ap without contribution from under-relaxation
     // HJ, 26/Oct/2015
     volScalarField rUA
@@ -56,4 +55,4 @@
     // re-used.  HJ, 22/Jan/2016
     U = UUrf*(U - rUA*fvc::grad(p)) + (1 - UUrf)*U.prevIter();
     U.correctBoundaryConditions();
-
+}

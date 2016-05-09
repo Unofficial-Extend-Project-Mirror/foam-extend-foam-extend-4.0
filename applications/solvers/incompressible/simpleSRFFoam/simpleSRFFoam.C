@@ -75,7 +75,6 @@ int main(int argc, char *argv[])
 
             solve(UrelEqn() == -fvc::grad(p));
 
-            p.boundaryField().updateCoeffs();
             volScalarField AUrel = UrelEqn().A();
             Urel = UrelEqn().H()/AUrel;
             UrelEqn.clear();

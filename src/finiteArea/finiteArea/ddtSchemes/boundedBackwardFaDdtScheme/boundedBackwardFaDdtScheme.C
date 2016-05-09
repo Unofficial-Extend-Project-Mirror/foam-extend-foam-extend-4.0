@@ -819,7 +819,7 @@ boundedBackwardFaDdtScheme::facDdt0
 tmp<faScalarMatrix>
 boundedBackwardFaDdtScheme::famDdt
 (
-    areaScalarField& vf
+    const areaScalarField& vf
 )
 {
     tmp<faScalarMatrix> tfam
@@ -890,7 +890,7 @@ tmp<faScalarMatrix>
 boundedBackwardFaDdtScheme::famDdt
 (
     const dimensionedScalar& rho,
-    areaScalarField& vf
+    const areaScalarField& vf
 )
 {
     tmp<faScalarMatrix> tfam
@@ -960,7 +960,7 @@ tmp<faScalarMatrix>
 boundedBackwardFaDdtScheme::famDdt
 (
     const areaScalarField& rho,
-    areaScalarField& vf
+    const areaScalarField& vf
 )
 {
     tmp<faScalarMatrix> tfam

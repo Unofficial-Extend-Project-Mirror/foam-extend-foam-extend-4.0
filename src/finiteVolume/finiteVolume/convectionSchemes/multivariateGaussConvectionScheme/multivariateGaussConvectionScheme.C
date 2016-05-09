@@ -80,7 +80,7 @@ tmp<fvMatrix<Type> >
 multivariateGaussConvectionScheme<Type>::fvmDiv
 (
     const surfaceScalarField& faceFlux,
-    GeometricField<Type, fvPatchField, volMesh>& vf
+    const GeometricField<Type, fvPatchField, volMesh>& vf
 ) const
 {
     return gaussConvectionScheme<Type>

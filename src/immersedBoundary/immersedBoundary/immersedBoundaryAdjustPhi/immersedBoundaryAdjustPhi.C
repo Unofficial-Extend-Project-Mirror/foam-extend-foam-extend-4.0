@@ -36,7 +36,7 @@ License
 void Foam::immersedBoundaryAdjustPhi
 (
     surfaceScalarField& phi,
-    volVectorField& U
+    const volVectorField& U
 )
 {
     const fvMesh& mesh = phi.mesh();

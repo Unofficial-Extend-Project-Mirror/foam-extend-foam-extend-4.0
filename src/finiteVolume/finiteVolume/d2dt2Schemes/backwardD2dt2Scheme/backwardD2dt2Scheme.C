@@ -55,7 +55,10 @@ scalar backwardD2dt2Scheme<Type>::deltaT0_() const
 
 
 template<class Type>
-scalar backwardD2dt2Scheme<Type>::deltaT0_(GeometricField<Type, fvPatchField, volMesh>& vf) const
+scalar backwardD2dt2Scheme<Type>::deltaT0_
+(
+    const GeometricField<Type, fvPatchField, volMesh>& vf
+) const
 {
     // Bug fix, Zeljko Tukovic: solver with outer iterations over a time-step
     // HJ, 12/Feb/2010
@@ -228,7 +231,7 @@ template<class Type>
 tmp<fvMatrix<Type> >
 backwardD2dt2Scheme<Type>::fvmD2dt2
 (
-    GeometricField<Type, fvPatchField, volMesh>& vf
+    const GeometricField<Type, fvPatchField, volMesh>& vf
 )
 {
     tmp<fvMatrix<Type> > tfvm
@@ -256,7 +259,7 @@ backwardD2dt2Scheme<Type>::fvmD2dt2
         notImplemented
         (
             type()
-          + "::fvmD2dt2(GeometricField<Type, fvPatchField, volMesh>& vf)"
+          + "::fvmD2dt2(const GeometricField<Type, fvPatchField, volMesh>& vf)"
         );
     }
     else
@@ -284,7 +287,7 @@ tmp<fvMatrix<Type> >
 backwardD2dt2Scheme<Type>::fvmD2dt2
 (
     const dimensionedScalar& rho,
-    GeometricField<Type, fvPatchField, volMesh>& vf
+    const GeometricField<Type, fvPatchField, volMesh>& vf
 )
 {
     tmp<fvMatrix<Type> > tfvm
@@ -315,7 +318,7 @@ backwardD2dt2Scheme<Type>::fvmD2dt2
           + "::fvcD2dt2"
           + "("
           + "const dimensionedScalar& rho, "
-          + "GeometricField<Type, fvPatchField, volMesh>& vf"
+          + "const GeometricField<Type, fvPatchField, volMesh>& vf"
           + ")"
         );
     }
@@ -339,7 +342,7 @@ tmp<fvMatrix<Type> >
 backwardD2dt2Scheme<Type>::fvmD2dt2
 (
     const volScalarField& rho,
-    GeometricField<Type, fvPatchField, volMesh>& vf
+    const GeometricField<Type, fvPatchField, volMesh>& vf
 )
 {
     tmp<fvMatrix<Type> > tfvm

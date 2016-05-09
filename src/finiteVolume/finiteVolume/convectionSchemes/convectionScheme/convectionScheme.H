@@ -176,7 +176,7 @@ public:
         virtual tmp<fvMatrix<Type> > fvmDiv
         (
             const surfaceScalarField&,
-            GeometricField<Type, fvPatchField, volMesh>&
+            const GeometricField<Type, fvPatchField, volMesh>&
         ) const = 0;
 
         virtual tmp<GeometricField<Type, fvPatchField, volMesh> > fvcDiv

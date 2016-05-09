@@ -137,8 +137,6 @@ int main(int argc, char *argv[])
                     )
                   + HbyAblend*fvc::ddtPhiCorr(rrhoUA, rho, rhoU, phi);
 
-                p.boundaryField().updateCoeffs();
-
                 surfaceScalarField phiGradp =
                     rrhoUAf*mesh.magSf()*fvc::snGrad(p);
 

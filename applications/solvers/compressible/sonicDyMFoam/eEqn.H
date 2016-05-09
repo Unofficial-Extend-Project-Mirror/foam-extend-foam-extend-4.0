@@ -54,4 +54,5 @@
 
     // Recalculate density
     rho = thermo.rho();
+    rho.correctBoundaryConditions();
 }

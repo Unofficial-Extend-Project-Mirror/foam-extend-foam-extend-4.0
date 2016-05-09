@@ -104,7 +104,7 @@ public:
         tmp<fvMatrix<Type> > fvmAdjDiv
         (
             const volVectorField&,
-            GeometricField<Type, fvPatchField, volMesh>&
+            const GeometricField<Type, fvPatchField, volMesh>&
         ) const;
 
         tmp<GeometricField<Type, fvPatchField, volMesh> > fvcAdjDiv

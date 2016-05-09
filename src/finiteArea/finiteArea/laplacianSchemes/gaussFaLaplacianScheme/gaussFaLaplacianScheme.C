@@ -44,7 +44,7 @@ tmp<faMatrix<Type> >
 gaussLaplacianScheme<Type>::famLaplacian
 (
     const edgeScalarField& gamma,
-    GeometricField<Type, faPatchField, areaMesh>& vf
+    const GeometricField<Type, faPatchField, areaMesh>& vf
 )
 {
     tmp<edgeScalarField> tdeltaCoeffs = this->tlnGradScheme_().deltaCoeffs(vf);

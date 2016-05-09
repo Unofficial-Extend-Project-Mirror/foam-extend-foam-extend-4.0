@@ -297,8 +297,9 @@ gradScheme<Type>::fvmGrad
         "(\n"
         "    GeometricField<Type, fvPatchField, volMesh>&"
         ")\n"
-    )   << "Implicit gradient operator currently defined only for Gauss linear "
-        << "and leastSquares (cell and face limiters are optional)."
+    )   << "Implicit gradient operator currently defined only for "
+        << "Gauss linear and leastSquares "
+        << "(cell and face limiters are optional)."
         << abort(FatalError);
 
     typedef typename outerProduct<vector, Type>::type GradType;

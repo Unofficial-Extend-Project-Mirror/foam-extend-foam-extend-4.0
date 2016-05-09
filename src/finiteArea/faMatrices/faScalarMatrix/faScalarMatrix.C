@@ -113,14 +113,22 @@ lduSolverPerformance faMatrix<scalar>::faSolver::solve
     faMat_.addBoundarySource(totalSource, false);
 
     solver_->read(solverControls);
+
+    // Cast into a non-const to solve.  HJ, 6/May/2016
+    GeometricField<scalar, faPatchField, areaMesh>& psi =
+        const_cast<GeometricField<scalar, faPatchField, areaMesh>&>
+        (
+            faMat_.psi()
+        );
+
     lduSolverPerformance solverPerf =
-        solver_->solve(faMat_.psi().internalField(), totalSource);
+        solver_->solve(psi.internalField(), totalSource);
 
     solverPerf.print();
 
     faMat_.diag() = saveDiag;
 
-    faMat_.psi().correctBoundaryConditions();
+    psi.correctBoundaryConditions();
 
     return solverPerf;
 }
@@ -138,6 +146,9 @@ lduSolverPerformance faMatrix<scalar>::solve
                "solving faMatrix<scalar>"
             << endl;
     }
+
+    GeometricField<scalar, faPatchField, areaMesh>& psi =
+        const_cast<GeometricField<scalar, faPatchField, areaMesh>&>(psi_);
 
     scalarField saveDiag = diag();
     addBoundaryDiag(diag(), 0);
@@ -158,13 +169,13 @@ lduSolverPerformance faMatrix<scalar>::solve
         internalCoeffs_,
         interfaces,
         solverControls
-    )->solve(psi_.internalField(), totalSource);
+    )->solve(psi.internalField(), totalSource);
 
     solverPerf.print();
 
     diag() = saveDiag;
 
-    psi_.correctBoundaryConditions();
+    psi.correctBoundaryConditions();
 
     return solverPerf;
 }

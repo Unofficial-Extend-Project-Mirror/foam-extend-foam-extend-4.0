@@ -47,7 +47,7 @@ namespace Foam
 void immersedBoundaryAdjustPhi
 (
     surfaceScalarField& phi,
-    volVectorField& U
+    const volVectorField& U
 );
 
 } // End namespace Foam

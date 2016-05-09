@@ -116,7 +116,7 @@ public:
         tmp<fvMatrix<Type> > fvmLaplacian
         (
             const GeometricField<GType, fvsPatchField, surfaceMesh>&,
-            GeometricField<Type, fvPatchField, volMesh>&
+            const GeometricField<Type, fvPatchField, volMesh>&
         );
 
         tmp<GeometricField<Type, fvPatchField, volMesh> > fvcLaplacian

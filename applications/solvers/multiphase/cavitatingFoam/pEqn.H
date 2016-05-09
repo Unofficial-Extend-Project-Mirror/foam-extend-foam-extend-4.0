@@ -18,8 +18,6 @@
     phiv = (fvc::interpolate(HbyA) & mesh.Sf())
          + fvc::ddtPhiCorr(rUA, rho, U, phiv);
 
-    p.boundaryField().updateCoeffs();
-
     surfaceScalarField phiGradp = rUAf*mesh.magSf()*fvc::snGrad(p);
 
     phiv -= phiGradp/rhof;

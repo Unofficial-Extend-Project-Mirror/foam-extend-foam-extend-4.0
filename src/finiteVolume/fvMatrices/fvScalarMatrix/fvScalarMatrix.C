@@ -60,7 +60,7 @@ Foam::lduMatrix::solverPerformance Foam::fvMatrix<Foam::scalar>::solve
     const dictionary& solverControls
 )
 {
-    profilingTrigger profSolve("fvMatrix::solve_"+psi_.name());
+    profilingTrigger profSolve("fvMatrix::solve_" + psi_.name());
 
     if (debug)
     {
@@ -82,6 +82,10 @@ Foam::lduMatrix::solverPerformance Foam::fvMatrix<Foam::scalar>::solve
     // HJ, 20/Nov/2007
     lduInterfaceFieldPtrsList interfaces = psi_.boundaryField().interfaces();
 
+    // Cast into a non-const to solve.  HJ, 6/May/2016
+    GeometricField<scalar, fvPatchField, volMesh>& psi =
+        const_cast<GeometricField<scalar, fvPatchField, volMesh>&>(psi_);
+
     // Solver call
     lduSolverPerformance solverPerf = lduSolver::New
     (
@@ -91,14 +95,14 @@ Foam::lduMatrix::solverPerformance Foam::fvMatrix<Foam::scalar>::solve
         internalCoeffs_,
         interfaces,
         solverControls
-    )->solve(psi_.internalField(), totalSource);
+    )->solve(psi.internalField(), totalSource);
 
     solverPerf.print();
 
     // Diagonal has been restored, clear complete assembly flag?
     diag() = saveDiag;
 
-    psi_.correctBoundaryConditions();
+    psi.correctBoundaryConditions();
 
     return solverPerf;
 }

@@ -168,19 +168,19 @@ public:
 
         tmp<faScalarMatrix> famDdt
         (
-            areaScalarField&
+            const areaScalarField&
         );
 
         tmp<faScalarMatrix> famDdt
         (
             const dimensionedScalar&,
-            areaScalarField&
+            const areaScalarField&
         );
 
         tmp<faScalarMatrix> famDdt
         (
             const areaScalarField&,
-            areaScalarField&
+            const areaScalarField&
         );
 };
 

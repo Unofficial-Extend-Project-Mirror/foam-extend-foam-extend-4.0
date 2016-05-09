@@ -51,7 +51,7 @@ bool adjustPhi
 (
     surfaceScalarField& phi,
     const volVectorField& U,
-    volScalarField& p
+    const volScalarField& p
 );
 
 } // End namespace Foam

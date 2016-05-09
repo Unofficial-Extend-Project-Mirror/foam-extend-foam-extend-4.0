@@ -112,7 +112,7 @@ divScheme<Type>::fvmUDiv
     (
         "tmp<BlockLduSystem> divScheme<Type>::fvmDiv\n"
         "(\n"
-        "    GeometricField<Type, fvPatchField, volMesh>&"
+        "    const GeometricField<Type, fvPatchField, volMesh>&"
         ")\n"
     )   << "Implicit div operator currently defined only for Gauss linear. "
         << abort(FatalError);
@@ -144,7 +144,7 @@ divScheme<Type>::fvmUDiv
         "tmp<BlockLduSystem> divScheme<Type>::fvmDiv\n"
         "(\n"
         "    surfaceScalarField&"
-        "    GeometricField<Type, fvPatchField, volMesh>&"
+        "    const GeometricField<Type, fvPatchField, volMesh>&"
         ")\n"
     )   << "Implicit div operator currently defined only for Gauss linear. "
         << abort(FatalError);

@@ -92,7 +92,7 @@ public:
         tmp<faMatrix<Type> > famLaplacian
         (
             const edgeScalarField&,
-            GeometricField<Type, faPatchField, areaMesh>&
+            const GeometricField<Type, faPatchField, areaMesh>&
         );
 
         tmp<GeometricField<Type, faPatchField, areaMesh> > facLaplacian

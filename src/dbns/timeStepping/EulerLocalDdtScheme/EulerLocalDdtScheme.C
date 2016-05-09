@@ -296,7 +296,7 @@ template<class Type>
 tmp<fvMatrix<Type> >
 EulerLocalDdtScheme<Type>::fvmDdt
 (
-    GeometricField<Type, fvPatchField, volMesh>& vf
+    const GeometricField<Type, fvPatchField, volMesh>& vf
 )
 {
     const objectRegistry& registry = this->mesh();
@@ -342,7 +342,7 @@ tmp<fvMatrix<Type> >
 EulerLocalDdtScheme<Type>::fvmDdt
 (
     const dimensionedScalar& rho,
-    GeometricField<Type, fvPatchField, volMesh>& vf
+    const GeometricField<Type, fvPatchField, volMesh>& vf
 )
 {
     const objectRegistry& registry = this->mesh();
@@ -386,7 +386,7 @@ tmp<fvMatrix<Type> >
 EulerLocalDdtScheme<Type>::fvmDdt
 (
     const volScalarField& rho,
-    GeometricField<Type, fvPatchField, volMesh>& vf
+    const GeometricField<Type, fvPatchField, volMesh>& vf
 )
 {
     const objectRegistry& registry = this->mesh();

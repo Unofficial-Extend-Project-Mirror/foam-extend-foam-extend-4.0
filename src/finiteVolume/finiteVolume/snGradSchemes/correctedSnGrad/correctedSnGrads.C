@@ -39,4 +39,27 @@ namespace fv
 }
 }
 
+
+template<>
+Foam::tmp<Foam::surfaceScalarField>
+Foam::fv::correctedSnGrad<Foam::scalar>::correction
+(
+    const volScalarField& vsf
+) const
+{
+    return fullGradCorrection(vsf);
+}
+
+
+template<>
+Foam::tmp<Foam::surfaceVectorField>
+Foam::fv::correctedSnGrad<Foam::vector>::correction
+(
+    const volVectorField& vvf
+) const
+{
+    return fullGradCorrection(vvf);
+}
+
+
 // ************************************************************************* //

@@ -1,6 +1,4 @@
 {
-    p.boundaryField().updateCoeffs();
-
     // Prepare clean Ap without time derivative contribution and
     // without contribution from under-relaxation
     // HJ, 26/Oct/2015

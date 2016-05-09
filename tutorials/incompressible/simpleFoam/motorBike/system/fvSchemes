@@ -34,6 +34,7 @@ divSchemes
     div(phi,k)      Gauss upwind;
     div(phi,omega)  Gauss upwind;
     div((nuEff*dev(grad(U).T()))) Gauss linear;
+    div((nuEff*dev(T(grad(U))))) Gauss linear;
 }
 
 laplacianSchemes
@@ -58,6 +59,14 @@ fluxRequired
 {
     default         no;
     p;
+}
+
+cacheFields
+{
+    grad(U);
+    grad(p);
+    grad(k);
+    grad(omega);
 }
 
 // ************************************************************************* //

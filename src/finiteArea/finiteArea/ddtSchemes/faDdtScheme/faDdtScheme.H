@@ -190,19 +190,19 @@ public:
 
         virtual tmp<faMatrix<Type> > famDdt
         (
-            GeometricField<Type, faPatchField, areaMesh>&
+            const GeometricField<Type, faPatchField, areaMesh>&
         ) = 0;
 
         virtual tmp<faMatrix<Type> > famDdt
         (
             const dimensionedScalar&,
-            GeometricField<Type, faPatchField, areaMesh>&
+            const GeometricField<Type, faPatchField, areaMesh>&
         ) = 0;
 
         virtual tmp<faMatrix<Type> > famDdt
         (
             const areaScalarField&,
-            GeometricField<Type, faPatchField, areaMesh>&
+            const GeometricField<Type, faPatchField, areaMesh>&
         ) = 0;
 };
 

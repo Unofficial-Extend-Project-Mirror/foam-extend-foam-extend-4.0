@@ -172,13 +172,13 @@ public:
         virtual tmp<fvMatrix<Type> > fvmLaplacian
         (
             const GeometricField<GType, fvsPatchField, surfaceMesh>&,
-            GeometricField<Type, fvPatchField, volMesh>&
+            const GeometricField<Type, fvPatchField, volMesh>&
         ) = 0;
 
         virtual tmp<fvMatrix<Type> > fvmLaplacian
         (
             const GeometricField<GType, fvPatchField, volMesh>&,
-            GeometricField<Type, fvPatchField, volMesh>&
+            const GeometricField<Type, fvPatchField, volMesh>&
         );
 
         virtual tmp<GeometricField<Type, fvPatchField, volMesh> > fvcLaplacian
@@ -212,28 +212,28 @@ public:
 
 // Add the patch constructor functions to the hash tables
 
-#define makeFvLaplacianTypeScheme(SS, Type, GType)                             \
-                                                                               \
-    typedef SS<Type, GType> SS##Type##GType;                                   \
-    defineNamedTemplateTypeNameAndDebug(SS##Type##GType, 0);                   \
-                                                                               \
-    laplacianScheme<Type, GType>::                                             \
-        addIstreamConstructorToTable<SS<Type, GType> >                         \
+#define makeFvLaplacianTypeScheme(SS, Type, GType)                            \
+                                                                              \
+    typedef SS<Type, GType> SS##Type##GType;                                  \
+    defineNamedTemplateTypeNameAndDebug(SS##Type##GType, 0);                  \
+                                                                              \
+    laplacianScheme<Type, GType>::                                            \
+        addIstreamConstructorToTable<SS<Type, GType> >                        \
     add##SS##Type##GType##IstreamConstructorToTable_;
 
 
-#define makeFvLaplacianScheme(SS)                                              \
-                                                                               \
-makeFvLaplacianTypeScheme(SS, scalar, scalar)                                  \
-makeFvLaplacianTypeScheme(SS, scalar, symmTensor)                              \
-makeFvLaplacianTypeScheme(SS, scalar, tensor)                                  \
-makeFvLaplacianTypeScheme(SS, vector, scalar)                                  \
-makeFvLaplacianTypeScheme(SS, sphericalTensor, scalar)                         \
-makeFvLaplacianTypeScheme(SS, symmTensor, scalar)                              \
-makeFvLaplacianTypeScheme(SS, symmTensor, symmTensor)                          \
-makeFvLaplacianTypeScheme(SS, tensor, scalar)                                  \
-makeFvLaplacianTypeScheme(SS, vector, tensor)                                  \
-makeFvLaplacianTypeScheme(SS, vector, diagTensor)                              \
+#define makeFvLaplacianScheme(SS)                                             \
+                                                                              \
+makeFvLaplacianTypeScheme(SS, scalar, scalar)                                 \
+makeFvLaplacianTypeScheme(SS, scalar, symmTensor)                             \
+makeFvLaplacianTypeScheme(SS, scalar, tensor)                                 \
+makeFvLaplacianTypeScheme(SS, vector, scalar)                                 \
+makeFvLaplacianTypeScheme(SS, sphericalTensor, scalar)                        \
+makeFvLaplacianTypeScheme(SS, symmTensor, scalar)                             \
+makeFvLaplacianTypeScheme(SS, symmTensor, symmTensor)                         \
+makeFvLaplacianTypeScheme(SS, tensor, scalar)                                 \
+makeFvLaplacianTypeScheme(SS, vector, tensor)                                 \
+makeFvLaplacianTypeScheme(SS, vector, diagTensor)                             \
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
