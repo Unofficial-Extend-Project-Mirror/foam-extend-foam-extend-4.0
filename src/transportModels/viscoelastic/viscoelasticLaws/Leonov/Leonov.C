@@ -114,7 +114,8 @@ Foam::tmp<Foam::fvVectorMatrix> Foam::Leonov::divTau(volVectorField& U) const
 void Foam::Leonov::correct()
 {
     // Velocity gradient tensor
-    const tmp<volTensorField> L = fvc::grad(U());
+    const tmp<volTensorField> tL = fvc::grad(U());
+    const volTensorField& L = tL();
 
     // Convected derivate term
     volTensorField C = sigma_ & L;

@@ -84,7 +84,8 @@ Foam::Oldroyd_B::divTau(volVectorField& U) const
 void Foam::Oldroyd_B::correct()
 {
     // Velocity gradient tensor
-    const tmp<volTensorField> L = fvc::grad(U());
+    const tmp<volTensorField> tL = fvc::grad(U());
+    const volTensorField& L = tL();
 
     // Convected derivate term
     volTensorField C = tau_ & L;
