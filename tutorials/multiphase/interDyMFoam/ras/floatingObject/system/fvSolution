@@ -28,7 +28,8 @@ solvers
         agglomerator    faceAreaPair;
         mergeLevels     1;
     }
-
+    rho
+    {}
     pcorr
     {
         solver          PCG;
