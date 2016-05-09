@@ -27,7 +27,6 @@ Description
 
 #include "IOstream.H"
 #include "error.H"
-#include "Switch.H"
 #include <sstream>
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
@@ -62,14 +61,7 @@ Foam::IOstream::formatEnum(const word& format)
 Foam::IOstream::compressionType
 Foam::IOstream::compressionEnum(const word& compression)
 {
-    // get Switch (bool) value, but allow it to fail
-    Switch sw(compression, true);
-
-    if (sw.valid())
-    {
-        return sw ? IOstream::COMPRESSED : IOstream::UNCOMPRESSED;
-    }
-    else if (compression == "uncompressed")
+    if (compression == "uncompressed")
     {
         return IOstream::UNCOMPRESSED;
     }
