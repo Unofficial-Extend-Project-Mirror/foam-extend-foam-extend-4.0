@@ -79,6 +79,16 @@ class mapDistribute
         mutable autoPtr<List<labelPair> > schedulePtr_;
 
 
+   // Private Member Functions
+
+        static void checkReceivedSize
+        (
+            const label procI,
+            const label expectedSize,
+            const label receivedSize
+        );
+
+
 public:
 
     // Constructors
@@ -165,7 +175,7 @@ public:
 
         // Other
 
-            //- Compact maps. Gets per field a bool whether it is used (locally)
+            //- Compact maps. Gets per field a bool whether it is used locally
             //  and works out itself what this side and sender side can remove
             //  from maps.
             void compact(const boolList& elemIsUsed);
@@ -257,7 +267,6 @@ public:
     // Member Operators
 
         void operator=(const mapDistribute&);
-
 };
 
 

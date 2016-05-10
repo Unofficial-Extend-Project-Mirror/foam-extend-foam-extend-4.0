@@ -133,8 +133,9 @@ void MixingPlaneInterpolation<MasterPatch, SlavePatch>::calcAddressing() const
             noTransform,
             noTransform,
             noTranslation,
-            0,
-            0,
+            true,          // Patch data is complete on all processors
+            SMALL,
+            SMALL,
             true    // Scale GGI weights
         );
 
@@ -146,8 +147,9 @@ void MixingPlaneInterpolation<MasterPatch, SlavePatch>::calcAddressing() const
             noTransform,
             noTransform,
             noTranslation,
-            0,
-            0,
+            true,          // Patch data is complete on all processors
+            SMALL,
+            SMALL,
             true    // Scale GGI weights
         );
 

@@ -74,7 +74,7 @@ Foam::List<Foam::labelPair> Foam::mapDistribute::schedule
             slave++
         )
         {
-            IPstream fromSlave(Pstream::blocking, slave);
+            IPstream fromSlave(Pstream::scheduled, slave);
             List<labelPair> nbrData(fromSlave);
 
             forAll(nbrData, i)
@@ -95,18 +95,18 @@ Foam::List<Foam::labelPair> Foam::mapDistribute::schedule
             slave++
         )
         {
-            OPstream toSlave(Pstream::blocking, slave);
+            OPstream toSlave(Pstream::scheduled, slave);
             toSlave << allComms;
         }
     }
     else
     {
         {
-            OPstream toMaster(Pstream::blocking, Pstream::masterNo());
+            OPstream toMaster(Pstream::scheduled, Pstream::masterNo());
             toMaster << allComms;
         }
         {
-            IPstream fromMaster(Pstream::blocking, Pstream::masterNo());
+            IPstream fromMaster(Pstream::scheduled, Pstream::masterNo());
             fromMaster >> allComms;
         }
     }
@@ -123,29 +123,28 @@ Foam::List<Foam::labelPair> Foam::mapDistribute::schedule
     );
 
     // Processors involved in my schedule
-    return UIndirectList<labelPair>(allComms, mySchedule);
+    return List<labelPair>(UIndirectList<labelPair>(allComms, mySchedule));
 
-
-    //if (debug)
-    //{
-    //    Pout<< "I need to:" << endl;
-    //    const List<labelPair>& comms = schedule();
-    //    forAll(comms, i)
-    //    {
-    //        const labelPair& twoProcs = comms[i];
-    //        label sendProc = twoProcs[0];
-    //        label recvProc = twoProcs[1];
-    //
-    //        if (recvProc == Pstream::myProcNo())
-    //        {
-    //            Pout<< "    receive from " << sendProc << endl;
-    //        }
-    //        else
-    //        {
-    //            Pout<< "    send to " << recvProc << endl;
-    //        }
-    //    }
-    //}
+//     if (debug)
+//     {
+//         Pout<< "I need to:" << endl;
+//         const List<labelPair>& comms = schedule();
+//         forAll(comms, i)
+//         {
+//             const labelPair& twoProcs = comms[i];
+//             label sendProc = twoProcs[0];
+//             label recvProc = twoProcs[1];
+    
+//             if (recvProc == Pstream::myProcNo())
+//             {
+//                 Pout<< "    receive from " << sendProc << endl;
+//             }
+//             else
+//             {
+//                 Pout<< "    send to " << recvProc << endl;
+//             }
+//         }
+//     }
 }
 
 
@@ -162,6 +161,32 @@ const Foam::List<Foam::labelPair>& Foam::mapDistribute::schedule() const
         );
     }
     return schedulePtr_();
+}
+
+
+void Foam::mapDistribute::checkReceivedSize
+(
+    const label procI,
+    const label expectedSize,
+    const label receivedSize
+)
+{
+    if (receivedSize != expectedSize)
+    {
+        FatalErrorIn
+        (
+            "template<class T>\n"
+            "void mapDistribute::checkReceivedSize\n"
+            "(\n"
+            "    const label procI,\n"
+            "    const label expectedSize,\n"
+            "    const label receivedSize\n"
+            ")\n"
+        )   << "Expected from processor " << procI
+            << " " << expectedSize << " but received "
+            << receivedSize << " elements."
+            << abort(FatalError);
+    }
 }
 
 

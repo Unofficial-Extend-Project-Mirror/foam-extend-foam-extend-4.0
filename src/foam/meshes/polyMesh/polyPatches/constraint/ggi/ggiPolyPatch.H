@@ -47,6 +47,7 @@ SourceFiles
 #include "word.H"
 #include "faceZone.H"
 #include "Switch.H"
+#include "mapDistribute.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -110,6 +111,9 @@ class ggiPolyPatch
             //- List of zone faces indices to send to each processor
             mutable labelListList* sendAddrPtr_;
 
+            //- Map-distribute comms tool
+            mutable mapDistribute* mapPtr_;
+
 
     // Private member functions
 
@@ -146,6 +150,9 @@ class ggiPolyPatch
 
             //- Return send addressing
             const labelListList& sendAddr() const;
+
+            //- Return mapDistribute
+            const mapDistribute& map() const;
 
 
         // Memory management

@@ -167,10 +167,10 @@ void Foam::overlapGgiPolyPatch::calcPatchToPatch() const
                 forwardT(),
                 reverseT(),
                 separation(),
-                0,             // master overlap tolerance
-                0,             // slave overlap tolerance
+                true,          // Patch data is complete on all processors
+                SMALL,         // master overlap tolerance
+                SMALL,         // slave overlap tolerance
                 true,          // Rescale weighting factors.  Bug fix, MB.
-//                 ggiInterpolation::AABB
                 overlapGgiInterpolation::BB_OCTREE  // Octree search, MB.
 
             );
