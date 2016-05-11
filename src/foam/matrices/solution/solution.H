@@ -53,6 +53,12 @@ class solution
 {
     // Private data
 
+        //- Dictionary of temporary fields to cache
+        dictionary cache_;
+
+        //- Switch for the caching mechanism
+        bool caching_;
+
         //- Dictionary of relaxation factors for all the fields
         dictionary relaxationFactors_;
 
@@ -64,6 +70,9 @@ class solution
 
 
     // Private Member Functions
+
+        //- Read settings from the dictionary
+        void read(const dictionary&);
 
         //- Disallow default bitwise copy construct and assignment
         solution(const solution&);
@@ -84,12 +93,28 @@ public:
     // Constructors
 
         //- Construct for given objectRegistry and dictionary
-        solution(const objectRegistry& obr, const fileName& dictName);
+        solution
+        (
+            const objectRegistry& obr,
+            const fileName& dictName
+        );
 
 
     // Member Functions
 
         // Access
+
+            //- Return true if the given field should be cached
+            bool cache(const word& name) const;
+
+            //- Helper for printing cache message
+            template<class FieldType>
+            static void cachePrintMessage
+            (
+                const char* message,
+                const word& name,
+                const FieldType& vf
+            );
 
             //- Return true if the relaxation factor is given for the field
             bool relax(const word& name) const;
@@ -135,6 +160,12 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#ifdef NoRepository
+#   include "solutionTemplates.C"
+#endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

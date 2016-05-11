@@ -118,28 +118,16 @@ Foam::fv::gradScheme<Type>::grad
     typedef typename outerProduct<vector, Type>::type GradType;
     typedef GeometricField<GradType, fvPatchField, volMesh> GradFieldType;
 
-    if (!this->mesh().changing() && this->mesh().schemesDict().cache(name))
+    if (!this->mesh().changing() && this->mesh().solutionDict().cache(name))
     {
         if (!mesh().objectRegistry::template foundObject<GradFieldType>(name))
         {
-            if (fvSchemes::debug)
-            {
-                Info<< "Cache: Calculating and caching " << name
-                    << " originating from " << vsf.name()
-                    << " event No. " << vsf.eventNo()
-                    << endl;
-            }
+            solution::cachePrintMessage("Calculating and caching", name, vsf);
             tmp<GradFieldType> tgGrad = calcGrad(vsf, name);
             regIOobject::store(tgGrad.ptr());
         }
 
-        if (fvSchemes::debug)
-        {
-            Info<< "Cache: Retrieving " << name
-                << " originating from " << vsf.name()
-                << " event No. " << vsf.eventNo();
-        }
-
+        solution::cachePrintMessage("Retrieving", name, vsf);
         GradFieldType& gGrad = const_cast<GradFieldType&>
         (
             mesh().objectRegistry::template lookupObject<GradFieldType>(name)
@@ -147,7 +135,7 @@ Foam::fv::gradScheme<Type>::grad
 
         if (gGrad.upToDate(vsf.name()))
         {
-            if (fvSchemes::debug)
+            if (solution::debug)
             {
                 Info<< ": up-to-date." << endl;
             }
@@ -156,24 +144,15 @@ Foam::fv::gradScheme<Type>::grad
         }
         else
         {
-            if (fvSchemes::debug)
+            if (solution::debug)
             {
-                Info<< ": not up-to-date." << nl
-                    << "Cache: Deleting " << name
-                    << " originating from " << vsf.name()
-                    << " event No. " << vsf.eventNo()
-                    << endl;
+                Info<< ": not up-to-date." << endl;
+                solution::cachePrintMessage("Deleting", name, vsf);
             }
             gGrad.release();
             delete &gGrad;
 
-            if (fvSchemes::debug)
-            {
-                Info<< "Cache: Recalculating " << name
-                    << " originating from " << vsf.name()
-                    << " event No. " << vsf.eventNo()
-                    << endl;
-            }
+            solution::cachePrintMessage("Recalculating", name, vsf);
             tmp<GradFieldType> tgGrad = calcGrad(vsf, name);
 
             // Note: in order for the patchNeighbourField to be
@@ -182,13 +161,7 @@ Foam::fv::gradScheme<Type>::grad
             // shall be moved into the library fvc operators
             tgGrad().correctBoundaryConditions();
 
-            if (fvSchemes::debug)
-            {
-                Info<< "Cache: Storing " << name
-                    << " originating from " << vsf.name()
-                    << " event No. " << vsf.eventNo()
-                    << endl;
-            }
+            solution::cachePrintMessage("Storing", name, vsf);
             regIOobject::store(tgGrad.ptr());
             GradFieldType& gGrad = const_cast<GradFieldType&>
             (
@@ -215,25 +188,13 @@ Foam::fv::gradScheme<Type>::grad
 
             if (gGrad.ownedByRegistry())
             {
-                if (fvSchemes::debug)
-                {
-                    Info<< "Cache: Deleting " << name
-                        << " originating from " << vsf.name()
-                        << " event No. " << vsf.eventNo()
-                        << endl;
-                }
+                solution::cachePrintMessage("Deleting", name, vsf);
                 gGrad.release();
                 delete &gGrad;
             }
         }
 
-        if (fvSchemes::debug)
-        {
-            Info<< "Cache: Calculating " << name
-                << " originating from " << vsf.name()
-                << " event No. " << vsf.eventNo()
-                << endl;
-        }
+        solution::cachePrintMessage("Calculating", name, vsf);
         return calcGrad(vsf, name);
     }
 }
