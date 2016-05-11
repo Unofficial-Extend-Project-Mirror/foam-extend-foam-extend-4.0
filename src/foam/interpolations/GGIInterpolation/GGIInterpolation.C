@@ -49,7 +49,11 @@ label GGIInterpolation<MasterPatch, SlavePatch>::parMasterStart() const
     if (globalData())
     {
         // Integer division intended
-        return Pstream::myProcNo()*(masterPatch_.size()/Pstream::nProcs() + 1);
+        return Foam::min
+        (
+            masterPatch_.size() - 1,
+            Pstream::myProcNo()*(masterPatch_.size()/Pstream::nProcs() + 1)
+        );
     }
     else
     {
@@ -83,7 +87,11 @@ label GGIInterpolation<MasterPatch, SlavePatch>::parMasterEnd() const
 template<class MasterPatch, class SlavePatch>
 label GGIInterpolation<MasterPatch, SlavePatch>::parMasterSize() const
 {
-    return this->parMasterEnd() - this->parMasterStart();
+    return Foam::max
+    (
+        0,
+        this->parMasterEnd() - this->parMasterStart()
+    );
 }
 
 
