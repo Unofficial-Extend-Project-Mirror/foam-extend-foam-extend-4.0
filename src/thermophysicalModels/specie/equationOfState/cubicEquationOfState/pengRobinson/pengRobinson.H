@@ -114,8 +114,8 @@ public:
         //- Construct from components
         inline pengRobinson
         (
-	    const specie& sp
-	);
+            const specie& sp
+        );
 
         //- Construct from Istream
         pengRobinson(Istream&);
@@ -133,32 +133,32 @@ public:
         inline static autoPtr<pengRobinson> New(Istream& is);
 
     // Member functions
-	inline scalar rhostd()const;
+        inline scalar rhostd()const;
 
         //CL: Model coefficient a(T)
-	inline scalar a(const  scalar T)const;
+        inline scalar a(const  scalar T)const;
 
         //CL: temperature deriviative of model coefficient a(T)
-	inline scalar dadT(const  scalar T)const;
+        inline scalar dadT(const  scalar T)const;
 
         //CL: second order temperature deriviative of model coefficient a(T)
-	inline scalar d2adT2(const  scalar T)const;
+        inline scalar d2adT2(const  scalar T)const;
 
         //Return Peng Robinson factors
-	inline scalar a0()const;
+        inline scalar a0()const;
 
-	inline scalar b()const;
+        inline scalar b()const;
 
-	inline scalar n()const;
+        inline scalar n()const;
 
         //CL: return power of constants b_
-	inline scalar b2()const;
+        inline scalar b2()const;
 
-	inline scalar b3()const;
+        inline scalar b3()const;
 
-	inline scalar b4()const;
+        inline scalar b4()const;
 
-	inline scalar b5()const;
+        inline scalar b5()const;
 
         //CL: Equation of state
         inline scalar p(const scalar rho, const scalar T) const;
@@ -190,21 +190,21 @@ public:
             const scalar rho,
             const  scalar T
         ) const ; 
-	
+
         //CL: second order derivatives, not Used At The Moment
-        inline scalar d2pdv2(const scalar rho,const  scalar T) const;    		
-	
-        inline scalar d2pdT2(const scalar rho,const  scalar T) const;    		
-        
-        inline scalar d2pdvdT(const scalar rho,const  scalar T) const;    		
-	
-        inline scalar d2vdT2(const scalar rho,const  scalar T) const;    
-	
+        inline scalar d2pdv2(const scalar rho,const  scalar T) const;
+
+        inline scalar d2pdT2(const scalar rho,const  scalar T) const;
+
+        inline scalar d2pdvdT(const scalar rho,const  scalar T) const;
+
+        inline scalar d2vdT2(const scalar rho,const  scalar T) const;
+
         //CL: Used for internal Energy
         inline scalar integral_p_dv(const scalar rho,const  scalar T) const;
         
         //CL: Used for Entropy
-        inline scalar integral_dpdT_dv(const scalar rho,const  scalar T) const;  	
+        inline scalar integral_dpdT_dv(const scalar rho,const  scalar T) const;
 
         //- Return density [kg/m^3] 
         // rho0 is the starting point of the newton solver used to calculate rho

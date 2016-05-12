@@ -45,9 +45,9 @@ Germany
 #include "steam.H"
 
 #ifdef __cplusplus
-	#define EXTERN extern "C"
+    #define EXTERN extern "C"
 #else
-	#define EXTERN extern
+    #define EXTERN extern
 #endif 
 
 

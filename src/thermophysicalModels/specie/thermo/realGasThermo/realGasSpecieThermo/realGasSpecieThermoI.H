@@ -69,16 +69,17 @@ inline void Foam::realGasSpecieThermo<thermo>::T
 
     do
     {
-        Test = Tnew;   
-	rhoOld=rho;
-	rho=this->rho(p,Test,rhoOld);
+        Test = Tnew;
+        rhoOld=rho;
+        rho=this->rho(p,Test,rhoOld);
         i=0;
-      	do
-   	{   
+
+        do
+        {   
             //CL: using a stabilizing newton solver 
             //CL: if the solve is diverging, the step is reduced until the solver converges
             Tnew = Test - ((this->*F)(rho,Test) - f)/(this->*dFdT)(rho,Test)/(pow(2,i)); 
-	    i++;					
+            i++;
         }while
         (
             (i<20)
@@ -88,7 +89,7 @@ inline void Foam::realGasSpecieThermo<thermo>::T
                 > 
                 mag((this->*F)(rho,Test) - f)
             ))
-        );	
+        );
 
         if (iter++ > maxIter_)
         {
@@ -107,7 +108,7 @@ inline void Foam::realGasSpecieThermo<thermo>::T
         (mag(mag(Tnew) - mag(Test)) > Ttol)
         ||
         (mag(mag(rho) - mag(rhoOld)) > rhotol)
-    );		
+    );
 
     rho0=rho;
     T0=Tnew;
@@ -166,7 +167,7 @@ inline Foam::scalar Foam::realGasSpecieThermo<thermo>::Cv( const scalar rho, con
 
 template<class thermo>
 inline Foam::scalar Foam::realGasSpecieThermo<thermo>::H(const scalar rho, const scalar T) const
-{		
+{
     return this->h(rho,  T)/this->W();
 }
 
@@ -234,14 +235,14 @@ inline Foam::scalar Foam::realGasSpecieThermo<thermo>::psiE
     return  
     -(
         (
-	    T*pow(beta,2)*V
-	    -this->isothermalCompressiblity(rho,T)*cp
-	)
-	/
-	(
+        T*pow(beta,2)*V
+        -this->isothermalCompressiblity(rho,T)*cp
+    )
+    /
+    (
             cp*V
             -beta*this->p(rho,T)*pow(V,2)
-	)
+    )
     );
 }
 

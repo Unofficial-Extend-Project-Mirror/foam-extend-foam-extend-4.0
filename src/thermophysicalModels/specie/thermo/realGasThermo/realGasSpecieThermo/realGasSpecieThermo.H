@@ -123,8 +123,8 @@ class realGasSpecieThermo
         (
             scalar f,
             scalar &T0,
-	    scalar p,
-	    scalar &rho0,
+            scalar p,
+            scalar &rho0,
             scalar (realGasSpecieThermo::*F)(const scalar,const scalar) const,
             scalar (realGasSpecieThermo::*dFdT)(const scalar,const scalar) const
         ) const;
@@ -201,16 +201,16 @@ public:
 
                 //CL: Other variables
 
-	        //- Return compressibility drho/dp at h=constant [s^2/m^2] 
+            //- Return compressibility drho/dp at h=constant [s^2/m^2] 
                 inline scalar psiH(const scalar rho, const scalar T) const;
 
                 //- Return compressibility drho/dp at e=constant [s^2/m^2]     
                 inline scalar psiE(const scalar rho, const scalar T) const;
 
-	        //- Return compressibility drho/dH at p=constant 
+            //- Return compressibility drho/dH at p=constant 
                 inline scalar drhodH(const scalar rho, const scalar T) const;
 
-	        //- Return compressibility drho/dE at p=constant 
+            //- Return compressibility drho/dE at p=constant 
                 inline scalar drhodE(const scalar rho, const scalar T) const;
 
         // Energy->temperature  inversion functions

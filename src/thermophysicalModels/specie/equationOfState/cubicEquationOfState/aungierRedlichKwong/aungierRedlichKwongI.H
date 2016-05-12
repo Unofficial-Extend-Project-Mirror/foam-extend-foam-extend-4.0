@@ -356,13 +356,13 @@ inline scalar aungierRedlichKwong::isothermalCompressiblity(const scalar rho,con
 
 
 //- Return density [kg/m^3]
-inline scalar aungierRedlichKwong::rho(
+inline scalar aungierRedlichKwong::rho
+(
     const scalar p,
     const scalar T,
     const scalar rho0
 ) const
 {
- 
    scalar molarVolumePrevIteration;
    scalar molarVolume;
    label iter=0;
@@ -371,7 +371,7 @@ inline scalar aungierRedlichKwong::rho(
    scalar rho1=rhoMax_;
    scalar rho2=rhoMin_;
 
-   molarVolume=this->W()/rho0;	 
+   molarVolume=this->W()/rho0;
 
    do
    {
@@ -398,7 +398,7 @@ inline scalar aungierRedlichKwong::rho(
                    scalar f2 = this->p(rho2,T) - p;
                    scalar rho3 = (rho1 + rho2)/2;
                    scalar f3 = this->p(rho3,T) - p;
-	
+
                    if ((f2 < 0 && f3 > 0) || (f2 > 0 && f3 < 0))
                    {
                        rho1=rho3;
@@ -406,14 +406,14 @@ inline scalar aungierRedlichKwong::rho(
                    else if ((f1 < 0 && f3 > 0)||(f1 > 0 && f3 < 0))
                    {
                        rho2=rho3;
-                   }		 
-                   else	
+                   }
+                   else
                    {
                        rho2=(rho2 + rho3)/2;
                    }
 
                    if(mag(f3) < p*tol_)
-                   {	  	  
+                   {
                        molarVolume=this->W()/rho3;
                        molarVolumePrevIteration=this->W()/rho3;
                        break; 
@@ -422,7 +422,7 @@ inline scalar aungierRedlichKwong::rho(
                    {
                        molarVolumePrevIteration=this->W()/rho3;
                    }
-               }		  
+               }
            }
        }
        while

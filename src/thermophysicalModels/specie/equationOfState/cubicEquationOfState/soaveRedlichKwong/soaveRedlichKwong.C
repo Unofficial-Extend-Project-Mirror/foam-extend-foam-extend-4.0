@@ -62,7 +62,7 @@ soaveRedlichKwong::soaveRedlichKwong(Istream& is)
     // Starting GUESS for the density by ideal gas law
     rhostd_(this->rho(this->Pstd(),this->Tstd(),this->Pstd()/(this->Tstd()*this->R())))
 {
-    is.check("soaveRedlichKwong::soaveRedlichKwong(Istream& is)"); 	
+    is.check("soaveRedlichKwong::soaveRedlichKwong(Istream& is)");
 }
 //CL: Constructed needed in OpenFOAM 2.x.x
 //CL: Code works fine, but compiling problem in OpenFOAM 1.6.ext

@@ -120,11 +120,11 @@ public:
         inline scalar p(const scalar rho, const scalar T) const;
 
         //CL: return power of constants b_
-	inline scalar b2()const;
+        inline scalar b2()const;
 
-	inline scalar b3()const;
+        inline scalar b3()const;
 
-	inline scalar b5()const;
+        inline scalar b5()const;
 
 
         //first order derivatives 

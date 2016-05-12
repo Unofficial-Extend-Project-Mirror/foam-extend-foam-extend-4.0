@@ -87,9 +87,6 @@ protected:
         mutable scalar b5_;
         mutable scalar c2_;
 
-    //Density @STD, initialise after a, b!
-        scalar rhostd_;
-
     //CL: rhoMin and rhoMax are only used as boundaries for the bisection methode (see rho function)
     scalar rhoMax_;
     scalar rhoMin_;
@@ -102,6 +99,9 @@ protected:
 
     //CL: save the temperature for which the save coefficients (amix,dadTmix,d2adT2mix) are correct
     mutable scalar TSave;
+
+    //Density @STD, initialise after a, b!
+        scalar rhostd_;
 
     //Protected functions
     //CL: function updates the coefficients (aSave, daSave, d2aSave)
@@ -135,36 +135,36 @@ public:
 
    // Member functions
 
-	inline scalar rhostd() const;
+        inline scalar rhostd() const;
 
         //CL: Model coefficient a(T)
-	inline scalar a(const  scalar T)const;
+        inline scalar a(const  scalar T)const;
 
         //CL: temperature deriviative of model coefficient a(T)
-	inline scalar dadT(const  scalar T)const;
+        inline scalar dadT(const  scalar T)const;
 
         //CL: second order temperature deriviative of model coefficient a(T)
-	inline scalar d2adT2(const  scalar T)const;
+        inline scalar d2adT2(const  scalar T)const;
 
         //Return Aungier Redlich Kwong factors
-	inline scalar a0()const;
+        inline scalar a0()const;
 
-	inline scalar b()const;
+        inline scalar b()const;
 
-	inline scalar c()const;
+        inline scalar c()const;
 
-	inline scalar n()const;
+        inline scalar n()const;
 
         //CL: return power of constants (b_, c_)
-	inline scalar b2()const;
+        inline scalar b2()const;
 
-	inline scalar b3()const;
+        inline scalar b3()const;
 
-	inline scalar b4()const;
+        inline scalar b4()const;
 
-	inline scalar b5()const;
+        inline scalar b5()const;
 
-	inline scalar c2()const;
+        inline scalar c2()const;
 
 
         //CL: Equation of state
@@ -197,11 +197,11 @@ public:
         //CL: second order derivatives, not Used At The Moment
         inline scalar d2pdv2(const scalar rho, const  scalar T) const;    
 
-	inline scalar d2pdT2(const scalar rho,   scalar T) const;    
+        inline scalar d2pdT2(const scalar rho,   scalar T) const;    
 
         inline scalar d2pdvdT(const scalar rho, const  scalar T) const;    
 
-	inline scalar d2vdT2(const scalar rho, const  scalar T) const;    
+        inline scalar d2vdT2(const scalar rho, const  scalar T) const;    
 
         //CL: Used for internal Energy
         inline scalar integral_p_dv(const scalar rho, const  scalar T) const;
@@ -212,13 +212,13 @@ public:
         //- Return density [kg/m^3] 
         // rho0 is the starting point of the newton solver used to calculate rho
         inline scalar rho
-	(
+        (
             const scalar p,
             const scalar T,
             const scalar rho0
         ) const;
  
-        inline scalar rho(const scalar p, const  scalar T) const;
+        inline scalar rho(const scalar p, const  scalar T) const; 
 
         //- Return compressibility drho/dp at T=constant [s^2/m^2]
         inline scalar psi(const scalar rho, const scalar T) const;

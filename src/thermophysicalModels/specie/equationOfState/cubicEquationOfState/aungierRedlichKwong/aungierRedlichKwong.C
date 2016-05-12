@@ -60,11 +60,11 @@ aungierRedlichKwong::aungierRedlichKwong(Istream& is)
     b4_(pow(b_,4)),
     b5_(pow(b_,5)),
     c2_(pow(c_,2)),
-    // Starting GUESS for the density by ideal gas law
-    rhostd_(this->rho(this->Pstd(),this->Tstd(),this->Pstd()/(this->Tstd()*this->R()))),
-    rhoMax_(1500), 
+    rhoMax_(1500),
     rhoMin_(1e-3),
-    TSave(0.0)
+    // Starting GUESS for the density by ideal gas law
+    TSave(0.0),
+    rhostd_(this->rho(this->Pstd(),this->Tstd(),this->Pstd()/(this->Tstd()*this->R())))
 {
     is.check("aungierRedlichKwong::aungierRedlichKwong(Istream& is)");
 }

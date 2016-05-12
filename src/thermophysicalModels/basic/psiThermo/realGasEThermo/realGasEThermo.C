@@ -47,7 +47,6 @@ void Foam::realGasEThermo<MixtureType>::calculate()
     scalarField& muCells = this->mu_.internalField();
     scalarField& alphaCells = this->alpha_.internalField();
 
-
     forAll(TCells, celli)
     {
         const typename MixtureType::thermoType& mixture_ =
@@ -72,10 +71,8 @@ void Foam::realGasEThermo<MixtureType>::calculate()
         fvPatchScalarField& pmu = this->mu_.boundaryField()[patchi];
         fvPatchScalarField& palpha = this->alpha_.boundaryField()[patchi];
 
-
         if (pT.fixesValue())
         {
-
             forAll(pT, facei)
             {
                 const typename MixtureType::thermoType& mixture_ =
@@ -84,7 +81,7 @@ void Foam::realGasEThermo<MixtureType>::calculate()
                 prho[facei] = mixture_.rho(pp[facei], pT[facei],prho[facei]);
                 ppsi[facei]=mixture_.psiE(prho[facei],pT[facei]);
                 pdrhode[facei]=mixture_.drhodE(prho[facei],pT[facei]);
-		pe[facei] = mixture_.E(prho[facei], pT[facei]);
+                pe[facei] = mixture_.E(prho[facei], pT[facei]);
                 pmu[facei] = mixture_.mu(pT[facei]);
                 palpha[facei] = mixture_.alpha(prho[facei],pT[facei]);
             }
@@ -97,8 +94,8 @@ void Foam::realGasEThermo<MixtureType>::calculate()
                     this->patchFaceMixture(patchi, facei);
                 mixture_.TE(pe[facei], pT[facei],pp[facei],prho[facei]);
                 pmu[facei] = mixture_.mu(pT[facei]);
-		ppsi[facei]=mixture_.psiE(prho[facei],pT[facei]);
-		pdrhode[facei]=mixture_.drhodE(prho[facei],pT[facei]);
+                ppsi[facei]=mixture_.psiE(prho[facei],pT[facei]);
+                pdrhode[facei]=mixture_.drhodE(prho[facei],pT[facei]);
                 palpha[facei] = mixture_.alpha(prho[facei],pT[facei]);
             }
         }
@@ -132,7 +129,6 @@ Foam::realGasEThermo<MixtureType>::realGasEThermo
         dimensionSet(0, 2, -2, 0, 0),
         this->eBoundaryTypes()
     ),
-    
     rho_
     (
         IOobject
@@ -143,10 +139,9 @@ Foam::realGasEThermo<MixtureType>::realGasEThermo
             IOobject::READ_IF_PRESENT,
             IOobject::NO_WRITE
         ),
-	mesh,
-	dimDensity
+        mesh,
+        dimDensity
     ),
-
     drhode_
     (
         IOobject
@@ -157,11 +152,10 @@ Foam::realGasEThermo<MixtureType>::realGasEThermo
             IOobject::NO_READ,
             IOobject::NO_WRITE
         ),
-	mesh,
-	dimensionSet(1, -5, 2, 0, 0)
+        mesh,
+        dimensionSet(1, -5, 2, 0, 0)
     )
 {
-
     scalarField& eCells = e_.internalField();
     const scalarField& TCells = this->T_.internalField();
     const scalarField& pCells =this->p_.internalField();
@@ -173,32 +167,29 @@ Foam::realGasEThermo<MixtureType>::realGasEThermo
      rhoCells[celli]=this->cellMixture(celli).rho(pCells[celli],TCells[celli]);
     }
 
-
     forAll(rho_.boundaryField(), patchi)
     {
         rho_.boundaryField()[patchi] ==
             rho(this->T_.boundaryField()[patchi], patchi); 
     }
 
-
     forAll(eCells, celli)
     {
-        eCells[celli] = this->cellMixture(celli).E(rhoCells[celli],TCells[celli]);     
+        eCells[celli] = this->cellMixture(celli).E(rhoCells[celli],TCells[celli]);
     }
-
 
     forAll(e_.boundaryField(), patchi)
     {
         e_.boundaryField()[patchi] ==
-            e(this->T_.boundaryField()[patchi], patchi);                    
+            e(this->T_.boundaryField()[patchi], patchi);
     }
 
-    eBoundaryCorrection(e_);
+    this->eBoundaryCorrection(e_);
+
     calculate();
 
     // Switch on saving old time
     this->psi_.oldTime();
-
 }
 
 
@@ -331,13 +322,12 @@ Foam::tmp<Foam::volScalarField> Foam::realGasEThermo<MixtureType>::Cp() const
             (
                 "Cp",
                 mesh.time().timeName(),
-                mesh,
+                T_.db(),
                 IOobject::NO_READ,
-               IOobject::AUTO_WRITE
+                IOobject::NO_WRITE
             ),
             mesh,
-            dimensionSet(0, 2, -2, -1, 0),
-            this->T_.boundaryField().types()
+            dimensionSet(0, 2, -2, -1, 0)
         )
     );
 
@@ -351,7 +341,7 @@ Foam::tmp<Foam::volScalarField> Foam::realGasEThermo<MixtureType>::Cp() const
     forAll(this->T_.boundaryField(), patchi)
     {
         const fvPatchScalarField& pT = this->T_.boundaryField()[patchi];
-	const fvPatchScalarField& prho = this->rho_.boundaryField()[patchi];
+        const fvPatchScalarField& prho = this->rho_.boundaryField()[patchi];
         fvPatchScalarField& pCp = cp.boundaryField()[patchi];
 
         forAll(pT, facei)
@@ -404,12 +394,12 @@ Foam::tmp<Foam::volScalarField> Foam::realGasEThermo<MixtureType>::rho()  const
             (
                 "rhoFunctionThermo",
                 mesh.time().timeName(),
-                mesh,
+                T_.db(),
                 IOobject::NO_READ,
                 IOobject::NO_WRITE
             ),
-	mesh,
-	dimDensity
+            mesh,
+            dimDensity
         )
     );
  
@@ -428,7 +418,7 @@ Foam::tmp<Foam::volScalarField> Foam::realGasEThermo<MixtureType>::rho()  const
         const typename MixtureType::thermoType& mixture_ =
             this->cellMixture(celli);
 
-	// getting the new rho Field
+        // getting the new rho Field
         mixture_.TE(eCells[celli], TCells[celli], pCells[celli], rho[celli]);
     }
 
@@ -445,7 +435,7 @@ Foam::tmp<Foam::volScalarField> Foam::realGasEThermo<MixtureType>::rho()  const
             const typename MixtureType::thermoType& mixture_ =
                 this->patchFaceMixture(patchi, facei);
 
-	    // getting the new rho patch Field
+            // getting the new rho patch Field
             mixture_.TE(pe[facei], pT[facei],pp[facei],prho_[facei]);
         }
     }
@@ -455,7 +445,6 @@ Foam::tmp<Foam::volScalarField> Foam::realGasEThermo<MixtureType>::rho()  const
 template<class MixtureType>
 Foam::tmp<Foam::volScalarField> Foam::realGasEThermo<MixtureType>::Cv() const
 {
-
     const fvMesh& mesh = this->T_.mesh();
 
     tmp<volScalarField> tCv
@@ -466,9 +455,9 @@ Foam::tmp<Foam::volScalarField> Foam::realGasEThermo<MixtureType>::Cv() const
             (
                 "Cv",
                 mesh.time().timeName(),
-                mesh,
+                T_.db(),
                 IOobject::NO_READ,
-                IOobject::AUTO_WRITE
+                IOobject::NO_WRITE
             ),
             mesh,
             dimensionSet(0, 2, -2, -1, 0)
@@ -485,7 +474,7 @@ Foam::tmp<Foam::volScalarField> Foam::realGasEThermo<MixtureType>::Cv() const
     forAll(this->T_.boundaryField(), patchi)
     {
         cv.boundaryField()[patchi] =
-        Cv(this->T_.boundaryField()[patchi], patchi);
+           Cv(this->T_.boundaryField()[patchi], patchi);
     }
 
     return tCv;

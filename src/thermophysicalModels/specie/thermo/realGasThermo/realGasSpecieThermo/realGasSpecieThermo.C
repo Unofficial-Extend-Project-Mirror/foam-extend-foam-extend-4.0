@@ -50,8 +50,6 @@ Foam::realGasSpecieThermo<thermo>::realGasSpecieThermo(Istream& is)
     thermo(is)
 {
     is.check("realGasSpecieThermo::realGasSpecieThermo(Istream& is)");
-    
-	 
 }
 
 

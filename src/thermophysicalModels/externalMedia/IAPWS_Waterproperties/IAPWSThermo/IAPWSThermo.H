@@ -64,12 +64,11 @@ class IAPWSThermo
 :
     public basicPsiThermo
 {
-
     // Private data
 
         //- Enthalpy field
         volScalarField h_;
-	
+
         //- DensityField
         volScalarField rho_;
 
@@ -83,6 +82,10 @@ class IAPWSThermo
         //- Calculate the thermo variables
         void calculate();
 
+        //- Construct as copy (not implemented)
+        IAPWSThermo(const IAPWSThermo&);
+
+
 public:
 
     //- Runtime type information
@@ -90,8 +93,9 @@ public:
 
     // Constructors
 
-    //- Construct from mesh
-    IAPWSThermo(const fvMesh&);
+        //- Construct from mesh
+        IAPWSThermo(const fvMesh&, const objectRegistry& obj);
+
 
     //- Destructor
     virtual ~IAPWSThermo();
@@ -140,13 +144,13 @@ public:
             //- Density for patch [J/kg]
             virtual tmp<scalarField> rho
             (
-	        const scalarField& p,
+                const scalarField& p,
                 const scalarField& h,
                 const label patchi
             ) const;
 
             //- Heat capacity at constant pressure for patch [J/kg/K]
-	    // dummy function needed for BC
+            // dummy function needed for BC
             virtual tmp<scalarField> Cp
             (
                 const scalarField& T,
@@ -185,7 +189,7 @@ public:
 
 } // End namespace Foam
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
 #   include "IAPWSThermo.C"

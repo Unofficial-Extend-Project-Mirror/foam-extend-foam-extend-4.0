@@ -385,7 +385,7 @@ inline scalar pengRobinson::rho(
    scalar rho1=rhoMax_;
    scalar rho2=rhoMin_;
 
-   molarVolume=this->W()/rho0;	 
+   molarVolume=this->W()/rho0;
 
    do
    {
@@ -412,7 +412,7 @@ inline scalar pengRobinson::rho(
                    scalar f2 = this->p(rho2,T) - p;
                    scalar rho3 = (rho1 + rho2)/2;
                    scalar f3 = this->p(rho3,T) - p;
-	
+
                    if ((f2 < 0 && f3 > 0) || (f2 > 0 && f3 < 0))
                    {
                        rho1=rho3;
@@ -420,14 +420,14 @@ inline scalar pengRobinson::rho(
                    else if ((f1 < 0 && f3 > 0)||(f1 > 0 && f3 < 0))
                    {
                        rho2=rho3;
-                   }		 
-                   else	
+                   }
+                   else
                    {
                        rho2=(rho2 + rho3)/2;
                    }
 
                    if(mag(f3) < p*tol_)
-                   {	  	  
+                   {
                        molarVolume=this->W()/rho3;
                        molarVolumePrevIteration=this->W()/rho3;
                        break; 
@@ -436,7 +436,7 @@ inline scalar pengRobinson::rho(
                    {
                        molarVolumePrevIteration=this->W()/rho3;
                    }
-               }		  
+               }
            }
        }
        while

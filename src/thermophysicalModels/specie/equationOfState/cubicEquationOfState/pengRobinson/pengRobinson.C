@@ -59,7 +59,8 @@ pengRobinson::pengRobinson(Istream& is)
     b5_(pow(b_,5)),
     rhoMax_(1500),
     rhoMin_(1e-3),
-    TSave(0.0), 
+    TSave(0.0),
+    // Starting GUESS for the density by ideal gas law
     rhostd_(this->rho(this->Pstd(),this->Tstd(),this->Pstd()/(this->Tstd()*this->R())))
 {
     is.check("pengRobinson::pengRobinson(Istream& is)");

@@ -66,7 +66,7 @@ class realGasHThermo
 
         //- Enthalpy field
         volScalarField h_;
-	
+
         //- DensityField
         volScalarField rho_;
 

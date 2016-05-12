@@ -261,7 +261,7 @@ void Foam::calculateProperties_h
 
         dpdT=freesteam_region4_dpsatdT_T(S.R4.T);
 
-	// getting the states outside the vapour dome 
+        // getting the states outside the vapour dome 
         Sl=freesteam_set_pv(p,vl-0.0000001);  //inside region 1
         Sv=freesteam_set_pv(p,vv+0.0000001);  //inside region 2
   
@@ -450,7 +450,7 @@ Foam::scalar Foam::psiH(SteamState S)
 
         dpdT=freesteam_region4_dpsatdT_T(S.R4.T);
 
-	// getting the states outside the vapour dome 
+        // getting the states outside the vapour dome 
         Sl=freesteam_set_pv(p,vl-0.0000001);  //inside region 1
         Sv=freesteam_set_pv(p,vv+0.0000001);  //inside region 2
   
@@ -568,7 +568,7 @@ Foam::scalar Foam::drhodh(SteamState S)
         vv=1/freesteam_region4_rhog_T(S.R4.T);
         vl=1/freesteam_region4_rhof_T(S.R4.T);
 
-	// getting the states outside the vapour dome 
+        // getting the states outside the vapour dome 
         Sl=freesteam_set_pv(p,vl-0.0000001);  //inside region 1
         Sv=freesteam_set_pv(p,vv+0.0000001);  //inside region 2
   
