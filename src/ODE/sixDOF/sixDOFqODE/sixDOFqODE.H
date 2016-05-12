@@ -84,6 +84,18 @@ class sixDOFqODE
             //- Linear damping coeffs
             dimensionedDiagTensor linDampingCoeffs_;
 
+            //- Translational relaxation factor
+            scalar relaxFactorT_;
+
+            //- Rotational relaxation factor
+            scalar relaxFactorR_;
+
+            //- Old translational relaxation factor
+            scalar oldRelaxFactorT_;
+
+            //- Old rotational relaxation factor
+            scalar oldRelaxFactorR_;
+
 
         // Initial body state variables
 
@@ -113,6 +125,15 @@ class sixDOFqODE
 
 
         // External forces
+
+            //- Accelerations from previous iterations
+            //  A_[2] is the old value, A_[1] old old, A_[0] old old old
+            List<vector> A_;
+            List<vector> OmegaDot_;
+
+            //- Previos iteration non relaxed accelerations
+            List<vector> An_;
+            List<vector> OmegaDotn_;
 
             //- Force driving the motion in inertial coord. sys.
             dimensionedVector force_;
@@ -204,6 +225,9 @@ class sixDOFqODE
             //- Constrain translation vector in referent or global coordinate
             //  system
             void constrainTranslation(vector& vec) const;
+
+            //- Update Aitkens relaxation parameters
+            void aitkensRelaxation(const scalar min, const scalar max);
 
 
 public:
@@ -344,12 +368,18 @@ public:
             //- Return access to moment in relative coord. sys.
             inline dimensionedVector& momentRelative();
 
-
             //- Return total force in inertial coord. sys.
             inline dimensionedVector forceTotal() const;
 
             //- Return total moment in inertial coord. sys.
             inline dimensionedVector momentTotal() const;
+
+            //- Relax the force(acceleration) using Aitkens or fixed relaxation
+            void relaxAcceleration
+            (
+                const scalar minRelFactor,
+                const scalar maxRelFactor
+            );
 
 
         // Rotations
