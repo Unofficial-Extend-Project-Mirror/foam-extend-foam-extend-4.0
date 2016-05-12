@@ -68,6 +68,8 @@ coupledSolverPerformance coupledFvMatrix<scalar>::solve
         fvScalarMatrix& curMatrix =
             static_cast<fvScalarMatrix&>(matrices[rowI]);
 
+        curMatrix.completeAssembly();
+
         saveDiag.set(rowI, new scalarField(curMatrix.diag()));
         // HR 17/Feb/2013
         // Need to be able to compare references to support hacks such as in jumpCyclic
