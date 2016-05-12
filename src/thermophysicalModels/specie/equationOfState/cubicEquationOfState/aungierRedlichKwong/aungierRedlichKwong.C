@@ -50,21 +50,21 @@ aungierRedlichKwong::aungierRedlichKwong(Istream& is)
     Tcrit_(readScalar(is)),
     azentricFactor_(readScalar(is)),
     rhocrit_(readScalar(is)),    
-    a0_(0.42747*pow(this->RR,2)*pow(Tcrit_,2)/pcrit_),
-    b_(0.08664*this->RR*Tcrit_/pcrit_),
-    c_(this->RR*Tcrit_/(pcrit_+(a0_/(this->W()/rhocrit_*(this->W()/rhocrit_+b_))))+b_-this->W()/rhocrit_),
+    a0_(0.42747*pow(this->RR(),2)*pow(Tcrit_,2)/pcrit_),
+    b_(0.08664*this->RR()*Tcrit_/pcrit_),
+    c_(this->RR()*Tcrit_/(pcrit_+(a0_/(this->W()/rhocrit_*(this->W()/rhocrit_+b_))))+b_-this->W()/rhocrit_),
     n_(0.4986+1.2735*azentricFactor_+0.4754*pow(azentricFactor_,2)),
-    TSave(0.0), 
     //CL: Only uses the default values
-    rhoMin_(1e-3),
-    rhoMax_(1500),
     b2_(pow(b_,2)),
     b3_(pow(b_,3)),
     b4_(pow(b_,4)),
     b5_(pow(b_,5)),
     c2_(pow(c_,2)),
     // Starting GUESS for the density by ideal gas law
-    rhostd_(this->rho(Pstd,Tstd,Pstd/(Tstd*this->R())))
+    rhostd_(this->rho(this->Pstd(),this->Tstd(),this->Pstd()/(this->Tstd()*this->R()))),
+    rhoMax_(1500), 
+    rhoMin_(1e-3),
+    TSave(0.0)
 {
     is.check("aungierRedlichKwong::aungierRedlichKwong(Istream& is)");
 }
@@ -84,9 +84,9 @@ aungierRedlichKwong::aungierRedlichKwong(const dictionary& dict)
     //CL: therefore, rho can be larger than rhoMax and smaller than rhoMin
     rhoMin_(dict.subDict("equationOfState").lookupOrDefault("rhoMin",1e-3)),
     rhoMax_(dict.subDict("equationOfState").lookupOrDefault("rhoMax",1500)),
-    a0_(0.42747*pow(this->RR,2)*pow(Tcrit_,2)/pcrit_),
-    b_(0.08664*this->RR*Tcrit_/pcrit_),
-    c_(this->RR*Tcrit_/(pcrit_+(a0_/(this->W()/rhocrit_*(this->W()/rhocrit_+b_))))+b_-this->W()/rhocrit_),
+    a0_(0.42747*pow(this->RR(),2)*pow(Tcrit_,2)/pcrit_),
+    b_(0.08664*this->RR()*Tcrit_/pcrit_),
+    c_(this->RR()*Tcrit_/(pcrit_+(a0_/(this->W()/rhocrit_*(this->W()/rhocrit_+b_))))+b_-this->W()/rhocrit_),
     n_(0.4986+1.2735*azentricFactor_+0.4754*pow(azentricFactor_,2)),
     TSave(0.0), 
     b2_(pow(b_,2)),

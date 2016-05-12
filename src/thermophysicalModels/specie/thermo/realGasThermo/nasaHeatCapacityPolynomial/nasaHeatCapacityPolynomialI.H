@@ -58,11 +58,11 @@ inline Foam::nasaHeatCapacityPolynomial<equationOfState>::nasaHeatCapacityPolyno
     a5_(a5),
     a6_(a6),
     a7_(a7),
-    e0_std(e0(this->Tstd)),
-    s0_std(s0(this->Tstd)),
-    integral_p_dv_std(this->integral_p_dv(this->rhostd(),this->Tstd)),
-    integral_dpdT_dv_std(this->integral_dpdT_dv(this->rhostd(),this->Tstd)),
-    cp_std(this->cp_nonLimited(this->rhostd(),this->Tstd)) 
+    e0_std(e0(this->Tstd())),
+    s0_std(s0(this->Tstd())),
+    integral_p_dv_std(this->integral_p_dv(this->rhostd(),this->Tstd())),
+    integral_dpdT_dv_std(this->integral_dpdT_dv(this->rhostd(),this->Tstd())),
+    cp_std(this->cp_nonLimited(this->rhostd(),this->Tstd())) 
 {}
 
 //- Construct from components
@@ -157,7 +157,7 @@ inline Foam::scalar Foam::nasaHeatCapacityPolynomial<equationOfState>::h0
 ) const
 {
     return 
-    this->RR*T*
+    this->RR()*T*
     (
         -this->a1_*pow(T,-2)
         +this->a2_*log(T)/T
@@ -178,7 +178,7 @@ inline Foam::scalar Foam::nasaHeatCapacityPolynomial<equationOfState>::e0
     const scalar T
 ) const
 {
-    return this->h0(T) - this->RR*T;
+    return this->h0(T) - this->RR()*T;
 }
 	    
 // used to calculate the entropy
@@ -189,7 +189,7 @@ inline Foam::scalar Foam::nasaHeatCapacityPolynomial<equationOfState>::s0
     const scalar T
 ) const
 {
-     return this->RR*
+     return this->RR()*
      ( 
           this->a1_*(-1)/(2*pow(T,2))
           -this->a2_/T+this->a3_*log(T)
@@ -210,7 +210,7 @@ inline Foam::scalar Foam::nasaHeatCapacityPolynomial<equationOfState>::cp0
     const scalar T
 ) const
 {
-    return this->RR*
+    return this->RR()*
     (
         this->a1_*1/pow(T,2)
         +this->a2_*1/T
@@ -231,7 +231,7 @@ inline Foam::scalar Foam::nasaHeatCapacityPolynomial<equationOfState>::cv0
 ) const
 {
 
-    return this->cp0(T)-this->RR;
+    return this->cp0(T)-this->RR();
 }
 
 
@@ -299,7 +299,7 @@ inline Foam::scalar Foam::nasaHeatCapacityPolynomial<equationOfState>::h
     const scalar T   
 ) const
 {
-    return this->e(rho,T)+this->p(rho,T)/rho*this->W()-this->Pstd/this->rhostd()*this->W();
+    return this->e(rho,T)+this->p(rho,T)/rho*this->W()-this->Pstd()/this->rhostd()*this->W();
 }
 
 
@@ -315,7 +315,7 @@ inline Foam::scalar Foam::nasaHeatCapacityPolynomial<equationOfState>::e
 {
     return 
     (
-        -this->Tstd*integral_dpdT_dv_std
+        -this->Tstd()*integral_dpdT_dv_std
 	+integral_p_dv_std
 	+this->e0(T)-e0_std
 	+T*this->integral_dpdT_dv(rho,T)
@@ -338,7 +338,7 @@ inline Foam::scalar Foam::nasaHeatCapacityPolynomial<equationOfState>::s
 {
     return -integral_dpdT_dv_std
     +(this->s0(T)-s0_std)
-    -this->RR*log(T/this->Tstd)
+    -this->RR()*log(T/this->Tstd())
     + this->integral_dpdT_dv(rho,T);
 }
 

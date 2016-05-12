@@ -46,8 +46,8 @@ namespace Foam
 mixtureSoaveRedlichKwong::mixtureSoaveRedlichKwong(Istream& is)
 :
     soaveRedlichKwong(is),
-    numOfComp(1),
     singleComponent(1),
+    numOfComp(1),
     //CL: no real gas mixture correction when stream constructor is used
     realMixtureCorr_(false)
 { 

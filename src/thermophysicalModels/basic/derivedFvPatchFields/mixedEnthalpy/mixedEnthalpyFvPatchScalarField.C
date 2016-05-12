@@ -111,40 +111,27 @@ void Foam::mixedEnthalpyFvPatchScalarField::updateCoeffs()
 
     Tw.evaluate();
 
-    fvPatchScalarField& pw =
-        const_cast<fvPatchScalarField&>(thermo.p().boundaryField()[patchi]);
-    pw.evaluate();
-
     valueFraction() = Tw.valueFraction();
 
-    if
-    (
-        dimensionedInternalField().name() == db().mangleFileName("h")
-    )
+    if (dimensionedInternalField().name() == "h")
     {
         refValue() = thermo.h(Tw.refValue(), patchi);
         refGrad() = thermo.Cp(Tw, patchi)*Tw.refGrad()
-          + patch().deltaCoeffs()*
-            (
-                thermo.h(pw, Tw, patchi)
-              - thermo.h(pw, Tw, patch().faceCells())
-            );
-    }
-    else if
-    (
-        dimensionedInternalField().name() == db().mangleFileName("i")
-    )
-    {
+        + patch().deltaCoeffs()*
+         (
+            thermo.h(Tw, patchi)
+          - thermo.h(Tw, patch().faceCells())
+         );
     }
     else
     {
         refValue() = thermo.hs(Tw.refValue(), patchi);
         refGrad() = thermo.Cp(Tw, patchi)*Tw.refGrad()
-          + patch().deltaCoeffs()*
-            (
-                thermo.hs(pw, Tw, patchi)
-              - thermo.hs(pw, Tw, patch().faceCells())
-            );
+        + patch().deltaCoeffs()*
+         (
+            thermo.hs(Tw, patchi)
+          - thermo.hs(Tw, patch().faceCells())
+         );
     }
 
     mixedFvPatchScalarField::updateCoeffs();

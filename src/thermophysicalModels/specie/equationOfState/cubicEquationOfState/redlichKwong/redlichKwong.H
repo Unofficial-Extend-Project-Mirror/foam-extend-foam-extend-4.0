@@ -67,10 +67,6 @@ protected:
     scalar pcrit_;
     scalar Tcrit_; 
 
-    //CL: rhoMin and rhoMax are only used as boundaries for the bisection methode (see rho function)
-    scalar rhoMax_;
-    scalar rhoMin_;
-
     //-Redlich Kwong factors
     mutable scalar a_;
     mutable scalar b_;
@@ -79,6 +75,10 @@ protected:
     mutable scalar b2_;
     mutable scalar b3_;
     mutable scalar b5_;
+
+    //CL: rhoMin and rhoMax are only used as boundaries for the bisection methode (see rho function)
+    scalar rhoMax_;
+    scalar rhoMin_;
 
     //- Density @STD, initialise after a, b!
     mutable scalar rhostd_;

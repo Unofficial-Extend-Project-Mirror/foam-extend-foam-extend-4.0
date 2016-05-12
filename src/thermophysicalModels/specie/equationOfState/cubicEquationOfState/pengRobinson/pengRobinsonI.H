@@ -57,15 +57,15 @@ inline pengRobinson::pengRobinson(const word& name, const pengRobinson& pr)
     pcrit_(pr.pcrit_),
     Tcrit_(pr.Tcrit_),
     azentricFactor_(pr.azentricFactor_),
+    n_(pr.n_),
     a0_(pr.a0_),
     b_(pr.b_),
-    n_(pr.n_),
-    rhostd_(pr.rhostd_),
-    TSave(0),
     b2_(pr.b2_),
     b3_(pr.b3_),
     b4_(pr.b4_),
-    b5_(pr.b5_)
+    b5_(pr.b5_),
+    TSave(0),
+    rhostd_(pr.rhostd_)
 {}
 
 
@@ -196,7 +196,7 @@ inline scalar pengRobinson::p(const scalar rho,const scalar T) const
 {
     scalar Vm = this->W()/rho;
      
-    return this->RR*T/(Vm-b())-a(T)/(pow(Vm,2)+2*b()*Vm-b2());
+    return this->RR()*T/(Vm-b())-a(T)/(pow(Vm,2)+2*b()*Vm-b2());
 }
 
 
@@ -213,7 +213,7 @@ inline scalar pengRobinson::dpdv(const scalar rho, const scalar T) const
               (
                   b3()-b2()*Vm-b()*Vm2+Vm3
               )
-              -this->RR*T*
+              -this->RR()*T*
               (
                   b4()-4*b3()*Vm+2*b2()*Vm2
                       +4*b()*Vm3+pow(Vm,4)
@@ -229,7 +229,7 @@ inline scalar pengRobinson::dpdT(const scalar rho, const scalar T) const
 {
     scalar Vm = this->W()/rho;
 
-    return this->RR/(Vm-b())-dadT(T)/(pow(Vm,2)+2*b()*Vm-b2());
+    return this->RR()/(Vm-b())-dadT(T)/(pow(Vm,2)+2*b()*Vm-b2());
 }
 
 
@@ -255,7 +255,7 @@ inline scalar pengRobinson::integral_p_dv(const scalar rho,const scalar T) const
 {
     scalar Vm = this->W()/rho;
 
-    return -pow(2,0.5)*a(T)*log(b()*(1-pow(2,0.5))+Vm)/(4*b())+this->RR*T*log(Vm-b())
+    return -pow(2,0.5)*a(T)*log(b()*(1-pow(2,0.5))+Vm)/(4*b())+this->RR()*T*log(Vm-b())
                +pow(2,0.5)*a(T)*log(b()*(pow(2,0.5)+1)+Vm)/(4*b());
 }
 
@@ -267,7 +267,7 @@ inline scalar pengRobinson::integral_dpdT_dv(const scalar rho,const scalar T) co
     scalar Vm = this->W()/rho;
 
     return -pow(2,0.5)*dadT(T)*log(b()*(1-pow(2,0.5))+Vm)/(4*b())
-               +this->RR*log(Vm-b())+pow(2,0.5)*dadT(T)*log(b()*(pow(2,0.5)+1)+Vm)/(4*b());
+        +this->RR()*log(Vm-b())+pow(2,0.5)*dadT(T)*log(b()*(pow(2,0.5)+1)+Vm)/(4*b());
 }
 
 
@@ -295,7 +295,7 @@ inline scalar pengRobinson::d2pdv2(const scalar rho,const scalar T) const
                (
                    5*b5()-9*b4()*Vm+4*b2()*Vm3+3*b()*Vm4-3*Vm5
                )
-               -this->RR*T*
+               -this->RR()*T*
                (
                    pow(b(),6)-6*b5()*Vm+9*b4()*Vm2+4*b3()*Vm3
                        -9*b2()*Vm4-6*b()*Vm5-pow(Vm,6)
@@ -331,7 +331,7 @@ inline scalar pengRobinson::d2pdvdT(const scalar rho, const scalar T) const
               (
                   b3()-b2()*Vm-b()*Vm2+Vm3
               )
-              -this->RR*
+              -this->RR()*
               (
                   b4()-4*b3()*Vm+2*b2()*Vm2
                       +4*b()*Vm3+pow(Vm,4)

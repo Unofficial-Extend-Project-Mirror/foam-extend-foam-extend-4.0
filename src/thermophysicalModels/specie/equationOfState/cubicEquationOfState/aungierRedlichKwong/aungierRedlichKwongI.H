@@ -61,12 +61,12 @@ inline aungierRedlichKwong::aungierRedlichKwong(const word& name, const aungierR
     b_(pg.b_),
     c_(pg.c_),
     n_(pg.n_),
-    rhostd_(pg.rhostd_),
     b2_(pg.b2_),
     b3_(pg.b3_),
     b4_(pg.b4_),
     b5_(pg.b5_),
-    c2_(pg.c2_)
+    c2_(pg.c2_),
+    rhostd_(pg.rhostd_)
 {}
 
 
@@ -206,7 +206,7 @@ inline scalar aungierRedlichKwong::c2()const
 inline scalar aungierRedlichKwong::p(const scalar rho,const scalar T) const
 {
     scalar Vm = this->W()/rho;
-    return this->RR*T/(Vm-b()+c())
+    return this->RR()*T/(Vm-b()+c())
                -a(T)/(Vm*(Vm+b()));
 }
 
@@ -219,7 +219,7 @@ inline scalar aungierRedlichKwong::dpdv(const scalar rho, const scalar T) const
     scalar Vm2 = Vm*Vm;
 
     return  (a(T)*(b3()-2*b2()*c()+b()*(c()+Vm)*(c()-3*Vm)+2*Vm*pow(c()+Vm,2))
-                -this->RR*T*Vm2*(b2()+2*b()*Vm+Vm2))
+                   -this->RR()*T*Vm2*(b2()+2*b()*Vm+Vm2))
                     /(Vm2*pow(b()-c()-Vm,2)*pow(b()+Vm,2));
 }
 
@@ -229,7 +229,7 @@ inline scalar aungierRedlichKwong::dpdv(const scalar rho, const scalar T) const
 inline scalar aungierRedlichKwong::dpdT(const scalar rho, const scalar T) const
 {
     scalar Vm = this->W()/rho;
-    return this->RR/(Vm-b()+c())-dadT(T)/(Vm*(Vm+b()));
+    return this->RR()/(Vm-b()+c())-dadT(T)/(Vm*(Vm+b()));
 }
 
 
@@ -259,7 +259,7 @@ inline scalar aungierRedlichKwong::integral_p_dv
 ) const
 {
     scalar Vm = this->W()/rho;
-    return this->RR*T*log(-b()+c()+Vm)+a(T)*log(b()+Vm)/b()-a(T)*log(Vm)/b();
+    return this->RR()*T*log(-b()+c()+Vm)+a(T)*log(b()+Vm)/b()-a(T)*log(Vm)/b();
 }
 
 
@@ -272,7 +272,7 @@ inline scalar aungierRedlichKwong::integral_dpdT_dv
 ) const
 {
     scalar Vm = this->W()/rho;
-    return this->RR*log(-b()+c()+Vm)+dadT(T)*log(b()+Vm)/b()-dadT(T)*log(Vm)/b();
+    return this->RR()*log(-b()+c()+Vm)+dadT(T)*log(b()+Vm)/b()-dadT(T)*log(Vm)/b();
 }
 
 
@@ -293,7 +293,7 @@ inline scalar aungierRedlichKwong::d2pdv2(const scalar rho,const scalar T) const
 
     return -2*(a(T)*(b5()-3*b4()*c()+3*b3()*(c2()-c()*Vm-Vm2)
                -b2()*(c()+Vm)*(c2()-7*c()*Vm+Vm2)+3*b()*Vm*pow(c()+Vm,2)*(2*Vm-c())
-                   -3*Vm2*pow(c()+Vm,3))+this->RR*T*Vm3*(b3()+3*b2()*Vm
+                        -3*Vm2*pow(c()+Vm,3))+this->RR()*T*Vm3*(b3()+3*b2()*Vm
                         +3*b()*Vm2+Vm3))
                             /(Vm3*pow(b()-c()-Vm,3)*pow(b()+Vm,3));
 }
@@ -320,7 +320,7 @@ inline scalar aungierRedlichKwong::d2pdvdT(const scalar rho, const scalar T) con
     scalar Vm2 = Vm*Vm;
 
     return (dadT(T)*(b3()-2*b2()*c()+b()*(c()+Vm)*(c()-3*Vm)+2*Vm*pow(c()+Vm,2))
-               -this->RR*Vm2*(b2()+2*b()*Vm+Vm2))
+                 -this->RR()*Vm2*(b2()+2*b()*Vm+Vm2))
                    /(Vm2*pow(b()-c()-Vm,2)*pow(b()+Vm,2));
 }
 

@@ -58,14 +58,14 @@ inline soaveRedlichKwong::soaveRedlichKwong(const word& name,const  soaveRedlich
     pcrit_(srk.pcrit_),
     Tcrit_(srk.Tcrit_),
     azentricFactor_(srk.azentricFactor_),
+    n_(srk.n_),
     a0_(srk.a0_),
     b_(srk.b_),
-    n_(srk.n_),
-    rhostd_(srk.rhostd_),
-    TSave(0),
     b2_(srk.b2_),
     b3_(srk.b3_),
-    b5_(srk.b5_) 
+    b5_(srk.b5_),
+    TSave(0),
+    rhostd_(srk.rhostd_)
 {}
 
 
@@ -194,7 +194,7 @@ inline scalar soaveRedlichKwong::p(const scalar rho,const scalar T) const
 
     return 
     (
-        this->RR*T/(Vm-b_)
+        this->RR()*T/(Vm-b_)
         -a(T)/(Vm*(Vm+b_))
     );
 }
@@ -210,7 +210,7 @@ inline scalar soaveRedlichKwong::dpdv(const scalar rho, const scalar T) const
     return 
     (
         a(T)*(b3()-3*b_*Vm2+2*pow(Vm,3))
-        -this->RR*T*Vm2*(b2()+2*b_*Vm+Vm2)
+        -this->RR()*T*Vm2*(b2()+2*b_*Vm+Vm2)
     )
     /(Vm2*pow(b_+Vm,2)*pow(b_-Vm,2));   
 }
@@ -224,7 +224,7 @@ inline scalar soaveRedlichKwong::dpdT(const scalar rho, const scalar T) const
  
     return 
     (
-        this->RR/(Vm-b_)
+        this->RR()/(Vm-b_)
         -dadT(T)/(Vm*(Vm+b_))
     );
 }
@@ -253,7 +253,7 @@ inline scalar soaveRedlichKwong::integral_p_dv(const scalar rho,const scalar T) 
 {
     scalar Vm = this->W()/rho;
  
-    return this->RR*T*log(Vm-b_)+a(T)*log(b_+Vm)/b_-a(T)*log(Vm)/b_;
+    return this->RR()*T*log(Vm-b_)+a(T)*log(b_+Vm)/b_-a(T)*log(Vm)/b_;
 }
 
 
@@ -263,7 +263,7 @@ inline scalar soaveRedlichKwong::integral_dpdT_dv(const scalar rho,const scalar 
 {
     scalar Vm = this->W()/rho;
 
-    return this->RR*log(Vm-b_)+dadT(T)*log(b_+Vm)/b_-dadT(T)*log(Vm)/b_;
+    return this->RR()*log(Vm-b_)+dadT(T)*log(b_+Vm)/b_-dadT(T)*log(Vm)/b_;
 }
 
 
@@ -290,7 +290,7 @@ inline scalar soaveRedlichKwong::d2pdv2(const scalar rho,const scalar T) const
         (
             b5()-3*b3()*Vm2-b2()*Vm3+6*b_*pow(Vm,4)-3*pow(Vm,5)
         )
-        +this->RR*T*Vm3*
+        +this->RR()*T*Vm3*
         (
             b3()+3*b2()*Vm+3*b_*Vm2+Vm3
         )
@@ -322,7 +322,7 @@ inline scalar soaveRedlichKwong::d2pdvdT(const scalar rho, const scalar T) const
     return 
     (
         dadT(T)*(b3()-3*b_*Vm2+2*pow(Vm,3))
-        -this->RR*Vm2*(b2()+2*b_*Vm+Vm2)
+        -this->RR()*Vm2*(b2()+2*b_*Vm+Vm2)
     )
     /(Vm2*pow(b_+Vm,2)*pow(b_-Vm,2)); 
 }

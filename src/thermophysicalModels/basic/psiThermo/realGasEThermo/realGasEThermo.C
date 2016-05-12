@@ -109,10 +109,14 @@ void Foam::realGasEThermo<MixtureType>::calculate()
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 template<class MixtureType>
-Foam::realGasEThermo<MixtureType>::realGasEThermo(const fvMesh& mesh)
+Foam::realGasEThermo<MixtureType>::realGasEThermo
+(
+    const fvMesh& mesh,
+    const objectRegistry& obj
+)
 :
-    basicPsiThermo(mesh),
-    MixtureType(*this, mesh),
+    basicPsiThermo(mesh, obj),
+    MixtureType(*this, mesh, obj),
 
     e_
     (
@@ -120,7 +124,7 @@ Foam::realGasEThermo<MixtureType>::realGasEThermo(const fvMesh& mesh)
         (
             "e",
             mesh.time().timeName(),
-            mesh,
+            obj,
             IOobject::NO_READ,
             IOobject::NO_WRITE
         ),
@@ -135,7 +139,7 @@ Foam::realGasEThermo<MixtureType>::realGasEThermo(const fvMesh& mesh)
         (
             "rhoThermo",
             mesh.time().timeName(),
-            mesh,
+            obj,
             IOobject::READ_IF_PRESENT,
             IOobject::NO_WRITE
         ),
@@ -149,7 +153,7 @@ Foam::realGasEThermo<MixtureType>::realGasEThermo(const fvMesh& mesh)
         (
             "drhode",
             mesh.time().timeName(),
-            mesh,
+            obj,
             IOobject::NO_READ,
             IOobject::NO_WRITE
         ),

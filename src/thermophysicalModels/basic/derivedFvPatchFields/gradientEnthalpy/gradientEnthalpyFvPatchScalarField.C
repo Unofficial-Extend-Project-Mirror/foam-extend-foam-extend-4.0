@@ -104,36 +104,22 @@ void Foam::gradientEnthalpyFvPatchScalarField::updateCoeffs()
 
     Tw.evaluate();
 
-    fvPatchScalarField& pw =
-        const_cast<fvPatchScalarField&>(thermo.p().boundaryField()[patchi]);
-
-    pw.evaluate();
-
-    if
-    (
-        dimensionedInternalField().name() == db().mangleFileName("h")
-    )
+    if (dimensionedInternalField().name() == "h")
     {
         gradient() = thermo.Cp(Tw, patchi)*Tw.snGrad()
-          + patch().deltaCoeffs()*
-            (
-                thermo.h(pw, Tw, patchi)
-              - thermo.h(pw, Tw, patch().faceCells())
-            );
-    }
-    else if
-    (
-        dimensionedInternalField().name() == db().mangleFileName("i")
-    )
-    {
+        + patch().deltaCoeffs()*
+        (
+            thermo.h(Tw, patchi)
+          - thermo.h(Tw, patch().faceCells())
+        );
     }
     else
     {
         gradient() = thermo.Cp(Tw, patchi)*Tw.snGrad()
         + patch().deltaCoeffs()*
         (
-            thermo.hs(pw, Tw, patchi)
-          - thermo.hs(pw, Tw, patch().faceCells())
+            thermo.hs(Tw, patchi)
+          - thermo.hs(Tw, patch().faceCells())
         );
     }
 

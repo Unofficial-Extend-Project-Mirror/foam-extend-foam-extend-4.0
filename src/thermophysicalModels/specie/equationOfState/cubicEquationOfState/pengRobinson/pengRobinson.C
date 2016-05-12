@@ -49,18 +49,18 @@ pengRobinson::pengRobinson(Istream& is)
     pcrit_(readScalar(is)),
     Tcrit_(readScalar(is)),
     azentricFactor_(readScalar(is)),
-    a0_(0.457235*pow(this->RR,2)*pow(Tcrit_,2)/pcrit_),
-    b_(0.077796*this->RR*Tcrit_/pcrit_), 
     n_(0.37464+1.54226*azentricFactor_-0.26992*pow(azentricFactor_,2)),
-    TSave(0.0), 
-    rhostd_(this->rho(Pstd,Tstd,Pstd/(Tstd*this->R()))),
+    a0_(0.457235*pow(this->RR(),2)*pow(Tcrit_,2)/pcrit_),
+    b_(0.077796*this->RR()*Tcrit_/pcrit_),
     //CL: Only uses the default values
-    rhoMin_(1e-3),
-    rhoMax_(1500),
     b2_(pow(b_,2)),
     b3_(pow(b_,3)),
     b4_(pow(b_,4)),
-    b5_(pow(b_,5))  	
+    b5_(pow(b_,5)),
+    rhoMax_(1500),
+    rhoMin_(1e-3),
+    TSave(0.0), 
+    rhostd_(this->rho(this->Pstd(),this->Tstd(),this->Pstd()/(this->Tstd()*this->R())))
 {
     is.check("pengRobinson::pengRobinson(Istream& is)");
 }
@@ -79,8 +79,8 @@ pengRobinson::pengRobinson(const dictionary& dict)
     //CL: therefore, rho can be larger than rhoMax and smaller than rhoMin
     rhoMin_(dict.subDict("equationOfState").lookupOrDefault("rhoMin",1e-3)),
     rhoMax_(dict.subDict("equationOfState").lookupOrDefault("rhoMax",1500)),
-    a0_(0.457235*pow(this->RR,2)*pow(Tcrit_,2)/pcrit_),
-    b_(0.077796*this->RR*Tcrit_/pcrit_), 
+    a0_(0.457235*pow(this->RR(),2)*pow(Tcrit_,2)/pcrit_),
+    b_(0.077796*this->RR()*Tcrit_/pcrit_), 
     n_(0.37464+1.54226*azentricFactor_-0.26992*pow(azentricFactor_,2)),
     TSave(0.0), 
     b2_(pow(b_,2)),

@@ -45,6 +45,8 @@ Description
 
 #include "pureMixture.H"
 
+#include "thermoPhysicsTypes.H"
+
 #include "addToRunTimeSelectionTable.H"
 
 #include "redlichKwong.H"

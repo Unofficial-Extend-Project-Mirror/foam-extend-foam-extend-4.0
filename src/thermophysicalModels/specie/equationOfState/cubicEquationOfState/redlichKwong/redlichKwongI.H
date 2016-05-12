@@ -57,10 +57,10 @@ inline redlichKwong::redlichKwong(const word& name, const redlichKwong& rk)
     Tcrit_(rk.Tcrit_),
     a_(rk.a_),
     b_(rk.b_),
-    rhostd_(rk.rhostd_),
     b2_(rk.b2_),
     b3_(rk.b3_),
-    b5_(rk.b5_)
+    b5_(rk.b5_),
+    rhostd_(rk.rhostd_)
 {}
 
 
@@ -118,7 +118,7 @@ inline scalar redlichKwong::b5()const
 inline scalar redlichKwong::p(const scalar rho, const scalar T) const
 {
     scalar Vm = this->W()/rho;    
-    return this->RR*T/(Vm - b_) - a_/(sqrt(T)*Vm*(Vm + b_));
+    return this->RR()*T/(Vm - b_) - a_/(sqrt(T)*Vm*(Vm + b_));
 }
 
 
@@ -130,7 +130,7 @@ inline scalar redlichKwong::dpdv(const scalar rho, const scalar T) const
     scalar Vm2 = Vm*Vm;
 
     return (a_*(b3() - 3*b_*Vm2 + 2*pow(Vm,3))
-    - this->RR*pow(T,1.5)*Vm2*(b2() + 2*b_*Vm + Vm2))
+    - this->RR()*pow(T,1.5)*Vm2*(b2() + 2*b_*Vm + Vm2))
         /(sqrt(T)*Vm2*pow((b_ + Vm),2)*pow( (b_ - Vm),2));
 }
 
@@ -140,7 +140,7 @@ inline scalar redlichKwong::dpdv(const scalar rho, const scalar T) const
 inline scalar redlichKwong::dpdT(const scalar rho, const scalar T) const
 {
     scalar Vm = this->W()/rho;
-    return 0.5*a_/(pow(T,1.5)*Vm*(b_ + Vm))-this->RR/(b_ - Vm);
+    return 0.5*a_/(pow(T,1.5)*Vm*(b_ + Vm))-this->RR()/(b_ - Vm);
 }
 
 
@@ -170,7 +170,7 @@ inline scalar redlichKwong::integral_p_dv
 ) const
 {
     scalar Vm = this->W()/rho;
-    return this->RR*T*log(Vm - b_)
+    return this->RR()*T*log(Vm - b_)
         + (a_*log(b_ + Vm))/(b_*sqrt(T))
         - (a_*log(Vm))/(b_*sqrt(T));
 }
@@ -185,7 +185,7 @@ inline scalar redlichKwong::integral_dpdT_dv
 ) const
 {
     scalar Vm = this->W()/rho;
-    return this->RR*log(Vm - b_)
+    return this->RR()*log(Vm - b_)
         -(a_*log(b_ + Vm))/(2*b_*pow(T,1.5))
         +(a_*log(Vm))/(2*b_*pow(T,1.5));
 }
@@ -214,7 +214,7 @@ inline scalar redlichKwong::d2pdv2(const scalar rho, const scalar T) const
                 - b2()*Vm3
                 + 6*b_*pow(Vm,4)-3*pow(Vm,5)
             )
-            + this->RR*pow(T,1.5)*Vm3*(b3()
+            + this->RR()*pow(T,1.5)*Vm3*(b3()
             + 3*b2()*Vm
             + 3*b_*Vm2+Vm3)
         )
@@ -246,7 +246,7 @@ inline scalar redlichKwong::d2pdvdT(const scalar rho, const scalar T) const
     return
     -(0.5*(
         a_*(b3() - 3*b_*Vm2 + 2*pow(Vm,3))
-      + 2*this->RR*pow(T,1.5)*Vm2*(b2() + 2*b_*Vm + Vm2)
+      + 2*this->RR()*pow(T,1.5)*Vm2*(b2() + 2*b_*Vm + Vm2)
     ))
     /(pow(T,1.5)*Vm2*pow(b_ + Vm,2)*pow(b_ - Vm,2));
 }

@@ -72,10 +72,8 @@ void Foam::realGasHThermo<MixtureType>::calculate()
         fvPatchScalarField& pmu = this->mu_.boundaryField()[patchi];
         fvPatchScalarField& palpha = this->alpha_.boundaryField()[patchi];
 
-
         if (pT.fixesValue())
         {
-
             forAll(pT, facei)
             {
                 const typename MixtureType::thermoType& mixture_ =
@@ -84,7 +82,7 @@ void Foam::realGasHThermo<MixtureType>::calculate()
                 prho[facei] = mixture_.rho(pp[facei], pT[facei],prho[facei]);
                 ppsi[facei]=mixture_.psi(prho[facei],pT[facei]);
                 pdrhodh[facei]=mixture_.drhodH(prho[facei],pT[facei]);
-		ph[facei] = mixture_.H(prho[facei], pT[facei]);
+                ph[facei] = mixture_.H(prho[facei], pT[facei]);
                 pmu[facei] = mixture_.mu(pT[facei]);
                 palpha[facei] = mixture_.alpha(prho[facei],pT[facei]);
             }
@@ -98,8 +96,8 @@ void Foam::realGasHThermo<MixtureType>::calculate()
 
                 mixture_.TH(ph[facei], pT[facei],pp[facei],prho[facei]);
                 pmu[facei] = mixture_.mu(pT[facei]);
-		ppsi[facei]=mixture_.psi(prho[facei],pT[facei]);
-		pdrhodh[facei]=mixture_.drhodH(prho[facei],pT[facei]);
+                ppsi[facei]=mixture_.psi(prho[facei],pT[facei]);
+                pdrhodh[facei]=mixture_.drhodH(prho[facei],pT[facei]);
                 palpha[facei] = mixture_.alpha(prho[facei],pT[facei]);
             }
         }
@@ -110,10 +108,15 @@ void Foam::realGasHThermo<MixtureType>::calculate()
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 template<class MixtureType>
-Foam::realGasHThermo<MixtureType>::realGasHThermo(const fvMesh& mesh)
+Foam::realGasHThermo<MixtureType>::realGasHThermo
+(
+    const fvMesh& mesh,
+    const objectRegistry& obj
+)
+
 :
-    basicPsiThermo(mesh),
-    MixtureType(*this, mesh),
+    basicPsiThermo(mesh, obj),
+    MixtureType(*this, mesh, obj),
 
     h_
     (
@@ -121,44 +124,41 @@ Foam::realGasHThermo<MixtureType>::realGasHThermo(const fvMesh& mesh)
         (
             "h",
             mesh.time().timeName(),
-            mesh,
+            obj,
             IOobject::NO_READ,
             IOobject::NO_WRITE
         ),
-        mesh, 
+        mesh,
         dimensionSet(0, 2, -2, 0, 0),
         this->hBoundaryTypes()
-    ),   
-
+    ),
     rho_
     (
         IOobject
         (
             "rhoThermo",
             mesh.time().timeName(),
-            mesh,
+            obj,
             IOobject::READ_IF_PRESENT,
             IOobject::NO_WRITE
         ),
-	mesh,
-	dimDensity
+        mesh,
+        dimDensity
     ),
-
     drhodh_
     (
         IOobject
         (
             "drhodh",
             mesh.time().timeName(),
-            mesh,
+            obj,
             IOobject::NO_READ,
             IOobject::NO_WRITE
         ),
-	mesh,
-	dimensionSet(1, -5, 2, 0, 0)
+        mesh,
+        dimensionSet(1, -5, 2, 0, 0)
     )
 {
-
     scalarField& hCells = h_.internalField();
     const scalarField& TCells = this->T_.internalField();
     const scalarField& pCells =this->p_.internalField();
@@ -187,15 +187,15 @@ Foam::realGasHThermo<MixtureType>::realGasHThermo(const fvMesh& mesh)
     forAll(h_.boundaryField(), patchi)
     {
         h_.boundaryField()[patchi] ==
-            h(this->T_.boundaryField()[patchi], patchi);                    
+            h(this->T_.boundaryField()[patchi], patchi);
     }
 
     hBoundaryCorrection(h_);
+
     calculate();
 
     // Switch on saving old time
     this->psi_.oldTime();
-
 }
 
 

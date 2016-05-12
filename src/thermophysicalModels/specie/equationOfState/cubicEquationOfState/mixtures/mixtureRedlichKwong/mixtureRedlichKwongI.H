@@ -55,9 +55,9 @@ inline mixtureRedlichKwong::mixtureRedlichKwong
 )
 : 
     redlichKwong(rK),
-    numOfComp(numOfComp),
     weigths(weigths),
-    mixtureComponents(mixtureComponents)
+    mixtureComponents(mixtureComponents),
+    numOfComp(numOfComp)
 {
     a_=a;
     b_=b;
@@ -84,9 +84,9 @@ inline mixtureRedlichKwong::mixtureRedlichKwong
 )
 : 
     redlichKwong(rK),
-    numOfComp(numOfComp),
     weigths(weigths),
-    mixtureComponents(mixtureComponents)    
+    mixtureComponents(mixtureComponents),
+    numOfComp(numOfComp)
 {
     //CL: update model coefficients
     updateModelCoefficients();
@@ -96,7 +96,7 @@ inline mixtureRedlichKwong::mixtureRedlichKwong
     rhoMax_=rhoMax;
 
     //CL: calculating rho @ std
-    rhostd_=this->rho(Pstd, Tstd, Pstd/(Tstd*this->R()));
+    rhostd_=this->rho(this->Pstd(), this->Tstd(), this->Pstd()/(this->Tstd()*this->R()));
 }
 
 
@@ -200,7 +200,7 @@ inline void mixtureRedlichKwong::operator+=(const mixtureRedlichKwong& rK)
     rhoMax_=max(rhoMax_,rK.rhoMax_);
 
     //CL: calculating rho @ std
-    rhostd_=this->rho(Pstd, Tstd, Pstd*this->W()/(Tstd*this->R()));
+    rhostd_=this->rho(this->Pstd(), this->Tstd(), this->Pstd()*this->W()/(this->Tstd()*this->R()));
 }
 
 // * * * * * * * * * * * * * * * Friend Operators  * * * * * * * * * * * * * //

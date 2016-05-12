@@ -91,7 +91,7 @@ public:
     // Constructors
 
         //- Construct from mesh
-        realGasHThermo(const fvMesh&);
+        realGasHThermo(const fvMesh&, const objectRegistry& obj);
 
     //- Destructor
     virtual ~realGasHThermo();

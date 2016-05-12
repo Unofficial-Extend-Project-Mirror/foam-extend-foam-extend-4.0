@@ -172,9 +172,9 @@ inline scalar sutherlandTransport<thermo>::alpha(const scalar rho, const scalar 
     scalar Cv_ = this->Cv(rho,T);
     scalar Cp_ = this->Cp(rho,T);
 
-    scalar deltaT = T - specie::Tstd;
+    scalar deltaT = T - specie::Tstd();
     scalar CpBar =
-        (deltaT*(this->H(rho, T) - this->H(this->rhostd(),specie::Tstd)) + Cp_)/(sqr(deltaT) + 1);
+        (deltaT*(this->H(rho, T) - this->H(this->rhostd(),specie::Tstd())) + Cp_)/(sqr(deltaT) + 1);
 
     return mu(T)*Cv_*(1.32 + 1.77*this->R()/Cv_)/CpBar;
 }

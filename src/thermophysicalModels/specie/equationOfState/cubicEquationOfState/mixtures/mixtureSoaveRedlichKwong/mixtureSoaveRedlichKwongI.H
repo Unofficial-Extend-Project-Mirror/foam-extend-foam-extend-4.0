@@ -57,10 +57,10 @@ inline mixtureSoaveRedlichKwong::mixtureSoaveRedlichKwong
 )
 : 
     soaveRedlichKwong(srk),
-    numOfComp(numOfComp),
+    singleComponent(1),
     weigths(weigths),
     mixtureComponents(mixtureComponents),
-    singleComponent(1)
+    numOfComp(numOfComp)
 {
     a0_=a0;
     b_=b;
@@ -85,16 +85,15 @@ inline mixtureSoaveRedlichKwong::mixtureSoaveRedlichKwong
 )
 : 
     soaveRedlichKwong(srk),
-    numOfComp(numOfComp),
+    singleComponent(0),
     weigths(weigths),
     mixtureComponents(mixtureComponents),
-    singleComponent(0)
-    
+    numOfComp(numOfComp)
 {
     TSave=0.0;
     rhoMin_=rhoMin;
     rhoMax_=rhoMax;
-    rhostd_=this->rho(Pstd, Tstd, Pstd*this->W()/(Tstd*this->R()));
+    rhostd_=this->rho(this->Pstd(), this->Tstd(), this->Pstd()*this->W()/(this->Tstd()*this->R()));
 }
 
 
@@ -443,7 +442,7 @@ inline void mixtureSoaveRedlichKwong::operator+=(const mixtureSoaveRedlichKwong&
     rhoMax_=max(rhoMax_,srk.rhoMax_);
 
     //CL: calculating rho @ std
-    rhostd_=this->rho(Pstd, Tstd, Pstd*this->W()/(Tstd*this->R()));
+    rhostd_=this->rho(this->Pstd(), this->Tstd(), this->Pstd()*this->W()/(this->Tstd()*this->R()));
 }
 
 

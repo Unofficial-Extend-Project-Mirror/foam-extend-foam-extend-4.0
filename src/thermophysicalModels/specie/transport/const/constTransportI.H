@@ -131,9 +131,9 @@ inline scalar constTransport<thermo>::alpha(const scalar rho,const scalar T) con
 {
     scalar Cp_ = this->Cp(rho,T);
 
-    scalar deltaT = T - specie::Tstd;
+    scalar deltaT = T - specie::Tstd();
     scalar CpBar =
-        (deltaT*(this->H(rho,T) - this->H(this->rhostd(),specie::Tstd)) + Cp_)/(sqr(deltaT) + 1);
+        (deltaT*(this->H(rho,T) - this->H(this->rhostd(),specie::Tstd())) + Cp_)/(sqr(deltaT) + 1);
 
     return Cp_*mu(T)*rPr/CpBar;
 }

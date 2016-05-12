@@ -90,8 +90,8 @@ public:
 
     // Constructors
 
-        //- Construct from mesh
-        realGasEThermo(const fvMesh&);
+        //- Construct from mesh and object registry
+        realGasEThermo(const fvMesh&, const objectRegistry&);
 
     //- Destructor
     virtual ~realGasEThermo();
@@ -117,14 +117,14 @@ public:
 
         // Access to thermodynamic state variables
 
-            //- Enthalpy [J/kg]
+            //- Internal energy [J/kg]
             //  Non-const access allowed for transport equations
             virtual volScalarField& e()
             {
                 return e_;
             }
 
-            //- Enthalpy [J/kg]
+            //- Internal energy [J/kg]
             virtual const volScalarField& e() const
             {
                 return e_;
@@ -138,14 +138,14 @@ public:
 
         // Fields derived from thermodynamic state variables
 
-            //- Enthalpy for cell-set [J/kg]
+            //- Internal energy for cell-set [J/kg]
             virtual tmp<scalarField> e
             (
                 const scalarField& T,
                 const labelList& cells
             ) const;
 
-            //- Enthalpy for patch [J/kg]
+            //- Internal energy for patch [J/kg]
             virtual tmp<scalarField> e
             (
                 const scalarField& T,
