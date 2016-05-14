@@ -4,6 +4,10 @@ dbnsFlux/betaFlux/betaFlux.C
 dbnsFlux/hllcFlux/hllcFlux.C
 dbnsFlux/hllcALEFlux/hllcALEFlux.C
 
+basicNumericFlux/basicNumericFlux.C
+basicNumericFlux/newBasicNumericFlux.C
+numericFlux/numericFluxes.C
+
 multigrid/mgMeshLevel/mgMeshLevel.C
 multigrid/mgMeshLevel/fineMgMeshLevel.C
 multigrid/mgMeshLevel/coarseMgMeshLevel.C

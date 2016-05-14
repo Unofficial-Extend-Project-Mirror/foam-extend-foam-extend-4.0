@@ -21,67 +21,42 @@ License
     You should have received a copy of the GNU General Public License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
-Class
-    numericFluxBase
-
-Description
-    Base numeric flux class for density-based solvers
-
-Author
-    Aleksandar Jemcov
-    Rewrite by Hrvoje Jasak
-
-SourceFiles
-    numericFluxBase.H
-    numericFluxBase.C
-
 \*---------------------------------------------------------------------------*/
-
-#ifndef numericFluxBase_H
-#define numericFluxBase_H
 
 #include "basicNumericFlux.H"
-#include "volFieldsFwd.H"
-#include "surfaceFieldsFwd.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-namespace Foam
+Foam::autoPtr<Foam::basicNumericFlux> Foam::basicNumericFlux::New
+(
+    const volScalarField& p,
+    const volVectorField& U,
+    const volScalarField& T,
+    basicThermo& thermo
+)
 {
+    const dictionary& subDict =
+        p.mesh().schemesDict().subDict("divSchemes").subDict("dbns");
 
-/*---------------------------------------------------------------------------*\
-                        Class numericFluxBase Declaration
-\*---------------------------------------------------------------------------*/
+    word name = word(subDict.lookup("flux")) + "Flux"
+        + word(subDict.lookup("limiter")) + "Limiter";
 
-template<class Flux>
-class numericFluxBase
-:
-    public basicNumericFlux,
-    public Flux
-{
-public:
+    Info<< "Selecting numericFlux " << name << endl;
 
-    // Constructors
+    stateConstructorTable::iterator cstrIter =
+        stateConstructorTablePtr_->find(name);
 
-        //- Construct from mesh
-        numericFluxBase(const fvMesh& mesh)
-        :
-            basicNumericFlux(mesh)    
-        {}
+    if (cstrIter == stateConstructorTablePtr_->end())
+    {
+        FatalErrorIn("basicNumericFlux::New(const fvMesh&)")
+            << "Unknown basicNumericFlux type " << name << nl << nl
+            << "Valid basicNumericFlux types are:" << nl
+            << stateConstructorTablePtr_->sortedToc() << nl
+            << exit(FatalError);
+    }
 
+    return autoPtr<basicNumericFlux>(cstrIter()(p, U, T, thermo));
+}
 
-    //- Destructor
-    virtual ~numericFluxBase()
-    {}
-};
-
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-#endif
 
 // ************************************************************************* //

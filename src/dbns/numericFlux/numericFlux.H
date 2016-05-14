@@ -42,6 +42,7 @@ SourceFiles
 
 #include "numericFluxBase.H"
 #include "basicThermo.H"
+#include "fvc.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -58,10 +59,6 @@ class numericFlux
     public numericFluxBase<Flux>
 {
     // Private data
-
-        //- Reference to mesh
-        const fvMesh& mesh_;
-
 
         // Reference to primitive fields
 
@@ -150,6 +147,9 @@ class numericFlux
 
 public:
 
+    //- Runtime type information
+    TypeName("numericFlux");
+
     // Constructors
 
         //- Construct from components
@@ -168,13 +168,6 @@ public:
 
 
     // Member Functions
-
-        //- Return mesh reference
-        const fvMesh& mesh() const
-        {
-            return mesh_;
-        }
-
 
         // Return fluxes
 
