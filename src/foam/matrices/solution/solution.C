@@ -213,7 +213,8 @@ bool Foam::solution::cache(const word& name) const
     {
         if (debug)
         {
-            Info<< "Cache: find entry for " << name << endl;
+            Info<< "Cache: find entry for " << name
+                << ": " << Switch(cache_.found(name)) << endl;
         }
 
         return cache_.found(name);
