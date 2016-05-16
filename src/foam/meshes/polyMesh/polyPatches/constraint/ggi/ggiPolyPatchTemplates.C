@@ -89,18 +89,40 @@ Foam::tmp<Foam::Field<Type> > Foam::ggiPolyPatch::fastExpand
         shadow().receiveAddr();
     }
 
-    // Optimised mapDistribute
+    if (Pstream::parRun())
+    {
+        // Optimised mapDistribute
 
-    // Prepare return field: expand the field to zone size
-    tmp<Field<Type> > texpandField
-    (
-        new Field<Type>(ff)
-    );
+        // Prepare return field: expand the field to zone size
+        tmp<Field<Type> > texpandField
+        (
+            new Field<Type>(ff)
+        );
+        Field<Type>& expandField = texpandField();
 
-    Field<Type>& expandField = texpandField();
+        map().distribute(expandField);
 
-    map().distribute(expandField);
-    return texpandField;
+        return texpandField;
+    }
+    else
+    {
+        // Serial.  Expand the field to zone size
+
+        tmp<Field<Type> > texpandField
+        (
+            new Field<Type>(zone().size())  // filled with nans
+        );
+        Field<Type>& expandField = texpandField();
+
+        const labelList& zAddr = zoneAddressing();
+
+        forAll (zAddr, i)
+        {
+            expandField[zAddr[i]] = ff[i];
+        }
+
+        return texpandField;
+    }
 
 #if 0
 
@@ -110,6 +132,7 @@ Foam::tmp<Foam::Field<Type> > Foam::ggiPolyPatch::fastExpand
     (
         new Field<Type>(zone().size())  // filled with nans
     );
+    Field<Type>& expandField = texpandField();
 
     if (Pstream::master())
     {
@@ -290,6 +313,8 @@ Foam::tmp<Foam::Field<Type> > Foam::ggiPolyPatch::fastExpand
                 }
             }
         }
+
+        return texpandField;
     }
     else
     {
@@ -304,8 +329,6 @@ Foam::tmp<Foam::Field<Type> > Foam::ggiPolyPatch::fastExpand
     }
 
 #endif
-
-    return texpandField;
 }
 
 
