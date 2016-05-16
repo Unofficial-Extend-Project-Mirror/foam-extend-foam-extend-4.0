@@ -138,10 +138,10 @@ class overlapGgiPolyPatch
         void checkDefinition() const;
 
         //- Clear geometry
-        void clearGeom();
+        void clearGeom() const;
 
         //- Clear out
-        void clearOut();
+        void clearOut() const;
 
 
 protected:

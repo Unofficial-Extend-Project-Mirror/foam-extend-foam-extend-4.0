@@ -158,10 +158,10 @@ class ggiPolyPatch
         // Memory management
 
             //- Clear geometry
-            void clearGeom();
+            void clearGeom() const;
 
             //- Clear out
-            void clearOut();
+            void clearOut() const;
 
 
 protected:

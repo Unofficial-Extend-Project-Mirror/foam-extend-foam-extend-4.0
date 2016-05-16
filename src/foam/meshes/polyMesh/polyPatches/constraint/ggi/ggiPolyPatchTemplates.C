@@ -89,15 +89,27 @@ Foam::tmp<Foam::Field<Type> > Foam::ggiPolyPatch::fastExpand
         shadow().receiveAddr();
     }
 
+    // Optimised mapDistribute
+
     // Prepare return field: expand the field to zone size
     tmp<Field<Type> > texpandField
     (
-        new Field<Type>(zone().size(), pTraits<Type>::zero)
+        new Field<Type>(ff)
     );
 
     Field<Type>& expandField = texpandField();
 
-#if 1
+    map().distribute(expandField);
+    return texpandField;
+
+#if 0
+
+    // Variant 2: global gather-scatter.  Original version
+
+    tmp<Field<Type> > texpandField
+    (
+        new Field<Type>(zone().size())  // filled with nans
+    );
 
     if (Pstream::master())
     {
@@ -202,19 +214,24 @@ Foam::tmp<Foam::Field<Type> > Foam::ggiPolyPatch::fastExpand
         }
     }
 
-#else
+// #else
 
+    // Variant 3: unpacked mapDistribute
     if (Pstream::parRun())
     {
-        // Make shadow send subField to neighbour
-        for (label domain = 0; domain < Pstream::nProcs(); domain++)
+        // Send subField to other processors
+        for (label domainI = 0; domainI < Pstream::nProcs(); domainI++)
         {
-            const labelList& curMap = map().subMap()[domain];
+            const labelList& curMap = map().subMap()[domainI];
 
-            if (domain != Pstream::myProcNo() && curMap.size())
+            if (domainI != Pstream::myProcNo() && curMap.size())
             {
-                OPstream toNbr(Pstream::blocking, domain);
-                toNbr << UIndirectList<Type>(ff, curMap);
+                Pout<< "Sending " << curMap.size()
+                    << " from " << Pstream::myProcNo()
+                    << " to " << domainI
+                    << endl;
+                OPstream toNbr(Pstream::blocking, domainI);
+                toNbr << List<Type>(UIndirectList<Type>(ff, curMap));
             }
         }
 
@@ -228,7 +245,6 @@ Foam::tmp<Foam::Field<Type> > Foam::ggiPolyPatch::fastExpand
                 subField[i] = ff[mySubMap[i]];
             }
 
-
             // Receive sub field from myself (subField)
             const labelList& curMap =
                 map().constructMap()[Pstream::myProcNo()];
@@ -240,14 +256,19 @@ Foam::tmp<Foam::Field<Type> > Foam::ggiPolyPatch::fastExpand
         }
 
         // Receive sub field from neighbour
-        for (label domain = 0; domain < Pstream::nProcs(); domain++)
+        for (label domainI = 0; domainI < Pstream::nProcs(); domainI++)
         {
-            const labelList& curMap = map().constructMap()[domain];
+            const labelList& curMap = map().constructMap()[domainI];
 
-            if (domain != Pstream::myProcNo() && curMap.size())
+            if (domainI != Pstream::myProcNo() && curMap.size())
             {
-                IPstream fromNbr(Pstream::blocking, domain);
+                IPstream fromNbr(Pstream::blocking, domainI);
                 List<Type> recvField(fromNbr);
+                Pout<< "Receiving " << recvField.size()
+                    << " (" << curMap.size()
+                    << ") from " << domainI
+                    << " to " << Pstream::myProcNo()
+                    << endl;
 
                 if (curMap.size() != recvField.size())
                 {
@@ -257,7 +278,7 @@ Foam::tmp<Foam::Field<Type> > Foam::ggiPolyPatch::fastExpand
                         "(\n"
                         "    const Field<Type>& ff\n"
                         ") const"
-                    )   << "Expected from processor " << domain << " size "
+                    )   << "Expected from processor " << domainI << " size "
                         << curMap.size()  << " but received "
                         << recvField.size() << " elements."
                         << abort(FatalError);

@@ -99,7 +99,7 @@ void Foam::ggiPolyPatch::calcZoneAddressing() const
 
 void Foam::ggiPolyPatch::calcRemoteZoneAddressing() const
 {
-    // Calculate patch-to-zone addressing
+    // Calculate patch-to-remote zone addressing
     if (remoteZoneAddressingPtr_)
     {
         FatalErrorIn("void ggiPolyPatch::calcRemoteZoneAddressing() const")
@@ -114,7 +114,8 @@ void Foam::ggiPolyPatch::calcRemoteZoneAddressing() const
     }
 
     // Once zone addressing is established, visit the opposite side and find
-    // out which face data is needed for interpolation
+    // out which face data is needed for interpolation from the remote zone
+    // to interpolate to my live faces
     boolList usedShadows(shadow().zone().size(), false);
 
     const labelList& zAddr = zoneAddressing();
@@ -421,10 +422,10 @@ void Foam::ggiPolyPatch::calcSendReceive() const
 
     reduce(zoneProcID, maxOp<labelField>());
 
+    const labelList& shadowRza = shadow().remoteZoneAddressing();
+
     // Find out where my zone data is coming from
     labelList nRecv(Pstream::nProcs(), 0);
-
-    const labelList& shadowRza = shadow().remoteZoneAddressing();
 
     // Note: only visit the data from the local zone
     forAll (shadowRza, shadowRzaI)
@@ -472,8 +473,9 @@ void Foam::ggiPolyPatch::calcSendReceive() const
 
     labelListList shadowToReceiveAddr(Pstream::nProcs());
 
-    // What my shadow needs to receive
-    shadowToReceiveAddr[Pstream::myProcNo()] = shadow().remoteZoneAddressing();
+    // Get the list of what my shadow needs to receive from my zone
+    // on all other processors
+    shadowToReceiveAddr[Pstream::myProcNo()] = shadowRza;
     Pstream::gatherList(shadowToReceiveAddr);
     Pstream::scatterList(shadowToReceiveAddr);
 
@@ -563,7 +565,7 @@ const Foam::mapDistribute& Foam::ggiPolyPatch::map() const
 }
 
 
-void Foam::ggiPolyPatch::clearGeom()
+void Foam::ggiPolyPatch::clearGeom() const
 {
     deleteDemandDrivenData(reconFaceCellCentresPtr_);
 
@@ -579,7 +581,7 @@ void Foam::ggiPolyPatch::clearGeom()
 }
 
 
-void Foam::ggiPolyPatch::clearOut()
+void Foam::ggiPolyPatch::clearOut() const
 {
     clearGeom();
 
@@ -961,6 +963,12 @@ void Foam::ggiPolyPatch::initMovePoints(const pointField& p)
 
     // Calculate transforms on mesh motion?
     calcTransforms();
+
+    if (master())
+    {
+        shadow().clearGeom();
+        shadow().calcTransforms();
+    }
 
     // Update interpolation for new relative position of GGI interfaces
     if (patchToPatchPtr_)
