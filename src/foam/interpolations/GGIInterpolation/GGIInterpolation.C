@@ -51,7 +51,7 @@ label GGIInterpolation<MasterPatch, SlavePatch>::parMasterStart() const
         // Integer division intended
         return Foam::min
         (
-            masterPatch_.size() - 1,
+            masterPatch_.size(),
             Pstream::myProcNo()*(masterPatch_.size()/Pstream::nProcs() + 1)
         );
     }
