@@ -25,6 +25,9 @@ gradSchemes
     grad(p)         Gauss linear;
     grad(U)         Gauss linear;
 //    grad(U)         cellLimited Gauss linear 1;
+
+    grad(k)         Gauss linear;
+    grad(omega)     Gauss linear;
 }
 
 divSchemes

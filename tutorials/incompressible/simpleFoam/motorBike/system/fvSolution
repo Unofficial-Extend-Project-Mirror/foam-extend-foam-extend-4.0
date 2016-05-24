@@ -70,10 +70,10 @@ relaxationFactors
 
 cache
 {
-//     grad(U);
-//     grad(p);
-//     grad(k);
-//     grad(omega);
+    grad(U);
+    grad(p);
+    grad(k);
+    grad(omega);
 }
 
 // ************************************************************************* //
