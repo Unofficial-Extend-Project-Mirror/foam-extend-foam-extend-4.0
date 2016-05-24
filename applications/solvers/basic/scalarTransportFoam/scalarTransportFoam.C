@@ -30,6 +30,7 @@ Description
 \*---------------------------------------------------------------------------*/
 
 #include "fvCFD.H"
+#include "simpleControl.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -39,6 +40,9 @@ int main(int argc, char *argv[])
 
 #   include "createTime.H"
 #   include "createMesh.H"
+
+    simpleControl simple(mesh);
+
 #   include "createFields.H"
 
 
@@ -52,9 +56,7 @@ int main(int argc, char *argv[])
     {
         Info<< "Time = " << runTime.timeName() << nl << endl;
 
-#       include "readSIMPLEControls.H"
-
-        for (int nonOrth=0; nonOrth<=nNonOrthCorr; nonOrth++)
+        while (simple.correctNonOrthogonal())
         {
             solve
             (

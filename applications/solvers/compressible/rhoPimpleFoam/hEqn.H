@@ -8,16 +8,11 @@
         DpDt
     );
 
-    if (oCorr == nOuterCorr-1)
-    {
-        hEqn.relax();
-        hEqn.solve(mesh.solutionDict().solver("hFinal"));
-    }
-    else
-    {
-        hEqn.relax();
-        hEqn.solve();
-    }
+    hEqn.relax
+    (
+        mesh.solutionDict().relaxationFactor(h.select(pimple.finalIter()))
+    );
+    hEqn.solve(mesh.solutionDict().solver((h.select(pimple.finalIter()))));
 
     thermo.correct();
 }

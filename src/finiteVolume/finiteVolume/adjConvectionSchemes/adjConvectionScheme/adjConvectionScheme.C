@@ -82,7 +82,7 @@ tmp<adjConvectionScheme<Type> > adjConvectionScheme<Type>::New
             << exit(FatalIOError);
     }
 
-    word schemeName(schemeData);
+    const word schemeName(schemeData);
 
     typename IstreamConstructorTable::iterator cstrIter =
         IstreamConstructorTablePtr_->find(schemeName);

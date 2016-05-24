@@ -71,6 +71,13 @@ const tensor2D tensor2D::min
     -VGREAT, -VGREAT
 );
 
+template<>
+const tensor2D tensor2D::I
+(
+    1, 0,
+    0, 1
+);
+
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

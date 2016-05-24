@@ -5,7 +5,7 @@
       - fvm::laplacian(nu, U)
     );
 
-    if (momentumPredictor)
+    if (piso.momentumPredictor())
     {
         solve(UEqn == -fvc::grad(p));
     }

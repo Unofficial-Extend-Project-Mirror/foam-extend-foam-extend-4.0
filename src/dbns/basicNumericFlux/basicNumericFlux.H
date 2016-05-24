@@ -32,7 +32,7 @@ Author
 
 SourceFiles
     basicNumericFlux.C
-    newBasicPsiThermo.C
+    newBasicNumericFlux.C
 
 \*---------------------------------------------------------------------------*/
 
@@ -147,18 +147,6 @@ public:
 
             //- Return energy equation flux
             virtual tmp<scalarField> rhoEResidual() const = 0;
-
-
-        // Return Gradients
-
-            //- Return pressure gradient
-            virtual const volVectorField& gradP() const = 0;
-
-            //- Return pressure gradient
-            virtual const volTensorField& gradU() const = 0;
-
-            //- Return Temperature gradient
-            virtual const volVectorField& gradT() const = 0;
 
 
         // Update fluxes based on current state

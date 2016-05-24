@@ -1,9 +1,9 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | foam-extend: Open Source CFD                    |
-|  \\    /   O peration     | Version:     3.2                                |
+|  \\    /   O peration     | Version:     4.0                                |
 |   \\  /    A nd           | Web:         http://www.foam-extend.org         |
-|    \\/     M anipulation  |                                                 |
+|    \\/     M anipulation  | For copyright notice see file Copyright         |
 \*---------------------------------------------------------------------------*/
 FoamFile
 {
@@ -20,35 +20,30 @@ FoamFile
     inlet
     {
         type            patch;
-        physicalType    supersonicInlet;
         nFaces          80;
         startFace       31936;
     }
     outlet
     {
         type            patch;
-        physicalType    pressureTransmissiveOutlet;
         nFaces          64;
         startFace       32016;
     }
     bottom
     {
         type            symmetryPlane;
-        physicalType    symmetryPlane;
         nFaces          48;
         startFace       32080;
     }
     top
     {
         type            symmetryPlane;
-        physicalType    symmetryPlane;
         nFaces          240;
         startFace       32128;
     }
     obstacle
     {
         type            patch;
-        physicalType    adiabaticWall;
         nFaces          208;
         startFace       32368;
     }

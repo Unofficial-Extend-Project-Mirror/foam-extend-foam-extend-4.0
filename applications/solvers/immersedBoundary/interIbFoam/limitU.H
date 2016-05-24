@@ -1,5 +1,6 @@
 {
-    scalar limitMagU = readScalar(pimple.lookup("limitMagU"));
+    scalar limitMagU =
+        readScalar(mesh.solutionDict().subDict("PIMPLE").lookup("limitMagU"));
 
     volScalarField magU(mag(U));
 

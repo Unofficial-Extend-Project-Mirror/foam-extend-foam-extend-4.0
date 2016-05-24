@@ -58,6 +58,7 @@ int main(int argc, char *argv[])
 #   include "createDynamicFvMesh.H"
 #   include "createFields.H"
 #   include "initContinuityErrs.H"
+#   include "createControls.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

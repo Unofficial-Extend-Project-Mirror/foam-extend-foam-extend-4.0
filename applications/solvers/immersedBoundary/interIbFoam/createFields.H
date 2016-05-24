@@ -128,6 +128,8 @@
         );
     }
 
+    mesh.schemesDict().setFluxRequired(pd.name());
+
     // Construct interface from alpha1 distribution
     interfaceProperties interface(alpha1, U, twoPhaseProperties);
 

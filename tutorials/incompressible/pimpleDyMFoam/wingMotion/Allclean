@@ -6,14 +6,16 @@ cd ${0%/*} || exit 1    # run from this directory
 
 cd wingMotion_snappyHexMesh
 cleanCase
-\rm -f front.sMesh
+\rm -f front.sMesh symFront.sMesh
 \rm -f constant/cellLevel constant/pointLevel constant/polyMesh/refinementHistory
-
+rm -f constant/polyMesh/boundary
 
 cd ../wingMotion2D_simpleFoam
+rm -f constant/polyMesh/boundary
 cleanCase
 
 cd ../wingMotion2D_pimpleDyMFoam
 cleanCase
+rm -f constant/polyMesh/boundary
 rm -rf 0
 

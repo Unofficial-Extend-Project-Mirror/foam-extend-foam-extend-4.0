@@ -491,6 +491,11 @@ public:
         //  alpha = 0 : do nothing
         void relax(const scalar alpha);
 
+        //- Select the final iteration parameters if 'final' is true
+        //  by returning the field name + "Final"
+        //  otherwise the standard parameters by returning the field name
+        word select(bool final) const;
+
         //- Relax field (for steady-state solution).
         //  alpha is read from controlDict
         void relax();

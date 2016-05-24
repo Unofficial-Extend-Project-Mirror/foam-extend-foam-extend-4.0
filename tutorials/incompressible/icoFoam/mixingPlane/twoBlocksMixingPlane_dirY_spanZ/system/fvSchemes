@@ -49,12 +49,6 @@ snGradSchemes
     default         corrected;
 }
 
-fluxRequired
-{
-    default         no;
-    p;
-}
-
 mixingPlane
 {
     default        areaAveraging;

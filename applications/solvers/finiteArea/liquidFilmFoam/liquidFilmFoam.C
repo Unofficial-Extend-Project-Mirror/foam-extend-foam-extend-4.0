@@ -49,6 +49,7 @@ int main(int argc, char *argv[])
 #   include "readTransportProperties.H"
 #   include "createFaFields.H"
 #   include "createFvFields.H"
+#   include "createTimeControls.H"
 
     Info << "\nStarting time loop\n" << endl;
 

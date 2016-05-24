@@ -34,13 +34,13 @@ namespace Foam
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 // Construct null
-template <class Cmpt>
+template<class Cmpt>
 inline SymmTensor4thOrder<Cmpt>::SymmTensor4thOrder()
 {}
 
 
 // Construct given VectorSpace
-template <class Cmpt>
+template<class Cmpt>
 inline SymmTensor4thOrder<Cmpt>::SymmTensor4thOrder
 (
     const VectorSpace<SymmTensor4thOrder<Cmpt>, Cmpt, 9>& vs
@@ -51,7 +51,7 @@ inline SymmTensor4thOrder<Cmpt>::SymmTensor4thOrder
 
 
 // Construct given three Cmpts
-template <class Cmpt>
+template<class Cmpt>
 inline SymmTensor4thOrder<Cmpt>::SymmTensor4thOrder
 (
  const Cmpt txxxx, const Cmpt txxyy, const Cmpt txxzz,
@@ -72,7 +72,7 @@ inline SymmTensor4thOrder<Cmpt>::SymmTensor4thOrder
 
 
 // Construct from Istream
-template <class Cmpt>
+template<class Cmpt>
 inline SymmTensor4thOrder<Cmpt>::SymmTensor4thOrder(Istream& is)
 :
     VectorSpace<SymmTensor4thOrder<Cmpt>, Cmpt, 9>(is)
@@ -81,110 +81,110 @@ inline SymmTensor4thOrder<Cmpt>::SymmTensor4thOrder(Istream& is)
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-template <class Cmpt>
+template<class Cmpt>
 inline const Cmpt&  SymmTensor4thOrder<Cmpt>::xxxx() const
 {
     return this->v_[XXXX];
 }
 
-template <class Cmpt>
+template<class Cmpt>
 inline const Cmpt&  SymmTensor4thOrder<Cmpt>::xxyy() const
 {
     return this->v_[XXYY];
 }
 
-template <class Cmpt>
+template<class Cmpt>
 inline const Cmpt&  SymmTensor4thOrder<Cmpt>::xxzz() const
 {
     return this->v_[XXZZ];
 }
 
-template <class Cmpt>
+template<class Cmpt>
 inline const Cmpt&  SymmTensor4thOrder<Cmpt>::yyyy() const
 {
     return this->v_[YYYY];
 }
 
-template <class Cmpt>
+template<class Cmpt>
 inline const Cmpt&  SymmTensor4thOrder<Cmpt>::yyzz() const
 {
     return this->v_[YYZZ];
 }
 
-template <class Cmpt>
+template<class Cmpt>
 inline const Cmpt&  SymmTensor4thOrder<Cmpt>::zzzz() const
 {
     return this->v_[ZZZZ];
 }
 
-template <class Cmpt>
+template<class Cmpt>
 inline const Cmpt&  SymmTensor4thOrder<Cmpt>::xyxy() const
 {
     return this->v_[XYXY];
 }
 
-template <class Cmpt>
+template<class Cmpt>
 inline const Cmpt&  SymmTensor4thOrder<Cmpt>::yzyz() const
 {
     return this->v_[YZYZ];
 }
 
-template <class Cmpt>
+template<class Cmpt>
 inline const Cmpt&  SymmTensor4thOrder<Cmpt>::zxzx() const
 {
     return this->v_[ZXZX];
 }
 
 
-template <class Cmpt>
+template<class Cmpt>
 inline Cmpt& SymmTensor4thOrder<Cmpt>::xxxx()
 {
     return this->v_[XXXX];
 }
 
-template <class Cmpt>
+template<class Cmpt>
 inline Cmpt& SymmTensor4thOrder<Cmpt>::xxyy()
 {
     return this->v_[XXYY];
 }
 
-template <class Cmpt>
+template<class Cmpt>
 inline Cmpt& SymmTensor4thOrder<Cmpt>::xxzz()
 {
     return this->v_[XXZZ];
 }
 
-template <class Cmpt>
+template<class Cmpt>
 inline Cmpt& SymmTensor4thOrder<Cmpt>::yyyy()
 {
     return this->v_[YYYY];
 }
 
-template <class Cmpt>
+template<class Cmpt>
 inline Cmpt& SymmTensor4thOrder<Cmpt>::yyzz()
 {
     return this->v_[YYZZ];
 }
 
-template <class Cmpt>
+template<class Cmpt>
 inline Cmpt& SymmTensor4thOrder<Cmpt>::zzzz()
 {
     return this->v_[ZZZZ];
 }
 
-template <class Cmpt>
+template<class Cmpt>
 inline Cmpt& SymmTensor4thOrder<Cmpt>::xyxy()
 {
     return this->v_[XYXY];
 }
 
-template <class Cmpt>
+template<class Cmpt>
 inline Cmpt& SymmTensor4thOrder<Cmpt>::yzyz()
 {
     return this->v_[YZYZ];
 }
 
-template <class Cmpt>
+template<class Cmpt>
 inline Cmpt& SymmTensor4thOrder<Cmpt>::zxzx()
 {
     return this->v_[ZXZX];
@@ -196,7 +196,7 @@ inline Cmpt& SymmTensor4thOrder<Cmpt>::zxzx()
 
 //- Double-dot-product between a fourth order symmetric tensor and
 //  a symmetric tensor
-template <class Cmpt>
+template<class Cmpt>
 inline SymmTensor<Cmpt>
 operator&&(const SymmTensor4thOrder<Cmpt>& t4th, const SymmTensor<Cmpt>& st)
 {
@@ -216,7 +216,7 @@ operator&&(const SymmTensor4thOrder<Cmpt>& t4th, const SymmTensor<Cmpt>& st)
 
 //- Double-dot-product between a symmetric tensor and a symmetric
 //  fourth order tensor
-template <class Cmpt>
+template<class Cmpt>
 inline SymmTensor<Cmpt>
 operator&&(const SymmTensor<Cmpt>& st, const SymmTensor4thOrder<Cmpt>& t4th)
 {
@@ -238,7 +238,7 @@ operator&&(const SymmTensor<Cmpt>& st, const SymmTensor4thOrder<Cmpt>& t4th)
 
 //- Inner-product between a symmTensor4thOrder and a vector
 //  this is not implemented
-template <class Cmpt>
+template<class Cmpt>
 inline Vector<Cmpt>
 operator&(const SymmTensor4thOrder<Cmpt>& st, const Vector<Cmpt>& v)
 {
@@ -259,7 +259,7 @@ operator&(const SymmTensor4thOrder<Cmpt>& st, const Vector<Cmpt>& v)
 
 //- Inner-product between a vector and a symmTensor4thOrder
 //  this is not implemented
-template <class Cmpt>
+template<class Cmpt>
 inline Vector<Cmpt>
 operator&(const Vector<Cmpt>& v, const SymmTensor4thOrder<Cmpt>& st)
 {

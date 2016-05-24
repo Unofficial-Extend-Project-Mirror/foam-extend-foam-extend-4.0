@@ -10,11 +10,9 @@
     const scalar UUrf = mesh.solutionDict().relaxationFactor(U.name());
 
     // Momentum solution
-    eqnResidual = solve
+    solve
     (
         relax(HUEqn(), UUrf)
      ==
         -fvc::grad(p)
-    ).initialResidual();
-
-    maxResidual = max(eqnResidual, maxResidual);
+    );

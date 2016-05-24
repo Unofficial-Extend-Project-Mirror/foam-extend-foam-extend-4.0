@@ -176,7 +176,7 @@ LienCubicKE::LienCubicKE
 
     C5viscosity_
     (
-       -2*pow3(Cmu_)*pow4(k_)/pow3(epsilon_)*
+       -2.0*pow3(Cmu_)*pow4(k_)/pow3(epsilon_)*
         (
             magSqr(twoSymm(fvc::grad(U_)))
           - magSqr(2*skew(fvc::grad(U_)))

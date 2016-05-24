@@ -1,3 +1,0 @@
-consistentIcoFoam.C
-
-EXE = $(FOAM_APPBIN)/consistentIcoFoam

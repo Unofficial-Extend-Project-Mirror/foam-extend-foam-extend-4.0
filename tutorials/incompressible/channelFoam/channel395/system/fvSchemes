@@ -29,7 +29,7 @@ gradSchemes
 divSchemes
 {
     default         none;
-    div(phi,U)      Gauss linearUpwind Gauss linear;
+    div(phi,U)      Gauss linear;
     div(phi,k)      Gauss limitedLinear 1;
     div(phi,B)      Gauss limitedLinear 1;
     div(B)          Gauss linear;
@@ -58,10 +58,5 @@ snGradSchemes
     default         corrected;
 }
 
-fluxRequired
-{
-    default         no;
-    p;
-}
 
 // ************************************************************************* //

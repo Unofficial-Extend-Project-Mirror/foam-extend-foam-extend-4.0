@@ -62,11 +62,6 @@ snGradSchemes
     default         corrected;
 }
 
-fluxRequired
-{
-    default         no;
-}
-
 relaxationFactors
 {
     k               0.7;

@@ -44,15 +44,15 @@ UNARY_FUNCTION(symmTensor, tensor, twoSymm, transform)
 UNARY_FUNCTION(tensor, tensor, skew, transform)
 UNARY_FUNCTION(tensor, tensor, dev, transform)
 UNARY_FUNCTION(tensor, tensor, dev2, transform)
-UNARY_FUNCTION(scalar, tensor, det, transform)
-UNARY_FUNCTION(tensor, tensor, cof, cof)
+UNARY_FUNCTION(scalar, tensor, det, pow3)
+UNARY_FUNCTION(tensor, tensor, cof, pow2)
 UNARY_FUNCTION(tensor, tensor, inv, inv)
 UNARY_FUNCTION(tensor, tensor, hinv, hinv)
-UNARY_FUNCTION(vector, tensor, eigenValues, sign)
-UNARY_FUNCTION(tensor, tensor, eigenVectors, transform)
 
-UNARY_FUNCTION(vector, symmTensor, eigenValues, sign)
-UNARY_FUNCTION(symmTensor, symmTensor, eigenVectors, transform)
+UNARY_FUNCTION(vector, tensor, eigenValues, transform)
+UNARY_FUNCTION(tensor, tensor, eigenVectors, sign)
+UNARY_FUNCTION(vector, symmTensor, eigenValues, transform)
+UNARY_FUNCTION(symmTensor, symmTensor, eigenVectors, sign)
 
 
 // * * * * * * * * * * * * * * * global operators  * * * * * * * * * * * * * //

@@ -1,10 +1,7 @@
    #include "readPISOControls.H"
    #include "readTimeControls.H"
 
-    label nAlphaSubCycles
-    (
-        readLabel(piso.lookup("nAlphaSubCycles"))
-    );
+    nAlphaSubCycles = readLabel(piso.lookup("nAlphaSubCycles"));
 
     if (nAlphaSubCycles > 1 && nOuterCorr != 1)
     {

@@ -47,6 +47,7 @@ int main(int argc, char *argv[])
 #   include "createMesh.H"
 #   include "readThermodynamicProperties.H"
 #   include "createFields.H"
+#   include "createTimeControls.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

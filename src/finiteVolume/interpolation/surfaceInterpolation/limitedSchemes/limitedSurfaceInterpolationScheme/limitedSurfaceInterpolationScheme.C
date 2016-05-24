@@ -66,7 +66,7 @@ limitedSurfaceInterpolationScheme<Type>::New
             << exit(FatalIOError);
     }
 
-    word schemeName(schemeData);
+    const word schemeName(schemeData);
 
     typename MeshConstructorTable::iterator constructorIter =
         MeshConstructorTablePtr_->find(schemeName);
@@ -121,7 +121,7 @@ limitedSurfaceInterpolationScheme<Type>::New
             << exit(FatalIOError);
     }
 
-    word schemeName(schemeData);
+    const word schemeName(schemeData);
 
     typename MeshFluxConstructorTable::iterator constructorIter =
         MeshFluxConstructorTablePtr_->find(schemeName);

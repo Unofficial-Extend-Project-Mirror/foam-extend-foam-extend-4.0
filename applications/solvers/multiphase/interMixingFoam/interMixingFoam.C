@@ -48,7 +48,7 @@ int main(int argc, char *argv[])
 #   include "readPISOControls.H"
 #   include "initContinuityErrs.H"
 #   include "createFields.H"
-#   include "readTimeControls.H"
+#   include "createTimeControls.H"
 #   include "CourantNo.H"
 #   include "setInitialDeltaT.H"
 #   include "correctPhi.H"

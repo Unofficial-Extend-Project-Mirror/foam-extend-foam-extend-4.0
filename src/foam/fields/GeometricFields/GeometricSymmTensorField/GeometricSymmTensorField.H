@@ -48,7 +48,8 @@ namespace Foam
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-UNARY_FUNCTION(symmTensor, vector, sqr, transform)
+UNARY_FUNCTION(symmTensor, vector, sqr, sqr)
+UNARY_FUNCTION(symmTensor, symmTensor, innerSqr, sqr)
 
 UNARY_FUNCTION(scalar, symmTensor, tr, transform)
 UNARY_FUNCTION(sphericalTensor, symmTensor, sph, transform)
@@ -65,6 +66,10 @@ UNARY_FUNCTION(symmTensor, symmTensor, hinv, hinv)
 // * * * * * * * * * * * * * * * Global operators  * * * * * * * * * * * * * //
 
 UNARY_OPERATOR(vector, symmTensor, *, hdual, transform)
+
+BINARY_OPERATOR(tensor, symmTensor, symmTensor, &, '&', dot)
+BINARY_TYPE_OPERATOR(tensor, symmTensor, symmTensor, &, '&', dot)
+
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

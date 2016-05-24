@@ -46,6 +46,7 @@ int main(int argc, char *argv[])
 #   include "createMesh.H"
 #   include "createFields.H"
 #   include "initContinuityErrs.H"
+#   include "createTimeControls.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

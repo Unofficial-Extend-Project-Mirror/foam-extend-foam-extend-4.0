@@ -34,15 +34,18 @@ Author
 \*---------------------------------------------------------------------------*/
 
 #include "fvCFD.H"
+#include "pisoControl.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 int main(int argc, char *argv[])
 {
 #   include "setRootCase.H"
-
 #   include "createTime.H"
 #   include "createMesh.H"
+
+    pisoControl piso(mesh);
+
 #   include "createFields.H"
 #   include "initContinuityErrs.H"
 
@@ -54,7 +57,6 @@ int main(int argc, char *argv[])
     {
         Info<< "Time = " << runTime.timeName() << nl << endl;
 
-#       include "readPISOControls.H"
 #       include "CourantNo.H"
 
         // Convection-diffusion matrix
@@ -67,7 +69,10 @@ int main(int argc, char *argv[])
         // Time derivative matrix
         fvVectorMatrix ddtUEqn(fvm::ddt(U));
 
-        solve(ddtUEqn + HUEqn == -fvc::grad(p));
+        if (piso.momentumPredictor())
+        {
+            solve(ddtUEqn + HUEqn == -fvc::grad(p));
+        }
 
         // Prepare clean Ap without time derivative contribution
         // HJ, 26/Oct/2015
@@ -75,14 +80,14 @@ int main(int argc, char *argv[])
 
         // --- PISO loop
 
-        for (int corr = 0; corr < nCorr; corr++)
+        while (piso.correct())
         {
             U = HUEqn.H()/aU;
             phi = (fvc::interpolate(U) & mesh.Sf());
 
             adjustPhi(phi, U, p);
 
-            for (int nonOrth = 0; nonOrth <= nNonOrthCorr; nonOrth++)
+            while (piso.correctNonOrthogonal())
             {
                 fvScalarMatrix pEqn
                 (
@@ -90,9 +95,12 @@ int main(int argc, char *argv[])
                 );
 
                 pEqn.setReference(pRefCell, pRefValue);
-                pEqn.solve();
+                pEqn.solve
+                (
+                    mesh.solutionDict().solver(p.select(piso.finalInnerIter()))
+                );
 
-                if (nonOrth == nNonOrthCorr)
+                if (piso.finalNonOrthogonalIter())
                 {
                     phi -= pEqn.flux();
                 }

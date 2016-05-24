@@ -6,8 +6,8 @@
     // HJ, 26/Oct/2015
     aU = HUEqn.A();
 
-    // Store velocity under-relaxation point before using U for
-    // the flux precursor
+    // Store velocity under-relaxation point before using U for the flux
+    // precursor
     U.storePrevIter();
 
     U = HUEqn.H()/aU;
@@ -16,7 +16,7 @@
     // Global flux balance
     adjustPhi(phi, U, p);
 
-    for (int nonOrth = 0; nonOrth <= nNonOrthCorr; nonOrth++)
+    while (pimple.correctNonOrthogonal())
     {
         fvScalarMatrix pEqn
         (
@@ -24,31 +24,19 @@
         );
 
         pEqn.setReference(pRefCell, pRefValue);
-
-        if
+        pEqn.solve
         (
-            corr == nCorr - 1
-         && nonOrth == nNonOrthCorr
-        )
-        {
-            pEqn.solve
-            (
-                mesh.solutionDict().solver(p.name() + "Final")
-            );
-        }
-        else
-        {
-            pEqn.solve(mesh.solutionDict().solver(p.name()));
-        }
+            mesh.solutionDict().solver(p.select(pimple.finalInnerIter()))
+        );
 
-        if (nonOrth == nNonOrthCorr)
+        if (pimple.finalNonOrthogonalIter())
         {
             phi -= pEqn.flux();
         }
     }
 
-    // Explicitly relax pressure for momentum corrector
-    if (oCorr != nOuterCorr - 1)
+    // Explicitly relax pressure for momentum corrector except for last corrector
+    if (!pimple.finalIter())
     {
         p.relax();
     }

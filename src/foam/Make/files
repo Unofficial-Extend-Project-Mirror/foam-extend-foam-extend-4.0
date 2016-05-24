@@ -51,6 +51,7 @@ primitives/Vector/vector/vector.C
 
 primitives/Tensor2D/tensor2D/tensor2D.C
 primitives/SphericalTensor2D/sphericalTensor2D/sphericalTensor2D.C
+primitives/SymmTensor2D/symmTensor2D/symmTensor2D.C
 primitives/Vector2D/vector2D/vector2D.C
 
 primitives/complex/complex.C
@@ -639,6 +640,8 @@ $(writers)/rawGraph/rawGraph.C
 $(writers)/gnuplotGraph/gnuplotGraph.C
 $(writers)/xmgrGraph/xmgrGraph.C
 $(writers)/jplotGraph/jplotGraph.C
+
+meshes/data/data.C
 
 primitives/BlockCoeff/blockCoeffBase.C
 primitives/BlockCoeff/scalarBlockCoeff.C

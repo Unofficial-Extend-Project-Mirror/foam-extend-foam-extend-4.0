@@ -33,6 +33,7 @@ Description
 #include "hsCombustionThermo.H"
 #include "turbulenceModel.H"
 #include "combustionModel.H"
+#include "pimpleControl.H"
 
 #include "radiationModel.H"
 
@@ -43,11 +44,14 @@ int main(int argc, char *argv[])
     #include "setRootCase.H"
     #include "createTime.H"
     #include "createMesh.H"
+
+    pimpleControl pimple(mesh);
+
     #include "readGravitationalAcceleration.H"
     #include "initContinuityErrs.H"
     #include "createFields.H"
     #include "createRadiationModel.H"
-    #include "readTimeControls.H"
+    #include "createTimeControls.H"
     #include "compressibleCourantNo.H"
     #include "setInitialDeltaT.H"
 
@@ -57,7 +61,6 @@ int main(int argc, char *argv[])
 
     while (runTime.run())
     {
-        #include "readPISOControls.H"
         #include "readTimeControls.H"
         #include "compressibleCourantNo.H"
         #include "setDeltaT.H"
@@ -68,7 +71,7 @@ int main(int argc, char *argv[])
         #include "rhoEqn.H"
 
         // --- Pressure-velocity PIMPLE corrector loop
-        for (int oCorr=0; oCorr<nOuterCorr; oCorr++)
+        while (pimple.loop())
         {
             #include "UEqn.H"
 
@@ -76,7 +79,7 @@ int main(int argc, char *argv[])
             #include "fuhsEqn.H"
 
             // --- PISO loop
-            for (int corr = 0; corr < nCorr; corr++)
+            while (pimple.correct())
             {
                 #include "pEqn.H"
             }

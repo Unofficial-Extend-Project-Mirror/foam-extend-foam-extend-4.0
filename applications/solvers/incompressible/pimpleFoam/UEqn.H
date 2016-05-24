@@ -1,4 +1,4 @@
-// Convection-diffusion matrx
+// Convection-diffusion matrix
 fvVectorMatrix HUEqn
 (
     fvm::div(phi, U)
@@ -9,28 +9,19 @@ fvVectorMatrix HUEqn
 fvVectorMatrix ddtUEqn(fvm::ddt(U));
 
 // Get under-relaxation factor
-scalar UUrf = mesh.solutionDict().relaxationFactor(U.name());
+scalar UUrf =
+    mesh.solutionDict().relaxationFactor(U.select(pimple.finalIter()));
 
-if (oCorr == nOuterCorr - 1)
+if (pimple.momentumPredictor())
 {
-    if (mesh.solutionDict().relax("UFinal"))
-    {
-        UUrf = mesh.solutionDict().relaxationFactor("UFinal");
-    }
-    else
-    {
-        UUrf = 1;
-    }
-}
-
-if (momentumPredictor)
-{
+    // Solve momentum predictor
     solve
     (
         ddtUEqn
       + relax(HUEqn, UUrf)
      ==
-      - fvc::grad(p)
+      - fvc::grad(p),
+        mesh.solutionDict().solver((U.select(pimple.finalIter())))
     );
 }
 else

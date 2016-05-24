@@ -52,7 +52,7 @@ int main(int argc, char *argv[])
     #include "createClouds.H"
     #include "createRadiationModel.H"
     #include "initContinuityErrs.H"
-    #include "readTimeControls.H"
+    #include "createTimeControls.H"
     #include "compressibleCourantNo.H"
     #include "setInitialDeltaT.H"
 

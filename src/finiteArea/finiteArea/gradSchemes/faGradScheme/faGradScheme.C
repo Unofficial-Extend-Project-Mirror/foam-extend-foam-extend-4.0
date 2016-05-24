@@ -59,7 +59,8 @@ tmp<gradScheme<Type> > gradScheme<Type>::New
     {
         FatalIOErrorIn
         (
-            "gradScheme<Type>::New(Istream& schemeData)",
+            "gradScheme<Type>::New"
+            "(const faMesh& mesh, Istream& schemeData)",
             schemeData
         )   << "Grad scheme not specified" << endl << endl
             << "Valid grad schemes are :" << endl
@@ -67,7 +68,7 @@ tmp<gradScheme<Type> > gradScheme<Type>::New
             << exit(FatalIOError);
     }
 
-    word schemeName(schemeData);
+    const word schemeName(schemeData);
 
     typename IstreamConstructorTable::iterator cstrIter =
         IstreamConstructorTablePtr_->find(schemeName);
@@ -76,9 +77,10 @@ tmp<gradScheme<Type> > gradScheme<Type>::New
     {
         FatalIOErrorIn
         (
-            "gradScheme<Type>::New(Istream& schemeData)",
+            "gradScheme<Type>::New"
+            "(const faMesh& mesh, Istream& schemeData)",
             schemeData
-        )   << "unknown grad scheme " << schemeName << endl << endl
+        )   << "Unknown grad scheme " << schemeName << nl << nl
             << "Valid grad schemes are :" << endl
             << IstreamConstructorTablePtr_->sortedToc()
             << exit(FatalIOError);

@@ -3,7 +3,7 @@ rho = thermo.rho();
 volScalarField rUA = 1.0/UEqn.A();
 U = rUA*UEqn.H();
 
-if (transonic)
+if (piso.transonic())
 {
     surfaceScalarField phid
     (
@@ -12,7 +12,7 @@ if (transonic)
        *((fvc::interpolate(U) & mesh.Sf()) - fvc::meshPhi(rho, U))
     );
 
-    for (int nonOrth=0; nonOrth<=nNonOrthCorr; nonOrth++)
+    while (piso.correctNonOrthogonal())
     {
         fvScalarMatrix pEqn
         (
@@ -23,7 +23,7 @@ if (transonic)
 
         pEqn.solve();
 
-        if (nonOrth == nNonOrthCorr)
+        if (piso.finalNonOrthogonalIter())
         {
             phi == pEqn.flux();
         }
@@ -34,7 +34,7 @@ else
     phi = fvc::interpolate(rho)
          *((fvc::interpolate(U) & mesh.Sf()) - fvc::meshPhi(rho, U));
 
-    for (int nonOrth=0; nonOrth<=nNonOrthCorr; nonOrth++)
+    while (piso.correctNonOrthogonal())
     {
         fvScalarMatrix pEqn
         (
@@ -45,7 +45,7 @@ else
 
         pEqn.solve();
 
-        if (nonOrth == nNonOrthCorr)
+        if (piso.finalNonOrthogonalIter())
         {
             phi += pEqn.flux();
         }

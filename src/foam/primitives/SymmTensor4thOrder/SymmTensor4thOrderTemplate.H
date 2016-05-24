@@ -66,7 +66,7 @@ namespace Foam
                        Class SymmTensor4thOrder Declaration
 \*---------------------------------------------------------------------------*/
 
-template <class Cmpt>
+template<class Cmpt>
 class SymmTensor4thOrder
 :
     public VectorSpace<SymmTensor4thOrder<Cmpt>, Cmpt, 9>

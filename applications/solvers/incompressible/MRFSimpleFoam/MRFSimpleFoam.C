@@ -34,6 +34,7 @@ Description
 #include "incompressible/singlePhaseTransportModel/singlePhaseTransportModel.H"
 #include "incompressible/RAS/RASModel/RASModel.H"
 #include "MRFZones.H"
+#include "simpleControl.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -44,6 +45,9 @@ int main(int argc, char *argv[])
 
 #   include "createTime.H"
 #   include "createMesh.H"
+
+    simpleControl simple(mesh);
+
 #   include "createFields.H"
 #   include "initContinuityErrs.H"
 
@@ -54,8 +58,6 @@ int main(int argc, char *argv[])
     for (runTime++; !runTime.end(); runTime++)
     {
         Info<< "Time = " << runTime.timeName() << nl << endl;
-
-#       include "readSIMPLEControls.H"
 
         p.storePrevIter();
 
@@ -83,7 +85,7 @@ int main(int argc, char *argv[])
             adjustPhi(phi, U, p);
 
             // Non-orthogonal pressure corrector loop
-            for (int nonOrth=0; nonOrth<=nNonOrthCorr; nonOrth++)
+            while (simple.correctNonOrthogonal())
             {
                 fvScalarMatrix pEqn
                 (
@@ -93,7 +95,7 @@ int main(int argc, char *argv[])
                 pEqn.setReference(pRefCell, pRefValue);
                 pEqn.solve();
 
-                if (nonOrth == nNonOrthCorr)
+                if (simple.finalNonOrthogonalIter())
                 {
                     phi -= pEqn.flux();
                 }

@@ -27,6 +27,7 @@ License
 #include "foamTime.H"
 #include "demandDrivenData.H"
 #include "dictionary.H"
+#include "data.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -927,6 +928,23 @@ void Foam::GeometricField<Type, PatchField, GeoMesh>::relax()
     if (alpha > 0)
     {
         relax(alpha);
+    }
+}
+
+
+template<class Type, template<class> class PatchField, class GeoMesh>
+Foam::word Foam::GeometricField<Type, PatchField, GeoMesh>::select
+(
+    bool final
+) const
+{
+    if (final)
+    {
+        return this->name() + "Final";
+    }
+    else
+    {
+        return this->name();
     }
 }
 

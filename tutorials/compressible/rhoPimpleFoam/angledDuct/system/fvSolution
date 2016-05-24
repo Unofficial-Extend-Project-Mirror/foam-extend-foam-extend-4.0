@@ -118,9 +118,11 @@ PIMPLE
 relaxationFactors
 {
     U               0.7;
+    UFinal          1.0;
     p               0.3;
     rho             0.05;
     h               0.7;
+    hFinal          1.0;
     k               0.7;
     omega           0.7;
 }

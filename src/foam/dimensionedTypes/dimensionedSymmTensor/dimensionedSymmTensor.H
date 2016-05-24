@@ -51,6 +51,7 @@ typedef dimensioned<symmTensor> dimensionedSymmTensor;
 // global functions
 
 dimensionedSymmTensor sqr(const dimensionedVector&);
+dimensionedSymmTensor innerSqr(const dimensionedSymmTensor&);
 
 dimensionedScalar tr(const dimensionedSymmTensor&);
 dimensionedSymmTensor symm(const dimensionedSymmTensor&);

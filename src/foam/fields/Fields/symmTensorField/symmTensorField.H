@@ -39,6 +39,7 @@ SourceFiles
 #include "vectorField.H"
 #include "sphericalTensor.H"
 #include "symmTensor.H"
+#include "tensor.H"
 
 #define TEMPLATE
 #include "FieldFunctionsM.H"
@@ -53,6 +54,7 @@ typedef Field<symmTensor> symmTensorField;
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 UNARY_FUNCTION(symmTensor, vector, sqr)
+UNARY_FUNCTION(symmTensor, symmTensor, innerSqr)
 
 UNARY_FUNCTION(scalar, symmTensor, tr)
 UNARY_FUNCTION(sphericalTensor, symmTensor, sph)
@@ -69,6 +71,9 @@ UNARY_FUNCTION(symmTensor, symmTensor, hinv)
 // * * * * * * * * * * * * * * * global operators  * * * * * * * * * * * * * //
 
 UNARY_OPERATOR(vector, symmTensor, *, hdual)
+
+BINARY_OPERATOR(tensor, symmTensor, symmTensor, &, dot)
+BINARY_TYPE_OPERATOR(tensor, symmTensor, symmTensor, &, dot)
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

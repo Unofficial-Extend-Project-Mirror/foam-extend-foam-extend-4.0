@@ -39,6 +39,7 @@ Author
 #include "IFstream.H"
 #include "OFstream.H"
 #include "Random.H"
+#include "pisoControl.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -47,6 +48,9 @@ int main(int argc, char *argv[])
     #include "setRootCase.H"
     #include "createTime.H"
     #include "createMesh.H"
+
+    pisoControl piso(mesh);
+
     #include "readTransportProperties.H"
     #include "createFields.H"
     #include "initContinuityErrs.H"
@@ -57,8 +61,6 @@ int main(int argc, char *argv[])
     while (runTime.loop())
     {
         Info<< "Time = " << runTime.timeName() << nl << endl;
-
-        #include "readPISOControls.H"
 
         #include "CourantNo.H"
 
@@ -76,7 +78,7 @@ int main(int argc, char *argv[])
         // Time derivative matrix
         fvVectorMatrix ddtUEqn(fvm::ddt(U));
 
-        if (momentumPredictor)
+        if (piso.momentumPredictor())
         {
             solve(ddtUEqn + HUEqn == -fvc::grad(p));
         }
@@ -87,14 +89,14 @@ int main(int argc, char *argv[])
 
         // --- PISO loop
 
-        for (int corr = 0; corr < nCorr; corr++)
+        while (piso.correct())
         {
             U = HUEqn.H()/aU;
             phi = (fvc::interpolate(U) & mesh.Sf());
 
             adjustPhi(phi, U, p);
 
-            for (int nonOrth = 0; nonOrth <= nNonOrthCorr; nonOrth++)
+            while (piso.correctNonOrthogonal())
             {
                 fvScalarMatrix pEqn
                 (
@@ -102,17 +104,12 @@ int main(int argc, char *argv[])
                 );
 
                 pEqn.setReference(pRefCell, pRefValue);
+                pEqn.solve
+                (
+                    mesh.solutionDict().solver(p.select(piso.finalInnerIter()))
+                );
 
-                if (corr == nCorr-1 && nonOrth == nNonOrthCorr)
-                {
-                    pEqn.solve(mesh.solutionDict().solver(p.name() + "Final"));
-                }
-                else
-                {
-                    pEqn.solve(mesh.solutionDict().solver(p.name()));
-                }
-
-                if (nonOrth == nNonOrthCorr)
+                if (piso.finalNonOrthogonalIter())
                 {
                     phi -= pEqn.flux();
                 }

@@ -76,7 +76,7 @@ class fvSchemes
         dictionary laplacianSchemes_;
         ITstream defaultLaplacianScheme_;
 
-        dictionary fluxRequired_;
+        mutable dictionary fluxRequired_;
         bool defaultFluxRequired_;
 
 
@@ -123,6 +123,8 @@ public:
             ITstream& snGradScheme(const word& name) const;
 
             ITstream& laplacianScheme(const word& name) const;
+
+            void setFluxRequired(const word& name) const;
 
             bool fluxRequired(const word& name) const;
 

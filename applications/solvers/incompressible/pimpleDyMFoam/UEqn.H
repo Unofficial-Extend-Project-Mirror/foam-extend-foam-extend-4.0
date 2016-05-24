@@ -9,25 +9,18 @@
     fvVectorMatrix ddtUEqn(fvm::ddt(U));
 
     // Get under-relaxation factor
-    scalar UUrf = mesh.solutionDict().relaxationFactor(U.name());
+    scalar UUrf =
+        mesh.solutionDict().relaxationFactor(U.select(pimple.finalIter()));
 
-    if (oCorr == nOuterCorr - 1)
+    if (pimple.momentumPredictor())
     {
-        if (mesh.solutionDict().relax("UFinal"))
-        {
-            UUrf = mesh.solutionDict().relaxationFactor("UFinal");
-        }
-        else
-        {
-            UUrf = 1;
-        }
+        // Solve momentum predictor
+        solve
+        (
+            ddtUEqn
+          + relax(HUEqn, UUrf)
+         ==
+          - fvc::grad(p),
+            mesh.solutionDict().solver((U.select(pimple.finalIter())))
+        );
     }
-
-    // Solve momentum predictor
-    solve
-    (
-        ddtUEqn
-      + relax(HUEqn, UUrf)
-     ==
-      - fvc::grad(p)
-    );

@@ -277,9 +277,7 @@ void realizableKE::correct()
         return;
     }
 
-    const tmp<volTensorField> tgradU = fvc::grad(U_);
-    const volTensorField& gradU = tgradU();
-
+    volTensorField gradU = fvc::grad(U_);
     volScalarField S2 = 2*magSqr(dev(symm(gradU)));
     volScalarField magS = sqrt(S2);
 

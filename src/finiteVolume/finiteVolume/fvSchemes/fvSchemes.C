@@ -558,6 +558,17 @@ Foam::ITstream& Foam::fvSchemes::laplacianScheme(const word& name) const
 }
 
 
+void Foam::fvSchemes::setFluxRequired(const word& name) const
+{
+    if (debug)
+    {
+        Info<< "Setting fluxRequired for " << name << endl;
+    }
+
+    fluxRequired_.add(name, true, true);
+}
+
+
 bool Foam::fvSchemes::fluxRequired(const word& name) const
 {
     if (debug)
