@@ -122,6 +122,14 @@ class fvBlockMatrix
                 const scalarField& coeffIJ
             );
 
+            //- Insert coupling matrix diag and source into this fvBlockMatrix
+            void insertCouplingDiagSource
+            (
+                const direction dirI,
+                const direction dirJ,
+                const fvScalarMatrix& matrix
+            );
+
             //- Insert coupling matrix lower and upper into this fvBlockMatrix
             void insertCouplingUpperLower
             (
@@ -219,7 +227,7 @@ public:
                 const bool incrementColumnDir
             );
 
-            //- Insert scalar equation coupling into this fvBlockMatrix
+            //- Insert diagonal only equation coupling into this fvBlockMatrix
             //  Source compensation is done in function updateSourceCoupling()
             //  after all coupling terms are added.  HJ, 27/Apr/2015
             void insertEquationCoupling
@@ -227,6 +235,14 @@ public:
                 const direction dirI,
                 const direction dirJ,
                 const scalarField& coeffIJ
+            );
+
+            //- Insert scalar equation coupling into this fvBlockMatrix
+            void insertEquationCoupling
+            (
+                const direction dirI,
+                const direction dirJ,
+                const fvScalarMatrix& matrix
             );
 
             //- Add field into block field
@@ -242,6 +258,25 @@ public:
             //  user from the source, leaving the implicit update given by
             //  linearisation
             void updateSourceCoupling();
+
+            //- Insert adjoint convection tensor term. Hard coded to correspond
+            //  to Gauss gradient discretisation with linear interpolation. This
+            //  needs to be reorganised. VV, 7/Apr/2016.
+            void insertAdjointConvection
+            (
+                const direction UEqnDir,
+                const volVectorField& U,
+                const volVectorField& UStar
+            );
+
+            //- Insert Picard tensor term that comes from Picard linearisation
+            // of convection term in momentum equation. VV, 21/July/2014.
+            void insertPicardTensor
+            (
+                const direction UEqnDir,
+                const volVectorField& U,
+                const surfaceScalarField& phi
+            );
 
 
         // Solver calls for fvBlockMatrix
