@@ -47,7 +47,7 @@ namespace solidBodyMotionFunctions
 {
 
 /*---------------------------------------------------------------------------*\
-                          Class rotatingOscillation Declaration
+                      Class rotatingOscillation Declaration
 \*---------------------------------------------------------------------------*/
 
 class rotatingOscillation
@@ -97,19 +97,6 @@ public:
             const Time& runTime
         );
 
- /*       //- Construct and return a clone
-        virtual autoPtr<solidBodyMotionFunction> clone() const
-        {
-            return autoPtr<solidBodyMotionFunction>
-            (
-                new rotatingOscillation
-                (
-                    SBMFCoeffs_,
-                    time_
-                )
-            );
-        }
-*/
 
     //- Destructor
     virtual ~rotatingOscillation();
@@ -120,7 +107,7 @@ public:
         //- Return the solid-body motion transformation septernion
         virtual septernion transformation() const;
 
-	//- Return the solid-body motion velocity
+        //- Return the solid-body motion velocity
         virtual septernion velocity() const;
 
         //- Update properties from given dictionary
