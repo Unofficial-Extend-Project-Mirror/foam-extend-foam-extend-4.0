@@ -70,13 +70,14 @@
 
 
     // Create numeric flux
-    numericFlux<rusanovFlux, BarthJespersenLimiter> dbnsFlux
+    autoPtr<basicNumericFlux> dbnsFluxPtr = basicNumericFlux::New
     (
         p,
         U,
         T,
         thermo()
     );
+    basicNumericFlux& dbnsFlux = dbnsFluxPtr();
 
     // Create mass flux alias for easier coupling with other code components
     const surfaceScalarField& phi = dbnsFlux.rhoFlux();

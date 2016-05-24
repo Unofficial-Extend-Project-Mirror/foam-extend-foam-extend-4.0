@@ -21,67 +21,39 @@ License
     You should have received a copy of the GNU General Public License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
-Class
-    numericFluxBase
-
-Description
-    Base numeric flux class for density-based solvers
-
-Author
-    Aleksandar Jemcov
-    Rewrite by Hrvoje Jasak
-
-SourceFiles
-    numericFluxBase.H
-    numericFluxBase.C
-
 \*---------------------------------------------------------------------------*/
 
-#ifndef numericFluxBase_H
-#define numericFluxBase_H
+#include "makeBasicNumericFlux.H"
 
-#include "basicNumericFlux.H"
-#include "volFieldsFwd.H"
-#include "surfaceFieldsFwd.H"
+#include "rusanovFlux.H"
+#include "roeFlux.H"
+#include "betaFlux.H"
+#include "hllcFlux.H"
+#include "hllcALEFlux.H"
+
+#include "firstOrderLimiter.H"
+#include "BarthJespersenLimiter.H"
+#include "VenkatakrishnanLimiter.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 
-/*---------------------------------------------------------------------------*\
-                        Class numericFluxBase Declaration
-\*---------------------------------------------------------------------------*/
+/* * * * * * * * * * * * * * * Private Static Data * * * * * * * * * * * * * */
 
-template<class Flux>
-class numericFluxBase
-:
-    public basicNumericFlux,
-    public Flux
-{
-public:
+#define makeBasicNumericFluxForAllLimiters(Flux)                              \
+makeBasicNumericFlux(Flux, firstOrderLimiter);                                \
+makeBasicNumericFlux(Flux, BarthJespersenLimiter);                            \
+makeBasicNumericFlux(Flux, VenkatakrishnanLimiter);
 
-    // Constructors
-
-        //- Construct from mesh
-        numericFluxBase(const fvMesh& mesh)
-        :
-            basicNumericFlux(mesh)    
-        {}
-
-
-    //- Destructor
-    virtual ~numericFluxBase()
-    {}
-};
-
+makeBasicNumericFluxForAllLimiters(rusanovFlux);
+makeBasicNumericFluxForAllLimiters(betaFlux);
+makeBasicNumericFluxForAllLimiters(roeFlux);
+makeBasicNumericFluxForAllLimiters(hllcFlux);
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-#endif
 
 // ************************************************************************* //

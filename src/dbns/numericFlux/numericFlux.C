@@ -24,6 +24,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "numericFlux.H"
+#include "MDLimiter.H"
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
@@ -37,8 +38,7 @@ Foam::numericFlux<Flux, Limiter>::numericFlux
     basicThermo& thermo
 )
 :
-    numericFluxBase<Flux>(),
-    mesh_(p.mesh()),
+    numericFluxBase<Flux>(p.mesh()),
     p_(p),
     U_(U),
     T_(T),
@@ -48,20 +48,20 @@ Foam::numericFlux<Flux, Limiter>::numericFlux
         IOobject
         (
             "phi",
-            mesh_.time().timeName(),
-            mesh_,
+            this->mesh().time().timeName(),
+            this->mesh(),
             IOobject::NO_READ,
             IOobject::NO_WRITE
         ),
-        (linearInterpolate(thermo_.rho()*U_) & mesh_.Sf())
+        (linearInterpolate(thermo_.rho()*U_) & this->mesh().Sf())
     ),
     rhoUFlux_
     (
         IOobject
         (
             "rhoUFlux",
-            mesh_.time().timeName(),
-            mesh_,
+            this->mesh().time().timeName(),
+            this->mesh(),
             IOobject::NO_READ,
             IOobject::NO_WRITE
         ),
@@ -72,8 +72,8 @@ Foam::numericFlux<Flux, Limiter>::numericFlux
         IOobject
         (
             "rhoEFlux",
-            mesh_.time().timeName(),
-            mesh_,
+            this->mesh().time().timeName(),
+            this->mesh(),
             IOobject::NO_READ,
             IOobject::NO_WRITE
         ),
@@ -88,15 +88,15 @@ template<class Flux, class Limiter>
 void Foam::numericFlux<Flux, Limiter>::computeFlux()
 {
     // Get face-to-cell addressing: face area point from owner to neighbour
-    const unallocLabelList& owner = mesh_.owner();
-    const unallocLabelList& neighbour = mesh_.neighbour();
+    const unallocLabelList& owner = this->mesh().owner();
+    const unallocLabelList& neighbour = this->mesh().neighbour();
 
     // Get the face area vector
-    const surfaceVectorField& Sf = mesh_.Sf();
-    const surfaceScalarField& magSf = mesh_.magSf();
+    const surfaceVectorField& Sf = this->mesh().Sf();
+    const surfaceScalarField& magSf = this->mesh().magSf();
 
-    const volVectorField& cellCentre = mesh_.C();
-    const surfaceVectorField& faceCentre = mesh_.Cf();
+    const volVectorField& cellCentre = this->mesh().C();
+    const surfaceVectorField& faceCentre = this->mesh().Cf();
 
     // Thermodynamics
     const volScalarField Cv = thermo_.Cv();

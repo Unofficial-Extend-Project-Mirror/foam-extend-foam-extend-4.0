@@ -27,6 +27,12 @@ gradSchemes
 
 divSchemes
 {
+    dbns
+    {
+        flux           rusanov;
+        limiter        BarthJespersen;
+    }
+
     default         none;
     div(phi,k)      Gauss upwind;
     div(phi,epsilon) Gauss upwind;

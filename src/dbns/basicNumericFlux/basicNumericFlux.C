@@ -21,67 +21,31 @@ License
     You should have received a copy of the GNU General Public License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
-Class
-    numericFluxBase
-
-Description
-    Base numeric flux class for density-based solvers
-
-Author
-    Aleksandar Jemcov
-    Rewrite by Hrvoje Jasak
-
-SourceFiles
-    numericFluxBase.H
-    numericFluxBase.C
-
 \*---------------------------------------------------------------------------*/
 
-#ifndef numericFluxBase_H
-#define numericFluxBase_H
-
 #include "basicNumericFlux.H"
-#include "volFieldsFwd.H"
-#include "surfaceFieldsFwd.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
+    defineTypeNameAndDebug(basicNumericFlux, 0);
+    defineRunTimeSelectionTable(basicNumericFlux, state);
+}
 
-/*---------------------------------------------------------------------------*\
-                        Class numericFluxBase Declaration
-\*---------------------------------------------------------------------------*/
 
-template<class Flux>
-class numericFluxBase
+// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
+
+Foam::basicNumericFlux::basicNumericFlux(const fvMesh& mesh)
 :
-    public basicNumericFlux,
-    public Flux
-{
-public:
-
-    // Constructors
-
-        //- Construct from mesh
-        numericFluxBase(const fvMesh& mesh)
-        :
-            basicNumericFlux(mesh)    
-        {}
+    mesh_(mesh)
+{}
 
 
-    //- Destructor
-    virtual ~numericFluxBase()
-    {}
-};
+// * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
+Foam::basicNumericFlux::~basicNumericFlux()
+{}
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-#endif
 
 // ************************************************************************* //
