@@ -635,7 +635,7 @@ Foam::Pstream::nProcsSimpleSum
 );
 
 
-const Foam::debug::optimisationSwitch
+Foam::debug::optimisationSwitch
 Foam::Pstream::defaultCommsType
 (
     "commsType",

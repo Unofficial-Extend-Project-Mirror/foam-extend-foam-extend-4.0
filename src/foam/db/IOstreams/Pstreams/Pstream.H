@@ -257,7 +257,7 @@ public:
         static const debug::optimisationSwitch nProcsSimpleSum;
 
         //- Default commsType
-        static const debug::optimisationSwitch defaultCommsType;
+        static debug::optimisationSwitch defaultCommsType;
 
         //- Default comms with a cast
         inline static Pstream::commsTypes defaultComms()
