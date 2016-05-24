@@ -30,6 +30,11 @@ Description
 
     Turbulence modelling is generic, i.e. laminar, RAS or LES may be selected.
 
+    Consistent formulation without time-step and relaxation dependence by Jasak
+
+Author
+    Hrvoje Jasak, Wikki Ltd.  All rights reserved
+
 \*---------------------------------------------------------------------------*/
 
 #include "fvCFD.H"

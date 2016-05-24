@@ -26,6 +26,10 @@ Application
 
 Description
     Steady-state solver for incompressible, turbulent flow
+    Consistent formulation without time-step and relaxation dependence by Jasak
+
+Author
+    Hrvoje Jasak, Wikki Ltd.  All rights reserved
 
 \*---------------------------------------------------------------------------*/
 

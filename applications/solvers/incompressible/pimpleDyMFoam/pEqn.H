@@ -6,8 +6,8 @@
     // HJ, 26/Oct/2015
     aU = HUEqn.A();
 
-    // Store velocity under-relaxation point before using U for the flux
-    // precursor
+    // Store velocity under-relaxation point before using U for
+    // the flux precursor
     U.storePrevIter();
 
     U = HUEqn.H()/aU;
@@ -52,6 +52,9 @@
     {
         p.relax();
     }
+
+    // Make the fluxes relative to the mesh motion
+    fvc::makeRelative(phi, U);
 
 #   include "movingMeshContinuityErrs.H"
 

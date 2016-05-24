@@ -25,8 +25,12 @@ Application
     simpleSRFFoam
 
 Description
-    Steady-state solver for incompressible, turbulent flow of non-Newtonian
+    Steady-state solver for incompressible, turbulent flow of Newtonian
     fluids with single rotating frame.
+    Consistent formulation without time-step and relaxation dependence by Jasak
+
+Author
+    Hrvoje Jasak, Wikki Ltd.  All rights reserved
 
 \*---------------------------------------------------------------------------*/
 
@@ -46,8 +50,6 @@ int main(int argc, char *argv[])
 #   include "createMesh.H"
 #   include "createFields.H"
 #   include "initContinuityErrs.H"
-
-    //mesh.clearPrimitives();
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -75,6 +77,7 @@ int main(int argc, char *argv[])
 
             solve(UrelEqn() == -fvc::grad(p));
 
+            p.boundaryField().updateCoeffs();
             volScalarField AUrel = UrelEqn().A();
             Urel = UrelEqn().H()/AUrel;
             UrelEqn.clear();
