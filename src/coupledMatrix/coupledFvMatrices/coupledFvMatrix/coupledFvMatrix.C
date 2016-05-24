@@ -105,6 +105,7 @@ Foam::coupledFvMatrix<Type>::solve(const dictionary& solverControls)
         source.set(rowI, new Field<Type>(curMatrix.source()));
         sourceCmpt.set(rowI, new scalarField(curMatrix.psi().size()));
 
+        curMatrix.completeAssembly();
         curMatrix.addBoundarySource(source[rowI]);
 
         interfaces[rowI] = curMatrix.psi().boundaryField().interfaces();
