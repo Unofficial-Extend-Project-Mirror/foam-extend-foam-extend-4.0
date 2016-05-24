@@ -56,7 +56,7 @@ tmp<volVectorField> cellMDLimitedGrad<scalar>::calcGrad
 {
     const fvMesh& mesh = vsf.mesh();
 
-    tmp<volVectorField> tGrad = basicGradScheme_().grad(vsf);
+    tmp<volVectorField> tGrad = basicGradScheme_().calcGrad(vsf, name);
 
     if (k_ < SMALL)
     {
@@ -198,7 +198,7 @@ tmp<volTensorField> cellMDLimitedGrad<vector>::calcGrad
 {
     const fvMesh& mesh = vsf.mesh();
 
-    tmp<volTensorField> tGrad = basicGradScheme_().grad(vsf);
+    tmp<volTensorField> tGrad = basicGradScheme_().calcGrad(vsf, name);
 
     if (k_ < SMALL)
     {

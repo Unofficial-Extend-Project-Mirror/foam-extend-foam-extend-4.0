@@ -78,7 +78,7 @@ tmp<volVectorField> faceLimitedGrad<scalar>::calcGrad
 {
     const fvMesh& mesh = vsf.mesh();
 
-    tmp<volVectorField> tGrad = basicGradScheme_().grad(vsf);
+    tmp<volVectorField> tGrad = basicGradScheme_().calcGrad(vsf, name);
 
     if (k_ < SMALL)
     {
@@ -215,7 +215,7 @@ tmp<volTensorField> faceLimitedGrad<vector>::calcGrad
 {
     const fvMesh& mesh = vvf.mesh();
 
-    tmp<volTensorField> tGrad = basicGradScheme_().grad(vvf);
+    tmp<volTensorField> tGrad = basicGradScheme_().calcGrad(vvf, name);
 
     if (k_ < SMALL)
     {
@@ -387,6 +387,7 @@ tmp<BlockLduSystem<vector, vector> > faceLimitedGrad<scalar>::fvmGrad
     BlockLduSystem<vector, vector>& bs = tbs();
 
     // Calculate current gradient for explicit limiting
+    // In fvm::grad the current gradient may be cached
     tmp<volVectorField> tGrad = basicGradScheme_().grad(vsf);
     const volVectorField& g = tGrad();
 
