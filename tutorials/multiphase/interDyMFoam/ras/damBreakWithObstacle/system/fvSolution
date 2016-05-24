@@ -17,6 +17,8 @@ FoamFile
 
 solvers
 {
+    rho
+    {}
     pcorr
     {
         solver          PCG;

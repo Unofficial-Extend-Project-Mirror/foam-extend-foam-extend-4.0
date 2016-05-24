@@ -20,7 +20,7 @@ ddtSchemes
 
     ddt(rho,U)      steadyState;
     ddt(rho,i)      steadyState;
-    ddt(psi,p)      steadyInertial phi rho 0.25;
+    ddt(psi,p)      steadyState;
 
     ddt(rho,k)        steadyState;
     ddt(rho,epsilon)  steadyState;
@@ -48,7 +48,7 @@ divSchemes
 
     div(phi,k)       Gauss upwind;
     div(phi,epsilon) Gauss upwind;
-    div((muEff*dev2(grad(U).T()))) Gauss linear;
+    div((muEff*dev2(T(grad(U))))) Gauss linear;
 
     div(U,p)       Gauss linear;
 }

@@ -1,5 +1,4 @@
-    p.boundaryField().updateCoeffs();
-
+{
     volScalarField AU = UEqn().A();
 
     U = UEqn().H()/AU;
@@ -48,4 +47,4 @@
     // Momentum corrector
     U -= fvc::grad(p)/AU;
     U.correctBoundaryConditions();
-
+}

@@ -358,7 +358,7 @@ tmp<fvVectorMatrix> coupledKOmegaSST::divDevReff(volVectorField& U) const
     return
     (
       - fvm::laplacian(nuEff(), U)
-      - fvc::div(nuEff()*dev(fvc::grad(U)().T()))
+      - fvc::div(nuEff()*dev(T(fvc::grad(U))))
     );
 }
 
@@ -448,8 +448,7 @@ void coupledKOmegaSST::correct()
                 S2,
                 (c1_/a1_)*betaStar_*omega_*max(a1_*omega_, b1_*F23()*sqrt(S2))
             )
-          - fvm::Sp(2*beta(F1)*omega_, omega_)
-          + beta(F1)*sqr(omega_)
+          - fvm::Sp(beta(F1)*omega_, omega_)
           - fvm::SuSp
             (
                 (F1 - scalar(1))*CDkOmega/omega_,
@@ -506,7 +505,7 @@ void coupledKOmegaSST::correct()
         volScalarField couplingK
         (
             "couplingK",
-           betaStar_*k_
+            betaStar_*k_
         );
         scalarField& couplingKIn = couplingK.internalField();
 
@@ -517,7 +516,7 @@ void coupledKOmegaSST::correct()
         }
 
         // Insert coupling
-//         kOmegaEqn.insertEquationCoupling(0, 1, couplingK);
+        kOmegaEqn.insertEquationCoupling(0, 1, couplingK);
     }
 
     // Update source coupling: coupling terms eliminated from source
@@ -534,7 +533,6 @@ void coupledKOmegaSST::correct()
 
     k_.correctBoundaryConditions();
     omega_.correctBoundaryConditions();
-
 
     // Re-calculate viscosity
     // Fixed sqrt(2) error.  HJ, 10/Jun/2015

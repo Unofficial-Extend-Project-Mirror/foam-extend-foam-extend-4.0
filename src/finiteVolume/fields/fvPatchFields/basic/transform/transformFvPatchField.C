@@ -99,7 +99,7 @@ tmp<Field<Type> > transformFvPatchField<Type>::valueInternalCoeffs
     const tmp<scalarField>&
 ) const
 {
-    return pTraits<Type>::one - snGradTransformDiag();
+    return pTraits<Type>::one - this->snGradTransformDiag();
 }
 
 
@@ -113,7 +113,7 @@ tmp<Field<Type> > transformFvPatchField<Type>::valueBoundaryCoeffs
         *this
       - cmptMultiply
         (
-            valueInternalCoeffs(this->patch().weights()),
+            this->valueInternalCoeffs(this->patch().weights()),
             this->patchInternalField()
         );
 }
@@ -122,7 +122,7 @@ tmp<Field<Type> > transformFvPatchField<Type>::valueBoundaryCoeffs
 template<class Type>
 tmp<Field<Type> > transformFvPatchField<Type>::gradientInternalCoeffs() const
 {
-    return -this->patch().deltaCoeffs()*snGradTransformDiag();
+    return -this->patch().deltaCoeffs()*this->snGradTransformDiag();
 }
 
 
@@ -130,8 +130,12 @@ template<class Type>
 tmp<Field<Type> > transformFvPatchField<Type>::gradientBoundaryCoeffs() const
 {
     return
-        snGrad()
-      - cmptMultiply(gradientInternalCoeffs(), this->patchInternalField());
+        this->snGrad()
+      - cmptMultiply
+        (
+            this->gradientInternalCoeffs(),
+            this->patchInternalField()
+        );
 }
 
 

@@ -29,7 +29,7 @@ timeFormat general;
 timePrecision 6;
 writeCompression compressed;
 writeControl timeStep;
-writeFormat binary;
+writeFormat ascii;
 writeInterval 100;
 writePrecision 6;
 

@@ -151,7 +151,7 @@ tmp<volScalarField> thermalModel::S() const
             (
                 "zero",
                 dimEnergy/dimTime/dimVolume,
-                scalar(0.0)
+                scalar(0)
             )
         )
     );

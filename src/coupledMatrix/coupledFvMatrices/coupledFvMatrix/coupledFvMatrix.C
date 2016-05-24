@@ -58,7 +58,7 @@ Foam::word Foam::coupledFvMatrix<Type>::coupledPsiName() const
 
         if (rowI < matrices.size() - 1)
         {
-            cpn += "+";
+            cpn += "_";
         }
     }
 
@@ -198,7 +198,14 @@ Foam::coupledFvMatrix<Type>::solve(const dictionary& solverControls)
         {
             fvMatrix<Type>& curMatrix =
                 static_cast<fvMatrix<Type>& >(matrices[rowI]);
-            curMatrix.psi().internalField().replace(cmpt, psiCmpt[rowI]);
+
+            GeometricField<Type, fvPatchField, volMesh>& psiRef =
+                const_cast<GeometricField<Type, fvPatchField, volMesh>&>
+                (
+                    curMatrix.psi()
+                );
+
+            psiRef.internalField().replace(cmpt, psiCmpt[rowI]);
             curMatrix.diag() = saveDiag[rowI];
         }
     }
@@ -206,9 +213,16 @@ Foam::coupledFvMatrix<Type>::solve(const dictionary& solverControls)
     // Correct boundary conditions
     forAll (matrices, rowI)
     {
-        fvMatrix<Type>& curMatrix =
-            static_cast<fvMatrix<Type>& >(matrices[rowI]);
-        curMatrix.psi().correctBoundaryConditions();
+        const fvMatrix<Type>& curMatrix =
+            static_cast<const fvMatrix<Type>&>(matrices[rowI]);
+
+        GeometricField<Type, fvPatchField, volMesh>& psiRef =
+            const_cast<GeometricField<Type, fvPatchField, volMesh>&>
+            (
+                curMatrix.psi()
+            );
+
+        psiRef.correctBoundaryConditions();
     }
 
     return solverPerfVec;

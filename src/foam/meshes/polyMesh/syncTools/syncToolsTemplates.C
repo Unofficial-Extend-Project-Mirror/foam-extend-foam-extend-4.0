@@ -129,7 +129,7 @@ void Foam::syncTools::syncPointMap
     {
         // Send
 
-        forAll(patches, patchI)
+        forAll (patches, patchI)
         {
             if
             (
@@ -149,7 +149,7 @@ void Foam::syncTools::syncPointMap
                 // Note: how small initial size?
                 Map<T> patchInfo(meshPts.size() / 20);
 
-                forAll(meshPts, i)
+                forAll (meshPts, i)
                 {
                     typename Map<T>::const_iterator iter =
                         pointValues.find(meshPts[i]);
@@ -171,7 +171,7 @@ void Foam::syncTools::syncPointMap
 
         // Receive and combine.
 
-        forAll(patches, patchI)
+        forAll (patches, patchI)
         {
             if
             (
@@ -221,7 +221,7 @@ void Foam::syncTools::syncPointMap
     }
 
     // Do the cyclics.
-    forAll(patches, patchI)
+    forAll (patches, patchI)
     {
         if (isA<cyclicPolyPatch>(patches[patchI]))
         {
@@ -236,7 +236,7 @@ void Foam::syncTools::syncPointMap
             Map<T> half0Values(meshPts.size() / 20);
             Map<T> half1Values(meshPts.size() / 20);
 
-            forAll(coupledPoints, i)
+            forAll (coupledPoints, i)
             {
                 const edge& e = coupledPoints[i];
 
@@ -272,7 +272,7 @@ void Foam::syncTools::syncPointMap
                 separateList(-v, half1Values);
             }
 
-            forAll(coupledPoints, i)
+            forAll (coupledPoints, i)
             {
                 const edge& e = coupledPoints[i];
 
@@ -336,7 +336,7 @@ void Foam::syncTools::syncPointMap
 
 
         // Fill my entries in the shared points
-        forAll(sharedPtLabels, i)
+        forAll (sharedPtLabels, i)
         {
             label meshPointI = sharedPtLabels[i];
 
@@ -426,7 +426,7 @@ void Foam::syncTools::syncPointMap
 
         // Map from global shared index to meshpoint
         Map<label> sharedToMeshPoint(2*sharedPtAddr.size());
-        forAll(sharedPtAddr, i)
+        forAll (sharedPtAddr, i)
         {
             sharedToMeshPoint.insert(sharedPtAddr[i], sharedPtLabels[i]);
         }
@@ -480,7 +480,7 @@ void Foam::syncTools::syncEdgeMap
     {
         // Send
 
-        forAll(patches, patchI)
+        forAll (patches, patchI)
         {
             if
             (
@@ -499,7 +499,7 @@ void Foam::syncTools::syncEdgeMap
 
                 EdgeMap<T> patchInfo(edges.size() / 20);
 
-                forAll(edges, i)
+                forAll (edges, i)
                 {
                     const edge& e = edges[i];
                     const edge meshEdge(meshPts[e[0]], meshPts[e[1]]);
@@ -526,7 +526,7 @@ void Foam::syncTools::syncEdgeMap
 
         // Receive and combine.
 
-        forAll(patches, patchI)
+        forAll (patches, patchI)
         {
             if
             (
@@ -580,7 +580,7 @@ void Foam::syncTools::syncEdgeMap
     // Swap cyclic info
     // ~~~~~~~~~~~~~~~~
 
-    forAll(patches, patchI)
+    forAll (patches, patchI)
     {
         if (isA<cyclicPolyPatch>(patches[patchI]))
         {
@@ -596,7 +596,7 @@ void Foam::syncTools::syncEdgeMap
             Map<T> half0Values(meshPts.size() / 20);
             Map<T> half1Values(meshPts.size() / 20);
 
-            forAll(coupledEdges, i)
+            forAll (coupledEdges, i)
             {
                 const edge& twoEdges = coupledEdges[i];
 
@@ -644,7 +644,7 @@ void Foam::syncTools::syncEdgeMap
 
             // Extract and combine information
 
-            forAll(coupledEdges, i)
+            forAll (coupledEdges, i)
             {
                 const edge& twoEdges = coupledEdges[i];
 
@@ -695,7 +695,7 @@ void Foam::syncTools::syncEdgeMap
 
     // 1. Create map from meshPoint to globalShared index.
     Map<label> meshToShared(2*sharedPtLabels.size());
-    forAll(sharedPtLabels, i)
+    forAll (sharedPtLabels, i)
     {
         meshToShared.insert(sharedPtLabels[i], sharedPtAddr[i]);
     }
@@ -714,7 +714,7 @@ void Foam::syncTools::syncEdgeMap
     {
         const face& f = mesh.faces()[faceI];
 
-        forAll(f, fp)
+        forAll (f, fp)
         {
             label v0 = f[fp];
             label v1 = f[f.fcIndex(fp)];
@@ -881,7 +881,7 @@ void Foam::syncTools::syncPointList
     {
         // Send
 
-        forAll(patches, patchI)
+        forAll (patches, patchI)
         {
             if
             (
@@ -898,7 +898,7 @@ void Foam::syncTools::syncPointList
                 const labelList& meshPts = procPatch.meshPoints();
                 const labelList& nbrPts = procPatch.neighbPoints();
 
-                forAll(nbrPts, pointI)
+                forAll (nbrPts, pointI)
                 {
                     label nbrPointI = nbrPts[pointI];
                     if (nbrPointI >= 0 && nbrPointI < patchInfo.size())
@@ -915,7 +915,7 @@ void Foam::syncTools::syncPointList
 
         // Receive and combine.
 
-        forAll(patches, patchI)
+        forAll (patches, patchI)
         {
             if
             (
@@ -954,7 +954,7 @@ void Foam::syncTools::syncPointList
 
                 const labelList& meshPts = procPatch.meshPoints();
 
-                forAll(meshPts, pointI)
+                forAll (meshPts, pointI)
                 {
                     label meshPointI = meshPts[pointI];
                     cop(pointValues[meshPointI], nbrPatchInfo[pointI]);
@@ -964,7 +964,7 @@ void Foam::syncTools::syncPointList
     }
 
     // Do the cyclics.
-    forAll(patches, patchI)
+    forAll (patches, patchI)
     {
         if (isA<cyclicPolyPatch>(patches[patchI]))
         {
@@ -979,7 +979,7 @@ void Foam::syncTools::syncPointList
             List<T> half0Values(coupledPoints.size());
             List<T> half1Values(coupledPoints.size());
 
-            forAll(coupledPoints, i)
+            forAll (coupledPoints, i)
             {
                 const edge& e = coupledPoints[i];
 
@@ -1004,7 +1004,7 @@ void Foam::syncTools::syncPointList
                 separateList(-v, half1Values);
             }
 
-            forAll(coupledPoints, i)
+            forAll (coupledPoints, i)
             {
                 const edge& e = coupledPoints[i];
 
@@ -1043,7 +1043,7 @@ void Foam::syncTools::syncPointList
         // Values on shared points.
         List<T> sharedPts(pd.nGlobalPoints(), nullValue);
 
-        forAll(pd.sharedPointLabels(), i)
+        forAll (pd.sharedPointLabels(), i)
         {
             label meshPointI = pd.sharedPointLabels()[i];
             // Fill my entries in the shared points
@@ -1056,7 +1056,7 @@ void Foam::syncTools::syncPointList
 
         // Now we will all have the same information. Merge it back with
         // my local information.
-        forAll(pd.sharedPointLabels(), i)
+        forAll (pd.sharedPointLabels(), i)
         {
             label meshPointI = pd.sharedPointLabels()[i];
             pointValues[meshPointI] = sharedPts[pd.sharedPointAddr()[i]];
@@ -1095,7 +1095,7 @@ void Foam::syncTools::syncPointList
 
     List<T> meshValues(mesh.nPoints(), nullValue);
 
-    forAll(meshPoints, i)
+    forAll (meshPoints, i)
     {
         meshValues[meshPoints[i]] = pointValues[i];
     }
@@ -1109,7 +1109,7 @@ void Foam::syncTools::syncPointList
         applySeparation // separation
     );
 
-    forAll(meshPoints, i)
+    forAll (meshPoints, i)
     {
         pointValues[i] = meshValues[meshPoints[i]];
     }
@@ -1152,7 +1152,7 @@ void Foam::syncTools::syncEdgeList
     {
         // Send
 
-        forAll(patches, patchI)
+        forAll (patches, patchI)
         {
             if
             (
@@ -1169,7 +1169,7 @@ void Foam::syncTools::syncEdgeList
                 // Get region per patch edge in neighbouring edge numbers.
                 List<T> patchInfo(procPatch.nEdges(), nullValue);
 
-                forAll(neighbEdges, edgeI)
+                forAll (neighbEdges, edgeI)
                 {
                     label nbrEdgeI = neighbEdges[edgeI];
 
@@ -1186,7 +1186,7 @@ void Foam::syncTools::syncEdgeList
 
         // Receive and combine.
 
-        forAll(patches, patchI)
+        forAll (patches, patchI)
         {
             if
             (
@@ -1227,7 +1227,7 @@ void Foam::syncTools::syncEdgeList
                     separateList(-procPatch.separation(), nbrPatchInfo);
                 }
 
-                forAll(meshEdges, edgeI)
+                forAll (meshEdges, edgeI)
                 {
                     label meshEdgeI = meshEdges[edgeI];
 
@@ -1238,7 +1238,7 @@ void Foam::syncTools::syncEdgeList
     }
 
     // Do the cyclics.
-    forAll(patches, patchI)
+    forAll (patches, patchI)
     {
         if (isA<cyclicPolyPatch>(patches[patchI]))
         {
@@ -1253,7 +1253,7 @@ void Foam::syncTools::syncEdgeList
             List<T> half0Values(coupledEdges.size());
             List<T> half1Values(coupledEdges.size());
 
-            forAll(coupledEdges, i)
+            forAll (coupledEdges, i)
             {
                 const edge& e = coupledEdges[i];
 
@@ -1279,7 +1279,7 @@ void Foam::syncTools::syncEdgeList
                 separateList(-v, half1Values);
             }
 
-            forAll(coupledEdges, i)
+            forAll (coupledEdges, i)
             {
                 const edge& e = coupledEdges[i];
 
@@ -1317,7 +1317,7 @@ void Foam::syncTools::syncEdgeList
         // Values on shared edges.
         List<T> sharedPts(pd.nGlobalEdges(), nullValue);
 
-        forAll(pd.sharedEdgeLabels(), i)
+        forAll (pd.sharedEdgeLabels(), i)
         {
             label meshEdgeI = pd.sharedEdgeLabels()[i];
 
@@ -1331,7 +1331,7 @@ void Foam::syncTools::syncEdgeList
 
         // Now we will all have the same information. Merge it back with
         // my local information.
-        forAll(pd.sharedEdgeLabels(), i)
+        forAll (pd.sharedEdgeLabels(), i)
         {
             label meshEdgeI = pd.sharedEdgeLabels()[i];
             edgeValues[meshEdgeI] = sharedPts[pd.sharedEdgeAddr()[i]];
@@ -1375,7 +1375,7 @@ void Foam::syncTools::syncBoundaryFaceList
     {
         // Send
 
-        forAll(patches, patchI)
+        forAll (patches, patchI)
         {
             if
             (
@@ -1386,7 +1386,7 @@ void Foam::syncTools::syncBoundaryFaceList
                 const processorPolyPatch& procPatch =
                     refCast<const processorPolyPatch>(patches[patchI]);
 
-                label patchStart = procPatch.start()-mesh.nInternalFaces();
+                label patchStart = procPatch.start() - mesh.nInternalFaces();
 
                 if (contiguous<T>())
                 {
@@ -1400,7 +1400,12 @@ void Foam::syncTools::syncBoundaryFaceList
                 }
                 else
                 {
-                    OPstream toNbr(Pstream::blocking, procPatch.neighbProcNo());
+                    OPstream toNbr
+                    (
+                        Pstream::blocking,
+                        procPatch.neighbProcNo()
+                    );
+
                     toNbr <<
                         SubList<T>(faceValues, procPatch.size(), patchStart);
                 }
@@ -1410,7 +1415,7 @@ void Foam::syncTools::syncBoundaryFaceList
 
         // Receive and combine.
 
-        forAll(patches, patchI)
+        forAll (patches, patchI)
         {
             if
             (
@@ -1455,7 +1460,7 @@ void Foam::syncTools::syncBoundaryFaceList
 
                 label bFaceI = procPatch.start()-mesh.nInternalFaces();
 
-                forAll(nbrPatchInfo, i)
+                forAll (nbrPatchInfo, i)
                 {
                     cop(faceValues[bFaceI++], nbrPatchInfo[i]);
                 }
@@ -1464,7 +1469,7 @@ void Foam::syncTools::syncBoundaryFaceList
     }
 
     // Do the cyclics.
-    forAll(patches, patchI)
+    forAll (patches, patchI)
     {
         if (isA<cyclicPolyPatch>(patches[patchI]))
         {
@@ -1492,13 +1497,13 @@ void Foam::syncTools::syncBoundaryFaceList
             }
 
             label i0 = patchStart;
-            forAll(half1Values, i)
+            forAll (half1Values, i)
             {
                 cop(faceValues[i0++], half1Values[i]);
             }
 
             label i1 = half1Start;
-            forAll(half0Values, i)
+            forAll (half0Values, i)
             {
                 cop(faceValues[i1++], half0Values[i]);
             }
@@ -1602,7 +1607,7 @@ void Foam::syncTools::syncFaceList
     {
         // Send
 
-        forAll(patches, patchI)
+        forAll (patches, patchI)
         {
             if
             (
@@ -1614,7 +1619,7 @@ void Foam::syncTools::syncFaceList
                     refCast<const processorPolyPatch>(patches[patchI]);
 
                 patchValues[patchI].setSize(procPatch.size());
-                forAll(procPatch, i)
+                forAll (procPatch, i)
                 {
                     patchValues[patchI][i] =
                         faceValues.get(procPatch.start()+i);
@@ -1628,7 +1633,7 @@ void Foam::syncTools::syncFaceList
 
         // Receive and combine.
 
-        forAll(patches, patchI)
+        forAll (patches, patchI)
         {
             if
             (
@@ -1649,7 +1654,7 @@ void Foam::syncTools::syncFaceList
                 }
 
                 // Combine (bitwise)
-                forAll(procPatch, i)
+                forAll (procPatch, i)
                 {
                     unsigned int patchVal = patchValues[patchI][i];
                     label meshFaceI = procPatch.start()+i;
@@ -1662,7 +1667,7 @@ void Foam::syncTools::syncFaceList
     }
 
     // Do the cyclics.
-    forAll(patches, patchI)
+    forAll (patches, patchI)
     {
         if (isA<cyclicPolyPatch>(patches[patchI]))
         {
@@ -1736,7 +1741,7 @@ void Foam::syncTools::syncPointList
     {
         // Send
 
-        forAll(patches, patchI)
+        forAll (patches, patchI)
         {
             if
             (
@@ -1753,7 +1758,7 @@ void Foam::syncTools::syncPointList
                 const labelList& meshPts = procPatch.meshPoints();
                 const labelList& nbrPts = procPatch.neighbPoints();
 
-                forAll(nbrPts, pointI)
+                forAll (nbrPts, pointI)
                 {
                     label nbrPointI = nbrPts[pointI];
                     if (nbrPointI >= 0 && nbrPointI < procPatch.nPoints())
@@ -1771,7 +1776,7 @@ void Foam::syncTools::syncPointList
 
         // Receive and combine.
 
-        forAll(patches, patchI)
+        forAll (patches, patchI)
         {
             if
             (
@@ -1798,7 +1803,7 @@ void Foam::syncTools::syncPointList
 
                 const labelList& meshPts = procPatch.meshPoints();
 
-                forAll(meshPts, pointI)
+                forAll (meshPts, pointI)
                 {
                     label meshPointI = meshPts[pointI];
                     unsigned int pointVal = pointValues.get(meshPointI);
@@ -1810,7 +1815,7 @@ void Foam::syncTools::syncPointList
     }
 
     // Do the cyclics.
-    forAll(patches, patchI)
+    forAll (patches, patchI)
     {
         if (isA<cyclicPolyPatch>(patches[patchI]))
         {
@@ -1820,7 +1825,7 @@ void Foam::syncTools::syncPointList
             const edgeList& coupledPoints = cycPatch.coupledPoints();
             const labelList& meshPts = cycPatch.meshPoints();
 
-            forAll(coupledPoints, i)
+            forAll (coupledPoints, i)
             {
                 const edge& e = coupledPoints[i];
 
@@ -1847,7 +1852,7 @@ void Foam::syncTools::syncPointList
         // Values on shared points. Use unpacked storage for ease!
         List<unsigned int> sharedPts(pd.nGlobalPoints(), nullValue);
 
-        forAll(pd.sharedPointLabels(), i)
+        forAll (pd.sharedPointLabels(), i)
         {
             label meshPointI = pd.sharedPointLabels()[i];
             // Fill my entries in the shared points
@@ -1860,7 +1865,7 @@ void Foam::syncTools::syncPointList
 
         // Now we will all have the same information. Merge it back with
         // my local information.
-        forAll(pd.sharedPointLabels(), i)
+        forAll (pd.sharedPointLabels(), i)
         {
             label meshPointI = pd.sharedPointLabels()[i];
             pointValues.set(meshPointI, sharedPts[pd.sharedPointAddr()[i]]);
@@ -1904,7 +1909,7 @@ void Foam::syncTools::syncEdgeList
     {
         // Send
 
-        forAll(patches, patchI)
+        forAll (patches, patchI)
         {
             if
             (
@@ -1920,7 +1925,7 @@ void Foam::syncTools::syncEdgeList
                 const labelList& meshEdges = procPatch.meshEdges();
                 const labelList& neighbEdges = procPatch.neighbEdges();
 
-                forAll(neighbEdges, edgeI)
+                forAll (neighbEdges, edgeI)
                 {
                     label nbrEdgeI = neighbEdges[edgeI];
                     if (nbrEdgeI >= 0 && nbrEdgeI < procPatch.nEdges())
@@ -1938,7 +1943,7 @@ void Foam::syncTools::syncEdgeList
 
         // Receive and combine.
 
-        forAll(patches, patchI)
+        forAll (patches, patchI)
         {
             if
             (
@@ -1962,7 +1967,7 @@ void Foam::syncTools::syncEdgeList
 
                 const labelList& meshEdges = procPatch.meshEdges();
 
-                forAll(meshEdges, edgeI)
+                forAll (meshEdges, edgeI)
                 {
                     unsigned int patchVal = patchValues[patchI][edgeI];
                     label meshEdgeI = meshEdges[edgeI];
@@ -1975,7 +1980,7 @@ void Foam::syncTools::syncEdgeList
     }
 
     // Do the cyclics.
-    forAll(patches, patchI)
+    forAll (patches, patchI)
     {
         if (isA<cyclicPolyPatch>(patches[patchI]))
         {
@@ -1985,7 +1990,7 @@ void Foam::syncTools::syncEdgeList
             const edgeList& coupledEdges = cycPatch.coupledEdges();
             const labelList& meshEdges = cycPatch.meshEdges();
 
-            forAll(coupledEdges, i)
+            forAll (coupledEdges, i)
             {
                 const edge& e = coupledEdges[i];
 
@@ -2012,7 +2017,7 @@ void Foam::syncTools::syncEdgeList
         // Values on shared edges. Use unpacked storage for ease!
         List<unsigned int> sharedPts(pd.nGlobalEdges(), nullValue);
 
-        forAll(pd.sharedEdgeLabels(), i)
+        forAll (pd.sharedEdgeLabels(), i)
         {
             label meshEdgeI = pd.sharedEdgeLabels()[i];
             // Fill my entries in the shared edges
@@ -2025,7 +2030,7 @@ void Foam::syncTools::syncEdgeList
 
         // Now we will all have the same information. Merge it back with
         // my local information.
-        forAll(pd.sharedEdgeLabels(), i)
+        forAll (pd.sharedEdgeLabels(), i)
         {
             label meshEdgeI = pd.sharedEdgeLabels()[i];
             edgeValues.set(meshEdgeI, sharedPts[pd.sharedEdgeAddr()[i]]);

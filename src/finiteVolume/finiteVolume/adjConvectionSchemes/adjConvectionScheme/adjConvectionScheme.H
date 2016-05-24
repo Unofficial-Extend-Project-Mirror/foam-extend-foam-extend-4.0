@@ -136,7 +136,7 @@ public:
         virtual tmp<fvMatrix<Type> > fvmAdjDiv
         (
             const volVectorField&,
-            GeometricField<Type, fvPatchField, volMesh>&
+            const GeometricField<Type, fvPatchField, volMesh>&
         ) const = 0;
 
         virtual tmp<GeometricField<Type, fvPatchField, volMesh> > fvcAdjDiv

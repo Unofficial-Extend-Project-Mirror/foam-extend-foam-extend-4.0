@@ -55,14 +55,14 @@ namespace fam
         tmp<faMatrix<Type> > Su
         (
             const GeometricField<Type, faPatchField, areaMesh>&,
-            GeometricField<Type, faPatchField, areaMesh>&
+            const GeometricField<Type, faPatchField, areaMesh>&
         );
 
         template<class Type>
         tmp<faMatrix<Type> > Su
         (
             const tmp<GeometricField<Type, faPatchField, areaMesh> >&,
-            GeometricField<Type, faPatchField, areaMesh>&
+            const GeometricField<Type, faPatchField, areaMesh>&
         );
 
 
@@ -72,14 +72,14 @@ namespace fam
         tmp<faMatrix<Type> > Sp
         (
             const areaScalarField&,
-            GeometricField<Type, faPatchField, areaMesh>&
+            const GeometricField<Type, faPatchField, areaMesh>&
         );
 
         template<class Type>
         tmp<faMatrix<Type> > Sp
         (
             const tmp<areaScalarField>&,
-            GeometricField<Type, faPatchField, areaMesh>&
+            const GeometricField<Type, faPatchField, areaMesh>&
         );
 
 
@@ -87,7 +87,7 @@ namespace fam
         tmp<faMatrix<Type> > Sp
         (
             const dimensionedScalar&,
-            GeometricField<Type, faPatchField, areaMesh>&
+            const GeometricField<Type, faPatchField, areaMesh>&
         );
 
 
@@ -97,14 +97,14 @@ namespace fam
         tmp<faMatrix<Type> > SuSp
         (
             const areaScalarField&,
-            GeometricField<Type, faPatchField, areaMesh>&
+            const GeometricField<Type, faPatchField, areaMesh>&
         );
 
         template<class Type>
         tmp<faMatrix<Type> > SuSp
         (
             const tmp<areaScalarField>&,
-            GeometricField<Type, faPatchField, areaMesh>&
+            const GeometricField<Type, faPatchField, areaMesh>&
         );
 }
 

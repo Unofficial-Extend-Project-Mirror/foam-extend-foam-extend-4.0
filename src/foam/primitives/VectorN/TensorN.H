@@ -121,14 +121,15 @@ public:
             const direction j
         );
 
-        //- Diagonal
+        //- Return diagonal
         inline DiagTensorN<Cmpt, length> diag() const;
 
-        //- Transpose
+        //- Return transpose
         inline TensorN<Cmpt, length> T() const;
 
         //- Negative sum the vertical off-diagonal components
         inline TensorN<Cmpt, length> negSumDiag() const;
+
 
     // Member Operators
 

@@ -72,7 +72,7 @@ void Foam::magLongDelta::makeMagLongDistance() const
 
 //     if (debug)
     {
-        Info<< "magLongDelta::makeMagLongDistance() :"
+        InfoIn("magLongDelta::makeMagLongDistance()")
             << "Constructing magnitude of long cell distance"
             << endl;
     }
@@ -117,7 +117,7 @@ void Foam::magLongDelta::makeMagLongDistance() const
 
     if (debug)
     {
-        Info<< "magLongDelta::makeMagLongDistance() :"
+        InfoIn("magLongDelta::makeMagLongDistance()")
             << "Finished magnitude of long cell distance"
             << endl;
     }

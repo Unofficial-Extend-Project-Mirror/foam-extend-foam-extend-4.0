@@ -219,7 +219,7 @@ tmp<fvVectorMatrix> PDRkEpsilon::divDevRhoReff(volVectorField& U) const
 {
     return
     (
-      - fvm::laplacian(muEff(), U) - fvc::div(muEff()*dev2(fvc::grad(U)().T()))
+      - fvm::laplacian(muEff(), U) - fvc::div(muEff()*dev2(T(fvc::grad(U))))
     );
 }
 

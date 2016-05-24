@@ -1,0 +1,39 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | foam-extend: Open Source CFD                    |
+|  \\    /   O peration     | Version:     3.2                                |
+|   \\  /    A nd           | Web:         http://www.foam-extend.org         |
+|    \\/     M anipulation  | For copyright notice see file Copyright         |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      dynamicMeshDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+// dynamicFvMesh   staticFvMesh;
+dynamicFvMesh   immersedBoundarySolidBodyMotionFvMesh;
+
+immersedBoundarySolidBodyMotionFvMeshCoeffs
+{
+    motionFunctions
+    (
+        ibCylinder
+        {
+
+            solidBodyMotionFunction     rotatingOscillation;
+            rotatingOscillationCoeffs
+            {
+                origin		(0 0 0);
+		amplitude    (0 0 14);
+                period      0.5;
+            }
+        }
+    );
+}
+
+
+// ************************************************************************* //

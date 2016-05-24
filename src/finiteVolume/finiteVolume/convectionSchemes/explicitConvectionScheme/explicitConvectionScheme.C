@@ -68,7 +68,7 @@ tmp<fvMatrix<Type> >
 explicitConvectionScheme<Type>::fvmDiv
 (
     const surfaceScalarField& faceFlux,
-    GeometricField<Type, fvPatchField, volMesh>& vf
+    const GeometricField<Type, fvPatchField, volMesh>& vf
 ) const
 {
     tmp<fvMatrix<Type> > tfvm

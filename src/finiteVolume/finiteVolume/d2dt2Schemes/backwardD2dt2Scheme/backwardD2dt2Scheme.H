@@ -67,7 +67,10 @@ class backwardD2dt2Scheme
 
         //- Return the previous time-step or GREAT if the old timestep field
         //  wasn't available in which case Euler ddt is used
-        scalar deltaT0_(GeometricField<Type, fvPatchField, volMesh>&) const;
+        scalar deltaT0_
+        (
+            const GeometricField<Type, fvPatchField, volMesh>&
+        ) const;
 
         //- Disallow default bitwise copy construct
         backwardD2dt2Scheme(const backwardD2dt2Scheme&);
@@ -118,19 +121,19 @@ public:
 
         tmp<fvMatrix<Type> > fvmD2dt2
         (
-            GeometricField<Type, fvPatchField, volMesh>&
+            const GeometricField<Type, fvPatchField, volMesh>&
         );
 
         tmp<fvMatrix<Type> > fvmD2dt2
         (
             const dimensionedScalar&,
-            GeometricField<Type, fvPatchField, volMesh>&
+            const GeometricField<Type, fvPatchField, volMesh>&
         );
 
         tmp<fvMatrix<Type> > fvmD2dt2
         (
             const volScalarField&,
-            GeometricField<Type, fvPatchField, volMesh>&
+            const GeometricField<Type, fvPatchField, volMesh>&
         );
 };
 

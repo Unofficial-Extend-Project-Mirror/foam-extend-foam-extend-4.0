@@ -244,7 +244,7 @@ tmp<fvVectorMatrix> LaunderSharmaKE::divDevRhoReff(volVectorField& U) const
 {
     return
     (
-      - fvm::laplacian(muEff(), U) - fvc::div(muEff()*dev2(fvc::grad(U)().T()))
+      - fvm::laplacian(muEff(), U) - fvc::div(muEff()*dev2(T(fvc::grad(U))))
     );
 }
 
@@ -308,10 +308,11 @@ void LaunderSharmaKE::correct()
         divU += fvc::div(mesh_.phi());
     }
 
-    tmp<volTensorField> tgradU = fvc::grad(U_);
-    volScalarField G("RASModel::G", mut_*(tgradU() && dev(twoSymm(tgradU()))));
-    tgradU.clear();
+    // Change return type due to gradient cacheing.  HJ, 22/Apr/2016
+    const tmp<volTensorField> tgradU = fvc::grad(U_);
+    const volTensorField& gradU = tgradU();
 
+    volScalarField G("RASModel::G", mut_*(gradU && dev(twoSymm(gradU))));
 
     // Dissipation equation
 

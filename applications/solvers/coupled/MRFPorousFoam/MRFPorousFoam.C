@@ -90,7 +90,7 @@ int main(int argc, char *argv[])
         U.correctBoundaryConditions();
         p.correctBoundaryConditions();
 
-        phi = (fvc::interpolate(U) & mesh.Sf()) + pEqn.flux() + presSource;
+        phi = (fvc::interpolate(U) & mesh.Sf()) + tpEqn().flux() + tpresSource;
 
         // Make flux relative in rotating zones
         mrfZones.relativeFlux(phi);

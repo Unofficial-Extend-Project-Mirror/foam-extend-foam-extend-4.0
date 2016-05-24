@@ -1002,7 +1002,11 @@ COMPUTED_BASE_OPERATOR(scalar, /=)
 // * * * * * * * * * * * * * * * Ostream Operator  * * * * * * * * * * * * * //
 
 template<class Type>
-Foam::Ostream& Foam::operator<<(Ostream& os, const DecoupledCoeffField<Type>& f)
+Foam::Ostream& Foam::operator<<
+(
+    Ostream& os,
+    const DecoupledCoeffField<Type>& f
+)
 {
     // Write active type
     os << blockCoeffBase::activeLevelNames_[f.activeType()] << nl;

@@ -35,7 +35,7 @@ divSchemes
 
     div(phi,k)      Gauss vanLeer;
 
-    div((nuEff*dev(grad(U).T()))) Gauss linear;
+    div((nuEff*dev(T(grad(U))))) Gauss linear;
 }
 
 laplacianSchemes

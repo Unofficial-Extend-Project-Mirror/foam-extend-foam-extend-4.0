@@ -100,7 +100,6 @@ class LienCubicKELowRe
 
             wallDist y_;
 
-            volTensorField gradU_;
             volScalarField eta_;
             volScalarField ksi_;
             volScalarField Cmu_;

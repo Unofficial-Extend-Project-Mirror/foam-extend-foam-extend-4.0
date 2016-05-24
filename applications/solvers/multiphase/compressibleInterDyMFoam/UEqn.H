@@ -11,7 +11,7 @@
       + fvm::div(rhoPhi, U)
       - fvm::laplacian(muEff, U)
       - (fvc::grad(U) & fvc::grad(muEff))
-    //- fvc::div(muf*(mesh.Sf() & fvc::interpolate(fvc::grad(U)().T())))
+      - fvc::div(muEff*(mesh.Sf() & fvc::interpolate(T(fvc::grad(U)))))
     );
 
     UEqn.relax();

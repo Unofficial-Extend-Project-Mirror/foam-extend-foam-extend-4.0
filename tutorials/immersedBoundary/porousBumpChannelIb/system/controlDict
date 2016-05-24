@@ -49,8 +49,8 @@ libs
     "libincompressibleTransportModels.so"
     "libcompressibleTurbulenceModel.so"
     "libincompressibleRASModels.so"
-    // "libimmersedBoundary.so"
-    // "libimmersedBoundaryTurbulence.so"
+    "libimmersedBoundary.so"
+    "libimmersedBoundaryTurbulence.so"
 );
 
 functions

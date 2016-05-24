@@ -295,7 +295,7 @@ tmp<fvVectorMatrix> SpalartAllmaras::divDevRhoReff(volVectorField& U) const
     return
     (
       - fvm::laplacian(muEff_, U)
-      - fvc::div(muEff_*dev2(fvc::grad(U)().T()))
+      - fvc::div(muEff_*dev2(T(fvc::grad(U))))
     );
 }
 

@@ -45,12 +45,12 @@ bool Foam::adjustPhi
 (
     surfaceScalarField& phi,
     const volVectorField& U,
-    volScalarField& p
+    const volScalarField& p
 )
 {
     if (p.needReference())
     {
-        p.boundaryField().updateCoeffs();
+        // Removed updateCoeffs.  HJ, 9/May/2016
 
         scalar massIn = 0.0;
         scalar fixedMassOut = 0.0;

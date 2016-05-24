@@ -81,22 +81,23 @@ int main(int argc, char *argv[])
 
         // Update thermal conductivity in the solid
         solidThermo.correct();
-        ksolid = solidThermo.k();
+        kSolid = solidThermo.k();
 
         // Coupled patches
 #       include "attachPatches.H"
 
         kappaEff.correctBoundaryConditions();
-        ksolid.correctBoundaryConditions();
+        kSolid.correctBoundaryConditions();
 
         // Interpolate to the faces and add thermal resistance
-        surfaceScalarField ksolidf = fvc::interpolate(ksolid);
-        solidThermo.modifyResistance(ksolidf);
+        surfaceScalarField kSolidf = fvc::interpolate(kSolid);
+        solidThermo.modifyResistance(kSolidf);
 
 #       include "solveEnergy.H"
 
         // Update density according to Boussinesq approximation
         rhok = 1.0 - beta*(T - TRef);
+        rhok.correctBoundaryConditions();
 
         runTime.write();
 

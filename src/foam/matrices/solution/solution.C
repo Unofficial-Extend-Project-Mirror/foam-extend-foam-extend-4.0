@@ -64,6 +64,8 @@ Foam::solution::solution(const objectRegistry& obr, const fileName& dictName)
             IOobject::NO_WRITE
         )
     ),
+    cache_(dictionary::null),
+    caching_(false),
     relaxationFactors_
     (
         ITstream("relaxationFactors", tokenList())()
@@ -179,6 +181,12 @@ bool Foam::solution::read()
 
     if (readOk)
     {
+        if (found("cache"))
+        {
+            cache_ = subDict("cache");
+            caching_ = cache_.lookupOrDefault("active", true);
+        }
+
         if (found("relaxationFactors"))
         {
             relaxationFactors_ = subDict("relaxationFactors");
@@ -196,6 +204,25 @@ bool Foam::solution::read()
     }
 
     return readOk;
+}
+
+
+bool Foam::solution::cache(const word& name) const
+{
+    if (caching_)
+    {
+        if (debug)
+        {
+            Info<< "Cache: find entry for " << name
+                << ": " << Switch(cache_.found(name)) << endl;
+        }
+
+        return cache_.found(name);
+    }
+    else
+    {
+        return false;
+    }
 }
 
 

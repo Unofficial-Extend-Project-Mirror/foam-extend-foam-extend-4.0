@@ -115,7 +115,7 @@ class fvMatrix
     // Private data
 
         // Reference to GeometricField<Type, fvPatchField, volMesh>
-        GeometricField<Type, fvPatchField, volMesh>& psi_;
+        const GeometricField<Type, fvPatchField, volMesh>& psi_;
 
         //- Dimension set
         dimensionSet dimensions_;
@@ -187,7 +187,7 @@ public:
         //- Construct given a field to solve for
         fvMatrix
         (
-            GeometricField<Type, fvPatchField, volMesh>&,
+            const GeometricField<Type, fvPatchField, volMesh>&,
             const dimensionSet&
         );
 
@@ -200,7 +200,11 @@ public:
 #       endif
 
         //- Construct from Istream given field to solve for
-        fvMatrix(GeometricField<Type, fvPatchField, volMesh>&, Istream&);
+        fvMatrix
+        (
+            const GeometricField<Type, fvPatchField, volMesh>&,
+            Istream&
+        );
 
 
         //- Clone
@@ -223,11 +227,6 @@ public:
         // Access
 
             const GeometricField<Type, fvPatchField, volMesh>& psi() const
-            {
-                return psi_;
-            }
-
-            GeometricField<Type, fvPatchField, volMesh>& psi()
             {
                 return psi_;
             }

@@ -122,6 +122,28 @@ void Foam::CoeffField<Foam::diagTensor>::operator=
 }
 
 
+// * * * * * * * * * * * * * * * IOstream Operators  * * * * * * * * * * * * //
+
+Foam::Ostream& Foam::operator<<(Ostream& os, const CoeffField<diagTensor>& f)
+{
+    const DecoupledCoeffField<diagTensor>& df = f;
+    return operator<<(os, df);
+}
+
+
+Foam::Ostream& Foam::operator<<
+(
+    Ostream& os,
+    const tmp<CoeffField<diagTensor> >& tf
+)
+{
+    const DecoupledCoeffField<diagTensor>& df = tf();
+    os << df;
+    tf.clear();
+    return os;
+}
+
+
 /* * * * * * * * * * * * * * * * Global functions  * * * * * * * * * * * * * */
 
 Foam::tmp<Foam::CoeffField<Foam::diagTensor> > Foam::inv
@@ -135,6 +157,48 @@ Foam::tmp<Foam::CoeffField<Foam::diagTensor> > Foam::inv
     (
         new CoeffField<diagTensor>(inv(df)())
     );
+}
+
+
+template<>
+void Foam::multiply
+(
+    diagTensorField& f,
+    const CoeffField<diagTensor>& f1,
+    const diagTensor& f2
+)
+{
+    const DecoupledCoeffField<diagTensor>& df1 = f1;
+
+    multiply(f, df1, f2);
+}
+
+
+template<>
+void Foam::multiply
+(
+    diagTensorField& f,
+    const CoeffField<diagTensor>& f1,
+    const diagTensorField& f2
+)
+{
+    const DecoupledCoeffField<diagTensor>& df1 = f1;
+
+    multiply(f, df1, f2);
+}
+
+
+template<>
+void Foam::multiply
+(
+    diagTensorField& f,
+    const diagTensorField& f1,
+    const CoeffField<diagTensor>& f2
+)
+{
+    const DecoupledCoeffField<diagTensor>& df2 = f2;
+
+    multiply(f, f1, df2);
 }
 
 

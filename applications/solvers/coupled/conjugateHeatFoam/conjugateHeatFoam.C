@@ -109,6 +109,7 @@ int main(int argc, char *argv[])
 
         // Update density according to Boussinesq approximation
         rhok = 1.0 - beta*(T - TRef);
+        rhok.correctBoundaryConditions();
 
         runTime.write();
 

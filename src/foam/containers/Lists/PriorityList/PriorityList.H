@@ -50,7 +50,7 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                      Class PriorityList Declaration
+                          Class PriorityList Declaration
 \*---------------------------------------------------------------------------*/
 
 template<class Type>

@@ -31,10 +31,10 @@ solvers
         solver           BiCGStab;
         preconditioner   DILU;
 
-        minIter           0;
-        maxIter           1000;
+        minIter          0;
+        maxIter          1000;
         tolerance        1e-8;
-        relTol           0.01;
+        relTol           0.0;
     }
     i
     {
@@ -44,7 +44,7 @@ solvers
         minIter          0;
         maxIter          1000;
         tolerance        1e-8;
-        relTol           0.01;
+        relTol           0.0;
     }
     k
     {
@@ -79,12 +79,12 @@ relaxationFactors
 {
     // Note: under-relaxation factors used in wave-transmissive schemes
     Urel            0.5;
-    p               0.2;
+    p               0.3;
     i               0.1;
     rho             0.5;
 
-    k               0.2;
-    epsilon         0.2;
+    k               0.5;
+    epsilon         0.5;
 }
 
 fieldBounds

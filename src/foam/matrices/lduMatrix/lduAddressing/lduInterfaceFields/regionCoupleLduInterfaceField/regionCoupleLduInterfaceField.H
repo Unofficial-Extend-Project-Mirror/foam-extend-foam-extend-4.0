@@ -66,9 +66,8 @@ public:
         {}
 
 
-    // Destructor
-
-        virtual ~regionCoupleLduInterfaceField();
+    //-Destructor
+    virtual ~regionCoupleLduInterfaceField();
 };
 
 

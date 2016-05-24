@@ -751,6 +751,27 @@ void Foam::genericFvPatchField<Type>::rmap
 
 
 template<class Type>
+void Foam::genericFvPatchField<Type>::evaluate(const Pstream::commsTypes)
+{
+    FatalErrorIn
+    (
+        "genericFvPatchField<Type>::"
+        "evaluate(const Pstream::commsTypes)"
+    )   << "\n    "
+           "evaluate() cannot be called for a genericFvPatchField"
+           " (actual type " << actualTypeName_ << ")"
+        << "\n    on patch " << this->patch().name()
+        << " of field " << this->dimensionedInternalField().name()
+        << " in file " << this->dimensionedInternalField().objectPath()
+        << "\n    You are probably trying to solve for a field with a "
+           "generic boundary condition."
+        << exit(FatalError);
+
+    fvPatchField<Type>::evaluate();
+}
+
+
+template<class Type>
 Foam::tmp<Foam::Field<Type> >
 Foam::genericFvPatchField<Type>::valueInternalCoeffs
 (

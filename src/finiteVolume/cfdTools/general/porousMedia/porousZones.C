@@ -75,7 +75,7 @@ void Foam::porousZones::addResistance
 ) const
 {
     // addResistance for each zone, delaying the correction of the
-    // precessor BCs of AU
+    // processor BCs of AU
     forAll(*this, i)
     {
         operator[](i).addResistance(UEqn, AU, false);

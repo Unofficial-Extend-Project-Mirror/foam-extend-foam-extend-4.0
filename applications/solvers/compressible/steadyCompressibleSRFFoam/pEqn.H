@@ -4,9 +4,10 @@
     surfaceScalarField psisf = fvc::interpolate(psis);
     surfaceScalarField rhof = fvc::interpolate(rho);
 
-    // Needs to be outside of loop since p is changing, but psi and rho are not.
+    // Needs to be outside of loop since p is changing, but psi and rho are not
     surfaceScalarField rhoReff = rhof - psisf*fvc::interpolate(p);
 
+    // --- PISO loop
     for (int corr = 0; corr < nCorr; corr++)
     {
         Urel = rUrelA*UrelEqn.H();
@@ -20,12 +21,21 @@
 
         p.storePrevIter();
 
+        volScalarField divPhid
+        (
+            "divPhid",
+            fvc::div(phid)
+        );
+
         for (int nonOrth = 0; nonOrth <= nNonOrthCorr; nonOrth++)
         {
             fvScalarMatrix pEqn
             (
                 fvm::ddt(psis, p)
               + fvm::div(phid, p)
+                // Convective flux relaxation terms
+              + fvm::SuSp(-divPhid, p)
+              + divPhid*p
               + fvc::div(phid2)
               - fvm::laplacian(rho*rUrelA, p)
             );

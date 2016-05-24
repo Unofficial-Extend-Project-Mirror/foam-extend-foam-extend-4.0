@@ -30,11 +30,13 @@ License
 #include "BlockNoPrecon.H"
 #include "blockDiagonalPrecons.H"
 #include "blockGaussSeidelPrecons.H"
+#include "blockDiagGaussSeidelPrecons.H"
 #include "BlockCholeskyPrecon.H"
 #include "BlockILUCpPrecon.H"
 
 #include "blockLduSmoothers.H"
 #include "blockGaussSeidelSmoothers.H"
+#include "blockDiagGaussSeidelSmoothers.H"
 #include "BlockILUSmoother.H"
 #include "BlockILUCpSmoother.H"
 
@@ -43,11 +45,12 @@ License
 #include "BlockBiCGStabSolver.H"
 #include "BlockCGSolver.H"
 #include "BlockGaussSeidelSolver.H"
+#include "BlockDiagGaussSeidelSolver.H"
 #include "BlockGMRESSolver.H"
 
 // KRJ: 2012-12-15: Multigrid solver
-#include "blockAmgSolvers.H"
-#include "blockAmgPrecons.H"
+#include "blockAMGSolvers.H"
+#include "blockAMGPrecons.H"
 #include "blockMatrixCoarsenings.H"
 #include "blockMatrixAgglomerations.H"
 #include "blockCoeffNorms.H"
@@ -82,6 +85,9 @@ makeBlockPrecon(block##Type##Precon, block##Type##DiagonalPrecon);            \
 typedef BlockGaussSeidelPrecon<type > block##Type##GaussSeidelPrecon;         \
 makeBlockPrecon(block##Type##Precon, block##Type##GaussSeidelPrecon);         \
                                                                               \
+typedef BlockDiagGaussSeidelPrecon<type > block##Type##DiagGaussSeidelPrecon; \
+makeBlockPrecon(block##Type##Precon, block##Type##DiagGaussSeidelPrecon);     \
+                                                                              \
 typedef BlockCholeskyPrecon<type > block##Type##CholeskyPrecon;               \
 makeBlockPrecon(block##Type##Precon, block##Type##CholeskyPrecon);            \
                                                                               \
@@ -95,6 +101,9 @@ defineTemplateRunTimeSelectionTable(block##Type##Smoother, dictionary);       \
                                                                               \
 typedef BlockGaussSeidelSmoother<type > block##Type##GaussSeidelSmoother;     \
 makeBlockSmoother(block##Type##Smoother, block##Type##GaussSeidelSmoother);   \
+                                                                              \
+typedef BlockDiagGaussSeidelSmoother<type > block##Type##DiagGaussSeidelSmoother; \
+        makeBlockSmoother(block##Type##Smoother, block##Type##DiagGaussSeidelSmoother);  \
                                                                               \
 typedef BlockILUSmoother<type > block##Type##ILUSmoother;                     \
 makeBlockSmoother(block##Type##Smoother, block##Type##ILUSmoother);           \
@@ -135,6 +144,11 @@ makeBlockSolverTypeName(block##Type##GaussSeidelSolver);                      \
 addSolverToBlockMatrix(Type, block##Type##GaussSeidelSolver, symMatrix);      \
 addSolverToBlockMatrix(Type, block##Type##GaussSeidelSolver, asymMatrix);     \
                                                                               \
+typedef BlockDiagGaussSeidelSolver<type > block##Type##DiagGaussSeidelSolver; \
+makeBlockSolverTypeName(block##Type##DiagGaussSeidelSolver);                  \
+addSolverToBlockMatrix(Type, block##Type##DiagGaussSeidelSolver, symMatrix);  \
+addSolverToBlockMatrix(Type, block##Type##DiagGaussSeidelSolver, asymMatrix); \
+                                                                              \
 typedef BlockGMRESSolver<type > block##Type##GMRESSolver;                     \
 makeBlockSolverTypeName(block##Type##GMRESSolver);                            \
 addSolverToBlockMatrix(Type, block##Type##GMRESSolver, symMatrix);            \
@@ -160,12 +174,12 @@ makeBlockCoeffNorm(block##Type##CoeffNorm, block##Type##CoeffComponentNorm);  \
 typedef BlockCoeffMaxNorm<type > block##Type##CoeffMaxNorm;                   \
 makeBlockCoeffNorm(block##Type##CoeffNorm, block##Type##CoeffMaxNorm);        \
                                                                               \
-typedef BlockAmgSolver<type > block##Type##AmgSolver;                         \
+typedef BlockAMGSolver<type > block##Type##AmgSolver;                         \
 makeBlockSolverTypeName(block##Type##AmgSolver);                              \
 addSolverToBlockMatrix(Type, block##Type##AmgSolver, symMatrix);              \
 addSolverToBlockMatrix(Type, block##Type##AmgSolver, asymMatrix);             \
                                                                               \
-typedef BlockAmgPrecon<type > block##Type##AmgPrecon;                         \
+typedef BlockAMGPrecon<type > block##Type##AmgPrecon;                         \
 makeBlockPrecon(block##Type##Precon, block##Type##AmgPrecon);                 \
 
 forAllVectorNTypes(makeSolver)

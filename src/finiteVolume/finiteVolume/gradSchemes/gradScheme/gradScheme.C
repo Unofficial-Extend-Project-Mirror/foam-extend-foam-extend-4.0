@@ -118,28 +118,16 @@ Foam::fv::gradScheme<Type>::grad
     typedef typename outerProduct<vector, Type>::type GradType;
     typedef GeometricField<GradType, fvPatchField, volMesh> GradFieldType;
 
-    if (!this->mesh().changing() && this->mesh().schemesDict().cache(name))
+    if (!this->mesh().changing() && this->mesh().solutionDict().cache(name))
     {
         if (!mesh().objectRegistry::template foundObject<GradFieldType>(name))
         {
-            if (fvSchemes::debug)
-            {
-                Info << "Cache: Calculating and caching " << name
-                    << " originating from " << vsf.name()
-                    << " event No. " << vsf.eventNo()
-                    << endl;
-            }
+            solution::cachePrintMessage("Calculating and caching", name, vsf);
             tmp<GradFieldType> tgGrad = calcGrad(vsf, name);
             regIOobject::store(tgGrad.ptr());
         }
 
-        if (fvSchemes::debug)
-        {
-            Info << "Cache: Retrieving " << name
-                << " originating from " << vsf.name()
-                << " event No. " << vsf.eventNo()
-                << endl;
-        }
+        solution::cachePrintMessage("Retrieving", name, vsf);
         GradFieldType& gGrad = const_cast<GradFieldType&>
         (
             mesh().objectRegistry::template lookupObject<GradFieldType>(name)
@@ -147,36 +135,33 @@ Foam::fv::gradScheme<Type>::grad
 
         if (gGrad.upToDate(vsf.name()))
         {
+            if (solution::debug)
+            {
+                Info<< ": up-to-date." << endl;
+            }
+
             return gGrad;
         }
         else
         {
-            if (fvSchemes::debug)
+            if (solution::debug)
             {
-                Info << "Cache: Deleting " << name
-                    << " originating from " << vsf.name()
-                    << " event No. " << vsf.eventNo()
-                    << endl;
+                Info<< ": not up-to-date." << endl;
+                solution::cachePrintMessage("Deleting", name, vsf);
             }
             gGrad.release();
             delete &gGrad;
 
-            if (fvSchemes::debug)
-            {
-                Info << "Cache: Recalculating " << name
-                    << " originating from " << vsf.name()
-                    << " event No. " << vsf.eventNo()
-                    << endl;
-            }
+            solution::cachePrintMessage("Recalculating", name, vsf);
             tmp<GradFieldType> tgGrad = calcGrad(vsf, name);
 
-            if (fvSchemes::debug)
-            {
-                Info << "Cache: Storing " << name
-                    << " originating from " << vsf.name()
-                    << " event No. " << vsf.eventNo()
-                    << endl;
-            }
+            // Note: in order for the patchNeighbourField to be
+            // correct on coupled boundaries,
+            // correctBoundaryConditions needs to be called.  The call
+            // shall be moved into the library fvc operators
+            tgGrad().correctBoundaryConditions();
+
+            solution::cachePrintMessage("Storing", name, vsf);
             regIOobject::store(tgGrad.ptr());
             GradFieldType& gGrad = const_cast<GradFieldType&>
             (
@@ -203,25 +188,13 @@ Foam::fv::gradScheme<Type>::grad
 
             if (gGrad.ownedByRegistry())
             {
-                if (fvSchemes::debug)
-                {
-                    Info << "Cache: Deleting " << name
-                        << " originating from " << vsf.name()
-                        << " event No. " << vsf.eventNo()
-                        << endl;
-                }
+                solution::cachePrintMessage("Deleting", name, vsf);
                 gGrad.release();
                 delete &gGrad;
             }
         }
 
-        if (fvSchemes::debug)
-        {
-            Info << "Cache: Calculating " << name
-                << " originating from " << vsf.name()
-                << " event No. " << vsf.eventNo()
-                << endl;
-        }
+        solution::cachePrintMessage("Calculating", name, vsf);
         return calcGrad(vsf, name);
     }
 }
@@ -285,8 +258,9 @@ gradScheme<Type>::fvmGrad
         "(\n"
         "    GeometricField<Type, fvPatchField, volMesh>&"
         ")\n"
-    )   << "Implicit gradient operator currently defined only for Gauss linear "
-        << "and leastSquares (cell and face limiters are optional)."
+    )   << "Implicit gradient operator currently defined only for "
+        << "Gauss linear and leastSquares "
+        << "(cell and face limiters are optional)."
         << abort(FatalError);
 
     typedef typename outerProduct<vector, Type>::type GradType;

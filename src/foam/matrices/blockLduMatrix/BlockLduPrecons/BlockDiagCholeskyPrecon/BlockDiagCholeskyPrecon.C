@@ -225,7 +225,7 @@ void Foam::BlockDiagCholeskyPrecon<Type>::calcPreconDiag()
 //     if (preconDiag_.activeType() == blockCoeffBase::SQUARE)
 //     {
 //         typedef typename TypeCoeffField::linearTypeField linearTypeField;
-//         typedef typename TypeCoeffField::linearType valueType;
+//         typedef typename TypeCoeffField::linearType linearType;
 
 //         typedef typename TypeCoeffField::squareTypeField squareTypeField;
 
@@ -257,7 +257,7 @@ void Foam::BlockDiagCholeskyPrecon<Type>::calcPreconDiag()
 //         preconDiag_.asLinear() =
 //             cmptDivide
 //             (
-//                 linearTypeField(lf.size(), pTraits<valueType>::one),
+//                 linearTypeField(lf.size(), pTraits<linearType>::one),
 //                 lf
 //             );
 //     }
@@ -601,10 +601,9 @@ void Foam::BlockDiagCholeskyPrecon<Type>::precondition
 
     if (this->matrix_.symmetric())
     {
-        const TypeCoeffField& DiagCoeff = this->matrix_.diag();
         const TypeCoeffField& UpperCoeff = this->matrix_.upper();
 
-        if (DiagCoeff.activeType() == blockCoeffBase::SCALAR)
+        if (preconDiag_.activeType() == blockCoeffBase::SCALAR)
         {
             if (UpperCoeff.activeType() == blockCoeffBase::SCALAR)
             {
@@ -638,7 +637,7 @@ void Foam::BlockDiagCholeskyPrecon<Type>::precondition
                 );
             }
         }
-        else if (DiagCoeff.activeType() == blockCoeffBase::LINEAR)
+        else if (preconDiag_.activeType() == blockCoeffBase::LINEAR)
         {
             if (UpperCoeff.activeType() == blockCoeffBase::SCALAR)
             {
@@ -672,7 +671,7 @@ void Foam::BlockDiagCholeskyPrecon<Type>::precondition
                 );
             }
         }
-        else if (DiagCoeff.activeType() == blockCoeffBase::SQUARE)
+        else if (preconDiag_.activeType() == blockCoeffBase::SQUARE)
         {
             // Add diag coupling to b
             if (bPlusLU_.empty())
@@ -872,11 +871,10 @@ void Foam::BlockDiagCholeskyPrecon<Type>::preconditionT
     }
     else // Asymmetric matrix
     {
-        const TypeCoeffField& DiagCoeff = this->matrix_.diag();
         const TypeCoeffField& LowerCoeff = this->matrix_.lower();
         const TypeCoeffField& UpperCoeff = this->matrix_.upper();
 
-        if (DiagCoeff.activeType() == blockCoeffBase::SCALAR)
+        if (preconDiag_.activeType() == blockCoeffBase::SCALAR)
         {
             if (UpperCoeff.activeType() == blockCoeffBase::SCALAR)
             {
@@ -912,7 +910,7 @@ void Foam::BlockDiagCholeskyPrecon<Type>::preconditionT
                 );
             }
         }
-        else if (DiagCoeff.activeType() == blockCoeffBase::LINEAR)
+        else if (preconDiag_.activeType() == blockCoeffBase::LINEAR)
         {
             if (UpperCoeff.activeType() == blockCoeffBase::SCALAR)
             {
@@ -948,7 +946,7 @@ void Foam::BlockDiagCholeskyPrecon<Type>::preconditionT
                 );
             }
         }
-        else if (DiagCoeff.activeType() == blockCoeffBase::SQUARE)
+        else if (preconDiag_.activeType() == blockCoeffBase::SQUARE)
         {
             // Add diag coupling to b
             if (bPlusLU_.empty())

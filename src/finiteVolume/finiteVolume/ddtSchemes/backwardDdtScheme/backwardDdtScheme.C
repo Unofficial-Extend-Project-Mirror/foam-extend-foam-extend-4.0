@@ -362,7 +362,7 @@ template<class Type>
 tmp<fvMatrix<Type> >
 backwardDdtScheme<Type>::fvmDdt
 (
-    GeometricField<Type, fvPatchField, volMesh>& vf
+    const GeometricField<Type, fvPatchField, volMesh>& vf
 )
 {
     tmp<fvMatrix<Type> > tfvm
@@ -414,7 +414,7 @@ tmp<fvMatrix<Type> >
 backwardDdtScheme<Type>::fvmDdt
 (
     const dimensionedScalar& rho,
-    GeometricField<Type, fvPatchField, volMesh>& vf
+    const GeometricField<Type, fvPatchField, volMesh>& vf
 )
 {
     tmp<fvMatrix<Type> > tfvm
@@ -465,7 +465,7 @@ tmp<fvMatrix<Type> >
 backwardDdtScheme<Type>::fvmDdt
 (
     const volScalarField& rho,
-    GeometricField<Type, fvPatchField, volMesh>& vf
+    const GeometricField<Type, fvPatchField, volMesh>& vf
 )
 {
     tmp<fvMatrix<Type> > tfvm

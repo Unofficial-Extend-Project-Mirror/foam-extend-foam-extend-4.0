@@ -307,7 +307,7 @@ void fvBlockMatrix<Type>::updateCouplingCoeffs
     const GeometricField<matrixType, fvPatchField, volMesh>& psi =
         matrix.psi();
 
-    forAll(psi.boundaryField(), patchI)
+    forAll (psi.boundaryField(), patchI)
     {
         const fvPatchField<matrixType>& pf = psi.boundaryField()[patchI];
         const fvPatch& patch = pf.patch();
@@ -325,6 +325,7 @@ void fvBlockMatrix<Type>::updateCouplingCoeffs
             {
                 typename CoeffField<Type>::linearTypeField& pcoupleUpper =
                     this->coupleUpper()[patchI].asLinear();
+
                 typename CoeffField<Type>::linearTypeField& pcoupleLower =
                     this->coupleLower()[patchI].asLinear();
 
@@ -333,7 +334,7 @@ void fvBlockMatrix<Type>::updateCouplingCoeffs
                     scalarField icpCmpt = icp.component(cmptI);
                     scalarField bcpCmpt = bcp.component(cmptI);
 
-                    forAll(pf, faceI)
+                    forAll (pf, faceI)
                     {
                         pcoupleUpper[faceI](localDir) = bcpCmpt[faceI];
                         pcoupleLower[faceI](localDir) = icpCmpt[faceI];
@@ -352,6 +353,7 @@ void fvBlockMatrix<Type>::updateCouplingCoeffs
             {
                 typename CoeffField<Type>::squareTypeField& pcoupleUpper =
                     this->coupleUpper()[patchI].asSquare();
+
                 typename CoeffField<Type>::squareTypeField& pcoupleLower =
                     this->coupleLower()[patchI].asSquare();
 
@@ -360,10 +362,11 @@ void fvBlockMatrix<Type>::updateCouplingCoeffs
                     scalarField icpCmpt = icp.component(cmptI);
                     scalarField bcpCmpt = bcp.component(cmptI);
 
-                    forAll(pf, faceI)
+                    forAll (pf, faceI)
                     {
                         pcoupleUpper[faceI](localDir, localDir) =
                             bcpCmpt[faceI];
+
                         pcoupleLower[faceI](localDir, localDir) =
                             icpCmpt[faceI];
                     }
@@ -450,13 +453,13 @@ void Foam::fvBlockMatrix<Type>::insertBlock
     // Insert blockMatrix that represents coupling into larger system matrix
     for (direction cmptI = 0; cmptI < nCmpts; cmptI++)
     {
-        forAll(bmd, cellI)
+        forAll (bmd, cellI)
         {
             blockDiag[cellI](localDirI, localDirJ) +=
                 bmd[cellI].component(cmptI);
         }
 
-        forAll(bmu, faceI)
+        forAll (bmu, faceI)
         {
             blockUpper[faceI](localDirI, localDirJ) +=
                 bmu[faceI].component(cmptI);
@@ -505,7 +508,7 @@ void Foam::fvBlockMatrix<Type>::insertBoundaryContributions
     {
         scalarField sourceCmpt(source.component(cmptI));
 
-        forAll(b, cellI)
+        forAll (b, cellI)
         {
             b[cellI](localDirI) += sourceCmpt[cellI];
         }
@@ -525,26 +528,29 @@ void Foam::fvBlockMatrix<Type>::insertBoundaryContributions
     localDirJ = dirJ;
 
     // Insert coupling contributions into block matrix
-    forAll(bmesh, patchI)
+    forAll (bmesh, patchI)
     {
         if (bmesh[patchI].coupled())
         {
             typename CoeffField<Type>::squareTypeField& pcoupleUpper =
                 this->coupleUpper()[patchI].asSquare();
+
             typename CoeffField<Type>::squareTypeField& pcoupleLower =
                 this->coupleLower()[patchI].asSquare();
 
             const typename CoeffField<blockType>::linearTypeField& bmcu =
                 blockSystem.coupleUpper()[patchI].asLinear();
+
             const typename CoeffField<blockType>::linearTypeField& bmcl =
                 blockSystem.coupleLower()[patchI].asLinear();
 
             for (direction cmptI = 0; cmptI < nCmpts; cmptI++)
             {
-                forAll(bmcu, faceI)
+                forAll (bmcu, faceI)
                 {
                     pcoupleUpper[faceI](localDirI, localDirJ) +=
                           bmcu[faceI].component(cmptI);
+
                     pcoupleLower[faceI](localDirI, localDirJ) +=
                           bmcl[faceI].component(cmptI);
                 }
@@ -580,7 +586,7 @@ void fvBlockMatrix<Type>::insertCouplingDiag
         this->diag().asSquare();
 
     // Set off-diagonal coefficient
-    forAll(coeffIJ, cellI)
+    forAll (coeffIJ, cellI)
     {
         blockDiag[cellI](dirI, dirJ) += coeffIJ[cellI];
     }
@@ -631,7 +637,7 @@ void fvBlockMatrix<Type>::insertCouplingUpperLower
         typename CoeffField<Type>::squareTypeField& blockUpper =
             this->upper().asSquare();
 
-        forAll(upper, cellI)
+        forAll (upper, cellI)
         {
             blockUpper[cellI](dirI, dirJ) = upper[cellI];
         }
@@ -651,7 +657,7 @@ void fvBlockMatrix<Type>::insertCouplingUpperLower
     }
 
     // Insert block interface fields
-    forAll(this->interfaces(), patchI)
+    forAll (this->interfaces(), patchI)
     {
         if (this->interfaces().set(patchI))
         {
@@ -665,7 +671,7 @@ void fvBlockMatrix<Type>::insertCouplingUpperLower
             typename CoeffField<Type>::squareTypeField& blockLower =
                 this->coupleLower()[patchI].asSquare();
 
-            forAll(cUpper, faceI)
+            forAll (cUpper, faceI)
             {
                 blockUpper[faceI](dirI, dirJ) = cUpper[faceI];
                 blockLower[faceI](dirI, dirJ) = cLower[faceI];
@@ -785,7 +791,7 @@ void fvBlockMatrix<Type>::blockAdd
     Field<Type>& blockX
 )
 {
-    forAll(xSingle, cellI)
+    forAll (xSingle, cellI)
     {
         blockX[cellI](dir) += xSingle[cellI];
     }

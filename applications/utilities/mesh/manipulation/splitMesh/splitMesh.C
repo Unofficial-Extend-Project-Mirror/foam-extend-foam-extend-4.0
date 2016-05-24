@@ -263,6 +263,9 @@ int main(int argc, char *argv[])
 
     splitter.changeMesh();
 
+    // Remove zones - not needed
+    mesh.removeZones();
+
     Info<< "Writing mesh to " << runTime.timeName() << endl;
     if (!mesh.write())
     {

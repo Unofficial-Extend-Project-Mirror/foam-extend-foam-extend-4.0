@@ -68,14 +68,30 @@ Foam::linearUpwindV<Type>::correction
     const volVectorField& C = mesh.C();
     const surfaceVectorField& Cf = mesh.Cf();
 
-    GeometricField
-        <typename outerProduct<vector, Type>::type, fvPatchField, volMesh>
-        gradVf = gradScheme_().grad(vf);
+    // Due to gradient cacheing, must take a tmp field
+    // HJ, 22/Apr/2016
+    tmp
+    <
+        GeometricField
+        <
+            typename outerProduct<vector, Type>::type,
+            fvPatchField,
+            volMesh
+        >
+    > tgradVf = gradScheme_().grad(vf, gradSchemeName_);
+
+    const GeometricField
+    <
+        typename outerProduct<vector, Type>::type,
+        fvPatchField,
+        volMesh
+    >& gradVf = tgradVf();
 
     // Note: in order for the patchNeighbourField to be correct on coupled
     // boundaries, correctBoundaryConditions needs to be called.
     // The call shall be moved into the library fvc operators
-    gradVf.correctBoundaryConditions();
+    // Moved to cached gradScheme.  HJ, 22/Apr/2016
+//     gradVf.correctBoundaryConditions();
 
     forAll(faceFlux, facei)
     {

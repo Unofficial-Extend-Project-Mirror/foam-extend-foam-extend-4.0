@@ -139,7 +139,7 @@ int main(int argc, char *argv[])
           + aphiv_neg*(rho_neg*(e_neg + 0.5*magSqr(U_neg)) + p_neg)
           + aSf*p_pos - aSf*p_neg;
 
-        volTensorField tauMC("tauMC", mu*dev2(fvc::grad(U)().T()));
+        volTensorField tauMC("tauMC", mu*dev2(Foam::T(fvc::grad(U))));
 
         // --- Solve density
         solve(fvm::ddt(rho) + fvc::div(phi));

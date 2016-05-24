@@ -142,19 +142,19 @@ public:
 
         tmp<fvMatrix<Type> > fvmDdt
         (
-            GeometricField<Type, fvPatchField, volMesh>&
+            const GeometricField<Type, fvPatchField, volMesh>&
         );
 
         tmp<fvMatrix<Type> > fvmDdt
         (
             const dimensionedScalar&,
-            GeometricField<Type, fvPatchField, volMesh>&
+            const GeometricField<Type, fvPatchField, volMesh>&
         );
 
         tmp<fvMatrix<Type> > fvmDdt
         (
             const volScalarField&,
-            GeometricField<Type, fvPatchField, volMesh>&
+            const GeometricField<Type, fvPatchField, volMesh>&
         );
 
         typedef typename ddtScheme<Type>::fluxFieldType fluxFieldType;

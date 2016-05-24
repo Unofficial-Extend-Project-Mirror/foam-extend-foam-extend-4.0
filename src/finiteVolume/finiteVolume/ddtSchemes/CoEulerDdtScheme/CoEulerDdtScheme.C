@@ -368,7 +368,7 @@ template<class Type>
 tmp<fvMatrix<Type> >
 CoEulerDdtScheme<Type>::fvmDdt
 (
-    GeometricField<Type, fvPatchField, volMesh>& vf
+    const GeometricField<Type, fvPatchField, volMesh>& vf
 )
 {
     tmp<fvMatrix<Type> > tfvm
@@ -404,7 +404,7 @@ tmp<fvMatrix<Type> >
 CoEulerDdtScheme<Type>::fvmDdt
 (
     const dimensionedScalar& rho,
-    GeometricField<Type, fvPatchField, volMesh>& vf
+    const GeometricField<Type, fvPatchField, volMesh>& vf
 )
 {
     tmp<fvMatrix<Type> > tfvm
@@ -441,7 +441,7 @@ tmp<fvMatrix<Type> >
 CoEulerDdtScheme<Type>::fvmDdt
 (
     const volScalarField& rho,
-    GeometricField<Type, fvPatchField, volMesh>& vf
+    const GeometricField<Type, fvPatchField, volMesh>& vf
 )
 {
     tmp<fvMatrix<Type> > tfvm

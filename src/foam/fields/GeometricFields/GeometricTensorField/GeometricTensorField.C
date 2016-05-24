@@ -36,6 +36,7 @@ namespace Foam
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
+UNARY_FUNCTION(tensor, tensor, T, transform)
 UNARY_FUNCTION(scalar, tensor, tr, transform)
 UNARY_FUNCTION(sphericalTensor, tensor, sph, transform)
 UNARY_FUNCTION(symmTensor, tensor, symm, transform)

@@ -47,7 +47,7 @@ tmp<faMatrix<Type> >
 Su
 (
     const GeometricField<Type, faPatchField, areaMesh>& su,
-    GeometricField<Type, faPatchField, areaMesh>& vf
+    const GeometricField<Type, faPatchField, areaMesh>& vf
 )
 {
     const faMesh& mesh = vf.mesh();
@@ -72,7 +72,7 @@ tmp<faMatrix<Type> >
 Su
 (
     const tmp<GeometricField<Type, faPatchField, areaMesh> >& tsu,
-    GeometricField<Type, faPatchField, areaMesh>& vf
+    const GeometricField<Type, faPatchField, areaMesh>& vf
 )
 {
     tmp<faMatrix<Type> > tfam = fam::Su(tsu(), vf);
@@ -86,7 +86,7 @@ tmp<faMatrix<Type> >
 Sp
 (
     const areaScalarField& sp,
-    GeometricField<Type, faPatchField, areaMesh>& vf
+    const GeometricField<Type, faPatchField, areaMesh>& vf
 )
 {
     const faMesh& mesh = vf.mesh();
@@ -111,7 +111,7 @@ tmp<faMatrix<Type> >
 Sp
 (
     const tmp<areaScalarField>& tsp,
-    GeometricField<Type, faPatchField, areaMesh>& vf
+    const GeometricField<Type, faPatchField, areaMesh>& vf
 )
 {
     tmp<faMatrix<Type> > tfam = fam::Sp(tsp(), vf);
@@ -125,7 +125,7 @@ tmp<faMatrix<Type> >
 Sp
 (
     const dimensionedScalar& sp,
-    GeometricField<Type, faPatchField, areaMesh>& vf
+    const GeometricField<Type, faPatchField, areaMesh>& vf
 )
 {
     const faMesh& mesh = vf.mesh();
@@ -151,7 +151,7 @@ tmp<faMatrix<Type> >
 SuSp
 (
     const areaScalarField& sp,
-    GeometricField<Type, faPatchField, areaMesh>& vf
+    const GeometricField<Type, faPatchField, areaMesh>& vf
 )
 {
     const faMesh& mesh = vf.mesh();
@@ -179,7 +179,7 @@ tmp<faMatrix<Type> >
 SuSp
 (
     const tmp<areaScalarField>& tsp,
-    GeometricField<Type, faPatchField, areaMesh>& vf
+    const GeometricField<Type, faPatchField, areaMesh>& vf
 )
 {
     tmp<faMatrix<Type> > tfam = fam::SuSp(tsp(), vf);

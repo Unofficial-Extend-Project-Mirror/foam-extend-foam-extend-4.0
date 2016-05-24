@@ -35,7 +35,7 @@ SourceFiles
 #ifndef basicSymmetryFvPatchField_H
 #define basicSymmetryFvPatchField_H
 
-#include "transformFvPatchField.H"
+#include "transformFvPatchFields.H"
 #include "symmetryFvPatch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

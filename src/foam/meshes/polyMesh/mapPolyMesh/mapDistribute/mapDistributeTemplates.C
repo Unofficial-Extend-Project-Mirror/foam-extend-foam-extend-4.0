@@ -85,25 +85,7 @@ void Foam::mapDistribute::distribute
                 IPstream fromNbr(Pstream::blocking, domain);
                 List<T> subField(fromNbr);
 
-                if (subField.size() != map.size())
-                {
-                    FatalErrorIn
-                    (
-                        "template<class T>\n"
-                        "void mapDistribute::distribute\n"
-                        "(\n"
-                        "    const Pstream::commsTypes commsType,\n"
-                        "    const List<labelPair>& schedule,\n"
-                        "    const label constructSize,\n"
-                        "    const labelListList& subMap,\n"
-                        "    const labelListList& constructMap,\n"
-                        "    List<T>& field\n"
-                        ")\n"
-                    )   << "Expected from processor " << domain
-                        << " " << map.size() << " but received "
-                        << subField.size() << " elements."
-                        << abort(FatalError);
-                }
+                checkReceivedSize(domain, map.size(), subField.size());
 
                 forAll(map, i)
                 {
@@ -151,25 +133,7 @@ void Foam::mapDistribute::distribute
 
                 const labelList& map = constructMap[sendProc];
 
-                if (subField.size() != map.size())
-                {
-                    FatalErrorIn
-                    (
-                        "template<class T>\n"
-                        "void mapDistribute::distribute\n"
-                        "(\n"
-                        "    const Pstream::commsTypes commsType,\n"
-                        "    const List<labelPair>& schedule,\n"
-                        "    const label constructSize,\n"
-                        "    const labelListList& subMap,\n"
-                        "    const labelListList& constructMap,\n"
-                        "    List<T>& field\n"
-                        ")\n"
-                    )   << "Expected from processor " << sendProc
-                        << " " << map.size() << " but received "
-                        << subField.size() << " elements."
-                        << abort(FatalError);
-                }
+                checkReceivedSize(recvProc, map.size(), subField.size());
 
                 forAll(map, i)
                 {
@@ -292,25 +256,12 @@ void Foam::mapDistribute::distribute
 
             if (domain != Pstream::myProcNo() && map.size())
             {
-                if (recvFields[domain].size() != map.size())
-                {
-                    FatalErrorIn
-                    (
-                        "template<class T>\n"
-                        "void mapDistribute::distribute\n"
-                        "(\n"
-                        "    const Pstream::commsTypes commsType,\n"
-                        "    const List<labelPair>& schedule,\n"
-                        "    const label constructSize,\n"
-                        "    const labelListList& subMap,\n"
-                        "    const labelListList& constructMap,\n"
-                        "    List<T>& field\n"
-                        ")\n"
-                    )   << "Expected from processor " << domain
-                        << " " << map.size() << " but received "
-                        << recvFields[domain].size() << " elements."
-                        << abort(FatalError);
-                }
+                checkReceivedSize
+                (
+                    domain,
+                    map.size(),
+                    recvFields[domain].size()
+                );
 
                 forAll(map, i)
                 {
@@ -625,8 +576,9 @@ void Foam::mapDistribute::distribute
     }
     else
     {
+        // This needs to be cleaned up: temporary solution.  HJ, 15/Jun/2014
         FatalErrorIn("mapDistribute::distribute(..)")
-            << "Unknown communication schedule " << commsType
+            << "Unknown communication schedule " << label(commsType)
             << abort(FatalError);
     }
 }

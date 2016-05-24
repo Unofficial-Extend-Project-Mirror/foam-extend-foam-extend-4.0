@@ -1,0 +1,3 @@
+consistentPimpleDyMFoam.C
+
+EXE = $(FOAM_APPBIN)/consistentPimpleDyMFoam

@@ -39,10 +39,13 @@ void Foam::BlockLduMatrix<Type>::Amul
 {
     Ax = pTraits<Type>::zero;
 
-    // Initialise the update of coupled interfaces
-    initInterfaces(coupleUpper_, Ax, x);
+    // Note: changed order of interface update: init after core
+    // HJ, 14/Mar/2016
 
     AmulCore(Ax, x);
+
+    // Initialise the update of coupled interfaces
+    initInterfaces(coupleUpper_, Ax, x);
 
     // Update coupled interfaces
     updateInterfaces(coupleUpper_, Ax, x);
@@ -139,7 +142,6 @@ void Foam::BlockLduMatrix<Type>::AmulCore
         }
     }
 
-
     // Upper multiplication
 
     if (Upper.activeType() == blockCoeffBase::SCALAR)
@@ -181,10 +183,13 @@ void Foam::BlockLduMatrix<Type>::Tmul
 {
     Ax = pTraits<Type>::zero;
 
+    TmulCore(Ax, x);
+
+    // Note: changed order of interface update: init after core
+    // HJ, 14/Mar/2016
+
     // Initialise the update of coupled interfaces
     initInterfaces(coupleLower_, Ax, x);
-
-    TmulCore(Ax, x);
 
     // Update coupled interfaces
     updateInterfaces(coupleLower_, Ax, x);

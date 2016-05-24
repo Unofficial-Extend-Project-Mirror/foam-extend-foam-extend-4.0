@@ -37,7 +37,7 @@ SourceFiles
 #ifndef mixedFixedValueSlipFvPatchField_H
 #define mixedFixedValueSlipFvPatchField_H
 
-#include "transformFvPatchField.H"
+#include "transformFvPatchFields.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -45,7 +45,7 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                      Class mixedFixedValueSlipFvPatch Declaration
+                 Class mixedFixedValueSlipFvPatch Declaration
 \*---------------------------------------------------------------------------*/
 
 template<class Type>

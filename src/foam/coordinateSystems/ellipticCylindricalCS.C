@@ -258,7 +258,7 @@ Foam::tmp<Foam::vectorField> Foam::ellipticCylindricalCS::globalToLocal
 void Foam::ellipticCylindricalCS::write(Ostream& os) const
 {
     coordinateSystem::write(os);
-    os << "inDegrees: " << inDegrees() << endl;
+    os << " inDegrees: " << inDegrees() << endl;
 }
 
 

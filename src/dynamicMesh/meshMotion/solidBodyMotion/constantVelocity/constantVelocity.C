@@ -57,11 +57,11 @@ Foam::solidBodyMotionFunctions::constantVelocity::calcTransformation
     const vector translation = transVelocity_*(t - startMotionTime_);
     const vector rotation = rotVelocity_*(t - startMotionTime_);
 
-    const   quaternion R(rotation.x(), rotation.y(), rotation.z());
-    const   septernion TR
-        (
-            septernion(origin_ + translation)*R*septernion(-origin_)
-        );
+    const quaternion R(rotation.x(), rotation.y(), rotation.z());
+    const septernion TR
+    (
+        septernion(origin_ + translation)*R*septernion(-origin_)
+    );
 
     return TR;
 }

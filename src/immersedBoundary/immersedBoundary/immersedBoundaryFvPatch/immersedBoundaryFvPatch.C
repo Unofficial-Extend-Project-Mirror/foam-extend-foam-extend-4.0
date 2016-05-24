@@ -1035,7 +1035,7 @@ void Foam::immersedBoundaryFvPatch::makeIbPointsAndNormals() const
             )   << "Can't find nearest triSurface point for cell "
                 << ibc[cellI] << ", "
                 << mesh_.cellCentres()[ibc[cellI]]
-                << "Hit data = " << pih << nl
+                << ".  Hit data = " << pih << nl
                 << abort(FatalError);
         }
 

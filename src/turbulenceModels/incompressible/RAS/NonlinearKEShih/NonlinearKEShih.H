@@ -79,7 +79,6 @@ class NonlinearKEShih
             volScalarField k_;
             volScalarField epsilon_;
 
-            volTensorField gradU_;
             volScalarField eta_;
             volScalarField ksi_;
             volScalarField Cmu_;

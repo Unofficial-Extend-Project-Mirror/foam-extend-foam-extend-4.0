@@ -55,7 +55,6 @@ namespace Foam
 
 class mixingPlaneLduInterfaceField
 {
-
 public:
 
     //- Runtime type information
@@ -69,9 +68,8 @@ public:
         {}
 
 
-    // Destructor
-
-        virtual ~mixingPlaneLduInterfaceField();
+    //- Destructor
+    virtual ~mixingPlaneLduInterfaceField();
 
 
     // Member Functions

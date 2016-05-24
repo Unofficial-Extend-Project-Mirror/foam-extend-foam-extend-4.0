@@ -181,21 +181,21 @@ public:
 
 // Add the patch constructor functions to the hash tables
 
-#define makeSnGradTypeScheme(SS, Type)                                         \
-                                                                               \
-defineNamedTemplateTypeNameAndDebug(SS<Type>, 0);                              \
-                                                                               \
-snGradScheme<Type>::addMeshConstructorToTable<SS<Type> >                       \
+#define makeSnGradTypeScheme(SS, Type)                                        \
+                                                                              \
+defineNamedTemplateTypeNameAndDebug(SS<Type>, 0);                             \
+                                                                              \
+snGradScheme<Type>::addMeshConstructorToTable<SS<Type> >                      \
     add##SS##Type##MeshConstructorToTable_;
 
-#define makeSnGradScheme(SS)                                                   \
-                                                                               \
-makeSnGradTypeScheme(SS, scalar)                                               \
-makeSnGradTypeScheme(SS, vector)                                               \
-makeSnGradTypeScheme(SS, sphericalTensor)                                      \
-makeSnGradTypeScheme(SS, symmTensor)                                           \
-makeSnGradTypeScheme(SS, symmTensor4thOrder)                                   \
-makeSnGradTypeScheme(SS, diagTensor)                                           \
+#define makeSnGradScheme(SS)                                                  \
+                                                                              \
+makeSnGradTypeScheme(SS, scalar)                                              \
+makeSnGradTypeScheme(SS, vector)                                              \
+makeSnGradTypeScheme(SS, sphericalTensor)                                     \
+makeSnGradTypeScheme(SS, symmTensor)                                          \
+makeSnGradTypeScheme(SS, symmTensor4thOrder)                                  \
+makeSnGradTypeScheme(SS, diagTensor)                                          \
 makeSnGradTypeScheme(SS, tensor)
 
 

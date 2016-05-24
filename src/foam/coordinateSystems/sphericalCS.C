@@ -276,7 +276,7 @@ Foam::tmp<Foam::vectorField> Foam::sphericalCS::globalToLocal
 void Foam::sphericalCS::write(Ostream& os) const
 {
     coordinateSystem::write(os);
-    os << "inDegrees: " << inDegrees() << endl;
+    os << " inDegrees: " << inDegrees() << endl;
 }
 
 

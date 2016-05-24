@@ -195,7 +195,6 @@ void Foam::amgCycle::fixedCycle
         if (scale)
         {
             // Calculate scaling factor using a buffer
-
             coarseLevelPtr_->levelPtr_->scaleX
             (
                 xCoarse,

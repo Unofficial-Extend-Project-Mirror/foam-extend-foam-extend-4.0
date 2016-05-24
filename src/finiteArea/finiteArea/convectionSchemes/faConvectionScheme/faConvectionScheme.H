@@ -143,7 +143,7 @@ public:
         virtual tmp<faMatrix<Type> > famDiv
         (
             const edgeScalarField&,
-            GeometricField<Type, faPatchField, areaMesh>&
+            const GeometricField<Type, faPatchField, areaMesh>&
         ) const = 0;
 
         virtual tmp<GeometricField<Type, faPatchField, areaMesh> > facDiv

@@ -120,8 +120,8 @@ void GGIInterpolation<MasterPatch, SlavePatch>::maskedBridge
     // Note: tricky algorithm
     // In order for a face to be bridged it needs to be both in the
     // mask and in selection of faces that are bridged (addr).
-    // This implies an n-squared search, but we can use the fact that
-    // both lists are ordered.
+    // This implies an n-squared search, but we can avoid it by
+    // using the fact that both lists are ordered.
 
     label maskAddrI = 0;
 

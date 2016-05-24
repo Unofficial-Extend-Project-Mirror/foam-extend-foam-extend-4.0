@@ -49,7 +49,6 @@ namespace Foam
 
 class processorLduInterfaceField
 {
-
 public:
 
     //- Runtime type information

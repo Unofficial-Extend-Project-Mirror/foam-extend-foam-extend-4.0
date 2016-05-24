@@ -9,7 +9,7 @@
              << (
                      0.5*nu*average
                      (
-                         magSqr(fvc::grad(U) + fvc::grad(U)().T())
+                         magSqr(fvc::grad(U) + T(fvc::grad(U)))
                      )
                 ).value() << endl;
 

@@ -50,3 +50,9 @@ volVector4Field Up
     mesh,
     dimensionedVector4("zero", dimless, vector4::zero)
 );
+
+Info<< "Creating field rAU\n" << endl;
+// Note: depending on the porosity treatment, only one of the rAU fields
+// will be used.  HJ, 1/Mar/2016
+tmp<volScalarField> trAU;
+tmp<volTensorField> trTU;

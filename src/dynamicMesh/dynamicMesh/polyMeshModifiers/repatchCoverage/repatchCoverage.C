@@ -292,7 +292,8 @@ bool Foam::repatchCoverage::changeTopology() const
         slave,
         tensorField::zero,  // forwardT
         tensorField::zero,  // reverseT
-        vectorField::zero   // separation
+        vectorField::zero,  // separation
+        false               // Patches are not global
     );
 
     // Check uncovered master and slave faces

@@ -39,7 +39,7 @@ SourceFiles
 #define overlapGgiFvPatchField_H
 
 #include "coupledFvPatchField.H"
-#include "overlapGgiLduInterfaceField.H"
+#include "overlapGGILduInterfaceField.H"
 #include "overlapGgiFvPatch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -54,7 +54,7 @@ namespace Foam
 template<class Type>
 class overlapGgiFvPatchField
 :
-    public overlapGgiLduInterfaceField,
+    public overlapGGILduInterfaceField,
     public coupledFvPatchField<Type>
 {
     // Private data
@@ -150,7 +150,7 @@ public:
                 const direction cmpt
             ) const
             {
-                overlapGgiLduInterfaceField::transformCoupleField(f, cmpt);
+                overlapGGILduInterfaceField::transformCoupleField(f, cmpt);
             }
 
             //- Initialise neighbour matrix update

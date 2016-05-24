@@ -123,7 +123,7 @@ public:
         tmp<fvMatrix<Type> > fvmDiv
         (
             const surfaceScalarField&,
-            GeometricField<Type, fvPatchField, volMesh>&
+            const GeometricField<Type, fvPatchField, volMesh>&
         ) const;
 
         tmp<GeometricField<Type, fvPatchField, volMesh> > fvcDiv

@@ -47,7 +47,7 @@ const label tetFemMatrix<Type>::fixFillIn = 4;
 template<class Type>
 tetFemMatrix<Type>::tetFemMatrix
 (
-    GeometricField<Type, tetPolyPatchField, tetPointMesh>& psi,
+    const GeometricField<Type, tetPolyPatchField, tetPointMesh>& psi,
     const dimensionSet& ds
 )
 :
@@ -93,7 +93,7 @@ tetFemMatrix<Type>::tetFemMatrix(const tetFemMatrix<Type>& tetFem)
 template<class Type>
 tetFemMatrix<Type>::tetFemMatrix
 (
-    GeometricField<Type, tetPolyPatchField, tetPointMesh>& psi,
+    const GeometricField<Type, tetPolyPatchField, tetPointMesh>& psi,
     Istream& is
 )
 :

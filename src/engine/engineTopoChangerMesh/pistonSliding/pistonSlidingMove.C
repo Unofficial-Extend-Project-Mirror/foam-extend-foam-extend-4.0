@@ -122,7 +122,7 @@ bool Foam::pistonSliding::attached() const
 
     forAll (morphs, modI)
     {
-        if (typeid(morphs[modI]) == typeid(slidingInterface))
+        if (isA<slidingInterface>(morphs[modI]))
         {
             result =
                 result
@@ -133,7 +133,7 @@ bool Foam::pistonSliding::attached() const
     // Check thal all sliders are in sync (debug only)
     forAll (morphs, modI)
     {
-        if (typeid(morphs[modI]) == typeid(slidingInterface))
+        if (isA<slidingInterface>(morphs[modI]))
         {
             if
             (

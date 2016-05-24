@@ -278,19 +278,19 @@ public:
         const T operator&(const T&);
 
         //- Return value
-        T operator()() const
+        inline T operator()() const
         {
             return switchValue_;
         }
 
         // Return switch name
-        std::string switchName()
+        inline std::string switchName()
         {
             return switchName_;
         }
 
         //- Return switch description
-        std::string switchDescription()
+        inline std::string switchDescription()
         {
             return switchDescription_;
         }

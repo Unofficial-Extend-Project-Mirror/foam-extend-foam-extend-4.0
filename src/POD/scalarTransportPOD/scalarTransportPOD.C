@@ -234,13 +234,11 @@ void Foam::scalarTransportPOD::calcDerivativeCoeffs() const
     {
         const volScalarField& snapI = b.orthoField(i);
 
-        volVectorField gradSnapI = fvc::grad(snapI);
-
         for (label j = 0; j < b.baseSize(); j++)
         {
             const volScalarField& snapJ = b.orthoField(j);
 
-            volVectorField gradSnapJ = fvc::grad(snapJ);
+            const tmp<volVectorField> gradSnapJ = fvc::grad(snapJ);
 
             derivative[i][j] =
                 DT.value()*POD::projection(fvc::div(gradSnapJ), snapI)

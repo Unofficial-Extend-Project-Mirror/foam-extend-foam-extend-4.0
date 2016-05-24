@@ -250,6 +250,22 @@ Foam::label Foam::checkTopology
                 rs
             );
             ctr.write();
+
+            // Count number of cells in all regions
+            labelList nCellsInRegions(rs.nRegions(), 0);
+
+            forAll (rs, rsI)
+            {
+                nCellsInRegions[rs[rsI]]++;
+            }
+
+            Info<< "Nuumber of cells per region: " << nl;
+
+            forAll (nCellsInRegions, regionI)
+            {
+                Info<< tab << regionI << tab << nCellsInRegions[regionI] << nl;
+            }
+            Info<< endl;
         }
     }
 

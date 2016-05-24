@@ -98,16 +98,7 @@ class fineNumericFlux
             surfaceScalarField& rhoEFlux_;
 
 
-        // Gradients
-
-            //- Static pressure gradient
-            volVectorField gradP_;
-
-            //- Velocity gradient
-            volTensorField gradU_;
-
-            //- Static temperature gradient
-            volVectorField gradT_;
+        // Gradients: no longer stored.  HJ, 22/Apr/2016
 
 
     // Private Member Functions
@@ -223,27 +214,6 @@ public:
             virtual tmp<scalarField> rhoEResidual() const
             {
                 return fvc::div(rhoEFlux_)().internalField();
-            }
-
-
-        // Return Gradients
-
-            //- Return pressure gradient
-            const volVectorField& gradP() const
-            {
-                return gradP_;
-            }
-
-            //- Return pressure gradient
-            const volTensorField& gradU() const
-            {
-                return gradU_;
-            }
-
-            //- Return Temperature gradient
-            const volVectorField& gradT() const
-            {
-                return gradT_;
             }
 
 

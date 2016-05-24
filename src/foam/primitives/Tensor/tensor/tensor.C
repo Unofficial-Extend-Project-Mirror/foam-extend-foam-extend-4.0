@@ -607,10 +607,10 @@ tensor eigenVectors(const symmTensor& t)
 // Matrix inversion with singular value decomposition
 tensor hinv(const tensor& t)
 {
-    static const scalar large = 1e10;
-    static const scalar small = 1e-10;
+    static const scalar hinvLarge = 1e10;
+    static const scalar hinvSmall = 1e-10;
 
-    if (det(t) > small)
+    if (det(t) > hinvSmall)
     {
         return inv(t);
     }
@@ -627,7 +627,7 @@ tensor hinv(const tensor& t)
         // Jovani Favero, 18/Nov/2009
         // Further bug fix: replace > with == and add SMALL to zeroInv
         // Dominik Christ, 7/Aug/2012
-        if (mag(eig.z()) == large*mag(eig.z()))
+        if (mag(eig.z()) == hinvLarge*mag(eig.z()))
         {
             // Three zero eigen values (z is largest in magnitude).
             // Return zero inverse
@@ -637,13 +637,13 @@ tensor hinv(const tensor& t)
         // Compare smaller eigen values and if out of range of large
         // consider them singular
 
-        if (mag(eig.z()) > large*mag(eig.x()))
+        if (mag(eig.z()) > hinvLarge*mag(eig.x()))
         {
             // Make a tensor out of symmTensor sqr.  HJ, 24/Oct/2009
             zeroInv += tensor(sqr(eigVecs.x()));
         }
 
-        if (mag(eig.z()) > large*mag(eig.y()))
+        if (mag(eig.z()) > hinvLarge*mag(eig.y()))
         {
             // Make a tensor out of symmTensor sqr.  HJ, 24/Oct/2009
             zeroInv += tensor(sqr(eigVecs.y()));
@@ -656,10 +656,10 @@ tensor hinv(const tensor& t)
 
 symmTensor hinv(const symmTensor& t)
 {
-    static const scalar large = 1e10;
-    static const scalar small = 1e-10;
+    static const scalar hinvLarge = 1e10;
+    static const scalar hinvSmall = 1e-10;
 
-    if (det(t) > small)
+    if (det(t) > hinvSmall)
     {
         return inv(t);
     }
@@ -676,7 +676,7 @@ symmTensor hinv(const symmTensor& t)
         // Jovani Favero, 18/Nov/2009
         // Further bug fix: replace > with == and add SMALL to zeroInv
         // Dominik Christ, 7/Aug/2012
-        if (mag(eig.z()) == large*mag(eig.z()))
+        if (mag(eig.z()) == hinvLarge*mag(eig.z()))
         {
             // Three zero eigen values (z is largest in magnitude).
             // Return zero inverse
@@ -686,12 +686,12 @@ symmTensor hinv(const symmTensor& t)
         // Compare smaller eigen values and if out of range of large
         // consider them singular
 
-        if (mag(eig.z()) > large*mag(eig.x()))
+        if (mag(eig.z()) > hinvLarge*mag(eig.x()))
         {
             zeroInv += sqr(eigVecs.x());
         }
 
-        if (mag(eig.z()) > large*mag(eig.y()))
+        if (mag(eig.z()) > hinvLarge*mag(eig.y()))
         {
             zeroInv += sqr(eigVecs.y());
         }

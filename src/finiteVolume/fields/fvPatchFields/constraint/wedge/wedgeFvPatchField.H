@@ -35,7 +35,7 @@ SourceFiles
 #ifndef wedgeFvPatchField_H
 #define wedgeFvPatchField_H
 
-#include "transformFvPatchField.H"
+#include "transformFvPatchFields.H"
 #include "wedgeFvPatch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

@@ -104,7 +104,6 @@ Foam::BlockGaussSeidelSolver<Type>::solve
             wA -= b;
 
             solverPerf.finalResidual() = gSum(cmptMag(wA))/norm;
-            solverPerf.nIterations()++;
         } while (!this->stop(solverPerf));
     }
 

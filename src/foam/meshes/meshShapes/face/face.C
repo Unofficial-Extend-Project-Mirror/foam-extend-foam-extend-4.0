@@ -650,26 +650,31 @@ Foam::scalar Foam::face::sweptVol
 {
     // For a triangle do the swept volume directly.
     // Sandeep Menon, 19/Oct/2011
-    if (size() == 3)
-    {
-        return
-        (
-            triPointRef
-            (
-                oldPoints[operator[](0)],
-                oldPoints[operator[](1)],
-                oldPoints[operator[](2)]
-            ).sweptVol
-            (
-                triPointRef
-                (
-                    newPoints[operator[](0)],
-                    newPoints[operator[](1)],
-                    newPoints[operator[](2)]
-                )
-            )
-        );
-    }
+
+    // This Optimization causes a small discrepancy between the swept-volume of
+    // opposite faces of complex cells with triangular faces opposing polygons.
+    // It could be used without problem for tetrahedral cells
+    // Found by Vuko Vukcevic, 10/Feb/2016
+//     if (size() == 3)
+//     {
+//         return
+//         (
+//             triPointRef
+//             (
+//                 oldPoints[operator[](0)],
+//                 oldPoints[operator[](1)],
+//                 oldPoints[operator[](2)]
+//             ).sweptVol
+//             (
+//                 triPointRef
+//                 (
+//                     newPoints[operator[](0)],
+//                     newPoints[operator[](1)],
+//                     newPoints[operator[](2)]
+//                 )
+//             )
+//         );
+//     }
 
     scalar sv = 0;
 

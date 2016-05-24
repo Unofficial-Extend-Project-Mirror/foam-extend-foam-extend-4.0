@@ -141,7 +141,11 @@ inline void cellMDLimitedGrad<scalar>::limitFace
 {
     scalar extrapolate = dcf & g;
 
-    if (extrapolate > maxDelta)
+    if (mag(extrapolate) < SMALL)
+    {
+        // Limiter remains unchanged
+    }
+    else if (extrapolate > maxDelta)
     {
         g = g + dcf*(maxDelta - extrapolate)/magSqr(dcf);
     }

@@ -1,9 +1,9 @@
-    p.boundaryField().updateCoeffs();
-
+{
     volScalarField AU = UEqn().A();
     U = UEqn().H()/AU;
     UEqn.clear();
     phi = fvc::interpolate(U) & mesh.Sf();
+
     adjustPhi(phi, U, p);
 
     // Non-orthogonal pressure corrector loop
@@ -41,4 +41,4 @@
     // Momentum corrector
     U -= fvc::grad(p)/AU;
     U.correctBoundaryConditions();
-
+}

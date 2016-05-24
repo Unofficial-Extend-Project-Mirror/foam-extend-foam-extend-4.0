@@ -53,14 +53,14 @@ namespace fam
     template<class Type>
     tmp<faMatrix<Type> > laplacian
     (
-        GeometricField<Type, faPatchField, areaMesh>&
+        const GeometricField<Type, faPatchField, areaMesh>&
     );
 
 
     template<class Type>
     tmp<faMatrix<Type> > laplacian
     (
-        GeometricField<Type, faPatchField, areaMesh>&,
+        const GeometricField<Type, faPatchField, areaMesh>&,
         const word&
     );
 
@@ -69,7 +69,7 @@ namespace fam
     tmp<faMatrix<Type> > laplacian
     (
         const dimensionedScalar&,
-        GeometricField<Type, faPatchField, areaMesh>&
+        const GeometricField<Type, faPatchField, areaMesh>&
     );
 
 
@@ -77,7 +77,7 @@ namespace fam
     tmp<faMatrix<Type> > laplacian
     (
         const dimensionedScalar&,
-        GeometricField<Type, faPatchField, areaMesh>&,
+        const GeometricField<Type, faPatchField, areaMesh>&,
         const word&
     );
 
@@ -86,14 +86,14 @@ namespace fam
     tmp<faMatrix<Type> > laplacian
     (
         const areaScalarField&,
-        GeometricField<Type, faPatchField, areaMesh>&
+        const GeometricField<Type, faPatchField, areaMesh>&
     );
 
     template<class Type>
     tmp<faMatrix<Type> > laplacian
     (
         const areaScalarField&,
-        GeometricField<Type, faPatchField, areaMesh>&,
+        const GeometricField<Type, faPatchField, areaMesh>&,
         const word&
     );
 
@@ -101,21 +101,21 @@ namespace fam
     tmp<faMatrix<Type> > laplacian
     (
         const areaScalarField&,
-        GeometricField<Type, faPatchField, areaMesh>&
+        const GeometricField<Type, faPatchField, areaMesh>&
     );
 
     template<class Type>
     tmp<faMatrix<Type> > laplacian
     (
         const tmp<areaScalarField>&,
-        GeometricField<Type, faPatchField, areaMesh>&,
+        const GeometricField<Type, faPatchField, areaMesh>&,
         const word&
     );
     template<class Type>
     tmp<faMatrix<Type> > laplacian
     (
         const tmp<areaScalarField>&,
-        GeometricField<Type, faPatchField, areaMesh>&,
+        const GeometricField<Type, faPatchField, areaMesh>&,
         const word&
     );
 
@@ -124,7 +124,7 @@ namespace fam
     tmp<faMatrix<Type> > laplacian
     (
         const edgeScalarField&,
-        GeometricField<Type, faPatchField, areaMesh>&,
+        const GeometricField<Type, faPatchField, areaMesh>&,
         const word&
     );
 
@@ -132,7 +132,7 @@ namespace fam
     tmp<faMatrix<Type> > laplacian
     (
         const tmp<edgeScalarField>&,
-        GeometricField<Type, faPatchField, areaMesh>&,
+        const GeometricField<Type, faPatchField, areaMesh>&,
         const word&
     );
 
@@ -141,14 +141,14 @@ namespace fam
     tmp<faMatrix<Type> > laplacian
     (
         const edgeScalarField&,
-        GeometricField<Type, faPatchField, areaMesh>&
+        const GeometricField<Type, faPatchField, areaMesh>&
     );
 
     template<class Type>
     tmp<faMatrix<Type> > laplacian
     (
         const tmp<edgeScalarField>&,
-        GeometricField<Type, faPatchField, areaMesh>&
+        const GeometricField<Type, faPatchField, areaMesh>&
     );
 
 
@@ -156,14 +156,14 @@ namespace fam
     tmp<faMatrix<Type> > laplacian
     (
         const areaTensorField&,
-        GeometricField<Type, faPatchField, areaMesh>&
+        const GeometricField<Type, faPatchField, areaMesh>&
     );
 
     template<class Type>
     tmp<faMatrix<Type> > laplacian
     (
         const tmp<areaTensorField>&,
-        GeometricField<Type, faPatchField, areaMesh>&
+        const GeometricField<Type, faPatchField, areaMesh>&
     );
 
 
@@ -171,14 +171,14 @@ namespace fam
     tmp<faMatrix<Type> > laplacian
     (
         const edgeTensorField&,
-        GeometricField<Type, faPatchField, areaMesh>&
+        const GeometricField<Type, faPatchField, areaMesh>&
     );
 
     template<class Type>
     tmp<faMatrix<Type> > laplacian
     (
         const tmp<edgeTensorField>&,
-        GeometricField<Type, faPatchField, areaMesh>&
+        const GeometricField<Type, faPatchField, areaMesh>&
     );
 }
 

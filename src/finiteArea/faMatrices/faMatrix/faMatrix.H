@@ -71,7 +71,7 @@ class faMatrix
     // Private data
 
         // Reference to GeometricField<Type, faPatchField, areaMesh>
-        GeometricField<Type, faPatchField, areaMesh>& psi_;
+        const GeometricField<Type, faPatchField, areaMesh>& psi_;
 
         //- Dimension set
         dimensionSet dimensions_;
@@ -189,7 +189,7 @@ public:
         //- Construct given a field to solve for
         faMatrix
         (
-            GeometricField<Type, faPatchField, areaMesh>&,
+            const GeometricField<Type, faPatchField, areaMesh>&,
             const dimensionSet&
         );
 
@@ -197,7 +197,11 @@ public:
         faMatrix(const faMatrix<Type>&);
 
         //- Construct from Istream given field to solve for
-        faMatrix(GeometricField<Type, faPatchField, areaMesh>&, Istream&);
+        faMatrix
+        (
+            const GeometricField<Type, faPatchField, areaMesh>&,
+            Istream&
+        );
 
 
     // Destructor
@@ -210,11 +214,6 @@ public:
         // Access
 
             const GeometricField<Type, faPatchField, areaMesh>& psi() const
-            {
-                return psi_;
-            }
-
-            GeometricField<Type, faPatchField, areaMesh>& psi()
             {
                 return psi_;
             }

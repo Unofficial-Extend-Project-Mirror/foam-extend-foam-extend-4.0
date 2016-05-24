@@ -65,15 +65,22 @@ int main(int argc, char *argv[])
 #       include "initConvergenceCheck.H"
 
 #       include "UEqn.H"
-#       include "iEqn.H"
 #       include "pEqn.H"
+
+// #       include "hEqn.H"
+        // Solving for rothalpy
+#       include "iEqn.H"
 
 #       include "rhoFromP.H"
 
         // Correct turbulence
         turbulence->correct();
 
-        Uabs = Urel + SRF->U();
+        // Update rotational velocity
+        Urot = SRF->U();
+
+        // Update absolute velocity
+        Uabs = Urel + Urot;
 
         runTime.write();
 

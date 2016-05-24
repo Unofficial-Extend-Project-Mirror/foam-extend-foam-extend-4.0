@@ -30,6 +30,8 @@ Description
     - pitch (rotation about y) followed by
     - yaw (rotation about z)
 
+    or -rotateAlongVector (vector and angle in degrees)
+
     The yawPitchRoll does yaw followed by pitch followed by roll.
 
 \*---------------------------------------------------------------------------*/
@@ -42,10 +44,10 @@ Description
 #include "transformField.H"
 #include "Pair.H"
 #include "quaternion.H"
+#include "RodriguesRotation.H"
 
 using namespace Foam;
 using namespace Foam::mathematicalConstant;
-
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 // Main program:
@@ -59,6 +61,7 @@ int main(int argc, char *argv[])
     argList::validArgs.append("output surface file");
     argList::validOptions.insert("translate", "vector");
     argList::validOptions.insert("rotate", "(vector vector)");
+    argList::validOptions.insert("rotateAlongVector", "(vector angleInDegree)");
     argList::validOptions.insert("scale", "vector");
     argList::validOptions.insert("rollPitchYaw", "(roll pitch yaw)");
     argList::validOptions.insert("yawPitchRoll", "(yaw pitch roll)");
@@ -72,7 +75,6 @@ int main(int argc, char *argv[])
 
     Info<< "Writing surf to " << outFileName << " ..." << endl;
 
-
     if (args.options().empty())
     {
         FatalErrorIn(args.executable())
@@ -85,6 +87,8 @@ int main(int argc, char *argv[])
 
     pointField points(surf1.points());
 
+    // Translation options
+
     if (args.optionFound("translate"))
     {
         vector transVector(args.optionLookup("translate")());
@@ -93,6 +97,8 @@ int main(int argc, char *argv[])
 
         points += transVector;
     }
+
+    // Rotation options
 
     if (args.optionFound("rotate"))
     {
@@ -133,7 +139,6 @@ int main(int argc, char *argv[])
             << "    pitch " << v.y() << nl
             << "    roll  " << v.z() << endl;
 
-
         // Convert to radians
         v *= pi/180.0;
 
@@ -148,6 +153,22 @@ int main(int argc, char *argv[])
         Info<< "Rotating points by quaternion " << R << endl;
         points = transform(R, points);
     }
+    else if (args.optionFound("rotateAlongVector"))
+    {
+        vector rotationAxis;
+        scalar rotationAngle;
+
+        args.optionLookup("rotateAlongVector")()
+            >> rotationAxis
+            >> rotationAngle;
+
+        tensor T = RodriguesRotation(rotationAxis, rotationAngle);
+
+        Info << "Rotating points by " << T << endl;
+        points = transform(T, points);
+    }
+
+    // Scale options
 
     if (args.optionFound("scale"))
     {

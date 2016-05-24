@@ -73,7 +73,8 @@ inline VectorN<Cmpt, length>::VectorN
 template <class Cmpt, int length>
 inline VectorN<Cmpt, length>::VectorN(const Cmpt& vx)
 {
-    VectorSpaceOps<VectorN<Cmpt, length>::nComponents,0>::eqOpS(*this, vx, eqOp<Cmpt>());
+    VectorSpaceOps<VectorN<Cmpt, length>::nComponents,0>::eqOpS
+        (*this, vx, eqOp<Cmpt>());
 }
 
 
@@ -103,10 +104,12 @@ inline Cmpt& VectorN<Cmpt, length>::operator()(const direction i)
 
 //- Multiply components of VectorN by VectorN
 template<class Cmpt, int length>
-inline VectorN<Cmpt, length> VectorN<Cmpt, length>::cmptMultiply(const VectorN<Cmpt, length>& v)
+inline VectorN<Cmpt, length>
+VectorN<Cmpt, length>::cmptMultiply(const VectorN<Cmpt, length>& v)
 {
     VectorN<Cmpt, length> res;
-    VectorSpaceOps<VectorN<Cmpt, length>::nComponents,0>::op(res, *this, v, multiplyOp<Cmpt>());
+    VectorSpaceOps<VectorN<Cmpt, length>::nComponents,0>::op
+        (res, *this, v, multiplyOp<Cmpt>());
     return res;
 }
 
@@ -175,19 +178,32 @@ inline VectorN<Cmpt, length>
 operator/(const scalar s, const VectorN<Cmpt, length>& v)
 {
     VectorN<Cmpt, length> res;
-    VectorSpaceOps<VectorN<Cmpt, length>::nComponents,0>::opSV(res, s, v, divideOp3<Cmpt, scalar, Cmpt>());
+    VectorSpaceOps<VectorN<Cmpt, length>::nComponents,0>::opSV
+        (res, s, v, divideOp3<Cmpt, scalar, Cmpt>());
     return res;
 }
 
 
 //- Multiply components of VectorN by VectorN
 template<class Cmpt, int length>
-inline VectorN<Cmpt, length> cmptMultiply(const VectorN<Cmpt, length>& v1, const VectorN<Cmpt, length>& v2)
+inline VectorN<Cmpt, length>
+cmptMultiply(const VectorN<Cmpt, length>& v1, const VectorN<Cmpt, length>& v2)
 {
     VectorN<Cmpt, length> res;
-    VectorSpaceOps<VectorN<Cmpt, length>::nComponents,0>::op(res, v1, v2, multiplyOp<Cmpt>());
+    VectorSpaceOps<VectorN<Cmpt, length>::nComponents,0>::op
+        (res, v1, v2, multiplyOp<Cmpt>());
     return res;
 }
+
+
+//- Multiply row of VectorN with a scalar
+template<class Cmpt, int length>
+inline VectorN<Cmpt, length>
+scaleRow(const VectorN<Cmpt, length>& v, const Cmpt& c)
+{
+    return v*c;
+}
+
 
 //- Return the component sum
 // template <class Cmpt, int length>

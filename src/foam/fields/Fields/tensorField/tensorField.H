@@ -51,7 +51,7 @@ namespace Foam
 
 typedef Field<tensor> tensorField;
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * * Global Functions  * * * * * * * * * * * * * //
 
 UNARY_FUNCTION(scalar, tensor, tr)
 UNARY_FUNCTION(sphericalTensor, tensor, sph)
@@ -70,8 +70,11 @@ UNARY_FUNCTION(tensor, tensor, hinv)
 UNARY_FUNCTION(vector, symmTensor, eigenValues)
 UNARY_FUNCTION(tensor, symmTensor, eigenVectors)
 
+BINARY_FUNCTION(tensor, tensor, vector, scaleRow)
+BINARY_TYPE_FUNCTION(tensor, tensor, vector, scaleRow)
 
-// * * * * * * * * * * * * * * * global operators  * * * * * * * * * * * * * //
+
+// * * * * * * * * * * * * * * * Global Operators  * * * * * * * * * * * * * //
 
 UNARY_OPERATOR(vector, tensor, *, hdual)
 UNARY_OPERATOR(tensor, vector, *, hdual)

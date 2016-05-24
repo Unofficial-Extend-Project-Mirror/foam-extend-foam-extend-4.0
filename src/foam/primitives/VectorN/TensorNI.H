@@ -83,6 +83,23 @@ inline TensorN<Cmpt, length>::TensorN(Istream& is)
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
+//- Return tensor diagonal
+template <class Cmpt, int length>
+inline DiagTensorN<Cmpt, length> TensorN<Cmpt, length>::diag() const
+{
+    DiagTensorN<Cmpt, length> dt;
+
+    label diagI = 0;
+    for (label i = 0; i < TensorN<Cmpt, length>::rowLength; i++)
+    {
+        dt[i] = this->v_[diagI];
+        diagI += TensorN<Cmpt, length>::rowLength + 1;
+    }
+
+    return dt;
+}
+
+
 //- Return tensor transpose
 template <class Cmpt, int length>
 inline TensorN<Cmpt, length> TensorN<Cmpt, length>::T() const
@@ -102,23 +119,6 @@ inline TensorN<Cmpt, length> TensorN<Cmpt, length>::T() const
     }
 
     return transpose;
-}
-
-
-//- Return tensor diagonal
-template <class Cmpt, int length>
-inline DiagTensorN<Cmpt, length> TensorN<Cmpt, length>::diag() const
-{
-    DiagTensorN<Cmpt, length> dt;
-
-    label diagI = 0;
-    for (label i = 0; i < TensorN<Cmpt, length>::rowLength; i++)
-    {
-        dt[i] = this->v_[diagI];
-        diagI += TensorN<Cmpt, length>::rowLength + 1;
-    }
-
-    return dt;
 }
 
 
@@ -1006,6 +1006,29 @@ inline TensorN<Cmpt, length> negSumDiag(const TensorN<Cmpt, length>& t)
 {
     return t.negSumDiag();
 }
+
+
+//- Scale tensor row with a VectorN
+template <class Cmpt, int length>
+inline TensorN<Cmpt, length> scaleRow
+(
+    const TensorN<Cmpt, length>& t,
+    const VectorN<Cmpt, length>& v
+)
+{
+    TensorN<Cmpt, length> result;
+
+    for (label i = 0; i < TensorN<Cmpt, length>::rowLength; i++)
+    {
+        for (label j = 0; j < TensorN<Cmpt, length>::rowLength; j++)
+        {
+            result(i, j) = t(i, j)*v(j);
+        }
+    }
+
+    return result;
+}
+
 
 //- Return the component sum
 // template <class Cmpt, int length>

@@ -89,10 +89,6 @@ void Foam::ggiPolyPatch::calcZoneAddressing() const
     // Check zone addressing
     if (zAddr.size() > 0 && min(zAddr) < 0)
     {
-        Info<< "myZone: " << myZone << nl
-            << "my start and size: " << start() << " and " << size() << nl
-            << "zAddr: " << zAddr << endl;
-
         FatalErrorIn("void ggiPolyPatch::calcZoneAddressing() const")
             << "Problem with patch-to-zone addressing: some patch faces "
             << "not found in interpolation zone"
@@ -103,7 +99,7 @@ void Foam::ggiPolyPatch::calcZoneAddressing() const
 
 void Foam::ggiPolyPatch::calcRemoteZoneAddressing() const
 {
-    // Calculate patch-to-zone addressing
+    // Calculate patch-to-remote zone addressing
     if (remoteZoneAddressingPtr_)
     {
         FatalErrorIn("void ggiPolyPatch::calcRemoteZoneAddressing() const")
@@ -118,7 +114,8 @@ void Foam::ggiPolyPatch::calcRemoteZoneAddressing() const
     }
 
     // Once zone addressing is established, visit the opposite side and find
-    // out which face data is needed for interpolation
+    // out which face data is needed for interpolation from the remote zone
+    // to interpolate to my live faces
     boolList usedShadows(shadow().zone().size(), false);
 
     const labelList& zAddr = zoneAddressing();
@@ -208,10 +205,11 @@ void Foam::ggiPolyPatch::calcPatchToPatch() const
                 forwardT(),
                 reverseT(),
                 -separation(), // Slave-to-master separation: Use - localValue
+                true,          // Patch data is complete on all processors
                 // Bug fix, delayed slave evaluation causes error
                 // HJ, 30/Jun/2013
-                0,             // Non-overlapping face tolerances
-                0,             // HJ, 24/Oct/2008
+                SMALL,         // Non-overlapping face tolerances
+                SMALL,         // HJ, 24/Oct/2008
                 true,          // Rescale weighting factors.  Bug fix, MB.
                 reject_        // Quick rejection algorithm, default BB_OCTREE
             );
@@ -262,7 +260,7 @@ void Foam::ggiPolyPatch::calcReconFaceCellCentres() const
     if (debug)
     {
         InfoIn("void ggiPolyPatch::calcReconFaceCellCentres() const")
-            << "Calculating recon centres for patch"
+            << "Calculating recon centres for patch "
             << name() << endl;
     }
 
@@ -359,12 +357,12 @@ void Foam::ggiPolyPatch::calcLocalParallel() const
 void Foam::ggiPolyPatch::calcSendReceive() const
 {
     // Note: all processors will execute calcSendReceive but only master will
-    // hold the information.  Therefore, pointers on slave processors
+    // hold complete the information.  Therefore, pointers on slave processors
     // will remain meaningless, but for purposes of consistency
     // (of the calc-call) they will be set to zero-sized array
     // HJ, 4/Jun/2011
 
-    if (receiveAddrPtr_ || sendAddrPtr_)
+    if (receiveAddrPtr_ || sendAddrPtr_ || mapPtr_)
     {
         FatalErrorIn("void ggiPolyPatch::calcSendReceive() const")
             << "Send-receive addressing already calculated"
@@ -385,52 +383,152 @@ void Foam::ggiPolyPatch::calcSendReceive() const
             << abort(FatalError);
     }
 
-    // Master will receive and store the maps
-    if (Pstream::master())
+    // Gather send and receive addressing (to master)
+
+    // Get patch-to-zone addressing
+    const labelList& za = zoneAddressing();
+
+    // Get remote patch-to-zone addressing
+    const labelList& rza = remoteZoneAddressing();
+
+    receiveAddrPtr_ = new labelListList(Pstream::nProcs());
+    labelListList& rAddr = *receiveAddrPtr_;
+
+    sendAddrPtr_ = new labelListList(Pstream::nProcs());
+    labelListList& sAddr = *sendAddrPtr_;
+
+    rAddr[Pstream::myProcNo()] = za;
+    sAddr[Pstream::myProcNo()] = rza;
+
+    // Perform gather operation to master
+    Pstream::gatherList(rAddr);
+    Pstream::gatherList(sAddr);
+
+    // Perform scatter operation to master
+    Pstream::scatterList(rAddr);
+    Pstream::scatterList(sAddr);
+
+    // Zone addressing and remote zone addressing is fixed.  Determine the
+    // parallel communications pattern
+
+    // Make a zone-sized field and fill it in with proc markings for processor
+    // that holds and requires the data
+    labelField zoneProcID(zone().size(), -1);
+
+    forAll (za, zaI)
     {
-        receiveAddrPtr_ = new labelListList(Pstream::nProcs());
-        labelListList& rAddr = *receiveAddrPtr_;
+        zoneProcID[za[zaI]] = Pstream::myProcNo();
+    }
 
-        sendAddrPtr_ = new labelListList(Pstream::nProcs());
-        labelListList& sAddr = *sendAddrPtr_;
+    reduce(zoneProcID, maxOp<labelField>());
 
-        // Insert master
-        rAddr[0] = zoneAddressing();
+    const labelList& shadowRza = shadow().remoteZoneAddressing();
 
-        for (label procI = 1; procI < Pstream::nProcs(); procI++)
+    // Find out where my zone data is coming from
+    labelList nRecv(Pstream::nProcs(), 0);
+
+    // Note: only visit the data from the local zone
+    forAll (shadowRza, shadowRzaI)
+    {
+        nRecv[zoneProcID[shadowRza[shadowRzaI]]]++;
+    }
+
+    // Make a receiving sub-map
+    // It tells me which data I will receive from which processor and
+    // where I need to put it into the remoteZone data before the mapping
+    labelListList constructMap(Pstream::nProcs());
+
+    // Size the receiving list
+    forAll (nRecv, procI)
+    {
+        constructMap[procI].setSize(nRecv[procI]);
+    }
+
+    // Reset counters for processors
+    nRecv = 0;
+
+    forAll (shadowRza, shadowRzaI)
+    {
+        label recvProc = zoneProcID[shadowRza[shadowRzaI]];
+
+        constructMap[recvProc][nRecv[recvProc]] = shadowRza[shadowRzaI];
+
+        nRecv[recvProc]++;
+    }
+
+    // Make the sending sub-map
+    // It tells me which data is required from me to be send to which
+    // processor
+
+    // Algorithm
+    // - expand the local zone faces with indices into a size of local zone
+    // - go through remote zone addressing on all processors
+    // - find out who hits my faces
+    labelList localZoneIndices(zone().size(), -1);
+
+    forAll (za, zaI)
+    {
+        localZoneIndices[za[zaI]] = zaI;
+    }
+
+    labelListList shadowToReceiveAddr(Pstream::nProcs());
+
+    // Get the list of what my shadow needs to receive from my zone
+    // on all other processors
+    shadowToReceiveAddr[Pstream::myProcNo()] = shadowRza;
+    Pstream::gatherList(shadowToReceiveAddr);
+    Pstream::scatterList(shadowToReceiveAddr);
+
+    // Now local zone indices contain the index of a local face that will
+    // provide the data.  For faces that are not local, the index will be -1
+ 
+    // Find out where my zone data is going to
+
+    // Make a sending sub-map
+    // It tells me which data I will send to which processor
+    labelListList sendMap(Pstream::nProcs());
+
+    // Collect local labels to be sent to each processor
+    forAll (shadowToReceiveAddr, procI)
+    {
+        const labelList& curProcSend = shadowToReceiveAddr[procI];
+
+        // Find out how much of my data is going to this processor
+        label nProcSend = 0;
+
+        forAll (curProcSend, sendI)
         {
-            // Note: must use normal comms because the size of the
-            // communicated lists is unknown on the receiving side
-            // HJ, 4/Jun/2011
+            if (localZoneIndices[curProcSend[sendI]] > -1)
+            {
+                nProcSend++;
+            }
+        }
 
-            // Opt: reconsider mode of communication
-            IPstream ip(Pstream::scheduled, procI);
+        if (nProcSend > 0)
+        {
+            // Collect the indices
+            labelList& curSendMap = sendMap[procI];
 
-            rAddr[procI] = labelList(ip);
+            curSendMap.setSize(nProcSend);
 
-            sAddr[procI] = labelList(ip);
+            // Reset counter
+            nProcSend = 0;
+
+            forAll (curProcSend, sendI)
+            {
+                if (localZoneIndices[curProcSend[sendI]] > -1)
+                {
+                    curSendMap[nProcSend] =
+                        localZoneIndices[curProcSend[sendI]];
+                    nProcSend++;
+                }
+            }
         }
     }
-    else
-    {
-        // Create dummy pointers: only master processor stores maps
-        receiveAddrPtr_ = new labelListList();
-        sendAddrPtr_ = new labelListList();
 
-        // Send information to master
-        const labelList& za = zoneAddressing();
-        const labelList& ra = remoteZoneAddressing();
-
-        // Note: must use normal comms because the size of the
-        // communicated lists is unknown on the receiving side
-        // HJ, 4/Jun/2011
-
-        // Opt: reconsider mode of communication
-        OPstream op(Pstream::scheduled, Pstream::masterNo());
-
-        // Send local and remote addressing to master
-        op << za << ra;
-    }
+    // Map will return the object of the size of remote zone
+    // HJ, 9/May/2016
+    mapPtr_ = new mapDistribute(zone().size(), sendMap, constructMap);
 }
 
 
@@ -456,7 +554,18 @@ const Foam::labelListList& Foam::ggiPolyPatch::sendAddr() const
 }
 
 
-void Foam::ggiPolyPatch::clearGeom()
+const Foam::mapDistribute& Foam::ggiPolyPatch::map() const
+{
+    if (!mapPtr_)
+    {
+        calcSendReceive();
+    }
+
+    return *mapPtr_;
+}
+
+
+void Foam::ggiPolyPatch::clearGeom() const
 {
     deleteDemandDrivenData(reconFaceCellCentresPtr_);
 
@@ -468,10 +577,11 @@ void Foam::ggiPolyPatch::clearGeom()
 
     deleteDemandDrivenData(receiveAddrPtr_);
     deleteDemandDrivenData(sendAddrPtr_);
+    deleteDemandDrivenData(mapPtr_);
 }
 
 
-void Foam::ggiPolyPatch::clearOut()
+void Foam::ggiPolyPatch::clearOut() const
 {
     clearGeom();
 
@@ -508,7 +618,8 @@ Foam::ggiPolyPatch::ggiPolyPatch
     reconFaceCellCentresPtr_(NULL),
     localParallelPtr_(NULL),
     receiveAddrPtr_(NULL),
-    sendAddrPtr_(NULL)
+    sendAddrPtr_(NULL),
+    mapPtr_(NULL)
 {}
 
 
@@ -538,7 +649,8 @@ Foam::ggiPolyPatch::ggiPolyPatch
     reconFaceCellCentresPtr_(NULL),
     localParallelPtr_(NULL),
     receiveAddrPtr_(NULL),
-    sendAddrPtr_(NULL)
+    sendAddrPtr_(NULL),
+    mapPtr_(NULL)
 {}
 
 
@@ -563,7 +675,8 @@ Foam::ggiPolyPatch::ggiPolyPatch
     reconFaceCellCentresPtr_(NULL),
     localParallelPtr_(NULL),
     receiveAddrPtr_(NULL),
-    sendAddrPtr_(NULL)
+    sendAddrPtr_(NULL),
+    mapPtr_(NULL)
 {
     if (dict.found("quickReject"))
     {
@@ -594,7 +707,8 @@ Foam::ggiPolyPatch::ggiPolyPatch
     reconFaceCellCentresPtr_(NULL),
     localParallelPtr_(NULL),
     receiveAddrPtr_(NULL),
-    sendAddrPtr_(NULL)
+    sendAddrPtr_(NULL),
+    mapPtr_(NULL)
 {}
 
 
@@ -621,7 +735,8 @@ Foam::ggiPolyPatch::ggiPolyPatch
     reconFaceCellCentresPtr_(NULL),
     localParallelPtr_(NULL),
     receiveAddrPtr_(NULL),
-    sendAddrPtr_(NULL)
+    sendAddrPtr_(NULL),
+    mapPtr_(NULL)
 {}
 
 
@@ -849,6 +964,12 @@ void Foam::ggiPolyPatch::initMovePoints(const pointField& p)
     // Calculate transforms on mesh motion?
     calcTransforms();
 
+    if (master())
+    {
+        shadow().clearGeom();
+        shadow().calcTransforms();
+    }
+
     // Update interpolation for new relative position of GGI interfaces
     if (patchToPatchPtr_)
     {
@@ -951,7 +1072,8 @@ void Foam::ggiPolyPatch::calcTransforms() const
 
             fileName fvPath(mesh.time().path()/"VTK");
             mkDir(fvPath);
-            Pout<< "shadow().localFaces(): " << shadow().localFaces().size()
+            Pout<< "Patch " << name()
+                << " shadow().localFaces(): " << shadow().localFaces().size()
                 << " patchToPatch().uncoveredSlaveFaces().size(): "
                 << patchToPatch().uncoveredSlaveFaces().size()
                 << " shadow().localPoints(): " << shadow().localPoints().size()

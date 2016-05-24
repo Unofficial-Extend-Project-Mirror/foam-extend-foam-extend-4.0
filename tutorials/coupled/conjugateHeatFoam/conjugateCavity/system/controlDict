@@ -59,7 +59,6 @@ functions
 
         K              kappaEff;
     }
-
     heatFlux
     {
         // Type of functionObject

@@ -40,6 +40,8 @@ Description
 namespace Foam
 {
     typedef List<vector> vectorList;
+    typedef List<vectorList> vectorListList;
+    typedef List<vectorListList> vectorListListList;
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

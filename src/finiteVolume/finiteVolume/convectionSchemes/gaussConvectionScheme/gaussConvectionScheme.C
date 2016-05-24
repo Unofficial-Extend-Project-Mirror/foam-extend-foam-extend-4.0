@@ -68,7 +68,7 @@ tmp<fvMatrix<Type> >
 gaussConvectionScheme<Type>::fvmDiv
 (
     const surfaceScalarField& faceFlux,
-    GeometricField<Type, fvPatchField, volMesh>& vf
+    const GeometricField<Type, fvPatchField, volMesh>& vf
 ) const
 {
     tmp<surfaceScalarField> tweights = tinterpScheme_().weights(vf);

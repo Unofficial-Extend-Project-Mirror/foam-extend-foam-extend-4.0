@@ -79,7 +79,6 @@ int main(int argc, char *argv[])
 
             solve(UEqn() == -fvc::grad(p));
 
-            p.boundaryField().updateCoeffs();
             volScalarField rUA = 1.0/UEqn().A();
             U = rUA*UEqn().H();
             UEqn.clear();
