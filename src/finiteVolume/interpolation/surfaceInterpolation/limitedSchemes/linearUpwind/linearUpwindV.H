@@ -55,10 +55,10 @@ class linearUpwindV
 {
     // Private Data
 
-        //- Name of grad scheme
+        //- Name of gradient scheme
         word gradSchemeName_;
 
-        //- Grad scheme
+        //- Gradient scheme
         tmp<fv::gradScheme<Type> > gradScheme_;
 
 
@@ -87,6 +87,7 @@ public:
         )
         :
             upwind<Type>(mesh, faceFlux),
+            gradSchemeName_("grad"),
             gradScheme_
             (
                 new fv::gaussGrad<Type>(mesh)
@@ -103,12 +104,13 @@ public:
         )
         :
             upwind<Type>(mesh, schemeData),
+            gradSchemeName_(schemeData),
             gradScheme_
             (
                 fv::gradScheme<Type>::New
                 (
                     mesh,
-                    schemeData
+                    mesh.schemesDict().gradScheme(gradSchemeName_)
                 )
             )
         {}
@@ -122,12 +124,13 @@ public:
         )
         :
             upwind<Type>(mesh, faceFlux, schemeData),
+            gradSchemeName_(schemeData),
             gradScheme_
             (
                 fv::gradScheme<Type>::New
                 (
                     mesh,
-                    schemeData
+                    mesh.schemesDict().gradScheme(gradSchemeName_)
                 )
             )
         {}
@@ -147,7 +150,6 @@ public:
         (
             const GeometricField<Type, fvPatchField, volMesh>&
         ) const;
-
 };
 
 
