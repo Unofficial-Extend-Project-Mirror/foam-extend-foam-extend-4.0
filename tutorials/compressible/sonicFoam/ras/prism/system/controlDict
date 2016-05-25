@@ -15,6 +15,12 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
+libs
+(
+    "libcompressibleRASModels.so"
+    "liblduSolvers.so"
+)
+
 application     sonicFoam;
 
 startFrom       latestTime;

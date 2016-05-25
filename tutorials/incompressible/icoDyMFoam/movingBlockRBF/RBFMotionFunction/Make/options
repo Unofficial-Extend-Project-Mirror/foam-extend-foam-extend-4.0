@@ -8,3 +8,4 @@ LIB_LIBS = \
     -ldynamicMesh \
     -lfiniteVolume \
     -lmeshTools \
+    -lRBFMotionSolver
