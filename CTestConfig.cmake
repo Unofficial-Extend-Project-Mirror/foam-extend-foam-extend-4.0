@@ -10,7 +10,7 @@
 # on the foam-extend CDash service hosted on SourceForge.Net
 # See here: http://foam-extend.sourceforge.net/CDash/index.php
 #
-set(CTEST_PROJECT_NAME "foam-extend-3.2")
+set(CTEST_PROJECT_NAME "foam-extend-4.0")
 set(CTEST_NIGHTLY_START_TIME "01:00:00 UTC")
 
 set(CTEST_DROP_METHOD "http")
