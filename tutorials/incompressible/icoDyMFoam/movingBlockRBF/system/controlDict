@@ -14,6 +14,12 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
+libs
+(
+    "libRBFMotionSolver.so"
+    "liblduSolvers.so"
+)
+
 application     icoDyMFoam;
 
 startFrom       startTime;

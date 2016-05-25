@@ -14,6 +14,15 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
+libs
+(
+    "liblduSolvers.so"
+    "libfoam.so"
+    "libsurfMesh.so"
+    "libsampling.so"
+    "libimmersedBoundary.so"
+)
+
 application icoDyMFoam;
 
 startFrom       startTime;
@@ -47,7 +56,5 @@ runTimeModifiable yes;
 adjustTimeStep  no;
 
 maxCo           0.2;
-
-libs ( "libfoam.so" "libsurfMesh.so" "libsampling.so" "libimmersedBoundary.so");
 
 // ************************************************************************* //

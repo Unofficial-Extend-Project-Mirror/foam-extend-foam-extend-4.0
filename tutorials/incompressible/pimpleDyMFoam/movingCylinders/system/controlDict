@@ -14,6 +14,12 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
+libs
+(
+    "libtopoChangerFvMesh.so"
+    "liblduSolvers.so"
+)
+
 application     pimpleDyMFoam;
 
 startFrom       startTime;

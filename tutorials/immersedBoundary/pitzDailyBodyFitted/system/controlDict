@@ -48,7 +48,7 @@ adjustTimeStep  no;
 
 maxCo           0.2;
 
-libs ("libforces.so");
+libs ("liblduSolvers.so" "libforces.so");
 
 functions
 (

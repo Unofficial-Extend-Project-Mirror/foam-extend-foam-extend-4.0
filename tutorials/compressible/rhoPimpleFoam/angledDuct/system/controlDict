@@ -15,6 +15,11 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
+libs
+(
+    "libcompressibleRASModels"
+)
+
 application     rhoPimpleFoam;
 
 startFrom       startTime;
