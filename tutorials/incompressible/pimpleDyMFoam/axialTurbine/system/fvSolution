@@ -32,6 +32,12 @@ solvers
         relTol          0.1;
     }
 
+    UFinal
+    {
+        $U;
+        relTol          0;
+    }
+
     "(k|epsilon)"
     {
         solver          PBiCG;

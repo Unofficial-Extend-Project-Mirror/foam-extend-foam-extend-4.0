@@ -28,6 +28,7 @@ solvers
     }
     p
     {
+        $p;
         solver           CG;
         preconditioner   DIC;
 
@@ -38,12 +39,7 @@ solvers
     }
     pFinal
     {
-        solver           CG;
-        preconditioner   DIC;
-
-        minIter          0;
-        maxIter          1000;
-        tolerance        1e-06;
+        $p;
         relTol           0;
     }
     U
@@ -56,6 +52,12 @@ solvers
         tolerance        1e-07;
         relTol           0;
     }
+
+    UFinal
+    {
+        $U;
+        relTol           0;
+    }
 }
 
 PIMPLE
@@ -64,14 +66,6 @@ PIMPLE
     nOuterCorrectors 2;
     nCorrectors     4;
     nNonOrthogonalCorrectors 0;
-
-    pRefCell 0;
-    pRefValue 0;
-}
-
-SIMPLE
-{
-    nNonOrthogonalCorrectors 4;
 
     pRefCell 0;
     pRefValue 0;

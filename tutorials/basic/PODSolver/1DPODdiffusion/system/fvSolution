@@ -14,7 +14,7 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-T
+solvers
 {
     solver          PBiCG;
     preconditioner  DILU;

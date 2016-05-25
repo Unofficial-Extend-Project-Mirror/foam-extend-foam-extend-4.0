@@ -16,7 +16,7 @@ FoamFile
 
 solvers
 {
-      p
+    p
     {
         solver           PCG;
         preconditioner   DIC;
@@ -39,14 +39,6 @@ solvers
     }
 }
 
-SIMPLE
-{
-    nNonOrthogonalCorrectors 5;
-
-    pRefPoint (0 -0.45 0.05);
-    pRefValue 0;
-}
-
 PIMPLE
 {
     nOuterCorrectors 2;
@@ -56,5 +48,11 @@ PIMPLE
     pRefPoint (-0.1 0 0.0005);
     pRefValue 0;
 }
+
+relaxationFactors
+{
+    "U.*"           1;
+}
+
 
 // ************************************************************************* //
