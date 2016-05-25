@@ -39,6 +39,15 @@ solvers
     }
 }
 
+// for laplacianFoam
+SIMPLE
+{
+    nNonOrthogonalCorrectors 5;
+
+    pRefPoint (0 -0.45 0.05);
+    pRefValue 0;
+}
+
 PIMPLE
 {
     nOuterCorrectors 2;
