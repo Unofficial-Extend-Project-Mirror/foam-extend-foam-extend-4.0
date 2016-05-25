@@ -36,7 +36,7 @@
 
 cmake_minimum_required (VERSION 2.8)
 
-PROJECT(foam-extend-3.2)
+PROJECT(foam-extend-4.0)
 
 #-----------------------------------------------------------------------------
 # Utility functions
