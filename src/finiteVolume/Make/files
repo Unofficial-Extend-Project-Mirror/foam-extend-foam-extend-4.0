@@ -123,9 +123,11 @@ $(constraintFvPatchFields)/wedge/wedgeFvPatchScalarField.C
 $(constraintFvPatchFields)/wedge/wedgeFvPatchVectorNFields.C
 $(constraintFvPatchFields)/ggi/ggiFvPatchFields.C
 $(constraintFvPatchFields)/ggi/ggiFvPatchVectorNFields.C
+$(constraintFvPatchFields)/jumpGgi/jumpGgiFvPatchFields.C
 $(constraintFvPatchFields)/cyclicGgi/cyclicGgiFvPatchFields.C
 $(constraintFvPatchFields)/overlapGgi/overlapGgiFvPatchFields.C
 $(constraintFvPatchFields)/mixingPlane/mixingPlaneFvPatchFields.C
+$(constraintFvPatchFields)/jumpMixingPlane/jumpMixingPlaneFvPatchFields.C
 $(constraintFvPatchFields)/regionCoupling/regionCouplingFvPatchFields.C
 
 derivedFvPatchFields = $(fvPatchFields)/derived
