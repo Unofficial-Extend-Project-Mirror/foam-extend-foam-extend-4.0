@@ -100,6 +100,8 @@ Foam::lduMatrix::solverPerformance Foam::fvMatrix<Foam::scalar>::solve
 
     psi_.correctBoundaryConditions();
 
+    psi_.mesh().setSolverPerformance(psi_.name(), solverPerf);
+
     return solverPerf;
 }
 

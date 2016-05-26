@@ -24,6 +24,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "solutionControl.H"
+#include "lduMatrix.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
@@ -191,7 +192,7 @@ void Foam::solutionControl::maxTypeResidual
 
     if (mesh_.foundObject<fieldType>(fieldName))
     {
-        const List<SolverPerformance<Type> > sp(data);
+        const List<lduSolverPerformance> sp(data);
         firstRes = cmptMax(sp.first().initialResidual());
         lastRes = cmptMax(sp.last().initialResidual());
     }
