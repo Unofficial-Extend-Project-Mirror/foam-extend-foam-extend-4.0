@@ -94,3 +94,5 @@
         h
     );
     i -= 0.5*magSqr(Urot);
+
+    mesh.schemesDict().setFluxRequired(p.name());

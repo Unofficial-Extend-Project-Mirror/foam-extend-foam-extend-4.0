@@ -20,9 +20,6 @@
 
     hEqn.relax();
 
-    eqnResidual = hEqn.solve().initialResidual();
-    maxResidual = max(eqnResidual, maxResidual);
-
     // Bounding of enthalpy taken out
     thermo.correct();
     psis = thermo.psi()/thermo.Cp()*thermo.Cv();

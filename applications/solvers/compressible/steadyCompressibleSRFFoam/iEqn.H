@@ -24,8 +24,7 @@
 
     iEqn.relax();
 
-    eqnResidual = iEqn.solve().initialResidual();
-    maxResidual = max(eqnResidual, maxResidual);
+    iEqn.solve();
 
     // Calculate enthalpy out of rothalpy
     volVectorField Urot("Urot", SRF->U());

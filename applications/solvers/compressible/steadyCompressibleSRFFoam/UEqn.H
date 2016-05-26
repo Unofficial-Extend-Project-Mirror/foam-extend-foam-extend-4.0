@@ -11,9 +11,4 @@
 
     UrelEqn.relax();
 
-    eqnResidual = solve
-    (
-        UrelEqn == -fvc::grad(p)
-    ).initialResidual();
-
-    maxResidual = max(eqnResidual, maxResidual);
+    solve(UrelEqn == -fvc::grad(p));

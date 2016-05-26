@@ -101,3 +101,5 @@
         h
     );
     i -= 0.5*magSqr(SRF->U());
+
+    mesh.schemesDict().setFluxRequired(p.name());
