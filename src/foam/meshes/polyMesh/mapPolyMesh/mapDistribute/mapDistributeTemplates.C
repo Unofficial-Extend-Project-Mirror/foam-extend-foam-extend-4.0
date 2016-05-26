@@ -141,6 +141,7 @@ void Foam::mapDistribute::distribute
                 }
             }
         }
+
         field.transfer(newField);
     }
     else if (commsType == Pstream::nonBlocking)
@@ -174,7 +175,9 @@ void Foam::mapDistribute::distribute
             if (domain != Pstream::myProcNo() && map.size())
             {
                 List<T>& subField = sendFields[domain];
+
                 subField.setSize(map.size());
+
                 forAll(map, i)
                 {
                     subField[i] = field[map[i]];
@@ -219,6 +222,7 @@ void Foam::mapDistribute::distribute
 
             List<T>& subField = sendFields[Pstream::myProcNo()];
             subField.setSize(map.size());
+
             forAll(map, i)
             {
                 subField[i] = field[map[i]];
@@ -229,7 +233,6 @@ void Foam::mapDistribute::distribute
         // Combine bits. Note that can reuse field storage
 
         field.setSize(constructSize);
-
 
         // Receive sub field from myself (sendFields[Pstream::myProcNo()])
         {

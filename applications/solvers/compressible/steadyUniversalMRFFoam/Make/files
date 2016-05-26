@@ -1,0 +1,3 @@
+steadyUniversalMRFFoam.C
+
+EXE = $(FOAM_APPBIN)/steadyUniversalMRFFoam
