@@ -284,17 +284,27 @@ void GGIInterpolation<MasterPatch, SlavePatch>::maskedMasterToSlave
     if (this->doTransform() && pTraits<Type>::rank > 0)
     {
         // Transform master data to slave
-        Field<Type> transformFF;
+        Field<Type> transformFF(ff.size());
 
         if (reverseT_.size() == 1)
         {
             // Constant transform
-            transformFF = transform(reverseT_[0], ff);
+            // Transform only masked elements.  HJ, 25/May/2016
+            forAll (mask, maskI)
+            {
+                transformFF[mask[maskI]] =
+                    transform(reverseT_[0], ff[mask[maskI]]);
+            }
         }
         else
         {
             // Full patch transform
-            transformFF = transform(reverseT_, ff);
+            // Transform only masked elements.  HJ, 25/May/2016
+            forAll (mask, maskI)
+            {
+                transformFF[mask[maskI]] =
+                    transform(reverseT_[mask[maskI]], ff[mask[maskI]]);
+            }
         }
 
         GGIInterpolation<MasterPatch, SlavePatch>::maskedInterpolate
@@ -445,16 +455,26 @@ void GGIInterpolation<MasterPatch, SlavePatch>::maskedSlaveToMaster
     if (this->doTransform() && pTraits<Type>::rank > 0)
     {
         // Transform slave data to master
-        Field<Type> transformFF;
+        Field<Type> transformFF(ff.size());
         if (forwardT_.size() == 1)
         {
             // Constant transform
-            transformFF = transform(forwardT_[0], ff);
+            // Transform only masked elements.  HJ, 25/May/2016
+            forAll (mask, maskI)
+            {
+                transformFF[mask[maskI]] =
+                    transform(forwardT_[0], ff[mask[maskI]]);
+            }
         }
         else
         {
             // Full patch transform
-            transformFF = transform(forwardT_, ff);
+            // Transform only masked elements.  HJ, 25/May/2016
+            forAll (mask, maskI)
+            {
+                transformFF[mask[maskI]] =
+                    transform(forwardT_[mask[maskI]], ff[mask[maskI]]);
+            }
         }
 
         GGIInterpolation<MasterPatch, SlavePatch>::maskedInterpolate
