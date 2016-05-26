@@ -1,5 +1,5 @@
 #include "readTimeControls.H"
 
-correctPhi = piso.dict().lookupOrDefault("correctPhi", false);
+correctPhi = pimple.dict().lookupOrDefault("correctPhi", false);
 
-checkMeshCourantNo = piso.dict().lookupOrDefault("checkMeshCourantNo", false);
+checkMeshCourantNo = pimple.dict().lookupOrDefault("checkMeshCourantNo", false);

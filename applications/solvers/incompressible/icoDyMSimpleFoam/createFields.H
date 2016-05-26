@@ -72,7 +72,7 @@
         zeroGradientFvPatchScalarField::typeName
     );
 
-    bool momentumPredictor = piso.momentumPredictor();
+    bool momentumPredictor = pimple.momentumPredictor();
 
     {
         bool momentumPredictorSave = momentumPredictor;

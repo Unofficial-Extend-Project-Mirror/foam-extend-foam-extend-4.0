@@ -36,7 +36,7 @@ Author
 
 #include "fvCFD.H"
 #include "dynamicFvMesh.H"
-#include "pisoControl.H"
+#include "pimpleControl.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -46,7 +46,7 @@ int main(int argc, char *argv[])
 #   include "createTime.H"
 #   include "createDynamicFvMesh.H"
 
-    pisoControl piso(mesh);
+    pimpleControl pimple(mesh);
 
 #   include "initContinuityErrs.H"
 #   include "initTotalVolume.H"
@@ -94,7 +94,7 @@ int main(int argc, char *argv[])
 
         // --- SIMPLE loop
 
-        while (piso.correct())
+        while (pimple.correct())
         {
 #           include "CourantNo.H"
 
@@ -108,10 +108,8 @@ int main(int argc, char *argv[])
 
             adjustPhi(phi, U, p);
 
-            p.storePrevIter();
-
             // Non-orthogonal pressure corrector loop
-            while (piso.correctNonOrthogonal())
+            while (pimple.correctNonOrthogonal())
             {
                 fvScalarMatrix pEqn
                 (
@@ -121,10 +119,10 @@ int main(int argc, char *argv[])
                 pEqn.setReference(pRefCell, pRefValue);
                 pEqn.solve
                 (
-                    mesh.solutionDict().solver(p.select(piso.finalInnerIter()))
+                    mesh.solutionDict().solver(p.select(pimple.finalInnerIter()))
                 );
 
-                if (piso.finalNonOrthogonalIter())
+                if (pimple.finalNonOrthogonalIter())
                 {
                     phi -= pEqn.flux();
                 }

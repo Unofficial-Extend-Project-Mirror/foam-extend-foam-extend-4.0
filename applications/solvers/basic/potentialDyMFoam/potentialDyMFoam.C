@@ -80,8 +80,6 @@ int main(int argc, char *argv[])
 
         while (piso.correctNonOrthogonal())
         {
-            p.storePrevIter();
-
             fvScalarMatrix pEqn
             (
                 fvm::laplacian
