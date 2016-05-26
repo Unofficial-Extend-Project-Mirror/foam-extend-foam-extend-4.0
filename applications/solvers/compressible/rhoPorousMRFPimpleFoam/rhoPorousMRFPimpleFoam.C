@@ -69,12 +69,6 @@ int main(int argc, char *argv[])
 
         Info<< "Time = " << runTime.timeName() << nl << endl;
 
-        if (!pimple.firstIter())
-        {
-            p.storePrevIter();
-            rho.storePrevIter();
-        }
-
         #include "rhoEqn.H"
 
         // --- Pressure-velocity PIMPLE corrector loop
