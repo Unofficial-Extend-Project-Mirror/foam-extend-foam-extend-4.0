@@ -68,3 +68,5 @@
 
     porousZones pZones(mesh);
     Switch pressureImplicitPorosity(false);
+
+    mesh.schemesDict().setFluxRequired(p.name());

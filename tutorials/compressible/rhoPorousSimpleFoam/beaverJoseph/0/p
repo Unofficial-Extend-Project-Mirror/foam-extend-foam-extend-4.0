@@ -35,7 +35,11 @@ boundaryField
     outlet
     {
         type            fixedValue;
-        value $internalField;
+        value           $internalField;
+    }
+    frontAndBack
+    {
+        type            empty;
     }
 }
 

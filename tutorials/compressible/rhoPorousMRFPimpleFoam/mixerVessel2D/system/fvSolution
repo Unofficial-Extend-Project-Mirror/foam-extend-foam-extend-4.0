@@ -112,7 +112,9 @@ PIMPLE
 relaxationFactors
 {
     U               1;
+    UFinal          1;
     h               1;
+    hFinal          1;
     k               1;
     epsilon         1;
 }
