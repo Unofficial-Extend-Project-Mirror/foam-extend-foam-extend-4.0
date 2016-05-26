@@ -147,11 +147,11 @@ void Foam::fixedEnthalpyFvPatchScalarField::updateCoeffs()
             const fvPatchVectorField& Urotp =
                 lookupPatchField<volVectorField, vector>(UrotName);
 
-               operator==
-               (
-                   thermo.h(Tw, patchi)
-                 - 0.5*(magSqr(Urotp) - magSqr(Urelp))
-               );
+            operator==
+            (
+                thermo.h(Tw, patchi)
+              - 0.5*(magSqr(Urotp) - magSqr(Urelp))
+            );
         }
     }
     else
