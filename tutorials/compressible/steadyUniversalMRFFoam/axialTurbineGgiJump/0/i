@@ -84,17 +84,19 @@ boundaryField
     {
         type            gradientEnthalpy;
         gradient        uniform 307494; 
+        value           uniform 307494; 
  	 }
     RUHUB
     {
         type            gradientEnthalpy;	
-     	gradient        uniform 307494; 
+     	gradient        uniform 307494;
+        value           uniform 307494;
     }
     RUSHROUD
     {
         type            gradientEnthalpy;
         gradient        uniform 307494; 
-
+        value           uniform 307494;
     }
     DTINLET
     {
@@ -107,7 +109,7 @@ boundaryField
     {
         type            gradientEnthalpy;
         gradient        uniform 0;
-		value           uniform 307494; 
+		value           uniform 307494;
     }
     DTCYCLIC1
     {

@@ -86,8 +86,8 @@ boundaryField
     DTINLET
     {
         type            ggiEnthalpyJump;
-		patchType 		ggi;
-rotating false;
+        patchType 		ggi;
+        rotating        false;
 		value           uniform 305.66;
     }
     DTOUTLET
