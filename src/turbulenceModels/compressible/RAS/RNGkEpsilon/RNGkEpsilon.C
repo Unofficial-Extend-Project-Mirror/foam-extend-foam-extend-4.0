@@ -308,7 +308,7 @@ void RNGkEpsilon::correct()
     const tmp<volTensorField> tgradU = fvc::grad(U_);
     const volTensorField& gradU = tgradU();
 
-    volScalarField S2 = (gradU && dev(twoSymm(tgradU)));
+    volScalarField S2 = (gradU && dev(twoSymm(gradU)));
 
     volScalarField G("RASModel::G", mut_*S2);
 
