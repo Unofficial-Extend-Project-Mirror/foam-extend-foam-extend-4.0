@@ -31,6 +31,7 @@ Description
 \*---------------------------------------------------------------------------*/
 
 #include "fvCFD.H"
+#include "pisoControl.H"
 
 #include "basicKinematicCloud.H"
 
@@ -42,6 +43,9 @@ int main(int argc, char *argv[])
 
 #   include "createTime.H"
 #   include "createMesh.H"
+
+    pisoControl piso(mesh);
+
 #   include "createFields.H"
 #   include "initContinuityErrs.H"
 
@@ -53,7 +57,6 @@ int main(int argc, char *argv[])
     {
         Info<< "Time = " << runTime.timeName() << nl << endl;
 
-#       include "readPISOControls.H"
 #       include "CourantNo.H"
 
         Info<< "Evolving kinematicCloud" << endl;
@@ -73,7 +76,7 @@ int main(int argc, char *argv[])
 
         // --- PISO loop
 
-        for (int corr=0; corr<nCorr; corr++)
+        while (piso.correct())
         {
             volScalarField rUA = 1.0/UEqn.A();
 
@@ -83,7 +86,7 @@ int main(int argc, char *argv[])
 
             adjustPhi(phi, U, p);
 
-            for (int nonOrth=0; nonOrth<=nNonOrthCorr; nonOrth++)
+            while (piso.correctNonOrthogonal())
             {
                 fvScalarMatrix pEqn
                 (
@@ -93,7 +96,7 @@ int main(int argc, char *argv[])
                 pEqn.setReference(pRefCell, pRefValue);
                 pEqn.solve();
 
-                if (nonOrth == nNonOrthCorr)
+                if (piso.finalNonOrthogonalIter())
                 {
                     phi -= pEqn.flux();
                 }

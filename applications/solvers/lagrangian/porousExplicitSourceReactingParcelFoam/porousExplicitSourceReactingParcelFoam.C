@@ -49,6 +49,7 @@ Description
 #include "radiationModel.H"
 #include "porousZones.H"
 #include "timeActivatedExplicitSource.H"
+#include "pisoControl.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -58,6 +59,9 @@ int main(int argc, char *argv[])
 
     #include "createTime.H"
     #include "createMesh.H"
+
+    pisoControl piso(mesh);
+
     #include "readChemistryProperties.H"
     #include "readGravitationalAcceleration.H"
     #include "createFields.H"
@@ -77,7 +81,6 @@ int main(int argc, char *argv[])
     while (runTime.run())
     {
         #include "readTimeControls.H"
-        #include "readPISOControls.H"
         #include "readAdditionalSolutionControls.H"
         #include "compressibleCourantNo.H"
         #include "setDeltaT.H"
@@ -95,7 +98,7 @@ int main(int argc, char *argv[])
         #include "hsEqn.H"
 
         // --- PISO loop
-        for (int corr = 0; corr < nCorr; corr++)
+        while (piso.correct())
         {
             #include "pEqn.H"
         }

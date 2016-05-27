@@ -96,7 +96,7 @@ solvers
     }
 }
 
-PISO
+PIMPLE
 {
     transonic       no;
     nCorrectors     2;

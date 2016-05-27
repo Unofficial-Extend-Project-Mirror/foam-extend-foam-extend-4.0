@@ -32,6 +32,7 @@ Description
 #include "fvCFD.H"
 #include "basicPsiThermo.H"
 #include "turbulenceModel.H"
+#include "pimpleControl.H"
 
 #include "basicThermoCloud.H"
 #include "basicKinematicCloud.H"
@@ -44,12 +45,14 @@ int main(int argc, char *argv[])
 
     #include "createTime.H"
     #include "createMesh.H"
+
+    pimpleControl pimple(mesh);
+
     #include "readGravitationalAcceleration.H"
     #include "createFields.H"
     #include "createClouds.H"
-    #include "readPISOControls.H"
     #include "initContinuityErrs.H"
-    #include "readTimeControls.H"
+    #include "createTimeControls.H"
     #include "compressibleCourantNo.H"
     #include "setInitialDeltaT.H"
 
@@ -60,7 +63,6 @@ int main(int argc, char *argv[])
     while (runTime.run())
     {
         #include "readTimeControls.H"
-        #include "readPISOControls.H"
         #include "compressibleCourantNo.H"
         #include "setDeltaT.H"
 
@@ -78,12 +80,12 @@ int main(int argc, char *argv[])
         #include "rhoEqn.H"
 
         // --- PIMPLE loop
-        for (int ocorr=1; ocorr<=nOuterCorr; ocorr++)
+        while (pimple.loop())
         {
             #include "UEqn.H"
 
             // --- PISO loop
-            for (int corr=1; corr<=nCorr; corr++)
+            while (pimple.correct())
             {
                 #include "hsEqn.H"
                 #include "pEqn.H"
