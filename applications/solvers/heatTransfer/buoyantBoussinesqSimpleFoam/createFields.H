@@ -64,7 +64,7 @@
         pRefCell,
         pRefValue
     );
-
+    mesh.schemesDict().setFluxRequired(p.name());
 
     // Kinematic density for buoyancy force
     volScalarField rhok

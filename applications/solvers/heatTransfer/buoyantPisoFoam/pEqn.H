@@ -23,7 +23,7 @@
 
     phi = phiU + rhorUAf*fvc::interpolate(rho)*(g & mesh.Sf());
 
-    for (int nonOrth=0; nonOrth<=nNonOrthCorr; nonOrth++)
+    while (piso.correctNonOrthogonal())
     {
         fvScalarMatrix pEqn
         (
@@ -32,16 +32,9 @@
           - fvm::laplacian(rhorUAf, p)
         );
 
-        if (corr == nCorr - 1 && nonOrth == nNonOrthCorr)
-        {
-            pEqn.solve(mesh.solutionDict().solver(p.name() + "Final"));
-        }
-        else
-        {
-            pEqn.solve(mesh.solutionDict().solver(p.name()));
-        }
+        pEqn.solve(mesh.solutionDict().solver(p.select(piso.finalInnerIter())));
 
-        if (nonOrth == nNonOrthCorr)
+        if (piso.finalNonOrthogonalIter())
         {
             phi += pEqn.flux();
         }

@@ -65,3 +65,5 @@
     dimensionedScalar initialMass = fvc::domainIntegrate(rho);
 
     dimensionedScalar totalVolume = sum(mesh.V());
+
+    mesh.schemesDict().setFluxRequired(p.name());

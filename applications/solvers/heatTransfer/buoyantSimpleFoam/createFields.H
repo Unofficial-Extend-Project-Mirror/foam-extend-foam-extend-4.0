@@ -67,3 +67,5 @@
 
 
     dimensionedScalar initialMass = fvc::domainIntegrate(rho);
+
+    mesh.schemesDict().setFluxRequired(p.name());
