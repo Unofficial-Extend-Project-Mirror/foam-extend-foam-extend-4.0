@@ -44,7 +44,7 @@ solvers
         mergeLevels      1;
     }
 
-    "(U|k|omega)"
+    "(U|UFinal|k|omega)"
     {
         solver          PBiCG;
         preconditioner  DILU;
