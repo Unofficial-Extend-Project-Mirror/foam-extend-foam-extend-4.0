@@ -112,10 +112,9 @@ public:
         );
 
 
-    // Destructor
-
-        virtual ~fineBlockAMGLevel()
-        {}
+    //- Destructor
+    virtual ~fineBlockAMGLevel()
+    {}
 
 
     // Member Functions

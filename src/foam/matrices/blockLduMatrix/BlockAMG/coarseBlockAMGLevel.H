@@ -113,9 +113,8 @@ public:
         );
 
 
-    // Destructor
-
-        virtual ~coarseBlockAMGLevel();
+    //- Destructor
+    virtual ~coarseBlockAMGLevel();
 
 
     // Member Functions
