@@ -360,10 +360,6 @@ $(limitedGradSchemes)/faceLimitedGrad/faceLimitedGrads.C
 $(limitedGradSchemes)/cellLimitedGrad/cellLimitedGrads.C
 $(limitedGradSchemes)/faceMDLimitedGrad/faceMDLimitedGrads.C
 $(limitedGradSchemes)/cellMDLimitedGrad/cellMDLimitedGrads.C
-$(limitedGradSchemes)/barthJespersenGrad/barthJespersenGrads.C
-$(limitedGradSchemes)/venkatakrishnanGrad/venkatakrishnanGrads.C
-$(limitedGradSchemes)/wangGrad/wangGrads.C
-$(limitedGradSchemes)/michalakGoochGrad/michalakGoochGrads.C
 
 snGradSchemes = finiteVolume/snGradSchemes
 $(snGradSchemes)/snGradScheme/snGradSchemes.C

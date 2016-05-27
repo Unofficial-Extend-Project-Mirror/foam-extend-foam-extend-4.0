@@ -714,17 +714,9 @@ $(BlockLduPrecons)/BlockGaussSeidelPrecon/scalarBlockGaussSeidelPrecon.C
 $(BlockLduPrecons)/BlockGaussSeidelPrecon/tensorBlockGaussSeidelPrecon.C
 $(BlockLduPrecons)/BlockGaussSeidelPrecon/blockGaussSeidelPrecons.C
 
-$(BlockLduPrecons)/BlockDiagGaussSeidelPrecon/scalarBlockDiagGaussSeidelPrecon.C
-$(BlockLduPrecons)/BlockDiagGaussSeidelPrecon/tensorBlockDiagGaussSeidelPrecon.C
-$(BlockLduPrecons)/BlockDiagGaussSeidelPrecon/blockDiagGaussSeidelPrecons.C
-
 $(BlockLduPrecons)/BlockCholeskyPrecon/scalarBlockCholeskyPrecon.C
 $(BlockLduPrecons)/BlockCholeskyPrecon/tensorBlockCholeskyPrecon.C
 $(BlockLduPrecons)/BlockCholeskyPrecon/blockCholeskyPrecons.C
-
-$(BlockLduPrecons)/BlockDiagCholeskyPrecon/scalarBlockDiagCholeskyPrecon.C
-$(BlockLduPrecons)/BlockDiagCholeskyPrecon/tensorBlockDiagCholeskyPrecon.C
-$(BlockLduPrecons)/BlockDiagCholeskyPrecon/blockDiagCholeskyPrecons.C
 
 $(BlockLduPrecons)/BlockAMGPrecon/blockAMGPrecons.C
 
@@ -735,7 +727,6 @@ $(BlockLduPrecons)/BlockILUCpPrecon/blockILUCpPrecons.C
 BlockLduSmoothers = matrices/blockLduMatrix/BlockLduSmoothers
 $(BlockLduSmoothers)/BlockLduSmoother/blockLduSmoothers.C
 $(BlockLduSmoothers)/BlockGaussSeidelSmoother/blockGaussSeidelSmoothers.C
-$(BlockLduSmoothers)/BlockDiagGaussSeidelSmoother/blockDiagGaussSeidelSmoothers.C
 $(BlockLduSmoothers)/BlockILUSmoother/blockILUSmoothers.C
 $(BlockLduSmoothers)/BlockILUCpSmoother/blockILUCpSmoothers.C
 
@@ -744,7 +735,6 @@ $(BlockLduSolvers)/blockVectorNSolvers.C
 $(BlockLduSolvers)/BlockLduSolver/blockLduSolvers.C
 $(BlockLduSolvers)/BlockDiagonal/blockDiagonalSolvers.C
 $(BlockLduSolvers)/BlockGaussSeidel/blockGaussSeidelSolvers.C
-$(BlockLduSolvers)/BlockDiagGaussSeidel/blockDiagGaussSeidelSolvers.C
 $(BlockLduSolvers)/BlockCG/blockCGSolvers.C
 $(BlockLduSolvers)/BlockBiCGStab/blockBiCGStabSolvers.C
 $(BlockLduSolvers)/BlockGMRES/blockGMRESSolvers.C

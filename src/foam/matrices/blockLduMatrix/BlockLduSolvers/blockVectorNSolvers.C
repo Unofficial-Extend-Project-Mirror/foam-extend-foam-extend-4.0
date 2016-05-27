@@ -30,13 +30,11 @@ License
 #include "BlockNoPrecon.H"
 #include "blockDiagonalPrecons.H"
 #include "blockGaussSeidelPrecons.H"
-#include "blockDiagGaussSeidelPrecons.H"
 #include "BlockCholeskyPrecon.H"
 #include "BlockILUCpPrecon.H"
 
 #include "blockLduSmoothers.H"
 #include "blockGaussSeidelSmoothers.H"
-#include "blockDiagGaussSeidelSmoothers.H"
 #include "BlockILUSmoother.H"
 #include "BlockILUCpSmoother.H"
 
@@ -45,7 +43,6 @@ License
 #include "BlockBiCGStabSolver.H"
 #include "BlockCGSolver.H"
 #include "BlockGaussSeidelSolver.H"
-#include "BlockDiagGaussSeidelSolver.H"
 #include "BlockGMRESSolver.H"
 
 // KRJ: 2012-12-15: Multigrid solver
@@ -85,9 +82,6 @@ makeBlockPrecon(block##Type##Precon, block##Type##DiagonalPrecon);            \
 typedef BlockGaussSeidelPrecon<type > block##Type##GaussSeidelPrecon;         \
 makeBlockPrecon(block##Type##Precon, block##Type##GaussSeidelPrecon);         \
                                                                               \
-typedef BlockDiagGaussSeidelPrecon<type > block##Type##DiagGaussSeidelPrecon; \
-makeBlockPrecon(block##Type##Precon, block##Type##DiagGaussSeidelPrecon);     \
-                                                                              \
 typedef BlockCholeskyPrecon<type > block##Type##CholeskyPrecon;               \
 makeBlockPrecon(block##Type##Precon, block##Type##CholeskyPrecon);            \
                                                                               \
@@ -101,9 +95,6 @@ defineTemplateRunTimeSelectionTable(block##Type##Smoother, dictionary);       \
                                                                               \
 typedef BlockGaussSeidelSmoother<type > block##Type##GaussSeidelSmoother;     \
 makeBlockSmoother(block##Type##Smoother, block##Type##GaussSeidelSmoother);   \
-                                                                              \
-typedef BlockDiagGaussSeidelSmoother<type > block##Type##DiagGaussSeidelSmoother; \
-        makeBlockSmoother(block##Type##Smoother, block##Type##DiagGaussSeidelSmoother);  \
                                                                               \
 typedef BlockILUSmoother<type > block##Type##ILUSmoother;                     \
 makeBlockSmoother(block##Type##Smoother, block##Type##ILUSmoother);           \
@@ -143,11 +134,6 @@ typedef BlockGaussSeidelSolver<type > block##Type##GaussSeidelSolver;         \
 makeBlockSolverTypeName(block##Type##GaussSeidelSolver);                      \
 addSolverToBlockMatrix(Type, block##Type##GaussSeidelSolver, symMatrix);      \
 addSolverToBlockMatrix(Type, block##Type##GaussSeidelSolver, asymMatrix);     \
-                                                                              \
-typedef BlockDiagGaussSeidelSolver<type > block##Type##DiagGaussSeidelSolver; \
-makeBlockSolverTypeName(block##Type##DiagGaussSeidelSolver);                  \
-addSolverToBlockMatrix(Type, block##Type##DiagGaussSeidelSolver, symMatrix);  \
-addSolverToBlockMatrix(Type, block##Type##DiagGaussSeidelSolver, asymMatrix); \
                                                                               \
 typedef BlockGMRESSolver<type > block##Type##GMRESSolver;                     \
 makeBlockSolverTypeName(block##Type##GMRESSolver);                            \
