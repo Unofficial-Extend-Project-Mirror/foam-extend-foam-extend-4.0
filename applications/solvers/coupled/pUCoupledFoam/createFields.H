@@ -50,3 +50,5 @@ volVector4Field Up
     mesh,
     dimensionedVector4("zero", dimless, vector4::zero)
 );
+
+mesh.schemesDict().setFluxRequired(p.name());
