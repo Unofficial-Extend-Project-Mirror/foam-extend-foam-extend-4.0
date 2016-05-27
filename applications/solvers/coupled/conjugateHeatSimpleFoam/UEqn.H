@@ -9,7 +9,7 @@
 
     UEqn().relax();
 
-    eqnResidual = solve
+    solve
     (
         UEqn()
       ==
@@ -22,6 +22,4 @@
                 )*mesh.magSf()
             )
         )
-    ).initialResidual();
-
-    maxResidual = max(eqnResidual, maxResidual);
+    );

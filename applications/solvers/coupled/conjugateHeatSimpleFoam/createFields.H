@@ -71,6 +71,7 @@
         pRefCell,
         pRefValue
     );
+    mesh.schemesDict().setFluxRequired(p_rgh.name());
 
     autoPtr<incompressible::RASModel> turbulence
     (
