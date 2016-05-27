@@ -27,8 +27,7 @@ boundaryField
     GVOUTLET
     {
         type            ggi;
-		patchType 		ggi;
-		value           uniform 100000;
+        value           uniform 100000;
     }
     GVCYCLIC
     {
@@ -49,14 +48,12 @@ boundaryField
     RUINLET
     {
         type            ggi;
-	    patchType 		ggi;
-		value           uniform 100000;
+        value           uniform 100000;
     }
     RUOUTLET
     {
         type            ggi;
-		patchType 		ggi;
-		value           uniform 100000;
+        value           uniform 100000;
     }
     RUCYCLIC1
     {
@@ -81,8 +78,7 @@ boundaryField
     DTINLET
     {
         type            ggi;
-		patchType 		ggi;
-		value           uniform 100000;
+        value           uniform 100000;
     }
     DTOUTLET
     {

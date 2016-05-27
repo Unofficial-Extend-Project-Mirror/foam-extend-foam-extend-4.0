@@ -23,15 +23,15 @@ boundaryField
 {
     GVINLET
     {
-		type            fixedEnthalpy;
-		value           uniform 307494;
+        type            fixedEnthalpy;
+        value           uniform 307494;
     }
     GVOUTLET
     {
-		type            ggiEnthalpyJump;
-	    patchType 		ggi;
-		rotating false;
-	 	value           uniform 307494;
+        type            ggiEnthalpyJump;
+        patchType       ggi;
+        rotating        false;
+        value           uniform 307494;
     }
     GVCYCLIC
     {
@@ -48,91 +48,91 @@ boundaryField
     {
         type            gradientEnthalpy;
         gradient        uniform 0;
-        value           uniform 307494; 
+        value           uniform 307494;
     }
     GVSHROUD
     {
         type            gradientEnthalpy;
         gradient        uniform 0;
-        value           uniform 307494; 
+        value           uniform 307494;
     }
     RUINLET
-	{
-  		type            ggiEnthalpyJump;
-  		patchType 		ggi;
-		rotating true;
-    	value           uniform 307494;
+    {
+        type            ggiEnthalpyJump;
+        patchType       ggi;
+        rotating        true;
+        value           uniform 307494;
     }
     RUOUTLET
     {
-   		type            ggiEnthalpyJump;
-   		patchType 		ggi;
-		rotating true;
-   		value           uniform 307494; 
+        type            ggiEnthalpyJump;
+        patchType       ggi;
+        rotating        true;
+        value           uniform 307494;
     }
     RUCYCLIC1
     {
         type            cyclicGgi;
-		value           uniform 307494; 
+        value           uniform 307494;
     }
     RUCYCLIC2
     {
         type            cyclicGgi;
- 		value           uniform 307494; 
+        value           uniform 307494;
     }
     RUBLADE
     {
         type            gradientEnthalpy;
-        gradient        uniform 307494; 
-        value           uniform 307494; 
- 	 }
+        gradient        uniform 307494;
+        value           uniform 307494;
+    }
     RUHUB
     {
-        type            gradientEnthalpy;	
-     	gradient        uniform 307494;
+        type            gradientEnthalpy;
+        gradient        uniform 307494;
         value           uniform 307494;
     }
     RUSHROUD
     {
         type            gradientEnthalpy;
-        gradient        uniform 307494; 
+        gradient        uniform 307494;
         value           uniform 307494;
     }
     DTINLET
     {
-		type            ggiEnthalpyJump;
-		patchType 		ggi;
-		rotating false;
-		value           uniform 305.66;
+        type            ggiEnthalpyJump;
+        patchType       ggi;
+        rotating        false;
+        value           uniform 305.66;
     }
     DTOUTLET
     {
         type            gradientEnthalpy;
         gradient        uniform 0;
-		value           uniform 307494;
+        value           uniform 307494;
     }
     DTCYCLIC1
     {
         type            cyclicGgi;
-        value           uniform 307494; 
+        value           uniform 307494;
     }
     DTCYCLIC2
     {
         type            cyclicGgi;
-		value           uniform 307494; 
+        value           uniform 307494;
     }
     DTHUB
     {
         type            gradientEnthalpy;
         gradient        uniform 0;
-        value           uniform 307494; 
+        value           uniform 307494;
 
     }
     DTSHROUD
     {
         type            gradientEnthalpy;
         gradient        uniform 0;
-        value            uniform 307494; 
+        value            uniform 307494;
     }
 }
 
