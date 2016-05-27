@@ -696,9 +696,9 @@ void Foam::fvMatrix<Type>::relax(const scalar alpha)
 template<class Type>
 void Foam::fvMatrix<Type>::relax()
 {
-    if (psi_.mesh().solutionDict().relax(psi_.name()))
+    if (psi_.mesh().solutionDict().relaxEquation(psi_.name()))
     {
-        relax(psi_.mesh().solutionDict().relaxationFactor(psi_.name()));
+        relax(psi_.mesh().solutionDict().equationRelaxationFactor(psi_.name()));
     }
     else
     {

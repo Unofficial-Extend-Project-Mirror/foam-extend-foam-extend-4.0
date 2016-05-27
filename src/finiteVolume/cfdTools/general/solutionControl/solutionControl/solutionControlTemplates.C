@@ -45,7 +45,11 @@ void Foam::solutionControl::storePrevIter() const
 
         size_t prevIterField = fName.find("PrevIter");
 
-        if ((prevIterField == word::npos) && mesh_.solutionDict().relax(fName))
+        if
+        (
+            (prevIterField == word::npos)
+         && mesh_.solutionDict().relaxField(fName)
+        )
         {
             if (debug)
             {
