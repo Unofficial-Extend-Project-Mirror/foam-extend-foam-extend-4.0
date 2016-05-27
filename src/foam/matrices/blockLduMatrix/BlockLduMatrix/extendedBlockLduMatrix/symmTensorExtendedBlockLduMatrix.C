@@ -72,7 +72,7 @@ void Foam::extendedBlockLduMatrix<Foam::symmTensor>::mapOffDiagCoeffs
             if (upper.activeType() == blockCoeffBase::SCALAR)
             {
                 // Helper type definition
-                typedef typename CoeffField<symmTensor>::scalarTypeField
+                typedef CoeffField<symmTensor>::scalarTypeField
                     activeType;
 
                 // Get references to fields
@@ -89,7 +89,7 @@ void Foam::extendedBlockLduMatrix<Foam::symmTensor>::mapOffDiagCoeffs
             else if (upper.activeType() == blockCoeffBase::LINEAR)
             {
                 // Helper type definition
-                typedef typename CoeffField<symmTensor>::linearTypeField
+                typedef CoeffField<symmTensor>::linearTypeField
                     activeType;
 
                 // Get references to fields
@@ -132,7 +132,7 @@ void Foam::extendedBlockLduMatrix<Foam::symmTensor>::mapOffDiagCoeffs
             if (lower.activeType() == blockCoeffBase::SCALAR)
             {
                 // Helper type definition
-                typedef typename CoeffField<symmTensor>::scalarTypeField
+                typedef CoeffField<symmTensor>::scalarTypeField
                     activeType;
 
                 // Get references to fields
@@ -149,7 +149,7 @@ void Foam::extendedBlockLduMatrix<Foam::symmTensor>::mapOffDiagCoeffs
             else if (lower.activeType() == blockCoeffBase::LINEAR)
             {
                 // Helper type definition
-                typedef typename CoeffField<symmTensor>::linearTypeField
+                typedef CoeffField<symmTensor>::linearTypeField
                     activeType;
 
                 // Get references to fields
@@ -201,7 +201,7 @@ void Foam::extendedBlockLduMatrix<Foam::symmTensor>::mapOffDiagCoeffs
         if (upper.activeType() == blockCoeffBase::SCALAR)
         {
             // Helper type definition
-            typedef typename CoeffField<symmTensor>::scalarTypeField
+            typedef CoeffField<symmTensor>::scalarTypeField
                 activeType;
 
             // Get references to fields
@@ -221,7 +221,7 @@ void Foam::extendedBlockLduMatrix<Foam::symmTensor>::mapOffDiagCoeffs
         else if (upper.activeType() == blockCoeffBase::LINEAR)
         {
             // Helper type definition
-            typedef typename CoeffField<symmTensor>::linearTypeField
+            typedef CoeffField<symmTensor>::linearTypeField
                 activeType;
 
             // Get references to fields
