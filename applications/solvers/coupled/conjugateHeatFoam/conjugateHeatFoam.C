@@ -39,6 +39,7 @@ Description
 #include "singlePhaseTransportModel.H"
 #include "RASModel.H"
 #include "pisoControl.H"
+#include "simpleControl.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

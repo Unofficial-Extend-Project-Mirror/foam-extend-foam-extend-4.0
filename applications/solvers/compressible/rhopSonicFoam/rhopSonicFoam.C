@@ -61,11 +61,7 @@ int main(int argc, char *argv[])
     {
         Info<< "Time = " << runTime.value() << nl << endl;
 
-        scalar HbyAblend =
-            readScalar
-            (
-                mesh.solutionDict().subDict("PIMPLE").lookup("HbyAblend")
-            );
+        scalar HbyAblend = readScalar(pimple.dict().lookup("HbyAblend"));
 
 #       include "readTimeControls.H"
 

@@ -1,8 +1,8 @@
 {
     // Solid side
-#   include "readSolidControls.H"
+    simpleControl simpleSolid(solidMesh);
 
-    for (int nonOrth = 0; nonOrth <= nNonOrthCorr; nonOrth++)
+    while (simpleSolid.correctNonOrthogonal())
     {
         coupledFvScalarMatrix TEqns(2);
 

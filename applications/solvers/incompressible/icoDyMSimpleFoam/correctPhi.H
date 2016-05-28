@@ -26,7 +26,7 @@
 
     mesh.schemesDict().setFluxRequired(pcorr.name());
 
-    while (pimple.correctNonOrthogonal())
+    while (piso.correctNonOrthogonal())
     {
         fvScalarMatrix pcorrEqn
         (
@@ -36,7 +36,7 @@
         pcorrEqn.setReference(pRefCell, pRefValue);
         pcorrEqn.solve();
 
-        if (pimple.finalNonOrthogonalIter())
+        if (piso.finalNonOrthogonalIter())
         {
             phi -= pcorrEqn.flux();
         }

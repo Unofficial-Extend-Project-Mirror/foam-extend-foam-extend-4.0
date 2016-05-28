@@ -64,13 +64,7 @@
 
     label pRefCell = 0;
     scalar pRefValue = 0.0;
-    setRefCell
-    (
-        p_rgh,
-        mesh.solutionDict().subDict("SIMPLE"),
-        pRefCell,
-        pRefValue
-    );
+    setRefCell(p_rgh, simple.dict(), pRefCell, pRefValue);
     mesh.schemesDict().setFluxRequired(p_rgh.name());
 
     autoPtr<incompressible::RASModel> turbulence

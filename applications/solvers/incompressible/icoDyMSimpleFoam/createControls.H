@@ -2,10 +2,10 @@
 
 bool correctPhi
 (
-    pimple.dict().lookupOrDefault("correctPhi", false)
+    piso.dict().lookupOrDefault("correctPhi", false)
 );
 
 bool checkMeshCourantNo
 (
-    pimple.dict().lookupOrDefault("checkMeshCourantNo", false)
+    piso.dict().lookupOrDefault("checkMeshCourantNo", false)
 );
