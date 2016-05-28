@@ -13,7 +13,7 @@
 
     phi = phiU - ghf*fvc::snGrad(rho)*rUAf*mesh.magSf();
 
-    for(int nonOrth=0; nonOrth<=nNonOrthCorr; nonOrth++)
+    while (pimple.correctNonOrthogonal())
     {
         fvScalarMatrix p_rghEqn
         (
@@ -24,14 +24,10 @@
 
         p_rghEqn.solve
         (
-            mesh.solutionDict().solver
-            (
-                p_rgh.name()
-              + ((corr == nCorr - 1 && nonOrth == nNonOrthCorr) ? "Final" : "")
-            )
+            mesh.solutionDict().solver(p_rgh.select(pimple.finalInnerIter()))
         );
 
-        if (nonOrth == nNonOrthCorr)
+        if (pimple.finalNonOrthogonalIter())
         {
             phi -= p_rghEqn.flux();
         }

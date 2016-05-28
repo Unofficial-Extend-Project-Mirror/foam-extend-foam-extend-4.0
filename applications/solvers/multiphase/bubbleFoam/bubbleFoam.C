@@ -34,6 +34,7 @@ Description
 #include "nearWallDist.H"
 #include "wallFvPatch.H"
 #include "Switch.H"
+#include "pisoControl.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -43,6 +44,9 @@ int main(int argc, char *argv[])
 
 #   include "createTime.H"
 #   include "createMesh.H"
+
+    pisoControl piso(mesh);
+
 #   include "readGravitationalAcceleration.H"
 #   include "createFields.H"
 #   include "initContinuityErrs.H"
@@ -64,7 +68,7 @@ int main(int argc, char *argv[])
 
         // --- PISO loop
 
-        for (int corr = 0; corr < nCorr; corr++)
+        while (piso.correct())
         {
 #           include "pEqn.H"
 

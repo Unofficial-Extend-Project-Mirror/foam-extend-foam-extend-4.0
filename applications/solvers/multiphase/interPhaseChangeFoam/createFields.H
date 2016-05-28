@@ -103,16 +103,14 @@
 
     label pdRefCell = 0;
     scalar pdRefValue = 0.0;
-    setRefCell(pd, mesh.solutionDict().subDict("PISO"), pdRefCell, pdRefValue);
+    setRefCell(pd, pimple.dict(), pdRefCell, pdRefValue);
+    mesh.schemesDict().setFluxRequired(pd.name());
 
     scalar pRefValue = 0.0;
 
     if (pd.needReference())
     {
-        pRefValue = readScalar
-        (
-            mesh.solutionDict().subDict("PISO").lookup("pRefValue")
-        );
+        pRefValue = readScalar(pimple.dict().lookup("pRefValue"));
 
         p += dimensionedScalar
         (

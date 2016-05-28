@@ -124,6 +124,11 @@ solvers
 
 PISO
 {
+    cAlpha          4;
+}
+
+PIMPLE
+{
     momentumPredictor no;
     transSonic      no;
     nOuterCorrectors 3;
@@ -131,7 +136,6 @@ PISO
     nNonOrthogonalCorrectors 0;
     nAlphaCorr      1;
     nAlphaSubCycles 1;
-    cAlpha          4;
 }
 
 // ************************************************************************* //
