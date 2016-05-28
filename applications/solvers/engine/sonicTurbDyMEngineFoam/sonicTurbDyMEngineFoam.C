@@ -39,6 +39,7 @@ Description
 #include "turbulenceModel.H"
 #include "Switch.H"
 #include "OFstream.H"
+#include "pimpleControl.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -49,7 +50,9 @@ int main(int argc, char *argv[])
 
 #   include "createEngineTime.H"
 #   include "createEngineDynamicMesh.H"
-#   include "readPIMPLEControls.H"
+
+    pimpleControl pimple(mesh);
+
 #   include "createFields.H"
 #   include "initContinuityErrs.H"
 #   include "createTimeControls.H"
@@ -67,7 +70,6 @@ int main(int argc, char *argv[])
 
     while (runTime.run())
     {
-#       include "readPIMPLEControls.H"
 #       include "checkTotalVolume.H"
 #       include "readEngineTimeControls.H"
 #       include "compressibleCourantNo.H"
@@ -106,19 +108,18 @@ int main(int argc, char *argv[])
         }
 
         // Pressure-velocity corrector
-        int oCorr = 0;
-        do
+        while (pimple.loop())
         {
 #           include "rhoEqn.H"
 #           include "UEqn.H"
 
             // --- PISO loop
-            for (int corr = 1; corr <= nCorr; corr++)
+            while (pimple.correct())
             {
 #               include "pEqn.H"
 #               include "hEqn.H"
             }
-        } while (++oCorr < nOuterCorr);
+        }
 
         turbulence->correct();
 

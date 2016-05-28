@@ -163,3 +163,5 @@
     fields.add(h);
     fields.add(hu);
     flameWrinkling->addXi(fields);
+
+    mesh.schemesDict().setFluxRequired(p.name());
