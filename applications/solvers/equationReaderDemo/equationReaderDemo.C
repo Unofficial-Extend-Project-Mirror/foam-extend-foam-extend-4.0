@@ -36,6 +36,7 @@ Author
 #include "singlePhaseTransportModel.H"
 #include "RASModel.H"
 #include "IOEquationReader.H"
+#include "simpleControl.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -44,6 +45,9 @@ int main(int argc, char *argv[])
 #   include "setRootCase.H"
 #   include "createTime.H"
 #   include "createMesh.H"
+
+    simpleControl simple(mesh);
+
 #   include "createFields.H"
 #   include "createEquationReader.H"
 #   include "loadEquationData.H"
@@ -54,21 +58,9 @@ int main(int argc, char *argv[])
 
     Info<< "\nStarting time loop\n" << endl;
 
-    while (runTime.loop())
+    while (simple.loop())
     {
         Info<< "Time = " << runTime.timeName() << nl << endl;
-
-    dictionary simple = mesh.solutionDict().subDict("SIMPLE");
-
-    int nNonOrthCorr =
-        simple.lookupOrDefault<int>("nNonOrthogonalCorrectors", 0);
-
-    bool momentumPredictor =
-        simple.lookupOrDefault<Switch>("momentumPredictor", true);
-
-#       include "initConvergenceCheck.H"
-
-        p.storePrevIter();
 
         // Pressure-velocity SIMPLE corrector
         {
@@ -85,8 +77,6 @@ int main(int argc, char *argv[])
         Info<< "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
             << "  ClockTime = " << runTime.elapsedClockTime() << " s"
             << nl << endl;
-
-#       include "convergenceCheck.H"
     }
 
     Info<< "End\n" << endl;
