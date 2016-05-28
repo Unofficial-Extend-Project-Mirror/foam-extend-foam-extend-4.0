@@ -32,7 +32,4 @@ interpolationSchemes
 snGradSchemes
 {}
 
-fluxRequired
-{}
-
 // ************************************************************************* //
