@@ -39,6 +39,7 @@ Description
 #include "faceTetPolyPatch.H"
 #include "tetPolyPatchInterpolation.H"
 #include "fixedValueTetPolyPatchFields.H"
+#include "pisoControl.H"
 
 #include "pointMesh.H"
 #include "pointFields.H"
@@ -51,6 +52,9 @@ int main(int argc, char *argv[])
 #   include "setRootCase.H"
 #   include "createTime.H"
 #   include "createDynamicFvMesh.H"
+
+    pisoControl piso(mesh);
+
 #   include "createStressMesh.H"
 #   include "createFields.H"
 #   include "createStressFields.H"
@@ -66,7 +70,6 @@ int main(int argc, char *argv[])
 
     while (runTime.run())
     {
-#       include "readPISOControls.H"
 #       include "readTimeControls.H"
 #       include "CourantNo.H"
 #       include "setDeltaT.H"
