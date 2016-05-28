@@ -34,6 +34,7 @@ Author
 
 #include "fvCFD.H"
 #include "viscoelasticModel.H"
+#include "pisoControl.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -44,6 +45,9 @@ int main(int argc, char *argv[])
 
 #   include "createTime.H"
 #   include "createMesh.H"
+
+    pisoControl piso(mesh);
+
 #   include "createFields.H"
 #   include "initContinuityErrs.H"
 #   include "createTimeControls.H"
@@ -55,7 +59,6 @@ int main(int argc, char *argv[])
     while (runTime.run())
     {
 
-#       include "readPISOControls.H"
 #       include "readTimeControls.H"
 #       include "CourantNo.H"
 #       include "setDeltaT.H"
@@ -65,7 +68,7 @@ int main(int argc, char *argv[])
         Info<< "Time = " << runTime.timeName() << nl << endl;
 
         // Pressure-velocity SIMPLE corrector loop
-        for (int corr = 0; corr < nCorr; corr++)
+        while (piso.correct())
         {
             // Momentum predictor
 
@@ -91,7 +94,7 @@ int main(int argc, char *argv[])
             p.storePrevIter();
 
             // Non-orthogonal pressure corrector loop
-            for (int nonOrth=0; nonOrth<=nNonOrthCorr; nonOrth++)
+            while (piso.correctNonOrthogonal())
             {
                 fvScalarMatrix pEqn
                 (
@@ -101,7 +104,7 @@ int main(int argc, char *argv[])
                 pEqn.setReference(pRefCell, pRefValue);
                 pEqn.solve();
 
-                if (nonOrth == nNonOrthCorr)
+                if (piso.finalNonOrthogonalIter())
                 {
                     phi -= pEqn.flux();
                 }
