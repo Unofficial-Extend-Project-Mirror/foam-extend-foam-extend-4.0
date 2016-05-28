@@ -35,6 +35,8 @@ Author
 
 #include "fvCFD.H"
 #include "multiSolver.H"
+#include "pisoControl.H"
+#include "simpleControl.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
