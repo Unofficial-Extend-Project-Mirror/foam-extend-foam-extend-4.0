@@ -1,12 +1,12 @@
 {
     label nAlphaCorr
     (
-        readLabel(piso.lookup("nAlphaCorr"))
+        readLabel(pimple.dict().lookup("nAlphaCorr"))
     );
 
     label nAlphaSubCycles
     (
-        readLabel(piso.lookup("nAlphaSubCycles"))
+        readLabel(pimple.dict().lookup("nAlphaSubCycles"))
     );
 
     surfaceScalarField phic = mag(phi/mesh.magSf());
@@ -36,7 +36,7 @@
         #include "alphaEqns.H"
     }
 
-    if (oCorr == 0)
+    if (pimple.firstIter())
     {
         interface.correct();
     }

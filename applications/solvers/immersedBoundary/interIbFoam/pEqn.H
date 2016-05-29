@@ -1,9 +1,4 @@
 {
-    if (!pimple.firstIter())
-    {
-        pd.storePrevIter();
-    }
-
     volScalarField rUA = 1.0/UEqn.A();
     surfaceScalarField rUAf = fvc::interpolate(rUA);
 

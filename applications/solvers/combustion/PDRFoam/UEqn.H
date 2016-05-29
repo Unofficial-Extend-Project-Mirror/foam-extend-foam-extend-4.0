@@ -9,7 +9,7 @@
 
     volSymmTensorField invA = inv(I*UEqn.A() + drag->Dcu());
 
-    if (momentumPredictor)
+    if (piso.momentumPredictor())
     {
         U = invA & (UEqn.H() - betav*fvc::grad(p));
         U.correctBoundaryConditions();

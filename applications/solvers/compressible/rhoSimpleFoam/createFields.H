@@ -42,17 +42,11 @@
 
     label pRefCell = 0;
     scalar pRefValue = 0.0;
-    setRefCell(p, mesh.solutionDict().subDict("SIMPLE"), pRefCell, pRefValue);
+    setRefCell(p, simple.dict(), pRefCell, pRefValue);
+    mesh.schemesDict().setFluxRequired(p.name());
 
-    dimensionedScalar rhoMax
-    (
-        mesh.solutionDict().subDict("SIMPLE").lookup("rhoMax")
-    );
-
-    dimensionedScalar rhoMin
-    (
-        mesh.solutionDict().subDict("SIMPLE").lookup("rhoMin")
-    );
+    dimensionedScalar rhoMax(simple.dict().lookup("rhoMax"));
+    dimensionedScalar rhoMin(simple.dict().lookup("rhoMin"));
 
     Info<< "Creating turbulence model\n" << endl;
     autoPtr<compressible::RASModel> turbulence

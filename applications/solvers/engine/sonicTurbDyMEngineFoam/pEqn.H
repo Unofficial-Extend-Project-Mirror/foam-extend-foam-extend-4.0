@@ -4,18 +4,13 @@
     rUA = 1.0/UEqn.A();
     U = rUA*UEqn.H();
 
-    if (nOuterCorr != 1)
-    {
-        p.storePrevIter();
-    }
-
-    if (transonic)
+    if (pimple.transonic())
     {
         surfaceScalarField phid =
             fvc::interpolate(thermo.psi())*
             ((fvc::interpolate(U) & mesh.Sf()) - fvc::meshPhi(rho, U));
 
-        for (int nonOrth=0; nonOrth<=nNonOrthCorr; nonOrth++)
+        while (pimple.correctNonOrthogonal())
         {
             fvScalarMatrix pEqn
             (
@@ -26,7 +21,7 @@
 
             pEqn.solve();
 
-            if (nonOrth == nNonOrthCorr)
+            if (pimple.finalNonOrthogonalIter())
             {
                 phi == pEqn.flux();
             }
@@ -37,7 +32,7 @@
         phi = fvc::interpolate(rho)*
             ((fvc::interpolate(U) & mesh.Sf()) - fvc::meshPhi(rho, U));
 
-        for (int nonOrth=0; nonOrth<=nNonOrthCorr; nonOrth++)
+        while (pimple.correctNonOrthogonal())
         {
             fvScalarMatrix pEqn
             (
@@ -48,7 +43,7 @@
 
             pEqn.solve();
 
-            if (nonOrth == nNonOrthCorr)
+            if (pimple.finalNonOrthogonalIter())
             {
                 phi += pEqn.flux();
             }
@@ -56,7 +51,7 @@
     }
 
     // Explicitly relax pressure except for last corrector
-    if (oCorr != nOuterCorr - 1)
+    if (!pimple.finalIter())
     {
         p.relax();
     }

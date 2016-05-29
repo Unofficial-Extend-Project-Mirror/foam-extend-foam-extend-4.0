@@ -65,3 +65,5 @@ volScalarField rAU
     mesh,
     runTime.deltaT()
 );
+
+mesh.schemesDict().setFluxRequired(p.name());

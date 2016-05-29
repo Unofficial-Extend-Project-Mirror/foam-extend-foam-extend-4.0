@@ -34,7 +34,7 @@ solvers
     }
 }
 
-PISO
+PIMPLE
 {
     nOuterCorrectors            6;
     nCorrectors                 2;

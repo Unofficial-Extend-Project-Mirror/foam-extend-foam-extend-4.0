@@ -1,14 +1,5 @@
-#   include "readTimeControls.H"
-#   include "readPIMPLEControls.H"
+#include "readTimeControls.H"
 
-    correctPhi = false;
-    if (pimple.found("correctPhi"))
-    {
-        correctPhi = Switch(pimple.lookup("correctPhi"));
-    }
+correctPhi = pimple.dict().lookupOrDefault("correctPhi", false);
 
-    checkMeshCourantNo = false;
-    if (pimple.found("checkMeshCourantNo"))
-    {
-        checkMeshCourantNo = Switch(pimple.lookup("checkMeshCourantNo"));
-    }
+checkMeshCourantNo = pimple.dict().lookupOrDefault("checkMeshCourantNo", false);

@@ -60,3 +60,5 @@
             thermo
         )
     );
+
+    mesh.schemesDict().setFluxRequired(p.name());

@@ -4,7 +4,7 @@
 
     tmp<fvScalarMatrix> pEqnComp;
 
-    if (transonic)
+    if (pimple.transonic())
     {
         pEqnComp =
             (fvm::ddt(p) + fvm::div(phi, p) - fvm::Sp(fvc::div(phi), p));
@@ -31,7 +31,7 @@
           + fvc::interpolate(rho)*(g & mesh.Sf())
         )*rUAf;
 
-    for (int nonOrth=0; nonOrth<=nNonOrthCorr; nonOrth++)
+    while (pimple.correctNonOrthogonal())
     {
         fvScalarMatrix pEqnIncomp
         (
@@ -39,12 +39,7 @@
           - fvm::laplacian(rUAf, p)
         );
 
-        if
-        (
-            oCorr == nOuterCorr-1
-            && corr == nCorr-1
-            && nonOrth == nNonOrthCorr
-        )
+        if (pimple.finalInnerIter())
         {
             solve
             (
@@ -70,7 +65,7 @@
             );
         }
 
-        if (nonOrth == nNonOrthCorr)
+        if (pimple.finalNonOrthogonalIter())
         {
             dgdt =
                 (pos(alpha2)*(psi2/rho2) - pos(alpha1)*(psi1/rho1))

@@ -17,7 +17,7 @@
 
     UEqn.relax();
 
-    if (momentumPredictor)
+    if (pimple.momentumPredictor())
     {
         solve
         (

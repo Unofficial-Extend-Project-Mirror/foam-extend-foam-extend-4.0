@@ -8,7 +8,7 @@
 
     UEqn().relax();
 
-    eqnResidual = solve
+    solve
     (
         UEqn()
       ==
@@ -19,6 +19,4 @@
               - fvc::snGrad(p)*mesh.magSf()
             )
         )
-    ).initialResidual();
-
-    maxResidual = max(eqnResidual, maxResidual);
+    );

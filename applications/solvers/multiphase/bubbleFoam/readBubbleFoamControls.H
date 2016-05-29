@@ -1,5 +1,3 @@
-#   include "readPISOControls.H"
+    int nAlphaCorr(readInt(piso.dict().lookup("nAlphaCorr")));
 
-    int nAlphaCorr(readInt(piso.lookup("nAlphaCorr")));
-
-    Switch correctAlpha(piso.lookup("correctAlpha"));
+    Switch correctAlpha(piso.dict().lookup("correctAlpha"));

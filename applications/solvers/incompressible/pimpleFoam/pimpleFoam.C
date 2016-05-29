@@ -71,11 +71,6 @@ int main(int argc, char *argv[])
         // --- PIMPLE loop
         while (pimple.loop())
         {
-            if (!pimple.firstIter())
-            {
-                p.storePrevIter();
-            }
-
 #           include "UEqn.H"
 
             // --- PISO loop

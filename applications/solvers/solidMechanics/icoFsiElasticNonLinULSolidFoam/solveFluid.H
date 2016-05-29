@@ -19,14 +19,14 @@
         // --- PISO loop
         volScalarField rUA = 1.0/UEqn.A();
 
-        for (int corr=0; corr<nCorr; corr++)
+        while (piso.correct())
         {
             U = rUA*UEqn.H();
             phi = (fvc::interpolate(U) & mesh.Sf());
 
             adjustPhi(phi, U, p);
 
-            for (int nonOrth=0; nonOrth<=nNonOrthCorr; nonOrth++)
+            while (piso.correctNonOrthogonal())
             {
                 fvScalarMatrix pEqn
                 (
@@ -37,7 +37,7 @@
                 pEqn.setReference(pRefCell, pRefValue);
                 pEqn.solve();
 
-                if (nonOrth == nNonOrthCorr)
+                if (piso.finalNonOrthogonalIter())
                 {
                     phi -= pEqn.flux();
                 }

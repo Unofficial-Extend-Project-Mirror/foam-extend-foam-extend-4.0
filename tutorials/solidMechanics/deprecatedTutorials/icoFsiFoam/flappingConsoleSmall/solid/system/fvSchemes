@@ -49,11 +49,4 @@ snGradSchemes
     default         corrected;
 }
 
-fluxRequired
-{
-    default         no;
-    U;
-    T;
-}
-
 // ************************************************************************* //

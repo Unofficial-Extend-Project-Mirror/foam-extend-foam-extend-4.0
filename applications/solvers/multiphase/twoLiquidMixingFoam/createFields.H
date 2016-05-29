@@ -93,22 +93,14 @@
 
     label p_rghRefCell = 0;
     scalar p_rghRefValue = 0.0;
-    setRefCell
-    (
-        p_rgh,
-        mesh.solutionDict().subDict("PIMPLE"),
-        p_rghRefCell,
-        p_rghRefValue
-    );
+    setRefCell(p_rgh, pimple.dict(), p_rghRefCell, p_rghRefValue);
+    mesh.schemesDict().setFluxRequired(p_rgh.name());
 
     scalar pRefValue = 0.0;
 
     if (p_rgh.needReference())
     {
-        pRefValue = readScalar
-        (
-            mesh.solutionDict().subDict("PIMPLE").lookup("pRefValue")
-        );
+        pRefValue = readScalar(pimple.dict().lookup("pRefValue"));
 
         p += dimensionedScalar
         (

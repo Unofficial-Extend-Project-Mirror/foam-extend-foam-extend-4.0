@@ -42,6 +42,7 @@ Author
 #include "fvCFD.H"
 #include "basicPsiThermo.H"
 #include "turbulenceModel.H"
+#include "pimpleControl.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -50,6 +51,9 @@ int main(int argc, char *argv[])
 #   include "setRootCase.H"
 #   include "createTime.H"
 #   include "createMesh.H"
+
+    pimpleControl pimple(mesh);
+
 #   include "createFields.H"
 #   include "initContinuityErrs.H"
 #   include "createTimeControls.H"
@@ -61,7 +65,6 @@ int main(int argc, char *argv[])
     while (runTime.run())
     {
 #       include "readTimeControls.H"
-#       include "readPIMPLEControls.H"
 #       include "compressibleCourantNo.H"
 #       include "setDeltaT.H"
 
@@ -70,8 +73,7 @@ int main(int argc, char *argv[])
         Info<< "Time = " << runTime.timeName() << nl << endl;
 
         // --- PIMPLE loop
-        label oCorr = 0;
-        do
+        while (pimple.loop())
         {
 #           include "rhoEqn.H"
 #           include "eEqn.H"
@@ -87,13 +89,13 @@ int main(int argc, char *argv[])
             // but psi and rho are not
             surfaceScalarField rhoReff = rhof - psisf*fvc::interpolate(p);
 
-            for (int corr = 0; corr < nCorr; corr++)
+            while (pimple.correct())
             {
 #               include "pEqn.H"
             }
 
             turbulence->correct();
-        } while (++oCorr < nOuterCorr);
+        }
 
         runTime.write();
 

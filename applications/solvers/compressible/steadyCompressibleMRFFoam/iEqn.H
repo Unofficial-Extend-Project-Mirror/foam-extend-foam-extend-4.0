@@ -20,8 +20,7 @@
 
     iEqn.relax();
 
-    eqnResidual = iEqn.solve().initialResidual();
-    maxResidual = max(eqnResidual, maxResidual);
+    iEqn.solve();
 
     // Calculate enthalpy out of rothalpy
     h = i + 0.5*(magSqr(Urot) - magSqr(Urel));

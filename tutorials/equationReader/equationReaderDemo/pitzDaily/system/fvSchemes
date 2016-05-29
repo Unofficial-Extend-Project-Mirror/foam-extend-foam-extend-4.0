@@ -35,7 +35,7 @@ divSchemes
     div(phi,R)      Gauss upwind;
     div(R)          Gauss linear;
     div(phi,nuTilda) Gauss upwind;
-    div((nuEff*dev(T(grad(U))))) Gauss linear; // backwards compatibility
+    div((nuEff*dev(grad(U).T()))) Gauss linear; // backwards compatibility
     div((nuEff*dev(T(grad(U))))) Gauss linear;
 }
 
@@ -61,10 +61,5 @@ snGradSchemes
     default         corrected;
 }
 
-fluxRequired
-{
-    default         no;
-    p;
-}
 
 // ************************************************************************* //

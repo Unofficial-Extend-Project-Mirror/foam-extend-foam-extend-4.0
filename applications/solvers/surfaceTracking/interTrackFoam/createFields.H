@@ -121,3 +121,4 @@ if (interface.twoFluids())
 
 #   include "setRefCell.H"
 
+mesh.schemesDict().setFluxRequired(p.name());

@@ -1,6 +1,9 @@
 
 #   include "createTime.H"
 #   include "createMesh.H"
+
+    pisoControl piso(mesh);
+
 #   include "createFields_icoFoam.H"
 #   include "initContinuityErrs.H"
 
@@ -12,7 +15,6 @@
     {
         Info<< "Time = " << runTime.timeName() << nl << endl;
 
-#       include "readPISOControls.H"
 #       include "CourantNo.H"
 
         fvVectorMatrix UEqn
@@ -26,7 +28,7 @@
 
         // --- PISO loop
 
-        for (int corr=0; corr<nCorr; corr++)
+        while (piso.correct())
         {
             volScalarField rUA = 1.0/UEqn.A();
 
@@ -36,7 +38,7 @@
 
             adjustPhi(phi, U, p);
 
-            for (int nonOrth=0; nonOrth<=nNonOrthCorr; nonOrth++)
+            while (piso.correctNonOrthogonal())
             {
                 fvScalarMatrix pEqn
                 (
@@ -46,7 +48,7 @@
                 pEqn.setReference(pRefCell, pRefValue);
                 pEqn.solve();
 
-                if (nonOrth == nNonOrthCorr)
+                if (piso.finalNonOrthogonalIter())
                 {
                     phi -= pEqn.flux();
                 }

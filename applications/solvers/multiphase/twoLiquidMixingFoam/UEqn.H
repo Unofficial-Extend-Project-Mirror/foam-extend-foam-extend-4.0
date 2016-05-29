@@ -14,23 +14,12 @@
     //- fvc::div(muEff*(fvc::interpolate(dev(fvc::grad(U))) & mesh.Sf()))
     );
 
-    if (oCorr == nOuterCorr-1)
-    {
-        if (mesh.solutionDict().relax("UFinal"))
-        {
-            UEqn.relax(mesh.solutionDict().relaxationFactor("UFinal"));
-        }
-        else
-        {
-            UEqn.relax(1);
-        }
-    }
-    else
-    {
-        UEqn.relax();
-    }
+    UEqn.relax
+    (
+        mesh.solutionDict().relaxationFactor(U.select(pimple.finalIter()))
+    );
 
-    if (momentumPredictor)
+    if (pimple.momentumPredictor())
     {
         solve
         (
@@ -40,6 +29,6 @@
             (
                 (- ghf*fvc::snGrad(rho) - fvc::snGrad(p_rgh))*mesh.magSf()
             ),
-            mesh.solutionDict().solver(oCorr == nOuterCorr-1 ? "UFinal" : "U")
+            mesh.solutionDict().solver((U.select(pimple.finalIter())))
         );
     }

@@ -56,3 +56,5 @@ Info<< "Creating field rAU\n" << endl;
 // will be used.  HJ, 1/Mar/2016
 tmp<volScalarField> trAU;
 tmp<volTensorField> trTU;
+
+mesh.schemesDict().setFluxRequired(p.name());

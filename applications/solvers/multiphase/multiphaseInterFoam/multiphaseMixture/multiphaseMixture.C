@@ -265,23 +265,23 @@ void Foam::multiphaseMixture::correct()
     (
         readLabel
         (
-            mesh_.solutionDict().subDict("PISO").lookup("nAlphaSubCycles")
+            mesh_.solutionDict().subDict("PIMPLE").lookup("nAlphaSubCycles")
         )
     );
 
     label nAlphaCorr
     (
-        readLabel(mesh_.solutionDict().subDict("PISO").lookup("nAlphaCorr"))
+        readLabel(mesh_.solutionDict().subDict("PIMPLE").lookup("nAlphaCorr"))
     );
 
     bool cycleAlpha
     (
-        Switch(mesh_.solutionDict().subDict("PISO").lookup("cycleAlpha"))
+        Switch(mesh_.solutionDict().subDict("PIMPLE").lookup("cycleAlpha"))
     );
 
     scalar cAlpha
     (
-        readScalar(mesh_.solutionDict().subDict("PISO").lookup("cAlpha"))
+        readScalar(mesh_.solutionDict().subDict("PIMPLE").lookup("cAlpha"))
     );
 
 

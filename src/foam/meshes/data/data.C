@@ -59,4 +59,41 @@ const Foam::dictionary& Foam::data::solverPerformanceDict() const
 }
 
 
+void Foam::data::setSolverPerformance
+(
+    const word& name,
+    const lduSolverPerformance& sp
+) const
+{
+    dictionary& dict = const_cast<dictionary&>(solverPerformanceDict());
+
+    List<lduSolverPerformance> perfs;
+
+    if (prevTimeIndex_ != this->time().timeIndex())
+    {
+        // Reset solver performance between iterations
+        prevTimeIndex_ = this->time().timeIndex();
+        dict.clear();
+    }
+    else
+    {
+        dict.readIfPresent(name, perfs);
+    }
+
+    // Append to list
+    perfs.setSize(perfs.size()+1, sp);
+
+    dict.set(name, perfs);
+}
+
+
+void Foam::data::setSolverPerformance
+(
+    const lduSolverPerformance& sp
+) const
+{
+    setSolverPerformance(sp.fieldName(), sp);
+}
+
+
 // ************************************************************************* //

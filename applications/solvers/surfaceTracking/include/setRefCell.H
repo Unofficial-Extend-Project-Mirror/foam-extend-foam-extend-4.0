@@ -28,7 +28,7 @@ pNeedRef = returnReduce<bool>(pNeedRef, andOp<bool>());
 // Find reference cell
 if (pNeedRef)
 {
-    point refPointi(mesh.solutionDict().subDict("PISO").lookup("pRefPoint"));
+    point refPointi(mesh.solutionDict().subDict("PIMPLE").lookup("pRefPoint"));
     label refCelli = mesh.findCell(refPointi);
     label hasRef = (refCelli >= 0 ? 1 : 0);
     label sumHasRef = returnReduce<label>(hasRef, sumOp<label>());
@@ -50,6 +50,6 @@ if (pNeedRef)
     }
 
     pRefValue =
-        readScalar(mesh.solutionDict().subDict("PISO").lookup("pRefValue"));
+        readScalar(mesh.solutionDict().subDict("PIMPLE").lookup("pRefValue"));
 }
 

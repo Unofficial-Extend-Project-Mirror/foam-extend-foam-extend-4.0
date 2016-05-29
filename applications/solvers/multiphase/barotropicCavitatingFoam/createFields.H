@@ -75,3 +75,5 @@
         ),
         (gamma*psig + (1.0 - gamma)*psil)/rho
     );
+
+    mesh.schemesDict().setFluxRequired(p.name());

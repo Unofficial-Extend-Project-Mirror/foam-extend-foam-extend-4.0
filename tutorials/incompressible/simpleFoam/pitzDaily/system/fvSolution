@@ -64,7 +64,12 @@ SIMPLE
 {
     nNonOrthogonalCorrectors 0;
 
-    convergence          1e-4;
+    residualControl
+    {
+        p               1e-4;
+        U               1e-4;
+        "(k|epsilon)"   1e-4;
+    }
 }
 
 relaxationFactors

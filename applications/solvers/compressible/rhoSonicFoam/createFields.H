@@ -94,3 +94,5 @@
         rho*Cv*T + 0.5*rho*magSqr(rhoU/rho),
         T.boundaryField().types()
     );
+
+    mesh.schemesDict().setFluxRequired(p.name());
