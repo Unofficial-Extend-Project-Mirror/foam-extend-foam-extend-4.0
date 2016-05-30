@@ -35,7 +35,7 @@ SourceFiles
 #ifndef fixedNormalSlipFvPatchField_H
 #define fixedNormalSlipFvPatchField_H
 
-#include "transformFvPatchField.H"
+#include "transformFvPatchFields.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

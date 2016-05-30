@@ -33,14 +33,23 @@ Germany
 #include "realGasSpecieThermo.H"
 #include "IOstreams.H"
 
-/* * * * * * * * * * * * * * * private static data * * * * * * * * * * * * * */
+/* * * * * * * * * * * * * * * Private Static Data * * * * * * * * * * * * * */
 
 template<class thermo>
-const Foam::scalar Foam::realGasSpecieThermo<thermo>::tol_ = 1.0e-9;
+const Foam::debug::tolerancesSwitch
+Foam::realGasSpecieThermo<thermo>::tol_
+(
+    "realGasSpecieThermoTol",
+    1.0e-9
+);
 
 template<class thermo>
-const int Foam::realGasSpecieThermo<thermo>::maxIter_ = 500;
-
+const Foam::debug::optimisationSwitch
+Foam::realGasSpecieThermo<thermo>::maxIter_
+(
+    "speciesThermoMaxIter",
+    100
+);
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 

@@ -42,7 +42,9 @@
 
     adjustPhi(phi, U, pcorr);
 
-    for(int nonOrth=0; nonOrth<=nNonOrthCorr; nonOrth++)
+    mesh.schemesDict().setFluxRequired(pcorr.name());
+
+    while (pimple.correctNonOrthogonal())
     {
         fvScalarMatrix pcorrEqn
         (
@@ -51,11 +53,11 @@
 
         pcorrEqn.solve();
 
-        if (nonOrth == nNonOrthCorr)
+        if (pimple.finalNonOrthogonalIter())
         {
             phi -= pcorrEqn.flux();
         }
     }
 
-    #include "continuityErrs.H"
+#   include "continuityErrs.H"
 }

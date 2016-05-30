@@ -207,6 +207,69 @@ void Foam::sixDOFqODE::constrainTranslation(vector& vec) const
 }
 
 
+void Foam::sixDOFqODE::aitkensRelaxation
+(
+    const scalar min,
+    const scalar max
+)
+{
+    // Calculate translational relax factor
+    const scalar saveOldRelFacT = oldRelaxFactorT_;
+    oldRelaxFactorT_ = relaxFactorT_;
+
+    if(magSqr(A_[0] - An_[1] - A_[1] - An_[2]) > SMALL)
+    {
+        relaxFactorT_ = saveOldRelFacT + (saveOldRelFacT - 1)*
+        (
+            (A_[1] - An_[2])
+          & (A_[0] - An_[1] - A_[1] - An_[2])
+        )/
+        magSqr(A_[0] - An_[1] - A_[1] - An_[2]);
+    }
+    else
+    {
+        relaxFactorT_ = min;
+    }
+
+    // Bound the relaxation factor for stability
+    if(relaxFactorT_ > max)
+    {
+        relaxFactorT_ = max;
+    }
+    else if(relaxFactorT_ < min)
+    {
+        relaxFactorT_ = min;
+    }
+
+    // Calculate rotational relax factor
+    const scalar saveOldRelFacR = oldRelaxFactorR_;
+    oldRelaxFactorR_ = relaxFactorR_;
+
+    if(magSqr(OmegaDot_[0] - OmegaDotn_[1] - OmegaDot_[1] - OmegaDotn_[2]) > SMALL)
+    {
+        relaxFactorR_ =
+        saveOldRelFacR + (saveOldRelFacR - 1)*
+        ((OmegaDot_[1] - OmegaDotn_[2]) &
+        (OmegaDot_[0] - OmegaDotn_[1] - OmegaDot_[1] - OmegaDotn_[2]))/
+        magSqr(OmegaDot_[0] - OmegaDotn_[1] - OmegaDot_[1] - OmegaDotn_[2]);
+    }
+    else
+    {
+        relaxFactorR_ = min;
+    }
+
+    // Bound the relaxation factor for stability
+    if(relaxFactorR_ > max)
+    {
+        relaxFactorR_ = max;
+    }
+    else if(relaxFactorR_ < min)
+    {
+        relaxFactorR_ = min;
+    }
+}
+
+
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 // Construct from components
@@ -220,6 +283,10 @@ Foam::sixDOFqODE::sixDOFqODE(const IOobject& io)
     Xequilibrium_(lookup("equilibriumPosition")),
     linSpringCoeffs_(lookup("linearSpring")),
     linDampingCoeffs_(lookup("linearDamping")),
+    relaxFactorT_(1.0),
+    relaxFactorR_(1.0),
+    oldRelaxFactorT_(1.0),
+    oldRelaxFactorR_(1.0),
 
     Xrel_(lookup("Xrel")),
     U_(lookup("U")),
@@ -233,6 +300,10 @@ Foam::sixDOFqODE::sixDOFqODE(const IOobject& io)
     omegaAverage_(omega_),
     omegaAverageAbsolute_(omega_),
 
+    A_(3, vector::zero),
+    OmegaDot_(3, vector::zero),
+    An_(3, vector::zero),
+    OmegaDotn_(3, vector::zero),
     force_(lookup("force")),
     moment_(lookup("moment")),
     forceRelative_(lookup("forceRelative")),
@@ -286,6 +357,10 @@ Foam::sixDOFqODE::sixDOFqODE
     Xequilibrium_(sd.Xequilibrium_.name(), sd.Xequilibrium_),
     linSpringCoeffs_(sd.linSpringCoeffs_.name(), sd.linSpringCoeffs_),
     linDampingCoeffs_(sd.linDampingCoeffs_.name(), sd.linDampingCoeffs_),
+    relaxFactorT_(sd.relaxFactorT_),
+    relaxFactorR_(sd.relaxFactorR_),
+    oldRelaxFactorT_(sd.oldRelaxFactorT_),
+    oldRelaxFactorR_(sd.oldRelaxFactorR_),
 
     Xrel_(sd.Xrel_.name(), sd.Xrel_),
     U_(sd.U_.name(), sd.U_),
@@ -299,6 +374,10 @@ Foam::sixDOFqODE::sixDOFqODE
         sd.omegaAverageAbsolute_
     ),
 
+    A_(sd.A_),
+    OmegaDot_(sd.OmegaDot_),
+    An_(sd.An_),
+    OmegaDotn_(sd.OmegaDotn_),
     force_(sd.force_.name(), sd.force_),
     moment_(sd.moment_.name(), sd.moment_),
     forceRelative_(sd.forceRelative_.name(), sd.forceRelative_),
@@ -327,6 +406,8 @@ Foam::sixDOFqODE::~sixDOFqODE()
 
 void Foam::sixDOFqODE::setState(const sixDOFqODE& sd)
 {
+    // Set state does not copy AList_, AOld_, relaxFactor_ and relaxFactorOld_ to
+    // allow Aitkens relaxation (IG 5/May/2016)
     mass_ = sd.mass_;
     momentOfInertia_ = sd.momentOfInertia_;
 
@@ -388,23 +469,6 @@ void Foam::sixDOFqODE::derivatives
     dydx[4] = accel.y();
     dydx[5] = accel.z();
 
-//    // Add translational constraints by setting RHS of given components to zero
-//    if (fixedSurge_)
-//    {
-//        dydx[0] = 0; // Surge velocity
-//        dydx[3] = 0; // Surge acceleration
-//    }
-//    if (fixedSway_)
-//    {
-//        dydx[1] = 0; // Sway velocity
-//        dydx[4] = 0; // Sway acceleration
-//    }
-//    if (fixedHeave_)
-//    {
-//        dydx[2] = 0; // Heave velocity
-//        dydx[5] = 0; // Heave acceleration
-//    }
-
     // Set the derivatives for rotation
     dimensionedVector curOmega
     (
@@ -412,25 +476,6 @@ void Foam::sixDOFqODE::derivatives
         dimless/dimTime,
         vector(y[6], y[7], y[8])
     );
-
-//    dimensionedVector curGlobalOmega = curRotation.invR() & curOmega;
-//
-//    // Add rotational constraints by setting RHS of given components to zero
-//    if (fixedRoll_)
-//    {
-//        curGlobalOmega.value().x() = 0;
-//    }
-//    if (fixedPitch_)
-//    {
-//        curGlobalOmega.value().y() = 0;
-//    }
-//    if (fixedYaw_)
-//    {
-//        curGlobalOmega.value().z() = 0;
-//    }
-//
-//
-//    curOmega = curRotation.R() & curGlobalOmega;
 
     const vector omegaDot = OmegaDot(curRotation, curOmega).value();
 
@@ -540,6 +585,63 @@ void Foam::sixDOFqODE::update(const scalar delta)
     {
         omegaAverageAbsoluteValue.z() = 0;
     }
+}
+
+
+void Foam::sixDOFqODE::relaxAcceleration
+(
+    const scalar minRelFactor,
+    const scalar maxRelFactor
+)
+{
+    if (minRelFactor - maxRelFactor < SMALL)
+    {
+        // Fixed relaxation
+       relaxFactorT_ = minRelFactor;
+       relaxFactorR_ = minRelFactor;
+    }
+    else
+    {
+        // Use Aitkens relaxation
+
+        // Update Aitkens relaxation factor
+        aitkensRelaxation(minRelFactor, maxRelFactor);
+
+        // Update non relaxed accelerations
+        An_[1] = An_[2];
+        An_[2] = (force()/mass_).value();
+        OmegaDotn_[1] = OmegaDotn_[2];
+        OmegaDotn_[2] = (inv(momentOfInertia_) & moment()).value();
+    }
+
+    const dimensionedVector Aold
+    (
+        "",
+        dimensionSet(0, 1, -2, 0, 0, 0, 0),
+        A_[2]
+    );
+
+    const dimensionedVector OmegaDotold
+    (
+        "",
+        dimensionSet(0, 0, -2, 0, 0, 0, 0),
+        OmegaDot_[2]
+    );
+
+    force() =
+        Aold*mass_ + relaxFactorT_*(force() - Aold*mass_);
+
+    moment() =
+        (momentOfInertia_ & OmegaDotold)
+      + relaxFactorR_*(moment() - (momentOfInertia_ & OmegaDotold));
+
+    // Update relaxed old accelerations
+    A_[0] = A_[1];
+    A_[1] = A_[2];
+    A_[2] = (force()/mass_).value();
+    OmegaDot_[0] = OmegaDot_[1];
+    OmegaDot_[1] = OmegaDot_[2];
+    OmegaDot_[2] = (inv(momentOfInertia_) & moment()).value();
 }
 
 

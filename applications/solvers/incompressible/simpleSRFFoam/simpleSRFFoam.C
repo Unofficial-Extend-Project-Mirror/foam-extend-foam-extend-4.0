@@ -25,8 +25,12 @@ Application
     simpleSRFFoam
 
 Description
-    Steady-state solver for incompressible, turbulent flow of non-Newtonian
+    Steady-state solver for incompressible, turbulent flow of Newtonian
     fluids with single rotating frame.
+    Consistent formulation without time-step and relaxation dependence by Jasak
+
+Author
+    Hrvoje Jasak, Wikki Ltd.  All rights reserved
 
 \*---------------------------------------------------------------------------*/
 
@@ -34,6 +38,7 @@ Description
 #include "incompressible/singlePhaseTransportModel/singlePhaseTransportModel.H"
 #include "incompressible/RAS/RASModel/RASModel.H"
 #include "SRFModel.H"
+#include "simpleControl.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -44,22 +49,19 @@ int main(int argc, char *argv[])
 
 #   include "createTime.H"
 #   include "createMesh.H"
+
+    simpleControl simple(mesh);
+
 #   include "createFields.H"
 #   include "initContinuityErrs.H"
-
-    //mesh.clearPrimitives();
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
     Info<< "\nStarting time loop\n" << endl;
 
-    for (runTime++; !runTime.end(); runTime++)
+    while(simple.loop())
     {
         Info<< "Time = " << runTime.timeName() << nl << endl;
-
-#       include "readSIMPLEControls.H"
-
-        p.storePrevIter();
 
         // Pressure-velocity SIMPLE corrector
         {
@@ -83,7 +85,7 @@ int main(int argc, char *argv[])
             adjustPhi(phi, Urel, p);
 
             // Non-orthogonal pressure corrector loop
-            for (int nonOrth=0; nonOrth<=nNonOrthCorr; nonOrth++)
+            while (simple.correctNonOrthogonal())
             {
                 fvScalarMatrix pEqn
                 (
@@ -93,7 +95,7 @@ int main(int argc, char *argv[])
                 pEqn.setReference(pRefCell, pRefValue);
                 pEqn.solve();
 
-                if (nonOrth == nNonOrthCorr)
+                if (simple.finalNonOrthogonalIter())
                 {
                     phi -= pEqn.flux();
                 }

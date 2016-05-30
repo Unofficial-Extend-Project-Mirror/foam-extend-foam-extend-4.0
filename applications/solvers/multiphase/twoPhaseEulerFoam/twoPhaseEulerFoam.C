@@ -41,6 +41,7 @@ Description
 #include "dragModel.H"
 #include "phaseModel.H"
 #include "kineticTheoryModel.H"
+#include "pisoControl.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -50,11 +51,14 @@ int main(int argc, char *argv[])
 
 #   include "createTime.H"
 #   include "createMesh.H"
+
+    pisoControl piso(mesh);
+
 #   include "readGravitationalAcceleration.H"
 #   include "createFields.H"
 #   include "readPPProperties.H"
 #   include "initContinuityErrs.H"
-#   include "readTimeControls.H"
+#   include "createTimeControls.H"
 #   include "CourantNo.H"
 #   include "setInitialDeltaT.H"
 
@@ -78,11 +82,11 @@ int main(int argc, char *argv[])
 #       include "UEqns.H"
 
         // --- PISO loop
-        for (int corr = 0; corr < nCorr; corr++)
+        while (piso.correct())
         {
 #           include "pEqn.H"
 
-            if (correctAlpha && corr < nCorr - 1)
+            if (correctAlpha && !piso.finalInnerIter())
             {
 #               include "alphaEqn.H"
             }

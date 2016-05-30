@@ -109,10 +109,10 @@ class realGasSpecieThermo
     // Private data
 
         //- Convergence tolerance of energy -> temperature inversion functions
-        static const scalar tol_;
+        static const debug::tolerancesSwitch tol_;
 
         //- Max number of iterations in energy->temperature inversion functions
-        static const int maxIter_;
+        static const debug::optimisationSwitch maxIter_;
 
 
     // Private member functions

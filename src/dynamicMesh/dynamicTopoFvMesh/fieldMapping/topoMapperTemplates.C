@@ -86,6 +86,8 @@ void topoMapper::storeGradients
         // Register field under a name that's unique
         word registerName("remapGradient(" + field.name() + ')');
 
+        // Note: potential issue with cached gradients.  HJ, 22/Apr/2016
+
         // Make a new entry
         if (mesh_.schemesDict().subDict("gradSchemes").found(gradName))
         {

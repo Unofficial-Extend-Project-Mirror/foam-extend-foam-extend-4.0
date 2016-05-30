@@ -44,7 +44,7 @@ tmp
     BlockLduSystem<vector, typename outerProduct<vector, Type>::type>
 > grad
 (
-    GeometricField<Type, fvPatchField, volMesh>& vf,
+    const GeometricField<Type, fvPatchField, volMesh>& vf,
     const word& name
 )
 {
@@ -62,7 +62,7 @@ tmp
     BlockLduSystem<vector, typename outerProduct<vector, Type>::type>
 > grad
 (
-    GeometricField<Type, fvPatchField, volMesh>& vf
+    const GeometricField<Type, fvPatchField, volMesh>& vf
 )
 {
     return fvm::grad

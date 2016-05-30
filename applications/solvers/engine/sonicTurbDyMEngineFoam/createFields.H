@@ -128,3 +128,5 @@
         ),
         fvc::interpolate(rho) * fvc::meshPhi(U)
     );
+
+    mesh.schemesDict().setFluxRequired(p.name());

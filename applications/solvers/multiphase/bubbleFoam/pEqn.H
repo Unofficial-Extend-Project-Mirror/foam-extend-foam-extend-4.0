@@ -38,7 +38,7 @@
         alphaf*rUaAf/rhoa + betaf*rUbAf/rhob
     );
 
-    for(int nonOrth = 0; nonOrth <= nNonOrthCorr; nonOrth++)
+    while (piso.correctNonOrthogonal())
     {
         fvScalarMatrix pEqn
         (
@@ -48,7 +48,7 @@
         pEqn.setReference(pRefCell, pRefValue);
         pEqn.solve();
 
-        if (nonOrth == nNonOrthCorr)
+        if (piso.finalNonOrthogonalIter())
         {
             surfaceScalarField SfGradp = pEqn.flux()/Dp;
 

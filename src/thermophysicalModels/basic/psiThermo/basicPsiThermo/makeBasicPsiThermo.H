@@ -82,10 +82,6 @@ addToRunTimeSelectionTable                                                    \
     fvMesh                                                                    \
 )
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
 #define makeBasicExternalLibraryBasedThermo(Cthermo)                          \
                                                                               \
 typedef Cthermo                                                               \

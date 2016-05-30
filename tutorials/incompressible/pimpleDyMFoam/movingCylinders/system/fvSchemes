@@ -29,7 +29,7 @@ divSchemes
 {
     default         none;
     div(phi,U)      Gauss upwind;
-    div((nuEff*dev(grad(U).T())))  Gauss linear;
+    div((nuEff*dev(T(grad(U)))))  Gauss linear;
 }
 
 laplacianSchemes
@@ -41,14 +41,15 @@ laplacianSchemes
 
     laplacian(1,p) Gauss linear limited 0.5;
 
-    laplacian((1|A(U)),p) Gauss linear limited 0.5;
+    laplacian((1|aU),pcorr) Gauss linear limited 0.5;
+    laplacian((1|aU),p) Gauss linear limited 0.5;
 }
 
 interpolationSchemes
 {
     default         linear;
     interpolate(HbyA) linear;
-    interpolate(1|A) linear;
+    interpolate(1|aU) linear;
 }
 
 snGradSchemes
@@ -56,11 +57,5 @@ snGradSchemes
     default         limited 0.5;
 }
 
-fluxRequired
-{
-    default         no;
-    pcorr;
-    p;
-}
 
 // ************************************************************************* //

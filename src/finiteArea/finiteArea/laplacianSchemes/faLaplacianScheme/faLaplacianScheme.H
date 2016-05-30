@@ -171,13 +171,13 @@ public:
         virtual tmp<faMatrix<Type> > famLaplacian
         (
             const edgeScalarField&,
-            GeometricField<Type, faPatchField, areaMesh>&
+            const GeometricField<Type, faPatchField, areaMesh>&
         ) = 0;
 
         virtual tmp<faMatrix<Type> > famLaplacian
         (
             const areaScalarField&,
-            GeometricField<Type, faPatchField, areaMesh>&
+            const GeometricField<Type, faPatchField, areaMesh>&
         );
 
         virtual tmp<GeometricField<Type, faPatchField, areaMesh> > facLaplacian

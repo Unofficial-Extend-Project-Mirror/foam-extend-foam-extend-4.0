@@ -37,7 +37,7 @@ divSchemes
     div(phi,B)      Gauss limitedLinear 1;
     div(phi,muTilda) Gauss limitedLinear 1;
     div(B)          Gauss linear;
-    div((muEff*dev2(grad(U).T()))) Gauss linear;
+    div((muEff*dev2(T(grad(U))))) Gauss linear;
 }
 
 laplacianSchemes
@@ -60,12 +60,6 @@ interpolationSchemes
 snGradSchemes
 {
     default         corrected;
-}
-
-fluxRequired
-{
-    default         no;
-    p               ;
 }
 
 // ************************************************************************* //

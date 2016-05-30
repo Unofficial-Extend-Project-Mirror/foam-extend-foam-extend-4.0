@@ -432,6 +432,18 @@ inline Form cmptMag
 
 
 template<class Form, class Cmpt, int nCmpt>
+inline Form cmptSign
+(
+    const VectorSpace<Form, Cmpt, nCmpt>& vs
+)
+{
+    Form v;
+    VectorSpaceOps<nCmpt,0>::eqOp(v, vs, eqSignOp<Cmpt>());
+    return v;
+}
+
+
+template<class Form, class Cmpt, int nCmpt>
 inline Form cmptStabilise
 (
     const VectorSpace<Form, Cmpt, nCmpt>& vs,
@@ -440,7 +452,7 @@ inline Form cmptStabilise
 )
 {
     Form v = vs;
-    for (int i=0; i<nCmpt; i++)
+    for (int i = 0; i < nCmpt; i++)
     {
         if (mag(vs.v_[i]) < small)
         {

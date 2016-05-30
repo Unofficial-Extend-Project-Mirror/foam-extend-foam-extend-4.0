@@ -412,7 +412,7 @@ boundedBackwardDdtScheme::fvcDdt
 tmp<fvScalarMatrix>
 boundedBackwardDdtScheme::fvmDdt
 (
-    volScalarField& vf
+    const volScalarField& vf
 )
 {
     tmp<fvScalarMatrix> tfvm
@@ -483,7 +483,7 @@ tmp<fvScalarMatrix>
 boundedBackwardDdtScheme::fvmDdt
 (
     const dimensionedScalar& rho,
-    volScalarField& vf
+    const volScalarField& vf
 )
 {
     tmp<fvScalarMatrix> tfvm
@@ -553,7 +553,7 @@ tmp<fvScalarMatrix>
 boundedBackwardDdtScheme::fvmDdt
 (
     const volScalarField& rho,
-    volScalarField& vf
+    const volScalarField& vf
 )
 {
     tmp<fvScalarMatrix> tfvm

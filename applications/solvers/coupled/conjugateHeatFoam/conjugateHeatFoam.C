@@ -38,6 +38,8 @@ Description
 #include "thermalModel.H"
 #include "singlePhaseTransportModel.H"
 #include "RASModel.H"
+#include "pisoControl.H"
+#include "simpleControl.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -47,11 +49,14 @@ int main(int argc, char *argv[])
 #   include "createTime.H"
 #   include "createFluidMesh.H"
 #   include "createSolidMesh.H"
+
+    pisoControl piso(mesh);
+
 #   include "readGravitationalAcceleration.H"
 #   include "createFields.H"
 #   include "createSolidFields.H"
 #   include "initContinuityErrs.H"
-#   include "readTimeControls.H"
+#   include "createTimeControls.H"
 #   include "CourantNo.H"
 #   include "setInitialDeltaT.H"
 
@@ -64,7 +69,6 @@ int main(int argc, char *argv[])
         Info<< "Time = " << runTime.timeName() << nl << endl;
 
 #       include "readTimeControls.H"
-#       include "readPISOControls.H"
 #       include "CourantNo.H"
 #       include "setDeltaT.H"
 
@@ -75,7 +79,7 @@ int main(int argc, char *argv[])
 
         p_rgh.storePrevIter();
 
-        for (int corr = 0; corr < nCorr; corr++)
+        while (piso.correct())
         {
 #           include "pEqn.H"
         }
@@ -109,6 +113,7 @@ int main(int argc, char *argv[])
 
         // Update density according to Boussinesq approximation
         rhok = 1.0 - beta*(T - TRef);
+        rhok.correctBoundaryConditions();
 
         runTime.write();
 

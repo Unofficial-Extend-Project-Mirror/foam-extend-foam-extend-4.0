@@ -28,8 +28,7 @@ solvers
         agglomerator     faceAreaPair;
         nCellsInCoarsestLevel 10;
         mergeLevels      1;
-    };
-
+    }
     U
     {
         solver           smoothSolver;
@@ -37,8 +36,7 @@ solvers
         tolerance        1e-8;
         relTol           0.1;
         nSweeps          1;
-    };
-
+    }
     k
     {
         solver           smoothSolver;
@@ -46,8 +44,7 @@ solvers
         tolerance        1e-8;
         relTol           0.1;
         nSweeps          1;
-    };
-
+    }
     omega
     {
         solver           smoothSolver;
@@ -55,12 +52,12 @@ solvers
         tolerance        1e-8;
         relTol           0.1;
         nSweeps          1;
-    };
+    }
 }
 
 SIMPLE
 {
-    nNonOrthogonalCorrectors 0;
+    nNonOrthogonalCorrectors 2;
 }
 
 relaxationFactors
@@ -69,6 +66,14 @@ relaxationFactors
     U               0.7;
     k               0.7;
     omega           0.7;
+}
+
+cache
+{
+    grad(U);
+    grad(p);
+    grad(k);
+    grad(omega);
 }
 
 // ************************************************************************* //

@@ -12,7 +12,7 @@ if (realFluid)
           + fvc::ddtPhiCorr(rUA, rho, U, phi)
         );
 
-    for (int nonOrth=0; nonOrth<=nNonOrthCorr; nonOrth++)
+    while (piso.correctNonOrthogonal())
     {
         fvScalarMatrix pEqn
         (
@@ -24,7 +24,7 @@ if (realFluid)
 
         pEqn.solve();
 
-        if (nonOrth == nNonOrthCorr)
+        if (piso.finalNonOrthogonalIter())
         {
             phi += pEqn.flux();
         }
@@ -32,7 +32,7 @@ if (realFluid)
 }
 else
 {
-    if (transonic)
+    if (piso.transonic())
     {
         surfaceScalarField phid
         (
@@ -44,7 +44,7 @@ else
             )
         );
 
-        for (int nonOrth=0; nonOrth<=nNonOrthCorr; nonOrth++)
+        while (piso.correctNonOrthogonal())
         {
             fvScalarMatrix pEqn
             (
@@ -55,7 +55,7 @@ else
 
             pEqn.solve();
 
-            if (nonOrth == nNonOrthCorr)
+            if (piso.finalNonOrthogonalIter())
             {
                 phi == pEqn.flux();
             }
@@ -70,7 +70,7 @@ else
           + fvc::ddtPhiCorr(rUA, rho, U, phi)
         );
 
-        for (int nonOrth=0; nonOrth<=nNonOrthCorr; nonOrth++)
+        while (piso.correctNonOrthogonal())
         {
             fvScalarMatrix pEqn
             (
@@ -81,7 +81,7 @@ else
 
             pEqn.solve();
 
-            if (nonOrth == nNonOrthCorr)
+            if (piso.finalNonOrthogonalIter())
             {
                 phi += pEqn.flux();
             }

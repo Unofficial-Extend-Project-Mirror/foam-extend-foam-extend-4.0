@@ -44,6 +44,10 @@ boundaryField
         type            fixedValue;
         value           uniform 0.99;
     }
+    defaultFaces
+    {
+        type            empty;
+    }
 }
 
 // ************************************************************************* //

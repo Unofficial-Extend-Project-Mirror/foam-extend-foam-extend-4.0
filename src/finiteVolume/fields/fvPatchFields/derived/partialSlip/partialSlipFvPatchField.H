@@ -35,7 +35,7 @@ SourceFiles
 #ifndef partialSlipFvPatchField_H
 #define partialSlipFvPatchField_H
 
-#include "transformFvPatchField.H"
+#include "transformFvPatchFields.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

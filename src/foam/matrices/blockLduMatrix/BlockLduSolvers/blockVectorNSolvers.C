@@ -46,8 +46,8 @@ License
 #include "BlockGMRESSolver.H"
 
 // KRJ: 2012-12-15: Multigrid solver
-#include "blockAmgSolvers.H"
-#include "blockAmgPrecons.H"
+#include "blockAMGSolvers.H"
+#include "blockAMGPrecons.H"
 #include "blockMatrixCoarsenings.H"
 #include "blockMatrixAgglomerations.H"
 #include "blockCoeffNorms.H"
@@ -160,12 +160,12 @@ makeBlockCoeffNorm(block##Type##CoeffNorm, block##Type##CoeffComponentNorm);  \
 typedef BlockCoeffMaxNorm<type > block##Type##CoeffMaxNorm;                   \
 makeBlockCoeffNorm(block##Type##CoeffNorm, block##Type##CoeffMaxNorm);        \
                                                                               \
-typedef BlockAmgSolver<type > block##Type##AmgSolver;                         \
+typedef BlockAMGSolver<type > block##Type##AmgSolver;                         \
 makeBlockSolverTypeName(block##Type##AmgSolver);                              \
 addSolverToBlockMatrix(Type, block##Type##AmgSolver, symMatrix);              \
 addSolverToBlockMatrix(Type, block##Type##AmgSolver, asymMatrix);             \
                                                                               \
-typedef BlockAmgPrecon<type > block##Type##AmgPrecon;                         \
+typedef BlockAMGPrecon<type > block##Type##AmgPrecon;                         \
 makeBlockPrecon(block##Type##Precon, block##Type##AmgPrecon);                 \
 
 forAllVectorNTypes(makeSolver)

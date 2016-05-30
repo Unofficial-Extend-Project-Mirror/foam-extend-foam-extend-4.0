@@ -190,7 +190,7 @@ void faMatrix<Type>::addBoundarySource
 template<class Type>
 faMatrix<Type>::faMatrix
 (
-    GeometricField<Type, faPatchField, areaMesh>& psi,
+    const GeometricField<Type, faPatchField, areaMesh>& psi,
     const dimensionSet& ds
 )
 :
@@ -205,7 +205,7 @@ faMatrix<Type>::faMatrix
 {
     if (debug)
     {
-        Info<< "faMatrix<Type>(GeometricField<Type, faPatchField, areaMesh>&,"
+        Info<< "faMatrix<Type>(const GeometricField<Type, faPatchField, areaMesh>&,"
                " const dimensionSet&) : "
                "constructing faMatrix<Type> for field " << psi_.name()
             << endl;
@@ -235,7 +235,13 @@ faMatrix<Type>::faMatrix
         );
     }
 
-    psi_.boundaryField().updateCoeffs();
+    // Update the boundary coefficients of psi without changing its event No.
+    GeometricField<Type, faPatchField, areaMesh>& psiRef =
+       const_cast<GeometricField<Type, faPatchField, areaMesh>&>(psi_);
+
+    label currentStatePsi = psiRef.eventNo();
+    psiRef.boundaryField().updateCoeffs();
+    psiRef.eventNo() = currentStatePsi;
 }
 
 
@@ -273,7 +279,7 @@ faMatrix<Type>::faMatrix(const faMatrix<Type>& fam)
 template<class Type>
 faMatrix<Type>::faMatrix
 (
-    GeometricField<Type, faPatchField, areaMesh>& psi,
+    const GeometricField<Type, faPatchField, areaMesh>& psi,
     Istream& is
 )
 :
@@ -288,7 +294,7 @@ faMatrix<Type>::faMatrix
 {
     if (debug)
     {
-        Info<< "faMatrix<Type>(GeometricField<Type, faPatchField, areaMesh>&,"
+        Info<< "faMatrix<Type>(const GeometricField<Type, faPatchField, areaMesh>&,"
                " Istream&) : "
                "constructing faMatrix<Type> for field " << psi_.name()
             << endl;
@@ -542,16 +548,18 @@ void faMatrix<Type>::relax(const scalar alpha)
 template<class Type>
 void faMatrix<Type>::relax()
 {
-    scalar alpha = 0;
-
-    if (psi_.mesh().solutionDict().relax(psi_.name()))
+    if (psi_.mesh().solutionDict().relaxEquation(psi_.name()))
     {
-        alpha = psi_.mesh().solutionDict().relaxationFactor(psi_.name());
+        relax(psi_.mesh().solutionDict().equationRelaxationFactor(psi_.name()));
     }
-
-    if (alpha > 0)
+    else
     {
-        relax(alpha);
+        if (debug)
+        {
+            InfoIn("void faMatrix<Type>::relax()")
+                << "Relaxation factor for field " << psi_.name()
+                << " not found.  Relaxation will not be used." << endl;
+        }
     }
 }
 

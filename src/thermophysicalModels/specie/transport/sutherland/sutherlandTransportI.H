@@ -178,6 +178,8 @@ inline scalar sutherlandTransport<thermo>::alpha(const scalar rho, const scalar 
 
     return mu(T)*Cv_*(1.32 + 1.77*this->R()/Cv_)/CpBar;
 }
+
+
 // * * * * * * * * * * * * * * * Member Operators  * * * * * * * * * * * * * //
 
 template<class thermo>

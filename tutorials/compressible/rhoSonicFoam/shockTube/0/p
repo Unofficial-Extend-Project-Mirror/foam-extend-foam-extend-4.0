@@ -1,9 +1,9 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | foam-extend: Open Source CFD                    |
-|  \\    /   O peration     | Version:     3.2                                |
+|  \\    /   O peration     | Version:     4.0                                |
 |   \\  /    A nd           | Web:         http://www.foam-extend.org         |
-|    \\/     M anipulation  |                                                 |
+|    \\/     M anipulation  | For copyright notice see file Copyright         |
 \*---------------------------------------------------------------------------*/
 FoamFile
 {
@@ -17,7 +17,7 @@ FoamFile
 
 dimensions      [1 -1 -2 0 0 0 0];
 
-internalField   nonuniform List<scalar>
+internalField   nonuniform List<scalar> 
 1000
 (
 100000
@@ -1034,5 +1034,6 @@ boundaryField
         type            empty;
     }
 }
+
 
 // ************************************************************************* //

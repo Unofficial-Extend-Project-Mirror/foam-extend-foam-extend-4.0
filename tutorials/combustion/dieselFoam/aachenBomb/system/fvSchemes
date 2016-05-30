@@ -42,7 +42,7 @@ divSchemes
         ft vanLeer;
         hs vanLeer;
     };
-    div((muEff*dev2(grad(U).T()))) Gauss linear;
+    div((muEff*dev2(T(grad(U))))) Gauss linear;
 }
 
 laplacianSchemes
@@ -66,12 +66,6 @@ interpolationSchemes
 snGradSchemes
 {
     default         corrected;
-}
-
-fluxRequired
-{
-    default         no;
-    p;
 }
 
 // ************************************************************************* //

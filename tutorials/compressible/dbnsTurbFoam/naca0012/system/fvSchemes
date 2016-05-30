@@ -27,13 +27,19 @@ gradSchemes
 
 divSchemes
 {
+    dbns
+    {
+        flux           rusanov;
+        limiter        BarthJespersen;
+    }
+
     default         none;
     div(phi,k)      Gauss upwind;
     div(phi,epsilon) Gauss upwind;
     div(devRhoReff) Gauss linear;
     div((devRhoReff&U)) Gauss linear;
 
-    div((muEff*dev2(grad(U).T()))) Gauss linear;
+    div((muEff*dev2(T(grad(U))))) Gauss linear;
 }
 
 laplacianSchemes
@@ -54,11 +60,6 @@ interpolationSchemes
 snGradSchemes
 {
     default         corrected;
-}
-
-fluxRequired
-{
-    default         no;
 }
 
 relaxationFactors

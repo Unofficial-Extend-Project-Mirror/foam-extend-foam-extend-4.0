@@ -31,6 +31,9 @@ kOmegaSSTSAS/kOmegaSSTSAS.C
 /* Wall functions */
 wallFunctions=derivedFvPatchFields/wallFunctions
 
+derivedFvPatchFields/decayingTurbulence/decayingVorton.C
+derivedFvPatchFields/decayingTurbulence/decayingTurbulenceFvPatchVectorField.C
+
 nuSgsWallFunctions=$(wallFunctions)/nuSgsWallFunctions
 $(nuSgsWallFunctions)/nuSgsWallFunction/nuSgsWallFunctionFvPatchScalarField.C
 

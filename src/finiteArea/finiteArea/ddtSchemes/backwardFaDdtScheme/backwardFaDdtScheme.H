@@ -157,19 +157,19 @@ public:
 
         tmp<faMatrix<Type> > famDdt
         (
-            GeometricField<Type, faPatchField, areaMesh>&
+            const GeometricField<Type, faPatchField, areaMesh>&
         );
 
         tmp<faMatrix<Type> > famDdt
         (
             const dimensionedScalar&,
-            GeometricField<Type, faPatchField, areaMesh>&
+            const GeometricField<Type, faPatchField, areaMesh>&
         );
 
         tmp<faMatrix<Type> > famDdt
         (
             const areaScalarField&,
-            GeometricField<Type, faPatchField, areaMesh>&
+            const GeometricField<Type, faPatchField, areaMesh>&
         );
 };
 

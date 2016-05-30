@@ -22,13 +22,13 @@ ddtSchemes
 
 gradSchemes
 {
- default         cellMDLimited Gauss linear 0.333;
- grad(p)         cellMDLimited Gauss linear 0.333;
+    default         cellMDLimited Gauss linear 0.333;
+    grad(p)         cellMDLimited Gauss linear 0.333;
 }
 
 divSchemes
 {
-    default         Gauss linear;
+    default         none;
     div(phi,U)      Gauss limitedLinearV 0.5;
     div(phid,p)     Gauss limitedLinear  0.5;
     div(phiU,p)     Gauss limitedLinear  0.5;
@@ -38,8 +38,7 @@ divSchemes
     div(phi,R)      Gauss limitedLinear 0.5;
     div(phi,omega)  Gauss limitedLinear  0.5;;
     div(U)          Gauss limitedLinear  0.5;
-    div((muEff*dev2(grad(U).T()))) Gauss linear;
-
+    div((muEff*dev2(T(grad(U))))) Gauss linear;
 }
 
 laplacianSchemes
@@ -53,7 +52,6 @@ laplacianSchemes
     laplacian(DomegaEff,omega) Gauss linear corrected;
     laplacian((rho*(1|A(U))),p) Gauss linear corrected;
     laplacian(alphaEff,h) Gauss linear corrected;
-
 }
 
 interpolationSchemes
@@ -64,12 +62,6 @@ interpolationSchemes
 snGradSchemes
 {
     default         corrected;
-}
-
-fluxRequired
-{
-    default         no;
-    p               ;
 }
 
 

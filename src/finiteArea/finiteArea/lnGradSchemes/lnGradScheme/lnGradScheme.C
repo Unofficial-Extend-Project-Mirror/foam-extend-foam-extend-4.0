@@ -71,7 +71,7 @@ tmp<lnGradScheme<Type> > lnGradScheme<Type>::New
             << exit(FatalIOError);
     }
 
-    word schemeName(schemeData);
+    const word schemeName(schemeData);
 
     typename MeshConstructorTable::iterator constructorIter =
         MeshConstructorTablePtr_->find(schemeName);
@@ -82,8 +82,8 @@ tmp<lnGradScheme<Type> > lnGradScheme<Type>::New
         (
             "lnGradScheme<Type>::New(const faMesh&, Istream&)",
             schemeData
-        )   << "Unknown discretisation scheme " << schemeName
-            << endl << endl
+        )   << "Unknown discretisation scheme "
+            << schemeName << nl << nl
             << "Valid schemes are :" << endl
             << MeshConstructorTablePtr_->sortedToc()
             << exit(FatalIOError);
@@ -122,7 +122,7 @@ lnGradScheme<Type>::lnGrad
         (
             IOobject
             (
-                lnGradName + vf.name() + ')',
+                lnGradName + "("+vf.name()+')',
                 vf.instance(),
                 vf.db(),
                 IOobject::NO_READ,

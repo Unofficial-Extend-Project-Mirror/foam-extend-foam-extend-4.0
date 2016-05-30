@@ -38,17 +38,19 @@ Contributor:
 
 defineTypeNameAndDebug(Foam::GGIInterpolationName, 0);
 
+
 template<>
 const char*
-Foam::NamedEnum<Foam::GGIInterpolationName::quickReject, 4>::names[] =
+Foam::NamedEnum<Foam::GGIInterpolationName::quickReject, 3>::names[] =
 {
     "distance3D",
     "AABB",
-    "bbOctree",
-    "nSquared"
+    "bbOctree"
 };
 
-const Foam::NamedEnum<Foam::GGIInterpolationName::quickReject, 4>
+
+const Foam::NamedEnum<Foam::GGIInterpolationName::quickReject, 3>
     Foam::GGIInterpolationName::quickRejectNames_;
+
 
 // ************************************************************************* //

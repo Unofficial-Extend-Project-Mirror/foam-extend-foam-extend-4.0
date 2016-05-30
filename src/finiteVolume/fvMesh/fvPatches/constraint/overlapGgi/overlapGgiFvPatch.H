@@ -46,7 +46,7 @@ SourceFiles
 #define overlapGgiFvPatch_H
 
 #include "ggiFvPatch.H"
-#include "overlapGgiLduInterface.H"
+#include "overlapGGILduInterface.H"
 #include "overlapGgiPolyPatch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -61,7 +61,7 @@ namespace Foam
 class overlapGgiFvPatch
 :
     public coupledFvPatch,
-    public overlapGgiLduInterface
+    public overlapGGILduInterface
 {
     // Private Data
 

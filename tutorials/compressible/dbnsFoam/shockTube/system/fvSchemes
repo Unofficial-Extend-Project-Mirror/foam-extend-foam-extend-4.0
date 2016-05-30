@@ -25,7 +25,13 @@ gradSchemes
 }
 
 divSchemes
-{}
+{
+    dbns
+    {
+        flux           rusanov;
+        limiter        BarthJespersen;
+    }
+}
 
 laplacianSchemes
 {}
@@ -39,7 +45,5 @@ interpolationSchemes
 snGradSchemes
 {}
 
-fluxRequired
-{}
 
 // ************************************************************************* //

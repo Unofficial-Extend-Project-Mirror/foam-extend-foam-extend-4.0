@@ -179,11 +179,11 @@ public:
         //- Type of values the UPtrList contains.
         typedef T value_type;
 
-        //- Type that can be used for storing into UPtrList::value_type objects.
+        //- Type that can be used for storing into UPtrList::value_type objects
         typedef T& reference;
 
-        //- Type that can be used for storing into constant UPtrList::value_type
-        //  objects.
+        //- Type that can be used for storing into constant
+        //  UPtrList::value_type objects.
         typedef const T& const_reference;
 
 

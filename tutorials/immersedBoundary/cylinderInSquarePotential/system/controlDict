@@ -49,7 +49,7 @@ adjustTimeStep  no;
 
 maxCo           0.2;
 
-libs ( "libimmersedBoundary.so");
+libs ( "liblduSolvers.so" "libimmersedBoundary.so");
 
 functions
 {

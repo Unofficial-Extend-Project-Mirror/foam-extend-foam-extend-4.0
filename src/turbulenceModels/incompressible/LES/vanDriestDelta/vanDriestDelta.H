@@ -25,7 +25,7 @@ Class
     Foam::incompressible::LESModels::vanDriestDelta
 
 Description
-    Simple cube-root of cell volume delta used in incompressible LES models.
+    Simple cube-root of cell volume delta with van Driest wall damping.
 
 SourceFiles
     vanDriestDelta.C

@@ -133,9 +133,8 @@ public:
         );
 
 
-    // Destructor
-
-        virtual ~surfaceInterpolationScheme();
+    //- Destructor
+    virtual ~surfaceInterpolationScheme();
 
 
     // Member Functions

@@ -5,7 +5,7 @@
       + turbulence->divDevRhoReff(U)
     );
 
-    if (momentumPredictor)
+    if (piso.momentumPredictor())
     {
         solve(UEqn == -fvc::grad(p));
     }

@@ -45,6 +45,7 @@ Description
 #include "twoPhaseMixture.H"
 #include "turbulenceModel.H"
 #include "porousZones.H"
+#include "pimpleControl.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -53,12 +54,14 @@ int main(int argc, char *argv[])
 #   include "setRootCase.H"
 #   include "createTime.H"
 #   include "createMesh.H"
+
+    pimpleControl pimple(mesh);
+
 #   include "readGravitationalAcceleration.H"
-#   include "readPIMPLEControls.H"
 #   include "initContinuityErrs.H"
 #   include "createFields.H"
 #   include "createPorousZones.H"
-#   include "readTimeControls.H"
+#   include "createTimeControls.H"
 #   include "correctPhi.H"
 #   include "CourantNo.H"
 #   include "setInitialDeltaT.H"
@@ -69,7 +72,6 @@ int main(int argc, char *argv[])
 
     while (runTime.run())
     {
-#       include "readPIMPLEControls.H"
 #       include "readTimeControls.H"
 #       include "CourantNo.H"
 #       include "setDeltaT.H"
@@ -79,8 +81,7 @@ int main(int argc, char *argv[])
         Info<< "Time = " << runTime.timeName() << nl << endl;
 
         // Pressure-velocity corrector
-        int oCorr = 0;
-        do
+        while (pimple.loop())
         {
             twoPhaseProperties.correct();
 
@@ -89,7 +90,7 @@ int main(int argc, char *argv[])
 #           include "UEqn.H"
 
             // --- PISO loop
-            for (int corr = 0; corr < nCorr; corr++)
+            while (pimple.correct())
             {
 #               include "pEqn.H"
             }
@@ -97,7 +98,7 @@ int main(int argc, char *argv[])
 #           include "continuityErrs.H"
 
             turbulence->correct();
-        } while (++oCorr < nOuterCorr);
+        }
 
         runTime.write();
 

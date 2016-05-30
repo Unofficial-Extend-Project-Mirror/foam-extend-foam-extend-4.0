@@ -62,13 +62,13 @@ tmp<laplacianScheme<Type> > laplacianScheme<Type>::New
         (
             "laplacianScheme<Type>::New(const faMesh&, Istream&)",
             schemeData
-        )   << "Laplacian scheme not specified" << endl << endl
+        )   << "Laplacian scheme not specified" << nl << nl
             << "Valid laplacian schemes are :" << endl
             << IstreamConstructorTablePtr_->sortedToc()
             << exit(FatalIOError);
     }
 
-    word schemeName(schemeData);
+    const word schemeName(schemeData);
 
     typename IstreamConstructorTable::iterator cstrIter =
         IstreamConstructorTablePtr_->find(schemeName);
@@ -79,7 +79,7 @@ tmp<laplacianScheme<Type> > laplacianScheme<Type>::New
         (
             "laplacianScheme<Type>::New(const faMesh&, Istream&)",
             schemeData
-        )   << "unknown laplacian scheme " << schemeName << endl << endl
+        )   << "Unknown laplacian scheme " << schemeName << nl << nl
             << "Valid laplacian schemes are :" << endl
             << IstreamConstructorTablePtr_->sortedToc()
             << exit(FatalIOError);
@@ -103,7 +103,7 @@ tmp<faMatrix<Type> >
 laplacianScheme<Type>::famLaplacian
 (
     const areaScalarField& gamma,
-    GeometricField<Type, faPatchField, areaMesh>& vf
+    const GeometricField<Type, faPatchField, areaMesh>& vf
 )
 {
     return famLaplacian(tinterpGammaScheme_().interpolate(gamma)(), vf);

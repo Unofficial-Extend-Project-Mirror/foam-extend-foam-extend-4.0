@@ -36,6 +36,7 @@ Description
 #include "barotropicCompressibilityModel.H"
 #include "twoPhaseMixture.H"
 #include "turbulenceModel.H"
+#include "pimpleControl.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -45,10 +46,12 @@ int main(int argc, char *argv[])
 
 #   include "createTime.H"
 #   include "createMesh.H"
+
+    pimpleControl pimple(mesh);
+
 #   include "readThermodynamicProperties.H"
-#   include "readControls.H"
+#   include "createControls.H"
 #   include "createFields.H"
-#   include "initContinuityErrs.H"
 #   include "compressibleCourantNo.H"
 #   include "setInitialDeltaT.H"
 
@@ -65,13 +68,13 @@ int main(int argc, char *argv[])
         runTime++;
         Info<< "Time = " << runTime.timeName() << nl << endl;
 
-        for (int outerCorr = 0; outerCorr < nOuterCorr; outerCorr++)
+        while (pimple.loop())
         {
 #           include "rhoEqn.H"
 #           include "gammaPsi.H"
 #           include "UEqn.H"
 
-            for (int corr = 0; corr < nCorr; corr++)
+            while (pimple.correct())
             {
 #               include "pEqn.H"
             }

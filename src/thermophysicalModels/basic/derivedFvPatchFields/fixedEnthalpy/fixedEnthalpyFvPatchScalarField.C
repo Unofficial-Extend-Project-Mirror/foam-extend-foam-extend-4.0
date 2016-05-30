@@ -103,9 +103,56 @@ void Foam::fixedEnthalpyFvPatchScalarField::updateCoeffs()
         const_cast<fvPatchScalarField&>(thermo.T().boundaryField()[patchi]);
     Tw.evaluate();
 
-    if (dimensionedInternalField().name() == "h")
+    if
+    (
+        dimensionedInternalField().name() == db().mangleFileName("h")
+    )
     {
         operator==(thermo.h(Tw, patchi));
+    }
+    else if
+    (
+        dimensionedInternalField().name() == db().mangleFileName("i")
+    )
+    {
+        // Get access to relative and rotational velocity
+        const word UrelName("Urel");
+        const word UrotName("Urot");
+
+        if
+        (
+            !this->db().objectRegistry::found(UrelName)
+         || !this->db().objectRegistry::found(UrotName)
+        )
+        {
+             // Velocities not available, do not update
+            InfoIn
+            (
+                "void gradientEnthalpyFvPatchScalarField::"
+                "updateCoeffs(const vectorField& Up)"
+            )   << "Velocity fields " << UrelName << " or "
+                << UrotName << " not found.  "
+                << "Performing enthalpy value update for field "
+                << this->dimensionedInternalField().name()
+                << " and patch " << patchi
+                << endl;
+
+               operator==(thermo.h(Tw, patchi));
+        }
+        else
+        {
+            const fvPatchVectorField& Urelp =
+                lookupPatchField<volVectorField, vector>(UrelName);
+
+            const fvPatchVectorField& Urotp =
+                lookupPatchField<volVectorField, vector>(UrotName);
+
+            operator==
+            (
+                thermo.h(Tw, patchi)
+              - 0.5*(magSqr(Urotp) - magSqr(Urelp))
+            );
+        }
     }
     else
     {

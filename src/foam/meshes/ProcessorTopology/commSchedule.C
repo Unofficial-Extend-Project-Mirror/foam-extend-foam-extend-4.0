@@ -33,7 +33,10 @@ License
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-defineTypeNameAndDebug(Foam::commSchedule, 0);
+namespace Foam
+{
+defineTypeNameAndDebug(commSchedule, 0);
+}
 
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //

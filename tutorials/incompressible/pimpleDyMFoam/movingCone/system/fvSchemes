@@ -29,16 +29,16 @@ gradSchemes
 divSchemes
 {
     default         none;
-    div(phi,U)      Gauss linear;
-    div((nuEff*dev(grad(U).T()))) Gauss linear;
+    div(phi,U)      Gauss linear grad(U);
+    div((nuEff*dev(T(grad(U))))) Gauss linear;
 }
 
 laplacianSchemes
 {
     default         none;
     laplacian(nu,U) Gauss linear corrected;
-    laplacian(rAU,pcorr) Gauss linear corrected;
-    laplacian(rAU,p) Gauss linear corrected;
+    laplacian((1|aU),pcorr) Gauss linear corrected;
+    laplacian((1|aU),p)  Gauss linear corrected;
     laplacian(diffusivity,cellMotionU) Gauss linear uncorrected;
     laplacian(nuEff,U) Gauss linear uncorrected;
 }
@@ -54,11 +54,5 @@ snGradSchemes
     default         corrected;
 }
 
-fluxRequired
-{
-    default         no;
-    pcorr           ;
-    p               ;
-}
 
 // ************************************************************************* //

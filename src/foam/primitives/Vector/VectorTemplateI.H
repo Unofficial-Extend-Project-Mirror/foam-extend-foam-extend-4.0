@@ -156,6 +156,14 @@ inline Vector<Cmpt> operator^(const Vector<Cmpt>& v1, const Vector<Cmpt>& v2)
 }
 
 
+template <class Cmpt>
+inline Vector<Cmpt> scaleRow(const Vector<Cmpt>& v, const Cmpt& c)
+{
+    // Multiply by scalar
+    return v*c;
+}
+
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam

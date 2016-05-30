@@ -116,6 +116,28 @@ void Foam::CoeffField<Foam::tensor>::operator=
 }
 
 
+// * * * * * * * * * * * * * * * IOstream Operators  * * * * * * * * * * * * //
+
+Foam::Ostream& Foam::operator<<(Ostream& os, const CoeffField<tensor>& f)
+{
+    const DecoupledCoeffField<tensor>& df = f;
+    return operator<<(os, df);
+}
+
+
+Foam::Ostream& Foam::operator<<
+(
+    Ostream& os,
+    const tmp<CoeffField<tensor> >& tf
+)
+{
+    const DecoupledCoeffField<tensor>& df = tf();
+    os << df;
+    tf.clear();
+    return os;
+}
+
+
 /* * * * * * * * * * * * * * * * Global functions  * * * * * * * * * * * * * */
 
 template<>
@@ -127,6 +149,48 @@ Foam::tmp<Foam::CoeffField<Foam::tensor> > Foam::inv
     const DecoupledCoeffField<tensor>& df = f;
 
     return tmp<CoeffField<tensor> >(new CoeffField<tensor>(inv(df)()));
+}
+
+
+template<>
+void Foam::multiply
+(
+    tensorField& f,
+    const CoeffField<tensor>& f1,
+    const tensor& f2
+)
+{
+    const DecoupledCoeffField<tensor>& df1 = f1;
+
+    multiply(f, df1, f2);
+}
+
+
+template<>
+void Foam::multiply
+(
+    tensorField& f,
+    const CoeffField<tensor>& f1,
+    const tensorField& f2
+)
+{
+    const DecoupledCoeffField<tensor>& df1 = f1;
+
+    multiply(f, df1, f2);
+}
+
+
+template<>
+void Foam::multiply
+(
+    tensorField& f,
+    const tensorField& f1,
+    const CoeffField<tensor>& f2
+)
+{
+    const DecoupledCoeffField<tensor>& df2 = f2;
+
+    multiply(f, f1, df2);
 }
 
 

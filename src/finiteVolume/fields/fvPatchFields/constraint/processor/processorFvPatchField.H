@@ -235,8 +235,7 @@ public:
                 const CoeffField<Type>&,
                 const Pstream::commsTypes commsType,
                 const bool switchToLhs
-            ) const
-            {}
+            ) const;
 
             //- Update result field based on interface functionality
             virtual void updateInterfaceMatrix
@@ -247,14 +246,7 @@ public:
                 const CoeffField<Type>&,
                 const Pstream::commsTypes commsType,
                 const bool switchToLhs
-            ) const
-            {
-                notImplemented
-                (
-                    "processorFvPatchField<Type>::updateInterfaceMatrix "
-                    "for block matrices"
-                );
-            }
+            ) const;
 
 
         //- Processor coupled interface functions

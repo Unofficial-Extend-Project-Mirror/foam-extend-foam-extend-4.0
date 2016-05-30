@@ -399,7 +399,7 @@ template<class Type>
 tmp<fvMatrix<Type> >
 backwardDualDdtScheme<Type>::fvmDdt
 (
-    GeometricField<Type, fvPatchField, volMesh>& vf
+    const GeometricField<Type, fvPatchField, volMesh>& vf
 )
 {
     const objectRegistry& registry = this->mesh();
@@ -479,7 +479,7 @@ tmp<fvMatrix<Type> >
 backwardDualDdtScheme<Type>::fvmDdt
 (
     const dimensionedScalar& rho,
-    GeometricField<Type, fvPatchField, volMesh>& vf
+    const GeometricField<Type, fvPatchField, volMesh>& vf
 )
 {
     const objectRegistry& registry = this->mesh();
@@ -557,7 +557,7 @@ tmp<fvMatrix<Type> >
 backwardDualDdtScheme<Type>::fvmDdt
 (
     const volScalarField& rho,
-    GeometricField<Type, fvPatchField, volMesh>& vf
+    const GeometricField<Type, fvPatchField, volMesh>& vf
 )
 {
     const objectRegistry& registry = this->mesh();

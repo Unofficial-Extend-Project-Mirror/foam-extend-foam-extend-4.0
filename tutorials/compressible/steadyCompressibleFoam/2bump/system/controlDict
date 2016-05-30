@@ -14,6 +14,11 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
+libs
+(
+    "liblduSolvers.so"
+)
+
 startFrom       startTime;
 
 startTime       0;
@@ -26,7 +31,7 @@ deltaT          1;
 
 writeControl    timeStep;
 
-writeInterval   50;
+writeInterval   100;
 
 purgeWrite      0;
 
@@ -34,7 +39,7 @@ writeFormat     ascii;
 
 writePrecision  6;
 
-writeCompression uncompressed;
+writeCompression compressed;
 
 timeFormat      general;
 

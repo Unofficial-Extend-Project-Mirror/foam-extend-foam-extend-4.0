@@ -24,6 +24,17 @@ solvers
         minIter          1;
         maxIter          1000;
         tolerance        1e-06;
+        relTol           0.01;
+    }
+
+    pFinal
+    {
+        solver           CG;
+        preconditioner   Cholesky;
+
+        minIter          1;
+        maxIter          1000;
+        tolerance        1e-06;
         relTol           0;
     }
 

@@ -260,7 +260,7 @@ tmp<fvVectorMatrix> realizableKE::divDevRhoReff(volVectorField& U) const
 {
     return
     (
-      - fvm::laplacian(muEff(), U) - fvc::div(muEff()*dev2(fvc::grad(U)().T()))
+      - fvm::laplacian(muEff(), U) - fvc::div(muEff()*dev2(T(fvc::grad(U))))
     );
 }
 
@@ -318,7 +318,9 @@ void realizableKE::correct()
         divU += fvc::div(mesh_.phi());
     }
 
-    volTensorField gradU = fvc::grad(U_);
+    const tmp<volTensorField> tgradU = fvc::grad(U_);
+    const volTensorField& gradU = tgradU();
+
     volScalarField S2 = 2*magSqr(dev(symm(gradU)));
     volScalarField magS = sqrt(S2);
 

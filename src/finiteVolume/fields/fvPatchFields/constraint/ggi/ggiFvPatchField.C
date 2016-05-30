@@ -37,6 +37,7 @@ Note on parallelisation
 
 #include "ggiFvPatchField.H"
 #include "symmTransformField.H"
+#include "coeffFields.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -253,6 +254,7 @@ void ggiFvPatchField<Type>::initInterfaceMatrixUpdate
     // patch comms.  HJ, 11/Jul/2011
 
     // Get shadow face-cells and assemble shadow field
+    // Consider using shadowField().patchInternalField() ? HJ, 18/Feb/2016
     const unallocLabelList& sfc = ggiPatch_.shadow().faceCells();
 
     scalarField sField(sfc.size());
@@ -293,6 +295,69 @@ void ggiFvPatchField<Type>::updateInterfaceMatrix
     const scalarField& coeffs,
     const direction cmpt,
     const Pstream::commsTypes,
+    const bool switchToLhs
+) const
+{}
+
+
+template<class Type>
+void ggiFvPatchField<Type>::initInterfaceMatrixUpdate
+(
+    const Field<Type>& psiInternal,
+    Field<Type>& result,
+    const BlockLduMatrix<Type>&,
+    const CoeffField<Type>& coeffs,
+    const Pstream::commsTypes commsType,
+    const bool switchToLhs
+) const
+{
+    // Communication is allowed either before or after processor
+    // patch comms.  HJ, 11/Jul/2011
+
+    // Get shadow face-cells and assemble shadow patch internal field
+    // Consider using shadowField().patchInternalField() ? HJ, 18/Feb/2016
+    const unallocLabelList& sfc = ggiPatch_.shadow().faceCells();
+
+    Field<Type> sField(sfc.size());
+
+    forAll (sField, i)
+    {
+        sField[i] = psiInternal[sfc[i]];
+    }
+
+    Field<Type> pnf = ggiPatch_.interpolate(sField);
+
+    // Multiply neighbour field with coeffs and re-use pnf for result
+    // of multiplication
+    multiply(pnf, coeffs, pnf);
+
+    const unallocLabelList& fc = ggiPatch_.faceCells();
+
+    if (switchToLhs)
+    {
+        forAll (fc, elemI)
+        {
+            result[fc[elemI]] += pnf[elemI];
+        }
+    }
+    else
+    {
+        forAll (fc, elemI)
+        {
+            result[fc[elemI]] -= pnf[elemI];
+        }
+    }
+}
+
+
+template<class Type>
+void ggiFvPatchField<Type>::updateInterfaceMatrix
+(
+    const Field<Type>&,
+    Field<Type>&,
+    const BlockLduMatrix<Type>&,
+    const CoeffField<Type>&,
+    const Pstream::commsTypes commsType,
     const bool switchToLhs
 ) const
 {}

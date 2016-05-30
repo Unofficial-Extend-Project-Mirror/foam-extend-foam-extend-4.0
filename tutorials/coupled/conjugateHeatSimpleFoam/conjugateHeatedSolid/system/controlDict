@@ -1,0 +1,84 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | foam-extend: Open Source CFD                    |
+|  \\    /   O peration     | Version:     3.2                                |
+|   \\  /    A nd           | Web:         http://www.foam-extend.org         |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      controlDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+application     conjugateHeatSimpleFoam;
+
+startFrom       startTime;
+
+startTime       0;
+
+stopAt          endTime;
+
+endTime         100;
+
+deltaT          1;
+
+writeControl    timeStep;
+
+writeInterval   10;
+
+purgeWrite      0;
+
+writeFormat     ascii;
+
+writePrecision  6;
+
+writeCompression uncompressed;
+
+timeFormat      general;
+
+timePrecision   6;
+
+runTimeModifiable yes;
+
+functions
+(
+    heatFlux
+    {
+        // Type of functionObject
+        type heatFlux;
+        outputControl timeStep;
+        outputInterval 1;
+
+        K              kappaEff;
+    }
+    heatFlux
+    {
+        // Type of functionObject
+        type heatFlux;
+        outputControl timeStep;
+        outputInterval 1;
+        region solid;
+
+        K              k;
+    }
+    minMaxT
+    {
+        type minMaxField;
+        functionObjectLibs ("libfieldFunctionObjects.so");
+        name T;
+    }
+    minMaxTSolid
+    {
+        type minMaxField;
+        region solid;
+        functionObjectLibs ("libfieldFunctionObjects.so");
+        name T;
+    }
+);
+
+
+// ************************************************************************* //

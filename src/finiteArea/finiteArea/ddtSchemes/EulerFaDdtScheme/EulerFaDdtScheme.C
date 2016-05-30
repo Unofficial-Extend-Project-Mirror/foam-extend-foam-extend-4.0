@@ -501,7 +501,7 @@ template<class Type>
 tmp<faMatrix<Type> >
 EulerFaDdtScheme<Type>::famDdt
 (
-    GeometricField<Type, faPatchField, areaMesh>& vf
+    const GeometricField<Type, faPatchField, areaMesh>& vf
 )
 {
     tmp<faMatrix<Type> > tfam
@@ -537,7 +537,7 @@ tmp<faMatrix<Type> >
 EulerFaDdtScheme<Type>::famDdt
 (
     const dimensionedScalar& rho,
-    GeometricField<Type, faPatchField, areaMesh>& vf
+    const GeometricField<Type, faPatchField, areaMesh>& vf
 )
 {
     tmp<faMatrix<Type> > tfam
@@ -574,7 +574,7 @@ tmp<faMatrix<Type> >
 EulerFaDdtScheme<Type>::famDdt
 (
     const areaScalarField& rho,
-    GeometricField<Type, faPatchField, areaMesh>& vf
+    const GeometricField<Type, faPatchField, areaMesh>& vf
 )
 {
     tmp<faMatrix<Type> > tfam

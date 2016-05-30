@@ -27,3 +27,5 @@
     );
 
 #   include "createPhi.H"
+
+    mesh.schemesDict().setFluxRequired(p.name());

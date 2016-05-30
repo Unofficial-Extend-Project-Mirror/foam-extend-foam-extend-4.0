@@ -9,7 +9,7 @@
 
     UEqn.relax();
 
-    if (momentumPredictor)
+    if (piso.momentumPredictor())
     {
         solve
         (

@@ -269,7 +269,7 @@ tmp<fvVectorMatrix> LRR::divDevRhoReff(volVectorField& U) const
             fvc::div(rho_*R_ + couplingFactor_*mut_*fvc::grad(U))
           + fvc::laplacian((1.0 - couplingFactor_)*mut_, U)
           - fvm::laplacian(muEff(), U)
-          - fvc::div(mu()*dev2(fvc::grad(U)().T()))
+          - fvc::div(mu()*dev2(T(fvc::grad(U))))
         );
     }
     else
@@ -279,7 +279,7 @@ tmp<fvVectorMatrix> LRR::divDevRhoReff(volVectorField& U) const
             fvc::div(rho_*R_)
           + fvc::laplacian(mut_, U)
           - fvm::laplacian(muEff(), U)
-          - fvc::div(mu()*dev2(fvc::grad(U)().T()))
+          - fvc::div(mu()*dev2(T(fvc::grad(U))))
         );
     }
 }

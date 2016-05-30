@@ -3,7 +3,7 @@
 | \\      /  F ield         | foam-extend: Open Source CFD                    |
 |  \\    /   O peration     | Version:     3.2                                |
 |   \\  /    A nd           | Web:         http://www.foam-extend.org         |
-|    \\/     M anipulation  |                                                 |
+|    \\/     M anipulation  | For copyright notice see file Copyright         |
 \*---------------------------------------------------------------------------*/
 FoamFile
 {
@@ -21,37 +21,37 @@ FoamFile
     {
         type            patch;
         nFaces          150;
-        startFace       76473;
+        startFace       71816;
     }
     inlet
     {
         type            patch;
         nFaces          48;
-        startFace       76623;
+        startFace       71966;
     }
     outlet
     {
         type            patch;
         nFaces          48;
-        startFace       76671;
+        startFace       72014;
     }
     wing
     {
         type            wall;
         nFaces          778;
-        startFace       76719;
+        startFace       72062;
     }
-    back
+    symBack
     {
         type            empty;
-        nFaces          38129;
-        startFace       77497;
+        nFaces          35801;
+        startFace       72840;
     }
-    front
+    symFront
     {
         type            empty;
-        nFaces          38129;
-        startFace       115626;
+        nFaces          35801;
+        startFace       108641;
     }
 )
 

@@ -38,7 +38,6 @@ Note:
     Note2: number of items send on one processor have to equal the number
     of items received on the other processor.
 
-
 SourceFiles
     mapDistribute.C
 
@@ -60,7 +59,7 @@ namespace Foam
 class mapPolyMesh;
 
 /*---------------------------------------------------------------------------*\
-                           Class mapDistribute Declaration
+                        Class mapDistribute Declaration
 \*---------------------------------------------------------------------------*/
 
 class mapDistribute
@@ -78,6 +77,16 @@ class mapDistribute
 
         //- Schedule
         mutable autoPtr<List<labelPair> > schedulePtr_;
+
+
+   // Private Member Functions
+
+        static void checkReceivedSize
+        (
+            const label procI,
+            const label expectedSize,
+            const label receivedSize
+        );
 
 
 public:
@@ -166,7 +175,7 @@ public:
 
         // Other
 
-            //- Compact maps. Gets per field a bool whether it is used (locally)
+            //- Compact maps. Gets per field a bool whether it is used locally
             //  and works out itself what this side and sender side can remove
             //  from maps.
             void compact(const boolList& elemIsUsed);
@@ -258,7 +267,6 @@ public:
     // Member Operators
 
         void operator=(const mapDistribute&);
-
 };
 
 

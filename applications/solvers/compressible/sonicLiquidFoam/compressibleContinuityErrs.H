@@ -1,8 +1,8 @@
 {
-    scalar sumLocalContErr =
+    sumLocalContErr =
         (sum(mag(rho - rho0 - psi*(p - p0)))/sum(rho)).value();
 
-    scalar globalContErr = (sum(rho - rho0 - psi*(p - p0))/sum(rho)).value();
+    globalContErr = (sum(rho - rho0 - psi*(p - p0))/sum(rho)).value();
 
     cumulativeContErr += globalContErr;
 

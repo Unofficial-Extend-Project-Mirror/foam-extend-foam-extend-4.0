@@ -8,7 +8,7 @@
     volScalarField rUA = 1.0/UEqn.A();
     U = rUA*UEqn.H();
 
-    if (transonic)
+    if (pimple.transonic())
     {
         surfaceScalarField phiv =
             (fvc::interpolate(U) & mesh.Sf())
@@ -22,7 +22,7 @@
             fvc::interpolate(thermo.psi())*phiv
         );
 
-        for (int nonOrth=0; nonOrth<=nNonOrthCorr; nonOrth++)
+        while (pimple.correctNonOrthogonal())
         {
             fvScalarMatrix pEqn
             (
@@ -31,21 +31,12 @@
               - fvm::laplacian(rho*rUA, p)
             );
 
-            if
+            pEqn.solve
             (
-                ocorr == nOuterCorr
-             && corr == nCorr
-             && nonOrth == nNonOrthCorr
-            )
-            {
-                pEqn.solve(mesh.solutionDict().solver(p.name() + "Final"));
-            }
-            else
-            {
-                pEqn.solve();
-            }
+                mesh.solutionDict().solver(p.select(pimple.finalInnerIter()))
+            );
 
-            if (nonOrth == nNonOrthCorr)
+            if (pimple.finalNonOrthogonalIter())
             {
                 phi += pEqn.flux();
             }
@@ -60,7 +51,7 @@
               + fvc::ddtPhiCorr(rUA, rho, U, phi)
             );
 
-        for (int nonOrth=0; nonOrth<=nNonOrthCorr; nonOrth++)
+        while (pimple.correctNonOrthogonal())
         {
             fvScalarMatrix pEqn
             (
@@ -69,21 +60,12 @@
               - fvm::laplacian(rho*rUA, p)
             );
 
-            if
+            pEqn.solve
             (
-                ocorr == nOuterCorr
-             && corr == nCorr
-             && nonOrth == nNonOrthCorr
-            )
-            {
-                pEqn.solve(mesh.solutionDict().solver(p.name() + "Final"));
-            }
-            else
-            {
-                pEqn.solve();
-            }
+                mesh.solutionDict().solver(p.select(pimple.finalInnerIter()))
+            );
 
-            if (nonOrth == nNonOrthCorr)
+            if (pimple.finalNonOrthogonalIter())
             {
                 phi += pEqn.flux();
             }

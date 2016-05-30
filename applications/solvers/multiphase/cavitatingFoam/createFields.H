@@ -83,3 +83,6 @@
     (
         incompressible::turbulenceModel::New(U, phiv, twoPhaseProperties)
     );
+
+    mesh.schemesDict().setFluxRequired(p.name());
+    mesh.schemesDict().setFluxRequired(rho.name());

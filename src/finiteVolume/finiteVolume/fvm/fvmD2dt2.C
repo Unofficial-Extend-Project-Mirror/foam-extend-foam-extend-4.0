@@ -44,7 +44,7 @@ template<class Type>
 tmp<fvMatrix<Type> >
 d2dt2
 (
-    GeometricField<Type, fvPatchField, volMesh>& vf,
+    const GeometricField<Type, fvPatchField, volMesh>& vf,
     const word& name
 )
 {
@@ -61,7 +61,7 @@ tmp<fvMatrix<Type> >
 d2dt2
 (
     const dimensionedScalar& rho,
-    GeometricField<Type, fvPatchField, volMesh>& vf,
+    const GeometricField<Type, fvPatchField, volMesh>& vf,
     const word& name
 )
 {
@@ -78,7 +78,7 @@ tmp<fvMatrix<Type> >
 d2dt2
 (
     const volScalarField& rho,
-    GeometricField<Type, fvPatchField, volMesh>& vf,
+    const GeometricField<Type, fvPatchField, volMesh>& vf,
     const word& name
 )
 {
@@ -94,7 +94,7 @@ template<class Type>
 tmp<fvMatrix<Type> >
 d2dt2
 (
-    GeometricField<Type, fvPatchField, volMesh>& vf
+    const GeometricField<Type, fvPatchField, volMesh>& vf
 )
 {
     return fvm::d2dt2(vf, "d2dt2(" + vf.name() + ')');
@@ -106,7 +106,7 @@ tmp<fvMatrix<Type> >
 d2dt2
 (
     const dimensionedScalar& rho,
-    GeometricField<Type, fvPatchField, volMesh>& vf
+    const GeometricField<Type, fvPatchField, volMesh>& vf
 )
 {
     return fvm::d2dt2(rho, vf, "d2dt2(" + rho.name() + ',' + vf.name() + ')');
@@ -118,7 +118,7 @@ tmp<fvMatrix<Type> >
 d2dt2
 (
     const volScalarField& rho,
-    GeometricField<Type, fvPatchField, volMesh>& vf
+    const GeometricField<Type, fvPatchField, volMesh>& vf
 )
 {
     return fvm::d2dt2(rho, vf, "d2dt2(" + rho.name() + ',' + vf.name() + ')');

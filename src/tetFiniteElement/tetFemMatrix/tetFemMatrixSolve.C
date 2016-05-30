@@ -77,6 +77,13 @@ lduSolverPerformance tetFemMatrix<Type>::solve
     // HJ, 20/Nov/2007
     lduInterfaceFieldPtrsList interfaces = psi_.boundaryField().interfaces();
 
+    // Cast into a non-const to solve.  HJ, 6/May/2016
+    GeometricField<Type, tetPolyPatchField, tetPointMesh>& psi =
+        const_cast<GeometricField<Type, tetPolyPatchField, tetPointMesh>&>
+        (
+            psi_
+        );
+
     for (direction cmpt = 0; cmpt < Type::nComponents; cmpt++)
     {
         if (validComponents[cmpt] == -1) continue;
@@ -154,7 +161,7 @@ lduSolverPerformance tetFemMatrix<Type>::solve
             solverPerfVec = solverPerf;
         }
 
-        psi_.internalField().replace(cmpt, psiCmpt);
+        psi.internalField().replace(cmpt, psiCmpt);
 
         reconstructMatrix();
     }
@@ -165,7 +172,7 @@ lduSolverPerformance tetFemMatrix<Type>::solve
             << endl;
     }
 
-    psi_.correctBoundaryConditions();
+    psi.correctBoundaryConditions();
 
     return solverPerfVec;
 }

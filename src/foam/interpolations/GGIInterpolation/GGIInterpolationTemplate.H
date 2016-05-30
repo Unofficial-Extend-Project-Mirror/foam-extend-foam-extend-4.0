@@ -28,6 +28,21 @@ Description
     Mass-conservative face interpolation of face data between two
     primitivePatches
 
+    Note on parallelisation
+    GGI search and cutting is an expensive operation, typically used in
+    patch-to-patch interpolation.  The current paradigm keeps primitive patch
+    data as a global zone on all processors for ease of manipulation
+    and to avoid global numbering.
+
+    GGIInterpolation uses a globalData flag to indicate that identical
+    patch data is available everywhere.  In such cases, ALL processors
+    (not just the ones which hold a piece of the active GGI surface)
+    can be used for the cutting, with the resulting addressing and weights
+    data assembled by global communication at the end.
+
+    If the GGI patch data is not identical on all processors, set
+    globalData to false.  HJ, 27/Apr/2016
+
 Author
     Hrvoje Jasak, Wikki Ltd.  All rights reserved
 
@@ -86,8 +101,7 @@ public:
         {
             THREE_D_DISTANCE,
             AABB,
-            BB_OCTREE,
-            N_SQUARED
+            BB_OCTREE
         };
 
 
@@ -96,7 +110,7 @@ public:
         ClassName("GGIInterpolation");
 
         //- Quick reject names
-        static const NamedEnum<quickReject, 4> quickRejectNames_;
+        static const NamedEnum<quickReject, 3> quickRejectNames_;
 
 
     // Constructors
@@ -147,6 +161,10 @@ class GGIInterpolation
         //  master plane.  Size equals number of slave faces; zero length
         //  indicates no translation.  MB, 28/Jan/2009
         vectorField forwardSep_;
+
+        //- Global data: are master and slave present on all processors?
+        //  If true, cutting will be performed in parallel
+        bool globalData_;
 
         //- Master non-overlap face tolerance factor
         const scalar masterNonOverlapFaceTol_;
@@ -236,6 +254,27 @@ class GGIInterpolation
 
         //- Disallow default bitwise assignment
         void operator=(const GGIInterpolation&);
+
+
+    // Helper functions for parallel search
+
+        //- Is parallel cutting active?
+        bool globalData() const
+        {
+            return
+                Pstream::parRun()
+             && globalData_
+             && masterPatch_.size() > 10*Pstream::nProcs();
+        }
+
+        //- Parallel master slice start
+        label parMasterStart() const;
+
+        //- Parallel master slice end
+        label parMasterEnd() const;
+
+        //- Parallel master slice size
+        label parMasterSize() const;
 
 
     // Helper functions for demand-driven data
@@ -423,16 +462,16 @@ public:
             const tensorField& forwardT,
             const tensorField& reverseT,
             const vectorField& forwardSep,
+            const bool globalData,
             const scalar masterFaceNonOverlapFaceTol = 0,
             const scalar slaveFaceNonOverlapFaceTol = 0,
             const bool rescaleGGIWeightingFactors = true,
-            const quickReject reject = AABB
+            const quickReject reject = BB_OCTREE
         );
 
 
     // Destructor
-
-        ~GGIInterpolation();
+    ~GGIInterpolation();
 
 
     // Member Functions

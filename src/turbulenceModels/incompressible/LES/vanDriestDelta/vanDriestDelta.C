@@ -66,7 +66,8 @@ void vanDriestDelta::calcDelta()
     );
 
     const fvPatchList& patches = mesh_.boundary();
-    forAll(patches, patchi)
+
+    forAll (patches, patchi)
     {
         if (patches[patchi].isWall())
         {

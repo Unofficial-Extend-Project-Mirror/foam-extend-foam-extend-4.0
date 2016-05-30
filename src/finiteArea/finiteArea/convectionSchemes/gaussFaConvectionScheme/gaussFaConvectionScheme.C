@@ -58,7 +58,7 @@ tmp<faMatrix<Type> >
 gaussConvectionScheme<Type>::famDiv
 (
     const edgeScalarField& faceFlux,
-    GeometricField<Type, faPatchField, areaMesh>& vf
+    const GeometricField<Type, faPatchField, areaMesh>& vf
 ) const
 {
     tmp<edgeScalarField> tweights = tinterpScheme_().weights(vf);

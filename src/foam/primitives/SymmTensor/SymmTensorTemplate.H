@@ -50,7 +50,7 @@ namespace Foam
                            Class SymmTensor Declaration
 \*---------------------------------------------------------------------------*/
 
-template <class Cmpt>
+template<class Cmpt>
 class SymmTensor
 :
     public VectorSpace<SymmTensor<Cmpt>, Cmpt, 6>
@@ -79,6 +79,7 @@ public:
         static const SymmTensor one;
         static const SymmTensor max;
         static const SymmTensor min;
+        static const SymmTensor I;
 
 
     //- Component labeling enumeration

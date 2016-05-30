@@ -128,6 +128,12 @@ public:
 
         // Access
 
+		    //- Return reference to GGI patch
+			const ggiFvPatch& ggiPatch() const
+			{
+				return ggiPatch_;
+			}
+
             //- Return shadow patch field
             const ggiFvPatchField<Type>& shadowPatchField() const;
 
@@ -145,6 +151,9 @@ public:
             (
                 const Pstream::commsTypes commsType
             );
+
+
+        // Coupled interface functionality
 
             //- Transform neighbour field
             virtual void transformCoupleField
@@ -176,6 +185,44 @@ public:
                 const lduMatrix&,
                 const scalarField& coeffs,
                 const direction cmpt,
+                const Pstream::commsTypes commsType,
+                const bool switchToLhs
+            ) const;
+
+
+        // Block coupled interface functionality
+
+            //- Transform given patch field
+            virtual void transformCoupleField
+            (
+                Field<Type>& f
+            ) const
+            {
+                notImplemented
+                (
+                    "ggiFvPatchField<Type>::transformCoupleField"
+                    "(Field<Type>& f) const"
+                );
+            }
+
+            //- Initialise neighbour matrix update
+            virtual void initInterfaceMatrixUpdate
+            (
+                const Field<Type>&,
+                Field<Type>&,
+                const BlockLduMatrix<Type>&,
+                const CoeffField<Type>&,
+                const Pstream::commsTypes commsType,
+                const bool switchToLhs
+            ) const;
+
+            //- Update result field based on interface functionality
+            virtual void updateInterfaceMatrix
+            (
+                const Field<Type>&,
+                Field<Type>&,
+                const BlockLduMatrix<Type>&,
+                const CoeffField<Type>&,
                 const Pstream::commsTypes commsType,
                 const bool switchToLhs
             ) const;

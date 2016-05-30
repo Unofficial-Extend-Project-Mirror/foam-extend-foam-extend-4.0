@@ -39,7 +39,7 @@ void Foam::BlockGaussSeidelPrecon<Type>::calcInvDiag()
 {
     typedef CoeffField<Type> TypeCoeffField;
     typedef typename TypeCoeffField::linearTypeField linearTypeField;
-    typedef typename TypeCoeffField::linearType valueType;
+    typedef typename TypeCoeffField::linearType linearType;
 
     typedef typename TypeCoeffField::squareTypeField squareTypeField;
 
@@ -58,7 +58,7 @@ void Foam::BlockGaussSeidelPrecon<Type>::calcInvDiag()
         invDiag_.asLinear() =
             cmptDivide
             (
-                linearTypeField(d.size(), pTraits<valueType>::one),
+                linearTypeField(d.size(), pTraits<linearType>::one),
                 d.asLinear()
             );
     }
@@ -91,7 +91,7 @@ void Foam::BlockGaussSeidelPrecon<Type>::calcInvDiag()
         invDiag_.asLinear() =
             cmptDivide
             (
-                linearTypeField(lf.size(), pTraits<valueType>::one),
+                linearTypeField(lf.size(), pTraits<linearType>::one),
                 lf
             );
     }
@@ -130,81 +130,78 @@ void Foam::BlockGaussSeidelPrecon<Type>::BlockSweep
     // Must transfer data between the different CPUs. Notes on the Jacobi
     // iteration style can be seen in GaussSeidelSolver.C
 
-    for (label sweep = 0; sweep < nSweeps_; sweep++)
+    bPrime_ = b;
+
+    this->matrix_.initInterfaces
+    (
+        this->matrix_.coupleUpper(),
+        bPrime_,
+        x,
+        true             // switch to lhs of system
+    );
+
+    this->matrix_.updateInterfaces
+    (
+        this->matrix_.coupleUpper(),
+        bPrime_,
+        x,
+        true             // switch to lhs of system
+    );
+
+    register label fStart, fEnd, curCoeff;
+
+    // Forward sweep
+    for (register label rowI = 0; rowI < nRows; rowI++)
     {
-        bPrime_ = b;
+        Type& curX = x[rowI];
 
-        this->matrix_.initInterfaces
-        (
-            this->matrix_.coupleUpper(),
-            bPrime_,
-            x,
-            true             // switch to lhs of system
-        );
+        // Grab the accumulated neighbour side
+        curX = bPrime_[rowI];
 
-        this->matrix_.updateInterfaces
-        (
-            this->matrix_.coupleUpper(),
-            bPrime_,
-            x,
-            true             // switch to lhs of system
-        );
+        // Start and end of this row
+        fStart = ownStart[rowI];
+        fEnd = ownStart[rowI + 1];
 
-        register label fStart, fEnd, curCoeff;
-
-        // Forward sweep
-        for (register label rowI = 0; rowI < nRows; rowI++)
+        // Accumulate the owner product side
+        for (curCoeff = fStart; curCoeff < fEnd; curCoeff++)
         {
-            Type& curX = x[rowI];
-
-            // Grab the accumulated neighbour side
-            curX = bPrime_[rowI];
-
-            // Start and end of this row
-            fStart = ownStart[rowI];
-            fEnd = ownStart[rowI + 1];
-
-            // Accumulate the owner product side
-            for (curCoeff = fStart; curCoeff < fEnd; curCoeff++)
-            {
-                curX -= mult(upper[curCoeff], x[u[curCoeff]]);
-            }
-
-            // Finish current x
-            curX = mult(dD[rowI], curX);
-
-            // Distribute the neighbour side using current x
-            for (curCoeff = fStart; curCoeff < fEnd; curCoeff++)
-            {
-                // lower = upper transposed
-                bPrime_[u[curCoeff]] -=
-                    mult(mult.transpose(upper[curCoeff]), curX);
-            }
+            curX -= mult(upper[curCoeff], x[u[curCoeff]]);
         }
 
-        // Reverse sweep
-        for (register label rowI = nRows - 1; rowI >= 0; rowI--)
+        // Finish current x
+        curX = mult(dD[rowI], curX);
+
+        // Distribute the neighbour side using current x
+        for (curCoeff = fStart; curCoeff < fEnd; curCoeff++)
         {
-            Type& curX = x[rowI];
-
-            // Grab the accumulated neighbour side
-            curX = bPrime_[rowI];
-
-            // Start and end of this row
-            fStart = ownStart[rowI];
-            fEnd = ownStart[rowI + 1];
-
-            // Accumulate the owner product side
-            for (curCoeff = fStart; curCoeff < fEnd; curCoeff++)
-            {
-                curX -= mult(upper[curCoeff], x[u[curCoeff]]);
-            }
-
-            // Finish current x
-            curX = mult(dD[rowI], curX);
-
-            // No need to update bPrime on reverse sweep. VV, 10/Sep/2015.
+            // lower = upper transposed
+            bPrime_[u[curCoeff]] -=
+                mult(mult.transpose(upper[curCoeff]), curX);
         }
+    }
+
+    // Reverse sweep
+    for (register label rowI = nRows - 1; rowI >= 0; rowI--)
+    {
+        Type& curX = x[rowI];
+
+        // Grab the accumulated neighbour side
+        curX = bPrime_[rowI];
+
+        // Start and end of this row
+        fStart = ownStart[rowI];
+        fEnd = ownStart[rowI + 1];
+
+        // Accumulate the owner product side
+        for (curCoeff = fStart; curCoeff < fEnd; curCoeff++)
+        {
+            curX -= mult(upper[curCoeff], x[u[curCoeff]]);
+        }
+
+        // Finish current x
+        curX = mult(dD[rowI], curX);
+
+        // No need to update bPrime on reverse sweep. VV, 10/Sep/2015.
     }
 }
 
@@ -234,79 +231,76 @@ void Foam::BlockGaussSeidelPrecon<Type>::BlockSweep
     // Must transfer data between the different CPUs. Notes on the Jacobi
     // iteration style can be seen in GaussSeidelSolver.C
 
-    for (label sweep = 0; sweep < nSweeps_; sweep++)
+    bPrime_ = b;
+
+    this->matrix_.initInterfaces
+    (
+        this->matrix_.coupleUpper(),
+        bPrime_,
+        x,
+        true             // switch to lhs of system
+    );
+
+    this->matrix_.updateInterfaces
+    (
+        this->matrix_.coupleUpper(),
+        bPrime_,
+        x,
+        true             // switch to lhs of system
+    );
+
+    register label fStart, fEnd, curCoeff;
+
+    // Forward sweep
+    for (register label rowI = 0; rowI < nRows; rowI++)
     {
-        bPrime_ = b;
+        Type& curX = x[rowI];
 
-        this->matrix_.initInterfaces
-        (
-            this->matrix_.coupleUpper(),
-            bPrime_,
-            x,
-            true             // switch to lhs of system
-        );
+        // Grab the accumulated neighbour side
+        curX = bPrime_[rowI];
 
-        this->matrix_.updateInterfaces
-        (
-            this->matrix_.coupleUpper(),
-            bPrime_,
-            x,
-            true             // switch to lhs of system
-        );
+        // Start and end of this row
+        fStart = ownStart[rowI];
+        fEnd = ownStart[rowI + 1];
 
-        register label fStart, fEnd, curCoeff;
-
-        // Forward sweep
-        for (register label rowI = 0; rowI < nRows; rowI++)
+        // Accumulate the owner product side
+        for (curCoeff = fStart; curCoeff < fEnd; curCoeff++)
         {
-            Type& curX = x[rowI];
-
-            // Grab the accumulated neighbour side
-            curX = bPrime_[rowI];
-
-            // Start and end of this row
-            fStart = ownStart[rowI];
-            fEnd = ownStart[rowI + 1];
-
-            // Accumulate the owner product side
-            for (curCoeff = fStart; curCoeff < fEnd; curCoeff++)
-            {
-                curX -= mult(upper[curCoeff], x[u[curCoeff]]);
-            }
-
-            // Finish current x
-            curX = mult(dD[rowI], curX);
-
-            // Distribute the neighbour side using current x
-            for (curCoeff = fStart; curCoeff < fEnd; curCoeff++)
-            {
-                bPrime_[u[curCoeff]] -= mult(lower[curCoeff], curX);
-            }
+            curX -= mult(upper[curCoeff], x[u[curCoeff]]);
         }
 
-        // Reverse sweep
-        for (register label rowI = nRows - 1; rowI >= 0; rowI--)
+        // Finish current x
+        curX = mult(dD[rowI], curX);
+
+        // Distribute the neighbour side using current x
+        for (curCoeff = fStart; curCoeff < fEnd; curCoeff++)
         {
-            Type& curX = x[rowI];
-
-            // Grab the accumulated neighbour side
-            curX = bPrime_[rowI];
-
-            // Start and end of this row
-            fStart = ownStart[rowI];
-            fEnd = ownStart[rowI + 1];
-
-            // Accumulate the owner product side
-            for (curCoeff = fStart; curCoeff < fEnd; curCoeff++)
-            {
-                curX -= mult(upper[curCoeff], x[u[curCoeff]]);
-            }
-
-            // Finish current x
-            curX = mult(dD[rowI], curX);
-
-            // No need to update bPrime on reverse sweep. VV, 10/Sep/2015.
+            bPrime_[u[curCoeff]] -= mult(lower[curCoeff], curX);
         }
+    }
+
+    // Reverse sweep
+    for (register label rowI = nRows - 1; rowI >= 0; rowI--)
+    {
+        Type& curX = x[rowI];
+
+        // Grab the accumulated neighbour side
+        curX = bPrime_[rowI];
+
+        // Start and end of this row
+        fStart = ownStart[rowI];
+        fEnd = ownStart[rowI + 1];
+
+        // Accumulate the owner product side
+        for (curCoeff = fStart; curCoeff < fEnd; curCoeff++)
+        {
+            curX -= mult(upper[curCoeff], x[u[curCoeff]]);
+        }
+
+        // Finish current x
+        curX = mult(dD[rowI], curX);
+
+        // No need to update bPrime on reverse sweep. VV, 10/Sep/2015.
     }
 }
 
@@ -383,66 +377,84 @@ void Foam::BlockGaussSeidelPrecon<Type>::precondition
         {
             if (UpperCoeff.activeType() == blockCoeffBase::SCALAR)
             {
-                BlockSweep
-                (
-                    x,
-                    invDiag_.asScalar(),
-                    UpperCoeff.asScalar(),
-                    b
-                );
+                for (label sweep = 0; sweep < nSweeps_; sweep++)
+                {
+                    BlockSweep
+                    (
+                        x,
+                        invDiag_.asScalar(),
+                        UpperCoeff.asScalar(),
+                        b
+                    );
+                }
             }
             else if (UpperCoeff.activeType() == blockCoeffBase::LINEAR)
             {
-                BlockSweep
-                (
-                    x,
-                    invDiag_.asScalar(),
-                    UpperCoeff.asLinear(),
-                    b
-                );
+                for (label sweep = 0; sweep < nSweeps_; sweep++)
+                {
+                    BlockSweep
+                    (
+                        x,
+                        invDiag_.asScalar(),
+                        UpperCoeff.asLinear(),
+                        b
+                    );
+                }
             }
             else if (UpperCoeff.activeType() == blockCoeffBase::SQUARE)
             {
-                BlockSweep
-                (
-                    x,
-                    invDiag_.asScalar(),
-                    UpperCoeff.asSquare(),
-                    b
-                );
+                for (label sweep = 0; sweep < nSweeps_; sweep++)
+                {
+                    BlockSweep
+                    (
+                        x,
+                        invDiag_.asScalar(),
+                        UpperCoeff.asSquare(),
+                        b
+                    );
+                }
             }
         }
         else if (DiagCoeff.activeType() == blockCoeffBase::LINEAR)
         {
             if (UpperCoeff.activeType() == blockCoeffBase::SCALAR)
             {
-                BlockSweep
-                (
-                    x,
-                    invDiag_.asLinear(),
-                    UpperCoeff.asScalar(),
-                    b
-                );
+                for (label sweep = 0; sweep < nSweeps_; sweep++)
+                {
+                    BlockSweep
+                    (
+                        x,
+                        invDiag_.asLinear(),
+                        UpperCoeff.asScalar(),
+                        b
+                    );
+                }
             }
             else if (UpperCoeff.activeType() == blockCoeffBase::LINEAR)
             {
-                BlockSweep
-                (
-                    x,
-                    invDiag_.asLinear(),
-                    UpperCoeff.asLinear(),
-                    b
-                );
+                for (label sweep = 0; sweep < nSweeps_; sweep++)
+                {
+                    BlockSweep
+                    (
+                        x,
+                        invDiag_.asLinear(),
+                        UpperCoeff.asLinear(),
+                        b
+                    );
+                }
             }
             else if (UpperCoeff.activeType() == blockCoeffBase::SQUARE)
             {
-                BlockSweep
-                (
-                    x,
-                    invDiag_.asLinear(),
-                    UpperCoeff.asSquare(),
-                    b
-                );
+                for (label sweep = 0; sweep < nSweeps_; sweep++)
+                {
+                    BlockSweep
+                    (
+                        x,
+                        invDiag_.asLinear(),
+                        UpperCoeff.asSquare(),
+                        b
+                    );
+                }
             }
         }
         else if (DiagCoeff.activeType() == blockCoeffBase::SQUARE)
@@ -461,36 +473,45 @@ void Foam::BlockGaussSeidelPrecon<Type>::precondition
 
             if (UpperCoeff.activeType() == blockCoeffBase::SCALAR)
             {
-                // Note linear diag inversed due to decoupling
-                BlockSweep
-                (
-                    x,
-                    invDiag_.asLinear(),
-                    UpperCoeff.asScalar(),
-                    bPlusLU_
-                );
+                for (label sweep = 0; sweep < nSweeps_; sweep++)
+                {
+                    // Note linear diag inversed due to decoupling
+                    BlockSweep
+                    (
+                        x,
+                        invDiag_.asLinear(),
+                        UpperCoeff.asScalar(),
+                        bPlusLU_
+                    );
+                }
             }
             else if (UpperCoeff.activeType() == blockCoeffBase::LINEAR)
             {
-                // Note linear diag inversed due to decoupling
-                BlockSweep
-                (
-                    x,
-                    invDiag_.asLinear(),
-                    UpperCoeff.asLinear(),
-                    bPlusLU_
-                );
+                for (label sweep = 0; sweep < nSweeps_; sweep++)
+                {
+                    // Note linear diag inversed due to decoupling
+                    BlockSweep
+                    (
+                        x,
+                        invDiag_.asLinear(),
+                        UpperCoeff.asLinear(),
+                        bPlusLU_
+                    );
+                }
             }
             else if (UpperCoeff.activeType() == blockCoeffBase::SQUARE)
             {
-                // Note linear diag inversed due to decoupling
-                BlockSweep
-                (
-                    x,
-                    invDiag_.asLinear(),
-                    UpperCoeff.asSquare(),
-                    bPlusLU_
-                );
+                for (label sweep = 0; sweep < nSweeps_; sweep++)
+                {
+                    // Note linear diag inversed due to decoupling
+                    BlockSweep
+                    (
+                        x,
+                        invDiag_.asLinear(),
+                        UpperCoeff.asSquare(),
+                        bPlusLU_
+                    );
+                }
             }
         }
         else
@@ -527,61 +548,76 @@ void Foam::BlockGaussSeidelPrecon<Type>::precondition
         {
             if (UpperCoeff.activeType() == blockCoeffBase::SCALAR)
             {
-                BlockSweep
-                (
-                    x,
-                    invDiag_.asScalar(),
-                    LowerCoeff.asScalar(),
-                    UpperCoeff.asScalar(),
-                    b
-                );
+                for (label sweep = 0; sweep < nSweeps_; sweep++)
+                {
+                    BlockSweep
+                    (
+                        x,
+                        invDiag_.asScalar(),
+                        LowerCoeff.asScalar(),
+                        UpperCoeff.asScalar(),
+                        b
+                    );
+                }
             }
             else if (UpperCoeff.activeType() == blockCoeffBase::LINEAR)
             {
-                BlockSweep
-                (
-                    x,
-                    invDiag_.asScalar(),
-                    LowerCoeff.asLinear(),
-                    UpperCoeff.asLinear(),
-                    b
-                );
+                for (label sweep = 0; sweep < nSweeps_; sweep++)
+                {
+                    BlockSweep
+                    (
+                        x,
+                        invDiag_.asScalar(),
+                        LowerCoeff.asLinear(),
+                        UpperCoeff.asLinear(),
+                        b
+                    );
+                }
             }
             else if (UpperCoeff.activeType() == blockCoeffBase::SQUARE)
             {
-                BlockSweep
-                (
-                    x,
-                    invDiag_.asScalar(),
-                    LowerCoeff.asSquare(),
-                    UpperCoeff.asSquare(),
-                    b
-                );
+                for (label sweep = 0; sweep < nSweeps_; sweep++)
+                {
+                    BlockSweep
+                    (
+                        x,
+                        invDiag_.asScalar(),
+                        LowerCoeff.asSquare(),
+                        UpperCoeff.asSquare(),
+                        b
+                    );
+                }
             }
         }
         else if (DiagCoeff.activeType() == blockCoeffBase::LINEAR)
         {
             if (UpperCoeff.activeType() == blockCoeffBase::SCALAR)
             {
-                BlockSweep
-                (
-                    x,
-                    invDiag_.asLinear(),
-                    LowerCoeff.asScalar(),
-                    UpperCoeff.asScalar(),
-                    b
-                );
+                for (label sweep = 0; sweep < nSweeps_; sweep++)
+                {
+                    BlockSweep
+                    (
+                        x,
+                        invDiag_.asLinear(),
+                        LowerCoeff.asScalar(),
+                        UpperCoeff.asScalar(),
+                        b
+                    );
+                }
             }
             else if (UpperCoeff.activeType() == blockCoeffBase::LINEAR)
             {
-                BlockSweep
-                (
-                    x,
-                    invDiag_.asLinear(),
-                    LowerCoeff.asLinear(),
-                    UpperCoeff.asLinear(),
-                    b
-                );
+                for (label sweep = 0; sweep < nSweeps_; sweep++)
+                {
+                    BlockSweep
+                    (
+                        x,
+                        invDiag_.asLinear(),
+                        LowerCoeff.asLinear(),
+                        UpperCoeff.asLinear(),
+                        b
+                    );
+                }
             }
             else if (UpperCoeff.activeType() == blockCoeffBase::SQUARE)
             {
@@ -603,47 +639,63 @@ void Foam::BlockGaussSeidelPrecon<Type>::precondition
                 bPlusLU_.setSize(b.size(), pTraits<Type>::zero);
             }
 
-            // Multiply overwrites bPlusLU_: no need to initialise
-            // Change of sign accounted via change of sign of bPlusLU_
-            // HJ, 20/Aug/2015
-            multiply(bPlusLU_, LUDiag_, x);
-            bPlusLU_ += b;
-
             if (UpperCoeff.activeType() == blockCoeffBase::SCALAR)
             {
-                // Note linear diag inversed due to decoupling
-                BlockSweep
-                (
-                    x,
-                    invDiag_.asLinear(),
-                    LowerCoeff.asScalar(),
-                    UpperCoeff.asScalar(),
-                    bPlusLU_
-                );
+                for (label sweep = 0; sweep < nSweeps_; sweep++)
+                {
+                    multiply(bPlusLU_, LUDiag_, x);
+                    bPlusLU_ += b;
+
+                    // Note linear diag inversed due to decoupling
+                    BlockSweep
+                    (
+                        x,
+                        invDiag_.asLinear(),
+                        LowerCoeff.asScalar(),
+                        UpperCoeff.asScalar(),
+                        bPlusLU_
+                    );
+                }
             }
             else if (UpperCoeff.activeType() == blockCoeffBase::LINEAR)
             {
-                // Note linear diag inversed due to decoupling
-                BlockSweep
-                (
-                    x,
-                    invDiag_.asLinear(),
-                    LowerCoeff.asLinear(),
-                    UpperCoeff.asLinear(),
-                    bPlusLU_
-                );
+                for (label sweep = 0; sweep < nSweeps_; sweep++)
+                {
+                    multiply(bPlusLU_, LUDiag_, x);
+                    bPlusLU_ += b;
+
+                    // Note linear diag inversed due to decoupling
+                    BlockSweep
+                    (
+                        x,
+                        invDiag_.asLinear(),
+                        LowerCoeff.asLinear(),
+                        UpperCoeff.asLinear(),
+                        bPlusLU_
+                    );
+                }
             }
             else if (UpperCoeff.activeType() == blockCoeffBase::SQUARE)
             {
-                // Note linear diag inversed due to decoupling
-                BlockSweep
-                (
-                    x,
-                    invDiag_.asLinear(),
-                    LowerCoeff.asSquare(),
-                    UpperCoeff.asSquare(),
-                    bPlusLU_
-                );
+//                 Info<< "Diag: " << DiagCoeff.asSquare()[50] << nl
+//                     << "LUDiag: " << LUDiag_.asSquare()[50] << nl
+//                     << "invDiag: " << invDiag_.asLinear()[50] << nl
+//                     << endl;
+                for (label sweep = 0; sweep < nSweeps_; sweep++)
+                {
+                    multiply(bPlusLU_, LUDiag_, x);
+                    bPlusLU_ += b;
+
+                    // Note linear diag inversed due to decoupling
+                    BlockSweep
+                    (
+                        x,
+                        invDiag_.asLinear(),
+                        LowerCoeff.asSquare(),
+                        UpperCoeff.asSquare(),
+                        bPlusLU_
+                    );
+                }
             }
         }
         else
@@ -702,84 +754,102 @@ void Foam::BlockGaussSeidelPrecon<Type>::preconditionT
         // to be enforced without the per-element if-condition, which
         // makes for ugly code.  HJ, 19/May/2005
 
-        //Note: Assuming lower and upper triangle have the same active type
+        // Note: Assuming lower and upper triangle have the same active type
 
         if (DiagCoeff.activeType() == blockCoeffBase::SCALAR)
         {
             if (UpperCoeff.activeType() == blockCoeffBase::SCALAR)
             {
-                // Transpose multiplication - swap lower and upper coeff arrays
-                BlockSweep
-                (
-                    xT,
-                    invDiag_.asScalar(),
-                    UpperCoeff.asScalar(),
-                    LowerCoeff.asScalar(),
-                    bT
-                );
+                for (label sweep = 0; sweep < nSweeps_; sweep++)
+                {
+                    // Transpose multiplication - swap lower and upper coeff
+                    BlockSweep
+                    (
+                        xT,
+                        invDiag_.asScalar(),
+                        UpperCoeff.asScalar(),
+                        LowerCoeff.asScalar(),
+                        bT
+                    );
+                }
             }
             else if (UpperCoeff.activeType() == blockCoeffBase::LINEAR)
             {
-                // Transpose multiplication - swap lower and upper coeff arrays
-                BlockSweep
-                (
-                    xT,
-                    invDiag_.asScalar(),
-                    UpperCoeff.asLinear(),
-                    LowerCoeff.asLinear(),
-                    bT
-                );
+                for (label sweep = 0; sweep < nSweeps_; sweep++)
+                {
+                    // Transpose multiplication - swap lower and upper coeff
+                    BlockSweep
+                    (
+                        xT,
+                        invDiag_.asScalar(),
+                        UpperCoeff.asLinear(),
+                        LowerCoeff.asLinear(),
+                        bT
+                    );
+                }
             }
             else if (UpperCoeff.activeType() == blockCoeffBase::SQUARE)
             {
-                // Transpose multiplication - swap lower and upper coeff arrays
-                BlockSweep
-                (
-                    xT,
-                    invDiag_.asScalar(),
-                    UpperCoeff.asSquare(),
-                    LowerCoeff.asSquare(),
-                    bT
-                );
+                for (label sweep = 0; sweep < nSweeps_; sweep++)
+                {
+                    // Transpose multiplication - swap lower and upper coeff
+                    BlockSweep
+                    (
+                        xT,
+                        invDiag_.asScalar(),
+                        UpperCoeff.asSquare(),
+                        LowerCoeff.asSquare(),
+                        bT
+                    );
+                }
             }
         }
         else if (DiagCoeff.activeType() == blockCoeffBase::LINEAR)
         {
             if (UpperCoeff.activeType() == blockCoeffBase::SCALAR)
             {
-                // Transpose multiplication - swap lower and upper coeff arrays
-                BlockSweep
-                (
-                    xT,
-                    invDiag_.asLinear(),
-                    UpperCoeff.asScalar(),
-                    LowerCoeff.asScalar(),
-                    bT
-                );
+                for (label sweep = 0; sweep < nSweeps_; sweep++)
+                {
+                    // Transpose multiplication - swap lower and upper coeff
+                    BlockSweep
+                    (
+                        xT,
+                        invDiag_.asLinear(),
+                        UpperCoeff.asScalar(),
+                        LowerCoeff.asScalar(),
+                        bT
+                    );
+                }
             }
             else if (UpperCoeff.activeType() == blockCoeffBase::LINEAR)
             {
-                // Transpose multiplication - swap lower and upper coeff arrays
-                BlockSweep
-                (
-                    xT,
-                    invDiag_.asLinear(),
-                    UpperCoeff.asLinear(),
-                    LowerCoeff.asLinear(),
-                    bT
-                );
+                for (label sweep = 0; sweep < nSweeps_; sweep++)
+                {
+                    // Transpose multiplication - swap lower and upper coeff
+                    BlockSweep
+                    (
+                        xT,
+                        invDiag_.asLinear(),
+                        UpperCoeff.asLinear(),
+                        LowerCoeff.asLinear(),
+                        bT
+                    );
+                }
             }
             else if (UpperCoeff.activeType() == blockCoeffBase::SQUARE)
             {
-                // Transpose multiplication - swap lower and upper coeff arrays
-                BlockSweep
-                (
-                    xT,
-                    invDiag_.asLinear(),
-                    UpperCoeff.asSquare(),
-                    LowerCoeff.asSquare(),
-                    bT
-                );
+                for (label sweep = 0; sweep < nSweeps_; sweep++)
+                {
+                    // Transpose multiplication - swap lower and upper coeff
+                    BlockSweep
+                    (
+                        xT,
+                        invDiag_.asLinear(),
+                        UpperCoeff.asSquare(),
+                        LowerCoeff.asSquare(),
+                        bT
+                    );
+                }
             }
         }
         else if (DiagCoeff.activeType() == blockCoeffBase::SQUARE)
@@ -790,50 +860,62 @@ void Foam::BlockGaussSeidelPrecon<Type>::preconditionT
                 bPlusLU_.setSize(bT.size(), pTraits<Type>::zero);
             }
 
-            // Multiply overwrites bPlusLU_: no need to initialise
-            // Change of sign accounted via change of sign of bPlusLU_
-            // HJ, 20/Aug/2015
-            multiply(bPlusLU_, LUDiag_, xT);
-            bPlusLU_ += bT;
-
             if (UpperCoeff.activeType() == blockCoeffBase::SCALAR)
             {
-                // Transpose multiplication - swap lower and upper coeff arrays
-                // Note linear diag inversed due to decoupling
-                BlockSweep
-                (
-                    xT,
-                    invDiag_.asLinear(),
-                    UpperCoeff.asScalar(),
-                    LowerCoeff.asScalar(),
-                    bPlusLU_
-                );
+                for (label sweep = 0; sweep < nSweeps_; sweep++)
+                {
+                    multiply(bPlusLU_, LUDiag_, xT);
+                    bPlusLU_ += bT;
+
+                    // Transpose multiplication - swap lower and upper coeff
+                    // Note linear diag inversed due to decoupling
+                    BlockSweep
+                    (
+                        xT,
+                        invDiag_.asLinear(),
+                        UpperCoeff.asScalar(),
+                        LowerCoeff.asScalar(),
+                        bPlusLU_
+                    );
+                }
             }
             else if (UpperCoeff.activeType() == blockCoeffBase::LINEAR)
             {
-                // Transpose multiplication - swap lower and upper coeff arrays
-                // Note linear diag inversed due to decoupling
-                BlockSweep
-                (
-                    xT,
-                    invDiag_.asLinear(),
-                    UpperCoeff.asLinear(),
-                    LowerCoeff.asLinear(),
-                    bPlusLU_
-                );
+                for (label sweep = 0; sweep < nSweeps_; sweep++)
+                {
+                    multiply(bPlusLU_, LUDiag_, xT);
+                    bPlusLU_ += bT;
+
+                    // Transpose multiplication - swap lower and upper coeff
+                    // Note linear diag inversed due to decoupling
+                    BlockSweep
+                    (
+                        xT,
+                        invDiag_.asLinear(),
+                        UpperCoeff.asLinear(),
+                        LowerCoeff.asLinear(),
+                        bPlusLU_
+                    );
+                }
             }
             else if (UpperCoeff.activeType() == blockCoeffBase::SQUARE)
             {
-                // Transpose multiplication - swap lower and upper coeff arrays
-                // Note linear diag inversed due to decoupling
-                BlockSweep
-                (
-                    xT,
-                    invDiag_.asLinear(),
-                    UpperCoeff.asSquare(),
-                    LowerCoeff.asSquare(),
-                    bPlusLU_
-                );
+                for (label sweep = 0; sweep < nSweeps_; sweep++)
+                {
+                    multiply(bPlusLU_, LUDiag_, xT);
+                    bPlusLU_ += bT;
+
+                    // Transpose multiplication - swap lower and upper coeff
+                    // Note linear diag inversed due to decoupling
+                    BlockSweep
+                    (
+                        xT,
+                        invDiag_.asLinear(),
+                        UpperCoeff.asSquare(),
+                        LowerCoeff.asSquare(),
+                        bPlusLU_
+                    );
+                }
             }
         }
         else

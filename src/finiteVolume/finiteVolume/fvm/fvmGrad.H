@@ -25,7 +25,8 @@ InNamespace
     Foam::fvm
 
 Description
-    Calculate the BlockLduSystem (matrix & source) for the gradient of the field
+    Calculate the BlockLduSystem (matrix & source) for the gradient
+    of the field.
     Intended use: block coupled solvers. i.e. implicit grad(p) in momentum
     equation.
 
@@ -61,7 +62,7 @@ namespace fvm
         BlockLduSystem<vector, typename outerProduct<vector, Type>::type>
     > grad
     (
-        GeometricField<Type, fvPatchField, volMesh>&,
+        const GeometricField<Type, fvPatchField, volMesh>&,
         const word&
     );
 
@@ -71,7 +72,7 @@ namespace fvm
         BlockLduSystem<vector, typename outerProduct<vector, Type>::type>
     > grad
     (
-        GeometricField<Type, fvPatchField, volMesh>&
+        const GeometricField<Type, fvPatchField, volMesh>&
     );
 }
 

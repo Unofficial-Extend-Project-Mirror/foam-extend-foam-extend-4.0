@@ -3,7 +3,7 @@ rho = thermo.rho();
 volScalarField rUA = 1.0/UEqn.A();
 U = rUA*UEqn.H();
 
-if (transonic)
+if (pimple.transonic())
 {
     surfaceScalarField phid
     (
@@ -15,7 +15,7 @@ if (transonic)
         )
     );
 
-    for (int nonOrth=0; nonOrth<=nNonOrthCorr; nonOrth++)
+    while (pimple.correctNonOrthogonal())
     {
         fvScalarMatrix pEqn
         (
@@ -28,7 +28,7 @@ if (transonic)
 
         pEqn.solve();
 
-        if (nonOrth == nNonOrthCorr)
+        if (pimple.finalNonOrthogonalIter())
         {
             phi == pEqn.flux();
         }
@@ -43,7 +43,7 @@ else
           + fvc::ddtPhiCorr(rUA, rho, U, phi)
         );
 
-    for (int nonOrth=0; nonOrth<=nNonOrthCorr; nonOrth++)
+    while (pimple.correctNonOrthogonal())
     {
         fvScalarMatrix pEqn
         (
@@ -56,7 +56,7 @@ else
 
         pEqn.solve();
 
-        if (nonOrth == nNonOrthCorr)
+        if (pimple.finalNonOrthogonalIter())
         {
             phi += pEqn.flux();
         }

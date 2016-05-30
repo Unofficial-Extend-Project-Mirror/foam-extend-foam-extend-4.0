@@ -171,6 +171,18 @@ public:
                 return solverName_;
             }
 
+            //- Return field name
+            const word& fieldName() const
+            {
+                return fieldName_;
+            }
+
+            //- Return access to field name
+            word& fieldName()
+            {
+                return fieldName_;
+            }
+
             //- Return initial residual
             scalar initialResidual() const
             {
@@ -234,6 +246,25 @@ public:
 
             //- Print summary of solver performance
             void print() const;
+
+        // Member Operators
+
+            bool operator!=(const solverPerformance&) const;
+
+        // Ostream Operator
+
+            friend Istream& operator>>
+            (
+                Istream&,
+                solverPerformance&
+            );
+
+            friend Ostream& operator<<
+            (
+                Ostream&,
+                const solverPerformance&
+            );
+
     };
 
 

@@ -28,7 +28,7 @@ gradSchemes
 divSchemes
 {
     default         none;
-    div(phi,U)      Gauss linear;
+    div(phi,U)      Gauss linearUpwind leastSquares;
 }
 
 laplacianSchemes
@@ -47,12 +47,6 @@ interpolationSchemes
 snGradSchemes
 {
     default         corrected;
-}
-
-fluxRequired
-{
-    default         no;
-    p;
 }
 
 // ************************************************************************* //

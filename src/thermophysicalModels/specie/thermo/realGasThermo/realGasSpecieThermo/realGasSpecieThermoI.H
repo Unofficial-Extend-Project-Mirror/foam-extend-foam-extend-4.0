@@ -62,8 +62,8 @@ inline void Foam::realGasSpecieThermo<thermo>::T
     scalar Tnew = T0;
     scalar rhoOld;
     scalar rho=rho0;
-    scalar Ttol = T0*tol_;
-    scalar rhotol=rho0*tol_;
+    scalar Ttol = T0*tol_();
+    scalar rhotol=rho0*tol_();
     label iter = 0;
     label i;
 

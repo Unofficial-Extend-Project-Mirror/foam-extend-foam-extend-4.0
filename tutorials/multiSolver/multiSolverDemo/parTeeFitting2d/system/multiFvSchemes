@@ -53,12 +53,6 @@ multiSolver
         {
             default         corrected;
         }
-
-        fluxRequired
-        {
-            default         no;
-            p;
-        }
     }
 
     icoFoam2
@@ -97,12 +91,6 @@ multiSolver
         {
             default         corrected;
         }
-
-        fluxRequired
-        {
-            default         no;
-            p;
-        }
     }
 
     scalarTransportFoam
@@ -138,11 +126,6 @@ multiSolver
         snGradSchemes
         {
             default         corrected;
-        }
-
-        fluxRequired
-        {
-            default         no;
         }
    }
 }

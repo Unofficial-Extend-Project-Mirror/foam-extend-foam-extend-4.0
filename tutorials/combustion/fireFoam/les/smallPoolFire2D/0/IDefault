@@ -20,12 +20,37 @@ internalField   uniform 0;
 
 boundaryField
 {
-    ".*"
+    outlet
     {
         type            greyDiffusiveRadiation;
         T               T;
         emissivity      1.0
         value           uniform 0;
+    }
+    sides
+    {
+        type            greyDiffusiveRadiation;
+        T               T;
+        emissivity      1.0
+        value           uniform 0;
+    }
+    base
+    {
+        type            greyDiffusiveRadiation;
+        T               T;
+        emissivity      1.0
+        value           uniform 0;
+    }
+    inlet
+    {
+        type            greyDiffusiveRadiation;
+        T               T;
+        emissivity      1.0
+        value           uniform 0;
+    }
+    frontAndBack
+    {
+        type        empty;
     }
 }
 

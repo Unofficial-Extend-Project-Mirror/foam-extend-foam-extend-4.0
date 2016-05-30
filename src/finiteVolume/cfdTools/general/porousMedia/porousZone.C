@@ -353,8 +353,8 @@ void Foam::porousZone::addResistance
     if (correctAUprocBC)
     {
         // Correct the boundary conditions of the tensorial diagonal to ensure
-        // processor boundaries are correctly handled when AU^-1 is interpolated
-        // for the pressure equation.
+        // processor boundaries are correctly handled when AU^-1 is
+        // interpolated for the pressure equation.
         AU.correctBoundaryConditions();
     }
 }
@@ -383,7 +383,9 @@ void Foam::porousZone::writeDict(Ostream& os, bool subDict) const
 
     if (dict_.found("porosity"))
     {
-        os.writeKeyword("porosity") << porosity() << token::END_STATEMENT << nl;
+        os.writeKeyword("porosity")
+            << porosity() << token::END_STATEMENT
+            << nl;
     }
 
     // powerLaw coefficients

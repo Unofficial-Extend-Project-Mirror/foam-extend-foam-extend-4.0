@@ -26,6 +26,10 @@ Application
 
 Description
     Incompressible LES solver for flow in a channel.
+    Consistent formulation without time-step and relaxation dependence by Jasak
+
+Author
+    Hrvoje Jasak, Wikki Ltd.  All rights reserved
 
 \*---------------------------------------------------------------------------*/
 
@@ -35,6 +39,7 @@ Description
 #include "IFstream.H"
 #include "OFstream.H"
 #include "Random.H"
+#include "pisoControl.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -43,6 +48,9 @@ int main(int argc, char *argv[])
     #include "setRootCase.H"
     #include "createTime.H"
     #include "createMesh.H"
+
+    pisoControl piso(mesh);
+
     #include "readTransportProperties.H"
     #include "createFields.H"
     #include "initContinuityErrs.H"
@@ -54,69 +62,69 @@ int main(int argc, char *argv[])
     {
         Info<< "Time = " << runTime.timeName() << nl << endl;
 
-        #include "readPISOControls.H"
-
         #include "CourantNo.H"
 
         sgsModel->correct();
 
-        fvVectorMatrix UEqn
+        // Convection-diffusion matrix
+        fvVectorMatrix HUEqn
         (
-            fvm::ddt(U)
-          + fvm::div(phi, U)
+            fvm::div(phi, U)
           + sgsModel->divDevBeff(U)
          ==
             flowDirection*gradP
         );
 
-        if (momentumPredictor)
+        // Time derivative matrix
+        fvVectorMatrix ddtUEqn(fvm::ddt(U));
+
+        if (piso.momentumPredictor())
         {
-            solve(UEqn == -fvc::grad(p));
+            solve(ddtUEqn + HUEqn == -fvc::grad(p));
         }
 
+        // Prepare clean Ap without time derivative contribution
+        // HJ, 26/Oct/2015
+        volScalarField aU = HUEqn.A();
 
         // --- PISO loop
 
-        volScalarField rUA = 1.0/UEqn.A();
-
-        for (int corr = 0; corr < nCorr; corr++)
+        while (piso.correct())
         {
-            U = rUA*UEqn.H();
-            phi = (fvc::interpolate(U) & mesh.Sf())
-                + fvc::ddtPhiCorr(rUA, U, phi);
+            U = HUEqn.H()/aU;
+            phi = (fvc::interpolate(U) & mesh.Sf());
 
             adjustPhi(phi, U, p);
 
-            for (int nonOrth=0; nonOrth<=nNonOrthCorr; nonOrth++)
+            while (piso.correctNonOrthogonal())
             {
                 fvScalarMatrix pEqn
                 (
-                    fvm::laplacian(rUA, p) == fvc::div(phi)
+                    fvm::laplacian(1/aU, p) == fvc::div(phi)
                 );
 
                 pEqn.setReference(pRefCell, pRefValue);
+                pEqn.solve
+                (
+                    mesh.solutionDict().solver(p.select(piso.finalInnerIter()))
+                );
 
-                if (corr == nCorr-1 && nonOrth == nNonOrthCorr)
-                {
-                    pEqn.solve(mesh.solutionDict().solver(p.name() + "Final"));
-                }
-                else
-                {
-                    pEqn.solve(mesh.solutionDict().solver(p.name()));
-                }
-
-                if (nonOrth == nNonOrthCorr)
+                if (piso.finalNonOrthogonalIter())
                 {
                     phi -= pEqn.flux();
                 }
             }
 
-            #include "continuityErrs.H"
+#           include "continuityErrs.H"
 
-            U -= rUA*fvc::grad(p);
+            // Note: cannot call H(U) here because the velocity is not complete
+            // HJ, 22/Jan/2016
+            U = 1.0/(aU + ddtUEqn.A())*
+                (
+                    U*aU - fvc::grad(p) + ddtUEqn.H()
+                );
             U.correctBoundaryConditions();
         }
-
 
         // Correct driving force for a constant mass flow rate
 
@@ -127,9 +135,9 @@ int main(int argc, char *argv[])
         // Calculate the pressure gradient increment needed to
         // adjust the average flow-rate to the correct value
         dimensionedScalar gragPplus =
-            (magUbar - magUbarStar)/rUA.weightedAverage(mesh.V());
+            (magUbar - magUbarStar)*aU.weightedAverage(mesh.V());
 
-        U += flowDirection*rUA*gragPplus;
+        U += gragPplus/aU*flowDirection;
 
         gradP += gragPplus;
 

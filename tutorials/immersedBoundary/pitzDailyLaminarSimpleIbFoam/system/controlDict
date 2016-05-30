@@ -44,7 +44,7 @@ timePrecision   6;
 
 runTimeModifiable yes;
 
-libs ( "libimmersedBoundary.so");
+libs ( "liblduSolvers.so" "libimmersedBoundary.so");
 
 functions
 (

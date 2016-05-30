@@ -1,0 +1,3 @@
+steadyUniversalFoam.C
+
+EXE = $(FOAM_APPBIN)/steadyUniversalFoam

@@ -24,6 +24,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "faceLimitedGrad.H"
+#include "gaussGrad.H"
 #include "fvMesh.H"
 #include "volMesh.H"
 #include "surfaceMesh.H"
@@ -77,7 +78,7 @@ tmp<volVectorField> faceLimitedGrad<scalar>::calcGrad
 {
     const fvMesh& mesh = vsf.mesh();
 
-    tmp<volVectorField> tGrad = basicGradScheme_().grad(vsf, name);
+    tmp<volVectorField> tGrad = basicGradScheme_().calcGrad(vsf, name);
 
     if (k_ < SMALL)
     {
@@ -199,7 +200,7 @@ tmp<volVectorField> faceLimitedGrad<scalar>::calcGrad
 
     g.internalField() *= limiter;
     g.correctBoundaryConditions();
-    gradScheme<scalar>::correctBoundaryConditions(vsf, g);
+    gaussGrad<scalar>::correctBoundaryConditions(vsf, g);
 
     return tGrad;
 }
@@ -214,7 +215,7 @@ tmp<volTensorField> faceLimitedGrad<vector>::calcGrad
 {
     const fvMesh& mesh = vvf.mesh();
 
-    tmp<volTensorField> tGrad = basicGradScheme_().grad(vvf, name);
+    tmp<volTensorField> tGrad = basicGradScheme_().calcGrad(vvf, name);
 
     if (k_ < SMALL)
     {
@@ -360,7 +361,7 @@ tmp<volTensorField> faceLimitedGrad<vector>::calcGrad
 
     g.internalField() *= limiter;
     g.correctBoundaryConditions();
-    gradScheme<vector>::correctBoundaryConditions(vvf, g);
+    gaussGrad<vector>::correctBoundaryConditions(vvf, g);
 
     return tGrad;
 }

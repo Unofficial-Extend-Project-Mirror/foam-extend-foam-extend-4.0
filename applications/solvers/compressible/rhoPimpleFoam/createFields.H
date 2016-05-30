@@ -39,10 +39,7 @@
 
 #   include "compressibleCreatePhi.H"
 
-    dimensionedScalar pMin
-    (
-        mesh.solutionDict().subDict("PIMPLE").lookup("pMin")
-    );
+    dimensionedScalar pMin(pimple.dict().lookup("pMin"));
 
     Info<< "Creating turbulence model\n" << endl;
     autoPtr<compressible::turbulenceModel> turbulence
@@ -62,3 +59,5 @@
     Info<< "Creating field DpDt\n" << endl;
     volScalarField DpDt =
         fvc::DDt(surfaceScalarField("phiU", phi/fvc::interpolate(rho)), p);
+
+    mesh.schemesDict().setFluxRequired(p.name());

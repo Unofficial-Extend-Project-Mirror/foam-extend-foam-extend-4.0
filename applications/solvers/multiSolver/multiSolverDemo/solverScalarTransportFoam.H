@@ -1,5 +1,8 @@
 #   include "createTime.H"
 #   include "createMesh.H"
+
+    simpleControl simple(mesh);
+
 #   include "createFields_scalarTransportFoam.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -8,19 +11,11 @@
 
 #   include "CourantNo.H"
 
-    for (runTime++; !runTime.end(); runTime++)
+    while (simple.loop())
     {
         Info<< "Time = " << runTime.timeName() << nl << endl;
 
-    dictionary simple = mesh.solutionDict().subDict("SIMPLE");
-
-    int nNonOrthCorr =
-        simple.lookupOrDefault<int>("nNonOrthogonalCorrectors", 0);
-
-    bool momentumPredictor =
-        simple.lookupOrDefault<Switch>("momentumPredictor", true);
-
-        for (int nonOrth=0; nonOrth<=nNonOrthCorr; nonOrth++)
+        while (simple.correctNonOrthogonal())
         {
             solve
             (

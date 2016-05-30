@@ -52,6 +52,7 @@ maxCo           0.2;
 
 libs
 (
+    "liblduSolvers.so"
     "libimmersedBoundary.so" 
     "libimmersedBoundaryDynamicFvMesh.so" 
 );

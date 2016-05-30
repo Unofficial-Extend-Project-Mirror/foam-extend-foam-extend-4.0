@@ -38,6 +38,7 @@ Description
 #include "thermalModel.H"
 #include "singlePhaseTransportModel.H"
 #include "RASModel.H"
+#include "simpleControl.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -47,6 +48,9 @@ int main(int argc, char *argv[])
 #   include "createTime.H"
 #   include "createFluidMesh.H"
 #   include "createSolidMesh.H"
+
+    simpleControl simple(mesh);
+
 #   include "readGravitationalAcceleration.H"
 #   include "createFields.H"
 #   include "createSolidFields.H"
@@ -56,12 +60,9 @@ int main(int argc, char *argv[])
 
     Info<< "\nStarting time loop\n" << endl;
 
-    while (runTime.loop())
+    while (simple.loop())
     {
         Info<< "Time = " << runTime.timeName() << nl << endl;
-
-#       include "readSIMPLEControls.H"
-#       include "initConvergenceCheck.H"
 
         // Detach patches
 #       include "detachPatches.H"
@@ -81,22 +82,23 @@ int main(int argc, char *argv[])
 
         // Update thermal conductivity in the solid
         solidThermo.correct();
-        ksolid = solidThermo.k();
+        kSolid = solidThermo.k();
 
         // Coupled patches
 #       include "attachPatches.H"
 
         kappaEff.correctBoundaryConditions();
-        ksolid.correctBoundaryConditions();
+        kSolid.correctBoundaryConditions();
 
         // Interpolate to the faces and add thermal resistance
-        surfaceScalarField ksolidf = fvc::interpolate(ksolid);
-        solidThermo.modifyResistance(ksolidf);
+        surfaceScalarField kSolidf = fvc::interpolate(kSolid);
+        solidThermo.modifyResistance(kSolidf);
 
 #       include "solveEnergy.H"
 
         // Update density according to Boussinesq approximation
         rhok = 1.0 - beta*(T - TRef);
+        rhok.correctBoundaryConditions();
 
         runTime.write();
 

@@ -14,4 +14,19 @@ $(NSRDSfunctions)/NSRDSfunc7/NSRDSfunc7.C
 $(NSRDSfunctions)/NSRDSfunc14/NSRDSfunc14.C
 $(APIfunctions)/APIdiffCoefFunc/APIdiffCoefFunc.C
 
+freesteam-2.1/common.c
+freesteam-2.1/steam.c
+freesteam-2.1/b23.c
+freesteam-2.1/backwards.c
+freesteam-2.1/viscosity.c
+freesteam-2.1/thcond.c
+freesteam-2.1/region1.c
+freesteam-2.1/region2.c
+freesteam-2.1/region3.c
+freesteam-2.1/region4.c
+freesteam-2.1/steam_pv.c
+freesteam-2.1/steam_ph.c
+freesteam-2.1/steam_pT.c
+freesteam-2.1/zeroin.c
+
 LIB = $(FOAM_LIBBIN)/libthermophysicalFunctions

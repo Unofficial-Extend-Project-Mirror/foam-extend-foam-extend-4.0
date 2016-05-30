@@ -43,7 +43,7 @@ Foam::tmp<Foam::fvMatrix<Foam::Type> >                                       \
 Foam::fv::gaussLaplacianScheme<Foam::Type, Foam::scalar>::fvmLaplacian       \
 (                                                                            \
     const GeometricField<scalar, fvsPatchField, surfaceMesh>& gamma,         \
-    GeometricField<Type, fvPatchField, volMesh>& vf                          \
+    const GeometricField<Type, fvPatchField, volMesh>& vf                    \
 )                                                                            \
 {                                                                            \
     const fvMesh& mesh = this->mesh();                                       \

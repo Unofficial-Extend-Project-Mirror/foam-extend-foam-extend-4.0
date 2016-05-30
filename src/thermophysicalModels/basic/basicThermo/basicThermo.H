@@ -102,6 +102,7 @@ protected:
         //- Construct as copy (not implemented)
         basicThermo(const basicThermo&);
 
+
 public:
 
     //- Runtime type information

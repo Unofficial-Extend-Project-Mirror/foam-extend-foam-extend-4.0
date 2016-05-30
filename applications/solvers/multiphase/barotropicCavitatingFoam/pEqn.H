@@ -15,7 +15,7 @@
 
     surfaceScalarField phip = fvc::interpolate(psiByRho)*phi;
 
-    for(int nonOrth=0; nonOrth<=nNonOrthCorr; nonOrth++)
+    while (piso.correctNonOrthogonal())
     {
         fvScalarMatrix pEqn
         (
@@ -29,7 +29,7 @@
            + fvc::div(phi) - pEqn
         );
 
-        if (nonOrth == nNonOrthCorr)
+        if (piso.finalNonOrthogonalIter())
         {
             phi -= pEqn.flux();
         }

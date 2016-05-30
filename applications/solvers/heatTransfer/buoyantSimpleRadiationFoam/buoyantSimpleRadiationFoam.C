@@ -35,6 +35,7 @@ Description
 #include "RASModel.H"
 #include "fixedGradientFvPatchFields.H"
 #include "radiationModel.H"
+#include "simpleControl.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -43,6 +44,9 @@ int main(int argc, char *argv[])
 #   include "setRootCase.H"
 #   include "createTime.H"
 #   include "createMesh.H"
+
+    simpleControl simple(mesh);
+
 #   include "readGravitationalAcceleration.H"
 #   include "createFields.H"
 #   include "createRadiationModel.H"
@@ -52,15 +56,9 @@ int main(int argc, char *argv[])
 
     Info<< "\nStarting time loop\n" << endl;
 
-    while (runTime.loop())
+    while (simple.loop())
     {
         Info<< "Time = " << runTime.timeName() << nl << endl;
-
-#       include "readSIMPLEControls.H"
-#       include "initConvergenceCheck.H"
-
-        p.storePrevIter();
-        rho.storePrevIter();
 
         // Pressure-velocity SIMPLE corrector
         {
@@ -76,8 +74,6 @@ int main(int argc, char *argv[])
         Info<< "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
             << "  ClockTime = " << runTime.elapsedClockTime() << " s"
             << nl << endl;
-
-#       include "convergenceCheck.H"
     }
 
     Info<< "End\n" << endl;

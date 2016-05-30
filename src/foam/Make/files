@@ -51,6 +51,7 @@ primitives/Vector/vector/vector.C
 
 primitives/Tensor2D/tensor2D/tensor2D.C
 primitives/SphericalTensor2D/sphericalTensor2D/sphericalTensor2D.C
+primitives/SymmTensor2D/symmTensor2D/symmTensor2D.C
 primitives/Vector2D/vector2D/vector2D.C
 
 primitives/complex/complex.C
@@ -271,13 +272,15 @@ $(lduMatrix)/preconditioners/GAMGPreconditioner/GAMGPreconditioner.C
 lduAddressing = $(lduMatrix)/lduAddressing
 $(lduAddressing)/lduAddressing.C
 $(lduAddressing)/extendedLduAddressing/extendedLduAddressing.C
-$(lduAddressing)/lduInterface/lduInterface.C
-$(lduAddressing)/lduInterface/processorLduInterface.C
-$(lduAddressing)/lduInterface/cyclicLduInterface.C
-$(lduAddressing)/lduInterface/ggiLduInterface.C
-$(lduAddressing)/lduInterface/overlapGgiLduInterface.C
-$(lduAddressing)/lduInterface/mixingPlaneLduInterface.C
-$(lduAddressing)/lduInterface/regionCoupleLduInterface.C
+
+lduInterfaces = $(lduAddressing)/lduInterfaces
+$(lduInterfaces)/lduInterface/lduInterface.C
+$(lduInterfaces)/processorLduInterface/processorLduInterface.C
+$(lduInterfaces)/cyclicLduInterface/cyclicLduInterface.C
+$(lduInterfaces)/ggiLduInterface/ggiLduInterface.C
+$(lduInterfaces)/overlapGGILduInterface/overlapGGILduInterface.C
+$(lduInterfaces)/mixingPlaneLduInterface/mixingPlaneLduInterface.C
+$(lduInterfaces)/regionCoupleLduInterface/regionCoupleLduInterface.C
 
 lduInterfaceFields = $(lduAddressing)/lduInterfaceFields
 $(lduInterfaceFields)/lduInterfaceField/lduInterfaceField.C
@@ -285,47 +288,47 @@ $(lduInterfaceFields)/processorLduInterfaceField/processorLduInterfaceField.C
 $(lduInterfaceFields)/cyclicLduInterfaceField/cyclicLduInterfaceField.C
 $(lduInterfaceFields)/ggiLduInterfaceField/ggiLduInterfaceField.C
 $(lduInterfaceFields)/mixingPlaneLduInterfaceField/mixingPlaneLduInterfaceField.C
-$(lduInterfaceFields)/overlapGgiLduInterfaceField/overlapGgiLduInterfaceField.C
+$(lduInterfaceFields)/overlapGGILduInterfaceField/overlapGGILduInterfaceField.C
 $(lduInterfaceFields)/regionCoupleLduInterfaceField/regionCoupleLduInterfaceField.C
 
-GAMG = $(lduMatrix)/solvers/GAMG
-$(GAMG)/GAMGSolver.C
-$(GAMG)/GAMGSolverAgglomerateMatrix.C
-$(GAMG)/GAMGSolverScalingFactor.C
-$(GAMG)/GAMGSolverSolve.C
+AMG = $(lduMatrix)/solvers/AMG
+$(AMG)/GAMGSolver.C
+$(AMG)/GAMGSolverAgglomerateMatrix.C
+$(AMG)/GAMGSolverScalingFactor.C
+$(AMG)/GAMGSolverSolve.C
 
-GAMGInterfaces = $(GAMG)/interfaces
-$(GAMGInterfaces)/GAMGInterface/GAMGInterface.C
-$(GAMGInterfaces)/GAMGInterface/newGAMGInterface.C
-$(GAMGInterfaces)/processorGAMGInterface/processorGAMGInterface.C
-$(GAMGInterfaces)/cyclicGAMGInterface/cyclicGAMGInterface.C
-$(GAMGInterfaces)/ggiGAMGInterface/ggiGAMGInterface.C
-$(GAMGInterfaces)/cyclicGgiGAMGInterface/cyclicGgiGAMGInterface.C
-$(GAMGInterfaces)/regionCoupleGAMGInterface/regionCoupleGAMGInterface.C
-$(GAMGInterfaces)/mixingPlaneGAMGInterface/mixingPlaneGAMGInterface.C
+AMGInterfaces = $(AMG)/interfaces
+$(AMGInterfaces)/AMGInterface/AMGInterface.C
+$(AMGInterfaces)/AMGInterface/newAMGInterface.C
+$(AMGInterfaces)/processorAMGInterface/processorAMGInterface.C
+$(AMGInterfaces)/cyclicAMGInterface/cyclicAMGInterface.C
+$(AMGInterfaces)/ggiAMGInterface/ggiAMGInterface.C
+$(AMGInterfaces)/cyclicGGIAMGInterface/cyclicGGIAMGInterface.C
+$(AMGInterfaces)/regionCoupleAMGInterface/regionCoupleAMGInterface.C
+$(AMGInterfaces)/mixingPlaneAMGInterface/mixingPlaneAMGInterface.C
 
-GAMGInterfaceFields = $(GAMG)/interfaceFields
-$(GAMGInterfaceFields)/GAMGInterfaceField/GAMGInterfaceField.C
-$(GAMGInterfaceFields)/GAMGInterfaceField/newGAMGInterfaceField.C
-$(GAMGInterfaceFields)/processorGAMGInterfaceField/processorGAMGInterfaceField.C
-$(GAMGInterfaceFields)/cyclicGAMGInterfaceField/cyclicGAMGInterfaceField.C
-$(GAMGInterfaceFields)/ggiGAMGInterfaceField/ggiGAMGInterfaceField.C
-$(GAMGInterfaceFields)/cyclicGgiGAMGInterfaceField/cyclicGgiGAMGInterfaceField.C
-$(GAMGInterfaceFields)/regionCoupleGAMGInterfaceField/regionCoupleGAMGInterfaceField.C
-$(GAMGInterfaceFields)/mixingPlaneGAMGInterfaceField/mixingPlaneGAMGInterfaceField.C
+AMGInterfaceFields = $(AMG)/interfaceFields
+$(AMGInterfaceFields)/AMGInterfaceField/AMGInterfaceField.C
+$(AMGInterfaceFields)/AMGInterfaceField/newAMGInterfaceField.C
+$(AMGInterfaceFields)/processorAMGInterfaceField/processorAMGInterfaceField.C
+$(AMGInterfaceFields)/cyclicAMGInterfaceField/cyclicAMGInterfaceField.C
+$(AMGInterfaceFields)/ggiAMGInterfaceField/ggiAMGInterfaceField.C
+$(AMGInterfaceFields)/cyclicGgiAMGInterfaceField/cyclicGgiAMGInterfaceField.C
+$(AMGInterfaceFields)/regionCoupleAMGInterfaceField/regionCoupleAMGInterfaceField.C
+$(AMGInterfaceFields)/mixingPlaneAMGInterfaceField/mixingPlaneAMGInterfaceField.C
 
-GAMGAgglomerations = $(GAMG)/GAMGAgglomerations
+AMGAgglomerations = $(AMG)/AMGAgglomerations
 
-GAMGAgglomeration = $(GAMGAgglomerations)/GAMGAgglomeration
+GAMGAgglomeration = $(AMGAgglomerations)/GAMGAgglomeration
 $(GAMGAgglomeration)/GAMGAgglomeration.C
 $(GAMGAgglomeration)/GAMGAgglomerateLduAddressing.C
 
-pairGAMGAgglomeration = $(GAMGAgglomerations)/pairGAMGAgglomeration
+pairGAMGAgglomeration = $(AMGAgglomerations)/pairGAMGAgglomeration
 $(pairGAMGAgglomeration)/pairGAMGAgglomeration.C
 $(pairGAMGAgglomeration)/pairGAMGAgglomerate.C
 $(pairGAMGAgglomeration)/pairGAMGAgglomerationCombineLevels.C
 
-algebraicPairGAMGAgglomeration = $(GAMGAgglomerations)/algebraicPairGAMGAgglomeration
+algebraicPairGAMGAgglomeration = $(AMGAgglomerations)/algebraicPairGAMGAgglomeration
 $(algebraicPairGAMGAgglomeration)/algebraicPairGAMGAgglomeration.C
 
 meshes/lduMesh/lduMesh.C
@@ -533,6 +536,7 @@ fields/cloud/cloud.C
 Fields = fields/Fields
 $(Fields)/labelField/labelField.C
 $(Fields)/scalarField/scalarField.C
+$(Fields)/vectorField/vectorField.C
 $(Fields)/sphericalTensorField/sphericalTensorField.C
 $(Fields)/diagTensorField/diagTensorField.C
 $(Fields)/symmTensorField/symmTensorField.C
@@ -637,10 +641,13 @@ $(writers)/gnuplotGraph/gnuplotGraph.C
 $(writers)/xmgrGraph/xmgrGraph.C
 $(writers)/jplotGraph/jplotGraph.C
 
+meshes/data/data.C
+
 primitives/BlockCoeff/blockCoeffBase.C
 primitives/BlockCoeff/scalarBlockCoeff.C
 primitives/BlockCoeff/sphericalTensorBlockCoeff.C
 primitives/BlockCoeff/symmTensorBlockCoeff.C
+primitives/BlockCoeff/symmTensor4thOrderBlockCoeff.C
 primitives/BlockCoeff/tensorBlockCoeff.C
 
 BlockCoeffNorm = primitives/BlockCoeff/BlockCoeffNorm
@@ -653,75 +660,85 @@ fields/expandContract/expandTensorField.C
 
 fields/CoeffField/scalarCoeffField.C
 fields/CoeffField/sphericalTensorCoeffField.C
+fields/CoeffField/diagTensorCoeffField.C
 fields/CoeffField/symmTensorCoeffField.C
+fields/CoeffField/symmTensor4thOrderCoeffField.C
 fields/CoeffField/tensorCoeffField.C
 
-matrices/blockLduMatrix/BlockLduMatrix/blockLduMatrices.C
-matrices/blockLduMatrix/BlockLduMatrix/scalarBlockLduMatrix.C
-matrices/blockLduMatrix/BlockLduMatrix/sphericalTensorBlockLduMatrix.C
-matrices/blockLduMatrix/BlockLduMatrix/symmTensorBlockLduMatrix.C
-matrices/blockLduMatrix/BlockLduMatrix/tensorBlockLduMatrix.C
-matrices/blockLduMatrix/BlockLduMatrix/blockVectorNMatrices.C
-matrices/blockLduMatrix/BlockLduMatrix/BlockConstraint/scalarBlockConstraint.C
+BlockLduMatrix = matrices/blockLduMatrix/BlockLduMatrix
+$(BlockLduMatrix)/blockLduMatrices.C
+$(BlockLduMatrix)/scalarBlockLduMatrix.C
+$(BlockLduMatrix)/sphericalTensorBlockLduMatrix.C
+$(BlockLduMatrix)/symmTensorBlockLduMatrix.C
+$(BlockLduMatrix)/tensorBlockLduMatrix.C
+$(BlockLduMatrix)/blockVectorNMatrices.C
+$(BlockLduMatrix)/BlockConstraint/scalarBlockConstraint.C
 
-matrices/blockLduMatrix/BlockLduMatrix/extendedBlockLduMatrix/extendedBlockLduMatrices.C
-matrices/blockLduMatrix/BlockLduMatrix/extendedBlockLduMatrix/sphericalTensorExtendedBlockLduMatrix.C
-matrices/blockLduMatrix/BlockLduMatrix/extendedBlockLduMatrix/symmTensorExtendedBlockLduMatrix.C
-matrices/blockLduMatrix/BlockLduMatrix/extendedBlockLduMatrix/tensorExtendedBlockLduMatrix.C
-matrices/blockLduMatrix/BlockLduMatrix/extendedBlockLduMatrix/extendedBlockVectorNMatrices.C
+$(BlockLduMatrix)/extendedBlockLduMatrix/extendedBlockLduMatrices.C
+$(BlockLduMatrix)/extendedBlockLduMatrix/sphericalTensorExtendedBlockLduMatrix.C
+$(BlockLduMatrix)/extendedBlockLduMatrix/symmTensorExtendedBlockLduMatrix.C
+$(BlockLduMatrix)/extendedBlockLduMatrix/tensorExtendedBlockLduMatrix.C
+$(BlockLduMatrix)/extendedBlockLduMatrix/extendedBlockVectorNMatrices.C
 
-BlockLduInterfaceField = matrices/blockLduMatrix/BlockLduMatrix/BlockLduInterfaceField
-$(BlockLduInterfaceField)/BlockLduInterfaceFields.C
-$(BlockLduInterfaceField)/processorBlockLduInterfaceField/processorBlockLduInterfaceFields.C
-$(BlockLduInterfaceField)/BlockGAMGInterfaceField/blockGAMGInterfaceFields.C
-$(BlockLduInterfaceField)/processorBlockGAMGInterfaceField/processorBlockGAMGInterfaceFields.C
-$(BlockLduInterfaceField)/blockVectorNLduInterfaceFields.C
-$(BlockLduInterfaceField)/blockVectorNGAMGInterfaceFields.C
+BlockLduInterfaceFields = $(BlockLduMatrix)/BlockLduInterfaceFields
+$(BlockLduInterfaceFields)/BlockLduInterfaceField/BlockLduInterfaceFields.C
+$(BlockLduInterfaceFields)/BlockLduInterfaceField/blockVectorNLduInterfaceFields.C
+$(BlockLduInterfaceFields)/GGIBlockLduInterfaceField/GGIBlockLduInterfaceFields.C
+$(BlockLduInterfaceFields)/MixingPlaneBlockLduInterfaceField/MixingPlaneBlockLduInterfaceFields.C
+$(BlockLduInterfaceFields)/OverlapGGIBlockLduInterfaceField/OverlapGGIBlockLduInterfaceFields.C
+$(BlockLduInterfaceFields)/ProcessorBlockLduInterfaceField/ProcessorBlockLduInterfaceFields.C
 
-matrices/blockLduMatrix/BlockAmg/blockAmgCycles.C
-matrices/blockLduMatrix/BlockAmg/blockAmgLevels.C
-matrices/blockLduMatrix/BlockAmg/BlockMatrixCoarsening/blockMatrixCoarsenings.C
-matrices/blockLduMatrix/BlockAmg/BlockMatrixCoarsening/blockMatrixAgglomerations.C
+BlockAMG = matrices/blockLduMatrix/BlockAMG
+$(BlockAMG)/blockAMGCycles.C
+$(BlockAMG)/blockAMGLevels.C
 
-matrices/blockLduMatrix/BlockLduPrecons/BlockLduPrecon/blockLduPrecons.C
-matrices/blockLduMatrix/BlockLduPrecons/BlockNoPrecon/blockNoPrecons.C
+BlockAMGInterfaceFields = $(BlockAMG)/BlockAMGInterfaceFields
+$(BlockAMGInterfaceFields)/BlockAMGInterfaceField/blockAMGInterfaceFields.C
+$(BlockAMGInterfaceFields)/BlockAMGInterfaceField/blockVectorNAMGInterfaceFields.C
+$(BlockAMGInterfaceFields)/ProcessorBlockAMGInterfaceField/ProcessorBlockAMGInterfaceFields.C
+$(BlockAMGInterfaceFields)/GGIBlockAMGInterfaceField/GGIBlockAMGInterfaceFields.C
 
-matrices/blockLduMatrix/BlockLduPrecons/BlockDiagonalPrecon/scalarBlockDiagonalPrecon.C
-matrices/blockLduMatrix/BlockLduPrecons/BlockDiagonalPrecon/tensorBlockDiagonalPrecon.C
-matrices/blockLduMatrix/BlockLduPrecons/BlockDiagonalPrecon/blockDiagonalPrecons.C
+BlockMatrixCoarsening = $(BlockAMG)/BlockMatrixCoarsening
+$(BlockMatrixCoarsening)/BlockMatrixCoarsening/blockMatrixCoarsenings.C
+$(BlockMatrixCoarsening)/BlockMatrixAgglomeration/blockMatrixAgglomerations.C
 
-matrices/blockLduMatrix/BlockLduPrecons/BlockGaussSeidelPrecon/scalarBlockGaussSeidelPrecon.C
-matrices/blockLduMatrix/BlockLduPrecons/BlockGaussSeidelPrecon/tensorBlockGaussSeidelPrecon.C
-matrices/blockLduMatrix/BlockLduPrecons/BlockGaussSeidelPrecon/blockGaussSeidelPrecons.C
+BlockLduPrecons = matrices/blockLduMatrix/BlockLduPrecons
+$(BlockLduPrecons)/BlockLduPrecon/blockLduPrecons.C
+$(BlockLduPrecons)/BlockNoPrecon/blockNoPrecons.C
 
-matrices/blockLduMatrix/BlockLduPrecons/BlockCholeskyPrecon/scalarBlockCholeskyPrecon.C
-matrices/blockLduMatrix/BlockLduPrecons/BlockCholeskyPrecon/tensorBlockCholeskyPrecon.C
-matrices/blockLduMatrix/BlockLduPrecons/BlockCholeskyPrecon/blockCholeskyPrecons.C
+$(BlockLduPrecons)/BlockDiagonalPrecon/scalarBlockDiagonalPrecon.C
+$(BlockLduPrecons)/BlockDiagonalPrecon/tensorBlockDiagonalPrecon.C
+$(BlockLduPrecons)/BlockDiagonalPrecon/blockDiagonalPrecons.C
 
-matrices/blockLduMatrix/BlockLduPrecons/BlockDiagCholeskyPrecon/scalarBlockDiagCholeskyPrecon.C
-matrices/blockLduMatrix/BlockLduPrecons/BlockDiagCholeskyPrecon/tensorBlockDiagCholeskyPrecon.C
-matrices/blockLduMatrix/BlockLduPrecons/BlockDiagCholeskyPrecon/blockDiagCholeskyPrecons.C
+$(BlockLduPrecons)/BlockGaussSeidelPrecon/scalarBlockGaussSeidelPrecon.C
+$(BlockLduPrecons)/BlockGaussSeidelPrecon/tensorBlockGaussSeidelPrecon.C
+$(BlockLduPrecons)/BlockGaussSeidelPrecon/blockGaussSeidelPrecons.C
 
-matrices/blockLduMatrix/BlockLduPrecons/BlockAmgPrecon/blockAmgPrecons.C
+$(BlockLduPrecons)/BlockCholeskyPrecon/scalarBlockCholeskyPrecon.C
+$(BlockLduPrecons)/BlockCholeskyPrecon/tensorBlockCholeskyPrecon.C
+$(BlockLduPrecons)/BlockCholeskyPrecon/blockCholeskyPrecons.C
 
-matrices/blockLduMatrix/BlockLduPrecons/BlockILUCpPrecon/scalarBlockILUCpPrecon.C
-matrices/blockLduMatrix/BlockLduPrecons/BlockILUCpPrecon/tensorBlockILUCpPrecon.C
-matrices/blockLduMatrix/BlockLduPrecons/BlockILUCpPrecon/blockILUCpPrecons.C
+$(BlockLduPrecons)/BlockAMGPrecon/blockAMGPrecons.C
 
-matrices/blockLduMatrix/BlockLduSmoothers/BlockLduSmoother/blockLduSmoothers.C
-matrices/blockLduMatrix/BlockLduSmoothers/BlockGaussSeidelSmoother/blockGaussSeidelSmoothers.C
-matrices/blockLduMatrix/BlockLduSmoothers/BlockILUSmoother/blockILUSmoothers.C
-matrices/blockLduMatrix/BlockLduSmoothers/BlockILUCpSmoother/blockILUCpSmoothers.C
+$(BlockLduPrecons)/BlockILUCpPrecon/scalarBlockILUCpPrecon.C
+$(BlockLduPrecons)/BlockILUCpPrecon/tensorBlockILUCpPrecon.C
+$(BlockLduPrecons)/BlockILUCpPrecon/blockILUCpPrecons.C
 
-/* compile blockVectorNSolvers earlier to exploit parallelismn */
-matrices/blockLduMatrix/BlockLduSolvers/blockVectorNSolvers.C
-matrices/blockLduMatrix/BlockLduSolvers/BlockLduSolver/blockLduSolvers.C
-matrices/blockLduMatrix/BlockLduSolvers/BlockDiagonal/blockDiagonalSolvers.C
-matrices/blockLduMatrix/BlockLduSolvers/BlockGaussSeidel/blockGaussSeidelSolvers.C
-matrices/blockLduMatrix/BlockLduSolvers/BlockCG/blockCGSolvers.C
-matrices/blockLduMatrix/BlockLduSolvers/BlockBiCGStab/blockBiCGStabSolvers.C
-matrices/blockLduMatrix/BlockLduSolvers/BlockGMRES/blockGMRESSolvers.C
-matrices/blockLduMatrix/BlockLduSolvers/BlockAmgSolver/blockAmgSolvers.C
-matrices/blockLduMatrix/BlockLduSolvers/Segregated/segregatedSolvers.C
+BlockLduSmoothers = matrices/blockLduMatrix/BlockLduSmoothers
+$(BlockLduSmoothers)/BlockLduSmoother/blockLduSmoothers.C
+$(BlockLduSmoothers)/BlockGaussSeidelSmoother/blockGaussSeidelSmoothers.C
+$(BlockLduSmoothers)/BlockILUSmoother/blockILUSmoothers.C
+$(BlockLduSmoothers)/BlockILUCpSmoother/blockILUCpSmoothers.C
+
+BlockLduSolvers = matrices/blockLduMatrix/BlockLduSolvers
+$(BlockLduSolvers)/blockVectorNSolvers.C
+$(BlockLduSolvers)/BlockLduSolver/blockLduSolvers.C
+$(BlockLduSolvers)/BlockDiagonal/blockDiagonalSolvers.C
+$(BlockLduSolvers)/BlockGaussSeidel/blockGaussSeidelSolvers.C
+$(BlockLduSolvers)/BlockCG/blockCGSolvers.C
+$(BlockLduSolvers)/BlockBiCGStab/blockBiCGStabSolvers.C
+$(BlockLduSolvers)/BlockGMRES/blockGMRESSolvers.C
+$(BlockLduSolvers)/BlockAMGSolver/blockAMGSolvers.C
+$(BlockLduSolvers)/Segregated/segregatedSolvers.C
 
 LIB = $(FOAM_LIBBIN)/libfoam

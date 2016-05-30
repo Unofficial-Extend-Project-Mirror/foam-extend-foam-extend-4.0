@@ -44,6 +44,58 @@ namespace Foam
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
 template<class MasterPatch, class SlavePatch>
+label GGIInterpolation<MasterPatch, SlavePatch>::parMasterStart() const
+{
+    if (globalData())
+    {
+        // Integer division intended
+        return Foam::min
+        (
+            masterPatch_.size(),
+            Pstream::myProcNo()*(masterPatch_.size()/Pstream::nProcs() + 1)
+        );
+    }
+    else
+    {
+        // No parallel search: do complete patch
+        return 0;
+    }
+}
+
+
+template<class MasterPatch, class SlavePatch>
+label GGIInterpolation<MasterPatch, SlavePatch>::parMasterEnd() const
+{
+    if (globalData())
+    {
+        // Integer division intended
+        return Foam::min
+        (
+            masterPatch_.size(),
+            (Pstream::myProcNo() + 1)*
+            (masterPatch_.size()/Pstream::nProcs() + 1)
+        );
+    }
+    else
+    {
+        // No parallel search: do complete patch
+        return masterPatch_.size();
+    }
+}
+
+
+template<class MasterPatch, class SlavePatch>
+label GGIInterpolation<MasterPatch, SlavePatch>::parMasterSize() const
+{
+    return Foam::max
+    (
+        0,
+        this->parMasterEnd() - this->parMasterStart()
+    );
+}
+
+
+template<class MasterPatch, class SlavePatch>
 void GGIInterpolation<MasterPatch, SlavePatch>::clearOut()
 {
     deleteDemandDrivenData(masterAddrPtr_);
@@ -67,6 +119,7 @@ GGIInterpolation<MasterPatch, SlavePatch>::GGIInterpolation
     const tensorField& forwardT,
     const tensorField& reverseT,
     const vectorField& forwardSep,
+    const bool globalData,
     const scalar masterNonOverlapFaceTol,
     const scalar slaveNonOverlapFaceTol,
     const bool rescaleGGIWeightingFactors,
@@ -78,6 +131,7 @@ GGIInterpolation<MasterPatch, SlavePatch>::GGIInterpolation
     forwardT_(forwardT),
     reverseT_(reverseT),
     forwardSep_(forwardSep),
+    globalData_(globalData),
     masterNonOverlapFaceTol_(masterNonOverlapFaceTol),
     slaveNonOverlapFaceTol_(slaveNonOverlapFaceTol),
     rescaleGGIWeightingFactors_(rescaleGGIWeightingFactors),

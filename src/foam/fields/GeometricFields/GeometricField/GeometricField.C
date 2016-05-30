@@ -27,6 +27,7 @@ License
 #include "foamTime.H"
 #include "demandDrivenData.H"
 #include "dictionary.H"
+#include "data.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -665,7 +666,7 @@ Foam::GeometricField<Type, PatchField, GeoMesh>::GeometricField
     if (debug)
     {
         Info<< "GeometricField<Type, PatchField, GeoMesh>::GeometricField : "
-               "constructing as copy resetting IO params"
+               "constructing as copy resetting IO params and patch types"
             << endl << this->info() << endl;
     }
 
@@ -910,6 +911,20 @@ bool Foam::GeometricField<Type, PatchField, GeoMesh>::needReference() const
 template<class Type, template<class> class PatchField, class GeoMesh>
 void Foam::GeometricField<Type, PatchField, GeoMesh>::relax(const scalar alpha)
 {
+    if(alpha <= 0)
+    {
+        return;
+    }
+
+    //if (debug)
+    {
+        InfoIn
+        (
+            "GeometricField<Type, PatchField, GeoMesh>::relax"
+            "(const scalar alpha)"
+        )  << "Relaxing" << endl << this->info() << " by " << alpha << endl;
+    }
+
     operator==(prevIter() + alpha*(*this - prevIter()));
 }
 
@@ -917,17 +932,42 @@ void Foam::GeometricField<Type, PatchField, GeoMesh>::relax(const scalar alpha)
 template<class Type, template<class> class PatchField, class GeoMesh>
 void Foam::GeometricField<Type, PatchField, GeoMesh>::relax()
 {
-    scalar alpha = 0;
+    word name = this->name();
 
-    if (this->mesh().solutionDict().relax(this->name()))
+    if (this->mesh().solutionDict().relaxField(name))
     {
-        alpha = this->mesh().solutionDict().relaxationFactor(this->name());
+        relax(this->mesh().solutionDict().fieldRelaxationFactor(name));
     }
+}
 
-    if (alpha > 0)
+
+template<class Type, template<class> class PatchField, class GeoMesh>
+Foam::word Foam::GeometricField<Type, PatchField, GeoMesh>::select
+(
+    bool final
+) const
+{
+    if (final)
     {
-        relax(alpha);
+        return this->name() + "Final";
     }
+    else
+    {
+        return this->name();
+    }
+}
+
+
+template<class Type, template<class> class PatchField, class GeoMesh>
+void Foam::GeometricField<Type, PatchField, GeoMesh>::writeMinMax
+(
+    Ostream& os
+) const
+{
+    os  << "min/max(" << this->name() << ") = "
+        << Foam::min(*this).value() << ", "
+        << Foam::max(*this).value()
+        << endl;
 }
 
 

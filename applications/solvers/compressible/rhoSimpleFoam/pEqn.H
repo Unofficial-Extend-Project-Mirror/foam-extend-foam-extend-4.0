@@ -9,7 +9,7 @@ UEqn.clear();
 
 bool closedVolume = false;
 
-if (transonic)
+if (simple.transonic())
 {
     surfaceScalarField phid
     (
@@ -17,7 +17,7 @@ if (transonic)
         fvc::interpolate(psi)*(fvc::interpolate(U) & mesh.Sf())
     );
 
-    for (int nonOrth=0; nonOrth<=nNonOrthCorr; nonOrth++)
+    while (simple.correctNonOrthogonal())
     {
         fvScalarMatrix pEqn
         (
@@ -26,22 +26,13 @@ if (transonic)
         );
 
         // Relax the pressure equation to ensure diagonal-dominance
-        pEqn.relax(mesh.solutionDict().relaxationFactor("pEqn"));
+        pEqn.relax();
 
         pEqn.setReference(pRefCell, pRefValue);
 
-        // retain the residual from the first iteration
-        if (nonOrth == 0)
-        {
-            eqnResidual = pEqn.solve().initialResidual();
-            maxResidual = max(eqnResidual, maxResidual);
-        }
-        else
-        {
-            pEqn.solve();
-        }
+        pEqn.solve();
 
-        if (nonOrth == nNonOrthCorr)
+        if (simple.finalNonOrthogonalIter())
         {
             phi == pEqn.flux();
         }
@@ -52,7 +43,7 @@ else
     phi = fvc::interpolate(rho)*(fvc::interpolate(U) & mesh.Sf());
     closedVolume = adjustPhi(phi, U, p);
 
-    for (int nonOrth=0; nonOrth<=nNonOrthCorr; nonOrth++)
+    while (simple.correctNonOrthogonal())
     {
         fvScalarMatrix pEqn
         (
@@ -61,18 +52,9 @@ else
 
         pEqn.setReference(pRefCell, pRefValue);
 
-        // Retain the residual from the first iteration
-        if (nonOrth == 0)
-        {
-            eqnResidual = pEqn.solve().initialResidual();
-            maxResidual = max(eqnResidual, maxResidual);
-        }
-        else
-        {
-            pEqn.solve();
-        }
+        pEqn.solve();
 
-        if (nonOrth == nNonOrthCorr)
+        if (simple.finalNonOrthogonalIter())
         {
             phi -= pEqn.flux();
         }

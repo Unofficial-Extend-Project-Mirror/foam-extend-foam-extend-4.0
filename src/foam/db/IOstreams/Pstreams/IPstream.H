@@ -92,8 +92,7 @@ public:
 
 
     // Destructor
-
-        ~IPstream();
+    ~IPstream();
 
 
     // Member functions

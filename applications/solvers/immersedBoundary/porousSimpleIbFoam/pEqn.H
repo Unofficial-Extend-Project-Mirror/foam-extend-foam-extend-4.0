@@ -1,5 +1,4 @@
-    p.boundaryField().updateCoeffs();
-
+{
     volScalarField AU = UEqn().A();
 
     U = UEqn().H()/AU;
@@ -14,7 +13,7 @@
     adjustPhi(phi, U, p);
 
     // Non-orthogonal pressure corrector loop
-    for (int nonOrth=0; nonOrth<=nNonOrthCorr; nonOrth++)
+    while (simple.correctNonOrthogonal())
     {
         fvScalarMatrix pEqn
         (
@@ -23,18 +22,9 @@
 
         pEqn.setReference(pRefCell, pRefValue);
 
-        // Retain the residual from the first iteration
-        if (nonOrth == 0)
-        {
-            eqnResidual = pEqn.solve().initialResidual();
-            maxResidual = max(eqnResidual, maxResidual);
-        }
-        else
-        {
-            pEqn.solve();
-        }
+        pEqn.solve();
 
-        if (nonOrth == nNonOrthCorr)
+        if (simple.finalNonOrthogonalIter())
         {
             phi -= pEqn.flux();
         }
@@ -48,4 +38,4 @@
     // Momentum corrector
     U -= fvc::grad(p)/AU;
     U.correctBoundaryConditions();
-
+}

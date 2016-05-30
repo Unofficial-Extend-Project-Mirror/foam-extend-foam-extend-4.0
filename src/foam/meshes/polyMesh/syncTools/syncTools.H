@@ -192,6 +192,7 @@ public:
             const bool applySeparation
         );
 
+
         // Sparse versions
 
             //- Synchronize values on selected points.
@@ -219,6 +220,7 @@ public:
                 const CombineOp& cop,
                 const bool applySeparation
             );
+
 
         // PackedList versions
 
@@ -254,6 +256,7 @@ public:
                 const CombineOp& cop,
                 const unsigned int nullValue
             );
+
 
         // Other
 

@@ -59,7 +59,7 @@ tmp<surfaceInterpolationScheme<Type> > surfaceInterpolationScheme<Type>::New
             << exit(FatalIOError);
     }
 
-    word schemeName(schemeData);
+    const word schemeName(schemeData);
 
     if (surfaceInterpolation::debug || surfaceInterpolationScheme<Type>::debug)
     {
@@ -79,8 +79,8 @@ tmp<surfaceInterpolationScheme<Type> > surfaceInterpolationScheme<Type>::New
         (
             "surfaceInterpolationScheme<Type>::New(const fvMesh&, Istream&)",
             schemeData
-        )   << "Unknown discretisation scheme " << schemeName
-            << endl << endl
+        )   << "Unknown discretisation scheme "
+            << schemeName << nl << nl
             << "Valid schemes are :" << endl
             << MeshConstructorTablePtr_->sortedToc()
             << exit(FatalIOError);
@@ -113,7 +113,7 @@ tmp<surfaceInterpolationScheme<Type> > surfaceInterpolationScheme<Type>::New
             << exit(FatalIOError);
     }
 
-    word schemeName(schemeData);
+    const word schemeName(schemeData);
 
     if (surfaceInterpolation::debug || surfaceInterpolationScheme<Type>::debug)
     {
@@ -134,8 +134,8 @@ tmp<surfaceInterpolationScheme<Type> > surfaceInterpolationScheme<Type>::New
             "surfaceInterpolationScheme<Type>::New"
             "(const fvMesh&, const surfaceScalarField&, Istream&)",
             schemeData
-        )   << "Unknown discretisation scheme " << schemeName
-            << endl << endl
+        )   << "Unknown discretisation scheme "
+            << schemeName << nl << nl
             << "Valid schemes are :" << endl
             << MeshFluxConstructorTablePtr_->sortedToc()
             << exit(FatalIOError);
@@ -171,7 +171,10 @@ surfaceInterpolationScheme<Type>::interpolate
                "(const GeometricField<Type, fvPatchField, volMesh>&, "
                "const tmp<surfaceScalarField>&, "
                "const tmp<surfaceScalarField>&) : "
-               "interpolating volTypeField from cells to faces "
+               "interpolating "
+            << vf.type() << " "
+            << vf.name()
+            << " from cells to faces "
                "without explicit correction"
             << endl;
     }
@@ -231,7 +234,7 @@ surfaceInterpolationScheme<Type>::interpolate
 
 
 //- Return the face-interpolate of the given cell field
-//  with the given weigting factors
+//  with the given weighting factors
 template<class Type>
 tmp<GeometricField<Type, fvsPatchField, surfaceMesh> >
 surfaceInterpolationScheme<Type>::interpolate
@@ -245,7 +248,10 @@ surfaceInterpolationScheme<Type>::interpolate
         Info<< "surfaceInterpolationScheme<Type>::interpolate"
                "(const GeometricField<Type, fvPatchField, volMesh>&, "
                "const tmp<surfaceScalarField>&) : "
-               "interpolating volTypeField from cells to faces "
+               "interpolating "
+            << vf.type() << " "
+            << vf.name()
+            << " from cells to faces "
                "without explicit correction"
             << endl;
     }
@@ -313,7 +319,10 @@ surfaceInterpolationScheme<Type>::interpolate
     {
         Info<< "surfaceInterpolationScheme<Type>::interpolate"
                "(const GeometricField<Type, fvPatchField, volMesh>&) : "
-            << "interpolating volTypeField from cells to faces"
+               "interpolating "
+            << vf.type() << " "
+            << vf.name()
+            << " from cells to faces"
             << endl;
     }
 

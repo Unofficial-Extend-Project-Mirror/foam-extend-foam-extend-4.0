@@ -100,7 +100,7 @@ public:
         //- Return access to ith component
         inline Cmpt& operator()(const direction i);
 
-        //- Componentwise multiply
+        //- Component-wise multiply
         inline VectorN<Cmpt, length> cmptMultiply
         (
             const VectorN<Cmpt, length>&

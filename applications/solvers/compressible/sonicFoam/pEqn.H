@@ -1,7 +1,7 @@
 {
     U = UEqn.H()/UEqn.A();
 
-    for (int nonOrth = 0; nonOrth <= nNonOrthCorr; nonOrth++)
+    while (pimple.correctNonOrthogonal())
     {
         // Calculate phi for boundary conditions
         phi = rhof*
@@ -36,7 +36,7 @@
         pEqn.solve();
 
         // Calculate the flux
-        if (nonOrth == nNonOrthCorr)
+        if (pimple.finalNonOrthogonalIter())
         {
             phi = phid2 + pEqn.flux();
         }

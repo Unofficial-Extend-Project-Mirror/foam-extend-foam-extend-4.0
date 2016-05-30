@@ -22,7 +22,7 @@ boundaryField
 {
     inlet
     {
-        type            totalTemperature;
+        type            isentropicTotalTemperature;
         phi             phi;
         rho             none;
         psi             psi;
@@ -35,7 +35,6 @@ boundaryField
     outlet
     {
         type            zeroGradient;
-        value           $internalField;
     }
 
     blade

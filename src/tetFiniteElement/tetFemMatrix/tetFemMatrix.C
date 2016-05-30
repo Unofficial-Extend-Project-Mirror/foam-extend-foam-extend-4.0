@@ -47,7 +47,7 @@ const label tetFemMatrix<Type>::fixFillIn = 4;
 template<class Type>
 tetFemMatrix<Type>::tetFemMatrix
 (
-    GeometricField<Type, tetPolyPatchField, tetPointMesh>& psi,
+    const GeometricField<Type, tetPolyPatchField, tetPointMesh>& psi,
     const dimensionSet& ds
 )
 :
@@ -93,7 +93,7 @@ tetFemMatrix<Type>::tetFemMatrix(const tetFemMatrix<Type>& tetFem)
 template<class Type>
 tetFemMatrix<Type>::tetFemMatrix
 (
-    GeometricField<Type, tetPolyPatchField, tetPointMesh>& psi,
+    const GeometricField<Type, tetPolyPatchField, tetPointMesh>& psi,
     Istream& is
 )
 :
@@ -215,16 +215,18 @@ void tetFemMatrix<Type>::relax(const scalar alpha)
 template<class Type>
 void tetFemMatrix<Type>::relax()
 {
-    scalar alpha = 0;
-
     if (psi_.mesh().solutionDict().relax(psi_.name()))
     {
-        alpha = psi_.mesh().solutionDict().relaxationFactor(psi_.name());
+        relax(psi_.mesh().solutionDict().equationRelaxationFactor(psi_.name()));
     }
-
-    if (alpha > 0)
+    else
     {
-        relax(alpha);
+        if (debug)
+        {
+            InfoIn("void tetFemMatrix<Type>::relax()")
+                << "Relaxation factor for field " << psi_.name()
+                << " not found.  Relaxation will not be used." << endl;
+        }
     }
 }
 

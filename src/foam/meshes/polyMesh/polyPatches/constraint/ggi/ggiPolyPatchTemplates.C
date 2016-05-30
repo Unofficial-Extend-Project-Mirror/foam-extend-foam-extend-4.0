@@ -89,12 +89,55 @@ Foam::tmp<Foam::Field<Type> > Foam::ggiPolyPatch::fastExpand
         shadow().receiveAddr();
     }
 
-    // Expand the field to zone size
+#if 1
+
+    // New version: mapDistribute
+
+    if (Pstream::parRun())
+    {
+        // Optimised mapDistribute
+
+        // Prepare return field: expand the field to zone size
+        tmp<Field<Type> > texpandField
+        (
+            new Field<Type>(ff)
+        );
+        Field<Type>& expandField = texpandField();
+
+        map().distribute(expandField);
+
+        return texpandField;
+    }
+    else
+    {
+        // Serial.  Expand the field to zone size
+
+        tmp<Field<Type> > texpandField
+        (
+            new Field<Type>(zone().size())  // filled with nans
+        );
+        Field<Type>& expandField = texpandField();
+
+        const labelList& zAddr = zoneAddressing();
+
+        forAll (zAddr, i)
+        {
+            expandField[zAddr[i]] = ff[i];
+        }
+
+        return texpandField;
+    }
+
+#else
+
+    // Variant 2: global gather-scatter.  Original version
+
+    // Note: expandField is filled with nans in unused part
+    // HJ, 25/May/2016
     tmp<Field<Type> > texpandField
     (
-        new Field<Type>(zone().size(), pTraits<Type>::zero)
+        new Field<Type>(zone().size())
     );
-
     Field<Type>& expandField = texpandField();
 
     if (Pstream::master())
@@ -201,6 +244,99 @@ Foam::tmp<Foam::Field<Type> > Foam::ggiPolyPatch::fastExpand
     }
 
     return texpandField;
+
+// #else
+
+//     // Variant 3: unpacked mapDistribute
+//     if (Pstream::parRun())
+//     {
+//         // Send subField to other processors
+//         for (label domainI = 0; domainI < Pstream::nProcs(); domainI++)
+//         {
+//             const labelList& curMap = map().subMap()[domainI];
+
+//             if (domainI != Pstream::myProcNo() && curMap.size())
+//             {
+//                 Pout<< "Sending " << curMap.size()
+//                     << " from " << Pstream::myProcNo()
+//                     << " to " << domainI
+//                     << endl;
+//                 OPstream toNbr(Pstream::blocking, domainI);
+//                 toNbr << List<Type>(UIndirectList<Type>(ff, curMap));
+//             }
+//         }
+
+//         // Subset myself
+//         {
+//             const labelList& mySubMap = map().subMap()[Pstream::myProcNo()];
+
+//             List<Type> subField(mySubMap.size());
+//             forAll (mySubMap, i)
+//             {
+//                 subField[i] = ff[mySubMap[i]];
+//             }
+
+//             // Receive sub field from myself (subField)
+//             const labelList& curMap =
+//                 map().constructMap()[Pstream::myProcNo()];
+
+//             forAll (curMap, i)
+//             {
+//                 expandField[curMap[i]] = subField[i];
+//             }
+//         }
+
+//         // Receive sub field from neighbour
+//         for (label domainI = 0; domainI < Pstream::nProcs(); domainI++)
+//         {
+//             const labelList& curMap = map().constructMap()[domainI];
+
+//             if (domainI != Pstream::myProcNo() && curMap.size())
+//             {
+//                 IPstream fromNbr(Pstream::blocking, domainI);
+//                 List<Type> recvField(fromNbr);
+//                 Pout<< "Receiving " << recvField.size()
+//                     << " (" << curMap.size()
+//                     << ") from " << domainI
+//                     << " to " << Pstream::myProcNo()
+//                     << endl;
+
+//                 if (curMap.size() != recvField.size())
+//                 {
+//                     FatalErrorIn
+//                     (
+//                         "tmp<Field<Type> > ggiPolyPatch::fastExpand\n"
+//                         "(\n"
+//                         "    const Field<Type>& ff\n"
+//                         ") const"
+//                     )   << "Expected from processor " << domainI << " size "
+//                         << curMap.size()  << " but received "
+//                         << recvField.size() << " elements."
+//                         << abort(FatalError);
+//                 }
+
+//                 forAll (curMap, i)
+//                 {
+//                     expandField[curMap[i]] = recvField[i];
+//                 }
+//             }
+//         }
+
+//         return texpandField;
+//     }
+//     else
+//     {
+//         // Serial.  Expand the field to zone size
+
+//         const labelList& zAddr = zoneAddressing();
+
+//         forAll (zAddr, i)
+//         {
+//             expandField[zAddr[i]] = ff[i];
+//         }
+//     }
+
+#endif
 }
 
 

@@ -46,11 +46,12 @@ runTimeModifiable yes;
 
 libs
 (
+    "liblduSolvers.so"
     "libincompressibleTransportModels.so"
     "libcompressibleTurbulenceModel.so"
     "libincompressibleRASModels.so"
-    // "libimmersedBoundary.so"
-    // "libimmersedBoundaryTurbulence.so"
+    "libimmersedBoundary.so"
+    "libimmersedBoundaryTurbulence.so"
 );
 
 functions

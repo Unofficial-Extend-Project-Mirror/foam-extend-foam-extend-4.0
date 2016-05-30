@@ -473,7 +473,7 @@ Foam::tmp<Foam::volScalarField> Foam::realGasHThermo<MixtureType>::Cv() const
     forAll(this->T_.boundaryField(), patchi)
     {
         cv.boundaryField()[patchi] =
-        Cv(this->T_.boundaryField()[patchi], patchi);
+            Cv(this->T_.boundaryField()[patchi], patchi);
     }
 
     return tCv;

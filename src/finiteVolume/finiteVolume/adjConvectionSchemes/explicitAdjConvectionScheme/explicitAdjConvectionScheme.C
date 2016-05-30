@@ -45,7 +45,7 @@ tmp<fvMatrix<Type> >
 explicitAdjConvectionScheme<Type>::fvmAdjDiv
 (
     const volVectorField& Up,
-    GeometricField<Type, fvPatchField, volMesh>& vf
+    const GeometricField<Type, fvPatchField, volMesh>& vf
 ) const
 {
     tmp<fvMatrix<Type> > tfvm

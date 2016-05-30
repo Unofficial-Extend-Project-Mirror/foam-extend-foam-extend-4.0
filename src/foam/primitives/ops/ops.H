@@ -94,6 +94,10 @@ template<class T>
 class eqMagOp
 { public: void operator()(T& x, const T& y) const { x = mag(y); } };
 
+template<class T>
+class eqSignOp
+{ public: void operator()(T& x, const T& y) const { x = sign(y); } };
+
 template<class T1, class T2>
 class plusEqMagSqrOp2
 { public: void operator()(T1& x, const T2& y) const { x += magSqr(y); } };

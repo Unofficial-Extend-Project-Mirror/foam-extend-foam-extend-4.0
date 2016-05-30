@@ -44,7 +44,7 @@ template<class Type>
 tmp<faMatrix<Type> >
 ddt
 (
-    GeometricField<Type, faPatchField, areaMesh>& vf
+    const GeometricField<Type, faPatchField, areaMesh>& vf
 )
 {
     return fa::faDdtScheme<Type>::New
@@ -60,7 +60,7 @@ tmp<faMatrix<Type> >
 ddt
 (
     const dimensionedScalar& rho,
-    GeometricField<Type, faPatchField, areaMesh>& vf
+    const GeometricField<Type, faPatchField, areaMesh>& vf
 )
 {
     return fa::faDdtScheme<Type>::New
@@ -79,7 +79,7 @@ tmp<faMatrix<Type> >
 ddt
 (
     const areaScalarField& rho,
-    GeometricField<Type, faPatchField, areaMesh>& vf
+    const GeometricField<Type, faPatchField, areaMesh>& vf
 )
 {
     return fa::faDdtScheme<Type>::New

@@ -229,7 +229,7 @@ Foam::tmp<Foam::vectorField> Foam::parabolicCylindricalCS::globalToLocal
 void Foam::parabolicCylindricalCS::write(Ostream& os) const
 {
     coordinateSystem::write(os);
-    os << "inDegrees: " << inDegrees() << endl;
+    os << " inDegrees: " << inDegrees() << endl;
 }
 
 

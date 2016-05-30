@@ -55,7 +55,7 @@ namespace fam
     tmp<faMatrix<Type> > div
     (
         const edgeScalarField&,
-        GeometricField<Type, faPatchField, areaMesh>&,
+        const GeometricField<Type, faPatchField, areaMesh>&,
         const word& name
     );
 
@@ -63,7 +63,7 @@ namespace fam
     tmp<faMatrix<Type> > div
     (
         const tmp<edgeScalarField>&,
-        GeometricField<Type, faPatchField, areaMesh>&,
+        const GeometricField<Type, faPatchField, areaMesh>&,
         const word& name
     );
 
@@ -71,14 +71,14 @@ namespace fam
     tmp<faMatrix<Type> > div
     (
         const edgeScalarField&,
-        GeometricField<Type, faPatchField, areaMesh>&
+        const GeometricField<Type, faPatchField, areaMesh>&
     );
 
     template<class Type>
     tmp<faMatrix<Type> > div
     (
         const tmp<edgeScalarField>&,
-        GeometricField<Type, faPatchField, areaMesh>&
+        const GeometricField<Type, faPatchField, areaMesh>&
     );
 }
 

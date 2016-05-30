@@ -38,6 +38,9 @@ SourceFiles
 #include "scalarField.H"
 #include "vector.H"
 
+#define TEMPLATE
+#include "FieldFunctionsM.H"
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
@@ -47,9 +50,20 @@ namespace Foam
 
 typedef Field<vector> vectorField;
 
+
+// * * * * * * * * * * * * * * * Global Functions  * * * * * * * * * * * * * //
+
+BINARY_FUNCTION(vector, vector, scalar, scaleRow)
+BINARY_TYPE_FUNCTION(vector, vector, scalar, scaleRow)
+
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#include "undefFieldFunctionsM.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

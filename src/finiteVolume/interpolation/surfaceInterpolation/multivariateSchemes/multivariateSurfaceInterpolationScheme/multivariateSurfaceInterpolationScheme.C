@@ -76,7 +76,7 @@ multivariateSurfaceInterpolationScheme<Type>::New
             << endl;
     }
 
-    word schemeName(schemeData);
+    const word schemeName(schemeData);
 
     typename IstreamConstructorTable::iterator constructorIter =
         IstreamConstructorTablePtr_->find(schemeName);

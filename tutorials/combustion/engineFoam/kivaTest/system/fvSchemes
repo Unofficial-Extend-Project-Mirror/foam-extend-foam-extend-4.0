@@ -43,7 +43,7 @@ divSchemes
     div(U)          Gauss linear;
     div((Su*grad(b))) Gauss linear;
     div((U+((Su*Xi)*grad(b)))) Gauss linear;
-    div((muEff*dev2(grad(U).T()))) Gauss linear;
+    div((muEff*dev2(T(grad(U))))) Gauss linear;
 }
 
 laplacianSchemes
@@ -59,6 +59,7 @@ laplacianSchemes
     laplacian(alphaEff,h) Gauss linear limited 0.5;
     laplacian(alphaEff,hu) Gauss linear limited 0.5;
     laplacian(alphaEff,ft) Gauss linear limited 0.5;
+    laplacian(alphaEff,b) Gauss linear limited 0.5;
 }
 
 interpolationSchemes
@@ -69,12 +70,6 @@ interpolationSchemes
 snGradSchemes
 {
     default         limited 0.5;
-}
-
-fluxRequired
-{
-    default         no;
-    p               ;
 }
 
 // ************************************************************************* //

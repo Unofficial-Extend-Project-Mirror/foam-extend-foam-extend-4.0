@@ -616,7 +616,7 @@ void Foam::debug::updateCentralDictVars
                             {
                                 InfoIn
                                 (
-                                    "debug::updateCentralDictVars\n"
+                                    "\ndebug::updateCentralDictVars\n"
                                     "(\n"
                                     "    const globalControlDictSwitchSet,\n"
                                     "    const string& keyValues,\n"

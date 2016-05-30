@@ -36,6 +36,7 @@ Description
 #include "MUSCL.H"
 #include "LimitedScheme.H"
 #include "boundaryTypes.H"
+#include "pimpleControl.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -45,8 +46,12 @@ int main(int argc, char *argv[])
 #   include "setRootCase.H"
 #   include "createTime.H"
 #   include "createMesh.H"
+
+    pimpleControl pimple(mesh);
+
 #   include "readThermodynamicProperties.H"
 #   include "createFields.H"
+#   include "createTimeControls.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -56,8 +61,7 @@ int main(int argc, char *argv[])
     {
         Info<< "Time = " << runTime.value() << nl << endl;
 
-#       include "readPISOControls.H"
-        scalar HbyAblend = readScalar(piso.lookup("HbyAblend"));
+        scalar HbyAblend = readScalar(pimple.dict().lookup("HbyAblend"));
 
 #       include "readTimeControls.H"
 
@@ -71,7 +75,7 @@ int main(int argc, char *argv[])
 
 #       include "setDeltaT.H"
 
-        for (int outerCorr = 0; outerCorr < nOuterCorr; outerCorr++)
+        while (pimple.loop())
         {
             magRhoU = mag(rhoU);
             H = (rhoE + p)/rho;
@@ -117,7 +121,7 @@ int main(int argc, char *argv[])
             psi = 1.0/(R*T);
             p = rho/psi;
 
-            for (int corr = 0; corr < nCorr; corr++)
+            while (pimple.correct())
             {
                 volScalarField rrhoUA = 1.0/rhoUEqn.A();
                 surfaceScalarField rrhoUAf("rrhoUAf", fvc::interpolate(rrhoUA));
@@ -136,8 +140,6 @@ int main(int argc, char *argv[])
                         (HbyA, HbyAWeights) & mesh.Sf()
                     )
                   + HbyAblend*fvc::ddtPhiCorr(rrhoUA, rho, rhoU, phi);
-
-                p.boundaryField().updateCoeffs();
 
                 surfaceScalarField phiGradp =
                     rrhoUAf*mesh.magSf()*fvc::snGrad(p);

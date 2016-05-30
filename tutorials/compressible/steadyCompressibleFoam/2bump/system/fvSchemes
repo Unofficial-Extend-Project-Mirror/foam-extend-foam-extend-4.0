@@ -20,8 +20,8 @@ ddtSchemes
 
     ddt(rho,U)      steadyState;
     ddt(rho,h)      steadyState;
-//     ddt(rho,h)      steadyInertial phi rho 1;
-    ddt(psi,p)      steadyInertial phi rho 1;
+    ddt(psi,p)      steadyState;
+    ddt(rho,K)      steadyState;
 
     U               steadyState;
     T               steadyState;
@@ -36,19 +36,15 @@ gradSchemes
 divSchemes
 {
     default          none;
-//     div(phi,U)       Gauss upwind;
-//     div(phi,h)       Gauss upwind;
-//     div(phid,p)      Gauss upwind;
-
     div(phi,U)       Gauss vanLeerDC;
     div(phi,h)       Gauss vanLeerDC;
-    div(phid,p)      Gauss vanLeer;
+    div(phid,p)      Gauss upwind;
 
-    div(U,p)         Gauss linear;
+    div(phi,K)       Gauss linear;
 
     div(phi,k)       Gauss upwind;
     div(phi,epsilon) Gauss upwind;
-    div((muEff*dev2(grad(U).T()))) Gauss linear;
+    div((muEff*dev2(T(grad(U))))) Gauss linear;
 }
 
 laplacianSchemes
@@ -64,12 +60,6 @@ interpolationSchemes
 snGradSchemes
 {
     default           corrected;
-}
-
-fluxRequired
-{
-    default           no;
-    p;
 }
 
 // ************************************************************************* //

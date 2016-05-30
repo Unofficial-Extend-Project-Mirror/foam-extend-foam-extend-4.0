@@ -117,14 +117,14 @@ void Foam::flowRateInletVelocityFvPatchVectorField::updateCoeffs()
         return;
     }
 
-    if (patch().boundaryMesh().mesh().moving())
-    {
-        WarningIn
-        (
-            "void flowRateInletVelocityFvPatchVectorField::updateCoeffs()"
-        )   << "Patch area not correctly updated on mesh motion"
-            << endl;
-    }
+//     if (patch().boundaryMesh().mesh().moving())
+//     {
+//         WarningIn
+//         (
+//             "void flowRateInletVelocityFvPatchVectorField::updateCoeffs()"
+//         )   << "Patch area not correctly updated on mesh motion"
+//             << endl;
+//     }
 
     // A simpler way of doing this would be nice
     scalar avgU = -flowRate_/(gSumArea_ + SMALL);

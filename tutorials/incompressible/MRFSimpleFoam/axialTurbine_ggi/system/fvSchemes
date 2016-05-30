@@ -32,7 +32,7 @@ divSchemes
     div(phi,U)      Gauss limitedLinearV 1;
     div(phi,k)      Gauss limitedLinear 1;
     div(phi,epsilon) Gauss limitedLinear 1;
-    div((nuEff*dev(grad(U).T()))) Gauss linear;
+    div((nuEff*dev(T(grad(U))))) Gauss linear;
 }
 
 laplacianSchemes
@@ -53,12 +53,6 @@ interpolationSchemes
 snGradSchemes
 {
     default         corrected;
-}
-
-fluxRequired
-{
-    default         no;
-    p;
 }
 
 mixingPlane

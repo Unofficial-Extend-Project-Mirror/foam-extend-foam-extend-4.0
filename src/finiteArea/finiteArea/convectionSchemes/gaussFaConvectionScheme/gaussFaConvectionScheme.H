@@ -117,7 +117,7 @@ public:
         tmp<faMatrix<Type> > famDiv
         (
             const edgeScalarField&,
-            GeometricField<Type, faPatchField, areaMesh>&
+            const GeometricField<Type, faPatchField, areaMesh>&
         ) const;
 
         tmp<GeometricField<Type, faPatchField, areaMesh> > facDiv

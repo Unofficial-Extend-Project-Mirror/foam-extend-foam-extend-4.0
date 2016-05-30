@@ -12,7 +12,7 @@ fvVectorMatrix UEqn
   - fvm::laplacian(mu, U, "laplacian(muEff,U)")
 );
 
-if (momentumPredictor)
+if (pimple.momentumPredictor())
 {
     solve
     (

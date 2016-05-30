@@ -43,6 +43,7 @@ Description
 #include "interfaceProperties.H"
 #include "twoPhaseMixture.H"
 #include "turbulenceModel.H"
+#include "pimpleControl.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -51,8 +52,11 @@ int main(int argc, char *argv[])
     #include "setRootCase.H"
     #include "createTime.H"
     #include "createDynamicFvMesh.H"
+
+    pimpleControl pimple(mesh);
+
     #include "readGravitationalAcceleration.H"
-    #include "readControls.H"
+    #include "createControls.H"
     #include "initContinuityErrs.H"
     #include "createFields.H"
     #include "CourantNo.H"
@@ -101,7 +105,7 @@ int main(int argc, char *argv[])
         turbulence->correct();
 
         // --- Outer-corrector loop
-        for (int oCorr=0; oCorr<nOuterCorr; oCorr++)
+        while (pimple.loop())
         {
             #include "alphaEqnsSubCycle.H"
 
@@ -110,7 +114,7 @@ int main(int argc, char *argv[])
             #include "UEqn.H"
 
             // --- PISO loop
-            for (int corr = 0; corr < nCorr; corr++)
+            while (pimple.correct())
             {
                 #include "pEqn.H"
             }

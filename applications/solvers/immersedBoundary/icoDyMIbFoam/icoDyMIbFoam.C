@@ -38,6 +38,7 @@ Author
 #include "dynamicFvMesh.H"
 #include "immersedBoundaryFvPatch.H"
 #include "immersedBoundaryAdjustPhi.H"
+#include "pimpleControl.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -46,6 +47,9 @@ int main(int argc, char *argv[])
 #   include "setRootCase.H"
 #   include "createTime.H"
 #   include "createDynamicFvMesh.H"
+
+    pimpleControl pimple(mesh);
+
 #   include "createFields.H"
 #   include "initContinuityErrs.H"
 
@@ -68,12 +72,10 @@ int main(int argc, char *argv[])
         // Make the fluxes relative to the mesh motion
         fvc::makeRelative(phi, U);
 
-#       include "readPIMPLEControls.H"
 #       include "CourantNo.H"
 
         // Pressure-velocity corrector
-        int oCorr = 0;
-        do
+        while (pimple.loop())
         {
             fvVectorMatrix UEqn
             (
@@ -82,10 +84,13 @@ int main(int argc, char *argv[])
               - fvm::laplacian(nu, U)
             );
 
-            solve(UEqn == -fvc::grad(p));
+            if (pimple.momentumPredictor())
+            {
+                solve(UEqn == -fvc::grad(p));
+            }
 
             // --- PISO loop
-            for (int corr = 0; corr < nCorr; corr++)
+            while (pimple.correct())
             {
                 volScalarField rUA = 1.0/UEqn.A();
 
@@ -99,7 +104,8 @@ int main(int argc, char *argv[])
                 immersedBoundaryAdjustPhi(phi, U);
                 adjustPhi(phi, U, p);
 
-                for (int nonOrth = 0; nonOrth <= nNonOrthCorr; nonOrth++)
+                // Non-orthogonal pressure corrector loop
+                while (pimple.correctNonOrthogonal())
                 {
                     fvScalarMatrix pEqn
                     (
@@ -107,9 +113,15 @@ int main(int argc, char *argv[])
                     );
 
                     pEqn.setReference(pRefCell, pRefValue);
-                    pEqn.solve();
+                    pEqn.solve
+                    (
+                        mesh.solutionDict().solver
+                        (
+                            p.select(pimple.finalInnerIter())
+                        )
+                    );
 
-                    if (nonOrth == nNonOrthCorr)
+                    if (pimple.finalNonOrthogonalIter())
                     {
                         phi -= pEqn.flux();
                     }
@@ -123,7 +135,7 @@ int main(int argc, char *argv[])
                 U -= rUA*fvc::grad(p);
                 U.correctBoundaryConditions();
             }
-        } while (++oCorr < nOuterCorr);
+        }
 
         runTime.write();
 

@@ -62,7 +62,7 @@ tmp
 <
     GeometricField
     <
-        typename outerProduct<vector,Type>::type, fvPatchField, volMesh
+        typename outerProduct<vector, Type>::type, fvPatchField, volMesh
     >
 >
 grad
@@ -85,7 +85,7 @@ tmp
 <
     GeometricField
     <
-        typename outerProduct<vector,Type>::type, fvPatchField, volMesh
+        typename outerProduct<vector, Type>::type, fvPatchField, volMesh
     >
 >
 grad
@@ -107,7 +107,7 @@ tmp
 <
     GeometricField
     <
-        typename outerProduct<vector,Type>::type, fvPatchField, volMesh
+        typename outerProduct<vector, Type>::type, fvPatchField, volMesh
     >
 >
 grad
@@ -136,7 +136,7 @@ tmp
 <
     GeometricField
     <
-        typename outerProduct<vector,Type>::type, fvPatchField, volMesh
+        typename outerProduct<vector, Type>::type, fvPatchField, volMesh
     >
 >
 grad
@@ -153,7 +153,7 @@ tmp
 <
     GeometricField
     <
-        typename outerProduct<vector,Type>::type, fvPatchField, volMesh
+        typename outerProduct<vector, Type>::type, fvPatchField, volMesh
     >
 >
 grad

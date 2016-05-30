@@ -35,6 +35,7 @@ Description
 #include "fft.H"
 #include "calcEk.H"
 #include "graph.H"
+#include "pisoControl.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -44,6 +45,9 @@ int main(int argc, char *argv[])
 
     #include "createTime.H"
     #include "createMeshNoClear.H"
+
+    pisoControl piso(mesh);
+
     #include "readTransportProperties.H"
     #include "createFields.H"
     #include "readTurbulenceProperties.H"
@@ -56,8 +60,6 @@ int main(int argc, char *argv[])
     while (runTime.loop())
     {
         Info<< "Time = " << runTime.timeName() << nl << endl;
-
-        #include "readPISOControls.H"
 
         force.internalField() = ReImSum
         (
@@ -83,7 +85,7 @@ int main(int argc, char *argv[])
 
         // --- PISO loop
 
-        for (int corr=1; corr<=1; corr++)
+        while (piso.correct())
         {
             volScalarField rUA = 1.0/UEqn.A();
 

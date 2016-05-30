@@ -1,4 +1,0 @@
-IAPWSThermo/IAPWS-IF97.C
-IAPWSThermo/IAPWSThermos.C
-
-LIB = $(FOAM_LIBBIN)/libIAPWSThermo

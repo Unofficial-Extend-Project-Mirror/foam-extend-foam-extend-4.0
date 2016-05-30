@@ -12,4 +12,5 @@
     rho = Foam::min(rho, rhoMax);
     rho = Foam::max(rho, rhoMin);
     rho.relax();
+    rho.correctBoundaryConditions();
 }

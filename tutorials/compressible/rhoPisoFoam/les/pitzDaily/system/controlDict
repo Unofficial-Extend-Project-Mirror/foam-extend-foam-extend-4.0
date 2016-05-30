@@ -15,6 +15,11 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
+libs
+(
+    "libcompressibleLESModels.so"
+)
+
 application     rhoPisoFoam;
 
 startFrom       startTime;

@@ -53,6 +53,32 @@ correctedSnGrad<Type>::~correctedSnGrad()
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 template<class Type>
+Foam::tmp<Foam::GeometricField<Type, Foam::fvsPatchField, Foam::surfaceMesh> >
+Foam::fv::correctedSnGrad<Type>::fullGradCorrection
+(
+    const GeometricField<Type, fvPatchField, volMesh>& vf
+) const
+{
+    const fvMesh& mesh = this->mesh();
+
+    // construct GeometricField<Type, fvsPatchField, surfaceMesh>
+    tmp<GeometricField<Type, fvsPatchField, surfaceMesh> > tssf =
+        mesh.correctionVectors()
+      & linear<typename outerProduct<vector, Type>::type>(mesh).interpolate
+        (
+            gradScheme<Type>::New
+            (
+                mesh,
+                mesh.schemesDict().gradScheme("grad(" + vf.name() + ')')
+            )().grad(vf, "grad(" + vf.name() + ')')
+        );
+    tssf().rename("snGradCorr(" + vf.name() + ')');
+
+    return tssf;
+}
+
+
+template<class Type>
 tmp<GeometricField<Type, fvsPatchField, surfaceMesh> >
 correctedSnGrad<Type>::correction
 (
@@ -85,21 +111,8 @@ correctedSnGrad<Type>::correction
         ssf.replace
         (
             cmpt,
-            mesh.correctionVectors()
-          & linear
-            <
-                typename
-                outerProduct<vector, typename pTraits<Type>::cmptType>::type
-            >(mesh).interpolate
-            (
-                gradScheme<typename pTraits<Type>::cmptType>::New
-                (
-                    mesh,
-                    mesh.schemesDict().gradScheme(ssf.name())
-                )()
-                //gaussGrad<typename pTraits<Type>::cmptType>(mesh)
-               .grad(vf.component(cmpt))
-            )
+            correctedSnGrad<typename pTraits<Type>::cmptType>(mesh)
+           .fullGradCorrection(vf.component(cmpt))
         );
     }
 

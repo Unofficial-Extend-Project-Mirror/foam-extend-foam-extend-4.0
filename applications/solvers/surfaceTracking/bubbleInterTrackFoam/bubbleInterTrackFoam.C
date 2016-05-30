@@ -37,7 +37,7 @@ Description
 #include "inletOutletFvPatchFields.H"
 #include "fixedGradientFvPatchFields.H"
 #include "boundBox.H"
-
+#include "pimpleControl.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -46,6 +46,9 @@ int main(int argc, char *argv[])
 #   include "setRootCase.H"
 #   include "createTime.H"
 #   include "createDynamicFvMesh.H"
+
+    pimpleControl pimple(mesh);
+
 #   include "createFields.H"
 #   include "initContinuityErrs.H"
 #   include "createBubble.H"
@@ -59,8 +62,6 @@ int main(int argc, char *argv[])
     {
         Info << "Time = " << runTime.value() << endl << endl;
 
-#       include "readPISOControls.H"
-
         interface.moveMeshPointsForOldFreeSurfDisplacement();
 
         interface.updateDisplacementDirections();
@@ -70,7 +71,7 @@ int main(int argc, char *argv[])
         Info<< "\nMax surface Courant Number = "
             << interface.maxCourantNumber() << endl << endl;
 
-        for (int corr=0; corr<nOuterCorr; corr++)
+        while (pimple.loop())
         {
             // Update interface bc
             interface.updateBoundaryConditions();
@@ -91,7 +92,7 @@ int main(int argc, char *argv[])
             solve(UEqn == -fvc::grad(p));
 
             // --- PISO loop
-            for (int i=0; i<nCorr; i++)
+            while (pimple.correct())
             {
                 volScalarField AU = UEqn.A();
 
@@ -104,7 +105,7 @@ int main(int argc, char *argv[])
 #               include "scaleSpacePhi.H"
 
                 // Non-orthogonal pressure corrector loop
-                for (label nonOrth=0; nonOrth<=nNonOrthCorr; nonOrth++)
+                while (pimple.correctNonOrthogonal())
                 {
                     fvScalarMatrix pEqn
                     (
@@ -116,7 +117,7 @@ int main(int argc, char *argv[])
 
                     pEqn.solve();
 
-                    if (nonOrth == nNonOrthCorr)
+                    if (pimple.finalNonOrthogonalIter())
                     {
                         phi -= pEqn.flux();
                     }

@@ -47,6 +47,7 @@ Author
 #include "specie.H"
 #include "basicPsiThermo.H"
 #include "turbulenceModel.H"
+#include "pimpleControl.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -56,8 +57,12 @@ int main(int argc, char *argv[])
 
 #   include "createTime.H"
 #   include "createDynamicFvMesh.H"
+
+    pimpleControl pimple(mesh);
+
 #   include "createFields.H"
 #   include "initContinuityErrs.H"
+#   include "createControls.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -105,8 +110,7 @@ int main(int argc, char *argv[])
         }
 
         // --- PIMPLE loop
-        label oCorr = 0;
-        do
+        while (pimple.loop())
         {
 #           include "rhoEqn.H"
 #           include "eEqn.H"
@@ -122,13 +126,13 @@ int main(int argc, char *argv[])
             // but psi and rho are not
             surfaceScalarField rhoReff = rhof - psisf*fvc::interpolate(p);
 
-            for (int corr = 0; corr < nCorr; corr++)
+            while (pimple.correct())
             {
 #               include "pEqn.H"
             }
 
             turbulence->correct();
-        } while (++oCorr < nOuterCorr);
+        }
 
         runTime.write();
 

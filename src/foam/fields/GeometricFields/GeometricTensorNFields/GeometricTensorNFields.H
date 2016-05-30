@@ -47,11 +47,13 @@ SourceFiles
 #define TensorN_FieldFunctions(tensorType, diagTensorType, sphericalTensorType,     \
     vectorType, CmptType, args...)                                                  \
                                                                                     \
-UNARY_FUNCTION(tensorType, tensorType,inv,inv)                                      \
-UNARY_FUNCTION(diagTensorType, tensorType,diag,diag)                                \
-UNARY_FUNCTION(tensorType, tensorType,negSumDiag,negSumDiag)                        \
-UNARY_FUNCTION(CmptType, tensorType,contractScalar,contractScalar)                  \
-UNARY_FUNCTION(vectorType, tensorType,contractLinear,contractLinear)                \
+UNARY_FUNCTION(tensorType, tensorType, T, transform)                                \
+UNARY_FUNCTION(tensorType, tensorType, inv, inv)                                    \
+UNARY_FUNCTION(diagTensorType, tensorType, diag, diag)                              \
+UNARY_FUNCTION(diagTensorType, tensorType, T, transform)                            \
+UNARY_FUNCTION(tensorType, tensorType, negSumDiag, negSumDiag)                      \
+UNARY_FUNCTION(CmptType, tensorType, contractScalar, contractScalar)                \
+UNARY_FUNCTION(vectorType, tensorType, contractLinear, contractLinear)              \
                                                                                     \
 BINARY_OPERATOR(tensorType, CmptType, tensorType, *,'*',multiply)                   \
 BINARY_TYPE_OPERATOR(tensorType, CmptType, tensorType, *,'*',multiply)              \

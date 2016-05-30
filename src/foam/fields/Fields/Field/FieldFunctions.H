@@ -152,6 +152,16 @@ tmp<Field<Type> > cmptMag(const UList<Type>& f);
 template<class Type>
 tmp<Field<Type> > cmptMag(const tmp<Field<Type> >& tf);
 
+
+template<class Type>
+void cmptSign(Field<Type>& res, const UList<Type>& f);
+
+template<class Type>
+tmp<Field<Type> > cmptSign(const UList<Type>& f);
+
+template<class Type>
+tmp<Field<Type> > cmptSign(const tmp<Field<Type> >& tf);
+
 #define TMP_UNARY_FUNCTION(ReturnType, Func)                                  \
                                                                               \
 template<class Type>                                                          \

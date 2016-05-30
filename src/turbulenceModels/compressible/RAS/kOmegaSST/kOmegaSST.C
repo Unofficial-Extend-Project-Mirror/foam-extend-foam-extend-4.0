@@ -369,7 +369,7 @@ tmp<fvVectorMatrix> kOmegaSST::divDevRhoReff(volVectorField& U) const
 {
     return
     (
-      - fvm::laplacian(muEff(), U) - fvc::div(muEff()*dev2(fvc::grad(U)().T()))
+      - fvm::laplacian(muEff(), U) - fvc::div(muEff()*dev2(T(fvc::grad(U))))
     );
 }
 
@@ -442,9 +442,11 @@ void kOmegaSST::correct()
         divU += fvc::div(mesh_.phi());
     }
 
-    tmp<volTensorField> tgradU = fvc::grad(U_);
-    volScalarField S2(2*magSqr(symm(tgradU())));
-    volScalarField GbyMu((tgradU() && dev(twoSymm(tgradU()))));
+    const tmp<volTensorField> tgradU = fvc::grad(U_);
+    const volTensorField& gradU = tgradU();
+
+    volScalarField S2(2*magSqr(symm(gradU)));
+    volScalarField GbyMu((gradU && dev(twoSymm(gradU))));
     volScalarField G("RASModel::G", mut_*GbyMu);
     tgradU.clear();
 

@@ -78,7 +78,7 @@ tmp<fvMatrix<Type> >
 noLaplacianScheme<Type, GType>::fvmLaplacian
 (
     const GeometricField<GType, fvsPatchField, surfaceMesh>& gamma,
-    GeometricField<Type, fvPatchField, volMesh>& vf
+    const GeometricField<Type, fvPatchField, volMesh>& vf
 )
 {
     const surfaceScalarField& deltaCoeffs = this->mesh().deltaCoeffs();

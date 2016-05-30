@@ -54,7 +54,7 @@ void Foam::layerARGambit::makeLayersLive()
     // Enable layering
     forAll (topoChanges, modI)
     {
-        if (typeid(topoChanges[modI]) == typeid(layerAdditionRemoval))
+        if (isA<layerAdditionRemoval>(topoChanges[modI]))
         {
             topoChanges[modI].enable();
         }

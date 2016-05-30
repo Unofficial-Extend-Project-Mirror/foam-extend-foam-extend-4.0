@@ -89,13 +89,13 @@ Foam::scalar Foam::coupledIterativeSolver::normFactor
 {
     typedef FieldField<Field, scalar> scalarFieldField;
 
-    // Calculate reference value of x
-    scalar xRef = gAverage(x);
-
     scalarFieldField pA(x.size());
 
     forAll (x, rowI)
     {
+        // Calculate reference value of x
+        scalar xRef = gAverage(x[rowI]);
+
         pA.set(rowI, new scalarField(x[rowI].size(), xRef));
     }
 

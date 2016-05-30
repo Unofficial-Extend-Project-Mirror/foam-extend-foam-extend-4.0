@@ -61,7 +61,7 @@ Description
 namespace Foam
 {
 
-/* * * * * * * * * * * * * * * private static data * * * * * * * * * * * * * */
+/* * * * * * * * * * * * * * * Private Static Data * * * * * * * * * * * * * */
 
 makeBasicMixture
 (

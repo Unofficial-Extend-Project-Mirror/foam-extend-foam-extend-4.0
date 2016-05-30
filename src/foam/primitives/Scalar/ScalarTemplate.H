@@ -235,6 +235,12 @@ inline Scalar cmptMag(const Scalar s)
 }
 
 
+inline Scalar cmptSign(const Scalar s)
+{
+    return sign(s);
+}
+
+
 // Standard C++ transcendental functions
 transFunc(sqrt)
 transFunc(cbrt)
@@ -268,7 +274,7 @@ transFunc(y1)
 
 
 // Stabilisation around zero for division
-inline Scalar stabilise(const Scalar s, const Scalar small)
+inline Scalar stabilise(const Scalar& s, const Scalar& small)
 {
     if (s >= 0)
     {
@@ -283,9 +289,9 @@ inline Scalar stabilise(const Scalar s, const Scalar small)
 
 inline Scalar cmptStabilise
 (
-    const Scalar s,
-    const Scalar small,
-    const Scalar value
+    const Scalar& s,
+    const Scalar& small,
+    const Scalar& value
 )
 {
     if (mag(s) < small)

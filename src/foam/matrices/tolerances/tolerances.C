@@ -62,7 +62,7 @@ bool tolerances::read()
 {
     if (regIOobject::read())
     {
-        word toleranceSetName(lookup("toleranceSet"));
+        const word toleranceSetName(lookup("toleranceSet"));
         const dictionary& toleranceSet(subDict(toleranceSetName));
 
         if (toleranceSet.found("relaxationFactors"))

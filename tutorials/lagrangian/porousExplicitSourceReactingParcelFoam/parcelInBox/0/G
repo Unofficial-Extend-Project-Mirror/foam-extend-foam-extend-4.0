@@ -47,6 +47,10 @@ boundaryField
         emissivity      1;
         value           uniform 0;
     }
+    defaultFaces
+    {
+        type            empty;
+    }
 }
 
 // ************************************************************************* //

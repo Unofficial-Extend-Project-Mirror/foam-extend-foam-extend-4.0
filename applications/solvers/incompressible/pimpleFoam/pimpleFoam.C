@@ -30,11 +30,17 @@ Description
 
     Turbulence modelling is generic, i.e. laminar, RAS or LES may be selected.
 
+    Consistent formulation without time-step and relaxation dependence by Jasak
+
+Author
+    Hrvoje Jasak, Wikki Ltd.  All rights reserved
+
 \*---------------------------------------------------------------------------*/
 
 #include "fvCFD.H"
 #include "singlePhaseTransportModel.H"
 #include "turbulenceModel.H"
+#include "pimpleControl.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -43,15 +49,18 @@ int main(int argc, char *argv[])
 #   include "setRootCase.H"
 #   include "createTime.H"
 #   include "createMesh.H"
+
+    pimpleControl pimple(mesh);
+
 #   include "createFields.H"
 #   include "initContinuityErrs.H"
+#   include "createTimeControls.H"
 
     Info<< "\nStarting time loop\n" << endl;
 
     while (runTime.run())
     {
 #       include "readTimeControls.H"
-#       include "readPIMPLEControls.H"
 #       include "CourantNo.H"
 #       include "setDeltaT.H"
 
@@ -59,18 +68,13 @@ int main(int argc, char *argv[])
 
         Info<< "Time = " << runTime.timeName() << nl << endl;
 
-        // --- Pressure-velocity PIMPLE corrector loop
-        for (int oCorr = 0; oCorr < nOuterCorr; oCorr++)
+        // --- PIMPLE loop
+        while (pimple.loop())
         {
-            if (nOuterCorr != 1)
-            {
-                p.storePrevIter();
-            }
-
 #           include "UEqn.H"
 
             // --- PISO loop
-            for (int corr = 0; corr < nCorr; corr++)
+            while (pimple.correct())
             {
 #               include "pEqn.H"
             }
