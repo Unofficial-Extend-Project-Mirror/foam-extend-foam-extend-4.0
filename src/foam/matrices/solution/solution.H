@@ -60,10 +60,16 @@ class solution
         bool caching_;
 
         //- Dictionary of relaxation factors for all the fields
-        dictionary relaxationFactors_;
+        dictionary fieldRelaxDict_;
+
+        //- Dictionary of relaxation factors for all the equations
+        dictionary eqnRelaxDict_;
 
         //- Optional default relaxation factor for all the fields
-        scalar defaultRelaxationFactor_;
+        scalar fieldRelaxDefault_;
+
+        //- Optional default relaxation factor for all the equations
+        scalar eqnRelaxDefault_;
 
         //- Dictionary of solver parameters for all the fields
         dictionary solvers_;
@@ -117,10 +123,20 @@ public:
             );
 
             //- Return true if the relaxation factor is given for the field
-            bool relax(const word& name) const;
+            bool relaxField(const word& name) const;
+
+            //- Return true if the relaxation factor is given for the equation
+            bool relaxEquation(const word& name) const;
 
             //- Return the relaxation factor for the given field
-            scalar relaxationFactor(const word& name) const;
+            scalar fieldRelaxationFactor(const word& name) const;
+
+            //- Return the relaxation factor for the given eqation
+            scalar equationRelaxationFactor(const word& name) const;
+
+            //- Return the selected sub-dictionary of solvers if the "select"
+            //  keyword is given, otherwise return the complete dictionary
+            const dictionary& solutionDict() const;
 
             //- Return the solver controls dictionary for the given field
             const dictionary& solverDict(const word& name) const;
@@ -131,10 +147,16 @@ public:
 
         // Edit
 
-            //- Return access to relaxation factors dictionary
-            dictionary& relaxationFactors()
+            //- Return access to field relaxation factors dictionary
+            dictionary& fieldRelaxationFactors()
             {
-                return relaxationFactors_;
+                return fieldRelaxDict_;
+            }
+
+            //- Return access to equation relaxation factors dictionary
+            dictionary& equationRelaxationFactors()
+            {
+                return eqnRelaxDict_;
             }
 
             //- Return access to solvers dictionary
