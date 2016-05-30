@@ -28,7 +28,7 @@ Description
 Author
 Christian Lucas
 Institut für Thermodynamik
-Technische Universität Braunschweig 
+Technische Universität Braunschweig
 Germany
 
 \*---------------------------------------------------------------------------*/

@@ -28,7 +28,7 @@ Description
 Author
 Christian Lucas
 Institut für Thermodynamik
-Technische Universität Braunschweig 
+Technische Universität Braunschweig
 Germany
 
 \*---------------------------------------------------------------------------*/
@@ -49,7 +49,7 @@ aungierRedlichKwong::aungierRedlichKwong(Istream& is)
     pcrit_(readScalar(is)),
     Tcrit_(readScalar(is)),
     azentricFactor_(readScalar(is)),
-    rhocrit_(readScalar(is)),    
+    rhocrit_(readScalar(is)),
     a0_(0.42747*pow(this->RR(),2)*pow(Tcrit_,2)/pcrit_),
     b_(0.08664*this->RR()*Tcrit_/pcrit_),
     c_(this->RR()*Tcrit_/(pcrit_+(a0_/(this->W()/rhocrit_*(this->W()/rhocrit_+b_))))+b_-this->W()/rhocrit_),
@@ -88,7 +88,7 @@ aungierRedlichKwong::aungierRedlichKwong(const dictionary& dict)
     b_(0.08664*this->RR()*Tcrit_/pcrit_),
     c_(this->RR()*Tcrit_/(pcrit_+(a0_/(this->W()/rhocrit_*(this->W()/rhocrit_+b_))))+b_-this->W()/rhocrit_),
     n_(0.4986+1.2735*azentricFactor_+0.4754*pow(azentricFactor_,2)),
-    TSave(0.0), 
+    TSave(0.0),
     b2_(pow(b_,2)),
     b3_(pow(b_,3)),
     b4_(pow(b_,4)),
@@ -119,7 +119,7 @@ void Foam::aungierRedlichKwong::write(Ostream& os) const
 
 Ostream& operator<<(Ostream& os, const aungierRedlichKwong& ark)
 {
-    os  << static_cast<const specie&>(ark)<< token::SPACE 
+    os  << static_cast<const specie&>(ark)<< token::SPACE
         << ark.pcrit_ << tab<< ark.Tcrit_<< tab<<ark.azentricFactor_<< tab<<ark.rhocrit_;
 
     os.check("Ostream& operator<<(Ostream& os, const aungierRedlichKwong& st)");

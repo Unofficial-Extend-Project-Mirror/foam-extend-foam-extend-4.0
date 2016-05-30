@@ -109,10 +109,10 @@ public:
                 return p_*psi();
             }
 
-            //CL: drhodh needed for pressure equation of the real gas solver 
+            //CL: drhodh needed for pressure equation of the real gas solver
             virtual const volScalarField& drhodh() const;
 
-            //CL: drhode needed for pressure equation of the real gas solver 
+            //CL: drhode needed for pressure equation of the real gas solver
             virtual const volScalarField& drhode() const;
 };
 

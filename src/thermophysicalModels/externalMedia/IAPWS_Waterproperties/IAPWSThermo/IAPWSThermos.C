@@ -25,7 +25,7 @@ License
 Author
 Christian Lucas
 Institut für Thermodynamik
-Technische Universität Braunschweig 
+Technische Universität Braunschweig
 Germany
 
 \*---------------------------------------------------------------------------*/
@@ -34,7 +34,7 @@ Germany
 #include "makeBasicPsiThermo.H"
 #include "IAPWSThermo.H"
 
-// including dummy classes --> this classes do nothing 
+// including dummy classes --> this classes do nothing
 // except satisfy the template structure
 //#include "dummyEqnOfState.H"
 //#include "dummyThermo.H"

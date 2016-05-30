@@ -27,12 +27,12 @@ Class
 
 Description:
 
-    Waterproperties based on the IAPWS 97 tables   
-    The water properties are caluclated using freeSteam (http://freesteam.sourceforge.net/example.php) 
-       
+    Waterproperties based on the IAPWS 97 tables
+    The water properties are caluclated using freeSteam (http://freesteam.sourceforge.net/example.php)
+
     General paper decribing the water tables:
 
-    "Revised Release on the IAPWS Industrial Formulation 1997 for the Thermodynamic Properties of Water and Steam"      
+    "Revised Release on the IAPWS Industrial Formulation 1997 for the Thermodynamic Properties of Water and Steam"
 
 SourceFiles
     IAPWSThermo.C
@@ -40,7 +40,7 @@ SourceFiles
 Author
 Christian Lucas
 Institut für Thermodynamik
-Technische Universität Braunschweig 
+Technische Universität Braunschweig
 Germany
 
 

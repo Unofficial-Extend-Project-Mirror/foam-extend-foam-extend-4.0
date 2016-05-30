@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | 
+    \\  /    A nd           |
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -27,9 +27,9 @@ Class
 
 Description
 
-    This is an subversion of the specieThermo function. While the "orginal" specieThermo function  
+    This is an subversion of the specieThermo function. While the "orginal" specieThermo function
     is only valid for perfect Gases, this function is valid for real gases.
-   
+
     Basic thermodynamics type based on the use of fitting functions for
     cp, h, s obtained from the template argument type thermo.  All other
     properties are derived from these primitive functions.
@@ -43,7 +43,7 @@ SourceFiles
 Author
 Christian Lucas
 Institut für Thermodynamik
-Technische Universität Braunschweig 
+Technische Universität Braunschweig
 Germany
 
 
@@ -157,7 +157,7 @@ public:
         // Calculate and return derived properties
         // (These functions need not provided in derived types)
 
-                //CL: isentropic expansion factor "gamma" (heat capacity ratio for perfect gas) 
+                //CL: isentropic expansion factor "gamma" (heat capacity ratio for perfect gas)
                 inline scalar gamma(const scalar T, const scalar rho) const;
 
                 //- Sensible internal energy [J/kmol]
@@ -201,16 +201,16 @@ public:
 
                 //CL: Other variables
 
-            //- Return compressibility drho/dp at h=constant [s^2/m^2] 
+            //- Return compressibility drho/dp at h=constant [s^2/m^2]
                 inline scalar psiH(const scalar rho, const scalar T) const;
 
-                //- Return compressibility drho/dp at e=constant [s^2/m^2]     
+                //- Return compressibility drho/dp at e=constant [s^2/m^2]
                 inline scalar psiE(const scalar rho, const scalar T) const;
 
-            //- Return compressibility drho/dH at p=constant 
+            //- Return compressibility drho/dH at p=constant
                 inline scalar drhodH(const scalar rho, const scalar T) const;
 
-            //- Return compressibility drho/dE at p=constant 
+            //- Return compressibility drho/dE at p=constant
                 inline scalar drhodE(const scalar rho, const scalar T) const;
 
         // Energy->temperature  inversion functions

@@ -28,7 +28,7 @@ Description
 Author
 Christian Lucas
 Institut für Thermodynamik
-Technische Universität Braunschweig 
+Technische Universität Braunschweig
 Germany
 
 \*---------------------------------------------------------------------------*/
@@ -58,7 +58,7 @@ redlichKwong::redlichKwong(Istream& is)
     rhoMin_(1e-3),
     // Starting GUESS for the density by ideal gas law
     rhostd_(this->rho(this->Pstd(), this->Tstd(), this->Pstd()/(this->Tstd()*this->R())))
-{ 
+{
     is.check("redlichKwong::redlichKwong(Istream& is)");
 }
 //CL: Constructed needed in OpenFOAM 2.x.x
@@ -81,7 +81,7 @@ redlichKwong::redlichKwong(const dictionary& dict)
     b3_(pow(b_,3)),
     b5_(pow(b_,5)),
     // Starting GUESS for the density by ideal gas law
-    rhostd_(this->rho(Pstd, Tstd, Pstd/(Tstd*this->R()))) 
+    rhostd_(this->rho(Pstd, Tstd, Pstd/(Tstd*this->R())))
 {}
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
@@ -104,7 +104,7 @@ void Foam::redlichKwong::write(Ostream& os) const
 
 Ostream& operator<<(Ostream& os, const redlichKwong& rk)
 {
-    os  << static_cast<const specie&>(rk)<< token::SPACE 
+    os  << static_cast<const specie&>(rk)<< token::SPACE
         << rk.pcrit_ << tab<< rk.Tcrit_;
 
     os.check("Ostream& operator<<(Ostream& os, const redlichKwong& st)");

@@ -35,7 +35,7 @@ SourceFiles
 Author
 Christian Lucas
 Institut für Thermodynamik
-Technische Universität Braunschweig 
+Technische Universität Braunschweig
 Germany
 
 
@@ -130,7 +130,7 @@ public:
                 return h_;
             }
 
-            //CL: drhodh needed for pressure equation of the real gas solver 
+            //CL: drhodh needed for pressure equation of the real gas solver
             virtual const volScalarField& drhodh() const
             {
                 return drhodh_;

@@ -28,8 +28,8 @@ Class
 Description
     Mixture Aungier Redlich Kwong equation of state.
 
-    Mixture based on a pseudo critical point approach. 
-    
+    Mixture based on a pseudo critical point approach.
+
     For further information, see:
     BOOK Title: The Properties of Gases And Liquids, Fifth Edition, McGraw-Hill, Chapter 5
     Authors: B. Poling; J. Prausnitz; J. O'Connell
@@ -42,7 +42,7 @@ SourceFiles
 Author
 Christian Lucas
 Institut für Thermodynamik
-Technische Universität Braunschweig 
+Technische Universität Braunschweig
 Germany
 
 \*---------------------------------------------------------------------------*/
@@ -73,27 +73,27 @@ protected:
 
     // data at the critical point
     scalar Zcrit_;
-        
+
     //CL. molar volume at the critical point
     scalar Vcrit_;
 
     //CL: save the concentrations of each component of the mixture
     //CL: needs to be multiplied by this->W() to get the molar fractions
     //mutable DynamicList<scalar> weigths;
-    
+
     //CL: saves a pointer to the pure component classes of the mixture
    // mutable DynamicList<mixtureAungierRedlichKwong*> mixtureComponents;
 
 
 public:
-  
+
 
     // Constructors
 
         //- Construct from components
         inline mixtureAungierRedlichKwong
         (
-            const aungierRedlichKwong& sp, 
+            const aungierRedlichKwong& sp,
             scalar Tcrit,
             scalar azentricFactor,
             scalar Vcrit,

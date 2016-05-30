@@ -28,7 +28,7 @@ Description
 Author
 Christian Lucas
 Institut für Thermodynamik
-Technische Universität Braunschweig 
+Technische Universität Braunschweig
 Germany
 
 \*---------------------------------------------------------------------------*/
@@ -82,7 +82,7 @@ soaveRedlichKwong::soaveRedlichKwong(const dictionary& dict)
     a0_(0.42747*pow(this->RR(),2)*pow(Tcrit_,2)/(pcrit_)),
     b_(0.08664*this->RR()*Tcrit_/pcrit_),
     n_(0.48508+1.55171*azentricFactor_-0.15613*pow(azentricFactor_,2)),
-    TSave(0.0), 
+    TSave(0.0),
     b2_(pow(b_,2)),
     b3_(pow(b_,3)),
     b5_(pow(b_,5)),
@@ -110,7 +110,7 @@ void Foam::soaveRedlichKwong::write(Ostream& os) const
 
 Ostream& operator<<(Ostream& os, const soaveRedlichKwong& srk)
 {
-    os  << static_cast<const specie&>(srk)<< token::SPACE 
+    os  << static_cast<const specie&>(srk)<< token::SPACE
         << srk.pcrit_ << tab<< srk.Tcrit_<<tab<<srk.azentricFactor_;
 
     os.check("Ostream& operator<<(Ostream& os, const soaveRedlichKwong& st)");

@@ -25,7 +25,7 @@ License
 Author
 Christian Lucas
 Institut für Thermodynamik
-Technische Universität Braunschweig 
+Technische Universität Braunschweig
 Germany
 
 \*---------------------------------------------------------------------------*/
@@ -114,15 +114,15 @@ inline scalar redlichKwong::b5()const
 
 
 
-//returns the pressure for a given density and temperature    
+//returns the pressure for a given density and temperature
 inline scalar redlichKwong::p(const scalar rho, const scalar T) const
 {
-    scalar Vm = this->W()/rho;    
+    scalar Vm = this->W()/rho;
     return this->RR()*T/(Vm - b_) - a_/(sqrt(T)*Vm*(Vm + b_));
 }
 
 
-//Real deviative dp/dv at constant temperature 
+//Real deviative dp/dv at constant temperature
 //(molar values)
 inline scalar redlichKwong::dpdv(const scalar rho, const scalar T) const
 {
@@ -135,7 +135,7 @@ inline scalar redlichKwong::dpdv(const scalar rho, const scalar T) const
 }
 
 
-//Real deviative dp/dT at constant molar volume 
+//Real deviative dp/dT at constant molar volume
 //(molar values)
 inline scalar redlichKwong::dpdT(const scalar rho, const scalar T) const
 {
@@ -144,7 +144,7 @@ inline scalar redlichKwong::dpdT(const scalar rho, const scalar T) const
 }
 
 
-//Real  deviative dv/dT at constant pressure 
+//Real  deviative dv/dT at constant pressure
 //using implicit differentiation
 //(molar values)
 inline scalar redlichKwong::dvdT(const scalar rho, const scalar T) const
@@ -153,9 +153,9 @@ inline scalar redlichKwong::dvdT(const scalar rho, const scalar T) const
 }
 
 
-//Real  deviative dv/dp at constant temperature 
+//Real  deviative dv/dp at constant temperature
 //(molar values)
-inline scalar redlichKwong::dvdp(const scalar rho, const scalar T)  const 
+inline scalar redlichKwong::dvdp(const scalar rho, const scalar T)  const
 {
     return 1/this->dpdv(rho,T);
 }
@@ -224,10 +224,10 @@ inline scalar redlichKwong::d2pdv2(const scalar rho, const scalar T) const
 
 
 //(molar values)
-//using second Order implicit differentiation 
+//using second Order implicit differentiation
 inline scalar redlichKwong::d2vdT2(const scalar rho, const scalar T) const
 {
-    return 
+    return
     -(
           pow(this->dpdT(rho,T),2)*this->d2pdv2(rho,T)
         + pow(this->dpdv(rho,T),2)*this->d2pdT2(rho,T)
@@ -242,7 +242,7 @@ inline scalar redlichKwong::d2pdvdT(const scalar rho, const scalar T) const
 {
     scalar Vm = this->W()/rho;
     scalar Vm2 = Vm*Vm;
-    
+
     return
     -(0.5*(
         a_*(b3() - 3*b_*Vm2 + 2*pow(Vm,3))
@@ -252,13 +252,13 @@ inline scalar redlichKwong::d2pdvdT(const scalar rho, const scalar T) const
 }
 
 
-// the result of this intergal is needed for the nasa based cp polynomial 
+// the result of this intergal is needed for the nasa based cp polynomial
 //(molar values)
 inline scalar redlichKwong::integral_d2pdT2_dv
 (
     const scalar rho,
     const scalar T
-) const 
+) const
 {
     scalar Vm = this->W()/rho;
     return 0.75*a_*log(b_  +  Vm)/(pow(T,2.5)*b_)
@@ -299,7 +299,7 @@ inline scalar redlichKwong::rho
     const scalar rho0
 ) const
 {
- 
+
    scalar molarVolumePrevIteration;
    scalar molarVolume;
    label iter=0;
@@ -313,7 +313,7 @@ inline scalar redlichKwong::rho
    do
    {
        molarVolumePrevIteration= molarVolume;
-   
+
        label i=0;
        do
        {
@@ -325,7 +325,7 @@ inline scalar redlichKwong::rho
                )/pow(2,i);
 
            i++;
-           if (i>8) 
+           if (i>8)
            {
                //CL: using bisection methode as backup,
                //CL: solution must be between rhoMin_ to rhoMax
@@ -339,7 +339,7 @@ inline scalar redlichKwong::rho
                    if ((f2 < 0 && f3 > 0) || (f2 > 0 && f3 < 0))
                    {
                        rho1=rho3;
-                   }  
+                   }
                    else if ((f1 < 0 && f3 > 0)||(f1 > 0 && f3 < 0))
                    {
                        rho2=rho3;
@@ -353,7 +353,7 @@ inline scalar redlichKwong::rho
                    {
                        molarVolume=this->W()/rho3;
                        molarVolumePrevIteration=this->W()/rho3;
-                       break; 
+                       break;
                    }
                    else
                    {
@@ -383,7 +383,7 @@ inline scalar redlichKwong::rho
 }
 
 
-//- Return density [kg/m^3]on 
+//- Return density [kg/m^3]on
 inline scalar redlichKwong::rho(const scalar p, const scalar T) const
 {
     // using perfect gas equation as starting point

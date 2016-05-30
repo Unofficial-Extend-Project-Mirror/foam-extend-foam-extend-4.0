@@ -41,7 +41,7 @@ SourceFiles
 Author
 Christian Lucas
 Institut für Thermodynamik
-Technische Universität Braunschweig 
+Technische Universität Braunschweig
 Germany
 
 \*---------------------------------------------------------------------------*/
@@ -72,23 +72,23 @@ class mixtureRedlichKwong
 :
     public redlichKwong
 {
-    // Private data 
-    
+    // Private data
+
     // Private functions
 
     //CL: function updates the model coefficients (a,b) of the mixture
-    //CL: this is the function with the mixing rule 
-    inline void updateModelCoefficients() const; 
+    //CL: this is the function with the mixing rule
+    inline void updateModelCoefficients() const;
 
 protected:
-    
+
     //CL: save the concentrations of each component of the mixture
     //CL: needs to be multiplied by this->W() to get the molar fractions
     mutable DynamicList<scalar> weigths;
-    
+
     //CL: saves a pointer to the pure component classes of the mixture
     mutable DynamicList<mixtureRedlichKwong*> mixtureComponents;
-   
+
     //CL: counts the number of components
     mutable label numOfComp;
 
@@ -118,7 +118,7 @@ public:
             label numOfComp,
             DynamicList<scalar> weigths,
             DynamicList<mixtureRedlichKwong*> mixtureComponents,
-            scalar a, 
+            scalar a,
             scalar b,
             scalar rhostd,
             scalar rhoMin,

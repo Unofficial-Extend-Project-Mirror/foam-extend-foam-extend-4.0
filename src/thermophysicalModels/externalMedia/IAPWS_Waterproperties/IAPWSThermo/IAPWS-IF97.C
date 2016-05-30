@@ -25,8 +25,8 @@ License
 Author
 Christian Lucas
 Institut für Thermodynamik
-Technische Universität Braunschweig 
-Germany 
+Technische Universität Braunschweig
+Germany
 \*---------------------------------------------------------------------------*/
 
 
@@ -38,13 +38,13 @@ Germany
 //CL: calculated all (minimal) needed properties for a given pressure and enthalpy
 void Foam::calculateProperties_ph
 (
-    scalar &p, 
-    scalar &h, 
-    scalar &T, 
-    scalar &rho, 
-    scalar &psi, 
-    scalar &drhodh, 
-    scalar &mu, 
+    scalar &p,
+    scalar &h,
+    scalar &T,
+    scalar &rho,
+    scalar &psi,
+    scalar &drhodh,
+    scalar &mu,
     scalar &alpha
 )
 {
@@ -55,19 +55,19 @@ void Foam::calculateProperties_ph
     scalar x;
 
     S=freesteam_set_ph(p,h);
-    calculateProperties_h(S,p,h,T,rho,psi,drhodh,mu,alpha,x);   
+    calculateProperties_h(S,p,h,T,rho,psi,drhodh,mu,alpha,x);
 }
 
 //CL: calculated all (minimal) needed properties + the vapor mass fraction for a given pressure and enthalpy
 void Foam::calculateProperties_ph
 (
-    scalar &p, 
-    scalar &h, 
-    scalar &T, 
-    scalar &rho, 
-    scalar &psi, 
-    scalar &drhodh, 
-    scalar &mu, 
+    scalar &p,
+    scalar &h,
+    scalar &T,
+    scalar &rho,
+    scalar &psi,
+    scalar &drhodh,
+    scalar &mu,
     scalar &alpha,
     scalar &x
 )
@@ -75,19 +75,19 @@ void Foam::calculateProperties_ph
     SteamState S;
 
     S=freesteam_set_ph(p,h);
-    calculateProperties_h(S,p,h,T,rho,psi,drhodh,mu,alpha,x);   
+    calculateProperties_h(S,p,h,T,rho,psi,drhodh,mu,alpha,x);
 }
 
 //CL: calculated all (minimal) needed properties for a given pressure and temperature
 void Foam::calculateProperties_pT
 (
-    scalar &p, 
-    scalar &T, 
-    scalar &h, 
-    scalar &rho, 
-    scalar &psi, 
-    scalar &drhodh, 
-    scalar &mu, 
+    scalar &p,
+    scalar &T,
+    scalar &h,
+    scalar &rho,
+    scalar &psi,
+    scalar &drhodh,
+    scalar &mu,
     scalar &alpha
 )
 {
@@ -98,19 +98,19 @@ void Foam::calculateProperties_pT
     scalar x;
 
     S=freesteam_set_pT(p,T);
-    calculateProperties_h(S,p,h,T,rho,psi,drhodh,mu,alpha,x);   
+    calculateProperties_h(S,p,h,T,rho,psi,drhodh,mu,alpha,x);
 }
 
 //CL: calculated all (minimal) needed properties + the vapor mass fraction for a given pressure and temperature
 void Foam::calculateProperties_pT
 (
-    scalar &p, 
-    scalar &T, 
-    scalar &h, 
-    scalar &rho, 
-    scalar &psi, 
-    scalar &drhodh, 
-    scalar &mu, 
+    scalar &p,
+    scalar &T,
+    scalar &h,
+    scalar &rho,
+    scalar &psi,
+    scalar &drhodh,
+    scalar &mu,
     scalar &alpha,
     scalar &x
 )
@@ -118,29 +118,29 @@ void Foam::calculateProperties_pT
     SteamState S;
 
     S=freesteam_set_pT(p,T);
-    calculateProperties_h(S,p,h,T,rho,psi,drhodh,mu,alpha,x);   
+    calculateProperties_h(S,p,h,T,rho,psi,drhodh,mu,alpha,x);
 }
 
 
 //CL: calculated the properties --> this function is called by the functions above
 //CL: does not calulated the internal energy, if this is needed e.g. for sonicFoam
-//CL: the function has to be changed a little bit 
+//CL: the function has to be changed a little bit
 void Foam::calculateProperties_h
 (
-    SteamState S, 
-    scalar &p, 
-    scalar &h, 
-    scalar &T, 
-    scalar &rho, 
-    scalar &psi, 
-    scalar &drhodh, 
-    scalar &mu, 
-    scalar &alpha, 
+    SteamState S,
+    scalar &p,
+    scalar &h,
+    scalar &T,
+    scalar &rho,
+    scalar &psi,
+    scalar &drhodh,
+    scalar &mu,
+    scalar &alpha,
     scalar &x
 )
 {
     label region;
-    scalar kappa,lambda,cp,beta; 
+    scalar kappa,lambda,cp,beta;
 
     region=freesteam_region(S);
 
@@ -157,7 +157,7 @@ void Foam::calculateProperties_h
         kappa=freesteam_region1_kappaT_pT(S.R1.p,S.R1.T);
         beta=freesteam_region1_alphav_pT(S.R1.p,S.R1.T);
         cp=freesteam_region1_cp_pT(S.R1.p,S.R1.T);
- 
+
         //CL: getting derivatives using Bridgmans table
         //CL: psi=(drho/dp)_h=const
         //CL: drhodh=(drho/dh)_p=const
@@ -182,7 +182,7 @@ void Foam::calculateProperties_h
         kappa=freesteam_region2_kappaT_pT(S.R2.p,S.R2.T);
         beta=freesteam_region2_alphav_pT(S.R2.p,S.R2.T);
         cp=freesteam_region2_cp_pT(S.R2.p,S.R2.T);
- 
+
         //CL: getting derivatives using Bridgmans table
         //CL: psi=(drho/dp)_h=const
         //CL: drhodh=(drho/dh)_p=const
@@ -197,12 +197,12 @@ void Foam::calculateProperties_h
     else if (region==3)
     {
         scalar gamma,cv;
- 
+
         rho=S.R3.rho;
         T=S.R3.T;
         p=freesteam_region3_p_rhoT(S.R3.rho,S.R3.T);
         h=freesteam_region3_h_rhoT(S.R3.rho,S.R3.T);
-        
+
         //CL= when h<h @ critical point -->x=0 else x=1
         if (h<2084256.263)
         {
@@ -212,9 +212,9 @@ void Foam::calculateProperties_h
         {
             x=1;
         }
-     
-        //Cl: note: beta=1/V*(dV/dP)_P=const 
-        //Cl: note: kappa=1/V*(dV/dP)_T=const 
+
+        //Cl: note: beta=1/V*(dV/dP)_P=const
+        //Cl: note: kappa=1/V*(dV/dP)_T=const
         //Cl: note: in FreeStream, gamma=1/p*(dp/dT)_v=const is called alphap (in this region)
         gamma=freesteam_region3_alphap_rhoT(S.R3.rho,S.R3.T);
         cp=freesteam_region3_cp_rhoT(S.R3.rho,S.R3.T);
@@ -242,7 +242,7 @@ void Foam::calculateProperties_h
         scalar dpdT,dvdh,dvdp,dxdp;
 
         SteamState Sl,Sv;
-      
+
         x=S.R4.x;
         T=S.R4.T;
         rho=1/freesteam_region4_v_Tx(S.R4.T,S.R4.x);
@@ -250,7 +250,7 @@ void Foam::calculateProperties_h
         p=freesteam_region4_psat_T(S.R4.T);
         cp=freesteam_region4_cp_Tx(S.R4.T,S.R4.x);
 
- 
+
         //CL: Getting density on the vapour and liquid lines
         rhov=freesteam_region4_rhog_T(S.R4.T);
         rhol=freesteam_region4_rhof_T(S.R4.T);
@@ -261,10 +261,10 @@ void Foam::calculateProperties_h
 
         dpdT=freesteam_region4_dpsatdT_T(S.R4.T);
 
-        // getting the states outside the vapour dome 
+        // getting the states outside the vapour dome
         Sl=freesteam_set_pv(p,vl-0.0000001);  //inside region 1
         Sv=freesteam_set_pv(p,vv+0.0000001);  //inside region 2
-  
+
         kappal=freesteam_region1_kappaT_pT(Sl.R1.p,Sl.R1.T);
         kappav=freesteam_region2_kappaT_pT(Sv.R2.p,Sv.R2.T);
 
@@ -288,7 +288,7 @@ void Foam::calculateProperties_h
         dxdp=-dhldp/(hv-hl)
                  +(h-hl)/((hv-hl)*(hv-hl))
                      *(dhvdp-dhldp);
-        
+
         //CL: psi=(drho/dp)_h=const
         dvdp=dvldp+(dvvdp-dvldp)*x+(vv-vl)*dxdp;
         psi=-rho*rho*dvdp;
@@ -296,7 +296,7 @@ void Foam::calculateProperties_h
         //CL: drhodh=(drho/dh)_p=const
         dvdh=(vv-vl)/(hv-hl);
         drhodh=-rho*rho*dvdh;
-        
+
         //CL: getting transport properties
         mu=freesteam_mu_rhoT(rho, T);
         lambda=freesteam_k_rhoT(rho,T);
@@ -368,14 +368,14 @@ Foam::scalar Foam::psiH_pT(scalar p,scalar T)
 Foam::scalar Foam::psiH_ph(scalar p,scalar h)
 {
     return psiH(freesteam_set_ph(p,h));
-} 
+}
 
 
 //CL: psiH=(drho/dp)_h=const
 Foam::scalar Foam::psiH(SteamState S)
 {
     label region;
-    scalar kappa,cp,beta,psiH,rho; 
+    scalar kappa,cp,beta,psiH,rho;
 
     region=freesteam_region(S);
 
@@ -387,7 +387,7 @@ Foam::scalar Foam::psiH(SteamState S)
         beta=freesteam_region1_alphav_pT(S.R1.p,S.R1.T);
         cp=freesteam_region1_cp_pT(S.R1.p,S.R1.T);
         rho=1/freesteam_region1_v_pT(S.R1.p,S.R1.T);
- 
+
         //CL: getting derivatives using Bridgmans table
         //CL: psiH=(drho/dp)_h=const
         psiH=-((S.R1.T*beta*beta-beta)/cp-kappa*rho);
@@ -409,12 +409,12 @@ Foam::scalar Foam::psiH(SteamState S)
     {
 
         scalar gamma,cv,p;
- 
+
         rho=S.R3.rho;
         p=freesteam_region3_p_rhoT(S.R3.rho,S.R3.T);
-             
-        //Cl: note: beta=1/V*(dV/dP)_P=const 
-        //Cl: note: kappa=1/V*(dV/dP)_T=const 
+
+        //Cl: note: beta=1/V*(dV/dP)_P=const
+        //Cl: note: kappa=1/V*(dV/dP)_T=const
         //Cl: note: in FreeStream, gamma=1/p*(dp/dT)_v=const is called alphap (in this region
         gamma=freesteam_region3_alphap_rhoT(S.R3.rho,S.R3.T);
         cp=freesteam_region3_cp_rhoT(S.R3.rho,S.R3.T);
@@ -432,10 +432,10 @@ Foam::scalar Foam::psiH(SteamState S)
         scalar rhov,rhol,betav,betal,kappav,kappal,vv,vl,cpl,cpv,hl,hv,h,p;
         scalar dvldp,dvvdp,dhldp,dhvdp;
         scalar dpdT,dvdp,dxdp;
-        
-        
+
+
         SteamState Sl,Sv;
-      
+
         rho=1/freesteam_region4_v_Tx(S.R4.T,S.R4.x);
         h=freesteam_region4_h_Tx(S.R4.T,S.R4.x);
         p=freesteam_region4_psat_T(S.R4.T);
@@ -450,10 +450,10 @@ Foam::scalar Foam::psiH(SteamState S)
 
         dpdT=freesteam_region4_dpsatdT_T(S.R4.T);
 
-        // getting the states outside the vapour dome 
+        // getting the states outside the vapour dome
         Sl=freesteam_set_pv(p,vl-0.0000001);  //inside region 1
         Sv=freesteam_set_pv(p,vv+0.0000001);  //inside region 2
-  
+
         kappal=freesteam_region1_kappaT_pT(Sl.R1.p,Sl.R1.T);
         kappav=freesteam_region2_kappaT_pT(Sv.R2.p,Sv.R2.T);
 
@@ -476,7 +476,7 @@ Foam::scalar Foam::psiH(SteamState S)
         dxdp=-dhldp/(hv-hl)
                  +(h-hl)/((hv-hl)*(hv-hl))
                      *(dhvdp-dhldp);
-        
+
         //CL: psiH=(drho/dp)_h=const
         dvdp=dvldp+(dvvdp-dvldp)*S.R4.x+(vv-vl)*dxdp;
         psiH=-rho*rho*dvdp;
@@ -487,7 +487,7 @@ Foam::scalar Foam::psiH(SteamState S)
     }
 
     return psiH;
-} 
+}
 
 
 //CL: drhodh=(drho/dh)_p=const
@@ -501,14 +501,14 @@ Foam::scalar Foam::drhodh_pT(scalar p,scalar T)
 Foam::scalar Foam::drhodh_ph(scalar p,scalar h)
 {
     return drhodh(freesteam_set_ph(p,h));
-} 
+}
 
 
 //CL: drhodh=(drho/dh)_p=const
 Foam::scalar Foam::drhodh(SteamState S)
 {
     label region;
-    scalar cp,beta,drhodh,rho; 
+    scalar cp,beta,drhodh,rho;
 
     region=freesteam_region(S);
 
@@ -519,7 +519,7 @@ Foam::scalar Foam::drhodh(SteamState S)
         //Cl: note: in FreeStream, beta=1/V*(dV/dP)_P=const is called alphaV (in this region)
         beta=freesteam_region1_alphav_pT(S.R1.p,S.R1.T);
         cp=freesteam_region1_cp_pT(S.R1.p,S.R1.T);
- 
+
         //CL: getting derivatives using Bridgmans table
         //CL: drhodh=(drho/dh)_p=const
         drhodh=-rho*beta/cp;
@@ -532,7 +532,7 @@ Foam::scalar Foam::drhodh(SteamState S)
         //Cl: note: in FreeStream, kappa=1/V*(dV/dP)_T=const is called kappaT (in this region)
         beta=freesteam_region2_alphav_pT(S.R2.p,S.R2.T);
         cp=freesteam_region2_cp_pT(S.R2.p,S.R2.T);
- 
+
         //CL: getting derivatives using Bridgmans table
         //CL: drhodh=(drho/dh)_p=const
         drhodh=-rho*beta/cp;
@@ -543,8 +543,8 @@ Foam::scalar Foam::drhodh(SteamState S)
         scalar gamma,cv,p;
 
         p=freesteam_region3_p_rhoT(S.R3.rho,S.R3.T);
-             
-        //Cl: note: beta=1/V*(dV/dP)_P=const 
+
+        //Cl: note: beta=1/V*(dV/dP)_P=const
         //Cl: note: in FreeStream, gamma=1/p*(dp/dT)_v=const is called alphap (in this region
         gamma=freesteam_region3_alphap_rhoT(S.R3.rho,S.R3.T);
         cp=freesteam_region3_cp_rhoT(S.R3.rho,S.R3.T);
@@ -568,10 +568,10 @@ Foam::scalar Foam::drhodh(SteamState S)
         vv=1/freesteam_region4_rhog_T(S.R4.T);
         vl=1/freesteam_region4_rhof_T(S.R4.T);
 
-        // getting the states outside the vapour dome 
+        // getting the states outside the vapour dome
         Sl=freesteam_set_pv(p,vl-0.0000001);  //inside region 1
         Sv=freesteam_set_pv(p,vv+0.0000001);  //inside region 2
-  
+
         hl=freesteam_region1_h_pT(Sl.R1.p,Sl.R1.T);
         hv=freesteam_region2_h_pT(Sv.R2.p,Sv.R2.T);
 
@@ -582,8 +582,8 @@ Foam::scalar Foam::drhodh(SteamState S)
     {
          Info<<"IAPWS-IF97.C error, outside the regions 1-4"<<endl;
     }
-    
+
     return drhodh;
-} 
+}
 
 

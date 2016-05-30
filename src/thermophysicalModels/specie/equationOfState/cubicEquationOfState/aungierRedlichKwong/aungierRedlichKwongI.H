@@ -25,7 +25,7 @@ License
 Author
 Christian Lucas
 Institut für Thermodynamik
-Technische Universität Braunschweig 
+Technische Universität Braunschweig
 Germany
 
 \*---------------------------------------------------------------------------*/
@@ -56,7 +56,7 @@ inline aungierRedlichKwong::aungierRedlichKwong(const word& name, const aungierR
     pcrit_(pg.pcrit_),
     Tcrit_(pg.Tcrit_),
     azentricFactor_(pg.azentricFactor_),
-    rhocrit_(pg.rhocrit_),    
+    rhocrit_(pg.rhocrit_),
     a0_(pg.a0_),
     b_(pg.b_),
     c_(pg.c_),
@@ -108,15 +108,15 @@ inline scalar aungierRedlichKwong::a(const scalar T)const
 {
     //CL: check if a has already been calculated for this temperature
     if(TSave==T)
-    { 
-        return aSave;  
+    {
+        return aSave;
     }
     //CL: If not, recalculate a(T), dadT(T) and d2adT2(T)
     else
     {
         updateModelCoefficients(T);
         return aSave;
-    }     
+    }
 }
 
 
@@ -126,14 +126,14 @@ inline scalar aungierRedlichKwong::dadT(const scalar T)const
     // check if a has already been calculated for this temperature
     if(TSave==T)
     {
-        return daSave;  
+        return daSave;
     }
     //CL: If not, recalculate a(T), dadT(T) and d2adT2(T)
     else
     {
         updateModelCoefficients(T);
         return daSave;
-    }    
+    }
 }
 
 
@@ -143,14 +143,14 @@ inline scalar aungierRedlichKwong::d2adT2(const scalar T)const
     // check if a has already been calculated for this temperature
     if(TSave==T)
     {
-        return d2aSave;  
+        return d2aSave;
     }
     //CL: If not, recalculate a(T), dadT(T) and d2adT2(T)
     else
     {
         updateModelCoefficients(T);
         return d2aSave;
-    }    
+    }
 }
 
 //Aungier Redlich Kwong factors
@@ -202,7 +202,7 @@ inline scalar aungierRedlichKwong::c2()const
 }
 
 
-//returns the pressure for a given density and temperature    
+//returns the pressure for a given density and temperature
 inline scalar aungierRedlichKwong::p(const scalar rho,const scalar T) const
 {
     scalar Vm = this->W()/rho;
@@ -211,7 +211,7 @@ inline scalar aungierRedlichKwong::p(const scalar rho,const scalar T) const
 }
 
 
-//Real deviative dp/dv at constant temperature 
+//Real deviative dp/dv at constant temperature
 //(molar values)
 inline scalar aungierRedlichKwong::dpdv(const scalar rho, const scalar T) const
 {
@@ -224,7 +224,7 @@ inline scalar aungierRedlichKwong::dpdv(const scalar rho, const scalar T) const
 }
 
 
-//Real deviative dp/dT at constant molar volume 
+//Real deviative dp/dT at constant molar volume
 //(molar values)
 inline scalar aungierRedlichKwong::dpdT(const scalar rho, const scalar T) const
 {
@@ -233,7 +233,7 @@ inline scalar aungierRedlichKwong::dpdT(const scalar rho, const scalar T) const
 }
 
 
-//Real  deviative dv/dT at constant pressure 
+//Real  deviative dv/dT at constant pressure
 //using implicit differentiation
 //(molar values)
 inline scalar aungierRedlichKwong::dvdT(const scalar rho,const scalar T) const
@@ -242,9 +242,9 @@ inline scalar aungierRedlichKwong::dvdT(const scalar rho,const scalar T) const
 }
 
 
-//Real  deviative dv/dp at constant temperature 
+//Real  deviative dv/dp at constant temperature
 //(molar values)
-inline scalar aungierRedlichKwong::dvdp(const scalar rho,const scalar T)  const 
+inline scalar aungierRedlichKwong::dvdp(const scalar rho,const scalar T)  const
 {
     return 1/this->dpdv(rho,T);
 }
@@ -266,7 +266,7 @@ inline scalar aungierRedlichKwong::integral_p_dv
 //needed to calculate the entropy
 //(molar values)
 inline scalar aungierRedlichKwong::integral_dpdT_dv
-( 
+(
     const scalar rho,
     const scalar T
 ) const
@@ -300,10 +300,10 @@ inline scalar aungierRedlichKwong::d2pdv2(const scalar rho,const scalar T) const
 
 
 //(molar values)
-//using second order implicit differentiation 
+//using second order implicit differentiation
 inline scalar aungierRedlichKwong::d2vdT2(const scalar rho, const scalar T) const
 {
-    return 
+    return
     -(
           pow(this->dpdT(rho,T),2)*this->d2pdv2(rho,T)
         + pow(this->dpdv(rho,T),2)*this->d2pdT2(rho,T)
@@ -325,13 +325,13 @@ inline scalar aungierRedlichKwong::d2pdvdT(const scalar rho, const scalar T) con
 }
 
 
-// the result of this intergal is needed for the nasa based cp polynomial 
+// the result of this intergal is needed for the nasa based cp polynomial
 //(molar values)
 inline scalar aungierRedlichKwong::integral_d2pdT2_dv
 (
     const scalar rho,
     const scalar T
-) const 
+) const
 {
     scalar Vm = this->W()/rho;
     return d2adT2(T)*log(b()+Vm)/b()-d2adT2(T)*log(Vm)/b();
@@ -376,7 +376,7 @@ inline scalar aungierRedlichKwong::rho
    do
    {
        molarVolumePrevIteration= molarVolume;
-   
+
        label i=0;
        do
        {
@@ -387,7 +387,7 @@ inline scalar aungierRedlichKwong::rho
                )/pow(2,i);
 
            i++;
-           if (i>8) 
+           if (i>8)
            {
                //CL: using bisection methode as backup,
                //CL: solution must be between rho=0.001 to rho=1500;
@@ -402,7 +402,7 @@ inline scalar aungierRedlichKwong::rho
                    if ((f2 < 0 && f3 > 0) || (f2 > 0 && f3 < 0))
                    {
                        rho1=rho3;
-                   }  
+                   }
                    else if ((f1 < 0 && f3 > 0)||(f1 > 0 && f3 < 0))
                    {
                        rho2=rho3;
@@ -416,7 +416,7 @@ inline scalar aungierRedlichKwong::rho
                    {
                        molarVolume=this->W()/rho3;
                        molarVolumePrevIteration=this->W()/rho3;
-                       break; 
+                       break;
                    }
                    else
                    {

@@ -23,8 +23,8 @@ License
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 Description
-    IAPWS-IF97 (water) based thermodynamic class. Water properties calculated by freeSteam.    
-    
+    IAPWS-IF97 (water) based thermodynamic class. Water properties calculated by freeSteam.
+
     This code connects OpenFoam with freeSteam and provides the basic functions needed in OpenFOAM
 
     For more information about freeSteam and its authors have a look @ http://freesteam.sourceforge.net/example.php
@@ -35,7 +35,7 @@ SourceFiles
 Author
 Christian Lucas
 Institut für Thermodynamik
-Technische Universität Braunschweig 
+Technische Universität Braunschweig
 Germany
 \*---------------------------------------------------------------------------*/
 #ifndef IAPWSIF97_H
@@ -48,10 +48,10 @@ Germany
     #define EXTERN extern "C"
 #else
     #define EXTERN extern
-#endif 
+#endif
 
 
-//CL: 
+//CL:
 EXTERN double freesteam_p(SteamState S);
 EXTERN double freesteam_T(SteamState S);
 EXTERN double freesteam_rho(SteamState S);
@@ -143,42 +143,42 @@ namespace Foam
     void calculateProperties_pT
     (
         scalar &p,
-        scalar &T, 
-        scalar &h, 
-        scalar &rho, 
-        scalar &psi, 
-        scalar &drhodh, 
-        scalar &mu, 
+        scalar &T,
+        scalar &h,
+        scalar &rho,
+        scalar &psi,
+        scalar &drhodh,
+        scalar &mu,
         scalar &alpha
     );
 
     //CL: This function returns the same values as the function above for given p and T
     //CL: Additionally, the vapor mass fraction x is return
     //CL: NOTE: This function is only included to have the possibility to update x at the fixedValue (Temperature) BC
-    //CL: can only return x=0 and x=1 because it is not possible to describe the vapour dome with p and T 
+    //CL: can only return x=0 and x=1 because it is not possible to describe the vapour dome with p and T
     void calculateProperties_pT
     (
-        scalar &p, 
-        scalar &T, 
-        scalar &h, 
-        scalar &rho, 
-        scalar &psi, 
-        scalar &drhodh, 
-        scalar &mu, 
-        scalar &alpha, 
+        scalar &p,
+        scalar &T,
+        scalar &h,
+        scalar &rho,
+        scalar &psi,
+        scalar &drhodh,
+        scalar &mu,
+        scalar &alpha,
         scalar &x
     );
 
     //CL: This functions returns all (minimal) needed properties (p,T,h,rho,psi,drhodh,mu and alpha) for given p and h
     void calculateProperties_ph
     (
-        scalar &p, 
-        scalar &h, 
-        scalar &T, 
-        scalar &rho, 
-        scalar &psi, 
-        scalar &drhodh, 
-        scalar &mu, 
+        scalar &p,
+        scalar &h,
+        scalar &T,
+        scalar &rho,
+        scalar &psi,
+        scalar &drhodh,
+        scalar &mu,
         scalar &alpha
     );
 
@@ -186,14 +186,14 @@ namespace Foam
     //CL: Additionally, the vapor mass fraction x is return
     void calculateProperties_ph
     (
-        scalar &p, 
-        scalar &h, 
-        scalar &T, 
-        scalar &rho, 
-        scalar &psi, 
-        scalar &drhodh, 
-        scalar &mu, 
-        scalar &alpha, 
+        scalar &p,
+        scalar &h,
+        scalar &T,
+        scalar &rho,
+        scalar &psi,
+        scalar &drhodh,
+        scalar &mu,
+        scalar &alpha,
         scalar &x
     );
 

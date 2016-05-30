@@ -25,7 +25,7 @@ License
 Author
 Christian Lucas
 Institut für Thermodynamik
-Technische Universität Braunschweig 
+Technische Universität Braunschweig
 Germany
 
 
@@ -43,11 +43,11 @@ namespace Foam
 // Construct from components
 inline soaveRedlichKwong::soaveRedlichKwong
 (
-    const specie& sp   
+    const specie& sp
 )
 :
     specie(sp),
-    TSave(0)     
+    TSave(0)
 {}
 
 
@@ -107,15 +107,15 @@ inline scalar soaveRedlichKwong::a(const scalar T)const
 {
     //CL: check if a has already been calculated for this temperature
     if(TSave==T)
-    { 
-        return aSave;  
+    {
+        return aSave;
     }
     //CL: If not, recalculate a(T), dadT(T) and d2adT2(T)
     else
     {
         updateModelCoefficients(T);
         return aSave;
-    }     
+    }
 }
 
 
@@ -125,14 +125,14 @@ inline scalar soaveRedlichKwong::dadT(const scalar T)const
     // check if a has already been calculated for this temperature
     if(TSave==T)
     {
-        return daSave;  
+        return daSave;
     }
     //CL: If not, recalculate a(T), dadT(T) and d2adT2(T)
     else
     {
         updateModelCoefficients(T);
         return daSave;
-    }    
+    }
 }
 
 
@@ -142,14 +142,14 @@ inline scalar soaveRedlichKwong::d2adT2(const scalar T)const
     // check if a has already been calculated for this temperature
     if(TSave==T)
     {
-        return d2aSave;  
+        return d2aSave;
     }
     //CL: If not, recalculate a(T), dadT(T) and d2adT2(T)
     else
     {
         updateModelCoefficients(T);
         return d2aSave;
-    }    
+    }
 }
 
 
@@ -187,12 +187,12 @@ inline scalar soaveRedlichKwong::b5()const
 }
 
 
-//returns the pressure for a given density and temperature    
+//returns the pressure for a given density and temperature
 inline scalar soaveRedlichKwong::p(const scalar rho,const scalar T) const
 {
     scalar Vm = this->W()/rho;
 
-    return 
+    return
     (
         this->RR()*T/(Vm-b_)
         -a(T)/(Vm*(Vm+b_))
@@ -200,29 +200,29 @@ inline scalar soaveRedlichKwong::p(const scalar rho,const scalar T) const
 }
 
 
-//Real deviative dp/dv at constant temperature 
+//Real deviative dp/dv at constant temperature
 //(molar values)
 inline scalar soaveRedlichKwong::dpdv(const scalar rho, const scalar T) const
 {
     scalar Vm = this->W()/rho;
     scalar Vm2 = Vm*Vm;
 
-    return 
+    return
     (
         a(T)*(b3()-3*b_*Vm2+2*pow(Vm,3))
         -this->RR()*T*Vm2*(b2()+2*b_*Vm+Vm2)
     )
-    /(Vm2*pow(b_+Vm,2)*pow(b_-Vm,2));   
+    /(Vm2*pow(b_+Vm,2)*pow(b_-Vm,2));
 }
 
 
-//Real deviative dp/dT at constant molar volume 
+//Real deviative dp/dT at constant molar volume
 //(molar values)
 inline scalar soaveRedlichKwong::dpdT(const scalar rho, const scalar T) const
 {
     scalar Vm = this->W()/rho;
- 
-    return 
+
+    return
     (
         this->RR()/(Vm-b_)
         -dadT(T)/(Vm*(Vm+b_))
@@ -239,20 +239,20 @@ inline scalar soaveRedlichKwong::dvdT(const scalar rho,const scalar T) const
 }
 
 
-//Real  deviative dv/dp at constant temperature 
+//Real  deviative dv/dp at constant temperature
 //(molar values)
-inline scalar soaveRedlichKwong::dvdp(const scalar rho,const scalar T)  const 
+inline scalar soaveRedlichKwong::dvdp(const scalar rho,const scalar T)  const
 {
     return 1/this->dpdv(rho,T);
 }
 
 
-//needed to calculate the internal energy 
+//needed to calculate the internal energy
 //(molar values)
 inline scalar soaveRedlichKwong::integral_p_dv(const scalar rho,const scalar T) const
 {
     scalar Vm = this->W()/rho;
- 
+
     return this->RR()*T*log(Vm-b_)+a(T)*log(b_+Vm)/b_-a(T)*log(Vm)/b_;
 }
 
@@ -276,14 +276,14 @@ inline scalar soaveRedlichKwong::d2pdT2(const scalar rho,const scalar T) const
 }
 
 
-//(molar values) 
+//(molar values)
 inline scalar soaveRedlichKwong::d2pdv2(const scalar rho,const scalar T) const
 {
     scalar Vm = this->W()/rho;
     scalar Vm2 = Vm*Vm;
     scalar Vm3 = Vm*Vm*Vm;
 
-    return 
+    return
     2*
     (
         a(T)*
@@ -295,15 +295,15 @@ inline scalar soaveRedlichKwong::d2pdv2(const scalar rho,const scalar T) const
             b3()+3*b2()*Vm+3*b_*Vm2+Vm3
         )
     )
-    /(Vm3*pow(b_+Vm,3)*pow(Vm-b_,3));   
+    /(Vm3*pow(b_+Vm,3)*pow(Vm-b_,3));
 }
 
 
 //(molar values)
-// using second Order implicit differentiation 
+// using second Order implicit differentiation
 inline scalar soaveRedlichKwong::d2vdT2(const scalar rho, const scalar T) const
 {
-    return 
+    return
     -(
           pow(this->dpdT(rho,T),2)*this->d2pdv2(rho,T)
         + pow(this->dpdv(rho,T),2)*this->d2pdT2(rho,T)
@@ -319,19 +319,19 @@ inline scalar soaveRedlichKwong::d2pdvdT(const scalar rho, const scalar T) const
     scalar Vm = this->W()/rho;
     scalar Vm2 = Vm*Vm;
 
-    return 
+    return
     (
         dadT(T)*(b3()-3*b_*Vm2+2*pow(Vm,3))
         -this->RR()*Vm2*(b2()+2*b_*Vm+Vm2)
     )
-    /(Vm2*pow(b_+Vm,2)*pow(b_-Vm,2)); 
+    /(Vm2*pow(b_+Vm,2)*pow(b_-Vm,2));
 }
 
 
-// the result of this intergal is needed for the nasa based cp polynomial 
+// the result of this intergal is needed for the nasa based cp polynomial
 //(molar values)
-inline scalar soaveRedlichKwong::integral_d2pdT2_dv(const scalar rho,const scalar T) const 
-{    
+inline scalar soaveRedlichKwong::integral_d2pdT2_dv(const scalar rho,const scalar T) const
+{
     scalar Vm = this->W()/rho;
 
     return d2adT2(T)*log(b_+Vm)/b_-d2adT2(T)*log(Vm)/b_;
@@ -361,7 +361,7 @@ inline scalar soaveRedlichKwong::rho(
     const scalar rho0
 ) const
 {
- 
+
    scalar molarVolumePrevIteration;
    scalar molarVolume;
    label iter=0;
@@ -375,7 +375,7 @@ inline scalar soaveRedlichKwong::rho(
    do
    {
        molarVolumePrevIteration= molarVolume;
-   
+
        label i=0;
        do
        {
@@ -386,7 +386,7 @@ inline scalar soaveRedlichKwong::rho(
                )/pow(2,i);
 
            i++;
-           if (i>8) 
+           if (i>8)
            {
                //CL: using bisection methode as backup,
                //CL: solution must be between rho=0.001 to rho=1500;
@@ -401,11 +401,11 @@ inline scalar soaveRedlichKwong::rho(
                    if ((f2 < 0 && f3 > 0) || (f2 > 0 && f3 < 0))
                    {
                        rho1=rho3;
-                   }  
+                   }
                    else if ((f1 < 0 && f3 > 0)||(f1 > 0 && f3 < 0))
                    {
                        rho2=rho3;
-                   } 
+                   }
                    else
                    {
                        rho2=(rho2 + rho3)/2;
@@ -415,7 +415,7 @@ inline scalar soaveRedlichKwong::rho(
                    {
                        molarVolume=this->W()/rho3;
                        molarVolumePrevIteration=this->W()/rho3;
-                       break; 
+                       break;
                    }
                    else
                    {
@@ -444,7 +444,7 @@ inline scalar soaveRedlichKwong::rho(
    return this->W()/molarVolume;
 }
 
-//- Return density [kg/m^3]on 
+//- Return density [kg/m^3]on
 inline scalar soaveRedlichKwong::rho(const scalar p,const scalar T) const
 {
     //CL: using perfect gas equation as starting point

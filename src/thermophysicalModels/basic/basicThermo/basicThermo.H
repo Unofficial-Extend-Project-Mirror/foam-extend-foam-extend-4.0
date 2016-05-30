@@ -247,7 +247,7 @@ public:
             //- Thermal diffusivity for enthalpy of mixture [kg/m/s]
             virtual const volScalarField& alpha() const;
 
-       
+
         //- Read thermophysicalProperties dictionary
         virtual bool read();
 };

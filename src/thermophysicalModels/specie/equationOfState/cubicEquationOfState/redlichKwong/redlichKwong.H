@@ -35,7 +35,7 @@ SourceFiles
 Author
 Christian Lucas
 Institut für Thermodynamik
-Technische Universität Braunschweig 
+Technische Universität Braunschweig
 Germany
 
 \*---------------------------------------------------------------------------*/
@@ -65,7 +65,7 @@ protected:
 
     // Protected data
     scalar pcrit_;
-    scalar Tcrit_; 
+    scalar Tcrit_;
 
     //-Redlich Kwong factors
     mutable scalar a_;
@@ -84,7 +84,7 @@ protected:
     mutable scalar rhostd_;
 
 public:
-  
+
     // Constructors
 
         //- Construct from components
@@ -127,22 +127,22 @@ public:
         inline scalar b5()const;
 
 
-        //first order derivatives 
+        //first order derivatives
         inline scalar dpdv(const scalar rho, const  scalar T) const;
 
         inline scalar dpdT(const scalar rho, const scalar T) const;
 
         inline scalar dvdT(const scalar rho, const  scalar T) const;
 
-        inline scalar dvdp(const scalar rho, const scalar T) const; 
+        inline scalar dvdp(const scalar rho, const scalar T) const;
 
-        inline scalar isobarExpCoef(const scalar rho, const  scalar T) const; 
+        inline scalar isobarExpCoef(const scalar rho, const  scalar T) const;
 
         inline scalar isothermalCompressiblity
         (
             const scalar rho,
             const scalar T
-        ) const; 
+        ) const;
 
         // Used for cv
         inline scalar integral_d2pdT2_dv
@@ -152,7 +152,7 @@ public:
         ) const;
 
         //Used for internal Energy
-        inline scalar integral_p_dv(const scalar rho, const scalar T) const;  
+        inline scalar integral_p_dv(const scalar rho, const scalar T) const;
 
         // Used for Entropy
         inline scalar integral_dpdT_dv(const scalar rho, const scalar T) const;
@@ -177,7 +177,7 @@ public:
 
         inline scalar rho(const scalar p, const scalar T) const;
 
-        //- Return compressibility drho/dp at T=constant [s^2/m^2]  
+        //- Return compressibility drho/dp at T=constant [s^2/m^2]
         inline scalar psi(const scalar rho, const scalar T) const;
 
         //- Return compression factor []
@@ -198,7 +198,7 @@ public:
     // Member operators
 
         inline void operator+=(const redlichKwong&);
-/*        
+/*
         inline void operator-=(const redlichKwong&);
         inline void operator*=(const scalar);
 */

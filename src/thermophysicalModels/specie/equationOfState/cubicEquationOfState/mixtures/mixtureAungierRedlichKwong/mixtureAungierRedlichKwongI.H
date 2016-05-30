@@ -25,7 +25,7 @@ License
 Author
 Christian Lucas
 Institut für Thermodynamik
-Technische Universität Braunschweig 
+Technische Universität Braunschweig
 Germany
 
 \*---------------------------------------------------------------------------*/
@@ -51,14 +51,14 @@ inline mixtureAungierRedlichKwong::mixtureAungierRedlichKwong
     scalar rhoMax
 )
 :
-    aungierRedlichKwong(sp),    
+    aungierRedlichKwong(sp),
     Vcrit_(Vcrit),
     Zcrit_(Zcrit)
 {
     //CL: Saving critical data
     Tcrit_=Tcrit;
-    pcrit_=Zcrit*this->RR*Tcrit/Vcrit;  
-    rhocrit_=this->W()/Vcrit_;    
+    pcrit_=Zcrit*this->RR*Tcrit/Vcrit;
+    rhocrit_=this->W()/Vcrit_;
     azentricFactor_=azentricFactor;
 
     //CL: calculating the aungier redlich kwong coefficience
@@ -71,7 +71,7 @@ inline mixtureAungierRedlichKwong::mixtureAungierRedlichKwong
     rhoMin_=rhoMin;
     rhoMax_=rhoMax;
 
-    //CL: 
+    //CL:
     b2_=pow(b_,2);
     b3_=pow(b_,3);
     b4_=pow(b_,4);
@@ -128,7 +128,7 @@ inline void mixtureAungierRedlichKwong::operator+=(const mixtureAungierRedlichKw
     Vcrit_=molr1*Vcrit_+molr2*pr.Vcrit_;
     pcrit_=Zcrit_*this->RR*Tcrit_/Vcrit_;
     rhocrit_=this->W()/Vcrit_;
-    
+
     //CL: calculating new azentric factor
     azentricFactor_=molr1*azentricFactor_+molr2*pr.azentricFactor_;
 
@@ -142,7 +142,7 @@ inline void mixtureAungierRedlichKwong::operator+=(const mixtureAungierRedlichKw
     c_=this->RR*Tcrit_/(pcrit_+(a0_/(this->W()/rhocrit_*(this->W()/rhocrit_+b_))))+b_-this->W()/rhocrit_;
     n_=0.4986+1.2735*azentricFactor_+0.4754*pow(azentricFactor_,2);
 
-    //CL: 
+    //CL:
     b2_=pow(b_,2);
     b3_=pow(b_,3);
     b4_=pow(b_,4);
@@ -195,11 +195,11 @@ inline mixtureAungierRedlichKwong operator*
     return mixtureAungierRedlichKwong
            (
                s*static_cast<const aungierRedlichKwong&>(pr),
-               pr.Tcrit_, 
-               pr.azentricFactor_, 
-               pr.Vcrit_, 
-               pr.Zcrit_, 
-               pr.rhoMin_, 
+               pr.Tcrit_,
+               pr.azentricFactor_,
+               pr.Vcrit_,
+               pr.Zcrit_,
+               pr.rhoMin_,
                pr.rhoMax_
            );
 }

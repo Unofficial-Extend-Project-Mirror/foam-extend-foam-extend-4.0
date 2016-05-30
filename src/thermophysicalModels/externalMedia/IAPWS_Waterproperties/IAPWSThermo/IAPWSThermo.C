@@ -25,7 +25,7 @@ License
 Author
 Christian Lucas
 Institut für Thermodynamik
-Technische Universität Braunschweig 
+Technische Universität Braunschweig
 Germany
 
 \*---------------------------------------------------------------------------*/
@@ -45,21 +45,21 @@ void Foam::IAPWSThermo::calculate()
     scalarField& drhodhCells = this->drhodh_.internalField();
     scalarField& muCells = this->mu_.internalField();
     scalarField& alphaCells = this->alpha_.internalField();
-    
+
     //CL: Updating all cell properties
     //CL: loop through all cells
     forAll(TCells, celli)
-    { 
+    {
         //CL: see IAPWAS-IF97.H
         calculateProperties_ph
         (
-            pCells[celli], 
-            hCells[celli], 
-            TCells[celli], 
-            rhoCells[celli], 
-            psiCells[celli], 
-            drhodhCells[celli], 
-            muCells[celli], 
+            pCells[celli],
+            hCells[celli],
+            TCells[celli],
+            rhoCells[celli],
+            psiCells[celli],
+            drhodhCells[celli],
+            muCells[celli],
             alphaCells[celli]
         );
     }
@@ -84,13 +84,13 @@ void Foam::IAPWSThermo::calculate()
                 //CL: see IAPWAS-IF97.H
                 calculateProperties_pT
                 (
-                    pp[facei], 
-                    pT[facei], 
-                    ph[facei], 
-                    prho[facei], 
-                    ppsi[facei], 
-                    pdrhodh[facei], 
-                    pmu[facei],  
+                    pp[facei],
+                    pT[facei],
+                    ph[facei],
+                    prho[facei],
+                    ppsi[facei],
+                    pdrhodh[facei],
+                    pmu[facei],
                     palpha[facei]
                 );
             }
@@ -103,13 +103,13 @@ void Foam::IAPWSThermo::calculate()
                 //CL: see IAPWAS-IF97.H
                 calculateProperties_ph
                 (
-                    pp[facei], 
-                    ph[facei], 
-                    pT[facei], 
-                    prho[facei], 
-                    ppsi[facei], 
-                    pdrhodh[facei], 
-                    pmu[facei],  
+                    pp[facei],
+                    ph[facei],
+                    pT[facei],
+                    prho[facei],
+                    ppsi[facei],
+                    pdrhodh[facei],
+                    pmu[facei],
                     palpha[facei]
                 );
             }
@@ -143,7 +143,7 @@ Foam::IAPWSThermo::IAPWSThermo
         dimensionSet(0, 2, -2, 0, 0),
         this->hBoundaryTypes()
     ),
-    
+
     rho_
     (
         IOobject
@@ -186,18 +186,18 @@ Foam::IAPWSThermo::IAPWSThermo
     forAll(h_.boundaryField(), patchi)
     {
         h_.boundaryField()[patchi] ==
-            h(this->T_.boundaryField()[patchi], patchi);                    
+            h(this->T_.boundaryField()[patchi], patchi);
     }
 
     forAll(rhoCells, celli)
     {
-        rhoCells[celli] = rho_pT(pCells[celli],TCells[celli]); 
+        rhoCells[celli] = rho_pT(pCells[celli],TCells[celli]);
     }
 
     forAll(rho_.boundaryField(), patchi)
     {
         rho_.boundaryField()[patchi] ==
-            rho(this->p_.boundaryField()[patchi] ,this->h_.boundaryField()[patchi], patchi);  
+            rho(this->p_.boundaryField()[patchi] ,this->h_.boundaryField()[patchi], patchi);
     }
 
     hBoundaryCorrection(h_);
@@ -256,7 +256,7 @@ Foam::tmp<Foam::scalarField> Foam::IAPWSThermo::h
     }
 
     return th;
-} 
+}
 
 
 Foam::tmp<Foam::scalarField> Foam::IAPWSThermo::h
@@ -273,7 +273,7 @@ Foam::tmp<Foam::scalarField> Foam::IAPWSThermo::h
 
     forAll(T, facei)
     {
-        h[facei] =  h_pT(pp[facei], T[facei]); 
+        h[facei] =  h_pT(pp[facei], T[facei]);
     }
 
     return th;
@@ -365,7 +365,7 @@ Foam::tmp<Foam::volScalarField> Foam::IAPWSThermo::Cp() const
 }
 
 
-//CL: Returns an updated field for rho 
+//CL: Returns an updated field for rho
 Foam::tmp<Foam::volScalarField> Foam::IAPWSThermo::rho() const
 {
     const fvMesh& mesh = this->p_.mesh();

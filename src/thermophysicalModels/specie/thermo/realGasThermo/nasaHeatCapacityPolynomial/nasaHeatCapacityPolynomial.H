@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | 
+    \\  /    A nd           |
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -26,13 +26,13 @@ Class
     Foam::nasaHeatCapacityPolynomial
 
 Description
-    Nasa Heat Capacity Polynomial for perfect Gas (7.order polynominal) --> freely available for many fluids    
-    --> paper title: NASA Glenn Coefficients for Calculating Thermodynamic Properties of Individual Species 
+    Nasa Heat Capacity Polynomial for perfect Gas (7.order polynominal) --> freely available for many fluids
+    --> paper title: NASA Glenn Coefficients for Calculating Thermodynamic Properties of Individual Species
 
     templated into the equationOfState
     -> uses the equation of state to calculate all real Gas properties like Enthalpy, Entropy ...
     -> can not be used with the perfectGas equation of state
-   
+
     Equations for the real gas correction: Have a look at thermodnamics books e.g. Thermodynamics: An Engineering Approch, 5 Edition, Chapter 12
 
 SourceFiles
@@ -42,7 +42,7 @@ SourceFiles
 Author
 Christian Lucas
 Institut für Thermodynamik
-Technische Universität Braunschweig 
+Technische Universität Braunschweig
 Germany
 
 \*---------------------------------------------------------------------------*/
@@ -174,7 +174,7 @@ public:
         inline static autoPtr<nasaHeatCapacityPolynomial> New(Istream& is);
 
     // Member Functions
-        
+
         //- perfect Gas Enthalpy [J/kmol]
         inline scalar h0(const scalar T) const;
 

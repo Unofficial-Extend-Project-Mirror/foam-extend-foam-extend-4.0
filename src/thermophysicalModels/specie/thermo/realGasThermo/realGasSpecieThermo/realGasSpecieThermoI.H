@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | 
+    \\  /    A nd           |
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -25,7 +25,7 @@ License
 Author
 Christian Lucas
 Institut für Thermodynamik
-Technische Universität Braunschweig 
+Technische Universität Braunschweig
 Germany
 
 
@@ -75,18 +75,18 @@ inline void Foam::realGasSpecieThermo<thermo>::T
         i=0;
 
         do
-        {   
-            //CL: using a stabilizing newton solver 
+        {
+            //CL: using a stabilizing newton solver
             //CL: if the solve is diverging, the step is reduced until the solver converges
-            Tnew = Test - ((this->*F)(rho,Test) - f)/(this->*dFdT)(rho,Test)/(pow(2,i)); 
+            Tnew = Test - ((this->*F)(rho,Test) - f)/(this->*dFdT)(rho,Test)/(pow(2,i));
             i++;
         }while
         (
             (i<20)
             &&
             ((
-                mag((this->*F)(rho,Tnew) - f) 
-                > 
+                mag((this->*F)(rho,Tnew) - f)
+                >
                 mag((this->*F)(rho,Test) - f)
             ))
         );
@@ -104,7 +104,7 @@ inline void Foam::realGasSpecieThermo<thermo>::T
         }
     } while
     //CL: both fields must converge
-    ( 
+    (
         (mag(mag(Tnew) - mag(Test)) > Ttol)
         ||
         (mag(mag(rho) - mag(rhoOld)) > rhotol)
@@ -206,12 +206,12 @@ inline Foam::scalar Foam::realGasSpecieThermo<thermo>::psiH
 (
     const scalar rho,
     const scalar T
-    
+
 ) const
 {
     scalar beta=this->isobarExpCoef(rho,T);
 
-    return  
+    return
     -(
         (T*beta*beta-beta)/this->Cp(rho,T)
         -this->isothermalCompressiblity(rho,T)*rho
@@ -225,14 +225,14 @@ inline Foam::scalar Foam::realGasSpecieThermo<thermo>::psiE
 (
     const scalar rho,
     const scalar T
-    
+
 ) const
 {
     scalar V = 1/rho;
     scalar cp=this->Cp(rho,T);
     scalar beta=this->isobarExpCoef(rho,T);
 
-    return  
+    return
     -(
         (
         T*pow(beta,2)*V
@@ -246,27 +246,27 @@ inline Foam::scalar Foam::realGasSpecieThermo<thermo>::psiE
     );
 }
 
-//CL:- Returns drho/dH at p=constant 
+//CL:- Returns drho/dH at p=constant
 //CL:- using Bridgeman's Table
 template<class thermo>
 inline Foam::scalar Foam::realGasSpecieThermo<thermo>::drhodH
 (
     const scalar rho,
     const scalar T
-    
+
 ) const
 {
     return -(rho*this->isobarExpCoef(rho,T))/this->Cp(rho,T);
 }
 
-//CL:- Returns drho/dE at p=constant 
+//CL:- Returns drho/dE at p=constant
 //CL:- using Bridgeman's Table
 template<class thermo>
 inline Foam::scalar Foam::realGasSpecieThermo<thermo>::drhodE
 (
     const scalar rho,
     const scalar T
-    
+
 ) const
 {
     scalar beta=this->isobarExpCoef(rho,T);

@@ -25,7 +25,7 @@ License
 Author
 Christian Lucas
 Institut für Thermodynamik
-Technische Universität Braunschweig 
+Technische Universität Braunschweig
 Germany
 
 \*---------------------------------------------------------------------------*/
@@ -40,7 +40,7 @@ namespace Foam
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 // Construct from components
-// CL: needed for operator* 
+// CL: needed for operator*
 inline mixturePengRobinson::mixturePengRobinson
 (
     const pengRobinson& pr,
@@ -55,7 +55,7 @@ inline mixturePengRobinson::mixturePengRobinson
     scalar rhoMin,
     scalar rhoMax
 )
-: 
+:
     pengRobinson(pr),
     singleComponent(1),
     weigths(weigths),
@@ -64,7 +64,7 @@ inline mixturePengRobinson::mixturePengRobinson
 {
     a0_=a0;
     b_=b;
-    Tcrit_=Tcrit; 
+    Tcrit_=Tcrit;
     n_=n;
     rhostd_=rhostd;
     rhoMin_=rhoMin;
@@ -82,12 +82,12 @@ inline mixturePengRobinson::mixturePengRobinson
     scalar rhoMin,
     scalar rhoMax
 )
-: 
+:
     pengRobinson(pr),
     singleComponent(0),
     weigths(weigths),
     mixtureComponents(mixtureComponents),
-    numOfComp(numOfComp)    
+    numOfComp(numOfComp)
 {
     TSave=0.0;
     rhoMin_=rhoMin;
@@ -120,23 +120,23 @@ inline autoPtr<mixturePengRobinson> mixturePengRobinson::New(Istream& is)
 //CL: updates the coefficents of the model after the construction of the mixture
 //CL: uses the van der waals mixing rule
 inline void mixturePengRobinson::updateModelCoefficients(const  scalar T) const
-{  
-    // CL: to make sure that the coefficents are only updated if the mixture has more than 1 component 
+{
+    // CL: to make sure that the coefficents are only updated if the mixture has more than 1 component
     if (singleComponent==0)
-    {    
+    {
         // Checking if the mixture coefficient were already calculated for this temperature
         if(TSave!=T)
         {
             label i,j,k;
- 
+
             aSave=0;
             daSave=0;
             d2aSave=0;
             b_=0;
 
             for (i=0;i<numOfComp;i++)
-            { 
-                //CL: getting a(T), dadT(T) and d2adT2(T) for the mixture 
+            {
+                //CL: getting a(T), dadT(T) and d2adT2(T) for the mixture
                 //CL: using van der waals mixing rule
                 for (j=0;j<numOfComp;j++)
                 {
@@ -144,22 +144,22 @@ inline void mixturePengRobinson::updateModelCoefficients(const  scalar T) const
                     //CL: use mixture correction cofficients k_ij (see paper reference)
                     if(mixtureComponents[0]->realMixtureCorr_==true)
                     {
-                        // first and second order temperature derivative of the van der waals mixing rule for a(T) 
+                        // first and second order temperature derivative of the van der waals mixing rule for a(T)
                         if(i==j)
                         {
                             aSave=aSave+amix(T,i,j);
                             daSave=daSave+dadTmix(T,i,j);
                             d2aSave=d2aSave+d2adT2mix(T,i,j);
                         }
-                        else 
+                        else
                         {
                             //CL: gives the position of the correction factor in the vector realMixtureCorrCoef_
                             k=i+j-1;
 
                             aSave=aSave+amix(T,i,j)*(1-mixtureComponents[0]->realMixtureCorrCoef_[k]);
                             daSave=daSave+dadTmix(T,i,j)*(1-mixtureComponents[0]->realMixtureCorrCoef_[k]);
-                            d2aSave=d2aSave+d2adT2mix(T,i,j)*(1-mixtureComponents[0]->realMixtureCorrCoef_[k]);  
-                        }    
+                            d2aSave=d2aSave+d2adT2mix(T,i,j)*(1-mixtureComponents[0]->realMixtureCorrCoef_[k]);
+                        }
 
                     }
                     else
@@ -167,17 +167,17 @@ inline void mixturePengRobinson::updateModelCoefficients(const  scalar T) const
                         aSave=aSave+amix(T,i,j);
                         daSave=daSave+dadTmix(T,i,j);
                         d2aSave=d2aSave+d2adT2mix(T,i,j);
-                    }           
+                    }
                 }
 
-                //CL: getting b for the mixture 
+                //CL: getting b for the mixture
                 //CL: using van der waals mixing rule
                 b_=b_+weigths[i]*mixtureComponents[i]->b()*this->W();
 
                 //CL: saving the temperature at which the mixture coefficients are valid
                 TSave=T;
             }
- 
+
             b2_=b_*b_;
             b3_=pow(b_,3);
             b4_=pow(b_,4);
@@ -229,7 +229,7 @@ inline scalar mixturePengRobinson::d2adT2mix(const scalar T, const label i, cons
 
 
 
-//returns the pressure for a given density and temperature    
+//returns the pressure for a given density and temperature
 inline scalar mixturePengRobinson::p(const scalar rho, const scalar T) const
 {
     updateModelCoefficients(T);
@@ -237,7 +237,7 @@ inline scalar mixturePengRobinson::p(const scalar rho, const scalar T) const
 }
 
 
-//Real deviative dp/dv at constant temperature 
+//Real deviative dp/dv at constant temperature
 //(molar values)
 inline scalar mixturePengRobinson::dpdv(const scalar rho, const scalar T) const
 {
@@ -246,7 +246,7 @@ inline scalar mixturePengRobinson::dpdv(const scalar rho, const scalar T) const
 }
 
 
-//Real deviative dp/dT at constant molar volume 
+//Real deviative dp/dT at constant molar volume
 //(molar values)
 inline scalar mixturePengRobinson::dpdT(const scalar rho, const scalar T) const
 {
@@ -255,7 +255,7 @@ inline scalar mixturePengRobinson::dpdT(const scalar rho, const scalar T) const
 }
 
 
-//Real  deviative dv/dT at constant pressure 
+//Real  deviative dv/dT at constant pressure
 //(molar values)
 inline scalar mixturePengRobinson::dvdT(const scalar rho, const scalar T) const
 {
@@ -264,7 +264,7 @@ inline scalar mixturePengRobinson::dvdT(const scalar rho, const scalar T) const
 }
 
 
-//Real  deviative dv/dp at constant temperature 
+//Real  deviative dv/dp at constant temperature
 //(molar values)
 inline scalar mixturePengRobinson::dvdp(const scalar rho, const scalar T)  const
 {
@@ -280,7 +280,7 @@ inline scalar mixturePengRobinson::integral_p_dv
     const scalar rho,
     const scalar T
 ) const
-{ 
+{
     updateModelCoefficients(T);
     return pengRobinson::integral_p_dv(rho,T);
 }
@@ -304,7 +304,7 @@ inline scalar mixturePengRobinson::d2pdT2(const scalar rho, const scalar T) cons
 {
     updateModelCoefficients(T);
     return pengRobinson::d2pdT2(rho,T);
-} 
+}
 
 
 //(molar values)
@@ -331,7 +331,7 @@ inline scalar mixturePengRobinson::d2pdvdT(const scalar rho, const scalar T) con
 }
 
 
-// the result of this intergal is needed for the nasa based cp polynomial 
+// the result of this intergal is needed for the nasa based cp polynomial
 //(molar values)
 inline scalar mixturePengRobinson::integral_d2pdT2_dv
 (
@@ -370,7 +370,7 @@ inline scalar mixturePengRobinson::isothermalCompressiblity
 }
 
 
-//- Return density [kg/m^3]on 
+//- Return density [kg/m^3]on
 inline scalar mixturePengRobinson::rho
 (
     const scalar p,
@@ -383,7 +383,7 @@ inline scalar mixturePengRobinson::rho
 }
 
 
-//- Return density [kg/m^3]on 
+//- Return density [kg/m^3]on
 inline scalar mixturePengRobinson::rho(const scalar p, const scalar T) const
 {
     updateModelCoefficients(T);
@@ -422,9 +422,9 @@ inline void mixturePengRobinson::operator+=(const mixturePengRobinson& pr)
         weigths.setSize(2*numOfComp);
         mixtureComponents.setSize(2*numOfComp);
     }
-  
-    //Cl: oldClass+=pr 
-    //CL: Saving the object pointer and weigths of pr (which is @ mixtureComponents[0] and weigths[0]) at the numOfComp's value of the oldClass 
+
+    //Cl: oldClass+=pr
+    //CL: Saving the object pointer and weigths of pr (which is @ mixtureComponents[0] and weigths[0]) at the numOfComp's value of the oldClass
     weigths[numOfComp]=pr.weigths[0];
     mixtureComponents[numOfComp]=pr.mixtureComponents[0];
 
@@ -465,7 +465,7 @@ inline mixturePengRobinson operator+
         mixtureComponents.setSize(2*pr1.numOfComp);
     }
 
-    //CL: Getting the new weigths and mixtureComponents lists, 
+    //CL: Getting the new weigths and mixtureComponents lists,
     //CL: Saving the object pointer and weigths of pr2 (which is @ mixtureComponents[0] and weigths[0]) at the numOfComp's value of the new object
     weigths[pr1.numOfComp]=pr2.weigths[0];
     mixtureComponents[pr1.numOfComp]=pr2.mixtureComponents[0];
@@ -484,7 +484,7 @@ inline mixturePengRobinson operator*
     //CL: saving the "concentraction" of the component of the mixture in the vector weights
     //CL: saved at the Position "numOfComp-1"
     DynamicList<scalar> weigths=pr.weigths;
-    weigths[pr.numOfComp-1]=s*pr.nMoles(); 
+    weigths[pr.numOfComp-1]=s*pr.nMoles();
 
    return mixturePengRobinson(s*static_cast<const pengRobinson&>(pr), pr.numOfComp, weigths,
        pr.mixtureComponents,pr.a0_,pr.b_,pr.Tcrit_,pr.n_,pr.rhostd_, pr.rhoMin_, pr.rhoMax_);

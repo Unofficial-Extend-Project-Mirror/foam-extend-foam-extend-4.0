@@ -40,7 +40,7 @@ SourceFiles
 Author
 Christian Lucas
 Institut für Thermodynamik
-Technische Universität Braunschweig 
+Technische Universität Braunschweig
 Germany
 
 \*---------------------------------------------------------------------------*/
@@ -70,7 +70,7 @@ protected:
 
     // Private data
         scalar pcrit_;
-        scalar Tcrit_; 
+        scalar Tcrit_;
         scalar azentricFactor_;
         scalar rhocrit_;
 
@@ -105,10 +105,10 @@ protected:
 
     //Protected functions
     //CL: function updates the coefficients (aSave, daSave, d2aSave)
-    inline void updateModelCoefficients(const  scalar T) const; 
+    inline void updateModelCoefficients(const  scalar T) const;
 
 public:
-  
+
 
     // Constructors
 
@@ -170,46 +170,46 @@ public:
         //CL: Equation of state
         inline scalar p(const scalar rho, const scalar T) const;
 
-        //CL: first order derivatives 
+        //CL: first order derivatives
         inline scalar dpdv(const scalar rho, const  scalar T) const;
 
         inline scalar dpdT(const scalar rho, const scalar T) const;
 
         inline scalar dvdT(const scalar rho, const  scalar T) const;
 
-        inline scalar dvdp(const scalar rho, const scalar T) const; 
+        inline scalar dvdp(const scalar rho, const scalar T) const;
 
-        inline scalar isobarExpCoef(const scalar rho, const  scalar T) const; 
+        inline scalar isobarExpCoef(const scalar rho, const  scalar T) const;
 
         inline scalar isothermalCompressiblity
         (
             const scalar rho,
             const scalar T
-        ) const; 
-        
+        ) const;
+
         //CL: Used for cv
         inline scalar integral_d2pdT2_dv
         (
             const scalar rho,
             const scalar T
-        ) const ; 
+        ) const ;
 
         //CL: second order derivatives, not Used At The Moment
-        inline scalar d2pdv2(const scalar rho, const  scalar T) const;    
+        inline scalar d2pdv2(const scalar rho, const  scalar T) const;
 
-        inline scalar d2pdT2(const scalar rho,   scalar T) const;    
+        inline scalar d2pdT2(const scalar rho,   scalar T) const;
 
-        inline scalar d2pdvdT(const scalar rho, const  scalar T) const;    
+        inline scalar d2pdvdT(const scalar rho, const  scalar T) const;
 
-        inline scalar d2vdT2(const scalar rho, const  scalar T) const;    
+        inline scalar d2vdT2(const scalar rho, const  scalar T) const;
 
         //CL: Used for internal Energy
         inline scalar integral_p_dv(const scalar rho, const  scalar T) const;
 
         //CL: Used for Entropy
-        inline scalar integral_dpdT_dv(const scalar rho, const  scalar T) const;  
+        inline scalar integral_dpdT_dv(const scalar rho, const  scalar T) const;
 
-        //- Return density [kg/m^3] 
+        //- Return density [kg/m^3]
         // rho0 is the starting point of the newton solver used to calculate rho
         inline scalar rho
         (
@@ -217,8 +217,8 @@ public:
             const scalar T,
             const scalar rho0
         ) const;
- 
-        inline scalar rho(const scalar p, const  scalar T) const; 
+
+        inline scalar rho(const scalar p, const  scalar T) const;
 
         //- Return compressibility drho/dp at T=constant [s^2/m^2]
         inline scalar psi(const scalar rho, const scalar T) const;
@@ -227,7 +227,7 @@ public:
         inline scalar Z
         (
             const scalar p,
-            const scalar T, 
+            const scalar T,
             const scalar rho0
         ) const;
 

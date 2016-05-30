@@ -41,7 +41,7 @@ SourceFiles
 Author
 Christian Lucas
 Institut für Thermodynamik
-Technische Universität Braunschweig 
+Technische Universität Braunschweig
 Germany
 
 \*---------------------------------------------------------------------------*/
@@ -77,33 +77,33 @@ protected:
 
     //CL: bool used to make sure the model behaves like a single component model when needed
     //CL: this is needed during the construction of the mixture
-    mutable bool singleComponent;    
-  
+    mutable bool singleComponent;
+
     //CL: save the concentrations of each component of the mixture
     //CL: needs to be multiplied by this->W() to get the molar fractions
     mutable DynamicList<scalar> weigths;
-    
+
     //CL: saves a pointer to the pure component classes of the mixture
     mutable DynamicList<mixtureSoaveRedlichKwong*> mixtureComponents;
-   
+
     //CL: counts the number of components
     mutable label numOfComp;
 
     //Protected functions
 
-    //CL: function updates the coefficients (aSave, daSave, d2aSave, b) of the mixture 
-    inline void updateModelCoefficients(const  scalar T) const; 
+    //CL: function updates the coefficients (aSave, daSave, d2aSave, b) of the mixture
+    inline void updateModelCoefficients(const  scalar T) const;
 
     //CL: Variables used in real gas mixture correction
 
         //CL: If true, the real gas mixture correction is used
         mutable bool  realMixtureCorr_;
- 
+
         //CL: number of mixture components, needed to calculate the mixture correction factors needed
         //CL: do not mistake this variable with numOfComp,
         //CL: numOfComp is a counter to counts the number of components while the mixture is constructed
         mutable label nCom_;
- 
+
         //CL: stores real mixture correction coefficients
         mutable DynamicList<scalar> realMixtureCorrCoef_;
 
@@ -120,7 +120,7 @@ public:
             label numOfComp,
             DynamicList<scalar> weigths,
             DynamicList<mixtureSoaveRedlichKwong*> mixtureComponents,
-            scalar a0, 
+            scalar a0,
             scalar b,
             scalar Tcrit,
             scalar n,
@@ -160,29 +160,29 @@ public:
 
         //CL: mixture coefficience
         inline scalar amix(const scalar T, const label i, const  label j) const;
-                 
+
         inline scalar dadTmix(const scalar T, const label i, const  label j) const;
 
         inline scalar d2adT2mix(const scalar T, const label i, const  label j) const;
 
         inline scalar p(const scalar rho, const scalar T) const;
 
-        //first order derivatives 
+        //first order derivatives
         inline scalar dpdv(const scalar rho, const  scalar T) const;
 
         inline scalar dpdT(const scalar rho, const scalar T) const;
 
         inline scalar dvdT(const scalar rho, const  scalar T) const;
 
-        inline scalar dvdp(const scalar rho, const scalar T) const; 
+        inline scalar dvdp(const scalar rho, const scalar T) const;
 
-        inline scalar isobarExpCoef(const scalar rho, const  scalar T) const; 
+        inline scalar isobarExpCoef(const scalar rho, const  scalar T) const;
 
         inline scalar isothermalCompressiblity
         (
             const scalar rho,
             const scalar T
-        ) const; 
+        ) const;
 
         // Used for cv
         inline scalar integral_d2pdT2_dv
@@ -192,7 +192,7 @@ public:
         ) const;
 
         //Used for internal Energy
-        inline scalar integral_p_dv(const scalar rho, const scalar T) const;  
+        inline scalar integral_p_dv(const scalar rho, const scalar T) const;
 
         // Used for Entropy
         inline scalar integral_dpdT_dv(const scalar rho, const scalar T) const;
@@ -217,7 +217,7 @@ public:
 
         inline scalar rho(const scalar p, const scalar T) const;
 
-        //- Return compressibility drho/dp at T=constant [s^2/m^2]  
+        //- Return compressibility drho/dp at T=constant [s^2/m^2]
         inline scalar psi(const scalar rho, const scalar T) const;
 
         //- Return compression factor []

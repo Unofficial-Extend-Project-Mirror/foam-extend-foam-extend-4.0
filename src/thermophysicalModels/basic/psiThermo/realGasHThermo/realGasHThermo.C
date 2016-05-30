@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | 
+    \\  /    A nd           |
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -25,7 +25,7 @@ License
 Author
 Christian Lucas
 Institut für Thermodynamik
-Technische Universität Braunschweig 
+Technische Universität Braunschweig
 Germany
 
 \*---------------------------------------------------------------------------*/
@@ -169,12 +169,12 @@ Foam::realGasHThermo<MixtureType>::realGasHThermo
     forAll(rho_.boundaryField(), patchi)
     {
         rho_.boundaryField()[patchi] ==
-            rho(this->T_.boundaryField()[patchi], patchi); 
+            rho(this->T_.boundaryField()[patchi], patchi);
     }
 
     forAll(hCells, celli)
     {
-        hCells[celli] = this->cellMixture(celli).H(rhoCells[celli],TCells[celli]);     
+        hCells[celli] = this->cellMixture(celli).H(rhoCells[celli],TCells[celli]);
     }
 
     forAll(h_.boundaryField(), patchi)
@@ -228,7 +228,7 @@ Foam::tmp<Foam::scalarField> Foam::realGasHThermo<MixtureType>::h
 ) const
 {
     //CL: need the pressure of the internal field to calculate the realGas enthalpy
-    //CL: this is done this way to assure compatibility to old OF Thermo-Versions 
+    //CL: this is done this way to assure compatibility to old OF Thermo-Versions
     const scalarField& pCells = this->p_.internalField();
 
     tmp<scalarField> th(new scalarField(T.size()));
@@ -240,7 +240,7 @@ Foam::tmp<Foam::scalarField> Foam::realGasHThermo<MixtureType>::h
     }
 
     return th;
-} 
+}
 
 template<class MixtureType>
 Foam::tmp<Foam::scalarField> Foam::realGasHThermo<MixtureType>::h
@@ -250,7 +250,7 @@ Foam::tmp<Foam::scalarField> Foam::realGasHThermo<MixtureType>::h
 ) const
 {
     //CL: need the pressure at the patch to calculate the realGas enthalpy
-    //CL: this is done this way to assure compatibility to old OF Thermo-Versions 
+    //CL: this is done this way to assure compatibility to old OF Thermo-Versions
     const fvPatchScalarField& pp = this->p_.boundaryField()[patchi];
 
     tmp<scalarField> th(new scalarField(T.size()));
@@ -272,7 +272,7 @@ Foam::tmp<Foam::scalarField> Foam::realGasHThermo<MixtureType>::rho
 ) const
 {
     //CL: need the pressure at the patch to calculate the realGas enthalpy
-    //CL: this is done this way to assure compatibility to old OF Thermo-Versions 
+    //CL: this is done this way to assure compatibility to old OF Thermo-Versions
     const fvPatchScalarField& pp = this->p_.boundaryField()[patchi];
 
     tmp<scalarField> trho(new scalarField(T.size()));
@@ -294,7 +294,7 @@ Foam::tmp<Foam::scalarField> Foam::realGasHThermo<MixtureType>::Cp
 ) const
 {
     //CL: need the pressure at the patch to calculate the realGas enthalpy
-    //CL: this is done this way to assure compatibility to old OF Thermo-Versions 
+    //CL: this is done this way to assure compatibility to old OF Thermo-Versions
     const fvPatchScalarField& pp = this->p_.boundaryField()[patchi];
 
     tmp<scalarField> tCp(new scalarField(T.size()));
@@ -361,7 +361,7 @@ Foam::tmp<Foam::scalarField> Foam::realGasHThermo<MixtureType>::Cv
 ) const
 {
     //CL: need the pressure at the patch to calculate the realGas enthalpy
-    //CL: this is done this way to assure compatibility to old OF Thermo-Versions 
+    //CL: this is done this way to assure compatibility to old OF Thermo-Versions
     const fvPatchScalarField& pp = this->p_.boundaryField()[patchi];
 
     tmp<scalarField> tCv(new scalarField(T.size()));
@@ -383,7 +383,7 @@ Foam::tmp<Foam::volScalarField> Foam::realGasHThermo<MixtureType>::rho()  const
     const fvMesh& mesh = this->T_.mesh();
 
     //CL: create a rho Field, which will be return
-    //CL: the problem is that this function is "const", 
+    //CL: the problem is that this function is "const",
     //CL: so a new variabel is needed
       tmp<volScalarField> trho
       (
@@ -401,11 +401,11 @@ Foam::tmp<Foam::volScalarField> Foam::realGasHThermo<MixtureType>::rho()  const
             dimDensity
         )
     );
- 
-   //CL: copy "old" rho value onto the new rho field as start point 
-   //CL: for the newton solver used in this->TH( ... ) 
+
+   //CL: copy "old" rho value onto the new rho field as start point
+   //CL: for the newton solver used in this->TH( ... )
    trho()=rho_;
- 
+
    volScalarField& rho = trho();
 
     const scalarField& hCells = h_.internalField();
@@ -425,8 +425,8 @@ Foam::tmp<Foam::volScalarField> Foam::realGasHThermo<MixtureType>::rho()  const
     {
         fvPatchScalarField pp = this->p_.boundaryField()[patchi];
         fvPatchScalarField ph = h_.boundaryField()[patchi];
-        fvPatchScalarField pT = this->T_.boundaryField()[patchi];  
-        
+        fvPatchScalarField pT = this->T_.boundaryField()[patchi];
+
         fvPatchScalarField& prho_ = rho.boundaryField()[patchi];
 
         forAll(pp, facei)

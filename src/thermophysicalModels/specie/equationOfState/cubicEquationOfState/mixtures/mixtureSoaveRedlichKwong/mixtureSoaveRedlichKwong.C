@@ -28,7 +28,7 @@ Description
 Author
 Christian Lucas
 Institut für Thermodynamik
-Technische Universität Braunschweig 
+Technische Universität Braunschweig
 Germany
 
 \*---------------------------------------------------------------------------*/
@@ -50,7 +50,7 @@ mixtureSoaveRedlichKwong::mixtureSoaveRedlichKwong(Istream& is)
     numOfComp(1),
     //CL: no real gas mixture correction when stream constructor is used
     realMixtureCorr_(false)
-{ 
+{
     //CL: set size of weigths, mixtureComponents ... to 10,
     //CL: when more mixture componentents are used
     //CL: size of the DynamicLis increases automatically
@@ -72,7 +72,7 @@ mixtureSoaveRedlichKwong::mixtureSoaveRedlichKwong(const dictionary& dict)
     numOfComp(1),
     singleComponent(1),
     realMixtureCorr_(dict.subDict("equationOfState").lookupOrDefault("realMixtureCorrection",false))
-{ 
+{
     //CL: set size of weigths, mixtureComponents ... to 10,
     //CL: when more mixture componentents are used
     //CL: size of the DynamicLis increases automatically
@@ -101,21 +101,21 @@ mixtureSoaveRedlichKwong::mixtureSoaveRedlichKwong(const dictionary& dict)
         label i;
         label j;
         label k=0;
- 
+
         // CL: saves the number of mixtureCorrectionCoefficients needed for this mixture
         // CL: need to be set to 1
         label sizeOfVector_=1;
 
         //CL: size of the vector depends on the number of components
-        //CL: determine the size of the vector    
+        //CL: determine the size of the vector
         for (i=3; i<=nCom_;i++)
-        {   
+        {
             sizeOfVector_=sizeOfVector_+(i-1);
         }
- 
-        //CL: setting the size 
+
+        //CL: setting the size
         realMixtureCorrCoef_.setSize(sizeOfVector_);
-       
+
         //CL: Reading the real mixture correction coefficients
         //CL: Naming convention e.g for 3 component mixture:
         //CL: mixtureCorrectionCoefficient_12, mixtureCorrectionCoefficient_13, mixtureCorrectionCoefficient_23

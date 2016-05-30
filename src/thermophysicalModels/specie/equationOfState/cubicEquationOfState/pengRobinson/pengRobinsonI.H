@@ -25,7 +25,7 @@ License
 Author
 Christian Lucas
 Institut für Thermodynamik
-Technische Universität Braunschweig 
+Technische Universität Braunschweig
 Germany
 
 \*---------------------------------------------------------------------------*/
@@ -42,11 +42,11 @@ namespace Foam
 // Construct from components
 inline pengRobinson::pengRobinson
 (
-    const specie& sp    
+    const specie& sp
 )
 :
     specie(sp),
-    TSave(0) 
+    TSave(0)
 {}
 
 
@@ -107,15 +107,15 @@ inline scalar pengRobinson::a(const scalar T)const
 {
     //CL: check if a has already been calculated for this temperature
     if(TSave==T)
-    { 
-        return aSave;  
+    {
+        return aSave;
     }
     //CL: If not, recalculate a(T), dadT(T) and d2adT2(T)
     else
     {
         updateModelCoefficients(T);
         return aSave;
-    }     
+    }
 }
 
 
@@ -125,14 +125,14 @@ inline scalar pengRobinson::dadT(const scalar T)const
     // check if a has already been calculated for this temperature
     if(TSave==T)
     {
-        return daSave;  
+        return daSave;
     }
     //CL: If not, recalculate a(T), dadT(T) and d2adT2(T)
     else
     {
         updateModelCoefficients(T);
         return daSave;
-    }    
+    }
 }
 
 
@@ -142,14 +142,14 @@ inline scalar pengRobinson::d2adT2(const scalar T)const
     // check if a has already been calculated for this temperature
     if(TSave==T)
     {
-        return d2aSave;  
+        return d2aSave;
     }
     //CL: If not, recalculate a(T), dadT(T) and d2adT2(T)
     else
     {
         updateModelCoefficients(T);
         return d2aSave;
-    }    
+    }
 }
 
 
@@ -191,16 +191,16 @@ inline scalar pengRobinson::b5()const
     return b5_;
 }
 
-//returns the pressure for a given density and temperature    
+//returns the pressure for a given density and temperature
 inline scalar pengRobinson::p(const scalar rho,const scalar T) const
 {
     scalar Vm = this->W()/rho;
-     
+
     return this->RR()*T/(Vm-b())-a(T)/(pow(Vm,2)+2*b()*Vm-b2());
 }
 
 
-//Real deviative dp/dv at constant temperature 
+//Real deviative dp/dv at constant temperature
 //(molar values)
 inline scalar pengRobinson::dpdv(const scalar rho, const scalar T) const
 {
@@ -223,7 +223,7 @@ inline scalar pengRobinson::dpdv(const scalar rho, const scalar T) const
 }
 
 
-//Real deviative dp/dT at constant molar volume 
+//Real deviative dp/dT at constant molar volume
 //(molar values)
 inline scalar pengRobinson::dpdT(const scalar rho, const scalar T) const
 {
@@ -233,7 +233,7 @@ inline scalar pengRobinson::dpdT(const scalar rho, const scalar T) const
 }
 
 
-//Real  deviative dv/dT at constant pressure 
+//Real  deviative dv/dT at constant pressure
 //by using implicit differentiation
 //(molar values)
 inline scalar pengRobinson::dvdT(const scalar rho,const scalar T) const
@@ -243,7 +243,7 @@ inline scalar pengRobinson::dvdT(const scalar rho,const scalar T) const
 
 
 //(molar values)
-inline scalar pengRobinson::dvdp(const scalar rho,const scalar T)  const 
+inline scalar pengRobinson::dvdp(const scalar rho,const scalar T)  const
 {
     return 1/this->dpdv(rho,T);
 }
@@ -306,10 +306,10 @@ inline scalar pengRobinson::d2pdv2(const scalar rho,const scalar T) const
 
 
 //(molar values)
-//using second order implicit differentiation 
+//using second order implicit differentiation
 inline scalar pengRobinson::d2vdT2(const scalar rho, const scalar T) const
 {
-    return 
+    return
     -(
           pow(this->dpdT(rho,T),2)*this->d2pdv2(rho,T)
         + pow(this->dpdv(rho,T),2)*this->d2pdT2(rho,T)
@@ -325,7 +325,7 @@ inline scalar pengRobinson::d2pdvdT(const scalar rho, const scalar T) const
     scalar Vm = this->W()/rho;
     scalar Vm2 = Vm*Vm;
     scalar Vm3 = Vm*Vm*Vm;
-  
+
     return(
               2*dadT(T)*
               (
@@ -341,9 +341,9 @@ inline scalar pengRobinson::d2pdvdT(const scalar rho, const scalar T) const
 }
 
 
-// the result of this intergal is needed for the nasa based cp polynomial 
+// the result of this intergal is needed for the nasa based cp polynomial
 //(molar values)
-inline scalar pengRobinson::integral_d2pdT2_dv(const scalar rho,const scalar T) const 
+inline scalar pengRobinson::integral_d2pdT2_dv(const scalar rho,const scalar T) const
 {
     scalar Vm = this->W()/rho;
 
@@ -364,7 +364,7 @@ inline scalar pengRobinson::isobarExpCoef(const scalar rho,const scalar T)  cons
 inline scalar pengRobinson::isothermalCompressiblity(const scalar rho,const scalar T) const
 {
     return this->isobarExpCoef(rho, T)/this->dpdT(rho, T);
-    //CL: also possible 
+    //CL: also possible
     //CL: return -this->dvdp(rho,T)*rho/this->W();
 }
 
@@ -401,7 +401,7 @@ inline scalar pengRobinson::rho(
                )/pow(2,i);
 
            i++;
-           if (i>8) 
+           if (i>8)
            {
                //CL: using bisection methode as backup,
                //CL: solution must be between rho=0.001 to rho=1500;
@@ -416,7 +416,7 @@ inline scalar pengRobinson::rho(
                    if ((f2 < 0 && f3 > 0) || (f2 > 0 && f3 < 0))
                    {
                        rho1=rho3;
-                   }  
+                   }
                    else if ((f1 < 0 && f3 > 0)||(f1 > 0 && f3 < 0))
                    {
                        rho2=rho3;
@@ -430,7 +430,7 @@ inline scalar pengRobinson::rho(
                    {
                        molarVolume=this->W()/rho3;
                        molarVolumePrevIteration=this->W()/rho3;
-                       break; 
+                       break;
                    }
                    else
                    {
@@ -460,15 +460,15 @@ inline scalar pengRobinson::rho(
 }
 
 
-//- Return density [kg/m^3]on 
+//- Return density [kg/m^3]on
 inline scalar pengRobinson::rho(const scalar p,const scalar T) const
 {
     // using perfect gas equation as starting point
-    return rho(p,T,p/(this->R()*T)); 
+    return rho(p,T,p/(this->R()*T));
 }
 
 
-//- Return compressibility drho/dp at T=constant [s^2/m^2] 
+//- Return compressibility drho/dp at T=constant [s^2/m^2]
 inline scalar pengRobinson::psi(const scalar rho, const scalar T) const
 {
     return -this->dvdp(rho,T)*pow(rho,2)/this->W();

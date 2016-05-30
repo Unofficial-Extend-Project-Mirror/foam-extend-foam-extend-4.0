@@ -28,7 +28,7 @@ Description
 Author
 Christian Lucas
 Institut für Thermodynamik
-Technische Universität Braunschweig 
+Technische Universität Braunschweig
 Germany
 
 \*---------------------------------------------------------------------------*/
@@ -81,14 +81,14 @@ pengRobinson::pengRobinson(const dictionary& dict)
     rhoMin_(dict.subDict("equationOfState").lookupOrDefault("rhoMin",1e-3)),
     rhoMax_(dict.subDict("equationOfState").lookupOrDefault("rhoMax",1500)),
     a0_(0.457235*pow(this->RR(),2)*pow(Tcrit_,2)/pcrit_),
-    b_(0.077796*this->RR()*Tcrit_/pcrit_), 
+    b_(0.077796*this->RR()*Tcrit_/pcrit_),
     n_(0.37464+1.54226*azentricFactor_-0.26992*pow(azentricFactor_,2)),
-    TSave(0.0), 
+    TSave(0.0),
     b2_(pow(b_,2)),
     b3_(pow(b_,3)),
     b4_(pow(b_,4)),
     b5_(pow(b_,5)),
-    rhostd_(this->rho(Pstd,Tstd,Pstd/(Tstd*this->R()))) 
+    rhostd_(this->rho(Pstd,Tstd,Pstd/(Tstd*this->R())))
 {}
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
@@ -111,7 +111,7 @@ void Foam::pengRobinson::write(Ostream& os) const
 
 Ostream& operator<<(Ostream& os, const pengRobinson& pr)
 {
-    os  << static_cast<const specie&>(pr)<< token::SPACE 
+    os  << static_cast<const specie&>(pr)<< token::SPACE
         << pr.pcrit_ << tab<< pr.Tcrit_<< tab << pr.azentricFactor_;
 
     os.check("Ostream& operator<<(Ostream& os, const pengRobinson& st)");
