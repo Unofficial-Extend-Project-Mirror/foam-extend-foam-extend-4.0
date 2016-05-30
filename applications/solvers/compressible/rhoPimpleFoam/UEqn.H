@@ -9,7 +9,7 @@ tmp<fvVectorMatrix> UEqn
 
 UEqn().relax
 (
-    mesh.solutionDict().relaxationFactor(U.select(pimple.finalIter()))
+    mesh.solutionDict().equationRelaxationFactor(U.select(pimple.finalIter()))
 );
 
 volScalarField rUA = 1.0/UEqn().A();

@@ -16,7 +16,7 @@
 
     UEqn.relax
     (
-        mesh.solutionDict().relaxationFactor(U.select(pimple.finalIter()))
+        mesh.solutionDict().equationRelaxationFactor(U.select(pimple.finalIter()))
     );
 
     if (pimple.momentumPredictor())

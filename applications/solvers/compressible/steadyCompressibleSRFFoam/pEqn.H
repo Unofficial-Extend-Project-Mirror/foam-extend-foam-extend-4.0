@@ -20,6 +20,12 @@
 
         p.storePrevIter();
 
+        volScalarField divPhid
+        (
+            "divPhid",
+            fvc::div(phid)
+        );
+
         while (pimple.correctNonOrthogonal())
         {
             fvScalarMatrix pEqn

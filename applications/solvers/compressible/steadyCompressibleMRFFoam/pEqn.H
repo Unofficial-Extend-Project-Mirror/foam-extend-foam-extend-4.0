@@ -7,6 +7,7 @@
     // Needs to be outside of loop since p is changing, but psi and rho are not.
     surfaceScalarField rhoReff = rhof - psisf*fvc::interpolate(p);
 
+    // --- PISO loop
     while (pimple.correct())
     {
         U = rUA*UEqn.H();
@@ -24,6 +25,12 @@
         mrfZones.relativeFlux(rhoReff, phid2);
 
         p.storePrevIter();
+
+        volScalarField divPhid
+        (
+            "divPhid",
+            fvc::div(phid)
+        );
 
         while (pimple.correctNonOrthogonal())
         {
