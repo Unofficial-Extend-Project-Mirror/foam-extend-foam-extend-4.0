@@ -105,12 +105,6 @@ class ggiPolyPatch
             //  Used for parallel optimisation
             mutable bool* localParallelPtr_;
 
-            //- List of zone faces indices received from each processor
-            mutable labelListList* receiveAddrPtr_;
-
-            //- List of zone faces indices to send to each processor
-            mutable labelListList* sendAddrPtr_;
-
             //- Map-distribute comms tool
             mutable mapDistribute* mapPtr_;
 
@@ -143,13 +137,6 @@ class ggiPolyPatch
 
             //- Calculate send and receive addressing
             void calcSendReceive() const;
-
-
-            //- Return receive addressing
-            const labelListList& receiveAddr() const;
-
-            //- Return send addressing
-            const labelListList& sendAddr() const;
 
             //- Return mapDistribute
             const mapDistribute& map() const;

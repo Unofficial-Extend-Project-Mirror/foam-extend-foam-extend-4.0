@@ -362,7 +362,7 @@ void Foam::ggiPolyPatch::calcSendReceive() const
     // (of the calc-call) they will be set to zero-sized array
     // HJ, 4/Jun/2011
 
-    if (receiveAddrPtr_ || sendAddrPtr_ || mapPtr_)
+    if (mapPtr_)
     {
         FatalErrorIn("void ggiPolyPatch::calcSendReceive() const")
             << "Send-receive addressing already calculated"
@@ -387,29 +387,6 @@ void Foam::ggiPolyPatch::calcSendReceive() const
 
     // Get patch-to-zone addressing
     const labelList& za = zoneAddressing();
-
-    // Get remote patch-to-zone addressing
-    const labelList& rza = remoteZoneAddressing();
-
-    receiveAddrPtr_ = new labelListList(Pstream::nProcs());
-    labelListList& rAddr = *receiveAddrPtr_;
-
-    sendAddrPtr_ = new labelListList(Pstream::nProcs());
-    labelListList& sAddr = *sendAddrPtr_;
-
-    rAddr[Pstream::myProcNo()] = za;
-    sAddr[Pstream::myProcNo()] = rza;
-
-    // Perform gather operation to master
-    Pstream::gatherList(rAddr);
-    Pstream::gatherList(sAddr);
-
-    // Perform scatter operation to master
-    Pstream::scatterList(rAddr);
-    Pstream::scatterList(sAddr);
-
-    // Zone addressing and remote zone addressing is fixed.  Determine the
-    // parallel communications pattern
 
     // Make a zone-sized field and fill it in with proc markings for processor
     // that holds and requires the data
@@ -457,7 +434,7 @@ void Foam::ggiPolyPatch::calcSendReceive() const
     }
 
     // Make the sending sub-map
-    // It tells me which data is required from me to be send to which
+    // It tells me which data is required from me to be sent to which
     // processor
 
     // Algorithm
@@ -532,28 +509,6 @@ void Foam::ggiPolyPatch::calcSendReceive() const
 }
 
 
-const Foam::labelListList& Foam::ggiPolyPatch::receiveAddr() const
-{
-    if (!receiveAddrPtr_)
-    {
-        calcSendReceive();
-    }
-
-    return *receiveAddrPtr_;
-}
-
-
-const Foam::labelListList& Foam::ggiPolyPatch::sendAddr() const
-{
-    if (!sendAddrPtr_)
-    {
-        calcSendReceive();
-    }
-
-    return *sendAddrPtr_;
-}
-
-
 const Foam::mapDistribute& Foam::ggiPolyPatch::map() const
 {
     if (!mapPtr_)
@@ -575,8 +530,6 @@ void Foam::ggiPolyPatch::clearGeom() const
     // HJ, 23/Jun/2011
     deleteDemandDrivenData(remoteZoneAddressingPtr_);
 
-    deleteDemandDrivenData(receiveAddrPtr_);
-    deleteDemandDrivenData(sendAddrPtr_);
     deleteDemandDrivenData(mapPtr_);
 }
 
@@ -617,8 +570,6 @@ Foam::ggiPolyPatch::ggiPolyPatch
     remoteZoneAddressingPtr_(NULL),
     reconFaceCellCentresPtr_(NULL),
     localParallelPtr_(NULL),
-    receiveAddrPtr_(NULL),
-    sendAddrPtr_(NULL),
     mapPtr_(NULL)
 {}
 
@@ -648,8 +599,6 @@ Foam::ggiPolyPatch::ggiPolyPatch
     remoteZoneAddressingPtr_(NULL),
     reconFaceCellCentresPtr_(NULL),
     localParallelPtr_(NULL),
-    receiveAddrPtr_(NULL),
-    sendAddrPtr_(NULL),
     mapPtr_(NULL)
 {}
 
@@ -674,8 +623,6 @@ Foam::ggiPolyPatch::ggiPolyPatch
     remoteZoneAddressingPtr_(NULL),
     reconFaceCellCentresPtr_(NULL),
     localParallelPtr_(NULL),
-    receiveAddrPtr_(NULL),
-    sendAddrPtr_(NULL),
     mapPtr_(NULL)
 {
     if (dict.found("quickReject"))
@@ -706,8 +653,6 @@ Foam::ggiPolyPatch::ggiPolyPatch
     remoteZoneAddressingPtr_(NULL),
     reconFaceCellCentresPtr_(NULL),
     localParallelPtr_(NULL),
-    receiveAddrPtr_(NULL),
-    sendAddrPtr_(NULL),
     mapPtr_(NULL)
 {}
 
@@ -734,8 +679,6 @@ Foam::ggiPolyPatch::ggiPolyPatch
     remoteZoneAddressingPtr_(NULL),
     reconFaceCellCentresPtr_(NULL),
     localParallelPtr_(NULL),
-    receiveAddrPtr_(NULL),
-    sendAddrPtr_(NULL),
     mapPtr_(NULL)
 {}
 
@@ -915,7 +858,7 @@ void Foam::ggiPolyPatch::initAddressing()
         if (Pstream::parRun() && !localParallel())
         {
             // Calculate send addressing
-            sendAddr();
+            map();
         }
     }
 
@@ -990,7 +933,7 @@ void Foam::ggiPolyPatch::initMovePoints(const pointField& p)
 
         if (Pstream::parRun() && !localParallel())
         {
-            sendAddr();
+            map();
         }
     }
 

@@ -64,138 +64,37 @@ tmp<Field<Type> > ggiAMGInterface::fastReduce(const UList<Type>& ff) const
 
         return tresult;
     }
-
-    // Execute reduce if not already done
-    if (!initReduce_)
-    {
-        initFastReduce();
-    }
-
-    if (Pstream::master())
-    {
-        // Master collects information and distributes data.
-        Field<Type> expandField(zoneSize(), pTraits<Type>::zero);
-
-        // Insert master processor
-        const labelList& za = zoneAddressing();
-
-        forAll (za, i)
-        {
-            expandField[za[i]] = ff[i];
-        }
-
-        // Master receives and inserts data from all processors for which
-        // receiveAddr contains entries
-        for (label procI = 1; procI < Pstream::nProcs(); procI++)
-        {
-            const labelList& curRAddr = receiveAddr_[procI];
-
-            if (!curRAddr.empty())
-            {
-                Field<Type> receiveBuf(curRAddr.size());
-
-                // Opt: reconsider mode of communication
-                IPstream::read
-                (
-                    Pstream::blocking,
-                    procI,
-                    reinterpret_cast<char*>(receiveBuf.begin()),
-                    receiveBuf.byteSize()
-                );
-
-                // Insert received information
-                forAll (curRAddr, i)
-                {
-                    expandField[curRAddr[i]] = receiveBuf[i];
-                }
-            }
-        }
-
-        // Expanded field complete, send required data to other processors
-        for (label procI = 1; procI < Pstream::nProcs(); procI++)
-        {
-            const labelList& curSAddr = sendAddr_[procI];
-
-            if (!curSAddr.empty())
-            {
-                Field<Type> sendBuf(curSAddr.size());
-
-                forAll (curSAddr, i)
-                {
-                    sendBuf[i] = expandField[curSAddr[i]];
-                }
-
-                // Opt: reconsider mode of communication
-                OPstream::write
-                (
-                    Pstream::blocking,
-                    procI,
-                    reinterpret_cast<const char*>(sendBuf.begin()),
-                    sendBuf.byteSize()
-                );
-            }
-        }
-
-        // Note: different from ggi patch: field reduction happens within
-        // fastReduce.  HJ, 26/Jun/2011
-        const labelList& sza = shadowInterface().zoneAddressing();
-
-        tmp<Field<Type> > tredField
-        (
-            new Field<Type>(sza.size(), pTraits<Type>::zero)
-        );
-        Field<Type>& redField = tredField();
-
-        // Select elements from shadow zone addressing
-        forAll (sza, i)
-        {
-            redField[i] = expandField[sza[i]];
-        }
-
-        return tredField;
-    }
     else
     {
-        // Send local data to master and receive remote data
-        // If patch is empty, communication is avoided
-        // HJ, 4/Jun/2011
-        if (size())
+        // Optimised mapDistribute
+
+        // Execute init reduce to calculate addressing if not already done
+        if (!initReduce_)
         {
-            // Opt: reconsider mode of communication
-            OPstream::write
-            (
-                Pstream::blocking,
-                Pstream::masterNo(),
-                reinterpret_cast<const char*>(ff.begin()),
-                ff.byteSize()
-            );
+            initFastReduce();
         }
 
-        // Prepare to receive remote data
-        const labelList& sza = shadowInterface().zoneAddressing();
+        // Prepare for distribute: field will be expanded to zone size
+        List<Type> expand = ff;
 
-        tmp<Field<Type> > treceiveBuf
+        map().distribute(expand);
+
+        const labelList& shadowZa = shadowInterface().zoneAddressing();
+
+        // Prepare return field: zone size
+        tmp<Field<Type> > tresult
         (
-            new Field<Type>(sza.size(), pTraits<Type>::zero)
+            new Field<Type>(shadowZa.size())
         );
-        Field<Type>& receiveBuf = treceiveBuf();
+        Field<Type>& result = tresult();
 
-        if (!sza.empty())
+        // Filter from expanded field to zone size
+        forAll (shadowZa, shadowZaI)
         {
-            // Opt: reconsider mode of communication
-            IPstream::read
-            (
-                Pstream::blocking,
-                Pstream::masterNo(),
-                reinterpret_cast<char*>(receiveBuf.begin()),
-                receiveBuf.byteSize()
-            );
-
-            // Note: different from ggi patch: field reduction happens within
-            // fastReduce.  HJ, 26/Jun/2011
+            result[shadowZaI] = expand[shadowZa[shadowZaI]];
         }
 
-        return treceiveBuf;
+        return tresult;
     }
 }
 

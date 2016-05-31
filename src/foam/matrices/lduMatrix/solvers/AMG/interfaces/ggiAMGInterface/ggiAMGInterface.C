@@ -44,42 +44,153 @@ namespace Foam
 
 void Foam::ggiAMGInterface::initFastReduce() const
 {
+    if (!Pstream::parRun())
+    {
+        FatalErrorIn("void ggiAMGInterface::initFastReduce() const")
+            << "Requested calculation of send-receive addressing for a "
+            << "serial run.  This is not allowed"
+            << abort(FatalError);
+    }
+
     // Init should be executed only once
     initReduce_ = true;
 
+    // Note: this is different from ggiPolyPatch comms because zone
+    // is the same on master the slave side.
+    // HJ, 31/May/2016
+
     // Establish parallel comms pattern
-    if (!localParallel() && Pstream::parRun())
+
+    // Get addressing
+    const labelList& za = zoneAddressing();
+    const labelList& shadowZa = shadowInterface().zoneAddressing();
+
+    // Make a zone-sized field and fill it in with proc markings for processor
+    // that holds and requires the data
+    labelField zoneProcID(zoneSize(), -1);
+
+    forAll (za, zaI)
     {
-        // Only master handles communication
-        if (Pstream::master())
+        zoneProcID[za[zaI]] = Pstream::myProcNo();
+    }
+
+    reduce(zoneProcID, maxOp<labelField>());
+
+    // Find out where my zone data is coming from
+    labelList nRecv(Pstream::nProcs(), 0);
+
+    forAll (shadowZa, shadowZaI)
+    {
+        nRecv[zoneProcID[shadowZa[shadowZaI]]]++;
+    }
+
+    // Make a receiving sub-map
+    // It tells me which data I will receive from which processor and
+    // where I need to put it into the remoteZone data before the mapping
+    labelListList constructMap(Pstream::nProcs());
+
+    // Size the receiving list
+    forAll (nRecv, procI)
+    {
+        constructMap[procI].setSize(nRecv[procI]);
+    }
+
+    // Reset counters for processors
+    nRecv = 0;
+
+    forAll (shadowZa, shadowZaI)
+    {
+        label recvProc = zoneProcID[shadowZa[shadowZaI]];
+
+        constructMap[recvProc][nRecv[recvProc]] = shadowZa[shadowZaI];
+
+        nRecv[recvProc]++;
+    }
+
+    // Make the sending sub-map
+    // It tells me which data is required from me to be sent to which
+    // processor
+
+    // Algorithm
+    // - expand the local zone faces with indices into a size of local zone
+    // - go through remote zone addressing on all processors
+    // - find out who hits my faces
+    labelList localZoneIndices(zoneSize(), -1);
+
+    forAll (za, zaI)
+    {
+        localZoneIndices[za[zaI]] = zaI;
+    }
+
+    labelListList shadowToReceiveAddr(Pstream::nProcs());
+
+    // Get the list of what my shadow needs to receive from my zone
+    // on all other processors
+    shadowToReceiveAddr[Pstream::myProcNo()] = shadowZa;
+    Pstream::gatherList(shadowToReceiveAddr);
+    Pstream::scatterList(shadowToReceiveAddr);
+
+    // Now local zone indices contain the index of a local face that will
+    // provide the data.  For faces that are not local, the index will be -1
+ 
+    // Find out where my zone data is going to
+
+    // Make a sending sub-map
+    // It tells me which data I will send to which processor
+    labelListList sendMap(Pstream::nProcs());
+
+    // Collect local labels to be sent to each processor
+    forAll (shadowToReceiveAddr, procI)
+    {
+        const labelList& curProcSend = shadowToReceiveAddr[procI];
+
+        // Find out how much of my data is going to this processor
+        label nProcSend = 0;
+
+        forAll (curProcSend, sendI)
         {
-            receiveAddr_.setSize(Pstream::nProcs());
-            sendAddr_.setSize(Pstream::nProcs());
-
-            receiveAddr_[0] = zoneAddressing();
-
-            for (label procI = 1; procI < Pstream::nProcs(); procI++)
+            if (localZoneIndices[curProcSend[sendI]] > -1)
             {
-                // Note: must use normal comms because the size of the
-                // communicated lists is unknown on the receiving side
-                // HJ, 4/Jun/2011
-
-                // Opt: reconsider mode of communication
-                IPstream ip(Pstream::scheduled, procI);
-
-                receiveAddr_[procI] = labelList(ip);
-
-                sendAddr_[procI] = labelList(ip);
+                nProcSend++;
             }
         }
-        else
-        {
-            // Opt: reconsider mode of communication
-            OPstream op(Pstream::scheduled, Pstream::masterNo());
 
-            op << zoneAddressing() << shadowInterface().zoneAddressing();
+        if (nProcSend > 0)
+        {
+            // Collect the indices
+            labelList& curSendMap = sendMap[procI];
+
+            curSendMap.setSize(nProcSend);
+
+            // Reset counter
+            nProcSend = 0;
+
+            forAll (curProcSend, sendI)
+            {
+                if (localZoneIndices[curProcSend[sendI]] > -1)
+                {
+                    curSendMap[nProcSend] =
+                        localZoneIndices[curProcSend[sendI]];
+                    nProcSend++;
+                }
+            }
         }
     }
+
+    // Map will return the object of the size of remote zone
+    // HJ, 9/May/2016
+    mapPtr_ = new mapDistribute(zoneSize(), sendMap, constructMap);
+}
+
+
+const Foam::mapDistribute& Foam::ggiAMGInterface::map() const
+{
+    if (!mapPtr_)
+    {
+        initFastReduce();
+    }
+
+    return *mapPtr_;
 }
 
 
@@ -98,8 +209,7 @@ Foam::ggiAMGInterface::ggiAMGInterface
     zoneSize_(0),
     zoneAddressing_(),
     initReduce_(false),
-    receiveAddr_(),
-    sendAddr_()
+    mapPtr_(NULL)
 {
     // Note.
     // All processors will do the same coarsening and then filter
@@ -598,7 +708,9 @@ Foam::ggiAMGInterface::ggiAMGInterface
 // * * * * * * * * * * * * * * * * Destructor * * * * * * * * * * * * * * * //
 
 Foam::ggiAMGInterface::~ggiAMGInterface()
-{}
+{
+    deleteDemandDrivenData(mapPtr_);
+}
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //

@@ -40,6 +40,7 @@ SourceFiles
 
 #include "AMGInterface.H"
 #include "ggiLduInterface.H"
+#include "mapDistribute.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -73,11 +74,8 @@ class ggiAMGInterface
             //- Has reduce been initialised?
             mutable bool initReduce_;
 
-            //- List of zone faces indices received from each processor
-            mutable labelListList receiveAddr_;
-
-            //- List of zone faces indices to send to each processor
-            mutable labelListList sendAddr_;
+            //- Map-distribute comms tool
+            mutable mapDistribute* mapPtr_;
 
 
     // Private Member Functions
@@ -88,8 +86,12 @@ class ggiAMGInterface
         //- Disallow default bitwise assignment
         void operator=(const ggiAMGInterface&);
 
+
         //- Init fast reduce
         void initFastReduce() const;
+
+        //- Return mapDistribute
+        const mapDistribute& map() const;
 
 
     // Private static data
