@@ -20,7 +20,7 @@
         )*rUAf*mesh.magSf();
 
 
-    for(int nonOrth=0; nonOrth<=nNonOrthCorr; nonOrth++)
+    while (pimple.correctNonOrthogonal())
     {
         fvScalarMatrix pdEqn
         (
@@ -29,16 +29,12 @@
 
         pdEqn.setReference(pdRefCell, pdRefValue);
 
-        if (corr == nCorr - 1 && nonOrth == nNonOrthCorr)
-        {
-            pdEqn.solve(mesh.solutionDict().solver(pd.name() + "Final"));
-        }
-        else
-        {
-            pdEqn.solve(mesh.solutionDict().solver(pd.name()));
-        }
+        pdEqn.solve
+        (
+            mesh.solutionDict().solver(pd.select(pimple.finalInnerIter()))
+        );
 
-        if (nonOrth == nNonOrthCorr)
+        if (pimple.finalNonOrthogonalIter())
         {
             phi -= pdEqn.flux();
         }

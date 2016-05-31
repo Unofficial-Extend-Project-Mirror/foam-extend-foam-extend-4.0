@@ -38,6 +38,7 @@ Description
 #include "thermalModel.H"
 #include "singlePhaseTransportModel.H"
 #include "RASModel.H"
+#include "simpleControl.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -47,6 +48,9 @@ int main(int argc, char *argv[])
 #   include "createTime.H"
 #   include "createFluidMesh.H"
 #   include "createSolidMesh.H"
+
+    simpleControl simple(mesh);
+
 #   include "readGravitationalAcceleration.H"
 #   include "createFields.H"
 #   include "createSolidFields.H"
@@ -56,12 +60,9 @@ int main(int argc, char *argv[])
 
     Info<< "\nStarting time loop\n" << endl;
 
-    while (runTime.loop())
+    while (simple.loop())
     {
         Info<< "Time = " << runTime.timeName() << nl << endl;
-
-#       include "readSIMPLEControls.H"
-#       include "initConvergenceCheck.H"
 
         // Detach patches
 #       include "detachPatches.H"

@@ -22,3 +22,5 @@
 
     const label pRefCell = pRefCellFluid[i];
     const scalar pRefValue = pRefValueFluid[i];
+
+    mesh.schemesDict().setFluxRequired(p.name());

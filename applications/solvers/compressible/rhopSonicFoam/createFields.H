@@ -127,3 +127,4 @@
     fields.add(magRhoU);
     fields.add(H);
 
+    mesh.schemesDict().setFluxRequired(p.name());

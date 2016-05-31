@@ -10,7 +10,7 @@
 
     hEqn.relax
     (
-        mesh.solutionDict().relaxationFactor(h.select(pimple.finalIter()))
+        mesh.solutionDict().equationRelaxationFactor(h.select(pimple.finalIter()))
     );
     hEqn.solve(mesh.solutionDict().solver((h.select(pimple.finalIter()))));
 

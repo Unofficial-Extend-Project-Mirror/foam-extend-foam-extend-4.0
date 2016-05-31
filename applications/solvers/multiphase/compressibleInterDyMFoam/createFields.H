@@ -142,3 +142,5 @@
             pcorrTypes[i] = fixedValueFvPatchScalarField::typeName;
         }
     }
+
+    mesh.schemesDict().setFluxRequired(p.name());

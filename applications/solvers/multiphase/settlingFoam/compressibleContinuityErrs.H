@@ -1,4 +1,4 @@
-    scalar sumLocalContErr =
+    sumLocalContErr =
         runTime.deltaT().value()*
         mag
         (
@@ -6,7 +6,7 @@
           + fvc::div(phi)
         )().weightedAverage(rho*mesh.V()).value();
 
-    scalar globalContErr =
+    globalContErr =
           runTime.deltaT().value()*
           (
               fvc::ddt(rho)

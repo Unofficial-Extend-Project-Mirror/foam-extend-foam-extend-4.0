@@ -59,11 +59,9 @@ int main(int argc, char *argv[])
 
     Info<< "\nStarting time loop\n" << endl;
 
-    for (runTime++; !runTime.end(); runTime++)
+    while(simple.loop())
     {
         Info<< "Time = " << runTime.timeName() << nl << endl;
-
-        p.storePrevIter();
 
         // Pressure-velocity SIMPLE corrector
         {

@@ -1011,7 +1011,7 @@ bool Foam::ping(const word& hostname, const label timeOut)
 }
 
 
-int Foam::system(const string& command)
+int Foam::system(const std::string& command)
 {
     return ::system(command.c_str());
 }

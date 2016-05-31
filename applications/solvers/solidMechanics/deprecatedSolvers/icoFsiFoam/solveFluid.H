@@ -1,7 +1,7 @@
 {
     // SIMPLE loop
 
-    for (int corr=0; corr<nCorr; corr++)
+    while (piso.correct())
     {
         fvVectorMatrix UEqn
         (
@@ -23,7 +23,7 @@
 
         p.storePrevIter();
 
-        for (int nonOrth=0; nonOrth<=nNonOrthCorr; nonOrth++)
+        while (piso.correctNonOrthogonal())
         {
             fvScalarMatrix pEqn
             (
@@ -33,7 +33,7 @@
             pEqn.setReference(pRefCell, pRefValue);
             pEqn.solve();
 
-            if (nonOrth == nNonOrthCorr)
+            if (piso.finalNonOrthogonalIter())
             {
                 phi -= pEqn.flux();
             }

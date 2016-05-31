@@ -10,7 +10,7 @@
     surfaceScalarField buoyancyPhi(rUAf*ghf*fvc::snGrad(rhok)*mesh.magSf());
     phi -= buoyancyPhi;
 
-    for (int nonOrth=0; nonOrth<=nNonOrthCorr; nonOrth++)
+    while (piso.correctNonOrthogonal())
     {
         fvScalarMatrix p_rghEqn
         (
@@ -19,16 +19,15 @@
 
         p_rghEqn.setReference(pRefCell, pRefValue);
 
-        if (corr == nCorr-1 && nonOrth == nNonOrthCorr)
-        {
-            p_rghEqn.solve(mesh.solutionDict().solver(p_rgh.name() + "Final"));
-        }
-        else
-        {
-            p_rghEqn.solve(mesh.solutionDict().solver(p_rgh.name()));
-        }
+        p_rghEqn.solve
+        (
+            mesh.solutionDict().solver
+            (
+                p_rgh.select(piso.finalInnerIter())
+            )
+        );
 
-        if (nonOrth == nNonOrthCorr)
+        if (piso.finalNonOrthogonalIter())
         {
             // Calculate the conservative fluxes
             phi -= p_rghEqn.flux();

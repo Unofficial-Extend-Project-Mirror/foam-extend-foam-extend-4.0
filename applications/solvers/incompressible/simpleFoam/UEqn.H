@@ -7,7 +7,7 @@
     );
 
     // Get under-relaxation factor
-    const scalar UUrf = mesh.solutionDict().relaxationFactor(U.name());
+    const scalar UUrf = mesh.solutionDict().equationRelaxationFactor(U.name());
 
     // Momentum solution
     solve

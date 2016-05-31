@@ -39,10 +39,7 @@
 
     #include "compressibleCreatePhi.H"
 
-    dimensionedScalar pMin
-    (
-        mesh.solutionDict().subDict("PIMPLE").lookup("pMin")
-    );
+    dimensionedScalar pMin(pimple.dict().lookup("pMin"));
 
     Info<< "Creating turbulence model\n" << endl;
     autoPtr<compressible::turbulenceModel> turbulence
@@ -68,3 +65,5 @@
 
     porousZones pZones(mesh);
     Switch pressureImplicitPorosity(false);
+
+    mesh.schemesDict().setFluxRequired(p.name());

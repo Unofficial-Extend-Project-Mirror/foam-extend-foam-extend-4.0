@@ -14,7 +14,7 @@
         rhorUAf*fvc::interpolate(rho)*(g & mesh.Sf());
     phi += buoyancyPhi;
 
-    for (int nonOrth=0; nonOrth<=nNonOrthCorr; nonOrth++)
+    while (simple.correctNonOrthogonal())
     {
         fvScalarMatrix pEqn
         (
@@ -23,18 +23,9 @@
 
         pEqn.setReference(pRefCell, pRefValue);
 
-        // retain the residual from the first iteration
-        if (nonOrth == 0)
-        {
-            eqnResidual = pEqn.solve().initialResidual();
-            maxResidual = max(eqnResidual, maxResidual);
-        }
-        else
-        {
-            pEqn.solve();
-        }
+        pEqn.solve();
 
-        if (nonOrth == nNonOrthCorr)
+        if (simple.finalNonOrthogonalIter())
         {
             // For closed-volume cases adjust the pressure and density levels
             // to obey overall mass continuity

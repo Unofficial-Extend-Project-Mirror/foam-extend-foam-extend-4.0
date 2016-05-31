@@ -58,11 +58,4 @@ snGradSchemes
     snGrad(p)       corrected;
 }
 
-fluxRequired
-{
-    default        none;
-    p;
-    rho;
-}
-
 // ************************************************************************* //

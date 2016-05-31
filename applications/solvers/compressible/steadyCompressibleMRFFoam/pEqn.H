@@ -4,11 +4,11 @@
     surfaceScalarField psisf = fvc::interpolate(psis);
     surfaceScalarField rhof = fvc::interpolate(rho);
 
-    // Needs to be outside of loop since p is changing, but psi and rho are not
+    // Needs to be outside of loop since p is changing, but psi and rho are not.
     surfaceScalarField rhoReff = rhof - psisf*fvc::interpolate(p);
 
     // --- PISO loop
-    for (int corr = 0; corr < nCorr; corr++)
+    while (pimple.correct())
     {
         U = rUA*UEqn.H();
 
@@ -32,7 +32,7 @@
             fvc::div(phid)
         );
 
-        for (int nonOrth = 0; nonOrth <= nNonOrthCorr; nonOrth++)
+        while (pimple.correctNonOrthogonal())
         {
             fvScalarMatrix pEqn
             (
@@ -45,16 +45,10 @@
               - fvm::laplacian(rho*rUA, p)
             );
 
-            // Retain the residual from the first pressure solution
-            eqnResidual = pEqn.solve().initialResidual();
-
-            if (corr == 0 && nonOrth == 0)
-            {
-                maxResidual = max(eqnResidual, maxResidual);
-            }
+            pEqn.solve();
 
             // Calculate the flux
-            if (nonOrth == nNonOrthCorr)
+            if (pimple.finalNonOrthogonalIter())
             {
                 phi = phid2 + pEqn.flux();
             }

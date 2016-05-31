@@ -1,9 +1,9 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | foam-extend: Open Source CFD                    |
-|  \\    /   O peration     | Version:     3.2                                |
+|  \\    /   O peration     | Version:     4.0                                |
 |   \\  /    A nd           | Web:         http://www.foam-extend.org         |
-|    \\/     M anipulation  |                                                 |
+|    \\/     M anipulation  | For copyright notice see file Copyright         |
 \*---------------------------------------------------------------------------*/
 FoamFile
 {
@@ -15,43 +15,61 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-6
+9
 (
     maxY
     {
         type            empty;
-        nFaces          400;
-        startFace       22800;
+        nFaces          0;
+        startFace       59065;
     }
     minX
     {
         type            empty;
-        nFaces          400;
-        startFace       23200;
+        nFaces          0;
+        startFace       59065;
     }
     maxX
     {
         type            empty;
-        nFaces          400;
-        startFace       23600;
+        nFaces          0;
+        startFace       59065;
     }
     minY
     {
         type            empty;
-        nFaces          400;
-        startFace       24000;
+        nFaces          0;
+        startFace       59065;
     }
     ground
     {
         type            wall;
-        nFaces          400;
-        startFace       24400;
+        nFaces          590;
+        startFace       59065;
     }
     maxZ
     {
         type            empty;
-        nFaces          400;
-        startFace       24800;
+        nFaces          0;
+        startFace       59655;
+    }
+    igloo_region0
+    {
+        type            wall;
+        nFaces          2260;
+        startFace       59655;
+    }
+    twoFridgeFreezers_seal_0
+    {
+        type            wall;
+        nFaces          1344;
+        startFace       61915;
+    }
+    twoFridgeFreezers_herring_1
+    {
+        type            wall;
+        nFaces          1116;
+        startFace       63259;
     }
 )
 

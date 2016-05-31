@@ -31,7 +31,7 @@
 
     label pRefCell = 0;
     scalar pRefValue = 0.0;
-    setRefCell(p, mesh.solutionDict().subDict("SIMPLE"), pRefCell, pRefValue);
+    setRefCell(p, simple.dict(), pRefCell, pRefValue);
     mesh.schemesDict().setFluxRequired(p.name());
 
     singlePhaseTransportModel laminarTransport(U, phi);
@@ -49,12 +49,9 @@
     if (pZones.size())
     {
         // nUCorrectors for pressureImplicitPorosity
-        if (mesh.solutionDict().subDict("SIMPLE").found("nUCorrectors"))
+        if (simple.dict().found("nUCorrectors"))
         {
-            nUCorr = readInt
-            (
-                mesh.solutionDict().subDict("SIMPLE").lookup("nUCorrectors")
-            );
+            nUCorr = readInt(simple.dict().lookup("nUCorrectors"));
         }
 
         if (nUCorr > 0)

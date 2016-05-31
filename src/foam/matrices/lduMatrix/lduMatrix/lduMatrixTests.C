@@ -104,4 +104,62 @@ void Foam::lduMatrix::solverPerformance::print() const
 }
 
 
+bool Foam::lduSolverPerformance::operator!=
+(
+    const lduSolverPerformance& sp
+) const
+{
+    return
+    (
+        solverName()      != sp.solverName()
+     || fieldName()       != sp.fieldName()
+     || initialResidual() != sp.initialResidual()
+     || finalResidual()   != sp.finalResidual()
+     || nIterations()     != sp.nIterations()
+     || converged()       != sp.converged()
+     || singular()        != sp.singular()
+    );
+}
+
+
+Foam::Istream& Foam::operator>>
+(
+    Istream& is,
+    typename Foam::lduSolverPerformance& sp
+)
+{
+    is.readBeginList("SolverPerformance<Type>");
+    is  >> sp.solverName_
+        >> sp.fieldName_
+        >> sp.initialResidual_
+        >> sp.finalResidual_
+        >> sp.noIterations_
+        >> sp.converged_
+        >> sp.singular_;
+    is.readEndList("SolverPerformance<Type>");
+
+    return is;
+}
+
+
+Foam::Ostream& Foam::operator<<
+(
+    Ostream& os,
+    const typename Foam::lduSolverPerformance& sp
+)
+{
+    os  << token::BEGIN_LIST
+        << sp.solverName_ << token::SPACE
+        << sp.fieldName_ << token::SPACE
+        << sp.initialResidual_ << token::SPACE
+        << sp.finalResidual_ << token::SPACE
+        << sp.noIterations_ << token::SPACE
+        << sp.converged_ << token::SPACE
+        << sp.singular_ << token::SPACE
+        << token::END_LIST;
+
+    return os;
+}
+
+
 // ************************************************************************* //

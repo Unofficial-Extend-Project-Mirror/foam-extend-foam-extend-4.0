@@ -64,6 +64,7 @@ Author
 #include "scalarIOField.H"
 #include "leastSquaresVolPointInterpolation.H"
 #include "symmetryPolyPatch.H"
+#include "pisoControl.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -72,6 +73,9 @@ int main(int argc, char *argv[])
 #   include "setRootCase.H"
 #   include "createTime.H"
 #   include "createDynamicFvMesh.H"
+
+    pisoControl piso(mesh);
+
 #   include "createFields.H"
 #   include "createStressMesh.H"
 #   include "createStressFields.H"
@@ -87,8 +91,6 @@ int main(int argc, char *argv[])
     while (runTime.loop())
     {
         Info << "Time = " << runTime.timeName() << nl << endl;
-
-#       include "readPISOControls.H"
 
 #       include "readFsiControls.H"
 
@@ -117,7 +119,7 @@ int main(int argc, char *argv[])
         while
         (
             (fsiResidualNorm > outerCorrTolerance)
-         && (outerCorr < nOuterCorr)
+         && (outerCorr < piso.nCorrPIMPLE())
         );
 
         Vs += DV;

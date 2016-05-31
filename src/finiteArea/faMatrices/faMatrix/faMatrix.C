@@ -548,16 +548,18 @@ void faMatrix<Type>::relax(const scalar alpha)
 template<class Type>
 void faMatrix<Type>::relax()
 {
-    scalar alpha = 0;
-
-    if (psi_.mesh().solutionDict().relax(psi_.name()))
+    if (psi_.mesh().solutionDict().relaxEquation(psi_.name()))
     {
-        alpha = psi_.mesh().solutionDict().relaxationFactor(psi_.name());
+        relax(psi_.mesh().solutionDict().equationRelaxationFactor(psi_.name()));
     }
-
-    if (alpha > 0)
+    else
     {
-        relax(alpha);
+        if (debug)
+        {
+            InfoIn("void faMatrix<Type>::relax()")
+                << "Relaxation factor for field " << psi_.name()
+                << " not found.  Relaxation will not be used." << endl;
+        }
     }
 }
 

@@ -12,7 +12,7 @@
         rUAf*fvc::interpolate(rhok)*(g & mesh.Sf());
     phi += buoyancyPhi;
 
-    for (int nonOrth=0; nonOrth<=nNonOrthCorr; nonOrth++)
+    while (simple.correctNonOrthogonal())
     {
         fvScalarMatrix pEqn
         (
@@ -21,18 +21,9 @@
 
         pEqn.setReference(pRefCell, pRefValue);
 
-        // retain the residual from the first iteration
-        if (nonOrth == 0)
-        {
-            eqnResidual = pEqn.solve().initialResidual();
-            maxResidual = max(eqnResidual, maxResidual);
-        }
-        else
-        {
-            pEqn.solve();
-        }
+        pEqn.solve();
 
-        if (nonOrth == nNonOrthCorr)
+        if (simple.finalNonOrthogonalIter())
         {
             // Calculate the conservative fluxes
             phi -= pEqn.flux();

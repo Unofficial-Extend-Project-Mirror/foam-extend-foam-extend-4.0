@@ -83,15 +83,12 @@ solvers
     };
 }
 
-PISO
+PIMPLE
 {
     nCorrectors                2;
     nNonOrthogonalCorrectors   1;
 
 //    removeSwirl                2;
 }
-
-SIMPLE
-{}
 
 // ************************************************************************* //

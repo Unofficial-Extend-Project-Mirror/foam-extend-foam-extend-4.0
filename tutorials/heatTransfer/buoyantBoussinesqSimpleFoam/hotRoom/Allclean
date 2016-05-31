@@ -4,4 +4,5 @@
 . $WM_PROJECT_DIR/bin/tools/CleanFunctions
 
 cleanCase
+rm -f constant/polyMesh/boundary
 cp 0/T.org 0/T

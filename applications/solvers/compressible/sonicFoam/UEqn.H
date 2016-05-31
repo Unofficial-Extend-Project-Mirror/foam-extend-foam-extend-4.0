@@ -5,20 +5,9 @@
       + turbulence->divDevRhoReff(U)
     );
 
-    if (oCorr == nOuterCorr - 1)
-    {
-        if (mesh.solutionDict().relax("UFinal"))
-        {
-            UEqn.relax(mesh.solutionDict().relaxationFactor("UFinal"));
-        }
-        else
-        {
-            UEqn.relax(1);
-        }
-    }
-    else
-    {
-        UEqn.relax();
-    }
+    UEqn.relax
+    (
+        mesh.solutionDict().equationRelaxationFactor(U.select(pimple.finalIter()))
+    );
 
     solve(UEqn == -fvc::grad(p));

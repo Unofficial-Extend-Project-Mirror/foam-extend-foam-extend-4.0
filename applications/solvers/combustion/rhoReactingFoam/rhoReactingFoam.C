@@ -36,6 +36,7 @@ Description
 #include "rhoChemistryModel.H"
 #include "chemistrySolver.H"
 #include "multivariateScheme.H"
+#include "pimpleControl.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -44,6 +45,9 @@ int main(int argc, char *argv[])
 #   include "setRootCase.H"
 #   include "createTime.H"
 #   include "createMesh.H"
+
+    pimpleControl pimple(mesh);
+
 #   include "readChemistryProperties.H"
 #   include "readGravitationalAcceleration.H"
 #   include "createFields.H"
@@ -59,7 +63,6 @@ int main(int argc, char *argv[])
     while (runTime.run())
     {
 #       include "readTimeControls.H"
-#       include "readPISOControls.H"
 #       include "compressibleCourantNo.H"
 #       include "setDeltaT.H"
 
@@ -69,14 +72,14 @@ int main(int argc, char *argv[])
 #       include "chemistry.H"
 #       include "rhoEqn.H"
 
-        for (label ocorr=1; ocorr <= nOuterCorr; ocorr++)
+        while (pimple.loop())
         {
 #           include "UEqn.H"
 #           include "YEqn.H"
 #           include "hsEqn.H"
 
             // --- PISO loop
-            for (int corr=1; corr<=nCorr; corr++)
+            while (pimple.correct())
             {
 #               include "pEqn.H"
             }

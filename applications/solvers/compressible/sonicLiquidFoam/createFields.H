@@ -42,3 +42,5 @@
 
 
 #   include "compressibleCreatePhi.H"
+
+    mesh.schemesDict().setFluxRequired(p.name());

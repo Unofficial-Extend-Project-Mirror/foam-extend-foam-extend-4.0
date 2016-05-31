@@ -39,7 +39,7 @@ SourceFiles
 #define data_H
 
 #include "IOdictionary.H"
-#include "solverPerformance.H"
+#include "lduMatrix.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -91,18 +91,16 @@ public:
             const dictionary& solverPerformanceDict() const;
 
             //- Add/set the solverPerformance entry for the named field
-            template<class Type>
             void setSolverPerformance
             (
                 const word& name,
-                const SolverPerformance<Type>&
+                const lduSolverPerformance&
             ) const;
 
             //- Add/set the solverPerformance entry, using its fieldName
-            template<class Type>
             void setSolverPerformance
             (
-                const SolverPerformance<Type>&
+                const lduSolverPerformance&
             ) const;
 };
 
@@ -110,12 +108,6 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-#ifdef NoRepository
-#   include "dataTemplates.C"
-#endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
