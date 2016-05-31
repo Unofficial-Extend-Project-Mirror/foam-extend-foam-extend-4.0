@@ -33,6 +33,3 @@
         << "  Max(alpha1) = " << max(alpha1).value()
         << endl;
 }
-
-
-solve(fvm::ddt(rho) + fvc::div(rhoPhi));
