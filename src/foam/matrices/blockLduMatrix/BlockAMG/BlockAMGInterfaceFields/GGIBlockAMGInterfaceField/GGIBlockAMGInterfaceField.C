@@ -108,8 +108,6 @@ Foam::GGIBlockAMGInterfaceField<Type>::GGIBlockAMGInterfaceField
     rank_(),
     fieldTransferBuffer_()
 {
-    Info<< "Constructed GGIBlockAMGInterfaceField" << endl;
-
     // If the interface based on a patch this must be taken care specially of
     if (isA<GGIBlockLduInterfaceField<Type> >(fineInterfaceField))
     {
@@ -145,9 +143,7 @@ Foam::GGIBlockAMGInterfaceField<Type>::GGIBlockAMGInterfaceField
 
 template<class Type>
 Foam::GGIBlockAMGInterfaceField<Type>::~GGIBlockAMGInterfaceField()
-{
-    Info<< "Destructed ~GGIBlockAMGInterfaceField" << endl;
-}
+{}
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
