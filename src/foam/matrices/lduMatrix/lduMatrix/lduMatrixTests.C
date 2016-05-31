@@ -125,7 +125,7 @@ bool Foam::lduSolverPerformance::operator!=
 Foam::Istream& Foam::operator>>
 (
     Istream& is,
-    typename Foam::lduSolverPerformance& sp
+    lduSolverPerformance& sp
 )
 {
     is.readBeginList("SolverPerformance<Type>");
@@ -145,7 +145,7 @@ Foam::Istream& Foam::operator>>
 Foam::Ostream& Foam::operator<<
 (
     Ostream& os,
-    const typename Foam::lduSolverPerformance& sp
+    const lduSolverPerformance& sp
 )
 {
     os  << token::BEGIN_LIST
