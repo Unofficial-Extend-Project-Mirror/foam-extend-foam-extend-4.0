@@ -916,7 +916,7 @@ void Foam::GeometricField<Type, PatchField, GeoMesh>::relax(const scalar alpha)
         return;
     }
 
-    //if (debug)
+    if (debug)
     {
         InfoIn
         (
