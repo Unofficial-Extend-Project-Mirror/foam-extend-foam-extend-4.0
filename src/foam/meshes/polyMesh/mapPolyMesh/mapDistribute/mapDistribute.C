@@ -43,7 +43,7 @@ Foam::List<Foam::labelPair> Foam::mapDistribute::schedule
         HashSet<labelPair, labelPair::Hash<> > commsSet(Pstream::nProcs());
 
         // Find what communication is required
-        forAll(subMap, procI)
+        forAll (subMap, procI)
         {
             if (procI != Pstream::myProcNo())
             {
@@ -77,7 +77,7 @@ Foam::List<Foam::labelPair> Foam::mapDistribute::schedule
             IPstream fromSlave(Pstream::scheduled, slave);
             List<labelPair> nbrData(fromSlave);
 
-            forAll(nbrData, i)
+            forAll (nbrData, i)
             {
                 if (findIndex(allComms, nbrData[i]) == -1)
                 {
@@ -129,7 +129,7 @@ Foam::List<Foam::labelPair> Foam::mapDistribute::schedule
 //     {
 //         Pout<< "I need to:" << endl;
 //         const List<labelPair>& comms = schedule();
-//         forAll(comms, i)
+//         forAll (comms, i)
 //         {
 //             const labelPair& twoProcs = comms[i];
 //             label sendProc = twoProcs[0];
@@ -246,7 +246,7 @@ Foam::mapDistribute::mapDistribute
     labelList nSend(Pstream::nProcs(), 0);
     labelList nRecv(Pstream::nProcs(), 0);
 
-    forAll(sendProcs, sampleI)
+    forAll (sendProcs, sampleI)
     {
         label sendProc = sendProcs[sampleI];
         label recvProc = recvProcs[sampleI];
@@ -268,7 +268,8 @@ Foam::mapDistribute::mapDistribute
 
     subMap_.setSize(Pstream::nProcs());
     constructMap_.setSize(Pstream::nProcs());
-    forAll(nSend, procI)
+
+    forAll (nSend, procI)
     {
         subMap_[procI].setSize(nSend[procI]);
         constructMap_[procI].setSize(nRecv[procI]);
@@ -276,7 +277,7 @@ Foam::mapDistribute::mapDistribute
     nSend = 0;
     nRecv = 0;
 
-    forAll(sendProcs, sampleI)
+    forAll (sendProcs, sampleI)
     {
         label sendProc = sendProcs[sampleI];
         label recvProc = recvProcs[sampleI];
@@ -286,12 +287,14 @@ Foam::mapDistribute::mapDistribute
             // I am the sender. Store index I need to send.
             subMap_[recvProc][nSend[recvProc]++] = sampleI;
         }
+
         if (Pstream::myProcNo() == recvProc)
         {
             // I am the receiver.
             constructMap_[sendProc][nRecv[sendProc]++] = sampleI;
+
             // Largest entry inside constructMap
-            constructSize_ = sampleI+1;
+            constructSize_ = sampleI + 1;
         }
     }
 }
@@ -327,7 +330,7 @@ void Foam::mapDistribute::compact(const boolList& elemIsUsed)
             {
                 boolList& subField = sendFields[domain];
                 subField.setSize(map.size());
-                forAll(map, i)
+                forAll (map, i)
                 {
                     subField[i] = elemIsUsed[map[i]];
                 }
@@ -370,7 +373,7 @@ void Foam::mapDistribute::compact(const boolList& elemIsUsed)
             const labelList& map = constructMap_[Pstream::myProcNo()];
 
             recvFields[Pstream::myProcNo()].setSize(map.size());
-            forAll(map, i)
+            forAll (map, i)
             {
                 recvFields[Pstream::myProcNo()][i] = elemIsUsed[map[i]];
             }
@@ -391,7 +394,7 @@ void Foam::mapDistribute::compact(const boolList& elemIsUsed)
             labelList newMap(map.size());
             label newI = 0;
 
-            forAll(map, i)
+            forAll (map, i)
             {
                 if (recvFields[domain][i])
                 {
@@ -420,7 +423,7 @@ void Foam::mapDistribute::compact(const boolList& elemIsUsed)
         labelList newMap(map.size());
         label newI = 0;
 
-        forAll(map, i)
+        forAll (map, i)
         {
             label destinationI = map[i];
 
@@ -439,7 +442,7 @@ void Foam::mapDistribute::compact(const boolList& elemIsUsed)
         }
     }
 
-    constructSize_ = maxConstructIndex+1;
+    constructSize_ = maxConstructIndex + 1;
 
     // Clear the schedule (note:not necessary if nothing changed)
     schedulePtr_.clear();
