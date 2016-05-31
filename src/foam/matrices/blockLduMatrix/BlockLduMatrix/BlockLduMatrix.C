@@ -269,6 +269,20 @@ Foam::BlockLduMatrix<Type>::lower() const
 
 
 template<class Type>
+void Foam::BlockLduMatrix<Type>::clearInterfaces()
+{
+    forAll (interfaces_, i)
+    {
+        if (interfaces_.set(i))
+        {
+            delete interfaces_(i);
+        }
+    }
+}
+
+
+
+template<class Type>
 bool Foam::BlockLduMatrix<Type>::empty() const
 {
     return (!diagPtr_ && !lowerPtr_ && !upperPtr_);

@@ -325,6 +325,9 @@ public:
                 return interfaces_;
             }
 
+            //- Clear interfaces.  Destructor helper
+            void clearInterfaces();
+
 
         // Matrix structure
 

@@ -89,9 +89,16 @@ Foam::coarseBlockAMGLevel<Type>::coarseBlockAMGLevel
 template<class Type>
 Foam::coarseBlockAMGLevel<Type>::~coarseBlockAMGLevel()
 {
+    // Clear addressing interfaces
     if (addrPtr_.valid())
     {
         addrPtr_().clearInterfaces();
+    }
+
+    // Clear matrix interfaces
+    if (matrixPtr_.valid())
+    {
+        matrixPtr_().clearInterfaces();
     }
 }
 
