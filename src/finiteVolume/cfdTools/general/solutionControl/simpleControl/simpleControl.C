@@ -57,6 +57,7 @@ bool Foam::simpleControl::criteriaSatisfied()
     {
         const word& variableName = iter().keyword();
         const label fieldI = applyToField(variableName);
+
         if (fieldI != -1)
         {
             scalar lastResidual = 0;
