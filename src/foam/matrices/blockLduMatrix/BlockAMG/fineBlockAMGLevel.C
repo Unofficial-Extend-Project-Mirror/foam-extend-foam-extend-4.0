@@ -236,8 +236,7 @@ void Foam::fineBlockAMGLevel<Type>::scaleX
 
     matrix_.Amul(Ax_, x);
 
-#if 1
-
+    // Variant 1: scale complete x with a single scaling factor
     scalar scalingFactorNum = sumProd(x, b);
     scalar scalingFactorDenom = sumProd(x, Ax_);
 
@@ -265,51 +264,6 @@ void Foam::fineBlockAMGLevel<Type>::scaleX
             )
         );
     }
-
-#else
-
-    // Variant 2: scale each x individually
-    // HJ, 25/Feb/2015
-    Type scalingFactorNum = sumCmptProd(x, b);
-    Type scalingFactorDenom = sumCmptProd(x, Ax_);
-
-    Vector2D<Type> scalingVector(scalingFactorNum, scalingFactorDenom);
-    reduce(scalingVector, sumOp<Vector2D<Type> >());
-
-    Type scalingFactor = pTraits<Type>::one;
-
-    // Scale x
-    for (direction dir = 0; dir < pTraits<Type>::nComponents; dir++)
-    {
-        scalar num = component(scalingVector[0], dir);
-        scalar denom = component(scalingVector[1], dir);
-
-        if
-        (
-            mag(num) > SMALL
-         && mag(num) < GREAT
-         && mag(denom) > SMALL
-         && mag(denom) < GREAT
-         && num*denom > 0
-        )
-        {
-            // Regular scaling
-            setComponent(scalingFactor, dir) = Foam::max
-            (
-                0.01,
-                Foam::min
-                (
-                    num/denom
-                    100
-                )
-            );
-        }
-    }
-
-    // Scale X
-    cmptMultiply(x, x, scalingFactor);
-
-#endif
 }
 
 
