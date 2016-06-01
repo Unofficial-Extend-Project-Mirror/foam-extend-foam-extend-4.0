@@ -46,7 +46,6 @@ fvMeshMapper = fvMesh/fvMeshMapper
 $(fvMeshMapper)/fvPatchMapper.C
 $(fvMeshMapper)/fvSurfaceMapper.C
 
-
 extendedStencil = fvMesh/extendedStencil
 
 cellToCell = $(extendedStencil)/cellToCell
