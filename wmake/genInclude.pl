@@ -51,17 +51,13 @@ my $fileName = basename($source);
 $cwd =~ s/lnInclude//;
 $source =~ s/$cwd//;
 
-my $dir = $cwd;
-$dir =~ s/^.*\/src\///;
+my $prefix = "../";
 
-my $link = $dir . $source;
+my $link = $prefix . $source;
 
 my $incGuardName = uc "INC_$fileName";
 $incGuardName =~ s/\./_/;
 open (FILE, '>', $fileName) or die ("ERROR: Can't open '$fileName' [$!]");
-print FILE "#ifndef $incGuardName\n";
-print FILE "#define $incGuardName\n";
 print FILE "#include \"$link\"\n";
-print FILE "#endif\n";
 close (FILE);
 
