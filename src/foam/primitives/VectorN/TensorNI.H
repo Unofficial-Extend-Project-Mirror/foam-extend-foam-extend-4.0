@@ -793,22 +793,33 @@ inline Cmpt det(const TensorN<Cmpt, length>& t)
 
     TensorN<Cmpt, length - 1> subMatrix;
 
+    // Laplace expansion using first column
+    // Bugfix, TU, 31 May 2016
+
     for (label i = 0; i < length; i++)
     {
-        label nj = 0;
+        // Column of submatrix
+        label js = 0;
 
-        // Build sub-matrix, skipping the
-        for (label j = 0; j < length; j++)
+        for (label j = 1; j < length; j++)
         {
-            // Skip i-th column
-            if (j == i) continue;
+            // Row of submatrix
+            label is = 0;
 
-            for (label k = 1; k < length; k++)
+            for (label k = 0; k < length; k++)
             {
-                subMatrix(nj, k) = t(j, k);
+                // Row which is crossed out in the expansion
+                if (k == i)
+                {
+                    continue;
+                }
+                else
+                {
+                    subMatrix(is,js) = t(k,j);
+                    is++;
+                }
             }
-
-            nj++;
+            js++;
         }
 
         // Handle +/- sign switch
