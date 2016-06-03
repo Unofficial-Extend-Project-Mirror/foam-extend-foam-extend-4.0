@@ -368,12 +368,18 @@ void faMatrix<Type>::setValues
     const unallocLabelList& nei = mesh.neighbour();
 
     scalarField& Diag = diag();
+    Field<Type>& psi =
+        const_cast
+        <
+            GeometricField<Type, faPatchField, areaMesh>&
+        >(psi_).internalField();
+
 
     forAll(faceLabels, i)
     {
         label facei = faceLabels[i];
 
-        psi_[facei] = values[i];
+        psi[facei] = values[i];
         source_[facei] = values[i]*Diag[facei];
 
         if (symmetric() || asymmetric())
