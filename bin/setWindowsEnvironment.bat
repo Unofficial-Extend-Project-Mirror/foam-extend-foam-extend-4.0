@@ -13,4 +13,4 @@ set MPI_BUFFER_SIZE=20000000
 
 if defined PARAVIEW_HOME set PATH=%PARAVIEW_HOME%\bin;%PATH%
 if defined MPI_ROOTDIR set PATH=%MPI_ROOTDIR%\bin;%PATH%
-set PATH=%FOAM_HOME%\lib;%FOAM_HOME%\lib\openmpi-1.6.1;%FOAM_HOME%\bin;%PATH%
+set PATH=%FOAM_HOME%\lib;%FOAM_HOME%\bin;%PATH%

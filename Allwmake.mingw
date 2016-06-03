@@ -69,8 +69,10 @@ echo "Build foam-extend ... (see `pwd`/Allwmake.log)"
 ./Allwmake > Allwmake.log 2>&1
 echo "Copying MinGW dependencies to $FOAM_APPBIN ..."
 cp -p $MINGW_HOME/bin/libgcc_s_seh-1.dll $FOAM_APPBIN
+cp -p $MINGW_HOME/bin/libgomp-1.dll $FOAM_APPBIN
 cp -p $MINGW_HOME/bin/libstdc++-6.dll $FOAM_APPBIN
 cp -p $MINGW_HOME/bin/libwinpthread-1.dll $FOAM_APPBIN
+cp -p $WM_THIRD_PARTY_DIR/packages/pthreads-w32-2-9-1-release/Pre-built.2/dll/x64/pthreadGC2.dll $FOAM_APPBIN
 echo "Creating release package ... (see `pwd`/createWindowsBinaryPackage.log)"
 ./bin/createWindowsBinaryPackage > createWindowsBinaryPackage.log 2>&1
 

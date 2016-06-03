@@ -42,14 +42,15 @@ export PROGRAMS_HOME=/c/Programs
 set_system_paths() {
     echo "Setting environment variables for user-defined installed system tools and utilities ..."
     export CMAKE_HOME=$PROGRAMS_HOME/cmake-3.2.3-win32-x86
-    export GIT_HOME=$PROGRAMS_HOME/Git
-    export MINGW_HOME=$PROGRAMS_HOME/mingw64
+    #export GIT_HOME=$PROGRAMS_HOME/Git
+    #export JAVA_HOME="/c/Program Files/Java/jre1.8.0_45"
+    export MINGW_HOME=$PROGRAMS_HOME/x86_64-4.8.2-release-win32-seh-rt_v3-rev3/mingw64
     export MPI_ROOTDIR=$PROGRAMS_HOME/OpenMPI_v1.6.1-x64
     export PARAVIEW_HOME=$PROGRAMS_HOME/ParaView-4.3.1
-    #export PERL_HOME=$PROGRAMS_HOME/strawberry-perl-5.20.2.1-64bit/perl
-    export PEXPORTS_HOME=$PROGRAMS_HOME/pexports-0.46
-    export PYTHON_HOME=$PROGRAMS_HOME/Python27
-    export SUBVERSION_HOME=$PROGRAMS_HOME/svn-win32-1.8.13
+    export PERL_HOME=$PROGRAMS_HOME/strawberry-perl-5.20.2.1-64bit/perl
+    #export PEXPORTS_HOME=$PROGRAMS_HOME/pexports-0.46-mingw32
+    #export PYTHON_HOME=$PROGRAMS_HOME/Python27
+    #export SUBVERSION_HOME=$PROGRAMS_HOME/svn-win32-1.8.13
     export WGET_HOME=$PROGRAMS_HOME/wget-1.11.4-1
     export ZIP_HOME="/c/Program Files/7-Zip"
 }
@@ -59,16 +60,16 @@ add_to_path() {
     echo "Adding user-defined installed system tools to PATH ..."
     export PATH=$ZIP_HOME:$PATH
     export PATH=$WGET_HOME/bin:$PATH
-    export PATH=$PYTHON_HOME:$PATH
-    export PATH=$SUBVERSION_HOME/bin:$PATH
-    export PATH=$GIT_HOME/cmd:$PATH
-    #export PATH=$PERL_HOME/bin:$PATH
+    #export PATH=$JAVA_HOME/bin:$PATH
+    #export PATH=$PYTHON_HOME:$PATH
+    #export PATH=$SUBVERSION_HOME/bin:$PATH
+    #export PATH=$GIT_HOME/cmd:$PATH
     export PATH=$PARAVIEW_HOME/bin:$PATH
+    export PATH=$PERL_HOME/bin:$PATH
     export PATH=$CMAKE_HOME/bin:$PATH
-    export PATH=$PEXPORTS_HOME/bin:$PATH
-    export PATH=$MINGW_HOME/bin:$PATH
-#   MPI comes last to enforce the path
     export PATH=$MPI_ROOTDIR/bin:$PATH
+    #export PATH=$PEXPORTS_HOME/bin:$PATH
+    export PATH=$MINGW_HOME/bin:$PATH
 }
 # }}}
 

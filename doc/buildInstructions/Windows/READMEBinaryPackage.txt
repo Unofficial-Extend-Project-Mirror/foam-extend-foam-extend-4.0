@@ -1,7 +1,7 @@
 #------------------------------------------------------------------------------
 # =========                 |
 # \\      /  F ield         | foam-extend: Open Source CFD
-#  \\    /   O peration     | Version:     3.2
+#  \\    /   O peration     | Version:     4.0
 #   \\  /    A nd           | Web:         http://www.foam-extend.org
 #    \\/     M anipulation  | For copyright notice see file Copyright
 #------------------------------------------------------------------------------
@@ -87,3 +87,6 @@ NOTES
 1) This version does not fully support runtime selection of extended features. If necessary, you can
    explicitly load the required DLL using the "libs" function in system/controlDict, for example:
        libs ("liblduSolvers.dll");
+
+2) The original foam-extend 4.0 source code is available from Git:
+       git clone -b nextRelease http://git.code.sf.net/p/foam-extend/foam-extend-3.2 foam-extend-4.0

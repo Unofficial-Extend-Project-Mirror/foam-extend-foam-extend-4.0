@@ -52,16 +52,15 @@ $cwd =~ s/lnInclude//;
 $source =~ s/$cwd//;
 
 my $dir = $cwd;
-$dir =~ s/^.*\/src\///;
+if ($dir =~ /^.*\/src\//) {
+    $dir =~ s/^.*\/src\///;
+}
+elsif ($dir =~ /^.*\/applications\//) {
+    $dir =~ s/^.*\/applications\///;
+}
 
 my $link = $dir . $source;
-
-my $incGuardName = uc "INC_$fileName";
-$incGuardName =~ s/\./_/;
 open (FILE, '>', $fileName) or die ("ERROR: Can't open '$fileName' [$!]");
-print FILE "#ifndef $incGuardName\n";
-print FILE "#define $incGuardName\n";
 print FILE "#include \"$link\"\n";
-print FILE "#endif\n";
 close (FILE);
 

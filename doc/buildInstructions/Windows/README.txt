@@ -1,7 +1,7 @@
 #------------------------------------------------------------------------------
 # =========                 |
 # \\      /  F ield         | foam-extend: Open Source CFD
-#  \\    /   O peration     | Version:     3.2
+#  \\    /   O peration     | Version:     4.0
 #   \\  /    A nd           | Web:         http://www.foam-extend.org
 #    \\/     M anipulation  | For copyright notice see file Copyright
 #------------------------------------------------------------------------------
@@ -52,26 +52,17 @@ already have the correct tools installed on your system.
    (such as Strawberry Perl), although you need to be careful of the
     version numbers.
 
-3) Download and install MSYS (see reference list below).  If this is your first
-   use of MSYS, create a file fstab in c/MinGW/msys/1.0/etc with single-line
-   contents:
+3) Download and install MSYS (see reference list below). If this is your first
+   use of MSYS, create a file fstab in c/MinGW/msys/1.0/etc with single-line contents:
+       c:/mingw /mingw
+   This mounts your home directory (this assumes you have installed MSYS to the default
+   c:/MinGW directory). From Windows, you will find your home directory under
+       c:/MinGW/msys/1.0/home/<user name>
 
-   c:/mingw /mingw
+4) Download the foam-extend 4.0 source code using Git:
+       git clone -b nextRelease http://git.code.sf.net/p/foam-extend/foam-extend-3.2 foam-extend-4.0
 
-   to mount your home directory (this assumes you have installed MSYS to the default
-   c:/MinGW directory).
-   From Windows, you will find your home directory under
-   c:/MinGW/msys/1.0/home/<user name>
-
-4) Download the foam-extend source code from
-
-   http://sourceforge.net/projects/openfoam-extend/
-
-   using the command:
-
-   git clone --branch nextRelease git://git.code.sf.net/p/foam-extend/foam-extend-3.2
-
-5) Open a new MSYS shell and chdir to your foam-extend-3.2 source directory.
+5) Open a new MSYS shell and chdir to your foam-extend-4.0 source directory.
 
 6) Edit the user-modifiable entries in etc/bashrc.mingw to point to the
    locations where you have installed the required system tools in the first two
@@ -102,7 +93,7 @@ already have the correct tools installed on your system.
         approach for developers.
 
    (b). From a standard Windows CMD.exe command prompt using the created
-        foam-extend-3.2-win-x64.zip stand-alone package. This can be used on any
+        foam-extend-4.0-win-x64.{7z,zip} stand-alone package. This can be used on any
         Windows machine without access to MSYS shells or compilers. See the
         READMEBinaryPackage.txt contained within the package for further details.
 
@@ -162,10 +153,10 @@ Version: 0.44 (or above)
 URL    : http://sourceforge.net/projects/mingw/files/MinGW/Extension/pexports/pexports-0.46/pexports-0.46-mingw32-bin.tar.xz/download
 For    : Extracting symbols from OpenMPI DLLs to pass to dlltool.exe (supplied in MinGW-w64 package). Move directory "bin" to "pexports-0.46" after unpacking.
 
-Name   : Pyhton
+Name   : Python
 Version: 2.7
 URL    : https://www.python.org/download/releases/2.7/
-For    : Not essential
+For    : Running Python scripts. Not essential
 
 Name   : Strawberry Perl
 Version: 5.20.2.1 (or above)
@@ -175,14 +166,12 @@ For    : Running Perl scripts, "pexports.exe" and "gmake.exe" utilities
 Name   : Subversion
 Version: 1.8.13
 URL    : http://sourceforge.net/projects/win32svn/files/1.8.13/
-For    : ??????????
+For    : Version control system. Not essential.
 
 Name   : wget
 Version: 1.11.4-1 (or above)
 URL    : http://downloads.sourceforge.net/gnuwin32/wget-1.11.4-1-bin.zip, http://downloads.sourceforge.net/gnuwin32/wget-1.11.4-1-dep.zip, http://downloads.sourceforge.net/gnuwin32/wget-1.11.4-1-doc.zip
 For    : Automatically downloading files from internet (eg. for use in automated build scripts)
-
-git clone --branch nextRelease git://git.code.sf.net/p/openfoam-extend/foam-extend-3.1
 
 
 4. EXAMPLE OUTPUT FROM SOURCING etc/bashrc.mingw
