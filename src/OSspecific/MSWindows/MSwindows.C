@@ -1247,7 +1247,7 @@ bool ping(const word& hostname, const label timeOut)
 }
 
 
-int system(const string& command)
+int system(const std::string& command)
 {
     return std::system(command.c_str());
 }
