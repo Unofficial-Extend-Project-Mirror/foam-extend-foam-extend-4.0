@@ -11,4 +11,5 @@ LIB_LIBS = \
     -L$(METIS_LIB_DIR) -lmetis \
     -L$(PARMETIS_LIB_DIR) -lmetis -lparmetis \
     -ldecompositionMethods \
-    -lmetisDecomp
+    -lmetisDecomp \
+    -L$(OPENMPI_DIR)/lib -lmpi
