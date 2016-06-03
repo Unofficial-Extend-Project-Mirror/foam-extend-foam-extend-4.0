@@ -62,7 +62,7 @@ class tmp
         //- Pointer to temporary object
         mutable T* ptr_;
 
-        // Const reference to constant object
+        //- Const reference to constant object
         const T& ref_;
 
 
@@ -79,11 +79,12 @@ public:
         //- Construct copy and increment reference count
         inline tmp(const tmp<T>&);
 
+        //- Construct copy transferring content of temporary if required
+        inline tmp(const tmp<T>&, bool allowTransfer);
 
-    // Destructor
 
-        //- Delete object when reference count == 0
-        inline ~tmp();
+    //- Destructor, delete object when reference count == 0
+    inline ~tmp();
 
 
     // Member Functions
