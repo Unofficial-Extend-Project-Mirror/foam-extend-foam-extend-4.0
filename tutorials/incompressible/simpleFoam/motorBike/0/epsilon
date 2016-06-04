@@ -9,16 +9,41 @@ FoamFile
 {
     version     2.0;
     format      ascii;
-    class       dictionary;
-    object      RASProperties;
+    class       volScalarField;
+    object      epsilon;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-RASModel            kOmegaSST;
-// RASModel            kEpsilon;
+#include        "initialConditions"
 
-turbulence          on;
+dimensions      [0 2 -3 0 0 0 0];
 
-printCoeffs         on;
+internalField   uniform 0.005;
+
+boundaryField
+{
+    #include "fixedInlet"
+
+    outlet
+    {
+        type            inletOutlet;
+        inletValue      $internalField;
+        value           $internalField;
+    }
+
+    lowerWall
+    {
+        type            omegaWallFunction;
+        value           $internalField;
+    }
+
+    "motorBike_.*"
+    {
+        type            omegaWallFunction;
+        value           $internalField;
+    }
+
+    #include "frontBackUpperPatches"
+}
 
 // ************************************************************************* //

@@ -29,6 +29,7 @@ divSchemes
     default         none;
     div(phi,U)      Gauss linearUpwindV Gauss linear;
     div(phi,k)      Gauss upwind;
+    div(phi,epsilon) Gauss upwind;
     div(phi,omega)  Gauss upwind;
     div((nuEff*dev(T(grad(U))))) Gauss linear;
 }
