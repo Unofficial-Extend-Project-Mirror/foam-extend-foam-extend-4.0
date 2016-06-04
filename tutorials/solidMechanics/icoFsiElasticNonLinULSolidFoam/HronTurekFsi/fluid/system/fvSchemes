@@ -49,6 +49,8 @@ laplacianSchemes
 interpolationSchemes
 {
     default           none;
+    interpolate(grad(U)) linear;
+    interpolate(grad(p)) linear;
     interpolate(y) linear;
     interpolate(U) skewCorrected linear;
 }

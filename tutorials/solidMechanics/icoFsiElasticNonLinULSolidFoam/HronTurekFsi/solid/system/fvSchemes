@@ -44,20 +44,21 @@ divSchemes
 laplacianSchemes
 {
     default             none;
-    laplacian(DDU,DU) Gauss linear corrected;
+    laplacian(DDU,DU)   Gauss linear corrected;
 }
 
 snGradSchemes
 {
     default none;
-//    snGrad(U)       corrected;
+
 }
 
 interpolationSchemes
 {
-    default                  none;
-    interpolate(sigma) linear;
-    interpolate(mu) linear;
+    default              none;
+    interpolate(grad(U)) linear;
+    interpolate(sigma)   linear;
+    interpolate(mu)      linear;
 }
 
 // ************************************************************************* //
