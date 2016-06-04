@@ -21,64 +21,29 @@ License
     You should have received a copy of the GNU General Public License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
+Typedef
+    Foam::lduSolverPerformance
+
+Description
+    BlockSolverPerformance instantiated for a scalar and lduMatrix
+
 \*---------------------------------------------------------------------------*/
 
-#include "diagonalSolver.H"
+#ifndef lduSolverPerformance_H
+#define lduSolverPerformance_H
 
-// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
+#include "BlockSolverPerformance.H"
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
-    defineTypeNameAndDebug(diagonalSolver, 0);
+    typedef BlockSolverPerformance<scalar> lduSolverPerformance;
 }
-
-
-// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
-
-Foam::diagonalSolver::diagonalSolver
-(
-    const word& fieldName,
-    const lduMatrix& matrix,
-    const FieldField<Field, scalar>& coupleBouCoeffs,
-    const FieldField<Field, scalar>& coupleIntCoeffs,
-    const lduInterfaceFieldPtrsList& interfaces,
-    const dictionary& dict
-)
-:
-    lduMatrix::solver
-    (
-        fieldName,
-        matrix,
-        coupleBouCoeffs,
-        coupleIntCoeffs,
-        interfaces,
-        dict
-    )
-{}
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-Foam::lduSolverPerformance Foam::diagonalSolver::solve
-(
-    scalarField& x,
-    const scalarField& b,
-    const direction cmpt
-) const
-{
-    x = b/matrix_.diag();
-
-    return lduSolverPerformance
-    (
-        typeName,
-        fieldName(),
-        0,
-        0,
-        0,
-        true,
-        false
-    );
-}
-
+#endif
 
 // ************************************************************************* //

@@ -363,7 +363,7 @@ public:
 
             //- Solve returning the solution statistics.
             //  Use the given solver controls
-            lduMatrix::solverPerformance solve(const dictionary&);
+            lduSolverPerformance solve(const dictionary&);
 
             //- Solve returning the solution statistics.
             //  Solver controls read from fvSolution

@@ -207,7 +207,7 @@ Foam::scalar Foam::lduMatrix::solver::normFactor
 
 bool Foam::lduMatrix::solver::stop
 (
-    lduMatrix::solverPerformance& solverPerf
+    lduSolverPerformance& solverPerf
 ) const
 {
     if (solverPerf.nIterations() < minIter_)
@@ -221,7 +221,7 @@ bool Foam::lduMatrix::solver::stop
 
 bool Foam::lduMatrix::solver::converged
 (
-    lduMatrix::solverPerformance& solverPerf
+    lduSolverPerformance& solverPerf
 ) const
 {
     if

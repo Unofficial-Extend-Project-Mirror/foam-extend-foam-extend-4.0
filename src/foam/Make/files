@@ -242,7 +242,6 @@ lduMatrix = matrices/lduMatrix
 $(lduMatrix)/lduMatrix/lduMatrix.C
 $(lduMatrix)/lduMatrix/lduMatrixOperations.C
 $(lduMatrix)/lduMatrix/lduMatrixATmul.C
-$(lduMatrix)/lduMatrix/lduMatrixTests.C
 $(lduMatrix)/lduMatrix/lduMatrixUpdateMatrixInterfaces.C
 $(lduMatrix)/lduMatrix/lduMatrixSolver.C
 $(lduMatrix)/lduMatrix/lduMatrixSmoother.C
@@ -641,8 +640,6 @@ $(writers)/gnuplotGraph/gnuplotGraph.C
 $(writers)/xmgrGraph/xmgrGraph.C
 $(writers)/jplotGraph/jplotGraph.C
 
-meshes/data/data.C
-
 primitives/BlockCoeff/blockCoeffBase.C
 primitives/BlockCoeff/scalarBlockCoeff.C
 primitives/BlockCoeff/sphericalTensorBlockCoeff.C
@@ -733,6 +730,8 @@ $(BlockLduSmoothers)/BlockILUCpSmoother/blockILUCpSmoothers.C
 BlockLduSolvers = matrices/blockLduMatrix/BlockLduSolvers
 $(BlockLduSolvers)/blockVectorNSolvers.C
 $(BlockLduSolvers)/BlockLduSolver/blockLduSolvers.C
+$(BlockLduSolvers)/BlockLduSolver/BlockSolverPerformances.C
+$(BlockLduSolvers)/BlockLduSolver/BlockSolverPerformanceVectorN.C
 $(BlockLduSolvers)/BlockDiagonal/blockDiagonalSolvers.C
 $(BlockLduSolvers)/BlockGaussSeidel/blockGaussSeidelSolvers.C
 $(BlockLduSolvers)/BlockCG/blockCGSolvers.C

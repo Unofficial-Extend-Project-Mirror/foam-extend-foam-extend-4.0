@@ -55,7 +55,7 @@ void Foam::fvMatrix<Foam::scalar>::setComponentReference
 
 
 template<>
-Foam::lduMatrix::solverPerformance Foam::fvMatrix<Foam::scalar>::solve
+Foam::lduSolverPerformance Foam::fvMatrix<Foam::scalar>::solve
 (
     const dictionary& solverControls
 )
@@ -104,7 +104,7 @@ Foam::lduMatrix::solverPerformance Foam::fvMatrix<Foam::scalar>::solve
 
     psi.correctBoundaryConditions();
 
-    psi_.mesh().setSolverPerformance(psi_.name(), solverPerf);
+    psi_.mesh().solutionDict().setSolverPerformance(psi_.name(), solverPerf);
 
     return solverPerf;
 }
