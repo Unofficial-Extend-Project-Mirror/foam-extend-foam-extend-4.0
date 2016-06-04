@@ -15,11 +15,6 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-libs
-(
-    "libcompressibleRASModels.so"
-)
-
 application     engineFoam;
 
 startFrom       startTime;
