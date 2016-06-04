@@ -2,7 +2,7 @@
 #       include "readSolidMechanicsControls.H"
 
         int iCorr = 0;
-        lduMatrix::solverPerformance solverPerf;
+        lduSolverPerformance solverPerf;
         scalar initialResidual = 0;
 
         lduMatrix::debug = 0;

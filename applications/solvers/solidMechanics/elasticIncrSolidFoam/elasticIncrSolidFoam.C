@@ -70,7 +70,7 @@ int main(int argc, char *argv[])
         int iCorr = 0;
         scalar initialResidual = 0;
         scalar relativeResidual = 1.0;
-        lduMatrix::solverPerformance solverPerf;
+        lduSolverPerformance solverPerf;
         lduMatrix::debug = 0;
 
         do

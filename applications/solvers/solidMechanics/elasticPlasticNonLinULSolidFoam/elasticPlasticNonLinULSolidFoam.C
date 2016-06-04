@@ -80,7 +80,7 @@ int main(int argc, char *argv[])
 #       include "readSolidMechanicsControls.H"
 
         int iCorr = 0;
-        lduMatrix::solverPerformance solverPerf;
+        lduSolverPerformance solverPerf;
         scalar initialResidual = 0;
         scalar relativeResidual = 1.0;
         lduMatrix::debug = 0;

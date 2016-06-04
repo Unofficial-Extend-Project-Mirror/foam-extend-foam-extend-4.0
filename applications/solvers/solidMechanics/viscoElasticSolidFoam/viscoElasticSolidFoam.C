@@ -73,7 +73,7 @@ int main(int argc, char *argv[])
         Info << "average lambda = " << average(lambdaf.internalField()) << endl;
 
         int iCorr = 0;
-        lduMatrix::solverPerformance solverPerf;
+        lduSolverPerformance solverPerf;
         scalar initialResidual = 1.0;
         scalar residual = 1.0;
         surfaceSymmTensorField DSigmaCorrf = fvc::interpolate(DSigmaCorr);
