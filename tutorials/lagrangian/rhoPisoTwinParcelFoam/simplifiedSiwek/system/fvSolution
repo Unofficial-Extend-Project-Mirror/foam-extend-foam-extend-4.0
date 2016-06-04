@@ -27,7 +27,7 @@ solvers
 
     U
     {
-        solver          PBiCG;
+        solver          BiCGStab;
         preconditioner  DILU;
         tolerance       1e-05;
         relTol          0;
@@ -35,7 +35,7 @@ solvers
 
     p
     {
-        solver          PBiCG;
+        solver          BiCGStab;
         preconditioner  DILU;
         tolerance       1e-06;
         relTol          0;
@@ -51,7 +51,7 @@ solvers
 
     "(Yi|CO2|O2|N2|CH4|H2|H2O|CO)"
     {
-        solver          PBiCG;
+        solver          BiCGStab;
         preconditioner  DILU;
         tolerance       1e-06;
         relTol          0;
@@ -59,7 +59,7 @@ solvers
 
     hs
     {
-        solver          PBiCG;
+        solver          BiCGStab;
         preconditioner  DILU;
         tolerance       1e-05;
         relTol          0;
@@ -67,7 +67,7 @@ solvers
 
     "(R|k|epsilon)"
     {
-        solver          PBiCG;
+        solver          BiCGStab;
         preconditioner  DILU;
         tolerance       1e-05;
         relTol          0;

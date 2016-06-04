@@ -28,7 +28,7 @@ solvers
     };
     U
     {
-        solver           PBiCG;
+        solver           BiCGStab;
         preconditioner   DILU;
 
         minIter          0;
@@ -38,7 +38,7 @@ solvers
     };
     k
     {
-        solver           PBiCG;
+        solver           BiCGStab;
         preconditioner   DILU;
 
         minIter          0;
@@ -46,9 +46,9 @@ solvers
         tolerance        1e-05;
         relTol           0.1;
     };
-    epsilon PBiCG
+    epsilon BiCGStab
     {
-        solver           PBiCG;
+        solver           BiCGStab;
         preconditioner   DILU;
 
         minIter          0;
@@ -56,9 +56,9 @@ solvers
         tolerance        1e-05;
         relTol           0.1;
     };
-    R PBiCG
+    R BiCGStab
     {
-        solver           PBiCG;
+        solver           BiCGStab;
         preconditioner   DILU;
 
         minIter          0;
@@ -66,9 +66,9 @@ solvers
         tolerance        1e-05;
         relTol           0.1;
     };
-    nuTilda PBiCG
+    nuTilda BiCGStab
     {
-        solver           PBiCG;
+        solver           BiCGStab;
         preconditioner   DILU;
 
         minIter          0;

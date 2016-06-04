@@ -22,25 +22,25 @@ solvers
         tolerance        1e-06;
         relTol           0;
     };
-    k PBiCG
+    k BiCGStab
     {
         preconditioner   DILU;
         tolerance        1e-06;
         relTol           0;
     };
-    epsilon PBiCG
+    epsilon BiCGStab
     {
         preconditioner   DILU;
         tolerance        1e-06;
         relTol           0;
     };
-    R PBiCG
+    R BiCGStab
     {
         preconditioner   DILU;
         tolerance        1e-06;
         relTol           0;
     };
-    nuTilda PBiCG
+    nuTilda BiCGStab
     {
         preconditioner   DILU;
         tolerance        1e-06;

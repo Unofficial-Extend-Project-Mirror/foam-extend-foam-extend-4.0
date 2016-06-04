@@ -29,7 +29,7 @@ solvers
         maxIter          200;
     };
 
-    U PBiCG
+    U BiCGStab
     {
         preconditioner
         {
@@ -42,7 +42,7 @@ solvers
         maxIter          200;
     };
 
-    k PBiCG
+    k BiCGStab
     {
         preconditioner
         {
@@ -55,7 +55,7 @@ solvers
         maxIter          200;
     };
 
-    epsilon PBiCG
+    epsilon BiCGStab
     {
         preconditioner
         {
@@ -68,7 +68,7 @@ solvers
         maxIter          200;
     };
 
-    R PBiCG
+    R BiCGStab
     {
         preconditioner
         {
@@ -81,7 +81,7 @@ solvers
         maxIter          200;
     };
 
-    nuTilda PBiCG
+    nuTilda BiCGStab
     {
         preconditioner
         {

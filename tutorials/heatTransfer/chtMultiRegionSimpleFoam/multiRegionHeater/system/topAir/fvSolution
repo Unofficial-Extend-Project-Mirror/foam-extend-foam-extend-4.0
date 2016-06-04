@@ -40,7 +40,7 @@ solvers
 
     "(U|h|k|epsilon)"
     {
-        solver           PBiCG;
+        solver           BiCGStab;
         preconditioner   DILU;
         tolerance        1e-08;
         relTol           0.1;

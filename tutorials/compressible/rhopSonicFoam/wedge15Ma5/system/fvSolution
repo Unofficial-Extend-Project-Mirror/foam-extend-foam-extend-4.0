@@ -27,7 +27,7 @@ solvers
 
     rho
     {
-        solver          PBiCG;
+        solver          BiCGStab;
         preconditioner  DILU;
         tolerance       1e-15;
         relTol          0;
@@ -35,7 +35,7 @@ solvers
 
     rhoU
     {
-        solver          PBiCG;
+        solver          BiCGStab;
         preconditioner  DILU;
         tolerance       1e-15;
         relTol          0;
@@ -43,7 +43,7 @@ solvers
 
     rhoE
     {
-        solver          PBiCG;
+        solver          BiCGStab;
         preconditioner  DILU;
         tolerance       1e-15;
         relTol          0;
@@ -51,7 +51,7 @@ solvers
 
     rhoH
     {
-        solver          PBiCG;
+        solver          BiCGStab;
         preconditioner  DILU;
         tolerance       1e-15;
         relTol          0;

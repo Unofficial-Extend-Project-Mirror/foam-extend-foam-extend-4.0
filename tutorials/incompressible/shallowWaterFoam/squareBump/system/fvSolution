@@ -34,7 +34,7 @@ solvers
 
     hU
     {
-        solver          PBiCG;
+        solver          BiCGStab;
         preconditioner  DILU;
         tolerance       1e-6;
         relTol          0;

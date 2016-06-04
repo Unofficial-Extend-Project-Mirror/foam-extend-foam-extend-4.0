@@ -30,7 +30,7 @@ solvers
         relTol           0;
     };
     // Solver for the k equation
-    k PBiCG
+    k BiCGStab
     {
         preconditioner
         {
@@ -43,7 +43,7 @@ solvers
         relTol           0;
     };
     // Solver for the epsilon equation
-    epsilon PBiCG
+    epsilon BiCGStab
     {
         preconditioner
         {
@@ -56,7 +56,7 @@ solvers
         relTol           0;
     };
     // Solver for the R equation
-    R PBiCG
+    R BiCGStab
     {
         preconditioner
         {
@@ -69,7 +69,7 @@ solvers
         relTol           0;
     };
     // Solver for the nuTilda equation
-    nuTilda PBiCG
+    nuTilda BiCGStab
     {
         preconditioner
         {

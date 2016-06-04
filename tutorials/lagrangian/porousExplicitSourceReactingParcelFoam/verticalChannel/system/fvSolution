@@ -51,7 +51,7 @@ solvers
     };
     "(Yi|hs)"
     {
-        solver          PBiCG;
+        solver          BiCGStab;
         preconditioner  DILU;
         maxIter         200;
         tolerance       1e-06;

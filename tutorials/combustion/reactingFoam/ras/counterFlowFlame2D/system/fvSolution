@@ -34,7 +34,7 @@ solvers
 
     "(U|Yi|hs|k|epsilon)"
     {
-        solver          PBiCG;
+        solver          BiCGStab;
         preconditioner  DILU;
         tolerance       1e-06;
         relTol          0;

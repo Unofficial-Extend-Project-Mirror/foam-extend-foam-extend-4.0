@@ -26,7 +26,7 @@ solvers
 
     U
     {
-        solver          PBiCG;
+        solver          BiCGStab;
         preconditioner  DILU;
         tolerance       1e-05;
         relTol          0;
@@ -34,7 +34,7 @@ solvers
 
     T
     {
-        solver          PBiCG;
+        solver          BiCGStab;
         preconditioner  DILU;
         tolerance       1e-05;
         relTol          0;

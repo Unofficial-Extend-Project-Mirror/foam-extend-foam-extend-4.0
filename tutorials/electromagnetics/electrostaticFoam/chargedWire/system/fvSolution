@@ -22,7 +22,7 @@ solvers
         tolerance        1e-08;
         relTol           0.2;
     };
-    rho PBiCG
+    rho BiCGStab
     {
         preconditioner   DILU;
         tolerance        1e-08;

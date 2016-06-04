@@ -52,21 +52,21 @@ solvers
     }
     U
     {
-        solver           PBiCG;
+        solver           BiCGStab;
         preconditioner   DILU;
         tolerance        1e-07;
         relTol           0.1;
     }
     k
     {
-        solver           PBiCG;
+        solver           BiCGStab;
         preconditioner   DILU;
         tolerance        1e-07;
         relTol           0.01;
     }
     epsilon
     {
-        solver           PBiCG;
+        solver           BiCGStab;
         preconditioner   DILU;
         tolerance        1e-07;
         relTol           0.01;

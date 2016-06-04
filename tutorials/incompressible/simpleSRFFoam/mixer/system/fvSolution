@@ -32,35 +32,35 @@ solvers
     };
     k
     {
-        solver           PBiCG;
+        solver           BiCGStab;
         preconditioner   DILU;
         tolerance        1e-05;
         relTol           0.1;
     };
     epsilon
     {
-        solver           PBiCG;
+        solver           BiCGStab;
         preconditioner   DILU;
         tolerance        1e-05;
         relTol           0.1;
     };
     omega
     {
-        solver           PBiCG;
+        solver           BiCGStab;
         preconditioner   DILU;
         tolerance        1e-05;
         relTol           0.1;
     };
     R
     {
-        solver           PBiCG;
+        solver           BiCGStab;
         preconditioner   DILU;
         tolerance        1e-05;
         relTol           0.1;
     };
     nuTilda
     {
-        solver           PBiCG;
+        solver           BiCGStab;
         preconditioner   DILU;
         tolerance        1e-05;
         relTol           0.1;

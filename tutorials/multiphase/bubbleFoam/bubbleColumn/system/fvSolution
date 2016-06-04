@@ -16,48 +16,55 @@ FoamFile
 
 solvers
 {
-    p PCG
+    p
     {
+        solver           PCG;
         preconditioner   DIC;
         tolerance        1e-10;
         relTol           0;
-    };
-    Ua PBiCG
+    }
+    Ua
     {
+        solver           BiCGStab;
         preconditioner   DILU;
         tolerance        1e-05;
         relTol           0;
-    };
-    Ub PBiCG
+    }
+    Ub
     {
+        solver           BiCGStab;
         preconditioner   DILU;
         tolerance        1e-05;
         relTol           0;
-    };
-    alpha PBiCG
+    }
+    alpha
     {
+        solver           BiCGStab;
         preconditioner   DILU;
         tolerance        1e-10;
         relTol           0;
-    };
-    beta PBiCG
+    }
+    beta
     {
+        solver           BiCGStab;
         preconditioner   DILU;
         tolerance        1e-10;
         relTol           0;
-    };
-    k PBiCG
+    }
+    k
     {
+        solver           BiCGStab;
         preconditioner   DILU;
         tolerance        1e-05;
         relTol           0;
-    };
-    epsilon PBiCG
+    }
+    epsilon
     {
+        solver           BiCGStab;
         preconditioner   DILU;
         tolerance        1e-05;
         relTol           0;
-    };
+    }
 }
 
 PISO

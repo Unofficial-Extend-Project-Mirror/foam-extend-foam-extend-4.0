@@ -103,7 +103,7 @@ solvers
 
     "(k|epsilon|omega|R|nuTilda)"
     {
-        solver          PBiCG;
+        solver          BiCGStab;
         preconditioner  DILU;
         tolerance       1e-8;
         relTol          0;

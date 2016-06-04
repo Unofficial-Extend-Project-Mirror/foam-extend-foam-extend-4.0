@@ -22,13 +22,13 @@ solvers
         tolerance        1e-06;
         relTol           0;
     };
-    U PBiCG
+    U BiCGStab
     {
         preconditioner   DILU;
         tolerance        1e-05;
         relTol           0;
     };
-    B PBiCG
+    B BiCGStab
     {
         preconditioner   DILU;
         tolerance        1e-05;

@@ -22,19 +22,19 @@ solvers
         tolerance        1e-07;
         relTol           0;
     };
-    U PBiCG
+    U BiCGStab
     {
         preconditioner   DILU;
         tolerance        1e-07;
         relTol           0;
     };
-    k PBiCG
+    k BiCGStab
     {
         preconditioner   DILU;
         tolerance        1e-07;
         relTol           0;
     };
-    epsilon PBiCG
+    epsilon BiCGStab
     {
         preconditioner   DILU;
         tolerance        1e-07;
@@ -46,7 +46,7 @@ solvers
         tolerance        1e-07;
         relTol           0;
     };
-    Alpha PBiCG
+    Alpha BiCGStab
     {
         preconditioner   DILU;
         tolerance        1e-07;

@@ -19,7 +19,7 @@ solvers
 {
     p
     {
-        solver          PBiCG;
+        solver          BiCGStab;
         preconditioner  DILU;
         tolerance       1e-12;
         relTol          0;

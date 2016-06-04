@@ -25,35 +25,35 @@ solvers
     };
     U
     {
-        solver           PBiCG;
+        solver           BiCGStab;
         preconditioner   DILU;
         tolerance        1e-05;
         relTol           0;
     };
     h
     {
-        solver           PBiCG;
+        solver           BiCGStab;
         preconditioner   DILU;
         tolerance        1e-05;
         relTol           0;
     };
     k
     {
-        solver           PBiCG;
+        solver           BiCGStab;
         preconditioner   DILU;
         tolerance        1e-05;
         relTol           0;
     };
     epsilon
     {
-        solver           PBiCG;
+        solver           BiCGStab;
         preconditioner   DILU;
         tolerance        1e-05;
         relTol           0;
     };
     R
     {
-        solver           PBiCG;
+        solver           BiCGStab;
         preconditioner   DILU;
         tolerance        1e-05;
         relTol           0;
