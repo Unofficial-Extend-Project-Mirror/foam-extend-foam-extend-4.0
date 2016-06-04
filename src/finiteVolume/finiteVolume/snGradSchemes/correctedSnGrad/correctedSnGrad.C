@@ -30,6 +30,7 @@ Description
 #include "volFields.H"
 #include "surfaceFields.H"
 #include "linear.H"
+#include "surfaceInterpolate.H"
 #include "fvcGrad.H"
 #include "gaussGrad.H"
 
@@ -61,17 +62,8 @@ Foam::fv::correctedSnGrad<Type>::fullGradCorrection
 {
     const fvMesh& mesh = this->mesh();
 
-    // construct GeometricField<Type, fvsPatchField, surfaceMesh>
     tmp<GeometricField<Type, fvsPatchField, surfaceMesh> > tssf =
-        mesh.correctionVectors()
-      & linear<typename outerProduct<vector, Type>::type>(mesh).interpolate
-        (
-            gradScheme<Type>::New
-            (
-                mesh,
-                mesh.schemesDict().gradScheme("grad(" + vf.name() + ')')
-            )().grad(vf, "grad(" + vf.name() + ')')
-        );
+        mesh.correctionVectors() & fvc::interpolate(fvc::grad(vf));
     tssf().rename("snGradCorr(" + vf.name() + ')');
 
     return tssf;

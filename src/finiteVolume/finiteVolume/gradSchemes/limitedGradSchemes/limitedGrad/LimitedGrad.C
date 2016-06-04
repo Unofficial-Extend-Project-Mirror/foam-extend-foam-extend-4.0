@@ -232,7 +232,7 @@ LimitedGrad<Type, GradientLimiter>::gradientField
 ) const
 {
     // Get base gradient
-    tmp<GeoGradFieldType> tGrad = basicGradScheme_().grad(vf, name);
+    tmp<GeoGradFieldType> tGrad = basicGradScheme_().calcGrad(vf, name);
     GeoGradFieldType& gradVf = tGrad();
 
     // Apply the limiter
@@ -263,6 +263,7 @@ LimitedGrad<Type, GradientLimiter>::gradientMatrix
     GradMatrixType& bs = tbs();
 
     // Calculate limiter.  Using explicit gradient
+    // Using cached gradient?  Check.  HJ, 4/Jun/2016
     GeoFieldType limitField
     (
         this->limiter

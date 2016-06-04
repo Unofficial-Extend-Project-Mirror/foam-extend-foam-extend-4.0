@@ -158,12 +158,6 @@ Foam::fv::gradScheme<Type>::grad
             solution::cachePrintMessage("Recalculating", name, vsf);
             tmp<GradFieldType> tgGrad = calcGrad(vsf, name);
 
-            // Note: in order for the patchNeighbourField to be
-            // correct on coupled boundaries,
-            // correctBoundaryConditions needs to be called.  The call
-            // shall be moved into the library fvc operators
-            tgGrad().correctBoundaryConditions();
-
             solution::cachePrintMessage("Storing", name, vsf);
             regIOobject::store(tgGrad.ptr());
             GradFieldType& gGrad = const_cast<GradFieldType&>

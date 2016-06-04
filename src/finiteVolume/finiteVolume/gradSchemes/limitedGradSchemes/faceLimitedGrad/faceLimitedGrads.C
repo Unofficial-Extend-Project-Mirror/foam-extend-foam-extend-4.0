@@ -387,6 +387,7 @@ tmp<BlockLduSystem<vector, vector> > faceLimitedGrad<scalar>::fvmGrad
     BlockLduSystem<vector, vector>& bs = tbs();
 
     // Calculate current gradient for explicit limiting
+    // Using cached gradient?  Check.  HJ, 4/Jun/2016
     tmp<volVectorField> tGrad = basicGradScheme_().grad(vsf);
     const volVectorField& g = tGrad();
 

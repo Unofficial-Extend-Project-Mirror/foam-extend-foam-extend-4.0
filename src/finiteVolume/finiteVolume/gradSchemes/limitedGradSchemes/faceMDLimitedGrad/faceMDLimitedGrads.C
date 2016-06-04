@@ -57,7 +57,7 @@ tmp<volVectorField> faceMDLimitedGrad<scalar>::calcGrad
 {
     const fvMesh& mesh = vsf.mesh();
 
-    tmp<volVectorField> tGrad = basicGradScheme_().grad(vsf, name);
+    tmp<volVectorField> tGrad = basicGradScheme_().calcGrad(vsf, name);
 
     if (k_ < SMALL)
     {
@@ -196,7 +196,7 @@ tmp<volTensorField> faceMDLimitedGrad<vector>::calcGrad
 {
     const fvMesh& mesh = vvf.mesh();
 
-    tmp<volTensorField> tGrad = basicGradScheme_().grad(vvf, name);
+    tmp<volTensorField> tGrad = basicGradScheme_().calcGrad(vvf, name);
 
     if (k_ < SMALL)
     {
