@@ -44,13 +44,6 @@ ADD_PARAVIEW_PLUGIN(
     SERVER_MANAGER_SOURCES vtkPV4FoamReader.cxx
 )
 
-# Build the client-side plugin
-#ADD_PARAVIEW_PLUGIN(
-#    PV4FoamReader
-#    "1.0"
-#    GUI_RESOURCES PV4FoamReader.qrc
-#)
-
 TARGET_LINK_LIBRARIES(
     PV4FoamReader_SM
     foam
