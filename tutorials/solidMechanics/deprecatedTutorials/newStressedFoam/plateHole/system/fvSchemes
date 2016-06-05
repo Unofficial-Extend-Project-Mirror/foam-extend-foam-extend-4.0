@@ -49,6 +49,7 @@ interpolationSchemes
     default                  none;
     interpolate(sigma)       linear;
     interpolate(muLambda)    harmonic;
+    interpolate(grad(U))     linear;
 }
 
 // ************************************************************************* //

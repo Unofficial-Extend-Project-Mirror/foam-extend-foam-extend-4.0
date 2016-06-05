@@ -51,6 +51,8 @@ interpolationSchemes
     default           none;
     interpolate(y) linear;
     interpolate(U) skewCorrected linear;
+    interpolate(grad(U)) linear;
+    interpolate(grad(p))     linear;
 }
 
 snGradSchemes
