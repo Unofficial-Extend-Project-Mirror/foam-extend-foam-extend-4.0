@@ -4,6 +4,14 @@
     name="PV4FoamReader"
     class="vtkPV4FoamReader">
 
+    <!-- File extension section for paraview 4.3+ -->
+
+      <Hints>
+        <ReaderFactory
+          extensions="OpenFOAM"
+          file_description="OpenFOAM Reader" />
+      </Hints>
+
     <!-- File name - compulsory -->
     <StringVectorProperty
       name="FileName"
