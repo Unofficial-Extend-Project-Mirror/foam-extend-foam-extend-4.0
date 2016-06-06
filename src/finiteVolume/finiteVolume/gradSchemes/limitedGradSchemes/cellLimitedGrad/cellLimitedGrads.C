@@ -76,7 +76,7 @@ inline void cellLimitedGrad<Type>::limitFace
     const Type& extrapolate
 )
 {
-    for(direction cmpt=0; cmpt<Type::nComponents; cmpt++)
+    for (direction cmpt = 0; cmpt < Type::nComponents; cmpt++)
     {
         cellLimitedGrad<scalar>::limitFace
         (

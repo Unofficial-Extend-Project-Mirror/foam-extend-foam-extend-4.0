@@ -165,7 +165,7 @@ inline void cellMDLimitedGrad<Type>::limitFace
     const vector& dcf
 )
 {
-    for(direction cmpt=0; cmpt<Type::nComponents; cmpt++)
+    for (direction cmpt = 0; cmpt < Type::nComponents; cmpt++)
     {
         vector gi(g[cmpt], g[cmpt+3], g[cmpt+6]);
         cellMDLimitedGrad<scalar>::limitFace
