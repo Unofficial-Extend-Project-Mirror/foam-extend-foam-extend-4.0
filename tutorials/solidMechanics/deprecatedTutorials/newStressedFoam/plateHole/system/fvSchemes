@@ -50,6 +50,7 @@ interpolationSchemes
     interpolate(grad(U))     linear;
     interpolate(sigma)       linear;
     interpolate(muLambda)    harmonic;
+    interpolate(grad(U))     linear;
 }
 
 // ************************************************************************* //
