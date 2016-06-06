@@ -83,9 +83,9 @@ tmp<volSymmTensorField> scaleSimilarity::devBeff() const
 }
 
 
-tmp<fvVectorMatrix> scaleSimilarity::divDevBeff(volVectorField& U) const
+tmp<fvVectorMatrix> scaleSimilarity::divDevBeff() const
 {
-    return fvm::Su(fvc::div(devBeff()), U);
+    return fvm::Su(fvc::div(devBeff()), U_);
 }
 
 

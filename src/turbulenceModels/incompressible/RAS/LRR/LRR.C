@@ -226,20 +226,20 @@ tmp<volSymmTensorField> LRR::devReff() const
 }
 
 
-tmp<fvVectorMatrix> LRR::divDevReff(volVectorField& U) const
+tmp<fvVectorMatrix> LRR::divDevReff() const
 {
     if (couplingFactor_.value() > 0.0)
     {
         return
         (
-            fvc::div(R_ + couplingFactor_*nut_*fvc::grad(U), "div(R)")
+            fvc::div(R_ + couplingFactor_*nut_*fvc::grad(U_), "div(R)")
           + fvc::laplacian
             (
                  (1.0 - couplingFactor_)*nut_,
-                 U,
+                 U_,
                  "laplacian(nuEff,U)"
             )
-          - fvm::laplacian(nuEff(), U)
+          - fvm::laplacian(nuEff(), U_)
         );
     }
     else
@@ -247,8 +247,8 @@ tmp<fvVectorMatrix> LRR::divDevReff(volVectorField& U) const
         return
         (
             fvc::div(R_)
-          + fvc::laplacian(nut_, U, "laplacian(nuEff,U)")
-          - fvm::laplacian(nuEff(), U)
+          + fvc::laplacian(nut_, U_, "laplacian(nuEff,U)")
+          - fvm::laplacian(nuEff(), U_)
         );
     }
 }

@@ -2,7 +2,7 @@
     (
         fvm::ddt(U)
       + fvm::div(phi, U)
-      + turbulence->divDevReff(U)
+      + turbulence->divDevReff()
     );
 
     if (piso.momentumPredictor())

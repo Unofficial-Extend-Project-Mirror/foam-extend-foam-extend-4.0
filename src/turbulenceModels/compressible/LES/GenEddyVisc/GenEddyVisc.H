@@ -143,7 +143,7 @@ public:
 
         //- Returns div(rho*dev(B)).
         // This is the additional term due to the filtering of the NSE.
-        virtual tmp<fvVectorMatrix> divDevRhoBeff(volVectorField& U) const;
+        virtual tmp<fvVectorMatrix> divDevRhoBeff() const;
 
         //- Correct Eddy-Viscosity and related properties
         virtual void correct(const tmp<volTensorField>& gradU);

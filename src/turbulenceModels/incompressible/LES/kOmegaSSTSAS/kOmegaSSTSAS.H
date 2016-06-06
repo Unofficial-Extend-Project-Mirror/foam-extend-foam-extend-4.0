@@ -243,7 +243,7 @@ public:
 
         //- Return the deviatoric part of the divergence of Beff
         //  i.e. the additional term in the filtered NSE.
-        virtual tmp<fvVectorMatrix> divDevBeff(volVectorField& U) const;
+        virtual tmp<fvVectorMatrix> divDevBeff() const;
 
         //- Solve the turbulence equations (k-w) and correct the turbulence
         //  viscosity

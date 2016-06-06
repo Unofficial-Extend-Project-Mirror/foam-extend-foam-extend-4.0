@@ -109,7 +109,7 @@ public:
 
         //- Returns div(B).
         // This is the additional term due to the filtering of the NSE.
-        virtual tmp<fvVectorMatrix> divDevBeff(volVectorField& U) const;
+        virtual tmp<fvVectorMatrix> divDevBeff() const;
 
         //- Read LESProperties dictionary
         virtual bool read();

@@ -3,7 +3,7 @@
     tmp<fvVectorMatrix> UEqn
     (
         fvm::div(phi, U)
-      + turbulence->divDevReff(U)
+      + turbulence->divDevReff()
       + fvm::SuSp(-fvc::div(phi), U)
     );
 

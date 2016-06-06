@@ -302,7 +302,7 @@ public:
         virtual tmp<volSymmTensorField> devRhoReff() const = 0;
 
         //- Return the source term for the momentum equation
-        virtual tmp<fvVectorMatrix> divDevRhoReff(volVectorField& U) const = 0;
+        virtual tmp<fvVectorMatrix> divDevRhoReff() const = 0;
 
         //- Return yPlus for the given patch
         virtual tmp<scalarField> yPlus

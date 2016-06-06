@@ -174,7 +174,7 @@ public:
         tmp<volSymmTensorField> devRhoReff() const;
 
         //- Return the source term for the momentum equation
-        tmp<fvVectorMatrix> divDevRhoReff(volVectorField& U) const;
+        tmp<fvVectorMatrix> divDevRhoReff() const;
 
         //- Solve the turbulence equations and correct the turbulence viscosity
         void correct();

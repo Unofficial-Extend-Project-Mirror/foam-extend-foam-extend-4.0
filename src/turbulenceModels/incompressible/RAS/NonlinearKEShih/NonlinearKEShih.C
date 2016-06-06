@@ -262,13 +262,13 @@ tmp<volSymmTensorField> NonlinearKEShih::devReff() const
 }
 
 
-tmp<fvVectorMatrix> NonlinearKEShih::divDevReff(volVectorField& U) const
+tmp<fvVectorMatrix> NonlinearKEShih::divDevReff() const
 {
     return
     (
         fvc::div(nonlinearStress_)
-      - fvm::laplacian(nuEff(), U)
-      - fvc::div(nuEff()*dev(T(fvc::grad(U))))
+      - fvm::laplacian(nuEff(), U_)
+      - fvc::div(nuEff()*dev(T(fvc::grad(U_))))
     );
 }
 

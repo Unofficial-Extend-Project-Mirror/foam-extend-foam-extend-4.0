@@ -131,7 +131,7 @@ public:
 
         //- Implementation of div(B). This is necessary to override
         // (and include) the div(B) terms from both the parent classes.
-        virtual tmp<fvVectorMatrix> divDevBeff(volVectorField& U) const;
+        virtual tmp<fvVectorMatrix> divDevBeff() const;
 
         //- Correct Eddy-Viscosity and related properties
         virtual void correct(const tmp<volTensorField>& gradU);

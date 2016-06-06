@@ -178,12 +178,12 @@ tmp<volSymmTensorField> kEpsilon::devReff() const
 }
 
 
-tmp<fvVectorMatrix> kEpsilon::divDevReff(volVectorField& U) const
+tmp<fvVectorMatrix> kEpsilon::divDevReff() const
 {
     return
     (
-      - fvm::laplacian(nuEff(), U)
-      - fvc::div(nuEff()*dev(T(fvc::grad(U))))
+      - fvm::laplacian(nuEff(), U_)
+      - fvc::div(nuEff()*dev(T(fvc::grad(U_))))
     );
 }
 

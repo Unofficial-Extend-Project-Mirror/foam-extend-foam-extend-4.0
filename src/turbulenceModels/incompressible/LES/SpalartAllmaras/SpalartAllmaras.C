@@ -344,11 +344,11 @@ tmp<volSymmTensorField> SpalartAllmaras::devBeff() const
 }
 
 
-tmp<fvVectorMatrix> SpalartAllmaras::divDevBeff(volVectorField& U) const
+tmp<fvVectorMatrix> SpalartAllmaras::divDevBeff() const
 {
     return
     (
-      - fvm::laplacian(nuEff(), U) - fvc::div(nuEff()*dev(T(fvc::grad(U))))
+      - fvm::laplacian(nuEff(), U_) - fvc::div(nuEff()*dev(T(fvc::grad(U_))))
     );
 }
 

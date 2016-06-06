@@ -2,7 +2,7 @@
     fvVectorMatrix HUEqn
     (
         fvm::div(phi, U)
-      + turbulence->divDevReff(U)
+      + turbulence->divDevReff()
     );
 
     // Time derivative matrix

@@ -70,7 +70,7 @@ int main(int argc, char *argv[])
         fvVectorMatrix HUEqn
         (
             fvm::div(phi, U)
-          + sgsModel->divDevBeff(U)
+          + sgsModel->divDevBeff()
          ==
             flowDirection*gradP
         );

@@ -140,11 +140,11 @@ tmp<volSymmTensorField> laminar::devBeff() const
 }
 
 
-tmp<fvVectorMatrix> laminar::divDevBeff(volVectorField& U) const
+tmp<fvVectorMatrix> laminar::divDevBeff() const
 {
     return
     (
-      - fvm::laplacian(nu(), U) - fvc::div(nu()*dev(T(fvc::grad(U))))
+      - fvm::laplacian(nu(), U_) - fvc::div(nu()*dev(T(fvc::grad(U_))))
     );
 }
 

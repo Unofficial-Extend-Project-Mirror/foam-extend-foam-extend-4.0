@@ -232,13 +232,13 @@ tmp<volSymmTensorField> LienLeschzinerLowRe::devReff() const
 }
 
 
-tmp<fvVectorMatrix> LienLeschzinerLowRe::divDevReff(volVectorField& U) const
+tmp<fvVectorMatrix> LienLeschzinerLowRe::divDevReff() const
 {
     return
     (
-      - fvm::laplacian(nuEff(), U)
-    //- (fvc::grad(U) & fvc::grad(nuEff()))
-      - fvc::div(nuEff()*T(fvc::grad(U)))
+      - fvm::laplacian(nuEff(), U_)
+    //- (fvc::grad(U_) & fvc::grad(nuEff()))
+      - fvc::div(nuEff()*T(fvc::grad(U_)))
     );
 }
 

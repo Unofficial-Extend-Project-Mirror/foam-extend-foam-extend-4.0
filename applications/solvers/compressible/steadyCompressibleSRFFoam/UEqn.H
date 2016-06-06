@@ -5,7 +5,7 @@
     (
         fvm::ddt(rho, Urel)
       + fvm::div(phi, Urel)
-      + turbulence->divDevRhoReff(Urel)
+      + turbulence->divDevRhoReff()
       + rho*SRF->Su()
     );
 

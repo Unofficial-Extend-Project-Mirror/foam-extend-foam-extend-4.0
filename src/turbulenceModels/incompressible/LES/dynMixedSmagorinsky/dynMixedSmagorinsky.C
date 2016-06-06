@@ -99,12 +99,12 @@ tmp<volSymmTensorField> dynMixedSmagorinsky::devBeff() const
 }
 
 
-tmp<fvVectorMatrix> dynMixedSmagorinsky::divDevBeff(volVectorField& U) const
+tmp<fvVectorMatrix> dynMixedSmagorinsky::divDevBeff() const
 {
     return
     (
-        scaleSimilarity::divDevBeff(U)
-      + dynSmagorinsky::divDevBeff(U)
+        scaleSimilarity::divDevBeff()
+      + dynSmagorinsky::divDevBeff()
     );
 }
 

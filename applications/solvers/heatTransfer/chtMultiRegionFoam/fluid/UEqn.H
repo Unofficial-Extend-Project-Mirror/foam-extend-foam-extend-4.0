@@ -3,7 +3,7 @@
     (
         fvm::ddt(rho, U)
       + fvm::div(phi, U)
-      + turb.divDevRhoReff(U)
+      + turb.divDevRhoReff()
     );
 
     UEqn().relax();

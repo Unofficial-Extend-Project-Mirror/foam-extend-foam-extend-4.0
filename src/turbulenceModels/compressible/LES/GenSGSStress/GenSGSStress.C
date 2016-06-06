@@ -136,14 +136,14 @@ tmp<volSymmTensorField> GenSGSStress::devRhoBeff() const
 }
 
 
-tmp<fvVectorMatrix> GenSGSStress::divDevRhoBeff(volVectorField& U) const
+tmp<fvVectorMatrix> GenSGSStress::divDevRhoBeff() const
 {
     return
     (
-        fvc::div(rho()*B_ + 0.05*muSgs_*fvc::grad(U))
-      + fvc::laplacian(0.95*muSgs_, U, "laplacian(muEff,U)")
-      - fvm::laplacian(muEff(), U)
-      - fvc::div(mu()*dev2(T(fvc::grad(U))))
+        fvc::div(rho()*B_ + 0.05*muSgs_*fvc::grad(U_))
+      + fvc::laplacian(0.95*muSgs_, U_, "laplacian(muEff,U)")
+      - fvm::laplacian(muEff(), U_)
+      - fvc::div(mu()*dev2(T(fvc::grad(U_))))
     );
 }
 

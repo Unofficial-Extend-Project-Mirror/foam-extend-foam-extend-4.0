@@ -2,7 +2,7 @@
     (
         fvm::ddt(rho, U)
       + fvm::div(phi, U)
-      + turbulence->divDevRhoReff(U)
+      + turbulence->divDevRhoReff()
      ==
         rho.dimensionedInternalField()*g
       + coalParcels.SU()

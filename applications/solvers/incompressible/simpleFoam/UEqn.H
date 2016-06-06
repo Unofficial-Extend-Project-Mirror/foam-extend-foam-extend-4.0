@@ -3,7 +3,7 @@
     tmp<fvVectorMatrix> HUEqn
     (
         fvm::div(phi, U)
-      + turbulence->divDevReff(U)
+      + turbulence->divDevReff()
     );
 
     // Get under-relaxation factor

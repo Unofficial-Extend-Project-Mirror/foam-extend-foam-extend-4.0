@@ -116,7 +116,7 @@ public:
 
         //- Return the deviatoric part of the effective sub-grid
         //  turbulence stress tensor including the laminar stress
-        virtual tmp<fvVectorMatrix> divDevBeff(volVectorField& U) const;
+        virtual tmp<fvVectorMatrix> divDevBeff() const;
 
         //- Correct Eddy-Viscosity and related properties
         virtual void correct(const tmp<volTensorField>& gradU);

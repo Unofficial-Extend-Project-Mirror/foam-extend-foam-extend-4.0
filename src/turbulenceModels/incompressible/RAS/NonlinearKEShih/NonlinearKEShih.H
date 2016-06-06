@@ -156,7 +156,7 @@ public:
         virtual tmp<volSymmTensorField> devReff() const;
 
         //- Return the source term for the momentum equation
-        virtual tmp<fvVectorMatrix> divDevReff(volVectorField& U) const;
+        virtual tmp<fvVectorMatrix> divDevReff() const;
 
         //- Solve the turbulence equations and correct the turbulence viscosity
         virtual void correct();

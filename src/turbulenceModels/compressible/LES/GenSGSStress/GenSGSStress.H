@@ -147,7 +147,7 @@ public:
 
         //- Returns divergence of B : i.e. the additional term in the
         //  filtered NSE
-        virtual tmp<fvVectorMatrix> divDevRhoBeff(volVectorField& U) const;
+        virtual tmp<fvVectorMatrix> divDevRhoBeff() const;
 
         //- Correct Eddy-Viscosity and related properties
         virtual void correct(const tmp<volTensorField>& gradU);

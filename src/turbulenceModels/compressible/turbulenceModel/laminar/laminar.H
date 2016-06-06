@@ -119,7 +119,7 @@ public:
         virtual tmp<volSymmTensorField> devRhoReff() const;
 
         //- Return the source term for the momentum equation
-        virtual tmp<fvVectorMatrix> divDevRhoReff(volVectorField& U) const;
+        virtual tmp<fvVectorMatrix> divDevRhoReff() const;
 
         //- Correct the laminar viscosity
         virtual void correct();

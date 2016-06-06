@@ -60,7 +60,7 @@ int main(int argc, char *argv[])
     {
         Info<< "Time = " << runTime.timeName() << nl << endl;
 
-        fvVectorMatrix divR = turbulence->divDevReff(U);
+        fvVectorMatrix divR = turbulence->divDevReff();
         divR.source() = flowMask & divR.source();
 
         fvVectorMatrix UEqn

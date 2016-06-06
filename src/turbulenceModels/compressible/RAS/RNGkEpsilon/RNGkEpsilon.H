@@ -169,7 +169,7 @@ public:
         virtual tmp<volSymmTensorField> devRhoReff() const;
 
         //- Return the effective stress tensor including the laminar stress
-        virtual tmp<fvVectorMatrix> divDevRhoReff(volVectorField& U) const;
+        virtual tmp<fvVectorMatrix> divDevRhoReff() const;
 
         //- Solve the turbulence equations and correct the turbulence viscosity
         virtual void correct();

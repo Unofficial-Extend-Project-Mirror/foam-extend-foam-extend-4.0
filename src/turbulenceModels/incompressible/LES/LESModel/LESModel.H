@@ -211,7 +211,7 @@ public:
 
         //- Returns div(dev(Beff)).
         //  This is the additional term due to the filtering of the NSE.
-        virtual tmp<fvVectorMatrix> divDevBeff(volVectorField& U) const = 0;
+        virtual tmp<fvVectorMatrix> divDevBeff() const = 0;
 
 
         // RAS compatibility functions for the turbulenceModel base class
@@ -235,9 +235,9 @@ public:
             }
 
             //- Return the source term for the momentum equation
-            virtual tmp<fvVectorMatrix> divDevReff(volVectorField& U) const
+            virtual tmp<fvVectorMatrix> divDevReff() const
             {
-                return divDevBeff(U);
+                return divDevBeff();
             }
 
 

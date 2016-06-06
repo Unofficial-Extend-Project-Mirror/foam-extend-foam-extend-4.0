@@ -175,7 +175,7 @@ public:
 
         //- Return the deviatoric part of the divergence of Beff
         //  i.e. the additional term in the filtered NSE.
-        virtual tmp<fvVectorMatrix> divDevBeff(volVectorField& U) const;
+        virtual tmp<fvVectorMatrix> divDevBeff() const;
 
         //- Correct nuTilda and related properties
         virtual void correct(const tmp<volTensorField>& gradU);

@@ -353,12 +353,12 @@ tmp<volSymmTensorField> blockKOmegaSST::devReff() const
 }
 
 
-tmp<fvVectorMatrix> blockKOmegaSST::divDevReff(volVectorField& U) const
+tmp<fvVectorMatrix> blockKOmegaSST::divDevReff() const
 {
     return
     (
-      - fvm::laplacian(nuEff(), U)
-      - fvc::div(nuEff()*dev(T(fvc::grad(U))))
+      - fvm::laplacian(nuEff(), U_)
+      - fvc::div(nuEff()*dev(T(fvc::grad(U_))))
     );
 }
 

@@ -4,7 +4,7 @@ tmp<fvVectorMatrix> UEqn
 (
     pZones.ddt(rho, U)
   + fvm::div(phi, U)
-  + turbulence->divDevRhoReff(U)
+  + turbulence->divDevRhoReff()
 );
 
 UEqn().relax

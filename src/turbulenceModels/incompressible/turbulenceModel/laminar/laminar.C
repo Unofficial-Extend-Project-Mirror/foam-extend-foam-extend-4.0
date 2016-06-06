@@ -188,12 +188,12 @@ tmp<volSymmTensorField> laminar::devReff() const
 }
 
 
-tmp<fvVectorMatrix> laminar::divDevReff(volVectorField& U) const
+tmp<fvVectorMatrix> laminar::divDevReff() const
 {
     return
     (
-      - fvm::laplacian(nuEff(), U)
-      - fvc::div(nuEff()*dev(T(fvc::grad(U))))
+      - fvm::laplacian(nuEff(), U_)
+      - fvc::div(nuEff()*dev(T(fvc::grad(U_))))
     );
 }
 

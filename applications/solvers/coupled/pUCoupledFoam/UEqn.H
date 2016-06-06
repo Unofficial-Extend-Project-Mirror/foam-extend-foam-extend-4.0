@@ -9,7 +9,7 @@
     fvVectorMatrix UEqn
     (
         fvm::div(phi, U)
-      + turbulence->divDevReff(U)
+      + turbulence->divDevReff()
     );
 
     rAU = 1.0/UEqn.A();

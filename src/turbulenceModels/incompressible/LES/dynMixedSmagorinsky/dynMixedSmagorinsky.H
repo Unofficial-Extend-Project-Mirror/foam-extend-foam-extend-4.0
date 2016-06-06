@@ -126,7 +126,7 @@ public:
 
         //- Returns div(B).
         // This is the additional term due to the filtering of the NSE.
-        tmp<fvVectorMatrix> divDevBeff(volVectorField& U) const;
+        tmp<fvVectorMatrix> divDevBeff() const;
 
         //- Correct Eddy-Viscosity and related properties
         void correct(const tmp<volTensorField>& gradU);

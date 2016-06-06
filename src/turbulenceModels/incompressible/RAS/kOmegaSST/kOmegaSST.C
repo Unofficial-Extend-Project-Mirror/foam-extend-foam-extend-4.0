@@ -334,18 +334,18 @@ tmp<volSymmTensorField> kOmegaSST::devReff() const
                 IOobject::NO_READ,
                 IOobject::NO_WRITE
             ),
-           -nuEff()*dev(twoSymm(fvc::grad(U_)))
+            -nuEff()*dev(twoSymm(fvc::grad(U_)))
         )
     );
 }
 
 
-tmp<fvVectorMatrix> kOmegaSST::divDevReff(volVectorField& U) const
+tmp<fvVectorMatrix> kOmegaSST::divDevReff() const
 {
     return
     (
-      - fvm::laplacian(nuEff(), U)
-      - fvc::div(nuEff()*dev(T(fvc::grad(U))))
+      - fvm::laplacian(nuEff(), U_)
+      - fvc::div(nuEff()*dev(T(fvc::grad(U_))))
     );
 }
 
@@ -458,7 +458,6 @@ void kOmegaSST::correct()
     kEqn.relax();
     solve(kEqn);
     bound(k_, k0_);
-    bound(omega_, omega0_);
 
     // Re-calculate viscosity
     // Fixed sqrt(2) error.  HJ, 10/Jun/2015

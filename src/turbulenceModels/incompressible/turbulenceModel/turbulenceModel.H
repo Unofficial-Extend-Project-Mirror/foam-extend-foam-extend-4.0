@@ -64,7 +64,7 @@ namespace incompressible
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class turbulenceModel Declaration
+                      Class turbulenceModel Declaration
 \*---------------------------------------------------------------------------*/
 
 class turbulenceModel
@@ -191,7 +191,7 @@ public:
         virtual tmp<volSymmTensorField> devReff() const = 0;
 
         //- Return the source term for the momentum equation
-        virtual tmp<fvVectorMatrix> divDevReff(volVectorField& U) const = 0;
+        virtual tmp<fvVectorMatrix> divDevReff() const = 0;
 
         //- Solve the turbulence equations and correct the turbulence viscosity
         virtual void correct() = 0;

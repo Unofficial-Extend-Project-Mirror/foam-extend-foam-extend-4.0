@@ -69,7 +69,7 @@ int main(int argc, char *argv[])
             tmp<fvVectorMatrix> UrelEqn
             (
                 fvm::div(phi, Urel)
-              + turbulence->divDevReff(Urel)
+              + turbulence->divDevReff()
               + SRF->Su()
             );
 

@@ -166,12 +166,12 @@ tmp<volSymmTensorField> laminar::devRhoReff() const
 }
 
 
-tmp<fvVectorMatrix> laminar::divDevRhoReff(volVectorField& U) const
+tmp<fvVectorMatrix> laminar::divDevRhoReff() const
 {
     return
     (
-      - fvm::laplacian(muEff(), U)
-      - fvc::div(muEff()*dev2(T(fvc::grad(U))))
+      - fvm::laplacian(muEff(), U_)
+      - fvc::div(muEff()*dev2(T(fvc::grad(U_))))
     );
 }
 

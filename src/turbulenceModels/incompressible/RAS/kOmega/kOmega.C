@@ -187,12 +187,12 @@ tmp<volSymmTensorField> kOmega::devReff() const
 }
 
 
-tmp<fvVectorMatrix> kOmega::divDevReff(volVectorField& U) const
+tmp<fvVectorMatrix> kOmega::divDevReff() const
 {
     return
     (
-      - fvm::laplacian(nuEff(), U)
-      - fvc::div(nuEff()*dev(T(fvc::grad(U))))
+      - fvm::laplacian(nuEff(), U_)
+      - fvc::div(nuEff()*dev(T(fvc::grad(U_))))
     );
 }
 
