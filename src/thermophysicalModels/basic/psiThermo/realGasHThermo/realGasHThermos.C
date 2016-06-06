@@ -28,13 +28,9 @@ Institut für Thermodynamik
 Technische Universität Braunschweig
 Germany
 
-
-
 \*---------------------------------------------------------------------------*/
 
-
 #include "makeBasicPsiThermo.H"
-
 
 #include "redlichKwong.H"
 #include "pengRobinson.H"
@@ -44,7 +40,7 @@ Germany
 #include "realGasSpecieThermo.H"
 #include "constTransport.H"
 #include "sutherlandTransport.H"
-
+#include "constantHeatCapacity.H"
 #include "pureMixture.H"
 #include "realGasHThermo.H"
 
@@ -106,9 +102,6 @@ makeBasicRealGasThermo
     pengRobinson
 );
 
-
-
-
 makeBasicRealGasThermo
 (
     realGasHThermo,
@@ -138,6 +131,88 @@ makeBasicRealGasThermo
     nasaHeatCapacityPolynomial,
     soaveRedlichKwong
 );
+
+makeBasicRealGasThermo
+(
+    realGasHThermo,
+    pureMixture,
+    sutherlandTransport,
+    realGasSpecieThermo,
+    constantHeatCapacity,
+    pengRobinson
+);
+
+
+makeBasicRealGasThermo
+(
+    realGasHThermo,
+    pureMixture,
+    sutherlandTransport,
+    realGasSpecieThermo,
+    constantHeatCapacity,
+    aungierRedlichKwong
+);
+
+makeBasicRealGasThermo
+(
+    realGasHThermo,
+    pureMixture,
+    sutherlandTransport,
+    realGasSpecieThermo,
+    constantHeatCapacity,
+    redlichKwong
+);
+
+makeBasicRealGasThermo
+(
+    realGasHThermo,
+    pureMixture,
+    sutherlandTransport,
+    realGasSpecieThermo,
+    constantHeatCapacity,
+    soaveRedlichKwong
+);
+
+makeBasicRealGasThermo
+(
+    realGasHThermo,
+    pureMixture,
+    constTransport,
+    realGasSpecieThermo,
+    constantHeatCapacity,
+    pengRobinson
+);
+
+makeBasicRealGasThermo
+(
+    realGasHThermo,
+    pureMixture,
+    constTransport,
+    realGasSpecieThermo,
+    constantHeatCapacity,
+    aungierRedlichKwong
+);
+
+makeBasicRealGasThermo
+(
+    realGasHThermo,
+    pureMixture,
+    constTransport,
+    realGasSpecieThermo,
+    constantHeatCapacity,
+    redlichKwong
+);
+
+makeBasicRealGasThermo
+(
+    realGasHThermo,
+    pureMixture,
+    constTransport,
+    realGasSpecieThermo,
+    constantHeatCapacity,
+    soaveRedlichKwong
+);
+
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

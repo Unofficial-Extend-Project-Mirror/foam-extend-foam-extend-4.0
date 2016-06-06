@@ -63,33 +63,33 @@ namespace Foam
 class aungierRedlichKwong
 :
     public specie
-
 {
-
-protected:
-
-    // Private data
-        scalar pcrit_;
-        scalar Tcrit_;
-        scalar azentricFactor_;
-        scalar rhocrit_;
+    // private data
+    //CL: data at critical point
+    scalar pcrit_;
+    scalar Tcrit_; 
+    scalar rhocrit_;
+    scalar azentricFactor_;
 
     //Aungier Redlich Kwong factors
-        mutable scalar a0_;
-        mutable scalar b_;
-        mutable scalar c_;
-        mutable scalar n_;
+    scalar a0_;
+    scalar b_;
+    scalar c_;
+    scalar n_;
 
     //CL: pow of constants (b_, c_) used in the code e.g. b2_=b*b;
-        mutable scalar b2_;
-        mutable scalar b3_;
-        mutable scalar b4_;
-        mutable scalar b5_;
-        mutable scalar c2_;
+    scalar b2_;
+    scalar b3_;
+    scalar b4_;
+    scalar b5_;
+    scalar c2_;
 
     //CL: rhoMin and rhoMax are only used as boundaries for the bisection methode (see rho function)
-    scalar rhoMax_;
     scalar rhoMin_;
+    scalar rhoMax_;
+
+    //- Density @STD, initialise after a0, b, c, n!
+    scalar rhostd_;
 
     //CL: Variables to save the values of a, dadT and d2adT2 of the mixture
     //CL: Variables must corrected for changing temperatures
@@ -100,15 +100,11 @@ protected:
     //CL: save the temperature for which the save coefficients (amix,dadTmix,d2adT2mix) are correct
     mutable scalar TSave;
 
-    //Density @STD, initialise after a, b!
-        scalar rhostd_;
-
     //Protected functions
     //CL: function updates the coefficients (aSave, daSave, d2aSave)
     inline void updateModelCoefficients(const  scalar T) const;
 
 public:
-
 
     // Constructors
 
@@ -135,51 +131,51 @@ public:
 
    // Member functions
 
+        //Return Aungier Redlich Kwong factors
+        inline scalar a0() const;
+
+        inline scalar b() const;
+
+        inline scalar c() const;
+
+        inline scalar n() const;
+
         inline scalar rhostd() const;
 
+        inline scalar rhoMin() const;
+
+        inline scalar rhoMax() const;
+
+        inline scalar Tcrit() const;
+
+        inline scalar pcrit() const;
+
+        inline scalar rhocrit() const;
+
+        inline scalar azentricFactor() const;
+
         //CL: Model coefficient a(T)
-        inline scalar a(const  scalar T)const;
+        inline scalar a(const scalar T) const;
 
         //CL: temperature deriviative of model coefficient a(T)
-        inline scalar dadT(const  scalar T)const;
+        inline scalar dadT(const scalar T) const;
 
         //CL: second order temperature deriviative of model coefficient a(T)
-        inline scalar d2adT2(const  scalar T)const;
-
-        //Return Aungier Redlich Kwong factors
-        inline scalar a0()const;
-
-        inline scalar b()const;
-
-        inline scalar c()const;
-
-        inline scalar n()const;
-
-        //CL: return power of constants (b_, c_)
-        inline scalar b2()const;
-
-        inline scalar b3()const;
-
-        inline scalar b4()const;
-
-        inline scalar b5()const;
-
-        inline scalar c2()const;
-
+        inline scalar d2adT2(const scalar T) const;
 
         //CL: Equation of state
         inline scalar p(const scalar rho, const scalar T) const;
 
         //CL: first order derivatives
-        inline scalar dpdv(const scalar rho, const  scalar T) const;
+        inline scalar dpdv(const scalar rho, const scalar T) const;
 
         inline scalar dpdT(const scalar rho, const scalar T) const;
 
-        inline scalar dvdT(const scalar rho, const  scalar T) const;
+        inline scalar dvdT(const scalar rho, const scalar T) const;
 
         inline scalar dvdp(const scalar rho, const scalar T) const;
 
-        inline scalar isobarExpCoef(const scalar rho, const  scalar T) const;
+        inline scalar isobarExpCoef(const scalar rho, const scalar T) const;
 
         inline scalar isothermalCompressiblity
         (
@@ -192,22 +188,30 @@ public:
         (
             const scalar rho,
             const scalar T
-        ) const ;
+        ) const;
 
         //CL: second order derivatives, not Used At The Moment
-        inline scalar d2pdv2(const scalar rho, const  scalar T) const;
+        inline scalar d2pdv2(const scalar rho, const scalar T) const;
 
-        inline scalar d2pdT2(const scalar rho,   scalar T) const;
+        inline scalar d2pdT2(const scalar rho, const scalar T) const;
 
-        inline scalar d2pdvdT(const scalar rho, const  scalar T) const;
+        inline scalar d2pdvdT(const scalar rho, const scalar T) const;
 
-        inline scalar d2vdT2(const scalar rho, const  scalar T) const;
+        inline scalar d2vdT2(const scalar rho, const scalar T) const;
 
         //CL: Used for internal Energy
-        inline scalar integral_p_dv(const scalar rho, const  scalar T) const;
+        inline scalar integral_p_dv
+        (
+            const scalar rho,
+            const scalar T
+        ) const;
 
         //CL: Used for Entropy
-        inline scalar integral_dpdT_dv(const scalar rho, const  scalar T) const;
+        inline scalar integral_dpdT_dv
+        (
+            const scalar rho,
+            const scalar T
+        ) const;
 
         //- Return density [kg/m^3]
         // rho0 is the starting point of the newton solver used to calculate rho
@@ -218,12 +222,12 @@ public:
             const scalar rho0
         ) const;
 
-        inline scalar rho(const scalar p, const  scalar T) const;
+        inline scalar rho(const scalar p, const scalar T) const;
 
         //- Return compressibility drho/dp at T=constant [s^2/m^2]
         inline scalar psi(const scalar rho, const scalar T) const;
 
-        //- Return compression factor  []
+        //- Return compression factor []
         inline scalar Z
         (
             const scalar p,
@@ -242,6 +246,8 @@ public:
 
         inline void operator+=(const aungierRedlichKwong&);
 
+        inline void operator*=(const scalar);
+
 
     // Friend operators
 
@@ -256,6 +262,7 @@ public:
             const scalar s,
             const aungierRedlichKwong&
         );
+
 
     // Ostream Operator
 

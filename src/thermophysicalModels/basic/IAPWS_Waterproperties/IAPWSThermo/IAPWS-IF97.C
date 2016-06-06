@@ -27,8 +27,8 @@ Christian Lucas
 Institut für Thermodynamik
 Technische Universität Braunschweig
 Germany
-\*---------------------------------------------------------------------------*/
 
+\*---------------------------------------------------------------------------*/
 
 #include "IAPWS-IF97.H"
 
@@ -55,6 +55,7 @@ void Foam::calculateProperties_ph
     calculateProperties_h(S,p,h,T,rho,psi,drhodh,mu,alpha,x);
 }
 
+
 //CL: calculated all (minimal) needed properties + the vapor mass fraction for a given pressure and enthalpy
 void Foam::calculateProperties_ph
 (
@@ -74,6 +75,7 @@ void Foam::calculateProperties_ph
     S=freesteam_set_ph(p,h);
     calculateProperties_h(S,p,h,T,rho,psi,drhodh,mu,alpha,x);
 }
+
 
 //CL: calculated all (minimal) needed properties for a given pressure and temperature
 void Foam::calculateProperties_pT
@@ -97,6 +99,7 @@ void Foam::calculateProperties_pT
     S=freesteam_set_pT(p,T);
     calculateProperties_h(S,p,h,T,rho,psi,drhodh,mu,alpha,x);
 }
+
 
 //CL: calculated all (minimal) needed properties + the vapor mass fraction for a given pressure and temperature
 void Foam::calculateProperties_pT
@@ -305,11 +308,13 @@ void Foam::calculateProperties_h
     }
 }
 
+
 //CL: returns density for given pressure and temperature
 Foam::scalar Foam::rho_pT(scalar p,scalar T)
 {
     return 1/freesteam_v(freesteam_set_pT(p,T));
 }
+
 
 //CL: returns density for given pressure and enthalpy
 Foam::scalar Foam::rho_ph(scalar p,scalar h)
@@ -317,11 +322,13 @@ Foam::scalar Foam::rho_ph(scalar p,scalar h)
     return 1/freesteam_v(freesteam_set_ph(p,h));
 }
 
+
 //CL: returns Cp(heat capacity @ contant pressure) for given pressure and temperature
 Foam::scalar Foam::cp_pT(scalar p,scalar T)
 {
     return freesteam_cp(freesteam_set_pT(p,T));
 }
+
 
 //CL: returns Cp(heat capacity @ contant pressure) for given pressure and enthalpy
 Foam::scalar Foam::cp_ph(scalar p,scalar h)
@@ -335,17 +342,20 @@ Foam::scalar Foam::cv_pT(scalar p,scalar T)
     return freesteam_cv(freesteam_set_pT(p,T));
 }
 
+
 //CL: returns Cv (heat capacity @ contant volume) for given pressure and enthalpy
 Foam::scalar Foam::cv_ph(scalar p,scalar h)
 {
     return freesteam_cv(freesteam_set_ph(p,h));
 }
 
+
 //CL: returns enthalpy for given pressure and temperature
 Foam::scalar Foam::h_pT(scalar p,scalar T)
 {
     return freesteam_h(freesteam_set_pT(p,T));
 }
+
 
 //CL: returns temperature for given pressure and enthalpy
 Foam::scalar Foam::T_ph(scalar p,scalar h)
@@ -429,7 +439,6 @@ Foam::scalar Foam::psiH(SteamState S)
         scalar rhov,rhol,betav,betal,kappav,kappal,vv,vl,cpl,hl,hv,h,p;
         scalar dvldp,dvvdp,dhldp,dhvdp;
         scalar dpdT,dvdp,dxdp;
-
 
         SteamState Sl,Sv;
 
@@ -539,7 +548,6 @@ Foam::scalar Foam::drhodh(SteamState S)
     }
     else if (region==3)
     {
-
         scalar gamma,cv,p;
 
         p=freesteam_region3_p_rhoT(S.R3.rho,S.R3.T);
@@ -557,7 +565,6 @@ Foam::scalar Foam::drhodh(SteamState S)
     }
     else if (region==4)
     {
-
         scalar vv,vl,hl,hv,p;
         SteamState Sl,Sv;
 

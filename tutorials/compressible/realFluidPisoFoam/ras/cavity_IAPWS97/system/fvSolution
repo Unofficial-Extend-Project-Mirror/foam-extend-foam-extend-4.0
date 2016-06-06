@@ -1,9 +1,9 @@
-/*--------------------------------*- C++ -*----------------------------------*\
-| =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     |                                  |
-|   \\  /    A nd           |                   
-|    \\/     M anipulation  |                                                 |
+/*---------------------------------------------------------------------------*\
+  =========                 |
+  \\      /  F ield         | foam-extend: Open Source CFD
+   \\    /   O peration     |
+    \\  /    A nd           | For copyright notice see file Copyright
+     \\/     M anipulation  |
 \*---------------------------------------------------------------------------*/
 FoamFile
 {
@@ -23,11 +23,12 @@ solvers
         tolerance       1e-14;
         relTol          0.001;
         smoother        GaussSeidel;
-	minIter		4;	
+        minIter		    4;	
+        //maxIter		100;
         cacheAgglomeration true;
-	nPreSweeps	1;
-	nPostSweeps	3;
-	nFinestSweeps	3;
+        nPreSweeps      1;
+        nPostSweeps     3;
+        nFinestSweeps   3;
         nCellsInCoarsestLevel 20;
         agglomerator    faceAreaPair;
         mergeLevels     1;
@@ -86,12 +87,9 @@ solvers
 
 PISO
 {
-    //Important
-    realFluid true;
     nNonOrthogonalCorrectors 0;
-    nCorrectors     1;
+    nCorrectors     2;
     momentumPredictor yes;
-    // transonic true;
 }
 
 

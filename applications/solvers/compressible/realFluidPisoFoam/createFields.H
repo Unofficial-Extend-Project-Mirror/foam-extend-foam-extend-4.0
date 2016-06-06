@@ -11,8 +11,6 @@
     const volScalarField& psi = thermo.psi();
     const volScalarField& drhodh = thermo.drhodh();
 
-    bool realFluid=mesh.solutionDict().subDict("PISO").lookupOrDefault<bool>("realFluid",false);
-
     volScalarField rho
     (
         IOobject
@@ -42,7 +40,6 @@
 
 #   include "compressibleCreatePhi.H"
 
-
     Info<< "Creating turbulence model\n" << endl;
     autoPtr<compressible::turbulenceModel> turbulence
     (
@@ -54,7 +51,6 @@
             thermo
         )
     );
-
 
     Info<< "Creating field DpDt\n" << endl;
     volScalarField DpDt =

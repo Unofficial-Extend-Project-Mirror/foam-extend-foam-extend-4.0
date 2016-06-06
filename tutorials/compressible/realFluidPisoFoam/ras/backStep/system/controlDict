@@ -1,9 +1,9 @@
-/*--------------------------------*- C++ -*----------------------------------*\
-| =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  1.6                                   |
-|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
-|    \\/     M anipulation  |                                                 |
+/*---------------------------------------------------------------------------*\
+  =========                 |
+  \\      /  F ield         | foam-extend: Open Source CFD
+   \\    /   O peration     |
+    \\  /    A nd           | For copyright notice see file Copyright
+     \\/     M anipulation  |
 \*---------------------------------------------------------------------------*/
 FoamFile
 {
@@ -19,6 +19,8 @@ application     realFluidPisoFoam;
 
 startFrom       latestTime;
 
+//startTime       0;
+
 stopAt          endTime;
 
 endTime         0.5;
@@ -27,7 +29,7 @@ deltaT          1e-5;
 
 writeControl    runTime;
 
-writeInterval   1e-2;
+writeInterval   0.1;
 
 purgeWrite      0;
 
@@ -43,7 +45,7 @@ timePrecision   10;
 
 adjustTimeStep  yes;
 
-maxCo           0.5;
+maxCo          0.5;
 
 maxDeltaT       1e-2;
 

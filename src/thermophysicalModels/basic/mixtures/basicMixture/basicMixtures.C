@@ -33,12 +33,19 @@ Description
 #include "makeBasicMixture.H"
 
 #include "perfectGas.H"
+#include "redlichKwong.H"
+#include "pengRobinson.H"
+#include "aungierRedlichKwong.H"
+#include "soaveRedlichKwong.H"
 
 #include "eConstThermo.H"
 
 #include "hConstThermo.H"
 #include "janafThermo.H"
+#include "nasaHeatCapacityPolynomial.H"
+#include "constantHeatCapacity.H"
 #include "specieThermo.H"
+#include "realGasSpecieThermo.H"
 
 #include "constTransport.H"
 #include "sutherlandTransport.H"
@@ -48,13 +55,6 @@ Description
 #include "thermoPhysicsTypes.H"
 
 #include "addToRunTimeSelectionTable.H"
-
-#include "redlichKwong.H"
-#include "pengRobinson.H"
-#include "aungierRedlichKwong.H"
-#include "soaveRedlichKwong.H"
-#include "realGasSpecieThermo.H"
-#include "nasaHeatCapacityPolynomial.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -118,7 +118,6 @@ makeBasicRealFluidMixture
     redlichKwong
 );
 
-
 makeBasicRealFluidMixture
 (
     pureMixture,
@@ -136,7 +135,6 @@ makeBasicRealFluidMixture
     nasaHeatCapacityPolynomial,
     aungierRedlichKwong
 );
-
 
 makeBasicRealFluidMixture
 (
@@ -147,8 +145,6 @@ makeBasicRealFluidMixture
     soaveRedlichKwong
 );
 
-
-
 makeBasicRealFluidMixture
 (
     pureMixture,
@@ -157,7 +153,6 @@ makeBasicRealFluidMixture
     nasaHeatCapacityPolynomial,
     redlichKwong
 );
-
 
 makeBasicRealFluidMixture
 (
@@ -168,7 +163,6 @@ makeBasicRealFluidMixture
     pengRobinson
 );
 
-
 makeBasicRealFluidMixture
 (
     pureMixture,
@@ -178,13 +172,84 @@ makeBasicRealFluidMixture
     aungierRedlichKwong
 );
 
-
 makeBasicRealFluidMixture
 (
     pureMixture,
     constTransport,
     realGasSpecieThermo,
     nasaHeatCapacityPolynomial,
+    soaveRedlichKwong
+);
+
+makeBasicRealFluidMixture
+(
+    pureMixture,
+    sutherlandTransport,
+    realGasSpecieThermo,
+    constantHeatCapacity,
+    redlichKwong
+);
+
+makeBasicRealFluidMixture
+(
+    pureMixture,
+    sutherlandTransport,
+    realGasSpecieThermo,
+    constantHeatCapacity,
+    pengRobinson
+);
+
+makeBasicRealFluidMixture
+(
+    pureMixture,
+    sutherlandTransport,
+    realGasSpecieThermo,
+    constantHeatCapacity,
+    aungierRedlichKwong
+);
+
+makeBasicRealFluidMixture
+(
+    pureMixture,
+    sutherlandTransport,
+    realGasSpecieThermo,
+    constantHeatCapacity,
+    soaveRedlichKwong
+);
+
+makeBasicRealFluidMixture
+(
+    pureMixture,
+    constTransport,
+    realGasSpecieThermo,
+    constantHeatCapacity,
+    redlichKwong
+);
+
+makeBasicRealFluidMixture
+(
+    pureMixture,
+    constTransport,
+    realGasSpecieThermo,
+    constantHeatCapacity,
+    pengRobinson
+);
+
+makeBasicRealFluidMixture
+(
+    pureMixture,
+    constTransport,
+    realGasSpecieThermo,
+    constantHeatCapacity,
+    aungierRedlichKwong
+);
+
+makeBasicRealFluidMixture
+(
+    pureMixture,
+    constTransport,
+    realGasSpecieThermo,
+    constantHeatCapacity,
     soaveRedlichKwong
 );
 

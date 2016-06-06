@@ -164,6 +164,9 @@ public:
         //- Construct from Istream
         nasaHeatCapacityPolynomial(Istream&);
 
+        //- Construct from dictionary
+        nasaHeatCapacityPolynomial(const dictionary& dict);
+
         //- Construct as named copy
         inline nasaHeatCapacityPolynomial(const word&, const nasaHeatCapacityPolynomial&);
 

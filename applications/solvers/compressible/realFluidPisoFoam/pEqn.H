@@ -3,89 +3,28 @@ rho = thermo.rho();
 volScalarField rUA = 1.0/UEqn.A();
 U = rUA*UEqn.H();
 
-if (realFluid)
+phi =
+    fvc::interpolate(rho)*
+    (
+        (fvc::interpolate(U) & mesh.Sf())
+      + fvc::ddtPhiCorr(rUA, rho, U, phi)
+    );
+
+while (piso.correctNonOrthogonal())
 {
-    phi =
-        fvc::interpolate(rho)*
-        (
-            (fvc::interpolate(U) & mesh.Sf())
-          + fvc::ddtPhiCorr(rUA, rho, U, phi)
-        );
+    fvScalarMatrix pEqn
+    (
+        psi*fvm::ddt(p)
+      + drhodh*fvc::ddt(h)
+      + fvc::div(phi)
+      - fvm::laplacian(rho*rUA, p)
+    );
 
-    while (piso.correctNonOrthogonal())
+    pEqn.solve();
+
+    if (piso.finalNonOrthogonalIter())
     {
-        fvScalarMatrix pEqn
-        (
-            psi*fvm::ddt(p)
-          + drhodh*fvc::ddt(h)
-          + fvc::div(phi)
-          - fvm::laplacian(rho*rUA, p)
-        );
-
-        pEqn.solve();
-
-        if (piso.finalNonOrthogonalIter())
-        {
-            phi += pEqn.flux();
-        }
-    }
-}
-else
-{
-    if (piso.transonic())
-    {
-        surfaceScalarField phid
-        (
-            "phid",
-            fvc::interpolate(psi)
-           *(
-                (fvc::interpolate(U) & mesh.Sf())
-               + fvc::ddtPhiCorr(rUA, rho, U, phi)
-            )
-        );
-
-        while (piso.correctNonOrthogonal())
-        {
-            fvScalarMatrix pEqn
-            (
-                fvm::ddt(psi, p)
-              + fvm::div(phid, p)
-              - fvm::laplacian(rho*rUA, p)
-            );
-
-            pEqn.solve();
-
-            if (piso.finalNonOrthogonalIter())
-            {
-                phi == pEqn.flux();
-            }
-        }
-    }
-    else
-    {
-        phi =
-        fvc::interpolate(rho)*
-        (
-            (fvc::interpolate(U) & mesh.Sf())
-          + fvc::ddtPhiCorr(rUA, rho, U, phi)
-        );
-
-        while (piso.correctNonOrthogonal())
-        {
-            fvScalarMatrix pEqn
-            (
-                fvm::ddt(psi, p)
-              + fvc::div(phi)
-              - fvm::laplacian(rho*rUA, p)
-            );
-
-            pEqn.solve();
-
-            if (piso.finalNonOrthogonalIter())
-            {
-                phi += pEqn.flux();
-            }
-        }
+        phi += pEqn.flux();
     }
 }
 

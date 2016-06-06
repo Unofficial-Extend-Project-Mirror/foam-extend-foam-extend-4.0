@@ -30,16 +30,8 @@ Germany
 
 \*---------------------------------------------------------------------------*/
 
-
 #include "makeBasicPsiThermo.H"
 #include "IAPWSThermo.H"
-
-// including dummy classes --> this classes do nothing
-// except satisfy the template structure
-//#include "dummyEqnOfState.H"
-//#include "dummyThermo.H"
-//#include "dummyH.H"
-//#include "dummyTransport.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -47,18 +39,6 @@ namespace Foam
 {
 
 /* * * * * * * * * * * * * * * private static data * * * * * * * * * * * * * */
-
-/*
-makeBasicRealGasThermo
-(
-    IAPWSThermo,
-    pureMixture,
-    dummyTransport,
-    dummyThermo,
-    dummyH,
-    dummyEqnOfState
-);
-*/
 
 makeBasicExternalLibraryBasedThermo
 (

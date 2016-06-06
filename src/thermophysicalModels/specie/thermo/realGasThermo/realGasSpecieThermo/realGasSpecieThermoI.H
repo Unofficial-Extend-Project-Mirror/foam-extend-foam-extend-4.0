@@ -28,7 +28,6 @@ Institut für Thermodynamik
 Technische Universität Braunschweig
 Germany
 
-
 \*---------------------------------------------------------------------------*/
 
 #include "realGasSpecieThermo.H"
@@ -61,34 +60,34 @@ inline void Foam::realGasSpecieThermo<thermo>::T
     scalar Test ;
     scalar Tnew = T0;
     scalar rhoOld;
-    scalar rho=rho0;
+    scalar rho = rho0;
     scalar Ttol = T0*tol_();
-    scalar rhotol=rho0*tol_();
+    scalar rhotol = rho0*tol_();
     label iter = 0;
     label i;
 
     do
     {
         Test = Tnew;
-        rhoOld=rho;
-        rho=this->rho(p,Test,rhoOld);
-        i=0;
+        rhoOld = rho;
+        rho = this->rho(p, Test, rhoOld);
+        i = 0;
 
         do
         {
             //CL: using a stabilizing newton solver
             //CL: if the solve is diverging, the step is reduced until the solver converges
-            Tnew = Test - ((this->*F)(rho,Test) - f)/(this->*dFdT)(rho,Test)/(pow(2,i));
+            Tnew = Test - ((this->*F)(rho, Test) - f)/(this->*dFdT)(rho, Test)/(pow(2, i));
             i++;
-        }while
+        } while
         (
             (i<20)
             &&
-            ((
-                mag((this->*F)(rho,Tnew) - f)
+            (
+                mag((this->*F)(rho, Tnew) - f)
                 >
-                mag((this->*F)(rho,Test) - f)
-            ))
+                mag((this->*F)(rho, Test) - f)
+            )
         );
 
         if (iter++ > maxIter_)
@@ -114,6 +113,7 @@ inline void Foam::realGasSpecieThermo<thermo>::T
     T0=Tnew;
 }
 
+
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 template<class thermo>
@@ -128,7 +128,6 @@ inline Foam::realGasSpecieThermo<thermo>::realGasSpecieThermo
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
-
 
 template<class thermo>
 inline Foam::scalar Foam::realGasSpecieThermo<thermo>::gamma(const scalar rho,  const scalar T ) const

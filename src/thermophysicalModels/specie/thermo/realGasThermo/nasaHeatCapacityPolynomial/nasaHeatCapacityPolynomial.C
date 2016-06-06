@@ -51,10 +51,10 @@ Foam::nasaHeatCapacityPolynomial<equationOfState>::nasaHeatCapacityPolynomial(Is
     s0_std(s0(this->Tstd())),
     integral_p_dv_std(this->integral_p_dv(this->rhostd(),this->Tstd())),
     integral_dpdT_dv_std(this->integral_dpdT_dv(this->rhostd(),this->Tstd())),
-    // cp @ STD (needed to limit cp for stability
+    //cp @ STD (needed to limit cp for stability
     cp_std(this->cp_nonLimited(this->rhostd(),this->Tstd()))
 {
-    is.check("nasaHeatCapacityPolynomial::nasaHeatCapacityPolynomial(Istream& is)");
+    is.check("nasaHeatCapacityPolynomial::nasaHeatCapacityPolynomial(Istream& is)"); 	
 }
 
 

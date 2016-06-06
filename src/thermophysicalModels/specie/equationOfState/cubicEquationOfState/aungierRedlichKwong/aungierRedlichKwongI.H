@@ -45,7 +45,8 @@ inline aungierRedlichKwong::aungierRedlichKwong
     const specie& sp
 )
 :
-    specie(sp)
+    specie(sp),
+    TSave(0)
 {}
 
 
@@ -55,8 +56,8 @@ inline aungierRedlichKwong::aungierRedlichKwong(const word& name, const aungierR
     specie(name, pg),
     pcrit_(pg.pcrit_),
     Tcrit_(pg.Tcrit_),
-    azentricFactor_(pg.azentricFactor_),
     rhocrit_(pg.rhocrit_),
+    azentricFactor_(pg.azentricFactor_),
     a0_(pg.a0_),
     b_(pg.b_),
     c_(pg.c_),
@@ -66,9 +67,14 @@ inline aungierRedlichKwong::aungierRedlichKwong(const word& name, const aungierR
     b4_(pg.b4_),
     b5_(pg.b5_),
     c2_(pg.c2_),
-    rhostd_(pg.rhostd_)
+    rhoMin_(pg.rhoMin_),
+    rhoMax_(pg.rhoMax_),
+    rhostd_(pg.rhostd_),
+    aSave(0.0),
+    daSave(0.0),
+    d2aSave(0.0),
+    TSave(0.0)
 {}
-
 
 
 // Construct and return a clone
@@ -85,18 +91,55 @@ inline autoPtr<aungierRedlichKwong> aungierRedlichKwong::New(Istream& is)
 }
 
 
-// * * * * * * * * * * * * *  Member Functions  * * * * * * * * * * * //
+// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-inline scalar aungierRedlichKwong::rhostd()const
+inline scalar aungierRedlichKwong::rhostd() const
 {
     return rhostd_;
 }
 
+
+inline scalar aungierRedlichKwong::rhoMin() const
+{
+    return rhoMin_;
+}
+
+
+inline scalar aungierRedlichKwong::rhoMax() const
+{
+    return rhoMax_;
+}
+
+
+inline scalar aungierRedlichKwong::Tcrit() const
+{
+    return Tcrit_;
+}
+
+
+inline scalar aungierRedlichKwong::pcrit() const
+{
+    return pcrit_;
+}
+
+
+inline scalar aungierRedlichKwong::rhocrit() const
+{
+    return rhocrit_;
+}
+
+
+inline scalar aungierRedlichKwong::azentricFactor() const
+{
+    return azentricFactor_;
+}
+
+
 inline void aungierRedlichKwong::updateModelCoefficients(const scalar T)const
 {
-    aSave=a0_*pow(T/Tcrit_,-n());
-    daSave=-a0_*n()*pow(T/Tcrit_,-n())/T;
-    d2aSave=a0_*(n() *n()+n())/(T*T)*pow(T/Tcrit_,-n());
+    aSave=a0_*pow(T/Tcrit_, -n_);
+    daSave=-a0_*n_*pow(T/Tcrit_, -n_)/T;
+    d2aSave=a0_*(n_*n_ + n_)/(T*T)*pow(T/Tcrit_, -n_);
 
     //CL: saving the temperature at which the coefficients are valid
     TSave=T;
@@ -153,61 +196,36 @@ inline scalar aungierRedlichKwong::d2adT2(const scalar T)const
     }
 }
 
+
 //Aungier Redlich Kwong factors
-inline scalar aungierRedlichKwong::a0()const
+inline scalar aungierRedlichKwong::a0() const
 {
     return a0_;
 }
 
 
-inline scalar aungierRedlichKwong::b()const
+inline scalar aungierRedlichKwong::b() const
 {
     return b_;
 }
 
-inline scalar aungierRedlichKwong::c()const
+
+inline scalar aungierRedlichKwong::c() const
 {
     return c_;
 }
 
-inline scalar aungierRedlichKwong::n()const
+inline scalar aungierRedlichKwong::n() const
 {
     return n_;
 }
 
-//CL: pow of constants (b(), c()) used in the code e.g. b2_=b*b;
-inline scalar aungierRedlichKwong::b2()const
-{
-    return b2_;
-}
-
-inline scalar aungierRedlichKwong::b3()const
-{
-    return b3_;
-}
-
-inline scalar aungierRedlichKwong::b4()const
-{
-    return b4_;
-}
-
-inline scalar aungierRedlichKwong::b5()const
-{
-    return b5_;
-}
-
-inline scalar aungierRedlichKwong::c2()const
-{
-    return c2_;
-}
-
 
 //returns the pressure for a given density and temperature
-inline scalar aungierRedlichKwong::p(const scalar rho,const scalar T) const
+inline scalar aungierRedlichKwong::p(const scalar rho, const scalar T) const
 {
     scalar Vm = this->W()/rho;
-    return this->RR()*T/(Vm-b()+c())
-               -a(T)/(Vm*(Vm+b()));
+    return this->RR()*T/(Vm - b_ + c_) - a(T)/(Vm*(Vm + b_));
 }
 
 
@@ -215,12 +233,15 @@ inline scalar aungierRedlichKwong::p(const scalar rho,const scalar T) const
 //(molar values)
 inline scalar aungierRedlichKwong::dpdv(const scalar rho, const scalar T) const
 {
-   scalar Vm = this->W()/rho;
+    scalar Vm = this->W()/rho;
     scalar Vm2 = Vm*Vm;
 
-    return  (a(T)*(b3()-2*b2()*c()+b()*(c()+Vm)*(c()-3*Vm)+2*Vm*pow(c()+Vm,2))
-                   -this->RR()*T*Vm2*(b2()+2*b()*Vm+Vm2))
-                    /(Vm2*pow(b()-c()-Vm,2)*pow(b()+Vm,2));
+    return
+    (
+        a(T)*(b3_ - 2*b2_*c_ + b_*(c_ + Vm)*(c_ - 3*Vm) + 2*Vm*pow(c_ + Vm, 2))
+      - this->RR()*T*Vm2*(b2_ + 2*b_*Vm + Vm2)
+    )
+   /(Vm2*pow(b_ - c_ - Vm, 2)*pow(b_ + Vm, 2));
 }
 
 
@@ -229,24 +250,24 @@ inline scalar aungierRedlichKwong::dpdv(const scalar rho, const scalar T) const
 inline scalar aungierRedlichKwong::dpdT(const scalar rho, const scalar T) const
 {
     scalar Vm = this->W()/rho;
-    return this->RR()/(Vm-b()+c())-dadT(T)/(Vm*(Vm+b()));
+    return this->RR()/(Vm - b_ + c_)-dadT(T)/(Vm*(Vm + b_));
 }
 
 
 //Real  deviative dv/dT at constant pressure
 //using implicit differentiation
 //(molar values)
-inline scalar aungierRedlichKwong::dvdT(const scalar rho,const scalar T) const
+inline scalar aungierRedlichKwong::dvdT(const scalar rho, const scalar T) const
 {
-    return (-1)*this->dpdT(rho,T)/this->dpdv(rho,T);
+    return -this->dpdT(rho, T)/this->dpdv(rho, T);
 }
 
 
 //Real  deviative dv/dp at constant temperature
 //(molar values)
-inline scalar aungierRedlichKwong::dvdp(const scalar rho,const scalar T)  const
+inline scalar aungierRedlichKwong::dvdp(const scalar rho, const scalar T) const
 {
-    return 1/this->dpdv(rho,T);
+    return 1/this->dpdv(rho, T);
 }
 
 
@@ -259,7 +280,8 @@ inline scalar aungierRedlichKwong::integral_p_dv
 ) const
 {
     scalar Vm = this->W()/rho;
-    return this->RR()*T*log(-b()+c()+Vm)+a(T)*log(b()+Vm)/b()-a(T)*log(Vm)/b();
+    return this->RR()*T*log(-b_ + c_ + Vm) + a(T)/b_*(log(b_ + Vm) - log(Vm));
+    //return this->RR()*T*log(-b_ + c_ + Vm) + a(T)*log(b_ + Vm)/b_ - a(T)*log(Vm)/b_;
 }
 
 
@@ -272,7 +294,8 @@ inline scalar aungierRedlichKwong::integral_dpdT_dv
 ) const
 {
     scalar Vm = this->W()/rho;
-    return this->RR()*log(-b()+c()+Vm)+dadT(T)*log(b()+Vm)/b()-dadT(T)*log(Vm)/b();
+    return this->RR()*log(-b_ + c_ + Vm) + dadT(T)/b_*(log(b_ + Vm) - log(Vm));
+    //return this->RR()*log(-b_ + c_ + Vm) + dadT(T)*log(b_ + Vm)/b_ - dadT(T)*log(Vm)/b_;
 }
 
 
@@ -280,7 +303,7 @@ inline scalar aungierRedlichKwong::integral_dpdT_dv
 inline scalar aungierRedlichKwong::d2pdT2(const scalar rho,const scalar T) const
 {
     scalar Vm = this->W()/rho;
-    return -d2adT2(T)/(Vm*(Vm+b()));
+    return -d2adT2(T)/(Vm*(Vm + b_));
 }
 
 
@@ -289,39 +312,61 @@ inline scalar aungierRedlichKwong::d2pdv2(const scalar rho,const scalar T) const
 {
     scalar Vm = this->W()/rho;
     scalar Vm2 = Vm*Vm;
-    scalar Vm3 = Vm*Vm*Vm;
+    scalar Vm3 = Vm2*Vm;
 
-    return -2*(a(T)*(b5()-3*b4()*c()+3*b3()*(c2()-c()*Vm-Vm2)
-               -b2()*(c()+Vm)*(c2()-7*c()*Vm+Vm2)+3*b()*Vm*pow(c()+Vm,2)*(2*Vm-c())
-                        -3*Vm2*pow(c()+Vm,3))+this->RR()*T*Vm3*(b3()+3*b2()*Vm
-                        +3*b()*Vm2+Vm3))
-                            /(Vm3*pow(b()-c()-Vm,3)*pow(b()+Vm,3));
+    return -2*
+    (
+        a(T)*
+        (
+            b5_ - 3*b4_*c_ + 3*b3_*(c2_ - c_*Vm - Vm2)
+          - b2_*(c_ + Vm)*(c2_ - 7*c_*Vm+Vm2)
+          + 3*b_*Vm*pow(c_ + Vm, 2)*(2*Vm - c_)
+          - 3*Vm2*pow(c_ + Vm, 3)
+        )
+      + this->RR()*T*Vm3*(b3_ + 3*b2_*Vm + 3*b_*Vm2 + Vm3)
+    )
+   /(Vm3*pow(b_ - c_ - Vm, 3)*pow(b_ + Vm, 3));
 }
 
 
 //(molar values)
 //using second order implicit differentiation
-inline scalar aungierRedlichKwong::d2vdT2(const scalar rho, const scalar T) const
+inline scalar aungierRedlichKwong::d2vdT2
+(
+    const scalar rho,
+    const scalar T
+) const
 {
-    return
+    scalar dpdT2=this->dpdT(rho, T)*this->dpdT(rho, T);
+    scalar dpdv2=this->dpdv(rho, T)*this->dpdv(rho, T);
+    scalar dpdv3=dpdv2*this->dpdv(rho, T);
+
+    return 
     -(
-          pow(this->dpdT(rho,T),2)*this->d2pdv2(rho,T)
-        + pow(this->dpdv(rho,T),2)*this->d2pdT2(rho,T)
-        - 2*this->dpdv(rho,T)*this->dpdT(rho,T)*this->d2pdvdT(rho,T)
+          dpdT2*this->d2pdv2(rho, T)
+        + dpdv2*this->d2pdT2(rho, T)
+        - 2*this->dpdv(rho, T)*this->dpdT(rho, T)*this->d2pdvdT(rho, T)
     )
-    /(pow(this->dpdv(rho,T),3));
+    /dpdv3;
 }
 
 
 //(molar values)
-inline scalar aungierRedlichKwong::d2pdvdT(const scalar rho, const scalar T) const
+inline scalar aungierRedlichKwong::d2pdvdT
+(
+    const scalar rho,
+    const scalar T
+) const
 {
     scalar Vm = this->W()/rho;
     scalar Vm2 = Vm*Vm;
 
-    return (dadT(T)*(b3()-2*b2()*c()+b()*(c()+Vm)*(c()-3*Vm)+2*Vm*pow(c()+Vm,2))
-                 -this->RR()*Vm2*(b2()+2*b()*Vm+Vm2))
-                   /(Vm2*pow(b()-c()-Vm,2)*pow(b()+Vm,2));
+    return
+    (
+        dadT(T)*(b3_ - 2*b2_*c_ + b_*(c_ + Vm)*(c_ - 3*Vm)+2*Vm*pow(c_ + Vm, 2))
+      - this->RR()*Vm2*(b2_ + 2*b_*Vm + Vm2)
+    )
+    /(Vm2*pow(b_ - c_ - Vm, 2)*pow(b_ + Vm, 2));
 }
 
 
@@ -334,13 +379,17 @@ inline scalar aungierRedlichKwong::integral_d2pdT2_dv
 ) const
 {
     scalar Vm = this->W()/rho;
-    return d2adT2(T)*log(b()+Vm)/b()-d2adT2(T)*log(Vm)/b();
+    return d2adT2(T)*log(b_ + Vm)/b_ - d2adT2(T)*log(Vm)/b_;
 }
 
 
 //Isobar expansion Coefficent beta = 1/v (dv/dt) at constant p
 //(molar values)
-inline scalar aungierRedlichKwong::isobarExpCoef(const scalar rho,const scalar T)  const
+inline scalar aungierRedlichKwong::isobarExpCoef
+(
+    const scalar rho,
+    const scalar T
+) const
 {
     return this->dvdT(rho, T)*rho/this->W();
 }
@@ -348,7 +397,11 @@ inline scalar aungierRedlichKwong::isobarExpCoef(const scalar rho,const scalar T
 
 //isothemal compressiblity kappa (not Thermal conductivity)
 //(molar values)
-inline scalar aungierRedlichKwong::isothermalCompressiblity(const scalar rho,const scalar T) const
+inline scalar aungierRedlichKwong::isothermalCompressiblity
+(
+    const scalar rho,
+    const scalar T
+) const
 {
     return this->isobarExpCoef(rho, T)/this->dpdT(rho, T);
     //also possible : return -this->dvdp(rho,T)*rho/this->W();
@@ -365,13 +418,13 @@ inline scalar aungierRedlichKwong::rho
 {
    scalar molarVolumePrevIteration;
    scalar molarVolume;
-   label iter=0;
-   label maxIter_=400;
-   scalar tol_=1e-8;
-   scalar rho1=rhoMax_;
-   scalar rho2=rhoMin_;
+   label iter = 0;
+   label maxIter_ = 400;
+   scalar tol_ = 1e-8;
+   scalar rho1 = rhoMax_;
+   scalar rho2 = rhoMin_;
 
-   molarVolume=this->W()/rho0;
+   molarVolume = this->W()/rho0;
 
    do
    {
@@ -380,24 +433,24 @@ inline scalar aungierRedlichKwong::rho
        label i=0;
        do
        {
+           //CL: modified Newton solver
            molarVolume=molarVolumePrevIteration
                -(
                    (this->p((this->W()/molarVolumePrevIteration),T) - p)
-                   /(this->dpdv((this->W()/molarVolumePrevIteration),T))
+                   /(this->dpdv((this->W()/molarVolumePrevIteration), T))
                )/pow(2,i);
 
            i++;
            if (i>8)
            {
                //CL: using bisection methode as backup,
-               //CL: solution must be between rho=0.001 to rho=1500;
-               //CL: if not, change rhoMax_ and rhoMin_
+               //CL: solution must be between rhoMin_ to rhoMax
                for(i=0; i<200; i++)
                {
-                   scalar f1 = this->p(rho1,T) - p;
-                   scalar f2 = this->p(rho2,T) - p;
+                   scalar f1 = this->p(rho1, T) - p;
+                   scalar f2 = this->p(rho2, T) - p;
                    scalar rho3 = (rho1 + rho2)/2;
-                   scalar f3 = this->p(rho3,T) - p;
+                   scalar f3 = this->p(rho3, T) - p;
 
                    if ((f2 < 0 && f3 > 0) || (f2 > 0 && f3 < 0))
                    {
@@ -427,15 +480,16 @@ inline scalar aungierRedlichKwong::rho
        }
        while
        (
-           mag(this->p((this->W()/molarVolume),T) - p)
-         > mag(this->p((this->W()/molarVolumePrevIteration),T) - p)
+           mag(this->p((this->W()/molarVolume), T) - p)
+         > mag(this->p((this->W()/molarVolumePrevIteration), T) - p)
        );
 
        if (iter++ > maxIter_)
        {
            FatalErrorIn
            (
-               "inline scalar aungierRedlichKwong::rho(const scalar p, const scalar T, const scalar rho0) const "
+               "inline scalar aungierRedlichKwong::rho"
+               "(const scalar p, const scalar T, const scalar rho0) const "
            )   << "Maximum number of iterations exceeded"
                << abort(FatalError);
        }
@@ -447,33 +501,43 @@ inline scalar aungierRedlichKwong::rho
 
 
 //- Return density [kg/m^3]
-inline scalar aungierRedlichKwong::rho(const scalar p,const scalar T) const
+inline scalar aungierRedlichKwong::rho(const scalar p, const scalar T) const
 {
-    //using perfect gas equation as starting point
-    return rho(p,T,p/(this->R()*T));
+    //CL: using perfect gas equation as starting point
+    return rho(p, T, p/(this->R()*T));
 }
 
 
 //- Return compressibility drho/dp at T=constant [s^2/m^2]
 inline scalar aungierRedlichKwong::psi(const scalar rho, const scalar T) const
 {
-    return -this->dvdp(rho,T)*pow(rho,2)/this->W();
+    return -this->dvdp(rho, T)*rho*rho/this->W();
 }
 
 
 //- Return compression factor []
-inline scalar aungierRedlichKwong::Z( const scalar p, const scalar T,const scalar rho0) const
+inline scalar aungierRedlichKwong::Z
+(
+    const scalar p,
+    const scalar T,
+    const scalar rho0
+) const
 {
-    return p/(this->R()*T*this->rho(p,T,rho0));
+    return p/(this->R()*T*this->rho(p, T, rho0));
 }
 
 
 // * * * * * * * * * * * * * * * Member Operators  * * * * * * * * * * * * * //
 
-
-inline void aungierRedlichKwong::operator+=(const aungierRedlichKwong& pr)
+inline void aungierRedlichKwong::operator+=(const aungierRedlichKwong& ark)
 {
-    specie::operator+=(pr);
+    specie::operator+=(ark);
+}
+
+
+inline void aungierRedlichKwong::operator*=(const scalar s)
+{
+    specie::operator*=(s);
 }
 
 
@@ -481,25 +545,27 @@ inline void aungierRedlichKwong::operator+=(const aungierRedlichKwong& pr)
 
 inline aungierRedlichKwong operator+
 (
-    const aungierRedlichKwong& pr1,
-    const aungierRedlichKwong& pr2
+    const aungierRedlichKwong& ark1,
+    const aungierRedlichKwong& ark2
 )
 {
     return aungierRedlichKwong
     (
-        static_cast<const specie&>(pr1)
-      + static_cast<const specie&>(pr2)
+        static_cast<const specie&>(ark1)
+      + static_cast<const specie&>(ark2)
     );
 }
+
 
 inline aungierRedlichKwong operator*
 (
     const scalar s,
-    const aungierRedlichKwong& pr
+    const aungierRedlichKwong& ark
 )
 {
-    return aungierRedlichKwong(s*static_cast<const specie&>(pr));
+    return aungierRedlichKwong(s*static_cast<const specie&>(ark));
 }
+
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

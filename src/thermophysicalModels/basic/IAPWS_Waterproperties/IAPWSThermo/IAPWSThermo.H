@@ -43,7 +43,6 @@ Institut für Thermodynamik
 Technische Universität Braunschweig
 Germany
 
-
 \*---------------------------------------------------------------------------*/
 
 #ifndef IAPWSThermo_H

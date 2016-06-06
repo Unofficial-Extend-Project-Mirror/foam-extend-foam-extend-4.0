@@ -51,7 +51,6 @@ Germany
 #include "specie.H"
 #include "autoPtr.H"
 
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
@@ -64,28 +63,29 @@ namespace Foam
 class soaveRedlichKwong
 :
     public specie
-
 {
-
-protected:
-    // Protected data
+    // private data
+    //CL: data at critical point
     scalar pcrit_;
-    scalar Tcrit_;
+    scalar Tcrit_; 
     scalar azentricFactor_;
 
     //-Soave Redlich Kwong
-    scalar n_;
     scalar a0_;
-    mutable scalar b_;
+    scalar b_;
+    scalar n_;
 
     //CL: pow of constants b_ used in the code e.g. b2_=b*b;
-    mutable scalar b2_;
-    mutable scalar b3_;
-    mutable scalar b5_;
+    scalar b2_;
+    scalar b3_;
+    scalar b5_;
 
     //CL: rhoMin and rhoMax are only used as boundaries for the bisection methode (see rho function)
-    scalar rhoMax_;
     scalar rhoMin_;
+    scalar rhoMax_;
+
+    //- Density @STD, initialise after a0, b!
+    scalar rhostd_;
 
     //CL: Variables to save the values of a, dadT and d2adT2 of the mixture
     //CL: Variables must corrected for changing temperatures
@@ -96,23 +96,18 @@ protected:
     //CL: save the temperature for which the save coefficients (amix,dadTmix,d2adT2mix) are correct
     mutable scalar TSave;
 
-    //- Density @STD, initialise after a0, b!
-    mutable scalar rhostd_;
-
-
     //Protected functions
     //CL: function updates the coefficients (aSave, daSave, d2aSave)
     inline void updateModelCoefficients(const  scalar T) const;
 
 public:
 
-
     // Constructors
 
         //- Construct from components
         inline soaveRedlichKwong
         (
-            const specie& s
+            const specie& sp
         );
 
         //- Construct from Istream
@@ -122,7 +117,7 @@ public:
         //soaveRedlichKwong(const dictionary& dict);
 
         //- Construct as named copy
-        inline soaveRedlichKwong(const word& name,const soaveRedlichKwong&);
+        inline soaveRedlichKwong(const word& name, const soaveRedlichKwong&);
 
         //- Construct and return a clone
         inline autoPtr<soaveRedlichKwong> clone() const;
@@ -131,48 +126,44 @@ public:
         inline static autoPtr<soaveRedlichKwong> New(Istream& is);
 
     // Member functions
-        inline scalar rhostd()const;
-
-        //CL: Model coefficient a(T)
-        inline scalar a(const  scalar T)const;
-
-        //CL: temperature deriviative of model coefficient a(T)
-        inline scalar dadT(const  scalar T)const;
-
-        //CL: second order temperature deriviative of model coefficient a(T)
-        inline scalar d2adT2(const  scalar T)const;
 
         //Return Soave Redlich Kwong factors
-        inline scalar a0()const;
+        inline scalar a0() const;
 
-        inline scalar b()const;
+        inline scalar b() const;
 
-        inline scalar n()const;
+        inline scalar n() const;
 
-        //CL: return power of constants b_
-        inline scalar b2()const;
+        inline scalar rhostd() const;
 
-        inline scalar b3()const;
+        inline scalar rhoMin() const;
 
-        inline scalar b5()const;
+        inline scalar rhoMax() const;
+
+        inline scalar Tcrit() const;
+
+        //CL: Model coefficient a(T)
+        inline scalar a(const scalar T) const;
+
+        //CL: temperature deriviative of model coefficient a(T)
+        inline scalar dadT(const scalar T) const;
+
+        //CL: second order temperature deriviative of model coefficient a(T)
+        inline scalar d2adT2(const scalar T) const;
 
         //CL: Equation of state
         inline scalar p(const scalar rho, const scalar T) const;
 
         //CL: first order derivatives
-        inline scalar dpdv(const scalar rho,const  scalar T) const;
+        inline scalar dpdv(const scalar rho, const scalar T) const;
 
         inline scalar dpdT(const scalar rho, const scalar T) const;
 
-        inline scalar dvdT(const scalar rho,const  scalar T) const;
+        inline scalar dvdT(const scalar rho, const scalar T) const;
 
         inline scalar dvdp(const scalar rho, const scalar T) const;
 
-        inline scalar isobarExpCoef
-        (
-            const scalar rho,
-            const scalar T
-        ) const;
+        inline scalar isobarExpCoef(const scalar rho, const scalar T) const;
 
         inline scalar isothermalCompressiblity
         (
@@ -181,22 +172,34 @@ public:
         ) const;
 
         //CL: Used for cv
-        inline scalar integral_d2pdT2_dv(const scalar rho,const  scalar T) const ;
+        inline scalar integral_d2pdT2_dv
+        (
+            const scalar rho,
+            const scalar T
+        ) const;
 
         //CL: second order derivatives, not Used At The Moment
-        inline scalar d2pdv2(const scalar rho,const  scalar T) const;
+        inline scalar d2pdv2(const scalar rho, const scalar T) const;
 
-        inline scalar d2pdT2(const scalar rho,const  scalar T) const;
+        inline scalar d2pdT2(const scalar rho, const scalar T) const;
 
-        inline scalar d2pdvdT(const scalar rho,const  scalar T) const;
+        inline scalar d2pdvdT(const scalar rho, const scalar T) const;
 
-        inline scalar d2vdT2(const scalar rho,const  scalar T) const;
+        inline scalar d2vdT2(const scalar rho, const scalar T) const;
 
         //CL: Used for internal Energy
-        inline scalar integral_p_dv(const scalar rho,const  scalar T) const;
+        inline scalar integral_p_dv
+        (
+            const scalar rho,
+            const scalar T
+        ) const;
 
-        //Used for Entropy
-        inline scalar integral_dpdT_dv(const scalar rho,const  scalar T) const;
+        //CL: Used for Entropy
+        inline scalar integral_dpdT_dv
+        (
+            const scalar rho,
+            const scalar T
+        ) const;
 
         //- Return density [kg/m^3]
         // rho0 is the starting point of the newton solver used to calculate rho
@@ -207,7 +210,7 @@ public:
             const scalar rho0
         ) const;
 
-        inline scalar rho(const scalar p,const  scalar T) const;
+        inline scalar rho(const scalar p, const scalar T) const;
 
         //- Return compressibility drho/dp at T=constant [s^2/m^2]
         inline scalar psi(const scalar rho, const scalar T) const;
@@ -232,11 +235,8 @@ public:
 
         inline void operator+=(const soaveRedlichKwong&);
 
-/*
-        inline void operator-=(const soaveRedlichKwong&);
-
         inline void operator*=(const scalar);
-*/
+
 
     // Friend operators
 
@@ -251,6 +251,7 @@ public:
             const scalar s,
             const soaveRedlichKwong&
         );
+
 
     // Ostream Operator
 

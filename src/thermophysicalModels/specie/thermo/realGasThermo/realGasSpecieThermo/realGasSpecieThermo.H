@@ -34,8 +34,6 @@ Description
     cp, h, s obtained from the template argument type thermo.  All other
     properties are derived from these primitive functions.
 
-    Some function copied from the "orginal" specieThermo!
-
 SourceFiles
     realGasSpecieThermoI.H
     realGasSpecieThermo.C
@@ -45,7 +43,6 @@ Christian Lucas
 Institut für Thermodynamik
 Technische Universität Braunschweig
 Germany
-
 
 \*---------------------------------------------------------------------------*/
 
@@ -226,7 +223,6 @@ public:
 
         inline void operator+=(const realGasSpecieThermo&);
         inline void operator-=(const realGasSpecieThermo&);
-
         inline void operator*=(const scalar);
 
 

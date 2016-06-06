@@ -97,7 +97,7 @@ inline Foam::nasaHeatCapacityPolynomial<equationOfState>::nasaHeatCapacityPolyno
     s0_std(s0_std_),
     integral_p_dv_std(integral_p_dv_std_),
     integral_dpdT_dv_std(integral_dpdT_dv_std_),
-    cp_std(cp_std_)
+    cp_std(cp_std_) 
 {}
 
 
@@ -145,6 +145,7 @@ Foam::nasaHeatCapacityPolynomial<equationOfState>::New(Istream& is)
         new nasaHeatCapacityPolynomial<equationOfState>(is)
     );
 }
+
 
  // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
@@ -200,8 +201,6 @@ inline Foam::scalar Foam::nasaHeatCapacityPolynomial<equationOfState>::s0
 }
 
 
-
-
 //perfect gas cp
 template<class equationOfState>
 inline Foam::scalar Foam::nasaHeatCapacityPolynomial<equationOfState>::cp0
@@ -232,7 +231,6 @@ inline Foam::scalar Foam::nasaHeatCapacityPolynomial<equationOfState>::cv0
 
     return this->cp0(T)-this->RR();
 }
-
 
 
 //function to calculate real gas cp
@@ -281,13 +279,10 @@ inline Foam::scalar Foam::nasaHeatCapacityPolynomial<equationOfState>::cv
 (
     const scalar rho,
     const scalar T
-
 ) const
 {
     return this->cv0(T)+T*this->integral_d2pdT2_dv(rho, T);
 }
-
-
 
 
 //function to calculate real gas enthalpy
@@ -332,7 +327,6 @@ inline Foam::scalar Foam::nasaHeatCapacityPolynomial<equationOfState>::s
 (
     const scalar rho,
     const scalar T
-
 ) const
 {
     return -integral_dpdT_dv_std
@@ -341,8 +335,8 @@ inline Foam::scalar Foam::nasaHeatCapacityPolynomial<equationOfState>::s
     + this->integral_dpdT_dv(rho,T);
 }
 
-// * * * * * * * * * * * * * * * Member Operators  * * * * * * * * * * * * * //
 
+// * * * * * * * * * * * * * * * Member Operators  * * * * * * * * * * * * * //
 
 template<class equationOfState>
 inline void Foam::nasaHeatCapacityPolynomial<equationOfState>::operator+=

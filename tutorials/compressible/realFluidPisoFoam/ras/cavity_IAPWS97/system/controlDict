@@ -19,15 +19,17 @@ application     realFluidPisoFoam;
 
 startFrom       latestTime;
 
+//startTime       0;
+
 stopAt          endTime;
 
-endTime         0.5;
+endTime         0.2;
 
 deltaT          1e-5;
 
 writeControl    runTime;
 
-writeInterval   0.1;
+writeInterval  1e-2;
 
 purgeWrite      0;
 
@@ -43,18 +45,11 @@ timePrecision   10;
 
 adjustTimeStep  yes;
 
-maxCo           0.5;
+maxCo          0.75;
 
-maxDeltaT       1e-3;
+maxDeltaT       0.01;
 
 runTimeModifiable yes;
-
-//CL: load libraries need for the water properties
-libs
-(
-    "libIAPWSThermo.so"
-    "libfreesteam.so"
-);
 
 
 // ************************************************************************* //

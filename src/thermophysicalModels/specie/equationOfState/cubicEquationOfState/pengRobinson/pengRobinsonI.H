@@ -57,15 +57,21 @@ inline pengRobinson::pengRobinson(const word& name, const pengRobinson& pr)
     pcrit_(pr.pcrit_),
     Tcrit_(pr.Tcrit_),
     azentricFactor_(pr.azentricFactor_),
-    n_(pr.n_),
     a0_(pr.a0_),
     b_(pr.b_),
+    n_(pr.n_),
     b2_(pr.b2_),
     b3_(pr.b3_),
     b4_(pr.b4_),
     b5_(pr.b5_),
-    TSave(0),
-    rhostd_(pr.rhostd_)
+    b6_(pr.b6_),
+    rhoMin_(pr.rhoMin_),
+    rhoMax_(pr.rhoMax_),
+    rhostd_(pr.rhostd_),
+    aSave(0.0), 
+    daSave(0.0), 
+    d2aSave(0.0),
+    TSave(0.0)
 {}
 
 
@@ -83,27 +89,45 @@ inline autoPtr<pengRobinson> pengRobinson::New(Istream& is)
 }
 
 
-// * * * * * * * * * * * * *  Member Functions  * * * * * * * * * * * //
+// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-inline void pengRobinson::updateModelCoefficients(const scalar T)const
+inline scalar pengRobinson::rhostd() const
 {
-    aSave=a0_*pow(1+n_*(1-pow(T/Tcrit_,0.5)),2);
-    daSave=a0_*n_*(n_*sqrt(T/Tcrit_)-n_-1)*sqrt(T/Tcrit_)/T;
-    d2aSave=a0_*n_*(n_+1)*sqrt(T/Tcrit_)/(2*pow(T,2));
+    return rhostd_;
+}
+
+
+inline scalar pengRobinson::rhoMin() const
+{
+    return rhoMin_;
+}
+
+
+inline scalar pengRobinson::rhoMax() const
+{
+    return rhoMax_;
+}
+
+
+inline scalar pengRobinson::Tcrit() const
+{
+    return Tcrit_;
+}
+
+
+inline void pengRobinson::updateModelCoefficients(const scalar T) const
+{
+    aSave=a0_*pow(1 + n_*(1 - pow(T/Tcrit_, 0.5)), 2);
+    daSave=a0_*n_*(n_*sqrt(T/Tcrit_) - n_ - 1)*sqrt(T/Tcrit_)/T;
+    d2aSave=a0_*n_*(n_ + 1)*sqrt(T/Tcrit_)/(2*T*T);
 
     //CL: saving the temperature at which the coefficients are valid
     TSave=T;
 }
 
 
-inline scalar pengRobinson::rhostd()const
-{
-    return rhostd_;
-}
-
-
 //CL: Model coefficient a(T)
-inline scalar pengRobinson::a(const scalar T)const
+inline scalar pengRobinson::a(const scalar T) const
 {
     //CL: check if a has already been calculated for this temperature
     if(TSave==T)
@@ -120,7 +144,7 @@ inline scalar pengRobinson::a(const scalar T)const
 
 
 //CL: temperature deriviative of model coefficient a(T)
-inline scalar pengRobinson::dadT(const scalar T)const
+inline scalar pengRobinson::dadT(const scalar T) const
 {
     // check if a has already been calculated for this temperature
     if(TSave==T)
@@ -137,7 +161,7 @@ inline scalar pengRobinson::dadT(const scalar T)const
 
 
 //CL: second order temperature deriviative of model coefficient a(T)
-inline scalar pengRobinson::d2adT2(const scalar T)const
+inline scalar pengRobinson::d2adT2(const scalar T) const
 {
     // check if a has already been calculated for this temperature
     if(TSave==T)
@@ -153,50 +177,30 @@ inline scalar pengRobinson::d2adT2(const scalar T)const
 }
 
 
-inline scalar pengRobinson::a0()const
+inline scalar pengRobinson::a0() const
 {
     return a0_;
 }
 
 
-inline scalar pengRobinson::b()const
+inline scalar  pengRobinson::b() const
 {
     return b_;
 }
 
 
-inline scalar pengRobinson::n()const
+inline scalar pengRobinson::n() const
 {
     return n_;
 }
 
-//CL: pow of constant b() used in the code e.g. b2_=b*b;
-inline scalar pengRobinson::b2()const
-{
-    return b2_;
-}
-
-inline scalar pengRobinson::b3()const
-{
-    return b3_;
-}
-
-inline scalar pengRobinson::b4()const
-{
-    return b4_;
-}
-
-inline scalar pengRobinson::b5()const
-{
-    return b5_;
-}
 
 //returns the pressure for a given density and temperature
-inline scalar pengRobinson::p(const scalar rho,const scalar T) const
+inline scalar pengRobinson::p(const scalar rho, const scalar T) const
 {
     scalar Vm = this->W()/rho;
-
-    return this->RR()*T/(Vm-b())-a(T)/(pow(Vm,2)+2*b()*Vm-b2());
+    scalar Vm2 = Vm*Vm; 
+    return this->RR()*T/(Vm - b_) - a(T)/(Vm2 + 2*b_*Vm - b2_);
 }
 
 
@@ -206,20 +210,21 @@ inline scalar pengRobinson::dpdv(const scalar rho, const scalar T) const
 {
     scalar Vm = this->W()/rho;
     scalar Vm2 = Vm*Vm;
-    scalar Vm3 = Vm*Vm*Vm;
+    scalar Vm3 = Vm2*Vm;
+    scalar Vm4 = Vm3*Vm;
 
-    return(
-              2*a(T)*
-              (
-                  b3()-b2()*Vm-b()*Vm2+Vm3
-              )
-              -this->RR()*T*
-              (
-                  b4()-4*b3()*Vm+2*b2()*Vm2
-                      +4*b()*Vm3+pow(Vm,4)
-              )
-          )
-          /(pow(b()-Vm,2)*pow(b2()-2*b()*Vm-Vm2,2));
+    return
+    (
+        2*a(T)*
+        (
+            b3_ - b2_*Vm - b_*Vm2 + Vm3
+        )
+      - this->RR()*T*
+        (
+            b4_ - 4*b3_*Vm + 2*b2_*Vm2 + 4*b_*Vm3 + Vm4
+        )
+    )
+   /(pow(b_ - Vm, 2)*pow(b2_ - 2*b_*Vm - Vm2, 2));
 }
 
 
@@ -228,132 +233,166 @@ inline scalar pengRobinson::dpdv(const scalar rho, const scalar T) const
 inline scalar pengRobinson::dpdT(const scalar rho, const scalar T) const
 {
     scalar Vm = this->W()/rho;
-
-    return this->RR()/(Vm-b())-dadT(T)/(pow(Vm,2)+2*b()*Vm-b2());
+    scalar Vm2 = Vm*Vm;
+    return this->RR()/(Vm - b_) - dadT(T)/(Vm2 + 2*b_*Vm - b2_);
 }
 
 
 //Real  deviative dv/dT at constant pressure
 //by using implicit differentiation
 //(molar values)
-inline scalar pengRobinson::dvdT(const scalar rho,const scalar T) const
+inline scalar pengRobinson::dvdT(const scalar rho, const scalar T) const
 {
-    return (-1)*this->dpdT(rho,T)/this->dpdv(rho,T);
+    return -this->dpdT(rho, T)/this->dpdv(rho, T);
 }
 
 
+//Real  deviative dv/dp at constant temperature
 //(molar values)
-inline scalar pengRobinson::dvdp(const scalar rho,const scalar T)  const
+inline scalar pengRobinson::dvdp(const scalar rho, const scalar T)  const
 {
-    return 1/this->dpdv(rho,T);
+    return 1/this->dpdv(rho, T);
 }
 
 
-//(molar values)
 //needed to calculate the internal energy
-inline scalar pengRobinson::integral_p_dv(const scalar rho,const scalar T) const
+//(molar values)
+inline scalar pengRobinson::integral_p_dv
+(
+    const scalar rho,
+    const scalar T
+) const
 {
     scalar Vm = this->W()/rho;
+    scalar root2=pow(2, 0.5);
 
-    return -pow(2,0.5)*a(T)*log(b()*(1-pow(2,0.5))+Vm)/(4*b())+this->RR()*T*log(Vm-b())
-               +pow(2,0.5)*a(T)*log(b()*(pow(2,0.5)+1)+Vm)/(4*b());
+    return
+      - root2*a(T)*log(b_*(1-root2) + Vm)/(4*b_)
+      + this->RR()*T*log(Vm - b_)
+      + root2*a(T)*log(b_*(root2 + 1) + Vm)/(4*b_);
 }
 
 
+//needed to calculate the entropy
 //(molar values)
 //needed to calculate the entropy
-inline scalar pengRobinson::integral_dpdT_dv(const scalar rho,const scalar T) const
+inline scalar pengRobinson::integral_dpdT_dv
+(
+    const scalar rho,
+    const scalar T
+) const
 {
     scalar Vm = this->W()/rho;
-
-    return -pow(2,0.5)*dadT(T)*log(b()*(1-pow(2,0.5))+Vm)/(4*b())
-        +this->RR()*log(Vm-b())+pow(2,0.5)*dadT(T)*log(b()*(pow(2,0.5)+1)+Vm)/(4*b());
+    scalar root2=pow(2, 0.5);
+    return
+      - root2*dadT(T)*log(b_*(1 - root2) + Vm)/(4*b_)
+      + this->RR()*log(Vm - b_) + root2*dadT(T)*log(b_*(root2 + 1) + Vm)/(4*b_);
 }
 
 
 //(molar values)
-inline scalar pengRobinson::d2pdT2(const scalar rho,const scalar T) const
-{
-    scalar Vm = this->W()/rho;
-
-    return -d2adT2(T)/(pow(Vm,2)+2*b()*Vm-b2());
-}
-
-
-//(molar values)
-inline scalar pengRobinson::d2pdv2(const scalar rho,const scalar T) const
+inline scalar pengRobinson::d2pdT2(const scalar rho, const scalar T) const
 {
     scalar Vm = this->W()/rho;
     scalar Vm2 = Vm*Vm;
-    scalar Vm3 = Vm*Vm*Vm;
-    scalar Vm4 = Vm*Vm*Vm*Vm;
-    scalar Vm5 = Vm*Vm*Vm*Vm*Vm;
+    return -d2adT2(T)/(Vm2 + 2*b_*Vm-b2_);
+}
+
+
+//(molar values)
+inline scalar pengRobinson::d2pdv2(const scalar rho, const scalar T) const
+{
+    scalar Vm = this->W()/rho;
+    scalar Vm2 = Vm*Vm;
+    scalar Vm3 = Vm2*Vm;
+    scalar Vm4 = Vm3*Vm;
+    scalar Vm5 = Vm4*Vm;
+    scalar Vm6 = Vm5*Vm;
 
     return 2*
-           (
-               a(T)*
-               (
-                   5*b5()-9*b4()*Vm+4*b2()*Vm3+3*b()*Vm4-3*Vm5
-               )
-               -this->RR()*T*
-               (
-                   pow(b(),6)-6*b5()*Vm+9*b4()*Vm2+4*b3()*Vm3
-                       -9*b2()*Vm4-6*b()*Vm5-pow(Vm,6)
-               )
-           )
-           /(pow(b()-Vm,3)*pow(b2()-2*b()*Vm-Vm2,3));
+    (
+        a(T)*
+        (
+            5*b5_ - 9*b4_*Vm + 4*b2_*Vm3 + 3*b_*Vm4 - 3*Vm5
+        )
+      - this->RR()*T*
+        (
+            b6_ - 6*b5_*Vm + 9*b4_*Vm2 + 4*b3_*Vm3 - 9*b2_*Vm4 - 6*b_*Vm5 - Vm6
+        )
+    )
+   /(pow(b_ - Vm, 3)*pow(b2_ - 2*b_*Vm - Vm2, 3));
 }
 
 
 //(molar values)
 //using second order implicit differentiation
-inline scalar pengRobinson::d2vdT2(const scalar rho, const scalar T) const
+inline scalar pengRobinson::d2vdT2
+(
+    const scalar rho,
+    const scalar T
+) const
 {
-    return
+    scalar dpdT2=this->dpdT(rho, T)*this->dpdT(rho, T);
+    scalar dpdv2=this->dpdv(rho, T)*this->dpdv(rho, T);
+    scalar dpdv3=dpdv2*this->dpdv(rho, T);
+
+    return 
     -(
-          pow(this->dpdT(rho,T),2)*this->d2pdv2(rho,T)
-        + pow(this->dpdv(rho,T),2)*this->d2pdT2(rho,T)
-        - 2*this->dpdv(rho,T)*this->dpdT(rho,T)*this->d2pdvdT(rho,T)
+          dpdT2*this->d2pdv2(rho, T)
+        + dpdv2*this->d2pdT2(rho, T)
+        - 2*this->dpdv(rho, T)*this->dpdT(rho, T)*this->d2pdvdT(rho, T)
     )
-    /(pow(this->dpdv(rho,T),3));
+    /dpdv3;
 }
 
 
 //(molar values)
-inline scalar pengRobinson::d2pdvdT(const scalar rho, const scalar T) const
+inline scalar pengRobinson::d2pdvdT
+(
+    const scalar rho,
+    const scalar T
+) const
 {
     scalar Vm = this->W()/rho;
     scalar Vm2 = Vm*Vm;
-    scalar Vm3 = Vm*Vm*Vm;
-
-    return(
-              2*dadT(T)*
-              (
-                  b3()-b2()*Vm-b()*Vm2+Vm3
-              )
-              -this->RR()*
-              (
-                  b4()-4*b3()*Vm+2*b2()*Vm2
-                      +4*b()*Vm3+pow(Vm,4)
-              )
-          )
-          /(pow(b()-Vm,2)*pow(b2()-2*b()*Vm-Vm2,2));
+    scalar Vm3 = Vm2*Vm;
+    scalar Vm4 = Vm3*Vm;
+  
+    return
+    (
+        2*dadT(T)*(b3_ - b2_*Vm - b_*Vm2 + Vm3)
+      - this->RR()*(b4_ - 4*b3_*Vm + 2*b2_*Vm2 + 4*b_*Vm3 + Vm4)
+    )
+   /(pow(b_ - Vm, 2)*pow(b2_ - 2*b_*Vm - Vm2, 2));
 }
 
 
 // the result of this intergal is needed for the nasa based cp polynomial
 //(molar values)
-inline scalar pengRobinson::integral_d2pdT2_dv(const scalar rho,const scalar T) const
+inline scalar pengRobinson::integral_d2pdT2_dv
+(
+    const scalar rho,
+    const scalar T
+) const
 {
     scalar Vm = this->W()/rho;
+    scalar root2=pow(2, 0.5);
 
-    return pow(2,0.5)*d2adT2(T)*log(b()*(pow(2,0.5)+1)+Vm)/(4*b())-pow(2,0.5)*d2adT2(T)*log(b()*(1-pow(2,0.5))+Vm)/(4*b());
+    return root2*d2adT2(T)/(4*b_)
+        *(log(b_*(root2 + 1) + Vm) - log(b_*(1 - root2) + Vm));
+
+      //  root2*d2adT2(T)*log(b_*(root2 + 1) + Vm)/(4*b_)
+      //- root2*d2adT2(T)*log(b_*(1 - root2)+Vm)/(4*b_);
 }
 
 
 //Isobar expansion Coefficent beta = 1/v (dv/dt) at constant p
 //(molar values)
-inline scalar pengRobinson::isobarExpCoef(const scalar rho,const scalar T)  const
+inline scalar pengRobinson::isobarExpCoef
+(
+    const scalar rho,
+    const scalar T
+) const
 {
     return this->dvdT(rho, T)*rho/this->W();
 }
@@ -361,31 +400,35 @@ inline scalar pengRobinson::isobarExpCoef(const scalar rho,const scalar T)  cons
 
 //isothemal compressiblity kappa (not Thermal conductivity)
 //(molar values)
-inline scalar pengRobinson::isothermalCompressiblity(const scalar rho,const scalar T) const
+inline scalar pengRobinson::isothermalCompressiblity
+(
+    const scalar rho,
+    const scalar T
+) const
 {
     return this->isobarExpCoef(rho, T)/this->dpdT(rho, T);
     //CL: also possible
-    //CL: return -this->dvdp(rho,T)*rho/this->W();
+    //CL: return -this->dvdp(rho, T)*rho/this->W();
 }
 
 
 //- Return density [kg/m^3]
-inline scalar pengRobinson::rho(
+inline scalar pengRobinson::rho
+(
     const scalar p,
     const scalar T,
     const scalar rho0
 ) const
 {
-
    scalar molarVolumePrevIteration;
    scalar molarVolume;
-   label iter=0;
-   label maxIter_=400;
-   scalar tol_=1e-8;
-   scalar rho1=rhoMax_;
-   scalar rho2=rhoMin_;
+   label iter = 0;
+   label maxIter_ = 400;
+   scalar tol_ = 1e-8;
+   scalar rho1 = rhoMax_;
+   scalar rho2 = rhoMin_;
 
-   molarVolume=this->W()/rho0;
+   molarVolume = this->W()/rho0;
 
    do
    {
@@ -394,24 +437,24 @@ inline scalar pengRobinson::rho(
        label i=0;
        do
        {
+           //CL: modified Newton solver
            molarVolume=molarVolumePrevIteration
                -(
                    (this->p((this->W()/molarVolumePrevIteration),T) - p)
-                   /(this->dpdv((this->W()/molarVolumePrevIteration),T))
+                   /(this->dpdv((this->W()/molarVolumePrevIteration), T))
                )/pow(2,i);
 
            i++;
            if (i>8)
            {
                //CL: using bisection methode as backup,
-               //CL: solution must be between rho=0.001 to rho=1500;
-               //CL: if not, change rhoMax_ and rhoMin_
+               //CL: solution must be between rhoMin_ to rhoMax
                for(i=0; i<200; i++)
                {
-                   scalar f1 = this->p(rho1,T) - p;
-                   scalar f2 = this->p(rho2,T) - p;
+                   scalar f1 = this->p(rho1, T) - p;
+                   scalar f2 = this->p(rho2, T) - p;
                    scalar rho3 = (rho1 + rho2)/2;
-                   scalar f3 = this->p(rho3,T) - p;
+                   scalar f3 = this->p(rho3, T) - p;
 
                    if ((f2 < 0 && f3 > 0) || (f2 > 0 && f3 < 0))
                    {
@@ -441,15 +484,16 @@ inline scalar pengRobinson::rho(
        }
        while
        (
-           mag(this->p((this->W()/molarVolume),T) - p)
-         > mag(this->p((this->W()/molarVolumePrevIteration),T) - p)
+           mag(this->p((this->W()/molarVolume), T) - p)
+         > mag(this->p((this->W()/molarVolumePrevIteration), T) - p)
        );
 
        if (iter++ > maxIter_)
        {
            FatalErrorIn
            (
-               "inline scalar pengRobinson::rho(const scalar p, const scalar T, const scalar rho0) const "
+               "inline scalar pengRobinson::rho"
+               "(const scalar p, const scalar T, const scalar rho0) const "
            )   << "Maximum number of iterations exceeded"
                << abort(FatalError);
        }
@@ -461,47 +505,46 @@ inline scalar pengRobinson::rho(
 
 
 //- Return density [kg/m^3]on
-inline scalar pengRobinson::rho(const scalar p,const scalar T) const
+inline scalar pengRobinson::rho(const scalar p, const scalar T) const
 {
-    // using perfect gas equation as starting point
-    return rho(p,T,p/(this->R()*T));
+    //CL: using perfect gas equation as starting point
+    return rho(p, T, p/(this->R()*T));
 }
 
 
 //- Return compressibility drho/dp at T=constant [s^2/m^2]
 inline scalar pengRobinson::psi(const scalar rho, const scalar T) const
 {
-    return -this->dvdp(rho,T)*pow(rho,2)/this->W();
+    return -this->dvdp(rho, T)*rho*rho/this->W();
 }
 
 
 //- Return compression factor []
-inline scalar pengRobinson::Z( const scalar p, const scalar T,const scalar rho0) const
+inline scalar pengRobinson::Z
+(
+    const scalar p,
+    const scalar T,
+    const scalar rho0
+) const
 {
-    return p/(this->R()*T*this->rho(p,T,rho0));
+    return p/(this->R()*T*this->rho(p, T, rho0));
 }
 
 
 // * * * * * * * * * * * * * * * Member Operators  * * * * * * * * * * * * * //
-
 
 inline void pengRobinson::operator+=(const pengRobinson& pr)
 {
     specie::operator+=(pr);
 }
 
-/*
-inline void pengRobinson::operator-=(const pengRobinson& pr)
-{
-    specie::operator-=(pr);
-}
 
 inline void pengRobinson::operator*=(const scalar s)
 {
     specie::operator*=(s);
 }
 
-*/
+
 // * * * * * * * * * * * * * * * Friend Operators  * * * * * * * * * * * * * //
 
 inline pengRobinson operator+
@@ -517,6 +560,7 @@ inline pengRobinson operator+
     );
 }
 
+
 inline pengRobinson operator*
 (
     const scalar s,
@@ -525,6 +569,7 @@ inline pengRobinson operator*
 {
     return pengRobinson(s*static_cast<const specie&>(pr));
 }
+
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

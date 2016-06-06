@@ -36,34 +36,33 @@ Germany
 #include "soaveRedlichKwong.H"
 #include "IOstreams.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-namespace Foam
-{
-
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-soaveRedlichKwong::soaveRedlichKwong(Istream& is)
+Foam::soaveRedlichKwong::soaveRedlichKwong(Istream& is)
 :
     specie(is),
     pcrit_(readScalar(is)),
     Tcrit_(readScalar(is)),
     azentricFactor_(readScalar(is)),
-    n_(0.48508+1.55171*azentricFactor_-0.15613*pow(azentricFactor_,2)),
-    a0_(0.42747*pow(this->RR(),2)*pow(Tcrit_,2)/(pcrit_)),
+    a0_(0.42747*pow(this->RR(), 2)*pow(Tcrit_, 2)/pcrit_),
     b_(0.08664*this->RR()*Tcrit_/pcrit_),
+    n_(0.48508 + 1.55171*azentricFactor_ - 0.15613*pow(azentricFactor_, 2)),
+    b2_(b_*b_),
+    b3_(b2_*b_),
+    b5_(b2_*b3_),
     //CL: Only uses the default values
-    b2_(pow(b_,2)),
-    b3_(pow(b_,3)),
-    b5_(pow(b_,5)),
-    rhoMax_(1500),
     rhoMin_(1e-3),
-    TSave(0.0),
+    rhoMax_(1500),
     // Starting GUESS for the density by ideal gas law
-    rhostd_(this->rho(this->Pstd(),this->Tstd(),this->Pstd()/(this->Tstd()*this->R())))
+    rhostd_(this->rho(this->Pstd(), this->Tstd(), this->Pstd()/(this->Tstd()*this->R()))),
+    aSave(0.0),
+    daSave(0.0),
+    d2aSave(0.0),
+    TSave(0.0)
 {
     is.check("soaveRedlichKwong::soaveRedlichKwong(Istream& is)");
 }
+
 //CL: Constructed needed in OpenFOAM 2.x.x
 //CL: Code works fine, but compiling problem in OpenFOAM 1.6.ext
 //CL:  because specie has no constructor using dict
@@ -74,21 +73,32 @@ soaveRedlichKwong::soaveRedlichKwong(const dictionary& dict)
     pcrit_(readScalar(dict.subDict("equationOfState").lookup("pCritical"))),
     Tcrit_(readScalar(dict.subDict("equationOfState").lookup("TCritical"))),
     azentricFactor_(readScalar(dict.subDict("equationOfState").lookup("azentricFactor"))),
-    //CL: rhoMin and rhoMax are only used as boundaries for the bisection methode (see rho function)
+    a0_(0.42747*pow(this->RR(), 2)*pow(Tcrit_, 2)/pcrit_),
+    b_(0.08664*this->RR()*Tcrit_/pcrit_),
+    n_(0.48508 + 1.55171*azentricFactor_ - 0.15613*pow(azentricFactor_, 2)),
+    b2_(b_*b_),
+    b3_(b_*b2_),
+    b5_(b3_*b2_),
+    //CL: rhoMin and rhoMax are only used as boundaries for the bisection method (see rho function)
     //CL: important: rhoMin and rhoMax are not used as boundary for the newton solver
     //CL: therefore, rho can be larger than rhoMax and smaller than rhoMin
     rhoMin_(dict.subDict("equationOfState").lookupOrDefault("rhoMin",1e-3)),
     rhoMax_(dict.subDict("equationOfState").lookupOrDefault("rhoMax",1500)),
-    a0_(0.42747*pow(this->RR(),2)*pow(Tcrit_,2)/(pcrit_)),
-    b_(0.08664*this->RR()*Tcrit_/pcrit_),
-    n_(0.48508+1.55171*azentricFactor_-0.15613*pow(azentricFactor_,2)),
-    TSave(0.0),
-    b2_(pow(b_,2)),
-    b3_(pow(b_,3)),
-    b5_(pow(b_,5)),
+    //CL: rhoMin and rhoMax are only used as boundaries for the bisection method (see rho function)
+    //CL: important: rhoMin and rhoMax are not used as boundary for the newton solver
+    //CL: therefore, rho can be larger than rhoMax and smaller than rhoMin
+    rhoMin_(dict.subDict("equationOfState").lookupOrDefault("rhoMin",1e-3)),
+    rhoMax_(dict.subDict("equationOfState").lookupOrDefault("rhoMax",1500)),
     // Starting GUESS for the density by ideal gas law
-    rhostd_(this->rho(this->Pstd(),this->Tstd(),this->Pstd()/(this->Tstd()*this->R())))
-{}
+    rhostd_(this->rho(this->Pstd(), this->Tstd(), this->Pstd()/(this->Tstd()*this->R()))),
+    aSave(0.0),
+    daSave(0.0),
+    d2aSave(0.0),
+    TSave(0.0)
+{
+    is.check("soaveRedlichKwong::soaveRedlichKwong(Istream& is)");
+}
+
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
@@ -106,9 +116,11 @@ void Foam::soaveRedlichKwong::write(Ostream& os) const
     os  << indent << dict.dictName() << dict;
 }
 */
+
+
 // * * * * * * * * * * * * * * * Ostream Operator  * * * * * * * * * * * * * //
 
-Ostream& operator<<(Ostream& os, const soaveRedlichKwong& srk)
+Foam::Ostream& Foam::operator<<(Ostream& os, const soaveRedlichKwong& srk)
 {
     os  << static_cast<const specie&>(srk)<< token::SPACE
         << srk.pcrit_ << tab<< srk.Tcrit_<<tab<<srk.azentricFactor_;
@@ -117,9 +129,5 @@ Ostream& operator<<(Ostream& os, const soaveRedlichKwong& srk)
     return os;
 }
 
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // ************************************************************************* //

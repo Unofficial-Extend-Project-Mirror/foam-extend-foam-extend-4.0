@@ -220,6 +220,7 @@ void Foam::realGasHThermo<MixtureType>::correct()
     }
 }
 
+
 template<class MixtureType>
 Foam::tmp<Foam::scalarField> Foam::realGasHThermo<MixtureType>::h
 (
@@ -241,6 +242,7 @@ Foam::tmp<Foam::scalarField> Foam::realGasHThermo<MixtureType>::h
 
     return th;
 }
+
 
 template<class MixtureType>
 Foam::tmp<Foam::scalarField> Foam::realGasHThermo<MixtureType>::h
@@ -264,6 +266,7 @@ Foam::tmp<Foam::scalarField> Foam::realGasHThermo<MixtureType>::h
     return th;
 }
 
+
 template<class MixtureType>
 Foam::tmp<Foam::scalarField> Foam::realGasHThermo<MixtureType>::rho
 (
@@ -286,6 +289,7 @@ Foam::tmp<Foam::scalarField> Foam::realGasHThermo<MixtureType>::rho
     return trho;
 }
 
+
 template<class MixtureType>
 Foam::tmp<Foam::scalarField> Foam::realGasHThermo<MixtureType>::Cp
 (
@@ -307,6 +311,7 @@ Foam::tmp<Foam::scalarField> Foam::realGasHThermo<MixtureType>::Cp
 
     return tCp;
 }
+
 
 template<class MixtureType>
 Foam::tmp<Foam::volScalarField> Foam::realGasHThermo<MixtureType>::Cp() const
@@ -375,6 +380,7 @@ Foam::tmp<Foam::scalarField> Foam::realGasHThermo<MixtureType>::Cv
     return tCv;
 }
 
+
 // CL: Maybe this function should be changed so that it is not "const" fucntion anymore
 template<class MixtureType>
 Foam::tmp<Foam::volScalarField> Foam::realGasHThermo<MixtureType>::rho()  const
@@ -440,6 +446,7 @@ Foam::tmp<Foam::volScalarField> Foam::realGasHThermo<MixtureType>::rho()  const
     }
     return trho;
 }
+
 
 template<class MixtureType>
 Foam::tmp<Foam::volScalarField> Foam::realGasHThermo<MixtureType>::Cv() const

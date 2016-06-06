@@ -28,13 +28,9 @@ Institut für Thermodynamik
 Technische Universität Braunschweig
 Germany
 
-
-
 \*---------------------------------------------------------------------------*/
 
-
 #include "makeBasicPsiThermo.H"
-
 
 #include "redlichKwong.H"
 #include "pengRobinson.H"
@@ -44,7 +40,7 @@ Germany
 #include "realGasSpecieThermo.H"
 #include "constTransport.H"
 #include "sutherlandTransport.H"
-
+#include "constantHeatCapacity.H"
 #include "pureMixture.H"
 #include "realGasEThermo.H"
 
@@ -135,6 +131,88 @@ makeBasicRealGasThermo
     nasaHeatCapacityPolynomial,
     soaveRedlichKwong
 );
+
+makeBasicRealGasThermo
+(
+    realGasEThermo,
+    pureMixture,
+    sutherlandTransport,
+    realGasSpecieThermo,
+    constantHeatCapacity,
+    pengRobinson
+);
+
+
+makeBasicRealGasThermo
+(
+    realGasEThermo,
+    pureMixture,
+    sutherlandTransport,
+    realGasSpecieThermo,
+    constantHeatCapacity,
+    aungierRedlichKwong
+);
+
+makeBasicRealGasThermo
+(
+    realGasEThermo,
+    pureMixture,
+    sutherlandTransport,
+    realGasSpecieThermo,
+    constantHeatCapacity,
+    redlichKwong
+);
+
+makeBasicRealGasThermo
+(
+    realGasEThermo,
+    pureMixture,
+    sutherlandTransport,
+    realGasSpecieThermo,
+    constantHeatCapacity,
+    soaveRedlichKwong
+);
+
+makeBasicRealGasThermo
+(
+    realGasEThermo,
+    pureMixture,
+    constTransport,
+    realGasSpecieThermo,
+    constantHeatCapacity,
+    pengRobinson
+);
+
+makeBasicRealGasThermo
+(
+    realGasEThermo,
+    pureMixture,
+    constTransport,
+    realGasSpecieThermo,
+    constantHeatCapacity,
+    aungierRedlichKwong
+);
+
+makeBasicRealGasThermo
+(
+    realGasEThermo,
+    pureMixture,
+    constTransport,
+    realGasSpecieThermo,
+    constantHeatCapacity,
+    redlichKwong
+);
+
+makeBasicRealGasThermo
+(
+    realGasEThermo,
+    pureMixture,
+    constTransport,
+    realGasSpecieThermo,
+    constantHeatCapacity,
+    soaveRedlichKwong
+);
+
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

@@ -59,29 +59,26 @@ class redlichKwong
 :
     public specie
 {
-
-
-protected:
-
-    // Protected data
+    // private data
+    //CL: data at critical point
     scalar pcrit_;
-    scalar Tcrit_;
+    scalar Tcrit_; 
 
-    //-Redlich Kwong factors
-    mutable scalar a_;
-    mutable scalar b_;
+    //CL: Redlich Kwong factors
+    scalar a_;
+    scalar b_;
 
     //CL: pow of constants b_ used in the code e.g. b2_=b*b;
-    mutable scalar b2_;
-    mutable scalar b3_;
-    mutable scalar b5_;
+    scalar b2_;
+    scalar b3_;
+    scalar b5_;
 
     //CL: rhoMin and rhoMax are only used as boundaries for the bisection methode (see rho function)
-    scalar rhoMax_;
     scalar rhoMin_;
+    scalar rhoMax_;
 
     //- Density @STD, initialise after a, b!
-    mutable scalar rhostd_;
+    scalar rhostd_;
 
 public:
 
@@ -110,33 +107,32 @@ public:
 
     // Member functions
 
-        inline scalar rhostd() const;
-
         //Return Redlich Kwong factors
         inline scalar a() const;
 
         inline scalar b() const;
 
+        inline scalar rhostd() const;
+
+        inline scalar rhoMin() const;
+
+        inline scalar rhoMax() const;
+
+        inline scalar Tcrit() const;
+
+        //CL: Equation of state
         inline scalar p(const scalar rho, const scalar T) const;
 
-        //CL: return power of constants b_
-        inline scalar b2()const;
-
-        inline scalar b3()const;
-
-        inline scalar b5()const;
-
-
-        //first order derivatives
-        inline scalar dpdv(const scalar rho, const  scalar T) const;
+        //CL: first order derivatives
+        inline scalar dpdv(const scalar rho, const scalar T) const;
 
         inline scalar dpdT(const scalar rho, const scalar T) const;
 
-        inline scalar dvdT(const scalar rho, const  scalar T) const;
+        inline scalar dvdT(const scalar rho, const scalar T) const;
 
         inline scalar dvdp(const scalar rho, const scalar T) const;
 
-        inline scalar isobarExpCoef(const scalar rho, const  scalar T) const;
+        inline scalar isobarExpCoef(const scalar rho, const scalar T) const;
 
         inline scalar isothermalCompressiblity
         (
@@ -144,7 +140,7 @@ public:
             const scalar T
         ) const;
 
-        // Used for cv
+        //CL: Used for cv
         inline scalar integral_d2pdT2_dv
         (
             const scalar rho,
@@ -157,14 +153,14 @@ public:
         // Used for Entropy
         inline scalar integral_dpdT_dv(const scalar rho, const scalar T) const;
 
-        // second order derivatives, not Used At The Moment
+        //CL: second order derivatives, not Used At The Moment
         inline scalar d2pdv2(const scalar rho, const scalar T) const;
 
         inline scalar d2pdT2(const scalar rho, const scalar T) const;
 
         inline scalar d2pdvdT(const scalar rho, const scalar T) const;
 
-        inline scalar d2vdT2(const scalar rho, const  scalar T) const;
+        inline scalar d2vdT2(const scalar rho, const scalar T) const;
 
         //- Return density [kg/m^3]
         // rho0 is the starting point of the newton solver used to calculate rho
@@ -198,10 +194,9 @@ public:
     // Member operators
 
         inline void operator+=(const redlichKwong&);
-/*
-        inline void operator-=(const redlichKwong&);
+
         inline void operator*=(const scalar);
-*/
+
 
     // Friend operators
 
@@ -216,6 +211,7 @@ public:
             const scalar s,
             const redlichKwong&
         );
+
 
     // Ostream Operator
 

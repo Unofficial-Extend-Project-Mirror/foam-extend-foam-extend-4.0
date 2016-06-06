@@ -211,13 +211,11 @@ Foam::IAPWSThermo::IAPWSThermo
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
-
 Foam::IAPWSThermo::~IAPWSThermo()
 {}
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
-
 
 void Foam::IAPWSThermo::correct()
 {

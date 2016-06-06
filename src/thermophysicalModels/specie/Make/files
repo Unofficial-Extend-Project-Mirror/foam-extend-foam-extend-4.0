@@ -8,17 +8,12 @@ $(atomicWeights)/atomicWeights.C
 $(specie)/specie.C
 $(speciesTable)/speciesTable.C
 $(equationOfState)/perfectGas/perfectGas.C
+$(equationOfState)/cubicEquationOfState/redlichKwong/redlichKwong.C
+$(equationOfState)/cubicEquationOfState/aungierRedlichKwong/aungierRedlichKwong.C
+$(equationOfState)/cubicEquationOfState/pengRobinson/pengRobinson.C
+$(equationOfState)/cubicEquationOfState/soaveRedlichKwong/soaveRedlichKwong.C
 $(reactions)/makeChemkinReactions.C
 $(reactions)/makeReactionThermoReactions.C
 $(reactions)/makeLangmuirHinshelwoodReactions.C
-
-$(equationOfState)/cubicEquationOfState/aungierRedlichKwong/aungierRedlichKwong.C
-$(equationOfState)/cubicEquationOfState/pengRobinson/pengRobinson.C
-$(equationOfState)/cubicEquationOfState/redlichKwong/redlichKwong.C
-$(equationOfState)/cubicEquationOfState/soaveRedlichKwong/soaveRedlichKwong.C
-$(equationOfState)/cubicEquationOfState/mixtures/mixtureRedlichKwong/mixtureRedlichKwong.C
-$(equationOfState)/cubicEquationOfState/mixtures/mixturePengRobinson/mixturePengRobinson.C
-$(equationOfState)/cubicEquationOfState/mixtures/mixtureSoaveRedlichKwong/mixtureSoaveRedlichKwong.C
-
 
 LIB = $(FOAM_LIBBIN)/libspecie

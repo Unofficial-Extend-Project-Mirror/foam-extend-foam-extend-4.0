@@ -47,8 +47,8 @@ template<class thermo>
 const Foam::debug::optimisationSwitch
 Foam::realGasSpecieThermo<thermo>::maxIter_
 (
-    "speciesThermoMaxIter",
-    100
+    "realGasSpecieThermoMaxIter",
+    500
 );
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //

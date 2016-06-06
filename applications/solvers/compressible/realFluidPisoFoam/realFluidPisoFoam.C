@@ -23,13 +23,13 @@ License
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 Application
-    rhoPisoFoam
+    realFluidPisoFoam
 
 Description
-    Transient PISO solver for compressible, laminar or turbulent flow.
-   
-    CL: rhoPisoFoam with a changed pressure equation for non-perfect gas fluids
-    CL: see realFluid flag
+    Transient PISO solver for compressible, laminar or turbulent flow
+    of real fluids e.g. real gases (cubic equations of state)
+
+    Solver cannot be used with perfect gas library
 
 \*---------------------------------------------------------------------------*/
 
