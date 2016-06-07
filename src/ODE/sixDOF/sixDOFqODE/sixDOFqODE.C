@@ -232,11 +232,11 @@ void Foam::sixDOFqODE::aitkensRelaxation
     }
 
     // Bound the relaxation factor for stability
-    if(relaxFactorT_ > max)
+    if (relaxFactorT_ > max)
     {
         relaxFactorT_ = max;
     }
-    else if(relaxFactorT_ < min)
+    else if (relaxFactorT_ < min)
     {
         relaxFactorT_ = min;
     }
@@ -245,7 +245,11 @@ void Foam::sixDOFqODE::aitkensRelaxation
     const scalar saveOldRelFacR = oldRelaxFactorR_;
     oldRelaxFactorR_ = relaxFactorR_;
 
-    if(magSqr(OmegaDot_[0] - OmegaDotn_[1] - OmegaDot_[1] - OmegaDotn_[2]) > SMALL)
+    if
+    (
+        magSqr(OmegaDot_[0] - OmegaDotn_[1] - OmegaDot_[1] - OmegaDotn_[2])
+      > SMALL
+    )
     {
         relaxFactorR_ =
         saveOldRelFacR + (saveOldRelFacR - 1)*
