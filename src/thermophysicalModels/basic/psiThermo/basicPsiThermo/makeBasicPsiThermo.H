@@ -60,6 +60,46 @@ addToRunTimeSelectionTable                                                    \
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
+#define makeBasicRealGasThermo(Cthermo,Mixture,Transport,SpecieThermo,Thermo,EqnOfState) \
+                                                                              \
+typedef Cthermo<Mixture<Transport<SpecieThermo<Thermo<EqnOfState> > > > >     \
+    Cthermo##Mixture##Transport##SpecieThermo##Thermo##EqnOfState;            \
+                                                                              \
+defineTemplateTypeNameAndDebugWithName                                        \
+(                                                                             \
+    Cthermo##Mixture##Transport##SpecieThermo##Thermo##EqnOfState,            \
+    #Cthermo                                                                  \
+        "<"#Mixture"<"#Transport"<"#SpecieThermo"<"#Thermo"<"#EqnOfState">>>>>", \
+    0                                                                         \
+);                                                                            \
+                                                                              \
+addToRunTimeSelectionTable                                                    \
+(                                                                             \
+    basicPsiThermo,                                                           \
+    Cthermo##Mixture##Transport##SpecieThermo##Thermo##EqnOfState,            \
+    fvMesh                                                                    \
+)
+
+#define makeBasicExternalLibraryBasedThermo(Cthermo)                          \
+                                                                              \
+typedef Cthermo                                                               \
+    Cthermo;                                                                  \
+                                                                              \
+defineTypeNameAndDebug                                                        \
+(                                                                             \
+    Cthermo,                                                                  \
+    0                                                                         \
+);                                                                            \
+                                                                              \
+addToRunTimeSelectionTable                                                    \
+(                                                                             \
+    basicPsiThermo,                                                           \
+    Cthermo,                                                                  \
+    fvMesh                                                                    \
+)
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
 #endif
 
 // ************************************************************************* //
