@@ -52,7 +52,7 @@ bool Foam::simpleControl::criteriaSatisfied()
     bool achieved = true;
     bool checked = false;    // safety that some checks were indeed performed
 
-    const dictionary& solverDict = mesh_.solverPerformanceDict();
+    const dictionary& solverDict = mesh_.solutionDict().solverPerformanceDict();
     forAllConstIter(dictionary, solverDict, iter)
     {
         const word& variableName = iter().keyword();

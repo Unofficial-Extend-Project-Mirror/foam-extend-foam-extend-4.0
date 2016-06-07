@@ -7,7 +7,7 @@
     Urot == U - Urel;
 
     fvScalarMatrix iEqn
-    (      
+    (
 	      fvm::ddt(rho, i)
         + fvm::div(phi, i)
         - fvm::laplacian(turbulence->alphaEff(), i)
@@ -18,8 +18,7 @@
 
     iEqn.relax();
 
-    eqnResidual = iEqn.solve().initialResidual();
-    maxResidual = max(eqnResidual, maxResidual);
+    iEqn.solve();
 
     // From rothalpy, calculate enthalpy after solution of rothalpy equation
     h = i + 0.5*(magSqr(Urot) - magSqr(Urel));

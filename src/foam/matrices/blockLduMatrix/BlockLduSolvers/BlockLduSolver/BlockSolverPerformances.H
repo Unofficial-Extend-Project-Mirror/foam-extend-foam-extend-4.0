@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
-    \\  /    A nd           | Web:         http://www.foam-extend.org
-     \\/     M anipulation  | For copyright notice see file Copyright
+   \\    /   O peration     |
+    \\  /    A nd           | For copyright notice see file Copyright
+     \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -21,64 +21,44 @@ License
     You should have received a copy of the GNU General Public License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
+Class
+    BlockSolverPerformance
+
+Description
+    Typedefs for BlockSolverPerformance
+
+Author
+    Vanja Skuric, FMENA Zagreb. All rights reserved.
+
 \*---------------------------------------------------------------------------*/
 
-#include "diagonalSolver.H"
+#ifndef BlockSolverPerformances_H
+#define BlockSolverPerformances_H
 
-// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
+#include "BlockSolverPerformance.H"
+#include "fieldTypes.H"
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
-    defineTypeNameAndDebug(diagonalSolver, 0);
-}
 
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
-
-Foam::diagonalSolver::diagonalSolver
-(
-    const word& fieldName,
-    const lduMatrix& matrix,
-    const FieldField<Field, scalar>& coupleBouCoeffs,
-    const FieldField<Field, scalar>& coupleIntCoeffs,
-    const lduInterfaceFieldPtrsList& interfaces,
-    const dictionary& dict
-)
-:
-    lduMatrix::solver
-    (
-        fieldName,
-        matrix,
-        coupleBouCoeffs,
-        coupleIntCoeffs,
-        interfaces,
-        dict
-    )
-{}
+typedef BlockSolverPerformance<scalar> BlockSolverPerformanceScalar;
+typedef BlockSolverPerformance<vector> BlockSolverPerformanceVector;
+typedef BlockSolverPerformance<sphericalTensor>
+    BlockSolverPerformanceSphericalTensor;
+typedef BlockSolverPerformance<symmTensor> BlockSolverPerformanceSymmTensor;
+typedef BlockSolverPerformance<tensor> BlockSolverPerformanceTensor;
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-Foam::lduSolverPerformance Foam::diagonalSolver::solve
-(
-    scalarField& x,
-    const scalarField& b,
-    const direction cmpt
-) const
-{
-    x = b/matrix_.diag();
+} // End namespace Foam
 
-    return lduSolverPerformance
-    (
-        typeName,
-        fieldName(),
-        0,
-        0,
-        0,
-        true,
-        false
-    );
-}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
+#endif
 
 // ************************************************************************* //

@@ -103,7 +103,6 @@ Foam::fvMesh::fvMesh(const IOobject& io)
 :
     polyMesh(io),
     surfaceInterpolation(*this),
-    data(static_cast<const objectRegistry&>(*this)),
     boundary_(*this, boundaryMesh()),
     lduPtr_(NULL),
     curTimeIndex_(time().timeIndex()),
@@ -206,7 +205,6 @@ Foam::fvMesh::fvMesh
 :
     polyMesh(io, points, faces, allOwner, allNeighbour, syncPar),
     surfaceInterpolation(*this),
-    data(static_cast<const objectRegistry&>(*this)),
     boundary_(*this),
     lduPtr_(NULL),
     curTimeIndex_(time().timeIndex()),
@@ -237,7 +235,6 @@ Foam::fvMesh::fvMesh
 :
     polyMesh(io, points, faces, cells, syncPar),
     surfaceInterpolation(*this),
-    data(static_cast<const objectRegistry&>(*this)),
     boundary_(*this),
     lduPtr_(NULL),
     curTimeIndex_(time().timeIndex()),
@@ -285,7 +282,6 @@ Foam::fvMesh::fvMesh
         syncPar
     ),
     surfaceInterpolation(*this),
-    data(static_cast<const objectRegistry&>(*this)),
     boundary_(*this),
     lduPtr_(NULL),
     curTimeIndex_(time().timeIndex()),

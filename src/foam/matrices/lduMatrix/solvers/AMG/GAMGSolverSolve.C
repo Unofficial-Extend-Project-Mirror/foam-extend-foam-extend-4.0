@@ -30,7 +30,7 @@ License
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-Foam::lduMatrix::solverPerformance Foam::GAMGSolver::solve
+Foam::lduSolverPerformance Foam::GAMGSolver::solve
 (
     scalarField& x,
     const scalarField& b,

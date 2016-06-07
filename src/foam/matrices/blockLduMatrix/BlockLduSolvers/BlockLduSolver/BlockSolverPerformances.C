@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
-    \\  /    A nd           | Web:         http://www.foam-extend.org
-     \\/     M anipulation  | For copyright notice see file Copyright
+   \\    /   O peration     |
+    \\  /    A nd           | For copyright notice see file Copyright
+     \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -21,62 +21,32 @@ License
     You should have received a copy of the GNU General Public License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
-InClass
-    Foam::fvScalarMatrix
-
 Description
-    A scalar instance of fvMatrix
+    BlockSolverPerformance static data members
 
-SourceFiles
-    fvScalarMatrix.C
+Author
+    Vanja Skuric, FMENA Zagreb. All rights reserved.
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef fvScalarMatrix_H
-#define fvScalarMatrix_H
-
-#include "fvMatrix.H"
+#include "BlockSolverPerformances.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 
-// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-// Set reference level for a component of the solution
-// on a given patch face
-template<>
-void fvMatrix<scalar>::setComponentReference
-(
-    const label patchi,
-    const label facei,
-    const direction,
-    const scalar value
-);
-
-template<>
-lduSolverPerformance fvMatrix<scalar>::solve
-(
-    const dictionary&
-);
-
-template<>
-tmp<scalarField> fvMatrix<scalar>::residual() const;
-
-template<>
-tmp<volScalarField> fvMatrix<scalar>::H() const;
-
-template<>
-tmp<volScalarField> fvMatrix<scalar>::H1() const;
+defineNamedTemplateTypeNameAndDebug(BlockSolverPerformanceScalar, 1);
+defineNamedTemplateTypeNameAndDebug(BlockSolverPerformanceVector, 1);
+defineNamedTemplateTypeNameAndDebug(BlockSolverPerformanceSphericalTensor, 1);
+defineNamedTemplateTypeNameAndDebug(BlockSolverPerformanceSymmTensor, 1);
+defineNamedTemplateTypeNameAndDebug(BlockSolverPerformanceTensor, 1);
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-#endif
 
 // ************************************************************************* //

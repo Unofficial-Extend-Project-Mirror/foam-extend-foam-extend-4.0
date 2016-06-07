@@ -43,6 +43,7 @@ GE CONFIDENTIAL INFORMATION 2016 General Electric Company. All Rights Reserved
 #include "basicRhoThermo.H"
 #include "RASModel.H"
 #include "MRFZones.H"
+#include "pimpleControl.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -53,9 +54,11 @@ int main(int argc, char *argv[])
 
 #   include "createTime.H"
 #   include "createMesh.H"
+
+    pimpleControl pimple(mesh);
+
 #   include "createThermo.H"
 #   include "createFields.H"
-#   include "readPIMPLEControls.H"
 #   include "initContinuityErrs.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -66,10 +69,7 @@ int main(int argc, char *argv[])
     {
         Info<< "Time = " << runTime.timeName() << nl << endl;
 
-#       include "readPIMPLEControls.H"
 #       include "readFieldBounds.H"
-
-#       include "initConvergenceCheck.H"
 
 #       include "UEqn.H"
 #       include "pEqn.H"
@@ -86,8 +86,6 @@ int main(int argc, char *argv[])
         Info<< "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
             << "  ClockTime = " << runTime.elapsedClockTime() << " s"
             << nl << endl;
-
-#       include "convergenceCheck.H"
     }
 
 #   include "clearThermo.H"

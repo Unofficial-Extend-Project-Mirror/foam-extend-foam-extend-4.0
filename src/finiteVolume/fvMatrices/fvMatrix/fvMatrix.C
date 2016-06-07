@@ -1390,7 +1390,7 @@ Foam::tmp<Foam::fvMatrix<Type> > Foam::relax(const fvMatrix<Type>& m)
 
 
 template<class Type>
-Foam::lduMatrix::solverPerformance Foam::solve
+Foam::lduSolverPerformance Foam::solve
 (
     fvMatrix<Type>& fvm,
     const dictionary& solverControls
@@ -1400,13 +1400,13 @@ Foam::lduMatrix::solverPerformance Foam::solve
 }
 
 template<class Type>
-Foam::lduMatrix::solverPerformance Foam::solve
+Foam::lduSolverPerformance Foam::solve
 (
     const tmp<fvMatrix<Type> >& tfvm,
     const dictionary& solverControls
 )
 {
-    lduMatrix::solverPerformance solverPerf =
+    lduSolverPerformance solverPerf =
         const_cast<fvMatrix<Type>&>(tfvm()).solve(solverControls);
 
     tfvm.clear();
@@ -1416,18 +1416,18 @@ Foam::lduMatrix::solverPerformance Foam::solve
 
 
 template<class Type>
-Foam::lduMatrix::solverPerformance Foam::solve(fvMatrix<Type>& fvm)
+Foam::lduSolverPerformance Foam::solve(fvMatrix<Type>& fvm)
 {
     return fvm.solve();
 }
 
 template<class Type>
-Foam::lduMatrix::solverPerformance Foam::solve
+Foam::lduSolverPerformance Foam::solve
 (
     const tmp<fvMatrix<Type> >& tfvm
 )
 {
-    lduMatrix::solverPerformance solverPerf =
+    lduSolverPerformance solverPerf =
         const_cast<fvMatrix<Type>&>(tfvm()).solve();
 
     tfvm.clear();

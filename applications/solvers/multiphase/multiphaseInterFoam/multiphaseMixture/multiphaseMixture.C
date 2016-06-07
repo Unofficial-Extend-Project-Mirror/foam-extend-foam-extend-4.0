@@ -125,6 +125,7 @@ Foam::multiphaseMixture::multiphaseMixture
     forAllIter(PtrDictionary<phase>, phases_, iter)
     {
         alphaTable_.add(iter());
+        mesh_.schemesDict().setFluxRequired(iter().volScalarField::name());
     }
 }
 

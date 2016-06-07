@@ -64,7 +64,7 @@ int main(int argc, char *argv[])
 
         int iCorr = 0;
         scalar initialResidual = 0;
-        lduMatrix::solverPerformance solverPerf;
+        lduSolverPerformance solverPerf;
         scalar relativeResidual = GREAT;
         lduMatrix::debug = 0;
 

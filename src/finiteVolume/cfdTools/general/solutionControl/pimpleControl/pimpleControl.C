@@ -63,7 +63,7 @@ bool Foam::pimpleControl::criteriaSatisfied()
     bool achieved = true;
     bool checked = false;    // safety that some checks were indeed performed
 
-    const dictionary& solverDict = mesh_.solverPerformanceDict();
+    const dictionary& solverDict = mesh_.solutionDict().solverPerformanceDict();
     forAllConstIter(dictionary, solverDict, iter)
     {
         const word& variableName = iter().keyword();
@@ -190,7 +190,7 @@ bool Foam::pimpleControl::loop()
         }
 
         corr_ = 0;
-        mesh_.data::remove("finalIteration");
+        mesh_.solutionDict().remove("finalIteration");
         return false;
     }
 
@@ -202,7 +202,7 @@ bool Foam::pimpleControl::loop()
             Info<< algorithmName_ << ": converged in " << corr_ - 1
                 << " iterations" << endl;
 
-            mesh_.data::remove("finalIteration");
+            mesh_.solutionDict().remove("finalIteration");
             corr_ = 0;
             converged_ = false;
 
@@ -213,7 +213,7 @@ bool Foam::pimpleControl::loop()
             Info<< algorithmName_ << ": iteration " << corr_ << endl;
             storePrevIterFields();
 
-            mesh_.data::add("finalIteration", true);
+            mesh_.solutionDict().add("finalIteration", true);
             converged_ = true;
         }
     }
@@ -221,7 +221,7 @@ bool Foam::pimpleControl::loop()
     {
         if (finalIter())
         {
-            mesh_.data::add("finalIteration", true);
+            mesh_.solutionDict().add("finalIteration", true);
         }
 
         if (corr_ <= nCorrPIMPLE_)

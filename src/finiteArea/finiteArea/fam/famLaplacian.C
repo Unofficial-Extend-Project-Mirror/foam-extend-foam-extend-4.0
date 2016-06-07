@@ -329,6 +329,40 @@ laplacian
 }
 
 
+template<class Type>
+tmp<faMatrix<Type> >
+laplacian
+(
+    const edgeTensorField& gamma,
+    const GeometricField<Type, faPatchField, areaMesh>& vf,
+    const word& name
+)
+{
+    const faMesh& mesh = vf.mesh();
+
+    return fam::laplacian
+    (
+        (mesh.Le() & gamma & mesh.Le())/sqr(mesh.magLe()),
+        vf,
+        name
+    );
+}
+
+template<class Type>
+tmp<faMatrix<Type> >
+laplacian
+(
+    const tmp<edgeTensorField>& tgamma,
+    const GeometricField<Type, faPatchField, areaMesh>& vf,
+    const word& name
+)
+{
+    tmp<faMatrix<Type> > Laplacian = fam::laplacian(tgamma(), vf, name);
+    tgamma.clear();
+    return Laplacian;
+}
+
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace fam

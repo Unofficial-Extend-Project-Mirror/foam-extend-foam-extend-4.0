@@ -93,7 +93,7 @@ protected:
         }
 
         // Holds recent solver performance
-        lduMatrix::solverPerformance solverPerf_;
+        lduSolverPerformance solverPerf_;
 
 
 public:
@@ -125,7 +125,7 @@ public:
         virtual void updateMesh(const mapPolyMesh&);
 
         //- Return recent solver performance
-        const lduMatrix::solverPerformance& solverPerformance() const
+        const lduSolverPerformance& solverPerformance() const
         {
             return solverPerf_;
         }

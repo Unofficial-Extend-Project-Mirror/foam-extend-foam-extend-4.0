@@ -52,7 +52,7 @@ void Foam::fvMatrix<Type>::setComponentReference
 
 
 template<class Type>
-Foam::lduMatrix::solverPerformance Foam::fvMatrix<Type>::solve
+Foam::lduSolverPerformance Foam::fvMatrix<Type>::solve
 (
     const dictionary& solverControls
 )
@@ -140,7 +140,7 @@ Foam::lduMatrix::solverPerformance Foam::fvMatrix<Type>::solve
             cmpt
         );
 
-        lduMatrix::solverPerformance solverPerf;
+        lduSolverPerformance solverPerf;
 
         // Solver call
         solverPerf = lduMatrix::solver::New
@@ -170,14 +170,14 @@ Foam::lduMatrix::solverPerformance Foam::fvMatrix<Type>::solve
 
     psi.correctBoundaryConditions();
 
-    psi_.mesh().setSolverPerformance(psi_.name(), solverPerfVec);
+    psi_.mesh().solutionDict().setSolverPerformance(psi_.name(), solverPerfVec);
 
     return solverPerfVec;
 }
 
 
 template<class Type>
-Foam::lduMatrix::solverPerformance Foam::fvMatrix<Type>::solve()
+Foam::lduSolverPerformance Foam::fvMatrix<Type>::solve()
 {
     return solve(psi_.mesh().solutionDict().solverDict(psi_.name()));
 }
