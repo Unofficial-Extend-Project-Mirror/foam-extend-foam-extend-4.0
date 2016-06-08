@@ -1,0 +1,24 @@
+set terminal postscript enhanced color solid
+
+set output "pressure.ps
+set xlabel "x, m" offset 0,0.5
+set ylabel  "p/{/Symbol r}" offset 2,0
+#set y2label "dy [m]"
+set grid
+
+set size 0.8,0.5
+
+#set y2tics
+
+set border linewidth 1.5
+
+set rmargin 2
+set lmargin 6
+
+plot "data/interfacePressure_1-sub-iter.dat" using 1:3 title "1 sub-iter" with lines lw 1.5, \
+"data/interfacePressure_2-sub-iter.dat" using 1:3 title "2 sub-iter" with points lt 2 ps 1 pt 6 lw 1.5, \
+"data/interfacePressure_converged.dat" using 1:3 title "Converged" with lines lw 1.5
+
+
+#set output
+#set terminal x11

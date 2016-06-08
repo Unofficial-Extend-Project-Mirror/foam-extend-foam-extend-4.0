@@ -53,11 +53,11 @@ int yyFlexLexer::yylex()
 // It is called by yylex but is not used as the mechanism to change file.
 // See <<EOF>>
 //! @cond dummy
-#if YY_FLEX_SUBMINOR_VERSION < 34
-extern "C" int yywrap()
-#else
+// #if YY_FLEX_SUBMINOR_VERSION < 34
+// extern "C" int yywrap()
+// #else
 int yyFlexLexer::yywrap()
-#endif
+// #endif
 {
     return 1;
 }

@@ -65,6 +65,8 @@ class velocityLaplacianFvMotionSolver
         //- Diffusivity used to control the motion
         autoPtr<motionDiffusivity> diffusivityPtr_;
 
+        //- Use leastSquares volToPoint interpolaltion
+        Switch leastSquaresVolPoint_;
 
     // Private Member Functions
 

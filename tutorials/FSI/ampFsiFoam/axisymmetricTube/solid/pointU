@@ -1,0 +1,54 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM Extend Project: Open Source CFD        |
+|  \\    /   O peration     | Version:  1.6-ext                               |
+|   \\  /    A nd           | Web:      www.extend-project.de                 |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       pointVectorField;
+    location    "0";
+    object      pointU;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+dimensions      [0 1 0 0 0 0 0];
+
+internalField   uniform (0 0 0);
+
+boundaryField
+{
+    symmetry-xy
+    {
+        type symmetryPlane;
+    }
+    symmetry-xz
+    {
+        type symmetryPlane;
+    }
+    outlet
+    {
+        type fixedValue;
+        value uniform (0 0 0);
+    }
+    inlet
+    {
+        type fixedValue;
+        value uniform (0 0 0);
+    }
+    interface-solid
+    {
+        type            calculated;
+        value           uniform (0 0 0);
+    }
+    outer-wall
+    {
+        type            calculated;
+        value           uniform (0 0 0);
+    }
+}
+
+// ************************************************************************* //

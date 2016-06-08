@@ -1,0 +1,18 @@
+setSet -case fluid
+
+faceSet plateZone new patchToFace plate
+quit
+
+setsToZones -case fluid -noFlipMap
+
+decomposePar -case fluid -cellDist
+
+
+
+setSet -case solid
+
+faceSet plateZone new patchToFace plate
+quit
+setsToZones -case solid -noFlipMap
+
+decomposePar -case solid -cellDist

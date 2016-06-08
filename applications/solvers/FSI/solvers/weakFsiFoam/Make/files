@@ -1,0 +1,3 @@
+weakFsiFoam.C
+
+EXE = $(FOAM_APPBIN)/weakFsiFoam

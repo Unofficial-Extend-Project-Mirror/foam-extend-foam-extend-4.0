@@ -1,0 +1,15 @@
+#!/bin/sh
+set -x
+
+wmake libso fluidSolidInteraction
+
+wmake solvers/fsiFoam
+wmake solvers/ampFsiFoam
+wmake solvers/weakFsiFoam
+wmake solvers/fluidFoam
+wmake solvers/solidFoam
+wmake solvers/thermalSolidFoam
+
+wmake libso utilities/functionObjects/pointHistory
+wmake libso utilities/functionObjects/patchAvgTractionHistory
+wmake libso utilities/functionObjects/centrifugalBodyForce

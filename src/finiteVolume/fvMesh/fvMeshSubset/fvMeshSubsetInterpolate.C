@@ -29,6 +29,8 @@ License
 #include "emptyFvPatchFields.H"
 #include "emptyFvsPatchFields.H"
 #include "calculatedPointPatchFields.H"
+#include "globalPointPatchFields.H"
+#include "symmetryFvPatch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -214,11 +216,29 @@ tmp<GeometricField<Type, fvPatchField, volMesh> > fvMeshSubset::interpolate
 
         forAll(lastPatchField, faceI)
         {
-            lastPatchField[faceI] =
-                w[fm[lastPatchStart + faceI]]*
-                vfI[own[fm[lastPatchStart + faceI]]]
-              + (1.0 - w[fm[lastPatchStart + faceI]])*
-                vfI[ngb[fm[lastPatchStart + faceI]]];
+            if (fm[lastPatchStart + faceI] < baseMesh().nInternalFaces())
+            {
+                lastPatchField[faceI] =
+                    w[fm[lastPatchStart + faceI]]*
+                    vfI[own[fm[lastPatchStart + faceI]]]
+                  + (1.0 - w[fm[lastPatchStart + faceI]])*
+                    vfI[ngb[fm[lastPatchStart + faceI]]];
+            }
+            else
+            {
+                label patchID =
+                    baseMesh().boundaryMesh().whichPatch
+                    (
+                        fm[lastPatchStart + faceI]
+                    );
+
+                label localFaceIndex =
+                    fm[lastPatchStart + faceI]
+                  - baseMesh().boundaryMesh()[patchID].start();
+
+                lastPatchField[faceI] =
+                    vf.boundaryField()[patchID][localFaceIndex];
+            }
         }
     }
 
@@ -577,6 +597,29 @@ fvMeshSubset::interpolate
                 )
             );
         }
+    }
+
+    // Add the global patch
+    if (isType<globalPointPatch>(sMesh.boundary()[sMesh.boundary().size()-1]))
+    {
+        patchFields.resize(pm.size() + 1);
+        patchFields.set
+        (
+            pm.size(),
+            new GlobalPointPatchField
+            <
+                pointPatchField,
+                pointMesh,
+                pointPatch,
+                globalPointPatch,
+                DummyMatrix,
+                Type
+            >
+            (
+                sMesh.boundary().globalPatch(),
+                DimensionedField<Type, pointMesh>::null()
+            )
+        );
     }
 
     // Create the complete field from the pieces

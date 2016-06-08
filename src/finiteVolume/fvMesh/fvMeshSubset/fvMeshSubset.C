@@ -1480,7 +1480,7 @@ pointMesh& Foam::fvMeshSubset::subPointMesh()
 {
     if (!pointMeshSubsetPtr_)
     {
-        pointMeshSubsetPtr_ = new pointMesh(subMesh());
+        pointMeshSubsetPtr_ = new pointMesh(subMesh(), true);
     }
 
     return *pointMeshSubsetPtr_;

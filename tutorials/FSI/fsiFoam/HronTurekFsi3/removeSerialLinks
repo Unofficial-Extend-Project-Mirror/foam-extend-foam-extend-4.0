@@ -1,0 +1,11 @@
+#!/bin/tcsh
+
+cd $1
+
+rm 0/solid
+
+rm constant/solid
+
+rm system/solid
+
+cd ..
