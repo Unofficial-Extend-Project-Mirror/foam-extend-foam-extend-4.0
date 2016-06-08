@@ -112,9 +112,8 @@ public:
         );
 
 
-    // Destructor
-
-        virtual ~BlockAMGPrecon();
+    //- Destructor
+    virtual ~BlockAMGPrecon();
 
 
     // Member Functions

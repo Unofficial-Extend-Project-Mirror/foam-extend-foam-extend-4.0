@@ -35,10 +35,6 @@ Author
 #include "BlockAMGCycle.H"
 #include "demandDrivenData.H"
 
-// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
-
-
-
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 // Construct from AMG level
