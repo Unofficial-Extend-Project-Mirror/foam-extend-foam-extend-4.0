@@ -47,7 +47,7 @@ inline VectorSpace<Form, Cmpt, nCmpt>::VectorSpace
     const VectorSpace<Form, Cmpt, nCmpt>& vs
 )
 {
-    VectorSpaceOps<nCmpt,0>::eqOp(*this, vs, eqOp<Cmpt>());
+    VectorSpaceOps<nCmpt, 0>::eqOp(*this, vs, eqOp<Cmpt>());
 }
 
 
@@ -193,7 +193,7 @@ inline void VectorSpace<Form, Cmpt, nCmpt>::operator=
     const VectorSpace<Form, Cmpt, nCmpt>& vs
 )
 {
-    VectorSpaceOps<nCmpt,0>::eqOp(*this, vs, eqOp<Cmpt>());
+    VectorSpaceOps<nCmpt, 0>::eqOp(*this, vs, eqOp<Cmpt>());
 }
 
 
@@ -203,7 +203,7 @@ inline void VectorSpace<Form, Cmpt, nCmpt>::operator+=
     const VectorSpace<Form, Cmpt, nCmpt>& vs
 )
 {
-    VectorSpaceOps<nCmpt,0>::eqOp(*this, vs, plusEqOp<Cmpt>());
+    VectorSpaceOps<nCmpt, 0>::eqOp(*this, vs, plusEqOp<Cmpt>());
 }
 
 
@@ -213,7 +213,7 @@ inline void VectorSpace<Form, Cmpt, nCmpt>::operator-=
     const VectorSpace<Form, Cmpt, nCmpt>& vs
 )
 {
-    VectorSpaceOps<nCmpt,0>::eqOp(*this, vs, minusEqOp<Cmpt>());
+    VectorSpaceOps<nCmpt, 0>::eqOp(*this, vs, minusEqOp<Cmpt>());
 }
 
 
@@ -223,7 +223,7 @@ inline void VectorSpace<Form, Cmpt, nCmpt>::operator*=
     const scalar s
 )
 {
-    VectorSpaceOps<nCmpt,0>::eqOpS(*this, s, multiplyEqOp2<Cmpt, scalar>());
+    VectorSpaceOps<nCmpt, 0>::eqOpS(*this, s, multiplyEqOp2<Cmpt, scalar>());
 }
 
 
@@ -233,7 +233,7 @@ inline void VectorSpace<Form, Cmpt, nCmpt>::operator/=
     const scalar s
 )
 {
-    VectorSpaceOps<nCmpt,0>::eqOpS(*this, s, divideEqOp2<Cmpt, scalar>());
+    VectorSpaceOps<nCmpt, 0>::eqOpS(*this, s, divideEqOp2<Cmpt, scalar>());
 }
 
 
@@ -308,7 +308,7 @@ inline scalar magSqr
 )
 {
     scalar ms = magSqr(vs.v_[0]);
-    VectorSpaceOps<nCmpt,1>::SeqOp(ms, vs, plusEqMagSqrOp2<scalar, Cmpt>());
+    VectorSpaceOps<nCmpt, 1>::SeqOp(ms, vs, plusEqMagSqrOp2<scalar, Cmpt>());
     return ms;
 }
 
@@ -331,7 +331,7 @@ inline VectorSpace<Form, Cmpt, nCmpt> cmptMultiply
 )
 {
     Form v;
-    VectorSpaceOps<nCmpt,0>::op(v, vs1, vs2, cmptMultiplyOp<Cmpt>());
+    VectorSpaceOps<nCmpt, 0>::op(v, vs1, vs2, cmptMultiplyOp<Cmpt>());
     return v;
 }
 
@@ -344,7 +344,7 @@ inline VectorSpace<Form, Cmpt, nCmpt> cmptDivide
 )
 {
     Form v;
-    VectorSpaceOps<nCmpt,0>::op(v, vs1, vs2, cmptDivideOp<Cmpt>());
+    VectorSpaceOps<nCmpt, 0>::op(v, vs1, vs2, cmptDivideOp<Cmpt>());
     return v;
 }
 
@@ -368,7 +368,7 @@ inline VectorSpace<Form, Cmpt, nCmpt> stabilise
 )
 {
     Form v;
-    VectorSpaceOps<nCmpt,0>::opVS(v, vs, small, stabiliseOp<Cmpt>());
+    VectorSpaceOps<nCmpt, 0>::opVS(v, vs, small, stabiliseOp<Cmpt>());
     return v;
 }
 
@@ -380,7 +380,7 @@ inline Cmpt cmptMax
 )
 {
     Cmpt cMax = vs.v_[0];
-    VectorSpaceOps<nCmpt,1>::SeqOp(cMax, vs, maxEqOp<Cmpt>());
+    VectorSpaceOps<nCmpt, 1>::SeqOp(cMax, vs, maxEqOp<Cmpt>());
     return cMax;
 }
 
@@ -392,7 +392,7 @@ inline Cmpt cmptMin
 )
 {
     Cmpt cMin = vs.v_[0];
-    VectorSpaceOps<nCmpt,1>::SeqOp(cMin, vs, minEqOp<Cmpt>());
+    VectorSpaceOps<nCmpt, 1>::SeqOp(cMin, vs, minEqOp<Cmpt>());
     return cMin;
 }
 
@@ -404,7 +404,7 @@ inline Cmpt cmptSum
 )
 {
     Cmpt sum = vs.v_[0];
-    VectorSpaceOps<nCmpt,1>::SeqOp(sum, vs, plusEqOp<Cmpt>());
+    VectorSpaceOps<nCmpt, 1>::SeqOp(sum, vs, plusEqOp<Cmpt>());
     return sum;
 }
 
@@ -426,7 +426,7 @@ inline Form cmptMag
 )
 {
     Form v;
-    VectorSpaceOps<nCmpt,0>::eqOp(v, vs, eqMagOp<Cmpt>());
+    VectorSpaceOps<nCmpt, 0>::eqOp(v, vs, eqMagOp<Cmpt>());
     return v;
 }
 
@@ -438,7 +438,7 @@ inline Form cmptSign
 )
 {
     Form v;
-    VectorSpaceOps<nCmpt,0>::eqOp(v, vs, eqSignOp<Cmpt>());
+    VectorSpaceOps<nCmpt, 0>::eqOp(v, vs, eqSignOp<Cmpt>());
     return v;
 }
 
@@ -471,7 +471,7 @@ inline Form max
 )
 {
     Form v;
-    VectorSpaceOps<nCmpt,0>::op(v, vs1, vs2, maxOp<Cmpt>());
+    VectorSpaceOps<nCmpt, 0>::op(v, vs1, vs2, maxOp<Cmpt>());
     return v;
 }
 
@@ -484,7 +484,7 @@ inline Form min
 )
 {
     Form v;
-    VectorSpaceOps<nCmpt,0>::op(v, vs1, vs2, minOp<Cmpt>());
+    VectorSpaceOps<nCmpt, 0>::op(v, vs1, vs2, minOp<Cmpt>());
     return v;
 }
 
@@ -497,7 +497,7 @@ inline Form minMod
 )
 {
     Form v;
-    VectorSpaceOps<nCmpt,0>::op(v, vs1, vs2, minModOp<Cmpt>());
+    VectorSpaceOps<nCmpt, 0>::op(v, vs1, vs2, minModOp<Cmpt>());
     return v;
 }
 
@@ -540,7 +540,7 @@ inline Form operator-
 )
 {
     Form v;
-    VectorSpaceOps<nCmpt,0>::eqOp(v, vs, eqMinusOp<Cmpt>());
+    VectorSpaceOps<nCmpt, 0>::eqOp(v, vs, eqMinusOp<Cmpt>());
     return v;
 }
 
@@ -553,7 +553,7 @@ inline Form operator+
 )
 {
     Form v;
-    VectorSpaceOps<nCmpt,0>::op(v, vs1, vs2, plusOp<Cmpt>());
+    VectorSpaceOps<nCmpt, 0>::op(v, vs1, vs2, plusOp<Cmpt>());
     return v;
 }
 
@@ -566,7 +566,7 @@ inline Form operator-
 )
 {
     Form v;
-    VectorSpaceOps<nCmpt,0>::op(v, vs1, vs2, minusOp<Cmpt>());
+    VectorSpaceOps<nCmpt, 0>::op(v, vs1, vs2, minusOp<Cmpt>());
     return v;
 }
 
@@ -579,7 +579,7 @@ inline Form operator*
 )
 {
     Form v;
-    VectorSpaceOps<nCmpt,0>::opSV(v, s, vs, multiplyOp3<Cmpt, scalar, Cmpt>());
+    VectorSpaceOps<nCmpt, 0>::opSV(v, s, vs, multiplyOp3<Cmpt, scalar, Cmpt>());
     return v;
 }
 
@@ -592,7 +592,7 @@ inline Form operator*
 )
 {
     Form v;
-    VectorSpaceOps<nCmpt,0>::opVS(v, vs, s, multiplyOp3<Cmpt, Cmpt, scalar>());
+    VectorSpaceOps<nCmpt, 0>::opVS(v, vs, s, multiplyOp3<Cmpt, Cmpt, scalar>());
     return v;
 }
 
@@ -605,7 +605,7 @@ inline Form operator/
 )
 {
     Form v;
-    VectorSpaceOps<nCmpt,0>::opVS(v, vs, s, divideOp3<Cmpt, Cmpt, scalar>());
+    VectorSpaceOps<nCmpt, 0>::opVS(v, vs, s, divideOp3<Cmpt, Cmpt, scalar>());
     return v;
 }
 
@@ -618,7 +618,7 @@ inline Form operator/
 )
 {
     Form v;
-    VectorSpaceOps<nCmpt,0>::op(v, vs1, vs2, divideOp<Cmpt>());
+    VectorSpaceOps<nCmpt, 0>::op(v, vs1, vs2, divideOp<Cmpt>());
     return v;
 }
 
@@ -631,7 +631,7 @@ inline Form operator/
 )
 {
     Form v;
-    VectorSpaceOps<nCmpt,0>::opSV(v, s, vs, divideOp2<scalar, Cmpt>());
+    VectorSpaceOps<nCmpt, 0>::opSV(v, s, vs, divideOp2<scalar, Cmpt>());
     return v;
 }
 */
