@@ -28,7 +28,6 @@ License
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-
 Foam::debug::debugSwitch
 Foam::fvSchemes::debug
 (
@@ -584,6 +583,36 @@ bool Foam::fvSchemes::fluxRequired(const word& name) const
     {
         return defaultFluxRequired_;
     }
+}
+
+bool Foam::fvSchemes::writeData(Ostream& os) const
+{
+    // Write dictionaries
+    os << nl << "ddtSchemes";
+    ddtSchemes_.write(os, true);
+
+    os << nl << "d2dt2Schemes";
+    d2dt2Schemes_.write(os, true);
+
+    os << nl << "interpolationSchemes";
+    interpolationSchemes_.write(os, true);
+
+    os << nl << "divSchemes";
+    divSchemes_.write(os, true);
+
+    os << nl << "gradSchemes";
+    gradSchemes_.write(os, true);
+
+    os << nl << "snGradSchemes";
+    snGradSchemes_.write(os, true);
+
+    os << nl << "laplacianSchemes";
+    laplacianSchemes_.write(os, true);
+
+    os << nl << "fluxRequired";
+    fluxRequired_.write(os, true);
+
+    return true;
 }
 
 

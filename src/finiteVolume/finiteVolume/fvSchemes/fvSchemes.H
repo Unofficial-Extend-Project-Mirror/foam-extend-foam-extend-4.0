@@ -95,7 +95,7 @@ class fvSchemes
 public:
 
     //- Debug switch
-        static debug::debugSwitch debug;
+    static debug::debugSwitch debug;
 
 
     // Constructors
@@ -184,6 +184,12 @@ public:
 
             //- Read the fvSchemes
             bool read();
+
+
+        // Write
+
+            //- WriteData function required for regIOobject write operation
+            virtual bool writeData(Ostream&) const;
 };
 
 

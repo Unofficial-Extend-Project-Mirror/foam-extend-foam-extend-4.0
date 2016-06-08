@@ -102,7 +102,7 @@ int main(int argc, char *argv[])
         //#     include "waveCourantNo.H"
 
         int iCorr = 0;
-        lduMatrix::solverPerformance solverPerf;
+        lduSolverPerformance solverPerf;
         scalar initialResidual = 0;
         scalar relativeResidual = 1;
         //scalar forceResidual = 1;

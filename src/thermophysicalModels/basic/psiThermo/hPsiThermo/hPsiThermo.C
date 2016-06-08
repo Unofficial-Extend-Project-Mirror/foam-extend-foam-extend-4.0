@@ -111,7 +111,7 @@ Foam::hPsiThermo<MixtureType>::hPsiThermo
         (
             "h",
             mesh.time().timeName(),
-            mesh,
+            obj,
             IOobject::NO_READ,
             IOobject::NO_WRITE
         ),

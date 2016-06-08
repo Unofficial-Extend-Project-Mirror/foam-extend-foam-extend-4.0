@@ -56,7 +56,7 @@ void fvMatrix<scalar>::setComponentReference
 );
 
 template<>
-lduMatrix::solverPerformance fvMatrix<scalar>::solve
+lduSolverPerformance fvMatrix<scalar>::solve
 (
     const dictionary&
 );

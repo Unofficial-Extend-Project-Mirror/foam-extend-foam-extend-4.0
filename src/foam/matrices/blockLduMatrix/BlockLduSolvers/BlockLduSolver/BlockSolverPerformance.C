@@ -34,7 +34,7 @@ bool Foam::BlockSolverPerformance<Type>::checkConvergence
     const scalar RelTolerance
 )
 {
-    if (BlockLduMatrix<Type>::debug >= 2)
+    if (debug >= 2)
     {
         Info<< solverName_
             << ":  Iteration " << nIterations_
@@ -92,7 +92,7 @@ bool Foam::BlockSolverPerformance<Type>::checkSingularity
 template<class Type>
 void Foam::BlockSolverPerformance<Type>::print() const
 {
-    if (BlockLduMatrix<Type>::debug)
+    if (debug)
     {
         Info<< solverName_ << ":  Solving for " << fieldName_;
 
@@ -108,6 +108,67 @@ void Foam::BlockSolverPerformance<Type>::print() const
                 << endl;
         }
     }
+}
+
+
+template<class Type>
+bool Foam::BlockSolverPerformance<Type>::operator!=
+(
+    const BlockSolverPerformance<Type>& bsp
+) const
+{
+    return
+    (
+        solverName()      != bsp.solverName()
+     || fieldName()       != bsp.fieldName()
+     || initialResidual() != bsp.initialResidual()
+     || finalResidual()   != bsp.finalResidual()
+     || nIterations()     != bsp.nIterations()
+     || converged()       != bsp.converged()
+     || singular()        != bsp.singular()
+    );
+}
+
+
+template<class Type>
+Foam::Istream& Foam::operator>>
+(
+    Istream& is,
+    typename Foam::BlockSolverPerformance<Type>& bsp
+)
+{
+    is.readBeginList("BlockSolverPerformance<Type>");
+    is  >> bsp.solverName_
+        >> bsp.fieldName_
+        >> bsp.initialResidual_
+        >> bsp.finalResidual_
+        >> bsp.nIterations_
+        >> bsp.converged_
+        >> bsp.singular_;
+    is.readEndList("BlockSolverPerformance<Type>");
+
+    return is;
+}
+
+
+template<class Type>
+Foam::Ostream& Foam::operator<<
+(
+    Ostream& os,
+    const typename Foam::BlockSolverPerformance<Type>& bsp
+)
+{
+    os  << token::BEGIN_LIST
+        << bsp.solverName_ << token::SPACE
+        << bsp.fieldName_ << token::SPACE
+        << bsp.initialResidual_ << token::SPACE
+        << bsp.finalResidual_ << token::SPACE
+        << bsp.nIterations_ << token::SPACE
+        << bsp.converged_ << token::SPACE
+        << bsp.singular_ << token::SPACE
+        << token::END_LIST;
+
+    return os;
 }
 
 

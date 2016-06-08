@@ -180,6 +180,23 @@ namespace fam
         const tmp<edgeTensorField>&,
         const GeometricField<Type, faPatchField, areaMesh>&
     );
+
+
+    template<class Type>
+    tmp<faMatrix<Type> > laplacian
+    (
+        const edgeTensorField&,
+        const GeometricField<Type, faPatchField, areaMesh>&,
+        const word& name
+    );
+
+    template<class Type>
+    tmp<faMatrix<Type> > laplacian
+    (
+        const tmp<edgeTensorField>&,
+        const GeometricField<Type, faPatchField, areaMesh>&,
+        const word& name
+    );
 }
 
 

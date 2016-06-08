@@ -1,0 +1,55 @@
+/*---------------------------------------------------------------------------*\
+  =========                 |
+  \\      /  F ield         | foam-extend: Open Source CFD
+   \\    /   O peration     |
+    \\  /    A nd           | For copyright notice see file Copyright
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      controlDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+application     realFluidPisoFoam;
+
+startFrom       latestTime;
+
+//startTime       0;
+
+stopAt          endTime;
+
+endTime         0.5;
+
+deltaT          1e-5;
+
+writeControl    runTime;
+
+writeInterval   0.1;
+
+purgeWrite      0;
+
+writeFormat     ascii;
+
+writePrecision  6;
+
+writeCompression uncompressed;
+
+timeFormat      general;
+
+timePrecision   10;
+
+adjustTimeStep  yes;
+
+maxCo          0.5;
+
+maxDeltaT       1e-2;
+
+runTimeModifiable yes;
+
+
+// ************************************************************************* //

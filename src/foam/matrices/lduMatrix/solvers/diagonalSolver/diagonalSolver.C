@@ -59,7 +59,7 @@ Foam::diagonalSolver::diagonalSolver
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-Foam::lduMatrix::solverPerformance Foam::diagonalSolver::solve
+Foam::lduSolverPerformance Foam::diagonalSolver::solve
 (
     scalarField& x,
     const scalarField& b,

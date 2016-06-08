@@ -8,11 +8,16 @@ psiThermo/basicPsiThermo/newBasicPsiThermo.C
 psiThermo/hPsiThermo/hPsiThermos.C
 psiThermo/hsPsiThermo/hsPsiThermos.C
 psiThermo/ePsiThermo/ePsiThermos.C
+psiThermo/realGasHThermo/realGasHThermos.C
+psiThermo/realGasEThermo/realGasEThermos.C
 
 rhoThermo/basicRhoThermo/basicRhoThermo.C
 rhoThermo/basicRhoThermo/newBasicRhoThermo.C
 rhoThermo/hRhoThermo/hRhoThermos.C
 rhoThermo/hsRhoThermo/hsRhoThermos.C
+
+IAPWS_Waterproperties/IAPWSThermo/IAPWS-IF97.C
+IAPWS_Waterproperties/IAPWSThermo/IAPWSThermos.C
 
 derivedFvPatchFields/fixedEnthalpy/fixedEnthalpyFvPatchScalarField.C
 derivedFvPatchFields/gradientEnthalpy/gradientEnthalpyFvPatchScalarField.C
