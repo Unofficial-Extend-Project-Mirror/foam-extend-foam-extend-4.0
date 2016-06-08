@@ -1,4 +1,5 @@
 EXE_INC = \
+    -I$(FOAM_APP)/solvers/multiphase/twoPhaseEulerFoam/kineticTheoryModels/lnInclude \
     -I$(LIB_SRC)/finiteVolume/lnInclude \
     -I$(LIB_SRC)/transportModels/incompressible/lnInclude \
     -IturbulenceModel \

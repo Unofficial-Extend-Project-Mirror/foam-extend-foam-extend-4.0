@@ -24,6 +24,9 @@ License
 Class
     Foam::viscosityModel
 
+Namespace
+    Foam::kineticTheoryModels
+
 Description
 
 SourceFiles
@@ -31,8 +34,8 @@ SourceFiles
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef viscosityModel_H
-#define viscosityModel_H
+#ifndef kineticTheoryViscosityModel_H
+#define kineticTheoryViscosityModel_H
 
 #include "dictionary.H"
 #include "volFields.H"

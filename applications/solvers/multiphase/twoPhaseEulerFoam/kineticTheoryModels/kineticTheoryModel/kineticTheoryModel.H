@@ -37,7 +37,7 @@ SourceFiles
 #include "dragModel.H"
 #include "phaseModel.H"
 #include "autoPtr.H"
-#include "viscosityModel.H"
+#include "kineticTheoryViscosityModel.H"
 #include "conductivityModel.H"
 #include "radialModel.H"
 #include "granularPressureModel.H"
