@@ -3,7 +3,7 @@ surfaceScalarField presSource
 (
     "presSource",
     fvc::interpolate(rAU)*
-    (fvc::interpolate(fvc::grad(p, "grad(pSource)")) & mesh.Sf())
+    (fvc::interpolate(fvc::grad(p)) & mesh.Sf())
 );
 
 fvScalarMatrix pEqn
