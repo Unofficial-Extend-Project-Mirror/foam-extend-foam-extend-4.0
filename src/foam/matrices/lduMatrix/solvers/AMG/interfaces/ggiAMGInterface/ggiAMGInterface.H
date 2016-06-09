@@ -69,10 +69,7 @@ class ggiAMGInterface
         labelList zoneAddressing_;
 
 
-        // Parallel communication optimisation, stored on master processor
-
-            //- Has reduce been initialised?
-            mutable bool initReduce_;
+        // Parallel communication
 
             //- Map-distribute comms tool
             mutable mapDistribute* mapPtr_;
@@ -213,6 +210,9 @@ public:
             {
                 return fineGgiInterface_;
             }
+
+            //- Return interface size
+            virtual label interfaceSize() const;
 
             //- Return zone size
             virtual label zoneSize() const;

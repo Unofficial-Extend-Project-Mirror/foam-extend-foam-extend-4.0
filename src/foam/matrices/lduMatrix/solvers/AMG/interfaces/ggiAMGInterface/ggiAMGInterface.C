@@ -44,6 +44,13 @@ namespace Foam
 
 void Foam::ggiAMGInterface::initFastReduce() const
 {
+    if (mapPtr_)
+    {
+        FatalErrorIn("void ggiAMGInterface::initFastReduce() const")
+            << "map already calculated"
+            << abort(FatalError);
+    }
+
     if (!Pstream::parRun())
     {
         FatalErrorIn("void ggiAMGInterface::initFastReduce() const")
@@ -51,9 +58,6 @@ void Foam::ggiAMGInterface::initFastReduce() const
             << "serial run.  This is not allowed"
             << abort(FatalError);
     }
-
-    // Init should be executed only once
-    initReduce_ = true;
 
     // Note: this is different from ggiPolyPatch comms because zone
     // is the same on master the slave side.
@@ -183,17 +187,6 @@ void Foam::ggiAMGInterface::initFastReduce() const
 }
 
 
-const Foam::mapDistribute& Foam::ggiAMGInterface::map() const
-{
-    if (!mapPtr_)
-    {
-        initFastReduce();
-    }
-
-    return *mapPtr_;
-}
-
-
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 Foam::ggiAMGInterface::ggiAMGInterface
@@ -208,7 +201,6 @@ Foam::ggiAMGInterface::ggiAMGInterface
     fineGgiInterface_(refCast<const ggiLduInterface>(fineInterface)),
     zoneSize_(0),
     zoneAddressing_(),
-    initReduce_(false),
     mapPtr_(NULL)
 {
     // Note.
@@ -245,6 +237,8 @@ Foam::ggiAMGInterface::ggiAMGInterface
 
         if (!localParallel())
         {
+            // Optimisation of this comms call is needed
+            // HJ, 9/Jun/2016
             reduce(localExpandAddressing, sumOp<labelField>());
         }
     }
@@ -269,6 +263,8 @@ Foam::ggiAMGInterface::ggiAMGInterface
 
         if (!localParallel())
         {
+            // Optimisation of this comms call is needed
+            // HJ, 9/Jun/2016
             reduce(neighbourExpandAddressing, sumOp<labelField>());
         }
     }
@@ -421,7 +417,7 @@ Foam::ggiAMGInterface::ggiAMGInterface
     else
     {
         // Coarse level, addressing is stored in faceCells
-        forAll (localExpandAddressing, ffi)
+        forAll (localExpandAddressing, ffI)
         {
             label curMaster = -1;
             label curSlave = -1;
@@ -432,14 +428,14 @@ Foam::ggiAMGInterface::ggiAMGInterface
             if (master())
             {
                 // Master side
-                curMaster = localExpandAddressing[ffi];
-                curSlave = neighbourExpandAddressing[ffi];
+                curMaster = localExpandAddressing[ffI];
+                curSlave = neighbourExpandAddressing[ffI];
             }
             else
             {
                 // Slave side
-                curMaster = neighbourExpandAddressing[ffi];
-                curSlave = localExpandAddressing[ffi];
+                curMaster = neighbourExpandAddressing[ffI];
+                curSlave = localExpandAddressing[ffI];
             }
 
             // Look for the master cell.  If it has already got a face,
@@ -481,7 +477,7 @@ Foam::ggiAMGInterface::ggiAMGInterface
                     if (nbrsIter() == curSlave)
                     {
                         nbrFound = true;
-                        faceFacesIter().append(ffi);
+                        faceFacesIter().append(ffI);
                         // Add dummy weight
                         faceFaceWeightsIter().append(1.0);
                         nAgglomPairs++;
@@ -492,7 +488,7 @@ Foam::ggiAMGInterface::ggiAMGInterface
                 if (!nbrFound)
                 {
                     curNbrs.append(curSlave);
-                    curFaceFaces.append(SLList<label>(ffi));
+                    curFaceFaces.append(SLList<label>(ffI));
                     // Add dummy weight
                     curFaceWeights.append(SLList<scalar>(1.0));
 
@@ -510,7 +506,7 @@ Foam::ggiAMGInterface::ggiAMGInterface
                 faceFaceTable.insert
                 (
                     curMaster,
-                    SLList<SLList<label> >(SLList<label>(ffi))
+                    SLList<SLList<label> >(SLList<label>(ffI))
                 );
 
                 // Add dummy weight
@@ -535,7 +531,9 @@ Foam::ggiAMGInterface::ggiAMGInterface
     labelList contents = neighboursTable.toc();
 
     // Sort makes sure the order is identical on both sides.
-    // HJ, 20/Feb.2009
+    // Since the global zone is defined by this sort, the neighboursTable
+    // must be complete on all processors
+    // HJ, 20/Feb/2009 and 6/Jun/2016
     sort(contents);
 
     // Grab zone size and create zone addressing
@@ -734,16 +732,13 @@ Foam::tmp<Foam::scalarField> Foam::ggiAMGInterface::agglomerateCoeffs
         zoneFineCoeffs[fineZa[i]] = fineCoeffs[i];
     }
 
-    // Reduce zone data
-    if (!localParallel())
-    {
-        reduce(zoneFineCoeffs, sumOp<scalarField>());
-    }
+    // Reduce zone data is not required: all coefficients are local
+    // HJ, 9/Jun/2016
 
     scalarField zoneCoarseCoeffs(zoneSize(), 0);
 
     // Restrict coefficient
-    forAll(restrictAddressing_, ffi)
+    forAll (restrictAddressing_, ffi)
     {
         zoneCoarseCoeffs[restrictAddressing_[ffi]] +=
             restrictWeights_[ffi]*zoneFineCoeffs[fineAddressing_[ffi]];
@@ -788,6 +783,11 @@ const Foam::ggiLduInterface& Foam::ggiAMGInterface::shadowInterface() const
 }
 
 
+Foam::label Foam::ggiAMGInterface::interfaceSize() const
+{
+    return faceCells_.size();
+}
+
 Foam::label Foam::ggiAMGInterface::zoneSize() const
 {
     return zoneSize_;
@@ -813,6 +813,17 @@ const Foam::labelListList& Foam::ggiAMGInterface::addressing() const
 bool Foam::ggiAMGInterface::localParallel() const
 {
     return fineGgiInterface_.localParallel();
+}
+
+
+const Foam::mapDistribute& Foam::ggiAMGInterface::map() const
+{
+    if (!mapPtr_)
+    {
+        initFastReduce();
+    }
+
+    return *mapPtr_;
 }
 
 

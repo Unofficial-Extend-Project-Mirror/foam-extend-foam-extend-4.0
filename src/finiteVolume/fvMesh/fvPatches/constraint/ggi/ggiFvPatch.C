@@ -221,6 +221,12 @@ const Foam::ggiLduInterface& Foam::ggiFvPatch::shadowInterface() const
 }
 
 
+Foam::label Foam::ggiFvPatch::interfaceSize() const
+{
+    return ggiPolyPatch_.size();
+}
+
+
 Foam::label Foam::ggiFvPatch::zoneSize() const
 {
     return ggiPolyPatch_.zone().size();

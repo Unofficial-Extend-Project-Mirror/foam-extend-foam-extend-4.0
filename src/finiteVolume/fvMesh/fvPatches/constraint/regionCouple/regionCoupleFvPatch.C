@@ -265,6 +265,12 @@ Foam::regionCoupleFvPatch::shadowInterface() const
 }
 
 
+Foam::label Foam::regionCoupleFvPatch::interfaceSize() const
+{
+    return rcPolyPatch_.size();
+}
+
+
 Foam::label Foam::regionCoupleFvPatch::zoneSize() const
 {
     return rcPolyPatch_.zone().size();

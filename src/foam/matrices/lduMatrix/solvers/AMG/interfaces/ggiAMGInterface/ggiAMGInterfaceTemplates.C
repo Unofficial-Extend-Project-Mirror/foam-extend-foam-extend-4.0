@@ -69,10 +69,7 @@ tmp<Field<Type> > ggiAMGInterface::fastReduce(const UList<Type>& ff) const
         // Optimised mapDistribute
 
         // Execute init reduce to calculate addressing if not already done
-        if (!initReduce_)
-        {
-            initFastReduce();
-        }
+        map();
 
         // Prepare for distribute: field will be expanded to zone size
         List<Type> expand = ff;

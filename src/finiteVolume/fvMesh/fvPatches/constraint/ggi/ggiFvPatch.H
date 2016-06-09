@@ -155,6 +155,9 @@ public:
             //- Return shadow interface
             virtual const ggiLduInterface& shadowInterface() const;
 
+            //- Return interface size
+            virtual label interfaceSize() const;
+
             //- Return zone size
             virtual label zoneSize() const;
 
