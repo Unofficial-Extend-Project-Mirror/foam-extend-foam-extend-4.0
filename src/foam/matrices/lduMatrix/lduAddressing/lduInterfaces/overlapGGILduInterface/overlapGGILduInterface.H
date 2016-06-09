@@ -52,7 +52,6 @@ namespace Foam
 
 class overlapGGILduInterface
 {
-
 public:
 
     //- Runtime type information
@@ -60,9 +59,8 @@ public:
 
     // Constructors
 
-    // Destructor
-
-        virtual ~overlapGGILduInterface();
+    //- Destructor
+    virtual ~overlapGGILduInterface();
 
 
     // Member Functions

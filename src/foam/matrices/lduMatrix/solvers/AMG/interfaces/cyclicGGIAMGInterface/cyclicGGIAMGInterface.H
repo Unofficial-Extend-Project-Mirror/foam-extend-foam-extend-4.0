@@ -73,9 +73,8 @@ public:
         );
 
 
-    // Destructor
-
-        virtual ~cyclicGGIAMGInterface();
+    //- Destructor
+    virtual ~cyclicGGIAMGInterface();
 };
 
 

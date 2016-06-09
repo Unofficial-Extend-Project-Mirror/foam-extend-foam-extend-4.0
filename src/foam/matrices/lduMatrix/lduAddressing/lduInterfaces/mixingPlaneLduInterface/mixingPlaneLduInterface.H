@@ -71,6 +71,7 @@ public:
     //- Runtime type information
     TypeName("mixingPlaneLduInterface");
 
+
     // Constructors
 
         //- Construct null
@@ -81,9 +82,8 @@ public:
         {}
 
 
-    // Destructor
-
-        virtual ~mixingPlaneLduInterface();
+    //- Destructor
+    virtual ~mixingPlaneLduInterface();
 
 
     // Member Functions

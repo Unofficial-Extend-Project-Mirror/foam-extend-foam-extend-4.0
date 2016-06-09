@@ -59,9 +59,8 @@ public:
 
     // Constructors
 
-    // Destructor
-
-        virtual ~regionCoupleLduInterface();
+    //- Destructor
+    virtual ~regionCoupleLduInterface();
 
 };
 
