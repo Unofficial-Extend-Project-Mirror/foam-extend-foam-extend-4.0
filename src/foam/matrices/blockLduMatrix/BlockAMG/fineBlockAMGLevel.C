@@ -181,7 +181,7 @@ void Foam::fineBlockAMGLevel<Type>::solve
     const scalar relTol
 ) const
 {
-    Info<< "Fine level solver"<<endl;
+    Info<< "Fine level solver" << endl;
 
     // Create artificial dictionary for finest solution
     dictionary finestDict;
