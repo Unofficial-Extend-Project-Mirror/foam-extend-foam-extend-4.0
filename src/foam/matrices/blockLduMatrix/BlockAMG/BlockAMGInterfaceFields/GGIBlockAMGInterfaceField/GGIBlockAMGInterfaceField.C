@@ -46,11 +46,9 @@ void Foam::GGIBlockAMGInterfaceField<Type>::agglomerateBlockType
     const ggiLduInterface& fineGgiInterface = ggiInterface_.fineGgiInterface();
 
     // Reassemble fine coefficients to full fine zone size
-    Field<Type2> zoneFineCoeffs
-    (
-        fineGgiInterface.zoneSize(),
-        pTraits<Type2>::zero
-    );
+    // No need to initialise to zero, as only local coefficients
+    // are used.  HJ, 9/Jun/2016
+    Field<Type2> zoneFineCoeffs(fineGgiInterface.zoneSize());
 
     const labelList& fineZa = fineGgiInterface.zoneAddressing();
 
@@ -59,11 +57,8 @@ void Foam::GGIBlockAMGInterfaceField<Type>::agglomerateBlockType
         zoneFineCoeffs[fineZa[i]] = fineCoeffs[i];
     }
 
-    // Reduce zone data
-    if (!ggiInterface_.localParallel())
-    {
-        reduce(zoneFineCoeffs, sumOp<Field<Type2> >());
-    }
+    // Reduce zone data is not required: all coefficients are local
+    // HJ, 9/Jun/2016
 
     Field<Type2> zoneCoarseCoeffs
     (

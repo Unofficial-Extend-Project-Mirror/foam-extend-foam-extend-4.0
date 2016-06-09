@@ -723,7 +723,9 @@ Foam::tmp<Foam::scalarField> Foam::ggiAMGInterface::agglomerateCoeffs
     // HJ, 16/Mar/2016
 
     // Reassemble fine coefficients to full fine zone size
-    scalarField zoneFineCoeffs(fineGgiInterface_.zoneSize(), 0);
+    // No need to initialise to zero, as only local coefficients
+    // are used.  HJ, 9/Jun/2016
+    scalarField zoneFineCoeffs(fineGgiInterface_.zoneSize());
 
     const labelList& fineZa = fineGgiInterface_.zoneAddressing();
 
