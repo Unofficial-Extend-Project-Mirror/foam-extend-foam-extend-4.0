@@ -40,7 +40,7 @@ void Foam::AMGInterface::combine(const AMGInterface& coarseGi)
 {
     const labelList& coarseFra = coarseGi.restrictAddressing_;
 
-    forAll(restrictAddressing_, ffi)
+    forAll (restrictAddressing_, ffi)
     {
         restrictAddressing_[ffi] = coarseFra[restrictAddressing_[ffi]];
     }
@@ -67,7 +67,7 @@ Foam::tmp<Foam::scalarField> Foam::AMGInterface::agglomerateCoeffs
     scalarField& coarseCoeffs = tcoarseCoeffs();
 
     // Added weights to account for non-integral matching
-    forAll(restrictAddressing_, ffi)
+    forAll (restrictAddressing_, ffi)
     {
         coarseCoeffs[restrictAddressing_[ffi]] +=
             restrictWeights_[ffi]*fineCoeffs[fineAddressing_[ffi]];
