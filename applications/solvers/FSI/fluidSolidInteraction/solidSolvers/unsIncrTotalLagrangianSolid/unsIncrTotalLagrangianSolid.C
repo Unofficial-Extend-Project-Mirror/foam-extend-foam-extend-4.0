@@ -1095,7 +1095,7 @@ bool unsIncrTotalLagrangianSolid::evolve()
 
     int iCorr = 0;
     scalar initialResidual = 0;
-    lduMatrix::solverPerformance solverPerf;
+    lduSolverPerformance solverPerf;
     scalar res = 1;
     scalar maxRes = 0;
     scalar curConvergenceTolerance = convergenceTolerance;

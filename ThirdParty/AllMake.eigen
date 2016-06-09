@@ -57,7 +57,7 @@ echo ========================================
 echo
 
 # Eigen
-if [ -d $(WM_THIRD_PARTY_DIR)/packages/eigen3 ]
+if [ -d $WM_THIRD_PARTY_DIR/packages/eigen3 ]
 then
     echo "eigen3 found."
 else
@@ -67,10 +67,7 @@ else
     \tar xvzf 3.2.8.tar.gz
     \rm -f 3.2.8.tar.gz
     \mv eigen-eigen-07105f7124f9 ./packages/eigen3
-    fi
 fi
-
-
 
 echo ========================================
 echo Done ThirdParty AllMake: Stage3

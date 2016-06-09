@@ -3,6 +3,9 @@ set -x
 
 wmake libso fluidSolidInteraction
 
+# Create Eigen soft link
+ln -srf ../../../ThirdParty/packages/eigen3/Eigen/ fluidSolidInteraction/lnInclude/
+
 wmake solvers/fsiFoam
 wmake solvers/ampFsiFoam
 wmake solvers/weakFsiFoam

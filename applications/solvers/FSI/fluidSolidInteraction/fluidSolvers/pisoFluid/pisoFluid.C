@@ -308,7 +308,7 @@ void pisoFluid::evolve()
     (
         fvm::ddt(U_)
       + fvm::div(phi_, U_)
-      + turbulence_->divDevReff(U_)
+      + turbulence_->divDevReff()
     );
 
     solve(UEqn == -gradp_);

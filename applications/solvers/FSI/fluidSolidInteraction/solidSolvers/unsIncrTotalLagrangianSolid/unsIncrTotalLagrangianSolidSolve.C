@@ -261,7 +261,7 @@ scalar unsIncrTotalLagrangianSolid::smooth
 
     int iCorr = 0;
     scalar initialResidual = 0;
-    lduMatrix::solverPerformance solverPerf;
+    lduSolverPerformance solverPerf;
     scalar residual = GREAT;
 
     lduMatrix::debug = debug;
@@ -498,7 +498,7 @@ scalar unsIncrTotalLagrangianSolid::smooth
 
     int iCorr = 0;
     scalar initialResidual = 0;
-    lduMatrix::solverPerformance solverPerf;
+    lduSolverPerformance solverPerf;
     scalar residual = GREAT;
 
     lduMatrix::debug = debug;
