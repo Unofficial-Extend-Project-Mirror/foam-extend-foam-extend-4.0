@@ -33,49 +33,52 @@
 #------------------------------------------------------------------------------
 
 
-**********************************************************************************************
-**********************************************************************************************
-***** IMPORTANT: THIS IS VERSION IS NOT FULLY TESTED OR VALIDATED. PLEASE USE WITH CARE. *****
-**********************************************************************************************
-**********************************************************************************************
+*****************************************************************************************************************
+*****************************************************************************************************************
+***** IMPORTANT: THIS VERSION IS PROVIDED AS-IS AND IS NOT FULLY TESTED OR VALIDATED. PLEASE USE WITH CARE. *****
+*****************************************************************************************************************
+*****************************************************************************************************************
 
 
 INSTRUCTIONS ON HOW TO INSTALL AND RUN THE WINDOWS VERSION OF FOAM-EXTEND
 -------------------------------------------------------------------------
 1) Unzip the package file to any suitable directory (with no whitespaces) on your computer.
 
-2) Install OpenMPI if you do not already have it. You can download this from:
+2) Optionally, install OpenMPI and ParaView if you do not already have them.
+   You can download these from:
        http://www.open-mpi.org/software/ompi/v1.6/downloads/OpenMPI_v1.6.1-1_win64.exe
-   It is strongly recommended to install this in a directory with no whitespaces.
-   Once installed, create a new environment variable called MPI_ROOTDIR to point to the
-   installation directory where you install OpenMPI.
-
-3) If you wish to perform post-processing using ParaView and you do not already have it,
-   you can download ParaView from:
        http://www.paraview.org/download
-   It is strongly recommended to install this in a directory with no whitespaces.
-   Once installed, create a new environment variable called PARAVIEW_HOME to point to the
-   installation directory where you install ParaView.
+   It is strongly recommended to install these in directories with no white spaces.
+   Once installed, create new environment variables called MPI_ROOTDIR and PARAVIEW_HOME 
+   to point to the installation directory where you installed them. This can be done by
+   editing the user-editable settings in the environment configuration:
+       call <PATH_TO_FOAM>\etc\foamWindowsEnvironment.bat
+   where <PATH_TO_FOAM> is the full path of the directory where you unzipped the package.
+   For example:
+       rem =========== USER EDITABLE SETTINGS ===========
+       set MPI_ROOTDIR=C:\Programs\OpenMPI_v1.6.1-x64
+       set PARAVIEW_HOME=C:\Programs\ParaView-4.3.1
+       rem ==============================================
 
-4) Start a new CMD (DOS) prompt, and run the following command:
-       call <PATH_TO_FOAM>\setWindowsEnvironment.bat
+3) Start a new CMD (DOS) prompt, and run the following command:
+       call <PATH_TO_FOAM>\foamWindowsEnvironment.bat
    where <PATH_TO_FOAM> is the full path of the directory where you unzipped the package.
    The foam environment is now configured correctly for use within this CMD prompt only.
 
    Alternatively, create a desktop shortcut to <PATH_TO_FOAM>\foamWindowsShell.bat
    When you double-click this shortcut, a new CMD prompt is open with the foam environment automatically set.
 
-5) From the CMD prompts opened in the previous step, you can now run the usual foam applications, for example:
+4) From the CMD prompts opened in the previous step, you can now run the usual foam applications, for example:
        cd /d <PATH_TO_CASE>
        blockMesh
        sonicFoam
 
-6) To run in parallel using using OpenMPI, run (for example):
+5) To run in parallel using using OpenMPI, run (for example):
        cd /d <PATH_TO_CASE>
        decomposePar
        mpirun -np 4 sonicFoam.exe -parallel
 
-7) To post-process the results using ParaView, just run "parafoam" in the case directory:
+6) To post-process the results using ParaView, just run "parafoam" in the case directory:
        cd /d <PATH_TO_CASE>
        parafoam
 
