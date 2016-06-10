@@ -358,6 +358,8 @@ inline void sumMagToDiag
     const TensorN<Cmpt, length>& t
 )
 {
+    result = VectorN<Cmpt, length>::zero;
+
     for (register int i = 0; i < TensorN<Cmpt, length>::rowLength; i++)
     {
         for (register int j = 0; j < TensorN<Cmpt, length>::rowLength; j++)
