@@ -61,11 +61,11 @@ INSTRUCTIONS ON HOW TO INSTALL AND RUN THE WINDOWS VERSION OF FOAM-EXTEND
        rem ==============================================
 
 3) Start a new CMD (DOS) prompt, and run the following command:
-       call <PATH_TO_FOAM>\foamWindowsEnvironment.bat
+       call <PATH_TO_FOAM>\etc\foamWindowsEnvironment.bat
    where <PATH_TO_FOAM> is the full path of the directory where you unzipped the package.
    The foam environment is now configured correctly for use within this CMD prompt only.
 
-   Alternatively, create a desktop shortcut to <PATH_TO_FOAM>\foamWindowsShell.bat
+   Alternatively, create a desktop shortcut to <PATH_TO_FOAM>\etc\foamWindowsShell.bat
    When you double-click this shortcut, a new CMD prompt is open with the foam environment automatically set.
 
 4) From the CMD prompts opened in the previous step, you can now run the usual foam applications, for example:
