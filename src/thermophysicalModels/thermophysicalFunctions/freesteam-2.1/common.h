@@ -53,7 +53,13 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 # define FREESTEAM_DLL extern FREESTEAM_IMPORT
 #endif
 
-#if !defined(FREESTEAM_DLL) || !defined(FREESTEAM_EXPORT) || !defined(FREESTEAM_IMPORT)
+// Guard added by Cesare Guardino to enable correct export of symbols on MinGW
+
+#ifdef mingw
+# define FREESTEAM_EXPORT
+# define FREESTEAM_IMPORT
+# define FREESTEAM_DLL
+#elif !defined(FREESTEAM_DLL) || !defined(FREESTEAM_EXPORT) || !defined(FREESTEAM_IMPORT)
 # error "NO FREESTEAM_DLL DEFINED"
 #endif
 
