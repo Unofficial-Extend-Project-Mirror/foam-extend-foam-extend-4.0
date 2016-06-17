@@ -23,21 +23,26 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "Maxwell.H"
+#include "UpperConvectedMaxwell.H"
 #include "addToRunTimeSelectionTable.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
 namespace Foam
 {
-    defineTypeNameAndDebug(Maxwell, 0);
-    addToRunTimeSelectionTable(viscoelasticLaw, Maxwell, dictionary);
+    defineTypeNameAndDebug(UpperConvectedMaxwell, 0);
+    addToRunTimeSelectionTable
+    (
+        viscoelasticLaw,
+        UpperConvectedMaxwell,
+        dictionary
+    );
 }
 
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-Foam::Maxwell::Maxwell
+Foam::UpperConvectedMaxwell::UpperConvectedMaxwell
 (
     const word& name,
     const volVectorField& U,
@@ -67,7 +72,8 @@ Foam::Maxwell::Maxwell
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-Foam::tmp<Foam::fvVectorMatrix> Foam::Maxwell::divTau(volVectorField& U) const
+Foam::tmp<Foam::fvVectorMatrix>
+Foam::UpperConvectedMaxwell::divTau(volVectorField& U) const
 {
     dimensionedScalar etaPEff = etaP_;
 
@@ -80,7 +86,7 @@ Foam::tmp<Foam::fvVectorMatrix> Foam::Maxwell::divTau(volVectorField& U) const
 }
 
 
-void Foam::Maxwell::correct()
+void Foam::UpperConvectedMaxwell::correct()
 {
     // Velocity gradient tensor
     const tmp<volTensorField> tL = fvc::grad(U());
