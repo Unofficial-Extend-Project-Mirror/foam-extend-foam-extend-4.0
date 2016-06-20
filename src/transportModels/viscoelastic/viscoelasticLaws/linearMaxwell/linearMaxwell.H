@@ -22,21 +22,21 @@ License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    UpperConvectedMaxwell
+    linearMaxwell
 
 Description
-    UpperConvectedMaxwell linear viscoelastic fluid model (UpperConvectedMaxwell, J.C., 1867).
+    Maxwell linear viscoelastic fluid model (linearMaxwell, J.C., 1867).
 
 Author
     Jovani L. Favero.  All rights reserved
 
 SourceFiles
-    UpperConvectedMaxwell.C
+    linearMaxwell.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef UpperConvectedMaxwell_H
-#define UpperConvectedMaxwell_H
+#ifndef linearMaxwell_H
+#define linearMaxwell_H
 
 #include "viscoelasticLaw.H"
 
@@ -46,10 +46,10 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class UpperConvectedMaxwell Declaration
+                           Class linearMaxwell Declaration
 \*---------------------------------------------------------------------------*/
 
-class UpperConvectedMaxwell
+class linearMaxwell
 :
     public viscoelasticLaw
 {
@@ -77,21 +77,21 @@ class UpperConvectedMaxwell
     // Private Member Functions
 
         //- Disallow default bitwise copy construct
-        UpperConvectedMaxwell(const UpperConvectedMaxwell&);
+        linearMaxwell(const linearMaxwell&);
 
         //- Disallow default bitwise assignment
-        void operator=(const UpperConvectedMaxwell&);
+        void operator=(const linearMaxwell&);
 
 
 public:
 
     //- Runtime type information
-    TypeName("UpperConvectedMaxwell");
+    TypeName("linearMaxwell");
 
     // Constructors
 
         //- Construct from components
-        UpperConvectedMaxwell
+        linearMaxwell
         (
             const word& name,
             const volVectorField& U,
@@ -102,7 +102,7 @@ public:
 
     // Destructor
 
-        virtual ~UpperConvectedMaxwell()
+        virtual ~linearMaxwell()
         {}
 
 

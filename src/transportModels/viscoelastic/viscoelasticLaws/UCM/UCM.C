@@ -23,26 +23,21 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "UpperConvectedMaxwell.H"
+#include "UCM.H"
 #include "addToRunTimeSelectionTable.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
 namespace Foam
 {
-    defineTypeNameAndDebug(UpperConvectedMaxwell, 0);
-    addToRunTimeSelectionTable
-    (
-        viscoelasticLaw,
-        UpperConvectedMaxwell,
-        dictionary
-    );
+    defineTypeNameAndDebug(UCM, 0);
+    addToRunTimeSelectionTable(viscoelasticLaw, UCM, dictionary);
 }
 
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-Foam::UpperConvectedMaxwell::UpperConvectedMaxwell
+Foam::UCM::UCM
 (
     const word& name,
     const volVectorField& U,
@@ -64,7 +59,6 @@ Foam::UpperConvectedMaxwell::UpperConvectedMaxwell
         U.mesh()
     ),
     rho_(dict.lookup("rho")),
-    etaS_(dict.lookup("etaS")),
     etaP_(dict.lookup("etaP")),
     lambda_(dict.lookup("lambda"))
 {}
@@ -72,8 +66,7 @@ Foam::UpperConvectedMaxwell::UpperConvectedMaxwell
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-Foam::tmp<Foam::fvVectorMatrix>
-Foam::UpperConvectedMaxwell::divTau(volVectorField& U) const
+Foam::tmp<Foam::fvVectorMatrix> Foam::UCM::divTau(volVectorField& U) const
 {
     dimensionedScalar etaPEff = etaP_;
 
@@ -81,16 +74,15 @@ Foam::UpperConvectedMaxwell::divTau(volVectorField& U) const
     (
         fvc::div(tau_/rho_, "div(tau)")
       - fvc::laplacian(etaPEff/rho_, U, "laplacian(etaPEff,U)")
-      + fvm::laplacian( (etaPEff + etaS_)/rho_, U, "laplacian(etaPEff+etaS,U)")
+      + fvm::laplacian( (etaPEff)/rho_, U, "laplacian(etaPEff+etaS,U)")
     );
 }
 
 
-void Foam::UpperConvectedMaxwell::correct()
+void Foam::UCM::correct()
 {
     // Velocity gradient tensor
-    const tmp<volTensorField> tL = fvc::grad(U());
-    const volTensorField& L = tL();
+    volTensorField L = fvc::grad(U());
 
     // Convected derivate term
     volTensorField C = tau_ & L;
