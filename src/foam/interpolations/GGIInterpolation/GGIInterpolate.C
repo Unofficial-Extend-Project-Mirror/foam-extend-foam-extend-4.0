@@ -628,6 +628,8 @@ void GGIInterpolation<MasterPatch, SlavePatch>::maskedBridgeSlave
 }
 
 
+
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam

@@ -77,6 +77,10 @@ echo
 # this stage should be called last in your compilation process
 ./AllMake.stage5
 
+# Running stage eigen
+./AllMake.eigen
+
+
 echo ========================================
 echo Done ThirdParty Allwmake
 echo ========================================

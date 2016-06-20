@@ -1,0 +1,49 @@
+/*---------------------------------------------------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  1.3                                   |
+|   \\  /    A nd           | Web:      http://www.openfoam.org               |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+
+FoamFile
+{
+    version         2.0;
+    format          ascii;
+
+    root            "";
+    case            "";
+    instance        "";
+    local           "";
+
+    class           dictionary;
+    object          couplingProperties;
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+solidPatch interface-solid;
+solidZone interface-solid-zone;
+
+
+fluidPatch interface-fluid;
+fluidZone interface-fluid-zone;
+
+//movingRegion region0;
+
+fsiRelaxationFactor 0.025;
+
+interfaceDeformationLimit 0;
+
+outerCorrTolerance 1e-6;
+nOuterCorr 40;
+
+
+//couplingScheme Aitken;
+couplingScheme IQN-ILS;
+
+couplingReuse       0;
+
+fsi yes;
+
+// ************************************************************************* //

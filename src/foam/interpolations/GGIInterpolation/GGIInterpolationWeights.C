@@ -38,6 +38,7 @@ Modification by:
 #include "boolList.H"
 #include "DynamicList.H"
 #include "dimensionedConstants.H"
+#include "triPointRef.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -153,6 +154,9 @@ void GGIInterpolation<MasterPatch, SlavePatch>::calcAddressing() const
 
     const pointField& masterPatchPoints = masterPatch_.points();
     const vectorField masterPatchNormals = masterPatch_.faceNormals();
+
+    // // ZT, 05/07/2014
+    // const vectorField& slavePatchNormals = slavePatch_.faceNormals();
 
     // Store the polygon made by projecting the face points onto the
     // face normal
@@ -357,6 +361,13 @@ void GGIInterpolation<MasterPatch, SlavePatch>::calcAddressing() const
                     neighbErrorProjectionAlongW
                 );
 
+            // // ZT, 05/07/2014
+            // scalar orientation =
+            //     (
+            //         masterPatchNormals[faceMi]
+            //       & slavePatchNormals[curCMN[neighbI]]
+            //     );
+
             // We are now ready to filter out the "bad" neighbours.
             // For this, we will apply the Separating Axes Theorem
             // http://en.wikipedia.org/wiki/Separating_axis_theorem.
@@ -372,6 +383,7 @@ void GGIInterpolation<MasterPatch, SlavePatch>::calcAddressing() const
                     neighbPointsInUV,
                     sqrt(areaErrorTol_()) // distErrorTol
                 )
+             // && (orientation < -SMALL) // ZT, 05/07/2014
             )
             {
                 // We have an overlap between the master face and this
@@ -740,6 +752,468 @@ GGIInterpolation<MasterPatch, SlavePatch>::findNonOverlappingFaces
 
     return tpatchFaceNonOverlapAddr;
 }
+
+template<class FromPatch, class ToPatch>
+void GGIInterpolation<FromPatch, ToPatch>::
+calcMasterPointAddressing() const
+{
+    Info << "calcMasterPointAddressing() const" << endl;
+
+    // Find master points addressing
+    if (masterPointAddressingPtr_)
+    {
+        FatalErrorIn
+        (
+            "void ExtendedGGIInterpolation::"
+            "calcMasterPointAddressing() const"
+        )
+            << "Master points addressing already exists"
+                << abort(FatalError);
+    }
+
+    masterPointAddressingPtr_ =
+        new List<labelPair>
+        (
+            this->masterPatch().nPoints(),
+            labelPair(-1,-1)
+        );
+    List<labelPair>& masterPointAddr = *masterPointAddressingPtr_;
+
+    masterPointDistancePtr_ =
+        new scalarField
+        (
+            this->masterPatch().nPoints(),
+            GREAT
+        );
+    scalarField& masterPointDist = *masterPointDistancePtr_;
+
+    const labelListList& masterFaceAddr = this->masterAddr();
+
+    const labelListList& pointFaces = this->masterPatch().pointFaces();
+
+    const faceList& slaveFaces = this->slavePatch().localFaces();
+    const pointField& slavePoints = this->slavePatch().localPoints();
+
+    const pointField& masterPoints = this->masterPatch().localPoints();
+
+    forAll(masterPointAddr, pointI)
+    {
+        const point& P = masterPoints[pointI];
+
+        labelHashSet possibleSlaveFacesSet;
+
+        const labelList& curPointFaces = pointFaces[pointI];
+        forAll(curPointFaces, faceI)
+        {
+            label curFace = curPointFaces[faceI];
+
+            const labelList& curSlaveFaces = masterFaceAddr[curFace];
+
+            forAll(curSlaveFaces, fI)
+            {
+                if (!possibleSlaveFacesSet.found(curSlaveFaces[fI]))
+                {
+                    possibleSlaveFacesSet.insert(curSlaveFaces[fI]);
+                }
+            }
+        }
+
+        labelList possibleSlaveFaces = possibleSlaveFacesSet.toc();
+
+        scalar MinEta = -GREAT;
+        labelPair faceTriangle(-1, -1);
+        scalar distance = GREAT;
+
+        forAll(possibleSlaveFaces, faceI)
+        {
+            label curSlaveFace = possibleSlaveFaces[faceI];
+
+            const face& f = slaveFaces[curSlaveFace];
+
+            point ctr = Foam::average(f.points(slavePoints));
+
+            point nextPoint = ctr;
+
+            for (label pI = 0; pI < f.size(); pI++)
+            {
+                nextPoint = slavePoints[f.nextLabel(pI)];
+
+                triPointRef t
+                (
+                    slavePoints[f[pI]],
+                    nextPoint,
+                    ctr
+                );
+
+                vector n = t.normal();
+                scalar A = mag(n);
+                n /= A;
+
+                // Intersection point
+                point I = P + n*(n&(t.a() - P));
+
+                // Areal coordinates
+                scalarField eta(3, 0);
+
+                eta[0] = (triPointRef(I, t.b(), t.c()).normal() & n)/A;
+                eta[1] = (triPointRef(I, t.c(), t.a()).normal() & n)/A;
+                eta[2] = (triPointRef(I, t.a(), t.b()).normal() & n)/A;
+
+                scalar minEta = min(eta);
+
+                if (minEta > MinEta)
+                {
+                    MinEta = minEta;
+                    faceTriangle.first() = curSlaveFace;
+                    faceTriangle.second() = pI;
+
+                    distance = ((P - I)&n);
+                }
+            }
+        }
+
+        masterPointAddr[pointI] = faceTriangle;
+        masterPointDist[pointI] = distance;
+    }
+
+    Info << "Extended GGI, master point distance, max: "
+        << max(masterPointDist)
+        << ", avg: " << average(masterPointDist)
+        << ", min: " << min(masterPointDist) << endl;
+
+
+    // Check orientation
+
+    const pointField& masterPointNormals =
+        this->masterPatch().pointNormals();
+
+    const vectorField& slaveFaceNormals =
+        this->slavePatch().faceNormals();
+
+    scalarField orientation(masterPointAddr.size(), 0);
+
+    label nIncorrectPoints = 0;
+
+    forAll(masterPointAddr, pointI)
+    {
+        orientation[pointI] =
+            (
+                masterPointNormals[pointI]
+              & slaveFaceNormals[masterPointAddr[pointI].first()]
+            );
+
+        if (orientation[pointI] > -SMALL)
+        {
+            nIncorrectPoints++;
+        }
+    }
+
+//     Info << "Extended GGI, master point orientation (<0), max: "
+//         << max(orientation)
+//         << ", min: " << min(orientation) << ", nIncorrectPoints: "
+//         << nIncorrectPoints << "/" << masterPointAddr.size() << endl;
+}
+
+template<class FromPatch, class ToPatch>
+void GGIInterpolation<FromPatch, ToPatch>::
+calcMasterPointWeights() const
+{
+    // Find master point weights
+    if (masterPointWeightsPtr_)
+    {
+        FatalErrorIn
+        (
+            "void ExtendedGGIInterpolation::"
+            "calcMasterPointAddressing() const"
+        )
+            << "Master point weights already exist"
+                << abort(FatalError);
+    }
+
+    masterPointWeightsPtr_ =
+        new FieldField<Field, scalar>(this->masterPatch().nPoints());
+    FieldField<Field, scalar>& masterPointWeights = *masterPointWeightsPtr_;
+
+    const faceList& slaveFaces = this->slavePatch().localFaces();
+    const pointField& slavePoints = this->slavePatch().localPoints();
+
+    const pointField& masterPoints = this->masterPatch().localPoints();
+
+    const List<labelPair>& addr = this->masterPointAddr();
+
+    forAll(masterPointWeights, pointI)
+    {
+        if (addr[pointI].first() != -1)
+        {
+            const point& P = masterPoints[pointI];
+
+            const face& hitFace =
+                slaveFaces[addr[pointI].first()];
+
+            point ctr = Foam::average(hitFace.points(slavePoints));
+
+            label pI = addr[pointI].second();
+
+            triPointRef t
+            (
+                slavePoints[hitFace[pI]],
+                slavePoints[hitFace.nextLabel(pI)],
+                ctr
+            );
+
+            vector n = t.normal();
+            n /= mag(n);
+
+            // Intersection point
+            point I = P + n*(n&(t.a() - P));
+
+            masterPointWeights.set(pointI, scalarField(3));
+
+            masterPointWeights[pointI][0] = t.Ni(0, I);
+            masterPointWeights[pointI][1] = t.Ni(1, I);
+            masterPointWeights[pointI][2] = t.Ni(2, I);
+        }
+        else
+        {
+            masterPointWeights.set(pointI, scalarField(0));
+        }
+    }
+}
+
+template<class FromPatch, class ToPatch>
+void GGIInterpolation<FromPatch, ToPatch>::
+calcSlavePointAddressing() const
+{
+    Info << "calcSlavePointAddressing() const" << endl;
+
+    // Find master points addressing
+    if (slavePointAddressingPtr_)
+    {
+        FatalErrorIn
+        (
+            "void ExtendedGGIInterpolation::"
+            "calcSlavePointAddressing() const"
+        )
+            << "Slave points addressing already exists"
+                << abort(FatalError);
+    }
+
+    slavePointAddressingPtr_ =
+        new List<labelPair>
+        (
+            this->slavePatch().nPoints(),
+            labelPair(-1,-1)
+        );
+    List<labelPair>& slavePointAddr = *slavePointAddressingPtr_;
+
+    slavePointDistancePtr_ =
+        new scalarField
+        (
+            this->slavePatch().nPoints(),
+            GREAT
+        );
+    scalarField& slavePointDist = *slavePointDistancePtr_;
+
+    const labelListList& slaveFaceAddr = this->slaveAddr();
+
+    const labelListList& pointFaces = this->slavePatch().pointFaces();
+
+    const faceList& masterFaces = this->masterPatch().localFaces();
+    const pointField& masterPoints = this->masterPatch().localPoints();
+
+    const pointField& slavePoints = this->slavePatch().localPoints();
+
+    forAll(slavePointAddr, pointI)
+    {
+        const point& P = slavePoints[pointI];
+
+        labelHashSet possibleMasterFacesSet;
+
+        const labelList& curPointFaces = pointFaces[pointI];
+        forAll(curPointFaces, faceI)
+        {
+            label curFace = curPointFaces[faceI];
+
+            const labelList& curMasterFaces = slaveFaceAddr[curFace];
+
+            forAll(curMasterFaces, fI)
+            {
+                if (!possibleMasterFacesSet.found(curMasterFaces[fI]))
+                {
+                    possibleMasterFacesSet.insert(curMasterFaces[fI]);
+                }
+            }
+        }
+
+        labelList possibleMasterFaces = possibleMasterFacesSet.toc();
+
+        scalar MinEta = -GREAT;
+        labelPair faceTriangle(-1, -1);
+        scalar distance = GREAT;
+
+        forAll(possibleMasterFaces, faceI)
+        {
+            label curMasterFace = possibleMasterFaces[faceI];
+
+            const face& f = masterFaces[curMasterFace];
+
+            point ctr = Foam::average(f.points(masterPoints));
+
+            point nextPoint = ctr;
+
+            for (label pI = 0; pI < f.size(); pI++)
+            {
+                nextPoint = masterPoints[f.nextLabel(pI)];
+
+                triPointRef t
+                (
+                    masterPoints[f[pI]],
+                    nextPoint,
+                    ctr
+                );
+
+                vector n = t.normal();
+                scalar A = mag(n);
+                n /= A;
+
+                // Intersection point
+                point I = P + n*(n&(t.a() - P));
+
+                // Areal coordinates
+                scalarField eta(3, 0);
+
+                eta[0] = (triPointRef(I, t.b(), t.c()).normal() & n)/A;
+                eta[1] = (triPointRef(I, t.c(), t.a()).normal() & n)/A;
+                eta[2] = (triPointRef(I, t.a(), t.b()).normal() & n)/A;
+
+                scalar minEta = min(eta);
+
+                if (minEta > MinEta)
+                {
+                    MinEta = minEta;
+                    faceTriangle.first() = curMasterFace;
+                    faceTriangle.second() = pI;
+
+                    distance = ((P - I)&n);
+                }
+            }
+        }
+
+//         Info << "MinEta " << MinEta << endl;
+
+        slavePointAddr[pointI] = faceTriangle;
+        slavePointDist[pointI] = distance;
+
+//         Info << "slave " << pointI << ", "
+//             << slavePointAddr[pointI] << endl;
+    }
+
+    Info << "Extended GGI, slave point distance, max: "
+        << max(slavePointDist)
+        << ", avg: " << average(slavePointDist)
+        << ", min: " << min(slavePointDist) << endl;
+
+    // Check orientation
+
+    const pointField& slavePointNormals =
+        this->slavePatch().pointNormals();
+
+    const vectorField& masterFaceNormals =
+        this->masterPatch().faceNormals();
+
+    scalarField orientation(slavePointAddr.size(), 0);
+
+    label nIncorrectPoints = 0;
+
+    forAll(slavePointAddr, pointI)
+    {
+        if (slavePointAddr[pointI].first() != -1)
+        {
+            orientation[pointI] =
+                (
+                    slavePointNormals[pointI]
+                  & masterFaceNormals[slavePointAddr[pointI].first()]
+                );
+
+            if (orientation[pointI] > -SMALL)
+            {
+                nIncorrectPoints++;
+            }
+        }
+    }
+
+    Info << "Extended GGI, slave point orientation (<0), max: "
+        << max(orientation)
+        << ", min: " << min(orientation) << ", nIncorrectPoints: "
+        << nIncorrectPoints << "/" << slavePointAddr.size() << endl;
+}
+
+template<class FromPatch, class ToPatch>
+void GGIInterpolation<FromPatch, ToPatch>::
+calcSlavePointWeights() const
+{
+    // Find master point weights
+    if (slavePointWeightsPtr_)
+    {
+        FatalErrorIn
+        (
+            "void ExtendedGGIInterpolation::"
+            "calcSlavePointAddressing() const"
+        )
+            << "Slave point weights already exist"
+                << abort(FatalError);
+    }
+
+    slavePointWeightsPtr_ =
+        new FieldField<Field, scalar>(this->slavePatch().nPoints());
+    FieldField<Field, scalar>& slavePointWeights = *slavePointWeightsPtr_;
+
+    const faceList& masterFaces = this->masterPatch().localFaces();
+    const pointField& masterPoints = this->masterPatch().localPoints();
+
+    const pointField& slavePoints = this->slavePatch().localPoints();
+
+    const List<labelPair>& addr = this->slavePointAddr();
+
+    forAll(slavePointWeights, pointI)
+    {
+        if (addr[pointI].first() != -1)
+        {
+            const point& P = slavePoints[pointI];
+
+            const face& hitFace =
+                masterFaces[addr[pointI].first()];
+
+            point ctr = Foam::average(hitFace.points(masterPoints));
+
+            label pI = addr[pointI].second();
+
+            triPointRef t
+            (
+                masterPoints[hitFace[pI]],
+                masterPoints[hitFace.nextLabel(pI)],
+                ctr
+            );
+
+            vector n = t.normal();
+            n /= mag(n);
+
+            // Intersection point
+            point I = P + n*(n&(t.a() - P));
+
+            slavePointWeights.set(pointI, scalarField(3));
+
+            slavePointWeights[pointI][0] = t.Ni(0, I);
+            slavePointWeights[pointI][1] = t.Ni(1, I);
+            slavePointWeights[pointI][2] = t.Ni(2, I);
+        }
+        else
+        {
+            slavePointWeights.set(pointI, scalarField(0));
+        }
+    }
+}
+
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

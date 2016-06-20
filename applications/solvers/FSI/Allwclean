@@ -1,0 +1,18 @@
+#!/bin/sh
+set -x
+
+wclean fluidSolidInteraction
+
+wclean solvers/fsiFoam
+wclean solvers/ampFsiFoam
+wclean solvers/weakFsiFoam
+wclean solvers/fluidFoam
+wclean solvers/solidFoam
+wclean solvers/thermalSolidFoam
+
+wclean utilities/functionObjects/pointHistory
+wclean utilities/functionObjects/patchAvgTractionHistory
+wclean utilities/functionObjects/centrifugalBodyForce
+
+# Wipe out all lnInclude directories and re-link
+wcleanLnIncludeAll

@@ -1,0 +1,264 @@
+/*---------------------------------------------------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     |
+    \\  /    A nd           | Copyright held by original author
+     \\/     M anipulation  |
+-------------------------------------------------------------------------------
+License
+    This file is part of OpenFOAM.
+
+    OpenFOAM is free software; you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by the
+    Free Software Foundation; either version 2 of the License, or (at your
+    option) any later version.
+
+    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
+    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+    for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with OpenFOAM; if not, write to the Free Software Foundation,
+    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+
+\*---------------------------------------------------------------------------*/
+
+#include "fvcGradf.H"
+#include "fvMesh.H"
+#include "volFields.H"
+#include "surfaceFields.H"
+#include "pointFields.H"
+
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+namespace Foam
+{
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+namespace fvc
+{
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+template<class Type>
+tmp
+<
+    GeometricField
+    <
+        typename outerProduct<vector, Type>::type,
+        fvsPatchField,
+        surfaceMesh
+    >
+> grad
+(
+    const GeometricField<Type, fvPatchField, volMesh>& vf,
+    const GeometricField<Type, pointPatchField, pointMesh>& pf
+)
+{
+    typedef typename outerProduct<vector, Type>::type GradType;
+
+    const fvMesh& mesh = vf.mesh();
+
+    tmp<GeometricField<GradType, fvsPatchField, surfaceMesh> > tGrad
+    (
+        new GeometricField<GradType, fvsPatchField, surfaceMesh>
+        (
+            IOobject
+            (
+                "grad" + vf.name() + "f",
+                vf.instance(),
+                mesh,
+                IOobject::NO_READ,
+                IOobject::NO_WRITE
+            ),
+            mesh,
+            dimensioned<GradType>
+            (
+                "0",
+                vf.dimensions()/dimLength,
+                pTraits<GradType>::zero
+            )
+        )
+    );
+    Field<GradType>& gradI = tGrad().internalField();
+
+    const vectorField& points = mesh.points();
+    const faceList& faces = mesh.faces();
+
+//     const vectorField& faceCentres = mesh.faceCentres();
+
+    const labelList& owner = mesh.owner();
+    const labelList& neighbour = mesh.neighbour();
+
+    const volVectorField& C = mesh.C();
+    const surfaceVectorField& Cf = mesh.Cf();
+
+    const GeometricField<GradType, fvPatchField, volMesh>& gradVf =
+        mesh.lookupObject<GeometricField<GradType, fvPatchField, volMesh> >
+        (
+	    "grad(" + vf.name() + ")"
+        );
+
+    surfaceVectorField n = mesh.Sf()/mesh.magSf();
+//     const vectorField& nI = n.internalField();
+
+    const Field<Type>& pfI = pf.internalField();
+
+    forAll(gradI, faceI)
+    {
+        const face& curFace = faces[faceI];
+
+        const edgeList curFaceEdges = curFace.edges();
+
+	Type curFaceFieldValue = pTraits<Type>::zero;
+
+        // Owner contribution
+        label own = owner[faceI];
+        curFaceFieldValue +=
+            0.5*(vf[own] + ((Cf[faceI] - C[own]) & gradVf[own]));
+
+        // Neighbour contribution
+        label nei = neighbour[faceI];
+        curFaceFieldValue +=
+	    0.5*(vf[nei] + ((Cf[faceI] - C[nei]) & gradVf[nei]));
+
+        gradI[faceI] = pTraits<GradType>::zero;
+        scalar faceArea = 0;
+
+        forAll(curFaceEdges, edgeI)
+        {
+            const edge& curEdge = curFaceEdges[edgeI];
+
+	    vectorField p(3, vector::zero);
+	    p[0] = points[curEdge.start()];
+	    p[1] = points[curEdge.end()];
+	    p[2] = Cf[faceI];
+
+	    Field<Type> f(3, pTraits<Type>::zero);
+	    f[0] = pfI[curEdge.start()];
+	    f[1] = pfI[curEdge.end()];
+	    f[2] = curFaceFieldValue;
+
+	    triFace tri(0, 1, 2);
+
+	    vector triCentre = tri.centre(p);
+	    vector triNormal = tri.normal(p);
+	    triNormal /= mag(triNormal);
+	    edgeList triEdges = tri.edges();
+
+
+	    GradType triGrad = pTraits<GradType>::zero;
+
+	    forAll(triEdges, eI)
+            {
+                vector e = triEdges[eI].vec(p);
+
+                vector Le = (e^triNormal);
+                Le *= tri.edgeDirection(triEdges[eI]);
+
+                // Edge-centre value of the field
+                Type fe =
+		  0.5*(f[triEdges[eI].start()] + f[triEdges[eI].end()]);
+
+                // Gradient
+                triGrad += Le*fe;
+            }
+
+            // Gradient
+            gradI[faceI] += triGrad;
+
+            // Area
+            faceArea += tri.mag(p);
+        }
+
+        gradI[faceI] /= faceArea;
+    }
+
+    forAll(tGrad().boundaryField(), patchI)
+    {
+        Field<GradType>& patchGrad = tGrad().boundaryField()[patchI];
+
+	const vectorField& pCf = Cf.boundaryField()[patchI];
+
+        forAll(patchGrad, faceI)
+        {
+            label globalFaceID = mesh.boundaryMesh()[patchI].start() + faceI;
+
+            const face& curFace = mesh.faces()[globalFaceID];
+
+	    const edgeList curFaceEdges = curFace.edges();
+
+	    const Type& curFaceFieldValue =
+                vf.boundaryField()[patchI][faceI];
+
+	    patchGrad[faceI] = pTraits<GradType>::zero;
+	    scalar faceArea = 0;
+
+	    forAll(curFaceEdges, edgeI)
+	    {
+                const edge& curEdge = curFaceEdges[edgeI];
+
+		vectorField p(3, vector::zero);
+		p[0] = points[curEdge.start()];
+		p[1] = points[curEdge.end()];
+		p[2] = pCf[faceI];
+
+		Field<Type> f(3, pTraits<Type>::zero);
+		f[0] = pfI[curEdge.start()];
+		f[1] = pfI[curEdge.end()];
+		f[2] = curFaceFieldValue;
+
+		triFace tri(0, 1, 2);
+
+		vector triCentre = tri.centre(p);
+		vector triNormal = tri.normal(p);
+		triNormal /= mag(triNormal);
+		edgeList triEdges = tri.edges();
+
+
+		GradType triGrad = pTraits<GradType>::zero;
+
+		forAll(triEdges, eI)
+		{
+		    vector e = triEdges[eI].vec(p);
+
+		    vector Le = (e^triNormal);
+		    Le *= tri.edgeDirection(triEdges[eI]);
+
+		    // Edge-centre value of the field
+		    Type fe =
+		        0.5*(f[triEdges[eI].start()] + f[triEdges[eI].end()]);
+
+		    // Gradient
+		    triGrad += Le*fe;
+		}
+
+		// Gradient
+		patchGrad[faceI] += triGrad;
+
+		// Area
+		faceArea += tri.mag(p);
+	    }
+
+	    patchGrad[faceI] /= faceArea;
+        }
+    }
+
+    // Add normal component of the gradient
+    tGrad() += n*fvc::snGrad(vf);
+
+    return tGrad;
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+} // End namespace fvc
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+} // End namespace Foam
+
+// ************************************************************************* //

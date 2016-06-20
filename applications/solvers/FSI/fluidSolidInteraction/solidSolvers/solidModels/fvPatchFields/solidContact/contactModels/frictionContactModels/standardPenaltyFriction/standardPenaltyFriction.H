@@ -1,0 +1,227 @@
+/*---------------------------------------------------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     |
+    \\  /    A nd           | Copyright (C) 2004-2007 Hrvoje Jasak
+     \\/     M anipulation  |
+-------------------------------------------------------------------------------
+License
+    This file is part of OpenFOAM.
+
+    OpenFOAM is free software; you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by the
+    Free Software Foundation; either version 2 of the License, or (at your
+    option) any later version.
+
+    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
+    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+    for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with OpenFOAM; if not, write to the Free Software Foundation,
+    Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+
+Class
+    standardPenaltyFriction
+
+Description
+    standardPenaltyFriction contact friction law
+    Essentially Coulomb friction
+    Increments of friction traction are added to the slave faces until the
+    the increment of relative motion is zero or until the friction reaches
+    fricCoeff*pressure
+
+SourceFiles
+    standardPenaltyFriction.C
+
+Author
+    Philip Cardiff UCD
+    Matthias Schnaithmann Universitat Stuttgart
+
+\*---------------------------------------------------------------------------*/
+
+#ifndef standardPenaltyFriction_H
+#define standardPenaltyFriction_H
+
+#include "frictionContactModel.H"
+#include "frictionLaw.H"
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+namespace Foam
+{
+
+/*---------------------------------------------------------------------------*\
+                         Class standardPenaltyFriction Declaration
+\*---------------------------------------------------------------------------*/
+
+class standardPenaltyFriction
+:
+    public frictionContactModel
+{
+    // Private data
+
+         //- the contact model contains the contact procedure
+         //- whereas the contact law contains is the physcial law eg Coulomb
+        dictionary frictionContactModelDict_;
+
+         //- friction law
+        frictionLaw* frictionLawPtr_;
+
+         //- reference to mesh
+        const fvMesh& mesh_;
+
+       //- slave traction - not used for standardPenaltyFriction
+       vectorField slaveDisp_;
+
+       //- slave traction
+       vectorField slaveTraction_;
+       vectorField oldSlaveTraction_;
+
+       //- slave friction value fraction
+       symmTensorField slaveValueFrac_;
+
+       //- slip
+       vectorField slip_;
+
+       // frictional penalty factor and scaling factor
+       scalar* frictionPenaltyFactorPtr_;
+       scalar frictionPenaltyScale_;
+       scalar relaxFac_;
+
+       // contact iteration number
+       label contactIterNum_;
+
+       // info frequency - how often to print to contact file
+       int infoFreq_;
+
+       // oscillation correction factor
+       // 1 -> no correction
+       // 0 -> fully smoothed
+       // values as high as 0.999 can help eliminate oscillations
+       Switch oscillationCorr_;
+       //scalar oscillationCorrFac_;
+       int smoothingSteps_;
+
+       // contact info file
+       OFstream* contactFilePtr_;
+
+
+    // Private Member Functions
+
+        //- Return penalty factor
+        virtual scalar frictionPenaltyFactor()
+        {
+            if (!frictionPenaltyFactorPtr_)
+            {
+                calcFrictionPenaltyFactor();
+            }
+
+            return *frictionPenaltyFactorPtr_;
+        }
+
+        //- Disallow default bitwise copy construct
+        //standardPenaltyFriction(const standardPenaltyFriction&);
+
+        //- Disallow default bitwise assignment
+        void operator=(const standardPenaltyFriction&);
+
+public:
+
+    //- Runtime type information
+    TypeName("standardPenalty");
+
+
+    // Constructors
+
+        //- Construct from dictionary
+        standardPenaltyFriction
+        (
+            const word& name,
+            const fvPatch& patch,
+            const dictionary& dict,
+            const label masterPatchID,
+            const label slavePatchID,
+            const label masterFaceZoneID,
+            const label slaveFaceZoneID
+        );
+
+        //- Construct as copy
+        standardPenaltyFriction(const standardPenaltyFriction&);
+
+        //- Construct and return a clone
+        virtual autoPtr<frictionContactModel> clone() const
+        {
+            return
+                autoPtr<frictionContactModel>
+                (
+                    new standardPenaltyFriction(*this)
+                );
+        }
+
+
+    // Destructor
+
+        virtual ~standardPenaltyFriction()
+        {}
+
+
+    // Member Functions
+
+        //- Correct the rheological model
+        virtual void correct
+        (
+            const vectorField& slavePressure,
+            const primitiveFacePatch& masterFaceZonePatch,
+            const primitiveFacePatch& slaveFaceZonePatch,
+            const intersection::algorithm alg,
+            const intersection::direction dir,
+            const word interpolationMethod,
+            const word fieldName,
+            const Switch orthotropic,
+            const nonLinearGeometry::nonLinearType nonLinear,
+            const vectorField& slaveFaceNormals
+        );
+
+        //- Return slave friction displacement
+        virtual const vectorField& slaveDisp() const
+        {
+            return slaveDisp_;
+        }
+
+        //- Return slave friction traction
+        virtual const vectorField& slaveTraction() const
+        {
+            return slaveTraction_;
+        }
+
+        //- Return slave friction value fraction
+        virtual const symmTensorField& slaveValueFrac() const
+        {
+            return slaveValueFrac_;
+        }
+
+        //- calculate penalty factor
+        void calcFrictionPenaltyFactor();
+
+        //- Return slip field
+        virtual const vectorField& slip() const
+        {
+            return slip_;
+        }
+
+        //- Write law dictionary
+        virtual void writeDict(Ostream& os) const;
+};
+
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+} // End namespace Foam
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#endif
+
+// ************************************************************************* //

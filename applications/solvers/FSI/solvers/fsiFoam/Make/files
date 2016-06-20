@@ -1,0 +1,3 @@
+fsiFoam.C
+
+EXE = $(FOAM_APPBIN)/fsiFoam

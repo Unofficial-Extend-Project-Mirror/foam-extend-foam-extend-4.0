@@ -1,0 +1,54 @@
+c++WARN     = -Wno-deprecated -Wall -Wextra -Wno-unused-parameter -Wnon-virtual-dtor -Wunused-local-typedefs -Werror -Wredundant-decls -Wcast-align -Wmissing-declarations  -Wswitch-enum -Winvalid-pch -Wredundant-decls -Wformat=2 -Wmissing-format-attribute -Wformat-nonliteral
+
+
+EXE_INC = -std=c++11 \
+    -I./fluidSolvers/finiteVolume/RBFMeshMotionSolver \
+    -I./fluidSolvers/finiteVolume/RBFMeshMotionSolver/RBFFunctions \
+    -I./solidSolvers/solidModels/fvPatchFields/symmetry \
+    -I./solidSolvers/solidModels/contactModels/frictionContactModels/frictionContactModel/frictionLaws/frictionLaw \
+    -I./solidSolvers/solidModels/contactModels/frictionContactModels/frictionContactModel \
+    -I./solidSolvers/solidModels/contactModels/normalContactModels/normalContactModel \
+    -I./solidSolvers/solidModels/constitutiveModel/tractionBoundaryGradient \
+    -I./solidSolvers/solidModels/nonLinearGeometry \
+    -I./solidSolvers/solidModels/constitutiveModel/rheologyLaws/PronyViscoelastic \
+    -I./solidSolvers/solidModels/arbitraryCrack/pointDistDiff \
+    -I$(WM_THIRD_PARTY_DIR)/packages/eigen3 \
+    -I./solidSolvers/solidModels/componentReference \
+    -I./solidSolvers/solidModels/constitutiveModel/lnInclude \
+    -I./solidSolvers/solidModels/constitutiveModel/plasticityStressReturnMethods/plasticityStressReturn \
+    -I./solidSolvers/solidModels/constitutiveModel/rheologyLaws/rheologyLaw \
+    -I./solidSolvers/solidModels/constitutiveModel \
+    -I./fluidSolidInterface \
+    -I./solidSolvers/finiteVolume/fvc \
+    -I./solidSolvers/solidModels/fvPatchFields/tractionDisplacement \
+    -I./solidSolvers/solidModels/fvPatchFields/tractionDisplacementIncrement \
+    -I./solidSolvers/solidModels/fvPatchFields/fixedDisplacement \
+    -I./solidSolvers/solidModels/fvPatchFields/symmetryDisplacement \
+    -I./solidSolvers/solidSolver \
+    -I./solidSolvers/solidModels/arbitraryCrack/crackerFvMesh \
+    -I./fluidSolvers/finiteVolume/ddtSchemes \
+    -I./fluidSolvers/fluidSolver \
+    -I$(LIB_SRC)/foam/lnInclude \
+    -I$(LIB_SRC)/finiteArea/lnInclude \
+    -I$(LIB_SRC)/finiteVolume/lnInclude \
+    -I$(LIB_SRC)/turbulenceModels/incompressible/turbulenceModel \
+    -I$(LIB_SRC)/transportModels \
+    -I$(LIB_SRC)/transportModels/incompressible/singlePhaseTransportModel \
+    -I$(LIB_SRC)/dynamicMesh/dynamicFvMesh/lnInclude \
+    -I$(LIB_SRC)/dynamicMesh/dynamicMesh/lnInclude \
+    -I$(LIB_SRC)/dynamicMesh/meshMotion/fvMotionSolver/lnInclude \
+    -I$(LIB_SRC)/dynamicMesh/meshMotion/tetMotionSolver/lnInclude \
+    -I$(LIB_SRC)/dynamicMesh/topoChangerFvMesh/lnInclude \
+    -I$(LIB_SRC)/lagrangian/basic/lnInclude \
+    -I$(LIB_SRC)/meshTools/lnInclude \
+    -I$(LIB_SRC)/tetFiniteElement/lnInclude \
+
+EXE_LIBS = \
+    -lincompressibleTurbulenceModel \
+    -lincompressibleRASModels \
+    -lincompressibleLESModels \
+    -lincompressibleTransportModels \
+    -lfiniteVolume \
+    -ldynamicFvMesh \
+    -ldynamicMesh \
+    -lmeshTools

@@ -70,6 +70,7 @@ SourceFiles
 #include "NamedEnum.H"
 #include "tolerancesSwitch.H"
 #include "optimisationSwitch.H"
+#include "labelPair.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -189,6 +190,14 @@ class GGIInterpolation
             //- Master to slave  weights
             mutable scalarListList* masterWeightsPtr_;
 
+            //- Slave face into which each point of master patch is projected
+            mutable List<labelPair>* masterPointAddressingPtr_;
+
+            //- Weighting factors
+            mutable FieldField<Field, scalar>* masterPointWeightsPtr_;
+
+            //- Distance to intersection for master patch points
+            mutable scalarField* masterPointDistancePtr_;
 
         // Slave-to-master interpolation
 
@@ -198,14 +207,22 @@ class GGIInterpolation
             //- Slave to master weights
             mutable scalarListList* slaveWeightsPtr_;
 
+            //- Master face into which each point of slave patch is projected
+            mutable List<labelPair>* slavePointAddressingPtr_;
+
+            //- Weighting factors
+            mutable FieldField<Field, scalar>* slavePointWeightsPtr_;
+
+            //- Distance to intersection for master patch points
+            mutable scalarField* slavePointDistancePtr_;
+
             //- List of uncovered master faces
             mutable labelList* uncoveredMasterAddrPtr_;
 
             //- List of uncovered slave faces
             mutable labelList* uncoveredSlaveAddrPtr_;
 
-
-    // Private static data
+  // Private static data
 
         //- Facet area error tolerance
         static const debug::tolerancesSwitch areaErrorTol_;
@@ -255,6 +272,17 @@ class GGIInterpolation
         //- Disallow default bitwise assignment
         void operator=(const GGIInterpolation&);
 
+        //- Calculate point weights
+        void calcMasterPointAddressing() const;
+
+        //- Calculate point weights
+        void calcMasterPointWeights() const;
+
+        //- Calculate point weights
+        void calcSlavePointAddressing() const;
+
+        //- Calculate point weights
+        void calcSlavePointWeights() const;
 
     // Helper functions for parallel search
 
@@ -508,6 +536,23 @@ public:
             //- Return reference to the slave list of non-overlap faces
             const labelList& uncoveredSlaveFaces() const;
 
+            //- Return reference to point addressing
+            const List<labelPair>& masterPointAddr() const;
+
+            //- Return reference to point weights
+            const FieldField<Field, scalar>& masterPointWeights() const;
+
+            //- Return distance to intersection for patch points
+            const scalarField& masterPointDistanceToIntersection() const;
+
+            //- Return reference to point addressing
+            const List<labelPair>& slavePointAddr() const;
+
+            //- Return reference to point weights
+            const FieldField<Field, scalar>& slavePointWeights() const;
+
+            //- Return distance to intersection for patch points
+            const scalarField& slavePointDistanceToIntersection() const;
 
     // Interpolation functions
 
@@ -531,7 +576,6 @@ public:
             Field<Type>& result,
             const labelList& mask
         ) const;
-
 
         //- Interpolate from slave to master
         template<class Type>
@@ -588,6 +632,31 @@ public:
             Field<Type>& ff,
             const labelList& mask
         ) const;
+
+        //- Interpolate point field
+        template<class Type>
+        tmp<Field<Type> > masterToSlavePointInterpolate
+        (
+            const Field<Type>& pf
+        ) const;
+
+//         template<class Type>
+//         tmp<Field<Type> > masterToSlavePointInterpolate
+//         (
+//             const tmp<Field<Type> >& tpf
+//         ) const;
+
+        template<class Type>
+        tmp<Field<Type> > slaveToMasterPointInterpolate
+        (
+            const Field<Type>& pf
+        ) const;
+
+//         template<class Type>
+//         tmp<Field<Type> > slaveToMasterPointInterpolate
+//         (
+//             const tmp<Field<Type> >& tpf
+//         ) const;
 
 
     // Edit
