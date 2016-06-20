@@ -15,7 +15,7 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-application fsiFoam;
+application     fsiFoam;
 
 startFrom       startTime;
 
