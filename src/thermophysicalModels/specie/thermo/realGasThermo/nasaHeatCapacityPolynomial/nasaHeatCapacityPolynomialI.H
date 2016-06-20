@@ -97,7 +97,7 @@ inline Foam::nasaHeatCapacityPolynomial<equationOfState>::nasaHeatCapacityPolyno
     s0_std(s0_std_),
     integral_p_dv_std(integral_p_dv_std_),
     integral_dpdT_dv_std(integral_dpdT_dv_std_),
-    cp_std(cp_std_) 
+    cp_std(cp_std_)
 {}
 
 

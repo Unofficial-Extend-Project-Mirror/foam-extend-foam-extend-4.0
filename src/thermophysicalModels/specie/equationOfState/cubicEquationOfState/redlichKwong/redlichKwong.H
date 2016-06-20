@@ -62,7 +62,7 @@ class redlichKwong
     // private data
     //CL: data at critical point
     scalar pcrit_;
-    scalar Tcrit_; 
+    scalar Tcrit_;
 
     //CL: Redlich Kwong factors
     scalar a_;

@@ -81,147 +81,156 @@ Foam::orthotropicLinearElastic::orthotropicLinearElastic
     A44_( 2*Gxy_ ),
     A55_( 2*Gyz_ ),
     A66_( 2*Gzx_ ),
-    C_(
-       IOobject
-       (
-	"rheologyLawStoredC",
-	mesh().time().timeName(),
-	mesh(),
-	IOobject::NO_READ,
-	IOobject::NO_WRITE
-	),
-       mesh(),
-       dimensionedSymmTensor4thOrder("zero", dimForce/dimArea,
-				     symmTensor4thOrder(A11_.value(), A12_.value(), A31_.value(),
-							A22_.value(), A23_.value(),
-							A33_.value(),
-							A44_.value(),
-							A55_.value(),
-							A66_.value())
-				     ),
-       zeroGradientFvPatchSymmTensor4thOrderField::typeName
-	),
-    matDir_(
-	    IOobject
-	    (
-	     "materialDirections",
-	     mesh().time().timeName(),
-	     mesh(),
-	     IOobject::MUST_READ,
-	     IOobject::NO_WRITE
-	     ),
-	    mesh()
-	    )
-{
-  //- check material properties lie within physical constraints
-  //- ref Abaqus analysis user's manual orthotropic material
-  Info << "\tChecking physical constraints on the orthotropic material properties" << endl;
-
-  //- E and G should be greater than zero
-  if(Ex_.value() < 0.0 || Ey_.value() < 0.0 || Ez_.value() < 0.0
-     || Gxy_.value() < 0.0 || Gyz_.value() < 0.0 || Gzx_.value() < 0.0)
-    {
-      FatalError << "Ex, Ey, Ez, Gxy, Gyz, Gzx should all be greater than zero!"
-		 << exit(FatalError);
-    }
-
-  //- restriction on Poisson's ratio
-  if(mag(nuxy_.value()) >= sqrt(Ex_.value()/Ey_.value())
-     || mag(nuyz_.value()) >= sqrt(Ey_.value()/Ez_.value())
-     || mag(nuzx_.value()) >= sqrt(Ez_.value()/Ex_.value()))
-    {
-      FatalError << "mag(nuij) should be less sqrt(Ei/Ej)"
-		 << exit(FatalError);
-    }
-
-  if( dimensionedScalar(1 - nuxy_*nuyx_ - nuyz_*nuzy_ - nuzx_*nuxz_ - 2*nuyx_*nuzy_*nuxz_).value() <= 0 )
-    {
-      FatalError << "(1 - nuxy*nuyx - nuyz*nuzy - nuzx*nuxz - 2*nuyx*nuzy*nuxz) should be greater than zero!"
-		 << exit(FatalError);
-    }
-
-
-  Info << "\tRotating local material properties to global coordinate system" << endl;
-  //- rotate tensors
-  volTensorField R
+    C_
     (
-     IOobject
-     (
-      "R",
-      mesh().time().timeName(),
-      mesh(),
-      IOobject::NO_READ,
-      IOobject::NO_WRITE
-      ),
-     mesh(),
-     dimensionedTensor("zero", dimless, tensor::zero),
-     zeroGradientFvPatchTensorField::typeName
-     );
+        IOobject
+        (
+            "rheologyLawStoredC",
+            mesh().time().timeName(),
+            mesh(),
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        ),
+        mesh(),
+        dimensionedSymmTensor4thOrder("zero", dimForce/dimArea,
+        symmTensor4thOrder
+        (
+            A11_.value(), A12_.value(), A31_.value(),
+            A22_.value(), A23_.value(),
+            A33_.value(),
+            A44_.value(),
+            A55_.value(),
+            A66_.value())
+        ),
+        zeroGradientFvPatchSymmTensor4thOrderField::typeName
+    ),
+    matDir_
+    (
+        IOobject
+        (
+            "materialDirections",
+            mesh().time().timeName(),
+            mesh(),
+            IOobject::MUST_READ,
+            IOobject::NO_WRITE
+        ),
+        mesh()
+    )
+{
+    //- check material properties lie within physical constraints
+    //- ref Abaqus analysis user's manual orthotropic material
+    Info << "\tChecking physical constraints on the orthotropic material properties" << endl;
 
-  //- make sure matDir_ are unit directions
-  forAll(matDir_, celli)
+    //- E and G should be greater than zero
+    if
+    (
+        Ex_.value() < 0.0 || Ey_.value() < 0.0 || Ez_.value() < 0.0
+     || Gxy_.value() < 0.0 || Gyz_.value() < 0.0 || Gzx_.value() < 0.0
+    )
     {
-      {
-	scalar magVec =
-	  mag(vector(matDir_[celli][0], matDir_[celli][1], matDir_[celli][2]));
-	matDir_[celli][0] /= magVec;
-	matDir_[celli][1] /= magVec;
-	matDir_[celli][2] /= magVec;
-      }
-      {
-	scalar magVec =
-	  mag(vector(matDir_[celli][3], matDir_[celli][4], matDir_[celli][5]));
-	matDir_[celli][3] /= magVec;
-	matDir_[celli][4] /= magVec;
-	matDir_[celli][5] /= magVec;
-      }
-      {
-	scalar magVec =
-	  mag(vector(matDir_[celli][6], matDir_[celli][7], matDir_[celli][8]));
-	matDir_[celli][6] /= magVec;
-	matDir_[celli][7] /= magVec;
-	matDir_[celli][8] /= magVec;
-      }
+        FatalError << "Ex, Ey, Ez, Gxy, Gyz, Gzx should all be greater than zero!"
+            << exit(FatalError);
     }
 
-  //- global axes
-  vector e0(1,0,0);
-  vector e1(0,1,0);
-  vector e2(0,0,1);
-
-  forAll(R, celli)
+    //- restriction on Poisson's ratio
+    if
+    (
+        mag(nuxy_.value()) >= sqrt(Ex_.value()/Ey_.value())
+     || mag(nuyz_.value()) >= sqrt(Ey_.value()/Ez_.value())
+     || mag(nuzx_.value()) >= sqrt(Ez_.value()/Ex_.value())
+    )
     {
-      // R_ij = xold_i & xnew_i;
-      {
-	vector mD(matDir_[celli][0], matDir_[celli][1], matDir_[celli][2]);
-	R[celli][0] = e0 & mD;
-	R[celli][1] = e1 & mD;
-	R[celli][2] = e2 & mD;
-      }
-      {
-	vector mD(matDir_[celli][3], matDir_[celli][4], matDir_[celli][5]);
-	R[celli][3] = e0 & mD;
-	R[celli][4] = e1 & mD;
-	R[celli][5] = e2 & mD;
-      }
-      {
-	vector mD(matDir_[celli][6], matDir_[celli][7], matDir_[celli][8]);
-	R[celli][6] = e0 & mD;
-	R[celli][7] = e1 & mD;
-	R[celli][8] = e2 & mD;
-      }
+        FatalError << "mag(nuij) should be less sqrt(Ei/Ej)"
+            << exit(FatalError);
     }
 
-  //Info << "R is " << R.internalField() << endl;
-  R.correctBoundaryConditions();
-  //R.write();
+    if( dimensionedScalar(1 - nuxy_*nuyx_ - nuyz_*nuzy_ - nuzx_*nuxz_ - 2*nuyx_*nuzy_*nuxz_).value() <= 0 )
+    {
+        FatalError << "(1 - nuxy*nuyx - nuyz*nuzy - nuzx*nuxz - 2*nuyx*nuzy*nuxz) should be greater than zero!"
+            << exit(FatalError);
+    }
 
-  //- rotate C to global corrdinate system
-  //Info << "C_ local is " << C_.internalField() << endl;
-  C_.correctBoundaryConditions();
-  C_ = transform(R, C_);
-  C_.correctBoundaryConditions();
-  //Info << "C_ global is " << C_.internalField() << endl;
+    Info << "\tRotating local material properties to global coordinate system" << endl;
+    //- rotate tensors
+    volTensorField R
+    (
+        IOobject
+        (
+            "R",
+            mesh().time().timeName(),
+            mesh(),
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        ),
+        mesh(),
+        dimensionedTensor("zero", dimless, tensor::zero),
+        zeroGradientFvPatchTensorField::typeName
+    );
+
+    //- make sure matDir_ are unit directions
+    forAll(matDir_, celli)
+    {
+        {
+            scalar magVec =
+                mag(vector(matDir_[celli][0], matDir_[celli][1], matDir_[celli][2]));
+            matDir_[celli][0] /= magVec;
+            matDir_[celli][1] /= magVec;
+            matDir_[celli][2] /= magVec;
+        }
+        {
+            scalar magVec =
+                mag(vector(matDir_[celli][3], matDir_[celli][4], matDir_[celli][5]));
+            matDir_[celli][3] /= magVec;
+            matDir_[celli][4] /= magVec;
+            matDir_[celli][5] /= magVec;
+        }
+        {
+            scalar magVec =
+                mag(vector(matDir_[celli][6], matDir_[celli][7], matDir_[celli][8]));
+            matDir_[celli][6] /= magVec;
+            matDir_[celli][7] /= magVec;
+            matDir_[celli][8] /= magVec;
+        }
+    }
+
+    //- global axes
+    vector e0(1,0,0);
+    vector e1(0,1,0);
+    vector e2(0,0,1);
+
+    forAll(R, celli)
+    {
+        // R_ij = xold_i & xnew_i;
+        {
+            vector mD(matDir_[celli][0], matDir_[celli][1], matDir_[celli][2]);
+            R[celli][0] = e0 & mD;
+            R[celli][1] = e1 & mD;
+            R[celli][2] = e2 & mD;
+        }
+        {
+            vector mD(matDir_[celli][3], matDir_[celli][4], matDir_[celli][5]);
+            R[celli][3] = e0 & mD;
+            R[celli][4] = e1 & mD;
+            R[celli][5] = e2 & mD;
+        }
+        {
+            vector mD(matDir_[celli][6], matDir_[celli][7], matDir_[celli][8]);
+            R[celli][6] = e0 & mD;
+            R[celli][7] = e1 & mD;
+            R[celli][8] = e2 & mD;
+        }
+    }
+
+    //Info << "R is " << R.internalField() << endl;
+    R.correctBoundaryConditions();
+    //R.write();
+
+    //- rotate C to global corrdinate system
+    //Info << "C_ local is " << C_.internalField() << endl;
+    C_.correctBoundaryConditions();
+    C_ = transform(R, C_);
+    C_.correctBoundaryConditions();
+    //Info << "C_ global is " << C_.internalField() << endl;
 }
 
 
@@ -362,7 +371,7 @@ Foam::scalar Foam::orthotropicLinearElastic::sigmaY
     const label cellID
 ) const
 {
-  return GREAT;
+    return GREAT;
 }
 
 Foam::scalar Foam::orthotropicLinearElastic::dSigmaY
@@ -371,13 +380,13 @@ Foam::scalar Foam::orthotropicLinearElastic::dSigmaY
     const label cellID
 ) const
 {
-  return 0;
+    return 0;
 }
 
 //Foam::tmp<Foam::volTensorField> Foam::orthotropicLinearElastic::K() const
 Foam::tmp<Foam::volDiagTensorField> Foam::orthotropicLinearElastic::K() const
 {
-  tmp<volDiagTensorField> tresult
+    tmp<volDiagTensorField> tresult
     (
         new volDiagTensorField
         (
@@ -395,34 +404,34 @@ Foam::tmp<Foam::volDiagTensorField> Foam::orthotropicLinearElastic::K() const
         )
     );
 
-  volDiagTensorField& K = tresult();
+    volDiagTensorField& K = tresult();
 
-  forAll(K, celli)
+    forAll(K, celli)
     {
       K[celli].xx() = C_[celli].xxxx();
       K[celli].yy() = C_[celli].yyyy();
       K[celli].zz() = C_[celli].zzzz();
     }
 
-  tresult().correctBoundaryConditions();
+    tresult().correctBoundaryConditions();
 
-  return tresult;
+    return tresult;
 }
 
 Foam::tmp<Foam::volSymmTensor4thOrderField> Foam::orthotropicLinearElastic::C() const
 {
-  tmp<volSymmTensor4thOrderField> tresult
+    tmp<volSymmTensor4thOrderField> tresult
     (
         new volSymmTensor4thOrderField
         (
-	 C_
-	 )
+            C_
+        )
     );
 
-  volSymmTensor4thOrderField& result = tresult();
+    volSymmTensor4thOrderField& result = tresult();
 
-  result.correctBoundaryConditions();
+    result.correctBoundaryConditions();
 
-  return tresult;
+    return tresult;
 }
 // ************************************************************************* //

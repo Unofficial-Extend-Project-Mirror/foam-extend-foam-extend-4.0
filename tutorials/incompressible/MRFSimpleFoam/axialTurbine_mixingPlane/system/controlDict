@@ -16,7 +16,7 @@ FoamFile
 
 libs
 (
-    "liblduSolvers.so" 
+    "liblduSolvers.so"
 )
 
 application MRFSimpleFoam;

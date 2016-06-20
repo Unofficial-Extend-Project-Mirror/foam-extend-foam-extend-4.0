@@ -66,7 +66,7 @@ public:
         //- Construct from mesh
         numericFluxBase(const fvMesh& mesh)
         :
-            basicNumericFlux(mesh)    
+            basicNumericFlux(mesh)
         {}
 
 

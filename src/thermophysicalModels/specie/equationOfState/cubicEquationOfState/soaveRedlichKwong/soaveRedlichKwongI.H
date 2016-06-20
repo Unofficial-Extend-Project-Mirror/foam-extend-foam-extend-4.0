@@ -310,7 +310,7 @@ inline scalar soaveRedlichKwong::d2vdT2
     scalar dpdv2=this->dpdv(rho, T)*this->dpdv(rho, T);
     scalar dpdv3=dpdv2*this->dpdv(rho, T);
 
-    return 
+    return
     -(
           dpdT2*this->d2pdv2(rho, T)
         + dpdv2*this->d2pdT2(rho, T)

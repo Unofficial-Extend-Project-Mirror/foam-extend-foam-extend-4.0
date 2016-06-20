@@ -104,9 +104,9 @@ function(GetGitBranchName var)
     foreach(branch ${listOfGitBranches})
         string(REGEX MATCH "\\* .*$" matchString ${branch})
         string(LENGTH "${matchString}" lengthMatchString)
-	if(lengthMatchString GREATER 0)
-	    # We have  match. Cleanup and set retValue
-	    string(REPLACE "* " "" retValue ${matchString})
+        if(lengthMatchString GREATER 0)
+            # We have  match. Cleanup and set retValue
+            string(REPLACE "* " "" retValue ${matchString})
         endif()
     endforeach()
 
@@ -122,7 +122,7 @@ function(GetGitRevNumber var)
     set( retValue "unknown")
 
     execute_process(
-	COMMAND         git rev-parse --short=12 HEAD
+    COMMAND         git rev-parse --short=12 HEAD
         WORKING_DIRECTORY ${FOAM_ROOT}
         OUTPUT_VARIABLE git_rev_number
     )
@@ -259,11 +259,11 @@ elseif(GIT_FOUND)
 
     if(NOT GIT_ECODE)
         # We have a valid git repository.
-	# Grab the branch and revision info. Add to the build name
-	GetGitBranchName(GIT_BRANCH_NAME)
+        # Grab the branch and revision info. Add to the build name
+        GetGitBranchName(GIT_BRANCH_NAME)
         message("Git branch: ${GIT_BRANCH_NAME}")
 
-	GetGitRevNumber(GIT_REV_NUMBER)
+        GetGitRevNumber(GIT_REV_NUMBER)
         message("Git revision: ${GIT_REV_NUMBER}")
 
         SET(BUILDNAME "${BUILDNAME}-git-branch=${GIT_BRANCH_NAME}")
@@ -301,8 +301,8 @@ elseif(GIT_FOUND)
           SET(BUILDNAME "${BUILDNAME}-hg-rev=${GIT_REV_NUMBER}")
         else()
           # Not a git or mercurial repository: no branch nor revision information available
-	  SET(BUILDNAME "${BUILDNAME}-git-branch=unknown")
-	  SET(BUILDNAME "${BUILDNAME}-git-rev=unknown")
+          SET(BUILDNAME "${BUILDNAME}-git-branch=unknown")
+          SET(BUILDNAME "${BUILDNAME}-git-rev=unknown")
         endif()
     endif()
 else()
@@ -379,18 +379,18 @@ IF(BUILD_TESTING)
     IF(RUN_FROM_ONE_TIMESTEP)
         # Modify the cases controlDict file in order to run for only one time step
         MESSAGE("${testRunTimeDirectory}: Modifying the controlDict files for running only one time step in directory: ${TEST_CASE_DIR}")
-	if(CMAKE_HOST_WIN32)
+        if(CMAKE_HOST_WIN32)
           # Need to supply a bash shell to run the script under Windows
           EXECUTE_PROCESS(
             COMMAND bash -c "$ENV{FOAM_TEST_HARNESS_DIR}/scripts/prepareCasesForOneTimeStep.sh ${TEST_CASE_DIR}"
             WORKING_DIRECTORY .
-            )
-	else()
+          )
+        else()
           EXECUTE_PROCESS(
             COMMAND $ENV{FOAM_TEST_HARNESS_DIR}/scripts/prepareCasesForOneTimeStep.sh ${TEST_CASE_DIR}
             WORKING_DIRECTORY .
-            )
-	endif()
+          )
+        endif()
     ENDIF(RUN_FROM_ONE_TIMESTEP)
 
 ENDIF(BUILD_TESTING)

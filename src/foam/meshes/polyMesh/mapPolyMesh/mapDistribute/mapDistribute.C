@@ -134,7 +134,7 @@ Foam::List<Foam::labelPair> Foam::mapDistribute::schedule
 //             const labelPair& twoProcs = comms[i];
 //             label sendProc = twoProcs[0];
 //             label recvProc = twoProcs[1];
-    
+
 //             if (recvProc == Pstream::myProcNo())
 //             {
 //                 Pout<< "    receive from " << sendProc << endl;

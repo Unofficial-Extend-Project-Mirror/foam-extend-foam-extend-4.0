@@ -40,7 +40,6 @@ boundaryField
         deadCellValue      0;
 
         value uniform 0;
-	
     }
 
      input
@@ -60,7 +59,7 @@ boundaryField
         type zeroGradient;
     }
 
-    frontAndBack    
+    frontAndBack
     {
         type empty;
     }

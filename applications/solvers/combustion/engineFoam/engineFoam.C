@@ -100,7 +100,7 @@ int main(int argc, char *argv[])
 #       include "UEqn.H"
 
         // --- PISO loop
-        while (piso.correct()) 
+        while (piso.correct())
         {
 #           include "ftEqn.H"
 #           include "bEqn.H"

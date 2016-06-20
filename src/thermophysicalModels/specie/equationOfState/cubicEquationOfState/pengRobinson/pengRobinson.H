@@ -41,7 +41,7 @@ SourceFiles
 Author
 Christian Lucas
 Institut für Thermodynamik
-Technische Universität Braunschweig 
+Technische Universität Braunschweig
 Germany
 
 \*---------------------------------------------------------------------------*/
@@ -69,7 +69,7 @@ class pengRobinson
     // private data
     //CL: data at critical point
     scalar pcrit_;
-    scalar Tcrit_; 
+    scalar Tcrit_;
     scalar azentricFactor_;
 
     //-Peng Robinson factors
@@ -111,8 +111,8 @@ public:
         //- Construct from components
         inline pengRobinson
         (
-	        const specie& sp
-	    );
+            const specie& sp
+        );
 
         //- Construct from Istream
         pengRobinson(Istream&);

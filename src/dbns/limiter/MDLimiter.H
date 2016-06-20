@@ -218,7 +218,7 @@ public:
                     cellVolume[nei],
                     phiMaxIn[nei] - phi_[nei],
                     phiMinIn[nei] - phi_[nei],
-                    (deltaRRight & gradPhiIn[nei])                    
+                    (deltaRRight & gradPhiIn[nei])
                 );
             }
 

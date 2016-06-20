@@ -88,27 +88,27 @@ bool Foam::dlLibraryTable::open(const fileName& functionLibName)
         // Capitan) with System Integrity Protection (SIP) enabled, let's try
         // building a full path using well-known environment variables. This is
         // the last resort, unless you provide the full pathname yourself.
-	if (!functionLibPtr)
-	{
+        if (!functionLibPtr)
+        {
             fileName l_LIBBIN_Name =
                 getEnv("FOAM_LIBBIN")/osxFileName;
             functionLibPtr =
                 dlopen(l_LIBBIN_Name.c_str(), RTLD_LAZY|RTLD_GLOBAL);
-	}
-	if (!functionLibPtr)
-	{
+        }
+        if (!functionLibPtr)
+        {
             fileName l_SITE_LIBBIN_Name =
                 getEnv("FOAM_SITE_LIBBIN")/osxFileName;
             functionLibPtr =
                 dlopen(l_SITE_LIBBIN_Name.c_str(), RTLD_LAZY|RTLD_GLOBAL);
-	}
-	if (!functionLibPtr)
-	{
+        }
+        if (!functionLibPtr)
+        {
             fileName l_USER_LIBBIN_Name =
                 getEnv("FOAM_USER_LIBBIN")/osxFileName;
             functionLibPtr =
                 dlopen(l_USER_LIBBIN_Name.c_str(), RTLD_LAZY|RTLD_GLOBAL);
-	}
+        }
 #elif defined mingw
         if(!functionLibPtr && functionLibName.ext()=="so") {
             fileName lName=functionLibName.lessExt()+".dll";

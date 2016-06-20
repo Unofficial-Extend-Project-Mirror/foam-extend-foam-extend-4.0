@@ -31,8 +31,8 @@ Description
     templated into the equationOfState
     -> uses the equation of state to calculate all real Gas properties like Enthalpy, Entropy ...
     -> can not be used with the perfectGas equation of state
-   
-    Equations for the real gas correction: Have a look at thermodnamics books e.g. Thermodynamics: 
+
+    Equations for the real gas correction: Have a look at thermodnamics books e.g. Thermodynamics:
     An Engineering Approch, 5 Edition, Chapter 12
 
 SourceFiles
@@ -42,7 +42,7 @@ SourceFiles
 Author
 Christian Lucas
 Institut für Thermodynamik
-Technische Universität Braunschweig 
+Technische Universität Braunschweig
 Germany
 
 \*---------------------------------------------------------------------------*/
@@ -112,11 +112,11 @@ class constantHeatCapacity
         scalar Cp0_;
         //CL: molar values
         scalar cp0_;
-	scalar e0_std;
-	scalar s0_std;
-	scalar integral_p_dv_std;
-	scalar integral_dpdT_dv_std;
-	scalar cp_std;
+        scalar e0_std;
+        scalar s0_std;
+        scalar integral_p_dv_std;
+        scalar integral_dpdT_dv_std;
+        scalar cp_std;
 
     // Private member functions
 
@@ -126,7 +126,7 @@ class constantHeatCapacity
         (
             const equationOfState& st,
             const scalar cp0_
-	);
+        );
 
         //- Construct from components
         //CL: used for the operator*
@@ -159,10 +159,10 @@ public:
         inline static autoPtr<constantHeatCapacity> New(Istream& is);
 
     // Member Functions
-        
-	//- perfect Gas Enthalpy [J/kmol]
+
+    //- perfect Gas Enthalpy [J/kmol]
         inline scalar h0(const scalar T) const;
-	    
+
         //- perfect Gas Entropy [J/(kmol K)]
         inline scalar s0(const scalar T) const;
 
@@ -179,7 +179,7 @@ public:
         inline scalar cp(const scalar rho, const scalar T) const;
 
         //- non Limited Heat capacity at constant pressure [J/(kmol K)]
-	inline scalar cp_nonLimited(const scalar rho, const scalar T) const;
+        inline scalar cp_nonLimited(const scalar rho, const scalar T) const;
 
         //- Heat capacity at constant pressure [J/(kmol K)]
         inline scalar cv(const scalar rho, const scalar T) const;
@@ -189,7 +189,7 @@ public:
 
         //- Entropy [J/(kmol K)]
         inline scalar s(const scalar rho,const scalar T) const;
-	    
+
         //- Internal Energy [J/kmol]
         inline scalar e(const scalar rho, const scalar T) const;
 

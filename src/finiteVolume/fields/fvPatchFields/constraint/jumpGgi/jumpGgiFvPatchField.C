@@ -124,28 +124,27 @@ void jumpGgiFvPatchField<Type>::initInterfaceMatrixUpdate
     scalarField sField(sfc.size());
     if
     (
-	reinterpret_cast<const void*>(&psiInternal)
+        reinterpret_cast<const void*>(&psiInternal)
      == reinterpret_cast<const void*>(&this->internalField())
     )
     {
-	const scalarField jf = jump()().component(cmpt);
+        const scalarField jf = jump()().component(cmpt);
 
-    	forAll (sField, i)
-    	{
+        forAll (sField, i)
+        {
             sField[i] = psiInternal[sfc[i]] + jf[i];
-    	}
+        }
     }
     else
     {
-
-    	forAll (sField, i)
-    	{
+        forAll (sField, i)
+        {
             sField[i] = psiInternal[sfc[i]];
-    	}
+        }
     }
 
     scalarField pnf = this->ggiPatch().interpolate(sField);
-    
+
     // Multiply the field by coefficients and add into the result
     const unallocLabelList& fc = this->ggiPatch().faceCells();
 

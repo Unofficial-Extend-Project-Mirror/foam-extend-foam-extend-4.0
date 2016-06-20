@@ -420,7 +420,7 @@ void Foam::decompositionMethod::fixCyclics
             )   << "Fixed " << nFixedCyclics << " disconnected cyclic faces";
         }
     }
-	while (nFixedCyclics > 0);
+    while (nFixedCyclics > 0);
 }
 
 

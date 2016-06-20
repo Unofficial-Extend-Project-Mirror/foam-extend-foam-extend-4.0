@@ -67,7 +67,7 @@ class aungierRedlichKwong
     // private data
     //CL: data at critical point
     scalar pcrit_;
-    scalar Tcrit_; 
+    scalar Tcrit_;
     scalar rhocrit_;
     scalar azentricFactor_;
 

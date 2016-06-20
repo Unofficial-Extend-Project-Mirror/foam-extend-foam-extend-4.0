@@ -78,7 +78,7 @@ Foam::redlichKwong::redlichKwong(const dictionary& dict)
     rhoMax_(dict.subDict("equationOfState").lookupOrDefault("rhoMax",1500)),
     // Starting GUESS for the density by ideal gas law
     rhostd_(this->rho(this->Pstd(), this->Tstd(), this->Pstd()/(this->Tstd()*this->R())))
-{ 
+{
     is.check("redlichKwong::redlichKwong(Istream& is)");
 }
 

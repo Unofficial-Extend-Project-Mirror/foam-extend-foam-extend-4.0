@@ -321,14 +321,14 @@ Foam::immersedBoundaryFvPatch::toSamplingPoints
 
 
 template<class Type>
-const Foam::tmp<Foam::Field<Type> > 
+const Foam::tmp<Foam::Field<Type> >
 Foam::immersedBoundaryFvPatch::renumberField
 (
     const   Field<Type>& f
 ) const
 {
     const dynamicLabelList& triFInM = this->triFacesInMesh();
-    
+
     tmp<Field<Type> > trf(new Field<Type>(triFInM.size()));
     Field<Type>& rf = trf();
 

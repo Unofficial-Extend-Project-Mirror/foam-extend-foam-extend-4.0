@@ -19,7 +19,7 @@ libs
 (
     "libinterfaceProperties.so"
 )
- 
+
 application     multiphaseInterFoam;
 
 startFrom       latestTime;

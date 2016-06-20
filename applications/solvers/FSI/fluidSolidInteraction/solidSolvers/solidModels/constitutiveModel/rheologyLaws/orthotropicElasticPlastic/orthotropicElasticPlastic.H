@@ -199,8 +199,8 @@ public:
         //- If the rheologyLaw needs plasticity procedures
         virtual bool plasticityModelNeeded() const
         {
-	  return true;
-	};
+            return true;
+        };
 
         //- Return modulus of plasticity
         virtual tmp<volScalarField> Ep() const;

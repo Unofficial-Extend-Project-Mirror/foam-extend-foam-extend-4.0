@@ -49,7 +49,7 @@ INSTRUCTIONS ON HOW TO INSTALL AND RUN THE WINDOWS VERSION OF FOAM-EXTEND
        http://www.open-mpi.org/software/ompi/v1.6/downloads/OpenMPI_v1.6.1-1_win64.exe
        http://www.paraview.org/download
    It is strongly recommended to install these in directories with no white spaces.
-   Once installed, create new environment variables called MPI_ROOTDIR and PARAVIEW_HOME 
+   Once installed, create new environment variables called MPI_ROOTDIR and PARAVIEW_HOME
    to point to the installation directory where you installed them. This can be done by
    editing the user-editable settings in the environment configuration:
        call <PATH_TO_FOAM>\etc\foamWindowsEnvironment.bat

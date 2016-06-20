@@ -136,7 +136,7 @@ void Foam::ggiAMGInterface::initFastReduce() const
 
     // Now local zone indices contain the index of a local face that will
     // provide the data.  For faces that are not local, the index will be -1
- 
+
     // Find out where my zone data is going to
 
     // Make a sending sub-map

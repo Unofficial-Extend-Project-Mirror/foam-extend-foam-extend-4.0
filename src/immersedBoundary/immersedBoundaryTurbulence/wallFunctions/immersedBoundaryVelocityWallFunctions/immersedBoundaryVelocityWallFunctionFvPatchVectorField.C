@@ -212,19 +212,19 @@ immersedBoundaryVelocityWallFunctionFvPatchVectorField::wallTangentialValue() co
 
     const immersedBoundaryFvPatch& ibFvP =
         immersedBoundaryFvPatchVectorField::ibPatch();
-    if 
+    if
     (
-        wallTangentialValue_.empty() 
+        wallTangentialValue_.empty()
      || (ibFvP.movingIb() || ibFvP.boundaryMesh().mesh().moving())
     )
     {
         wallTangentialValue_.setSize
         (
             this->ibPatch().ibCells().size(),
-            0            
+            0
         );
     }
-    
+
     return wallTangentialValue_;
 }
 
@@ -236,9 +236,9 @@ immersedBoundaryVelocityWallFunctionFvPatchVectorField::tauWall() const
 
     const immersedBoundaryFvPatch& ibFvP =
         immersedBoundaryFvPatchVectorField::ibPatch();
-    if 
+    if
     (
-        tauWall_.empty() 
+        tauWall_.empty()
      || (ibFvP.movingIb() || ibFvP.boundaryMesh().mesh().moving())
     )
     {
@@ -248,7 +248,7 @@ immersedBoundaryVelocityWallFunctionFvPatchVectorField::tauWall() const
             vector::zero
         );
     }
-    
+
     return tauWall_;
 }
 
@@ -260,9 +260,9 @@ immersedBoundaryVelocityWallFunctionFvPatchVectorField::wallMask() const
 
     const immersedBoundaryFvPatch& ibFvP =
         immersedBoundaryFvPatchVectorField::ibPatch();
-    if 
+    if
     (
-        wallMask_.empty() 
+        wallMask_.empty()
      || (ibFvP.movingIb() || ibFvP.boundaryMesh().mesh().moving())
     )
     {
@@ -272,7 +272,7 @@ immersedBoundaryVelocityWallFunctionFvPatchVectorField::wallMask() const
             false
         );
     }
-    
+
     return wallMask_;
 }
 

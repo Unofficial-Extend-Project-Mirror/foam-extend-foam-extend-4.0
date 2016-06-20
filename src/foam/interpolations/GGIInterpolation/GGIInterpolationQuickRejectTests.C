@@ -318,7 +318,7 @@ void GGIInterpolation<MasterPatch, SlavePatch>::findNeighboursAABB
     )
 //     forAll (masterPatch_, faceMi)
     {
-        masterPatchBB[faceMi - pmStart] = boundBox 
+        masterPatchBB[faceMi - pmStart] = boundBox
         (
             masterPatch_[faceMi].points(masterPatch_.points()),
             false

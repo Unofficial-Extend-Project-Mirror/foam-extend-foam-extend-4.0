@@ -67,7 +67,7 @@ class soaveRedlichKwong
     // private data
     //CL: data at critical point
     scalar pcrit_;
-    scalar Tcrit_; 
+    scalar Tcrit_;
     scalar azentricFactor_;
 
     //-Soave Redlich Kwong

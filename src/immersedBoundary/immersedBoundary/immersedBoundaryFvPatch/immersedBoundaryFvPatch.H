@@ -562,7 +562,7 @@ public:
 
 
         // Helper functions
-            
+
             //- Renumber Field to corespond to triangular faces contained
             //  inside the mesh
             template<class Type>

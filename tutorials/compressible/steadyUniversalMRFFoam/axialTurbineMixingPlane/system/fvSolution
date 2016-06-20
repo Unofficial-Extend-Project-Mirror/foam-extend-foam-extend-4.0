@@ -47,7 +47,8 @@ solvers
         tolerance        1e-7;
         relTol           0.1;
     }
-	T
+
+    T
     {
         solver           smoothSolver;
         smoother         GaussSeidel;
@@ -55,7 +56,8 @@ solvers
         tolerance        1e-7;
         relTol           0.1;
     }
-    i	
+
+    i
     {
         solver           smoothSolver;
         smoother         GaussSeidel;
@@ -87,9 +89,9 @@ relaxationFactors
     U               0.1;
     p               0.1;
     h               0.1;
-	i               0.1;
+    i               0.1;
     rho             0.1;
-    T		    0.1;
+    T               0.1;
 
     k               0.1;
     epsilon         0.1;
@@ -97,10 +99,10 @@ relaxationFactors
 
 fieldBounds
 {
-    p      50     1e8;
-    T      100    1000;
-    U   1000;
-    epsilon  0	1e6;
+    p        50     1e8;
+    T        100    1000;
+    U               1000;
+    epsilon  0      1e6;
 }
 
 

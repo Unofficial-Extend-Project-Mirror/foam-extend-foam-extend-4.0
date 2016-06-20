@@ -997,7 +997,7 @@ Foam::BlockMatrixAgglomeration<Type>::restrictMatrix() const
             // of block coefficients must be done by a FIELD (not interface)
             // via a new set of virtual functions
             // HJ, 16/Mar/2016
-                
+
             // Note: in the scalar AMG, agglomeration is done by the interface
             // (always scalar) but in the block matrix it is done by a
             // templated block interface field

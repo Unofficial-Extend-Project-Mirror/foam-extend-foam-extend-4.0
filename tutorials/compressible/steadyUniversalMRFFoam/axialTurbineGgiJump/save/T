@@ -24,14 +24,14 @@ boundaryField
     GVINLET
     {
         type            fixedValue;
-		value           uniform 305.66;
+        value           uniform 305.66;
     }
     GVOUTLET
     {
         type            ggiEnthalpyJump;
-		patchType 		ggi;
+        patchType       ggi;
         rotating        false;
-		value           uniform 305.66;
+        value           uniform 305.66;
     }
     GVCYCLIC
     {
@@ -52,16 +52,16 @@ boundaryField
     RUINLET
     {
         type            ggiEnthalpyJump;
-	    patchType 		ggi;
-        rotating 		true;
-		value           uniform 305.66;
+        patchType       ggi;
+        rotating        true;
+        value           uniform 305.66;
     }
     RUOUTLET
     {
         type            ggiEnthalpyJump;
-		patchType 		ggi;
-		rotating 		true;
-		value           uniform 305.66;
+        patchType         ggi;
+        rotating         true;
+        value           uniform 305.66;
     }
     RUCYCLIC1
     {
@@ -86,9 +86,9 @@ boundaryField
     DTINLET
     {
         type            ggiEnthalpyJump;
-        patchType 		ggi;
+        patchType       ggi;
         rotating        false;
-		value           uniform 305.66;
+        value           uniform 305.66;
     }
     DTOUTLET
     {

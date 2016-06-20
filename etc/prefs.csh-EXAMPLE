@@ -170,7 +170,7 @@
 # You can override your identifier using this environment variable
 #setenv CDASH_SUBMIT_LOCAL_HOST_ID choose_your_CDash_system_identifer
 
-# Buildname suffix for the FOAM CDash test harness on foam-extend 
+# Buildname suffix for the FOAM CDash test harness on foam-extend
 # By default, the git branch name and git revision number will be
 # appended to the CDash build name.
 # Otherwise, for users not using git, or wanting to provide additionnal

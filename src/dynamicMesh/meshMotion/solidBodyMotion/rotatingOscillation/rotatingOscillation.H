@@ -106,8 +106,8 @@ public:
 
         //- Return the solid-body motion transformation septernion
         virtual septernion transformation() const;
-	
-	//- Return the solid-body motion velocity
+
+    //- Return the solid-body motion velocity
         virtual septernion velocity() const;
 
         //- Update properties from given dictionary

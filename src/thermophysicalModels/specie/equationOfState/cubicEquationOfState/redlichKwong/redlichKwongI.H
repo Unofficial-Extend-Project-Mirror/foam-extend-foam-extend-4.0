@@ -126,7 +126,7 @@ inline scalar redlichKwong::p(const scalar rho, const scalar T) const
 }
 
 
-//Real deviative dp/dv at constant temperature 
+//Real deviative dp/dv at constant temperature
 //(molar values)
 inline scalar redlichKwong::dpdv(const scalar rho, const scalar T) const
 {
@@ -233,7 +233,7 @@ inline scalar redlichKwong::d2vdT2(const scalar rho, const scalar T) const
     scalar dpdv2=this->dpdv(rho, T)*this->dpdv(rho, T);
     scalar dpdv3=dpdv2*this->dpdv(rho, T);
 
-    return 
+    return
     -(
           dpdT2*this->d2pdv2(rho, T)
         + dpdv2*this->d2pdT2(rho, T)
@@ -250,7 +250,7 @@ inline scalar redlichKwong::d2pdvdT(const scalar rho, const scalar T) const
     scalar Vm2 = Vm*Vm;
     scalar Vm3 = Vm2*Vm;
     scalar T15_ = pow(T, 1.5);
-    
+
     return
     -(
         0.5*

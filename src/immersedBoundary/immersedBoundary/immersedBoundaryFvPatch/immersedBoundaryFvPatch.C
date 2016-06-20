@@ -2582,7 +2582,7 @@ Foam::immersedBoundaryFvPatch::triFacesInMesh() const
 
         triFacesInMesh_.clear();
         triFacesInMesh_.setCapacity(triCf.size()/2);
-    
+
         // Find tri faces with centre inside the processor mesh
         forAll(triCf, fI)
         {

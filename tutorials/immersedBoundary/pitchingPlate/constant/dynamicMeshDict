@@ -23,13 +23,12 @@ immersedBoundarySolidBodyMotionFvMeshCoeffs
     (
         ibCylinder
         {
-
             solidBodyMotionFunction     rotatingOscillation;
             rotatingOscillationCoeffs
             {
-                origin		(0 0 0);
-		amplitude    (0 0 14);
-                period      0.5;
+                origin       (0 0 0);
+                amplitude    (0 0 14);
+                period       0.5;
             }
         }
     );

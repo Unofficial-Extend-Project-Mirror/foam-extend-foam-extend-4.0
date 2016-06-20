@@ -128,11 +128,11 @@ public:
 
         // Access
 
-		    //- Return reference to GGI patch
-			const ggiFvPatch& ggiPatch() const
-			{
-				return ggiPatch_;
-			}
+            //- Return reference to GGI patch
+            const ggiFvPatch& ggiPatch() const
+            {
+                return ggiPatch_;
+            }
 
             //- Return shadow patch field
             const ggiFvPatchField<Type>& shadowPatchField() const;

@@ -588,7 +588,7 @@ Foam::scalar Foam::drhodh(SteamState S)
     else
     {
          Info<<"IAPWS-IF97.C error, outside the regions 1-4"<<endl;
-         
+
          // Keep compiler happy
          drhodh = 0;
     }

@@ -179,9 +179,9 @@ Foam::Field<Type>& immersedBoundaryWallFunctionFvPatchField<Type>::wallValue() c
     const immersedBoundaryFvPatch& ibFvP =
         immersedBoundaryFvPatchField<Type>::ibPatch();
 
-    if 
+    if
     (
-        wallValue_.empty() 
+        wallValue_.empty()
      || (ibFvP.movingIb() || ibFvP.boundaryMesh().mesh().moving())
     )
     {
@@ -191,7 +191,7 @@ Foam::Field<Type>& immersedBoundaryWallFunctionFvPatchField<Type>::wallValue() c
             pTraits<Type>::zero
         );
     }
-    
+
     return wallValue_;
 }
 
@@ -207,9 +207,9 @@ Foam::boolList& immersedBoundaryWallFunctionFvPatchField<Type>::wallMask() const
     const immersedBoundaryFvPatch& ibFvP =
         immersedBoundaryFvPatchField<Type>::ibPatch();
 
-    if 
+    if
     (
-        wallMask_.empty() 
+        wallMask_.empty()
      || (ibFvP.movingIb() || ibFvP.boundaryMesh().mesh().moving())
     )
     {
@@ -219,7 +219,7 @@ Foam::boolList& immersedBoundaryWallFunctionFvPatchField<Type>::wallMask() const
             false
         );
     }
-    
+
     return wallMask_;
 }
 

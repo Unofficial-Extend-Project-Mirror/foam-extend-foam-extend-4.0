@@ -339,7 +339,7 @@ gradientBoundaryCoeffs() const
         vectorField nGradU =
             2
            *(
-		*this
+                *this
               - (patchInternalField() + dUP)
             )*this->patch().deltaCoeffs()
           - nGradUP;

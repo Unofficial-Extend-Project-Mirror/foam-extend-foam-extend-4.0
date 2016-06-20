@@ -17,7 +17,7 @@ FoamFile
 
 libs
 (
-    "libfvMotionSolver.so" 
+    "libfvMotionSolver.so"
 )
 
 application    moveDynamicMesh;

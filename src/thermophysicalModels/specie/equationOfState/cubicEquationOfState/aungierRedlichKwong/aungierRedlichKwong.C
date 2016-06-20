@@ -98,7 +98,7 @@ Foam::aungierRedlichKwong::aungierRedlichKwong(const dictionary& dict)
     daSave(0.0),
     d2aSave(0.0),
     TSave(0.0)
-{ 
+{
     is.check("aungierRedlichKwong::aungierRedlichKwong(Istream& is)");
 }
 
