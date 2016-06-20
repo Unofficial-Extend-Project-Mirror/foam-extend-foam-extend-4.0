@@ -64,7 +64,7 @@ void pointPatchInterpolation::interpolate
 
     forAll(bm, patchi)
     {
-        if (!isA<emptyFvPatch>(bm[patchi]) && !bm[patchi].coupled())
+        if (!isA<emptyFvPatch>(bm[patchi]) && bm[patchi].coupled())
         {
             pointPatchField<Type>& ppf = pf.boundaryField()[patchi];
 
