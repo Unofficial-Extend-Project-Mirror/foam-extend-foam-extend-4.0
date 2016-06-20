@@ -618,26 +618,21 @@ void Foam::sixDOFqODE::relaxAcceleration
         OmegaDotn_[2] = (inv(momentOfInertia_) & moment()).value();
     }
 
-    const dimensionedVector Aold
-    (
-        "",
-        dimensionSet(0, 1, -2, 0, 0, 0, 0),
-        A_[2]
-    );
+    const vector Aold = A_[2];
 
-    const dimensionedVector OmegaDotold
-    (
-        "",
-        dimensionSet(0, 0, -2, 0, 0, 0, 0),
-        OmegaDot_[2]
-    );
+    const vector OmegaDotold = OmegaDot_[2];
 
-    force() =
-        Aold*mass_ + relaxFactorT_*(force() - Aold*mass_);
+    force().value() =
+        Aold*mass_.value()
+      + relaxFactorT_*(force().value() - Aold*mass_.value());
 
-    moment() =
-        (momentOfInertia_ & OmegaDotold)
-      + relaxFactorR_*(moment() - (momentOfInertia_ & OmegaDotold));
+    moment().value() =
+        (momentOfInertia_.value() & OmegaDotold)
+      + relaxFactorR_*
+        (
+            moment().value()
+          - (momentOfInertia_.value() & OmegaDotold)
+        );
 
     // Update relaxed old accelerations
     A_[0] = A_[1];
