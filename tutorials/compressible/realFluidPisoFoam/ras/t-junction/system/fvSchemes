@@ -1,9 +1,9 @@
-/*---------------------------------------------------------------------------*\
-  =========                 |
-  \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | foam-extend: Open Source CFD                    |
+|  \\    /   O peration     | Version:     4.0                                |
+|   \\  /    A nd           | Web:         http://www.foam-extend.org         |
+|    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 FoamFile
 {
@@ -69,5 +69,6 @@ fluxRequired
     default         no;
     p               ;
 }
+
 
 // ************************************************************************* //

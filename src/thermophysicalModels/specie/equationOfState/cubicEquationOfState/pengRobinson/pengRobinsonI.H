@@ -1,26 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
-   \\    /   O peration     |
-    \\  /    A nd           | Copyright held by original author
-     \\/     M anipulation  |
+  \\      /  F ield         | foam-extend: Open Source CFD
+   \\    /   O peration     | Version:     4.0
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of foam-extend.
 
-    OpenFOAM is free software; you can redistribute it and/or modify it
+    foam-extend is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 2 of the License, or (at your
+    Free Software Foundation, either version 3 of the License, or (at your
     option) any later version.
 
-    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenFOAM; if not, write to the Free Software Foundation,
-    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Author
 Christian Lucas
@@ -68,8 +67,8 @@ inline pengRobinson::pengRobinson(const word& name, const pengRobinson& pr)
     rhoMin_(pr.rhoMin_),
     rhoMax_(pr.rhoMax_),
     rhostd_(pr.rhostd_),
-    aSave(0.0), 
-    daSave(0.0), 
+    aSave(0.0),
+    daSave(0.0),
     d2aSave(0.0),
     TSave(0.0)
 {}
@@ -199,7 +198,7 @@ inline scalar pengRobinson::n() const
 inline scalar pengRobinson::p(const scalar rho, const scalar T) const
 {
     scalar Vm = this->W()/rho;
-    scalar Vm2 = Vm*Vm; 
+    scalar Vm2 = Vm*Vm;
     return this->RR()*T/(Vm - b_) - a(T)/(Vm2 + 2*b_*Vm - b2_);
 }
 
@@ -336,7 +335,7 @@ inline scalar pengRobinson::d2vdT2
     scalar dpdv2=this->dpdv(rho, T)*this->dpdv(rho, T);
     scalar dpdv3=dpdv2*this->dpdv(rho, T);
 
-    return 
+    return
     -(
           dpdT2*this->d2pdv2(rho, T)
         + dpdv2*this->d2pdT2(rho, T)
@@ -357,7 +356,7 @@ inline scalar pengRobinson::d2pdvdT
     scalar Vm2 = Vm*Vm;
     scalar Vm3 = Vm2*Vm;
     scalar Vm4 = Vm3*Vm;
-  
+
     return
     (
         2*dadT(T)*(b3_ - b2_*Vm - b_*Vm2 + Vm3)

@@ -1,26 +1,25 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
-   \\    /   O peration     |
-    \\  /    A nd           | Copyright held by original author
-     \\/     M anipulation  |
+  \\      /  F ield         | foam-extend: Open Source CFD
+   \\    /   O peration     | Version:     4.0
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is part of foam-extend.
 
-    OpenFOAM is free software; you can redistribute it and/or modify it
+    foam-extend is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 2 of the License, or (at your
+    Free Software Foundation, either version 3 of the License, or (at your
     option) any later version.
 
-    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenFOAM; if not, write to the Free Software Foundation,
-    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 \*---------------------------------------------------------------------------*/
 
@@ -113,14 +112,14 @@ void Foam::fluidSolidInterface::calcFluidToSolidInterpolator() const
     }
 
     std::shared_ptr<RBFFunctionInterface> rbfFunction;
-    rbfFunction = std::shared_ptr<RBFFunctionInterface>( new TPSFunction() );
+    rbfFunction = std::shared_ptr<RBFFunctionInterface>(new TPSFunction());
 
     // std::shared_ptr<RBFInterpolation> rbf;
     fluidToSolidPtr_ =
         std::shared_ptr<RBFInterpolation>
         (
-            new RBFInterpolation( rbfFunction )
-            // new RBFInterpolation( rbfFunctionPtr_ )
+            new RBFInterpolation(rbfFunction)
+            // new RBFInterpolation(rbfFunctionPtr_)
         );
 
     vectorField solidZoneFaceCentres =
@@ -146,7 +145,7 @@ void Foam::fluidSolidInterface::calcFluidToSolidInterpolator() const
         solidX(faceI, 2) = solidZoneFaceCentres[faceI].z();
     }
 
-    fluidToSolidPtr_->compute( fluidX, solidX );
+    fluidToSolidPtr_->compute(fluidX, solidX);
 
     Info << "Checking fluid-to-solid interpolator" << endl;
     {
@@ -186,39 +185,39 @@ void Foam::fluidSolidInterface::calcFluidToSolidInterpolator() const
                 solidMesh().boundaryMesh()[solidPatchIndex_].faceCentres()
             );
 
-	matrix fluidX(fluidZoneFaceCentres.size(), 3);
-	// matrix solidX(solidPatchFaceCentres.size(), 3);
-	matrix fluidXsolid(solidPatchFaceCentres.size(), 3);
+        matrix fluidX(fluidZoneFaceCentres.size(), 3);
+        // matrix solidX(solidPatchFaceCentres.size(), 3);
+        matrix fluidXsolid(solidPatchFaceCentres.size(), 3);
 
-	forAll(fluidZoneFaceCentres, faceI)
+        forAll(fluidZoneFaceCentres, faceI)
         {
             fluidX(faceI, 0) = fluidZoneFaceCentres[faceI].x();
             fluidX(faceI, 1) = fluidZoneFaceCentres[faceI].y();
             fluidX(faceI, 2) = fluidZoneFaceCentres[faceI].z();
         }
 
-	// forAll(solidPatchFaceCentres, faceI)
+        // forAll(solidPatchFaceCentres, faceI)
         // {
         //     solidX(faceI, 0) = solidPatchFaceCentres[faceI].x();
         //     solidX(faceI, 1) = solidPatchFaceCentres[faceI].y();
         //     solidX(faceI, 2) = solidPatchFaceCentres[faceI].z();
         // }
 
-	// fluidToSolidPtr_->compute( fluidX, solidX );
-	fluidToSolidPtr_->interpolate( fluidX, fluidXsolid );
+        // fluidToSolidPtr_->compute(fluidX, solidX);
+        fluidToSolidPtr_->interpolate(fluidX, fluidXsolid);
 
-	vectorField fluidPatchFaceCentresAtSolid
+        vectorField fluidPatchFaceCentresAtSolid
         (
             solidPatchFaceCentres.size(),
             vector::zero
         );
 
-	forAll(fluidPatchFaceCentresAtSolid, faceI)
-	{
+        forAll(fluidPatchFaceCentresAtSolid, faceI)
+        {
             fluidPatchFaceCentresAtSolid[faceI].x() = fluidXsolid(faceI, 0);
             fluidPatchFaceCentresAtSolid[faceI].y() = fluidXsolid(faceI, 1);
             fluidPatchFaceCentresAtSolid[faceI].z() = fluidXsolid(faceI, 2);
-	}
+        }
 
         scalar maxDist = gMax
         (
@@ -515,14 +514,14 @@ void Foam::fluidSolidInterface::calcSolidToFluidInterpolator() const
     }
 
     std::shared_ptr<RBFFunctionInterface> rbfFunction;
-    rbfFunction = std::shared_ptr<RBFFunctionInterface>( new TPSFunction() );
+    rbfFunction = std::shared_ptr<RBFFunctionInterface>(new TPSFunction());
 
     // std::shared_ptr<RBFInterpolation> rbf;
     solidToFluidPtr_ =
         std::shared_ptr<RBFInterpolation>
         (
-            new RBFInterpolation( rbfFunction )
-            // new RBFInterpolation( rbfFunctionPtr_ )
+            new RBFInterpolation(rbfFunction)
+            // new RBFInterpolation(rbfFunctionPtr_)
         );
 
     vectorField solidZonePoints =
@@ -548,7 +547,7 @@ void Foam::fluidSolidInterface::calcSolidToFluidInterpolator() const
         solidX(faceI, 2) = solidZonePoints[faceI].z();
     }
 
-    solidToFluidPtr_->compute( solidX, fluidX );
+    solidToFluidPtr_->compute(solidX, fluidX);
 
     Info << "Checking solid-to-fluid interpolator" << endl;
     {
@@ -564,14 +563,14 @@ void Foam::fluidSolidInterface::calcSolidToFluidInterpolator() const
             solidPoints(faceI, 2) = solidZonePoints[faceI].z();
         }
 
-	solidToFluidPtr_->interpolate( solidPoints, fluidPoints );
+        solidToFluidPtr_->interpolate(solidPoints, fluidPoints);
 
-	forAll(fluidZonePoints, faceI)
-	{
+        forAll(fluidZonePoints, faceI)
+        {
             fluidZonePointsInterp[faceI].x() = fluidPoints(faceI, 0);
             fluidZonePointsInterp[faceI].y() = fluidPoints(faceI, 1);
             fluidZonePointsInterp[faceI].z() = fluidPoints(faceI, 2);
-	}
+        }
 
         scalar maxDist = gMax
         (
@@ -2026,24 +2025,24 @@ void Foam::fluidSolidInterface::updateForce()
     {
         Info << "... using RBF interpolation" << endl;
 
-	matrix fluidForce(fluidZoneTotalTraction.size(), 3);
-	matrix solidForce(solidZoneTotalTraction.size(), 3);
+        matrix fluidForce(fluidZoneTotalTraction.size(), 3);
+        matrix solidForce(solidZoneTotalTraction.size(), 3);
 
-	forAll(fluidZoneTotalTraction, faceI)
+        forAll(fluidZoneTotalTraction, faceI)
         {
             fluidForce(faceI, 0) = fluidZoneTotalTraction[faceI].x();
             fluidForce(faceI, 1) = fluidZoneTotalTraction[faceI].y();
             fluidForce(faceI, 2) = fluidZoneTotalTraction[faceI].z();
         }
 
-	fluidToSolid()->interpolate( fluidForce, solidForce );
+        fluidToSolid()->interpolate(fluidForce, solidForce);
 
-	forAll(solidZoneTotalTraction, faceI)
-	{
+        forAll(solidZoneTotalTraction, faceI)
+        {
             solidZoneTotalTraction[faceI].x() = -solidForce(faceI, 0);
             solidZoneTotalTraction[faceI].y() = -solidForce(faceI, 1);
             solidZoneTotalTraction[faceI].z() = -solidForce(faceI, 2);
-	}
+        }
     }
     else
     {
@@ -2723,41 +2722,41 @@ Foam::scalar Foam::fluidSolidInterface::updateResidual()
     {
         Info << "Displacement interpolation using RBF interpolation" << endl;
 
-	matrix fluidDispl(solidZonePointsDispl().size(), 3);
-	matrix solidDispl(solidZonePointsDisplAtSolid.size(), 3);
+        matrix fluidDispl(solidZonePointsDispl().size(), 3);
+        matrix solidDispl(solidZonePointsDisplAtSolid.size(), 3);
 
-	forAll(solidZonePointsDisplAtSolid, pointI)
+        forAll(solidZonePointsDisplAtSolid, pointI)
         {
             solidDispl(pointI, 0) = solidZonePointsDisplAtSolid[pointI].x();
             solidDispl(pointI, 1) = solidZonePointsDisplAtSolid[pointI].y();
             solidDispl(pointI, 2) = solidZonePointsDisplAtSolid[pointI].z();
         }
 
-	solidToFluid()->interpolate( solidDispl, fluidDispl );
+        solidToFluid()->interpolate(solidDispl, fluidDispl);
 
-	forAll(solidZonePointsDispl(), pointI)
-	{
+        forAll(solidZonePointsDispl(), pointI)
+        {
             solidZonePointsDispl()[pointI].x() = fluidDispl(pointI, 0);
             solidZonePointsDispl()[pointI].y() = fluidDispl(pointI, 1);
             solidZonePointsDispl()[pointI].z() = fluidDispl(pointI, 2);
-	}
+        }
 
         // Total displacement
-	forAll(solidZonePointsTotDisplAtSolid, pointI)
+        forAll(solidZonePointsTotDisplAtSolid, pointI)
         {
             solidDispl(pointI, 0) = solidZonePointsTotDisplAtSolid[pointI].x();
             solidDispl(pointI, 1) = solidZonePointsTotDisplAtSolid[pointI].y();
             solidDispl(pointI, 2) = solidZonePointsTotDisplAtSolid[pointI].z();
         }
 
-	solidToFluid()->interpolate( solidDispl, fluidDispl );
+        solidToFluid()->interpolate(solidDispl, fluidDispl);
 
-	forAll(solidZonePointsTotDispl, pointI)
-	{
+        forAll(solidZonePointsTotDispl, pointI)
+        {
             solidZonePointsTotDispl[pointI].x() = fluidDispl(pointI, 0);
             solidZonePointsTotDispl[pointI].y() = fluidDispl(pointI, 1);
             solidZonePointsTotDispl[pointI].z() = fluidDispl(pointI, 2);
-	}
+        }
     }
     else
     {

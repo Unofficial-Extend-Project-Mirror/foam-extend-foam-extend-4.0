@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     4.0
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -24,7 +24,7 @@ License
 Author
 Christian Lucas
 Institut für Thermodynamik
-Technische Universität Braunschweig 
+Technische Universität Braunschweig
 Germany
 
 \*---------------------------------------------------------------------------*/
@@ -46,7 +46,7 @@ inline Foam::constantHeatCapacity<equationOfState>::constantHeatCapacity
     s0_std(s0(this->Tstd)),
     integral_p_dv_std(this->integral_p_dv(this->rhostd(),this->Tstd)),
     integral_dpdT_dv_std(this->integral_dpdT_dv(this->rhostd(),this->Tstd)),
-    cp_std(this->cp_nonLimited(this->rhostd(),this->Tstd)) 
+    cp_std(this->cp_nonLimited(this->rhostd(),this->Tstd))
 {}
 
 
@@ -70,7 +70,7 @@ inline Foam::constantHeatCapacity<equationOfState>::constantHeatCapacity
     s0_std(s0_std_),
     integral_p_dv_std(integral_p_dv_std_),
     integral_dpdT_dv_std(integral_dpdT_dv_std_),
-    cp_std(cp_std_) 
+    cp_std(cp_std_)
 {}
 
 
@@ -116,7 +116,7 @@ Foam::constantHeatCapacity<equationOfState>::New(Istream& is)
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 //used to calculate the internal energy
-//perfect gas enthalpy 
+//perfect gas enthalpy
 template<class equationOfState>
 inline Foam::scalar Foam::constantHeatCapacity<equationOfState>::h0
 (
@@ -128,7 +128,7 @@ inline Foam::scalar Foam::constantHeatCapacity<equationOfState>::h0
 
 
 //used to calculate the internal energy
-//perfect gas internal energy 
+//perfect gas internal energy
 template<class equationOfState>
 inline Foam::scalar Foam::constantHeatCapacity<equationOfState>::e0
 (
@@ -137,10 +137,10 @@ inline Foam::scalar Foam::constantHeatCapacity<equationOfState>::e0
 {
     return this->h0(T) - this->RR()*T;
 }
-	
-    
+
+
 // used to calculate the entropy
-// perfect gas entropy 
+// perfect gas entropy
 template<class equationOfState>
 inline Foam::scalar Foam::constantHeatCapacity<equationOfState>::s0
 (
@@ -180,14 +180,14 @@ template<class equationOfState>
 inline Foam::scalar Foam::constantHeatCapacity<equationOfState>::cp
 (
      const scalar rho,
-     const scalar T 
+     const scalar T
 ) const
 {
-    // Problem --> dpdv(rho,T)  is =0 at some points within the vapour dome. To increase stability, (dp/dv) has to be limited 
+    // Problem --> dpdv(rho,T)  is =0 at some points within the vapour dome. To increase stability, (dp/dv) has to be limited
     // cp can be negative within the vapor dome. To avoid this nonphysical result, the absolute value is used.
-    // within the vapourdome and at the critical point, cp increases to very high values --> infinity, 
-    // this would decrease the stability, so cp will be limited to 20 times the cp @ STD    
-    return  
+    // within the vapourdome and at the critical point, cp increases to very high values --> infinity,
+    // this would decrease the stability, so cp will be limited to 20 times the cp @ STD
+    return
     min
     (
         cp_std*20,
@@ -196,7 +196,7 @@ inline Foam::scalar Foam::constantHeatCapacity<equationOfState>::cp
             this->cv(rho,T)
           - T*pow((this->dpdT(rho, T)), 2)/min(this->dpdv(rho, T), -1)
         )
-    ); 
+    );
 }
 
 
@@ -206,10 +206,10 @@ template<class equationOfState>
 inline Foam::scalar Foam::constantHeatCapacity<equationOfState>::cp_nonLimited
 (
      const scalar rho,
-     const scalar T 
+     const scalar T
 ) const
 {
-    return 
+    return
         fabs(this->cv(rho, T)
       - T*pow((this->dpdT(rho, T)), 2)/min(this->dpdv(rho, T), -1));
 }
@@ -222,7 +222,6 @@ inline Foam::scalar Foam::constantHeatCapacity<equationOfState>::cv
 (
     const scalar rho,
     const scalar T
-    
 ) const
 {
     return this->cv0(T) + T*this->integral_d2pdT2_dv(rho, T);
@@ -232,9 +231,9 @@ inline Foam::scalar Foam::constantHeatCapacity<equationOfState>::cv
 //function to calculate real gas enthalpy
 template<class equationOfState>
 inline Foam::scalar Foam::constantHeatCapacity<equationOfState>::h
-(   
+(
     const scalar rho,
-    const scalar T   
+    const scalar T
 ) const
 {
     return
@@ -249,12 +248,12 @@ inline Foam::scalar Foam::constantHeatCapacity<equationOfState>::h
 // equation: du= cv0 dT +[T*dp/dT -p]dv
 template<class equationOfState>
 inline Foam::scalar Foam::constantHeatCapacity<equationOfState>::e
-(   
+(
     const scalar rho,
-    const scalar T    
+    const scalar T
 ) const
 {
-    return 
+    return
       - this->Tstd()*integral_dpdT_dv_std
       + integral_p_dv_std
       + this->e0(T)
@@ -273,7 +272,6 @@ inline Foam::scalar Foam::constantHeatCapacity<equationOfState>::s
 (
     const scalar rho,
     const scalar T
-    
 ) const
 {
     return
@@ -293,7 +291,6 @@ inline void Foam::constantHeatCapacity<equationOfState>::operator+=
     const constantHeatCapacity<equationOfState>& np
 )
 {
-	
     scalar molr1 = this->nMoles();
 
     equationOfState::operator+=(np);
@@ -378,8 +375,8 @@ inline Foam::constantHeatCapacity<equationOfState> Foam::operator*
     const constantHeatCapacity<equationOfState>& np
 )
 {
-    //CL: values at STD don't need to be recalculated, 
-    //CL: therefore, providing the values in the constructor 
+    //CL: values at STD don't need to be recalculated,
+    //CL: therefore, providing the values in the constructor
     return constantHeatCapacity<equationOfState>
     (
         s*static_cast<const equationOfState&>(np),

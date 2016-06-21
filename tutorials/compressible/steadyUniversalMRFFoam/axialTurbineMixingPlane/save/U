@@ -1,7 +1,7 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | foam-extend: Open Source CFD                    |
-|  \\    /   O peration     | Version:     3.2                                |
+|  \\    /   O peration     | Version:     4.0                                |
 |   \\  /    A nd           | Web:         http://www.foam-extend.org         |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
@@ -28,7 +28,7 @@ boundaryField
     GVOUTLET
     {
         type            mixingPlane;
-		value           uniform (0 0 -1);
+        value           uniform (0 0 -1);
     }
     GVCYCLIC
     {
@@ -52,12 +52,12 @@ boundaryField
     RUINLET
     {
         type            mixingPlane;
-		value           uniform (0 0 -1);
+        value           uniform (0 0 -1);
     }
     RUOUTLET
     {
         type            mixingPlane;
-		value           uniform (0 0 -1);
+        value           uniform (0 0 -1);
     }
     RUCYCLIC1
     {
@@ -85,7 +85,7 @@ boundaryField
     DTINLET
     {
         type            mixingPlane;
-		value           uniform (0 0 -1);
+        value           uniform (0 0 -1);
     }
     DTOUTLET
     {
@@ -110,5 +110,6 @@ boundaryField
         value           uniform (0 0 0);
     }
 }
+
 
 // ************************************************************************* //

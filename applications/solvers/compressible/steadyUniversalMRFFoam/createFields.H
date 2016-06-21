@@ -77,7 +77,7 @@
             IOobject::MUST_READ,
             IOobject::AUTO_WRITE
         ),
-        mesh 
+        mesh
     );
     i == h - 0.5*(magSqr(Urot) - magSqr(Urel));
 

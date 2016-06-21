@@ -1,17 +1,16 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  1.2                                   |
-|   \\  /    A nd           | Web:      http://www.openfoam.org               |
+| \\      /  F ield         | foam-extend: Open Source CFD                    |
+|  \\    /   O peration     | Version:     4.0                                |
+|   \\  /    A nd           | Web:         http://www.foam-extend.org         |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
-
 FoamFile
 {
-    version         2.0;
-    format          ascii;
-    class           dictionary;
-    object          fvSchemes;
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      fvSchemes;
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -22,7 +21,7 @@ ddtSchemes
 
 //    ddt(rho,U)     steadyInertial phi rho 0.25;
     ddt(rho,h)        steadyState;
-	 ddt(rho,i)        steadyState;
+    ddt(rho,i)        steadyState;
 //     ddt(rho,h)      steadyInertial phi rho 0.25;
     ddt(psi,p)        steadyInertial phi rho 1;
 //     ddt(psi,p)        steadyState;
@@ -44,7 +43,7 @@ divSchemes
     default           none;
     div(phi,U)        Gauss upwind;
     div(phi,h)        Gauss upwind;
-	div(phi,i)        Gauss upwind;
+    div(phi,i)        Gauss upwind;
     div(phid,p)       Gauss upwind;
 
     div(phi,k)        Gauss upwind;
@@ -74,10 +73,10 @@ snGradSchemes
 
 mixingPlane
 {
-	default	areaAveraging;
-	U	    areaAveraging;
-	k	    fluxAveraging;
-	omega	areaAveraging;
+    default  areaAveraging;
+    U        areaAveraging;
+    k        fluxAveraging;
+    omega    areaAveraging;
 }
 
 

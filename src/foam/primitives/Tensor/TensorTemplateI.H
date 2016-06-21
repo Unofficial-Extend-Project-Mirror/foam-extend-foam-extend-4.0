@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -640,8 +640,8 @@ inline Tensor<Cmpt> scaleRow(const Tensor<Cmpt>& t, const Vector<Cmpt>& v)
 {
     return Tensor<Cmpt>
     (
-        t.xx()*v.x(), t.xy()*v.y(), t.xz()*v.z(), 
-        t.yx()*v.x(), t.yy()*v.y(), t.yz()*v.z(), 
+        t.xx()*v.x(), t.xy()*v.y(), t.xz()*v.z(),
+        t.yx()*v.x(), t.yy()*v.y(), t.yz()*v.z(),
         t.zx()*v.x(), t.zy()*v.y(), t.zz()*v.z()
     );
 }

@@ -2,9 +2,9 @@
 #------------------------------------------------------------------------------
 # =========                 |
 # \\      /  F ield         | foam-extend: Open Source CFD
-#  \\    /   O peration     |
-#   \\  /    A nd           | For copyright notice see file Copyright
-#    \\/     M anipulation  |
+#  \\    /   O peration     | Version:     4.0
+#   \\  /    A nd           | Web:         http://www.foam-extend.org
+#    \\/     M anipulation  | For copyright notice see file Copyright
 #------------------------------------------------------------------------------
 # License
 #     This file is part of foam-extend.
@@ -32,7 +32,7 @@
 #------------------------------------------------------------------------------
 
 # Base settings
-FOAM_VERSION=foam-extend-3.1
+FOAM_VERSION=foam-extend-4.0
 SUPPLIED_VERSION_GCC=4.3.3
 MIN_VERSION_GCC=4.3.1
 

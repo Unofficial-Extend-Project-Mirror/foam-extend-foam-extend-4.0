@@ -1,8 +1,8 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM Extend Project: Open Source CFD        |
-|  \\    /   O peration     | Version:  1.6-ext                               |
-|   \\  /    A nd           | Web:      www.extend-project.de                 |
+| \\      /  F ield         | foam-extend: Open Source CFD                    |
+|  \\    /   O peration     | Version:     4.0                                |
+|   \\  /    A nd           | Web:         http://www.foam-extend.org         |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 FoamFile
@@ -52,8 +52,8 @@ maxCo           0.2;
 libs
 (
     "libdynamicFvMesh.so"
-    "libimmersedBoundary.so" 
-    "libimmersedBoundaryDynamicFvMesh.so" 
+    "libimmersedBoundary.so"
+    "libimmersedBoundaryDynamicFvMesh.so"
 );
 
 

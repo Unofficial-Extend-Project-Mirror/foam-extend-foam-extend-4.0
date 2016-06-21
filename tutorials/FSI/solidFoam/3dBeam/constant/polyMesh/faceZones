@@ -1,8 +1,8 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM Extend Project: Open source CFD        |
-|  \\    /   O peration     | Version:  1.6-ext                               |
-|   \\  /    A nd           | Web:      www.extend-project.de                 |
+| \\      /  F ield         | foam-extend: Open Source CFD                    |
+|  \\    /   O peration     | Version:     4.0                                |
+|   \\  /    A nd           | Web:         http://www.foam-extend.org         |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 FoamFile
@@ -27928,5 +27928,6 @@ faceLabels      List<label>
 flipMap         List<bool> 27900{0};
 }
 )
+
 
 // ************************************************************************* //

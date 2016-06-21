@@ -1,7 +1,7 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | foam-extend: Open Source CFD                    |
-|  \\    /   O peration     | Version:     3.2                                |
+|  \\    /   O peration     | Version:     4.0                                |
 |   \\  /    A nd           | Web:         http://www.foam-extend.org         |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
@@ -20,5 +20,6 @@ phases          ( water { transportModel Newtonian ; nu nu [ 0 2 -1 0 0 0 0 ] 1e
 refPhase        air;
 
 sigmas          ( ( air water ) 0.07 ( air oil ) 0.07 ( air mercury ) 0.07 ( water oil ) 0.07 ( water mercury ) 0.07 ( oil mercury ) 0.07 );
+
 
 // ************************************************************************* //

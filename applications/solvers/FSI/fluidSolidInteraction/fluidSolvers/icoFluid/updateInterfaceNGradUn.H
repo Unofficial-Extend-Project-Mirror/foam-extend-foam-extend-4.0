@@ -17,36 +17,34 @@
        *mesh.deltaCoeffs().boundaryField()[fsi.fluidPatchIndex()];
 
     Info << "nGradUn, max: " << gMax(nGradUn_) << ", min: "
-	 << gMin(nGradUn_) << ", avg: " << gAverage(nGradUn_) << endl;
+        << gMin(nGradUn_) << ", avg: " << gAverage(nGradUn_) << endl;
 
-// 	bool secondOrderCorrection = true;
+//     bool secondOrderCorrection = true;
 
-// 	if (secondOrderCorrection)
-// 	  {
-// 	    // Correct normal component of phiU
-// 	    // befor gradient calculation
-// 	    forAll(phiU.boundaryField(), patchI)
-// 	      {
-// 		        vectorField n =
-// 			  mesh().Sf().boundaryField()[patchI]
-// 			  /mesh().magSf().boundaryField()[patchI];
+//     if (secondOrderCorrection)
+//     {
+//         // Correct normal component of phiU
+//         // befor gradient calculation
+//         forAll(phiU.boundaryField(), patchI)
+//         {
+//                 vectorField n =
+//               mesh().Sf().boundaryField()[patchI]
+//               /mesh().magSf().boundaryField()[patchI];
 
-// 			phiU.boundaryField()[patchI] +=
-// 			              n
-// 			  *(
-// 			    (
-// 			     phi_.boundaryField()[patchI]
-// 			     /mesh().magSf().boundaryField()[patchI]
-// 			     )
-// 			    - (n&phiU.boundaryField()[patchI])
-// 			    );
-// 	      }
+//             phiU.boundaryField()[patchI] +=
+//                n
+//               *(
+//                    (
+//                        phi_.boundaryField()[patchI]
+//                       /mesh().magSf().boundaryField()[patchI]
+//                    )
+//                  - (n&phiU.boundaryField()[patchI])
+//                );
+//         }
 
-// 	    // Calc gradient
-// 	        tensorField gradPhiUp =
-// 		  fvc::grad(phiU)().boundaryField()[aPatchID()]
-// 		  .patchInternalField();
-
-// 		nGradUn() = 2*nGradUn() - (nA&(gradPhiUp&nA));
-// 	  }
+//         // Calc gradient
+//         tensorField gradPhiUp =
+//             fvc::grad(phiU)().boundaryField()[aPatchID()].patchInternalField();
+//             nGradUn() = 2*nGradUn() - (nA&(gradPhiUp&nA));
+//     }
 }

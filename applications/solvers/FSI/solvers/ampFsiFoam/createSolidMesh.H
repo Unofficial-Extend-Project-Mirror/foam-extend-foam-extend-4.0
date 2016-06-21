@@ -24,40 +24,40 @@ fvMesh solidMesh
 //     if (isA<symmetryPolyPatch>(solidMesh.boundaryMesh()[patchI]))
 //     {
 //         const labelList& meshPoints =
-// 	    solidMesh.boundaryMesh()[patchI].meshPoints();
+//         solidMesh.boundaryMesh()[patchI].meshPoints();
 
-// 	vector avgN =
-// 	    gAverage(solidMesh.boundaryMesh()[patchI].pointNormals());
+//     vector avgN =
+//         gAverage(solidMesh.boundaryMesh()[patchI].pointNormals());
 
-// 	vector i(1, 0, 0);
-// 	vector j(0, 1, 0);
-// 	vector k(0, 0, 1);
+//     vector i(1, 0, 0);
+//     vector j(0, 1, 0);
+//     vector k(0, 0, 1);
 
-// 	if (mag(avgN&i) > 0.95)
-// 	{
-// 	    forAll(meshPoints, pI)
-// 	    {
-// 	        newPoints[meshPoints[pI]].x() = 0;
-// 	    }
-// 	}
-// 	else if (mag(avgN&j) > 0.95)
-// 	{
-// 	    forAll(meshPoints, pI)
-// 	    {
-// 	        newPoints[meshPoints[pI]].y() = 0;
-// 	    }
-// 	}
-// 	else if (mag(avgN&k) > 0.95)
-// 	{
-// 	    forAll(meshPoints, pI)
-// 	    {
-// 	        newPoints[meshPoints[pI]].z() = 0;
-// 	    }
-// 	}
+//     if (mag(avgN&i) > 0.95)
+//     {
+//         forAll(meshPoints, pI)
+//         {
+//             newPoints[meshPoints[pI]].x() = 0;
+//         }
+//     }
+//     else if (mag(avgN&j) > 0.95)
+//     {
+//         forAll(meshPoints, pI)
+//         {
+//             newPoints[meshPoints[pI]].y() = 0;
+//         }
+//     }
+//     else if (mag(avgN&k) > 0.95)
+//     {
+//         forAll(meshPoints, pI)
+//         {
+//             newPoints[meshPoints[pI]].z() = 0;
+//         }
+//     }
 
-// 	avgN = gAverage(solidMesh.boundaryMesh()[patchI].pointNormals());
+//     avgN = gAverage(solidMesh.boundaryMesh()[patchI].pointNormals());
 
-// 	Pout << "avgN = " << avgN << endl;
+//     Pout << "avgN = " << avgN << endl;
 //     }
 // }
 

@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -136,7 +136,7 @@ void Foam::ggiAMGInterface::initFastReduce() const
 
     // Now local zone indices contain the index of a local face that will
     // provide the data.  For faces that are not local, the index will be -1
- 
+
     // Find out where my zone data is going to
 
     // Make a sending sub-map

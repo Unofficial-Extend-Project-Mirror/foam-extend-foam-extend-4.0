@@ -8,7 +8,7 @@
 
     fvScalarMatrix iEqn
     (
-	      fvm::ddt(rho, i)
+          fvm::ddt(rho, i)
         + fvm::div(phi, i)
         - fvm::laplacian(turbulence->alphaEff(), i)
      ==

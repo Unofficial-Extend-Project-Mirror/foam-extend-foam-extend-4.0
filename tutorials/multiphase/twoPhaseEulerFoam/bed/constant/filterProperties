@@ -1,7 +1,7 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | foam-extend: Open Source CFD                    |
-|  \\    /   O peration     | Version:     3.2                                |
+|  \\    /   O peration     | Version:     4.0                                |
 |   \\  /    A nd           | Web:         http://www.foam-extend.org         |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
@@ -22,5 +22,6 @@ filterNormal           (0 0 1);
 filterPosition         filterPosition      [0 1 0 0 0]     (0 0 0.02);
 
 filterThickness        filterThickness     [0 1 0 0 0]     1.0e-6;
+
 
 // ************************************************************************* //

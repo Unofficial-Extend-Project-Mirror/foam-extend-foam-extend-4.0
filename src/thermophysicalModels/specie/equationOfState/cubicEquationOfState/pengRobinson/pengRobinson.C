@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     4.0
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -27,7 +27,7 @@ Description
 Author
 Christian Lucas
 Institut für Thermodynamik
-Technische Universität Braunschweig 
+Technische Universität Braunschweig
 Germany
 
 \*---------------------------------------------------------------------------*/
@@ -44,7 +44,7 @@ Foam::pengRobinson::pengRobinson(Istream& is)
     Tcrit_(readScalar(is)),
     azentricFactor_(readScalar(is)),
     a0_(0.457235*pow(this->RR(), 2)*pow(Tcrit_, 2)/pcrit_),
-    b_(0.077796*this->RR()*Tcrit_/pcrit_), 
+    b_(0.077796*this->RR()*Tcrit_/pcrit_),
     n_(0.37464 + 1.54226*azentricFactor_ - 0.26992*pow(azentricFactor_, 2)),
     b2_(b_*b_),
     b3_(b2_*b_),
@@ -117,7 +117,7 @@ void Foam::pengRobinson::write(Ostream& os) const
 
 Foam::Ostream& Foam::operator<<(Ostream& os, const pengRobinson& pr)
 {
-    os  << static_cast<const specie&>(pr)<< token::SPACE 
+    os  << static_cast<const specie&>(pr)<< token::SPACE
         << pr.pcrit_ << tab<< pr.Tcrit_<< tab << pr.azentricFactor_;
 
     os.check("Ostream& operator<<(Ostream& os, const pengRobinson& st)");

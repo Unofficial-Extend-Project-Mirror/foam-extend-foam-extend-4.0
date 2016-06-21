@@ -17,38 +17,36 @@ FoamFile
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-boundaryCellSize	4.5;
-//keepCellsIntersectingBoundary	1;
-maxCellSize	9;
-//minCellSize	0.375;
+boundaryCellSize 4.5;
+//keepCellsIntersectingBoundary 1;
+maxCellSize      9;
+//minCellSize    0.375;
 
-surfaceFile	"socket.fms";
+surfaceFile    "socket.fms";
 
 boundaryLayers
 {
-    maxFirstLayerThickness	2.0;
-    nLayers	1;
-    thicknessRatio	1.2;
+    maxFirstLayerThickness 2.0;
+    nLayers                1;
+    thicknessRatio         1.2;
 
     patchBoundaryLayers
     {
-
         patch7
         {
-            allowDiscontinuity	0;
-            maxFirstLayerThickness	1.0;
-            nLayers	2;
-            thicknessRatio	1.1;
+            allowDiscontinuity 0;
+            maxFirstLayerThickness 1.0;
+            nLayers            2;
+            thicknessRatio     1.1;
         }
     }
 }
 
 localRefinement
 {
-
     patch15
     {
-        additionalRefinementLevels	1;
+        additionalRefinementLevels    1;
     }
 
     subset1

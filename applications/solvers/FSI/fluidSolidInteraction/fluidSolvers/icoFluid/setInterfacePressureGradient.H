@@ -20,7 +20,7 @@ forAll(p_.boundaryField(), patchI)
             (n&U_.boundaryField()[patchI])
            /rUA.boundaryField()[patchI]
           - phi_.boundaryField()[patchI]
-	       /mesh.magSf().boundaryField()[patchI]
+           /mesh.magSf().boundaryField()[patchI]
            /rUA.boundaryField()[patchI]
           + nGradUn_
            /mesh.deltaCoeffs().boundaryField()[patchI]
@@ -28,7 +28,7 @@ forAll(p_.boundaryField(), patchI)
 
         phi_.boundaryField()[patchI] +=
             pInterface.gradient()
-	       *rUA.boundaryField()[patchI]
-	       *mesh.magSf().boundaryField()[patchI];
+           *rUA.boundaryField()[patchI]
+           *mesh.magSf().boundaryField()[patchI];
     }
 }
