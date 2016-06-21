@@ -18,4 +18,5 @@ FoamFile
 //simulationType laminar;
 simulationType RASModel; //epsilon diverges after a while
 
+
 // ************************************************************************* //

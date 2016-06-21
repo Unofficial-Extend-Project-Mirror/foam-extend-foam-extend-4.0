@@ -12,6 +12,8 @@ FoamFile
     class       dictionary;
     object      faMeshDefinition;
 }
+
+
 // ************************************************************************** //
 
 polyMeshPatches  1( freeSurface );

@@ -58,7 +58,7 @@ printHeader() {
 | \\\\      /  F ield         | foam-extend: Open Source CFD                    |
 |  \\\\    /   O peration     | Version:     ${foamVersion}  |
 |   \\\\  /    A nd           | Web:         http://www.foam-extend.org         |
-|    \\\\/     M anipulation  |                                                 |
+|    \\\\/     M anipulation  | For copyright notice see file Copyright         |
 \\*---------------------------------------------------------------------------*/
 FoamFile
 {

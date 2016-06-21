@@ -23,4 +23,5 @@ solver          velocityComponentLaplacian x;
 
 diffusivity     directional ( 1 200 0 );
 
+
 // ************************************************************************* //

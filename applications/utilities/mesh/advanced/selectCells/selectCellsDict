@@ -37,4 +37,5 @@ selectOutside   true;
 // 0.5*of the cell size. Set to <0 to disable.
 nearDistance    -1;
 
+
 // ************************************************************************* //
