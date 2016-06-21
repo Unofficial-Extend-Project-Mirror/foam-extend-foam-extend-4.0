@@ -42,7 +42,7 @@ bool Foam::IOobject::writeHeader(Ostream& os) const
         return false;
     }
 
-    writeBanner(os)
+    writeBanner(os, false, true)
         << "FoamFile\n{\n"
         << "    version     " << os.version() << ";\n"
         << "    format      " << os.format() << ";\n"

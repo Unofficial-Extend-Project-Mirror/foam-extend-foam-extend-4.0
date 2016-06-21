@@ -680,7 +680,7 @@ bool Foam::polyBoundaryMesh::writeData(Ostream& os) const
             << indent << token::END_BLOCK << endl;
     }
 
-    os  << decrIndent << token::END_LIST;
+    os  << decrIndent << token::END_LIST << endl;
 
     // Check state of IOstream
     os.check("polyBoundaryMesh::writeData(Ostream& os) const");

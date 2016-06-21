@@ -361,7 +361,12 @@ public:
             //- Write the standard FOAM file/dictionary banner
             //  Optionally without -*- C++ -*- editor hint (eg, for logs)
             template<class Stream>
-            static inline Stream& writeBanner(Stream& os, bool noHint=false);
+            static inline Stream& writeBanner
+            (
+                Stream& os,
+                bool noHint=false,
+                bool noCopyRight=false
+            );
 
             //- Write the standard file section divider
             template<class Stream>

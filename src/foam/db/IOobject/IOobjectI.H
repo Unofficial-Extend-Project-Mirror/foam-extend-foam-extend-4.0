@@ -28,7 +28,7 @@ License
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 template<class Stream>
-inline Stream& Foam::IOobject::writeBanner(Stream& os, bool noHint)
+inline Stream& Foam::IOobject::writeBanner(Stream& os, bool noHint, bool noCopyright)
 {
     static bool spacesSet = false;
     static char spaces[37];
@@ -64,8 +64,20 @@ inline Stream& Foam::IOobject::writeBanner(Stream& os, bool noHint)
         "| =========                 |                                                 |\n"
         "| \\\\      /  F ield         | foam-extend: Open Source CFD                    |\n"
         "|  \\\\    /   O peration     | Version:     " << FOAMversion << spaces << "|\n"
-        "|   \\\\  /    A nd           | Web:         http://www.foam-extend.org         |\n"
-        "|    \\\\/     M anipulation  | For copyright notice see file Copyright         |\n"
+        "|   \\\\  /    A nd           | Web:         http://www.foam-extend.org         |\n";
+
+    if (noCopyright)
+    {
+        os  <<
+            "|    \\\\/     M anipulation  |                                                 |\n";
+    }
+    else
+    {
+        os  <<
+            "|    \\\\/     M anipulation  | For copyright notice see file Copyright         |\n";
+    }
+
+    os  <<
         "\\*---------------------------------------------------------------------------*/\n";
 
     return os;
