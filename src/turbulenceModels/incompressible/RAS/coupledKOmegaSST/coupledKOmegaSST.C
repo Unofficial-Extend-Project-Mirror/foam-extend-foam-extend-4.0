@@ -448,7 +448,8 @@ void coupledKOmegaSST::correct()
                 S2,
                 (c1_/a1_)*betaStar_*omega_*max(a1_*omega_, b1_*F23()*sqrt(S2))
             )
-          - fvm::Sp(beta(F1)*omega_, omega_)
+          - fvm::Sp(2*beta(F1)*omega_, omega_)
+          + beta(F1)*sqr(omega_)
           - fvm::SuSp
             (
                 (F1 - scalar(1))*CDkOmega/omega_,
@@ -460,27 +461,6 @@ void coupledKOmegaSST::correct()
         omegaEqn.completeAssembly();
 
         kOmegaEqn.insertEquation(1, omegaEqn);
-
-        // Add coupling term
-        volScalarField couplingOmega
-        (
-            "couplingOmega",
-            -beta(F1)*sqr(omega_)/k_
-        );
-        scalarField& couplingOmegaIn = couplingOmega.internalField();
-
-        // Collect cell indices where wall functions are active from the
-        // omega wall functions
-        eliminated = omegaEqn.eliminatedEqns().toc();
-
-        // Eliminate coupling in wall function cells for omega
-        forAll (eliminated, cellI)
-        {
-            couplingOmegaIn[eliminated[cellI]] *= 0;
-        }
-
-        // Insert coupling
-        kOmegaEqn.insertEquationCoupling(1, 0, couplingOmega);
    }
 
     // Turbulent kinetic energy equation
@@ -505,9 +485,11 @@ void coupledKOmegaSST::correct()
         volScalarField couplingK
         (
             "couplingK",
-            betaStar_*k_
+            -pos(G - c1_*betaStar_*k_*omega_)*c1_*betaStar_*k_
         );
         scalarField& couplingKIn = couplingK.internalField();
+
+        eliminated = kEqn.eliminatedEqns().toc();
 
         // Eliminate coupling in wall function cells for k
         forAll (eliminated, cellI)
