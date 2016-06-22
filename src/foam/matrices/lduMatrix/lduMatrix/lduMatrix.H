@@ -135,8 +135,9 @@ public:
             //  is responsible for keeping a copy
             const lduInterfaceFieldPtrsList& interfaces_;
 
-
+            //- Profiling trigger
             profilingTrigger profile_;
+
 
         // Protected Member Functions
 
