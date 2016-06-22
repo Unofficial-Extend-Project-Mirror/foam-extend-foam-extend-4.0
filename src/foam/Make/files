@@ -663,12 +663,11 @@ fields/CoeffField/symmTensor4thOrderCoeffField.C
 fields/CoeffField/tensorCoeffField.C
 
 BlockLduMatrix = matrices/blockLduMatrix/BlockLduMatrix
-$(BlockLduMatrix)/blockLduMatrices.C
+$(BlockLduMatrix)/blockLduMatrixName.C
 $(BlockLduMatrix)/scalarBlockLduMatrix.C
 $(BlockLduMatrix)/sphericalTensorBlockLduMatrix.C
 $(BlockLduMatrix)/symmTensorBlockLduMatrix.C
 $(BlockLduMatrix)/tensorBlockLduMatrix.C
-$(BlockLduMatrix)/blockVectorNMatrices.C
 $(BlockLduMatrix)/BlockConstraint/scalarBlockConstraint.C
 
 $(BlockLduMatrix)/extendedBlockLduMatrix/extendedBlockLduMatrices.C
@@ -730,8 +729,6 @@ $(BlockLduSmoothers)/BlockILUCpSmoother/blockILUCpSmoothers.C
 BlockLduSolvers = matrices/blockLduMatrix/BlockLduSolvers
 $(BlockLduSolvers)/blockVectorNSolvers.C
 $(BlockLduSolvers)/BlockLduSolver/blockLduSolvers.C
-$(BlockLduSolvers)/BlockLduSolver/BlockSolverPerformances.C
-$(BlockLduSolvers)/BlockLduSolver/BlockSolverPerformanceVectorN.C
 $(BlockLduSolvers)/BlockDiagonal/blockDiagonalSolvers.C
 $(BlockLduSolvers)/BlockGaussSeidel/blockGaussSeidelSolvers.C
 $(BlockLduSolvers)/BlockCG/blockCGSolvers.C
