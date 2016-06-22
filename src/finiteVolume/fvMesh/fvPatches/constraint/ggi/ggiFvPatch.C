@@ -271,6 +271,12 @@ const Foam::scalarListList& Foam::ggiFvPatch::weights() const
 }
 
 
+void Foam::ggiFvPatch::expandAddrToZone(labelField& lf) const
+{
+    lf = ggiPolyPatch_.fastExpand(lf);
+}
+
+
 Foam::tmp<Foam::labelField> Foam::ggiFvPatch::interfaceInternalField
 (
     const unallocLabelList& internalData
@@ -306,6 +312,7 @@ void Foam::ggiFvPatch::initInternalFieldTransfer
     const unallocLabelList& iF
 ) const
 {
+    // Label transfer is local without global reduction
     labelTransferBuffer_ = patchInternalField(iF);
 }
 

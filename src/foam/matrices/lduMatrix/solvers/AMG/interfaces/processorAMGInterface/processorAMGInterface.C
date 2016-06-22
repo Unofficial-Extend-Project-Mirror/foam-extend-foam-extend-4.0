@@ -189,7 +189,8 @@ Foam::processorAMGInterface::processorAMGInterface
 
                 for
                 (
-                    SLList<label>::iterator facesIter = faceFacesIter().begin();
+                    SLList<label>::iterator facesIter =
+                        faceFacesIter().begin();
                     facesIter != faceFacesIter().end();
                     ++facesIter
                 )

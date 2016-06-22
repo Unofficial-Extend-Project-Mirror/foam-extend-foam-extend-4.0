@@ -33,9 +33,60 @@ namespace Foam
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 template<class Type>
+tmp<Field<Type> > ggiAMGInterface::fastExpand(const UList<Type>& ff) const
+{
+    // Rewrite, 1/Jun/2016
+    // To avoid creating zone-sized data and gather-scatter communication
+    // to the master, the optimised map-distribute call is implemented.
+    // The field is filled with local data which is then sent where needed
+    // through map-distribute.
+    // On return, the field is expanded to zone size but only filled with
+    // the data which is needed for the shadow
+    // HJ, 1/Jun/2016
+
+    if (ff.size() != this->size())
+    {
+        FatalErrorIn
+        (
+            "tmp<Field<Type> > ggiAMGInterface::fastExpand"
+            "("
+            "    const UList<Type>& ff"
+            ") const"
+        )   << "Wrong field size.  ff: " << ff.size()
+            << " interface: " << this->size()
+            << abort(FatalError);
+    }
+
+    if (localParallel() || !Pstream::parRun())
+    {
+        // Field remains identical: no parallel communications required
+        tmp<Field<Type> > tresult(new Field<Type>(ff));
+
+        return tresult;
+    }
+    else
+    {
+        // Optimised mapDistribute
+
+        // Execute init reduce to calculate addressing if not already done
+        map();
+
+        // Prepare for distribute.  Note: field will be expanded to zone size
+        // during the distribute operation
+        tmp<Field<Type> > tresult(new Field<Type>(ff));
+        List<Type>& expand = tresult();
+
+        map().distribute(expand);
+
+        return tresult;
+    }
+}
+
+
+template<class Type>
 tmp<Field<Type> > ggiAMGInterface::fastReduce(const UList<Type>& ff) const
 {
-    // Algorithm
+    // Old algorithm: OBOSLETE
     // Local processor contains faceCells part of the zone and requires
     // zoneAddressing part.
     // For fast communications, each processor will send the faceCells and
@@ -43,6 +94,18 @@ tmp<Field<Type> > ggiAMGInterface::fastReduce(const UList<Type>& ff) const
     // and send off messages to all processors containing only
     // the required data
     // HJ, 24/Jun/2011
+
+    // Rewrite, 1/Jun/2016
+    // To avoid creating zone-sized data and gather-scatter communication
+    // to the master, the optimised map-distribute call is implemented.
+    // The field is filled with local data which is then sent where needed
+    // through map-distribute.
+    // On return, the field is expanded to zone size but only filled with
+    // the data which is needed for the shadow
+    // Having received the zone data, shadow data is extracted from the
+    // field size.  Note: this works only on coarse levels, where one-on-one
+    // mapping applies
+    // HJ, 1/Jun/2016
 
     if (ff.size() != this->size())
     {
@@ -71,7 +134,8 @@ tmp<Field<Type> > ggiAMGInterface::fastReduce(const UList<Type>& ff) const
         // Execute init reduce to calculate addressing if not already done
         map();
 
-        // Prepare for distribute: field will be expanded to zone size
+        // Prepare for distribute.  Note: field will be expanded to zone size
+        // during the distribute operation
         List<Type> expand = ff;
 
         map().distribute(expand);

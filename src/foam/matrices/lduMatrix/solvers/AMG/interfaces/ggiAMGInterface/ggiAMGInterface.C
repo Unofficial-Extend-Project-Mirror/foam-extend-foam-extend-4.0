@@ -204,11 +204,6 @@ Foam::ggiAMGInterface::ggiAMGInterface
     mapPtr_(NULL)
 {
     // Note.
-    // All processors will do the same coarsening and then filter
-    // the addressing to the local processor
-    // HJ, 1/Apr/2009
-
-    // Note.
     // Signalling in global clustering requires me to recognise clustering
     // from separate processors as separate.  In the first phase, this will be
     // used to recognise cluster from each processor as separate and in the
@@ -222,7 +217,15 @@ Foam::ggiAMGInterface::ggiAMGInterface
     // larger max int, which can be changed on request
     // HJ, 1/Apr/2009
 
-    // Expand the local and neighbour addressing to full zone size
+    // New algorithm will assemble local clusters and then create a global
+    // zone ordering by collecting all faces (coarse pairs) from proc0,
+    // followed by proc 1 etc.  This avoids global communication and allows
+    // each processor only to perform the analysis on locally created coarse
+    // faces
+    // HJ, 13/Jun/2016
+
+    // To help with analysis, expand the local and neighbour addressing
+    // to full zone size
     labelField localExpandAddressing(fineGgiInterface_.zoneSize(), 0);
 
     // Memory management, local
@@ -235,60 +238,70 @@ Foam::ggiAMGInterface::ggiAMGInterface
                 localRestrictAddressing[i] + procOffset*Pstream::myProcNo();
         }
 
-        if (!localParallel())
-        {
-            // Optimisation of this comms call is needed
-            // HJ, 9/Jun/2016
-            reduce(localExpandAddressing, sumOp<labelField>());
-        }
+        // Removed global reduce.  Only local faces will be analysed.
+        // HJ, 13/Jun/2016
     }
 
+    // Create addressing for neighbour faces.  Note: expandAddrToZone will
+    // expand the addressing to zone size.  HJ, 13/Jun/2016
     labelField neighbourExpandAddressing
     (
-        fineGgiInterface_.shadowInterface().zoneSize(),
-        0
+        fineGgiInterface_.shadowInterface().interfaceSize()
     );
 
+    // Fill local cluster ID with a combination of a local ID and processor
+    // offset
     // Memory management, neighbour
     {
-        const labelList& addr =
-            fineGgiInterface_.shadowInterface().zoneAddressing();
-
-        forAll (addr, i)
+        forAll (neighbourExpandAddressing, i)
         {
-            neighbourExpandAddressing[addr[i]] =
+            neighbourExpandAddressing[i] =
                 neighbourRestrictAddressing[i]
               + procOffset*Pstream::myProcNo();
         }
 
-        if (!localParallel())
-        {
-            // Optimisation of this comms call is needed
-            // HJ, 9/Jun/2016
-            reduce(neighbourExpandAddressing, sumOp<labelField>());
-        }
+        // Expand neighbour side to get all the data required from other
+        // processors.  Note: neigbour is now the size of remote zone
+        fineGgiInterface_.shadowInterface().expandAddrToZone
+        (
+            neighbourExpandAddressing
+        );
     }
 
+    // DEBUG: Check that all sizes are at zone size.
+    Info<< "Sizes check: local zone size "
+        << fineGgiInterface_.zoneSize()
+        << " " << localExpandAddressing << nl
+        << "shadow zone size "
+        << fineGgiInterface_.shadowInterface().zoneSize()
+        << " " << neighbourExpandAddressing
+        << endl;
+
+
+    // Note: neighbourExpandAddressing will be filled with NaNs for faces which
+    // not local
+
+    Info<< "End of reduce" << endl;
     // Make a lookup table of entries for owner/neighbour.
     // All sizes are guessed at the size of fine interface
     // HJ, 19/Feb/2009
 
     HashTable<SLList<label>, label, Hash<label> > neighboursTable
     (
-        localExpandAddressing.size()
+        fineGgiInterface_.interfaceSize()
     );
 
     // Table of face-sets to be agglomerated
     HashTable<SLList<SLList<label> >, label, Hash<label> > faceFaceTable
     (
-        localExpandAddressing.size()
+        fineGgiInterface_.interfaceSize()
     );
 
     // Table of face-sets weights to be agglomerated
     HashTable<SLList<SLList<scalar> >, label, Hash<label> >
         faceFaceWeightsTable
         (
-            localExpandAddressing.size()
+            fineGgiInterface_.interfaceSize()
         );
 
     // Count the number of coarse faces
@@ -300,11 +313,24 @@ Foam::ggiAMGInterface::ggiAMGInterface
     // On the fine level, addressing is made in a labelListList
     if (fineGgiInterface_.fineLevel())
     {
+        // This addressing defines how to interpolate for all zone faces
+        // across the interface
         const labelListList& fineAddr = fineGgiInterface_.addressing();
         const scalarListList& fineWeights = fineGgiInterface_.weights();
 
-        forAll (fineAddr, ffI)
+        // Note: cluster only locally live faces
+        // HJ, 13/Jun/2016
+
+        // This addressing defines which faces from zone are local
+        const labelList& fineZa = fineGgiInterface_.zoneAddressing();
+
+        // Perform analysis only for local faces
+        // HJ, 22/Jun/2016
+        forAll (fineZa, fineZaI)
         {
+            // Get the local face (from zone) to analyse
+            const label ffI = fineZa[fineZaI];
+
             const labelList& curFineNbrs = fineAddr[ffI];
             const scalarList& curFineWeigts = fineWeights[ffI];
 
@@ -372,6 +398,9 @@ Foam::ggiAMGInterface::ggiAMGInterface
                             nbrFound = true;
                             faceFacesIter().append(ffI);
                             faceFaceWeightsIter().append(curNW);
+
+                            // New agglomeration pair found in already
+                            // existing pair
                             nAgglomPairs++;
 
                             break;
@@ -384,7 +413,7 @@ Foam::ggiAMGInterface::ggiAMGInterface
                         curFaceFaces.append(SLList<label>(ffI));
                         curFaceWeights.append(SLList<scalar>(curNW));
 
-                        // New coarse face created
+                        // New coarse face created for an existing master
                         nCoarseFaces++;
                         nAgglomPairs++;
                     }
@@ -407,7 +436,7 @@ Foam::ggiAMGInterface::ggiAMGInterface
                         SLList<SLList<scalar> >(SLList<scalar>(curNW))
                     );
 
-                    // New coarse face created
+                    // New coarse face created for a new master
                     nCoarseFaces++;
                     nAgglomPairs++;
                 }
@@ -417,8 +446,16 @@ Foam::ggiAMGInterface::ggiAMGInterface
     else
     {
         // Coarse level, addressing is stored in faceCells
-        forAll (localExpandAddressing, ffI)
+        // This addressing defines whicf faces from zone are local
+        const labelList& fineZa = fineGgiInterface_.zoneAddressing();
+
+        // Perform analysis only for local faces
+        // HJ, 22/Jun/2016
+        forAll (fineZa, fineZaI)
         {
+            // Get the local face (from zone) to analyse
+            const label ffI = fineZa[fineZaI];
+
             label curMaster = -1;
             label curSlave = -1;
 
@@ -480,6 +517,9 @@ Foam::ggiAMGInterface::ggiAMGInterface
                         faceFacesIter().append(ffI);
                         // Add dummy weight
                         faceFaceWeightsIter().append(1.0);
+
+                        // New agglomeration pair found in already
+                        // existing pair
                         nAgglomPairs++;
                         break;
                     }
@@ -492,7 +532,7 @@ Foam::ggiAMGInterface::ggiAMGInterface
                     // Add dummy weight
                     curFaceWeights.append(SLList<scalar>(1.0));
 
-                    // New coarse face created
+                    // New coarse face created for an existing master
                     nCoarseFaces++;
                     nAgglomPairs++;
                 }
@@ -516,116 +556,193 @@ Foam::ggiAMGInterface::ggiAMGInterface
                     SLList<SLList<scalar> >(SLList<scalar>(1.0))
                 );
 
-                // New coarse face created
+                // New coarse face created for a new master
                 nCoarseFaces++;
                 nAgglomPairs++;
             }
         } // end for all fine faces
     }
 
-    faceCells_.setSize(nCoarseFaces, -1);
-    fineAddressing_.setSize(nAgglomPairs, -1);
-    restrictAddressing_.setSize(nAgglomPairs, -1);
-    restrictWeights_.setSize(nAgglomPairs);
+    // In order to assemble the coarse global face zone, find out
+    // how many faces have been created on each processor.
+    // Note that masters and slaves both count faces so we will only ask master
+    // sizes to count
+    labelList nCoarseFacesPerProc(Pstream::nProcs(), 0);
+
+    if (master())
+    {
+        nCoarseFacesPerProc[Pstream::myProcNo()] = nCoarseFaces;
+    }
+
+    reduce(nCoarseFacesPerProc, sumOp<labelList>());
+
+    Info<< "Number of faces per processor: " << nCoarseFacesPerProc
+        << endl;
+
+    // Coarse global face zone is assembled by adding all faces from proc0,
+    // followed by all faces from proc1 etc.
+    // Therefore, on procN, my master offset
+    // will be equal to the sum of numbers of coarse faces on all processors
+    // before mine
+    // HJ, 13/Jun/2016
+
+    label coarseGlobalFaceOffset = 0;
+
+    for (label i = 0; i < Pstream::myProcNo(); i++)
+    {
+        coarseGlobalFaceOffset += nCoarseFacesPerProc[i];
+    }
+
+    Pout<< "coarseGlobalFaceOffset: " << coarseGlobalFaceOffset << endl;
+
+    Info<< "End of contents assembly" << endl;
+    labelField masterFaceCells(nCoarseFaces, -1);
+    labelField masterZoneAddressing(nCoarseFaces, -1);
+    labelField masterFineAddressing(nCoarseFaces, -1);
+    labelField masterRestrictAddressing(nAgglomPairs, -1);
+    scalarField masterRestrictWeights(nAgglomPairs);
+
+    // Note: in multiple agglomeration
 
     labelList contents = neighboursTable.toc();
 
+    // Global faces shall be assembled by the increasing label of master
+    // cluster ID.
+
     // Sort makes sure the order is identical on both sides.
-    // Since the global zone is defined by this sort, the neighboursTable
-    // must be complete on all processors
     // HJ, 20/Feb/2009 and 6/Jun/2016
     sort(contents);
 
     // Grab zone size and create zone addressing
-    zoneSize_ = nCoarseFaces;
+    zoneSize_ = sum(nCoarseFacesPerProc);
+    Info<< "zoneSize_: " << zoneSize_ << endl;
 
-    zoneAddressing_.setSize(nCoarseFaces);
+    // Note:
+    // When I am agglomerating the master, I know faces are stacked up in order
+    // but on the slave side, all I know is the master cluster index and
+    // not a master coarse face index.  Therefore:
+    // - master needs to be agglomerated first
+    // - once master is agglomerated, I need to signal to the slave side
+    //   the global coarse face zone index
+
+
+    // Note: zone addressing will be assembled only for local clusters
+    // using the coarseGlobalFaceOffset
+    // HJ, 13/Jun/2016
     label nProcFaces = 0;
 
     // Reset face counter for re-use
     nCoarseFaces = 0;
     nAgglomPairs = 0;
 
-    if (master())
+    // Note:
+    // Since clustering has now happened only on local faces, addressing and
+    // all other array work on local indices and not on the coarse global zone
+    // HJ, 13/Jun/2016
+
+    // Establish zone addressing on the master side and communicate
+    // it to the shadow
+
+    // On master side, the owner addressing is stored in table of contents
+    forAll (contents, masterI)
     {
-        // On master side, the owner addressing is stored in table of contents
-        forAll (contents, masterI)
+        SLList<label>& curNbrs =
+            neighboursTable.find(contents[masterI])();
+
+        // Note: neighbour processor index is irrelevant.  HJ, 1/Apr/2009
+
+        SLList<SLList<label> >& curFaceFaces =
+            faceFaceTable.find(contents[masterI])();
+
+        SLList<SLList<scalar> >& curFaceWeights =
+            faceFaceWeightsTable.find(contents[masterI])();
+
+        SLList<label>::iterator nbrsIter = curNbrs.begin();
+        SLList<SLList<label> >::iterator faceFacesIter =
+            curFaceFaces.begin();
+
+        SLList<SLList<scalar> >::iterator faceFaceWeightsIter =
+            curFaceWeights.begin();
+
+        for
+        (
+            ;
+            nbrsIter != curNbrs.end()
+         && faceFacesIter != curFaceFaces.end()
+         && faceFaceWeightsIter != curFaceWeights.end();
+            ++nbrsIter, ++faceFacesIter, ++faceFaceWeightsIter
+        )
         {
-            SLList<label>& curNbrs =
-                neighboursTable.find(contents[masterI])();
+            // Check if master is on local processor: no longer needed,
+            // as only local processor is being searched.  HJ, 13/Jun/2016
 
-            // Note: neighbour processor index is irrelevant.  HJ, 1/Apr/2009
+            // Record that this face belongs locally
+            // Use offset to indicate its position in the list
+            masterZoneAddressing[nProcFaces] =
+                nProcFaces + coarseGlobalFaceOffset;
 
-            SLList<SLList<label> >& curFaceFaces =
-                faceFaceTable.find(contents[masterI])();
+            masterFaceCells[nProcFaces] =
+                contents[masterI] - procOffset*Pstream::myProcNo();
 
-            SLList<SLList<scalar> >& curFaceWeights =
-                faceFaceWeightsTable.find(contents[masterI])();
+            SLList<label>::iterator facesIter =
+                faceFacesIter().begin();
 
-            SLList<label>::iterator nbrsIter = curNbrs.begin();
-            SLList<SLList<label> >::iterator faceFacesIter =
-                curFaceFaces.begin();
-
-            SLList<SLList<scalar> >::iterator faceFaceWeightsIter =
-                curFaceWeights.begin();
+            SLList<scalar>::iterator weightsIter =
+                faceFaceWeightsIter().begin();
 
             for
             (
                 ;
-                nbrsIter != curNbrs.end()
-             && faceFacesIter != curFaceFaces.end()
-             && faceFaceWeightsIter != curFaceWeights.end();
-                ++nbrsIter, ++faceFacesIter, ++faceFaceWeightsIter
+                facesIter != faceFacesIter().end()
+             && weightsIter != faceFaceWeightsIter().end();
+                ++facesIter, ++weightsIter
             )
             {
-                // Check if master is on local processor
-                if
-                (
-                    contents[masterI] >= procOffset*Pstream::myProcNo()
-                 && contents[masterI] < procOffset*(Pstream::myProcNo() + 1)
-                )
-                {
-                    // Record that this face belongs locally
-                    zoneAddressing_[nProcFaces] = nCoarseFaces;
-                    faceCells_[nProcFaces] =
-                        contents[masterI] - procOffset*Pstream::myProcNo();
-                    nProcFaces++;
+                masterFineAddressing[nAgglomPairs] = facesIter();
 
-                    SLList<label>::iterator facesIter =
-                        faceFacesIter().begin();
-                    SLList<scalar>::iterator weightsIter =
-                        faceFaceWeightsIter().begin();
-
-                    for
-                    (
-                        ;
-                        facesIter != faceFacesIter().end()
-                     && weightsIter != faceFaceWeightsIter().end();
-                        ++facesIter, ++weightsIter
-                    )
-                    {
-                        fineAddressing_[nAgglomPairs] = facesIter();
-                        restrictAddressing_[nAgglomPairs] = nCoarseFaces;
-                        restrictWeights_[nAgglomPairs] = weightsIter();
-                        nAgglomPairs++;
-                    }
-                }
-
-                // Not a local face, but still created in global zone
-                nCoarseFaces++;
+                // Master processor zone face is calculated from
+                masterRestrictAddressing[nAgglomPairs] =
+                    nProcFaces + coarseGlobalFaceOffset;
+                masterRestrictWeights[nAgglomPairs] = weightsIter();
+                nAgglomPairs++;
             }
+
+            nProcFaces++;
         }
+    }
 
-        // Resize arrays: not all of ggi is used locally
-        faceCells_.setSize(nProcFaces);
-        zoneAddressing_.setSize(nProcFaces);
+    // Resize arrays: not all of ggi is used locally
+    masterFaceCells.setSize(nProcFaces);
+    masterZoneAddressing.setSize(nProcFaces);
 
-        fineAddressing_.setSize(nAgglomPairs);
-        restrictAddressing_.setSize(nAgglomPairs);
-        restrictWeights_.setSize(nAgglomPairs);
+    masterFineAddressing.setSize(nAgglomPairs);
+    masterRestrictAddressing.setSize(nAgglomPairs);
+    masterRestrictWeights.setSize(nAgglomPairs);
+
+    // Note: Both master and slave have done the same agglomeration up to here
+
+    if (master())
+    {
+        // Master has completed the clustering
+        faceCells_ = masterFaceCells;
+        zoneAddressing_ = masterZoneAddressing;
+        fineAddressing_ = masterFineAddressing;
+        restrictAddressing_ = masterRestrictAddressing;
+        restrictWeights_ = masterRestrictWeights;
     }
     else
     {
+        // Note: shadowRestrictAddressing contains the
+
+        // Note: zone addressing will be assembled only for local clusters
+        // using the coarseGlobalFaceOffset
+        // HJ, 13/Jun/2016
+        label nProcFaces = 0;
+
+        // Reset face counter for re-use
+        nCoarseFaces = 0;
+        nAgglomPairs = 0;
+
         // On slave side, the owner addressing is stored in linked lists
         forAll (contents, masterI)
         {
@@ -646,6 +763,7 @@ Foam::ggiAMGInterface::ggiAMGInterface
 
             SLList<SLList<scalar> >::iterator faceFaceWeightsIter =
                 curFaceWeights.begin();
+
             for
             (
                 ;
@@ -655,41 +773,37 @@ Foam::ggiAMGInterface::ggiAMGInterface
                 ++nbrsIter, ++faceFacesIter, ++faceFaceWeightsIter
             )
             {
-                // Check if the face is on local processor
-                if
+                // Check if the face is on local processor: no longer needed,
+                // as only local processor is being searched.  HJ, 13/Jun/2016
+
+                // Record that this face belongs locally.
+
+//HJ, HERE: I need to find out the global face index for the face that was created from the master side
+
+                zoneAddressing_[nProcFaces] = nCoarseFaces;
+                faceCells_[nProcFaces] =
+                    nbrsIter() - procOffset*Pstream::myProcNo();
+                nProcFaces++;
+
+                SLList<label>::iterator facesIter =
+                    faceFacesIter().begin();
+
+                SLList<scalar>::iterator weightsIter =
+                    faceFaceWeightsIter().begin();
+
+                for
                 (
-                    nbrsIter() >= procOffset*Pstream::myProcNo()
-                 && nbrsIter() < procOffset*(Pstream::myProcNo() + 1)
+                    ;
+                    facesIter != faceFacesIter().end()
+                 && weightsIter != faceFaceWeightsIter().end();
+                    ++facesIter, ++weightsIter
                 )
                 {
-                    // Record that this face belongs locally.
-                    zoneAddressing_[nProcFaces] = nCoarseFaces;
-                    faceCells_[nProcFaces] =
-                        nbrsIter() - procOffset*Pstream::myProcNo();
-                    nProcFaces++;
-
-                    SLList<label>::iterator facesIter =
-                        faceFacesIter().begin();
-
-                    SLList<scalar>::iterator weightsIter =
-                        faceFaceWeightsIter().begin();
-
-                    for
-                    (
-                        ;
-                        facesIter != faceFacesIter().end()
-                     && weightsIter != faceFaceWeightsIter().end();
-                        ++facesIter, ++weightsIter
-                    )
-                    {
-                        fineAddressing_[nAgglomPairs] = facesIter();
-                        restrictAddressing_[nAgglomPairs] = nCoarseFaces;
-                        restrictWeights_[nAgglomPairs] = weightsIter();
-                        nAgglomPairs++;
-                    }
+                    fineAddressing_[nAgglomPairs] = facesIter();
+                    restrictAddressing_[nAgglomPairs] = nCoarseFaces;
+                    restrictWeights_[nAgglomPairs] = weightsIter();
+                    nAgglomPairs++;
                 }
-
-                nCoarseFaces++;
             }
         }
 
@@ -718,6 +832,8 @@ Foam::tmp<Foam::scalarField> Foam::ggiAMGInterface::agglomerateCoeffs
     const scalarField& fineCoeffs
 ) const
 {
+    // HJ, HERE THIS SHOULD BE REMOVED: NO LONGER NEEDED BECAUSE ALL ADDRESSING IS LOCAL
+
     // Note: reconsider better parallel communication here.
     // Currently expanding to full zone size
     // HJ, 16/Mar/2016
@@ -914,6 +1030,12 @@ Foam::tmp<Foam::scalarField> Foam::ggiAMGInterface::internalFieldTransfer
 ) const
 {
     return shadowInterface().fieldTransferBuffer();
+}
+
+
+void Foam::ggiAMGInterface::expandAddrToZone(labelField& lf) const
+{
+    lf = fastExpand(lf);
 }
 
 

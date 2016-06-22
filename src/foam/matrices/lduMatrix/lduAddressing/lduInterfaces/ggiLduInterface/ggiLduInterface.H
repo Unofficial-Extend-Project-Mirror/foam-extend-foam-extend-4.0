@@ -121,6 +121,10 @@ public:
         //- Return face reverse transformation tensor
         virtual const tensorField& reverseT() const = 0;
 
+        //- Expand addressing to zone
+        //  Used in optimised AMG coarsening
+        virtual void expandAddrToZone(labelField&) const = 0;
+
 
         // Transfer buffer access
 

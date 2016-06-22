@@ -143,9 +143,23 @@ public:
 
         // Interface transfer functions
 
+            //- Fast expand
+            //  Note: contains global communications
+            //  This function will expand data to zone size with fast comms
+            //  filling in only the part of the zone that is required
+            //  on the shadow side
+            template<class Type>
+            tmp<Field<Type> > fastExpand(const UList<Type>&) const;
+
             //- Fast reduce
             //  Note: contains global communications
-            //  New, HJ, 24/Jun/2011
+            //  This function will expand data to zone size with fast comms
+            //  and filter the field to cover the need of a shadow zone
+            //  This makes sense on coarse levels because all addressing
+            //  is one-on-one (one master, one slave).  On the fine level
+            //  each face in the zone may contribute to multiple faces meaning
+            // that the data needs to be expanded to zone size
+            //  HJ, 24/Jun/2011 and 13/Jun/2016
             template<class Type>
             tmp<Field<Type> > fastReduce(const UList<Type>&) const;
 
@@ -234,6 +248,10 @@ public:
 
             //- Return neighbour-cell transformation tensor
             virtual const tensorField& reverseT() const;
+
+            //- Expand addressing to zone
+            //  Used in optimised AMG coarsening
+            virtual void expandAddrToZone(labelField&) const;
 };
 
 
