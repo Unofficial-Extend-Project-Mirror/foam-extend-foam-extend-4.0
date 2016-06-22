@@ -4,9 +4,10 @@
     surfaceScalarField psisf = fvc::interpolate(psis);
     surfaceScalarField rhof = fvc::interpolate(rho);
 
-    // Needs to be outside of loop since p is changing, but psi and rho are not
+    // Needs to be outside of loop since p is changing, but psi and rho are not.
     surfaceScalarField rhoReff = rhof - psisf*fvc::interpolate(p);
 
+    // --- PISO loop
     while (pimple.correct())
     {
         U = rUA*UEqn.H();
@@ -17,6 +18,11 @@
         surfaceScalarField phid2 = rhoReff/rhof*phi;
 
         surfaceScalarField phid("phid", psisf/rhof*phi);
+
+        // Make fluxes relative within the MRF zone
+        mrfZones.relativeFlux(rhoReff, phi);
+        mrfZones.relativeFlux(psisf, phid);
+        mrfZones.relativeFlux(rhoReff, phid2);
 
         p.storePrevIter();
 
