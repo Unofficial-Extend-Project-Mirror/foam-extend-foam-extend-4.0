@@ -187,6 +187,11 @@ public:
                 return coupledFvPatch::reverseT();
             }
 
+            //- Expand addressing to zone
+            //  Used in optimised AMG coarsening
+            virtual void expandAddrToZone(labelField&) const;
+
+
             //- Return the values of the given internal data adjacent to
             //  the interface as a field
             virtual tmp<labelField> interfaceInternalField

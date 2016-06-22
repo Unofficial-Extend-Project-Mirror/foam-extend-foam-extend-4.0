@@ -47,7 +47,7 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                       Class overlapGGILduInterface Declaration
+                   Class overlapGGILduInterface Declaration
 \*---------------------------------------------------------------------------*/
 
 class overlapGGILduInterface

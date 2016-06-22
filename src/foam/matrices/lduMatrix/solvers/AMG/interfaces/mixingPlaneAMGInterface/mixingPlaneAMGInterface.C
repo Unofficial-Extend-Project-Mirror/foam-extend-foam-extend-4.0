@@ -168,6 +168,7 @@ void Foam::mixingPlaneAMGInterface::initInternalFieldTransfer
     const unallocLabelList& iF
 ) const
 {
+    // NOTE: Change this: requires fast reduce.  HJ, 13/Jun/20106
     labelTransferBuffer_ = interfaceInternalField(iF);
 }
 

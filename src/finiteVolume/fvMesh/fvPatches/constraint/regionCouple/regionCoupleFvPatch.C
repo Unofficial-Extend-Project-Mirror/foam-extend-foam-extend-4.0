@@ -315,6 +315,16 @@ const Foam::scalarListList& Foam::regionCoupleFvPatch::weights() const
 }
 
 
+void Foam::regionCoupleFvPatch::expandAddrToZone(labelField& lf) const
+{
+    // Missing code.  Activate for AMG solvers across regionCoupleFvPatch
+    notImplemented
+    (
+        "void regionCoupleFvPatch::expandAddrToZone(labelField& lf) const"
+    );
+}
+
+
 Foam::tmp<Foam::labelField> Foam::regionCoupleFvPatch::interfaceInternalField
 (
     const unallocLabelList& internalData
