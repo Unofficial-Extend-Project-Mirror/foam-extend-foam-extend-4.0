@@ -122,6 +122,11 @@ void Foam::solution::read(const dictionary& dict)
         solvers_ = dict.subDict("solvers");
         upgradeSolverDict(solvers_);
     }
+
+    if (dict.found("solverPerformance"))
+    {
+        solverPerformance_ = dict.subDict("solverPerformance");
+    }
 }
 
 
@@ -147,6 +152,7 @@ Foam::solution::solution(const objectRegistry& obr, const fileName& dictName)
     fieldRelaxDefault_(0),
     eqnRelaxDefault_(0),
     solvers_(dictionary::null),
+    solverPerformance_(dictionary::null),
     prevTimeIndex_(0)
 {
     if (!headerOk())
@@ -411,9 +417,9 @@ bool Foam::solution::writeData(Ostream& os) const
     return true;
 }
 
-const Foam::dictionary& Foam::solution::solverPerformanceDict() const
+Foam::dictionary& Foam::solution::solverPerformanceDict() const
 {
-    return subDict("solverPerformance");
+    return solverPerformance_;
 }
 
 
@@ -423,25 +429,23 @@ void Foam::solution::setSolverPerformance
     const lduSolverPerformance& sp
 ) const
 {
-    dictionary& dict = const_cast<dictionary&>(solverPerformanceDict());
-
     List<lduSolverPerformance> perfs;
 
     if (prevTimeIndex_ != this->time().timeIndex())
     {
         // Reset solver performance between iterations
         prevTimeIndex_ = this->time().timeIndex();
-        dict.clear();
+        solverPerformance_.clear();
     }
     else
     {
-        dict.readIfPresent(name, perfs);
+        solverPerformance_.readIfPresent(name, perfs);
     }
 
     // Append to list
-    perfs.setSize(perfs.size()+1, sp);
+    perfs.setSize(perfs.size() + 1, sp);
 
-    dict.set(name, perfs);
+    solverPerformance_.set(name, perfs);
 }
 
 

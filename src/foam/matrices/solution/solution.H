@@ -75,6 +75,9 @@ class solution
         //- Dictionary of solver parameters for all the fields
         dictionary solvers_;
 
+        //- Dictionary of solver performance.  Used in convergence check
+        mutable dictionary solverPerformance_;
+
         //- Previously used time-index, used for reset between iterations
         mutable label prevTimeIndex_;
 
@@ -151,7 +154,7 @@ public:
             //- Return the dictionary of solver performance data
             //  which includes initial and final residuals for convergence
             //  checking
-            const dictionary& solverPerformanceDict() const;
+            dictionary& solverPerformanceDict() const;
 
             //- Add/set the solverPerformance entry for the named field
             void setSolverPerformance
