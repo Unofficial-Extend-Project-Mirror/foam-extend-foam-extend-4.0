@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -318,7 +318,7 @@ void GGIInterpolation<MasterPatch, SlavePatch>::findNeighboursAABB
     )
 //     forAll (masterPatch_, faceMi)
     {
-        masterPatchBB[faceMi - pmStart] = boundBox 
+        masterPatchBB[faceMi - pmStart] = boundBox
         (
             masterPatch_[faceMi].points(masterPatch_.points()),
             false

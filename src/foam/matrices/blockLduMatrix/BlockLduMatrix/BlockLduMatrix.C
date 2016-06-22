@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -314,7 +314,7 @@ bool Foam::BlockLduMatrix<Type>::symmetric() const
     // pattern, but asymmetric because the diagonal or upper coefficients are
     // square and asymmetric within the coefficients.
     // In such cases, the symmetric check in this function will falsely claim
-    // the matrix is symmetries whereas in its flattened nature it is not 
+    // the matrix is symmetries whereas in its flattened nature it is not
     // For the moment, symmetric check is used to see if the lower() is
     // allocated or not.
     // Please reconsider, especially related to matrix structure in

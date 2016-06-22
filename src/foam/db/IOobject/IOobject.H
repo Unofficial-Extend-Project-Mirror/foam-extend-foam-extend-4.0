@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -361,7 +361,12 @@ public:
             //- Write the standard FOAM file/dictionary banner
             //  Optionally without -*- C++ -*- editor hint (eg, for logs)
             template<class Stream>
-            static inline Stream& writeBanner(Stream& os, bool noHint=false);
+            static inline Stream& writeBanner
+            (
+                Stream& os,
+                bool noHint=false,
+                bool noCopyRight=false
+            );
 
             //- Write the standard file section divider
             template<class Stream>

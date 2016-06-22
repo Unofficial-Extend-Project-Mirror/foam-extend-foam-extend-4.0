@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     |
-    \\  /    A nd           | For copyright notice see file Copyright
-     \\/     M anipulation  |
+   \\    /   O peration     | Version:     4.0
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
 License
     This file is part of foam-extend.
@@ -24,7 +24,7 @@ License
 Author
 Christian Lucas
 Institut für Thermodynamik
-Technische Universität Braunschweig 
+Technische Universität Braunschweig
 Germany
 
 \*---------------------------------------------------------------------------*/
@@ -46,9 +46,9 @@ Foam::constantHeatCapacity<equationOfState>::constantHeatCapacity(Istream& is)
     integral_p_dv_std(this->integral_p_dv(this->rhostd(),this->Tstd())),
     integral_dpdT_dv_std(this->integral_dpdT_dv(this->rhostd(),this->Tstd())),
     // cp @ STD (needed to limit cp for stability
-    cp_std(this->cp_nonLimited(this->rhostd(),this->Tstd())) 	
+    cp_std(this->cp_nonLimited(this->rhostd(),this->Tstd()))
 {
-    is.check("constantHeatCapacity::constantHeatCapacity(Istream& is)"); 	
+    is.check("constantHeatCapacity::constantHeatCapacity(Istream& is)");
 }
 
 

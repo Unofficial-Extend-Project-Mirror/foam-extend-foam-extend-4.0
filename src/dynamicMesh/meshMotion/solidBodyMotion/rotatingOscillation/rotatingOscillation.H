@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -106,8 +106,8 @@ public:
 
         //- Return the solid-body motion transformation septernion
         virtual septernion transformation() const;
-	
-	//- Return the solid-body motion velocity
+
+    //- Return the solid-body motion velocity
         virtual septernion velocity() const;
 
         //- Update properties from given dictionary

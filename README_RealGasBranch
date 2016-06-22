@@ -38,8 +38,8 @@ Features
    --> classes = externalMedia/IAPWS_Waterproperties
 
 /*************************************Solver**************************************************/
- 
-1. Changed pressure equation of rhoPisoFoam. Orginal pressure equation assumes perfect gas 
+
+1. Changed pressure equation of rhoPisoFoam. Orginal pressure equation assumes perfect gas
    (linear relationship between pressure and density)
    --> new solver = realFluidPisoFoam
 
@@ -58,6 +58,3 @@ Features
 
 git commit: "add branch ReadMe file"
    --> added this file
-
-
-   

@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -100,7 +100,7 @@ int main(int argc, char *argv[])
 #       include "UEqn.H"
 
         // --- PISO loop
-        while (piso.correct()) 
+        while (piso.correct())
         {
 #           include "ftEqn.H"
 #           include "bEqn.H"

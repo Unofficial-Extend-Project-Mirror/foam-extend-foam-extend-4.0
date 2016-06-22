@@ -1,7 +1,7 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | foam-extend: Open Source CFD                    |
-|  \\    /   O peration     | Version:     3.2                                |
+|  \\    /   O peration     | Version:     4.0                                |
 |   \\  /    A nd           | Web:         http://www.foam-extend.org         |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
@@ -79,5 +79,6 @@ ignitionThickness ignitionThickness [ 0 1 0 0 0 0 0 ] 0.001;
 ignitionCircleFraction 0.5;
 
 ignitionKernelArea ignitionKernelArea [ 0 2 0 0 0 0 0 ] 0.001;
+
 
 // ************************************************************************* //

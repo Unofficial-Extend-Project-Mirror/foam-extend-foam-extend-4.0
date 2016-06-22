@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -42,7 +42,7 @@ bool Foam::IOobject::writeHeader(Ostream& os) const
         return false;
     }
 
-    writeBanner(os)
+    writeBanner(os, false, true)
         << "FoamFile\n{\n"
         << "    version     " << os.version() << ";\n"
         << "    format      " << os.format() << ";\n"
