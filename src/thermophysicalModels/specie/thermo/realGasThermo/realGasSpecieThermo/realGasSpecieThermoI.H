@@ -234,13 +234,13 @@ inline Foam::scalar Foam::realGasSpecieThermo<thermo>::psiE
     return
     -(
         (
-        T*pow(beta,2)*V
+        T*beta*beta*V
         -this->isothermalCompressiblity(rho,T)*cp
     )
     /
     (
             cp*V
-            -beta*this->p(rho,T)*pow(V,2)
+            -beta*this->p(rho,T)*V*V
     )
     );
 }

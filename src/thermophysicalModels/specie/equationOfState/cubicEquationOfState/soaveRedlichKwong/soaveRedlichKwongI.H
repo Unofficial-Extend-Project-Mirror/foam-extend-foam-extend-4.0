@@ -115,9 +115,11 @@ inline scalar soaveRedlichKwong::Tcrit() const
 
 inline void soaveRedlichKwong::updateModelCoefficients(const scalar T) const
 {
-    aSave=a0_*pow(1 + n_*(1 - pow(T/Tcrit_, 0.5)), 2);
-    daSave=a0_*n_*(n_*sqrt(T/Tcrit_) - n_ - 1)*sqrt(T/Tcrit_)/T;
-    d2aSave=a0_*n_*(n_ + 1)*sqrt(T/Tcrit_)/(2*T*T);
+    scalar TTc_=pow(T/Tcrit_, 0.5);
+
+    aSave=a0_*(1 + n_*(1 - TTc_))*(1 + n_*(1 - TTc_));
+    daSave=a0_*n_*(n_*TTc_ - n_ - 1)*TTc_/T;
+    d2aSave=a0_*n_*(n_ + 1)*TTc_/(2*T*T);
 
     //CL: saving the temperature at which the coefficients are valid
     TSave=T;
@@ -213,7 +215,7 @@ inline scalar soaveRedlichKwong::dpdv(const scalar rho, const scalar T) const
     (
         a(T)*(b3_ - 3*b_*Vm2 + 2*Vm3) - this->RR()*T*Vm2*(b2_ + 2*b_*Vm + Vm2)
     )
-   /(Vm2*pow(b_ + Vm, 2)*pow(b_ - Vm, 2));
+   /(Vm2*(b_ + Vm)*(b_ + Vm)*(b_ - Vm)*(b_ - Vm));
 }
 
 
@@ -294,7 +296,7 @@ inline scalar soaveRedlichKwong::d2pdv2(const scalar rho, const scalar T) const
         a(T)*(b5_ - 3*b3_*Vm2 - b2_*Vm3 + 6*b_*Vm4 - 3*Vm5)
       + this->RR()*T*Vm3*(b3_ + 3*b2_*Vm + 3*b_*Vm2 + Vm3)
     )
-   /(Vm3*pow(b_ + Vm, 3)*pow(Vm - b_, 3));
+   /(Vm3*(b_ + Vm)*(b_ + Vm)*(b_ + Vm)*(Vm - b_)*(Vm - b_)*(Vm - b_));
 }
 
 
@@ -306,15 +308,17 @@ inline scalar soaveRedlichKwong::d2vdT2
     const scalar T
 ) const
 {
-    scalar dpdT2=this->dpdT(rho, T)*this->dpdT(rho, T);
-    scalar dpdv2=this->dpdv(rho, T)*this->dpdv(rho, T);
-    scalar dpdv3=dpdv2*this->dpdv(rho, T);
+    scalar dpdT_=this->dpdT(rho, T);
+    scalar dpdT2=dpdT_*dpdT_;
+    scalar dpdv_=this->dpdv(rho, T);
+    scalar dpdv2=dpdv_*dpdv_;
+    scalar dpdv3=dpdv2*dpdv_;
 
     return 
     -(
           dpdT2*this->d2pdv2(rho, T)
         + dpdv2*this->d2pdT2(rho, T)
-        - 2*this->dpdv(rho, T)*this->dpdT(rho, T)*this->d2pdvdT(rho, T)
+        - 2*dpdv_*dpdT_*this->d2pdvdT(rho, T)
     )
     /dpdv3;
 }
@@ -335,7 +339,7 @@ inline scalar soaveRedlichKwong::d2pdvdT
     (
         dadT(T)*(b3_ - 3*b_*Vm2 + 2*Vm3) - this->RR()*Vm2*(b2_ + 2*b_*Vm + Vm2)
     )
-    /(Vm2*pow(b_ + Vm, 2)*pow(b_ - Vm, 2));
+    /(Vm2*(b_ + Vm)*(b_ + Vm)*(b_ - Vm)*(b_ - Vm));
 }
 
 

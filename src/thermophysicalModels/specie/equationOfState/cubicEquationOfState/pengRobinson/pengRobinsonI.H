@@ -117,9 +117,11 @@ inline scalar pengRobinson::Tcrit() const
 
 inline void pengRobinson::updateModelCoefficients(const scalar T) const
 {
-    aSave=a0_*pow(1 + n_*(1 - pow(T/Tcrit_, 0.5)), 2);
-    daSave=a0_*n_*(n_*sqrt(T/Tcrit_) - n_ - 1)*sqrt(T/Tcrit_)/T;
-    d2aSave=a0_*n_*(n_ + 1)*sqrt(T/Tcrit_)/(2*T*T);
+    scalar TTc_=sqrt(T/Tcrit_);
+
+    aSave=a0_*(1 + n_*(1 - TTc_))*(1 + n_*(1 - TTc_));
+    daSave=a0_*n_*(n_*TTc_ - n_ - 1)*TTc_/T;
+    d2aSave=a0_*n_*(n_ + 1)*TTc_/(2*T*T);
 
     //CL: saving the temperature at which the coefficients are valid
     TSave=T;
@@ -224,7 +226,7 @@ inline scalar pengRobinson::dpdv(const scalar rho, const scalar T) const
             b4_ - 4*b3_*Vm + 2*b2_*Vm2 + 4*b_*Vm3 + Vm4
         )
     )
-   /(pow(b_ - Vm, 2)*pow(b2_ - 2*b_*Vm - Vm2, 2));
+   /((b_ - Vm)*(b_ - Vm)*(b2_ - 2*b_*Vm - Vm2)*(b2_ - 2*b_*Vm - Vm2));
 }
 
 
@@ -320,7 +322,11 @@ inline scalar pengRobinson::d2pdv2(const scalar rho, const scalar T) const
             b6_ - 6*b5_*Vm + 9*b4_*Vm2 + 4*b3_*Vm3 - 9*b2_*Vm4 - 6*b_*Vm5 - Vm6
         )
     )
-   /(pow(b_ - Vm, 3)*pow(b2_ - 2*b_*Vm - Vm2, 3));
+    /
+    (
+         (b_ - Vm)*(b_ - Vm)*(b_ - Vm)*(b2_ - 2*b_*Vm - Vm2)
+        *(b2_ - 2*b_*Vm - Vm2)*(b2_ - 2*b_*Vm - Vm2)
+    );
 }
 
 
@@ -332,15 +338,17 @@ inline scalar pengRobinson::d2vdT2
     const scalar T
 ) const
 {
-    scalar dpdT2=this->dpdT(rho, T)*this->dpdT(rho, T);
-    scalar dpdv2=this->dpdv(rho, T)*this->dpdv(rho, T);
-    scalar dpdv3=dpdv2*this->dpdv(rho, T);
+    scalar dpdT_=this->dpdT(rho, T);
+    scalar dpdT2=dpdT_*dpdT_;
+    scalar dpdv_=this->dpdv(rho, T);
+    scalar dpdv2=dpdv_*dpdv_;
+    scalar dpdv3=dpdv2*dpdv_;
 
     return 
     -(
           dpdT2*this->d2pdv2(rho, T)
         + dpdv2*this->d2pdT2(rho, T)
-        - 2*this->dpdv(rho, T)*this->dpdT(rho, T)*this->d2pdvdT(rho, T)
+        - 2*dpdv_*dpdT_*this->d2pdvdT(rho, T)
     )
     /dpdv3;
 }
@@ -363,7 +371,7 @@ inline scalar pengRobinson::d2pdvdT
         2*dadT(T)*(b3_ - b2_*Vm - b_*Vm2 + Vm3)
       - this->RR()*(b4_ - 4*b3_*Vm + 2*b2_*Vm2 + 4*b_*Vm3 + Vm4)
     )
-   /(pow(b_ - Vm, 2)*pow(b2_ - 2*b_*Vm - Vm2, 2));
+   /((b_ - Vm)*(b_ - Vm)*(b2_ - 2*b_*Vm - Vm2)*(b2_ - 2*b_*Vm - Vm2));
 }
 
 

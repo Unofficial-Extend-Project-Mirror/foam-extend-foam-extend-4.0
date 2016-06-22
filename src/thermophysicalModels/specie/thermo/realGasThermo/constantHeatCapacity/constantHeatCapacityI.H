@@ -183,10 +183,15 @@ inline Foam::scalar Foam::constantHeatCapacity<equationOfState>::cp
      const scalar T 
 ) const
 {
-    // Problem --> dpdv(rho,T)  is =0 at some points within the vapour dome. To increase stability, (dp/dv) has to be limited 
-    // cp can be negative within the vapor dome. To avoid this nonphysical result, the absolute value is used.
-    // within the vapourdome and at the critical point, cp increases to very high values --> infinity, 
-    // this would decrease the stability, so cp will be limited to 20 times the cp @ STD    
+    scalar dpdT_=this->dpdT(rho, T);
+
+    // CL: within the vapor dome, some stabilty problems might occur due to unphysical results (EOS not valite in vapor dome)
+    // CL: In order to find the right solution, the newton solver might go into the vapor dome (in an intermediate step)
+    // CL: Therefore, to avoid a crash, the following stabilisation step should be used  
+    // CL: dpdv(rho,T)  is =0 at some points within the vapour dome. To increase stability, (dp/dv) has to be limited 
+    // CL: cp can be negative within the vapor dome. To avoid this nonphysical result, the absolute value is used.
+    // CL: within the vapourdome and at the critical point, cp increases to very high values --> infinity, 
+    // CL: this would decrease the stability, so cp will be limited to 20 times the cp @ STD   
     return  
     min
     (
@@ -194,7 +199,7 @@ inline Foam::scalar Foam::constantHeatCapacity<equationOfState>::cp
         fabs
         (
             this->cv(rho,T)
-          - T*pow((this->dpdT(rho, T)), 2)/min(this->dpdv(rho, T), -1)
+          - T*dpdT_*dpdT_/min(this->dpdv(rho, T), -1)
         )
     ); 
 }
@@ -209,9 +214,11 @@ inline Foam::scalar Foam::constantHeatCapacity<equationOfState>::cp_nonLimited
      const scalar T 
 ) const
 {
+    scalar dpdT_=this->dpdT(rho, T);
+
     return 
         fabs(this->cv(rho, T)
-      - T*pow((this->dpdT(rho, T)), 2)/min(this->dpdv(rho, T), -1));
+      - T*dpdT_*dpdT_/min(this->dpdv(rho, T), -1));
 }
 
 
@@ -278,9 +285,8 @@ inline Foam::scalar Foam::constantHeatCapacity<equationOfState>::s
 {
     return
       - integral_dpdT_dv_std
-      + this->s0(T)
-      - s0_std
-      - this->RR*log(T/this->Tstd())
+      + this->s0(T) - s0_std
+      - this->RR()*log(T/this->Tstd())
       + this->integral_dpdT_dv(rho, T);
 }
 

@@ -133,12 +133,13 @@ inline scalar redlichKwong::dpdv(const scalar rho, const scalar T) const
     scalar Vm = this->W()/rho;
     scalar Vm2 = Vm*Vm;
     scalar Vm3 = Vm2*Vm;
+    scalar T05_ = pow(T, 0.5);
 
     return
     (
-        a_*(b3_ - 3*b_*Vm2 + 2*Vm3) - this->RR()*pow(T, 1.5)*Vm2*(b2_ + 2*b_*Vm + Vm2)
+        a_*(b3_ - 3*b_*Vm2 + 2*Vm3) - this->RR()*T*T05_*Vm2*(b2_ + 2*b_*Vm + Vm2)
     )
-   /(sqrt(T)*Vm2*pow((b_ + Vm), 2)*pow( (b_ - Vm), 2));
+   /(T05_*Vm2*(b_ + Vm)*(b_ + Vm)*(b_ - Vm)*(b_ - Vm));
 }
 
 
@@ -212,15 +213,16 @@ inline scalar redlichKwong::d2pdv2(const scalar rho, const scalar T) const
     scalar Vm3 = Vm2*Vm;
     scalar Vm4 = Vm3*Vm;
     scalar Vm5 = Vm4*Vm;
+    scalar T05_ = pow(T, 0.5);
 
     return
     (
         2*
         (
             a_*(b5_ - 3*b3_*Vm2 - b2_*Vm3 + 6*b_*Vm4 - 3*Vm5)
-          + this->RR()*pow(T, 1.5)*Vm3*(b3_ + 3*b2_*Vm + 3*b_*Vm2 + Vm3)
+          + this->RR()*T*T05_*Vm3*(b3_ + 3*b2_*Vm + 3*b_*Vm2 + Vm3)
         )
-        /(sqrt(T)*Vm3*pow((b_ + Vm), 3)*pow(Vm - b_, 3))
+        /(T05_*Vm3*(b_ + Vm)*(b_ + Vm)*(b_ + Vm)*(Vm - b_)*(Vm - b_)*(Vm - b_))
     );
 }
 
@@ -229,15 +231,17 @@ inline scalar redlichKwong::d2pdv2(const scalar rho, const scalar T) const
 //using second order implicit differentiation
 inline scalar redlichKwong::d2vdT2(const scalar rho, const scalar T) const
 {
-    scalar dpdT2=this->dpdT(rho, T)*this->dpdT(rho, T);
-    scalar dpdv2=this->dpdv(rho, T)*this->dpdv(rho, T);
-    scalar dpdv3=dpdv2*this->dpdv(rho, T);
+    scalar dpdT_=this->dpdT(rho, T);
+    scalar dpdT2=dpdT_*dpdT_;
+    scalar dpdv_=this->dpdv(rho, T);
+    scalar dpdv2=dpdv_*dpdv_;
+    scalar dpdv3=dpdv2*dpdv_;
 
     return 
     -(
           dpdT2*this->d2pdv2(rho, T)
         + dpdv2*this->d2pdT2(rho, T)
-        - 2*this->dpdv(rho, T)*this->dpdT(rho, T)*this->d2pdvdT(rho, T)
+        - 2*dpdv_*dpdT_*this->d2pdvdT(rho, T)
     )
     /dpdv3;
 }
@@ -259,7 +263,7 @@ inline scalar redlichKwong::d2pdvdT(const scalar rho, const scalar T) const
           + 2*this->RR()*T15_*Vm2*(b2_ + 2*b_*Vm + Vm2)
         )
     )
-    /(T15_*Vm2*pow(b_ + Vm, 2)*pow(b_ - Vm, 2));
+    /(T15_*Vm2*(b_ + Vm)*(b_ + Vm)*(b_ - Vm)*(b_ - Vm));
 }
 
 
