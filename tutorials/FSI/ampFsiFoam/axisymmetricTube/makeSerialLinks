@@ -1,18 +1,10 @@
-#!/bin/tcsh
+#!/bin/sh
 
-cd $1
+cd $1/constant
 
-
-cd constant
-
-ln -s ../../$2/constant solid
-
+ln -sf ../../$2/constant solid
 cd ../system
-
-ln -s ../../$2/system solid
-
+ln -sf ../../$2/system solid
 cd ../0
-
-ln -s ../../$2/0 solid
-
+ln -sf ../../$2/0 solid
 cd ../../

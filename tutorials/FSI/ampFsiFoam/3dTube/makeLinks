@@ -1,27 +1,19 @@
-#!/bin/tcsh
+#!/bin/sh -x
 
-cd $1
+cd $1/constant
 
-cd constant
-
-ln -s ../../$2/constant solid
-
+ln -sf ../../$2/constant solid
 cd ../system
-
-ln -s ../../$2/system solid
-
+ln -sf ../../$2/system solid
 cd ../0
-
-ln -s ../../$2/0 solid
-
+ln -sf ../../$2/0 solid
 cd ..
 
-
-foreach proc(processor*)
+for proc in processor*; do
 cd $proc
 cd 0
-ln -s ../../../$2/$proc/0 solid
+ln -sf ../../../$2/$proc/0 solid
 cd ../constant
-ln -s ../../../$2/$proc/constant solid
+ln -sf ../../../$2/$proc/constant solid
 cd ../..
-end
+done
