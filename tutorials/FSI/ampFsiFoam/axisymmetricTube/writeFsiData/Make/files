@@ -1,4 +1,0 @@
-
-writeFsiData.C
-
-LIB = $(FOAM_USER_LIBBIN)/libwriteFsiData
