@@ -84,7 +84,7 @@ RASModel::RASModel
     epsilonSmall_("epsilonSmall", epsilon0_.dimensions(), SMALL),
     omega0_("omega0", dimless/dimTime, SMALL),
     omegaSmall_("omegaSmall", omega0_.dimensions(), SMALL),
-    muRatio_(lookupOrDefault<scalar>("muRatio", 1e4)),
+    muRatio_(lookupOrDefault<scalar>("muRatio", 1e6)),
 
     y_(mesh_)
 {
