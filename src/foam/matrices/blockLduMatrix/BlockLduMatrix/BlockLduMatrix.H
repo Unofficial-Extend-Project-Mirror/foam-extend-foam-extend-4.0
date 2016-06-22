@@ -60,6 +60,28 @@ SourceFiles
 namespace Foam
 {
 
+/*---------------------------------------------------------------------------*\
+                     Class blockLduMatrix Declaration
+\*---------------------------------------------------------------------------*/
+
+class blockLduMatrix
+{
+public:
+
+    // Static data
+
+        ClassName("blockLduMatrix");
+
+
+    // Constructors
+
+        //- Construct null
+        blockLduMatrix()
+        {}
+};
+
+
+
 // * * * * * * Forward declaration of template friend fuctions * * * * * * * //
 
 template<class Type>
@@ -79,6 +101,7 @@ class BlockConstraint;
 template<class Type>
 class BlockLduMatrix
 :
+    public blockLduMatrix,
     public refCount
 {
 public:
@@ -210,10 +233,6 @@ protected:
 
 
 public:
-
-    //- Runtime type information
-    TypeName("BlockLduMatrix");
-
 
     // Constructors
 

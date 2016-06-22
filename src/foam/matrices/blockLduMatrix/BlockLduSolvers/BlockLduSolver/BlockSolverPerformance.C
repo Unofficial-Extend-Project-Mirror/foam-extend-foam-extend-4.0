@@ -23,6 +23,7 @@ License
 
 \*---------------------------------------------------------------------------*/
 
+#include "BlockLduMatrix.H"
 #include "BlockSolverPerformance.H"
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
@@ -34,7 +35,7 @@ bool Foam::BlockSolverPerformance<Type>::checkConvergence
     const scalar RelTolerance
 )
 {
-    if (debug >= 2)
+    if (blockLduMatrix::debug >= 2)
     {
         Info<< solverName_
             << ":  Iteration " << nIterations_
@@ -92,7 +93,7 @@ bool Foam::BlockSolverPerformance<Type>::checkSingularity
 template<class Type>
 void Foam::BlockSolverPerformance<Type>::print() const
 {
-    if (debug)
+    if (blockLduMatrix::debug)
     {
         Info<< solverName_ << ":  Solving for " << fieldName_;
 

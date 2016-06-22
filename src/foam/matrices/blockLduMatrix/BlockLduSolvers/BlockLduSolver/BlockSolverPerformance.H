@@ -39,7 +39,6 @@ SourceFiles
 #define BlockSolverPerformance_H
 
 #include "error.H"
-#include "runTimeSelectionTables.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -90,12 +89,6 @@ class BlockSolverPerformance
 
 
 public:
-
-    // Static data
-
-        // Declare name of the class and its debug switch
-        ClassName("BlockSolverPerformance");
-
 
     // Constructors
 
