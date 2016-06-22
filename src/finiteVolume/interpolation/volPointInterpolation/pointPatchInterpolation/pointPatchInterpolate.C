@@ -64,7 +64,7 @@ void pointPatchInterpolation::interpolate
 
     forAll(bm, patchi)
     {
-        if (!isA<emptyFvPatch>(bm[patchi]) && bm[patchi].coupled())
+        if (!isA<emptyFvPatch>(bm[patchi]) && !bm[patchi].coupled())
         {
             pointPatchField<Type>& ppf = pf.boundaryField()[patchi];
 
@@ -110,6 +110,28 @@ void pointPatchInterpolation::interpolate
         }
     }
 
+    // Add missing contributions across the coupled boundaries. The weights are
+    // constructed and normalised by correctly taking into account their
+    // contributions from the other side, so we need to add the field
+    // contributions from the other side. VV, 21/June/2016.
+    forAll(pf.boundaryField(), patchi)
+    {
+        if (pf.boundaryField()[patchi].coupled())
+        {
+            pf.boundaryField()[patchi].initAddField();
+        }
+    }
+
+    forAll(pf.boundaryField(), patchi)
+    {
+        if (pf.boundaryField()[patchi].coupled())
+        {
+            pf.boundaryField()[patchi].addField
+            (
+                pf.internalField()
+            );
+        }
+    }
 
     // Correct patch-patch boundary points by interpolation "around" corners
     const labelListList& PointFaces = fvMesh_.pointFaces();
