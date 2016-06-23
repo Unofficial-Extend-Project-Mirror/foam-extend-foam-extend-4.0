@@ -350,7 +350,7 @@ inline Foam::scalar Foam::nasaHeatCapacityPolynomial<equationOfState>::s
     const scalar T
 ) const
 {
-    return 
+    return
     (
       - integral_dpdT_dv_std
       + this->s0(T)

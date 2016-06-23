@@ -46,10 +46,10 @@ Foam::constantHeatCapacity<equationOfState>::constantHeatCapacity(Istream& is)
     s0_std(s0(this->Tstd())),
     integral_p_dv_std(this->integral_p_dv(this->rhostd(),this->Tstd())),
     integral_dpdT_dv_std(this->integral_dpdT_dv(this->rhostd(),this->Tstd())),
-    //CL: cp @ STD (needed to limit cp for stability
-    cp_std(this->cp_nonLimited(this->rhostd(),this->Tstd())) 	
+    //CL: cp @ STD (needed to limit cp for stability)
+    cp_std(this->cp_nonLimited(this->rhostd(), this->Tstd()))
 {
-    is.check("constantHeatCapacity::constantHeatCapacity(Istream& is)"); 	
+    is.check("constantHeatCapacity::constantHeatCapacity(Istream& is)");
 }
 
 
