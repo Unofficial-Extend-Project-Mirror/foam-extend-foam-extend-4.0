@@ -225,7 +225,7 @@ inline scalar pengRobinson::dpdv(const scalar rho, const scalar T) const
             b4_ - 4*b3_*Vm + 2*b2_*Vm2 + 4*b_*Vm3 + Vm4
         )
     )
-   /pow(b_ - Vm, 6);
+   /pow(b_ - Vm, 8);
 }
 
 
