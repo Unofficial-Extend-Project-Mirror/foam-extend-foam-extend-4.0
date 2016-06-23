@@ -126,7 +126,7 @@ void Foam::aungierRedlichKwong::write(Ostream& os) const
 Foam::Ostream& Foam::operator<<(Ostream& os, const aungierRedlichKwong& ark)
 {
     os  << static_cast<const specie&>(ark)<< token::SPACE
-        << ark.pcrit_ << tab<< ark.Tcrit_<< tab<<ark.azentricFactor_<< tab<<ark.rhocrit_;
+        << ark.pcrit_ << tab<< ark.Tcrit_<< tab<<ark.rhocrit_ << tab<<ark.azentricFactor_;
 
     os.check("Ostream& operator<<(Ostream& os, const aungierRedlichKwong& st)");
     return os;

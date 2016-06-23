@@ -3,7 +3,7 @@
 | \\      /  F ield         | foam-extend: Open Source CFD                    |
 |  \\    /   O peration     | Version:     4.0                                |
 |   \\  /    A nd           | Web:         http://www.foam-extend.org         |
-|    \\/     M anipulation  |                                                 |
+|    \\/     M anipulation  | For copyright notice see file Copyright         |
 \*---------------------------------------------------------------------------*/
 FoamFile
 {
@@ -11,35 +11,46 @@ FoamFile
     format      ascii;
     class       volScalarField;
     location    "0";
-    object      omega;
+    object      epsilon;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-dimensions      [0 0 -1 0 0 0 0];
+dimensions      [0 2 -3 0 0 0 0];
 
-internalField   uniform 2.6;
+internalField   uniform 200;
 
 boundaryField
 {
-    movingWall
+    outlet
     {
-        type            compressible::omegaWallFunction;
+        type            inletOutlet;
+        inletValue      uniform 200;
+        value           uniform 200;
+    }
+    inlet1
+    {
+        type            compressible::turbulentMixingLengthDissipationRateInlet;
+        mixingLength    0.005;
+        phi             phi;
+        k               k;
+        value           uniform 200;
+    }
+    inlet2
+    {
+        type            compressible::turbulentMixingLengthDissipationRateInlet;
+        mixingLength    0.005;
+        phi             phi;
+        k               k;
+        value           uniform 200;
+    }
+    wall
+    {
+        type            compressible::epsilonWallFunction;
+        refValue        uniform 0;
+        value           uniform 200;
         Cmu             0.09;
         kappa           0.41;
         E               9.8;
-        value           uniform 2.6;
-    }
-    fixedWalls
-    {
-        type            compressible::omegaWallFunction;
-        Cmu             0.09;
-        kappa           0.41;
-        E               9.8;
-        value           uniform 2.6;
-    }
-    frontAndBack
-    {
-        type            empty;
     }
 }
 

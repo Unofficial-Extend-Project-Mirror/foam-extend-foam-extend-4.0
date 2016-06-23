@@ -136,12 +136,14 @@ inline scalar aungierRedlichKwong::azentricFactor() const
 
 inline void aungierRedlichKwong::updateModelCoefficients(const scalar T)const
 {
-    aSave=a0_*pow(T/Tcrit_, -n_);
-    daSave=-a0_*n_*pow(T/Tcrit_, -n_)/T;
-    d2aSave=a0_*(n_*n_ + n_)/(T*T)*pow(T/Tcrit_, -n_);
+    scalar TTc = pow(T/Tcrit_, -n_);
+
+    aSave = a0_*TTc;
+    daSave = -a0_*n_*TTc/T;
+    d2aSave = a0_*(n_*n_ + n_)/(T*T)*TTc;
 
     //CL: saving the temperature at which the coefficients are valid
-    TSave=T;
+    TSave = T;
 }
 
 
@@ -224,6 +226,7 @@ inline scalar aungierRedlichKwong::n() const
 inline scalar aungierRedlichKwong::p(const scalar rho, const scalar T) const
 {
     scalar Vm = this->W()/rho;
+
     return this->RR()*T/(Vm - b_ + c_) - a(T)/(Vm*(Vm + b_));
 }
 
@@ -249,6 +252,7 @@ inline scalar aungierRedlichKwong::dpdv(const scalar rho, const scalar T) const
 inline scalar aungierRedlichKwong::dpdT(const scalar rho, const scalar T) const
 {
     scalar Vm = this->W()/rho;
+
     return this->RR()/(Vm - b_ + c_)-dadT(T)/(Vm*(Vm + b_));
 }
 
@@ -279,6 +283,7 @@ inline scalar aungierRedlichKwong::integral_p_dv
 ) const
 {
     scalar Vm = this->W()/rho;
+
     return this->RR()*T*log(-b_ + c_ + Vm) + a(T)/b_*(log(b_ + Vm) - log(Vm));
     //return this->RR()*T*log(-b_ + c_ + Vm) + a(T)*log(b_ + Vm)/b_ - a(T)*log(Vm)/b_;
 }
@@ -293,6 +298,7 @@ inline scalar aungierRedlichKwong::integral_dpdT_dv
 ) const
 {
     scalar Vm = this->W()/rho;
+
     return this->RR()*log(-b_ + c_ + Vm) + dadT(T)/b_*(log(b_ + Vm) - log(Vm));
     //return this->RR()*log(-b_ + c_ + Vm) + dadT(T)*log(b_ + Vm)/b_ - dadT(T)*log(Vm)/b_;
 }
@@ -302,6 +308,7 @@ inline scalar aungierRedlichKwong::integral_dpdT_dv
 inline scalar aungierRedlichKwong::d2pdT2(const scalar rho,const scalar T) const
 {
     scalar Vm = this->W()/rho;
+
     return -d2adT2(T)/(Vm*(Vm + b_));
 }
 
@@ -312,19 +319,27 @@ inline scalar aungierRedlichKwong::d2pdv2(const scalar rho,const scalar T) const
     scalar Vm = this->W()/rho;
     scalar Vm2 = Vm*Vm;
     scalar Vm3 = Vm2*Vm;
+    scalar cpVm = c_ + Vm;
+    scalar bpVm3 = pow(b_ + Vm, 3);
 
     return -2*
     (
         a(T)*
         (
-            b5_ - 3*b4_*c_ + 3*b3_*(c2_ - c_*Vm - Vm2)
-          - b2_*(c_ + Vm)*(c2_ - 7*c_*Vm+Vm2)
-          + 3*b_*Vm*pow(c_ + Vm, 2)*(2*Vm - c_)
-          - 3*Vm2*pow(c_ + Vm, 3)
+            b5_ - 3*b4_*c_ + 3*b3_*pow(c_ - Vm, 2)
+          + cpVm*
+            (
+              - b2_*(c2_ - 7*c_*Vm + Vm2)
+              + cpVm*
+                (
+                    3*b_*Vm*(2*Vm - c_)
+                  - 3*Vm2*cpVm
+                )
+            )
         )
-      + this->RR()*T*Vm3*(b3_ + 3*b2_*Vm + 3*b_*Vm2 + Vm3)
+      + this->RR()*T*Vm3*bpVm3
     )
-   /(Vm3*pow(b_ - c_ - Vm, 3)*pow(b_ + Vm, 3));
+   /(Vm3*pow(b_ - c_ - Vm, 3)*bpVm3);
 }
 
 
@@ -336,15 +351,17 @@ inline scalar aungierRedlichKwong::d2vdT2
     const scalar T
 ) const
 {
-    scalar dpdT2=this->dpdT(rho, T)*this->dpdT(rho, T);
-    scalar dpdv2=this->dpdv(rho, T)*this->dpdv(rho, T);
-    scalar dpdv3=dpdv2*this->dpdv(rho, T);
+    scalar dpdT = this->dpdT(rho, T);
+    scalar dpdT2 = dpdT*dpdT;
+    scalar dpdv = this->dpdv(rho, T);
+    scalar dpdv2 = dpdv*dpdv;
+    scalar dpdv3 = dpdv2*dpdv;
 
     return
     -(
           dpdT2*this->d2pdv2(rho, T)
         + dpdv2*this->d2pdT2(rho, T)
-        - 2*this->dpdv(rho, T)*this->dpdT(rho, T)*this->d2pdvdT(rho, T)
+        - 2*dpdv*dpdT*this->d2pdvdT(rho, T)
     )
     /dpdv3;
 }
@@ -359,13 +376,17 @@ inline scalar aungierRedlichKwong::d2pdvdT
 {
     scalar Vm = this->W()/rho;
     scalar Vm2 = Vm*Vm;
+    scalar cpVm = c_ + Vm;
+    scalar cpVm2 = cpVm*cpVm;
+    scalar bpVm = b_ + Vm;
+    scalar bpVm2 = bpVm*bpVm;
 
     return
     (
-        dadT(T)*(b3_ - 2*b2_*c_ + b_*(c_ + Vm)*(c_ - 3*Vm)+2*Vm*pow(c_ + Vm, 2))
-      - this->RR()*Vm2*(b2_ + 2*b_*Vm + Vm2)
+        dadT(T)*(b3_ - 2*b2_*c_ + b_*cpVm*(c_ - 3*Vm) + 2*Vm*cpVm2)
+      - this->RR()*Vm2*bpVm2
     )
-    /(Vm2*pow(b_ - c_ - Vm, 2)*pow(b_ + Vm, 2));
+    /(Vm2*pow(b_ - c_ - Vm, 2)*bpVm2);
 }
 
 
@@ -378,6 +399,7 @@ inline scalar aungierRedlichKwong::integral_d2pdT2_dv
 ) const
 {
     scalar Vm = this->W()/rho;
+
     return d2adT2(T)*log(b_ + Vm)/b_ - d2adT2(T)*log(Vm)/b_;
 }
 

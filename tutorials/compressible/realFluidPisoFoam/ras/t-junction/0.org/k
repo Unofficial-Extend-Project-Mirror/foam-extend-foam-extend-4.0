@@ -3,7 +3,7 @@
 | \\      /  F ield         | foam-extend: Open Source CFD                    |
 |  \\    /   O peration     | Version:     4.0                                |
 |   \\  /    A nd           | Web:         http://www.foam-extend.org         |
-|    \\/     M anipulation  |                                                 |
+|    \\/     M anipulation  | For copyright notice see file Copyright         |
 \*---------------------------------------------------------------------------*/
 FoamFile
 {
@@ -11,35 +11,40 @@ FoamFile
     format      ascii;
     class       volScalarField;
     location    "0";
-    object      omega;
+    object      k;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-dimensions      [0 0 -1 0 0 0 0];
+dimensions      [0 2 -2 0 0 0 0];
 
-internalField   uniform 2.6;
+internalField   uniform 1;
 
 boundaryField
 {
-    movingWall
+    outlet
     {
-        type            compressible::omegaWallFunction;
-        Cmu             0.09;
-        kappa           0.41;
-        E               9.8;
-        value           uniform 2.6;
+        type            zeroGradient;
     }
-    fixedWalls
+    inlet1
     {
-        type            compressible::omegaWallFunction;
-        Cmu             0.09;
-        kappa           0.41;
-        E               9.8;
-        value           uniform 2.6;
+        type            turbulentIntensityKineticEnergyInlet;
+        intensity       0.05;
+        U               U;
+        phi             phi;
+        value           uniform 1;
     }
-    frontAndBack
+    inlet2
     {
-        type            empty;
+        type            turbulentIntensityKineticEnergyInlet;
+        intensity       0.05;
+        U               U;
+        phi             phi;
+        value           uniform 1;
+    }
+    wall
+    {
+        type            compressible::kqRWallFunction;
+        value           uniform 1;
     }
 }
 

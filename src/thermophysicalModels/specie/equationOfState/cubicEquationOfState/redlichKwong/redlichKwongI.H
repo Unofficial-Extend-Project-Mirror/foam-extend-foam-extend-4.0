@@ -121,6 +121,7 @@ inline scalar redlichKwong::b() const
 inline scalar redlichKwong::p(const scalar rho, const scalar T) const
 {
     scalar Vm = this->W()/rho;
+
     return this->RR()*T/(Vm - b_) - a_/(sqrt(T)*Vm*(Vm + b_));
 }
 
@@ -132,12 +133,14 @@ inline scalar redlichKwong::dpdv(const scalar rho, const scalar T) const
     scalar Vm = this->W()/rho;
     scalar Vm2 = Vm*Vm;
     scalar Vm3 = Vm2*Vm;
+    scalar T05 = pow(T, 0.5);
+    scalar bpVm2 = pow(b_ + Vm, 2);
 
     return
     (
-        a_*(b3_ - 3*b_*Vm2 + 2*Vm3) - this->RR()*pow(T, 1.5)*Vm2*(b2_ + 2*b_*Vm + Vm2)
+        a_*(b3_ - 3*b_*Vm2 + 2*Vm3) - this->RR()*T*T05*Vm2*bpVm2
     )
-   /(sqrt(T)*Vm2*pow((b_ + Vm), 2)*pow( (b_ - Vm), 2));
+   /(T05*Vm2*bpVm2*pow(b_ - Vm, 2));
 }
 
 
@@ -146,7 +149,8 @@ inline scalar redlichKwong::dpdv(const scalar rho, const scalar T) const
 inline scalar redlichKwong::dpdT(const scalar rho, const scalar T) const
 {
     scalar Vm = this->W()/rho;
-    return 0.5*a_/(pow(T, 1.5)*Vm*(b_ + Vm))-this->RR()/(b_ - Vm);
+
+    return 0.5*a_/(pow(T, 1.5)*Vm*(b_ + Vm)) - this->RR()/(b_ - Vm);
 }
 
 
@@ -176,6 +180,7 @@ inline scalar redlichKwong::integral_p_dv
 ) const
 {
     scalar Vm = this->W()/rho;
+
     return this->RR()*T*log(Vm - b_) + a_/(b_*sqrt(T))*(log(b_ + Vm) - log(Vm));
     //return this->RR()*T*log(Vm - b_) + (a_*log(b_ + Vm))/(b_*sqrt(T)) - (a_*log(Vm))/(b_*sqrt(T));
 }
@@ -190,6 +195,7 @@ inline scalar redlichKwong::integral_dpdT_dv
 ) const
 {
     scalar Vm = this->W()/rho;
+
     return this->RR()*log(Vm - b_) - a_/(2*b_*pow(T, 1.5))*(log(b_ + Vm) - log(Vm));
     //return this->RR()*log(Vm - b_) - (a_*log(b_ + Vm))/(2*b_*T15_) + (a_*log(Vm))/(2*b_*T15_);
 }
@@ -211,15 +217,16 @@ inline scalar redlichKwong::d2pdv2(const scalar rho, const scalar T) const
     scalar Vm3 = Vm2*Vm;
     scalar Vm4 = Vm3*Vm;
     scalar Vm5 = Vm4*Vm;
+    scalar T05 = pow(T, 0.5);
 
     return
     (
         2*
         (
             a_*(b5_ - 3*b3_*Vm2 - b2_*Vm3 + 6*b_*Vm4 - 3*Vm5)
-          + this->RR()*pow(T, 1.5)*Vm3*(b3_ + 3*b2_*Vm + 3*b_*Vm2 + Vm3)
+          + this->RR()*T*T05*Vm3*(b3_ + 3*b2_*Vm + 3*b_*Vm2 + Vm3)
         )
-        /(sqrt(T)*Vm3*pow((b_ + Vm), 3)*pow(Vm - b_, 3))
+        /(T05*Vm3*pow((b_ + Vm), 3)*pow(Vm - b_, 3))
     );
 }
 
@@ -228,15 +235,17 @@ inline scalar redlichKwong::d2pdv2(const scalar rho, const scalar T) const
 //using second order implicit differentiation
 inline scalar redlichKwong::d2vdT2(const scalar rho, const scalar T) const
 {
-    scalar dpdT2=this->dpdT(rho, T)*this->dpdT(rho, T);
-    scalar dpdv2=this->dpdv(rho, T)*this->dpdv(rho, T);
-    scalar dpdv3=dpdv2*this->dpdv(rho, T);
+    scalar dpdT = this->dpdT(rho, T);
+    scalar dpdT2 = dpdT*dpdT;
+    scalar dpdv = this->dpdv(rho, T);
+    scalar dpdv2 = dpdv*dpdv;
+    scalar dpdv3 = dpdv2*dpdv;
 
     return
     -(
           dpdT2*this->d2pdv2(rho, T)
         + dpdv2*this->d2pdT2(rho, T)
-        - 2*this->dpdv(rho, T)*this->dpdT(rho, T)*this->d2pdvdT(rho, T)
+        - 2*dpdv*dpdT*this->d2pdvdT(rho, T)
     )
     /dpdv3;
 }

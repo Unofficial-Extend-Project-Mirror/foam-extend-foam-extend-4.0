@@ -143,6 +143,7 @@ void Foam::calculateProperties_h
 
     region=freesteam_region(S);
 
+    //CL:Liquid phase
     if (region==1)
     {
         p=S.R1.p;
@@ -168,6 +169,7 @@ void Foam::calculateProperties_h
         lambda=freesteam_k_rhoT(rho,T);
         alpha=lambda/cp; //Cl: Important info -->alpha= thermal diffusivity time density
     }
+    //CL:vapor phase
     else if (region==2)
     {
         p=S.R2.p;
@@ -193,6 +195,7 @@ void Foam::calculateProperties_h
         lambda=freesteam_k_rhoT(rho,T);
         alpha=lambda/cp; //Cl: Important info -->alpha= thermal diffusivity time density
     }
+    //CL: supercritial fluid
     else if (region==3)
     {
         scalar gamma,cv;
@@ -234,9 +237,10 @@ void Foam::calculateProperties_h
         alpha=lambda/cp; //Cl: Important info -->alpha= thermal diffusivity time density
 
     }
+    //inside the vapor dome
     else if (region==4)
     {
-        scalar rhov,rhol,betav,betal,kappav,kappal,vv,vl,cpl,hl,hv,cp;
+        scalar rhov,rhol,betav,betal,kappav,kappal,vv,vl,cpl,cpv,hl,hv,cp;
         scalar dvldp,dvvdp,dhldp,dhvdp;
         scalar dpdT,dvdh,dvdp,dxdp;
 
@@ -271,7 +275,7 @@ void Foam::calculateProperties_h
         betav=freesteam_region2_alphav_pT(Sv.R2.p,Sv.R2.T);
 
         cpl=freesteam_region1_cp_pT(Sl.R1.p,Sl.R1.T);
-        //cpv=freesteam_region2_cp_pT(Sv.R2.p,Sv.R2.T);
+        cpv=freesteam_region2_cp_pT(Sv.R2.p,Sv.R2.T);
 
         hl=freesteam_region1_h_pT(Sl.R1.p,Sl.R1.T);
         hv=freesteam_region2_h_pT(Sv.R2.p,Sv.R2.T);
@@ -282,7 +286,7 @@ void Foam::calculateProperties_h
         dvvdp=betav*vv/dpdT-kappav*vv;
 
         dhldp=vl*(1-betal*Sl.R1.T)+cpl/dpdT;
-        dhvdp=vv*(1-betav*Sv.R2.T)+cpl/dpdT;
+        dhvdp=vv*(1-betav*Sv.R2.T)+cpv/dpdT;
 
         dxdp=-dhldp/(hv-hl)
                  +(h-hl)/((hv-hl)*(hv-hl))
@@ -385,6 +389,7 @@ Foam::scalar Foam::psiH(SteamState S)
 
     region=freesteam_region(S);
 
+    //CL:liquid phase
     if (region==1)
     {
         //Cl: note: in FreeStream, beta=1/V*(dV/dP)_P=const is called alphaV (in this region)
@@ -398,6 +403,7 @@ Foam::scalar Foam::psiH(SteamState S)
         //CL: psiH=(drho/dp)_h=const
         psiH=-((S.R1.T*beta*beta-beta)/cp-kappa*rho);
     }
+    //CL:vapor phase
     else if (region==2)
     {
         //Cl: note: in FreeStream, beta=1/V*(dV/dP)_P=const is called alphaV (in this region)
@@ -411,6 +417,7 @@ Foam::scalar Foam::psiH(SteamState S)
         //CL: psiH=(drho/dp)_h=const
         psiH=-((S.R2.T*beta*beta-beta)/cp-kappa*rho);
     }
+    //CL:supercritical fluid
     else if (region==3)
     {
 
@@ -433,9 +440,10 @@ Foam::scalar Foam::psiH(SteamState S)
         psiH=-((S.R3.T*beta*beta-beta)/cp-kappa*rho);
 
     }
+    //inside the vapor dome
     else if (region==4)
     {
-        scalar rhov,rhol,betav,betal,kappav,kappal,vv,vl,cpl,hl,hv,h,p;
+        scalar rhov,rhol,betav,betal,kappav,kappal,vv,vl,cpl,cpv,hl,hv,h,p;
         scalar dvldp,dvvdp,dhldp,dhvdp;
         scalar dpdT,dvdp,dxdp;
 
@@ -466,7 +474,7 @@ Foam::scalar Foam::psiH(SteamState S)
         betav=freesteam_region2_alphav_pT(Sv.R2.p,Sv.R2.T);
 
         cpl=freesteam_region1_cp_pT(Sl.R1.p,Sl.R1.T);
-        //cpv=freesteam_region2_cp_pT(Sv.R2.p,Sv.R2.T);
+        cpv=freesteam_region2_cp_pT(Sv.R2.p,Sv.R2.T);
 
         hl=freesteam_region1_h_pT(Sl.R1.p,Sl.R1.T);
         hv=freesteam_region2_h_pT(Sv.R2.p,Sv.R2.T);
@@ -476,7 +484,7 @@ Foam::scalar Foam::psiH(SteamState S)
         dvvdp=betav*vv/dpdT-kappav*vv;
 
         dhldp=vl*(1-betal*Sl.R1.T)+cpl/dpdT;
-        dhvdp=vv*(1-betav*Sv.R2.T)+cpl/dpdT;
+        dhvdp=vv*(1-betav*Sv.R2.T)+cpv/dpdT;
 
         dxdp=-dhldp/(hv-hl)
                  +(h-hl)/((hv-hl)*(hv-hl))

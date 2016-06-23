@@ -114,12 +114,14 @@ inline scalar soaveRedlichKwong::Tcrit() const
 
 inline void soaveRedlichKwong::updateModelCoefficients(const scalar T) const
 {
-    aSave=a0_*pow(1 + n_*(1 - pow(T/Tcrit_, 0.5)), 2);
-    daSave=a0_*n_*(n_*sqrt(T/Tcrit_) - n_ - 1)*sqrt(T/Tcrit_)/T;
-    d2aSave=a0_*n_*(n_ + 1)*sqrt(T/Tcrit_)/(2*T*T);
+    scalar TTc = pow(T/Tcrit_, 0.5);
+
+    aSave = a0_*(1 + n_*(1 - TTc))*(1 + n_*(1 - TTc));
+    daSave = a0_*n_*(n_*TTc - n_ - 1)*TTc/T;
+    d2aSave = a0_*n_*(n_ + 1)*TTc/(2*T*T);
 
     //CL: saving the temperature at which the coefficients are valid
-    TSave=T;
+    TSave = T;
 }
 
 
@@ -221,6 +223,7 @@ inline scalar soaveRedlichKwong::dpdv(const scalar rho, const scalar T) const
 inline scalar soaveRedlichKwong::dpdT(const scalar rho, const scalar T) const
 {
     scalar Vm = this->W()/rho;
+
     return this->RR()/(Vm - b_) - dadT(T)/(Vm*(Vm + b_));
 }
 
@@ -251,6 +254,7 @@ inline scalar soaveRedlichKwong::integral_p_dv
 ) const
 {
     scalar Vm = this->W()/rho;
+
     return this->RR()*T*log(Vm - b_) + a(T)/b_*(log(b_ + Vm) - log(Vm));
     //return this->RR()*T*log(Vm - b_) + a(T)*log(b_ + Vm)/b_ - a(T)*log(Vm)/b_;
 }
@@ -266,6 +270,7 @@ inline scalar soaveRedlichKwong::integral_dpdT_dv
 ) const
 {
     scalar Vm = this->W()/rho;
+
     return this->RR()*log(Vm - b_) + dadT(T)/b_*(log(b_ + Vm) - log(Vm));
     //return this->RR()*log(Vm - b_) + dadT(T)*log(b_ + Vm)/b_ - dadT(T)*log(Vm)/b_;
 }
@@ -275,6 +280,7 @@ inline scalar soaveRedlichKwong::integral_dpdT_dv
 inline scalar soaveRedlichKwong::d2pdT2(const scalar rho, const scalar T) const
 {
     scalar Vm = this->W()/rho;
+
     return -d2adT2(T)/(Vm*(Vm + b_));
 }
 
@@ -305,15 +311,17 @@ inline scalar soaveRedlichKwong::d2vdT2
     const scalar T
 ) const
 {
-    scalar dpdT2=this->dpdT(rho, T)*this->dpdT(rho, T);
-    scalar dpdv2=this->dpdv(rho, T)*this->dpdv(rho, T);
-    scalar dpdv3=dpdv2*this->dpdv(rho, T);
+    scalar dpdT = this->dpdT(rho, T);
+    scalar dpdT2 = dpdT*dpdT;
+    scalar dpdv = this->dpdv(rho, T);
+    scalar dpdv2 = dpdv*dpdv;
+    scalar dpdv3 = dpdv2*dpdv;
 
     return
     -(
           dpdT2*this->d2pdv2(rho, T)
         + dpdv2*this->d2pdT2(rho, T)
-        - 2*this->dpdv(rho, T)*this->dpdT(rho, T)*this->d2pdvdT(rho, T)
+        - 2*dpdv*dpdT*this->d2pdvdT(rho, T)
     )
     /dpdv3;
 }
@@ -347,6 +355,7 @@ inline scalar soaveRedlichKwong::integral_d2pdT2_dv
 ) const
 {
     scalar Vm = this->W()/rho;
+
     return d2adT2(T)*log(b_ + Vm)/b_ - d2adT2(T)*log(Vm)/b_;
 }
 

@@ -108,7 +108,7 @@ class constantHeatCapacity
 {
     // Private data
 
-        //CL: spec. cp
+        //CL: specific values
         scalar Cp0_;
         //CL: molar values
         scalar cp0_;

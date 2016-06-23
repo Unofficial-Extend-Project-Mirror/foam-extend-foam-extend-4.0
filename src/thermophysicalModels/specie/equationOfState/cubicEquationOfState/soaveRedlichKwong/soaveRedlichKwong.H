@@ -92,7 +92,7 @@ class soaveRedlichKwong
     mutable scalar daSave;
     mutable scalar d2aSave;
 
-    //CL: save the temperature for which the save coefficients (amix,dadTmix,d2adT2mix) are correct
+    //CL: save the temperature for which the save coefficients (aSave, daSave, d2aSave) are correct
     mutable scalar TSave;
 
     //Protected functions
@@ -144,10 +144,10 @@ public:
         //CL: Model coefficient a(T)
         inline scalar a(const scalar T) const;
 
-        //CL: temperature deriviative of model coefficient a(T)
+        //CL: temperature derivative of model coefficient a(T)
         inline scalar dadT(const scalar T) const;
 
-        //CL: second order temperature deriviative of model coefficient a(T)
+        //CL: second order temperature derivative of model coefficient a(T)
         inline scalar d2adT2(const scalar T) const;
 
         //CL: Equation of state

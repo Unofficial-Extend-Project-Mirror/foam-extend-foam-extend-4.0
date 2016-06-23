@@ -131,7 +131,7 @@ inline Foam::realGasSpecieThermo<thermo>::realGasSpecieThermo
 template<class thermo>
 inline Foam::scalar Foam::realGasSpecieThermo<thermo>::gamma(const scalar rho,  const scalar T ) const
 {
-    return -1/(rho*this->p(rho,T))*this->cp(rho,T)/this->cv(rho,T)*this->dpdv(rho,T);
+    return -1/(rho*this->p(rho, T))*this->cp(rho, T)/this->cv(rho, T)*this->dpdv(rho, T);
 }
 
 
@@ -166,7 +166,7 @@ inline Foam::scalar Foam::realGasSpecieThermo<thermo>::Cv( const scalar rho, con
 template<class thermo>
 inline Foam::scalar Foam::realGasSpecieThermo<thermo>::H(const scalar rho, const scalar T) const
 {
-    return this->h(rho,  T)/this->W();
+    return this->h(rho, T)/this->W();
 }
 
 
@@ -187,7 +187,7 @@ inline Foam::scalar Foam::realGasSpecieThermo<thermo>::E(const scalar rho, const
 template<class thermo>
 inline Foam::scalar Foam::realGasSpecieThermo<thermo>::G(const scalar rho,  const scalar T) const
 {
-    return this->g(rho,  T)/this->W();
+    return this->g(rho, T)/this->W();
 }
 
 
@@ -207,12 +207,12 @@ inline Foam::scalar Foam::realGasSpecieThermo<thermo>::psiH
 
 ) const
 {
-    scalar beta=this->isobarExpCoef(rho,T);
+    scalar beta=this->isobarExpCoef(rho, T);
 
     return
     -(
-        (T*beta*beta-beta)/this->Cp(rho,T)
-        -this->isothermalCompressiblity(rho,T)*rho
+        (T*beta*beta-beta)/this->Cp(rho, T)
+      - this->isothermalCompressiblity(rho, T)*rho
     );
 }
 
@@ -227,20 +227,18 @@ inline Foam::scalar Foam::realGasSpecieThermo<thermo>::psiE
 ) const
 {
     scalar V = 1/rho;
-    scalar cp=this->Cp(rho,T);
-    scalar beta=this->isobarExpCoef(rho,T);
+    scalar cp = this->Cp(rho, T);
+    scalar beta = this->isobarExpCoef(rho, T);
 
     return
     -(
         (
-        T*pow(beta,2)*V
-        -this->isothermalCompressiblity(rho,T)*cp
-    )
-    /
-    (
-            cp*V
-            -beta*this->p(rho,T)*pow(V,2)
-    )
+            T*beta*beta*V - this->isothermalCompressiblity(rho, T)*cp
+        )
+        /
+        (
+            cp*V - beta*this->p(rho, T)*V*V
+        )
     );
 }
 
