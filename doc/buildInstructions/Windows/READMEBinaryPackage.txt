@@ -77,10 +77,11 @@ INSTRUCTIONS ON HOW TO INSTALL AND RUN THE WINDOWS VERSION OF FOAM-EXTEND
        cd /d <PATH_TO_CASE>
        decomposePar
        mpirun -np 4 sonicFoam.exe -parallel
+       reconstructPar
 
 6) To post-process the results using ParaView, just run "parafoam" in the case directory:
        cd /d <PATH_TO_CASE>
-       parafoam
+       paraFoam
 
    This will create a temporary .foam file in the case directory and automatically launch ParaView.
 
