@@ -37,13 +37,29 @@ Foam::autoPtr<Foam::dynamicFvMesh> Foam::dynamicFvMesh::New(const IOobject& io)
     forAll(libNames,i) {
         const word libName("lib"+libNames[i]+".so");
 
-        bool ok=dlLibraryTable::open(libName);
-        if(!ok) {
-            WarningIn("dynamicFvMesh::New(const IOobject& io)")
-                << "Loading of dynamic mesh library " << libName
+        bool libLoaded = false;
+
+        dlLibraryTable& ll = dlLibraryTable::loadedLibraries;
+
+        forAllConstIter(dlLibraryTable, ll, llI)
+        {
+            if (ll(llI.key()) == libName)
+            {
+                libLoaded = true;
+                break;
+            }
+        }
+
+        if (!libLoaded)
+        {
+            bool ok=dlLibraryTable::open(libName);
+            if(!ok) {
+                WarningIn("dynamicFvMesh::New(const IOobject& io)")
+                    << "Loading of dynamic mesh library " << libName
                     << " unsuccesful. Some dynamic mesh  methods may not be "
                     << " available"
                     << endl;
+            }
         }
     }
 

@@ -21,54 +21,64 @@ License
     You should have received a copy of the GNU General Public License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
-Application
-    Check a Finite Area mesh
+Class
+    Foam::directMappedWallTetPolyPatch
+
+Description
+    Direct mapped wall patch.
+
+SourceFiles
+    directMappedWallTetPolyPatch.C
 
 \*---------------------------------------------------------------------------*/
 
-#include "fvCFD.H"
-#include "faCFD.H"
+#ifndef directMappedWallTetPolyPatch_H
+#define directMappedWallTetPolyPatch_H
+
+#include "wallTetPolyPatch.H"
+#include "directMappedWallPolyPatch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-using namespace Foam;
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-int main(int argc, char *argv[])
+namespace Foam
 {
-#   include "addRegionOption.H"
 
-#   include "setRootCase.H"
-#   include "createTime.H"
-#   include "createNamedMesh.H"
-#   include "createFaMesh.H"
+/*---------------------------------------------------------------------------*\
+                   Class directMappedWallTetPolyPatch Declaration
+\*---------------------------------------------------------------------------*/
 
-    Info<< "Time = " << runTime.timeName() << nl << endl;
+class directMappedWallTetPolyPatch
+:
+    public wallTetPolyPatch
+{
 
-    // General mesh statistics
-    Info<< "Number of points: " << aMesh.nPoints() << nl
-        << "Number of internal edges: " << aMesh.nInternalEdges() << nl
-        << "Number of edges: " << aMesh.nEdges() << nl
-        << "Number of faces: " << aMesh.nFaces() << nl
-        << endl;
+public:
 
-    // Check geometry
-    Info<< "Face area:  min = " << min(aMesh.S().field())
-        << " max = "  << max(aMesh.S().field()) << nl
-        << "Internal edge length: min = "
-        << min(aMesh.magLe().internalField()) << nl
-        << " max = "  << max(aMesh.magLe().internalField()) << nl
-        << "Edge length: min = "
-        << min(aMesh.magLe()).value() << nl
-        << " max = "  << max(aMesh.magLe()).value() << nl
-        << "Face area normals:  min = " << min(aMesh.faceAreaNormals().field())
-        << " max = "  << max(aMesh.faceAreaNormals().field()) << nl
-        << endl;
+    //- Runtime type information
+    TypeName(directMappedWallPolyPatch::typeName_());
 
 
-    return(0);
-}
+    // Constructors
 
+        //- Construct from polyPatch
+        directMappedWallTetPolyPatch
+        (
+            const polyPatch& patch,
+            const tetPolyBoundaryMesh& bm
+        )
+        :
+            wallTetPolyPatch(patch, bm)
+        {}
+};
+
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+} // End namespace Foam
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#endif
 
 // ************************************************************************* //
+

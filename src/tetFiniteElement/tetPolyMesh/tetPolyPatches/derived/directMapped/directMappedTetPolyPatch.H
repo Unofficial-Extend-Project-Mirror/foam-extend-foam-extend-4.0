@@ -21,54 +21,66 @@ License
     You should have received a copy of the GNU General Public License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
-Application
-    Check a Finite Area mesh
+Class
+    Foam::directMappedTetPolyPatch
+
+Description
+    Direct mapped patch.
+
+SourceFiles
+    directMappedTetPolyPatch.C
 
 \*---------------------------------------------------------------------------*/
 
-#include "fvCFD.H"
-#include "faCFD.H"
+#ifndef directMappedTetPolyPatch_H
+#define directMappedTetPolyPatch_H
+
+#include "faceTetPolyPatch.H"
+#include "directMappedPolyPatch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-using namespace Foam;
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-int main(int argc, char *argv[])
+namespace Foam
 {
-#   include "addRegionOption.H"
 
-#   include "setRootCase.H"
-#   include "createTime.H"
-#   include "createNamedMesh.H"
-#   include "createFaMesh.H"
+/*---------------------------------------------------------------------------*\
+                     Class directMappedTetPolyPatch Declaration
+\*---------------------------------------------------------------------------*/
 
-    Info<< "Time = " << runTime.timeName() << nl << endl;
-
-    // General mesh statistics
-    Info<< "Number of points: " << aMesh.nPoints() << nl
-        << "Number of internal edges: " << aMesh.nInternalEdges() << nl
-        << "Number of edges: " << aMesh.nEdges() << nl
-        << "Number of faces: " << aMesh.nFaces() << nl
-        << endl;
-
-    // Check geometry
-    Info<< "Face area:  min = " << min(aMesh.S().field())
-        << " max = "  << max(aMesh.S().field()) << nl
-        << "Internal edge length: min = "
-        << min(aMesh.magLe().internalField()) << nl
-        << " max = "  << max(aMesh.magLe().internalField()) << nl
-        << "Edge length: min = "
-        << min(aMesh.magLe()).value() << nl
-        << " max = "  << max(aMesh.magLe()).value() << nl
-        << "Face area normals:  min = " << min(aMesh.faceAreaNormals().field())
-        << " max = "  << max(aMesh.faceAreaNormals().field()) << nl
-        << endl;
+class directMappedTetPolyPatch
+:
+    public faceTetPolyPatch
+{
 
 
-    return(0);
-}
 
+public:
+
+    //- Runtime type information
+    TypeName(directMappedPolyPatch::typeName_());
+
+
+    // Constructors
+
+        //- Construct from polyPatch
+        directMappedTetPolyPatch
+        (
+            const polyPatch& patch,
+            const tetPolyBoundaryMesh& bm
+        )
+        :
+            faceTetPolyPatch(patch, bm)
+        {}
+};
+
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+} // End namespace Foam
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#endif
 
 // ************************************************************************* //
+

@@ -17,6 +17,7 @@ cyclicGgiTetPolyPatch = $(constraintTetPolyPatches)/cyclicGgi
 mixingPlaneTetPolyPatch = $(constraintTetPolyPatches)/mixingPlane
 globalTetPolyPatch    = $(constraintTetPolyPatches)/global
 wallTetPolyPatch      = $(derivedTetPolyPatches)/wall
+directMappedTetPolyPatch = $(derivedTetPolyPatches)/directMapped
 
 MapTetFemFields       = $(tetPolyMesh)/MapTetFemFields
 
@@ -39,6 +40,8 @@ $(mixingPlaneTetPolyPatch)/mixingPlaneTetPolyPatch.C
 $(globalTetPolyPatch)/globalTetPolyPatch.C
 $(globalTetPolyPatch)/calcGlobalTetPolyPatchAddr.C
 $(wallTetPolyPatch)/wallTetPolyPatch.C
+$(directMappedTetPolyPatch)/directMappedTetPolyPatch.C
+$(directMappedTetPolyPatch)/directMappedWallTetPolyPatch.C
 $(tetPolyBoundaryMesh)/tetPolyBoundaryMesh.C
 $(tetPolyMesh)/tetPolyMeshLduAddressing.C
 $(tetPolyMesh)/tetPolyMesh.C

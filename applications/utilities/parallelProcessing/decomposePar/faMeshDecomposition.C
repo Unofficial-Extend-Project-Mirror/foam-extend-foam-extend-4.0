@@ -55,7 +55,7 @@ void faMeshDecomposition::distributeFaces()
         (
             IOobject
             (
-                fvMesh::defaultRegion,
+                GeoMesh<polyMesh>::mesh_.name(),
                 processorDb.timeName(),
                 processorDb
             )
@@ -252,7 +252,7 @@ void faMeshDecomposition::decomposeMesh(const bool filterEmptyPatches)
         (
             IOobject
             (
-                fvMesh::defaultRegion,
+                GeoMesh<polyMesh>::mesh_.name(),
                 processorDb.timeName(),
                 processorDb
             )
@@ -1073,7 +1073,7 @@ void faMeshDecomposition::decomposeMesh(const bool filterEmptyPatches)
         (
             IOobject
             (
-                fvMesh::defaultRegion,
+                GeoMesh<polyMesh>::mesh_.name(),
                 processorDb.timeName(),
                 processorDb
             )
@@ -1191,7 +1191,7 @@ bool faMeshDecomposition::writeDecomposition()
         (
             IOobject
             (
-                fvMesh::defaultRegion,
+                GeoMesh<polyMesh>::mesh_.name(),
                 processorDb.timeName(),
                 processorDb
             )

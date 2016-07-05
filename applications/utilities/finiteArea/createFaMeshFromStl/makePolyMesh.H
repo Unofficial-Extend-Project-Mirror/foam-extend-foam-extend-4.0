@@ -23,11 +23,18 @@
         faceRegion[faceI] = patch[faceI].region();
     }
 
+    word polyRegionName;
+
+    if (!args.optionReadIfPresent("region", polyRegionName))
+    {
+        polyRegionName = polyMesh::defaultRegion;
+    }
+
     polyMesh mesh
     (
         IOobject
         (
-            polyMesh::defaultRegion,
+            polyRegionName,
             runTime.constant(),
             runTime
         ),
