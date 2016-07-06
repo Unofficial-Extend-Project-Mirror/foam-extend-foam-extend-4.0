@@ -87,9 +87,6 @@ class aungierRedlichKwong
     scalar rhoMin_;
     scalar rhoMax_;
 
-    //- Density @STD, initialise after a0, b, c, n!
-    scalar rhostd_;
-
     //CL: Variables to save the values of a, dadT and d2adT2 of the mixture
     //CL: Variables must corrected for changing temperatures
     mutable scalar aSave;
@@ -98,6 +95,9 @@ class aungierRedlichKwong
 
     //CL: save the temperature for which the save coefficients (aSave, daSave, d2aSave) are correct
     mutable scalar TSave;
+
+    //- Density @STD, initialise after a0, b, c, n!
+    scalar rhostd_;
 
     //Protected functions
     //CL: function updates the coefficients (aSave, daSave, d2aSave)

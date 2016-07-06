@@ -60,17 +60,13 @@ inline pengRobinson::pengRobinson(const word& name, const pengRobinson& pr)
     b_(pr.b_),
     n_(pr.n_),
     b2_(pr.b2_),
-    b3_(pr.b3_),
-    b4_(pr.b4_),
-    b5_(pr.b5_),
-    b6_(pr.b6_),
     rhoMin_(pr.rhoMin_),
     rhoMax_(pr.rhoMax_),
-    rhostd_(pr.rhostd_),
     aSave(0.0),
     daSave(0.0),
     d2aSave(0.0),
-    TSave(0.0)
+    TSave(0.0),
+    rhostd_(pr.rhostd_)
 {}
 
 
@@ -123,7 +119,7 @@ inline void pengRobinson::updateModelCoefficients(const scalar T) const
     d2aSave = a0_*n_*(n_ + 1)*TTc/(2*T*T);
 
     //CL: saving the temperature at which the coefficients are valid
-    TSave=T;
+    TSave = T;
 }
 
 
@@ -131,7 +127,7 @@ inline void pengRobinson::updateModelCoefficients(const scalar T) const
 inline scalar pengRobinson::a(const scalar T) const
 {
     //CL: check if a has already been calculated for this temperature
-    if(TSave==T)
+    if(TSave == T)
     {
         return aSave;
     }
@@ -148,7 +144,7 @@ inline scalar pengRobinson::a(const scalar T) const
 inline scalar pengRobinson::dadT(const scalar T) const
 {
     // check if a has already been calculated for this temperature
-    if(TSave==T)
+    if(TSave == T)
     {
         return daSave;
     }
@@ -165,7 +161,7 @@ inline scalar pengRobinson::dadT(const scalar T) const
 inline scalar pengRobinson::d2adT2(const scalar T) const
 {
     // check if a has already been calculated for this temperature
-    if(TSave==T)
+    if(TSave == T)
     {
         return d2aSave;
     }
@@ -210,22 +206,15 @@ inline scalar pengRobinson::p(const scalar rho, const scalar T) const
 inline scalar pengRobinson::dpdv(const scalar rho, const scalar T) const
 {
     scalar Vm = this->W()/rho;
-    scalar Vm2 = Vm*Vm;
-    scalar Vm3 = Vm2*Vm;
-    scalar Vm4 = Vm3*Vm;
 
-    return
-    (
-        2*a(T)*
-        (
-            b3_ - b2_*Vm - b_*Vm2 + Vm3
-        )
-      - this->RR()*T*
-        (
-            b4_ - 4*b3_*Vm + 2*b2_*Vm2 + 4*b_*Vm3 + Vm4
-        )
-    )
-   /pow(b_ - Vm, 8);
+    scalar bmVm = b_ - Vm;
+    scalar bmVm2 = bmVm*bmVm;
+    scalar bpVm = b_ + Vm;
+
+    scalar t1 = bmVm2 - 2*Vm*Vm;
+    scalar t12 = t1*t1;
+
+    return (2*a(T)*bmVm2*bpVm - this->RR()*T*t12)/(bmVm2*t12);
 }
 
 
@@ -285,7 +274,7 @@ inline scalar pengRobinson::integral_dpdT_dv
 ) const
 {
     scalar Vm = this->W()/rho;
-    scalar root2=pow(2, 0.5);
+    scalar root2 = pow(2, 0.5);
 
     return
       - root2*dadT(T)*log(b_*(1 - root2) + Vm)/(4*b_)
@@ -308,23 +297,16 @@ inline scalar pengRobinson::d2pdv2(const scalar rho, const scalar T) const
 {
     scalar Vm = this->W()/rho;
     scalar Vm2 = Vm*Vm;
-    scalar Vm3 = Vm2*Vm;
-    scalar Vm4 = Vm3*Vm;
-    scalar Vm5 = Vm4*Vm;
-    scalar Vm6 = Vm5*Vm;
 
-    return 2*
-    (
-        a(T)*
-        (
-            5*b5_ - 9*b4_*Vm + 4*b2_*Vm3 + 3*b_*Vm4 - 3*Vm5
-        )
-      - this->RR()*T*
-        (
-            b6_ - 6*b5_*Vm + 9*b4_*Vm2 + 4*b3_*Vm3 - 9*b2_*Vm4 - 6*b_*Vm5 - Vm6
-        )
-    )
-    /pow(b_ - Vm, 9);
+    scalar bmVm = b_ - Vm;
+    scalar bmVm2 = bmVm*bmVm;
+    scalar bmVm3 = bmVm2*bmVm;
+
+    scalar t1 = bmVm2 - 2*Vm2;
+    scalar t12 = t1*t1;
+    scalar t13 = t12*t1;
+
+    return 2*(a(T)*bmVm3*(5*b_ + 6*b_*Vm + 3*Vm2) - this->RR()*T*t13)/(bmVm*t1);
 }
 
 
@@ -360,16 +342,16 @@ inline scalar pengRobinson::d2pdvdT
 ) const
 {
     scalar Vm = this->W()/rho;
-    scalar Vm2 = Vm*Vm;
-    scalar Vm3 = Vm2*Vm;
-    scalar Vm4 = Vm3*Vm;
 
-    return
-    (
-        2*dadT(T)*(b3_ - b2_*Vm - b_*Vm2 + Vm3)
-      - this->RR()*(b4_ - 4*b3_*Vm + 2*b2_*Vm2 + 4*b_*Vm3 + Vm4)
-    )
-   /pow(b_ - Vm, 6);
+    scalar bmVm = b_ - Vm;
+    scalar bmVm2 = bmVm*bmVm;
+    scalar bpVm = b_ + Vm;
+
+    scalar t1 = bmVm2 - 2*Vm*Vm;
+    scalar t12 = t1*t1;
+    scalar t14 = t12*t12;
+
+    return (2*dadT(T)*bmVm2*bpVm - this->RR()*t14)/(bmVm2*t12);
 }
 
 

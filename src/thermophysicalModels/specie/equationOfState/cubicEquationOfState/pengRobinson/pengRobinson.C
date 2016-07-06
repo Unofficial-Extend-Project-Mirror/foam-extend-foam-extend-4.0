@@ -47,19 +47,15 @@ Foam::pengRobinson::pengRobinson(Istream& is)
     b_(0.077796*this->RR()*Tcrit_/pcrit_),
     n_(0.37464 + 1.54226*azentricFactor_ - 0.26992*pow(azentricFactor_, 2)),
     b2_(b_*b_),
-    b3_(b2_*b_),
-    b4_(b3_*b_),
-    b5_(b4_*b_),
-    b6_(b5_*b_),
     //CL: Only uses the default values
     rhoMin_(1e-3),
     rhoMax_(1500),
-    // Starting GUESS for the density by ideal gas law
-    rhostd_(this->rho(this->Pstd(), this->Tstd(), this->Pstd()/(this->Tstd()*this->R()))),
     aSave(0.0),
     daSave(0.0),
     d2aSave(0.0),
-    TSave(0.0)
+    TSave(0.0),
+    // Starting GUESS for the density by ideal gas law
+    rhostd_(this->rho(this->Pstd(), this->Tstd(), this->Pstd()/(this->Tstd()*this->R())))
 {
     is.check("pengRobinson::pengRobinson(Istream& is)");
 }
