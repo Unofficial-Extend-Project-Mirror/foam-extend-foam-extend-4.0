@@ -105,21 +105,8 @@
     scalar pdRefValue = 0.0;
     setRefCell(pd, pimple.dict(), pdRefCell, pdRefValue);
 
-    scalar pRefValue = 0.0;
-
-    if (pd.needReference())
-    {
-        pRefValue = readScalar(pimple.dict().lookup("pRefValue"));
-
-        p += dimensionedScalar
-        (
-            "p",
-            p.dimensions(),
-            pRefValue - getRefCellValue(p, pdRefCell)
-        );
-    }
-
     mesh.schemesDict().setFluxRequired(pd.name());
+    mesh.schemesDict().setFluxRequired(alpha1.name());
 
     // Construct interface from alpha1 distribution
     interfaceProperties interface(alpha1, U, twoPhaseProperties);

@@ -88,8 +88,6 @@ int main(int argc, char *argv[])
         {
             twoPhaseProperties.correct();
 
-#           include "alphaEqn.H"
-
 #           include "UEqn.H"
 
             // --- PISO loop
@@ -102,20 +100,10 @@ int main(int argc, char *argv[])
 
 #           include "limitU.H"
 
-            // Recalculate the mass fluxes
-            rhoPhi = phi*fvc::interpolate(rho);
+            p = pd + rho*gh;
+            p.correctBoundaryConditions();
 
-            p = pd + cellIbMask*rho*gh;
-
-            if (pd.needReference())
-            {
-                p += dimensionedScalar
-                (
-                    "p",
-                    p.dimensions(),
-                    pRefValue - getRefCellValue(p, pdRefCell)
-                );
-            }
+#           include "alphaEqn.H"
 
             turbulence->correct();
         }
