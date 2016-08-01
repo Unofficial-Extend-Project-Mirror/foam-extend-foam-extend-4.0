@@ -95,7 +95,7 @@ public:
 
     // Destructor
 
-        ~sixDOFbodies()
+        virtual ~sixDOFbodies()
         {}
 
 
