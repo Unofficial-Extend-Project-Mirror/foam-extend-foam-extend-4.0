@@ -80,7 +80,7 @@ PISO
 PIMPLE
 {
     nOuterCorrectors 2;
-    nCorrectors     6;
+    nCorrectors     4;
     nNonOrthogonalCorrectors 0;
 
     pdRefPoint      (-0.9 1.4 0.05);
@@ -89,13 +89,19 @@ PIMPLE
     pRefPoint      (-0.9 1.4 0.05);
     pRefValue      0;
 
-    limitMagU      35;
+    limitMagU      20;
 }
 
 relaxationFactors
 {
-    U          0.9;
-    pd         0.8;
+    equations
+    {
+        U          0.9;
+    }
+    fields
+    {
+        pd         0.8;
+    }
 }
 
 
