@@ -729,8 +729,12 @@ void Foam::fvMatrix<Type>::completeAssembly()
 
     assemblyCompleted_ = true;
 
-    const typename GeometricField<Type, fvPatchField, volMesh>::
-        GeometricBoundaryField& bFields = psi_.boundaryField();
+    // Cast away const to manipulate matrix
+    GeometricField<Type, fvPatchField, volMesh>& ncPsi =
+        const_cast<GeometricField<Type, fvPatchField, volMesh>& >(psi_);
+
+    typename GeometricField<Type, fvPatchField, volMesh>::
+        GeometricBoundaryField& bFields = ncPsi.boundaryField();
 
     forAll(bFields, patchI)
     {

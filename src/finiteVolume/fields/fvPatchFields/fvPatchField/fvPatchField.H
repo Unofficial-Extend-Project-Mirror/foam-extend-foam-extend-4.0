@@ -463,7 +463,7 @@ public:
         // Matrix manipulation
 
             //- Manipulate matrix
-            virtual void manipulateMatrix(fvMatrix<Type>& matrix) const;
+            virtual void manipulateMatrix(fvMatrix<Type>& matrix);
 
 
         // I-O

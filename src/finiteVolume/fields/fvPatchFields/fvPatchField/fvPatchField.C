@@ -242,7 +242,7 @@ void Foam::fvPatchField<Type>::evaluate(const Pstream::commsTypes)
 
 
 template<class Type>
-void Foam::fvPatchField<Type>::manipulateMatrix(fvMatrix<Type>& matrix) const
+void Foam::fvPatchField<Type>::manipulateMatrix(fvMatrix<Type>& matrix)
 {
     // do nothing
 }
