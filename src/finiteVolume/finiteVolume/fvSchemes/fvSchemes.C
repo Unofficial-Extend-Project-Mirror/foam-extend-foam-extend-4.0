@@ -53,9 +53,11 @@ void Foam::fvSchemes::clear()
     defaultSnGradScheme_.clear();
     laplacianSchemes_.clear(); // optional
     defaultLaplacianScheme_.clear();
-    fluxRequired_.clear();
-    defaultFluxRequired_ = false;
+
+    // Set up special handling for fluxRequired: do not clear
+    // HJ, 25/Jul/2016
 }
+
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
@@ -200,7 +202,7 @@ bool Foam::fvSchemes::read()
     {
         const dictionary& dict = schemesDict();
 
-        // persistent settings across reads is incorrect
+        // Persistent settings across reads is incorrect
         clear();
 
         if (dict.found("ddtSchemes"))
