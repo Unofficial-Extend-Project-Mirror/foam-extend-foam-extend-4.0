@@ -47,7 +47,7 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-          Class pressureDirectedInletOutletVelocityFvPatch Declaration
+    Class pressureDirectedInletOutletVelocityFvPatchVectorField Declaration
 \*---------------------------------------------------------------------------*/
 
 class pressureDirectedInletOutletVelocityFvPatchVectorField
@@ -168,6 +168,18 @@ public:
             word& phiName()
             {
                 return phiName_;
+            }
+
+            //- Return inlet direction
+            const vectorField& inletDir() const
+            {
+                return inletDir_;
+            }
+
+            //- Return access to inlet direction
+            vectorField& inletDir()
+            {
+                return inletDir_;
             }
 
 
