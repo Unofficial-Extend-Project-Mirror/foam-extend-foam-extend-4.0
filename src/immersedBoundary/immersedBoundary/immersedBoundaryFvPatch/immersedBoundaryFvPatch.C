@@ -30,6 +30,8 @@ License
 #include "SortableList.H"
 #include "volFields.H"
 #include "surfaceFields.H"
+#include "treeBoundBox.H"
+#include "treeDataCell.H"
 #include "addToRunTimeSelectionTable.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -1127,7 +1129,7 @@ void Foam::immersedBoundaryFvPatch::makeIbCellCells() const
     // Note: the algorithm is originally written with inward-facing normals
     // and subsequently changed: IB surface normals point outwards
     // HJ, 21/May/2012
-//     const vectorField& ibn = ibNormals();
+    const vectorField& ibn = ibNormals();
 
     forAll (cellCells, cellI)
     {
@@ -1152,14 +1154,14 @@ void Foam::immersedBoundaryFvPatch::makeIbCellCells() const
             // Collect the cells within rM of the fitting cell
             if (r <= rM[cellI])
             {
-//                 scalar angleLimit =
-//                     -Foam::cos(angleFactor_()*mathematicalConstant::pi/180);
+                scalar angleLimit =
+                    -Foam::cos(angleFactor_()*mathematicalConstant::pi/180);
 
                 vector dir = (C[curCell] - ibp[cellI]);
                 dir /= mag(dir) + SMALL;
 
                 // Change of sign of normal.  HJ, 21/May/2012
-//                 if ((-ibn[cellI] & dir) >= angleLimit)
+                if ((-ibn[cellI] & dir) >= angleLimit)
                 {
                     cellCells[cellI][cI++] = curCell;
                 }
@@ -2576,29 +2578,71 @@ const Foam::dynamicLabelList&
 Foam::immersedBoundaryFvPatch::triFacesInMesh() const
 {
     // Check if triFacesInMesh has been updated this time step
-    if(ibUpdateTimeIndex_ != mesh_.time().timeIndex())
+    if (ibUpdateTimeIndex_ != mesh_.time().timeIndex())
     {
         const vectorField& triCf = this->triCf();
 
         triFacesInMesh_.clear();
         triFacesInMesh_.setCapacity(triCf.size()/2);
 
+        // Use octree search to find the cell
+        treeBoundBox overallBb(mesh_.points());
+        Random rndGen(123456);
+        overallBb = overallBb.extend(rndGen, 1E-4);
+        overallBb.min() -= point(ROOTVSMALL, ROOTVSMALL, ROOTVSMALL);
+        overallBb.max() += point(ROOTVSMALL, ROOTVSMALL, ROOTVSMALL);
+
+        // Search
+        indexedOctree<treeDataCell> cellSearch
+        (
+            treeDataCell(false, mesh_),
+            overallBb,  // overall search domain
+            8,          // maxLevel
+            10,         // leafsize
+            3.0         // duplicity
+        );
+        scalar span = cellSearch.bb().mag();
+
         // Find tri faces with centre inside the processor mesh
-        forAll(triCf, fI)
+        forAll (triCf, fI)
         {
             const vector curTriCf = triCf[fI];
 
-            if(!mesh_.bounds().containsInside(curTriCf))
+            if (!mesh_.bounds().containsInside(curTriCf))
             {
                 // Face centre is not inside the mesh
                 continue;
             }
             else
             {
-                if(mesh_.findCell(curTriCf) != -1)
+#if 0
+                // Slow mesh cell search
+                if (mesh_.findCell(curTriCf) != -1)
                 {
                     triFacesInMesh_.append(fI);
                 }
+#else
+                // Octree mesh search
+                pointIndexHit pih = cellSearch.findNearest(curTriCf, span);
+
+                if (pih.hit())
+                {
+                    // Found a hit.  Additional check for point in cell
+                    const label hitCell = pih.index();
+
+                    if
+                    (
+                        mesh_.pointInCellBB
+                        (
+                            curTriCf,
+                            hitCell
+                        )
+                    )
+                    {
+                        triFacesInMesh_.append(fI);
+                    }
+                }
+#endif
             }
         }
 

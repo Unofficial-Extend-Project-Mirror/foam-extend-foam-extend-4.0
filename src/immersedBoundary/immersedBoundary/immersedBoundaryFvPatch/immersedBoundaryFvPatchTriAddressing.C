@@ -114,11 +114,15 @@ void Foam::immersedBoundaryFvPatch::makeTriAddressing() const
             do
             {
                 const label curTri = nextToVisit.removeHead();
-
                 // Discard tri if already visited
-                if (visited[curTri]) continue;
-
-                visited.insert(curTri);
+                if (visited[curTri])
+                {
+                    continue;
+                }
+                else
+                {
+                    visited.insert(curTri);
+                }
 
                 const triFace& curTriPoints = triPatch[curTri];
 
@@ -143,6 +147,14 @@ void Foam::immersedBoundaryFvPatch::makeTriAddressing() const
                             }
                         }
                     }
+                }
+
+                // If the search has gone wrong, escape with
+                // poorer interpolation.
+                if (nextToVisit.size() > 200 && !ibPointsToUse.empty())
+                {
+                    Info<< "ESCAPE " << ibPointsToUse.size() << endl;
+                    break;
                 }
             } while
             (
