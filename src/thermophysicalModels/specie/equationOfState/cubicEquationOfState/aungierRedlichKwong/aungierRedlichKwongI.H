@@ -68,11 +68,11 @@ inline aungierRedlichKwong::aungierRedlichKwong(const word& name, const aungierR
     c2_(pg.c2_),
     rhoMin_(pg.rhoMin_),
     rhoMax_(pg.rhoMax_),
-    rhostd_(pg.rhostd_),
     aSave(0.0),
     daSave(0.0),
     d2aSave(0.0),
-    TSave(0.0)
+    TSave(0.0),
+    rhostd_(pg.rhostd_)
 {}
 
 
@@ -237,13 +237,16 @@ inline scalar aungierRedlichKwong::dpdv(const scalar rho, const scalar T) const
 {
     scalar Vm = this->W()/rho;
     scalar Vm2 = Vm*Vm;
+    scalar bpVm = b_ + Vm;
+    scalar bpVm2 = bpVm*bpVm;
+    scalar cpVm = c_ + Vm;
 
     return
     (
-        a(T)*(b3_ - 2*b2_*c_ + b_*(c_ + Vm)*(c_ - 3*Vm) + 2*Vm*pow(c_ + Vm, 2))
-      - this->RR()*T*Vm2*(b2_ + 2*b_*Vm + Vm2)
+        a(T)*(b3_ - 2*b2_*c_ + b_*cpVm*(c_ - 3*Vm) + 2*Vm*cpVm*cpVm)
+      - this->RR()*T*Vm2*bpVm2
     )
-   /(Vm2*pow(b_ - c_ - Vm, 2)*pow(b_ + Vm, 2));
+   /(Vm2*pow(b_ - c_ - Vm, 2)*bpVm2);
 }
 
 
@@ -284,8 +287,7 @@ inline scalar aungierRedlichKwong::integral_p_dv
 {
     scalar Vm = this->W()/rho;
 
-    return this->RR()*T*log(-b_ + c_ + Vm) + a(T)/b_*(log(b_ + Vm) - log(Vm));
-    //return this->RR()*T*log(-b_ + c_ + Vm) + a(T)*log(b_ + Vm)/b_ - a(T)*log(Vm)/b_;
+    return this->RR()*T*log(Vm - b_ + c_) + a(T)/b_*log((b_ + Vm)/Vm);
 }
 
 
@@ -299,8 +301,7 @@ inline scalar aungierRedlichKwong::integral_dpdT_dv
 {
     scalar Vm = this->W()/rho;
 
-    return this->RR()*log(-b_ + c_ + Vm) + dadT(T)/b_*(log(b_ + Vm) - log(Vm));
-    //return this->RR()*log(-b_ + c_ + Vm) + dadT(T)*log(b_ + Vm)/b_ - dadT(T)*log(Vm)/b_;
+    return this->RR()*log(Vm - b_ + c_) + dadT(T)/b_*log((b_ + Vm)/Vm);
 }
 
 
@@ -309,7 +310,7 @@ inline scalar aungierRedlichKwong::d2pdT2(const scalar rho,const scalar T) const
 {
     scalar Vm = this->W()/rho;
 
-    return -d2adT2(T)/(Vm*(Vm + b_));
+    return -d2adT2(T)/(Vm*(b_ + Vm));
 }
 
 
@@ -400,7 +401,7 @@ inline scalar aungierRedlichKwong::integral_d2pdT2_dv
 {
     scalar Vm = this->W()/rho;
 
-    return d2adT2(T)*log(b_ + Vm)/b_ - d2adT2(T)*log(Vm)/b_;
+    return d2adT2(T)/b_*log((b_ + Vm)/Vm);
 }
 
 

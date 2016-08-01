@@ -63,9 +63,11 @@ public:
 
 int main(int argc, char *argv[])
 {
+#   include "addRegionOption.H"
+
 #   include "setRootCase.H"
 #   include "createTime.H"
-#   include "createMesh.H"
+#   include "createNamedMesh.H"
 
     // Reading faMeshDefinition dictionary
     IOdictionary faMeshDefinition

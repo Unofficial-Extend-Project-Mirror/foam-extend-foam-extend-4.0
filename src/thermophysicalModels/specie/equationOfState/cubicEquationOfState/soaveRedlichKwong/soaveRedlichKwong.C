@@ -47,17 +47,15 @@ Foam::soaveRedlichKwong::soaveRedlichKwong(Istream& is)
     b_(0.08664*this->RR()*Tcrit_/pcrit_),
     n_(0.48508 + 1.55171*azentricFactor_ - 0.15613*pow(azentricFactor_, 2)),
     b2_(b_*b_),
-    b3_(b2_*b_),
-    b5_(b2_*b3_),
     //CL: Only uses the default values
     rhoMin_(1e-3),
     rhoMax_(1500),
-    // Starting GUESS for the density by ideal gas law
-    rhostd_(this->rho(this->Pstd(), this->Tstd(), this->Pstd()/(this->Tstd()*this->R()))),
     aSave(0.0),
     daSave(0.0),
     d2aSave(0.0),
-    TSave(0.0)
+    TSave(0.0),
+    // Starting GUESS for the density by ideal gas law
+    rhostd_(this->rho(this->Pstd(), this->Tstd(), this->Pstd()/(this->Tstd()*this->R())))
 {
     is.check("soaveRedlichKwong::soaveRedlichKwong(Istream& is)");
 }
@@ -83,12 +81,12 @@ soaveRedlichKwong::soaveRedlichKwong(const dictionary& dict)
     //CL: therefore, rho can be larger than rhoMax and smaller than rhoMin
     rhoMin_(dict.subDict("equationOfState").lookupOrDefault("rhoMin",1e-3)),
     rhoMax_(dict.subDict("equationOfState").lookupOrDefault("rhoMax",1500)),
-    // Starting GUESS for the density by ideal gas law
-    rhostd_(this->rho(this->Pstd(), this->Tstd(), this->Pstd()/(this->Tstd()*this->R()))),
     aSave(0.0),
     daSave(0.0),
     d2aSave(0.0),
-    TSave(0.0)
+    TSave(0.0),
+    // Starting GUESS for the density by ideal gas law
+    rhostd_(this->rho(this->Pstd(), this->Tstd(), this->Pstd()/(this->Tstd()*this->R())))
 {
     is.check("soaveRedlichKwong::soaveRedlichKwong(Istream& is)");
 }

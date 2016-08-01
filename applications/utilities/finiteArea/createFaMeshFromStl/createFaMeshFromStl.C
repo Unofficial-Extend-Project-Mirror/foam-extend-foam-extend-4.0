@@ -50,6 +50,8 @@ using namespace Foam;
 
 int main(int argc, char *argv[])
 {
+#   include "addRegionOption.H"
+
     argList::validArgs.append("STL mesh file");
 
     argList args(argc, argv);

@@ -425,7 +425,7 @@ public:
             //- Return current motion time index
             label curMotionTimeIndex() const
             {
-                return moving_;
+                return curMotionTimeIndex_;
             }
 
             //- Set the mesh to be moving

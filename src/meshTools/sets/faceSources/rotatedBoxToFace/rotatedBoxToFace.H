@@ -22,21 +22,32 @@ License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    Foam::pointToCell
+    Foam::rotatedBoxToFace
 
 Description
-    A topoSetSource to select cells based on usage of points.
+    A topoSetSource to select faces based on face centres inside
+    rotated/skewed box (parallelopiped?).
+
+    Box defined as origin and i,j,k vectors.
+    E.g. box rotated 45 degrees around z-axis with sizes sqrt(0.2^2+0.2^2)
+    (and extra large, 200 in z direction):
+    @verbatim
+       origin   ( 0.4 0.4 -100);
+       i        ( 0.2 0.2    0);
+       j        (-0.2 0.2    0);
+       k        ( 0.0 0.0  100);
+    @endverbatim
 
 SourceFiles
-    pointToCell.C
+    rotatedBoxToFace.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef pointToCell_H
-#define pointToCell_H
+#ifndef rotatedBoxToFace_H
+#define rotatedBoxToFace_H
 
 #include "topoSetSource.H"
-#include "NamedEnum.H"
+#include "treeBoundBox.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -44,74 +55,59 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                        Class pointToCell Declaration
+                     Class rotatedBoxToFace Declaration
 \*---------------------------------------------------------------------------*/
 
-class pointToCell
+class rotatedBoxToFace
 :
     public topoSetSource
 {
-public:
-        //- Enumeration defining the valid options
-        enum pointAction
-        {
-            ANY,    // Cells using any point in set
-            ALL     // Cells whose all points are in set
-        };
 
-private:
+    // Private data
 
         //- Add usage string
         static addToUsageTable usage_;
 
-        static const NamedEnum<pointAction, 2> pointActionNames_;
 
-        //- Name of set to use
-        word setName_;
-
-        //- Option
-        pointAction option_;
+        //- skewed box
+        const vector origin_;
+        const vector i_;
+        const vector j_;
+        const vector k_;
 
 
     // Private Member Functions
 
-        //- Depending on point-to-cell option add to or delete from cellSet.
         void combine(topoSet& set, const bool add) const;
 
 
 public:
 
     //- Runtime type information
-    TypeName("pointToCell");
+    TypeName("rotatedBoxToFace");
 
     // Constructors
 
         //- Construct from components
-        pointToCell
+        rotatedBoxToFace
         (
             const polyMesh& mesh,
-            const word& setName,
-            const pointAction option
+            const vector& origin,
+            const vector& i,
+            const vector& j,
+            const vector& k
         );
 
         //- Construct from dictionary
-        pointToCell
-        (
-            const polyMesh& mesh,
-            const dictionary& dict
-        );
+        rotatedBoxToFace(const polyMesh& mesh, const dictionary& dict);
 
         //- Construct from Istream
-        pointToCell
-        (
-            const polyMesh& mesh,
-            Istream&
-        );
+        rotatedBoxToFace(const polyMesh& mesh, Istream&);
 
 
     // Destructor
 
-        virtual ~pointToCell();
+        virtual ~rotatedBoxToFace();
 
 
     // Member Functions
@@ -134,3 +130,4 @@ public:
 #endif
 
 // ************************************************************************* //
+

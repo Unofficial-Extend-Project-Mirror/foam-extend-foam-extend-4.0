@@ -73,6 +73,7 @@ $(faceSources)/boundaryToFace/boundaryToFace.C
 $(faceSources)/zoneToFace/zoneToFace.C
 $(faceSources)/setToFace/setToFace.C
 $(faceSources)/boxToFace/boxToFace.C
+$(faceSources)/rotatedBoxToFace/rotatedBoxToFace.C
 
 pointSources = sets/pointSources
 $(pointSources)/labelToPoint/labelToPoint.C

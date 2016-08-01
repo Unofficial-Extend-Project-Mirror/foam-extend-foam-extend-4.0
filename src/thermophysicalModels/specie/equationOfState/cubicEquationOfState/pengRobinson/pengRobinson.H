@@ -79,17 +79,10 @@ class pengRobinson
 
     //CL: pow of constants b_ used in the code e.g. b2_=b*b;
     scalar b2_;
-    scalar b3_;
-    scalar b4_;
-    scalar b5_;
-    scalar b6_;
 
     //CL: rhoMin and rhoMax are only used as boundaries for the bisection methode (see rho function)
     scalar rhoMin_;
     scalar rhoMax_;
-
-    //- Density @STD, initialise after a0, b!
-    scalar rhostd_;
 
     //CL: Variables to save the values of a, dadT and d2adT2 of the mixture
     //CL: Variables must corrected for changing temperatures
@@ -99,6 +92,9 @@ class pengRobinson
 
     //CL: save the temperature for which the save coefficients (aSave, daSave, d2aSave) are correct
     mutable scalar TSave;
+
+    //- Density @STD, initialise after a0, b!
+    scalar rhostd_;
 
     //Protected functions
     //CL: function updates the coefficients (aSave, daSave, d2aSave)

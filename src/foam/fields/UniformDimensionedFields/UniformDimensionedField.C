@@ -61,7 +61,7 @@ Foam::UniformDimensionedField<Type>::UniformDimensionedField
 {
     dictionary dict(readStream(typeName));
     this->dimensions().reset(dict.lookup("dimensions"));
-    this->value() = dict.lookup("value");
+    this->value() = pTraits<Type>(dict.lookup("value"));
 }
 
 

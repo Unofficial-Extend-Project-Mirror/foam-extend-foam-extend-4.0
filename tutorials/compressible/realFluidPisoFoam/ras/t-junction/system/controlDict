@@ -45,7 +45,7 @@ timePrecision   10;
 
 adjustTimeStep  yes;
 
-maxCo           0.25;
+maxCo           0.1;
 
 maxDeltaT       1e-2;
 

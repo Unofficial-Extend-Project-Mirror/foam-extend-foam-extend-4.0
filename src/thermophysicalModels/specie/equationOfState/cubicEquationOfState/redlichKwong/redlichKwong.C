@@ -45,8 +45,6 @@ Foam::redlichKwong::redlichKwong(Istream& is)
     a_(0.42748*pow(this->RR(), 2)*pow(Tcrit_, 2.5)/pcrit_),
     b_(0.08664*this->RR()*Tcrit_/pcrit_),
     b2_(pow(b_,2)),
-    b3_(pow(b_,3)),
-    b5_(pow(b_,5)),
     //CL: Only uses the default values
     rhoMin_(1e-3),
     rhoMax_(1500),
