@@ -32,6 +32,7 @@ License
 Foam::autoPtr<Foam::AMGInterface> Foam::AMGInterface::New
 (
     const lduPrimitiveMesh& lduMesh,
+    const lduInterfacePtrsList& coarseInterfaces,
     const lduInterface& fineInterface,
     const labelField& localRestrictAddressing,
     const labelField& neighbourRestrictAddressing
@@ -46,11 +47,14 @@ Foam::autoPtr<Foam::AMGInterface> Foam::AMGInterface::New
     {
         FatalErrorIn
         (
-            "AMGInterface::New"
-            "(const lduPrimitiveMesh& lduMesh,"
-            "const lduInterface& fineInterface,"
-            "const labelField& localRestrictAddressing,"
-            "const labelField& neighbourRestrictAddressing)"
+            "AMGInterface::New\n"
+            "(\n"
+            "    const lduPrimitiveMesh& lduMesh,\n"
+            "    const lduInterfacePtrsList& coarseInterfaces,\n"
+            "    const lduInterface& fineInterface,\n"
+            "    const labelField& localRestrictAddressing,\n"
+            "    const labelField& neighbourRestrictAddressing\n"
+            ")"
         )   << "Unknown AMGInterface type " << coupleType << ".\n"
             << "Valid AMGInterface types are :"
             << lduInterfaceConstructorTablePtr_->sortedToc()
@@ -62,6 +66,7 @@ Foam::autoPtr<Foam::AMGInterface> Foam::AMGInterface::New
         cstrIter()
         (
             lduMesh,
+            coarseInterfaces,
             fineInterface,
             localRestrictAddressing,
             neighbourRestrictAddressing

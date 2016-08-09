@@ -68,6 +68,11 @@ class ggiAMGInterface
         //- Zone addressing
         labelList zoneAddressing_;
 
+        //- Processor master faces
+        //  Per-processor insertion list of local faces into global zone
+        //  The list is created on the master side and passed onto the slave
+        //  to allow the slave to insert faces in the same order
+        labelListList procMasterFaces_;
 
         // Parallel communication
 
@@ -110,15 +115,15 @@ public:
         ggiAMGInterface
         (
             const lduPrimitiveMesh& lduMesh,
+            const lduInterfacePtrsList& coarseInterfaces,
             const lduInterface& fineInterface,
             const labelField& localRestrictAddressing,
             const labelField& neighbourRestrictAddressing
         );
 
 
-    // Destructor
-
-        virtual ~ggiAMGInterface();
+    //- Destructor
+    virtual ~ggiAMGInterface();
 
 
     // Member Functions
@@ -239,6 +244,9 @@ public:
 
             //- Is the patch localised on a single processor
             virtual bool localParallel() const;
+
+            //- Processor master face insertion list
+            const labelListList& procMasterFaces() const;
 
             //- Return weights
             virtual const scalarListList& weights() const;

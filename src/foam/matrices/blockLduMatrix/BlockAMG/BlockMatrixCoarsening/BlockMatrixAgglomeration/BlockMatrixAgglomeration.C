@@ -950,6 +950,7 @@ Foam::BlockMatrixAgglomeration<Type>::restrictMatrix() const
                 AMGInterface::New
                 (
                     coarseAddrPtr(),
+                    coarseInterfaces,
                     fineInterface,
                     fineInterface.interfaceInternalField(agglomIndex_),
                     fineInterfaceAddr[intI]

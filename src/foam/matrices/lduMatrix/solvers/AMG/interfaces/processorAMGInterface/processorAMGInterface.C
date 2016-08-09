@@ -45,6 +45,7 @@ namespace Foam
 Foam::processorAMGInterface::processorAMGInterface
 (
     const lduPrimitiveMesh& lduMesh,
+    const lduInterfacePtrsList& coarseInterfaces,
     const lduInterface& fineInterface,
     const labelField& localRestrictAddressing,
     const labelField& neighbourRestrictAddressing
