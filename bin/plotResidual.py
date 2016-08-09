@@ -62,6 +62,7 @@ for line in lines:
                 tepsilon.append(iepsilon)
                 epsilon.append(float(matchepsilon.group(2)))
 
+# write clean data file
 outfile=open('residual.dat','w')
 
 if iomega > 0:
