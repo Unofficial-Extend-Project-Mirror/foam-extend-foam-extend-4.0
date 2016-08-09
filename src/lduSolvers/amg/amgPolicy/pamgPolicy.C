@@ -648,6 +648,7 @@ Foam::autoPtr<Foam::amgMatrix> Foam::pamgPolicy::restrictMatrix
                 AMGInterface::New
                 (
                     *coarseAddrPtr,
+                    coarseInterfaces,
                     fineInterface,
                     fineInterface.interfaceInternalField(child_),
                     fineInterfaceAddr[intI]
