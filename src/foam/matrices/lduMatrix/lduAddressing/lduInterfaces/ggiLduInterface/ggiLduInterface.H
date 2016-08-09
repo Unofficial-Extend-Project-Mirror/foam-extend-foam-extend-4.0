@@ -78,9 +78,8 @@ public:
         {}
 
 
-    // Destructor
-
-        virtual ~ggiLduInterface();
+    //- Destructor
+    virtual ~ggiLduInterface();
 
 
     // Member Functions
