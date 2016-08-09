@@ -30,7 +30,6 @@ Description
     combined using the given combination function and the result is
     broadcast to all nodes
 
-
 \*---------------------------------------------------------------------------*/
 
 #ifndef PstreamCombineReduceOps_H

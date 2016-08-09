@@ -46,7 +46,7 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class PstreamGlobals Declaration
+                     Class PstreamGlobals Declaration
 \*---------------------------------------------------------------------------*/
 
 namespace PstreamGlobals
