@@ -258,6 +258,12 @@ bool Foam::ggiFvPatch::localParallel() const
 }
 
 
+const Foam::mapDistribute& Foam::ggiFvPatch::map() const
+{
+    return ggiPolyPatch_.map();
+}
+
+
 const Foam::scalarListList& Foam::ggiFvPatch::weights() const
 {
     if (ggiPolyPatch_.master())

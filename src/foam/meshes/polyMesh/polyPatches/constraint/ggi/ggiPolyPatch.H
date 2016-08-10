@@ -138,9 +138,6 @@ class ggiPolyPatch
             //- Calculate send and receive addressing
             void calcSendReceive() const;
 
-            //- Return mapDistribute
-            const mapDistribute& map() const;
-
 
         // Memory management
 
@@ -334,6 +331,9 @@ public:
 
             //- Is the patch localised on a single processor
             bool localParallel() const;
+
+            //- Return mapDistribute
+            const mapDistribute& map() const;
 
             //- Return reference to patch-to-patch interpolation
             //  Used only for addressing

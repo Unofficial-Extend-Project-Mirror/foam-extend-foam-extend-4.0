@@ -171,6 +171,9 @@ public:
             //- Is the patch localised on a single processor
             virtual bool localParallel() const;
 
+            //- Return mapDistribute
+            virtual const mapDistribute& map() const;
+
             //- Return weights.  Master side returns own weights and
             //  slave side returns weights from master
             virtual const scalarListList& weights() const;

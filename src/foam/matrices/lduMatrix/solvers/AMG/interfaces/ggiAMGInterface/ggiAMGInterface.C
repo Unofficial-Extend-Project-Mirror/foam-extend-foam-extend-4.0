@@ -839,30 +839,67 @@ Foam::ggiAMGInterface::ggiAMGInterface
         // Re-pack singly linked list of processor master faces
         // and pass to other processors
 
-        // First index: master proc
-        // Second index: slave proc
-        // List contents: global faces in order
-        labelListListList crissCrossList(Pstream::nProcs());
-
-        labelListList& crissList = crissCrossList[Pstream::myProcNo()];
-
-        crissList.setSize(Pstream::nProcs());
-
-        forAll (crissList, procI)
-        {
-            crissList[procI] = procMasterFacesLL[procI];
-        }
-
-        Pstream::gatherList(crissCrossList);
-        Pstream::scatterList(crissCrossList);
-
         procMasterFaces_.setSize(Pstream::nProcs());
 
-        forAll (procMasterFaces_, procI)
+        // Copy self
+        procMasterFaces_[Pstream::myProcNo()] =
+            procMasterFacesLL[Pstream::myProcNo()];
+
+        if (Pstream::parRun())
         {
-            procMasterFaces_[procI] =
-                crissCrossList[procI][Pstream::myProcNo()];
+            const List<labelPair> schedule =
+                fineGgiInterface_.map().schedule();
+
+            // Do the comms
+            forAll (schedule, i)
+            {
+                const label sendProc = schedule[i].first();
+                const label recvProc = schedule[i].second();
+
+                if (Pstream::myProcNo() == sendProc)
+                {
+                    OPstream toNbr(Pstream::scheduled, recvProc);
+                    toNbr << labelList(procMasterFacesLL[recvProc]);
+                }
+                else if (Pstream::myProcNo() == recvProc)
+                {
+                    IPstream fromNbr(Pstream::scheduled, sendProc);
+                    
+                    procMasterFaces_[sendProc] = labelList(fromNbr);
+                }
+                else
+                {
+                    FatalErrorIn("...")
+                        << "My proc number " << Pstream::myProcNo()
+                            << " is neither a sender nor a receiver: "
+                            << schedule[i]
+                            << abort(FatalError);
+                }
+            }
         }
+
+//         // First index: master proc
+//         // Second index: slave proc
+//         // List contents: global faces in order
+//         labelListListList crissCrossList(Pstream::nProcs());
+
+//         labelListList& crissList = crissCrossList[Pstream::myProcNo()];
+
+//         crissList.setSize(Pstream::nProcs());
+
+//         forAll (crissList, procI)
+//         {
+//             crissList[procI] = procMasterFacesLL[procI];
+//         }
+
+//         Pstream::gatherList(crissCrossList);
+//         Pstream::scatterList(crissCrossList);
+
+//         forAll (procMasterFaces_, procI)
+//         {
+//             procMasterFaces_[procI] =
+//                 crissCrossList[procI][Pstream::myProcNo()];
+//         }
     }
     // Agglomerate slave
     else

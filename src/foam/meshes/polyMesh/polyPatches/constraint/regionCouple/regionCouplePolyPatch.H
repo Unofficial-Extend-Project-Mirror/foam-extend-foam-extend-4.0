@@ -42,6 +42,7 @@ SourceFiles
 #include "ggiInterpolation.H"
 #include "faceZone.H"
 #include "Switch.H"
+#include "mapDistribute.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -81,24 +82,30 @@ class regionCouplePolyPatch
         //- Use bridging to fix overlap error in interpolation
         Switch bridgeOverlap_;
 
-        //- Shadow patch index.  Delayed evaluation for construction
-        mutable label shadowIndex_;
-
-        //- Interpolation zone index.  Delayed evaluation for construction
-        mutable label zoneIndex_;
+        //- Quick reject algorithm
+        ggiZoneInterpolation::quickReject reject_;
 
 
-        //- Patch-to-patch interpolation
-        mutable ggiZoneInterpolation* patchToPatchPtr_;
+        // Demand-driven data
 
-        //- Patch-to-zone addressing
-        mutable labelList* zoneAddressingPtr_;
+            //- Shadow patch index.  Delayed evaluation for construction
+            mutable label shadowIndex_;
 
-        //- Remote zone addressing: data needed for interpolation
-        mutable labelList* remoteZoneAddressingPtr_;
+            //- Interpolation zone index.  Delayed evaluation for construction
+            mutable label zoneIndex_;
 
-        //- Reconstructed patch neighbour cell centres
-        mutable vectorField* reconFaceCellCentresPtr_;
+
+            //- Patch-to-patch interpolation
+            mutable ggiZoneInterpolation* patchToPatchPtr_;
+
+            //- Patch-to-zone addressing
+            mutable labelList* zoneAddressingPtr_;
+
+            //- Remote zone addressing: data needed for interpolation
+            mutable labelList* remoteZoneAddressingPtr_;
+
+            //- Reconstructed patch neighbour cell centres
+            mutable vectorField* reconFaceCellCentresPtr_;
 
 
         // Parallel communication optimisation, stored on master processor
@@ -108,11 +115,8 @@ class regionCouplePolyPatch
             //  Used for parallel optimisation
             mutable bool* localParallelPtr_;
 
-            //- List of zone faces indices received from each processor
-            mutable labelListList* receiveAddrPtr_;
-
-            //- List of zone faces indices to send to each processor
-            mutable labelListList* sendAddrPtr_;
+            //- Map-distribute comms tool
+            mutable mapDistribute* mapPtr_;
 
 
     // Private member functions
@@ -143,13 +147,6 @@ class regionCouplePolyPatch
 
             //- Calculate send and receive addressing
             void calcSendReceive() const;
-
-
-            //- Return receive addressing
-            const labelListList& receiveAddr() const;
-
-            //- Return send addressing
-            const labelListList& sendAddr() const;
 
 
         // Memory management
@@ -232,7 +229,9 @@ public:
             const bool attached,
             const bool master,
             const bool isWall,
-            const bool bridgeOverlap
+            const bool bridgeOverlap,
+            const ggiZoneInterpolation::quickReject
+                reject = ggiZoneInterpolation::BB_OCTREE
         );
 
         //- Construct from dictionary
@@ -292,9 +291,8 @@ public:
         }
 
 
-    // Destructor
-
-        virtual ~regionCouplePolyPatch();
+    //-Destructor
+    virtual ~regionCouplePolyPatch();
 
 
     // Member functions
@@ -381,6 +379,9 @@ public:
 
             //- Is the patch localised on a single processor
             bool localParallel() const;
+
+            //- Return mapDistribute
+            const mapDistribute& map() const;
 
             //- Return reference to patch-to-patch interpolation
             const ggiZoneInterpolation& patchToPatch() const;

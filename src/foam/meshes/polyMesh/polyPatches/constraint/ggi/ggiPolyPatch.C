@@ -509,17 +509,6 @@ void Foam::ggiPolyPatch::calcSendReceive() const
 }
 
 
-const Foam::mapDistribute& Foam::ggiPolyPatch::map() const
-{
-    if (!mapPtr_)
-    {
-        calcSendReceive();
-    }
-
-    return *mapPtr_;
-}
-
-
 void Foam::ggiPolyPatch::clearGeom() const
 {
     deleteDemandDrivenData(reconFaceCellCentresPtr_);
@@ -529,6 +518,10 @@ void Foam::ggiPolyPatch::clearGeom() const
     // Local zone addressing does not change with mesh motion
     // HJ, 23/Jun/2011
     deleteDemandDrivenData(remoteZoneAddressingPtr_);
+
+    // localParallel depends on geometry - must be cleared!
+    // HR, 11/Jul/2013
+    deleteDemandDrivenData(localParallelPtr_);
 
     deleteDemandDrivenData(mapPtr_);
 }
@@ -543,7 +536,6 @@ void Foam::ggiPolyPatch::clearOut() const
 
     deleteDemandDrivenData(zoneAddressingPtr_);
     deleteDemandDrivenData(patchToPatchPtr_);
-    deleteDemandDrivenData(localParallelPtr_);
 }
 
 
@@ -823,6 +815,17 @@ const Foam::ggiZoneInterpolation& Foam::ggiPolyPatch::patchToPatch() const
     {
         return shadow().patchToPatch();
     }
+}
+
+
+const Foam::mapDistribute& Foam::ggiPolyPatch::map() const
+{
+    if (!mapPtr_)
+    {
+        calcSendReceive();
+    }
+
+    return *mapPtr_;
 }
 
 
