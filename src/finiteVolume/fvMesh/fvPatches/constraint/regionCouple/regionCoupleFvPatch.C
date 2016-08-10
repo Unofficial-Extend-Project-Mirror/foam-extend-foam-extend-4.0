@@ -34,6 +34,7 @@ Author
 #include "fvMesh.H"
 #include "fvBoundaryMesh.H"
 #include "foamTime.H"
+#include "mapDistribute.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -299,6 +300,12 @@ const Foam::labelListList& Foam::regionCoupleFvPatch::addressing() const
 bool Foam::regionCoupleFvPatch::localParallel() const
 {
     return rcPolyPatch_.localParallel();
+}
+
+
+const Foam::mapDistribute& Foam::regionCoupleFvPatch::map() const
+{
+    return rcPolyPatch_.map();
 }
 
 

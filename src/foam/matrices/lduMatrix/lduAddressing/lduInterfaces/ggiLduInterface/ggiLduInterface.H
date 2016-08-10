@@ -46,6 +46,10 @@ SourceFiles
 namespace Foam
 {
 
+// Forward declaration of classes
+
+class mapDistribute;
+
 /*---------------------------------------------------------------------------*\
                        Class ggiLduInterface Declaration
 \*---------------------------------------------------------------------------*/
@@ -110,6 +114,9 @@ public:
 
         //- Is the patch localised on a single processor
         virtual bool localParallel() const = 0;
+
+        //- Return mapDistribute
+        virtual const mapDistribute& map() const = 0;
 
         //- Return weights
         virtual const scalarListList& weights() const = 0;
