@@ -66,7 +66,7 @@ void Foam::immersedBoundaryFvPatch::makeInvDirichletMatrices() const
     // Initialize maxRowSum for debug
     scalar maxRowSum = 0.0;
 
-    const FieldField<Field, vector>& procC = ibProcCentres();
+    const vectorListList& procC = ibProcCentres();
 
     label nCoeffs = 5;
 
@@ -305,7 +305,7 @@ void Foam::immersedBoundaryFvPatch::makeInvNeumannMatrices() const
     // Initialize maxRowSum for debug
     scalar maxRowSum = 0.0;
 
-    const FieldField<Field, vector>& procC = ibProcCentres();
+    const vectorListList& procC = ibProcCentres();
 
     label nCoeffs = 6;
 

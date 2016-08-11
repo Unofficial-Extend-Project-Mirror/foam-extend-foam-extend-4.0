@@ -51,7 +51,6 @@ maxCo           0.2;
 
 libs
 (
-    "liblduSoLvers.so"
     "libimmersedBoundary.so"
 );
 

@@ -49,6 +49,8 @@ SourceFiles
 #include "surfaceFieldsFwd.H"
 #include "dynamicLabelList.H"
 #include "labelPair.H"
+#include "scalarList.H"
+#include "vectorList.H"
 #include "FieldFields.H"
 #include "scalarMatrices.H"
 
@@ -70,7 +72,7 @@ class immersedBoundaryFvPatch
 {
     // Private data
 
-        //- Reference to processor patch
+        //- Reference to immersed boundary patch
         const immersedBoundaryPolyPatch& ibPolyPatch_;
 
         //- Finite volume mesh reference
@@ -168,10 +170,10 @@ class immersedBoundaryFvPatch
             mutable labelListList* ibProcCellsPtr_;
 
             //- Centres of cells from neighbour processors
-            mutable FieldField<Field, vector>* ibProcCentresPtr_;
+            mutable vectorListList* ibProcCentresPtr_;
 
             //- Gamma of cells from neighbour processors
-            mutable FieldField<Field, scalar>* ibProcGammaPtr_;
+            mutable scalarListList* ibProcGammaPtr_;
 
             //- Cell-proc-cell addressing
             mutable List<List<labelPair> >* ibCellProcCellsPtr_;
@@ -447,12 +449,12 @@ public:
             //- Return neighbour proc centres
             //  These are centres from neighbouring processors the
             //  local processor needs to receive
-            const FieldField<Field, vector>& ibProcCentres() const;
+            const vectorListList& ibProcCentres() const;
 
             //- Return neighbour proc gamma
             //  These are gamma values from neighbouring processors the
             //  local processor needs to receive
-            const FieldField<Field, scalar>& ibProcGamma() const;
+            const scalarListList& ibProcGamma() const;
 
             //- Return neighbour cell addressing
             const List<List<labelPair> >& ibCellProcCells() const;

@@ -41,6 +41,9 @@ Foam::immersedBoundaryFvPatch::sendAndReceive
     );
     FieldField<Field, Type>& procPsi = tprocPsi();
 
+    // This requires a rewrite useng mapDistribute
+    // HJ, 11/Aug/2016
+
     forAll (procPsi, procI)
     {
         procPsi.set

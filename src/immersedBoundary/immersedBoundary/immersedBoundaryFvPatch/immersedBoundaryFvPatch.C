@@ -1095,21 +1095,11 @@ void Foam::immersedBoundaryFvPatch::makeIbCellCells() const
     ibCellCellsPtr_ = new labelListList(ibc.size());
     labelListList& cellCells = *ibCellCellsPtr_;
 
-    ibProcCentresPtr_ = new FieldField<Field, vector>(Pstream::nProcs());
-    FieldField<Field, vector>& procCentres = *ibProcCentresPtr_;
+    ibProcCentresPtr_ = new vectorListList(Pstream::nProcs());
+    vectorListList& procCentres = *ibProcCentresPtr_;
 
-    forAll (procCentres, procI)
-    {
-        procCentres.set(procI, new vectorField(0));
-    }
-
-    ibProcGammaPtr_ = new FieldField<Field, scalar>(Pstream::nProcs());
-    FieldField<Field, scalar>& procGamma = *ibProcGammaPtr_;
-
-    forAll (procGamma, procI)
-    {
-        procGamma.set(procI, new scalarField(0));
-    }
+    ibProcGammaPtr_ = new scalarListList(Pstream::nProcs());
+    scalarListList& procGamma = *ibProcGammaPtr_;
 
 
     ibCellProcCellsPtr_ = new List<List<labelPair> >(ibc.size());
@@ -1250,113 +1240,29 @@ void Foam::immersedBoundaryFvPatch::makeIbCellCells() const
         labelList procIbCells = procIbCellsSet.toc();
         sort(procIbCells);
 
-        // Note: consider more sophisticated gather-scatter
-        // HJ, 18/Jun/2015
-
-        // Send and receive number  of immersed boundary cells
-        // next to processor boundaries
-        for (label procI = 0; procI < Pstream::nProcs(); procI++)
-        {
-            if (procI != Pstream::myProcNo())
-            {
-                // Parallel data exchange
-                {
-                    OPstream toProc
-                    (
-                        Pstream::blocking,
-                        procI,
-                        sizeof(label)
-                    );
-
-                    toProc << procIbCells.size();
-                }
-            }
-        }
-
-        labelList sizes(Pstream::nProcs(), 0);
-        for (label procI = 0; procI < Pstream::nProcs(); procI++)
-        {
-            if (procI != Pstream::myProcNo())
-            {
-                // Parallel data exchange
-                {
-                    IPstream fromProc
-                    (
-                        Pstream::blocking,
-                        procI,
-                        sizeof(label)
-                    );
-
-                    fromProc >> sizes[procI];
-                }
-            }
-        }
+        // Note: new gather-scatter operations
+        // HJ, 11/Aug/2016
 
         // Send and receive ibc centres and radii
-        vectorField centres(procIbCells.size(), vector::zero);
+        vectorListList ctrs(Pstream::nProcs());
+
+        ctrs[Pstream::myProcNo()].setSize(procIbCells.size());
+        vectorList& centres = ctrs[Pstream::myProcNo()];
+
         forAll (centres, cellI)
         {
             centres[cellI] = C[ibc[procIbCells[cellI]]];
         }
-        scalarField procRMax(rM, procIbCells);
 
-        for (label procI = 0; procI < Pstream::nProcs(); procI++)
-        {
-            if (procI != Pstream::myProcNo())
-            {
-                // Parallel data exchange
-                {
-                    OPstream toProc
-                    (
-                        Pstream::blocking,
-                        procI,
-                        centres.size()*sizeof(vector)
-                      + procRMax.size()*sizeof(scalar)
-                    );
+        Pstream::gatherList(ctrs);
+        Pstream::scatterList(ctrs);
 
-                    toProc << centres << procRMax;
-                }
-            }
-        }
+        scalarListList rMax(Pstream::nProcs());
 
-        FieldField<Field, vector> ctrs(Pstream::nProcs());
-        FieldField<Field, scalar> rMax(Pstream::nProcs());
+        rMax[Pstream::myProcNo()] = scalarField(rM, procIbCells);
 
-        for (label procI = 0; procI < Pstream::nProcs(); procI++)
-        {
-            if (procI != Pstream::myProcNo())
-            {
-                ctrs.set
-                (
-                    procI,
-                    new vectorField(sizes[procI], vector::zero)
-                );
-
-                rMax.set
-                (
-                    procI,
-                    new scalarField(sizes[procI], 0)
-                );
-
-                // Parallel data exchange
-                {
-                    IPstream fromProc
-                    (
-                        Pstream::blocking,
-                        procI,
-                        sizes[procI]*sizeof(vector)
-                      + sizes[procI]*sizeof(scalar)
-                    );
-
-                    fromProc >> ctrs[procI] >> rMax[procI];
-                }
-            }
-            else
-            {
-                ctrs.set(procI, new vectorField(0));
-                rMax.set(procI, new scalarField(0));
-            }
-        }
+        Pstream::gatherList(rMax);
+        Pstream::scatterList(rMax);
 
         // Find cells needed by other processors
         if (ibProcCellsPtr_)
@@ -1431,131 +1337,27 @@ void Foam::immersedBoundaryFvPatch::makeIbCellCells() const
             procCells[procI] = procCellSet.toc();
         }
 
+        Pstream::gatherList(procCells);
+        Pstream::scatterList(procCells);
 
-        // Send and receive sizes
-        for (label procI = 0; procI < Pstream::nProcs(); procI++)
-        {
-            if (procI != Pstream::myProcNo())
-            {
-                // Parallel data exchange
-                {
-                    OPstream toProc
-                    (
-                        Pstream::blocking,
-                        procI,
-                        sizeof(label)
-                    );
+        procCentres[Pstream::myProcNo()] =
+            vectorField
+            (
+                C,
+                procCells[Pstream::myProcNo()]
+            );
 
-                    toProc << procCells[procI].size();
-                }
-            }
-        }
-
-        labelList procSizes(Pstream::nProcs(), 0);
-        for (label procI = 0; procI < Pstream::nProcs(); procI++)
-        {
-            if (procI != Pstream::myProcNo())
-            {
-                // Parallel data exchange
-                {
-                    IPstream fromProc
-                    (
-                        Pstream::blocking,
-                        procI,
-                        sizeof(label)
-                    );
-
-                    fromProc >> procSizes[procI];
-                }
-            }
-        }
-
-        // Send cell centres
-        for (label procI = 0; procI < Pstream::nProcs(); procI++)
-        {
-            if (procI != Pstream::myProcNo())
-            {
-                vectorField centres(C, procCells[procI]);
-
-                // Parallel data exchange
-                {
-                    OPstream toProc
-                    (
-                        Pstream::blocking,
-                        procI,
-                        centres.size()*sizeof(vector)
-                    );
-
-                    toProc << centres;
-                }
-            }
-        }
-
-        // Receive cell centres
-        for (label procI = 0; procI < Pstream::nProcs(); procI++)
-        {
-            if (procI != Pstream::myProcNo())
-            {
-                procCentres[procI].setSize(procSizes[procI]);
-
-                // Parallel data exchange
-                {
-                    IPstream fromProc
-                    (
-                        Pstream::blocking,
-                        procI,
-                        procSizes[procI]*sizeof(vector)
-                    );
-
-                    fromProc >> procCentres[procI];
-                }
-            }
-            // else: already set to zero-size field
-        }
+        Pstream::gatherList(procCentres);
+        Pstream::scatterList(procCentres);
 
         // Send cell gamma
-        const scalarField& gammaI = gamma().internalField();
-        for (label procI = 0; procI < Pstream::nProcs(); procI++)
-        {
-            if (procI != Pstream::myProcNo())
-            {
-                scalarField gamma(gammaI, procCells[procI]);
-
-                // Parallel data exchange
-                {
-                    OPstream toProc
-                    (
-                        Pstream::blocking,
-                        procI,
-                        gamma.size()*sizeof(scalar)
-                    );
-
-                    toProc << gamma;
-                }
-            }
-        }
-
-        // Receive cell gamma
-        for (label procI = 0; procI < Pstream::nProcs(); procI++)
-        {
-            if (procI != Pstream::myProcNo())
-            {
-                procGamma[procI].setSize(procSizes[procI]);
-
-                // Parallel data exchange
-                {
-                    IPstream fromProc
-                    (
-                        Pstream::blocking,
-                        procI,
-                        procSizes[procI]*sizeof(scalar)
-                    );
-
-                    fromProc >> procGamma[procI];
-                }
-            }
-            // else: already set to zero-size field
-        }
+        procGamma[Pstream::myProcNo()] =
+            scalarField
+            (
+                gamma().internalField(),
+                procCells[Pstream::myProcNo()]
+            );
+        // Reset own size to zero?  HJ, 11/Aug/2016
 
         // Cell-procCells addressing
         forAll (cellProcCells, cellI)
@@ -2410,7 +2212,7 @@ const Foam::labelListList& Foam::immersedBoundaryFvPatch::ibCellCells() const
 }
 
 
-const Foam::FieldField<Foam::Field, Foam::vector>&
+const Foam::vectorListList&
 Foam::immersedBoundaryFvPatch::ibProcCentres() const
 {
     if (!ibProcCentresPtr_)
@@ -2422,7 +2224,7 @@ Foam::immersedBoundaryFvPatch::ibProcCentres() const
 }
 
 
-const Foam::FieldField<Foam::Field, Foam::scalar>&
+const Foam::scalarListList&
 Foam::immersedBoundaryFvPatch::ibProcGamma() const
 {
     if (!ibProcGammaPtr_)

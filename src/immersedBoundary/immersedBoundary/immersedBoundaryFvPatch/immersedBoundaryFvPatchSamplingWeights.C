@@ -74,8 +74,8 @@ void Foam::immersedBoundaryFvPatch::makeIbSamplingWeights() const
     const scalarField& gammaIn = gamma().internalField();
     const vectorField& CIn = mesh_.C().internalField();
 
-    const FieldField<Field, scalar>& gammaProc = ibProcGamma();
-    const FieldField<Field, vector>& CProc = ibProcCentres();
+    const scalarListList& gammaProc = ibProcGamma();
+    const vectorListList& CProc = ibProcCentres();
 
     // Go through all cellCells and calculate inverse distance for
     // all live points
