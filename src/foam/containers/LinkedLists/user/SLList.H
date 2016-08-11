@@ -65,7 +65,7 @@ public:
         {}
 
         //- Construct from Istream
-        SLList(Istream& is)
+        explicit SLList(Istream& is)
         :
             LList<SLListBase, T>(is)
         {}

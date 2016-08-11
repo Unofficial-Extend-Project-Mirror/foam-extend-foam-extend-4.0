@@ -21,8 +21,6 @@ License
     You should have received a copy of the GNU General Public License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
-Description
-
 \*---------------------------------------------------------------------------*/
 
 #include "ILList.H"
@@ -55,7 +53,7 @@ void Foam::ILList<LListBase, T>::read(Istream& is, const INew& iNew)
         {
             if (delimiter == token::BEGIN_LIST)
             {
-                for (label i=0; i<s; i++)
+                for (label i=0; i<s; ++i)
                 {
                     this->append(iNew(is).ptr());
 
@@ -77,7 +75,7 @@ void Foam::ILList<LListBase, T>::read(Istream& is, const INew& iNew)
                     "reading entry"
                 );
 
-                for (label i=1; i<s; i++)
+                for (label i=1; i<s; ++i)
                 {
                     this->append(new T(*tPtr));
                 }
@@ -133,14 +131,14 @@ template<class LListBase, class T>
 template<class INew>
 Foam::ILList<LListBase, T>::ILList(Istream& is, const INew& iNew)
 {
-    read(is, iNew);
+    this->read(is, iNew);
 }
 
 
 template<class LListBase, class T>
 Foam::ILList<LListBase, T>::ILList(Istream& is)
 {
-    read(is, INew<T>());
+    this->read(is, INew<T>());
 }
 
 
@@ -155,7 +153,5 @@ Foam::Istream& Foam::operator>>(Istream& is, ILList<LListBase, T>& L)
     return is;
 }
 
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 // ************************************************************************* //

@@ -66,7 +66,7 @@ class ILList
 :
     public UILList<LListBase, T>
 {
-    // Private member functions
+    // Private Member Functions
 
         //- Read from Istream using given Istream constructor class
         template<class INew>
@@ -95,34 +95,15 @@ public:
 
         //- Copy constructor with additional argument for clone
         template<class CloneArg>
-        ILList(const ILList<LListBase, T>& lst, const CloneArg& cloneArg)
-        #ifdef __INTEL_COMPILER
-        :
-            UILList<LListBase, T>()
-        {
-            for
-            (
-                typename UILList<LListBase, T>::const_iterator iter =
-                    lst.begin();
-                iter != lst.end();
-                ++iter
-            )
-            {
-                append(iter().clone(cloneArg).ptr());
-            }
-        }
-        #else
-        ;
-        #endif
+        ILList(const ILList<LListBase, T>& lst, const CloneArg& cloneArg);
 
         //- Construct from Istream using given Istream constructor class
         template<class INew>
         ILList(Istream&, const INew&);
 
 
-    // Destructor
-
-        ~ILList();
+    //- Destructor
+    ~ILList();
 
 
     // Member Functions
@@ -139,7 +120,7 @@ public:
             void clear();
 
             //- Transfer the contents of the argument into this List
-            //  and annull the argument list.
+            //  and annul the argument list.
             void transfer(ILList<LListBase, T>&);
 
 

@@ -71,11 +71,11 @@ class LPtrList
 :
     public LList<LListBase, T*>
 {
-    // Private member functions
+    // Private Member Functions
 
         //- Read from Istream using given Istream constructor class
         template<class INew>
-        void read(Istream&, const INew& inewt);
+        void read(Istream&, const INew&);
 
 
 public:
@@ -112,9 +112,8 @@ public:
         LPtrList(const LPtrList&);
 
 
-    // Destructor
-
-        ~LPtrList();
+    //- Destructor
+    ~LPtrList();
 
 
     // Member Functions
@@ -155,7 +154,7 @@ public:
             void clear();
 
             //- Transfer the contents of the argument into this List
-            //  and annull the argument list.
+            //  and annul the argument list.
             void transfer(LPtrList<LListBase, T>&);
 
 
@@ -189,10 +188,7 @@ public:
         public:
 
             //- Construct from base iterator
-            iterator
-            (
-                LListBase_iterator baseIter
-            )
+            iterator(LListBase_iterator baseIter)
             :
                 LList<LListBase, T*>::iterator(baseIter)
             {}
@@ -225,19 +221,13 @@ public:
         public:
 
             //- Construct from base const_iterator
-            const_iterator
-            (
-                LListBase_const_iterator baseIter
-            )
+            const_iterator(LListBase_const_iterator baseIter)
             :
                 LList<LListBase, T*>::const_iterator(baseIter)
             {}
 
             //- Construct from base iterator
-            const_iterator
-            (
-                LListBase_iterator baseIter
-            )
+            const_iterator(LListBase_iterator baseIter)
             :
                 LList<LListBase, T*>::const_iterator(baseIter)
             {}

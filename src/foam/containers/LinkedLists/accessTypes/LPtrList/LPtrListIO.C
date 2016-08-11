@@ -58,7 +58,7 @@ void Foam::LPtrList<LListBase, T>::read(Istream& is, const INew& iNew)
         {
             if (delimiter == token::BEGIN_LIST)
             {
-                for (label i=0; i<s; i++)
+                for (label i=0; i<s; ++i)
                 {
                     this->append(iNew(is).ptr());
 
@@ -80,7 +80,7 @@ void Foam::LPtrList<LListBase, T>::read(Istream& is, const INew& iNew)
                     "reading entry"
                 );
 
-                for (label i=1; i<s; i++)
+                for (label i=1; i<s; ++i)
                 {
                     this->append(tPtr->clone().ptr());
                 }

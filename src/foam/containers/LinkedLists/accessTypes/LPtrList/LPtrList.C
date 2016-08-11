@@ -34,7 +34,7 @@ Foam::LPtrList<LListBase, T>::LPtrList(const LPtrList<LListBase, T>& lst)
 {
     for (const_iterator iter = lst.begin(); iter != lst.end(); ++iter)
     {
-        append(iter().clone().ptr());
+        this->append(iter().clone().ptr());
     }
 }
 
@@ -44,7 +44,7 @@ Foam::LPtrList<LListBase, T>::LPtrList(const LPtrList<LListBase, T>& lst)
 template<class LListBase, class T>
 Foam::LPtrList<LListBase, T>::~LPtrList()
 {
-    clear();
+    this->clear();
 }
 
 
@@ -69,8 +69,8 @@ bool Foam::LPtrList<LListBase, T>::eraseHead()
 template<class LListBase, class T>
 void Foam::LPtrList<LListBase, T>::clear()
 {
-    label oldSize = this->size();
-    for (label i=0; i<oldSize; i++)
+    const label oldSize = this->size();
+    for (label i=0; i<oldSize; ++i)
     {
         eraseHead();
     }
@@ -96,7 +96,7 @@ void Foam::LPtrList<LListBase, T>::operator=(const LPtrList<LListBase, T>& lst)
 
     for (const_iterator iter = lst.begin(); iter != lst.end(); ++iter)
     {
-        append(iter().clone().ptr());
+        this->append(iter().clone().ptr());
     }
 }
 

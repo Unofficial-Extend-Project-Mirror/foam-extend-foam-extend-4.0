@@ -122,9 +122,8 @@ public:
         LList(const LList<LListBase, T>&);
 
 
-    // Destructor
-
-        ~LList();
+    //- Destructor
+    ~LList();
 
 
     // Member Functions
@@ -201,8 +200,9 @@ public:
             void clear();
 
             //- Transfer the contents of the argument into this List
-            //  and annull the argument list.
+            //  and annul the argument list.
             void transfer(LList<LListBase, T>&);
+
 
     // Member operators
 
@@ -239,10 +239,7 @@ public:
         public:
 
             //- Construct from base iterator
-            iterator
-            (
-                LListBase_iterator baseIter
-            )
+            iterator(LListBase_iterator baseIter)
             :
                 LListBase_iterator(baseIter)
             {}
@@ -283,20 +280,14 @@ public:
         public:
 
             //- Construct from base const_iterator
-            const_iterator
-            (
-                LListBase_const_iterator baseIter
-            )
+            const_iterator(LListBase_const_iterator baseIter)
             :
                 LListBase_const_iterator(baseIter)
             {}
 
 
             //- Construct from base iterator
-            const_iterator
-            (
-                LListBase_iterator baseIter
-            )
+            const_iterator(LListBase_iterator baseIter)
             :
                 LListBase_const_iterator(baseIter)
             {}
