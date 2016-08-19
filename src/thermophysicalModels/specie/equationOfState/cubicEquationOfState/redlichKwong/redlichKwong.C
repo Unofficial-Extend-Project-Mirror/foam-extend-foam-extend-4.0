@@ -44,7 +44,8 @@ Foam::redlichKwong::redlichKwong(Istream& is)
     Tcrit_(readScalar(is)),
     a_(0.42748*pow(this->RR(), 2)*pow(Tcrit_, 2.5)/pcrit_),
     b_(0.08664*this->RR()*Tcrit_/pcrit_),
-    b2_(pow(b_,2)),
+    b2_(b_*b_),
+    b3_(b2_*b_),
     //CL: Only uses the default values
     rhoMin_(1e-3),
     rhoMax_(1500),
@@ -67,7 +68,6 @@ Foam::redlichKwong::redlichKwong(const dictionary& dict)
     b_(0.08664*this->RR()*Tcrit_/pcrit_),
     b2_(pow(b_,2)),
     b3_(pow(b_,3)),
-    b5_(pow(b_,5)),
     //CL: rhoMin and rhoMax are only used as boundaries for the bisection methode (see rho function)
     //CL: important: rhoMin and rhoMax are not used as boundary for the newton solver
     //CL: therefore, rho can be larger than rhoMax and smaller than rhoMin

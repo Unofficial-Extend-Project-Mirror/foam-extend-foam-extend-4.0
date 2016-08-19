@@ -69,6 +69,7 @@ class redlichKwong
 
     //CL: pow of constants b_ used in the code e.g. b2_=b*b;
     scalar b2_;
+    scalar b3_;
 
     //CL: rhoMin and rhoMax are only used as boundaries for the bisection methode (see rho function)
     scalar rhoMin_;

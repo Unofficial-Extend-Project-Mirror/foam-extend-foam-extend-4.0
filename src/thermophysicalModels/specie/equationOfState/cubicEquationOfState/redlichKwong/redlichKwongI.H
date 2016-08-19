@@ -57,6 +57,7 @@ inline redlichKwong::redlichKwong(const word& name, const redlichKwong& rk)
     a_(rk.a_),
     b_(rk.b_),
     b2_(rk.b2_),
+    b3_(rk.b3_),
     rhoMin_(rk.rhoMin_),
     rhoMax_(rk.rhoMax_),
     rhostd_(rk.rhostd_)
@@ -130,13 +131,15 @@ inline scalar redlichKwong::dpdv(const scalar rho, const scalar T) const
 {
     scalar Vm = this->W()/rho;
     scalar Vm2 = Vm*Vm;
+    scalar Vm3 = Vm2*Vm;
     scalar T05 = pow(T, 0.5);
     scalar bmVm = b_ - Vm;
     scalar bmVm2 = bmVm*bmVm;
     scalar bpVm = b_ + Vm;
     scalar bpVm2 = bpVm*bpVm;
 
-    return (a_*bmVm2*bpVm - this->RR()*T*T05*Vm2*bpVm2)/(T05*Vm2*bpVm2*bmVm2);
+    return (a_*(b3_ - 3*b_*Vm2 + 2*Vm3) - this->RR()*T*T05*Vm2*bpVm2)
+        /(T05*Vm2*bpVm2*bmVm2);
 }
 
 
