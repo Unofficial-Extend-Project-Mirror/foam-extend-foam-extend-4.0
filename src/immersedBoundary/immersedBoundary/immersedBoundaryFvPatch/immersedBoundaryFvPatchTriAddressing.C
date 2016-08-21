@@ -132,7 +132,7 @@ void Foam::immersedBoundaryFvPatch::makeTriAddressing() const
                 // Discard tri if already visited
                 if (visited[curTri]) continue;
 
-                visited.insert(curTri);
+                visited[curTri] = true;
 
                 const triFace& curTriPoints = triPatch[curTri];
 
