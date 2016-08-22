@@ -2,7 +2,7 @@
 
     // Prepare clean 1/Ap without contribution from under-relaxation
     // HJ, 26/Oct/2015
-    volScalarField rAU
+    volScalarField rUA
     (
         "(1|A(U))",
         1/HUEqn().A()
@@ -12,7 +12,7 @@
     // the flux precursor
     U.storePrevIter();
 
-    U = rAU*HUEqn().H();
+    U = rUA*HUEqn().H();
     HUEqn.clear();
     phi = fvc::interpolate(U) & mesh.Sf();
     adjustPhi(phi, U, p);
