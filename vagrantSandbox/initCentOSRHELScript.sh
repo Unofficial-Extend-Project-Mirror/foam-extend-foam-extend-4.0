@@ -19,7 +19,7 @@ fi
 
 # some of these packages are already installed. But lets be sure
 
-neededPackages=(gcc-c++ gcc-gfortran mercurial git flex bison make ccache rpm-build wget zlib-devel binutils-devel libXt-devel cmake)
+neededPackages=(gcc-c++ gcc-gfortran mercurial git flex bison make ccache rpm-build wget zlib-devel libXt-devel cmake)
 bonusPackages=(emacs csh tcsh zsh)
 
 for p in ${neededPackages[@]}; do

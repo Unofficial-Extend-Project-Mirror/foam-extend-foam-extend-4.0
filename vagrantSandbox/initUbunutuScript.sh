@@ -53,7 +53,7 @@ echo
 echo "Tools for packaging"
 echo
 
-packagingPackages=(default-mta dpkg-dev debhelper devscripts cdbs binutils-dev)
+packagingPackages=(default-mta dpkg-dev debhelper devscripts cdbs)
 for p in ${packagingPackages[@]}; do
     apt-get -y install $p
 done
