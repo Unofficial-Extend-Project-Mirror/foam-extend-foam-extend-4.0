@@ -1,6 +1,6 @@
 CPP        += -D$(WM_ARCH)
 
-GLIBS      = -liberty -lexecinfo
+GLIBS      = -lexecinfo
 
 include $(GENERAL_RULES)/standard
 
