@@ -224,10 +224,13 @@ Foam::ggiAMGInterface::ggiAMGInterface
     // Expand neighbour side to get all the data required from other
     // processors.
     // Note: neigbour is now the size of remote zone
-    fineGgiInterface_.shadowInterface().expandAddrToZone
-    (
-        neighbourExpandAddressing
-    );
+    if (!fineGgiInterface_.shadowInterface().localParallel())
+    {
+        fineGgiInterface_.shadowInterface().expandAddrToZone
+        (
+            neighbourExpandAddressing
+        );
+    }
 
     // Create addressing for neighbour processors.  Note: expandAddrToZone will
     // expand the addressing to zone size.  HJ, 13/Jun/2016
@@ -240,10 +243,13 @@ Foam::ggiAMGInterface::ggiAMGInterface
     // Expand neighbour side to get all the data required from other
     // processors.
     // Note: neigbour is now the size of remote zone
-    fineGgiInterface_.shadowInterface().expandAddrToZone
-    (
-        neighbourExpandProc
-    );
+    if (!fineGgiInterface_.shadowInterface().localParallel())
+    {
+        fineGgiInterface_.shadowInterface().expandAddrToZone
+        (
+            neighbourExpandProc
+        );
+    }
 
     // Note: neighbourExpandAddressing and neighbourExpandProc
     // will be filled with NaNs for faces which are not local
@@ -1258,7 +1264,10 @@ Foam::tmp<Foam::scalarField> Foam::ggiAMGInterface::internalFieldTransfer
 
 void Foam::ggiAMGInterface::expandAddrToZone(labelField& lf) const
 {
-    lf = fastExpand(lf);
+    if (!localParallel())
+    {
+        lf = fastExpand(lf);
+    }
 }
 
 

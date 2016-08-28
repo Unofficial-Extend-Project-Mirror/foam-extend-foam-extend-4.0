@@ -99,7 +99,7 @@ class ggiAMGInterface
     // Private static data
 
         //- Processor cluster offset index
-        static const label procOffset = 4000000;
+        static const long procOffset = 12000000;
 
 
 public:
