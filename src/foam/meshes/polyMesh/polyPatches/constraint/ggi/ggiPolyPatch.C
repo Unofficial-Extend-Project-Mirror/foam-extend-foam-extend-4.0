@@ -62,6 +62,15 @@ bool Foam::ggiPolyPatch::active() const
     polyPatchID shadow(shadowName_, boundaryMesh());
     faceZoneID zone(zoneName_, boundaryMesh().mesh().faceZones());
 
+    // For decomposition and reconstruction
+    // If not runing in parallel and the patch is not local, this is a serial
+    // operation on a piece of a parallel decomposition and is therefore
+    // inactive.  HJ, 5/Spe/2016
+    if (!Pstream::parRun() && !localParallel())
+    {
+        return false;
+    }
+
     return shadow.active() && zone.active();
 }
 

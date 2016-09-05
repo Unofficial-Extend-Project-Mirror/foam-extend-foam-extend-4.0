@@ -70,10 +70,10 @@ bool Foam::regionCouplePolyPatch::active() const
     {
         // Shadow region present
         const polyMesh& sr = boundaryMesh().mesh().db().parent().
-        objectRegistry::lookupObject<polyMesh>
-        (
-            shadowRegionName_
-        );
+            objectRegistry::lookupObject<polyMesh>
+            (
+                shadowRegionName_
+            );
 
         polyPatchID shadowPatch(shadowPatchName_, sr.boundaryMesh());
 
