@@ -62,7 +62,7 @@ void Foam::MRFZone::setMRFFaces()
     if (cellZoneID_ != -1)
     {
         const labelList& cellLabels = mesh_.cellZones()[cellZoneID_];
-        forAll(cellLabels, i)
+        forAll (cellLabels, i)
         {
             zoneCell[cellLabels[i]] = true;
         }
@@ -84,15 +84,15 @@ void Foam::MRFZone::setMRFFaces()
 
     labelHashSet excludedPatches(excludedPatchLabels_);
 
-    forAll(patches, patchI)
+    forAll (patches, patchI)
     {
         const polyPatch& pp = patches[patchI];
 
         if (pp.isWall() && !excludedPatches.found(patchI))
         {
-            forAll(pp, i)
+            forAll (pp, i)
             {
-                label faceI = pp.start()+i;
+                label faceI = pp.start() + i;
 
                 if (zoneCell[own[faceI]])
                 {
@@ -103,9 +103,9 @@ void Foam::MRFZone::setMRFFaces()
         }
         else if (!isA<emptyPolyPatch>(pp))
         {
-            forAll(pp, i)
+            forAll (pp, i)
             {
-                label faceI = pp.start()+i;
+                label faceI = pp.start() + i;
 
                 if (zoneCell[own[faceI]])
                 {
@@ -138,11 +138,11 @@ void Foam::MRFZone::setMRFFaces()
     labelList nIncludedFaces(patches.size(), 0);
     labelList nExcludedFaces(patches.size(), 0);
 
-    forAll(patches, patchi)
+    forAll (patches, patchi)
     {
         const polyPatch& pp = patches[patchi];
 
-        forAll(pp, patchFacei)
+        forAll (pp, patchFacei)
         {
             label faceI = pp.start()+patchFacei;
 
@@ -159,7 +159,7 @@ void Foam::MRFZone::setMRFFaces()
 
     includedFaces_.setSize(patches.size());
     excludedFaces_.setSize(patches.size());
-    forAll(nIncludedFaces, patchi)
+    forAll (nIncludedFaces, patchi)
     {
         includedFaces_[patchi].setSize(nIncludedFaces[patchi]);
         excludedFaces_[patchi].setSize(nExcludedFaces[patchi]);
@@ -167,11 +167,11 @@ void Foam::MRFZone::setMRFFaces()
     nIncludedFaces = 0;
     nExcludedFaces = 0;
 
-    forAll(patches, patchi)
+    forAll (patches, patchi)
     {
         const polyPatch& pp = patches[patchi];
 
-        forAll(pp, patchFacei)
+        forAll (pp, patchFacei)
         {
             label faceI = pp.start()+patchFacei;
 
@@ -201,9 +201,9 @@ void Foam::MRFZone::setMRFFaces()
         internalFaces.write();
 
         faceSet MRFFaces(mesh_, "includedFaces", 100);
-        forAll(includedFaces_, patchi)
+        forAll (includedFaces_, patchi)
         {
-            forAll(includedFaces_[patchi], i)
+            forAll (includedFaces_[patchi], i)
             {
                 label patchFacei = includedFaces_[patchi][i];
                 MRFFaces.insert(patches[patchi].start()+patchFacei);
@@ -215,12 +215,12 @@ void Foam::MRFZone::setMRFFaces()
         MRFFaces.write();
 
         faceSet excludedFaces(mesh_, "excludedFaces", 100);
-        forAll(excludedFaces_, patchi)
+        forAll (excludedFaces_, patchi)
         {
-            forAll(excludedFaces_[patchi], i)
+            forAll (excludedFaces_[patchi], i)
             {
                 label patchFacei = excludedFaces_[patchi][i];
-                excludedFaces.insert(patches[patchi].start()+patchFacei);
+                excludedFaces.insert(patches[patchi].start() + patchFacei);
             }
         }
         Pout<< "Writing " << excludedFaces.size()
@@ -231,12 +231,30 @@ void Foam::MRFZone::setMRFFaces()
 }
 
 
+Foam::vector Foam::MRFZone::Omega() const
+{
+    if (rampTime_ < SMALL)
+    {
+        return omega_.value()*axis_.value();
+    }
+    else
+    {
+        // Ramping
+        Info<< "MRF Ramp: " << Foam::min(mesh_.time().value()/rampTime_, 1)
+            << endl;
+
+        return Foam::min(mesh_.time().value()/rampTime_, 1)*
+            omega_.value()*axis_.value();
+    }
+}
+
+
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 Foam::MRFZone::MRFZone(const fvMesh& mesh, Istream& is)
 :
-    mesh_(mesh),
     name_(is),
+    mesh_(mesh),
     dict_(is),
     cellZoneID_(mesh_.cellZones().findZoneID(name_)),
     excludedPatchNames_
@@ -246,7 +264,7 @@ Foam::MRFZone::MRFZone(const fvMesh& mesh, Istream& is)
     origin_(dict_.lookup("origin")),
     axis_(dict_.lookup("axis")),
     omega_(dict_.lookup("omega")),
-    Omega_("Omega", omega_*axis_)
+    rampTime_(dict_.lookupOrDefault<scalar>("rampTime", 0))
 {
     if (dict_.found("patches"))
     {
@@ -260,12 +278,19 @@ Foam::MRFZone::MRFZone(const fvMesh& mesh, Istream& is)
 
     const polyBoundaryMesh& patches = mesh_.boundaryMesh();
 
+    if (mag(axis_.value()) < SMALL)
+    {
+        FatalErrorIn("MRFZone(const fvMesh&, Istream&)")
+            << "Axis vector has zero magnitude: " << axis_
+            << ".  This is not allowed"
+            << abort(FatalError);
+    }
+
     axis_ = axis_/mag(axis_);
-    Omega_ = omega_*axis_;
 
     excludedPatchLabels_.setSize(excludedPatchNames_.size());
 
-    forAll(excludedPatchNames_, i)
+    forAll (excludedPatchNames_, i)
     {
         excludedPatchLabels_[i] = patches.findPatchID(excludedPatchNames_[i]);
 
@@ -309,12 +334,12 @@ void Foam::MRFZone::addCoriolis(fvVectorMatrix& UEqn) const
     const scalarField& V = mesh_.V();
     vectorField& Usource = UEqn.source();
     const vectorField& U = UEqn.psi();
-    const vector& Omega = Omega_.value();
+    const vector rotVel = Omega();
 
-    forAll(cells, i)
+    forAll (cells, i)
     {
         label celli = cells[i];
-        Usource[celli] -= V[celli]*(Omega ^ U[celli]);
+        Usource[celli] -= V[celli]*(rotVel ^ U[celli]);
     }
 }
 
@@ -334,12 +359,12 @@ void Foam::MRFZone::addCoriolis
     const scalarField& V = mesh_.V();
     vectorField& Usource = UEqn.source();
     const vectorField& U = UEqn.psi();
-    const vector& Omega = Omega_.value();
+    const vector rotVel = Omega();
 
-    forAll(cells, i)
+    forAll (cells, i)
     {
         label celli = cells[i];
-        Usource[celli] -= V[celli]*rho[celli]*(Omega ^ U[celli]);
+        Usource[celli] -= V[celli]*rho[celli]*(rotVel ^ U[celli]);
     }
 }
 
@@ -349,20 +374,20 @@ void Foam::MRFZone::relativeVelocity(volVectorField& U) const
     const volVectorField& C = mesh_.C();
 
     const vector& origin = origin_.value();
-    const vector& Omega = Omega_.value();
+    const vector rotVel = Omega();
 
     const labelList& cells = mesh_.cellZones()[cellZoneID_];
 
-    forAll(cells, i)
+    forAll (cells, i)
     {
         label celli = cells[i];
-        U[celli] -= (Omega ^ (C[celli] - origin));
+        U[celli] -= (rotVel ^ (C[celli] - origin));
     }
 
     // Included patches
-    forAll(includedFaces_, patchi)
+    forAll (includedFaces_, patchi)
     {
-        forAll(includedFaces_[patchi], i)
+        forAll (includedFaces_[patchi], i)
         {
             label patchFacei = includedFaces_[patchi][i];
             U.boundaryField()[patchi][patchFacei] = vector::zero;
@@ -370,13 +395,13 @@ void Foam::MRFZone::relativeVelocity(volVectorField& U) const
     }
 
     // Excluded patches
-    forAll(excludedFaces_, patchi)
+    forAll (excludedFaces_, patchi)
     {
-        forAll(excludedFaces_[patchi], i)
+        forAll (excludedFaces_[patchi], i)
         {
             label patchFacei = excludedFaces_[patchi][i];
             U.boundaryField()[patchi][patchFacei] -=
-                (Omega ^ (C.boundaryField()[patchi][patchFacei] - origin));
+                (rotVel ^ (C.boundaryField()[patchi][patchFacei] - origin));
         }
     }
 }
@@ -387,35 +412,35 @@ void Foam::MRFZone::absoluteVelocity(volVectorField& U) const
     const volVectorField& C = mesh_.C();
 
     const vector& origin = origin_.value();
-    const vector& Omega = Omega_.value();
+    const vector rotVel = Omega();
 
     const labelList& cells = mesh_.cellZones()[cellZoneID_];
 
-    forAll(cells, i)
+    forAll (cells, i)
     {
         label celli = cells[i];
-        U[celli] += (Omega ^ (C[celli] - origin));
+        U[celli] += (rotVel ^ (C[celli] - origin));
     }
 
     // Included patches
-    forAll(includedFaces_, patchi)
+    forAll (includedFaces_, patchi)
     {
-        forAll(includedFaces_[patchi], i)
+        forAll (includedFaces_[patchi], i)
         {
             label patchFacei = includedFaces_[patchi][i];
             U.boundaryField()[patchi][patchFacei] =
-                (Omega ^ (C.boundaryField()[patchi][patchFacei] - origin));
+                (rotVel ^ (C.boundaryField()[patchi][patchFacei] - origin));
         }
     }
 
     // Excluded patches
-    forAll(excludedFaces_, patchi)
+    forAll (excludedFaces_, patchi)
     {
-        forAll(excludedFaces_[patchi], i)
+        forAll (excludedFaces_[patchi], i)
         {
             label patchFacei = excludedFaces_[patchi][i];
             U.boundaryField()[patchi][patchFacei] +=
-                (Omega ^ (C.boundaryField()[patchi][patchFacei] - origin));
+                (rotVel ^ (C.boundaryField()[patchi][patchFacei] - origin));
         }
     }
 }
@@ -460,36 +485,36 @@ void Foam::MRFZone::meshPhi
     const surfaceVectorField& Cf = mesh_.Cf();
 
     const vector& origin = origin_.value();
-    const vector& Omega = Omega_.value();
+    const vector rotVel = Omega();
 
     // Internal faces
-    forAll(internalFaces_, i)
+    forAll (internalFaces_, i)
     {
         label facei = internalFaces_[i];
-        phi[facei] = (Omega ^ (Cf[facei] - origin));
+        phi[facei] = (rotVel ^ (Cf[facei] - origin));
     }
 
     // Included patches
-    forAll(includedFaces_, patchi)
+    forAll (includedFaces_, patchi)
     {
-        forAll(includedFaces_[patchi], i)
+        forAll (includedFaces_[patchi], i)
         {
             label patchFacei = includedFaces_[patchi][i];
 
             phi.boundaryField()[patchi][patchFacei] =
-                (Omega ^ (Cf.boundaryField()[patchi][patchFacei] - origin));
+                (rotVel ^ (Cf.boundaryField()[patchi][patchFacei] - origin));
         }
     }
 
     // Excluded patches
-    forAll(excludedFaces_, patchi)
+    forAll (excludedFaces_, patchi)
     {
-        forAll(excludedFaces_[patchi], i)
+        forAll (excludedFaces_[patchi], i)
         {
             label patchFacei = excludedFaces_[patchi][i];
 
             phi.boundaryField()[patchi][patchFacei] =
-                (Omega ^ (Cf.boundaryField()[patchi][patchFacei] - origin));
+                (rotVel ^ (Cf.boundaryField()[patchi][patchFacei] - origin));
         }
     }
 }
@@ -497,20 +522,20 @@ void Foam::MRFZone::meshPhi
 void Foam::MRFZone::correctBoundaryVelocity(volVectorField& U) const
 {
     const vector& origin = origin_.value();
-    const vector& Omega = Omega_.value();
+    const vector rotVel = Omega();
 
     // Included patches
-    forAll(includedFaces_, patchi)
+    forAll (includedFaces_, patchi)
     {
         const vectorField& patchC = mesh_.Cf().boundaryField()[patchi];
 
         vectorField pfld(U.boundaryField()[patchi]);
 
-        forAll(includedFaces_[patchi], i)
+        forAll (includedFaces_[patchi], i)
         {
             label patchFacei = includedFaces_[patchi][i];
 
-            pfld[patchFacei] = (Omega ^ (patchC[patchFacei] - origin));
+            pfld[patchFacei] = (rotVel ^ (patchC[patchFacei] - origin));
         }
 
         U.boundaryField()[patchi] == pfld;
@@ -529,12 +554,12 @@ void Foam::MRFZone::Su
     const volVectorField& C = mesh_.C();
 
     const vector& origin = origin_.value();
-    const vector& Omega = Omega_.value();
+    const vector rotVel = Omega();
 
-    forAll(cells, i)
+    forAll (cells, i)
     {
         source[cells[i]] =
-            (Omega ^ (C[cells[i]] - origin)) & gradPhi[cells[i]];
+            (rotVel ^ (C[cells[i]] - origin)) & gradPhi[cells[i]];
     }
 }
 
@@ -550,13 +575,13 @@ void Foam::MRFZone::Su
     const volVectorField& C = mesh_.C();
 
     const vector& origin = origin_.value();
-    const vector& Omega = Omega_.value();
+    const vector rotVel = Omega();
 
-    forAll(cells, i)
+    forAll (cells, i)
     {
         source[cells[i]] =
-            ((Omega ^ (C[cells[i]] - origin)) & gradPhi[cells[i]])
-          - (Omega ^ phi[cells[i]]);
+            ((rotVel ^ (C[cells[i]] - origin)) & gradPhi[cells[i]])
+          - (rotVel ^ phi[cells[i]]);
     }
 }
 

@@ -29,7 +29,7 @@ Description
     obtained from a control dictionary constructed from the given stream.
 
     The rotation of the MRF region is defined by an origin and axis of
-    rotation and an angular speed.
+    rotation and an angular speed in rad/s.
 
 SourceFiles
     MRFZone.C
@@ -65,15 +65,22 @@ class MRFZone
 {
     // Private data
 
-        const fvMesh& mesh_;
-
+        //- Name of the MRF zone
         const word name_;
 
+        //- Mesh reference
+        const fvMesh& mesh_;
+
+        //- Reference to dictionary
         const dictionary dict_;
 
+        //- MRF cell zone ID: cells in MRF region
         label cellZoneID_;
 
+        //- List of patch names touching the MRF zone which do not move
         const wordList excludedPatchNames_;
+
+        //- List of patch labels touching the MRF zone which do not move
         labelList excludedPatchLabels_;
 
         //- Internal faces that are part of MRF
@@ -85,16 +92,33 @@ class MRFZone
         //- Excluded faces (per patch) that do not move with the MRF
         labelListList excludedFaces_;
 
+        //- Origin of rotation
         const dimensionedVector origin_;
+
+        //- Axis of rotation
         dimensionedVector axis_;
-        const dimensionedScalar omega_;
-        dimensionedVector Omega_;
+
+        //- Rotational velocity in rad/s
+        dimensionedScalar omega_;
+
+        //- Ramping time scale
+        scalar rampTime_;
 
 
     // Private Member Functions
 
+        //- Disallow default bitwise copy construct
+        MRFZone(const MRFZone&);
+
+        //- Disallow default bitwise assignment
+        void operator=(const MRFZone&);
+
+
         //- Divide faces in frame according to patch
         void setMRFFaces();
+
+        //- Return rotational vector
+        vector Omega() const;
 
         //- Make the given absolute mass/vol flux relative within MRF region
         template<class RhoFieldType>
@@ -111,12 +135,6 @@ class MRFZone
             const RhoFieldType& rho,
             surfaceScalarField& phi
         ) const;
-
-        //- Disallow default bitwise copy construct
-        MRFZone(const MRFZone&);
-
-        //- Disallow default bitwise assignment
-        void operator=(const MRFZone&);
 
 
 public:
@@ -170,7 +188,11 @@ public:
         void addCoriolis(fvVectorMatrix& UEqn) const;
 
         //- Add the Coriolis force contribution to the momentum equation
-        void addCoriolis(const volScalarField& rho, fvVectorMatrix& UEqn) const;
+        void addCoriolis
+        (
+            const volScalarField& rho,
+            fvVectorMatrix& UEqn
+        ) const;
 
         //- Make the given absolute velocity relative within the MRF region
         void relativeVelocity(volVectorField& U) const;
