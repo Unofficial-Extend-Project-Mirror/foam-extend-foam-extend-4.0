@@ -46,7 +46,7 @@ namespace Foam
 class faceTetPolyPatch;
 
 /*---------------------------------------------------------------------------*\
-              Class tetPolyPatchInterpolation Declaration
+                  Class tetPolyPatchInterpolation Declaration
 \*---------------------------------------------------------------------------*/
 
 class tetPolyPatchInterpolation
@@ -88,13 +88,14 @@ public:
 
     // Member Functions
 
-        //- Interpolate from faces to points
+        //- Interpolate from mesh faces to tet FEM points
         template<class Type>
         tmp<Field<Type> > faceToPointInterpolate
         (
             const Field<Type>& ff
         ) const;
 
+        //- Interpolate from mesh faces to tet FEM points
         template<class Type>
         tmp<Field<Type> > faceToPointInterpolate
         (
