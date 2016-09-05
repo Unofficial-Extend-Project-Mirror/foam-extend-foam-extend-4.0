@@ -40,8 +40,8 @@
 # Requirements:
 #     1: Your foam-extend environment must be properly initialized
 #     2: AllMake.stage1 if you are overriding your system compiler
-#     3: The file etc/prefs.sh should be used for setting the variables enabling
-#        the compilation of the various packages
+#     3: The file etc/prefs.sh should be used for setting the variables
+#        enabling the compilation of the various packages
 #
 # Author:
 #     Martin Beaudoin, Hydro-Quebec, (2015)
@@ -103,6 +103,13 @@ then
 	echo "Building openmpi 1.8.8"
 	( rpm_make -p openmpi-1.8.8 -s openmpi-1.8.8.spec  -u http://www.open-mpi.org/software/ompi/v1.8/downloads/openmpi-1.8.8.tar.gz \
           -f --define '_configureAdditionalArgs "$WM_THIRD_PARTY_USE_OPENMPI_188_ConfigureAdditionalArgs"')
+    }
+    # mvipich2-2.2
+    #
+    [ ! -z "$WM_THIRD_PARTY_USE_MVAPICH2_22" ] && {
+        echo "Building mvapich2 2.2"
+        ( rpm_make -p mvapich2-2.2 -s mvapich2-2.2.spec -u http://mvapich.cse.ohio-state.edu/download/mvapich/mv2/mvapich2-2.2.tar.gz \
+          -f --define '_configureAdditionalArgs "$WM_THIRD_PARTY_USE_MVAPICH2_22_ConfigureAdditionalArgs"')
     }
 else
     echo "Using system installed OpenMPI"

@@ -220,6 +220,9 @@ export WM_THIRD_PARTY_USE_OPENMPI_188=1
 #export WM_THIRD_PARTY_USE_OPENMPI_15=1
 #export WM_THIRD_PARTY_USE_OPENMPI_143=1
 #export WM_THIRD_PARTY_USE_OPENMPI_141=1
+#export WM_THIRD_PARTY_USE_MVAPICH2_22=1
+#export WM_THIRD_PARTY_USE_MVAPICH2_22_ConfigureAdditionalArgs='--disable-mcast'
+
 
 #
 # For AllMake.stage3
