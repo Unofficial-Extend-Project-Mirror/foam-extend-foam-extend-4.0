@@ -78,7 +78,7 @@ void faMeshDecomposition::distributeFaces()
                     IOobject
                     (
                         "faceProcAddressing",
-                        "constant",
+                        procMesh.facesInstance(),
                         procMesh.meshSubDir,
                         procMesh,
                         IOobject::MUST_READ,
@@ -94,7 +94,7 @@ void faMeshDecomposition::distributeFaces()
                     IOobject
                     (
                         "owner",
-                        "constant",
+                        procMesh.facesInstance(),
                         procMesh.meshSubDir,
                         procMesh,
                         IOobject::MUST_READ,
@@ -127,7 +127,7 @@ void faMeshDecomposition::distributeFaces()
                     IOobject
                     (
                         "faceProcAddressing",
-                        "constant",
+                        procMesh.facesInstance(),
                         procMesh.meshSubDir,
                         procMesh,
                         IOobject::MUST_READ,
@@ -263,7 +263,7 @@ void faMeshDecomposition::decomposeMesh(const bool filterEmptyPatches)
             IOobject
             (
                 "pointProcAddressing",
-                "constant",
+                procFvMesh.facesInstance(),
                 procFvMesh.meshSubDir,
                 procFvMesh,
                 IOobject::MUST_READ,
@@ -279,7 +279,7 @@ void faMeshDecomposition::decomposeMesh(const bool filterEmptyPatches)
                 IOobject
                 (
                     "faceProcAddressing",
-                    "constant",
+                    procFvMesh.facesInstance(),
                     procFvMesh.meshSubDir,
                     procFvMesh,
                     IOobject::MUST_READ,
@@ -1202,7 +1202,7 @@ bool faMeshDecomposition::writeDecomposition()
             IOobject
             (
                 "boundaryProcAddressing",
-                "constant",
+                procFvMesh.facesInstance(),
                 procFvMesh.meshSubDir,
                 procFvMesh,
                 IOobject::MUST_READ,
@@ -1340,13 +1340,20 @@ bool faMeshDecomposition::writeDecomposition()
         maxProcPatches = max(maxProcPatches, nProcPatches);
         maxProcEdges = max(maxProcEdges, nProcEdges);
 
+        word faceLabelsInstance =
+            procMesh.time().findInstance
+            (
+                procMesh.meshDir(),
+                "faceLabels"
+            );
+
         // create and write the addressing information
         labelIOList pointProcAddressing
         (
             IOobject
             (
                 "pointProcAddressing",
-                "constant",
+                faceLabelsInstance,
                 procMesh.meshSubDir,
                 procFvMesh,
                 IOobject::NO_READ,
@@ -1361,7 +1368,7 @@ bool faMeshDecomposition::writeDecomposition()
             IOobject
             (
                 "edgeProcAddressing",
-                "constant",
+                faceLabelsInstance,
                 procMesh.meshSubDir,
                 procFvMesh,
                 IOobject::NO_READ,
@@ -1376,7 +1383,7 @@ bool faMeshDecomposition::writeDecomposition()
             IOobject
             (
                 "faceProcAddressing",
-                "constant",
+                faceLabelsInstance,
                 procMesh.meshSubDir,
                 procFvMesh,
                 IOobject::NO_READ,
@@ -1391,7 +1398,7 @@ bool faMeshDecomposition::writeDecomposition()
             IOobject
             (
                 "boundaryProcAddressing",
-                "constant",
+                faceLabelsInstance,
                 procMesh.meshSubDir,
                 procFvMesh,
                 IOobject::NO_READ,
