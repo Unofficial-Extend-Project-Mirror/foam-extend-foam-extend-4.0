@@ -258,7 +258,7 @@ Foam::faMesh::faMesh(const polyMesh& pMesh)
     // Calculate the geometry for the patches (transformation tensors etc.)
     boundary_.calcGeometry();
 
-    if (isFile(pMesh.time().timePath()/"S0"))
+    if (isFile(pMesh.time().timePath()/pMesh.dbDir()/"S0"))
     {
         S0Ptr_ = new DimensionedField<scalar, areaMesh>
         (
@@ -805,7 +805,7 @@ Foam::faMesh::faMesh
     // Calculate the geometry for the patches (transformation tensors etc.)
     boundary_.calcGeometry();
 
-    if (isFile(mesh().time().timePath()/"S0"))
+    if (isFile(mesh().time().timePath()/mesh().dbDir()/"S0"))
     {
         S0Ptr_ = new DimensionedField<scalar, areaMesh>
         (
