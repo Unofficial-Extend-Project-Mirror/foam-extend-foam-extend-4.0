@@ -65,6 +65,10 @@ int main(int argc, char *argv[])
 #           include "pEqn.H"
         }
 
+        // Calculate relative velocity
+        Urel == U;
+        mrfZones.relativeVelocity(Urel);
+
         turbulence->correct();
 
         runTime.write();
