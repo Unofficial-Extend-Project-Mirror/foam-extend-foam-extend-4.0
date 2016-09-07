@@ -35,6 +35,7 @@ for line in lines:
                 mvy.append(float(match.group(12)))
                 mvz.append(float(match.group(13)))
 
+
 # combine pressure and viscous forces and moments
 fx = fpx
 fy = fpy
@@ -53,10 +54,17 @@ for i in range(1,len(t)):
         mz[i] += mvz[i]
 
 # write clean data file
-outfile=open('forces.dat','w')
+outForces=open('forces.dat','w')
 
 for data in zip(t,fx,fy,fz):
-        outfile.write(' '.join([str(d) for d in data])+'\n')
+        outForces.write(' '.join([str(d) for d in data])+'\n')
+outForces.close()
+
+outMoments=open('moments.dat','w')
+
+for data in zip(t,mx,my,mz):
+        outMoments.write(' '.join([str(d) for d in data])+'\n')
+outMoments.close()
 
 # plot forces
 import pylab
