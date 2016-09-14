@@ -92,12 +92,26 @@ public:
         {}
 
 
-    // Destructor
-
-        virtual ~ggiFvPatch();
+    //- Destructor
+    virtual ~ggiFvPatch();
 
 
     // Member functions
+
+        // Communication support
+
+            //- Return communicator used for parallel communication
+            virtual int comm() const
+            {
+                return ggiPolyPatch_.comm();
+            }
+
+            //- Return message tag used for sending
+            virtual int tag() const
+            {
+                return ggiPolyPatch_.tag();
+            }
+
 
         // Access
 

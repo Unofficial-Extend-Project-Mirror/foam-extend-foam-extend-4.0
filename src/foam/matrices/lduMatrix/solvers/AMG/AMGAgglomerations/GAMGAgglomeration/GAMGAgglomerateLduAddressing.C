@@ -264,6 +264,7 @@ void Foam::GAMGAgglomeration::agglomerateLduAddressing
             nCoarseCells,
             coarseOwner,
             coarseNeighbour,
+            fineMesh.comm(),
             true
         )
     );
@@ -298,7 +299,8 @@ void Foam::GAMGAgglomeration::agglomerateLduAddressing
                         (
                             restrictMap
                         ),
-                        fineInterfaceAddr[inti]
+                        fineInterfaceAddr[inti],
+                        fineMesh.comm() // Set up comm per level?
                     ).ptr()
                 );
 

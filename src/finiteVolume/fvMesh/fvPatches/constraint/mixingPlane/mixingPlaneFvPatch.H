@@ -95,12 +95,26 @@ public:
         {}
 
 
-    // Destructor
-
-        virtual ~mixingPlaneFvPatch();
+    //- Destructor
+    virtual ~mixingPlaneFvPatch();
 
 
     // Member functions
+
+        // Communication support
+
+            //- Return communicator used for parallel communication
+            virtual int comm() const
+            {
+                return mixingPlanePolyPatch_.comm();
+            }
+
+            //- Return message tag used for sending
+            virtual int tag() const
+            {
+                return mixingPlanePolyPatch_.tag();
+            }
+
 
         // Access
 

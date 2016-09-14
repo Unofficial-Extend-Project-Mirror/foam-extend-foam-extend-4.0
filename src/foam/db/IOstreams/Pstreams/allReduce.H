@@ -22,27 +22,50 @@ License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Description
-    Prints out a description of the streams
+    Various functions to wrap MPI_Allreduce
+
+SourceFiles
+    allReduceTemplates.C
 
 \*---------------------------------------------------------------------------*/
 
-#include "IPstream.H"
-#include "OPstream.H"
+#ifndef allReduce_H
+#define allReduce_H
+
+#include "mpi.h"
+
+#include "Pstream.H"
+#include "PstreamGlobals.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-void Foam::IPstream::print(Ostream& os) const
+namespace Foam
 {
-    os  << "Reading from processor " << fromProcNo_
-        << " to processor " << myProcNo() << Foam::endl;
-}
 
+template<class Type, class BinaryOp>
+void allReduce
+(
+    Type& Value,
+    int count,
+    MPI_Datatype MPIType,
+    MPI_Op op,
+    const BinaryOp& bop,
+    const int tag,
+    const int communicator
+);
 
-void Foam::OPstream::print(Ostream& os) const
-{
-    os  << "Writing from processor " << toProcNo_
-        << " to processor " << myProcNo() << Foam::endl;
-}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
+} // End namespace Foam
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#ifdef NoRepository
+#   include "allReduceTemplates.C"
+#endif
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#endif
 
 // ************************************************************************* //

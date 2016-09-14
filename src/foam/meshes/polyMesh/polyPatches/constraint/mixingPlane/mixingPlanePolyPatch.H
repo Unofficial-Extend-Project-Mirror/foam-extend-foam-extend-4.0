@@ -278,9 +278,8 @@ public:
         }
 
 
-    // Destructor
-
-        virtual ~mixingPlanePolyPatch();
+    //- Destructor
+    virtual ~mixingPlanePolyPatch();
 
 
     // Member functions
@@ -344,6 +343,15 @@ public:
             //- Return reference to patch-to-patch interpolation
             //  Used only for addressing
             const mixingPlaneZoneInterpolation& patchToPatch() const;
+
+
+        // Communications support
+
+            //- Return communicator used for communication
+            virtual label comm() const;
+
+            //- Return message tag to use for communication
+            virtual int tag() const;
 
 
         // Interpolation functions

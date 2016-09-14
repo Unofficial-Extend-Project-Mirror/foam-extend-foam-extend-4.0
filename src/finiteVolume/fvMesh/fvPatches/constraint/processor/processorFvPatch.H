@@ -86,10 +86,9 @@ public:
         {}
 
 
-    // Destructor
-
-        virtual ~processorFvPatch()
-        {}
+    //- Destructor
+    virtual ~processorFvPatch()
+    {}
 
 
     // Member functions
@@ -118,6 +117,21 @@ public:
                 return false;
             }
         }
+
+        // Communication support
+
+            //- Return communicator used for parallel communication
+            virtual int comm() const
+            {
+                return procPolyPatch_.comm();
+            }
+
+            //- Return message tag used for sending
+            virtual int tag() const
+            {
+                return procPolyPatch_.tag();
+            }
+
 
         //- Return face transformation tensor
         virtual const tensorField& forwardT() const

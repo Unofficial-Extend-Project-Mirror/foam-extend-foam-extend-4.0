@@ -28,7 +28,6 @@ License
 #include "objectRegistry.H"
 #include "PstreamReduceOps.H"
 
-
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 Foam::Istream& Foam::regIOobject::readStream()

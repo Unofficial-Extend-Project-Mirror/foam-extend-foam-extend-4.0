@@ -36,6 +36,8 @@ void Foam::processorLduInterface::send
     const UList<Type>& f
 ) const
 {
+    label nBytes = f.byteSize();
+
     if (commsType == Pstream::blocking || commsType == Pstream::scheduled)
     {
         OPstream::write
@@ -43,7 +45,9 @@ void Foam::processorLduInterface::send
             commsType,
             neighbProcNo(),
             reinterpret_cast<const char*>(f.begin()),
-            f.byteSize()
+            nBytes,
+            tag(),
+            comm()
         );
     }
     else if (commsType == Pstream::nonBlocking)
@@ -55,18 +59,22 @@ void Foam::processorLduInterface::send
             commsType,
             neighbProcNo(),
             receiveBuf_.begin(),
-            receiveBuf_.size()
+            receiveBuf_.size(),
+            tag(),
+            comm()
         );
 
-        resizeBuf(sendBuf_, f.byteSize());
-        memcpy(sendBuf_.begin(), f.begin(), f.byteSize());
+        resizeBuf(sendBuf_, nBytes);
+        memcpy(sendBuf_.begin(), f.begin(), nBytes);
 
         OPstream::write
         (
             commsType,
             neighbProcNo(),
             sendBuf_.begin(),
-            f.byteSize()
+            nBytes,
+            tag(),
+            comm()
         );
     }
     else
@@ -92,7 +100,9 @@ void Foam::processorLduInterface::receive
             commsType,
             neighbProcNo(),
             reinterpret_cast<char*>(f.begin()),
-            f.byteSize()
+            f.byteSize(),
+            tag(),
+            comm()
         );
     }
     else if (commsType == Pstream::nonBlocking)
@@ -141,7 +151,7 @@ void Foam::processorLduInterface::compressedSend
         resizeBuf(sendBuf_, nBytes);
         float *fArray = reinterpret_cast<float*>(sendBuf_.begin());
 
-        for (register label i=0; i<nm1; i++)
+        for (register label i = 0; i < nm1; i++)
         {
             fArray[i] = sArray[i] - slast[i%nCmpts];
         }
@@ -155,7 +165,9 @@ void Foam::processorLduInterface::compressedSend
                 commsType,
                 neighbProcNo(),
                 sendBuf_.begin(),
-                nBytes
+                nBytes,
+                tag(),
+                comm()
             );
         }
         else if (commsType == Pstream::nonBlocking)
@@ -167,7 +179,9 @@ void Foam::processorLduInterface::compressedSend
                 commsType,
                 neighbProcNo(),
                 receiveBuf_.begin(),
-                receiveBuf_.size()
+                receiveBuf_.size(),
+                tag(),
+                comm()
             );
 
             OPstream::write
@@ -175,7 +189,9 @@ void Foam::processorLduInterface::compressedSend
                 commsType,
                 neighbProcNo(),
                 sendBuf_.begin(),
-                nBytes
+                nBytes,
+                tag(),
+                comm()
             );
         }
         else
@@ -215,7 +231,9 @@ void Foam::processorLduInterface::compressedReceive
                 commsType,
                 neighbProcNo(),
                 receiveBuf_.begin(),
-                nBytes
+                nBytes,
+                tag(),
+                comm()
             );
         }
         else if (commsType != Pstream::nonBlocking)
@@ -231,7 +249,7 @@ void Foam::processorLduInterface::compressedReceive
         scalar *sArray = reinterpret_cast<scalar*>(f.begin());
         const scalar *slast = &sArray[nm1];
 
-        for (register label i=0; i<nm1; i++)
+        for (register label i = 0; i < nm1; i++)
         {
             sArray[i] = fArray[i] + slast[i%nCmpts];
         }

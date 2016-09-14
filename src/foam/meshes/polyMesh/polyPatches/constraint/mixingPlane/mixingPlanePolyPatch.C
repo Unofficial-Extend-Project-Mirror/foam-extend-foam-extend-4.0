@@ -805,6 +805,18 @@ Foam::mixingPlanePolyPatch::patchToPatch() const
 }
 
 
+Foam::label Foam::mixingPlanePolyPatch::comm() const
+{
+    return boundaryMesh().mesh().comm();
+}
+
+
+int Foam::mixingPlanePolyPatch::tag() const
+{
+    return Pstream::msgType();
+}
+
+
 const Foam::vectorField&
 Foam::mixingPlanePolyPatch::reconFaceCellCentres() const
 {

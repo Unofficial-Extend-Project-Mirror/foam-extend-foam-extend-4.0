@@ -921,6 +921,18 @@ void Foam::regionCouplePolyPatch::detach() const
 }
 
 
+Foam::label Foam::regionCouplePolyPatch::comm() const
+{
+    return boundaryMesh().mesh().comm();
+}
+
+
+int Foam::regionCouplePolyPatch::tag() const
+{
+    return Pstream::msgType();
+}
+
+
 const Foam::labelList& Foam::regionCouplePolyPatch::zoneAddressing() const
 {
     if (!zoneAddressingPtr_)

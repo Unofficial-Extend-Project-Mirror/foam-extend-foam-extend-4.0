@@ -35,7 +35,8 @@ Foam::autoPtr<Foam::AMGInterface> Foam::AMGInterface::New
     const lduInterfacePtrsList& coarseInterfaces,
     const lduInterface& fineInterface,
     const labelField& localRestrictAddressing,
-    const labelField& neighbourRestrictAddressing
+    const labelField& neighbourRestrictAddressing,
+    const label coarseComm
 )
 {
     word coupleType(fineInterface.type());
@@ -53,7 +54,8 @@ Foam::autoPtr<Foam::AMGInterface> Foam::AMGInterface::New
             "    const lduInterfacePtrsList& coarseInterfaces,\n"
             "    const lduInterface& fineInterface,\n"
             "    const labelField& localRestrictAddressing,\n"
-            "    const labelField& neighbourRestrictAddressing\n"
+            "    const labelField& neighbourRestrictAddressing,\n"
+            "    const label coarseComm\n"
             ")"
         )   << "Unknown AMGInterface type " << coupleType << ".\n"
             << "Valid AMGInterface types are :"
@@ -69,7 +71,8 @@ Foam::autoPtr<Foam::AMGInterface> Foam::AMGInterface::New
             coarseInterfaces,
             fineInterface,
             localRestrictAddressing,
-            neighbourRestrictAddressing
+            neighbourRestrictAddressing,
+            coarseComm
         )
     );
 }

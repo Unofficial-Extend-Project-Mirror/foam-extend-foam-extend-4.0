@@ -43,6 +43,7 @@ SourceFiles
 #define processorPolyPatch_H
 
 #include "coupledPolyPatch.H"
+#include "polyBoundaryMesh.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -189,9 +190,8 @@ public:
         }
 
 
-    // Destructor
-
-        virtual ~processorPolyPatch();
+    //- Destructor
+    virtual ~processorPolyPatch();
 
 
     // Member functions
@@ -207,6 +207,15 @@ public:
         {
             return neighbProcNo_;
         }
+
+        // Communications support
+
+            //- Return communicator used for communication
+            virtual label comm() const;
+
+            //- Return message tag to use for communication
+            virtual int tag() const;
+
 
         //- Does the processor own the patch ?
         bool owner() const

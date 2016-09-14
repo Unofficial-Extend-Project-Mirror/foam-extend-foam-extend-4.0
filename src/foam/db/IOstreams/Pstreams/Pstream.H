@@ -29,11 +29,12 @@ Description
 
 SourceFiles
     Pstream.C
-    PstreamsPrint.C
+    PstreamReduceOps.C
     PstreamCommsStruct.C
     gatherScatter.C
     combineGatherScatter.C
     gatherScatterList.C
+    PstreamExchange.C
 
 \*---------------------------------------------------------------------------*/
 
@@ -47,6 +48,8 @@ SourceFiles
 #include "NamedEnum.H"
 #include "dynamicLabelList.H"
 #include "optimisationSwitch.H"
+#include "ListOps.H"
+#include "LIFOStack.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -59,7 +62,6 @@ namespace Foam
 
 class Pstream
 {
-
 public:
 
     //- Types of communications
@@ -71,6 +73,7 @@ public:
     };
 
     static const NamedEnum<commsTypes, 3> commsTypeNames;
+
 
     // Public classes
 
@@ -85,7 +88,7 @@ public:
                 //- procIDs of processors directly below me
                 labelList below_;
 
-                //- procIDs of all processors below (so not just directly below)
+                //- procIDs of all processors below (not just directly below)
                 labelList allBelow_;
 
                 //- procIDs of all processors not below. (inverse set of
@@ -157,7 +160,7 @@ public:
                 friend Ostream& operator<<(Ostream&, const commsStruct&);
         };
 
-        //- combineReduce operator for lists. Used for counting.
+        //- combineReduce operator for lists.  Used for counting.
         class listEq
         {
         public:
@@ -165,7 +168,7 @@ public:
             template<class T>
             void operator()(T& x, const T& y) const
             {
-                forAll(y, i)
+                forAll (y, i)
                 {
                     if (y[i].size())
                     {
@@ -183,32 +186,38 @@ private:
         //- Is this a parallel run?
         static bool parRun_;
 
-        //- My processor index
-        static int myProcNo_;
-
-        //- Process IDs
-        static List<int> procIDs_;
-
-        //- Default message type
+        //- Default message type info
         static const int msgType_;
 
+        //- Stack of free comms
+        static LIFOStack<label> freeComms_;
+
+        //- My processor index
+        static DynamicList<int> myProcNo_;
+
+        //- Process IDs
+        static DynamicList<List<int> > procIDs_;
+
+        //- List of parent communicators
+        static DynamicList<label> parentCommunicator_;
+
         //- Structure for linear communications
-        static List<commsStruct> linearCommunication_;
+        static DynamicList<List<commsStruct> > linearCommunication_;
 
         //- Structure for tree communications
-        static List<commsStruct> treeCommunication_;
+        static DynamicList<List<commsStruct> > treeCommunication_;
 
 
     // Private member functions
 
         //- Set data for parallel running
-        static void setParRun();
+        static void setParRun(const label nProcs);
 
         //- Calculate linear communication schedule
-        static void calcLinearComm(const label nProcs);
+        static List<commsStruct> calcLinearComm(const label nProcs);
 
         //- Calculate tree communication schedule
-        static void calcTreeComm(const label nProcs);
+        static List<commsStruct> calcTreeComm(const label nProcs);
 
         //- Helper function for tree communication schedule determination
         //  Collects all processorIDs below a processor
@@ -222,6 +231,19 @@ private:
         //- Initialize all communication schedules. Callback from
         //  Pstream::init()
         static void initCommunicationSchedule();
+
+        //- Allocate a communicator with index
+        static void allocatePstreamCommunicator
+        (
+            const label parentIndex,
+            const label index
+        );
+
+        //- Free a communicator
+        static void freePstreamCommunicator
+        (
+            const label index
+        );
 
 
 protected:
@@ -268,6 +290,15 @@ public:
             );
         }
 
+        //- Number of polling cycles in processor updates
+        static const debug::optimisationSwitch nPollProcInterfaces;
+
+        //- Default communicator (all processors)
+        static label worldComm;
+
+        //- Debugging: warn for use of any communicator differing from warnComm
+        static label warnComm;
+
 
     // Constructors
 
@@ -290,6 +321,79 @@ public:
 
     // Member functions
 
+        //- Allocate a new communicator
+        static label allocateCommunicator
+        (
+            const label parent,
+            const labelList& subRanks,
+            const bool doPstream = true
+        );
+
+        //- Free a previously allocated communicator
+        static void freeCommunicator
+        (
+            const label communicator,
+            const bool doPstream = true
+        );
+
+        //- Free all communicators
+        static void freeCommunicators(const bool doPstream);
+
+
+        //- Helper class for allocating/freeing communicators
+        class communicator
+        {
+            //- Communicator identifier
+            label comm_;
+
+            //- Disallow copy and assignment
+            communicator(const communicator&);
+            void operator=(const communicator&);
+
+        public:
+
+            //- Constructo from components
+            communicator
+            (
+                const label parent,
+                const labelList& subRanks,
+                const bool doPstream
+            )
+            :
+                comm_(allocateCommunicator(parent, subRanks, doPstream))
+            {}
+
+            //- Destructor
+            ~communicator()
+            {
+                freeCommunicator(comm_);
+            }
+
+            //- Cast to label
+            operator label() const
+            {
+                return comm_;
+            }
+        };
+
+
+        //- Return physical processor number (i.e. processor number in
+        //  worldComm) given communicator and processor
+        static int baseProcNo(const label myComm, const int procID);
+
+        //- Return processor number in communicator (given physical processor
+        //  number) (= reverse of baseProcNo)
+        static label procNo(const label comm, const int baseProcID);
+
+        //- Return processor number in communicator (given processor number
+        //  and communicator)
+        static label procNo
+        (
+            const label myComm,
+            const label currentComm,
+            const int currentProcID
+        );
+
         //- Add the valid option this type of communications library
         //  adds/requires on the command line
         static void addValidParOptions(HashTable<string>& validParOptions);
@@ -298,44 +402,78 @@ public:
         //  Spawns slave processes and initialises inter-communication
         static bool init(int& argc, char**& argv);
 
+
+        // Non-blocking comms
+
+            //- Get number of outstanding requests
+            static label nRequests();
+
+            //- Truncate number of outstanding requests
+            static void resetRequests(const label sz);
+
+            //- Wait until all requests (from start onwards) have finished.
+            static void waitRequests(const label start = 0);
+
+            //- Wait until request i has finished.
+            static void waitRequest(const label i);
+
+            //- Non-blocking comms: has request i finished?
+            static bool finishedRequest(const label i);
+
+            static int allocateTag(const char*);
+
+            static int allocateTag(const word&);
+
+            static void freeTag(const char*, const int tag);
+
+            static void freeTag(const word&, const int tag);
+
+
         //- Is this a parallel run?
         static bool& parRun()
         {
             return parRun_;
         }
 
-        //- Number of processes in parallel run
-        static label nProcs()
+        //- Number of processes in parallel run for a given communicator
+        static label nProcs(const label communicator = 0)
         {
-            return procIDs_.size();
+            return procIDs_[communicator].size();
         }
 
-        //- Am I the master process
-        static bool master()
-        {
-            return myProcNo_ == masterNo();
-        }
-
-        //- Process index of the master
+        //- Process index of the master for the global communicator
         static int masterNo()
         {
             return 0;
         }
 
-        //- Number of this process (starting from masterNo() = 0)
-        static int myProcNo()
+        //- Am I the master process
+        static bool master(const label communicator = 0)
         {
-            return myProcNo_;
+            return myProcNo_[communicator] == masterNo();
+        }
+
+
+        //- Number of this process (starting from masterNo() = 0)
+        static int myProcNo(const label communicator = 0)
+        {
+            return myProcNo_[communicator];
+        }
+
+        //- Return parent communicator
+        static label parent(const label communicator)
+        {
+            return parentCommunicator_(communicator);
         }
 
         //- Process IDs
-        static const List<int>& procIDs()
+        static const List<int>& procIDs(const int communicator)
         {
-            return procIDs_;
+            return procIDs_[communicator];
         }
 
         //- Process ID of given process index
-        static int procID(int procNo)
+        static List<int>& procID(const int procNo)
         {
             return procIDs_[procNo];
         }
@@ -347,21 +485,27 @@ public:
         }
 
         //- Process index of last slave
-        static int lastSlave()
+        static int lastSlave(const label communicator = 0)
         {
-            return nProcs() - 1;
+            return nProcs(communicator) - 1;
         }
 
         //- Communication schedule for linear all-to-master (proc 0)
-        static const List<commsStruct>& linearCommunication()
+        static const List<commsStruct>& linearCommunication
+        (
+            const label communicator = 0
+        )
         {
-            return linearCommunication_;
+            return linearCommunication_[communicator];
         }
 
         //- Communication schedule for tree all-to-master (proc 0)
-        static const List<commsStruct>& treeCommunication()
+        static const List<commsStruct>& treeCommunication
+        (
+            const label communicator = 0
+        )
         {
-            return treeCommunication_;
+            return treeCommunication_[communicator];
         }
 
         //- Message tag of standard messages
@@ -400,21 +544,40 @@ public:
             (
                 const List<commsStruct>& comms,
                 T& Value,
-                const BinaryOp& bop
+                const BinaryOp& bop,
+                const int tag,
+                const label comm
             );
 
             //- Like above but switches between linear/tree communication
             template <class T, class BinaryOp>
-            static void gather(T& Value, const BinaryOp& bop);
+            static void gather
+            (
+                T& Value,
+                const BinaryOp& bop,
+                const int tag = Pstream::msgType(),
+                const label comm = Pstream::worldComm
+            );
 
             //- Scatter data. Distribute without modification.
             //  Reverse of gather
             template <class T>
-            static void scatter(const List<commsStruct>& comms, T& Value);
+            static void scatter
+            (
+                const List<commsStruct>& comms,
+                T& Value,
+                const int tag,
+                const label comm
+            );
 
             //- Like above but switches between linear/tree communication
             template <class T>
-            static void scatter(T& Value);
+            static void scatter
+            (
+                T& Value,
+                const int tag = Pstream::msgType(),
+                const label comm = Pstream::worldComm
+            );
 
 
         // Combine variants. Inplace combine values from processors.
@@ -425,24 +588,39 @@ public:
             (
                 const List<commsStruct>& comms,
                 T& Value,
-                const CombineOp& cop
+                const CombineOp& cop,
+                const int tag,
+                const label comm
             );
 
             //- Like above but switches between linear/tree communication
             template <class T, class CombineOp>
-            static void combineGather(T& Value, const CombineOp& cop);
+            static void combineGather
+            (
+                T& Value,
+                const CombineOp& cop,
+                const int tag = Pstream::msgType(),
+                const label comm = Pstream::worldComm
+            );
 
             //- Scatter data. Reverse of combineGather
             template <class T>
             static void combineScatter
             (
                 const List<commsStruct>& comms,
-                T& Value
+                T& Value,
+                const int tag,
+                const label comm
             );
 
             //- Like above but switches between linear/tree communication
             template <class T>
-            static void combineScatter(T& Value);
+            static void combineScatter
+            (
+                T& Value,
+                const int tag = Pstream::msgType(),
+                const label comm = Pstream::worldComm
+            );
 
         // Combine variants working on whole List at a time.
 
@@ -451,7 +629,9 @@ public:
             (
                 const List<commsStruct>& comms,
                 List<T>& Value,
-                const CombineOp& cop
+                const CombineOp& cop,
+                const int tag,
+                const label comm
             );
 
             //- Like above but switches between linear/tree communication
@@ -459,7 +639,9 @@ public:
             static void listCombineGather
             (
                 List<T>& Value,
-                const CombineOp& cop
+                const CombineOp& cop,
+                const int tag = Pstream::msgType(),
+                const label comm = Pstream::worldComm
             );
 
             //- Scatter data. Reverse of combineGather
@@ -467,12 +649,19 @@ public:
             static void listCombineScatter
             (
                 const List<commsStruct>& comms,
-                List<T>& Value
+                List<T>& Value,
+                const int tag,
+                const label comm
             );
 
             //- Like above but switches between linear/tree communication
             template <class T>
-            static void listCombineScatter(List<T>& Value);
+            static void listCombineScatter
+            (
+                List<T>& Value,
+                const int tag = Pstream::msgType(),
+                const label comm = Pstream::worldComm
+            );
 
         // Combine variants working on whole map at a time. Container needs to
         // have iterators and find() defined.
@@ -482,7 +671,9 @@ public:
             (
                 const List<commsStruct>& comms,
                 Container& Values,
-                const CombineOp& cop
+                const CombineOp& cop,
+                const int tag,
+                const label comm
             );
 
             //- Like above but switches between linear/tree communication
@@ -490,7 +681,9 @@ public:
             static void mapCombineGather
             (
                 Container& Values,
-                const CombineOp& cop
+                const CombineOp& cop,
+                const int tag = Pstream::msgType(),
+                const label comm = Pstream::worldComm
             );
 
             //- Scatter data. Reverse of combineGather
@@ -498,13 +691,19 @@ public:
             static void mapCombineScatter
             (
                 const List<commsStruct>& comms,
-                Container& Values
+                Container& Values,
+                const int tag,
+                const label comm
             );
 
             //- Like above but switches between linear/tree communication
             template <class Container>
-            static void mapCombineScatter(Container& Values);
-
+            static void mapCombineScatter
+            (
+                Container& Values,
+                const int tag = Pstream::msgType(),
+                const label comm = Pstream::worldComm
+            );
 
 
         // Gather/scatter keeping the individual processor data separate.
@@ -516,24 +715,56 @@ public:
             static void gatherList
             (
                 const List<commsStruct>& comms,
-                List<T>& Values
+                List<T>& Values,
+                const int tag,
+                const label comm
             );
 
             //- Like above but switches between linear/tree communication
             template <class T>
-            static void gatherList(List<T>& Values);
+            static void gatherList
+            (
+                List<T>& Values,
+                const int tag = Pstream::msgType(),
+                const label comm = Pstream::worldComm
+            );
 
             //- Scatter data. Reverse of gatherList
             template <class T>
             static void scatterList
             (
                 const List<commsStruct>& comms,
-                List<T>& Values
+                List<T>& Values,
+                const int tag,
+                const label comm
             );
 
             //- Like above but switches between linear/tree communication
             template <class T>
-            static void scatterList(List<T>& Values);
+            static void scatterList
+            (
+                List<T>& Values,
+                const int tag = Pstream::msgType(),
+                const label comm = Pstream::worldComm
+            );
+
+
+        // Exchange
+
+            //- Exchange data. Sends sendData, receives into recvData, sets
+            //  sizes (not bytes). sizes[p0][p1] is what processor p0 has
+            //  sent to p1. Continuous data only.
+            //  If block=true will wait for all transfers to finish.
+            template<class Container, class T>
+            static void exchange
+            (
+                const List<Container>&,
+                List<Container>&,
+                labelListList& sizes,
+                const int tag = Pstream::msgType(),
+                const label comm = Pstream::worldComm,
+                const bool block = true
+            );
 };
 
 
@@ -556,6 +787,7 @@ Ostream& operator<<(Ostream&, const Pstream::commsStruct&);
 #   include "gatherScatter.C"
 #   include "combineGatherScatter.C"
 #   include "gatherScatterList.C"
+#   include "PstreamExchange.C"
 #endif
 
 

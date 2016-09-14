@@ -31,6 +31,7 @@ Contributor
 
 #include "ggiPolyPatch.H"
 #include "polyBoundaryMesh.H"
+#include "polyMesh.H"
 #include "addToRunTimeSelectionTable.H"
 #include "demandDrivenData.H"
 #include "polyPatchID.H"
@@ -65,7 +66,7 @@ bool Foam::ggiPolyPatch::active() const
     // For decomposition and reconstruction
     // If not runing in parallel and the patch is not local, this is a serial
     // operation on a piece of a parallel decomposition and is therefore
-    // inactive.  HJ, 5/Spe/2016
+    // inactive.  HJ, 5/Sep/2016
     if (!Pstream::parRun() && !localParallel())
     {
         return false;
@@ -767,6 +768,18 @@ const Foam::ggiPolyPatch& Foam::ggiPolyPatch::shadow() const
 const Foam::faceZone& Foam::ggiPolyPatch::zone() const
 {
     return boundaryMesh().mesh().faceZones()[zoneIndex()];
+}
+
+
+Foam::label Foam::ggiPolyPatch::comm() const
+{
+    return boundaryMesh().mesh().comm();
+}
+
+
+int Foam::ggiPolyPatch::tag() const
+{
+    return Pstream::msgType();
 }
 
 

@@ -132,14 +132,16 @@ public:
                 const lduInterfacePtrsList& coarseInterfaces,
                 const lduInterface& fineInterface,
                 const labelField& localRestrictAddressing,
-                const labelField& neighbourRestrictAddressing
+                const labelField& neighbourRestrictAddressing,
+                const label coarseComm
             ),
             (
                 lduMesh,
                 coarseInterfaces,
                 fineInterface,
                 localRestrictAddressing,
-                neighbourRestrictAddressing
+                neighbourRestrictAddressing,
+                coarseComm
             )
         );
 
@@ -154,7 +156,8 @@ public:
             const lduInterfacePtrsList& coarseInterfaces,
             const lduInterface& fineInterface,
             const labelField& localRestrictAddressing,
-            const labelField& neighbourRestrictAddressing
+            const labelField& neighbourRestrictAddressing,
+            const label coarseComm
         );
 
 
@@ -162,7 +165,10 @@ public:
 
         //- Construct from fine-level interface,
         //  local and neighbour restrict addressing
-        AMGInterface(const lduPrimitiveMesh& lduMesh)
+        AMGInterface
+        (
+            const lduPrimitiveMesh& lduMesh
+        )
         :
             lduMesh_(lduMesh)
         {}

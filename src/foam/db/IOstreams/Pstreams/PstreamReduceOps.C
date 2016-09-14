@@ -21,59 +21,11 @@ License
     You should have received a copy of the GNU General Public License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
-Namespace
-    Foam::PstreamGlobals
-
-Description
-    Global functions and variables for working with parallel streams,
-    but principally for gamma/mpi
-
-SourceFiles
-    PstreamGlobals.C
-
 \*---------------------------------------------------------------------------*/
 
-#ifndef PstreamGlobals_H
-#define PstreamGlobals_H
-
-#include "mpi.h"
-
-#include "DynamicList.H"
+#include "PstreamReduceOps.H"
+#include "allReduce.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-namespace Foam
-{
-
-/*---------------------------------------------------------------------------*\
-                        Class PstreamGlobals Declaration
-\*---------------------------------------------------------------------------*/
-
-namespace PstreamGlobals
-{
-
-extern DynamicList<MPI_Request> outstandingRequests_;
-
-extern int nTags_;
-
-extern DynamicList<int> freedTags_;
-
-
-// Current communicators. First element will be MPI_COMM_WORLD
-extern DynamicList<MPI_Comm> MPICommunicators_;
-extern DynamicList<MPI_Group> MPIGroups_;
-
-void checkCommunicator(const label, const label procNo);
-
-};
-
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-#endif
 
 // ************************************************************************* //

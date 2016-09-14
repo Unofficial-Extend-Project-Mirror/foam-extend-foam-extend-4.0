@@ -249,7 +249,7 @@ public:
             ) const;
 
 
-        //- Processor coupled interface functions
+        // Processor coupled interface functions
 
             //- Return processor number
             virtual int myProcNo() const
@@ -262,6 +262,16 @@ public:
             {
                 return procPatch_.neighbProcNo();
             }
+
+
+            // Communication support
+
+                //- Return communicator used for parallel communication
+                virtual int comm() const
+                {
+                    return procPatch_.comm();
+                }
+
 
             //- Does the patch field perform the transfromation
             virtual bool doTransform() const

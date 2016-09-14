@@ -38,6 +38,8 @@ Foam::IPstream::IPstream
     const commsTypes commsType,
     const int fromProcNo,
     const label bufSize,
+    const int tag,
+    const label comm,
     streamFormat format,
     versionNumber version
 )
@@ -45,6 +47,8 @@ Foam::IPstream::IPstream
     Pstream(commsType, bufSize),
     Istream(format, version),
     fromProcNo_(fromProcNo),
+    tag_(tag),
+    comm_(comm),
     messageSize_(0)
 {
     setOpened();
@@ -52,17 +56,31 @@ Foam::IPstream::IPstream
 
     MPI_Status status;
 
-    // If the buffer size is not specified, probe the incomming message
+    // If the buffer size is not specified, probe the incoming message
     // and set it
     if (!bufSize)
     {
-        MPI_Probe(procID(fromProcNo_), msgType(), MPI_COMM_WORLD, &status);
+        MPI_Probe
+        (
+            fromProcNo_,
+            tag_,
+            PstreamGlobals::MPICommunicators_[comm_],
+            &status
+        );
         MPI_Get_count(&status, MPI_BYTE, &messageSize_);
 
         buf_.setSize(messageSize_);
     }
 
-    messageSize_ = read(commsType, fromProcNo_, buf_.begin(), buf_.size());
+    messageSize_ = IPstream::read
+    (
+        commsType,
+        fromProcNo_,
+        buf_.begin(),
+        buf_.size(),
+        tag_,
+        comm_
+    );
 
     if (!messageSize_)
     {
@@ -83,9 +101,31 @@ Foam::label Foam::IPstream::read
     const commsTypes commsType,
     const int fromProcNo,
     char* buf,
-    const std::streamsize bufSize
+    const std::streamsize bufSize,
+    const int tag,
+    const label comm
 )
 {
+    if (debug)
+    {
+        Pout<< "UIPstream::read : starting read from:" << fromProcNo
+            << " tag:" << tag << " comm:" << comm
+            << " wanted size:" << label(bufSize)
+            << " commsType:" << Pstream::commsTypeNames[commsType]
+            << Foam::endl;
+    }
+
+    if (Pstream::warnComm != -1 && comm != Pstream::warnComm)
+    {
+        Pout<< "UIPstream::read : starting read from:" << fromProcNo
+            << " tag:" << tag << " comm:" << comm
+            << " wanted size:" << label(bufSize)
+            << " commsType:" << Pstream::commsTypeNames[commsType]
+            << " warnComm:" << Pstream::warnComm
+            << Foam::endl;
+        error::printStack(Pout);
+    }
+
     if (commsType == blocking || commsType == scheduled)
     {
         MPI_Status status;
@@ -96,10 +136,10 @@ Foam::label Foam::IPstream::read
             (
                 buf,
                 bufSize,
-                MPI_PACKED,
-                procID(fromProcNo),
-                msgType(),
-                MPI_COMM_WORLD,
+                MPI_BYTE,
+                fromProcNo,
+                tag,
+                PstreamGlobals::MPICommunicators_[comm],
                 &status
             )
         )
@@ -144,10 +184,10 @@ Foam::label Foam::IPstream::read
             (
                 buf,
                 bufSize,
-                MPI_PACKED,
-                procID(fromProcNo),
-                msgType(),
-                MPI_COMM_WORLD,
+                MPI_BYTE,
+                fromProcNo,
+                tag,
+                PstreamGlobals::MPICommunicators_[comm],
                 &request
             )
         )
@@ -162,8 +202,18 @@ Foam::label Foam::IPstream::read
             return 0;
         }
 
-        PstreamGlobals::IPstream_outstandingRequests_.append(request);
+        if (debug)
+        {
+            Pout<< "UIPstream::read : started read from:" << fromProcNo
+                << " tag:" << tag << " read size:" << label(bufSize)
+                << " commsType:" << Pstream::commsTypeNames[commsType]
+                << " request:" << PstreamGlobals::outstandingRequests_.size()
+                << Foam::endl;
+        }
 
+        PstreamGlobals::outstandingRequests_.append(request);
+
+        // Assume the message is completely received.
         return 1;
     }
     else
@@ -177,58 +227,6 @@ Foam::label Foam::IPstream::read
 
         return 0;
     }
-}
-
-
-void Foam::IPstream::waitRequests()
-{
-    if (PstreamGlobals::IPstream_outstandingRequests_.size())
-    {
-        if
-        (
-            MPI_Waitall
-            (
-                PstreamGlobals::IPstream_outstandingRequests_.size(),
-                PstreamGlobals::IPstream_outstandingRequests_.begin(),
-                MPI_STATUSES_IGNORE
-            )
-        )
-        {
-            FatalErrorIn
-            (
-                "IPstream::waitRequests()"
-            )   << "MPI_Waitall returned with error" << endl;
-        }
-
-        PstreamGlobals::IPstream_outstandingRequests_.clear();
-    }
-}
-
-
-bool Foam::IPstream::finishedRequest(const label i)
-{
-    if (i >= PstreamGlobals::IPstream_outstandingRequests_.size())
-    {
-        FatalErrorIn
-        (
-            "IPstream::finishedRequest(const label)"
-        )   << "There are "
-            << PstreamGlobals::IPstream_outstandingRequests_.size()
-            << " outstanding send requests and you are asking for i=" << i
-            << nl
-            << "Maybe you are mixing blocking/non-blocking comms?"
-            << Foam::abort(FatalError);
-    }
-
-    int flag;
-    MPI_Test
-    (
-        &PstreamGlobals::IPstream_outstandingRequests_[i],
-        &flag,
-        MPI_STATUS_IGNORE
-    );
-
-    return flag != 0;
 }
 
 

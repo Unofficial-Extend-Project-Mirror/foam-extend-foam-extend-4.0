@@ -48,11 +48,14 @@ Foam::processorAMGInterface::processorAMGInterface
     const lduInterfacePtrsList& coarseInterfaces,
     const lduInterface& fineInterface,
     const labelField& localRestrictAddressing,
-    const labelField& neighbourRestrictAddressing
+    const labelField& neighbourRestrictAddressing,
+    const label coarseComm
 )
 :
     AMGInterface(lduMesh),
-    fineProcInterface_(refCast<const processorLduInterface>(fineInterface))
+    fineProcInterface_(refCast<const processorLduInterface>(fineInterface)),
+    comm_(coarseComm),
+    tag_(refCast<const processorLduInterface>(fineInterface).tag())
 {
     // Make a lookup table of entries for owner/neighbour
     HashTable<SLList<label>, label, Hash<label> > neighboursTable

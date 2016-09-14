@@ -48,7 +48,8 @@ Foam::cyclicGGIAMGInterface::cyclicGGIAMGInterface
     const lduInterfacePtrsList& coarseInterfaces,
     const lduInterface& fineInterface,
     const labelField& localRestrictAddressing,
-    const labelField& neighbourRestrictAddressing
+    const labelField& neighbourRestrictAddressing,
+    const label coarseComm
 )
 :
     ggiAMGInterface
@@ -57,7 +58,8 @@ Foam::cyclicGGIAMGInterface::cyclicGGIAMGInterface
         coarseInterfaces,
         fineInterface,
         localRestrictAddressing,
-        neighbourRestrictAddressing
+        neighbourRestrictAddressing,
+        coarseComm
     )
 {}
 

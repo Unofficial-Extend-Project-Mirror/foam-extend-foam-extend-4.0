@@ -147,7 +147,6 @@ $(Pstreams)/IPstream.C
 $(Pstreams)/OPstream.C
 $(Pstreams)/IPread.C
 $(Pstreams)/OPwrite.C
-$(Pstreams)/PstreamsPrint.C
 
 dictionary = db/dictionary
 $(dictionary)/dictionary.C

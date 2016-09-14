@@ -48,7 +48,8 @@ Foam::cyclicAMGInterface::cyclicAMGInterface
     const lduInterfacePtrsList& coarseInterfaces,
     const lduInterface& fineInterface,
     const labelField& localRestrictAddressing,
-    const labelField& neighbourRestrictAddressing
+    const labelField& neighbourRestrictAddressing,
+    const label coarseComm // Not needed
 )
 :
     AMGInterface(lduMesh),

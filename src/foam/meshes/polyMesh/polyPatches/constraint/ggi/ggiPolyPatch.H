@@ -303,6 +303,15 @@ public:
             const faceZone& zone() const;
 
 
+        // Communications support
+
+            //- Return communicator used for communication
+            virtual label comm() const;
+
+            //- Return message tag to use for communication
+            virtual int tag() const;
+
+
         // Interpolation data
 
             //- Is this the master side?

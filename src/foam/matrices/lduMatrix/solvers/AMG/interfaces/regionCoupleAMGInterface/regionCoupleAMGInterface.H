@@ -46,7 +46,7 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                     Class regionCoupleAMGInterface Declaration
+                   Class regionCoupleAMGInterface Declaration
 \*---------------------------------------------------------------------------*/
 
 class regionCoupleAMGInterface
@@ -76,13 +76,13 @@ public:
             const lduInterfacePtrsList& coarseInterfaces,
             const lduInterface& fineInterface,
             const labelField& localRestrictAddressing,
-            const labelField& neighbourRestrictAddressing
+            const labelField& neighbourRestrictAddressing,
+            const label coarseComm
         );
 
 
-    // Destructor
-
-        virtual ~regionCoupleAMGInterface();
+    //- Destructor
+    virtual ~regionCoupleAMGInterface();
 
 
     // Member Functions

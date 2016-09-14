@@ -68,13 +68,13 @@ Foam::Pstream::commsStruct::commsStruct
 {
     boolList inBelow(nProcs, false);
 
-    forAll(allBelow, belowI)
+    forAll (allBelow, belowI)
     {
         inBelow[allBelow[belowI]] = true;
     }
 
     label notI = 0;
-    forAll(inBelow, procI)
+    forAll (inBelow, procI)
     {
         if ((procI != myProcID) && !inBelow[procI])
         {

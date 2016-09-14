@@ -124,9 +124,8 @@ public:
         );
 
 
-    // Destructor
-
-        virtual ~processorPointPatch();
+    //- Destructor
+    virtual ~processorPointPatch();
 
 
     // Member functions
@@ -173,6 +172,21 @@ public:
         {
             return procPolyPatch_;
         }
+
+
+        // Communications support
+
+            //- Return communicator used for communication
+            virtual label comm() const
+            {
+                return procPolyPatch_.comm();
+            }
+
+            //- Return message tag to use for communication
+            virtual int tag() const
+            {
+                return procPolyPatch_.tag();
+            }
 
 
         // Access functions for demand driven data
