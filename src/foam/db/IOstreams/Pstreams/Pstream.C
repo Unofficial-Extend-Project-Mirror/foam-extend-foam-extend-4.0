@@ -108,7 +108,7 @@ Foam::List<Foam::Pstream::commsStruct> Foam::Pstream::calcLinearComm
         belowIDs,
         labelList(0)
     );
-    Pout<< "SIZE: " << linearCommunication.size() << " nProcs: " << nProcs << endl;
+
     // Slaves. Have no below processors, only communicate up to master
     for (label procID = 1; procID < nProcs; procID++)
     {
@@ -165,8 +165,6 @@ Foam::List<Foam::Pstream::commsStruct> Foam::Pstream::calcTreeComm
 
     List<dynamicLabelList> receives(nProcs);
     labelList sends(nProcs, -1);
-
-    // Info<< "Using " << nLevels << " communication levels" << endl;
 
     label offset = 2;
     label childOffset = offset/2;
