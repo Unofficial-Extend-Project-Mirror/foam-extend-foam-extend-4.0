@@ -63,16 +63,28 @@ bool Foam::ggiPolyPatch::active() const
     polyPatchID shadow(shadowName_, boundaryMesh());
     faceZoneID zone(zoneName_, boundaryMesh().mesh().faceZones());
 
-    // For decomposition and reconstruction
-    // If not runing in parallel and the patch is not local, this is a serial
-    // operation on a piece of a parallel decomposition and is therefore
-    // inactive.  HJ, 5/Sep/2016
-    if (!Pstream::parRun() && !localParallel())
+    if (shadow.active() && zone.active())
     {
+        if
+        (
+            !Pstream::parRun()
+         && size() != boundaryMesh().mesh().faceZones()[zone.index()].size()
+        )
+        {
+            // Patch is present in serial run, but zone is not the same size
+            // Probably doing decomposition and reconstruction
+            // HJ, 14/Sep/2016
+
+            return false;
+        }
+
+        return true;
+    }
+    else
+    {
+        // Zones not active.  Nothing to check
         return false;
     }
-
-    return shadow.active() && zone.active();
 }
 
 
@@ -960,11 +972,11 @@ void Foam::ggiPolyPatch::initMovePoints(const pointField& p)
         {
             map();
         }
-    }
 
-    if (active() && master())
-    {
-        reconFaceCellCentres();
+        if (master())
+        {
+            reconFaceCellCentres();
+        }
     }
 
     polyPatch::initMovePoints(p);
