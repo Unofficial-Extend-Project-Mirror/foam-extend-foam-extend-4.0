@@ -29,7 +29,6 @@ Description
 
 SourceFiles
     Pstream.C
-    PstreamReduceOps.C
     PstreamCommsStruct.C
     gatherScatter.C
     combineGatherScatter.C
