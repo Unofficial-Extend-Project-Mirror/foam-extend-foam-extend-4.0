@@ -78,7 +78,7 @@ void Foam::ggiAMGInterface::initFastReduce() const
         zoneProcID[za[zaI]] = Pstream::myProcNo();
     }
 
-    reduce(zoneProcID, maxOp<labelField>());
+    reduce(zoneProcID, maxOp<labelField>(), tag(), comm());
 
     // Find out where my zone data is coming from
     labelList nRecv(Pstream::nProcs(), 0);
@@ -195,8 +195,7 @@ Foam::ggiAMGInterface::ggiAMGInterface
     const lduInterfacePtrsList& coarseInterfaces,
     const lduInterface& fineInterface,
     const labelField& localRestrictAddressing,
-    const labelField& neighbourRestrictAddressing,
-    const label coarseComm
+    const labelField& neighbourRestrictAddressing
 )
 :
     AMGInterface(lduMesh),
@@ -204,8 +203,8 @@ Foam::ggiAMGInterface::ggiAMGInterface
     zoneSize_(0),
     zoneAddressing_(),
     procMasterFaces_(),
-    comm_(coarseComm),
-    tag_(refCast<const ggiLduInterface>(fineInterface).tag()),
+    comm_(fineGgiInterface_.comm()),
+    tag_(fineGgiInterface_.tag()),
     mapPtr_(NULL)
 {
     // New algorithm will assemble local clusters on the master side and
@@ -688,7 +687,7 @@ Foam::ggiAMGInterface::ggiAMGInterface
 
     nCoarseFacesPerProc[Pstream::myProcNo()] = nCoarseFaces;
 
-    reduce(nCoarseFacesPerProc, sumOp<labelList>());
+    reduce(nCoarseFacesPerProc, sumOp<labelList>(), tag(), comm());
 
     // Coarse global face zone is assembled by adding all faces from proc0,
     // followed by all faces from proc1 etc.

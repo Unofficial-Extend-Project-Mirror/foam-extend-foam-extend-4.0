@@ -48,8 +48,7 @@ Foam::regionCoupleAMGInterface::regionCoupleAMGInterface
     const lduInterfacePtrsList& coarseInterfaces,
     const lduInterface& fineInterface,
     const labelField& localRestrictAddressing,
-    const labelField& neighbourRestrictAddressing,
-    const label coarseComm
+    const labelField& neighbourRestrictAddressing
 )
 :
     ggiAMGInterface
@@ -58,8 +57,7 @@ Foam::regionCoupleAMGInterface::regionCoupleAMGInterface
         coarseInterfaces,
         fineInterface,
         localRestrictAddressing,
-        neighbourRestrictAddressing,
-        coarseComm
+        neighbourRestrictAddressing
     ),
     coupled_(fineInterface.coupled())
 {}

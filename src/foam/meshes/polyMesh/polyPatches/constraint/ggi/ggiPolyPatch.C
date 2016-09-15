@@ -359,6 +359,45 @@ void Foam::ggiPolyPatch::calcLocalParallel() const
         reduce(emptyOrComplete, andOp<bool>());
     }
 
+    if (emptyOrComplete)
+    {
+        comm_ = boundaryMesh().mesh().comm();
+    }
+    else
+    {
+        // Count how many patch faces exist on each processor
+        labelList nFacesPerProc(Pstream::nProcs(), 0);
+        nFacesPerProc[Pstream::myProcNo()] = size();
+//         reduce(nFacesPerProc, maxOp<label>());
+        Pstream::gatherList(nFacesPerProc);
+        Pstream::scatterList(nFacesPerProc);
+
+        Pout<< "nFacesPerProc: " << nFacesPerProc << endl;
+        // Make a comm, from all processors that contain the ggi faces
+        labelList ggiCommProcs(Pstream::nProcs());
+        label nGgiCommProcs = 0;
+
+        forAll (nFacesPerProc, procI)
+        {
+            if (nFacesPerProc[procI] > 0)
+            {
+                ggiCommProcs[nGgiCommProcs] = procI;
+                nGgiCommProcs++;
+            }
+        }
+        ggiCommProcs.setSize(nGgiCommProcs);
+
+        // Allocate communicator
+        Info<< "Allocating communicator for GGI patch " << name()
+            << " with " << ggiCommProcs
+            << endl;
+        comm_ = Pstream::allocateCommunicator
+        (
+            Pstream::worldComm,
+            ggiCommProcs
+        );
+    }
+
     if (debug && Pstream::parRun())
     {
         Info<< "GGI patch Master: " << name()
@@ -785,7 +824,18 @@ const Foam::faceZone& Foam::ggiPolyPatch::zone() const
 
 Foam::label Foam::ggiPolyPatch::comm() const
 {
-    return boundaryMesh().mesh().comm();
+    //HJ, Testing.  Use optimised comm or a local one
+
+    // Note: comm is calculated with localParallel and will use the
+    // localParallelPtr_ for signalling.  HJ, 10/Sep2016
+    if (!localParallelPtr_)
+    {
+        calcLocalParallel();
+    }
+
+    return comm_;
+
+//     return boundaryMesh().mesh().comm();
 }
 
 

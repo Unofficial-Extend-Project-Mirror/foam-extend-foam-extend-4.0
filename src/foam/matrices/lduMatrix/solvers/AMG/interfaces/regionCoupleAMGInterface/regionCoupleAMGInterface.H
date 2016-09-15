@@ -76,8 +76,7 @@ public:
             const lduInterfacePtrsList& coarseInterfaces,
             const lduInterface& fineInterface,
             const labelField& localRestrictAddressing,
-            const labelField& neighbourRestrictAddressing,
-            const label coarseComm
+            const labelField& neighbourRestrictAddressing
         );
 
 

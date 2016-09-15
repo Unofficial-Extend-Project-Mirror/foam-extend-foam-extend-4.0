@@ -954,8 +954,7 @@ Foam::BlockMatrixAgglomeration<Type>::restrictMatrix() const
                     coarseInterfaces,
                     fineInterface,
                     fineInterface.interfaceInternalField(agglomIndex_),
-                    fineInterfaceAddr[intI],
-                    Pstream::worldComm //HJ, AMG Comm fineMesh.comm(),
+                    fineInterfaceAddr[intI]
                 ).ptr()
             );
         }

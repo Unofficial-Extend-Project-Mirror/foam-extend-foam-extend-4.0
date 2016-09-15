@@ -54,8 +54,7 @@ Foam::mixingPlaneAMGInterface::mixingPlaneAMGInterface
     const lduInterfacePtrsList& coarseInterfaces,
     const lduInterface& fineInterface,
     const labelField& localRestrictAddressing,
-    const labelField& neighbourRestrictAddressing,
-    const label coarseComm
+    const labelField& neighbourRestrictAddressing
 )
 :
     AMGInterface(lduMesh),
@@ -63,8 +62,8 @@ Foam::mixingPlaneAMGInterface::mixingPlaneAMGInterface
     (
         refCast<const mixingPlaneLduInterface>(fineInterface)
     ),
-    comm_(coarseComm),
-    tag_(refCast<const mixingPlaneLduInterface>(fineInterface).tag())
+    comm_(fineMixingPlaneInterface_.comm()),
+    tag_(fineMixingPlaneInterface_.tag())
 {}
 
 

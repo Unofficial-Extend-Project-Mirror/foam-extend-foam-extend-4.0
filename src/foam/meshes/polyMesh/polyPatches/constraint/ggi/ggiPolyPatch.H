@@ -105,6 +105,12 @@ class ggiPolyPatch
             //  Used for parallel optimisation
             mutable bool* localParallelPtr_;
 
+            //- Communicator to use for parallel communication
+            mutable label comm_;
+
+            //- Message tag used for sending
+            mutable int tag_;
+
             //- Map-distribute comms tool
             mutable mapDistribute* mapPtr_;
 

@@ -299,8 +299,7 @@ void Foam::GAMGAgglomeration::agglomerateLduAddressing
                         (
                             restrictMap
                         ),
-                        fineInterfaceAddr[inti],
-                        fineMesh.comm() // Set up comm per level?
+                        fineInterfaceAddr[inti]
                     ).ptr()
                 );
 

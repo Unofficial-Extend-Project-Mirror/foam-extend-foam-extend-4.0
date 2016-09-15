@@ -651,8 +651,7 @@ Foam::autoPtr<Foam::amgMatrix> Foam::pamgPolicy::restrictMatrix
                     coarseInterfaces,
                     fineInterface,
                     fineInterface.interfaceInternalField(child_),
-                    fineInterfaceAddr[intI],
-                    Pstream::worldComm //HJ, AMG Comm fineMesh.comm()
+                    fineInterfaceAddr[intI]
                 ).ptr()
             );
         }
