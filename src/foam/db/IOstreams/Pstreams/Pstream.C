@@ -106,7 +106,7 @@ Foam::List<Foam::Pstream::commsStruct> Foam::Pstream::calcLinearComm
         0,
         -1,
         belowIDs,
-        labelList(0)
+        labelList()
     );
 
     // Slaves. Have no below processors, only communicate up to master
@@ -117,8 +117,8 @@ Foam::List<Foam::Pstream::commsStruct> Foam::Pstream::calcLinearComm
             nProcs,
             procID,
             0,
-            labelList(0),
-            labelList(0)
+            labelList(),
+            labelList()
         );
     }
 
@@ -280,7 +280,7 @@ void Foam::Pstream::allocatePstreamCommunicator
         {
             FatalErrorIn
             (
-                "Pstream::allocateCommunicator\n"
+                "Pstream::allocatePstreamCommunicator\n"
                 "(\n"
                 "    const label parentIndex,\n"
                 "    const labelList& subRanks\n"
@@ -391,10 +391,10 @@ Foam::label Foam::Pstream::allocateCommunicator
         index = parentCommunicator_.size();
 
         myProcNo_.append(-1);
-        procIDs_.append(List<int>(0));
+        procIDs_.append(List<int>());
         parentCommunicator_.append(-1);
-        linearCommunication_.append(List<commsStruct>(0));
-        treeCommunication_.append(List<commsStruct>(0));
+        linearCommunication_.append(List<commsStruct>());
+        treeCommunication_.append(List<commsStruct>());
     }
 
     if (debug)
@@ -415,7 +415,7 @@ Foam::label Foam::Pstream::allocateCommunicator
         procIDs_[index][i] = subRanks[i];
 
         // Enforce incremental order (so index is rank in next communicator)
-        if (i >= 1 && subRanks[i] <= subRanks[i-1])
+        if (i >= 1 && subRanks[i] <= subRanks[i - 1])
         {
             FatalErrorIn
             (
@@ -674,6 +674,7 @@ void Foam::reduce
             << endl;
         error::printStack(Pout);
     }
+
     allReduce(Value, 1, MPI_SCALAR, MPI_SUM, bop, tag, comm);
 }
 
@@ -1036,9 +1037,9 @@ Foam::debug::optimisationSwitch
 Foam::Pstream::defaultCommsType
 (
     "commsType",
-//     "nonBlocking",
+    "nonBlocking",
 //     "scheduled",
-    "blocking",
+//     "blocking",
     "blocking, nonBlocking, scheduled"
 );
 

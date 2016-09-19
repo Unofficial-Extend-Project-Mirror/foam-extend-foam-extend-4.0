@@ -134,7 +134,7 @@ void reduce
 {
     notImplemented
     (
-        "reduce(T&, const BinaryOp&, const int, const label, label&"
+        "reduce(T&, const BinaryOp&, const int, const label, label&)"
     );
 }
 

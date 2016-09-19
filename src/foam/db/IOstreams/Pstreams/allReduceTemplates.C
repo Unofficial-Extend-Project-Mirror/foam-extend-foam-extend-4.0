@@ -64,7 +64,7 @@ void Foam::allReduce
                         &value,
                         MPICount,
                         MPIType,
-                        slave,  //Pstream::procID(slave),
+                        slave,
                         tag,
                         PstreamGlobals::MPICommunicators_[comm],
                         MPI_STATUS_IGNORE
@@ -98,7 +98,7 @@ void Foam::allReduce
                     &Value,
                     MPICount,
                     MPIType,
-                    Pstream::masterNo(),//Pstream::procID(masterNo()),
+                    Pstream::masterNo(),
                     tag,
                     PstreamGlobals::MPICommunicators_[comm]
                 )
@@ -137,7 +137,7 @@ void Foam::allReduce
                         &Value,
                         MPICount,
                         MPIType,
-                        slave,      //Pstream::procID(slave),
+                        slave,
                         tag,
                         PstreamGlobals::MPICommunicators_[comm]
                     )
@@ -168,7 +168,7 @@ void Foam::allReduce
                     &Value,
                     MPICount,
                     MPIType,
-                    Pstream::masterNo(),//Pstream::procID(masterNo()),
+                    Pstream::masterNo(),
                     tag,
                     PstreamGlobals::MPICommunicators_[comm],
                     MPI_STATUS_IGNORE
@@ -194,6 +194,7 @@ void Foam::allReduce
     else
     {
         Type sum;
+
         MPI_Allreduce
         (
             &Value,
@@ -203,6 +204,7 @@ void Foam::allReduce
             MPIOp,
             PstreamGlobals::MPICommunicators_[comm]
         );
+
         Value = sum;
     }
 }

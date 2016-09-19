@@ -78,6 +78,8 @@ void Foam::ggiAMGInterface::initFastReduce() const
         zoneProcID[za[zaI]] = Pstream::myProcNo();
     }
 
+//     reduce(zoneProcID, maxOp<labelField>());
+
     reduce(zoneProcID, maxOp<labelField>(), tag(), comm());
 
     // Find out where my zone data is coming from
@@ -687,7 +689,8 @@ Foam::ggiAMGInterface::ggiAMGInterface
 
     nCoarseFacesPerProc[Pstream::myProcNo()] = nCoarseFaces;
 
-    reduce(nCoarseFacesPerProc, sumOp<labelList>(), tag(), comm());
+//     reduce(nCoarseFacesPerProc, sumOp<labelList>(), tag(), comm());
+    reduce(nCoarseFacesPerProc, sumOp<labelList>());
 
     // Coarse global face zone is assembled by adding all faces from proc0,
     // followed by all faces from proc1 etc.

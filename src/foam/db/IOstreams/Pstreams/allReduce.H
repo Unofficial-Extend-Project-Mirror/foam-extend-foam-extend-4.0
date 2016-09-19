@@ -54,6 +54,7 @@ void allReduce
     const int communicator
 );
 
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam

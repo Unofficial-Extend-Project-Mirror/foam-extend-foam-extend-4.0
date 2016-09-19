@@ -42,7 +42,9 @@ Foam::OPstream::~OPstream()
             commsType_,
             toProcNo_,
             buf_.begin(),
-            bufPosition_
+            bufPosition_,
+            tag_,
+            comm_
         )
     )
     {
@@ -81,6 +83,7 @@ bool Foam::OPstream::write
             << " commsType:" << Pstream::commsTypeNames[commsType]
             << " warnComm:" << Pstream::warnComm
             << Foam::endl;
+
         error::printStack(Pout);
     }
 

@@ -368,11 +368,10 @@ void Foam::ggiPolyPatch::calcLocalParallel() const
         // Count how many patch faces exist on each processor
         labelList nFacesPerProc(Pstream::nProcs(), 0);
         nFacesPerProc[Pstream::myProcNo()] = size();
-//         reduce(nFacesPerProc, maxOp<label>());
+
         Pstream::gatherList(nFacesPerProc);
         Pstream::scatterList(nFacesPerProc);
 
-        Pout<< "nFacesPerProc: " << nFacesPerProc << endl;
         // Make a comm, from all processors that contain the ggi faces
         labelList ggiCommProcs(Pstream::nProcs());
         label nGgiCommProcs = 0;
@@ -388,14 +387,15 @@ void Foam::ggiPolyPatch::calcLocalParallel() const
         ggiCommProcs.setSize(nGgiCommProcs);
 
         // Allocate communicator
-        Info<< "Allocating communicator for GGI patch " << name()
-            << " with " << ggiCommProcs
-            << endl;
         comm_ = Pstream::allocateCommunicator
         (
             Pstream::worldComm,
             ggiCommProcs
         );
+
+        Info<< "Allocating communicator for GGI patch " << name()
+            << " with " << ggiCommProcs << ": " << comm_
+            << endl;
     }
 
     if (debug && Pstream::parRun())
@@ -584,6 +584,13 @@ void Foam::ggiPolyPatch::clearGeom() const
     // HR, 11/Jul/2013
     deleteDemandDrivenData(localParallelPtr_);
 
+    // Clear communicator
+    if (comm_ != Pstream::worldComm)
+    {
+        Pstream::freeCommunicator(comm_);
+        comm_ = Pstream::worldComm;
+    }
+
     deleteDemandDrivenData(mapPtr_);
 }
 
@@ -623,6 +630,8 @@ Foam::ggiPolyPatch::ggiPolyPatch
     remoteZoneAddressingPtr_(NULL),
     reconFaceCellCentresPtr_(NULL),
     localParallelPtr_(NULL),
+    comm_(Pstream::worldComm),
+    tag_(Pstream::msgType()),
     mapPtr_(NULL)
 {}
 
@@ -652,6 +661,8 @@ Foam::ggiPolyPatch::ggiPolyPatch
     remoteZoneAddressingPtr_(NULL),
     reconFaceCellCentresPtr_(NULL),
     localParallelPtr_(NULL),
+    comm_(Pstream::worldComm),
+    tag_(-1),
     mapPtr_(NULL)
 {}
 
@@ -676,6 +687,8 @@ Foam::ggiPolyPatch::ggiPolyPatch
     remoteZoneAddressingPtr_(NULL),
     reconFaceCellCentresPtr_(NULL),
     localParallelPtr_(NULL),
+    comm_(Pstream::worldComm),
+    tag_(-1),
     mapPtr_(NULL)
 {
     if (dict.found("quickReject"))
@@ -706,6 +719,8 @@ Foam::ggiPolyPatch::ggiPolyPatch
     remoteZoneAddressingPtr_(NULL),
     reconFaceCellCentresPtr_(NULL),
     localParallelPtr_(NULL),
+    comm_(pp.comm_),
+    tag_(pp.tag_),
     mapPtr_(NULL)
 {}
 
@@ -732,6 +747,8 @@ Foam::ggiPolyPatch::ggiPolyPatch
     remoteZoneAddressingPtr_(NULL),
     reconFaceCellCentresPtr_(NULL),
     localParallelPtr_(NULL),
+    comm_(pp.comm_),
+    tag_(pp.tag_),
     mapPtr_(NULL)
 {}
 
