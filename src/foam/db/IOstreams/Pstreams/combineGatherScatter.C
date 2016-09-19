@@ -222,8 +222,11 @@ void Pstream::combineScatter
             }
         }
 
-        // Send to my downstairs neighbours
-        forAll (myComm.below(), belowI)
+        // Send to my downstairs neighbours.  Note reverse order (compared to
+        // receiving). This is to make sure to send to the critical path
+        // (only when using a tree schedule!) first.
+        // This is ESI Comms optimisation, v16.06.  HJ, 19/Sep/2016
+        forAllReverse (myComm.below(), belowI)
         {
             label belowID = myComm.below()[belowI];
 
@@ -461,8 +464,11 @@ void Pstream::listCombineScatter
             }
         }
 
-        // Send to my downstairs neighbours
-        forAll (myComm.below(), belowI)
+        // Send to my downstairs neighbours.  Note reverse order (compared to
+        // receiving). This is to make sure to send to the critical path
+        // (only when using a tree schedule!) first.
+        // This is ESI Comms optimisation, v16.06.  HJ, 19/Sep/2016
+        forAllReverse (myComm.below(), belowI)
         {
             label belowID = myComm.below()[belowI];
 
@@ -662,8 +668,11 @@ void Pstream::mapCombineScatter
             }
         }
 
-        // Send to my downstairs neighbours
-        forAll (myComm.below(), belowI)
+        // Send to my downstairs neighbours.  Note reverse order (compared to
+        // receiving). This is to make sure to send to the critical path
+        // (only when using a tree schedule!) first.
+        // This is ESI Comms optimisation, v16.06.  HJ, 19/Sep/2016
+        forAllReverse (myComm.below(), belowI)
         {
             label belowID = myComm.below()[belowI];
 

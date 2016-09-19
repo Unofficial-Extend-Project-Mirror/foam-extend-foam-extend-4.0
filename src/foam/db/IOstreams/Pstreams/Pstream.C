@@ -67,22 +67,43 @@ const Foam::NamedEnum<Foam::Pstream::commsTypes, 3>
 
 void Foam::Pstream::setParRun(const label nProcs)
 {
-    parRun_ = true;
-
-    // Redo worldComm communicator (created at static initialisation)
-    freeCommunicator(Pstream::worldComm);
-    label comm = allocateCommunicator(-1, identity(nProcs), true);
-
-    if (comm != Pstream::worldComm)
+    if (nProcs == 0)
     {
-        FatalErrorIn("Pstream::setParRun(const label)")
-            << "problem : comm:" << comm
-            << "  Pstream::worldComm:" << Pstream::worldComm
-            << Foam::exit(FatalError);
-    }
+        parRun_ = false;
+        freeCommunicator(Pstream::worldComm);
 
-    Pout.prefix() = '[' +  name(myProcNo()) + "] ";
-    Perr.prefix() = '[' +  name(myProcNo()) + "] ";
+        label comm = allocateCommunicator(-1, labelList(1, label(0)), false);
+
+        if (comm != Pstream::worldComm)
+        {
+            FatalErrorIn("Pstream::setParRun(const label)")
+                << "problem : comm:" << comm
+                << "  Pstream::worldComm:" << Pstream::worldComm
+                << Foam::exit(FatalError);
+        }
+
+        Pout.prefix() = "";
+        Perr.prefix() = "";
+    }
+    else
+    {
+        parRun_ = true;
+
+        // Redo worldComm communicator (created at static initialisation)
+        freeCommunicator(Pstream::worldComm);
+        label comm = allocateCommunicator(-1, identity(nProcs), true);
+
+        if (comm != Pstream::worldComm)
+        {
+            FatalErrorIn("Pstream::setParRun(const label)")
+                << "problem : comm:" << comm
+                << "  Pstream::worldComm:" << Pstream::worldComm
+                << Foam::exit(FatalError);
+        }
+
+        Pout.prefix() = '[' +  name(myProcNo()) + "] ";
+        Perr.prefix() = '[' +  name(myProcNo()) + "] ";
+    }
 }
 
 
