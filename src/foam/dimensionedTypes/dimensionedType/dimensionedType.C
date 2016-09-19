@@ -133,45 +133,6 @@ dimensioned<Type>::dimensioned
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 template <class Type>
-const word& dimensioned<Type>::name() const
-{
-    return name_;
-}
-
-template <class Type>
-word& dimensioned<Type>::name()
-{
-    return name_;
-}
-
-
-template <class Type>
-const dimensionSet& dimensioned<Type>::dimensions() const
-{
-    return dimensions_;
-}
-
-template <class Type>
-dimensionSet& dimensioned<Type>::dimensions()
-{
-    return dimensions_;
-}
-
-
-template <class Type>
-const Type& dimensioned<Type>::value() const
-{
-    return value_;
-}
-
-template <class Type>
-Type& dimensioned<Type>::value()
-{
-    return value_;
-}
-
-
-template <class Type>
 dimensioned<typename dimensioned<Type>::cmptType> dimensioned<Type>::component
 (
     const direction d
