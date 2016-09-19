@@ -50,10 +50,10 @@ void Pstream::gather
     const label comm
 )
 {
-    if (Pstream::nProcs() > 1)
+    if (Pstream::nProcs(comm) > 1)
     {
         // Get my communication order
-        const commsStruct& myComm = comms[Pstream::myProcNo()];
+        const commsStruct& myComm = comms[Pstream::myProcNo(comm)];
 
         // Receive from my downstairs neighbours
         forAll (myComm.below(), belowI)
@@ -129,13 +129,13 @@ void Pstream::gather
     const label comm
 )
 {
-    if (Pstream::nProcs() < Pstream::nProcsSimpleSum())
+    if (Pstream::nProcs(comm) < Pstream::nProcsSimpleSum())
     {
-        gather(Pstream::linearCommunication(), Value, bop, tag, comm);
+        gather(Pstream::linearCommunication(comm), Value, bop, tag, comm);
     }
     else
     {
-        gather(Pstream::treeCommunication(), Value, bop, tag, comm);
+        gather(Pstream::treeCommunication(comm), Value, bop, tag, comm);
     }
 }
 
@@ -149,10 +149,10 @@ void Pstream::scatter
     const label comm
 )
 {
-    if (Pstream::nProcs() > 1)
+    if (Pstream::nProcs(comm) > 1)
     {
         // Get my communication order
-        const commsStruct& myComm = comms[Pstream::myProcNo()];
+        const commsStruct& myComm = comms[Pstream::myProcNo(comm)];
 
         // Receive from up
         if (myComm.above() != -1)
@@ -221,13 +221,13 @@ void Pstream::scatter
 template <class T>
 void Pstream::scatter(T& Value, const int tag, const label comm)
 {
-    if (Pstream::nProcs() < Pstream::nProcsSimpleSum())
+    if (Pstream::nProcs(comm) < Pstream::nProcsSimpleSum())
     {
-        scatter(Pstream::linearCommunication(), Value, tag, comm);
+        scatter(Pstream::linearCommunication(comm), Value, tag, comm);
     }
     else
     {
-        scatter(Pstream::treeCommunication(), Value, tag, comm);
+        scatter(Pstream::treeCommunication(comm), Value, tag, comm);
     }
 }
 

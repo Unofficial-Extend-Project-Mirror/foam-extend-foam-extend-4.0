@@ -233,7 +233,7 @@ void Pstream::scatterList
                 ")"
             )   << "Size of list:" << Values.size()
                 << " does not equal the number of processors:"
-                << Pstream::nProcs()
+                << Pstream::nProcs(comm)
                 << Foam::abort(FatalError);
         }
 
