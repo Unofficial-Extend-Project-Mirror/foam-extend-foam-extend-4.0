@@ -418,7 +418,21 @@ void GGIInterpolation<MasterPatch, SlavePatch>::calcAddressing() const
                         neighbPointsInUV
                     );
 
-                if (intersectionArea > VSMALL) // Or > areaErrorTol_ ???
+                scalar intersectionTestArea =
+                    Foam::max
+                    (
+                        VSMALL,
+                        areaErrorTol_()*
+                        Foam::max
+                        (
+                            surfaceAreaMasterPointsInUV,
+                            surfaceAreaNeighbPointsInUV
+                        )
+                    );
+
+                // Fix: previously checked for VSMALL.
+                // HJ, 19/Sep2/106
+                if (intersectionArea > intersectionTestArea)
                 {
                     // We compute the GGI weights based on this
                     // intersection area, and on the individual face
