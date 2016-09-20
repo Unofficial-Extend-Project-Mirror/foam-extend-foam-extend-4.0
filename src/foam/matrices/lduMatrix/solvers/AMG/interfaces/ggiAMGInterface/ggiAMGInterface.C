@@ -59,6 +59,22 @@ void Foam::ggiAMGInterface::initFastReduce() const
             << abort(FatalError);
     }
 
+    // If the processor is not in the GGI comm, create a dummy map
+    if (Pstream::myProcNo(comm()) == -1)
+    {
+        mapPtr_ = new mapDistribute
+        (
+            zoneSize(),  // This is zero if there are no local GGI faces
+            labelListList(Pstream::nProcs()),
+            labelListList(Pstream::nProcs())
+        );
+
+        return;
+    }
+
+    // From here on, work on processors within the communicator
+    // HJ, 20/Sep/2016
+
     // Note: this is different from ggiPolyPatch comms because zone
     // is the same on master the slave side.
     // HJ, 31/May/2016
@@ -78,8 +94,9 @@ void Foam::ggiAMGInterface::initFastReduce() const
         zoneProcID[za[zaI]] = Pstream::myProcNo();
     }
 
-//     reduce(zoneProcID, maxOp<labelField>());
-
+    // Note: reduce with a comm will only be present on processors containing
+    // master or slave faces.  Other processors created a dummy map above
+    // HJ, 20/Sep/2016
     reduce(zoneProcID, maxOp<labelField>(), tag(), comm());
 
     // Find out where my zone data is coming from
@@ -128,13 +145,19 @@ void Foam::ggiAMGInterface::initFastReduce() const
         localZoneIndices[za[zaI]] = zaI;
     }
 
-    labelListList shadowToReceiveAddr(Pstream::nProcs());
+    // Note: rewrite this to use comm().  However, all proc indicators will be
+    // done with local comms addressing instead of the global processor number
+    // HJ, 20/Sep/2016
+    labelListList shadowToReceiveAddr(Pstream::nProcs(comm()));
 
     // Get the list of what my shadow needs to receive from my zone
     // on all other processors
-    shadowToReceiveAddr[Pstream::myProcNo()] = shadowZa;
-    Pstream::gatherList(shadowToReceiveAddr);
-    Pstream::scatterList(shadowToReceiveAddr);
+    shadowToReceiveAddr[Pstream::myProcNo(comm())] = shadowZa;
+
+    // Note gather-scatter with a comm.  Processors without GGI faces
+    // have been eliminated beforehand
+    Pstream::gatherList(shadowToReceiveAddr, tag(), comm());
+    Pstream::scatterList(shadowToReceiveAddr, tag(), comm());
 
     // Now local zone indices contain the index of a local face that will
     // provide the data.  For faces that are not local, the index will be -1
@@ -146,38 +169,44 @@ void Foam::ggiAMGInterface::initFastReduce() const
     labelListList sendMap(Pstream::nProcs());
 
     // Collect local labels to be sent to each processor
-    forAll (shadowToReceiveAddr, procI)
+    for (label procI = 0; procI < Pstream::nProcs(); procI++)
     {
-        const labelList& curProcSend = shadowToReceiveAddr[procI];
-
-        // Find out how much of my data is going to this processor
-        label nProcSend = 0;
-
-        forAll (curProcSend, sendI)
+        // Look for processors that are in the current comm, ie. containing
+        // faces from the ggi patch
+        if (Pstream::procNo(comm(), procI) != -1)
         {
-            if (localZoneIndices[curProcSend[sendI]] > -1)
-            {
-                nProcSend++;
-            }
-        }
+            const labelList& curProcSend =
+                shadowToReceiveAddr[Pstream::procNo(comm(), procI)];
 
-        if (nProcSend > 0)
-        {
-            // Collect the indices
-            labelList& curSendMap = sendMap[procI];
-
-            curSendMap.setSize(nProcSend);
-
-            // Reset counter
-            nProcSend = 0;
+            // Find out how much of my data is going to this processor
+            label nProcSend = 0;
 
             forAll (curProcSend, sendI)
             {
                 if (localZoneIndices[curProcSend[sendI]] > -1)
                 {
-                    curSendMap[nProcSend] =
-                        localZoneIndices[curProcSend[sendI]];
                     nProcSend++;
+                }
+            }
+
+            if (nProcSend > 0)
+            {
+                // Collect the indices
+                labelList& curSendMap = sendMap[procI];
+
+                curSendMap.setSize(nProcSend);
+
+                // Reset counter
+                nProcSend = 0;
+
+                forAll (curProcSend, sendI)
+                {
+                    if (localZoneIndices[curProcSend[sendI]] > -1)
+                    {
+                        curSendMap[nProcSend] =
+                            localZoneIndices[curProcSend[sendI]];
+                        nProcSend++;
+                    }
                 }
             }
         }
@@ -689,8 +718,12 @@ Foam::ggiAMGInterface::ggiAMGInterface
 
     nCoarseFacesPerProc[Pstream::myProcNo()] = nCoarseFaces;
 
-//     reduce(nCoarseFacesPerProc, sumOp<labelList>(), tag(), comm());
-    reduce(nCoarseFacesPerProc, sumOp<labelList>());
+    // Reduce number of coarse faces per proc
+    // Note: reducing with comms means that the processors with no
+    // contact with the GGI interface will have zero zone size.
+    // This needs to be handled separately in the initFastReduce
+    // HJ, 20/Sep/2016
+    reduce(nCoarseFacesPerProc, sumOp<labelList>(), tag(), comm());
 
     // Coarse global face zone is assembled by adding all faces from proc0,
     // followed by all faces from proc1 etc.
@@ -888,29 +921,6 @@ Foam::ggiAMGInterface::ggiAMGInterface
                 }
             }
         }
-
-//         // First index: master proc
-//         // Second index: slave proc
-//         // List contents: global faces in order
-//         labelListListList crissCrossList(Pstream::nProcs());
-
-//         labelListList& crissList = crissCrossList[Pstream::myProcNo()];
-
-//         crissList.setSize(Pstream::nProcs());
-
-//         forAll (crissList, procI)
-//         {
-//             crissList[procI] = procMasterFacesLL[procI];
-//         }
-
-//         Pstream::gatherList(crissCrossList);
-//         Pstream::scatterList(crissCrossList);
-
-//         forAll (procMasterFaces_, procI)
-//         {
-//             procMasterFaces_[procI] =
-//                 crissCrossList[procI][Pstream::myProcNo()];
-//         }
     }
     // Agglomerate slave
     else
