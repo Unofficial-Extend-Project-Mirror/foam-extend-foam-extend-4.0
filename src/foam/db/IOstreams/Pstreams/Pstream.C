@@ -431,6 +431,7 @@ Foam::label Foam::Pstream::allocateCommunicator
 
     // Convert from label to int
     procIDs_[index].setSize(subRanks.size());
+
     forAll (procIDs_[index], i)
     {
         procIDs_[index][i] = subRanks[i];
