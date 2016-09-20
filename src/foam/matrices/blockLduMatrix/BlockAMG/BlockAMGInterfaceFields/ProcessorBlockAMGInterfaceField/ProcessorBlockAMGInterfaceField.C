@@ -94,7 +94,7 @@ void Foam::ProcessorBlockAMGInterfaceField<Type>::initInterfaceMatrixUpdate
     const bool switchToLhs
 ) const
 {
-    procInterface_.compressedSend
+    procInterface_.send
     (
         commsType,
         procInterface_.interfaceInternalField(psiInternal)()
@@ -115,7 +115,7 @@ void Foam::ProcessorBlockAMGInterfaceField<Type>::updateInterfaceMatrix
 {
     Field<Type> pnf
     (
-        procInterface_.compressedReceive<Type>(commsType, this->size())
+        procInterface_.receive<Type>(commsType, this->size())
     );
 
     // Multiply neighbour field with coeffs and re-use pnf for result

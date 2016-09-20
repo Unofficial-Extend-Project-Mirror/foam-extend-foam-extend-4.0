@@ -81,7 +81,7 @@ void Foam::processorAMGInterfaceField::initInterfaceMatrixUpdate
     const bool switchToLhs
 ) const
 {
-    procInterface_.compressedSend
+    procInterface_.send
     (
         commsType,
         procInterface_.interfaceInternalField(psiInternal)()
@@ -102,7 +102,7 @@ void Foam::processorAMGInterfaceField::updateInterfaceMatrix
 {
     scalarField pnf
     (
-        procInterface_.compressedReceive<scalar>(commsType, coeffs.size())
+        procInterface_.receive<scalar>(commsType, coeffs.size())
     );
     transformCoupleField(pnf, cmpt);
 

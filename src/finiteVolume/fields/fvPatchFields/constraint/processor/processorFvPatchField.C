@@ -180,7 +180,7 @@ void processorFvPatchField<Type>::initEvaluate
 {
     if (Pstream::parRun())
     {
-        procPatch_.compressedSend(commsType, this->patchInternalField()());
+        procPatch_.send(commsType, this->patchInternalField()());
     }
 }
 
@@ -193,7 +193,7 @@ void processorFvPatchField<Type>::evaluate
 {
     if (Pstream::parRun())
     {
-        procPatch_.compressedReceive<Type>(commsType, *this);
+        procPatch_.receive<Type>(commsType, *this);
 
         if (doTransform())
         {
@@ -222,7 +222,7 @@ void processorFvPatchField<Type>::initInterfaceMatrixUpdate
     const bool switchToLhs
 ) const
 {
-    procPatch_.compressedSend
+    procPatch_.send
     (
         commsType,
         this->patch().patchInternalField(psiInternal)()
@@ -244,7 +244,7 @@ void processorFvPatchField<Type>::updateInterfaceMatrix
 {
     scalarField pnf
     (
-        procPatch_.compressedReceive<scalar>(commsType, this->size())()
+        procPatch_.receive<scalar>(commsType, this->size())()
     );
 
     // Transform according to the transformation tensor
@@ -281,7 +281,7 @@ void processorFvPatchField<Type>::initInterfaceMatrixUpdate
     const bool switchToLhs
 ) const
 {
-    procPatch_.compressedSend
+    procPatch_.send
     (
         commsType,
         this->patch().patchInternalField(psiInternal)()
@@ -302,7 +302,7 @@ void processorFvPatchField<Type>::updateInterfaceMatrix
 {
     Field<Type> pnf
     (
-        procPatch_.compressedReceive<Type>(commsType, this->size())()
+        procPatch_.receive<Type>(commsType, this->size())()
     );
 
     // Multiply neighbour field with coeffs and re-use pnf for result

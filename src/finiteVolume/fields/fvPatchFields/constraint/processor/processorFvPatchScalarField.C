@@ -44,7 +44,7 @@ void processorFvPatchField<scalar>::initInterfaceMatrixUpdate
     const bool switchToLhs
 ) const
 {
-    procPatch_.compressedSend
+    procPatch_.send
     (
         commsType,
         patch().patchInternalField(psiInternal)()
@@ -66,7 +66,7 @@ void processorFvPatchField<scalar>::updateInterfaceMatrix
 {
     scalarField pnf
     (
-        procPatch_.compressedReceive<scalar>(commsType, this->size())()
+        procPatch_.receive<scalar>(commsType, this->size())()
     );
 
     const unallocLabelList& faceCells = patch().faceCells();
@@ -99,7 +99,7 @@ void processorFvPatchField<scalar>::initInterfaceMatrixUpdate
     const bool switchToLhs
 ) const
 {
-    procPatch_.compressedSend
+    procPatch_.send
     (
         commsType,
         patch().patchInternalField(psiInternal)()
@@ -120,7 +120,7 @@ void processorFvPatchField<scalar>::updateInterfaceMatrix
 {
     scalarField pnf
     (
-        procPatch_.compressedReceive<scalar>(commsType, this->size())()
+        procPatch_.receive<scalar>(commsType, this->size())()
     );
 
     const unallocLabelList& faceCells = patch().faceCells();

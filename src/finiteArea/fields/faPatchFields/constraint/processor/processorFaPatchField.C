@@ -176,7 +176,7 @@ void processorFaPatchField<Type>::initEvaluate
 {
     if (Pstream::parRun())
     {
-        procPatch_.compressedSend(commsType, this->patchInternalField()());
+        procPatch_.send(commsType, this->patchInternalField()());
     }
 }
 
@@ -189,7 +189,7 @@ void processorFaPatchField<Type>::evaluate
 {
     if (Pstream::parRun())
     {
-        procPatch_.compressedReceive<Type>(commsType, *this);
+        procPatch_.receive<Type>(commsType, *this);
 
         if (doTransform())
         {
@@ -218,7 +218,7 @@ void processorFaPatchField<Type>::initInterfaceMatrixUpdate
     const bool switchToLhs
 ) const
 {
-    procPatch_.compressedSend
+    procPatch_.send
     (
         commsType,
         this->patch().patchInternalField(psiInternal)()
@@ -240,7 +240,7 @@ void processorFaPatchField<Type>::updateInterfaceMatrix
 {
     scalarField pnf
     (
-        procPatch_.compressedReceive<scalar>(commsType, this->size())()
+        procPatch_.receive<scalar>(commsType, this->size())()
     );
 
     // Transform according to the transformation tensor

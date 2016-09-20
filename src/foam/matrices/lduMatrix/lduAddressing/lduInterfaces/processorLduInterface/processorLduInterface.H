@@ -128,32 +128,6 @@ public:
                 const Pstream::commsTypes commsType,
                 const label size
             ) const;
-
-
-            //- Raw field send function with data compression
-            template<class Type>
-            void compressedSend
-            (
-                const Pstream::commsTypes commsType,
-                const UList<Type>&
-            ) const;
-
-            //- Raw field receive function with data compression
-            template<class Type>
-            void compressedReceive
-            (
-                const Pstream::commsTypes commsType,
-                UList<Type>&
-            ) const;
-
-            //- Raw field receive function with data compression,
-            //  returning a field
-            template<class Type>
-            tmp<Field<Type> > compressedReceive
-            (
-                const Pstream::commsTypes commsType,
-                const label size
-            ) const;
 };
 
 
