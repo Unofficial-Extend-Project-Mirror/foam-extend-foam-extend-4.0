@@ -50,6 +50,13 @@ void Pstream::gather
     const label comm
 )
 {
+    // Return if not active in this comm
+    // HJ, 12/Sep/2016
+    if (Pstream::myProcNo(comm) == -1)
+    {
+        return;
+    }
+
     if (Pstream::nProcs(comm) > 1)
     {
         // Get my communication order
@@ -149,6 +156,13 @@ void Pstream::scatter
     const label comm
 )
 {
+    // Return if not active in this comm
+    // HJ, 12/Sep/2016
+    if (Pstream::myProcNo(comm) == -1)
+    {
+        return;
+    }
+
     if (Pstream::nProcs(comm) > 1)
     {
         // Get my communication order

@@ -54,6 +54,13 @@ void Pstream::gatherList
     const label comm
 )
 {
+    // Return if not active in this comm
+    // HJ, 12/Sep/2016
+    if (Pstream::myProcNo(comm) == -1)
+    {
+        return;
+    }
+
     if (Pstream::nProcs(comm) > 1)
     {
         if (Values.size() != Pstream::nProcs(comm))
@@ -218,6 +225,13 @@ void Pstream::scatterList
     const label comm
 )
 {
+    // Return if not active in this comm
+    // HJ, 12/Sep/2016
+    if (Pstream::myProcNo(comm) == -1)
+    {
+        return;
+    }
+
     if (Pstream::nProcs(comm) > 1)
     {
         if (Values.size() != Pstream::nProcs(comm))
