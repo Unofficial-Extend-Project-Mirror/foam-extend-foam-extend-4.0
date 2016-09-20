@@ -65,16 +65,11 @@ bool Foam::ggiPolyPatch::active() const
 
     if (shadow.active() && zone.active())
     {
-        if
-        (
-            !Pstream::parRun()
-         && size() != boundaryMesh().mesh().faceZones()[zone.index()].size()
-        )
+        if (!Pstream::parRun() && !localParallel())
         {
             // Patch is present in serial run, but zone is not the same size
             // Probably doing decomposition and reconstruction
             // HJ, 14/Sep/2016
-
             return false;
         }
 
@@ -325,49 +320,46 @@ void Foam::ggiPolyPatch::calcLocalParallel() const
     localParallelPtr_ = new bool(false);
     bool& emptyOrComplete = *localParallelPtr_;
 
-    // If running in serial, all GGIs are expanded to zone size.
-    // This happens on decomposition and reconstruction where
-    // size and shadow size may be zero, but zone size may not
-    // HJ, 1/Jun/2011
-    if (!Pstream::parRun())
+    if (size() > zone().size())
     {
+        FatalErrorIn("void ggiPolyPatch::calcLocalParallel() const")
+            << "Patch size is greater than zone size for GGI patch "
+            << name() << ".  This is not allowerd: "
+            << "the face zone must contain all patch faces and be "
+            << "global in parallel runs"
+            << abort(FatalError);
+    }
+
+    // Calculate localisation on master and shadow
+    if ((size() == 0 && shadow().size() == 0))
+    {
+        // No ggi on this processor
+        emptyOrComplete = true;
+    }
+    else if (!zone().empty() || !shadow().zone().empty())
+    {
+        // GGI present on the processor and complete for both
+        emptyOrComplete =
+        (
+            zone().size() == size()
+         && shadow().zone().size() == shadow().size()
+        );
+    }
+    else
+    {
+        // Master and shadow on different processors
         emptyOrComplete = false;
     }
-    else
-    {
-        // Check that patch size is greater than the zone size.
-        // This is an indication of the error where the face zone is not global
-        // in a parallel run.  HJ, 9/Nov/2014
-        if (size() > zone().size())
-        {
-            FatalErrorIn("void ggiPolyPatch::calcLocalParallel() const")
-                << "Patch size is greater than zone size for GGI patch "
-                << name() << ".  This is not allowerd: "
-                << "the face zone must contain all patch faces and be "
-                << "global in parallel runs"
-                << abort(FatalError);
-        }
 
-        // Calculate localisation on master and shadow
-        emptyOrComplete =
-            (
-                zone().size() == size()
-             && shadow().zone().size() == shadow().size()
-            )
-         || (size() == 0 && shadow().size() == 0);
+    reduce(emptyOrComplete, andOp<bool>());
 
-        reduce(emptyOrComplete, andOp<bool>());
-    }
-
-    if (emptyOrComplete)
-    {
-        comm_ = boundaryMesh().mesh().comm();
-    }
-    else
+    // Note: only master allocates the comm_
+    // HJ, 20/Sep/2016
+    if (!emptyOrComplete && Pstream::parRun() && master())
     {
         // Count how many patch faces exist on each processor
         labelList nFacesPerProc(Pstream::nProcs(), 0);
-        nFacesPerProc[Pstream::myProcNo()] = size();
+        nFacesPerProc[Pstream::myProcNo()] = size() + shadow().size();
 
         Pstream::gatherList(nFacesPerProc);
         Pstream::scatterList(nFacesPerProc);
@@ -396,6 +388,10 @@ void Foam::ggiPolyPatch::calcLocalParallel() const
         Info<< "Allocating communicator for GGI patch " << name()
             << " with " << ggiCommProcs << ": " << comm_
             << endl;
+    }
+    else
+    {
+        comm_ = boundaryMesh().mesh().comm();
     }
 
     if (debug && Pstream::parRun())
@@ -844,13 +840,20 @@ Foam::label Foam::ggiPolyPatch::comm() const
     //HJ, Testing.  Use optimised comm or a local one
 
     // Note: comm is calculated with localParallel and will use the
-    // localParallelPtr_ for signalling.  HJ, 10/Sep2016
-    if (!localParallelPtr_)
+    // localParallelPtr_ for signalling.  HJ, 10/Sep/2016
+    if (master())
     {
-        calcLocalParallel();
-    }
+        if (!localParallelPtr_)
+        {
+            calcLocalParallel();
+        }
 
-    return comm_;
+        return comm_;
+    }
+    else
+    {
+        return shadow().comm();
+    }
 
 //     return boundaryMesh().mesh().comm();
 }

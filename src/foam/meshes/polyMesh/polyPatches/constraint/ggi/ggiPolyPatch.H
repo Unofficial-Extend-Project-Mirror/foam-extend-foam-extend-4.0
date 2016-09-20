@@ -106,6 +106,7 @@ class ggiPolyPatch
             mutable bool* localParallelPtr_;
 
             //- Communicator to use for parallel communication
+            //  Note: only master side allocates the comm
             mutable label comm_;
 
             //- Message tag used for sending
