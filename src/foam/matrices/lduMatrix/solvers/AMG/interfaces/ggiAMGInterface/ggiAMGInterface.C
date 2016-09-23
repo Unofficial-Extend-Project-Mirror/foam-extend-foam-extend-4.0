@@ -246,7 +246,10 @@ Foam::ggiAMGInterface::ggiAMGInterface
     // each processor only to perform the analysis on locally created coarse
     // faces
     // HJ, 13/Jun/2016
-    Info<< "Start ggiAMGInterface constructor " << lTime_.elapsedCpuTime() << endl;
+    Info<< "Start ggiAMGInterface constructor for size "
+        << fineGgiInterface_.interfaceSize() << ": " 
+        << lTime_.elapsedCpuTime() << endl;
+
     // Note: local addressing contains only local faces
     const labelList& fineZa =  fineGgiInterface_.zoneAddressing();
 
@@ -266,7 +269,7 @@ Foam::ggiAMGInterface::ggiAMGInterface
             neighbourExpandAddressing
         );
     }
-    Info<< "ggiAMGInterface expandToAddr1 " << lTime_.elapsedCpuTime() << endl;
+
     // Create addressing for neighbour processors.  Note: expandAddrToZone will
     // expand the addressing to zone size.  HJ, 13/Jun/2016
     labelField neighbourExpandProc
@@ -285,7 +288,7 @@ Foam::ggiAMGInterface::ggiAMGInterface
             neighbourExpandProc
         );
     }
-    Info<< "ggiAMGInterface expandToAddr2 " << lTime_.elapsedCpuTime() << endl;
+
     // Note: neighbourExpandAddressing and neighbourExpandProc
     // will be filled with NaNs for faces which are not local
 
@@ -711,7 +714,7 @@ Foam::ggiAMGInterface::ggiAMGInterface
     fineAddressing_.setSize(nAgglomPairs, -1);
     restrictAddressing_.setSize(nAgglomPairs, -1);
     restrictWeights_.setSize(nAgglomPairs);
-    Info<< "ggiAMGInterface end Addr " << lTime_.elapsedCpuTime() << endl;
+
     // In order to assemble the coarse global face zone, find out
     // how many faces have been created on each processor.
     // Note that masters and slaves both count faces so we will
@@ -726,7 +729,7 @@ Foam::ggiAMGInterface::ggiAMGInterface
     // This needs to be handled separately in the initFastReduce
     // HJ, 20/Sep/2016
     reduce(nCoarseFacesPerProc, sumOp<labelList>(), tag(), comm());
-    Info<< "ggiAMGInterface end reduce 1 " << lTime_.elapsedCpuTime() << endl;
+
     // Coarse global face zone is assembled by adding all faces from proc0,
     // followed by all faces from proc1 etc.
     // Therefore, on procN, my master offset
@@ -904,12 +907,26 @@ Foam::ggiAMGInterface::ggiAMGInterface
 
                 if (Pstream::myProcNo() == sendProc)
                 {
-                    OPstream toNbr(Pstream::scheduled, recvProc);
+                    OPstream toNbr
+                    (
+                        Pstream::scheduled,
+                        recvProc,
+                        0,
+                        tag(),
+                        comm()
+                    );
                     toNbr << labelList(procMasterFacesLL[recvProc]);
                 }
                 else if (Pstream::myProcNo() == recvProc)
                 {
-                    IPstream fromNbr(Pstream::scheduled, sendProc);
+                    IPstream fromNbr
+                    (
+                        Pstream::scheduled,
+                        sendProc,
+                        0,
+                        tag(),
+                        comm()
+                    );
 
                     procMasterFaces_[sendProc] = labelList(fromNbr);
                 }
@@ -1047,6 +1064,7 @@ Foam::ggiAMGInterface::ggiAMGInterface
         }
         Info<< "ggiAMGInterface end agglom slave " << lTime_.elapsedCpuTime() << endl;
     }
+    Info<< "End ggiAMGInterface constructor " << lTime_.elapsedCpuTime() << endl;
 }
 
 
