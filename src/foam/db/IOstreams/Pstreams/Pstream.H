@@ -273,11 +273,6 @@ public:
 
     // Static data
 
-        //- Should compact transfer be used in which floats replace doubles
-        //  reducing the bandwidth requirement at the expense of some loss
-        //  in accuracy
-        static const debug::optimisationSwitch floatTransfer;
-
         //- Number of processors at which the sum algorithm changes from linear
         //  to tree
         static const debug::optimisationSwitch nProcsSimpleSum;
