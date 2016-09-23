@@ -152,10 +152,9 @@ public:
         );
 
 
-    // Destructor
-
-        virtual ~BlockGaussSeidelPrecon()
-        {}
+    //- Destructor
+    virtual ~BlockGaussSeidelPrecon()
+    {}
 
 
     // Member Functions
