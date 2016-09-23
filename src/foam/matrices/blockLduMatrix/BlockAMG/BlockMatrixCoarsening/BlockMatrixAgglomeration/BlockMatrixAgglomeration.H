@@ -43,7 +43,7 @@ SourceFiles
 #include "BlockCoeffNorm.H"
 #include "BlockCoeff.H"
 #include "tolerancesSwitch.H"
-#include "clock.H"
+#include "cpuTime.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -85,7 +85,7 @@ class BlockMatrixAgglomeration
         //- Can a coarse level be constructed?
         bool coarsen_;
 
-        clock lTime_;
+        cpuTime lTime_;
 
 
     // Private Member Functions

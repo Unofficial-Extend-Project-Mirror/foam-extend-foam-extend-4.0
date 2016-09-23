@@ -143,7 +143,7 @@ void Foam::BlockMatrixAgglomeration<Type>::calcAgglomeration()
         // Reset agglomeration index array
         agglomIndex_ = -1;
     }
-    Info<< "End prepare addressing: " << lTime_.elapsedClockTime() << endl;
+    Info<< "End prepare addressing: " << lTime_.elapsedCpuTime() << endl;
 
 
     // Calculate agglomeration
@@ -179,7 +179,7 @@ void Foam::BlockMatrixAgglomeration<Type>::calcAgglomeration()
 
         return;
     }
-    Info<< "End coeff mag: " << lTime_.elapsedClockTime() << endl;
+    Info<< "End coeff mag: " << lTime_.elapsedCpuTime() << endl;
 
     labelList sizeOfGroups(nRows, 0);
 
@@ -235,7 +235,7 @@ void Foam::BlockMatrixAgglomeration<Type>::calcAgglomeration()
             }
         }
     }
-    Info<< "End weak connections: " << lTime_.elapsedClockTime() << endl;
+    Info<< "End weak connections: " << lTime_.elapsedCpuTime() << endl;
 
     // Go through the off-diagonal and create clusters, marking the child array
     label indexUngrouped, indexGrouped;
@@ -343,7 +343,7 @@ void Foam::BlockMatrixAgglomeration<Type>::calcAgglomeration()
             }
         }
     }
-    Info<< "End agglom index: " << lTime_.elapsedClockTime() << endl;
+    Info<< "End agglom index: " << lTime_.elapsedCpuTime() << endl;
 
     // The decision on parallel agglomeration needs to be made for the
     // whole gang of processes; otherwise I may end up with a different
@@ -373,7 +373,7 @@ void Foam::BlockMatrixAgglomeration<Type>::calcAgglomeration()
             Pout << ".  Rejected" << endl;
         }
     }
-    Info<< "End calcAgglomeration: " << lTime_.elapsedClockTime() << endl;
+    Info<< "End calcAgglomeration: " << lTime_.elapsedCpuTime() << endl;
 }
 
 
@@ -385,7 +385,7 @@ void Foam::BlockMatrixAgglomeration<Type>::restrictDiag
 ) const
 {
     typedef CoeffField<Type> TypeCoeffField;
-    Info<< "Start restrictDiag: " << lTime_.elapsedClockTime() << endl;
+    Info<< "Start restrictDiag: " << lTime_.elapsedCpuTime() << endl;
     if
     (
         Coeff.activeType() == blockCoeffBase::SQUARE
@@ -460,7 +460,7 @@ void Foam::BlockMatrixAgglomeration<Type>::restrictDiag
         )   << "Problem in coeff type morphing"
             << abort(FatalError);
     }
-    Info<< "End restrictDiag: " << lTime_.elapsedClockTime() << endl;
+    Info<< "End restrictDiag: " << lTime_.elapsedCpuTime() << endl;
 }
 
 
@@ -477,7 +477,7 @@ void Foam::BlockMatrixAgglomeration<Type>::agglomerateCoeffs
 {
     // Does the matrix have solo equations
     bool soloEqns = nSolo_ > 0;
-    Info<< "Start agglomerateCoeffs symm: " << lTime_.elapsedClockTime() << endl;
+    Info<< "Start agglomerateCoeffs symm: " << lTime_.elapsedCpuTime() << endl;
     // Get addressing
     const unallocLabelList& upperAddr = matrix_.lduAddr().upperAddr();
     const unallocLabelList& lowerAddr = matrix_.lduAddr().lowerAddr();
@@ -510,7 +510,7 @@ void Foam::BlockMatrixAgglomeration<Type>::agglomerateCoeffs
               + activeFineUpperTranspose[fineCoeffI];
         }
     }
-    Info<< "End agglomerateCoeffs symm: " << lTime_.elapsedClockTime() << endl;
+    Info<< "End agglomerateCoeffs symm: " << lTime_.elapsedCpuTime() << endl;
 }
 
 
@@ -528,7 +528,7 @@ void Foam::BlockMatrixAgglomeration<Type>::agglomerateCoeffs
 {
     // Does the matrix have solo equations
     bool soloEqns = nSolo_ > 0;
-    Info<< "Start agglomerateCoeffs asymm: " << lTime_.elapsedClockTime() << endl;
+    Info<< "Start agglomerateCoeffs asymm: " << lTime_.elapsedCpuTime() << endl;
     // Get addressing
     const unallocLabelList& upperAddr = matrix_.lduAddr().upperAddr();
     const unallocLabelList& lowerAddr = matrix_.lduAddr().lowerAddr();
@@ -560,7 +560,7 @@ void Foam::BlockMatrixAgglomeration<Type>::agglomerateCoeffs
               + activeFineLower[fineCoeffI];
         }
     }
-    Info<< "End agglomerateCoeffs asymm: " << lTime_.elapsedClockTime() << endl;
+    Info<< "End agglomerateCoeffs asymm: " << lTime_.elapsedCpuTime() << endl;
 }
 
 
@@ -689,7 +689,7 @@ Foam::BlockMatrixAgglomeration<Type>::restrictMatrix() const
     //    insert the coeffs in the upper order. At the same time, collect the
     //    owner and neighbour addressing.
     // 4) Agglomerate the diagonal by summing up the fine diagonal
-    Info<< "Start restrictMatrix: " << lTime_.elapsedClockTime() << endl;
+    Info<< "Start restrictMatrix: " << lTime_.elapsedCpuTime() << endl;
 
     // Get addressing
     const unallocLabelList& upperAddr = matrix_.lduAddr().upperAddr();
@@ -864,7 +864,7 @@ Foam::BlockMatrixAgglomeration<Type>::restrictMatrix() const
     blockNbrsData.setSize(0);
     initCoarseNeighb.setSize(0);
     coarseCoeffMap.setSize(0);
-    Info<< "End restrictMatrix core: " << lTime_.elapsedClockTime() << endl;
+    Info<< "End restrictMatrix core: " << lTime_.elapsedCpuTime() << endl;
 
 
     // Create coarse-level coupled interfaces
@@ -970,7 +970,7 @@ Foam::BlockMatrixAgglomeration<Type>::restrictMatrix() const
             coarseInterfaceAddr[intI] = coarseInterface.faceCells();
         }
     }
-    Info<< "End restrictMatrix interfaces: " << lTime_.elapsedClockTime() << endl;
+    Info<< "End restrictMatrix interfaces: " << lTime_.elapsedCpuTime() << endl;
 
     // Add interfaces
     coarseAddrPtr->addInterfaces
@@ -1047,7 +1047,7 @@ Foam::BlockMatrixAgglomeration<Type>::restrictMatrix() const
     }
 
     // Matrix restriction done!
-    Info<< "End restrictMatrix: " << lTime_.elapsedClockTime() << endl;
+    Info<< "End restrictMatrix: " << lTime_.elapsedCpuTime() << endl;
 
     typedef CoeffField<Type> TypeCoeffField;
 
@@ -1244,7 +1244,7 @@ Foam::BlockMatrixAgglomeration<Type>::restrictMatrix() const
                 << abort(FatalError);
         }
     }
-    Info<< "End restrictMatrix agglomerateCoeffs: " << lTime_.elapsedClockTime() << endl;
+    Info<< "End restrictMatrix agglomerateCoeffs: " << lTime_.elapsedCpuTime() << endl;
 
     // Create and return BlockAMGLevel
     return autoPtr<BlockAMGLevel<Type> >
