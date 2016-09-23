@@ -164,9 +164,8 @@ public:
         );
 
 
-    // Destructor
-
-        virtual ~BlockMatrixAgglomeration();
+    //- Destructor
+    virtual ~BlockMatrixAgglomeration();
 
 
     // Member Functions

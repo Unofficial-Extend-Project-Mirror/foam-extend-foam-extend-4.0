@@ -349,6 +349,8 @@ void Foam::BlockMatrixAgglomeration<Type>::calcAgglomeration()
     // whole gang of processes; otherwise I may end up with a different
     // number of agglomeration levels on different processors.
 
+    // If the number of coarse equations is les than minimum and
+    // if the matrix has reduced in size by at least 1/3, coarsen
     if
     (
         nCoarseEqns_ > BlockMatrixCoarsening<Type>::minCoarseEqns()
