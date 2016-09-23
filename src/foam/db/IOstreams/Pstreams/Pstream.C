@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     3.2
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -23,6 +23,11 @@ License
 
 \*---------------------------------------------------------------------------*/
 
+
+#include <cstring>
+#include <cstdlib>
+#include <csignal>
+
 #include "mpi.h"
 
 #include "Pstream.H"
@@ -30,13 +35,6 @@ License
 #include "debug.H"
 #include "dictionary.H"
 #include "OSspecific.H"
-#include "PstreamGlobals.H"
-#include "SubList.H"
-#include "allReduce.H"
-
-#include <cstring>
-#include <cstdlib>
-#include <csignal>
 
 #if defined(WM_SP)
 #   define MPI_SCALAR MPI_FLOAT
@@ -65,85 +63,65 @@ const Foam::NamedEnum<Foam::Pstream::commsTypes, 3>
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
-void Foam::Pstream::setParRun(const label nProcs)
+void Foam::Pstream::setParRun()
 {
-    if (nProcs == 0)
-    {
-        parRun_ = false;
-        freeCommunicator(Pstream::worldComm);
+    parRun_ = true;
 
-        label comm = allocateCommunicator(-1, labelList(1, label(0)), false);
-
-        if (comm != Pstream::worldComm)
-        {
-            FatalErrorIn("Pstream::setParRun(const label)")
-                << "problem : comm:" << comm
-                << "  Pstream::worldComm:" << Pstream::worldComm
-                << Foam::exit(FatalError);
-        }
-
-        Pout.prefix() = "";
-        Perr.prefix() = "";
-    }
-    else
-    {
-        parRun_ = true;
-
-        // Redo worldComm communicator (created at static initialisation)
-        freeCommunicator(Pstream::worldComm);
-        label comm = allocateCommunicator(-1, identity(nProcs), true);
-
-        if (comm != Pstream::worldComm)
-        {
-            FatalErrorIn("Pstream::setParRun(const label)")
-                << "problem : comm:" << comm
-                << "  Pstream::worldComm:" << Pstream::worldComm
-                << Foam::exit(FatalError);
-        }
-
-        Pout.prefix() = '[' +  name(myProcNo()) + "] ";
-        Perr.prefix() = '[' +  name(myProcNo()) + "] ";
-    }
+    Pout.prefix() = '[' +  name(myProcNo()) + "] ";
+    Perr.prefix() = '[' +  name(myProcNo()) + "] ";
 }
 
 
-Foam::List<Foam::Pstream::commsStruct> Foam::Pstream::calcLinearComm
-(
-    const label nProcs
-)
+void Foam::Pstream::calcLinearComm(const label nProcs)
 {
-    List<commsStruct> linearCommunication(nProcs);
+    linearCommunication_.setSize(nProcs);
 
     // Master
     labelList belowIDs(nProcs - 1);
-    forAll (belowIDs, i)
+    forAll(belowIDs, i)
     {
         belowIDs[i] = i + 1;
     }
 
-    linearCommunication[0] = commsStruct
+    linearCommunication_[0] = commsStruct
     (
         nProcs,
         0,
         -1,
         belowIDs,
-        labelList()
+        labelList(0)
     );
 
     // Slaves. Have no below processors, only communicate up to master
     for (label procID = 1; procID < nProcs; procID++)
     {
-        linearCommunication[procID] = commsStruct
+        linearCommunication_[procID] = commsStruct
         (
             nProcs,
             procID,
             0,
-            labelList(),
-            labelList()
+            labelList(0),
+            labelList(0)
         );
     }
+}
 
-    return linearCommunication;
+
+// Append my children (and my children children etc.) to allReceives.
+void Foam::Pstream::collectReceives
+(
+    const label procID,
+    const List<dynamicLabelList >& receives,
+    dynamicLabelList& allReceives
+)
+{
+    const dynamicLabelList& myChildren = receives[procID];
+
+    forAll(myChildren, childI)
+    {
+        allReceives.append(myChildren[childI]);
+        collectReceives(myChildren[childI], receives, allReceives);
+    }
 }
 
 
@@ -173,10 +151,7 @@ Foam::List<Foam::Pstream::commsStruct> Foam::Pstream::calcLinearComm
 //  5       -               4
 //  6       7               4
 //  7       -               6
-Foam::List<Foam::Pstream::commsStruct> Foam::Pstream::calcTreeComm
-(
-    const label nProcs
-)
+void Foam::Pstream::calcTreeComm(label nProcs)
 {
     label nLevels = 1;
     while ((1 << nLevels) < nProcs)
@@ -184,8 +159,10 @@ Foam::List<Foam::Pstream::commsStruct> Foam::Pstream::calcTreeComm
         nLevels++;
     }
 
-    List<dynamicLabelList> receives(nProcs);
+    List<dynamicLabelList > receives(nProcs);
     labelList sends(nProcs, -1);
+
+    // Info<< "Using " << nLevels << " communication levels" << endl;
 
     label offset = 2;
     label childOffset = offset/2;
@@ -213,18 +190,18 @@ Foam::List<Foam::Pstream::commsStruct> Foam::Pstream::calcTreeComm
 
     // For all processors find the processors it receives data from
     // (and the processors they receive data from etc.)
-    List<dynamicLabelList> allReceives(nProcs);
+    List<dynamicLabelList > allReceives(nProcs);
     for (label procID = 0; procID < nProcs; procID++)
     {
         collectReceives(procID, receives, allReceives[procID]);
     }
 
 
-    List<commsStruct> treeCommunication(nProcs);
+    treeCommunication_.setSize(nProcs);
 
     for (label procID = 0; procID < nProcs; procID++)
     {
-        treeCommunication[procID] = commsStruct
+        treeCommunication_[procID] = commsStruct
         (
             nProcs,
             procID,
@@ -232,26 +209,6 @@ Foam::List<Foam::Pstream::commsStruct> Foam::Pstream::calcTreeComm
             receives[procID].shrink(),
             allReceives[procID].shrink()
         );
-    }
-
-    return treeCommunication;
-}
-
-
-// Append my children (and my children;s children etc.) to allReceives.
-void Foam::Pstream::collectReceives
-(
-    const label procID,
-    const List<dynamicLabelList>& receives,
-    dynamicLabelList& allReceives
-)
-{
-    const dynamicLabelList& myChildren = receives[procID];
-
-    forAll (myChildren, childI)
-    {
-        allReceives.append(myChildren[childI]);
-        collectReceives(myChildren[childI], receives, allReceives);
     }
 }
 
@@ -265,295 +222,6 @@ void Foam::Pstream::initCommunicationSchedule()
 }
 
 
-void Foam::Pstream::allocatePstreamCommunicator
-(
-    const label parentIndex,
-    const label index
-)
-{
-    if (index == PstreamGlobals::MPIGroups_.size())
-    {
-        // Extend storage with dummy values
-        MPI_Group newGroup;
-        PstreamGlobals::MPIGroups_.append(newGroup);
-        MPI_Comm newComm;
-        PstreamGlobals::MPICommunicators_.append(newComm);
-    }
-    else if (index > PstreamGlobals::MPIGroups_.size())
-    {
-        FatalErrorIn
-        (
-            "Pstream::allocatePstreamCommunicator\n"
-            "(\n"
-            "    const label parentIndex,\n"
-            "    const labelList& subRanks\n"
-            ")\n"
-        )   << "PstreamGlobals out of sync with Pstream data. Problem."
-            << Foam::exit(FatalError);
-    }
-
-
-    if (parentIndex == -1)
-    {
-        // Allocate world communicator
-
-        if (index != Pstream::worldComm)
-        {
-            FatalErrorIn
-            (
-                "Pstream::allocatePstreamCommunicator\n"
-                "(\n"
-                "    const label parentIndex,\n"
-                "    const labelList& subRanks\n"
-                ")\n"
-            )   << "world communicator should always be index "
-                << Pstream::worldComm << Foam::exit(FatalError);
-        }
-
-        PstreamGlobals::MPICommunicators_[index] = MPI_COMM_WORLD;
-        MPI_Comm_group(MPI_COMM_WORLD, &PstreamGlobals::MPIGroups_[index]);
-        MPI_Comm_rank
-        (
-            PstreamGlobals::MPICommunicators_[index],
-           &myProcNo_[index]
-        );
-
-        // Set the number of processes to the actual number
-        int numProcs;
-        MPI_Comm_size(PstreamGlobals::MPICommunicators_[index], &numProcs);
-        procIDs_[index] = identity(numProcs);
-    }
-    else
-    {
-        // Create new group
-        MPI_Group_incl
-        (
-            PstreamGlobals::MPIGroups_[parentIndex],
-            procIDs_[index].size(),
-            procIDs_[index].begin(),
-            &PstreamGlobals::MPIGroups_[index]
-        );
-
-        // Create new communicator
-        MPI_Comm_create
-        (
-            PstreamGlobals::MPICommunicators_[parentIndex],
-            PstreamGlobals::MPIGroups_[index],
-            &PstreamGlobals::MPICommunicators_[index]
-        );
-
-        if (PstreamGlobals::MPICommunicators_[index] == MPI_COMM_NULL)
-        {
-            myProcNo_[index] = -1;
-        }
-        else
-        {
-            if
-            (
-                MPI_Comm_rank
-                (
-                    PstreamGlobals::MPICommunicators_[index],
-                   &myProcNo_[index]
-                )
-            )
-            {
-                FatalErrorIn
-                (
-                    "Pstream::allocatePstreamCommunicator\n"
-                    "(\n"
-                    "    const label,\n"
-                    "    const labelList&\n"
-                    ")\n"
-                )   << "Problem :"
-                    << " when allocating communicator at " << index
-                    << " from ranks " << procIDs_[index]
-                    << " of parent " << parentIndex
-                    << " cannot find my own rank"
-                    << Foam::exit(FatalError);
-            }
-        }
-    }
-}
-
-
-void Foam::Pstream::freePstreamCommunicator(const label communicator)
-{
-    if (communicator != Pstream::worldComm)
-    {
-        if (PstreamGlobals::MPICommunicators_[communicator] != MPI_COMM_NULL)
-        {
-            // Free communicator. Sets communicator to MPI_COMM_NULL
-            MPI_Comm_free(&PstreamGlobals::MPICommunicators_[communicator]);
-        }
-        if (PstreamGlobals::MPIGroups_[communicator] != MPI_GROUP_NULL)
-        {
-            // Free greoup. Sets group to MPI_GROUP_NULL
-            MPI_Group_free(&PstreamGlobals::MPIGroups_[communicator]);
-        }
-    }
-}
-
-
-Foam::label Foam::Pstream::allocateCommunicator
-(
-    const label parentIndex,
-    const labelList& subRanks,
-    const bool doPstream
-)
-{
-    label index;
-    if (!freeComms_.empty())
-    {
-        index = freeComms_.pop();
-    }
-    else
-    {
-        // Extend storage
-        index = parentCommunicator_.size();
-
-        myProcNo_.append(-1);
-        procIDs_.append(List<int>());
-        parentCommunicator_.append(-1);
-        linearCommunication_.append(List<commsStruct>());
-        treeCommunication_.append(List<commsStruct>());
-    }
-
-    if (debug)
-    {
-        Pout<< "Communicators : Allocating communicator " << index << endl
-            << "    parent : " << parentIndex << endl
-            << "    procs  : " << subRanks << endl
-            << endl;
-    }
-
-    // Initialise; overwritten by allocatePstreamCommunicator
-    myProcNo_[index] = 0;
-
-    // Convert from label to int
-    procIDs_[index].setSize(subRanks.size());
-
-    forAll (procIDs_[index], i)
-    {
-        procIDs_[index][i] = subRanks[i];
-
-        // Enforce incremental order (so index is rank in next communicator)
-        if (i >= 1 && subRanks[i] <= subRanks[i - 1])
-        {
-            FatalErrorIn
-            (
-                "Pstream::allocateCommunicator"
-                "(const label, const labelList&, const bool)"
-            )   << "subranks not sorted : " << subRanks
-                << " when allocating subcommunicator from parent "
-                << parentIndex
-                << Foam::abort(FatalError);
-        }
-    }
-    parentCommunicator_[index] = parentIndex;
-
-    linearCommunication_[index] = calcLinearComm(procIDs_[index].size());
-    treeCommunication_[index] = calcTreeComm(procIDs_[index].size());
-
-
-    if (doPstream && parRun())
-    {
-        allocatePstreamCommunicator(parentIndex, index);
-    }
-
-    return index;
-}
-
-
-void Foam::Pstream::freeCommunicator
-(
-    const label communicator,
-    const bool doPstream
-)
-{
-    if (debug)
-    {
-        Pout<< "Communicators : Freeing communicator " << communicator << endl
-            << "    parent   : " << parentCommunicator_[communicator] << endl
-            << "    myProcNo : " << myProcNo_[communicator] << endl
-            << endl;
-    }
-
-    if (doPstream && parRun())
-    {
-        freePstreamCommunicator(communicator);
-    }
-    myProcNo_[communicator] = -1;
-    //procIDs_[communicator].clear();
-    parentCommunicator_[communicator] = -1;
-    linearCommunication_[communicator].clear();
-    treeCommunication_[communicator].clear();
-
-    freeComms_.push(communicator);
-}
-
-
-void Foam::Pstream::freeCommunicators(const bool doPstream)
-{
-    forAll (myProcNo_, communicator)
-    {
-        if (myProcNo_[communicator] != -1)
-        {
-            freeCommunicator(communicator, doPstream);
-        }
-    }
-}
-
-
-int Foam::Pstream::baseProcNo(const label myComm, const int myProcID)
-{
-    int procID = myProcID;
-    label comm = myComm;
-
-    while (parent(comm) != -1)
-    {
-        const List<int>& parentRanks = Pstream::procID(comm);
-        procID = parentRanks[procID];
-        comm = Pstream::parent(comm);
-    }
-
-    return procID;
-}
-
-
-Foam::label Foam::Pstream::procNo(const label myComm, const int baseProcID)
-{
-    const List<int>& parentRanks = procID(myComm);
-    label parentComm = parent(myComm);
-
-    if (parentComm == -1)
-    {
-        return findIndex(parentRanks, baseProcID);
-    }
-    else
-    {
-        label parentRank = procNo(parentComm, baseProcID);
-        return findIndex(parentRanks, parentRank);
-    }
-}
-
-
-Foam::label Foam::Pstream::procNo
-(
-    const label myComm,
-    const label currentComm,
-    const int currentProcID
-)
-{
-    label physProcID = Pstream::baseProcNo(currentComm, currentProcID);
-    return procNo(myComm, physProcID);
-}
-
-
-
-
-// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
-
-
 // NOTE:
 // valid parallel options vary between implementations, but flag common ones.
 // if they are not removed by MPI_Init(), the subsequent argument processing
@@ -565,6 +233,7 @@ void Foam::Pstream::addValidParOptions(HashTable<string>& validParOptions)
     validParOptions.insert("p4wd", "directory");
     validParOptions.insert("p4amslave", "");
     validParOptions.insert("p4yourname", "hostname");
+    validParOptions.insert("GAMMANP", "number of instances");
     validParOptions.insert("machinefile", "machine file");
 }
 
@@ -575,25 +244,24 @@ bool Foam::Pstream::init(int& argc, char**& argv)
 
     int numprocs;
     MPI_Comm_size(MPI_COMM_WORLD, &numprocs);
-    int myRank;
-    MPI_Comm_rank(MPI_COMM_WORLD, &myRank);
-
-    if (debug)
-    {
-        Pout<< "Pstream::init : initialised with numProcs:" << numprocs
-            << " myRank:" << myRank << endl;
-    }
+    MPI_Comm_rank(MPI_COMM_WORLD, &myProcNo_);
 
     if (numprocs <= 1)
     {
         FatalErrorIn("Pstream::init(int& argc, char**& argv)")
-            << "bool IPstream::init(int& argc, char**& argv) : "
+            << "bool Pstream::init(int& argc, char**& argv) : "
                "attempt to run parallel on 1 processor"
             << Foam::abort(FatalError);
     }
 
-    // Initialise parallel structure
-    setParRun(numprocs);
+    procIDs_.setSize(numprocs);
+
+    forAll(procIDs_, procNo)
+    {
+        procIDs_[procNo] = procNo;
+    }
+
+    setParRun();
 
 #   ifndef SGIMPI
     string bufferSizeName = getEnv("MPI_BUFFER_SIZE");
@@ -616,12 +284,15 @@ bool Foam::Pstream::init(int& argc, char**& argv)
     }
 #   endif
 
-    //int processorNameLen;
-    //char processorName[MPI_MAX_PROCESSOR_NAME];
-    //
-    //MPI_Get_processor_name(processorName, &processorNameLen);
-    //processorName[processorNameLen] = '\0';
-    //Pout<< "Processor name:" << processorName << endl;
+    int processorNameLen;
+    char processorName[MPI_MAX_PROCESSOR_NAME];
+
+    MPI_Get_processor_name(processorName, &processorNameLen);
+
+    //signal(SIGABRT, stop);
+
+    // Now that nprocs is known construct communication tables.
+    initCommunicationSchedule();
 
     return true;
 }
@@ -629,39 +300,12 @@ bool Foam::Pstream::init(int& argc, char**& argv)
 
 void Foam::Pstream::exit(int errnum)
 {
-    if (debug)
-    {
-        Pout<< "Pstream::exit." << endl;
-    }
-
 #   ifndef SGIMPI
     int size;
     char* buff;
     MPI_Buffer_detach(&buff, &size);
     delete[] buff;
 #   endif
-
-    if (PstreamGlobals::outstandingRequests_.size())
-    {
-        label n = PstreamGlobals::outstandingRequests_.size();
-        PstreamGlobals::outstandingRequests_.clear();
-
-        WarningIn("Pstream::exit(int)")
-            << "There are still " << n << " outstanding MPI_Requests." << endl
-            << "This means that your code exited before doing a"
-            << " Pstream::waitRequests()." << endl
-            << "This should not happen for a normal code exit."
-            << endl;
-    }
-
-    // Clean mpi communicators
-    forAll (myProcNo_, communicator)
-    {
-        if (myProcNo_[communicator] != -1)
-        {
-            freePstreamCommunicator(communicator);
-        }
-    }
 
     if (errnum == 0)
     {
@@ -681,369 +325,305 @@ void Foam::Pstream::abort()
 }
 
 
-void Foam::reduce
-(
-    scalar& Value,
-    const sumOp<scalar>& bop,
-    const int tag,
-    const label comm
-)
+void Foam::reduce(scalar& Value, const sumOp<scalar>& bop)
 {
-    if (Pstream::warnComm != -1 && comm != Pstream::warnComm)
+    if (!Pstream::parRun())
     {
-        Pout<< "** reducing:" << Value << " with comm:" << comm
-            << " warnComm:" << Pstream::warnComm
-            << endl;
-        error::printStack(Pout);
+        return;
     }
 
-    allReduce(Value, 1, MPI_SCALAR, MPI_SUM, bop, tag, comm);
-}
-
-
-void Foam::reduce
-(
-    scalar& Value,
-    const minOp<scalar>& bop,
-    const int tag,
-    const label comm
-)
-{
-    if (Pstream::warnComm != -1 && comm != Pstream::warnComm)
+    if (Pstream::nProcs() <= Pstream::nProcsSimpleSum())
     {
-        Pout<< "** reducing:" << Value << " with comm:" << comm
-            << " warnComm:" << Pstream::warnComm
-            << endl;
-        error::printStack(Pout);
-    }
-    allReduce(Value, 1, MPI_SCALAR, MPI_MIN, bop, tag, comm);
-}
-
-
-void Foam::reduce
-(
-    vector2D& Value,
-    const sumOp<vector2D>& bop,
-    const int tag,
-    const label comm
-)
-{
-    if (Pstream::warnComm != -1 && comm != Pstream::warnComm)
-    {
-        Pout<< "** reducing:" << Value << " with comm:" << comm
-            << " warnComm:" << Pstream::warnComm
-            << endl;
-        error::printStack(Pout);
-    }
-    allReduce(Value, 2, MPI_SCALAR, MPI_SUM, bop, tag, comm);
-}
-
-
-void Foam::sumReduce
-(
-    scalar& Value,
-    label& Count,
-    const int tag,
-    const label comm
-)
-{
-    if (Pstream::warnComm != -1 && comm != Pstream::warnComm)
-    {
-        Pout<< "** reducing:" << Value << " with comm:" << comm
-            << " warnComm:" << Pstream::warnComm
-            << endl;
-        error::printStack(Pout);
-    }
-    vector2D twoScalars(Value, scalar(Count));
-    reduce(twoScalars, sumOp<vector2D>(), tag, comm);
-
-    Value = twoScalars.x();
-    Count = twoScalars.y();
-}
-
-
-void Foam::reduce
-(
-    scalar& Value,
-    const sumOp<scalar>& bop,
-    const int tag,
-    const label comm,
-    label& requestID
-)
-{
-#ifdef MPIX_COMM_TYPE_SHARED
-    // Assume mpich2 with non-blocking collectives extensions. Once mpi3
-    // is available this will change.
-    MPI_Request request;
-    scalar v = Value;
-    MPIX_Ireduce
-    (
-        &v,
-        &Value,
-        1,
-        MPI_SCALAR,
-        MPI_SUM,
-        0,              // root
-        PstreamGlobals::MPICommunicators_[comm],
-        &request
-    );
-
-    requestID = PstreamGlobals::outstandingRequests_.size();
-    PstreamGlobals::outstandingRequests_.append(request);
-
-    if (debug)
-    {
-        Pout<< "Pstream::allocateRequest for non-blocking reduce"
-            << " : request:" << requestID
-            << endl;
-    }
-#else
-    // Non-blocking not yet implemented in mpi
-    reduce(Value, bop, tag, comm);
-
-    requestID = -1;
-#endif
-}
-
-
-Foam::label Foam::Pstream::nRequests()
-{
-    return PstreamGlobals::outstandingRequests_.size();
-}
-
-
-void Foam::Pstream::resetRequests(const label i)
-{
-    if (i < PstreamGlobals::outstandingRequests_.size())
-    {
-        PstreamGlobals::outstandingRequests_.setSize(i);
-    }
-}
-
-
-void Foam::Pstream::waitRequests(const label start)
-{
-    if (debug)
-    {
-        Pout<< "Pstream::waitRequests : starting wait for "
-            << PstreamGlobals::outstandingRequests_.size()-start
-            << " outstanding requests starting at " << start << endl;
-    }
-
-    if (PstreamGlobals::outstandingRequests_.size())
-    {
-        SubList<MPI_Request> waitRequests
-        (
-            PstreamGlobals::outstandingRequests_,
-            PstreamGlobals::outstandingRequests_.size() - start,
-            start
-        );
-
-        if
-        (
-            MPI_Waitall
-            (
-                waitRequests.size(),
-                waitRequests.begin(),
-                MPI_STATUSES_IGNORE
-            )
-        )
+        if (Pstream::master())
         {
-            FatalErrorIn
+            for
             (
-                "Pstream::waitRequests()"
-            )   << "MPI_Waitall returned with error" << Foam::endl;
+                int slave=Pstream::firstSlave();
+                slave<=Pstream::lastSlave();
+                slave++
+            )
+            {
+                scalar value;
+
+                if
+                (
+                    MPI_Recv
+                    (
+                        &value,
+                        1,
+                        MPI_SCALAR,
+                        Pstream::procID(slave),
+                        Pstream::msgType(),
+                        MPI_COMM_WORLD,
+                        MPI_STATUS_IGNORE
+                    )
+                )
+                {
+                    FatalErrorIn
+                    (
+                        "reduce(scalar& Value, const sumOp<scalar>& sumOp)"
+                    )   << "MPI_Recv failed"
+                        << Foam::abort(FatalError);
+                }
+
+                Value = bop(Value, value);
+            }
+        }
+        else
+        {
+            if
+            (
+                MPI_Send
+                (
+                    &Value,
+                    1,
+                    MPI_SCALAR,
+                    Pstream::procID(Pstream::masterNo()),
+                    Pstream::msgType(),
+                    MPI_COMM_WORLD
+                )
+            )
+            {
+                FatalErrorIn
+                (
+                    "reduce(scalar& Value, const sumOp<scalar>& sumOp)"
+                )   << "MPI_Send failed"
+                    << Foam::abort(FatalError);
+            }
         }
 
-        resetRequests(start);
+
+        if (Pstream::master())
+        {
+            for
+            (
+                int slave=Pstream::firstSlave();
+                slave<=Pstream::lastSlave();
+                slave++
+            )
+            {
+                if
+                (
+                    MPI_Send
+                    (
+                        &Value,
+                        1,
+                        MPI_SCALAR,
+                        Pstream::procID(slave),
+                        Pstream::msgType(),
+                        MPI_COMM_WORLD
+                    )
+                )
+                {
+                    FatalErrorIn
+                    (
+                        "reduce(scalar& Value, const sumOp<scalar>& sumOp)"
+                    )   << "MPI_Send failed"
+                        << Foam::abort(FatalError);
+                }
+            }
+        }
+        else
+        {
+            if
+            (
+                MPI_Recv
+                (
+                    &Value,
+                    1,
+                    MPI_SCALAR,
+                    Pstream::procID(Pstream::masterNo()),
+                    Pstream::msgType(),
+                    MPI_COMM_WORLD,
+                    MPI_STATUS_IGNORE
+                )
+            )
+            {
+                FatalErrorIn
+                (
+                    "reduce(scalar& Value, const sumOp<scalar>& sumOp)"
+                )   << "MPI_Recv failed"
+                    << Foam::abort(FatalError);
+            }
+        }
     }
-
-    if (debug)
+    else
     {
-        Pout<< "Pstream::waitRequests : finished wait." << endl;
-    }
-}
+        scalar sum;
+        MPI_Allreduce(&Value, &sum, 1, MPI_SCALAR, MPI_SUM, MPI_COMM_WORLD);
+        Value = sum;
 
+        /*
+        int myProcNo = Pstream::myProcNo();
+        int nProcs = Pstream::nProcs();
 
-void Foam::Pstream::waitRequest(const label i)
-{
-    if (debug)
-    {
-        Pout<< "Pstream::waitRequest : starting wait for request:" << i
-            << endl;
-    }
+        //
+        // receive from children
+        //
+        int level = 1;
+        int thisLevelOffset = 2;
+        int childLevelOffset = thisLevelOffset/2;
+        int childProcId = 0;
 
-    if (i >= PstreamGlobals::outstandingRequests_.size())
-    {
-        FatalErrorIn
+        while
         (
-            "Pstream::waitRequest(const label)"
-        )   << "There are " << PstreamGlobals::outstandingRequests_.size()
-            << " outstanding send requests and you are asking for i=" << i
-            << nl
-            << "Maybe you are mixing blocking/non-blocking comms?"
-            << Foam::abort(FatalError);
-    }
-
-    if
-    (
-        MPI_Wait
-        (
-           &PstreamGlobals::outstandingRequests_[i],
-            MPI_STATUS_IGNORE
+            (childLevelOffset < nProcs)
+         && (myProcNo % thisLevelOffset) == 0
         )
-    )
-    {
-        FatalErrorIn
-        (
-            "Pstream::waitRequest()"
-        )   << "MPI_Wait returned with error" << Foam::endl;
+        {
+            childProcId = myProcNo + childLevelOffset;
+
+            scalar value;
+
+            if (childProcId < nProcs)
+            {
+                if
+                (
+                    MPI_Recv
+                    (
+                        &value,
+                        1,
+                        MPI_SCALAR,
+                        Pstream::procID(childProcId),
+                        Pstream::msgType(),
+                        MPI_COMM_WORLD,
+                        MPI_STATUS_IGNORE
+                    )
+                )
+                {
+                    FatalErrorIn
+                    (
+                        "reduce(scalar& Value, const sumOp<scalar>& sumOp)"
+                    )   << "MPI_Recv failed"
+                        << Foam::abort(FatalError);
+                }
+
+                Value = bop(Value, value);
+            }
+
+            level++;
+            thisLevelOffset <<= 1;
+            childLevelOffset = thisLevelOffset/2;
+        }
+
+        //
+        // send and receive from parent
+        //
+        if (!Pstream::master())
+        {
+            int parentId = myProcNo - (myProcNo % thisLevelOffset);
+
+            if
+            (
+                MPI_Send
+                (
+                    &Value,
+                    1,
+                    MPI_SCALAR,
+                    Pstream::procID(parentId),
+                    Pstream::msgType(),
+                    MPI_COMM_WORLD
+                )
+            )
+            {
+                FatalErrorIn
+                (
+                    "reduce(scalar& Value, const sumOp<scalar>& sumOp)"
+                )   << "MPI_Send failed"
+                    << Foam::abort(FatalError);
+            }
+
+            if
+            (
+                MPI_Recv
+                (
+                    &Value,
+                    1,
+                    MPI_SCALAR,
+                    Pstream::procID(parentId),
+                    Pstream::msgType(),
+                    MPI_COMM_WORLD,
+                    MPI_STATUS_IGNORE
+                )
+            )
+            {
+                FatalErrorIn
+                (
+                    "reduce(scalar& Value, const sumOp<scalar>& sumOp)"
+                )   << "MPI_Recv failed"
+                    << Foam::abort(FatalError);
+            }
+        }
+
+
+        //
+        // distribute to my children
+        //
+        level--;
+        thisLevelOffset >>= 1;
+        childLevelOffset = thisLevelOffset/2;
+
+        while (level > 0)
+        {
+            childProcId = myProcNo + childLevelOffset;
+
+            if (childProcId < nProcs)
+            {
+                if
+                (
+                    MPI_Send
+                    (
+                        &Value,
+                        1,
+                        MPI_SCALAR,
+                        Pstream::procID(childProcId),
+                        Pstream::msgType(),
+                        MPI_COMM_WORLD
+                    )
+                )
+                {
+                    FatalErrorIn
+                    (
+                        "reduce(scalar& Value, const sumOp<scalar>& sumOp)"
+                    )   << "MPI_Send failed"
+                        << Foam::abort(FatalError);
+                }
+            }
+
+            level--;
+            thisLevelOffset >>= 1;
+            childLevelOffset = thisLevelOffset/2;
+        }
+        */
     }
-
-    if (debug)
-    {
-        Pout<< "Pstream::waitRequest : finished wait for request:" << i
-            << endl;
-    }
-}
-
-
-bool Foam::Pstream::finishedRequest(const label i)
-{
-    if (debug)
-    {
-        Pout<< "Pstream::finishedRequest : checking request:" << i
-            << endl;
-    }
-
-    if (i >= PstreamGlobals::outstandingRequests_.size())
-    {
-        FatalErrorIn
-        (
-            "Pstream::finishedRequest(const label)"
-        )   << "There are " << PstreamGlobals::outstandingRequests_.size()
-            << " outstanding send requests and you are asking for i=" << i
-            << nl
-            << "Maybe you are mixing blocking/non-blocking comms?"
-            << Foam::abort(FatalError);
-    }
-
-    int flag;
-    MPI_Test
-    (
-       &PstreamGlobals::outstandingRequests_[i],
-       &flag,
-        MPI_STATUS_IGNORE
-    );
-
-    if (debug)
-    {
-        Pout<< "Pstream::finishedRequest : finished request:" << i
-            << endl;
-    }
-
-    return flag != 0;
-}
-
-
-int Foam::Pstream::allocateTag(const char* s)
-{
-    int tag;
-    if (PstreamGlobals::freedTags_.size())
-    {
-        tag = PstreamGlobals::freedTags_.remove();
-    }
-    else
-    {
-        tag = PstreamGlobals::nTags_++;
-    }
-
-    if (debug)
-    {
-        Pout<< "Pstream::allocateTag " << s
-            << " : tag:" << tag
-            << endl;
-    }
-
-    return tag;
-}
-
-
-int Foam::Pstream::allocateTag(const word& s)
-{
-    int tag;
-    if (PstreamGlobals::freedTags_.size())
-    {
-        tag = PstreamGlobals::freedTags_.remove();
-    }
-    else
-    {
-        tag = PstreamGlobals::nTags_++;
-    }
-
-    if (debug)
-    {
-        Pout<< "Pstream::allocateTag " << s
-            << " : tag:" << tag
-            << endl;
-    }
-
-    return tag;
-}
-
-
-void Foam::Pstream::freeTag(const char* s, const int tag)
-{
-    if (debug)
-    {
-        Pout<< "Pstream::freeTag " << s << " tag:" << tag << endl;
-    }
-    PstreamGlobals::freedTags_.append(tag);
-}
-
-
-void Foam::Pstream::freeTag(const word& s, const int tag)
-{
-    if (debug)
-    {
-        Pout<< "Pstream::freeTag " << s << " tag:" << tag << endl;
-    }
-    PstreamGlobals::freedTags_.append(tag);
 }
 
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
+// Initialise my process number to 0 (the master)
+int Foam::Pstream::myProcNo_(0);
+
+
 // By default this is not a parallel run
 bool Foam::Pstream::parRun_(false);
 
-// Free communicators
-Foam::LIFOStack<Foam::label> Foam::Pstream::freeComms_;
-
-// My processor number
-Foam::DynamicList<int> Foam::Pstream::myProcNo_(10);
 
 // List of process IDs
-Foam::DynamicList<Foam::List<int> > Foam::Pstream::procIDs_(10);
+Foam::List<int> Foam::Pstream::procIDs_(1, 0);
 
-// Parent communicator
-Foam::DynamicList<Foam::label> Foam::Pstream::parentCommunicator_(10);
 
 // Standard transfer message type
 const int Foam::Pstream::msgType_(1);
 
+
 // Linear communication schedule
-Foam::DynamicList<Foam::List<Foam::Pstream::commsStruct> >
-Foam::Pstream::linearCommunication_(10);
+Foam::List<Foam::Pstream::commsStruct> Foam::Pstream::linearCommunication_(0);
+
 
 // Multi level communication schedule
-Foam::DynamicList<Foam::List<Foam::Pstream::commsStruct> >
-Foam::Pstream::treeCommunication_(10);
+Foam::List<Foam::Pstream::commsStruct> Foam::Pstream::treeCommunication_(0);
 
-
-// Allocate a serial communicator. This gets overwritten in parallel mode
-// (by Pstream::setParRun())
-Foam::Pstream::communicator serialComm(-1, Foam::labelList(1, 0), false);
 
 // Number of processors at which the reduce algorithm changes from linear to
 // tree
@@ -1055,30 +635,15 @@ Foam::Pstream::nProcsSimpleSum
 );
 
 
-Foam::debug::optimisationSwitch
+const Foam::debug::optimisationSwitch
 Foam::Pstream::defaultCommsType
 (
     "commsType",
-    "nonBlocking",
+//     "nonBlocking",
 //     "scheduled",
-//     "blocking",
+    "blocking",
     "blocking, nonBlocking, scheduled"
 );
-
-
-const Foam::debug::optimisationSwitch
-Foam::Pstream::nPollProcInterfaces
-(
-    "nPollProcInterfaces",
-    0
-);
-
-// Default communicator
-Foam::label Foam::Pstream::worldComm(0);
-
-
-// Warn for use of any communicator
-Foam::label Foam::Pstream::warnComm(-1);
 
 
 // ************************************************************************* //
