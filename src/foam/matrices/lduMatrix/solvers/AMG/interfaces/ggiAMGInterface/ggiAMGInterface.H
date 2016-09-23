@@ -42,6 +42,8 @@ SourceFiles
 #include "ggiLduInterface.H"
 #include "mapDistribute.H"
 
+#include "cpuTime.H"
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
@@ -85,6 +87,8 @@ class ggiAMGInterface
 
             //- Map-distribute comms tool
             mutable mapDistribute* mapPtr_;
+
+            cpuTime lTime_;
 
 
     // Private Member Functions

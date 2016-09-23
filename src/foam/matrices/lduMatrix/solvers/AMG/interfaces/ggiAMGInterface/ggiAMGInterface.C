@@ -71,7 +71,7 @@ void Foam::ggiAMGInterface::initFastReduce() const
 
         return;
     }
-
+    Info<< "Start initFastReduce " << lTime_.elapsedCpuTime() << endl;
     // From here on, work on processors within the communicator
     // HJ, 20/Sep/2016
 
@@ -215,6 +215,7 @@ void Foam::ggiAMGInterface::initFastReduce() const
     // Map will return the object of the size of remote zone
     // HJ, 9/May/2016
     mapPtr_ = new mapDistribute(zoneSize(), sendMap, constructMap);
+    Info<< "End initFastReduce " << lTime_.elapsedCpuTime() << endl;
 }
 
 
@@ -236,7 +237,8 @@ Foam::ggiAMGInterface::ggiAMGInterface
     procMasterFaces_(),
     comm_(fineGgiInterface_.comm()),
     tag_(fineGgiInterface_.tag()),
-    mapPtr_(NULL)
+    mapPtr_(NULL),
+    lTime_()
 {
     // New algorithm will assemble local clusters on the master side and
     // create zone ordering by collecting all faces (coarse pairs) from proc0,
@@ -244,7 +246,7 @@ Foam::ggiAMGInterface::ggiAMGInterface
     // each processor only to perform the analysis on locally created coarse
     // faces
     // HJ, 13/Jun/2016
-
+    Info<< "Start ggiAMGInterface constructor " << lTime_.elapsedCpuTime() << endl;
     // Note: local addressing contains only local faces
     const labelList& fineZa =  fineGgiInterface_.zoneAddressing();
 
@@ -264,7 +266,7 @@ Foam::ggiAMGInterface::ggiAMGInterface
             neighbourExpandAddressing
         );
     }
-
+    Info<< "ggiAMGInterface expandToAddr1 " << lTime_.elapsedCpuTime() << endl;
     // Create addressing for neighbour processors.  Note: expandAddrToZone will
     // expand the addressing to zone size.  HJ, 13/Jun/2016
     labelField neighbourExpandProc
@@ -283,7 +285,7 @@ Foam::ggiAMGInterface::ggiAMGInterface
             neighbourExpandProc
         );
     }
-
+    Info<< "ggiAMGInterface expandToAddr2 " << lTime_.elapsedCpuTime() << endl;
     // Note: neighbourExpandAddressing and neighbourExpandProc
     // will be filled with NaNs for faces which are not local
 
@@ -709,7 +711,7 @@ Foam::ggiAMGInterface::ggiAMGInterface
     fineAddressing_.setSize(nAgglomPairs, -1);
     restrictAddressing_.setSize(nAgglomPairs, -1);
     restrictWeights_.setSize(nAgglomPairs);
-
+    Info<< "ggiAMGInterface end Addr " << lTime_.elapsedCpuTime() << endl;
     // In order to assemble the coarse global face zone, find out
     // how many faces have been created on each processor.
     // Note that masters and slaves both count faces so we will
@@ -724,7 +726,7 @@ Foam::ggiAMGInterface::ggiAMGInterface
     // This needs to be handled separately in the initFastReduce
     // HJ, 20/Sep/2016
     reduce(nCoarseFacesPerProc, sumOp<labelList>(), tag(), comm());
-
+    Info<< "ggiAMGInterface end reduce 1 " << lTime_.elapsedCpuTime() << endl;
     // Coarse global face zone is assembled by adding all faces from proc0,
     // followed by all faces from proc1 etc.
     // Therefore, on procN, my master offset
@@ -921,6 +923,7 @@ Foam::ggiAMGInterface::ggiAMGInterface
                 }
             }
         }
+        Info<< "ggiAMGInterface end agglom master " << lTime_.elapsedCpuTime() << endl;
     }
     // Agglomerate slave
     else
@@ -1042,6 +1045,7 @@ Foam::ggiAMGInterface::ggiAMGInterface
                 nProcFaces++;
             }
         }
+        Info<< "ggiAMGInterface end agglom slave " << lTime_.elapsedCpuTime() << endl;
     }
 }
 

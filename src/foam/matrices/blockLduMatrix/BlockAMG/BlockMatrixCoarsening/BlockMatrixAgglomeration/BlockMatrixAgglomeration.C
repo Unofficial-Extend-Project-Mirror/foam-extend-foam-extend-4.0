@@ -957,9 +957,10 @@ Foam::BlockMatrixAgglomeration<Type>::restrictMatrix() const
                     fineInterfaceAddr[intI]
                 ).ptr()
             );
+            Info<< " Interface " << intI << ": " << lTime_.elapsedCpuTime() << endl;
         }
     }
-
+    Info<< "End restrictMatrix interfaces: " << lTime_.elapsedCpuTime() << endl;
     forAll (interfaceFields, intI)
     {
         if (interfaceFields.set(intI))
@@ -970,7 +971,7 @@ Foam::BlockMatrixAgglomeration<Type>::restrictMatrix() const
             coarseInterfaceAddr[intI] = coarseInterface.faceCells();
         }
     }
-    Info<< "End restrictMatrix interfaces: " << lTime_.elapsedCpuTime() << endl;
+    Info<< "End restrictMatrix interface fields: " << lTime_.elapsedCpuTime() << endl;
 
     // Add interfaces
     coarseAddrPtr->addInterfaces
