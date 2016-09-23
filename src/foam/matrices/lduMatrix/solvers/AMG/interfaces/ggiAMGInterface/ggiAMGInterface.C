@@ -910,7 +910,7 @@ Foam::ggiAMGInterface::ggiAMGInterface
                     OPstream toNbr
                     (
                         Pstream::scheduled,
-                        recvProc,
+                        Pstream::procNo(comm(), recvProc),
                         0,
                         tag(),
                         comm()
@@ -922,7 +922,7 @@ Foam::ggiAMGInterface::ggiAMGInterface
                     IPstream fromNbr
                     (
                         Pstream::scheduled,
-                        sendProc,
+                        Pstream::procNo(comm(), sendProc),
                         0,
                         tag(),
                         comm()
