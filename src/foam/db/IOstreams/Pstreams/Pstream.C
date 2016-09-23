@@ -682,8 +682,8 @@ void Foam::Pstream::abort()
 
 void Foam::reduce
 (
-    scalar& Value,
-    const sumOp<scalar>& bop,
+    bool& Value,
+    const andOp<bool>& bop,
     const int tag,
     const label comm
 )
@@ -696,7 +696,67 @@ void Foam::reduce
         error::printStack(Pout);
     }
 
-    allReduce(Value, 1, MPI_SCALAR, MPI_SUM, bop, tag, comm);
+    // Note: C++ bool is a type separate from C and cannot be cast
+    // For safety and compatibility with compilers, convert bool to int
+    // to comply with MPI types.  HJ, 23/Sep/2016
+
+    int intBool = 0;
+
+    if (Value)
+    {
+        intBool = 1;
+    }
+
+    allReduce(intBool, 1, MPI_INT, MPI_LAND, bop, tag, comm);
+
+    if (intBool > 0)
+    {
+        Value = true;
+    }
+    else
+    {
+        Value = false;
+    }
+}
+
+
+void Foam::reduce
+(
+    bool& Value,
+    const orOp<bool>& bop,
+    const int tag,
+    const label comm
+)
+{
+    if (Pstream::warnComm != -1 && comm != Pstream::warnComm)
+    {
+        Pout<< "** reducing:" << Value << " with comm:" << comm
+            << " warnComm:" << Pstream::warnComm
+            << endl;
+        error::printStack(Pout);
+    }
+
+    // Note: C++ bool is a type separate from C and cannot be cast
+    // For safety and compatibility with compilers, convert bool to int
+    // to comply with MPI types.  HJ, 23/Sep/2016
+
+    int intBool = 0;
+
+    if (Value)
+    {
+        intBool = 1;
+    }
+
+    allReduce(intBool, 1, MPI_INT, MPI_LOR, bop, tag, comm);
+
+    if (intBool > 0)
+    {
+        Value = true;
+    }
+    else
+    {
+        Value = false;
+    }
 }
 
 
@@ -716,6 +776,45 @@ void Foam::reduce
         error::printStack(Pout);
     }
     allReduce(Value, 1, MPI_SCALAR, MPI_MIN, bop, tag, comm);
+}
+
+
+void Foam::reduce
+(
+    scalar& Value,
+    const maxOp<scalar>& bop,
+    const int tag,
+    const label comm
+)
+{
+    if (Pstream::warnComm != -1 && comm != Pstream::warnComm)
+    {
+        Pout<< "** reducing:" << Value << " with comm:" << comm
+            << " warnComm:" << Pstream::warnComm
+            << endl;
+        error::printStack(Pout);
+    }
+    allReduce(Value, 1, MPI_SCALAR, MPI_MAX, bop, tag, comm);
+}
+
+
+void Foam::reduce
+(
+    scalar& Value,
+    const sumOp<scalar>& bop,
+    const int tag,
+    const label comm
+)
+{
+    if (Pstream::warnComm != -1 && comm != Pstream::warnComm)
+    {
+        Pout<< "** reducing:" << Value << " with comm:" << comm
+            << " warnComm:" << Pstream::warnComm
+            << endl;
+        error::printStack(Pout);
+    }
+
+    allReduce(Value, 1, MPI_SCALAR, MPI_SUM, bop, tag, comm);
 }
 
 
@@ -1050,7 +1149,7 @@ const Foam::debug::optimisationSwitch
 Foam::Pstream::nProcsSimpleSum
 (
     "nProcsSimpleSum",
-    16
+    0
 );
 
 

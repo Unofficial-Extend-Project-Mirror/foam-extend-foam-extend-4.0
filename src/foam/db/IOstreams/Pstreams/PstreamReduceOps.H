@@ -139,7 +139,28 @@ void reduce
 }
 
 
-// Insist there are specialisations for the common reductions of scalar(s)
+// Insist there are specialisations for the common reductions of bool
+// See implementation notes on casting of a C++ bool into MPI_INT in
+// Pstream.C  HJ, 23/Sep/2016
+
+void reduce
+(
+    bool& Value,
+    const andOp<bool>& bop,
+    const int tag = Pstream::msgType(),
+    const label comm = Pstream::worldComm
+);
+
+void reduce
+(
+    bool& Value,
+    const orOp<bool>& bop,
+    const int tag = Pstream::msgType(),
+    const label comm = Pstream::worldComm
+);
+
+// Insist there are specialisations for the common reductions of scalars
+
 void reduce
 (
     scalar& Value,
@@ -152,6 +173,14 @@ void reduce
 (
     scalar& Value,
     const minOp<scalar>& bop,
+    const int tag = Pstream::msgType(),
+    const label comm = Pstream::worldComm
+);
+
+void reduce
+(
+    scalar& Value,
+    const maxOp<scalar>& bop,
     const int tag = Pstream::msgType(),
     const label comm = Pstream::worldComm
 );
