@@ -85,7 +85,7 @@ void Foam::tetPolyMesh::calcParPointData() const
         // parallel points.  The list will have duplicates, which need
         // to be eliminated
 
-        SLList<edge> parEdges;
+        HashSet<edge, Hash<edge> > parEdgesSet;
 
         forAll (mesh_.boundaryMesh(), patchI)
         {
@@ -110,26 +110,9 @@ void Foam::tetPolyMesh::calcParPointData() const
                         edge newEdge = edge(p[e[eI].start()], p[e[eI].end()]);
 
                         // Check if the edge is already on the list
-                        bool found = false;
-
-                        for
-                        (
-                            SLList<edge>::iterator parEIter =
-                                parEdges.begin();
-                            parEIter != parEdges.end();
-                            ++parEIter
-                        )
+                        if (!parEdgesSet.found(newEdge))
                         {
-                            if (parEIter() == newEdge)
-                            {
-                                found = true;
-                                break;
-                            }
-                        }
-
-                        if (!found)
-                        {
-                            parEdges.append(newEdge);
+                            parEdgesSet.insert(newEdge);
                         }
                     }
                 }
@@ -137,7 +120,7 @@ void Foam::tetPolyMesh::calcParPointData() const
         }
 
         // Re-pack the list
-        parEdgesPtr_ = new edgeList(parEdges);
+        parEdgesPtr_ = new edgeList(parEdgesSet.toc());
     }
 }
 
