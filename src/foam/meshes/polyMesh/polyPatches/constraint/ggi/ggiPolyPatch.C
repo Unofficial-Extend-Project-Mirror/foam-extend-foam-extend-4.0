@@ -658,7 +658,7 @@ Foam::ggiPolyPatch::ggiPolyPatch
     reconFaceCellCentresPtr_(NULL),
     localParallelPtr_(NULL),
     comm_(Pstream::worldComm),
-    tag_(-1),
+    tag_(Pstream::msgType()),
     mapPtr_(NULL)
 {}
 
@@ -684,7 +684,7 @@ Foam::ggiPolyPatch::ggiPolyPatch
     reconFaceCellCentresPtr_(NULL),
     localParallelPtr_(NULL),
     comm_(Pstream::worldComm),
-    tag_(-1),
+    tag_(Pstream::msgType()),
     mapPtr_(NULL)
 {
     if (dict.found("quickReject"))
