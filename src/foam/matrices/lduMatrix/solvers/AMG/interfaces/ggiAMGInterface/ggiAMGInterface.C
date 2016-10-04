@@ -71,7 +71,7 @@ void Foam::ggiAMGInterface::initFastReduce() const
 
         return;
     }
-    if (Pstream::myProcNo() == 7) Pout<< "Start initFastReduce " << lTime_.elapsedCpuTime() << endl;
+    Info<< "Start initFastReduce " << lTime_.elapsedCpuTime() << endl;
     // From here on, work on processors within the communicator
     // HJ, 20/Sep/2016
 
@@ -215,7 +215,7 @@ void Foam::ggiAMGInterface::initFastReduce() const
     // Map will return the object of the size of remote zone
     // HJ, 9/May/2016
     mapPtr_ = new mapDistribute(zoneSize(), sendMap, constructMap);
-    if (Pstream::myProcNo() == 7) Pout<< "End initFastReduce " << lTime_.elapsedCpuTime() << endl;
+    Info<< "End initFastReduce " << lTime_.elapsedCpuTime() << endl;
 }
 
 
@@ -246,7 +246,7 @@ Foam::ggiAMGInterface::ggiAMGInterface
     // each processor only to perform the analysis on locally created coarse
     // faces
     // HJ, 13/Jun/2016
-    if (Pstream::myProcNo() == 7) Pout<< "Start ggiAMGInterface constructor for size "
+    Info<< "Start ggiAMGInterface constructor for size "
         << fineGgiInterface_.interfaceSize() << ": "
         << lTime_.elapsedCpuTime() << endl;
 
@@ -340,7 +340,7 @@ Foam::ggiAMGInterface::ggiAMGInterface
     // On the fine level, addressing is made in a labelListList
     if (fineGgiInterface_.fineLevel())
     {
-        if (Pstream::myProcNo() == 7) Pout<< "fineGgiInterface start: " << lTime_.elapsedCpuTime() << endl;
+        Info<< "fineGgiInterface start: " << lTime_.elapsedCpuTime() << endl;
         // This addressing defines how to interpolate for all zone faces
         // across the interface
         const labelListList& fineAddr = fineGgiInterface_.addressing();
@@ -527,13 +527,13 @@ Foam::ggiAMGInterface::ggiAMGInterface
                 }
             } // end for all current neighbours
         } // end for all fine faces
-        if (Pstream::myProcNo() == 7) Pout<< "fineGgiInterface end: " << lTime_.elapsedCpuTime() << endl;
+        Info<< "fineGgiInterface end: " << lTime_.elapsedCpuTime() << endl;
     }
     else
     {
         // Coarse level, addressing is stored in faceCells
         // This addressing defines which faces from zone are local
-        if (Pstream::myProcNo() == 7) Pout<< "coarseGgiInterface start: " << lTime_.elapsedCpuTime() << endl;
+        Info<< "coarseGgiInterface start: " << lTime_.elapsedCpuTime() << endl;
         // Perform analysis only for local faces
         // HJ, 22/Jun/2016
         forAll (fineZa, fineZaI)
@@ -709,7 +709,7 @@ Foam::ggiAMGInterface::ggiAMGInterface
                 nAgglomPairs++;
             }
         } // end for all fine faces
-        if (Pstream::myProcNo() == 7) Pout<< "coarseGgiInterface end: " << lTime_.elapsedCpuTime() << endl;
+        Info<< "coarseGgiInterface end: " << lTime_.elapsedCpuTime() << endl;
     } // end of else in fine level (coarse level)
 
     // Since only local faces are analysed, lists can now be resized
@@ -772,7 +772,7 @@ Foam::ggiAMGInterface::ggiAMGInterface
     // the local zone is created.  HJ, 1/Aug/2016
     if (master())
     {
-        if (Pstream::myProcNo() == 7) Pout<< "ggiAMGInterface start agglom master: " << lTime_.elapsedCpuTime() << endl;
+        Info<< "ggiAMGInterface start agglom master: " << lTime_.elapsedCpuTime() << endl;
         // Note:
         // When I am agglomerating the master, faces are stacked up in order
         // but on the slave side, all I know is the master cluster index and
@@ -916,7 +916,7 @@ Foam::ggiAMGInterface::ggiAMGInterface
                 }
             }
         }
-        if (Pstream::myProcNo() == 7) Pout<< "ggiAMGInterface end agglom master " << lTime_.elapsedCpuTime() << endl;
+        Info<< "ggiAMGInterface end agglom master " << lTime_.elapsedCpuTime() << endl;
     }
     // Agglomerate slave
     else
@@ -943,7 +943,7 @@ Foam::ggiAMGInterface::ggiAMGInterface
 
         // Count how many global faces are used for each proc on the other side
         labelList npmf(Pstream::nProcs(), 0);
-        if (Pstream::myProcNo() == 7) Pout<< "ggiAMGInterface start agglom slave: " << lTime_.elapsedCpuTime() << endl;
+        Info<< "ggiAMGInterface start agglom slave: " << lTime_.elapsedCpuTime() << endl;
         // On slave side, the owner addressing is stored in linked lists
         forAll (contents, masterI)
         {
@@ -1010,9 +1010,9 @@ Foam::ggiAMGInterface::ggiAMGInterface
                 nProcFaces++;
             }
         }
-        if (Pstream::myProcNo() == 7) Pout<< "ggiAMGInterface end agglom slave " << lTime_.elapsedCpuTime() << endl;
+        Info<< "ggiAMGInterface end agglom slave " << lTime_.elapsedCpuTime() << endl;
     }
-    if (Pstream::myProcNo() == 7) Pout<< "End ggiAMGInterface constructor " << lTime_.elapsedCpuTime() << endl;
+    Info<< "End ggiAMGInterface constructor " << lTime_.elapsedCpuTime() << endl;
 }
 
 
