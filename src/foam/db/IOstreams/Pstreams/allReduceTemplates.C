@@ -44,155 +44,155 @@ void Foam::allReduce
         return;
     }
 
-    if (Pstream::nProcs(comm) <= Pstream::nProcsSimpleSum)
-    {
-        if (Pstream::master(comm))
-        {
-            for
-            (
-                int slave = Pstream::firstSlave();
-                slave <= Pstream::lastSlave(comm);
-                slave++
-            )
-            {
-                Type value;
+//     if (Pstream::nProcs(comm) <= Pstream::nProcsSimpleSum)
+//     {
+//         if (Pstream::master(comm))
+//         {
+//             for
+//             (
+//                 int slave = Pstream::firstSlave();
+//                 slave <= Pstream::lastSlave(comm);
+//                 slave++
+//             )
+//             {
+//                 Type value;
 
-                if
-                (
-                    MPI_Recv
-                    (
-                        &value,
-                        MPICount,
-                        MPIType,
-                        slave,
-                        tag,
-                        PstreamGlobals::MPICommunicators_[comm],
-                        MPI_STATUS_IGNORE
-                    )
-                )
-                {
-                    FatalErrorIn
-                    (
-                        "void Foam::allReduce\n"
-                        "(\n"
-                        "    Type&,\n"
-                        "    int,\n"
-                        "    MPI_Datatype,\n"
-                        "    MPI_Op,\n"
-                        "    const BinaryOp&,\n"
-                        "    const int\n"
-                        ")\n"
-                    )   << "MPI_Recv failed"
-                        << Foam::abort(FatalError);
-                }
+//                 if
+//                 (
+//                     MPI_Recv
+//                     (
+//                         &value,
+//                         MPICount,
+//                         MPIType,
+//                         slave,
+//                         tag,
+//                         PstreamGlobals::MPICommunicators_[comm],
+//                         MPI_STATUS_IGNORE
+//                     )
+//                 )
+//                 {
+//                     FatalErrorIn
+//                     (
+//                         "void Foam::allReduce\n"
+//                         "(\n"
+//                         "    Type&,\n"
+//                         "    int,\n"
+//                         "    MPI_Datatype,\n"
+//                         "    MPI_Op,\n"
+//                         "    const BinaryOp&,\n"
+//                         "    const int\n"
+//                         ")\n"
+//                     )   << "MPI_Recv failed"
+//                         << Foam::abort(FatalError);
+//                 }
 
-                Value = bop(Value, value);
-            }
-        }
-        else
-        {
-            if
-            (
-                MPI_Send
-                (
-                    &Value,
-                    MPICount,
-                    MPIType,
-                    Pstream::masterNo(),
-                    tag,
-                    PstreamGlobals::MPICommunicators_[comm]
-                )
-            )
-            {
-                FatalErrorIn
-                (
-                    "void Foam::allReduce\n"
-                    "(\n"
-                    "    Type&,\n"
-                    "    int,\n"
-                    "    MPI_Datatype,\n"
-                    "    MPI_Op,\n"
-                    "    const BinaryOp&,\n"
-                    "    const int\n"
-                    ")\n"
-                )   << "MPI_Send failed"
-                    << Foam::abort(FatalError);
-            }
-        }
+//                 Value = bop(Value, value);
+//             }
+//         }
+//         else
+//         {
+//             if
+//             (
+//                 MPI_Send
+//                 (
+//                     &Value,
+//                     MPICount,
+//                     MPIType,
+//                     Pstream::masterNo(),
+//                     tag,
+//                     PstreamGlobals::MPICommunicators_[comm]
+//                 )
+//             )
+//             {
+//                 FatalErrorIn
+//                 (
+//                     "void Foam::allReduce\n"
+//                     "(\n"
+//                     "    Type&,\n"
+//                     "    int,\n"
+//                     "    MPI_Datatype,\n"
+//                     "    MPI_Op,\n"
+//                     "    const BinaryOp&,\n"
+//                     "    const int\n"
+//                     ")\n"
+//                 )   << "MPI_Send failed"
+//                     << Foam::abort(FatalError);
+//             }
+//         }
 
 
-        if (Pstream::master(comm))
-        {
-            for
-            (
-                int slave = Pstream::firstSlave();
-                slave <= Pstream::lastSlave(comm);
-                slave++
-            )
-            {
-                if
-                (
-                    MPI_Send
-                    (
-                        &Value,
-                        MPICount,
-                        MPIType,
-                        slave,
-                        tag,
-                        PstreamGlobals::MPICommunicators_[comm]
-                    )
-                )
-                {
-                    FatalErrorIn
-                    (
-                        "void Foam::allReduce\n"
-                        "(\n"
-                        "    Type&,\n"
-                        "    int,\n"
-                        "    MPI_Datatype,\n"
-                        "    MPI_Op,\n"
-                        "    const BinaryOp&,\n"
-                        "    const int\n"
-                        ")\n"
-                    )   << "MPI_Send failed"
-                        << Foam::abort(FatalError);
-                }
-            }
-        }
-        else
-        {
-            if
-            (
-                MPI_Recv
-                (
-                    &Value,
-                    MPICount,
-                    MPIType,
-                    Pstream::masterNo(),
-                    tag,
-                    PstreamGlobals::MPICommunicators_[comm],
-                    MPI_STATUS_IGNORE
-                )
-            )
-            {
-                FatalErrorIn
-                (
-                    "void Foam::allReduce\n"
-                    "(\n"
-                    "    Type&,\n"
-                    "    int,\n"
-                    "    MPI_Datatype,\n"
-                    "    MPI_Op,\n"
-                    "    const BinaryOp&,\n"
-                    "    const int\n"
-                    ")\n"
-                )   << "MPI_Recv failed"
-                    << Foam::abort(FatalError);
-            }
-        }
-    }
-    else
-    {
+//         if (Pstream::master(comm))
+//         {
+//             for
+//             (
+//                 int slave = Pstream::firstSlave();
+//                 slave <= Pstream::lastSlave(comm);
+//                 slave++
+//             )
+//             {
+//                 if
+//                 (
+//                     MPI_Send
+//                     (
+//                         &Value,
+//                         MPICount,
+//                         MPIType,
+//                         slave,
+//                         tag,
+//                         PstreamGlobals::MPICommunicators_[comm]
+//                     )
+//                 )
+//                 {
+//                     FatalErrorIn
+//                     (
+//                         "void Foam::allReduce\n"
+//                         "(\n"
+//                         "    Type&,\n"
+//                         "    int,\n"
+//                         "    MPI_Datatype,\n"
+//                         "    MPI_Op,\n"
+//                         "    const BinaryOp&,\n"
+//                         "    const int\n"
+//                         ")\n"
+//                     )   << "MPI_Send failed"
+//                         << Foam::abort(FatalError);
+//                 }
+//             }
+//         }
+//         else
+//         {
+//             if
+//             (
+//                 MPI_Recv
+//                 (
+//                     &Value,
+//                     MPICount,
+//                     MPIType,
+//                     Pstream::masterNo(),
+//                     tag,
+//                     PstreamGlobals::MPICommunicators_[comm],
+//                     MPI_STATUS_IGNORE
+//                 )
+//             )
+//             {
+//                 FatalErrorIn
+//                 (
+//                     "void Foam::allReduce\n"
+//                     "(\n"
+//                     "    Type&,\n"
+//                     "    int,\n"
+//                     "    MPI_Datatype,\n"
+//                     "    MPI_Op,\n"
+//                     "    const BinaryOp&,\n"
+//                     "    const int\n"
+//                     ")\n"
+//                 )   << "MPI_Recv failed"
+//                     << Foam::abort(FatalError);
+//             }
+//         }
+//     }
+//     else
+//     {
         Type sum;
 
         MPI_Allreduce
@@ -206,7 +206,7 @@ void Foam::allReduce
         );
 
         Value = sum;
-    }
+//     }
 }
 
 

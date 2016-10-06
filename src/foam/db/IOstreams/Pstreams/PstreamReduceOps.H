@@ -159,6 +159,33 @@ void reduce
     const label comm = Pstream::worldComm
 );
 
+
+// Insist there are specialisations for the common reductions of labels
+
+void reduce
+(
+    label& Value,
+    const sumOp<label>& bop,
+    const int tag = Pstream::msgType(),
+    const label comm = Pstream::worldComm
+);
+
+void reduce
+(
+    label& Value,
+    const minOp<label>& bop,
+    const int tag = Pstream::msgType(),
+    const label comm = Pstream::worldComm
+);
+
+void reduce
+(
+    label& Value,
+    const maxOp<label>& bop,
+    const int tag = Pstream::msgType(),
+    const label comm = Pstream::worldComm
+);
+
 // Insist there are specialisations for the common reductions of scalars
 
 void reduce
@@ -208,6 +235,34 @@ void reduce
     const int tag,
     const label comm,
     label& request
+);
+
+
+// Insist there are specialisations for the common reductions of
+// lists of labels
+
+void reduce
+(
+    UList<label>& Value,
+    const sumOp<UList<label> >& bop,
+    const int tag = Pstream::msgType(),
+    const label comm = Pstream::worldComm
+);
+
+void reduce
+(
+    UList<label>& Value,
+    const minOp<UList<label> >& bop,
+    const int tag = Pstream::msgType(),
+    const label comm = Pstream::worldComm
+);
+
+void reduce
+(
+    UList<label>& Value,
+    const maxOp<UList<label> >& bop,
+    const int tag = Pstream::msgType(),
+    const label comm = Pstream::worldComm
 );
 
 

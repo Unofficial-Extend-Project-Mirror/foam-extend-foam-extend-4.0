@@ -97,7 +97,7 @@ void Foam::ggiAMGInterface::initFastReduce() const
     // Note: reduce with a comm will only be present on processors containing
     // master or slave faces.  Other processors created a dummy map above
     // HJ, 20/Sep/2016
-    reduce(zoneProcID, maxOp<labelField>(), tag(), comm());
+    reduce(zoneProcID, maxOp<UList<label> >(), tag(), comm());
 
     // Find out where my zone data is coming from
     labelList nRecv(Pstream::nProcs(), 0);
@@ -340,7 +340,6 @@ Foam::ggiAMGInterface::ggiAMGInterface
     // On the fine level, addressing is made in a labelListList
     if (fineGgiInterface_.fineLevel())
     {
-        Info<< "fineGgiInterface start: " << lTime_.elapsedCpuTime() << endl;
         // This addressing defines how to interpolate for all zone faces
         // across the interface
         const labelListList& fineAddr = fineGgiInterface_.addressing();
@@ -348,6 +347,10 @@ Foam::ggiAMGInterface::ggiAMGInterface
 
         // Perform analysis only for local faces
         // HJ, 22/Jun/2016
+
+        label curMasterProc, curSlaveProc;
+        long curMaster, curSlave;
+
         forAll (fineZa, fineZaI)
         {
             // Get the local face (from zone) to analyse
@@ -358,10 +361,10 @@ Foam::ggiAMGInterface::ggiAMGInterface
 
             forAll (curFineNbrs, nbrI)
             {
-                long curMaster = -1;
-                label curMasterProc = -1;
-                long curSlave = -1;
-                label curSlaveProc = -1;
+                curMaster = -1;
+                curMasterProc = -1;
+                curSlave = -1;
+                curSlaveProc = -1;
 
                 // Note.  Signalling in global clustering requires
                 // me to recognise clustering from separate
@@ -527,24 +530,27 @@ Foam::ggiAMGInterface::ggiAMGInterface
                 }
             } // end for all current neighbours
         } // end for all fine faces
-        Info<< "fineGgiInterface end: " << lTime_.elapsedCpuTime() << endl;
     }
     else
     {
         // Coarse level, addressing is stored in faceCells
         // This addressing defines which faces from zone are local
-        Info<< "coarseGgiInterface start: " << lTime_.elapsedCpuTime() << endl;
+
         // Perform analysis only for local faces
         // HJ, 22/Jun/2016
+
+        label curMasterProc, curSlaveProc;
+        long curMaster, curSlave;
+
         forAll (fineZa, fineZaI)
         {
             // Get the local face (from zone) to analyse
             const label ffI = fineZa[fineZaI];
 
-            long curMaster = -1;
-            label curMasterProc = -1;
-            long curSlave = -1;
-            label curSlaveProc = -1;
+            curMaster = -1;
+            curMasterProc = -1;
+            curSlave = -1;
+            curSlaveProc = -1;
 
             // Note.  Signalling in global clustering requires
             // me to recognise clustering from separate
@@ -709,7 +715,6 @@ Foam::ggiAMGInterface::ggiAMGInterface
                 nAgglomPairs++;
             }
         } // end for all fine faces
-        Info<< "coarseGgiInterface end: " << lTime_.elapsedCpuTime() << endl;
     } // end of else in fine level (coarse level)
 
     // Since only local faces are analysed, lists can now be resized
@@ -721,7 +726,7 @@ Foam::ggiAMGInterface::ggiAMGInterface
     // In order to assemble the coarse global face zone, find out
     // how many faces have been created on each processor.
     // Note that masters and slaves both count faces so we will
-    //  only ask master sizes to count
+    // only ask master sizes to count
     labelList nCoarseFacesPerProc(Pstream::nProcs(), 0);
 
     nCoarseFacesPerProc[Pstream::myProcNo()] = nCoarseFaces;
@@ -731,7 +736,10 @@ Foam::ggiAMGInterface::ggiAMGInterface
     // contact with the GGI interface will have zero zone size.
     // This needs to be handled separately in the initFastReduce
     // HJ, 20/Sep/2016
-    reduce(nCoarseFacesPerProc, sumOp<labelList>(), tag(), comm());
+
+    // Optimised comm: Wait for info from previous processor, add your
+    // number of coarse faces and pass to next processor
+    reduce(nCoarseFacesPerProc, sumOp<UList<label> >(), tag(), comm());
 
     // Coarse global face zone is assembled by adding all faces from proc0,
     // followed by all faces from proc1 etc.
