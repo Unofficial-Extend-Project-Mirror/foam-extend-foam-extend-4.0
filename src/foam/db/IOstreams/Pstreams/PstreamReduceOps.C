@@ -250,8 +250,8 @@ void Foam::reduce
 
 void Foam::reduce
 (
-    UList<label>& Value,
-    const sumOp<UList<label> >& bop,
+    List<label>& Value,
+    const sumOp<List<label> >& bop,
     const int tag,
     const label comm
 )
@@ -264,7 +264,89 @@ void Foam::reduce
         error::printStack(Pout);
     }
 
-    allReduce(*Value.begin(), Value.size(), MPI_LABEL, MPI_SUM, bop, tag, comm);
+    // Make a copy of the Value in the send buffer so that Value can be
+    // used for receive.  HJ, 8/Oct/2016
+    labelList send(Value);
+
+    int MPISize = Value.size();
+
+    MPI_Allreduce
+    (
+        send.begin(),
+        Value.begin(),
+        MPISize,
+        MPI_LABEL,
+        MPI_SUM,
+        PstreamGlobals::MPICommunicators_[comm]
+    );
+}
+
+
+void Foam::reduce
+(
+    List<label>& Value,
+    const minOp<List<label> >& bop,
+    const int tag,
+    const label comm
+)
+{
+    if (Pstream::warnComm != -1 && comm != Pstream::warnComm)
+    {
+        Pout<< "** reducing:" << Value << " with comm:" << comm
+            << " warnComm:" << Pstream::warnComm
+            << endl;
+        error::printStack(Pout);
+    }
+
+    // Make a copy of the Value in the send buffer so that Value can be
+    // used for receive.  HJ, 8/Oct/2016
+    labelList send(Value);
+
+    int MPISize = Value.size();
+
+    MPI_Allreduce
+    (
+        send.begin(),
+        Value.begin(),
+        MPISize,
+        MPI_LABEL,
+        MPI_MIN,
+        PstreamGlobals::MPICommunicators_[comm]
+    );
+}
+
+
+void Foam::reduce
+(
+    List<label>& Value,
+    const maxOp<List<label> >& bop,
+    const int tag,
+    const label comm
+)
+{
+    if (Pstream::warnComm != -1 && comm != Pstream::warnComm)
+    {
+        Pout<< "** reducing:" << Value << " with comm:" << comm
+            << " warnComm:" << Pstream::warnComm
+            << endl;
+        error::printStack(Pout);
+    }
+
+    // Make a copy of the Value in the send buffer so that Value can be
+    // used for receive.  HJ, 8/Oct/2016
+    labelList send(Value);
+
+    int MPISize = Value.size();
+
+    MPI_Allreduce
+    (
+        send.begin(),
+        Value.begin(),
+        MPISize,
+        MPI_LABEL,
+        MPI_MAX,
+        PstreamGlobals::MPICommunicators_[comm]
+    );
 }
 
 

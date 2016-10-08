@@ -239,28 +239,29 @@ void reduce
 
 
 // Insist there are specialisations for the common reductions of
-// lists of labels
+// lists of labels.  Note: template function specialisation must be the
+// exact match on argument types.  HJ, 8/Oct/2016
 
 void reduce
 (
-    UList<label>& Value,
-    const sumOp<UList<label> >& bop,
+    List<label>& Value,
+    const sumOp<List<label> >& bop,
     const int tag = Pstream::msgType(),
     const label comm = Pstream::worldComm
 );
 
 void reduce
 (
-    UList<label>& Value,
-    const minOp<UList<label> >& bop,
+    List<label>& Value,
+    const minOp<List<label> >& bop,
     const int tag = Pstream::msgType(),
     const label comm = Pstream::worldComm
 );
 
 void reduce
 (
-    UList<label>& Value,
-    const maxOp<UList<label> >& bop,
+    List<label>& Value,
+    const maxOp<List<label> >& bop,
     const int tag = Pstream::msgType(),
     const label comm = Pstream::worldComm
 );
