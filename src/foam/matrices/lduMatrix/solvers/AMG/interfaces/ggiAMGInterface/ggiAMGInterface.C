@@ -97,7 +97,7 @@ void Foam::ggiAMGInterface::initFastReduce() const
     // Note: reduce with a comm will only be present on processors containing
     // master or slave faces.  Other processors created a dummy map above
     // HJ, 20/Sep/2016
-    reduce(zoneProcID, maxOp<UList<label> >(), tag(), comm());
+    reduce(zoneProcID, maxOp<labelList>(), tag(), comm());
 
     // Find out where my zone data is coming from
     labelList nRecv(Pstream::nProcs(), 0);
@@ -739,8 +739,8 @@ Foam::ggiAMGInterface::ggiAMGInterface
 
     // Optimised comm: Wait for info from previous processor, add your
     // number of coarse faces and pass to next processor
-    reduce(nCoarseFacesPerProc, sumOp<UList<label> >(), tag(), comm());
-
+    reduce(nCoarseFacesPerProc, sumOp<List<label> >(), tag(), comm());
+    Pout<< "nCoarseFacesPerProc: " << nCoarseFacesPerProc << endl;
     // Coarse global face zone is assembled by adding all faces from proc0,
     // followed by all faces from proc1 etc.
     // Therefore, on procN, my master offset
