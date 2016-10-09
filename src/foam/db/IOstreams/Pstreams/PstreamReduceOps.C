@@ -269,7 +269,8 @@ void Foam::reduce
     labelList send(Value);
 
     int MPISize = Value.size();
-
+    Pout<< "comm: " << comm << " size: "
+        << PstreamGlobals::MPICommunicators_.size() << endl;
     MPI_Allreduce
     (
         send.begin(),
@@ -277,7 +278,8 @@ void Foam::reduce
         MPISize,
         MPI_LABEL,
         MPI_SUM,
-        PstreamGlobals::MPICommunicators_[comm]
+        PstreamGlobals::MPICommunicators_[Pstream::worldComm]
+//         PstreamGlobals::MPICommunicators_[comm]
     );
 }
 
