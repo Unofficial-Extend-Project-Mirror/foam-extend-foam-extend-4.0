@@ -87,7 +87,7 @@ void Foam::ggiAMGInterface::initFastReduce() const
 
     // Make a zone-sized field and fill it in with proc markings for processor
     // that holds and requires the data
-    labelField zoneProcID(zoneSize(), -1);
+    labelList zoneProcID(zoneSize(), -1);
 
     forAll (za, zaI)
     {
@@ -740,7 +740,7 @@ Foam::ggiAMGInterface::ggiAMGInterface
     // Optimised comm: Wait for info from previous processor, add your
     // number of coarse faces and pass to next processor
     reduce(nCoarseFacesPerProc, sumOp<List<label> >(), tag(), comm());
-    Pout<< "nCoarseFacesPerProc: " << nCoarseFacesPerProc << endl;
+
     // Coarse global face zone is assembled by adding all faces from proc0,
     // followed by all faces from proc1 etc.
     // Therefore, on procN, my master offset
