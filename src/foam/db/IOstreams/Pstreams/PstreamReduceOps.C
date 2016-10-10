@@ -279,7 +279,7 @@ void Foam::reduce
     labelList send(Value);
 
     int MPISize = Value.size();
-    Pout<< "In labelList reduce, sumOp" << endl;
+
     MPI_Allreduce
     (
         send.begin(),
@@ -319,7 +319,7 @@ void Foam::reduce
     labelList send(Value);
 
     int MPISize = Value.size();
-    Pout<< "In labelList reduce, minOp" << endl;
+
     MPI_Allreduce
     (
         send.begin(),
@@ -359,7 +359,7 @@ void Foam::reduce
     labelList send(Value);
 
     int MPISize = Value.size();
-    Pout<< "In labelList reduce, maxOp" << endl;
+
     MPI_Allreduce
     (
         send.begin(),
