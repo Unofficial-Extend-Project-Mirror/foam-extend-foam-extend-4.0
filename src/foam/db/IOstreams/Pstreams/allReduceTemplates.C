@@ -47,6 +47,12 @@ void Foam::allReduce
     // Removed send-received loop: use Allreduce instead.
     // HJ, 8/Oct/2016
 
+    // Skip processors that are not in the communicator
+    if (Pstream::myProcNo(comm) == -1)
+    {
+        return;
+    }
+
     Type sum;
 
     MPI_Allreduce

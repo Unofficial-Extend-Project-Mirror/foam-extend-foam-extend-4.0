@@ -147,6 +147,7 @@ void Foam::reduce
             << endl;
         error::printStack(Pout);
     }
+
     allReduce(Value, 1, MPI_LABEL, MPI_MIN, bop, tag, comm);
 }
 
@@ -166,6 +167,7 @@ void Foam::reduce
             << endl;
         error::printStack(Pout);
     }
+
     allReduce(Value, 1, MPI_LABEL, MPI_MAX, bop, tag, comm);
 }
 
@@ -205,6 +207,7 @@ void Foam::reduce
             << endl;
         error::printStack(Pout);
     }
+
     allReduce(Value, 1, MPI_SCALAR, MPI_MIN, bop, tag, comm);
 }
 
@@ -224,6 +227,7 @@ void Foam::reduce
             << endl;
         error::printStack(Pout);
     }
+
     allReduce(Value, 1, MPI_SCALAR, MPI_MAX, bop, tag, comm);
 }
 
@@ -264,13 +268,18 @@ void Foam::reduce
         error::printStack(Pout);
     }
 
+    // Skip processors that are not in the communicator
+    if (Pstream::myProcNo(comm) == -1)
+    {
+        return;
+    }
+
     // Make a copy of the Value in the send buffer so that Value can be
     // used for receive.  HJ, 8/Oct/2016
     labelList send(Value);
 
     int MPISize = Value.size();
-    Pout<< "comm: " << comm << " size: "
-        << PstreamGlobals::MPICommunicators_.size() << endl;
+    Pout<< "In labelList reduce, sumOp" << endl;
     MPI_Allreduce
     (
         send.begin(),
@@ -278,8 +287,7 @@ void Foam::reduce
         MPISize,
         MPI_LABEL,
         MPI_SUM,
-        PstreamGlobals::MPICommunicators_[Pstream::worldComm]
-//         PstreamGlobals::MPICommunicators_[comm]
+        PstreamGlobals::MPICommunicators_[comm]
     );
 }
 
@@ -300,12 +308,18 @@ void Foam::reduce
         error::printStack(Pout);
     }
 
+    // Skip processors that are not in the communicator
+    if (Pstream::myProcNo(comm) == -1)
+    {
+        return;
+    }
+
     // Make a copy of the Value in the send buffer so that Value can be
     // used for receive.  HJ, 8/Oct/2016
     labelList send(Value);
 
     int MPISize = Value.size();
-
+    Pout<< "In labelList reduce, minOp" << endl;
     MPI_Allreduce
     (
         send.begin(),
@@ -334,12 +348,18 @@ void Foam::reduce
         error::printStack(Pout);
     }
 
+    // Skip processors that are not in the communicator
+    if (Pstream::myProcNo(comm) == -1)
+    {
+        return;
+    }
+
     // Make a copy of the Value in the send buffer so that Value can be
     // used for receive.  HJ, 8/Oct/2016
     labelList send(Value);
 
     int MPISize = Value.size();
-
+    Pout<< "In labelList reduce, maxOp" << endl;
     MPI_Allreduce
     (
         send.begin(),
@@ -367,6 +387,7 @@ void Foam::reduce
             << endl;
         error::printStack(Pout);
     }
+
     allReduce(Value, 2, MPI_SCALAR, MPI_SUM, bop, tag, comm);
 }
 
@@ -386,6 +407,7 @@ void Foam::sumReduce
             << endl;
         error::printStack(Pout);
     }
+
     vector2D twoScalars(Value, scalar(Count));
     reduce(twoScalars, sumOp<vector2D>(), tag, comm);
 
