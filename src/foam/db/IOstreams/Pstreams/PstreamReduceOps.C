@@ -68,6 +68,25 @@ void Foam::reduce
         error::printStack(Pout);
     }
 
+#   ifdef FULLDEBUG
+    // Check for processors that are not in the communicator
+    if (Pstream::myProcNo(comm) == -1)
+    {
+        FatalErrorIn
+        (
+            "void Foam::reduce\n"
+            "(\n"
+            "    bool& Value,\n"
+            "    const andOp<bool>& bop,\n"
+            "    const int tag,\n"
+            "    const label comm\n"
+            ")"
+        )   << "Reduce called on the processor which is not a member "
+            << "of comm.  This is not allowed"
+            << abort(FatalError);
+    }
+#   endif
+
     // Note: C++ bool is a type separate from C and cannot be cast
     // For safety and compatibility with compilers, convert bool to int
     // to comply with MPI types.  HJ, 23/Sep/2016
@@ -107,6 +126,25 @@ void Foam::reduce
             << endl;
         error::printStack(Pout);
     }
+
+#   ifdef FULLDEBUG
+    // Check for processors that are not in the communicator
+    if (Pstream::myProcNo(comm) == -1)
+    {
+        FatalErrorIn
+        (
+            "void Foam::reduce\n"
+            "(\n"
+            "    bool& Value,\n"
+            "    const orOp<bool>& bop,\n"
+            "    const int tag,\n"
+            "    const label comm\n"
+            ")"
+        )   << "Reduce called on the processor which is not a member "
+            << "of comm.  This is not allowed"
+            << abort(FatalError);
+    }
+#   endif
 
     // Note: C++ bool is a type separate from C and cannot be cast
     // For safety and compatibility with compilers, convert bool to int
@@ -148,6 +186,25 @@ void Foam::reduce
         error::printStack(Pout);
     }
 
+#   ifdef FULLDEBUG
+    // Check for processors that are not in the communicator
+    if (Pstream::myProcNo(comm) == -1)
+    {
+        FatalErrorIn
+        (
+            "void Foam::reduce\n"
+            "(\n"
+            "    label& Value,\n"
+            "    const minOp<label>& bop,\n"
+            "    const int tag,\n"
+            "    const label comm\n"
+            ")"
+        )   << "Reduce called on the processor which is not a member "
+            << "of comm.  This is not allowed"
+            << abort(FatalError);
+    }
+#   endif
+
     allReduce(Value, 1, MPI_LABEL, MPI_MIN, bop, tag, comm);
 }
 
@@ -167,6 +224,25 @@ void Foam::reduce
             << endl;
         error::printStack(Pout);
     }
+
+#   ifdef FULLDEBUG
+    // Check for processors that are not in the communicator
+    if (Pstream::myProcNo(comm) == -1)
+    {
+        FatalErrorIn
+        (
+            "void Foam::reduce\n"
+            "(\n"
+            "    label& Value,\n"
+            "    const maxOp<label>& bop,\n"
+            "    const int tag,\n"
+            "    const label comm\n"
+            ")"
+        )   << "Reduce called on the processor which is not a member "
+            << "of comm.  This is not allowed"
+            << abort(FatalError);
+    }
+#   endif
 
     allReduce(Value, 1, MPI_LABEL, MPI_MAX, bop, tag, comm);
 }
@@ -188,6 +264,25 @@ void Foam::reduce
         error::printStack(Pout);
     }
 
+#   ifdef FULLDEBUG
+    // Check for processors that are not in the communicator
+    if (Pstream::myProcNo(comm) == -1)
+    {
+        FatalErrorIn
+        (
+            "void Foam::reduce\n"
+            "(\n"
+            "    label& Value,\n"
+            "    const sumOp<label>& bop,\n"
+            "    const int tag,\n"
+            "    const label comm\n"
+            ")"
+        )   << "Reduce called on the processor which is not a member "
+            << "of comm.  This is not allowed"
+            << abort(FatalError);
+    }
+#   endif
+
     allReduce(Value, 1, MPI_LABEL, MPI_SUM, bop, tag, comm);
 }
 
@@ -207,6 +302,25 @@ void Foam::reduce
             << endl;
         error::printStack(Pout);
     }
+
+#   ifdef FULLDEBUG
+    // Check for processors that are not in the communicator
+    if (Pstream::myProcNo(comm) == -1)
+    {
+        FatalErrorIn
+        (
+            "void Foam::reduce\n"
+            "(\n"
+            "    scalar& Value,\n"
+            "    const minOp<scalar>& bop,\n"
+            "    const int tag,\n"
+            "    const label comm\n"
+            ")"
+        )   << "Reduce called on the processor which is not a member "
+            << "of comm.  This is not allowed"
+            << abort(FatalError);
+    }
+#   endif
 
     allReduce(Value, 1, MPI_SCALAR, MPI_MIN, bop, tag, comm);
 }
@@ -228,6 +342,25 @@ void Foam::reduce
         error::printStack(Pout);
     }
 
+#   ifdef FULLDEBUG
+    // Check for processors that are not in the communicator
+    if (Pstream::myProcNo(comm) == -1)
+    {
+        FatalErrorIn
+        (
+            "void Foam::reduce\n"
+            "(\n"
+            "    scalar& Value,\n"
+            "    const maxOp<scalar>& bop,\n"
+            "    const int tag,\n"
+            "    const label comm\n"
+            ")"
+        )   << "Reduce called on the processor which is not a member "
+            << "of comm.  This is not allowed"
+            << abort(FatalError);
+    }
+#   endif
+
     allReduce(Value, 1, MPI_SCALAR, MPI_MAX, bop, tag, comm);
 }
 
@@ -248,47 +381,26 @@ void Foam::reduce
         error::printStack(Pout);
     }
 
-    allReduce(Value, 1, MPI_SCALAR, MPI_SUM, bop, tag, comm);
-}
-
-
-void Foam::reduce
-(
-    List<label>& Value,
-    const sumOp<List<label> >& bop,
-    const int tag,
-    const label comm
-)
-{
-    if (Pstream::warnComm != -1 && comm != Pstream::warnComm)
-    {
-        Pout<< "** reducing:" << Value << " with comm:" << comm
-            << " warnComm:" << Pstream::warnComm
-            << endl;
-        error::printStack(Pout);
-    }
-
-    // Skip processors that are not in the communicator
+#   ifdef FULLDEBUG
+    // Check for processors that are not in the communicator
     if (Pstream::myProcNo(comm) == -1)
     {
-        return;
+        FatalErrorIn
+        (
+            "void Foam::reduce\n"
+            "(\n"
+            "    scalar& Value,\n"
+            "    const sumOp<scalar>& bop,\n"
+            "    const int tag,\n"
+            "    const label comm\n"
+            ")"
+        )   << "Reduce called on the processor which is not a member "
+            << "of comm.  This is not allowed"
+            << abort(FatalError);
     }
+#   endif
 
-    // Make a copy of the Value in the send buffer so that Value can be
-    // used for receive.  HJ, 8/Oct/2016
-    labelList send(Value);
-
-    int MPISize = Value.size();
-
-    MPI_Allreduce
-    (
-        send.begin(),
-        Value.begin(),
-        MPISize,
-        MPI_LABEL,
-        MPI_SUM,
-        PstreamGlobals::MPICommunicators_[comm]
-    );
+    allReduce(Value, 1, MPI_SCALAR, MPI_SUM, bop, tag, comm);
 }
 
 
@@ -308,11 +420,24 @@ void Foam::reduce
         error::printStack(Pout);
     }
 
-    // Skip processors that are not in the communicator
+#   ifdef FULLDEBUG
+    // Check for processors that are not in the communicator
     if (Pstream::myProcNo(comm) == -1)
     {
-        return;
+        FatalErrorIn
+        (
+            "void Foam::reduce\n"
+            "(\n"
+            "    List<label>& Value,\n"
+            "    const minOp<List<label> >& bop,\n"
+            "    const int tag,\n"
+            "    const label comm\n"
+            ")"
+        )   << "Reduce called on the processor which is not a member "
+            << "of comm.  This is not allowed"
+            << abort(FatalError);
     }
+#   endif
 
     // Make a copy of the Value in the send buffer so that Value can be
     // used for receive.  HJ, 8/Oct/2016
@@ -348,11 +473,77 @@ void Foam::reduce
         error::printStack(Pout);
     }
 
-    // Skip processors that are not in the communicator
+#   ifdef FULLDEBUG
+    // Check for processors that are not in the communicator
     if (Pstream::myProcNo(comm) == -1)
     {
-        return;
+        FatalErrorIn
+        (
+            "void Foam::reduce\n"
+            "(\n"
+            "    List<label>& Value,\n"
+            "    const maxOp<List<label> >& bop,\n"
+            "    const int tag,\n"
+            "    const label comm\n"
+            ")"
+        )   << "Reduce called on the processor which is not a member "
+            << "of comm.  This is not allowed"
+            << abort(FatalError);
     }
+#   endif
+
+    // Make a copy of the Value in the send buffer so that Value can be
+    // used for receive.  HJ, 8/Oct/2016
+    labelList send(Value);
+
+    int MPISize = Value.size();
+    Pout<< "In labelList reduce, maxOp" << endl;
+    MPI_Allreduce
+    (
+        send.begin(),
+        Value.begin(),
+        MPISize,
+        MPI_LABEL,
+        MPI_MAX,
+        PstreamGlobals::MPICommunicators_[comm]
+    );
+}
+
+
+void Foam::reduce
+(
+    List<label>& Value,
+    const sumOp<List<label> >& bop,
+    const int tag,
+    const label comm
+)
+{
+    if (Pstream::warnComm != -1 && comm != Pstream::warnComm)
+    {
+        Pout<< "** reducing:" << Value << " with comm:" << comm
+            << " warnComm:" << Pstream::warnComm
+            << endl;
+        error::printStack(Pout);
+    }
+
+#   ifdef FULLDEBUG
+    // Check for processors that are not in the communicator
+    if (Pstream::myProcNo(comm) == -1)
+    {
+        FatalErrorIn
+        (
+            "void Foam::reduce\n"
+            "(\n"
+            "    List<label>& Value,\n"
+            "    const sumOp<List<label> >& bop,\n"
+            "    const int tag,\n"
+            "    const label comm\n"
+            ")"
+        )   << "Reduce called on the processor which is not a member "
+            << "of comm.  This is not allowed"
+            << abort(FatalError);
+    }
+#   endif
 
     // Make a copy of the Value in the send buffer so that Value can be
     // used for receive.  HJ, 8/Oct/2016
@@ -366,7 +557,7 @@ void Foam::reduce
         Value.begin(),
         MPISize,
         MPI_LABEL,
-        MPI_MAX,
+        MPI_SUM,
         PstreamGlobals::MPICommunicators_[comm]
     );
 }
@@ -388,6 +579,25 @@ void Foam::reduce
         error::printStack(Pout);
     }
 
+#   ifdef FULLDEBUG
+    // Check for processors that are not in the communicator
+    if (Pstream::myProcNo(comm) == -1)
+    {
+        FatalErrorIn
+        (
+            "void Foam::reduce\n"
+            "(\n"
+            "    vector2D& Value,\n"
+            "    const sumOp<vector2D>& bop,\n"
+            "    const int tag,\n"
+            "    const label comm\n"
+            ")"
+        )   << "Reduce called on the processor which is not a member "
+            << "of comm.  This is not allowed"
+            << abort(FatalError);
+    }
+#   endif
+
     allReduce(Value, 2, MPI_SCALAR, MPI_SUM, bop, tag, comm);
 }
 
@@ -408,6 +618,25 @@ void Foam::sumReduce
         error::printStack(Pout);
     }
 
+#   ifdef FULLDEBUG
+    // Check for processors that are not in the communicator
+    if (Pstream::myProcNo(comm) == -1)
+    {
+        FatalErrorIn
+        (
+            "void Foam::sumReduce\n"
+            "(\n"
+            "    scalar& Value,\n"
+            "    label& Count,\n"
+            "    const int tag,\n"
+            "    const label comm\n"
+            ")"
+        )   << "Reduce called on the processor which is not a member "
+            << "of comm.  This is not allowed"
+            << abort(FatalError);
+    }
+#   endif
+
     vector2D twoScalars(Value, scalar(Count));
     reduce(twoScalars, sumOp<vector2D>(), tag, comm);
 
@@ -425,6 +654,26 @@ void Foam::reduce
     label& requestID
 )
 {
+#   ifdef FULLDEBUG
+    // Check for processors that are not in the communicator
+    if (Pstream::myProcNo(comm) == -1)
+    {
+        FatalErrorIn
+        (
+            "void Foam::reduce\n"
+            "(\n"
+            "    scalar& Value,\n"
+            "    const sumOp<scalar>& bop,\n"
+            "    const int tag,\n"
+            "    const label comm,\n"
+            "    label& requestID\n"
+            ")"
+        )   << "Reduce called on the processor which is not a member "
+            << "of comm.  This is not allowed"
+            << abort(FatalError);
+    }
+#   endif
+
 #ifdef MPIX_COMM_TYPE_SHARED
     // Assume mpich2 with non-blocking collectives extensions. Once mpi3
     // is available this will change.
