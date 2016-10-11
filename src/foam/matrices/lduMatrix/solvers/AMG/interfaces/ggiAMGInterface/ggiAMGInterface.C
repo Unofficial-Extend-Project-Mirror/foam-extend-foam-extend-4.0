@@ -250,6 +250,12 @@ Foam::ggiAMGInterface::ggiAMGInterface
         << fineGgiInterface_.interfaceSize() << ": "
         << lTime_.elapsedCpuTime() << endl;
 
+    // If the processor is not in the GGI comm, escape.  HJ, 10/Oct/2016
+    if (Pstream::myProcNo(comm()) == -1)
+    {
+        return;
+    }
+
     // Note: local addressing contains only local faces
     const labelList& fineZa =  fineGgiInterface_.zoneAddressing();
 
