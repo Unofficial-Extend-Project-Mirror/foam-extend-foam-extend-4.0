@@ -250,11 +250,31 @@ Foam::ggiAMGInterface::ggiAMGInterface
         << fineGgiInterface_.interfaceSize() << ": "
         << lTime_.elapsedCpuTime() << endl;
 
+    // Initialise fine map
+    // Note: the mapDistribute contains a waitRequests call which cannot
+    // be limited to a comm.  Therefore, all processors need to calculate
+    // the mapDistribute schedule before escaping the constructor,
+    // even if there are no ggi faces available.
+    // HJ, 18/Oct/2016
+    fineGgiInterface_.map().schedule();
+
     // If the processor is not in the GGI comm, escape.  HJ, 10/Oct/2016
     if (Pstream::myProcNo(comm()) == -1)
     {
+        // Processor does not have either master or shadow faces
+        // Set all sizes to zero
+        zoneSize_ = 0;
+        zoneAddressing_.clear();
+        fineAddressing_.clear();
+        restrictAddressing_.clear();
+        restrictWeights_.clear();
+
         return;
     }
+
+    // Continuing only with interfaces within the GGI comm only.
+    // Note: on interfaces without the GGI comm, zone size will be zero
+    // HJ, 11/Oct/2016
 
     // Note: local addressing contains only local faces
     const labelList& fineZa =  fineGgiInterface_.zoneAddressing();
@@ -742,9 +762,6 @@ Foam::ggiAMGInterface::ggiAMGInterface
     // contact with the GGI interface will have zero zone size.
     // This needs to be handled separately in the initFastReduce
     // HJ, 20/Sep/2016
-
-    // Optimised comm: Wait for info from previous processor, add your
-    // number of coarse faces and pass to next processor
     reduce(nCoarseFacesPerProc, sumOp<List<label> >(), tag(), comm());
 
     // Coarse global face zone is assembled by adding all faces from proc0,
