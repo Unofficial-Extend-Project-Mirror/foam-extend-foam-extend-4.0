@@ -70,12 +70,20 @@ Foam::List<Foam::labelPair> Foam::mapDistribute::schedule
         // Receive and merge
         for
         (
-            int slave=Pstream::firstSlave();
-            slave<=Pstream::lastSlave();
+            int slave = Pstream::firstSlave();
+            slave <= Pstream::lastSlave();
             slave++
         )
         {
-            IPstream fromSlave(Pstream::scheduled, slave, 0, tag);
+            IPstream fromSlave
+            (
+                Pstream::defaultComms(),
+//                Pstream::scheduled,
+                slave,
+                0,
+                tag
+            );
+
             List<labelPair> nbrData(fromSlave);
 
             forAll (nbrData, i)
@@ -83,7 +91,7 @@ Foam::List<Foam::labelPair> Foam::mapDistribute::schedule
                 if (findIndex(allComms, nbrData[i]) == -1)
                 {
                     label sz = allComms.size();
-                    allComms.setSize(sz+1);
+                    allComms.setSize(sz + 1);
                     allComms[sz] = nbrData[i];
                 }
             }
@@ -91,25 +99,42 @@ Foam::List<Foam::labelPair> Foam::mapDistribute::schedule
         // Send back
         for
         (
-            int slave=Pstream::firstSlave();
-            slave<=Pstream::lastSlave();
+            int slave = Pstream::firstSlave();
+            slave <= Pstream::lastSlave();
             slave++
         )
         {
-            OPstream toSlave(Pstream::scheduled, slave, 0, tag);
+            OPstream toSlave
+            (
+                Pstream::defaultComms(),
+//                Pstream::scheduled,
+                slave,
+                0,
+                tag
+            );
+
             toSlave << allComms;
         }
     }
     else
     {
         {
-            OPstream toMaster(Pstream::scheduled, Pstream::masterNo(), 0, tag);
+            OPstream toMaster
+            (
+                Pstream::defaultComms(),
+//                Pstream::scheduled,
+                Pstream::masterNo(),
+                0,
+                tag
+            );
+
             toMaster << allComms;
         }
         {
             IPstream fromMaster
             (
-                Pstream::scheduled,
+                Pstream::defaultComms(),
+//                Pstream::scheduled,
                 Pstream::masterNo(),
                 0,
                 tag
