@@ -47,11 +47,27 @@ void Foam::allReduce
     // Removed send-received loop: use Allreduce instead.
     // HJ, 8/Oct/2016
 
-    // Skip processors that are not in the communicator
+#   ifdef FULLDEBUG
+    // Check for processors that are not in the communicator
     if (Pstream::myProcNo(comm) == -1)
     {
-        return;
+        FatalErrorIn
+        (
+            "void Foam::allReduce\n"
+            "(\n"
+            "    Type& Value,\n"
+            "    int MPICount,\n"
+            "    MPI_Datatype MPIType,\n"
+            "    MPI_Op MPIOp,\n"
+            "    const BinaryOp& bop,\n"
+            "    const int tag,\n"
+            "    const label comm\n"
+            ")"
+        )   << "Reduce called on the processor which is not a member "
+            << "of comm.  This is not allowed"
+            << abort(FatalError);
     }
+#   endif
 
     Type sum;
 
