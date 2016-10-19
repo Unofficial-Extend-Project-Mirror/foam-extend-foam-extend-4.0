@@ -412,6 +412,11 @@ void Foam::reduce
     const label comm
 )
 {
+    if (!Pstream::parRun())
+    {
+        return;
+    }
+
     if (Pstream::warnComm != -1 && comm != Pstream::warnComm)
     {
         Pout<< "** reducing:" << Value << " with comm:" << comm
@@ -465,6 +470,11 @@ void Foam::reduce
     const label comm
 )
 {
+    if (!Pstream::parRun())
+    {
+        return;
+    }
+
     if (Pstream::warnComm != -1 && comm != Pstream::warnComm)
     {
         Pout<< "** reducing:" << Value << " with comm:" << comm
@@ -518,6 +528,11 @@ void Foam::reduce
     const label comm
 )
 {
+    if (!Pstream::parRun())
+    {
+        return;
+    }
+
     if (Pstream::warnComm != -1 && comm != Pstream::warnComm)
     {
         Pout<< "** reducing:" << Value << " with comm:" << comm
@@ -654,6 +669,11 @@ void Foam::reduce
     label& requestID
 )
 {
+    if (!Pstream::parRun())
+    {
+        return;
+    }
+
 #   ifdef FULLDEBUG
     // Check for processors that are not in the communicator
     if (Pstream::myProcNo(comm) == -1)
