@@ -420,8 +420,7 @@ void Foam::mapDistribute::compact(const boolList& elemIsUsed, const int tag)
 
 
         // Wait for all to finish
-
-        Pstream::waitRequests(startOfRequests);
+//         Pstream::waitRequests(startOfRequests);
 
 
         // Compact out all submap entries that are referring to unused elements
