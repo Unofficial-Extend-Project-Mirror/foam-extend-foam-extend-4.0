@@ -71,7 +71,7 @@ void Foam::ggiAMGInterface::initFastReduce() const
 
         return;
     }
-    Info<< "Start initFastReduce " << lTime_.elapsedCpuTime() << endl;
+
     // From here on, work on processors within the communicator
     // HJ, 20/Sep/2016
 
@@ -215,7 +215,6 @@ void Foam::ggiAMGInterface::initFastReduce() const
     // Map will return the object of the size of remote zone
     // HJ, 9/May/2016
     mapPtr_ = new mapDistribute(zoneSize(), sendMap, constructMap);
-    Info<< "End initFastReduce " << lTime_.elapsedCpuTime() << endl;
 }
 
 
@@ -246,9 +245,6 @@ Foam::ggiAMGInterface::ggiAMGInterface
     // each processor only to perform the analysis on locally created coarse
     // faces
     // HJ, 13/Jun/2016
-    Info<< "Start ggiAMGInterface constructor for size "
-        << fineGgiInterface_.interfaceSize() << ": "
-        << lTime_.elapsedCpuTime() << endl;
 
     // Initialise fine map
     // Note: the mapDistribute contains a waitRequests call which cannot
@@ -256,7 +252,10 @@ Foam::ggiAMGInterface::ggiAMGInterface
     // the mapDistribute schedule before escaping the constructor,
     // even if there are no ggi faces available.
     // HJ, 18/Oct/2016
-    fineGgiInterface_.map().schedule();
+    if (Pstream::parRun())
+    {
+        fineGgiInterface_.map().schedule();
+    }
 
     // If the processor is not in the GGI comm, escape.  HJ, 10/Oct/2016
     if (Pstream::myProcNo(comm()) == -1)
@@ -803,7 +802,6 @@ Foam::ggiAMGInterface::ggiAMGInterface
     // the local zone is created.  HJ, 1/Aug/2016
     if (master())
     {
-        Info<< "ggiAMGInterface start agglom master: " << lTime_.elapsedCpuTime() << endl;
         // Note:
         // When I am agglomerating the master, faces are stacked up in order
         // but on the slave side, all I know is the master cluster index and
@@ -947,7 +945,6 @@ Foam::ggiAMGInterface::ggiAMGInterface
                 }
             }
         }
-        Info<< "ggiAMGInterface end agglom master " << lTime_.elapsedCpuTime() << endl;
     }
     // Agglomerate slave
     else
@@ -974,7 +971,7 @@ Foam::ggiAMGInterface::ggiAMGInterface
 
         // Count how many global faces are used for each proc on the other side
         labelList npmf(Pstream::nProcs(), 0);
-        Info<< "ggiAMGInterface start agglom slave: " << lTime_.elapsedCpuTime() << endl;
+
         // On slave side, the owner addressing is stored in linked lists
         forAll (contents, masterI)
         {
@@ -1041,9 +1038,7 @@ Foam::ggiAMGInterface::ggiAMGInterface
                 nProcFaces++;
             }
         }
-        Info<< "ggiAMGInterface end agglom slave " << lTime_.elapsedCpuTime() << endl;
     }
-    Info<< "End ggiAMGInterface constructor " << lTime_.elapsedCpuTime() << endl;
 }
 
 
