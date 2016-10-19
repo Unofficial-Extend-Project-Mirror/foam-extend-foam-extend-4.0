@@ -385,9 +385,12 @@ void Foam::ggiPolyPatch::calcLocalParallel() const
             ggiCommProcs
         );
 
-        Info<< "Allocating communicator for GGI patch " << name()
-            << " with " << ggiCommProcs << ": " << comm_
-            << endl;
+        if (debug && Pstream::parRun())
+        {
+            Info<< "Allocating communicator for GGI patch " << name()
+                << " with " << ggiCommProcs << ": " << comm_
+                << endl;
+        }
     }
     else
     {
