@@ -294,7 +294,7 @@ void Pstream::scatterList
                     label leafID = notBelowLeaves[leafI];
                     fromAbove >> Values[leafID];
 
-                    if (debug)
+                    if (debug > 1)
                     {
                         Pout<< " received through "
                             << myComm.above() << " data for:" << leafID
@@ -342,7 +342,7 @@ void Pstream::scatterList
                     label leafID = notBelowLeaves[leafI];
                     toBelow << Values[leafID];
 
-                    if (debug)
+                    if (debug > 1)
                     {
                         Pout<< " sent through "
                             << belowID << " data for:" << leafID
