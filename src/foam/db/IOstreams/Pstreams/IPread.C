@@ -108,7 +108,7 @@ Foam::label Foam::IPstream::read
 {
     if (debug)
     {
-        Pout<< "UIPstream::read : starting read from:" << fromProcNo
+        Pout<< "IPstream::read : starting read from:" << fromProcNo
             << " tag:" << tag << " comm:" << comm
             << " wanted size:" << label(bufSize)
             << " commsType:" << Pstream::commsTypeNames[commsType]
@@ -117,7 +117,7 @@ Foam::label Foam::IPstream::read
 
     if (Pstream::warnComm != -1 && comm != Pstream::warnComm)
     {
-        Pout<< "UIPstream::read : starting read from:" << fromProcNo
+        Pout<< "IPstream::read : starting read from:" << fromProcNo
             << " tag:" << tag << " comm:" << comm
             << " wanted size:" << label(bufSize)
             << " commsType:" << Pstream::commsTypeNames[commsType]
@@ -204,7 +204,7 @@ Foam::label Foam::IPstream::read
 
         if (debug)
         {
-            Pout<< "UIPstream::read : started read from:" << fromProcNo
+            Pout<< "IPstream::read : started read from:" << fromProcNo
                 << " tag:" << tag << " read size:" << label(bufSize)
                 << " commsType:" << Pstream::commsTypeNames[commsType]
                 << " request:" << PstreamGlobals::outstandingRequests_.size()
