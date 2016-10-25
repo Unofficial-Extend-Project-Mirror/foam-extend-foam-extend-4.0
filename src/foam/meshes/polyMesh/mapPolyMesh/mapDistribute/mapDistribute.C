@@ -77,8 +77,7 @@ Foam::List<Foam::labelPair> Foam::mapDistribute::schedule
         {
             IPstream fromSlave
             (
-                Pstream::defaultComms(),
-//                Pstream::scheduled,
+                Pstream::scheduled,
                 slave,
                 0,
                 tag
@@ -106,8 +105,7 @@ Foam::List<Foam::labelPair> Foam::mapDistribute::schedule
         {
             OPstream toSlave
             (
-                Pstream::defaultComms(),
-//                Pstream::scheduled,
+                Pstream::scheduled,
                 slave,
                 0,
                 tag
@@ -121,8 +119,7 @@ Foam::List<Foam::labelPair> Foam::mapDistribute::schedule
         {
             OPstream toMaster
             (
-                Pstream::defaultComms(),
-//                Pstream::scheduled,
+                Pstream::scheduled,
                 Pstream::masterNo(),
                 0,
                 tag
@@ -133,8 +130,7 @@ Foam::List<Foam::labelPair> Foam::mapDistribute::schedule
         {
             IPstream fromMaster
             (
-                Pstream::defaultComms(),
-//                Pstream::scheduled,
+                Pstream::scheduled,
                 Pstream::masterNo(),
                 0,
                 tag
@@ -420,7 +416,8 @@ void Foam::mapDistribute::compact(const boolList& elemIsUsed, const int tag)
 
 
         // Wait for all to finish
-//         Pstream::waitRequests(startOfRequests);
+        Pout<< "BARRIER in compact" << endl;
+        Pstream::waitRequests(startOfRequests);
 
 
         // Compact out all submap entries that are referring to unused elements
