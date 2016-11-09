@@ -92,7 +92,7 @@ then
     #
     [ ! -z "$WM_THIRD_PARTY_USE_LIBCCMIO_261" ] && {
 	echo "Building Libccmio 2.6.1"
-	( rpm_make -p libccmio-2.6.1 -s libccmio-2.6.1.spec -u http://portal.nersc.gov/svn/visit/tags/2.4.2/third_party/libccmio-2.6.1.tar.gz )
+	( rpm_make -p libccmio-2.6.1 -s libccmio-2.6.1.spec -u http://portal.nersc.gov/project/visit/third_party/libccmio-2.6.1.tar.gz )
     }
 else
     echo "Using system installed Libccmio"
