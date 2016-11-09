@@ -24,7 +24,7 @@ http://sourceforge.net/projects/openfoam-extend/files/foam-extend-3.0/
 * Install required packages:
 
     sudo yum groupinstall "Development Tools"
-    sudo yum install gcc-c++ binutils-devel bison flex m4 zlib-devel \
+    sudo yum install gcc-c++ bison flex m4 zlib-devel \
     qt-devel qtwebkit-devel mercurial graphviz
 
 * Set environment variables:

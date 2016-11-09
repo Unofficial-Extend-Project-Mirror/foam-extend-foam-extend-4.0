@@ -23,7 +23,7 @@ http://sourceforge.net/projects/openfoam-extend/files/foam-extend-3.1/
 
 * Install required packages:
 
-    sudo apt-get install git-core build-essential binutils-dev flex bison \
+    sudo apt-get install git-core build-essential flex bison \
     zlib1g-dev qt4-dev-tools libqt4-dev libncurses5-dev libxt-dev rpm \
     mercurial graphviz
 

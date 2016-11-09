@@ -1,6 +1,6 @@
 CPP        = /usr/lib/cpp -undef $(GFLAGS)
 
-PROJECT_LIBS = -l$(WM_PROJECT) -liberty -lnsl -lsocket
+PROJECT_LIBS = -l$(WM_PROJECT) -lnsl -lsocket
 
 include $(GENERAL_RULES)/standard
 
