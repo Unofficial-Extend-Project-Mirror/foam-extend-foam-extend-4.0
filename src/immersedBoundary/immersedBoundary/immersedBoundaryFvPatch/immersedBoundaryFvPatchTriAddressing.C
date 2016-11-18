@@ -86,7 +86,7 @@ void Foam::immersedBoundaryFvPatch::makeTriAddressing() const
 
     boolList visited(triPatch.size(), false);
 
-    register label curTri;
+    label curTri = 0;
 
     // Only search for tri faces in the mesh
     forAll (triFacesInMesh, tfimI)
@@ -125,12 +125,16 @@ void Foam::immersedBoundaryFvPatch::makeTriAddressing() const
                 // already visited faces
                 do
                 {
-                    curTri = nextToVisit.removeHead();
+                    if (!nextToVisit.empty())
+                    {
+                        curTri = nextToVisit.removeHead();
+                    }
+                    else
+                    {
+                        break;
+                    }
                 }
                 while (visited[curTri]);
-
-                // Discard tri if already visited
-                if (visited[curTri]) continue;
 
                 visited[curTri] = true;
 
