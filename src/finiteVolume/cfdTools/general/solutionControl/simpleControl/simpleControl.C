@@ -134,7 +134,7 @@ bool Foam::simpleControl::loop()
         if (criteriaSatisfied())
         {
             Info<< nl << algorithmName_ << " solution converged in "
-                << time.timeName() << " iterations" << nl << endl;
+                << time.value() << " iterations" << nl << endl;
 
             // Set to finalise calculation
             time.writeAndEnd();
