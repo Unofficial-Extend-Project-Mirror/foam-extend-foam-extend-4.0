@@ -29,19 +29,23 @@ namespace Foam
 
 // VTK includes
 #include "vtkMultiBlockDataSetAlgorithm.h"
-#include "vtkIOGeometryModule.h"
 
 // VTK forward declarations
 class vtkDataArraySelection;
 class vtkCallbackCommand;
 
 
-class VTKIOGEOMETRY_EXPORT vtkPV4FoamReader
+
+/*---------------------------------------------------------------------------*\
+                     Class vtkPV4FoamReader Declaration
+\*---------------------------------------------------------------------------*/
+
+class vtkPV4FoamReader
 :
     public vtkMultiBlockDataSetAlgorithm
 {
 public:
-    vtkTypeRevisionMacro(vtkPV4FoamReader,vtkMultiBlockDataSetAlgorithm);
+    vtkTypeMacro(vtkPV4FoamReader, vtkMultiBlockDataSetAlgorithm);
     void PrintSelf(ostream&, vtkIndent);
 
     static vtkPV4FoamReader* New();
