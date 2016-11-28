@@ -466,17 +466,17 @@ void GGIInterpolation<MasterPatch, SlavePatch>::calcAddressing() const
                 }
                 else
                 {
-                    WarningIn
-                    (
-                        "GGIInterpolation<MasterPatch, SlavePatch>::"
-                        "calcAddressing()"
-                    )   << "polygonIntersection is returning a "
-                        << "zero surface area between " << nl
-                        << "     Master face: " << faceMi
-                        << " and Neighbour face: " << curCMN[neighbI]
-                        << " intersection area = " << intersectionArea << nl
-                        << "Please check the two quick-check algorithms for "
-                        << "GGIInterpolation.  Something is  missing." << endl;
+//                     WarningIn
+//                     (
+//                         "GGIInterpolation<MasterPatch, SlavePatch>::"
+//                         "calcAddressing()"
+//                     )   << "polygonIntersection is returning a "
+//                         << "zero surface area between " << nl
+//                         << "     Master face: " << faceMi
+//                         << " and Neighbour face: " << curCMN[neighbI]
+//                         << " intersection area = " << intersectionArea << nl
+//                         << "Please check the two quick-check algorithms for "
+//                         << "GGIInterpolation.  Something is  missing." << endl;
                 }
             }
         }

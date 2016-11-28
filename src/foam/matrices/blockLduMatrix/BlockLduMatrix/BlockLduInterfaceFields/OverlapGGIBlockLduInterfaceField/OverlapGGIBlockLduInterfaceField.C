@@ -49,11 +49,11 @@ void Foam::OverlapGGIBlockLduInterfaceField<Type>::transformCoupleField
     {
         if (forwardT().size() == 1)
         {
-            f *= pow(diag(forwardT()[0]).component(cmpt), rank());
+            f *= pow(diag(forwardT()[0]).component(cmpt), pTraits<Type>::rank);
         }
         else
         {
-            f *= pow(diag(forwardT())().component(cmpt), rank());
+            f *= pow(diag(forwardT())().component(cmpt), pTraits<Type>::rank);
         }
     }
 }

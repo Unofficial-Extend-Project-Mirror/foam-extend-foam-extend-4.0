@@ -52,14 +52,14 @@ void Foam::processorLduInterface::send
     }
     else if (commsType == Pstream::nonBlocking)
     {
-        resizeBuf(receiveBuf_, f.size()*sizeof(Type));
+        resizeBuf(receiveBuf_, nBytes);
 
         IPstream::read
         (
             commsType,
             neighbProcNo(),
             receiveBuf_.begin(),
-            receiveBuf_.size(),
+            nBytes,
             tag(),
             comm()
         );

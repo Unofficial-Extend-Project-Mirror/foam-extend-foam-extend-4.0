@@ -52,7 +52,11 @@ Foam::processorAMGInterfaceField::processorAMGInterfaceField
     AMGInterfaceField(AMGCp, fineInterfaceField),
     procInterface_(refCast<const processorAMGInterface>(AMGCp)),
     doTransform_(false),
-    rank_(0)
+    rank_(0),
+    outstandingSendRequest_(-1),
+    outstandingRecvRequest_(-1),
+    scalarSendBuf_(0),
+    scalarReceiveBuf_(0)
 {
     const processorLduInterfaceField& p =
         refCast<const processorLduInterfaceField>(fineInterfaceField);
@@ -81,11 +85,50 @@ void Foam::processorAMGInterfaceField::initInterfaceMatrixUpdate
     const bool switchToLhs
 ) const
 {
-    procInterface_.send
-    (
-        commsType,
-        procInterface_.interfaceInternalField(psiInternal)()
-    );
+    label oldWarn = Pstream::warnComm;
+    Pstream::warnComm = comm();
+
+    scalarSendBuf_ = procInterface_.interfaceInternalField(psiInternal);
+
+    if (commsType == Pstream::nonBlocking)
+    {
+        // Fast path.
+        scalarReceiveBuf_.setSize(scalarSendBuf_.size());
+        outstandingRecvRequest_ = Pstream::nRequests();
+        IPstream::read
+        (
+            Pstream::nonBlocking,
+            procInterface_.neighbProcNo(),
+            reinterpret_cast<char*>(scalarReceiveBuf_.begin()),
+            scalarReceiveBuf_.byteSize(),
+            procInterface_.tag(),
+            comm()
+        );
+
+        outstandingSendRequest_ = Pstream::nRequests();
+        OPstream::write
+        (
+            Pstream::nonBlocking,
+            procInterface_.neighbProcNo(),
+            reinterpret_cast<const char*>(scalarSendBuf_.begin()),
+            scalarSendBuf_.byteSize(),
+            procInterface_.tag(),
+            comm()
+        );
+    }
+    else
+    {
+        procInterface_.send
+        (
+            commsType,
+            procInterface_.interfaceInternalField(psiInternal)()
+        );
+    }
+
+    // Mark as ready for update
+    const_cast<processorAMGInterfaceField&>(*this).updatedMatrix() = false;
+
+    Pstream::warnComm = oldWarn;
 }
 
 
@@ -100,11 +143,41 @@ void Foam::processorAMGInterfaceField::updateInterfaceMatrix
     const bool switchToLhs
 ) const
 {
-    scalarField pnf
-    (
-        procInterface_.receive<scalar>(commsType, coeffs.size())
-    );
-    transformCoupleField(pnf, cmpt);
+    if (this->updatedMatrix())
+    {
+        return;
+    }
+
+    if (commsType == Pstream::nonBlocking)
+    {
+        // Fast path.
+        if
+        (
+            outstandingRecvRequest_ >= 0
+         && outstandingRecvRequest_ < Pstream::nRequests()
+        )
+        {
+            Pstream::waitRequest(outstandingRecvRequest_);
+        }
+
+        // Recv finished so assume sending finished as well.
+        outstandingSendRequest_ = -1;
+        outstandingRecvRequest_ = -1;
+    }
+    else
+    {
+        // Check size
+        scalarReceiveBuf_.setSize(scalarSendBuf_.size());
+
+        procInterface_.receive<scalar>(commsType, scalarReceiveBuf_);
+    }
+
+    // The data is now in scalarReceiveBuf_ for both cases
+
+    // Transform according to the transformation tensor
+    transformCoupleField(scalarReceiveBuf_, cmpt);
+
+    // Multiply the field by coefficients and add into the result
 
     const unallocLabelList& faceCells = procInterface_.faceCells();
 
@@ -112,16 +185,19 @@ void Foam::processorAMGInterfaceField::updateInterfaceMatrix
     {
         forAll(faceCells, elemI)
         {
-            result[faceCells[elemI]] += coeffs[elemI]*pnf[elemI];
+            result[faceCells[elemI]] += coeffs[elemI]*scalarReceiveBuf_[elemI];
         }
     }
     else
     {
         forAll(faceCells, elemI)
         {
-            result[faceCells[elemI]] -= coeffs[elemI]*pnf[elemI];
+            result[faceCells[elemI]] -= coeffs[elemI]*scalarReceiveBuf_[elemI];
         }
     }
+
+    // Mark as updated
+    const_cast<processorAMGInterfaceField&>(*this).updatedMatrix() = true;
 }
 
 

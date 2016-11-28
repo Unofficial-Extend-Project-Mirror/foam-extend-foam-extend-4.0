@@ -31,27 +31,28 @@ License
 #include "coeffFields.H"
 #include "demandDrivenData.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-namespace Foam
-{
-
 // * * * * * * * * * * * * * * * * Constructors * * * * * * * * * * * * * * //
 
 template<class Type>
-processorFvPatchField<Type>::processorFvPatchField
+Foam::processorFvPatchField<Type>::processorFvPatchField
 (
     const fvPatch& p,
     const DimensionedField<Type, volMesh>& iF
 )
 :
     coupledFvPatchField<Type>(p, iF),
-    procPatch_(refCast<const processorFvPatch>(p))
+    procPatch_(refCast<const processorFvPatch>(p)),
+    outstandingSendRequest_(-1),
+    outstandingRecvRequest_(-1),
+    sendBuf_(0),
+    receiveBuf_(0),
+    scalarSendBuf_(0),
+    scalarReceiveBuf_(0)
 {}
 
 
 template<class Type>
-processorFvPatchField<Type>::processorFvPatchField
+Foam::processorFvPatchField<Type>::processorFvPatchField
 (
     const fvPatch& p,
     const DimensionedField<Type, volMesh>& iF,
@@ -59,13 +60,18 @@ processorFvPatchField<Type>::processorFvPatchField
 )
 :
     coupledFvPatchField<Type>(p, iF, f),
-    procPatch_(refCast<const processorFvPatch>(p))
+    procPatch_(refCast<const processorFvPatch>(p)),
+    outstandingSendRequest_(-1),
+    outstandingRecvRequest_(-1),
+    sendBuf_(0),
+    receiveBuf_(0),
+    scalarSendBuf_(0),
+    scalarReceiveBuf_(0)
 {}
 
 
-// Construct by mapping given processorFvPatchField<Type>
 template<class Type>
-processorFvPatchField<Type>::processorFvPatchField
+Foam::processorFvPatchField<Type>::processorFvPatchField
 (
     const processorFvPatchField<Type>& ptf,
     const fvPatch& p,
@@ -74,9 +80,15 @@ processorFvPatchField<Type>::processorFvPatchField
 )
 :
     coupledFvPatchField<Type>(ptf, p, iF, mapper),
-    procPatch_(refCast<const processorFvPatch>(p))
+    procPatch_(refCast<const processorFvPatch>(p)),
+    outstandingSendRequest_(-1),
+    outstandingRecvRequest_(-1),
+    sendBuf_(0),
+    receiveBuf_(0),
+    scalarSendBuf_(0),
+    scalarReceiveBuf_(0)
 {
-    if (!isType<processorFvPatch>(this->patch()))
+    if (!isA<processorFvPatch>(this->patch()))
     {
         FatalErrorIn
         (
@@ -98,7 +110,7 @@ processorFvPatchField<Type>::processorFvPatchField
 
 
 template<class Type>
-processorFvPatchField<Type>::processorFvPatchField
+Foam::processorFvPatchField<Type>::processorFvPatchField
 (
     const fvPatch& p,
     const DimensionedField<Type, volMesh>& iF,
@@ -106,9 +118,15 @@ processorFvPatchField<Type>::processorFvPatchField
 )
 :
     coupledFvPatchField<Type>(p, iF, dict),
-    procPatch_(refCast<const processorFvPatch>(p))
+    procPatch_(refCast<const processorFvPatch>(p)),
+    outstandingSendRequest_(-1),
+    outstandingRecvRequest_(-1),
+    sendBuf_(0),
+    receiveBuf_(0),
+    scalarSendBuf_(0),
+    scalarReceiveBuf_(0)
 {
-    if (!isType<processorFvPatch>(p))
+    if (!isA<processorFvPatch>(p))
     {
         FatalIOErrorIn
         (
@@ -130,42 +148,79 @@ processorFvPatchField<Type>::processorFvPatchField
 
 
 template<class Type>
-processorFvPatchField<Type>::processorFvPatchField
+Foam::processorFvPatchField<Type>::processorFvPatchField
 (
     const processorFvPatchField<Type>& ptf
 )
 :
     processorLduInterfaceField(),
     coupledFvPatchField<Type>(ptf),
-    procPatch_(refCast<const processorFvPatch>(ptf.patch()))
+    procPatch_(refCast<const processorFvPatch>(ptf.patch())),
+    outstandingSendRequest_(-1),
+    outstandingRecvRequest_(-1),
+    sendBuf_(0),
+    receiveBuf_(0),
+    scalarSendBuf_(0),
+    scalarReceiveBuf_(0)
 {}
 
 
 template<class Type>
-processorFvPatchField<Type>::processorFvPatchField
+Foam::processorFvPatchField<Type>::processorFvPatchField
 (
     const processorFvPatchField<Type>& ptf,
     const DimensionedField<Type, volMesh>& iF
 )
 :
     coupledFvPatchField<Type>(ptf, iF),
-    procPatch_(refCast<const processorFvPatch>(ptf.patch()))
-{}
+    procPatch_(refCast<const processorFvPatch>(ptf.patch())),
+    outstandingSendRequest_(-1),
+    outstandingRecvRequest_(-1),
+    sendBuf_(0),
+    receiveBuf_(0),
+    scalarSendBuf_(0),
+    scalarReceiveBuf_(0)
+{
+    if (debug && !ptf.ready())
+    {
+        FatalErrorIn
+        (
+            "processorFvPatchField<Type>::processorFvPatchField\n"
+            "(\n"
+            "    const processorFvPatchField<Type>& ptf,\n"
+            "    const DimensionedField<Type, volMesh>& iF\n"
+            ")"
+        )   << "On patch " << procPatch_.name() << " outstanding request."
+            << abort(FatalError);
+    }
+}
 
 
 // * * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * //
 
 template<class Type>
-processorFvPatchField<Type>::~processorFvPatchField()
+Foam::processorFvPatchField<Type>::~processorFvPatchField()
 {}
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 template<class Type>
-tmp<Field<Type> > processorFvPatchField<Type>::patchNeighbourField() const
+Foam::tmp<Foam::Field<Type> >
+Foam::processorFvPatchField<Type>::patchNeighbourField() const
 {
-    // Warning: returning own patch field, which on update stores
+    if (debug && !this->ready())
+    {
+        FatalErrorIn
+        (
+            "tmp<Field<Type> >"
+            "processorFvPatchField<Type>::patchNeighbourField() const"
+        )   << "On patch " << procPatch_.name()
+            << " outstanding request."
+            << abort(FatalError);
+    }
+
+    // Warning: returning own patch field, which only after update stores
     // actual neighbour data
     // HJ, 14/May/2009
     return *this;
@@ -173,27 +228,79 @@ tmp<Field<Type> > processorFvPatchField<Type>::patchNeighbourField() const
 
 
 template<class Type>
-void processorFvPatchField<Type>::initEvaluate
+void Foam::processorFvPatchField<Type>::initEvaluate
 (
     const Pstream::commsTypes commsType
 )
 {
     if (Pstream::parRun())
     {
-        procPatch_.send(commsType, this->patchInternalField()());
+        // Collect data into send buffer
+        sendBuf_ = this->patchInternalField();
+
+        if (commsType == Pstream::nonBlocking)
+        {
+            // Fast path. Receive into *this
+
+            outstandingRecvRequest_ = Pstream::nRequests();
+
+            IPstream::read
+            (
+                Pstream::nonBlocking,
+                procPatch_.neighbProcNo(),
+                reinterpret_cast<char*>(this->begin()),
+                this->byteSize(),
+                procPatch_.tag(),
+                procPatch_.comm()
+            );
+
+            outstandingSendRequest_ = Pstream::nRequests();
+
+            OPstream::write
+            (
+                Pstream::nonBlocking,
+                procPatch_.neighbProcNo(),
+                reinterpret_cast<const char*>(sendBuf_.begin()),
+                this->byteSize(),
+                procPatch_.tag(),
+                procPatch_.comm()
+            );
+        }
+        else
+        {
+            procPatch_.send(commsType, sendBuf_);
+        }
     }
 }
 
 
 template<class Type>
-void processorFvPatchField<Type>::evaluate
+void Foam::processorFvPatchField<Type>::evaluate
 (
     const Pstream::commsTypes commsType
 )
 {
     if (Pstream::parRun())
     {
-        procPatch_.receive<Type>(commsType, *this);
+        if (commsType == Pstream::nonBlocking)
+        {
+            // Fast path. Received into *this
+
+            if
+            (
+                outstandingRecvRequest_ >= 0
+             && outstandingRecvRequest_ < Pstream::nRequests()
+            )
+            {
+                Pstream::waitRequest(outstandingRecvRequest_);
+            }
+            outstandingSendRequest_ = -1;
+            outstandingRecvRequest_ = -1;
+        }
+        else
+        {
+            procPatch_.receive<Type>(commsType, *this);
+        }
 
         if (doTransform())
         {
@@ -204,14 +311,15 @@ void processorFvPatchField<Type>::evaluate
 
 
 template<class Type>
-tmp<Field<Type> > processorFvPatchField<Type>::snGrad() const
+Foam::tmp<Foam::Field<Type> >
+Foam::processorFvPatchField<Type>::snGrad() const
 {
     return this->patch().deltaCoeffs()*(*this - this->patchInternalField());
 }
 
 
 template<class Type>
-void processorFvPatchField<Type>::initInterfaceMatrixUpdate
+void Foam::processorFvPatchField<Type>::initInterfaceMatrixUpdate
 (
     const scalarField& psiInternal,
     scalarField&,
@@ -222,16 +330,68 @@ void processorFvPatchField<Type>::initInterfaceMatrixUpdate
     const bool switchToLhs
 ) const
 {
-    procPatch_.send
-    (
-        commsType,
-        this->patch().patchInternalField(psiInternal)()
-    );
+    scalarSendBuf_ = this->patch().patchInternalField(psiInternal);
+
+    if (commsType == Pstream::nonBlocking)
+    {
+        // Fast path.
+        if (debug && !this->ready())
+        {
+            FatalErrorIn
+            (
+                "void processorFvPatchField<Type>::initInterfaceMatrixUpdate\n"
+                "(\n"
+                "    const scalarField& psiInternal,\n"
+                "    scalarField&,\n"
+                "    const lduMatrix&,\n"
+                "    const scalarField&,\n"
+                "    const direction,\n"
+                "    const Pstream::commsTypes commsType,\n"
+                "    const bool switchToLhs\n"
+                ") const"
+            )   << "On patch " << procPatch_.name()
+                << " outstanding request."
+                << abort(FatalError);
+        }
+
+        // Check buffer size
+        scalarReceiveBuf_.setSize(this->size());
+
+        outstandingRecvRequest_ = Pstream::nRequests();
+
+        IPstream::read
+        (
+            Pstream::nonBlocking,
+            procPatch_.neighbProcNo(),
+            reinterpret_cast<char*>(scalarReceiveBuf_.begin()),
+            scalarReceiveBuf_.byteSize(),
+            procPatch_.tag(),
+            procPatch_.comm()
+        );
+
+        outstandingSendRequest_ = Pstream::nRequests();
+
+        OPstream::write
+        (
+            Pstream::nonBlocking,
+            procPatch_.neighbProcNo(),
+            reinterpret_cast<const char*>(scalarSendBuf_.begin()),
+            scalarSendBuf_.byteSize(),
+            procPatch_.tag(),
+            procPatch_.comm()
+        );
+    }
+    else
+    {
+        procPatch_.send(commsType, scalarSendBuf_);
+    }
+
+    const_cast<processorFvPatchField<Type>&>(*this).updatedMatrix() = false;
 }
 
 
 template<class Type>
-void processorFvPatchField<Type>::updateInterfaceMatrix
+void Foam::processorFvPatchField<Type>::updateInterfaceMatrix
 (
     const scalarField&,
     scalarField& result,
@@ -242,36 +402,65 @@ void processorFvPatchField<Type>::updateInterfaceMatrix
     const bool switchToLhs
 ) const
 {
-    scalarField pnf
-    (
-        procPatch_.receive<scalar>(commsType, this->size())()
-    );
+    if (this->updatedMatrix())
+    {
+        return;
+    }
+
+    if (commsType == Pstream::nonBlocking)
+    {
+        // Fast path.
+        if
+        (
+            outstandingRecvRequest_ >= 0
+         && outstandingRecvRequest_ < Pstream::nRequests()
+        )
+        {
+            Pstream::waitRequest(outstandingRecvRequest_);
+        }
+
+        // Recv finished so assume sending finished as well.
+        outstandingSendRequest_ = -1;
+        outstandingRecvRequest_ = -1;
+    }
+    else
+    {
+        // Check size
+        scalarReceiveBuf_.setSize(this->size());
+
+        procPatch_.receive<scalar>(commsType, scalarReceiveBuf_);
+    }
+
+    // The data is now in scalarReceiveBuf_ for both cases
 
     // Transform according to the transformation tensor
-    transformCoupleField(pnf, cmpt);
+    transformCoupleField(scalarReceiveBuf_, cmpt);
 
     // Multiply the field by coefficients and add into the result
+
     const unallocLabelList& faceCells = this->patch().faceCells();
 
     if (switchToLhs)
     {
         forAll(faceCells, elemI)
         {
-            result[faceCells[elemI]] += coeffs[elemI]*pnf[elemI];
+            result[faceCells[elemI]] += coeffs[elemI]*scalarReceiveBuf_[elemI];
         }
     }
     else
     {
         forAll(faceCells, elemI)
         {
-            result[faceCells[elemI]] -= coeffs[elemI]*pnf[elemI];
+            result[faceCells[elemI]] -= coeffs[elemI]*scalarReceiveBuf_[elemI];
         }
     }
+
+    const_cast<processorFvPatchField<Type>&>(*this).updatedMatrix() = true;
 }
 
 
 template<class Type>
-void processorFvPatchField<Type>::initInterfaceMatrixUpdate
+void Foam::processorFvPatchField<Type>::initInterfaceMatrixUpdate
 (
     const Field<Type>& psiInternal,
     Field<Type>&,
@@ -281,16 +470,71 @@ void processorFvPatchField<Type>::initInterfaceMatrixUpdate
     const bool switchToLhs
 ) const
 {
-    procPatch_.send
-    (
-        commsType,
-        this->patch().patchInternalField(psiInternal)()
-    );
+    sendBuf_ = this->patch().patchInternalField(psiInternal);
+
+    if (commsType == Pstream::nonBlocking)
+    {
+        // Fast path.
+        if (debug && !this->ready())
+        {
+            FatalErrorIn
+            (
+                "void processorFvPatchField<Type>::initInterfaceMatrixUpdate\n"
+                "(\n"
+                "    const Field<Type>& psiInternal,\n"
+                "    Field<Type>&,\n"
+                "    const BlockLduMatrix<Type>&,\n"
+                "    const CoeffField<Type>&,\n"
+                "    const Pstream::commsTypes commsType,\n"
+                "    const bool switchToLhs\n"
+                ") const"
+            )   << "On patch " << procPatch_.name()
+                << " outstanding request."
+                << abort(FatalError);
+        }
+
+        // Check buffer size
+        receiveBuf_.setSize(this->size());
+
+        outstandingRecvRequest_ = Pstream::nRequests();
+
+        IPstream::read
+        (
+            Pstream::nonBlocking,
+            procPatch_.neighbProcNo(),
+            reinterpret_cast<char*>(receiveBuf_.begin()),
+            receiveBuf_.byteSize(),
+            procPatch_.tag(),
+            procPatch_.comm()
+        );
+
+        outstandingSendRequest_ = Pstream::nRequests();
+
+        OPstream::write
+        (
+            Pstream::nonBlocking,
+            procPatch_.neighbProcNo(),
+            reinterpret_cast<const char*>(sendBuf_.begin()),
+            sendBuf_.byteSize(),
+            procPatch_.tag(),
+            procPatch_.comm()
+        );
+    }
+    else
+    {
+        procPatch_.send
+        (
+            commsType,
+            this->patch().patchInternalField(psiInternal)()
+        );
+    }
+
+    const_cast<processorFvPatchField<Type>&>(*this).updatedMatrix() = false;
 }
 
 
 template<class Type>
-void processorFvPatchField<Type>::updateInterfaceMatrix
+void Foam::processorFvPatchField<Type>::updateInterfaceMatrix
 (
     const Field<Type>& psiInternal,
     Field<Type>& result,
@@ -300,14 +544,40 @@ void processorFvPatchField<Type>::updateInterfaceMatrix
     const bool switchToLhs
 ) const
 {
-    Field<Type> pnf
-    (
-        procPatch_.receive<Type>(commsType, this->size())()
-    );
+    if (this->updatedMatrix())
+    {
+        return;
+    }
 
-    // Multiply neighbour field with coeffs and re-use pnf for result
+    if (commsType == Pstream::nonBlocking)
+    {
+        // Fast path.
+        if
+        (
+            outstandingRecvRequest_ >= 0
+         && outstandingRecvRequest_ < Pstream::nRequests()
+        )
+        {
+            Pstream::waitRequest(outstandingRecvRequest_);
+        }
+
+        // Recv finished so assume sending finished as well.
+        outstandingSendRequest_ = -1;
+        outstandingRecvRequest_ = -1;
+    }
+    else
+    {
+        // Check size
+        receiveBuf_.setSize(this->size());
+
+        procPatch_.receive<Type>(commsType, receiveBuf_);
+    }
+
+    // The data is now in receiveBuf_ for both cases
+
+    // Multiply neighbour field with coeffs and re-use buffer for result
     // of multiplication
-    multiply(pnf, coeffs, pnf);
+    multiply(receiveBuf_, coeffs, receiveBuf_);
 
     const unallocLabelList& faceCells = this->patch().faceCells();
 
@@ -315,21 +585,19 @@ void processorFvPatchField<Type>::updateInterfaceMatrix
     {
         forAll(faceCells, elemI)
         {
-            result[faceCells[elemI]] += pnf[elemI];
+            result[faceCells[elemI]] += receiveBuf_[elemI];
         }
     }
     else
     {
         forAll(faceCells, elemI)
         {
-            result[faceCells[elemI]] -= pnf[elemI];
+            result[faceCells[elemI]] -= receiveBuf_[elemI];
         }
     }
+
+    const_cast<processorFvPatchField<Type>&>(*this).updatedMatrix() = true;
 }
 
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // ************************************************************************* //

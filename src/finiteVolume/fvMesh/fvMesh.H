@@ -123,6 +123,7 @@ class fvMesh
 
        // Make geometric data
 
+            //- Make face areas
             void makeSf() const;
 
             //- Make face area magnitudes
