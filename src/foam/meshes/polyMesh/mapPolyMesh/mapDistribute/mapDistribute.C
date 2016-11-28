@@ -188,6 +188,7 @@ const Foam::List<Foam::labelPair>& Foam::mapDistribute::schedule() const
             )
         );
     }
+
     return schedulePtr_();
 }
 
@@ -414,11 +415,8 @@ void Foam::mapDistribute::compact(const boolList& elemIsUsed, const int tag)
             }
         }
 
-
         // Wait for all to finish
-        Pout<< "BARRIER in compact" << endl;
         Pstream::waitRequests(startOfRequests);
-
 
         // Compact out all submap entries that are referring to unused elements
         for (label domain = 0; domain < Pstream::nProcs(); domain++)
@@ -479,6 +477,7 @@ void Foam::mapDistribute::compact(const boolList& elemIsUsed, const int tag)
     constructSize_ = maxConstructIndex + 1;
 
     // Clear the schedule (note:not necessary if nothing changed)
+    Pout<< "CLEAR SCHEDULE POINTER" << endl;
     schedulePtr_.clear();
 }
 

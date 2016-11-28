@@ -237,7 +237,6 @@ void Foam::mapDistribute::distribute
             }
 
             // Block ourselves, waiting only for the current comms
-            Pout<< "TEMPLATE BARRIER in distribute, non-blocking non-contiguous" << endl;
             Pstream::waitRequests(nOutstanding);
 
             // Consume
@@ -344,12 +343,9 @@ void Foam::mapDistribute::distribute
 
 
             // Wait for all to finish
-            Pout<< "TEMPLATE BARRIER in distribute, non-blocking, contiguous" << endl;
             Pstream::waitRequests(nOutstanding);
 
-
             // Collect neighbour fields
-
             for (label domain = 0; domain < Pstream::nProcs(); domain++)
             {
                 const labelList& map = constructMap[domain];
@@ -585,7 +581,6 @@ void Foam::mapDistribute::distribute
             }
 
             // Block ourselves, waiting only for the current comms
-            Pout<< "TEMPLATE BARRIER in distribute, non-blocking non-contiguous 2" << endl;
             Pstream::waitRequests(nOutstanding);
 
             // Consume
@@ -689,14 +684,10 @@ void Foam::mapDistribute::distribute
                 }
             }
 
-
             // Wait for all to finish
-            Pout<< "TEMPLATE BARRIER in distribute, non-blocking contiguous 2" << endl;
             Pstream::waitRequests(nOutstanding);
 
-
             // Collect neighbour fields
-
             for (label domain = 0; domain < Pstream::nProcs(); domain++)
             {
                 const labelList& map = constructMap[domain];
