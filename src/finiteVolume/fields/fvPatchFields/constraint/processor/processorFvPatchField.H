@@ -285,6 +285,9 @@ public:
 
             // Communication support
 
+                //- Is all data available
+                virtual bool ready() const;
+
                 //- Return communicator used for parallel communication
                 virtual int comm() const
                 {

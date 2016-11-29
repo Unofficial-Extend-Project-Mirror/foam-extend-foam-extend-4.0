@@ -600,4 +600,40 @@ void Foam::processorFvPatchField<Type>::updateInterfaceMatrix
 }
 
 
+template<class Type>
+bool Foam::processorFvPatchField<Type>::ready() const
+{
+    if
+    (
+        outstandingSendRequest_ >= 0
+     && outstandingSendRequest_ < Pstream::nRequests()
+    )
+    {
+        bool finished = Pstream::finishedRequest(outstandingSendRequest_);
+        if (!finished)
+        {
+            return false;
+        }
+    }
+    outstandingSendRequest_ = -1;
+
+    if
+    (
+        outstandingRecvRequest_ >= 0
+     && outstandingRecvRequest_ < Pstream::nRequests()
+    )
+    {
+        bool finished = Pstream::finishedRequest(outstandingRecvRequest_);
+
+        if (!finished)
+        {
+            return false;
+        }
+    }
+    outstandingRecvRequest_ = -1;
+
+    return true;
+}
+
+
 // ************************************************************************* //

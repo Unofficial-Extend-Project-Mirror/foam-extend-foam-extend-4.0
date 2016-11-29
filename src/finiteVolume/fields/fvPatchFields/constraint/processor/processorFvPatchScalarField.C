@@ -33,26 +33,6 @@ namespace Foam
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 template<>
-void processorFvPatchField<scalar>::initInterfaceMatrixUpdate
-(
-    const scalarField& psiInternal,
-    scalarField&,
-    const lduMatrix&,
-    const scalarField&,
-    const direction,
-    const Pstream::commsTypes commsType,
-    const bool switchToLhs
-) const
-{
-    procPatch_.send
-    (
-        commsType,
-        patch().patchInternalField(psiInternal)()
-    );
-}
-
-
-template<>
 void processorFvPatchField<scalar>::updateInterfaceMatrix
 (
     const scalarField&,
@@ -64,82 +44,60 @@ void processorFvPatchField<scalar>::updateInterfaceMatrix
     const bool switchToLhs
 ) const
 {
-    scalarField pnf
-    (
-        procPatch_.receive<scalar>(commsType, this->size())()
-    );
+    if (this->updatedMatrix())
+    {
+        return;
+    }
 
-    const unallocLabelList& faceCells = patch().faceCells();
+    if (commsType == Pstream::nonBlocking)
+    {
+        // Fast path.
+        if
+        (
+            outstandingRecvRequest_ >= 0
+         && outstandingRecvRequest_ < Pstream::nRequests()
+        )
+        {
+            Pstream::waitRequest(outstandingRecvRequest_);
+        }
+
+        // Recv finished so assume sending finished as well.
+        outstandingSendRequest_ = -1;
+        outstandingRecvRequest_ = -1;
+    }
+    else
+    {
+        // Check size
+        scalarReceiveBuf_.setSize(this->size());
+
+        procPatch_.receive<scalar>(commsType, scalarReceiveBuf_);
+    }
+
+    // The data is now in scalarReceiveBuf_ for both cases
+
+    // Transform according to the transformation tensor
+    // No transform for scalar.  HJ, 29/Nov/2016
+    
+    // Multiply the field by coefficients and add into the result
+
+    const unallocLabelList& faceCells = this->patch().faceCells();
 
     if (switchToLhs)
     {
-        forAll (faceCells, facei)
+        forAll(faceCells, elemI)
         {
-            result[faceCells[facei]] += coeffs[facei]*pnf[facei];
+            result[faceCells[elemI]] += coeffs[elemI]*scalarReceiveBuf_[elemI];
         }
     }
     else
     {
-        forAll (faceCells, facei)
+        forAll(faceCells, elemI)
         {
-            result[faceCells[facei]] -= coeffs[facei]*pnf[facei];
+            result[faceCells[elemI]] -= coeffs[elemI]*scalarReceiveBuf_[elemI];
         }
     }
-}
 
-
-template<>
-void processorFvPatchField<scalar>::initInterfaceMatrixUpdate
-(
-    const scalarField& psiInternal,
-    scalarField&,
-    const BlockLduMatrix<scalar>&,
-    const CoeffField<scalar>&,
-    const Pstream::commsTypes commsType,
-    const bool switchToLhs
-) const
-{
-    procPatch_.send
-    (
-        commsType,
-        patch().patchInternalField(psiInternal)()
-    );
-}
-
-
-template<>
-void processorFvPatchField<scalar>::updateInterfaceMatrix
-(
-    const scalarField&,
-    scalarField& result,
-    const BlockLduMatrix<scalar>&,
-    const CoeffField<scalar>& coeffs,
-    const Pstream::commsTypes commsType,
-    const bool switchToLhs
-) const
-{
-    scalarField pnf
-    (
-        procPatch_.receive<scalar>(commsType, this->size())()
-    );
-
-    const unallocLabelList& faceCells = patch().faceCells();
-    const scalarField& scalarCoeffs = coeffs.asScalar();
-
-    if (switchToLhs)
-    {
-        forAll (faceCells, facei)
-        {
-            result[faceCells[facei]] += scalarCoeffs[facei]*pnf[facei];
-        }
-    }
-    else
-    {
-        forAll (faceCells, facei)
-        {
-            result[faceCells[facei]] -= scalarCoeffs[facei]*pnf[facei];
-        }
-    }
+    const_cast<processorFvPatchField<scalar>&>(*this).updatedMatrix() = true;
 }
 
 

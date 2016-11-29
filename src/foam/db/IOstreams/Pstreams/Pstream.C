@@ -922,8 +922,6 @@ Foam::Pstream::defaultCommsType
 (
     "commsType",
     "nonBlocking",
-//     "scheduled",
-//     "blocking",
     "blocking, nonBlocking, scheduled"
 );
 
