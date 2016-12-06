@@ -66,12 +66,7 @@ gaussGrad<Type>::grad
 
     GeometricField<GradType, faPatchField, areaMesh>& gGrad = tgGrad();
 
-    gGrad -= vsf*fac::edgeIntegrate(vsf.mesh().Le());
-
-    // Remove component of gradient normal to surface (area)
-    const areaVectorField& n = vsf.mesh().faceAreaNormals();
-
-    gGrad -= n*(n & gGrad);
+    // Removed for consistencty.  Matthias Rauter, 6/Dec/2016
     gGrad.correctBoundaryConditions();
 
     gGrad.rename("grad(" + vsf.name() + ')');
@@ -96,15 +91,9 @@ void gaussGrad<Type>::correctBoundaryConditions
         if (!vsf.boundaryField()[patchI].coupled())
         {
             vectorField m =
-                vsf.mesh().Le().boundaryField()[patchI]
-                /vsf.mesh().magLe().boundaryField()[patchI];
+                vsf.mesh().Le().boundaryField()[patchI]/
+                vsf.mesh().magLe().boundaryField()[patchI];
 
-            // Zeljko Tukovic
-//             gGrad.boundaryField()[patchI] =
-//                 m*vsf.boundaryField()[patchI].snGrad();
-
-            //HJ Not sure: should this be a complete correction or just the
-            //   tangential part?  HJ, 24/Jul/2009
             gGrad.boundaryField()[patchI] += m*
             (
                 vsf.boundaryField()[patchI].snGrad()

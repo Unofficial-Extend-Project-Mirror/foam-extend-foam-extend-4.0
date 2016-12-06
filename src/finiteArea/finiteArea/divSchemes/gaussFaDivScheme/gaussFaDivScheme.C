@@ -62,7 +62,7 @@ gaussDivScheme<Type>::facDiv
         (
             this->mesh_.Le() & this->tinterpScheme_().interpolate(vf)
         )
-      - this->mesh_.faceCurvatures()*(this->mesh_.faceAreaNormals()&vf)
+        // Removed for consistencty.  Matthias Rauter, 6/Dec/2016
     );
 
     tDiv().rename("div(" + vf.name() + ')');

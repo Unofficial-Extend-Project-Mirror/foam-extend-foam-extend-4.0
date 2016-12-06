@@ -23,7 +23,7 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "famDiv.H"
+#include "vectorFamDiv.H"
 #include "faMesh.H"
 #include "faMatrix.H"
 #include "faConvectionScheme.H"
@@ -40,82 +40,21 @@ namespace fam
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-template<class Type>
-tmp<faMatrix<Type> >
+template<>
+tmp<faMatrix<scalar> >
 div
 (
     const edgeScalarField& flux,
-    const GeometricField<Type, faPatchField, areaMesh>& vf,
+    const GeometricField<scalar, faPatchField, areaMesh>& vf,
     const word& name
 )
 {
-    const areaVectorField& n = vf.mesh().faceAreaNormals();
-
-    tmp<faMatrix<Type> > tM
+    return fa::convectionScheme<scalar>::New
     (
-        fa::convectionScheme<Type>::New
-        (
-            vf.mesh(),
-            flux,
-            vf.mesh().schemesDict().divScheme(name)
-        )().famDiv(flux, vf)
-    );
-    faMatrix<Type>& M = tM();
-
-    GeometricField<Type, faPatchField, areaMesh> v
-    (
-        fa::convectionScheme<Type>::New
-        (
-            vf.mesh(),
-            flux,
-            vf.mesh().schemesDict().divScheme(name)
-        )().facDiv(flux, vf)
-    );
-
-    //HJ Check if the product is from left or right.  HJ, 6/Dec/2016
-    M -= (v & n)*n;
-
-    return tM;
-}
-
-
-template<class Type>
-tmp<faMatrix<Type> >
-div
-(
-    const tmp<edgeScalarField>& tflux,
-    const GeometricField<Type, faPatchField, areaMesh>& vf,
-    const word& name
-)
-{
-    tmp<faMatrix<Type> > Div(fam::div(tflux(), vf, name));
-    tflux.clear();
-    return Div;
-}
-
-
-template<class Type>
-tmp<faMatrix<Type> >
-div
-(
-    const edgeScalarField& flux,
-    const GeometricField<Type, faPatchField, areaMesh>& vf
-)
-{
-    return fam::div(flux, vf, "div("+flux.name()+','+vf.name()+')');
-}
-
-template<class Type>
-tmp<faMatrix<Type> >
-div
-(
-    const tmp<edgeScalarField>& tflux,
-    const GeometricField<Type, faPatchField, areaMesh>& vf
-)
-{
-    tmp<faMatrix<Type> > Div(fam::div(tflux(), vf));
-    tflux.clear();
-    return Div;
+        vf.mesh(),
+        flux,
+        vf.mesh().schemesDict().divScheme(name)
+    )().famDiv(flux, vf);
 }
 
 

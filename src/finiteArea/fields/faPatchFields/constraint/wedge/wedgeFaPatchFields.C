@@ -28,7 +28,6 @@ Description
 #include "faPatchFields.H"
 #include "wedgeFaPatchFields.H"
 #include "addToRunTimeSelectionTable.H"
-// #include "volFields.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -36,10 +35,6 @@ namespace Foam
 {
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
-
-// defineNamedTemplateTypeNameAndDebug(wedgeFaPatchScalarField, 0);
-// defineNamedTemplateTypeNameAndDebug(wedgeFaPatchVectorField, 0);
-// defineNamedTemplateTypeNameAndDebug(wedgeFaPatchTensorField, 0);
 
 makeFaPatchFields(wedge);
 

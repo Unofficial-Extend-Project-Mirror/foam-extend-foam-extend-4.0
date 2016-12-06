@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     3.2
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -23,12 +23,13 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "facGrad.H"
+#include "facNGrad.H"
 #include "areaFields.H"
 #include "edgeFields.H"
 #include "facEdgeIntegrate.H"
 #include "faMesh.H"
 #include "faGradScheme.H"
+#include "transformField.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -50,7 +51,7 @@ tmp
         typename outerProduct<vector, Type>::type, faPatchField, areaMesh
     >
 >
-grad
+ngrad
 (
     const GeometricField<Type, faePatchField, edgeMesh>& ssf
 )
@@ -58,13 +59,11 @@ grad
     const areaVectorField &n = ssf.mesh().faceAreaNormals();
     typedef typename outerProduct<vector,Type>::type GradType;
 
-    tmp<GeometricField<GradType, faPatchField, areaMesh> > tgGrad =
-        fac::edgeIntegrate(ssf.mesh().Sf()*ssf);
+    tmp<GeometricField<GradType, faPatchField, areaMesh> > tgGrad = fac::edgeIntegrate(ssf.mesh().Sf() * ssf);
 
-    GeometricField<GradType, faPatchField, areaMesh>& gGrad = tgGrad();
+    GeometricField<GradType, faPatchField, areaMesh>& grad = tgGrad();
 
-    gGrad -= (gGrad & n)*n;
-    gGrad.correctBoundaryConditions();
+    grad = (grad&n)*n;
 
     return tgGrad;
 }
@@ -77,7 +76,7 @@ tmp
         typename outerProduct<vector,Type>::type, faPatchField, areaMesh
     >
 >
-grad
+ngrad
 (
     const tmp<GeometricField<Type, faePatchField, edgeMesh> >& tssf
 )
@@ -85,7 +84,7 @@ grad
     typedef typename outerProduct<vector, Type>::type GradType;
     tmp<GeometricField<GradType, faPatchField, areaMesh> > Grad
     (
-        fac::grad(tssf())
+        fac::ngrad(tssf())
     );
     tssf.clear();
     return Grad;
@@ -100,7 +99,7 @@ tmp
         typename outerProduct<vector,Type>::type, faPatchField, areaMesh
     >
 >
-grad
+ngrad
 (
     const GeometricField<Type, faPatchField, areaMesh>& vf,
     const word& name
@@ -109,17 +108,15 @@ grad
     const areaVectorField &n = vf.mesh().faceAreaNormals();
     typedef typename outerProduct<vector,Type>::type GradType;
 
-    tmp<GeometricField<GradType, faPatchField, areaMesh> > tgGrad =
-        fa::gradScheme<Type>::New
+    tmp<GeometricField<GradType, faPatchField, areaMesh> > tgGrad = fa::gradScheme<Type>::New
         (
             vf.mesh(),
             vf.mesh().schemesDict().gradScheme(name)
         )().grad(vf);
 
-    GeometricField<GradType, faPatchField, areaMesh>& gGrad = tgGrad();
+    GeometricField<GradType, faPatchField, areaMesh>& grad = tgGrad();
 
-    gGrad -= (gGrad & n)*n;
-    gGrad.correctBoundaryConditions();
+    grad = (grad&n)*n;
 
     return tgGrad;
 }
@@ -133,7 +130,7 @@ tmp
         typename outerProduct<vector,Type>::type, faPatchField, areaMesh
     >
 >
-grad
+ngrad
 (
     const tmp<GeometricField<Type, faPatchField, areaMesh> >& tvf,
     const word& name
@@ -147,7 +144,7 @@ grad
         >
     > tGrad
     (
-        fac::grad(tvf(), name)
+        fac::ngrad(tvf(), name)
     );
     tvf.clear();
     return tGrad;
@@ -162,12 +159,12 @@ tmp
         typename outerProduct<vector,Type>::type, faPatchField, areaMesh
     >
 >
-grad
+ngrad
 (
     const GeometricField<Type, faPatchField, areaMesh>& vf
 )
 {
-    return fac::grad(vf, "grad(" + vf.name() + ')');
+    return fac::ngrad(vf, "grad(" + vf.name() + ')');
 }
 
 
@@ -179,7 +176,7 @@ tmp
         typename outerProduct<vector,Type>::type, faPatchField, areaMesh
     >
 >
-grad
+ngrad
 (
     const tmp<GeometricField<Type, faPatchField, areaMesh> >& tvf
 )
@@ -187,7 +184,7 @@ grad
     typedef typename outerProduct<vector, Type>::type GradType;
     tmp<GeometricField<GradType, faPatchField, areaMesh> > Grad
     (
-        fac::grad(tvf())
+        fac::ngrad(tvf())
     );
     tvf.clear();
     return Grad;

@@ -138,11 +138,8 @@ leastSquaresFaGrad<Type>::grad
         }
     }
 
-
     // Remove component of gradient normal to surface (area)
-    const areaVectorField& n = vsf.mesh().faceAreaNormals();
-
-    lsGrad -= n*(n & lsGrad);
+    // Removed for consistencty.  Matthias Rauter, 6/Dec/2016
     lsGrad.correctBoundaryConditions();
 
     gaussGrad<Type>::correctBoundaryConditions(vsf, lsGrad);

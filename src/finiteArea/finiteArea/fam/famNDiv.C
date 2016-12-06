@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     3.2
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -23,7 +23,7 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "famDiv.H"
+#include "famNDiv.H"
 #include "faMesh.H"
 #include "faMatrix.H"
 #include "faConvectionScheme.H"
@@ -42,53 +42,31 @@ namespace fam
 
 template<class Type>
 tmp<faMatrix<Type> >
-div
+ndiv
 (
     const edgeScalarField& flux,
-    const GeometricField<Type, faPatchField, areaMesh>& vf,
+    GeometricField<Type, faPatchField, areaMesh>& vf,
     const word& name
 )
 {
-    const areaVectorField& n = vf.mesh().faceAreaNormals();
-
-    tmp<faMatrix<Type> > tM
+    return fa::convectionScheme<Type>::New
     (
-        fa::convectionScheme<Type>::New
-        (
-            vf.mesh(),
-            flux,
-            vf.mesh().schemesDict().divScheme(name)
-        )().famDiv(flux, vf)
-    );
-    faMatrix<Type>& M = tM();
-
-    GeometricField<Type, faPatchField, areaMesh> v
-    (
-        fa::convectionScheme<Type>::New
-        (
-            vf.mesh(),
-            flux,
-            vf.mesh().schemesDict().divScheme(name)
-        )().facDiv(flux, vf)
-    );
-
-    //HJ Check if the product is from left or right.  HJ, 6/Dec/2016
-    M -= (v & n)*n;
-
-    return tM;
+        vf.mesh(),
+        flux,
+        vf.mesh().schemesDict().divScheme(name)
+    )().famDiv(flux, vf);//TODO calculate normal
 }
-
 
 template<class Type>
 tmp<faMatrix<Type> >
-div
+ndiv
 (
     const tmp<edgeScalarField>& tflux,
-    const GeometricField<Type, faPatchField, areaMesh>& vf,
+    GeometricField<Type, faPatchField, areaMesh>& vf,
     const word& name
 )
 {
-    tmp<faMatrix<Type> > Div(fam::div(tflux(), vf, name));
+    tmp<faMatrix<Type> > Div(fam::ndiv(tflux(), vf, name));
     tflux.clear();
     return Div;
 }
@@ -96,24 +74,24 @@ div
 
 template<class Type>
 tmp<faMatrix<Type> >
-div
+ndiv
 (
     const edgeScalarField& flux,
-    const GeometricField<Type, faPatchField, areaMesh>& vf
+    GeometricField<Type, faPatchField, areaMesh>& vf
 )
 {
-    return fam::div(flux, vf, "div("+flux.name()+','+vf.name()+')');
+    return fam::ndiv(flux, vf, "div("+flux.name()+','+vf.name()+')');
 }
 
 template<class Type>
 tmp<faMatrix<Type> >
-div
+ndiv
 (
     const tmp<edgeScalarField>& tflux,
-    const GeometricField<Type, faPatchField, areaMesh>& vf
+    GeometricField<Type, faPatchField, areaMesh>& vf
 )
 {
-    tmp<faMatrix<Type> > Div(fam::div(tflux(), vf));
+    tmp<faMatrix<Type> > Div(fam::ndiv(tflux(), vf));
     tflux.clear();
     return Div;
 }
