@@ -610,6 +610,7 @@ bool Foam::processorFvPatchField<Type>::ready() const
     )
     {
         bool finished = Pstream::finishedRequest(outstandingSendRequest_);
+
         if (!finished)
         {
             return false;
