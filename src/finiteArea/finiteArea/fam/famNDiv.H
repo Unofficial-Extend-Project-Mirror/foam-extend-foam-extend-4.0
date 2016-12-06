@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     3.2
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -21,25 +21,80 @@ License
     You should have received a copy of the GNU General Public License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
+Namespace
+    fam
+
 Description
+    Calculate the matrix for the divergence of the given field and flux.
+
+SourceFiles
+    famDiv.C
 
 \*---------------------------------------------------------------------------*/
 
-#include "faPatchFields.H"
-#include "transformFaPatchFields.H"
-#include "addToRunTimeSelectionTable.H"
+#ifndef famNDiv_H
+#define famNDiv_H
+
+#include "areaFieldsFwd.H"
+#include "edgeFieldsFwd.H"
+#include "edgeInterpolationScheme.H"
+#include "faMatrix.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 
-// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
+/*---------------------------------------------------------------------------*\
+                     Namespace fam functions Declaration
+\*---------------------------------------------------------------------------*/
 
-makeFaPatchFieldsTypeName(transform);
+namespace fam
+{
+    template<class Type>
+    tmp<faMatrix<Type> > ndiv
+    (
+        const edgeScalarField&,
+        GeometricField<Type, faPatchField, areaMesh>&,
+        const word& name
+    );
+
+    template<class Type>
+    tmp<faMatrix<Type> > ndiv
+    (
+        const tmp<edgeScalarField>&,
+        GeometricField<Type, faPatchField, areaMesh>&,
+        const word& name
+    );
+
+    template<class Type>
+    tmp<faMatrix<Type> > ndiv
+    (
+        const edgeScalarField&,
+        GeometricField<Type, faPatchField, areaMesh>&
+    );
+
+    template<class Type>
+    tmp<faMatrix<Type> > ndiv
+    (
+        const tmp<edgeScalarField>&,
+        GeometricField<Type, faPatchField, areaMesh>&
+    );
+}
+
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#ifdef NoRepository
+#   include "famNDiv.C"
+#endif
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#endif
 
 // ************************************************************************* //

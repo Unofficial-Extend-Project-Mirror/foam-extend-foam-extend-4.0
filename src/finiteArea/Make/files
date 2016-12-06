@@ -48,6 +48,8 @@ derivedFaPatchFields = $(faPatchFields)/derived
 $(derivedFaPatchFields)/fixedValueOutflow/fixedValueOutflowFaPatchFields.C
 $(derivedFaPatchFields)/inletOutlet/inletOutletFaPatchFields.C
 $(derivedFaPatchFields)/slip/slipFaPatchFields.C
+$(derivedFaPatchFields)/edgeNormalFixedValue/edgeNormalFixedValueFaPatchVectorField.C
+$(derivedFaPatchFields)/timeVaryingUniformFixedValue/timeVaryingUniformFixedValueFaPatchFields.C
 
 faePatchFields = fields/faePatchFields
 $(faePatchFields)/faePatchField/faePatchFields.C
@@ -92,6 +94,7 @@ $(ddtSchemes)/backwardFaDdtScheme/backwardFaDdtSchemes.C
 $(ddtSchemes)/boundedBackwardFaDdtScheme/boundedBackwardFaDdtScheme.C
 
 divSchemes = finiteArea/divSchemes
+finiteArea/fam/vectorFamDiv.C
 $(divSchemes)/faDivScheme/faDivSchemes.C
 $(divSchemes)/gaussFaDivScheme/gaussFaDivSchemes.C
 

@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     3.2
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -23,7 +23,7 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "facDiv.H"
+#include "facNDiv.H"
 #include "faMesh.H"
 #include "facEdgeIntegrate.H"
 #include "faDivScheme.H"
@@ -44,33 +44,30 @@ namespace fac
 
 template<class Type>
 tmp<GeometricField<Type, faPatchField, areaMesh> >
-div
+ndiv
 (
     const GeometricField<Type, faePatchField, edgeMesh>& ssf
 )
 {
-    const areaVectorField& n = ssf.mesh().faceAreaNormals();
+    const areaVectorField &n = ssf.mesh().faceAreaNormals();
 
-    tmp<GeometricField<Type, faPatchField, areaMesh> > tDiv =
-        fac::edgeIntegrate(ssf);
+    tmp<GeometricField<Type, faPatchField, areaMesh> > v = fac::edgeIntegrate(ssf);
 
-    GeometricField<Type, faPatchField, areaMesh>& Div = tDiv();
+    //v.internalField() = transform(n*n, v.internalField());
+    v.internalField() = (v.internalField()&n)*n;
 
-    Div.internalField() = transform(tensor::I - sqr(n), Div.internalField());
-    Div.correctBoundaryConditions();
-
-    return tDiv;
+    return v;
 }
 
 
 template<class Type>
 tmp<GeometricField<Type, faPatchField, areaMesh> >
-div
+ndiv
 (
     const tmp<GeometricField<Type, faePatchField, edgeMesh> >& tssf
 )
 {
-    tmp<GeometricField<Type, faPatchField, areaMesh> > Div(fac::div(tssf()));
+    tmp<GeometricField<Type, faPatchField, areaMesh> > Div(fac::ndiv(tssf()));
     tssf.clear();
     return Div;
 }
@@ -84,39 +81,26 @@ tmp
         typename innerProduct<vector, Type>::type, faPatchField, areaMesh
     >
 >
-div
+ndiv
 (
     const GeometricField<Type, faPatchField, areaMesh>& vf,
     const word& name
 )
 {
-    const areaVectorField& n = vf.mesh().faceAreaNormals();
+    const areaVectorField &n = vf.mesh().faceAreaNormals();
 
-    tmp
-    <
-        GeometricField
-        <
-            typename innerProduct<vector, Type>::type,
-            faPatchField,
-            areaMesh
-        >
-    > tDiv
+    tmp<GeometricField<Type, faPatchField, areaMesh> > tDiv
     (
         fa::divScheme<Type>::New
-        (
-            vf.mesh(), vf.mesh().schemesDict().divScheme(name)
-        )().facDiv(vf)
+            (
+                vf.mesh(), vf.mesh().schemesDict().divScheme(name)
+            )().facDiv(vf)
     );
-    GeometricField
-    <
-        typename innerProduct<vector, Type>::type,
-        faPatchField,
-        areaMesh
-    >& Div = tDiv();
 
-    Div.internalField() = transform(tensor::I - sqr(n), Div.internalField());
-    Div.correctBoundaryConditions();
+    GeometricField<Type, faPatchField, areaMesh>& Div = tDiv();
 
+    //Div.internalField() = transform(n*n, Div.internalField());
+    Div.internalField() = (Div.internalField()&n)*n;
     return tDiv;
 }
 
@@ -129,7 +113,7 @@ tmp
         typename innerProduct<vector, Type>::type, faPatchField, areaMesh
     >
 >
-div
+ndiv
 (
     const tmp<GeometricField<Type, faPatchField, areaMesh> >& tvvf,
     const word& name
@@ -138,7 +122,7 @@ div
     typedef typename innerProduct<vector, Type>::type DivType;
     tmp<GeometricField<DivType, faPatchField, areaMesh> > Div
     (
-        fac::div(tvvf(), name)
+        fac::ndiv(tvvf(), name)
     );
     tvvf.clear();
     return Div;
@@ -152,12 +136,12 @@ tmp
         typename innerProduct<vector, Type>::type, faPatchField, areaMesh
     >
 >
-div
+ndiv
 (
     const GeometricField<Type, faPatchField, areaMesh>& vf
 )
 {
-    return fac::div(vf, "div("+vf.name()+')');
+    return fac::ndiv(vf, "div("+vf.name()+')');
 }
 
 
@@ -169,7 +153,7 @@ tmp
         typename innerProduct<vector, Type>::type, faPatchField, areaMesh
     >
 >
-div
+ndiv
 (
     const tmp<GeometricField<Type, faPatchField, areaMesh> >& tvvf
 )
@@ -177,7 +161,7 @@ div
     typedef typename innerProduct<vector, Type>::type DivType;
     tmp<GeometricField<DivType, faPatchField, areaMesh> > Div
     (
-        fac::div(tvvf())
+        fac::ndiv(tvvf())
     );
 
     tvvf.clear();
@@ -187,28 +171,29 @@ div
 
 template<class Type>
 tmp<GeometricField<Type, faPatchField, areaMesh> >
-div
+ndiv
 (
     const edgeScalarField& flux,
     const GeometricField<Type, faPatchField, areaMesh>& vf,
     const word& name
 )
 {
-    const areaVectorField& n = vf.mesh().faceAreaNormals();
+    const areaVectorField &n = vf.mesh().faceAreaNormals();
 
     tmp<GeometricField<Type, faPatchField, areaMesh> > tDiv
     (
         fa::convectionScheme<Type>::New
-        (
-            vf.mesh(),
-            flux,
-            vf.mesh().schemesDict().divScheme(name)
-        )().facDiv(flux, vf)
+            (
+                vf.mesh(),
+                flux,
+                vf.mesh().schemesDict().divScheme(name)
+            )().facDiv(flux, vf)
     );
+
     GeometricField<Type, faPatchField, areaMesh>& Div = tDiv();
 
-    Div.internalField() = transform(tensor::I - sqr(n), Div.internalField());
-    Div.correctBoundaryConditions();
+    //Div.internalField() = transform(n*n, Div.internalField());
+    Div.internalField() = (Div.internalField()&n)*n;
 
     return tDiv;
 
@@ -217,7 +202,7 @@ div
 
 template<class Type>
 tmp<GeometricField<Type, faPatchField, areaMesh> >
-div
+ndiv
 (
     const tmp<edgeScalarField>& tflux,
     const GeometricField<Type, faPatchField, areaMesh>& vf,
@@ -226,7 +211,7 @@ div
 {
     tmp<GeometricField<Type, faPatchField, areaMesh> > Div
     (
-        fac::div(tflux(), vf, name)
+        fac::ndiv(tflux(), vf, name)
     );
     tflux.clear();
     return Div;
@@ -235,7 +220,7 @@ div
 
 template<class Type>
 tmp<GeometricField<Type, faPatchField, areaMesh> >
-div
+ndiv
 (
     const edgeScalarField& flux,
     const tmp<GeometricField<Type, faPatchField, areaMesh> >& tvf,
@@ -244,7 +229,7 @@ div
 {
     tmp<GeometricField<Type, faPatchField, areaMesh> > Div
     (
-        fac::div(flux, tvf(), name)
+        fac::ndiv(flux, tvf(), name)
     );
     tvf.clear();
     return Div;
@@ -253,7 +238,7 @@ div
 
 template<class Type>
 tmp<GeometricField<Type, faPatchField, areaMesh> >
-div
+ndiv
 (
     const tmp<edgeScalarField>& tflux,
     const tmp<GeometricField<Type, faPatchField, areaMesh> >& tvf,
@@ -262,7 +247,7 @@ div
 {
     tmp<GeometricField<Type, faPatchField, areaMesh> > Div
     (
-        fac::div(tflux(), tvf(), name)
+        fac::ndiv(tflux(), tvf(), name)
     );
     tflux.clear();
     tvf.clear();
@@ -272,13 +257,13 @@ div
 
 template<class Type>
 tmp<GeometricField<Type, faPatchField, areaMesh> >
-div
+ndiv
 (
     const edgeScalarField& flux,
     const GeometricField<Type, faPatchField, areaMesh>& vf
 )
 {
-    return fac::div
+    return fac::ndiv
     (
         flux, vf, "div("+flux.name()+','+vf.name()+')'
     );
@@ -287,7 +272,7 @@ div
 
 template<class Type>
 tmp<GeometricField<Type, faPatchField, areaMesh> >
-div
+ndiv
 (
     const tmp<edgeScalarField>& tflux,
     const GeometricField<Type, faPatchField, areaMesh>& vf
@@ -295,7 +280,7 @@ div
 {
     tmp<GeometricField<Type, faPatchField, areaMesh> > Div
     (
-        fac::div(tflux(), vf)
+        fac::ndiv(tflux(), vf)
     );
     tflux.clear();
     return Div;
@@ -304,7 +289,7 @@ div
 
 template<class Type>
 tmp<GeometricField<Type, faPatchField, areaMesh> >
-div
+ndiv
 (
     const edgeScalarField& flux,
     const tmp<GeometricField<Type, faPatchField, areaMesh> >& tvf
@@ -312,7 +297,7 @@ div
 {
     tmp<GeometricField<Type, faPatchField, areaMesh> > Div
     (
-        fac::div(flux, tvf())
+        fac::ndiv(flux, tvf())
     );
     tvf.clear();
     return Div;
@@ -321,7 +306,7 @@ div
 
 template<class Type>
 tmp<GeometricField<Type, faPatchField, areaMesh> >
-div
+ndiv
 (
     const tmp<edgeScalarField>& tflux,
     const tmp<GeometricField<Type, faPatchField, areaMesh> >& tvf
@@ -329,7 +314,7 @@ div
 {
     tmp<GeometricField<Type, faPatchField, areaMesh> > Div
     (
-        fac::div(tflux(), tvf())
+        fac::ndiv(tflux(), tvf())
     );
     tflux.clear();
     tvf.clear();

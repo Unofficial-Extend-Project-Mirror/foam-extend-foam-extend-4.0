@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     3.2
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -22,24 +22,22 @@ License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Namespace
-    fam
+    fac
 
 Description
-    Calculate the matrix for the divergence of the given field and flux.
+    Calculate the gradient normal to the surface of the given field.
 
 SourceFiles
-    famDiv.C
-    vectorFamDiv.C
+    facGrad.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef famDiv_H
-#define famDiv_H
+
+#ifndef facNGrad_H
+#define facNGrad_H
 
 #include "areaFieldsFwd.H"
 #include "edgeFieldsFwd.H"
-#include "edgeInterpolationScheme.H"
-#include "faMatrix.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -47,39 +45,71 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                     Namespace fam functions Declaration
+                     Namespace fac functions Declaration
 \*---------------------------------------------------------------------------*/
 
-namespace fam
+namespace fac
 {
     template<class Type>
-    tmp<faMatrix<Type> > div
+    tmp
+    <
+        GeometricField
+        <typename outerProduct<vector, Type>::type, faPatchField, areaMesh>
+    > ngrad
     (
-        const edgeScalarField&,
+        const GeometricField<Type, faePatchField, edgeMesh>&
+    );
+
+    template<class Type>
+    tmp
+    <
+        GeometricField
+        <typename outerProduct<vector, Type>::type, faPatchField, areaMesh>
+    > ngrad
+    (
+        const tmp<GeometricField<Type, faePatchField, edgeMesh> >&
+    );
+
+    template<class Type>
+    tmp
+    <
+        GeometricField
+        <typename outerProduct<vector, Type>::type, faPatchField, areaMesh>
+    >ngrad
+    (
         const GeometricField<Type, faPatchField, areaMesh>&,
         const word& name
     );
 
     template<class Type>
-    tmp<faMatrix<Type> > div
+    tmp
+    <
+        GeometricField
+        <typename outerProduct<vector, Type>::type, faPatchField, areaMesh>
+    >ngrad
     (
-        const tmp<edgeScalarField>&,
-        const GeometricField<Type, faPatchField, areaMesh>&,
+        const tmp<GeometricField<Type, faPatchField, areaMesh> >&,
         const word& name
     );
 
     template<class Type>
-    tmp<faMatrix<Type> > div
+    tmp
+    <
+        GeometricField
+        <typename outerProduct<vector, Type>::type, faPatchField, areaMesh>
+    >ngrad
     (
-        const edgeScalarField&,
         const GeometricField<Type, faPatchField, areaMesh>&
     );
 
     template<class Type>
-    tmp<faMatrix<Type> > div
+    tmp
+    <
+        GeometricField
+        <typename outerProduct<vector, Type>::type, faPatchField, areaMesh>
+    >ngrad
     (
-        const tmp<edgeScalarField>&,
-        const GeometricField<Type, faPatchField, areaMesh>&
+        const tmp<GeometricField<Type, faPatchField, areaMesh> >&
     );
 }
 
@@ -90,11 +120,8 @@ namespace fam
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-// Template specialisation
-#include "vectorFamDiv.H"
-
 #ifdef NoRepository
-#   include "famDiv.C"
+#   include "facNGrad.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

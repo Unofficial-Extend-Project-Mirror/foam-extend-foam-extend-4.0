@@ -21,25 +21,54 @@ License
     You should have received a copy of the GNU General Public License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
+Typedef
+    Foam::fam
+
 Description
+    Specialisation of fam div for a flux.
+
+SourceFiles
+    vectorFamDiv.C
 
 \*---------------------------------------------------------------------------*/
 
-#include "faPatchFields.H"
-#include "transformFaPatchFields.H"
-#include "addToRunTimeSelectionTable.H"
+#ifndef vectorFamDiv_H
+#define vectorFamDiv_H
+
+#include "famDiv.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 
-// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
+namespace fam
+{
 
-makeFaPatchFieldsTypeName(transform);
+/*---------------------------------------------------------------------------*\
+                     Namespace fam functions Declaration
+\*---------------------------------------------------------------------------*/
+
+template<>
+tmp<faMatrix<scalar> >
+div
+(
+    const edgeScalarField& flux,
+    const GeometricField<scalar, faPatchField, areaMesh>& vf,
+    const word& name
+);
+
+    
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+}
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#endif
 
 // ************************************************************************* //

@@ -21,25 +21,31 @@ License
     You should have received a copy of the GNU General Public License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
-Description
-
 \*---------------------------------------------------------------------------*/
 
-#include "faPatchFields.H"
-#include "transformFaPatchFields.H"
-#include "addToRunTimeSelectionTable.H"
+#ifndef timeVaryingUniformFixedValueFaPatchFieldsFwd_H
+#define timeVaryingUniformFixedValueFaPatchFieldsFwd_H
+
+#include "faPatchField.H"
+#include "fieldTypes.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 
-// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-makeFaPatchFieldsTypeName(transform);
+template<class Type> class timeVaryingUniformFixedValueFaPatchField;
+
+makeFaPatchTypeFieldTypedefs(timeVaryingUniformFixedValue);
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#endif
 
 // ************************************************************************* //
