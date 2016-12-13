@@ -1,13 +1,13 @@
 #                            -*- mode: org; -*-
 #
-#+TITLE:             *Release notes for foam-extend-3.2*
+#+TITLE:             *Release notes for foam-extend-4.0*
 #+AUTHOR:                foam-extend administrators:
 #+AUTHOR:                        Hrvoje Jasak
 #+AUTHOR:                       Håkan Nilsson
 #+AUTHOR:                       Henrik Rusche
 #+AUTHOR:                      Martin Beaudoin
 #+AUTHOR:                     Bernhard Gschaider
-#+DATE:                          August 2015
+#+DATE:                          December 2016
 #+LINK:                     http://foam-extend.org
 #+OPTIONS: author:nil
 #+OPTIONS: toc:2
@@ -31,9 +31,9 @@
   comprehensive dynamic mesh (motion and topological changes)
   capability and GPU support. For a full list, see below and previous
   release notes at:
-  http://sourceforge.net/p/openfoam-extend/wiki/Home/
+  http://sourceforge.net/p/foam-extend/wiki/Home/
 
-  Version 3.2, nicknamed "Ann Arbor", is the current version of
+  Version 4.0, nicknamed "Guimaraes", is the current version of
   foam-extend. The release continues the tradition and spirit of the
   original FOAM code developed by prof. Jasak and Mr. Weller during
   their time at Imperial College and released as the general purpose
@@ -47,21 +47,22 @@
 
 
 ** Installation
-   foam-extend-3.2 can be compiled and runs on a large variety of Linux, Mac or Windows
+   foam-extend-4.0 can be compiled and runs on a large variety of Linux, Mac or Windows
    systems
 
   * Main supported OSs:
-    - Ubuntu 14.04
-    - Fedora 20
+    - Ubuntu 16.04 LTS
+    - Ubuntu 14.04 LTS
+    - Fedora 24
     - Mac OS X
-    - Microsoft Windows 7 and 8.1
+    - Microsoft Windows 7, 8.1 and 10
 
   * Compile from source:
 
     Please refer to doc/buildInstructions/ for details. Further
     installation instruction are available on the unofficial OpenFOAM
     Wiki:
-    http://openfoamwiki.net/index.php/Installation/Linux/foam-extend-3.1
+    http://openfoamwiki.net/index.php/Installation/Linux/foam-extend-4.0
     If you have improvements or build instructions for a new system,
     please share them with the community (see section "How to
     contribute", below).
@@ -69,8 +70,8 @@
   * Download binary packages:
 
     Binary packages are available for download at
-    http://sourceforge.net/projects/openfoam-extend/ for the following
-    systems: Ubuntu 14.04, Fedora 20 and Mac OS X.
+    http://sourceforge.net/projects/foam-extend/ for the following
+    systems: Ubuntu 16.04, Fedora 24 and Mac OS X and Windows 10.
 
   * Accompanying ThirdParty software:
     - gcc compatibility up to 4.9.2
@@ -81,20 +82,20 @@
     - libccmio 2.6.1
     - mesquite 2.1.2
     - metis 5.1.0
-    - openmpi 1.6.5
-    - Paraview 4.3.1
+    - openmpi 1.8.8
+    - Paraview 4.4.0
     - parmetis 4.0.3
     - ParMGridGen 1.0
     - PyFoam 0.6.4
     - qt 4.8.6
     - scotch 6.0.4
-    - swak4Foam 0.3.2
+    - swak4Foam 0.4.0
 
 
 ** Compatibility
   Upstream features from the OpenFOAM® code base are merged into
   foam-extend on regular basis. The interface format of
-  foam-extend-3.2 is largely compatible to foam-extend-3.1, to
+  foam-extend-4.0 is largely compatible to foam-extend-3.2, to
   OpenFOAM-1.6-ext and OpenFOAM-1.7.x. In some cases, the
   differences are caused by bug fixes and algorithmic improvements,
   considered more important than inter-operability.
@@ -172,108 +173,96 @@
 
   * Algebraic multigrid solver framework
 
-  * 243 tutorials with automated run scripts
+  * 253 tutorials with automated run scripts
 
   * Automatic test harness
 
   * Approximately 6000 bug fixes in fundamental level libraries and
     discretisation techniques
 
-** New features in foam-extend-3.2, since foam-extend-3.1
+** New features in foam-extend-4.0, since foam-extend-3.2
   The list of features is a result of the work of numerous
   contributors. The maintainers of foam-extend would formally like to
   thank them all.
 
   Get a full log of the updates by (either):
 #+BEGIN_SRC bash
-    user@machine> git log 3.1.. > commitLog
+    user@machine> git log 4.0.. > commitLog
 #+END_SRC
 #+BEGIN_SRC bash
-    user@machine> git log 3.1.. --oneline > commitLog
+    user@machine> git log 4.0.. --oneline > commitLog
 #+END_SRC
 #+BEGIN_SRC bash
-    user@machine> gitg 3.1..
+    user@machine> gitg 4.0..
 #+END_SRC
 
   * Major new features:
-    - Immersed Boundary method: full release
-    - Liquid film method, based on finite area infrastructure
-    - Global controlDict switches controlled from command line
-    - Integration of cfMesh automatic mesh solvers
-    - Update to block coupled solvers: Performance, Coupled RAS, MRF
-    - Rewrite of block-coupled matrix assembly and analysis tools
-    - New solver: potentialDyMFoam
-    - Rothalpy in compressible MRF solvers for turbomachinery
-    - Symmetry 2nd order accurate boundary condition
-    - Generation of config files (e.g. csh, tcsh, fishshell, zsh) from bashrc
-    - Overhaul of fvDOM radiation model: symmetry plane and fast convergence
-    - New compilers: GCC new versions, Icc 14 and Icc 16, Clang
-    - Long long support
-    - Long double support
-    - SuperBee01 and SuperBee01DC
-    - wallShearStress also for compressible flow (backport)
-    - Version updates of 3rd Party, PyFOAM, swak4Foam
-    - Extend-bazaar: Added makeAxialMesh
-    - Added limiters on turbulence viscosity
-    - Initial version of block-coupled turbulence models
-    - New ThirdParty app: ParaView server for parallel rendering
-
-  * Licence: GPLv3
+    - Improved BlockLduMatrix and block-coupled p-U solver and associated tools
+    - ILUCp and block ILUCp preconditioners
+    - Added MRF and porous media handling to the block-coupled solver
+    - Change of generic turbulence modelling interface: no U required
+    - Updated version of block-coupled turbulence models
+    - Major improvements in immersed boundary method library: improved performance
+      and parallel scaling.  Completed supporft for moving deforming immersed boundary
+    - Adopted vanilla OpenFOAM solver control format (solutionControl class)
+    - Implicit adjoint convection operator
+    - Improved GGI interpolation and cutting, with better parallel scaling
+    - Global GGI search option for parallel cases
+    - GGI and mixing planes with jump condition for the rothalpy equation
+    - Improved 6-DOF solver, with new handling of constraints
+    - Fully integrated real gas library
+    - Updated viscoelastoplastic models
+    - New steady-state universal flow solver, handling incompressible and compressible
+      flows within the same framework
+    - Time consistent incompressible solvers update
+    - Added decaying turbulence inlet boundary condition by Kornev
+    - New gradient limiter implementation
+    - Full gradient cacheing capability
+    - Removed fluxRequired from solution dictionaries
+    - Consistent notation of 1/aP
+    - Dynamic mesh improvements: prescribed motion functions
 
   * Software
-    - File name changes resolving name clashes on non-case-sensitive filing
-      systems
-    - Unified code base for Windows, Mac OS X and Linux compilation
-    - Parallel execution of automated test loops
+    - New handling of lnInclude directories: avoid file copying on MS Windows
+    - Changes to controlDict and options on MS Windows
+    - Consistency in formatting of compression options
+    - Raspberry Pi port
 
   * Installation:
-    - Native port to Microsoft Windows 7 and 8.1
-    - Updated and bug-fixed installation procedures
-    - Improved ThirdParty packages selection mechanism
+    - Compilation improvements
+    - Updated packages versions and compilation in ThirdParty
+    - Changed compilation options for Infiniband: new versions of MPI
+    - Added support for mvapich2-2.2
+    - Updated compilation for latest version of XCode for Mac OSX
+    - Updates for MS Windows build
 
   * Solvers:
-    - potentialDyMFoam
-    - sonicDyMFoam
-    - sonicFoamAutoMotion
-    - MRFPorousFoam
-    - liquidFilmFoam
-    - surfactantFoam
-    - icoIbFoam
-    - interIbFoam
-    - porousSimpleIbFoam
-    - potentialIbFoam
-    - simpleIbFoam
+    - Updated time consistent incompressible solvers (channelFoam, icoFoam, nonNewtonianIcoFoam, pimpleDyMFoam, pimpleFoam, simpleFoam, simpleSRFFoam)
+    - Steady universal (compressible and incompressible) flow solver (steadyUniversalFoam)
+    - Block-coupled p-U solver improvements (MRFPorousFoam and pUCoupledFoam)
+    - Improved steadyCompressibleMRFFoam
 
   * New tutorials:
-    - Mesquite mesh movement
-    - Immersed boundary method
-    - Liquid film examples
+    - Transient real fluid examples
+    - Universal steady-state MRF examples
+    - Additional coupled CHT example
+    - Additional immersed boundary example
+    - Additional steady-state MRF and GGI example
 
   * Bug fixes: see git log for details
 
 ** Recent successful compilations and tests
-   * CentOS 6.6:
-
-     http://foam-extend.sourceforge.net/CDash/buildSummary.php?buildid=49
-     http://foam-extend.sourceforge.net/CDash/buildSummary.php?buildid=48
-
-   * Ubuntu 14.04
-
-     http://foam-extend.sourceforge.net/CDash/buildSummary.php?buildid=47
-
-   * Mac OS X 10.10
-
-    http://foam-extend.sourceforge.net/CDash/buildSummary.php?buildid=46
+   * Ubuntu 16.04 LTS
 
 ** Reporting bugs
     To report bugs, please use the bugtracker at
-    http://sourceforge.net/p/openfoam-extend/ticketsfoamextendrelease/
+    http://sourceforge.net/p/foam-extend/tickets/
 
 ** How to contribute
     All your contributions are highly welcome: New solvers, utilities and
     models; bug fixes; documentation. The many ways of contributing and the
     contribution process are described in detail at:
-    http://sourceforge.net/p/openfoam-extend/wiki/HowToContribute/
+    http://sourceforge.net/p/foam-extend/wiki/HowToContribute/
 
 ** List of Contributors:
     See file ListOfContributors

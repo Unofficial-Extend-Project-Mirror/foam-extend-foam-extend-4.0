@@ -3,8 +3,8 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<title><b>Release notes for foam-extend-3.2</b></title>
-<!-- 2015-09-11 Fri 18:01 -->
+<title><b>Release notes for foam-extend-4.0</b></title>
+<!-- 2016-12-09 Fri 16:16 -->
 <meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta  name="generator" content="Org-mode" />
 <style type="text/css">
@@ -54,6 +54,8 @@
   pre.src-sql:before   { content: 'SQL'; }
 
   table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
   td, th { vertical-align:top;  }
   th.right  { text-align: center;  }
   th.left   { text-align: center;   }
@@ -134,7 +136,7 @@ for the JavaScript code in this tag.
 </head>
 <body>
 <div id="content">
-<h1 class="title"><b>Release notes for foam-extend-3.2</b></h1>
+<h1 class="title"><b>Release notes for foam-extend-4.0</b></h1>
 <div id="table-of-contents">
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
@@ -143,7 +145,7 @@ for the JavaScript code in this tag.
 <li><a href="#sec-2">2. Installation</a></li>
 <li><a href="#sec-3">3. Compatibility</a></li>
 <li><a href="#sec-4">4. Main differentiators between foam-extend and OpenFOAM</a></li>
-<li><a href="#sec-5">5. New features in foam-extend-3.2, since foam-extend-3.1</a></li>
+<li><a href="#sec-5">5. New features in foam-extend-4.0, since foam-extend-3.2</a></li>
 <li><a href="#sec-6">6. Recent successful compilations and tests</a></li>
 <li><a href="#sec-7">7. Reporting bugs</a></li>
 <li><a href="#sec-8">8. How to contribute</a></li>
@@ -173,11 +175,11 @@ transfer and other physics coupling, finite area method,
 comprehensive dynamic mesh (motion and topological changes)
 capability and GPU support. For a full list, see below and previous
 release notes at:
-<a href="http://sourceforge.net/p/openfoam-extend/wiki/Home/">http://sourceforge.net/p/openfoam-extend/wiki/Home/</a>
+<a href="http://sourceforge.net/p/foam-extend/wiki/Home/">http://sourceforge.net/p/foam-extend/wiki/Home/</a>
 </p>
 
 <p>
-Version 3.2, nicknamed "Ann Arbor", is the current version of
+Version 4.0, nicknamed "Guimaraes", is the current version of
 foam-extend. The release continues the tradition and spirit of the
 original FOAM code developed by prof. Jasak and Mr. Weller during
 their time at Imperial College and released as the general purpose
@@ -194,24 +196,27 @@ foam-extend are a community effort not endorsed by ESI Group.
 </div>
 </div>
 
+
 <div id="outline-container-sec-2" class="outline-2">
 <h2 id="sec-2"><span class="section-number-2">2</span> Installation</h2>
 <div class="outline-text-2" id="text-2">
 <p>
-foam-extend-3.2 can be compiled and runs on a large variety of Linux, Mac or Windows
+foam-extend-4.0 can be compiled and runs on a large variety of Linux, Mac or Windows
 systems
 </p>
 
 <ul class="org-ul">
 <li>Main supported OSs:
 <ul class="org-ul">
-<li>Ubuntu 14.04
+<li>Ubuntu 16.04 LTS
 </li>
-<li>Fedora 20
+<li>Ubuntu 14.04 LTS
+</li>
+<li>Fedora 24
 </li>
 <li>Mac OS X
 </li>
-<li>Microsoft Windows 7 and 8.1
+<li>Microsoft Windows 7, 8.1 and 10
 </li>
 </ul>
 </li>
@@ -222,7 +227,7 @@ systems
 Please refer to doc/buildInstructions/ for details. Further
 installation instruction are available on the unofficial OpenFOAM
 Wiki:
-<a href="http://openfoamwiki.net/index.php/Installation/Linux/foam-extend-3.1">http://openfoamwiki.net/index.php/Installation/Linux/foam-extend-3.1</a>
+<a href="http://openfoamwiki.net/index.php/Installation/Linux/foam-extend-4.0">http://openfoamwiki.net/index.php/Installation/Linux/foam-extend-4.0</a>
 If you have improvements or build instructions for a new system,
 please share them with the community (see section "How to
 contribute", below).
@@ -233,8 +238,8 @@ contribute", below).
 
 <p>
 Binary packages are available for download at
-<a href="http://sourceforge.net/projects/openfoam-extend/">http://sourceforge.net/projects/openfoam-extend/</a> for the following
-systems: Ubuntu 14.04, Fedora 20 and Mac OS X.
+<a href="http://sourceforge.net/projects/foam-extend/">http://sourceforge.net/projects/foam-extend/</a> for the following
+systems: Ubuntu 16.04, Fedora 24 and Mac OS X and Windows 10.
 </p>
 </li>
 
@@ -256,9 +261,9 @@ systems: Ubuntu 14.04, Fedora 20 and Mac OS X.
 </li>
 <li>metis 5.1.0
 </li>
-<li>openmpi 1.6.5
+<li>openmpi 1.8.8
 </li>
-<li>Paraview 4.3.1
+<li>Paraview 4.4.0
 </li>
 <li>parmetis 4.0.3
 </li>
@@ -270,7 +275,7 @@ systems: Ubuntu 14.04, Fedora 20 and Mac OS X.
 </li>
 <li>scotch 6.0.4
 </li>
-<li>swak4Foam 0.3.2
+<li>swak4Foam 0.4.0
 </li>
 </ul>
 </li>
@@ -278,19 +283,21 @@ systems: Ubuntu 14.04, Fedora 20 and Mac OS X.
 </div>
 </div>
 
+
 <div id="outline-container-sec-3" class="outline-2">
 <h2 id="sec-3"><span class="section-number-2">3</span> Compatibility</h2>
 <div class="outline-text-2" id="text-3">
 <p>
 Upstream features from the OpenFOAM® code base are merged into
 foam-extend on regular basis. The interface format of
-foam-extend-3.2 is largely compatible to foam-extend-3.1, to
+foam-extend-4.0 is largely compatible to foam-extend-3.2, to
 OpenFOAM-1.6-ext and OpenFOAM-1.7.x. In some cases, the
 differences are caused by bug fixes and algorithmic improvements,
 considered more important than inter-operability.
 </p>
 </div>
 </div>
+
 <div id="outline-container-sec-4" class="outline-2">
 <h2 id="sec-4"><span class="section-number-2">4</span> Main differentiators between foam-extend and OpenFOAM</h2>
 <div class="outline-text-2" id="text-4">
@@ -386,7 +393,7 @@ correction or explicit schemes
 <li>Algebraic multigrid solver framework
 </li>
 
-<li>243 tutorials with automated run scripts
+<li>253 tutorials with automated run scripts
 </li>
 
 <li>Automatic test harness
@@ -398,8 +405,9 @@ discretisation techniques
 </ul>
 </div>
 </div>
+
 <div id="outline-container-sec-5" class="outline-2">
-<h2 id="sec-5"><span class="section-number-2">5</span> New features in foam-extend-3.2, since foam-extend-3.1</h2>
+<h2 id="sec-5"><span class="section-number-2">5</span> New features in foam-extend-4.0, since foam-extend-3.2</h2>
 <div class="outline-text-2" id="text-5">
 <p>
 The list of features is a result of the work of numerous
@@ -412,128 +420,126 @@ Get a full log of the updates by (either):
 </p>
 <div class="org-src-container">
 
-<pre class="src src-bash">user@machine&gt; git log 3.1.. &gt; commitLog
+<pre class="src src-bash">user@machine&gt; git log 4.0.. &gt; commitLog
 </pre>
 </div>
 <div class="org-src-container">
 
-<pre class="src src-bash">user@machine&gt; git log 3.1.. --oneline &gt; commitLog
+<pre class="src src-bash">user@machine&gt; git log 4.0.. --oneline &gt; commitLog
 </pre>
 </div>
 <div class="org-src-container">
 
-<pre class="src src-bash">user@machine&gt; gitg 3.1..
+<pre class="src src-bash">user@machine&gt; gitg 4.0..
 </pre>
 </div>
 
 <ul class="org-ul">
 <li>Major new features:
 <ul class="org-ul">
-<li>Immersed Boundary method: full release
+<li>Improved BlockLduMatrix and block-coupled p-U solver and associated tools
 </li>
-<li>Liquid film method, based on finite area infrastructure
+<li>ILUCp and block ILUCp preconditioners
 </li>
-<li>Global controlDict switches controlled from command line
+<li>Added MRF and porous media handling to the block-coupled solver
 </li>
-<li>Integration of cfMesh automatic mesh solvers
+<li>Change of generic turbulence modelling interface: no U required
 </li>
-<li>Update to block coupled solvers: Performance, Coupled RAS, MRF
+<li>Updated version of block-coupled turbulence models
 </li>
-<li>Rewrite of block-coupled matrix assembly and analysis tools
+<li>Major improvements in immersed boundary method library: improved performance
+and parallel scaling.  Completed supporft for moving deforming immersed boundary
 </li>
-<li>New solver: potentialDyMFoam
+<li>Adopted vanilla OpenFOAM solver control format (solutionControl class)
 </li>
-<li>Rothalpy in compressible MRF solvers for turbomachinery
+<li>Implicit adjoint convection operator
 </li>
-<li>Symmetry 2nd order accurate boundary condition
+<li>Improved GGI interpolation and cutting, with better parallel scaling
 </li>
-<li>Generation of config files (e.g. csh, tcsh, fishshell, zsh) from bashrc
+<li>Global GGI search option for parallel cases
 </li>
-<li>Overhaul of fvDOM radiation model: symmetry plane and fast convergence
+<li>GGI and mixing planes with jump condition for the rothalpy equation
 </li>
-<li>New compilers: GCC new versions, Icc 14 and Icc 16, Clang
+<li>Improved 6-DOF solver, with new handling of constraints
 </li>
-<li>Long long support
+<li>Fully integrated real gas library
 </li>
-<li>Long double support
+<li>Updated viscoelastoplastic models
 </li>
-<li>SuperBee01 and SuperBee01DC
+<li>New steady-state universal flow solver, handling incompressible and compressible
+flows within the same framework
 </li>
-<li>wallShearStress also for compressible flow (backport)
+<li>Time consistent incompressible solvers update
 </li>
-<li>Version updates of 3rd Party, PyFOAM, swak4Foam
+<li>Added decaying turbulence inlet boundary condition by Kornev
 </li>
-<li>Extend-bazaar: Added makeAxialMesh
+<li>New gradient limiter implementation
 </li>
-<li>Added limiters on turbulence viscosity
+<li>Full gradient cacheing capability
 </li>
-<li>Initial version of block-coupled turbulence models
+<li>Removed fluxRequired from solution dictionaries
 </li>
-<li>New ThirdParty app: ParaView server for parallel rendering
+<li>Consistent notation of 1/aP
+</li>
+<li>Dynamic mesh improvements: prescribed motion functions
 </li>
 </ul>
 </li>
 
-<li>Licence: GPLv3
-</li>
-
 <li>Software
 <ul class="org-ul">
-<li>File name changes resolving name clashes on non-case-sensitive filing
-systems
+<li>New handling of lnInclude directories: avoid file copying on MS Windows
 </li>
-<li>Unified code base for Windows, Mac OS X and Linux compilation
+<li>Changes to controlDict and options on MS Windows
 </li>
-<li>Parallel execution of automated test loops
+<li>Consistency in formatting of compression options
+</li>
+<li>Raspberry Pi port
 </li>
 </ul>
 </li>
 
 <li>Installation:
 <ul class="org-ul">
-<li>Native port to Microsoft Windows 7 and 8.1
+<li>Compilation improvements
 </li>
-<li>Updated and bug-fixed installation procedures
+<li>Updated packages versions and compilation in ThirdParty
 </li>
-<li>Improved ThirdParty packages selection mechanism
+<li>Changed compilation options for Infiniband: new versions of MPI
+</li>
+<li>Added support for mvapich2-2.2
+</li>
+<li>Updated compilation for latest version of XCode for Mac OSX
+</li>
+<li>Updates for MS Windows build
 </li>
 </ul>
 </li>
 
 <li>Solvers:
 <ul class="org-ul">
-<li>potentialDyMFoam
+<li>Updated time consistent incompressible solvers (channelFoam, icoFoam, nonNewtonianIcoFoam, pimpleDyMFoam, pimpleFoam, simpleFoam, simpleSRFFoam)
 </li>
-<li>sonicDyMFoam
+<li>Steady universal (compressible and incompressible) flow solver (steadyUniversalFoam)
 </li>
-<li>sonicFoamAutoMotion
+<li>Block-coupled p-U solver improvements (MRFPorousFoam and pUCoupledFoam)
 </li>
-<li>MRFPorousFoam
-</li>
-<li>liquidFilmFoam
-</li>
-<li>surfactantFoam
-</li>
-<li>icoIbFoam
-</li>
-<li>interIbFoam
-</li>
-<li>porousSimpleIbFoam
-</li>
-<li>potentialIbFoam
-</li>
-<li>simpleIbFoam
+<li>Improved steadyCompressibleMRFFoam
 </li>
 </ul>
 </li>
 
 <li>New tutorials:
 <ul class="org-ul">
-<li>Mesquite mesh movement
+<li>Transient real fluid examples
 </li>
-<li>Immersed boundary method
+<li>Universal steady-state MRF examples
 </li>
-<li>Liquid film examples
+<li>Additional coupled CHT example
+</li>
+<li>Additional immersed boundary example
+</li>
+<li>Additional steady-state MRF and GGI example
 </li>
 </ul>
 </li>
@@ -543,43 +549,27 @@ systems
 </ul>
 </div>
 </div>
+
 <div id="outline-container-sec-6" class="outline-2">
 <h2 id="sec-6"><span class="section-number-2">6</span> Recent successful compilations and tests</h2>
 <div class="outline-text-2" id="text-6">
 <ul class="org-ul">
-<li>CentOS 6.6:
-
-<p>
-<a href="http://foam-extend.sourceforge.net/CDash/buildSummary.php?buildid=49">http://foam-extend.sourceforge.net/CDash/buildSummary.php?buildid=49</a>
-<a href="http://foam-extend.sourceforge.net/CDash/buildSummary.php?buildid=48">http://foam-extend.sourceforge.net/CDash/buildSummary.php?buildid=48</a>
-</p>
-</li>
-
-<li>Ubuntu 14.04
-
-<p>
-<a href="http://foam-extend.sourceforge.net/CDash/buildSummary.php?buildid=47">http://foam-extend.sourceforge.net/CDash/buildSummary.php?buildid=47</a>
-</p>
-</li>
-
-<li>Mac OS X 10.10
-
-<p>
-<a href="http://foam-extend.sourceforge.net/CDash/buildSummary.php?buildid=46">http://foam-extend.sourceforge.net/CDash/buildSummary.php?buildid=46</a>
-</p>
+<li>Ubuntu 16.04 LTS
 </li>
 </ul>
 </div>
 </div>
+
 <div id="outline-container-sec-7" class="outline-2">
 <h2 id="sec-7"><span class="section-number-2">7</span> Reporting bugs</h2>
 <div class="outline-text-2" id="text-7">
 <p>
 To report bugs, please use the bugtracker at
-<a href="http://sourceforge.net/p/openfoam-extend/ticketsfoamextendrelease/">http://sourceforge.net/p/openfoam-extend/ticketsfoamextendrelease/</a>
+<a href="http://sourceforge.net/p/foam-extend/tickets/">http://sourceforge.net/p/foam-extend/tickets/</a>
 </p>
 </div>
 </div>
+
 <div id="outline-container-sec-8" class="outline-2">
 <h2 id="sec-8"><span class="section-number-2">8</span> How to contribute</h2>
 <div class="outline-text-2" id="text-8">
@@ -587,10 +577,11 @@ To report bugs, please use the bugtracker at
 All your contributions are highly welcome: New solvers, utilities and
 models; bug fixes; documentation. The many ways of contributing and the
 contribution process are described in detail at:
-<a href="http://sourceforge.net/p/openfoam-extend/wiki/HowToContribute/">http://sourceforge.net/p/openfoam-extend/wiki/HowToContribute/</a>
+<a href="http://sourceforge.net/p/foam-extend/wiki/HowToContribute/">http://sourceforge.net/p/foam-extend/wiki/HowToContribute/</a>
 </p>
 </div>
 </div>
+
 <div id="outline-container-sec-9" class="outline-2">
 <h2 id="sec-9"><span class="section-number-2">9</span> List of Contributors:</h2>
 <div class="outline-text-2" id="text-9">
@@ -601,9 +592,9 @@ See file ListOfContributors
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="date">Date: August 2015</p>
-<p class="date">Created: 2015-09-11 Fri 18:01</p>
-<p class="creator"><a href="http://www.gnu.org/software/emacs/">Emacs</a> 24.3.1 (<a href="http://orgmode.org">Org</a> mode 8.2.4)</p>
+<p class="date">Date: December 2016</p>
+<p class="date">Created: 2016-12-09 Fri 16:16</p>
+<p class="creator"><a href="http://www.gnu.org/software/emacs/">Emacs</a> 24.5.1 (<a href="http://orgmode.org">Org</a> mode 8.2.10)</p>
 <p class="validation"><a href="http://validator.w3.org/check?uri=referer">Validate</a></p>
 </div>
 </body>
