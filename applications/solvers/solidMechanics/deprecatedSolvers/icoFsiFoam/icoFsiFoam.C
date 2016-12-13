@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -39,6 +39,7 @@ Description
 #include "faceTetPolyPatch.H"
 #include "tetPolyPatchInterpolation.H"
 #include "fixedValueTetPolyPatchFields.H"
+#include "pisoControl.H"
 
 #include "pointMesh.H"
 #include "pointFields.H"
@@ -51,12 +52,15 @@ int main(int argc, char *argv[])
 #   include "setRootCase.H"
 #   include "createTime.H"
 #   include "createDynamicFvMesh.H"
+
+    pisoControl piso(mesh);
+
 #   include "createStressMesh.H"
 #   include "createFields.H"
 #   include "createStressFields.H"
 #   include "readMechanicalProperties.H"
 #   include "readCouplingProperties.H"
-#   include "readTimeControls.H"
+#   include "createTimeControls.H"
 
 #   include "initContinuityErrs.H"
 
@@ -66,7 +70,6 @@ int main(int argc, char *argv[])
 
     while (runTime.run())
     {
-#       include "readPISOControls.H"
 #       include "readTimeControls.H"
 #       include "CourantNo.H"
 #       include "setDeltaT.H"

@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -50,6 +50,7 @@ Description
 
 #include "fvCFD.H"
 #include "OSspecific.H"
+#include "pisoControl.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -59,6 +60,9 @@ int main(int argc, char *argv[])
 
 #   include "createTime.H"
 #   include "createMesh.H"
+
+    pisoControl piso(mesh);
+
 #   include "createFields.H"
 #   include "initContinuityErrs.H"
 
@@ -69,7 +73,6 @@ int main(int argc, char *argv[])
 
     while (runTime.loop())
     {
-#       include "readPISOControls.H"
 #       include "readBPISOControls.H"
 
         Info<< "Time = " << runTime.timeName() << nl << endl;
@@ -91,7 +94,7 @@ int main(int argc, char *argv[])
 
             // --- PISO loop
 
-            for (int corr = 0; corr < nCorr; corr++)
+            while (piso.correct())
             {
                 volScalarField rUA = 1.0/UEqn.A();
 
@@ -100,7 +103,7 @@ int main(int argc, char *argv[])
                 phi = (fvc::interpolate(U) & mesh.Sf())
                     + fvc::ddtPhiCorr(rUA, U, phi);
 
-                for (int nonOrth=0; nonOrth<=nNonOrthCorr; nonOrth++)
+                while (piso.correctNonOrthogonal())
                 {
                     fvScalarMatrix pEqn
                     (
@@ -110,7 +113,7 @@ int main(int argc, char *argv[])
                     pEqn.setReference(pRefCell, pRefValue);
                     pEqn.solve();
 
-                    if (nonOrth == nNonOrthCorr)
+                    if (piso.finalNonOrthogonalIter())
                     {
                         phi -= pEqn.flux();
                     }

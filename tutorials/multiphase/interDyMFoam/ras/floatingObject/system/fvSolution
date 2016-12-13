@@ -1,7 +1,7 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | foam-extend: Open Source CFD                    |
-|  \\    /   O peration     | Version:     3.2                                |
+|  \\    /   O peration     | Version:     4.0                                |
 |   \\  /    A nd           | Web:         http://www.foam-extend.org         |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
@@ -28,7 +28,8 @@ solvers
         agglomerator    faceAreaPair;
         mergeLevels     1;
     }
-
+    rho
+    {}
     pcorr
     {
         solver          PCG;
@@ -102,7 +103,7 @@ solvers
 
     "(k|epsilon|omega|R|nuTilda)"
     {
-        solver          PBiCG;
+        solver          BiCGStab;
         preconditioner  DILU;
         tolerance       1e-8;
         relTol          0;
@@ -129,5 +130,6 @@ relaxationFactors
 {
     "(U|k|epsilon|omega|R|nuTilda)"               1;
 }
+
 
 // ************************************************************************* //

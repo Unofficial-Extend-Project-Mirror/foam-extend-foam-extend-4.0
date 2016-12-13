@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -264,15 +264,20 @@ tmp<volSymmTensorField> LaunderGibsonRSTM::devReff() const
 }
 
 
-tmp<fvVectorMatrix> LaunderGibsonRSTM::divDevReff(volVectorField& U) const
+tmp<fvVectorMatrix> LaunderGibsonRSTM::divDevReff() const
 {
     if (couplingFactor_.value() > 0.0)
     {
         return
         (
-            fvc::div(R_ + couplingFactor_*nut_*fvc::grad(U), "div(R)")
-          + fvc::laplacian((1.0-couplingFactor_)*nut_, U, "laplacian(nuEff,U)")
-          - fvm::laplacian(nuEff(), U)
+            fvc::div(R_ + couplingFactor_*nut_*fvc::grad(U_), "div(R)")
+          + fvc::laplacian
+            (
+                (1.0-couplingFactor_)*nut_,
+                U_,
+                "laplacian(nuEff,U)"
+            )
+          - fvm::laplacian(nuEff(), U_)
         );
     }
     else
@@ -280,8 +285,8 @@ tmp<fvVectorMatrix> LaunderGibsonRSTM::divDevReff(volVectorField& U) const
         return
         (
             fvc::div(R_)
-          + fvc::laplacian(nut_, U, "laplacian(nuEff,U)")
-          - fvm::laplacian(nuEff(), U)
+          + fvc::laplacian(nut_, U_, "laplacian(nuEff,U)")
+          - fvm::laplacian(nuEff(), U_)
         );
     }
 }

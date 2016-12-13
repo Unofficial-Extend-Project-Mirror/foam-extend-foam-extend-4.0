@@ -80,28 +80,36 @@ then
     then
         # ParaView 4.0.1
         #
-	[ ! -z "$WM_THIRD_PARTY_USE_PARAVIEW_401" ] && {
-	    echo "Building ParaView 4.0.1"
-            ( rpm_make -p ParaView-4.0.1 -s ParaView-4.0.1.spec -u http://downloads.sourceforge.net/project/openfoam-extend/foam-extend-3.1/ThirdParty/ParaView-v4.0.1-source.tgz \
+        [ ! -z "$WM_THIRD_PARTY_USE_PARAVIEW_401" ] && {
+            echo "Building ParaView 4.0.1"
+            ( rpm_make -p ParaView-4.0.1 -s ParaView-4.0.1.spec -u http://downloads.sourceforge.net/project/foam-extend/ThirdParty/ParaView-v4.0.1-source.tgz \
 		-f --define='_qmakePath $QT_BIN_DIR/qmake'
             )
-	}
+        }
         # ParaView 4.1.0
         #
-	[ ! -z "$WM_THIRD_PARTY_USE_PARAVIEW_410" ] && {
-	    echo "Building ParaView 4.1.0"
-            ( rpm_make -p ParaView-4.1.0 -s ParaView-4.1.0.spec -u http://downloads.sourceforge.net/project/openfoam-extend/foam-extend-3.1/ThirdParty/ParaView-v4.1.0-source.tar.gz \
+        [ ! -z "$WM_THIRD_PARTY_USE_PARAVIEW_410" ] && {
+            echo "Building ParaView 4.1.0"
+            ( rpm_make -p ParaView-4.1.0 -s ParaView-4.1.0.spec -u http://downloads.sourceforge.net/project/foam-extend/ThirdParty/ParaView-v4.1.0-source.tar.gz \
 		-f --define='_qmakePath $QT_BIN_DIR/qmake'
             )
-	}
+        }
         # ParaView 4.3.1
         #
-	[ ! -z "$WM_THIRD_PARTY_USE_PARAVIEW_431" ] && {
-	    echo "Building ParaView 4.3.1"
-            ( rpm_make -p ParaView-4.3.1 -s ParaView-4.3.1.spec -u http://downloads.sourceforge.net/project/openfoam-extend/foam-extend-3.1/ThirdParty/ParaView-v4.3.1-source.tar.gz \
+        [ ! -z "$WM_THIRD_PARTY_USE_PARAVIEW_431" ] && {
+            echo "Building ParaView 4.3.1"
+            ( rpm_make -p ParaView-4.3.1 -s ParaView-4.3.1.spec -u http://downloads.sourceforge.net/project/foam-extend/ThirdParty/ParaView-v4.3.1-source.tar.gz \
 		-f --define='_qmakePath $QT_BIN_DIR/qmake'
             )
-	}
+        }
+        # ParaView 4.4.0
+        #
+        [ ! -z "$WM_THIRD_PARTY_USE_PARAVIEW_440" ] && {
+            echo "Building ParaView 4.4.0"
+            ( rpm_make -p ParaView-4.4.0 -s ParaView-4.4.0.spec -u http://downloads.sourceforge.net/project/foam-extend/ThirdParty/ParaView-v4.4.0-source.tar.gz \
+		-f --define='_qmakePath $QT_BIN_DIR/qmake'
+            )
+        }
     else
         echo "WARNING: "
         echo "WARNING: Skipping the installation of ParaView-4.x.x."

@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -49,6 +49,87 @@ static const Foam::List<Foam::word> subDictNames
 //! @endcond localScope
 
 
+// * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * * //
+
+void Foam::solution::read(const dictionary& dict)
+{
+    if (dict.found("cache"))
+    {
+        cache_ = dict.subDict("cache");
+        caching_ = cache_.lookupOrDefault("active", true);
+    }
+
+    if (dict.found("relaxationFactors"))
+    {
+        const dictionary& relaxDict(dict.subDict("relaxationFactors"));
+        if (relaxDict.found("fields") || relaxDict.found("equations"))
+        {
+            if (relaxDict.found("fields"))
+            {
+                fieldRelaxDict_ = relaxDict.subDict("fields");
+            }
+
+            if (relaxDict.found("equations"))
+            {
+                eqnRelaxDict_ = relaxDict.subDict("equations");
+            }
+        }
+        else
+        {
+            // backwards compatibility
+            fieldRelaxDict_.clear();
+
+            const wordList entryNames(relaxDict.toc());
+            forAll(entryNames, i)
+            {
+                const word& e = entryNames[i];
+                scalar value = readScalar(relaxDict.lookup(e));
+
+                if (e(0, 1) == "p")
+                {
+                    fieldRelaxDict_.add(e, value);
+                }
+                else if (e.length() >= 3)
+                {
+                    if (e(0, 3) == "rho")
+                    {
+                        fieldRelaxDict_.add(e, value);
+                    }
+                }
+
+            }
+
+            eqnRelaxDict_ = relaxDict;
+        }
+
+        fieldRelaxDefault_ =
+            fieldRelaxDict_.lookupOrDefault<scalar>("default", 0.0);
+
+        eqnRelaxDefault_ =
+            eqnRelaxDict_.lookupOrDefault<scalar>("default", 0.0);
+
+        if (debug)
+        {
+            Info<< "relaxation factors:" << nl
+                << "fields: " << fieldRelaxDict_ << nl
+                << "equations: " << eqnRelaxDict_ << endl;
+        }
+    }
+
+
+    if (dict.found("solvers"))
+    {
+        solvers_ = dict.subDict("solvers");
+        upgradeSolverDict(solvers_);
+    }
+
+    if (dict.found("solverPerformance"))
+    {
+        solverPerformance_ = dict.subDict("solverPerformance");
+    }
+}
+
+
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 Foam::solution::solution(const objectRegistry& obr, const fileName& dictName)
@@ -64,12 +145,15 @@ Foam::solution::solution(const objectRegistry& obr, const fileName& dictName)
             IOobject::NO_WRITE
         )
     ),
-    relaxationFactors_
-    (
-        ITstream("relaxationFactors", tokenList())()
-    ),
-    defaultRelaxationFactor_(0),
-    solvers_(ITstream("solvers", tokenList())())
+    cache_(dictionary::null),
+    caching_(false),
+    fieldRelaxDict_(dictionary::null),
+    eqnRelaxDict_(dictionary::null),
+    fieldRelaxDefault_(0),
+    eqnRelaxDefault_(0),
+    solvers_(dictionary::null),
+    solverPerformance_(dictionary::null),
+    prevTimeIndex_(0)
 {
     if (!headerOk())
     {
@@ -84,7 +168,9 @@ Foam::solution::solution(const objectRegistry& obr, const fileName& dictName)
         }
     }
 
-    read();
+    read(solutionDict());
+
+    set("solverPerformance", dictionary());
 }
 
 
@@ -168,76 +254,118 @@ Foam::label Foam::solution::upgradeSolverDict
 }
 
 
-bool Foam::solution::read()
+bool Foam::solution::cache(const word& name) const
 {
-    bool readOk = false;
-
-    if (headerOk())
+    if (caching_)
     {
-        readOk = regIOobject::read();
-    }
-
-    if (readOk)
-    {
-        if (found("relaxationFactors"))
+        if (debug)
         {
-            relaxationFactors_ = subDict("relaxationFactors");
+            Info<< "Cache: find entry for " << name
+                << ": " << Switch(cache_.found(name)) << endl;
         }
 
-        relaxationFactors_.readIfPresent("default", defaultRelaxationFactor_);
-
-        if (found("solvers"))
-        {
-            solvers_ = subDict("solvers");
-            upgradeSolverDict(solvers_);
-        }
-
-        return true;
+        return cache_.found(name);
     }
-
-    return readOk;
+    else
+    {
+        return false;
+    }
 }
 
 
-bool Foam::solution::relax(const word& name) const
+bool Foam::solution::relaxField(const word& name) const
 {
     if (debug)
     {
-        Info<< "Find relax for " << name << endl;
+        Info<< "Field relaxation factor for " << name
+            << " is " << (fieldRelaxDict_.found(name) ? "set" : "unset")
+            << endl;
     }
 
-    return
-        relaxationFactors_.found(name)
-     || relaxationFactors_.found("default");
+    return fieldRelaxDict_.found(name) || fieldRelaxDict_.found("default");
 }
 
 
-Foam::scalar Foam::solution::relaxationFactor(const word& name) const
+bool Foam::solution::relaxEquation(const word& name) const
 {
     if (debug)
     {
-        Info<< "Lookup relaxationFactor for " << name << endl;
+        Info<< "Find equation relaxation factor for " << name << endl;
     }
 
-    if (relaxationFactors_.found(name))
+    return eqnRelaxDict_.found(name) || eqnRelaxDict_.found("default");
+}
+
+
+Foam::scalar Foam::solution::fieldRelaxationFactor(const word& name) const
+{
+    if (debug)
     {
-        return readScalar(relaxationFactors_.lookup(name));
+        Info<< "Lookup variable relaxation factor for " << name << endl;
     }
-    else if (defaultRelaxationFactor_ > SMALL)
+
+    if (fieldRelaxDict_.found(name))
     {
-        return defaultRelaxationFactor_;
+        return readScalar(fieldRelaxDict_.lookup(name));
+    }
+    else if (fieldRelaxDefault_ > SMALL)
+    {
+        return fieldRelaxDefault_;
     }
     else
     {
         FatalIOErrorIn
         (
-            "Foam::solution::relaxationFactor(const word&)",
-            relaxationFactors_
-        )   << "Cannot find relaxationFactor for '" << name
+            "Foam::solution::fieldRelaxationFactor(const word&)",
+            fieldRelaxDict_
+        )   << "Cannot find variable relaxation factor for '" << name
             << "' or a suitable default value."
             << exit(FatalIOError);
 
         return 0;
+    }
+}
+
+
+Foam::scalar Foam::solution::equationRelaxationFactor(const word& name) const
+{
+    if (debug)
+    {
+        Info<< "Lookup equation relaxation factor for " << name << endl;
+    }
+
+    if (eqnRelaxDict_.found(name))
+    {
+        return readScalar(eqnRelaxDict_.lookup(name));
+    }
+    else if (eqnRelaxDefault_ > SMALL)
+    {
+        return eqnRelaxDefault_;
+    }
+    else
+    {
+        FatalIOErrorIn
+        (
+            "Foam::solution::eqnRelaxationFactor(const word&)",
+            eqnRelaxDict_
+        )   << "Cannot find equation relaxation factor for '" << name
+            << "' or a suitable default value."
+            << exit(FatalIOError);
+
+        return 0;
+    }
+}
+
+
+const Foam::dictionary& Foam::solution::solutionDict() const
+{
+    if (found("select"))
+    {
+        return subDict(word(lookup("select")));
+    }
+    else
+    {
+        return *this;
     }
 }
 
@@ -266,15 +394,22 @@ const Foam::dictionary& Foam::solution::solver(const word& name) const
 }
 
 
+bool Foam::solution::read()
+{
+    if (regIOobject::read())
+    {
+        read(solutionDict());
+
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
 bool Foam::solution::writeData(Ostream& os) const
 {
-    // Write dictionaries
-    os << nl << "solvers";
-    solvers_.write(os, true);
-
-    os << nl << "relaxationFactors";
-    relaxationFactors_.write(os, true);
-
     // Write direct entries of the solution dictionary
     // HJ, 16/Feb/2010
     dictionary::write(os, false);
@@ -282,5 +417,44 @@ bool Foam::solution::writeData(Ostream& os) const
     return true;
 }
 
+Foam::dictionary& Foam::solution::solverPerformanceDict() const
+{
+    return solverPerformance_;
+}
+
+
+void Foam::solution::setSolverPerformance
+(
+    const word& name,
+    const lduSolverPerformance& sp
+) const
+{
+    List<lduSolverPerformance> perfs;
+
+    if (prevTimeIndex_ != this->time().timeIndex())
+    {
+        // Reset solver performance between iterations
+        prevTimeIndex_ = this->time().timeIndex();
+        solverPerformance_.clear();
+    }
+    else
+    {
+        solverPerformance_.readIfPresent(name, perfs);
+    }
+
+    // Append to list
+    perfs.setSize(perfs.size() + 1, sp);
+
+    solverPerformance_.set(name, perfs);
+}
+
+
+void Foam::solution::setSolverPerformance
+(
+    const lduSolverPerformance& sp
+) const
+{
+    setSolverPerformance(sp.fieldName(), sp);
+}
 
 // ************************************************************************* //

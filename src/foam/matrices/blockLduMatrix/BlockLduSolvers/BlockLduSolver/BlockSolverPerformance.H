@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -39,7 +39,6 @@ SourceFiles
 #define BlockSolverPerformance_H
 
 #include "error.H"
-#include "runTimeSelectionTables.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -50,6 +49,9 @@ namespace Foam
 
 template<class Type>
 class BlockSolverPerformance;
+
+template<class Type>
+Istream& operator>>(Istream&, BlockSolverPerformance<Type>&);
 
 template<class Type>
 Ostream& operator<<(Ostream&, const BlockSolverPerformance<Type>&);
@@ -90,6 +92,16 @@ public:
 
     // Constructors
 
+        //- Construct without solver and field name
+        BlockSolverPerformance()
+        :
+            initialResidual_(pTraits<Type>::zero),
+            finalResidual_(pTraits<Type>::zero),
+            nIterations_(0),
+            converged_(false),
+            singular_(false)
+        {}
+
         //- Construct with solver and field name
         BlockSolverPerformance
         (
@@ -118,6 +130,18 @@ public:
         const word& solverName() const
         {
             return solverName_;
+        }
+
+        //- Return solver name
+        word& solverName()
+        {
+            return solverName_;
+        }
+
+        //- Return field name
+        const word& fieldName() const
+        {
+            return fieldName_;
         }
 
         //- Return initial residual
@@ -192,6 +216,26 @@ public:
 
         //- Print summary of solver performance
         void print() const;
+
+
+    // Member Operators
+
+        bool operator!=(const BlockSolverPerformance<Type>&) const;
+
+
+    // Friend functions
+
+        friend Istream& operator>> <Type>
+        (
+            Istream&,
+            BlockSolverPerformance<Type>&
+        );
+
+        friend Ostream& operator<< <Type>
+        (
+            Ostream&,
+            const BlockSolverPerformance<Type>&
+        );
 };
 
 

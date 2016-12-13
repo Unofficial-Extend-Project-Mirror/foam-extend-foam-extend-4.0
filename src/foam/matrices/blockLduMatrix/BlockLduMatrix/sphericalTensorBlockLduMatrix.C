@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -37,7 +37,7 @@ template<>
 void Foam::BlockLduMatrix<Foam::sphericalTensor>::sumDiag()
 {
     // Decoupled version
-    this->decoupledSumDiag();
+    decoupledSumDiag();
 }
 
 
@@ -45,7 +45,7 @@ template<>
 void Foam::BlockLduMatrix<Foam::sphericalTensor>::negSumDiag()
 {
     // Decoupled version
-    this->decoupledNegSumDiag();
+    decoupledNegSumDiag();
 }
 
 
@@ -53,7 +53,7 @@ template<>
 void Foam::BlockLduMatrix<sphericalTensor>::check() const
 {
     // Decoupled version
-    this->decoupledCheck();
+    decoupledCheck();
 }
 
 
@@ -66,7 +66,7 @@ void Foam::BlockLduMatrix<Foam::sphericalTensor>::relax
 )
 {
     // Decoupled version
-    this->decoupledRelax(x, b, alpha);
+    decoupledRelax(x, b, alpha);
 }
 
 
@@ -77,7 +77,7 @@ void Foam::BlockLduMatrix<Foam::sphericalTensor>::operator*=
 )
 {
     // Decoupled version
-    this->decoupledMultEqOp(sf);
+    decoupledMultEqOp(sf);
 }
 
 

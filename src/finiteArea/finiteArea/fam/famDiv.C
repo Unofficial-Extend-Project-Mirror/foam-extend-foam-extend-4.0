@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -45,7 +45,7 @@ tmp<faMatrix<Type> >
 div
 (
     const edgeScalarField& flux,
-    GeometricField<Type, faPatchField, areaMesh>& vf,
+    const GeometricField<Type, faPatchField, areaMesh>& vf,
     const word& name
 )
 {
@@ -62,7 +62,7 @@ tmp<faMatrix<Type> >
 div
 (
     const tmp<edgeScalarField>& tflux,
-    GeometricField<Type, faPatchField, areaMesh>& vf,
+    const GeometricField<Type, faPatchField, areaMesh>& vf,
     const word& name
 )
 {
@@ -77,7 +77,7 @@ tmp<faMatrix<Type> >
 div
 (
     const edgeScalarField& flux,
-    GeometricField<Type, faPatchField, areaMesh>& vf
+    const GeometricField<Type, faPatchField, areaMesh>& vf
 )
 {
     return fam::div(flux, vf, "div("+flux.name()+','+vf.name()+')');
@@ -88,7 +88,7 @@ tmp<faMatrix<Type> >
 div
 (
     const tmp<edgeScalarField>& tflux,
-    GeometricField<Type, faPatchField, areaMesh>& vf
+    const GeometricField<Type, faPatchField, areaMesh>& vf
 )
 {
     tmp<faMatrix<Type> > Div(fam::div(tflux(), vf));

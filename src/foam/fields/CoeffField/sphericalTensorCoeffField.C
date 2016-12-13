@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -122,6 +122,32 @@ void Foam::CoeffField<Foam::sphericalTensor>::operator=
 }
 
 
+// * * * * * * * * * * * * * * * IOstream Operators  * * * * * * * * * * * * //
+
+Foam::Ostream& Foam::operator<<
+(
+    Ostream& os,
+    const CoeffField<sphericalTensor>& f
+)
+{
+    const DecoupledCoeffField<sphericalTensor>& df = f;
+    return operator<<(os, df);
+}
+
+
+Foam::Ostream& Foam::operator<<
+(
+    Ostream& os,
+    const tmp<CoeffField<sphericalTensor> >& tf
+)
+{
+    const DecoupledCoeffField<sphericalTensor>& df = tf();
+    os << df;
+    tf.clear();
+    return os;
+}
+
+
 /* * * * * * * * * * * * * * * * Global functions  * * * * * * * * * * * * * */
 
 Foam::tmp<Foam::CoeffField<Foam::sphericalTensor> > Foam::inv
@@ -135,6 +161,48 @@ Foam::tmp<Foam::CoeffField<Foam::sphericalTensor> > Foam::inv
     (
         new CoeffField<sphericalTensor>(inv(df)())
     );
+}
+
+
+template<>
+void Foam::multiply
+(
+    sphericalTensorField& f,
+    const CoeffField<sphericalTensor>& f1,
+    const sphericalTensor& f2
+)
+{
+    const DecoupledCoeffField<sphericalTensor>& df1 = f1;
+
+    multiply(f, df1, f2);
+}
+
+
+template<>
+void Foam::multiply
+(
+    sphericalTensorField& f,
+    const CoeffField<sphericalTensor>& f1,
+    const sphericalTensorField& f2
+)
+{
+    const DecoupledCoeffField<sphericalTensor>& df1 = f1;
+
+    multiply(f, df1, f2);
+}
+
+
+template<>
+void Foam::multiply
+(
+    sphericalTensorField& f,
+    const sphericalTensorField& f1,
+    const CoeffField<sphericalTensor>& f2
+)
+{
+    const DecoupledCoeffField<sphericalTensor>& df2 = f2;
+
+    multiply(f, f1, df2);
 }
 
 

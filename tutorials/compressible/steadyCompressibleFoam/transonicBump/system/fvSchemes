@@ -1,7 +1,7 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | foam-extend: Open Source CFD                    |
-|  \\    /   O peration     | Version:     3.2                                |
+|  \\    /   O peration     | Version:     4.0                                |
 |   \\  /    A nd           | Web:         http://www.foam-extend.org         |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
@@ -20,8 +20,9 @@ ddtSchemes
 
     ddt(rho,U)      steadyState;
     ddt(rho,h)      steadyState;
-    ddt(psi,p)      steadyInertial phi rho 0.95;
+    ddt(psi,p)      steadyState;
 
+    ddt(rho,K)      steadyState;
     U               steadyState;
     T               steadyState;
     p               steadyState;
@@ -29,7 +30,7 @@ ddtSchemes
 
 gradSchemes
 {
-    default         Gauss linear;
+    default         cellLimited Gauss linear 1;
 }
 
 divSchemes
@@ -37,22 +38,13 @@ divSchemes
     default          none;
 
     div(phi,U)       Gauss upwind;
-//     div(phi,U)       Gauss linearUpwind faceLimited Gauss linear 1.0;
-//     div(phi,U)      Gauss vanLeerDC;
-
     div(phi,h)       Gauss upwind;
-//     div(phi,h)      Gauss vanLeerDC;
-
     div(phid,p)      Gauss upwind;
-//     div(phid,p)      Gauss vanLeerDC;
+    div(phi,K)       Gauss linear;
 
     div(phi,k)       Gauss upwind;
     div(phi,epsilon) Gauss upwind;
-    div((muEff*dev2(grad(U).T()))) Gauss linear;
-
-    div(U,p)         Gauss linear;
-
-    div(U)           Gauss linear;
+    div((muEff*dev2(T(grad(U))))) Gauss linear;
 }
 
 laplacianSchemes
@@ -70,10 +62,5 @@ snGradSchemes
     default           corrected;
 }
 
-fluxRequired
-{
-    default           no;
-    p;
-}
 
 // ************************************************************************* //

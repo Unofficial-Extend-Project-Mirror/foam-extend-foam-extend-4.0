@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -27,8 +27,9 @@ License
 #include "processorFvPatch.H"
 #include "IPstream.H"
 #include "OPstream.H"
-#include "demandDrivenData.H"
 #include "transformField.H"
+#include "coeffFields.H"
+#include "demandDrivenData.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -264,6 +265,64 @@ void processorFvPatchField<Type>::updateInterfaceMatrix
         forAll(faceCells, elemI)
         {
             result[faceCells[elemI]] -= coeffs[elemI]*pnf[elemI];
+        }
+    }
+}
+
+
+template<class Type>
+void processorFvPatchField<Type>::initInterfaceMatrixUpdate
+(
+    const Field<Type>& psiInternal,
+    Field<Type>&,
+    const BlockLduMatrix<Type>&,
+    const CoeffField<Type>&,
+    const Pstream::commsTypes commsType,
+    const bool switchToLhs
+) const
+{
+    procPatch_.compressedSend
+    (
+        commsType,
+        this->patch().patchInternalField(psiInternal)()
+    );
+}
+
+
+template<class Type>
+void processorFvPatchField<Type>::updateInterfaceMatrix
+(
+    const Field<Type>& psiInternal,
+    Field<Type>& result,
+    const BlockLduMatrix<Type>&,
+    const CoeffField<Type>& coeffs,
+    const Pstream::commsTypes commsType,
+    const bool switchToLhs
+) const
+{
+    Field<Type> pnf
+    (
+        procPatch_.compressedReceive<Type>(commsType, this->size())()
+    );
+
+    // Multiply neighbour field with coeffs and re-use pnf for result
+    // of multiplication
+    multiply(pnf, coeffs, pnf);
+
+    const unallocLabelList& faceCells = this->patch().faceCells();
+
+    if (switchToLhs)
+    {
+        forAll(faceCells, elemI)
+        {
+            result[faceCells[elemI]] += pnf[elemI];
+        }
+    }
+    else
+    {
+        forAll(faceCells, elemI)
+        {
+            result[faceCells[elemI]] -= pnf[elemI];
         }
     }
 }

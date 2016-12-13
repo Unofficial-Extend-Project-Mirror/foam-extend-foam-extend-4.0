@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -61,7 +61,7 @@ class gaussLaplacianScheme
         tmp<fvMatrix<Type> > fvmLaplacianUncorrected
         (
             const surfaceScalarField& gammaMagSf,
-            GeometricField<Type, fvPatchField, volMesh>&
+            const GeometricField<Type, fvPatchField, volMesh>&
         );
 
         tmp<GeometricField<Type, fvsPatchField, surfaceMesh> > gammaSnGradCorr
@@ -125,7 +125,7 @@ public:
         tmp<fvMatrix<Type> > fvmLaplacian
         (
             const GeometricField<GType, fvsPatchField, surfaceMesh>&,
-            GeometricField<Type, fvPatchField, volMesh>&
+            const GeometricField<Type, fvPatchField, volMesh>&
         );
 
         tmp<GeometricField<Type, fvPatchField, volMesh> > fvcLaplacian
@@ -145,7 +145,7 @@ template<>                                                                  \
 tmp<fvMatrix<Type> > gaussLaplacianScheme<Type, scalar>::fvmLaplacian       \
 (                                                                           \
     const GeometricField<scalar, fvsPatchField, surfaceMesh>&,              \
-    GeometricField<Type, fvPatchField, volMesh>&                            \
+    const GeometricField<Type, fvPatchField, volMesh>&                      \
 );                                                                          \
                                                                             \
 template<>                                                                  \

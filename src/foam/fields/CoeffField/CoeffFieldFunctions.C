@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -25,9 +25,12 @@ License
 
 #include "BlockCoeff.H"
 
-/* * * * * * * * * * * * * * * * Global functions  * * * * * * * * * * * * * */
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-namespace Foam { // namespace added to make CLang happy
+namespace Foam
+{
+
+/* * * * * * * * * * * * * * * * Global functions  * * * * * * * * * * * * * */
 
 template<class Type>
 tmp<CoeffField<Type> > inv(const CoeffField<Type>& f)
@@ -37,7 +40,7 @@ tmp<CoeffField<Type> > inv(const CoeffField<Type>& f)
     // type is introduced.  HJ, 24/May/2005
 
     typedef typename CoeffField<Type>::linearTypeField fieldType;
-    typedef typename CoeffField<Type>::linearType valueType;
+    typedef typename CoeffField<Type>::linearType linearType;
 
     // Create result
     tmp<CoeffField<Type> > tresult(new CoeffField<Type>(f.size()));
@@ -54,7 +57,7 @@ tmp<CoeffField<Type> > inv(const CoeffField<Type>& f)
         fieldType inverse =
             cmptDivide
             (
-                fieldType(lf.size(), pTraits<valueType>::one),
+                fieldType(lf.size(), pTraits<linearType>::one),
                 lf
             );
 
@@ -332,7 +335,6 @@ tmp<Field<Type> > operator op                                                 \
 // HJ, 17/Jun/2010
 BINARY_OPERATOR_R(Type, Type, *, multiply)
 
-} // namespace Foam
 
 #undef BINARY_OPERATOR_R
 #undef BINARY_OPERATOR_FF
@@ -345,3 +347,7 @@ BINARY_OPERATOR_R(Type, Type, *, multiply)
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+} // End namespace Foam
+
+// ************************************************************************* //

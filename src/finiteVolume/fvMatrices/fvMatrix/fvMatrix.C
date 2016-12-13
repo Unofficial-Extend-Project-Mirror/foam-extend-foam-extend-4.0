@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -246,7 +246,7 @@ void Foam::fvMatrix<Type>::correctImplicitBoundarySource
 template<class Type>
 Foam::fvMatrix<Type>::fvMatrix
 (
-    GeometricField<Type, fvPatchField, volMesh>& psi,
+    const GeometricField<Type, fvPatchField, volMesh>& psi,
     const dimensionSet& ds
 )
 :
@@ -261,9 +261,12 @@ Foam::fvMatrix<Type>::fvMatrix
 {
     if (debug)
     {
-        Info<< "fvMatrix<Type>(GeometricField<Type, fvPatchField, volMesh>&,"
-               " const dimensionSet&) : "
-               "constructing fvMatrix<Type> for field " << psi_.name()
+        InfoIn
+        (
+            "fvMatrix<Type>("
+            "const GeometricField<Type, fvPatchField, volMesh>&,"
+            "const dimensionSet&)"
+        )   << "constructing fvMatrix<Type> for field " << psi_.name()
             << endl;
     }
 
@@ -291,7 +294,13 @@ Foam::fvMatrix<Type>::fvMatrix
         );
     }
 
-    psi_.boundaryField().updateCoeffs();
+    // Update the boundary coefficients of psi without changing its event No.
+    GeometricField<Type, fvPatchField, volMesh>& psiRef =
+       const_cast<GeometricField<Type, fvPatchField, volMesh>&>(psi_);
+
+    label currentStatePsi = psiRef.eventNo();
+    psiRef.boundaryField().updateCoeffs();
+    psiRef.eventNo() = currentStatePsi;
 }
 
 
@@ -388,7 +397,7 @@ Foam::fvMatrix<Type>::fvMatrix(const tmp<fvMatrix<Type> >& tfvm)
 template<class Type>
 Foam::fvMatrix<Type>::fvMatrix
 (
-    GeometricField<Type, fvPatchField, volMesh>& psi,
+    const GeometricField<Type, fvPatchField, volMesh>& psi,
     Istream& is
 )
 :
@@ -477,12 +486,17 @@ void Foam::fvMatrix<Type>::setValues
     const unallocLabelList& nei = mesh.neighbour();
 
     scalarField& Diag = diag();
+    Field<Type>& psi =
+        const_cast
+        <
+            GeometricField<Type, fvPatchField, volMesh>&
+        >(psi_).internalField();
 
     forAll(cellLabels, i)
     {
         label celli = cellLabels[i];
 
-        psi_[celli] = values[i];
+        psi[celli] = values[i];
         source_[celli] = values[i]*Diag[celli];
 
         if (symmetric() || asymmetric())
@@ -682,9 +696,9 @@ void Foam::fvMatrix<Type>::relax(const scalar alpha)
 template<class Type>
 void Foam::fvMatrix<Type>::relax()
 {
-    if (psi_.mesh().solutionDict().relax(psi_.name()))
+    if (psi_.mesh().solutionDict().relaxEquation(psi_.name()))
     {
-        relax(psi_.mesh().solutionDict().relaxationFactor(psi_.name()));
+        relax(psi_.mesh().solutionDict().equationRelaxationFactor(psi_.name()));
     }
     else
     {
@@ -715,8 +729,12 @@ void Foam::fvMatrix<Type>::completeAssembly()
 
     assemblyCompleted_ = true;
 
+    // Cast away const to manipulate matrix
+    GeometricField<Type, fvPatchField, volMesh>& ncPsi =
+        const_cast<GeometricField<Type, fvPatchField, volMesh>& >(psi_);
+
     typename GeometricField<Type, fvPatchField, volMesh>::
-        GeometricBoundaryField& bFields = psi_.boundaryField();
+        GeometricBoundaryField& bFields = ncPsi.boundaryField();
 
     forAll(bFields, patchI)
     {
@@ -1376,7 +1394,7 @@ Foam::tmp<Foam::fvMatrix<Type> > Foam::relax(const fvMatrix<Type>& m)
 
 
 template<class Type>
-Foam::lduMatrix::solverPerformance Foam::solve
+Foam::lduSolverPerformance Foam::solve
 (
     fvMatrix<Type>& fvm,
     const dictionary& solverControls
@@ -1386,13 +1404,13 @@ Foam::lduMatrix::solverPerformance Foam::solve
 }
 
 template<class Type>
-Foam::lduMatrix::solverPerformance Foam::solve
+Foam::lduSolverPerformance Foam::solve
 (
     const tmp<fvMatrix<Type> >& tfvm,
     const dictionary& solverControls
 )
 {
-    lduMatrix::solverPerformance solverPerf =
+    lduSolverPerformance solverPerf =
         const_cast<fvMatrix<Type>&>(tfvm()).solve(solverControls);
 
     tfvm.clear();
@@ -1402,18 +1420,18 @@ Foam::lduMatrix::solverPerformance Foam::solve
 
 
 template<class Type>
-Foam::lduMatrix::solverPerformance Foam::solve(fvMatrix<Type>& fvm)
+Foam::lduSolverPerformance Foam::solve(fvMatrix<Type>& fvm)
 {
     return fvm.solve();
 }
 
 template<class Type>
-Foam::lduMatrix::solverPerformance Foam::solve
+Foam::lduSolverPerformance Foam::solve
 (
     const tmp<fvMatrix<Type> >& tfvm
 )
 {
-    lduMatrix::solverPerformance solverPerf =
+    lduSolverPerformance solverPerf =
         const_cast<fvMatrix<Type>&>(tfvm()).solve();
 
     tfvm.clear();

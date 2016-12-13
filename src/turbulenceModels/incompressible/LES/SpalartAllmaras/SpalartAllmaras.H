@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -175,7 +175,7 @@ public:
 
         //- Return the deviatoric part of the divergence of Beff
         //  i.e. the additional term in the filtered NSE.
-        virtual tmp<fvVectorMatrix> divDevBeff(volVectorField& U) const;
+        virtual tmp<fvVectorMatrix> divDevBeff() const;
 
         //- Correct nuTilda and related properties
         virtual void correct(const tmp<volTensorField>& gradU);

@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -191,10 +191,6 @@ public:
             const GradFieldType& gradPhiIn = gradPhi.internalField();
 
             // Compute limiter values, internal faces
-
-            // Dummy flux
-            scalar upwindFlux = 1;
-
             forAll (owner, faceI)
             {
                 const label& own = owner[faceI];
@@ -203,34 +199,27 @@ public:
                 vector deltaRLeft = faceCentre[faceI] - cellCentre[own];
                 vector deltaRRight = faceCentre[faceI] - cellCentre[nei];
 
-                Type phiOwnerLimiter = limitFunction.limiter
+                // Find minimal limiter value in each cell
+
+                // Owner side
+                limitFunction.limiter
                 (
+                    phiLimiterIn[own],
                     cellVolume[own],
-                    upwindFlux,
                     phiMaxIn[own] - phi_[own],
                     phiMinIn[own] - phi_[own],
-                    gradPhiIn[own],
-                    gradPhiIn[nei],
-                    deltaRLeft
+                    (deltaRLeft & gradPhiIn[own])
                 );
 
-                Type phiNeighbourLimiter = limitFunction.limiter
+                // Neighbour side
+                limitFunction.limiter
                 (
+                    phiLimiterIn[nei],
                     cellVolume[nei],
-                    upwindFlux,
                     phiMaxIn[nei] - phi_[nei],
                     phiMinIn[nei] - phi_[nei],
-                    gradPhiIn[nei],
-                    gradPhiIn[own],
-                    deltaRRight
+                    (deltaRRight & gradPhiIn[nei])
                 );
-
-                // find minimal limiter value in each cell
-                phiLimiterIn[own] =
-                    min(phiLimiterIn[own], phiOwnerLimiter);
-
-                phiLimiterIn[nei] =
-                    min(phiLimiterIn[nei], phiNeighbourLimiter);
             }
 
             // Coupled boundaries
@@ -255,24 +244,19 @@ public:
                     const GradFieldType gradPhiRight =
                         gradPhi.boundaryField()[patchI].patchNeighbourField();
 
+                    // Find minimal limiter value in each cell
                     forAll (fc, faceI)
                     {
                         const label& curFC = fc[faceI];
 
-                        Type phiFCLimiter = limitFunction.limiter
+                        limitFunction.limiter
                         (
+                            phiLimiterIn[curFC],
                             cellVolume[curFC],
-                            upwindFlux,
                             phiMaxIn[curFC] - phi_[curFC],
                             phiMinIn[curFC] - phi_[curFC],
-                            gradPhiLeft[faceI],
-                            gradPhiRight[faceI],
-                            deltaR[faceI]
+                            (deltaR[faceI] & gradPhiLeft[faceI])
                         );
-
-                        // Find minimal limiter value in each cell
-                        phiLimiterIn[curFC] =
-                            min(phiLimiterIn[curFC], phiFCLimiter);
                     }
                 }
             }

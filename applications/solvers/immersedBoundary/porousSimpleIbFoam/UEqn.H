@@ -2,16 +2,11 @@
     tmp<fvVectorMatrix> UEqn
     (
         fvm::div(phi, U)
-      + turbulence->divDevReff(U)
+      + turbulence->divDevReff()
     );
 
     UEqn().relax();
 
     pZones.addResistance(UEqn());
 
-    eqnResidual = solve
-    (
-        UEqn() == -fvc::grad(p)
-    ).initialResidual();
-
-    maxResidual = max(eqnResidual, maxResidual);
+    solve(UEqn() == -fvc::grad(p));

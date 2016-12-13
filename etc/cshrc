@@ -1,7 +1,7 @@
 #----------------------------------*-sh-*--------------------------------------
 # =========                 |
 # \\      /  F ield         | foam-extend: Open Source CFD
-#  \\    /   O peration     | Version:     3.2
+#  \\    /   O peration     | Version:     4.0
 #   \\  /    A nd           | Web:         http://www.foam-extend.org
 #    \\/     M anipulation  | For copyright notice see file Copyright
 #------------------------------------------------------------------------------
@@ -32,7 +32,7 @@
 
 setenv WM_PROJECT foam
 setenv WM_FORK extend
-setenv WM_PROJECT_VERSION 3.2
+setenv WM_PROJECT_VERSION 4.0
 
 # helps to easily write #ifdefs to detect a foam-extend version
 setenv FOAM_DEV 1
@@ -97,7 +97,7 @@ setenv WM_THIRD_PARTY_USE_HWLOC_1101 1
 #
 # For AllMake.stage4
 #setenv WM_THIRD_PARTY_USE_QT_486 1
-setenv WM_THIRD_PARTY_USE_PARAVIEW_431 1
+setenv WM_THIRD_PARTY_USE_PARAVIEW_440 1
 
 
 # Source files, possibly with some verbosity

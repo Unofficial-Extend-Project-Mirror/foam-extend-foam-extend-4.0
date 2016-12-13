@@ -14,21 +14,10 @@
         // viscous heating?
     );
 
-    if (oCorr == nOuterCorr - 1)
-    {
-        if (mesh.solutionDict().relax("eFinal"))
-        {
-            eEqn.relax(mesh.solutionDict().relaxationFactor("eFinal"));
-        }
-        else
-        {
-            eEqn.relax(1);
-        }
-    }
-    else
-    {
-        eEqn.relax();
-    }
+    eEqn.relax
+    (
+        mesh.solutionDict().equationRelaxationFactor(e.select(pimple.finalIter()))
+    );
 
     eEqn.solve();
 
@@ -39,4 +28,5 @@
 
     // Recalculate density
     rho = thermo.rho();
+    rho.correctBoundaryConditions();
 }

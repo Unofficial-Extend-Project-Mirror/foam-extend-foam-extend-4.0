@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -175,7 +175,18 @@ Foam::lduSolverPerformance Foam::bicgStabSolver::solve
             // Bug fix, Alexander Monakov, 11/Jul/2012
             preconPtr_->precondition(sh, s, cmpt);
             matrix_.Amul(t, sh, coupleBouCoeffs_, interfaces_, cmpt);
-            omega = gSumProd(t, s)/gSumProd(t, t);
+
+            scalar tt = gSumProd(t, t);
+
+            // Stabilise zero omega.  HJ, 3/May/2016
+            if (tt > VSMALL)
+            {
+                omega = gSumProd(t, s)/tt;
+            }
+            else
+            {
+                omega = 0;
+            }
 
             // Update solution and residual
             forAll (x, i)

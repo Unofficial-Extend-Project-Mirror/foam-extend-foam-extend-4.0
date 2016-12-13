@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -37,7 +37,7 @@ SourceFiles
 #include "dragModel.H"
 #include "phaseModel.H"
 #include "autoPtr.H"
-#include "viscosityModel.H"
+#include "kineticTheoryViscosityModel.H"
 #include "conductivityModel.H"
 #include "radialModel.H"
 #include "granularPressureModel.H"

@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -66,6 +66,7 @@ Description
 #include "Switch.H"
 #include "bound.H"
 #include "dynamicRefineFvMesh.H"
+#include "pisoControl.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -75,12 +76,14 @@ int main(int argc, char *argv[])
 
 #   include "createTime.H"
 #   include "createDynamicFvMesh.H"
+
+    pisoControl piso(mesh);
+
 #   include "readCombustionProperties.H"
 #   include "readGravitationalAcceleration.H"
 #   include "createFields.H"
-#   include "readPISOControls.H"
 #   include "initContinuityErrs.H"
-#   include "readTimeControls.H"
+#   include "createTimeControls.H"
 #   include "setInitialDeltaT.H"
 
     scalar StCoNum = 0.0;
@@ -92,7 +95,6 @@ int main(int argc, char *argv[])
     while (runTime.run())
     {
 #       include "readTimeControls.H"
-#       include "readPISOControls.H"
 #       include "CourantNo.H"
 
 #       include "setDeltaT.H"
@@ -168,7 +170,7 @@ int main(int argc, char *argv[])
 #       include "UEqn.H"
 
         // --- PISO loop
-        for (int corr=1; corr<=nCorr; corr++)
+        while (piso.correct())
         {
 #           include "bEqn.H"
 #           include "ftEqn.H"

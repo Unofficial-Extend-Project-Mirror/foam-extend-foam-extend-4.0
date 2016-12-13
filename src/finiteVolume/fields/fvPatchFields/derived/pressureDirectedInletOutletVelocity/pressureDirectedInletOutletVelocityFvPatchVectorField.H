@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -47,7 +47,7 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-          Class pressureDirectedInletOutletVelocityFvPatch Declaration
+    Class pressureDirectedInletOutletVelocityFvPatchVectorField Declaration
 \*---------------------------------------------------------------------------*/
 
 class pressureDirectedInletOutletVelocityFvPatchVectorField
@@ -168,6 +168,18 @@ public:
             word& phiName()
             {
                 return phiName_;
+            }
+
+            //- Return inlet direction
+            const vectorField& inletDir() const
+            {
+                return inletDir_;
+            }
+
+            //- Return access to inlet direction
+            vectorField& inletDir()
+            {
+                return inletDir_;
             }
 
 

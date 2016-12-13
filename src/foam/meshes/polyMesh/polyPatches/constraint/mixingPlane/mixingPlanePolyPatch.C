@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -405,13 +405,13 @@ const Foam::labelListList& Foam::mixingPlanePolyPatch::receiveAddr() const
 }
 
 
-void Foam::mixingPlanePolyPatch::clearGeom()
+void Foam::mixingPlanePolyPatch::clearGeom() const
 {
     deleteDemandDrivenData(reconFaceCellCentresPtr_);
 }
 
 
-void Foam::mixingPlanePolyPatch::clearOut()
+void Foam::mixingPlanePolyPatch::clearOut() const
 {
     clearGeom();
 
@@ -871,6 +871,12 @@ void Foam::mixingPlanePolyPatch::initMovePoints(const pointField& p)
 
     // Calculate transforms on mesh motion?
     calcTransforms();
+
+    if (master())
+    {
+        shadow().clearGeom();
+        shadow().calcTransforms();
+    }
 
     // Update interpolation for new relative position of mixingPlane interfaces
     if (patchToPatchPtr_)

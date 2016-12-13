@@ -1,7 +1,7 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | foam-extend: Open Source CFD                    |
-|  \\    /   O peration     | Version:     3.2                                |
+|  \\    /   O peration     | Version:     4.0                                |
 |   \\  /    A nd           | Web:         http://www.foam-extend.org         |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
@@ -24,35 +24,40 @@ boundaryField
     box
     {
         type            compressible::epsilonWallFunction;
+        refValue        uniform 0;
+        value           uniform 0.01;
         Cmu             0.09;
         kappa           0.41;
         E               9.8;
-        value           uniform 0.01;
     }
     floor
     {
         type            compressible::epsilonWallFunction;
+        refValue        uniform 0;
+        value           uniform 0.01;
         Cmu             0.09;
         kappa           0.41;
         E               9.8;
-        value           uniform 0.01;
     }
     ceiling
     {
         type            compressible::epsilonWallFunction;
+        refValue        uniform 0;
+        value           uniform 0.01;
         Cmu             0.09;
         kappa           0.41;
         E               9.8;
-        value           uniform 0.01;
     }
     fixedWalls
     {
         type            compressible::epsilonWallFunction;
+        refValue        uniform 0;
+        value           uniform 0.01;
         Cmu             0.09;
         kappa           0.41;
         E               9.8;
-        value           uniform 0.01;
     }
 }
+
 
 // ************************************************************************* //

@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -51,7 +51,7 @@ namespace Foam
 
 typedef Field<tensor> tensorField;
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * * Global Functions  * * * * * * * * * * * * * //
 
 UNARY_FUNCTION(scalar, tensor, tr)
 UNARY_FUNCTION(sphericalTensor, tensor, sph)
@@ -70,8 +70,11 @@ UNARY_FUNCTION(tensor, tensor, hinv)
 UNARY_FUNCTION(vector, symmTensor, eigenValues)
 UNARY_FUNCTION(tensor, symmTensor, eigenVectors)
 
+BINARY_FUNCTION(tensor, tensor, vector, scaleRow)
+BINARY_TYPE_FUNCTION(tensor, tensor, vector, scaleRow)
 
-// * * * * * * * * * * * * * * * global operators  * * * * * * * * * * * * * //
+
+// * * * * * * * * * * * * * * * Global Operators  * * * * * * * * * * * * * //
 
 UNARY_OPERATOR(vector, tensor, *, hdual)
 UNARY_OPERATOR(tensor, vector, *, hdual)

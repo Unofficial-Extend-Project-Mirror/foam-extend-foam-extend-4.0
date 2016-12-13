@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -53,8 +53,6 @@ class faSchemes
 :
     public IOdictionary
 {
-private:
-
     // Private data
 
         dictionary ddtSchemes_;
@@ -78,13 +76,19 @@ private:
         dictionary laplacianSchemes_;
         ITstream defaultLaplacianScheme_;
 
-        dictionary fluxRequired_;
+        mutable dictionary fluxRequired_;
+        bool defaultFluxRequired_;
 
 
     // Private Member Functions
 
-        //- Disallow default bitwise copy construct and assignment
+        //- Clear the dictionaries and streams before reading
+        void clear();
+
+        //- Disallow default bitwise copy construct
         faSchemes(const faSchemes&);
+
+        //- Disallow default bitwise assignment
         void operator=(const faSchemes&);
 
 
@@ -119,6 +123,8 @@ public:
             ITstream& lnGradScheme(const word& name) const;
 
             ITstream& laplacianScheme(const word& name) const;
+
+            void setFluxRequired(const word& name) const;
 
             bool fluxRequired(const word& name) const;
 

@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -58,7 +58,7 @@ Foam::word Foam::coupledFvMatrix<Type>::coupledPsiName() const
 
         if (rowI < matrices.size() - 1)
         {
-            cpn += "+";
+            cpn += "_";
         }
     }
 
@@ -105,6 +105,7 @@ Foam::coupledFvMatrix<Type>::solve(const dictionary& solverControls)
         source.set(rowI, new Field<Type>(curMatrix.source()));
         sourceCmpt.set(rowI, new scalarField(curMatrix.psi().size()));
 
+        curMatrix.completeAssembly();
         curMatrix.addBoundarySource(source[rowI]);
 
         interfaces[rowI] = curMatrix.psi().boundaryField().interfaces();
@@ -198,7 +199,14 @@ Foam::coupledFvMatrix<Type>::solve(const dictionary& solverControls)
         {
             fvMatrix<Type>& curMatrix =
                 static_cast<fvMatrix<Type>& >(matrices[rowI]);
-            curMatrix.psi().internalField().replace(cmpt, psiCmpt[rowI]);
+
+            GeometricField<Type, fvPatchField, volMesh>& psiRef =
+                const_cast<GeometricField<Type, fvPatchField, volMesh>&>
+                (
+                    curMatrix.psi()
+                );
+
+            psiRef.internalField().replace(cmpt, psiCmpt[rowI]);
             curMatrix.diag() = saveDiag[rowI];
         }
     }
@@ -206,9 +214,16 @@ Foam::coupledFvMatrix<Type>::solve(const dictionary& solverControls)
     // Correct boundary conditions
     forAll (matrices, rowI)
     {
-        fvMatrix<Type>& curMatrix =
-            static_cast<fvMatrix<Type>& >(matrices[rowI]);
-        curMatrix.psi().correctBoundaryConditions();
+        const fvMatrix<Type>& curMatrix =
+            static_cast<const fvMatrix<Type>&>(matrices[rowI]);
+
+        GeometricField<Type, fvPatchField, volMesh>& psiRef =
+            const_cast<GeometricField<Type, fvPatchField, volMesh>&>
+            (
+                curMatrix.psi()
+            );
+
+        psiRef.correctBoundaryConditions();
     }
 
     return solverPerfVec;

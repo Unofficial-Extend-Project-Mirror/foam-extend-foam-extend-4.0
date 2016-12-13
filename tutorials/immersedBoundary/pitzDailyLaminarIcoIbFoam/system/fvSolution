@@ -1,7 +1,7 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | foam-extend: Open Source CFD                    |
-|  \\    /   O peration     | Version:     3.2                                |
+|  \\    /   O peration     | Version:     4.0                                |
 |   \\  /    A nd           | Web:         http://www.foam-extend.org         |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
@@ -40,6 +40,19 @@ solvers
 //     }
 
     p
+    {
+        solver          GAMG;
+        tolerance       1e-07;
+        relTol          0.01;
+        minIter 1;
+        smoother        GaussSeidel;
+        cacheAgglomeration true;
+        nCellsInCoarsestLevel 10;
+        agglomerator    faceAreaPair;
+        mergeLevels     1;
+    }
+
+    pFinal
     {
         solver          GAMG;
         tolerance       1e-07;
@@ -84,5 +97,6 @@ PIMPLE
     pRefPoint (0.1 0 0);
     pRefValue 0;
 }
+
 
 // ************************************************************************* //

@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -62,7 +62,7 @@ int main(int argc, char *argv[])
 
         int iCorr = 0;
         scalar initialResidual = 0;
-        lduMatrix::solverPerformance solverPerf;
+        lduSolverPerformance solverPerf;
         scalar relativeResidual = 1.0;
         lduMatrix::debug = 0;
 

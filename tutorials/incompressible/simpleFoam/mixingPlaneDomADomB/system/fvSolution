@@ -1,7 +1,7 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | foam-extend: Open Source CFD                    |
-|  \\    /   O peration     | Version:     3.2                                |
+|  \\    /   O peration     | Version:     4.0                                |
 |   \\  /    A nd           | Web:         http://www.foam-extend.org         |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
@@ -66,7 +66,13 @@ SIMPLE
     nNonOrthogonalCorrectors 1;
     pRefCell 0;
     pRefValue 0;
-    convergence 1e-5;
+
+    residualControl
+    {
+        p               1e-5;
+        U               1e-5;
+        "(k|epsilon)"   1e-5;
+    }
 }
 
 relaxationFactors
@@ -76,5 +82,6 @@ relaxationFactors
     k               0.7;
     epsilon         0.7;
 }
+
 
 // ************************************************************************* //

@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -57,6 +57,7 @@ Description
 #include "ignition.H"
 #include "Switch.H"
 #include "OFstream.H"
+#include "pisoControl.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -66,9 +67,13 @@ int main(int argc, char *argv[])
 
 #   include "createEngineTime.H"
 #   include "createEngineMesh.H"
+
+    pisoControl piso(mesh);
+
 #   include "readCombustionProperties.H"
 #   include "createFields.H"
 #   include "initContinuityErrs.H"
+#   include "createTimeControls.H"
 #   include "readEngineTimeControls.H"
 #   include "compressibleCourantNo.H"
 #   include "setInitialDeltaT.H"
@@ -80,7 +85,6 @@ int main(int argc, char *argv[])
 
     while (runTime.run())
     {
-#       include "readPISOControls.H"
 #       include "readEngineTimeControls.H"
 #       include "compressibleCourantNo.H"
 #       include "setDeltaT.H"
@@ -96,7 +100,7 @@ int main(int argc, char *argv[])
 #       include "UEqn.H"
 
         // --- PISO loop
-        for (int corr=1; corr<=nCorr; corr++)
+        while (piso.correct())
         {
 #           include "ftEqn.H"
 #           include "bEqn.H"

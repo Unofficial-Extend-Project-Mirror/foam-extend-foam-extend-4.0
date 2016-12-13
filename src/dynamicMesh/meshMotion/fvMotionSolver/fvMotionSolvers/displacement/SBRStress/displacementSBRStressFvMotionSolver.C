@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -136,7 +136,8 @@ void Foam::displacementSBRStressFvMotionSolver::solve()
 
     surfaceScalarField Df = diffusivityPtr_->operator()();
 
-    volTensorField gradCd = fvc::grad(cellDisplacement_);
+    const tmp<volTensorField> tgradCd = fvc::grad(cellDisplacement_);
+    const volTensorField& gradCd = tgradCd();
 
     Foam::solve
     (

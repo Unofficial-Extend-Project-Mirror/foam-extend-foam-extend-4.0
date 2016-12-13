@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -64,7 +64,6 @@ class SRFModel
 :
     public IOdictionary
 {
-
 protected:
 
     // Protected data
@@ -168,10 +167,10 @@ public:
             //- Return velocity vector from positions
             vectorField velocity(const vectorField& positions) const;
 
-            //- Return velocity of SRF for complete mesh
+            //- Return rotational velocity of SRF for complete mesh
             tmp<volVectorField> U() const;
 
-            //- Return face velocity of SRF for complete mesh
+            //- Return rotational face velocity of SRF for complete mesh
             tmp<surfaceVectorField> faceU() const;
 
             //- Return absolute velocity for complete mesh

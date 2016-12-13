@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -166,7 +166,7 @@ public:
 
         //- Returns div(rho*dev(B)).
         // This is the additional term due to the filtering of the NSE.
-        virtual tmp<fvVectorMatrix> divDevRhoBeff(volVectorField& U) const;
+        virtual tmp<fvVectorMatrix> divDevRhoBeff() const;
 
         //- Correct nuTilda and related properties
         virtual void correct(const tmp<volTensorField>& gradU);

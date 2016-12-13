@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -91,8 +91,8 @@ void calcIncompressibleYPlus
 
             Info<< "Patch " << patchi
                 << " named " << nutPw.patch().name()
-                << " y+ : min: " << min(Yp) << " max: " << max(Yp)
-                << " average: " << average(Yp) << nl << endl;
+                << " y+ : min: " << gMin(Yp) << " max: " << gMax(Yp)
+                << " average: " << gAverage(Yp) << nl << endl;
         }
     }
 
@@ -171,8 +171,8 @@ void calcCompressibleYPlus
 
             Info<< "Patch " << patchi
                 << " named " << mutPw.patch().name()
-                << " y+ : min: " << min(Yp) << " max: " << max(Yp)
-                << " average: " << average(Yp) << nl << endl;
+                << " y+ : min: " << gMin(Yp) << " max: " << gMax(Yp)
+                << " average: " << gAverage(Yp) << nl << endl;
         }
     }
 
@@ -243,8 +243,8 @@ void calcTwoPhaseYPlus
 
             Info<< "Patch " << patchi
                 << " named " << nutPw.patch().name()
-                << " y+ : min: " << min(Yp) << " max: " << max(Yp)
-                << " average: " << average(Yp) << nl << endl;
+                << " y+ : min: " << gMin(Yp) << " max: " << gMax(Yp)
+                << " average: " << gAverage(Yp) << nl << endl;
         }
     }
 

@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -288,14 +288,14 @@ tmp<volSymmTensorField> SpalartAllmaras::devRhoReff() const
 }
 
 
-tmp<fvVectorMatrix> SpalartAllmaras::divDevRhoReff(volVectorField& U) const
+tmp<fvVectorMatrix> SpalartAllmaras::divDevRhoReff() const
 {
     volScalarField muEff_ = muEff();
 
     return
     (
-      - fvm::laplacian(muEff_, U)
-      - fvc::div(muEff_*dev2(fvc::grad(U)().T()))
+      - fvm::laplacian(muEff_, U_)
+      - fvc::div(muEff_*dev2(T(fvc::grad(U_))))
     );
 }
 

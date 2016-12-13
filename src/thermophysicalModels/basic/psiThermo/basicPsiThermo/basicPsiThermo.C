@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -46,6 +46,21 @@ Foam::basicPsiThermo::basicPsiThermo(const fvMesh& mesh, const objectRegistry& o
 
 Foam::basicPsiThermo::~basicPsiThermo()
 {}
+
+
+// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+
+const Foam::volScalarField& Foam::basicPsiThermo::drhodh() const
+{
+    notImplemented("basicPsiThermo::drhodh()");
+    return const_cast<volScalarField&>(volScalarField::null());
+}
+
+const Foam::volScalarField& Foam::basicPsiThermo::drhode() const
+{
+    notImplemented("basicPsiThermo::drhode()");
+    return const_cast<volScalarField&>(volScalarField::null());
+}
 
 
 // ************************************************************************* //

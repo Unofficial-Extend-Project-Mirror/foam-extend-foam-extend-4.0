@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -324,24 +324,6 @@ mixingPlaneFvPatchField<Type>::mixingPlaneFvPatchField
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-// Return shadow field
-template<class Type>
-const mixingPlaneFvPatchField<Type>&
-mixingPlaneFvPatchField<Type>::shadowPatchField() const
-{
-    const GeometricField<Type, fvPatchField, volMesh>& fld =
-        static_cast<const GeometricField<Type, fvPatchField, volMesh>&>
-        (
-            this->internalField()
-        );
-
-    return refCast<const mixingPlaneFvPatchField<Type> >
-    (
-        fld.boundaryField()[mixingPlanePatch_.shadowIndex()]
-    );
-}
-
-
 template<class Type>
 void mixingPlaneFvPatchField<Type>::autoMap
 (
@@ -368,6 +350,39 @@ void mixingPlaneFvPatchField<Type>::rmap
         refCast<const mixingPlaneFvPatchField<Type> >(ptf);
 
     fluxWeights_.rmap(tiptf.fluxWeights_, addr);
+}
+
+
+// Return shadow field
+template<class Type>
+const mixingPlaneFvPatchField<Type>&
+mixingPlaneFvPatchField<Type>::shadowPatchField() const
+{
+    const GeometricField<Type, fvPatchField, volMesh>& fld =
+        static_cast<const GeometricField<Type, fvPatchField, volMesh>&>
+        (
+            this->internalField()
+        );
+
+    return refCast<const mixingPlaneFvPatchField<Type> >
+    (
+        fld.boundaryField()[mixingPlanePatch_.shadowIndex()]
+    );
+}
+
+
+// Return shadow field
+template<class Type>
+const mixingPlaneInterpolation::mixingType&
+mixingPlaneFvPatchField<Type>::mixing() const
+{
+    // If mixing type is unknown, read it
+    if (this->mixing_ == mixingPlaneInterpolation::MIXING_UNKNOWN)
+    {
+        this->readMixingType();
+    }
+
+    return mixing_;
 }
 
 

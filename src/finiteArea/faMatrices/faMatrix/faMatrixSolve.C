@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -75,6 +75,10 @@ lduSolverPerformance faMatrix<Type>::solve(const dictionary& solverControls)
     // HJ, 20/Nov/2007
     lduInterfaceFieldPtrsList interfaces = psi_.boundaryField().interfaces();
 
+    // Cast into a non-const to solve.  HJ, 6/May/2016
+    GeometricField<Type, faPatchField, areaMesh>& psi =
+       const_cast<GeometricField<Type, faPatchField, areaMesh>&>(psi_);
+
     for (direction cmpt = 0; cmpt < Type::nComponents; cmpt++)
     {
         // copy field and source
@@ -139,11 +143,11 @@ lduSolverPerformance faMatrix<Type>::solve(const dictionary& solverControls)
             solverPerfVec = solverPerf;
         }
 
-        psi_.internalField().replace(cmpt, psiCmpt);
+        psi.internalField().replace(cmpt, psiCmpt);
         diag() = saveDiag;
     }
 
-    psi_.correctBoundaryConditions();
+    psi.correctBoundaryConditions();
 
     return solverPerfVec;
 }

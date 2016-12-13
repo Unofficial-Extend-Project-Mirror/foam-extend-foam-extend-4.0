@@ -1,7 +1,7 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | foam-extend: Open Source CFD                    |
-|  \\    /   O peration     | Version:     3.2                                |
+|  \\    /   O peration     | Version:     4.0                                |
 |   \\  /    A nd           | Web:         http://www.foam-extend.org         |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
@@ -25,35 +25,35 @@ solvers
     }
     U
     {
-        solver           PBiCG;
+        solver           BiCGStab;
         preconditioner   DILU;
         tolerance        1e-05;
         relTol           0.1;
     }
     k
     {
-        solver           PBiCG;
+        solver           BiCGStab;
         preconditioner   DILU;
         tolerance        1e-05;
         relTol           0.1;
     }
     epsilon
     {
-        solver           PBiCG;
+        solver           BiCGStab;
         preconditioner   DILU;
         tolerance        1e-05;
         relTol           0.1;
     }
     R
     {
-        solver           PBiCG;
+        solver           BiCGStab;
         preconditioner   DILU;
         tolerance        1e-05;
         relTol           0.1;
     }
     nuTilda
     {
-        solver           PBiCG;
+        solver           BiCGStab;
         preconditioner   DILU;
         tolerance        1e-05;
         relTol           0.1;
@@ -64,17 +64,39 @@ SIMPLE
 {
     nNonOrthogonalCorrectors 0;
 
-    convergence          1e-4;
+    residualControl
+    {
+        p               1e-4;
+        U               1e-4;
+        "(k|epsilon)"   1e-4;
+    }
 }
 
 relaxationFactors
 {
-    p               0.3;
-    U               0.7;
-    k               0.7;
-    epsilon         0.7;
-    R               0.7;
-    nuTilda         0.7;
+    fields
+    {
+        p               0.3;
+    }
+
+    equations
+    {
+        U               0.7;
+        k               0.7;
+        epsilon         0.7;
+        R               0.7;
+        nuTilda         0.7;
+    }
 }
+
+cache
+{
+    grad(U);
+    grad(p);
+    grad(k);
+    grad(omega);
+    grad(epsilon);
+}
+
 
 // ************************************************************************* //

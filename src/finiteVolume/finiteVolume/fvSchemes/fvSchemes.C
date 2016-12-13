@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -28,7 +28,6 @@ License
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-
 Foam::debug::debugSwitch
 Foam::fvSchemes::debug
 (
@@ -54,10 +53,11 @@ void Foam::fvSchemes::clear()
     defaultSnGradScheme_.clear();
     laplacianSchemes_.clear(); // optional
     defaultLaplacianScheme_.clear();
-    fluxRequired_.clear();
-    defaultFluxRequired_ = false;
-    cacheFields_.clear();
+
+    // Set up special handling for fluxRequired: do not clear
+    // HJ, 25/Jul/2016
 }
+
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
@@ -174,15 +174,7 @@ Foam::fvSchemes::fvSchemes(const objectRegistry& obr)
             tokenList()
         )()
     ),
-    defaultFluxRequired_(false),
-    cacheFields_
-    (
-        ITstream
-        (
-            objectPath() + "::cacheFields",
-            tokenList()
-        )()
-    )
+    defaultFluxRequired_(false)
 {
     if (!headerOk())
     {
@@ -210,7 +202,7 @@ bool Foam::fvSchemes::read()
     {
         const dictionary& dict = schemesDict();
 
-        // persistent settings across reads is incorrect
+        // Persistent settings across reads is incorrect
         clear();
 
         if (dict.found("ddtSchemes"))
@@ -408,11 +400,6 @@ bool Foam::fvSchemes::read()
             }
         }
 
-        if (dict.found("cacheFields"))
-        {
-            cacheFields_ = dict.subDict("cacheFields");
-        }
-
         return true;
     }
     else
@@ -572,6 +559,17 @@ Foam::ITstream& Foam::fvSchemes::laplacianScheme(const word& name) const
 }
 
 
+void Foam::fvSchemes::setFluxRequired(const word& name) const
+{
+    if (debug)
+    {
+        Info<< "Setting fluxRequired for " << name << endl;
+    }
+
+    fluxRequired_.add(name, true, true);
+}
+
+
 bool Foam::fvSchemes::fluxRequired(const word& name) const
 {
     if (debug)
@@ -589,22 +587,34 @@ bool Foam::fvSchemes::fluxRequired(const word& name) const
     }
 }
 
-
-bool Foam::fvSchemes::cache(const word& name) const
+bool Foam::fvSchemes::writeData(Ostream& os) const
 {
-    if (debug)
-    {
-        Info<< "Lookup cache for " << name << endl;
-    }
+    // Write dictionaries
+    os << nl << "ddtSchemes";
+    ddtSchemes_.write(os, true);
 
-    if (cacheFields_.found(name))
-    {
-        return true;
-    }
-    else
-    {
-        return false;
-    }
+    os << nl << "d2dt2Schemes";
+    d2dt2Schemes_.write(os, true);
+
+    os << nl << "interpolationSchemes";
+    interpolationSchemes_.write(os, true);
+
+    os << nl << "divSchemes";
+    divSchemes_.write(os, true);
+
+    os << nl << "gradSchemes";
+    gradSchemes_.write(os, true);
+
+    os << nl << "snGradSchemes";
+    snGradSchemes_.write(os, true);
+
+    os << nl << "laplacianSchemes";
+    laplacianSchemes_.write(os, true);
+
+    os << nl << "fluxRequired";
+    fluxRequired_.write(os, true);
+
+    return true;
 }
 
 

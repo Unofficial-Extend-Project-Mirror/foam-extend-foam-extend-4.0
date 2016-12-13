@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -38,5 +38,28 @@ namespace fv
     makeSnGradScheme(correctedSnGrad)
 }
 }
+
+
+template<>
+Foam::tmp<Foam::surfaceScalarField>
+Foam::fv::correctedSnGrad<Foam::scalar>::correction
+(
+    const volScalarField& vsf
+) const
+{
+    return fullGradCorrection(vsf);
+}
+
+
+template<>
+Foam::tmp<Foam::surfaceVectorField>
+Foam::fv::correctedSnGrad<Foam::vector>::correction
+(
+    const volVectorField& vvf
+) const
+{
+    return fullGradCorrection(vvf);
+}
+
 
 // ************************************************************************* //

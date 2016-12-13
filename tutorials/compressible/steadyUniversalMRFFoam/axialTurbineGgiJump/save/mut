@@ -1,0 +1,146 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | foam-extend: Open Source CFD                    |
+|  \\    /   O peration     | Version:     4.0                                |
+|   \\  /    A nd           | Web:         http://www.foam-extend.org         |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       volScalarField;
+    location    "0";
+    object      mut;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+dimensions      [1 -1 -1 0 0 0 0];
+
+internalField   uniform 0;
+
+boundaryField
+{
+    GVINLET
+    {
+        type            calculated;
+        value           uniform 0;
+    }
+    GVOUTLET
+    {
+        type            ggi;
+        value           uniform 0;
+    }
+    GVCYCLIC
+    {
+        type            cyclic;
+        value           uniform 0;
+    }
+    GVBLADE
+    {
+        type            mutWallFunction;
+        Cmu             0.09;
+        kappa           0.41;
+        E               9.8;
+        value           uniform 0;
+    }
+    GVHUB
+    {
+        type            mutWallFunction;
+        Cmu             0.09;
+        kappa           0.41;
+        E               9.8;
+        value           uniform 0;
+    }
+    GVSHROUD
+    {
+        type            mutWallFunction;
+        Cmu             0.09;
+        kappa           0.41;
+        E               9.8;
+        value           uniform 0;
+    }
+    RUINLET
+    {
+        type            ggi;
+        value           uniform 0;
+    }
+    RUOUTLET
+    {
+        type            ggi;
+        value           uniform 0;
+    }
+    RUCYCLIC1
+    {
+        type            cyclicGgi;
+        value           uniform 0;
+    }
+    RUCYCLIC2
+    {
+        type            cyclicGgi;
+        value           uniform 0;
+    }
+    RUBLADE
+    {
+        type            mutWallFunction;
+        Cmu             0.09;
+        kappa           0.41;
+        E               9.8;
+        value           uniform 0;
+    }
+    RUHUB
+    {
+        type            mutWallFunction;
+        Cmu             0.09;
+        kappa           0.41;
+        E               9.8;
+        value           uniform 0;
+    }
+    RUSHROUD
+    {
+        type            mutWallFunction;
+        Cmu             0.09;
+        kappa           0.41;
+        E               9.8;
+        value           uniform 0;
+    }
+    DTINLET
+    {
+        type            ggi;
+        value           uniform 0;
+    }
+    DTOUTLET
+    {
+        type            calculated;
+        value           uniform 0;
+    }
+    DTCYCLIC1
+    {
+        type            cyclicGgi;
+        value           uniform 0;
+    }
+    DTCYCLIC2
+    {
+        type            cyclicGgi;
+        value           uniform 0;
+    }
+    DTHUB
+    {
+        type            mutWallFunction;
+        Cmu             0.09;
+        kappa           0.41;
+        E               9.8;
+        value           uniform 0;
+    }
+    DTSHROUD
+    {
+        type            mutWallFunction;
+        Cmu             0.09;
+        kappa           0.41;
+        E               9.8;
+        value           uniform 0;
+    }
+}
+
+
+// ************************************************************************* //

@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -125,6 +125,7 @@ Foam::multiphaseMixture::multiphaseMixture
     forAllIter(PtrDictionary<phase>, phases_, iter)
     {
         alphaTable_.add(iter());
+        mesh_.schemesDict().setFluxRequired(iter().volScalarField::name());
     }
 }
 
@@ -265,23 +266,23 @@ void Foam::multiphaseMixture::correct()
     (
         readLabel
         (
-            mesh_.solutionDict().subDict("PISO").lookup("nAlphaSubCycles")
+            mesh_.solutionDict().subDict("PIMPLE").lookup("nAlphaSubCycles")
         )
     );
 
     label nAlphaCorr
     (
-        readLabel(mesh_.solutionDict().subDict("PISO").lookup("nAlphaCorr"))
+        readLabel(mesh_.solutionDict().subDict("PIMPLE").lookup("nAlphaCorr"))
     );
 
     bool cycleAlpha
     (
-        Switch(mesh_.solutionDict().subDict("PISO").lookup("cycleAlpha"))
+        Switch(mesh_.solutionDict().subDict("PIMPLE").lookup("cycleAlpha"))
     );
 
     scalar cAlpha
     (
-        readScalar(mesh_.solutionDict().subDict("PISO").lookup("cAlpha"))
+        readScalar(mesh_.solutionDict().subDict("PIMPLE").lookup("cAlpha"))
     );
 
 

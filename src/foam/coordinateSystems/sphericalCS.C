@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -276,7 +276,7 @@ Foam::tmp<Foam::vectorField> Foam::sphericalCS::globalToLocal
 void Foam::sphericalCS::write(Ostream& os) const
 {
     coordinateSystem::write(os);
-    os << "inDegrees: " << inDegrees() << endl;
+    os << " inDegrees: " << inDegrees() << endl;
 }
 
 

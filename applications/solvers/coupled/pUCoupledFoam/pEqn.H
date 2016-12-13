@@ -1,21 +1,14 @@
 // Pressure parts of the continuity equation
-surfaceScalarField rUAf
-(
-    "rUAf",
-    fvc::interpolate(1.0/UEqn().A())
-);
-
-UEqn.clear();
-
 surfaceScalarField presSource
 (
     "presSource",
-    rUAf*(fvc::interpolate(fvc::grad(p, "grad(pSource)")) & mesh.Sf())
+    fvc::interpolate(rAU)*
+    (fvc::interpolate(fvc::grad(p)) & mesh.Sf())
 );
 
 fvScalarMatrix pEqn
 (
-  - fvm::laplacian(rUAf, p)
+  - fvm::laplacian(rAU, p)
  ==
   - fvc::div(presSource)
 );

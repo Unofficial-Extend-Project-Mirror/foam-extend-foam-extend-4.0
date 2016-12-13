@@ -2,7 +2,7 @@
 #------------------------------------------------------------------------------
 # =========                 |
 # \\      /  F ield         | foam-extend: Open Source CFD
-#  \\    /   O peration     | Version:     3.2
+#  \\    /   O peration     | Version:     4.0
 #   \\  /    A nd           | Web:         http://www.foam-extend.org
 #    \\/     M anipulation  | For copyright notice see file Copyright
 #------------------------------------------------------------------------------
@@ -148,9 +148,15 @@ find -L . -type l -exec rm {} \;
 # create links, avoid recreating links unless necessary
 # things placed in the 'noLink' directory are skipped
 #
+if [ "$WM_ARCH_BASE" = "mingw" -a ! "$WM_FORCE_LN" ] ; then
+    lnCmd="genInclude.pl"
+else
+    lnCmd="ln $lnOpt"
+fi
+
 find .. $findOpt \
     \( -name lnInclude -o -name Make -o -name config -o -name noLink \) -prune \
  -o \( -name '*.[CHh]' -o -name '*.[ch]xx' -o -name '*.[ch]pp' -o -name '*.type' \)  \
- -exec ln $lnOpt {} . \;
+ -exec $lnCmd {} . \;
 
 #------------------------------------------------------------------------------

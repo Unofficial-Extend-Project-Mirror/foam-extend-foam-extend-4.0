@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -58,11 +58,18 @@ lduSolverPerformance tetFemMatrix<scalar>::solve
     // Store the boundary coefficients for insertion of boundary conditions
     storeBoundaryCoeffs();
 
+    // Cast into a non-const to solve.  HJ, 6/May/2016
+    GeometricField<scalar, tetPolyPatchField, tetPointMesh>& psi =
+        const_cast<GeometricField<scalar, tetPolyPatchField, tetPointMesh>&>
+        (
+            psi_
+        );
+
     // Set component boundary conditions
     scalarField sourceCpy = source_;
 
     // Store the boundary coefficients for insertion of boundary conditions
-    setComponentBoundaryConditions(0, psi_, sourceCpy);
+    setComponentBoundaryConditions(0, psi, sourceCpy);
 
     // Add the coupling coefficients
     addCouplingCoeffs();
@@ -109,7 +116,7 @@ lduSolverPerformance tetFemMatrix<scalar>::solve
         coupledIntCoeffs,
         interfaces,
         solverControls
-    )->solve(psi_.internalField(), sourceCpy);
+    )->solve(psi.internalField(), sourceCpy);
 
     solverPerf.print();
 
@@ -122,7 +129,7 @@ lduSolverPerformance tetFemMatrix<scalar>::solve
             << endl;
     }
 
-    psi_.correctBoundaryConditions();
+    psi.correctBoundaryConditions();
 
     return solverPerf;
 }
@@ -138,7 +145,11 @@ tmp<scalarField> tetFemMatrix<scalar>::residual()
     // Set component boundary conditions
     scalarField sourceCpy = source_;
 
-    setComponentBoundaryConditions(0, psi_, sourceCpy);
+    // Make a copy of psi to make sure it is not corrupted
+    // HJ, 6/May/2016
+    scalarField psiCpy = psi_;
+
+    setComponentBoundaryConditions(0, psiCpy, sourceCpy);
 
     // Add the coupling coefficients
     addCouplingCoeffs();

@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -101,7 +101,7 @@ public:
         virtual tmp<volSymmTensorField> devReff() const;
 
         //- Return the source term for the momentum equation
-        virtual tmp<fvVectorMatrix> divDevReff(volVectorField& U) const;
+        virtual tmp<fvVectorMatrix> divDevReff() const;
 
         //- Correct the laminar viscosity
         virtual void correct();

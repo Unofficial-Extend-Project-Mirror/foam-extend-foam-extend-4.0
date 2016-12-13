@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -122,6 +122,32 @@ void Foam::CoeffField<Foam::symmTensor4thOrder>::operator=
 }
 
 
+// * * * * * * * * * * * * * * * IOstream Operators  * * * * * * * * * * * * //
+
+Foam::Ostream& Foam::operator<<
+(
+    Ostream& os,
+    const CoeffField<symmTensor4thOrder>& f
+)
+{
+    const DecoupledCoeffField<symmTensor4thOrder>& df = f;
+    return operator<<(os, df);
+}
+
+
+Foam::Ostream& Foam::operator<<
+(
+    Ostream& os,
+    const tmp<CoeffField<symmTensor4thOrder> >& tf
+)
+{
+    const DecoupledCoeffField<symmTensor4thOrder>& df = tf();
+    os << df;
+    tf.clear();
+    return os;
+}
+
+
 /* * * * * * * * * * * * * * * * Global functions  * * * * * * * * * * * * * */
 
 Foam::tmp<Foam::CoeffField<Foam::symmTensor4thOrder> > Foam::inv
@@ -135,6 +161,48 @@ Foam::tmp<Foam::CoeffField<Foam::symmTensor4thOrder> > Foam::inv
     (
         new CoeffField<symmTensor4thOrder>(inv(df)())
     );
+}
+
+
+template<>
+void Foam::multiply
+(
+    symmTensor4thOrderField& f,
+    const CoeffField<symmTensor4thOrder>& f1,
+    const symmTensor4thOrder& f2
+)
+{
+    const DecoupledCoeffField<symmTensor4thOrder>& df1 = f1;
+
+    multiply(f, df1, f2);
+}
+
+
+template<>
+void Foam::multiply
+(
+    symmTensor4thOrderField& f,
+    const CoeffField<symmTensor4thOrder>& f1,
+    const symmTensor4thOrderField& f2
+)
+{
+    const DecoupledCoeffField<symmTensor4thOrder>& df1 = f1;
+
+    multiply(f, df1, f2);
+}
+
+
+template<>
+void Foam::multiply
+(
+    symmTensor4thOrderField& f,
+    const symmTensor4thOrderField& f1,
+    const CoeffField<symmTensor4thOrder>& f2
+)
+{
+    const DecoupledCoeffField<symmTensor4thOrder>& df2 = f2;
+
+    multiply(f, f1, df2);
 }
 
 

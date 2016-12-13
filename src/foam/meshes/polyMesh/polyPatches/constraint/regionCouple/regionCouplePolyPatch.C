@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -222,10 +222,10 @@ void Foam::regionCouplePolyPatch::calcPatchToPatch() const
                 forwardT(),
                 reverseT(),
                 shadow().separation(), // Slave-to-master separation. Bug fix
-                0,             // Non-overlapping face tolerances
-                0,
+                true,          // Patch data is complete on all processors
+                SMALL,         // Non-overlapping face tolerances
+                SMALL,
                 true,          // Rescale weighting factors
-//                 ggiInterpolation::AABB
                 ggiInterpolation::BB_OCTREE  // Octree search, MB.
             );
 

@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -266,20 +266,26 @@ void Foam::fineAmgLevel::scaleX
         mag(scalingVector[0]) > GREAT
      || mag(scalingVector[1]) > GREAT
      || scalingVector[0]*scalingVector[1] <= 0
-     || mag(scalingVector[0]) < mag(scalingVector[1])
+//      || mag(scalingVector[0]) < mag(scalingVector[1])
     )
     {
         // Factor = 1.0, no scaling
     }
-    else if (mag(scalingVector[0]) > 2*mag(scalingVector[1]))
-    {
-        // Max factor = 2
-        x *= 2.0;
-    }
     else
     {
-        // Regular scaling
-        x *= scalingVector[0]/stabilise(scalingVector[1], SMALL);
+        // Regular scaling with a limiter
+        scalar scalingFactor =
+            Foam::max
+            (
+                0.1,
+                Foam::min
+                (
+                    scalingVector[0]/stabilise(scalingVector[1], SMALL),
+                    10
+                )
+            );
+
+        x *= scalingFactor;
     }
 }
 

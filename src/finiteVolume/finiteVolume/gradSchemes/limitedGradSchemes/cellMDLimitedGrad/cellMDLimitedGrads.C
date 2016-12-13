@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -24,6 +24,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "cellMDLimitedGrad.H"
+#include "gaussGrad.H"
 #include "fvMesh.H"
 #include "volMesh.H"
 #include "surfaceMesh.H"
@@ -55,7 +56,7 @@ tmp<volVectorField> cellMDLimitedGrad<scalar>::calcGrad
 {
     const fvMesh& mesh = vsf.mesh();
 
-    tmp<volVectorField> tGrad = basicGradScheme_().grad(vsf, name);
+    tmp<volVectorField> tGrad = basicGradScheme_().calcGrad(vsf, name);
 
     if (k_ < SMALL)
     {
@@ -182,7 +183,7 @@ tmp<volVectorField> cellMDLimitedGrad<scalar>::calcGrad
     }
 
     g.correctBoundaryConditions();
-    gradScheme<scalar>::correctBoundaryConditions(vsf, g);
+    gaussGrad<scalar>::correctBoundaryConditions(vsf, g);
 
     return tGrad;
 }
@@ -197,7 +198,7 @@ tmp<volTensorField> cellMDLimitedGrad<vector>::calcGrad
 {
     const fvMesh& mesh = vsf.mesh();
 
-    tmp<volTensorField> tGrad = basicGradScheme_().grad(vsf, name);
+    tmp<volTensorField> tGrad = basicGradScheme_().calcGrad(vsf, name);
 
     if (k_ < SMALL)
     {
@@ -323,7 +324,7 @@ tmp<volTensorField> cellMDLimitedGrad<vector>::calcGrad
     }
 
     g.correctBoundaryConditions();
-    gradScheme<vector>::correctBoundaryConditions(vsf, g);
+    gaussGrad<vector>::correctBoundaryConditions(vsf, g);
 
     return tGrad;
 }

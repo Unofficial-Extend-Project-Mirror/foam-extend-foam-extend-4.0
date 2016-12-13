@@ -158,7 +158,9 @@ build_library() {
             download $PACKAGE.zip ftp://sourceware.org/pub/pthreads-win32/pthreads-w32-2-9-1-release.zip > $LOG_FILE 2>&1
             unzip_dir $PACKAGE >> $LOG_FILE 2>&1
             patch $PACKAGE
+            sleep 5
             mv $PACKAGE $INSTALL_DIR
+            sleep 5
             ;;
 
         metis-5.1.0)

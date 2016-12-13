@@ -1,7 +1,7 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | foam-extend: Open Source CFD                    |
-|  \\    /   O peration     | Version:     3.2                                |
+|  \\    /   O peration     | Version:     4.0                                |
 |   \\  /    A nd           | Web:         http://www.foam-extend.org         |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
@@ -28,8 +28,9 @@ boundaryField
 
     outlet
     {
-        type           inletOutlet;
-        inletValue     uniform (0 0 0);
+        type            inletOutlet;
+        inletValue      uniform (0 0 0);
+        value           uniform (100 0 0);
     }
 
     blade
@@ -55,5 +56,6 @@ boundaryField
         type            cyclic;
     }
 }
+
 
 // ************************************************************************* //

@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -239,11 +239,12 @@ tmp<volSymmTensorField> RNGkEpsilon::devRhoReff() const
 }
 
 
-tmp<fvVectorMatrix> RNGkEpsilon::divDevRhoReff(volVectorField& U) const
+tmp<fvVectorMatrix> RNGkEpsilon::divDevRhoReff() const
 {
     return
     (
-      - fvm::laplacian(muEff(), U) - fvc::div(muEff()*dev2(fvc::grad(U)().T()))
+      - fvm::laplacian(muEff(), U_)
+      - fvc::div(muEff()*dev2(T(fvc::grad(U_))))
     );
 }
 
@@ -304,9 +305,11 @@ void RNGkEpsilon::correct()
         divU += fvc::div(mesh_.phi());
     }
 
-    tmp<volTensorField> tgradU = fvc::grad(U_);
-    volScalarField S2 = (tgradU() && dev(twoSymm(tgradU())));
-    tgradU.clear();
+    // Change return type due to gradient cacheing.  HJ, 22/Apr/2016
+    const tmp<volTensorField> tgradU = fvc::grad(U_);
+    const volTensorField& gradU = tgradU();
+
+    volScalarField S2 = (gradU && dev(twoSymm(gradU)));
 
     volScalarField G("RASModel::G", mut_*S2);
 

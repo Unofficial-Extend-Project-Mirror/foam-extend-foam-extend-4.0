@@ -1,0 +1,63 @@
+/*---------------------------------------------------------------------------*\
+  =========                 |
+  \\      /  F ield         | foam-extend: Open Source CFD
+   \\    /   O peration     | Version:     4.0
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+
+    location    "constant";
+    object      thermophysicalProperties;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+//CL: List of possible real gas models
+
+//thermoType  realGasHThermo<pureMixture<sutherlandTransport<realGasSpecieThermo<nasaHeatCapacityPolynomial<redlichKwong>>>>>;
+//mixture         CO2 1 44.01 73.773e5 304.13 49436.5054 -626.411601 5.30172524 0.002503813816 -0.0000002127308728 -0.000000000768998878 2.849677801e-13 1.4792e-06 116;
+
+//thermoType  realGasHThermo<pureMixture<sutherlandTransport<realGasSpecieThermo<nasaHeatCapacityPolynomial<aungierRedlichKwong>>>>>;
+//mixture CO2 1 44.01 73.773e5 304.13 467.6 0.22394  49436.5054 -626.411601 5.30172524 0.002503813816 -0.0000002127308728 -0.000000000768998878 2.849677801E-13 1.4792e-06 116;
+
+thermoType  realGasHThermo<pureMixture<sutherlandTransport<realGasSpecieThermo<nasaHeatCapacityPolynomial<pengRobinson>>>>>;
+mixture        CO2 1 44.01 73.773e5 304.13 0.22394 49436.5054 -626.411601 5.30172524 0.002503813816 -0.0000002127308728 -0.000000000768998878 2.849677801e-13 1.4792e-06 116;
+
+//thermoType  realGasHThermo<pureMixture<sutherlandTransport<realGasSpecieThermo<nasaHeatCapacityPolynomial<soaveRedlichKwong>>>>>;
+//mixture         CO2 1 44.01 73.773e5 304.13 0.22394 49436.5054 -626.411601 5.30172524 0.002503813816 -0.0000002127308728 -0.000000000768998878 2.849677801e-13 1.4792e-06 116;
+
+//thermoType  realGasHThermo<pureMixture<sutherlandTransport<realGasSpecieThermo<constantHeatCapacity<aungierRedlichKwong>>>>>;
+//mixture CO2 1 44.01 73.773e5 304.13 467.6 0.22394  839 1.4792e-06 116;
+
+//thermoType  realGasHThermo<pureMixture<sutherlandTransport<realGasSpecieThermo<constantHeatCapacity<pengRobinson>>>>>;
+//thermoType  realGasHThermo<pureMixture<sutherlandTransport<realGasSpecieThermo<constantHeatCapacity<soaveRedlichKwong>>>>>;
+//thermoType  realGasHThermo<pureMixture<constTransport<realGasSpecieThermo<nasaHeatCapacityPolynomial<redlichKwong>>>>>;
+//thermoType  realGasHThermo<pureMixture<constTransport<realGasSpecieThermo<nasaHeatCapacityPolynomial<pengRobinson>>>>>;
+//thermoType  realGasHThermo<pureMixture<constTransport<realGasSpecieThermo<nasaHeatCapacityPolynomial<aungierRedlichKwong>>>>>;
+//thermoType  realGasHThermo<pureMixture<constTransport<realGasSpecieThermo<nasaHeatCapacityPolynomial<soaveRedlichKwong>>>>>;
+//thermoType  realGasHThermo<pureMixture<constTransport<realGasSpecieThermo<constantHeatCapacity<redlichKwong>>>>>;
+//thermoType  realGasHThermo<pureMixture<constTransport<realGasSpecieThermo<constantHeatCapacity<pengRobinson>>>>>;
+//thermoType  realGasHThermo<pureMixture<constTransport<realGasSpecieThermo<constantHeatCapacity<aungierRedlichKwong>>>>>;
+//thermoType  realGasHThermo<pureMixture<constTransport<realGasSpecieThermo<constantHeatCapacity<soaveRedlichKwong>>>>>;
+
+
+
+//CL: description of coefficients
+// *********************************************************************************************************************** //
+//   Coefficient:
+//   CO2                  --> Name
+//   1
+//   44.01                --> Molar Volume
+//   77.773e5             --> critical pressure
+//   304.13               --> critical temperatur
+//   0.22394              --> acentric factor (not needed for redlich kwong)
+//   467.6                --> critical density (only for aungier redlich kwong)
+//   49436.5054 --> 2.849677801e-13     --> 7 heat capacity polynomial coefficents --> coefficients, see paper cited in class
+//   ....                 --> two coefficents for sutherlandRealGasTransport or for the constRealGasTransport model
+//   839                  --> constant cp of perfect gas (used for constantHeatCapacity)
+// *********************************************************************************************************************** //
+

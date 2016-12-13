@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -34,7 +34,7 @@ Foam::UILList<LListBase, T>::UILList(const UILList<LListBase, T>& lst)
 {
     for (const_iterator iter = lst.begin(); iter != lst.end(); ++iter)
     {
-        append(&iter());
+        this->append(&iter());
     }
 }
 
@@ -48,7 +48,7 @@ void Foam::UILList<LListBase, T>::operator=(const UILList<LListBase, T>& rhs)
 
     for (const_iterator iter = rhs.begin(); iter != rhs.end(); ++iter)
     {
-        append(&iter());
+        this->append(&iter());
     }
 }
 

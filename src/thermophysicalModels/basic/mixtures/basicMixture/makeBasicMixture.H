@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -56,6 +56,26 @@ defineTemplateTypeNameAndDebugWithName                                        \
     0                                                                         \
 );
 
+#define makeBasicRealFluidMixture(Mixture,Transport,SpecieThermo,Thermo,EqnOfState) \
+                                                                              \
+typedef Mixture<Transport<SpecieThermo<Thermo<EqnOfState> > > >               \
+    Mixture##Transport##SpecieThermo##Thermo##EqnOfState;                     \
+                                                                              \
+defineTemplateTypeNameAndDebugWithName                                        \
+    (Mixture##Transport##SpecieThermo##Thermo##EqnOfState,                    \
+    #Mixture"<"#Transport"<"#SpecieThermo"<"#Thermo"<"#EqnOfState">>>>", 0)
+
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#define makeBasicRealFluidMixture(Mixture,Transport,SpecieThermo,Thermo,EqnOfState)                 \
+                                                                              \
+typedef Mixture<Transport<SpecieThermo<Thermo<EqnOfState> > > >               \
+    Mixture##Transport##SpecieThermo##Thermo##EqnOfState;                     \
+                                                                              \
+defineTemplateTypeNameAndDebugWithName                                        \
+    (Mixture##Transport##SpecieThermo##Thermo##EqnOfState,                    \
+    #Mixture"<"#Transport"<"#SpecieThermo"<"#Thermo"<"#EqnOfState">>>>", 0)
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

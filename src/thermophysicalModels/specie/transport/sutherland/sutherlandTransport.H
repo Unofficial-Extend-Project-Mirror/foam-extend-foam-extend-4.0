@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -158,6 +158,12 @@ public:
 
         //- Thermal diffusivity for enthalpy [kg/ms]
         inline scalar alpha(const scalar T) const;
+
+        //- Thermal conductivity [W/mK] for real gas
+        inline scalar kappa(const scalar rho, const scalar T) const;
+
+        //- Thermal diffusivity for enthalpy [kg/ms] for real gas
+        inline scalar alpha(const scalar rho, const scalar T) const;
 
         // Species diffusivity
         //inline scalar D(const scalar T) const;

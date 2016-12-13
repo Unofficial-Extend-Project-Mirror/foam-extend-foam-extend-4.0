@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -124,11 +124,12 @@ tmp<volSymmTensorField> GenEddyVisc::devRhoBeff() const
 }
 
 
-tmp<fvVectorMatrix> GenEddyVisc::divDevRhoBeff(volVectorField& U) const
+tmp<fvVectorMatrix> GenEddyVisc::divDevRhoBeff() const
 {
     return
     (
-      - fvm::laplacian(muEff(), U) - fvc::div(muEff()*dev2(fvc::grad(U)().T()))
+      - fvm::laplacian(muEff(), U_)
+      - fvc::div(muEff()*dev2(T(fvc::grad(U_))))
     );
 }
 

@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -82,12 +82,49 @@ public:
         void operator=(const linearTypeField&);
         void operator=(const tmp<linearTypeField>&);
 
+    // IOstream operators
+
+        friend Ostream& operator<<
+        (
+            Ostream&,
+            const CoeffField<diagTensor>&
+        );
+
+        friend Ostream& operator<<
+        (
+            Ostream&,
+            const tmp<CoeffField<diagTensor> >&
+        );
 };
 
 
 /* * * * * * * * * * * * * * * * Global functions  * * * * * * * * * * * * * */
 
 tmp<CoeffField<diagTensor> > inv(const CoeffField<diagTensor>& f);
+
+template<>
+void multiply
+(
+    Field<diagTensor>& f,
+    const CoeffField<diagTensor>& f1,
+    const diagTensor& f2
+);
+
+template<>
+void multiply
+(
+    Field<diagTensor>& f,
+    const CoeffField<diagTensor>& f1,
+    const Field<diagTensor>& f2
+);
+
+template<>
+void multiply
+(
+    Field<diagTensor>& f,
+    const Field<diagTensor>& f1,
+    const CoeffField<diagTensor>& f2
+);
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

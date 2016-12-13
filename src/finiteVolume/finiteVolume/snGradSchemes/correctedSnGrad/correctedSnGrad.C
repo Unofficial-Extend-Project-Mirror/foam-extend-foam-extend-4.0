@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -30,6 +30,7 @@ Description
 #include "volFields.H"
 #include "surfaceFields.H"
 #include "linear.H"
+#include "surfaceInterpolate.H"
 #include "fvcGrad.H"
 #include "gaussGrad.H"
 
@@ -51,6 +52,23 @@ correctedSnGrad<Type>::~correctedSnGrad()
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+
+template<class Type>
+Foam::tmp<Foam::GeometricField<Type, Foam::fvsPatchField, Foam::surfaceMesh> >
+Foam::fv::correctedSnGrad<Type>::fullGradCorrection
+(
+    const GeometricField<Type, fvPatchField, volMesh>& vf
+) const
+{
+    const fvMesh& mesh = this->mesh();
+
+    tmp<GeometricField<Type, fvsPatchField, surfaceMesh> > tssf =
+        mesh.correctionVectors() & fvc::interpolate(fvc::grad(vf));
+    tssf().rename("snGradCorr(" + vf.name() + ')');
+
+    return tssf;
+}
+
 
 template<class Type>
 tmp<GeometricField<Type, fvsPatchField, surfaceMesh> >
@@ -85,21 +103,8 @@ correctedSnGrad<Type>::correction
         ssf.replace
         (
             cmpt,
-            mesh.correctionVectors()
-          & linear
-            <
-                typename
-                outerProduct<vector, typename pTraits<Type>::cmptType>::type
-            >(mesh).interpolate
-            (
-                gradScheme<typename pTraits<Type>::cmptType>::New
-                (
-                    mesh,
-                    mesh.schemesDict().gradScheme(ssf.name())
-                )()
-                //gaussGrad<typename pTraits<Type>::cmptType>(mesh)
-               .grad(vf.component(cmpt))
-            )
+            correctedSnGrad<typename pTraits<Type>::cmptType>(mesh)
+           .fullGradCorrection(vf.component(cmpt))
         );
     }
 

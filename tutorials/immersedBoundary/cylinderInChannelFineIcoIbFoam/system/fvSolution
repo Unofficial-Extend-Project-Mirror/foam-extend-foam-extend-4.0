@@ -1,7 +1,7 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | foam-extend: Open Source CFD                    |
-|  \\    /   O peration     | Version:     3.2                                |
+|  \\    /   O peration     | Version:     4.0                                |
 |   \\  /    A nd           | Web:         http://www.foam-extend.org         |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
@@ -35,6 +35,25 @@ solvers
         relTol          0.01;
     }
 
+    pFinal
+    {
+        solver          amgSolver;
+        cycle           W-cycle;
+        policy          PAMG;
+        nPreSweeps      2;
+        nPostSweeps     2;
+        groupSize       4;
+        minCoarseEqns   4;
+        nMaxLevels      100;
+        scale           on;
+        smoother        symGaussSeidel;
+
+        minIter         1;
+        maxIter         100;
+        tolerance       1e-7;
+        relTol          0.0;
+    }
+
     U
     {
         solver           BiCGStab;
@@ -64,5 +83,6 @@ PIMPLE
     pRefPoint (0 -0.45 0.05);
     pRefValue 0;
 }
+
 
 // ************************************************************************* //

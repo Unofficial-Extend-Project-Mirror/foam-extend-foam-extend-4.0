@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -130,7 +130,8 @@ Foam::tmp<Foam::fvVectorMatrix> Foam::XPP_DE::divTau(volVectorField& U) const
 void Foam::XPP_DE::correct()
 {
     // Velocity gradient tensor
-    volTensorField L = fvc::grad(U());
+    const tmp<volTensorField> tL = fvc::grad(U());
+    const volTensorField& L = tL();
 
     // Convected derivate term
     volTensorField C = S_ & L;

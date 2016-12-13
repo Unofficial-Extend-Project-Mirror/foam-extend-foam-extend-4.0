@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -24,6 +24,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "lduAddressing.H"
+#include "extendedLduAddressing.H"
 #include "demandDrivenData.H"
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
@@ -169,6 +170,18 @@ void Foam::lduAddressing::calcLosortStart() const
 }
 
 
+// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
+
+Foam::lduAddressing::lduAddressing(const label nEqns)
+:
+    size_(nEqns),
+    losortPtr_(NULL),
+    ownerStartPtr_(NULL),
+    losortStartPtr_(NULL),
+    extendedAddr_(5)
+{}
+
+
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
 Foam::lduAddressing::~lduAddressing()
@@ -245,6 +258,29 @@ Foam::label Foam::lduAddressing::triIndex(const label a, const label b) const
         << abort(FatalError);
 
     return -1;
+}
+
+
+const Foam::extendedLduAddressing&
+Foam::lduAddressing::extendedAddr(const label p) const
+{
+    if (p == 0 || p > 4)
+    {
+        FatalErrorIn
+        (
+            "const Foam::extendedLduAddressing& "
+            "Foam::lduAddressing::extendedAddr(const label p) const"
+        )   << "Currently supported extended addressing fill-in only "
+            << "between order 1 and 4"
+            << abort(FatalError);
+    }
+
+    if (!extendedAddr_.set(p))
+    {
+        extendedAddr_.set(p, new extendedLduAddressing(*this, p));
+    }
+
+    return extendedAddr_[p];
 }
 
 

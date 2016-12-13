@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -116,7 +116,7 @@ public:
 
         //- Return the deviatoric part of the effective sub-grid
         //  turbulence stress tensor including the laminar stress
-        virtual tmp<fvVectorMatrix> divDevBeff(volVectorField& U) const;
+        virtual tmp<fvVectorMatrix> divDevBeff() const;
 
         //- Correct Eddy-Viscosity and related properties
         virtual void correct(const tmp<volTensorField>& gradU);

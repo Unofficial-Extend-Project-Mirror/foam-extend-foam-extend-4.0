@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -101,7 +101,7 @@ Foam::BlockLduMatrix<Type>::BlockLduMatrix(const BlockLduMatrix<Type>& A)
 }
 
 
-//HJ, problematic: memmory management.
+//HJ, problematic: memory management.
 // Reconsider.  HJ, 7/Nov/2010
 template<class Type>
 Foam::BlockLduMatrix<Type>::BlockLduMatrix(BlockLduMatrix<Type>& A, bool reUse)
@@ -269,6 +269,20 @@ Foam::BlockLduMatrix<Type>::lower() const
 
 
 template<class Type>
+void Foam::BlockLduMatrix<Type>::clearInterfaces()
+{
+    forAll (interfaces_, i)
+    {
+        if (interfaces_.set(i))
+        {
+            delete interfaces_(i);
+        }
+    }
+}
+
+
+
+template<class Type>
 bool Foam::BlockLduMatrix<Type>::empty() const
 {
     return (!diagPtr_ && !lowerPtr_ && !upperPtr_);
@@ -294,6 +308,19 @@ bool Foam::BlockLduMatrix<Type>::symmetric() const
             << "triangle is allocated.  This is not allowed."
             << abort(FatalError);
     }
+
+    // Note:
+    // It is possible that the block matrix is symmetric in sparseness
+    // pattern, but asymmetric because the diagonal or upper coefficients are
+    // square and asymmetric within the coefficients.
+    // In such cases, the symmetric check in this function will falsely claim
+    // the matrix is symmetries whereas in its flattened nature it is not
+    // For the moment, symmetric check is used to see if the lower() is
+    // allocated or not.
+    // Please reconsider, especially related to matrix structure in
+    // complex cases and in choice of linear equation solver for matrices
+    // with asymmetric square coefficients
+    // HJ and VV, 16/Mar/2016
 
     return (diagPtr_ && (!lowerPtr_ && upperPtr_));
 }

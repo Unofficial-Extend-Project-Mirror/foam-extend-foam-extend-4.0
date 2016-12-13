@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -39,7 +39,7 @@ Description
 #include "foamTime.H"
 #include "fvMesh.H"
 #include "fvBlockMatrix.H"
-
+#include "simpleControl.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -49,6 +49,9 @@ int main(int argc, char *argv[])
 #   include "setRootCase.H"
 #   include "createTime.H"
 #   include "createMesh.H"
+
+    simpleControl simple(mesh);
+
 #   include "createFields.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -57,13 +60,11 @@ int main(int argc, char *argv[])
 
 #   include "CourantNo.H"
 
-    for (runTime++; !runTime.end(); runTime++)
+    while (simple.loop())
     {
         Info<< "Time = " << runTime.timeName() << nl << endl;
 
-#       include "readSIMPLEControls.H"
-
-        for (int nonOrth=0; nonOrth<=nNonOrthCorr; nonOrth++)
+        while (simple.correctNonOrthogonal())
         {
             fvScalarMatrix TEqn
             (

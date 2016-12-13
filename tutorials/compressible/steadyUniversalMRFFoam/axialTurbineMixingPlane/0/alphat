@@ -1,0 +1,130 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | foam-extend: Open Source CFD                    |
+|  \\    /   O peration     | Version:     4.0                                |
+|   \\  /    A nd           | Web:         http://www.foam-extend.org         |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       volScalarField;
+    location    "0";
+    object      alphat;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+dimensions      [1 -1 -1 0 0 0 0];
+
+internalField   uniform 0;
+
+boundaryField
+{
+    GVINLET
+    {
+        type            calculated;
+        value           uniform 0;
+    }
+    GVOUTLET
+    {
+        type            mixingPlane;
+        value           uniform 0;
+    }
+    GVCYCLIC
+    {
+        type            cyclic;
+        value           uniform 0;
+    }
+    GVBLADE
+    {
+        type            alphatWallFunction;
+        Prt             0.85;
+        value           uniform 0;
+    }
+    GVHUB
+    {
+        type            alphatWallFunction;
+        Prt             0.85;
+        value           uniform 0;
+    }
+    GVSHROUD
+    {
+        type            alphatWallFunction;
+        Prt             0.85;
+        value           uniform 0;
+    }
+    RUINLET
+    {
+        type            mixingPlane;
+        value           uniform 0;
+    }
+    RUOUTLET
+    {
+        type            mixingPlane;
+        value           uniform 0;
+    }
+    RUCYCLIC1
+    {
+        type            cyclicGgi;
+        value           uniform 0;
+    }
+    RUCYCLIC2
+    {
+        type            cyclicGgi;
+        value           uniform 0;
+    }
+    RUBLADE
+    {
+        type            alphatWallFunction;
+        Prt             0.85;
+        value           uniform 0;
+    }
+    RUHUB
+    {
+        type            alphatWallFunction;
+        Prt             0.85;
+        value           uniform 0;
+    }
+    RUSHROUD
+    {
+        type            alphatWallFunction;
+        Prt             0.85;
+        value           uniform 0;
+    }
+    DTINLET
+    {
+        type            mixingPlane;
+        value           uniform 0;
+    }
+    DTOUTLET
+    {
+        type            calculated;
+        value           uniform 0;
+    }
+    DTCYCLIC1
+    {
+        type            cyclicGgi;
+        value           uniform 0;
+    }
+    DTCYCLIC2
+    {
+        type            cyclicGgi;
+        value           uniform 0;
+    }
+    DTHUB
+    {
+        type            alphatWallFunction;
+        Prt             0.85;
+        value           uniform 0;
+    }
+    DTSHROUD
+    {
+        type            alphatWallFunction;
+        Prt             0.85;
+        value           uniform 0;
+    }
+}
+
+
+// ************************************************************************* //

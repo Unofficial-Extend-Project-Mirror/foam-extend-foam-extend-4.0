@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -162,17 +162,16 @@ public:
 
 // Add the patch constructor functions to the hash tables
 
-#define makeFaDivTypeScheme(SS, Type)                                          \
-                                                                               \
-defineNamedTemplateTypeNameAndDebug(SS<Type>, 0);                              \
-                                                                               \
-divScheme<Type>::addIstreamConstructorToTable<SS<Type> >                       \
+#define makeFaDivTypeScheme(SS, Type)                                         \
+                                                                              \
+defineNamedTemplateTypeNameAndDebug(SS<Type>, 0);                             \
+                                                                              \
+divScheme<Type>::addIstreamConstructorToTable<SS<Type> >                      \
     add##SS##Type##IstreamConstructorToTable_;
 
-
-#define makeFaDivScheme(SS)                                                    \
-                                                                               \
-makeFaDivTypeScheme(SS, vector)                                                \
+#define makeFaDivScheme(SS)                                                   \
+                                                                              \
+makeFaDivTypeScheme(SS, vector)                                               \
 makeFaDivTypeScheme(SS, tensor)
 
 

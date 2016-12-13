@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -57,6 +57,46 @@ addToRunTimeSelectionTable                                                    \
     fvMesh                                                                    \
 )
 
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#define makeBasicRealGasThermo(Cthermo,Mixture,Transport,SpecieThermo,Thermo,EqnOfState) \
+                                                                              \
+typedef Cthermo<Mixture<Transport<SpecieThermo<Thermo<EqnOfState> > > > >     \
+    Cthermo##Mixture##Transport##SpecieThermo##Thermo##EqnOfState;            \
+                                                                              \
+defineTemplateTypeNameAndDebugWithName                                        \
+(                                                                             \
+    Cthermo##Mixture##Transport##SpecieThermo##Thermo##EqnOfState,            \
+    #Cthermo                                                                  \
+        "<"#Mixture"<"#Transport"<"#SpecieThermo"<"#Thermo"<"#EqnOfState">>>>>", \
+    0                                                                         \
+);                                                                            \
+                                                                              \
+addToRunTimeSelectionTable                                                    \
+(                                                                             \
+    basicPsiThermo,                                                           \
+    Cthermo##Mixture##Transport##SpecieThermo##Thermo##EqnOfState,            \
+    fvMesh                                                                    \
+)
+
+#define makeBasicExternalLibraryBasedThermo(Cthermo)                          \
+                                                                              \
+typedef Cthermo                                                               \
+    Cthermo;                                                                  \
+                                                                              \
+defineTypeNameAndDebug                                                        \
+(                                                                             \
+    Cthermo,                                                                  \
+    0                                                                         \
+);                                                                            \
+                                                                              \
+addToRunTimeSelectionTable                                                    \
+(                                                                             \
+    basicPsiThermo,                                                           \
+    Cthermo,                                                                  \
+    fvMesh                                                                    \
+)
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

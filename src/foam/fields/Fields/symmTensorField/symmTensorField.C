@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -38,6 +38,7 @@ namespace Foam
 // * * * * * * * * * * * * * * * global functions  * * * * * * * * * * * * * //
 
 UNARY_FUNCTION(symmTensor, vector, sqr)
+UNARY_FUNCTION(symmTensor, symmTensor, innerSqr)
 
 UNARY_FUNCTION(scalar, symmTensor, tr)
 UNARY_FUNCTION(sphericalTensor, symmTensor, sph)
@@ -170,6 +171,9 @@ tmp<Field<symmTensor> > transformFieldMask<symmTensor>
 // * * * * * * * * * * * * * * * global operators  * * * * * * * * * * * * * //
 
 UNARY_OPERATOR(vector, symmTensor, *, hdual)
+
+BINARY_OPERATOR(tensor, symmTensor, symmTensor, &, dot)
+BINARY_TYPE_OPERATOR(tensor, symmTensor, symmTensor, &, dot)
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

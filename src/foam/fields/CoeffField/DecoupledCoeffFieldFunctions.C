@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -38,7 +38,7 @@ Foam::tmp<Foam::DecoupledCoeffField<Type> > Foam::inv
     // type is introduced.  HJ, 24/May/2005
 
     typedef typename DecoupledCoeffField<Type>::linearTypeField fieldType;
-    typedef typename DecoupledCoeffField<Type>::linearType valueType;
+    typedef typename DecoupledCoeffField<Type>::linearType linearType;
 
     // Create result
     tmp<DecoupledCoeffField<Type> > tresult
@@ -58,7 +58,7 @@ Foam::tmp<Foam::DecoupledCoeffField<Type> > Foam::inv
         fieldType inverse =
             cmptDivide
             (
-                fieldType(lf.size(), pTraits<valueType>::one),
+                fieldType(lf.size(), pTraits<linearType>::one),
                 lf
             );
 

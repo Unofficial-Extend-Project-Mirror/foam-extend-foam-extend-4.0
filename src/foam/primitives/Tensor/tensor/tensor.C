@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -74,6 +74,14 @@ const tensor tensor::min
     -VGREAT, -VGREAT, -VGREAT,
     -VGREAT, -VGREAT, -VGREAT,
     -VGREAT, -VGREAT, -VGREAT
+);
+
+template<>
+const tensor tensor::I
+(
+    1, 0, 0,
+    0, 1, 0,
+    0, 0, 1
 );
 
 
@@ -221,9 +229,8 @@ vector eigenVector(const tensor& t, const scalar lambda)
             (A.yz()*A.zx() - A.zz()*A.yx())/sd0,
             (A.zy()*A.yx() - A.yy()*A.zx())/sd0
         );
-        ev /= mag(ev);
 
-        return ev;
+        return ev/mag(ev);
     }
     else if (magSd1 > magSd2 && magSd1 > SMALL)
     {
@@ -233,9 +240,8 @@ vector eigenVector(const tensor& t, const scalar lambda)
             1,
             (A.zx()*A.xy() - A.xx()*A.zy())/sd1
         );
-        ev /= mag(ev);
 
-        return ev;
+        return ev/mag(ev);
     }
     else if (magSd2 > SMALL)
     {
@@ -245,9 +251,8 @@ vector eigenVector(const tensor& t, const scalar lambda)
             (A.yx()*A.xz() - A.xx()*A.yz())/sd2,
             1
         );
-        ev /= mag(ev);
 
-        return ev;
+        return ev/mag(ev);
     }
     else
     {
@@ -607,10 +612,10 @@ tensor eigenVectors(const symmTensor& t)
 // Matrix inversion with singular value decomposition
 tensor hinv(const tensor& t)
 {
-    static const scalar large = 1e10;
-    static const scalar small = 1e-10;
+    static const scalar hinvLarge = 1e10;
+    static const scalar hinvSmall = 1e-10;
 
-    if (det(t) > small)
+    if (det(t) > hinvSmall)
     {
         return inv(t);
     }
@@ -627,7 +632,7 @@ tensor hinv(const tensor& t)
         // Jovani Favero, 18/Nov/2009
         // Further bug fix: replace > with == and add SMALL to zeroInv
         // Dominik Christ, 7/Aug/2012
-        if (mag(eig.z()) == large*mag(eig.z()))
+        if (mag(eig.z()) == hinvLarge*mag(eig.z()))
         {
             // Three zero eigen values (z is largest in magnitude).
             // Return zero inverse
@@ -637,13 +642,13 @@ tensor hinv(const tensor& t)
         // Compare smaller eigen values and if out of range of large
         // consider them singular
 
-        if (mag(eig.z()) > large*mag(eig.x()))
+        if (mag(eig.z()) > hinvLarge*mag(eig.x()))
         {
             // Make a tensor out of symmTensor sqr.  HJ, 24/Oct/2009
             zeroInv += tensor(sqr(eigVecs.x()));
         }
 
-        if (mag(eig.z()) > large*mag(eig.y()))
+        if (mag(eig.z()) > hinvLarge*mag(eig.y()))
         {
             // Make a tensor out of symmTensor sqr.  HJ, 24/Oct/2009
             zeroInv += tensor(sqr(eigVecs.y()));
@@ -656,10 +661,10 @@ tensor hinv(const tensor& t)
 
 symmTensor hinv(const symmTensor& t)
 {
-    static const scalar large = 1e10;
-    static const scalar small = 1e-10;
+    static const scalar hinvLarge = 1e10;
+    static const scalar hinvSmall = 1e-10;
 
-    if (det(t) > small)
+    if (det(t) > hinvSmall)
     {
         return inv(t);
     }
@@ -676,7 +681,7 @@ symmTensor hinv(const symmTensor& t)
         // Jovani Favero, 18/Nov/2009
         // Further bug fix: replace > with == and add SMALL to zeroInv
         // Dominik Christ, 7/Aug/2012
-        if (mag(eig.z()) == large*mag(eig.z()))
+        if (mag(eig.z()) == hinvLarge*mag(eig.z()))
         {
             // Three zero eigen values (z is largest in magnitude).
             // Return zero inverse
@@ -686,12 +691,12 @@ symmTensor hinv(const symmTensor& t)
         // Compare smaller eigen values and if out of range of large
         // consider them singular
 
-        if (mag(eig.z()) > large*mag(eig.x()))
+        if (mag(eig.z()) > hinvLarge*mag(eig.x()))
         {
             zeroInv += sqr(eigVecs.x());
         }
 
-        if (mag(eig.z()) > large*mag(eig.y()))
+        if (mag(eig.z()) > hinvLarge*mag(eig.y()))
         {
             zeroInv += sqr(eigVecs.y());
         }

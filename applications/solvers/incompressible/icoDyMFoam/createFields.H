@@ -52,7 +52,8 @@
 
     label pRefCell = 0;
     scalar pRefValue = 0.0;
-    setRefCell(p, mesh.solutionDict().subDict("PISO"), pRefCell, pRefValue);
+    setRefCell(p, piso.dict(), pRefCell, pRefValue);
+    mesh.schemesDict().setFluxRequired(p.name());
 
 
     Info<< "Reading field rAU if present\n" << endl;
@@ -70,21 +71,3 @@
         runTime.deltaT(),
         zeroGradientFvPatchScalarField::typeName
     );
-
-
-    {
-        const dictionary& piso = mesh.solutionDict().subDict("PISO");
-
-        bool momentumPredictor = true;
-        if (piso.found("momentumPredictor"))
-        {
-            momentumPredictor = Switch(piso.lookup("momentumPredictor"));
-        }
-
-        bool momentumPredictorSave = momentumPredictor;
-        momentumPredictor = false;
-#       include "UEqn.H"
-        momentumPredictor = momentumPredictorSave;
-
-        rAU = 1.0/UEqn.A();
-    }

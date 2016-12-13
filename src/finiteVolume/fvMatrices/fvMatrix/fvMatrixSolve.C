@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -52,7 +52,7 @@ void Foam::fvMatrix<Type>::setComponentReference
 
 
 template<class Type>
-Foam::lduMatrix::solverPerformance Foam::fvMatrix<Type>::solve
+Foam::lduSolverPerformance Foam::fvMatrix<Type>::solve
 (
     const dictionary& solverControls
 )
@@ -102,6 +102,10 @@ Foam::lduMatrix::solverPerformance Foam::fvMatrix<Type>::solve
     // HJ, 20/Nov/2007
     lduInterfaceFieldPtrsList interfaces = psi_.boundaryField().interfaces();
 
+    // Cast into a non-const to solve.  HJ, 6/May/2016
+    GeometricField<Type, fvPatchField, volMesh>& psi =
+       const_cast<GeometricField<Type, fvPatchField, volMesh>&>(psi_);
+
     for (direction cmpt = 0; cmpt < Type::nComponents; cmpt++)
     {
         if (validComponents[cmpt] == -1) continue;
@@ -136,7 +140,7 @@ Foam::lduMatrix::solverPerformance Foam::fvMatrix<Type>::solve
             cmpt
         );
 
-        lduMatrix::solverPerformance solverPerf;
+        lduSolverPerformance solverPerf;
 
         // Solver call
         solverPerf = lduMatrix::solver::New
@@ -160,18 +164,20 @@ Foam::lduMatrix::solverPerformance Foam::fvMatrix<Type>::solve
             solverPerfVec = solverPerf;
         }
 
-        psi_.internalField().replace(cmpt, psiCmpt);
+        psi.internalField().replace(cmpt, psiCmpt);
         diag() = saveDiag;
     }
 
-    psi_.correctBoundaryConditions();
+    psi.correctBoundaryConditions();
+
+    psi_.mesh().solutionDict().setSolverPerformance(psi_.name(), solverPerfVec);
 
     return solverPerfVec;
 }
 
 
 template<class Type>
-Foam::lduMatrix::solverPerformance Foam::fvMatrix<Type>::solve()
+Foam::lduSolverPerformance Foam::fvMatrix<Type>::solve()
 {
     return solve(psi_.mesh().solutionDict().solverDict(psi_.name()));
 }

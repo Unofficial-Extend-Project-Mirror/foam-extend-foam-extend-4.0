@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -170,7 +170,7 @@ Foam::threePhaseInterfaceProperties::threePhaseInterfaceProperties
     (
         readScalar
         (
-            mixture.U().mesh().solutionDict().subDict("PISO").lookup("cAlpha")
+            mixture.U().mesh().solutionDict().subDict("PIMPLE").lookup("cAlpha")
         )
     ),
     sigma12_(mixture.lookup("sigma12")),

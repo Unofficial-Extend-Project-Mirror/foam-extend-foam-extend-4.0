@@ -11,7 +11,7 @@
         Info << "lambda = " << average(lambda.internalField()) << endl;
 
         int iCorr = 0;
-        lduMatrix::solverPerformance solverPerf;
+        lduSolverPerformance solverPerf;
         scalar initialResidual = 0;
         scalar err = GREAT;
 

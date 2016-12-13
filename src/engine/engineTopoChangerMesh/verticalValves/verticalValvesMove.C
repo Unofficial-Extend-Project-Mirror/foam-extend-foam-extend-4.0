@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -123,7 +123,7 @@ bool Foam::verticalValves::attached() const
 
     forAll (morphs, modI)
     {
-        if (typeid(morphs[modI]) == typeid(slidingInterface))
+        if (isA<slidingInterface>(morphs[modI]))
         {
             result =
                 result
@@ -134,7 +134,7 @@ bool Foam::verticalValves::attached() const
     // Check thal all sliders are in sync (debug only)
     forAll (morphs, modI)
     {
-        if (typeid(morphs[modI]) == typeid(slidingInterface))
+        if (isA<slidingInterface>(morphs[modI]))
         {
             if
             (

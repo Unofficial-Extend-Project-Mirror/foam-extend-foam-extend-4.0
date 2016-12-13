@@ -3,7 +3,7 @@
 
 #   include "limitU.H"
 
-    for (int nonOrth = 0; nonOrth <= nNonOrthCorr; nonOrth++)
+    while (pimple.correctNonOrthogonal())
     {
         // Calculate phi for boundary conditions
         phi = rhof*
@@ -36,25 +36,13 @@
           - fvm::laplacian(rho*rUA, p)
         );
 
-        if
+        pEqn.solve
         (
-//              oCorr == nOuterCorr - 1
-            corr == nCorr - 1
-         && nonOrth == nNonOrthCorr
-        )
-        {
-            pEqn.solve
-            (
-                mesh.solutionDict().solver(p.name() + "Final")
-            );
-        }
-        else
-        {
-            pEqn.solve(mesh.solutionDict().solver(p.name()));
-        }
+            mesh.solutionDict().solver(p.select(pimple.finalInnerIter()))
+        );
 
         // Calculate the flux
-        if (nonOrth == nNonOrthCorr)
+        if (pimple.finalNonOrthogonalIter())
         {
             phi = phid2 + pEqn.flux();
         }

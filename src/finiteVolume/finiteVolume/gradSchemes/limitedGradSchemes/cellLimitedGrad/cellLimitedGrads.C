@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -66,6 +66,7 @@ inline void cellLimitedGrad<scalar>::limitFace
     }
 }
 
+
 template<class Type>
 inline void cellLimitedGrad<Type>::limitFace
 (
@@ -75,7 +76,7 @@ inline void cellLimitedGrad<Type>::limitFace
     const Type& extrapolate
 )
 {
-    for(direction cmpt=0; cmpt<Type::nComponents; cmpt++)
+    for (direction cmpt = 0; cmpt < Type::nComponents; cmpt++)
     {
         cellLimitedGrad<scalar>::limitFace
         (
@@ -99,7 +100,7 @@ tmp<volVectorField> cellLimitedGrad<scalar>::calcGrad
 {
     const fvMesh& mesh = vsf.mesh();
 
-    tmp<volVectorField> tGrad = basicGradScheme_().grad(vsf, name);
+    tmp<volVectorField> tGrad = basicGradScheme_().calcGrad(vsf, name);
 
     if (k_ < SMALL)
     {
@@ -229,7 +230,7 @@ tmp<volVectorField> cellLimitedGrad<scalar>::calcGrad
 
     if (fv::debug)
     {
-        Info<< "gradient limiter for: " << vsf.name()
+        Info<< "Explicit scalar gradient limiter for: " << vsf.name()
             << " max = " << gMax(limiter)
             << " min = " << gMin(limiter)
             << " average: " << gAverage(limiter) << endl;
@@ -237,7 +238,7 @@ tmp<volVectorField> cellLimitedGrad<scalar>::calcGrad
 
     g.internalField() *= limiter;
     g.correctBoundaryConditions();
-    gradScheme<scalar>::correctBoundaryConditions(vsf, g);
+    gaussGrad<scalar>::correctBoundaryConditions(vsf, g);
 
     return tGrad;
 }
@@ -252,7 +253,7 @@ tmp<volTensorField> cellLimitedGrad<vector>::calcGrad
 {
     const fvMesh& mesh = vsf.mesh();
 
-    tmp<volTensorField> tGrad = basicGradScheme_().grad(vsf, name);
+    tmp<volTensorField> tGrad = basicGradScheme_().calcGrad(vsf, name);
 
     if (k_ < SMALL)
     {
@@ -381,7 +382,7 @@ tmp<volTensorField> cellLimitedGrad<vector>::calcGrad
 
     if (fv::debug)
     {
-        Info<< "gradient limiter for: " << vsf.name()
+        Info<< "Explicit vector gradient limiter for: " << vsf.name()
             << " max = " << gMax(limiter)
             << " min = " << gMin(limiter)
             << " average: " << gAverage(limiter) << endl;
@@ -400,7 +401,7 @@ tmp<volTensorField> cellLimitedGrad<vector>::calcGrad
     }
 
     g.correctBoundaryConditions();
-    gradScheme<vector>::correctBoundaryConditions(vsf, g);
+    gaussGrad<vector>::correctBoundaryConditions(vsf, g);
 
     return tGrad;
 }
@@ -426,6 +427,8 @@ tmp<BlockLduSystem<vector, vector> > cellLimitedGrad<scalar>::fvmGrad
     BlockLduSystem<vector, vector>& bs = tbs();
 
     // Calculate current gradient for explicit limiting
+    // In fvm::grad the current gradient may be cached
+    // Using cached gradient?  Check.  HJ, 4/Jun/2016
     tmp<volVectorField> tGrad = basicGradScheme_().grad(vsf);
     const volVectorField& g = tGrad();
 
@@ -563,7 +566,7 @@ tmp<BlockLduSystem<vector, vector> > cellLimitedGrad<scalar>::fvmGrad
 
     if (fv::debug)
     {
-        Info<< "gradient limiter for: " << vsf.name()
+        Info<< "Implicit scalar gradient limiter for: " << vsf.name()
             << " max = " << gMax(lfIn)
             << " min = " << gMin(lfIn)
             << " average: " << gAverage(lfIn) << endl;

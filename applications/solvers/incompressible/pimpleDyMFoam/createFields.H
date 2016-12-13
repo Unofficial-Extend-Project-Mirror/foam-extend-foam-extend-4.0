@@ -32,7 +32,8 @@
 
     label pRefCell = 0;
     scalar pRefValue = 0.0;
-    setRefCell(p, mesh.solutionDict().subDict("PIMPLE"), pRefCell, pRefValue);
+    setRefCell(p, pimple.dict(), pRefCell, pRefValue);
+    mesh.schemesDict().setFluxRequired(p.name());
 
     singlePhaseTransportModel laminarTransport(U, phi);
 
@@ -41,18 +42,18 @@
         incompressible::turbulenceModel::New(U, phi, laminarTransport)
     );
 
-    Info<< "Reading field rAU if present\n" << endl;
-    volScalarField rAU
+    Info<< "Reading field aU if present\n" << endl;
+    volScalarField aU
     (
         IOobject
         (
-            "rAU",
+            "aU",
             runTime.timeName(),
             mesh,
             IOobject::READ_IF_PRESENT,
             IOobject::AUTO_WRITE
         ),
         mesh,
-        runTime.deltaT(),
+        1/runTime.deltaT(),
         zeroGradientFvPatchScalarField::typeName
     );

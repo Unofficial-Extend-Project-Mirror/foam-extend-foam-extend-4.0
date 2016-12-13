@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -87,50 +87,62 @@ void Foam::BlockGaussSeidelPrecon<Type>::decoupledPrecondition
         {
             if (UpperCoeff.activeType() == blockCoeffBase::SCALAR)
             {
-                BlockSweep
-                (
-                    x,
-                    invDiag_.asScalar(),
-                    LowerCoeff.asScalar(),
-                    UpperCoeff.asScalar(),
-                    b
-                );
+                for (label sweep = 0; sweep < nSweeps_; sweep++)
+                {
+                    BlockSweep
+                    (
+                        x,
+                        invDiag_.asScalar(),
+                        LowerCoeff.asScalar(),
+                        UpperCoeff.asScalar(),
+                        b
+                    );
+                }
             }
             else if (UpperCoeff.activeType() == blockCoeffBase::LINEAR)
             {
-                BlockSweep
-                (
-                    x,
-                    invDiag_.asScalar(),
-                    LowerCoeff.asLinear(),
-                    UpperCoeff.asLinear(),
-                    b
-                );
+                for (label sweep = 0; sweep < nSweeps_; sweep++)
+                {
+                    BlockSweep
+                    (
+                        x,
+                        invDiag_.asScalar(),
+                        LowerCoeff.asLinear(),
+                        UpperCoeff.asLinear(),
+                        b
+                    );
+                }
             }
         }
         else if (invDiag_.activeType() == blockCoeffBase::LINEAR)
         {
             if (UpperCoeff.activeType() == blockCoeffBase::SCALAR)
             {
-                BlockSweep
-                (
-                    x,
-                    invDiag_.asLinear(),
-                    LowerCoeff.asScalar(),
-                    UpperCoeff.asScalar(),
-                    b
-                );
+                for (label sweep = 0; sweep < nSweeps_; sweep++)
+                {
+                    BlockSweep
+                    (
+                        x,
+                        invDiag_.asLinear(),
+                        LowerCoeff.asScalar(),
+                        UpperCoeff.asScalar(),
+                        b
+                    );
+                }
             }
             else if (UpperCoeff.activeType() == blockCoeffBase::LINEAR)
             {
-                BlockSweep
-                (
-                    x,
-                    invDiag_.asLinear(),
-                    LowerCoeff.asLinear(),
-                    UpperCoeff.asLinear(),
-                    b
-                );
+                for (label sweep = 0; sweep < nSweeps_; sweep++)
+                {
+                    BlockSweep
+                    (
+                        x,
+                        invDiag_.asLinear(),
+                        LowerCoeff.asLinear(),
+                        UpperCoeff.asLinear(),
+                        b
+                    );
+                }
             }
         }
         else
@@ -201,54 +213,66 @@ void Foam::BlockGaussSeidelPrecon<Type>::decoupledPreconditionT
         {
             if (UpperCoeff.activeType() == blockCoeffBase::SCALAR)
             {
-                // Transpose multiplication - swap lower and upper coeff arrays
-                BlockSweep
-                (
-                    xT,
-                    invDiag_.asScalar(),
-                    UpperCoeff.asScalar(),
-                    LowerCoeff.asScalar(),
-                    bT
-                );
+                for (label sweep = 0; sweep < nSweeps_; sweep++)
+                {
+                    // Transpose multiplication - swap lower and upper coeff
+                    BlockSweep
+                    (
+                        xT,
+                        invDiag_.asScalar(),
+                        UpperCoeff.asScalar(),
+                        LowerCoeff.asScalar(),
+                        bT
+                    );
+                }
             }
             else if (UpperCoeff.activeType() == blockCoeffBase::LINEAR)
             {
-                // Transpose multiplication - swap lower and upper coeff arrays
-                BlockSweep
-                (
-                    xT,
-                    invDiag_.asScalar(),
-                    UpperCoeff.asLinear(),
-                    LowerCoeff.asLinear(),
-                    bT
-                );
+                for (label sweep = 0; sweep < nSweeps_; sweep++)
+                {
+                // Transpose multiplication - swap lower and upper coeff
+                    BlockSweep
+                    (
+                        xT,
+                        invDiag_.asScalar(),
+                        UpperCoeff.asLinear(),
+                        LowerCoeff.asLinear(),
+                        bT
+                    );
+                }
             }
         }
         else if (invDiag_.activeType() == blockCoeffBase::LINEAR)
         {
             if (UpperCoeff.activeType() == blockCoeffBase::SCALAR)
             {
-                // Transpose multiplication - swap lower and upper coeff arrays
-                BlockSweep
-                (
-                    xT,
-                    invDiag_.asLinear(),
-                    UpperCoeff.asScalar(),
-                    LowerCoeff.asScalar(),
-                    bT
-                );
+                for (label sweep = 0; sweep < nSweeps_; sweep++)
+                {
+                    // Transpose multiplication - swap lower and upper coeff
+                    BlockSweep
+                    (
+                        xT,
+                        invDiag_.asLinear(),
+                        UpperCoeff.asScalar(),
+                        LowerCoeff.asScalar(),
+                        bT
+                    );
+                }
             }
             else if (UpperCoeff.activeType() == blockCoeffBase::LINEAR)
             {
-                // Transpose multiplication - swap lower and upper coeff arrays
-                BlockSweep
-                (
-                    xT,
-                    invDiag_.asLinear(),
-                    UpperCoeff.asLinear(),
-                    LowerCoeff.asLinear(),
-                    bT
-                );
+                for (label sweep = 0; sweep < nSweeps_; sweep++)
+                {
+                    // Transpose multiplication - swap lower and upper coeff
+                    BlockSweep
+                    (
+                        xT,
+                        invDiag_.asLinear(),
+                        UpperCoeff.asLinear(),
+                        LowerCoeff.asLinear(),
+                        bT
+                    );
+                }
             }
         }
         else

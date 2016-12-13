@@ -1,7 +1,7 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | foam-extend: Open Source CFD                    |
-|  \\    /   O peration     | Version:     3.2                                |
+|  \\    /   O peration     | Version:     4.0                                |
 |   \\  /    A nd           | Web:         http://www.foam-extend.org         |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
@@ -22,14 +22,14 @@ boundaryField
 {
     INLE1
     {
-        type            fixedValue;
+        type            pressureInletOutletVelocity;
         value           uniform (234.636777 0 0);
     }
 
     PRES2
     {
-        type           inletOutlet;
-        inletValue     uniform (0 0 0);
+        type           pressureInletOutletVelocity;
+        value          uniform (234.636777 0 0);
     }
 
     WALL3
@@ -49,5 +49,6 @@ boundaryField
         type            empty;
     }
 }
+
 
 // ************************************************************************* //

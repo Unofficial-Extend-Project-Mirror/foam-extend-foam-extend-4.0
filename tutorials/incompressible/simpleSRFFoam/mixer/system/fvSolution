@@ -1,7 +1,7 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | foam-extend: Open Source CFD                    |
-|  \\    /   O peration     | Version:     3.2                                |
+|  \\    /   O peration     | Version:     4.0                                |
 |   \\  /    A nd           | Web:         http://www.foam-extend.org         |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
@@ -25,42 +25,42 @@ solvers
     };
     Urel
     {
-        solver           PBiCG;
-        preconditioner   DILU;
+        solver           smoothSolver;
+        smoother         GaussSeidel;
         tolerance        1e-05;
         relTol           0.1;
     };
     k
     {
-        solver           PBiCG;
+        solver           BiCGStab;
         preconditioner   DILU;
         tolerance        1e-05;
         relTol           0.1;
     };
     epsilon
     {
-        solver           PBiCG;
+        solver           BiCGStab;
         preconditioner   DILU;
         tolerance        1e-05;
         relTol           0.1;
     };
     omega
     {
-        solver           PBiCG;
+        solver           BiCGStab;
         preconditioner   DILU;
         tolerance        1e-05;
         relTol           0.1;
     };
     R
     {
-        solver           PBiCG;
+        solver           BiCGStab;
         preconditioner   DILU;
         tolerance        1e-05;
         relTol           0.1;
     };
     nuTilda
     {
-        solver           PBiCG;
+        solver           BiCGStab;
         preconditioner   DILU;
         tolerance        1e-05;
         relTol           0.1;
@@ -75,12 +75,13 @@ SIMPLE
 relaxationFactors
 {
     p               0.3;
-    Urel            0.7;
+    Urel            0.5;
     k               0.7;
     epsilon         0.7;
     omega           0.7;
     R               0.7;
     nuTilda         0.7;
 }
+
 
 // ************************************************************************* //

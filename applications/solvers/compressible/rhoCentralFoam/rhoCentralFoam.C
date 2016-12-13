@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -45,7 +45,7 @@ int main(int argc, char *argv[])
 #   include "createMesh.H"
 #   include "createFields.H"
 #   include "readThermophysicalProperties.H"
-#   include "readTimeControls.H"
+#   include "createTimeControls.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -139,7 +139,7 @@ int main(int argc, char *argv[])
           + aphiv_neg*(rho_neg*(e_neg + 0.5*magSqr(U_neg)) + p_neg)
           + aSf*p_pos - aSf*p_neg;
 
-        volTensorField tauMC("tauMC", mu*dev2(fvc::grad(U)().T()));
+        volTensorField tauMC("tauMC", mu*dev2(Foam::T(fvc::grad(U))));
 
         // --- Solve density
         solve(fvm::ddt(rho) + fvc::div(phi));

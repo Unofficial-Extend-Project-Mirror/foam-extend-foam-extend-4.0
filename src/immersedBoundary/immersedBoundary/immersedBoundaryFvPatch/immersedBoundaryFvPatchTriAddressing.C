@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -61,7 +61,7 @@ void Foam::immersedBoundaryFvPatch::makeTriAddressing() const
     {
         hitTris[hf[hfI]] = hfI;
     }
-
+    Info<< "triangles: " << triPatch.size() << " hit: " << hf.size() << endl;
     // Allocate storage
     cellsToTriAddrPtr_ = new labelListList(triPatch.size());
     labelListList& addr = *cellsToTriAddrPtr_;
@@ -84,8 +84,16 @@ void Foam::immersedBoundaryFvPatch::makeTriAddressing() const
     label faceIndex = 0;
     label counter = 0;
 
-    forAll (triPatch, triI)
+    boolList visited(triPatch.size(), false);
+
+    label curTri = 0;
+
+    // Only search for tri faces in the mesh
+    forAll (triFacesInMesh, tfimI)
     {
+
+        const label triI = triFacesInMesh[tfimI];
+
         if (hitTris[triI] > -1)
         {
             // Triangle contains IB point
@@ -99,8 +107,8 @@ void Foam::immersedBoundaryFvPatch::makeTriAddressing() const
         {
             // No direct hit.  Start a neighbourhood search
 
-            // Record already visited faces
-            labelHashSet visited;
+            // Reset visited faces
+            visited = false;
 
             // Collect new faces to visit
             SLList<label> nextToVisit;
@@ -113,36 +121,58 @@ void Foam::immersedBoundaryFvPatch::makeTriAddressing() const
 
             do
             {
-                const label curTri = nextToVisit.removeHead();
+                // Pick next face that was not visited by skipping
+                // already visited faces
+                do
+                {
+                    if (!nextToVisit.empty())
+                    {
+                        curTri = nextToVisit.removeHead();
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+                while (visited[curTri]);
 
-                // Discard tri if already visited
-                if (visited[curTri]) continue;
-
-                visited.insert(curTri);
+                visited[curTri] = true;
 
                 const triFace& curTriPoints = triPatch[curTri];
 
                 // For all current points of face, pick up neighbouring faces
                 forAll (curTriPoints, tpI)
                 {
-                    const labelList curNbrs = pf[curTriPoints[tpI]];
+                    const labelList& curNbrs = pf[curTriPoints[tpI]];
 
                     forAll (curNbrs, nbrI)
                     {
-                        if (!visited.found(curNbrs[nbrI]))
+                        if (visited[curNbrs[nbrI]])
                         {
-                            // Found a face which is not visited.  Add it to
-                            // the list of faces to visit
-                            nextToVisit.append(curNbrs[nbrI]);
-
+                            continue;
+                        }
+                        else
+                        {
                             if (hitTris[curNbrs[nbrI]] > -1)
                             {
                                 // Found a neighbour with a hit: use this
                                 // IB point
                                 ibPointsToUse.insert(hitTris[curNbrs[nbrI]]);
                             }
+
+                            // Found a face which is not visited.  Add it to
+                            // the list of faces to visit
+                            nextToVisit.append(curNbrs[nbrI]);
                         }
                     }
+                }
+
+                // If the search has gone wrong eg. because of a discrepancy
+                // in the resolution between the mesh and the STL, escape with
+                // poorer interpolation.
+                if (nextToVisit.size() > 200 && !ibPointsToUse.empty())
+                {
+                    break;
                 }
             } while
             (

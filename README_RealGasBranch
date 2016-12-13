@@ -1,0 +1,60 @@
+Features
+
+
+/*************************************Libraries**************************************************/
+
+1. Included cubic equations of state for pure fluid.
+   --> Redlich Kwong --> class = redlichKwong
+   --> Peng Robinson --> class = pengRobinson
+   --> Soave Redlich Kwong --> class = soaveRedlichKwong
+   --> Aungier Redlich Kwong --> class = aungierRedlichKwong
+
+2. Included cubic equations of state for mixtures.
+   TODO: connect the classes to the reaction models
+   -->class = mixtureRedlichKwong
+   -->class = mixturePengRobinson
+   -->class = mixtureSoaveRedlichKwong
+   -->class = aungierSoaveRedlichKwong
+
+3. Included a new Thermo model
+   --> enthalpy calculated using NASA heat capacity polynomical
+       Added real gas correction in class
+       class = nasaHeatCapacityPolynomial
+
+4. Minor changed in thermo related models so that they can be used with real gas classes
+   --> class = realGasSpecieThermo
+   --> class = sutherland
+   --> class = const
+   --> class = basicMixture
+   --> class = basicPsiThermo
+
+5. Added enthalpy and internal energy thermodynamic class based on basicPsiThermo for real gases
+   --> enthalpy based thermo model, class = realGasHThermo
+   --> internal energy based thermo model, class = realGasEThermo
+
+6. Added high precision water properties (IAPWS97) based on freeSteam (external program, not included)
+   Classes will not be compiled by Allwmake file
+   Classes will compile without freeSteam. Freesteam is loaded at runTime (see Tutorial)
+   --> classes = externalMedia/IAPWS_Waterproperties
+
+/*************************************Solver**************************************************/
+
+1. Changed pressure equation of rhoPisoFoam. Orginal pressure equation assumes perfect gas
+   (linear relationship between pressure and density)
+   --> new solver = realFluidPisoFoam
+
+/*************************************Tutorials**************************************************/
+
+1. pure fluid real gas mixture tutorial
+   --> realFluidPisoFoam/ras/backStep
+
+2. IAPWS97 water properties tutorial
+   freeSteam must be installed for this tutorial
+   additional classes loaded in controlDict
+   --> realFluidPisoFoam/ras/cavity_IAPWS97
+
+
+/*************************************Change log**************************************************/
+
+git commit: "add branch ReadMe file"
+   --> added this file

@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -680,7 +680,7 @@ bool Foam::polyBoundaryMesh::writeData(Ostream& os) const
             << indent << token::END_BLOCK << endl;
     }
 
-    os  << decrIndent << token::END_LIST;
+    os  << decrIndent << token::END_LIST << endl;
 
     // Check state of IOstream
     os.check("polyBoundaryMesh::writeData(Ostream& os) const");

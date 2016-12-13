@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -147,7 +147,7 @@ public:
 
         //- Returns divergence of B : i.e. the additional term in the
         //  filtered NSE
-        virtual tmp<fvVectorMatrix> divDevRhoBeff(volVectorField& U) const;
+        virtual tmp<fvVectorMatrix> divDevRhoBeff() const;
 
         //- Correct Eddy-Viscosity and related properties
         virtual void correct(const tmp<volTensorField>& gradU);

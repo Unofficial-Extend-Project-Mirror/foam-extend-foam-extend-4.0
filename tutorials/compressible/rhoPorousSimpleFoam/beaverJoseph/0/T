@@ -1,7 +1,7 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | foam-extend: Open Source CFD                    |
-|  \\    /   O peration     | Version:     3.2                                |
+|  \\    /   O peration     | Version:     4.0                                |
 |   \\  /    A nd           | Web:         http://www.foam-extend.org         |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
@@ -27,17 +27,22 @@ boundaryField
     }
     outlet
     {
-        type inletOutlet;
-        inletValue $internalField;
+        type            inletOutlet;
+        inletValue      $internalField;
     }
     lowerWall
     {
-        type zeroGradient;
+        type            zeroGradient;
     }
     upperWall
     {
-        type zeroGradient;
+        type            zeroGradient;
+    }
+    frontAndBack
+    {
+        type            empty;
     }
 }
+
 
 // ************************************************************************* //

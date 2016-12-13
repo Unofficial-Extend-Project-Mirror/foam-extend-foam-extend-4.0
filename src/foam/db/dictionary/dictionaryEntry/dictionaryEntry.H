@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -27,9 +27,9 @@ Class
 Description
     A keyword and a list of tokens is a 'dictionaryEntry'.
 
-    An dictionaryEntry can be read, written and printed, and the types and
-    values of its tokens analysed.  A dictionaryEntry is a high-level building
-    block for data description.  It is a front-end for the token parser.
+    A dictionaryEntry can be read, written and printed, and the types and
+    values of its tokens analysed. A dictionaryEntry is a high-level building
+    block for data description. It is a front-end for the token parser.
     A list of entries can be used as a set of keyword syntax elements,
     for example.
 

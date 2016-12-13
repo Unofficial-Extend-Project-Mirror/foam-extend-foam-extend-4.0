@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -65,7 +65,10 @@ UNARY_FUNCTION(sphericalTensorType, cmptType, expandScalar)                   \
                                                                               \
 UNARY_FUNCTION(tensorType, vectorType, expandLinear)                          \
 UNARY_FUNCTION(diagTensorType, vectorType, expandLinear)                      \
-UNARY_FUNCTION(sphericalTensorType, vectorType, expandLinear)
+UNARY_FUNCTION(sphericalTensorType, vectorType, expandLinear)                 \
+                                                                              \
+UNARY_FUNCTION(vectorType, tensorType, sumToDiag)                             \
+UNARY_FUNCTION(vectorType, tensorType, sumMagToDiag)
 
 
 // * * * * * * * * * * * * * * * Global Functions  * * * * * * * * * * * * * //

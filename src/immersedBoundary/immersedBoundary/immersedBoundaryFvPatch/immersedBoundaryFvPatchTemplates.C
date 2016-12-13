@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -40,6 +40,9 @@ Foam::immersedBoundaryFvPatch::sendAndReceive
         new FieldField<Field, Type>(Pstream::nProcs())
     );
     FieldField<Field, Type>& procPsi = tprocPsi();
+
+    // This requires a rewrite useng mapDistribute
+    // HJ, 11/Aug/2016
 
     forAll (procPsi, procI)
     {
@@ -321,14 +324,14 @@ Foam::immersedBoundaryFvPatch::toSamplingPoints
 
 
 template<class Type>
-const Foam::tmp<Foam::Field<Type> > 
+const Foam::tmp<Foam::Field<Type> >
 Foam::immersedBoundaryFvPatch::renumberField
 (
     const   Field<Type>& f
 ) const
 {
     const dynamicLabelList& triFInM = this->triFacesInMesh();
-    
+
     tmp<Field<Type> > trf(new Field<Type>(triFInM.size()));
     Field<Type>& rf = trf();
 

@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -46,18 +46,21 @@ addToRunTimeSelectionTable(topoSetSource, pointToCell, istream);
 Foam::topoSetSource::addToUsageTable Foam::pointToCell::usage_
 (
     pointToCell::typeName,
-    "\n    Usage: pointToCell <pointSet> any\n\n"
-    "    Select all cells with any point in the pointSet\n\n"
+    "\n    Usage: pointToCell <pointSet> any|all\n\n"
+    "    Select cells with\n"
+    "    -any point in the pointSet\n"
+    "    -all points in the pointSet\n\n"
 );
 
 template<>
-const char* Foam::NamedEnum<Foam::pointToCell::pointAction, 1>::names[] =
+const char* Foam::NamedEnum<Foam::pointToCell::pointAction, 2>::names[] =
 {
-    "any"
+    "any",
+    "all"
 };
 
 
-const Foam::NamedEnum<Foam::pointToCell::pointAction, 1>
+const Foam::NamedEnum<Foam::pointToCell::pointAction, 2>
     Foam::pointToCell::pointActionNames_;
 
 
@@ -69,9 +72,9 @@ void Foam::pointToCell::combine(topoSet& set, const bool add) const
     pointSet loadedSet(mesh_, setName_);
 
 
-    // Handle any selection
     if (option_ == ANY)
     {
+        // Add cells with any point in loadedSet
         for
         (
             pointSet::const_iterator iter = loadedSet.begin();
@@ -86,6 +89,53 @@ void Foam::pointToCell::combine(topoSet& set, const bool add) const
             forAll(pCells, pCellI)
             {
                 addOrDelete(set, pCells[pCellI], add);
+            }
+        }
+    }
+    else if (option_ == ALL)
+    {
+        // Add all cells whose points are all in set.
+
+        Map<label> numPoints(loadedSet.size());
+
+        forAllConstIter(pointSet, loadedSet, iter)
+        {
+            label pointI = iter.key();
+
+            const labelList& pCells = mesh_.pointCells()[pointI];
+
+            forAll(pCells, pCellI)
+            {
+                label cellI = pCells[pCellI];
+
+                Map<label>::iterator fndCell = numPoints.find(cellI);
+
+                if (fndCell == numPoints.end())
+                {
+                    numPoints.insert(cellI, 1);
+                }
+                else
+                {
+                    fndCell()++;
+                }
+            }
+        }
+
+
+        // Include cells that are referenced as many times as there are points
+        // in cell -> all points of cell
+        for
+        (
+            Map<label>::const_iterator iter = numPoints.begin();
+            iter != numPoints.end();
+            ++iter
+        )
+        {
+            label cellI = iter.key();
+
+            if (iter() == mesh_.cellPoints()[cellI].size())
+            {
+                addOrDelete(set, cellI, add);
             }
         }
     }

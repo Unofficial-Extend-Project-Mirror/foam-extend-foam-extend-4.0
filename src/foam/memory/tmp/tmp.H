@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -62,7 +62,7 @@ class tmp
         //- Pointer to temporary object
         mutable T* ptr_;
 
-        // Const reference to constant object
+        //- Const reference to constant object
         const T& ref_;
 
 
@@ -79,11 +79,12 @@ public:
         //- Construct copy and increment reference count
         inline tmp(const tmp<T>&);
 
+        //- Construct copy transferring content of temporary if required
+        inline tmp(const tmp<T>&, bool allowTransfer);
 
-    // Destructor
 
-        //- Delete object when reference count == 0
-        inline ~tmp();
+    //- Destructor, delete object when reference count == 0
+    inline ~tmp();
 
 
     // Member Functions

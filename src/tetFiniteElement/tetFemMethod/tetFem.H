@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -46,7 +46,7 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                  Namespace tetFem functions Declaration
+                      Namespace tetFem functions Declaration
 \*---------------------------------------------------------------------------*/
 
 namespace tetFem
@@ -56,66 +56,66 @@ namespace tetFem
         template<class Type>
         static tmp<tetFemMatrix<Type> > laplacian
         (
-            GeometricField<Type, tetPolyPatchField, tetPointMesh>&
+            const GeometricField<Type, tetPolyPatchField, tetPointMesh>&
         );
 
         template<class Type>
         static tmp<tetFemMatrix<Type> > laplacian
         (
             const elementScalarField&,
-            GeometricField<Type, tetPolyPatchField, tetPointMesh>&
+            const GeometricField<Type, tetPolyPatchField, tetPointMesh>&
         );
 
         template<class Type>
         static tmp<tetFemMatrix<Type> > smoother
         (
-            GeometricField<Type, tetPolyPatchField, tetPointMesh>&
+            const GeometricField<Type, tetPolyPatchField, tetPointMesh>&
         );
 
         template<class Type>
         static tmp<tetFemMatrix<Type> > laplacian
         (
             const dimensionedScalar&,
-            GeometricField<Type, tetPolyPatchField, tetPointMesh>&
+            const GeometricField<Type, tetPolyPatchField, tetPointMesh>&
         );
 
         template<class Type>
         static tmp<tetFemMatrix<Type> > laplacianTranspose
         (
-            GeometricField<Type, tetPolyPatchField, tetPointMesh>&
+            const GeometricField<Type, tetPolyPatchField, tetPointMesh>&
         );
 
         template<class Type>
         static tmp<tetFemMatrix<Type> > laplacianTranspose
         (
             const elementScalarField&,
-            GeometricField<Type, tetPolyPatchField, tetPointMesh>&
+            const GeometricField<Type, tetPolyPatchField, tetPointMesh>&
         );
 
         template<class Type>
         static tmp<tetFemMatrix<Type> > laplacianTranspose
         (
             const dimensionedScalar&,
-            GeometricField<Type, tetPolyPatchField, tetPointMesh>&
+            const GeometricField<Type, tetPolyPatchField, tetPointMesh>&
         );
 
         template<class Type>
         static tmp<tetFemMatrix<Type> > laplacianTrace
         (
-            GeometricField<Type, tetPolyPatchField, tetPointMesh>&
+            const GeometricField<Type, tetPolyPatchField, tetPointMesh>&
         );
         template<class Type>
         static tmp<tetFemMatrix<Type> > laplacianTrace
         (
             const elementScalarField&,
-            GeometricField<Type, tetPolyPatchField, tetPointMesh>&
+            const GeometricField<Type, tetPolyPatchField, tetPointMesh>&
         );
 
         template<class Type>
         static tmp<tetFemMatrix<Type> > laplacianTrace
         (
             const dimensionedScalar&,
-            GeometricField<Type, tetPolyPatchField, tetPointMesh>&
+            const GeometricField<Type, tetPolyPatchField, tetPointMesh>&
         );
 };
 

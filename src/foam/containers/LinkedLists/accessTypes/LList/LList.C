@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -37,7 +37,7 @@ Foam::LList<LListBase, T>::LList(const LList<LListBase, T>& lst)
 {
     for (const_iterator iter = lst.begin(); iter != lst.end(); ++iter)
     {
-        append(iter());
+        this->append(iter());
     }
 }
 
@@ -55,9 +55,9 @@ template<class LListBase, class T>
 void Foam::LList<LListBase, T>::clear()
 {
     label oldSize = this->size();
-    for (label i=0; i<oldSize; i++)
+    for (label i=0; i<oldSize; ++i)
     {
-        removeHead();
+        this->removeHead();
     }
 
     LListBase::clear();
@@ -81,7 +81,7 @@ void Foam::LList<LListBase, T>::operator=(const LList<LListBase, T>& lst)
 
     for (const_iterator iter = lst.begin(); iter != lst.end(); ++iter)
     {
-        append(iter());
+        this->append(iter());
     }
 }
 

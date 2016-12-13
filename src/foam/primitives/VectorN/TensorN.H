@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -121,14 +121,15 @@ public:
             const direction j
         );
 
-        //- Diagonal
+        //- Return diagonal
         inline DiagTensorN<Cmpt, length> diag() const;
 
-        //- Transpose
+        //- Return transpose
         inline TensorN<Cmpt, length> T() const;
 
         //- Negative sum the vertical off-diagonal components
         inline TensorN<Cmpt, length> negSumDiag() const;
+
 
     // Member Operators
 

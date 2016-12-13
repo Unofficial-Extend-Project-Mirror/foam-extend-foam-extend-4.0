@@ -154,3 +154,5 @@
         aMesh,
         dimensionedScalar("one", dimless, 0.01)
     );
+
+    aMesh.schemesDict().setFluxRequired("h");

@@ -5,15 +5,10 @@
     (
         fvm::ddt(rho, Urel)
       + fvm::div(phi, Urel)
-      + turbulence->divDevRhoReff(Urel)
+      + turbulence->divDevRhoReff()
       + rho*SRF->Su()
     );
 
     UrelEqn.relax();
 
-    eqnResidual = solve
-    (
-        UrelEqn == -fvc::grad(p)
-    ).initialResidual();
-
-    maxResidual = max(eqnResidual, maxResidual);
+    solve(UrelEqn == -fvc::grad(p));

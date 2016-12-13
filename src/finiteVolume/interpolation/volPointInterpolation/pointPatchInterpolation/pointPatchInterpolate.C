@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -110,6 +110,28 @@ void pointPatchInterpolation::interpolate
         }
     }
 
+    // Add missing contributions across the coupled boundaries. The weights are
+    // constructed and normalised by correctly taking into account their
+    // contributions from the other side, so we need to add the field
+    // contributions from the other side. VV, 21/June/2016.
+    forAll(pf.boundaryField(), patchi)
+    {
+        if (pf.boundaryField()[patchi].coupled())
+        {
+            pf.boundaryField()[patchi].initAddField();
+        }
+    }
+
+    forAll(pf.boundaryField(), patchi)
+    {
+        if (pf.boundaryField()[patchi].coupled())
+        {
+            pf.boundaryField()[patchi].addField
+            (
+                pf.internalField()
+            );
+        }
+    }
 
     // Correct patch-patch boundary points by interpolation "around" corners
     const labelListList& PointFaces = fvMesh_.pointFaces();

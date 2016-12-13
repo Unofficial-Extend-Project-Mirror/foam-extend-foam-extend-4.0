@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -55,7 +55,7 @@ namespace fvm
     tmp<fvMatrix<Type> > adjDiv
     (
         const volVectorField&,
-        GeometricField<Type, fvPatchField, volMesh>&,
+        const GeometricField<Type, fvPatchField, volMesh>&,
         const word& name
     );
 
@@ -63,7 +63,7 @@ namespace fvm
     tmp<fvMatrix<Type> > adjDiv
     (
         const tmp<volVectorField>&,
-        GeometricField<Type, fvPatchField, volMesh>&,
+        const GeometricField<Type, fvPatchField, volMesh>&,
         const word& name
     );
 
@@ -72,14 +72,14 @@ namespace fvm
     tmp<fvMatrix<Type> > adjDiv
     (
         const volVectorField&,
-        GeometricField<Type, fvPatchField, volMesh>&
+        const GeometricField<Type, fvPatchField, volMesh>&
     );
 
     template<class Type>
     tmp<fvMatrix<Type> > adjDiv
     (
         const tmp<volVectorField>&,
-        GeometricField<Type, fvPatchField, volMesh>&
+        const GeometricField<Type, fvPatchField, volMesh>&
     );
 }
 

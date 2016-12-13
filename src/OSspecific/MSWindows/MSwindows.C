@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -1247,7 +1247,7 @@ bool ping(const word& hostname, const label timeOut)
 }
 
 
-int system(const string& command)
+int system(const std::string& command)
 {
     return std::system(command.c_str());
 }

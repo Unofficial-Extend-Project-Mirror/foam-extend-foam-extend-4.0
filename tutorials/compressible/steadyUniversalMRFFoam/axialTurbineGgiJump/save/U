@@ -1,0 +1,115 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | foam-extend: Open Source CFD                    |
+|  \\    /   O peration     | Version:     4.0                                |
+|   \\  /    A nd           | Web:         http://www.foam-extend.org         |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       volVectorField;
+    object      U;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+dimensions      [0 1 -1 0 0 0 0];
+
+internalField   uniform (0.1 0.1 -1);
+
+boundaryField
+{
+    GVINLET
+    {
+        type            fixedValue;
+        value           uniform (0 0 -1);
+    }
+    GVOUTLET
+    {
+        type            ggi;
+        value           uniform (0 0 -1);
+    }
+    GVCYCLIC
+    {
+        type            cyclic;
+    }
+    GVBLADE
+    {
+        type            fixedValue;
+        value           uniform (0 0 0);
+    }
+    GVHUB
+    {
+        type            fixedValue;
+        value           uniform (0 0 0);
+    }
+    GVSHROUD
+    {
+        type            fixedValue;
+        value           uniform (0 0 0);
+    }
+    RUINLET
+    {
+        type            ggi;
+        value           uniform (0 0 -1);
+    }
+    RUOUTLET
+    {
+        type            ggi;
+        value           uniform (0 0 -1);
+    }
+    RUCYCLIC1
+    {
+        type            cyclicGgi;
+    }
+    RUCYCLIC2
+    {
+        type            cyclicGgi;
+    }
+    RUBLADE
+    {
+        type            fixedValue;
+        value           uniform (0 0 0);
+    }
+    RUHUB
+    {
+        type            fixedValue;
+        value           uniform (0 0 0);
+    }
+    RUSHROUD
+    {
+        type            fixedValue;
+        value           uniform (0 0 0);
+    }
+    DTINLET
+    {
+        type            ggi;
+        value           uniform (0 0 -1);
+    }
+    DTOUTLET
+    {
+        type            zeroGradient;
+    }
+    DTCYCLIC1
+    {
+        type            cyclicGgi;
+    }
+    DTCYCLIC2
+    {
+        type            cyclicGgi;
+    }
+    DTHUB
+    {
+        type            fixedValue;
+        value           uniform (0 0 0);
+    }
+    DTSHROUD
+    {
+        type            fixedValue;
+        value           uniform (0 0 0);
+    }
+}
+
+
+// ************************************************************************* //

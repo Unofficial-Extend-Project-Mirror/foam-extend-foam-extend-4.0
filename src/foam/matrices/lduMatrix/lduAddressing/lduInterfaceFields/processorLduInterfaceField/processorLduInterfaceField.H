@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -49,7 +49,6 @@ namespace Foam
 
 class processorLduInterfaceField
 {
-
 public:
 
     //- Runtime type information
@@ -63,9 +62,8 @@ public:
         {}
 
 
-    // Destructor
-
-        virtual ~processorLduInterfaceField();
+    //- Destructor
+    virtual ~processorLduInterfaceField();
 
 
     // Member Functions

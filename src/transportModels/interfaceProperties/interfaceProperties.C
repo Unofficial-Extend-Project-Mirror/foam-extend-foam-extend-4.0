@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -101,7 +101,7 @@ void Foam::interfaceProperties::calculateK()
     const surfaceVectorField& Sf = mesh.Sf();
 
     // Cell gradient of alpha
-    volVectorField gradAlpha = fvc::grad(alpha1_);
+    const tmp<volVectorField> gradAlpha = fvc::grad(alpha1_);
 
     // Interpolated face-gradient of alpha
     surfaceVectorField gradAlphaf = fvc::interpolate(gradAlpha);

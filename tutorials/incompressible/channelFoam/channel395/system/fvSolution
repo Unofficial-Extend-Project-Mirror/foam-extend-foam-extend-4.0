@@ -1,7 +1,7 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | foam-extend: Open Source CFD                    |
-|  \\    /   O peration     | Version:     3.2                                |
+|  \\    /   O peration     | Version:     4.0                                |
 |   \\  /    A nd           | Web:         http://www.foam-extend.org         |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
@@ -28,25 +28,25 @@ solvers
         tolerance        1e-06;
         relTol           0;
     };
-    U PBiCG
+    U BiCGStab
     {
         preconditioner   DILU;
         tolerance        1e-05;
         relTol           0;
     };
-    k PBiCG
+    k BiCGStab
     {
         preconditioner   DILU;
         tolerance        1e-05;
         relTol           0;
     };
-    B PBiCG
+    B BiCGStab
     {
         preconditioner   DILU;
         tolerance        1e-05;
         relTol           0;
     };
-    nuTilda PBiCG
+    nuTilda BiCGStab
     {
         preconditioner   DILU;
         tolerance        1e-05;
@@ -61,5 +61,6 @@ PISO
     pRefCell        1001;
     pRefValue       0;
 }
+
 
 // ************************************************************************* //

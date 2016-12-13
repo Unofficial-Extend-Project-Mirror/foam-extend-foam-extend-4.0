@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -35,6 +35,7 @@ Description
 #include "fvCFD.H"
 #include "interfaceProperties.H"
 #include "twoPhaseMixture.H"
+#include "pisoControl.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -55,18 +56,13 @@ int main(int argc, char *argv[])
     runTime.setTime(Times[startTime], startTime);
 
 #   include "createMesh.H"
-#   include "readGravitationalAcceleration.H"
 
-    const dictionary& piso = mesh.solutionDict().subDict("PISO");
+    pisoControl piso(mesh);
+
+#   include "readGravitationalAcceleration.H"
 
     label pRefCell = 0;
     scalar pRefValue = 0.0;
-
-    int nNonOrthCorr = 0;
-    if (piso.found("nNonOrthogonalCorrectors"))
-    {
-        nNonOrthCorr = readInt(piso.lookup("nNonOrthogonalCorrectors"));
-    }
 
     for (label i = startTime; i < endTime; i++)
     {
@@ -195,7 +191,8 @@ int main(int argc, char *argv[])
                 pd
             );
 
-            setRefCell(p, piso, pRefCell, pRefValue);
+            setRefCell(p, piso.dict(), pRefCell, pRefValue);
+            mesh.schemesDict().setFluxRequired(p.name());
 
             volScalarField rUA = 1.0/UEqn.A();
             surfaceScalarField rUAf = fvc::interpolate(rUA);
@@ -204,7 +201,7 @@ int main(int argc, char *argv[])
 
             phi = fvc::interpolate(U) & mesh.Sf();
 
-            for(int nonOrth = 0; nonOrth <= nNonOrthCorr; nonOrth++)
+            while (piso.correctNonOrthogonal())
             {
                 fvScalarMatrix pEqn
                 (

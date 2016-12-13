@@ -1,7 +1,7 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | foam-extend: Open Source CFD                    |
-|  \\    /   O peration     | Version:     3.2                                |
+|  \\    /   O peration     | Version:     4.0                                |
 |   \\  /    A nd           | Web:         http://www.foam-extend.org         |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
@@ -43,7 +43,7 @@ solvers
 
     U
     {
-        solver          PBiCG;
+        solver          BiCGStab;
         preconditioner  DILU;
         tolerance       1e-05;
         relTol          0.1;
@@ -51,7 +51,7 @@ solvers
 
     UFinal
     {
-        solver          PBiCG;
+        solver          BiCGStab;
         preconditioner  DILU;
         tolerance       1e-05;
         relTol          0;
@@ -59,7 +59,7 @@ solvers
 
     k
     {
-        solver          PBiCG;
+        solver          BiCGStab;
         preconditioner  DILU;
         tolerance       1e-05;
         relTol          0;
@@ -67,7 +67,7 @@ solvers
 
     epsilon
     {
-        solver          PBiCG;
+        solver          BiCGStab;
         preconditioner  DILU;
         tolerance       1e-05;
         relTol          0;
@@ -86,8 +86,10 @@ PIMPLE
 relaxationFactors
 {
     U               1;
+    UFinal          1;
     k               1;
     epsilon         1;
 }
+
 
 // ************************************************************************* //

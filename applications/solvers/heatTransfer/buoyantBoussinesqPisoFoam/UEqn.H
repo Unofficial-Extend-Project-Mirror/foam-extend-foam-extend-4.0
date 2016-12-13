@@ -4,12 +4,12 @@
     (
         fvm::ddt(U)
       + fvm::div(phi, U)
-      + turbulence->divDevReff(U)
+      + turbulence->divDevReff()
     );
 
     UEqn.relax();
 
-    if (momentumPredictor)
+    if (piso.momentumPredictor())
     {
         solve
         (

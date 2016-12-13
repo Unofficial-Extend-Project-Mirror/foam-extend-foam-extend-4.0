@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -31,6 +31,7 @@ Description
 \*---------------------------------------------------------------------------*/
 
 #include "fvCFD.H"
+#include "pimpleControl.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -39,6 +40,9 @@ int main(int argc, char *argv[])
 #   include "setRootCase.H"
 #   include "createTime.H"
 #   include "createMesh.H"
+
+    pimpleControl pimple(mesh);
+
 #   include "readThermodynamicProperties.H"
 #   include "readTransportProperties.H"
 #   include "createFields.H"
@@ -52,14 +56,12 @@ int main(int argc, char *argv[])
     {
         Info<< "Time = " << runTime.timeName() << nl << endl;
 
-#       include "readPIMPLEControls.H"
 #       include "compressibleCourantNo.H"
 
 #       include "rhoEqn.H"
 
         // --- PIMPLE loop
-        label oCorr = 0;
-        do
+        while (pimple.loop())
         {
             fvVectorMatrix UEqn
             (
@@ -71,7 +73,7 @@ int main(int argc, char *argv[])
             solve(UEqn == -fvc::grad(p));
 
             // --- PISO loop
-            for (int corr = 0; corr < nCorr; corr++)
+            while (pimple.correct())
             {
                 volScalarField rAU("rAU", 1.0/UEqn.A());
                 surfaceScalarField rhorAUf
@@ -113,7 +115,7 @@ int main(int argc, char *argv[])
                 U -= rAU*fvc::grad(p);
                 U.correctBoundaryConditions();
             }
-        } while (++oCorr < nOuterCorr);
+        }
 
 
         // Correct density

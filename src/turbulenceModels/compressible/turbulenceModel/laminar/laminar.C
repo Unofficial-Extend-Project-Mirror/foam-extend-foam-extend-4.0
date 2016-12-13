@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -184,12 +184,12 @@ tmp<volSymmTensorField> laminar::devRhoReff() const
 }
 
 
-tmp<fvVectorMatrix> laminar::divDevRhoReff(volVectorField& U) const
+tmp<fvVectorMatrix> laminar::divDevRhoReff() const
 {
     return
     (
-      - fvm::laplacian(muEff(), U)
-      - fvc::div(muEff()*dev2(fvc::grad(U)().T()))
+      - fvm::laplacian(muEff(), U_)
+      - fvc::div(muEff()*dev2(T(fvc::grad(U_))))
     );
 }
 

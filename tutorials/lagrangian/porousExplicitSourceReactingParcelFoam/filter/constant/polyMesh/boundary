@@ -1,7 +1,7 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | foam-extend: Open Source CFD                    |
-|  \\    /   O peration     | Version:     3.2                                |
+|  \\    /   O peration     | Version:     4.0                                |
 |   \\  /    A nd           | Web:         http://www.foam-extend.org         |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
@@ -21,40 +21,41 @@ FoamFile
     {
         type            wall;
         nFaces          172;
-        startFace       3334;
+        startFace       3314;
     }
     inlet
     {
         type            patch;
         nFaces          20;
-        startFace       3506;
+        startFace       3486;
     }
     outlet
     {
         type            patch;
         nFaces          20;
-        startFace       3526;
+        startFace       3506;
     }
     cycLeft
     {
         type            cyclic;
-        nFaces          0;
-        startFace       3546;
+        nFaces          40;
+        startFace       3526;
         featureCos      0.9;
     }
     cycRight
     {
         type            cyclic;
         nFaces          0;
-        startFace       3546;
+        startFace       3566;
         featureCos      0.9;
     }
     frontAndBack
     {
         type            empty;
         nFaces          3440;
-        startFace       3546;
+        startFace       3566;
     }
 )
+
 
 // ************************************************************************* //

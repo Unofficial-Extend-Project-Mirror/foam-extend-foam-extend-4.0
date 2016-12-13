@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -173,7 +173,7 @@ bool ping(const word&, const label port, const label timeOut);
 bool ping(const word&, const label timeOut = 10);
 
 //- Execute the specified command
-int system(const string& command);
+int system(const std::string& command);
 
 // Low level random numbers. Use Random class instead.
 

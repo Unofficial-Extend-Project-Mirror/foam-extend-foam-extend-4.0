@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -153,6 +153,14 @@ inline Vector<Cmpt> operator^(const Vector<Cmpt>& v1, const Vector<Cmpt>& v2)
         (v1.z()*v2.x() - v1.x()*v2.z()),
         (v1.x()*v2.y() - v1.y()*v2.x())
     );
+}
+
+
+template <class Cmpt>
+inline Vector<Cmpt> scaleRow(const Vector<Cmpt>& v, const Cmpt& c)
+{
+    // Multiply by scalar
+    return v*c;
 }
 
 

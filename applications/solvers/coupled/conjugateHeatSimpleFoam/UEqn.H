@@ -3,13 +3,13 @@
     tmp<fvVectorMatrix> UEqn
     (
         fvm::div(phi, U)
-      + turbulence->divDevReff(U)
+      + turbulence->divDevReff()
       + fvm::SuSp(-fvc::div(phi), U)
     );
 
     UEqn().relax();
 
-    eqnResidual = solve
+    solve
     (
         UEqn()
       ==
@@ -22,6 +22,4 @@
                 )*mesh.magSf()
             )
         )
-    ).initialResidual();
-
-    maxResidual = max(eqnResidual, maxResidual);
+    );

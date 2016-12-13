@@ -1,7 +1,7 @@
 #------------------------------------------------------------------------------
 # =========                 |
 # \\      /  F ield         | foam-extend: Open Source CFD
-#  \\    /   O peration     | Version:     3.2
+#  \\    /   O peration     | Version:     4.0
 #   \\  /    A nd           | Web:         http://www.foam-extend.org
 #    \\/     M anipulation  | For copyright notice see file Copyright
 #------------------------------------------------------------------------------
@@ -64,7 +64,11 @@ CLASSES_DIR        = $(MAKE_DIR)/classes
 SYS_INC            =
 SYS_LIBS           =
 
+ifeq ($(WM_ARCH_BASE),mingw)
+PROJECT_INC        = -I$(FOAM_SRC) -I$(FOAM_APP) -I$(LIB_SRC)/$(WM_PROJECT)/lnInclude -I$(LIB_SRC)/OSspecific/$(WM_OSTYPE)/lnInclude
+else
 PROJECT_INC        = -I$(LIB_SRC)/$(WM_PROJECT)/lnInclude -I$(LIB_SRC)/OSspecific/$(WM_OSTYPE)/lnInclude
+endif
 PROJECT_LIBS       = -l$(WM_PROJECT)
 PROJECT_VERSION    = $(shell printf -- "-DPROJECT_VERSION=%d%03d%03d" $$(echo $(WM_PROJECT_VERSION) | sed -e 's/\./ /g'))
 

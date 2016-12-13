@@ -1,0 +1,87 @@
+/*---------------------------------------------------------------------------*\
+  =========                 |
+  \\      /  F ield         | foam-extend: Open Source CFD
+   \\    /   O peration     | Version:     4.0
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
+-------------------------------------------------------------------------------
+License
+    This file is part of foam-extend.
+
+    foam-extend is free software: you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by the
+    Free Software Foundation, either version 3 of the License, or (at your
+    option) any later version.
+
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
+
+Class
+    Foam::cyclicGgiAMGInterfaceField
+
+Description
+    AMG agglomerated cyclicGgi interface field.
+
+Author
+    Hrvoje Jasak, Wikki Ltd.  All rights reserved.
+
+SourceFiles
+    cyclicGgiAMGInterfaceField.C
+
+\*---------------------------------------------------------------------------*/
+
+#ifndef cyclicGgiAMGInterfaceField_H
+#define cyclicGgiAMGInterfaceField_H
+
+#include "AMGInterfaceField.H"
+#include "ggiAMGInterfaceField.H"
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+namespace Foam
+{
+
+/*---------------------------------------------------------------------------*\
+                  Class cyclicGgiAMGInterfaceField Declaration
+\*---------------------------------------------------------------------------*/
+
+class cyclicGgiAMGInterfaceField
+:
+    public ggiAMGInterfaceField
+{
+public:
+
+    //- Runtime type information
+    TypeName("cyclicGgi");
+
+
+    // Constructors
+
+        //- Construct from AMG interface and fine level interface field
+        cyclicGgiAMGInterfaceField
+        (
+            const AMGInterface& AMGCp,
+            const lduInterfaceField& fineInterfaceField
+        );
+
+
+    // Destructor
+
+        virtual ~cyclicGgiAMGInterfaceField();
+};
+
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+} // End namespace Foam
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#endif
+
+// ************************************************************************* //

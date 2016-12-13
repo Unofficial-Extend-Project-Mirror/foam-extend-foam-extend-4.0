@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -151,6 +151,16 @@ tmp<Field<Type> > cmptMag(const UList<Type>& f);
 
 template<class Type>
 tmp<Field<Type> > cmptMag(const tmp<Field<Type> >& tf);
+
+
+template<class Type>
+void cmptSign(Field<Type>& res, const UList<Type>& f);
+
+template<class Type>
+tmp<Field<Type> > cmptSign(const UList<Type>& f);
+
+template<class Type>
+tmp<Field<Type> > cmptSign(const tmp<Field<Type> >& tf);
 
 #define TMP_UNARY_FUNCTION(ReturnType, Func)                                  \
                                                                               \

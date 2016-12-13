@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -123,6 +123,37 @@ public:
                 {
                     return pTraits<Type>::zero;
                 }
+            }
+
+
+        // Coefficient times coefficient multiplication. Needed for BlockILUCp
+        // preconditioner. VV, 12/Jul/2015.
+
+            scalarType activeTypeMultiply
+            (
+                const scalarType& a,
+                const scalarType& b
+            ) const
+            {
+                return a*b;
+            }
+
+            linearType activeTypeMultiply
+            (
+                const linearType& a,
+                const linearType& b
+            ) const
+            {
+                return cmptMultiply(a, b);
+            }
+
+            squareType activeTypeMultiply
+            (
+                const squareType& a,
+                const squareType& b
+            ) const
+            {
+                return (a & b);
             }
 
 

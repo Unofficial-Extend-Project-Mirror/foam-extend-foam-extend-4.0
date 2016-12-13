@@ -1,0 +1,153 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | foam-extend: Open Source CFD                    |
+|  \\    /   O peration     | Version:     4.0                                |
+|   \\  /    A nd           | Web:         http://www.foam-extend.org         |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       volScalarField;
+    location    "0";
+    object      epsilon;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+dimensions      [0 2 -3 0 0 0 0];
+
+internalField   uniform 14.855;
+
+boundaryField
+{
+    GVINLET
+    {
+        type            fixedValue;
+        value           uniform 14.855;
+    }
+    GVOUTLET
+    {
+        type            mixingPlane;
+        value           uniform 14.855;
+    }
+    GVCYCLIC
+    {
+        type            cyclic;
+        value           uniform 14.855;
+    }
+    GVBLADE
+    {
+        type            compressible::epsilonWallFunction;
+        refValue        uniform 0;
+        value           uniform 14.855;
+        Cmu             0.09;
+        kappa           0.41;
+        E               9.8;
+    }
+    GVHUB
+    {
+        type            compressible::epsilonWallFunction;
+        refValue        uniform 0;
+        value           uniform 14.855;
+        Cmu             0.09;
+        kappa           0.41;
+        E               9.8;
+    }
+    GVSHROUD
+    {
+        type            compressible::epsilonWallFunction;
+        refValue        uniform 0;
+        value           uniform 14.855;
+        Cmu             0.09;
+        kappa           0.41;
+        E               9.8;
+    }
+    RUINLET
+    {
+        type            mixingPlane;
+        value           uniform 14.855;
+    }
+    RUOUTLET
+    {
+        type            mixingPlane;
+        value           uniform 14.855;
+    }
+    RUCYCLIC1
+    {
+        type            cyclicGgi;
+        value           uniform 14.855;
+    }
+    RUCYCLIC2
+    {
+        type            cyclicGgi;
+        value           uniform 14.855;
+    }
+    RUBLADE
+    {
+        type            compressible::epsilonWallFunction;
+        refValue        uniform 0;
+        value           uniform 14.855;
+        Cmu             0.09;
+        kappa           0.41;
+        E               9.8;
+    }
+    RUHUB
+    {
+        type            compressible::epsilonWallFunction;
+        refValue        uniform 0;
+        value           uniform 14.855;
+        Cmu             0.09;
+        kappa           0.41;
+        E               9.8;
+    }
+    RUSHROUD
+    {
+        type            compressible::epsilonWallFunction;
+        refValue        uniform 0;
+        value           uniform 14.855;
+        Cmu             0.09;
+        kappa           0.41;
+        E               9.8;
+    }
+    DTINLET
+    {
+        type            mixingPlane;
+        value           uniform 14.855;
+    }
+    DTOUTLET
+    {
+        type            zeroGradient;
+    }
+    DTCYCLIC1
+    {
+        type            cyclicGgi;
+        value           uniform 14.855;
+    }
+    DTCYCLIC2
+    {
+        type            cyclicGgi;
+        value           uniform 14.855;
+    }
+    DTHUB
+    {
+        type            compressible::epsilonWallFunction;
+        refValue        uniform 0;
+        value           uniform 14.855;
+        Cmu             0.09;
+        kappa           0.41;
+        E               9.8;
+    }
+    DTSHROUD
+    {
+        type            compressible::epsilonWallFunction;
+        refValue        uniform 0;
+        value           uniform 14.855;
+        Cmu             0.09;
+        kappa           0.41;
+        E               9.8;
+    }
+}
+
+
+// ************************************************************************* //

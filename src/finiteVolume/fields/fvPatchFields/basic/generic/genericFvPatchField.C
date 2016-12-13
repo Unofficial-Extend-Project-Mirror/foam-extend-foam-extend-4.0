@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -747,6 +747,27 @@ void Foam::genericFvPatchField<Type>::rmap
             iter()->rmap(*dptfIter(), addr);
         }
     }
+}
+
+
+template<class Type>
+void Foam::genericFvPatchField<Type>::evaluate(const Pstream::commsTypes)
+{
+    FatalErrorIn
+    (
+        "genericFvPatchField<Type>::"
+        "evaluate(const Pstream::commsTypes)"
+    )   << "\n    "
+           "evaluate() cannot be called for a genericFvPatchField"
+           " (actual type " << actualTypeName_ << ")"
+        << "\n    on patch " << this->patch().name()
+        << " of field " << this->dimensionedInternalField().name()
+        << " in file " << this->dimensionedInternalField().objectPath()
+        << "\n    You are probably trying to solve for a field with a "
+           "generic boundary condition."
+        << exit(FatalError);
+
+    fvPatchField<Type>::evaluate();
 }
 
 

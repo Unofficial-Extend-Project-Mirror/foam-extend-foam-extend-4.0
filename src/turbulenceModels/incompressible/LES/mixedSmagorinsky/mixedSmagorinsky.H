@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -131,7 +131,7 @@ public:
 
         //- Implementation of div(B). This is necessary to override
         // (and include) the div(B) terms from both the parent classes.
-        virtual tmp<fvVectorMatrix> divDevBeff(volVectorField& U) const;
+        virtual tmp<fvVectorMatrix> divDevBeff() const;
 
         //- Correct Eddy-Viscosity and related properties
         virtual void correct(const tmp<volTensorField>& gradU);

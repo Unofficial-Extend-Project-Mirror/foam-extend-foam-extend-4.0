@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -41,8 +41,15 @@ pointFieldDecomposer::decomposeField
     const GeometricField<Type, pointPatchField, pointMesh>& field
 ) const
 {
-    // Create and map the internal field values
-    Field<Type> internalField(field.internalField(), pointAddressing_);
+    // ZT, 08-06-2016
+    // // Create and map the internal field values
+    // Field<Type> internalField(field.internalField(), pointAddressing_);
+    Field<Type> internalField(procMesh_.nPoints(), pTraits<Type>::zero);
+    const Field<Type>& fieldI = field.internalField();
+    for(label i=0; i<procMesh_.nPoints(); i++)
+    {
+        internalField[i] = fieldI[pointAddressing_[i]];
+    }
 
     // Create a list of pointers for the patchFields including one extra
     // for the global patch

@@ -1,0 +1,67 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | foam-extend: Open Source CFD                    |
+|  \\    /   O peration     | Version:     4.0                                |
+|   \\  /    A nd           | Web:         http://www.foam-extend.org         |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      fvSolution;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+solvers
+{
+    "p|pFinal"
+    {
+        solver           PCG;
+        preconditioner   DIC;
+
+        minIter          1;
+        maxIter          1000;
+        tolerance        1e-08;
+        relTol           0;
+    }
+
+    "U|UFinal"
+    {
+        solver           BiCGStab;
+        preconditioner   ILU0;
+
+        minIter          1;
+        maxIter          1000;
+        tolerance        1e-08;
+        relTol           0;
+    }
+}
+
+// for laplacianFoam
+SIMPLE
+{
+    nNonOrthogonalCorrectors 5;
+
+    pRefPoint (0 -0.45 0.05);
+    pRefValue 0;
+}
+
+PIMPLE
+{
+    nOuterCorrectors 2;
+    nCorrectors     4;
+    nNonOrthogonalCorrectors 0;
+
+    pRefPoint (-0.1 0 0.0005);
+    pRefValue 0;
+}
+
+relaxationFactors
+{
+    "U.*"           1;
+}
+
+
+// ************************************************************************* //

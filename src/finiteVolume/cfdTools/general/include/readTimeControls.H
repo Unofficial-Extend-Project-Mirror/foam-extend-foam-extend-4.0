@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -29,17 +29,13 @@ Description
 
 \*---------------------------------------------------------------------------*/
 
-Switch adjustTimeStep
-(
-    runTime.controlDict().lookup("adjustTimeStep")
-);
+adjustTimeStep =
+    runTime.controlDict().lookupOrDefault("adjustTimeStep", false);
 
-scalar maxCo
-(
-    readScalar(runTime.controlDict().lookup("maxCo"))
-);
+maxCo =
+    runTime.controlDict().lookupOrDefault<scalar>("maxCo", 1.0);
 
-scalar maxDeltaT =
+maxDeltaT =
     runTime.controlDict().lookupOrDefault<scalar>("maxDeltaT", GREAT);
 
 // ************************************************************************* //

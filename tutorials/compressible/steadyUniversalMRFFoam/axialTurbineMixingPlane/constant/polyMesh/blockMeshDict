@@ -1,0 +1,577 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | foam-extend: Open Source CFD                    |
+|  \\    /   O peration     | Version:     4.0                                |
+|   \\  /    A nd           | Web:         http://www.foam-extend.org         |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      blockMeshDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+// General macros to create 2D/extruded-2D meshes
+
+
+
+//define(calc, [esyscmd(echo $1 | bc | tr -d \\n)])
+
+
+
+
+
+
+
+
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+convertToMeters 1;
+
+// HUB AND SHROUD RADIUS
+// Hub radius (m)
+
+// Shroud radius (m)
+
+
+// GUIDE VANE REGION GEOMETRY AND MESH PROPERTIES
+// Guide vane inlet axial length (m)
+
+// Guide vane axial length (m)
+
+// Guide vane outlet axial length (m)
+
+// Number of guide vanes per 360 degrees (integer!)
+
+// Number of cells in radial direction at guide vane
+
+// Number of cells in tangential direction between guide vanes
+
+// Number of cells in axial direction at guide vane inlet
+
+// Number of cells in axial direction between guide vanes
+
+// Number of cells in axial direction at guide vane outlet
+
+
+// RUNNER REGION GEOMETRY AND MESH PROPERTIES
+// Runner inlet axial length (m)
+
+// Runner axial length (m)
+
+// Runner outlet axial length (m)
+
+// Number of runner blades per 360 degrees (integer!)
+
+// Number of cells in radial direction in runner
+
+// Number of cells in tangential direction between runner blades
+
+// Number of cells in axial direction at runner inlet
+
+// Number of cells in axial direction between runner blades
+
+// Number of cells in axial direction at runner outlet
+
+
+// DRAFT TUBE REGION GEOMETRY AND MESH PROPERTIES
+// "Draft tube" axial length (m)
+
+// Number of sections per 360 degrees (integer!)
+
+// Number of cells in radial direction in "draft tube"
+
+// Number of cells in tangential direction in "draft tube"
+
+// Number of cells in axial direction in "draft tube"
+
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+// TANGENTIAL PITCHES (RADIANS)
+// Guide vane region
+
+// Runner region
+
+// Draft tube region
+
+
+// TANGENTIAL SHIFTS BETWEEN AXIAL LEVELS (BOTTOM-UP)
+// Tangential shift from level DT0 to DT1
+
+// Runner region
+// Tangential shift from level RU0 to RU1
+
+// Tangential shift from level RU1 to RU2
+
+// Tangential shift from level RU2 to RU3
+
+// Guide vane region
+// Tangential shift from level GV0 to GV1
+
+// Tangential shift from level GV1 to GV2
+
+// Tangential shift from level GV2 to GV3
+
+
+// AXIAL/TANGENTIAL BASE POINTS FOR EACH LEVEL (BOTTOM-UP):
+// (CENTER OF RUNNER SET TO THETA=0, Z=0)
+// Draft tube:
+ //Center runner
+ // Straight draft tube!
+ //Center runner
+// Runner:
+ //Center runner
+ //Center runner
+
+
+
+// Guide vane:
+ //Center runner
+ //Center runner
+
+
+
+
+vertices //(radial [m], tangential [radians], axial [m])
+(
+//Guide vane hub:
+    (0.05 -0.0691150383 0.07) // Vertex GV0lb = 0 
+    (0.05 -0.00628318530000001 0.07) // Vertex GV0rb = 1 
+    (0.05 -0.062831853 0.09) // Vertex GV1lb = 2 
+    (0.05 0 0.09) // Vertex GV1rb = 3 
+    (0.05 -0.0314159265 0.19) // Vertex GV2lb = 4 
+    (0.05 0.0314159265 0.19) // Vertex GV2rb = 5 
+    (0.05 -0.0314159265 0.29) // Vertex GV3lb = 6 
+    (0.05 0.0314159265 0.29) // Vertex GV3rb = 7 
+
+//Guide vane shroud:
+    (0.1 -0.0691150383 0.07) // Vertex GV0lt = 8 
+    (0.1 -0.00628318530000001 0.07) // Vertex GV0rt = 9 
+    (0.1 -0.062831853 0.09) // Vertex GV1lt = 10 
+    (0.1 0 0.09) // Vertex GV1rt = 11 
+    (0.1 -0.0314159265 0.19) // Vertex GV2lt = 12 
+    (0.1 0.0314159265 0.19) // Vertex GV2rt = 13 
+    (0.1 -0.0314159265 0.29) // Vertex GV3lt = 14 
+    (0.1 0.0314159265 0.29) // Vertex GV3rt = 15 
+
+//Runner hub:
+    (0.05 -0.0062831853 -0.07) // Vertex RU0lb = 16 
+    (0.05 0.0565486677 -0.07) // Vertex RU0rb = 17 
+    (0.05 -0.0125663706 -0.05) // Vertex RU1lb = 18 
+    (0.05 0.0502654824 -0.05) // Vertex RU1rb = 19 
+    (0.05 -0.062831853 0.05) // Vertex RU2lb = 20 
+    (0.05 0 0.05) // Vertex RU2rb = 21 
+    (0.05 -0.0691150383 0.07) // Vertex RU3lb = 22 
+    (0.05 -0.00628318530000001 0.07) // Vertex RU3rb = 23 
+
+//Runner shroud:
+    (0.1 -0.0062831853 -0.07) // Vertex RU0lt = 24 
+    (0.1 0.0565486677 -0.07) // Vertex RU0rt = 25 
+    (0.1 -0.0125663706 -0.05) // Vertex RU1lt = 26 
+    (0.1 0.0502654824 -0.05) // Vertex RU1rt = 27 
+    (0.1 -0.062831853 0.05) // Vertex RU2lt = 28 
+    (0.1 0 0.05) // Vertex RU2rt = 29 
+    (0.1 -0.0691150383 0.07) // Vertex RU3lt = 30 
+    (0.1 -0.00628318530000001 0.07) // Vertex RU3rt = 31 
+
+//Draft tube hub:
+    (0.05 -0.0062831853 -0.14) // Vertex DT0lb = 32 
+    (0.05 0.0565486677 -0.14) // Vertex DT0rb = 33 
+    (0.05 -0.0062831853 -0.07) // Vertex DT1lb = 34 
+    (0.05 0.0565486677 -0.07) // Vertex DT1rb = 35 
+
+//Draft tube shroud:
+    (0.1 -0.0062831853 -0.14) // Vertex DT0lt = 36 
+    (0.1 0.0565486677 -0.14) // Vertex DT0rt = 37 
+    (0.1 -0.0062831853 -0.07) // Vertex DT1lt = 38 
+    (0.1 0.0565486677 -0.07) // Vertex DT1rt = 39 
+);
+
+blocks
+(
+//Guide vane:
+    hex (0 1 3 2 8 9 11 10)
+    (10 2 10)
+    simpleGrading (1 1 1)
+
+    hex (2 3 5 4 10 11 13 12)
+    (10 10 10)
+    simpleGrading (1 1 1)
+
+    hex (4 5 7 6 12 13 15 14)
+    (10 10 10)
+    simpleGrading (1 1 1)
+
+//Runner:
+    hex (16 17 19 18 24 25 27 26)
+    rotor
+    (10 2 10)
+    simpleGrading (1 1 1)
+
+    hex (18 19 21 20 26 27 29 28)
+    rotor
+    (10 10 10)
+    simpleGrading (1 1 1)
+
+    hex (20 21 23 22 28 29 31 30)
+    rotor
+    (10 2 10)
+    simpleGrading (1 1 1)
+
+//Draft tube:
+    hex (32 33 35 34 36 37 39 38)
+    (10 7 10)
+    simpleGrading (1 1 1)
+
+);
+
+edges // Inappropriate with arc due to coordinate conversion
+(
+//Runner
+    spline 26 28
+    (
+        (0.1 -0.04523893416 0)
+    )
+    spline 18 20
+    (
+        (0.05 -0.04523893416 0)
+    )
+    spline 27 29
+    (
+        (0.1 0.0125663706 0)
+    )
+    spline 19 21
+    (
+        (0.05 0.0125663706 0)
+    )
+//Guide vane
+    spline 10 12
+    (
+        (0.1 -0.039269908125 0.14)
+    )
+    spline 2 4
+    (
+        (0.05 -0.039269908125 0.14)
+    )
+    spline 11 13
+    (
+        (0.1 0.020420352225 0.14)
+    )
+    spline 3 5
+    (
+        (0.05 0.020420352225 0.14)
+    )
+);
+
+boundary
+(
+    GVINLET
+    {
+        type            patch;
+        faces
+        (
+            (7 6 14 15)
+        );
+    }
+
+    GVOUTLET
+    {
+        type            mixingPlane;
+        shadowPatch     RUINLET;
+        zone            GVOUTLETZone;
+        coordinateSystem
+        {
+            type            cylindrical;
+            name            mixingCS;
+            origin          (0 0 0);
+            axis            (0 0 1);
+            direction       (1 0 0);
+            inDegrees       false; //Use radians
+            //Equivalent axis/direction definition:
+            //e3              (0 0 1);
+            //e1              (1 0 0);
+        }
+        ribbonPatch
+        {
+            sweepAxis       Theta;
+            stackAxis       R;
+            discretisation  bothPatches;
+        }
+        faces
+        (
+            (0 1 9 8)
+        );
+    }
+
+    GVCYCLIC
+    {
+        type cyclic;
+        featureCos      0.9;
+        //MUST specify transformation since cyclic is not flat.
+        //Set global debugSwitch cyclic to 1 to check that it is correct!
+        transform   rotational;
+        rotationAxis (0 0 1);
+        rotationCentre (0 0 0);
+        rotationAngle  -72; //Degrees from second half to first half
+        //Face numbering must be same on both halfs/sides. The numbering
+        //is determined by the block definition, not by the faces list
+        //below. Just make sure that each face definition is according
+        //to the rule "clockwise when looking from inside the block".
+        faces
+        (
+            //First half, left side:
+            (2 0 8 10)
+            (6 4 12 14)
+            //Second half, right side:
+            (1 3 11 9)
+            (5 7 15 13)
+        );
+    }
+
+    GVBLADE
+    {
+        type wall;
+        faces
+        (
+            (4 2 10 12)
+            (3 5 13 11)
+        );
+    }
+
+    GVHUB
+    {
+        type wall;
+        faces
+        (
+            (0 2 3 1)
+            (2 4 5 3)
+            (4 6 7 5)
+        );
+    }
+
+    GVSHROUD
+    {
+        type wall;
+        faces
+        (
+            (8 9 11 10)
+            (10 11 13 12)
+            (12 13 15 14)
+        );
+    }
+
+    RUINLET
+    {
+        type            mixingPlane;
+        shadowPatch     GVOUTLET;
+        zone            RUINLETZone;
+        coordinateSystem
+        {
+            type            cylindrical;
+            name            mixingCS;
+            origin          (0 0 0);
+            axis            (0 0 1);
+            direction       (1 0 0);
+            inDegrees       false; //Use radians
+            //Equivalent axis/direction definition:
+            //e3              (0 0 1);
+            //e1              (1 0 0);
+        }
+        ribbonPatch
+        {
+            sweepAxis       Theta;
+            stackAxis       R;
+            discretisation  bothPatches;
+        }
+        faces
+        (
+            (23 22 30 31)
+        );
+    }
+
+    RUOUTLET
+    {
+        type            mixingPlane;
+        shadowPatch     DTINLET;
+        zone            RUOUTLETZone;
+        coordinateSystem
+        {
+            type            cylindrical;
+            name            mixingCS;
+            origin          (0 0 0);
+            axis            (0 0 1);
+            direction       (1 0 0);
+            inDegrees       false; //Use radians
+            //Equivalent axis/direction definition:
+            //e3              (0 0 1);
+            //e1              (1 0 0);
+        }
+        ribbonPatch
+        {
+            sweepAxis       Theta;
+            stackAxis       R;
+            discretisation  bothPatches;
+        }
+        faces
+        (
+            (16 17 25 24)
+        );
+    }
+
+    RUCYCLIC1
+    {
+        type             cyclicGgi;
+        shadowPatch      RUCYCLIC2;
+        zone             RUCYCLIC1Zone;
+        bridgeOverlap    false;
+        rotationAxis     (0 0 1);
+        rotationAngle    72;
+        separationOffset (0 0 0);
+        faces
+        (
+            (18 16 24 26)
+            (22 20 28 30)
+        );
+    }
+
+    RUCYCLIC2
+    {
+        type             cyclicGgi;
+        shadowPatch      RUCYCLIC1;
+        zone             RUCYCLIC2Zone;
+        bridgeOverlap    false;
+        rotationAxis     (0 0 1);
+        rotationAngle    -72;
+        separationOffset (0 0 0);
+        faces
+        (
+            (17 19 27 25)
+            (21 23 31 29)
+        );
+    }
+
+    RUBLADE
+    {
+        type wall;
+        faces
+        (
+            (20 18 26 28)
+            (19 21 29 27)
+        );
+    }
+
+    RUHUB
+    {
+        type wall;
+        faces
+        (
+            (16 18 19 17)
+            (18 20 21 19)
+            (20 22 23 21)
+        );
+    }
+
+    RUSHROUD
+    {
+        type wall;
+        faces
+        (
+            (24 25 27 26)
+            (26 27 29 28)
+            (28 29 31 30)
+        );
+    }
+
+    DTINLET
+    {
+        type            mixingPlane;
+        shadowPatch     RUOUTLET;
+        zone            DTINLETZone;
+        coordinateSystem
+        {
+            type            cylindrical;
+            name            mixingCS;
+            origin          (0 0 0);
+            axis            (0 0 1);
+            direction       (1 0 0);
+            inDegrees       false; //Use radians
+            //Equivalent axis/direction definition:
+            //e3              (0 0 1);
+            //e1              (1 0 0);
+        }
+        ribbonPatch
+        {
+            sweepAxis       Theta;
+            stackAxis       R;
+            discretisation  bothPatches;
+        }
+        faces
+        (
+            (35 34 38 39)
+        );
+    }
+
+    DTOUTLET
+    {
+        type patch;
+        faces
+        (
+            (32 33 37 36)
+        );
+    }
+
+    DTCYCLIC1
+    {
+        type             cyclicGgi;
+        shadowPatch      DTCYCLIC2;
+        zone             DTCYCLIC1Zone;
+        bridgeOverlap    false;
+        rotationAxis     (0 0 1);
+        rotationAngle    72;
+        separationOffset (0 0 0);
+        faces
+        (
+            (34 32 36 38)
+        );
+    }
+
+    DTCYCLIC2
+    {
+        type             cyclicGgi;
+        shadowPatch      DTCYCLIC1;
+        zone             DTCYCLIC2Zone;
+        bridgeOverlap    false;
+        rotationAxis     (0 0 1);
+        rotationAngle    -72;
+        separationOffset (0 0 0);
+        faces
+        (
+            (33 35 39 37)
+        );
+    }
+
+    DTHUB
+    {
+        type wall;
+        faces
+        (
+            (32 34 35 33)
+        );
+    }
+
+    DTSHROUD
+    {
+        type wall;
+        faces
+        (
+            (36 37 39 38)
+        );
+    }
+);
+
+
+// ************************************************************************* //

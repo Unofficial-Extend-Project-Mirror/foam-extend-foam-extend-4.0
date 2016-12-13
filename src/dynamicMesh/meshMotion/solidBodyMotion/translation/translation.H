@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -25,7 +25,7 @@ Class
     Foam::solidBodyMotionFunctions::translation
 
 Description
-    translation motion function
+    Translation motion function with sine law ramping for velocity.
 
 SourceFiles
     translation.C
@@ -70,7 +70,7 @@ class translation
         void operator=(const translation&);
 
 
-        //- Ramping factor resulting from rampTime_ value
+        //- Velocity ramping factor resulting from rampTime_ value
         scalar rampFactor() const;
 
 

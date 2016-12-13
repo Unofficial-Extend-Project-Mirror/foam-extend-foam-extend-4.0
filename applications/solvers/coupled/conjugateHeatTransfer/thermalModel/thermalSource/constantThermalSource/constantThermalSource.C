@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -31,7 +31,12 @@ License
 namespace Foam
 {
     defineTypeNameAndDebug(constantThermalSource, 0);
-    addToRunTimeSelectionTable(thermalSource, constantThermalSource, dictionary);
+    addToRunTimeSelectionTable
+    (
+        thermalSource,
+        constantThermalSource,
+        dictionary
+    );
 }
 
 
@@ -78,9 +83,34 @@ void Foam::constantThermalSource::addSource(volScalarField& source) const
 
         const labelList& cells = mesh().cellZones()[zoneID];
 
-        forAll(cells, cellI)
+        // Sum up the volumes
+        scalar sumVolume = 0;
+
+        const scalarField& V = mesh().V().field();
+
+        forAll (cells, cellI)
         {
-            source[cells[cellI]] = S_.value();
+            sumVolume += V[cells[cellI]];
+        }
+
+        reduce(sumVolume, sumOp<scalar>());
+
+        if (sumVolume < SMALL)
+        {
+            FatalErrorIn
+            (
+                "constantThermalSource::addSourcex()\n"
+            )   << "Zone " << zones_[zoneI]
+                << " specified in source " << name()
+                << " has zero volume: " << sumVolume
+                << abort(FatalError);
+        }
+
+        const scalar SoverV = S_.value()/sumVolume;
+
+        forAll (cells, cellI)
+        {
+            source[cells[cellI]] = SoverV;
         }
     }
 }

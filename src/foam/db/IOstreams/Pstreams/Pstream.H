@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -72,101 +72,130 @@ public:
 
     static const NamedEnum<commsTypes, 3> commsTypeNames;
 
-    //- Structure for communicating between processors
-    class commsStruct
-    {
-        // Private data
+    // Public classes
 
-            //- procID of above processor
-            label above_;
+        //- Structure for communicating between processors
+        class commsStruct
+        {
+            // Private data
 
-            //- procIDs of processors directly below me
-            labelList below_;
+                //- procID of above processor
+                label above_;
 
-            //- procIDs of all processors below (so not just directly below)
-            labelList allBelow_;
+                //- procIDs of processors directly below me
+                labelList below_;
 
-            //- procIDs of all processors not below. (inverse set of allBelow_
-            //  and minus myProcNo)
-            labelList allNotBelow_;
+                //- procIDs of all processors below (so not just directly below)
+                labelList allBelow_;
 
-
-    public:
-
-        // Constructors
-
-            //- Construct null
-            commsStruct();
-
-            //- Construct from components
-            commsStruct
-            (
-                const label,
-                const labelList&,
-                const labelList&,
-                const labelList&
-            );
-
-            //- Construct from components; construct allNotBelow_
-            commsStruct
-            (
-                const label nProcs,
-                const label myProcID,
-                const label,
-                const labelList&,
-                const labelList&
-            );
+                //- procIDs of all processors not below. (inverse set of
+                //  allBelow_ and minus myProcNo)
+                labelList allNotBelow_;
 
 
-        // Member Functions
+        public:
 
-            // Access
+            // Constructors
 
-                label above() const
+                //- Construct null
+                commsStruct();
+
+                //- Construct from components
+                commsStruct
+                (
+                    const label,
+                    const labelList&,
+                    const labelList&,
+                    const labelList&
+                );
+
+                //- Construct from components; construct allNotBelow_
+                commsStruct
+                (
+                    const label nProcs,
+                    const label myProcID,
+                    const label,
+                    const labelList&,
+                    const labelList&
+                );
+
+
+            // Member Functions
+
+                // Access
+
+                    label above() const
+                    {
+                        return above_;
+                    }
+
+                    const labelList& below() const
+                    {
+                        return below_;
+                    }
+
+                    const labelList& allBelow() const
+                    {
+                        return allBelow_;
+                    }
+
+                    const labelList& allNotBelow() const
+                    {
+                        return allNotBelow_;
+                    }
+
+
+            // Member operators
+
+                bool operator==(const commsStruct&) const;
+
+                bool operator!=(const commsStruct&) const;
+
+
+             // Ostream Operator
+
+                friend Ostream& operator<<(Ostream&, const commsStruct&);
+        };
+
+        //- combineReduce operator for lists. Used for counting.
+        class listEq
+        {
+        public:
+
+            template<class T>
+            void operator()(T& x, const T& y) const
+            {
+                forAll(y, i)
                 {
-                    return above_;
+                    if (y[i].size())
+                    {
+                        x[i] = y[i];
+                    }
                 }
-
-                const labelList& below() const
-                {
-                    return below_;
-                }
-
-                const labelList& allBelow() const
-                {
-                    return allBelow_;
-                }
-
-                const labelList& allNotBelow() const
-                {
-                    return allNotBelow_;
-                }
-
-
-        // Member operators
-
-            bool operator==(const commsStruct&) const;
-
-            bool operator!=(const commsStruct&) const;
-
-
-         // Ostream Operator
-
-            friend Ostream& operator<<(Ostream&, const commsStruct&);
-    };
+            }
+        };
 
 
 private:
 
     // Private data
 
-        static int myProcNo_;
+        //- Is this a parallel run?
         static bool parRun_;
 
+        //- My processor index
+        static int myProcNo_;
+
+        //- Process IDs
         static List<int> procIDs_;
+
+        //- Default message type
         static const int msgType_;
 
+        //- Structure for linear communications
         static List<commsStruct> linearCommunication_;
+
+        //- Structure for tree communications
         static List<commsStruct> treeCommunication_;
 
 
@@ -233,7 +262,7 @@ public:
         static const debug::optimisationSwitch nProcsSimpleSum;
 
         //- Default commsType
-        static const debug::optimisationSwitch defaultCommsType;
+        static debug::optimisationSwitch defaultCommsType;
 
         //- Default comms with a cast
         inline static Pstream::commsTypes defaultComms()
@@ -275,7 +304,7 @@ public:
         static bool init(int& argc, char**& argv);
 
         //- Is this a parallel run?
-        static bool parRun()
+        static bool& parRun()
         {
             return parRun_;
         }
@@ -346,19 +375,19 @@ public:
             return msgType_;
         }
 
-            //- Get the communications type of the stream
-            commsTypes commsType() const
-            {
-                return commsType_;
-            }
+        //- Get the communications type of the stream
+        commsTypes commsType() const
+        {
+            return commsType_;
+        }
 
-            //- Set the communications type of the stream
-            commsTypes commsType(const commsTypes ct)
-            {
-                commsTypes oldCommsType = commsType_;
-                commsType_ = ct;
-                return oldCommsType;
-            }
+        //- Set the communications type of the stream
+        commsTypes commsType(const commsTypes ct)
+        {
+            commsTypes oldCommsType = commsType_;
+            commsType_ = ct;
+            return oldCommsType;
+        }
 
         //- Exit program
         static void exit(int errnum = 1);

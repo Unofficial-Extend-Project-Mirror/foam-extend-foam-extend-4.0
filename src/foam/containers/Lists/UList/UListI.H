@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -90,7 +90,7 @@ inline void Foam::UList<T>::checkStart(const label start) const
     if (start<0 || (start && start>=size_))
     {
         FatalErrorIn("UList<T>::checkStart(const label)")
-	    << "start " << start << " out of range 0 ... " << max(label(size_-1), label(0))
+            << "start " << start << " out of range 0 ... " << max(size_-1, 0)
             << abort(FatalError);
     }
 }

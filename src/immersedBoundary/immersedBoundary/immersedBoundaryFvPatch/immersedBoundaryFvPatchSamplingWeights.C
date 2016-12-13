@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -74,8 +74,8 @@ void Foam::immersedBoundaryFvPatch::makeIbSamplingWeights() const
     const scalarField& gammaIn = gamma().internalField();
     const vectorField& CIn = mesh_.C().internalField();
 
-    const FieldField<Field, scalar>& gammaProc = ibProcGamma();
-    const FieldField<Field, vector>& CProc = ibProcCentres();
+    const scalarListList& gammaProc = ibProcGamma();
+    const vectorListList& CProc = ibProcCentres();
 
     // Go through all cellCells and calculate inverse distance for
     // all live points

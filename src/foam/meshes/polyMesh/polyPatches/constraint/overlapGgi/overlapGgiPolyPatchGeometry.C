@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -167,10 +167,10 @@ void Foam::overlapGgiPolyPatch::calcPatchToPatch() const
                 forwardT(),
                 reverseT(),
                 separation(),
-                0,             // master overlap tolerance
-                0,             // slave overlap tolerance
+                true,          // Patch data is complete on all processors
+                SMALL,         // master overlap tolerance
+                SMALL,         // slave overlap tolerance
                 true,          // Rescale weighting factors.  Bug fix, MB.
-//                 ggiInterpolation::AABB
                 overlapGgiInterpolation::BB_OCTREE  // Octree search, MB.
 
             );
@@ -291,7 +291,7 @@ void Foam::overlapGgiPolyPatch::checkDefinition() const
 }
 
 
-void Foam::overlapGgiPolyPatch::clearGeom()
+void Foam::overlapGgiPolyPatch::clearGeom() const
 {
     // Note: Currently deleting patch-to-patch interpolation together with
     // expanded master and slave patches on mesh motion to avoid problems
@@ -306,7 +306,7 @@ void Foam::overlapGgiPolyPatch::clearGeom()
 }
 
 
-void Foam::overlapGgiPolyPatch::clearOut()
+void Foam::overlapGgiPolyPatch::clearOut() const
 {
     clearGeom();
 
@@ -376,6 +376,12 @@ void Foam::overlapGgiPolyPatch::initMovePoints(const pointField& p)
 
     // Calculate transforms on mesh motion?
     calcTransforms();
+
+    if (master())
+    {
+        shadow().clearGeom();
+        shadow().calcTransforms();
+    }
 
     // Update interpolation for new relative position of GGI interfaces
     // Note: currently, patches and interpolation are cleared in clearGeom()

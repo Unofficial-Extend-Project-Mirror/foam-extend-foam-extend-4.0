@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -48,32 +48,32 @@ Foam::Istream& Foam::operator>>(Istream& is, Switch& s)
 
     if (t.isLabel())
     {
-        s.switch_ = Switch::asEnum(bool(t.labelToken()));
+        s = bool(t.labelToken());
     }
     else if (t.isWord())
     {
         // allow invalid values, but catch after for correct error message
-        Switch::switchType sw = Switch::asEnum(t.wordToken(), true);
+        Switch sw(t.wordToken(), true);
 
-        if (sw == Switch::INVALID)
+        if (sw.valid())
+        {
+            s = sw;
+        }
+        else
         {
             is.setBad();
-            FatalIOErrorIn("operator>>(Istream&, Switch&)", is)
+            FatalIOErrorIn("operator>>(Istream&, bool/Switch&)", is)
                 << "expected 'true/false', 'on/off' ... found " << t.wordToken()
                 << exit(FatalIOError);
 
             return is;
-        }
-        else
-        {
-            s.switch_ = sw;
         }
     }
     else
     {
         is.setBad();
         FatalIOErrorIn("operator>>(Istream&, bool/Switch&)", is)
-            << "wrong token type - expected bool found " << t
+            << "wrong token type - expected bool, found " << t
             << exit(FatalIOError);
 
         return is;

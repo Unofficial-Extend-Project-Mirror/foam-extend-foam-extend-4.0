@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -46,11 +46,14 @@ SourceFiles
 namespace Foam
 {
 
+template<class Cmpt>
+class SymmTensor2D;
+
 /*---------------------------------------------------------------------------*\
                            Class Tensor2D Declaration
 \*---------------------------------------------------------------------------*/
 
-template <class Cmpt>
+template<class Cmpt>
 class Tensor2D
 :
     public VectorSpace<Tensor2D<Cmpt>, Cmpt, 4>
@@ -75,6 +78,7 @@ public:
         static const Tensor2D one;
         static const Tensor2D max;
         static const Tensor2D min;
+        static const Tensor2D I;
 
 
     //- Component labeling enumeration
@@ -88,6 +92,9 @@ public:
 
         //- Construct given VectorSpace
         inline Tensor2D(const VectorSpace<Tensor2D<Cmpt>, Cmpt, 4>&);
+
+        //- Construct given SymmTensor2D
+        inline Tensor2D(const SymmTensor2D<Cmpt>&);
 
         //- Construct given SphericalTensor2D
         inline Tensor2D(const SphericalTensor2D<Cmpt>&);
@@ -149,6 +156,9 @@ public:
 
 
     // Member Operators
+
+        //- Copy SymmTensor2D
+        inline void operator=(const SymmTensor2D<Cmpt>&);
 
         //- Copy SphericalTensor2D
         inline void operator=(const SphericalTensor2D<Cmpt>&);

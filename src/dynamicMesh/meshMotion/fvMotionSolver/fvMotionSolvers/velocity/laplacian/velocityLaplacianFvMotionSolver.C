@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -28,6 +28,7 @@ License
 #include "fvmLaplacian.H"
 #include "addToRunTimeSelectionTable.H"
 #include "volPointInterpolation.H"
+#include "leastSquaresVolPointInterpolation.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
@@ -87,8 +88,15 @@ Foam::velocityLaplacianFvMotionSolver::velocityLaplacianFvMotionSolver
     diffusivityPtr_
     (
         motionDiffusivity::New(*this, lookup("diffusivity"))
-    )
-{}
+    ),
+    leastSquaresVolPoint_(false)
+{
+    if (found("leastSquaresVolPoint"))
+    {
+        leastSquaresVolPoint_ =
+            Switch(lookup("leastSquaresVolPoint"));
+    }
+}
 
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
@@ -102,17 +110,38 @@ Foam::velocityLaplacianFvMotionSolver::~velocityLaplacianFvMotionSolver()
 Foam::tmp<Foam::pointField>
 Foam::velocityLaplacianFvMotionSolver::curPoints() const
 {
-    volPointInterpolation::New(fvMesh_).interpolate
-    (
-        cellMotionU_,
-        pointMotionU_
-    );
+    if (leastSquaresVolPoint_)
+    {
+        leastSquaresVolPointInterpolation::New(fvMesh_).interpolate
+        (
+            cellMotionU_,
+            pointMotionU_
+        );
+    }
+    else
+    {
+        volPointInterpolation::New(fvMesh_).interpolate
+        (
+            cellMotionU_,
+            pointMotionU_
+        );
+    }
 
-    tmp<pointField> tcurPoints
-    (
-        fvMesh_.points()
-      + fvMesh_.time().deltaT().value()*pointMotionU_.internalField()
-    );
+    tmp<pointField> tcurPoints(new pointField(fvMesh_.allPoints()));
+    pointField& cp = tcurPoints();
+    const pointField& pointMotionUI = pointMotionU_.internalField();
+
+    forAll(pointMotionUI, pointI)
+    {
+        cp[pointI] +=
+            pointMotionUI[pointI]*fvMesh_.time().deltaT().value();
+    }
+
+    // tmp<pointField> tcurPoints
+    // (
+    //     fvMesh_.points()
+    //   + fvMesh_.time().deltaT().value()*pointMotionU_.internalField()
+    // );
 
     twoDCorrectPoints(tcurPoints());
 
@@ -124,20 +153,31 @@ void Foam::velocityLaplacianFvMotionSolver::solve()
 {
     // The points have moved so before interpolation update
     // the fvMotionSolver accordingly
-    movePoints(fvMesh_.points());
+    movePoints(fvMesh_.allPoints());
 
     diffusivityPtr_->correct();
-    pointMotionU_.boundaryField().updateCoeffs();
 
-    Foam::solve
-    (
-        fvm::laplacian
+    // ZT, Problem on symmetry plane
+    // pointMotionU_.boundaryField().updateCoeffs();
+
+    label nNonOrthCorr = 1;
+    if (found("nNonOrthogonalCorrectors"))
+    {
+        nNonOrthCorr = readInt(lookup("nNonOrthogonalCorrectors"));
+    }
+
+    for (label i=0; i<nNonOrthCorr; i++)
+    {
+        Foam::solve
         (
-            diffusivityPtr_->operator()(),
-            cellMotionU_,
-            "laplacian(diffusivity,cellMotionU)"
-        )
-    );
+            fvm::laplacian
+            (
+                diffusivityPtr_->operator()(),
+                cellMotionU_,
+                "laplacian(diffusivity,cellMotionU)"
+            )
+        );
+    }
 }
 
 

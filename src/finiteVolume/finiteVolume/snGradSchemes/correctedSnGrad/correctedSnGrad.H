@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -84,9 +84,8 @@ public:
         {}
 
 
-    // Destructor
-
-        virtual ~correctedSnGrad();
+    //- Destructor
+    virtual ~correctedSnGrad();
 
 
     // Member Functions
@@ -107,10 +106,38 @@ public:
         }
 
         //- Return the explicit correction to the correctedSnGrad
-        //  for the given field
+        //  for the given field using the gradient of the field
+        //  This is needed for use of cached gradient when possible
+        //  HJ, 6/May/2016
+        tmp<GeometricField<Type, fvsPatchField, surfaceMesh> >
+        fullGradCorrection
+        (
+            const GeometricField<Type, fvPatchField, volMesh>&
+        ) const;
+
+        //- Return the explicit correction to the correctedSnGrad
+        //  for the given field using the gradients of the field components
         virtual tmp<GeometricField<Type, fvsPatchField, surfaceMesh> >
         correction(const GeometricField<Type, fvPatchField, volMesh>&) const;
 };
+
+
+// * * * * * * * * Template Member Function Specialisations  * * * * * * * * //
+
+//  This is needed for use of cached gradient when possible
+//  HJ, 6/May/2016
+template<>
+tmp<surfaceScalarField> correctedSnGrad<scalar>::correction
+(
+    const volScalarField& vsf
+) const;
+
+
+template<>
+tmp<surfaceVectorField> correctedSnGrad<vector>::correction
+(
+    const volVectorField& vvf
+) const;
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

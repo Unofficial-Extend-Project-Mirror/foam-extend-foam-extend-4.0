@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -133,8 +133,9 @@ void MixingPlaneInterpolation<MasterPatch, SlavePatch>::calcAddressing() const
             noTransform,
             noTransform,
             noTranslation,
-            0,
-            0,
+            true,          // Patch data is complete on all processors
+            SMALL,
+            SMALL,
             true    // Scale GGI weights
         );
 
@@ -146,8 +147,9 @@ void MixingPlaneInterpolation<MasterPatch, SlavePatch>::calcAddressing() const
             noTransform,
             noTransform,
             noTranslation,
-            0,
-            0,
+            true,          // Patch data is complete on all processors
+            SMALL,
+            SMALL,
             true    // Scale GGI weights
         );
 

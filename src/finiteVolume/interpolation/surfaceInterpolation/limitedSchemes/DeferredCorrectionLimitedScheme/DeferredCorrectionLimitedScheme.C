@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -84,19 +84,24 @@ DeferredCorrectionLimitedScheme<Type, Limiter, LimitFunc>::limiter
     const GeometricField<typename Limiter::phiType, fvPatchField, volMesh>&
         lPhi = tlPhi();
 
-    GeometricField<typename Limiter::gradPhiType, fvPatchField, volMesh>
-        gradc = fvc::grad(lPhi);
-    gradc.correctBoundaryConditions();
+    // Due to gradient cacheing, must take a tmp field
+    // HJ, 22/Apr/2016
+    tmp
+    <
+        GeometricField<typename Limiter::gradPhiType, fvPatchField, volMesh>
+    > tgradc = fvc::grad(lPhi);
+
+    const GeometricField
+    <
+        typename Limiter::gradPhiType, fvPatchField, volMesh
+    >& gradc = tgradc();
 
     // Note: in order for the patchNeighbourField to be correct on coupled
     // boundaries, correctBoundaryConditions needs to be called.
     // The call shall be moved into the library fvc operators
-    gradc.correctBoundaryConditions();
+    // Moved to cached gradScheme.  HJ, 22/Apr/2016
+//     gradc.correctBoundaryConditions();
 
-    // Note: in order for the patchNeighbourField to be correct on coupled
-    // boundaries, correctBoundaryConditions needs to be called.
-    // The call shall be moved into the library fvc operators
-    gradc.correctBoundaryConditions();
 
     const surfaceScalarField& CDweights = mesh.surfaceInterpolation::weights();
 

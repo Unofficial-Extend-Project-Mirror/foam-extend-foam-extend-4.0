@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -85,6 +85,19 @@ public:
         void operator=(const linearTypeField&);
         void operator=(const tmp<linearTypeField>&);
 
+    // IOstream operators
+
+        friend Ostream& operator<<
+        (
+            Ostream&,
+            const CoeffField<symmTensor4thOrder>&
+        );
+
+        friend Ostream& operator<<
+        (
+            Ostream&,
+            const tmp<CoeffField<symmTensor4thOrder> >&
+        );
 };
 
 
@@ -92,6 +105,30 @@ public:
 
 tmp<CoeffField<symmTensor4thOrder> >
 inv(const CoeffField<symmTensor4thOrder>& f);
+
+template<>
+void multiply
+(
+    Field<symmTensor4thOrder>& f,
+    const CoeffField<symmTensor4thOrder>& f1,
+    const symmTensor4thOrder& f2
+);
+
+template<>
+void multiply
+(
+    Field<symmTensor4thOrder>& f,
+    const CoeffField<symmTensor4thOrder>& f1,
+    const Field<symmTensor4thOrder>& f2
+);
+
+template<>
+void multiply
+(
+    Field<symmTensor4thOrder>& f,
+    const Field<symmTensor4thOrder>& f1,
+    const CoeffField<symmTensor4thOrder>& f2
+);
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

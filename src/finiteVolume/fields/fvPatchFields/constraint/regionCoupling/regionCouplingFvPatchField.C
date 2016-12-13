@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -40,7 +40,8 @@ namespace Foam
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
 template<class Type>
-const Foam::Field<Type>& regionCouplingFvPatchField<Type>::originalPatchField() const
+const Foam::Field<Type>&
+regionCouplingFvPatchField<Type>::originalPatchField() const
 {
     if (curTimeIndex_ != this->db().time().timeIndex())
     {
@@ -272,9 +273,9 @@ void regionCouplingFvPatchField<Type>::initEvaluate
     // Interpolation must happen at init
 
     // Note: If used with interpolation - either on explicitly or called by the
-    // laplacian operator, the values set here are overridden by the interpolation
-    // scheme. In order to get the same diffusivities on both sides an identical
-    // interpolation scheme must be used.
+    // laplacian operator, the values set here are overridden by the
+    // interpolation scheme. In order to get the same diffusivities on
+    //  both sides an identical interpolation scheme must be used.
     // Note^2: Even if harmonic used, the interpolation is still wrong for most
     // CHT cases since (cell values vs. face values)
     // Note^3: None of this is intuitiv - fix requires low-level changes!

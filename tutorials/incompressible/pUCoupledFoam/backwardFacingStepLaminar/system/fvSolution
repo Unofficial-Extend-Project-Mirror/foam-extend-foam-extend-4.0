@@ -1,7 +1,7 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | foam-extend: Open Source CFD                    |
-|  \\    /   O peration     | Version:     3.2                                |
+|  \\    /   O peration     | Version:     4.0                                |
 |   \\  /    A nd           | Web:         http://www.foam-extend.org         |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
@@ -42,13 +42,16 @@ solvers
         minCoarseEqns   4;
         nMaxLevels      100;
         scale           on;
-        coarseSmoother  ILU;
-        fineSmoother    ILU;
+        smoother
+        {
+            smoother        ILUCp;
+            fillInLevel     1;
+        }
 
         minIter         0;
         maxIter         100;
         tolerance       1e-7;
-        relTol          0.005;
+        relTol          0.0;
     }
 
     // Segregated
@@ -61,7 +64,7 @@ solvers
     }
     U
     {
-        solver           PBiCG;
+        solver           BiCGStab;
         preconditioner   DILU;
         tolerance        1e-07;
         relTol           0.1;
@@ -86,7 +89,8 @@ fieldBounds
 
 relaxationFactors
 {
-    U    0.95;
+//     U    0.95;
 }
+
 
 // ************************************************************************* //

@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -42,7 +42,7 @@ translatingWallVelocityFvPatchVectorField
     const DimensionedField<vector, volMesh>& iF
 )
 :
-    fixedValueFvPatchField<vector>(p, iF),
+    fixedValueFvPatchVectorField(p, iF),
     U_(vector::zero)
 {}
 
@@ -55,7 +55,7 @@ translatingWallVelocityFvPatchVectorField
     const dictionary& dict
 )
 :
-    fixedValueFvPatchField<vector>(p, iF),
+    fixedValueFvPatchVectorField(p, iF),
     U_(dict.lookup("U"))
 {
     // Evaluate the wall velocity
@@ -72,7 +72,7 @@ translatingWallVelocityFvPatchVectorField
     const fvPatchFieldMapper& mapper
 )
 :
-    fixedValueFvPatchField<vector>(ptf, p, iF, mapper),
+    fixedValueFvPatchVectorField(ptf, p, iF, mapper),
     U_(ptf.U_)
 {}
 
@@ -83,7 +83,7 @@ translatingWallVelocityFvPatchVectorField
     const translatingWallVelocityFvPatchVectorField& twvpvf
 )
 :
-    fixedValueFvPatchField<vector>(twvpvf),
+    fixedValueFvPatchVectorField(twvpvf),
     U_(twvpvf.U_)
 {}
 
@@ -95,7 +95,7 @@ translatingWallVelocityFvPatchVectorField
     const DimensionedField<vector, volMesh>& iF
 )
 :
-    fixedValueFvPatchField<vector>(twvpvf, iF),
+    fixedValueFvPatchVectorField(twvpvf, iF),
     U_(twvpvf.U_)
 {}
 

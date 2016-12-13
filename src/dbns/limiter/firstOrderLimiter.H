@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -43,7 +43,7 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                  Class firstOrderLimiter Declaration
+                      Class firstOrderLimiter Declaration
 \*---------------------------------------------------------------------------*/
 
 class firstOrderLimiter
@@ -56,71 +56,37 @@ public:
         firstOrderLimiter()
         {}
 
-        //- Return limiter
-        inline scalar limiter
+
+    // Destructor - default
+
+
+    // Member functions
+
+        //- Set scalar limiter value
+        inline void limiter
         (
+            scalar& lim,
             const scalar& cellVolume,
             const scalar& deltaOneMax,
             const scalar& deltaOneMin,
             const scalar& deltaTwo
         )
         {
-            return 0;
+            lim = 0;
         }
 
-        //- Return limiter for a scalar
-        inline scalar limiter
+        //- Set Type limiter
+        template<class Type>
+        inline void limiter
         (
+            Type& lim,
             const scalar& cellVolume,
-            const scalar& faceFlux,
-            const scalar& deltaOneMax,
-            const scalar& deltaOneMin,
-            const vector& gradPhiP,
-            const vector& gradPhiN,
-            const vector& d
+            const Type& deltaOneMax,
+            const Type& deltaOneMin,
+            const Type& extrapolate
         )
         {
-            return 0;
-        }
-
-        //- Return limiter for a vector
-        inline vector limiter
-        (
-            const scalar& cellVolume,
-            const scalar& faceFlux,
-            const vector& deltaOneMax,
-            const vector& deltaOneMin,
-            const tensor& gradPhiP,
-            const tensor& gradPhiN,
-            const vector& d
-        )
-        {
-            return vector::zero;
-        }
-
-        //- Return limiter for a symmTensor
-        inline symmTensor limiter
-        (
-            const scalar& cellVolume,
-            const scalar& faceFlux,
-            const symmTensor& deltaOneMax,
-            const symmTensor& deltaOneMin,
-            const vector& gradPhiPXX,
-            const vector& gradPhiNXX,
-            const vector& gradPhiPXY,
-            const vector& gradPhiNXY,
-            const vector& gradPhiPXZ,
-            const vector& gradPhiNXZ,
-            const vector& gradPhiPYY,
-            const vector& gradPhiNYY,
-            const vector& gradPhiPYZ,
-            const vector& gradPhiNYZ,
-            const vector& gradPhiPZZ,
-            const vector& gradPhiNZZ,
-            const vector& d
-        )
-        {
-            return symmTensor::zero;
+            lim = pTraits<Type>::zero;
         }
 };
 

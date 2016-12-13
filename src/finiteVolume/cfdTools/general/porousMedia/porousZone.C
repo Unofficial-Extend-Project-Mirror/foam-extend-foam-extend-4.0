@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -353,8 +353,8 @@ void Foam::porousZone::addResistance
     if (correctAUprocBC)
     {
         // Correct the boundary conditions of the tensorial diagonal to ensure
-        // processor boundaries are correctly handled when AU^-1 is interpolated
-        // for the pressure equation.
+        // processor boundaries are correctly handled when AU^-1 is
+        // interpolated for the pressure equation.
         AU.correctBoundaryConditions();
     }
 }
@@ -383,7 +383,9 @@ void Foam::porousZone::writeDict(Ostream& os, bool subDict) const
 
     if (dict_.found("porosity"))
     {
-        os.writeKeyword("porosity") << porosity() << token::END_STATEMENT << nl;
+        os.writeKeyword("porosity")
+            << porosity() << token::END_STATEMENT
+            << nl;
     }
 
     // powerLaw coefficients

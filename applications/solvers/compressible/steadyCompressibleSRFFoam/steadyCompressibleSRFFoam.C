@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -37,6 +37,7 @@ Author
 #include "basicPsiThermo.H"
 #include "RASModel.H"
 #include "SRFModel.H"
+#include "pimpleControl.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -47,8 +48,10 @@ int main(int argc, char *argv[])
 
 #   include "createTime.H"
 #   include "createMesh.H"
+
+    pimpleControl pimple(mesh);
+
 #   include "createFields.H"
-#   include "readPIMPLEControls.H"
 #   include "initContinuityErrs.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -59,29 +62,31 @@ int main(int argc, char *argv[])
     {
         Info<< "Time = " << runTime.timeName() << nl << endl;
 
-#       include "readPIMPLEControls.H"
 #       include "readFieldBounds.H"
 
-#       include "initConvergenceCheck.H"
-
 #       include "UEqn.H"
-#       include "iEqn.H"
 #       include "pEqn.H"
+
+// #       include "hEqn.H"
+        // Solving for rothalpy
+#       include "iEqn.H"
 
 #       include "rhoFromP.H"
 
         // Correct turbulence
         turbulence->correct();
 
-        Uabs = Urel + SRF->U();
+        // Update rotational velocity
+        Urot = SRF->U();
+
+        // Update absolute velocity
+        Uabs = Urel + Urot;
 
         runTime.write();
 
         Info<< "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
             << "  ClockTime = " << runTime.elapsedClockTime() << " s"
             << nl << endl;
-
-#       include "convergenceCheck.H"
     }
 
     Info<< "End\n" << endl;

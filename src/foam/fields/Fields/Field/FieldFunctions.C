@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -292,6 +292,30 @@ tmp<Field<Type> > cmptMag(const tmp<Field<Type> >& tf)
 {
     tmp<Field<Type> > tRes = reuseTmp<Type, Type>::New(tf);
     cmptMag(tRes(), tf());
+    reuseTmp<Type, Type>::clear(tf);
+    return tRes;
+}
+
+
+template<class Type>
+void cmptSign(Field<Type>& res, const UList<Type>& f)
+{
+    TFOR_ALL_F_OP_FUNC_F(Type, res, =, cmptSign, Type, f)
+}
+
+template<class Type>
+tmp<Field<Type> > cmptSign(const UList<Type>& f)
+{
+    tmp<Field<Type> > tRes(new Field<Type>(f.size()));
+    cmptSign(tRes(), f);
+    return tRes;
+}
+
+template<class Type>
+tmp<Field<Type> > cmptSign(const tmp<Field<Type> >& tf)
+{
+    tmp<Field<Type> > tRes = reuseTmp<Type, Type>::New(tf);
+    cmptSign(tRes(), tf());
     reuseTmp<Type, Type>::clear(tf);
     return tRes;
 }

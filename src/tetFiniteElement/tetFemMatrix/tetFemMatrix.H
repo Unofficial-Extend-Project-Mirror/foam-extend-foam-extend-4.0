@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -72,7 +72,7 @@ class tetFemMatrix
     // Private data
 
         //- Reference to GeometricField
-        GeometricField<Type, tetPolyPatchField, tetPointMesh>& psi_;
+        const GeometricField<Type, tetPolyPatchField, tetPointMesh>& psi_;
 
         //- Dimension set
         dimensionSet dimensions_;
@@ -154,7 +154,7 @@ public:
         //- Construct given a field to solve for
         tetFemMatrix
         (
-            GeometricField<Type, tetPolyPatchField, tetPointMesh>&,
+            const GeometricField<Type, tetPolyPatchField, tetPointMesh>&,
             const dimensionSet&
         );
 
@@ -164,7 +164,7 @@ public:
         //- Construct from Istream given field to solve for
         tetFemMatrix
         (
-            GeometricField<Type, tetPolyPatchField, tetPointMesh>&,
+            const GeometricField<Type, tetPolyPatchField, tetPointMesh>&,
             Istream&
         );
 
@@ -180,11 +180,6 @@ public:
 
             const GeometricField<Type, tetPolyPatchField, tetPointMesh>&
             psi() const
-            {
-                return psi_;
-            }
-
-            GeometricField<Type, tetPolyPatchField, tetPointMesh>& psi()
             {
                 return psi_;
             }

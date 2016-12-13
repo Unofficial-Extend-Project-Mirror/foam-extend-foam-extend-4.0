@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -260,16 +260,16 @@ tmp<volSymmTensorField> LRR::devRhoReff() const
 }
 
 
-tmp<fvVectorMatrix> LRR::divDevRhoReff(volVectorField& U) const
+tmp<fvVectorMatrix> LRR::divDevRhoReff() const
 {
     if (couplingFactor_.value() > 0.0)
     {
         return
         (
-            fvc::div(rho_*R_ + couplingFactor_*mut_*fvc::grad(U))
-          + fvc::laplacian((1.0 - couplingFactor_)*mut_, U)
-          - fvm::laplacian(muEff(), U)
-          - fvc::div(mu()*dev2(fvc::grad(U)().T()))
+            fvc::div(rho_*R_ + couplingFactor_*mut_*fvc::grad(U_))
+          + fvc::laplacian((1.0 - couplingFactor_)*mut_, U_)
+          - fvm::laplacian(muEff(), U_)
+          - fvc::div(mu()*dev2(T(fvc::grad(U_))))
         );
     }
     else
@@ -277,9 +277,9 @@ tmp<fvVectorMatrix> LRR::divDevRhoReff(volVectorField& U) const
         return
         (
             fvc::div(rho_*R_)
-          + fvc::laplacian(mut_, U)
-          - fvm::laplacian(muEff(), U)
-          - fvc::div(mu()*dev2(fvc::grad(U)().T()))
+          + fvc::laplacian(mut_, U_)
+          - fvm::laplacian(muEff(), U_)
+          - fvc::div(mu()*dev2(T(fvc::grad(U_))))
         );
     }
 }

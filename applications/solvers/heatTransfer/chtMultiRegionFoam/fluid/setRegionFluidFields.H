@@ -15,3 +15,5 @@
     volScalarField& h = thermo.h();
 
     const dimensionedScalar massIni("massIni", dimMass, initialMassFluid[i]);
+
+    mesh.schemesDict().setFluxRequired(p.name());

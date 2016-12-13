@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -34,7 +34,7 @@ License
 #define TensorN_FieldFunctions(tensorType, diagTensorType, sphericalTensorType,     \
     vectorType, CmptType, args...)                                                  \
                                                                                     \
-UNARY_FUNCTION(tensorType, tensorType,inv,inv)                                      \
+UNARY_FUNCTION(tensorType, tensorType, T, transform)                                \
 UNARY_FUNCTION(diagTensorType, tensorType,diag,diag)                                \
 UNARY_FUNCTION(tensorType, tensorType,negSumDiag,negSumDiag)                        \
 UNARY_FUNCTION(CmptType, tensorType,contractScalar,contractScalar)                  \

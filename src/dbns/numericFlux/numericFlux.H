@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -42,6 +42,7 @@ SourceFiles
 
 #include "numericFluxBase.H"
 #include "basicThermo.H"
+#include "fvc.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -58,10 +59,6 @@ class numericFlux
     public numericFluxBase<Flux>
 {
     // Private data
-
-        //- Reference to mesh
-        const fvMesh& mesh_;
-
 
         // Reference to primitive fields
 
@@ -90,16 +87,7 @@ class numericFlux
             surfaceScalarField rhoEFlux_;
 
 
-        // Gradients
-
-            //- Static pressure gradient
-            volVectorField gradP_;
-
-            //- Velocity gradient
-            volTensorField gradU_;
-
-            //- Static temperature gradient
-            volVectorField gradT_;
+        // Gradients: no longer stored.  HJ, 22/Apr/2016
 
 
     // Private Member Functions
@@ -150,6 +138,9 @@ class numericFlux
 
 public:
 
+    //- Runtime type information
+    TypeName("numericFlux");
+
     // Constructors
 
         //- Construct from components
@@ -168,13 +159,6 @@ public:
 
 
     // Member Functions
-
-        //- Return mesh reference
-        const fvMesh& mesh() const
-        {
-            return mesh_;
-        }
-
 
         // Return fluxes
 
@@ -215,27 +199,6 @@ public:
             virtual tmp<scalarField> rhoEResidual() const
             {
                 return fvc::div(rhoEFlux_)().internalField();
-            }
-
-
-        // Return Gradients
-
-            //- Return pressure gradient
-            const volVectorField& gradP() const
-            {
-                return gradP_;
-            }
-
-            //- Return pressure gradient
-            const volTensorField& gradU() const
-            {
-                return gradU_;
-            }
-
-            //- Return Temperature gradient
-            const volVectorField& gradT() const
-            {
-                return gradT_;
             }
 
 

@@ -54,14 +54,14 @@ cat <<'EOF' >> patch.txt
 --- etc/prefs.sh-EXAMPLE        2015-11-26 05:01:05.676022832 +0000
 +++ etc/prefs.sh        2015-12-05 17:27:58.100579669 +0000
 @@ -36,8 +36,9 @@
- 
+
  # Specify system compiler
  # ~~~~~~~~~~~~~~~~~~~~~~~
 -#compilerInstall=System
 +compilerInstall=System
  #compilerInstall=FOAM
 +#WM_COMPILER=Gcc49
- 
+
  # Specify system openmpi
  # ~~~~~~~~~~~~~~~~~~~~~~
 @@ -46,14 +47,14 @@
@@ -84,7 +84,7 @@ cat <<'EOF' >> patch.txt
 +export OPENMPI_INCLUDE_DIR="`$OPENMPI_BIN_DIR/mpicc --showme:incdirs`"
 +export OPENMPI_COMPILE_FLAGS="`$OPENMPI_BIN_DIR/mpicc --showme:compile`"
 +export OPENMPI_LINK_FLAGS="`$OPENMPI_BIN_DIR/mpicc --showme:link`"
- 
+
  # Specify system installed ThirdParty packages/libraries
  # NB: The packages installed under $WM_THIRD_PARTY_DIR
 @@ -201,7 +202,6 @@
@@ -102,12 +102,12 @@ cat <<'EOF' >> patch.txt
 -export WM_THIRD_PARTY_USE_CMAKE_322=1
 +#export WM_THIRD_PARTY_USE_CMAKE_322=1
 +unset WM_THIRD_PARTY_USE_CMAKE_322
- 
+
  #
  # For AllMake.stage2
 EOF
 
- # Patch the file prefs.sh  
+ # Patch the file prefs.sh
 patch -p0 < patch.txt
 
  # Cleanup
@@ -133,7 +133,7 @@ services on your Raspberry Pi, you might even ran out of memory completely. So
 it is recommended not to compile foam-extend in parallel unless you keep an eye
 regularly on the compilation process and adjust your environment variable
 WM_NCOMPPROCS accordingly so you can compile some libraries/applications in
-parallel and some others using just 1 core. 
+parallel and some others using just 1 core.
 
    export WM_NCOMPPROCS=1    # or maybe 2
 

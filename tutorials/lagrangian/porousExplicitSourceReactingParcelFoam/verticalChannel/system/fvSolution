@@ -1,7 +1,7 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | foam-extend: Open Source CFD                    |
-|  \\    /   O peration     | Version:     3.2                                |
+|  \\    /   O peration     | Version:     4.0                                |
 |   \\  /    A nd           | Web:         http://www.foam-extend.org         |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
@@ -51,7 +51,7 @@ solvers
     };
     "(Yi|hs)"
     {
-        solver          PBiCG;
+        solver          BiCGStab;
         preconditioner  DILU;
         maxIter         200;
         tolerance       1e-06;
@@ -86,5 +86,6 @@ additional
     eWork           true;
     hWork           true;
 }
+
 
 // ************************************************************************* //

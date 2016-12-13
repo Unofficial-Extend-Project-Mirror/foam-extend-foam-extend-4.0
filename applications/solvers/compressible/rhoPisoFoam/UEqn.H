@@ -2,10 +2,10 @@
     (
         fvm::ddt(rho, U)
       + fvm::div(phi, U)
-      + turbulence->divDevRhoReff(U)
+      + turbulence->divDevRhoReff()
     );
 
-    if (momentumPredictor)
+    if (piso.momentumPredictor())
     {
         solve(UEqn == -fvc::grad(p));
     }

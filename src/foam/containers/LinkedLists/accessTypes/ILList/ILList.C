@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -44,7 +44,6 @@ Foam::ILList<LListBase, T>::ILList(const ILList<LListBase, T>& lst)
 }
 
 
-#ifndef __INTEL_COMPILER
 template<class LListBase, class T>
 template<class CloneArg>
 Foam::ILList<LListBase, T>::ILList
@@ -65,7 +64,6 @@ Foam::ILList<LListBase, T>::ILList
         this->append(iter().clone(cloneArg).ptr());
     }
 }
-#endif
 
 
 // * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * * //
@@ -114,7 +112,7 @@ template<class LListBase, class T>
 void Foam::ILList<LListBase, T>::clear()
 {
     label oldSize = this->size();
-    for (label i=0; i<oldSize; i++)
+    for (label i=0; i<oldSize; ++i)
     {
         eraseHead();
     }

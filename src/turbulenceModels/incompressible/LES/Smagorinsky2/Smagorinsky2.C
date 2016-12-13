@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -79,22 +79,17 @@ tmp<volSymmTensorField> Smagorinsky2::B() const
 }
 
 
-tmp<fvVectorMatrix> Smagorinsky2::divDevBeff
-(
-    volVectorField& U
-) const
+tmp<fvVectorMatrix> Smagorinsky2::divDevBeff() const
 {
-    volTensorField gradU = fvc::grad(U);
-
     volSymmTensorField aniNuEff
     (
         "aniNuEff",
-        I*nuEff() + cD2_*delta()*symm(gradU)
+        I*nuEff() + cD2_*delta()*symm(fvc::grad(U_))
     );
 
     return
     (
-      - fvm::laplacian(aniNuEff, U) - fvc::div(nuEff()*dev(fvc::grad(U)().T()))
+      - fvm::laplacian(aniNuEff, U_) - fvc::div(nuEff()*dev(T(fvc::grad(U_))))
     );
 }
 

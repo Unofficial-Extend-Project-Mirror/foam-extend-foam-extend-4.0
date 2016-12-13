@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -76,10 +76,8 @@ class fvSchemes
         dictionary laplacianSchemes_;
         ITstream defaultLaplacianScheme_;
 
-        dictionary fluxRequired_;
+        mutable dictionary fluxRequired_;
         bool defaultFluxRequired_;
-
-        dictionary cacheFields_;
 
 
     // Private Member Functions
@@ -97,7 +95,7 @@ class fvSchemes
 public:
 
     //- Debug switch
-        static debug::debugSwitch debug;
+    static debug::debugSwitch debug;
 
 
     // Constructors
@@ -126,9 +124,9 @@ public:
 
             ITstream& laplacianScheme(const word& name) const;
 
-            bool fluxRequired(const word& name) const;
+            void setFluxRequired(const word& name) const;
 
-            bool cache(const word& name) const;
+            bool fluxRequired(const word& name) const;
 
 
         // Edit
@@ -186,6 +184,12 @@ public:
 
             //- Read the fvSchemes
             bool read();
+
+
+        // Write
+
+            //- WriteData function required for regIOobject write operation
+            virtual bool writeData(Ostream&) const;
 };
 
 

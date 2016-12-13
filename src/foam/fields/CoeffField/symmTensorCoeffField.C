@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -122,6 +122,28 @@ void Foam::CoeffField<Foam::symmTensor>::operator=
 }
 
 
+// * * * * * * * * * * * * * * * IOstream Operators  * * * * * * * * * * * * //
+
+Foam::Ostream& Foam::operator<<(Ostream& os, const CoeffField<symmTensor>& f)
+{
+    const DecoupledCoeffField<symmTensor>& df = f;
+    return operator<<(os, df);
+}
+
+
+Foam::Ostream& Foam::operator<<
+(
+    Ostream& os,
+    const tmp<CoeffField<symmTensor> >& tf
+)
+{
+    const DecoupledCoeffField<symmTensor>& df = tf();
+    os << df;
+    tf.clear();
+    return os;
+}
+
+
 /* * * * * * * * * * * * * * * * Global functions  * * * * * * * * * * * * * */
 
 Foam::tmp<Foam::CoeffField<Foam::symmTensor> > Foam::inv
@@ -135,6 +157,48 @@ Foam::tmp<Foam::CoeffField<Foam::symmTensor> > Foam::inv
     (
         new CoeffField<symmTensor>(inv(df)())
     );
+}
+
+
+template<>
+void Foam::multiply
+(
+    symmTensorField& f,
+    const CoeffField<symmTensor>& f1,
+    const symmTensor& f2
+)
+{
+    const DecoupledCoeffField<symmTensor>& df1 = f1;
+
+    multiply(f, df1, f2);
+}
+
+
+template<>
+void Foam::multiply
+(
+    symmTensorField& f,
+    const CoeffField<symmTensor>& f1,
+    const symmTensorField& f2
+)
+{
+    const DecoupledCoeffField<symmTensor>& df1 = f1;
+
+    multiply(f, df1, f2);
+}
+
+
+template<>
+void Foam::multiply
+(
+    symmTensorField& f,
+    const symmTensorField& f1,
+    const CoeffField<symmTensor>& f2
+)
+{
+    const DecoupledCoeffField<symmTensor>& df2 = f2;
+
+    multiply(f, f1, df2);
 }
 
 

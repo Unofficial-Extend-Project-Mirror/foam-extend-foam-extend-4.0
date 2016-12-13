@@ -34,7 +34,9 @@
         fvc::makeAbsolute(phi, U);
     }
 
-    for(int nonOrth = 0; nonOrth <= nNonOrthCorr; nonOrth++)
+    mesh.schemesDict().setFluxRequired(pcorr.name());
+
+    for(int nonOrth=0; nonOrth<=nNonOrthCorr; nonOrth++)
     {
         fvScalarMatrix pcorrEqn
         (

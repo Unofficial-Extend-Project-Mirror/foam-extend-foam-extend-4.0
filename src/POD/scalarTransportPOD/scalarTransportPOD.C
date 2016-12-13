@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -234,13 +234,11 @@ void Foam::scalarTransportPOD::calcDerivativeCoeffs() const
     {
         const volScalarField& snapI = b.orthoField(i);
 
-        volVectorField gradSnapI = fvc::grad(snapI);
-
         for (label j = 0; j < b.baseSize(); j++)
         {
             const volScalarField& snapJ = b.orthoField(j);
 
-            volVectorField gradSnapJ = fvc::grad(snapJ);
+            const tmp<volVectorField> gradSnapJ = fvc::grad(snapJ);
 
             derivative[i][j] =
                 DT.value()*POD::projection(fvc::div(gradSnapJ), snapI)

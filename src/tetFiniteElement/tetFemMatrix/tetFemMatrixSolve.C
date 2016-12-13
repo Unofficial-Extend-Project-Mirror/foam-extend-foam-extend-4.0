@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -76,6 +76,13 @@ lduSolverPerformance tetFemMatrix<Type>::solve
     // Make a copy of interfaces: no longer a reference
     // HJ, 20/Nov/2007
     lduInterfaceFieldPtrsList interfaces = psi_.boundaryField().interfaces();
+
+    // Cast into a non-const to solve.  HJ, 6/May/2016
+    GeometricField<Type, tetPolyPatchField, tetPointMesh>& psi =
+        const_cast<GeometricField<Type, tetPolyPatchField, tetPointMesh>&>
+        (
+            psi_
+        );
 
     for (direction cmpt = 0; cmpt < Type::nComponents; cmpt++)
     {
@@ -154,7 +161,7 @@ lduSolverPerformance tetFemMatrix<Type>::solve
             solverPerfVec = solverPerf;
         }
 
-        psi_.internalField().replace(cmpt, psiCmpt);
+        psi.internalField().replace(cmpt, psiCmpt);
 
         reconstructMatrix();
     }
@@ -165,7 +172,7 @@ lduSolverPerformance tetFemMatrix<Type>::solve
             << endl;
     }
 
-    psi_.correctBoundaryConditions();
+    psi.correctBoundaryConditions();
 
     return solverPerfVec;
 }

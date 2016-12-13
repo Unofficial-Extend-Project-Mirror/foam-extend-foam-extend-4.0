@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -53,14 +53,14 @@ namespace fvm
     tmp<fvMatrix<Type> > d2dt2
     (
         const dimensionedScalar&,
-        GeometricField<Type, fvPatchField, volMesh>&,
+        const GeometricField<Type, fvPatchField, volMesh>&,
         const word& name
     );
 
     template<class Type>
     tmp<fvMatrix<Type> > d2dt2
     (
-        GeometricField<Type, fvPatchField, volMesh>&,
+        const GeometricField<Type, fvPatchField, volMesh>&,
         const word& name
     );
 
@@ -68,7 +68,7 @@ namespace fvm
     tmp<fvMatrix<Type> > d2dt2
     (
         const volScalarField&,
-        GeometricField<Type, fvPatchField, volMesh>&,
+        const GeometricField<Type, fvPatchField, volMesh>&,
         const word& name
     );
 
@@ -76,21 +76,21 @@ namespace fvm
     tmp<fvMatrix<Type> > d2dt2
     (
         const dimensionedScalar&,
-        GeometricField<Type, fvPatchField, volMesh>&,
+        const GeometricField<Type, fvPatchField, volMesh>&,
         const word& name
     );
 
     template<class Type>
     tmp<fvMatrix<Type> > d2dt2
     (
-        GeometricField<Type, fvPatchField, volMesh>&
+        const GeometricField<Type, fvPatchField, volMesh>&
     );
 
     template<class Type>
     tmp<fvMatrix<Type> > d2dt2
     (
         const volScalarField&,
-        GeometricField<Type, fvPatchField, volMesh>&
+        const GeometricField<Type, fvPatchField, volMesh>&
     );
 }
 

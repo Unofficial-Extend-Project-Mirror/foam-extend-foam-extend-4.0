@@ -1,7 +1,7 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | foam-extend: Open Source CFD                    |
-|  \\    /   O peration     | Version:     3.2                                |
+|  \\    /   O peration     | Version:     4.0                                |
 |   \\  /    A nd           | Web:         http://www.foam-extend.org         |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
@@ -22,7 +22,7 @@ boundaryField
 {
     inlet
     {
-        type            totalTemperature;
+        type            isentropicTotalTemperature;
         phi             phi;
         rho             none;
         psi             psi;
@@ -35,7 +35,6 @@ boundaryField
     outlet
     {
         type            zeroGradient;
-        value           $internalField;
     }
 
     blade
@@ -58,5 +57,6 @@ boundaryField
         type            cyclic;
     }
 }
+
 
 // ************************************************************************* //

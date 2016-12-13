@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -109,6 +109,54 @@ inline void expandLinear(Tensor<Cmpt>& result, const Vector<Cmpt>& v)
     );
 }
 
+
+//- Sum row elements of a tensor as a vector
+template <class Cmpt>
+inline void sumToDiag(Vector<Cmpt>& result, const Tensor<Cmpt>& t)
+{
+    result = Vector<Cmpt>
+    (
+        t.xx() + t.xy() + t.xz(),
+        t.yx() + t.yy() + t.yz(),
+        t.zx() + t.zy() + t.zz()
+    );
+}
+
+
+//- Sum row elements of a TensorN as a vectorN
+template <class Cmpt>
+inline Vector<Cmpt> sumToDiag(const Tensor<Cmpt>& t)
+{
+    Vector<Cmpt> result;
+    sumToDiag(result, t);
+    return result;
+}
+
+
+//- Sum row elements of a tensor as a vector
+template <class Cmpt>
+inline void sumMagToDiag(Vector<Cmpt>& result, const Tensor<Cmpt>& t)
+{
+    result = Vector<Cmpt>
+    (
+        Foam::mag(t.xx()) + Foam::mag(t.xy()) + Foam::mag(t.xz()),
+        Foam::mag(t.yx()) + Foam::mag(t.yy()) + Foam::mag(t.yz()),
+        Foam::mag(t.zx()) + Foam::mag(t.zy()) + Foam::mag(t.zz())
+    );
+}
+
+
+//- Sum magnitudes of row elements of a TensorN as a vectorN
+template <class Cmpt>
+inline Vector<Cmpt> sumMagToDiag(const Tensor<Cmpt>& t)
+{
+    Vector<Cmpt> result;
+    sumMagToDiag(result, t);
+    return result;
+}
+
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam
 

@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -27,6 +27,21 @@ Class
 Description
     Mass-conservative face interpolation of face data between two
     primitivePatches
+
+    Note on parallelisation
+    GGI search and cutting is an expensive operation, typically used in
+    patch-to-patch interpolation.  The current paradigm keeps primitive patch
+    data as a global zone on all processors for ease of manipulation
+    and to avoid global numbering.
+
+    GGIInterpolation uses a globalData flag to indicate that identical
+    patch data is available everywhere.  In such cases, ALL processors
+    (not just the ones which hold a piece of the active GGI surface)
+    can be used for the cutting, with the resulting addressing and weights
+    data assembled by global communication at the end.
+
+    If the GGI patch data is not identical on all processors, set
+    globalData to false.  HJ, 27/Apr/2016
 
 Author
     Hrvoje Jasak, Wikki Ltd.  All rights reserved
@@ -55,6 +70,7 @@ SourceFiles
 #include "NamedEnum.H"
 #include "tolerancesSwitch.H"
 #include "optimisationSwitch.H"
+#include "labelPair.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -86,8 +102,7 @@ public:
         {
             THREE_D_DISTANCE,
             AABB,
-            BB_OCTREE,
-            N_SQUARED
+            BB_OCTREE
         };
 
 
@@ -96,7 +111,7 @@ public:
         ClassName("GGIInterpolation");
 
         //- Quick reject names
-        static const NamedEnum<quickReject, 4> quickRejectNames_;
+        static const NamedEnum<quickReject, 3> quickRejectNames_;
 
 
     // Constructors
@@ -148,6 +163,10 @@ class GGIInterpolation
         //  indicates no translation.  MB, 28/Jan/2009
         vectorField forwardSep_;
 
+        //- Global data: are master and slave present on all processors?
+        //  If true, cutting will be performed in parallel
+        bool globalData_;
+
         //- Master non-overlap face tolerance factor
         const scalar masterNonOverlapFaceTol_;
 
@@ -171,6 +190,14 @@ class GGIInterpolation
             //- Master to slave  weights
             mutable scalarListList* masterWeightsPtr_;
 
+            //- Slave face into which each point of master patch is projected
+            mutable List<labelPair>* masterPointAddressingPtr_;
+
+            //- Weighting factors
+            mutable FieldField<Field, scalar>* masterPointWeightsPtr_;
+
+            //- Distance to intersection for master patch points
+            mutable scalarField* masterPointDistancePtr_;
 
         // Slave-to-master interpolation
 
@@ -180,14 +207,22 @@ class GGIInterpolation
             //- Slave to master weights
             mutable scalarListList* slaveWeightsPtr_;
 
+            //- Master face into which each point of slave patch is projected
+            mutable List<labelPair>* slavePointAddressingPtr_;
+
+            //- Weighting factors
+            mutable FieldField<Field, scalar>* slavePointWeightsPtr_;
+
+            //- Distance to intersection for master patch points
+            mutable scalarField* slavePointDistancePtr_;
+
             //- List of uncovered master faces
             mutable labelList* uncoveredMasterAddrPtr_;
 
             //- List of uncovered slave faces
             mutable labelList* uncoveredSlaveAddrPtr_;
 
-
-    // Private static data
+  // Private static data
 
         //- Facet area error tolerance
         static const debug::tolerancesSwitch areaErrorTol_;
@@ -236,6 +271,38 @@ class GGIInterpolation
 
         //- Disallow default bitwise assignment
         void operator=(const GGIInterpolation&);
+
+        //- Calculate point weights
+        void calcMasterPointAddressing() const;
+
+        //- Calculate point weights
+        void calcMasterPointWeights() const;
+
+        //- Calculate point weights
+        void calcSlavePointAddressing() const;
+
+        //- Calculate point weights
+        void calcSlavePointWeights() const;
+
+    // Helper functions for parallel search
+
+        //- Is parallel cutting active?
+        bool globalData() const
+        {
+            return
+                Pstream::parRun()
+             && globalData_
+             && masterPatch_.size() > 10*Pstream::nProcs();
+        }
+
+        //- Parallel master slice start
+        label parMasterStart() const;
+
+        //- Parallel master slice end
+        label parMasterEnd() const;
+
+        //- Parallel master slice size
+        label parMasterSize() const;
 
 
     // Helper functions for demand-driven data
@@ -423,16 +490,16 @@ public:
             const tensorField& forwardT,
             const tensorField& reverseT,
             const vectorField& forwardSep,
+            const bool globalData,
             const scalar masterFaceNonOverlapFaceTol = 0,
             const scalar slaveFaceNonOverlapFaceTol = 0,
             const bool rescaleGGIWeightingFactors = true,
-            const quickReject reject = AABB
+            const quickReject reject = BB_OCTREE
         );
 
 
     // Destructor
-
-        ~GGIInterpolation();
+    ~GGIInterpolation();
 
 
     // Member Functions
@@ -469,6 +536,23 @@ public:
             //- Return reference to the slave list of non-overlap faces
             const labelList& uncoveredSlaveFaces() const;
 
+            //- Return reference to point addressing
+            const List<labelPair>& masterPointAddr() const;
+
+            //- Return reference to point weights
+            const FieldField<Field, scalar>& masterPointWeights() const;
+
+            //- Return distance to intersection for patch points
+            const scalarField& masterPointDistanceToIntersection() const;
+
+            //- Return reference to point addressing
+            const List<labelPair>& slavePointAddr() const;
+
+            //- Return reference to point weights
+            const FieldField<Field, scalar>& slavePointWeights() const;
+
+            //- Return distance to intersection for patch points
+            const scalarField& slavePointDistanceToIntersection() const;
 
     // Interpolation functions
 
@@ -492,7 +576,6 @@ public:
             Field<Type>& result,
             const labelList& mask
         ) const;
-
 
         //- Interpolate from slave to master
         template<class Type>
@@ -549,6 +632,31 @@ public:
             Field<Type>& ff,
             const labelList& mask
         ) const;
+
+        //- Interpolate point field
+        template<class Type>
+        tmp<Field<Type> > masterToSlavePointInterpolate
+        (
+            const Field<Type>& pf
+        ) const;
+
+//         template<class Type>
+//         tmp<Field<Type> > masterToSlavePointInterpolate
+//         (
+//             const tmp<Field<Type> >& tpf
+//         ) const;
+
+        template<class Type>
+        tmp<Field<Type> > slaveToMasterPointInterpolate
+        (
+            const Field<Type>& pf
+        ) const;
+
+//         template<class Type>
+//         tmp<Field<Type> > slaveToMasterPointInterpolate
+//         (
+//             const tmp<Field<Type> >& tpf
+//         ) const;
 
 
     // Edit

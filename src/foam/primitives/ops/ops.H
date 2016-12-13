@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -93,6 +93,10 @@ class eqMagOp2
 template<class T>
 class eqMagOp
 { public: void operator()(T& x, const T& y) const { x = mag(y); } };
+
+template<class T>
+class eqSignOp
+{ public: void operator()(T& x, const T& y) const { x = sign(y); } };
 
 template<class T1, class T2>
 class plusEqMagSqrOp2

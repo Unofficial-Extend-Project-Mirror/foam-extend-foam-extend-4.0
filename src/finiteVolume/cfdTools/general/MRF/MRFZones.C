@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -232,7 +232,10 @@ Foam::tmp<Foam::volScalarField> Foam::MRFZones::Su
     );
     volScalarField& source = tPhiSource();
 
-    volVectorField gradPhi = fvc::grad(phi);
+    // Due to gradient cacheing, must take a tmp field
+    // HJ, 22/Apr/2016
+    tmp<volVectorField> tgradPhi = fvc::grad(phi);
+    const volVectorField& gradPhi = tgradPhi();
 
     forAll(*this, i)
     {
@@ -267,7 +270,10 @@ Foam::tmp<Foam::volVectorField> Foam::MRFZones::Su
     );
     volVectorField& source = tPhiSource();
 
-    volTensorField gradPhi = fvc::grad(phi);
+    // Due to gradient cacheing, must take a tmp field
+    // HJ, 22/Apr/2016
+    tmp<volTensorField> tgradPhi = fvc::grad(phi);
+    const volTensorField& gradPhi = tgradPhi();
 
     forAll(*this, i)
     {

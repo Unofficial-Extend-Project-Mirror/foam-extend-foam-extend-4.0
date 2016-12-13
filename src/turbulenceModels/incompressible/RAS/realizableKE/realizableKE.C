@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -231,12 +231,12 @@ tmp<volSymmTensorField> realizableKE::devReff() const
 }
 
 
-tmp<fvVectorMatrix> realizableKE::divDevReff(volVectorField& U) const
+tmp<fvVectorMatrix> realizableKE::divDevReff() const
 {
     return
     (
-      - fvm::laplacian(nuEff(), U)
-      - fvc::div(nuEff()*dev(fvc::grad(U)().T()))
+      - fvm::laplacian(nuEff(), U_)
+      - fvc::div(nuEff()*dev(T(fvc::grad(U_))))
     );
 }
 

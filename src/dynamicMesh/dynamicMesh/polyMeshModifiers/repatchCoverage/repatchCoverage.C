@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -292,7 +292,8 @@ bool Foam::repatchCoverage::changeTopology() const
         slave,
         tensorField::zero,  // forwardT
         tensorField::zero,  // reverseT
-        vectorField::zero   // separation
+        vectorField::zero,  // separation
+        false               // Patches are not global
     );
 
     // Check uncovered master and slave faces

@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -54,6 +54,17 @@ dimensionedSymmTensor sqr(const dimensionedVector& dv)
         "sqr("+dv.name()+')',
         sqr(dv.dimensions()),
         sqr(dv.value())
+    );
+}
+
+
+dimensionedSymmTensor innerSqr(const dimensionedSymmTensor& dt)
+{
+    return dimensionedSymmTensor
+    (
+        "innerSqr("+dt.name()+')',
+        sqr(dt.dimensions()),
+        innerSqr(dt.value())
     );
 }
 
@@ -129,7 +140,7 @@ dimensionedSymmTensor cof(const dimensionedSymmTensor& dt)
     return dimensionedSymmTensor
     (
         "cof("+dt.name()+')',
-        dt.dimensions(),
+        pow(dt.dimensions(), symmTensor::dim - 1),
         cof(dt.value())
     );
 }

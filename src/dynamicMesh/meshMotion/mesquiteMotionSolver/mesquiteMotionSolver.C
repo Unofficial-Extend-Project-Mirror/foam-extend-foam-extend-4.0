@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -2086,7 +2086,7 @@ void mesquiteMotionSolver::initParallelSurfaceSmoothing()
         parRead(procIndices_[pI], nProcSize[pI]);
 
         // Require a sync for size mismatch
-        bool requiresSync = false;
+        Switch requiresSync(false);
 
         if (nProcSize[pI] != sendSurfPointMap_[pI].size())
         {
@@ -2098,7 +2098,7 @@ void mesquiteMotionSolver::initParallelSurfaceSmoothing()
             Pout<< " neiProcNo: " << procIndices_[pI]
                 << " mySize: " << sendSurfPointMap_[pI].size()
                 << " neiSize: " << nProcSize[pI]
-                << " requireSync: " << Switch::asText(requiresSync)
+                << " requireSync: " << requiresSync.asText()
                 << endl;
         }
     }

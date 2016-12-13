@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -53,6 +53,9 @@ void expandScalar(Field<vector>& res, const UList<scalar>& f);
 
 void expandScalar(Field<tensor>& res, const UList<scalar>& f);
 void expandLinear(Field<tensor>& res, const UList<vector>& f);
+
+void sumToDiag(Field<vector>& res, const UList<tensor>& f);
+void sumMagToDiag(Field<vector>& res, const UList<tensor>& f);
 
 } // End namespace Foam
 

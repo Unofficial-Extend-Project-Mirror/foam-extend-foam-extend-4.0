@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -68,7 +68,7 @@ tmp<divScheme<Type> > divScheme<Type>::New
             << exit(FatalIOError);
     }
 
-    word schemeName(schemeData);
+    const word schemeName(schemeData);
 
     typename IstreamConstructorTable::iterator cstrIter =
         IstreamConstructorTablePtr_->find(schemeName);
@@ -79,7 +79,8 @@ tmp<divScheme<Type> > divScheme<Type>::New
         (
             "divScheme<Type>::New(const fvMesh&, Istream&)",
             schemeData
-        )   << "unknown div scheme " << schemeName << endl << endl
+        )   << "Unknown div scheme "
+            << schemeName << nl << nl
             << "Valid div schemes are :" << endl
             << IstreamConstructorTablePtr_->sortedToc()
             << exit(FatalIOError);
@@ -112,7 +113,7 @@ divScheme<Type>::fvmUDiv
     (
         "tmp<BlockLduSystem> divScheme<Type>::fvmDiv\n"
         "(\n"
-        "    GeometricField<Type, fvPatchField, volMesh>&"
+        "    const GeometricField<Type, fvPatchField, volMesh>&"
         ")\n"
     )   << "Implicit div operator currently defined only for Gauss linear. "
         << abort(FatalError);
@@ -144,7 +145,7 @@ divScheme<Type>::fvmUDiv
         "tmp<BlockLduSystem> divScheme<Type>::fvmDiv\n"
         "(\n"
         "    surfaceScalarField&"
-        "    GeometricField<Type, fvPatchField, volMesh>&"
+        "    const GeometricField<Type, fvPatchField, volMesh>&"
         ")\n"
     )   << "Implicit div operator currently defined only for Gauss linear. "
         << abort(FatalError);

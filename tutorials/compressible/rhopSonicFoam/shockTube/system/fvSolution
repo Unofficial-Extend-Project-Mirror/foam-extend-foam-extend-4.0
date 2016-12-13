@@ -1,7 +1,7 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | foam-extend: Open Source CFD                    |
-|  \\    /   O peration     | Version:     3.2                                |
+|  \\    /   O peration     | Version:     4.0                                |
 |   \\  /    A nd           | Web:         http://www.foam-extend.org         |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
@@ -21,48 +21,49 @@ solvers
     {
         solver          PCG;
         preconditioner  DIC;
-        tolerance       1e-15;
+        tolerance       1e-8;
         relTol          0;
     }
 
     rho
     {
-        solver          PBiCG;
+        solver          BiCGStab;
         preconditioner  DILU;
-        tolerance       1e-15;
+        tolerance       1e-8;
         relTol          0;
     }
 
     rhoU
     {
-        solver          PBiCG;
+        solver          BiCGStab;
         preconditioner  DILU;
-        tolerance       1e-15;
+        tolerance       1e-8;
         relTol          0;
     }
 
     rhoE
     {
-        solver          PBiCG;
+        solver          BiCGStab;
         preconditioner  DILU;
-        tolerance       1e-15;
+        tolerance       1e-8;
         relTol          0;
     }
 
     rhoH
     {
-        solver          PBiCG;
+        solver          BiCGStab;
         preconditioner  DILU;
-        tolerance       1e-15;
+        tolerance       1e-8;
         relTol          0;
     }
 }
 
-PISO
+PIMPLE
 {
     nOuterCorrectors 3;
     nCorrectors     1;
     HbyAblend       0;
 }
+
 
 // ************************************************************************* //

@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -193,8 +193,6 @@ LienLeschzinerLowRe::LienLeschzinerLowRe
 
 tmp<volSymmTensorField> LienLeschzinerLowRe::R() const
 {
-    volTensorField gradU = fvc::grad(U_);
-
     return tmp<volSymmTensorField>
     (
         new volSymmTensorField
@@ -207,7 +205,7 @@ tmp<volSymmTensorField> LienLeschzinerLowRe::R() const
                 IOobject::NO_READ,
                 IOobject::NO_WRITE
             ),
-            ((2.0/3.0)*I)*k_ - nut_*twoSymm(gradU),
+            ((2.0/3.0)*I)*k_ - nut_*twoSymm(fvc::grad(U_)),
             k_.boundaryField().types()
         )
     );
@@ -234,13 +232,13 @@ tmp<volSymmTensorField> LienLeschzinerLowRe::devReff() const
 }
 
 
-tmp<fvVectorMatrix> LienLeschzinerLowRe::divDevReff(volVectorField& U) const
+tmp<fvVectorMatrix> LienLeschzinerLowRe::divDevReff() const
 {
     return
     (
-      - fvm::laplacian(nuEff(), U)
-    //- (fvc::grad(U) & fvc::grad(nuEff()))
-      - fvc::div(nuEff()*fvc::grad(U)().T())
+      - fvm::laplacian(nuEff(), U_)
+    //- (fvc::grad(U_) & fvc::grad(nuEff()))
+      - fvc::div(nuEff()*T(fvc::grad(U_)))
     );
 }
 
@@ -292,7 +290,8 @@ void LienLeschzinerLowRe::correct()
 
     scalar Cmu75 = pow(Cmu_.value(), 0.75);
 
-    volTensorField gradU = fvc::grad(U_);
+    const tmp<volTensorField> tgradU = fvc::grad(U_);
+    const volTensorField& gradU = tgradU();
 
     // generation term
     volScalarField S2 = symm(gradU) && gradU;

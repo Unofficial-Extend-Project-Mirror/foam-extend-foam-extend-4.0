@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -74,6 +74,9 @@ UNARY_TEMPLATE_FUNCTION_VS(SphericalTensorN, expandScalar)
 UNARY_TEMPLATE_FUNCTION(TensorN, VectorN, expandLinear)
 UNARY_TEMPLATE_FUNCTION(DiagTensorN, VectorN, expandLinear)
 UNARY_TEMPLATE_FUNCTION(SphericalTensorN, VectorN, expandLinear)
+
+UNARY_TEMPLATE_FUNCTION(VectorN, TensorN, sumToDiag)
+UNARY_TEMPLATE_FUNCTION(VectorN, TensorN, sumMagToDiag)
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

@@ -1,7 +1,7 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | foam-extend: Open Source CFD                    |
-|  \\    /   O peration     | Version:     3.2                                |
+|  \\    /   O peration     | Version:     4.0                                |
 |   \\  /    A nd           | Web:         http://www.foam-extend.org         |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
@@ -28,6 +28,7 @@ solvers
     }
     p
     {
+        $p;
         solver           CG;
         preconditioner   DIC;
 
@@ -38,12 +39,7 @@ solvers
     }
     pFinal
     {
-        solver           CG;
-        preconditioner   DIC;
-
-        minIter          0;
-        maxIter          1000;
-        tolerance        1e-06;
+        $p;
         relTol           0;
     }
     U
@@ -54,6 +50,12 @@ solvers
         minIter          0;
         maxIter          1000;
         tolerance        1e-07;
+        relTol           0;
+    }
+
+    UFinal
+    {
+        $U;
         relTol           0;
     }
 }
@@ -69,18 +71,11 @@ PIMPLE
     pRefValue 0;
 }
 
-SIMPLE
-{
-    nNonOrthogonalCorrectors 4;
-
-    pRefCell 0;
-    pRefValue 0;
-}
-
 relaxationFactors
 {
-    U 0.7;
-//     p 0.3;
+    U       0.7;
+    UFinal  1;
 }
+
 
 // ************************************************************************* //

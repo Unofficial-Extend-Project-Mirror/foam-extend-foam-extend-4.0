@@ -4,40 +4,26 @@ tmp<fvVectorMatrix> UEqn
 (
     pZones.ddt(rho, U)
   + fvm::div(phi, U)
-  + turbulence->divDevRhoReff(U)
+  + turbulence->divDevRhoReff()
 );
 
-if (oCorr == nOuterCorr-1)
-{
-    if (mesh.solutionDict().relax("UFinal"))
-    {
-        UEqn().relax(mesh.solutionDict().relaxationFactor("UFinal"));
-    }
-    else
-    {
-        UEqn().relax(1);
-    }
-}
-else
-{
-    UEqn().relax();
-}
+UEqn().relax
+(
+    mesh.solutionDict().equationRelaxationFactor(U.select(pimple.finalIter()))
+);
 
 mrfZones.addCoriolis(rho, UEqn());
 pZones.addResistance(UEqn());
 
 volScalarField rUA = 1.0/UEqn().A();
 
-if (momentumPredictor)
+if (pimple.momentumPredictor())
 {
-    if (oCorr == nOuterCorr-1)
-    {
-        solve(UEqn() == -fvc::grad(p), mesh.solutionDict().solver("UFinal"));
-    }
-    else
-    {
-        solve(UEqn() == -fvc::grad(p));
-    }
+    solve
+    (
+        UEqn() == -fvc::grad(p),
+        mesh.solutionDict().solver((U.select(pimple.finalIter())))
+    );
 }
 else
 {

@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -141,19 +141,19 @@ public:
 
         tmp<fvScalarMatrix> fvmDdt
         (
-            volScalarField&
+            const volScalarField&
         );
 
         tmp<fvScalarMatrix> fvmDdt
         (
             const dimensionedScalar&,
-            volScalarField&
+            const volScalarField&
         );
 
         tmp<fvScalarMatrix> fvmDdt
         (
             const volScalarField&,
-            volScalarField&
+            const volScalarField&
         );
 
         tmp<surfaceScalarField> fvcDdtPhiCorr

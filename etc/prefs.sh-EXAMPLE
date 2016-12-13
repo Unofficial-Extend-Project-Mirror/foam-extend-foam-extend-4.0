@@ -1,7 +1,7 @@
 #----------------------------------*-sh-*--------------------------------------
 # =========                 |
 # \\      /  F ield         | foam-extend: Open Source CFD
-#  \\    /   O peration     | Version:     3.2
+#  \\    /   O peration     | Version:     4.0
 #   \\  /    A nd           | Web:         http://www.foam-extend.org
 #    \\/     M anipulation  | For copyright notice see file Copyright
 #------------------------------------------------------------------------------
@@ -180,7 +180,7 @@ export FOAM_VERBOSE=1
 # You can override your identifier using this environment variable
 #export CDASH_SUBMIT_LOCAL_HOST_ID=choose_your_CDash_system_identifer
 
-# Buildname suffix for the FOAM CDash test harness on foam-extend 
+# Buildname suffix for the FOAM CDash test harness on foam-extend
 # By default, the git branch name and git revision number will be
 # appended to the CDash build name.
 # Otherwise, for users not using git, or wanting to provide additionnal
@@ -214,9 +214,9 @@ export WM_THIRD_PARTY_USE_CMAKE_322=1
 #
 # For AllMake.stage2
 export WM_THIRD_PARTY_USE_OPENMPI_188=1
-#export WM_THIRD_PARTY_USE_OPENMPI_188_ConfigureAdditionalArgs='--enable-mpi-cxx --with-openib=/usr --with-openib-libdir=/usr/lib64'
+#export WM_THIRD_PARTY_USE_OPENMPI_188_ConfigureAdditionalArgs='--enable-mpi-cxx --with-verbs'
 #export WM_THIRD_PARTY_USE_OPENMPI_165=1
-#export WM_THIRD_PARTY_USE_OPENMPI_165_ConfigureAdditionalArgs='--enable-mpi-cxx --with-openib=/usr --with-openib-libdir=/usr/lib64'
+#export WM_THIRD_PARTY_USE_OPENMPI_165_ConfigureAdditionalArgs='--enable-mpi-cxx --with-openib'
 #export WM_THIRD_PARTY_USE_OPENMPI_15=1
 #export WM_THIRD_PARTY_USE_OPENMPI_143=1
 #export WM_THIRD_PARTY_USE_OPENMPI_141=1
@@ -238,7 +238,8 @@ export WM_THIRD_PARTY_USE_HWLOC_1101=1
 #
 # For AllMake.stage4
 export WM_THIRD_PARTY_USE_QT_486=1
-export WM_THIRD_PARTY_USE_PARAVIEW_431=1
+export WM_THIRD_PARTY_USE_PARAVIEW_440=1
+#export WM_THIRD_PARTY_USE_PARAVIEW_431=1
 #export WM_THIRD_PARTY_USE_PARAVIEW_410=1
 
 

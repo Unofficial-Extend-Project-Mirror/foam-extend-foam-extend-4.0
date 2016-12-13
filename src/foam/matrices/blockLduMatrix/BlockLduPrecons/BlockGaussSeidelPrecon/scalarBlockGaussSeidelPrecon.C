@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -48,7 +48,7 @@ void BlockGaussSeidelPrecon<scalar>::calcInvDiag()
 {
     // Direct inversion of diagonal is sufficient, as the diagonal
     // is linear.  HJ, 20/Aug/2015
-    invDiag_ = inv(this->matrix_.diag());
+    invDiag_ = 1/this->matrix_.diag();
 }
 
 
@@ -61,23 +61,17 @@ void BlockGaussSeidelPrecon<scalar>::precondition
 {
     if (matrix_.diagonal())
     {
-        const scalarField& d = matrix_.diag();
-
-        forAll (x, i)
-        {
-            x[i] = b[i]/d[i];
-        }
+        x = b*invDiag_;
     }
     else if (matrix_.symmetric() || matrix_.asymmetric())
     {
-        scalarField dD = 1.0/matrix_.diag();
         const scalarField& LowerCoeff = matrix_.lower();
         const scalarField& UpperCoeff = matrix_.upper();
 
         BlockSweep
         (
             x,
-            dD,
+            invDiag_,
             LowerCoeff,
             UpperCoeff,
             b
@@ -95,16 +89,10 @@ void BlockGaussSeidelPrecon<scalar>::preconditionT
 {
     if (matrix_.diagonal())
     {
-        const scalarField& d = matrix_.diag();
-
-        forAll (xT, i)
-        {
-            xT[i] = bT[i]/d[i];
-        }
+        xT = bT*invDiag_;
     }
     else if (matrix_.symmetric() || matrix_.asymmetric())
     {
-        scalarField dD = 1.0/matrix_.diag();
         const scalarField& LowerCoeff = matrix_.lower();
         const scalarField& UpperCoeff = matrix_.upper();
 
@@ -112,7 +100,7 @@ void BlockGaussSeidelPrecon<scalar>::preconditionT
         BlockSweep
         (
             xT,
-            dD,
+            invDiag_,
             UpperCoeff,
             LowerCoeff,
             bT

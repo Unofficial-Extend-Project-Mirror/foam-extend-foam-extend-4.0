@@ -3,12 +3,12 @@ rho = thermo.rho();
 volScalarField rUA = 1.0/UEqn().A();
 U = rUA*UEqn().H();
 
-if (nCorr <= 1)
+if (pimple.nCorrPISO() <= 1)
 {
     UEqn.clear();
 }
 
-if (transonic)
+if (pimple.transonic())
 {
     surfaceScalarField phid
     (
@@ -20,7 +20,7 @@ if (transonic)
         )
     );
 
-    for (int nonOrth=0; nonOrth<=nNonOrthCorr; nonOrth++)
+    while (pimple.correctNonOrthogonal())
     {
         fvScalarMatrix pEqn
         (
@@ -29,21 +29,12 @@ if (transonic)
           - fvm::laplacian(rho*rUA, p)
         );
 
-        if
+        pEqn.solve
         (
-            oCorr == nOuterCorr-1
-            && corr == nCorr-1
-            && nonOrth == nNonOrthCorr
-        )
-        {
-            pEqn.solve(mesh.solutionDict().solver("pFinal"));
-        }
-        else
-        {
-            pEqn.solve();
-        }
+            mesh.solutionDict().solver(p.select(pimple.finalInnerIter()))
+        );
 
-        if (nonOrth == nNonOrthCorr)
+        if (pimple.finalNonOrthogonalIter())
         {
             phi == pEqn.flux();
         }
@@ -58,7 +49,7 @@ else
         //+ fvc::ddtPhiCorr(rUA, rho, U, phi)
         );
 
-    for (int nonOrth=0; nonOrth<=nNonOrthCorr; nonOrth++)
+    while (pimple.correctNonOrthogonal())
     {
         // Pressure corrector
         fvScalarMatrix pEqn
@@ -68,21 +59,12 @@ else
           - fvm::laplacian(rho*rUA, p)
         );
 
-        if
+        pEqn.solve
         (
-            oCorr == nOuterCorr-1
-         && corr == nCorr-1
-         && nonOrth == nNonOrthCorr
-        )
-        {
-            pEqn.solve(mesh.solutionDict().solver("pFinal"));
-        }
-        else
-        {
-            pEqn.solve();
-        }
+            mesh.solutionDict().solver(p.select(pimple.finalInnerIter()))
+        );
 
-        if (nonOrth == nNonOrthCorr)
+        if (pimple.finalNonOrthogonalIter())
         {
             phi += pEqn.flux();
         }

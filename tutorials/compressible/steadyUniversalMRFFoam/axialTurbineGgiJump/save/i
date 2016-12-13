@@ -1,0 +1,140 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | foam-extend: Open Source CFD                    |
+|  \\    /   O peration     | Version:     4.0                                |
+|   \\  /    A nd           | Web:         http://www.foam-extend.org         |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       volScalarField;
+    location    "20";
+    object      i;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+dimensions      [0 2 -2 0 0 0 0];
+
+internalField   uniform 307494;
+
+boundaryField
+{
+    GVINLET
+    {
+        type            fixedEnthalpy;
+        value           uniform 307494;
+    }
+    GVOUTLET
+    {
+        type            ggiEnthalpyJump;
+        patchType       ggi;
+        rotating        false;
+        value           uniform 307494;
+    }
+    GVCYCLIC
+    {
+        type            cyclic;
+        value           uniform 307494;
+    }
+    GVBLADE
+    {
+        type            gradientEnthalpy;
+        gradient        uniform 0;
+        value           uniform 307000;
+    }
+    GVHUB
+    {
+        type            gradientEnthalpy;
+        gradient        uniform 0;
+        value           uniform 307494;
+    }
+    GVSHROUD
+    {
+        type            gradientEnthalpy;
+        gradient        uniform 0;
+        value           uniform 307494;
+    }
+    RUINLET
+    {
+        type            ggiEnthalpyJump;
+        patchType       ggi;
+        rotating        true;
+        value           uniform 307494;
+    }
+    RUOUTLET
+    {
+        type            ggiEnthalpyJump;
+        patchType       ggi;
+        rotating        true;
+        value           uniform 307494;
+    }
+    RUCYCLIC1
+    {
+        type            cyclicGgi;
+        value           uniform 307494;
+    }
+    RUCYCLIC2
+    {
+        type            cyclicGgi;
+        value           uniform 307494;
+    }
+    RUBLADE
+    {
+        type            gradientEnthalpy;
+        gradient        uniform 307494;
+        value           uniform 307494;
+    }
+    RUHUB
+    {
+        type            gradientEnthalpy;
+        gradient        uniform 307494;
+        value           uniform 307494;
+    }
+    RUSHROUD
+    {
+        type            gradientEnthalpy;
+        gradient        uniform 307494;
+        value           uniform 307494;
+    }
+    DTINLET
+    {
+        type            ggiEnthalpyJump;
+        patchType       ggi;
+        rotating        false;
+        value           uniform 305.66;
+    }
+    DTOUTLET
+    {
+        type            gradientEnthalpy;
+        gradient        uniform 0;
+        value           uniform 307494;
+    }
+    DTCYCLIC1
+    {
+        type            cyclicGgi;
+        value           uniform 307494;
+    }
+    DTCYCLIC2
+    {
+        type            cyclicGgi;
+        value           uniform 307494;
+    }
+    DTHUB
+    {
+        type            gradientEnthalpy;
+        gradient        uniform 0;
+        value           uniform 307494;
+
+    }
+    DTSHROUD
+    {
+        type            gradientEnthalpy;
+        gradient        uniform 0;
+        value            uniform 307494;
+    }
+}
+
+
+// ************************************************************************* //

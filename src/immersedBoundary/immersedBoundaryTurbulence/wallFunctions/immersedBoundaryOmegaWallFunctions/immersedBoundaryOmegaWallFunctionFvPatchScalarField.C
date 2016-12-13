@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -324,7 +324,7 @@ void immersedBoundaryOmegaWallFunctionFvPatchScalarField::updateCoeffs()
             // Compute omega at the IB cell
             omegaNew[ibCellI] = 6.0*nu[ibCellI]/(beta1_*sqr(y[ibCellI]));
 
-            // Bugfix - set zeroGradient bc for large omega values at ib boundary 
+            // Bugfix - set zeroGradient bc for large omega values at ib boundary
             // to avoid k unboundedness (IG 30/OCT/2015), not
             // sure if this is a good criteria
             if(omegaNew[ibCellI] > 10.0)

@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -115,7 +115,7 @@ class fvMatrix
     // Private data
 
         // Reference to GeometricField<Type, fvPatchField, volMesh>
-        GeometricField<Type, fvPatchField, volMesh>& psi_;
+        const GeometricField<Type, fvPatchField, volMesh>& psi_;
 
         //- Dimension set
         dimensionSet dimensions_;
@@ -187,7 +187,7 @@ public:
         //- Construct given a field to solve for
         fvMatrix
         (
-            GeometricField<Type, fvPatchField, volMesh>&,
+            const GeometricField<Type, fvPatchField, volMesh>&,
             const dimensionSet&
         );
 
@@ -200,7 +200,11 @@ public:
 #       endif
 
         //- Construct from Istream given field to solve for
-        fvMatrix(GeometricField<Type, fvPatchField, volMesh>&, Istream&);
+        fvMatrix
+        (
+            const GeometricField<Type, fvPatchField, volMesh>&,
+            Istream&
+        );
 
 
         //- Clone
@@ -223,11 +227,6 @@ public:
         // Access
 
             const GeometricField<Type, fvPatchField, volMesh>& psi() const
-            {
-                return psi_;
-            }
-
-            GeometricField<Type, fvPatchField, volMesh>& psi()
             {
                 return psi_;
             }
@@ -364,7 +363,7 @@ public:
 
             //- Solve returning the solution statistics.
             //  Use the given solver controls
-            lduMatrix::solverPerformance solve(const dictionary&);
+            lduSolverPerformance solve(const dictionary&);
 
             //- Solve returning the solution statistics.
             //  Solver controls read from fvSolution

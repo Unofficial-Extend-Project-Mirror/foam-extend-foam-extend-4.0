@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -40,6 +40,7 @@ SourceFiles
 #ifndef numericFluxBase_H
 #define numericFluxBase_H
 
+#include "basicNumericFlux.H"
 #include "volFieldsFwd.H"
 #include "surfaceFieldsFwd.H"
 
@@ -55,50 +56,23 @@ namespace Foam
 template<class Flux>
 class numericFluxBase
 :
+    public basicNumericFlux,
     public Flux
 {
 public:
 
     // Constructors
 
-        //- Construct null
-        numericFluxBase()
+        //- Construct from mesh
+        numericFluxBase(const fvMesh& mesh)
+        :
+            basicNumericFlux(mesh)
         {}
 
 
     //- Destructor
     virtual ~numericFluxBase()
     {}
-
-
-    // Memeber functions
-
-        // Return fluxes
-
-            //- Return continuity equation flux
-            virtual const surfaceScalarField& rhoFlux() const = 0;
-
-            //- Return momentum equation flux
-            virtual const surfaceVectorField& rhoUFlux() const = 0;
-
-            //- Return energy equation flux
-            virtual const surfaceScalarField& rhoEFlux() const = 0;
-
-
-        // Return residuals
-
-            //- Return mass residual
-            virtual tmp<scalarField> rhoResidual() const = 0;
-
-            //- Return momentum residual
-            virtual tmp<vectorField> rhoUResidual() const = 0;
-
-            //- Return energy residual
-            virtual tmp<scalarField> rhoEResidual() const = 0;
-
-
-        //- Update fluxes based on current state
-        virtual void computeFlux() = 0;
 };
 
 

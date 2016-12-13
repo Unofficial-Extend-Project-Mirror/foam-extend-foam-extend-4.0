@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -47,6 +47,7 @@ SourceFiles
 #include "word.H"
 #include "faceZone.H"
 #include "Switch.H"
+#include "mapDistribute.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -104,11 +105,8 @@ class ggiPolyPatch
             //  Used for parallel optimisation
             mutable bool* localParallelPtr_;
 
-            //- List of zone faces indices received from each processor
-            mutable labelListList* receiveAddrPtr_;
-
-            //- List of zone faces indices to send to each processor
-            mutable labelListList* sendAddrPtr_;
+            //- Map-distribute comms tool
+            mutable mapDistribute* mapPtr_;
 
 
     // Private member functions
@@ -140,21 +138,17 @@ class ggiPolyPatch
             //- Calculate send and receive addressing
             void calcSendReceive() const;
 
-
-            //- Return receive addressing
-            const labelListList& receiveAddr() const;
-
-            //- Return send addressing
-            const labelListList& sendAddr() const;
+            //- Return mapDistribute
+            const mapDistribute& map() const;
 
 
         // Memory management
 
             //- Clear geometry
-            void clearGeom();
+            void clearGeom() const;
 
             //- Clear out
-            void clearOut();
+            void clearOut() const;
 
 
 protected:

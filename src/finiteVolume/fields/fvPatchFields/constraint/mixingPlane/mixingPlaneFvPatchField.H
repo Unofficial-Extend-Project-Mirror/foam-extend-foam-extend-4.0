@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -89,14 +89,6 @@ class mixingPlaneFvPatchField
 
         //- Calculate flux mask and weights
         void calcFluxMask() const;
-
-        // Return flux mask.  Flux mask is calculated from master fluxes
-        //  and relates to the mixing plane profile
-        const scalarField& fluxMask() const;
-
-        // Return flux weights.  Flux weights relate to local faces and are
-        //  used in weighted interpolation
-        const scalarField& fluxWeights() const;
 
 
 public:
@@ -186,8 +178,25 @@ public:
 
         // Access
 
+            //- Return reference to mixingPlanePatch patch
+            const mixingPlaneFvPatch& mixingPlanePatch() const
+            {
+                return mixingPlanePatch_;
+            }
+
             //- Return shadow patch field
             const mixingPlaneFvPatchField<Type>& shadowPatchField() const;
+
+            //- Return reference to mixing patch
+            const mixingPlaneInterpolation::mixingType& mixing() const;
+
+            //- Return flux mask.  Flux mask is calculated from master fluxes
+            //  and relates to the mixing plane profile
+            const scalarField& fluxMask() const;
+
+            //- Return flux weights.  Flux weights relate to local faces
+            //  and are used in weighted interpolation
+            const scalarField& fluxWeights() const;
 
 
         // Evaluation functions

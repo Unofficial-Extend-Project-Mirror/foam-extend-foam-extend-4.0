@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -278,19 +278,19 @@ public:
         const T operator&(const T&);
 
         //- Return value
-        T operator()() const
+        inline T operator()() const
         {
             return switchValue_;
         }
 
         // Return switch name
-        std::string switchName()
+        inline std::string switchName()
         {
             return switchName_;
         }
 
         //- Return switch description
-        std::string switchDescription()
+        inline std::string switchDescription()
         {
             return switchDescription_;
         }

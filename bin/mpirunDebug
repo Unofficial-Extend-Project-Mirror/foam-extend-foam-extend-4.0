@@ -2,9 +2,9 @@
 #------------------------------------------------------------------------------
 # =========                 |
 # \\      /  F ield         | foam-extend: Open Source CFD
-#  \\    /   O peration     |
-#   \\  /    A nd           | For copyright notice see file Copyright
-#    \\/     M anipulation  |
+#  \\    /   O peration     | Version:     4.0
+#   \\  /    A nd           | Web:         http://www.foam-extend.org
+#    \\/     M anipulation  | For copyright notice see file Copyright
 #------------------------------------------------------------------------------
 # License
 #     This file is part of foam-extend.
@@ -181,7 +181,7 @@ do
         echo "$sourceFoam; cd $PWD; $exec $args 2>&1 | tee $procLog; read dummy" >> $procCmdFile
         echo "${node}xterm -font fixed -title 'processor'$proc $geom -e $procCmdFile" >> $PWD/mpirun.schema
     elif [ "$method" -eq 5 ]; then
-        echo "$sourceFoam; cd $PWD; valgrind $exec $args; read dummy" >> $procCmdFile
+        echo "$sourceFoam; cd $PWD; valgrind --tool=memcheck --leak-check=full $exec $args | tee $procLog; read dummy" >> $procCmdFile
         echo "${node}xterm -font fixed -title 'processor'$proc $geom -e $procCmdFile" >> $PWD/mpirun.schema
     elif [ "$method" -eq 6 ]; then
         ## maybe one could use nemiver sessions for reloading breakpoints --session=<N> or --last

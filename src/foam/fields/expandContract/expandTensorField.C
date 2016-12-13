@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -84,6 +84,25 @@ void expandLinear(Field<tensor>& res, const UList<vector>& f)
         expandLinear(res[i], f[i]);
     }
 }
+
+
+void sumToDiag(Field<vector>& res, const UList<tensor>& f)
+{
+    forAll (res, i)
+    {
+        sumToDiag(res[i], f[i]);
+    }
+}
+
+
+void sumMagToDiag(Field<vector>& res, const UList<tensor>& f)
+{
+    forAll (res, i)
+    {
+        sumMagToDiag(res[i], f[i]);
+    }
+}
+
 
 } // End namespace Foam
 

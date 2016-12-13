@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -235,8 +235,7 @@ public:
                 const CoeffField<Type>&,
                 const Pstream::commsTypes commsType,
                 const bool switchToLhs
-            ) const
-            {}
+            ) const;
 
             //- Update result field based on interface functionality
             virtual void updateInterfaceMatrix
@@ -247,14 +246,7 @@ public:
                 const CoeffField<Type>&,
                 const Pstream::commsTypes commsType,
                 const bool switchToLhs
-            ) const
-            {
-                notImplemented
-                (
-                    "processorFvPatchField<Type>::updateInterfaceMatrix "
-                    "for block matrices"
-                );
-            }
+            ) const;
 
 
         //- Processor coupled interface functions

@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -55,8 +55,8 @@ public:
         //- Enumeration defining the valid options
         enum pointAction
         {
-            ANY     // Cells using any point in set
-            //ALL   // Possible extension: cells whose all points are in set
+            ANY,    // Cells using any point in set
+            ALL     // Cells whose all points are in set
         };
 
 private:
@@ -64,7 +64,7 @@ private:
         //- Add usage string
         static addToUsageTable usage_;
 
-        static const NamedEnum<pointAction, 1> pointActionNames_;
+        static const NamedEnum<pointAction, 2> pointActionNames_;
 
         //- Name of set to use
         word setName_;

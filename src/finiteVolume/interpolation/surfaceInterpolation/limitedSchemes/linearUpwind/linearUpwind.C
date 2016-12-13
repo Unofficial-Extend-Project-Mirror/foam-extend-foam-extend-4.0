@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -66,16 +66,32 @@ Foam::linearUpwind<Type>::correction
     const volVectorField& C = mesh.C();
     const surfaceVectorField& Cf = mesh.Cf();
 
-    GeometricField
-        <typename outerProduct<vector, Type>::type, fvPatchField, volMesh>
-        gradVf = gradScheme_().grad(vf);
+    // Due to gradient cacheing, must take a tmp field
+    // HJ, 22/Apr/2016
+    tmp
+    <
+        GeometricField
+        <
+            typename outerProduct<vector, Type>::type,
+            fvPatchField,
+            volMesh
+        >
+    > tgradVf = gradScheme_().grad(vf, gradSchemeName_);
+
+    const GeometricField
+    <
+        typename outerProduct<vector, Type>::type,
+        fvPatchField,
+        volMesh
+    >& gradVf = tgradVf();
 
     // Note: in order for the patchNeighbourField to be correct on coupled
     // boundaries, correctBoundaryConditions needs to be called.
     // The call shall be moved into the library fvc operators
-    gradVf.correctBoundaryConditions();
+    // Moved to cached gradScheme.  HJ, 22/Apr/2016
+//     gradVf.correctBoundaryConditions();
 
-    forAll(faceFlux, facei)
+    forAll (faceFlux, facei)
     {
         if (faceFlux[facei] > 0)
         {
@@ -93,7 +109,7 @@ Foam::linearUpwind<Type>::correction
     typename GeometricField<Type, fvsPatchField, surfaceMesh>::
         GeometricBoundaryField& bSfCorr = sfCorr.boundaryField();
 
-    forAll(bSfCorr, patchi)
+    forAll (bSfCorr, patchi)
     {
         fvsPatchField<Type>& pSfCorr = bSfCorr[patchi];
 
@@ -114,7 +130,7 @@ Foam::linearUpwind<Type>::correction
             // Better version of d-vectors: Zeljko Tukovic, 25/Apr/2010
             vectorField pd = p.delta();
 
-            forAll(pOwner, facei)
+            forAll (pOwner, facei)
             {
                 label own = pOwner[facei];
 

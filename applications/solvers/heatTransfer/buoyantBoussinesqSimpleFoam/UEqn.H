@@ -3,12 +3,12 @@
     tmp<fvVectorMatrix> UEqn
     (
         fvm::div(phi, U)
-      + turbulence->divDevReff(U)
+      + turbulence->divDevReff()
     );
 
     UEqn().relax();
 
-    eqnResidual = solve
+    solve
     (
         UEqn()
       ==
@@ -19,6 +19,4 @@
               - fvc::snGrad(p)*mesh.magSf()
             )
         )
-    ).initialResidual();
-
-    maxResidual = max(eqnResidual, maxResidual);
+    );

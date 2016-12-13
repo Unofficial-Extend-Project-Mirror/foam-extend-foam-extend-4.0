@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -138,10 +138,10 @@ class overlapGgiPolyPatch
         void checkDefinition() const;
 
         //- Clear geometry
-        void clearGeom();
+        void clearGeom() const;
 
         //- Clear out
-        void clearOut();
+        void clearOut() const;
 
 
 protected:

@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -50,6 +50,23 @@ directionMixedFvPatchField<Type>::directionMixedFvPatchField
 template<class Type>
 directionMixedFvPatchField<Type>::directionMixedFvPatchField
 (
+    const fvPatch& p,
+    const DimensionedField<Type, volMesh>& iF,
+    const dictionary& dict
+)
+:
+    transformFvPatchField<Type>(p, iF, dict),
+    refValue_("refValue", dict, p.size()),
+    refGrad_("refGradient", dict, p.size()),
+    valueFraction_("valueFraction", dict, p.size())
+{
+    evaluate();
+}
+
+
+template<class Type>
+directionMixedFvPatchField<Type>::directionMixedFvPatchField
+(
     const directionMixedFvPatchField<Type>& ptf,
     const fvPatch& p,
     const DimensionedField<Type, volMesh>& iF,
@@ -66,18 +83,14 @@ directionMixedFvPatchField<Type>::directionMixedFvPatchField
 template<class Type>
 directionMixedFvPatchField<Type>::directionMixedFvPatchField
 (
-    const fvPatch& p,
-    const DimensionedField<Type, volMesh>& iF,
-    const dictionary& dict
+    const directionMixedFvPatchField<Type>& ptf
 )
 :
-    transformFvPatchField<Type>(p, iF, dict),
-    refValue_("refValue", dict, p.size()),
-    refGrad_("refGradient", dict, p.size()),
-    valueFraction_("valueFraction", dict, p.size())
-{
-    evaluate();
-}
+    transformFvPatchField<Type>(ptf),
+    refValue_(ptf.refValue_),
+    refGrad_(ptf.refGrad_),
+    valueFraction_(ptf.valueFraction_)
+{}
 
 
 template<class Type>

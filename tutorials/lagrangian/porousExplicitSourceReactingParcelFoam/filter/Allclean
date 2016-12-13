@@ -6,7 +6,7 @@
 cleanCase
 
 # remove 0 directory
-rm -rf 0
+rm -rf 0 postProcessing
 
 # copy 0.org to 0
 cp -r 0.org 0

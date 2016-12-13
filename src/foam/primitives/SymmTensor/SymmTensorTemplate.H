@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -50,7 +50,7 @@ namespace Foam
                            Class SymmTensor Declaration
 \*---------------------------------------------------------------------------*/
 
-template <class Cmpt>
+template<class Cmpt>
 class SymmTensor
 :
     public VectorSpace<SymmTensor<Cmpt>, Cmpt, 6>
@@ -79,6 +79,7 @@ public:
         static const SymmTensor one;
         static const SymmTensor max;
         static const SymmTensor min;
+        static const SymmTensor I;
 
 
     //- Component labeling enumeration

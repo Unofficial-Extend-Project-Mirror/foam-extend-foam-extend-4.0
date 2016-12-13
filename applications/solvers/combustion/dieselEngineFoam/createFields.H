@@ -107,3 +107,5 @@ DimensionedField<scalar, volMesh> chemistrySh
     mesh,
     dimensionedScalar("chemistrySh", dimEnergy/dimTime/dimVolume, 0.0)
 );
+
+mesh.schemesDict().setFluxRequired(p.name());

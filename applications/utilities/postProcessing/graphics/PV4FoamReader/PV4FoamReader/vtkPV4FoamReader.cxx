@@ -33,7 +33,6 @@
 // Foam includes
 #include "vtkPV4Foam.H"
 
-vtkCxxRevisionMacro(vtkPV4FoamReader, "$Revision: 1.5$");
 vtkStandardNewMacro(vtkPV4FoamReader);
 
 #undef EXPERIMENTAL_TIME_CACHING

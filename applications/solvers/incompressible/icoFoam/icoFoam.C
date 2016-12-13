@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -26,19 +26,26 @@ Application
 
 Description
     Transient solver for incompressible, laminar flow of Newtonian fluids.
+    Consistent formulation without time-step and relaxation dependence by Jasak
+
+Author
+    Hrvoje Jasak, Wikki Ltd.  All rights reserved
 
 \*---------------------------------------------------------------------------*/
 
 #include "fvCFD.H"
+#include "pisoControl.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 int main(int argc, char *argv[])
 {
 #   include "setRootCase.H"
-
 #   include "createTime.H"
 #   include "createMesh.H"
+
+    pisoControl piso(mesh);
+
 #   include "createFields.H"
 #   include "initContinuityErrs.H"
 
@@ -50,41 +57,50 @@ int main(int argc, char *argv[])
     {
         Info<< "Time = " << runTime.timeName() << nl << endl;
 
-#       include "readPISOControls.H"
 #       include "CourantNo.H"
 
-        fvVectorMatrix UEqn
+        // Convection-diffusion matrix
+        fvVectorMatrix HUEqn
         (
-            fvm::ddt(U)
-          + fvm::div(phi, U)
+            fvm::div(phi, U)
           - fvm::laplacian(nu, U)
         );
 
-        solve(UEqn == -fvc::grad(p));
+        // Time derivative matrix
+        fvVectorMatrix ddtUEqn(fvm::ddt(U));
+
+        if (piso.momentumPredictor())
+        {
+            solve(ddtUEqn + HUEqn == -fvc::grad(p));
+        }
+
+        // Prepare clean Ap without time derivative contribution
+        // HJ, 26/Oct/2015
+        volScalarField aU = HUEqn.A();
 
         // --- PISO loop
 
-        for (int corr = 0; corr < nCorr; corr++)
+        while (piso.correct())
         {
-            volScalarField rUA = 1.0/UEqn.A();
-
-            U = rUA*UEqn.H();
-            phi = (fvc::interpolate(U) & mesh.Sf())
-                + fvc::ddtPhiCorr(rUA, U, phi);
+            U = HUEqn.H()/aU;
+            phi = (fvc::interpolate(U) & mesh.Sf());
 
             adjustPhi(phi, U, p);
 
-            for (int nonOrth=0; nonOrth<=nNonOrthCorr; nonOrth++)
+            while (piso.correctNonOrthogonal())
             {
                 fvScalarMatrix pEqn
                 (
-                    fvm::laplacian(rUA, p) == fvc::div(phi)
+                    fvm::laplacian(1/aU, p) == fvc::div(phi)
                 );
 
                 pEqn.setReference(pRefCell, pRefValue);
-                pEqn.solve();
+                pEqn.solve
+                (
+                    mesh.solutionDict().solver(p.select(piso.finalInnerIter()))
+                );
 
-                if (nonOrth == nNonOrthCorr)
+                if (piso.finalNonOrthogonalIter())
                 {
                     phi -= pEqn.flux();
                 }
@@ -92,7 +108,12 @@ int main(int argc, char *argv[])
 
 #           include "continuityErrs.H"
 
-            U -= rUA*fvc::grad(p);
+            // Note: cannot call H(U) here because the velocity is not complete
+            // HJ, 22/Jan/2016
+            U = 1.0/(aU + ddtUEqn.A())*
+                (
+                    U*aU - fvc::grad(p) + ddtUEqn.H()
+                );
             U.correctBoundaryConditions();
         }
 

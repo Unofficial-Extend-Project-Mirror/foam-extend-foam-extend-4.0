@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -25,7 +25,8 @@ Class
     Foam::lduPrimitiveMesh
 
 Description
-    Simplest contrete lduMesh which stores the addressing needed bu lduMatrix.
+    Simplest contrete lduMesh which stores the addressing needed by the
+    lduMatrix.  Addressing is contained locally
 
 \*---------------------------------------------------------------------------*/
 
@@ -131,6 +132,21 @@ public:
             interfaces_ = interfaces;
             patchAddr_ = pa;
             patchSchedule_ = ps;
+        }
+
+        //- Clear interfaces
+        void clearInterfaces()
+        {
+            // Clear interface pointers: they are not deleted
+            // by the lduInterfacePtrsList (derived from UPtrList)
+            // HJ, 5/Feb/2016
+            forAll (interfaces_, i)
+            {
+                if (interfaces_.set(i))
+                {
+                    delete interfaces_(i);
+                }
+            }
         }
 
         //- Return number of interfaces

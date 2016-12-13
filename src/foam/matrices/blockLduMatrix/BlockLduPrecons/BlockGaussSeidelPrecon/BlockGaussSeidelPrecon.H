@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -87,7 +87,7 @@ class BlockGaussSeidelPrecon
         //- Calculate inverse diagonal
         void calcInvDiag();
 
-        // Block Gauss-Seidel sweep, symetric matrix
+        //- Block Gauss-Seidel sweep, symmetric matrix
         template<class DiagType, class ULType>
         void BlockSweep
         (
@@ -97,7 +97,7 @@ class BlockGaussSeidelPrecon
             const Field<Type>& b
         ) const;
 
-        // Block Gauss-Seidel sweep, asymmetric matrix
+        //- Block Gauss-Seidel sweep, asymmetric matrix
         template<class DiagType, class ULType>
         void BlockSweep
         (

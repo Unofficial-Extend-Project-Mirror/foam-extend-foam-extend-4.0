@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -53,7 +53,7 @@ class SymmTensor;
                            Class Tensor Declaration
 \*---------------------------------------------------------------------------*/
 
-template <class Cmpt>
+template<class Cmpt>
 class Tensor
 :
     public VectorSpace<Tensor<Cmpt>, Cmpt, 9>
@@ -82,6 +82,7 @@ public:
         static const Tensor one;
         static const Tensor max;
         static const Tensor min;
+        static const Tensor I;
 
 
     //- Component labeling enumeration
@@ -93,7 +94,7 @@ public:
         //- Construct null
         inline Tensor();
 
-        //- Construct given VectorSpace
+        //- Construct given VectorSpace of the same rank
         inline Tensor(const VectorSpace<Tensor<Cmpt>, Cmpt, 9>&);
 
         //- Construct given SphericalTensor
@@ -102,7 +103,10 @@ public:
         //- Construct given SymmTensor
         inline Tensor(const SymmTensor<Cmpt>&);
 
-        //- Construct given the three vectors
+        //- Construct given triad
+        inline Tensor(const Vector<Vector<Cmpt> >&);
+
+        //- Construct given the three vector components
         inline Tensor
         (
             const Vector<Cmpt>& x,
@@ -149,9 +153,10 @@ public:
             // Access vector components.
             // Note: returning const only to find out lhs usage
 
-            inline const Vector<Cmpt> x() const;
-            inline const Vector<Cmpt> y() const;
-            inline const Vector<Cmpt> z() const;
+            inline Vector<Cmpt> x() const;
+            inline Vector<Cmpt> y() const;
+            inline Vector<Cmpt> z() const;
+            inline Vector<Cmpt> vectorComponent(const direction) const;
 
             //- Return (i, j) component.  Consistency with VectorN
             inline const Cmpt& operator()
@@ -179,6 +184,9 @@ public:
 
         //- Assign to a SymmTensor
         inline void operator=(const SymmTensor<Cmpt>&);
+
+        //- Assign to a triad
+        inline void operator=(const Vector<Vector<Cmpt> >&);
 };
 
 

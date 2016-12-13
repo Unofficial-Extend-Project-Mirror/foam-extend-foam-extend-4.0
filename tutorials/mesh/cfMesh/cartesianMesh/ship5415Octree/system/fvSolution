@@ -32,7 +32,7 @@ solvers
         maxIter 1000;
         preconditioner  DILU;
         relTol  0;
-        solver  PBiCG;
+        solver  BiCGStab;
         tolerance   1e-06;
     }
 

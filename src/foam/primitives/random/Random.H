@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -53,11 +53,11 @@ class Random
 {
     // Private data
 
+        //- Seed for random numbers
         label Seed;
 
 
 public:
-
 
     // Constructors
 
@@ -67,22 +67,30 @@ public:
 
     // Member functions
 
+        //- Return random bit
         int bit();
 
         //- scalar [0..1] (so including 0,1)
         scalar scalar01();
+
         //- vector with every component scalar01
         vector vector01();
+
         //- sphericalTensor with every component scalar01
         sphericalTensor sphericalTensor01();
+
         //- symmTensor with every component scalar01
         symmTensor symmTensor01();
+
         //- symmTensor4thOrder with every component scalar01
         symmTensor4thOrder symmTensor4thOrder01();
+
         //- diagTensor with every component scalar01
          diagTensor diagTensor01();
+
         //- tensor with every component scalar01
         tensor tensor01();
+
         //- label [lower..upper]
         label integer(const label lower, const label upper);
 

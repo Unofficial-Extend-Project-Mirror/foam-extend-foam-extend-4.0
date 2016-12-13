@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -89,13 +89,13 @@ Foam::scalar Foam::coupledIterativeSolver::normFactor
 {
     typedef FieldField<Field, scalar> scalarFieldField;
 
-    // Calculate reference value of x
-    scalar xRef = gAverage(x);
-
     scalarFieldField pA(x.size());
 
     forAll (x, rowI)
     {
+        // Calculate reference value of x
+        scalar xRef = gAverage(x[rowI]);
+
         pA.set(rowI, new scalarField(x[rowI].size(), xRef));
     }
 

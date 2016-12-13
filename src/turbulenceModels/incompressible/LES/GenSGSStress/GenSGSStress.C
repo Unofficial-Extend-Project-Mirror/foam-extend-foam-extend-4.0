@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -128,21 +128,18 @@ tmp<volSymmTensorField> GenSGSStress::devBeff() const
 }
 
 
-tmp<fvVectorMatrix> GenSGSStress::divDevBeff
-(
-    volVectorField& U
-) const
+tmp<fvVectorMatrix> GenSGSStress::divDevBeff() const
 {
     if (couplingFactor_.value() > 0.0)
     {
         return
         (
-            fvc::div(B_ + couplingFactor_*nuSgs_*fvc::grad(U))
+            fvc::div(B_ + couplingFactor_*nuSgs_*fvc::grad(U_))
           + fvc::laplacian
             (
-                (1.0 - couplingFactor_)*nuSgs_, U, "laplacian(nuEff,U)"
+                (1.0 - couplingFactor_)*nuSgs_, U_, "laplacian(nuEff,U)"
             )
-          - fvm::laplacian(nuEff(), U)
+          - fvm::laplacian(nuEff(), U_)
         );
     }
     else
@@ -150,8 +147,8 @@ tmp<fvVectorMatrix> GenSGSStress::divDevBeff
         return
         (
             fvc::div(B_)
-          + fvc::laplacian(nuSgs_, U, "laplacian(nuEff,U)")
-          - fvm::laplacian(nuEff(), U)
+          + fvc::laplacian(nuSgs_, U_, "laplacian(nuEff,U)")
+          - fvm::laplacian(nuEff(), U_)
         );
     }
 }

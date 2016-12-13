@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -51,6 +51,9 @@ UNARY_FUNCTION(CmptType, vectorType, cmptSum)                                \
                                                                              \
 BINARY_FUNCTION(vectorType, vectorType, vectorType, cmptMultiply)            \
 BINARY_TYPE_FUNCTION(vectorType, vectorType, vectorType, cmptMultiply)       \
+                                                                             \
+BINARY_FUNCTION(vectorType, vectorType, CmptType, scaleRow)                  \
+BINARY_TYPE_FUNCTION(vectorType, vectorType, CmptType, scaleRow)             \
                                                                              \
 BINARY_OPERATOR(vectorType, CmptType, vectorType, /, divide)                 \
 BINARY_TYPE_OPERATOR(vectorType, CmptType, vectorType, /, divide)            \

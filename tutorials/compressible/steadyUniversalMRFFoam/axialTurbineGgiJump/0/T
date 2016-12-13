@@ -1,0 +1,116 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | foam-extend: Open Source CFD                    |
+|  \\    /   O peration     | Version:     4.0                                |
+|   \\  /    A nd           | Web:         http://www.foam-extend.org         |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       volScalarField;
+    location    "0";
+    object      T;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+dimensions      [0 0 0 1 0 0 0];
+
+internalField   uniform 305.66;
+
+boundaryField
+{
+    GVINLET
+    {
+        type            fixedValue;
+        value           uniform 305.66;
+    }
+    GVOUTLET
+    {
+        type            ggiEnthalpyJump;
+        patchType       ggi;
+        rotating        false;
+        value           uniform 305.66;
+    }
+    GVCYCLIC
+    {
+        type            cyclic;
+    }
+    GVBLADE
+    {
+        type            zeroGradient;
+    }
+    GVHUB
+    {
+        type            zeroGradient;
+    }
+    GVSHROUD
+    {
+        type            zeroGradient;
+    }
+    RUINLET
+    {
+        type            ggiEnthalpyJump;
+        patchType       ggi;
+        rotating        true;
+        value           uniform 305.66;
+    }
+    RUOUTLET
+    {
+        type            ggiEnthalpyJump;
+        patchType         ggi;
+        rotating         true;
+        value           uniform 305.66;
+    }
+    RUCYCLIC1
+    {
+        type            cyclicGgi;
+    }
+    RUCYCLIC2
+    {
+        type            cyclicGgi;
+    }
+    RUBLADE
+    {
+        type            zeroGradient;
+    }
+    RUHUB
+    {
+        type            zeroGradient;
+    }
+    RUSHROUD
+    {
+        type            zeroGradient;
+    }
+    DTINLET
+    {
+        type            ggiEnthalpyJump;
+        patchType       ggi;
+        rotating        false;
+        value           uniform 305.66;
+    }
+    DTOUTLET
+    {
+        type            zeroGradient;
+    }
+    DTCYCLIC1
+    {
+        type            cyclicGgi;
+    }
+    DTCYCLIC2
+    {
+        type            cyclicGgi;
+    }
+    DTHUB
+    {
+        type            zeroGradient;
+    }
+    DTSHROUD
+    {
+        type            zeroGradient;
+    }
+}
+
+
+// ************************************************************************* //

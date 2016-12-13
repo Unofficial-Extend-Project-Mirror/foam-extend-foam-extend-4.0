@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -181,21 +181,21 @@ public:
 
 // Add the patch constructor functions to the hash tables
 
-#define makeSnGradTypeScheme(SS, Type)                                         \
-                                                                               \
-defineNamedTemplateTypeNameAndDebug(SS<Type>, 0);                              \
-                                                                               \
-snGradScheme<Type>::addMeshConstructorToTable<SS<Type> >                       \
+#define makeSnGradTypeScheme(SS, Type)                                        \
+                                                                              \
+defineNamedTemplateTypeNameAndDebug(SS<Type>, 0);                             \
+                                                                              \
+snGradScheme<Type>::addMeshConstructorToTable<SS<Type> >                      \
     add##SS##Type##MeshConstructorToTable_;
 
-#define makeSnGradScheme(SS)                                                   \
-                                                                               \
-makeSnGradTypeScheme(SS, scalar)                                               \
-makeSnGradTypeScheme(SS, vector)                                               \
-makeSnGradTypeScheme(SS, sphericalTensor)                                      \
-makeSnGradTypeScheme(SS, symmTensor)                                           \
-makeSnGradTypeScheme(SS, symmTensor4thOrder)                                   \
-makeSnGradTypeScheme(SS, diagTensor)                                           \
+#define makeSnGradScheme(SS)                                                  \
+                                                                              \
+makeSnGradTypeScheme(SS, scalar)                                              \
+makeSnGradTypeScheme(SS, vector)                                              \
+makeSnGradTypeScheme(SS, sphericalTensor)                                     \
+makeSnGradTypeScheme(SS, symmTensor)                                          \
+makeSnGradTypeScheme(SS, symmTensor4thOrder)                                  \
+makeSnGradTypeScheme(SS, diagTensor)                                          \
 makeSnGradTypeScheme(SS, tensor)
 
 

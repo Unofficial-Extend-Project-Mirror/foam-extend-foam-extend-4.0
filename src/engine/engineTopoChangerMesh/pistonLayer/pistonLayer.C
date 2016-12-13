@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -55,7 +55,7 @@ void Foam::pistonLayer::makeLayersLive()
     // Enable layering
     forAll (topoChanges, modI)
     {
-        if (typeid(topoChanges[modI]) == typeid(layerAdditionRemoval))
+        if (isA<layerAdditionRemoval>(topoChanges[modI]))
         {
             topoChanges[modI].enable();
         }

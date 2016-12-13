@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -42,7 +42,7 @@ namespace Foam
 template<class Type>
 tmp<tetFemMatrix<Type> > tetFem::laplacian
 (
-    GeometricField<Type, tetPolyPatchField, tetPointMesh>& vf
+    const GeometricField<Type, tetPolyPatchField, tetPointMesh>& vf
 )
 {
     elementScalarField Gamma
@@ -66,7 +66,7 @@ template<class Type>
 tmp<tetFemMatrix<Type> > tetFem::laplacian
 (
     const elementScalarField& gamma,
-    GeometricField<Type, tetPolyPatchField, tetPointMesh>& vf
+    const GeometricField<Type, tetPolyPatchField, tetPointMesh>& vf
 )
 {
     const tetPolyMesh& mesh = vf.mesh();
@@ -182,7 +182,7 @@ tmp<tetFemMatrix<Type> > tetFem::laplacian
 template<class Type>
 tmp<tetFemMatrix<Type> > tetFem::smoother
 (
-    GeometricField<Type, tetPolyPatchField, tetPointMesh>& vf
+    const GeometricField<Type, tetPolyPatchField, tetPointMesh>& vf
 )
 {
     tmp<tetFemMatrix<Type> > tfem
@@ -207,7 +207,7 @@ template<class Type>
 tmp<tetFemMatrix<Type> > tetFem::laplacian
 (
     const dimensionedScalar& gamma,
-    GeometricField<Type, tetPolyPatchField, tetPointMesh>& vf
+    const GeometricField<Type, tetPolyPatchField, tetPointMesh>& vf
 )
 {
     elementScalarField Gamma
@@ -230,7 +230,7 @@ tmp<tetFemMatrix<Type> > tetFem::laplacian
 template<class Type>
 tmp<tetFemMatrix<Type> > tetFem::laplacianTranspose
 (
-    GeometricField<Type, tetPolyPatchField, tetPointMesh>& vf
+    const GeometricField<Type, tetPolyPatchField, tetPointMesh>& vf
 )
 {
     elementScalarField Gamma
@@ -254,7 +254,7 @@ template<class Type>
 tmp<tetFemMatrix<Type> > tetFem::laplacianTranspose
 (
     const elementScalarField& gamma,
-    GeometricField<Type, tetPolyPatchField, tetPointMesh>& vf
+    const GeometricField<Type, tetPolyPatchField, tetPointMesh>& vf
 )
 {
     const tetPolyMesh& mesh = vf.mesh();
@@ -399,7 +399,7 @@ template<class Type>
 tmp<tetFemMatrix<Type> > tetFem::laplacianTranspose
 (
     const dimensionedScalar& gamma,
-    GeometricField<Type, tetPolyPatchField, tetPointMesh>& vf
+    const GeometricField<Type, tetPolyPatchField, tetPointMesh>& vf
 )
 {
     elementScalarField Gamma
@@ -423,7 +423,7 @@ template<class Type>
 tmp<tetFemMatrix<Type> > tetFem::laplacianTrace
 (
     const elementScalarField& gamma,
-    GeometricField<Type, tetPolyPatchField, tetPointMesh>& vf
+    const GeometricField<Type, tetPolyPatchField, tetPointMesh>& vf
 )
 {
     const tetPolyMesh& mesh = vf.mesh();
@@ -564,7 +564,7 @@ template<class Type>
 tmp<tetFemMatrix<Type> > tetFem::laplacianTrace
 (
     const dimensionedScalar& gamma,
-    GeometricField<Type, tetPolyPatchField, tetPointMesh>& vf
+    const GeometricField<Type, tetPolyPatchField, tetPointMesh>& vf
 )
 {
     elementScalarField Gamma
@@ -587,7 +587,7 @@ tmp<tetFemMatrix<Type> > tetFem::laplacianTrace
 template<class Type>
 tmp<tetFemMatrix<Type> > tetFem::laplacianTrace
 (
-    GeometricField<Type, tetPolyPatchField, tetPointMesh>& vf
+    const GeometricField<Type, tetPolyPatchField, tetPointMesh>& vf
 )
 {
     elementScalarField Gamma

@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -99,7 +99,7 @@ Description
                         *magFaceGradU[facei]
                         *Cmu25*sqrt(k_[faceCelli])
                         /(kappa_.value()*y_[patchi][facei])
-                      - (nonlinearStress_[faceCelli] && gradU_[faceCelli]);
+                      - (nonlinearStress_[faceCelli] && gradU[faceCelli]);
                 }
             }
         }

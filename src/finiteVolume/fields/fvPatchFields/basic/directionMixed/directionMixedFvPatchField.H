@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -35,7 +35,7 @@ SourceFiles
 #ifndef directionMixedFvPatchField_H
 #define directionMixedFvPatchField_H
 
-#include "transformFvPatchField.H"
+#include "transformFvPatchFields.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -105,6 +105,12 @@ public:
             );
         }
 
+        //- Construct as copy
+        directionMixedFvPatchField
+        (
+            const directionMixedFvPatchField<Type>&
+        );
+
         //- Construct as copy setting internal field reference
         directionMixedFvPatchField
         (
@@ -156,32 +162,38 @@ public:
 
         // Return defining fields
 
-            virtual Field<Type>& refValue()
-            {
-                return refValue_;
-            }
-
+            //- Return reference value
             virtual const Field<Type>& refValue() const
             {
                 return refValue_;
             }
 
-            virtual Field<Type>& refGrad()
+            //- Return access to reference value
+            virtual Field<Type>& refValue()
             {
-                return refGrad_;
+                return refValue_;
             }
 
+            //- Return reference gradient
             virtual const Field<Type>& refGrad() const
             {
                 return refGrad_;
             }
 
-            virtual symmTensorField& valueFraction()
+            //- Return access to reference gradient
+            virtual Field<Type>& refGrad()
+            {
+                return refGrad_;
+            }
+
+            //- Return value fraction
+            virtual const symmTensorField& valueFraction() const
             {
                 return valueFraction_;
             }
 
-            virtual const symmTensorField& valueFraction() const
+            //- Return access to value fraction
+            virtual symmTensorField& valueFraction()
             {
                 return valueFraction_;
             }

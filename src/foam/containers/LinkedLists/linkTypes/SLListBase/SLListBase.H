@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -78,7 +78,7 @@ private:
        //- Number of elements in in list
        label nElmts_;
 
-    // Private member functions
+    // Private Member Functions
 
         //- Disallow default bitwise copy construct
         SLListBase(const SLListBase&);
@@ -107,9 +107,8 @@ public:
         inline SLListBase(link*);
 
 
-    // Destructor
-
-        ~SLListBase();
+    //- Destructor
+    ~SLListBase();
 
 
     // Member Functions
@@ -156,7 +155,7 @@ public:
             inline void clear();
 
             //- Transfer the contents of the argument into this List
-            //  and annull the argument list.
+            //  and annul the argument list.
             inline void transfer(SLListBase&);
 
     // STL iterator
@@ -250,7 +249,7 @@ public:
 
 private:
 
-        //- iterator returned by end()
+        //- Iterator returned by end()
         static iterator endIter_;
 
         //- const_iterator returned by end()

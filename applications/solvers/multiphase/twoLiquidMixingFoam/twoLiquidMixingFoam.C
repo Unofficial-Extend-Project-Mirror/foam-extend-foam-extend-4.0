@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -34,6 +34,7 @@ Description
 #include "fvCFD.H"
 #include "twoPhaseMixture.H"
 #include "turbulenceModel.H"
+#include "pimpleControl.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -42,11 +43,13 @@ int main(int argc, char *argv[])
 #   include "setRootCase.H"
 #   include "createTime.H"
 #   include "createMesh.H"
+
+    pimpleControl pimple(mesh);
+
 #   include "readGravitationalAcceleration.H"
-#   include "readPIMPLEControls.H"
 #   include "initContinuityErrs.H"
 #   include "createFields.H"
-#   include "readTimeControls.H"
+#   include "createTimeControls.H"
 #   include "CourantNo.H"
 #   include "setInitialDeltaT.H"
 
@@ -56,7 +59,6 @@ int main(int argc, char *argv[])
 
     while (runTime.run())
     {
-#       include "readPIMPLEControls.H"
 #       include "readTimeControls.H"
 #       include "CourantNo.H"
 #       include "setDeltaT.H"
@@ -66,7 +68,7 @@ int main(int argc, char *argv[])
         Info<< "Time = " << runTime.timeName() << nl << endl;
 
         // --- Pressure-velocity PIMPLE corrector loop
-        for (int oCorr=0; oCorr<nOuterCorr; oCorr++)
+        while (pimple.loop())
         {
             twoPhaseProperties.correct();
 
@@ -75,7 +77,7 @@ int main(int argc, char *argv[])
 #           include "UEqn.H"
 
             // --- PISO loop
-            for (int corr = 0; corr < nCorr; corr++)
+            while (pimple.correct())
             {
 #               include "p_rghEqn.H"
             }

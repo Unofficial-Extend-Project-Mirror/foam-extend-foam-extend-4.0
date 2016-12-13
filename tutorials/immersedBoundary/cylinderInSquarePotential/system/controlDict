@@ -1,7 +1,7 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | foam-extend: Open Source CFD                    |
-|  \\    /   O peration     | Version:     3.2                                |
+|  \\    /   O peration     | Version:     4.0                                |
 |   \\  /    A nd           | Web:         http://www.foam-extend.org         |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
@@ -49,7 +49,7 @@ adjustTimeStep  no;
 
 maxCo           0.2;
 
-libs ( "libimmersedBoundary.so");
+libs ( "liblduSolvers.so" "libimmersedBoundary.so");
 
 functions
 {
@@ -61,5 +61,6 @@ functions
         Uref 1;
     }
 }
+
 
 // ************************************************************************* //

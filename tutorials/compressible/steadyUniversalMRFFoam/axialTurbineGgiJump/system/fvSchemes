@@ -1,0 +1,83 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | foam-extend: Open Source CFD                    |
+|  \\    /   O peration     | Version:     4.0                                |
+|   \\  /    A nd           | Web:         http://www.foam-extend.org         |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+
+FoamFile
+{
+    version         2.0;
+    format          ascii;
+    class           dictionary;
+    object          fvSchemes;
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+ddtSchemes
+{
+    default           steadyState;
+
+//    ddt(rho,U)     steadyInertial phi rho 0.25;
+    ddt(rho,h)        steadyState;
+    ddt(rho,i)        steadyState;
+//     ddt(rho,h)      steadyInertial phi rho 0.25;
+    ddt(psi,p)        steadyInertial phi rho 1;
+//     ddt(psi,p)        steadyState;
+
+    ddt(rho,k)        steadyState;
+    ddt(rho,epsilon)  steadyState;
+
+    U              steadyState;
+    T              steadyState;
+    p              steadyState;
+}
+gradSchemes
+{
+    default           Gauss linear;
+}
+
+divSchemes
+{
+    default           none;
+    div(phi,U)        Gauss upwind;
+    div(phi,h)        Gauss upwind;
+    div(phi,i)        Gauss upwind;
+    div(phid,p)       Gauss upwind;
+
+    div(phi,k)        Gauss upwind;
+    div(phi,epsilon)  Gauss upwind;
+
+
+    div((muEff*dev2(T(grad(U))))) Gauss linear;
+    div((nuEff*dev(T(grad(U)))))  Gauss linear;
+    div(U,p)    Gauss upwind;
+
+}
+
+laplacianSchemes
+{
+    default           Gauss linear limited 0.5;
+}
+
+interpolationSchemes
+{
+    default           linear;
+}
+
+snGradSchemes
+{
+    default           limited 0.5;
+}
+
+mixingPlane
+{
+    default  areaAveraging;
+    U        areaAveraging;
+    k        fluxAveraging;
+    omega    areaAveraging;
+}
+
+// ************************************************************************* //

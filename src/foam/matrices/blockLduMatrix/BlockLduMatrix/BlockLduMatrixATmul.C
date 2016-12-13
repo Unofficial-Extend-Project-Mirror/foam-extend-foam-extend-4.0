@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -39,10 +39,13 @@ void Foam::BlockLduMatrix<Type>::Amul
 {
     Ax = pTraits<Type>::zero;
 
-    // Initialise the update of coupled interfaces
-    initInterfaces(coupleUpper_, Ax, x);
+    // Note: changed order of interface update: init after core
+    // HJ, 14/Mar/2016
 
     AmulCore(Ax, x);
+
+    // Initialise the update of coupled interfaces
+    initInterfaces(coupleUpper_, Ax, x);
 
     // Update coupled interfaces
     updateInterfaces(coupleUpper_, Ax, x);
@@ -139,7 +142,6 @@ void Foam::BlockLduMatrix<Type>::AmulCore
         }
     }
 
-
     // Upper multiplication
 
     if (Upper.activeType() == blockCoeffBase::SCALAR)
@@ -181,10 +183,13 @@ void Foam::BlockLduMatrix<Type>::Tmul
 {
     Ax = pTraits<Type>::zero;
 
+    TmulCore(Ax, x);
+
+    // Note: changed order of interface update: init after core
+    // HJ, 14/Mar/2016
+
     // Initialise the update of coupled interfaces
     initInterfaces(coupleLower_, Ax, x);
-
-    TmulCore(Ax, x);
 
     // Update coupled interfaces
     updateInterfaces(coupleLower_, Ax, x);
@@ -237,7 +242,8 @@ void Foam::BlockLduMatrix<Type>::TmulCore
 
         for (register label coeffI = 0; coeffI < u.size(); coeffI++)
         {
-            Tx[u[coeffI]] += mult(activeUpper[coeffI], x[l[coeffI]]);
+            // Bug fix: Missing transpose. VV, 31/Aug/2015.
+            Tx[u[coeffI]] += mult(activeUpper[coeffI].T(), x[l[coeffI]]);
         }
     }
 
@@ -303,7 +309,8 @@ void Foam::BlockLduMatrix<Type>::TmulCore
 
             for (register label coeffI = 0; coeffI < u.size(); coeffI++)
             {
-                Tx[l[coeffI]] += mult(activeLower[coeffI], x[u[coeffI]]);
+                // Bug fix: Missing transpose. VV, 31/Aug/2015.
+                Tx[l[coeffI]] += mult(activeLower[coeffI].T(), x[u[coeffI]]);
             }
         }
     }

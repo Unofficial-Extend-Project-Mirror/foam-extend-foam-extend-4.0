@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -32,6 +32,7 @@ Description
 
 #include "argList.H"
 #include "polyMesh.H"
+#include "timeSelector.H"
 #include "pointFields.H"
 #include "tetFemMatrix.H"
 #include "tetPointFields.H"
@@ -43,29 +44,31 @@ using namespace Foam;
 
 int main(int argc, char *argv[])
 {
+    timeSelector::addOptions();
+
+#   include "addRegionOption.H"
+
     argList::validArgs.append("scaling factor");
 
 #   include "setRootCase.H"
-
-    scalar scaleFactor(readScalar(IStringStream(args.additionalArgs()[0])()));
-
 #   include "createTime.H"
 #   include "createPolyMesh.H"
 
-    tetPolyMesh tetMesh(mesh);
+    scalar scaleFactor(readScalar(IStringStream(args.additionalArgs()[0])()));
 
-    // Get times list
-    instantList Times = runTime.times();
+    instantList timeDirs = timeSelector::select0(runTime, args);
+
+    tetPolyMesh tetMesh(mesh);
 
     pointField zeroPoints(mesh.points());
 
-    runTime.setTime(Times[0], 0);
-
-    for (int i = 1; i<Times.size(); i++)
+    forAll(timeDirs, timeI)
     {
-        runTime.setTime(Times[i], i);
+        runTime.setTime(timeDirs[timeI], timeI);
 
         Info<< "Time = " << runTime.timeName() << endl;
+
+        polyMesh::readUpdateState state = mesh.readUpdate();
 
         IOobject Uheader
         (

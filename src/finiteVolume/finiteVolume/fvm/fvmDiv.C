@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -45,7 +45,7 @@ tmp<fvMatrix<Type> >
 div
 (
     const surfaceScalarField& rho,
-    GeometricField<Type, fvPatchField, volMesh>& vf,
+    const GeometricField<Type, fvPatchField, volMesh>& vf,
     const word& name
 )
 {
@@ -63,7 +63,7 @@ tmp<fvMatrix<Type> >
 div
 (
     const tmp<surfaceScalarField>& trho,
-    GeometricField<Type, fvPatchField, volMesh>& vf,
+    const GeometricField<Type, fvPatchField, volMesh>& vf,
     const word& name
 )
 {
@@ -78,7 +78,7 @@ tmp<fvMatrix<Type> >
 div
 (
     const surfaceScalarField& rho,
-    GeometricField<Type, fvPatchField, volMesh>& vf
+    const GeometricField<Type, fvPatchField, volMesh>& vf
 )
 {
     return fvm::div(rho, vf, "div(" + rho.name() + ',' + vf.name() + ')');
@@ -90,7 +90,7 @@ tmp<fvMatrix<Type> >
 div
 (
     const tmp<surfaceScalarField>& trho,
-    GeometricField<Type, fvPatchField, volMesh>& vf
+    const GeometricField<Type, fvPatchField, volMesh>& vf
 )
 {
     tmp<fvMatrix<Type> > Div(fvm::div(trho(), vf));
@@ -105,7 +105,7 @@ tmp
     BlockLduSystem<vector, typename innerProduct<vector, Type>::type>
 > UDiv
 (
-    GeometricField<Type, fvPatchField, volMesh>& vf,
+    const GeometricField<Type, fvPatchField, volMesh>& vf,
     const word& name
 )
 {
@@ -124,7 +124,7 @@ tmp
 > UDiv
 (
     const surfaceScalarField& rho,
-    GeometricField<Type, fvPatchField, volMesh>& vf,
+    const GeometricField<Type, fvPatchField, volMesh>& vf,
     const word& name
 )
 {
@@ -143,7 +143,7 @@ tmp
 > UDiv
 (
     const tmp<surfaceScalarField>& trho,
-    GeometricField<Type, fvPatchField, volMesh>& vf,
+    const GeometricField<Type, fvPatchField, volMesh>& vf,
     const word& name
 )
 {
@@ -163,7 +163,7 @@ tmp
     BlockLduSystem<vector, typename innerProduct<vector, Type>::type>
 > UDiv
 (
-    GeometricField<Type, fvPatchField, volMesh>& vf
+    const GeometricField<Type, fvPatchField, volMesh>& vf
 )
 {
     return fvm::UDiv
@@ -181,7 +181,7 @@ tmp
 > UDiv
 (
     const surfaceScalarField& rho,
-    GeometricField<Type, fvPatchField, volMesh>& vf
+    const GeometricField<Type, fvPatchField, volMesh>& vf
 )
 {
     return fvm::UDiv
@@ -200,7 +200,7 @@ tmp
 > UDiv
 (
     const tmp<surfaceScalarField>& trho,
-    GeometricField<Type, fvPatchField, volMesh>& vf
+    const GeometricField<Type, fvPatchField, volMesh>& vf
 )
 {
     tmp

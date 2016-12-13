@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -83,6 +83,23 @@ inline TensorN<Cmpt, length>::TensorN(Istream& is)
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
+//- Return tensor diagonal
+template <class Cmpt, int length>
+inline DiagTensorN<Cmpt, length> TensorN<Cmpt, length>::diag() const
+{
+    DiagTensorN<Cmpt, length> dt;
+
+    label diagI = 0;
+    for (label i = 0; i < TensorN<Cmpt, length>::rowLength; i++)
+    {
+        dt[i] = this->v_[diagI];
+        diagI += TensorN<Cmpt, length>::rowLength + 1;
+    }
+
+    return dt;
+}
+
+
 //- Return tensor transpose
 template <class Cmpt, int length>
 inline TensorN<Cmpt, length> TensorN<Cmpt, length>::T() const
@@ -104,21 +121,6 @@ inline TensorN<Cmpt, length> TensorN<Cmpt, length>::T() const
     return transpose;
 }
 
-//- Return tensor diagonal
-template <class Cmpt, int length>
-inline DiagTensorN<Cmpt, length> TensorN<Cmpt, length>::diag() const
-{
-    DiagTensorN<Cmpt, length> dt;
-
-    label diagI=0;
-    for (label i = 0; i < TensorN<Cmpt, length>::rowLength; i++)
-    {
-        dt[i] = this->v_[diagI];
-        diagI += TensorN<Cmpt, length>::rowLength + 1;
-    }
-
-    return dt;
-}
 
 //- Negative sum the vertical off-diagonal components
 template <class Cmpt, int length>
@@ -152,6 +154,7 @@ inline TensorN<Cmpt, length> TensorN<Cmpt, length>::negSumDiag() const
 
     return negsumdiag;
 }
+
 
 //- Assign to a SphericalTensorN
 template <class Cmpt, int length>
@@ -502,7 +505,11 @@ operator+(const TensorN<Cmpt, length>& t1, const TensorN<Cmpt, length>& t2)
 //- Addition of TensorN and DiagTensorN
 template <class Cmpt, int length>
 inline TensorN<Cmpt, length>
-operator+(const TensorN<Cmpt, length>& t1, const DiagTensorN<Cmpt, length>& dt2)
+operator+
+(
+    const TensorN<Cmpt, length>& t1,
+    const DiagTensorN<Cmpt, length>& dt2
+)
 {
     TensorN<Cmpt, length> result(t1);
 
@@ -520,7 +527,11 @@ operator+(const TensorN<Cmpt, length>& t1, const DiagTensorN<Cmpt, length>& dt2)
 //- Addition of DiagTensorN and TensorN
 template <class Cmpt, int length>
 inline TensorN<Cmpt, length>
-operator+(const DiagTensorN<Cmpt, length>& dt1, const TensorN<Cmpt, length>& t2)
+operator+
+(
+    const DiagTensorN<Cmpt, length>& dt1,
+    const TensorN<Cmpt, length>& t2
+)
 {
     TensorN<Cmpt, length> result(t2);
 
@@ -602,7 +613,11 @@ operator-(const TensorN<Cmpt, length>& t1, const TensorN<Cmpt, length>& t2)
 //- Subtraction of TensorN and DiagTensorN
 template <class Cmpt, int length>
 inline TensorN<Cmpt, length>
-operator-(const TensorN<Cmpt, length>& t1, const DiagTensorN<Cmpt, length>& dt2)
+operator-
+(
+    const TensorN<Cmpt, length>& t1,
+    const DiagTensorN<Cmpt, length>& dt2
+)
 {
     TensorN<Cmpt, length> result(t1);
 
@@ -620,7 +635,11 @@ operator-(const TensorN<Cmpt, length>& t1, const DiagTensorN<Cmpt, length>& dt2)
 //- Subtraction of DiagTensorN and TensorN
 template <class Cmpt, int length>
 inline TensorN<Cmpt, length>
-operator-(const DiagTensorN<Cmpt, length>& dt1, const TensorN<Cmpt, length>& t2)
+operator-
+(
+    const DiagTensorN<Cmpt, length>& dt1,
+    const TensorN<Cmpt, length>& t2
+)
 {
     TensorN<Cmpt, length> result(-t2);
 
@@ -709,7 +728,11 @@ operator/(const TensorN<Cmpt, length>& t1, const TensorN<Cmpt, length>& t2)
 //- Inner Product of a DiagTensorN and an inverse TensorN
 template <class Cmpt, int length>
 inline TensorN<Cmpt, length>
-operator/(const DiagTensorN<Cmpt, length>& dt1, const TensorN<Cmpt, length>& t2)
+operator/
+(
+    const DiagTensorN<Cmpt, length>& dt1,
+    const TensorN<Cmpt, length>& t2
+)
 {
     return dt1 & inv(t2);
 }
@@ -718,7 +741,11 @@ operator/(const DiagTensorN<Cmpt, length>& dt1, const TensorN<Cmpt, length>& t2)
 //- Inner Product of a TensorN and an inverse DiagTensorN
 template <class Cmpt, int length>
 inline TensorN<Cmpt, length>
-operator/(const TensorN<Cmpt, length>& t1, const DiagTensorN<Cmpt, length>& dt2)
+operator/
+(
+    const TensorN<Cmpt, length>& t1,
+    const DiagTensorN<Cmpt, length>& dt2
+)
 {
     return t1 & inv(dt2);
 }
@@ -766,22 +793,33 @@ inline Cmpt det(const TensorN<Cmpt, length>& t)
 
     TensorN<Cmpt, length - 1> subMatrix;
 
+    // Laplace expansion using first column
+    // Bugfix, TU, 31 May 2016
+
     for (label i = 0; i < length; i++)
     {
-        label nj = 0;
+        // Column of submatrix
+        label js = 0;
 
-        // Build sub-matrix, skipping the
-        for (label j = 0; j < length; j++)
+        for (label j = 1; j < length; j++)
         {
-            // Skip i-th column
-            if (j == i) continue;
+            // Row of submatrix
+            label is = 0;
 
-            for (label k = 1; k < length; k++)
+            for (label k = 0; k < length; k++)
             {
-                subMatrix(nj, k) = t(j, k);
+                // Row which is crossed out in the expansion
+                if (k == i)
+                {
+                    continue;
+                }
+                else
+                {
+                    subMatrix(is,js) = t(k,j);
+                    is++;
+                }
             }
-
-            nj++;
+            js++;
         }
 
         // Handle +/- sign switch
@@ -972,12 +1010,36 @@ inline DiagTensorN<Cmpt, length> diag(const TensorN<Cmpt, length>& t)
     return t.diag();
 }
 
+
 //- Return tensor diagonal
 template <class Cmpt, int length>
 inline TensorN<Cmpt, length> negSumDiag(const TensorN<Cmpt, length>& t)
 {
     return t.negSumDiag();
 }
+
+
+//- Scale tensor row with a VectorN
+template <class Cmpt, int length>
+inline TensorN<Cmpt, length> scaleRow
+(
+    const TensorN<Cmpt, length>& t,
+    const VectorN<Cmpt, length>& v
+)
+{
+    TensorN<Cmpt, length> result;
+
+    for (label i = 0; i < TensorN<Cmpt, length>::rowLength; i++)
+    {
+        for (label j = 0; j < TensorN<Cmpt, length>::rowLength; j++)
+        {
+            result(i, j) = t(i, j)*v(j);
+        }
+    }
+
+    return result;
+}
+
 
 //- Return the component sum
 // template <class Cmpt, int length>

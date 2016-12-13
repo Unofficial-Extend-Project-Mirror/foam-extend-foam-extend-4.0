@@ -128,3 +128,5 @@ if (composition.contains("fu"))
 }
 
 fields.add(hs);
+
+mesh.schemesDict().setFluxRequired(p.name());

@@ -1,7 +1,7 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | foam-extend: Open Source CFD                    |
-|  \\    /   O peration     | Version:     3.2                                |
+|  \\    /   O peration     | Version:     4.0                                |
 |   \\  /    A nd           | Web:         http://www.foam-extend.org         |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
@@ -29,7 +29,7 @@ divSchemes
 {
     default         none;
     div(phi,U)      Gauss linearUpwind Gauss; //upwind;
-    div((nuEff*dev(grad(U).T()))) Gauss linear;
+    div((nuEff*dev(T(grad(U))))) Gauss linear;
     div(phi,epsilon) Gauss upwind;
     div(phi,k) Gauss upwind;
 }
@@ -59,18 +59,12 @@ snGradSchemes
     default         corrected;
 }
 
-fluxRequired
-{
-    default         no;
-    pcorr;
-    p;
-}
-
 mixingPlane
 {
     default         areaAveraging;
     U               areaAveraging;
     p               areaAveraging;
 }
+
 
 // ************************************************************************* //

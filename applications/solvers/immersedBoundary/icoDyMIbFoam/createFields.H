@@ -17,6 +17,7 @@
         transportProperties.lookup("nu")
     );
 
+
     Info<< "Reading field p\n" << endl;
     volScalarField p
     (
@@ -30,6 +31,7 @@
         ),
         mesh
     );
+
 
     Info<< "Reading field U\n" << endl;
     volVectorField U
@@ -47,6 +49,8 @@
 
 #   include "createPhi.H"
 
+
     label pRefCell = 0;
     scalar pRefValue = 0.0;
-    setRefCell(p, mesh.solutionDict().subDict("PIMPLE"), pRefCell, pRefValue);
+    setRefCell(p, pimple.dict(), pRefCell, pRefValue);
+    mesh.schemesDict().setFluxRequired(p.name());

@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -25,7 +25,28 @@ Class
     Foam::incompressible::RASModels::LienCubicKE
 
 Description
-    Lien cubic non-linear k-epsilon turbulence model for incompressible flows.
+    Lien cubic non-linear low-Reynolds k-epsilon turbulence models for
+    incompressible flows.
+
+    This turbulence model is described in:
+    \verbatim
+        Lien, F.S., Chen, W.L. & Leschziner, M.A. (1996).
+        Low-Reynolds-number eddy-viscosity modeling based on non-linear
+        stress-strain/vorticity relations.
+        Engineering Turbulence Modelling and Experiments 3, 91-100.
+    \endverbatim
+
+    Implemented according to the specification in:
+    <a href=
+    "http://personalpages.manchester.ac.uk/staff/david.d.apsley/specturb.pdf"
+    >Apsley: Turbulence Models 2002</a>
+
+    In addition to the low-Reynolds number damping functions support for
+    wall-functions is also included to allow for low- and high-Reynolds number
+    operation.
+
+See Also
+    Foam::incompressible::RASModels::ShihQuadraticKE
 
 SourceFiles
     LienCubicKE.C
@@ -75,7 +96,6 @@ class LienCubicKE
             volScalarField k_;
             volScalarField epsilon_;
 
-            volTensorField gradU_;
             volScalarField eta_;
             volScalarField ksi_;
             volScalarField Cmu_;
@@ -103,10 +123,9 @@ public:
         );
 
 
-    // Destructor
-
-        virtual ~LienCubicKE()
-        {}
+    //- Destructor
+    virtual ~LienCubicKE()
+    {}
 
 
     // Member Functions
@@ -154,7 +173,7 @@ public:
         virtual tmp<volSymmTensorField> devReff() const;
 
         //- Return the source term for the momentum equation
-        virtual tmp<fvVectorMatrix> divDevReff(volVectorField& U) const;
+        virtual tmp<fvVectorMatrix> divDevReff() const;
 
         //- Solve the turbulence equations and correct the turbulence viscosity
         virtual void correct();

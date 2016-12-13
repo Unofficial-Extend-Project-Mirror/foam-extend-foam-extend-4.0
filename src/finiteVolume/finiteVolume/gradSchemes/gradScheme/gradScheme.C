@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -52,7 +52,8 @@ tmp<gradScheme<Type> > gradScheme<Type>::New
 {
     if (fv::debug)
     {
-        Info<< "gradScheme<Type>::New(Istream& schemeData) : "
+        Info<< "gradScheme<Type>::New"
+               "(const fvMesh& mesh, Istream& schemeData) : "
                "constructing gradScheme<Type>"
             << endl;
     }
@@ -61,7 +62,8 @@ tmp<gradScheme<Type> > gradScheme<Type>::New
     {
         FatalIOErrorIn
         (
-            "gradScheme<Type>::New(Istream& schemeData)",
+            "gradScheme<Type>::New"
+            "(const fvMesh& mesh, Istream& schemeData)",
             schemeData
         )   << "Grad scheme not specified" << endl << endl
             << "Valid grad schemes are :" << endl
@@ -69,7 +71,7 @@ tmp<gradScheme<Type> > gradScheme<Type>::New
             << exit(FatalIOError);
     }
 
-    word schemeName(schemeData);
+    const word schemeName(schemeData);
 
     typename IstreamConstructorTable::iterator cstrIter =
         IstreamConstructorTablePtr_->find(schemeName);
@@ -78,9 +80,10 @@ tmp<gradScheme<Type> > gradScheme<Type>::New
     {
         FatalIOErrorIn
         (
-            "gradScheme<Type>::New(Istream& schemeData)",
+            "gradScheme<Type>::New"
+            "(const fvMesh& mesh, Istream& schemeData)",
             schemeData
-        )   << "unknown grad scheme " << schemeName << endl << endl
+        )   << "Unknown grad scheme " << schemeName << nl << nl
             << "Valid grad schemes are :" << endl
             << IstreamConstructorTablePtr_->sortedToc()
             << exit(FatalIOError);
@@ -118,28 +121,16 @@ Foam::fv::gradScheme<Type>::grad
     typedef typename outerProduct<vector, Type>::type GradType;
     typedef GeometricField<GradType, fvPatchField, volMesh> GradFieldType;
 
-    if (!this->mesh().changing() && this->mesh().schemesDict().cache(name))
+    if (!this->mesh().changing() && this->mesh().solutionDict().cache(name))
     {
         if (!mesh().objectRegistry::template foundObject<GradFieldType>(name))
         {
-            if (fvSchemes::debug)
-            {
-                Info << "Cache: Calculating and caching " << name
-                    << " originating from " << vsf.name()
-                    << " event No. " << vsf.eventNo()
-                    << endl;
-            }
+            solution::cachePrintMessage("Calculating and caching", name, vsf);
             tmp<GradFieldType> tgGrad = calcGrad(vsf, name);
             regIOobject::store(tgGrad.ptr());
         }
 
-        if (fvSchemes::debug)
-        {
-            Info << "Cache: Retrieving " << name
-                << " originating from " << vsf.name()
-                << " event No. " << vsf.eventNo()
-                << endl;
-        }
+        solution::cachePrintMessage("Retrieving", name, vsf);
         GradFieldType& gGrad = const_cast<GradFieldType&>
         (
             mesh().objectRegistry::template lookupObject<GradFieldType>(name)
@@ -147,36 +138,27 @@ Foam::fv::gradScheme<Type>::grad
 
         if (gGrad.upToDate(vsf.name()))
         {
+            if (solution::debug)
+            {
+                Info<< ": up-to-date." << endl;
+            }
+
             return gGrad;
         }
         else
         {
-            if (fvSchemes::debug)
+            if (solution::debug)
             {
-                Info << "Cache: Deleting " << name
-                    << " originating from " << vsf.name()
-                    << " event No. " << vsf.eventNo()
-                    << endl;
+                Info<< ": not up-to-date." << endl;
+                solution::cachePrintMessage("Deleting", name, vsf);
             }
             gGrad.release();
             delete &gGrad;
 
-            if (fvSchemes::debug)
-            {
-                Info << "Cache: Recalculating " << name
-                    << " originating from " << vsf.name()
-                    << " event No. " << vsf.eventNo()
-                    << endl;
-            }
+            solution::cachePrintMessage("Recalculating", name, vsf);
             tmp<GradFieldType> tgGrad = calcGrad(vsf, name);
 
-            if (fvSchemes::debug)
-            {
-                Info << "Cache: Storing " << name
-                    << " originating from " << vsf.name()
-                    << " event No. " << vsf.eventNo()
-                    << endl;
-            }
+            solution::cachePrintMessage("Storing", name, vsf);
             regIOobject::store(tgGrad.ptr());
             GradFieldType& gGrad = const_cast<GradFieldType&>
             (
@@ -203,28 +185,17 @@ Foam::fv::gradScheme<Type>::grad
 
             if (gGrad.ownedByRegistry())
             {
-                if (fvSchemes::debug)
-                {
-                    Info << "Cache: Deleting " << name
-                        << " originating from " << vsf.name()
-                        << " event No. " << vsf.eventNo()
-                        << endl;
-                }
+                solution::cachePrintMessage("Deleting", name, vsf);
                 gGrad.release();
                 delete &gGrad;
             }
         }
 
-        if (fvSchemes::debug)
-        {
-            Info << "Cache: Calculating " << name
-                << " originating from " << vsf.name()
-                << " event No. " << vsf.eventNo()
-                << endl;
-        }
+        solution::cachePrintMessage("Calculating", name, vsf);
         return calcGrad(vsf, name);
     }
 }
+
 
 template<class Type>
 Foam::tmp
@@ -285,8 +256,9 @@ gradScheme<Type>::fvmGrad
         "(\n"
         "    GeometricField<Type, fvPatchField, volMesh>&"
         ")\n"
-    )   << "Implicit gradient operator currently defined only for Gauss linear "
-        << "and leastSquares (cell and face limiters are optional)."
+    )   << "Implicit gradient operator currently defined only for "
+        << "Gauss linear and leastSquares "
+        << "(cell and face limiters are optional)."
         << abort(FatalError);
 
     typedef typename outerProduct<vector, Type>::type GradType;

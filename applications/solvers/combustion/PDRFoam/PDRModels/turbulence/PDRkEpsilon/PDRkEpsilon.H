@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -174,7 +174,7 @@ public:
         tmp<volSymmTensorField> devRhoReff() const;
 
         //- Return the source term for the momentum equation
-        tmp<fvVectorMatrix> divDevRhoReff(volVectorField& U) const;
+        tmp<fvVectorMatrix> divDevRhoReff() const;
 
         //- Solve the turbulence equations and correct the turbulence viscosity
         void correct();

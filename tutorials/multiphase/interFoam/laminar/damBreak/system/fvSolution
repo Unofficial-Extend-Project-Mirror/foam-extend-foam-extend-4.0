@@ -1,7 +1,7 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | foam-extend: Open Source CFD                    |
-|  \\    /   O peration     | Version:     3.2                                |
+|  \\    /   O peration     | Version:     4.0                                |
 |   \\  /    A nd           | Web:         http://www.foam-extend.org         |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
@@ -17,6 +17,8 @@ FoamFile
 
 solvers
 {
+    rho
+    {}
     pcorr
     {
         solver          PCG;
@@ -43,7 +45,7 @@ solvers
 
     U
     {
-        solver          PBiCG;
+        solver          BiCGStab;
         preconditioner  DILU;
         tolerance       1e-06;
         relTol          0;
@@ -62,5 +64,6 @@ PIMPLE
     nAlphaCorr      1;
     nAlphaSubCycles 2;
 }
+
 
 // ************************************************************************* //

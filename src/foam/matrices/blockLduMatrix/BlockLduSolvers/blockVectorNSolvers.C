@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -31,10 +31,12 @@ License
 #include "blockDiagonalPrecons.H"
 #include "blockGaussSeidelPrecons.H"
 #include "BlockCholeskyPrecon.H"
+#include "BlockILUCpPrecon.H"
 
 #include "blockLduSmoothers.H"
 #include "blockGaussSeidelSmoothers.H"
 #include "BlockILUSmoother.H"
+#include "BlockILUCpSmoother.H"
 
 #include "blockLduSolvers.H"
 #include "BlockDiagonalSolver.H"
@@ -44,8 +46,8 @@ License
 #include "BlockGMRESSolver.H"
 
 // KRJ: 2012-12-15: Multigrid solver
-#include "blockAmgSolvers.H"
-#include "blockAmgPrecons.H"
+#include "blockAMGSolvers.H"
+#include "blockAMGPrecons.H"
 #include "blockMatrixCoarsenings.H"
 #include "blockMatrixAgglomerations.H"
 #include "blockCoeffNorms.H"
@@ -83,6 +85,9 @@ makeBlockPrecon(block##Type##Precon, block##Type##GaussSeidelPrecon);         \
 typedef BlockCholeskyPrecon<type > block##Type##CholeskyPrecon;               \
 makeBlockPrecon(block##Type##Precon, block##Type##CholeskyPrecon);            \
                                                                               \
+typedef BlockILUCpPrecon<type > block##Type##ILUCpPrecon;                     \
+makeBlockPrecon(block##Type##Precon, block##Type##ILUCpPrecon);               \
+                                                                              \
 /* Smoothers */                                                               \
 typedef BlockLduSmoother<type > block##Type##Smoother;                        \
 defineNamedTemplateTypeNameAndDebug(block##Type##Smoother, 0);                \
@@ -93,6 +98,9 @@ makeBlockSmoother(block##Type##Smoother, block##Type##GaussSeidelSmoother);   \
                                                                               \
 typedef BlockILUSmoother<type > block##Type##ILUSmoother;                     \
 makeBlockSmoother(block##Type##Smoother, block##Type##ILUSmoother);           \
+                                                                              \
+typedef BlockILUCpSmoother<type > block##Type##ILUCpSmoother;                 \
+makeBlockSmoother(block##Type##Smoother, block##Type##ILUCpSmoother);         \
                                                                               \
                                                                               \
 /* Solvers */                                                                 \
@@ -152,12 +160,12 @@ makeBlockCoeffNorm(block##Type##CoeffNorm, block##Type##CoeffComponentNorm);  \
 typedef BlockCoeffMaxNorm<type > block##Type##CoeffMaxNorm;                   \
 makeBlockCoeffNorm(block##Type##CoeffNorm, block##Type##CoeffMaxNorm);        \
                                                                               \
-typedef BlockAmgSolver<type > block##Type##AmgSolver;                         \
+typedef BlockAMGSolver<type > block##Type##AmgSolver;                         \
 makeBlockSolverTypeName(block##Type##AmgSolver);                              \
 addSolverToBlockMatrix(Type, block##Type##AmgSolver, symMatrix);              \
 addSolverToBlockMatrix(Type, block##Type##AmgSolver, asymMatrix);             \
                                                                               \
-typedef BlockAmgPrecon<type > block##Type##AmgPrecon;                         \
+typedef BlockAMGPrecon<type > block##Type##AmgPrecon;                         \
 makeBlockPrecon(block##Type##Precon, block##Type##AmgPrecon);                 \
 
 forAllVectorNTypes(makeSolver)

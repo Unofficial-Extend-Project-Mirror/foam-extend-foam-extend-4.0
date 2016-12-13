@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -55,33 +55,93 @@ void faMeshDecomposition::distributeFaces()
         (
             IOobject
             (
-                fvMesh::defaultRegion,
+                GeoMesh<polyMesh>::mesh_.name(),
                 processorDb.timeName(),
                 processorDb
             )
         );
 
-        labelHashSet faceProcAddressingHash
-        (
-            labelIOList
-            (
-                IOobject
-                (
-                    "faceProcAddressing",
-                    "constant",
-                    procMesh.meshSubDir,
-                    procMesh,
-                    IOobject::MUST_READ,
-                    IOobject::NO_WRITE
-                )
-            )
-        );
-
-        forAll (faceLabels(), faceI)
+        // If faMesh's fvPatch is a part of the global face zones, faces of that
+        // patch will be present on all processors. Because of that, looping
+        // through faceProcAddressing will decompose global faMesh faces to the
+        // very last processor regardless of where fvPatch is really decomposed.
+        // Since global faces which do not belong to specific processor are
+        // located at the end of the faceProcAddressing, cutting it at
+        // i = owner.size() will correctly decompose faMesh faces.
+        // Vanja Skuric, 2016-04-21
+        if (decompositionDict_.found("globalFaceZones"))
         {
-            if (faceProcAddressingHash.found(faceLabels()[faceI] + 1))
+            labelList faceProcAddressing
+            (
+                labelIOList
+                (
+                    IOobject
+                    (
+                        "faceProcAddressing",
+                        "constant",
+                        procMesh.meshSubDir,
+                        procMesh,
+                        IOobject::MUST_READ,
+                        IOobject::NO_WRITE
+                    )
+                )
+            );
+
+            const label ownerSize =
+            (
+                labelIOList
+                (
+                    IOobject
+                    (
+                        "owner",
+                        "constant",
+                        procMesh.meshSubDir,
+                        procMesh,
+                        IOobject::MUST_READ,
+                        IOobject::NO_WRITE
+                    )
+                )
+            ).size();
+
+            labelHashSet faceProcAddressingHash(ownerSize);
+
+            for (int i = 0; i < ownerSize; ++i)
             {
-                faceToProc_[faceI] = procI;
+                faceProcAddressingHash.insert(faceProcAddressing[i]);
+            }
+
+            forAll (faceLabels(), faceI)
+            {
+                if (faceProcAddressingHash.found(faceLabels()[faceI] + 1))
+                {
+                    faceToProc_[faceI] = procI;
+                }
+            }
+        }
+        else
+        {
+            labelHashSet faceProcAddressingHash
+            (
+                labelIOList
+                (
+                    IOobject
+                    (
+                        "faceProcAddressing",
+                        "constant",
+                        procMesh.meshSubDir,
+                        procMesh,
+                        IOobject::MUST_READ,
+                        IOobject::NO_WRITE
+                    )
+                )
+            );
+
+            forAll (faceLabels(), faceI)
+            {
+                if (faceProcAddressingHash.found(faceLabels()[faceI] + 1))
+                {
+                    faceToProc_[faceI] = procI;
+                }
             }
         }
     }
@@ -192,7 +252,7 @@ void faMeshDecomposition::decomposeMesh(const bool filterEmptyPatches)
         (
             IOobject
             (
-                fvMesh::defaultRegion,
+                GeoMesh<polyMesh>::mesh_.name(),
                 processorDb.timeName(),
                 processorDb
             )
@@ -1013,7 +1073,7 @@ void faMeshDecomposition::decomposeMesh(const bool filterEmptyPatches)
         (
             IOobject
             (
-                fvMesh::defaultRegion,
+                GeoMesh<polyMesh>::mesh_.name(),
                 processorDb.timeName(),
                 processorDb
             )
@@ -1131,7 +1191,7 @@ bool faMeshDecomposition::writeDecomposition()
         (
             IOobject
             (
-                fvMesh::defaultRegion,
+                GeoMesh<polyMesh>::mesh_.name(),
                 processorDb.timeName(),
                 processorDb
             )

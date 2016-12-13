@@ -1,0 +1,109 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | foam-extend: Open Source CFD                    |
+|  \\    /   O peration     | Version:     4.0                                |
+|   \\  /    A nd           | Web:         http://www.foam-extend.org         |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      fvSolution;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+solvers
+{
+    p
+    {
+        solver           BiCGStab;
+        preconditioner   DILU;
+        tolerance        1e-8;
+        relTol           0.05;
+    }
+    U
+    {
+        solver           smoothSolver;
+        smoother         GaussSeidel;
+        nSweeps          2;
+        tolerance        1e-7;
+        relTol           0.1;
+    }
+    k
+    {
+        solver           smoothSolver;
+        smoother         GaussSeidel;
+        nSweeps          2;
+        tolerance        1e-7;
+        relTol           0.1;
+    }
+    epsilon
+    {
+        solver           smoothSolver;
+        smoother         GaussSeidel;
+        nSweeps          2;
+        tolerance        1e-7;
+        relTol           0.1;
+    }
+
+    T
+    {
+        solver           smoothSolver;
+        smoother         GaussSeidel;
+        nSweeps          2;
+        tolerance        1e-7;
+        relTol           0.1;
+    }
+
+    i
+    {
+        solver           smoothSolver;
+        smoother         GaussSeidel;
+        nSweeps          2;
+        tolerance        1e-7;
+        relTol           0.1;
+    }
+}
+
+SIMPLE
+{
+    nNonOrthogonalCorrectors 0;
+    pRefCell 0;
+    pRefValue 0;
+}
+PIMPLE
+{
+    nOuterCorrectors         1;
+    nCorrectors              1;
+    nNonOrthogonalCorrectors 0;
+    compressible           yes;
+   convergence            1e-5;
+
+}
+
+relaxationFactors
+{
+    // Note: under-relaxation factors used in wave-transmissive schemes
+    U               0.1;
+    p               0.1;
+    h               0.1;
+    i               0.1;
+    rho             0.1;
+    T               0.1;
+
+    k               0.1;
+    epsilon         0.1;
+}
+
+fieldBounds
+{
+    p        50     1e8;
+    T        100    1000;
+    U               1000;
+    epsilon  0      1e6;
+}
+
+
+// ************************************************************************* //

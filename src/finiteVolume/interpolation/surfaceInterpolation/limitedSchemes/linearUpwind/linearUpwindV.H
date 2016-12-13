@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -55,6 +55,10 @@ class linearUpwindV
 {
     // Private Data
 
+        //- Name of gradient scheme
+        word gradSchemeName_;
+
+        //- Gradient scheme
         tmp<fv::gradScheme<Type> > gradScheme_;
 
 
@@ -83,6 +87,7 @@ public:
         )
         :
             upwind<Type>(mesh, faceFlux),
+            gradSchemeName_("grad"),
             gradScheme_
             (
                 new fv::gaussGrad<Type>(mesh)
@@ -99,12 +104,13 @@ public:
         )
         :
             upwind<Type>(mesh, schemeData),
+            gradSchemeName_(schemeData),
             gradScheme_
             (
                 fv::gradScheme<Type>::New
                 (
                     mesh,
-                    schemeData
+                    mesh.schemesDict().gradScheme(gradSchemeName_)
                 )
             )
         {}
@@ -118,12 +124,13 @@ public:
         )
         :
             upwind<Type>(mesh, faceFlux, schemeData),
+            gradSchemeName_(schemeData),
             gradScheme_
             (
                 fv::gradScheme<Type>::New
                 (
                     mesh,
-                    schemeData
+                    mesh.schemesDict().gradScheme(gradSchemeName_)
                 )
             )
         {}
@@ -143,7 +150,6 @@ public:
         (
             const GeometricField<Type, fvPatchField, volMesh>&
         ) const;
-
 };
 
 

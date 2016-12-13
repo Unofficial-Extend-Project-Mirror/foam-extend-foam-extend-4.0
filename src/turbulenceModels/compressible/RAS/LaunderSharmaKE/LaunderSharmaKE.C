@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -240,11 +240,12 @@ tmp<volSymmTensorField> LaunderSharmaKE::devRhoReff() const
 }
 
 
-tmp<fvVectorMatrix> LaunderSharmaKE::divDevRhoReff(volVectorField& U) const
+tmp<fvVectorMatrix> LaunderSharmaKE::divDevRhoReff() const
 {
     return
     (
-      - fvm::laplacian(muEff(), U) - fvc::div(muEff()*dev2(fvc::grad(U)().T()))
+      - fvm::laplacian(muEff(), U_)
+      - fvc::div(muEff()*dev2(T(fvc::grad(U_))))
     );
 }
 
@@ -308,10 +309,11 @@ void LaunderSharmaKE::correct()
         divU += fvc::div(mesh_.phi());
     }
 
-    tmp<volTensorField> tgradU = fvc::grad(U_);
-    volScalarField G("RASModel::G", mut_*(tgradU() && dev(twoSymm(tgradU()))));
-    tgradU.clear();
+    // Change return type due to gradient cacheing.  HJ, 22/Apr/2016
+    const tmp<volTensorField> tgradU = fvc::grad(U_);
+    const volTensorField& gradU = tgradU();
 
+    volScalarField G("RASModel::G", mut_*(gradU && dev(twoSymm(gradU))));
 
     // Dissipation equation
 

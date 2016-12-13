@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -58,7 +58,7 @@ void Foam::LPtrList<LListBase, T>::read(Istream& is, const INew& iNew)
         {
             if (delimiter == token::BEGIN_LIST)
             {
-                for (label i=0; i<s; i++)
+                for (label i=0; i<s; ++i)
                 {
                     this->append(iNew(is).ptr());
 
@@ -80,7 +80,7 @@ void Foam::LPtrList<LListBase, T>::read(Istream& is, const INew& iNew)
                     "reading entry"
                 );
 
-                for (label i=1; i<s; i++)
+                for (label i=1; i<s; ++i)
                 {
                     this->append(tPtr->clone().ptr());
                 }

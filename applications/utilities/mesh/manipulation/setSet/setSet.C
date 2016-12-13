@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -325,7 +325,7 @@ void printAllSets(const polyMesh& mesh, Ostream& os)
 
 
 // Physically remove a set
-void removeSet
+bool removeSet
 (
     const polyMesh& mesh,
     const word& setType,
@@ -346,7 +346,11 @@ void removeSet
         fileName object = objects[setName]->objectPath();
         Info<< "Removing file " << object << endl;
         rm(object);
+
+        return true;
     }
+
+    return false;
 }
 
 
@@ -392,11 +396,7 @@ bool doCommand
 
         IOobject::readOption r;
 
-        if (action == topoSetSource::REMOVE)
-        {
-            removeSet(mesh, setType, setName);
-        }
-        else if
+        if
         (
             (action == topoSetSource::NEW)
          || (action == topoSetSource::CLEAR)
@@ -414,7 +414,11 @@ bool doCommand
             currentSet.resize(max(currentSet.size(), typSize));
         }
 
-        if (!currentSetPtr.valid())
+        if (action == topoSetSource::REMOVE)
+        {
+            ok = removeSet(mesh, setType, setName);
+        }
+        else if (!currentSetPtr.valid())
         {
             Info<< "    Cannot construct/load set "
                 << topoSet::localPath(mesh, setName) << endl;

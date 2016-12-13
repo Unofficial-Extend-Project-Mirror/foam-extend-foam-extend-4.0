@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -72,7 +72,7 @@ void Foam::magLongDelta::makeMagLongDistance() const
 
 //     if (debug)
     {
-        Info<< "magLongDelta::makeMagLongDistance() :"
+        InfoIn("magLongDelta::makeMagLongDistance()")
             << "Constructing magnitude of long cell distance"
             << endl;
     }
@@ -117,7 +117,7 @@ void Foam::magLongDelta::makeMagLongDistance() const
 
     if (debug)
     {
-        Info<< "magLongDelta::makeMagLongDistance() :"
+        InfoIn("magLongDelta::makeMagLongDistance()")
             << "Finished magnitude of long cell distance"
             << endl;
     }

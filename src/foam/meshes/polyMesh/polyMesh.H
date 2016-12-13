@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -425,7 +425,7 @@ public:
             //- Return current motion time index
             label curMotionTimeIndex() const
             {
-                return moving_;
+                return curMotionTimeIndex_;
             }
 
             //- Set the mesh to be moving

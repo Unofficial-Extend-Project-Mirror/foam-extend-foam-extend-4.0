@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -63,10 +63,23 @@ div
     const surfaceScalarField signF = pos(flux);
 
     // Calculate gradient of the solution
-    GeometricField
+    // Change of return type due to gradient cacheing.  HJ, 22/Apr/2016
+    const tmp
     <
-        typename outerProduct<vector, Type>::type, fvPatchField, volMesh
-    > gradVf = fvc::grad(vf);
+        GeometricField
+        <
+            typename outerProduct<vector, Type>::type,
+            fvPatchField,
+            volMesh
+        >
+    > tgradVf = fvc::grad(vf);
+
+    const GeometricField
+    <
+        typename outerProduct<vector, Type>::type,
+        fvPatchField,
+        volMesh
+    >& gradVf = tgradVf();
 
     // Internal faces
     forAll (owner, faceI)

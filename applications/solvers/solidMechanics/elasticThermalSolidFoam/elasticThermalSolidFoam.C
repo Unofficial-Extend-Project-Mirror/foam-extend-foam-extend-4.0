@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -66,8 +66,8 @@ int main(int argc, char *argv[])
         scalar initialResidual = 1.0;
         scalar relResT = 1.0;
         scalar relResU = 1.0;
-        lduMatrix::solverPerformance solverPerfU;
-        lduMatrix::solverPerformance solverPerfT;
+        lduSolverPerformance solverPerfU;
+        lduSolverPerformance solverPerfT;
         lduMatrix::debug = 0;
 
         // solve energy equation for temperature

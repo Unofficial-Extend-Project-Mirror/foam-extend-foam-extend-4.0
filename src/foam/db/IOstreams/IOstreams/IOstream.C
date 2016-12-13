@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -27,6 +27,7 @@ Description
 
 #include "IOstream.H"
 #include "error.H"
+#include "Switch.H"
 #include <sstream>
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
@@ -61,7 +62,14 @@ Foam::IOstream::formatEnum(const word& format)
 Foam::IOstream::compressionType
 Foam::IOstream::compressionEnum(const word& compression)
 {
-    if (compression == "uncompressed")
+    // get Switch (bool) value, but allow it to fail
+    Switch sw(compression, true);
+
+    if (sw.valid())
+    {
+        return sw ? IOstream::COMPRESSED : IOstream::UNCOMPRESSED;
+    }
+    else if (compression == "uncompressed")
     {
         return IOstream::UNCOMPRESSED;
     }

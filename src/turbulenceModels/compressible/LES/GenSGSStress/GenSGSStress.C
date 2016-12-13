@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -136,14 +136,14 @@ tmp<volSymmTensorField> GenSGSStress::devRhoBeff() const
 }
 
 
-tmp<fvVectorMatrix> GenSGSStress::divDevRhoBeff(volVectorField& U) const
+tmp<fvVectorMatrix> GenSGSStress::divDevRhoBeff() const
 {
     return
     (
-        fvc::div(rho()*B_ + 0.05*muSgs_*fvc::grad(U))
-      + fvc::laplacian(0.95*muSgs_, U, "laplacian(muEff,U)")
-      - fvm::laplacian(muEff(), U)
-      - fvc::div(mu()*dev2(fvc::grad(U)().T()))
+        fvc::div(rho()*B_ + 0.05*muSgs_*fvc::grad(U_))
+      + fvc::laplacian(0.95*muSgs_, U_, "laplacian(muEff,U)")
+      - fvm::laplacian(muEff(), U_)
+      - fvc::div(mu()*dev2(T(fvc::grad(U_))))
     );
 }
 

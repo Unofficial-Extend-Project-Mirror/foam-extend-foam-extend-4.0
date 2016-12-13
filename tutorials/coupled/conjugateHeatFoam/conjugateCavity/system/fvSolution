@@ -1,7 +1,7 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | foam-extend: Open Source CFD                    |
-|  \\    /   O peration     | Version:     3.2                                |
+|  \\    /   O peration     | Version:     4.0                                |
 |   \\  /    A nd           | Web:         http://www.foam-extend.org         |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
@@ -23,10 +23,9 @@ solvers
 
         minIter          0;
         maxIter          1000;
-        tolerance        1e-25;
+        tolerance        1e-7;
         relTol           0.01;
-    };
-
+    }
     p_rghFinal
     {
         solver           PCG;
@@ -34,32 +33,29 @@ solvers
 
         minIter          0;
         maxIter          1000;
-        tolerance        1e-25;
+        tolerance        1e-7;
         relTol           0;
-    };
-
+    }
     U
     {
-        solver           PBiCG;
+        solver           BiCGStab;
         preconditioner   DILU;
 
         minIter          1;
         maxIter          1000;
-        tolerance        1e-25;
-        relTol           0.01;
-    };
-
-    T+T
+        tolerance        1e-7;
+        relTol           0;
+    }
+    T_T
     {
-        solver           BiCG;
+        solver           BiCGStab;
         preconditioner   Cholesky;
 
         minIter          0;
         maxIter          1000;
-        tolerance        1e-25;
-        relTol           0.1;
-    };
-
+        tolerance        1e-7;
+        relTol           0;
+    }
     G
     {
         solver           PCG;
@@ -67,31 +63,29 @@ solvers
 
         minIter          1;
         maxIter          1000;
-        tolerance        1e-25;
-        relTol           0.1;
-    };
-
+        tolerance        1e-7;
+        relTol           0;
+    }
     epsilon
     {
-        solver           PBiCG;
+        solver           BiCGStab;
         preconditioner   DILU;
 
         minIter          1;
         maxIter          100;
-        tolerance        1e-25;
-        relTol           0.01;
-    };
-
+        tolerance        1e-7;
+        relTol           0;
+    }
     k
     {
-        solver           PBiCG;
+        solver           BiCGStab;
         preconditioner   DILU;
 
         minIter          1;
         maxIter          100;
-        tolerance        1e-25;
-        relTol           0.01;
-    };
+        tolerance        1e-7;
+        relTol           0;
+    }
 }
 
 PISO
@@ -105,5 +99,6 @@ PISO
 relaxationFactors
 {
 }
+
 
 // ************************************************************************* //

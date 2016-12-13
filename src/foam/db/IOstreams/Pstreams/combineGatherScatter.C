@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -74,7 +74,7 @@ void Pstream::combineGather
                     sizeof(T)
                 );
 
-                if (debug & 2)
+                if (debug > 1)
                 {
                     Pout<< " received from "
                         << belowID << " data:" << value << endl;
@@ -87,7 +87,7 @@ void Pstream::combineGather
                 IPstream fromBelow(Pstream::scheduled, belowID);
                 T value(fromBelow);
 
-                if (debug & 2)
+                if (debug > 1)
                 {
                     Pout<< " received from "
                         << belowID << " data:" << value << endl;
@@ -100,7 +100,7 @@ void Pstream::combineGather
         // Send up Value
         if (myComm.above() != -1)
         {
-            if (debug & 2)
+            if (debug > 1)
             {
                 Pout<< " sending to " << myComm.above()
                     << " data:" << Value << endl;
@@ -167,7 +167,7 @@ void Pstream::combineScatter(const List<Pstream::commsStruct>& comms, T& Value)
                 Value = T(fromAbove);
             }
 
-            if (debug & 2)
+            if (debug > 1)
             {
                 Pout<< " received from "
                     << myComm.above() << " data:" << Value << endl;
@@ -179,7 +179,7 @@ void Pstream::combineScatter(const List<Pstream::commsStruct>& comms, T& Value)
         {
             label belowID = myComm.below()[belowI];
 
-            if (debug & 2)
+            if (debug > 1)
             {
                 Pout<< " sending to " << belowID << " data:" << Value << endl;
             }
@@ -252,7 +252,7 @@ void Pstream::listCombineGather
                     receivedValues.byteSize()
                 );
 
-                if (debug & 2)
+                if (debug > 1)
                 {
                     Pout<< " received from "
                         << belowID << " data:" << receivedValues << endl;
@@ -268,7 +268,7 @@ void Pstream::listCombineGather
                 IPstream fromBelow(Pstream::scheduled, belowID);
                 List<T> receivedValues(fromBelow);
 
-                if (debug & 2)
+                if (debug > 1)
                 {
                     Pout<< " received from "
                         << belowID << " data:" << receivedValues << endl;
@@ -284,7 +284,7 @@ void Pstream::listCombineGather
         // Send up Value
         if (myComm.above() != -1)
         {
-            if (debug & 2)
+            if (debug > 1)
             {
                 Pout<< " sending to " << myComm.above()
                     << " data:" << Values << endl;
@@ -355,7 +355,7 @@ void Pstream::listCombineScatter
                 fromAbove >> Values;
             }
 
-            if (debug & 2)
+            if (debug > 1)
             {
                 Pout<< " received from "
                     << myComm.above() << " data:" << Values << endl;
@@ -367,7 +367,7 @@ void Pstream::listCombineScatter
         {
             label belowID = myComm.below()[belowI];
 
-            if (debug & 2)
+            if (debug > 1)
             {
                 Pout<< " sending to " << belowID << " data:" << Values << endl;
             }
@@ -433,7 +433,7 @@ void Pstream::mapCombineGather
             IPstream fromBelow(Pstream::scheduled, belowID);
             Container receivedValues(fromBelow);
 
-            if (debug & 2)
+            if (debug > 1)
             {
                 Pout<< " received from "
                     << belowID << " data:" << receivedValues << endl;
@@ -464,7 +464,7 @@ void Pstream::mapCombineGather
         // Send up Value
         if (myComm.above() != -1)
         {
-            if (debug & 2)
+            if (debug > 1)
             {
                 Pout<< " sending to " << myComm.above()
                     << " data:" << Values << endl;
@@ -509,7 +509,7 @@ void Pstream::mapCombineScatter
             IPstream fromAbove(Pstream::scheduled, myComm.above());
             fromAbove >> Values;
 
-            if (debug & 2)
+            if (debug > 1)
             {
                 Pout<< " received from "
                     << myComm.above() << " data:" << Values << endl;
@@ -521,7 +521,7 @@ void Pstream::mapCombineScatter
         {
             label belowID = myComm.below()[belowI];
 
-            if (debug & 2)
+            if (debug > 1)
             {
                 Pout<< " sending to " << belowID << " data:" << Values << endl;
             }

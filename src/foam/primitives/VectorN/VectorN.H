@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -70,6 +70,8 @@ public:
         static const char* const typeName;
         static const VectorN zero;
         static const VectorN one;
+        static const VectorN max;
+        static const VectorN min;
 
 
     // Constructors
@@ -98,7 +100,7 @@ public:
         //- Return access to ith component
         inline Cmpt& operator()(const direction i);
 
-        //- Componentwise multiply
+        //- Component-wise multiply
         inline VectorN<Cmpt, length> cmptMultiply
         (
             const VectorN<Cmpt, length>&

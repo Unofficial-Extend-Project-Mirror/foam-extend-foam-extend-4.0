@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -49,6 +49,7 @@ namespace Foam
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
+UNARY_FUNCTION(tensor, tensor, T, transform)
 UNARY_FUNCTION(scalar, tensor, tr, transform)
 UNARY_FUNCTION(sphericalTensor, tensor, sph, transform)
 UNARY_FUNCTION(symmTensor, tensor, symm, transform)

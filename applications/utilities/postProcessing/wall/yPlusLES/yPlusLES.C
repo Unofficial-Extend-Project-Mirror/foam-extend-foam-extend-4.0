@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -122,8 +122,8 @@ int main(int argc, char *argv[])
 
                 Info<< "Patch " << patchi
                     << " named " << currPatch.name()
-                    << " y+ : min: " << min(Yp) << " max: " << max(Yp)
-                    << " average: " << average(Yp) << nl << endl;
+                    << " y+ : min: " << gMin(Yp) << " max: " << gMax(Yp)
+                    << " average: " << gAverage(Yp) << nl << endl;
             }
         }
 

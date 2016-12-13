@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -53,14 +53,17 @@ GGIInterpolation<MasterPatch, SlavePatch>::faceBoundBoxExtendSpanFraction_
     "Add robustness for quick-search algo. Keep it to a few percent."
 );
 
+
 template<class MasterPatch, class SlavePatch>
 const Foam::debug::optimisationSwitch
 GGIInterpolation<MasterPatch, SlavePatch>::octreeSearchMinNLevel_
 (
     "GGIOctreeSearchMinNLevel",
     3,
-    "GGI neighbouring facets octree-based search: minNlevel parameter for octree"
+    "GGI neighbouring facets octree-based search: "
+    "minNlevel parameter for octree"
 );
+
 
 template<class MasterPatch, class SlavePatch>
 const Foam::debug::optimisationSwitch
@@ -68,8 +71,10 @@ GGIInterpolation<MasterPatch, SlavePatch>::octreeSearchMaxLeafRatio_
 (
     "GGIOctreeSearchMaxLeafRatio",
     3,
-    "GGI neighbouring facets octree-based search: maxLeafRatio parameter for octree"
+    "GGI neighbouring facets octree-based search: "
+    "maxLeafRatio parameter for octree"
 );
+
 
 template<class MasterPatch, class SlavePatch>
 const Foam::debug::optimisationSwitch
@@ -77,7 +82,8 @@ GGIInterpolation<MasterPatch, SlavePatch>::octreeSearchMaxShapeRatio_
 (
     "GGIOctreeSearchMaxShapeRatio",
     1,
-    "GGI neighbouring facets octree-based search: maxShapeRatio parameter for octree"
+    "GGI neighbouring facets octree-based search: "
+    "maxShapeRatio parameter for octree"
 );
 
 
@@ -87,7 +93,7 @@ GGIInterpolation<MasterPatch, SlavePatch>::octreeSearchMaxShapeRatio_
 // One of the most primitive ways of doing collision detection is to
 // approximate each object or a part of the object with a sphere, and
 // then check whether spheres intersect each other. This method is
-// widely used even today because it’s computationally inexpensive.
+// widely used even today because it's computationally inexpensive.
 // We merely check whether the distance between the centers of two
 // spheres is less than the sum of the two radii (which indicates that
 // a collision has occurred). Even better, if we calculate whether the
@@ -123,7 +129,8 @@ void GGIInterpolation<MasterPatch, SlavePatch>::findNeighbours3D
     labelListList& result
 ) const
 {
-    List<DynamicList<label, 8> > candidateMasterNeighbors(masterPatch_.size());
+    // Allocation to local size.  HJ, 27/Apr/2016
+    List<DynamicList<label, 8> > candidateMasterNeighbors(parMasterSize());
 
     // First, compute the face center and the sphere radius (squared)
     // of the slave patch faces so we will not have to recompute this
@@ -131,6 +138,8 @@ void GGIInterpolation<MasterPatch, SlavePatch>::findNeighbours3D
     vectorField slaveFaceCentre(slavePatch_.size());
     scalarField slaveRadius2(slavePatch_.size());
 
+    // Since the parallelised search is done on the master, all of
+    // slave face data is needed.  HJ, 27/Apr/2016
     forAll (slavePatch_, faceSi)
     {
         // Grab points from slave face
@@ -179,10 +188,10 @@ void GGIInterpolation<MasterPatch, SlavePatch>::findNeighbours3D
 
         boundBox bbSlave(curFacePoints, false);
 
-        scalar tmpValue = Foam::magSqr(bbSlave.max() - bbSlave.min())/4.0;
+        scalar tmpValue = 0.25*Foam::magSqr(bbSlave.max() - bbSlave.min());
 
-        // We compare squared distances, so save the sqrt() if value > 1.0.
-        if (tmpValue < 1.0)
+        // We compare squared distances, so save the sqrt() if value > 1.
+        if (tmpValue < 1)
         {
             // Take the sqrt, otherwise, we underestimate the radius
             slaveRadius2[faceSi] = sqrt(tmpValue);
@@ -194,7 +203,17 @@ void GGIInterpolation<MasterPatch, SlavePatch>::findNeighbours3D
     }
 
     // Next, we search for each master face a list of potential neighbors
-    forAll (masterPatch_, faceMi)
+
+    // Parallel search split.  HJ, 27/Apr/2016
+    const label pmStart = this->parMasterStart();
+
+    for
+    (
+        label faceMi = pmStart;
+        faceMi < this->parMasterEnd();
+        faceMi++
+    )
+//     forAll (masterPatch_, faceMi)
     {
         // For each masterPatch faces, compute the bounding box. With
         // this, we compute the radius of the bounding sphere for this
@@ -238,18 +257,24 @@ void GGIInterpolation<MasterPatch, SlavePatch>::findNeighbours3D
 
             if (distFaceCenters < (masterRadius2 + slaveRadius2[faceSi]))
             {
-                candidateMasterNeighbors[faceMi].append(faceSi);
+                candidateMasterNeighbors[faceMi - pmStart].append(faceSi);
             }
         }
     }
 
-    // Repack the list
-    result.setSize(masterPatch_.size());
+    // Repack the list.  Local size
+    result.setSize(parMasterSize());
 
+    // Parallel search split: local size.  HJ, 27/Apr/2016
     forAll (result, i)
     {
         result[i].transfer(candidateMasterNeighbors[i].shrink());
     }
+
+    // Note: since the neighbours are used to perform a search, there is
+    // no need to do a global reduce of the candidates.  The rest of the list
+    // (searched on other processors) will remain unused.
+    // HJ, 27/Apr/2016
 }
 
 
@@ -276,20 +301,28 @@ void GGIInterpolation<MasterPatch, SlavePatch>::findNeighboursAABB
     labelListList& result
 ) const
 {
-    List<DynamicList<label, 8> > candidateMasterNeighbors(masterPatch_.size());
+    // Allocation to local size.  HJ, 27/Apr/2016
+    List<DynamicList<label, 8> > candidateMasterNeighbors(parMasterSize());
 
-    // Grab the master patch faces bounding boxes
-    List<boundBox> masterPatchBB(masterPatch_.size());
+    // Allocation to local size.  HJ, 27/Apr/2016
+    List<boundBox> masterPatchBB(parMasterSize());
 
-    forAll (masterPatch_, faceMi)
+    // Parallel search split.  HJ, 27/Apr/2016
+    const label pmStart = this->parMasterStart();
+
+    for
+    (
+        label faceMi = this->parMasterStart();
+        faceMi < this->parMasterEnd();
+        faceMi++
+    )
+//     forAll (masterPatch_, faceMi)
     {
-        boundBox bbMaster
+        masterPatchBB[faceMi - pmStart] = boundBox
         (
             masterPatch_[faceMi].points(masterPatch_.points()),
             false
         );
-
-        masterPatchBB[faceMi] = bbMaster;
     }
 
     // Grab the slave patch faces bounding boxes, plus compute its
@@ -388,15 +421,22 @@ void GGIInterpolation<MasterPatch, SlavePatch>::findNeighboursAABB
     // then, compute the intersection
     const vectorField& masterFaceNormals = masterPatch_.faceNormals();
 
-    forAll (masterPatchBB, faceMi)
+    // Parallel search split.  HJ, 27/Apr/2016
+    for
+    (
+        label faceMi = this->parMasterStart();
+        faceMi < this->parMasterEnd();
+        faceMi++
+    )
+//     forAll (masterPatch_, faceMi)
     {
         forAll (slavePatchBB, faceSi)
         {
             // Compute the augmented AABB
             boundBox augmentedBBMaster
             (
-                masterPatchBB[faceMi].min() - deltaBBSlave[faceSi],
-                masterPatchBB[faceMi].max() + deltaBBSlave[faceSi]
+                masterPatchBB[faceMi - pmStart].min() - deltaBBSlave[faceSi],
+                masterPatchBB[faceMi - pmStart].max() + deltaBBSlave[faceSi]
             );
 
             if (augmentedBBMaster.overlaps(slavePatchBB[faceSi]))
@@ -408,20 +448,27 @@ void GGIInterpolation<MasterPatch, SlavePatch>::findNeighboursAABB
 
                 if (mag(featureCos) > featureCosTol_)
                 {
-                    candidateMasterNeighbors[faceMi].append(faceSi);
+                    candidateMasterNeighbors[faceMi - pmStart].append(faceSi);
                 }
             }
         }
     }
 
-    // Repack the list
-    result.setSize(masterPatch_.size());
+    // Repack the list.  Local size
+    result.setSize(parMasterSize());
 
+    // Parallel search split: local size.  HJ, 27/Apr/2016
     forAll (result, i)
     {
         result[i].transfer(candidateMasterNeighbors[i].shrink());
     }
+
+    // Note: since the neighbours are used to perform a search, there is
+    // no need to do a global reduce of the candidates.  The rest of the list
+    // (searched on other processors) will remain unused.
+    // HJ, 27/Apr/2016
 }
+
 
 // This algorithm find the faces in proximity of another face based
 // on the face BB (Bounding Box) and an octree of bounding boxes.
@@ -431,12 +478,22 @@ void GGIInterpolation<MasterPatch, SlavePatch>::findNeighboursBBOctree
     labelListList& result
 ) const
 {
-    List<DynamicList<label, 8> > candidateMasterNeighbors(masterPatch_.size());
+    // Allocation to local size.  HJ, 27/Apr/2016
+    List<DynamicList<label, 8> > candidateMasterNeighbors(parMasterSize());
 
-    // Initialize the list of master patch faces bounding box
-    treeBoundBoxList lmasterFaceBB(masterPatch_.size());
+    // Allocation to local size.  HJ, 27/Apr/2016
+    treeBoundBoxList lmasterFaceBB(parMasterSize());
 
-    forAll (masterPatch_, faceMi)
+    // Parallel search split.  HJ, 27/Apr/2016
+    const label pmStart = this->parMasterStart();
+
+    for
+    (
+        label faceMi = this->parMasterStart();
+        faceMi < this->parMasterEnd();
+        faceMi++
+    )
+//     forAll (masterPatch_, faceMi)
     {
         pointField facePoints
         (
@@ -448,7 +505,7 @@ void GGIInterpolation<MasterPatch, SlavePatch>::findNeighboursBBOctree
         // (1% by default)
         treeBoundBox bbFaceMaster(facePoints);
 
-        lmasterFaceBB[faceMi] =
+        lmasterFaceBB[faceMi - pmStart] =
             bbFaceMaster.extend(faceBoundBoxExtendSpanFraction_());
     }
 
@@ -532,11 +589,18 @@ void GGIInterpolation<MasterPatch, SlavePatch>::findNeighboursBBOctree
     // Visit each master patch face BB and find the potential neighbours
     // using the slave patch octree
 
-    forAll (lmasterFaceBB, faceMi)
+    // Parallel search split.  HJ, 27/Apr/2016
+    for
+    (
+        label faceMi = this->parMasterStart();
+        faceMi < this->parMasterEnd();
+        faceMi++
+    )
+//     forAll (masterPatch_, faceMi)
     {
         // List of candidate neighbours
         labelList overlappedFaces  =
-            slavePatchOctree.findBox(lmasterFaceBB[faceMi]);
+            slavePatchOctree.findBox(lmasterFaceBB[faceMi - pmStart]);
 
         forAll (overlappedFaces, ovFi)
         {
@@ -549,18 +613,24 @@ void GGIInterpolation<MasterPatch, SlavePatch>::findNeighboursBBOctree
 
             if (mag(featureCos) > featureCosTol_)
             {
-                candidateMasterNeighbors[faceMi].append(faceSi);
+                candidateMasterNeighbors[faceMi - pmStart].append(faceSi);
             }
         }
     }
 
-    // Repack the list
-    result.setSize(masterPatch_.size());
+    // Repack the list.  Local size
+    result.setSize(parMasterSize());
 
+    // Parallel search split: local size.  HJ, 27/Apr/2016
     forAll (result, i)
     {
         result[i].transfer(candidateMasterNeighbors[i].shrink());
     }
+
+    // Note: since the neighbours are used to perform a search, there is
+    // no need to do a global reduce of the candidates.  The rest of the list
+    // (searched on other processors) will remain unused.
+    // HJ, 27/Apr/2016
 }
 
 

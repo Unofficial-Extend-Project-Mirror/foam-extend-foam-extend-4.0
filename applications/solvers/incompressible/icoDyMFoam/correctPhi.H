@@ -34,7 +34,9 @@
         fvc::makeAbsolute(phi, U);
     }
 
-    for(int nonOrth = 0; nonOrth <= nNonOrthCorr; nonOrth++)
+    mesh.schemesDict().setFluxRequired(pcorr.name());
+
+    while (piso.correctNonOrthogonal())
     {
         fvScalarMatrix pcorrEqn
         (
@@ -44,7 +46,7 @@
         pcorrEqn.setReference(pRefCell, pRefValue);
         pcorrEqn.solve();
 
-        if (nonOrth == nNonOrthCorr)
+        if (piso.finalNonOrthogonalIter())
         {
             phi -= pcorrEqn.flux();
         }

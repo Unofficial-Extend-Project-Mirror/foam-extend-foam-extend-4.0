@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -202,7 +202,13 @@ bool Foam::functionObjectList::read()
     }
 
     // Update existing and add new functionObjects
-    const entry* entryPtr = parentDict_.lookupEntryPtr("functions",false,false);
+    const entry* entryPtr = parentDict_.lookupEntryPtr
+    (
+        "functions",
+        false,
+        false
+    );
+
     if (entryPtr)
     {
         PtrList<functionObject> newPtrs;

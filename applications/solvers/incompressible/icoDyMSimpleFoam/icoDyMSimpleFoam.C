@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -36,6 +36,7 @@ Author
 
 #include "fvCFD.H"
 #include "dynamicFvMesh.H"
+#include "pisoControl.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -44,9 +45,13 @@ int main(int argc, char *argv[])
 #   include "setRootCase.H"
 #   include "createTime.H"
 #   include "createDynamicFvMesh.H"
+
+    pisoControl piso(mesh);
+
 #   include "initContinuityErrs.H"
 #   include "initTotalVolume.H"
 #   include "createFields.H"
+#   include "createControls.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -89,7 +94,7 @@ int main(int argc, char *argv[])
 
         // --- SIMPLE loop
 
-        for (int ocorr = 0; ocorr < nOuterCorr; ocorr++)
+        while (piso.correct())
         {
 #           include "CourantNo.H"
 
@@ -105,7 +110,8 @@ int main(int argc, char *argv[])
 
             p.storePrevIter();
 
-            for (int nonOrth=0; nonOrth<=nNonOrthCorr; nonOrth++)
+            // Non-orthogonal pressure corrector loop
+            while (piso.correctNonOrthogonal())
             {
                 fvScalarMatrix pEqn
                 (
@@ -113,21 +119,12 @@ int main(int argc, char *argv[])
                 );
 
                 pEqn.setReference(pRefCell, pRefValue);
-
-                if
+                pEqn.solve
                 (
-                    ocorr == nOuterCorr - 1
-                 && nonOrth == nNonOrthCorr
-                )
-                {
-                    pEqn.solve(mesh.solutionDict().solver(p.name() + "Final"));
-                }
-                else
-                {
-                    pEqn.solve(mesh.solutionDict().solver(p.name()));
-                }
+                    mesh.solutionDict().solver(p.select(piso.finalInnerIter()))
+                );
 
-                if (nonOrth == nNonOrthCorr)
+                if (piso.finalNonOrthogonalIter())
                 {
                     phi -= pEqn.flux();
                 }

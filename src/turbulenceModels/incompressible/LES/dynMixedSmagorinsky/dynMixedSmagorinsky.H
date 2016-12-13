@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -126,7 +126,7 @@ public:
 
         //- Returns div(B).
         // This is the additional term due to the filtering of the NSE.
-        tmp<fvVectorMatrix> divDevBeff(volVectorField& U) const;
+        tmp<fvVectorMatrix> divDevBeff() const;
 
         //- Correct Eddy-Viscosity and related properties
         void correct(const tmp<volTensorField>& gradU);

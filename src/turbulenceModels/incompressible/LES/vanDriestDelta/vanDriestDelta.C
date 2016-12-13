@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -66,7 +66,8 @@ void vanDriestDelta::calcDelta()
     );
 
     const fvPatchList& patches = mesh_.boundary();
-    forAll(patches, patchi)
+
+    forAll (patches, patchi)
     {
         if (patches[patchi].isWall())
         {

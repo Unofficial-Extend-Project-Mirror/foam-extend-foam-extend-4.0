@@ -1,7 +1,7 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | foam-extend: Open Source CFD                    |
-|  \\    /   O peration     | Version:     3.2                                |
+|  \\    /   O peration     | Version:     4.0                                |
 |   \\  /    A nd           | Web:         http://www.foam-extend.org         |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
@@ -49,8 +49,12 @@ laplacianSchemes
 interpolationSchemes
 {
     default           none;
+    interpolate(grad(U)) linear;
+    interpolate(grad(p)) linear;
     interpolate(y) linear;
     interpolate(U) skewCorrected linear;
+    interpolate(grad(U)) linear;
+    interpolate(grad(p))     linear;
 }
 
 snGradSchemes
@@ -58,10 +62,5 @@ snGradSchemes
     default         corrected;
 }
 
-fluxRequired
-{
-    default         no;
-    p;
-}
 
 // ************************************************************************* //

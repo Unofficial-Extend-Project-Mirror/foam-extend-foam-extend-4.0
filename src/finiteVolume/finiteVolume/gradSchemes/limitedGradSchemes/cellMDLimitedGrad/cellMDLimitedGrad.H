@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -141,7 +141,11 @@ inline void cellMDLimitedGrad<scalar>::limitFace
 {
     scalar extrapolate = dcf & g;
 
-    if (extrapolate > maxDelta)
+    if (mag(extrapolate) < SMALL)
+    {
+        // Limiter remains unchanged
+    }
+    else if (extrapolate > maxDelta)
     {
         g = g + dcf*(maxDelta - extrapolate)/magSqr(dcf);
     }
@@ -161,7 +165,7 @@ inline void cellMDLimitedGrad<Type>::limitFace
     const vector& dcf
 )
 {
-    for(direction cmpt=0; cmpt<Type::nComponents; cmpt++)
+    for (direction cmpt = 0; cmpt < Type::nComponents; cmpt++)
     {
         vector gi(g[cmpt], g[cmpt+3], g[cmpt+6]);
         cellMDLimitedGrad<scalar>::limitFace

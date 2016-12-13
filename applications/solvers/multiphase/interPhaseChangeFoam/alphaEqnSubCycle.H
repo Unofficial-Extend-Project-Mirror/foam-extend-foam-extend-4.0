@@ -13,12 +13,12 @@ surfaceScalarField rhoPhi
 {
     label nAlphaCorr
     (
-        readLabel(piso.lookup("nAlphaCorr"))
+        readLabel(pimple.dict().lookup("nAlphaCorr"))
     );
 
     label nAlphaSubCycles
     (
-        readLabel(piso.lookup("nAlphaSubCycles"))
+        readLabel(pimple.dict().lookup("nAlphaSubCycles"))
     );
 
     surfaceScalarField phic = mag(phi/mesh.magSf());
@@ -44,7 +44,7 @@ surfaceScalarField rhoPhi
 #       include "alphaEqn.H"
     }
 
-    if (nOuterCorr == 1)
+    if (pimple.nCorrPIMPLE() == 1)
     {
         interface.correct();
     }

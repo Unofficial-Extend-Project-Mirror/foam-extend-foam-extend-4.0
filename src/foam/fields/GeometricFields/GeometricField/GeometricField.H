@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -494,6 +494,14 @@ public:
         //- Relax field (for steady-state solution).
         //  alpha is read from controlDict
         void relax();
+
+        //- Select the final iteration parameters if 'final' is true
+        //  by returning the field name + "Final"
+        //  otherwise the standard parameters by returning the field name
+        word select(bool final) const;
+
+        //- Helper function to write the min and max to an Ostream
+        void writeMinMax(Ostream& os) const;
 
 
     // Member function *this operators

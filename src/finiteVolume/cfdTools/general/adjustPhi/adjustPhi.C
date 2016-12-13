@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -45,12 +45,12 @@ bool Foam::adjustPhi
 (
     surfaceScalarField& phi,
     const volVectorField& U,
-    volScalarField& p
+    const volScalarField& p
 )
 {
     if (p.needReference())
     {
-        p.boundaryField().updateCoeffs();
+        // Removed updateCoeffs.  HJ, 9/May/2016
 
         scalar massIn = 0.0;
         scalar fixedMassOut = 0.0;

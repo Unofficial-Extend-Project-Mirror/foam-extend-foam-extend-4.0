@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -32,6 +32,7 @@ Description
 #include "fvCFD.H"
 #include "immersedBoundaryFvPatch.H"
 #include "immersedBoundaryAdjustPhi.H"
+#include "simpleControl.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -43,16 +44,18 @@ int main(int argc, char *argv[])
 
 #   include "createTime.H"
 #   include "createMesh.H"
+
+    simpleControl simple(mesh);
+
 #   include "createIbMasks.H"
 #   include "createFields.H"
-#   include "readSIMPLEControls.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
     Info<< nl << "Calculating potential flow" << endl;
 
     // Do correctors over the complete set
-    for (int nonOrth=0; nonOrth<=nNonOrthCorr; nonOrth++)
+    while (simple.correctNonOrthogonal())
     {
         phi = faceIbMask*(linearInterpolate(U) & mesh.Sf());
 
@@ -86,7 +89,7 @@ int main(int argc, char *argv[])
         // Correct the flux
         phi -= pEqn.flux();
 
-        if (nonOrth != nNonOrthCorr)
+        if (!simple.finalNonOrthogonalIter())
         {
             p.relax();
         }

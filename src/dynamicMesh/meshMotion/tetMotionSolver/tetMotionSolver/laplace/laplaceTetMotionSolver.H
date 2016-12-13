@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -93,7 +93,7 @@ protected:
         }
 
         // Holds recent solver performance
-        lduMatrix::solverPerformance solverPerf_;
+        lduSolverPerformance solverPerf_;
 
 
 public:
@@ -125,7 +125,7 @@ public:
         virtual void updateMesh(const mapPolyMesh&);
 
         //- Return recent solver performance
-        const lduMatrix::solverPerformance& solverPerformance() const
+        const lduSolverPerformance& solverPerformance() const
         {
             return solverPerf_;
         }

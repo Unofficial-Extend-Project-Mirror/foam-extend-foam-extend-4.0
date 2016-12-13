@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -85,6 +85,8 @@ void topoMapper::storeGradients
 
         // Register field under a name that's unique
         word registerName("remapGradient(" + field.name() + ')');
+
+        // Note: potential issue with cached gradients.  HJ, 22/Apr/2016
 
         // Make a new entry
         if (mesh_.schemesDict().subDict("gradSchemes").found(gradName))

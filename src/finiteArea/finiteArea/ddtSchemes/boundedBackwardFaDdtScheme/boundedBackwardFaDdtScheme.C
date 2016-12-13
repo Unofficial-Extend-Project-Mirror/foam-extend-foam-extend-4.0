@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -819,7 +819,7 @@ boundedBackwardFaDdtScheme::facDdt0
 tmp<faScalarMatrix>
 boundedBackwardFaDdtScheme::famDdt
 (
-    areaScalarField& vf
+    const areaScalarField& vf
 )
 {
     tmp<faScalarMatrix> tfam
@@ -890,7 +890,7 @@ tmp<faScalarMatrix>
 boundedBackwardFaDdtScheme::famDdt
 (
     const dimensionedScalar& rho,
-    areaScalarField& vf
+    const areaScalarField& vf
 )
 {
     tmp<faScalarMatrix> tfam
@@ -960,7 +960,7 @@ tmp<faScalarMatrix>
 boundedBackwardFaDdtScheme::famDdt
 (
     const areaScalarField& rho,
-    areaScalarField& vf
+    const areaScalarField& vf
 )
 {
     tmp<faScalarMatrix> tfam

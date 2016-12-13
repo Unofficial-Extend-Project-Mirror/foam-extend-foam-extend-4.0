@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -232,11 +232,11 @@ void Foam::sixDOFqODE::aitkensRelaxation
     }
 
     // Bound the relaxation factor for stability
-    if(relaxFactorT_ > max)
+    if (relaxFactorT_ > max)
     {
         relaxFactorT_ = max;
     }
-    else if(relaxFactorT_ < min)
+    else if (relaxFactorT_ < min)
     {
         relaxFactorT_ = min;
     }
@@ -245,7 +245,11 @@ void Foam::sixDOFqODE::aitkensRelaxation
     const scalar saveOldRelFacR = oldRelaxFactorR_;
     oldRelaxFactorR_ = relaxFactorR_;
 
-    if(magSqr(OmegaDot_[0] - OmegaDotn_[1] - OmegaDot_[1] - OmegaDotn_[2]) > SMALL)
+    if
+    (
+        magSqr(OmegaDot_[0] - OmegaDotn_[1] - OmegaDot_[1] - OmegaDotn_[2])
+      > SMALL
+    )
     {
         relaxFactorR_ =
         saveOldRelFacR + (saveOldRelFacR - 1)*
@@ -614,26 +618,21 @@ void Foam::sixDOFqODE::relaxAcceleration
         OmegaDotn_[2] = (inv(momentOfInertia_) & moment()).value();
     }
 
-    const dimensionedVector Aold
-    (
-        "",
-        dimensionSet(0, 1, -2, 0, 0, 0, 0),
-        A_[2]
-    );
+    const vector Aold = A_[2];
 
-    const dimensionedVector OmegaDotold
-    (
-        "",
-        dimensionSet(0, 0, -2, 0, 0, 0, 0),
-        OmegaDot_[2]
-    );
+    const vector OmegaDotold = OmegaDot_[2];
 
-    force() =
-        Aold*mass_ + relaxFactorT_*(force() - Aold*mass_);
+    force().value() =
+        Aold*mass_.value()
+      + relaxFactorT_*(force().value() - Aold*mass_.value());
 
-    moment() =
-        (momentOfInertia_ & OmegaDotold)
-      + relaxFactorR_*(moment() - (momentOfInertia_ & OmegaDotold));
+    moment().value() =
+        (momentOfInertia_.value() & OmegaDotold)
+      + relaxFactorR_*
+        (
+            moment().value()
+          - (momentOfInertia_.value() & OmegaDotold)
+        );
 
     // Update relaxed old accelerations
     A_[0] = A_[1];

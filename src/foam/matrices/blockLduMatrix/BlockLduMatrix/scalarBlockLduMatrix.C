@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -34,14 +34,14 @@ namespace Foam
 template<>
 void BlockLduMatrix<scalar>::sumDiag()
 {
-    scalarField& activeDiag = this->diag();
+    scalarField& activeDiag = diag();
 
     const unallocLabelList& l = lduAddr().lowerAddr();
     const unallocLabelList& u = lduAddr().upperAddr();
 
     if (symmetric())
     {
-        const scalarField& activeUpper = this->upper();
+        const scalarField& activeUpper = upper();
 
         for (register label coeffI = 0; coeffI < l.size(); coeffI++)
         {
@@ -51,8 +51,8 @@ void BlockLduMatrix<scalar>::sumDiag()
     }
     else if (asymmetric())
     {
-        const scalarField& activeLower = this->lower();
-        const scalarField& activeUpper = this->upper();
+        const scalarField& activeLower = lower();
+        const scalarField& activeUpper = upper();
 
         for (register label coeffI = 0; coeffI < l.size(); coeffI++)
         {
@@ -72,14 +72,14 @@ void BlockLduMatrix<scalar>::sumDiag()
 template<>
 void BlockLduMatrix<scalar>::negSumDiag()
 {
-    scalarField& activeDiag = this->diag();
+    scalarField& activeDiag = diag();
 
     const unallocLabelList& l = lduAddr().lowerAddr();
     const unallocLabelList& u = lduAddr().upperAddr();
 
     if (symmetric())
     {
-        const scalarField& activeUpper = this->upper();
+        const scalarField& activeUpper = upper();
 
         for (register label coeffI = 0; coeffI < l.size(); coeffI++)
         {
@@ -89,8 +89,8 @@ void BlockLduMatrix<scalar>::negSumDiag()
     }
     else if (asymmetric())
     {
-        const scalarField& activeLower = this->lower();
-        const scalarField& activeUpper = this->upper();
+        const scalarField& activeLower = lower();
+        const scalarField& activeUpper = upper();
 
         for (register label coeffI = 0; coeffI < l.size(); coeffI++)
         {
@@ -111,14 +111,14 @@ template<>
 void BlockLduMatrix<scalar>::check() const
 {
     // Copy the diagonal
-    scalarField activeDiagCopy = this->diag();
+    scalarField activeDiagCopy = diag();
 
     const unallocLabelList& l = lduAddr().lowerAddr();
     const unallocLabelList& u = lduAddr().upperAddr();
 
     if (symmetric())
     {
-        const scalarField& activeUpper = this->upper();
+        const scalarField& activeUpper = upper();
 
         for (register label coeffI = 0; coeffI < l.size(); coeffI++)
         {
@@ -130,13 +130,13 @@ void BlockLduMatrix<scalar>::check() const
             << "Symmetric matrix: raw matrix difference: "
             << sum(mag(activeDiagCopy))
             << " scaled: "
-            << sum(mag(activeDiagCopy))/sum(mag(this->diag()))
+            << sum(mag(activeDiagCopy))/sum(mag(diag()))
             << endl;
     }
     else if (asymmetric())
     {
-        const scalarField& activeLower = this->lower();
-        const scalarField& activeUpper = this->upper();
+        const scalarField& activeLower = lower();
+        const scalarField& activeUpper = upper();
 
         for (register label coeffI = 0; coeffI < l.size(); coeffI++)
         {
@@ -148,7 +148,7 @@ void BlockLduMatrix<scalar>::check() const
             << "Asymmetric matrix: raw matrix difference: "
             << sum(mag(activeDiagCopy))
             << " scaled: "
-            << sum(mag(activeDiagCopy))/sum(mag(this->diag()))
+            << sum(mag(activeDiagCopy))/sum(mag(diag()))
             << endl;
     }
     else
@@ -167,9 +167,9 @@ void BlockLduMatrix<scalar>::relax
     const scalar alpha
 )
 {
-    scalarField& activeDiag = this->diag();
+    scalarField& activeDiag = diag();
 
-    scalarField activeDiagOld = this->diag();
+    scalarField activeDiagOld = diag();
 
     const unallocLabelList& l = lduAddr().lowerAddr();
     const unallocLabelList& u = lduAddr().upperAddr();
@@ -178,7 +178,7 @@ void BlockLduMatrix<scalar>::relax
 
     if (symmetric())
     {
-        const scalarField& activeUpper = this->upper();
+        const scalarField& activeUpper = upper();
 
         for (register label coeffI = 0; coeffI < l.size(); coeffI++)
         {
@@ -188,8 +188,8 @@ void BlockLduMatrix<scalar>::relax
     }
     else if (asymmetric())
     {
-        const scalarField& activeLower = this->lower();
-        const scalarField& activeUpper = this->upper();
+        const scalarField& activeLower = lower();
+        const scalarField& activeUpper = upper();
 
         for (register label coeffI = 0; coeffI < l.size(); coeffI++)
         {

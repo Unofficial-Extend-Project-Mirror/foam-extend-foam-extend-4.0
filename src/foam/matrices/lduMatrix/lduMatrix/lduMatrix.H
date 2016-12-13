@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -42,7 +42,6 @@ SourceFiles
     lduMatrixOperations.C
     lduMatrixSolver.C
     lduMatrixPreconditioner.C
-    lduMatrixTests.C
     lduMatrixUpdateMatrixInterfaces.C
     lduMatrixBufferedUpdateMatrixInterfaces.C
 
@@ -60,6 +59,7 @@ SourceFiles
 #include "autoPtr.H"
 #include "runTimeSelectionTables.H"
 #include "profilingTrigger.H"
+#include "lduSolverPerformance.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -92,150 +92,6 @@ class lduMatrix
 
 
 public:
-
-    //- Class returned by the solver, containing performance statistics
-    class solverPerformance
-    {
-        // Private Data
-
-            //- Name of solver
-            word solverName_;
-
-            //- Name of field
-            word fieldName_;
-
-            //- Initial residual
-            scalar initialResidual_;
-
-            //- Final residual
-            scalar finalResidual_;
-
-            //- Number of iterations
-            label noIterations_;
-
-            //- Has the solver converged?
-            bool converged_;
-
-            //- Has the solver indicated a singular matrix?
-            bool singular_;
-
-
-    public:
-
-        // Constructors
-
-            //- Construct null
-            solverPerformance()
-            :
-                initialResidual_(0),
-                finalResidual_(0),
-                noIterations_(0),
-                converged_(false),
-                singular_(false)
-            {}
-
-
-            //- Construct from components
-            solverPerformance
-            (
-                const word& solverName,
-                const word& fieldName,
-                const scalar iRes = 0,
-                const scalar fRes = 0,
-                const label nIter = 0,
-                const bool converged = false,
-                const bool singular = false
-            )
-            :
-                solverName_(solverName),
-                fieldName_(fieldName),
-                initialResidual_(iRes),
-                finalResidual_(fRes),
-                noIterations_(nIter),
-                converged_(converged),
-                singular_(singular)
-            {}
-
-
-        // Member functions
-
-            //- Return solver name
-            const word& solverName() const
-            {
-                return solverName_;
-            }
-
-            //- Return access to solver name
-            word& solverName()
-            {
-                return solverName_;
-            }
-
-            //- Return initial residual
-            scalar initialResidual() const
-            {
-                return initialResidual_;
-            }
-
-            //- Return initial residual
-            scalar& initialResidual()
-            {
-                return initialResidual_;
-            }
-
-
-            //- Return final residual
-            scalar finalResidual() const
-            {
-                return finalResidual_;
-            }
-
-            //- Return final residual
-            scalar& finalResidual()
-            {
-                return finalResidual_;
-            }
-
-
-            //- Return number of iterations
-            label nIterations() const
-            {
-                return noIterations_;
-            }
-
-            //- Return number of iterations
-            label& nIterations()
-            {
-                return noIterations_;
-            }
-
-
-            //- Has the solver converged?
-            bool converged() const
-            {
-                return converged_;
-            }
-
-            //- Is the matrix singular?
-            bool singular() const
-            {
-                return singular_;
-            }
-
-            //- Convergence test
-            bool checkConvergence
-            (
-                const scalar tolerance,
-                const scalar relTolerance
-            );
-
-            //- Singularity test
-            bool checkSingularity(const scalar residual);
-
-            //- Print summary of solver performance
-            void print() const;
-    };
-
 
     //- Abstract base-class for lduMatrix solvers
     class solver
@@ -279,8 +135,9 @@ public:
             //  is responsible for keeping a copy
             const lduInterfaceFieldPtrsList& interfaces_;
 
-
+            //- Profiling trigger
             profilingTrigger profile_;
+
 
         // Protected Member Functions
 
@@ -291,10 +148,10 @@ public:
             }
 
             //- Is the stop criterion reached
-            bool stop(lduMatrix::solverPerformance& solverPerf) const;
+            bool stop(lduSolverPerformance& solverPerf) const;
 
             //- Is the converrgence criterion reached
-            bool converged(lduMatrix::solverPerformance& solverPerf) const;
+            bool converged(lduSolverPerformance& solverPerf) const;
 
             //- Read the control parameters from the dictionary
             virtual void readControls();
@@ -460,7 +317,7 @@ public:
             //- Read and reset the solver parameters from the given stream
             virtual void read(const dictionary&);
 
-            virtual solverPerformance solve
+            virtual lduSolverPerformance solve
             (
                 scalarField& x,
                 const scalarField& b,
@@ -1017,7 +874,6 @@ public:
 
 // Helper typedefs
 typedef lduMatrix::solver lduSolver;
-typedef lduMatrix::solverPerformance lduSolverPerformance;
 typedef lduMatrix::preconditioner lduPreconditioner;
 typedef lduMatrix::smoother lduSmoother;
 

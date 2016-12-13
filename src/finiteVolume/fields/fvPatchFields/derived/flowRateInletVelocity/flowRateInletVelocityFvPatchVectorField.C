@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     3.2
+   \\    /   O peration     | Version:     4.0
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -117,14 +117,14 @@ void Foam::flowRateInletVelocityFvPatchVectorField::updateCoeffs()
         return;
     }
 
-    if (patch().boundaryMesh().mesh().moving())
-    {
-        WarningIn
-        (
-            "void flowRateInletVelocityFvPatchVectorField::updateCoeffs()"
-        )   << "Patch area not correctly updated on mesh motion"
-            << endl;
-    }
+//     if (patch().boundaryMesh().mesh().moving())
+//     {
+//         WarningIn
+//         (
+//             "void flowRateInletVelocityFvPatchVectorField::updateCoeffs()"
+//         )   << "Patch area not correctly updated on mesh motion"
+//             << endl;
+//     }
 
     // A simpler way of doing this would be nice
     scalar avgU = -flowRate_/(gSumArea_ + SMALL);

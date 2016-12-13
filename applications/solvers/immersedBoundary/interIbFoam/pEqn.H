@@ -1,25 +1,17 @@
 {
-    if (nOuterCorr != 1)
-    {
-        pd.storePrevIter();
-    }
-
     volScalarField rUA = 1.0/UEqn.A();
     surfaceScalarField rUAf = fvc::interpolate(rUA);
 
     U = rUA*UEqn.H();
     // Immersed boundary update
     U.correctBoundaryConditions();
+#   include "limitU.H"
 
     surfaceScalarField phiU
     (
         "phiU",
         faceIbMask*(fvc::interpolate(U) & mesh.Sf())
     );
-
-    // Adjust immersed boundary fluxes
-    immersedBoundaryAdjustPhi(phiU, U);
-    adjustPhi(phiU, U, pd);
 
     phi = phiU
       + faceIbMask*
@@ -28,36 +20,33 @@
           - ghf*fvc::snGrad(rho)
         )*rUAf*mesh.magSf();
 
+    // Adjust immersed boundary fluxes
+    immersedBoundaryAdjustPhi(phi, U);
+    adjustPhi(phi, U, pd);
 
-    for(int nonOrth = 0; nonOrth <= nNonOrthCorr; nonOrth++)
+
+    while (pimple.correctNonOrthogonal())
     {
         fvScalarMatrix pdEqn
         (
-            fvm::laplacian(rUAf, pd) == fvc::div(phi)
+            fvm::laplacian(rUAf, pd, "laplacian(rAU,pd)") == fvc::div(phi)
         );
 
         pdEqn.setReference(pdRefCell, pdRefValue);
 
-        if (corr == nCorr - 1 && nonOrth == nNonOrthCorr)
-        {
-            pdEqn.solve(mesh.solutionDict().solver(pd.name() + "Final"));
-        }
-        else
-        {
-            pdEqn.solve(mesh.solutionDict().solver(pd.name()));
-        }
+        pdEqn.solve
+        (
+            mesh.solutionDict().solver(pd.select(pimple.finalInnerIter()))
+        );
 
-        if (nonOrth == nNonOrthCorr)
+        if (pimple.finalNonOrthogonalIter())
         {
             phi -= pdEqn.flux();
         }
     }
 
-    // Explicitly relax pressure except for last corrector
-    if (oCorr != nOuterCorr - 1)
-    {
-        pd.relax();
-    }
+    // Explicitly relax pressure
+    pd.relax();
 
     U += rUA*fvc::reconstruct((phi - phiU)/rUAf);
     U.correctBoundaryConditions();
