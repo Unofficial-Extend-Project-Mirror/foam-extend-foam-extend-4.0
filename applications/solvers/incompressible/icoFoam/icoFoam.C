@@ -60,6 +60,9 @@ int main(int argc, char *argv[])
 
 #       include "CourantNo.H"
 
+        // Time-derivative matrix
+        fvVectorMatrix ddtUEqn(fvm::ddt(U));
+
         // Convection-diffusion matrix
         fvVectorMatrix HUEqn
         (
@@ -69,7 +72,7 @@ int main(int argc, char *argv[])
 
         if (piso.momentumPredictor())
         {
-            solve(fvm::ddt(U) + HUEqn == -fvc::grad(p));
+            solve(ddtUEqn + HUEqn == -fvc::grad(p));
         }
 
         // Prepare clean 1/a_p without time derivative contribution
@@ -81,9 +84,9 @@ int main(int argc, char *argv[])
         {
             // Calculate U from convection-diffusion matrix
             U = rAU*HUEqn.H();
-            
-            // Consistently calculate flux and face velocity
-            phi = piso.timeConsistentFlux(U, rAU);
+
+            // Consistently calculate flux
+            piso.calculateTimeConsistentFlux(phi, U, rAU);
 
             adjustPhi(phi, U, p);
 
@@ -91,7 +94,14 @@ int main(int argc, char *argv[])
             {
                 fvScalarMatrix pEqn
                 (
-                    fvm::laplacian(rAU, p) == fvc::div(phi)
+                    fvm::laplacian
+                    (
+                        rAU/fvc::interpolate(piso.aCoeff()),
+                        p,
+                        "laplacian(rAU," + p.name() + ')'
+                    )
+                 ==
+                    fvc::div(phi)
                 );
 
                 pEqn.setReference(pRefCell, pRefValue);
@@ -109,8 +119,7 @@ int main(int argc, char *argv[])
 #           include "continuityErrs.H"
 
             // Consistently reconstruct velocity after pressure equation
-            U = piso.timeConsistentVelocity(U, rAU, p);
-            U.correctBoundaryConditions();
+            piso.reconstructVelocity(U, ddtUEqn, rAU, p, phi);
         }
 
         runTime.write();

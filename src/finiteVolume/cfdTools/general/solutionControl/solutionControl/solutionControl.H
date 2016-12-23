@@ -25,7 +25,9 @@ Class
     Foam::solutionControl
 
 Description
-    Base class for solution control classes
+    Base class for solution control classes.
+    The class also provides additional member functions for calculation
+    of time and under-relaxation consistent flux and velocity.
 
 \*---------------------------------------------------------------------------*/
 
@@ -145,6 +147,19 @@ protected:
 
 private:
 
+    // Private data
+
+        // Fields necessary for time and under-relaxation consistency
+
+            //- A coeff (A^~) arising from consistency formulation
+            volScalarField* aCoeffPtr_;
+
+            //- Face velocity needed for consistent formulation
+            surfaceVectorField* faceUPtr_;
+
+
+    // Private member functions
+
         //- Disallow default bitwise copy construct
         solutionControl(const solutionControl&);
 
@@ -202,6 +217,38 @@ public:
             //- Flag to indicate to relax pressure using the
             //  "consistent" approach of SIMPLEC
             inline bool consistent() const;
+
+
+        // Time and under-relaxation consistency. Note: these functions could be
+        // made virtual and specific to SIMPLE, PISO and PIMPLE, but we will
+        // make them general in sense they account for arbitrary ddt scheme
+        // and arbitrary under-relaxation (e.g. if someone runs SIMPLE in
+        // transient mode or PISO with under-relaxation)
+
+            //- Calculate and return time consistent flux (before pressure
+            //  equation). At point of call, U = H/A where H and A come from
+            //  convection-diffusion equation only.
+            void calculateTimeConsistentFlux
+            (
+                surfaceScalarField& phi,
+                const volVectorField& U,
+                const volScalarField& rAU
+            );
+
+            //- Reconstruct velocity (after pressure equation). At point of
+            //  call, U = H/A where H and A come from convection-diffusion
+            //  equation only
+            void reconstructVelocity
+            (
+                volVectorField& U,
+                const fvVectorMatrix& ddtUEqn,
+                const volScalarField& rAU,
+                const volScalarField& p,
+                const surfaceScalarField& phi
+            );
+
+            //- Const access to aCoeff (needed for pressure equation)
+            const volScalarField& aCoeff() const;
 
 
         // Evolution
