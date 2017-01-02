@@ -665,7 +665,7 @@ SLTSDdtScheme<Type>::fvcDdtConsistentPhiCorr
     const surfaceScalarField& rAUf
 ) const
 {
-    return (mesh().Sf() & faceU.oldTime())/rAUf*fvc::interpolate(SLrDeltaT());
+    return (mesh().Sf() & faceU.oldTime())*rAUf*fvc::interpolate(SLrDeltaT());
 }
 
 

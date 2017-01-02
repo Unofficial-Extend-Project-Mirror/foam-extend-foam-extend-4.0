@@ -175,16 +175,17 @@ const Foam::dimensionedScalar Foam::pimpleControl::relaxFactor
     const Foam::volVectorField& U
 ) const
 {
-    return
-        dimensionedScalar
-        (
-            "alphaU",
-            dimless,
-            mesh_.solutionDict().equationRelaxationFactor
+    scalar urf = 1;
+
+    if (mesh_.solutionDict().relaxEquation(U.select(finalIter())))
+    {
+        urf = mesh_.solutionDict().equationRelaxationFactor
             (
                 U.select(finalIter())
-            )
-        );
+            );
+    }
+
+    return dimensionedScalar("alphaU", dimless, urf);
 }
 
 

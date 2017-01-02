@@ -522,7 +522,7 @@ EulerDdtScheme<Type>::fvcDdtConsistentPhiCorr
     const surfaceScalarField& rAUf
 ) const
 {
-    return (mesh().Sf() & faceU.oldTime())/rAUf/mesh().time().deltaT();
+    return (mesh().Sf() & faceU.oldTime())*rAUf/mesh().time().deltaT();
 }
 
 

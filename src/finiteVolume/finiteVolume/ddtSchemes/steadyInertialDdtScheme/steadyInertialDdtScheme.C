@@ -666,7 +666,7 @@ steadyInertialDdtScheme<Type>::fvcDdtConsistentPhiCorr
     const surfaceScalarField& rAUf
 ) const
 {
-    return (mesh().Sf() & faceU.oldTime())/rAUf*CofrDeltaT();
+    return (mesh().Sf() & faceU.oldTime())*rAUf*CofrDeltaT();
 }
 
 

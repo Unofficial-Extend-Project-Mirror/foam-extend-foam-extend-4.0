@@ -732,8 +732,8 @@ backwardDdtScheme<Type>::fvcDdtConsistentPhiCorr
 
     const scalar rDeltaT = 1.0/deltaT;
 
-    const dimensionedScalar beta("beta", dimTime, coefft0*rDeltaT);
-    const dimensionedScalar gamma("gamma", dimTime, -coefft00*rDeltaT);
+    const dimensionedScalar beta("beta", dimless/dimTime, coefft0*rDeltaT);
+    const dimensionedScalar gamma("gamma", dimless/dimTime, -coefft00*rDeltaT);
 
     return
         rAUf*

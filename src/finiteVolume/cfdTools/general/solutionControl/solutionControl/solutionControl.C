@@ -222,6 +222,22 @@ Foam::scalar Foam::solutionControl::maxResidual
 }
 
 
+const Foam::dimensionedScalar Foam::solutionControl::relaxFactor
+(
+    const Foam::volVectorField& U
+) const
+{
+    scalar urf = 1;
+
+    if (mesh_.solutionDict().relaxEquation(U.name()))
+    {
+        urf = mesh_.solutionDict().equationRelaxationFactor(U.name());
+    }
+
+    return dimensionedScalar("alphaU", dimless, urf);
+}
+
+
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 Foam::solutionControl::solutionControl(fvMesh& mesh, const word& algorithmName)
@@ -330,6 +346,9 @@ void Foam::solutionControl::calcTimeConsistentFlux
 
     // Interpolate original rAU on the faces
     const surfaceScalarField rAUf = fvc::interpolate(rAU);
+
+    // Store previous iteration for the correct handling of under-relaxation
+    phi.storePrevIter();
 
     // Calculate the ordinary part of the flux (H/A)
     phi = (faceU & mesh_.Sf());
@@ -468,21 +487,6 @@ const Foam::volScalarField& Foam::solutionControl::aCoeff() const
     }
 
     return *aCoeffPtr_;
-}
-
-
-const Foam::dimensionedScalar Foam::solutionControl::relaxFactor
-(
-    const Foam::volVectorField& U
-) const
-{
-    return
-        dimensionedScalar
-        (
-            "alphaU",
-            dimless,
-            mesh_.solutionDict().equationRelaxationFactor(U.name())
-        );
 }
 
 

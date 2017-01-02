@@ -145,6 +145,17 @@ protected:
         ) const;
 
 
+        // Time and under-relaxation consistency
+
+            //- Get relaxation factor for velocity field. Overriden in
+            //  pimpleControl since different relaxation factor may be used for
+            //  final iteration.
+            virtual const dimensionedScalar relaxFactor
+            (
+                const volVectorField& U
+            ) const;
+
+
 private:
 
     // Private data
@@ -250,14 +261,6 @@ public:
 
             //- Const access to aCoeff (needed for pressure equation)
             const volScalarField& aCoeff() const;
-
-            //- Get relaxation factor for velocity field. Overriden in
-            //  pimpleControl since different relaxation factor may be used for
-            //  final iteration.
-            virtual const dimensionedScalar relaxFactor
-            (
-                const volVectorField& U
-            ) const;
 
 
         // Evolution

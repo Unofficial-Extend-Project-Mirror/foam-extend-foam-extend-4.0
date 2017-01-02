@@ -91,6 +91,15 @@ protected:
         virtual bool criteriaSatisfied();
 
 
+        // Time and under-relaxation consistency
+
+            //- Get relaxation factor for velocity field
+            virtual const dimensionedScalar relaxFactor
+            (
+                const volVectorField& U
+            ) const;
+
+
 public:
 
     // Static Data Members
@@ -121,15 +130,6 @@ public:
 
             //- Current PISO corrector index
             inline label corrPISO() const;
-
-
-        // Time and under-relaxation consistency
-
-            //- Get relaxation factor for velocity field
-            virtual const dimensionedScalar relaxFactor
-            (
-                const volVectorField& U
-            ) const;
 
 
         // Solution control
