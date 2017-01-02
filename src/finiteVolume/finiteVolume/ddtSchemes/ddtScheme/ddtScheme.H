@@ -222,6 +222,15 @@ public:
         ) = 0;
 
 
+        // Member functions for the new time consistent formulation
+        virtual tmp<fluxFieldType> fvcDdtConsistentPhiCorr
+        (
+            const GeometricField<Type, fvsPatchField, surfaceMesh>& faceU,
+            const GeometricField<Type, fvPatchField, volMesh>& U,
+            const surfaceScalarField& rAUf
+        ) const = 0;
+
+
         virtual tmp<surfaceScalarField> meshPhi
         (
             const GeometricField<Type, fvPatchField, volMesh>&
@@ -282,8 +291,19 @@ tmp<surfaceScalarField> SS<scalar>::fvcDdtPhiCorr                              \
 {                                                                              \
     notImplemented(#SS"<scalar>::fvcDdtPhiCorr");                              \
     return surfaceScalarField::null();                                         \
+}                                                                              \
+                                                                               \
+template<>                                                                     \
+tmp<surfaceScalarField> SS<scalar>::fvcDdtConsistentPhiCorr                    \
+(                                                                              \
+    const surfaceScalarField& faceU,                                           \
+    const volScalarField& U,                                                   \
+    const surfaceScalarField& rAUf                                             \
+) const                                                                        \
+{                                                                              \
+    notImplemented(#SS"<scalar>::fvcDdtConsistentPhiCorr");                    \
+    return surfaceScalarField::null();                                         \
 }
-
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

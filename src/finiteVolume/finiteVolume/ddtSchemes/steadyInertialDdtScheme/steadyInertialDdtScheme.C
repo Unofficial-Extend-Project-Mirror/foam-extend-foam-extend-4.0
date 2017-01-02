@@ -658,6 +658,19 @@ steadyInertialDdtScheme<Type>::fvcDdtPhiCorr
 
 
 template<class Type>
+tmp<typename steadyInertialDdtScheme<Type>::fluxFieldType>
+steadyInertialDdtScheme<Type>::fvcDdtConsistentPhiCorr
+(
+    const GeometricField<Type, fvsPatchField, surfaceMesh>& faceU,
+    const GeometricField<Type, fvPatchField, volMesh>& U,
+    const surfaceScalarField& rAUf
+) const
+{
+    return (mesh().Sf() & faceU.oldTime())/rAUf*CofrDeltaT();
+}
+
+
+template<class Type>
 tmp<surfaceScalarField> steadyInertialDdtScheme<Type>::meshPhi
 (
     const GeometricField<Type, fvPatchField, volMesh>&

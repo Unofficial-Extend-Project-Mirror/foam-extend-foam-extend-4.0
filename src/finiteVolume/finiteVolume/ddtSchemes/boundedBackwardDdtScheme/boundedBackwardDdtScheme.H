@@ -171,6 +171,16 @@ public:
             const surfaceScalarField& phi
         );
 
+
+        // Member functions for the new time consistent formulation
+        tmp<surfaceScalarField> fvcDdtConsistentPhiCorr
+        (
+            const surfaceScalarField& faceU,
+            const volScalarField& U,
+            const surfaceScalarField& rAUf
+        ) const;
+
+
         tmp<surfaceScalarField> meshPhi
         (
             const volScalarField&

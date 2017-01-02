@@ -152,10 +152,10 @@ private:
         // Fields necessary for time and under-relaxation consistency
 
             //- A coeff (A^~) arising from consistency formulation
-            volScalarField* aCoeffPtr_;
+            mutable volScalarField* aCoeffPtr_;
 
             //- Face velocity needed for consistent formulation
-            surfaceVectorField* faceUPtr_;
+            mutable surfaceVectorField* faceUPtr_;
 
 
     // Private member functions
@@ -228,12 +228,13 @@ public:
             //- Calculate and return time consistent flux (before pressure
             //  equation). At point of call, U = H/A where H and A come from
             //  convection-diffusion equation only.
-            void calculateTimeConsistentFlux
+            void calcTimeConsistentFlux
             (
                 surfaceScalarField& phi,
                 const volVectorField& U,
-                const volScalarField& rAU
-            );
+                const volScalarField& rAU,
+                const fvVectorMatrix& ddtUEqn
+            ) const;
 
             //- Reconstruct velocity (after pressure equation). At point of
             //  call, U = H/A where H and A come from convection-diffusion
@@ -245,10 +246,18 @@ public:
                 const volScalarField& rAU,
                 const volScalarField& p,
                 const surfaceScalarField& phi
-            );
+            ) const;
 
             //- Const access to aCoeff (needed for pressure equation)
             const volScalarField& aCoeff() const;
+
+            //- Get relaxation factor for velocity field. Overriden in
+            //  pimpleControl since different relaxation factor may be used for
+            //  final iteration.
+            virtual const dimensionedScalar relaxFactor
+            (
+                const volVectorField& U
+            ) const;
 
 
         // Evolution

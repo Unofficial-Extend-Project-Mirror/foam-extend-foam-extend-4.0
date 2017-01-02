@@ -86,7 +86,7 @@ int main(int argc, char *argv[])
             U = rAU*HUEqn.H();
 
             // Consistently calculate flux
-            piso.calculateTimeConsistentFlux(phi, U, rAU);
+            piso.calcTimeConsistentFlux(phi, U, rAU, ddtUEqn);
 
             adjustPhi(phi, U, p);
 
@@ -96,7 +96,7 @@ int main(int argc, char *argv[])
                 (
                     fvm::laplacian
                     (
-                        rAU/fvc::interpolate(piso.aCoeff()),
+                        rAU/piso.aCoeff(),
                         p,
                         "laplacian(rAU," + p.name() + ')'
                     )

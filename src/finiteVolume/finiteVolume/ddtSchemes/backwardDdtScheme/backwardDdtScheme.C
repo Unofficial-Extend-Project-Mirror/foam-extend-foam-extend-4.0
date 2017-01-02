@@ -715,6 +715,39 @@ backwardDdtScheme<Type>::fvcDdtPhiCorr
 
 
 template<class Type>
+tmp<typename backwardDdtScheme<Type>::fluxFieldType>
+backwardDdtScheme<Type>::fvcDdtConsistentPhiCorr
+(
+    const GeometricField<Type, fvsPatchField, surfaceMesh>& faceU,
+    const GeometricField<Type, fvPatchField, volMesh>& U,
+    const surfaceScalarField& rAUf
+) const
+{
+    const scalar deltaT = deltaT_();
+    const scalar deltaT0 = deltaT0_(U);
+
+    const scalar coefft   = 1 + deltaT/(deltaT + deltaT0);
+    const scalar coefft00 = deltaT*deltaT/(deltaT0*(deltaT + deltaT0));
+    const scalar coefft0  = coefft + coefft00;
+
+    const scalar rDeltaT = 1.0/deltaT;
+
+    const dimensionedScalar beta("beta", dimTime, coefft0*rDeltaT);
+    const dimensionedScalar gamma("gamma", dimTime, -coefft00*rDeltaT);
+
+    return
+        rAUf*
+        (
+            mesh().Sf()
+          & (
+                beta*faceU.oldTime()
+              + gamma*faceU.oldTime().oldTime()
+            )
+        );
+}
+
+
+template<class Type>
 tmp<surfaceScalarField> backwardDdtScheme<Type>::meshPhi
 (
     const GeometricField<Type, fvPatchField, volMesh>& vf

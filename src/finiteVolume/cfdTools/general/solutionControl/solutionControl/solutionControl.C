@@ -26,6 +26,9 @@ License
 #include "solutionControl.H"
 #include "lduMatrix.H"
 #include "demandDrivenData.H"
+#include "fvc.H"
+#include "slipFvPatchFields.H"
+#include "symmetryFvPatchFields.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
@@ -258,8 +261,9 @@ void Foam::solutionControl::calcTimeConsistentFlux
 (
     surfaceScalarField& phi,
     const volVectorField& U,
-    const volScalarField& rAU
-)
+    const volScalarField& rAU,
+    const fvVectorMatrix& ddtUEqn
+) const
 {
     // Store necessary fields for time consistency if they are not present
     if (!aCoeffPtr_ && !faceUPtr_)
@@ -289,7 +293,7 @@ void Foam::solutionControl::calcTimeConsistentFlux
                 IOobject::NO_WRITE
             ),
             mesh_,
-            dimensionedScalar("zero", dimVelocity, 0.0)
+            dimensionedVector("zero", dimVelocity, vector::zero)
         );
     }
     else if (!aCoeffPtr_ || !faceUPtr_)
@@ -314,7 +318,7 @@ void Foam::solutionControl::calcTimeConsistentFlux
     // 1. Update flux and aCoeff due to ddt discretisation
     // 2. Update flux and aCoeff due to under-relaxation
     // 3. Scale the flux with aCoeff, making sure that flux at fixed boundaries
-    //    remains is consistent
+    //    remains consistent
 
     // Get fields that will be updated
     volScalarField& aCoeff = *aCoeffPtr_;
@@ -333,23 +337,15 @@ void Foam::solutionControl::calcTimeConsistentFlux
     // STAGE 1: consistent ddt discretisation handling
 
     // Add consistent flux contribution due to ddt discretisation
-    phi += fvc::ddtConsistentPhiCorr(U, rAUf, faceU);
+    phi += fvc::ddtConsistentPhiCorr(faceU, U, rAUf);
 
-    // Reset aCoeff according to ddt discretisation
-    aCoeff = fvc::ddtRAUCorr(U, rAU); // Note: returns 1 + ddt(U).A()*rAU
+    // Calculate aCoeff according to ddt discretisation
+    aCoeff = 1.0 + ddtUEqn.A()*rAU;
 
     // STAGE 2: consistent under-relaxation handling
 
     // Get under-relaxation factor used in this iteration
-    const dimensionedScalar alphaU
-    (
-        "alphaU",
-        dimless,
-        mesh_.solutionDict().equationRelaxationFactor
-        (
-            U.select(this->finalIter())
-        )
-    );
+    const dimensionedScalar alphaU = this->relaxFactor(U);
 
     // Helper variable
     const dimensionedScalar urfCoeff = (1.0 - alphaU)/alphaU;
@@ -373,7 +369,7 @@ void Foam::solutionControl::calcTimeConsistentFlux
     // Scale the flux
     phi /= fvc::interpolate(aCoeff);
 
-    // Get necessary data
+    // Get necessary data at the boundaries
     const volVectorField::GeometricBoundaryField& Ub = U.boundaryField();
     const surfaceVectorField::GeometricBoundaryField& Sb =
         mesh_.Sf().boundaryField();
@@ -391,13 +387,13 @@ void Foam::solutionControl::calcTimeConsistentFlux
         if (Ub[patchI].fixesValue())
         {
             // This is fixed value patch, flux needs to be recalculated
-            // respecting the boundary condition
+            // with respect to the boundary condition
             phib[patchI] == (Ub[patchI] & Sb[patchI]);
         }
         else if
         (
             isA<slipFvPatchVectorField>(Ub[patchI])
-         || isA<symmetryFvPatchVectorField>(Ub[patchI]])
+         || isA<symmetryFvPatchVectorField>(Ub[patchI])
         )
         {
             // This is slip or symmetry, flux needs to be zero
@@ -414,7 +410,7 @@ void Foam::solutionControl::reconstructVelocity
     const volScalarField& rAU,
     const volScalarField& p,
     const surfaceScalarField& phi
-)
+) const
 {
     // Reconstruct the velocity using all the components from original equation
     U = 1.0/(1.0/rAU + ddtUEqn.A())*
@@ -438,7 +434,6 @@ void Foam::solutionControl::reconstructVelocity
             "\n) const"
         )   << "faceUPtr_ not calculated. Make sure you have called"
             << " calculateTimeConsistentFlux(...) before calling this function."
-            << endl;
             << exit(FatalError);
     }
     surfaceVectorField& faceU = *faceUPtr_;
@@ -469,11 +464,25 @@ const Foam::volScalarField& Foam::solutionControl::aCoeff() const
             "const volScalarField& solutionControl::aCoeff() const"
         )   << "aCoeffPtr_ not calculated. Make sure you have called"
             << " calculateTimeConsistentFlux(...) before calling aCoeff()."
-            << endl;
             << exit(FatalError);
     }
 
     return *aCoeffPtr_;
+}
+
+
+const Foam::dimensionedScalar Foam::solutionControl::relaxFactor
+(
+    const Foam::volVectorField& U
+) const
+{
+    return
+        dimensionedScalar
+        (
+            "alphaU",
+            dimless,
+            mesh_.solutionDict().equationRelaxationFactor(U.name())
+        );
 }
 
 

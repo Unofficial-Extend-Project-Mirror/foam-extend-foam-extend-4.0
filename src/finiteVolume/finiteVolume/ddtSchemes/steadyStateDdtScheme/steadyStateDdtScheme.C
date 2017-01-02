@@ -331,6 +331,38 @@ steadyStateDdtScheme<Type>::fvcDdtPhiCorr
 
 
 template<class Type>
+tmp<typename steadyStateDdtScheme<Type>::fluxFieldType>
+steadyStateDdtScheme<Type>::fvcDdtConsistentPhiCorr
+(
+    const GeometricField<Type, fvsPatchField, surfaceMesh>& faceU,
+    const GeometricField<Type, fvPatchField, volMesh>& U,
+    const surfaceScalarField& rAUf
+) const
+{
+    return tmp<fluxFieldType>
+    (
+        new fluxFieldType
+        (
+            IOobject
+            (
+                "ddtConsistentPhiCorr("
+              + faceU.name() + "," + rAUf.name() + ')',
+                mesh().time().timeName(),
+                mesh()
+            ),
+            mesh(),
+            dimensioned<typename flux<Type>::type>
+            (
+                "zero",
+                faceU.dimensions()*dimArea/rAUf.dimensions()/dimTime,
+                pTraits<typename flux<Type>::type>::zero
+            )
+        )
+    );
+}
+
+
+template<class Type>
 tmp<surfaceScalarField> steadyStateDdtScheme<Type>::meshPhi
 (
     const GeometricField<Type, fvPatchField, volMesh>& vf

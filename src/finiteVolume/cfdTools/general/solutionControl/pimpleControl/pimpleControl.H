@@ -123,6 +123,15 @@ public:
             inline label corrPISO() const;
 
 
+        // Time and under-relaxation consistency
+
+            //- Get relaxation factor for velocity field
+            virtual const dimensionedScalar relaxFactor
+            (
+                const volVectorField& U
+            ) const;
+
+
         // Solution control
 
             //- PIMPLE loop

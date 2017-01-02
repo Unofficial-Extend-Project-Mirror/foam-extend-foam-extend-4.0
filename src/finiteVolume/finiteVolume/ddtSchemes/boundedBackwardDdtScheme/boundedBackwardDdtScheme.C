@@ -659,6 +659,22 @@ tmp<surfaceScalarField> boundedBackwardDdtScheme::fvcDdtPhiCorr
 }
 
 
+tmp<surfaceScalarField> boundedBackwardDdtScheme::fvcDdtConsistentPhiCorr
+(
+    const surfaceScalarField& faceU,
+    const volScalarField& U,
+    const surfaceScalarField& rAUf
+) const
+{
+    notImplemented
+    (
+        "boundedBackwardDdtScheme::fvcDdtConsistentPhiCorr"
+    );
+
+    return surfaceScalarField::null();
+}
+
+
 tmp<surfaceScalarField> boundedBackwardDdtScheme::meshPhi
 (
     const volScalarField& vf

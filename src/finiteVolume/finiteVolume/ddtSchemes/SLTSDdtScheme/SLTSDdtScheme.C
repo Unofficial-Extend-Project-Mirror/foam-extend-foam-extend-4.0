@@ -657,6 +657,19 @@ SLTSDdtScheme<Type>::fvcDdtPhiCorr
 
 
 template<class Type>
+tmp<typename SLTSDdtScheme<Type>::fluxFieldType>
+SLTSDdtScheme<Type>::fvcDdtConsistentPhiCorr
+(
+    const GeometricField<Type, fvsPatchField, surfaceMesh>& faceU,
+    const GeometricField<Type, fvPatchField, volMesh>& U,
+    const surfaceScalarField& rAUf
+) const
+{
+    return (mesh().Sf() & faceU.oldTime())/rAUf*fvc::interpolate(SLrDeltaT());
+}
+
+
+template<class Type>
 tmp<surfaceScalarField> SLTSDdtScheme<Type>::meshPhi
 (
     const GeometricField<Type, fvPatchField, volMesh>&

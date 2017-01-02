@@ -122,6 +122,25 @@ namespace fvc
             surfaceMesh
         >& phi
     );
+
+
+    // Functions for the new time consistent formulation
+    template<class Type>
+    tmp
+    <
+        GeometricField
+        <
+            typename Foam::flux<Type>::type,
+            fvsPatchField,
+            surfaceMesh
+        >
+    >
+    ddtConsistentPhiCorr
+    (
+        const GeometricField<Type, fvsPatchField, surfaceMesh>& faceU,
+        const GeometricField<Type, fvPatchField, volMesh>& U,
+        const surfaceScalarField& rAUf
+    );
 }
 
 
