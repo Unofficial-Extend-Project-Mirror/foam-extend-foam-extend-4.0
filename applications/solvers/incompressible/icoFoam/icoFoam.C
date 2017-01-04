@@ -86,7 +86,7 @@ int main(int argc, char *argv[])
             U = rAU*HUEqn.H();
 
             // Consistently calculate flux
-            piso.calcTimeConsistentFlux(phi, U, rAU, ddtUEqn);
+            piso.calcTransientConsistentFlux(phi, U, rAU, ddtUEqn);
 
             adjustPhi(phi, U, p);
 
@@ -96,7 +96,7 @@ int main(int argc, char *argv[])
                 (
                     fvm::laplacian
                     (
-                        rAU/piso.aCoeff(),
+                        fvc::interpolate(rAU)/piso.aCoeff(),
                         p,
                         "laplacian(rAU," + p.name() + ')'
                     )
@@ -119,7 +119,7 @@ int main(int argc, char *argv[])
 #           include "continuityErrs.H"
 
             // Consistently reconstruct velocity after pressure equation
-            piso.reconstructVelocity(U, ddtUEqn, rAU, p, phi);
+            piso.reconstructTransientVelocity(U, ddtUEqn, rAU, p, phi);
         }
 
         runTime.write();

@@ -238,6 +238,93 @@ const Foam::dimensionedScalar Foam::solutionControl::relaxFactor
 }
 
 
+void Foam::solutionControl::addDdtFluxContribution
+(
+    surfaceScalarField& phi,
+    surfaceScalarField& aCoeff,
+    const surfaceVectorField& faceU,
+    const volVectorField& U,
+    const surfaceScalarField& rAUf,
+    const fvVectorMatrix& ddtUEqn
+) const
+{
+    // Add ddt scheme dependent flux contribution. Here: phi = H/A & Sf.
+    phi += fvc::ddtConsistentPhiCorr(faceU, U, rAUf);
+
+    // Add ddt scheme dependent contribution to diffusion scale coeff. Here:
+    // aCoeff = 1.
+    aCoeff += fvc::interpolate(ddtUEqn.A())*rAUf;
+}
+
+
+void Foam::solutionControl::addUnderRelaxationFluxContribution
+(
+    surfaceScalarField& phi,
+    surfaceScalarField& aCoeff,
+    const volVectorField& U
+) const
+{
+    // Get under-relaxation factor used in this iteration
+    const dimensionedScalar alphaU(this->relaxFactor(U));
+
+    const dimensionedScalar urfCoeff((1.0 - alphaU)/alphaU);
+
+    // Add under-relaxation dependent flux contribution
+    phi += urfCoeff*phi.prevIter();
+
+    // Add under-relaxation dependent contribution to diffusion scale coeff
+    aCoeff += urfCoeff*aCoeff;
+
+    // Note: this is not 100% entirely consistent with the way FOAM handles
+    // under-relaxation. In fvMatrix::relax() member function, the diagonal
+    // dominance is first assured by limiting the diagonal and the matrix is
+    // then relaxed. However, this is a very minor inconsistency, especially
+    // since this term vanishes when non-linear iterations converge to a tight
+    // tolerance (achieving steady state in SIMPLE or converging PISO/PIMPLE in
+    // each time step). VV, 23/Dec/2016.
+}
+
+
+void Foam::solutionControl::correctBoundaryFlux
+(
+    surfaceScalarField& phi,
+    const volVectorField& U
+) const
+{
+    // Get necessary data at the boundaries
+    const volVectorField::GeometricBoundaryField& Ub = U.boundaryField();
+    const surfaceVectorField::GeometricBoundaryField& Sb =
+        mesh_.Sf().boundaryField();
+
+    surfaceScalarField::GeometricBoundaryField& phib = phi.boundaryField();
+
+    // Correct flux at boundaries depending on patch type. Note: it is possible
+    // that we missed some important boundary conditions that need special
+    // considerations when calculating the flux. Maybe we can reorganise this in
+    // future by relying on distinction between = and == operators for
+    // fvsPatchFields. However, that would require serious changes at the
+    // moment. VV, 23/Dec/2016.
+    forAll (phib, patchI)
+    {
+        if (Ub[patchI].fixesValue())
+        {
+            // This is fixed value patch, flux needs to be recalculated
+            // with respect to the boundary condition
+            phib[patchI] == (Ub[patchI] & Sb[patchI]);
+        }
+        else if
+        (
+            isA<slipFvPatchVectorField>(Ub[patchI])
+         || isA<symmetryFvPatchVectorField>(Ub[patchI])
+        )
+        {
+            // This is slip or symmetry, flux needs to be zero
+            phib[patchI] == 0.0;
+        }
+    }
+}
+
+
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 Foam::solutionControl::solutionControl(fvMesh& mesh, const word& algorithmName)
@@ -273,7 +360,7 @@ Foam::solutionControl::~solutionControl()
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-void Foam::solutionControl::calcTimeConsistentFlux
+void Foam::solutionControl::calcTransientConsistentFlux
 (
     surfaceScalarField& phi,
     const volVectorField& U,
@@ -284,7 +371,7 @@ void Foam::solutionControl::calcTimeConsistentFlux
     // Store necessary fields for time consistency if they are not present
     if (!aCoeffPtr_ && !faceUPtr_)
     {
-        aCoeffPtr_ = new volScalarField
+        aCoeffPtr_ = new surfaceScalarField
         (
             IOobject
             (
@@ -316,20 +403,22 @@ void Foam::solutionControl::calcTimeConsistentFlux
     {
         FatalErrorIn
         (
-            "tmp<surfaceScalarField> solutionControl::timeConsistentFlux"
+            "void solutionControl::calcTransientConsistentFlux"
             "\n("
+            "\n    surfaceScalarField& phi,"
             "\n    const volVectorField& U,"
-            "\n    const volScalarField& rAU"
+            "\n    const volScalarField& rAU,"
+            "\n    const fvVectorMatrix& ddtUEqn"
             "\n)"
         )   << "Either aCoeffPtr_ or faceUPtr_ is allocated while the"
-            << " other is not. This must not happen."
-            << endl
+            << " other is not."
+            << nl
+            << " This must not happen in transient simulation. Make sure"
+            << " that functions aiding consistency are called in the right"
+            << " order (first flux and then velocity reconstruction)."
             << exit(FatalError);
     }
 
-    // Now that we are sure that pointers are valid and the fields are there, we
-    // can do the calculation of the flux, while storing necessary data for
-    // future velocity reconstruction.
     // Algorithm:
     // 1. Update flux and aCoeff due to ddt discretisation
     // 2. Update flux and aCoeff due to under-relaxation
@@ -337,11 +426,12 @@ void Foam::solutionControl::calcTimeConsistentFlux
     //    remains consistent
 
     // Get fields that will be updated
-    volScalarField& aCoeff = *aCoeffPtr_;
+    surfaceScalarField& aCoeff = *aCoeffPtr_;
     surfaceVectorField& faceU = *faceUPtr_;
 
     // Update face interpolated velocity field. Note: handling of oldTime faceU
-    // fields happens in ddt scheme when calling ddtConsistentPhiCorr
+    // fields happens in ddt scheme when calling ddtConsistentPhiCorr inside
+    // addDdtFluxContribution
     faceU = fvc::interpolate(U);
 
     // Interpolate original rAU on the faces
@@ -353,76 +443,90 @@ void Foam::solutionControl::calcTimeConsistentFlux
     // Calculate the ordinary part of the flux (H/A)
     phi = (faceU & mesh_.Sf());
 
+    // Initialize aCoeff to 1
+    aCoeff = dimensionedScalar("one", dimless, 1.0);
+
     // STAGE 1: consistent ddt discretisation handling
-
-    // Add consistent flux contribution due to ddt discretisation
-    phi += fvc::ddtConsistentPhiCorr(faceU, U, rAUf);
-
-    // Calculate aCoeff according to ddt discretisation
-    aCoeff = 1.0 + ddtUEqn.A()*rAU;
+    addDdtFluxContribution(phi, aCoeff, faceU, U, rAUf, ddtUEqn);
 
     // STAGE 2: consistent under-relaxation handling
-
-    // Get under-relaxation factor used in this iteration
-    const dimensionedScalar alphaU = this->relaxFactor(U);
-
-    // Helper variable
-    const dimensionedScalar urfCoeff = (1.0 - alphaU)/alphaU;
-
-    // Add consistent flux contribution due to possible under-relaxation
-    phi += urfCoeff*fvc::interpolate(aCoeff)*phi.prevIter();
-
-    // Add under-relaxation contribution to aCoeff
-    aCoeff += urfCoeff*aCoeff;
-
-    // Note: this is not 100% entirely consistent with the way FOAM handles
-    // under-relaxation. In fvMatrix::relax() member function, the diagonal
-    // dominance is first assured by limiting the diagonal and the matrix is
-    // then relaxed. However, this is a very minor inconsistency, especially
-    // since this term vanishes when non-linear iterations converge to a tight
-    // tolerance (achieving steady state in SIMPLE or converging PISO/PIMPLE in
-    // each time step). VV, 23/Dec/2016.
+    addUnderRelaxationFluxContribution(phi, aCoeff, U);
 
     // STAGE 3: scale the flux and correct it at the boundaries
-
-    // Scale the flux
-    phi /= fvc::interpolate(aCoeff);
-
-    // Get necessary data at the boundaries
-    const volVectorField::GeometricBoundaryField& Ub = U.boundaryField();
-    const surfaceVectorField::GeometricBoundaryField& Sb =
-        mesh_.Sf().boundaryField();
-
-    surfaceScalarField::GeometricBoundaryField& phib = phi.boundaryField();
-
-    // Correct flux at boundaries depending on patch type. Note: it is possible
-    // that we missed some important boundary conditions that need special
-    // considerations when calculating the flux. Maybe we can reorganise this in
-    // future by relying on distinction between = and == operators for
-    // fvsPatchFields. However, that would require serious changes at the
-    // moment. VV, 23/Dec/2016.
-    forAll (phib, patchI)
-    {
-        if (Ub[patchI].fixesValue())
-        {
-            // This is fixed value patch, flux needs to be recalculated
-            // with respect to the boundary condition
-            phib[patchI] == (Ub[patchI] & Sb[patchI]);
-        }
-        else if
-        (
-            isA<slipFvPatchVectorField>(Ub[patchI])
-         || isA<symmetryFvPatchVectorField>(Ub[patchI])
-        )
-        {
-            // This is slip or symmetry, flux needs to be zero
-            phib[patchI] == 0.0;
-        }
-    }
+    phi /= aCoeff;
+    correctBoundaryFlux(phi, U);
 }
 
 
-void Foam::solutionControl::reconstructVelocity
+void Foam::solutionControl::calcSteadyConsistentFlux
+(
+    surfaceScalarField& phi,
+    const volVectorField& U
+) const
+{
+    // Store aCoeff field for time consistency if it is not present. Note: faceU
+    // does not need to be stored
+    if (!aCoeffPtr_ && !faceUPtr_)
+    {
+        aCoeffPtr_ = new surfaceScalarField
+        (
+            IOobject
+            (
+                "aCoeff",
+                mesh_.time().timeName(),
+                mesh_,
+                IOobject::NO_READ,
+                IOobject::NO_WRITE
+            ),
+            mesh_,
+            dimensionedScalar("zero", dimless, 0.0)
+        );
+    }
+    else if (faceUPtr_)
+    {
+        FatalErrorIn
+        (
+            "void solutionControl::calcSteadyConsistentFlux"
+            "\n("
+            "\n    surfaceScalarField& phi,"
+            "\n    const volVectorField& U,"
+            "\n    const volScalarField& rAU"
+            "\n)"
+        )   << "faceUPtr_ is allocated."
+            << nl
+            << " This must not happen in steady simulation. Make sure"
+            << " that the right functions aiding consistency are called in the"
+            << " right order (first flux and then velocity reconstruction)."
+            << exit(FatalError);
+    }
+
+    // Algorithm:
+    // 1. Update flux and aCoeff due to under-relaxation
+    // 2. Scale the flux with aCoeff, making sure that flux at fixed boundaries
+    //    remains consistent
+
+    // Get aCoeff field
+    surfaceScalarField& aCoeff = *aCoeffPtr_;
+
+    // Store previous iteration for the correct handling of under-relaxation
+    phi.storePrevIter();
+
+    // Calculate the ordinary part of the flux (H/A)
+    phi = (fvc::interpolate(U) & mesh_.Sf());
+
+    // Initialize aCoeff to 1
+    aCoeff = dimensionedScalar("one", dimless, 1.0);
+
+    // STAGE 1: consistent under-relaxation handling
+    addUnderRelaxationFluxContribution(phi, aCoeff, U);
+
+    // STAGE 2: scale the flux and correct it at the boundaries
+    phi /= aCoeff;
+    correctBoundaryFlux(phi, U);
+}
+
+
+void Foam::solutionControl::reconstructTransientVelocity
 (
     volVectorField& U,
     const fvVectorMatrix& ddtUEqn,
@@ -444,15 +548,16 @@ void Foam::solutionControl::reconstructVelocity
     {
         FatalErrorIn
         (
-            "void solutionControl::reconstructVelocity"
+            "void solutionControl::reconstructTransientVelocity"
             "\n("
             "\n    volVectorField& U,"
             "\n    const volVectorField& ddtUEqn,"
             "\n    const volScalarField& rAU,"
             "\n    const volScalarField& p"
+            "\n    const surfaceScalarField& phi"
             "\n) const"
         )   << "faceUPtr_ not calculated. Make sure you have called"
-            << " calculateTimeConsistentFlux(...) before calling this function."
+            << " calcTransientConsistentFlux(...) before calling this function."
             << exit(FatalError);
     }
     surfaceVectorField& faceU = *faceUPtr_;
@@ -474,15 +579,31 @@ void Foam::solutionControl::reconstructVelocity
 }
 
 
-const Foam::volScalarField& Foam::solutionControl::aCoeff() const
+void Foam::solutionControl::reconstructSteadyVelocity
+(
+    volVectorField& U,
+    const volScalarField& rAU,
+    const volScalarField& p
+) const
+{
+    // Reconstruct the velocity field
+    U -= rAU*fvc::grad(p);
+    U.correctBoundaryConditions();
+
+    // Note: no need to store and update faceU field for steady state run
+}
+
+
+const Foam::surfaceScalarField& Foam::solutionControl::aCoeff() const
 {
     if (!aCoeffPtr_)
     {
         FatalErrorIn
         (
-            "const volScalarField& solutionControl::aCoeff() const"
+            "const surfaceScalarField& solutionControl::aCoeff() const"
         )   << "aCoeffPtr_ not calculated. Make sure you have called"
-            << " calculateTimeConsistentFlux(...) before calling aCoeff()."
+            << " calcTransientConsistentFlux(...) or "
+            << " calcSteadyConsistentFlux(...) before calling aCoeff()."
             << exit(FatalError);
     }
 

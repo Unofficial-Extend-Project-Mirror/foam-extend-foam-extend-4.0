@@ -145,13 +145,41 @@ protected:
         ) const;
 
 
-        // Time and under-relaxation consistency
+        // Time and under-relaxation consistency helper functions
 
             //- Get relaxation factor for velocity field. Overriden in
             //  pimpleControl since different relaxation factor may be used for
             //  final iteration.
             virtual const dimensionedScalar relaxFactor
             (
+                const volVectorField& U
+            ) const;
+
+            //- Add consistent flux contribution arising from time derivative
+            //  term. Note: aCoeff is parameter for clarity
+            void addDdtFluxContribution
+            (
+                surfaceScalarField& phi,
+                surfaceScalarField& aCoeff,
+                const surfaceVectorField& faceU,
+                const volVectorField& U,
+                const surfaceScalarField& rAUf,
+                const fvVectorMatrix& ddtUEqn
+            ) const;
+
+            //- Add consistent flux contribution arising from the
+            //  under-relaxation. Note: aCoeff is parameter for clarity
+            void addUnderRelaxationFluxContribution
+            (
+                surfaceScalarField& phi,
+                surfaceScalarField& aCoeff,
+                const volVectorField& U
+            ) const;
+
+            //- Correct flux at the boundaries
+            void correctBoundaryFlux
+            (
+                surfaceScalarField& phi,
                 const volVectorField& U
             ) const;
 
@@ -163,7 +191,7 @@ private:
         // Fields necessary for time and under-relaxation consistency
 
             //- A coeff (A^~) arising from consistency formulation
-            mutable volScalarField* aCoeffPtr_;
+            mutable surfaceScalarField* aCoeffPtr_;
 
             //- Face velocity needed for consistent formulation
             mutable surfaceVectorField* faceUPtr_;
@@ -230,16 +258,14 @@ public:
             inline bool consistent() const;
 
 
-        // Time and under-relaxation consistency. Note: these functions could be
-        // made virtual and specific to SIMPLE, PISO and PIMPLE, but we will
-        // make them general in sense they account for arbitrary ddt scheme
-        // and arbitrary under-relaxation (e.g. if someone runs SIMPLE in
-        // transient mode or PISO with under-relaxation)
+        // Time and under-relaxation consistency.
+        // Note: argument matching U parameter needs to be equal U = H/A, where
+        // H and A come from convection-difussion equation only (without time
+        // derivative term)
 
-            //- Calculate and return time consistent flux (before pressure
-            //  equation). At point of call, U = H/A where H and A come from
-            //  convection-diffusion equation only.
-            void calcTimeConsistentFlux
+            //- Calculate consistent flux for transient solvers (before pressure
+            //  equation).
+            void calcTransientConsistentFlux
             (
                 surfaceScalarField& phi,
                 const volVectorField& U,
@@ -247,10 +273,17 @@ public:
                 const fvVectorMatrix& ddtUEqn
             ) const;
 
-            //- Reconstruct velocity (after pressure equation). At point of
-            //  call, U = H/A where H and A come from convection-diffusion
-            //  equation only
-            void reconstructVelocity
+            //- Calculate consistent flux for steady state solvers (before
+            //  pressure equation).
+            void calcSteadyConsistentFlux
+            (
+                surfaceScalarField& phi,
+                const volVectorField& U
+            ) const;
+
+            //- Reconstruct velocity for transient solvers (after pressure
+            //  equation and flux reconstruction).
+            void reconstructTransientVelocity
             (
                 volVectorField& U,
                 const fvVectorMatrix& ddtUEqn,
@@ -259,8 +292,17 @@ public:
                 const surfaceScalarField& phi
             ) const;
 
+            //- Reconstruct velocity for steady state solvers (after pressure
+            //  equation and flux reconstruction).
+            void reconstructSteadyVelocity
+            (
+                volVectorField& U,
+                const volScalarField& rAU,
+                const volScalarField& p
+            ) const;
+
             //- Const access to aCoeff (needed for pressure equation)
-            const volScalarField& aCoeff() const;
+            const surfaceScalarField& aCoeff() const;
 
 
         // Evolution
