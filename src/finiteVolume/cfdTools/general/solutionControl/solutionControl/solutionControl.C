@@ -529,10 +529,10 @@ void Foam::solutionControl::calcSteadyConsistentFlux
 void Foam::solutionControl::reconstructTransientVelocity
 (
     volVectorField& U,
+    surfaceScalarField& phi,
     const fvVectorMatrix& ddtUEqn,
     const volScalarField& rAU,
-    const volScalarField& p,
-    const surfaceScalarField& phi
+    const volScalarField& p
 ) const
 {
     // Reconstruct the velocity using all the components from original equation
@@ -540,10 +540,9 @@ void Foam::solutionControl::reconstructTransientVelocity
         (
             U/rAU + ddtUEqn.H() - fvc::grad(p)
         );
-    U.correctBoundaryConditions();
 
     // Update divergence free face velocity field, whose value will be used in
-    // the next time step
+    // the next time step. Note that we need to have absolute flux here.
     if (!faceUPtr_)
     {
         FatalErrorIn
@@ -576,6 +575,13 @@ void Foam::solutionControl::reconstructTransientVelocity
     // Now that the normal component is zero, add the normal component from
     // conservative flux
     faceU += phi*rSf;
+
+    // If the mesh is moving, flux needs to be relative before boundary
+    // conditions for velocity are corrected. VV and IG, 4/Jan/2016.
+    fvc::makeRelative(phi, U);
+
+    // Correct boundary conditions with relative flux
+    U.correctBoundaryConditions();
 }
 
 

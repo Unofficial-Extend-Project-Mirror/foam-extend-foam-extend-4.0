@@ -286,10 +286,10 @@ public:
             void reconstructTransientVelocity
             (
                 volVectorField& U,
+                surfaceScalarField& phi,
                 const fvVectorMatrix& ddtUEqn,
                 const volScalarField& rAU,
-                const volScalarField& p,
-                const surfaceScalarField& phi
+                const volScalarField& p
             ) const;
 
             //- Reconstruct velocity for steady state solvers (after pressure
