@@ -1,18 +1,13 @@
     // Solve the momentum equation
 
-    tmp<fvVectorMatrix> HUEqn
+    tmp<fvVectorMatrix> UEqn
     (
         fvm::div(phi, U)
       + turbulence->divDevReff()
     );
 
-    // Get under-relaxation factor
-    const scalar UUrf = mesh.solutionDict().equationRelaxationFactor(U.name());
+    // Relax the equation
+    UEqn().relax();
 
     // Momentum solution
-    solve
-    (
-        relax(HUEqn(), UUrf)
-     ==
-        -fvc::grad(p)
-    );
+    solve(UEqn() == -fvc::grad(p));
