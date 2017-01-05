@@ -270,7 +270,7 @@ void Foam::solutionControl::addUnderRelaxationFluxContribution
     const dimensionedScalar urfCoeff((1.0 - alphaU)/alphaU);
 
     // Add under-relaxation dependent flux contribution
-    phi += urfCoeff*phi.prevIter();
+    phi += urfCoeff*aCoeff*phi.prevIter();
 
     // Add under-relaxation dependent contribution to diffusion scale coeff
     aCoeff += urfCoeff*aCoeff;
