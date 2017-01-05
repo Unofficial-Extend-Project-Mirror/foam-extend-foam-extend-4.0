@@ -27,6 +27,7 @@ Application
 Description
     Transient solver for incompressible, laminar flow of non-Newtonian fluids.
     Consistent formulation without time-step and relaxation dependence by Jasak
+    and Tukovic.
 
 Author
     Hrvoje Jasak, Wikki Ltd.  All rights reserved
@@ -63,6 +64,9 @@ int main(int argc, char *argv[])
 
         fluid.correct();
 
+        // Time-derivative matrix
+        fvVectorMatrix ddtUEqn(fvm::ddt(U));
+
         // Convection-diffusion matrix
         fvVectorMatrix HUEqn
         (
@@ -70,24 +74,23 @@ int main(int argc, char *argv[])
           - fvm::laplacian(fluid.nu(), U)
         );
 
-        // Time derivative matrix
-        fvVectorMatrix ddtUEqn(fvm::ddt(U));
-
         if (piso.momentumPredictor())
         {
             solve(ddtUEqn + HUEqn == -fvc::grad(p));
         }
 
-        // Prepare clean Ap without time derivative contribution
-        // HJ, 26/Oct/2015
-        volScalarField aU = HUEqn.A();
+        // Prepare clean 1/a_p without time derivative contribution
+        volScalarField rAU = 1.0/HUEqn.A();
 
         // --- PISO loop
 
         while (piso.correct())
         {
-            U = HUEqn.H()/aU;
-            phi = (fvc::interpolate(U) & mesh.Sf());
+            // Calculate U from convection-diffusion matrix
+            U = rAU*HUEqn.H();
+
+            // Consistently calculate flux
+            piso.calcTransientConsistentFlux(phi, U, rAU, ddtUEqn);
 
             adjustPhi(phi, U, p);
 
@@ -95,7 +98,14 @@ int main(int argc, char *argv[])
             {
                 fvScalarMatrix pEqn
                 (
-                    fvm::laplacian(1/aU, p) == fvc::div(phi)
+                    fvm::laplacian
+                    (
+                        fvc::interpolate(rAU)/piso.aCoeff(),
+                        p,
+                        "laplacian(rAU," + p.name() + ')'
+                    )
+                 ==
+                    fvc::div(phi)
                 );
 
                 pEqn.setReference(pRefCell, pRefValue);
@@ -112,13 +122,8 @@ int main(int argc, char *argv[])
 
 #           include "continuityErrs.H"
 
-            // Note: cannot call H(U) here because the velocity is not complete
-            // HJ, 22/Jan/2016
-            U = 1.0/(aU + ddtUEqn.A())*
-                (
-                    U*aU - fvc::grad(p) + ddtUEqn.H()
-                );
-            U.correctBoundaryConditions();
+            // Consistently reconstruct velocity after pressure equation
+            piso.reconstructTransientVelocity(U, phi, ddtUEqn, rAU, p);
         }
 
         runTime.write();
