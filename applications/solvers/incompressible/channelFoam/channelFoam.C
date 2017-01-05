@@ -128,7 +128,7 @@ int main(int argc, char *argv[])
 #           include "continuityErrs.H"
 
             // Consistently reconstruct velocity after pressure equation
-            piso.reconstructTransientVelocity(U, ddtUEqn, rAU, p, phi);
+            piso.reconstructTransientVelocity(U, phi, ddtUEqn, rAU, p);
         }
 
         // Correct driving force for a constant mass flow rate
