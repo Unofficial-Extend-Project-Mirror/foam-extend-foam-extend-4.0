@@ -1,11 +1,12 @@
-    fvVectorMatrix UEqn
+    // Time-derivative matrix
+    fvVectorMatrix ddtUEqn(fvm::ddt(U));
+
+    // Convection-diffusion matrix
+    fvVectorMatrix HUEqn
     (
-        fvm::ddt(U)
-      + fvm::div(phi, U)
+        fvm::div(phi, U)
       - fvm::laplacian(nu, U)
     );
 
-    UEqn.relax();
-
-    // Solve the momentum equation
-    solve(UEqn == -fvc::grad(p));
+    // Solve the relaxed momentum equation
+    solve(relax(ddtUEqn + HUEqn) == -fvc::grad(p));
