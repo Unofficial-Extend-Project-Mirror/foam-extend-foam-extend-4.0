@@ -25,12 +25,13 @@ Application
     pimpleFoam
 
 Description
-    Large time-step transient solver for incompressible, flow using the PIMPLE
-    (merged PISO-SIMPLE) algorithm.
+    Large time-step transient solver for incompressible turbulent flow using
+    the PIMPLE (merged PISO-SIMPLE) algorithm.
 
     Turbulence modelling is generic, i.e. laminar, RAS or LES may be selected.
 
     Consistent formulation without time-step and relaxation dependence by Jasak
+    and Tukovic
 
 Author
     Hrvoje Jasak, Wikki Ltd.  All rights reserved
