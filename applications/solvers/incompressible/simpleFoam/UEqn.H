@@ -6,8 +6,5 @@
       + turbulence->divDevReff()
     );
 
-    // Relax the equation
-    UEqn().relax();
-
     // Momentum solution
-    solve(UEqn() == -fvc::grad(p));
+    solve(relax(UEqn()) == -fvc::grad(p));
