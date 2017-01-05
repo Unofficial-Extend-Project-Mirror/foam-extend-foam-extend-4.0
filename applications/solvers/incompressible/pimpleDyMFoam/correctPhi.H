@@ -41,7 +41,7 @@
     {
         fvScalarMatrix pcorrEqn
         (
-            fvm::laplacian(1/aU, pcorr) == fvc::div(phi)
+            fvm::laplacian(rAU, pcorr) == fvc::div(phi)
         );
 
         pcorrEqn.setReference(pRefCell, pRefValue);
@@ -55,6 +55,7 @@
         // Fluxes are corrected to absolute velocity and further corrected
         // later.  HJ, 6/Feb/2009
     }
+
 #   include "continuityErrs.H"
 }
 

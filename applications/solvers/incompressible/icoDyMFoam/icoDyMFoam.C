@@ -61,12 +61,11 @@ int main(int argc, char *argv[])
     {
 #       include "readControls.H"
 #       include "checkTotalVolume.H"
+#       include "CourantNo.H"
+#       include "setDeltaT.H"
 
         // Make the fluxes absolute
         fvc::makeAbsolute(phi, U);
-
-#       include "CourantNo.H"
-#       include "setDeltaT.H"
 
         runTime++;
 
@@ -136,7 +135,7 @@ int main(int argc, char *argv[])
                 }
             }
 
-#           include "continuityErrs.H"
+#           include "movingMeshContinuityErrs.H"
 
             // Consistently reconstruct velocity after pressure equation.
             // Note: flux is made relative inside the function
