@@ -26,8 +26,9 @@ Application
 
 Description
     Transient solver for incompressible, laminar flow of Newtonian fluids
-    with dynamic mesh. Consistent formulation without time-step and relaxation
-    dependence by Jasak and Tukovic.
+    with dynamic mesh.
+    Consistent formulation without time-step and relaxation dependence by Jasak
+    and Tukovic.
 
 Author
     Hrvoje Jasak, Wikki Ltd.  All rights reserved.

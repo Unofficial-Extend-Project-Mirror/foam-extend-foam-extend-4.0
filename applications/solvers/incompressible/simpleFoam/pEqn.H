@@ -17,14 +17,13 @@
             (
                 fvc::interpolate(rAU)/simple.aCoeff(),
                 p,
-                "laplacian(rAU" + p.name() + ')'
+                "laplacian(rAU," + p.name() + ')'
             )
          ==
             fvc::div(phi)
         );
 
         pEqn.setReference(pRefCell, pRefValue);
-
         pEqn.solve();
 
         if (simple.finalNonOrthogonalIter())
