@@ -337,7 +337,7 @@ steadyStateDdtScheme<Type>::fvcDdtConsistentPhiCorr
     const GeometricField<Type, fvsPatchField, surfaceMesh>& faceU,
     const GeometricField<Type, fvPatchField, volMesh>& U,
     const surfaceScalarField& rAUf
-) const
+)
 {
     return tmp<fluxFieldType>
     (

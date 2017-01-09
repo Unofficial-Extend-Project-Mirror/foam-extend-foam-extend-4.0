@@ -1168,6 +1168,55 @@ CrankNicolsonDdtScheme<Type>::fvcDdtPhiCorr
 
 
 template<class Type>
+tmp<typename CrankNicolsonDdtScheme<Type>::fluxFieldType>
+CrankNicolsonDdtScheme<Type>::fvcDdtConsistentPhiCorr
+(
+    const GeometricField<Type, fvsPatchField, surfaceMesh>& faceU,
+    const GeometricField<Type, fvPatchField, volMesh>& U,
+    const surfaceScalarField& rAUf
+)
+{
+    // Store old ddt field for faceU, necessary for consistent flux evaluation
+    DDt0Field<GeometricField<Type, fvsPatchField, surfaceMesh> >& faceUDdt0 =
+        ddt0_<GeometricField<Type, fvsPatchField, surfaceMesh> >
+        (
+            "ddt0(" + faceU.name() + ')',
+            faceU.dimensions()
+        );
+
+    // Trigger storage of faceU old time values
+    faceU.oldTime().oldTime();
+
+    // Evaluate faceU ddt if necessary
+    if (evaluate(faceUDdt0))
+    {
+        scalar rDtCoef0 = rDtCoef0_(faceUDdt0).value();
+
+        // Update ddt(faceU)
+        faceUDdt0 =
+        (
+            rDtCoef0*
+            (
+                faceU.oldTime()
+              - faceU.oldTime().oldTime()
+            )
+          - offCentre_(faceUDdt0())
+        );
+    }
+
+    return
+        rAUf*
+        (
+            mesh().Sf()
+          & (
+                rDtCoef_(faceUDdt0)*faceU.oldTime()
+              + offCentre_(faceUDdt0())
+            )
+        );
+}
+
+
+template<class Type>
 tmp<surfaceScalarField> CrankNicolsonDdtScheme<Type>::meshPhi
 (
     const GeometricField<Type, fvPatchField, volMesh>& vf

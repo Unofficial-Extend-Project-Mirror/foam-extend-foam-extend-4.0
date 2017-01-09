@@ -178,7 +178,7 @@ public:
             const surfaceScalarField& faceU,
             const volScalarField& U,
             const surfaceScalarField& rAUf
-        ) const;
+        );
 
 
         tmp<surfaceScalarField> meshPhi

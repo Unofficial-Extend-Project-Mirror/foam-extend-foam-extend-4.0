@@ -251,20 +251,7 @@ public:
             const GeometricField<Type, fvsPatchField, surfaceMesh>& faceU,
             const GeometricField<Type, fvPatchField, volMesh>& U,
             const surfaceScalarField& rAUf
-        ) const
-        {
-            notImplemented
-            (
-                "CrankNicolsonScheme::fvcDdtConsistentPhiCorr\n"
-                "\n("
-                "\n    GeometricField<Type, fvsPatchField, surfaceMesh>& faceU,"
-                "\n    GeometricField<Type, fvPatchField, volMesh>& U,"
-                "\n    const surfaceScalarField& rAUf,"
-                "\n)"
-            );
-
-            return fluxFieldType::null();
-        }
+        );
 
 
         tmp<surfaceScalarField> meshPhi
@@ -299,7 +286,7 @@ tmp<surfaceScalarField> CrankNicolsonDdtScheme<scalar>::fvcDdtConsistentPhiCorr
     const surfaceScalarField& faceU,
     const volScalarField& U,
     const surfaceScalarField& rAUf
-) const;
+);
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

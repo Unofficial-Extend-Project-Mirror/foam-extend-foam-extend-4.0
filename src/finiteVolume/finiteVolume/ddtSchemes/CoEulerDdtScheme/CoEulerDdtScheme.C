@@ -658,7 +658,7 @@ CoEulerDdtScheme<Type>::fvcDdtConsistentPhiCorr
     const GeometricField<Type, fvsPatchField, surfaceMesh>& faceU,
     const GeometricField<Type, fvPatchField, volMesh>& U,
     const surfaceScalarField& rAUf
-) const
+)
 {
     return (mesh().Sf() & faceU.oldTime())*rAUf*CofrDeltaT();
 }

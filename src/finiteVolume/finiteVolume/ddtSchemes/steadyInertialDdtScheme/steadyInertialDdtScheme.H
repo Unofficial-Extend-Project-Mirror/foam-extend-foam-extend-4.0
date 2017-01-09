@@ -181,7 +181,7 @@ public:
             const GeometricField<Type, fvsPatchField, surfaceMesh>& faceU,
             const GeometricField<Type, fvPatchField, volMesh>& U,
             const surfaceScalarField& rAUf
-        ) const;
+        );
 
 
         tmp<surfaceScalarField> meshPhi
@@ -216,7 +216,7 @@ tmp<surfaceScalarField> steadyInertialDdtScheme<scalar>::fvcDdtConsistentPhiCorr
     const surfaceScalarField& faceU,
     const volScalarField& U,
     const surfaceScalarField& rAUf
-) const;
+);
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

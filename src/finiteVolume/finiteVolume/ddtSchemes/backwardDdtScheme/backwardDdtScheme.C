@@ -721,7 +721,7 @@ backwardDdtScheme<Type>::fvcDdtConsistentPhiCorr
     const GeometricField<Type, fvsPatchField, surfaceMesh>& faceU,
     const GeometricField<Type, fvPatchField, volMesh>& U,
     const surfaceScalarField& rAUf
-) const
+)
 {
     const scalar deltaT = deltaT_();
     const scalar deltaT0 = deltaT0_(U);

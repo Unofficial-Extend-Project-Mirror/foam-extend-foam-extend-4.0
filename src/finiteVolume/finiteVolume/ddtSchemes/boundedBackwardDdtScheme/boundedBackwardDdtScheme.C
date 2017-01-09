@@ -664,7 +664,7 @@ tmp<surfaceScalarField> boundedBackwardDdtScheme::fvcDdtConsistentPhiCorr
     const surfaceScalarField& faceU,
     const volScalarField& U,
     const surfaceScalarField& rAUf
-) const
+)
 {
     notImplemented
     (

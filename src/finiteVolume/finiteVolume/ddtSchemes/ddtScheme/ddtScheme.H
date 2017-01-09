@@ -228,7 +228,7 @@ public:
             const GeometricField<Type, fvsPatchField, surfaceMesh>& faceU,
             const GeometricField<Type, fvPatchField, volMesh>& U,
             const surfaceScalarField& rAUf
-        ) const = 0;
+        ) = 0;
 
 
         virtual tmp<surfaceScalarField> meshPhi
@@ -299,7 +299,7 @@ tmp<surfaceScalarField> SS<scalar>::fvcDdtConsistentPhiCorr                    \
     const surfaceScalarField& faceU,                                           \
     const volScalarField& U,                                                   \
     const surfaceScalarField& rAUf                                             \
-) const                                                                        \
+)                                                                              \
 {                                                                              \
     notImplemented(#SS"<scalar>::fvcDdtConsistentPhiCorr");                    \
     return surfaceScalarField::null();                                         \
