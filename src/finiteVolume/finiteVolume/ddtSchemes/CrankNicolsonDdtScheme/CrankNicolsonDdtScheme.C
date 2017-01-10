@@ -1190,12 +1190,10 @@ CrankNicolsonDdtScheme<Type>::fvcDdtConsistentPhiCorr
     // Evaluate faceU ddt if necessary
     if (evaluate(faceUDdt0))
     {
-        scalar rDtCoef0 = rDtCoef0_(faceUDdt0).value();
-
         // Update ddt(faceU)
         faceUDdt0 =
         (
-            rDtCoef0*
+            rDtCoef0_(faceUDdt0)*
             (
                 faceU.oldTime()
               - faceU.oldTime().oldTime()
