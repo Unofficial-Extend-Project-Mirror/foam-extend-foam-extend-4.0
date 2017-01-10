@@ -943,7 +943,7 @@ Tolerances
     slidingEdgeEndCutoffTol         0.0001;
     slidingEdgeCoPlanarTol          0.8;
 
-     GGIAreaErrorTol                 1e-8;
+    GGIAreaErrorTol                 1e-8;
 }
 
 DimensionedConstants

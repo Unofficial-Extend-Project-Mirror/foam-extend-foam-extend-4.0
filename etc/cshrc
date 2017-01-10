@@ -77,11 +77,11 @@ setenv WM_THIRD_PARTY_DIR $WM_PROJECT_DIR/ThirdParty
 # This can be overriden in prefs.sh
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # For AllMake.stage1
-setenv WM_THIRD_PARTY_USE_CMAKE_322 1
+#setenv WM_THIRD_PARTY_USE_CMAKE_322 1
 
 #
 # For AllMake.stage2
-setenv WM_THIRD_PARTY_USE_OPENMPI_165 1
+#setenv WM_THIRD_PARTY_USE_OPENMPI_165 1
 
 #
 # For AllMake.stage3
