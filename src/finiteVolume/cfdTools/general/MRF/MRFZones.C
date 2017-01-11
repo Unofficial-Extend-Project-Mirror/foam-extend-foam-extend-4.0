@@ -77,7 +77,7 @@ Foam::tmp<Foam::surfaceScalarField> Foam::MRFZones::fluxCorrection() const
     );
     surfaceScalarField& MRFZonesPhiCorr = tMRFZonesPhiCorr();
 
-    forAll(*this, i)
+    forAll (*this, i)
     {
         operator[](i).relativeFlux(MRFZonesPhiCorr);
     }
@@ -106,7 +106,7 @@ Foam::tmp<Foam::surfaceVectorField> Foam::MRFZones::meshPhi() const
     );
     surfaceVectorField& MRFZonesPhiCorr = tMRFZonesPhiCorr();
 
-    forAll(*this, i)
+    forAll (*this, i)
     {
         operator[](i).meshPhi(MRFZonesPhiCorr);
     }
@@ -117,7 +117,7 @@ Foam::tmp<Foam::surfaceVectorField> Foam::MRFZones::meshPhi() const
 
 void Foam::MRFZones::addCoriolis(fvVectorMatrix& UEqn) const
 {
-    forAll(*this, i)
+    forAll (*this, i)
     {
         operator[](i).addCoriolis(UEqn);
     }
@@ -126,7 +126,7 @@ void Foam::MRFZones::addCoriolis(fvVectorMatrix& UEqn) const
 
 void Foam::MRFZones::relativeFlux(surfaceScalarField& phi) const
 {
-    forAll(*this, i)
+    forAll (*this, i)
     {
         operator[](i).relativeFlux(phi);
     }
@@ -135,7 +135,7 @@ void Foam::MRFZones::relativeFlux(surfaceScalarField& phi) const
 
 void Foam::MRFZones::absoluteFlux(surfaceScalarField& phi) const
 {
-    forAll(*this, i)
+    forAll (*this, i)
     {
         operator[](i).absoluteFlux(phi);
     }
@@ -148,7 +148,7 @@ void Foam::MRFZones::addCoriolis
     fvVectorMatrix& UEqn
 ) const
 {
-    forAll(*this, i)
+    forAll (*this, i)
     {
         operator[](i).addCoriolis(rho, UEqn);
     }
@@ -161,7 +161,7 @@ void Foam::MRFZones::relativeFlux
     surfaceScalarField& phi
 ) const
 {
-    forAll(*this, i)
+    forAll (*this, i)
     {
         operator[](i).relativeFlux(rho, phi);
     }
@@ -174,7 +174,7 @@ void Foam::MRFZones::absoluteFlux
     surfaceScalarField& phi
 ) const
 {
-    forAll(*this, i)
+    forAll (*this, i)
     {
         operator[](i).absoluteFlux(rho, phi);
     }
@@ -183,7 +183,7 @@ void Foam::MRFZones::absoluteFlux
 
 void Foam::MRFZones::relativeVelocity(volVectorField& U) const
 {
-    forAll(*this, i)
+    forAll (*this, i)
     {
         operator[](i).relativeVelocity(U);
     }
@@ -192,7 +192,7 @@ void Foam::MRFZones::relativeVelocity(volVectorField& U) const
 
 void Foam::MRFZones::absoluteVelocity(volVectorField& U) const
 {
-    forAll(*this, i)
+    forAll (*this, i)
     {
         operator[](i).absoluteVelocity(U);
     }
@@ -201,7 +201,7 @@ void Foam::MRFZones::absoluteVelocity(volVectorField& U) const
 
 void Foam::MRFZones::correctBoundaryVelocity(volVectorField& U) const
 {
-    forAll(*this, i)
+    forAll (*this, i)
     {
         operator[](i).correctBoundaryVelocity(U);
     }
@@ -237,7 +237,7 @@ Foam::tmp<Foam::volScalarField> Foam::MRFZones::Su
     tmp<volVectorField> tgradPhi = fvc::grad(phi);
     const volVectorField& gradPhi = tgradPhi();
 
-    forAll(*this, i)
+    forAll (*this, i)
     {
         operator[](i).Su(phi, gradPhi, source);
     }
@@ -275,7 +275,7 @@ Foam::tmp<Foam::volVectorField> Foam::MRFZones::Su
     tmp<volTensorField> tgradPhi = fvc::grad(phi);
     const volTensorField& gradPhi = tgradPhi();
 
-    forAll(*this, i)
+    forAll (*this, i)
     {
         operator[](i).Su(phi, gradPhi, source);
     }

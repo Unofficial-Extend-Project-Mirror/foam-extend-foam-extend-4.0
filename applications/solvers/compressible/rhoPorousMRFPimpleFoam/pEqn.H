@@ -3,6 +3,9 @@ rho = thermo.rho();
 volScalarField rUA = 1.0/UEqn().A();
 U = rUA*UEqn().H();
 
+// Update boundary velocity for consistency with the flux
+mrfZones.correctBoundaryVelocity(U);
+
 if (pimple.nCorrPISO() <= 1)
 {
     UEqn.clear();

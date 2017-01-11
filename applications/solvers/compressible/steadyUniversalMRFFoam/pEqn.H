@@ -12,6 +12,9 @@
     {
         U = rUA*UEqn.H();
 
+        // Update boundary velocity for consistency with the flux
+        mrfZones.correctBoundaryVelocity(U);
+
         // Calculate phi for boundary conditions
         phi = rhof*fvc::interpolate(U) & mesh.Sf();
 

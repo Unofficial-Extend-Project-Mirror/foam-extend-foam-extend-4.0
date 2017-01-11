@@ -4,6 +4,9 @@
 
     U = rUA*UEqn.H();
 
+    // Update boundary velocity for consistency with the flux
+    mrfZones.correctBoundaryVelocity(U);
+
     surfaceScalarField phiU
     (
         "phiU",

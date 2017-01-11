@@ -9,6 +9,10 @@
         1/HUEqn().A()
     );
 
+    // Update boundary velocity for consistency with the flux
+    // This is needed for a ramped MRF
+    mrfZones.correctBoundaryVelocity(U);
+
     // Store velocity under-relaxation point before using U for
     // the flux precursor
     U.storePrevIter();

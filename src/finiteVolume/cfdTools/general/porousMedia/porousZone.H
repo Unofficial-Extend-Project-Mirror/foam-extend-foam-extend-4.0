@@ -44,7 +44,6 @@ Description
         S = - (\mu \, d + \frac{\rho |U|}{2} \, f) U
     @f]
 
-
     Since negative Darcy/Forchheimer parameters are invalid, they can be used
     to specify a multiplier (of the max component).
 
@@ -106,15 +105,15 @@ class porousZone
         //- Coordinate system used for the zone (Cartesian)
         coordinateSystem coordSys_;
 
-        //- porosity of the zone (0 < porosity <= 1)
+        //- Porosity of the zone (0 < porosity <= 1)
         //  Placeholder for treatment of temporal terms.
         //  Currently unused.
         scalar porosity_;
 
-        //- powerLaw coefficient C0
+        //- Power Law coefficient C0
         scalar C0_;
 
-        //- powerLaw coefficient C1
+        //- Power Law coefficient C1
         scalar C1_;
 
         //- Darcy coefficient
@@ -126,7 +125,7 @@ class porousZone
 
     // Private Member Functions
 
-        //- adjust negative resistance values to be multiplier of max value
+        //- Adjust negative resistance values to be multiplier of max value
         static void adjustNegativeResistance(dimensionedVector& resist);
 
         //- Power-law resistance
@@ -247,7 +246,13 @@ public:
                 return cellZoneID_;
             }
 
-            //- dictionary values used for the porousZone
+            //- Return cellZone
+            const cellZone& zone() const
+            {
+                return mesh_.cellZones()[cellZoneID_];
+            }
+
+            //- Dictionary values used for the porousZone
             const dictionary& dict() const
             {
                 return dict_;
