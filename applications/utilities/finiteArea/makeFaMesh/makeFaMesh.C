@@ -314,6 +314,26 @@ int main(int argc, char *argv[])
         }
     }
 
+    if (args.optionFound("addEmptyPatch"))
+    {
+        word emptyPatchName(args.optionLookup("addEmptyPatch")());
+        dictionary emptyPatchDict;
+        emptyPatchDict.add("type", "empty");
+        emptyPatchDict.add("edgeLabels", labelList());
+        emptyPatchDict.add("ngbPolyPatchIndex", -1);
+
+        faPatchLst.append
+        (
+            faPatch::New
+            (
+                emptyPatchName,
+                emptyPatchDict,
+                faPatchLst.size(),
+                areaMesh.boundary()
+            ).ptr()
+        );
+    }
+
     Info << "Add faPatches ... ";
     areaMesh.addFaPatches(List<faPatch*>(faPatchLst));
     Info << "Done" << endl;
