@@ -28,9 +28,6 @@ License
 #include "addToRunTimeSelectionTable.H"
 #include "lduMatrix.H"
 
-// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
-
-
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 template<class Type>
@@ -42,7 +39,11 @@ Foam::ProcessorBlockAMGInterfaceField<Type>::ProcessorBlockAMGInterfaceField
 :
     BlockAMGInterfaceField<Type>(AMGCp, fineInterfaceField),
     procInterface_(refCast<const processorAMGInterface>(AMGCp)),
-    doTransform_(false)
+    doTransform_(false),
+    outstandingSendRequest_(-1),
+    outstandingRecvRequest_(-1),
+    sendBuf_(0),
+    receiveBuf_(0)
 {
     // If the interface based on a patch this must be taken care specially of
     if (isA<ProcessorBlockLduInterfaceField<Type> >(fineInterfaceField))
@@ -94,11 +95,51 @@ void Foam::ProcessorBlockAMGInterfaceField<Type>::initInterfaceMatrixUpdate
     const bool switchToLhs
 ) const
 {
-    procInterface_.compressedSend
-    (
-        commsType,
-        procInterface_.interfaceInternalField(psiInternal)()
-    );
+    label oldWarn = Pstream::warnComm;
+    Pstream::warnComm = comm();
+
+    sendBuf_ = procInterface_.interfaceInternalField(psiInternal);
+
+    if (commsType == Pstream::nonBlocking)
+    {
+        // Fast path.
+        receiveBuf_.setSize(sendBuf_.size());
+        outstandingRecvRequest_ = Pstream::nRequests();
+        IPstream::read
+        (
+            Pstream::nonBlocking,
+            procInterface_.neighbProcNo(),
+            reinterpret_cast<char*>(receiveBuf_.begin()),
+            receiveBuf_.byteSize(),
+            procInterface_.tag(),
+            comm()
+        );
+
+        outstandingSendRequest_ = Pstream::nRequests();
+        OPstream::write
+        (
+            Pstream::nonBlocking,
+            procInterface_.neighbProcNo(),
+            reinterpret_cast<const char*>(sendBuf_.begin()),
+            sendBuf_.byteSize(),
+            procInterface_.tag(),
+            comm()
+        );
+    }
+    else
+    {
+        procInterface_.send
+        (
+            commsType,
+            procInterface_.interfaceInternalField(psiInternal)()
+        );
+    }
+
+    // Mark as ready for update
+    const_cast<ProcessorBlockAMGInterfaceField<Type>&>(*this).updatedMatrix() =
+        false;
+
+    Pstream::warnComm = oldWarn;
 }
 
 
@@ -113,14 +154,42 @@ void Foam::ProcessorBlockAMGInterfaceField<Type>::updateInterfaceMatrix
     const bool switchToLhs
 ) const
 {
-    Field<Type> pnf
-    (
-        procInterface_.compressedReceive<Type>(commsType, this->size())
-    );
+    if (this->updatedMatrix())
+    {
+        return;
+    }
 
-    // Multiply neighbour field with coeffs and re-use pnf for result
+    if (commsType == Pstream::nonBlocking)
+    {
+        // Fast path.
+        if
+        (
+            outstandingRecvRequest_ >= 0
+         && outstandingRecvRequest_ < Pstream::nRequests()
+        )
+        {
+            Pstream::waitRequest(outstandingRecvRequest_);
+        }
+
+        // Recv finished so assume sending finished as well.
+        outstandingSendRequest_ = -1;
+        outstandingRecvRequest_ = -1;
+    }
+    else
+    {
+        // Check size
+        receiveBuf_.setSize(sendBuf_.size());
+
+        procInterface_.receive<Type>(commsType, receiveBuf_);
+    }
+
+    // The data is now in receiveBuf_ for both cases
+
+    // Transformation missing.  Is it needed?  HJ, 28/Nov/2016
+
+    // Multiply neighbour field with coeffs and re-use buffer for result
     // of multiplication
-    multiply(pnf, coeffs, pnf);
+    multiply(receiveBuf_, coeffs, receiveBuf_);
 
     const unallocLabelList& faceCells = procInterface_.faceCells();
 
@@ -128,16 +197,20 @@ void Foam::ProcessorBlockAMGInterfaceField<Type>::updateInterfaceMatrix
     {
         forAll(faceCells, elemI)
         {
-            result[faceCells[elemI]] += pnf[elemI];
+            result[faceCells[elemI]] += receiveBuf_[elemI];
         }
     }
     else
     {
         forAll(faceCells, elemI)
         {
-            result[faceCells[elemI]] -= pnf[elemI];
+            result[faceCells[elemI]] -= receiveBuf_[elemI];
         }
     }
+
+    // Mark as updated
+    const_cast<ProcessorBlockAMGInterfaceField<Type>&>(*this).updatedMatrix() =
+        true;
 }
 
 

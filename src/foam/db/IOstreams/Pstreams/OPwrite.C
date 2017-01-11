@@ -42,7 +42,9 @@ Foam::OPstream::~OPstream()
             commsType_,
             toProcNo_,
             buf_.begin(),
-            bufPosition_
+            bufPosition_,
+            tag_,
+            comm_
         )
     )
     {
@@ -60,9 +62,34 @@ bool Foam::OPstream::write
     const commsTypes commsType,
     const int toProcNo,
     const char* buf,
-    const std::streamsize bufSize
+    const std::streamsize bufSize,
+    const int tag,
+    const label comm
 )
 {
+    if (debug)
+    {
+        Pout<< "OPstream::write : starting write to:" << toProcNo
+            << " tag:" << tag
+            << " comm:" << comm << " size:" << label(bufSize)
+            << " commsType:" << Pstream::commsTypeNames[commsType]
+            << Foam::endl;
+    }
+    if (Pstream::warnComm != -1 && comm != Pstream::warnComm)
+    {
+        Pout<< "OPstream::write : starting write to:" << toProcNo
+            << " tag:" << tag
+            << " comm:" << comm << " size:" << label(bufSize)
+            << " commsType:" << Pstream::commsTypeNames[commsType]
+            << " warnComm:" << Pstream::warnComm
+            << Foam::endl;
+
+        error::printStack(Pout);
+    }
+
+
+    PstreamGlobals::checkCommunicator(comm, toProcNo);
+
     bool transferFailed = true;
 
     if (commsType == blocking)
@@ -71,11 +98,19 @@ bool Foam::OPstream::write
         (
             const_cast<char*>(buf),
             bufSize,
-            MPI_PACKED,
-            procID(toProcNo),
-            msgType(),
-            MPI_COMM_WORLD
+            MPI_BYTE,
+            toProcNo,   //procID(toProcNo),
+            tag,
+            PstreamGlobals::MPICommunicators_[comm] // MPI_COMM_WORLD
         );
+
+        if (debug)
+        {
+            Pout<< "OPstream::write : finished write to:" << toProcNo
+                << " tag:" << tag << " size:" << label(bufSize)
+                << " commsType:" << Pstream::commsTypeNames[commsType]
+                << Foam::endl;
+        }
     }
     else if (commsType == scheduled)
     {
@@ -83,11 +118,19 @@ bool Foam::OPstream::write
         (
             const_cast<char*>(buf),
             bufSize,
-            MPI_PACKED,
-            procID(toProcNo),
-            msgType(),
-            MPI_COMM_WORLD
+            MPI_BYTE,
+            toProcNo,   //procID(toProcNo),
+            tag,
+            PstreamGlobals::MPICommunicators_[comm] // MPI_COMM_WORLD
         );
+
+        if (debug)
+        {
+            Pout<< "OPstream::write : finished write to:" << toProcNo
+                << " tag:" << tag << " size:" << label(bufSize)
+                << " commsType:" << Pstream::commsTypeNames[commsType]
+                << Foam::endl;
+        }
     }
     else if (commsType == nonBlocking)
     {
@@ -97,14 +140,23 @@ bool Foam::OPstream::write
         (
             const_cast<char*>(buf),
             bufSize,
-            MPI_PACKED,
-            procID(toProcNo),
-            msgType(),
-            MPI_COMM_WORLD,
+            MPI_BYTE,
+            toProcNo,   //procID(toProcNo),
+            tag,
+            PstreamGlobals::MPICommunicators_[comm],// MPI_COMM_WORLD,
             &request
         );
 
-        PstreamGlobals::OPstream_outstandingRequests_.append(request);
+        if (debug)
+        {
+            Pout<< "OPstream::write : started write to:" << toProcNo
+                << " tag:" << tag << " size:" << label(bufSize)
+                << " commsType:" << Pstream::commsTypeNames[commsType]
+                << " request:" << PstreamGlobals::outstandingRequests_.size()
+                << Foam::endl;
+        }
+
+        PstreamGlobals::outstandingRequests_.append(request);
     }
     else
     {
@@ -117,58 +169,6 @@ bool Foam::OPstream::write
     }
 
     return !transferFailed;
-}
-
-
-void Foam::OPstream::waitRequests()
-{
-    if (PstreamGlobals::OPstream_outstandingRequests_.size())
-    {
-        if
-        (
-            MPI_Waitall
-            (
-                PstreamGlobals::OPstream_outstandingRequests_.size(),
-                PstreamGlobals::OPstream_outstandingRequests_.begin(),
-                MPI_STATUSES_IGNORE
-            )
-        )
-        {
-            FatalErrorIn
-            (
-                "OPstream::waitRequests()"
-            )   << "MPI_Waitall returned with error" << Foam::endl;
-        }
-
-        PstreamGlobals::OPstream_outstandingRequests_.clear();
-    }
-}
-
-
-bool Foam::OPstream::finishedRequest(const label i)
-{
-    if (i >= PstreamGlobals::OPstream_outstandingRequests_.size())
-    {
-        FatalErrorIn
-        (
-            "OPstream::finishedRequest(const label)"
-        )   << "There are "
-            << PstreamGlobals::OPstream_outstandingRequests_.size()
-            << " outstanding send requests and you are asking for i=" << i
-            << nl
-            << "Maybe you are mixing blocking/non-blocking comms?"
-            << Foam::abort(FatalError);
-    }
-
-    int flag;
-    MPI_Test
-    (
-        &PstreamGlobals::OPstream_outstandingRequests_[i],
-        &flag,
-        MPI_STATUS_IGNORE
-    );
-
-    return flag != 0;
 }
 
 

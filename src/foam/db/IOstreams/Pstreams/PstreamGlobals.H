@@ -46,14 +46,24 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class PstreamGlobals Declaration
+                        Class PstreamGlobals Declaration
 \*---------------------------------------------------------------------------*/
 
 namespace PstreamGlobals
 {
 
-extern DynamicList<MPI_Request> IPstream_outstandingRequests_;
-extern DynamicList<MPI_Request> OPstream_outstandingRequests_;
+extern DynamicList<MPI_Request> outstandingRequests_;
+
+extern int nTags_;
+
+extern DynamicList<int> freedTags_;
+
+
+// Current communicators. First element will be MPI_COMM_WORLD
+extern DynamicList<MPI_Comm> MPICommunicators_;
+extern DynamicList<MPI_Group> MPIGroups_;
+
+void checkCommunicator(const label, const label procNo);
 
 };
 

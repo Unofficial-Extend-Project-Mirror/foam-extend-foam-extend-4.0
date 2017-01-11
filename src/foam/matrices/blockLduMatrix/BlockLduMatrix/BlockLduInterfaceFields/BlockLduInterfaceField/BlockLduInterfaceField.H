@@ -85,10 +85,9 @@ public:
         {}
 
 
-    // Destructor
-
-        virtual ~BlockLduInterfaceField()
-        {}
+    //- Destructor
+    virtual ~BlockLduInterfaceField()
+    {}
 
 
     // Member Functions

@@ -61,6 +61,7 @@ void tetPolyMesh::clearOut() const
     clearOutParPointData();
 }
 
+
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 // Construct from components
@@ -71,6 +72,7 @@ tetPolyMesh::tetPolyMesh(const polyMesh& pMesh)
     boundary_(*this, pMesh.boundaryMesh()),
     faceOffset_(mesh_.nPoints()),
     cellOffset_(faceOffset_ + mesh_.nFaces()),
+    comm_(Pstream::worldComm),
     nPoints_(-1),
     nEdges_(-1),
     nTets_(-1),
@@ -104,6 +106,18 @@ tetPolyMesh::~tetPolyMesh()
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+
+Foam::label Foam::tetPolyMesh::comm() const
+{
+    return comm_;
+}
+
+
+Foam::label& Foam::tetPolyMesh::comm()
+{
+    return comm_;
+}
+
 
 // Return number of edges in decomposition for a face
 label tetPolyMesh::nEdgesForFace(const label faceID) const

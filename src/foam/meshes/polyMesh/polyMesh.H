@@ -134,6 +134,9 @@ private:
             //  Defined according to the presence of empty patches
             mutable Vector<label> solutionD_;
 
+            //- Communicator used for parallel communication
+            label comm_;
+
 
         // Zoning information
 
@@ -293,9 +296,8 @@ public:
         );
 
 
-    // Destructor
-
-        virtual ~polyMesh();
+    //- Destructor
+    virtual ~polyMesh();
 
 
     // Member Functions
@@ -386,23 +388,36 @@ public:
             //- Return the number of valid solved-for dimensions in the mesh
             label nSolutionD() const;
 
-            //- Return point zone mesh
-            const pointZoneMesh& pointZones() const
-            {
-                return pointZones_;
-            }
 
-            //- Return face zone mesh
-            const faceZoneMesh& faceZones() const
-            {
-                return faceZones_;
-            }
+            // Communication support
 
-            //- Return cell zone mesh
-            const cellZoneMesh& cellZones() const
-            {
-                return cellZones_;
-            }
+                //- Return communicator used for parallel communication
+                label comm() const;
+
+                //- Return communicator used for parallel communication
+                label& comm();
+
+
+            // Point, face and cell zones
+
+                //- Return point zone mesh
+                const pointZoneMesh& pointZones() const
+                {
+                    return pointZones_;
+                }
+
+                //- Return face zone mesh
+                const faceZoneMesh& faceZones() const
+                {
+                    return faceZones_;
+                }
+
+                //- Return cell zone mesh
+                const cellZoneMesh& cellZones() const
+                {
+                    return cellZones_;
+                }
+
 
             //- Return parallel info
             const globalMeshData& globalData() const;

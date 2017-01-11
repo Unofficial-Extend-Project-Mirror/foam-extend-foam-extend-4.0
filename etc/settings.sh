@@ -375,22 +375,16 @@ SYSTEMOPENMPI)
     unset mpi_version
     ;;
 
+
 MVAPICH2)
-    mpi_version=mvapich2
-
-    if [ -n "${MVAPICH2_BIN_DIR}" ] && [ -d "${MVAPICH2_BIN_DIR}" ]
-    then
-        _foamAddPath $MVAPICH2_BIN_DIR
-    else
-        MVAPICH2_BIN_DIR=$(dirname `which mpicc`)
-    fi
-
-    if which mpicc >/dev/null
-    then
-        mpicc -v 2>/dev/null | grep -q "mpicc for MVAPICH2" ||
-            echo "Warning: `which mpicc` does not appear to be for MVAPICH2"
-    else
-        echo "Warning: mpicc not available"
+    mpi_version=mvapich2-2.2
+    if [ ! -z $WM_THIRD_PARTY_USE_MVAPICH2_20 ] && [ -e $WM_THIRD_PARTY_DIR/packages/mvapich2-2.2/platforms/$WM_OPTIONS ]
+        then
+        if [ "$FOAM_VERBOSE" -a "$PS1" ]
+        then
+            echo "Using mvapich2 from the ThirdParty package: $WM_THIRD_PARTY_DIR/packages/$mpi_version"
+        fi
+        _foamSource $WM_THIRD_PARTY_DIR/packages/$mpi_version/platforms/$WM_OPTIONS/etc/$mpi_version.sh
     fi
 
     export MPI_HOME=`dirname $MVAPICH2_BIN_DIR`

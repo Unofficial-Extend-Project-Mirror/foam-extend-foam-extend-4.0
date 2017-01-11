@@ -300,12 +300,17 @@ case SYSTEMOPENMPI:
     breaksw
 
 case MVAPICH2:
-    set mpi_version=mvapich2-2.2
-    if ($?WM_THIRD_PARTY_USE_MVAPICH2_22 != 0 && -d $WM_THIRD_PARTY_DIR/packages/mvapich2-2.2/platforms/$WM_OPTIONS ) then
-        if ($?FOAM_VERBOSE && $?prompt) then
-            echo "Using mvapich2-2.2 from the ThirdParty package: $WM_THIRD_PARTY_DIR/packages/$mpi_version"
+    set mpi_version=mvapich2
+
+    if ($?MVAPICH2_BIN_DIR != 0) then
+        if (-d "${MVAPICH2_BIN_DIR}" ) then
+        _foamAddPath $MVAPICH2_BIN_DIR
         endif
-        _foamSource $WM_THIRD_PARTY_DIR/packages/$mpi_version/platforms/$WM_OPTIONS/etc/$mpi_version.csh
+    else
+        set mpicc_cmd=`which mpicc`
+        setenv MVAPICH2_BIN_DIR `dirname $mpicc_cmd`
+        unset mpicc_cmd
+    endif
 
     setenv MPI_HOME `dirname $MVAPICH2_BIN_DIR`
     setenv MPI_ARCH_PATH $MPI_HOME
@@ -571,8 +576,8 @@ endif
 
 # zoltan
 # ~~~~~
-if ( $?ZOLTAN_SYSTEM == 0 && $?WM_THIRD_PARTY_USE_ZOLTAN_36 != 0 && -e "$WM_THIRD_PARTY_DIR"/packages/zoltan-3.6/platforms/$WM_OPTIONS ) then
-    _foamSource $WM_THIRD_PARTY_DIR/packages/zoltan-3.6/platforms/$WM_OPTIONS/etc/zoltan-3.6.csh
+if ( $?ZOLTAN_SYSTEM == 0 && $?WM_THIRD_PARTY_USE_ZOLTAN_35 != 0 && -e "$WM_THIRD_PARTY_DIR"/packages/zoltan-3.5/platforms/$WM_OPTIONS ) then
+    _foamSource $WM_THIRD_PARTY_DIR/packages/zoltan-3.5/platforms/$WM_OPTIONS/etc/zoltan-3.5.csh
 endif
 
 # Python

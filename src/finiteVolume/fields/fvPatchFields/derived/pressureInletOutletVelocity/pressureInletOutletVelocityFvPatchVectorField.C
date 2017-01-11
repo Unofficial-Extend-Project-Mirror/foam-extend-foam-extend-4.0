@@ -192,7 +192,6 @@ void pressureInletOutletVelocityFvPatchVectorField::updateCoeffs()
     }
 
     directionMixedFvPatchVectorField::updateCoeffs();
-    directionMixedFvPatchVectorField::evaluate();
 }
 
 

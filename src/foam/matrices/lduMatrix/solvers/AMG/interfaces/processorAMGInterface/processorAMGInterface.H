@@ -59,6 +59,12 @@ class processorAMGInterface
         //  agglomerated
         const processorLduInterface& fineProcInterface_;
 
+        //- Communicator to use for parallel communication
+        const label comm_;
+
+        //- Message tag used for sending
+        const int tag_;
+
 
     // Private Member Functions
 
@@ -81,15 +87,15 @@ public:
         processorAMGInterface
         (
             const lduPrimitiveMesh& lduMesh,
+            const lduInterfacePtrsList& coarseInterfaces,
             const lduInterface& fineInterface,
             const labelField& localRestrictAddressing,
             const labelField& neighbourRestrictAddressing
         );
 
 
-    // Destructor
-
-        virtual ~processorAMGInterface();
+    //- Destructor
+    virtual ~processorAMGInterface();
 
 
     // Member Functions
@@ -100,6 +106,21 @@ public:
             virtual bool coupled() const
             {
                 return true;
+            }
+
+
+        // Communications support
+
+            //- Return communicator used for parallel communication
+            virtual int comm() const
+            {
+                return comm_;
+            }
+
+            //- Return message tag used for sending
+            virtual int tag() const
+            {
+                return tag_;
             }
 
 

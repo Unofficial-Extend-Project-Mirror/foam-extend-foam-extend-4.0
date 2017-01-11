@@ -166,7 +166,8 @@ public:
             static List<labelPair> schedule
             (
                 const labelListList& subMap,
-                const labelListList& constructMap
+                const labelListList& constructMap,
+                const int tag
             );
 
             //- Return a schedule. Demand driven. See above.
@@ -178,8 +179,11 @@ public:
             //- Compact maps. Gets per field a bool whether it is used locally
             //  and works out itself what this side and sender side can remove
             //  from maps.
-            void compact(const boolList& elemIsUsed);
-
+            void compact
+            (
+                const boolList& elemIsUsed,
+                const int tag = Pstream::msgType()
+            );
 
             //- Distribute data. Note:schedule only used for Pstream::scheduled
             //  for now, all others just use send-to-all, receive-from-all.
@@ -191,7 +195,8 @@ public:
                 const label constructSize,
                 const labelListList& subMap,
                 const labelListList& constructMap,
-                List<T>&
+                List<T>&,
+                const int tag = Pstream::msgType()
             );
 
             //- Distribute data. If multiple processors writing to same
@@ -206,12 +211,17 @@ public:
                 const labelListList& constructMap,
                 List<T>&,
                 const CombineOp& cop,
-                const T& nullValue
+                const T& nullValue,
+                const int tag = Pstream::msgType()
             );
 
             //- Distribute data using default commsType.
             template<class T>
-            void distribute(List<T>& fld) const
+            void distribute
+            (
+                 List<T>& fld,
+                const int tag = Pstream::msgType()
+            ) const
             {
                 if
                 (
@@ -255,7 +265,7 @@ public:
                 }
             }
 
-            //- Correct for topo change.
+            //- Correct for topo change
             void updateMesh(const mapPolyMesh&)
             {
                 notImplemented
@@ -263,6 +273,7 @@ public:
                     "mapDistribute::updateMesh(const mapPolyMesh&)"
                 );
             }
+
 
     // Member Operators
 

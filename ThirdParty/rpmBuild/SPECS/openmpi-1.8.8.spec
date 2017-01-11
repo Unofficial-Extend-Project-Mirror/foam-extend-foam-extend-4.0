@@ -138,7 +138,7 @@ Group: 			Development/Tools
         --enable-orterun-prefix-by-default \
         --enable-shared \
         --enable-mpi-cxx \
-	--disable-static \
+        --disable-static \
         --disable-mpi-f77 \
         --disable-mpi-f90 \
         --without-slurm \

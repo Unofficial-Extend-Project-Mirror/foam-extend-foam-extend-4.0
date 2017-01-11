@@ -92,13 +92,17 @@ Foam::OPstream::OPstream
     const commsTypes commsType,
     const int toProcNo,
     const label bufSize,
+    const int tag,
+    const label comm,
     streamFormat format,
     versionNumber version
 )
 :
     Pstream(commsType, bufSize),
     Ostream(format, version),
-    toProcNo_(toProcNo)
+    toProcNo_(toProcNo),
+    tag_(tag),
+    comm_(comm)
 {
     setOpened();
     setGood();
@@ -230,6 +234,14 @@ Foam::Ostream& Foam::OPstream::write(const char* data, std::streamsize count)
     writeToBuffer(data, count, 8);
 
     return *this;
+}
+
+
+void Foam::OPstream::print(Ostream& os) const
+{
+    os  << "Writing from processor " << toProcNo_
+        << " to processor " << myProcNo() << " in communicator " << comm_
+        << " and tag " << tag_ << Foam::endl;
 }
 
 

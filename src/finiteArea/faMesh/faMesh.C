@@ -1047,6 +1047,18 @@ void Foam::faMesh::addFaPatches(const List<faPatch*>& p)
 }
 
 
+Foam::label Foam::faMesh::comm() const
+{
+    return comm_;
+}
+
+
+Foam::label& Foam::faMesh::comm()
+{
+    return comm_;
+}
+
+
 const Foam::objectRegistry& Foam::faMesh::thisDb() const
 {
     return mesh().thisDb();

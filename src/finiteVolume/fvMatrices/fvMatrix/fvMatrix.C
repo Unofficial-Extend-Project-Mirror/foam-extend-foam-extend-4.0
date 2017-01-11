@@ -698,7 +698,10 @@ void Foam::fvMatrix<Type>::relax()
 {
     if (psi_.mesh().solutionDict().relaxEquation(psi_.name()))
     {
-        relax(psi_.mesh().solutionDict().equationRelaxationFactor(psi_.name()));
+        relax
+        (
+            psi_.mesh().solutionDict().equationRelaxationFactor(psi_.name())
+        );
     }
     else
     {

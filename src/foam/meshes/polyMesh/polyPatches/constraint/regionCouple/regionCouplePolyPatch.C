@@ -70,10 +70,10 @@ bool Foam::regionCouplePolyPatch::active() const
     {
         // Shadow region present
         const polyMesh& sr = boundaryMesh().mesh().db().parent().
-        objectRegistry::lookupObject<polyMesh>
-        (
-            shadowRegionName_
-        );
+            objectRegistry::lookupObject<polyMesh>
+            (
+                shadowRegionName_
+            );
 
         polyPatchID shadowPatch(shadowPatchName_, sr.boundaryMesh());
 
@@ -226,7 +226,7 @@ void Foam::regionCouplePolyPatch::calcPatchToPatch() const
                 SMALL,         // Non-overlapping face tolerances
                 SMALL,
                 true,          // Rescale weighting factors
-                ggiInterpolation::BB_OCTREE  // Octree search, MB.
+                reject_        // Quick rejection algorithm, default BB_OCTREE
             );
 
         // Abort immediately if uncovered faces are present and the option
@@ -378,7 +378,7 @@ void Foam::regionCouplePolyPatch::calcSendReceive() const
     // (of the calc-call) they will be set to zero-sized array
     // HJ, 4/Jun/2011
 
-    if (receiveAddrPtr_ || sendAddrPtr_)
+    if (mapPtr_)
     {
         FatalErrorIn("void regionCouplePolyPatch::calcSendReceive() const")
             << "Send-receive addressing already calculated"
@@ -399,74 +399,129 @@ void Foam::regionCouplePolyPatch::calcSendReceive() const
             << abort(FatalError);
     }
 
-    // Master will receive and store the maps
-    if (Pstream::master())
+    // Gather send and receive addressing (to master)
+
+    // Get patch-to-zone addressing
+    const labelList& za = zoneAddressing();
+
+    // Make a zone-sized field and fill it in with proc markings for processor
+    // that holds and requires the data
+    labelField zoneProcID(zone().size(), -1);
+
+    forAll (za, zaI)
     {
-        receiveAddrPtr_ = new labelListList(Pstream::nProcs());
-        labelListList& rAddr = *receiveAddrPtr_;
+        zoneProcID[za[zaI]] = Pstream::myProcNo();
+    }
 
-        sendAddrPtr_ = new labelListList(Pstream::nProcs());
-        labelListList& sAddr = *sendAddrPtr_;
+    reduce(zoneProcID, maxOp<labelField>());
 
-        // Insert master
-        rAddr[0] = zoneAddressing();
+    const labelList& shadowRza = shadow().remoteZoneAddressing();
 
-        for (label procI = 1; procI < Pstream::nProcs(); procI++)
+    // Find out where my zone data is coming from
+    labelList nRecv(Pstream::nProcs(), 0);
+
+    // Note: only visit the data from the local zone
+    forAll (shadowRza, shadowRzaI)
+    {
+        nRecv[zoneProcID[shadowRza[shadowRzaI]]]++;
+    }
+
+    // Make a receiving sub-map
+    // It tells me which data I will receive from which processor and
+    // where I need to put it into the remoteZone data before the mapping
+    labelListList constructMap(Pstream::nProcs());
+
+    // Size the receiving list
+    forAll (nRecv, procI)
+    {
+        constructMap[procI].setSize(nRecv[procI]);
+    }
+
+    // Reset counters for processors
+    nRecv = 0;
+
+    forAll (shadowRza, shadowRzaI)
+    {
+        label recvProc = zoneProcID[shadowRza[shadowRzaI]];
+
+        constructMap[recvProc][nRecv[recvProc]] = shadowRza[shadowRzaI];
+
+        nRecv[recvProc]++;
+    }
+
+    // Make the sending sub-map
+    // It tells me which data is required from me to be sent to which
+    // processor
+
+    // Algorithm
+    // - expand the local zone faces with indices into a size of local zone
+    // - go through remote zone addressing on all processors
+    // - find out who hits my faces
+    labelList localZoneIndices(zone().size(), -1);
+
+    forAll (za, zaI)
+    {
+        localZoneIndices[za[zaI]] = zaI;
+    }
+
+    labelListList shadowToReceiveAddr(Pstream::nProcs());
+
+    // Get the list of what my shadow needs to receive from my zone
+    // on all other processors
+    shadowToReceiveAddr[Pstream::myProcNo()] = shadowRza;
+    Pstream::gatherList(shadowToReceiveAddr);
+    Pstream::scatterList(shadowToReceiveAddr);
+
+    // Now local zone indices contain the index of a local face that will
+    // provide the data.  For faces that are not local, the index will be -1
+
+    // Find out where my zone data is going to
+
+    // Make a sending sub-map
+    // It tells me which data I will send to which processor
+    labelListList sendMap(Pstream::nProcs());
+
+    // Collect local labels to be sent to each processor
+    forAll (shadowToReceiveAddr, procI)
+    {
+        const labelList& curProcSend = shadowToReceiveAddr[procI];
+
+        // Find out how much of my data is going to this processor
+        label nProcSend = 0;
+
+        forAll (curProcSend, sendI)
         {
-            // Note: must use normal comms because the size of the
-            // communicated lists is unknown on the receiving side
-            // HJ, 4/Jun/2011
+            if (localZoneIndices[curProcSend[sendI]] > -1)
+            {
+                nProcSend++;
+            }
+        }
 
-            // Opt: reconsider mode of communication
-            IPstream ip(Pstream::scheduled, procI);
+        if (nProcSend > 0)
+        {
+            // Collect the indices
+            labelList& curSendMap = sendMap[procI];
 
-            rAddr[procI] = labelList(ip);
+            curSendMap.setSize(nProcSend);
 
-            sAddr[procI] = labelList(ip);
+            // Reset counter
+            nProcSend = 0;
+
+            forAll (curProcSend, sendI)
+            {
+                if (localZoneIndices[curProcSend[sendI]] > -1)
+                {
+                    curSendMap[nProcSend] =
+                        localZoneIndices[curProcSend[sendI]];
+                    nProcSend++;
+                }
+            }
         }
     }
-    else
-    {
-        // Create dummy pointers: only master processor stores maps
-        receiveAddrPtr_ = new labelListList();
-        sendAddrPtr_ = new labelListList();
 
-        // Send information to master
-        const labelList& za = zoneAddressing();
-        const labelList& ra = remoteZoneAddressing();
-
-        // Note: must use normal comms because the size of the
-        // communicated lists is unknown on the receiving side
-        // HJ, 4/Jun/2011
-
-        // Opt: reconsider mode of communication
-        OPstream op(Pstream::scheduled, Pstream::masterNo());
-
-        // Send local and remote addressing to master
-        op << za << ra;
-    }
-}
-
-
-const Foam::labelListList& Foam::regionCouplePolyPatch::receiveAddr() const
-{
-    if (!receiveAddrPtr_)
-    {
-        calcSendReceive();
-    }
-
-    return *receiveAddrPtr_;
-}
-
-
-const Foam::labelListList& Foam::regionCouplePolyPatch::sendAddr() const
-{
-    if (!sendAddrPtr_)
-    {
-        calcSendReceive();
-    }
-
-    return *sendAddrPtr_;
+    // Map will return the object of the size of remote zone
+    // HJ, 9/May/2016
+    mapPtr_ = new mapDistribute(zone().size(), sendMap, constructMap);
 }
 
 
@@ -492,24 +547,28 @@ void Foam::regionCouplePolyPatch::clearGeom() const
 {
     clearDeltas();
 
+    deleteDemandDrivenData(reconFaceCellCentresPtr_);
+
     // Remote addressing and send-receive maps depend on the local
     // position.  Therefore, it needs to be recalculated at mesh motion.
     // Local zone addressing does not change with mesh motion
     // HJ, 23/Jun/2011
     deleteDemandDrivenData(remoteZoneAddressingPtr_);
 
-    deleteDemandDrivenData(receiveAddrPtr_);
-    deleteDemandDrivenData(sendAddrPtr_);
-
     // localParallel depends on geometry - must be cleared!
     // HR, 11/Jul/2013
     deleteDemandDrivenData(localParallelPtr_);
+
+    deleteDemandDrivenData(mapPtr_);
 }
 
 
 void Foam::regionCouplePolyPatch::clearOut() const
 {
     clearGeom();
+
+    shadowIndex_ = -1;
+    zoneIndex_ = -1;
 
     deleteDemandDrivenData(zoneAddressingPtr_);
     deleteDemandDrivenData(patchToPatchPtr_);
@@ -535,6 +594,7 @@ Foam::regionCouplePolyPatch::regionCouplePolyPatch
     master_(false),
     isWall_(false),
     bridgeOverlap_(false),
+    reject_(ggiZoneInterpolation::BB_OCTREE),
     shadowIndex_(-1),
     zoneIndex_(-1),
     patchToPatchPtr_(NULL),
@@ -542,8 +602,7 @@ Foam::regionCouplePolyPatch::regionCouplePolyPatch
     remoteZoneAddressingPtr_(NULL),
     reconFaceCellCentresPtr_(NULL),
     localParallelPtr_(NULL),
-    receiveAddrPtr_(NULL),
-    sendAddrPtr_(NULL)
+    mapPtr_(NULL)
 {}
 
 
@@ -560,7 +619,8 @@ Foam::regionCouplePolyPatch::regionCouplePolyPatch
     const bool attached,
     const bool master,
     const bool isWall,
-    const bool bridgeOverlap
+    const bool bridgeOverlap,
+    const ggiZoneInterpolation::quickReject reject
 )
 :
     coupledPolyPatch(name, size, start, index, bm),
@@ -571,6 +631,7 @@ Foam::regionCouplePolyPatch::regionCouplePolyPatch
     master_(master),
     isWall_(isWall),
     bridgeOverlap_(bridgeOverlap),
+    reject_(reject),
     shadowIndex_(-1),
     zoneIndex_(-1),
     patchToPatchPtr_(NULL),
@@ -578,8 +639,7 @@ Foam::regionCouplePolyPatch::regionCouplePolyPatch
     remoteZoneAddressingPtr_(NULL),
     reconFaceCellCentresPtr_(NULL),
     localParallelPtr_(NULL),
-    receiveAddrPtr_(NULL),
-    sendAddrPtr_(NULL)
+    mapPtr_(NULL)
 {}
 
 
@@ -599,6 +659,7 @@ Foam::regionCouplePolyPatch::regionCouplePolyPatch
     master_(dict.lookup("master")),
     isWall_(dict.lookup("isWall")),
     bridgeOverlap_(dict.lookup("bridgeOverlap")),
+    reject_(ggiZoneInterpolation::BB_OCTREE),
     shadowIndex_(-1),
     zoneIndex_(-1),
     patchToPatchPtr_(NULL),
@@ -606,9 +667,16 @@ Foam::regionCouplePolyPatch::regionCouplePolyPatch
     remoteZoneAddressingPtr_(NULL),
     reconFaceCellCentresPtr_(NULL),
     localParallelPtr_(NULL),
-    receiveAddrPtr_(NULL),
-    sendAddrPtr_(NULL)
-{}
+    mapPtr_(NULL)
+{
+    if (dict.found("quickReject"))
+    {
+        reject_ = ggiZoneInterpolation::quickRejectNames_.read
+        (
+            dict.lookup("quickReject")
+        );
+    }
+}
 
 
 Foam::regionCouplePolyPatch::regionCouplePolyPatch
@@ -624,6 +692,8 @@ Foam::regionCouplePolyPatch::regionCouplePolyPatch
     attached_(pp.attached_),
     master_(pp.master_),
     isWall_(pp.isWall_),
+    bridgeOverlap_(pp.bridgeOverlap_),
+    reject_(pp.reject_),
     shadowIndex_(-1),
     zoneIndex_(-1),
     patchToPatchPtr_(NULL),
@@ -631,8 +701,7 @@ Foam::regionCouplePolyPatch::regionCouplePolyPatch
     remoteZoneAddressingPtr_(NULL),
     reconFaceCellCentresPtr_(NULL),
     localParallelPtr_(NULL),
-    receiveAddrPtr_(NULL),
-    sendAddrPtr_(NULL)
+    mapPtr_(NULL)
 {}
 
 
@@ -652,6 +721,8 @@ Foam::regionCouplePolyPatch::regionCouplePolyPatch
     attached_(pp.attached_),
     master_(pp.master_),
     isWall_(pp.isWall_),
+    bridgeOverlap_(pp.bridgeOverlap_),
+    reject_(pp.reject_),
     shadowIndex_(-1),
     zoneIndex_(-1),
     patchToPatchPtr_(NULL),
@@ -659,8 +730,7 @@ Foam::regionCouplePolyPatch::regionCouplePolyPatch
     remoteZoneAddressingPtr_(NULL),
     reconFaceCellCentresPtr_(NULL),
     localParallelPtr_(NULL),
-    receiveAddrPtr_(NULL),
-    sendAddrPtr_(NULL)
+    mapPtr_(NULL)
 {}
 
 
@@ -851,6 +921,18 @@ void Foam::regionCouplePolyPatch::detach() const
 }
 
 
+Foam::label Foam::regionCouplePolyPatch::comm() const
+{
+    return boundaryMesh().mesh().comm();
+}
+
+
+int Foam::regionCouplePolyPatch::tag() const
+{
+    return Pstream::msgType();
+}
+
+
 const Foam::labelList& Foam::regionCouplePolyPatch::zoneAddressing() const
 {
     if (!zoneAddressingPtr_)
@@ -911,6 +993,17 @@ Foam::regionCouplePolyPatch::patchToPatch() const
 }
 
 
+const Foam::mapDistribute& Foam::regionCouplePolyPatch::map() const
+{
+    if (!mapPtr_)
+    {
+        calcSendReceive();
+    }
+
+    return *mapPtr_;
+}
+
+
 const Foam::vectorField&
 Foam::regionCouplePolyPatch::reconFaceCellCentres() const
 {
@@ -940,6 +1033,11 @@ void Foam::regionCouplePolyPatch::initAddressing()
         // Calculate transforms for correct GGI cut
         calcTransforms();
 
+        if (master())
+        {
+            shadow().calcTransforms();
+        }
+
         // Force zone addressing and remote zone addressing
         // (uses GGI interpolator)
         zoneAddressing();
@@ -949,7 +1047,7 @@ void Foam::regionCouplePolyPatch::initAddressing()
         if (Pstream::parRun() && !localParallel())
         {
             // Calculate send addressing
-            sendAddr();
+            map();
         }
     }
 
@@ -1019,7 +1117,7 @@ void Foam::regionCouplePolyPatch::initMovePoints(const pointField& p)
         if (Pstream::parRun() && !localParallel())
         {
             // Calculate send addressing
-            sendAddr();
+            map();
         }
     }
 

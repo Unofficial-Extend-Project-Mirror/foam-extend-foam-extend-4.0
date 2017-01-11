@@ -258,6 +258,12 @@ bool Foam::ggiFvPatch::localParallel() const
 }
 
 
+const Foam::mapDistribute& Foam::ggiFvPatch::map() const
+{
+    return ggiPolyPatch_.map();
+}
+
+
 const Foam::scalarListList& Foam::ggiFvPatch::weights() const
 {
     if (ggiPolyPatch_.master())
@@ -268,6 +274,12 @@ const Foam::scalarListList& Foam::ggiFvPatch::weights() const
     {
         return ggiPolyPatch_.patchToPatch().slaveWeights();
     }
+}
+
+
+void Foam::ggiFvPatch::expandAddrToZone(labelField& lf) const
+{
+    lf = ggiPolyPatch_.fastExpand(lf);
 }
 
 
@@ -306,6 +318,7 @@ void Foam::ggiFvPatch::initInternalFieldTransfer
     const unallocLabelList& iF
 ) const
 {
+    // Label transfer is local without global reduction
     labelTransferBuffer_ = patchInternalField(iF);
 }
 

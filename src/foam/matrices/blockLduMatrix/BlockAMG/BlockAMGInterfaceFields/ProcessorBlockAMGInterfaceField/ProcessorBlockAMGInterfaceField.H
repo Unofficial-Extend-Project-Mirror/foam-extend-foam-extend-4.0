@@ -62,8 +62,20 @@ class ProcessorBlockAMGInterfaceField
         //- Is the transform required
         bool doTransform_;
 
-        //- Rank of component for transformation
-        int rank_;
+
+        // Sending and receiving
+
+            //- Outstanding request
+            mutable label outstandingSendRequest_;
+
+            //- Outstanding request
+            mutable label outstandingRecvRequest_;
+
+            //- Send buffer.
+            mutable Field<Type> sendBuf_;
+
+            //- Receive buffer.
+            mutable Field<Type> receiveBuf_;
 
 
     // Private Member Functions
@@ -159,6 +171,12 @@ public:
 
         //- Processor interface functions
 
+            //- Return communicator used for comms
+            virtual label comm() const
+            {
+                return procInterface_.comm();
+            }
+
             //- Return processor number
             virtual int myProcNo() const
             {
@@ -181,12 +199,6 @@ public:
             virtual const tensorField& forwardT() const
             {
                 return procInterface_.forwardT();
-            }
-
-            //- Return rank of component for transform
-            virtual int rank() const
-            {
-                return rank_;
             }
 };
 

@@ -46,6 +46,10 @@ SourceFiles
 namespace Foam
 {
 
+// Forward declaration of classes
+
+class mapDistribute;
+
 /*---------------------------------------------------------------------------*\
                        Class ggiLduInterface Declaration
 \*---------------------------------------------------------------------------*/
@@ -78,9 +82,8 @@ public:
         {}
 
 
-    // Destructor
-
-        virtual ~ggiLduInterface();
+    //- Destructor
+    virtual ~ggiLduInterface();
 
 
     // Member Functions
@@ -112,6 +115,9 @@ public:
         //- Is the patch localised on a single processor
         virtual bool localParallel() const = 0;
 
+        //- Return mapDistribute
+        virtual const mapDistribute& map() const = 0;
+
         //- Return weights
         virtual const scalarListList& weights() const = 0;
 
@@ -120,6 +126,19 @@ public:
 
         //- Return face reverse transformation tensor
         virtual const tensorField& reverseT() const = 0;
+
+        //- Expand addressing to zone
+        //  Used in optimised AMG coarsening
+        virtual void expandAddrToZone(labelField&) const = 0;
+
+
+        // Communications support
+
+            //- Return communicator used for parallel communication
+            virtual int comm() const = 0;
+
+            //- Return message tag used for sending
+            virtual int tag() const = 0;
 
 
         // Transfer buffer access

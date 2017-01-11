@@ -76,9 +76,8 @@ public:
         processorLduInterface();
 
 
-    // Destructor
-
-        virtual ~processorLduInterface();
+    //- Destructor
+    virtual ~processorLduInterface();
 
 
     // Member Functions
@@ -93,6 +92,15 @@ public:
 
             //- Return face transformation tensor
             virtual const tensorField& forwardT() const = 0;
+
+
+        // Communications support
+
+            //- Return communicator used for parallel communication
+            virtual int comm() const = 0;
+
+            //- Return message tag used for sending
+            virtual int tag() const = 0;
 
 
         // Transfer functions
@@ -116,32 +124,6 @@ public:
             //- Raw field receive function returning field
             template<class Type>
             tmp<Field<Type> > receive
-            (
-                const Pstream::commsTypes commsType,
-                const label size
-            ) const;
-
-
-            //- Raw field send function with data compression
-            template<class Type>
-            void compressedSend
-            (
-                const Pstream::commsTypes commsType,
-                const UList<Type>&
-            ) const;
-
-            //- Raw field receive function with data compression
-            template<class Type>
-            void compressedReceive
-            (
-                const Pstream::commsTypes commsType,
-                UList<Type>&
-            ) const;
-
-            //- Raw field receive function with data compression,
-            //  returning a field
-            template<class Type>
-            tmp<Field<Type> > compressedReceive
             (
                 const Pstream::commsTypes commsType,
                 const label size

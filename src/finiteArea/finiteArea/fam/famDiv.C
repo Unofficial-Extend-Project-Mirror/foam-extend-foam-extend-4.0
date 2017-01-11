@@ -49,13 +49,35 @@ div
     const word& name
 )
 {
-    return fa::convectionScheme<Type>::New
+    const areaVectorField& n = vf.mesh().faceAreaNormals();
+
+    tmp<faMatrix<Type> > tM
     (
-        vf.mesh(),
-        flux,
-        vf.mesh().schemesDict().divScheme(name)
-    )().famDiv(flux, vf);
+        fa::convectionScheme<Type>::New
+        (
+            vf.mesh(),
+            flux,
+            vf.mesh().schemesDict().divScheme(name)
+        )().famDiv(flux, vf)
+    );
+    faMatrix<Type>& M = tM();
+
+    GeometricField<Type, faPatchField, areaMesh> v
+    (
+        fa::convectionScheme<Type>::New
+        (
+            vf.mesh(),
+            flux,
+            vf.mesh().schemesDict().divScheme(name)
+        )().facDiv(flux, vf)
+    );
+
+    //HJ Check if the product is from left or right.  HJ, 6/Dec/2016
+    M -= (v & n)*n;
+
+    return tM;
 }
+
 
 template<class Type>
 tmp<faMatrix<Type> >

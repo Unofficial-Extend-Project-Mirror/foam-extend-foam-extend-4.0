@@ -82,6 +82,7 @@ rpm_make()
     echo "Package name      : $_PACKAGE"
     echo "Package URL       : $_PACKAGE_URL"
     echo "RPM spec file name: $_SPECFILE"
+    echo "RPM file name     : $_RPMFILENAME"
     echo "Additional flags  : $_ADDITIONALFLAGS"
 
     # Shift options

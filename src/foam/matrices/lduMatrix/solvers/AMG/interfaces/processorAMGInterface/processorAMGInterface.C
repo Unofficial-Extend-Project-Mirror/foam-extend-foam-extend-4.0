@@ -45,13 +45,16 @@ namespace Foam
 Foam::processorAMGInterface::processorAMGInterface
 (
     const lduPrimitiveMesh& lduMesh,
+    const lduInterfacePtrsList& coarseInterfaces,
     const lduInterface& fineInterface,
     const labelField& localRestrictAddressing,
     const labelField& neighbourRestrictAddressing
 )
 :
     AMGInterface(lduMesh),
-    fineProcInterface_(refCast<const processorLduInterface>(fineInterface))
+    fineProcInterface_(refCast<const processorLduInterface>(fineInterface)),
+    comm_(fineProcInterface_.comm()),
+    tag_(fineProcInterface_.tag())
 {
     // Make a lookup table of entries for owner/neighbour
     HashTable<SLList<label>, label, Hash<label> > neighboursTable
@@ -189,7 +192,8 @@ Foam::processorAMGInterface::processorAMGInterface
 
                 for
                 (
-                    SLList<label>::iterator facesIter = faceFacesIter().begin();
+                    SLList<label>::iterator facesIter =
+                        faceFacesIter().begin();
                     facesIter != faceFacesIter().end();
                     ++facesIter
                 )

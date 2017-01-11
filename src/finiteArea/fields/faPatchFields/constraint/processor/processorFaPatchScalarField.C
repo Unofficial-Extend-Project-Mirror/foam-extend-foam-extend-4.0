@@ -52,7 +52,7 @@ void processorFaPatchField<scalar>::initInterfaceMatrixUpdate
     const bool switchToLhs
 ) const
 {
-    procPatch_.compressedSend
+    procPatch_.send
     (
         commsType,
         patch().patchInternalField(psiInternal)()
@@ -74,7 +74,7 @@ void processorFaPatchField<scalar>::updateInterfaceMatrix
 {
     scalarField pnf
     (
-        procPatch_.compressedReceive<scalar>(commsType, this->size())()
+        procPatch_.receive<scalar>(commsType, this->size())()
     );
 
     const unallocLabelList& edgeFaces = patch().edgeFaces();

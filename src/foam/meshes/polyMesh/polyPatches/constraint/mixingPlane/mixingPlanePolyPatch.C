@@ -58,6 +58,15 @@ bool Foam::mixingPlanePolyPatch::active() const
     polyPatchID shadow(shadowName_, boundaryMesh());
     faceZoneID zone(zoneName_, boundaryMesh().mesh().faceZones());
 
+    // For decomposition and reconstruction
+    // If not runing in parallel and the patch is not local, this is a serial
+    // operation on a piece of a parallel decomposition and is therefore
+    // inactive.  HJ, 5/Sep/2016
+    if (!Pstream::parRun() && !localParallel())
+    {
+        return false;
+    }
+
     return shadow.active() && zone.active();
 }
 
@@ -793,6 +802,18 @@ Foam::mixingPlanePolyPatch::patchToPatch() const
     {
         return shadow().patchToPatch();
     }
+}
+
+
+Foam::label Foam::mixingPlanePolyPatch::comm() const
+{
+    return boundaryMesh().mesh().comm();
+}
+
+
+int Foam::mixingPlanePolyPatch::tag() const
+{
+    return Pstream::msgType();
 }
 
 

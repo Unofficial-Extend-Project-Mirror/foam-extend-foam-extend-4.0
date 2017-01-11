@@ -27,12 +27,13 @@ License
 #include "addToRunTimeSelectionTable.H"
 #include "dictionary.H"
 #include "SubField.H"
-#include "demandDrivenData.H"
 #include "matchPoints.H"
 #include "OFstream.H"
+#include "polyBoundaryMesh.H"
 #include "polyMesh.H"
 #include "foamTime.H"
 #include "transformList.H"
+#include "demandDrivenData.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -133,6 +134,18 @@ Foam::processorPolyPatch::~processorPolyPatch()
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+
+Foam::label Foam::processorPolyPatch::comm() const
+{
+    return boundaryMesh().mesh().comm();
+}
+
+
+int Foam::processorPolyPatch::tag() const
+{
+    return Pstream::msgType();
+}
+
 
 void Foam::processorPolyPatch::initAddressing()
 {

@@ -171,9 +171,8 @@ public:
         }
 
 
-    // Destructor
-
-        virtual ~cyclicGgiPolyPatch();
+    //- Destructor
+    virtual ~cyclicGgiPolyPatch();
 
 
     // Member functions

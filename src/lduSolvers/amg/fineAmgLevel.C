@@ -257,8 +257,8 @@ void Foam::fineAmgLevel::scaleX
         scalingFactorDenom += x[i]*Ax[i];
     }
 
-    vector scalingVector(scalingFactorNum, scalingFactorDenom, 0);
-    reduce(scalingVector, sumOp<vector>());
+    vector2D scalingVector(scalingFactorNum, scalingFactorDenom);
+    reduce(scalingVector, sumOp<vector2D>());
 
     // Scale x
     if
