@@ -36,7 +36,11 @@ namespace Foam
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-Foam::basicPsiThermo::basicPsiThermo(const fvMesh& mesh, const objectRegistry& obj)
+Foam::basicPsiThermo::basicPsiThermo
+(
+    const fvMesh& mesh,
+    const objectRegistry& obj
+)
 :
     basicThermo(mesh, obj)
 {}

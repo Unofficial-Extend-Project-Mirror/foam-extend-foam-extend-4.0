@@ -87,9 +87,10 @@ bool Foam::mixingPlaneCheckFunctionObject::execute()
 
     forAll (mesh.boundaryMesh(), patchI)
     {
-        if (
-            isA<mixingPlanePolyPatch>(mesh.boundaryMesh()[patchI]) &&
-            mesh.boundaryMesh()[patchI].size()
+        if
+        (
+            isA<mixingPlanePolyPatch>(mesh.boundaryMesh()[patchI])
+          && mesh.boundaryMesh()[patchI].size()
         )
         {
             if (!visited[patchI])
@@ -202,7 +203,7 @@ bool Foam::mixingPlaneCheckFunctionObject::execute()
 
                // Old way of computing phi balance
 
-                if( mesh.foundObject<surfaceScalarField>(phiName_) )
+                if (mesh.foundObject<surfaceScalarField>(phiName_))
                 {
                     const surfaceScalarField& phi =
                         mesh.lookupObject<surfaceScalarField>(phiName_);
@@ -210,10 +211,13 @@ bool Foam::mixingPlaneCheckFunctionObject::execute()
                     // Calculate local and shadow flux
                     scalar masterPatchScaleFactor_ = 1.0;
                     scalar shadowPatchScaleFactor_ = sumMasterAreas/sumShadowAreas;
-                    scalar localFlux    = masterPatchScaleFactor_ * sum(phi.boundaryField()[patchI]);
+                    scalar localFlux =masterPatchScaleFactor_*
+                        sum(phi.boundaryField()[patchI]);
+
                     scalar localFluxMag = mag(localFlux);
 
-                    scalar shadowFlux    = shadowPatchScaleFactor_ * sum(phi.boundaryField()[shadowPatchI]);
+                    scalar shadowFlux =shadowPatchScaleFactor_*
+                        sum(phi.boundaryField()[shadowPatchI]);
 //                     scalar shadowFluxMag = mag(shadowFlux);
 
                     Info<< "Mixing plane pair "
@@ -227,43 +231,6 @@ bool Foam::mixingPlaneCheckFunctionObject::execute()
             }
         }
     }
-
-
-//         {
-//             word patchName = phi.boundaryField()[patchI].patch().name();
-
-//             if (patchName == masterPatchName_ && !visited[patchI])
-//             {
-//                 visited[patchI] = true;
-
-//                 // Calculate local and shadow flux
-//                 scalar localFlux    = masterPatchScaleFactor_ * sum(phi.boundaryField()[patchI]);
-//                 //scalar localFluxMag = masterPatchScaleFactor_ * sumMag(phi.boundaryField()[patchI]);
-//                 scalar localFluxMag = mag(localFlux);
-
-//                 const mixingPlanePolyPatch& mixingPlanePatch =
-//                     refCast<const mixingPlanePolyPatch>
-//                     (
-//                         phi.boundaryField()[patchI].patch().patch()
-//                     );
-
-//                 const label shadowPatchI = mixingPlanePatch.shadowIndex();
-
-//                 visited[shadowPatchI] = true;
-
-//                 scalar shadowFlux    = shadowPatchScaleFactor_ * sum(phi.boundaryField()[shadowPatchI]);
-//                 //scalar shadowFluxMag = shadowPatchScaleFactor_ * sumMag(phi.boundaryField()[shadowPatchI]);
-//                 scalar shadowFluxMag = mag(shadowFlux);
-
-//                 Info<< "mixingPlane pair " << name_ << " (" << mixingPlanePatch.name() << ", " << mixingPlanePatch.shadow().name() << ") : "
-//                     << " flux: " << localFlux << " " << shadowFlux
-//                     << " : mag: " <<  localFluxMag << " " << shadowFluxMag
-//                     << " Diff = " << localFlux + shadowFlux << " or "
-//                     << mag(localFlux + shadowFlux)/(localFluxMag + SMALL)*100
-//                     << " %" << endl;
-//             }
-//         }
-//     }
 
     return true;
 }
