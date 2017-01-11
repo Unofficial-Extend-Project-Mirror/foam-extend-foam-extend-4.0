@@ -49,12 +49,13 @@ ndiv
     const GeometricField<Type, faePatchField, edgeMesh>& ssf
 )
 {
-    const areaVectorField &n = ssf.mesh().faceAreaNormals();
+    const areaVectorField& n = ssf.mesh().faceAreaNormals();
 
-    tmp<GeometricField<Type, faPatchField, areaMesh> > v = fac::edgeIntegrate(ssf);
+    tmp<GeometricField<Type, faPatchField, areaMesh> > v =
+        fac::edgeIntegrate(ssf);
 
-    //v.internalField() = transform(n*n, v.internalField());
-    v.internalField() = (v.internalField()&n)*n;
+    v.internalField() = n*(n & v.internalField());
+    v.correctBoundaryConditions();
 
     return v;
 }
@@ -87,7 +88,7 @@ ndiv
     const word& name
 )
 {
-    const areaVectorField &n = vf.mesh().faceAreaNormals();
+    const areaVectorField& n = vf.mesh().faceAreaNormals();
 
     tmp<GeometricField<Type, faPatchField, areaMesh> > tDiv
     (
@@ -96,11 +97,11 @@ ndiv
                 vf.mesh(), vf.mesh().schemesDict().divScheme(name)
             )().facDiv(vf)
     );
-
     GeometricField<Type, faPatchField, areaMesh>& Div = tDiv();
 
-    //Div.internalField() = transform(n*n, Div.internalField());
-    Div.internalField() = (Div.internalField()&n)*n;
+    Div.internalField() = n*(n & Div.internalField());
+    Div.correctBoundaryConditions();
+
     return tDiv;
 }
 
@@ -125,6 +126,7 @@ ndiv
         fac::ndiv(tvvf(), name)
     );
     tvvf.clear();
+
     return Div;
 }
 
@@ -178,22 +180,22 @@ ndiv
     const word& name
 )
 {
-    const areaVectorField &n = vf.mesh().faceAreaNormals();
+    const areaVectorField& n = vf.mesh().faceAreaNormals();
 
     tmp<GeometricField<Type, faPatchField, areaMesh> > tDiv
     (
         fa::convectionScheme<Type>::New
-            (
-                vf.mesh(),
-                flux,
-                vf.mesh().schemesDict().divScheme(name)
-            )().facDiv(flux, vf)
+        (
+            vf.mesh(),
+            flux,
+            vf.mesh().schemesDict().divScheme(name)
+        )().facDiv(flux, vf)
     );
 
     GeometricField<Type, faPatchField, areaMesh>& Div = tDiv();
 
-    //Div.internalField() = transform(n*n, Div.internalField());
-    Div.internalField() = (Div.internalField()&n)*n;
+    Div.internalField() = n*(n &Div.internalField());
+    Div.correctBoundaryConditions();
 
     return tDiv;
 
@@ -214,6 +216,7 @@ ndiv
         fac::ndiv(tflux(), vf, name)
     );
     tflux.clear();
+
     return Div;
 }
 
@@ -232,6 +235,7 @@ ndiv
         fac::ndiv(flux, tvf(), name)
     );
     tvf.clear();
+
     return Div;
 }
 
@@ -251,6 +255,7 @@ ndiv
     );
     tflux.clear();
     tvf.clear();
+
     return Div;
 }
 
@@ -318,6 +323,7 @@ ndiv
     );
     tflux.clear();
     tvf.clear();
+
     return Div;
 }
 

@@ -63,7 +63,7 @@ grad
 
     GeometricField<GradType, faPatchField, areaMesh>& gGrad = tgGrad();
 
-    gGrad -= (gGrad & n)*n;
+    gGrad -= n*(n & gGrad);
     gGrad.correctBoundaryConditions();
 
     return tgGrad;
@@ -118,7 +118,7 @@ grad
 
     GeometricField<GradType, faPatchField, areaMesh>& gGrad = tgGrad();
 
-    gGrad -= (gGrad & n)*n;
+    gGrad -= n*(n & gGrad);
     gGrad.correctBoundaryConditions();
 
     return tgGrad;

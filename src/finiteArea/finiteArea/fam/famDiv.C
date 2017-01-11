@@ -73,7 +73,7 @@ div
     );
 
     //HJ Check if the product is from left or right.  HJ, 6/Dec/2016
-    M -= (v & n)*n;
+    M -= n*(n & v);
 
     return tM;
 }
@@ -90,6 +90,7 @@ div
 {
     tmp<faMatrix<Type> > Div(fam::div(tflux(), vf, name));
     tflux.clear();
+
     return Div;
 }
 
@@ -115,6 +116,7 @@ div
 {
     tmp<faMatrix<Type> > Div(fam::div(tflux(), vf));
     tflux.clear();
+
     return Div;
 }
 

@@ -68,6 +68,7 @@ ndiv
 {
     tmp<faMatrix<Type> > Div(fam::ndiv(tflux(), vf, name));
     tflux.clear();
+
     return Div;
 }
 
@@ -93,6 +94,7 @@ ndiv
 {
     tmp<faMatrix<Type> > Div(fam::ndiv(tflux(), vf));
     tflux.clear();
+
     return Div;
 }
 
