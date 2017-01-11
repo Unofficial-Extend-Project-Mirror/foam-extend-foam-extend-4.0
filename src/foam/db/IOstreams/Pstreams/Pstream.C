@@ -305,7 +305,7 @@ void Foam::Pstream::allocatePstreamCommunicator
         MPI_Comm_rank
         (
             PstreamGlobals::MPICommunicators_[index],
-           &myProcNo_[index]
+            &myProcNo_[index]
         );
 
         // Set the number of processes to the actual number
@@ -343,7 +343,7 @@ void Foam::Pstream::allocatePstreamCommunicator
                 MPI_Comm_rank
                 (
                     PstreamGlobals::MPICommunicators_[index],
-                   &myProcNo_[index]
+                    &myProcNo_[index]
                 )
             )
             {
@@ -751,7 +751,7 @@ void Foam::Pstream::waitRequest(const label i)
     (
         MPI_Wait
         (
-           &PstreamGlobals::outstandingRequests_[i],
+            &PstreamGlobals::outstandingRequests_[i],
             MPI_STATUS_IGNORE
         )
     )
@@ -793,8 +793,8 @@ bool Foam::Pstream::finishedRequest(const label i)
     int flag;
     MPI_Test
     (
-       &PstreamGlobals::outstandingRequests_[i],
-       &flag,
+        &PstreamGlobals::outstandingRequests_[i],
+        &flag,
         MPI_STATUS_IGNORE
     );
 
