@@ -58,12 +58,14 @@ outForces=open('forces.dat','w')
 
 for data in zip(t,fx,fy,fz):
         outForces.write(' '.join([str(d) for d in data])+'\n')
+
 outForces.close()
 
 outMoments=open('moments.dat','w')
 
 for data in zip(t,mx,my,mz):
         outMoments.write(' '.join([str(d) for d in data])+'\n')
+
 outMoments.close()
 
 # plot forces
