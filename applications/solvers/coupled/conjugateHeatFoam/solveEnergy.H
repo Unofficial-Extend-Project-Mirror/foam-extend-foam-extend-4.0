@@ -14,14 +14,11 @@
               + fvm::div(phi, T)
             )
           - fvm::laplacian(kappaEff, T)
-            ==
+         ==
             radiation->Ru()
           - fvm::Sp(4.0*radiation->Rp()*pow3(T), T)
           + 3.0*radiation->Rp()*pow4(T)
         );
-
-        //Done automatically in 1.6.1-ext
-        //TFluidEqn->boundaryManipulate(T.boundaryField());
 
         fvScalarMatrix* TSolidEqn = new fvScalarMatrix
         (
@@ -29,10 +26,6 @@
           - fvm::laplacian(ksolidf, Tsolid, "laplacian(k,T)")
           + fvm::SuSp(-solidThermo.S()/Tsolid, Tsolid)
         );
-
-        //Done automatically in 1.6.1-ext
-        //TSolidEqn->boundaryManipulate(Tsolid.boundaryField());
-
 
         // Add fluid equation
         TEqns.set(0, TFluidEqn);
