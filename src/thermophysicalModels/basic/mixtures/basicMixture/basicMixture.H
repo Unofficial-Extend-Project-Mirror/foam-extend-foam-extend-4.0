@@ -65,9 +65,8 @@ public:
         basicMixture(const dictionary&, const fvMesh&, const objectRegistry&);
 
 
-    // Destructor
-
-        virtual ~basicMixture();
+    //- Destructor
+    virtual ~basicMixture();
 };
 
 

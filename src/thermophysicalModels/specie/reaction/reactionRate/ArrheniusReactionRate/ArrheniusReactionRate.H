@@ -44,7 +44,7 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class ArrheniusReactionRate Declaration
+                  Class ArrheniusReactionRate Declaration
 \*---------------------------------------------------------------------------*/
 
 class ArrheniusReactionRate

@@ -88,7 +88,11 @@ public:
     // Selectors
 
         //- Standard selection based on fvMesh
-        static autoPtr<hsCombustionThermo> New(const fvMesh&, const objectRegistry&);
+        static autoPtr<hsCombustionThermo> New
+        (
+            const fvMesh&,
+            const objectRegistry&
+        );
 
         static autoPtr<hsCombustionThermo> New(const fvMesh& mesh)
         {

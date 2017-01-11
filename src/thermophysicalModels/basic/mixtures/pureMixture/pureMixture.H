@@ -75,9 +75,8 @@ public:
         pureMixture(const dictionary&, const fvMesh&, const objectRegistry&);
 
 
-    // Destructor
-
-        ~pureMixture();
+    //- Destructor
+    ~pureMixture();
 
 
     // Member functions
