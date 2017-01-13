@@ -533,7 +533,7 @@ void Foam::MRFZone::correctBoundaryVelocity(volVectorField& U) const
 {
     const vector& origin = origin_.value();
     const vector rotVel = Omega();
-    Info<< "rotVel: " << rotVel << endl;
+
     // Included patches
     forAll (includedFaces_, patchi)
     {
