@@ -1,36 +1,32 @@
     p.boundaryField().updateCoeffs();
 
-    // Prepare clean 1/Ap without contribution from under-relaxation
-    // HJ, 26/Oct/2015
-    volScalarField rUA
-    (
-        "(1|A(Urel))",
-        1/HUrelEqn().A()
-    );
+    volScalarField rAUrel = 1.0/UrelEqn().A();
+    Urel = rAUrel*UrelEqn().H();
+    UrelEqn.clear();
 
-    // Store velocity under-relaxation point before using U for the flux
-    // precursor
-    Urel.storePrevIter();
-
-    Urel = rUA*HUrelEqn().H();
-    HUrelEqn.clear();
-    phi = fvc::interpolate(Urel) & mesh.Sf();
-
-    // Global flux balance
+    // Calculate under-relaxation consistent flux
+    simple.calcSteadyConsistentFlux(phi, Urel);
     adjustPhi(phi, Urel, p);
 
     // Non-orthogonal pressure corrector loop
-    for (int nonOrth = 0; nonOrth <= nNonOrthCorr; nonOrth++)
+    while (simple.correctNonOrthogonal())
     {
         fvScalarMatrix pEqn
         (
-            fvm::laplacian(rUA, p) == fvc::div(phi)
+            fvm::laplacian
+            (
+                fvc::interpolate(rAUrel)/simple.aCoeff(),
+                p,
+                "laplacian(rAU," + p.name() + ')'
+            )
+          ==
+            fvc::div(phi)
         );
 
         pEqn.setReference(pRefCell, pRefValue);
         pEqn.solve();
 
-        if (nonOrth == nNonOrthCorr)
+        if (simple.finalNonOrthogonalIter())
         {
             phi -= pEqn.flux();
         }
@@ -41,8 +37,5 @@
     // Explicitly relax pressure for momentum corrector
     p.relax();
 
-    // Momentum corrector
-    // Note: since under-relaxation does not change aU, H/a in U can be
-    // re-used.  HJ, 22/Jan/2016
-    Urel = UUrf*(Urel - rUA*fvc::grad(p)) + (1 - UUrf)*Urel.prevIter();
-    Urel.correctBoundaryConditions();
+    // Reconstruct consistent velocity after pressure equation
+    simple.reconstructSteadyVelocity(Urel, rAUrel, p);
