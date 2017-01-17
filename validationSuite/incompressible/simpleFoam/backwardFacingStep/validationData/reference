@@ -1,0 +1,18 @@
+Author: Robert Keser, robert.keser@gmail.com
+
+Reference experimental data:
+@article{DRIVER-1985,
+    doi = {10.2514/3.8890},
+    title   = {Features of a reattaching turbulent shear layer in divergent
+    channelflow},
+    author  = {D. M. Driver and H. L. Seegmiller},
+    publisher   = {American Institute of Aeronautics and Astronautics},
+    journal = {AIAA Journal},
+    issnp   = {0001-1452},
+    issne   = {1533-385X},
+    year    = {1985},
+    month   = {02},
+    volume  = {23},
+    issue   = {2},
+    page    = {163--171}
+}
