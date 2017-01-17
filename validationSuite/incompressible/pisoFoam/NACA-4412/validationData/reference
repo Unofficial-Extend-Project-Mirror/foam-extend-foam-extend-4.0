@@ -1,0 +1,9 @@
+Author: Filip Sutalo, sutalo.filip1@gmail.com
+
+Reference experimental data:
+https://turbmodels.larc.nasa.gov/naca4412sep_val.html
+
+Notes:
+    1. Since flow separation occurs, we should have performed averaging of the
+       results instead of taking the last iteration solution for comparison.
+    2. There are some doubts regarding experimental measurements.

@@ -1,0 +1,46 @@
+ /*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  1.6                                   |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      sampleDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+interpolationScheme cellPoint;
+surfaceFormat raw;
+
+setFormat   gnuplot;
+
+
+sets
+();
+
+fields (
+p
+);
+
+surfaces
+(
+
+        solidWall
+        {
+        type        patch;
+        patchName   solidWall;
+        rhoName rhoInf;
+        rhoInf 1.0; //Reference density for fluid
+        outputInterval: 1.0
+        interpolate    true;
+        triangulate    false;
+        }       
+);
+
+
+// *********************************************************************** //
