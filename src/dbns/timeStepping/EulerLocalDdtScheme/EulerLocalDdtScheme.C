@@ -625,6 +625,30 @@ EulerLocalDdtScheme<Type>::fvcDdtPhiCorr
 
 
 template<class Type>
+tmp<typename EulerLocalDdtScheme<Type>::fluxFieldType>
+EulerLocalDdtScheme<Type>::fvcDdtConsistentPhiCorr
+(
+    const GeometricField<Type, fvsPatchField, surfaceMesh>& faceU,
+    const GeometricField<Type, fvPatchField, volMesh>& U,
+    const surfaceScalarField& rAUf
+)
+{
+    const objectRegistry& registry = this->mesh();
+
+    // Get access to the scalar beta[i]
+    const scalarField& beta =
+        registry.lookupObject<scalarField>(deltaTName_);
+
+    const surfaceScalarField rDeltaTf = fvc::interpolate
+    (
+        1.0/(beta[0]*registry.lookupObject<volScalarField>(deltaTauName_))
+    );
+
+    return (mesh().Sf() & faceU.oldTime())*rAUf*rDeltaTf;
+}
+
+
+template<class Type>
 tmp<surfaceScalarField> EulerLocalDdtScheme<Type>::meshPhi
 (
     const GeometricField<Type, fvPatchField, volMesh>&
