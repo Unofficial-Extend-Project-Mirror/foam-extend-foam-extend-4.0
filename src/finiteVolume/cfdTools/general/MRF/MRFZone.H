@@ -221,7 +221,7 @@ public:
         ) const;
 
         //- Compute the pseudo mesh phi of the MRF region
-        void meshPhi(surfaceVectorField& phi) const;
+        void meshPhi(surfaceScalarField& phi) const;
 
         //- Correct the boundary velocity for the roation of the MRF region
         void correctBoundaryVelocity(volVectorField& U) const;

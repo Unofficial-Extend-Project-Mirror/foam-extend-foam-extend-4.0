@@ -86,11 +86,11 @@ Foam::tmp<Foam::surfaceScalarField> Foam::MRFZones::fluxCorrection() const
 }
 
 
-Foam::tmp<Foam::surfaceVectorField> Foam::MRFZones::meshPhi() const
+Foam::tmp<Foam::surfaceScalarField> Foam::MRFZones::meshPhi() const
 {
-    tmp<surfaceVectorField> tMRFZonesPhiCorr
+    tmp<surfaceScalarField> tMRFZonesPhiCorr
     (
-        new surfaceVectorField
+        new surfaceScalarField
         (
             IOobject
             (
@@ -101,10 +101,10 @@ Foam::tmp<Foam::surfaceVectorField> Foam::MRFZones::meshPhi() const
                 IOobject::NO_WRITE
             ),
             mesh_,
-            dimensionedVector("zero", dimVelocity, vector::zero)
+            dimensionedScalar("zero", dimVolume/dimTime, 0)
         )
     );
-    surfaceVectorField& MRFZonesPhiCorr = tMRFZonesPhiCorr();
+    surfaceScalarField& MRFZonesPhiCorr = tMRFZonesPhiCorr();
 
     forAll (*this, i)
     {

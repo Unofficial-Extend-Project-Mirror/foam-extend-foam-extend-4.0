@@ -44,34 +44,42 @@ void Foam::MRFZone::relativeRhoFlux
     const vector rotVel = Omega();
 
     // Internal faces
+    const vectorField& CfIn = Cf.internalField();
+    const vectorField& SfIn = Sf.internalField();
+
+    register label faceI, patchFaceI;
+
     forAll (internalFaces_, i)
     {
-        label facei = internalFaces_[i];
-        phi[facei] -= rho[facei]*(rotVel ^ (Cf[facei] - origin)) & Sf[facei];
+        faceI = internalFaces_[i];
+
+        phi[faceI] -=
+            rho[faceI]*(rotVel ^ (CfIn[faceI] - origin)) & SfIn[faceI];
     }
 
-    // Included patches
-    forAll (includedFaces_, patchi)
+    // Included patches: reset the flux to exactly zero to avoid
+    // round-off issues
+    forAll (includedFaces_, patchI)
     {
-        forAll (includedFaces_[patchi], i)
+        forAll (includedFaces_[patchI], i)
         {
-            label patchFacei = includedFaces_[patchi][i];
+            patchFaceI = includedFaces_[patchI][i];
 
-            phi.boundaryField()[patchi][patchFacei] = 0.0;
+            phi.boundaryField()[patchI][patchFaceI] = 0.0;
         }
     }
 
     // Excluded patches
-    forAll (excludedFaces_, patchi)
+    forAll (excludedFaces_, patchI)
     {
-        forAll (excludedFaces_[patchi], i)
+        forAll (excludedFaces_[patchI], i)
         {
-            label patchFacei = excludedFaces_[patchi][i];
+            patchFaceI = excludedFaces_[patchI][i];
 
-            phi.boundaryField()[patchi][patchFacei] -=
-                rho.boundaryField()[patchi][patchFacei]
-               *(rotVel ^ (Cf.boundaryField()[patchi][patchFacei] - origin))
-              & Sf.boundaryField()[patchi][patchFacei];
+            phi.boundaryField()[patchI][patchFaceI] -=
+                rho.boundaryField()[patchI][patchFaceI]
+               *(rotVel ^ (Cf.boundaryField()[patchI][patchFaceI] - origin))
+              & Sf.boundaryField()[patchI][patchFaceI];
         }
     }
 }
@@ -91,35 +99,41 @@ void Foam::MRFZone::absoluteRhoFlux
     const vector rotVel = Omega();
 
     // Internal faces
+    const vectorField& CfIn = Cf.internalField();
+    const vectorField& SfIn = Sf.internalField();
+
+    register label faceI, patchFaceI;
+
     forAll (internalFaces_, i)
     {
-        label facei = internalFaces_[i];
-        phi[facei] += (rotVel ^ (Cf[facei] - origin)) & Sf[facei];
+        faceI = internalFaces_[i];
+        
+        phi[faceI] += (rotVel ^ (CfIn[faceI] - origin)) & SfIn[faceI];
     }
 
     // Included patches
-    forAll (includedFaces_, patchi)
+    forAll (includedFaces_, patchI)
     {
-        forAll (includedFaces_[patchi], i)
+        forAll (includedFaces_[patchI], i)
         {
-            label patchFacei = includedFaces_[patchi][i];
+            patchFaceI = includedFaces_[patchI][i];
 
-            phi.boundaryField()[patchi][patchFacei] +=
-                (rotVel ^ (Cf.boundaryField()[patchi][patchFacei] - origin))
-              & Sf.boundaryField()[patchi][patchFacei];
+            phi.boundaryField()[patchI][patchFaceI] +=
+                (rotVel ^ (Cf.boundaryField()[patchI][patchFaceI] - origin))
+              & Sf.boundaryField()[patchI][patchFaceI];
         }
     }
 
     // Excluded patches
-    forAll (excludedFaces_, patchi)
+    forAll (excludedFaces_, patchI)
     {
-        forAll (excludedFaces_[patchi], i)
+        forAll (excludedFaces_[patchI], i)
         {
-            label patchFacei = excludedFaces_[patchi][i];
+            patchFaceI = excludedFaces_[patchI][i];
 
-            phi.boundaryField()[patchi][patchFacei] +=
-                (rotVel ^ (Cf.boundaryField()[patchi][patchFacei] - origin))
-              & Sf.boundaryField()[patchi][patchFacei];
+            phi.boundaryField()[patchI][patchFaceI] +=
+                (rotVel ^ (Cf.boundaryField()[patchI][patchFaceI] - origin))
+              & Sf.boundaryField()[patchI][patchFaceI];
         }
     }
 }
