@@ -161,6 +161,15 @@ public:
                 const Pstream::commsTypes commsType,
                 const bool switchToLhs
             ) const = 0;
+
+            //- Update the constraints
+            virtual void updateConstraints
+            (
+                const scalarField&,
+                scalarField&,
+                const label
+            ) const
+            {}
 };
 
 
