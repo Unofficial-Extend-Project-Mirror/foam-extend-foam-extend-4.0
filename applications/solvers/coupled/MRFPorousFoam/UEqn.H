@@ -52,9 +52,7 @@
         trAU().rename("rAU");
     }
 
-    // Insert the additional components. Note this will destroy the H and A
-
-    UEqn += fvm::SuSp(-divPhi, U) + divPhi*U;
+    // Under-relax momentum. Note this will destroy the H and A
     UEqn.relax();
 
     // Insert momentum equation
