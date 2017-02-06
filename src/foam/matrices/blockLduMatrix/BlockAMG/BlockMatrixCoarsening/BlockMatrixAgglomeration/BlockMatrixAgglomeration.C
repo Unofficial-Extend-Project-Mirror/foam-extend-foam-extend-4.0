@@ -369,6 +369,20 @@ void Foam::BlockMatrixAgglomeration<Type>::calcAgglomeration()
         {
             Pout << ".  Rejected" << endl;
         }
+
+        // Count cluster size
+        labelList clusterSize(nCoarseEqns_, 0);
+
+        forAll (agglomIndex_, eqnI)
+        {
+            clusterSize[agglomIndex_[eqnI]]++;
+        }
+
+        label minClusterSize = gMin(clusterSize);
+        label maxClusterSize = gMax(clusterSize);
+
+        Info<< "Cluster size: min = " << minClusterSize
+            << " max = " << maxClusterSize << endl;
     }
 }
 
