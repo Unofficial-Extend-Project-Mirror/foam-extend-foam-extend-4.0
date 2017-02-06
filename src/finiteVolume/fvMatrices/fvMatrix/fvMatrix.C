@@ -56,7 +56,7 @@ void Foam::fvMatrix<Type>::addToInternalField
             << abort(FatalError);
     }
 
-    forAll(addr, faceI)
+    forAll (addr, faceI)
     {
         intf[addr[faceI]] += pf[faceI];
     }
@@ -96,7 +96,7 @@ void Foam::fvMatrix<Type>::subtractFromInternalField
             << abort(FatalError);
     }
 
-    forAll(addr, faceI)
+    forAll (addr, faceI)
     {
         intf[addr[faceI]] -= pf[faceI];
     }
@@ -124,7 +124,7 @@ void Foam::fvMatrix<Type>::addBoundaryDiag
     const direction solveCmpt
 ) const
 {
-    forAll(internalCoeffs_, patchI)
+    forAll (internalCoeffs_, patchI)
     {
         addToInternalField
         (
@@ -139,7 +139,7 @@ void Foam::fvMatrix<Type>::addBoundaryDiag
 template<class Type>
 void Foam::fvMatrix<Type>::addCmptAvBoundaryDiag(scalarField& diag) const
 {
-    forAll(internalCoeffs_, patchI)
+    forAll (internalCoeffs_, patchI)
     {
         addToInternalField
         (
@@ -158,7 +158,7 @@ void Foam::fvMatrix<Type>::addBoundarySource
     const bool couples
 ) const
 {
-    forAll(psi_.boundaryField(), patchI)
+    forAll (psi_.boundaryField(), patchI)
     {
         const fvPatchField<Type>& ptf = psi_.boundaryField()[patchI];
         const Field<Type>& pbc = boundaryCoeffs_[patchI];
@@ -190,7 +190,7 @@ void Foam::fvMatrix<Type>::correctImplicitBoundarySource
     const direction cmpt
 ) const
 {
-    forAll(psi_.boundaryField(), patchI)
+    forAll (psi_.boundaryField(), patchI)
     {
         const fvPatchField<Type>& ptf = psi_.boundaryField()[patchI];
         const scalarField& pbc = bouCoeffsCmpt[patchI];
@@ -492,7 +492,7 @@ void Foam::fvMatrix<Type>::setValues
             GeometricField<Type, fvPatchField, volMesh>&
         >(psi_).internalField();
 
-    forAll(cellLabels, i)
+    forAll (cellLabels, i)
     {
         label celli = cellLabels[i];
 
@@ -503,7 +503,7 @@ void Foam::fvMatrix<Type>::setValues
         {
             const cell& c = cells[celli];
 
-            forAll(c, j)
+            forAll (c, j)
             {
                 label facei = c[j];
 
@@ -622,7 +622,7 @@ void Foam::fvMatrix<Type>::relax(const scalar alpha)
     sumMagOffDiag(sumOff);
 
     // Handle the boundary contributions to the diagonal
-    forAll(psi_.boundaryField(), patchI)
+    forAll (psi_.boundaryField(), patchI)
     {
         const fvPatchField<Type>& ptf = psi_.boundaryField()[patchI];
 
@@ -637,7 +637,7 @@ void Foam::fvMatrix<Type>::relax(const scalar alpha)
 
                 // For coupled boundaries add the diagonal and
                 // off-diagonal contributions
-                forAll(pa, face)
+                forAll (pa, face)
                 {
                     D[pa[face]] += component(iCoeffs[face], 0);
                     sumOff[pa[face]] += mag(component(pCoeffs[face], 0));
@@ -649,7 +649,7 @@ void Foam::fvMatrix<Type>::relax(const scalar alpha)
                 // contribution off-diagonal sum which avoids having to remove
                 // it from the diagonal later.
                 // Also add the source contribution from the relaxation
-                forAll(pa, face)
+                forAll (pa, face)
                 {
                     Type iCoeff0 = iCoeffs[face];
                     iCoeffs[face] = cmptMag(iCoeffs[face]);
@@ -669,7 +669,7 @@ void Foam::fvMatrix<Type>::relax(const scalar alpha)
     D /= alpha;
 
     // Now remove the diagonal contribution from coupled boundaries
-    forAll(psi_.boundaryField(), patchI)
+    forAll (psi_.boundaryField(), patchI)
     {
         const fvPatchField<Type>& ptf = psi_.boundaryField()[patchI];
 
@@ -680,7 +680,7 @@ void Foam::fvMatrix<Type>::relax(const scalar alpha)
 
             if (ptf.coupled())
             {
-                forAll(pa, face)
+                forAll (pa, face)
                 {
                     D[pa[face]] -= component(iCoeffs[face], 0);
                 }
@@ -716,6 +716,140 @@ void Foam::fvMatrix<Type>::relax()
 
 
 template<class Type>
+void Foam::fvMatrix<Type>::relax
+(
+    const scalar alpha,
+    const word& cellZoneName
+)
+{
+    if (alpha <= 0)
+    {
+        return;
+    }
+
+    // Find cell zone and check it is not empty
+    const label zoneID = psi_.mesh().cellZones().findZoneID(cellZoneName);
+
+    if (zoneID < 0)
+    {
+        WarningIn
+        (
+            "void fvMatrix<Type>::relax\n"
+            "(\n"
+            "    const scalar alpha,\n"
+            "    const word& cellZoneName\n"
+            ")"
+        )   << "Cannot find cell zone " << cellZoneName
+            << ".  No relaxation applied"
+            << endl;
+
+        return;
+    }
+
+    if (psi_.mesh().cellZones()[zoneID].empty())
+    {
+        // Zone empty, skip
+        return;
+    }
+
+    Field<Type>& S = source();
+    scalarField& D = diag();
+
+    // Store the current unrelaxed diagonal for use in updating the source
+    scalarField D0(D);
+
+    // Calculate the sum-mag off-diagonal from the interior faces
+    scalarField sumOff(D.size(), 0.0);
+    sumMagOffDiag(sumOff);
+
+    // Handle the boundary contributions to the diagonal
+    forAll (psi_.boundaryField(), patchI)
+    {
+        const fvPatchField<Type>& ptf = psi_.boundaryField()[patchI];
+
+        if (ptf.size())
+        {
+            const unallocLabelList& pa = lduAddr().patchAddr(patchI);
+            Field<Type>& iCoeffs = internalCoeffs_[patchI];
+
+            if (ptf.coupled())
+            {
+                const Field<Type>& pCoeffs = boundaryCoeffs_[patchI];
+
+                // For coupled boundaries add the diagonal and
+                // off-diagonal contributions
+                forAll (pa, face)
+                {
+                    D[pa[face]] += component(iCoeffs[face], 0);
+                    sumOff[pa[face]] += mag(component(pCoeffs[face], 0));
+                }
+            }
+            else
+            {
+                // For non-coupled boundaries subtract the diagonal
+                // contribution off-diagonal sum which avoids having to remove
+                // it from the diagonal later.
+                // Also add the source contribution from the relaxation
+                forAll (pa, face)
+                {
+                    Type iCoeff0 = iCoeffs[face];
+                    iCoeffs[face] = cmptMag(iCoeffs[face]);
+                    sumOff[pa[face]] -= cmptMin(iCoeffs[face]);
+                    iCoeffs[face] /= alpha;
+                    S[pa[face]] +=
+                        cmptMultiply(iCoeffs[face] - iCoeff0, psi_[pa[face]]);
+                }
+            }
+        }
+    }
+
+    // Under-relax only cells within the zone
+    const labelList& zoneCells = psi_.mesh().cellZones()[zoneID];
+
+    forAll (zoneCells, zcI)
+    {
+        const label cellI = zoneCells[zcI];
+
+        // Ensure the matrix is diagonally dominant...
+        D[cellI] = max(D[cellI], sumOff[cellI]);
+
+        // ... then relax
+        D[cellI] /= alpha;
+    }
+
+    // Now remove the diagonal contribution from coupled boundaries
+    forAll (psi_.boundaryField(), patchI)
+    {
+        const fvPatchField<Type>& ptf = psi_.boundaryField()[patchI];
+
+        if (ptf.size())
+        {
+            const unallocLabelList& pa = lduAddr().patchAddr(patchI);
+            Field<Type>& iCoeffs = internalCoeffs_[patchI];
+
+            if (ptf.coupled())
+            {
+                forAll (pa, face)
+                {
+                    D[pa[face]] -= component(iCoeffs[face], 0);
+                }
+            }
+        }
+    }
+
+    const Field<Type>& psiIn = psi_.internalField();
+
+    forAll (zoneCells, zcI)
+    {
+        const label cellI = zoneCells[zcI];
+
+        // Finally add the relaxation contribution to the source.
+        S[cellI] += (D[cellI] - D0[cellI])*psiIn[cellI];
+    }
+}
+
+
+template<class Type>
 void Foam::fvMatrix<Type>::completeAssembly()
 {
     if (assemblyCompleted_)
@@ -739,7 +873,7 @@ void Foam::fvMatrix<Type>::completeAssembly()
     typename GeometricField<Type, fvPatchField, volMesh>::
         GeometricBoundaryField& bFields = ncPsi.boundaryField();
 
-    forAll(bFields, patchI)
+    forAll (bFields, patchI)
     {
         bFields[patchI].manipulateMatrix(*this);
     }
@@ -760,7 +894,7 @@ Foam::tmp<Foam::Field<Type> > Foam::fvMatrix<Type>::DD() const
 {
     tmp<Field<Type> > tdiag(pTraits<Type>::one*diag());
 
-    forAll(psi_.boundaryField(), patchI)
+    forAll (psi_.boundaryField(), patchI)
     {
         const fvPatchField<Type>& ptf = psi_.boundaryField()[patchI];
 
@@ -1223,7 +1357,7 @@ void Foam::fvMatrix<Type>::operator*=
     lduMatrix::operator*=(dsf.field());
     source_ *= dsf.field();
 
-    forAll(boundaryCoeffs_, patchI)
+    forAll (boundaryCoeffs_, patchI)
     {
         scalarField psf
         (
