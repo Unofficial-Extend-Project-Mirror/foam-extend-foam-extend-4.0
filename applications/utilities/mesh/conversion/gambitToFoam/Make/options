@@ -1,4 +1,4 @@
-ifneq ($(FLEX_DIR), "")
+ifneq ($(FLEX_DIR),)
 EXE_INC = \
     -I$(FLEX_DIR)/include
 endif
