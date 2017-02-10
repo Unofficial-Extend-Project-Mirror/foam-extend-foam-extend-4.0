@@ -81,17 +81,40 @@ int main(int argc, char *argv[])
 #       include "couplingTerms.H"
 
         // Solve the block matrix
-        maxResidual = cmptMax(UpEqn.solve().initialResidual());
+        residual = UpEqn.solve();
+        maxResidual = cmptMax(residual.initialResidual());
 
-        // Retrieve solution
-        UpEqn.retrieveSolution(0, U.internalField());
-        UpEqn.retrieveSolution(3, p.internalField());
+        // Check for divergence
+        if (mag(residual.finalResidual() - residual.initialResidual()) > 1)
+        {
+            Info<< "DIVERGENCE: rescue step" << endl;
 
-        U.correctBoundaryConditions();
-        p.correctBoundaryConditions();
+            // Solving potential flow equation and correcting velocities
+            phi = (fvc::interpolate(U) & mesh.Sf());
+            
+            solve
+            (
+                tpEqn
+             ==
+              - fvc::div(U)
+            );
 
-        phi = (fvc::interpolate(U) & mesh.Sf()) + tpEqn().flux() + tpresSource;
+            phi += tpEqn().flux() + tpresSource;
 
+            U = fvc::reconstruct(phi);
+        }
+        else
+        {
+            // Retrieve solution
+            UpEqn.retrieveSolution(0, U.internalField());
+            UpEqn.retrieveSolution(3, p.internalField());
+
+            U.correctBoundaryConditions();
+            p.correctBoundaryConditions();
+
+            phi = (fvc::interpolate(U) & mesh.Sf()) + tpEqn().flux() + tpresSource;
+        }
+        
         // Make flux relative in rotating zones
         mrfZones.relativeFlux(phi);
 

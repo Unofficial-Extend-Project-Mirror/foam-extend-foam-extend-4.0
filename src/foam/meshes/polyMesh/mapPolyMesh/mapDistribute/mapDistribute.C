@@ -33,7 +33,8 @@ License
 Foam::List<Foam::labelPair> Foam::mapDistribute::schedule
 (
     const labelListList& subMap,
-    const labelListList& constructMap
+    const labelListList& constructMap,
+    const int tag
 )
 {
     // Communications: send and receive processor
@@ -69,12 +70,19 @@ Foam::List<Foam::labelPair> Foam::mapDistribute::schedule
         // Receive and merge
         for
         (
-            int slave=Pstream::firstSlave();
-            slave<=Pstream::lastSlave();
+            int slave = Pstream::firstSlave();
+            slave <= Pstream::lastSlave();
             slave++
         )
         {
-            IPstream fromSlave(Pstream::scheduled, slave);
+            IPstream fromSlave
+            (
+                Pstream::scheduled,
+                slave,
+                0,
+                tag
+            );
+
             List<labelPair> nbrData(fromSlave);
 
             forAll (nbrData, i)
@@ -82,7 +90,7 @@ Foam::List<Foam::labelPair> Foam::mapDistribute::schedule
                 if (findIndex(allComms, nbrData[i]) == -1)
                 {
                     label sz = allComms.size();
-                    allComms.setSize(sz+1);
+                    allComms.setSize(sz + 1);
                     allComms[sz] = nbrData[i];
                 }
             }
@@ -90,23 +98,43 @@ Foam::List<Foam::labelPair> Foam::mapDistribute::schedule
         // Send back
         for
         (
-            int slave=Pstream::firstSlave();
-            slave<=Pstream::lastSlave();
+            int slave = Pstream::firstSlave();
+            slave <= Pstream::lastSlave();
             slave++
         )
         {
-            OPstream toSlave(Pstream::scheduled, slave);
+            OPstream toSlave
+            (
+                Pstream::scheduled,
+                slave,
+                0,
+                tag
+            );
+
             toSlave << allComms;
         }
     }
     else
     {
         {
-            OPstream toMaster(Pstream::scheduled, Pstream::masterNo());
+            OPstream toMaster
+            (
+                Pstream::scheduled,
+                Pstream::masterNo(),
+                0,
+                tag
+            );
+
             toMaster << allComms;
         }
         {
-            IPstream fromMaster(Pstream::scheduled, Pstream::masterNo());
+            IPstream fromMaster
+            (
+                Pstream::scheduled,
+                Pstream::masterNo(),
+                0,
+                tag
+            );
             fromMaster >> allComms;
         }
     }
@@ -156,10 +184,11 @@ const Foam::List<Foam::labelPair>& Foam::mapDistribute::schedule() const
         (
             new List<labelPair>
             (
-                schedule(subMap_, constructMap_)
+                schedule(subMap_, constructMap_, Pstream::msgType())
             )
         );
     }
+
     return schedulePtr_();
 }
 
@@ -311,7 +340,7 @@ Foam::mapDistribute::mapDistribute(const mapDistribute& map)
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
-void Foam::mapDistribute::compact(const boolList& elemIsUsed)
+void Foam::mapDistribute::compact(const boolList& elemIsUsed, const int tag)
 {
     // 1. send back to sender. Have him delete the corresponding element
     //    from the submap and do the same to the constructMap locally
@@ -319,7 +348,12 @@ void Foam::mapDistribute::compact(const boolList& elemIsUsed)
 
     // Send elemIsUsed field to neighbour. Use nonblocking code from
     // mapDistribute but in reverse order.
+    if (Pstream::parRun())
     {
+        label startOfRequests = Pstream::nRequests();
+
+        // Set up receives from neighbours
+
         List<boolList> sendFields(Pstream::nProcs());
 
         for (label domain = 0; domain < Pstream::nProcs(); domain++)
@@ -340,7 +374,8 @@ void Foam::mapDistribute::compact(const boolList& elemIsUsed)
                     Pstream::nonBlocking,
                     domain,
                     reinterpret_cast<const char*>(subField.begin()),
-                    subField.size()*sizeof(bool)
+                    subField.size()*sizeof(bool),
+                    tag
                 );
             }
         }
@@ -361,7 +396,8 @@ void Foam::mapDistribute::compact(const boolList& elemIsUsed)
                     Pstream::nonBlocking,
                     domain,
                     reinterpret_cast<char*>(recvFields[domain].begin()),
-                    recvFields[domain].size()*sizeof(bool)
+                    recvFields[domain].size()*sizeof(bool),
+                    tag
                 );
             }
         }
@@ -379,12 +415,8 @@ void Foam::mapDistribute::compact(const boolList& elemIsUsed)
             }
         }
 
-
         // Wait for all to finish
-
-        OPstream::waitRequests();
-        IPstream::waitRequests();
-
+        Pstream::waitRequests(startOfRequests);
 
         // Compact out all submap entries that are referring to unused elements
         for (label domain = 0; domain < Pstream::nProcs(); domain++)
@@ -445,6 +477,7 @@ void Foam::mapDistribute::compact(const boolList& elemIsUsed)
     constructSize_ = maxConstructIndex + 1;
 
     // Clear the schedule (note:not necessary if nothing changed)
+    Pout<< "CLEAR SCHEDULE POINTER" << endl;
     schedulePtr_.clear();
 }
 

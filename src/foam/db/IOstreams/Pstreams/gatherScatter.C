@@ -45,16 +45,25 @@ void Pstream::gather
 (
     const List<Pstream::commsStruct>& comms,
     T& Value,
-    const BinaryOp& bop
+    const BinaryOp& bop,
+    const int tag,
+    const label comm
 )
 {
-    if (Pstream::parRun())
+    // Return if not active in this comm
+    // HJ, 12/Sep/2016
+    if (Pstream::myProcNo(comm) == -1)
+    {
+        return;
+    }
+
+    if (Pstream::nProcs(comm) > 1)
     {
         // Get my communication order
-        const commsStruct& myComm = comms[Pstream::myProcNo()];
+        const commsStruct& myComm = comms[Pstream::myProcNo(comm)];
 
         // Receive from my downstairs neighbours
-        forAll(myComm.below(), belowI)
+        forAll (myComm.below(), belowI)
         {
             T value;
 
@@ -65,12 +74,21 @@ void Pstream::gather
                     Pstream::scheduled,
                     myComm.below()[belowI],
                     reinterpret_cast<char*>(&value),
-                    sizeof(T)
+                    sizeof(T),
+                    tag,
+                    comm
                 );
             }
             else
             {
-                IPstream fromBelow(Pstream::scheduled, myComm.below()[belowI]);
+                IPstream fromBelow
+                (
+                    Pstream::scheduled,
+                    myComm.below()[belowI],
+                    0,
+                    tag,
+                    comm
+                );
                 fromBelow >> value;
             }
 
@@ -87,12 +105,21 @@ void Pstream::gather
                     Pstream::scheduled,
                     myComm.above(),
                     reinterpret_cast<const char*>(&Value),
-                    sizeof(T)
+                    sizeof(T),
+                    tag,
+                    comm
                 );
             }
             else
             {
-                OPstream toAbove(Pstream::scheduled, myComm.above());
+                OPstream toAbove
+                (
+                    Pstream::scheduled,
+                    myComm.above(),
+                    0,
+                    tag,
+                    comm
+                );
                 toAbove << Value;
             }
         }
@@ -101,26 +128,45 @@ void Pstream::gather
 
 
 template <class T, class BinaryOp>
-void Pstream::gather(T& Value, const BinaryOp& bop)
+void Pstream::gather
+(
+    T& Value,
+    const BinaryOp& bop,
+    const int tag,
+    const label comm
+)
 {
-    if (Pstream::nProcs() < Pstream::nProcsSimpleSum())
+    if (Pstream::nProcs(comm) < Pstream::nProcsSimpleSum())
     {
-        gather(Pstream::linearCommunication(), Value, bop);
+        gather(Pstream::linearCommunication(comm), Value, bop, tag, comm);
     }
     else
     {
-        gather(Pstream::treeCommunication(), Value, bop);
+        gather(Pstream::treeCommunication(comm), Value, bop, tag, comm);
     }
 }
 
 
 template <class T>
-void Pstream::scatter(const List<Pstream::commsStruct>& comms, T& Value)
+void Pstream::scatter
+(
+    const List<Pstream::commsStruct>& comms,
+    T& Value,
+    const int tag,
+    const label comm
+)
 {
-    if (Pstream::parRun())
+    // Return if not active in this comm
+    // HJ, 12/Sep/2016
+    if (Pstream::myProcNo(comm) == -1)
+    {
+        return;
+    }
+
+    if (Pstream::nProcs(comm) > 1)
     {
         // Get my communication order
-        const commsStruct& myComm = comms[Pstream::myProcNo()];
+        const commsStruct& myComm = comms[Pstream::myProcNo(comm)];
 
         // Receive from up
         if (myComm.above() != -1)
@@ -132,18 +178,30 @@ void Pstream::scatter(const List<Pstream::commsStruct>& comms, T& Value)
                     Pstream::scheduled,
                     myComm.above(),
                     reinterpret_cast<char*>(&Value),
-                    sizeof(T)
+                    sizeof(T),
+                    tag,
+                    comm
                 );
             }
             else
             {
-                IPstream fromAbove(Pstream::scheduled, myComm.above());
+                IPstream fromAbove
+                (
+                    Pstream::scheduled,
+                    myComm.above(),
+                    0,
+                    tag,
+                    comm
+                );
                 fromAbove >> Value;
             }
         }
 
-        // Send to my downstairs neighbours
-        forAll(myComm.below(), belowI)
+        // Send to my downstairs neighbours.  Note reverse order (compared to
+        // receiving). This is to make sure to send to the critical path
+        // (only when using a tree schedule!) first.
+        // This is ESI Comms optimisation, v16.06.  HJ, 19/Sep/2016
+        forAllReverse (myComm.below(), belowI)
         {
             if (contiguous<T>())
             {
@@ -152,12 +210,21 @@ void Pstream::scatter(const List<Pstream::commsStruct>& comms, T& Value)
                     Pstream::scheduled,
                     myComm.below()[belowI],
                     reinterpret_cast<const char*>(&Value),
-                    sizeof(T)
+                    sizeof(T),
+                    tag,
+                    comm
                 );
             }
             else
             {
-                OPstream toBelow(Pstream::scheduled,myComm.below()[belowI]);
+                OPstream toBelow
+                (
+                    Pstream::scheduled,
+                    myComm.below()[belowI],
+                    0,
+                    tag,
+                    comm
+                );
                 toBelow << Value;
             }
         }
@@ -166,15 +233,15 @@ void Pstream::scatter(const List<Pstream::commsStruct>& comms, T& Value)
 
 
 template <class T>
-void Pstream::scatter(T& Value)
+void Pstream::scatter(T& Value, const int tag, const label comm)
 {
-    if (Pstream::nProcs() < Pstream::nProcsSimpleSum())
+    if (Pstream::nProcs(comm) < Pstream::nProcsSimpleSum())
     {
-        scatter(Pstream::linearCommunication(), Value);
+        scatter(Pstream::linearCommunication(comm), Value, tag, comm);
     }
     else
     {
-        scatter(Pstream::treeCommunication(), Value);
+        scatter(Pstream::treeCommunication(comm), Value, tag, comm);
     }
 }
 

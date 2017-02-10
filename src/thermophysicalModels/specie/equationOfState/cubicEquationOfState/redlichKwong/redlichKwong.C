@@ -66,8 +66,8 @@ Foam::redlichKwong::redlichKwong(const dictionary& dict)
     Tcrit_(readScalar(dict.subDict("equationOfState").lookup("TCritical"))),
     a_(0.42748*pow(this->RR(),2)*pow(Tcrit_,2.5)/pcrit_),
     b_(0.08664*this->RR()*Tcrit_/pcrit_),
-    b2_(pow(b_,2)),
-    b3_(pow(b_,3)),
+    b2_(pow(b_, 2)),
+    b3_(pow(b_, 3)),
     //CL: rhoMin and rhoMax are only used as boundaries for the bisection methode (see rho function)
     //CL: important: rhoMin and rhoMax are not used as boundary for the newton solver
     //CL: therefore, rho can be larger than rhoMax and smaller than rhoMin

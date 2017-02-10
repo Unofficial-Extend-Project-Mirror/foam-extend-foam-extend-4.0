@@ -46,7 +46,7 @@ pressureDirectedInletOutletVelocityFvPatchVectorField
     mixedFvPatchVectorField(p, iF),
     phiName_("phi"),
     rhoName_("rho"),
-    inletDir_(p.size())
+    inletDir_(p.size(), vector(1, 0, 0))
 {
     refValue() = *this;
     refGrad() = vector::zero;
@@ -84,6 +84,30 @@ pressureDirectedInletOutletVelocityFvPatchVectorField
     inletDir_("inletDirection", dict, p.size())
 {
     fvPatchVectorField::operator=(vectorField("value", dict, p.size()));
+
+    if (!inletDir_.empty())
+    {
+        if (min(mag(inletDir_)) < SMALL)
+        {
+            FatalErrorIn
+            (
+                "pressureDirectedInletOutletVelocityFvPatchVectorField::\n"
+                "pressureDirectedInletOutletVelocityFvPatchVectorField\n"
+                "(\n"
+                "    const fvPatch& p,\n"
+                "    const DimensionedField<vector, volMesh>& iF,\n"
+                "    const dictionary& dict\n"
+                ")"
+            )    << "Badly defined inlet direction for field "
+                 << this->dimensionedInternalField().name()
+                 << " and patch " << this->patch().name()
+                 << abort(FatalError);
+        }
+    }       
+
+    // Normalise to obtain the flow direction
+    inletDir_ /= (mag(inletDir_) + SMALL);
+
     refValue() = *this;
     refGrad() = vector::zero;
     valueFraction() = 0.0;

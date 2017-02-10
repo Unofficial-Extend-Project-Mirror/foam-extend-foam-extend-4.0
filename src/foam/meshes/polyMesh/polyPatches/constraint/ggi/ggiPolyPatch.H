@@ -105,6 +105,13 @@ class ggiPolyPatch
             //  Used for parallel optimisation
             mutable bool* localParallelPtr_;
 
+            //- Communicator to use for parallel communication
+            //  Note: only master side allocates the comm
+            mutable label comm_;
+
+            //- Message tag used for sending
+            mutable int tag_;
+
             //- Map-distribute comms tool
             mutable mapDistribute* mapPtr_;
 
@@ -137,9 +144,6 @@ class ggiPolyPatch
 
             //- Calculate send and receive addressing
             void calcSendReceive() const;
-
-            //- Return mapDistribute
-            const mapDistribute& map() const;
 
 
         // Memory management
@@ -306,6 +310,15 @@ public:
             const faceZone& zone() const;
 
 
+        // Communications support
+
+            //- Return communicator used for communication
+            virtual label comm() const;
+
+            //- Return message tag to use for communication
+            virtual int tag() const;
+
+
         // Interpolation data
 
             //- Is this the master side?
@@ -334,6 +347,9 @@ public:
 
             //- Is the patch localised on a single processor
             bool localParallel() const;
+
+            //- Return mapDistribute
+            const mapDistribute& map() const;
 
             //- Return reference to patch-to-patch interpolation
             //  Used only for addressing

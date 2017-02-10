@@ -207,8 +207,7 @@ public:
 
 
     //- Destructor
-
-        virtual ~cellZone();
+    virtual ~cellZone();
 
 
     // Member Functions

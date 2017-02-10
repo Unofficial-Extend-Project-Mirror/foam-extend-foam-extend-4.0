@@ -44,7 +44,7 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                         Class wedgeFvPatch Declaration
+                     Class wedgeFvPatchField Declaration
 \*---------------------------------------------------------------------------*/
 
 template<class Type>

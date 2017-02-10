@@ -119,17 +119,17 @@ public:
 
     // Member Functions
 
-        //- Return reference to x
-        virtual Field<Type>& x();
-
-        //- Return reference to b
-        virtual Field<Type>& b();
-
         //- Return reference to dictionary
         const dictionary& dict() const
         {
             return dict_;
         }
+
+        //- Return reference to x
+        virtual Field<Type>& x();
+
+        //- Return reference to b
+        virtual Field<Type>& b();
 
         //- Calculate residual
         virtual void residual

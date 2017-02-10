@@ -55,6 +55,18 @@ processorFaPatch::~processorFaPatch()
 
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
 
+Foam::label Foam::processorFaPatch::comm() const
+{
+    return boundaryMesh().mesh().comm();
+}
+
+
+int Foam::processorFaPatch::tag() const
+{
+    return Pstream::msgType();
+}
+
+
 void processorFaPatch::makeNonGlobalPatchPoints() const
 {
     // If it is not runing parallel or there are no global points

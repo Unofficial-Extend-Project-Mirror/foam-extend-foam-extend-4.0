@@ -34,6 +34,7 @@ Author
 #include "fvMesh.H"
 #include "fvBoundaryMesh.H"
 #include "foamTime.H"
+#include "mapDistribute.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -302,6 +303,12 @@ bool Foam::regionCoupleFvPatch::localParallel() const
 }
 
 
+const Foam::mapDistribute& Foam::regionCoupleFvPatch::map() const
+{
+    return rcPolyPatch_.map();
+}
+
+
 const Foam::scalarListList& Foam::regionCoupleFvPatch::weights() const
 {
     if (rcPolyPatch_.master())
@@ -312,6 +319,16 @@ const Foam::scalarListList& Foam::regionCoupleFvPatch::weights() const
     {
         return rcPolyPatch_.patchToPatch().slaveWeights();
     }
+}
+
+
+void Foam::regionCoupleFvPatch::expandAddrToZone(labelField& lf) const
+{
+    // Missing code.  Activate for AMG solvers across regionCoupleFvPatch
+    notImplemented
+    (
+        "void regionCoupleFvPatch::expandAddrToZone(labelField& lf) const"
+    );
 }
 
 

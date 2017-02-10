@@ -29,6 +29,7 @@ Description
 
 SourceFiles
     famDiv.C
+    vectorFamDiv.C
 
 \*---------------------------------------------------------------------------*/
 
@@ -88,6 +89,9 @@ namespace fam
 } // End namespace Foam
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+// Template specialisation
+#include "vectorFamDiv.H"
 
 #ifdef NoRepository
 #   include "famDiv.C"

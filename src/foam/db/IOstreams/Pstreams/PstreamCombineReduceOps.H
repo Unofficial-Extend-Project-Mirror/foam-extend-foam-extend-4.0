@@ -30,7 +30,6 @@ Description
     combined using the given combination function and the result is
     broadcast to all nodes
 
-
 \*---------------------------------------------------------------------------*/
 
 #ifndef PstreamCombineReduceOps_H
@@ -51,26 +50,62 @@ void combineReduce
 (
     const List<Pstream::commsStruct>& comms,
     T& Value,
-    const CombineOp& cop
+    const CombineOp& cop,
+    const int tag,
+    const label comm
 )
 {
-    Pstream::combineGather(comms, Value, cop);
-    Pstream::combineScatter(comms, Value);
+    Pstream::combineGather(comms, Value, cop, tag, comm);
+    Pstream::combineScatter(comms, Value, tag, comm);
 }
 
 
 template <class T, class CombineOp>
-void combineReduce(T& Value, const CombineOp& cop)
+void combineReduce
+(
+    T& Value,
+    const CombineOp& cop,
+    const int tag = Pstream::msgType(),
+    const label comm = Pstream::worldComm
+)
 {
     if (Pstream::nProcs() < Pstream::nProcsSimpleSum())
     {
-        Pstream::combineGather(Pstream::linearCommunication(), Value, cop);
-        Pstream::combineScatter(Pstream::linearCommunication(), Value);
+        Pstream::combineGather
+        (
+            Pstream::linearCommunication(comm),
+            Value,
+            cop,
+            tag,
+            comm
+        );
+
+        Pstream::combineScatter
+        (
+            Pstream::linearCommunication(comm),
+            Value,
+            tag,
+            comm
+        );
     }
     else
     {
-        Pstream::combineGather(Pstream::treeCommunication(), Value, cop);
-        Pstream::combineScatter(Pstream::treeCommunication(), Value);
+        Pstream::combineGather
+        (
+            Pstream::treeCommunication(comm),
+            Value,
+            cop,
+            tag,
+            comm
+        );
+
+        Pstream::combineScatter
+        (
+            Pstream::treeCommunication(comm),
+            Value,
+            tag,
+            comm
+        );
     }
 }
 

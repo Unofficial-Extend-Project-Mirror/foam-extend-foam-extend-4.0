@@ -174,9 +174,8 @@ public:
         );
 
 
-    // Destructor
-
-        virtual ~probes();
+    //- Destructor
+    virtual ~probes();
 
 
     // Member Functions

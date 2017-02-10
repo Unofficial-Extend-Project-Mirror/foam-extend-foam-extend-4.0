@@ -59,10 +59,9 @@ public:
 
     // Constructors
 
-    // Destructor
-
-        virtual ~lduMesh()
-        {}
+    //- Destructor
+    virtual ~lduMesh()
+    {}
 
 
     // Member Functions
@@ -78,6 +77,10 @@ public:
             //- Return a list of pointers for each patch
             //  with only those pointing to interfaces being set
             virtual lduInterfacePtrsList interfaces() const = 0;
+
+            //- Return communicator used for parallel communication
+            virtual int comm() const = 0;
+
 };
 
 

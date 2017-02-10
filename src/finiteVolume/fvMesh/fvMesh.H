@@ -123,6 +123,7 @@ class fvMesh
 
        // Make geometric data
 
+            //- Make face areas
             void makeSf() const;
 
             //- Make face area magnitudes
@@ -216,9 +217,8 @@ public:
         );
 
 
-    // Destructor
-
-        virtual ~fvMesh();
+    //- Destructor
+    virtual ~fvMesh();
 
 
     // Member Functions
@@ -283,6 +283,15 @@ public:
             {
                 return lduAddr().upperAddr();
             }
+
+
+            // Communication support
+
+                //- Return communicator used for parallel communication
+                label comm() const
+                {
+                    return polyMesh::comm();
+                }
 
 
             //- Return cell volumes

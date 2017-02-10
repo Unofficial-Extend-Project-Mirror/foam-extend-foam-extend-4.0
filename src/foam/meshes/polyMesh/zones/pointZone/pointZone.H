@@ -209,8 +209,7 @@ public:
 
 
     //- Destructor
-
-        virtual ~pointZone();
+    virtual ~pointZone();
 
 
     // Member Functions

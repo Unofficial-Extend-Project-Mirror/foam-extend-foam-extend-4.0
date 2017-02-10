@@ -137,7 +137,7 @@ public:
                 const scalarField& c
             ) const;
 
-            //- Reverse rate constant from the given formard rate constant
+            //- Reverse rate constant from the given forward rate constant
             virtual scalar kr
             (
                 const scalar kfwd,

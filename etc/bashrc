@@ -91,11 +91,11 @@ export WM_THIRD_PARTY_DIR=$WM_PROJECT_DIR/ThirdParty
 # Use 'set' and 'unset' to adjust for your environent
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # For AllMake.stage1
-export WM_THIRD_PARTY_USE_CMAKE_322=1
+#export WM_THIRD_PARTY_USE_CMAKE_322=1
 
 #
 # For AllMake.stage2
-export WM_THIRD_PARTY_USE_OPENMPI_165=1
+export WM_THIRD_PARTY_USE_OPENMPI_188=1
 
 #
 # For AllMake.stage3

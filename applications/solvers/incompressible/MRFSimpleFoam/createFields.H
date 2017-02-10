@@ -44,3 +44,19 @@
 
     MRFZones mrfZones(mesh);
     mrfZones.correctBoundaryVelocity(U);
+
+    // Create Urel as a permanent field to make it available for on-the-fly
+    // post-processing operations
+    volVectorField Urel
+    (
+        IOobject
+        (
+            "Urel",
+            runTime.timeName(),
+            mesh,
+            IOobject::NO_READ,
+            IOobject::AUTO_WRITE
+        ),
+        U
+    );
+    mrfZones.relativeVelocity(Urel);

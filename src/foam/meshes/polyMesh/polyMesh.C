@@ -244,6 +244,7 @@ Foam::polyMesh::polyMesh(const IOobject& io)
     bounds_(allPoints_),
     geometricD_(Vector<label>::zero),
     solutionD_(Vector<label>::zero),
+    comm_(Pstream::worldComm),
     pointZones_
     (
         IOobject
@@ -441,6 +442,7 @@ Foam::polyMesh::polyMesh
     bounds_(allPoints_, syncPar),
     geometricD_(Vector<label>::zero),
     solutionD_(Vector<label>::zero),
+    comm_(Pstream::worldComm),
     pointZones_
     (
         IOobject
@@ -601,6 +603,7 @@ Foam::polyMesh::polyMesh
     bounds_(allPoints_, syncPar),
     geometricD_(Vector<label>::zero),
     solutionD_(Vector<label>::zero),
+    comm_(Pstream::worldComm),
     pointZones_
     (
         IOobject
@@ -922,6 +925,18 @@ const Foam::Vector<Foam::label>& Foam::polyMesh::solutionD() const
 Foam::label Foam::polyMesh::nSolutionD() const
 {
     return cmptSum(solutionD() + Vector<label>::one)/2;
+}
+
+
+Foam::label Foam::polyMesh::comm() const
+{
+    return comm_;
+}
+
+
+Foam::label& Foam::polyMesh::comm()
+{
+    return comm_;
 }
 
 

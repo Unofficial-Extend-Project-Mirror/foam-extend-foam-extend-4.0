@@ -111,9 +111,8 @@ public:
         );
 
 
-    // Destructor
-
-        virtual ~ggiPointPatch();
+    //- Destructor
+    virtual ~ggiPointPatch();
 
 
     // Member Functions
@@ -122,6 +121,21 @@ public:
 
             //- Return true because this patch is coupled
             virtual bool coupled() const;
+
+
+        // Communications support
+
+            //- Return communicator used for communication
+            virtual label comm() const
+            {
+                return ggiPolyPatch_.comm();
+            }
+
+            //- Return message tag to use for communication
+            virtual int tag() const
+            {
+                return ggiPolyPatch_.tag();
+            }
 };
 
 

@@ -42,6 +42,8 @@ SourceFiles
 #include "ggiLduInterface.H"
 #include "mapDistribute.H"
 
+#include "cpuTime.H"
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
@@ -68,11 +70,25 @@ class ggiAMGInterface
         //- Zone addressing
         labelList zoneAddressing_;
 
+        //- Processor master faces
+        //  Per-processor insertion list of local faces into global zone
+        //  The list is created on the master side and passed onto the slave
+        //  to allow the slave to insert faces in the same order
+        labelListList procMasterFaces_;
+
 
         // Parallel communication
 
+            //- Communicator to use for parallel communication
+            const label comm_;
+
+            //- Message tag used for sending
+            const int tag_;
+
             //- Map-distribute comms tool
             mutable mapDistribute* mapPtr_;
+
+            cpuTime lTime_;
 
 
     // Private Member Functions
@@ -94,7 +110,7 @@ class ggiAMGInterface
     // Private static data
 
         //- Processor cluster offset index
-        static const label procOffset = 4000000;
+        static const long procOffset = 12000000;
 
 
 public:
@@ -110,15 +126,15 @@ public:
         ggiAMGInterface
         (
             const lduPrimitiveMesh& lduMesh,
+            const lduInterfacePtrsList& coarseInterfaces,
             const lduInterface& fineInterface,
             const labelField& localRestrictAddressing,
             const labelField& neighbourRestrictAddressing
         );
 
 
-    // Destructor
-
-        virtual ~ggiAMGInterface();
+    //- Destructor
+    virtual ~ggiAMGInterface();
 
 
     // Member Functions
@@ -129,6 +145,21 @@ public:
             virtual bool coupled() const
             {
                 return true;
+            }
+
+
+        // Communications support
+
+            //- Return communicator used for parallel communication
+            virtual int comm() const
+            {
+                return comm_;
+            }
+
+            //- Return message tag used for sending
+            virtual int tag() const
+            {
+                return tag_;
             }
 
 
@@ -143,9 +174,23 @@ public:
 
         // Interface transfer functions
 
+            //- Fast expand
+            //  Note: contains global communications
+            //  This function will expand data to zone size with fast comms
+            //  filling in only the part of the zone that is required
+            //  on the shadow side
+            template<class Type>
+            tmp<Field<Type> > fastExpand(const UList<Type>&) const;
+
             //- Fast reduce
             //  Note: contains global communications
-            //  New, HJ, 24/Jun/2011
+            //  This function will expand data to zone size with fast comms
+            //  and filter the field to cover the need of a shadow zone
+            //  This makes sense on coarse levels because all addressing
+            //  is one-on-one (one master, one slave).  On the fine level
+            //  each face in the zone may contribute to multiple faces meaning
+            // that the data needs to be expanded to zone size
+            //  HJ, 24/Jun/2011 and 13/Jun/2016
             template<class Type>
             tmp<Field<Type> > fastReduce(const UList<Type>&) const;
 
@@ -226,6 +271,9 @@ public:
             //- Is the patch localised on a single processor
             virtual bool localParallel() const;
 
+            //- Processor master face insertion list
+            const labelListList& procMasterFaces() const;
+
             //- Return weights
             virtual const scalarListList& weights() const;
 
@@ -234,6 +282,10 @@ public:
 
             //- Return neighbour-cell transformation tensor
             virtual const tensorField& reverseT() const;
+
+            //- Expand addressing to zone
+            //  Used in optimised AMG coarsening
+            virtual void expandAddrToZone(labelField&) const;
 };
 
 

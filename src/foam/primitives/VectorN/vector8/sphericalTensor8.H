@@ -33,7 +33,7 @@ Description
 #define sphericalTensor8_H
 
 #include "SphericalTensorN.H"
-#include "vector6.H"
+#include "vector8.H"
 #include "contiguous.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

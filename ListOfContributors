@@ -1,8 +1,8 @@
 #                            -*- mode: org; -*-
 #
-#+TITLE:          *Cumulative List of Contributors for foam-extend-3.0*
+#+TITLE:          *Cumulative List of Contributors for foam-extend
 #+AUTHOR:                      Hrvoje Jasak.
-#+DATE:                       10 January 2014
+#+DATE:                       9 February 2017
 #+LINK:                  http://foam-extend.org
 #+OPTIONS: author:nil
 
@@ -91,4 +91,7 @@ Contents:
     Alexander Vakhrushev
     Vuko Vukcevic
     Niklas Wikstrom
-
+    Celio Fernandes
+    Luis Ferras
+    Manoel de Araujo
+    J.Miguel Nobrega

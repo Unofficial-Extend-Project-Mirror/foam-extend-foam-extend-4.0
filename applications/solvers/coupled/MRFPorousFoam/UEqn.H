@@ -5,6 +5,9 @@
         fvc::div(phi)
     );
 
+    // Update boundary velocity for consistency with the flux
+    mrfZones.correctBoundaryVelocity(U);
+
     // Momentum equation
     fvVectorMatrix UEqn
     (
@@ -49,9 +52,7 @@
         trAU().rename("rAU");
     }
 
-    // Insert the additional components. Note this will destroy the H and A
-
-    UEqn += fvm::SuSp(-divPhi, U) + divPhi*U;
+    // Under-relax momentum. Note this will destroy the H and A
     UEqn.relax();
 
     // Insert momentum equation
@@ -67,28 +68,38 @@
 
         const scalarField& V = mesh.V().field();
 
-        // Note: this insertion should only happen in porous cell zones
-        // A rewrite of the porousZones class interface is needed.
+        // Note: insertion should only happen in porous cell zones
         // HJ, 14/Mar/2016
-        forAll (TUIn, cellI)
+
+        register label cellI;
+
+        forAll (pZones, pZoneI)
         {
-            const scalar& cellV = V[cellI];
+            const labelList& curZoneCells = pZones[pZoneI].zone();
 
-            const tensor& cellTU = TUIn[cellI];
+            // Loop over all cells in the zone
+            forAll (curZoneCells, zcI)
+            {
+                cellI = curZoneCells[zcI];
 
-            CoeffField<vector4>::squareType& cellDD = DD[cellI];
+                const scalar& cellV = V[cellI];
 
-            cellDD(0, 0) += cellV*cellTU.xx();
-            cellDD(0, 1) += cellV*cellTU.xy();
-            cellDD(0, 2) += cellV*cellTU.xz();
+                const tensor& cellTU = TUIn[cellI];
 
-            cellDD(1, 0) += cellV*cellTU.yx();
-            cellDD(1, 1) += cellV*cellTU.yy();
-            cellDD(2, 2) += cellV*cellTU.yz();
+                CoeffField<vector4>::squareType& cellDD = DD[cellI];
 
-            cellDD(2, 0) += cellV*cellTU.zx();
-            cellDD(2, 1) += cellV*cellTU.zy();
-            cellDD(2, 2) += cellV*cellTU.zz();
+                cellDD(0, 0) += cellV*cellTU.xx();
+                cellDD(0, 1) += cellV*cellTU.xy();
+                cellDD(0, 2) += cellV*cellTU.xz();
+
+                cellDD(1, 0) += cellV*cellTU.yx();
+                cellDD(1, 1) += cellV*cellTU.yy();
+                cellDD(2, 2) += cellV*cellTU.yz();
+
+                cellDD(2, 0) += cellV*cellTU.zx();
+                cellDD(2, 1) += cellV*cellTU.zy();
+                cellDD(2, 2) += cellV*cellTU.zz();
+            }
         }
     }
 }

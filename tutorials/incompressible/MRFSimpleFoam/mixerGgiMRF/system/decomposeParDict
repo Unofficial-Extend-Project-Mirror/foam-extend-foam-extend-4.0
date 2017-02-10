@@ -16,15 +16,9 @@ FoamFile
 
 numberOfSubdomains 4;
 
-method          simple;
+method          scotch;
 
 globalFaceZones ( insideZone outsideZone );
-
-simpleCoeffs
-{
-    n               (2 2 1);
-    delta           0.001;
-}
 
 distributed     no;
 

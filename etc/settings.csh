@@ -173,7 +173,7 @@ case OPENMPI:
         if ($?FOAM_VERBOSE && $?prompt) then
             echo "Using openmpi-1.8.8 from the ThirdParty package: $WM_THIRD_PARTY_DIR/packages/$mpi_version"
         endif
-        _foamSource  $WM_THIRD_PARTY_DIR/packages/$mpi_version/platforms/$WM_OPTIONS/etc/$mpi_version.csh
+        _foamSource $WM_THIRD_PARTY_DIR/packages/$mpi_version/platforms/$WM_OPTIONS/etc/$mpi_version.csh
 
     else if ($?WM_THIRD_PARTY_USE_OPENMPI_165 != 0 && -d $WM_THIRD_PARTY_DIR/packages/openmpi-1.6.5/platforms/$WM_OPTIONS ) then
         set mpi_version=openmpi-1.6.5
@@ -181,7 +181,7 @@ case OPENMPI:
         if ($?FOAM_VERBOSE && $?prompt) then
             echo "Using openmpi-1.6.5 from the ThirdParty package: $WM_THIRD_PARTY_DIR/packages/$mpi_version"
         endif
-        _foamSource  $WM_THIRD_PARTY_DIR/packages/$mpi_version/platforms/$WM_OPTIONS/etc/$mpi_version.csh
+        _foamSource $WM_THIRD_PARTY_DIR/packages/$mpi_version/platforms/$WM_OPTIONS/etc/$mpi_version.csh
 
     else if ($?WM_THIRD_PARTY_USE_OPENMPI_143 != 0 && -d $WM_THIRD_PARTY_DIR/packages/openmpi-1.4.3/platforms/$WM_OPTIONS ) then
         set mpi_version=openmpi-1.4.3
@@ -189,7 +189,7 @@ case OPENMPI:
         if ($?FOAM_VERBOSE && $?prompt) then
             echo "Using openmpi-1.4.3 from the ThirdParty package: $WM_THIRD_PARTY_DIR/packages/$mpi_version"
         endif
-        _foamSource  $WM_THIRD_PARTY_DIR/packages/$mpi_version/platforms/$WM_OPTIONS/etc/$mpi_version.csh
+        _foamSource $WM_THIRD_PARTY_DIR/packages/$mpi_version/platforms/$WM_OPTIONS/etc/$mpi_version.csh
 
     else if ($?WM_THIRD_PARTY_USE_OPENMPI_143 != 0 && -d $WM_THIRD_PARTY_DIR/packages/openmpi-1.5/platforms/$WM_OPTIONS ) then
         set mpi_version=openmpi-1.5
@@ -197,7 +197,7 @@ case OPENMPI:
         if ($?FOAM_VERBOSE && $?prompt) then
             echo "Using openmpi-1.5 from the ThirdParty package: $WM_THIRD_PARTY_DIR/packages/$mpi_version"
         endif
-        _foamSource  $WM_THIRD_PARTY_DIR/packages/$mpi_version/platforms/$WM_OPTIONS/etc/$mpi_version.csh
+        _foamSource $WM_THIRD_PARTY_DIR/packages/$mpi_version/platforms/$WM_OPTIONS/etc/$mpi_version.csh
     endif
 
     unset mpi_version
@@ -576,8 +576,8 @@ endif
 
 # zoltan
 # ~~~~~
-if ( $?ZOLTAN_SYSTEM == 0 && $?WM_THIRD_PARTY_USE_ZOLTAN_36 != 0 && -e "$WM_THIRD_PARTY_DIR"/packages/zoltan-3.6/platforms/$WM_OPTIONS ) then
-    _foamSource $WM_THIRD_PARTY_DIR/packages/zoltan-3.6/platforms/$WM_OPTIONS/etc/zoltan-3.6.csh
+if ( $?ZOLTAN_SYSTEM == 0 && $?WM_THIRD_PARTY_USE_ZOLTAN_35 != 0 && -e "$WM_THIRD_PARTY_DIR"/packages/zoltan-3.5/platforms/$WM_OPTIONS ) then
+    _foamSource $WM_THIRD_PARTY_DIR/packages/zoltan-3.5/platforms/$WM_OPTIONS/etc/zoltan-3.5.csh
 endif
 
 # Python

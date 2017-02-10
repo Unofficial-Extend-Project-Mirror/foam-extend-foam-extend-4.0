@@ -37,7 +37,6 @@ SourceFiles
 
 #include "coupledFaPatch.H"
 #include "processorLduInterface.H"
-// #include "processorPolyPatch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -55,7 +54,10 @@ class processorFaPatch
 {
     // Private data
 
+        //- My processro number
         int myProcNo_;
+
+        //- Neighbour processor number
         int neighbProcNo_;
 
         //- Processor-neighbbour patch edge centres
@@ -75,6 +77,7 @@ class processorFaPatch
         //  non-global, i.e. present in this processor patch
         mutable labelList* nonGlobalPatchPointsPtr_;
 
+
 protected:
 
     // Protected Member functions
@@ -88,27 +91,27 @@ protected:
         //- Find non-globa patch points
         void makeNonGlobalPatchPoints() const;
 
-protected:
 
-    // Protected Member functions
+        // Geometry functions
 
-        //- Initialise the calculation of the patch geometry
-        void initGeometry();
+            //- Initialise the calculation of the patch geometry
+            void initGeometry();
 
-        //- Calculate the patch geometry
-        void calcGeometry();
+            //- Calculate the patch geometry
+            void calcGeometry();
 
-        //- Initialise the patches for moving points
-        void initMovePoints(const pointField&);
+            //- Initialise the patches for moving points
+            void initMovePoints(const pointField&);
 
-        //- Correct patches after moving points
-        void movePoints(const pointField&);
+            //- Correct patches after moving points
+            void movePoints(const pointField&);
 
-        //- Initialise the update of the patch topology
-        virtual void initUpdateMesh();
+            //- Initialise the update of the patch topology
+            virtual void initUpdateMesh();
 
-        //- Update of the patch topology
-        virtual void updateMesh();
+            //- Update of the patch topology
+            virtual void updateMesh();
+
 
 public:
 
@@ -160,9 +163,9 @@ public:
             nonGlobalPatchPointsPtr_(NULL)
         {}
 
-    // Destructor
 
-        virtual ~processorFaPatch();
+    //- Destructor
+    virtual ~processorFaPatch();
 
 
     // Member functions
@@ -191,6 +194,16 @@ public:
                 return false;
             }
         }
+
+
+        // Communications support
+
+            //- Return communicator used for communication
+            virtual label comm() const;
+
+            //- Return message tag to use for communication
+            virtual int tag() const;
+
 
         //- Return face transformation tensor
         virtual const tensorField& forwardT() const

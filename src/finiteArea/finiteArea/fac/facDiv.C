@@ -28,6 +28,7 @@ License
 #include "facEdgeIntegrate.H"
 #include "faDivScheme.H"
 #include "faConvectionScheme.H"
+#include "transformField.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -48,7 +49,17 @@ div
     const GeometricField<Type, faePatchField, edgeMesh>& ssf
 )
 {
-    return fac::edgeIntegrate(ssf);
+    const areaVectorField& n = ssf.mesh().faceAreaNormals();
+
+    tmp<GeometricField<Type, faPatchField, areaMesh> > tDiv =
+        fac::edgeIntegrate(ssf);
+
+    GeometricField<Type, faPatchField, areaMesh>& Div = tDiv();
+
+    Div.internalField() = transform(tensor::I - sqr(n), Div.internalField());
+    Div.correctBoundaryConditions();
+
+    return tDiv;
 }
 
 
@@ -79,10 +90,34 @@ div
     const word& name
 )
 {
-    return fa::divScheme<Type>::New
+    const areaVectorField& n = vf.mesh().faceAreaNormals();
+
+    tmp
+    <
+        GeometricField
+        <
+            typename innerProduct<vector, Type>::type,
+            faPatchField,
+            areaMesh
+        >
+    > tDiv
     (
-        vf.mesh(), vf.mesh().schemesDict().divScheme(name)
-    )().facDiv(vf);
+        fa::divScheme<Type>::New
+        (
+            vf.mesh(), vf.mesh().schemesDict().divScheme(name)
+        )().facDiv(vf)
+    );
+    GeometricField
+    <
+        typename innerProduct<vector, Type>::type,
+        faPatchField,
+        areaMesh
+    >& Div = tDiv();
+
+    Div.internalField() = transform(tensor::I - sqr(n), Div.internalField());
+    Div.correctBoundaryConditions();
+
+    return tDiv;
 }
 
 
@@ -159,12 +194,24 @@ div
     const word& name
 )
 {
-    return fa::convectionScheme<Type>::New
+    const areaVectorField& n = vf.mesh().faceAreaNormals();
+
+    tmp<GeometricField<Type, faPatchField, areaMesh> > tDiv
     (
-        vf.mesh(),
-        flux,
-        vf.mesh().schemesDict().divScheme(name)
-    )().facDiv(flux, vf);
+        fa::convectionScheme<Type>::New
+        (
+            vf.mesh(),
+            flux,
+            vf.mesh().schemesDict().divScheme(name)
+        )().facDiv(flux, vf)
+    );
+    GeometricField<Type, faPatchField, areaMesh>& Div = tDiv();
+
+    Div.internalField() = transform(tensor::I - sqr(n), Div.internalField());
+    Div.correctBoundaryConditions();
+
+    return tDiv;
+
 }
 
 

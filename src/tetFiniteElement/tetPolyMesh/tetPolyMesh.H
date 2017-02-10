@@ -116,7 +116,7 @@ class tetPolyMeshMapper;
 class tetPolyMeshLduAddressing;
 
 /*---------------------------------------------------------------------------*\
-                     Class tetPolyMesh Declaration
+                           Class tetPolyMesh Declaration
 \*---------------------------------------------------------------------------*/
 
 class tetPolyMesh
@@ -137,6 +137,9 @@ class tetPolyMesh
 
         //- Offset in numbering to first cell centre
         label cellOffset_;
+
+        //- Communicator used for parallel communication
+        label comm_;
 
 
     // Demand-driven data
@@ -205,9 +208,9 @@ public:
         //- Construct from components
         explicit tetPolyMesh(const polyMesh& pMesh);
 
-    // Destructor
 
-        ~tetPolyMesh();
+    //- Destructor
+    virtual ~tetPolyMesh();
 
 
     // Member Functions
@@ -368,6 +371,15 @@ public:
 
                 //- Shared parallel edges
                 const edgeList& parallelEdges() const;
+
+
+            // Communication support
+
+                //- Return communicator used for parallel communication
+                label comm() const;
+
+                //- Return communicator used for parallel communication
+                label& comm();
 
 
         // Edit

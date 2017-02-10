@@ -139,9 +139,8 @@ public:
         );
 
 
-    // Destructor
-
-        virtual ~fieldMinMax();
+    //- Destructor
+    virtual ~fieldMinMax();
 
 
     // Member Functions

@@ -357,6 +357,14 @@ public:
             //  alpha is read from controlDict
             void relax();
 
+            //- Relax matrix only within a cell zone
+            //  Experimental
+            void relax
+            (
+                const scalar alpha,
+                const labelList& zoneCells
+            );
+
             //- Complete matrix assembly for solution:
             //  Manipulate based on a boundary field
             void completeAssembly();

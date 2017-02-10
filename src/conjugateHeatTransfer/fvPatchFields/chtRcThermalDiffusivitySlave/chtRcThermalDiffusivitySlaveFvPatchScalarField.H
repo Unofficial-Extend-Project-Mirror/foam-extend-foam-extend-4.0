@@ -22,83 +22,79 @@ License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    chtRcTemperatureFvPatchScalarField
+    chtRcThermalDiffusivitySlaveFvPatchScalarField
 
 Description
-    Region couple patch field taking radiation into account
+    Diffusivity for the region couple patch field taking radiation into account
+    Slave side
 
 Author
     Henrik Rusche, Wikki GmbH.  All rights reserved
+    Cleaned up by Hrvoje Jasak
 
 SourceFiles
-    chtRcTemperatureFvPatchScalarField.C
+    chtRcThermalDiffusivitySlaveFvPatchScalarField.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef chtRcTemperatureFvPatchScalarField_H
-#define chtRcTemperatureFvPatchScalarField_H
+#ifndef chtRcThermalDiffusivitySlaveFvPatchScalarField_H
+#define chtRcThermalDiffusivitySlaveFvPatchScalarField_H
 
-#include "regionCouplingFvPatchFields.H"
-#include "fvMatricesFwd.H"
+#include "chtRegionCoupleBase.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 
+class chtThermalDiffusivityRegionCoupleFvPatchScalarField;
+class chtTemperatureRegionCoupleFvPatchScalarField;
+
 /*---------------------------------------------------------------------------*\
-                  Class chtRcTemperatureFvPatchScalarField Declaration
+        Class chtRcThermalDiffusivitySlaveFvPatchScalarField Declaration
 \*---------------------------------------------------------------------------*/
 
-class chtRcTemperatureFvPatchScalarField
+class chtRcThermalDiffusivitySlaveFvPatchScalarField
 :
-    public regionCouplingFvPatchScalarField
+    public chtRegionCoupleBase
 {
-    // Private data
-
-        //- Name of thermal diffusivity field
-        word kName_;
-
-        //- Take radiation into account for this patch
-        bool radiation_;
-
-
 public:
 
     //- Runtime type information
-    TypeName("chtRcTemperature");
+    TypeName("chtRcThermalDiffusivitySlave");
 
 
     // Constructors
 
         //- Construct from patch and internal field
-        chtRcTemperatureFvPatchScalarField
+        chtRcThermalDiffusivitySlaveFvPatchScalarField
         (
             const fvPatch&,
             const DimensionedField<scalar, volMesh>&
         );
 
         //- Construct from patch, internal field and dictionary
-        chtRcTemperatureFvPatchScalarField
+        chtRcThermalDiffusivitySlaveFvPatchScalarField
         (
             const fvPatch&,
             const DimensionedField<scalar, volMesh>&,
             const dictionary&
         );
 
-        //- Construct by mapping given chtRcTemperatureFvPatchScalarField onto a new patch
-        chtRcTemperatureFvPatchScalarField
+        //- Construct by mapping given
+        //  chtRcThermalDiffusivitySlaveFvPatchScalarField onto a new patch
+        chtRcThermalDiffusivitySlaveFvPatchScalarField
         (
-            const chtRcTemperatureFvPatchScalarField&,
+            const chtRcThermalDiffusivitySlaveFvPatchScalarField&,
             const fvPatch&,
             const DimensionedField<scalar, volMesh>&,
             const fvPatchFieldMapper&
         );
 
         //- Construct as copy setting internal field reference
-        chtRcTemperatureFvPatchScalarField
+        chtRcThermalDiffusivitySlaveFvPatchScalarField
         (
-            const chtRcTemperatureFvPatchScalarField&,
+            const chtRcThermalDiffusivitySlaveFvPatchScalarField&,
             const DimensionedField<scalar, volMesh>&
         );
 
@@ -107,7 +103,7 @@ public:
         {
             return tmp<fvPatchScalarField>
             (
-                new chtRcTemperatureFvPatchScalarField(*this)
+                new chtRcThermalDiffusivitySlaveFvPatchScalarField(*this)
             );
         }
 
@@ -119,46 +115,26 @@ public:
         {
             return tmp<fvPatchScalarField>
             (
-                new chtRcTemperatureFvPatchScalarField(*this, iF)
+                new chtRcThermalDiffusivitySlaveFvPatchScalarField(*this, iF)
             );
         }
 
 
     // Member functions
 
-        // Access functions
-
-            //- Return radiation
-            bool radiation() const
-            {
-                return radiation_;
-            }
+        // Access
 
             //- Return shadow patch field
-            virtual const chtRcTemperatureFvPatchScalarField&
-                shadowPatchField() const;
+            virtual const chtRegionCoupleBase& shadowPatchField() const;
 
 
         // Evaluation functions
 
-            //- Initialise the evaluation of the patch field
-            virtual void initEvaluate(const Pstream::commsTypes commsType);
-
-            //- Evaluate the patch field
-            virtual void evaluate(const Pstream::commsTypes commsType);
-
             //- Evaluate the patch field
             virtual void updateCoeffs();
 
-            //- Calculate source term
-            virtual tmp<scalarField> source() const;
-
-            //- Manipulate matrix
-            virtual void manipulateMatrix(fvScalarMatrix& matrix);
-
-        //- Write
-        virtual void write(Ostream&) const;
-
+            //- Evaluate the patch field
+            virtual void evaluate(const Pstream::commsTypes commsType);
 };
 
 

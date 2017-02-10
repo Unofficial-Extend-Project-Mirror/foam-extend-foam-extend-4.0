@@ -92,12 +92,26 @@ public:
         {}
 
 
-    // Destructor
-
-        virtual ~ggiFvPatch();
+    //- Destructor
+    virtual ~ggiFvPatch();
 
 
     // Member functions
+
+        // Communication support
+
+            //- Return communicator used for parallel communication
+            virtual int comm() const
+            {
+                return ggiPolyPatch_.comm();
+            }
+
+            //- Return message tag used for sending
+            virtual int tag() const
+            {
+                return ggiPolyPatch_.tag();
+            }
+
 
         // Access
 
@@ -171,6 +185,9 @@ public:
             //- Is the patch localised on a single processor
             virtual bool localParallel() const;
 
+            //- Return mapDistribute
+            virtual const mapDistribute& map() const;
+
             //- Return weights.  Master side returns own weights and
             //  slave side returns weights from master
             virtual const scalarListList& weights() const;
@@ -186,6 +203,11 @@ public:
             {
                 return coupledFvPatch::reverseT();
             }
+
+            //- Expand addressing to zone
+            //  Used in optimised AMG coarsening
+            virtual void expandAddrToZone(labelField&) const;
+
 
             //- Return the values of the given internal data adjacent to
             //  the interface as a field

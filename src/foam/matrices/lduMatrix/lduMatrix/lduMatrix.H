@@ -258,10 +258,9 @@ public:
             );
 
 
-        // Destructor
-
-            virtual ~solver()
-            {}
+        //- Destructor
+        virtual ~solver()
+        {}
 
 
         // Member functions
@@ -418,10 +417,9 @@ public:
             );
 
 
-        // Destructor
-
-            virtual ~smoother()
-            {}
+        //- Destructor
+        virtual ~smoother()
+        {}
 
 
         // Member functions
@@ -556,10 +554,9 @@ public:
             );
 
 
-        // Destructor
-
-            virtual ~preconditioner()
-            {}
+        //- Destructor
+        virtual ~preconditioner()
+        {}
 
 
         // Member functions
@@ -635,9 +632,8 @@ public:
         }
 
 
-    // Destructor
-
-        virtual ~lduMatrix();
+    //- Destructor
+    virtual ~lduMatrix();
 
 
     // Member functions
@@ -698,6 +694,11 @@ public:
             bool hasLower() const
             {
                 return (lowerPtr_);
+            }
+
+            bool empty() const
+            {
+                return (!diagPtr_ && !lowerPtr_ && !upperPtr_);
             }
 
             bool diagonal() const
@@ -835,6 +836,15 @@ public:
                 scalarField& result,
                 const direction cmpt,
                 const bool switchToLhs = false
+            ) const;
+
+            //- Update the constraints operating on the solution and the source
+            //  of the system
+            void updateInterfaceConstraints
+            (
+                const scalarField& xif,
+                scalarField& residual,
+                const lduInterfaceFieldPtrsList& interfaces
             ) const;
 
 

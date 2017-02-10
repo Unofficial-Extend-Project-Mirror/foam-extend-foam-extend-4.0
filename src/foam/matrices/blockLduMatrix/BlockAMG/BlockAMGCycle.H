@@ -128,9 +128,8 @@ public:
         BlockAMGCycle(autoPtr<BlockAMGLevel<Type> > levelPtr);
 
 
-    // Destructor
-
-        virtual ~BlockAMGCycle();
+    //- Destructor
+    virtual ~BlockAMGCycle();
 
 
     // Member Functions

@@ -130,22 +130,41 @@ public:
     // Member functions
 
         //- Return const reference to name.
-        const word& name() const;
+        inline const word& name() const
+        {
+            return name_;
+        }
 
         //- Return non-const reference to name.
-        word& name();
+        inline word& name()
+        {
+            return name_;
+        }
+
 
         //- Return const reference to dimensions.
-        const dimensionSet& dimensions() const;
+        const dimensionSet& dimensions() const
+        {
+            return dimensions_;
+        }
 
         //- Return non-const reference to dimensions.
-        dimensionSet& dimensions();
+        inline dimensionSet& dimensions()
+        {
+            return dimensions_;
+        }
 
         //- Return const reference to value.
-        const Type& value() const;
+        inline const Type& value() const
+        {
+            return value_;
+        }
 
         //- Return non-const reference to value.
-        Type& value();
+        inline Type& value()
+        {
+            return value_;
+        }
 
         //- Return a component as a dimensioned<cmptType>
         dimensioned<cmptType> component(const direction) const;

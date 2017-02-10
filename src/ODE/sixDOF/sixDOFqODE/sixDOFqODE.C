@@ -598,7 +598,7 @@ void Foam::sixDOFqODE::relaxAcceleration
     const scalar maxRelFactor
 )
 {
-    if (minRelFactor - maxRelFactor < SMALL)
+    if (mag(minRelFactor - maxRelFactor) < SMALL)
     {
         // Fixed relaxation
        relaxFactorT_ = minRelFactor;

@@ -84,7 +84,7 @@ regionCouplingFvPatchField<Type>::regionCouplingFvPatchField
 :
     coupledFvPatchField<Type>(p, iF, dict),
     regionCouplePatch_(refCast<const regionCoupleFvPatch>(p)),
-    remoteFieldName_(dict.lookup("remoteField")),
+    remoteFieldName_(dict.lookupOrDefault<word>("remoteField", iF.name())),
     matrixUpdateBuffer_(),
     originalPatchField_(),
     curTimeIndex_(-1)

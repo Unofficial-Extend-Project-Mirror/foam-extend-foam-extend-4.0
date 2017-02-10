@@ -43,6 +43,7 @@ SourceFiles
 #include "BlockCoeffNorm.H"
 #include "BlockCoeff.H"
 #include "tolerancesSwitch.H"
+#include "cpuTime.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -83,6 +84,8 @@ class BlockMatrixAgglomeration
 
         //- Can a coarse level be constructed?
         bool coarsen_;
+
+        cpuTime lTime_;
 
 
     // Private Member Functions
@@ -161,9 +164,8 @@ public:
         );
 
 
-    // Destructor
-
-        virtual ~BlockMatrixAgglomeration();
+    //- Destructor
+    virtual ~BlockMatrixAgglomeration();
 
 
     // Member Functions

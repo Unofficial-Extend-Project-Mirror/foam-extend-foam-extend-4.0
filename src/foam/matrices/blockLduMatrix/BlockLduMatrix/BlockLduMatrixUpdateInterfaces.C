@@ -127,13 +127,73 @@ void Foam::BlockLduMatrix<Type>::updateInterfaces
     }
     else if (Pstream::defaultComms() == Pstream::nonBlocking)
     {
-        // Block until all sends/receives have been finished
-        IPstream::waitRequests();
-        OPstream::waitRequests();
+        // Try and consume interfaces as they become available
+        bool allUpdated = false;
 
+        for (label i = 0; i < Pstream::nPollProcInterfaces; i++)
+        {
+            allUpdated = true;
+
+            forAll (interfaces_, interfaceI)
+            {
+                if (interfaces_.set(interfaceI))
+                {
+                    if (!interfaces_[interfaceI].updatedMatrix())
+                    {
+                        if (interfaces_[interfaceI].ready())
+                        {
+                            interfaces_[interfaceI].updateInterfaceMatrix
+                            (
+                                psi,
+                                result,
+                                *this,
+                                interfaceCoeffs[interfaceI],
+                                Pstream::defaultComms(),
+                                switchToLhs
+                            );
+                        }
+                        else
+                        {
+                            allUpdated = false;
+                        }
+                    }
+                }
+            }
+
+            if (allUpdated)
+            {
+                break;
+            }
+        }
+
+        // Block for everything
+        if (Pstream::parRun())
+        {
+            if (allUpdated)
+            {
+                // All received. Just remove all storage of requests
+                // Note that we don't know what starting number of requests
+                // was before start of sends and receives (since set from
+                // initMatrixInterfaces) so set to 0 and lose any in-flight
+                // requests.
+                Pstream::resetRequests(0);
+            }
+            else
+            {
+                // Block for all requests and remove storage
+                IPstream::waitRequests();
+                OPstream::waitRequests();
+            }
+        }
+
+        // Consume
         forAll (interfaces_, interfaceI)
         {
-            if (interfaces_.set(interfaceI))
+            if
+            (
+                interfaces_.set(interfaceI)
+            && !interfaces_[interfaceI].updatedMatrix()
+            )
             {
                 interfaces_[interfaceI].updateInterfaceMatrix
                 (

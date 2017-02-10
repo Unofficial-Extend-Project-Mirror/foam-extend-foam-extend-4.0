@@ -264,6 +264,7 @@ void Foam::GAMGAgglomeration::agglomerateLduAddressing
             nCoarseCells,
             coarseOwner,
             coarseNeighbour,
+            fineMesh.comm(),
             true
         )
     );
@@ -292,6 +293,7 @@ void Foam::GAMGAgglomeration::agglomerateLduAddressing
                     AMGInterface::New
                     (
                         meshLevels_[fineLevelIndex],
+                        coarseInterfaces,
                         fineInterfaces[inti],
                         fineInterfaces[inti].interfaceInternalField
                         (
