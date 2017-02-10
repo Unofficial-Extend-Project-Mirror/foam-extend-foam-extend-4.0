@@ -28,7 +28,8 @@ Description
     UCM non linear viscoelastic fluid model (BIRD et al., 1987).
 
 Author
-    Jovani L. Favero.  All rights reserved
+    Miguel Nóbrega, Silvino Araújo, Célio Fernandes, Luís Ferrás. 
+    All rights reserved
 
 SourceFiles
     UCM.C
@@ -69,6 +70,9 @@ class UCM
 
             //- Relaxation time
             dimensionedScalar lambda_;
+
+            //- Stabilization viscosity
+            dimensionedScalar etaStab_;
 
 
     // Private Member Functions
