@@ -60,7 +60,8 @@ Foam::UCM::UCM
     ),
     rho_(dict.lookup("rho")),
     etaP_(dict.lookup("etaP")),
-    lambda_(dict.lookup("lambda"))
+    lambda_(dict.lookup("lambda")),
+    etaStab_(dimensionedScalar::lookupOrDefault("etaStab", dict, 0.0, dimMass/(dimLength*dimTime)))
 {}
 
 
@@ -68,14 +69,26 @@ Foam::UCM::UCM
 
 Foam::tmp<Foam::fvVectorMatrix> Foam::UCM::divTau(volVectorField& U) const
 {
-    dimensionedScalar etaPEff = etaP_;
+    if(etaStab_.value() < SMALL)
+    {
+        dimensionedScalar etaPEff = etaP_;
 
-    return
-    (
-        fvc::div(tau_/rho_, "div(tau)")
-      - fvc::laplacian(etaPEff/rho_, U, "laplacian(etaPEff,U)")
-      + fvm::laplacian( (etaPEff)/rho_, U, "laplacian(etaPEff+etaS,U)")
-    );
+    	return
+    	(
+    	    fvc::div(tau_/rho_, "div(tau)")
+    	  - fvc::laplacian(etaPEff/rho_, U, "laplacian(etaPEff,U)")
+    	  + fvm::laplacian( (etaPEff)/rho_, U, "laplacian(etaPEff+etaS,U)")
+    	);
+    }
+    else
+    {
+    	return
+    	(
+    	    fvc::div(tau_/rho_, "div(tau)")
+    	  - fvc::div((etaStab_/rho_)*fvc::grad(U), "div(tau)")
+    	  + fvm::laplacian( (etaStab_)/rho_, U, "laplacian(etaPEff+etaS,U)")
+    	);
+    }
 }
 
 
