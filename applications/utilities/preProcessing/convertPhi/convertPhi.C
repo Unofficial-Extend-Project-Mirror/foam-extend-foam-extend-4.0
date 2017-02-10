@@ -46,7 +46,6 @@ int main(int argc, char *argv[])
         FatalError.exit();
     }
 
-
     dimensionedScalar rhoRef
     (
         "rhoRef",
