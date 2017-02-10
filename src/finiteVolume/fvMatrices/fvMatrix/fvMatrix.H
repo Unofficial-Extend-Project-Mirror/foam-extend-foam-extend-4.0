@@ -362,7 +362,7 @@ public:
             void relax
             (
                 const scalar alpha,
-                const word& cellZoneName
+                const labelList& zoneCells
             );
 
             //- Complete matrix assembly for solution:

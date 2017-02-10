@@ -719,7 +719,7 @@ template<class Type>
 void Foam::fvMatrix<Type>::relax
 (
     const scalar alpha,
-    const word& cellZoneName
+    const labelList& zoneCells
 )
 {
     if (alpha <= 0)
@@ -727,26 +727,7 @@ void Foam::fvMatrix<Type>::relax
         return;
     }
 
-    // Find cell zone and check it is not empty
-    const label zoneID = psi_.mesh().cellZones().findZoneID(cellZoneName);
-
-    if (zoneID < 0)
-    {
-        WarningIn
-        (
-            "void fvMatrix<Type>::relax\n"
-            "(\n"
-            "    const scalar alpha,\n"
-            "    const word& cellZoneName\n"
-            ")"
-        )   << "Cannot find cell zone " << cellZoneName
-            << ".  No relaxation applied"
-            << endl;
-
-        return;
-    }
-
-    if (psi_.mesh().cellZones()[zoneID].empty())
+    if (zoneCells.empty())
     {
         // Zone empty, skip
         return;
@@ -804,7 +785,6 @@ void Foam::fvMatrix<Type>::relax
     }
 
     // Under-relax only cells within the zone
-    const labelList& zoneCells = psi_.mesh().cellZones()[zoneID];
 
     forAll (zoneCells, zcI)
     {
