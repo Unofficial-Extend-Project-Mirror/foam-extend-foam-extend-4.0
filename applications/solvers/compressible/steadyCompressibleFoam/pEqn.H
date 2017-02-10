@@ -13,7 +13,7 @@
         U = rUA*UEqn.H();
 
         // Calculate phi for boundary conditions
-        phi = rhof*fvc::interpolate(U) & mesh.Sf();
+        phi = rhof*(fvc::interpolate(U) & mesh.Sf());
 
         surfaceScalarField phid2 = rhoReff/rhof*phi;
 
