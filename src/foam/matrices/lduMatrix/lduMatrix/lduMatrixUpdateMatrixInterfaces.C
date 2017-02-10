@@ -285,4 +285,24 @@ void Foam::lduMatrix::updateMatrixInterfaces
 }
 
 
+void Foam::lduMatrix::updateInterfaceConstraints
+(
+    const scalarField& xif,
+    scalarField& residual,
+    const lduInterfaceFieldPtrsList& interfaces
+) const
+{
+    label counter = 0;
+
+    forAll (interfaces, interfaceI)
+    {
+        if (interfaces.set(interfaceI))
+        {
+            interfaces[interfaceI].updateConstraints(xif, residual, counter);
+            ++counter;
+        }
+    }
+}
+
+
 // ************************************************************************* //

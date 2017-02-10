@@ -838,6 +838,15 @@ public:
                 const bool switchToLhs = false
             ) const;
 
+            //- Update the constraints operating on the solution and the source
+            //  of the system
+            void updateInterfaceConstraints
+            (
+                const scalarField& xif,
+                scalarField& residual,
+                const lduInterfaceFieldPtrsList& interfaces
+            ) const;
+
 
             template<class Type>
             tmp<Field<Type> > H(const Field<Type>&) const;
