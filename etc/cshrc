@@ -77,11 +77,11 @@ setenv WM_THIRD_PARTY_DIR $WM_PROJECT_DIR/ThirdParty
 # This can be overriden in prefs.sh
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # For AllMake.stage1
-setenv WM_THIRD_PARTY_USE_CMAKE_322 1
+#setenv WM_THIRD_PARTY_USE_CMAKE_322 1
 
 #
 # For AllMake.stage2
-setenv WM_THIRD_PARTY_USE_OPENMPI_165 1
+setenv WM_THIRD_PARTY_USE_OPENMPI_188 1
 
 #
 # For AllMake.stage3
@@ -152,7 +152,7 @@ if ( ! $?WM_PRECISION_OPTION ) setenv WM_PRECISION_OPTION DP
 
 # WM_COMPILE_OPTION = Opt | Debug | Prof
 if ( ! $?WM_COMPILE_OPTION ) setenv WM_COMPILE_OPTION Opt
-#setenv WM_COMPILE_OPTION Opt
+setenv WM_COMPILE_OPTION Opt
 #setenv WM_COMPILE_OPTION Debug
 
 # WM_MPLIB = SYSTEMOPENMPI | OPENMPI | MPICH | MPICH-GM | HPMPI | GAMMA | MPI | QSMPI | MVAPICH2

@@ -225,7 +225,7 @@ bool Foam::cuttingPlane::walkCell
                 << "Did not find closed walk along surface of cell " << cellI
                 << " starting from edge " << startEdgeI
                 << " in " << nIter << " iterations." << nl
-                << "Collected cutPoints so far:" << faceVerts
+                << "Collected "  << faceVerts.size() << " cutPoints so far"
                 << endl;
 
             return false;
@@ -235,13 +235,14 @@ bool Foam::cuttingPlane::walkCell
 
         nIter++;
 
-        if (nIter > 1000)
+        // Note: reduce number of points in the cut before error
+        if (nIter > 100)
         {
             WarningIn("Foam::cuttingPlane::walkCell")
                 << "Did not find closed walk along surface of cell " << cellI
                 << " starting from edge " << startEdgeI
                 << " in " << nIter << " iterations." << nl
-                << "Collected cutPoints so far:" << faceVerts
+                << "Collected "  << faceVerts.size() << " cutPoints so far"
                 << endl;
             return false;
         }
@@ -258,7 +259,7 @@ bool Foam::cuttingPlane::walkCell
         WarningIn("Foam::cuttingPlane::walkCell")
             << "Did not find closed walk along surface of cell " << cellI
             << " starting from edge " << startEdgeI << nl
-            << "Collected cutPoints so far:" << faceVerts
+            << "Collected "  << faceVerts.size() << " cutPoints so far"
             << endl;
 
         return false;

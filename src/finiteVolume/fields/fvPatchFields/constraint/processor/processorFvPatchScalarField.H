@@ -36,18 +36,8 @@ namespace Foam
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-template<>
-void processorFvPatchField<scalar>::initInterfaceMatrixUpdate
-(
-    const scalarField&,
-    scalarField&,
-    const lduMatrix&,
-    const scalarField&,
-    const direction,
-    const Pstream::commsTypes commsType,
-    const bool switchToLhs
-) const;
-
+// Removed unnecessary specialisation for initInterfaceMatrixUpdate
+// HJ, 29/Nov/2016
 
 template<>
 void processorFvPatchField<scalar>::updateInterfaceMatrix
@@ -62,28 +52,10 @@ void processorFvPatchField<scalar>::updateInterfaceMatrix
 ) const;
 
 
-template<>
-void processorFvPatchField<scalar>::initInterfaceMatrixUpdate
-(
-    const scalarField& psiInternal,
-    scalarField&,
-    const BlockLduMatrix<scalar>&,
-    const CoeffField<scalar>&,
-    const Pstream::commsTypes commsType,
-    const bool switchToLhs
-) const;
+// Removed unnecessary specialisation for initInterfaceMatrixUpdate
+// and updateInterfaceMatrix for block matrices
+// HJ, 29/Nov/2016
 
-
-template<>
-void processorFvPatchField<scalar>::updateInterfaceMatrix
-(
-    const scalarField&,
-    scalarField& result,
-    const BlockLduMatrix<scalar>&,
-    const CoeffField<scalar>& coeffs,
-    const Pstream::commsTypes commsType,
-    const bool switchToLhs
-) const;
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

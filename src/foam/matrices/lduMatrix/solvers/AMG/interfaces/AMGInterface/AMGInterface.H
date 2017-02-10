@@ -82,9 +82,21 @@ protected:
         labelField faceCells_;
 
         //- Fine addressing
+        //  On GGI interfaces, a single fine coefficient may contribute to
+        //  multiple coarse coefficients using different weights.
+        //  To hanld this, a fine coefficient may be visited multiple times
+        //  which is recorded in fineAddressing.
+        //  For simple (matching) interfaces, fineAddressing_[i] = i
+        //  HJ, 21/Jun/2016
         labelField fineAddressing_;
 
         //- Restrict addressing
+        //  For each fine coefficient, list coarse cluster index it will be
+        //  agglomerated into
+        //  For cases where the fineAddressing is used, restrict addressing
+        //  and weights are expanded to match multiple hits for a single
+        //  fine coefficient, as dictated by fineAddressing
+        //  HJ, 21/Jun/2016
         labelField restrictAddressing_;
 
         //- Fine level agglomeration weights
@@ -117,12 +129,14 @@ public:
             lduInterface,
             (
                 const lduPrimitiveMesh& lduMesh,
+                const lduInterfacePtrsList& coarseInterfaces,
                 const lduInterface& fineInterface,
                 const labelField& localRestrictAddressing,
                 const labelField& neighbourRestrictAddressing
             ),
             (
                 lduMesh,
+                coarseInterfaces,
                 fineInterface,
                 localRestrictAddressing,
                 neighbourRestrictAddressing
@@ -137,6 +151,7 @@ public:
         static autoPtr<AMGInterface> New
         (
             const lduPrimitiveMesh& lduMesh,
+            const lduInterfacePtrsList& coarseInterfaces,
             const lduInterface& fineInterface,
             const labelField& localRestrictAddressing,
             const labelField& neighbourRestrictAddressing
@@ -147,10 +162,18 @@ public:
 
         //- Construct from fine-level interface,
         //  local and neighbour restrict addressing
-        AMGInterface(const lduPrimitiveMesh& lduMesh)
+        AMGInterface
+        (
+            const lduPrimitiveMesh& lduMesh
+        )
         :
             lduMesh_(lduMesh)
         {}
+
+
+    //- Destructor
+    virtual ~AMGInterface()
+    {}
 
 
     // Member Functions

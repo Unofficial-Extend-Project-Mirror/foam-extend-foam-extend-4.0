@@ -1,8 +1,9 @@
+{
     p.boundaryField().updateCoeffs();
 
     // Prepare clean 1/Ap without contribution from under-relaxation
     // HJ, 26/Oct/2015
-    volScalarField rUA
+    volScalarField rAU
     (
         "(1|A(U))",
         1/HUEqn().A()
@@ -12,8 +13,9 @@
     // the flux precursor
     U.storePrevIter();
 
-    U = rUA*HUEqn().H();
+    U = rAU*HUEqn().H();
     HUEqn.clear();
+
     phi = fvc::interpolate(U) & mesh.Sf();
     adjustPhi(phi, U, p);
 
@@ -22,7 +24,7 @@
     {
         fvScalarMatrix pEqn
         (
-            fvm::laplacian(rUA, p) == fvc::div(phi)
+            fvm::laplacian(rAU, p) == fvc::div(phi)
         );
 
         pEqn.setReference(pRefCell, pRefValue);
@@ -43,6 +45,6 @@
     // Momentum corrector
     // Note: since under-relaxation does not change aU, H/a in U can be
     // re-used.  HJ, 22/Jan/2016
-    U = UUrf*(U - rUA*fvc::grad(p)) + (1 - UUrf)*U.prevIter();
+    U = UUrf*(U - rAU*fvc::grad(p)) + (1 - UUrf)*U.prevIter();
     U.correctBoundaryConditions();
-
+}

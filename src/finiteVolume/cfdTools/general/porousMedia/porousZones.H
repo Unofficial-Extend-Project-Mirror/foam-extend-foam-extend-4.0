@@ -92,7 +92,7 @@ class porousZones
         void operator=(const porousZones&);
 
 
-        //- modify time derivative elements
+        //- Modify time derivative elements
         template<class Type>
         void modifyDdt(fvMatrix<Type>&) const;
 

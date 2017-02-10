@@ -31,6 +31,7 @@ Contributor
 
 #include "ggiPolyPatch.H"
 #include "polyBoundaryMesh.H"
+#include "polyMesh.H"
 #include "addToRunTimeSelectionTable.H"
 #include "demandDrivenData.H"
 #include "polyPatchID.H"
@@ -62,7 +63,23 @@ bool Foam::ggiPolyPatch::active() const
     polyPatchID shadow(shadowName_, boundaryMesh());
     faceZoneID zone(zoneName_, boundaryMesh().mesh().faceZones());
 
-    return shadow.active() && zone.active();
+    if (shadow.active() && zone.active())
+    {
+        if (!Pstream::parRun() && !localParallel())
+        {
+            // Patch is present in serial run, but zone is not the same size
+            // Probably doing decomposition and reconstruction
+            // HJ, 14/Sep/2016
+            return false;
+        }
+
+        return true;
+    }
+    else
+    {
+        // Zones not active.  Nothing to check
+        return false;
+    }
 }
 
 
@@ -303,38 +320,81 @@ void Foam::ggiPolyPatch::calcLocalParallel() const
     localParallelPtr_ = new bool(false);
     bool& emptyOrComplete = *localParallelPtr_;
 
-    // If running in serial, all GGIs are expanded to zone size.
-    // This happens on decomposition and reconstruction where
-    // size and shadow size may be zero, but zone size may not
-    // HJ, 1/Jun/2011
-    if (!Pstream::parRun())
+    if (size() > zone().size())
     {
-        emptyOrComplete = false;
+        FatalErrorIn("void ggiPolyPatch::calcLocalParallel() const")
+            << "Patch size is greater than zone size for GGI patch "
+            << name() << ".  This is not allowerd: "
+            << "the face zone must contain all patch faces and be "
+            << "global in parallel runs"
+            << abort(FatalError);
+    }
+
+    // Calculate localisation on master and shadow
+    if ((size() == 0 && shadow().size() == 0))
+    {
+        // No ggi on this processor
+        emptyOrComplete = true;
+    }
+    else if (!zone().empty() || !shadow().zone().empty())
+    {
+        // GGI present on the processor and complete for both
+        emptyOrComplete =
+        (
+            zone().size() == size()
+         && shadow().zone().size() == shadow().size()
+        );
     }
     else
     {
-        // Check that patch size is greater than the zone size.
-        // This is an indication of the error where the face zone is not global
-        // in a parallel run.  HJ, 9/Nov/2014
-        if (size() > zone().size())
+        // Master and shadow on different processors
+        emptyOrComplete = false;
+    }
+
+    reduce(emptyOrComplete, andOp<bool>());
+
+    // Note: only master allocates the comm_
+    // HJ, 20/Sep/2016
+    if (!emptyOrComplete && Pstream::parRun() && master())
+    {
+        // Count how many patch faces exist on each processor
+        labelList nFacesPerProc(Pstream::nProcs(), 0);
+        nFacesPerProc[Pstream::myProcNo()] = size() + shadow().size();
+
+        Pstream::gatherList(nFacesPerProc);
+        Pstream::scatterList(nFacesPerProc);
+
+        // Make a comm, from all processors that contain the ggi faces
+        labelList ggiCommProcs(Pstream::nProcs());
+        label nGgiCommProcs = 0;
+
+        forAll (nFacesPerProc, procI)
         {
-            FatalErrorIn("void ggiPolyPatch::calcLocalParallel() const")
-                << "Patch size is greater than zone size for GGI patch "
-                << name() << ".  This is not allowerd: "
-                << "the face zone must contain all patch faces and be "
-                << "global in parallel runs"
-                << abort(FatalError);
+            if (nFacesPerProc[procI] > 0)
+            {
+                ggiCommProcs[nGgiCommProcs] = procI;
+                nGgiCommProcs++;
+            }
         }
+        ggiCommProcs.setSize(nGgiCommProcs);
 
-        // Calculate localisation on master and shadow
-        emptyOrComplete =
-            (
-                zone().size() == size()
-             && shadow().zone().size() == shadow().size()
-            )
-         || (size() == 0 && shadow().size() == 0);
+        // Allocate communicator
+        comm_ = Pstream::allocateCommunicator
+        (
+            Pstream::worldComm,
+            ggiCommProcs
+        );
 
-        reduce(emptyOrComplete, andOp<bool>());
+        if (debug && Pstream::parRun())
+        {
+            Info<< "Allocating communicator for GGI patch " << name()
+                << " with " << ggiCommProcs << ": " << comm_
+                << endl;
+        }
+    }
+    else
+    {
+        comm_ = boundaryMesh().mesh().comm();
     }
 
     if (debug && Pstream::parRun())
@@ -509,17 +569,6 @@ void Foam::ggiPolyPatch::calcSendReceive() const
 }
 
 
-const Foam::mapDistribute& Foam::ggiPolyPatch::map() const
-{
-    if (!mapPtr_)
-    {
-        calcSendReceive();
-    }
-
-    return *mapPtr_;
-}
-
-
 void Foam::ggiPolyPatch::clearGeom() const
 {
     deleteDemandDrivenData(reconFaceCellCentresPtr_);
@@ -529,6 +578,17 @@ void Foam::ggiPolyPatch::clearGeom() const
     // Local zone addressing does not change with mesh motion
     // HJ, 23/Jun/2011
     deleteDemandDrivenData(remoteZoneAddressingPtr_);
+
+    // localParallel depends on geometry - must be cleared!
+    // HR, 11/Jul/2013
+    deleteDemandDrivenData(localParallelPtr_);
+
+    // Clear communicator
+    if (comm_ != Pstream::worldComm)
+    {
+        Pstream::freeCommunicator(comm_);
+        comm_ = Pstream::worldComm;
+    }
 
     deleteDemandDrivenData(mapPtr_);
 }
@@ -543,7 +603,6 @@ void Foam::ggiPolyPatch::clearOut() const
 
     deleteDemandDrivenData(zoneAddressingPtr_);
     deleteDemandDrivenData(patchToPatchPtr_);
-    deleteDemandDrivenData(localParallelPtr_);
 }
 
 
@@ -570,6 +629,8 @@ Foam::ggiPolyPatch::ggiPolyPatch
     remoteZoneAddressingPtr_(NULL),
     reconFaceCellCentresPtr_(NULL),
     localParallelPtr_(NULL),
+    comm_(Pstream::worldComm),
+    tag_(Pstream::msgType()),
     mapPtr_(NULL)
 {}
 
@@ -599,6 +660,8 @@ Foam::ggiPolyPatch::ggiPolyPatch
     remoteZoneAddressingPtr_(NULL),
     reconFaceCellCentresPtr_(NULL),
     localParallelPtr_(NULL),
+    comm_(Pstream::worldComm),
+    tag_(Pstream::msgType()),
     mapPtr_(NULL)
 {}
 
@@ -623,6 +686,8 @@ Foam::ggiPolyPatch::ggiPolyPatch
     remoteZoneAddressingPtr_(NULL),
     reconFaceCellCentresPtr_(NULL),
     localParallelPtr_(NULL),
+    comm_(Pstream::worldComm),
+    tag_(Pstream::msgType()),
     mapPtr_(NULL)
 {
     if (dict.found("quickReject"))
@@ -653,6 +718,8 @@ Foam::ggiPolyPatch::ggiPolyPatch
     remoteZoneAddressingPtr_(NULL),
     reconFaceCellCentresPtr_(NULL),
     localParallelPtr_(NULL),
+    comm_(pp.comm_),
+    tag_(pp.tag_),
     mapPtr_(NULL)
 {}
 
@@ -679,6 +746,8 @@ Foam::ggiPolyPatch::ggiPolyPatch
     remoteZoneAddressingPtr_(NULL),
     reconFaceCellCentresPtr_(NULL),
     localParallelPtr_(NULL),
+    comm_(pp.comm_),
+    tag_(pp.tag_),
     mapPtr_(NULL)
 {}
 
@@ -769,6 +838,36 @@ const Foam::faceZone& Foam::ggiPolyPatch::zone() const
 }
 
 
+Foam::label Foam::ggiPolyPatch::comm() const
+{
+    //HJ, Testing.  Use optimised comm or a local one
+
+    // Note: comm is calculated with localParallel and will use the
+    // localParallelPtr_ for signalling.  HJ, 10/Sep/2016
+    if (master())
+    {
+        if (!localParallelPtr_)
+        {
+            calcLocalParallel();
+        }
+
+        return comm_;
+    }
+    else
+    {
+        return shadow().comm();
+    }
+
+//     return boundaryMesh().mesh().comm();
+}
+
+
+int Foam::ggiPolyPatch::tag() const
+{
+    return Pstream::msgType();
+}
+
+
 const Foam::labelList& Foam::ggiPolyPatch::zoneAddressing() const
 {
     if (!zoneAddressingPtr_)
@@ -823,6 +922,17 @@ const Foam::ggiZoneInterpolation& Foam::ggiPolyPatch::patchToPatch() const
     {
         return shadow().patchToPatch();
     }
+}
+
+
+const Foam::mapDistribute& Foam::ggiPolyPatch::map() const
+{
+    if (!mapPtr_)
+    {
+        calcSendReceive();
+    }
+
+    return *mapPtr_;
 }
 
 
@@ -935,11 +1045,11 @@ void Foam::ggiPolyPatch::initMovePoints(const pointField& p)
         {
             map();
         }
-    }
 
-    if (active() && master())
-    {
-        reconFaceCellCentres();
+        if (master())
+        {
+            reconFaceCellCentres();
+        }
     }
 
     polyPatch::initMovePoints(p);

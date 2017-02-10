@@ -58,6 +58,12 @@ class IPstream
         //- ID of sending processor
         int fromProcNo_;
 
+        //- Message tag
+        const int tag_;
+
+        //- Communicator
+        const label comm_;
+
         //- Message size
         label messageSize_;
 
@@ -86,12 +92,14 @@ public:
             const commsTypes commsType,
             const int fromProcNo,
             const label bufSize = 0,
+            const int tag = Pstream::msgType(),
+            const label comm = Pstream::worldComm,
             streamFormat format = BINARY,
             versionNumber version = currentVersion
         );
 
 
-    // Destructor
+    //- Destructor
     ~IPstream();
 
 
@@ -115,14 +123,10 @@ public:
                 const commsTypes commsType,
                 const int fromProcNo,
                 char* buf,
-                const std::streamsize bufSize
+                const std::streamsize bufSize,
+                const int tag = Pstream::msgType(),
+                const label communicator = 0
             );
-
-            //- Non-blocking receives: wait until all have finished.
-            static void waitRequests();
-
-            //- Non-blocking receives: has request i finished?
-            static bool finishedRequest(const label i);
 
             //- Return next token from stream
             Istream& read(token&);

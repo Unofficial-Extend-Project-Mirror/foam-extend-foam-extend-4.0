@@ -65,6 +65,21 @@ class processorAMGInterfaceField
         int rank_;
 
 
+        // Sending and receiving
+
+            //- Outstanding request
+            mutable label outstandingSendRequest_;
+
+            //- Outstanding request
+            mutable label outstandingRecvRequest_;
+
+            //- Scalar send buffer
+            mutable Field<scalar> scalarSendBuf_;
+
+            //- Scalar receive buffer
+            mutable Field<scalar> scalarReceiveBuf_;
+
+
     // Private Member Functions
 
         //- Disallow default bitwise copy construct
@@ -143,6 +158,12 @@ public:
 
 
         //- Processor interface functions
+
+            //- Return communicator used for comms
+            virtual label comm() const
+            {
+                return procInterface_.comm();
+            }
 
             //- Return processor number
             virtual int myProcNo() const

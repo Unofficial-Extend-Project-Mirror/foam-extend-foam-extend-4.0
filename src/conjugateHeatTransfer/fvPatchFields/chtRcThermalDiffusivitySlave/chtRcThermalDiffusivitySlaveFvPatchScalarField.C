@@ -31,14 +31,10 @@ Author
 #include "fvPatchFieldMapper.H"
 #include "volFields.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-namespace Foam
-{
-
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-chtRcThermalDiffusivitySlaveFvPatchScalarField::chtRcThermalDiffusivitySlaveFvPatchScalarField
+Foam::chtRcThermalDiffusivitySlaveFvPatchScalarField::
+chtRcThermalDiffusivitySlaveFvPatchScalarField
 (
     const fvPatch& p,
     const DimensionedField<scalar, volMesh>& iF
@@ -48,7 +44,8 @@ chtRcThermalDiffusivitySlaveFvPatchScalarField::chtRcThermalDiffusivitySlaveFvPa
 {}
 
 
-chtRcThermalDiffusivitySlaveFvPatchScalarField::chtRcThermalDiffusivitySlaveFvPatchScalarField
+Foam::chtRcThermalDiffusivitySlaveFvPatchScalarField::
+chtRcThermalDiffusivitySlaveFvPatchScalarField
 (
     const fvPatch& p,
     const DimensionedField<scalar, volMesh>& iF,
@@ -59,7 +56,19 @@ chtRcThermalDiffusivitySlaveFvPatchScalarField::chtRcThermalDiffusivitySlaveFvPa
 {}
 
 
-chtRcThermalDiffusivitySlaveFvPatchScalarField::chtRcThermalDiffusivitySlaveFvPatchScalarField
+Foam::chtRcThermalDiffusivitySlaveFvPatchScalarField::
+chtRcThermalDiffusivitySlaveFvPatchScalarField
+(
+    const chtRcThermalDiffusivitySlaveFvPatchScalarField& ptf,
+    const DimensionedField<scalar, volMesh>& iF
+)
+:
+    chtRegionCoupleBase(ptf, iF)
+{}
+
+
+Foam::chtRcThermalDiffusivitySlaveFvPatchScalarField::
+chtRcThermalDiffusivitySlaveFvPatchScalarField
 (
     const chtRcThermalDiffusivitySlaveFvPatchScalarField& ptf,
     const fvPatch& p,
@@ -71,20 +80,10 @@ chtRcThermalDiffusivitySlaveFvPatchScalarField::chtRcThermalDiffusivitySlaveFvPa
 {}
 
 
-chtRcThermalDiffusivitySlaveFvPatchScalarField::chtRcThermalDiffusivitySlaveFvPatchScalarField
-(
-    const chtRcThermalDiffusivitySlaveFvPatchScalarField& ptf,
-    const DimensionedField<scalar, volMesh>& iF
-)
-:
-    chtRegionCoupleBase(ptf, iF)
-{}
-
-
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-const chtRegionCoupleBase&
-chtRcThermalDiffusivitySlaveFvPatchScalarField::shadowPatchField() const
+const Foam::chtRegionCoupleBase&
+Foam::chtRcThermalDiffusivitySlaveFvPatchScalarField::shadowPatchField() const
 {
     return dynamic_cast<const chtRegionCoupleBase&>
     (
@@ -93,7 +92,7 @@ chtRcThermalDiffusivitySlaveFvPatchScalarField::shadowPatchField() const
 }
 
 
-void chtRcThermalDiffusivitySlaveFvPatchScalarField::evaluate
+void Foam::chtRcThermalDiffusivitySlaveFvPatchScalarField::evaluate
 (
     const Pstream::commsTypes
 )
@@ -102,7 +101,7 @@ void chtRcThermalDiffusivitySlaveFvPatchScalarField::evaluate
 }
 
 
-void chtRcThermalDiffusivitySlaveFvPatchScalarField::updateCoeffs()
+void Foam::chtRcThermalDiffusivitySlaveFvPatchScalarField::updateCoeffs()
 {
     if (updated())
     {
@@ -115,12 +114,16 @@ void chtRcThermalDiffusivitySlaveFvPatchScalarField::updateCoeffs()
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-makePatchTypeField
-(
-    fvPatchScalarField,
-    chtRcThermalDiffusivitySlaveFvPatchScalarField
-);
+namespace Foam
+{
+
+    makePatchTypeField
+    (
+        fvPatchScalarField,
+        chtRcThermalDiffusivitySlaveFvPatchScalarField
+    );
 
 } // End namespace Foam
+
 
 // ************************************************************************* //

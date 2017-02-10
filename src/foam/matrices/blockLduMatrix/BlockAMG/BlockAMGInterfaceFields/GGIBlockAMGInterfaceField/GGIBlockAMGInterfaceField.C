@@ -100,7 +100,6 @@ Foam::GGIBlockAMGInterfaceField<Type>::GGIBlockAMGInterfaceField
     BlockAMGInterfaceField<Type>(AMGCp, fineInterfaceField),
     ggiInterface_(refCast<const ggiAMGInterface>(AMGCp)),
     doTransform_(false),
-    rank_(),
     fieldTransferBuffer_()
 {
     // If the interface based on a patch this must be taken care specially of
@@ -113,7 +112,6 @@ Foam::GGIBlockAMGInterfaceField<Type>::GGIBlockAMGInterfaceField
             );
 
         doTransform_ = p.doTransform();
-        rank_ = p.rank();
     }
     else if (isA<ggiLduInterfaceField>(fineInterfaceField))
     {
@@ -121,7 +119,6 @@ Foam::GGIBlockAMGInterfaceField<Type>::GGIBlockAMGInterfaceField
             refCast<const ggiLduInterfaceField >(fineInterfaceField);
 
         doTransform_ = p.doTransform();
-        rank_ = p.rank();
     }
     else
     {

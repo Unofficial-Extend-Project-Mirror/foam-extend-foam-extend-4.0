@@ -51,6 +51,7 @@ namespace Foam
 Foam::mixingPlaneAMGInterface::mixingPlaneAMGInterface
 (
     const lduPrimitiveMesh& lduMesh,
+    const lduInterfacePtrsList& coarseInterfaces,
     const lduInterface& fineInterface,
     const labelField& localRestrictAddressing,
     const labelField& neighbourRestrictAddressing
@@ -60,7 +61,9 @@ Foam::mixingPlaneAMGInterface::mixingPlaneAMGInterface
     fineMixingPlaneInterface_
     (
         refCast<const mixingPlaneLduInterface>(fineInterface)
-    )
+    ),
+    comm_(fineMixingPlaneInterface_.comm()),
+    tag_(fineMixingPlaneInterface_.tag())
 {}
 
 
@@ -168,6 +171,7 @@ void Foam::mixingPlaneAMGInterface::initInternalFieldTransfer
     const unallocLabelList& iF
 ) const
 {
+    // NOTE: Change this: requires fast reduce.  HJ, 13/Jun/20106
     labelTransferBuffer_ = interfaceInternalField(iF);
 }
 

@@ -81,7 +81,7 @@ public:
         tmp<surfaceScalarField> fluxCorrection() const;
 
         //- Return pseudo mesh flux
-        tmp<surfaceVectorField> meshPhi() const;
+        tmp<surfaceScalarField> meshPhi() const;
 
         // Incompressible MRF
 
@@ -134,7 +134,7 @@ public:
         void absoluteVelocity(volVectorField& Urel) const;
 
 
-        //- Correct the boundary velocity for the roation of the MRF region
+        //- Correct the boundary velocity for the rotation of the MRF region
         void correctBoundaryVelocity(volVectorField& U) const;
 
         //- Compute source term for volScalarFields

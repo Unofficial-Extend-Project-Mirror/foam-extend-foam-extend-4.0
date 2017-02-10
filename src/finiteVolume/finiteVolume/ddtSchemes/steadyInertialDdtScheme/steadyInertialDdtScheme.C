@@ -239,11 +239,11 @@ steadyInertialDdtScheme<Type>::fvcDdt
                 rDeltaT.internalField()*
                 (
                     vf.internalField()
-                  - vf.oldTime().internalField()*mesh().V0()/mesh().V()
+                  - vf.prevIter().internalField()*mesh().V0()/mesh().V()
                 ),
                 rDeltaT.boundaryField()*
                 (
-                    vf.boundaryField() - vf.oldTime().boundaryField()
+                    vf.boundaryField() - vf.prevIter().boundaryField()
                 )
             )
         );
@@ -255,7 +255,7 @@ steadyInertialDdtScheme<Type>::fvcDdt
             new GeometricField<Type, fvPatchField, volMesh>
             (
                 ddtIOobject,
-                rDeltaT*(vf - vf.oldTime())
+                rDeltaT*(vf - vf.prevIter())
             )
         );
     }
@@ -291,11 +291,11 @@ steadyInertialDdtScheme<Type>::fvcDdt
                 rDeltaT.internalField()*rho.value()*
                 (
                     vf.internalField()
-                  - vf.oldTime().internalField()*mesh().V0()/mesh().V()
+                  - vf.prevIter().internalField()*mesh().V0()/mesh().V()
                 ),
                 rDeltaT.boundaryField()*rho.value()*
                 (
-                    vf.boundaryField() - vf.oldTime().boundaryField()
+                    vf.boundaryField() - vf.prevIter().boundaryField()
                 )
             )
         );
@@ -307,7 +307,7 @@ steadyInertialDdtScheme<Type>::fvcDdt
             new GeometricField<Type, fvPatchField, volMesh>
             (
                 ddtIOobject,
-                rDeltaT*rho*(vf - vf.oldTime())
+                rDeltaT*rho*(vf - vf.prevIter())
             )
         );
     }
@@ -343,14 +343,14 @@ steadyInertialDdtScheme<Type>::fvcDdt
                 rDeltaT.internalField()*
                 (
                     rho.internalField()*vf.internalField()
-                  - rho.oldTime().internalField()
-                   *vf.oldTime().internalField()*mesh().V0()/mesh().V()
+                  - rho.internalField()
+                   *vf.prevIter().internalField()*mesh().V0()/mesh().V()
                 ),
                 rDeltaT.boundaryField()*
                 (
                     rho.boundaryField()*vf.boundaryField()
-                  - rho.oldTime().boundaryField()
-                   *vf.oldTime().boundaryField()
+                  - rho.boundaryField()
+                   *vf.prevIter().boundaryField()
                 )
             )
         );
@@ -362,7 +362,7 @@ steadyInertialDdtScheme<Type>::fvcDdt
             new GeometricField<Type, fvPatchField, volMesh>
             (
                 ddtIOobject,
-                rDeltaT*(rho*vf - rho.oldTime()*vf.oldTime())
+                rDeltaT*rho*(vf - vf.prevIter())
             )
         );
     }
@@ -393,11 +393,11 @@ steadyInertialDdtScheme<Type>::fvmDdt
 
     if (mesh().moving())
     {
-        fvm.source() = rDeltaT*vf.oldTime().internalField()*mesh().V0();
+        fvm.source() = rDeltaT*vf.prevIter().internalField()*mesh().V0();
     }
     else
     {
-        fvm.source() = rDeltaT*vf.oldTime().internalField()*mesh().V();
+        fvm.source() = rDeltaT*vf.prevIter().internalField()*mesh().V();
     }
 
     return tfvm;
@@ -429,12 +429,12 @@ steadyInertialDdtScheme<Type>::fvmDdt
     if (mesh().moving())
     {
         fvm.source() = rDeltaT
-            *rho.value()*vf.oldTime().internalField()*mesh().V0();
+            *rho.value()*vf.prevIter().internalField()*mesh().V0();
     }
     else
     {
         fvm.source() = rDeltaT
-            *rho.value()*vf.oldTime().internalField()*mesh().V();
+            *rho.value()*vf.prevIter().internalField()*mesh().V();
     }
 
     return tfvm;
@@ -466,14 +466,14 @@ steadyInertialDdtScheme<Type>::fvmDdt
     if (mesh().moving())
     {
         fvm.source() = rDeltaT
-            *rho.oldTime().internalField()
-            *vf.oldTime().internalField()*mesh().V0();
+            *rho.internalField()
+            *vf.prevIter().internalField()*mesh().V0();
     }
     else
     {
         fvm.source() = rDeltaT
-            *rho.oldTime().internalField()
-            *vf.oldTime().internalField()*mesh().V();
+            *rho.internalField()
+            *vf.prevIter().internalField()*mesh().V();
     }
 
     return tfvm;
@@ -522,10 +522,10 @@ steadyInertialDdtScheme<Type>::fvcDdtPhiCorr
             new fluxFieldType
             (
                 ddtIOobject,
-                this->fvcDdtPhiCoeff(U.oldTime(), phi.oldTime())*
+                this->fvcDdtPhiCoeff(U, phi)*
                 (
-                    fvc::interpolate(rDeltaT*rA)*phi.oldTime()
-                  - (fvc::interpolate(rDeltaT*rA*U.oldTime()) & mesh().Sf())
+                    fvc::interpolate(rDeltaT*rA)*phi
+                  - (fvc::interpolate(rDeltaT*rA*U.prevIter()) & mesh().Sf())
                 )
             )
         );
@@ -583,11 +583,12 @@ steadyInertialDdtScheme<Type>::fvcDdtPhiCorr
                 new fluxFieldType
                 (
                     ddtIOobject,
-                    this->fvcDdtPhiCoeff(U.oldTime(), phi.oldTime())
+                    this->fvcDdtPhiCoeff(U, phi)
                    *(
-                        fvc::interpolate(rDeltaT*rA*rho.oldTime())*
-                        phi.oldTime()
-                      - (fvc::interpolate(rDeltaT*rA*rho.oldTime()*U.oldTime())
+                        fvc::interpolate(rDeltaT*rA*rho)*phi
+                      - (
+                            fvc::interpolate(rDeltaT*rA*rho*U.prevIter()
+                        )
                       & mesh().Sf())
                     )
                 )
@@ -606,16 +607,16 @@ steadyInertialDdtScheme<Type>::fvcDdtPhiCorr
                     ddtIOobject,
                     this->fvcDdtPhiCoeff
                     (
-                        U.oldTime(),
-                        phi.oldTime()/fvc::interpolate(rho.oldTime())
+                        U.prevIter(),
+                        phi/fvc::interpolate(rho)
                     )
                    *(
-                        fvc::interpolate(rDeltaT*rA*rho.oldTime())
-                       *phi.oldTime()/fvc::interpolate(rho.oldTime())
+                        fvc::interpolate(rDeltaT*rA*rho)
+                       *phi/fvc::interpolate(rho)
                       - (
                             fvc::interpolate
                             (
-                                rDeltaT*rA*rho.oldTime()*U.oldTime()
+                                rDeltaT*rA*rho*U.prevIter()
                             ) & mesh().Sf()
                         )
                     )
@@ -633,11 +634,11 @@ steadyInertialDdtScheme<Type>::fvcDdtPhiCorr
                 new fluxFieldType
                 (
                     ddtIOobject,
-                    this->fvcDdtPhiCoeff(rho.oldTime(), U.oldTime(), phi.oldTime())
-                   *(
-                        fvc::interpolate(rDeltaT*rA)*phi.oldTime()
+                    this->fvcDdtPhiCoeff(rho, U, phi)*
+                    (
+                        fvc::interpolate(rDeltaT*rA)*phi
                       - (
-                            fvc::interpolate(rDeltaT*rA*U.oldTime())&mesh().Sf()
+                            fvc::interpolate(rDeltaT*rA*U.prevIter()) & mesh().Sf()
                         )
                     )
                 )

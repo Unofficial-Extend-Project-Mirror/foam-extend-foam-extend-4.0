@@ -110,6 +110,12 @@ class faMesh
             mutable label nFaces_;
 
 
+        // Communication support
+
+            //- Communicator used for parallel communication
+            label comm_;
+
+
     // Demand-driven data
 
         //- Primitive patch
@@ -287,9 +293,8 @@ public:
         );
 
 
-    // Destructor
-
-        virtual ~faMesh();
+    //- Destructor
+    virtual ~faMesh();
 
 
     // Member Functions
@@ -367,6 +372,15 @@ public:
                 {
                     return edgeNeighbour_;
                 }
+
+
+            // Communication support
+
+                //- Return communicator used for parallel communication
+                label comm() const;
+
+                //- Return communicator used for parallel communication
+                label& comm();
 
 
         // Access

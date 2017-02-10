@@ -14,7 +14,7 @@
               + fvm::SuSp(-fvc::div(phi), T)
             )
           - fvm::laplacian(kappaEff, T)
-            ==
+         ==
             radiation->Ru()
           - fvm::Sp(4.0*radiation->Rp()*pow3(T), T)
           + 3.0*radiation->Rp()*pow4(T)

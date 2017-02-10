@@ -1,5 +1,4 @@
 EXE_INC = \
-    -I../conjugateHeatTransfer/lnInclude \
     -I$(LIB_SRC)/turbulenceModels \
     -I$(LIB_SRC)/turbulenceModels/incompressible/RAS/RASModel \
     -I$(LIB_SRC)/turbulenceModels/incompressible/turbulenceModel \
@@ -7,8 +6,9 @@ EXE_INC = \
     -I$(LIB_SRC)/transportModels/incompressible/singlePhaseTransportModel \
     -I$(LIB_SRC)/coupledMatrix/lnInclude \
     -I$(LIB_SRC)/finiteVolume/lnInclude \
+    -I$(LIB_SRC)/thermophysicalModels/basic/lnInclude \
     -I$(LIB_SRC)/thermophysicalModels/radiation/lnInclude \
-    -I$(LIB_SRC)/thermophysicalModels/basic/lnInclude
+    -I$(LIB_SRC)/conjugateHeatTransfer/lnInclude
 
 EXE_LIBS = \
     -lincompressibleTurbulenceModel \

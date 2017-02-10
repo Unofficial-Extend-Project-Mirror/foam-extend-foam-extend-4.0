@@ -90,10 +90,9 @@ public:
         {}
 
 
-    // Destructor
-
-        virtual ~cyclicGgiFvPatch()
-        {}
+    //- Destructor
+    virtual ~cyclicGgiFvPatch()
+    {}
 
 
     // Member functions

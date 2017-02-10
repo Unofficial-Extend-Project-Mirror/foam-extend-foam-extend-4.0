@@ -36,14 +36,10 @@ Author
 #include "radiationConstants.H"
 #include "VectorN.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-namespace Foam
-{
-
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-chtRcThermalDiffusivityFvPatchScalarField::chtRcThermalDiffusivityFvPatchScalarField
+Foam::chtRcThermalDiffusivityFvPatchScalarField::
+chtRcThermalDiffusivityFvPatchScalarField
 (
     const fvPatch& p,
     const DimensionedField<scalar, volMesh>& iF
@@ -53,7 +49,8 @@ chtRcThermalDiffusivityFvPatchScalarField::chtRcThermalDiffusivityFvPatchScalarF
 {}
 
 
-chtRcThermalDiffusivityFvPatchScalarField::chtRcThermalDiffusivityFvPatchScalarField
+Foam::chtRcThermalDiffusivityFvPatchScalarField::
+chtRcThermalDiffusivityFvPatchScalarField
 (
     const fvPatch& p,
     const DimensionedField<scalar, volMesh>& iF,
@@ -64,7 +61,8 @@ chtRcThermalDiffusivityFvPatchScalarField::chtRcThermalDiffusivityFvPatchScalarF
 {}
 
 
-chtRcThermalDiffusivityFvPatchScalarField::chtRcThermalDiffusivityFvPatchScalarField
+Foam::chtRcThermalDiffusivityFvPatchScalarField::
+chtRcThermalDiffusivityFvPatchScalarField
 (
     const chtRcThermalDiffusivityFvPatchScalarField& ptf,
     const fvPatch& p,
@@ -76,7 +74,8 @@ chtRcThermalDiffusivityFvPatchScalarField::chtRcThermalDiffusivityFvPatchScalarF
 {}
 
 
-chtRcThermalDiffusivityFvPatchScalarField::chtRcThermalDiffusivityFvPatchScalarField
+Foam::chtRcThermalDiffusivityFvPatchScalarField::
+chtRcThermalDiffusivityFvPatchScalarField
 (
     const chtRcThermalDiffusivityFvPatchScalarField& ptf,
     const DimensionedField<scalar, volMesh>& iF
@@ -88,7 +87,7 @@ chtRcThermalDiffusivityFvPatchScalarField::chtRcThermalDiffusivityFvPatchScalarF
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-void chtRcThermalDiffusivityFvPatchScalarField::evaluate
+void Foam::chtRcThermalDiffusivityFvPatchScalarField::evaluate
 (
     const Pstream::commsTypes
 )
@@ -97,7 +96,7 @@ void chtRcThermalDiffusivityFvPatchScalarField::evaluate
 }
 
 
-void chtRcThermalDiffusivityFvPatchScalarField::updateCoeffs()
+void Foam::chtRcThermalDiffusivityFvPatchScalarField::updateCoeffs()
 {
     if (updated())
     {
@@ -109,16 +108,18 @@ void chtRcThermalDiffusivityFvPatchScalarField::updateCoeffs()
 
 
 void
-chtRcThermalDiffusivityFvPatchScalarField::calcThermalDiffusivity
+Foam::chtRcThermalDiffusivityFvPatchScalarField::calcThermalDiffusivity
 (
     chtRegionCoupleBase& owner,
     const chtRegionCoupleBase& neighbour
 ) const
 {
-    if(debug)
+    if (debug)
     {
-        Info << "In chtRcThermalDiffusivityFvPatchScalarField::calcThermalDiffusivity on "
-            << this->dimensionedInternalField().name()
+        InfoIn
+        (
+            "chtRcThermalDiffusivityFvPatchScalarField::calcThermalDiffusivity"
+        )   << "for field " << this->dimensionedInternalField().name()
             << " in " << this->patch().boundaryMesh().mesh().name()
             << endl;
     }
@@ -158,19 +159,19 @@ chtRcThermalDiffusivityFvPatchScalarField::calcThermalDiffusivity
         const scalarField& lfNei = neighbour.originalPatchField();
         scalarField lTcNei = TwOwn.shadowPatchField().patchInternalField();
 
-        forAll(lData, facei)
+        forAll (lData, facei)
         {
             lData[facei][0] = lTcNei[facei];
             lData[facei][1] = lfNei[facei];
         }
 
-        if(TwOwn.shadowPatchField().radiation())
+        if (TwOwn.shadowPatchField().radiation())
         {
             const scalarField& lQrNei =
                 owner.lookupShadowPatchField<volScalarField, scalar>("Qr");
             const scalarField& lTwNei = TwOwn.shadowPatchField();
 
-            forAll(lData, facei)
+            forAll (lData, facei)
             {
                 lData[facei][2] = lTwNei[facei];
                 lData[facei][3] = lQrNei[facei];
@@ -180,15 +181,15 @@ chtRcThermalDiffusivityFvPatchScalarField::calcThermalDiffusivity
         const Field<VectorN<scalar, 4> > iData =
             owner.regionCouplePatch().interpolate(lData);
 
-        forAll(iData, facei)
+        forAll (iData, facei)
         {
             TcNei[facei] = iData[facei][0];
             fNei[facei] = iData[facei][1];
         }
 
-        if(TwOwn.shadowPatchField().radiation())
+        if (TwOwn.shadowPatchField().radiation())
         {
-            forAll(iData, facei)
+            forAll (iData, facei)
             {
                 Qr[facei] += iData[facei][3];
                 fourQro[facei] +=
@@ -205,46 +206,35 @@ chtRcThermalDiffusivityFvPatchScalarField::calcThermalDiffusivity
     const scalarField kOwn = fOwn/(1.0 - p.weights())/mld.magDelta(p.index());
     const scalarField kNei = fNei/p.weights()/mld.magDelta(p.index());
 
-    //Info << "kOwn = " << kOwn << endl;
-    //Info << "kNei = " << kNei << endl;
-    //Info << "TcOwn = " << TcOwn << endl;
-    //Info << "TcNei = " << TcNei << endl;
-    //Info << "DeltaT = " << TcNei - TcOwn << endl;
-
-    //Info << "Qr = " << Qr << endl;
-    //Info << "kOwn + kNei = " << (kOwn + kNei) << endl;
-
-    //Info << "k = " << k << endl;
-
     k = kOwn*(TwOwn*(kNei*(TcNei - TcOwn) + Qr + fourQro) - TcOwn*fourQro);
     k /= stabilise((fourQro + TwOwn*(kOwn + kNei))*(TcNei - TcOwn), SMALL);
     k /= p.deltaCoeffs();
 
     //Info << "k = " << k << endl;
 
-    forAll(k, facei)
+    forAll (k, facei)
     {
         k[facei] = max(min(k[facei], 100*kHarm[facei]), 0.01*kHarm[facei]);
     }
-
-    //Info << "k = " << k << endl;
 
     owner.fvPatchScalarField::updateCoeffs();
 }
 
 
 void
-chtRcThermalDiffusivityFvPatchScalarField::calcTemperature
+Foam::chtRcThermalDiffusivityFvPatchScalarField::calcTemperature
 (
     chtRcTemperatureFvPatchScalarField& TwOwn,
     const chtRcTemperatureFvPatchScalarField& neighbour,
     const chtRegionCoupleBase& ownerK
 ) const
 {
-    if(debug)
+    if (debug)
     {
-        Info << "In chtRcThermalDiffusivityFvPatchScalarField::calcTemperature on "
-            << this->dimensionedInternalField().name()
+        InfoIn
+        (
+            "chtRcThermalDiffusivityFvPatchScalarField::calcTemperature"
+        )   << "for field " << this->dimensionedInternalField().name()
             << " in " << this->patch().boundaryMesh().mesh().name()
             << endl;
     }
@@ -280,19 +270,19 @@ chtRcThermalDiffusivityFvPatchScalarField::calcTemperature
         scalarField lTcNei =
             TwOwn.shadowPatchField().patchInternalField();
 
-        forAll(lData, facei)
+        forAll (lData, facei)
         {
             lData[facei][0] = lTcNei[facei];
             lData[facei][1] = lfNei[facei];
         }
 
-        if(TwOwn.shadowPatchField().radiation())
+        if (TwOwn.shadowPatchField().radiation())
         {
             const scalarField& lTwNei = TwOwn.shadowPatchField();
             const scalarField& lQrNei =
                 TwOwn.lookupShadowPatchField<volScalarField, scalar>("Qr");
 
-            forAll(lData, facei)
+            forAll (lData, facei)
             {
                 lData[facei][2] = lTwNei[facei];
                 lData[facei][3] = lQrNei[facei];
@@ -302,15 +292,15 @@ chtRcThermalDiffusivityFvPatchScalarField::calcTemperature
         const Field<VectorN<scalar, 4> > iData =
             TwOwn.regionCouplePatch().interpolate(lData);
 
-        forAll(iData, facei)
+        forAll (iData, facei)
         {
             TcNei[facei] = iData[facei][0];
             fNei[facei] = iData[facei][1];
         }
 
-        if(TwOwn.shadowPatchField().radiation())
+        if (TwOwn.shadowPatchField().radiation())
         {
-            forAll(iData, facei)
+            forAll (iData, facei)
             {
                 fourQro[facei] +=
                     4.0*radiation::sigmaSB.value()*pow4(iData[facei][2]);
@@ -322,29 +312,15 @@ chtRcThermalDiffusivityFvPatchScalarField::calcTemperature
     const scalarField kOwn = fOwn/(1.0 - p.weights())/mld.magDelta(p.index());
     const scalarField kNei = fNei/p.weights()/mld.magDelta(p.index());
 
-    //Info << "kOwn = " << kOwn << endl;
-    //Info << "kNei = " << kNei << endl;
-    //Info << "TcOwn = " << TcOwn << endl;
-    //Info << "TcNei = " << TcNei << endl;
-    //Info << "Qr = " << Qr << " Sum = " << sum(Qr*p.magSf()) << endl;
-
     TwOwn *=
         (fourQro + Qr + kOwn*TcOwn + kNei*TcNei)
        /(TwOwn*(kOwn + kNei) + fourQro);
-
-    //Info << "TwOwn = " << TwOwn << endl;
-
-    //scalarField q1 = (TwOwn - TcOwn)*kOwn;
-    //Info << "q1 = " << q1 << " Sum = " << sum(q1*p.magSf()) << endl;
-
-    //scalarField q2 = (TcNei - TcOwn)*ownerK*p.deltaCoeffs();
-    //Info << "q2 = " << q2 << " Sum = " << sum(q2*p.magSf()) << endl;
 
     TwOwn.fvPatchScalarField::updateCoeffs();
 }
 
 
-void chtRcThermalDiffusivityFvPatchScalarField::write(Ostream& os) const
+void Foam::chtRcThermalDiffusivityFvPatchScalarField::write(Ostream& os) const
 {
     fvPatchScalarField::write(os);
     os.writeKeyword("remoteField")
@@ -353,19 +329,18 @@ void chtRcThermalDiffusivityFvPatchScalarField::write(Ostream& os) const
 }
 
 
-//- Specify data associated with VectorN<scalar, 4> type is contiguous
-template<>
-inline bool contiguous<VectorN<scalar, 4> >() {return true;}
-
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-makePatchTypeField
-(
-    fvPatchScalarField,
-    chtRcThermalDiffusivityFvPatchScalarField
-);
+namespace Foam
+{
+
+    makePatchTypeField
+    (
+        fvPatchScalarField,
+        chtRcThermalDiffusivityFvPatchScalarField
+    );
 
 } // End namespace Foam
+
 
 // ************************************************************************* //

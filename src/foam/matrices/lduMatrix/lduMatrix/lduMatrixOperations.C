@@ -143,6 +143,12 @@ void Foam::lduMatrix::negate()
 
 void Foam::lduMatrix::operator+=(const lduMatrix& A)
 {
+    // Escape empty matrix
+    if (A.empty())
+    {
+        return;
+    }
+    
     if (A.diagPtr_)
     {
         diag() += A.diag();
@@ -211,6 +217,12 @@ void Foam::lduMatrix::operator+=(const lduMatrix& A)
 
 void Foam::lduMatrix::operator-=(const lduMatrix& A)
 {
+    // Escape empty matrix
+    if (A.empty())
+    {
+        return;
+    }
+    
     if (A.diagPtr_)
     {
         diag() -= A.diag();

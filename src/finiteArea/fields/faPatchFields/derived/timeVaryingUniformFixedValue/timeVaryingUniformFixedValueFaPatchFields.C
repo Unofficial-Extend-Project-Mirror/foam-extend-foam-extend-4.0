@@ -21,28 +21,23 @@ License
     You should have received a copy of the GNU General Public License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
-Description
-    Prints out a description of the streams
-
 \*---------------------------------------------------------------------------*/
 
-#include "IPstream.H"
-#include "OPstream.H"
+#include "timeVaryingUniformFixedValueFaPatchFields.H"
+#include "addToRunTimeSelectionTable.H"
+#include "areaFields.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-void Foam::IPstream::print(Ostream& os) const
+namespace Foam
 {
-    os  << "Reading from processor " << fromProcNo_
-        << " to processor " << myProcNo() << Foam::endl;
-}
 
+// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-void Foam::OPstream::print(Ostream& os) const
-{
-    os  << "Writing from processor " << toProcNo_
-        << " to processor " << myProcNo() << Foam::endl;
-}
+makeFaPatchFields(timeVaryingUniformFixedValue);
 
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+} // End namespace Foam
 
 // ************************************************************************* //

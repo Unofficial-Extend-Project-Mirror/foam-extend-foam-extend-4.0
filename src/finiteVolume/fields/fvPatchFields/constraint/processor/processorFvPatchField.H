@@ -69,6 +69,25 @@ class processorFvPatchField
         //- Local reference cast into the processor patch
         const processorFvPatch& procPatch_;
 
+        // Sending and receiving
+
+            //- Outstanding request
+            mutable label outstandingSendRequest_;
+
+            //- Outstanding request
+            mutable label outstandingRecvRequest_;
+
+            //- Send buffer.
+            mutable Field<Type> sendBuf_;
+
+            //- Receive buffer.
+            mutable Field<Type> receiveBuf_;
+
+            //- Scalar send buffer
+            mutable Field<scalar> scalarSendBuf_;
+
+            //- Scalar receive buffer
+            mutable Field<scalar> scalarReceiveBuf_;
 
 public:
 
@@ -143,7 +162,7 @@ public:
 
 
     //- Destructor
-    ~processorFvPatchField();
+    virtual ~processorFvPatchField();
 
 
     // Member functions
@@ -249,7 +268,7 @@ public:
             ) const;
 
 
-        //- Processor coupled interface functions
+        // Processor coupled interface functions
 
             //- Return processor number
             virtual int myProcNo() const
@@ -262,6 +281,19 @@ public:
             {
                 return procPatch_.neighbProcNo();
             }
+
+
+            // Communication support
+
+                //- Is all data available
+                virtual bool ready() const;
+
+                //- Return communicator used for parallel communication
+                virtual int comm() const
+                {
+                    return procPatch_.comm();
+                }
+
 
             //- Does the patch field perform the transfromation
             virtual bool doTransform() const

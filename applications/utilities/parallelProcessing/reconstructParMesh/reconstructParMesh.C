@@ -119,12 +119,12 @@ int main(int argc, char *argv[])
             << exit(FatalError);
     }
 
-    Foam::word regionName = polyMesh::defaultRegion;
+    word regionName = polyMesh::defaultRegion;
 
     if (args.optionReadIfPresent("region", regionName))
     {
         Info<< "Selecting region " << regionName << " for time = "
-            << runTime.timeName() << Foam::nl << Foam::endl;
+            << runTime.timeName() << nl << endl;
     }
 
     // Set all times on processor meshes equal to reconstructed mesh

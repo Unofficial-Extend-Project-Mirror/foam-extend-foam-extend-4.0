@@ -16,39 +16,15 @@ FoamFile
 
 numberOfSubdomains 12;
 
+globalFaceZones
+(
+    sideWallA_BB_cyclic1Zone
+    sideWallA_BB_cyclic2Zone
+    B_UPSTREAMZone
+    B_DOWNSTREAMZone
+);
+
 method          metis;
-
-simpleCoeffs
-{
-    n               (2 2 1);
-    delta           0.001;
-}
-
-hierarchicalCoeffs
-{
-    n               (1 1 1);
-    delta           0.001;
-    order           xyz;
-}
-
-metisCoeffs
-{
-    processorWeights
-    (
-        1
-        1
-        1
-        1
-        1
-        1
-        1
-        1
-        1
-        1
-        1
-        1
-    );
-}
 
 manualCoeffs
 {

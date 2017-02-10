@@ -53,6 +53,21 @@ for i in range(1,len(t)):
         my[i] += mvy[i]
         mz[i] += mvz[i]
 
+# write clean data file
+outForces=open('forces.dat','w')
+
+for data in zip(t,fx,fy,fz):
+        outForces.write(' '.join([str(d) for d in data])+'\n')
+
+outForces.close()
+
+outMoments=open('moments.dat','w')
+
+for data in zip(t,mx,my,mz):
+        outMoments.write(' '.join([str(d) for d in data])+'\n')
+
+outMoments.close()
+
 # plot forces
 import pylab
 pylab.xlabel('iteration')

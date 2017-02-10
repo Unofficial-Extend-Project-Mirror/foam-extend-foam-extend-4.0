@@ -58,6 +58,12 @@ class OPstream
          // ID of receiving processor
         int toProcNo_;
 
+        //- Message tag
+        const int tag_;
+
+        //- Communicator
+        const label comm_;
+
 
     // Private member functions
 
@@ -88,14 +94,15 @@ public:
             const commsTypes commsType,
             const int toProcNo,
             const label bufSize = 0,
+            const int tag = Pstream::msgType(),
+            const label comm = Pstream::worldComm,
             streamFormat format = BINARY,
             versionNumber version = currentVersion
         );
 
 
-    // Destructor
-
-        ~OPstream();
+    //- Destructor
+    ~OPstream();
 
 
     // Member functions
@@ -117,14 +124,10 @@ public:
                 const commsTypes commsType,
                 const int toProcNo,
                 const char* buf,
-                const std::streamsize bufSize
+                const std::streamsize bufSize,
+                const int tag = Pstream::msgType(),
+                const label comm = Pstream::worldComm
             );
-
-            //- Non-blocking writes: wait until all have finished.
-            static void waitRequests();
-
-            //- Non-blocking writes: has request i finished?
-            static bool finishedRequest(const label i);
 
             //- Write next token to stream
             Ostream& write(const token&);

@@ -62,7 +62,7 @@ void Foam::setRefCell
                          ")",
                         dict
                     )   << "Illegal master cellID " << refCelli
-                        << ". Should be 0.." << field.mesh().nCells()
+                        << ". Should be 0." << field.mesh().nCells()
                         << exit(FatalIOError);
                 }
             }

@@ -55,7 +55,18 @@ grad
     const GeometricField<Type, faePatchField, edgeMesh>& ssf
 )
 {
-    return fac::edgeIntegrate(ssf.mesh().Sf() * ssf);
+    const areaVectorField &n = ssf.mesh().faceAreaNormals();
+    typedef typename outerProduct<vector,Type>::type GradType;
+
+    tmp<GeometricField<GradType, faPatchField, areaMesh> > tgGrad =
+        fac::edgeIntegrate(ssf.mesh().Sf()*ssf);
+
+    GeometricField<GradType, faPatchField, areaMesh>& gGrad = tgGrad();
+
+    gGrad -= n*(n & gGrad);
+    gGrad.correctBoundaryConditions();
+
+    return tgGrad;
 }
 
 template<class Type>
@@ -95,11 +106,22 @@ grad
     const word& name
 )
 {
-    return fa::gradScheme<Type>::New
-    (
-        vf.mesh(),
-        vf.mesh().schemesDict().gradScheme(name)
-    )().grad(vf);
+    const areaVectorField &n = vf.mesh().faceAreaNormals();
+    typedef typename outerProduct<vector,Type>::type GradType;
+
+    tmp<GeometricField<GradType, faPatchField, areaMesh> > tgGrad =
+        fa::gradScheme<Type>::New
+        (
+            vf.mesh(),
+            vf.mesh().schemesDict().gradScheme(name)
+        )().grad(vf);
+
+    GeometricField<GradType, faPatchField, areaMesh>& gGrad = tgGrad();
+
+    gGrad -= n*(n & gGrad);
+    gGrad.correctBoundaryConditions();
+
+    return tgGrad;
 }
 
 

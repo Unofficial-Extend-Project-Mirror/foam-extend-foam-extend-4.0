@@ -344,6 +344,8 @@ void Foam::BlockMatrixAgglomeration<Type>::calcAgglomeration()
     // whole gang of processes; otherwise I may end up with a different
     // number of agglomeration levels on different processors.
 
+    // If the number of coarse equations is les than minimum and
+    // if the matrix has reduced in size by at least 1/3, coarsen
     if
     (
         nCoarseEqns_ > BlockMatrixCoarsening<Type>::minCoarseEqns()
@@ -367,6 +369,20 @@ void Foam::BlockMatrixAgglomeration<Type>::calcAgglomeration()
         {
             Pout << ".  Rejected" << endl;
         }
+
+        // Count cluster size
+        labelList clusterSize(nCoarseEqns_, 0);
+
+        forAll (agglomIndex_, eqnI)
+        {
+            clusterSize[agglomIndex_[eqnI]]++;
+        }
+
+        label minClusterSize = gMin(clusterSize);
+        label maxClusterSize = gMax(clusterSize);
+
+        Info<< "Cluster size: min = " << minClusterSize
+            << " max = " << maxClusterSize << endl;
     }
 }
 
@@ -638,7 +654,8 @@ Foam::BlockMatrixAgglomeration<Type>::BlockMatrixAgglomeration
     groupSize_(groupSize),
     nSolo_(0),
     nCoarseEqns_(0),
-    coarsen_(false)
+    coarsen_(false),
+    lTime_()
 {
     calcAgglomeration();
 }
@@ -880,11 +897,13 @@ Foam::BlockMatrixAgglomeration<Type>::restrictMatrix() const
             nCoarseEqns_,
             coarseOwner,
             coarseNeighbour,
+            Pstream::worldComm, //HJ, AMG Comm fineMesh.comm(),
             true
         )
     );
 
     // Initialise transfer of restrict addressing on the interface
+    // HJ, consider blocking comms.  HJ, 9/Jun/2016
     forAll (interfaceFields, intI)
     {
         if (interfaceFields.set(intI))
@@ -937,6 +956,7 @@ Foam::BlockMatrixAgglomeration<Type>::restrictMatrix() const
                 AMGInterface::New
                 (
                     coarseAddrPtr(),
+                    coarseInterfaces,
                     fineInterface,
                     fineInterface.interfaceInternalField(agglomIndex_),
                     fineInterfaceAddr[intI]

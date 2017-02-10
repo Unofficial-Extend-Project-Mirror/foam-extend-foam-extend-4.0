@@ -95,9 +95,8 @@ public:
         {}
 
 
-    // Destructor
-
-        virtual ~regionCoupleFvPatch();
+    //- Destructor
+    virtual ~regionCoupleFvPatch();
 
 
     // Member functions
@@ -121,6 +120,21 @@ public:
 
             //- Return delta (P to N) vectors across coupled patch
             virtual tmp<vectorField> delta() const;
+
+
+        // Communication support
+
+            //- Return communicator used for parallel communication
+            virtual int comm() const
+            {
+                return rcPolyPatch_.comm();
+            }
+
+            //- Return message tag used for sending
+            virtual int tag() const
+            {
+                return rcPolyPatch_.tag();
+            }
 
 
         // Interpolation
@@ -180,6 +194,9 @@ public:
             //- Is the patch localised on a single processor
             virtual bool localParallel() const;
 
+            //- Return mapDistribute
+            const mapDistribute& map() const;
+
             //- Return weights.  Master side returns own weights and
             //  slave side returns weights from master
             virtual const scalarListList& weights() const;
@@ -195,6 +212,11 @@ public:
             {
                 return coupledFvPatch::reverseT();
             }
+
+            //- Expand addressing to zone
+            //  Used in optimised AMG coarsening
+            virtual void expandAddrToZone(labelField&) const;
+
 
             //- Return the values of the given internal data adjacent to
             //  the interface as a field

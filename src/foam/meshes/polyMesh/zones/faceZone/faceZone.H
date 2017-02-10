@@ -243,8 +243,7 @@ public:
 
 
     //- Destructor
-
-        virtual ~faceZone();
+    virtual ~faceZone();
 
 
     // Member Functions

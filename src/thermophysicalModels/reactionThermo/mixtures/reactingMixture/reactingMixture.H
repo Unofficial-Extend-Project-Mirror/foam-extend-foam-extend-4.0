@@ -72,13 +72,17 @@ public:
     // Constructors
 
         //- Construct from dictionary and mesh
-        reactingMixture(const dictionary&, const fvMesh&, const objectRegistry&);
+        reactingMixture
+        (
+            const dictionary&,
+            const fvMesh&,
+            const objectRegistry&
+        );
 
 
-    // Destructor
-
-        virtual ~reactingMixture()
-        {}
+    //- Destructor
+    virtual ~reactingMixture()
+    {}
 
 
     // Member functions

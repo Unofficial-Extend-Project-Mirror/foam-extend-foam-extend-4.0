@@ -55,6 +55,9 @@ Description
 # undef  FOAM_LABEL_MAX
 # define FOAM_LABEL_MAX INT_MAX
 
+// Define identifier for label type for int
+# define WM_INT
+
 # include "int.H"
 # include "long.H"
 # include "longLong.H"
@@ -80,6 +83,9 @@ namespace Foam
 # undef  FOAM_LABEL_MAX
 # define FOAM_LABEL_MAX LONG_MAX
 
+// Define identifier for label type for long
+# define WM_LONG
+
 # include "int.H"
 # include "long.H"
 
@@ -104,6 +110,9 @@ namespace Foam
 
 # undef  FOAM_LABEL_MAX
 # define FOAM_LABEL_MAX LLONG_MAX
+
+// Define identifier for label type for long long
+# define WM_LLONG
 
 # include "int.H"
 # include "long.H"

@@ -141,7 +141,10 @@ tmp<Field<Type> > wedgeFvPatchField<Type>::snGrad() const
     Field<Type> pif = this->patchInternalField();
     return
     (
-        transform(refCast<const wedgeFvPatch>(this->patch()).cellT(), pif) - pif
+        transform
+        (
+            refCast<const wedgeFvPatch>(this->patch()).cellT(), pif
+        ) - pif
     )*(0.5*this->patch().deltaCoeffs());
 }
 

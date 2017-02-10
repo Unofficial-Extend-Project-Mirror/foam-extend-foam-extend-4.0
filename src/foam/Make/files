@@ -141,13 +141,13 @@ $(StringStreams)/StringStreamsPrint.C
 
 Pstreams = $(Streams)/Pstreams
 $(Pstreams)/Pstream.C
+$(Pstreams)/PstreamReduceOps.C
 $(Pstreams)/PstreamCommsStruct.C
 $(Pstreams)/PstreamGlobals.C
 $(Pstreams)/IPstream.C
 $(Pstreams)/OPstream.C
 $(Pstreams)/IPread.C
 $(Pstreams)/OPwrite.C
-$(Pstreams)/PstreamsPrint.C
 
 dictionary = db/dictionary
 $(dictionary)/dictionary.C

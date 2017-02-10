@@ -65,9 +65,6 @@ class GGIBlockAMGInterfaceField
         //- Is the transform required
         bool doTransform_;
 
-        //- Rank of component for transformation.
-        int rank_;
-
         //- Field transfer buffer
         mutable Field<Type> fieldTransferBuffer_;
 
@@ -199,11 +196,6 @@ public:
                 return ggiInterface_.reverseT();
             }
 
-            //- Return rank of component for transform
-            virtual int rank() const
-            {
-                return rank_;
-            }
 
         // Transfer buffer access
 
@@ -212,7 +204,6 @@ public:
             {
                 return fieldTransferBuffer_;
             }
-
 };
 
 

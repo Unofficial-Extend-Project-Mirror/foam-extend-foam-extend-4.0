@@ -59,6 +59,8 @@ thermophysicalModels/Allwmake
 transportModels/Allwmake
 turbulenceModels/Allwmake
 lagrangian/Allwmake
+wmake libso conjugateHeatTransfer
+
 postProcessing/Allwmake
 conversion/Allwmake
 

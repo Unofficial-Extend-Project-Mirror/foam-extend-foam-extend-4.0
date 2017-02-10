@@ -45,6 +45,7 @@ namespace Foam
 Foam::cyclicGGIAMGInterface::cyclicGGIAMGInterface
 (
     const lduPrimitiveMesh& lduMesh,
+    const lduInterfacePtrsList& coarseInterfaces,
     const lduInterface& fineInterface,
     const labelField& localRestrictAddressing,
     const labelField& neighbourRestrictAddressing
@@ -53,6 +54,7 @@ Foam::cyclicGGIAMGInterface::cyclicGGIAMGInterface
     ggiAMGInterface
     (
         lduMesh,
+        coarseInterfaces,
         fineInterface,
         localRestrictAddressing,
         neighbourRestrictAddressing
