@@ -1,0 +1,60 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | foam-extend: Open Source CFD                    |
+|  \\    /   O peration     | Version:     4.0                                |
+|   \\  /    A nd           | Web:         http://www.foam-extend.org         |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      controlDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+libs
+(
+    "liblduSolvers.so"
+)
+
+application     viscoelasticFluidFoam;
+
+startFrom       startTime;
+
+startTime       0.0;
+
+stopAt          endTime;
+
+endTime         15;
+
+deltaT          1e-4;
+
+writeControl    adjustableRunTime;
+
+writeInterval   1;
+
+purgeWrite      0;
+
+writeFormat     ascii;
+
+writePrecision  6;
+
+writeCompression uncompressed;
+
+timeFormat      general;
+
+timePrecision   6;
+
+graphFormat     raw;
+
+runTimeModifiable yes;
+
+adjustTimeStep  no;
+
+maxCo          0.35;
+
+maxDeltaT      0.01;
+
+// ************************************************************************* //
