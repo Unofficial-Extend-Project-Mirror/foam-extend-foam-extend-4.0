@@ -84,7 +84,7 @@ void Foam::MRFZone::setMRFFaces()
 
 
     labelHashSet excludedPatches(excludedPatchLabels_);
-    Info<< "Excluded patches: " << excludedPatchLabels_ << endl;
+
     forAll (patches, patchI)
     {
         const polyPatch& pp = patches[patchI];
@@ -246,12 +246,7 @@ Foam::vector Foam::MRFZone::Omega() const
         const scalar t = mesh_.time().value();
         const scalar ramp = sin(2*pi/(4*rampTime_)*Foam::min(rampTime_, t));
 
-        Info<< "MRF Ramp: " << ramp << endl;
-
         return ramp*omega_.value()*axis_.value();
-
-        // return Foam::min(mesh_.time().value()/rampTime_, 1.0)*
-        //     omega_.value()*axis_.value();
     }
 }
 
