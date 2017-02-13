@@ -12,7 +12,7 @@
         mesh
     );
 
-    Info << "Reading field U\n" << endl;
+    Info<< "Reading field U\n" << endl;
     volVectorField U
     (
         IOobject
