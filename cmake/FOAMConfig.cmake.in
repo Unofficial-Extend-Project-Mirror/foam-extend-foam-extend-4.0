@@ -1,0 +1,32 @@
+@PACKAGE_INIT@
+
+include("${CMAKE_CURRENT_LIST_DIR}/FOAMConfigVersion.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/FOAMMacros.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/FOAMTargets.cmake")
+
+message(STATUS "Importing FOAM ${FOAM_VERSION} from ${CMAKE_CURRENT_LIST_DIR}")
+
+include(CMakeFindDependencyMacro)
+
+find_dependency(MPI)
+add_library(mpi SHARED IMPORTED)
+set_property(TARGET mpi PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${MPI_C_INCLUDE_PATH})
+set_property(TARGET mpi PROPERTY IMPORTED_LOCATION ${MPI_LIBRARY})
+
+find_dependency(ZLIB)
+
+#set_and_check(FOAM_INCLUDE_DIR "@PACKAGE_INCLUDE_INSTALL_DIR@")
+#set_and_check(FOAM_LIBRARY foam)
+
+# Once we split into components
+#set(_supported_components Plot Table)
+
+#foreach(_comp ${FOAM_FIND_COMPONENTS})
+#  if (NOT ";${_supported_components};" MATCHES _comp)
+#    set(FOAM_FOUND False)
+#    set(FOAM_NOTFOUND_MESSAGE "Unsupported component: ${_comp}")
+#  endif()
+#  include("${CMAKE_CURRENT_LIST_DIR}/FOAM${_comp}Targets.cmake")
+#endforeach()
+
+check_required_components(FOAM)

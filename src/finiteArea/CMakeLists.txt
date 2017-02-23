@@ -1,0 +1,193 @@
+# --------------------------------------------------------------------------
+#   ========                 |
+#   \      /  F ield         | foam-extend: Open Source CFD
+#    \    /   O peration     | Version:     4.1
+#     \  /    A nd           | Web:         http://www.foam-extend.org
+#      \/     M anipulation  | For copyright notice see file Copyright
+# --------------------------------------------------------------------------
+# License
+#     This file is part of foam-extend.
+#
+#     foam-extend is free software: you can redistribute it and/or modify it
+#     under the terms of the GNU General Public License as published by the
+#     Free Software Foundation, either version 3 of the License, or {at your
+#     option} any later version.
+#
+#     foam-extend is distributed in the hope that it will be useful, but
+#     WITHOUT ANY WARRANTY; without even the implied warranty of
+#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+#     General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
+#
+# Description
+#     CMakeLists.txt file for libraries and applications
+#
+# Author
+#     Henrik Rusche, Wikki GmbH, 2017. All rights reserved
+#
+#
+# --------------------------------------------------------------------------
+
+list(APPEND sources
+  faMesh/faGlobalMeshData/faGlobalMeshData.C
+  faMesh/faMesh.C
+  faMesh/faMeshDemandDrivenData.C
+  faMesh/faMeshUpdate.C
+  faMesh/faBoundaryMesh/faBoundaryMesh.C
+)
+
+set(faPatches faMesh/faPatches)
+list(APPEND sources
+  ${faPatches}/faPatch/faPatch.C
+  ${faPatches}/faPatch/newFaPatch.C
+  ${faPatches}/basic/coupled/coupledFaPatch.C
+  ${faPatches}/constraint/empty/emptyFaPatch.C
+  ${faPatches}/constraint/processor/processorFaPatch.C
+  ${faPatches}/constraint/wedge/wedgeFaPatch.C
+  ${faPatches}/constraint/cyclic/cyclicFaPatch.C
+  ${faPatches}/constraint/symmetry/symmetryFaPatch.C
+)
+
+set(faMeshMapper faMesh/faMeshMapper)
+list(APPEND sources
+  ${faMeshMapper}/faMeshMapper.C
+  ${faMeshMapper}/faAreaMapper.C
+  ${faMeshMapper}/faEdgeMapper.C
+  ${faMeshMapper}/faPatchMapper.C
+)
+
+set(faPatchFields fields/faPatchFields)
+list(APPEND sources
+  ${faPatchFields}/faPatchField/faPatchFields.C
+)
+
+set(basicFaPatchFields ${faPatchFields}/basic)
+list(APPEND sources
+  ${basicFaPatchFields}/basicSymmetry/basicSymmetryFaPatchFields.C
+  ${basicFaPatchFields}/basicSymmetry/basicSymmetryFaPatchScalarField.C
+  ${basicFaPatchFields}/calculated/calculatedFaPatchFields.C
+  ${basicFaPatchFields}/coupled/coupledFaPatchFields.C
+  ${basicFaPatchFields}/zeroGradient/zeroGradientFaPatchFields.C
+  ${basicFaPatchFields}/fixedValue/fixedValueFaPatchFields.C
+  ${basicFaPatchFields}/fixedGradient/fixedGradientFaPatchFields.C
+  ${basicFaPatchFields}/mixed/mixedFaPatchFields.C
+  ${basicFaPatchFields}/transform/transformFaPatchFields.C
+  ${basicFaPatchFields}/transform/transformFaPatchScalarField.C
+)
+
+set(constraintFaPatchFields ${faPatchFields}/constraint)
+list(APPEND sources
+  ${constraintFaPatchFields}/empty/emptyFaPatchFields.C
+  ${constraintFaPatchFields}/processor/processorFaPatchFields.C
+  ${constraintFaPatchFields}/processor/processorFaPatchScalarField.C
+  ${constraintFaPatchFields}/wedge/wedgeFaPatchFields.C
+  ${constraintFaPatchFields}/wedge/wedgeFaPatchScalarField.C
+  ${constraintFaPatchFields}/cyclic/cyclicFaPatchFields.C
+  ${constraintFaPatchFields}/symmetry/symmetryFaPatchFields.C
+)
+
+set(derivedFaPatchFields ${faPatchFields}/derived)
+list(APPEND sources
+  ${derivedFaPatchFields}/fixedValueOutflow/fixedValueOutflowFaPatchFields.C
+  ${derivedFaPatchFields}/inletOutlet/inletOutletFaPatchFields.C
+  ${derivedFaPatchFields}/slip/slipFaPatchFields.C
+)
+
+set(faePatchFields fields/faePatchFields)
+list(APPEND sources
+  ${faePatchFields}/faePatchField/faePatchFields.C
+)
+
+set(basicFaePatchFields ${faePatchFields}/basic)
+list(APPEND sources
+  ${basicFaePatchFields}/calculated/calculatedFaePatchFields.C
+  ${basicFaePatchFields}/coupled/coupledFaePatchFields.C
+  ${basicFaePatchFields}/fixedValue/fixedValueFaePatchFields.C
+)
+
+set(constraintFaePatchFields ${faePatchFields}/constraint)
+list(APPEND sources
+  ${constraintFaePatchFields}/empty/emptyFaePatchFields.C
+  ${constraintFaePatchFields}/processor/processorFaePatchFields.C
+  ${constraintFaePatchFields}/wedge/wedgeFaePatchFields.C
+  ${constraintFaePatchFields}/cyclic/cyclicFaePatchFields.C
+  ${constraintFaePatchFields}/symmetry/symmetryFaePatchFields.C
+  fields/areaFields/areaFields.C
+  fields/edgeFields/edgeFields.C
+  faMatrices/faMatrices.C
+  faMatrices/faScalarMatrix/faScalarMatrix.C
+)
+
+set(edgeInterpolation interpolation/edgeInterpolation)
+list(APPEND sources
+  ${edgeInterpolation}/edgeInterpolation.C
+  ${edgeInterpolation}/edgeInterpolationScheme/edgeInterpolationSchemes.C
+)
+
+set(schemes ${edgeInterpolation}/schemes)
+list(APPEND sources
+  ${schemes}/linear/linearEdgeInterpolationMake.C
+  ${schemes}/upwind/upwindEdgeInterpolationMake.C
+  ${schemes}/linearUpwind/linearUpwindEdgeInterpolationMake.C
+  ${schemes}/Gamma/GammaEdgeInterpolationMake.C
+  ${schemes}/blended/blendedEdgeInterpolationMake.C
+  finiteArea/fa/fa.C
+  finiteArea/faSchemes/faSchemes.C
+)
+
+set(ddtSchemes finiteArea/ddtSchemes)
+list(APPEND sources
+  ${ddtSchemes}/faDdtScheme/faDdtSchemes.C
+  ${ddtSchemes}/steadyStateFaDdtScheme/steadyStateFaDdtSchemes.C
+  ${ddtSchemes}/EulerFaDdtScheme/EulerFaDdtSchemes.C
+  ${ddtSchemes}/backwardFaDdtScheme/backwardFaDdtSchemes.C
+  ${ddtSchemes}/boundedBackwardFaDdtScheme/boundedBackwardFaDdtScheme.C
+)
+
+set(divSchemes finiteArea/divSchemes)
+list(APPEND sources
+  ${divSchemes}/faDivScheme/faDivSchemes.C
+  ${divSchemes}/gaussFaDivScheme/gaussFaDivSchemes.C
+)
+
+set(gradSchemes finiteArea/gradSchemes)
+list(APPEND sources
+  ${gradSchemes}/faGradScheme/faGradSchemes.C
+  ${gradSchemes}/gaussFaGrad/gaussFaGrads.C
+  ${gradSchemes}/leastSquaresFaGrad/leastSquaresFaVectors.C
+  ${gradSchemes}/leastSquaresFaGrad/leastSquaresFaGrads.C
+)
+
+set(limitedGradSchemes ${gradSchemes}/limitedGradSchemes)
+list(APPEND sources
+  ${limitedGradSchemes}/faceLimitedFaGrad/faceLimitedFaGrads.C
+  ${limitedGradSchemes}/edgeLimitedFaGrad/edgeLimitedFaGrads.C
+)
+
+set(lnGradSchemes finiteArea/lnGradSchemes)
+list(APPEND sources
+  ${lnGradSchemes}/lnGradScheme/lnGradSchemes.C
+  ${lnGradSchemes}/correctedLnGrad/correctedLnGrads.C
+  ${lnGradSchemes}/limitedLnGrad/limitedLnGrads.C
+  ${lnGradSchemes}/fourthLnGrad/fourthLnGrads.C
+)
+
+set(laplacianSchemes finiteArea/laplacianSchemes)
+list(APPEND sources
+  ${laplacianSchemes}/faLaplacianScheme/faLaplacianSchemes.C
+  ${laplacianSchemes}/gaussFaLaplacianScheme/gaussFaLaplacianSchemes.C
+)
+
+set(convectionSchemes finiteArea/convectionSchemes)
+list(APPEND sources
+  ${convectionSchemes}/faConvectionScheme/faConvectionSchemes.C
+  ${convectionSchemes}/gaussFaConvectionScheme/gaussFaConvectionSchemes.C
+)
+
+add_foam_library(finiteArea SHARED ${sources})
+
+# This is a prototype! Replace second argument with a list of the highest
+# dependencies only. Inherited dependencies will be treated automatically.
+target_link_libraries(finiteArea PUBLIC foam)
