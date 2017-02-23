@@ -1,3 +1,0 @@
-patchStressIntegrate.C
-
-EXE = $(FOAM_APPBIN)/patchStressIntegrate
