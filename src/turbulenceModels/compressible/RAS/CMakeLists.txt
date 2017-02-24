@@ -31,7 +31,7 @@
 # --------------------------------------------------------------------------
 
 #  RAS turbulence models 
-list(APPEND sources
+list(APPEND SOURCES
   RASModel/RASModel.C
   laminar/laminar.C
   kEpsilon/kEpsilon.C
@@ -48,12 +48,12 @@ list(APPEND sources
 set(wallFunctions derivedFvPatchFields/wallFunctions)
 
 set(alphatWallFunctions ${wallFunctions}/alphatWallFunctions)
-list(APPEND sources
+list(APPEND SOURCES
   ${alphatWallFunctions}/alphatWallFunction/alphatWallFunctionFvPatchScalarField.C
 )
 
 set(mutWallFunctions ${wallFunctions}/mutWallFunctions)
-list(APPEND sources
+list(APPEND SOURCES
   ${mutWallFunctions}/mutkWallFunction/mutkWallFunctionFvPatchScalarField.C
   ${mutWallFunctions}/mutWallFunction/mutWallFunctionFvPatchScalarField.C
   ${mutWallFunctions}/mutRoughWallFunction/mutRoughWallFunctionFvPatchScalarField.C
@@ -64,22 +64,22 @@ list(APPEND sources
 )
 
 set(epsilonWallFunctions ${wallFunctions}/epsilonWallFunctions)
-list(APPEND sources
+list(APPEND SOURCES
   ${epsilonWallFunctions}/epsilonWallFunction/epsilonWallFunctionFvPatchScalarField.C
 )
 
 set(omegaWallFunctions ${wallFunctions}/omegaWallFunctions)
-list(APPEND sources
+list(APPEND SOURCES
   ${omegaWallFunctions}/omegaWallFunction/omegaWallFunctionFvPatchScalarField.C
 )
 
 set(kqRWallFunctions ${wallFunctions}/kqRWallFunctions)
-list(APPEND sources
+list(APPEND SOURCES
   ${kqRWallFunctions}/kqRWallFunction/kqRWallFunctionFvPatchFields.C
 )
 
 #  Patch fields 
-list(APPEND sources
+list(APPEND SOURCES
   derivedFvPatchFields/turbulentHeatFluxTemperature/turbulentHeatFluxTemperatureFvPatchScalarField.C
   derivedFvPatchFields/turbulentMixingLengthDissipationRateInlet/turbulentMixingLengthDissipationRateInletFvPatchScalarField.C
   derivedFvPatchFields/turbulentMixingLengthFrequencyInlet/turbulentMixingLengthFrequencyInletFvPatchScalarField.C
@@ -89,13 +89,11 @@ list(APPEND sources
   backwardsCompatibility/wallFunctions/backwardsCompatibilityWallFunctions.C
 )
 
-add_foam_library(compressibleRASModels SHARED ${sources})
+add_foam_library(compressibleRASModels SHARED ${SOURCES})
 
-# This is a prototype! Replace second argument with a list of the highest
-# dependencies only. Inherited dependencies will be treated automatically.
 target_link_libraries(compressibleRASModels PUBLIC compressibleTurbulenceModel)
 
 target_include_directories(compressibleRASModels PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/derivedFvPatchFields/wallFunctions/mutWallFunctions>
-  $<INSTALL_INTERFACE:include/mylib>
+#  $<INSTALL_INTERFACE:include/mylib>
 )

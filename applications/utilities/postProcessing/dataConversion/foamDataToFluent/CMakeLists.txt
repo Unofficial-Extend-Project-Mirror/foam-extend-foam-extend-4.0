@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   writeFluentScalarField.C
   writeFluentVectorField.C
   foamDataToFluent.C
@@ -44,5 +44,5 @@ endif()
 
 add_foam_executable(foamDataToFluent
   DEPENDS finiteVolume
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

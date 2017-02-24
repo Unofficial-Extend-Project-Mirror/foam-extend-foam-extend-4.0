@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   makeTriSurfaceMesh.C
 )
 
@@ -42,5 +42,5 @@ endif()
 
 add_foam_executable(makeTriSurfaceMesh
   DEPENDS immersedBoundary
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

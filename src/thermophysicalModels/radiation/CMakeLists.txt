@@ -31,12 +31,12 @@
 # --------------------------------------------------------------------------
 
 #  Radiation constants 
-list(APPEND sources
+list(APPEND SOURCES
   radiationConstants/radiationConstants.C
 )
 
 #  Radiation model 
-list(APPEND sources
+list(APPEND SOURCES
   radiationModel/radiationModel/radiationModel.C
   radiationModel/radiationModel/newRadiationModel.C
   radiationModel/noRadiation/noRadiation.C
@@ -49,7 +49,7 @@ list(APPEND sources
 )
 
 #  Scatter model 
-list(APPEND sources
+list(APPEND SOURCES
   submodels/scatterModel/scatterModel/scatterModel.C
   submodels/scatterModel/scatterModel/newScatterModel.C
   submodels/scatterModel/constantScatter/constantScatter.C
@@ -57,7 +57,7 @@ list(APPEND sources
 
 
 #  Absorption/Emission model 
-list(APPEND sources
+list(APPEND SOURCES
   submodels/absorptionEmissionModel/absorptionEmissionModel/absorptionEmissionModel.C
   submodels/absorptionEmissionModel/absorptionEmissionModel/newAbsorptionEmissionModel.C
   submodels/absorptionEmissionModel/noAbsorptionEmission/noAbsorptionEmission.C
@@ -69,7 +69,7 @@ list(APPEND sources
 
 
 #  Boundary conditions 
-list(APPEND sources
+list(APPEND SOURCES
   derivedFvPatchFields/MarshakRadiation/MarshakRadiationMixedFvPatchScalarField.C
   derivedFvPatchFields/MarshakRadiationFixedT/MarshakRadiationFixedTMixedFvPatchScalarField.C
   derivedFvPatchFields/greyDiffusiveRadiation/greyDiffusiveRadiationMixedFvPatchScalarField.C
@@ -78,8 +78,6 @@ list(APPEND sources
   derivedFvPatchFields/greyDiffusiveViewFactor/greyDiffusiveViewFactorFixedValueFvPatchScalarField.C
 )
 
-add_foam_library(radiation SHARED ${sources})
+add_foam_library(radiation SHARED ${SOURCES})
 
-# This is a prototype! Replace second argument with a list of the highest
-# dependencies only. Inherited dependencies will be treated automatically.
 target_link_libraries(radiation PUBLIC basicThermophysicalModels)

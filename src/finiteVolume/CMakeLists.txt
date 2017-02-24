@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   fvMesh/fvMeshGeometry.C
   fvMesh/fvMesh.C
   fvMesh/singleCellFvMesh/singleCellFvMesh.C
@@ -38,24 +38,24 @@ list(APPEND sources
 )
 
 set(fvBoundaryMesh fvMesh/fvBoundaryMesh)
-list(APPEND sources
+list(APPEND SOURCES
   ${fvBoundaryMesh}/fvBoundaryMesh.C
 )
 
 set(fvPatches fvMesh/fvPatches)
-list(APPEND sources
+list(APPEND SOURCES
   ${fvPatches}/fvPatch/fvPatch.C
   ${fvPatches}/fvPatch/newFvPatch.C
 )
 
 set(basicFvPatches ${fvPatches}/basic)
-list(APPEND sources
+list(APPEND SOURCES
   ${basicFvPatches}/coupled/coupledFvPatch.C
   ${basicFvPatches}/generic/genericFvPatch.C
 )
 
 set(constraintFvPatches ${fvPatches}/constraint)
-list(APPEND sources
+list(APPEND SOURCES
   ${constraintFvPatches}/empty/emptyFvPatch.C
   ${constraintFvPatches}/symmetry/symmetryFvPatch.C
   ${constraintFvPatches}/wedge/wedgeFvPatch.C
@@ -69,7 +69,7 @@ list(APPEND sources
 )
 
 set(derivedFvPatches ${fvPatches}/derived)
-list(APPEND sources
+list(APPEND SOURCES
   ${derivedFvPatches}/wall/wallFvPatch.C
   ${derivedFvPatches}/directMapped/directMappedFvPatch.C
   ${derivedFvPatches}/cohesive/cohesiveFvPatch.C
@@ -77,7 +77,7 @@ list(APPEND sources
 )
 
 set(wallDist fvMesh/wallDist)
-list(APPEND sources
+list(APPEND SOURCES
   ${wallDist}/wallPointYPlus/wallPointYPlus.C
   ${wallDist}/nearWallDistNoSearch.C
   ${wallDist}/nearWallDist.C
@@ -88,7 +88,7 @@ list(APPEND sources
 
 
 set(fvMeshMapper fvMesh/fvMeshMapper)
-list(APPEND sources
+list(APPEND SOURCES
   ${fvMeshMapper}/fvPatchMapper.C
   ${fvMeshMapper}/fvSurfaceMapper.C
 )
@@ -96,7 +96,7 @@ list(APPEND sources
 set(extendedStencil fvMesh/extendedStencil)
 
 set(cellToCell ${extendedStencil}/cellToCell)
-list(APPEND sources
+list(APPEND SOURCES
   ${cellToCell}/fullStencils/cellToCellStencil.C
   ${cellToCell}/fullStencils/CFCCellToCellStencil.C
   ${cellToCell}/fullStencils/CPCCellToCellStencil.C
@@ -104,7 +104,7 @@ list(APPEND sources
 )
 
 set(cellToFace ${extendedStencil}/cellToFace)
-list(APPEND sources
+list(APPEND SOURCES
   ${cellToFace}/fullStencils/cellToFaceStencil.C
   ${cellToFace}/fullStencils/CFCCellToFaceStencil.C
   ${cellToFace}/fullStencils/CECCellToFaceStencil.C
@@ -125,7 +125,7 @@ list(APPEND sources
 )
 
 set(faceToCell ${extendedStencil}/faceToCell)
-list(APPEND sources
+list(APPEND SOURCES
   ${faceToCell}/fullStencils/faceToCellStencil.C
   ${faceToCell}/fullStencils/CFCFaceToCellStencil.C
   ${faceToCell}/extendedFaceToCellStencil.C
@@ -135,13 +135,13 @@ list(APPEND sources
 
 
 set(fvPatchFields fields/fvPatchFields)
-list(APPEND sources
+list(APPEND SOURCES
   ${fvPatchFields}/fvPatchField/fvPatchFields.C
   ${fvPatchFields}/fvPatchField/fvPatchVectorNFields.C
 )
 
 set(basicFvPatchFields ${fvPatchFields}/basic)
-list(APPEND sources
+list(APPEND SOURCES
   ${basicFvPatchFields}/basicSymmetry/basicSymmetryFvPatchFields.C
   ${basicFvPatchFields}/basicSymmetry/basicSymmetryFvPatchScalarField.C
   ${basicFvPatchFields}/calculated/calculatedFvPatchFields.C
@@ -165,7 +165,7 @@ list(APPEND sources
 )
 
 set(constraintFvPatchFields ${fvPatchFields}/constraint)
-list(APPEND sources
+list(APPEND SOURCES
   ${constraintFvPatchFields}/cyclic/cyclicFvPatchFields.C
   ${constraintFvPatchFields}/cyclic/cyclicFvPatchVectorNFields.C
   ${constraintFvPatchFields}/empty/emptyFvPatchFields.C
@@ -189,7 +189,7 @@ list(APPEND sources
 )
 
 set(derivedFvPatchFields ${fvPatchFields}/derived)
-list(APPEND sources
+list(APPEND SOURCES
   ${derivedFvPatchFields}/activeBaffleVelocity/activeBaffleVelocityFvPatchVectorField.C
   ${derivedFvPatchFields}/advective/advectiveFvPatchFields.C
   ${derivedFvPatchFields}/directMappedFixedValue/directMappedFixedValueFvPatchFields.C
@@ -248,12 +248,12 @@ list(APPEND sources
 )
 
 set(fvsPatchFields fields/fvsPatchFields)
-list(APPEND sources
+list(APPEND SOURCES
   ${fvsPatchFields}/fvsPatchField/fvsPatchFields.C
 )
 
 set(basicFvsPatchFields ${fvsPatchFields}/basic)
-list(APPEND sources
+list(APPEND SOURCES
   ${basicFvsPatchFields}/calculated/calculatedFvsPatchFields.C
   ${basicFvsPatchFields}/coupled/coupledFvsPatchFields.C
   ${basicFvsPatchFields}/fixedValue/fixedValueFvsPatchFields.C
@@ -261,7 +261,7 @@ list(APPEND sources
 )
 
 set(constraintFvsPatchFields ${fvsPatchFields}/constraint)
-list(APPEND sources
+list(APPEND SOURCES
   ${constraintFvsPatchFields}/cyclic/cyclicFvsPatchFields.C
   ${constraintFvsPatchFields}/empty/emptyFvsPatchFields.C
   ${constraintFvsPatchFields}/processor/processorFvsPatchFields.C
@@ -275,7 +275,7 @@ list(APPEND sources
 )
 
 set(fvsPatchVectorNFields ${fvsPatchFields}/fvsPatchVectorNFields)
-list(APPEND sources
+list(APPEND SOURCES
   ${fvsPatchVectorNFields}/fvsPatchVectorNFields.C
   ${fvsPatchVectorNFields}/calculatedFvsPatchVectorNFields.C
   ${fvsPatchVectorNFields}/emptyFvsPatchVectorNFields.C
@@ -293,7 +293,7 @@ list(APPEND sources
 )
 
 set(interpolation interpolation/interpolation)
-list(APPEND sources
+list(APPEND SOURCES
   ${interpolation}/interpolation/interpolations.C
   ${interpolation}/interpolationCell/makeInterpolationCell.C
   ${interpolation}/interpolationCellPoint/cellPointWeight/cellPointWeight.C
@@ -304,26 +304,26 @@ list(APPEND sources
 )
 
 set(volPointInterpolation interpolation/volPointInterpolation)
-list(APPEND sources
+list(APPEND SOURCES
   ${volPointInterpolation}/pointPatchInterpolation/pointPatchInterpolation.C
   ${volPointInterpolation}/volPointInterpolation.C
   ${volPointInterpolation}/leastSquaresVolPointInterpolation/leastSquaresVolPointInterpolation.C
 )
 
 set(pointVolInterpolation interpolation/pointVolInterpolation)
-list(APPEND sources
+list(APPEND SOURCES
   ${pointVolInterpolation}/pointVolInterpolation.C
 )
 
 set(surfaceInterpolation interpolation/surfaceInterpolation)
-list(APPEND sources
+list(APPEND SOURCES
   ${surfaceInterpolation}/surfaceInterpolation/surfaceInterpolation.C
   ${surfaceInterpolation}/surfaceInterpolationScheme/surfaceInterpolationSchemes.C
   ${surfaceInterpolation}/VectorNSurfaceInterpolationSchemes/VectorNSurfaceInterpolationSchemes.C
 )
 
 set(schemes ${surfaceInterpolation}/schemes)
-list(APPEND sources
+list(APPEND SOURCES
   ${schemes}/linear/linear.C
   ${schemes}/midPoint/midPoint.C
   ${schemes}/downwind/downwind.C
@@ -351,12 +351,12 @@ list(APPEND sources
 )
 # 
 # $(schemes)/quadraticLinearPureUpwindFit/quadraticLinearPureUpwindFit.C
-list(APPEND sources
+list(APPEND SOURCES
   ${schemes}/linearPureUpwindFit/linearPureUpwindFit.C
 )
 
 set(limitedSchemes ${surfaceInterpolation}/limitedSchemes)
-list(APPEND sources
+list(APPEND SOURCES
   ${limitedSchemes}/limitedSurfaceInterpolationScheme/limitedSurfaceInterpolationSchemes.C
   ${limitedSchemes}/upwind/upwind.C
   ${limitedSchemes}/blended/blended.C
@@ -383,7 +383,7 @@ list(APPEND sources
 )
 
 set(multivariateSchemes ${surfaceInterpolation}/multivariateSchemes)
-list(APPEND sources
+list(APPEND SOURCES
   ${multivariateSchemes}/multivariateSurfaceInterpolationScheme/multivariateSurfaceInterpolationSchemes.C
   ${multivariateSchemes}/multivariateSelectionScheme/multivariateSelectionSchemes.C
   ${multivariateSchemes}/upwind/multivariateUpwind.C
@@ -399,7 +399,7 @@ list(APPEND sources
 )
 
 set(ddtSchemes finiteVolume/ddtSchemes)
-list(APPEND sources
+list(APPEND SOURCES
   ${ddtSchemes}/ddtScheme/ddtSchemes.C
   ${ddtSchemes}/steadyStateDdtScheme/steadyStateDdtSchemes.C
   ${ddtSchemes}/EulerDdtScheme/EulerDdtSchemes.C
@@ -413,7 +413,7 @@ list(APPEND sources
 )
 
 set(d2dt2Schemes finiteVolume/d2dt2Schemes)
-list(APPEND sources
+list(APPEND SOURCES
   ${d2dt2Schemes}/d2dt2Scheme/d2dt2Schemes.C
   ${d2dt2Schemes}/steadyStateD2dt2Scheme/steadyStateD2dt2Schemes.C
   ${d2dt2Schemes}/EulerD2dt2Scheme/EulerD2dt2Schemes.C
@@ -421,14 +421,14 @@ list(APPEND sources
 )
 
 set(divSchemes finiteVolume/divSchemes)
-list(APPEND sources
+list(APPEND SOURCES
   ${divSchemes}/divScheme/divSchemes.C
   ${divSchemes}/gaussDivScheme/gaussDivSchemes.C
   ${divSchemes}/gaussDivScheme/vectorGaussDivScheme.C
 )
 
 set(gradSchemes finiteVolume/gradSchemes)
-list(APPEND sources
+list(APPEND SOURCES
   ${gradSchemes}/gradScheme/gradSchemes.C
   ${gradSchemes}/gaussGrad/scalarGaussGrad.C
   ${gradSchemes}/gaussGrad/gaussGrads.C
@@ -442,7 +442,7 @@ list(APPEND sources
 )
 
 set(limitedGradSchemes ${gradSchemes}/limitedGradSchemes)
-list(APPEND sources
+list(APPEND SOURCES
   ${limitedGradSchemes}/faceLimitedGrad/faceLimitedGrads.C
   ${limitedGradSchemes}/cellLimitedGrad/cellLimitedGrads.C
   ${limitedGradSchemes}/faceMDLimitedGrad/faceMDLimitedGrads.C
@@ -450,7 +450,7 @@ list(APPEND sources
 )
 
 set(snGradSchemes finiteVolume/snGradSchemes)
-list(APPEND sources
+list(APPEND SOURCES
   ${snGradSchemes}/snGradScheme/snGradSchemes.C
   ${snGradSchemes}/correctedSnGrad/correctedSnGrads.C
   ${snGradSchemes}/limitedSnGrad/limitedSnGrads.C
@@ -464,7 +464,7 @@ list(APPEND sources
 # $(snGradSchemes)/quadraticFitSnGrad/quadraticFitSnGrads.C
 
 set(convectionSchemes finiteVolume/convectionSchemes)
-list(APPEND sources
+list(APPEND SOURCES
   ${convectionSchemes}/convectionScheme/convectionSchemes.C
   ${convectionSchemes}/gaussConvectionScheme/gaussConvectionSchemes.C
   ${convectionSchemes}/noConvectionScheme/noConvectionSchemes.C
@@ -473,14 +473,14 @@ list(APPEND sources
 )
 
 set(adjConvectionSchemes finiteVolume/adjConvectionSchemes)
-list(APPEND sources
+list(APPEND SOURCES
   ${adjConvectionSchemes}/adjConvectionScheme/adjConvectionSchemes.C
   ${adjConvectionSchemes}/noAdjConvectionScheme/noAdjConvectionSchemes.C
   ${adjConvectionSchemes}/explicitAdjConvectionScheme/explicitAdjConvectionSchemes.C
 )
 
 set(laplacianSchemes finiteVolume/laplacianSchemes)
-list(APPEND sources
+list(APPEND SOURCES
   ${laplacianSchemes}/laplacianScheme/laplacianSchemes.C
   ${laplacianSchemes}/gaussLaplacianScheme/gaussLaplacianSchemes.C
   ${laplacianSchemes}/noLaplacianScheme/noLaplacianSchemes.C
@@ -488,14 +488,14 @@ list(APPEND sources
 )
 
 set(general cfdTools/general)
-list(APPEND sources
+list(APPEND SOURCES
   ${general}/findRefCell/findRefCell.C
   ${general}/adjustPhi/adjustPhi.C
   ${general}/bound/bound.C
 )
 
 set(solutionControl ${general}/solutionControl)
-list(APPEND sources
+list(APPEND SOURCES
   ${solutionControl}/solutionControl/solutionControl.C
   ${solutionControl}/simpleControl/simpleControl.C
   ${solutionControl}/pimpleControl/pimpleControl.C
@@ -503,19 +503,19 @@ list(APPEND sources
 )
 
 set(porousMedia ${general}/porousMedia)
-list(APPEND sources
+list(APPEND SOURCES
   ${porousMedia}/porousZone.C
   ${porousMedia}/porousZones.C
 )
 
 set(MRF ${general}/MRF)
-list(APPEND sources
+list(APPEND SOURCES
   ${MRF}/MRFZone.C
   ${MRF}/MRFZones.C
 )
 
 set(SRF ${general}/SRF)
-list(APPEND sources
+list(APPEND SOURCES
   ${SRF}/SRFModel/SRFModel/SRFModel.C
   ${SRF}/SRFModel/SRFModel/newSRFModel.C
   ${SRF}/SRFModel/rpm/rpm.C
@@ -527,13 +527,11 @@ list(APPEND sources
 )
 
 set(fieldSources ${general}/fieldSources)
-list(APPEND sources
+list(APPEND SOURCES
   ${fieldSources}/pressureGradientExplicitSource/pressureGradientExplicitSource.C
   ${fieldSources}/timeActivatedExplicitSource/timeActivatedExplicitSource.C
 )
 
-add_foam_library(finiteVolume SHARED ${sources})
+add_foam_library(finiteVolume SHARED ${SOURCES})
 
-# This is a prototype! Replace second argument with a list of the highest
-# dependencies only. Inherited dependencies will be treated automatically.
 target_link_libraries(finiteVolume PUBLIC meshTools)

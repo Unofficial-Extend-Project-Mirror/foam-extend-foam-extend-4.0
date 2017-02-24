@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   attachPolyTopoChanger.C
   attachMesh.C
 )
@@ -43,5 +43,5 @@ endif()
 
 add_foam_executable(attachMesh
   DEPENDS dynamicMesh meshTools
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

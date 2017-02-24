@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   dieselFoam.C
 )
 
@@ -42,5 +42,5 @@ endif()
 
 add_foam_executable(dieselFoam
 #   DEPENDS finiteVolume
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

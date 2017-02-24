@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   rho/fixedRhoFvPatchScalarField.C
   rho/gradientRhoFvPatchScalarField.C
   rhoE/fixedRhoEFvPatchScalarField.C
@@ -39,8 +39,6 @@ list(APPEND sources
   p/inviscidWallPFvPatchScalarField.C
 )
 
-add_foam_library(rhopSonicFoam SHARED ${sources})
+add_foam_library(rhopSonicFoam SHARED ${SOURCES})
 
-# This is a prototype! Replace second argument with a list of the highest
-# dependencies only. Inherited dependencies will be treated automatically.
 #target_link_libraries(rhopSonicFoam finiteVolume)

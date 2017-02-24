@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   foamToFieldview9.C
   fieldviewTopology.C
   write_binary_uns.c
@@ -46,5 +46,5 @@ endif()
 
 add_foam_executable(foamToFieldview9
   DEPENDS finiteVolume
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

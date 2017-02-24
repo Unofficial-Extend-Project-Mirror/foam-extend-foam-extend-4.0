@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   particleTracks.C
 )
 
@@ -42,5 +42,5 @@ endif()
 
 add_foam_executable(particleTracks
   DEPENDS finiteVolume lagrangianBasic
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

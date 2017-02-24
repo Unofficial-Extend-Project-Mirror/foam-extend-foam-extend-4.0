@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   dbnsFlux/roeFlux/roeFlux.C
   dbnsFlux/rusanovFlux/rusanovFlux.C
   dbnsFlux/betaFlux/betaFlux.C
@@ -50,8 +50,6 @@ list(APPEND sources
   timeStepping/EulerLocalDdtScheme/EulerLocalDdtSchemes.C
 )
 
-add_foam_library(dbns SHARED ${sources})
+add_foam_library(dbns SHARED ${SOURCES})
 
-# This is a prototype! Replace second argument with a list of the highest
-# dependencies only. Inherited dependencies will be treated automatically.
 target_link_libraries(dbns PUBLIC finiteVolume meshTools basicThermophysicalModels)

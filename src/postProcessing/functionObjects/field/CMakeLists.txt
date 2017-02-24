@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   fieldAverage/fieldAverage/fieldAverage.C
   fieldAverage/fieldAverageItem/fieldAverageItem.C
   fieldAverage/fieldAverageItem/fieldAverageItemIO.C
@@ -50,8 +50,6 @@ list(APPEND sources
   surfaceInterpolateFields/surfaceInterpolateFields.C
 )
 
-add_foam_library(fieldFunctionObjects SHARED ${sources})
+add_foam_library(fieldFunctionObjects SHARED ${SOURCES})
 
-# This is a prototype! Replace second argument with a list of the highest
-# dependencies only. Inherited dependencies will be treated automatically.
 target_link_libraries(fieldFunctionObjects PUBLIC finiteVolume)

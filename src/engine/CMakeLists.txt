@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   engineTime/engineTime.C
   ignition/ignition.C
   ignition/ignitionIO.C
@@ -110,14 +110,12 @@ list(APPEND sources
 )
 
 #  derivedFvPatchFields/engineTimeVaryingUniformFixedValue/engineTimeVaryingUniformFixedValueFvPatchField.C 
-list(APPEND sources
+list(APPEND SOURCES
   derivedFvPatchFields/engineTimeVaryingUniformFixedValue/engineTimeVaryingUniformFixedValueFvPatchFields.C
   derivedFvPatchFields/engineMassFlowRateInletVelocity/engineMassFlowRateInletVelocityFvPatchVectorField.C
   derivedFvPatchFields/engineTimeVaryingTotalPressureFvPatchScalarField/engineTimeVaryingTotalPressureFvPatchScalarField.C
 )
 
-add_foam_library(engine SHARED ${sources})
+add_foam_library(engine SHARED ${SOURCES})
 
-# This is a prototype! Replace second argument with a list of the highest
-# dependencies only. Inherited dependencies will be treated automatically.
 target_link_libraries(engine PUBLIC dynamicFvMesh fvMotionSolver)

@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   engineCompRatio.C
 )
 
@@ -42,5 +42,5 @@ endif()
 
 add_foam_executable(engineCompRatio
   DEPENDS engine
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

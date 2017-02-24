@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   dynamicFvMesh/dynamicFvMesh.C
   dynamicFvMesh/newDynamicFvMesh.C
   staticFvMesh/staticFvMesh.C
@@ -48,8 +48,6 @@ list(APPEND sources
   fvMeshDistribute/fvMeshDistribute.C
 )
 
-add_foam_library(dynamicFvMesh SHARED ${sources})
+add_foam_library(dynamicFvMesh SHARED ${SOURCES})
 
-# This is a prototype! Replace second argument with a list of the highest
-# dependencies only. Inherited dependencies will be treated automatically.
 target_link_libraries(dynamicFvMesh PUBLIC dynamicMesh finiteVolume RBFMotionSolver solidBodyMotion tetMotionSolver)

@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   regionProperties/regionProperties.C
   derivedFvPatchFields/solidWallHeatFluxTemperature/solidWallHeatFluxTemperatureFvPatchScalarField.C
   derivedFvPatchFields/solidWallMixedTemperatureCoupled/solidWallMixedTemperatureCoupledFvPatchScalarField.C
@@ -47,5 +47,5 @@ endif()
 
 add_foam_executable(chtMultiRegionFoam
 #   DEPENDS finiteVolume
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

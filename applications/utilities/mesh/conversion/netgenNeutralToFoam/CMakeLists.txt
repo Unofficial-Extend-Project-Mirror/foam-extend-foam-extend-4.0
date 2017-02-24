@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   netgenNeutralToFoam.C
 )
 
@@ -42,5 +42,5 @@ endif()
 
 add_foam_executable(netgenNeutralToFoam
   DEPENDS foam
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   processorMeshesReconstructor.C
   processorMeshesRebuild.C
   processorFaMeshes.C
@@ -50,5 +50,5 @@ endif()
 
 add_foam_executable(reconstructParMesh
   DEPENDS finiteVolume finiteArea tetFiniteElement
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

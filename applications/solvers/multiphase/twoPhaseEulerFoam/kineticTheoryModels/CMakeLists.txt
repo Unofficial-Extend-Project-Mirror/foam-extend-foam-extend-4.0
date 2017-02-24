@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   kineticTheoryModel/kineticTheoryModel.C
   viscosityModel/viscosityModel/kineticTheoryViscosityModel.C
   viscosityModel/viscosityModel/newKineticTheoryViscosityModel.C
@@ -59,8 +59,6 @@ list(APPEND sources
   frictionalStressModel/Schaeffer/SchaefferFrictionalStress.C
 )
 
-add_foam_library(kineticTheoryModel SHARED ${sources})
+add_foam_library(kineticTheoryModel SHARED ${SOURCES})
 
-# This is a prototype! Replace second argument with a list of the highest
-# dependencies only. Inherited dependencies will be treated automatically.
 #target_link_libraries(kineticTheoryModel finiteVolume)

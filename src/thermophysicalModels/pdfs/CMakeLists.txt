@@ -37,7 +37,7 @@ set(general general)
 set(exponential exponential)
 set(RosinRammler RosinRammler)
 
-list(APPEND sources
+list(APPEND SOURCES
   ${pdf}/pdf.C
   ${pdf}/newPdf.C
   ${uniform}/uniform.C
@@ -47,8 +47,6 @@ list(APPEND sources
   ${RosinRammler}/RosinRammler.C
 )
 
-add_foam_library(pdf SHARED ${sources})
+add_foam_library(pdf SHARED ${SOURCES})
 
-# This is a prototype! Replace second argument with a list of the highest
-# dependencies only. Inherited dependencies will be treated automatically.
 target_link_libraries(pdf PUBLIC foam)

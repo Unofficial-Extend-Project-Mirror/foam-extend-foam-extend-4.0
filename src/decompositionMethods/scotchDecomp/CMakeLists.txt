@@ -30,13 +30,11 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   scotchDecomp/scotchDecomp.C
   engineScotchDecomp/engineScotchDecomp.C
 )
 
-add_foam_library(scotchDecomp SHARED ${sources})
+add_foam_library(scotchDecomp SHARED ${SOURCES})
 
-# This is a prototype! Replace second argument with a list of the highest
-# dependencies only. Inherited dependencies will be treated automatically.
 #target_link_libraries(scotchDecomp finiteVolume)

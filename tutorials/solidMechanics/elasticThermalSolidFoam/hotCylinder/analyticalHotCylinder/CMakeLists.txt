@@ -29,7 +29,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   analyticalHotCylinder.C
 )
 
@@ -41,5 +41,5 @@ endif()
 
 add_foam_executable(analyticalHotCylinder
 #   DEPENDS finiteVolume
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

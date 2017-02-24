@@ -30,15 +30,13 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   wallFunctions/immersedBoundaryWallFunctions/immersedBoundaryWallFunctionFvPatchFields.C
   wallFunctions/immersedBoundaryEpsilonWallFunctions/immersedBoundaryEpsilonWallFunctionFvPatchScalarField.C
   wallFunctions/immersedBoundaryOmegaWallFunctions/immersedBoundaryOmegaWallFunctionFvPatchScalarField.C
   wallFunctions/immersedBoundaryVelocityWallFunctions/immersedBoundaryVelocityWallFunctionFvPatchVectorField.C
 )
 
-add_foam_library(immersedBoundaryTurbulence SHARED ${sources})
+add_foam_library(immersedBoundaryTurbulence SHARED ${SOURCES})
 
-# This is a prototype! Replace second argument with a list of the highest
-# dependencies only. Inherited dependencies will be treated automatically.
 target_link_libraries(immersedBoundaryTurbulence immersedBoundary incompressibleRASModels incompressibleLESModels)

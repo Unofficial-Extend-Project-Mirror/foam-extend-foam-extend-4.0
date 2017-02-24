@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   subsetMesh.C
 )
 
@@ -42,5 +42,5 @@ endif()
 
 add_foam_executable(subsetMesh
   DEPENDS finiteVolume meshTools
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   improveSymmetryPlanes.C
 )
 
@@ -42,5 +42,5 @@ endif()
 
 add_foam_executable(improveSymmetryPlanes
   DEPENDS cfMesh
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

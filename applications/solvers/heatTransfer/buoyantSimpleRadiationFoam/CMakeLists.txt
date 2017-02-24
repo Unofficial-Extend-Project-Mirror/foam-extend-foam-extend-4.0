@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   buoyantSimpleRadiationFoam.C
 )
 
@@ -42,5 +42,5 @@ endif()
 
 add_foam_executable(buoyantSimpleRadiationFoam
 #   DEPENDS finiteVolume
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

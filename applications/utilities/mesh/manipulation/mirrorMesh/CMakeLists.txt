@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   mirrorFvMesh.C
   mirrorMesh.C
 )
@@ -43,5 +43,5 @@ endif()
 
 add_foam_executable(mirrorMesh
   DEPENDS finiteVolume
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

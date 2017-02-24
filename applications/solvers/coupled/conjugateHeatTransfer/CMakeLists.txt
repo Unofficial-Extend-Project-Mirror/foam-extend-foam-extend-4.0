@@ -30,12 +30,12 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   thermalModel/thermalModel.C
 )
 set(thermalLaws thermalModel/thermalLaws)
 
-list(APPEND sources
+list(APPEND SOURCES
   ${thermalLaws}/thermalLaw/thermalLaw.C
   ${thermalLaws}/thermalLaw/newThermalLaw.C
   ${thermalLaws}/constantThermal/constantThermal.C
@@ -45,7 +45,7 @@ list(APPEND sources
 
 set(thermalGaps thermalModel/thermalGaps)
 
-list(APPEND sources
+list(APPEND SOURCES
   ${thermalGaps}/thermalGap/thermalGap.C
   ${thermalGaps}/thermalGap/newThermalGap.C
   ${thermalGaps}/constantThermalGap/constantThermalGap.C
@@ -54,7 +54,7 @@ list(APPEND sources
 
 set(thermalSource thermalModel/thermalSource)
 
-list(APPEND sources
+list(APPEND SOURCES
   ${thermalSource}/thermalSource/thermalSource.C
   ${thermalSource}/thermalSource/newThermalSource.C
   ${thermalSource}/constantThermalSource/constantThermalSource.C
@@ -62,7 +62,7 @@ list(APPEND sources
 
 set(BCs fvPatchFields)
 
-list(APPEND sources
+list(APPEND SOURCES
   ${BCs}/controlledParabolicVelocity/controlledParabolicVelocityFvPatchVectorField.C
   ${BCs}/chtRegionCoupleBase/chtRegionCoupleBase.C
   ${BCs}/chtRcThermalDiffusivity/chtRcThermalDiffusivityFvPatchScalarField.C
@@ -82,13 +82,11 @@ list(APPEND sources
 
 set(FOs functionObjects)
 
-list(APPEND sources
+list(APPEND SOURCES
   ${FOs}/heatFlux/heatFlux/heatFlux.C
   ${FOs}/heatFlux/heatFluxFunctionObject/heatFluxFunctionObject.C
 )
 
-add_foam_library(conjugateHeatTransfer SHARED ${sources})
+add_foam_library(conjugateHeatTransfer SHARED ${SOURCES})
 
-# This is a prototype! Replace second argument with a list of the highest
-# dependencies only. Inherited dependencies will be treated automatically.
 #target_link_libraries(conjugateHeatTransfer finiteVolume)

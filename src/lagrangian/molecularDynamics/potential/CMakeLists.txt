@@ -32,13 +32,13 @@
 
 set(potential potential)
 
-list(APPEND sources
+list(APPEND SOURCES
   ${potential}/potential.C
 )
 
 set(pairPotential pairPotential)
 
-list(APPEND sources
+list(APPEND SOURCES
   ${pairPotential}/pairPotentialList/pairPotentialList.C
   ${pairPotential}/basic/pairPotential.C
   ${pairPotential}/basic/pairPotentialIO.C
@@ -54,7 +54,7 @@ list(APPEND sources
 
 set(energyScalingFunction energyScalingFunction)
 
-list(APPEND sources
+list(APPEND SOURCES
   ${energyScalingFunction}/basic/energyScalingFunction.C
   ${energyScalingFunction}/basic/newEnergyScalingFunction.C
   ${energyScalingFunction}/derived/shifted/shifted.C
@@ -66,7 +66,7 @@ list(APPEND sources
 
 set(tetherPotential tetherPotential)
 
-list(APPEND sources
+list(APPEND SOURCES
   ${tetherPotential}/tetherPotentialList/tetherPotentialList.C
   ${tetherPotential}/basic/tetherPotential.C
   ${tetherPotential}/basic/newTetherPotential.C
@@ -77,12 +77,10 @@ list(APPEND sources
 
 set(electrostaticPotential electrostaticPotential)
 
-list(APPEND sources
+list(APPEND SOURCES
   ${electrostaticPotential}/electrostaticPotential.C
 )
 
-add_foam_library(potential SHARED ${sources})
+add_foam_library(potential SHARED ${SOURCES})
 
-# This is a prototype! Replace second argument with a list of the highest
-# dependencies only. Inherited dependencies will be treated automatically.
 target_link_libraries(potential PUBLIC finiteVolume)

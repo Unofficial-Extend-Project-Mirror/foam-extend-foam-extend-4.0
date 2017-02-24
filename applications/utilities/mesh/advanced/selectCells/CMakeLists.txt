@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   edgeStats.C
   selectCells.C
 )
@@ -43,5 +43,5 @@ endif()
 
 add_foam_executable(selectCells
   DEPENDS finiteVolume
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

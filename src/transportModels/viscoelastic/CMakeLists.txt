@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   viscoelasticModel/viscoelasticModel.C
   viscoelasticLaws/viscoelasticLaw/viscoelasticLaw.C
   viscoelasticLaws/viscoelasticLaw/newViscoelasticLaw.C
@@ -54,8 +54,6 @@ list(APPEND sources
   viscoelasticLaws/multiMode/multiMode.C
 )
 
-add_foam_library(viscoelasticTransportModels SHARED ${sources})
+add_foam_library(viscoelasticTransportModels SHARED ${SOURCES})
 
-# This is a prototype! Replace second argument with a list of the highest
-# dependencies only. Inherited dependencies will be treated automatically.
 target_link_libraries(viscoelasticTransportModels PUBLIC finiteVolume)

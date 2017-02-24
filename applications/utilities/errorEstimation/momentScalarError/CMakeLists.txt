@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   momentScalarError.C
 )
 
@@ -42,5 +42,5 @@ endif()
 
 add_foam_executable(momentScalarError
   DEPENDS errorEstimation
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

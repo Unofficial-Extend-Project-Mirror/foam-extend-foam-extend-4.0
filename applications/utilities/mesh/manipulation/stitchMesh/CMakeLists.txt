@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   stitchMesh.C
 )
 
@@ -42,5 +42,5 @@ endif()
 
 add_foam_executable(stitchMesh
   DEPENDS finiteVolume dynamicMesh
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

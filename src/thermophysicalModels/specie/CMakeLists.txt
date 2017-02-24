@@ -36,7 +36,7 @@ set(speciesTable speciesTable)
 set(equationOfState equationOfState)
 set(reactions reaction/reactions)
 
-list(APPEND sources
+list(APPEND SOURCES
   ${atomicWeights}/atomicWeights.C
   ${specie}/specie.C
   ${speciesTable}/speciesTable.C
@@ -50,8 +50,6 @@ list(APPEND sources
   ${reactions}/makeLangmuirHinshelwoodReactions.C
 )
 
-add_foam_library(specie SHARED ${sources})
+add_foam_library(specie SHARED ${SOURCES})
 
-# This is a prototype! Replace second argument with a list of the highest
-# dependencies only. Inherited dependencies will be treated automatically.
 target_link_libraries(specie PUBLIC foam)

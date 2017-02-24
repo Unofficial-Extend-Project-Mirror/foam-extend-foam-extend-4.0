@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   deformedTetFemGeom.C
 )
 
@@ -42,5 +42,5 @@ endif()
 
 add_foam_executable(deformedTetFemGeom
   DEPENDS tetFiniteElement
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

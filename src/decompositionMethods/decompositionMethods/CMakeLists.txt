@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   decompositionMethod/decompositionMethod.C
   manualDecomp/manualDecomp.C
   geomDecomp/geomDecomp.C
@@ -39,8 +39,6 @@ list(APPEND sources
   patchConstrainedDecomp/patchConstrainedDecomp.C
 )
 
-add_foam_library(decompositionMethods SHARED ${sources})
+add_foam_library(decompositionMethods SHARED ${SOURCES})
 
-# This is a prototype! Replace second argument with a list of the highest
-# dependencies only. Inherited dependencies will be treated automatically.
 target_link_libraries(decompositionMethods PUBLIC foam)

@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   foamToEnsightParts.C
 )
 
@@ -42,5 +42,5 @@ endif()
 
 add_foam_executable(foamToEnsightParts
   DEPENDS finiteVolume conversion
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

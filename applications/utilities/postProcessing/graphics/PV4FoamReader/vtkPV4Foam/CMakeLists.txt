@@ -30,7 +30,9 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+include(${PARAVIEW_USE_FILE})
+
+list(APPEND SOURCES
   vtkPV4Foam.C
   vtkPV4FoamFields.C
   vtkPV4FoamMesh.C
@@ -43,8 +45,10 @@ list(APPEND sources
   vtkPV4FoamUtilities.C
 )
 
-add_foam_library(vtkPV4Foam SHARED ${sources})
+add_foam_library(vtkPV4Foam SHARED ${SOURCES})
 
-# This is a prototype! Replace second argument with a list of the highest
-# dependencies only. Inherited dependencies will be treated automatically.
-#target_link_libraries(vtkPV4Foam finiteVolume)
+target_link_libraries(vtkPV4Foam finiteVolume)
+target_include_directories(vtkPV4Foam PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../PV4FoamReader>
+#  $<INSTALL_INTERFACE:include/mylib>
+)

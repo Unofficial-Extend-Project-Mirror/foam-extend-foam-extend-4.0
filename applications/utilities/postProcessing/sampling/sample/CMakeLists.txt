@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   sample.C
 )
 
@@ -42,5 +42,5 @@ endif()
 
 add_foam_executable(sample
   DEPENDS sampling
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

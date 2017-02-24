@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   Mach.C
 )
 
@@ -42,5 +42,5 @@ endif()
 
 add_foam_executable(Mach
   DEPENDS postCalc reactionThermophysicalModels
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

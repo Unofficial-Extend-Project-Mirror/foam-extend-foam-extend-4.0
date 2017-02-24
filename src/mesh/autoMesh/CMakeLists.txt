@@ -33,7 +33,7 @@
 set(autoHexMesh autoHexMesh)
 set(autoHexMeshDriver ${autoHexMesh}/autoHexMeshDriver)
 
-list(APPEND sources
+list(APPEND SOURCES
   ${autoHexMeshDriver}/autoLayerDriver.C
   ${autoHexMeshDriver}/autoLayerDriverShrink.C
   ${autoHexMeshDriver}/autoSnapDriver.C
@@ -54,8 +54,6 @@ list(APPEND sources
   ${autoHexMesh}/trackedParticle/trackedParticleCloud.C
 )
 
-add_foam_library(autoMesh SHARED ${sources})
+add_foam_library(autoMesh SHARED ${SOURCES})
 
-# This is a prototype! Replace second argument with a list of the highest
-# dependencies only. Inherited dependencies will be treated automatically.
 target_link_libraries(autoMesh PUBLIC dynamicFvMesh edgeMesh)

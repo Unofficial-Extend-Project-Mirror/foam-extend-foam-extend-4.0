@@ -30,14 +30,12 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   ggiCheck/ggiCheckFunctionObject.C
   meshCheck/meshCheckFunctionObject.C
   mixingPlaneCheck/mixingPlaneCheckFunctionObject.C
 )
 
-add_foam_library(checkFunctionObjects SHARED ${sources})
+add_foam_library(checkFunctionObjects SHARED ${SOURCES})
 
-# This is a prototype! Replace second argument with a list of the highest
-# dependencies only. Inherited dependencies will be treated automatically.
 target_link_libraries(checkFunctionObjects PUBLIC finiteVolume)

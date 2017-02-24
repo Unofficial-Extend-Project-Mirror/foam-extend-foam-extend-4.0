@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   blockMeshApp.C
 )
 
@@ -42,5 +42,5 @@ endif()
 
 add_foam_executable(blockMesh
   DEPENDS blockMeshLib
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

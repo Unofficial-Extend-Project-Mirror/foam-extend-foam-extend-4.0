@@ -30,15 +30,13 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   LESfilter/LESfilter.C
   simpleFilter/simpleFilter.C
   laplaceFilter/laplaceFilter.C
   anisotropicFilter/anisotropicFilter.C
 )
 
-add_foam_library(LESfilters SHARED ${sources})
+add_foam_library(LESfilters SHARED ${SOURCES})
 
-# This is a prototype! Replace second argument with a list of the highest
-# dependencies only. Inherited dependencies will be treated automatically.
 target_link_libraries(LESfilters PUBLIC finiteVolume)

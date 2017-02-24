@@ -173,7 +173,7 @@ set(voronoiMeshGenerator voronoiMesh/voronoiMeshGenerator)
 
 set(workflowControls utilities/workflowControls)
 
-list(APPEND sources
+list(APPEND SOURCES
   ${checkMeshDict}/checkMeshDict.C
   ${lists}/pointFieldPMG.C
   ${lists}/faceListPMG.C
@@ -421,8 +421,6 @@ list(APPEND sources
   ${workflowControls}/workflowControls.C
 )
 
-add_foam_library(cfMesh SHARED ${sources})
+add_foam_library(cfMesh SHARED ${SOURCES})
 
-# This is a prototype! Replace second argument with a list of the highest
-# dependencies only. Inherited dependencies will be treated automatically.
 target_link_libraries(cfMesh PUBLIC meshTools edgeMesh)

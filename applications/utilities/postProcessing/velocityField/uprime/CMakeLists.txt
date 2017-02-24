@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   uprime.C
 )
 
@@ -42,5 +42,5 @@ endif()
 
 add_foam_executable(uprime
   DEPENDS postCalc
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   mergePolyMesh.C
   mergeMeshes.C
 )
@@ -43,5 +43,5 @@ endif()
 
 add_foam_executable(mergeMeshes
   DEPENDS dynamicMesh meshTools
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

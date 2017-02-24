@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   probes/probes.C
   probes/probesFunctionObject.C
   sampledSet/coordSet/coordSet.C
@@ -47,7 +47,7 @@ list(APPEND sources
 
 set(setWriters sampledSet/writers)
 
-list(APPEND sources
+list(APPEND SOURCES
   ${setWriters}/writers.C
   ${setWriters}/gnuplot/gnuplotSetWriterRunTime.C
   ${setWriters}/jplot/jplotSetWriterRunTime.C
@@ -72,7 +72,7 @@ list(APPEND sources
 
 set(surfWriters sampledSurface/writers)
 
-list(APPEND sources
+list(APPEND SOURCES
   ${surfWriters}/surfaceWriters.C
   ${surfWriters}/dx/dxSurfaceWriterRunTime.C
   ${surfWriters}/foamFile/foamFileSurfaceWriterRunTime.C
@@ -86,14 +86,12 @@ list(APPEND sources
 )
 
 set(meshToMesh meshToMeshInterpolation/meshToMesh)
-list(APPEND sources
+list(APPEND SOURCES
   ${meshToMesh}/meshToMesh.C
   ${meshToMesh}/calculateMeshToMeshAddressing.C
   ${meshToMesh}/calculateMeshToMeshWeights.C
 )
 
-add_foam_library(sampling SHARED ${sources})
+add_foam_library(sampling SHARED ${SOURCES})
 
-# This is a prototype! Replace second argument with a list of the highest
-# dependencies only. Inherited dependencies will be treated automatically.
 target_link_libraries(sampling PUBLIC finiteVolume surfMesh)

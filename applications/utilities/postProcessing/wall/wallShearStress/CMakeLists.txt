@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   wallShearStress.C
 )
 
@@ -42,5 +42,5 @@ endif()
 
 add_foam_executable(wallShearStress
   DEPENDS incompressibleRASModels compressibleRASModels
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

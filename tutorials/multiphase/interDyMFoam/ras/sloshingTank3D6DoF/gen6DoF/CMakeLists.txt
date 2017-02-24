@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   gen6DoF.C
 )
 
@@ -42,5 +42,5 @@ endif()
 
 add_foam_executable(gen6DoF
 #   DEPENDS finiteVolume
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

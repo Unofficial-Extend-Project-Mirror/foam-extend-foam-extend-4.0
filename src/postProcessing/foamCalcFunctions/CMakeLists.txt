@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   calcType/calcType.C
   calcType/newCalcType.C
   field/domainIntegrate/domainIntegrate.C
@@ -46,8 +46,6 @@ list(APPEND sources
   basic/scalarMult/scalarMult.C
 )
 
-add_foam_library(foamCalcFunctions SHARED ${sources})
+add_foam_library(foamCalcFunctions SHARED ${SOURCES})
 
-# This is a prototype! Replace second argument with a list of the highest
-# dependencies only. Inherited dependencies will be treated automatically.
 target_link_libraries(foamCalcFunctions PUBLIC finiteVolume)

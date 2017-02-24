@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   LESModel/LESModel.C
   GenEddyVisc/GenEddyVisc.C
   GenSGSStress/GenSGSStress.C
@@ -47,18 +47,16 @@ list(APPEND sources
 set(wallFunctions derivedFvPatchFields/wallFunctions)
 
 set(muSgsWallFunctions ${wallFunctions}/muSgsWallFunctions)
-list(APPEND sources
+list(APPEND SOURCES
   ${muSgsWallFunctions}/muSgsWallFunction/muSgsWallFunctionFvPatchScalarField.C
 )
 
 set(alphaSgsWallFunctions ${wallFunctions}/alphaSgsWallFunctions)
-list(APPEND sources
+list(APPEND SOURCES
   ${alphaSgsWallFunctions}/alphaSgsWallFunction/alphaSgsWallFunctionFvPatchScalarField.C
   ${alphaSgsWallFunctions}/alphaSgsJayatillekeWallFunction/alphaSgsJayatillekeWallFunctionFvPatchScalarField.C
 )
 
-add_foam_library(compressibleLESModels SHARED ${sources})
+add_foam_library(compressibleLESModels SHARED ${SOURCES})
 
-# This is a prototype! Replace second argument with a list of the highest
-# dependencies only. Inherited dependencies will be treated automatically.
 target_link_libraries(compressibleLESModels PUBLIC compressibleTurbulenceModel LESdeltas LESfilters)

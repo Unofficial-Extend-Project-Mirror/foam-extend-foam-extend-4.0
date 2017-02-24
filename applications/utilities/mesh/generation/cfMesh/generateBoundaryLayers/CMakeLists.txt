@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   generateBoundaryLayers.C
 )
 
@@ -42,5 +42,5 @@ endif()
 
 add_foam_executable(generateBoundaryLayers
   DEPENDS cfMesh
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

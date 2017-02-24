@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   tractionDisplacement/tractionDisplacementFvPatchVectorField.C
   stressedFoam.C
 )
@@ -43,5 +43,5 @@ endif()
 
 add_foam_executable(stressedFoam
 #   DEPENDS finiteVolume
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

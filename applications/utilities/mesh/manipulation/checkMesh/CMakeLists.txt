@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   printMeshStats.C
   checkTopology.C
   checkGeometry.C
@@ -45,5 +45,5 @@ endif()
 
 add_foam_executable(checkMesh
   DEPENDS finiteVolume meshTools
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

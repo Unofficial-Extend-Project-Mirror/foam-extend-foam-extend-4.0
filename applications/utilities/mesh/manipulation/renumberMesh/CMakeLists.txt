@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   renumberMesh.C
 )
 
@@ -42,5 +42,5 @@ endif()
 
 add_foam_executable(renumberMesh
   DEPENDS finiteVolume dynamicMesh
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

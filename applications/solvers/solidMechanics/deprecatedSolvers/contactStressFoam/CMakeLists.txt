@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   contactPatchPair.C
   contactPatchPairUpdateContact.C
   contactPatchPairSlavePressure.C
@@ -45,5 +45,5 @@ endif()
 
 add_foam_executable(contactStressFoam
 #   DEPENDS finiteVolume
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

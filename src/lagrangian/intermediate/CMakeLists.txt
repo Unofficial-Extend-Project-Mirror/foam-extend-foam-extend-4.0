@@ -40,13 +40,13 @@ set(DERIVEDCLOUDS ${CLOUDS}/derived)
 
 
 #  Parcels 
-list(APPEND sources
+list(APPEND SOURCES
   ${BASEPARCELS}/reactingParcel/reactingParcel.C
 )
 
 
 #  Cloud base classes 
-list(APPEND sources
+list(APPEND SOURCES
   ${BASECLOUDS}/kinematicCloud/kinematicCloud.C
   ${BASECLOUDS}/thermoCloud/thermoCloud.C
   ${BASECLOUDS}/reactingCloud/reactingCloud.C
@@ -56,7 +56,7 @@ list(APPEND sources
 
 #  kinematic parcel sub-models 
 set(KINEMATICPARCEL ${DERIVEDPARCELS}/basicKinematicParcel)
-list(APPEND sources
+list(APPEND SOURCES
   ${KINEMATICPARCEL}/basicKinematicParcel.C
   ${KINEMATICPARCEL}/defineBasicKinematicParcel.C
   ${KINEMATICPARCEL}/makeBasicKinematicParcelSubmodels.C
@@ -65,7 +65,7 @@ list(APPEND sources
 
 #  thermo parcel sub-models 
 set(THERMOPARCEL ${DERIVEDPARCELS}/basicThermoParcel)
-list(APPEND sources
+list(APPEND SOURCES
   ${THERMOPARCEL}/basicThermoParcel.C
   ${THERMOPARCEL}/defineBasicThermoParcel.C
   ${THERMOPARCEL}/makeBasicThermoParcelSubmodels.C
@@ -74,7 +74,7 @@ list(APPEND sources
 
 #  reacting parcel sub-models 
 set(REACTINGPARCEL ${DERIVEDPARCELS}/BasicReactingParcel)
-list(APPEND sources
+list(APPEND SOURCES
   ${REACTINGPARCEL}/defineBasicReactingParcel.C
   ${REACTINGPARCEL}/makeBasicReactingParcelSubmodels.C
 )
@@ -82,7 +82,7 @@ list(APPEND sources
 
 #  reacting multiphase parcel sub-models 
 set(REACTINGMPPARCEL ${DERIVEDPARCELS}/BasicReactingMultiphaseParcel)
-list(APPEND sources
+list(APPEND SOURCES
   ${REACTINGMPPARCEL}/defineBasicReactingMultiphaseParcel.C
   ${REACTINGMPPARCEL}/makeBasicReactingMultiphaseParcelSubmodels.C
 )
@@ -90,35 +90,35 @@ list(APPEND sources
 
 #  bolt-on models 
 set(RADIATION submodels/addOns/radiation)
-list(APPEND sources
+list(APPEND SOURCES
   ${RADIATION}/absorptionEmission/cloudAbsorptionEmission/cloudAbsorptionEmission.C
   ${RADIATION}/scatter/cloudScatter/cloudScatter.C
   submodels/Kinematic/PatchInteractionModel/LocalInteraction/patchInteractionData.C
 )
 
 set(KINEMATICINJECTION submodels/Kinematic/InjectionModel)
-list(APPEND sources
+list(APPEND SOURCES
   ${KINEMATICINJECTION}/KinematicLookupTableInjection/kinematicParcelInjectionData.C
   ${KINEMATICINJECTION}/KinematicLookupTableInjection/kinematicParcelInjectionDataIO.C
   ${KINEMATICINJECTION}/KinematicLookupTableInjection/kinematicParcelInjectionDataIOList.C
 )
 
 set(THERMOINJECTION submodels/Thermodynamic/InjectionModel)
-list(APPEND sources
+list(APPEND SOURCES
   ${THERMOINJECTION}/ThermoLookupTableInjection/thermoParcelInjectionData.C
   ${THERMOINJECTION}/ThermoLookupTableInjection/thermoParcelInjectionDataIO.C
   ${THERMOINJECTION}/ThermoLookupTableInjection/thermoParcelInjectionDataIOList.C
 )
 
 set(REACTINGINJECTION submodels/Reacting/InjectionModel)
-list(APPEND sources
+list(APPEND SOURCES
   ${REACTINGINJECTION}/ReactingLookupTableInjection/reactingParcelInjectionData.C
   ${REACTINGINJECTION}/ReactingLookupTableInjection/reactingParcelInjectionDataIO.C
   ${REACTINGINJECTION}/ReactingLookupTableInjection/reactingParcelInjectionDataIOList.C
 )
 
 set(REACTINGMPINJECTION submodels/ReactingMultiphase/InjectionModel)
-list(APPEND sources
+list(APPEND SOURCES
   ${REACTINGMPINJECTION}/ReactingMultiphaseLookupTableInjection/reactingMultiphaseParcelInjectionData.C
   ${REACTINGMPINJECTION}/ReactingMultiphaseLookupTableInjection/reactingMultiphaseParcelInjectionDataIO.C
   ${REACTINGMPINJECTION}/ReactingMultiphaseLookupTableInjection/reactingMultiphaseParcelInjectionDataIOList.C
@@ -126,7 +126,7 @@ list(APPEND sources
 
 
 #  data entries 
-list(APPEND sources
+list(APPEND SOURCES
   submodels/IO/DataEntry/makeDataEntries.C
   submodels/IO/DataEntry/polynomial/polynomial.C
   submodels/IO/DataEntry/polynomial/polynomialIO.C
@@ -134,26 +134,24 @@ list(APPEND sources
 
 
 #  integration schemes 
-list(APPEND sources
+list(APPEND SOURCES
   IntegrationScheme/makeIntegrationSchemes.C
 )
 
 
 #  particle forces 
-list(APPEND sources
+list(APPEND SOURCES
   particleForces/particleForces.C
 )
 
 
 #  phase properties 
-list(APPEND sources
+list(APPEND SOURCES
   phaseProperties/phaseProperties/phaseProperties.C
   phaseProperties/phaseProperties/phasePropertiesIO.C
   phaseProperties/phasePropertiesList/phasePropertiesList.C
 )
 
-add_foam_library(lagrangianIntermediate SHARED ${sources})
+add_foam_library(lagrangianIntermediate SHARED ${SOURCES})
 
-# This is a prototype! Replace second argument with a list of the highest
-# dependencies only. Inherited dependencies will be treated automatically.
 target_link_libraries(lagrangianIntermediate PUBLIC reactionThermophysicalModels radiation compressibleRASModels compressibleLESModels pdf liquidMixture solidMixture)

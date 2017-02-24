@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   icoDyMFoam.C
 )
 
@@ -42,5 +42,5 @@ endif()
 
 add_foam_executable(icoDyMFoam
   DEPENDS dynamicFvMesh
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

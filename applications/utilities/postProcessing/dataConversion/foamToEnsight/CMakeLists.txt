@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   itoa.C
   ensightMesh.C
   ensightParticlePositions.C
@@ -46,5 +46,5 @@ endif()
 
 add_foam_executable(foamToEnsight
   DEPENDS finiteVolume
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

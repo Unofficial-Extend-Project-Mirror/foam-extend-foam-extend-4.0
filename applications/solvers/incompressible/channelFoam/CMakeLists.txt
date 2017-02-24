@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   channelFoam.C
 )
 
@@ -42,5 +42,5 @@ endif()
 
 add_foam_executable(channelFoam
   DEPENDS incompressibleLESModels
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

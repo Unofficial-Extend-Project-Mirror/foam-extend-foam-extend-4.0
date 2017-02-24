@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   collapseBase.C
   collapseEdge.C
   surfaceClean.C
@@ -44,5 +44,5 @@ endif()
 
 add_foam_executable(surfaceClean
   DEPENDS meshTools
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   cudaSolver/cudaSolver.C
   cudaCG/cgDiag.cu
   cudaCG/cgAmg.cu
@@ -41,8 +41,6 @@ list(APPEND sources
   cudaBiCGStab/cudaBiCGStab.C
 )
 
-add_foam_library(cudaSolvers SHARED ${sources})
+add_foam_library(cudaSolvers SHARED ${SOURCES})
 
-# This is a prototype! Replace second argument with a list of the highest
-# dependencies only. Inherited dependencies will be treated automatically.
 #target_link_libraries(cudaSolvers finiteVolume)

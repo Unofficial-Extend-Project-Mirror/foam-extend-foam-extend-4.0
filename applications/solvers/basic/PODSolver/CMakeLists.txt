@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   PODSolver.C
 )
 
@@ -42,5 +42,5 @@ endif()
 
 add_foam_executable(PODSolver
   DEPENDS POD
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

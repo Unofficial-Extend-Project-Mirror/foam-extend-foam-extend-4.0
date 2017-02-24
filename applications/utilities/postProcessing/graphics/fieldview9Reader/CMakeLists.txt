@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   errno.c
   readerDatabase.C
   fieldview9Reader.C
@@ -44,5 +44,5 @@ endif()
 
 add_foam_executable(fvbinFoam
 #   DEPENDS finiteVolume
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

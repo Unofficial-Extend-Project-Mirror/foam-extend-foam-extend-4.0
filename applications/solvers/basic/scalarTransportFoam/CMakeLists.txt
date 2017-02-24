@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   scalarTransportFoam.C
 )
 
@@ -42,5 +42,5 @@ endif()
 
 add_foam_executable(scalarTransportFoam
   DEPENDS finiteVolume
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   createPatch.C
 )
 
@@ -42,5 +42,5 @@ endif()
 
 add_foam_executable(createPatch
   DEPENDS dynamicMesh
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

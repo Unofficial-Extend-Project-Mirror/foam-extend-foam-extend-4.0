@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   immersedBoundaryPolyPatch/immersedBoundaryPolyPatch.C
   immersedBoundaryPointPatch/immersedBoundaryPointPatch.C
   immersedBoundaryFvPatch/immersedBoundaryFvPatch.C
@@ -44,8 +44,6 @@ list(APPEND sources
   ibSwirlFlowRateInletVelocity/ibSwirlFlowRateInletVelocityFvPatchVectorField.C
 )
 
-add_foam_library(immersedBoundary SHARED ${sources})
+add_foam_library(immersedBoundary SHARED ${SOURCES})
 
-# This is a prototype! Replace second argument with a list of the highest
-# dependencies only. Inherited dependencies will be treated automatically.
 target_link_libraries(immersedBoundary PUBLIC finiteVolume sampling surfMesh dynamicMesh)

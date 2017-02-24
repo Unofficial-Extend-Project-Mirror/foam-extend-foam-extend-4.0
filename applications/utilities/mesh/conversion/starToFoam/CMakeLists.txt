@@ -30,13 +30,13 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   coupledFacePair.C
   starMesh.C
   readPoints.C
 )
 # readSeparatedPoints.C
-list(APPEND sources
+list(APPEND SOURCES
   readCells.C
   readBoundary.C
   fixCollapsedEdges.C
@@ -60,5 +60,5 @@ endif()
 
 add_foam_executable(starToFoam
   DEPENDS foam
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

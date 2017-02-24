@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   kivaToFoam.C
 )
 
@@ -42,5 +42,5 @@ endif()
 
 add_foam_executable(kivaToFoam
   DEPENDS foam
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

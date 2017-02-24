@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   refinementLevel.C
 )
 
@@ -42,5 +42,5 @@ endif()
 
 add_foam_executable(refinementLevel
   DEPENDS finiteVolume dynamicMesh
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

@@ -44,7 +44,7 @@ set(collisionModels spraySubModels/collisionModel)
 set(dispersionModels spraySubModels/dispersionModel)
 set(injectorModels spraySubModels/injectorModel)
 
-list(APPEND sources
+list(APPEND SOURCES
   ${parcel}/parcel.C
   ${parcel}/parcelFunctions.C
   ${parcel}/parcelIO.C
@@ -115,8 +115,6 @@ list(APPEND sources
   ${dispersionModels}/stochasticDispersionRAS/stochasticDispersionRAS.C
 )
 
-add_foam_library(dieselSpray SHARED ${sources})
+add_foam_library(dieselSpray SHARED ${SOURCES})
 
-# This is a prototype! Replace second argument with a list of the highest
-# dependencies only. Inherited dependencies will be treated automatically.
 target_link_libraries(dieselSpray PUBLIC lagrangianBasic lagrangianIntermediate basicThermophysicalModels)

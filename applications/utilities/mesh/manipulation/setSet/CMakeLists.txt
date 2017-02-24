@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   writePointSet.C
   writeFuns.C
   writePatch.C
@@ -45,5 +45,5 @@ endif()
 
 add_foam_executable(setSet
   DEPENDS meshTools
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

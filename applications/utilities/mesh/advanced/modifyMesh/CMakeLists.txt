@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   cellSplitter.C
   modifyMesh.C
 )
@@ -43,5 +43,5 @@ endif()
 
 add_foam_executable(modifyMesh
   DEPENDS finiteVolume dynamicMesh
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   estimateScalarError.C
 )
 
@@ -42,5 +42,5 @@ endif()
 
 add_foam_executable(estimateScalarError
   DEPENDS errorEstimation
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

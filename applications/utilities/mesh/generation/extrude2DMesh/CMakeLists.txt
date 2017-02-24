@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   extrude2DMesh.C
   doExtrude2DMesh.C
 )
@@ -43,5 +43,5 @@ endif()
 
 add_foam_executable(extrude2DMesh
   DEPENDS dynamicMesh
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

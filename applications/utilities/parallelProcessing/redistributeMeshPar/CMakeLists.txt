@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   redistributeMeshPar.C
 )
 
@@ -42,5 +42,5 @@ endif()
 
 add_foam_executable(redistributeMeshPar
   DEPENDS dynamicFvMesh
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

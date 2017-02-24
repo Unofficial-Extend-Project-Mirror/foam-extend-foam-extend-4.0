@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   meshDualiser.C
   polyDualMeshApp.C
 )
@@ -43,5 +43,5 @@ endif()
 
 add_foam_executable(polyDualMesh
   DEPENDS finiteVolume dynamicMesh
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

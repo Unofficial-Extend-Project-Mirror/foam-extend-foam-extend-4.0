@@ -30,13 +30,11 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   immersedBoundaryForces.C
   immersedBoundaryForcesFunctionObject.C
 )
 
-add_foam_library(immersedBoundaryForceFunctionObject SHARED ${sources})
+add_foam_library(immersedBoundaryForceFunctionObject SHARED ${SOURCES})
 
-# This is a prototype! Replace second argument with a list of the highest
-# dependencies only. Inherited dependencies will be treated automatically.
 target_link_libraries(immersedBoundaryForceFunctionObject immersedBoundaryTurbulence forces)

@@ -32,7 +32,7 @@
 
 FLEX_TARGET(gambitToFoam gambitToFoam.L
   ${CMAKE_CURRENT_BINARY_DIR}/gambitToFoam.C COMPILE_FLAGS "-+")
-list(APPEND sources ${FLEX_gambitToFoam_OUTPUTS})
+list(APPEND SOURCES ${FLEX_gambitToFoam_OUTPUTS})
 
 # Set minimal environment for external compilation
 if(NOT FOAM_FOUND)
@@ -42,5 +42,5 @@ endif()
 
 add_foam_executable(gambitToFoam
   DEPENDS foam
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   Lambda2.C
 )
 
@@ -42,5 +42,5 @@ endif()
 
 add_foam_executable(Lambda2
   DEPENDS postCalc
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

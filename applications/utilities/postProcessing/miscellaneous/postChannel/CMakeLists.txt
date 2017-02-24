@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   postChannel.C
   channelIndex.C
 )
@@ -43,5 +43,5 @@ endif()
 
 add_foam_executable(postChannel
   DEPENDS sampling
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

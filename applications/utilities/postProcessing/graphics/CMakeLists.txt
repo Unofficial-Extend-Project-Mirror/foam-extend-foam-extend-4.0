@@ -32,6 +32,6 @@
 add_subdirectory(newEnsightFoamReader)
 #add_subdirectory(PV3FoamReader)
 #add_subdirectory(PVFoamReader)
-#add_subdirectory(PV4FoamReader)
+add_subdirectory(PV4FoamReader)
 #add_subdirectory(fieldview9Reader)
 add_subdirectory(ensightFoamReader)

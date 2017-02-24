@@ -30,19 +30,17 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   turbulenceModel.C
   laminar/laminar.C
 )
 
-add_foam_library(compressibleTurbulenceModel SHARED ${sources})
+add_foam_library(compressibleTurbulenceModel SHARED ${SOURCES})
 
-# This is a prototype! Replace second argument with a list of the highest
-# dependencies only. Inherited dependencies will be treated automatically.
 target_link_libraries(compressibleTurbulenceModel PUBLIC basicThermophysicalModels)
 
 # Hack to cope with some weird include paths
 target_include_directories(compressibleTurbulenceModel PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../..>
-  $<INSTALL_INTERFACE:include/mylib>
+#  $<INSTALL_INTERFACE:include/mylib>
 )

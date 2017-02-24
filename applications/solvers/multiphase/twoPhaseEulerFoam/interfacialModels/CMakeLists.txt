@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   dragModels/dragModel/dragModel.C
   dragModels/dragModel/newDragModel.C
   dragModels/Ergun/Ergun.C
@@ -42,8 +42,6 @@ list(APPEND sources
   dragModels/SyamlalOBrien/SyamlalOBrien.C
 )
 
-add_foam_library(EulerianInterfacialModels SHARED ${sources})
+add_foam_library(EulerianInterfacialModels SHARED ${SOURCES})
 
-# This is a prototype! Replace second argument with a list of the highest
-# dependencies only. Inherited dependencies will be treated automatically.
 #target_link_libraries(EulerianInterfacialModels finiteVolume)

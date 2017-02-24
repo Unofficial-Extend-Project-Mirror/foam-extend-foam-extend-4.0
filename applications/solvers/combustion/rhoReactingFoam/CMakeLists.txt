@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   rhoReactingFoam.C
 )
 
@@ -42,5 +42,5 @@ endif()
 
 add_foam_executable(rhoReactingFoam
 #   DEPENDS finiteVolume
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

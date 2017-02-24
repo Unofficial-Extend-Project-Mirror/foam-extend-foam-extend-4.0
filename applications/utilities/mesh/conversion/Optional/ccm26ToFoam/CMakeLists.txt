@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   ccm26ToFoam.C
 )
 
@@ -42,5 +42,5 @@ endif()
 
 add_foam_executable(ccm26ToFoam
   DEPENDS finiteVolume meshTools
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

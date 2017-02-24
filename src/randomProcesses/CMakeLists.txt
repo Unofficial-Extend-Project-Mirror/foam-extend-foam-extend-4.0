@@ -41,7 +41,7 @@ set(turbulence turbulence)
 
 set(noise noise)
 
-list(APPEND sources
+list(APPEND SOURCES
   ${Kmesh}/Kmesh.C
   ${fft}/fft.C
   ${fft}/fftRenumber.C
@@ -52,8 +52,6 @@ list(APPEND sources
   ${noise}/noiseFFT.C
 )
 
-add_foam_library(randomProcesses SHARED ${sources})
+add_foam_library(randomProcesses SHARED ${SOURCES})
 
-# This is a prototype! Replace second argument with a list of the highest
-# dependencies only. Inherited dependencies will be treated automatically.
 target_link_libraries(randomProcesses PUBLIC finiteVolume)

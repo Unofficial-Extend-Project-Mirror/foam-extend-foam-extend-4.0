@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   surfZone/surfZone/surfZone.C
   surfZone/surfZone/surfZoneIOList.C
   surfZone/surfZoneIdentifier/surfZoneIdentifier.C
@@ -48,7 +48,7 @@ list(APPEND sources
 )
 
 set(surfaceFormats surfaceFormats)
-list(APPEND sources
+list(APPEND SOURCES
   ${surfaceFormats}/surfaceFormatsCore.C
   ${surfaceFormats}/ac3d/AC3DsurfaceFormatCore.C
   ${surfaceFormats}/ac3d/AC3DsurfaceFormatRunTime.C
@@ -68,8 +68,8 @@ list(APPEND sources
 )
 FLEX_TARGET(STLsurfaceFormatASCII ${surfaceFormats}/stl/STLsurfaceFormatASCII.L
   ${CMAKE_CURRENT_BINARY_DIR}/STLsurfaceFormatASCII.C COMPILE_FLAGS "-+")
-list(APPEND sources ${FLEX_STLsurfaceFormatASCII_OUTPUTS})
-list(APPEND sources
+list(APPEND SOURCES ${FLEX_STLsurfaceFormatASCII_OUTPUTS})
+list(APPEND SOURCES
   ${surfaceFormats}/tri/TRIsurfaceFormatCore.C
   ${surfaceFormats}/tri/TRIsurfaceFormatRunTime.C
   ${surfaceFormats}/vtk/VTKsurfaceFormatCore.C
@@ -80,8 +80,6 @@ list(APPEND sources
   ${surfaceFormats}/x3d/X3DsurfaceFormatRunTime.C
 )
 
-add_foam_library(surfMesh SHARED ${sources})
+add_foam_library(surfMesh SHARED ${SOURCES})
 
-# This is a prototype! Replace second argument with a list of the highest
-# dependencies only. Inherited dependencies will be treated automatically.
 target_link_libraries(surfMesh foam)

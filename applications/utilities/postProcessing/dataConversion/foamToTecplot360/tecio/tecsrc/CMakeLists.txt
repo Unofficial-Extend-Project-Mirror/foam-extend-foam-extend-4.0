@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   alloc.cpp
   arrlist.cpp
   auxdata.cpp
@@ -51,8 +51,6 @@ list(APPEND sources
   TranslatedString.cpp
 )
 
-add_foam_library(tecio SHARED ${sources})
+add_foam_library(tecio SHARED ${SOURCES})
 
-# This is a prototype! Replace second argument with a list of the highest
-# dependencies only. Inherited dependencies will be treated automatically.
 #target_link_libraries(tecio finiteVolume)

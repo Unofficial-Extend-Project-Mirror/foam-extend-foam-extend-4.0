@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   multiphaseMixture/phase/phase.C
   multiphaseMixture/multiphaseAlphaContactAngle/multiphaseAlphaContactAngleFvPatchScalarField.C
   multiphaseMixture/multiphaseMixture.C
@@ -45,5 +45,5 @@ endif()
 
 add_foam_executable(multiphaseInterFoam
 #   DEPENDS finiteVolume
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

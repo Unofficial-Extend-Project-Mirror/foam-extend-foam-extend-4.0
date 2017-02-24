@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   autoPatch.C
 )
 
@@ -42,5 +42,5 @@ endif()
 
 add_foam_executable(autoPatch
   DEPENDS dynamicMesh meshTools
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

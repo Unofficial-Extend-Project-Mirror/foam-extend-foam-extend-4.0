@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   foamToStarMesh.C
 )
 
@@ -42,5 +42,5 @@ endif()
 
 add_foam_executable(foamToStarMesh
   DEPENDS conversion
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

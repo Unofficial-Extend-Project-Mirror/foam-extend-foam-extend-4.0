@@ -30,13 +30,13 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   chemistryReaders/chemkinReader/chemkinReader.C
 )
 FLEX_TARGET(chemkinLexer chemistryReaders/chemkinReader/chemkinLexer.L
   ${CMAKE_CURRENT_BINARY_DIR}/chemkinLexer.C COMPILE_FLAGS "-+")
-list(APPEND sources ${FLEX_chemkinLexer_OUTPUTS})
-list(APPEND sources
+list(APPEND SOURCES ${FLEX_chemkinLexer_OUTPUTS})
+list(APPEND SOURCES
   chemistryReaders/chemistryReader/makeChemistryReaders.C
   mixtures/basicMultiComponentMixture/basicMultiComponentMixture.C
   combustionThermo/hCombustionThermo/hCombustionThermo.C
@@ -59,8 +59,6 @@ list(APPEND sources
   derivedFvPatchFields/mixedUnburntEnthalpy/mixedUnburntEnthalpyFvPatchScalarField.C
 )
 
-add_foam_library(reactionThermophysicalModels SHARED ${sources})
+add_foam_library(reactionThermophysicalModels SHARED ${SOURCES})
 
-# This is a prototype! Replace second argument with a list of the highest
-# dependencies only. Inherited dependencies will be treated automatically.
 target_link_libraries(reactionThermophysicalModels PUBLIC basicThermophysicalModels)

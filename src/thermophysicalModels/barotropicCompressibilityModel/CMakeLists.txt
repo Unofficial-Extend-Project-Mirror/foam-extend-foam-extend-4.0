@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   barotropicCompressibilityModel/barotropicCompressibilityModel.C
   barotropicCompressibilityModel/newBarotropicCompressibilityModel.C
   linear/linear.C
@@ -38,8 +38,6 @@ list(APPEND sources
   Chung/Chung.C
 )
 
-add_foam_library(barotropicCompressibilityModel SHARED ${sources})
+add_foam_library(barotropicCompressibilityModel SHARED ${SOURCES})
 
-# This is a prototype! Replace second argument with a list of the highest
-# dependencies only. Inherited dependencies will be treated automatically.
 target_link_libraries(barotropicCompressibilityModel finiteVolume)

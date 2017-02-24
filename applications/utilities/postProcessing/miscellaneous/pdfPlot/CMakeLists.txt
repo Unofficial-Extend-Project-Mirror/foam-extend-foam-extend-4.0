@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   pdfPlot.C
 )
 
@@ -42,5 +42,5 @@ endif()
 
 add_foam_executable(pdfPlot
   DEPENDS finiteVolume pdf
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

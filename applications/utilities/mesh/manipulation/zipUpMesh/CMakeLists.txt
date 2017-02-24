@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   zipUpMesh.C
 )
 
@@ -42,5 +42,5 @@ endif()
 
 add_foam_executable(zipUpMesh
   DEPENDS finiteVolume meshTools
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

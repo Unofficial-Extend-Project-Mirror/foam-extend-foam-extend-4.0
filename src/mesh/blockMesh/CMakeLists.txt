@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   curvedEdges/BSpline.C
   curvedEdges/CatmullRomSpline.C
   curvedEdges/polyLine.C
@@ -52,8 +52,6 @@ list(APPEND sources
   blockMesh/blockMeshMerge.C
 )
 
-add_foam_library(blockMeshLib SHARED ${sources})
+add_foam_library(blockMeshLib SHARED ${SOURCES})
 
-# This is a prototype! Replace second argument with a list of the highest
-# dependencies only. Inherited dependencies will be treated automatically.
 target_link_libraries(blockMeshLib PUBLIC ODE dynamicMesh finiteVolume meshTools)

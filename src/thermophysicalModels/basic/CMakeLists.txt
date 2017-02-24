@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   mixtures/basicMixture/basicMixture.C
   mixtures/basicMixture/basicMixtures.C
   basicThermo/basicThermo.C
@@ -61,8 +61,6 @@ list(APPEND sources
   derivedFvPatchFields/isentropicTotalTemperature/isentropicTotalTemperatureFvPatchScalarField.C
 )
 
-add_foam_library(basicThermophysicalModels SHARED ${sources})
+add_foam_library(basicThermophysicalModels SHARED ${SOURCES})
 
-# This is a prototype! Replace second argument with a list of the highest
-# dependencies only. Inherited dependencies will be treated automatically.
 target_link_libraries(basicThermophysicalModels PUBLIC finiteVolume specie thermophysicalFunctions)

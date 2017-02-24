@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   interfaceProperties.C
   interfaceCompression/interfaceCompression.C
   alphaContactAngle/alphaContactAngle/alphaContactAngleFvPatchScalarField.C
@@ -40,8 +40,6 @@ list(APPEND sources
   alphaFixedPressure/alphaFixedPressureFvPatchScalarField.C
 )
 
-add_foam_library(interfaceProperties SHARED ${sources})
+add_foam_library(interfaceProperties SHARED ${SOURCES})
 
-# This is a prototype! Replace second argument with a list of the highest
-# dependencies only. Inherited dependencies will be treated automatically.
 target_link_libraries(interfaceProperties PUBLIC finiteVolume)

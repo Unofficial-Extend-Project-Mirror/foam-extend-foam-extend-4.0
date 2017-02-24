@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   viscosityModels/viscosityModel/viscosityModel.C
   viscosityModels/viscosityModel/newViscosityModel.C
   viscosityModels/Newtonian/Newtonian.C
@@ -44,15 +44,11 @@ list(APPEND sources
   incompressibleTwoPhaseMixture/twoPhaseMixture.C
 )
 
-add_foam_library(incompressibleTransportModels SHARED ${sources})
+add_foam_library(incompressibleTransportModels SHARED ${SOURCES})
 
-# This is a prototype! Replace second argument with a list of the highest
-# dependencies only. Inherited dependencies will be treated automatically.
 target_link_libraries(incompressibleTransportModels finiteVolume)
 
 target_include_directories(incompressibleTransportModels PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/..>
-  $<INSTALL_INTERFACE:include/mylib> 
+#  $<INSTALL_INTERFACE:include/mylib> 
 )
-
-

@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   multiSolver.C
 )
 
@@ -42,5 +42,5 @@ endif()
 
 add_foam_executable(multiSolver
   DEPENDS finiteVolume multiSolverLib
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

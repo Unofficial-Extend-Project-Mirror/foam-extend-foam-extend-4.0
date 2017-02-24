@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   freeSurface.C
   makeFreeSurfaceData.C
   freeSurfacePointDisplacement.C
@@ -38,7 +38,7 @@ list(APPEND sources
 )
 
 set(basicCorrectedFvPatchFields correctedFvPatchFields/basicCorrectedFvPatchFields)
-list(APPEND sources
+list(APPEND SOURCES
   ${basicCorrectedFvPatchFields}/fixedGradient/fixedGradientCorrectedFvPatchFields.C
   ${basicCorrectedFvPatchFields}/fixedValue/fixedValueCorrectedFvPatchFields.C
   ${basicCorrectedFvPatchFields}/zeroGradient/zeroGradientCorrectedFvPatchFields.C
@@ -47,8 +47,6 @@ list(APPEND sources
   functionObjects/sloshingHistory/sloshingHistory.C
 )
 
-add_foam_library(freeSurface SHARED ${sources})
+add_foam_library(freeSurface SHARED ${SOURCES})
 
-# This is a prototype! Replace second argument with a list of the highest
-# dependencies only. Inherited dependencies will be treated automatically.
 #target_link_libraries(freeSurface finiteVolume)

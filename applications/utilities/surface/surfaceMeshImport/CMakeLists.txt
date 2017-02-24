@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   surfaceMeshImport.C
 )
 
@@ -42,5 +42,5 @@ endif()
 
 add_foam_executable(surfaceMeshImport
   DEPENDS surfMesh meshTools
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

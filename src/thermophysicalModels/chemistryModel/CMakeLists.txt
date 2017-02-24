@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   chemistryModel/basicChemistryModel/basicChemistryModel.C
   chemistryModel/psiChemistryModel/psiChemistryModel.C
   chemistryModel/psiChemistryModel/newPsiChemistryModel.C
@@ -41,8 +41,6 @@ list(APPEND sources
   chemistrySolver/chemistrySolver/makeChemistrySolvers.C
 )
 
-add_foam_library(chemistryModel SHARED ${sources})
+add_foam_library(chemistryModel SHARED ${SOURCES})
 
-# This is a prototype! Replace second argument with a list of the highest
-# dependencies only. Inherited dependencies will be treated automatically.
 target_link_libraries(chemistryModel PUBLIC reactionThermophysicalModels ODE)

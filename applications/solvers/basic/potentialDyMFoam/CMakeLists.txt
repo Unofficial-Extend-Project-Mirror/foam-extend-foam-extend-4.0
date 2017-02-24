@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   potentialDyMFoam.C
 )
 
@@ -42,5 +42,5 @@ endif()
 
 add_foam_executable(potentialDyMFoam
   DEPENDS dynamicFvMesh
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

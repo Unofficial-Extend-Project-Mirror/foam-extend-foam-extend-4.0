@@ -55,7 +55,7 @@ set(MapTetFemFields ${tetPolyMesh}/MapTetFemFields)
 
 set(tetPolyPatchInterpolation tetPolyPatchInterpolation)
 
-list(APPEND sources
+list(APPEND SOURCES
   ${tetPolyPatch}/tetPolyPatch.C
   ${faceTetPolyPatch}/faceTetPolyPatch.C
   ${faceTetPolyPatch}/newFaceTetPolyPatch.C
@@ -88,12 +88,12 @@ list(APPEND sources
 )
 
 set(tetPolyPatchFields fields/tetPolyPatchFields)
-list(APPEND sources
+list(APPEND SOURCES
   ${tetPolyPatchFields}/tetPolyPatchField/tetPolyPatchFields.C
 )
 
 set(basicTetPolyPatchFields ${tetPolyPatchFields}/basic)
-list(APPEND sources
+list(APPEND SOURCES
   ${basicTetPolyPatchFields}/calculated/calculatedTetPolyPatchFields.C
   ${basicTetPolyPatchFields}/coupled/coupledTetPolyPatchFields.C
   ${basicTetPolyPatchFields}/coupledFace/coupledFaceTetPolyPatchFields.C
@@ -105,7 +105,7 @@ list(APPEND sources
 )
 
 set(constraintTetPolyPatchFields ${tetPolyPatchFields}/constraint)
-list(APPEND sources
+list(APPEND SOURCES
   ${constraintTetPolyPatchFields}/empty/emptyTetPolyPatchFields.C
   ${constraintTetPolyPatchFields}/wedge/wedgeTetPolyPatchFields.C
   ${constraintTetPolyPatchFields}/symmetry/symmetryTetPolyPatchFields.C
@@ -113,7 +113,7 @@ list(APPEND sources
 )
 
 set(derivedTetPolyPatchFields ${tetPolyPatchFields}/derived)
-list(APPEND sources
+list(APPEND SOURCES
   ${derivedTetPolyPatchFields}/global/globalTetPolyPatchFields.C
   ${derivedTetPolyPatchFields}/componentMixed/componentMixedTetPolyPatchVectorField.C
   ${derivedTetPolyPatchFields}/oscillatingFixedValue/oscillatingFixedValueTetPolyPatchFields.C
@@ -122,12 +122,12 @@ list(APPEND sources
 )
 
 set(elementPatchFields fields/elementPatchFields)
-list(APPEND sources
+list(APPEND SOURCES
   ${elementPatchFields}/elementPatchField/elementPatchFields.C
 )
 
 set(basicElementPatchFields ${elementPatchFields}/basic)
-list(APPEND sources
+list(APPEND SOURCES
   ${basicElementPatchFields}/calculated/calculatedElementPatchFields.C
   ${basicElementPatchFields}/coupled/coupledElementPatchFields.C
   ${basicElementPatchFields}/coupledFace/coupledFaceElementPatchFields.C
@@ -135,7 +135,7 @@ list(APPEND sources
 )
 
 set(constraintElementPatchFields ${elementPatchFields}/constraint)
-list(APPEND sources
+list(APPEND SOURCES
   ${constraintElementPatchFields}/empty/emptyElementPatchFields.C
   ${constraintElementPatchFields}/wedge/wedgeElementPatchFields.C
   ${constraintElementPatchFields}/symmetry/symmetryElementPatchFields.C
@@ -147,8 +147,6 @@ list(APPEND sources
   tetFemMatrix/tetFemMatrices.C
 )
 
-add_foam_library(tetFiniteElement SHARED ${sources})
+add_foam_library(tetFiniteElement SHARED ${SOURCES})
 
-# This is a prototype! Replace second argument with a list of the highest
-# dependencies only. Inherited dependencies will be treated automatically.
 target_link_libraries(tetFiniteElement PUBLIC meshTools)

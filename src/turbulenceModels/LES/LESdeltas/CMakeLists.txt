@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   LESdelta/LESdelta.C
   cubeRootVolDelta/cubeRootVolDelta.C
   PrandtlDelta/PrandtlDelta.C
@@ -38,8 +38,6 @@ list(APPEND sources
   smoothDelta/smoothDelta.C
 )
 
-add_foam_library(LESdeltas SHARED ${sources})
+add_foam_library(LESdeltas SHARED ${SOURCES})
 
-# This is a prototype! Replace second argument with a list of the highest
-# dependencies only. Inherited dependencies will be treated automatically.
 target_link_libraries(LESdeltas PUBLIC finiteVolume)

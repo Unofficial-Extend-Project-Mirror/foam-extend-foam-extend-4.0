@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   processorMeshes.C
   decomposeSets.C
 )
@@ -43,5 +43,5 @@ endif()
 
 add_foam_executable(decomposeSets
   DEPENDS finiteVolume meshTools
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

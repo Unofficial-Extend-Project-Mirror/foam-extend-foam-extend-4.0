@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   signals/sigFpe.C
   signals/sigSegv.C
   signals/sigInt.C
@@ -45,8 +45,6 @@ list(APPEND sources
   printStack.C
 )
 
-add_foam_library(OSspecific SHARED ${sources})
+add_foam_library(OSspecific SHARED ${SOURCES})
 
-# This is a prototype! Replace second argument with a list of the highest
-# dependencies only. Inherited dependencies will be treated automatically.
 #target_link_libraries(OSspecific finiteVolume)

@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   surfacePointMerge.C
 )
 
@@ -42,5 +42,5 @@ endif()
 
 add_foam_executable(surfacePointMerge
   DEPENDS meshTools
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

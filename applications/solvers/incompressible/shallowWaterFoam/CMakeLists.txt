@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   shallowWaterFoam.C
 )
 
@@ -42,5 +42,5 @@ endif()
 
 add_foam_executable(shallowWaterFoam
   DEPENDS finiteVolume
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

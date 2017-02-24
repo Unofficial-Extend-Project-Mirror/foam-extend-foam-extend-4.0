@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   incompressibleThreePhaseMixture/threePhaseMixture.C
   threePhaseInterfaceProperties/threePhaseInterfaceProperties.C
   interMixingFoam.C
@@ -44,5 +44,5 @@ endif()
 
 add_foam_executable(interMixingFoam
 #   DEPENDS finiteVolume
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

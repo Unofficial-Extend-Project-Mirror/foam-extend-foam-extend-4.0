@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   compressibleInterFoam.C
 )
 
@@ -42,5 +42,5 @@ endif()
 
 add_foam_executable(compressibleInterFoam
 #   DEPENDS finiteVolume
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

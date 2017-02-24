@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   global/global.C
   global/dimensionedConstants/dimensionedConstants.C
   global/argList/argList.C
@@ -47,7 +47,7 @@ list(APPEND sources
 )
 
 set(bools primitives/bools)
-list(APPEND sources
+list(APPEND SOURCES
   ${bools}/bool/bool.C
   ${bools}/bool/boolIO.C
   ${bools}/Switch/Switch.C
@@ -56,7 +56,7 @@ list(APPEND sources
 )
 
 set(ints primitives/ints)
-list(APPEND sources
+list(APPEND SOURCES
   ${ints}/int/intIO.C
   ${ints}/uint/uintIO.C
   ${ints}/long/longIO.C
@@ -91,7 +91,7 @@ list(APPEND sources
 )
 
 set(strings primitives/strings)
-list(APPEND sources
+list(APPEND SOURCES
   ${strings}/string/foamString.C
   ${strings}/string/foamStringIO.C
   ${strings}/word/word.C
@@ -104,7 +104,7 @@ list(APPEND sources
 )
 
 set(sha1 primitives/hashes/SHA1)
-list(APPEND sources
+list(APPEND SOURCES
   ${sha1}/SHA1.C
   ${sha1}/SHA1Digest.C
   coordinateSystems/coordinateSystem.C
@@ -130,7 +130,7 @@ list(APPEND sources
 )
 
 set(primitiveLists primitives/Lists)
-list(APPEND sources
+list(APPEND SOURCES
   ${primitiveLists}/boolList.C
   ${primitiveLists}/diagTensorList.C
   ${primitiveLists}/labelIOList.C
@@ -146,19 +146,19 @@ list(APPEND sources
 )
 
 set(Streams db/IOstreams)
-list(APPEND sources
+list(APPEND SOURCES
   ${Streams}/token/tokenIO.C
 )
 
 set(IOstreams ${Streams}/IOstreams)
-list(APPEND sources
+list(APPEND SOURCES
   ${IOstreams}/IOstream.C
   ${IOstreams}/Istream.C
   ${IOstreams}/Ostream.C
 )
 
 set(Sstreams ${Streams}/Sstreams)
-list(APPEND sources
+list(APPEND SOURCES
   ${Sstreams}/ISstream.C
   ${Sstreams}/OSstream.C
   ${Sstreams}/SstreamsPrint.C
@@ -167,28 +167,28 @@ list(APPEND sources
 )
 
 set(gzstream ${Streams}/gzstream)
-list(APPEND sources
+list(APPEND SOURCES
   ${gzstream}/gzstream.C
 )
 
 set(Fstreams ${Streams}/Fstreams)
-list(APPEND sources
+list(APPEND SOURCES
   ${Fstreams}/IFstream.C
   ${Fstreams}/OFstream.C
 )
 
 set(Tstreams ${Streams}/Tstreams)
-list(APPEND sources
+list(APPEND SOURCES
   ${Tstreams}/ITstream.C
 )
 
 set(StringStreams ${Streams}/StringStreams)
-list(APPEND sources
+list(APPEND SOURCES
   ${StringStreams}/StringStreamsPrint.C
 )
 
 set(Pstreams ${Streams}/Pstreams)
-list(APPEND sources
+list(APPEND SOURCES
   ${Pstreams}/Pstream.C
   ${Pstreams}/PstreamCommsStruct.C
   ${Pstreams}/PstreamGlobals.C
@@ -200,31 +200,31 @@ list(APPEND sources
 )
 
 set(dictionary db/dictionary)
-list(APPEND sources
+list(APPEND SOURCES
   ${dictionary}/dictionary.C
   ${dictionary}/dictionaryIO.C
 )
 
 set(entry ${dictionary}/entry)
-list(APPEND sources
+list(APPEND SOURCES
   ${entry}/entry.C
   ${entry}/entryIO.C
 )
 
 set(primitiveEntry ${dictionary}/primitiveEntry)
-list(APPEND sources
+list(APPEND SOURCES
   ${primitiveEntry}/primitiveEntry.C
   ${primitiveEntry}/primitiveEntryIO.C
 )
 
 set(dictionaryEntry ${dictionary}/dictionaryEntry)
-list(APPEND sources
+list(APPEND SOURCES
   ${dictionaryEntry}/dictionaryEntry.C
   ${dictionaryEntry}/dictionaryEntryIO.C
 )
 
 set(functionEntries ${dictionary}/functionEntries)
-list(APPEND sources
+list(APPEND SOURCES
   ${functionEntries}/functionEntry/functionEntry.C
   ${functionEntries}/includeEntry/includeEntry.C
   ${functionEntries}/includeIfPresentEntry/includeIfPresentEntry.C
@@ -233,14 +233,14 @@ list(APPEND sources
 )
 
 set(IOdictionary db/IOobjects/IOdictionary)
-list(APPEND sources
+list(APPEND SOURCES
   ${IOdictionary}/IOdictionary.C
   ${IOdictionary}/IOdictionaryIO.C
   db/IOobjects/IOMap/IOMapName.C
 )
 
 set(IOobject db/IOobject)
-list(APPEND sources
+list(APPEND SOURCES
   ${IOobject}/IOobject.C
   ${IOobject}/IOobjectIO.C
   ${IOobject}/IOobjectReadHeader.C
@@ -248,7 +248,7 @@ list(APPEND sources
 )
 
 set(regIOobject db/regIOobject)
-list(APPEND sources
+list(APPEND SOURCES
   ${regIOobject}/regIOobject.C
   ${regIOobject}/regIOobjectRead.C
   ${regIOobject}/regIOobjectWrite.C
@@ -263,7 +263,7 @@ list(APPEND sources
 )
 
 set(Time db/Time)
-list(APPEND sources
+list(APPEND SOURCES
   ${Time}/TimePaths.C
   ${Time}/TimeState.C
   ${Time}/foamTime.C
@@ -290,21 +290,21 @@ list(APPEND sources
 )
 
 set(scalarMatrices matrices/scalarMatrices)
-list(APPEND sources
+list(APPEND SOURCES
   ${scalarMatrices}/scalarMatrices.C
   ${scalarMatrices}/scalarSquareMatrix.C
   ${scalarMatrices}/SVD/SVD.C
 )
 
 set(LUscalarMatrix matrices/LUscalarMatrix)
-list(APPEND sources
+list(APPEND SOURCES
   ${LUscalarMatrix}/LUscalarMatrix.C
   ${LUscalarMatrix}/procLduMatrix.C
   ${LUscalarMatrix}/procLduInterface.C
 )
 
 set(lduMatrix matrices/lduMatrix)
-list(APPEND sources
+list(APPEND SOURCES
   ${lduMatrix}/lduMatrix/lduMatrix.C
   ${lduMatrix}/lduMatrix/lduMatrixOperations.C
   ${lduMatrix}/lduMatrix/lduMatrixATmul.C
@@ -333,13 +333,13 @@ list(APPEND sources
 )
 
 set(lduAddressing ${lduMatrix}/lduAddressing)
-list(APPEND sources
+list(APPEND SOURCES
   ${lduAddressing}/lduAddressing.C
   ${lduAddressing}/extendedLduAddressing/extendedLduAddressing.C
 )
 
 set(lduInterfaces ${lduAddressing}/lduInterfaces)
-list(APPEND sources
+list(APPEND SOURCES
   ${lduInterfaces}/lduInterface/lduInterface.C
   ${lduInterfaces}/processorLduInterface/processorLduInterface.C
   ${lduInterfaces}/cyclicLduInterface/cyclicLduInterface.C
@@ -350,7 +350,7 @@ list(APPEND sources
 )
 
 set(lduInterfaceFields ${lduAddressing}/lduInterfaceFields)
-list(APPEND sources
+list(APPEND SOURCES
   ${lduInterfaceFields}/lduInterfaceField/lduInterfaceField.C
   ${lduInterfaceFields}/processorLduInterfaceField/processorLduInterfaceField.C
   ${lduInterfaceFields}/cyclicLduInterfaceField/cyclicLduInterfaceField.C
@@ -361,7 +361,7 @@ list(APPEND sources
 )
 
 set(AMG ${lduMatrix}/solvers/AMG)
-list(APPEND sources
+list(APPEND SOURCES
   ${AMG}/GAMGSolver.C
   ${AMG}/GAMGSolverAgglomerateMatrix.C
   ${AMG}/GAMGSolverScalingFactor.C
@@ -369,7 +369,7 @@ list(APPEND sources
 )
 
 set(AMGInterfaces ${AMG}/interfaces)
-list(APPEND sources
+list(APPEND SOURCES
   ${AMGInterfaces}/AMGInterface/AMGInterface.C
   ${AMGInterfaces}/AMGInterface/newAMGInterface.C
   ${AMGInterfaces}/processorAMGInterface/processorAMGInterface.C
@@ -381,7 +381,7 @@ list(APPEND sources
 )
 
 set(AMGInterfaceFields ${AMG}/interfaceFields)
-list(APPEND sources
+list(APPEND SOURCES
   ${AMGInterfaceFields}/AMGInterfaceField/AMGInterfaceField.C
   ${AMGInterfaceFields}/AMGInterfaceField/newAMGInterfaceField.C
   ${AMGInterfaceFields}/processorAMGInterfaceField/processorAMGInterfaceField.C
@@ -395,20 +395,20 @@ list(APPEND sources
 set(AMGAgglomerations ${AMG}/AMGAgglomerations)
 
 set(GAMGAgglomeration ${AMGAgglomerations}/GAMGAgglomeration)
-list(APPEND sources
+list(APPEND SOURCES
   ${GAMGAgglomeration}/GAMGAgglomeration.C
   ${GAMGAgglomeration}/GAMGAgglomerateLduAddressing.C
 )
 
 set(pairGAMGAgglomeration ${AMGAgglomerations}/pairGAMGAgglomeration)
-list(APPEND sources
+list(APPEND SOURCES
   ${pairGAMGAgglomeration}/pairGAMGAgglomeration.C
   ${pairGAMGAgglomeration}/pairGAMGAgglomerate.C
   ${pairGAMGAgglomeration}/pairGAMGAgglomerationCombineLevels.C
 )
 
 set(algebraicPairGAMGAgglomeration ${AMGAgglomerations}/algebraicPairGAMGAgglomeration)
-list(APPEND sources
+list(APPEND SOURCES
   ${algebraicPairGAMGAgglomeration}/algebraicPairGAMGAgglomeration.C
   meshes/lduMesh/lduMesh.C
   meshes/MeshObject/meshObjectBase.C
@@ -416,7 +416,7 @@ list(APPEND sources
 
 set(primitiveShapes meshes/primitiveShapes)
 
-list(APPEND sources
+list(APPEND SOURCES
   ${primitiveShapes}/line/line.C
   ${primitiveShapes}/plane/plane.C
   ${primitiveShapes}/triangle/triangleFuncs.C
@@ -424,13 +424,13 @@ list(APPEND sources
 )
 
 set(meshShapes meshes/meshShapes)
-list(APPEND sources
+list(APPEND SOURCES
   ${meshShapes}/edge/edge.C
   ${meshShapes}/edge/edgeIOList.C
 )
 
 set(face ${meshShapes}/face)
-list(APPEND sources
+list(APPEND SOURCES
   ${face}/face.C
   ${face}/faceIntersection.C
   ${face}/faceContactSphere.C
@@ -439,30 +439,30 @@ list(APPEND sources
 )
 
 set(cell ${meshShapes}/cell)
-list(APPEND sources
+list(APPEND SOURCES
   ${cell}/cell.C
   ${cell}/oppositeCellFace.C
   ${cell}/cellIOList.C
 )
 
 set(tetCell ${meshShapes}/tetCell)
-list(APPEND sources
+list(APPEND SOURCES
   ${tetCell}/tetCell.C
 )
 
 set(cellModeller ${meshShapes}/cellModeller)
-list(APPEND sources
+list(APPEND SOURCES
   ${cellModeller}/cellModeller.C
 )
 
 set(cellModel ${meshShapes}/cellModel)
-list(APPEND sources
+list(APPEND SOURCES
   ${cellModel}/cellModel.C
   ${cellModel}/cellModelIO.C
 )
 
 set(cellShape ${meshShapes}/cellShape)
-list(APPEND sources
+list(APPEND SOURCES
   ${cellShape}/cellShape.C
   ${cellShape}/cellShapeEqual.C
   ${cellShape}/cellShapeIO.C
@@ -473,19 +473,19 @@ list(APPEND sources
 set(polyMesh meshes/polyMesh)
 
 set(polyPatches ${polyMesh}/polyPatches)
-list(APPEND sources
+list(APPEND SOURCES
   ${polyPatches}/polyPatch/polyPatch.C
   ${polyPatches}/polyPatch/newPolyPatch.C
 )
 
 set(basicPolyPatches ${polyPatches}/basic)
-list(APPEND sources
+list(APPEND SOURCES
   ${basicPolyPatches}/coupled/coupledPolyPatch.C
   ${basicPolyPatches}/generic/genericPolyPatch.C
 )
 
 set(constraintPolyPatches ${polyPatches}/constraint)
-list(APPEND sources
+list(APPEND SOURCES
   ${constraintPolyPatches}/empty/emptyPolyPatch.C
   ${constraintPolyPatches}/symmetry/symmetryPolyPatch.C
   ${constraintPolyPatches}/wedge/wedgePolyPatch.C
@@ -500,20 +500,20 @@ list(APPEND sources
 )
 
 set(derivedPolyPatches ${polyPatches}/derived)
-list(APPEND sources
+list(APPEND SOURCES
   ${derivedPolyPatches}/wall/wallPolyPatch.C
   ${derivedPolyPatches}/cohesive/cohesivePolyPatch.C
 )
 
 set(polyBoundaryMesh ${polyMesh}/polyBoundaryMesh)
-list(APPEND sources
+list(APPEND SOURCES
   ${polyBoundaryMesh}/polyBoundaryMesh.C
   ${polyBoundaryMesh}/polyBoundaryMeshEntries.C
   meshes/ProcessorTopology/commSchedule.C
 )
 
 set(globalMeshData ${polyMesh}/globalMeshData)
-list(APPEND sources
+list(APPEND SOURCES
   ${globalMeshData}/globalMeshData.C
   ${globalMeshData}/globalPoints.C
   ${globalMeshData}/globalIndex.C
@@ -523,19 +523,19 @@ list(APPEND sources
 set(zones ${polyMesh}/zones)
 
 set(cellZone ${zones}/cellZone)
-list(APPEND sources
+list(APPEND SOURCES
   ${cellZone}/cellZone.C
   ${cellZone}/newCellZone.C
 )
 
 set(faceZone ${zones}/faceZone)
-list(APPEND sources
+list(APPEND SOURCES
   ${faceZone}/faceZone.C
   ${faceZone}/newFaceZone.C
 )
 
 set(pointZone ${polyMesh}/zones/pointZone)
-list(APPEND sources
+list(APPEND SOURCES
   ${pointZone}/pointZone.C
   ${pointZone}/newPointZone.C
   ${polyMesh}/polyMesh.C
@@ -547,7 +547,7 @@ list(APPEND sources
 )
 
 set(primitiveMesh meshes/primitiveMesh)
-list(APPEND sources
+list(APPEND SOURCES
   ${primitiveMesh}/primitiveMesh.C
   ${primitiveMesh}/primitiveMeshCellCells.C
   ${primitiveMesh}/primitiveMeshCellCentresAndVols.C
@@ -568,7 +568,7 @@ list(APPEND sources
 )
 
 set(primitiveMeshCheck ${primitiveMesh}/primitiveMeshCheck)
-list(APPEND sources
+list(APPEND SOURCES
   ${primitiveMeshCheck}/primitiveMeshCheck.C
   ${primitiveMeshCheck}/primitiveMeshCheckMotion.C
   ${primitiveMeshCheck}/primitiveMeshCheckPointNearness.C
@@ -576,13 +576,13 @@ list(APPEND sources
 )
 
 set(primitivePatch ${primitiveMesh}/primitivePatch)
-list(APPEND sources
+list(APPEND SOURCES
   ${primitivePatch}/patchZones.C
   ${primitivePatch}/walkPatch.C
 )
 
 set(cellMatcher ${meshShapes}/cellMatcher)
-list(APPEND sources
+list(APPEND SOURCES
   ${cellMatcher}/cellMatcher.C
   ${cellMatcher}/hexMatcher.C
   ${cellMatcher}/wedgeMatcher.C
@@ -594,7 +594,7 @@ list(APPEND sources
 )
 
 set(mapPolyMesh ${polyMesh}/mapPolyMesh)
-list(APPEND sources
+list(APPEND SOURCES
   ${mapPolyMesh}/mapPolyMesh.C
   ${mapPolyMesh}/pointMapper/pointMapper.C
   ${mapPolyMesh}/faceMapper/faceMapper.C
@@ -605,35 +605,35 @@ list(APPEND sources
 )
 
 set(PrimitivePatch ${primitiveMesh}/PrimitivePatchTemplate)
-list(APPEND sources
+list(APPEND SOURCES
   ${PrimitivePatch}/PrimitivePatchName.C
 )
 
 set(pointMesh meshes/pointMesh)
-list(APPEND sources
+list(APPEND SOURCES
   ${pointMesh}/pointMesh.C
 )
 
 set(pointMeshMapper ${pointMesh}/pointMeshMapper)
-list(APPEND sources
+list(APPEND SOURCES
   ${pointMeshMapper}/pointPatchMapper.C
 )
 
 set(pointPatches ${pointMesh}/pointPatches)
-list(APPEND sources
+list(APPEND SOURCES
   ${pointPatches}/pointPatch/pointPatch.C
   ${pointPatches}/facePointPatch/facePointPatch.C
   ${pointPatches}/facePointPatch/newFacePointPatch.C
 )
 
 set(basicPointPatches ${pointPatches}/basic)
-list(APPEND sources
+list(APPEND SOURCES
   ${basicPointPatches}/coupled/coupledPointPatch.C
   ${basicPointPatches}/generic/genericPointPatch.C
 )
 
 set(constraintPointPatches ${pointPatches}/constraint)
-list(APPEND sources
+list(APPEND SOURCES
   ${constraintPointPatches}/empty/emptyPointPatch.C
   ${constraintPointPatches}/symmetry/symmetryPointPatch.C
   ${constraintPointPatches}/wedge/wedgePointPatch.C
@@ -647,7 +647,7 @@ list(APPEND sources
 )
 
 set(derivedPointPatches ${pointPatches}/derived)
-list(APPEND sources
+list(APPEND SOURCES
   ${derivedPointPatches}/coupled/coupledFacePointPatch.C
   ${derivedPointPatches}/global/globalPointPatch.C
   ${derivedPointPatches}/wall/wallPointPatch.C
@@ -655,13 +655,13 @@ list(APPEND sources
 )
 
 set(pointBoundaryMesh ${pointMesh}/pointBoundaryMesh)
-list(APPEND sources
+list(APPEND SOURCES
   ${pointBoundaryMesh}/pointBoundaryMesh.C
   meshes/boundBox/boundBox.C
 )
 
 set(meshTools meshes/meshTools)
-list(APPEND sources
+list(APPEND SOURCES
   ${meshTools}/meshTools.C
   ${meshTools}/matchPoints.C
   ${meshTools}/mergePoints.C
@@ -670,7 +670,7 @@ list(APPEND sources
 )
 
 set(Fields fields/Fields)
-list(APPEND sources
+list(APPEND SOURCES
   ${Fields}/labelField/labelField.C
   ${Fields}/scalarField/scalarField.C
   ${Fields}/vectorField/vectorField.C
@@ -698,12 +698,12 @@ list(APPEND sources
 )
 
 set(pointPatchFields fields/pointPatchFields)
-list(APPEND sources
+list(APPEND SOURCES
   ${pointPatchFields}/pointPatchField/pointPatchFields.C
 )
 
 set(basicPointPatchFields ${pointPatchFields}/basic)
-list(APPEND sources
+list(APPEND SOURCES
   ${basicPointPatchFields}/calculated/calculatedPointPatchFields.C
   ${basicPointPatchFields}/generic/genericPointPatchFields.C
   ${basicPointPatchFields}/coupled/coupledPointPatchFields.C
@@ -714,7 +714,7 @@ list(APPEND sources
 )
 
 set(constraintPointPatchFields ${pointPatchFields}/constraint)
-list(APPEND sources
+list(APPEND SOURCES
   ${constraintPointPatchFields}/empty/emptyPointPatchFields.C
   ${constraintPointPatchFields}/symmetry/symmetryPointPatchFields.C
   ${constraintPointPatchFields}/wedge/wedgePointPatchFields.C
@@ -723,7 +723,7 @@ list(APPEND sources
 )
 
 set(derivedPointPatchFields ${pointPatchFields}/derived)
-list(APPEND sources
+list(APPEND SOURCES
   ${derivedPointPatchFields}/slip/slipPointPatchFields.C
   ${derivedPointPatchFields}/global/globalPointPatchFields.C
   ${derivedPointPatchFields}/uniformFixedValue/uniformFixedValuePointPatchFields.C
@@ -736,7 +736,7 @@ list(APPEND sources
 
 set(interpolations interpolations)
 set(interpolation ${interpolations}/interpolation)
-list(APPEND sources
+list(APPEND SOURCES
   ${interpolations}/splineInterpolateXY/splineInterpolateXY.C
   ${interpolations}/patchToPatchInterpolation/PatchToPatchInterpolationName.C
   ${interpolations}/GGIInterpolation/GGIInterpolationName.C
@@ -756,7 +756,7 @@ list(APPEND sources
 )
 
 set(octree algorithms/octree/octree)
-list(APPEND sources
+list(APPEND SOURCES
   ${octree}/octreeName.C
   ${octree}/octreeDataPoint.C
   ${octree}/octreeDataPointTreeLeaf.C
@@ -771,7 +771,7 @@ list(APPEND sources
 )
 
 set(indexedOctree algorithms/octree/indexedOctree)
-list(APPEND sources
+list(APPEND SOURCES
   ${indexedOctree}/indexedOctreeName.C
   ${indexedOctree}/treeDataCell.C
   ${indexedOctree}/treeDataEdge.C
@@ -782,7 +782,7 @@ list(APPEND sources
 )
 
 set(writers graph/writers)
-list(APPEND sources
+list(APPEND SOURCES
   ${writers}/rawGraph/rawGraph.C
   ${writers}/gnuplotGraph/gnuplotGraph.C
   ${writers}/xmgrGraph/xmgrGraph.C
@@ -796,7 +796,7 @@ list(APPEND sources
 )
 
 set(BlockCoeffNorm primitives/BlockCoeff/BlockCoeffNorm)
-list(APPEND sources
+list(APPEND SOURCES
   ${BlockCoeffNorm}/BlockCoeffNorm/blockCoeffNorms.C
   ${BlockCoeffNorm}/BlockCoeffTwoNorm/blockCoeffTwoNorms.C
   ${BlockCoeffNorm}/BlockCoeffMaxNorm/blockCoeffMaxNorms.C
@@ -811,7 +811,7 @@ list(APPEND sources
 )
 
 set(BlockLduMatrix matrices/blockLduMatrix/BlockLduMatrix)
-list(APPEND sources
+list(APPEND SOURCES
   ${BlockLduMatrix}/blockLduMatrixName.C
   ${BlockLduMatrix}/scalarBlockLduMatrix.C
   ${BlockLduMatrix}/sphericalTensorBlockLduMatrix.C
@@ -826,7 +826,7 @@ list(APPEND sources
 )
 
 set(BlockLduInterfaceFields ${BlockLduMatrix}/BlockLduInterfaceFields)
-list(APPEND sources
+list(APPEND SOURCES
   ${BlockLduInterfaceFields}/BlockLduInterfaceField/BlockLduInterfaceFields.C
   ${BlockLduInterfaceFields}/BlockLduInterfaceField/blockVectorNLduInterfaceFields.C
   ${BlockLduInterfaceFields}/GGIBlockLduInterfaceField/GGIBlockLduInterfaceFields.C
@@ -836,13 +836,13 @@ list(APPEND sources
 )
 
 set(BlockAMG matrices/blockLduMatrix/BlockAMG)
-list(APPEND sources
+list(APPEND SOURCES
   ${BlockAMG}/blockAMGCycles.C
   ${BlockAMG}/blockAMGLevels.C
 )
 
 set(BlockAMGInterfaceFields ${BlockAMG}/BlockAMGInterfaceFields)
-list(APPEND sources
+list(APPEND SOURCES
   ${BlockAMGInterfaceFields}/BlockAMGInterfaceField/blockAMGInterfaceFields.C
   ${BlockAMGInterfaceFields}/BlockAMGInterfaceField/blockVectorNAMGInterfaceFields.C
   ${BlockAMGInterfaceFields}/ProcessorBlockAMGInterfaceField/ProcessorBlockAMGInterfaceFields.C
@@ -850,13 +850,13 @@ list(APPEND sources
 )
 
 set(BlockMatrixCoarsening ${BlockAMG}/BlockMatrixCoarsening)
-list(APPEND sources
+list(APPEND SOURCES
   ${BlockMatrixCoarsening}/BlockMatrixCoarsening/blockMatrixCoarsenings.C
   ${BlockMatrixCoarsening}/BlockMatrixAgglomeration/blockMatrixAgglomerations.C
 )
 
 set(BlockLduPrecons matrices/blockLduMatrix/BlockLduPrecons)
-list(APPEND sources
+list(APPEND SOURCES
   ${BlockLduPrecons}/BlockLduPrecon/blockLduPrecons.C
   ${BlockLduPrecons}/BlockNoPrecon/blockNoPrecons.C
   ${BlockLduPrecons}/BlockDiagonalPrecon/scalarBlockDiagonalPrecon.C
@@ -875,7 +875,7 @@ list(APPEND sources
 )
 
 set(BlockLduSmoothers matrices/blockLduMatrix/BlockLduSmoothers)
-list(APPEND sources
+list(APPEND SOURCES
   ${BlockLduSmoothers}/BlockLduSmoother/blockLduSmoothers.C
   ${BlockLduSmoothers}/BlockGaussSeidelSmoother/blockGaussSeidelSmoothers.C
   ${BlockLduSmoothers}/BlockILUSmoother/blockILUSmoothers.C
@@ -883,7 +883,7 @@ list(APPEND sources
 )
 
 set(BlockLduSolvers matrices/blockLduMatrix/BlockLduSolvers)
-list(APPEND sources
+list(APPEND SOURCES
   ${BlockLduSolvers}/blockVectorNSolvers.C
   ${BlockLduSolvers}/BlockLduSolver/blockLduSolvers.C
   ${BlockLduSolvers}/BlockDiagonal/blockDiagonalSolvers.C
@@ -895,9 +895,7 @@ list(APPEND sources
   ${BlockLduSolvers}/Segregated/segregatedSolvers.C
 )
 
-add_foam_library(foam SHARED ${sources})
+add_foam_library(foam SHARED ${SOURCES})
 
-# This is a prototype! Replace second argument with a list of the highest
-# dependencies only. Inherited dependencies will be treated automatically.
 target_link_libraries(foam OSspecific mpi ZLIB::ZLIB)
 add_dependencies(foam getGitVersion)

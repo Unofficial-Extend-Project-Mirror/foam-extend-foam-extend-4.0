@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   FLMAToSurface.C
 )
 
@@ -42,5 +42,5 @@ endif()
 
 add_foam_executable(FLMAToSurface
   DEPENDS cfMesh
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

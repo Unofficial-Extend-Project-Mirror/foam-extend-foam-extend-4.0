@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   vorticity.C
 )
 
@@ -42,5 +42,5 @@ endif()
 
 add_foam_executable(vorticity
   DEPENDS postCalc
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

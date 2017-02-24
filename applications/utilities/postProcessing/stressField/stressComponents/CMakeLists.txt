@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   stressComponents.C
 )
 
@@ -42,5 +42,5 @@ endif()
 
 add_foam_executable(stressComponents
   DEPENDS incompressibleRASModels incompressibleTransportModels
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

@@ -34,7 +34,7 @@ set(thermophysicalFunction thermophysicalFunction)
 set(NSRDSfunctions NSRDSfunctions)
 set(APIfunctions APIfunctions)
 
-list(APPEND sources
+list(APPEND SOURCES
   ${thermophysicalFunction}/thermophysicalFunction.C
   ${NSRDSfunctions}/NSRDSfunc0/NSRDSfunc0.C
   ${NSRDSfunctions}/NSRDSfunc1/NSRDSfunc1.C
@@ -49,7 +49,7 @@ list(APPEND sources
 )
 
 set(freesteam freesteam-2.1)
-list(APPEND sources
+list(APPEND SOURCES
   ${freesteam}/common.c
   ${freesteam}/steam.c
   ${freesteam}/b23.c
@@ -66,8 +66,6 @@ list(APPEND sources
   ${freesteam}/zeroin.c
 )
 
-add_foam_library(thermophysicalFunctions SHARED ${sources})
+add_foam_library(thermophysicalFunctions SHARED ${SOURCES})
 
-# This is a prototype! Replace second argument with a list of the highest
-# dependencies only. Inherited dependencies will be treated automatically.
 target_link_libraries(thermophysicalFunctions foam)

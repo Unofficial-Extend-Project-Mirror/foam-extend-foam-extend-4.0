@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   cartesian2DMesh.C
 )
 
@@ -42,5 +42,5 @@ endif()
 
 add_foam_executable(cartesian2DMesh
   DEPENDS cfMesh
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

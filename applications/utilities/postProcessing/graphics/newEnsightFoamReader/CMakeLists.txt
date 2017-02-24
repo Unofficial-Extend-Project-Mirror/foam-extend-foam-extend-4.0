@@ -30,12 +30,10 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   libuserd.C
 )
 
-add_foam_library(userd-newFoam SHARED ${sources})
+add_foam_library(userd-newFoam SHARED ${SOURCES})
 
-# This is a prototype! Replace second argument with a list of the highest
-# dependencies only. Inherited dependencies will be treated automatically.
 target_link_libraries(userd-newFoam PUBLIC finiteVolume finiteArea lagrangianBasic)

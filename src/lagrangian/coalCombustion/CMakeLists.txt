@@ -31,13 +31,11 @@
 # --------------------------------------------------------------------------
 
 #  Coal parcel and sub-models 
-list(APPEND sources
+list(APPEND SOURCES
   CoalParcel/defineCoalParcel.C
   CoalParcel/makeCoalParcelSubmodels.C
 )
 
-add_foam_library(coalCombustion SHARED ${sources})
+add_foam_library(coalCombustion SHARED ${SOURCES})
 
-# This is a prototype! Replace second argument with a list of the highest
-# dependencies only. Inherited dependencies will be treated automatically.
 target_link_libraries(coalCombustion PUBLIC lagrangianBasic lagrangianIntermediate basicThermophysicalModels)

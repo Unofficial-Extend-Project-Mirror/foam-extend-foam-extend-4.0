@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   tractionDisplacementCorrection/tractionDisplacementCorrectionFvPatchVectorField.C
   solidEquilibriumDisplacementFoam.C
 )
@@ -43,5 +43,5 @@ endif()
 
 add_foam_executable(solidEquiriumDisplacementFoam
 #   DEPENDS finiteVolume
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

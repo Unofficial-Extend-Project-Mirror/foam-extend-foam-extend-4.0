@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   equationSource/equationSources.C
   equation/equation.C
   equation/equationIO.C
@@ -42,8 +42,6 @@ list(APPEND sources
   IOEquationReader/IOEquationReaderIO.C
 )
 
-add_foam_library(equationReader SHARED ${sources})
+add_foam_library(equationReader SHARED ${SOURCES})
 
-# This is a prototype! Replace second argument with a list of the highest
-# dependencies only. Inherited dependencies will be treated automatically.
 target_link_libraries(equationReader PUBLIC foam)

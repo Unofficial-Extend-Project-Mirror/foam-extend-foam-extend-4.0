@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   Pe.C
 )
 
@@ -42,5 +42,5 @@ endif()
 
 add_foam_executable(Pe
   DEPENDS postCalc incompressibleRASModels incompressibleLESModels compressibleRASModels compressibleLESModels
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

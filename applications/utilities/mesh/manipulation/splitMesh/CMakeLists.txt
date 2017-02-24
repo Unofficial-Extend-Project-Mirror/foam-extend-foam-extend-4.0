@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   regionSide.C
   splitMesh.C
 )
@@ -43,5 +43,5 @@ endif()
 
 add_foam_executable(splitMesh
   DEPENDS dynamicMesh meshTools
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

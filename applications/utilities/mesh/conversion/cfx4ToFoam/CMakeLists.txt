@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   hexBlock.C
   cfx4ToFoam.C
 )
@@ -43,5 +43,5 @@ endif()
 
 add_foam_executable(cfx4ToFoam
   DEPENDS foam
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

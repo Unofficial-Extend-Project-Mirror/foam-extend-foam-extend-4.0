@@ -32,7 +32,7 @@
 
 FLEX_TARGET(fluent3DMeshToFoam fluent3DMeshToFoam.L
   ${CMAKE_CURRENT_BINARY_DIR}/fluent3DMeshToFoam.C COMPILE_FLAGS "-+")
-list(APPEND sources ${FLEX_fluent3DMeshToFoam_OUTPUTS})
+list(APPEND SOURCES ${FLEX_fluent3DMeshToFoam_OUTPUTS})
 
 # Set minimal environment for external compilation
 if(NOT FOAM_FOUND)
@@ -42,5 +42,5 @@ endif()
 
 add_foam_executable(fluent3DMeshToFoam
   DEPENDS dynamicMesh
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

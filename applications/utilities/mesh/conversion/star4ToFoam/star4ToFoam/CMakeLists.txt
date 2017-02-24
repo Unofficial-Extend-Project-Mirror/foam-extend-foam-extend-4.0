@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   meshReader.C
   meshReaderAux.C
   starMeshReader.C
@@ -48,5 +48,5 @@ endif()
 
 add_foam_executable(star4ToFoam
   DEPENDS finiteVolume meshTools
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   makeFaMesh.C
 )
 
@@ -42,5 +42,5 @@ endif()
 
 add_foam_executable(makeFaMesh
   DEPENDS finiteVolume finiteArea
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

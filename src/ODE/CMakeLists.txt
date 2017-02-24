@@ -31,7 +31,7 @@
 # --------------------------------------------------------------------------
 
 set(ODESolvers ODESolvers)
-list(APPEND sources
+list(APPEND SOURCES
   ${ODESolvers}/ODESolver/ODESolver.C
   ${ODESolvers}/ODESolver/newODESolver.C
   ${ODESolvers}/Euler/Euler.C
@@ -43,19 +43,17 @@ list(APPEND sources
 )
 
 set(translationODE translationODE)
-list(APPEND sources
+list(APPEND SOURCES
   ${translationODE}/translationODE.C
 )
 
 set(sixDOF sixDOF)
-list(APPEND sources
+list(APPEND SOURCES
   ${sixDOF}/finiteRotation/finiteRotation.C
   ${sixDOF}/sixDOFqODE/sixDOFqODE.C
   ${sixDOF}/sixDOFbodies/sixDOFbodies.C
 )
 
-add_foam_library(ODE SHARED ${sources})
+add_foam_library(ODE SHARED ${SOURCES})
 
-# This is a prototype! Replace second argument with a list of the highest
-# dependencies only. Inherited dependencies will be treated automatically.
 target_link_libraries(ODE PUBLIC meshTools)

@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   pPrime2.C
 )
 
@@ -42,5 +42,5 @@ endif()
 
 add_foam_executable(pPrime2
   DEPENDS finiteVolume
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

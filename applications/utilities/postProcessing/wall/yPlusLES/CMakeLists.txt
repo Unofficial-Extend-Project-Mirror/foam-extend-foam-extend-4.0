@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   yPlusLES.C
 )
 
@@ -42,5 +42,5 @@ endif()
 
 add_foam_executable(yPlusLES
   DEPENDS incompressibleLESModels
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

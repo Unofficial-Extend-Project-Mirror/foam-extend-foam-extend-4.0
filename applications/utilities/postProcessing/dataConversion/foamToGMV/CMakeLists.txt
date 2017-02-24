@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   foamToGMV.C
   itoa.C
 )
@@ -43,5 +43,5 @@ endif()
 
 add_foam_executable(foamToGMV
   DEPENDS finiteVolume
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

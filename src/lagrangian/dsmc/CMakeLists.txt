@@ -31,25 +31,23 @@
 # --------------------------------------------------------------------------
 
 #  Parcels 
-list(APPEND sources
+list(APPEND SOURCES
   parcels/derived/dsmcParcel/dsmcParcel.C
 )
 
 #  Cloud base classes 
-list(APPEND sources
+list(APPEND SOURCES
   clouds/baseClasses/DsmcBaseCloud/DsmcBaseCloud.C
 )
 
 #  submodels 
-list(APPEND sources
+list(APPEND SOURCES
   parcels/derived/dsmcParcel/defineDsmcParcel.C
   parcels/derived/dsmcParcel/makeDsmcParcelBinaryCollisionModels.C
   parcels/derived/dsmcParcel/makeDsmcParcelWallInteractionModels.C
   parcels/derived/dsmcParcel/makeDsmcParcelInflowBoundaryModels.C
 )
 
-add_foam_library(dsmc SHARED ${sources})
+add_foam_library(dsmc SHARED ${SOURCES})
 
-# This is a prototype! Replace second argument with a list of the highest
-# dependencies only. Inherited dependencies will be treated automatically.
 target_link_libraries(dsmc finiteVolume lagrangianBasic)

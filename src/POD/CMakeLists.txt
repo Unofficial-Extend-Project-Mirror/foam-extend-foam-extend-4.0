@@ -30,15 +30,13 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   PODEigenBase/PODEigenBase.C
   PODOrthoNormalBase/scalarPODOrthoNormalBase.C
   PODODE/PODODE.C
   scalarTransportPOD/scalarTransportPOD.C
 )
 
-add_foam_library(POD SHARED ${sources})
+add_foam_library(POD SHARED ${SOURCES})
 
-# This is a prototype! Replace second argument with a list of the highest
-# dependencies only. Inherited dependencies will be treated automatically.
 target_link_libraries(POD PUBLIC finiteVolume ODE)

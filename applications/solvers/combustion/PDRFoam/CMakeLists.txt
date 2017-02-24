@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   XiModels/XiModel/XiModel.C
   XiModels/XiModel/newXiModel.C
   XiModels/fixed/fixed.C
@@ -64,5 +64,5 @@ endif()
 
 add_foam_executable(PDRFoam
 #   DEPENDS finiteVolume
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

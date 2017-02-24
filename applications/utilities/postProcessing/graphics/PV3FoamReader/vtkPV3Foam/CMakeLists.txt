@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   vtkPV3Foam.C
   vtkPV3FoamFields.C
   vtkPV3FoamMesh.C
@@ -43,8 +43,6 @@ list(APPEND sources
   vtkPV3FoamUtilities.C
 )
 
-add_foam_library(vtkPV3Foam SHARED ${sources})
+add_foam_library(vtkPV3Foam SHARED ${SOURCES})
 
-# This is a prototype! Replace second argument with a list of the highest
-# dependencies only. Inherited dependencies will be treated automatically.
 target_link_libraries(vtkPV3Foam PUBLIC foam)

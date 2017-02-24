@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   writeMeshObj.C
 )
 
@@ -42,5 +42,5 @@ endif()
 
 add_foam_executable(writeMeshObj
   DEPENDS foam meshTools
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

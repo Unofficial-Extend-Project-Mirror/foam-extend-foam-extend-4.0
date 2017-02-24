@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   dsmcInitialise.C
 )
 
@@ -42,5 +42,5 @@ endif()
 
 add_foam_executable(dsmcInitialise
   DEPENDS dsmc
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

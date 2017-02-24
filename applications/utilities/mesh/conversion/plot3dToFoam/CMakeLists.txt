@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   hexBlock.C
   plot3dToFoam.C
 )
@@ -43,5 +43,5 @@ endif()
 
 add_foam_executable(plot3dToFoam
   DEPENDS foam
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

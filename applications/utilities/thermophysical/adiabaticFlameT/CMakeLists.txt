@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   adiabaticFlameT.C
 )
 
@@ -42,5 +42,5 @@ endif()
 
 add_foam_executable(adiabaticFlameT
   DEPENDS specie
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

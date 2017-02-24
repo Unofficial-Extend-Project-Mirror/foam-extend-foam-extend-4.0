@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   vanDriestDelta/vanDriestDelta.C
   LESModel/LESModel.C
   GenEddyVisc/GenEddyVisc.C
@@ -55,25 +55,23 @@ list(APPEND sources
 
 # Smagorinsky2/Smagorinsky2.C
 
-list(APPEND sources
+list(APPEND SOURCES
   kOmegaSSTSAS/kOmegaSSTSAS.C
 )
 
 #  Wall functions 
 set(wallFunctions derivedFvPatchFields/wallFunctions)
 
-list(APPEND sources
+list(APPEND SOURCES
   derivedFvPatchFields/decayingTurbulence/decayingVorton.C
   derivedFvPatchFields/decayingTurbulence/decayingTurbulenceFvPatchVectorField.C
 )
 
 set(nuSgsWallFunctions ${wallFunctions}/nuSgsWallFunctions)
-list(APPEND sources
+list(APPEND SOURCES
   ${nuSgsWallFunctions}/nuSgsWallFunction/nuSgsWallFunctionFvPatchScalarField.C
 )
 
-add_foam_library(incompressibleLESModels SHARED ${sources})
+add_foam_library(incompressibleLESModels SHARED ${SOURCES})
 
-# This is a prototype! Replace second argument with a list of the highest
-# dependencies only. Inherited dependencies will be treated automatically.
 target_link_libraries(incompressibleLESModels PUBLIC incompressibleTurbulenceModel LESdeltas LESfilters)

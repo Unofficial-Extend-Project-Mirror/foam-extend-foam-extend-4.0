@@ -30,13 +30,11 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   movingImmersedBoundary/movingImmersedBoundary.C
   immersedBoundarySolidBodyMotionFvMesh/immersedBoundarySolidBodyMotionFvMesh.C
 )
 
-add_foam_library(immersedBoundaryDynamicFvMesh SHARED ${sources})
+add_foam_library(immersedBoundaryDynamicFvMesh SHARED ${SOURCES})
 
-# This is a prototype! Replace second argument with a list of the highest
-# dependencies only. Inherited dependencies will be treated automatically.
 target_link_libraries(immersedBoundaryDynamicFvMesh PUBLIC immersedBoundary dynamicFvMesh solidBodyMotion)

@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   foamToVTK.C
   internalWriter.C
   lagrangianWriter.C
@@ -53,5 +53,5 @@ endif()
 
 add_foam_executable(foamToVTK
   DEPENDS finiteVolume finiteArea
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   fluentFvMesh.C
   foamMeshToFluent.C
 )
@@ -43,5 +43,5 @@ endif()
 
 add_foam_executable(foamMeshToFluent
   DEPENDS finiteVolume
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

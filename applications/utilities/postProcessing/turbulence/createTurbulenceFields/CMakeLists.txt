@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   createTurbulenceFields.C
 )
 
@@ -42,5 +42,5 @@ endif()
 
 add_foam_executable(createTurbulenceFields
   DEPENDS incompressibleRASModels
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

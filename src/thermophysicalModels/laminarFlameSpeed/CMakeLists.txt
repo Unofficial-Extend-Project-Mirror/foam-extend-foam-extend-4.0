@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   laminarFlameSpeed/laminarFlameSpeed.C
   laminarFlameSpeed/newLaminarFlameSpeed.C
   constant/constant.C
@@ -38,8 +38,6 @@ list(APPEND sources
   GuldersEGR/GuldersEGR.C
 )
 
-add_foam_library(laminarFlameSpeedModels SHARED ${sources})
+add_foam_library(laminarFlameSpeedModels SHARED ${SOURCES})
 
-# This is a prototype! Replace second argument with a list of the highest
-# dependencies only. Inherited dependencies will be treated automatically.
 target_link_libraries(laminarFlameSpeedModels PUBLIC reactionThermophysicalModels)

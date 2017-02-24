@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   pisoFoam.C
 )
 
@@ -42,5 +42,5 @@ endif()
 
 add_foam_executable(pisoFoam
   DEPENDS incompressibleRASModels incompressibleLESModels
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

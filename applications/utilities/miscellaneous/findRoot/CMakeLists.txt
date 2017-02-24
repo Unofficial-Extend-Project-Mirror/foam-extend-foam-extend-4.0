@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   findRoot.C
 )
 
@@ -42,5 +42,5 @@ endif()
 
 add_foam_executable(findRoot
   DEPENDS finiteVolume ODE
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

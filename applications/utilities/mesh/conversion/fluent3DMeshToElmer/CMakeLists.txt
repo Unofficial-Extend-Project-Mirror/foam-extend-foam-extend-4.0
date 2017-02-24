@@ -32,7 +32,7 @@
 
 FLEX_TARGET(fluent3DMeshToElmer fluent3DMeshToElmer.L
   ${CMAKE_CURRENT_BINARY_DIR}/fluent3DMeshToElmer.C COMPILE_FLAGS "-+")
-list(APPEND sources ${FLEX_fluent3DMeshToElmer_OUTPUTS})
+list(APPEND SOURCES ${FLEX_fluent3DMeshToElmer_OUTPUTS})
 
 # Set minimal environment for external compilation
 if(NOT FOAM_FOUND)
@@ -42,5 +42,5 @@ endif()
 
 add_foam_executable(fluent3DMeshToElmer
   DEPENDS dynamicMesh conversion
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

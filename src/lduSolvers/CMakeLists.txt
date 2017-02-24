@@ -30,13 +30,13 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   crMatrix/crAddressing.C
   crMatrix/crMatrix.C
 )
 
 set(lduPrecon lduPrecon)
-list(APPEND sources
+list(APPEND SOURCES
   ${lduPrecon}/CholeskyPrecon/CholeskyPrecon.C
   ${lduPrecon}/ILU0/ILU0.C
   ${lduPrecon}/ILUC0/ILUC0.C
@@ -46,13 +46,13 @@ list(APPEND sources
 )
 
 set(lduSmoother lduSmoother)
-list(APPEND sources
+list(APPEND SOURCES
   ${lduSmoother}/symGaussSeidelSmoother/symGaussSeidelSmoother.C
   ${lduSmoother}/iluSmoother/iluSmoother.C
 )
 
 set(lduSolver lduSolver)
-list(APPEND sources
+list(APPEND SOURCES
   ${lduSolver}/cgSolver/cgSolver.C
   ${lduSolver}/bicgSolver/bicgSolver.C
   ${lduSolver}/bicgStabSolver/bicgStabSolver.C
@@ -65,20 +65,18 @@ list(APPEND sources
 )
 
 set(amg amg)
-list(APPEND sources
+list(APPEND SOURCES
   ${amg}/amgCycle.C
   ${amg}/fineAmgLevel.C
   ${amg}/coarseAmgLevel.C
 )
 
 set(amgPolicy ${amg}/amgPolicy)
-list(APPEND sources
+list(APPEND SOURCES
   ${amgPolicy}/amgPolicy.C
   ${amgPolicy}/pamgPolicy.C
 )
 
-add_foam_library(lduSolvers SHARED ${sources})
+add_foam_library(lduSolvers SHARED ${SOURCES})
 
-# This is a prototype! Replace second argument with a list of the highest
-# dependencies only. Inherited dependencies will be treated automatically.
 target_link_libraries(lduSolvers PUBLIC foam)

@@ -31,7 +31,7 @@
 # --------------------------------------------------------------------------
 
 set(arbitraryCrack arbitraryCrack)
-list(APPEND sources
+list(APPEND SOURCES
   ${arbitraryCrack}/faceCracker/faceCracker.C
   ${arbitraryCrack}/faceCracker/detachFaceCracker.C
   ${arbitraryCrack}/crackerFvMesh/crackerFvMesh.C
@@ -41,7 +41,7 @@ list(APPEND sources
 )
 
 set(boundaryConditions fvPatchFields)
-list(APPEND sources
+list(APPEND SOURCES
   ${boundaryConditions}/analyticalPlateHoleTraction/analyticalPlateHoleTractionFvPatchVectorField.C
   ${boundaryConditions}/fixedDisplacement/fixedDisplacementFvPatchVectorField.C
   ${boundaryConditions}/fixedDisplacementFixedRotation/fixedDisplacementFixedRotationFvPatchVectorField.C
@@ -60,7 +60,7 @@ list(APPEND sources
 )
 
 set(contactModels contactModels)
-list(APPEND sources
+list(APPEND SOURCES
   ${contactModels}/normalContactModels/normalContactModel/normalContactModel.C
   ${contactModels}/normalContactModels/normalContactModel/newNormalContactModel.C
   ${contactModels}/normalContactModels/iterativePenalty/iterativePenalty.C
@@ -78,7 +78,7 @@ list(APPEND sources
 )
 
 set(constitutiveModel constitutiveModel)
-list(APPEND sources
+list(APPEND SOURCES
   ${constitutiveModel}/constitutiveModel.C
   ${constitutiveModel}/plasticityStressReturnMethods/plasticityStressReturn/plasticityStressReturn.C
   ${constitutiveModel}/plasticityStressReturnMethods/plasticityStressReturn/newPlasticityStressReturn.C
@@ -97,7 +97,7 @@ list(APPEND sources
 )
 
 set(cohesiveLaws ${constitutiveModel}/cohesiveLaws)
-list(APPEND sources
+list(APPEND SOURCES
   ${cohesiveLaws}/cohesiveLaw/cohesiveLaw.C
   ${cohesiveLaws}/cohesiveLaw/newCohesiveLaw.C
   ${cohesiveLaws}/multiMaterialCohesiveLaw/multiMaterialCohesiveLaw.C
@@ -106,14 +106,14 @@ list(APPEND sources
 )
 
 set(finiteVolume finiteVolume)
-list(APPEND sources
+list(APPEND SOURCES
   ${finiteVolume}/gradSchemes/leastSquaresSolidInterfaceGrad/leastSquaresSolidInterfaceGrads.C
   ${finiteVolume}/gradSchemes/leastSquaresSolidInterfaceGrad/leastSquaresSolidInterfaceVectors.C
   nonLinearGeometry/nonLinearGeometry.C
 )
 
 set(rheologyLaws ${constitutiveModel}/rheologyLaws)
-list(APPEND sources
+list(APPEND SOURCES
   ${rheologyLaws}/rheologyLaw/rheologyLaw.C
   ${rheologyLaws}/rheologyLaw/newRheologyLaw.C
   ${rheologyLaws}/linearElastic/linearElastic.C
@@ -125,15 +125,13 @@ list(APPEND sources
   thermalModel/thermalModel.C
 )
 set(thermalLaws thermalModel/thermalLaws)
-list(APPEND sources
+list(APPEND SOURCES
   ${thermalLaws}/thermalLaw/thermalLaw.C
   ${thermalLaws}/thermalLaw/newThermalLaw.C
   ${thermalLaws}/constantThermal/constantThermal.C
   ${thermalLaws}/multiMaterialThermal/multiMaterialThermal.C
 )
 
-add_foam_library(solidModels SHARED ${sources})
+add_foam_library(solidModels SHARED ${SOURCES})
 
-# This is a prototype! Replace second argument with a list of the highest
-# dependencies only. Inherited dependencies will be treated automatically.
 target_link_libraries(solidModels PUBLIC topoChangerFvMesh finiteArea)

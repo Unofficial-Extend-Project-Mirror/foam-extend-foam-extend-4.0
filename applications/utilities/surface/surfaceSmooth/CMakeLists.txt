@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   surfaceSmooth.C
 )
 
@@ -42,5 +42,5 @@ endif()
 
 add_foam_executable(surfaceSmooth
   DEPENDS meshTools
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

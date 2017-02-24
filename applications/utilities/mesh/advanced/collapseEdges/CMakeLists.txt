@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   collapseEdges.C
 )
 
@@ -42,5 +42,5 @@ endif()
 
 add_foam_executable(collapseEdges
   DEPENDS finiteVolume dynamicMesh
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

@@ -37,7 +37,7 @@ set(referredCell ${interactionLists}/referredCell)
 set(referralLists ${interactionLists}/referralLists)
 set(directInteractionList ${interactionLists}/directInteractionList)
 
-list(APPEND sources
+list(APPEND SOURCES
   ${referralLists}/sendingReferralList.C
   ${referralLists}/receivingReferralList.C
   ${referredCellList}/referredCellList.C
@@ -48,24 +48,22 @@ list(APPEND sources
 )
 
 set(reducedUnits reducedUnits)
-list(APPEND sources
+list(APPEND SOURCES
   ${reducedUnits}/reducedUnits.C
   ${reducedUnits}/reducedUnitsIO.C
 )
 
 set(molecule molecule)
-list(APPEND sources
+list(APPEND SOURCES
   ${molecule}/molecule.C
   ${molecule}/moleculeIO.C
 )
 
 set(moleculeCloud moleculeCloud)
-list(APPEND sources
+list(APPEND SOURCES
   ${moleculeCloud}/moleculeCloud.C
 )
 
-add_foam_library(molecule SHARED ${sources})
+add_foam_library(molecule SHARED ${SOURCES})
 
-# This is a prototype! Replace second argument with a list of the highest
-# dependencies only. Inherited dependencies will be treated automatically.
 target_link_libraries(molecule PUBLIC potential)

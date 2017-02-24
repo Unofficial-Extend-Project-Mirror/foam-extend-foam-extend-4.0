@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   tetMotionSolver/tetMotionSolver.C
   tetMotionSolver/laplace/laplaceTetMotionSolver.C
   tetMotionSolver/pseudoSolid/pseudoSolidTetMotionSolver.C
@@ -46,8 +46,6 @@ list(APPEND sources
   motionDiffs/file/fileDiff.C
 )
 
-add_foam_library(tetMotionSolver SHARED ${sources})
+add_foam_library(tetMotionSolver SHARED ${SOURCES})
 
-# This is a prototype! Replace second argument with a list of the highest
-# dependencies only. Inherited dependencies will be treated automatically.
 target_link_libraries(tetMotionSolver PUBLIC tetFiniteElement dynamicMesh)

@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   faMesh/faGlobalMeshData/faGlobalMeshData.C
   faMesh/faMesh.C
   faMesh/faMeshDemandDrivenData.C
@@ -39,7 +39,7 @@ list(APPEND sources
 )
 
 set(faPatches faMesh/faPatches)
-list(APPEND sources
+list(APPEND SOURCES
   ${faPatches}/faPatch/faPatch.C
   ${faPatches}/faPatch/newFaPatch.C
   ${faPatches}/basic/coupled/coupledFaPatch.C
@@ -51,7 +51,7 @@ list(APPEND sources
 )
 
 set(faMeshMapper faMesh/faMeshMapper)
-list(APPEND sources
+list(APPEND SOURCES
   ${faMeshMapper}/faMeshMapper.C
   ${faMeshMapper}/faAreaMapper.C
   ${faMeshMapper}/faEdgeMapper.C
@@ -59,12 +59,12 @@ list(APPEND sources
 )
 
 set(faPatchFields fields/faPatchFields)
-list(APPEND sources
+list(APPEND SOURCES
   ${faPatchFields}/faPatchField/faPatchFields.C
 )
 
 set(basicFaPatchFields ${faPatchFields}/basic)
-list(APPEND sources
+list(APPEND SOURCES
   ${basicFaPatchFields}/basicSymmetry/basicSymmetryFaPatchFields.C
   ${basicFaPatchFields}/basicSymmetry/basicSymmetryFaPatchScalarField.C
   ${basicFaPatchFields}/calculated/calculatedFaPatchFields.C
@@ -78,7 +78,7 @@ list(APPEND sources
 )
 
 set(constraintFaPatchFields ${faPatchFields}/constraint)
-list(APPEND sources
+list(APPEND SOURCES
   ${constraintFaPatchFields}/empty/emptyFaPatchFields.C
   ${constraintFaPatchFields}/processor/processorFaPatchFields.C
   ${constraintFaPatchFields}/processor/processorFaPatchScalarField.C
@@ -89,26 +89,26 @@ list(APPEND sources
 )
 
 set(derivedFaPatchFields ${faPatchFields}/derived)
-list(APPEND sources
+list(APPEND SOURCES
   ${derivedFaPatchFields}/fixedValueOutflow/fixedValueOutflowFaPatchFields.C
   ${derivedFaPatchFields}/inletOutlet/inletOutletFaPatchFields.C
   ${derivedFaPatchFields}/slip/slipFaPatchFields.C
 )
 
 set(faePatchFields fields/faePatchFields)
-list(APPEND sources
+list(APPEND SOURCES
   ${faePatchFields}/faePatchField/faePatchFields.C
 )
 
 set(basicFaePatchFields ${faePatchFields}/basic)
-list(APPEND sources
+list(APPEND SOURCES
   ${basicFaePatchFields}/calculated/calculatedFaePatchFields.C
   ${basicFaePatchFields}/coupled/coupledFaePatchFields.C
   ${basicFaePatchFields}/fixedValue/fixedValueFaePatchFields.C
 )
 
 set(constraintFaePatchFields ${faePatchFields}/constraint)
-list(APPEND sources
+list(APPEND SOURCES
   ${constraintFaePatchFields}/empty/emptyFaePatchFields.C
   ${constraintFaePatchFields}/processor/processorFaePatchFields.C
   ${constraintFaePatchFields}/wedge/wedgeFaePatchFields.C
@@ -121,13 +121,13 @@ list(APPEND sources
 )
 
 set(edgeInterpolation interpolation/edgeInterpolation)
-list(APPEND sources
+list(APPEND SOURCES
   ${edgeInterpolation}/edgeInterpolation.C
   ${edgeInterpolation}/edgeInterpolationScheme/edgeInterpolationSchemes.C
 )
 
 set(schemes ${edgeInterpolation}/schemes)
-list(APPEND sources
+list(APPEND SOURCES
   ${schemes}/linear/linearEdgeInterpolationMake.C
   ${schemes}/upwind/upwindEdgeInterpolationMake.C
   ${schemes}/linearUpwind/linearUpwindEdgeInterpolationMake.C
@@ -138,7 +138,7 @@ list(APPEND sources
 )
 
 set(ddtSchemes finiteArea/ddtSchemes)
-list(APPEND sources
+list(APPEND SOURCES
   ${ddtSchemes}/faDdtScheme/faDdtSchemes.C
   ${ddtSchemes}/steadyStateFaDdtScheme/steadyStateFaDdtSchemes.C
   ${ddtSchemes}/EulerFaDdtScheme/EulerFaDdtSchemes.C
@@ -147,13 +147,13 @@ list(APPEND sources
 )
 
 set(divSchemes finiteArea/divSchemes)
-list(APPEND sources
+list(APPEND SOURCES
   ${divSchemes}/faDivScheme/faDivSchemes.C
   ${divSchemes}/gaussFaDivScheme/gaussFaDivSchemes.C
 )
 
 set(gradSchemes finiteArea/gradSchemes)
-list(APPEND sources
+list(APPEND SOURCES
   ${gradSchemes}/faGradScheme/faGradSchemes.C
   ${gradSchemes}/gaussFaGrad/gaussFaGrads.C
   ${gradSchemes}/leastSquaresFaGrad/leastSquaresFaVectors.C
@@ -161,13 +161,13 @@ list(APPEND sources
 )
 
 set(limitedGradSchemes ${gradSchemes}/limitedGradSchemes)
-list(APPEND sources
+list(APPEND SOURCES
   ${limitedGradSchemes}/faceLimitedFaGrad/faceLimitedFaGrads.C
   ${limitedGradSchemes}/edgeLimitedFaGrad/edgeLimitedFaGrads.C
 )
 
 set(lnGradSchemes finiteArea/lnGradSchemes)
-list(APPEND sources
+list(APPEND SOURCES
   ${lnGradSchemes}/lnGradScheme/lnGradSchemes.C
   ${lnGradSchemes}/correctedLnGrad/correctedLnGrads.C
   ${lnGradSchemes}/limitedLnGrad/limitedLnGrads.C
@@ -175,19 +175,17 @@ list(APPEND sources
 )
 
 set(laplacianSchemes finiteArea/laplacianSchemes)
-list(APPEND sources
+list(APPEND SOURCES
   ${laplacianSchemes}/faLaplacianScheme/faLaplacianSchemes.C
   ${laplacianSchemes}/gaussFaLaplacianScheme/gaussFaLaplacianSchemes.C
 )
 
 set(convectionSchemes finiteArea/convectionSchemes)
-list(APPEND sources
+list(APPEND SOURCES
   ${convectionSchemes}/faConvectionScheme/faConvectionSchemes.C
   ${convectionSchemes}/gaussFaConvectionScheme/gaussFaConvectionSchemes.C
 )
 
-add_foam_library(finiteArea SHARED ${sources})
+add_foam_library(finiteArea SHARED ${SOURCES})
 
-# This is a prototype! Replace second argument with a list of the highest
-# dependencies only. Inherited dependencies will be treated automatically.
 target_link_libraries(finiteArea PUBLIC foam)

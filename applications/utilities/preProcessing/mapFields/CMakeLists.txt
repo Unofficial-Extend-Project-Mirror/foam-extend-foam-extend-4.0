@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   mapLagrangian.C
   mapFields.C
 )
@@ -43,5 +43,5 @@ endif()
 
 add_foam_executable(mapFields
   DEPENDS sampling
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

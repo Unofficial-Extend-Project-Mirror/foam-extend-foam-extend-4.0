@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   pimpleFoam.C
 )
 
@@ -42,5 +42,5 @@ endif()
 
 add_foam_executable(pimpleFoam
   DEPENDS incompressibleRASModels incompressibleLESModels
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

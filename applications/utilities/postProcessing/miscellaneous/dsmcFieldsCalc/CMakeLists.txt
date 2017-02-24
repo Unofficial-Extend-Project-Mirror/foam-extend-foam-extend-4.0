@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   dsmcFieldsCalc.C
 )
 
@@ -42,5 +42,5 @@ endif()
 
 add_foam_executable(dsmcFieldsCalc
   DEPENDS postCalc utilityFunctionObjects dsmc 
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

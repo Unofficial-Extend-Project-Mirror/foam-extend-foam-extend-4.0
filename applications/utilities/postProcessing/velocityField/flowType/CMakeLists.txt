@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   flowType.C
 )
 
@@ -42,5 +42,5 @@ endif()
 
 add_foam_executable(flowType
   DEPENDS postCalc
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

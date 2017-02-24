@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   forceDisp.C
 )
 
@@ -42,5 +42,5 @@ endif()
 
 add_foam_executable(forceDisp
 #   DEPENDS finiteVolume
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

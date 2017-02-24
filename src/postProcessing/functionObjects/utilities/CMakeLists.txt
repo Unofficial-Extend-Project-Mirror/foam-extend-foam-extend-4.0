@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   staticPressure/staticPressure.C
   staticPressure/staticPressureFunctionObject.C
   dsmcFields/dsmcFields.C
@@ -39,8 +39,6 @@ list(APPEND sources
   divFlux/divFlux.C
 )
 
-add_foam_library(utilityFunctionObjects SHARED ${sources})
+add_foam_library(utilityFunctionObjects SHARED ${SOURCES})
 
-# This is a prototype! Replace second argument with a list of the highest
-# dependencies only. Inherited dependencies will be treated automatically.
 target_link_libraries(utilityFunctionObjects PUBLIC basicThermophysicalModels sampling dsmc)

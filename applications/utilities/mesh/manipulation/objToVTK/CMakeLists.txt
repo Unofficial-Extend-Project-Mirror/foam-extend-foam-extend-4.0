@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   objToVTK.C
 )
 
@@ -42,5 +42,5 @@ endif()
 
 add_foam_executable(objToVTK
   DEPENDS finiteVolume meshTools
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

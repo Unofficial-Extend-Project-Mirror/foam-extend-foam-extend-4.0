@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   tetDecomposition.C
 )
 
@@ -42,5 +42,5 @@ endif()
 
 add_foam_executable(tetDecomposition
   DEPENDS finiteVolume tetFiniteElement
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

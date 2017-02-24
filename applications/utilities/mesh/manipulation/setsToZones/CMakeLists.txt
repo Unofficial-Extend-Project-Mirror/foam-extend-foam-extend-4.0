@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   setsToZones.C
 )
 
@@ -42,5 +42,5 @@ endif()
 
 add_foam_executable(setsToZones
   DEPENDS meshTools
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

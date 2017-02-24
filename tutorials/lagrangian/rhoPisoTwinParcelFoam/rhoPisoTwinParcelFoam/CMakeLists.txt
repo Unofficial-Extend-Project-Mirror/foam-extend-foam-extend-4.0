@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   rhoPisoTwinParcelFoam.C
 )
 
@@ -42,5 +42,5 @@ endif()
 
 add_foam_executable(rhoPisoTwinParcelFoam
 #   DEPENDS finiteVolume
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

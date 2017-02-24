@@ -30,15 +30,13 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   mixedFixedValueSlip/mixedFixedValueSlipFvPatchFields.C
   U/maxwellSlipUFvPatchVectorField.C
   T/smoluchowskiJumpTFvPatchScalarField.C
   rho/fixedRhoFvPatchScalarField.C
 )
 
-add_foam_library(rhoCentralFoam SHARED ${sources})
+add_foam_library(rhoCentralFoam SHARED ${SOURCES})
 
-# This is a prototype! Replace second argument with a list of the highest
-# dependencies only. Inherited dependencies will be treated automatically.
 #target_link_libraries(rhoCentralFoam finiteVolume)

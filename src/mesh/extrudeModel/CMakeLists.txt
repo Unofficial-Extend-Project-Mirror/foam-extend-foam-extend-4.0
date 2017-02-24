@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   extrudeModel/extrudeModel.C
   extrudeModel/newExtrudeModel.C
   linearNormal/linearNormal.C
@@ -39,8 +39,6 @@ list(APPEND sources
   wedge/wedge.C
 )
 
-add_foam_library(extrudeModel SHARED ${sources})
+add_foam_library(extrudeModel SHARED ${SOURCES})
 
-# This is a prototype! Replace second argument with a list of the highest
-# dependencies only. Inherited dependencies will be treated automatically.
 target_link_libraries(extrudeModel PUBLIC dynamicMesh)

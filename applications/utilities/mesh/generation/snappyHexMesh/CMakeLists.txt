@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   snappyHexMesh.C
 )
 
@@ -42,5 +42,5 @@ endif()
 
 add_foam_executable(snappyHexMesh
   DEPENDS dynamicFvMesh autoMesh
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

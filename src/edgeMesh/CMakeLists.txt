@@ -30,14 +30,12 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   edgeMesh.C
   edgeMeshIO.C
   featureEdgeMesh.C
 )
 
-add_foam_library(edgeMesh SHARED ${sources})
+add_foam_library(edgeMesh SHARED ${SOURCES})
 
-# This is a prototype! Replace second argument with a list of the highest
-# dependencies only. Inherited dependencies will be treated automatically.
 target_link_libraries(edgeMesh PUBLIC foam)

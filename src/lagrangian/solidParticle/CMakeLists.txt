@@ -30,14 +30,12 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   solidParticle.C
   solidParticleIO.C
   solidParticleCloud.C
 )
 
-add_foam_library(solidParticle SHARED ${sources})
+add_foam_library(solidParticle SHARED ${SOURCES})
 
-# This is a prototype! Replace second argument with a list of the highest
-# dependencies only. Inherited dependencies will be treated automatically.
 target_link_libraries(solidParticle PUBLIC finiteVolume lagrangianBasic)

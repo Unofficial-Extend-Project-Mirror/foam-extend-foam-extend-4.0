@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   refineImmersedBoundaryMesh.C
 )
 
@@ -42,5 +42,5 @@ endif()
 
 add_foam_executable(refineImmersedBoundaryMesh
   DEPENDS immersedBoundary
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

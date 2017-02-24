@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   topoChangerFvMesh/topoChangerFvMesh.C
   attachDetachFvMesh/attachDetachFvMesh.C
   linearValveFvMesh/linearValveFvMesh.C
@@ -43,8 +43,6 @@ list(APPEND sources
   multiMixerFvMesh/multiMixerFvMesh.C
 )
 
-add_foam_library(topoChangerFvMesh SHARED ${sources})
+add_foam_library(topoChangerFvMesh SHARED ${SOURCES})
 
-# This is a prototype! Replace second argument with a list of the highest
-# dependencies only. Inherited dependencies will be treated automatically.
 target_link_libraries(topoChangerFvMesh PUBLIC dynamicFvMesh)

@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   writeIbMasks.C
 )
 
@@ -42,5 +42,5 @@ endif()
 
 add_foam_executable(writeIbMasks
   DEPENDS immersedBoundary
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

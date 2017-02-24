@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   realFluidPisoFoam.C
 )
 
@@ -42,5 +42,5 @@ endif()
 
 add_foam_executable(realFluidPisoFoam
 #   DEPENDS finiteVolume
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

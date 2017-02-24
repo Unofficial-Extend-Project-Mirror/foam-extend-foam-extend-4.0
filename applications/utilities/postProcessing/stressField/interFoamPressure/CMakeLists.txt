@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   interFoamPressure.C
 )
 
@@ -42,5 +42,5 @@ endif()
 
 add_foam_executable(interFoamPressure
   DEPENDS interfaceProperties incompressibleTransportModels
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

@@ -30,12 +30,12 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   fluentDataConverter.C
 )
 FLEX_TARGET(fluentDataToFoam fluentDataToFoam.L
   ${CMAKE_CURRENT_BINARY_DIR}/fluentDataToFoam.C COMPILE_FLAGS "-+")
-list(APPEND sources ${FLEX_fluentDataToFoam_OUTPUTS})
+list(APPEND SOURCES ${FLEX_fluentDataToFoam_OUTPUTS})
 
 # Set minimal environment for external compilation
 if(NOT FOAM_FOUND)
@@ -45,5 +45,9 @@ endif()
 
 add_foam_executable(fluentDataToFoam
   DEPENDS finiteVolume
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
+)
+target_include_directories(fluentDataToFoam PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+#  $<INSTALL_INTERFACE:include/mylib>
 )

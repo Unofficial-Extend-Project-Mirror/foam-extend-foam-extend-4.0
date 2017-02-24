@@ -31,7 +31,7 @@
 # --------------------------------------------------------------------------
 
 #  RAS turbulence models 
-list(APPEND sources
+list(APPEND SOURCES
   RASModel/RASModel.C
   laminar/laminar.C
   kEpsilon/kEpsilon.C
@@ -57,7 +57,7 @@ list(APPEND sources
 set(wallFunctions derivedFvPatchFields/wallFunctions)
 
 set(nutWallFunctions ${wallFunctions}/nutWallFunctions)
-list(APPEND sources
+list(APPEND SOURCES
   ${nutWallFunctions}/nutkWallFunction/nutkWallFunctionFvPatchScalarField.C
   ${nutWallFunctions}/nutWallFunction/nutWallFunctionFvPatchScalarField.C
   ${nutWallFunctions}/nutRoughWallFunction/nutRoughWallFunctionFvPatchScalarField.C
@@ -68,42 +68,39 @@ list(APPEND sources
 )
 
 set(epsilonWallFunctions ${wallFunctions}/epsilonWallFunctions)
-list(APPEND sources
+list(APPEND SOURCES
   ${epsilonWallFunctions}/epsilonWallFunction/epsilonWallFunctionFvPatchScalarField.C
 )
 
 set(omegaWallFunctions ${wallFunctions}/omegaWallFunctions)
-list(APPEND sources
+list(APPEND SOURCES
   ${omegaWallFunctions}/omegaWallFunction/omegaWallFunctionFvPatchScalarField.C
 )
 
 set(kqRWallFunctions ${wallFunctions}/kqRWallFunctions)
-list(APPEND sources
+list(APPEND SOURCES
   ${kqRWallFunctions}/kqRWallFunction/kqRWallFunctionFvPatchFields.C
 )
 
 set(RWallFunctions ${wallFunctions}/RWallFunctions)
-list(APPEND sources
+list(APPEND SOURCES
   ${RWallFunctions}/RWallFunction/RWallFunctionFvPatchSymmTensorField.C
 )
 
 
 #  Patch fields 
-list(APPEND sources
+list(APPEND SOURCES
   derivedFvPatchFields/turbulentHeatFluxTemperature/turbulentHeatFluxTemperatureFvPatchScalarField.C
   derivedFvPatchFields/turbulentMixingLengthDissipationRateInlet/turbulentMixingLengthDissipationRateInletFvPatchScalarField.C
   derivedFvPatchFields/turbulentMixingLengthFrequencyInlet/turbulentMixingLengthFrequencyInletFvPatchScalarField.C
   backwardsCompatibility/wallFunctions/backwardsCompatibilityWallFunctions.C
 )
 
-add_foam_library(incompressibleRASModels SHARED ${sources})
+add_foam_library(incompressibleRASModels SHARED ${SOURCES})
 
-# This is a prototype! Replace second argument with a list of the highest
-# dependencies only. Inherited dependencies will be treated automatically.
 target_link_libraries(incompressibleRASModels PUBLIC incompressibleTurbulenceModel)
 
 target_include_directories(incompressibleRASModels PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/derivedFvPatchFields/wallFunctions/nutWallFunctions>
-  $<INSTALL_INTERFACE:include/mylib>
+#  $<INSTALL_INTERFACE:include/mylib>
 )
-

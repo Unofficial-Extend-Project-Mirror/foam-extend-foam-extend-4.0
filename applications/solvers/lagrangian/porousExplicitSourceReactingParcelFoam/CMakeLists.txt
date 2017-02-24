@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   porousExplicitSourceReactingParcelFoam.C
 )
 
@@ -42,5 +42,5 @@ endif()
 
 add_foam_executable(porousExplicitSourceReactingParcelFoam
 #   DEPENDS finiteVolume
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

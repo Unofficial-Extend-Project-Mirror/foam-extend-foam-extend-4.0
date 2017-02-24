@@ -32,13 +32,13 @@
 
 set(polyMeshModifiers polyMeshModifiers)
 
-list(APPEND sources
+list(APPEND SOURCES
   ${polyMeshModifiers}/polyMeshModifier/polyMeshModifier.C
   ${polyMeshModifiers}/polyMeshModifier/newPolyMeshModifier.C
 )
 
 set(attachDetach ${polyMeshModifiers}/attachDetach)
-list(APPEND sources
+list(APPEND SOURCES
   ${attachDetach}/attachDetach.C
   ${attachDetach}/attachInterface.C
   ${attachDetach}/detachInterface.C
@@ -46,7 +46,7 @@ list(APPEND sources
 )
 
 set(layerAdditionRemoval ${polyMeshModifiers}/layerAdditionRemoval)
-list(APPEND sources
+list(APPEND SOURCES
   ${layerAdditionRemoval}/layerAdditionRemoval.C
   ${layerAdditionRemoval}/setLayerPairing.C
   ${layerAdditionRemoval}/addCellLayer.C
@@ -57,7 +57,7 @@ list(APPEND sources
 
 set(slidingInterface ${polyMeshModifiers}/slidingInterface)
 set(enrichedPatch ${slidingInterface}/enrichedPatch)
-list(APPEND sources
+list(APPEND SOURCES
   ${enrichedPatch}/enrichedPatch.C
   ${enrichedPatch}/enrichedPatchPointMap.C
   ${enrichedPatch}/enrichedPatchFaces.C
@@ -73,7 +73,7 @@ list(APPEND sources
 )
 
 set(repatchCoverage ${polyMeshModifiers}/repatchCoverage)
-list(APPEND sources
+list(APPEND SOURCES
   ${repatchCoverage}/repatchCoverage.C
   polyTopoChange/polyTopoChange/polyTopoChange.C
   polyTopoChange/polyTopoChange/actions/topoAction/topoActions.C
@@ -90,7 +90,7 @@ list(APPEND sources
 )
 
 set(directActions directTopoChange/directTopoChange/directActions)
-list(APPEND sources
+list(APPEND SOURCES
   ${directActions}/addPatchCellLayer.C
   ${directActions}/edgeCollapser.C
   ${directActions}/faceCollapser.C
@@ -104,7 +104,7 @@ list(APPEND sources
 )
 
 set(meshCut directTopoChange/meshCut)
-list(APPEND sources
+list(APPEND SOURCES
   ${meshCut}/cellLooper/cellLooper.C
   ${meshCut}/cellLooper/topoCellLooper.C
   ${meshCut}/cellLooper/geomCellLooper.C
@@ -120,7 +120,7 @@ list(APPEND sources
 )
 
 set(modifiers ${meshCut}/modifiers)
-list(APPEND sources
+list(APPEND SOURCES
   ${modifiers}/boundaryCutter/boundaryCutter.C
   ${modifiers}/meshCutter/meshCutter.C
   ${modifiers}/meshCutAndRemove/meshCutAndRemove.C
@@ -135,8 +135,6 @@ list(APPEND sources
   directTopoChange/repatchPolyTopoChanger/repatchPolyTopoChanger.C
 )
 
-add_foam_library(dynamicMesh SHARED ${sources})
+add_foam_library(dynamicMesh SHARED ${SOURCES})
 
-# This is a prototype! Replace second argument with a list of the highest
-# dependencies only. Inherited dependencies will be treated automatically.
 target_link_libraries(dynamicMesh PUBLIC meshTools)

@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   solidBodyMotionFunction/solidBodyMotionFunction.C
   solidBodyMotionFunction/newSolidBodyMotionFunction.C
   noMotion/noMotion.C
@@ -45,8 +45,6 @@ list(APPEND sources
   graphVelocity/graphVelocity.C
 )
 
-add_foam_library(solidBodyMotion SHARED ${sources})
+add_foam_library(solidBodyMotion SHARED ${SOURCES})
 
-# This is a prototype! Replace second argument with a list of the highest
-# dependencies only. Inherited dependencies will be treated automatically.
 target_link_libraries(solidBodyMotion PUBLIC foam)

@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   ensight/file/ensightFile.C
   ensight/file/ensightGeoFile.C
   ensight/part/ensightPart.C
@@ -52,8 +52,6 @@ list(APPEND sources
   polyDualMesh/polyDualMesh.C
 )
 
-add_foam_library(conversion SHARED ${sources})
+add_foam_library(conversion SHARED ${SOURCES})
 
-# This is a prototype! Replace second argument with a list of the highest
-# dependencies only. Inherited dependencies will be treated automatically.
 target_link_libraries(conversion PUBLIC finiteVolume)

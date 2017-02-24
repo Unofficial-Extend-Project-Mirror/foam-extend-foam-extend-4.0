@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   moveEngineMesh.C
 )
 
@@ -42,5 +42,5 @@ endif()
 
 add_foam_executable(moveEngineMesh
   DEPENDS engine
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

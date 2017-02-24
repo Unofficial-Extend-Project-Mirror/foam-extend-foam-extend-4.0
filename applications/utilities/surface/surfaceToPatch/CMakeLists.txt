@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   boundaryMesh.C
   surfaceToPatch.C
   treeDataPrimitivePatchName.C
@@ -44,5 +44,5 @@ endif()
 
 add_foam_executable(surfaceToPatch
   DEPENDS meshTools dynamicMesh
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

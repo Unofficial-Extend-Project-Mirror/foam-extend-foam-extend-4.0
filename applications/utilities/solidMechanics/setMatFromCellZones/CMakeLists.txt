@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   setMatFromCellZones.C
 )
 
@@ -42,5 +42,5 @@ endif()
 
 add_foam_executable(setMatFromCellZones
   DEPENDS finiteVolume
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

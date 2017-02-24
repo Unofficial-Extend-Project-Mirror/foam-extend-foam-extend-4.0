@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   refineWallLayer.C
 )
 
@@ -42,5 +42,5 @@ endif()
 
 add_foam_executable(refineWallLayer
   DEPENDS finiteVolume dynamicMesh
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

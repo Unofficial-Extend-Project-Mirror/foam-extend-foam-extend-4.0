@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   streamFunction.C
 )
 
@@ -42,5 +42,5 @@ endif()
 
 add_foam_executable(streamFunction
   DEPENDS postCalc
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

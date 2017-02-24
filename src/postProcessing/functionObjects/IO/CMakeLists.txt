@@ -30,13 +30,11 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   writeRegisteredObject/writeRegisteredObject.C
   writeRegisteredObject/writeRegisteredObjectFunctionObject.C
 )
 
-add_foam_library(IOFunctionObjects SHARED ${sources})
+add_foam_library(IOFunctionObjects SHARED ${SOURCES})
 
-# This is a prototype! Replace second argument with a list of the highest
-# dependencies only. Inherited dependencies will be treated automatically.
 target_link_libraries(IOFunctionObjects PUBLIC foam)

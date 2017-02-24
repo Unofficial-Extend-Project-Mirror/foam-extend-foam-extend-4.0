@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   testFadField.C
   fadOneFields.C
 )
@@ -43,5 +43,5 @@ endif()
 
 add_foam_executable(testFadField
   DEPENDS finiteVolume
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

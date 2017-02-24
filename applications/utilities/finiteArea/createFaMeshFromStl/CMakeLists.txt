@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   createFaMeshFromStl.C
 )
 
@@ -42,5 +42,5 @@ endif()
 
 add_foam_executable(createFaMeshFromStl
   DEPENDS finiteArea meshTools
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

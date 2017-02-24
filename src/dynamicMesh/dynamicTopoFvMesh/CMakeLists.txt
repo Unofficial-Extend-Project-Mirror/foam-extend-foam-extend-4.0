@@ -30,14 +30,14 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   eMesh/eMesh.C
   eMesh/eMeshDemandDrivenData.C
   eMesh/eBoundaryMesh/eBoundaryMesh.C
 )
 
 set(ePatches eMesh/ePatches)
-list(APPEND sources
+list(APPEND SOURCES
   ${ePatches}/ePatch/ePatch.C
   ${ePatches}/ePatch/newEPatch.C
   dynamicTopoFvMesh.C
@@ -62,18 +62,16 @@ list(APPEND sources
 )
 
 set(tetMetrics tetMetrics)
-list(APPEND sources
+list(APPEND SOURCES
   ${tetMetrics}/tetMetric.C
   ${tetMetrics}/tetMetrics.C
 )
 
 set(lengthScaleEstimator lengthScaleEstimator)
-list(APPEND sources
+list(APPEND SOURCES
   ${lengthScaleEstimator}/lengthScaleEstimator.C
 )
 
-add_foam_library(dynamicTopoFvMesh SHARED ${sources})
+add_foam_library(dynamicTopoFvMesh SHARED ${SOURCES})
 
-# This is a prototype! Replace second argument with a list of the highest
-# dependencies only. Inherited dependencies will be treated automatically.
 target_link_libraries(dynamicTopoFvMesh PUBLIC dynamicFvMesh)

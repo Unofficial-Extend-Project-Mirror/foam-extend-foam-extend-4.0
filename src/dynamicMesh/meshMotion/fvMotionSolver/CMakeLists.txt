@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   fvMotionSolvers/fvMotionSolver/fvMotionSolver.C
   fvMotionSolvers/velocity/laplacian/velocityLaplacianFvMotionSolver.C
   fvMotionSolvers/velocity/refLaplacian/refVelocityLaplacianFvMotionSolver.C
@@ -61,8 +61,6 @@ list(APPEND sources
   pointPatchFields/derived/surfaceDisplacement/surfaceDisplacementPointPatchVectorField.C
 )
 
-add_foam_library(fvMotionSolver SHARED ${sources})
+add_foam_library(fvMotionSolver SHARED ${SOURCES})
 
-# This is a prototype! Replace second argument with a list of the highest
-# dependencies only. Inherited dependencies will be treated automatically.
 target_link_libraries(fvMotionSolver PUBLIC finiteVolume dynamicMesh)

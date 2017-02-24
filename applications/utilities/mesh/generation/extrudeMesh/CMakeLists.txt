@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   extrudeMesh.C
 )
 
@@ -42,10 +42,10 @@ endif()
 
 add_foam_executable(extrudeMesh
   DEPENDS extrudeModel
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )
 
 target_include_directories(extrudeMesh PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/extrudedMesh>
-  $<INSTALL_INTERFACE:include/mylib>
+#  $<INSTALL_INTERFACE:include/mylib>
 )

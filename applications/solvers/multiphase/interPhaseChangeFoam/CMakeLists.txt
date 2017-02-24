@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   interPhaseChangeFoam.C
   phaseChangeTwoPhaseMixtures/phaseChangeTwoPhaseMixture/phaseChangeTwoPhaseMixture.C
   phaseChangeTwoPhaseMixtures/phaseChangeTwoPhaseMixture/newPhaseChangeTwoPhaseMixture.C
@@ -47,5 +47,5 @@ endif()
 
 add_foam_executable(interPhaseChangeFoam
 #   DEPENDS finiteVolume
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

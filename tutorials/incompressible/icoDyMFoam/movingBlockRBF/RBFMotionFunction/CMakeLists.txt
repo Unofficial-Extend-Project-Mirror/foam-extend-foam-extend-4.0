@@ -30,12 +30,10 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   RBFMotionFunctionObject.C
 )
 
-add_foam_library(RBFMotionFunction SHARED ${sources})
+add_foam_library(RBFMotionFunction SHARED ${SOURCES})
 
-# This is a prototype! Replace second argument with a list of the highest
-# dependencies only. Inherited dependencies will be treated automatically.
 #target_link_libraries(RBFMotionFunction finiteVolume)

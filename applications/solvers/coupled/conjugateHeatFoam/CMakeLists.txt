@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   conjugateHeatFoam.C
 )
 
@@ -42,5 +42,5 @@ endif()
 
 add_foam_executable(conjugateHeatFoam
 #   DEPENDS finiteVolume
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

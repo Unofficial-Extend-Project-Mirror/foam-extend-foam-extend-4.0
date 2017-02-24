@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   gmshToFoam.C
 )
 
@@ -42,5 +42,5 @@ endif()
 
 add_foam_executable(gmshToFoam
   DEPENDS dynamicMesh meshTools
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   simpleFoamResidual.C
 )
 
@@ -42,5 +42,5 @@ endif()
 
 add_foam_executable(simpleFoamResidual
   DEPENDS errorEstimation incompressibleRASModels incompressibleLESModels
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

@@ -30,12 +30,12 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   rheologyModel/rheologyModel.C
 )
 set(rheologyLaws rheologyModel/rheologyLaws)
 
-list(APPEND sources
+list(APPEND SOURCES
   ${rheologyLaws}/rheologyLaw/rheologyLaw.C
   ${rheologyLaws}/rheologyLaw/newRheologyLaw.C
   ${rheologyLaws}/linearElastic/linearElastic.C
@@ -50,7 +50,7 @@ list(APPEND sources
 )
 set(thermalLaws thermalModel/thermalLaws)
 
-list(APPEND sources
+list(APPEND SOURCES
   ${thermalLaws}/thermalLaw/thermalLaw.C
   ${thermalLaws}/thermalLaw/newThermalLaw.C
   ${thermalLaws}/constantThermal/constantThermal.C
@@ -66,8 +66,6 @@ list(APPEND sources
   fvPatchFields/cohesiveZone/cohesiveZoneFvPatchVectorField.C
 )
 
-add_foam_library(materialModels SHARED ${sources})
+add_foam_library(materialModels SHARED ${SOURCES})
 
-# This is a prototype! Replace second argument with a list of the highest
-# dependencies only. Inherited dependencies will be treated automatically.
 #target_link_libraries(materialModels finiteVolume)

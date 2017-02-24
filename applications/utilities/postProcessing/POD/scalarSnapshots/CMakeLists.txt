@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   scalarSnapshots.C
 )
 
@@ -42,5 +42,5 @@ endif()
 
 add_foam_executable(scalarSnapshots
   DEPENDS POD
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

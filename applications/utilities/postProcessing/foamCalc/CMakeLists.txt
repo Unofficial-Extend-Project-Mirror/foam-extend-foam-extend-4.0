@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   foamCalc.C
 )
 
@@ -42,5 +42,5 @@ endif()
 
 add_foam_executable(foamCalc
   DEPENDS foamCalcFunctions
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

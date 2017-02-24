@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   surfaceRedistributePar.C
 )
 
@@ -42,5 +42,5 @@ endif()
 
 add_foam_executable(surfaceRedistributePar
   DEPENDS meshTools
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

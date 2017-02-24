@@ -32,7 +32,7 @@
 
 FLEX_TARGET(ansysToFoam ansysToFoam.L
   ${CMAKE_CURRENT_BINARY_DIR}/ansysToFoam.C COMPILE_FLAGS "-+")
-list(APPEND sources ${FLEX_ansysToFoam_OUTPUTS})
+list(APPEND SOURCES ${FLEX_ansysToFoam_OUTPUTS})
 
 # Set minimal environment for external compilation
 if(NOT FOAM_FOUND)
@@ -42,5 +42,5 @@ endif()
 
 add_foam_executable(ansysToFoam
   DEPENDS foam
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

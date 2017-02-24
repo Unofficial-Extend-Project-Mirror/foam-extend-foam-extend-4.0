@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   forces/forces.C
   forces/forcesFunctionObject.C
   forceCoeffs/forceCoeffs.C
@@ -39,7 +39,7 @@ list(APPEND sources
 
 set(sDoFRBM pointPatchFields/derived/sixDoFRigidBodyMotion)
 
-list(APPEND sources
+list(APPEND SOURCES
   ${sDoFRBM}/sixDoFRigidBodyMotion.C
   ${sDoFRBM}/sixDoFRigidBodyMotionIO.C
   ${sDoFRBM}/sixDoFRigidBodyMotionState.C
@@ -48,7 +48,7 @@ list(APPEND sources
 
 set(sDoFRBMR ${sDoFRBM}/sixDoFRigidBodyMotionRestraint)
 
-list(APPEND sources
+list(APPEND SOURCES
   ${sDoFRBMR}/sixDoFRigidBodyMotionRestraint/sixDoFRigidBodyMotionRestraint.C
   ${sDoFRBMR}/sixDoFRigidBodyMotionRestraint/newSixDoFRigidBodyMotionRestraint.C
   ${sDoFRBMR}/linearAxialAngularSpring/linearAxialAngularSpring.C
@@ -59,7 +59,7 @@ list(APPEND sources
 
 set(sDoFRBMC ${sDoFRBM}/sixDoFRigidBodyMotionConstraint)
 
-list(APPEND sources
+list(APPEND SOURCES
   ${sDoFRBMC}/sixDoFRigidBodyMotionConstraint/sixDoFRigidBodyMotionConstraint.C
   ${sDoFRBMC}/sixDoFRigidBodyMotionConstraint/newSixDoFRigidBodyMotionConstraint.C
   ${sDoFRBMC}/fixedAxis/fixedAxis.C
@@ -71,8 +71,6 @@ list(APPEND sources
   pointPatchFields/derived/uncoupledSixDoFRigidBodyDisplacement/uncoupledSixDoFRigidBodyDisplacementPointPatchVectorField.C
 )
 
-add_foam_library(forces SHARED ${sources})
+add_foam_library(forces SHARED ${SOURCES})
 
-# This is a prototype! Replace second argument with a list of the highest
-# dependencies only. Inherited dependencies will be treated automatically.
 target_link_libraries(forces PUBLIC incompressibleRASModels incompressibleLESModels compressibleRASModels compressibleLESModels)

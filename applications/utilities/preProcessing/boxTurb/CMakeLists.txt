@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   boxTurb.C
 )
 
@@ -42,5 +42,5 @@ endif()
 
 add_foam_executable(boxTurb
   DEPENDS finiteVolume randomProcesses
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   liquid/liquid.C
   H2O/H2O.C
   C7H16/C7H16.C
@@ -64,8 +64,6 @@ list(APPEND sources
   iC3H8O/iC3H8O.C
 )
 
-add_foam_library(liquids SHARED ${sources})
+add_foam_library(liquids SHARED ${SOURCES})
 
-# This is a prototype! Replace second argument with a list of the highest
-# dependencies only. Inherited dependencies will be treated automatically.
 target_link_libraries(liquids thermophysicalFunctions)

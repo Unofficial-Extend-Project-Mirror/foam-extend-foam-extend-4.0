@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   uncoupledKinematicParcelFoam.C
 )
 
@@ -42,5 +42,5 @@ endif()
 
 add_foam_executable(uncoupledKinematicParcelFoam
 #   DEPENDS finiteVolume
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   R.C
 )
 
@@ -42,5 +42,5 @@ endif()
 
 add_foam_executable(R
   DEPENDS incompressibleRASModels
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

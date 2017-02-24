@@ -33,7 +33,7 @@
 get_property(inc TARGET foam PROPERTY INCLUDE_DIRECTORIES)
 include_directories(${inc})
 
-list(APPEND sources
+list(APPEND SOURCES
   signals/sigFpe.C
   signals/sigSegv.C
   signals/sigInt.C
@@ -48,17 +48,16 @@ list(APPEND sources
 )
 
 #ifdef SunOS64
-#list(APPEND sources
+#list(APPEND SOURCES
 #  dummyPrintStack.C
 #)
 #else
-list(APPEND sources
+list(APPEND SOURCES
   printStack.C
 )
 #endif
 
-add_foam_library(OSspecific SHARED ${sources})
+add_foam_library(OSspecific SHARED ${SOURCES})
 
-# This is a prototype! Replace second argument with a list of the highest
-# dependencies only. Inherited dependencies will be treated automatically.
-#target_link_libraries(OSspecific finiteVolume)
+target_link_libraries(OSspecific)
+add_dependencies(OSspecific foam_lnInclude)

@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   bunnylod/progmesh.C
   bunnylod/vector.C
   surfaceCoarsen.C
@@ -44,11 +44,10 @@ endif()
 
 add_foam_executable(surfaceCoarsen
   DEPENDS meshTools
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )
 
 target_include_directories(surfaceCoarsen PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/bunnylod>
-  $<INSTALL_INTERFACE:include/mylib>
+#  $<INSTALL_INTERFACE:include/mylib>
 )
-

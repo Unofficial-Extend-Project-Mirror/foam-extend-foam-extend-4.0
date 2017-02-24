@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   cellClassification/cellClassification.C
   cellClassification/cellInfo.C
   cellQuality/cellQuality.C
@@ -48,7 +48,7 @@ list(APPEND sources
 )
 
 set(searchableSurface searchableSurface)
-list(APPEND sources
+list(APPEND SOURCES
   ${searchableSurface}/distributedTriSurfaceMesh.C
   ${searchableSurface}/searchableBox.C
   ${searchableSurface}/searchableCylinder.C
@@ -64,7 +64,7 @@ list(APPEND sources
 )
 
 set(topoSets sets/topoSets)
-list(APPEND sources
+list(APPEND SOURCES
   ${topoSets}/cellSet.C
   ${topoSets}/topoSet.C
   ${topoSets}/faceSet.C
@@ -73,7 +73,7 @@ list(APPEND sources
 )
 
 set(cellSources sets/cellSources)
-list(APPEND sources
+list(APPEND SOURCES
   ${cellSources}/faceToCell/faceToCell.C
   ${cellSources}/fieldToCell/fieldToCell.C
   ${cellSources}/pointToCell/pointToCell.C
@@ -94,7 +94,7 @@ list(APPEND sources
 )
 
 set(faceSources sets/faceSources)
-list(APPEND sources
+list(APPEND SOURCES
   ${faceSources}/faceToFace/faceToFace.C
   ${faceSources}/labelToFace/labelToFace.C
   ${faceSources}/cellToFace/cellToFace.C
@@ -109,7 +109,7 @@ list(APPEND sources
 )
 
 set(pointSources sets/pointSources)
-list(APPEND sources
+list(APPEND SOURCES
   ${pointSources}/labelToPoint/labelToPoint.C
   ${pointSources}/pointToPoint/pointToPoint.C
   ${pointSources}/cellToPoint/cellToPoint.C
@@ -123,7 +123,7 @@ list(APPEND sources
 )
 
 set(triSurfaceInterfaces triSurface/triSurface/interfaces)
-list(APPEND sources
+list(APPEND SOURCES
   triSurface/triSurface/triSurface.C
   triSurface/triSurface/triSurfaceAddressing.C
   triSurface/triSurface/stitchTriangles.C
@@ -143,8 +143,8 @@ list(APPEND sources
 )
 FLEX_TARGET(readSTLASCII ${triSurfaceInterfaces}/STL/readSTLASCII.L
   ${CMAKE_CURRENT_BINARY_DIR}/readSTLASCII.C COMPILE_FLAGS "-+")
-list(APPEND sources ${FLEX_readSTLASCII_OUTPUTS})
-list(APPEND sources
+list(APPEND SOURCES ${FLEX_readSTLASCII_OUTPUTS})
+list(APPEND SOURCES
   ${triSurfaceInterfaces}/STL/readSTLBINARY.C
   ${triSurfaceInterfaces}/GTS/writeGTS.C
   ${triSurfaceInterfaces}/GTS/readGTS.C
@@ -166,19 +166,19 @@ list(APPEND sources
 set(booleanOps triSurface/booleanOps)
 
 set(surfaceIntersection ${booleanOps}/surfaceIntersection)
-list(APPEND sources
+list(APPEND SOURCES
   ${surfaceIntersection}/surfaceIntersection.C
   ${surfaceIntersection}/surfaceIntersectionFuncs.C
   ${surfaceIntersection}/edgeIntersections.C
 )
 
 set(booleanSurface ${booleanOps}/booleanSurface)
-list(APPEND sources
+list(APPEND SOURCES
   ${booleanSurface}/booleanSurface.C
 )
 
 set(intersectedSurface ${booleanOps}/intersectedSurface)
-list(APPEND sources
+list(APPEND SOURCES
   ${intersectedSurface}/intersectedSurface.C
   ${intersectedSurface}/edgeSurface.C
   triSurface/triSurfaceSearch/triSurfaceSearch.C
@@ -195,8 +195,6 @@ list(APPEND sources
   directMapped/directMappedPointPatch/directMappedWallPointPatch.C
 )
 
-add_foam_library(meshTools SHARED ${sources})
+add_foam_library(meshTools SHARED ${SOURCES})
 
-# This is a prototype! Replace second argument with a list of the highest
-# dependencies only. Inherited dependencies will be treated automatically.
 target_link_libraries(meshTools PUBLIC lagrangianBasic decompositionMethods)

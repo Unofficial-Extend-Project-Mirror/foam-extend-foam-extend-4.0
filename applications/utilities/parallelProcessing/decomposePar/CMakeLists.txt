@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   decomposeMesh.C
   decomposePar.C
   domainDecomposition.C
@@ -51,5 +51,5 @@ endif()
 
 add_foam_executable(decomposePar
   DEPENDS finiteVolume finiteArea tetFiniteElement
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

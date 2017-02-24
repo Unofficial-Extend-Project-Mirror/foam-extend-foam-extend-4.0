@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   refineSphereMesh.C
 )
 
@@ -42,5 +42,5 @@ endif()
 
 add_foam_executable(refineSphereMesh
 #   DEPENDS finiteVolume
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

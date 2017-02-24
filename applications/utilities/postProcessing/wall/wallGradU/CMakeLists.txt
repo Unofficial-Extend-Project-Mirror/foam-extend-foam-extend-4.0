@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   wallGradU.C
 )
 
@@ -42,5 +42,5 @@ endif()
 
 add_foam_executable(wallGradU
   DEPENDS finiteVolume
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

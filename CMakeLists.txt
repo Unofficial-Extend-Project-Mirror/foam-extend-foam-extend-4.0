@@ -1,16 +1,17 @@
-# /*-------------------------------------------------------------------------*\#   ========                 |
-#   \\      /  F ield         | foam-extend: Open Source CFD
-#    \\    /   O peration     | Version:     3.2
-#     \\  /    A nd           | Web:         http://www.foam-extend.org
-#      \\/     M anipulation  | For copyright notice see file Copyright
-# -----------------------------------------------------------------------------
+# --------------------------------------------------------------------------
+#   ========                 |
+#   \      /  F ield         | foam-extend: Open Source CFD
+#    \    /   O peration     | Version:     4.1
+#     \  /    A nd           | Web:         http://www.foam-extend.org
+#      \/     M anipulation  | For copyright notice see file Copyright
+# --------------------------------------------------------------------------
 # License
 #     This file is part of foam-extend.
 #
 #     foam-extend is free software: you can redistribute it and/or modify it
 #     under the terms of the GNU General Public License as published by the
-#     Free Software Foundation, either version 3 of the License, or (at your
-#     option) any later version.
+#     Free Software Foundation, either version 3 of the License, or {at your
+#     option} any later version.
 #
 #     foam-extend is distributed in the hope that it will be useful, but
 #     WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -21,17 +22,13 @@
 #     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 #
 # Description
-#     CMakeLists.txt file for implementing a test harness for the compilation
-#     and test of foam-extend-3.2 using Kitware CTest/CMake/CDash
-#
-#     The results will be submitted to the CDash server identified by the file
-#     CTestConfig.cmake
+#     CMakeLists.txt file for libraries and applications
 #
 # Author
-#     Martin Beaudoin, Hydro-Quebec, 2010. All rights reserved
+#     Henrik Rusche, Wikki GmbH, 2017. All rights reserved
 #
 #
-# \*-------------------------------------------------------------------------*/
+# --------------------------------------------------------------------------
 
 cmake_minimum_required (VERSION 2.8)
 
@@ -47,6 +44,7 @@ include(getGitVersion)
 
 add_custom_target(getGitVersion ALL
   COMMAND ${CMAKE_COMMAND} -P cmake/getGitVersion.cmake
+  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
   COMMENT "Getting GIT version"
 )
 
@@ -79,12 +77,13 @@ find_package(FLEX REQUIRED)
 
 find_package(Git REQUIRED)
 
+find_package(ParaView REQUIRED)
 
 #
 # Recurse into the source
 #
 
-# Set variabable to indicate that we are compiling internally. Used in applications.
+# Set variable to indicate that we are compiling internally. Used in applications.
 set(FOAM_FOUND 1)
 
 # Write something into FOAMTargets.cmake so that we can append to the file.
@@ -95,19 +94,36 @@ add_subdirectory(applications)
 
 
 #
-# Flags and definitions
+# Set default build type
 #
 
-# Define and process the definitions
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE Release CACHE STRING
+    "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel."
+    FORCE)
+endif()
+   
+#
+# Definitions inherited by all targets
+#
+
+# Single/Double precision
 set(FOAM_PRECISION "double" CACHE STRING "Numerical precision")
 set_property(CACHE FOAM_PRECISION PROPERTY STRINGS single double) 
 if(FOAM_PRECISION EQUAL "single")
-  target_compile_definitions(OSspecific PUBLIC -DWM_SP)
+  target_compile_definitions(OSspecific PUBLIC WM_SP)
 else()
-  target_compile_definitions(OSspecific PUBLIC -DWM_SP)
+  target_compile_definitions(OSspecific PUBLIC WM_DP)
 endif()
 
-target_compile_definitions(OSspecific PUBLIC -DNoRepository)
+# No Repository
+target_compile_definitions(OSspecific PUBLIC NoRepository)
+
+# FOAM's full debug mode
+if(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
+  target_compile_definitions(OSspecific PUBLIC FULLDEBUG)
+  target_compile_options(OSspecific PUBLIC -fdefault-inline -ggdb3)
+endif()
 
 #option(FOAM_PRECISION "help string describing option" -WM_DP)
 

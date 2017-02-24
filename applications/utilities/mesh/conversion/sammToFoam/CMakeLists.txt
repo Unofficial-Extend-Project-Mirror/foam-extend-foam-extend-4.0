@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   sammMesh.C
   fillSammCellShapeTable.C
   fillSammAddressingTable.C
@@ -56,5 +56,5 @@ endif()
 
 add_foam_executable(sammToFoam
   DEPENDS foam
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )

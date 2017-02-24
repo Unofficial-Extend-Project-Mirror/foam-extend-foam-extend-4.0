@@ -32,12 +32,10 @@
 
 
 
-list(APPEND sources errorEstimate/errorEstimate.H)
+list(APPEND SOURCES errorEstimate/errorEstimate.H)
 
-add_foam_library(errorEstimation SHARED ${sources})
+add_foam_library(errorEstimation SHARED ${SOURCES})
 
-# This is a prototype! Replace second argument with a list of the highest
-# dependencies only. Inherited dependencies will be treated automatically.
 target_link_libraries(errorEstimation PUBLIC finiteVolume)
 
 set_target_properties(errorEstimation PROPERTIES LINKER_LANGUAGE CXX)

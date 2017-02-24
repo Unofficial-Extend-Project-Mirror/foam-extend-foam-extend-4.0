@@ -30,14 +30,14 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   extrudedTriangleCellShape.C
   extrudedQuadCellShape.C
   create3DCellShape.C
 )
 FLEX_TARGET(fluentMeshToFoam fluentMeshToFoam.L
   ${CMAKE_CURRENT_BINARY_DIR}/fluentMeshToFoam.C COMPILE_FLAGS "-+")
-list(APPEND sources ${FLEX_fluentMeshToFoam_OUTPUTS})
+list(APPEND SOURCES ${FLEX_fluentMeshToFoam_OUTPUTS})
 
 # Set minimal environment for external compilation
 if(NOT FOAM_FOUND)
@@ -47,5 +47,9 @@ endif()
 
 add_foam_executable(fluentMeshToFoam
   DEPENDS dynamicMesh
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
+)
+target_include_directories(fluentMeshToFoam PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+#  $<INSTALL_INTERFACE:include/mylib>
 )

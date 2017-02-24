@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-list(APPEND sources
+list(APPEND SOURCES
   execFlowFunctionObjects.C
 )
 
@@ -42,5 +42,5 @@ endif()
 
 add_foam_executable(execFlowFunctionObjects
   DEPENDS postCalc incompressibleRASModels incompressibleLESModels compressibleRASModels compressibleLESModels
-  SOURCES ${sources}
+  SOURCES ${SOURCES}
 )
