@@ -182,7 +182,6 @@ public:
         //- Return autoPtr to the selected sixDOFODE
         static autoPtr<sixDOFODE> New(const IOobject& io);
 
-
     // Destructor
 
         virtual ~sixDOFODE();
@@ -209,6 +208,12 @@ public:
 
             //- Return access to equilibrium position of origin
             inline dimensionedVector& Xequilibrium();
+
+            //- Return linear spring coefficient
+            inline const dimensionedDiagTensor& linSpringCoeffs() const;
+
+            //- Return linear damping coefficient
+            inline const dimensionedDiagTensor& linDampingCoeffs() const;
 
 
         // Access to forces and moments
@@ -304,6 +309,9 @@ public:
                     const HamiltonRodriguezRot& rot
                 ) = 0;
 
+                //- Set ODE parameters from another ODE
+                virtual void setState(const sixDOFODE&);
+
 
             // Average motion per time-step
 
@@ -331,9 +339,6 @@ public:
                 //- Return transformation tensor between new and previous
                 //  rotation
                 virtual const tensor& rotIncrementTensor() const = 0;
-
-                //- Set ODE parameters from another ODE
-                virtual void setState(const sixDOFODE&) = 0;
 
 
             // ODE parameters

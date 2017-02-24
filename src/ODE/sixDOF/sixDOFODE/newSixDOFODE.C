@@ -22,6 +22,18 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
+Class
+    sixDOFODE
+
+Description
+    Abstract base class for six-degrees-of-freedom (6DOF) ordinary differential
+    equations
+
+Author
+    Dubravko Matijasevic, FSB Zagreb.  All rights reserved.
+    Hrvoje Jasak, FSB Zagreb. All rights reserved.
+    Vuko Vukcevic, FSB Zagreb.  All rights reserved.
+
 \*---------------------------------------------------------------------------*/
 
 #include "error.H"
