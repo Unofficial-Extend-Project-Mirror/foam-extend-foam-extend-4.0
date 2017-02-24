@@ -21,73 +21,103 @@ License
     You should have received a copy of the GNU General Public License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
-Class
-    translationODE
-
-Description
-    Ordinary differential equation for three degrees of freedom
-    solid body translation
-
-Author
-    Hrvoje Jasak
-    Dubravko Matijasevic
-
 \*---------------------------------------------------------------------------*/
-
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-const Foam::dimensionedScalar& Foam::translationODE::mass() const
+const Foam::dimensionedScalar& Foam::sixDOFODE::mass() const
 {
     return mass_;
 }
 
 
-const Foam::dimensionedVector& Foam::translationODE::Xrel() const
+Foam::dimensionedScalar& Foam::sixDOFODE::mass()
 {
-    return Xrel_;
+    return mass_;
 }
 
 
-Foam::dimensionedVector Foam::translationODE::X() const
+const Foam::dimensionedDiagTensor& Foam::sixDOFODE::momentOfInertia() const
 {
-    return xEquilibrium_ + Xrel();
+    return momentOfInertia_;
 }
 
 
-const Foam::dimensionedVector& Foam::translationODE::U() const
+Foam::dimensionedDiagTensor& Foam::sixDOFODE::momentOfInertia()
 {
-    return U_;
+    return momentOfInertia_;
 }
 
 
-const Foam::dimensionedVector& Foam::translationODE::Uold() const
+const Foam::dimensionedVector& Foam::sixDOFODE::Xequilibrium() const
 {
-    return Uold_;
+    return Xequilibrium_;
 }
 
 
-Foam::dimensionedVector Foam::translationODE::A() const
+Foam::dimensionedVector& Foam::sixDOFODE::Xequilibrium()
 {
-    return A(Xrel(), U());
+    return Xequilibrium_;
 }
 
 
-Foam::dimensionedVector Foam::translationODE::Uaverage() const
-{
-    return 0.5*(U_ + Uold_);
-}
-
-
-const Foam::dimensionedVector& Foam::translationODE::force() const
+const Foam::dimensionedVector& Foam::sixDOFODE::force() const
 {
     return force_;
 }
 
 
-Foam::dimensionedVector& Foam::translationODE::force()
+Foam::dimensionedVector& Foam::sixDOFODE::force()
 {
     return force_;
+}
+
+
+const Foam::dimensionedVector& Foam::sixDOFODE::moment() const
+{
+    return moment_;
+}
+
+
+Foam::dimensionedVector& Foam::sixDOFODE::moment()
+{
+    return moment_;
+}
+
+
+const Foam::dimensionedVector& Foam::sixDOFODE::forceRelative() const
+{
+    return forceRelative_;
+}
+
+
+Foam::dimensionedVector& Foam::sixDOFODE::forceRelative()
+{
+    return forceRelative_;
+}
+
+
+const Foam::dimensionedVector& Foam::sixDOFODE::momentRelative() const
+{
+    return momentRelative_;
+}
+
+
+Foam::dimensionedVector& Foam::sixDOFODE::momentRelative()
+{
+    return momentRelative_;
+}
+
+
+Foam::dimensionedVector Foam::sixDOFODE::forceTotal() const
+{
+    return force_ + (this->toAbsolute() & forceRelative_);
+}
+
+
+Foam::dimensionedVector Foam::sixDOFODE::momentTotal() const
+{
+    return moment_ + (this->toAbsolute() & momentRelative_);
 }
 
 
