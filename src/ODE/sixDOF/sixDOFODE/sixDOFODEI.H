@@ -21,6 +21,18 @@ License
     You should have received a copy of the GNU General Public License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
+Class
+    sixDOFODE
+
+Description
+    Abstract base class for six-degrees-of-freedom (6DOF) ordinary differential
+    equations
+
+Author
+    Dubravko Matijasevic, FSB Zagreb.  All rights reserved.
+    Hrvoje Jasak, FSB Zagreb. All rights reserved.
+    Vuko Vukcevic, FSB Zagreb.  All rights reserved.
+
 \*---------------------------------------------------------------------------*/
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
@@ -58,6 +70,18 @@ const Foam::dimensionedVector& Foam::sixDOFODE::Xequilibrium() const
 Foam::dimensionedVector& Foam::sixDOFODE::Xequilibrium()
 {
     return Xequilibrium_;
+}
+
+
+const Foam::dimensionedDiagTensor& Foam::sixDOFODE::linSpringCoeffs() const
+{
+    return linSpringCoeffs_;
+}
+
+
+const Foam::dimensionedDiagTensor& Foam::sixDOFODE::linDampingCoeffs() const
+{
+    return linDampingCoeffs_;
 }
 
 

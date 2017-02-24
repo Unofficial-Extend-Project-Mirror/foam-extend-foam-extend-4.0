@@ -16,5 +16,6 @@ $(sixDOF)/sixDOFbodies/sixDOFbodies.C
 
 $(sixDOF)/sixDOFODE/sixDOFODE.C
 $(sixDOF)/sixDOFODE/newSixDOFODE.C
+$(sixDOF)/quaternionSixDOF/quaternionSixDOF.C
 
 LIB = $(FOAM_LIBBIN)/libODE

@@ -209,7 +209,25 @@ void Foam::sixDOFODE::relaxAcceleration
 }
 
 
-// * * * * * * * * * * * * * * * Friend Operators  * * * * * * * * * * * * * //
+void Foam::sixDOFODE::setState(const sixDOFODE& sd)
+{
+    // Set state does not copy AList_, AOld_, relaxFactor_ and
+    // relaxFactorOld_. In case of multiple updates, overwriting Aitkens
+    // relaxation parameters would invalidate the underrelaxation.
+    // IG, 5/May/2016
+    mass_ = sd.mass_;
+    momentOfInertia_ = sd.momentOfInertia_;
+
+    Xequilibrium_ = sd.Xequilibrium_;
+    linSpringCoeffs_ = sd.linSpringCoeffs_;
+    linDampingCoeffs_ = sd.linDampingCoeffs_;
+
+    force_ = sd.force_;
+    moment_ = sd.moment_;
+    forceRelative_ = sd.forceRelative_;
+    momentRelative_ = sd.momentRelative_;
+}
+
 
 bool Foam::sixDOFODE::writeData(Ostream& os) const
 {
