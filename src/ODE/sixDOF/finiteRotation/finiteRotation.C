@@ -26,7 +26,8 @@ Class
 
 Author
     Dubravko Matijasevic, FSB Zagreb.  All rights reserved.
-    Update by Hrvoje Jasak
+    Hrvoje Jasak, FSB Zagreb.  All rights reserved.
+    Vuko Vukcevic, FSB Zagreb.  All rights reserved.
 
 \*---------------------------------------------------------------------------*/
 
@@ -82,9 +83,8 @@ Foam::vector Foam::finiteRotation::eulerAngles(const tensor& rotT)
     // Calculate roll angle
     rollAngle = atan2(rotT.yz(), rotT.zz());
 
-    // Use mag to avoid negative value due to round-off
-    // HJ, 24/Feb/2016
-    // Bugfix: sqr. SS, 18/Apr/2016
+    // Use mag to avoid negative value due to round-off, HJ, 24/Feb/2016
+    // Bugfix: missing sqr. SS, 18/Apr/2016
     const scalar c2 = sqrt(sqr(rotT.xx()) + sqr(rotT.xy()));
 
     // Calculate pitch angle
@@ -122,6 +122,14 @@ Foam::finiteRotation::finiteRotation
 {}
 
 
+Foam::finiteRotation::finiteRotation(const tensor& R)
+:
+    eInitial_(R),
+    rotTensor_(R),
+    rotIncrementTensor_(tensor::zero)
+{}
+
+
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
 Foam::finiteRotation::~finiteRotation()
@@ -130,12 +138,23 @@ Foam::finiteRotation::~finiteRotation()
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
+void Foam::finiteRotation::updateRotation(const tensor& R)
+{
+    rotIncrementTensor_ = (R & rotTensor_.T());
+    rotTensor_ = R;
+}
+
+
 void Foam::finiteRotation::updateRotation(const HamiltonRodriguezRot& rot)
 {
-    tensor rotR = rot.R();
+    updateRotation(rot.R());
+}
 
-    rotIncrementTensor_ = (rotR & (rotTensor_.T()));
-    rotTensor_ = rotR;
+
+void Foam::finiteRotation::updateRotationGivenIncrement(const tensor& incR)
+{
+    rotIncrementTensor_ = incR;
+    rotTensor_ = (incR & rotTensor_);
 }
 
 
