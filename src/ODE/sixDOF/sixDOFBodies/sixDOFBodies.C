@@ -83,11 +83,7 @@ void Foam::sixDOFBodies::setBodies()
         solvers_.set
         (
             bodyI,
-            ODESolver::New
-            (
-                lookup("solver"),
-                odes_[bodyI]
-            )
+            ODESolver::New(lookup("solver"), odes_[bodyI])
         );
     }
 }

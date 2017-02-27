@@ -31,7 +31,7 @@ Description
 
 Author
     Dubravko Matijasevic, FSB Zagreb.  All rights reserved.
-    Hrvoje Jasak, FSB Zagreb. All rights reserved.
+    Hrvoje Jasak, FSB Zagreb.  All rights reserved.
     Vuko Vukcevic, FSB Zagreb.  All rights reserved.
 
 SourceFiles
@@ -45,7 +45,7 @@ SourceFiles
 #define sixDOFODE_H
 
 #include "ODE.H"
-#include "IOdictionary.H"
+#include "sixDOFODEIO.H"
 #include "dimensionedTypes.H"
 #include "autoPtr.H"
 #include "runTimeSelectionTables.H"
@@ -54,6 +54,9 @@ SourceFiles
 
 namespace Foam
 {
+
+// Forward declarations of classes
+class IOobject;
 
 class finiteRotation;
 class HamiltonRodriguezRot;
@@ -64,10 +67,13 @@ class HamiltonRodriguezRot;
 
 class sixDOFODE
 :
-    public IOdictionary,
     public ODE
 {
     // Private data
+
+        //- Dictionary object controlling I/O for sixDOFODE
+        const sixDOFODEIO dict_;
+
 
         // Body data
 
@@ -190,6 +196,9 @@ public:
     // Member Functions
 
         // Access to common data
+
+            //- Return sixDOFODEIO (IOdictionary)
+            const sixDOFODEIO& dict() const;
 
             //- Return mass
             inline const dimensionedScalar& mass() const;
@@ -377,11 +386,6 @@ public:
 
             //- writeData member function required by regIOobject
             virtual bool writeData(Ostream&) const;
-
-
-    // Ostream operator
-
-        friend Ostream& operator<<(Ostream&, const sixDOFODE&);
 };
 
 
