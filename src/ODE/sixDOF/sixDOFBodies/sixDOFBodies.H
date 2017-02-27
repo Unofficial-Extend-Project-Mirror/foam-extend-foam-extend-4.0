@@ -22,7 +22,7 @@ License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    sixDOFbodies
+    sixDOFBodies
 
 Description
     6-DOF solver for multiple bodies
@@ -31,18 +31,17 @@ Author
     Dubravko Matijasevic, FSB Zagreb.  All rights reserved.
 
 SourceFiles
-    sixDOFbodies.C
+    sixDOFBodies.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef sixDOFbodies_H
-#define sixDOFbodies_H
+#ifndef sixDOFBodies_H
+#define sixDOFBodies_H
 
 #include "foamTime.H"
 #include "IOdictionary.H"
-#include "sixDOFqODE.H"
+#include "sixDOFODE.H"
 #include "ODESolver.H"
-#include "finiteRotation.H"
 #include "primitiveFields.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -51,10 +50,10 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                        Class sixDOFbodies Declaration
+                        Class sixDOFBodies Declaration
 \*---------------------------------------------------------------------------*/
 
-class sixDOFbodies
+class sixDOFBodies
 :
     public IOdictionary
 {
@@ -63,10 +62,10 @@ class sixDOFbodies
         //- Reference to time
         const Time& runTime_;
 
-        // Pointer list of Foam::sixDOFqODE objects
-        PtrList<sixDOFqODE> odes_;
+        // Pointer list of Foam::sixDOFODE objects
+        PtrList<sixDOFODE> odes_;
 
-        // Pointer list of Foam::sixDOFqODE solvers
+        // Pointer list of Foam::sixDOFODE solvers
         PtrList<ODESolver> solvers_;
 
         // Name list of solved bodies
@@ -76,10 +75,10 @@ class sixDOFbodies
     // Private Member Functions
 
         //- Disallow default bitwise copy construct
-        sixDOFbodies(const sixDOFbodies&);
+        sixDOFBodies(const sixDOFBodies&);
 
         //- Disallow default bitwise assignment
-        void operator=(const sixDOFbodies&);
+        void operator=(const sixDOFBodies&);
 
         //- Set bodies
         void setBodies();
@@ -90,12 +89,12 @@ public:
     // Constructors
 
         //- Construct from Time
-        sixDOFbodies(const Time& runTime);
+        sixDOFBodies(const Time& runTime);
 
 
     // Destructor
 
-        virtual ~sixDOFbodies()
+        virtual ~sixDOFBodies()
         {}
 
 
@@ -105,7 +104,7 @@ public:
         const wordList& names() const;
 
         //- Return list of bodies
-        const PtrList<sixDOFqODE>& operator()() const;
+        const PtrList<sixDOFODE>& operator()() const;
 
         //- Solve ODEs and update position
         void solve();
