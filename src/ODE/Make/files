@@ -12,10 +12,11 @@ $(ODESolvers)/SIBS/polyExtrapolate.C
 sixDOF = sixDOF
 $(sixDOF)/finiteRotation/finiteRotation.C
 $(sixDOF)/sixDOFqODE/sixDOFqODE.C
-$(sixDOF)/sixDOFbodies/sixDOFbodies.C
 
 $(sixDOF)/sixDOFODE/sixDOFODE.C
 $(sixDOF)/sixDOFODE/newSixDOFODE.C
 $(sixDOF)/quaternionSixDOF/quaternionSixDOF.C
+
+$(sixDOF)/sixDOFBodies/sixDOFBodies.C
 
 LIB = $(FOAM_LIBBIN)/libODE

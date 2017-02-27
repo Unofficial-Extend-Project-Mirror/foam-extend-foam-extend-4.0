@@ -36,7 +36,7 @@ Description
 #include "objectRegistry.H"
 #include "foamTime.H"
 #include "ODESolver.H"
-#include "sixDOFbodies.H"
+#include "sixDOFBodies.H"
 #include "OFstream.H"
 
 using namespace Foam;
@@ -48,7 +48,7 @@ int main(int argc, char *argv[])
 #   include "setRootCase.H"
 #   include "createTime.H"
 
-    sixDOFbodies structure(runTime);
+    sixDOFBodies structure(runTime);
     OFstream of(runTime.path()/"motion.dat");
 
     Info<< "\nStarting time loop\n" << endl;

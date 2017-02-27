@@ -22,7 +22,7 @@ License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    sixDOFbodies
+    sixDOFBodies
 
 Description
     6-DOF solver for multiple bodies
@@ -33,11 +33,11 @@ Author
 \*---------------------------------------------------------------------------*/
 
 #include "objectRegistry.H"
-#include "sixDOFbodies.H"
+#include "sixDOFBodies.H"
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
-void Foam::sixDOFbodies::setBodies()
+void Foam::sixDOFBodies::setBodies()
 {
     // Find if duplicate name existes
     forAll (names_, bodyI)
@@ -51,8 +51,9 @@ void Foam::sixDOFbodies::setBodies()
         {
             if (names_[bodyI] == names_[otherBody])
             {
-                FatalErrorIn("sixDOFbodies::setBodies()")
-                    << "Duplicate names of bodies: this is not allowed"
+                FatalErrorIn("sixDOFBodies::setBodies()")
+                    << "Found duplicate name: " << names_[bodyI]
+                    << " for bodies. This is not allowed."
                     << exit(FatalError);
             }
         }
@@ -66,7 +67,7 @@ void Foam::sixDOFbodies::setBodies()
         odes_.set
         (
             bodyI,
-            new sixDOFqODE
+            sixDOFODE::New
             (
                 IOobject
                 (
@@ -94,7 +95,7 @@ void Foam::sixDOFbodies::setBodies()
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-Foam::sixDOFbodies::sixDOFbodies
+Foam::sixDOFBodies::sixDOFBodies
 (
     const Time& runTime
 )
@@ -121,7 +122,7 @@ Foam::sixDOFbodies::sixDOFbodies
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-void Foam::sixDOFbodies::solve()
+void Foam::sixDOFBodies::solve()
 {
     const scalar tol = readScalar(lookup("eps"));
 
@@ -141,13 +142,13 @@ void Foam::sixDOFbodies::solve()
 }
 
 
-const Foam::wordList& Foam::sixDOFbodies::names() const
+const Foam::wordList& Foam::sixDOFBodies::names() const
 {
     return names_;
 }
 
 
-const Foam::PtrList<Foam::sixDOFqODE>& Foam::sixDOFbodies::operator()() const
+const Foam::PtrList<Foam::sixDOFODE>& Foam::sixDOFBodies::operator()() const
 {
     return odes_;
 }
