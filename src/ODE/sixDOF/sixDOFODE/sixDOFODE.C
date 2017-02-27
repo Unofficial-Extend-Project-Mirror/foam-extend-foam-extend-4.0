@@ -30,7 +30,7 @@ Description
 
 Author
     Dubravko Matijasevic, FSB Zagreb.  All rights reserved.
-    Hrvoje Jasak, FSB Zagreb. All rights reserved.
+    Hrvoje Jasak, FSB Zagreb.  All rights reserved.
     Vuko Vukcevic, FSB Zagreb.  All rights reserved.
 
 \*---------------------------------------------------------------------------*/
@@ -123,14 +123,15 @@ void Foam::sixDOFODE::aitkensRelaxation
 
 Foam::sixDOFODE::sixDOFODE(const IOobject& io)
 :
-    IOdictionary(io),
+    ODE(),
+    dict_(io, *this),
 
-    mass_(lookup("mass")),
-    momentOfInertia_(lookup("momentOfInertia")),
+    mass_(dict_.lookup("mass")),
+    momentOfInertia_(dict_.lookup("momentOfInertia")),
 
-    Xequilibrium_(lookup("equilibriumPosition")),
-    linSpringCoeffs_(lookup("linearSpring")),
-    linDampingCoeffs_(lookup("linearDamping")),
+    Xequilibrium_(dict_.lookup("equilibriumPosition")),
+    linSpringCoeffs_(dict_.lookup("linearSpring")),
+    linDampingCoeffs_(dict_.lookup("linearDamping")),
 
     relaxFactorT_(1.0),
     relaxFactorR_(1.0),
@@ -142,10 +143,10 @@ Foam::sixDOFODE::sixDOFODE(const IOobject& io)
     An_(3, vector::zero),
     OmegaDotn_(3, vector::zero),
 
-    force_(lookup("force")),
-    moment_(lookup("moment")),
-    forceRelative_(lookup("forceRelative")),
-    momentRelative_(lookup("momentRelative"))
+    force_(dict_.lookup("force")),
+    moment_(dict_.lookup("moment")),
+    forceRelative_(dict_.lookup("forceRelative")),
+    momentRelative_(dict_.lookup("momentRelative"))
 {}
 
 
@@ -156,6 +157,11 @@ Foam::sixDOFODE::~sixDOFODE()
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+
+const Foam::sixDOFODEIO& Foam::sixDOFODE::dict() const
+{
+    return dict_;
+}
 
 
 void Foam::sixDOFODE::relaxAcceleration
@@ -252,18 +258,6 @@ bool Foam::sixDOFODE::writeData(Ostream& os) const
         << token::END_STATEMENT << endl;
 
     return os.good();
-}
-
-
-// * * * * * * * * * * * * * * IOstream Operators  * * * * * * * * * * * * * //
-
-Foam::Ostream& Foam::operator<<(Ostream& os, const sixDOFODE& sds)
-{
-    sds.writeData(os);
-
-    os.check("Ostream& operator<<(Ostream&, const sixDOFODE");
-
-    return os;
 }
 
 

@@ -29,7 +29,7 @@ Description
 
 Author
     Dubravko Matijasevic, FSB Zagreb.  All rights reserved.
-    Hrvoje Jasak, FSB Zagreb. All rights reserved.
+    Hrvoje Jasak, FSB Zagreb.  All rights reserved.
     Vuko Vukcevic, FSB Zagreb.  All rights reserved.
 
 SourceFiles

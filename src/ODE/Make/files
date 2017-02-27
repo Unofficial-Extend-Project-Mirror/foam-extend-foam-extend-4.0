@@ -13,6 +13,7 @@ sixDOF = sixDOF
 $(sixDOF)/finiteRotation/finiteRotation.C
 $(sixDOF)/sixDOFqODE/sixDOFqODE.C
 
+$(sixDOF)/sixDOFODE/sixDOFODEIO.C
 $(sixDOF)/sixDOFODE/sixDOFODE.C
 $(sixDOF)/sixDOFODE/newSixDOFODE.C
 $(sixDOF)/quaternionSixDOF/quaternionSixDOF.C

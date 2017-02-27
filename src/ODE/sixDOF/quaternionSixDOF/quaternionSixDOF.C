@@ -29,7 +29,7 @@ Description
 
 Author
     Dubravko Matijasevic, FSB Zagreb.  All rights reserved.
-    Hrvoje Jasak, FSB Zagreb. All rights reserved.
+    Hrvoje Jasak, FSB Zagreb.  All rights reserved.
     Vuko Vukcevic, FSB Zagreb.  All rights reserved.
 
 SourceFiles
@@ -38,6 +38,7 @@ SourceFiles
 \*---------------------------------------------------------------------------*/
 
 #include "quaternionSixDOF.H"
+#include "sixDOFODEIO.H"
 #include "addToRunTimeSelectionTable.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -226,29 +227,29 @@ Foam::quaternionSixDOF::quaternionSixDOF(const IOobject& io)
 :
     sixDOFODE(io),
 
-    Xrel_(lookup("Xrel")),
-    U_(lookup("U")),
+    Xrel_(dict().lookup("Xrel")),
+    U_(dict().lookup("U")),
     Uaverage_(U_),
     rotation_
     (
-        vector(lookup("rotationVector")),
-        dimensionedScalar(lookup("rotationAngle")).value()
+        vector(dict().lookup("rotationVector")),
+        dimensionedScalar(dict().lookup("rotationAngle")).value()
     ),
-    omega_(lookup("omega")),
+    omega_(dict().lookup("omega")),
     omegaAverage_(omega_),
     omegaAverageAbsolute_(omega_),
 
     coeffs_(13, 0.0),
 
-    fixedSurge_(lookup("fixedSurge")),
-    fixedSway_(lookup("fixedSway")),
-    fixedHeave_(lookup("fixedHeave")),
-    fixedRoll_(lookup("fixedRoll")),
-    fixedPitch_(lookup("fixedPitch")),
-    fixedYaw_(lookup("fixedYaw")),
+    fixedSurge_(dict().lookup("fixedSurge")),
+    fixedSway_(dict().lookup("fixedSway")),
+    fixedHeave_(dict().lookup("fixedHeave")),
+    fixedRoll_(dict().lookup("fixedRoll")),
+    fixedPitch_(dict().lookup("fixedPitch")),
+    fixedYaw_(dict().lookup("fixedYaw")),
     referentMotionConstraints_
     (
-        lookupOrDefault<Switch>
+        dict().lookupOrDefault<Switch>
         (
             "referentMotionConstraints",
             false
@@ -271,9 +272,9 @@ Foam::quaternionSixDOF::quaternionSixDOF
         IOobject
         (
             name,
-            qsd.instance(),
-            qsd.local(),
-            qsd.db(),
+            qsd.dict().instance(),
+            qsd.dict().local(),
+            qsd.dict().db(),
             IOobject::NO_READ,
             IOobject::NO_WRITE
         )
@@ -658,18 +659,18 @@ bool Foam::quaternionSixDOF::writeData(Ostream& os) const
     os.writeKeyword("omega") << tab << this->omega()
         << token::END_STATEMENT << nl << nl;
 
-    os.writeKeyword("fixedSurge") << tab << this->fixedSurge_ <<
-        token::END_STATEMENT << endl;
-    os.writeKeyword("fixedSway") << tab << this->fixedSway_ <<
-        token::END_STATEMENT << endl;
-    os.writeKeyword("fixedHeave") << tab << this->fixedHeave_ <<
-        token::END_STATEMENT << endl;
-    os.writeKeyword("fixedRoll") << tab << this->fixedRoll_ <<
-        token::END_STATEMENT << endl;
-    os.writeKeyword("fixedPitch") << tab << this->fixedPitch_ <<
-        token::END_STATEMENT << endl;
-    os.writeKeyword("fixedYaw") << tab << this->fixedYaw_ <<
-        token::END_STATEMENT << endl;
+    os.writeKeyword("fixedSurge") << tab << fixedSurge_ <<
+        token::END_STATEMENT << nl;
+    os.writeKeyword("fixedSway") << tab << fixedSway_ <<
+        token::END_STATEMENT << nl;
+    os.writeKeyword("fixedHeave") << tab << fixedHeave_ <<
+        token::END_STATEMENT << nl;
+    os.writeKeyword("fixedRoll") << tab << fixedRoll_ <<
+        token::END_STATEMENT << nl;
+    os.writeKeyword("fixedPitch") << tab << fixedPitch_ <<
+        token::END_STATEMENT << nl;
+    os.writeKeyword("fixedYaw") << tab << fixedYaw_ <<
+        token::END_STATEMENT << nl << endl;
 
     return os.good();
 }
