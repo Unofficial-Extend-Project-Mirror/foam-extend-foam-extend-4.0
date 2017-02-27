@@ -14,12 +14,16 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
+// Mass properties and restraints (common to all sixDOFODE's)
 mass                m           [1 0 0 0 0 0 0]      1;
 momentOfInertia     J           [1 2 0 0 0 0 0]      (1 1 1);
 
 equilibriumPosition Xeq         [0 1 0 0 0 0 0]      (-1 0 0);
 linearSpring        k           [1 0 -2 0 0 0 0]     (1 1 1);
 linearDamping       d           [1 0 -1 0 0 0 0]     (0 0 0);
+
+// Specific input for certain sixDOFODE (here quaternionSixDOF)
+type quaternionSixDOF;
 
 // Xabs = Xeq + Xrel
 Xrel                Xrel        [0 1 0 0 0 0 0]      (0 0 0);
