@@ -26,7 +26,8 @@ Class
 
 Author
     Dubravko Matijasevic, FSB Zagreb.  All rights reserved.
-    Updated by Hrvoje Jasak
+    Hrvoje Jasak, FSB Zagreb.  All rights reserved.
+    Vuko Vukcevic, FSB Zagreb.  All rights reserved.
 
 SourceFiles
     finiteRotation.C
@@ -89,6 +90,9 @@ public:
             const scalar& angle
         );
 
+        //- Construct from rotation tensor
+        explicit finiteRotation(const tensor& R);
+
 
     // Destructor
 
@@ -97,8 +101,14 @@ public:
 
     // Member Functions
 
-        //- Update rotation
+        //- Update rotation given rotation tensor
+        void updateRotation(const tensor& R);
+
+        //- Update rotation given HamiltonRodriguezRot (quaternions)
         void updateRotation(const HamiltonRodriguezRot& rot);
+
+        //- Update rotation given increment rotation tensor
+        void updateRotationGivenIncrement(const tensor& incR);
 
         //- Return initial quaternions
         const HamiltonRodriguezRot& eInitial() const;
