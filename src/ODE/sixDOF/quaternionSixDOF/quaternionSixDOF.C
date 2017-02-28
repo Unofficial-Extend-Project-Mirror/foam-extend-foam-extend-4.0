@@ -38,7 +38,7 @@ SourceFiles
 \*---------------------------------------------------------------------------*/
 
 #include "quaternionSixDOF.H"
-#include "sixDOFODEIO.H"
+#include "OutputControlDictionary.H"
 #include "addToRunTimeSelectionTable.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
