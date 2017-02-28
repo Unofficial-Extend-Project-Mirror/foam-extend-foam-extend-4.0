@@ -45,18 +45,15 @@ SourceFiles
 #define sixDOFODE_H
 
 #include "ODE.H"
-#include "sixDOFODEIO.H"
 #include "dimensionedTypes.H"
 #include "autoPtr.H"
+#include "OutputControlDictionary.H"
 #include "runTimeSelectionTables.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
-
-// Forward declarations of classes
-class IOobject;
 
 class finiteRotation;
 class HamiltonRodriguezRot;
@@ -72,7 +69,7 @@ class sixDOFODE
     // Private data
 
         //- Dictionary object controlling I/O for sixDOFODE
-        const sixDOFODEIO dict_;
+        const OutputControlDictionary<sixDOFODE> dict_;
 
 
         // Body data
@@ -197,8 +194,8 @@ public:
 
         // Access to common data
 
-            //- Return sixDOFODEIO (IOdictionary)
-            const sixDOFODEIO& dict() const;
+            //- Return write controlled dictionary
+            const OutputControlDictionary<sixDOFODE>& dict() const;
 
             //- Return mass
             inline const dimensionedScalar& mass() const;

@@ -158,7 +158,8 @@ Foam::sixDOFODE::~sixDOFODE()
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-const Foam::sixDOFODEIO& Foam::sixDOFODE::dict() const
+const Foam::OutputControlDictionary<Foam::sixDOFODE>&
+Foam::sixDOFODE::dict() const
 {
     return dict_;
 }
