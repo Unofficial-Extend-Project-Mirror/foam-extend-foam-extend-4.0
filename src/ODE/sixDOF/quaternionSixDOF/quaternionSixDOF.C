@@ -189,38 +189,6 @@ void Foam::quaternionSixDOF::constrainTranslation(vector& vec) const
 }
 
 
-// * * * * * * * * * * * * Protected Member Functions  * * * * * * * * * * * //
-
-void Foam::quaternionSixDOF::setCoeffs()
-{
-    // Set ODE coefficients from position and rotation
-
-    // Linear displacement relative to spring equilibrium
-    const vector& Xval = Xrel_.value();
-    coeffs_[0] = Xval.x();
-    coeffs_[1] = Xval.y();
-    coeffs_[2] = Xval.z();
-
-    // Linear velocity
-    const vector& Uval = U_.value();
-    coeffs_[3] = Uval.x();
-    coeffs_[4] = Uval.y();
-    coeffs_[5] = Uval.z();
-
-    // Rotational velocity in non - inertial coordinate system
-    const vector& omegaVal = omega_.value();
-    coeffs_[6] = omegaVal.x();
-    coeffs_[7] = omegaVal.y();
-    coeffs_[8] = omegaVal.z();
-
-    // Quaternions
-    coeffs_[9] = rotation_.eInitial().e0();
-    coeffs_[10] = rotation_.eInitial().e1();
-    coeffs_[11] = rotation_.eInitial().e2();
-    coeffs_[12] = rotation_.eInitial().e3();
-}
-
-
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 Foam::quaternionSixDOF::quaternionSixDOF(const IOobject& io)
@@ -257,7 +225,31 @@ Foam::quaternionSixDOF::quaternionSixDOF(const IOobject& io)
     ),
     referentRotation_(vector(1, 0, 0), 0)
 {
-    setCoeffs();
+    // Set ODE coefficients from position and rotation
+
+    // Linear displacement relative to spring equilibrium
+    const vector& Xval = Xrel_.value();
+    coeffs_[0] = Xval.x();
+    coeffs_[1] = Xval.y();
+    coeffs_[2] = Xval.z();
+
+    // Linear velocity
+    const vector& Uval = U_.value();
+    coeffs_[3] = Uval.x();
+    coeffs_[4] = Uval.y();
+    coeffs_[5] = Uval.z();
+
+    // Rotational velocity in non - inertial coordinate system
+    const vector& omegaVal = omega_.value();
+    coeffs_[6] = omegaVal.x();
+    coeffs_[7] = omegaVal.y();
+    coeffs_[8] = omegaVal.z();
+
+    // Quaternions
+    coeffs_[9] = rotation_.eInitial().e0();
+    coeffs_[10] = rotation_.eInitial().e1();
+    coeffs_[11] = rotation_.eInitial().e2();
+    coeffs_[12] = rotation_.eInitial().e3();
 }
 
 
