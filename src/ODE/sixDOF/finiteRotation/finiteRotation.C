@@ -151,7 +151,7 @@ void Foam::finiteRotation::updateRotation(const HamiltonRodriguezRot& rot)
 }
 
 
-void Foam::finiteRotation::updateRotationGivenIncrement(const tensor& incR)
+void Foam::finiteRotation::updateRotationWithIncrement(const tensor& incR)
 {
     rotIncrementTensor_ = incR;
     rotTensor_ = (incR & rotTensor_);

@@ -85,6 +85,9 @@ void Foam::sixDOFBodies::setBodies()
             bodyI,
             ODESolver::New(lookup("solver"), odes_[bodyI])
         );
+
+        Info<< "Finished creating " << odes_[bodyI].type()
+            << " object for body " << names_[bodyI] << endl;
     }
 }
 

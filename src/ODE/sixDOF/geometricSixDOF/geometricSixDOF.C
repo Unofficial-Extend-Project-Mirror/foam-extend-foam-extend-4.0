@@ -190,7 +190,7 @@ Foam::tensor Foam::geometricSixDOF::expMap(const vector& rotInc) const
           + (skewRotInc & skewRotInc)*(1.0 - cos(magRotInc))/sqr(magRotInc);
     }
 
-    return R;
+    return R.T();
 }
 
 
@@ -568,15 +568,11 @@ void Foam::geometricSixDOF::derivatives
     // Get rotational increment vector (u)
     const vector rotIncrementVector(y[9], y[10], y[11]);
 
-    // Calculate rotation increment tensor obtained with exponential map using
-    // the increment vector
-    const tensor rotIncrement = expMap(rotIncrementVector);
-
-    // Update rotation tensor
-    rotation_.updateRotation(rotIncrement);
+    // Calculate current rotation tensor obtained with exponential map
+    const tensor curRot = (expMap(rotIncrementVector) & rotation_.rotTensor());
 
     // Calculate translational acceleration using current rotation
-    const vector accel = A(curX, curU, rotation_.rotTensor()).value();
+    const vector accel = A(curX, curU, curRot).value();
 
     // Set the derivatives for velocity
     dydx[3] = accel.x();
@@ -593,7 +589,7 @@ void Foam::geometricSixDOF::derivatives
     );
 
     // Calculate rotational acceleration using current rotation
-    const vector omegaDot = OmegaDot(rotation_.rotTensor(), curOmega).value();
+    const vector omegaDot = OmegaDot(curRot, curOmega).value();
 
     dydx[6] = omegaDot.x();
     dydx[7] = omegaDot.y();
@@ -649,7 +645,7 @@ void Foam::geometricSixDOF::update(const scalar delta)
     omegaVal.z() = coeffs_[8];
 
     // Update rotation with final increment vector
-    rotation_.updateRotation
+    rotation_.updateRotationWithIncrement
     (
         expMap(vector(coeffs_[9], coeffs_[10], coeffs_[11]))
     );
