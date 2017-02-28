@@ -14,13 +14,19 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-// Mass properties and restraints (common to all sixDOFODE's)
+// Mass properties and inputs common to all sixDOFODE's
 mass                m           [1 0 0 0 0 0 0]       1;
 momentOfInertia     J           [1 2 0 0 0 0 0]      (1 1 1);
 
 equilibriumPosition Xeq         [0 1 0 0 0 0 0]      (0 0 0);
 linearSpring        k           [1 0 -2 0 0 0 0]     (1 1 1);
 linearDamping       d           [1 0 -1 0 0 0 0]     (0 0 0);
+
+force               f           [1 1 -2 0 0 0 0]     (0 0 0);
+moment              m           [1 2 -2 0 0 0 0]     (0 0 0);
+
+forceRelative       fRel        [1 1 -2 0 0 0 0]     (0 0 0);
+momentRelative      mRel        [1 2 -2 0 0 0 0]     (-0.5773502692 -0.5773502692 -0.5773502692);
 
 // Specific input for certain sixDOFODE (here quaternionSixDOF)
 type quaternionSixDOF;
@@ -33,12 +39,6 @@ rotationVector                  (0 0 1);
 
 rotationAngle    rotationAngle  [0 0 0 0 0 0 0]       0;
 omega            rotUrel        [0 0 -1 0 0 0 0]     (0.5773502692 0.5773502692 0.5773502692);
-
-force               f           [1 1 -2 0 0 0 0]     (0 0 0);
-moment              m           [1 2 -2 0 0 0 0]     (0 0 0);
-
-forceRelative       fRel        [1 1 -2 0 0 0 0]     (0 0 0);
-momentRelative      mRel        [1 2 -2 0 0 0 0]     (-0.5773502692 -0.5773502692 -0.5773502692);
 
 // Motion constraints
 fixedSurge          no;
