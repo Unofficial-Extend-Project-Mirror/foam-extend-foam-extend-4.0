@@ -146,9 +146,6 @@ protected:
 
     // Protected Member Functions
 
-        //- Set ODE coefficients from position and rotation
-        virtual void setCoeffs() = 0;
-
         //- Update Aitkens relaxation parameters
         void aitkensRelaxation(const scalar min, const scalar max);
 

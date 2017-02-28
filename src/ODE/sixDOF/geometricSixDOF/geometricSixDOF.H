@@ -22,26 +22,39 @@ License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    quaternionSixDOF
+    geometricSixDOF
 
 Description
-    6-DOF solver using quaternions
+    6-DOF solver using a geometric method for integration of rotations.
+
+    Reference (bibtex):
+
+    @article {mullerTerze2016,
+        Author = {M\"{u}ller, A. and Terze, Z.},
+        title = {Geometric methods and formulations in computational
+                 multibody systems},
+        Journal = {Acta Mechanica},
+        Year = {2016},
+        Volume = {227},
+        Number = {12},
+        Pages = {3327--3350}
+    }
 
 Author
-    Dubravko Matijasevic, FSB Zagreb.  All rights reserved.
-    Hrvoje Jasak, FSB Zagreb.  All rights reserved.
+    Viktor Pandza, FSB Zagreb.  All rights reserved.
     Vuko Vukcevic, FSB Zagreb.  All rights reserved.
 
 SourceFiles
-    quaternionSixDOF.C
+    geometricSixDOF.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef quaternionSixDOF_H
-#define quaternionSixDOF_H
+#ifndef geometricSixDOF_H
+#define geometricSixDOF_H
 
 #include "sixDOFODE.H"
 #include "finiteRotation.H"
+#include "tolerancesSwitch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -49,10 +62,10 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                    Class quaternionSixDOF Declaration
+                    Class geometricSixDOF Declaration
 \*---------------------------------------------------------------------------*/
 
-class quaternionSixDOF
+class geometricSixDOF
 :
     public sixDOFODE
 {
@@ -69,8 +82,8 @@ class quaternionSixDOF
             //- Average velocity of mass centroid at previous time-step
             dimensionedVector Uaverage_;
 
-            //- Finite rotation
-            finiteRotation rotation_;
+            //- Finite rotation. Note: changed during solution process
+            mutable finiteRotation rotation_;
 
             //- Rotational velocity about mass centroid
             dimensionedVector omega_;
@@ -85,8 +98,13 @@ class quaternionSixDOF
             dimensionedVector omegaAverageAbsolute_;
 
 
-        //- ODE coefficients
-        scalarField coeffs_;
+        // ODE controls
+
+            //- Number of equations (depending on rotational constraints)
+            scalar nEqns_;
+
+            //- ODE coefficients
+            scalarField coeffs_;
 
 
         //- Motion constraints (given as fixed motion components)
@@ -109,20 +127,22 @@ class quaternionSixDOF
             //- Fixed yaw (rotation around z)
             Switch fixedYaw_;
 
-            //- Restraints in referent coordinate system
+            //- Constraints in referent coordinate system
             Switch referentMotionConstraints_;
 
-            //- Rotation of referent coordinate system
+            //- Rotation of referent coordinate system. Currently defined using
+            //  quaternions for comatibility. Need to reformulate.
+            //  VV, 28/Feb/2017.
             HamiltonRodriguezRot referentRotation_;
 
 
     // Private Member Functions
 
         //- Disallow default bitwise copy construct
-        quaternionSixDOF(const quaternionSixDOF&);
+        geometricSixDOF(const geometricSixDOF&);
 
         //- Disallow default bitwise assignment
-        void operator=(const quaternionSixDOF&);
+        void operator=(const geometricSixDOF&);
 
 
         // Variables in relative coordinate system (solved for)
@@ -133,7 +153,7 @@ class quaternionSixDOF
             (
                 const dimensionedVector& xR,
                 const dimensionedVector& uR,
-                const HamiltonRodriguezRot& rotation
+                const tensor& R
             ) const;
 
 
@@ -141,7 +161,7 @@ class quaternionSixDOF
             //  given current values for relative rotational velocity
             dimensionedVector OmegaDot
             (
-                const HamiltonRodriguezRot& rotation,
+                const tensor& R,
                 const dimensionedVector& omega
             ) const;
 
@@ -151,31 +171,46 @@ class quaternionSixDOF
                 const dimensionedVector& omega
             ) const;
 
-            //- Constrain rotation vector in referent or global coordinate
-            //  system
-            void constrainRotation(vector& vec) const;
-
             //- Constrain translation vector in referent or global coordinate
             //  system
             void constrainTranslation(vector& vec) const;
+
+            //- Exponential map used to calculate increment of the rotation
+            //  tensor
+            tensor expMap(const vector& rotInc) const;
+
+            //- Differential of the expontential map used to calculate the time
+            //  derivative of rotation increment vector
+            vector dexpMap(const vector& rotInc, const vector& omega) const;
 
 
 public:
 
     // Run-time type information
-    TypeName("quaternionSixDOF");
+    TypeName("geometricSixDOF");
+
+
+    // Static data members
+
+        //- Rotational increment tensor tolerance. Used in expMap member
+        //  function in case the rotation is negligibly small
+        static const debug::tolerancesSwitch rotIncTensorTol_;
+
+        //- Rotational increment rate of change tolerance. Used in dexpMap
+        //  member function in case the rotation rate is negligibly small
+        static const debug::tolerancesSwitch rotIncRateTol_;
 
 
     // Constructors
 
         //- Construct from dictionary
-        quaternionSixDOF(const IOobject& io);
+        geometricSixDOF(const IOobject& io);
 
-        //- Construct quaternionSixDOF object, changing name
-        quaternionSixDOF
+        //- Construct geometricSixDOF object, changing name
+        geometricSixDOF
         (
             const word& name,
-            const quaternionSixDOF& qsd
+            const geometricSixDOF& gsd
         );
 
         //- Return a clone, changing the name
@@ -184,7 +219,7 @@ public:
 
     // Destructor
 
-        virtual ~quaternionSixDOF();
+        virtual ~geometricSixDOF();
 
 
     // Member Functions
@@ -278,7 +313,7 @@ public:
                 //- Return number of equations
                 virtual label nEqns() const
                 {
-                    return 13;
+                    return nEqns_;
                 }
 
                 //- Return access to coefficients
@@ -312,7 +347,7 @@ public:
                 {
                     notImplemented
                     (
-                        "quaternionSixDOF::jacobian\n"
+                        "geometricSixDOF::jacobian\n"
                         "(\n"
                         "    const scalar x,\n"
                         "    const scalarField& y,\n"

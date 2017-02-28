@@ -17,6 +17,7 @@ $(sixDOF)/sixDOFODE/sixDOFODEIO.C
 $(sixDOF)/sixDOFODE/sixDOFODE.C
 $(sixDOF)/sixDOFODE/newSixDOFODE.C
 $(sixDOF)/quaternionSixDOF/quaternionSixDOF.C
+$(sixDOF)/geometricSixDOF/geometricSixDOF.C
 
 $(sixDOF)/sixDOFBodies/sixDOFBodies.C
 
