@@ -108,7 +108,7 @@ public:
         void updateRotation(const HamiltonRodriguezRot& rot);
 
         //- Update rotation given increment rotation tensor
-        void updateRotationGivenIncrement(const tensor& incR);
+        void updateRotationWithIncrement(const tensor& incR);
 
         //- Return initial quaternions
         const HamiltonRodriguezRot& eInitial() const;
