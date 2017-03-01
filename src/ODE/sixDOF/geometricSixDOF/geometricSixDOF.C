@@ -76,10 +76,8 @@ Foam::dimensionedVector Foam::geometricSixDOF::A
 {
     // Fix the total force in global coordinate system
     dimensionedVector fAbs =
-        // Force in global coordinate system
+        // External force
         force()
-        // Force in local coordinate system
-      + (R.T() & forceRelative())
         // Spring force in global coordinate system
       - (linSpringCoeffs() & xR)
         // Damping force in global coordinate system
@@ -100,10 +98,8 @@ Foam::dimensionedVector Foam::geometricSixDOF::OmegaDot
 {
     // External moment (torque) in local coordinate system
     dimensionedVector mRel =
-        // Moment in global coordinate system
-        (dimensionedTensor("R", dimless, R) & moment())
-        // Moment in local coordinate system
-      + momentRelative();
+        // External moment
+        (dimensionedTensor("R", dimless, R) & moment());
 
     // Note: constraints not implemented at the moment. They shall be
     // implemented in terms of Lagrange multipliers.
