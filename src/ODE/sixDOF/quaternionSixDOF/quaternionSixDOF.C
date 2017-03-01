@@ -190,6 +190,40 @@ void Foam::quaternionSixDOF::constrainTranslation(vector& vec) const
 }
 
 
+// * * * * * * * * * * * Protected Member Functions * * * * * * * * * * * * * //
+
+void Foam::quaternionSixDOF::setState(const sixDOFODE& sd)
+{
+    // First set the state in base class subobject
+    sixDOFODE::setState(sd);
+
+    // Cast sixDOFODE& to quaternionSixDOF&
+    const quaternionSixDOF& qsd = refCast<const quaternionSixDOF>(sd);
+
+    // Set state variables for this class
+    Xrel_ = qsd.Xrel_;
+    U_ = qsd.U_;
+    Uaverage_ = qsd.Uaverage_;
+    rotation_ = qsd.rotation_;
+    omega_ = qsd.omega_;
+    omegaAverage_ = qsd.omegaAverage_;
+    omegaAverageAbsolute_ = qsd.omegaAverageAbsolute_;
+
+    // Copy ODE coefficients: this carries actual ODE state
+    // HJ, 23/Mar/2015
+    coeffs_ = qsd.coeffs_;
+
+    fixedSurge_ = qsd.fixedSurge_;
+    fixedSway_ = qsd.fixedSway_;
+    fixedHeave_ = qsd.fixedHeave_;
+    fixedRoll_ = qsd.fixedRoll_;
+    fixedPitch_ = qsd.fixedPitch_;
+    fixedYaw_ = qsd.fixedYaw_;
+    referentMotionConstraints_ = qsd.referentMotionConstraints_;
+    referentRotation_ = qsd.referentRotation_;
+}
+
+
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 Foam::quaternionSixDOF::quaternionSixDOF(const IOobject& io)
@@ -260,18 +294,7 @@ Foam::quaternionSixDOF::quaternionSixDOF
     const quaternionSixDOF& qsd
 )
 :
-    sixDOFODE
-    (
-        IOobject
-        (
-            name,
-            qsd.dict().instance(),
-            qsd.dict().local(),
-            qsd.dict().db(),
-            IOobject::NO_READ,
-            IOobject::NO_WRITE
-        )
-    ),
+    sixDOFODE(name, qsd),
 
     Xrel_(qsd.Xrel_.name(), qsd.Xrel_),
     U_(qsd.U_.name(), qsd.U_),
@@ -351,38 +374,6 @@ const Foam::dimensionedVector& Foam::quaternionSixDOF::U() const
 const Foam::dimensionedVector& Foam::quaternionSixDOF::Uaverage() const
 {
     return Uaverage_;
-}
-
-
-void Foam::quaternionSixDOF::setState(const sixDOFODE& sd)
-{
-    // First set the state in base class subobject
-    sixDOFODE::setState(sd);
-
-    // Cast sixDOFODE& to quaternionSixDOF&
-    const quaternionSixDOF& qsd = refCast<const quaternionSixDOF>(sd);
-
-    // Set state variables for this class
-    Xrel_ = qsd.Xrel_;
-    U_ = qsd.U_;
-    Uaverage_ = qsd.Uaverage_;
-    rotation_ = qsd.rotation_;
-    omega_ = qsd.omega_;
-    omegaAverage_ = qsd.omegaAverage_;
-    omegaAverageAbsolute_ = qsd.omegaAverageAbsolute_;
-
-    // Copy ODE coefficients: this carries actual ODE state
-    // HJ, 23/Mar/2015
-    coeffs_ = qsd.coeffs_;
-
-    fixedSurge_ = qsd.fixedSurge_;
-    fixedSway_ = qsd.fixedSway_;
-    fixedHeave_ = qsd.fixedHeave_;
-    fixedRoll_ = qsd.fixedRoll_;
-    fixedPitch_ = qsd.fixedPitch_;
-    fixedYaw_ = qsd.fixedYaw_;
-    referentMotionConstraints_ = qsd.referentMotionConstraints_;
-    referentRotation_ = qsd.referentRotation_;
 }
 
 

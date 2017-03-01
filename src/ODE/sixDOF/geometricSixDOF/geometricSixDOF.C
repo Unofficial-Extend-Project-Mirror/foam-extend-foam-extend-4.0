@@ -233,6 +233,39 @@ Foam::vector Foam::geometricSixDOF::dexpMap
 }
 
 
+// * * * * * * * * * * * Protected Member Functions * * * * * * * * * * * * * //
+
+void Foam::geometricSixDOF::setState(const sixDOFODE& sd)
+{
+    // First set the state in base class subobject
+    sixDOFODE::setState(sd);
+
+    // Cast sixDOFODE& to geometricSixDOF&
+    const geometricSixDOF& gsd = refCast<const geometricSixDOF>(sd);
+
+    // Set state variables for this class
+    Xrel_ = gsd.Xrel_;
+    U_ = gsd.U_;
+    Uaverage_ = gsd.Uaverage_;
+    rotation_ = gsd.rotation_;
+    omega_ = gsd.omega_;
+    omegaAverage_ = gsd.omegaAverage_;
+
+    // Copy ODE coefficients: this carries actual ODE state
+    // HJ, 23/Mar/2015
+    coeffs_ = gsd.coeffs_;
+
+    fixedSurge_ = gsd.fixedSurge_;
+    fixedSway_ = gsd.fixedSway_;
+    fixedHeave_ = gsd.fixedHeave_;
+    fixedRoll_ = gsd.fixedRoll_;
+    fixedPitch_ = gsd.fixedPitch_;
+    fixedYaw_ = gsd.fixedYaw_;
+    referentMotionConstraints_ = gsd.referentMotionConstraints_;
+    referentRotation_ = gsd.referentRotation_;
+}
+
+
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 Foam::geometricSixDOF::geometricSixDOF(const IOobject& io)
@@ -310,18 +343,7 @@ Foam::geometricSixDOF::geometricSixDOF
     const geometricSixDOF& gsd
 )
 :
-    sixDOFODE
-    (
-        IOobject
-        (
-            name,
-            gsd.dict().instance(),
-            gsd.dict().local(),
-            gsd.dict().db(),
-            IOobject::NO_READ,
-            IOobject::NO_WRITE
-        )
-    ),
+    sixDOFODE(name, gsd),
 
     Xrel_(gsd.Xrel_.name(), gsd.Xrel_),
     U_(gsd.U_.name(), gsd.U_),
@@ -396,37 +418,6 @@ const Foam::dimensionedVector& Foam::geometricSixDOF::U() const
 const Foam::dimensionedVector& Foam::geometricSixDOF::Uaverage() const
 {
     return Uaverage_;
-}
-
-
-void Foam::geometricSixDOF::setState(const sixDOFODE& sd)
-{
-    // First set the state in base class subobject
-    sixDOFODE::setState(sd);
-
-    // Cast sixDOFODE& to geometricSixDOF&
-    const geometricSixDOF& gsd = refCast<const geometricSixDOF>(sd);
-
-    // Set state variables for this class
-    Xrel_ = gsd.Xrel_;
-    U_ = gsd.U_;
-    Uaverage_ = gsd.Uaverage_;
-    rotation_ = gsd.rotation_;
-    omega_ = gsd.omega_;
-    omegaAverage_ = gsd.omegaAverage_;
-
-    // Copy ODE coefficients: this carries actual ODE state
-    // HJ, 23/Mar/2015
-    coeffs_ = gsd.coeffs_;
-
-    fixedSurge_ = gsd.fixedSurge_;
-    fixedSway_ = gsd.fixedSway_;
-    fixedHeave_ = gsd.fixedHeave_;
-    fixedRoll_ = gsd.fixedRoll_;
-    fixedPitch_ = gsd.fixedPitch_;
-    fixedYaw_ = gsd.fixedYaw_;
-    referentMotionConstraints_ = gsd.referentMotionConstraints_;
-    referentRotation_ = gsd.referentRotation_;
 }
 
 

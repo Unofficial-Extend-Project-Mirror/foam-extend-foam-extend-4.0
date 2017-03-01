@@ -91,6 +91,15 @@ public:
 
         //- Update ODE after the solution, advancing by delta
         virtual void update(const scalar delta) = 0;
+
+        //- Member function for initialising the ODE state. Required for some
+        //  ODE's (specifically sixDOFODE's) which might be called multiple
+        //  times per single time-step. Called at the beginning of
+        //  ODESolver::solve and does nothing by default
+        virtual void init()
+        {
+            // Does nothing by default
+        }
 };
 
 
