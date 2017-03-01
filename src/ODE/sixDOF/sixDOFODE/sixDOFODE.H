@@ -135,19 +135,19 @@ class sixDOFODE
 
     // Private Member Functions
 
-        //- Disallow default bitwise copy construct
-        sixDOFODE(const sixDOFODE&);
+        // Copy control
 
-        //- Disallow default bitwise assignment
-        void operator=(const sixDOFODE&);
+            //- Disallow default bitwise copy construct
+            sixDOFODE(const sixDOFODE&);
+
+            //- Disallow default bitwise assignment
+            void operator=(const sixDOFODE&);
 
 
-protected:
+        // Aitkens relaxation helper function
 
-    // Protected Member Functions
-
-        //- Update Aitkens relaxation parameters
-        void aitkensRelaxation(const scalar min, const scalar max);
+            //- Update Aitkens relaxation parameters
+            void aitkensRelaxation(const scalar min, const scalar max);
 
 
 public:
@@ -181,6 +181,7 @@ public:
 
         //- Return autoPtr to the selected sixDOFODE
         static autoPtr<sixDOFODE> New(const IOobject& io);
+
 
     // Destructor
 
@@ -271,7 +272,7 @@ public:
                 virtual const dimensionedVector& omega() const = 0;
 
 
-            // Displacement and rotation in the absolute coordinate system
+            // Displacement and velocity in the absolute coordinate system
 
                 //- Return position of origin in absolute coordinate system
                 virtual dimensionedVector X() const = 0;
@@ -279,38 +280,11 @@ public:
                 //- Return velocity of origin
                 virtual const dimensionedVector& U() const = 0;
 
-                //- Return average velocity of origin for the previous time-step
+                //- Return average velocity of origin (evaluated at midstep)
                 virtual const dimensionedVector& Uaverage() const = 0;
-
-                //- Return finite rotation
-                virtual const finiteRotation& rotation() const = 0;
-
-                //- Return rotational vector of body
-                virtual vector rotVector() const = 0;
-
-                //- Return rotation angle of body
-                virtual dimensionedScalar rotAngle() const = 0;
 
 
             // Non-access control for setting state variables
-
-                //- Set position of origin
-                virtual void setXrel(const vector& x) = 0;
-
-                //- Set velocity of origin
-                virtual void setU(const vector& u) = 0;
-
-                //- Set rotational angle in relative coordinate system
-                virtual void setRotation(const HamiltonRodriguezRot& rot) = 0;
-
-                //- Set rotational velocity in relative coordinate system
-                virtual void setOmega(const vector& omega) = 0;
-
-                //- Set referent coordinate system to apply constraints
-                virtual void setReferentRotation
-                (
-                    const HamiltonRodriguezRot& rot
-                ) = 0;
 
                 //- Set ODE parameters from another ODE
                 virtual void setState(const sixDOFODE&);
@@ -318,17 +292,9 @@ public:
 
             // Average motion per time-step
 
-                //- Return average rotational vector of body
-                virtual vector rotVectorAverage() const = 0;
-
                 //- Return average rotational velocity in relative coordinate
-                //  system
+                //  system (evaluated at midstep)
                 virtual const dimensionedVector& omegaAverage() const = 0;
-
-                //- Return average rotational velocity in absolute coordinate
-                //  system
-                virtual const dimensionedVector&
-                omegaAverageAbsolute() const = 0;
 
 
             // Rotations

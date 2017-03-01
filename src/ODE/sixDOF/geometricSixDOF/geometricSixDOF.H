@@ -79,23 +79,21 @@ class geometricSixDOF
             //- Velocity of mass centroid
             dimensionedVector U_;
 
-            //- Average velocity of mass centroid at previous time-step
+            //- Average velocity of mass centroid (evaluated at midstep)
             dimensionedVector Uaverage_;
 
-            //- Finite rotation. Note: changed during solution process
-            mutable finiteRotation rotation_;
+            //- Rotation tensor
+            tensor rotation_;
+
+            //- Rotational increment tensor
+            tensor rotIncrement_;
 
             //- Rotational velocity about mass centroid
             dimensionedVector omega_;
 
-
-        // Average variables that need to be stored
-
             //- Average rotational velocity in relative coordinate system
+            //  (evaluated at midstep)
             dimensionedVector omegaAverage_;
-
-            //- Average rotational velocity in absolute coordinate system
-            dimensionedVector omegaAverageAbsolute_;
 
 
         // ODE controls
@@ -107,7 +105,7 @@ class geometricSixDOF
             scalarField coeffs_;
 
 
-        //- Motion constraints (given as fixed motion components)
+        // Motion constraints (given as fixed motion components)
 
             //- Fixed surge (x-translation)
             Switch fixedSurge_;
@@ -236,7 +234,7 @@ public:
                 virtual const dimensionedVector& omega() const;
 
 
-            // Displacement and rotation in the absolute coordinate system
+            // Displacement and velocity in the absolute coordinate system
 
                 //- Return position of origin in absolute coordinate system
                 virtual dimensionedVector X() const;
@@ -244,38 +242,11 @@ public:
                 //- Return velocity of origin
                 virtual const dimensionedVector& U() const;
 
-                //- Return average velocity of origin for the previous time-step
+                //- Return average velocity of origin (evaluated at midstep)
                 virtual const dimensionedVector& Uaverage() const;
-
-                //- Return finite rotation
-                virtual const finiteRotation& rotation() const;
-
-                //- Return rotational vector of body
-                virtual vector rotVector() const;
-
-                //- Return rotation angle of body
-                virtual dimensionedScalar rotAngle() const;
 
 
             // Non-access control for setting state variables
-
-                //- Set position of origin
-                virtual void setXrel(const vector& x);
-
-                //- Set velocity of origin
-                virtual void setU(const vector& u);
-
-                //- Set rotational angle in relative coordinate system
-                virtual void setRotation(const HamiltonRodriguezRot& rot);
-
-                //- Set rotational velocity in relative coordinate system
-                virtual void setOmega(const vector& omega);
-
-                //- Set referent coordinate system to apply constraints
-                virtual void setReferentRotation
-                (
-                    const HamiltonRodriguezRot& rot
-                );
 
                 //- Set ODE parameters from another ODE
                 virtual void setState(const sixDOFODE&);
@@ -283,16 +254,9 @@ public:
 
             // Average motion per time-step
 
-                //- Return average rotational vector of body
-                virtual vector rotVectorAverage() const;
-
                 //- Return average rotational velocity in relative coordinate
-                //  system
+                //  system (evaluated at midstep)
                 virtual const dimensionedVector& omegaAverage() const;
-
-                //- Return average rotational velocity in absolute coordinate
-                //  system
-                virtual const dimensionedVector& omegaAverageAbsolute() const;
 
 
             // Rotations
@@ -359,6 +323,7 @@ public:
 
                 //- Update ODE after the solution, advancing by delta
                 virtual void update(const scalar delta);
+
 
         // Write controls
 

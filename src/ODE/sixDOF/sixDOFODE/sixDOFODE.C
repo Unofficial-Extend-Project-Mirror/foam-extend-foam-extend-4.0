@@ -48,7 +48,7 @@ defineRunTimeSelectionTable(sixDOFODE, dictionary);
 
 }
 
-// * * * * * * * * * * * * Protected Member Functions  * * * * * * * * * * * //
+// * * * * * * * * * * * * Private Member Functions * * * * * * * * * * * * * //
 
 void Foam::sixDOFODE::aitkensRelaxation
 (
@@ -173,7 +173,7 @@ void Foam::sixDOFODE::relaxAcceleration
 {
     if (mag(minRelFactor - maxRelFactor) < SMALL)
     {
-        // Fixed relaxation
+       // Fixed relaxation
        relaxFactorT_ = minRelFactor;
        relaxFactorR_ = minRelFactor;
     }

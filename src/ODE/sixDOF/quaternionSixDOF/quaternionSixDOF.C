@@ -198,15 +198,15 @@ Foam::quaternionSixDOF::quaternionSixDOF(const IOobject& io)
 
     Xrel_(dict().lookup("Xrel")),
     U_(dict().lookup("U")),
-    Uaverage_(U_),
+    Uaverage_("Uaverage", U_),
     rotation_
     (
         vector(dict().lookup("rotationVector")),
         dimensionedScalar(dict().lookup("rotationAngle")).value()
     ),
     omega_(dict().lookup("omega")),
-    omegaAverage_(omega_),
-    omegaAverageAbsolute_(omega_),
+    omegaAverage_("omegaAverage", omega_),
+    omegaAverageAbsolute_("omegaAverageAbsolute", omega_),
 
     coeffs_(13, 0.0),
 
@@ -347,86 +347,10 @@ const Foam::dimensionedVector& Foam::quaternionSixDOF::U() const
     return U_;
 }
 
+
 const Foam::dimensionedVector& Foam::quaternionSixDOF::Uaverage() const
 {
     return Uaverage_;
-}
-
-
-const Foam::finiteRotation& Foam::quaternionSixDOF::rotation() const
-{
-    return rotation_;
-}
-
-
-Foam::vector Foam::quaternionSixDOF::rotVector() const
-{
-    return rotation_.rotVector();
-}
-
-
-Foam::dimensionedScalar Foam::quaternionSixDOF::rotAngle() const
-{
-    return dimensionedScalar("rotAngle", dimless, rotation_.rotAngle());
-}
-
-
-void Foam::quaternionSixDOF::setXrel(const vector& x)
-{
-    Xrel_.value() = x;
-
-    // Set X in coefficients
-    coeffs_[0] = x.x();
-    coeffs_[1] = x.y();
-    coeffs_[2] = x.z();
-}
-
-
-void Foam::quaternionSixDOF::setU(const vector& U)
-{
-    U_.value() = U;
-    Uaverage_ = U_;
-
-    // Set U in coefficients
-    coeffs_[3] = U.x();
-    coeffs_[4] = U.y();
-    coeffs_[5] = U.z();
-}
-
-
-void Foam::quaternionSixDOF::setRotation(const HamiltonRodriguezRot& rot)
-{
-    // Cannot call update rotation: simply set up coefficients
-    // HJ, 23/Mar/2015
-
-    coeffs_[9] = rot.e0();
-    coeffs_[10] = rot.e1();
-    coeffs_[11] = rot.e2();
-    coeffs_[12] = rot.e3();
-}
-
-
-void Foam::quaternionSixDOF::setOmega(const vector& omega)
-{
-    omega_.value() = omega;
-    omegaAverage_ = omega_;
-    omegaAverageAbsolute_ = omega_;
-
-    // Set omega in coefficients
-    coeffs_[6] = omega.x();
-    coeffs_[7] = omega.y();
-    coeffs_[8] = omega.z();
-}
-
-
-void Foam::quaternionSixDOF::setReferentRotation
-(
-    const HamiltonRodriguezRot& rot
-)
-{
-    referentRotation_ = rot;
-
-    referentMotionConstraints_ = true;
 }
 
 
@@ -462,22 +386,9 @@ void Foam::quaternionSixDOF::setState(const sixDOFODE& sd)
 }
 
 
-Foam::vector Foam::quaternionSixDOF::rotVectorAverage() const
-{
-    return rotation_.rotVectorAverage();
-}
-
-
 const Foam::dimensionedVector& Foam::quaternionSixDOF::omegaAverage() const
 {
     return omegaAverage_;
-}
-
-
-const Foam::dimensionedVector&
-Foam::quaternionSixDOF::omegaAverageAbsolute() const
-{
-    return omegaAverageAbsolute_;
 }
 
 
@@ -642,14 +553,15 @@ bool Foam::quaternionSixDOF::writeData(Ostream& os) const
     os.writeKeyword("type") << tab << type() << token::END_STATEMENT << endl;
 
     // Write data
-    os.writeKeyword("Xrel") << tab << this->Xrel()
+    os.writeKeyword("Xrel") << tab << Xrel_
         << token::END_STATEMENT << nl;
-    os.writeKeyword("U") << tab << this->U() << token::END_STATEMENT << nl;
-    os.writeKeyword("rotationVector") << tab << this->rotVector()
+    os.writeKeyword("U") << tab << U_ << token::END_STATEMENT << nl;
+    os.writeKeyword("rotationVector") << tab << rotation_.rotVector()
         << token::END_STATEMENT << nl;
-    os.writeKeyword("rotationAngle") << tab << this->rotAngle()
+    os.writeKeyword("rotationAngle") << tab
+        << dimensionedScalar("rotAngle", dimless, rotation_.rotAngle())
         << token::END_STATEMENT << nl;
-    os.writeKeyword("omega") << tab << this->omega()
+    os.writeKeyword("omega") << tab << omega_
         << token::END_STATEMENT << nl << nl;
 
     os.writeKeyword("fixedSurge") << tab << fixedSurge_ <<

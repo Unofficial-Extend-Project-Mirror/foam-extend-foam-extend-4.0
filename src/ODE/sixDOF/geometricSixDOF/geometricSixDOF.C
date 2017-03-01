@@ -170,7 +170,7 @@ Foam::tensor Foam::geometricSixDOF::expMap(const vector& rotInc) const
 {
     tensor R;
 
-    // Calculate the magnitude of the rotation increment vector
+    // Calculate the magnitude of the rotational increment vector
     const scalar magRotInc = mag(rotInc);
 
     if (magRotInc < rotIncTensorTol_)
@@ -202,7 +202,7 @@ Foam::vector Foam::geometricSixDOF::dexpMap
 {
     vector rotIncDot;
 
-    // Calculate the magnitude of the rotation increment vector
+    // Calculate the magnitude of the rotational increment vector
     const scalar magRotInc = mag(rotInc);
 
     if (magRotInc < rotIncRateTol_)
@@ -241,11 +241,14 @@ Foam::geometricSixDOF::geometricSixDOF(const IOobject& io)
 
     Xrel_(dict().lookup("Xrel")),
     U_(dict().lookup("U")),
-    Uaverage_(U_),
+    Uaverage_("Uaverage", U_),
     rotation_(tensor(dict().lookup("rotationTensor"))),
+    rotIncrement_
+    (
+        dict().lookupOrDefault<tensor>("rotationIncrementTensor", tensor::zero)
+    ),
     omega_(dict().lookup("omega")),
-    omegaAverage_(omega_),
-    omegaAverageAbsolute_(omega_),
+    omegaAverage_("omegaAverage", omega_),
 
     nEqns_(),
     coeffs_(),
@@ -326,11 +329,6 @@ Foam::geometricSixDOF::geometricSixDOF
     rotation_(gsd.rotation_),
     omega_(gsd.omega_.name(), gsd.omega_),
     omegaAverage_(gsd.omegaAverage_.name(), gsd.omegaAverage_),
-    omegaAverageAbsolute_
-    (
-        gsd.omegaAverageAbsolute_.name(),
-        gsd.omegaAverageAbsolute_
-    ),
 
     nEqns_(gsd.nEqns_),
     coeffs_(gsd.coeffs_),
@@ -401,80 +399,6 @@ const Foam::dimensionedVector& Foam::geometricSixDOF::Uaverage() const
 }
 
 
-const Foam::finiteRotation& Foam::geometricSixDOF::rotation() const
-{
-    return rotation_;
-}
-
-
-Foam::vector Foam::geometricSixDOF::rotVector() const
-{
-    return rotation_.rotVector();
-}
-
-
-Foam::dimensionedScalar Foam::geometricSixDOF::rotAngle() const
-{
-    return dimensionedScalar("rotAngle", dimless, rotation_.rotAngle());
-}
-
-
-void Foam::geometricSixDOF::setXrel(const vector& x)
-{
-    Xrel_.value() = x;
-
-    // Set X in coefficients
-    coeffs_[0] = x.x();
-    coeffs_[1] = x.y();
-    coeffs_[2] = x.z();
-}
-
-
-void Foam::geometricSixDOF::setU(const vector& U)
-{
-    U_.value() = U;
-    Uaverage_ = U_;
-
-    // Set U in coefficients
-    coeffs_[3] = U.x();
-    coeffs_[4] = U.y();
-    coeffs_[5] = U.z();
-}
-
-
-void Foam::geometricSixDOF::setRotation(const HamiltonRodriguezRot& rot)
-{
-    // Set increment rotation vector to zero
-    coeffs_[9] = 0;
-    coeffs_[10] = 0;
-    coeffs_[11] = 0;
-}
-
-
-void Foam::geometricSixDOF::setOmega(const vector& omega)
-{
-    omega_.value() = omega;
-    omegaAverage_ = omega_;
-    omegaAverageAbsolute_ = omega_;
-
-    // Set omega in coefficients
-    coeffs_[6] = omega.x();
-    coeffs_[7] = omega.y();
-    coeffs_[8] = omega.z();
-}
-
-
-void Foam::geometricSixDOF::setReferentRotation
-(
-    const HamiltonRodriguezRot& rot
-)
-{
-    referentRotation_ = rot;
-
-    referentMotionConstraints_ = true;
-}
-
-
 void Foam::geometricSixDOF::setState(const sixDOFODE& sd)
 {
     // First set the state in base class subobject
@@ -490,7 +414,6 @@ void Foam::geometricSixDOF::setState(const sixDOFODE& sd)
     rotation_ = gsd.rotation_;
     omega_ = gsd.omega_;
     omegaAverage_ = gsd.omegaAverage_;
-    omegaAverageAbsolute_ = gsd.omegaAverageAbsolute_;
 
     // Copy ODE coefficients: this carries actual ODE state
     // HJ, 23/Mar/2015
@@ -507,44 +430,27 @@ void Foam::geometricSixDOF::setState(const sixDOFODE& sd)
 }
 
 
-Foam::vector Foam::geometricSixDOF::rotVectorAverage() const
-{
-    return rotation_.rotVectorAverage();
-}
-
-
 const Foam::dimensionedVector& Foam::geometricSixDOF::omegaAverage() const
 {
     return omegaAverage_;
 }
 
 
-const Foam::dimensionedVector&
-Foam::geometricSixDOF::omegaAverageAbsolute() const
-{
-    return omegaAverageAbsolute_;
-}
-
-
 Foam::tensor Foam::geometricSixDOF::toRelative() const
 {
-    // Note: using rotation tensor directly since we are integrating rotational
-    // increment vector
-    return rotation_.rotTensor();
+    return rotation_;
 }
 
 
 Foam::tensor Foam::geometricSixDOF::toAbsolute() const
 {
-    // Note: using rotation tensor directly since we are integrating rotational
-    // increment vector
-    return rotation_.rotTensor().T();
+    return rotation_.T();
 }
 
 
 const Foam::tensor& Foam::geometricSixDOF::rotIncrementTensor() const
 {
-    return rotation_.rotIncrementTensor();
+    return rotIncrement_;
 }
 
 
@@ -569,7 +475,7 @@ void Foam::geometricSixDOF::derivatives
     const vector rotIncrementVector(y[9], y[10], y[11]);
 
     // Calculate current rotation tensor obtained with exponential map
-    const tensor curRot = (expMap(rotIncrementVector) & rotation_.rotTensor());
+    const tensor curRot = (expMap(rotIncrementVector) & rotation_);
 
     // Calculate translational acceleration using current rotation
     const vector accel = A(curX, curU, curRot).value();
@@ -612,7 +518,7 @@ void Foam::geometricSixDOF::update(const scalar delta)
     // Translation
 
     // Update displacement
-    vector Xold = Xrel_.value();
+    const vector Xold = Xrel_.value();
 
     vector& Xval = Xrel_.value();
 
@@ -638,27 +544,28 @@ void Foam::geometricSixDOF::update(const scalar delta)
     // Rotation
 
     // Update omega
+    const vector omegaOld = omega_.value();
+
     vector& omegaVal = omega_.value();
 
     omegaVal.x() = coeffs_[6];
     omegaVal.y() = coeffs_[7];
     omegaVal.z() = coeffs_[8];
 
-    // Update rotation with final increment vector
-    rotation_.updateRotationWithIncrement
-    (
-        expMap(vector(coeffs_[9], coeffs_[10], coeffs_[11]))
-    );
+    // Update rotational increment tensor
+    rotIncrement_ = expMap(vector(coeffs_[9], coeffs_[10], coeffs_[11]));
+
+    // Update rotational tensor
+    rotation_ = (rotIncrement_ & rotation_);
 
     // Reset increment vector in coefficients for the next step
     coeffs_[9] = 0;
     coeffs_[10] = 0;
     coeffs_[11] = 0;
 
-    omegaAverage_.value() = rotation_.omegaAverage(delta);
-
-    // Calculate omegaAverageAbsolute
-    omegaAverageAbsolute_.value() = rotation_.omegaAverageAbsolute(delta);
+    // Consider calculating average omega using rotational tensor and rotational
+    // increment tensors
+    omegaAverage_.value() = 0.5*(omegaVal + omegaOld);
 }
 
 
@@ -671,26 +578,28 @@ bool Foam::geometricSixDOF::writeData(Ostream& os) const
     os.writeKeyword("type") << tab << type() << token::END_STATEMENT << endl;
 
     // Write data
-    os.writeKeyword("Xrel") << tab << this->Xrel()
+    os.writeKeyword("Xrel") << tab << Xrel_
         << token::END_STATEMENT << nl;
-    os.writeKeyword("U") << tab << this->U() << token::END_STATEMENT << nl;
-    os.writeKeyword("rotationTensor") << tab << this->toRelative()
+    os.writeKeyword("U") << tab << U_ << token::END_STATEMENT << nl;
+    os.writeKeyword("rotationTensor") << tab << rotation_
         << token::END_STATEMENT << nl;
-    os.writeKeyword("omega") << tab << this->omega()
+    os.writeKeyword("rotationIncrementTensor") << tab << rotIncrement_
+        << token::END_STATEMENT << nl;
+    os.writeKeyword("omega") << tab << omega_
         << token::END_STATEMENT << nl << nl;
 
-    os.writeKeyword("fixedSurge") << tab << this->fixedSurge_ <<
-        token::END_STATEMENT << endl;
-    os.writeKeyword("fixedSway") << tab << this->fixedSway_ <<
-        token::END_STATEMENT << endl;
-    os.writeKeyword("fixedHeave") << tab << this->fixedHeave_ <<
-        token::END_STATEMENT << endl;
-    os.writeKeyword("fixedRoll") << tab << this->fixedRoll_ <<
-        token::END_STATEMENT << endl;
-    os.writeKeyword("fixedPitch") << tab << this->fixedPitch_ <<
-        token::END_STATEMENT << endl;
-    os.writeKeyword("fixedYaw") << tab << this->fixedYaw_ <<
-        token::END_STATEMENT << endl;
+    os.writeKeyword("fixedSurge") << tab << fixedSurge_ <<
+        token::END_STATEMENT << nl;
+    os.writeKeyword("fixedSway") << tab << fixedSway_ <<
+        token::END_STATEMENT << nl;
+    os.writeKeyword("fixedHeave") << tab << fixedHeave_ <<
+        token::END_STATEMENT << nl;
+    os.writeKeyword("fixedRoll") << tab << fixedRoll_ <<
+        token::END_STATEMENT << nl;
+    os.writeKeyword("fixedPitch") << tab << fixedPitch_ <<
+        token::END_STATEMENT << nl;
+    os.writeKeyword("fixedYaw") << tab << fixedYaw_ <<
+        token::END_STATEMENT << nl << endl;
 
     return os.good();
 }

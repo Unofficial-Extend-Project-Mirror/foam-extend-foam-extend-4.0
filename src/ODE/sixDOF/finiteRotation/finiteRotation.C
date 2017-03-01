@@ -40,9 +40,7 @@ Foam::vector Foam::finiteRotation::rotVector(const tensor& rotT)
 {
     vector ur = - *( inv(I + rotT) & (I - rotT) );
 
-    // Scaling to a unit vector.  HJ, problems with round-off
-    // HJ, 4/Aug/2008
-
+    // Scaling to a unit vector. Problems with round-off. HJ, 4/Aug/2008
     if (mag(ur) > SMALL)
     {
         return ur/(mag(ur) + SMALL);
@@ -50,8 +48,7 @@ Foam::vector Foam::finiteRotation::rotVector(const tensor& rotT)
     else
     {
         // Rotation vector is undertermined at zero rotation
-        // Returning arbitrary unit vector
-        // HJ, 4/Mar/2015
+        // Returning arbitrary unit vector. HJ, 4/Mar/2015
         return vector(0, 0, 1);
     }
 }
