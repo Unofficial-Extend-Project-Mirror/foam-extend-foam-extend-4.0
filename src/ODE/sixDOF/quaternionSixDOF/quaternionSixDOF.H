@@ -109,7 +109,7 @@ class quaternionSixDOF
             //- Fixed yaw (rotation around z)
             Switch fixedYaw_;
 
-            //- Restraints in referent coordinate system
+            //- Constraints in referent coordinate system
             Switch referentMotionConstraints_;
 
             //- Rotation of referent coordinate system

@@ -60,20 +60,21 @@ Foam::dimensionedVector Foam::quaternionSixDOF::A
     const HamiltonRodriguezRot& rotation
 ) const
 {
-    // Fix the global force for global rotation constraints
-    dimensionedVector fAbs = this->force();
+    // Fix the total force in global coordinate system
+    dimensionedVector fAbs =
+        // Force in global coordinate system
+        force()
+        // Force in local coordinate system
+      + (rotation.invR() & forceRelative())
+        // Spring force in global coordinate system
+      - (linSpringCoeffs() & xR)
+        // Damping force in global coordinate system
+      - (linDampingCoeffs() & uR);
 
     // Constrain translation
     constrainTranslation(fAbs.value());
 
-    return
-    (
-       - (linSpringCoeffs() & xR)    // spring
-       - (linDampingCoeffs() & uR)   // damping
-       + fAbs
-         // To absolute
-       + (rotation.invR() & forceRelative())
-    )/mass();
+    return fAbs/mass();
 }
 
 

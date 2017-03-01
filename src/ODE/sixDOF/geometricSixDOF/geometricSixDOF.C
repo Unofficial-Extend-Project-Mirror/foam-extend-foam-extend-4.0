@@ -79,7 +79,7 @@ Foam::dimensionedVector Foam::geometricSixDOF::A
         // Force in global coordinate system
         force()
         // Force in local coordinate system
-      + (dimensionedTensor("R_T", dimless, R.T()) & forceRelative())
+      + (R.T() & forceRelative())
         // Spring force in global coordinate system
       - (linSpringCoeffs() & xR)
         // Damping force in global coordinate system
