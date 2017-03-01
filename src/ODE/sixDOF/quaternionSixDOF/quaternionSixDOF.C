@@ -62,10 +62,8 @@ Foam::dimensionedVector Foam::quaternionSixDOF::A
 {
     // Fix the total force in global coordinate system
     dimensionedVector fAbs =
-        // Force in global coordinate system
+        // External force
         force()
-        // Force in local coordinate system
-      + (rotation.invR() & forceRelative())
         // Spring force in global coordinate system
       - (linSpringCoeffs() & xR)
         // Damping force in global coordinate system
@@ -96,7 +94,6 @@ Foam::dimensionedVector Foam::quaternionSixDOF::OmegaDot
             E(omega)
             // To relative
           + (rotation.R() & mAbs)
-          + momentRelative()
         );
 }
 

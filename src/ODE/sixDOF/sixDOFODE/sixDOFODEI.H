@@ -91,57 +91,30 @@ const Foam::dimensionedVector& Foam::sixDOFODE::force() const
 }
 
 
-Foam::dimensionedVector& Foam::sixDOFODE::force()
-{
-    return force_;
-}
-
-
 const Foam::dimensionedVector& Foam::sixDOFODE::moment() const
 {
     return moment_;
 }
 
 
-Foam::dimensionedVector& Foam::sixDOFODE::moment()
+void Foam::sixDOFODE::setExternalForceAndMoment
+(
+    const vector& externalForce,
+    const vector& externalMoment
+)
 {
-    return moment_;
-}
+    // Initialise the state before setting external forces and moments
+    initState();
 
+    // Set forces and moments
+    force_ = externalForce;
+    moment_ = externalMoment;
 
-const Foam::dimensionedVector& Foam::sixDOFODE::forceRelative() const
-{
-    return forceRelative_;
-}
-
-
-Foam::dimensionedVector& Foam::sixDOFODE::forceRelative()
-{
-    return forceRelative_;
-}
-
-
-const Foam::dimensionedVector& Foam::sixDOFODE::momentRelative() const
-{
-    return momentRelative_;
-}
-
-
-Foam::dimensionedVector& Foam::sixDOFODE::momentRelative()
-{
-    return momentRelative_;
-}
-
-
-Foam::dimensionedVector Foam::sixDOFODE::forceTotal() const
-{
-    return force_ + (this->toAbsolute() & forceRelative_);
-}
-
-
-Foam::dimensionedVector Foam::sixDOFODE::momentTotal() const
-{
-    return moment_ + (this->toAbsolute() & momentRelative_);
+    // Relax acceleration if the Aitkens relaxation is turned on
+    if (aitkensRelaxation_)
+    {
+        relaxAcceleration();
+    }
 }
 
 

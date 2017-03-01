@@ -54,9 +54,6 @@ void Foam::ODESolver::solve
     scalar& hEst
 )
 {
-    // Initialize ODE before solving
-    ode_.init();
-
     const label MAXSTP = 10000;
 
     scalar x = xStart;

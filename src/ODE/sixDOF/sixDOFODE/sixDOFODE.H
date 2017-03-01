@@ -48,6 +48,7 @@ SourceFiles
 #include "autoPtr.H"
 #include "OutputControlDictionary.H"
 #include "runTimeSelectionTables.H"
+#include "Switch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -92,6 +93,15 @@ class sixDOFODE
 
         // Aitkens relaxation data members
 
+            //- Switch to control whether to use Aitkens relaxation
+            Switch aitkensRelaxation_;
+
+            //- Minimum acceleration relaxation factor (default 0.1)
+            const scalar minRelaxFactor_;
+
+            //- Maximum acceleration relaxation factor (default 0.5)
+            const scalar maxRelaxFactor_;
+
             //- Translational relaxation factor
             scalar relaxFactorT_;
 
@@ -116,17 +126,11 @@ class sixDOFODE
 
         // External forces and moments
 
-            //- Force driving the motion in inertial coord. sys.
+            //- Force driving the motion in global (inertial) coord. sys.
             dimensionedVector force_;
 
-            //- Moment driving the motion in inertial coord. sys.
+            //- Moment driving the motion in global (inertial) coord. sys.
             dimensionedVector moment_;
-
-            //- Force driving the motion in relative coord. sys.
-            dimensionedVector forceRelative_;
-
-            //- Moment driving the motion in relative coord. sys.
-            dimensionedVector momentRelative_;
 
 
         // Private data used to control multiple ODE updates per time step
@@ -157,7 +161,18 @@ class sixDOFODE
         // Aitkens relaxation helper function
 
             //- Update Aitkens relaxation parameters
-            void aitkensRelaxation(const scalar min, const scalar max);
+            void updateRelaxFactors();
+
+            //- Relax the force (acceleration) using Aitkens or fixed relaxation
+            void relaxAcceleration();
+
+
+        // Helper function for controlling multiple ODE solver calls per
+        // time-step
+
+            //- Initialise ODE before setting external forces/moments and
+            //  solving
+            virtual void initState();
 
 
 protected:
@@ -245,41 +260,17 @@ public:
 
         // Access to forces and moments
 
-            //- Return force in inertial coord. sys.
+            //- Return force in global (inertial) coord. sys.
             inline const dimensionedVector& force() const;
 
-            //- Return access to force in inertial coord. sys.
-            inline dimensionedVector& force();
-
-            //- Return moment in inertial coord. sys.
+            //- Return moment in global (inertial) coord. sys.
             inline const dimensionedVector& moment() const;
 
-            //- Return access to moment in inertial coord. sys.
-            inline dimensionedVector& moment();
-
-            //- Return force in relative coord. sys.
-            inline const dimensionedVector& forceRelative() const;
-
-            //- Return access to force in relative coord. sys.
-            inline dimensionedVector& forceRelative();
-
-            //- Return moment in relative coord. sys.
-            inline const dimensionedVector& momentRelative() const;
-
-            //- Return access to moment in relative coord. sys.
-            inline dimensionedVector& momentRelative();
-
-            //- Return total force in inertial coord. sys.
-            inline dimensionedVector forceTotal() const;
-
-            //- Return total moment in inertial coord. sys.
-            inline dimensionedVector momentTotal() const;
-
-            //- Relax the force (acceleration) using Aitkens or fixed relaxation
-            void relaxAcceleration
+            //- Set external force and moment
+            inline void setExternalForceAndMoment
             (
-                const scalar minRelFactor,
-                const scalar maxRelFactor
+                const vector& externalForce,
+                const vector& externalMoment
             );
 
 
@@ -357,10 +348,6 @@ public:
 
                 //- Update ODE after the solution, advancing by delta
                 virtual void update(const scalar delta) = 0;
-
-                //- Initialise ODE before solving, handling multiple calls per
-                //  single time step
-                virtual void init();
 
 
         // Write control

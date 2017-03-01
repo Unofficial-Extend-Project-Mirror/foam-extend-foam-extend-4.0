@@ -50,11 +50,7 @@ defineRunTimeSelectionTable(sixDOFODE, dictionary);
 
 // * * * * * * * * * * * * Private Member Functions * * * * * * * * * * * * * //
 
-void Foam::sixDOFODE::aitkensRelaxation
-(
-    const scalar min,
-    const scalar max
-)
+void Foam::sixDOFODE::updateRelaxFactors()
 {
     // Calculate translational relax factor
     const scalar saveOldRelFacT = oldRelaxFactorT_;
@@ -71,17 +67,17 @@ void Foam::sixDOFODE::aitkensRelaxation
     }
     else
     {
-        relaxFactorT_ = min;
+        relaxFactorT_ = minRelaxFactor_;
     }
 
     // Bound the relaxation factor for stability
-    if (relaxFactorT_ > max)
+    if (relaxFactorT_ > maxRelaxFactor_)
     {
-        relaxFactorT_ = max;
+        relaxFactorT_ = maxRelaxFactor_;
     }
-    else if (relaxFactorT_ < min)
+    else if (relaxFactorT_ < minRelaxFactor_)
     {
-        relaxFactorT_ = min;
+        relaxFactorT_ = minRelaxFactor_;
     }
 
     // Calculate rotational relax factor
@@ -104,141 +100,35 @@ void Foam::sixDOFODE::aitkensRelaxation
     }
     else
     {
-        relaxFactorR_ = min;
+        relaxFactorR_ = minRelaxFactor_;
     }
 
     // Bound the relaxation factor for stability
-    if(relaxFactorR_ > max)
+    if (relaxFactorR_ > maxRelaxFactor_)
     {
-        relaxFactorR_ = max;
+        relaxFactorR_ = maxRelaxFactor_;
     }
-    else if(relaxFactorR_ < min)
+    else if (relaxFactorR_ < minRelaxFactor_)
     {
-        relaxFactorR_ = min;
+        relaxFactorR_ = minRelaxFactor_;
     }
 }
 
 
-// * * * * * * * * * * * Protected Member Functions * * * * * * * * * * * * * //
-
-void Foam::sixDOFODE::setState(const sixDOFODE& sd)
+void Foam::sixDOFODE::relaxAcceleration()
 {
-    // Set state does not copy AList_, AOld_, relaxFactor_ and relaxFactorOld_.
-    // In case of multiple updates, overwriting Aitkens relaxation parameters
-    // would invalidate the underrelaxation.  IG, 5/May/2016
-    mass_ = sd.mass_;
-    momentOfInertia_ = sd.momentOfInertia_;
-
-    Xequilibrium_ = sd.Xequilibrium_;
-    linSpringCoeffs_ = sd.linSpringCoeffs_;
-    linDampingCoeffs_ = sd.linDampingCoeffs_;
-
-    force_ = sd.force_;
-    moment_ = sd.moment_;
-    forceRelative_ = sd.forceRelative_;
-    momentRelative_ = sd.momentRelative_;
-}
-
-
-// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
-
-Foam::sixDOFODE::sixDOFODE(const IOobject& io)
-:
-    ODE(),
-    dict_(io, *this),
-
-    mass_(dict_.lookup("mass")),
-    momentOfInertia_(dict_.lookup("momentOfInertia")),
-
-    Xequilibrium_(dict_.lookup("equilibriumPosition")),
-    linSpringCoeffs_(dict_.lookup("linearSpring")),
-    linDampingCoeffs_(dict_.lookup("linearDamping")),
-
-    relaxFactorT_(1.0),
-    relaxFactorR_(1.0),
-    oldRelaxFactorT_(1.0),
-    oldRelaxFactorR_(1.0),
-
-    A_(3, vector::zero),
-    OmegaDot_(3, vector::zero),
-    An_(3, vector::zero),
-    OmegaDotn_(3, vector::zero),
-
-    force_(dict_.lookup("force")),
-    moment_(dict_.lookup("moment")),
-    forceRelative_(dict_.lookup("forceRelative")),
-    momentRelative_(dict_.lookup("momentRelative")),
-
-    curTimeIndex_(-1),
-    oldStatePtr_()
-{}
-
-
-Foam::sixDOFODE::sixDOFODE(const word& name, const sixDOFODE& sd)
-:
-    ODE(),
-    dict_(sd.dict_),
-
-    mass_(sd.mass_),
-    momentOfInertia_(sd.momentOfInertia_),
-
-    Xequilibrium_(sd.Xequilibrium_),
-    linSpringCoeffs_(sd.linSpringCoeffs_),
-    linDampingCoeffs_(sd.linDampingCoeffs_),
-
-    relaxFactorT_(1.0),
-    relaxFactorR_(1.0),
-    oldRelaxFactorT_(1.0),
-    oldRelaxFactorR_(1.0),
-
-    A_(3, vector::zero),
-    OmegaDot_(3, vector::zero),
-    An_(3, vector::zero),
-    OmegaDotn_(3, vector::zero),
-
-    force_(sd.force_),
-    moment_(sd.moment_),
-    forceRelative_(sd.forceRelative_),
-    momentRelative_(sd.momentRelative_),
-
-    curTimeIndex_(-1),
-    oldStatePtr_()
-{}
-
-
-// * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
-
-Foam::sixDOFODE::~sixDOFODE()
-{}
-
-
-// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
-
-const Foam::OutputControlDictionary<Foam::sixDOFODE>&
-Foam::sixDOFODE::dict() const
-{
-    return dict_;
-}
-
-
-void Foam::sixDOFODE::relaxAcceleration
-(
-    const scalar minRelFactor,
-    const scalar maxRelFactor
-)
-{
-    if (mag(minRelFactor - maxRelFactor) < SMALL)
+    if (mag(minRelaxFactor_ - maxRelaxFactor_) < SMALL)
     {
        // Fixed relaxation
-       relaxFactorT_ = minRelFactor;
-       relaxFactorR_ = minRelFactor;
+       relaxFactorT_ = minRelaxFactor_;
+       relaxFactorR_ = minRelaxFactor_;
     }
     else
     {
         // Use Aitkens relaxation
 
         // Update Aitkens relaxation factor
-        aitkensRelaxation(minRelFactor, maxRelFactor);
+        updateRelaxFactors();
 
         // Update non relaxed accelerations
         An_[1] = An_[2];
@@ -272,7 +162,7 @@ void Foam::sixDOFODE::relaxAcceleration
 }
 
 
-void Foam::sixDOFODE::init()
+void Foam::sixDOFODE::initState()
 {
     // Get time index
     const label timeIndex = dict().time().timeIndex();
@@ -299,6 +189,113 @@ void Foam::sixDOFODE::init()
 }
 
 
+// * * * * * * * * * * * Protected Member Functions * * * * * * * * * * * * * //
+
+void Foam::sixDOFODE::setState(const sixDOFODE& sd)
+{
+    // Set state does not copy AList_, AOld_, relaxFactor_ and relaxFactorOld_.
+    // In case of multiple updates, overwriting Aitkens relaxation parameters
+    // would invalidate the underrelaxation.  IG, 5/May/2016
+    mass_ = sd.mass_;
+    momentOfInertia_ = sd.momentOfInertia_;
+
+    Xequilibrium_ = sd.Xequilibrium_;
+    linSpringCoeffs_ = sd.linSpringCoeffs_;
+    linDampingCoeffs_ = sd.linDampingCoeffs_;
+
+    force_ = sd.force_;
+    moment_ = sd.moment_;
+}
+
+
+// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
+
+Foam::sixDOFODE::sixDOFODE(const IOobject& io)
+:
+    ODE(),
+    dict_(io, *this),
+
+    mass_(dict_.lookup("mass")),
+    momentOfInertia_(dict_.lookup("momentOfInertia")),
+
+    Xequilibrium_(dict_.lookup("equilibriumPosition")),
+    linSpringCoeffs_(dict_.lookup("linearSpring")),
+    linDampingCoeffs_(dict_.lookup("linearDamping")),
+
+    aitkensRelaxation_
+    (
+        dict_.lookupOrDefault<Switch>("useAitkensRelaxation", false)
+    ),
+    minRelaxFactor_(dict_.lookupOrDefault<scalar>("minRelaxFactor", 0.1)),
+    maxRelaxFactor_(dict_.lookupOrDefault<scalar>("maxRelaxFactor", 0.5)),
+
+    relaxFactorT_(1.0),
+    relaxFactorR_(1.0),
+    oldRelaxFactorT_(1.0),
+    oldRelaxFactorR_(1.0),
+
+    A_(3, vector::zero),
+    OmegaDot_(3, vector::zero),
+    An_(3, vector::zero),
+    OmegaDotn_(3, vector::zero),
+
+    force_(dict_.lookup("force")),
+    moment_(dict_.lookup("moment")),
+
+    curTimeIndex_(-1),
+    oldStatePtr_()
+{}
+
+
+Foam::sixDOFODE::sixDOFODE(const word& name, const sixDOFODE& sd)
+:
+    ODE(),
+    dict_(sd.dict_),
+
+    mass_(sd.mass_),
+    momentOfInertia_(sd.momentOfInertia_),
+
+    Xequilibrium_(sd.Xequilibrium_),
+    linSpringCoeffs_(sd.linSpringCoeffs_),
+    linDampingCoeffs_(sd.linDampingCoeffs_),
+
+    aitkensRelaxation_(sd.aitkensRelaxation_),
+    minRelaxFactor_(sd.minRelaxFactor_),
+    maxRelaxFactor_(sd.maxRelaxFactor_),
+
+    relaxFactorT_(1.0),
+    relaxFactorR_(1.0),
+    oldRelaxFactorT_(1.0),
+    oldRelaxFactorR_(1.0),
+
+    A_(3, vector::zero),
+    OmegaDot_(3, vector::zero),
+    An_(3, vector::zero),
+    OmegaDotn_(3, vector::zero),
+
+    force_(sd.force_),
+    moment_(sd.moment_),
+
+    curTimeIndex_(-1),
+    oldStatePtr_()
+{}
+
+
+// * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
+
+Foam::sixDOFODE::~sixDOFODE()
+{}
+
+
+// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+
+const Foam::OutputControlDictionary<Foam::sixDOFODE>&
+Foam::sixDOFODE::dict() const
+{
+    return dict_;
+}
+
+
 bool Foam::sixDOFODE::writeData(Ostream& os) const
 {
     os.writeKeyword("mass") << tab << mass_ << token::END_STATEMENT << nl;
@@ -312,14 +309,17 @@ bool Foam::sixDOFODE::writeData(Ostream& os) const
     os.writeKeyword("linearDamping") << tab << linDampingCoeffs_
         << token::END_STATEMENT << nl << nl;
 
+    os.writeKeyword("useAitkensRelaxation") << tab << aitkensRelaxation_
+        << token::END_STATEMENT << nl;
+    os.writeKeyword("minRelaxFactor") << tab << minRelaxFactor_
+        << token::END_STATEMENT << nl;
+    os.writeKeyword("maxRelaxFactor") << tab << maxRelaxFactor_
+        << token::END_STATEMENT << nl;
+
     os.writeKeyword("force") << tab << force_
         << token::END_STATEMENT << nl;
     os.writeKeyword("moment") << tab << moment_
         << token::END_STATEMENT << nl;
-    os.writeKeyword("forceRelative") << tab << forceRelative_
-        << token::END_STATEMENT << nl;
-    os.writeKeyword("momentRelative") << tab << momentRelative_
-        << token::END_STATEMENT << endl;
 
     return os.good();
 }
