@@ -26,7 +26,7 @@ Class
 
 Description
     Abstract base class for six-degrees-of-freedom (6DOF) ordinary differential
-    equations
+    equations with necessary interface for two-way coupling with CFD solvers.
 
 Author
     Dubravko Matijasevic, FSB Zagreb.  All rights reserved.

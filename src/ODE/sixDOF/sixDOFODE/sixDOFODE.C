@@ -26,7 +26,7 @@ Class
 
 Description
     Abstract base class for six-degrees-of-freedom (6DOF) ordinary differential
-    equations
+    equations with necessary interface for two-way coupling with CFD solvers.
 
 Author
     Dubravko Matijasevic, FSB Zagreb.  All rights reserved.
@@ -119,6 +119,27 @@ void Foam::sixDOFODE::aitkensRelaxation
 }
 
 
+// * * * * * * * * * * * Protected Member Functions * * * * * * * * * * * * * //
+
+void Foam::sixDOFODE::setState(const sixDOFODE& sd)
+{
+    // Set state does not copy AList_, AOld_, relaxFactor_ and relaxFactorOld_.
+    // In case of multiple updates, overwriting Aitkens relaxation parameters
+    // would invalidate the underrelaxation.  IG, 5/May/2016
+    mass_ = sd.mass_;
+    momentOfInertia_ = sd.momentOfInertia_;
+
+    Xequilibrium_ = sd.Xequilibrium_;
+    linSpringCoeffs_ = sd.linSpringCoeffs_;
+    linDampingCoeffs_ = sd.linDampingCoeffs_;
+
+    force_ = sd.force_;
+    moment_ = sd.moment_;
+    forceRelative_ = sd.forceRelative_;
+    momentRelative_ = sd.momentRelative_;
+}
+
+
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 Foam::sixDOFODE::sixDOFODE(const IOobject& io)
@@ -146,7 +167,42 @@ Foam::sixDOFODE::sixDOFODE(const IOobject& io)
     force_(dict_.lookup("force")),
     moment_(dict_.lookup("moment")),
     forceRelative_(dict_.lookup("forceRelative")),
-    momentRelative_(dict_.lookup("momentRelative"))
+    momentRelative_(dict_.lookup("momentRelative")),
+
+    curTimeIndex_(-1),
+    oldStatePtr_()
+{}
+
+
+Foam::sixDOFODE::sixDOFODE(const word& name, const sixDOFODE& sd)
+:
+    ODE(),
+    dict_(sd.dict_),
+
+    mass_(sd.mass_),
+    momentOfInertia_(sd.momentOfInertia_),
+
+    Xequilibrium_(sd.Xequilibrium_),
+    linSpringCoeffs_(sd.linSpringCoeffs_),
+    linDampingCoeffs_(sd.linDampingCoeffs_),
+
+    relaxFactorT_(1.0),
+    relaxFactorR_(1.0),
+    oldRelaxFactorT_(1.0),
+    oldRelaxFactorR_(1.0),
+
+    A_(3, vector::zero),
+    OmegaDot_(3, vector::zero),
+    An_(3, vector::zero),
+    OmegaDotn_(3, vector::zero),
+
+    force_(sd.force_),
+    moment_(sd.moment_),
+    forceRelative_(sd.forceRelative_),
+    momentRelative_(sd.momentRelative_),
+
+    curTimeIndex_(-1),
+    oldStatePtr_()
 {}
 
 
@@ -216,23 +272,30 @@ void Foam::sixDOFODE::relaxAcceleration
 }
 
 
-void Foam::sixDOFODE::setState(const sixDOFODE& sd)
+void Foam::sixDOFODE::init()
 {
-    // Set state does not copy AList_, AOld_, relaxFactor_ and
-    // relaxFactorOld_. In case of multiple updates, overwriting Aitkens
-    // relaxation parameters would invalidate the underrelaxation.
-    // IG, 5/May/2016
-    mass_ = sd.mass_;
-    momentOfInertia_ = sd.momentOfInertia_;
+    // Get time index
+    const label timeIndex = dict().time().timeIndex();
 
-    Xequilibrium_ = sd.Xequilibrium_;
-    linSpringCoeffs_ = sd.linSpringCoeffs_;
-    linDampingCoeffs_ = sd.linDampingCoeffs_;
+    if (curTimeIndex_ < timeIndex)
+    {
+        // First call in this time index, store data
+        oldStatePtr_ = this->clone(dict().name() + "_0");
 
-    force_ = sd.force_;
-    moment_ = sd.moment_;
-    forceRelative_ = sd.forceRelative_;
-    momentRelative_ = sd.momentRelative_;
+        Info<< "First 6DOF solution within a time step, storing old data..."
+            << endl;
+    }
+    else
+    {
+        // Multiple calls in this time index, reset this data
+        this->setState(oldStatePtr_());
+
+        Info<< "Repeated 6DOF solution within a time step, restoring data..."
+            << endl;
+    }
+
+    // Update local time index
+    curTimeIndex_ = timeIndex;
 }
 
 

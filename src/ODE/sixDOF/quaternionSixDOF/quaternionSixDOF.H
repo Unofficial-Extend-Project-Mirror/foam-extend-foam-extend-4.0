@@ -158,6 +158,16 @@ class quaternionSixDOF
             void constrainTranslation(vector& vec) const;
 
 
+protected:
+
+    // Protected Member Functions
+
+        // Non-access control for setting state variables
+
+            //- Set ODE parameters from another ODE
+            virtual void setState(const sixDOFODE&);
+
+
 public:
 
     // Run-time type information
@@ -209,12 +219,6 @@ public:
 
                 //- Return average velocity of origin (evaluated at midstep)
                 virtual const dimensionedVector& Uaverage() const;
-
-
-            // Non-access control for setting state variables
-
-                //- Set ODE parameters from another ODE
-                virtual void setState(const sixDOFODE&);
 
 
             // Average motion per time-step

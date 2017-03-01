@@ -26,8 +26,7 @@ Class
 
 Description
     Abstract base class for six-degrees-of-freedom (6DOF) ordinary differential
-    equations with a fat interface in order to provide representation of
-    rotations in quaternions or rotation tensors.
+    equations with necessary interface for two-way coupling with CFD solvers.
 
 Author
     Dubravko Matijasevic, FSB Zagreb.  All rights reserved.
@@ -54,9 +53,6 @@ SourceFiles
 
 namespace Foam
 {
-
-class finiteRotation;
-class HamiltonRodriguezRot;
 
 /*---------------------------------------------------------------------------*\
                          Class sixDOFODE Declaration
@@ -118,7 +114,7 @@ class sixDOFODE
             List<vector> OmegaDotn_;
 
 
-        // External forces
+        // External forces and moments
 
             //- Force driving the motion in inertial coord. sys.
             dimensionedVector force_;
@@ -131,6 +127,20 @@ class sixDOFODE
 
             //- Moment driving the motion in relative coord. sys.
             dimensionedVector momentRelative_;
+
+
+        // Private data used to control multiple ODE updates per time step
+        // Note: Before solving the ODE from the top level, we will store the
+        // previous state if this is the first update in a given time step. The
+        // state will be kept as the pointer to sixDOFODE, which is not optimal
+        // because we are keeping track of some unnecessary data. We could use
+        // more elegant and efficient code design. VV, 1/Mar/2017.
+
+            //- Local time index
+            label curTimeIndex_;
+
+            //- Pointer to the sixDOFODE object carrying old state
+            autoPtr<sixDOFODE> oldStatePtr_;
 
 
     // Private Member Functions
@@ -148,6 +158,16 @@ class sixDOFODE
 
             //- Update Aitkens relaxation parameters
             void aitkensRelaxation(const scalar min, const scalar max);
+
+
+protected:
+
+    // Protected Member Functions
+
+        // Non-access control for setting state variables
+
+            //- Set ODE parameters from another ODE
+            virtual void setState(const sixDOFODE&);
 
 
 public:
@@ -172,6 +192,9 @@ public:
 
         //- Construct from dictionary
         sixDOFODE(const IOobject& io);
+
+        //- Copy construct given new name
+        sixDOFODE(const word& name, const sixDOFODE& sd);
 
         //- Return a clone, changing the name
         virtual autoPtr<sixDOFODE> clone(const word& name) const = 0;
@@ -284,12 +307,6 @@ public:
                 virtual const dimensionedVector& Uaverage() const = 0;
 
 
-            // Non-access control for setting state variables
-
-                //- Set ODE parameters from another ODE
-                virtual void setState(const sixDOFODE&);
-
-
             // Average motion per time-step
 
                 //- Return average rotational velocity in relative coordinate
@@ -340,6 +357,10 @@ public:
 
                 //- Update ODE after the solution, advancing by delta
                 virtual void update(const scalar delta) = 0;
+
+                //- Initialise ODE before solving, handling multiple calls per
+                //  single time step
+                virtual void init();
 
 
         // Write control
