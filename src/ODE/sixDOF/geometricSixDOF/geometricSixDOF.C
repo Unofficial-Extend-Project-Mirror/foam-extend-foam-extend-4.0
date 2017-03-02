@@ -186,7 +186,7 @@ Foam::tensor Foam::geometricSixDOF::expMap(const vector& rotInc) const
           + (skewRotInc & skewRotInc)*(1.0 - cos(magRotInc))/sqr(magRotInc);
     }
 
-    return R.T();
+    return R;
 }
 
 
@@ -205,7 +205,14 @@ Foam::vector Foam::geometricSixDOF::dexpMap
     {
         // Stabilised calculation of rotation increment to avoid small
         // denominators
-        rotIncDot = omega;
+        const tensor lbRotIncOmega(lieBracket(rotInc, omega));
+
+        rotIncDot =
+        (
+            I
+          + lbRotIncOmega/2.0
+          + lieBracket(rotInc, *lbRotIncOmega)/12.0
+        ) & omega;
     }
     else
     {
@@ -221,8 +228,7 @@ Foam::vector Foam::geometricSixDOF::dexpMap
           + 0.5*skewRotInc
           - (skewRotInc & skewRotInc)*
             (magRotInc/tan(magRotInc/2.0) - 2.0)/(2.0*sqr(magRotInc))
-        )
-      & omega;
+        ) & omega;
     }
 
     return rotIncDot;
@@ -425,13 +431,13 @@ const Foam::dimensionedVector& Foam::geometricSixDOF::omegaAverage() const
 
 Foam::tensor Foam::geometricSixDOF::toRelative() const
 {
-    return rotation_;
+    return rotation_.T();
 }
 
 
 Foam::tensor Foam::geometricSixDOF::toAbsolute() const
 {
-    return rotation_.T();
+    return rotation_;
 }
 
 
@@ -462,7 +468,7 @@ void Foam::geometricSixDOF::derivatives
     const vector rotIncrementVector(y[9], y[10], y[11]);
 
     // Calculate current rotation tensor obtained with exponential map
-    const tensor curRot = (expMap(rotIncrementVector) & rotation_);
+    const tensor curRot = (rotation_ & expMap(rotIncrementVector));
 
     // Calculate translational acceleration using current rotation
     const vector accel = A(curX, curU, curRot).value();
@@ -543,7 +549,7 @@ void Foam::geometricSixDOF::update(const scalar delta)
     rotIncrement_ = expMap(vector(coeffs_[9], coeffs_[10], coeffs_[11]));
 
     // Update rotational tensor
-    rotation_ = (rotIncrement_ & rotation_);
+    rotation_ = (rotation_ & rotIncrement_);
 
     // Reset increment vector in coefficients for the next step
     coeffs_[9] = 0;

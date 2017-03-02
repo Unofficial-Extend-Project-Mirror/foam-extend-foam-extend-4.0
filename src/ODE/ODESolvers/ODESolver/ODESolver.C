@@ -52,7 +52,7 @@ void Foam::ODESolver::solve
     const scalar xEnd,
     const scalar eps,
     scalar& hEst
-)
+) const
 {
     const label MAXSTP = 10000;
 

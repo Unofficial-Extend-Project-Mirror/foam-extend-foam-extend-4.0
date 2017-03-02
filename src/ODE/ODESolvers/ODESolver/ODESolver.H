@@ -134,7 +134,7 @@ public:
             const scalar xEnd,
             const scalar eps,
             scalar& hEst
-        );
+        ) const;
 };
 
 

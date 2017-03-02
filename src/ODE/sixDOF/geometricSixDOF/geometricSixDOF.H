@@ -40,6 +40,9 @@ Description
         Pages = {3327--3350}
     }
 
+    Note on convention: rotation tensor (R, or rotation_) defines
+    body-to-inertial coordinate system transformation (local-to-global).
+
 Author
     Viktor Pandza, FSB Zagreb.  All rights reserved.
     Vuko Vukcevic, FSB Zagreb.  All rights reserved.
