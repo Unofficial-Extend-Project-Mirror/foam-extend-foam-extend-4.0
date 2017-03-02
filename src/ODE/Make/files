@@ -9,6 +9,9 @@ $(ODESolvers)/SIBS/SIBS.C
 $(ODESolvers)/SIBS/SIMPR.C
 $(ODESolvers)/SIBS/polyExtrapolate.C
 
+translationODE = translationODE
+$(translationODE)/translationODE.C
+
 sixDOF = sixDOF
 $(sixDOF)/finiteRotation/finiteRotation.C
 $(sixDOF)/sixDOFqODE/sixDOFqODE.C
