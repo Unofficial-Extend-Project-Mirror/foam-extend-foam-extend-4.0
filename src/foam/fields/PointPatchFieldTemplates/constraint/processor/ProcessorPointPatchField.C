@@ -82,7 +82,7 @@ sendField
 {
     const Field<Type2>& f = tf();
 
-    //HJ: This needs complete rewrite:
+    // This needs complete rewrite:
     // - move communications into a patch
     // - allow for various types of communication - done HR, 12/6/2017
     // HJ, 15/Apr/2009
