@@ -82,7 +82,7 @@ sendField
 {
     const Field<Type2>& f = tf();
 
-    //HJ: This needs complete rewrite:
+    // This needs complete rewrite:
     // - move communications into a patch
     // - allow for various types of communication
     // HJ, 15/Apr/2009
@@ -167,13 +167,18 @@ receivePointField
 {
     tmp<Field<Type2> > tf(new Field<Type2>(this->size()));
 
-    IPstream::read
-    (
-        commsType,
-        procPatch_.neighbProcNo(),
-        reinterpret_cast<char*>(tf().begin()),
-        tf().byteSize()
-    );
+    // Bugfix: need to read only if blocking on scheduled comms are used (see
+    // sendField function). VV, 2/Mar/2017.
+    if (commsType == Pstream::blocking || commsType == Pstream::scheduled)
+    {
+        IPstream::read
+        (
+            commsType,
+            procPatch_.neighbProcNo(),
+            reinterpret_cast<char*>(tf().begin()),
+            tf().byteSize()
+        );
+    }
 
     return tf;
 }
