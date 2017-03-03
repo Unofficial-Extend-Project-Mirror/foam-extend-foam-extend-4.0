@@ -42,6 +42,10 @@ if(NOT FOAM_FOUND)
 endif()
 
 add_foam_executable(solidEquiriumDisplacementFoam
-#   DEPENDS finiteVolume
+  DEPENDS finiteVolume
   SOURCES ${SOURCES}
+)
+
+target_include_directories(solidEquiriumDisplacementFoam PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../solidDisplacementFoam>
 )

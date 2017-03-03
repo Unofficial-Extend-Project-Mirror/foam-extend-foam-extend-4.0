@@ -39,4 +39,4 @@ list(APPEND SOURCES
 
 add_foam_library(rhoCentralFoam SHARED ${SOURCES})
 
-#target_link_libraries(rhoCentralFoam finiteVolume)
+target_link_libraries(rhoCentralFoam finiteVolume)

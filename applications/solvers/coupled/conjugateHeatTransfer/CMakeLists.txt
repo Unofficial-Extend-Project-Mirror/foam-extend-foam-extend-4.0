@@ -89,4 +89,4 @@ list(APPEND SOURCES
 
 add_foam_library(conjugateHeatTransfer SHARED ${SOURCES})
 
-#target_link_libraries(conjugateHeatTransfer finiteVolume)
+target_link_libraries(conjugateHeatTransfer PUBLIC radiation)

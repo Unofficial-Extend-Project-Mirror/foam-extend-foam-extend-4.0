@@ -41,6 +41,6 @@ if(NOT FOAM_FOUND)
 endif()
 
 add_foam_executable(porousSimpleIbFoam
-#   DEPENDS finiteVolume
+  DEPENDS immersedBoundaryTurbulence
   SOURCES ${SOURCES}
 )

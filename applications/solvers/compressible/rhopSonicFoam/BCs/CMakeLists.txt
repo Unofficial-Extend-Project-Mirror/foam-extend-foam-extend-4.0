@@ -41,4 +41,4 @@ list(APPEND SOURCES
 
 add_foam_library(rhopSonicFoam SHARED ${SOURCES})
 
-#target_link_libraries(rhopSonicFoam finiteVolume)
+target_link_libraries(rhopSonicFoam PUBLIC finiteVolume)

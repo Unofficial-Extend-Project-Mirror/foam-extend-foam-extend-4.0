@@ -42,6 +42,6 @@ if(NOT FOAM_FOUND)
 endif()
 
 add_foam_executable(solidDisplacementFoam
-#   DEPENDS finiteVolume
+  DEPENDS finiteVolume
   SOURCES ${SOURCES}
 )

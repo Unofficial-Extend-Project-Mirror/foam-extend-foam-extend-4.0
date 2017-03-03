@@ -41,6 +41,7 @@ if(NOT FOAM_FOUND)
 endif()
 
 add_foam_executable(XiFoam
-#   DEPENDS finiteVolume
+  DEPENDS reactionThermophysicalModels engine compressibleTurbulenceModel
+  DEPENDS laminarFlameSpeedModels
   SOURCES ${SOURCES}
 )

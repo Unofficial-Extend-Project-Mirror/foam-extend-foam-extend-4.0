@@ -43,6 +43,10 @@ if(NOT FOAM_FOUND)
 endif()
 
 add_foam_executable(newContactStressFoam
-#   DEPENDS finiteVolume
+  DEPENDS materialModels
   SOURCES ${SOURCES}
+)
+
+target_include_directories(newContactStressFoam PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../newStressedFoam>
 )

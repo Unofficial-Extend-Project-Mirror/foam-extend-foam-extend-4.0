@@ -42,6 +42,11 @@ if(NOT FOAM_FOUND)
 endif()
 
 add_foam_executable(stressFemFoam
-#   DEPENDS finiteVolume
+  DEPENDS finiteVolume tetFiniteElement
   SOURCES ${SOURCES}
 )
+
+target_include_directories(stressFemFoam PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/femStress/Traction>
+)
+

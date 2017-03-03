@@ -41,6 +41,6 @@ if(NOT FOAM_FOUND)
 endif()
 
 add_foam_executable(icoDyMIbFoam
-#   DEPENDS finiteVolume
+  DEPENDS immersedBoundary dynamicFvMesh
   SOURCES ${SOURCES}
 )

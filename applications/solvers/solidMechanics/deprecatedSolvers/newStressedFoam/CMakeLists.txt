@@ -41,6 +41,6 @@ if(NOT FOAM_FOUND)
 endif()
 
 add_foam_executable(newStressedFoam
-#   DEPENDS finiteVolume
+  DEPENDS materialModels
   SOURCES ${SOURCES}
 )

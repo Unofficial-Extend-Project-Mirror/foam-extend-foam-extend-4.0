@@ -41,6 +41,11 @@ if(NOT FOAM_FOUND)
 endif()
 
 add_foam_executable(porousInterFoam
-#   DEPENDS finiteVolume
+  DEPENDS finiteVolume interfaceProperties incompressibleTurbulenceModel
   SOURCES ${SOURCES}
 )
+
+target_include_directories(porousInterFoam PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../interFoam>
+)
+

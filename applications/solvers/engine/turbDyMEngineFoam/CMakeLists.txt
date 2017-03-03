@@ -41,6 +41,6 @@ if(NOT FOAM_FOUND)
 endif()
 
 add_foam_executable(turbDyMEngineFoam
-#   DEPENDS finiteVolume
+  DEPENDS incompressibleTurbulenceModel engine
   SOURCES ${SOURCES}
 )

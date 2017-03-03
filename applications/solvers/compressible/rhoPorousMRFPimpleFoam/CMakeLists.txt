@@ -41,6 +41,10 @@ if(NOT FOAM_FOUND)
 endif()
 
 add_foam_executable(rhoPorousMRFPimpleFoam
-#   DEPENDS finiteVolume
+  DEPENDS compressibleTurbulenceModel
   SOURCES ${SOURCES}
+)
+
+target_include_directories(rhoPorousMRFPimpleFoam PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../rhoPimpleFoam>
 )

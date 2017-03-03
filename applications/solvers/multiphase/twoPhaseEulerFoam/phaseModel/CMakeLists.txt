@@ -36,4 +36,4 @@ list(APPEND SOURCES
 
 add_foam_library(phaseModel SHARED ${SOURCES})
 
-#target_link_libraries(phaseModel finiteVolume)
+target_link_libraries(phaseModel PUBLIC finiteVolume incompressibleTransportModels)

@@ -41,6 +41,6 @@ if(NOT FOAM_FOUND)
 endif()
 
 add_foam_executable(liquidFilmFoam
-#   DEPENDS finiteVolume
+  DEPENDS finiteVolume finiteArea
   SOURCES ${SOURCES}
 )

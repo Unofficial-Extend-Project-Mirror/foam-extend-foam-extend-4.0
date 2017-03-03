@@ -41,6 +41,11 @@ if(NOT FOAM_FOUND)
 endif()
 
 add_foam_executable(coldEngineFoam
-#   DEPENDS finiteVolume
+  DEPENDS engine compressibleTurbulenceModel
   SOURCES ${SOURCES}
+)
+
+target_include_directories(coldEngineFoam PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../engineFoam>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../XiFoam>
 )

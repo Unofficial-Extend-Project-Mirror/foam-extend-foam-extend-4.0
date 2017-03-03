@@ -41,6 +41,6 @@ if(NOT FOAM_FOUND)
 endif()
 
 add_foam_executable(financialFoam
-#   DEPENDS finiteVolume
+  DEPENDS sampling
   SOURCES ${SOURCES}
 )

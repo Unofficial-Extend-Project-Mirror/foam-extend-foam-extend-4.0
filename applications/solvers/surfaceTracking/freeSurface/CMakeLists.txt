@@ -49,4 +49,4 @@ list(APPEND SOURCES
 
 add_foam_library(freeSurface SHARED ${SOURCES})
 
-#target_link_libraries(freeSurface finiteVolume)
+target_link_libraries(freeSurface PUBLIC finiteArea dynamicFvMesh)

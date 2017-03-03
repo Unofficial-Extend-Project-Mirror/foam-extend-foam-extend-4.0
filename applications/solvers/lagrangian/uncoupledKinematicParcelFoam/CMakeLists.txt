@@ -41,6 +41,6 @@ if(NOT FOAM_FOUND)
 endif()
 
 add_foam_executable(uncoupledKinematicParcelFoam
-#   DEPENDS finiteVolume
+  DEPENDS finiteVolume compressibleTurbulenceModel lagrangianIntermediate
   SOURCES ${SOURCES}
 )

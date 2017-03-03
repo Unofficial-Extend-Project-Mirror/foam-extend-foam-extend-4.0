@@ -41,6 +41,6 @@ if(NOT FOAM_FOUND)
 endif()
 
 add_foam_executable(equationReaderDemo
-#   DEPENDS finiteVolume
+  DEPENDS equationReader incompressibleRASModels
   SOURCES ${SOURCES}
 )

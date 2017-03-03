@@ -41,6 +41,6 @@ if(NOT FOAM_FOUND)
 endif()
 
 add_foam_executable(setFluidIndicator
-#   DEPENDS finiteVolume
+  DEPENDS freeSurface
   SOURCES ${SOURCES}
 )

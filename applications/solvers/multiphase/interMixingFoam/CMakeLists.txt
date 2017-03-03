@@ -43,6 +43,12 @@ if(NOT FOAM_FOUND)
 endif()
 
 add_foam_executable(interMixingFoam
-#   DEPENDS finiteVolume
+  DEPENDS finiteVolume interfaceProperties incompressibleTurbulenceModel
   SOURCES ${SOURCES}
+)
+
+target_include_directories(interMixingFoam PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../interFoam>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/incompressibleThreePhaseMixture>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/threePhaseInterfaceProperties>
 )

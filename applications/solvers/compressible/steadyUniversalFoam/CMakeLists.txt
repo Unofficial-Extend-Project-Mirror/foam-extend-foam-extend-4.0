@@ -41,6 +41,6 @@ if(NOT FOAM_FOUND)
 endif()
 
 add_foam_executable(steadyUniversalFoam
-#   DEPENDS finiteVolume
+  DEPENDS compressibleRASModels
   SOURCES ${SOURCES}
 )

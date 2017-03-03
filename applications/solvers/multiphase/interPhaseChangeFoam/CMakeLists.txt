@@ -46,6 +46,11 @@ if(NOT FOAM_FOUND)
 endif()
 
 add_foam_executable(interPhaseChangeFoam
-#   DEPENDS finiteVolume
+  DEPENDS finiteVolume interfaceProperties incompressibleTurbulenceModel
   SOURCES ${SOURCES}
 )
+
+target_include_directories(interPhaseChangeFoam PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/phaseChangeTwoPhaseMixtures/phaseChangeTwoPhaseMixture>
+)
+

@@ -42,6 +42,6 @@ if(NOT FOAM_FOUND)
 endif()
 
 add_foam_executable(icoFsiFoam
-#   DEPENDS finiteVolume
+  DEPENDS dynamicFvMesh
   SOURCES ${SOURCES}
 )

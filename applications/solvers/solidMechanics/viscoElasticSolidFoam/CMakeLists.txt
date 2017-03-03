@@ -41,6 +41,6 @@ if(NOT FOAM_FOUND)
 endif()
 
 add_foam_executable(viscoElasticSolidFoam
-#   DEPENDS finiteVolume
+  DEPENDS solidModels
   SOURCES ${SOURCES}
 )

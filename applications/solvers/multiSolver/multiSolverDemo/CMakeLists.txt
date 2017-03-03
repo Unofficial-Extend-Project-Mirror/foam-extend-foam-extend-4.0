@@ -41,6 +41,10 @@ if(NOT FOAM_FOUND)
 endif()
 
 add_foam_executable(multiSolverDemo
-#   DEPENDS finiteVolume
+  DEPENDS finiteVolume multiSolverLib
   SOURCES ${SOURCES}
+)
+
+target_include_directories(multiSolverDemo PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../../../../src/multiSolver/lnInclude>
 )

@@ -41,6 +41,10 @@ if(NOT FOAM_FOUND)
 endif()
 
 add_foam_executable(rhoPorousSimpleFoam
-#   DEPENDS finiteVolume
+  DEPENDS compressibleRASModels
   SOURCES ${SOURCES}
+)
+
+target_include_directories(rhoPorousSimpleFoam PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../../../../src/finiteVolume/cfdTools>
 )

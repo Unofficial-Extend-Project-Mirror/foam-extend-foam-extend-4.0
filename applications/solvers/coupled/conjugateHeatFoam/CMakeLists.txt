@@ -41,6 +41,6 @@ if(NOT FOAM_FOUND)
 endif()
 
 add_foam_executable(conjugateHeatFoam
-#   DEPENDS finiteVolume
+  DEPENDS incompressibleRASModels coupledLduMatrix conjugateHeatTransfer
   SOURCES ${SOURCES}
 )

@@ -63,6 +63,14 @@ if(NOT FOAM_FOUND)
 endif()
 
 add_foam_executable(PDRFoam
-#   DEPENDS finiteVolume
+  DEPENDS engine compressibleRASModels laminarFlameSpeedModels dynamicFvMesh
   SOURCES ${SOURCES}
+)
+
+target_include_directories(PDRFoam PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/XiModels/XiModel>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/XiModels/XiEqModels/XiEqModel>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/XiModels/XiGModels/XiGModel>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/PDRModels/dragModels/PDRDragModel>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/laminarFlameSpeed/SCOPE>
 )

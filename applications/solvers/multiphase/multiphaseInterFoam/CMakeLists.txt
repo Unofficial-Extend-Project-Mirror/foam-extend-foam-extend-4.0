@@ -44,6 +44,13 @@ if(NOT FOAM_FOUND)
 endif()
 
 add_foam_executable(multiphaseInterFoam
-#   DEPENDS finiteVolume
+  DEPENDS finiteVolume interfaceProperties incompressibleTurbulenceModel
   SOURCES ${SOURCES}
+)
+
+target_include_directories(multiphaseInterFoam PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../interFoam>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/multiphaseMixture>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/multiphaseMixture/phase>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/multiphaseMixture/multiphaseAlphaContactAngle>
 )

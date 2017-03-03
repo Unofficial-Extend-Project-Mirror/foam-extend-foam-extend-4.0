@@ -41,6 +41,10 @@ if(NOT FOAM_FOUND)
 endif()
 
 add_foam_executable(dieselFoam
-#   DEPENDS finiteVolume
+  DEPENDS chemistryModel dieselSpray
   SOURCES ${SOURCES}
+)
+
+target_include_directories(dieselFoam PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../dieselEngineFoam>
 )

@@ -41,6 +41,10 @@ if(NOT FOAM_FOUND)
 endif()
 
 add_foam_executable(buoyantSimpleRadiationFoam
-#   DEPENDS finiteVolume
+  DEPENDS radiation compressibleRASModels
   SOURCES ${SOURCES}
+)
+
+target_include_directories(buoyantSimpleRadiationFoam PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../buoyantSimpleFoam>
 )

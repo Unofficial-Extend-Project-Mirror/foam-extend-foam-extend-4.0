@@ -41,6 +41,6 @@ if(NOT FOAM_FOUND)
 endif()
 
 add_foam_executable(patchStressIntegrate
-#   DEPENDS finiteVolume
+  DEPENDS finiteVolume
   SOURCES ${SOURCES}
 )

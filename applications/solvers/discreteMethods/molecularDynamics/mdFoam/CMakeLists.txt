@@ -41,6 +41,6 @@ if(NOT FOAM_FOUND)
 endif()
 
 add_foam_executable(mdFoam
-#   DEPENDS finiteVolume
+  DEPENDS molecule molecularMeasurements
   SOURCES ${SOURCES}
 )

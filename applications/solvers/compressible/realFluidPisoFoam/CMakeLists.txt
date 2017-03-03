@@ -41,6 +41,6 @@ if(NOT FOAM_FOUND)
 endif()
 
 add_foam_executable(realFluidPisoFoam
-#   DEPENDS finiteVolume
+  DEPENDS compressibleTurbulenceModel
   SOURCES ${SOURCES}
 )

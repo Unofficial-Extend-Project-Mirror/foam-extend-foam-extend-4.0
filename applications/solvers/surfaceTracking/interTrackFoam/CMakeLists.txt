@@ -41,6 +41,10 @@ if(NOT FOAM_FOUND)
 endif()
 
 add_foam_executable(interTrackFoam
-#   DEPENDS finiteVolume
+  DEPENDS freeSurface
   SOURCES ${SOURCES}
+)
+
+target_include_directories(interTrackFoam PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../include>
 )

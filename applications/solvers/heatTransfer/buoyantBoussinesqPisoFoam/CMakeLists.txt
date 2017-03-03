@@ -41,6 +41,10 @@ if(NOT FOAM_FOUND)
 endif()
 
 add_foam_executable(buoyantBoussinesqPisoFoam
-#   DEPENDS finiteVolume
+  DEPENDS incompressibleTurbulenceModel
   SOURCES ${SOURCES}
+)
+
+target_include_directories(buoyantBoussinesqPisoFoam PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../buoyantBoussinesqSimpleFoam>
 )

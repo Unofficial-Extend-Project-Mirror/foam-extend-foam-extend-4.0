@@ -68,4 +68,4 @@ list(APPEND SOURCES
 
 add_foam_library(materialModels SHARED ${SOURCES})
 
-#target_link_libraries(materialModels finiteVolume)
+target_link_libraries(materialModels PUBLIC finiteVolume)
