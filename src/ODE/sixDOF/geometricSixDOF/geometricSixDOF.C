@@ -53,14 +53,14 @@ addToRunTimeSelectionTable(sixDOFODE, geometricSixDOF, dictionary);
 
 const Foam::debug::tolerancesSwitch Foam::geometricSixDOF::rotIncTensorTol_
 (
-    "geometrixSixDOFRotIncTensorTol",
+    "geometricSixDOFRotIncTensorTol",
     1e-10
 );
 
 
 const Foam::debug::tolerancesSwitch Foam::geometricSixDOF::rotIncRateTol_
 (
-    "geometrixSixDOFRotIncRateTol",
+    "geometricSixDOFRotIncRateTol",
     1e-6
 );
 
@@ -169,7 +169,7 @@ Foam::tensor Foam::geometricSixDOF::expMap(const vector& rotInc) const
     // Calculate the magnitude of the rotational increment vector
     const scalar magRotInc = mag(rotInc);
 
-    if (magRotInc < rotIncTensorTol_)
+    if (magRotInc < rotIncTensorTol_())
     {
         // No rotational increment
         R = I;
@@ -201,7 +201,7 @@ Foam::vector Foam::geometricSixDOF::dexpMap
     // Calculate the magnitude of the rotational increment vector
     const scalar magRotInc = mag(rotInc);
 
-    if (magRotInc < rotIncRateTol_)
+    if (magRotInc < rotIncRateTol_())
     {
         // Stabilised calculation of rotation increment to avoid small
         // denominators
