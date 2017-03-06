@@ -244,7 +244,25 @@ Foam::sixDOFODE::sixDOFODE(const IOobject& io)
 
     curTimeIndex_(-1),
     oldStatePtr_()
-{}
+{
+    // Sanity checks
+    if (mass_.value() < SMALL)
+    {
+        FatalErrorIn("sixDOFODE::sixDOFODE(const IOobject& io)")
+            << "Zero or negative mass detected: " << mass_.value()
+            << nl << "Please check " << dict_.name() << "dictionary."
+            << exit(FatalError);
+    }
+
+    if (cmptMin(momentOfInertia_.value()) < SMALL)
+    {
+        FatalErrorIn("sixDOFODE::sixDOFODE(const IOobject& io)")
+            << "Zero or negative moment of inertia detected: "
+            << momentOfInertia_.value()
+            << nl << "Please check " << dict_.name() << "dictionary."
+            << exit(FatalError);
+    }
+}
 
 
 Foam::sixDOFODE::sixDOFODE(const word& name, const sixDOFODE& sd)
