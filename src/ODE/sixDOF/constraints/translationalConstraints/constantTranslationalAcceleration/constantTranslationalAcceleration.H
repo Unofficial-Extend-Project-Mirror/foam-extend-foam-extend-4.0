@@ -65,18 +65,6 @@ class constantTranslationalAcceleration
         const scalar a_;
 
 
-    // Private Member Functions
-
-        //- Disallow default bitwise copy construct
-        constantTranslationalAcceleration
-        (
-            const constantTranslationalAcceleration&
-        );
-
-        //- Disallow default bitwise assignment
-        void operator=(const constantTranslationalAcceleration&);
-
-
 public:
 
     //- Runtime type information
@@ -92,6 +80,9 @@ public:
             const sixDOFODE& sixDOFODE,
             const dictionary& dict
         );
+
+        //- Construct and return a clone
+        virtual autoPtr<translationalConstraint> clone() const;
 
 
     // Destructor

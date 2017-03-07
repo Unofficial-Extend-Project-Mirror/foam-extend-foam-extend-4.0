@@ -78,15 +78,6 @@ class rotationalConstraint
         const sixDOFODE& sixDOFODE_;
 
 
-    // Private Member Functions
-
-        //- Disallow default bitwise copy construct
-        rotationalConstraint(const rotationalConstraint&);
-
-        //- Disallow default bitwise assignment
-        void operator=(const rotationalConstraint&);
-
-
 public:
 
     //- Runtime type information
@@ -140,6 +131,9 @@ public:
             const sixDOFODE& sixDOFODE,
             const dictionary& dict
         );
+
+        //- Construct and return a clone
+        virtual autoPtr<rotationalConstraint> clone() const = 0;
 
 
     // Selectors

@@ -69,15 +69,6 @@ class constantAngularAcceleration
         const Switch inGlobal_;
 
 
-    // Private Member Functions
-
-        //- Disallow default bitwise copy construct
-        constantAngularAcceleration(const constantAngularAcceleration&);
-
-        //- Disallow default bitwise assignment
-        void operator=(const constantAngularAcceleration&);
-
-
 public:
 
     //- Runtime type information
@@ -93,6 +84,9 @@ public:
             const sixDOFODE& sixDOFODE,
             const dictionary& dict
         );
+
+        //- Construct and return a clone
+        virtual autoPtr<rotationalConstraint> clone() const;
 
 
     // Destructor
