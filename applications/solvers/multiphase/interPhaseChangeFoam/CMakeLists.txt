@@ -46,7 +46,7 @@ if(NOT FOAM_FOUND)
 endif()
 
 add_foam_executable(interPhaseChangeFoam
-  DEPENDS finiteVolume interfaceProperties incompressibleTurbulenceModel
+  DEPENDS interfaceProperties incompressibleTurbulenceModel
   SOURCES ${SOURCES}
 )
 

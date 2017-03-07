@@ -72,12 +72,23 @@ set_property(TARGET mpi PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${MPI_C_INCLUDE_P
 set_property(TARGET mpi PROPERTY IMPORTED_LOCATION ${MPI_LIBRARY})
 
 find_package(ZLIB REQUIRED)
-  
+
 find_package(FLEX REQUIRED)
 
 find_package(Git REQUIRED)
 
+# Path to ParaViewConfig.cmake
+set(ParaView_DIR ${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/packages/ParaView-4.4.0/platforms/linux64GccDPOpt/lib/cmake/paraview-4.4)
+
 find_package(ParaView REQUIRED)
+
+# Clean the cache variable
+set(MGRIDGEN_LIBRARY MGRIDGEN_LIBRARY-NOTFOUND)
+
+# Find libMGridGen.so
+find_library(MGRIDGEN_LIBRARY MGridGen ${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/packages/ParMGridGen-1.0/platforms/linux64GccDPOpt/lib)
+set(MGRIDGEN_INCLUDES ${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/packages/ParMGridGen-1.0/platforms/linux64GccDPOpt/include)
+
 
 #
 # Recurse into the source
@@ -102,14 +113,14 @@ if(NOT CMAKE_BUILD_TYPE)
     "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel."
     FORCE)
 endif()
-   
+
 #
 # Definitions inherited by all targets
 #
 
 # Single/Double precision
 set(FOAM_PRECISION "double" CACHE STRING "Numerical precision")
-set_property(CACHE FOAM_PRECISION PROPERTY STRINGS single double) 
+set_property(CACHE FOAM_PRECISION PROPERTY STRINGS single double)
 if(FOAM_PRECISION EQUAL "single")
   target_compile_definitions(OSspecific PUBLIC WM_SP)
 else()

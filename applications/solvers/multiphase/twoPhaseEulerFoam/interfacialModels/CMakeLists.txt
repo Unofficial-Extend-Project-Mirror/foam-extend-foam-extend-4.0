@@ -44,8 +44,4 @@ list(APPEND SOURCES
 
 add_foam_library(EulerianInterfacialModels SHARED ${SOURCES})
 
-target_link_libraries(EulerianInterfacialModels PUBLIC finiteVolume phaseModel)
-
-target_include_directories(EulerianInterfacialModels PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../phaseModel>
-)
+target_link_libraries(EulerianInterfacialModels PUBLIC phaseModel)

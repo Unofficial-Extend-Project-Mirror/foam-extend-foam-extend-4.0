@@ -41,6 +41,6 @@ if(NOT FOAM_FOUND)
 endif()
 
 add_foam_executable(sonicTurbDyMEngineFoam
-  DEPENDS basicThermophysicalModels compressibleTurbulenceModel engine
+  DEPENDS compressibleTurbulenceModel engine
   SOURCES ${SOURCES}
 )

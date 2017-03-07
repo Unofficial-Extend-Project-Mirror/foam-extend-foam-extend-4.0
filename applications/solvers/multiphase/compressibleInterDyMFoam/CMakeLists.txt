@@ -41,7 +41,6 @@ if(NOT FOAM_FOUND)
 endif()
 
 add_foam_executable(compressibleInterDyMFoam
-  DEPENDS finiteVolume interfaceProperties incompressibleTurbulenceModel
-  DEPENDS dynamicFvMesh
+  DEPENDS interfaceProperties incompressibleTurbulenceModel dynamicFvMesh
   SOURCES ${SOURCES}
 )

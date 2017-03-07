@@ -39,11 +39,4 @@ list(APPEND SOURCES
 
 add_foam_library(combustionModels SHARED ${SOURCES})
 
-target_link_libraries(combustionModels finiteVolume)
-
-target_include_directories(combustionModels PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../../../../../src/thermophysicalModels/basic/lnInclude>
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../../../../../src/thermophysicalModels/reactionThermo/lnInclude>
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../../../../../src/thermophysicalModels/specie/lnInclude>
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../../../../../src/turbulenceModels/compressible/turbulenceModel>
-)
+target_link_libraries(combustionModels PUBLIC reactionThermophysicalModels compressibleTurbulenceModel)

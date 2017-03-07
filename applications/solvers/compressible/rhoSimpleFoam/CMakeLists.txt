@@ -44,7 +44,3 @@ add_foam_executable(rhoSimpleFoam
   DEPENDS compressibleRASModels
   SOURCES ${SOURCES}
 )
-
-target_include_directories(rhoSimpleFoam PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../../../../src/finiteVolume/cfdTools>
-)

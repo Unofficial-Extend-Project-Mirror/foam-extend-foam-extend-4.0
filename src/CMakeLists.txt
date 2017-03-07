@@ -1,4 +1,5 @@
-# --------------------------------------------------------------------------#   ========                 |
+# --------------------------------------------------------------------------
+#   ========                 |
 #   \      /  F ield         | foam-extend: Open Source CFD
 #    \    /   O peration     | Version:     4.1
 #     \  /    A nd           | Web:         http://www.foam-extend.org
@@ -60,4 +61,4 @@ add_subdirectory(fvAgglomerationMethods)
 add_subdirectory(meshTools)
 add_subdirectory(dynamicMesh)
 add_subdirectory(thermophysicalModels)
-#add_subdirectory(dbns)
+add_subdirectory(dbns)

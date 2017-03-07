@@ -1,4 +1,5 @@
-# --------------------------------------------------------------------------#   ========                 |
+# --------------------------------------------------------------------------
+#   ========                 |
 #   \      /  F ield         | foam-extend: Open Source CFD
 #    \    /   O peration     | Version:     4.1
 #     \  /    A nd           | Web:         http://www.foam-extend.org
@@ -40,11 +41,11 @@ add_subdirectory(rhoPorousMRFPimpleFoam)
 add_subdirectory(rhopSonicFoam)
 add_subdirectory(rhoPisoFoam)
 add_subdirectory(steadyCompressibleFoam)
-#add_subdirectory(dbnsFoam)
+add_subdirectory(dbnsFoam)
 add_subdirectory(steadyUniversalFoam)
 add_subdirectory(steadyCompressibleMRFFoam)
 add_subdirectory(rhoSimpleFoam)
 add_subdirectory(sonicLiquidFoam)
 add_subdirectory(rhoCentralFoam)
 add_subdirectory(rhoPorousSimpleFoam)
-#add_subdirectory(dbnsTurbFoam)
+add_subdirectory(dbnsTurbFoam)

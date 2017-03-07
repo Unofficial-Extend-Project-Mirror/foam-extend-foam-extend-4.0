@@ -44,7 +44,3 @@ add_foam_executable(multiSolverDemo
   DEPENDS finiteVolume multiSolverLib
   SOURCES ${SOURCES}
 )
-
-target_include_directories(multiSolverDemo PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../../../../src/multiSolver/lnInclude>
-)

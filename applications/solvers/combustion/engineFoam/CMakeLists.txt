@@ -41,8 +41,7 @@ if(NOT FOAM_FOUND)
 endif()
 
 add_foam_executable(engineFoam
-  DEPENDS reactionThermophysicalModels engine compressibleTurbulenceModel
-  DEPENDS laminarFlameSpeedModels
+  DEPENDS engine compressibleTurbulenceModel laminarFlameSpeedModels
   SOURCES ${SOURCES}
 )
 

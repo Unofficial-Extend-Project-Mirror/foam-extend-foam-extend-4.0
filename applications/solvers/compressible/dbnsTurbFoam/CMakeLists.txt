@@ -41,6 +41,6 @@ if(NOT FOAM_FOUND)
 endif()
 
 add_foam_executable(dbnsTurbFoam
-#   DEPENDS finiteVolume
+  DEPENDS dbns
   SOURCES ${SOURCES}
 )

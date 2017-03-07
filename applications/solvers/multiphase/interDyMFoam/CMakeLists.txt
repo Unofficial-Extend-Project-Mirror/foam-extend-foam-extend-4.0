@@ -41,12 +41,10 @@ if(NOT FOAM_FOUND)
 endif()
 
 add_foam_executable(interDyMFoam
-  DEPENDS finiteVolume interfaceProperties incompressibleTurbulenceModel
-  DEPENDS dynamicFvMesh
+  DEPENDS interfaceProperties incompressibleTurbulenceModel dynamicFvMesh
   SOURCES ${SOURCES}
 )
 
 target_include_directories(interDyMFoam PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../interFoam>
 )
-

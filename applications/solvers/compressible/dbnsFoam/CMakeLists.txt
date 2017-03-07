@@ -41,6 +41,6 @@ if(NOT FOAM_FOUND)
 endif()
 
 add_foam_executable(dbnsFoam
-  DEPENDS basicThermophysicalModels dbns
+  DEPENDS dbns
   SOURCES ${SOURCES}
 )

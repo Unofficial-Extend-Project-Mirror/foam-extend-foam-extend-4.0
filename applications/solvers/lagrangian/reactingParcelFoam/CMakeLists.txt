@@ -41,7 +41,6 @@ if(NOT FOAM_FOUND)
 endif()
 
 add_foam_executable(reactingParcelFoam
-  DEPENDS finiteVolume compressibleTurbulenceModel lagrangianIntermediate
-  DEPENDS chemistryModel
+  DEPENDS lagrangianIntermediate chemistryModel
   SOURCES ${SOURCES}
 )

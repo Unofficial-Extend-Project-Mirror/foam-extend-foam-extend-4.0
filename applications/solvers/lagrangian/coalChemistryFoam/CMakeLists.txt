@@ -41,7 +41,6 @@ if(NOT FOAM_FOUND)
 endif()
 
 add_foam_executable(coalChemistryFoam
-  DEPENDS finiteVolume compressibleTurbulenceModel lagrangianIntermediate
-  DEPENDS chemistryModel coalCombustion
+  DEPENDS lagrangianIntermediate coalCombustion chemistryModel
   SOURCES ${SOURCES}
 )

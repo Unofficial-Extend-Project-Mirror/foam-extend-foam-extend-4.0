@@ -47,5 +47,4 @@ add_foam_executable(bubbleInterTrackFoam
 
 target_include_directories(bubbleInterTrackFoam PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../include>
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../freeSurface/lnInclude>
 )

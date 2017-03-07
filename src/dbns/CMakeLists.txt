@@ -52,4 +52,10 @@ list(APPEND SOURCES
 
 add_foam_library(dbns SHARED ${SOURCES})
 
-target_link_libraries(dbns PUBLIC finiteVolume meshTools basicThermophysicalModels)
+target_link_libraries(dbns ${MGRIDGEN_LIBRARY} compressibleTurbulenceModel)
+
+target_include_directories(dbns PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/dbnsFlux/hllcFlux>
+  $<BUILD_INTERFACE:${MGRIDGEN_INCLUDES}/Lib>
+  $<BUILD_INTERFACE:${MGRIDGEN_INCLUDES}/IMlib>
+)

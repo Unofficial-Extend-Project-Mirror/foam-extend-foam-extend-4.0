@@ -535,3 +535,7 @@ list(APPEND SOURCES
 add_foam_library(finiteVolume SHARED ${SOURCES})
 
 target_link_libraries(finiteVolume PUBLIC meshTools)
+
+target_include_directories(finiteVolume PUBLIC
+$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/cfdTools>
+)
