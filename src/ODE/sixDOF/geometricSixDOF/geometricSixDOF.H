@@ -116,7 +116,7 @@ class geometricSixDOF
             PtrList<translationalConstraint> translationalConstraints_;
 
             //- List of rotational constraints
-            Ptrlist<rotationalConstraint> rotationalConstraints_;
+            PtrList<rotationalConstraint> rotationalConstraints_;
 
 
     // Private Member Functions
@@ -131,21 +131,25 @@ class geometricSixDOF
         // Variables in relative coordinate system (solved for)
 
             //- Return acceleration in relative coordinate system
-            //  given current values of relative displacement and velocity
+            //  given current values of relative displacement, velocity,
+            //  orientation (rotation tensor) and time
             dimensionedVector A
             (
                 const dimensionedVector& xR,
                 const dimensionedVector& uR,
-                const tensor& R
+                const tensor& R,
+                const scalar t
             ) const;
 
 
             //- Return rotational acceleration in relative coordinate system
-            //  given current values for relative rotational velocity
+            //  given current values for relative rotational velocity,
+            //  orientation (rotation tensor) and time
             dimensionedVector OmegaDot
             (
                 const tensor& R,
-                const dimensionedVector& omega
+                const dimensionedVector& omega,
+                const scalar t
             ) const;
 
             //- Return the Euler part of moment equation

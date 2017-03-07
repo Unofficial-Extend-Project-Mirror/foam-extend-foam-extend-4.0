@@ -65,7 +65,7 @@ Foam::autoPtr<Foam::rotationalConstraint> Foam::rotationalConstraint::New
     const word constraintType(dict.lookup("type"));
 
     wordConstructorTable::iterator cstrIter =
-        wordConstructorTablePtr_->find(constraintTypeType);
+        wordConstructorTablePtr_->find(constraintType);
 
     if (cstrIter == wordConstructorTablePtr_->end())
     {

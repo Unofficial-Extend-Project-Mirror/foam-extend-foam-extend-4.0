@@ -72,7 +72,8 @@ Foam::dimensionedVector Foam::geometricSixDOF::A
 (
     const dimensionedVector& xR,
     const dimensionedVector& uR,
-    const tensor& R
+    const tensor& R,
+    const scalar t
 ) const
 {
     // Create a scalar square matrix representing Newton equations with
@@ -87,7 +88,7 @@ Foam::dimensionedVector Foam::geometricSixDOF::A
     (
         force() // External force
       - (linSpringCoeffs() & xR) // Spring force
-      - (linDampingCoeffs() & uR); // Damping force
+      - (linDampingCoeffs() & uR) // Damping force
     );
     const vector& efVal = explicitForcing.value();
     const scalar& m = mass().value();
@@ -103,23 +104,23 @@ Foam::dimensionedVector Foam::geometricSixDOF::A
     forAll(translationalConstraints_, tcI)
     {
         // Get reference to current constraint
-        const translationalConstraint& curTc = translationalConstraint_[tcI];
+        const translationalConstraint& curTc = translationalConstraints_[tcI];
 
         // Get matrix contribution from constraint
-        const vector mc = curTc.matrixContribution();
+        const vector mc = curTc.matrixContribution(t, R);
 
         // Get matrix index
         const label index = tcI + 3;
 
         // Insert contributions into the matrix
-        forAll(lower, dirI)
+        forAll(mc, dirI)
         {
             M[dirI][index] = mc[dirI];
             M[index][dirI] = mc[dirI];
         }
 
         // Insert source contribution (remainder of the constraint function)
-        rhs[index] = curTc.sourceContribution();
+        rhs[index] = curTc.sourceContribution(t);
     }
 
     // Solve the matrix using LU decomposition. Note: solution is in the rhs and
@@ -132,7 +133,7 @@ Foam::dimensionedVector Foam::geometricSixDOF::A
         (
             "A",
             force().dimensions()/mass().dimensions(),
-            vector(rhs.x(), rhs.y(), rhs.z())
+            vector(rhs[0], rhs[1], rhs[2])
         );
 }
 
@@ -140,7 +141,8 @@ Foam::dimensionedVector Foam::geometricSixDOF::A
 Foam::dimensionedVector Foam::geometricSixDOF::OmegaDot
 (
     const tensor& R,
-    const dimensionedVector& omega
+    const dimensionedVector& omega,
+    const scalar t
 ) const
 {
     // Create a scalar square matrix representing Euler equations with
@@ -149,11 +151,14 @@ Foam::dimensionedVector Foam::geometricSixDOF::OmegaDot
     scalarField rhs(rotationalConstraints_.size() + 3, 0.0);
     scalarSquareMatrix J(rhs.size(), 0.0);
 
+    // Get current inertial-to-local transformation
+    const dimensionedTensor RT("RT", dimless, R.T());
+
     // Insert moment of inertia and explicit forcing into the system
     const dimensionedVector explicitForcing
     (
         E(omega) // Euler part
-      + (dimensionedTensor("R", dimless, R) & moment()) // External torque
+      + (RT & moment()) // External torque
     );
     const vector& efVal = explicitForcing.value();
     const diagTensor& I = momentOfInertia().value();
@@ -172,20 +177,20 @@ Foam::dimensionedVector Foam::geometricSixDOF::OmegaDot
         const rotationalConstraint& curRc = rotationalConstraints_[rcI];
 
         // Get matrix contribution from the constraint
-        const vector mc = curRc.matrixContribution();
+        const vector mc = curRc.matrixContribution(t, RT.value());
 
         // Get matrix index
         const label index = rcI + 3;
 
         // Insert contributions into the matrix
-        forAll(upper, dirI)
+        forAll(mc, dirI)
         {
             J[dirI][index] = mc[dirI];
             J[index][dirI] = mc[dirI];
         }
 
         // Insert source contribution (remainder of the constraint function)
-        rhs[index] = curRc.sourceContribution();
+        rhs[index] = curRc.sourceContribution(t);
     }
 
     // Solve the matrix using LU decomposition. Note: solution is in the rhs and
@@ -198,7 +203,7 @@ Foam::dimensionedVector Foam::geometricSixDOF::OmegaDot
         (
             "OmegaDot",
             moment().dimensions()/momentOfInertia().dimensions(),
-            vector(rhs.x(), rhs.y(), rhs.z())
+            vector(rhs[0], rhs[1], rhs[2])
         );
 }
 
@@ -307,8 +312,8 @@ void Foam::geometricSixDOF::setState(const sixDOFODE& sd)
     // HJ, 23/Mar/2015
     coeffs_ = gsd.coeffs_;
 
-    translationalConstraints = gsd.translationalConstraints_;
-    rotationalConstraints = gsd.rotationalConstraints_;
+    translationalConstraints_ = gsd.translationalConstraints_;
+    rotationalConstraints_ = gsd.rotationalConstraints_;
 }
 
 
@@ -365,10 +370,10 @@ Foam::geometricSixDOF::geometricSixDOF(const IOobject& io)
     // Read translation constraints if they are present
     if (dict().found("translationalConstraints"))
     {
-        PtrList<translationalConstraints> tcList
+        PtrList<translationalConstraint> tcList
         (
             dict().lookup("translationalConstraints"),
-            translationalConstraints::iNew(*this)
+            translationalConstraint::iNew(*this)
         );
         translationalConstraints_.transfer(tcList);
     }
@@ -376,10 +381,10 @@ Foam::geometricSixDOF::geometricSixDOF(const IOobject& io)
     // Read rotation constraints if they are present
     if (dict().found("rotationalConstraints"))
     {
-        PtrList<rotationalConstraints> tcList
+        PtrList<rotationalConstraint> tcList
         (
             dict().lookup("rotationalConstraints"),
-            rotationalConstraints::iNew(*this)
+            rotationalConstraint::iNew(*this)
         );
         rotationalConstraints_.transfer(tcList);
     }
@@ -404,7 +409,7 @@ Foam::geometricSixDOF::geometricSixDOF
     coeffs_(gsd.coeffs_),
 
     translationalConstraints_(gsd.translationalConstraints_),
-    rotationalConstraints_(gsd.rotationalConstraints_),
+    rotationalConstraints_(gsd.rotationalConstraints_)
 {}
 
 
@@ -511,7 +516,7 @@ void Foam::geometricSixDOF::derivatives
     const tensor curRot = (rotation_ & expMap(rotIncrementVector));
 
     // Calculate translational acceleration using current rotation
-    const vector accel = A(curX, curU, curRot).value();
+    const vector accel = A(curX, curU, curRot, x).value();
 
     // Set the derivatives for velocity
     dydx[3] = accel.x();
@@ -528,7 +533,7 @@ void Foam::geometricSixDOF::derivatives
     );
 
     // Calculate rotational acceleration using current rotation
-    const vector omegaDot = OmegaDot(curRot, curOmega).value();
+    const vector omegaDot = OmegaDot(curRot, curOmega, x).value();
 
     dydx[6] = omegaDot.x();
     dydx[7] = omegaDot.y();
@@ -569,7 +574,6 @@ void Foam::geometricSixDOF::update(const scalar delta)
     Uval.z() = coeffs_[5];
 
     // Constrain velocity and re-set coefficients
-    constrainTranslation(Uval);
     coeffs_[3] = Uval.x();
     coeffs_[4] = Uval.y();
     coeffs_[5] = Uval.z();

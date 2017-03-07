@@ -22,22 +22,22 @@ License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    Foam::rotationalConstraint
+    Foam::translationalConstraint
 
 Description
-    Abstract base class containing interface for rotation constraints used
+    Abstract base class containing interface for translational constraints used
     within sixDOFODE classes.
 
     The constraint is implicitly defined as:
 
-    g(omegaDot, t) = f(t)*omegaDot + a(t) = 0,
+    g(vDot, t) = f(t)*vDot + a(t) = 0,
 
-    where omegaDot is angular acceleration.
+    where vDot is translational acceleration.
 
     Interface provides all the necessary data for inserting the constraint into
     the resulting linear system via Lagrangian multipliers:
     1. matrixContribution() - corresponding to f(t) (prefactor multiplying
-                              omegaDot), to be inserted into the matrix.
+                              vDot), to be inserted into the matrix.
     2. sourceContribution() - corresponding to a(t), to be inserted into right
                               hand side vector.
 
@@ -46,12 +46,12 @@ Author
     Vuko Vukcevic, FSB Zagreb.  All rights reserved.
 
 SourceFiles
-    rotationalConstraint.C
+    translationalConstraint.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef rotationalConstraint_H
-#define rotationalConstraint_H
+#ifndef translationalConstraint_H
+#define translationalConstraint_H
 
 #include "sixDOFODE.H"
 #include "typeInfo.H"
@@ -64,10 +64,10 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                   Class rotationalConstraint Declaration
+                   Class translationalConstraint Declaration
 \*---------------------------------------------------------------------------*/
 
-class rotationalConstraint
+class translationalConstraint
 {
     // Private data
 
@@ -81,16 +81,16 @@ class rotationalConstraint
     // Private Member Functions
 
         //- Disallow default bitwise copy construct
-        rotationalConstraint(const rotationalConstraint&);
+        translationalConstraint(const translationalConstraint&);
 
         //- Disallow default bitwise assignment
-        void operator=(const rotationalConstraint&);
+        void operator=(const translationalConstraint&);
 
 
 public:
 
     //- Runtime type information
-    TypeName("rotationalConstraint");
+    TypeName("translationalConstraint");
 
 
     // Declare run-time constructor selection table
@@ -98,7 +98,7 @@ public:
         declareRunTimeSelectionTable
         (
             autoPtr,
-            rotationalConstraint,
+            translationalConstraint,
             word,
             (
                 const word& name,
@@ -110,7 +110,7 @@ public:
 
 
         //- Class used for the read-construction of
-        //  PtrLists of rotationalConstraint
+        //  PtrLists of translationalConstraint
         class iNew
         {
             const sixDOFODE& sixDOFODE_;
@@ -122,11 +122,11 @@ public:
                 sixDOFODE_(sixDOFODE)
             {}
 
-            autoPtr<rotationalConstraint> operator()(Istream& is) const
+            autoPtr<translationalConstraint> operator()(Istream& is) const
             {
                 word name(is);
                 dictionary dict(is);
-                return rotationalConstraint::New(name, sixDOFODE_, dict);
+                return translationalConstraint::New(name, sixDOFODE_, dict);
             }
         };
 
@@ -134,7 +134,7 @@ public:
     // Constructors
 
         //- Construct from dictionary
-        rotationalConstraint
+        translationalConstraint
         (
             const word& name,
             const sixDOFODE& sixDOFODE,
@@ -144,8 +144,8 @@ public:
 
     // Selectors
 
-        //- Return a reference to the selected rotationalConstraint
-        static autoPtr<rotationalConstraint> New
+        //- Return a reference to the selected translationalConstraint
+        static autoPtr<translationalConstraint> New
         (
             const word& name,
             const sixDOFODE& sixDOFODE,
@@ -155,7 +155,7 @@ public:
 
     // Destructor
 
-        virtual ~rotationalConstraint();
+        virtual ~translationalConstraint();
 
 
     // Member Functions
@@ -178,10 +178,14 @@ public:
         // Constraint specific functions
 
             //- Return matrix contribution defined by constraint, f(t)
-            const vector matrixContribution() const = 0;
+            virtual vector matrixContribution
+            (
+                const scalar t,
+                const tensor& toRelative
+            ) const = 0;
 
             //- Return source contribution defined by constraint, a(t)
-            const vector sourceContribution() const = 0;
+            virtual scalar sourceContribution(const scalar t) const = 0;
 };
 
 
