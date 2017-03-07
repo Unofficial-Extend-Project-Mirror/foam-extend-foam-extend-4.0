@@ -81,7 +81,6 @@ public:
         constantAngularAcceleration
         (
             const word& name,
-            const sixDOFODE& sixDOFODE,
             const dictionary& dict
         );
 

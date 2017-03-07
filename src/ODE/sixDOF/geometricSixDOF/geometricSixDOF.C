@@ -374,7 +374,7 @@ Foam::geometricSixDOF::geometricSixDOF(const IOobject& io)
         PtrList<translationalConstraint> tcList
         (
             dict().lookup("translationalConstraints"),
-            translationalConstraint::iNew(*this)
+            translationalConstraint::iNew()
         );
         translationalConstraints_.transfer(tcList);
     }
@@ -385,7 +385,7 @@ Foam::geometricSixDOF::geometricSixDOF(const IOobject& io)
         PtrList<rotationalConstraint> tcList
         (
             dict().lookup("rotationalConstraints"),
-            rotationalConstraint::iNew(*this)
+            rotationalConstraint::iNew()
         );
         rotationalConstraints_.transfer(tcList);
     }
@@ -626,10 +626,10 @@ bool Foam::geometricSixDOF::writeData(Ostream& os) const
     os.writeKeyword("omega") << tab << omega_
         << token::END_STATEMENT << nl << nl;
 
-    os.writeKeyword("translationalConstraints") << tab
-        << translationalConstraints_ << token::END_STATEMENT << nl;
-    os.writeKeyword("rotationalConstraints") << tab
-        << rotationalConstraints_ << token::END_STATEMENT << nl << endl;
+//    os.writeKeyword("translationalConstraints") << tab
+//        << translationalConstraints_ << token::END_STATEMENT << nl;
+//    os.writeKeyword("rotationalConstraints") << tab
+//        << rotationalConstraints_ << token::END_STATEMENT << nl << endl;
 
     return os.good();
 }

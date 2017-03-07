@@ -38,12 +38,8 @@ namespace Foam
 Foam::rotationalConstraint::rotationalConstraint
 (
     const word& name,
-    const sixDOFODE& sixDOFODE,
     const dictionary& dict
 )
-:
-    name_(name),
-    sixDOFODE_(sixDOFODE)
 {}
 
 
@@ -58,7 +54,6 @@ Foam::rotationalConstraint::~rotationalConstraint()
 Foam::autoPtr<Foam::rotationalConstraint> Foam::rotationalConstraint::New
 (
     const word& name,
-    const sixDOFODE& sixDOFODE,
     const dictionary& dict
 )
 {
@@ -74,7 +69,6 @@ Foam::autoPtr<Foam::rotationalConstraint> Foam::rotationalConstraint::New
             "rotationalConstraint::New"
             "\n("
             "\n    const word& name,"
-            "\n    const sixDOFODE& sixDOFODE,"
             "\n    const dictionary& dict,"
             "\n)"
         )   << "Unknown rotation constraint type: " << constraintType
@@ -89,7 +83,6 @@ Foam::autoPtr<Foam::rotationalConstraint> Foam::rotationalConstraint::New
         cstrIter()
         (
             name,
-            sixDOFODE,
             dict
         )
     );
