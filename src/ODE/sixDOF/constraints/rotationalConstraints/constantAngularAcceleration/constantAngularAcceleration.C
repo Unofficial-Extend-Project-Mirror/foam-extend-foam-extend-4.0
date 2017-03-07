@@ -55,6 +55,16 @@ Foam::constantAngularAcceleration::constantAngularAcceleration
 {}
 
 
+Foam::autoPtr<Foam::rotationalConstraint>
+Foam::constantAngularAcceleration::clone() const
+{
+    return autoPtr<rotationalConstraint>
+    (
+        new constantAngularAcceleration(*this)
+    );
+}
+
+
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
 Foam::constantAngularAcceleration::~constantAngularAcceleration()

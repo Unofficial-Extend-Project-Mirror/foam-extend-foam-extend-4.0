@@ -312,6 +312,7 @@ void Foam::geometricSixDOF::setState(const sixDOFODE& sd)
     // HJ, 23/Mar/2015
     coeffs_ = gsd.coeffs_;
 
+    // Copy constraints
     translationalConstraints_ = gsd.translationalConstraints_;
     rotationalConstraints_ = gsd.rotationalConstraints_;
 }

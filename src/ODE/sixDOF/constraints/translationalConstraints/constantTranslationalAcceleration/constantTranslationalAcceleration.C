@@ -54,6 +54,16 @@ Foam::constantTranslationalAcceleration::constantTranslationalAcceleration
 {}
 
 
+Foam::autoPtr<Foam::translationalConstraint>
+Foam::constantTranslationalAcceleration::clone() const
+{
+    return autoPtr<translationalConstraint>
+    (
+        new constantTranslationalAcceleration(*this)
+    );
+}
+
+
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
 Foam::constantTranslationalAcceleration::~constantTranslationalAcceleration()
