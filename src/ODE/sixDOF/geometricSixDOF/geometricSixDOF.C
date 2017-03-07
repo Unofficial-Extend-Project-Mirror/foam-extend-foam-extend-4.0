@@ -27,16 +27,17 @@ Class
 Description
     6-DOF solver using a geometric method for integration of rotations.
 
+    Run-time selectable constraints are handled via Lagrangian multipliers using
+    the interface from sixDOFConstraint class.
+
 Author
     Viktor Pandza, FSB Zagreb.  All rights reserved.
     Vuko Vukcevic, FSB Zagreb.  All rights reserved.
 
-SourceFiles
-    geometricSixDOF.C
-
 \*---------------------------------------------------------------------------*/
 
 #include "geometricSixDOF.H"
+#include "scalarSquareMatrix.H"
 #include "OutputControlDictionary.H"
 #include "addToRunTimeSelectionTable.H"
 
@@ -74,19 +75,65 @@ Foam::dimensionedVector Foam::geometricSixDOF::A
     const tensor& R
 ) const
 {
-    // Fix the total force in global coordinate system
-    dimensionedVector fAbs =
-        // External force
-        force()
-        // Spring force in global coordinate system
-      - (linSpringCoeffs() & xR)
-        // Damping force in global coordinate system
-      - (linDampingCoeffs() & uR);
+    // Create a scalar square matrix representing Newton equations with
+    // constraints and the corresponding source (right hand side vector).
+    // Note: size of the matrix is 3 + number of constraints
+    scalarField rhs(translationalConstraints_.size() + 3, 0.0);
+    scalarSquareMatrix M(rhs.size(), 0.0);
 
-    // Constrain translation simply by setting the total force to zero
-    constrainTranslation(fAbs.value());
+    // Insert mass and explicit forcing into the system. Note: translations are
+    // solved in the global coordinate system
+    const dimensionedVector explicitForcing
+    (
+        force() // External force
+      - (linSpringCoeffs() & xR) // Spring force
+      - (linDampingCoeffs() & uR); // Damping force
+    );
+    const vector& efVal = explicitForcing.value();
+    const scalar& m = mass().value();
 
-    return fAbs/mass();
+    forAll(efVal, dirI)
+    {
+        M[dirI][dirI] = m;
+
+        rhs[dirI] = efVal[dirI];
+    }
+
+    // Insert contributions from the constraints
+    forAll(translationalConstraints_, tcI)
+    {
+        // Get reference to current constraint
+        const translationalConstraint& curTc = translationalConstraint_[tcI];
+
+        // Get matrix contribution from constraint
+        const vector mc = curTc.matrixContribution();
+
+        // Get matrix index
+        const label index = tcI + 3;
+
+        // Insert contributions into the matrix
+        forAll(lower, dirI)
+        {
+            M[dirI][index] = mc[dirI];
+            M[index][dirI] = mc[dirI];
+        }
+
+        // Insert source contribution (remainder of the constraint function)
+        rhs[index] = curTc.sourceContribution();
+    }
+
+    // Solve the matrix using LU decomposition. Note: solution is in the rhs and
+    // it contains accelerations in the first three entries and corresponding
+    // Lagrangian multipliers in other entries.
+    scalarSquareMatrix::LUsolve(M, rhs);
+
+    return
+        dimensionedVector
+        (
+            "A",
+            force().dimensions()/mass().dimensions(),
+            vector(rhs.x(), rhs.y(), rhs.z())
+        );
 }
 
 
@@ -96,19 +143,62 @@ Foam::dimensionedVector Foam::geometricSixDOF::OmegaDot
     const dimensionedVector& omega
 ) const
 {
-    // External moment (torque) in local coordinate system
-    dimensionedVector mRel =
-        // External moment
-        (dimensionedTensor("R", dimless, R) & moment());
+    // Create a scalar square matrix representing Euler equations with
+    // constraints and the corresponding source (right hand side vector).
+    // Note: size of the matrix is 3 + number of constraints
+    scalarField rhs(rotationalConstraints_.size() + 3, 0.0);
+    scalarSquareMatrix J(rhs.size(), 0.0);
 
-    // Note: constraints not implemented at the moment. They shall be
-    // implemented in terms of Lagrange multipliers.
+    // Insert moment of inertia and explicit forcing into the system
+    const dimensionedVector explicitForcing
+    (
+        E(omega) // Euler part
+      + (dimensionedTensor("R", dimless, R) & moment()) // External torque
+    );
+    const vector& efVal = explicitForcing.value();
+    const diagTensor& I = momentOfInertia().value();
+
+    forAll(efVal, dirI)
+    {
+        J[dirI][dirI] = I[dirI];
+
+        rhs[dirI] = efVal[dirI];
+    }
+
+    // Insert contributions from the constraints
+    forAll(rotationalConstraints_, rcI)
+    {
+        // Get reference to current constraint
+        const rotationalConstraint& curRc = rotationalConstraints_[rcI];
+
+        // Get matrix contribution from the constraint
+        const vector mc = curRc.matrixContribution();
+
+        // Get matrix index
+        const label index = rcI + 3;
+
+        // Insert contributions into the matrix
+        forAll(upper, dirI)
+        {
+            J[dirI][index] = mc[dirI];
+            J[index][dirI] = mc[dirI];
+        }
+
+        // Insert source contribution (remainder of the constraint function)
+        rhs[index] = curRc.sourceContribution();
+    }
+
+    // Solve the matrix using LU decomposition. Note: solution is in the rhs and
+    // it contains OmegaDot's in the first three entries and corresponding
+    // Lagrangian multipliers in other entries.
+    scalarSquareMatrix::LUsolve(J, rhs);
 
     return
-        inv(momentOfInertia())
-      & (
-            E(omega)
-          + mRel
+        dimensionedVector
+        (
+            "OmegaDot",
+            moment().dimensions()/momentOfInertia().dimensions(),
+            vector(rhs.x(), rhs.y(), rhs.z())
         );
 }
 
@@ -119,46 +209,6 @@ Foam::dimensionedVector Foam::geometricSixDOF::E
 ) const
 {
     return (*(momentOfInertia() & omega) & omega);
-}
-
-
-void Foam::geometricSixDOF::constrainTranslation(vector& vec) const
-{
-    // Constrain the vector with respect to referent or global coordinate system
-    if (referentMotionConstraints_)
-    {
-        vector consVec(referentRotation_.R() & vec);
-
-        if (fixedSurge_)
-        {
-            consVec.x() = 0;
-        }
-        if (fixedSway_)
-        {
-            consVec.y() = 0;
-        }
-        if (fixedHeave_)
-        {
-            consVec.z() = 0;
-        }
-
-        vec = referentRotation_.invR() & consVec;
-    }
-    else
-    {
-        if (fixedSurge_)
-        {
-            vec.x() = 0;
-        }
-        if (fixedSway_)
-        {
-            vec.y() = 0;
-        }
-        if (fixedHeave_)
-        {
-            vec.z() = 0;
-        }
-    }
 }
 
 
@@ -257,14 +307,8 @@ void Foam::geometricSixDOF::setState(const sixDOFODE& sd)
     // HJ, 23/Mar/2015
     coeffs_ = gsd.coeffs_;
 
-    fixedSurge_ = gsd.fixedSurge_;
-    fixedSway_ = gsd.fixedSway_;
-    fixedHeave_ = gsd.fixedHeave_;
-    fixedRoll_ = gsd.fixedRoll_;
-    fixedPitch_ = gsd.fixedPitch_;
-    fixedYaw_ = gsd.fixedYaw_;
-    referentMotionConstraints_ = gsd.referentMotionConstraints_;
-    referentRotation_ = gsd.referentRotation_;
+    translationalConstraints = gsd.translationalConstraints_;
+    rotationalConstraints = gsd.rotationalConstraints_;
 }
 
 
@@ -285,33 +329,11 @@ Foam::geometricSixDOF::geometricSixDOF(const IOobject& io)
     omega_(dict().lookup("omega")),
     omegaAverage_("omegaAverage", omega_),
 
-    nEqns_(),
-    coeffs_(),
+    coeffs_(12, 0.0),
 
-    fixedSurge_(dict().lookup("fixedSurge")),
-    fixedSway_(dict().lookup("fixedSway")),
-    fixedHeave_(dict().lookup("fixedHeave")),
-    fixedRoll_(dict().lookup("fixedRoll")),
-    fixedPitch_(dict().lookup("fixedPitch")),
-    fixedYaw_(dict().lookup("fixedYaw")),
-    referentMotionConstraints_
-    (
-        dict().lookupOrDefault<Switch>
-        (
-            "referentMotionConstraints",
-            false
-        )
-    ),
-    referentRotation_(vector(1, 0, 0), 0)
+    translationalConstraints_(),
+    rotationalConstraints_()
 {
-    // Missing constraints. Count how many rotational constraints we have in
-    // order to count the number of equations.
-
-    nEqns_ = 12;
-
-    // Set size for ODE coefficients depending on number of equations
-    coeffs_.setSize(nEqns_);
-
     // Set ODE coefficients from position and rotation
 
     // Linear displacement relative to spring equilibrium
@@ -336,6 +358,31 @@ Foam::geometricSixDOF::geometricSixDOF(const IOobject& io)
     coeffs_[9] = 0;
     coeffs_[10] = 0;
     coeffs_[11] = 0;
+
+
+    // Read and construct constraints
+
+    // Read translation constraints if they are present
+    if (dict().found("translationalConstraints"))
+    {
+        PtrList<translationalConstraints> tcList
+        (
+            dict().lookup("translationalConstraints"),
+            translationalConstraints::iNew(*this)
+        );
+        translationalConstraints_.transfer(tcList);
+    }
+
+    // Read rotation constraints if they are present
+    if (dict().found("rotationalConstraints"))
+    {
+        PtrList<rotationalConstraints> tcList
+        (
+            dict().lookup("rotationalConstraints"),
+            rotationalConstraints::iNew(*this)
+        );
+        rotationalConstraints_.transfer(tcList);
+    }
 }
 
 
@@ -354,17 +401,10 @@ Foam::geometricSixDOF::geometricSixDOF
     omega_(gsd.omega_.name(), gsd.omega_),
     omegaAverage_(gsd.omegaAverage_.name(), gsd.omegaAverage_),
 
-    nEqns_(gsd.nEqns_),
     coeffs_(gsd.coeffs_),
 
-    fixedSurge_(gsd.fixedSurge_),
-    fixedSway_(gsd.fixedSway_),
-    fixedHeave_(gsd.fixedHeave_),
-    fixedRoll_(gsd.fixedRoll_),
-    fixedPitch_(gsd.fixedPitch_),
-    fixedYaw_(gsd.fixedYaw_),
-    referentMotionConstraints_(gsd.referentMotionConstraints_),
-    referentRotation_(gsd.referentRotation_)
+    translationalConstraints_(gsd.translationalConstraints_),
+    rotationalConstraints_(gsd.rotationalConstraints_),
 {}
 
 
@@ -581,18 +621,10 @@ bool Foam::geometricSixDOF::writeData(Ostream& os) const
     os.writeKeyword("omega") << tab << omega_
         << token::END_STATEMENT << nl << nl;
 
-    os.writeKeyword("fixedSurge") << tab << fixedSurge_ <<
-        token::END_STATEMENT << nl;
-    os.writeKeyword("fixedSway") << tab << fixedSway_ <<
-        token::END_STATEMENT << nl;
-    os.writeKeyword("fixedHeave") << tab << fixedHeave_ <<
-        token::END_STATEMENT << nl;
-    os.writeKeyword("fixedRoll") << tab << fixedRoll_ <<
-        token::END_STATEMENT << nl;
-    os.writeKeyword("fixedPitch") << tab << fixedPitch_ <<
-        token::END_STATEMENT << nl;
-    os.writeKeyword("fixedYaw") << tab << fixedYaw_ <<
-        token::END_STATEMENT << nl << endl;
+    os.writeKeyword("translationalConstraints") << tab
+        << translationalConstraints_ << token::END_STATEMENT << nl;
+    os.writeKeyword("rotationalConstraints") << tab
+        << rotationalConstraints_ << token::END_STATEMENT << nl << endl;
 
     return os.good();
 }
