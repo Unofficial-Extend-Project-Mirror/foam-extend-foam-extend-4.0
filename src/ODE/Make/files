@@ -16,6 +16,11 @@ sixDOF = sixDOF
 $(sixDOF)/finiteRotation/finiteRotation.C
 $(sixDOF)/sixDOFqODE/sixDOFqODE.C
 
+$(sixDOF)/constraints/rotationalConstraints/rotationalConstraint/rotationalConstraint.C
+$(sixDOF)/constraints/rotationalConstraints/constantAngularAcceleration/constantAngularAcceleration.C
+
+$(sixDOF)/constraints/translationalConstraints/translationalConstraint/translationalConstraint.C
+
 $(sixDOF)/sixDOFODE/sixDOFODE.C
 $(sixDOF)/sixDOFODE/newSixDOFODE.C
 $(sixDOF)/quaternionSixDOF/quaternionSixDOF.C

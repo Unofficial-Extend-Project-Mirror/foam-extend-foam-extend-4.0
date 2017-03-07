@@ -23,76 +23,76 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "constantAngularAcceleration.H"
-#include "addToRunTimeSelectionTable.H"
+#include "translationalConstraint.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
 namespace Foam
 {
-    defineTypeNameAndDebug(constantAngularAcceleration, 0);
-    addToRunTimeSelectionTable
-    (
-        rotationalConstraint,
-        constantAngularAcceleration,
-        word
-    );
+    defineTypeNameAndDebug(translationalConstraint, 0);
+    defineRunTimeSelectionTable(translationalConstraint, word);
 }
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-Foam::constantAngularAcceleration::constantAngularAcceleration
+Foam::translationalConstraint::translationalConstraint
 (
     const word& name,
     const sixDOFODE& sixDOFODE,
     const dictionary& dict
 )
 :
-    rotationalConstraint(name, sixDOFODE, dict),
-    dir_(dict.lookup("constraintDirection")),
-    alpha_(readScalar(dict.lookup("angularAcceleration"))),
-    inGlobal_(dict.lookup("inGlobalCoordinateSystem"))
+    name_(name),
+    sixDOFODE_(sixDOFODE)
 {}
 
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
-Foam::constantAngularAcceleration::~constantAngularAcceleration()
+Foam::translationalConstraint::~translationalConstraint()
 {}
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-Foam::vector Foam::constantAngularAcceleration::matrixContribution
+Foam::autoPtr<Foam::translationalConstraint> Foam::translationalConstraint::New
 (
-    const scalar,
-    const tensor& toRelative
-) const
+    const word& name,
+    const sixDOFODE& sixDOFODE,
+    const dictionary& dict
+)
 {
-    vector mc;
+    const word constraintType(dict.lookup("type"));
 
-    if (inGlobal_)
+    wordConstructorTable::iterator cstrIter =
+        wordConstructorTablePtr_->find(constraintType);
+
+    if (cstrIter == wordConstructorTablePtr_->end())
     {
-        // Constraint is given in global (inertial) coordinate system, transform
-        // it to local
-        mc = toRelative & dir_;
+        FatalErrorIn
+        (
+            "translationalConstraint::New"
+            "\n("
+            "\n    const word& name,"
+            "\n    const sixDOFODE& sixDOFODE,"
+            "\n    const dictionary& dict,"
+            "\n)"
+        )   << "Unknown translation constraint type: " << constraintType
+            << endl << endl
+            << "Valid translation constraint types are: " << endl
+            << wordConstructorTablePtr_->sortedToc()
+            << exit(FatalError);
     }
-    else
-    {
-        // Constraint already in local (body) coordinate system
-        mc = dir_;
-    }
 
-    return mc;
-}
-
-
-Foam::scalar Foam::constantAngularAcceleration::sourceContribution
-(
-    const scalar
-) const
-{
-    return alpha_;
+    return autoPtr<translationalConstraint>
+    (
+        cstrIter()
+        (
+            name,
+            sixDOFODE,
+            dict
+        )
+    );
 }
 
 

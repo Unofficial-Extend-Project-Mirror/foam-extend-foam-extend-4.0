@@ -23,76 +23,61 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "constantAngularAcceleration.H"
+#include "constantTranslationalAcceleration.H"
 #include "addToRunTimeSelectionTable.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
 namespace Foam
 {
-    defineTypeNameAndDebug(constantAngularAcceleration, 0);
+    defineTypeNameAndDebug(constantTranslationalAcceleration, 0);
     addToRunTimeSelectionTable
     (
-        rotationalConstraint,
-        constantAngularAcceleration,
+        translationalConstraint,
+        constantTranslationalAcceleration,
         word
     );
 }
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-Foam::constantAngularAcceleration::constantAngularAcceleration
+Foam::constantTranslationalAcceleration::constantTranslationalAcceleration
 (
     const word& name,
     const sixDOFODE& sixDOFODE,
     const dictionary& dict
 )
 :
-    rotationalConstraint(name, sixDOFODE, dict),
+    translationalConstraint(name, sixDOFODE, dict),
     dir_(dict.lookup("constraintDirection")),
-    alpha_(readScalar(dict.lookup("angularAcceleration"))),
-    inGlobal_(dict.lookup("inGlobalCoordinateSystem"))
+    a_(readScalar(dict.lookup("translationalAcceleration")))
 {}
 
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
-Foam::constantAngularAcceleration::~constantAngularAcceleration()
+Foam::constantTranslationalAcceleration::~constantTranslationalAcceleration()
 {}
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-Foam::vector Foam::constantAngularAcceleration::matrixContribution
+Foam::vector Foam::constantTranslationalAcceleration::matrixContribution
 (
     const scalar,
-    const tensor& toRelative
+    const tensor&
 ) const
 {
-    vector mc;
-
-    if (inGlobal_)
-    {
-        // Constraint is given in global (inertial) coordinate system, transform
-        // it to local
-        mc = toRelative & dir_;
-    }
-    else
-    {
-        // Constraint already in local (body) coordinate system
-        mc = dir_;
-    }
-
-    return mc;
+    return dir_;
 }
 
 
-Foam::scalar Foam::constantAngularAcceleration::sourceContribution
+Foam::scalar Foam::constantTranslationalAcceleration::sourceContribution
 (
     const scalar
 ) const
 {
-    return alpha_;
+    return a_;
 }
 
 
