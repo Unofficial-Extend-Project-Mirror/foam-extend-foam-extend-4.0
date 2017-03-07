@@ -26,7 +26,7 @@ Class
         muSgsWallFunctionFvPatchScalarField
 
 Description
-    Spalart Allmaas wall function boundary condition for compressible flows
+    Spalart Allmaras wall function boundary condition for compressible flows
 
 SourceFiles
     muSgsWallFunctionFvPatchScalarField.C
