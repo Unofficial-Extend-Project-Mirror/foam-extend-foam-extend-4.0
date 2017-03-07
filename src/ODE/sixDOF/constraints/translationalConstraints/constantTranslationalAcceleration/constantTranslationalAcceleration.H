@@ -77,7 +77,6 @@ public:
         constantTranslationalAcceleration
         (
             const word& name,
-            const sixDOFODE& sixDOFODE,
             const dictionary& dict
         );
 

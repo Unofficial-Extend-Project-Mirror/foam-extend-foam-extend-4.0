@@ -69,15 +69,6 @@ namespace Foam
 
 class translationalConstraint
 {
-    // Private data
-
-        //- Name of the constraint
-        const word name_;
-
-        //- Reference to underlying sixDOFODE
-        const sixDOFODE& sixDOFODE_;
-
-
 public:
 
     //- Runtime type information
@@ -93,10 +84,9 @@ public:
             word,
             (
                 const word& name,
-                const sixDOFODE& sixDOFODE,
                 const dictionary& dict
             ),
-            (name, sixDOFODE, dict)
+            (name, dict)
         );
 
 
@@ -104,20 +94,16 @@ public:
         //  PtrLists of translationalConstraint
         class iNew
         {
-            const sixDOFODE& sixDOFODE_;
-
         public:
 
-            iNew(const sixDOFODE& sixDOFODE)
-            :
-                sixDOFODE_(sixDOFODE)
+            iNew()
             {}
 
             autoPtr<translationalConstraint> operator()(Istream& is) const
             {
                 word name(is);
                 dictionary dict(is);
-                return translationalConstraint::New(name, sixDOFODE_, dict);
+                return translationalConstraint::New(name, dict);
             }
         };
 
@@ -128,7 +114,6 @@ public:
         translationalConstraint
         (
             const word& name,
-            const sixDOFODE& sixDOFODE,
             const dictionary& dict
         );
 
@@ -142,7 +127,6 @@ public:
         static autoPtr<translationalConstraint> New
         (
             const word& name,
-            const sixDOFODE& sixDOFODE,
             const dictionary& dict
         );
 
@@ -153,21 +137,6 @@ public:
 
 
     // Member Functions
-
-        // Access functions
-
-            //- Return const reference to name of the constraint
-            const word& name() const
-            {
-                return name_;
-            }
-
-            //- Return const reference to underlying sixDOFODE object
-            const sixDOFODE& sixDOF() const
-            {
-                return sixDOFODE_;
-            }
-
 
         // Constraint specific functions
 

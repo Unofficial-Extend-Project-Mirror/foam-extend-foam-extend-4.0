@@ -38,12 +38,8 @@ namespace Foam
 Foam::translationalConstraint::translationalConstraint
 (
     const word& name,
-    const sixDOFODE& sixDOFODE,
     const dictionary& dict
 )
-:
-    name_(name),
-    sixDOFODE_(sixDOFODE)
 {}
 
 
@@ -58,7 +54,6 @@ Foam::translationalConstraint::~translationalConstraint()
 Foam::autoPtr<Foam::translationalConstraint> Foam::translationalConstraint::New
 (
     const word& name,
-    const sixDOFODE& sixDOFODE,
     const dictionary& dict
 )
 {
@@ -74,7 +69,6 @@ Foam::autoPtr<Foam::translationalConstraint> Foam::translationalConstraint::New
             "translationalConstraint::New"
             "\n("
             "\n    const word& name,"
-            "\n    const sixDOFODE& sixDOFODE,"
             "\n    const dictionary& dict,"
             "\n)"
         )   << "Unknown translation constraint type: " << constraintType
@@ -89,7 +83,6 @@ Foam::autoPtr<Foam::translationalConstraint> Foam::translationalConstraint::New
         cstrIter()
         (
             name,
-            sixDOFODE,
             dict
         )
     );
