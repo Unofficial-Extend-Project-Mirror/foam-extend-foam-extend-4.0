@@ -27,6 +27,9 @@ Class
 Description
     6-DOF solver using a geometric method for integration of rotations.
 
+    Run-time selectable constraints are handled via Lagrangian multipliers using
+    the interface from sixDOFConstraint class.
+
     Reference (bibtex):
 
     @article {mullerTerze2016,
@@ -58,6 +61,8 @@ SourceFiles
 #include "sixDOFODE.H"
 #include "finiteRotation.H"
 #include "tolerancesSwitch.H"
+#include "translationalConstraint.H"
+#include "rotationalConstraint.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -101,40 +106,17 @@ class geometricSixDOF
 
         // ODE controls
 
-            //- Number of equations (depending on rotational constraints)
-            scalar nEqns_;
-
             //- ODE coefficients
             scalarField coeffs_;
 
 
-        // Motion constraints (given as fixed motion components)
+        // Motion constraints
 
-            //- Fixed surge (x-translation)
-            Switch fixedSurge_;
+            //- List of translational constraints
+            PtrList<translationalConstraint> translationalConstraints_;
 
-            //- Fixed sway (y-translation)
-            Switch fixedSway_;
-
-            //- Fixed heave (z-translation)
-            Switch fixedHeave_;
-
-            //- Fixed roll (rotation around x)
-            Switch fixedRoll_;
-
-            //- Fixed pitch (rotation around y)
-            Switch fixedPitch_;
-
-            //- Fixed yaw (rotation around z)
-            Switch fixedYaw_;
-
-            //- Constraints in referent coordinate system
-            Switch referentMotionConstraints_;
-
-            //- Rotation of referent coordinate system. Currently defined using
-            //  quaternions for comatibility. Need to reformulate.
-            //  VV, 28/Feb/2017.
-            HamiltonRodriguezRot referentRotation_;
+            //- List of rotational constraints
+            Ptrlist<rotationalConstraint> rotationalConstraints_;
 
 
     // Private Member Functions
@@ -171,10 +153,6 @@ class geometricSixDOF
             (
                 const dimensionedVector& omega
             ) const;
-
-            //- Constrain translation vector in referent or global coordinate
-            //  system
-            void constrainTranslation(vector& vec) const;
 
             //- Exponential map used to calculate increment of the rotation
             //  tensor
@@ -235,6 +213,23 @@ public:
 
     // Member Functions
 
+        // Access member functions
+
+            //- Return const reference to translation constraints
+            const PtrList<translationalConstraint>&
+            translationalConstraints() const
+            {
+                return translationalConstraints_;
+            }
+
+            //- Return const reference to translation constraints
+            const PtrList<rotationalConstraint>&
+            rotationalConstraints() const
+            {
+                return rotationalConstraints_;
+            }
+
+
         // Virtual interface for 6DOF motion state
 
             // Variables in relative coordinate system
@@ -284,7 +279,7 @@ public:
                 //- Return number of equations
                 virtual label nEqns() const
                 {
-                    return nEqns_;
+                    return 12;
                 }
 
                 //- Return access to coefficients
