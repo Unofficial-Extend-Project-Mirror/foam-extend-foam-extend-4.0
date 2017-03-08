@@ -75,7 +75,8 @@ Foam::constantAngularAcceleration::~constantAngularAcceleration()
 Foam::vector Foam::constantAngularAcceleration::matrixContribution
 (
     const scalar,
-    const tensor& toRelative
+    const tensor& toRelative,
+    const vector&
 ) const
 {
     vector mc;
@@ -98,7 +99,9 @@ Foam::vector Foam::constantAngularAcceleration::matrixContribution
 
 Foam::scalar Foam::constantAngularAcceleration::sourceContribution
 (
-    const scalar
+    const scalar,
+    const tensor& toRelative,
+    const vector&
 ) const
 {
     return alpha_;

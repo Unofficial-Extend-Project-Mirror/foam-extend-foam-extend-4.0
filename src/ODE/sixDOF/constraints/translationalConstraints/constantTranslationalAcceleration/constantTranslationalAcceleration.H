@@ -97,11 +97,20 @@ public:
             virtual vector matrixContribution
             (
                 const scalar,
-                const tensor&
+                const tensor&,
+                const vector&,
+                const vector&
             ) const;
 
             //- Return source contribution defined by constraint, a(t)
-            virtual scalar sourceContribution(const scalar) const;
+            virtual scalar sourceContribution
+            (
+                const scalar,
+                const tensor&,
+                const vector&,
+                const vector&
+            ) const;
+
 
 
     // I-O Functions
