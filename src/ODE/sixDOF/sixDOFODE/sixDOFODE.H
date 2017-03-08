@@ -49,6 +49,7 @@ SourceFiles
 #include "OutputControlDictionary.H"
 #include "runTimeSelectionTables.H"
 #include "Switch.H"
+#include "foamTime.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -172,7 +173,10 @@ class sixDOFODE
 
             //- Initialise ODE before setting external forces/moments and
             //  solving
-            virtual void initState();
+            void initState();
+
+            //- Calculate current ODE step fraction given time from ODE
+            inline scalar odeStepFraction(const scalar odeTime) const;
 
 
 protected:
@@ -183,6 +187,17 @@ protected:
 
             //- Set ODE parameters from another ODE
             virtual void setState(const sixDOFODE&);
+
+
+        // Get external force and moment (used during the solution process)
+
+            //- Return external force given time (linearly interpolated from
+            //  old state and current state)
+            dimensionedVector force(const scalar t) const;
+
+            //- Return external moment given time (linearly interpolated from
+            //  old state and current state)
+            dimensionedVector moment(const scalar t) const;
 
 
 public:
@@ -269,8 +284,8 @@ public:
             //- Set external force and moment
             inline void setExternalForceAndMoment
             (
-                const vector& externalForce,
-                const vector& externalMoment
+                const dimensionedVector& externalForce,
+                const dimensionedVector& externalMoment
             );
 
 

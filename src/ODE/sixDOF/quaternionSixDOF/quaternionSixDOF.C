@@ -68,7 +68,7 @@ Foam::dimensionedVector Foam::quaternionSixDOF::A
     // solved in the global coordinate system
     const dimensionedVector explicitForcing
     (
-        force() // External force
+        force(t) // External force
       - (linSpringCoeffs() & xR) // Spring force
       - (linDampingCoeffs() & uR) // Damping force
     );
@@ -141,7 +141,7 @@ Foam::dimensionedVector Foam::quaternionSixDOF::OmegaDot
     const dimensionedVector explicitForcing
     (
         E(omega) // Euler part
-      + (R & moment()) // External torque
+      + (R & moment(t)) // External torque
     );
     const vector& efVal = explicitForcing.value();
     const diagTensor& I = momentOfInertia().value();
