@@ -27,9 +27,6 @@ Class
 Description
     6-DOF solver using a geometric method for integration of rotations.
 
-    Run-time selectable constraints are handled via Lagrangian multipliers using
-    the interface from sixDOFConstraint class.
-
 Author
     Viktor Pandza, FSB Zagreb.  All rights reserved.
     Vuko Vukcevic, FSB Zagreb.  All rights reserved.
@@ -107,7 +104,7 @@ Foam::dimensionedVector Foam::geometricSixDOF::A
         const translationalConstraint& curTc = translationalConstraints_[tcI];
 
         // Get matrix contribution from constraint
-        const vector mc = curTc.matrixContribution(t, R);
+        const vector mc = curTc.matrixContribution(t, R.T());
 
         // Get matrix index
         const label index = tcI + 3;
@@ -382,12 +379,12 @@ Foam::geometricSixDOF::geometricSixDOF(const IOobject& io)
     // Read rotation constraints if they are present
     if (dict().found("rotationalConstraints"))
     {
-        PtrList<rotationalConstraint> tcList
+        PtrList<rotationalConstraint> rcList
         (
             dict().lookup("rotationalConstraints"),
             rotationalConstraint::iNew()
         );
-        rotationalConstraints_.transfer(tcList);
+        rotationalConstraints_.transfer(rcList);
     }
 }
 
@@ -574,7 +571,6 @@ void Foam::geometricSixDOF::update(const scalar delta)
     Uval.y() = coeffs_[4];
     Uval.z() = coeffs_[5];
 
-    // Constrain velocity and re-set coefficients
     coeffs_[3] = Uval.x();
     coeffs_[4] = Uval.y();
     coeffs_[5] = Uval.z();
@@ -601,8 +597,6 @@ void Foam::geometricSixDOF::update(const scalar delta)
     coeffs_[10] = 0;
     coeffs_[11] = 0;
 
-    // Consider calculating average omega using rotational tensor and rotational
-    // increment tensors
     omegaAverage_.value() = 0.5*(omegaVal + omegaOld);
 }
 

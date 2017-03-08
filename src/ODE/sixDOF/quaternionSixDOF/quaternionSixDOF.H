@@ -27,6 +27,13 @@ Class
 Description
     6-DOF solver using quaternions
 
+    Run-time selectable constraints are handled via Lagrangian multipliers using
+    the interface from translationa/rotationalConstraint classes.
+
+    Note on convention: rotation tensor R obtained from finiteRotation
+    (rotation_) defines inertial-to-body coordinate system transformation
+    (global-to-local). Opposite as in geometrixSixDOF.
+
 Author
     Dubravko Matijasevic, FSB Zagreb.  All rights reserved.
     Hrvoje Jasak, FSB Zagreb.  All rights reserved.
@@ -42,6 +49,8 @@ SourceFiles
 
 #include "sixDOFODE.H"
 #include "finiteRotation.H"
+#include "translationalConstraint.H"
+#include "rotationalConstraint.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -79,39 +88,18 @@ class quaternionSixDOF
             //  (evaluated at midstep)
             dimensionedVector omegaAverage_;
 
-            //- Average rotational velocity in absolute coordinate system
-            dimensionedVector omegaAverageAbsolute_;
-
 
         //- ODE coefficients
         scalarField coeffs_;
 
 
-        // Motion constraints (given as fixed motion components)
+        // Motion constraints
 
-            //- Fixed surge (x-translation)
-            Switch fixedSurge_;
+            //- List of translational constraints
+            PtrList<translationalConstraint> translationalConstraints_;
 
-            //- Fixed sway (y-translation)
-            Switch fixedSway_;
-
-            //- Fixed heave (z-translation)
-            Switch fixedHeave_;
-
-            //- Fixed roll (rotation around x)
-            Switch fixedRoll_;
-
-            //- Fixed pitch (rotation around y)
-            Switch fixedPitch_;
-
-            //- Fixed yaw (rotation around z)
-            Switch fixedYaw_;
-
-            //- Constraints in referent coordinate system
-            Switch referentMotionConstraints_;
-
-            //- Rotation of referent coordinate system
-            HamiltonRodriguezRot referentRotation_;
+            //- List of rotational constraints
+            PtrList<rotationalConstraint> rotationalConstraints_;
 
 
     // Private Member Functions
@@ -131,7 +119,8 @@ class quaternionSixDOF
             (
                 const dimensionedVector& xR,
                 const dimensionedVector& uR,
-                const HamiltonRodriguezRot& rotation
+                const HamiltonRodriguezRot& rotation,
+                const scalar t
             ) const;
 
 
@@ -140,7 +129,8 @@ class quaternionSixDOF
             dimensionedVector OmegaDot
             (
                 const HamiltonRodriguezRot& rotation,
-                const dimensionedVector& omega
+                const dimensionedVector& omega,
+                const scalar t
             ) const;
 
             //- Return the Euler part of moment equation
@@ -148,14 +138,6 @@ class quaternionSixDOF
             (
                 const dimensionedVector& omega
             ) const;
-
-            //- Constrain rotation vector in referent or global coordinate
-            //  system
-            void constrainRotation(vector& vec) const;
-
-            //- Constrain translation vector in referent or global coordinate
-            //  system
-            void constrainTranslation(vector& vec) const;
 
 
 protected:
@@ -196,6 +178,23 @@ public:
 
 
     // Member Functions
+
+        // Access member functions
+
+            //- Return const reference to translational constraints
+            const PtrList<translationalConstraint>&
+            translationalConstraints() const
+            {
+                return translationalConstraints_;
+            }
+
+            //- Return const reference to rotational constraints
+            const PtrList<rotationalConstraint>&
+            rotationalConstraints() const
+            {
+                return rotationalConstraints_;
+            }
+
 
         // Virtual interface for 6DOF motion state
 
