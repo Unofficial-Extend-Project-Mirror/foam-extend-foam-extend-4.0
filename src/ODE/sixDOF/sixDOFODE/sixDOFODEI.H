@@ -35,6 +35,23 @@ Author
 
 \*---------------------------------------------------------------------------*/
 
+// * * * * * * * * * * * * Private Member Functions * * * * * * * * * * * * * //
+
+Foam::scalar Foam::sixDOFODE::odeStepFraction(const scalar odeTime) const
+{
+    // Get current global time. Note: assuming that the ODESolver for a given
+    // time step is integrating from t - deltaT to t.
+    const scalar globalTime = dict().time().value();
+    const scalar globalDeltaT = dict().time().deltaT().value();
+
+    // Calculate current ODE step time step size
+    const scalar odeDeltaT = globalDeltaT - (globalTime - odeTime);
+
+    // Calculate and return ODE step size fraction
+    return odeDeltaT/globalDeltaT;
+}
+
+
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 const Foam::dimensionedScalar& Foam::sixDOFODE::mass() const
@@ -99,8 +116,8 @@ const Foam::dimensionedVector& Foam::sixDOFODE::moment() const
 
 void Foam::sixDOFODE::setExternalForceAndMoment
 (
-    const vector& externalForce,
-    const vector& externalMoment
+    const dimensionedVector& externalForce,
+    const dimensionedVector& externalMoment
 )
 {
     // Initialise the state before setting external forces and moments

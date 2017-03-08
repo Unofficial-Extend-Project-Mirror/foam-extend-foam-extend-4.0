@@ -208,6 +208,26 @@ void Foam::sixDOFODE::setState(const sixDOFODE& sd)
 }
 
 
+Foam::dimensionedVector Foam::sixDOFODE::force(const scalar t) const
+{
+    // Get ODE step fraction
+    const scalar alpha = odeStepFraction(t);
+
+    // Return linearly interpolated external force
+    return (alpha*oldStatePtr_->force() + (1 - alpha)*force());
+}
+
+
+Foam::dimensionedVector Foam::sixDOFODE::moment(const scalar t) const
+{
+    // Get ODE step fraction
+    const scalar alpha = odeStepFraction(t);
+
+    // Return linearly interpolated external moment
+    return (alpha*oldStatePtr_->moment() + (1 - alpha)*moment());
+}
+
+
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 Foam::sixDOFODE::sixDOFODE(const IOobject& io)
@@ -294,7 +314,7 @@ Foam::sixDOFODE::sixDOFODE(const word& name, const sixDOFODE& sd)
     force_(sd.force_),
     moment_(sd.moment_),
 
-    curTimeIndex_(-1),
+    curTimeIndex_(sd.curTimeIndex_),
     oldStatePtr_()
 {}
 

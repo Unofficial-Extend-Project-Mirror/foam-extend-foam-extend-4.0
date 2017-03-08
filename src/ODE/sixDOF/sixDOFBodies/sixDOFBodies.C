@@ -130,10 +130,19 @@ void Foam::sixDOFBodies::solve()
         Info << "Solving 6-DOF for " << names_[bodyI] << " in time"
          << tab << "T = " << runTime_.value() << " s" << endl;
 
+        // Note: set external force and moment needed to initialize the state
+        // of the sixDOFODE to correctly take into account multiple calls per
+        // time step
+        odes_[bodyI].setExternalForceAndMoment
+        (
+            dimensionedVector("zero", dimForce, vector::zero),
+            dimensionedVector("zero", dimForce*dimLength, vector::zero)
+        );
+
         solvers_[bodyI].solve
         (
+            runTime_.value() - runTime_.deltaT().value(),
             runTime_.value(),
-            runTime_.value() + runTime_.deltaT().value(),
             tol,
             runTime_.deltaT().value()
         );
