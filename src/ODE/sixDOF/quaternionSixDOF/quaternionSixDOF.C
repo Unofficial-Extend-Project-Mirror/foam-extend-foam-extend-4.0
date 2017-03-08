@@ -89,7 +89,14 @@ Foam::dimensionedVector Foam::quaternionSixDOF::A
         const translationalConstraint& curTc = translationalConstraints_[tcI];
 
         // Get matrix contribution from constraint
-        const vector mc = curTc.matrixContribution(t, rotation.R());
+        const vector mc =
+            curTc.matrixContribution
+            (
+                t,
+                rotation.R(),
+                xR.value(),
+                uR.value()
+            );
 
         // Get matrix index
         const label index = tcI + 3;
@@ -102,7 +109,14 @@ Foam::dimensionedVector Foam::quaternionSixDOF::A
         }
 
         // Insert source contribution (remainder of the constraint function)
-        rhs[index] = curTc.sourceContribution(t);
+        rhs[index] =
+            curTc.sourceContribution
+           (
+               t,
+               rotation.R(),
+               xR.value(),
+               uR.value()
+           );
     }
 
     // Solve the matrix using LU decomposition. Note: solution is in the rhs and
@@ -160,7 +174,13 @@ Foam::dimensionedVector Foam::quaternionSixDOF::OmegaDot
         const rotationalConstraint& curRc = rotationalConstraints_[rcI];
 
         // Get matrix contribution from the constraint
-        const vector mc = curRc.matrixContribution(t, R.value());
+        const vector mc =
+            curRc.matrixContribution
+            (
+                t,
+                R.value(),
+                omega.value()
+            );
 
         // Get matrix index
         const label index = rcI + 3;
@@ -173,7 +193,7 @@ Foam::dimensionedVector Foam::quaternionSixDOF::OmegaDot
         }
 
         // Insert source contribution (remainder of the constraint function)
-        rhs[index] = curRc.sourceContribution(t);
+        rhs[index] = curRc.sourceContribution(t, R.value(), omega.value());
     }
 
     // Solve the matrix using LU decomposition. Note: solution is in the rhs and

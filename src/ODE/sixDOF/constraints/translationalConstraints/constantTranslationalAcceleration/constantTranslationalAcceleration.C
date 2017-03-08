@@ -74,7 +74,9 @@ Foam::constantTranslationalAcceleration::~constantTranslationalAcceleration()
 Foam::vector Foam::constantTranslationalAcceleration::matrixContribution
 (
     const scalar,
-    const tensor&
+    const tensor&,
+    const vector&,
+    const vector&
 ) const
 {
     return dir_;
@@ -83,7 +85,10 @@ Foam::vector Foam::constantTranslationalAcceleration::matrixContribution
 
 Foam::scalar Foam::constantTranslationalAcceleration::sourceContribution
 (
-    const scalar
+    const scalar,
+    const tensor&,
+    const vector&,
+    const vector&
 ) const
 {
     return a_;
