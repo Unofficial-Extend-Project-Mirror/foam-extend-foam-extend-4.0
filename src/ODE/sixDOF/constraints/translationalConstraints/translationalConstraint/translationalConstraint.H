@@ -69,6 +69,12 @@ namespace Foam
 
 class translationalConstraint
 {
+    // Private Data
+
+        //- Name of the constraint
+        word name_;
+
+
 public:
 
     //- Runtime type information
@@ -149,6 +155,19 @@ public:
 
             //- Return source contribution defined by constraint, a(t)
             virtual scalar sourceContribution(const scalar t) const = 0;
+
+
+    // I-O Functions and Operators
+
+        //- Virtual write function
+        virtual void write(Ostream& os) const = 0;
+
+        //- Ostream operator implemented in terms of write operator
+        friend Ostream& operator<<
+        (
+            Ostream& os,
+            const translationalConstraint& tc
+        );
 };
 
 

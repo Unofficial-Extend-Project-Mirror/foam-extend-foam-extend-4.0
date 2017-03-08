@@ -40,6 +40,8 @@ Foam::translationalConstraint::translationalConstraint
     const word& name,
     const dictionary& dict
 )
+:
+    name_(name)
 {}
 
 
@@ -86,6 +88,26 @@ Foam::autoPtr<Foam::translationalConstraint> Foam::translationalConstraint::New
             dict
         )
     );
+}
+
+
+// * * * * * * * * * * * * * * * IOstream Operators  * * * * * * * * * * * * //
+
+Foam::Ostream& Foam::operator<<
+(
+    Ostream& os,
+    const translationalConstraint& tc
+)
+{
+    os << tc.name_ << nl << token::BEGIN_BLOCK << nl;
+
+    tc.write(os);
+
+    os << token::END_BLOCK << endl;
+
+    os.check("Ostream& operator<<(Ostream&, const translationalConstraint&");
+
+    return os;
 }
 
 

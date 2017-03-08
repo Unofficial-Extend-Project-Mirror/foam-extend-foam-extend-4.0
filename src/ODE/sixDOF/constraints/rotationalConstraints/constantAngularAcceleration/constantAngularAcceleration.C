@@ -105,4 +105,18 @@ Foam::scalar Foam::constantAngularAcceleration::sourceContribution
 }
 
 
+void Foam::constantAngularAcceleration::write(Ostream& os) const
+{
+    os.writeKeyword("type") << tab << type()
+       << token::END_STATEMENT << nl << nl;
+
+    os.writeKeyword("constraintDirection") << tab << dir_
+       << token::END_STATEMENT << nl;
+    os.writeKeyword("angularAcceleration") << tab << alpha_
+       << token::END_STATEMENT << nl;
+    os.writeKeyword("inGlobalCoordinateSystem") << tab << inGlobal_
+       << token::END_STATEMENT << endl;
+}
+
+
 // ************************************************************************* //

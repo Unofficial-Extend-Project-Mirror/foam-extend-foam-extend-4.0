@@ -20,6 +20,7 @@ $(sixDOF)/constraints/rotationalConstraints/rotationalConstraint/rotationalConst
 $(sixDOF)/constraints/rotationalConstraints/constantAngularAcceleration/constantAngularAcceleration.C
 
 $(sixDOF)/constraints/translationalConstraints/translationalConstraint/translationalConstraint.C
+$(sixDOF)/constraints/translationalConstraints/constantTranslationalAcceleration/constantTranslationalAcceleration.C
 
 $(sixDOF)/sixDOFODE/sixDOFODE.C
 $(sixDOF)/sixDOFODE/newSixDOFODE.C

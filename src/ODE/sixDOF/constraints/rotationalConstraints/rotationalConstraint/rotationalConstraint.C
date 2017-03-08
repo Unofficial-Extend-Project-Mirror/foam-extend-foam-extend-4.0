@@ -40,6 +40,8 @@ Foam::rotationalConstraint::rotationalConstraint
     const word& name,
     const dictionary& dict
 )
+:
+    name_(name)
 {}
 
 
@@ -86,6 +88,26 @@ Foam::autoPtr<Foam::rotationalConstraint> Foam::rotationalConstraint::New
             dict
         )
     );
+}
+
+
+// * * * * * * * * * * * * * * * IOstream Operators  * * * * * * * * * * * * //
+
+Foam::Ostream& Foam::operator<<
+(
+    Ostream& os,
+    const rotationalConstraint& rc
+)
+{
+    os << rc.name_ << nl << token::BEGIN_BLOCK << nl;
+
+    rc.write(os);
+
+    os << token::END_BLOCK << endl;
+
+    os.check("Ostream& operator<<(Ostream&, const rotationalConstraint&");
+
+    return os;
 }
 
 
