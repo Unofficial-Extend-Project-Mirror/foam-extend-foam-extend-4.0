@@ -41,6 +41,9 @@ Description
     2. sourceContribution() - corresponding to a(t), to be inserted into right
                               hand side vector.
 
+    Note: constraints are usually used alongside appropriate initial
+    conditions (velocity in a given direction).
+
 Author
     Viktor Pandza, FSB Zagreb.  All rights reserved.
     Vuko Vukcevic, FSB Zagreb.  All rights reserved.
