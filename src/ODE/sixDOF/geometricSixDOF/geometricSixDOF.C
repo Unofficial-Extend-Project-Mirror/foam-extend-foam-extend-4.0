@@ -613,7 +613,8 @@ bool Foam::geometricSixDOF::writeData(Ostream& os) const
     sixDOFODE::writeData(os);
 
     // Write type name
-    os.writeKeyword("type") << tab << type() << token::END_STATEMENT << endl;
+    os.writeKeyword("type") << tab << type()
+        << token::END_STATEMENT << nl << nl;
 
     // Write data
     os.writeKeyword("Xrel") << tab << Xrel_
@@ -624,12 +625,21 @@ bool Foam::geometricSixDOF::writeData(Ostream& os) const
     os.writeKeyword("rotationIncrementTensor") << tab << rotIncrement_
         << token::END_STATEMENT << nl;
     os.writeKeyword("omega") << tab << omega_
-        << token::END_STATEMENT << nl << nl;
+        << token::END_STATEMENT << nl << endl;
 
-//    os.writeKeyword("translationalConstraints") << tab
-//        << translationalConstraints_ << token::END_STATEMENT << nl;
-//    os.writeKeyword("rotationalConstraints") << tab
-//        << rotationalConstraints_ << token::END_STATEMENT << nl << endl;
+    if (!translationalConstraints_.empty())
+    {
+        os.writeKeyword("translationalConstraints")
+            << translationalConstraints_
+            << token::END_STATEMENT << nl << endl;
+    }
+
+    if (!rotationalConstraints_.empty())
+    {
+        os.writeKeyword("rotationalConstraints")
+            << rotationalConstraints_
+            << token::END_STATEMENT << endl;
+    }
 
     return os.good();
 }

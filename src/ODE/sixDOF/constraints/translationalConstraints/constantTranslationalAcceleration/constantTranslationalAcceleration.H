@@ -102,6 +102,12 @@ public:
 
             //- Return source contribution defined by constraint, a(t)
             virtual scalar sourceContribution(const scalar) const;
+
+
+    // I-O Functions
+
+        //- Virtual write function
+        virtual void write(Ostream& os) const;
 };
 
 

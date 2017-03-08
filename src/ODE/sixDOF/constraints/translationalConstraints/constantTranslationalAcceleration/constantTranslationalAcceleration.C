@@ -90,4 +90,16 @@ Foam::scalar Foam::constantTranslationalAcceleration::sourceContribution
 }
 
 
+void Foam::constantTranslationalAcceleration::write(Ostream& os) const
+{
+    os.writeKeyword("type") << tab << type()
+        << token::END_STATEMENT << nl << nl;
+
+    os.writeKeyword("constraintDirection") << tab << dir_
+       << token::END_STATEMENT << nl;
+    os.writeKeyword("translationalAcceleration") << tab << a_
+       << token::END_STATEMENT << endl;
+}
+
+
 // ************************************************************************* //

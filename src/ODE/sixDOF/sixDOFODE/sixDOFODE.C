@@ -332,12 +332,12 @@ bool Foam::sixDOFODE::writeData(Ostream& os) const
     os.writeKeyword("minRelaxFactor") << tab << minRelaxFactor_
         << token::END_STATEMENT << nl;
     os.writeKeyword("maxRelaxFactor") << tab << maxRelaxFactor_
-        << token::END_STATEMENT << nl;
+        << token::END_STATEMENT << nl << nl;
 
     os.writeKeyword("force") << tab << force_
         << token::END_STATEMENT << nl;
     os.writeKeyword("moment") << tab << moment_
-        << token::END_STATEMENT << nl;
+        << token::END_STATEMENT << nl << nl;
 
     return os.good();
 }

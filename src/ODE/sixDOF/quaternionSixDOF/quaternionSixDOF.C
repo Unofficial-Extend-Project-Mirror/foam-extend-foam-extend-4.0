@@ -538,7 +538,8 @@ bool Foam::quaternionSixDOF::writeData(Ostream& os) const
     sixDOFODE::writeData(os);
 
     // Write type name
-    os.writeKeyword("type") << tab << type() << token::END_STATEMENT << endl;
+    os.writeKeyword("type") << tab << type()
+        << token::END_STATEMENT << nl << nl;
 
     // Write data
     os.writeKeyword("Xrel") << tab << Xrel_
