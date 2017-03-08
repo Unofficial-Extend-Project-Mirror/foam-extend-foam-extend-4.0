@@ -32,9 +32,6 @@ Author
     Hrvoje Jasak, FSB Zagreb.  All rights reserved.
     Vuko Vukcevic, FSB Zagreb.  All rights reserved.
 
-SourceFiles
-    quaternionSixDOF.C
-
 \*---------------------------------------------------------------------------*/
 
 #include "quaternionSixDOF.H"
@@ -57,43 +54,139 @@ Foam::dimensionedVector Foam::quaternionSixDOF::A
 (
     const dimensionedVector& xR,
     const dimensionedVector& uR,
-    const HamiltonRodriguezRot& rotation
+    const HamiltonRodriguezRot& rotation,
+    const scalar t
 ) const
 {
-    // Fix the total force in global coordinate system
-    dimensionedVector fAbs =
-        // External force
-        force()
-        // Spring force in global coordinate system
-      - (linSpringCoeffs() & xR)
-        // Damping force in global coordinate system
-      - (linDampingCoeffs() & uR);
+    // Create a scalar square matrix representing Newton equations with
+    // constraints and the corresponding source (right hand side vector).
+    // Note: size of the matrix is 3 + number of constraints
+    scalarField rhs(translationalConstraints_.size() + 3, 0.0);
+    scalarSquareMatrix M(rhs.size(), 0.0);
 
-    // Constrain translation
-    constrainTranslation(fAbs.value());
+    // Insert mass and explicit forcing into the system. Note: translations are
+    // solved in the global coordinate system
+    const dimensionedVector explicitForcing
+    (
+        force() // External force
+      - (linSpringCoeffs() & xR) // Spring force
+      - (linDampingCoeffs() & uR) // Damping force
+    );
+    const vector& efVal = explicitForcing.value();
+    const scalar& m = mass().value();
 
-    return fAbs/mass();
+    forAll(efVal, dirI)
+    {
+        M[dirI][dirI] = m;
+
+        rhs[dirI] = efVal[dirI];
+    }
+
+    // Insert contributions from the constraints
+    forAll(translationalConstraints_, tcI)
+    {
+        // Get reference to current constraint
+        const translationalConstraint& curTc = translationalConstraints_[tcI];
+
+        // Get matrix contribution from constraint
+        const vector mc = curTc.matrixContribution(t, rotation.R());
+
+        // Get matrix index
+        const label index = tcI + 3;
+
+        // Insert contributions into the matrix
+        forAll(mc, dirI)
+        {
+            M[dirI][index] = mc[dirI];
+            M[index][dirI] = mc[dirI];
+        }
+
+        // Insert source contribution (remainder of the constraint function)
+        rhs[index] = curTc.sourceContribution(t);
+    }
+
+    // Solve the matrix using LU decomposition. Note: solution is in the rhs and
+    // it contains accelerations in the first three entries and corresponding
+    // Lagrangian multipliers in other entries.
+    scalarSquareMatrix::LUsolve(M, rhs);
+
+    return
+        dimensionedVector
+        (
+            "A",
+            force().dimensions()/mass().dimensions(),
+            vector(rhs[0], rhs[1], rhs[2])
+        );
 }
 
 
 Foam::dimensionedVector Foam::quaternionSixDOF::OmegaDot
 (
     const HamiltonRodriguezRot& rotation,
-    const dimensionedVector& omega
+    const dimensionedVector& omega,
+    const scalar t
 ) const
 {
-    // Fix the global moment for global rotation constraints
-    dimensionedVector mAbs = moment();
+    // Create a scalar square matrix representing Euler equations with
+    // constraints and the corresponding source (right hand side vector).
+    // Note: size of the matrix is 3 + number of constraints
+    scalarField rhs(rotationalConstraints_.size() + 3, 0.0);
+    scalarSquareMatrix J(rhs.size(), 0.0);
 
-    // Constrain rotation
-    constrainRotation(mAbs.value());
+    // Get current inertial-to-local transformation. Note: different convention
+    // (R represents coordinate transformation from global to local)
+    const dimensionedTensor R("R", dimless, rotation.R());
+
+    // Insert moment of inertia and explicit forcing into the system
+    const dimensionedVector explicitForcing
+    (
+        E(omega) // Euler part
+      + (R & moment()) // External torque
+    );
+    const vector& efVal = explicitForcing.value();
+    const diagTensor& I = momentOfInertia().value();
+
+    forAll(efVal, dirI)
+    {
+        J[dirI][dirI] = I[dirI];
+
+        rhs[dirI] = efVal[dirI];
+    }
+
+    // Insert contributions from the constraints
+    forAll(rotationalConstraints_, rcI)
+    {
+        // Get reference to current constraint
+        const rotationalConstraint& curRc = rotationalConstraints_[rcI];
+
+        // Get matrix contribution from the constraint
+        const vector mc = curRc.matrixContribution(t, R.value());
+
+        // Get matrix index
+        const label index = rcI + 3;
+
+        // Insert contributions into the matrix
+        forAll(mc, dirI)
+        {
+            J[dirI][index] = mc[dirI];
+            J[index][dirI] = mc[dirI];
+        }
+
+        // Insert source contribution (remainder of the constraint function)
+        rhs[index] = curRc.sourceContribution(t);
+    }
+
+    // Solve the matrix using LU decomposition. Note: solution is in the rhs and
+    // it contains OmegaDot's in the first three entries and corresponding
+    // Lagrangian multipliers in other entries.
+    scalarSquareMatrix::LUsolve(J, rhs);
 
     return
-        inv(momentOfInertia())
-      & (
-            E(omega)
-            // To relative
-          + (rotation.R() & mAbs)
+        dimensionedVector
+        (
+            "OmegaDot",
+            moment().dimensions()/momentOfInertia().dimensions(),
+            vector(rhs[0], rhs[1], rhs[2])
         );
 }
 
@@ -104,86 +197,6 @@ Foam::dimensionedVector Foam::quaternionSixDOF::E
 ) const
 {
     return (*(momentOfInertia() & omega) & omega);
-}
-
-
-void Foam::quaternionSixDOF::constrainRotation(vector& vec) const
-{
-    // Constrain the vector with respect to referent or global coordinate system
-    if (referentMotionConstraints_)
-    {
-        vector consVec(referentRotation_.R() & vec);
-
-        if (fixedRoll_)
-        {
-            consVec.x() = 0;
-        }
-        if (fixedPitch_)
-        {
-            consVec.y() = 0;
-        }
-        if (fixedYaw_)
-        {
-            consVec.z() = 0;
-        }
-
-        vec = referentRotation_.invR() & consVec;
-    }
-    else
-    {
-        if (fixedRoll_)
-        {
-            vec.x() = 0;
-        }
-        if (fixedPitch_)
-        {
-            vec.y() = 0;
-        }
-        if (fixedYaw_)
-        {
-            vec.z() = 0;
-        }
-    }
-}
-
-
-void Foam::quaternionSixDOF::constrainTranslation(vector& vec) const
-{
-    // Constrain the vector in respect to referent or global coordinate system
-    if (referentMotionConstraints_)
-    {
-        vector consVec(referentRotation_.R() & vec);
-
-        if (fixedSurge_)
-        {
-            consVec.x() = 0;
-        }
-        if (fixedSway_)
-        {
-            consVec.y() = 0;
-        }
-        if (fixedHeave_)
-        {
-            consVec.z() = 0;
-        }
-
-        vec = referentRotation_.invR() & consVec;
-    }
-    else
-    {
-        if (fixedSurge_)
-        {
-            vec.x() = 0;
-        }
-        if (fixedSway_)
-        {
-            vec.y() = 0;
-        }
-        if (fixedHeave_)
-        {
-            vec.z() = 0;
-        }
-    }
 }
 
 
@@ -204,20 +217,14 @@ void Foam::quaternionSixDOF::setState(const sixDOFODE& sd)
     rotation_ = qsd.rotation_;
     omega_ = qsd.omega_;
     omegaAverage_ = qsd.omegaAverage_;
-    omegaAverageAbsolute_ = qsd.omegaAverageAbsolute_;
 
     // Copy ODE coefficients: this carries actual ODE state
     // HJ, 23/Mar/2015
     coeffs_ = qsd.coeffs_;
 
-    fixedSurge_ = qsd.fixedSurge_;
-    fixedSway_ = qsd.fixedSway_;
-    fixedHeave_ = qsd.fixedHeave_;
-    fixedRoll_ = qsd.fixedRoll_;
-    fixedPitch_ = qsd.fixedPitch_;
-    fixedYaw_ = qsd.fixedYaw_;
-    referentMotionConstraints_ = qsd.referentMotionConstraints_;
-    referentRotation_ = qsd.referentRotation_;
+    // Copy constraints
+    translationalConstraints_ = qsd.translationalConstraints_;
+    rotationalConstraints_ = qsd.rotationalConstraints_;
 }
 
 
@@ -237,25 +244,11 @@ Foam::quaternionSixDOF::quaternionSixDOF(const IOobject& io)
     ),
     omega_(dict().lookup("omega")),
     omegaAverage_("omegaAverage", omega_),
-    omegaAverageAbsolute_("omegaAverageAbsolute", omega_),
 
     coeffs_(13, 0.0),
 
-    fixedSurge_(dict().lookup("fixedSurge")),
-    fixedSway_(dict().lookup("fixedSway")),
-    fixedHeave_(dict().lookup("fixedHeave")),
-    fixedRoll_(dict().lookup("fixedRoll")),
-    fixedPitch_(dict().lookup("fixedPitch")),
-    fixedYaw_(dict().lookup("fixedYaw")),
-    referentMotionConstraints_
-    (
-        dict().lookupOrDefault<Switch>
-        (
-            "referentMotionConstraints",
-            false
-        )
-    ),
-    referentRotation_(vector(1, 0, 0), 0)
+    translationalConstraints_(),
+    rotationalConstraints_()
 {
     // Set ODE coefficients from position and rotation
 
@@ -282,6 +275,30 @@ Foam::quaternionSixDOF::quaternionSixDOF(const IOobject& io)
     coeffs_[10] = rotation_.eInitial().e1();
     coeffs_[11] = rotation_.eInitial().e2();
     coeffs_[12] = rotation_.eInitial().e3();
+
+    // Read and construct constraints
+
+    // Read translation constraints if they are present
+    if (dict().found("translationalConstraints"))
+    {
+        PtrList<translationalConstraint> tcList
+        (
+            dict().lookup("translationalConstraints"),
+            translationalConstraint::iNew()
+        );
+        translationalConstraints_.transfer(tcList);
+    }
+
+    // Read rotation constraints if they are present
+    if (dict().found("rotationalConstraints"))
+    {
+        PtrList<rotationalConstraint> rcList
+        (
+            dict().lookup("rotationalConstraints"),
+            rotationalConstraint::iNew()
+        );
+        rotationalConstraints_.transfer(rcList);
+    }
 }
 
 
@@ -299,22 +316,11 @@ Foam::quaternionSixDOF::quaternionSixDOF
     rotation_(qsd.rotation_),
     omega_(qsd.omega_.name(), qsd.omega_),
     omegaAverage_(qsd.omegaAverage_.name(), qsd.omegaAverage_),
-    omegaAverageAbsolute_
-    (
-        qsd.omegaAverageAbsolute_.name(),
-        qsd.omegaAverageAbsolute_
-    ),
 
     coeffs_(qsd.coeffs_),
 
-    fixedSurge_(qsd.fixedSurge_),
-    fixedSway_(qsd.fixedSway_),
-    fixedHeave_(qsd.fixedHeave_),
-    fixedRoll_(qsd.fixedRoll_),
-    fixedPitch_(qsd.fixedPitch_),
-    fixedYaw_(qsd.fixedYaw_),
-    referentMotionConstraints_(qsd.referentMotionConstraints_),
-    referentRotation_(qsd.referentRotation_)
+    translationalConstraints_(qsd.translationalConstraints_),
+    rotationalConstraints_(qsd.rotationalConstraints_)
 {}
 
 
@@ -420,7 +426,7 @@ void Foam::quaternionSixDOF::derivatives
         y[12]
     );
 
-    const vector accel = A(curX, curU, curRotation).value();
+    const vector accel = A(curX, curU, curRotation, x).value();
 
     dydx[3] = accel.x();
     dydx[4] = accel.y();
@@ -434,7 +440,7 @@ void Foam::quaternionSixDOF::derivatives
         vector(y[6], y[7], y[8])
     );
 
-    const vector omegaDot = OmegaDot(curRotation, curOmega).value();
+    const vector omegaDot = OmegaDot(curRotation, curOmega, x).value();
 
     dydx[6] = omegaDot.x();
     dydx[7] = omegaDot.y();
@@ -444,26 +450,14 @@ void Foam::quaternionSixDOF::derivatives
     dydx[10] = curRotation.eDot(curOmega.value(), 1);
     dydx[11] = curRotation.eDot(curOmega.value(), 2);
     dydx[12] = curRotation.eDot(curOmega.value(), 3);
-
-    // Add rotational constraints by setting RHS of given components to zero
-    if (fixedRoll_)
-    {
-        dydx[10] = 0; // Roll axis (roll quaternion evolution RHS)
-    }
-    if (fixedPitch_)
-    {
-        dydx[11] = 0; // Pitch axis (pitch quaternion evolution RHS)
-    }
-    if (fixedYaw_)
-    {
-        dydx[12] = 0; // Yaw axis (yaw quaternion evolution RHS)
-    }
 }
 
 
 void Foam::quaternionSixDOF::update(const scalar delta)
 {
-    // Update position
+    // Translation
+
+    // Update displacement
     vector Xold = Xrel_.value();
 
     vector& Xval = Xrel_.value();
@@ -481,11 +475,11 @@ void Foam::quaternionSixDOF::update(const scalar delta)
     Uval.y() = coeffs_[4];
     Uval.z() = coeffs_[5];
 
-    // Constrain velocity
-    constrainTranslation(Uval);
     coeffs_[3] = Uval.x();
     coeffs_[4] = Uval.y();
     coeffs_[5] = Uval.z();
+
+    // Rotation
 
     // Update omega
     vector& omegaVal = omega_.value();
@@ -494,8 +488,6 @@ void Foam::quaternionSixDOF::update(const scalar delta)
     omegaVal.y() = coeffs_[7];
     omegaVal.z() = coeffs_[8];
 
-    // Constrain omega
-    constrainRotation(omegaVal);
     coeffs_[6] = omegaVal.x();
     coeffs_[7] = omegaVal.y();
     coeffs_[8] = omegaVal.z();
@@ -512,23 +504,6 @@ void Foam::quaternionSixDOF::update(const scalar delta)
     );
 
     omegaAverage_.value() = rotation_.omegaAverage(delta);
-
-    // Calculate and constrain omegaAverageAbsolute appropriately
-    vector& omegaAverageAbsoluteValue = omegaAverageAbsolute_.value();
-    omegaAverageAbsoluteValue = rotation_.omegaAverageAbsolute(delta);
-
-    if (fixedRoll_)
-    {
-        omegaAverageAbsoluteValue.x() = 0;
-    }
-    if (fixedPitch_)
-    {
-        omegaAverageAbsoluteValue.y() = 0;
-    }
-    if (fixedYaw_)
-    {
-        omegaAverageAbsoluteValue.z() = 0;
-    }
 }
 
 
@@ -553,18 +528,19 @@ bool Foam::quaternionSixDOF::writeData(Ostream& os) const
     os.writeKeyword("omega") << tab << omega_
         << token::END_STATEMENT << nl << nl;
 
-    os.writeKeyword("fixedSurge") << tab << fixedSurge_ <<
-        token::END_STATEMENT << nl;
-    os.writeKeyword("fixedSway") << tab << fixedSway_ <<
-        token::END_STATEMENT << nl;
-    os.writeKeyword("fixedHeave") << tab << fixedHeave_ <<
-        token::END_STATEMENT << nl;
-    os.writeKeyword("fixedRoll") << tab << fixedRoll_ <<
-        token::END_STATEMENT << nl;
-    os.writeKeyword("fixedPitch") << tab << fixedPitch_ <<
-        token::END_STATEMENT << nl;
-    os.writeKeyword("fixedYaw") << tab << fixedYaw_ <<
-        token::END_STATEMENT << nl << endl;
+    if (!translationalConstraints_.empty())
+    {
+        os.writeKeyword("translationalConstraints")
+            << translationalConstraints_
+            << token::END_STATEMENT << nl << endl;
+    }
+
+    if (!rotationalConstraints_.empty())
+    {
+        os.writeKeyword("rotationalConstraints")
+            << rotationalConstraints_
+            << token::END_STATEMENT << endl;
+    }
 
     return os.good();
 }

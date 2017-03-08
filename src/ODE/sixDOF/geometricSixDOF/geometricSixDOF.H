@@ -28,7 +28,7 @@ Description
     6-DOF solver using a geometric method for integration of rotations.
 
     Run-time selectable constraints are handled via Lagrangian multipliers using
-    the interface from sixDOFConstraint class.
+    the interface from translationa/rotationalConstraint classes.
 
     Reference (bibtex):
 
@@ -44,7 +44,8 @@ Description
     }
 
     Note on convention: rotation tensor (R, or rotation_) defines
-    body-to-inertial coordinate system transformation (local-to-global).
+    body-to-inertial coordinate system transformation
+    (local-to-global). Opposite as in quaternionSixDOF.
 
 Author
     Viktor Pandza, FSB Zagreb.  All rights reserved.
@@ -104,10 +105,8 @@ class geometricSixDOF
             dimensionedVector omegaAverage_;
 
 
-        // ODE controls
-
-            //- ODE coefficients
-            scalarField coeffs_;
+        //- ODE coefficients
+        scalarField coeffs_;
 
 
         // Motion constraints
@@ -219,14 +218,14 @@ public:
 
         // Access member functions
 
-            //- Return const reference to translation constraints
+            //- Return const reference to translational constraints
             const PtrList<translationalConstraint>&
             translationalConstraints() const
             {
                 return translationalConstraints_;
             }
 
-            //- Return const reference to translation constraints
+            //- Return const reference to rotational constraints
             const PtrList<rotationalConstraint>&
             rotationalConstraints() const
             {
