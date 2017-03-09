@@ -22,26 +22,30 @@ License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    Foam::constantTranslationalAcceleration
+    Foam::periodicOscillation
 
 Description
-    Translational constraint defined by constant translational acceleration
+    Periodic translational motion given by:
 
-    g(vDot) = vDot - a = 0.
+    g(vDot, t) = vDot + a*omega^2*sin(omega*t + phi) = 0,
+
+    where a is the amplitude of oscillation, omega radial frequency and phi is
+    the phase shift.
 
 Author
     Viktor Pandza, FSB Zagreb.  All rights reserved.
     Vuko Vukcevic, FSB Zagreb.  All rights reserved.
 
 SourceFiles
-    constantTranslationalAcceleration.C
+    periodicOscillation.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef constantTranslationalAcceleration_H
-#define constantTranslationalAcceleration_H
+#ifndef periodicOscillation_H
+#define periodicOscillation_H
 
 #include "translationalConstraint.H"
+#include "OFstream.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -49,32 +53,41 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                 Class constantTranslationalAcceleration Declaration
+                     Class periodicOscillation Declaration
 \*---------------------------------------------------------------------------*/
 
-class constantTranslationalAcceleration
+class periodicOscillation
 :
     public translationalConstraint
 {
     // Private data
 
-        //- Direction of the constraint (unit vector)
+        //- Direction
         vector dir_;
 
-        //- Constant value of the translational acceleration
+        //- Amplitude of the motion
         const scalar a_;
+
+        //- Period of the motion
+        const scalar period_;
+
+        //- Radian frequency of the motion
+        const scalar omega_;
+
+        //- Phase shift (in degrees)
+        const scalar phi_;
 
 
 public:
 
     //- Runtime type information
-    TypeName("constantTranslationalAcceleration");
+    TypeName("periodicOscillation");
 
 
     // Constructors
 
         //- Construct from dictionary
-        constantTranslationalAcceleration
+        periodicOscillation
         (
             const word& name,
             const dictionary& dict
@@ -86,7 +99,7 @@ public:
 
     // Destructor
 
-        virtual ~constantTranslationalAcceleration();
+        virtual ~periodicOscillation();
 
 
     // Member Functions
@@ -105,7 +118,7 @@ public:
             //- Return source contribution defined by constraint, a(t)
             virtual scalar sourceContribution
             (
-                const scalar,
+                const scalar t,
                 const tensor&,
                 const vector&,
                 const vector&

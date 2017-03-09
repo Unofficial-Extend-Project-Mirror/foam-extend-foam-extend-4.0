@@ -23,41 +23,44 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "constantTranslationalAcceleration.H"
+#include "periodicOscillation.H"
 #include "addToRunTimeSelectionTable.H"
+#include "mathematicalConstants.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
 namespace Foam
 {
-    defineTypeNameAndDebug(constantTranslationalAcceleration, 0);
+    defineTypeNameAndDebug(periodicOscillation, 0);
     addToRunTimeSelectionTable
     (
         translationalConstraint,
-        constantTranslationalAcceleration,
+        periodicOscillation,
         word
     );
 }
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-Foam::constantTranslationalAcceleration::constantTranslationalAcceleration
+Foam::periodicOscillation::periodicOscillation
 (
     const word& name,
     const dictionary& dict
 )
 :
     translationalConstraint(name, dict),
-    dir_(dict.lookup("constraintDirection")),
-    a_(readScalar(dict.lookup("translationalAcceleration")))
+    dir_(dict.lookup("direction")),
+    a_(readScalar(dict.lookup("motionAmplitude"))),
+    period_(readScalar(dict.lookup("period"))),
+    omega_(mathematicalConstant::twoPi/period_),
+    phi_(readScalar(dict.lookup("phaseShift"))*mathematicalConstant::pi/180.0)
 {
     // Rescale direction
     if (mag(dir_) < SMALL)
     {
         FatalErrorIn
         (
-            "Foam::constantTranslationalAcceleration::"
-            "constantTranslationalAcceleration"
+            "Foam::periodicOscillation::periodicOscillation"
             "\n("
             "\n    const word& name,"
             "\n    const dictionary& dict"
@@ -73,24 +76,24 @@ Foam::constantTranslationalAcceleration::constantTranslationalAcceleration
 
 
 Foam::autoPtr<Foam::translationalConstraint>
-Foam::constantTranslationalAcceleration::clone() const
+Foam::periodicOscillation::clone() const
 {
     return autoPtr<translationalConstraint>
     (
-        new constantTranslationalAcceleration(*this)
+        new periodicOscillation(*this)
     );
 }
 
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
-Foam::constantTranslationalAcceleration::~constantTranslationalAcceleration()
+Foam::periodicOscillation::~periodicOscillation()
 {}
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-Foam::vector Foam::constantTranslationalAcceleration::matrixContribution
+Foam::vector Foam::periodicOscillation::matrixContribution
 (
     const scalar,
     const tensor&,
@@ -102,27 +105,31 @@ Foam::vector Foam::constantTranslationalAcceleration::matrixContribution
 }
 
 
-Foam::scalar Foam::constantTranslationalAcceleration::sourceContribution
+Foam::scalar Foam::periodicOscillation::sourceContribution
 (
-    const scalar,
+    const scalar t,
     const tensor&,
     const vector&,
     const vector&
 ) const
 {
-    return a_;
+    return -a_*sqr(omega_)*(sin(omega_*t + phi_));
 }
 
 
-void Foam::constantTranslationalAcceleration::write(Ostream& os) const
+void Foam::periodicOscillation::write(Ostream& os) const
 {
     os.writeKeyword("type") << tab << type()
         << token::END_STATEMENT << nl << nl;
 
-    os.writeKeyword("constraintDirection") << tab << dir_
+    os.writeKeyword("direction") << tab << dir_
        << token::END_STATEMENT << nl;
-    os.writeKeyword("translationalAcceleration") << tab << a_
-       << token::END_STATEMENT << endl;
+    os.writeKeyword("motionAmplitude") << tab << a_
+       << token::END_STATEMENT << nl;
+    os.writeKeyword("period") << tab << period_
+      << token::END_STATEMENT << nl;
+    os.writeKeyword("phaseShift") << tab
+      << phi_*180.0/mathematicalConstant::pi << token::END_STATEMENT << endl;
 }
 
 

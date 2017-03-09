@@ -59,7 +59,7 @@ class constantAngularAcceleration
     // Private data
 
         //- Direction of the constraint (unit vector)
-        const vector dir_;
+        vector dir_;
 
         //- Constant value of angular acceleration
         const scalar alpha_;

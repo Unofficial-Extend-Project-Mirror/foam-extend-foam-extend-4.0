@@ -21,6 +21,7 @@ $(sixDOF)/constraints/rotationalConstraints/constantAngularAcceleration/constant
 
 $(sixDOF)/constraints/translationalConstraints/translationalConstraint/translationalConstraint.C
 $(sixDOF)/constraints/translationalConstraints/constantTranslationalAcceleration/constantTranslationalAcceleration.C
+$(sixDOF)/constraints/translationalConstraints/periodicOscillation/periodicOscillation.C
 
 $(sixDOF)/sixDOFODE/sixDOFODE.C
 $(sixDOF)/sixDOFODE/newSixDOFODE.C
