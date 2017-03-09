@@ -36,4 +36,4 @@ list(APPEND SOURCES
 
 add_foam_library(metisDecomp SHARED ${SOURCES})
 
-#target_link_libraries(metisDecomp finiteVolume)
+target_link_libraries(metisDecomp finiteVolume metis)

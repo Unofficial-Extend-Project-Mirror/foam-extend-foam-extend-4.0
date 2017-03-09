@@ -30,7 +30,7 @@
 #
 # --------------------------------------------------------------------------
 
-#add_subdirectory(parMetisDecomp)
+add_subdirectory(parMetisDecomp)
 add_subdirectory(decompositionMethods)
-#add_subdirectory(scotchDecomp)
-#add_subdirectory(metisDecomp)
+add_subdirectory(scotchDecomp)
+add_subdirectory(metisDecomp)

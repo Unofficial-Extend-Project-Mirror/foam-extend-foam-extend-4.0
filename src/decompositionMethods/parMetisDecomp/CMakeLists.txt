@@ -36,4 +36,4 @@ list(APPEND SOURCES
 
 add_foam_library(parMetisDecomp SHARED ${SOURCES})
 
-#target_link_libraries(parMetisDecomp finiteVolume)
+target_link_libraries(parMetisDecomp metisDecomp parmetis)

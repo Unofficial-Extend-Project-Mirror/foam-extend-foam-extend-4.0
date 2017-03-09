@@ -36,4 +36,4 @@ list(APPEND SOURCES
 
 add_foam_library(mesquiteMotionSolver SHARED ${SOURCES})
 
-target_link_libraries(mesquiteMotionSolver PUBLIC dynamicMesh)
+target_link_libraries(mesquiteMotionSolver PUBLIC dynamicMesh mesquite)

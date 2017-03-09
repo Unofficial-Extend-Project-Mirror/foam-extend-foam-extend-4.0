@@ -27,7 +27,6 @@ License
 #include "addToRunTimeSelectionTable.H"
 #include "floatScalar.H"
 #include "foamTime.H"
-#include "scotchDecomp.H"
 
 extern "C"
 {

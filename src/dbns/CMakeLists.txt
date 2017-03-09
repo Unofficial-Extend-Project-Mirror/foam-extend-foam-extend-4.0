@@ -50,12 +50,10 @@ list(APPEND SOURCES
   timeStepping/EulerLocalDdtScheme/EulerLocalDdtSchemes.C
 )
 
-add_foam_library(dbns SHARED ${SOURCES})
+if(PARMGRIDGEN_FOUND)
+  add_foam_library(dbns SHARED ${SOURCES})
 
-target_link_libraries(dbns ${MGRIDGEN_LIBRARY} compressibleTurbulenceModel)
-
-target_include_directories(dbns PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/dbnsFlux/hllcFlux>
-  $<BUILD_INTERFACE:${MGRIDGEN_INCLUDES}/Lib>
-  $<BUILD_INTERFACE:${MGRIDGEN_INCLUDES}/IMlib>
-)
+  target_link_libraries(dbns compressibleTurbulenceModel parmgridgen)
+else()
+  message(WARNING dbns will not be build)
+endif()

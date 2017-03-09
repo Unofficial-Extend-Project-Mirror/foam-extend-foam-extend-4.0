@@ -79,15 +79,42 @@ find_package(Git REQUIRED)
 
 # Path to ParaViewConfig.cmake
 set(ParaView_DIR ${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/packages/ParaView-4.4.0/platforms/linux64GccDPOpt/lib/cmake/paraview-4.4)
-
 find_package(ParaView REQUIRED)
 
-# Clean the cache variable
-set(MGRIDGEN_LIBRARY MGRIDGEN_LIBRARY-NOTFOUND)
+find_package(Mesquite REQUIRED)
+if(MESQUITE_FOUND)
+  add_library(mesquite SHARED IMPORTED)
+  set_property(TARGET mesquite PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${MESQUITE_INCLUDE_DIRS})
+  set_property(TARGET mesquite PROPERTY IMPORTED_LOCATION ${MESQUITE_LIBRARY})
+endif()
 
-# Find libMGridGen.so
-find_library(MGRIDGEN_LIBRARY MGridGen ${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/packages/ParMGridGen-1.0/platforms/linux64GccDPOpt/lib)
-set(MGRIDGEN_INCLUDES ${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/packages/ParMGridGen-1.0/platforms/linux64GccDPOpt/include)
+find_package(Scotch REQUIRED)
+if(SCOTCH_FOUND)
+  add_library(scotch SHARED IMPORTED)
+  set_property(TARGET scotch PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${SCOTCH_INCLUDE_DIRS})
+  set_property(TARGET scotch PROPERTY IMPORTED_LOCATION ${SCOTCH_LIBRARY})
+endif()
+
+find_package(Metis REQUIRED)
+if(METIS_FOUND)
+  add_library(metis SHARED IMPORTED)
+  set_property(TARGET metis PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${METIS_INCLUDE_DIRS})
+  set_property(TARGET metis PROPERTY IMPORTED_LOCATION ${METIS_LIBRARY})
+endif()
+
+find_package(ParMetis REQUIRED)
+if(PARMETIS_FOUND)
+  add_library(parmetis SHARED IMPORTED)
+  set_property(TARGET parmetis PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${PARMETIS_INCLUDE_DIRS})
+  set_property(TARGET parmetis PROPERTY IMPORTED_LOCATION ${PARMETIS_LIBRARY})
+endif()
+
+find_package(ParMGridGen REQUIRED)
+if(PARMGRIDGEN_FOUND)
+  add_library(parmgridgen SHARED IMPORTED)
+  set_property(TARGET parmgridgen PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${PARMGRIDGEN_INCLUDE_DIRS})
+  set_property(TARGET parmgridgen PROPERTY IMPORTED_LOCATION ${PARMGRIDGEN_LIBRARY})
+endif()
 
 
 #

@@ -33,5 +33,7 @@
 add_subdirectory(solidBodyMotion)
 add_subdirectory(RBFMotionSolver)
 add_subdirectory(fvMotionSolver)
-#add_subdirectory(mesquiteMotionSolver)
+if(MESQUITE_FOUND)
+  add_subdirectory(mesquiteMotionSolver)
+endif()
 add_subdirectory(tetMotionSolver)
