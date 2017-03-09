@@ -51,7 +51,26 @@ Foam::constantAngularAcceleration::constantAngularAcceleration
     dir_(dict.lookup("constraintDirection")),
     alpha_(readScalar(dict.lookup("angularAcceleration"))),
     inGlobal_(dict.lookup("inGlobalCoordinateSystem"))
-{}
+{
+    // Rescale direction
+    if (mag(dir_) < SMALL)
+    {
+        FatalErrorIn
+        (
+            "Foam::constantTranslationalAcceleration::"
+            "constantTranslationalAcceleration"
+            "\n("
+            "\n    const word& name,"
+            "\n    const dictionary& dict"
+            "\n)"
+        )   << "Zero direction specified. This is not allowed."
+            << exit(FatalError);
+    }
+    else
+    {
+        dir_ /= mag(dir_);
+    }
+}
 
 
 Foam::autoPtr<Foam::rotationalConstraint>

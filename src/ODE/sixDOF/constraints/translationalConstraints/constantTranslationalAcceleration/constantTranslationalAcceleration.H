@@ -59,7 +59,7 @@ class constantTranslationalAcceleration
     // Private data
 
         //- Direction of the constraint (unit vector)
-        const vector dir_;
+        vector dir_;
 
         //- Constant value of the translational acceleration
         const scalar a_;
