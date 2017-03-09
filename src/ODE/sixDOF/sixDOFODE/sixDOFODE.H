@@ -28,10 +28,16 @@ Description
     Abstract base class for six-degrees-of-freedom (6DOF) ordinary differential
     equations with necessary interface for two-way coupling with CFD solvers.
 
+    Holds list of translational and rotational constraints to be used in derived
+    classes.
+
 Author
     Dubravko Matijasevic, FSB Zagreb.  All rights reserved.
-    Hrvoje Jasak, FSB Zagreb.  All rights reserved.
+
+Reorganisation by
     Vuko Vukcevic, FSB Zagreb.  All rights reserved.
+    Inno Gatin, FSB Zagreb. All rights reserved.
+    Hrvoje Jasak, FSB Zagreb.  All rights reserved.
 
 SourceFiles
     sixDOFODEI.H
@@ -50,6 +56,9 @@ SourceFiles
 #include "runTimeSelectionTables.H"
 #include "Switch.H"
 #include "foamTime.H"
+#include "translationalConstraint.H"
+#include "rotationalConstraint.H"
+#include "PtrList.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -146,6 +155,15 @@ class sixDOFODE
 
             //- Pointer to the sixDOFODE object carrying old state
             autoPtr<sixDOFODE> oldStatePtr_;
+
+
+        // Motion constraints
+
+            //- List of translational constraints
+            PtrList<translationalConstraint> translationalConstraints_;
+
+            //- List of rotational constraints
+            PtrList<rotationalConstraint> rotationalConstraints_;
 
 
     // Private Member Functions
@@ -287,6 +305,17 @@ public:
                 const dimensionedVector& externalForce,
                 const dimensionedVector& externalMoment
             );
+
+
+        // Access to motion constraints
+
+            //- Return const reference to translational constraints
+            inline const PtrList<translationalConstraint>&
+            translationalConstraints() const;
+
+            //- Return const reference to rotational constraints
+            inline const PtrList<rotationalConstraint>&
+            rotationalConstraints() const;
 
 
         // Virtual interface for 6DOF motion state

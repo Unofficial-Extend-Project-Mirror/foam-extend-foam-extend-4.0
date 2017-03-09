@@ -24,13 +24,6 @@ License
 Class
     geometricSixDOF
 
-Description
-    6-DOF solver using a geometric method for integration of rotations.
-
-Author
-    Viktor Pandza, FSB Zagreb.  All rights reserved.
-    Vuko Vukcevic, FSB Zagreb.  All rights reserved.
-
 \*---------------------------------------------------------------------------*/
 
 #include "geometricSixDOF.H"
@@ -76,7 +69,7 @@ Foam::dimensionedVector Foam::geometricSixDOF::A
     // Create a scalar square matrix representing Newton equations with
     // constraints and the corresponding source (right hand side vector).
     // Note: size of the matrix is 3 + number of constraints
-    scalarField rhs(translationalConstraints_.size() + 3, 0.0);
+    scalarField rhs(translationalConstraints().size() + 3, 0.0);
     scalarSquareMatrix M(rhs.size(), 0.0);
 
     // Insert mass and explicit forcing into the system. Note: translations are
@@ -98,10 +91,10 @@ Foam::dimensionedVector Foam::geometricSixDOF::A
     }
 
     // Insert contributions from the constraints
-    forAll(translationalConstraints_, tcI)
+    forAll(translationalConstraints(), tcI)
     {
         // Get reference to current constraint
-        const translationalConstraint& curTc = translationalConstraints_[tcI];
+        const translationalConstraint& curTc = translationalConstraints()[tcI];
 
         // Get matrix contribution from constraint
         const vector mc =
@@ -152,7 +145,7 @@ Foam::dimensionedVector Foam::geometricSixDOF::OmegaDot
     // Create a scalar square matrix representing Euler equations with
     // constraints and the corresponding source (right hand side vector).
     // Note: size of the matrix is 3 + number of constraints
-    scalarField rhs(rotationalConstraints_.size() + 3, 0.0);
+    scalarField rhs(rotationalConstraints().size() + 3, 0.0);
     scalarSquareMatrix J(rhs.size(), 0.0);
 
     // Get current inertial-to-local transformation
@@ -175,10 +168,10 @@ Foam::dimensionedVector Foam::geometricSixDOF::OmegaDot
     }
 
     // Insert contributions from the constraints
-    forAll(rotationalConstraints_, rcI)
+    forAll(rotationalConstraints(), rcI)
     {
         // Get reference to current constraint
-        const rotationalConstraint& curRc = rotationalConstraints_[rcI];
+        const rotationalConstraint& curRc = rotationalConstraints()[rcI];
 
         // Get matrix contribution from the constraint
         const vector mc =
@@ -321,10 +314,6 @@ void Foam::geometricSixDOF::setState(const sixDOFODE& sd)
     // Copy ODE coefficients: this carries actual ODE state
     // HJ, 23/Mar/2015
     coeffs_ = gsd.coeffs_;
-
-    // Copy constraints
-    translationalConstraints_ = gsd.translationalConstraints_;
-    rotationalConstraints_ = gsd.rotationalConstraints_;
 }
 
 
@@ -345,10 +334,7 @@ Foam::geometricSixDOF::geometricSixDOF(const IOobject& io)
     omega_(dict().lookup("omega")),
     omegaAverage_("omegaAverage", omega_),
 
-    coeffs_(12, 0.0),
-
-    translationalConstraints_(),
-    rotationalConstraints_()
+    coeffs_(12, 0.0)
 {
     // Set ODE coefficients from position and rotation
 
@@ -374,31 +360,6 @@ Foam::geometricSixDOF::geometricSixDOF(const IOobject& io)
     coeffs_[9] = 0;
     coeffs_[10] = 0;
     coeffs_[11] = 0;
-
-
-    // Read and construct constraints
-
-    // Read translation constraints if they are present
-    if (dict().found("translationalConstraints"))
-    {
-        PtrList<translationalConstraint> tcList
-        (
-            dict().lookup("translationalConstraints"),
-            translationalConstraint::iNew()
-        );
-        translationalConstraints_.transfer(tcList);
-    }
-
-    // Read rotation constraints if they are present
-    if (dict().found("rotationalConstraints"))
-    {
-        PtrList<rotationalConstraint> rcList
-        (
-            dict().lookup("rotationalConstraints"),
-            rotationalConstraint::iNew()
-        );
-        rotationalConstraints_.transfer(rcList);
-    }
 }
 
 
@@ -417,10 +378,7 @@ Foam::geometricSixDOF::geometricSixDOF
     omega_(gsd.omega_.name(), gsd.omega_),
     omegaAverage_(gsd.omegaAverage_.name(), gsd.omegaAverage_),
 
-    coeffs_(gsd.coeffs_),
-
-    translationalConstraints_(gsd.translationalConstraints_),
-    rotationalConstraints_(gsd.rotationalConstraints_)
+    coeffs_(gsd.coeffs_)
 {}
 
 
@@ -633,20 +591,6 @@ bool Foam::geometricSixDOF::writeData(Ostream& os) const
         << token::END_STATEMENT << nl;
     os.writeKeyword("omega") << tab << omega_
         << token::END_STATEMENT << nl << endl;
-
-    if (!translationalConstraints_.empty())
-    {
-        os.writeKeyword("translationalConstraints")
-            << translationalConstraints_
-            << token::END_STATEMENT << nl << endl;
-    }
-
-    if (!rotationalConstraints_.empty())
-    {
-        os.writeKeyword("rotationalConstraints")
-            << rotationalConstraints_
-            << token::END_STATEMENT << endl;
-    }
 
     return os.good();
 }

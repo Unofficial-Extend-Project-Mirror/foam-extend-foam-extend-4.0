@@ -56,10 +56,12 @@ SourceFiles
 #ifndef translationalConstraint_H
 #define translationalConstraint_H
 
-#include "sixDOFODE.H"
 #include "typeInfo.H"
 #include "runTimeSelectionTables.H"
 #include "autoPtr.H"
+#include "dimensionedTypes.H"
+#include "dictionary.H"
+#include "Switch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
