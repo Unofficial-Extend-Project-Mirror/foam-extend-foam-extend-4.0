@@ -40,7 +40,7 @@ if(NOT FOAM_FOUND)
   find_package(FOAM REQUIRED)
 endif()
 
-add_foam_executable(mdEquirationFoam
+add_foam_executable(mdEquilibrationFoam
   DEPENDS molecule molecularMeasurements
   SOURCES ${SOURCES}
 )
