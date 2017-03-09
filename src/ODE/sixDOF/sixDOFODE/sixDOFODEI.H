@@ -24,15 +24,6 @@ License
 Class
     sixDOFODE
 
-Description
-    Abstract base class for six-degrees-of-freedom (6DOF) ordinary differential
-    equations with necessary interface for two-way coupling with CFD solvers.
-
-Author
-    Dubravko Matijasevic, FSB Zagreb.  All rights reserved.
-    Hrvoje Jasak, FSB Zagreb. All rights reserved.
-    Vuko Vukcevic, FSB Zagreb.  All rights reserved.
-
 \*---------------------------------------------------------------------------*/
 
 // * * * * * * * * * * * * Private Member Functions * * * * * * * * * * * * * //
@@ -134,5 +125,18 @@ void Foam::sixDOFODE::setExternalForceAndMoment
     }
 }
 
+
+const Foam::PtrList<Foam::translationalConstraint>&
+Foam::sixDOFODE::translationalConstraints() const
+{
+    return translationalConstraints_;
+}
+
+
+const Foam::PtrList<Foam::rotationalConstraint>&
+Foam::sixDOFODE::rotationalConstraints() const
+{
+    return rotationalConstraints_;
+}
 
 // ************************************************************************* //

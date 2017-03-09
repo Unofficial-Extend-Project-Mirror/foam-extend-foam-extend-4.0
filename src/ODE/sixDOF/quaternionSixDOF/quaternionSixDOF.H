@@ -36,8 +36,11 @@ Description
 
 Author
     Dubravko Matijasevic, FSB Zagreb.  All rights reserved.
-    Hrvoje Jasak, FSB Zagreb.  All rights reserved.
+
+Reorganization by
     Vuko Vukcevic, FSB Zagreb.  All rights reserved.
+    Inno Gatin, FSB Zagreb.  All rights reserved.
+    Hrvoje Jasak, FSB Zagreb.  All rights reserved.
 
 SourceFiles
     quaternionSixDOF.C
@@ -49,8 +52,6 @@ SourceFiles
 
 #include "sixDOFODE.H"
 #include "finiteRotation.H"
-#include "translationalConstraint.H"
-#include "rotationalConstraint.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -91,15 +92,6 @@ class quaternionSixDOF
 
         //- ODE coefficients
         scalarField coeffs_;
-
-
-        // Motion constraints
-
-            //- List of translational constraints
-            PtrList<translationalConstraint> translationalConstraints_;
-
-            //- List of rotational constraints
-            PtrList<rotationalConstraint> rotationalConstraints_;
 
 
     // Private Member Functions
@@ -178,23 +170,6 @@ public:
 
 
     // Member Functions
-
-        // Access member functions
-
-            //- Return const reference to translational constraints
-            const PtrList<translationalConstraint>&
-            translationalConstraints() const
-            {
-                return translationalConstraints_;
-            }
-
-            //- Return const reference to rotational constraints
-            const PtrList<rotationalConstraint>&
-            rotationalConstraints() const
-            {
-                return rotationalConstraints_;
-            }
-
 
         // Virtual interface for 6DOF motion state
 

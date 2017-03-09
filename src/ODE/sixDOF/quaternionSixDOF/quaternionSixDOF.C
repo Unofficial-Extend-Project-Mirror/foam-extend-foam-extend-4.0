@@ -24,14 +24,6 @@ License
 Class
     quaternionSixDOF
 
-Description
-    6-DOF solver using quaternions
-
-Author
-    Dubravko Matijasevic, FSB Zagreb.  All rights reserved.
-    Hrvoje Jasak, FSB Zagreb.  All rights reserved.
-    Vuko Vukcevic, FSB Zagreb.  All rights reserved.
-
 \*---------------------------------------------------------------------------*/
 
 #include "quaternionSixDOF.H"
@@ -61,7 +53,7 @@ Foam::dimensionedVector Foam::quaternionSixDOF::A
     // Create a scalar square matrix representing Newton equations with
     // constraints and the corresponding source (right hand side vector).
     // Note: size of the matrix is 3 + number of constraints
-    scalarField rhs(translationalConstraints_.size() + 3, 0.0);
+    scalarField rhs(translationalConstraints().size() + 3, 0.0);
     scalarSquareMatrix M(rhs.size(), 0.0);
 
     // Insert mass and explicit forcing into the system. Note: translations are
@@ -83,10 +75,10 @@ Foam::dimensionedVector Foam::quaternionSixDOF::A
     }
 
     // Insert contributions from the constraints
-    forAll(translationalConstraints_, tcI)
+    forAll(translationalConstraints(), tcI)
     {
         // Get reference to current constraint
-        const translationalConstraint& curTc = translationalConstraints_[tcI];
+        const translationalConstraint& curTc = translationalConstraints()[tcI];
 
         // Get matrix contribution from constraint
         const vector mc =
@@ -144,7 +136,7 @@ Foam::dimensionedVector Foam::quaternionSixDOF::OmegaDot
     // Create a scalar square matrix representing Euler equations with
     // constraints and the corresponding source (right hand side vector).
     // Note: size of the matrix is 3 + number of constraints
-    scalarField rhs(rotationalConstraints_.size() + 3, 0.0);
+    scalarField rhs(rotationalConstraints().size() + 3, 0.0);
     scalarSquareMatrix J(rhs.size(), 0.0);
 
     // Get current inertial-to-local transformation. Note: different convention
@@ -168,10 +160,10 @@ Foam::dimensionedVector Foam::quaternionSixDOF::OmegaDot
     }
 
     // Insert contributions from the constraints
-    forAll(rotationalConstraints_, rcI)
+    forAll(rotationalConstraints(), rcI)
     {
         // Get reference to current constraint
-        const rotationalConstraint& curRc = rotationalConstraints_[rcI];
+        const rotationalConstraint& curRc = rotationalConstraints()[rcI];
 
         // Get matrix contribution from the constraint
         const vector mc =
@@ -241,10 +233,6 @@ void Foam::quaternionSixDOF::setState(const sixDOFODE& sd)
     // Copy ODE coefficients: this carries actual ODE state
     // HJ, 23/Mar/2015
     coeffs_ = qsd.coeffs_;
-
-    // Copy constraints
-    translationalConstraints_ = qsd.translationalConstraints_;
-    rotationalConstraints_ = qsd.rotationalConstraints_;
 }
 
 
@@ -265,10 +253,7 @@ Foam::quaternionSixDOF::quaternionSixDOF(const IOobject& io)
     omega_(dict().lookup("omega")),
     omegaAverage_("omegaAverage", omega_),
 
-    coeffs_(13, 0.0),
-
-    translationalConstraints_(),
-    rotationalConstraints_()
+    coeffs_(13, 0.0)
 {
     // Set ODE coefficients from position and rotation
 
@@ -295,30 +280,6 @@ Foam::quaternionSixDOF::quaternionSixDOF(const IOobject& io)
     coeffs_[10] = rotation_.eInitial().e1();
     coeffs_[11] = rotation_.eInitial().e2();
     coeffs_[12] = rotation_.eInitial().e3();
-
-    // Read and construct constraints
-
-    // Read translation constraints if they are present
-    if (dict().found("translationalConstraints"))
-    {
-        PtrList<translationalConstraint> tcList
-        (
-            dict().lookup("translationalConstraints"),
-            translationalConstraint::iNew()
-        );
-        translationalConstraints_.transfer(tcList);
-    }
-
-    // Read rotation constraints if they are present
-    if (dict().found("rotationalConstraints"))
-    {
-        PtrList<rotationalConstraint> rcList
-        (
-            dict().lookup("rotationalConstraints"),
-            rotationalConstraint::iNew()
-        );
-        rotationalConstraints_.transfer(rcList);
-    }
 }
 
 
@@ -337,10 +298,7 @@ Foam::quaternionSixDOF::quaternionSixDOF
     omega_(qsd.omega_.name(), qsd.omega_),
     omegaAverage_(qsd.omegaAverage_.name(), qsd.omegaAverage_),
 
-    coeffs_(qsd.coeffs_),
-
-    translationalConstraints_(qsd.translationalConstraints_),
-    rotationalConstraints_(qsd.rotationalConstraints_)
+    coeffs_(qsd.coeffs_)
 {}
 
 
@@ -547,20 +505,6 @@ bool Foam::quaternionSixDOF::writeData(Ostream& os) const
         << token::END_STATEMENT << nl;
     os.writeKeyword("omega") << tab << omega_
         << token::END_STATEMENT << nl << nl;
-
-    if (!translationalConstraints_.empty())
-    {
-        os.writeKeyword("translationalConstraints")
-            << translationalConstraints_
-            << token::END_STATEMENT << nl << endl;
-    }
-
-    if (!rotationalConstraints_.empty())
-    {
-        os.writeKeyword("rotationalConstraints")
-            << rotationalConstraints_
-            << token::END_STATEMENT << endl;
-    }
 
     return os.good();
 }

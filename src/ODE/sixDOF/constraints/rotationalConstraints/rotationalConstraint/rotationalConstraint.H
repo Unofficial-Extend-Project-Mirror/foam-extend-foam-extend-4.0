@@ -56,10 +56,12 @@ SourceFiles
 #ifndef rotationalConstraint_H
 #define rotationalConstraint_H
 
-#include "sixDOFODE.H"
 #include "typeInfo.H"
 #include "runTimeSelectionTables.H"
 #include "autoPtr.H"
+#include "dimensionedTypes.H"
+#include "dictionary.H"
+#include "Switch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

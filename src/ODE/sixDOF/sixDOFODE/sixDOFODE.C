@@ -24,15 +24,6 @@ License
 Class
     sixDOFODE
 
-Description
-    Abstract base class for six-degrees-of-freedom (6DOF) ordinary differential
-    equations with necessary interface for two-way coupling with CFD solvers.
-
-Author
-    Dubravko Matijasevic, FSB Zagreb.  All rights reserved.
-    Hrvoje Jasak, FSB Zagreb.  All rights reserved.
-    Vuko Vukcevic, FSB Zagreb.  All rights reserved.
-
 \*---------------------------------------------------------------------------*/
 
 #include "objectRegistry.H"
@@ -205,6 +196,10 @@ void Foam::sixDOFODE::setState(const sixDOFODE& sd)
 
     force_ = sd.force_;
     moment_ = sd.moment_;
+
+    // Copy constraints
+    translationalConstraints_ = sd.translationalConstraints_;
+    rotationalConstraints_ = sd.rotationalConstraints_;
 }
 
 
@@ -263,7 +258,10 @@ Foam::sixDOFODE::sixDOFODE(const IOobject& io)
     moment_(dict_.lookup("moment")),
 
     curTimeIndex_(-1),
-    oldStatePtr_()
+    oldStatePtr_(),
+
+    translationalConstraints_(),
+    rotationalConstraints_()
 {
     // Sanity checks
     if (mass_.value() < SMALL)
@@ -281,6 +279,30 @@ Foam::sixDOFODE::sixDOFODE(const IOobject& io)
             << momentOfInertia_.value()
             << nl << "Please check " << dict_.name() << "dictionary."
             << exit(FatalError);
+    }
+
+    // Read and construct constraints
+
+    // Read translation constraints if they are present
+    if (dict().found("translationalConstraints"))
+    {
+        PtrList<translationalConstraint> tcList
+        (
+            dict().lookup("translationalConstraints"),
+            translationalConstraint::iNew()
+        );
+        translationalConstraints_.transfer(tcList);
+    }
+
+    // Read rotation constraints if they are present
+    if (dict().found("rotationalConstraints"))
+    {
+        PtrList<rotationalConstraint> rcList
+        (
+            dict().lookup("rotationalConstraints"),
+            rotationalConstraint::iNew()
+        );
+        rotationalConstraints_.transfer(rcList);
     }
 }
 
@@ -315,7 +337,10 @@ Foam::sixDOFODE::sixDOFODE(const word& name, const sixDOFODE& sd)
     moment_(sd.moment_),
 
     curTimeIndex_(sd.curTimeIndex_),
-    oldStatePtr_()
+    oldStatePtr_(),
+
+    translationalConstraints_(sd.translationalConstraints_),
+    rotationalConstraints_(sd.rotationalConstraints_)
 {}
 
 
@@ -358,6 +383,20 @@ bool Foam::sixDOFODE::writeData(Ostream& os) const
         << token::END_STATEMENT << nl;
     os.writeKeyword("moment") << tab << moment_
         << token::END_STATEMENT << nl << nl;
+
+    if (!translationalConstraints_.empty())
+    {
+        os.writeKeyword("translationalConstraints")
+            << translationalConstraints_
+            << token::END_STATEMENT << nl << endl;
+    }
+
+    if (!rotationalConstraints_.empty())
+    {
+        os.writeKeyword("rotationalConstraints")
+            << rotationalConstraints_
+            << token::END_STATEMENT << endl;
+    }
 
     return os.good();
 }

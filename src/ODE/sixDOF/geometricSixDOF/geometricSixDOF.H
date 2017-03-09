@@ -28,7 +28,7 @@ Description
     6-DOF solver using a geometric method for integration of rotations.
 
     Run-time selectable constraints are handled via Lagrangian multipliers using
-    the interface from translationa/rotationalConstraint classes.
+    the interface from translational/rotationalConstraint classes.
 
     Reference (bibtex):
 
@@ -60,10 +60,7 @@ SourceFiles
 #define geometricSixDOF_H
 
 #include "sixDOFODE.H"
-#include "finiteRotation.H"
 #include "tolerancesSwitch.H"
-#include "translationalConstraint.H"
-#include "rotationalConstraint.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -107,15 +104,6 @@ class geometricSixDOF
 
         //- ODE coefficients
         scalarField coeffs_;
-
-
-        // Motion constraints
-
-            //- List of translational constraints
-            PtrList<translationalConstraint> translationalConstraints_;
-
-            //- List of rotational constraints
-            PtrList<rotationalConstraint> rotationalConstraints_;
 
 
     // Private Member Functions
@@ -215,23 +203,6 @@ public:
 
 
     // Member Functions
-
-        // Access member functions
-
-            //- Return const reference to translational constraints
-            const PtrList<translationalConstraint>&
-            translationalConstraints() const
-            {
-                return translationalConstraints_;
-            }
-
-            //- Return const reference to rotational constraints
-            const PtrList<rotationalConstraint>&
-            rotationalConstraints() const
-            {
-                return rotationalConstraints_;
-            }
-
 
         // Virtual interface for 6DOF motion state
 
