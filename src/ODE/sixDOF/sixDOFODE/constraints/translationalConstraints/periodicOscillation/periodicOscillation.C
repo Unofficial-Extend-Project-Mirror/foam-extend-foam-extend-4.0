@@ -117,6 +117,32 @@ Foam::scalar Foam::periodicOscillation::sourceContribution
 }
 
 
+void Foam::periodicOscillation::stabilise
+(
+    const scalar t,
+    vector& x,
+    vector& u
+) const
+{
+    // Set the displacement according to periodic oscillation
+
+    // First subtract calculated displacement...
+    x -= (x & dir_)*dir_;
+
+    // ... then add the correct displacement
+    x += dir_*sin(omega_*t + phi_);
+
+
+    // Set the velocity according to periodic oscillation
+
+    // First subract calculated velocity...
+    u -= (u & dir_)*dir_;
+
+    // ... then add the correct velocity
+    u += dir_*cos(omega_*t + phi_);
+}
+
+
 void Foam::periodicOscillation::write(Ostream& os) const
 {
     os.writeKeyword("type") << tab << type()

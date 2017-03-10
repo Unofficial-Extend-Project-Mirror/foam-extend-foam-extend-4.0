@@ -32,6 +32,10 @@ Description
     where a is the amplitude of oscillation, omega radial frequency and phi is
     the phase shift.
 
+    Note: since this constraint is basically algebraic (dependent on
+    displacement), the differentiation index is two so the stabilisation on
+    displacement and velocity is necessary.
+
 Author
     Viktor Pandza, FSB Zagreb.  All rights reserved.
     Vuko Vukcevic, FSB Zagreb.  All rights reserved.
@@ -124,6 +128,13 @@ public:
                 const vector& 
             ) const;
 
+            //- Stabilise the constraint
+            virtual void stabilise
+            (
+                const scalar t,
+                vector& x,
+                vector& u
+            ) const;
 
 
     // I-O Functions

@@ -536,35 +536,52 @@ void Foam::geometricSixDOF::update(const scalar delta)
 {
     // Translation
 
-    // Update displacement
+    // Get displacement
     const vector Xold = Xrel_.value();
 
     vector& Xval = Xrel_.value();
-
     Xval.x() = coeffs_[0];
     Xval.y() = coeffs_[1];
     Xval.z() = coeffs_[2];
 
-    // Update velocity
-    Uaverage_.value() = (Xval - Xold)/delta;
-
+    // Get velocity
     vector& Uval = U_.value();
-
     Uval.x() = coeffs_[3];
     Uval.y() = coeffs_[4];
     Uval.z() = coeffs_[5];
 
+    // Stabilise translational constraints if necessary
+    forAll(translationalConstraints(), tcI)
+    {
+        // Note: get end time for this ODE step from mesh, assuming that the top
+        // level solves this ode from [t - deltaT, t], yielding solution at
+        // t. Done this way to preserve the interface of ODE class.
+        // VV, 10/Mar/2017.
+        const scalar t = dict().time().value();
+
+        translationalConstraints()[tcI].stabilise(t, Xval, Uval);
+    }
+
+    // Update (possibly constrained) displacement
+    coeffs_[0] = Xval.x();
+    coeffs_[1] = Xval.y();
+    coeffs_[2] = Xval.z();
+
+    // Update (possibly constrained) velocity
     coeffs_[3] = Uval.x();
     coeffs_[4] = Uval.y();
     coeffs_[5] = Uval.z();
 
+    // Update average velocity
+    Uaverage_.value() = (Xval - Xold)/delta;
+
+
     // Rotation
 
-    // Update omega
+    // Get angular velocity
     const vector omegaOld = omega_.value();
 
     vector& omegaVal = omega_.value();
-
     omegaVal.x() = coeffs_[6];
     omegaVal.y() = coeffs_[7];
     omegaVal.z() = coeffs_[8];
@@ -575,11 +592,29 @@ void Foam::geometricSixDOF::update(const scalar delta)
     // Update rotational tensor
     rotation_ = (rotation_ & rotIncrement_);
 
+    // Stabilise rotational constraints if necessary
+    forAll(rotationalConstraints(), rcI)
+    {
+        // Note: get end time for this ODE step from mesh, assuming that the top
+        // level solves this ode from [t - deltaT, t], yielding solution at
+        // t. Done this way to preserve the interface of ODE class.
+        // VV, 10/Mar/2017.
+        const scalar t = dict().time().value();
+
+        rotationalConstraints()[rcI].stabilise(t, omegaVal);
+    }
+
+    // Update (possibly constrained) omega
+    coeffs_[6] = omegaVal.x();
+    coeffs_[7] = omegaVal.y();
+    coeffs_[8] = omegaVal.z();
+
     // Reset increment vector in coefficients for the next step
     coeffs_[9] = 0;
     coeffs_[10] = 0;
     coeffs_[11] = 0;
 
+    // Update average omega
     omegaAverage_.value() = 0.5*(omegaVal + omegaOld);
 }
 

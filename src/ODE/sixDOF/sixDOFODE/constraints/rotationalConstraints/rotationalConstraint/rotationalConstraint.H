@@ -41,8 +41,12 @@ Description
     2. sourceContribution() - corresponding to a(t), to be inserted into right
                               hand side vector.
 
-    Note: constraints are usually used alongside appropriate initial
-    conditions (rotational rate in a given direction).
+    Notes:
+    1. Constraints are usually used alongside appropriate initial
+       conditions (rotational rate in a given direction),
+    2. According to DAE theory, a stabilisation on orientation/angular velocity
+       is necessary based on "differentiation index" used to obtain the final
+       form of the constraint.
 
 Author
     Viktor Pandza, FSB Zagreb.  All rights reserved.
@@ -165,6 +169,14 @@ public:
                 const scalar t,
                 const tensor& toRelative,
                 const vector& omega
+            ) const = 0;
+
+            //- Stabilise the constraint (necessary for constraints with
+            //  differentiation index higher than zero)
+            virtual void stabilise
+            (
+                const scalar t,
+                vector& omega
             ) const = 0;
 
 
