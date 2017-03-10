@@ -28,8 +28,8 @@ Description
     Abstract base class for six-degrees-of-freedom (6DOF) ordinary differential
     equations with necessary interface for two-way coupling with CFD solvers.
 
-    Holds list of translational and rotational constraints to be used in derived
-    classes.
+    Holds list of translational and rotational constraints and restraings to be
+    used in derived classes.
 
 Author
     Dubravko Matijasevic, FSB Zagreb.  All rights reserved.
@@ -56,9 +56,7 @@ SourceFiles
 #include "runTimeSelectionTables.H"
 #include "Switch.H"
 #include "foamTime.H"
-#include "translationalConstraint.H"
-#include "rotationalConstraint.H"
-#include "PtrList.H"
+#include "constraintsAndRestraints.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -164,6 +162,15 @@ class sixDOFODE
 
             //- List of rotational constraints
             PtrList<rotationalConstraint> rotationalConstraints_;
+
+
+        // Motion restraints
+
+            //- List of translational restraints
+            PtrList<translationalRestraint> translationalRestraints_;
+
+            //- List of rotational restraints
+            PtrList<rotationalRestraint> rotationalRestraints_;
 
 
     // Private Member Functions
@@ -316,6 +323,17 @@ public:
             //- Return const reference to rotational constraints
             inline const PtrList<rotationalConstraint>&
             rotationalConstraints() const;
+
+
+        // Access to motion restraints
+
+            //- Return const reference to translational restraints
+            inline const PtrList<translationalRestraint>&
+            translationalRestraints() const;
+
+            //- Return const reference to rotational restraints
+            inline const PtrList<rotationalRestraint>&
+            rotationalRestraints() const;
 
 
         // Virtual interface for 6DOF motion state

@@ -200,6 +200,10 @@ void Foam::sixDOFODE::setState(const sixDOFODE& sd)
     // Copy constraints
     translationalConstraints_ = sd.translationalConstraints_;
     rotationalConstraints_ = sd.rotationalConstraints_;
+
+    // Copy restraints
+    translationalRestraints_ = sd.translationalRestraints_;
+    rotationalRestraints_ = sd.rotationalRestraints_;
 }
 
 
@@ -261,7 +265,10 @@ Foam::sixDOFODE::sixDOFODE(const IOobject& io)
     oldStatePtr_(),
 
     translationalConstraints_(),
-    rotationalConstraints_()
+    rotationalConstraints_(),
+
+    translationalRestraints_(),
+    rotationalRestraints_()
 {
     // Sanity checks
     if (mass_.value() < SMALL)
@@ -281,7 +288,7 @@ Foam::sixDOFODE::sixDOFODE(const IOobject& io)
             << exit(FatalError);
     }
 
-    // Read and construct constraints
+    // Read and construct constraints and restraints
 
     // Read translation constraints if they are present
     if (dict().found("translationalConstraints"))
@@ -303,6 +310,28 @@ Foam::sixDOFODE::sixDOFODE(const IOobject& io)
             rotationalConstraint::iNew()
         );
         rotationalConstraints_.transfer(rcList);
+    }
+
+    // Read translation restraints if they are present
+    if (dict().found("translationalRestraints"))
+    {
+        PtrList<translationalRestraint> tcList
+        (
+            dict().lookup("translationalRestraints"),
+            translationalRestraint::iNew()
+        );
+        translationalRestraints_.transfer(tcList);
+    }
+
+    // Read rotation restraints if they are present
+    if (dict().found("rotationalRestraints"))
+    {
+        PtrList<rotationalRestraint> rcList
+        (
+            dict().lookup("rotationalRestraints"),
+            rotationalRestraint::iNew()
+        );
+        rotationalRestraints_.transfer(rcList);
     }
 }
 
@@ -340,7 +369,10 @@ Foam::sixDOFODE::sixDOFODE(const word& name, const sixDOFODE& sd)
     oldStatePtr_(),
 
     translationalConstraints_(sd.translationalConstraints_),
-    rotationalConstraints_(sd.rotationalConstraints_)
+    rotationalConstraints_(sd.rotationalConstraints_),
+
+    translationalRestraints_(sd.translationalRestraints_),
+    rotationalRestraints_(sd.rotationalRestraints_)
 {}
 
 
@@ -395,6 +427,20 @@ bool Foam::sixDOFODE::writeData(Ostream& os) const
     {
         os.writeKeyword("rotationalConstraints")
             << rotationalConstraints_
+            << token::END_STATEMENT << endl;
+    }
+
+    if (!translationalRestraints_.empty())
+    {
+        os.writeKeyword("translationalRestraints")
+            << translationalRestraints_
+            << token::END_STATEMENT << nl << endl;
+    }
+
+    if (!rotationalRestraints_.empty())
+    {
+        os.writeKeyword("rotationalRestraints")
+            << rotationalRestraints_
             << token::END_STATEMENT << endl;
     }
 
