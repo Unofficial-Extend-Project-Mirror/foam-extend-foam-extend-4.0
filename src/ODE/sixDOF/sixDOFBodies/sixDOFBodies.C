@@ -132,11 +132,11 @@ void Foam::sixDOFBodies::solve()
 
         // Note: set external force and moment needed to initialize the state
         // of the sixDOFODE to correctly take into account multiple calls per
-        // time step
+        // time step. Using constant force and moment throughout simulation.
         odes_[bodyI].setExternalForceAndMoment
         (
-            dimensionedVector("zero", dimForce, vector::zero),
-            dimensionedVector("zero", dimForce*dimLength, vector::zero)
+            dimensionedVector(odes_[bodyI].force()),
+            dimensionedVector(odes_[bodyI].moment())
         );
 
         solvers_[bodyI].solve
