@@ -22,32 +22,24 @@ License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    Foam::rotationalRestraint
+    Foam::linearSpringDamper
 
 Description
-    Abstract base class containing interface for rotational restraints used
-    within sixDOFODE classes.
-
-    Interface provides restraining moment to the rotational equations of
-    motion via moment() member function.
+    Translational restraint corresponding to linear spring and linear damper
+    defined by linear spring coefficients and linear damping coefficients.
 
 Author
     Vuko Vukcevic, FSB Zagreb.  All rights reserved.
 
 SourceFiles
-    rotationalRestraint.C
+    linearSpringDamper.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef rotationalRestraint_H
-#define rotationalRestraint_H
+#ifndef linearSpringDamper_H
+#define linearSpringDamper_H
 
-#include "typeInfo.H"
-#include "runTimeSelectionTables.H"
-#include "autoPtr.H"
-#include "dimensionedTypes.H"
-#include "dictionary.H"
-#include "Switch.H"
+#include "translationalRestraint.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -55,108 +47,64 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                   Class rotationalRestraint Declaration
+                   Class linearSpringDamper Declaration
 \*---------------------------------------------------------------------------*/
 
-class rotationalRestraint
+class linearSpringDamper
+:
+    public translationalRestraint
 {
     // Private Data
 
-        //- Name of the restraint
-        word name_;
+        //- Linear spring coefficients
+        diagTensor linSpringCoeffs_;
+
+        //- Linear damping coefficients
+        diagTensor linDampingCoeffs_;
 
 
 public:
 
     //- Runtime type information
-    TypeName("rotationalRestraint");
-
-
-    // Declare run-time constructor selection table
-
-        declareRunTimeSelectionTable
-        (
-            autoPtr,
-            rotationalRestraint,
-            word,
-            (
-                const word& name,
-                const dictionary& dict
-            ),
-            (name, dict)
-        );
-
-
-        //- Class used for the read-construction of
-        //  PtrLists of rotationalRestraint
-        class iNew
-        {
-        public:
-
-            iNew()
-            {}
-
-            autoPtr<rotationalRestraint> operator()(Istream& is) const
-            {
-                word name(is);
-                dictionary dict(is);
-                return rotationalRestraint::New(name, dict);
-            }
-        };
+    TypeName("linearSpringDamper");
 
 
     // Constructors
 
         //- Construct from dictionary
-        rotationalRestraint
+        linearSpringDamper
         (
             const word& name,
             const dictionary& dict
         );
 
         //- Construct and return a clone
-        virtual autoPtr<rotationalRestraint> clone() const = 0;
-
-
-    // Selectors
-
-        //- Return a reference to the selected rotationalRestraint
-        static autoPtr<rotationalRestraint> New
-        (
-            const word& name,
-            const dictionary& dict
-        );
+        virtual autoPtr<translationalRestraint> clone() const;
 
 
     // Destructor
 
-        virtual ~rotationalRestraint();
+        virtual ~linearSpringDamper();
 
 
     // Member Functions
 
         // Restraint specific functions
 
-            //- Return restraining moment (in the local coordinate system)
-            virtual vector restrainingMoment
+            //- Return restraining force (in the global coordinate system)
+            virtual vector restrainingForce
             (
                 const scalar t,
                 const tensor& toRelative,
-                const vector& omega
-            ) const = 0;
+                const vector& x,
+                const vector& u
+            ) const;
 
 
     // I-O Functions and Operators
 
         //- Virtual write function
-        virtual void write(Ostream& os) const = 0;
-
-        //- Ostream operator implemented in terms of write operator
-        friend Ostream& operator<<
-        (
-            Ostream& os,
-            const rotationalRestraint& rr
-        );
+        virtual void write(Ostream& os) const;
 };
 
 

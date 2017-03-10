@@ -92,12 +92,6 @@ class sixDOFODE
             //- Spring equilibrium position for translation
             dimensionedVector Xequilibrium_;
 
-            //- Linear spring coeffs
-            dimensionedDiagTensor linSpringCoeffs_;
-
-            //- Linear damping coeffs
-            dimensionedDiagTensor linDampingCoeffs_;
-
 
         // Aitkens relaxation data members
 
@@ -216,13 +210,22 @@ protected:
 
         // Get external force and moment (used during the solution process)
 
-            //- Return external force given time (linearly interpolated from
-            //  old state and current state)
-            dimensionedVector force(const scalar t) const;
+            //- Return external force with restraints for given ODE state
+            dimensionedVector force
+            (
+                const scalar t,
+                const tensor& toRelative,
+                const vector& x,
+                const vector& u
+            ) const;
 
-            //- Return external moment given time (linearly interpolated from
-            //  old state and current state)
-            dimensionedVector moment(const scalar t) const;
+            //- Return external moment with restraints given ODE state
+            dimensionedVector moment
+            (
+                const scalar t,
+                const tensor& toRelative,
+                const vector& omega
+            ) const;
 
 
 public:

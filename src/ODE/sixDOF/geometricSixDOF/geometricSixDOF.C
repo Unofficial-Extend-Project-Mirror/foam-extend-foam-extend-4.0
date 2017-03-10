@@ -73,13 +73,17 @@ Foam::dimensionedVector Foam::geometricSixDOF::A
     scalarSquareMatrix M(rhs.size(), 0.0);
 
     // Insert mass and explicit forcing into the system. Note: translations are
-    // solved in the global coordinate system
-    const dimensionedVector explicitForcing
-    (
-        force(t) // External force
-      - (linSpringCoeffs() & xR) // Spring force
-      - (linDampingCoeffs() & uR) // Damping force
-    );
+    // solved in the global coordinate system and the explicit forcing contains
+    // restraining forces
+    const dimensionedVector explicitForcing =
+        force
+        (
+            t,
+            R.T(),
+            xR.value(),
+            uR.value()
+        );
+
     const vector& efVal = explicitForcing.value();
     const scalar& m = mass().value();
 
@@ -155,7 +159,15 @@ Foam::dimensionedVector Foam::geometricSixDOF::OmegaDot
     const dimensionedVector explicitForcing
     (
         E(omega) // Euler part
-      + (RT & moment(t)) // External torque
+      + (
+          RT
+        & moment
+          (
+              t,
+              RT.value(),
+              omega.value()
+          )
+        ) // External torque with restraints
     );
     const vector& efVal = explicitForcing.value();
     const diagTensor& I = momentOfInertia().value();

@@ -81,18 +81,6 @@ Foam::dimensionedVector& Foam::sixDOFODE::Xequilibrium()
 }
 
 
-const Foam::dimensionedDiagTensor& Foam::sixDOFODE::linSpringCoeffs() const
-{
-    return linSpringCoeffs_;
-}
-
-
-const Foam::dimensionedDiagTensor& Foam::sixDOFODE::linDampingCoeffs() const
-{
-    return linDampingCoeffs_;
-}
-
-
 const Foam::dimensionedVector& Foam::sixDOFODE::force() const
 {
     return force_;
