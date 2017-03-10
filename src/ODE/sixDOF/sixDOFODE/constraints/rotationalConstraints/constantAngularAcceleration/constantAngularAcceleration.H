@@ -113,6 +113,16 @@ public:
                 const vector&
             ) const;
 
+            //- Stabilise the constraint
+            virtual void stabilise
+            (
+                const scalar,
+                vector&
+            ) const
+            {
+                // Does nothing: no need to stabilise this constraint
+            }
+
 
     // I-O Functions
 
