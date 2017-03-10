@@ -23,6 +23,7 @@ $(sixDOF)/sixDOFODE/constraints/translationalConstraints/constantTranslationalAc
 $(sixDOF)/sixDOFODE/constraints/translationalConstraints/periodicOscillation/periodicOscillation.C
 
 $(sixDOF)/sixDOFODE/restraints/translationalRestraints/translationalRestraint/translationalRestraint.C
+$(sixDOF)/sixDOFODE/restraints/translationalRestraints/linearSpringDamper/linearSpringDamper.C
 $(sixDOF)/sixDOFODE/restraints/rotationalRestraints/rotationalRestraint/rotationalRestraint.C
 
 $(sixDOF)/sixDOFODE/sixDOFODE.C

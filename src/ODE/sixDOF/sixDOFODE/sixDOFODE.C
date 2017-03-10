@@ -191,8 +191,6 @@ void Foam::sixDOFODE::setState(const sixDOFODE& sd)
     momentOfInertia_ = sd.momentOfInertia_;
 
     Xequilibrium_ = sd.Xequilibrium_;
-    linSpringCoeffs_ = sd.linSpringCoeffs_;
-    linDampingCoeffs_ = sd.linDampingCoeffs_;
 
     force_ = sd.force_;
     moment_ = sd.moment_;
@@ -207,23 +205,61 @@ void Foam::sixDOFODE::setState(const sixDOFODE& sd)
 }
 
 
-Foam::dimensionedVector Foam::sixDOFODE::force(const scalar t) const
+Foam::dimensionedVector Foam::sixDOFODE::force
+(
+    const scalar t,
+    const tensor& toRelative,
+    const vector& x,
+    const vector& u
+) const
 {
     // Get ODE step fraction
     const scalar alpha = odeStepFraction(t);
 
-    // Return linearly interpolated external force
-    return (alpha*oldStatePtr_->force() + (1 - alpha)*force());
+    // Calculate restraining force
+    dimensionedVector rForce("zero", dimForce, vector::zero);
+
+    forAll(translationalRestraints_, trI)
+    {
+        rForce.value() += translationalRestraints_[trI].restrainingForce
+        (
+            t, // Time
+            toRelative, // Transformation tensor
+            x, // Position in the global c.s.
+            u // Velocity in the global c.s.
+        );
+    }
+
+    // Return linearly interpolated external force with restraining force
+    return (alpha*oldStatePtr_->force() + (1 - alpha)*force()) + rForce;
 }
 
 
-Foam::dimensionedVector Foam::sixDOFODE::moment(const scalar t) const
+Foam::dimensionedVector Foam::sixDOFODE::moment
+(
+    const scalar t,
+    const tensor& toRelative,
+    const vector& omega
+) const
 {
     // Get ODE step fraction
     const scalar alpha = odeStepFraction(t);
 
-    // Return linearly interpolated external moment
-    return (alpha*oldStatePtr_->moment() + (1 - alpha)*moment());
+    // Calculate restraining moment
+    dimensionedVector rMoment("zero", dimForce*dimLength, vector::zero);
+
+    forAll(rotationalRestraints_, rrI)
+    {
+        rMoment.value() += rotationalRestraints_[rrI].restrainingMoment
+        (
+            t, // Time
+            toRelative, // Transformation tensor
+            omega // Angular velocity in local c.s.
+        );
+    }
+
+    // Return linearly interpolated external moment with restraining moment
+    return (alpha*oldStatePtr_->moment() + (1 - alpha)*moment() + rMoment);
 }
 
 
@@ -238,8 +274,6 @@ Foam::sixDOFODE::sixDOFODE(const IOobject& io)
     momentOfInertia_(dict_.lookup("momentOfInertia")),
 
     Xequilibrium_(dict_.lookup("equilibriumPosition")),
-    linSpringCoeffs_(dict_.lookup("linearSpring")),
-    linDampingCoeffs_(dict_.lookup("linearDamping")),
 
     aitkensRelaxation_
     (
@@ -345,8 +379,6 @@ Foam::sixDOFODE::sixDOFODE(const word& name, const sixDOFODE& sd)
     momentOfInertia_(sd.momentOfInertia_),
 
     Xequilibrium_(sd.Xequilibrium_),
-    linSpringCoeffs_(sd.linSpringCoeffs_),
-    linDampingCoeffs_(sd.linDampingCoeffs_),
 
     aitkensRelaxation_(sd.aitkensRelaxation_),
     minRelaxFactor_(sd.minRelaxFactor_),
@@ -399,10 +431,6 @@ bool Foam::sixDOFODE::writeData(Ostream& os) const
 
     os.writeKeyword("equilibriumPosition") << tab << Xequilibrium_
         << token::END_STATEMENT << nl;
-    os.writeKeyword("linearSpring") << tab << linSpringCoeffs_
-        << token::END_STATEMENT << nl;
-    os.writeKeyword("linearDamping") << tab << linDampingCoeffs_
-        << token::END_STATEMENT << nl << nl;
 
     os.writeKeyword("useAitkensRelaxation") << tab << aitkensRelaxation_
         << token::END_STATEMENT << nl;
