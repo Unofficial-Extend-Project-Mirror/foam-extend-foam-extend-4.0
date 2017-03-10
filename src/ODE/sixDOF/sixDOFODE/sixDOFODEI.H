@@ -139,4 +139,18 @@ Foam::sixDOFODE::rotationalConstraints() const
     return rotationalConstraints_;
 }
 
+
+const Foam::PtrList<Foam::translationalRestraint>&
+Foam::sixDOFODE::translationalRestraints() const
+{
+    return translationalRestraints_;
+}
+
+
+const Foam::PtrList<Foam::rotationalRestraint>&
+Foam::sixDOFODE::rotationalRestraints() const
+{
+    return rotationalRestraints_;
+}
+
 // ************************************************************************* //
