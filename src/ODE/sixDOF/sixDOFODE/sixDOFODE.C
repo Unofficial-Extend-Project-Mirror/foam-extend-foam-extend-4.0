@@ -307,19 +307,41 @@ Foam::sixDOFODE::sixDOFODE(const IOobject& io)
     // Sanity checks
     if (mass_.value() < SMALL)
     {
-        FatalErrorIn("sixDOFODE::sixDOFODE(const IOobject& io)")
-            << "Zero or negative mass detected: " << mass_.value()
+        FatalIOErrorIn
+        (
+            "sixDOFODE::sixDOFODE(const IOobject& io)",
+            dict_
+        )   << "Zero or negative mass detected: " << mass_.value()
             << nl << "Please check " << dict_.name() << "dictionary."
-            << exit(FatalError);
+            << exit(FatalIOError);
     }
 
     if (cmptMin(momentOfInertia_.value()) < SMALL)
     {
-        FatalErrorIn("sixDOFODE::sixDOFODE(const IOobject& io)")
-            << "Zero or negative moment of inertia detected: "
+        FatalIOErrorIn
+        (
+            "sixDOFODE::sixDOFODE(const IOobject& io)",
+            dict_
+        )   << "Zero or negative moment of inertia detected: "
             << momentOfInertia_.value()
             << nl << "Please check " << dict_.name() << "dictionary."
-            << exit(FatalError);
+            << exit(FatalIOError);
+    }
+
+    if
+    (
+        (minRelaxFactor_ < SMALL)
+     || (maxRelaxFactor_ > 1.0)
+     || ((maxRelaxFactor_ - minRelaxFactor_) < 0)
+    )
+    {
+        FatalIOErrorIn
+        (
+            "sixDOFODE::sixDOFODE(const IOobject& io)",
+            dict_
+        )   << "Invalid minRelaxFactor and maxRelaxFactor specified."
+            << nl << "Please use values within 0 and 1."
+            << exit(FatalIOError);
     }
 
     // Read and construct constraints and restraints
