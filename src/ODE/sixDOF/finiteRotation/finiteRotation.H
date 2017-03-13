@@ -62,20 +62,6 @@ class finiteRotation
         tensor rotIncrementTensor_;
 
 
-    // Private Member Functions
-
-        //- Calculate unit rotation vector from given rotation tensor
-        static vector rotVector(const tensor& rotT);
-
-        //- Calculate rotation angle from given rotation tensor
-        static scalar rotAngle(const tensor& rotT);
-
-        //- Calculate Euler angles (x-y-z (roll-pitch-yaw) convention by Bryan)
-        //  given the rotation tensor (global-to-local transformation).
-        //  Reference: Nikravesh: Computer-Aided Analysis of Mechanical Systems
-        static vector eulerAngles(const tensor& rotT);
-
-
 public:
 
     // Constructors
@@ -97,6 +83,20 @@ public:
     // Destructor
 
         ~finiteRotation();
+
+
+    // Static Functions
+
+        //- Calculate unit rotation vector from given rotation tensor
+        static vector rotVector(const tensor& rotT);
+
+        //- Calculate rotation angle from given rotation tensor
+        static scalar rotAngle(const tensor& rotT);
+
+        //- Calculate Euler angles (x-y-z (roll-pitch-yaw) convention by Bryan)
+        //  given the rotation tensor (global-to-local transformation).
+        //  Reference: Nikravesh: Computer-Aided Analysis of Mechanical Systems
+        static vector eulerAngles(const tensor& rotT);
 
 
     // Member Functions
