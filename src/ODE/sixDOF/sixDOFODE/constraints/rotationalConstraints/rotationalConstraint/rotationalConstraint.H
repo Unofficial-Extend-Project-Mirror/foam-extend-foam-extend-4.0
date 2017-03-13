@@ -164,6 +164,15 @@ public:
 
     // Member Functions
 
+        // Access functions
+
+            //- Return name
+            const word& name() const;
+    
+            //- Return underlying sixDOFODE object
+            const sixDOFODE& sixDOF() const;
+
+
         // Constraint specific functions
 
             //- Return matrix contribution defined by constraint, f(t)

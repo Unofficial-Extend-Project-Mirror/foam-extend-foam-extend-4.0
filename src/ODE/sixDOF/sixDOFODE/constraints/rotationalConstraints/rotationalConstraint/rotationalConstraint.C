@@ -56,6 +56,18 @@ Foam::rotationalConstraint::~rotationalConstraint()
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
+const Foam::word& Foam::rotationalConstraint::name() const
+{
+    return name_;
+}
+
+
+const Foam::sixDOFODE& Foam::rotationalConstraint::sixDOF() const
+{
+    return sixDOF_;
+}
+
+
 Foam::autoPtr<Foam::rotationalConstraint> Foam::rotationalConstraint::New
 (
     const word& name,

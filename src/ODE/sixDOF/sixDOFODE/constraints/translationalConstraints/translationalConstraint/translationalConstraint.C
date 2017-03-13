@@ -56,6 +56,18 @@ Foam::translationalConstraint::~translationalConstraint()
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
+const Foam::word& Foam::translationalConstraint::name() const
+{
+    return name_;
+}
+
+
+const Foam::sixDOFODE& Foam::translationalConstraint::sixDOF() const
+{
+    return sixDOF_;
+}
+
+
 Foam::autoPtr<Foam::translationalConstraint> Foam::translationalConstraint::New
 (
     const word& name,
