@@ -146,6 +146,15 @@ public:
 
     // Member Functions
 
+        // Access functions
+
+            //- Return name
+            const word& name() const;
+
+            //- Return underlying sixDOFODE object
+            const sixDOFODE& sixDOF() const;
+
+
         // Restraint specific functions
 
             //- Return restraining force (in the global coordinate system)
