@@ -195,13 +195,55 @@ void Foam::sixDOFODE::setState(const sixDOFODE& sd)
     force_ = sd.force_;
     moment_ = sd.moment_;
 
+
     // Copy constraints
-    translationalConstraints_ = sd.translationalConstraints_;
-    rotationalConstraints_ = sd.rotationalConstraints_;
+
+    // Translational constraints
+    translationalConstraints_.setSize(sd.translationalConstraints_.size());
+    forAll(sd.translationalConstraints_, trI)
+    {
+        translationalConstraints_.set
+        (
+            trI,
+            sd.translationalConstraints_[trI].clone()
+        );
+    }
+
+    // Rotational constraints
+    rotationalConstraints_.setSize(sd.rotationalConstraints_.size());
+    forAll(sd.rotationalConstraints_, rrI)
+    {
+        rotationalConstraints_.set
+        (
+            rrI,
+            sd.rotationalConstraints_[rrI].clone()
+        );
+    }
+
 
     // Copy restraints
-    translationalRestraints_ = sd.translationalRestraints_;
-    rotationalRestraints_ = sd.rotationalRestraints_;
+
+    // Translational restraints
+    translationalRestraints_.setSize(sd.translationalRestraints_.size());
+    forAll(sd.translationalRestraints_, trI)
+    {
+        translationalRestraints_.set
+        (
+            trI,
+            sd.translationalRestraints_[trI].clone()
+        );
+    }
+
+    // Rotational restraints
+    rotationalRestraints_.setSize(sd.rotationalRestraints_.size());
+    forAll(sd.rotationalRestraints_, rrI)
+    {
+        rotationalRestraints_.set
+        (
+            rrI,
+            sd.rotationalRestraints_[rrI].clone()
+        );
+    }
 }
 
 
@@ -352,7 +394,7 @@ Foam::sixDOFODE::sixDOFODE(const IOobject& io)
         PtrList<translationalConstraint> tcList
         (
             dict().lookup("translationalConstraints"),
-            translationalConstraint::iNew()
+            translationalConstraint::iNew(*this)
         );
         translationalConstraints_.transfer(tcList);
     }
@@ -363,7 +405,7 @@ Foam::sixDOFODE::sixDOFODE(const IOobject& io)
         PtrList<rotationalConstraint> rcList
         (
             dict().lookup("rotationalConstraints"),
-            rotationalConstraint::iNew()
+            rotationalConstraint::iNew(*this)
         );
         rotationalConstraints_.transfer(rcList);
     }
@@ -374,7 +416,7 @@ Foam::sixDOFODE::sixDOFODE(const IOobject& io)
         PtrList<translationalRestraint> tcList
         (
             dict().lookup("translationalRestraints"),
-            translationalRestraint::iNew()
+            translationalRestraint::iNew(*this)
         );
         translationalRestraints_.transfer(tcList);
     }
@@ -385,7 +427,7 @@ Foam::sixDOFODE::sixDOFODE(const IOobject& io)
         PtrList<rotationalRestraint> rcList
         (
             dict().lookup("rotationalRestraints"),
-            rotationalRestraint::iNew()
+            rotationalRestraint::iNew(*this)
         );
         rotationalRestraints_.transfer(rcList);
     }

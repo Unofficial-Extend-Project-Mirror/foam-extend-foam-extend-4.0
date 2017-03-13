@@ -75,7 +75,8 @@ public:
         linearSpringDamper
         (
             const word& name,
-            const dictionary& dict
+            const dictionary& dict,
+            const sixDOFODE& sixDOF
         );
 
         //- Construct and return a clone
