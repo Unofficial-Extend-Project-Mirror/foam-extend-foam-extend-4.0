@@ -77,21 +77,15 @@ Foam::vector Foam::finiteRotation::eulerAngles(const tensor& rotT)
     scalar& pitchAngle = eulerAngles.y();
     scalar& yawAngle = eulerAngles.z();
 
-    // Calculate roll angle
-    rollAngle = atan2(rotT.yz(), rotT.zz());
-
-    // Use mag to avoid negative value due to round-off, HJ, 24/Feb/2016
-    // Bugfix: missing sqr. SS, 18/Apr/2016
-    const scalar c2 = sqrt(sqr(rotT.xx()) + sqr(rotT.xy()));
-
     // Calculate pitch angle
-    pitchAngle = atan2(-rotT.xz(), c2);
+    pitchAngle = asin(rotT.xz());
 
-    const scalar s1 = sin(rollAngle);
-    const scalar c1 = cos(rollAngle);
+    // Calculate roll angle
+    const scalar cosPitch = cos(pitchAngle);
+    rollAngle = asin(-rotT.yz()/cosPitch);
 
     // Calculate yaw angle
-    yawAngle = atan2(s1*rotT.zx() - c1*rotT.yx(), c1*rotT.yy() - s1*rotT.zy());
+    yawAngle = asin(-rotT.xy()/cosPitch);
 
     return eulerAngles;
 }
