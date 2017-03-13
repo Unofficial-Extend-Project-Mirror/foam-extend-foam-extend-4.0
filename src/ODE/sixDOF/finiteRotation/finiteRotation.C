@@ -34,7 +34,7 @@ Author
 #include "objectRegistry.H"
 #include "finiteRotation.H"
 
-// * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
+// * * * * * * * * * * * * * * * Static Functions  * * * * * * * * * * * * * //
 
 Foam::vector Foam::finiteRotation::rotVector(const tensor& rotT)
 {
