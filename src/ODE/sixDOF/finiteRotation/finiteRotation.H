@@ -70,9 +70,9 @@ class finiteRotation
         //- Calculate rotation angle from given rotation tensor
         static scalar rotAngle(const tensor& rotT);
 
-        //- Calculate Euler angles (x-y-z (roll-pitch-yaw) convention) from
-        //  given rotation tensor. Reference: Mike Day, Insomniac Games,
-        //  Extracting Euler Angles from a Rotation Matrix.
+        //- Calculate Euler angles (x-y-z (roll-pitch-yaw) convention by Bryan)
+        //  given the rotation tensor (global-to-local transformation).
+        //  Reference: Nikravesh: Computer-Aided Analysis of Mechanical Systems
         static vector eulerAngles(const tensor& rotT);
 
 
