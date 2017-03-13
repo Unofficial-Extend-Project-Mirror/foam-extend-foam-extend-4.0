@@ -45,10 +45,11 @@ namespace Foam
 Foam::periodicOscillation::periodicOscillation
 (
     const word& name,
-    const dictionary& dict
+    const dictionary& dict,
+    const sixDOFODE& sixDOF
 )
 :
-    translationalConstraint(name, dict),
+    translationalConstraint(name, dict, sixDOF),
     dir_(dict.lookup("direction")),
     a_(readScalar(dict.lookup("motionAmplitude"))),
     period_(readScalar(dict.lookup("period"))),

@@ -44,10 +44,11 @@ namespace Foam
 Foam::linearSpringDamper::linearSpringDamper
 (
     const word& name,
-    const dictionary& dict
+    const dictionary& dict,
+    const sixDOFODE& sixDOF
 )
 :
-    translationalRestraint(name, dict),
+    translationalRestraint(name, dict, sixDOF),
     linSpringCoeffs_(dict.lookup("linearSpring")),
     linDampingCoeffs_(dict.lookup("linearDamping"))
 {}

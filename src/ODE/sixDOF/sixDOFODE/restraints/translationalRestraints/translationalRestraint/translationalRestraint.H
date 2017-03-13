@@ -54,6 +54,8 @@ SourceFiles
 namespace Foam
 {
 
+class sixDOFODE;
+
 /*---------------------------------------------------------------------------*\
                    Class translationalRestraint Declaration
 \*---------------------------------------------------------------------------*/
@@ -65,6 +67,8 @@ class translationalRestraint
         //- Name of the restraint
         word name_;
 
+        //- Reference to underlying sixDOFODE
+        const sixDOFODE& sixDOF_;
 
 public:
 
@@ -81,9 +85,10 @@ public:
             word,
             (
                 const word& name,
-                const dictionary& dict
+                const dictionary& dict,
+                const sixDOFODE& sixDOF
             ),
-            (name, dict)
+            (name, dict, sixDOF)
         );
 
 
@@ -91,16 +96,20 @@ public:
         //  PtrLists of translationalRestraint
         class iNew
         {
+            const sixDOFODE& sixDOF_;
+
         public:
 
-            iNew()
+            iNew(const sixDOFODE& sixDOF)
+            :
+                sixDOF_(sixDOF)
             {}
 
             autoPtr<translationalRestraint> operator()(Istream& is) const
             {
                 word name(is);
                 dictionary dict(is);
-                return translationalRestraint::New(name, dict);
+                return translationalRestraint::New(name, dict, sixDOF_);
             }
         };
 
@@ -111,7 +120,8 @@ public:
         translationalRestraint
         (
             const word& name,
-            const dictionary& dict
+            const dictionary& dict,
+            const sixDOFODE& sixDOF
         );
 
         //- Construct and return a clone
@@ -124,7 +134,8 @@ public:
         static autoPtr<translationalRestraint> New
         (
             const word& name,
-            const dictionary& dict
+            const dictionary& dict,
+            const sixDOFODE& sixDOF
         );
 
 

@@ -24,6 +24,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "translationalConstraint.H"
+#include "sixDOFODE.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
@@ -38,10 +39,12 @@ namespace Foam
 Foam::translationalConstraint::translationalConstraint
 (
     const word& name,
-    const dictionary& dict
+    const dictionary& dict,
+    const sixDOFODE& sixDOF
 )
 :
-    name_(name)
+    name_(name),
+    sixDOF_(sixDOF)
 {}
 
 
@@ -56,7 +59,8 @@ Foam::translationalConstraint::~translationalConstraint()
 Foam::autoPtr<Foam::translationalConstraint> Foam::translationalConstraint::New
 (
     const word& name,
-    const dictionary& dict
+    const dictionary& dict,
+    const sixDOFODE& sixDOF
 )
 {
     const word constraintType(dict.lookup("type"));
@@ -85,7 +89,8 @@ Foam::autoPtr<Foam::translationalConstraint> Foam::translationalConstraint::New
         cstrIter()
         (
             name,
-            dict
+            dict,
+            sixDOF
         )
     );
 }

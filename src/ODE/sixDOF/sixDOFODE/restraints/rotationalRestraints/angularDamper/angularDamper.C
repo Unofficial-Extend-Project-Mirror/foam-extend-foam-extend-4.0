@@ -44,10 +44,11 @@ namespace Foam
 Foam::angularDamper::angularDamper
 (
     const word& name,
-    const dictionary& dict
+    const dictionary& dict,
+    const sixDOFODE& sixDOF
 )
 :
-    rotationalRestraint(name, dict),
+    rotationalRestraint(name, dict, sixDOF),
     angDampingCoeffs_(dict.lookup("angularDamping")),
     inGlobal_(dict.lookup("inGlobalCoordinateSystem"))
 {}

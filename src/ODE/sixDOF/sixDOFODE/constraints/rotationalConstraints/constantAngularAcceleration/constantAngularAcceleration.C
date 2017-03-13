@@ -44,10 +44,11 @@ namespace Foam
 Foam::constantAngularAcceleration::constantAngularAcceleration
 (
     const word& name,
-    const dictionary& dict
+    const dictionary& dict,
+    const sixDOFODE& sixDOF
 )
 :
-    rotationalConstraint(name, dict),
+    rotationalConstraint(name, dict, sixDOF),
     dir_(dict.lookup("constraintDirection")),
     alpha_(readScalar(dict.lookup("angularAcceleration"))),
     inGlobal_(dict.lookup("inGlobalCoordinateSystem"))

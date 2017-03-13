@@ -24,6 +24,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "rotationalRestraint.H"
+#include "sixDOFODE.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
@@ -38,10 +39,12 @@ namespace Foam
 Foam::rotationalRestraint::rotationalRestraint
 (
     const word& name,
-    const dictionary& dict
+    const dictionary& dict,
+    const sixDOFODE& sixDOF
 )
 :
-    name_(name)
+    name_(name),
+    sixDOF_(sixDOF)
 {}
 
 
@@ -56,7 +59,8 @@ Foam::rotationalRestraint::~rotationalRestraint()
 Foam::autoPtr<Foam::rotationalRestraint> Foam::rotationalRestraint::New
 (
     const word& name,
-    const dictionary& dict
+    const dictionary& dict,
+    const sixDOFODE& sixDOF
 )
 {
     const word restraintType(dict.lookup("type"));
@@ -85,7 +89,8 @@ Foam::autoPtr<Foam::rotationalRestraint> Foam::rotationalRestraint::New
         cstrIter()
         (
             name,
-            dict
+            dict,
+            sixDOF
         )
     );
 }

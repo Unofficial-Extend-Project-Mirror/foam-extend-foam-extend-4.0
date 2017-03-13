@@ -72,6 +72,8 @@ SourceFiles
 namespace Foam
 {
 
+class sixDOFODE;
+
 /*---------------------------------------------------------------------------*\
                    Class rotationalConstraint Declaration
 \*---------------------------------------------------------------------------*/
@@ -82,7 +84,9 @@ class rotationalConstraint
 
         //- Name of the constraint
         word name_;
-    
+
+        //- Reference to underlying sixDOFODE
+        const sixDOFODE& sixDOF_;
 
 public:
 
@@ -99,9 +103,10 @@ public:
             word,
             (
                 const word& name,
-                const dictionary& dict
+                const dictionary& dict,
+                const sixDOFODE& sixDOF
             ),
-            (name, dict)
+            (name, dict, sixDOF)
         );
 
 
@@ -109,16 +114,20 @@ public:
         //  PtrLists of rotationalConstraint
         class iNew
         {
+            const sixDOFODE& sixDOF_;
+
         public:
 
-            iNew()
+            iNew(const sixDOFODE& sixDOF)
+            :
+                sixDOF_(sixDOF)
             {}
 
             autoPtr<rotationalConstraint> operator()(Istream& is) const
             {
                 word name(is);
                 dictionary dict(is);
-                return rotationalConstraint::New(name, dict);
+                return rotationalConstraint::New(name, dict, sixDOF_);
             }
         };
 
@@ -129,7 +138,8 @@ public:
         rotationalConstraint
         (
             const word& name,
-            const dictionary& dict
+            const dictionary& dict,
+            const sixDOFODE& sixDOF
         );
 
         //- Construct and return a clone
@@ -142,7 +152,8 @@ public:
         static autoPtr<rotationalConstraint> New
         (
             const word& name,
-            const dictionary& dict
+            const dictionary& dict,
+            const sixDOFODE& sixDOF
         );
 
 

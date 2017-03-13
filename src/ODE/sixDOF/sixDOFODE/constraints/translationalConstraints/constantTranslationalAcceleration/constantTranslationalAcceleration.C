@@ -44,10 +44,11 @@ namespace Foam
 Foam::constantTranslationalAcceleration::constantTranslationalAcceleration
 (
     const word& name,
-    const dictionary& dict
+    const dictionary& dict,
+    const sixDOFODE& sixDOF
 )
 :
-    translationalConstraint(name, dict),
+    translationalConstraint(name, dict, sixDOF),
     dir_(dict.lookup("constraintDirection")),
     a_(readScalar(dict.lookup("translationalAcceleration")))
 {
