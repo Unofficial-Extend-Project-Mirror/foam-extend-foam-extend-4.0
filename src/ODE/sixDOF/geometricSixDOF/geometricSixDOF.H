@@ -32,15 +32,15 @@ Description
 
     Reference (bibtex):
 
-    @article {mullerTerze2016,
-        Author = {M\"{u}ller, A. and Terze, Z.},
-        title = {Geometric methods and formulations in computational
-                 multibody systems},
-        Journal = {Acta Mechanica},
+    @article {terzeEtAl2016,
+        Author = {Terze, Z. and M\"{u}ller, A. and Zlatar, D.},
+        title = {Singularity-free time intergration or rotational quaternions
+        using non-redundant ordinary differential equations},
+        Journal = {Multibody System Dynamics},
         Year = {2016},
-        Volume = {227},
-        Number = {12},
-        Pages = {3327--3350}
+        Volume = {38},
+        Number = {3},
+        Pages = {201--225}
     }
 
     Note on convention: rotation tensor (R, or rotation_) defines
