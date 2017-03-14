@@ -316,6 +316,13 @@ public:
                 const dimensionedVector& externalMoment
             );
 
+            //- Initialize force and moment for the first time step
+            inline void initExternalForceAndMoment
+            (
+                const dimensionedVector& externalForce,
+                const dimensionedVector& externalMoment
+            );
+
 
         // Access to motion constraints
 
