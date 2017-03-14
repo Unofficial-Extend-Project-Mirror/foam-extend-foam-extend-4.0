@@ -87,7 +87,7 @@ class sixDOFODE
             dimensionedDiagTensor momentOfInertia_;
 
 
-        // Equilibrium position and spring/damping coefficients
+        // Equilibrium position
 
             //- Spring equilibrium position for translation
             dimensionedVector Xequilibrium_;
