@@ -114,6 +114,21 @@ void Foam::sixDOFODE::setExternalForceAndMoment
 }
 
 
+void Foam::sixDOFODE::initExternalForceAndMoment
+(
+    const dimensionedVector& externalForce,
+    const dimensionedVector& externalMoment
+)
+{
+    // Initialise force and moment only for the first time step
+    if (curTimeIndex_ == -1)
+    {
+        force_ = externalForce;
+        moment_ = externalMoment;
+    }
+}
+
+
 const Foam::PtrList<Foam::translationalConstraint>&
 Foam::sixDOFODE::translationalConstraints() const
 {
