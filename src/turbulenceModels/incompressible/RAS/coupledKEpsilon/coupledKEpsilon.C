@@ -253,9 +253,9 @@ void coupledKEpsilon::correct()
           + fvm::div(phi_, epsilon_)
           + fvm::SuSp(-fvc::div(phi_), epsilon_)
           - fvm::laplacian(DepsilonEff(), epsilon_)
-          + fvm::Sp(2*C2_*epsilon_/k_, epsilon_)
          ==
-            2*C1_*Cmu_*magSqr(symm(fvc::grad(U_)))*k_
+            C1_*G*epsilon_/k_
+          - fvm::Sp(2*C2_*epsilon_/k_, epsilon_)
           + C2_*sqr(epsilon_)/k_
         );
 
@@ -268,8 +268,7 @@ void coupledKEpsilon::correct()
         volScalarField coupling
         (
             "coupling",
-            -2*C1_*Cmu_*magSqr(symm(fvc::grad(U_)))
-           - C2_*sqr(epsilon_/k_)
+            -C2_*sqr(epsilon_/k_)
         );
         scalarField& couplingIn = coupling.internalField();
 
@@ -295,8 +294,10 @@ void coupledKEpsilon::correct()
           + fvm::div(phi_, k_)
           + fvm::SuSp(-fvc::div(phi_), k_)
           - fvm::laplacian(DkEff(), k_)
-          + fvm::Sp(Cmu_*k_/(nut_ + nutSmall), k_)
-          - G
+         ==
+            G
+          + Cmu_*sqr(k_)/(nut_+nutSmall)
+          - fvm::Sp(2*Cmu_*k_/(nut_+nutSmall), k_)
         );
 
         kEqn.relax();
