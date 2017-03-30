@@ -288,7 +288,7 @@ public:
             // Communication support
 
                 //- Return communicator used for parallel communication
-                label comm() const
+                virtual int comm() const
                 {
                     return polyMesh::comm();
                 }
