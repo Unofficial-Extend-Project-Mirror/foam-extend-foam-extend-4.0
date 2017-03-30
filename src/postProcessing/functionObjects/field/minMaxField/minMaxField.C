@@ -92,8 +92,12 @@ bool Foam::minMaxField::execute()
             fieldName_
         );
 
-        Info<< "Field " << fieldName_ << " min = " << Foam::min(f).value()
-            << " max = " << Foam::max(f).value() << endl;
+        Info<< "Field " << fieldName_
+            << " min = " << Foam::min(f).value()
+            << " (" << gMin(f.internalField()) << ")"
+            << " max = " << max(f).value()
+            << " (" << gMax(f.internalField()) << ")"
+            << endl;
 
         return true;
     }
@@ -103,9 +107,12 @@ bool Foam::minMaxField::execute()
 
         volScalarField magF = mag(f);
 
-        Info<< "Field " << fieldName_ << " magnitude min = "
-            << Foam::min(magF).value()
-            << " max = " << Foam::max(magF).value() << endl;
+        Info<< "Field " << fieldName_
+             << " magnitude min = " << Foam::min(magF).value()
+            << " (" << gMin(magF.internalField()) << ")"
+            << " max = " << max(magF).value()
+            << " (" << gMax(magF.internalField()) << ")"
+            << endl;
 
         return true;
     }
