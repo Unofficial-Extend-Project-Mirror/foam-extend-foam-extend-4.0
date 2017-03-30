@@ -299,7 +299,15 @@ void Foam::BlockMatrixClustering<Type>::calcClustering()
                     // Get column index, upper triangle
                     colI = upperAddr[rowCoeffI];
 
-                    curWeight = normUpper[rowCoeffI]/normDiag[curEqn];
+                    // curWeight = normUpper[rowCoeffI]/
+                    //     // normDiag[curEqn];
+                    //     max(normDiag[curEqn], normDiag[colI]);
+
+                    curWeight = Foam::min
+                    (
+                        normUpper[rowCoeffI]/normDiag[curEqn],
+                        normLower[rowCoeffI]/normDiag[colI]
+                    );
 
                     if (agglomIndex_[colI] == -1)
                     {
@@ -348,8 +356,15 @@ void Foam::BlockMatrixClustering<Type>::calcClustering()
                     // Get column index, lower triangle
                     colI = lowerAddr[losortAddr[rowCoeffI]];
 
-                    curWeight = normLower[losortAddr[rowCoeffI]]/
-                        normDiag[curEqn];
+                    // curWeight = normLower[losortAddr[rowCoeffI]]/
+                    //     // normDiag[curEqn];
+                    //     max(normDiag[curEqn], normDiag[colI]);
+
+                    curWeight = Foam::min
+                    (
+                        normLower[losortAddr[rowCoeffI]]/normDiag[curEqn],
+                        normUpper[losortAddr[rowCoeffI]]/normDiag[colI]
+                    );
 
                     if (agglomIndex_[colI] == -1)
                     {
@@ -428,12 +443,36 @@ void Foam::BlockMatrixClustering<Type>::calcClustering()
             (
                 groupPassI > 1
              || indexGrouped == -1
-             || sizeOfGroups[agglomIndex_[nextGrouped]] > maxGroupSize_
+             || sizeOfGroups[agglomIndex_[nextGrouped]] >= maxGroupSize_
             )
             {
-                // There is no group to put this equation into
-                sizeOfGroups[agglomIndex_[rowI]]++;
-                nCoarseEqns_++;
+                // If this is a solo cell and a group is available
+                // force it into the group irrespective of size
+                if
+                (
+                    sizeOfGroups[agglomIndex_[rowI]] == 0
+                 && indexGrouped != -1
+
+                )
+                {
+                    // Group exists, but it's too big.  Add it anyway
+                    agglomIndex_[rowI] = agglomIndex_[nextGrouped];
+                    sizeOfGroups[agglomIndex_[nextGrouped]]++;
+                }
+                else if (nSolo_ > 0)
+                {
+                    // There is no group, but there is a solo group.
+                    // Add it there
+                    agglomIndex_[rowI] = 0;
+                    sizeOfGroups[0]++;
+                    nSolo_ ++;
+                }
+                else 
+                {
+                    // No group and no solo group.  Make its own group
+                    sizeOfGroups[agglomIndex_[rowI]]++;
+                    nCoarseEqns_++;
+                }
             }
             else
             {
