@@ -102,10 +102,9 @@ public:
         }
 
 
-    // Destructor
-
-        virtual ~fvMeshLduAddressing()
-        {}
+    //- Destructor
+    virtual ~fvMeshLduAddressing()
+    {}
 
 
     // Member Functions
