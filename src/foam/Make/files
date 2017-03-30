@@ -238,6 +238,10 @@ $(LUscalarMatrix)/LUscalarMatrix.C
 $(LUscalarMatrix)/procLduMatrix.C
 $(LUscalarMatrix)/procLduInterface.C
 
+crMatrix = matrices/crMatrix
+$(crMatrix)/crAddressing.C
+$(crMatrix)/crMatrix.C
+
 lduMatrix = matrices/lduMatrix
 $(lduMatrix)/lduMatrix/lduMatrix.C
 $(lduMatrix)/lduMatrix/lduMatrixOperations.C
@@ -697,6 +701,8 @@ $(BlockAMGInterfaceFields)/GGIBlockAMGInterfaceField/GGIBlockAMGInterfaceFields.
 BlockMatrixCoarsening = $(BlockAMG)/BlockMatrixCoarsening
 $(BlockMatrixCoarsening)/BlockMatrixCoarsening/blockMatrixCoarsenings.C
 $(BlockMatrixCoarsening)/BlockMatrixAgglomeration/blockMatrixAgglomerations.C
+$(BlockMatrixCoarsening)/BlockMatrixClustering/blockMatrixClusterings.C
+$(BlockMatrixCoarsening)/BlockSelectiveAMG/blockSelectiveAMGs.C
 
 BlockLduPrecons = matrices/blockLduMatrix/BlockLduPrecons
 $(BlockLduPrecons)/BlockLduPrecon/blockLduPrecons.C
