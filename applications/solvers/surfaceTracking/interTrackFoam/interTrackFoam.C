@@ -56,9 +56,13 @@ int main(int argc, char *argv[])
 
     Info << "\nStarting time loop\n" << endl;
 
-    for (runTime++; !runTime.end(); runTime++)
+    while (runTime.run())
     {
-        Info << "Time = " << runTime.value() << endl << endl;
+#       include "readTimeControls.H"
+#       include "CourantNo.H"
+#       include "setSurfaceStabilityDeltaT.H"
+
+#       include "readPISOControls.H"
 
         interface.moveMeshPointsForOldFreeSurfDisplacement();
 
@@ -116,6 +120,8 @@ int main(int argc, char *argv[])
                     {
                         phi -= pEqn.flux();
                     }
+                    
+                    p.relax();
                 }
 
 #               include "continuityErrs.H"
