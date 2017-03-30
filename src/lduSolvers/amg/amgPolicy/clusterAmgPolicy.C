@@ -264,7 +264,7 @@ void Foam::clusterAmgPolicy::calcChild()
             for
             (
                 groupPassI = 1;
-                groupPassI < minClusterSize_;
+                groupPassI < minGroupSize_;
                 groupPassI++
             )
             {
@@ -419,7 +419,7 @@ void Foam::clusterAmgPolicy::calcChild()
             (
                 groupPassI > 1
              || indexGrouped == -1
-             || sizeOfGroups[child_[nextGrouped]] > maxClusterSize_
+             || sizeOfGroups[child_[nextGrouped]] > maxGroupSize_
             )
             {
                 // There is no group to put this equation into
@@ -501,8 +501,8 @@ Foam::clusterAmgPolicy::clusterAmgPolicy
 :
     amgPolicy(groupSize, minCoarseEqns),
     matrix_(matrix),
-    minClusterSize_(groupSize),
-    maxClusterSize_(2*groupSize),
+    minGroupSize_(groupSize),
+    maxGroupSize_(2*groupSize),
     child_(matrix_.lduAddr().size()),
     nSolo_(0),
     nCoarseEqns_(0),

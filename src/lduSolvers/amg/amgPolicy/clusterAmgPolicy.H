@@ -61,10 +61,10 @@ class clusterAmgPolicy
         const lduMatrix& matrix_;
 
         //- Min cluster size
-        const label minClusterSize_;
+        const label minGroupSize_;
 
         //- Max cluster size
-        const label maxClusterSize_;
+        const label maxGroupSize_;
 
         //- Child array: for each fine equation give coarse cluster index
         labelField child_;

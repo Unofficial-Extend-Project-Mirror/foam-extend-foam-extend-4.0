@@ -273,7 +273,7 @@ void Foam::BlockMatrixClustering<Type>::calcClustering()
             for
             (
                 groupPassI = 1;
-                groupPassI < minClusterSize_;
+                groupPassI < minGroupSize_;
                 groupPassI++
             )
             {
@@ -428,7 +428,7 @@ void Foam::BlockMatrixClustering<Type>::calcClustering()
             (
                 groupPassI > 1
              || indexGrouped == -1
-             || sizeOfGroups[agglomIndex_[nextGrouped]] > maxClusterSize_
+             || sizeOfGroups[agglomIndex_[nextGrouped]] > maxGroupSize_
             )
             {
                 // There is no group to put this equation into
@@ -765,8 +765,8 @@ Foam::BlockMatrixClustering<Type>::BlockMatrixClustering
 :
     BlockMatrixCoarsening<Type>(matrix, dict, groupSize, minCoarseEqns),
     matrix_(matrix),
-    minClusterSize_(readLabel(dict.lookup("minClusterSize"))),
-    maxClusterSize_(readLabel(dict.lookup("maxClusterSize"))),
+    minGroupSize_(readLabel(dict.lookup("minGroupSize"))),
+    maxGroupSize_(readLabel(dict.lookup("maxGroupSize"))),
     normPtr_(BlockCoeffNorm<Type>::New(dict)),
     agglomIndex_(matrix_.lduAddr().size()),
     groupSize_(groupSize),

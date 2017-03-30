@@ -66,17 +66,16 @@ class BlockMatrixClustering
         //- Reference to matrix
         const BlockLduMatrix<Type>& matrix_;
 
-        //- Min cluster size
-        const label minClusterSize_;
+        //- Min group size
+        const label minGroupSize_;
 
-        //- Max cluster size
-        const label maxClusterSize_;
+        //- Max group size
+        const label maxGroupSize_;
 
         //- Reference to a templated norm calculator
         autoPtr<BlockCoeffNorm<Type> > normPtr_;
 
-        //- Child array: for each fine equation give clustering cluster
-        //  index
+        //- Child array: for each fine equation give a clustering index
         labelField agglomIndex_;
 
         //- Group size
