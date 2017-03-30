@@ -135,6 +135,7 @@ class freeSurface
         //- Interface smoothing at the begining of time step
         Switch smoothing_;
 
+
     // Demand-driven data
 
         //- Patch to patch interpolation object which deals with
@@ -229,6 +230,7 @@ class freeSurface
             const vector& axis
         ) const;
 
+    
 public:
 
     // Declare name of the class and it's debug switch
@@ -247,9 +249,8 @@ public:
     );
 
 
-    // Destructor
-
-    ~freeSurface();
+    //- Destructor
+    virtual ~freeSurface();
 
 
     // Member Functions
