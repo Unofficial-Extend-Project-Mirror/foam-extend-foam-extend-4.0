@@ -175,10 +175,9 @@ public:
         }
 
 
-    // Destructor
-
-        virtual ~meshObjectBase()
-        {}
+    //- Destructor
+    virtual ~meshObjectBase()
+    {}
 
 
     // Member Functions
