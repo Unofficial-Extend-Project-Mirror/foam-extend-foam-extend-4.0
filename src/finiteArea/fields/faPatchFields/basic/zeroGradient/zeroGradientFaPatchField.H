@@ -42,7 +42,7 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                      Class zeroGradientFaPatch Declaration
+                 Class zeroGradientFaPatchField Declaration
 \*---------------------------------------------------------------------------*/
 
 template<class Type>
@@ -117,6 +117,11 @@ public:
                 new zeroGradientFaPatchField<Type>(*this, iF)
             );
         }
+
+
+    //- Destructor
+    virtual ~zeroGradientFaPatchField<Type>()
+    {}
 
 
     // Member functions
