@@ -304,8 +304,7 @@ public:
             const word& patchFieldType=PatchField<Type>::calculatedType()
         );
 
-        //- Constructor given IOobject, mesh, dimensioned<Type>
-        //  and patch types.
+        //- Construct given IOobject, mesh, dimensioned<Type> and patch types
         GeometricField
         (
             const IOobject&,
@@ -314,9 +313,7 @@ public:
             const wordList& patchFieldTypes
         );
 
-        //- Constructor from components
-
-#if ( !defined(SWIG) || (SWIG_VERSION > 0x010340) )
+        //- Construct from components
         GeometricField
         (
             const IOobject&,
@@ -325,7 +322,6 @@ public:
             const Field<Type>&,
             const PtrList<PatchField<Type> >&
         );
-#endif
 
         //- Construct and read given IOobject
         GeometricField
