@@ -52,6 +52,9 @@ class isentropicTotalPressureFvPatchScalarField
 {
     // Private data
 
+        //- Name of the flux field
+        word phiName_;
+
         //- Name of the velocity field
         word UName_;
 
