@@ -296,14 +296,6 @@ public:
             //  alpha is read from controlDict
             void relax();
 
-            //- Construct and return the solver
-            //  Solver controls read from Istream
-            autoPtr<faSolver> solver(const dictionary&);
-
-            //- Construct and return the solver
-            //  Solver controls read from faSolution
-            autoPtr<faSolver> solver();
-
             //- Solve returning the solution statistics.
             //  Solver controls read Istream
             lduSolverPerformance solve(const dictionary&);

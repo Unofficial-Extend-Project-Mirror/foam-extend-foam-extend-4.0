@@ -154,12 +154,6 @@ lduSolverPerformance faMatrix<Type>::solve(const dictionary& solverControls)
 
 
 template<class Type>
-autoPtr<typename faMatrix<Type>::faSolver> faMatrix<Type>::solver()
-{
-    return solver(psi_.mesh().solutionDict().solverDict(psi_.name()));
-}
-
-template<class Type>
 lduSolverPerformance faMatrix<Type>::faSolver::solve()
 {
     return solvei
