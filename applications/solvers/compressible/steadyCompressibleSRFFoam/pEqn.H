@@ -20,23 +20,13 @@
 
         p.storePrevIter();
 
-        volScalarField divPhid
-        (
-            "divPhid",
-            fvc::div(phid)
-        );
-
         while (pimple.correctNonOrthogonal())
         {
             fvScalarMatrix pEqn
             (
-                fvm::ddt(psis, p)
-              + fvm::div(phid, p)
-                // Convective flux relaxation terms
-              + fvm::SuSp(-divPhid, p)
-              + divPhid*p
-              + fvc::div(phid2)
+                fvm::div(phid, p)
               - fvm::laplacian(rho*rUrelA, p)
+              + fvc::div(phid2)
             );
 
             pEqn.solve();
