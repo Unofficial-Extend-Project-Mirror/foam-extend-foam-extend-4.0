@@ -50,18 +50,18 @@ Foam::scalar Foam::BlockCoeffComponentNorm<Type>::normalize
     const Foam::BlockCoeff<Type>& a
 )
 {
-    return mag(a.component(cmpt_));
+    return a.component(cmpt_);
 }
 
 
 template<class Type>
-void Foam::BlockCoeffComponentNorm<Type>::coeffMag
+void Foam::BlockCoeffComponentNorm<Type>::normalize
 (
-    const Foam::CoeffField<Type>& a,
-    Foam::Field<scalar>& b
+    Foam::Field<scalar>& b,
+    const Foam::CoeffField<Type>& a
 )
 {
-    b = mag(a.component(cmpt_));
+    b = a.component(cmpt_);
 }
 
 

@@ -22,54 +22,51 @@ License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    BlockMatrixAgglomeration
+    BlockMatrixClustering
 
 Description
-    Specialisation of the BlockMatrixAgglomeration for scalars.
+    Specialisation of the BlockMatrixClustering for tensors.
 
 Author
     Klas Jareteg, 2013-01-31
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef scalarBlockMatrixAgglomeration_H
-#define scalarBlockMatrixAgglomeration_H
+#ifndef tensorBlockMatrixClustering_H
+#define tensorBlockMatrixClustering_H
 
 #include "blockMatrixCoarsenings.H"
-#include "blockMatrixAgglomerations.H"
-#include "BlockMatrixAgglomeration.H"
-#include "BlockMatrixCoarsening.H"
+#include "blockMatrixClusterings.H"
+#include "BlockMatrixClustering.H"
 #include "runTimeSelectionTables.H"
-#include "scalarBlockLduMatrix.H"
-#include "scalarBlockConstraint.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 
-// * * * * * * Forward declaration of template friend fuctions * * * * * * * //
-
-
 /*---------------------------------------------------------------------------*\
-                 Class BlockMatrixAgglomeration Declaration
+                   Class BlockMatrixClustering Declaration
 \*---------------------------------------------------------------------------*/
 
 // Disable restrict matrix: no square type
 template<>
-inline autoPtr<BlockAMGLevel<scalar> >
-BlockMatrixAgglomeration<scalar>::restrictMatrix() const
+inline autoPtr<BlockAMGLevel<tensor> >
+BlockMatrixClustering<tensor>::restrictMatrix
+() const
 {
     FatalErrorIn
     (
-        "autoPtr<BlockAMGLevel<scalar> > "
-        "BlockMatrixAgglomeration<Type>::restrictMatrix() const"
-    )   << "Function not implemented for Type=scalar. " << endl
+        "autoPtr<BlockAMGLevel<tensor> > "
+        "BlockMatrixClustering<Type>::"
+        "restrictMatrix() const"
+    )   << "Function not implemented for Type=tensor. " << endl
         << abort(FatalError);
 
     // Dummy return to keep compiler happy
-    return autoPtr<BlockAMGLevel<scalar> >(NULL);
+    return autoPtr<BlockAMGLevel<tensor> >(NULL);
 }
+
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

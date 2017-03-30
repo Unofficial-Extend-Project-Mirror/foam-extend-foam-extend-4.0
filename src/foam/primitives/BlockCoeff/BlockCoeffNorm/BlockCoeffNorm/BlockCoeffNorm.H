@@ -86,22 +86,15 @@ public:
             autoPtr,
             BlockCoeffNorm,
             dictionary,
-            (
-                const dictionary& dict
-            ),
-            (
-                dict
-            )
+            (const dictionary& dict),
+            (dict)
         );
 
 
     // Constructors
 
         //- Construct from dictionary
-        BlockCoeffNorm
-        (
-            const dictionary& dict
-        );
+        BlockCoeffNorm(const dictionary& dict);
 
 
     // Selectors
@@ -113,10 +106,9 @@ public:
         );
 
 
-    // Destructor
-
-        virtual ~BlockCoeffNorm()
-        {}
+    //- Destructor
+    virtual ~BlockCoeffNorm()
+    {}
 
 
     // Member functions
@@ -127,10 +119,10 @@ public:
             const BlockCoeff<Type>& a
         ) = 0;
 
-        virtual void coeffMag
+        virtual void normalize
         (
-            const CoeffField<Type>& a,
-            Field<scalar>& b
+            Field<scalar>& b,
+            const CoeffField<Type>& a
         ) = 0;
 };
 

@@ -49,8 +49,7 @@ namespace Foam
                    Class BlockMatrixAgglomeration Declaration
 \*---------------------------------------------------------------------------*/
 
-//- Restrict matrix
-
+// Disable restrict matrix: no square type
 template<>
 inline autoPtr<BlockAMGLevel<tensor> >
 BlockMatrixAgglomeration<tensor>::restrictMatrix

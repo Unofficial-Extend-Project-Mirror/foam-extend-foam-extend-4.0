@@ -189,10 +189,9 @@ public:
         );
 
 
-    // Destructor
-
-        virtual ~BlockLduSolver()
-        {}
+    //- Destructor
+    virtual ~BlockLduSolver()
+    {}
 
 
     // Member functions

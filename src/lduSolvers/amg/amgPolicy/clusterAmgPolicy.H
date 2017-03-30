@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     3.2
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -22,21 +22,21 @@ License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    pamgPolicy
+    clusterAmgPolicy
 
 Description
-    Pairwise agglomerative AMG policy.  Legacy implementation
+    Clustering AMG policy
 
 Author
     Hrvoje Jasak, Wikki Ltd.  All rights reserved
 
 SourceFiles
-    pamgPolicy.C
+    clusterAmgPolicy.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef pamgPolicy_H
-#define pamgPolicy_H
+#ifndef clusterAmgPolicy_H
+#define clusterAmgPolicy_H
 
 #include "amgPolicy.H"
 #include "lduMatrix.H"
@@ -48,10 +48,10 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class pamgPolicy Declaration
+                           Class clusterAmgPolicy Declaration
 \*---------------------------------------------------------------------------*/
 
-class pamgPolicy
+class clusterAmgPolicy
 :
     public amgPolicy
 {
@@ -59,6 +59,12 @@ class pamgPolicy
 
         //- Reference to matrix
         const lduMatrix& matrix_;
+
+        //- Min cluster size
+        const label minClusterSize_;
+
+        //- Max cluster size
+        const label maxClusterSize_;
 
         //- Child array: for each fine equation give coarse cluster index
         labelField child_;
@@ -76,16 +82,19 @@ class pamgPolicy
     // Private Member Functions
 
         //- Disallow default bitwise copy construct
-        pamgPolicy(const pamgPolicy&);
+        clusterAmgPolicy(const clusterAmgPolicy&);
 
         //- Disallow default bitwise assignment
-        void operator=(const pamgPolicy&);
+        void operator=(const clusterAmgPolicy&);
 
         //- Calculate child
         void calcChild();
 
 
     // Private Static Data
+
+        //- Weighting factor
+        static const debug::tolerancesSwitch weightFactor_;
 
         //- Diagonal scaling factor
         static const debug::tolerancesSwitch diagFactor_;
@@ -94,13 +103,13 @@ class pamgPolicy
 public:
 
         //- Runtime type information
-        TypeName("PAMG");
+        TypeName("cluster");
 
 
     // Constructors
 
         //- Construct from matrix and group size
-        pamgPolicy
+        clusterAmgPolicy
         (
             const lduMatrix& matrix,
             const label groupSize,
@@ -109,7 +118,7 @@ public:
 
 
     //- Destructor
-    virtual ~pamgPolicy();
+    virtual ~clusterAmgPolicy();
 
 
     // Member Functions

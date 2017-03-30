@@ -50,6 +50,7 @@ License
 #include "blockAMGPrecons.H"
 #include "blockMatrixCoarsenings.H"
 #include "blockMatrixAgglomerations.H"
+#include "blockMatrixClusterings.H"
 #include "blockCoeffNorms.H"
 #include "blockCoeffTwoNorms.H"
 #include "blockCoeffMaxNorms.H"
@@ -146,6 +147,9 @@ defineTemplateRunTimeSelectionTable(block##Type##MatrixCoarsening, matrix);   \
                                                                               \
 typedef BlockMatrixAgglomeration<type > block##Type##MatrixAgglomeration;     \
 makeBlockMatrixCoarsening(block##Type##MatrixCoarsening, block##Type##MatrixAgglomeration); \
+                                                                              \
+typedef BlockMatrixClustering<type > block##Type##MatrixClustering;           \
+makeBlockMatrixCoarsening(block##Type##MatrixCoarsening, block##Type##MatrixClustering); \
                                                                               \
 typedef BlockCoeffNorm<type > block##Type##CoeffNorm;                         \
 defineNamedTemplateTypeNameAndDebug(block##Type##CoeffNorm, 0);               \

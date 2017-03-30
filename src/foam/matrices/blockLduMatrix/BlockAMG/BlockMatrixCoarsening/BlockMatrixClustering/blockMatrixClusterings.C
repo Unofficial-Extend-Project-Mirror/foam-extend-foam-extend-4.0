@@ -21,66 +21,23 @@ License
     You should have received a copy of the GNU General Public License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
-Class
-    BlockMatrixAgglomeration
-
-Description
-    Specialisation of the BlockMatrixAgglomeration for scalars.
-
-Author
-    Klas Jareteg, 2013-01-31
-
 \*---------------------------------------------------------------------------*/
 
-#ifndef scalarBlockMatrixAgglomeration_H
-#define scalarBlockMatrixAgglomeration_H
-
+#include "blockMatrixClusterings.H"
 #include "blockMatrixCoarsenings.H"
-#include "blockMatrixAgglomerations.H"
-#include "BlockMatrixAgglomeration.H"
-#include "BlockMatrixCoarsening.H"
-#include "runTimeSelectionTables.H"
-#include "scalarBlockLduMatrix.H"
-#include "scalarBlockConstraint.H"
+#include "coarseBlockAMGLevel.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 
-// * * * * * * Forward declaration of template friend fuctions * * * * * * * //
+// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-
-/*---------------------------------------------------------------------------*\
-                 Class BlockMatrixAgglomeration Declaration
-\*---------------------------------------------------------------------------*/
-
-// Disable restrict matrix: no square type
-template<>
-inline autoPtr<BlockAMGLevel<scalar> >
-BlockMatrixAgglomeration<scalar>::restrictMatrix() const
-{
-    FatalErrorIn
-    (
-        "autoPtr<BlockAMGLevel<scalar> > "
-        "BlockMatrixAgglomeration<Type>::restrictMatrix() const"
-    )   << "Function not implemented for Type=scalar. " << endl
-        << abort(FatalError);
-
-    // Dummy return to keep compiler happy
-    return autoPtr<BlockAMGLevel<scalar> >(NULL);
-}
-
+makeBlockMatrixCoarsenings(blockMatrixClustering);
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-#endif
 
 // ************************************************************************* //

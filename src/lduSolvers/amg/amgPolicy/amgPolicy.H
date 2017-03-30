@@ -123,10 +123,9 @@ public:
         {}
 
 
-    // Destructor
-
-        virtual ~amgPolicy()
-        {}
+    //- Destructor
+    virtual ~amgPolicy()
+    {}
 
 
     // Member Functions

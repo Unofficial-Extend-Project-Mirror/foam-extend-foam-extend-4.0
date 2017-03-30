@@ -22,22 +22,22 @@ License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    BlockMatrixAgglomeration
+    BlockMatrixClustering
 
 Description
-    Specialisation of the BlockMatrixAgglomeration for scalars.
+    Specialisation of the BlockMatrixClustering for scalars.
 
 Author
     Klas Jareteg, 2013-01-31
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef scalarBlockMatrixAgglomeration_H
-#define scalarBlockMatrixAgglomeration_H
+#ifndef scalarBlockMatrixClustering_H
+#define scalarBlockMatrixClustering_H
 
 #include "blockMatrixCoarsenings.H"
-#include "blockMatrixAgglomerations.H"
-#include "BlockMatrixAgglomeration.H"
+#include "blockMatrixClusterings.H"
+#include "BlockMatrixClustering.H"
 #include "BlockMatrixCoarsening.H"
 #include "runTimeSelectionTables.H"
 #include "scalarBlockLduMatrix.H"
@@ -52,18 +52,18 @@ namespace Foam
 
 
 /*---------------------------------------------------------------------------*\
-                 Class BlockMatrixAgglomeration Declaration
+                 Class BlockMatrixClustering Declaration
 \*---------------------------------------------------------------------------*/
 
 // Disable restrict matrix: no square type
 template<>
 inline autoPtr<BlockAMGLevel<scalar> >
-BlockMatrixAgglomeration<scalar>::restrictMatrix() const
+BlockMatrixClustering<scalar>::restrictMatrix() const
 {
     FatalErrorIn
     (
         "autoPtr<BlockAMGLevel<scalar> > "
-        "BlockMatrixAgglomeration<Type>::restrictMatrix() const"
+        "BlockMatrixClustering<Type>::restrictMatrix() const"
     )   << "Function not implemented for Type=scalar. " << endl
         << abort(FatalError);
 

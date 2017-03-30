@@ -49,7 +49,7 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                        Class coarseBlockAMGLevel Declaration
+                    Class coarseBlockAMGLevel Declaration
 \*---------------------------------------------------------------------------*/
 
 template<class Type>

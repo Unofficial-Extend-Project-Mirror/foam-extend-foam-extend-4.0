@@ -22,17 +22,17 @@ License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    BlockMatrixAgglomeration
+    BlockMatrixClustering
 
 Description
-    Agglomerative block matrix AMG corsening
+    Block matrix AMG coarsening by Jasak clustering algorithm
 
 Author
-    Klas Jareteg, 2012-12-13
+    Hrvoje Jasak, Wikki Ltd.  All rights reserved
 
 \*---------------------------------------------------------------------------*/
 
-#include "BlockMatrixAgglomeration.H"
+#include "BlockMatrixClustering.H"
 #include "boolList.H"
 #include "tolerancesSwitch.H"
 #include "coeffFields.H"
@@ -43,7 +43,7 @@ Author
 
 template<class Type>
 const Foam::debug::tolerancesSwitch
-Foam::BlockMatrixAgglomeration<Type>::weightFactor_
+Foam::BlockMatrixClustering<Type>::weightFactor_
 (
     "aamgWeightFactor",
     0.65
@@ -52,7 +52,7 @@ Foam::BlockMatrixAgglomeration<Type>::weightFactor_
 
 template<class Type>
 const Foam::debug::tolerancesSwitch
-Foam::BlockMatrixAgglomeration<Type>::diagFactor_
+Foam::BlockMatrixClustering<Type>::diagFactor_
 (
     "aamgDiagFactor",
     1e-8
@@ -62,124 +62,9 @@ Foam::BlockMatrixAgglomeration<Type>::diagFactor_
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
 template<class Type>
-void Foam::BlockMatrixAgglomeration<Type>::calcAgglomeration()
+void Foam::BlockMatrixClustering<Type>::calcClustering()
 {
-    // Algorithm:
-    // 1) Create temporary equation addressing using a double-pass algorithm.
-    //    to create the offset table.
-    // 2) Loop through all equations and for each equation find the best fit
-    //    neighbour.  If all neighbours are grouped, add equation to best group
-
-    // Create row-based addressing
-
-    const label nRows = matrix_.lduAddr().size();
-
-    const unallocLabelList& upperAddr = matrix_.lduAddr().upperAddr();
-    const unallocLabelList& lowerAddr = matrix_.lduAddr().lowerAddr();
-
-    // For each equation get number of coefficients in a row
-    labelList cols(upperAddr.size() + lowerAddr.size());
-    labelList cIndex(upperAddr.size() + lowerAddr.size());
-    labelList rowOffset(nRows + 1, 0);
-
-    // Count the number of coefficients
-    forAll (upperAddr, coeffI)
-    {
-        rowOffset[upperAddr[coeffI]]++;
-    }
-
-    forAll (lowerAddr, coeffI)
-    {
-        rowOffset[lowerAddr[coeffI]]++;
-    }
-
-    label nCoeffs = 0;
-
-    forAll (rowOffset, eqnI)
-    {
-        nCoeffs += rowOffset[eqnI];
-    }
-
-    rowOffset[nRows] = nCoeffs;
-
-    for (label eqnI = nRows - 1; eqnI >= 0; --eqnI)
-    {
-        rowOffset[eqnI] = rowOffset[eqnI  + 1] - rowOffset[eqnI];
-    }
-
-    rowOffset[0] = 0;
-
-    // Create column and coefficient index array
-    {
-        // Use agglomIndex to count number of entries per row.
-        // Reset the list for counting
-        labelList& nPerRow = agglomIndex_;
-        nPerRow = 0;
-
-        forAll (upperAddr, coeffI)
-        {
-            cols[rowOffset[upperAddr[coeffI]] + nPerRow[upperAddr[coeffI]]] =
-                lowerAddr[coeffI];
-
-            cIndex[rowOffset[upperAddr[coeffI]] + nPerRow[upperAddr[coeffI]]] =
-                coeffI;
-
-            nPerRow[upperAddr[coeffI]]++;
-        }
-
-        forAll (lowerAddr, coeffI)
-        {
-            cols[rowOffset[lowerAddr[coeffI]] + nPerRow[lowerAddr[coeffI]]] =
-                upperAddr[coeffI];
-
-            cIndex[rowOffset[lowerAddr[coeffI]] + nPerRow[lowerAddr[coeffI]]] =
-                coeffI;
-
-            nPerRow[lowerAddr[coeffI]]++;
-        }
-
-        // Reset agglomeration index array
-        agglomIndex_ = -1;
-    }
-
-
-    // Calculate agglomeration
-
-    // Get matrix coefficients
-    const CoeffField<Type>& diag = matrix_.diag();
-
-    // Coefficient magnitudes are pre-calculated
-    scalarField magDiag(diag.size());
-    scalarField magOffDiag(upperAddr.size());
-
-    // Calculate norm of block coefficient.  Note: the norm
-    // may be signed, ie. it will take the sign of the coefficient
-    normPtr_->normalize(magDiag, diag);
-
-    // Take magnitude of the norm
-    mag(magDiag, magDiag);
-
-    if (matrix_.asymmetric())
-    {
-        scalarField magUpper(upperAddr.size());
-        scalarField magLower(upperAddr.size());
-
-        // Take max of norm magnitude in upper and lower triangle
-        normPtr_->normalize(magUpper, matrix_.upper());
-        mag(magUpper, magUpper);
-
-        normPtr_->normalize(magLower, matrix_.lower());
-        mag(magLower, magLower);
-
-        Foam::max(magOffDiag, magUpper, magLower);
-    }
-    else if (matrix_.symmetric())
-    {
-        // Take max of norm magnitude
-        normPtr_->normalize(magOffDiag, matrix_.upper());
-        mag(magOffDiag, magOffDiag);
-    }
-    else
+    if (matrix_.diagonal())
     {
         // Diag only matrix.  Reset and return
         agglomIndex_ = 0;
@@ -188,33 +73,149 @@ void Foam::BlockMatrixAgglomeration<Type>::calcAgglomeration()
         return;
     }
 
+    // Algorithm:
+    // 1) Calculate appropriate connection strength for symmetric and asymmetric
+    //    matrix
+    // 2) Collect solo (disconnected) cells and remove them from agglomeration
+    //    by placing them into cluster zero (solo group)
+    // 3) Loop through all equations and for each equation find the best fit
+    //    neighbour.  If all neighbours are grouped, add equation
+    //    to best group
+
+    // Initialise child array
+    agglomIndex_ = -1;
+
+    const label nRows = matrix_.lduAddr().size();
+
+    // Get matrix addressing
+    const unallocLabelList& lowerAddr = matrix_.lduAddr().lowerAddr();
+    const unallocLabelList& upperAddr = matrix_.lduAddr().upperAddr();
+    const unallocLabelList& losortAddr = matrix_.lduAddr().losortAddr();
+
+    const unallocLabelList& ownerStartAddr =
+        matrix_.lduAddr().ownerStartAddr();
+    const unallocLabelList& losortStartAddr =
+        matrix_.lduAddr().losortStartAddr();
+
+
+    // Calculate clustering
+
+    // Get matrix coefficients and norms  Note: the norm
+    // may be signed, ie. it will take the sign of the coefficient
+
+    const CoeffField<Type>& diag = matrix_.diag();
+    scalarField normDiag(diag.size());
+    normPtr_->normalize(normDiag, diag);
+
+    scalarField normUpper(upperAddr.size(), 0);
+    scalarField normLower(upperAddr.size(), 0);
+
+    // Note:
+    // Matrix properties are no longer assumed, eg. the diag and off-diag
+    // sign is checked
+    // HJ, 29/Mar/2017
+
+    // Note: negative connections are eliminated in max(...) below
+    // HJ, 30/Mar/2017
+
+    if (matrix_.thereIsUpper())
+    {
+        normPtr_->normalize(normUpper, matrix_.upper());
+
+        // Owner: upper triangle
+        forAll (lowerAddr, coeffI)
+        {
+            // Sign of strong positive upper is opposite of the sign of
+            // its diagonal coefficient
+            normUpper[coeffI] = Foam::max
+            (
+                -1*sign(normDiag[lowerAddr[coeffI]])*normUpper[coeffI],
+                0
+            );
+        }
+    }
+
+    if (matrix_.thereIsLower())
+    {
+        normPtr_->normalize(normLower, matrix_.lower());
+
+        // Neighbour: lower triangle
+        forAll (lowerAddr, coeffI)
+        {
+            // Sign of strong positive upper is opposite of the sign of
+            // its diagonal coefficient
+            normLower[coeffI] = Foam::max
+            (
+                -1*sign(normDiag[upperAddr[coeffI]])*normLower[coeffI],
+                0
+            );
+        }
+    }
+    else
+    {
+        normLower = normUpper;
+    }
+
+    // Take magnitude of the diagonal norm after the normalisation
+    // of upper and lower is complete
+    // Note: upper and lower are already normalised
+    normDiag = mag(normDiag);
+
     labelList sizeOfGroups(nRows, 0);
 
     nCoarseEqns_ = 0;
 
     // Gather disconnected and weakly connected equations into cluster zero
     // Weak connection is assumed to be the one where the off-diagonal
-    // coefficient is smaller than diagFactor_*diag
+    // coefficient is smaller than diagFactor_()*diag
     {
         // Algorithm
         // Mark all cells to belong to zero cluster
         // Go through all upper and lower coefficients and for the ones
         // larger than threshold mark the equations out of cluster zero
 
-        scalarField magScaledDiag = diagFactor_()*magDiag;
+        scalarField scaledNormDiag = diagFactor_()*normDiag;
 
-        boolList zeroCluster(diag.size(), true);
+        boolList zeroCluster(normDiag.size(), true);
 
-        forAll (magOffDiag, coeffI)
+        if (matrix_.symmetric())
         {
-            if (magOffDiag[coeffI] > magScaledDiag[upperAddr[coeffI]])
+            // Owner: upper triangle
+            forAll (lowerAddr, coeffI)
             {
-                zeroCluster[upperAddr[coeffI]] = false;
+                if (normUpper[coeffI] > scaledNormDiag[lowerAddr[coeffI]])
+                {
+                    zeroCluster[lowerAddr[coeffI]] = false;
+                }
             }
 
-            if (magOffDiag[coeffI] > magScaledDiag[lowerAddr[coeffI]])
+            // Neighbour: lower triangle with symm coefficients
+            forAll (upperAddr, coeffI)
             {
-                zeroCluster[lowerAddr[coeffI]] = false;
+                if (normUpper[coeffI] > scaledNormDiag[upperAddr[coeffI]])
+                {
+                    zeroCluster[upperAddr[coeffI]] = false;
+                }
+            }
+        }
+        else if (matrix_.asymmetric())
+        {
+            // Owner: upper triangle
+            forAll (lowerAddr, coeffI)
+            {
+                if (normUpper[coeffI] > scaledNormDiag[lowerAddr[coeffI]])
+                {
+                    zeroCluster[lowerAddr[coeffI]] = false;
+                }
+            }
+
+            // Neighbour: lower triangle with lower coeffs
+            forAll (upperAddr, coeffI)
+            {
+                if (normLower[coeffI] > scaledNormDiag[upperAddr[coeffI]])
+                {
+                    zeroCluster[upperAddr[coeffI]] = false;
+                }
             }
         }
 
@@ -239,27 +240,42 @@ void Foam::BlockMatrixAgglomeration<Type>::calcAgglomeration()
         }
     }
 
-    // Go through the off-diagonal and create clusters, marking the child array
-    label indexUngrouped, indexGrouped;
-    label colI, curEqn, nextEqn, groupPassI;
 
-    scalar magRowDiag, magColDiag;
-    scalar weight, weightUngrouped, weightGrouped;
+    // Loop through cells
+    // - if the cell is not already grouped, open a new group (seed)
+    // - find stroungest grouped and ungrouped connection:
+    //   - grouped connection is towards an already grouped cell
+    //   - ungrouped connection is towards an ungrouped cell
+    // - decide if a grouped or ungrouped connection is better
 
-    for (label eqnI = 0; eqnI < nRows; eqnI++)
+    label curEqn, indexUngrouped, indexGrouped, colI, groupPassI,
+        nextUngrouped, nextGrouped;
+
+    scalar curWeight, weightUngrouped, weightGrouped;
+
+    for (label rowI = 0; rowI < nRows; rowI++)
     {
-        if (agglomIndex_[eqnI] == -1)
+        if (agglomIndex_[rowI] == -1)
         {
-            curEqn = eqnI;
+            // Found new ungrouped equation
+            curEqn = rowI;
 
+            // Reset grouped and upgrouped index
             indexUngrouped = -1;
             indexGrouped = -1;
 
+            // Make next group (coarse equation) and search for neighbours
             agglomIndex_[curEqn] = nCoarseEqns_;
 
-            magRowDiag = magDiag[curEqn];
-
-            for (groupPassI = 1; groupPassI < groupSize_; groupPassI++)
+            // Work on the group until the min group size is satisfied
+            // As each new element of the group is found, group search starts
+            // from this element until group cluster size is satisfied
+            for
+            (
+                groupPassI = 1;
+                groupPassI < minClusterSize_;
+                groupPassI++
+            )
             {
                 weightUngrouped = 0;
                 weightGrouped = 0;
@@ -267,38 +283,119 @@ void Foam::BlockMatrixAgglomeration<Type>::calcAgglomeration()
                 indexUngrouped = -1;
                 indexGrouped = -1;
 
+                nextUngrouped = -1;
+                nextGrouped = -1;
+
+                // Visit all neighbour equations
+
+                // Visit upper triangle coefficients from the equation
                 for
                 (
-                    label rowCoeffI = rowOffset[curEqn];
-                    rowCoeffI < rowOffset[curEqn + 1];
+                    label rowCoeffI = ownerStartAddr[curEqn];
+                    rowCoeffI < ownerStartAddr[curEqn + 1];
                     rowCoeffI++
                 )
                 {
-                    colI = cols[rowCoeffI];
+                    // Get column index, upper triangle
+                    colI = upperAddr[rowCoeffI];
 
-                    magColDiag = magDiag[colI];
-
-                    weight = magOffDiag[cIndex[rowCoeffI]]/
-                        max(magRowDiag, magColDiag);
+                    curWeight = normUpper[rowCoeffI]/normDiag[curEqn];
 
                     if (agglomIndex_[colI] == -1)
                     {
-                        if (indexUngrouped == -1 || weight > weightUngrouped)
+                        // Found ungrouped neighbour
+                        if
+                        (
+                            indexUngrouped == -1
+                         || curWeight > weightUngrouped
+                        )
                         {
+                            // Found or updated ungrouped neighbour
                             indexUngrouped = rowCoeffI;
-                            weightUngrouped = weight;
+                            weightUngrouped = curWeight;
+
+                            // Record possible next equation for search
+                            nextUngrouped = colI;
                         }
                     }
                     else if (agglomIndex_[curEqn] != agglomIndex_[colI])
                     {
-                        if (indexGrouped == -1 || weight > weightGrouped)
+                        // Check for neighbour in solo group
+                        if (nSolo_ == 0 || agglomIndex_[colI] != 0)
                         {
-                            indexGrouped = rowCoeffI;
-                            weightGrouped = weight;
+                            // Found neighbour belonging to other group
+                            if (indexGrouped == -1 || curWeight > weightGrouped)
+                            {
+                                // Found or updated grouped neighbour
+                                indexGrouped = rowCoeffI;
+                                weightGrouped = curWeight;
+
+                                // Record possible next equation for search
+                                nextGrouped = colI;
+                            }
                         }
                     }
                 }
 
+                // Visit lower triangle coefficients from the equation
+                for
+                (
+                    label rowCoeffI = losortStartAddr[curEqn];
+                    rowCoeffI < losortStartAddr[curEqn + 1];
+                    rowCoeffI++
+                )
+                {
+                    // Get column index, lower triangle
+                    colI = lowerAddr[losortAddr[rowCoeffI]];
+
+                    curWeight = normLower[losortAddr[rowCoeffI]]/
+                        normDiag[curEqn];
+
+                    if (agglomIndex_[colI] == -1)
+                    {
+                        // Found first or better ungrouped neighbour
+                        if
+                        (
+                            indexUngrouped == -1
+                         || curWeight > weightUngrouped
+                        )
+                        {
+                            // Found or updated ungrouped neighbour
+                            indexUngrouped = rowCoeffI;
+                            weightUngrouped = curWeight;
+
+                            // Record possible next equation for search
+                            nextUngrouped = colI;
+                        }
+                    }
+                    else if (agglomIndex_[curEqn] != agglomIndex_[colI])
+                    {
+                        // Check for neighbour in solo group
+                        if (nSolo_ == 0 || agglomIndex_[colI] != 0)
+                        {
+                            // Found first of better neighbour belonging to
+                            // other group
+                            if
+                            (
+                                indexGrouped == -1
+                             || curWeight > weightGrouped
+                            )
+                            {
+                                // Found or updated grouped neighbour
+                                indexGrouped = rowCoeffI;
+                                weightGrouped = curWeight;
+
+                                // Record possible next equation for search
+                                nextGrouped = colI;
+                            }
+                        }
+                    }
+                }
+
+                // Decide what to do with current equation
+
+                // If ungrouped candidate exists and it is stronger
+                // than best weighted grouped candidate, use it
                 if
                 (
                     indexUngrouped != -1
@@ -311,37 +408,38 @@ void Foam::BlockMatrixAgglomeration<Type>::calcAgglomeration()
                     // Found new element of group.  Add it and use as
                     // start of next search
 
-                    nextEqn = cols[indexUngrouped];
-
-                    agglomIndex_[nextEqn] = agglomIndex_[curEqn];
+                    agglomIndex_[nextUngrouped] = agglomIndex_[curEqn];
                     sizeOfGroups[agglomIndex_[curEqn]]++;
 
-                    curEqn = nextEqn;
+                    // Search from nextEqn
+                    curEqn = nextUngrouped;
                 }
                 else
                 {
-                    // Group full or cannot be extended
+                    // Group full or cannot be extended with new
+                    // ungrouped candidates
                     break;
                 }
             }
 
+
+            // Finished group passes
             if
             (
                 groupPassI > 1
              || indexGrouped == -1
-             || (
-                    sizeOfGroups[agglomIndex_[cols[indexGrouped]]]
-                  > (groupSize_ + 2)
-                )
+             || sizeOfGroups[agglomIndex_[nextGrouped]] > maxClusterSize_
             )
             {
-                sizeOfGroups[agglomIndex_[eqnI]]++;
+                // There is no group to put this equation into
+                sizeOfGroups[agglomIndex_[rowI]]++;
                 nCoarseEqns_++;
             }
             else
             {
-                agglomIndex_[eqnI] = agglomIndex_[cols[indexGrouped]];
-                sizeOfGroups[agglomIndex_[cols[indexGrouped]]]++;
+                // Dump current cell into the best group available
+                agglomIndex_[rowI] = agglomIndex_[nextGrouped];
+                sizeOfGroups[agglomIndex_[nextGrouped]]++;
             }
         }
     }
@@ -406,7 +504,7 @@ void Foam::BlockMatrixAgglomeration<Type>::calcAgglomeration()
 
 
 template<class Type>
-void Foam::BlockMatrixAgglomeration<Type>::restrictDiag
+void Foam::BlockMatrixClustering<Type>::restrictDiag
 (
     const CoeffField<Type>& Coeff,
     CoeffField<Type>& coarseCoeff
@@ -484,7 +582,7 @@ void Foam::BlockMatrixAgglomeration<Type>::restrictDiag
     {
         FatalErrorIn
         (
-            "void  BlockMatrixAgglomeration<Type>::restrictDiag() const"
+            "void  BlockMatrixClustering<Type>::restrictDiag() const"
         )   << "Problem in coeff type morphing"
             << abort(FatalError);
     }
@@ -493,7 +591,7 @@ void Foam::BlockMatrixAgglomeration<Type>::restrictDiag
 
 template<class Type>
 template<class DiagType, class ULType>
-void Foam::BlockMatrixAgglomeration<Type>::agglomerateCoeffs
+void Foam::BlockMatrixClustering<Type>::agglomerateCoeffs
 (
     const labelList& coeffRestrictAddr,
     Field<DiagType>& activeCoarseDiag,
@@ -542,7 +640,7 @@ void Foam::BlockMatrixAgglomeration<Type>::agglomerateCoeffs
 
 template<class Type>
 template<class DiagType, class ULType>
-void Foam::BlockMatrixAgglomeration<Type>::agglomerateCoeffs
+void Foam::BlockMatrixClustering<Type>::agglomerateCoeffs
 (
     const labelList& coeffRestrictAddr,
     Field<DiagType>& activeCoarseDiag,
@@ -590,7 +688,7 @@ void Foam::BlockMatrixAgglomeration<Type>::agglomerateCoeffs
 
 
 template<class Type>
-void Foam::BlockMatrixAgglomeration<Type>::restrictDiagDecoupled
+void Foam::BlockMatrixClustering<Type>::restrictDiagDecoupled
 (
     const CoeffField<Type>& Coeff,
     CoeffField<Type>& coarseCoeff
@@ -646,7 +744,7 @@ void Foam::BlockMatrixAgglomeration<Type>::restrictDiagDecoupled
     {
         FatalErrorIn
         (
-            "void BlockMatrixAgglomeration<Type>::restrictDiagDecoupled()"
+            "void BlockMatrixClustering<Type>::restrictDiagDecoupled()"
             " const"
         )   << "Problem in coeff type morphing"
             << abort(FatalError);
@@ -657,7 +755,7 @@ void Foam::BlockMatrixAgglomeration<Type>::restrictDiagDecoupled
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 template<class Type>
-Foam::BlockMatrixAgglomeration<Type>::BlockMatrixAgglomeration
+Foam::BlockMatrixClustering<Type>::BlockMatrixClustering
 (
     const BlockLduMatrix<Type>& matrix,
     const dictionary& dict,
@@ -667,6 +765,8 @@ Foam::BlockMatrixAgglomeration<Type>::BlockMatrixAgglomeration
 :
     BlockMatrixCoarsening<Type>(matrix, dict, groupSize, minCoarseEqns),
     matrix_(matrix),
+    minClusterSize_(readLabel(dict.lookup("minClusterSize"))),
+    maxClusterSize_(readLabel(dict.lookup("maxClusterSize"))),
     normPtr_(BlockCoeffNorm<Type>::New(dict)),
     agglomIndex_(matrix_.lduAddr().size()),
     groupSize_(groupSize),
@@ -675,14 +775,14 @@ Foam::BlockMatrixAgglomeration<Type>::BlockMatrixAgglomeration
     coarsen_(false),
     lTime_()
 {
-    calcAgglomeration();
+    calcClustering();
 }
 
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
 template<class Type>
-Foam::BlockMatrixAgglomeration<Type>::~BlockMatrixAgglomeration()
+Foam::BlockMatrixClustering<Type>::~BlockMatrixClustering()
 {}
 
 
@@ -690,14 +790,14 @@ Foam::BlockMatrixAgglomeration<Type>::~BlockMatrixAgglomeration()
 
 template<class Type>
 Foam::autoPtr<Foam::BlockAMGLevel<Type> >
-Foam::BlockMatrixAgglomeration<Type>::restrictMatrix() const
+Foam::BlockMatrixClustering<Type>::restrictMatrix() const
 {
     if (!coarsen_)
     {
         FatalErrorIn
         (
             "autoPtr<BlockAMGLevel<Type> > "
-            "BlockMatrixAgglomeration<Type>::restrictMatrix() const"
+            "BlockMatrixClustering<Type>::restrictMatrix() const"
         )   << "Requesting coarse matrix when it cannot be created"
             << abort(FatalError);
     }
@@ -727,7 +827,7 @@ Foam::BlockMatrixAgglomeration<Type>::restrictMatrix() const
         FatalErrorIn
         (
             "autoPtr<BlockLduMatrix<Type> >"
-            "BlockMatrixAgglomeration<Type>::restrictMatrix() const"
+            "BlockMatrixClustering<Type>::restrictMatrix() const"
         )   << "agglomIndex array does not correspond to fine level. " << endl
             << " Size: " << agglomIndex_.size()
             << " number of equations: " << matrix_.lduAddr().size()
@@ -1031,12 +1131,12 @@ Foam::BlockMatrixAgglomeration<Type>::restrictMatrix() const
                 ).ptr()
             );
 
-            // Since the type of agglomeration is now templated, agglomeration
+            // Since the type of clustering is now templated, clustering
             // of block coefficients must be done by a FIELD (not interface)
             // via a new set of virtual functions
             // HJ, 16/Mar/2016
 
-            // Note: in the scalar AMG, agglomeration is done by the interface
+            // Note: in the scalar AMG, clustering is done by the interface
             // (always scalar) but in the block matrix it is done by a
             // templated block interface field
             // HJ, 16/Mar/2016
@@ -1167,7 +1267,7 @@ Foam::BlockMatrixAgglomeration<Type>::restrictMatrix() const
             FatalErrorIn
             (
                 "autoPtr<BlockAMGLevel<Type> >"
-                "BlockMatrixAgglomeration<Type>::restrictMatrix() const"
+                "BlockMatrixClustering<Type>::restrictMatrix() const"
             )   << "Matrix coeff type morphing error, symmetric matrix"
                 << abort(FatalError);
         }
@@ -1260,7 +1360,7 @@ Foam::BlockMatrixAgglomeration<Type>::restrictMatrix() const
             FatalErrorIn
             (
                 "autoPtr<BlockAMGLevel<Type> >"
-                "BlockMatrixAgglomeration<Type>::restrictMatrix() const"
+                "BlockMatrixClustering<Type>::restrictMatrix() const"
             )   << "Matrix coeff type morphing error, asymmetric matrix"
                 << abort(FatalError);
         }
@@ -1283,7 +1383,7 @@ Foam::BlockMatrixAgglomeration<Type>::restrictMatrix() const
 
 
 template<class Type>
-void Foam::BlockMatrixAgglomeration<Type>::restrictResidual
+void Foam::BlockMatrixClustering<Type>::restrictResidual
 (
     const Field<Type>& res,
     Field<Type>& coarseRes
@@ -1299,7 +1399,7 @@ void Foam::BlockMatrixAgglomeration<Type>::restrictResidual
 
 
 template<class Type>
-void Foam::BlockMatrixAgglomeration<Type>::prolongateCorrection
+void Foam::BlockMatrixClustering<Type>::prolongateCorrection
 (
     Field<Type>& x,
     const Field<Type>& coarseX

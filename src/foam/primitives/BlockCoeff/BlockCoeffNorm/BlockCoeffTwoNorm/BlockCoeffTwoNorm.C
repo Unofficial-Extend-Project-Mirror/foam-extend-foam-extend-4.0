@@ -51,21 +51,25 @@ Foam::scalar Foam::BlockCoeffTwoNorm<Type>::normalize
 {
     if (a.activeType() == Foam::BlockCoeff<Type>::SCALAR)
     {
+        // Note: for two-norm, use mag
         return mag(a.asScalar());
     }
     else if (a.activeType() == Foam::BlockCoeff<Type>::LINEAR)
     {
+        // Note: for two-norm, use mag
         return mag(a.asLinear());
     }
     else if (a.activeType() == Foam::BlockCoeff<Type>::SQUARE)
     {
+        // Note: for two-norm, use mag
         return mag(a.asSquare());
     }
     else
     {
         FatalErrorIn
         (
-            "scalar BlockCoeffTwoNorm<Type>(const BlockCoeff<Type>& a)"
+            "scalar BlockCoeffTwoNorm<Type>::normalize"
+            "(const BlockCoeff<Type>& a)"
         )   << "Unknown type" << abort(FatalError);
 
         return 0;
@@ -77,22 +81,25 @@ Foam::scalar Foam::BlockCoeffTwoNorm<Type>::normalize
 
 
 template<class Type>
-void Foam::BlockCoeffTwoNorm<Type>::coeffMag
+void Foam::BlockCoeffTwoNorm<Type>::normalize
 (
-    const Foam::CoeffField<Type>& a,
-    Foam::Field<scalar>& b
+    Field<scalar>& b,
+    const CoeffField<Type>& a
 )
 {
     if (a.activeType() == Foam::BlockCoeff<Type>::SCALAR)
     {
+        // Note: for two-norm, use mag
         b = mag(a.asScalar());
     }
     else if (a.activeType() == Foam::BlockCoeff<Type>::LINEAR)
     {
+        // Note: for two-norm, use mag
         b = mag(a.asLinear());
     }
     else if (a.activeType() == Foam::BlockCoeff<Type>::SQUARE)
     {
+        // Note: for two-norm, use mag
         b = mag(a.asSquare());
     }
     else

@@ -22,17 +22,17 @@ License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    pamgPolicy
+    clusterAmgPolicy
 
 Description
-    Pairwise agglomerative AMG policy.  Legacy implementation
+    Block matrix AMG coarsening by Jasak clustering algorithm
 
 Author
     Hrvoje Jasak, Wikki Ltd.  All rights reserved
 
 \*---------------------------------------------------------------------------*/
 
-#include "pamgPolicy.H"
+#include "clusterAmgPolicy.H"
 #include "amgMatrix.H"
 #include "boolList.H"
 #include "addToRunTimeSelectionTable.H"
@@ -42,24 +42,30 @@ Author
 
 namespace Foam
 {
-    defineTypeNameAndDebug(pamgPolicy, 0);
+    defineTypeNameAndDebug(clusterAmgPolicy, 0);
 
-    addToRunTimeSelectionTable(amgPolicy, pamgPolicy, matrix);
+    addToRunTimeSelectionTable(amgPolicy, clusterAmgPolicy, matrix);
 
 } // End namespace Foam
 
 
-const Foam::debug::tolerancesSwitch
-Foam::pamgPolicy::diagFactor_
+const Foam::debug::tolerancesSwitch Foam::clusterAmgPolicy::weightFactor_
 (
-    "pamgDiagFactor",
+    "aamgWeightFactor",
+    0.65
+);
+
+
+const Foam::debug::tolerancesSwitch Foam::clusterAmgPolicy::diagFactor_
+(
+    "aamgDiagFactor",
     1e-8
 );
 
 
-// * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
+// * * * * * * * * * * * * * Private Member Functions * * * * * * * * * * * //
 
-void Foam::pamgPolicy::calcChild()
+void Foam::clusterAmgPolicy::calcChild()
 {
     if (matrix_.diagonal())
     {
@@ -71,121 +77,136 @@ void Foam::pamgPolicy::calcChild()
     }
 
     // Algorithm:
-    // 1) Create temporary equation addressing using a double-pass algorithm.
-    //    to create the offset table.
-    // 2) Loop through all equations and for each equation find the best fit
-    //    neighbour.  If all neighbours are grouped, add equation to best group
+    // 1) Calculate appropriate connection strength for symmetric and asymmetric
+    //    matrix
+    // 2) Collect solo (disconnected) cells and remove them from agglomeration
+    //    by placing them into cluster zero (solo group)
+    // 3) Loop through all equations and for each equation find the best fit
+    //    neighbour.  If all neighbours are grouped, add equation
+    //    to best group
 
-    // Get addressing
-    const label nEqns = matrix_.lduAddr().size();
+    // Initialise child array
+    child_ = -1;
 
-    const unallocLabelList& upperAddr = matrix_.lduAddr().upperAddr();
+    const label nRows = matrix_.lduAddr().size();
+
+    // Get matrix addressing
     const unallocLabelList& lowerAddr = matrix_.lduAddr().lowerAddr();
+    const unallocLabelList& upperAddr = matrix_.lduAddr().upperAddr();
+    const unallocLabelList& losortAddr = matrix_.lduAddr().losortAddr();
 
-    // Get off-diagonal matrix coefficients
-    const scalarField& upper = matrix_.upper();
+    const unallocLabelList& ownerStartAddr =
+        matrix_.lduAddr().ownerStartAddr();
+    const unallocLabelList& losortStartAddr =
+        matrix_.lduAddr().losortStartAddr();
 
-    // For each equation calculate coeffs
-    labelList cols(upperAddr.size() + lowerAddr.size());
-    labelList rowOffsets(nEqns + 1);
-
-    // Memory management
-    {
-        labelList nNbrs(nEqns, 0);
-
-        forAll (upperAddr, coeffI)
-        {
-            nNbrs[upperAddr[coeffI]]++;
-        }
-
-        forAll (lowerAddr, coeffI)
-        {
-            nNbrs[lowerAddr[coeffI]]++;
-        }
-
-        rowOffsets[0] = 0;
-
-        forAll (nNbrs, eqnI)
-        {
-            rowOffsets[eqnI + 1] = rowOffsets[eqnI] + nNbrs[eqnI];
-        }
-
-        // Reset the list to use as counter
-        nNbrs = 0;
-
-        forAll (upperAddr, coeffI)
-        {
-            cols
-            [
-                rowOffsets[upperAddr[coeffI]] + nNbrs[upperAddr[coeffI]]
-            ] = coeffI;
-
-            nNbrs[upperAddr[coeffI]]++;
-        }
-
-        forAll (lowerAddr, coeffI)
-        {
-            cols
-            [
-                rowOffsets[lowerAddr[coeffI]] + nNbrs[lowerAddr[coeffI]]
-            ] = coeffI;
-
-            nNbrs[lowerAddr[coeffI]]++;
-        }
-    }
-
-    // Reset child array
-    child_.setSize(nEqns, -1);
 
     // Calculate agglomeration
 
-    // Get matrix coefficients
+    // Get magnitudes of matrix coefficients
+
     const scalarField& diag = matrix_.diag();
+    const scalarField magDiag = mag(matrix_.diag());
 
-    scalarField magOffDiag;
+    // Calculate magnitude of strong positive connections
+    scalarField magUpper(upperAddr.size(), 0);
+    scalarField magLower(upperAddr.size(), 0);
 
-    if (matrix_.asymmetric())
+    // Note:
+    // Matrix properties are no longer assumed, eg. the diag and off-diag
+    // sign is checked
+    // HJ, 29/Mar/2017
+
+    // Note: negative connections are eliminated in max(...) below
+    // HJ, 30/Mar/2017
+
+    if (matrix_.hasUpper())
     {
-        magOffDiag = Foam::max(mag(matrix_.upper()), mag(matrix_.lower()));
+        const scalarField& upper = matrix_.upper();
+
+        // Owner: upper triangle
+        forAll (lowerAddr, coeffI)
+        {
+            // Sign of strong positive upper is opposite of the sign of
+            // its diagonal coefficient
+            magUpper[coeffI] =
+                Foam::max(-1*sign(diag[lowerAddr[coeffI]])*upper[coeffI], 0);
+        }
     }
-    else if (matrix_.symmetric())
+
+    if (matrix_.hasLower())
     {
-        magOffDiag = mag(matrix_.upper());
+        const scalarField& lower = matrix_.lower();
+
+        // Neighbour: lower triangle
+        forAll (lowerAddr, coeffI)
+        {
+            // Sign of strong positive upper is opposite of the sign of
+            // its diagonal coefficient
+            magLower[coeffI] =
+                Foam::max(-1*sign(diag[upperAddr[coeffI]])*lower[coeffI], 0);
+        }
     }
     else
     {
-        // Diag only matrix.  Reset and return
-        child_ = 0;
-        nCoarseEqns_ = 1;
-
-        return;
+        magLower = magUpper;
     }
+
+    labelList sizeOfGroups(nRows, 0);
 
     nCoarseEqns_ = 0;
 
     // Gather disconnected and weakly connected equations into cluster zero
     // Weak connection is assumed to be the one where the off-diagonal
-    // coefficient is smaller than diagFactor_*diag
+    // coefficient is smaller than diagFactor_()*diag
     {
         // Algorithm
         // Mark all cells to belong to zero cluster
         // Go through all upper and lower coefficients and for the ones
         // larger than threshold mark the equations out of cluster zero
 
-        scalarField magScaledDiag = diagFactor_()*mag(diag);
+        scalarField magScaledDiag = diagFactor_()*magDiag;
 
-        boolList zeroCluster(diag.size(), true);
+        boolList zeroCluster(magDiag.size(), true);
 
-        forAll (magOffDiag, coeffI)
+        if (matrix_.symmetric())
         {
-            if (magOffDiag[coeffI] > magScaledDiag[upperAddr[coeffI]])
+            // Owner: upper triangle
+            forAll (lowerAddr, coeffI)
             {
-                zeroCluster[upperAddr[coeffI]] = false;
+                if (magUpper[coeffI] > magScaledDiag[lowerAddr[coeffI]])
+                {
+                    zeroCluster[lowerAddr[coeffI]] = false;
+                }
             }
 
-            if (magOffDiag[coeffI] > magScaledDiag[lowerAddr[coeffI]])
+            // Neighbour: lower triangle with symm coefficients
+            forAll (upperAddr, coeffI)
             {
-                zeroCluster[lowerAddr[coeffI]] = false;
+                if (magUpper[coeffI] > magScaledDiag[upperAddr[coeffI]])
+                {
+                    zeroCluster[upperAddr[coeffI]] = false;
+                }
+            }
+        }
+        else if (matrix_.asymmetric())
+        {
+            // Owner: upper triangle
+            forAll (lowerAddr, coeffI)
+            {
+                if (magUpper[coeffI] > magScaledDiag[lowerAddr[coeffI]])
+                {
+                    zeroCluster[lowerAddr[coeffI]] = false;
+                }
+            }
+
+            // Neighbour: lower triangle with lower coeffs
+            forAll (upperAddr, coeffI)
+            {
+                if (magLower[coeffI] > magScaledDiag[upperAddr[coeffI]])
+                {
+                    zeroCluster[upperAddr[coeffI]] = false;
+                }
             }
         }
 
@@ -204,117 +225,258 @@ void Foam::pamgPolicy::calcChild()
         if (nSolo_ > 0)
         {
             // Found solo equations
+            sizeOfGroups[nCoarseEqns_] = nSolo_;
+
             nCoarseEqns_++;
         }
     }
 
-    // Go through the off-diagonal and create clusters, marking the child array
-    for (label eqnI = 0; eqnI < nEqns; eqnI++)
-    {
-        if (child_[eqnI] < 0)
-        {
-            label matchCoeffNo = -1;
-            scalar maxCoeff = -GREAT;
 
-            // Check row to find ungrouped neighbour with largest coefficient
+    // Loop through cells
+    // - if the cell is not already grouped, open a new group (seed)
+    // - find stroungest grouped and ungrouped connection:
+    //   - grouped connection is towards an already grouped cell
+    //   - ungrouped connection is towards an ungrouped cell
+    // - decide if a grouped or ungrouped connection is better
+
+    label curEqn, indexUngrouped, indexGrouped, colI, groupPassI,
+        nextUngrouped, nextGrouped;
+
+    scalar curWeight, weightUngrouped, weightGrouped;
+
+    for (label rowI = 0; rowI < nRows; rowI++)
+    {
+        if (child_[rowI] == -1)
+        {
+            // Found new ungrouped equation
+            curEqn = rowI;
+
+            // Reset grouped and upgrouped index
+            indexUngrouped = -1;
+            indexGrouped = -1;
+
+            // Make next group (coarse equation) and search for neighbours
+            child_[curEqn] = nCoarseEqns_;
+
+            // Work on the group until the min group size is satisfied
+            // As each new element of the group is found, group search starts
+            // from this element until group cluster size is satisfied
             for
             (
-                label rowCoeffI = rowOffsets[eqnI];
-                rowCoeffI < rowOffsets[eqnI + 1];
-                rowCoeffI++
+                groupPassI = 1;
+                groupPassI < minClusterSize_;
+                groupPassI++
             )
             {
-                label coeffI = cols[rowCoeffI];
+                weightUngrouped = 0;
+                weightGrouped = 0;
 
-                // I don't know whether the current equation is owner
-                //  or neighbour.  Therefore I'll check both sides
-                if
+                indexUngrouped = -1;
+                indexGrouped = -1;
+
+                nextUngrouped = -1;
+                nextGrouped = -1;
+
+                // Visit all neighbour equations
+
+                // Visit upper triangle coefficients from the equation
+                for
                 (
-                    child_[upperAddr[coeffI]] < 0
-                 && child_[lowerAddr[coeffI]] < 0
-                 && mag(upper[coeffI]) > maxCoeff
+                    label rowCoeffI = ownerStartAddr[curEqn];
+                    rowCoeffI < ownerStartAddr[curEqn + 1];
+                    rowCoeffI++
                 )
                 {
-                    // Match found. Pick up all the necessary data
-                    matchCoeffNo = coeffI;
-                    maxCoeff = mag(upper[coeffI]);
+                    // Get column index, upper triangle
+                    colI = upperAddr[rowCoeffI];
+
+                    curWeight = magUpper[rowCoeffI]/magDiag[curEqn];
+
+                    if (child_[colI] == -1)
+                    {
+                        // Found ungrouped neighbour
+                        if
+                        (
+                            indexUngrouped == -1
+                         || curWeight > weightUngrouped
+                        )
+                        {
+                            // Found or updated ungrouped neighbour
+                            indexUngrouped = rowCoeffI;
+                            weightUngrouped = curWeight;
+
+                            // Record possible next equation for search
+                            nextUngrouped = colI;
+                        }
+                    }
+                    else if (child_[curEqn] != child_[colI])
+                    {
+                        // Check for neighbour in solo group
+                        if (nSolo_ == 0 || child_[colI] != 0)
+                        {
+                            // Found neighbour belonging to other group
+                            if (indexGrouped == -1 || curWeight > weightGrouped)
+                            {
+                                // Found or updated grouped neighbour
+                                indexGrouped = rowCoeffI;
+                                weightGrouped = curWeight;
+
+                                // Record possible next equation for search
+                                nextGrouped = colI;
+                            }
+                        }
+                    }
+                }
+
+                // Visit lower triangle coefficients from the equation
+                for
+                (
+                    label rowCoeffI = losortStartAddr[curEqn];
+                    rowCoeffI < losortStartAddr[curEqn + 1];
+                    rowCoeffI++
+                )
+                {
+                    // Get column index, lower triangle
+                    colI = lowerAddr[losortAddr[rowCoeffI]];
+
+                    curWeight = magLower[losortAddr[rowCoeffI]]/
+                        magDiag[curEqn];
+
+                    if (child_[colI] == -1)
+                    {
+                        // Found first or better ungrouped neighbour
+                        if
+                        (
+                            indexUngrouped == -1
+                         || curWeight > weightUngrouped
+                        )
+                        {
+                            // Found or updated ungrouped neighbour
+                            indexUngrouped = rowCoeffI;
+                            weightUngrouped = curWeight;
+
+                            // Record possible next equation for search
+                            nextUngrouped = colI;
+                        }
+                    }
+                    else if (child_[curEqn] != child_[colI])
+                    {
+                        // Check for neighbour in solo group
+                        if (nSolo_ == 0 || child_[colI] != 0)
+                        {
+                            // Found first of better neighbour belonging to
+                            // other group
+                            if
+                            (
+                                indexGrouped == -1
+                             || curWeight > weightGrouped
+                            )
+                            {
+                                // Found or updated grouped neighbour
+                                indexGrouped = rowCoeffI;
+                                weightGrouped = curWeight;
+
+                                // Record possible next equation for search
+                                nextGrouped = colI;
+                            }
+                        }
+                    }
+                }
+
+                // Decide what to do with current equation
+
+                // If ungrouped candidate exists and it is stronger
+                // than best weighted grouped candidate, use it
+                if
+                (
+                    indexUngrouped != -1
+                 && (
+                        indexGrouped == -1
+                     || weightUngrouped >= weightFactor_()*weightGrouped
+                    )
+                )
+                {
+                    // Found new element of group.  Add it and use as
+                    // start of next search
+
+                    child_[nextUngrouped] = child_[curEqn];
+                    sizeOfGroups[child_[curEqn]]++;
+
+                    // Search from nextEqn
+                    curEqn = nextUngrouped;
+                }
+                else
+                {
+                    // Group full or cannot be extended with new
+                    // ungrouped candidates
+                    break;
                 }
             }
 
-            if (matchCoeffNo >= 0)
+
+            // Finished group passes
+            if
+            (
+                groupPassI > 1
+             || indexGrouped == -1
+             || sizeOfGroups[child_[nextGrouped]] > maxClusterSize_
+            )
             {
-                // Make a new group
-                child_[upperAddr[matchCoeffNo]] = nCoarseEqns_;
-                child_[lowerAddr[matchCoeffNo]] = nCoarseEqns_;
+                // There is no group to put this equation into
+                sizeOfGroups[child_[rowI]]++;
                 nCoarseEqns_++;
             }
             else
             {
-                // No match. Find the best neighbouring cluster and
-                // put the equation there
-                label clusterMatchCoeffNo = -1;
-                scalar clusterMaxCoeff = -GREAT;
-
-                for
-                (
-                    label rowCoeffI = rowOffsets[eqnI];
-                    rowCoeffI < rowOffsets[eqnI + 1];
-                    rowCoeffI++
-                )
-                {
-                    label coeffI = cols[rowCoeffI];
-
-                    if (mag(upper[coeffI]) > clusterMaxCoeff)
-                    {
-                        clusterMatchCoeffNo = coeffI;
-                        clusterMaxCoeff = mag(upper[coeffI]);
-                    }
-                }
-
-                if (clusterMatchCoeffNo >= 0)
-                {
-                    // Add the equation to the best cluster
-                    child_[eqnI] = max
-                    (
-                        child_[upperAddr[clusterMatchCoeffNo]],
-                        child_[lowerAddr[clusterMatchCoeffNo]]
-                    );
-                }
-                else
-                {
-                    // This is a Dirichlet point: no neighbours
-                    // Put it into its own cluster
-                    // This should have been already handled by the zero
-                    // cluster.  HJ, 29/Mar/2017
-                    child_[eqnI] = nCoarseEqns_;
-                    nCoarseEqns_++;
-                }
+                // Dump current cell into the best group available
+                child_[rowI] = child_[nextGrouped];
+                sizeOfGroups[child_[nextGrouped]]++;
             }
         }
     }
 
-    // Reverse the map to facilitate later agglomeration.
-    // Keep zero cluster at zero index
-    forAll (child_, eqnI)
-    {
-        child_[eqnI] = nCoarseEqns_ - 1 - child_[eqnI];
-    }
+    // Resize group size count
+    sizeOfGroups.setSize(nCoarseEqns_);
 
     // The decision on parallel agglomeration needs to be made for the
     // whole gang of processes; otherwise I may end up with a different
     // number of agglomeration levels on different processors.
 
-    if (nCoarseEqns_ > minCoarseEqns() && 3*nCoarseEqns_ <= 2*nEqns)
+    // If the number of coarse equations is less than minimum and
+    // if the matrix has reduced in size by at least 1/3, coarsen
+    if (nCoarseEqns_ > minCoarseEqns() && 3*nCoarseEqns_ <= 2*nRows)
     {
         coarsen_ = true;
     }
 
     reduce(coarsen_, andOp<bool>());
 
-    if (lduMatrix::debug >= 2)
+    // if (lduMatrix::debug >= 2)
     {
+        // Count solo cells
+        label nSingleClusters = 0;
+
+        // Adjust start based on solo cells cluster status
+        label start = 0;
+
+        if (nSolo_ > 0)
+        {
+            start = 1;
+        }
+
+        for (label i = start; i < sizeOfGroups.size(); i++)
+        {
+            if (sizeOfGroups[i] == 1)
+            {
+                nSingleClusters++;
+            }
+        }
+
         Pout<< "Coarse level size: " << nCoarseEqns_
-            << " nSolo = " << nSolo_;
+            << " nSolo = " << nSolo_
+            << " cluster (" << min(sizeOfGroups) << " "
+            << max(sizeOfGroups)
+            << ").  N singleton clusters = " << nSingleClusters;
 
         if (coarsen_)
         {
@@ -330,7 +492,7 @@ void Foam::pamgPolicy::calcChild()
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-Foam::pamgPolicy::pamgPolicy
+Foam::clusterAmgPolicy::clusterAmgPolicy
 (
     const lduMatrix& matrix,
     const label groupSize,
@@ -339,23 +501,40 @@ Foam::pamgPolicy::pamgPolicy
 :
     amgPolicy(groupSize, minCoarseEqns),
     matrix_(matrix),
-    child_(),
+    minClusterSize_(groupSize),
+    maxClusterSize_(2*groupSize),
+    child_(matrix_.lduAddr().size()),
     nSolo_(0),
     nCoarseEqns_(0),
     coarsen_(false)
 {
+    if (groupSize < 2)
+    {
+        FatalErrorIn
+        (
+            "clusterAmgPolicy::clusterAmgPolicy\n"
+            "(\n"
+            "    const lduMatrix& matrix,\n"
+            "    const label groupSize,\n"
+            "    const label minCoarseEqns\n"
+            ")"
+        )   << "Group size smaller than 2 is not allowed"
+            << abort(FatalError);
+    }
+
     calcChild();
 }
 
+
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
-Foam::pamgPolicy::~pamgPolicy()
+Foam::clusterAmgPolicy::~clusterAmgPolicy()
 {}
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-Foam::autoPtr<Foam::amgMatrix> Foam::pamgPolicy::restrictMatrix
+Foam::autoPtr<Foam::amgMatrix> Foam::clusterAmgPolicy::restrictMatrix
 (
     const FieldField<Field, scalar>& bouCoeffs,
     const FieldField<Field, scalar>& intCoeffs,
@@ -364,8 +543,10 @@ Foam::autoPtr<Foam::amgMatrix> Foam::pamgPolicy::restrictMatrix
 {
     if (!coarsen_)
     {
-        FatalErrorIn("autoPtr<amgMatrix> pamgPolicy::restrictMatrix() const")
-            << "Requesting coarse matrix when it cannot be created"
+        FatalErrorIn
+        (
+            "autoPtr<amgMatrix> clusterAmgPolicy::restrictMatrix() const"
+        )   << "Requesting coarse matrix when it cannot be created"
             << abort(FatalError);
     }
 
@@ -374,11 +555,11 @@ Foam::autoPtr<Foam::amgMatrix> Foam::pamgPolicy::restrictMatrix
     // 1) Loop through all fine coeffs. If the child labels on two sides are
     //    different, this creates a coarse coeff. Define owner and neighbour
     //    for this coeff based on cluster IDs.
-    // 2) Check if the coeff has been seen before. If yes, add the coefficient
-    //    to the appropriate field (stored with the equation). If no, create
+    // 2) Check if the coeff has been seen before.  If yes, add the coefficient
+    //    to the appropriate field (stored with the equation).  If no, create
     //    a new coeff with neighbour ID and add the coefficient
     // 3) Once all the coeffs have been created, loop through all clusters and
-    //    insert the coeffs in the upper order. At the same time, collect the
+    //    insert the coeffs in the upper order.  At the same time, collect the
     //    owner and neighbour addressing.
     // 4) Agglomerate the diagonal by summing up the fine diagonal
 
@@ -386,14 +567,14 @@ Foam::autoPtr<Foam::amgMatrix> Foam::pamgPolicy::restrictMatrix
     const unallocLabelList& upperAddr = matrix_.lduAddr().upperAddr();
     const unallocLabelList& lowerAddr = matrix_.lduAddr().lowerAddr();
 
-    label nFineCoeffs = upperAddr.size();
+    const label nFineCoeffs = upperAddr.size();
 
 #   ifdef FULLDEBUG
     if (child_.size() != matrix_.lduAddr().size())
     {
         FatalErrorIn
         (
-            "autoPtr<amgMatrix> pamgPolicy::restrictMatrix() const"
+            "autoPtr<amgMatrix> clusterAmgPolicy::restrictMatrix() const"
         )   << "Child array does not correspond to fine level. " << endl
             << " Child size: " << child_.size()
             << " number of equations: " << matrix_.lduAddr().size()
@@ -416,8 +597,6 @@ Foam::autoPtr<Foam::amgMatrix> Foam::pamgPolicy::restrictMatrix
     // Setup initial packed storage for neighbours and coefficients
     labelList blockNbrsData(maxNnbrs*nCoarseEqns_);
 
-    scalarList blockCoeffsData(maxNnbrs*nCoarseEqns_, 0.0);
-
     // Create face-restriction addressing
     // Note: value of coeffRestrictAddr for off-diagonal coefficients
     // touching solo cells will be invalid
@@ -429,6 +608,11 @@ Foam::autoPtr<Foam::amgMatrix> Foam::pamgPolicy::restrictMatrix
 
     // Counter for coarse coeffs
     label nCoarseCoeffs = 0;
+
+    // Note on zero cluster coarsening
+    // If the matrix contains a solo group, it will be in index zero.
+    // Since solo equations are disconnected from the rest of the matrix
+    // they do not create new off-diagonal coefficients
 
     // Loop through all fine coeffs
     forAll (upperAddr, fineCoeffI)
@@ -465,17 +649,16 @@ Foam::autoPtr<Foam::amgMatrix> Foam::pamgPolicy::restrictMatrix
             }
 
             // Check the neighbour to see if this coeff has already been found
-            label* ccCoeffs = &blockNbrsData[maxNnbrs*cOwn];
-
             bool nbrFound = false;
             label& ccnCoeffs = blockNnbrs[cOwn];
 
             for (int i = 0; i < ccnCoeffs; i++)
             {
-                if (initCoarseNeighb[ccCoeffs[i]] == cNei)
+                if (initCoarseNeighb[blockNbrsData[maxNnbrs*cOwn + i]] == cNei)
                 {
                     nbrFound = true;
-                    coeffRestrictAddr[fineCoeffI] = ccCoeffs[i];
+                    coeffRestrictAddr[fineCoeffI] =
+                        blockNbrsData[maxNnbrs*cOwn + i];
                     break;
                 }
             }
@@ -484,26 +667,25 @@ Foam::autoPtr<Foam::amgMatrix> Foam::pamgPolicy::restrictMatrix
             {
                 if (ccnCoeffs >= maxNnbrs)
                 {
+                    // Double the size of list and copy data
                     label oldMaxNnbrs = maxNnbrs;
                     maxNnbrs *= 2;
 
+                    // Resize and copy list
+                    const labelList oldBlockNbrsData = blockNbrsData;
                     blockNbrsData.setSize(maxNnbrs*nCoarseEqns_);
 
-                    forAllReverse(blockNnbrs, i)
+                    forAll (blockNnbrs, i)
                     {
-                        label* oldCcNbrs = &blockNbrsData[oldMaxNnbrs*i];
-                        label* newCcNbrs = &blockNbrsData[maxNnbrs*i];
-
-                        for (int j=0; j<blockNnbrs[i]; j++)
+                        for (int j = 0; j < blockNnbrs[i]; j++)
                         {
-                            newCcNbrs[j] = oldCcNbrs[j];
+                            blockNbrsData[maxNnbrs*i + j] =
+                                oldBlockNbrsData[oldMaxNnbrs*i + j];
                         }
                     }
-
-                    ccCoeffs = &blockNbrsData[maxNnbrs*cOwn];
                 }
 
-                ccCoeffs[ccnCoeffs] = nCoarseCoeffs;
+                blockNbrsData[maxNnbrs*cOwn + ccnCoeffs] = nCoarseCoeffs;
                 initCoarseNeighb[nCoarseCoeffs] = cNei;
                 coeffRestrictAddr[fineCoeffI] = nCoarseCoeffs;
                 ccnCoeffs++;
@@ -808,7 +990,7 @@ Foam::autoPtr<Foam::amgMatrix> Foam::pamgPolicy::restrictMatrix
 }
 
 
-void Foam::pamgPolicy::restrictResidual
+void Foam::clusterAmgPolicy::restrictResidual
 (
     const scalarField& res,
     scalarField& coarseRes
@@ -823,7 +1005,7 @@ void Foam::pamgPolicy::restrictResidual
 }
 
 
-void Foam::pamgPolicy::prolongateCorrection
+void Foam::clusterAmgPolicy::prolongateCorrection
 (
     scalarField& x,
     const scalarField& coarseX

@@ -82,10 +82,10 @@ inline scalar BlockCoeffMaxNorm<tensor>::normalize
 
 
 template<>
-inline void BlockCoeffMaxNorm<tensor>::coeffMag
+inline void BlockCoeffMaxNorm<tensor>::normalize
 (
-    const CoeffField<tensor>& a,
-    Field<scalar>& b
+    Field<scalar>& b,
+    const CoeffField<tensor>& a
 )
 {
     if (a.activeType() == BlockCoeff<tensor>::SCALAR)
@@ -94,6 +94,12 @@ inline void BlockCoeffMaxNorm<tensor>::coeffMag
     }
     else if (a.activeType() == BlockCoeff<tensor>::LINEAR)
     {
+        // Note.  This does not properly account for the sign of the
+        // off-diagonal coefficient.  If the off-diag is negative, the return
+        // should look for cmptMin and vice-versa
+        // Consider this unreliable
+        // HJ, 28/Feb/2017
+
         b = cmptMax(cmptMag(a.asLinear()));
     }
     else

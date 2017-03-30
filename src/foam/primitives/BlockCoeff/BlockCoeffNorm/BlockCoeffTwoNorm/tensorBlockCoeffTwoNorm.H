@@ -65,10 +65,12 @@ inline scalar BlockCoeffTwoNorm<tensor>::normalize
 {
     if (a.activeType() == BlockCoeff<tensor>::SCALAR)
     {
+        // Note: for two-norm, use mag
         return mag(a.asScalar());
     }
     else if (a.activeType() == BlockCoeff<tensor>::LINEAR)
     {
+        // Note: for two-norm, use mag
         return mag(a.asLinear());
     }
     else
@@ -84,18 +86,20 @@ inline scalar BlockCoeffTwoNorm<tensor>::normalize
 
 
 template<>
-inline void BlockCoeffTwoNorm<tensor>::coeffMag
+inline void BlockCoeffTwoNorm<tensor>::normalize
 (
-    const CoeffField<tensor>& a,
-    Field<scalar>& b
+    Field<scalar>& b,
+    const CoeffField<tensor>& a
 )
 {
     if (a.activeType() == BlockCoeff<tensor>::SCALAR)
     {
+        // Note: for two-norm, use mag
         b = mag(a.asScalar());
     }
     else if (a.activeType() == BlockCoeff<tensor>::LINEAR)
     {
+        // Note: for two-norm, use mag
         b = mag(a.asLinear());
     }
     else
