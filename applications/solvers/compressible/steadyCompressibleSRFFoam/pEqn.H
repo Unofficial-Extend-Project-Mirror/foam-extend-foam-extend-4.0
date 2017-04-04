@@ -25,8 +25,8 @@
             fvScalarMatrix pEqn
             (
                 fvm::div(phid, p)
-              - fvm::laplacian(rho*rUrelA, p)
               + fvc::div(phid2)
+              - fvm::laplacian(rho*rUrelA, p)
             );
 
             pEqn.solve();
@@ -38,7 +38,8 @@
             }
         }
 
-#       include "compressibleContinuityErrs.H"
+        // Use incompressible continuity error check: div(rho U) = 0
+#       include "continuityErrs.H"
 
         // Relax the pressure
         p.relax();

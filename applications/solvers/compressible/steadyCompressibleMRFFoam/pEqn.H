@@ -47,7 +47,8 @@
             }
         }
 
-#       include "compressibleContinuityErrs.H"
+        // Use incompressible continuity error check: div(rho U) = 0
+#       include "continuityErrs.H"
 
         // Relax the pressure
         p.relax();
