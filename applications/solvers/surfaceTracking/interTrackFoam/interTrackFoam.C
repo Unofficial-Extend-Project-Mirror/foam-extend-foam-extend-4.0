@@ -41,16 +41,16 @@ Description
 int main(int argc, char *argv[])
 {
 #   include "setRootCase.H"
-
 #   include "createTime.H"
-
 #   include "createDynamicFvMesh.H"
 
     pimpleControl pimple(mesh);
 
 #   include "createFields.H"
-
+#   include "createTimeControls.H"
 #   include "initContinuityErrs.H"
+#   include "CourantNo.H"
+#   include "setInitialDeltaT.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -60,7 +60,7 @@ int main(int argc, char *argv[])
     {
 #       include "readTimeControls.H"
 #       include "CourantNo.H"
-#       include "setSurfaceStabilityDeltaT.H"
+        //#       include "setSurfaceStabilityDeltaT.H"
 
 #       include "readPISOControls.H"
 
