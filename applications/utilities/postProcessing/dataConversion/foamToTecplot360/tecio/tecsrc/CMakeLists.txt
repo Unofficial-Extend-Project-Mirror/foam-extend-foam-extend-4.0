@@ -51,6 +51,43 @@ list(APPEND SOURCES
   TranslatedString.cpp
 )
 
+
 add_foam_library(tecio SHARED ${SOURCES})
 
-#target_link_libraries(tecio finiteVolume)
+
+target_compile_definitions(tecio PRIVATE MAKEARCHIVE USEENUM THREED ENGINE)
+if(UNIX)
+  target_compile_definitions(tecio PRIVATE LINUX)
+  target_compile_options(tecio PRIVATE -U_WIN32)
+  if(CMAKE_${LANG}_COMPILER_ID STREQUAL "Intel")
+    target_compile_definitions(tecio PRIVATE LINUXI64)
+  else()
+    target_compile_definitions(tecio PRIVATE LINUX64)
+    target_compile_options(tecio PRIVATE -U_WIN32)
+  endif()
+elseif(APPLE)
+  target_compile_definitions(tecio PRIVATE DARWIN LINUX64)
+  target_compile_options(tecio PRIVATE -U_WIN32)
+elseif(MINGW)
+  target_compile_definitions(tecio PRIVATE LINUX)
+endif()
+
+# This tries to mimic
+#
+#if defined(linux64)
+#    TECIO_FLAGS = -DMAKEARCHIVE -DLINUX -DLINUX64 -DUSEENUM -DTHREED -U_WIN32 -DENGINE
+#elif defined(darwinIntel) || defined(darwinIntel64) || defined(darwinPpc) || defined(darwinPpc64)
+#    TECIO_FLAGS = -DMAKEARCHIVE -DDARWIN -DUSEENUM -DTHREED -U_WIN32 -DENGINE
+#elif defined(linuxIA64)
+#    TECIO_FLAGS = -DMAKEARCHIVE -DLINUX -DLINUXI64 -DUSEENUM -DTHREED -U_WIN32 -DENGINE
+#elif defined(linux)
+#    TECIO_FLAGS = -DMAKEARCHIVE -DLINUX -DLINUX64 -DUSEENUM -DTHREED -U_WIN32 -DENGINE
+#elif defined(darwinIntel)
+#   warning "DarwinIntel architecture detected"
+#    TECIO_FLAGS = -DMAKEARCHIVE -DLINUX -DLINUX64 -DUSEENUM -DTHREED -U_WIN32 -DENGINE
+#elif defined(mingw)
+#   warning "MSWin mingw architecture detected"
+#    TECIO_FLAGS = -DMAKEARCHIVE -DLINUX -DUSEENUM -DTHREED -DENGINE
+#else
+#error "architecture not supported for compiling tecio."
+#endif

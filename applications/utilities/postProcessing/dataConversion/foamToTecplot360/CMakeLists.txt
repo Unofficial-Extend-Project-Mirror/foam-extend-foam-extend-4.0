@@ -31,3 +31,20 @@
 # --------------------------------------------------------------------------
 
 add_subdirectory(tecio)
+
+list(APPEND SOURCES
+  tecplotWriter.C
+  vtkMesh.C
+  foamToTecplot360.C
+)
+
+# Set minimal environment for external compilation
+if(NOT FOAM_FOUND)
+  cmake_minimum_required(VERSION 2.8)
+  find_package(FOAM REQUIRED)
+endif()
+
+add_foam_executable(foamToTecplot360
+  DEPENDS finiteVolume meshTools tecio
+  SOURCES ${SOURCES}
+)

@@ -30,4 +30,4 @@
 #
 # --------------------------------------------------------------------------
 
-#add_subdirectory(ccm26ToFoam)
+add_subdirectory(ccm26ToFoam)

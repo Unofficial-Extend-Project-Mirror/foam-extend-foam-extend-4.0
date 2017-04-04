@@ -41,6 +41,6 @@ if(NOT FOAM_FOUND)
 endif()
 
 add_foam_executable(ccm26ToFoam
-  DEPENDS finiteVolume meshTools
+  DEPENDS finiteVolume meshTools ccmio
   SOURCES ${SOURCES}
 )
