@@ -459,14 +459,6 @@ void Foam::BlockMatrixClustering<Type>::calcClustering()
                     agglomIndex_[rowI] = agglomIndex_[nextGrouped];
                     sizeOfGroups[agglomIndex_[nextGrouped]]++;
                 }
-                else if (nSolo_ > 0)
-                {
-                    // There is no group, but there is a solo group.
-                    // Add it there
-                    agglomIndex_[rowI] = 0;
-                    sizeOfGroups[0]++;
-                    nSolo_ ++;
-                }
                 else 
                 {
                     // No group and no solo group.  Make its own group
@@ -503,7 +495,7 @@ void Foam::BlockMatrixClustering<Type>::calcClustering()
 
     reduce(coarsen_, andOp<bool>());
 
-    // if (BlockLduMatrix<Type>::debug >= 3)
+    if (BlockLduMatrix<Type>::debug >= 3)
     {
         // Count singleton clusters
         label nSingleClusters = 0;
