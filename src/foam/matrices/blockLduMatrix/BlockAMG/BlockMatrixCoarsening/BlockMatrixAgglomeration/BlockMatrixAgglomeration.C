@@ -366,7 +366,7 @@ void Foam::BlockMatrixAgglomeration<Type>::calcAgglomeration()
 
     reduce(coarsen_, andOp<bool>());
 
-    // if (BlockLduMatrix<Type>::debug >= 3)
+    if (BlockLduMatrix<Type>::debug >= 3)
     {
         // Count singleton clusters
         label nSingleClusters = 0;
