@@ -122,6 +122,19 @@ public:
 
         static const char* const typeName;
 
+        //- Empty field
+        static const CoeffField<Type> zero;
+
+
+    // Static Member Functions
+
+        //- Return a null field
+        inline static const CoeffField<Type>& null()
+        {
+            return zero;
+        }
+
+
 
     // Constructors
 
@@ -138,12 +151,8 @@ public:
         tmp<CoeffField<Type> > clone() const;
 
 
-    // Destructor
-
-        ~CoeffField();
-
-        //- Clear data
-        void clear();
+    //- Destructor
+    ~CoeffField();
 
 
     // Member functions
@@ -162,6 +171,9 @@ public:
 
         //- Return the field transpose
         tmp<CoeffField<Type> > transpose() const;
+
+        //- Clear data
+        void clear();
 
 
         // Return as typed.  Fails when asked for the incorrect type
