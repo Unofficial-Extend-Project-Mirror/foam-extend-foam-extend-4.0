@@ -160,8 +160,10 @@ export FOAM_VERBOSE=1
 # System installed bison
 #export BISON_SYSTEM=1
 
-# System installed flex
+# System installed flex. FLEX_DIR should point to the directory where
+# $FLEX_DIR/bin/flex is located
 #export FLEX_SYSTEM=1
+#export FLEX_DIR=/usr
 
 # System installed m4
 #export M4_SYSTEM=1
