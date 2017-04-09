@@ -28,9 +28,9 @@ Description
     Set up trapping for floating point exceptions (signal FPE).
 
     Controlled by two env vars:
-    @param FOAM_SIGFPE \n
+    \param FOAM_SIGFPE \n
         exception trapping
-    @param FOAM_SETNAN \n
+    \param FOAM_SETNAN \n
         initialization of all malloced memory to NaN. If FOAM_SIGFPE
         also set, this will cause usage of uninitialized scalars to trigger
         an abort.
@@ -43,10 +43,11 @@ SourceFiles
 #ifndef sigFpe_H
 #define sigFpe_H
 
-#include "OSspecific.H"
 #include <signal.h>
 
-#if defined(linux) || defined(linuxAMD64) || defined(linuxIA64) || defined(linuxARM7)
+#if defined(linux) || defined(linux64) || \
+    defined(linuxAMD64) || defined(linuxIA64) || \
+    defined(linuxARM7) || defined(linuxPPC64) || defined(linuxPPC64le)
 #    define LINUX
 #endif
 
@@ -62,6 +63,8 @@ SourceFiles
 #undef FALSE
 
 #endif
+
+#include "UList.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -79,21 +82,13 @@ class sigFpe
         //- Saved old signal trapping setting
         static struct sigaction oldAction_;
 
-#       ifdef LINUX
+#       if defined (__APPLE__)
 
-            //- Saved old malloc
-            static void *(*old_malloc_hook)(size_t, const void *);
+        //- pointer to the original malloc that is overrided
+        static void *(*system_malloc_)(malloc_zone_t *zone, size_t size);
 
-            //- nan malloc function. From malloc_hook manpage.
-            static void* my_malloc_hook(size_t size, const void *caller);
-
-#elif defined (__APPLE__)
-
-    //- pointer to the original malloc that is overrided
-    static void *(*system_malloc_)(malloc_zone_t *zone, size_t size);
-
-    //- the overriding handler
-    static void* nan_malloc_(malloc_zone_t *zone, size_t size);
+        //- the overriding handler
+        static void* nan_malloc_(malloc_zone_t *zone, size_t size);
 
 #       endif
 
@@ -103,7 +98,7 @@ class sigFpe
 #   if defined(LINUX_GNUC) || defined(__APPLE__)
 
         //- Handler for caught signals
-        static void sigFpeHandler(int);
+        static void sigHandler(int);
 
 #   endif
 
@@ -113,17 +108,30 @@ public:
 
     // Constructors
 
+        //- Construct null
         sigFpe();
 
 
-    // Destructor
-
-        ~sigFpe();
+    //- Destructor
+    ~sigFpe();
 
 
     // Member functions
 
+        //- Activate SIGFPE signal handler when FOAM_SIGFPE is %set
+        //  Fill memory with NaN when FOAM_SETNAN is %set
         void set(const bool verbose);
+
+        //- Flag to indicate mallocNan is enabled
+        static bool mallocNanActive_;
+
+        #ifdef LINUX
+        //- Malloc function which initializes to NaN
+        static void* mallocNan(size_t size);
+        #endif
+
+        //- Fill block of data with NaN
+        static void fillNan(UList<scalar>&);
 };
 
 

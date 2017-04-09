@@ -64,6 +64,7 @@ Foam::label Foam::dictionaryEntry::startLineNumber() const
     }
 }
 
+
 Foam::label Foam::dictionaryEntry::endLineNumber() const
 {
     if (size())

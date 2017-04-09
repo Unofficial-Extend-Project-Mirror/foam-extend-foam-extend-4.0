@@ -50,7 +50,7 @@ namespace Foam
 class IFstream;
 
 /*---------------------------------------------------------------------------*\
-                       Class IFstreamAllocator Declaration
+                      Class IFstreamAllocator Declaration
 \*---------------------------------------------------------------------------*/
 
 //- A std::istream with ability to handle compressed files
@@ -70,22 +70,13 @@ class IFstreamAllocator
         IFstreamAllocator(const fileName& pathname);
 
 
-    // Destructor
-
-        ~IFstreamAllocator();
-
-
-public:
-
-    // Member functions
-
-        //- Access to underlying std::istream (for e.g. lexer)
-        istream& stdStream();
+    //- Destructor
+    ~IFstreamAllocator();
 };
 
 
 /*---------------------------------------------------------------------------*\
-                           Class IFstream Declaration
+                          Class IFstream Declaration
 \*---------------------------------------------------------------------------*/
 
 class IFstream
@@ -114,9 +105,8 @@ public:
         );
 
 
-    // Destructor
-
-        ~IFstream();
+    //- Destructor
+    ~IFstream();
 
 
     // Member functions
@@ -134,6 +124,16 @@ public:
             {
                 return pathname_;
             }
+
+
+        // STL stream
+
+            //- Access to underlying std::istream
+            virtual istream& stdStream();
+
+            //- Const access to underlying std::istream
+            virtual const istream& stdStream() const;
+
 
         // Print
 

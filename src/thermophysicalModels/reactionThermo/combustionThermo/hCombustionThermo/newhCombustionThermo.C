@@ -47,7 +47,7 @@ Foam::autoPtr<Foam::hCombustionThermo> Foam::hCombustionThermo::New
                 "thermophysicalProperties",
                 mesh.time().constant(),
                 obj,
-                IOobject::MUST_READ,
+                IOobject::MUST_READ_IF_MODIFIED,
                 IOobject::NO_WRITE
             )
         );
@@ -95,7 +95,7 @@ Foam::autoPtr<Foam::hCombustionThermo> Foam::hCombustionThermo::NewType
                 "thermophysicalProperties",
                 mesh.time().constant(),
                 obj,
-                IOobject::MUST_READ,
+                IOobject::MUST_READ_IF_MODIFIED,
                 IOobject::NO_WRITE
             )
         );

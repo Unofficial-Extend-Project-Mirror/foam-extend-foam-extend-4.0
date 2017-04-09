@@ -95,7 +95,7 @@ using namespace Foam;
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 template<class GeoField>
-void addPatchFields(fvMesh& mesh, const word& patchFieldType)
+void addPatchFields(const fvMesh& mesh, const word& patchFieldType)
 {
     HashTable<const GeoField*> flds
     (
@@ -136,7 +136,7 @@ void addPatchFields(fvMesh& mesh, const word& patchFieldType)
 
 // Remove last patch field
 template<class GeoField>
-void trimPatchFields(fvMesh& mesh, const label nPatches)
+void trimPatchFields(const fvMesh& mesh, const label nPatches)
 {
     HashTable<const GeoField*> flds
     (
@@ -163,7 +163,7 @@ void trimPatchFields(fvMesh& mesh, const label nPatches)
 
 // Reorder patch field
 template<class GeoField>
-void reorderPatchFields(fvMesh& mesh, const labelList& oldToNew)
+void reorderPatchFields(const fvMesh& mesh, const labelList& oldToNew)
 {
     HashTable<const GeoField*> flds
     (

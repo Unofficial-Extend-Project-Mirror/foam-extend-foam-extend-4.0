@@ -154,7 +154,7 @@ GenericPointPatchField
                         (
                             dynamicCast<token::Compound<List<scalar> > >
                             (
-                                fieldToken.transferCompoundToken()
+                                fieldToken.transferCompoundToken(is)
                             )
                         );
 
@@ -192,7 +192,7 @@ GenericPointPatchField
                         (
                             dynamicCast<token::Compound<List<vector> > >
                             (
-                                fieldToken.transferCompoundToken()
+                                fieldToken.transferCompoundToken(is)
                             )
                         );
 
@@ -233,7 +233,7 @@ GenericPointPatchField
                                 token::Compound<List<sphericalTensor> >
                             >
                             (
-                                fieldToken.transferCompoundToken()
+                                fieldToken.transferCompoundToken(is)
                             )
                         );
 
@@ -274,7 +274,7 @@ GenericPointPatchField
                                 token::Compound<List<symmTensor> >
                             >
                             (
-                                fieldToken.transferCompoundToken()
+                                fieldToken.transferCompoundToken(is)
                             )
                         );
 
@@ -312,7 +312,7 @@ GenericPointPatchField
                         (
                             dynamicCast<token::Compound<List<tensor> > >
                             (
-                                fieldToken.transferCompoundToken()
+                                fieldToken.transferCompoundToken(is)
                             )
                         );
 
@@ -353,7 +353,7 @@ GenericPointPatchField
                                 token::Compound<List<symmTensor4thOrder> >
                             >
                             (
-                                fieldToken.transferCompoundToken()
+                                fieldToken.transferCompoundToken(is)
                             )
                         );
 
@@ -394,7 +394,7 @@ GenericPointPatchField
                                 token::Compound<List<diagTensor> >
                             >
                             (
-                                fieldToken.transferCompoundToken()
+                                fieldToken.transferCompoundToken(is)
                             )
                         );
 

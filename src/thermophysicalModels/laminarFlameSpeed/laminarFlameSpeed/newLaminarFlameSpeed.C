@@ -39,7 +39,7 @@ Foam::autoPtr<Foam::laminarFlameSpeed> Foam::laminarFlameSpeed::New
             "combustionProperties",
             ct.T().time().constant(),
             ct.T().db(),
-            IOobject::MUST_READ,
+            IOobject::MUST_READ_IF_MODIFIED,
             IOobject::NO_WRITE,
             false
         )

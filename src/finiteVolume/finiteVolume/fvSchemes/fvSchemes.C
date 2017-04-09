@@ -70,8 +70,7 @@ Foam::fvSchemes::fvSchemes(const objectRegistry& obr)
             "fvSchemes",
             obr.time().system(),
             obr,
-//             IOobject::MUST_READ,
-            IOobject::READ_IF_PRESENT,  // Allow default dictionary creation
+            IOobject::READ_IF_PRESENT_IF_MODIFIED,  // Allow default dictionary creation
             IOobject::NO_WRITE
         )
     ),

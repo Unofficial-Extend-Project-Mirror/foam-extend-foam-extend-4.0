@@ -28,7 +28,6 @@ Description
 #include "octree.H"
 #include "treeLeaf.H"
 #include "treeNode.H"
-#include "long.H"
 #include "cpuTime.H"
 #include "linePointRef.H"
 #include "pointIndexHit.H"

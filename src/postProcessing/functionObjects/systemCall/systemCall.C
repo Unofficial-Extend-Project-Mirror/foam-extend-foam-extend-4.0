@@ -24,14 +24,14 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "systemCall.H"
-#include "dictionary.H"
-#include "objectRegistry.H"
+#include "foamTime.H"
+#include "dynamicCode.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
 namespace Foam
 {
-    defineTypeNameAndDebug(systemCall, 0);
+defineTypeNameAndDebug(systemCall, 0);
 }
 
 
@@ -65,14 +65,30 @@ Foam::systemCall::~systemCall()
 void Foam::systemCall::read(const dictionary& dict)
 {
     dict.readIfPresent("executeCalls", executeCalls_);
-    dict.readIfPresent("endCalls",     endCalls_);
-    dict.readIfPresent("writeCalls",   writeCalls_);
+    dict.readIfPresent("endCalls", endCalls_);
+    dict.readIfPresent("writeCalls", writeCalls_);
 
     if (executeCalls_.empty() && endCalls_.empty() && writeCalls_.empty())
     {
         WarningIn("Foam::system::read(const dictionary&)")
             << "no executeCalls, endCalls or writeCalls defined."
             << endl;
+    }
+    else if (!dynamicCode::allowSystemOperations)
+    {
+        FatalErrorIn("systemCall::read(const dictionary&)")
+            << "Executing user-supplied system calls is not enabled by "
+            << "default because of " << nl
+            << "security issues.  If you trust the case you can enable this "
+            << "facility by " << nl
+            << "adding to the InfoSwitches setting in the system controlDict:"
+            << nl << nl
+            << "    allowSystemOperations 1" << nl << nl
+            << "The system controlDict is either" << nl << nl
+            << "    ~/.OpenFOAM/$WM_PROJECT_VERSION/controlDict" << nl << nl
+            << "or" << nl << nl
+            << "    $WM_PROJECT_DIR/etc/controlDict" << nl << nl
+            << exit(FatalError);
     }
 }
 
@@ -92,6 +108,12 @@ void Foam::systemCall::end()
     {
         Foam::system(endCalls_[callI]);
     }
+}
+
+
+void Foam::systemCall::timeSet()
+{
+    // Do nothing
 }
 
 

@@ -186,7 +186,7 @@ bool Foam::sloshingHistory::start()
 }
 
 
-bool Foam::sloshingHistory::execute()
+bool Foam::sloshingHistory::execute(const bool forceWrite)
 {
     const fvMesh& mesh =
         time_.lookupObject<fvMesh>(regionName_);
@@ -206,6 +206,12 @@ bool Foam::sloshingHistory::execute()
     }
 
     return false;
+}
+
+
+bool Foam::sloshingHistory::setTime()
+{
+    return true;
 }
 
 

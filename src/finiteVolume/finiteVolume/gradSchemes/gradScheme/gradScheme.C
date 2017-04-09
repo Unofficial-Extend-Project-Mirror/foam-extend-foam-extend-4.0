@@ -136,7 +136,7 @@ Foam::fv::gradScheme<Type>::grad
             mesh().objectRegistry::template lookupObject<GradFieldType>(name)
         );
 
-        if (gGrad.upToDate(vsf.name()))
+        if (gGrad.upToDate(vsf))
         {
             if (solution::debug)
             {

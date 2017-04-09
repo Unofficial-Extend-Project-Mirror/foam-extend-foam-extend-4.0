@@ -38,7 +38,9 @@ SourceFiles
 
 \*---------------------------------------------------------------------------*/
 
-#include "OSspecific.H"
+#ifndef sigInt_H
+#define sigInt_H
+
 #include <signal.h>
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -60,23 +62,24 @@ class sigInt
 
     // Private Member Functions
 
-        static void sigIntHandler(int);
+        static void sigHandler(int);
 
 
 public:
 
     // Constructors
 
+        //- Construct null
         sigInt();
 
 
-    // Destructor
-
-        ~sigInt();
+    //- Destructor
+    ~sigInt();
 
 
     // Member functions
 
+        //- Activate SIGINT signal handler
         void set(const bool verbose);
 };
 
@@ -84,5 +87,9 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#endif
 
 // ************************************************************************* //

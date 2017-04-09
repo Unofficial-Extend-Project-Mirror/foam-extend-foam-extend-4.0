@@ -28,17 +28,17 @@ Description
     Class to handle errors and exceptions in a simple, consistent stream-based
     manner.
 
-    The error class is globaly instantiated with a title string. Errors,
+    The error class is globally instantiated with a title string. Errors,
     messages and other data are piped to the messageStream class in the
     standard manner.  Manipulators are supplied for exit and abort which may
-    terminate the program or throw an exception depending of if the exception
-    handling has beed switched on (off by default).
+    terminate the program or throw an exception depending on whether the
+    exception handling has been switched on (off by default).
 
 Usage
-    @code
+    \code
         error << "message1" << "message2" << FoamDataType << exit(errNo);
         error << "message1" << "message2" << FoamDataType << abort();
-    @endcode
+    \endcode
 
 SourceFiles
     error.C
@@ -61,7 +61,7 @@ Ostream& operator<<(Ostream&, const error&);
 
 
 /*---------------------------------------------------------------------------*\
-                           Class error Declaration
+                            Class error Declaration
 \*---------------------------------------------------------------------------*/
 
 class error
@@ -97,9 +97,8 @@ public:
         error(const error& err);
 
 
-    // Destructor
-
-        virtual ~error() throw();
+    //- Destructor
+    virtual ~error() throw();
 
 
     // Member functions
@@ -161,6 +160,10 @@ public:
         operator dictionary() const;
 
 
+        //- Helper function to print a stack (if OpenFOAM IO not yet
+        //  initialised)
+        static void safePrintStack(std::ostream&);
+
         //- Helper function to print a stack
         static void printStack(Ostream& os);
 
@@ -180,9 +183,7 @@ public:
 
 
 // Forward declaration of friend functions and operators
-
 class IOerror;
-
 Ostream& operator<<(Ostream&, const IOerror&);
 
 
@@ -213,9 +214,8 @@ public:
         IOerror(const dictionary& errDict);
 
 
-    // Destructor
-
-        virtual ~IOerror() throw();
+    //- Destructor
+    virtual ~IOerror() throw();
 
 
     // Member functions
@@ -267,6 +267,17 @@ public:
             const dictionary&
         );
 
+        //- Print basic message and exit. Uses cerr if streams not constructed
+        //  yet (at startup). Use in startup parsing instead of FatalError.
+        static void SafeFatalIOError
+        (
+            const char* functionName,
+            const char* sourceFileName,
+            const int sourceFileLineNumber,
+            const IOstream&,
+            const string& msg
+        );
+
         //- Create and return a dictionary
         operator dictionary() const;
 
@@ -291,19 +302,68 @@ extern error FatalError;
 extern IOerror FatalIOError;
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-// Convienient macros to add the file name and line number to the function name
-
-#define FatalErrorIn(fn) FatalError(fn, __FILE__, __LINE__)
-#define FatalIOErrorIn(fn, ios) FatalIOError(fn, __FILE__, __LINE__, ios)
-
-// Call for functions which are not currently implemented.
-// The functionName is printed and then abort is called.
-#define notImplemented(fn) \
-    FatalErrorIn(fn) << "Not implemented" << Foam::abort(FatalError);
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+// Convenience macros to add the file name and line number to the function name
+
+//- Report an error message using Foam::FatalError
+//  for functionName in file __FILE__ at line __LINE__
+#define FatalErrorIn(functionName)                                             \
+    ::Foam::FatalError((functionName), __FILE__, __LINE__)
+
+//- Report an error message using Foam::FatalError
+//  for FUNCTION_NAME in file __FILE__ at line __LINE__
+#define FatalErrorInFunction FatalErrorIn(FUNCTION_NAME)
+
+
+//- Report an error message using Foam::FatalIOError
+//  for functionName in file __FILE__ at line __LINE__
+//  for a particular IOstream
+#define FatalIOErrorIn(functionName, ios)                                      \
+    ::Foam::FatalIOError((functionName), __FILE__, __LINE__, (ios))
+
+//- Report an error message using Foam::FatalIOError
+//  for FUNCTION_NAME in file __FILE__ at line __LINE__
+//  for a particular IOstream
+#define FatalIOErrorInFunction(ios) FatalIOErrorIn(FUNCTION_NAME, ios)
+
+
+//- Report an error message using Foam::FatalIOError
+//  (or cerr if FatalIOError not yet constructed)
+//  for functionName in file __FILE__ at line __LINE__
+//  for a particular IOstream
+#define SafeFatalIOErrorIn(functionName, ios, msg)                             \
+    ::Foam::IOerror::SafeFatalIOError                                          \
+    ((functionName), __FILE__, __LINE__, (ios), (msg))
+
+//- Report an error message using Foam::FatalIOError
+//  (or cerr if FatalIOError not yet constructed)
+//  for functionName in file __FILE__ at line __LINE__
+//  for a particular IOstream
+#define SafeFatalIOErrorInFunction(ios, msg)                                   \
+    SafeFatalIOErrorIn(FUNCTION_NAME, ios, msg)
+
+
+//- Issue a FatalErrorIn for a function not currently implemented.
+//  The functionName is printed and then abort is called.
+//
+//  This macro can be particularly useful when methods must be defined to
+//  complete the interface of a derived class even if they should never be
+//  called for this derived class.
+#define notImplemented(functionName)                                           \
+    FatalErrorIn(functionName)                                                 \
+        << "Not implemented" << ::Foam::abort(FatalError);
+
+//- Issue a FatalErrorIn for a function not currently implemented.
+//  The FUNCTION_NAME is printed and then abort is called.
+//
+//  This macro can be particularly useful when methods must be defined to
+//  complete the interface of a derived class even if they should never be
+//  called for this derived class.
+#define NotImplemented notImplemented(FUNCTION_NAME)
+
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

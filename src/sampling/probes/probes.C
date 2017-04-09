@@ -28,6 +28,7 @@ License
 #include "dictionary.H"
 #include "foamTime.H"
 #include "IOmanip.H"
+#include "mapPolyMesh.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
@@ -36,240 +37,233 @@ namespace Foam
     defineTypeNameAndDebug(probes, 0);
 }
 
+
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
-void Foam::probes::findCells(const fvMesh& mesh)
+void Foam::probes::findElements(const fvMesh& mesh)
 {
-    if (cellList_.empty())
+    if (debug)
     {
-        Info<< "Searching for probe point locations" << endl;
+        Info<< "probes: resetting sample locations" << endl;
+    }
 
-        cellList_.setSize(probeLocations_.size());
+    elementList_.clear();
+    elementList_.setSize(size());
 
-        forAll(probeLocations_, probeI)
+    faceList_.clear();
+    faceList_.setSize(size());
+
+    forAll(*this, probeI)
+    {
+        const vector& location = operator[](probeI);
+
+        const label cellI = mesh.findCell(location);
+
+        elementList_[probeI] = cellI;
+
+        if (cellI != -1)
         {
-            cellList_[probeI] = mesh.findCell(probeLocations_[probeI]);
-
-            if (debug && cellList_[probeI] != -1)
+            const labelList& cellFaces = mesh.cells()[cellI];
+            const vector& cellCentre = mesh.cellCentres()[cellI];
+            scalar minDistance = GREAT;
+            label minFaceID = -1;
+            forAll (cellFaces, i)
             {
-                Pout<< "probes : found point " << probeLocations_[probeI]
-                    << " in cell " << cellList_[probeI] << endl;
+                label faceI = cellFaces[i];
+                vector dist = mesh.faceCentres()[faceI] - cellCentre;
+                if (mag(dist) < minDistance)
+                {
+                    minDistance = mag(dist);
+                    minFaceID = faceI;
+                }
             }
+            faceList_[probeI] = minFaceID;
+        }
+        else
+        {
+            faceList_[probeI] = -1;
         }
 
-
-        // Check if all probes have been found.
-        forAll(cellList_, probeI)
+        if (debug && (elementList_[probeI] != -1 || faceList_[probeI] != -1))
         {
-            label cellI = cellList_[probeI];
+            Pout<< "probes : found point " << location
+                << " in cell " << elementList_[probeI]
+                << " and face " << faceList_[probeI] << endl;
+        }
+    }
 
-            // Check at least one processor with cell.
-            reduce(cellI, maxOp<label>());
 
-            if (cellI == -1)
+    // Check if all probes have been found.
+    forAll(elementList_, probeI)
+    {
+        const vector& location = operator[](probeI);
+        label cellI = elementList_[probeI];
+        label faceI = faceList_[probeI];
+
+        // Check at least one processor with cell.
+        reduce(cellI, maxOp<label>());
+        reduce(faceI, maxOp<label>());
+
+        if (cellI == -1)
+        {
+            if (Pstream::master())
             {
-                if (Pstream::master())
-                {
-                    WarningIn("probes::read()")
-                        << "Did not find location " << probeLocations_[probeI]
-                        << " in any cell. Skipping location." << endl;
-                }
+                WarningIn("findElements::findElements(const fvMesh&)")
+                    << "Did not find location " << location
+                    << " in any cell. Skipping location." << endl;
             }
-            else
+        }
+        else if (faceI == -1)
+        {
+            if (Pstream::master())
             {
-                // Make sure location not on two domains.
-                if (cellList_[probeI] != -1 && cellList_[probeI] != cellI)
-                {
-                    WarningIn("probes::read()")
-                        << "Location " << probeLocations_[probeI]
-                        << " seems to be on multiple domains:"
-                        << " cell " << cellList_[probeI]
-                        << " on my domain " << Pstream::myProcNo()
+                WarningIn("probes::findElements(const fvMesh&)")
+                    << "Did not find location " << location
+                    << " in any face. Skipping location." << endl;
+            }
+        }
+        else
+        {
+            // Make sure location not on two domains.
+            if (elementList_[probeI] != -1 && elementList_[probeI] != cellI)
+            {
+                WarningIn("probes::findElements(const fvMesh&)")
+                    << "Location " << location
+                    << " seems to be on multiple domains:"
+                    << " cell " << elementList_[probeI]
+                    << " on my domain " << Pstream::myProcNo()
                         << " and cell " << cellI << " on some other domain."
-                        << endl
-                        << "This might happen if the probe location is on"
-                        << " a processor patch. Change the location slightly"
-                        << " to prevent this." << endl;
-                }
+                    << endl
+                    << "This might happen if the probe location is on"
+                    << " a processor patch. Change the location slightly"
+                    << " to prevent this." << endl;
+            }
+
+            if (faceList_[probeI] != -1 && faceList_[probeI] != faceI)
+            {
+                WarningIn("probes::findElements(const fvMesh&)")
+                    << "Location " << location
+                    << " seems to be on multiple domains:"
+                    << " cell " << faceList_[probeI]
+                    << " on my domain " << Pstream::myProcNo()
+                        << " and face " << faceI << " on some other domain."
+                    << endl
+                    << "This might happen if the probe location is on"
+                    << " a processor patch. Change the location slightly"
+                    << " to prevent this." << endl;
             }
         }
     }
 }
 
 
-bool Foam::probes::checkFieldTypes()
+Foam::label Foam::probes::prepare()
 {
-    wordList fieldTypes(fieldNames_.size());
+    const label nFields = classifyFields();
 
-    // check files for a particular time
-    if (loadFromFiles_)
-    {
-        forAll(fieldNames_, fieldI)
-        {
-            IOobject io
-            (
-                fieldNames_[fieldI],
-                obr_.time().timeName(),
-                refCast<const polyMesh>(obr_),
-                IOobject::MUST_READ,
-                IOobject::NO_WRITE,
-                false
-            );
-
-            if (io.headerOk())
-            {
-                fieldTypes[fieldI] = io.headerClassName();
-            }
-            else
-            {
-                fieldTypes[fieldI] = "(notFound)";
-            }
-        }
-    }
-    else
-    {
-        // check objectRegistry
-        forAll(fieldNames_, fieldI)
-        {
-            objectRegistry::const_iterator iter =
-                obr_.find(fieldNames_[fieldI]);
-
-            if (iter != obr_.end())
-            {
-                fieldTypes[fieldI] = iter()->type();
-            }
-            else
-            {
-                fieldTypes[fieldI] = "(notFound)";
-            }
-        }
-    }
-
-
-    label nFields = 0;
-
-    // classify fieldTypes
-    nFields += countFields(scalarFields_, fieldTypes);
-    nFields += countFields(vectorFields_, fieldTypes);
-    nFields += countFields(sphericalTensorFields_, fieldTypes);
-    nFields += countFields(symmTensorFields_, fieldTypes);
-    nFields += countFields(tensorFields_, fieldTypes);
-
-    // concatenate all the lists into foundFields
-    wordList foundFields(nFields);
-
-    label fieldI = 0;
-    forAll(scalarFields_, i)
-    {
-        foundFields[fieldI++] = scalarFields_[i];
-    }
-    forAll(vectorFields_, i)
-    {
-        foundFields[fieldI++] = vectorFields_[i];
-    }
-    forAll(sphericalTensorFields_, i)
-    {
-        foundFields[fieldI++] = sphericalTensorFields_[i];
-    }
-    forAll(symmTensorFields_, i)
-    {
-        foundFields[fieldI++] = symmTensorFields_[i];
-    }
-    forAll(tensorFields_, i)
-    {
-        foundFields[fieldI++] = tensorFields_[i];
-    }
-
+    // adjust file streams
     if (Pstream::master())
     {
-        fileName probeDir;
+        wordHashSet currentFields;
 
+        currentFields.insert(scalarFields_);
+        currentFields.insert(vectorFields_);
+        currentFields.insert(sphericalTensorFields_);
+        currentFields.insert(symmTensorFields_);
+        currentFields.insert(symmTensor4thOrderFields_);
+        currentFields.insert(diagTensorFields_);
+        currentFields.insert(tensorFields_);
+
+        currentFields.insert(surfaceScalarFields_);
+        currentFields.insert(surfaceVectorFields_);
+        currentFields.insert(surfaceSphericalTensorFields_);
+        currentFields.insert(surfaceSymmTensorFields_);
+        currentFields.insert(surfaceTensorFields_);
+
+        if (debug)
+        {
+            Info<< "Probing fields: " << currentFields << nl
+                << "Probing locations: " << *this << nl
+                << endl;
+        }
+
+
+        fileName probeDir;
         fileName probeSubDir = name_;
 
-        if (obr_.name() != polyMesh::defaultRegion)
+        if (mesh_.name() != polyMesh::defaultRegion)
         {
-            probeSubDir = probeSubDir/obr_.name();
+            probeSubDir = probeSubDir/mesh_.name();
         }
-        probeSubDir = probeSubDir/obr_.time().timeName();
+        probeSubDir = "postProcessing"/probeSubDir/mesh_.time().timeName();
 
         if (Pstream::parRun())
         {
             // Put in undecomposed case
             // (Note: gives problems for distributed data running)
-            probeDir = obr_.time().path()/".."/probeSubDir;
+            probeDir = mesh_.time().path()/".."/probeSubDir;
         }
         else
         {
-            probeDir = obr_.time().path()/probeSubDir;
+            probeDir = mesh_.time().path()/probeSubDir;
         }
 
-        // Close the file if any fields have been removed.
+        // ignore known fields, close streams for fields that no longer exist
         forAllIter(HashPtrTable<OFstream>, probeFilePtrs_, iter)
         {
-            if (findIndex(foundFields, iter.key()) == -1)
+            if (!currentFields.erase(iter.key()))
             {
                 if (debug)
                 {
-                    Pout<< "close stream: " << iter()->name() << endl;
+                    Info<< "close probe stream: " << iter()->name() << endl;
                 }
 
                 delete probeFilePtrs_.remove(iter);
             }
         }
 
-        // Open new files for new fields. Keep existing files.
-
-        probeFilePtrs_.resize(2*foundFields.size());
-
-        forAll(foundFields, fieldI)
+        // currentFields now just has the new fields - open streams for them
+        forAllConstIter(wordHashSet, currentFields, iter)
         {
-            const word& fldName = foundFields[fieldI];
+            const word& fieldName = iter.key();
 
-            // Check if added field. If so open a stream for it.
+            // Create directory if does not exist.
+            mkDir(probeDir);
 
-            if (!probeFilePtrs_.found(fldName))
+            OFstream* fPtr = new OFstream(probeDir/fieldName);
+
+            OFstream& fout = *fPtr;
+
+            if (debug)
             {
-                // Create directory if does not exist.
-                mkDir(probeDir);
-
-                OFstream* sPtr = new OFstream(probeDir/fldName);
-
-                if (debug)
-                {
-                    Pout<< "open  stream: " << sPtr->name() << endl;
-                }
-
-                probeFilePtrs_.insert(fldName, sPtr);
-
-                unsigned int w = IOstream::defaultPrecision() + 7;
-
-                for (direction cmpt=0; cmpt<vector::nComponents; cmpt++)
-                {
-                    *sPtr<< '#' << setw(IOstream::defaultPrecision() + 6)
-                        << vector::componentNames[cmpt];
-
-                    forAll(probeLocations_, probeI)
-                    {
-                        *sPtr<< ' ' << setw(w) << probeLocations_[probeI][cmpt];
-                    }
-                    *sPtr << endl;
-                }
-
-                *sPtr<< '#' << setw(IOstream::defaultPrecision() + 6)
-                    << "Time" << endl;
+                Info<< "open probe stream: " << fout.name() << endl;
             }
-        }
 
-        if (debug)
-        {
-            Pout<< "Probing fields:" << foundFields << nl
-                << "Probing locations:" << probeLocations_ << nl
-                << endl;
+            probeFilePtrs_.insert(fieldName, fPtr);
+
+            unsigned int w = IOstream::defaultPrecision() + 7;
+
+            forAll(*this, probeI)
+            {
+                fout<< "# Probe " << probeI << ' ' << operator[](probeI)
+                    << endl;
+            }
+
+            fout<< '#' << setw(IOstream::defaultPrecision() + 6)
+                << "Probe";
+
+            forAll(*this, probeI)
+            {
+                fout<< ' ' << setw(w) << probeI;
+            }
+            fout<< endl;
+
+            fout<< '#' << setw(IOstream::defaultPrecision() + 6)
+                << "Time" << endl;
         }
     }
 
-
-    return nFields > 0;
+    return nFields;
 }
 
 
@@ -283,18 +277,13 @@ Foam::probes::probes
     const bool loadFromFiles
 )
 :
+    pointField(0),
     name_(name),
-    obr_(obr),
+    mesh_(refCast<const fvMesh>(obr)),
     loadFromFiles_(loadFromFiles),
-    fieldNames_(),
-    probeLocations_(),
-    scalarFields_(),
-    vectorFields_(),
-    sphericalTensorFields_(),
-    symmTensorFields_(),
-    tensorFields_(),
-    cellList_(),
-    probeFilePtrs_()
+    fieldSelection_(),
+    fixedLocations_(true),
+    interpolationScheme_("cell")
 {
     read(dict);
 }
@@ -310,6 +299,7 @@ Foam::probes::~probes()
 
 void Foam::probes::execute()
 {
+    // Do nothing - only valid on write
 }
 
 
@@ -319,37 +309,145 @@ void Foam::probes::end()
 }
 
 
+void Foam::probes::timeSet()
+{
+    // Do nothing - only valid on write
+}
+
+
 void Foam::probes::write()
 {
-    // Check if the mesh is changing and if so, resample
-    const fvMesh& mesh = refCast<const fvMesh>(obr_);
-
-    if (mesh.moving() || mesh.changing())
-    {
-        cellList_.clear();
-        findCells(mesh);
-    }
-
-    if (probeLocations_.size() && checkFieldTypes())
+    if (size() && prepare())
     {
         sampleAndWrite(scalarFields_);
         sampleAndWrite(vectorFields_);
         sampleAndWrite(sphericalTensorFields_);
         sampleAndWrite(symmTensorFields_);
+        sampleAndWrite(symmTensor4thOrderFields_);
+        sampleAndWrite(diagTensorFields_);
         sampleAndWrite(tensorFields_);
+
+        sampleAndWriteSurfaceFields(surfaceScalarFields_);
+        sampleAndWriteSurfaceFields(surfaceVectorFields_);
+        sampleAndWriteSurfaceFields(surfaceSphericalTensorFields_);
+        sampleAndWriteSurfaceFields(surfaceSymmTensorFields_);
+        sampleAndWriteSurfaceFields(surfaceTensorFields_);
     }
 }
 
 
 void Foam::probes::read(const dictionary& dict)
 {
-    dict.lookup("fields") >> fieldNames_;
-    dict.lookup("probeLocations") >> probeLocations_;
+    dict.lookup("probeLocations") >> *this;
+    dict.lookup("fields") >> fieldSelection_;
 
-    // Force all cell locations to be redetermined
-    cellList_.clear();
-    findCells(refCast<const fvMesh>(obr_));
-    checkFieldTypes();
+    dict.readIfPresent("fixedLocations", fixedLocations_);
+    if (dict.readIfPresent("interpolationScheme", interpolationScheme_))
+    {
+        if (!fixedLocations_ && interpolationScheme_ != "cell")
+        {
+            WarningIn("void Foam::probes::read(const dictionary&)")
+                << "Only cell interpolation can be applied when "
+                << "not using fixedLocations.  InterpolationScheme "
+                << "entry will be ignored";
+        }
+    }
+
+    // Initialise cells to sample from supplied locations
+    findElements(mesh_);
+
+    prepare();
+}
+
+
+void Foam::probes::updateMesh(const mapPolyMesh& mpm)
+{
+    if (debug)
+    {
+        Info<< "probes: updateMesh" << endl;
+    }
+
+    if (fixedLocations_)
+    {
+        findElements(mesh_);
+    }
+    else
+    {
+        if (debug)
+        {
+            Info<< "probes: remapping sample locations" << endl;
+        }
+
+        // 1. Update cells
+        {
+            DynamicList<label> elems(elementList_.size());
+
+            const labelList& reverseMap = mpm.reverseCellMap();
+            forAll(elementList_, i)
+            {
+                label cellI = elementList_[i];
+                label newCellI = reverseMap[cellI];
+                if (newCellI == -1)
+                {
+                    // cell removed
+                }
+                else if (newCellI < -1)
+                {
+                    // cell merged
+                    elems.append(-newCellI - 2);
+                }
+                else
+                {
+                    // valid new cell
+                    elems.append(newCellI);
+                }
+            }
+
+            elementList_.transfer(elems);
+        }
+
+        // 2. Update faces
+        {
+            DynamicList<label> elems(faceList_.size());
+
+            const labelList& reverseMap = mpm.reverseFaceMap();
+            forAll(faceList_, i)
+            {
+                label faceI = faceList_[i];
+                label newFaceI = reverseMap[faceI];
+                if (newFaceI == -1)
+                {
+                    // face removed
+                }
+                else if (newFaceI < -1)
+                {
+                    // face merged
+                    elems.append(-newFaceI - 2);
+                }
+                else
+                {
+                    // valid new face
+                    elems.append(newFaceI);
+                }
+            }
+
+            faceList_.transfer(elems);
+        }
+    }
+}
+
+
+void Foam::probes::movePoints(const pointField&)
+{
+    if (debug)
+    {
+        Info<< "probes: movePoints" << endl;
+    }
+
+    if (fixedLocations_)
+    {
+        findElements(mesh_);
+    }
 }
 
 

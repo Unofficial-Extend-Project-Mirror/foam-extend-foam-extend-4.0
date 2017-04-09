@@ -29,7 +29,6 @@ License
 #include "triSurface.H"
 #include "vector2D.H"
 #include "OFstream.H"
-#include "long.H"
 #include "AverageIOField.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

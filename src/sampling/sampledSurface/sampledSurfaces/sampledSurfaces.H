@@ -40,6 +40,9 @@ SourceFiles
 #include "sampledSurface.H"
 #include "surfaceWriter.H"
 #include "volFieldsFwd.H"
+#include "surfaceFieldsFwd.H"
+#include "wordReList.H"
+#include "IOobjectList.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -58,61 +61,6 @@ class sampledSurfaces
     public PtrList<sampledSurface>
 {
     // Private classes
-
-        //- Class used for grouping field types
-        template<class Type>
-        class fieldGroup
-        :
-            public DynamicList<word>
-        {
-        public:
-
-            //- Surface formatter
-            autoPtr<surfaceWriter<Type> > formatter;
-
-            //- Construct null
-            fieldGroup()
-            :
-                DynamicList<word>(0),
-                formatter(NULL)
-            {}
-
-            //- Construct for a particular surface format
-            fieldGroup(const word& writeFormat)
-            :
-                DynamicList<word>(0),
-                formatter(surfaceWriter<Type>::New(writeFormat))
-            {}
-
-            //- Construct for a particular surface format and a list of field
-            //  names
-            fieldGroup
-            (
-                const word& writeFormat,
-                const wordList& fieldNames
-            )
-            :
-                DynamicList<word>(fieldNames),
-                formatter(surfaceWriter<Type>::New(writeFormat))
-            {}
-
-            void reset(const label nElem)
-            {
-                formatter.clear();
-                DynamicList<word>::setCapacity(nElem);
-                DynamicList<word>::clear();
-            }
-
-            void operator=(const word& writeFormat)
-            {
-                formatter = surfaceWriter<Type>::New(writeFormat);
-            }
-
-            void operator=(const wordList& fieldNames)
-            {
-                DynamicList<word>::operator=(fieldNames);
-            }
-        };
 
 
         //- Class used for surface merging information
@@ -141,6 +89,7 @@ class sampledSurfaces
         //- Tolerance for merging points (fraction of mesh bounding box)
         static scalar mergeTol_;
 
+
     // Private data
 
         //- Name of this set of surfaces,
@@ -160,13 +109,10 @@ class sampledSurfaces
         // Read from dictonary
 
             //- Names of fields to sample
-            wordList fieldNames_;
+            wordReList fieldSelection_;
 
             //- Interpolation scheme to use
             word interpolationScheme_;
-
-            //- Output format to use
-            word writeFormat_;
 
 
         // surfaces
@@ -177,36 +123,45 @@ class sampledSurfaces
 
         // Calculated
 
-            //- Generic surface formatter
-            autoPtr<surfaceWriter<bool> > genericFormatter_;
-
-            //- Categorized scalar/vector/tensor fields
-            fieldGroup<scalar> scalarFields_;
-            fieldGroup<vector> vectorFields_;
-            fieldGroup<sphericalTensor> sphericalTensorFields_;
-            fieldGroup<symmTensor> symmTensorFields_;
-            fieldGroup<tensor> tensorFields_;
+            //- Surface formatter
+            autoPtr<surfaceWriter> formatter_;
 
 
     // Private Member Functions
 
-        //- Classify field types, returns the number of fields
-        label classifyFieldTypes();
+
+        //- Return number of fields
+        label classifyFields();
 
         //- Write geometry only
         void writeGeometry() const;
+
+        //- Write sampled fieldName on surface and on outputDir path
+        template<class Type>
+        void writeSurface
+        (
+            const Field<Type>& values,
+            const label surfI,
+            const word& fieldName,
+            const fileName& outputDir
+        );
 
         //- Sample and write a particular volume field
         template<class Type>
         void sampleAndWrite
         (
-            const GeometricField<Type, fvPatchField, volMesh>&,
-            const surfaceWriter<Type>& formatter
+            const GeometricField<Type, fvPatchField, volMesh>&
         );
 
-        //- Sample and write all the fields of the given type
-        template <class Type>
-        void sampleAndWrite(fieldGroup<Type>&);
+        //- Sample and write a particular surface field
+        template<class Type>
+        void sampleAndWrite
+        (
+            const GeometricField<Type, fvsPatchField, surfaceMesh>&
+        );
+
+        //- Sample and write all sampled fields
+        template<class Type> void sampleAndWrite(const IOobjectList& objects);
 
         //- Disallow default bitwise copy construct and assignment
         sampledSurfaces(const sampledSurfaces&);
@@ -232,7 +187,7 @@ public:
         );
 
 
-    // Destructor
+    //- Destructor
 
         virtual ~sampledSurfaces();
 
@@ -266,6 +221,9 @@ public:
 
         //- Execute at the final time-loop, currently does nothing
         virtual void end();
+
+        //- Called when time was set at the end of the Time::operator++
+        virtual void timeSet();
 
         //- Sample and write
         virtual void write();

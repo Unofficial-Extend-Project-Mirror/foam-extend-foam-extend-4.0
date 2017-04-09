@@ -42,6 +42,7 @@ SourceFiles
 #include "direction.H"
 #include "scalar.H"
 #include "word.H"
+#include "zero.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

@@ -96,22 +96,15 @@ void Foam::distributedTriSurfaceMesh::distributeFields
 {
     typedef DimensionedField<Type, triSurfaceGeoMesh> DimensionedSurfField;
 
-    HashTable<const DimensionedSurfField*> fields
+    HashTable<DimensionedSurfField*> fields
     (
         objectRegistry::lookupClass
         <DimensionedSurfField >()
     );
 
-    for
-    (
-        typename HashTable<const DimensionedSurfField*>::iterator fieldIter =
-            fields.begin();
-        fieldIter != fields.end();
-        ++fieldIter
-    )
+    forAllIter (typename HashTable<DimensionedSurfField*>, fields, fieldIter)
     {
-        DimensionedSurfField& field =
-            const_cast<DimensionedSurfField&>(*fieldIter());
+        DimensionedSurfField& field = *fieldIter();
 
         label oldSize = field.size();
 

@@ -81,7 +81,7 @@ bool Foam::MachNumber::start()
 }
 
 
-bool Foam::MachNumber::execute()
+bool Foam::MachNumber::execute(const bool forceWrite)
 {
     const fvMesh& mesh =
         time_.lookupObject<fvMesh>(regionName_);

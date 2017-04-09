@@ -28,10 +28,19 @@ License
 #include "OFstream.H"
 #include "OSspecific.H"
 
+#include "makeSurfaceWriterMethods.H"
+
+// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
+
+namespace Foam
+{
+    makeSurfaceWriterType(dxSurfaceWriter);
+}
+
+
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
-template<class Type>
-void Foam::dxSurfaceWriter<Type>::writeGeometry
+void Foam::dxSurfaceWriter::writeGeometry
 (
     Ostream& os,
     const pointField& points,
@@ -54,7 +63,6 @@ void Foam::dxSurfaceWriter<Type>::writeGeometry
     os  << nl;
 
     // Write triangles
-
     os  << "# The irregular connections (triangles)" << nl
         << "object 2 class array type int rank 1 shape 3 items "
         << faces.size() << " data follows" << nl;
@@ -80,17 +88,41 @@ void Foam::dxSurfaceWriter<Type>::writeGeometry
 }
 
 
+void Foam::dxSurfaceWriter::writeTrailer(Ostream& os, const bool isNodeValues)
+{
+    if (isNodeValues)
+    {
+        os  << nl << "attribute \"dep\" string \"positions\""
+            << nl << nl;
+    }
+    else
+    {
+        os  << nl << "attribute \"dep\" string \"connections\""
+            << nl << nl;
+    }
+
+    os  << "# the field, with three components: \"positions\","
+        << " \"connections\", and \"data\"" << nl
+        << "object \"irregular positions irregular "
+        << "connections\" class field"
+        << nl
+        << "component \"positions\" value 1" << nl
+        << "component \"connections\" value 2" << nl
+        << "component \"data\" value 3" << nl;
+
+    os  << "end" << endl;
+}
+
+
 namespace Foam
 {
-    // Write scalarField in DX format
     template<>
-    void Foam::dxSurfaceWriter<Foam::scalar>::writeData
+    void Foam::dxSurfaceWriter::writeData
     (
         Ostream& os,
         const Field<scalar>& values
     )
     {
-        // Write data
         os  << "object 3 class array type float rank 0 items "
             << values.size() << " data follows" << nl;
 
@@ -101,15 +133,13 @@ namespace Foam
     }
 
 
-    // Write vectorField in DX format
     template<>
-    void Foam::dxSurfaceWriter<Foam::vector>::writeData
+    void Foam::dxSurfaceWriter::writeData
     (
         Ostream& os,
         const Field<vector>& values
     )
     {
-        // Write data
         os  << "object 3 class array type float rank 1 shape 3 items "
             << values.size() << " data follows" << nl;
 
@@ -122,15 +152,13 @@ namespace Foam
     }
 
 
-    // Write sphericalTensorField in DX format
     template<>
-    void Foam::dxSurfaceWriter<Foam::sphericalTensor>::writeData
+    void Foam::dxSurfaceWriter::writeData
     (
         Ostream& os,
         const Field<sphericalTensor>& values
     )
     {
-        // Write data
         os  << "object 3 class array type float rank 0 items "
             << values.size() << " data follows" << nl;
 
@@ -141,15 +169,13 @@ namespace Foam
     }
 
 
-    // Write symmTensorField in DX format
     template<>
-    void Foam::dxSurfaceWriter<Foam::symmTensor>::writeData
+    void Foam::dxSurfaceWriter::writeData
     (
         Ostream& os,
         const Field<symmTensor>& values
     )
     {
-        // Write data
         os  << "object 3 class array type float rank 2 shape 3 items "
             << values.size() << " data follows" << nl;
 
@@ -165,15 +191,14 @@ namespace Foam
     }
 
 
-    // Write tensorField in DX format
+    // Write Field<tensor> in DX format
     template<>
-    void Foam::dxSurfaceWriter<Foam::tensor>::writeData
+    inline void Foam::dxSurfaceWriter::writeData
     (
         Ostream& os,
         const Field<tensor>& values
     )
     {
-        // Write data
         os  << "object 3 class array type float rank 2 shape 3 items "
             << values.size() << " data follows" << nl;
 
@@ -189,15 +214,15 @@ namespace Foam
     }
 }
 
-// Write tensorField in DX format
+
+// arbitrary field
 template<class Type>
-void Foam::dxSurfaceWriter<Type>::writeData
+inline void Foam::dxSurfaceWriter::writeData
 (
     Ostream& os,
     const Field<Type>& values
 )
 {
-    // Write data
     os  << "object 3 class array type float rank 0 items "
         << values.size() << " data follows" << nl;
 
@@ -208,48 +233,16 @@ void Foam::dxSurfaceWriter<Type>::writeData
 }
 
 
-// Write trailer in DX format
 template<class Type>
-void Foam::dxSurfaceWriter<Type>::writeTrailer(Ostream& os)
-{
-    os  << "# the field, with three components: \"positions\","
-        << " \"connections\", and \"data\"" << nl
-        << "object \"irregular positions irregular "
-        << "connections\" class field"
-        << nl
-        << "component \"positions\" value 1" << nl
-        << "component \"connections\" value 2" << nl
-        << "component \"data\" value 3" << nl;
-}
-
-
-// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
-
-template<class Type>
-Foam::dxSurfaceWriter<Type>::dxSurfaceWriter()
-:
-    surfaceWriter<Type>()
-{}
-
-
-// * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
-
-template<class Type>
-Foam::dxSurfaceWriter<Type>::~dxSurfaceWriter()
-{}
-
-
-// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
-
-template<class Type>
-void Foam::dxSurfaceWriter<Type>::write
+void Foam::dxSurfaceWriter::writeTemplate
 (
     const fileName& outputDir,
     const fileName& surfaceName,
     const pointField& points,
     const faceList& faces,
-    const fileName& fieldName,
+    const word& fieldName,
     const Field<Type>& values,
+    const bool isNodeValues,
     const bool verbose
 ) const
 {
@@ -269,24 +262,29 @@ void Foam::dxSurfaceWriter<Type>::write
     }
 
     writeGeometry(os, points, faces);
-
     writeData(os, values);
-
-    if (values.size() == points.size())
-    {
-        os  << nl << "attribute \"dep\" string \"positions\""
-            << nl << nl;
-    }
-    else
-    {
-        os  << nl << "attribute \"dep\" string \"connections\""
-            << nl << nl;
-    }
-
-    writeTrailer(os);
-
-    os << "end" << nl;
+    writeTrailer(os, isNodeValues);
 }
+
+
+// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
+
+Foam::dxSurfaceWriter::dxSurfaceWriter()
+:
+    surfaceWriter()
+{}
+
+
+// * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
+
+Foam::dxSurfaceWriter::~dxSurfaceWriter()
+{}
+
+
+// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+
+// create write methods
+defineSurfaceWriterWriteFields(Foam::dxSurfaceWriter);
 
 
 // ************************************************************************* //

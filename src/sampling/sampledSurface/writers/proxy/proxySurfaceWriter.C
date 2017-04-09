@@ -29,27 +29,34 @@ License
 #include "OFstream.H"
 #include "OSspecific.H"
 
+#include "makeSurfaceWriterMethods.H"
+
+// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
+
+namespace Foam
+{
+    defineTypeNameAndDebug(proxySurfaceWriter, 0);
+}
+
+
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-template<class Type>
-Foam::proxySurfaceWriter<Type>::proxySurfaceWriter(const word& ext)
+Foam::proxySurfaceWriter::proxySurfaceWriter(const word& ext)
 :
-    surfaceWriter<Type>(),
+    surfaceWriter(),
     ext_(ext)
 {}
 
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
-template<class Type>
-Foam::proxySurfaceWriter<Type>::~proxySurfaceWriter()
+Foam::proxySurfaceWriter::~proxySurfaceWriter()
 {}
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-template<class Type>
-void Foam::proxySurfaceWriter<Type>::write
+void Foam::proxySurfaceWriter::write
 (
     const fileName& outputDir,
     const fileName& surfaceName,
@@ -69,19 +76,14 @@ void Foam::proxySurfaceWriter<Type>::write
         mkDir(outputDir);
     }
 
-    fileName fName(outputDir/surfaceName + "." + ext_);
+    fileName outName(outputDir/surfaceName + "." + ext_);
 
     if (verbose)
     {
-        Info<< "Writing geometry to " << fName << endl;
+        Info<< "Writing geometry to " << outName << endl;
     }
 
-    MeshedSurfaceProxy<face>
-    (
-        points,
-        faces
-    ).write(fName);
-
+    MeshedSurfaceProxy<face>(points, faces).write(outName);
 }
 
 

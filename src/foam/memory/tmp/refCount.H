@@ -79,9 +79,9 @@ public:
 
 
         //- Return true if the reference count is zero
-        bool okToDelete() const
+        bool unique() const
         {
-            return !count_;
+            return count_ == 0;
         }
 
 

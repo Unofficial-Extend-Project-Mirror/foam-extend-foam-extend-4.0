@@ -51,7 +51,7 @@ Description
 int main(int argc, char *argv[])
 {
     // enable -constant ... if someone really wants it
-    // enable -zeroTime to prevent accidentally trashing the initial fields
+    // enable -noZero to prevent accidentally trashing the initial fields
     timeSelector::addOptions(true, true);
     argList::noParallel();
 #   include "addRegionOption.H"
@@ -125,7 +125,7 @@ int main(int argc, char *argv[])
     // Set all times on processor meshes equal to reconstructed mesh
     forAll (databases, procI)
     {
-        databases[procI].setTime(runTime.timeName(), runTime.timeIndex());
+        databases[procI].setTime(runTime);
     }
 
     // Read all meshes and addressing to reconstructed mesh

@@ -24,28 +24,52 @@ License
 Class
     Foam::fieldAverage
 
-Description
-    Calculates the field averages given list of fieldAverageItems, e.g.
+Group
+    grpFieldFunctionObjects
 
-    @verbatim
+Description
+    This function object calculates average quantities for a user-specified
+    selection of volumetric and surface fields.  Fields are entered as a list
+    of sub-dictionaries, which indicate the type of averages to perform, and
+    can be updated during the calculation.  The current options include:
+    - \c mean: arithmetic mean:
+        \f[
+            \overline{x} = \frac{1}{N}\displaystyle\sum\limits_{i=0}^N x_i
+        \f]
+    - \c prime2Mean: prime-squared mean
+        \f[
+            \overline{x'}^2 = \frac{1}{N}\displaystyle\sum\limits_{i=0}^N
+            (x_i - \overline{x})^2
+        \f]
+    - base: average over 'time', or 'iteration' (\f$N\f$ in the above)
+    - window: optional averaging window, specified in 'base' units
+
+    Average field names are constructed by concatenating the base field with
+    the averaging type, e.g. when averaging field 'U', the resultant fields
+    are:
+    - arithmetic mean field, UMean
+    - prime-squared field, UPrime2Mean
+
+    Information regarding the number of averaging steps, and total averaging
+    time are written on a per-field basis to the
+    \c fieldAveragingProperties dictionary, located in \<time\>/uniform
+
+    When restarting form a previous calculation, the averaging is continuous.
+    However, the averaging process can be restarted using the \c resetOnRestart
+    option.
+
+    To restart the averaging process after each calculation output time, use
+    the \c resetOnOutput option.
+
+    Example of function object specification:
+    \verbatim
     fieldAverage1
     {
-        // Type of functionObject
         type fieldAverage;
-
-        // Where to load it from (if not already in solver)
-        functionObjectLibs ("libfieldAverage.so");
-
-        // Whether to perform a clean restart, or start from previous
-        // averaging info if available
-        cleanRestart true;
-
-        // Whether to reset the averaged fields after they have been written.
-        // Used to average over only the preceding write interval for transient
-        // cases.
-        resetOnOutput true;
-
-        // Fields to be averaged. runTime modifiable!
+        functionObjectLibs ("libfieldFunctionObjects.so");
+        ...
+        resetOnRestart true;
+        resetOnOutput false;
         fields
         (
             U
@@ -53,6 +77,8 @@ Description
                 mean            on;
                 prime2Mean      on;
                 base            time;
+                window          10.0;
+                windowName      w1;
             }
             p
             {
@@ -61,24 +87,30 @@ Description
                 base            time;
             }
         );
-    @endverbatim
+    }
+    \endverbatim
 
-    Member function calcAverages() calculates the averages.
+    \heading Function object usage
+    \table
+        Property     | Description             | Required    | Default value
+        type         | type name: fieldAverage | yes         |
+        resetOnRestart | flag to reset the averaging on restart | yes  |
+        resetOnOutput| flag to reset the averaging on output | yes |
+        fields       | list of fields and averaging options | yes |
+    \endtable
 
-    Member function fieldAverage::write() calls calcAverages(). Average
-    field names are constructed by concatenating the base field with the
-    averaging type, e.g.
-    - base field, U
-    - arithmetic mean field, UMean
-    - prime-squared field, UPrime2Mean
 
-    Information regarding the number of averaging steps, and total averaging
-    time are written on a (base) per-field basis to the
-    fieldAveragingProperties dictionary, located in \<time\>/uniform
+Note
+    To employ the \c prime2Mean option, the \c mean option must be selecetd.
+
+SeeAlso
+    Foam::functionObject
+    Foam::OutputFilterFunctionObject
 
 SourceFiles
     fieldAverage.C
     fieldAverageTemplates.C
+    fieldAverageItem.C
 
 \*---------------------------------------------------------------------------*/
 
@@ -86,8 +118,8 @@ SourceFiles
 #define fieldAverage_H
 
 #include "volFieldsFwd.H"
-#include "pointFieldFwd.H"
 #include "Switch.H"
+#include "pointFieldFwd.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -98,28 +130,20 @@ namespace Foam
 class objectRegistry;
 class dictionary;
 class fieldAverageItem;
-class OFstream;
 template<class Type>
 class List;
+class polyMesh;
 class mapPolyMesh;
 
 /*---------------------------------------------------------------------------*\
-                         Class fieldAverage Declaration
+                        Class fieldAverage Declaration
 \*---------------------------------------------------------------------------*/
 
 class fieldAverage
 {
 protected:
 
-    // File and field name extensions
-
-        //- Mean average
-        static const word EXT_MEAN;
-
-        //- Prime-squared average
-        static const word EXT_PRIME2MEAN;
-
-    // Private data
+    // Protected data
 
         //- Name of this set of field averages.
         word name_;
@@ -133,30 +157,18 @@ protected:
         //- Time at last call, prevents repeated averaging
         label prevTimeIndex_;
 
-        //- Clean restart flag
-        Switch cleanRestart_;
+        //- Reset the averaging process on restart flag
+        Switch resetOnRestart_;
 
-        //- resetOnOutput flag
+        //- Reset the averaging process on output flag
         Switch resetOnOutput_;
+
+        //- Initialised flag
+        bool initialised_;
 
         //- List of field average items, describing what averages to be
         //  calculated and output
         List<fieldAverageItem> faItems_;
-
-        // Lists of averages
-
-            // Arithmetic mean fields
-            wordList meanScalarFields_;
-            wordList meanVectorFields_;
-            wordList meanSphericalTensorFields_;
-            wordList meanSymmTensorFields_;
-            wordList meanTensorFields_;
-
-            // Prime-squared fields
-            // Only applicable to volScalarFields / volVectorFields
-            wordList prime2MeanScalarFields_;
-            wordList prime2MeanSymmTensorFields_;
-
 
         // Counters
 
@@ -173,24 +185,27 @@ protected:
 
             //- Checkout fields (causes deletion) from the database
             //  and reset lists
-            void resetFields(wordList&);
+            void resetFields();
 
             //- Reset lists (clear existing values) and initialize averaging.
             //  Check requested field averages are valid, populate field lists
             void initialize();
 
-            //- Add mean average field to list
+            //- Add mean average field to database
             template<class Type>
-            void addMeanField(const label, wordList&) const;
+            void addMeanFieldType(const label fieldI);
 
-            //- Add prime-squared average field to list
+            //- Add mean average field to database
+            template<class Type>
+            void addMeanField(const label fieldI);
+
+            //- Add prime-squared average field to database
             template<class Type1, class Type2>
-            void addPrime2MeanField
-            (
-                const label,
-                const wordList&,
-                wordList&
-            ) const;
+            void addPrime2MeanFieldType(const label fieldI);
+
+            //- Add prime-squared average field to database
+            template<class Type1, class Type2>
+            void addPrime2MeanField(const label fieldI);
 
 
         // Calculation functions
@@ -200,48 +215,47 @@ protected:
 
             //- Calculate mean average fields
             template<class Type>
-            void calculateMeanFields(const wordList&) const;
+            void calculateMeanFieldType(const label fieldI) const;
 
-            //- Add mean-squared field value to prime-squared mean field
-            template<class Type1, class Type2>
-            void addMeanSqrToPrime2Mean
-            (
-                const wordList&,
-                const wordList&
-            ) const;
+            //- Calculate mean average fields
+            template<class Type>
+            void calculateMeanFields() const;
 
             //- Calculate prime-squared average fields
             template<class Type1, class Type2>
-            void calculatePrime2MeanFields
-            (
-                const wordList&,
-                const wordList&
-            ) const;
+            void calculatePrime2MeanFieldType(const label fieldI) const;
+
+            //- Calculate prime-squared average fields
+            template<class Type1, class Type2>
+            void calculatePrime2MeanFields() const;
+
+            //- Add mean-squared field value to prime-squared mean field
+            template<class Type1, class Type2>
+            void addMeanSqrToPrime2MeanType(const label fieldI) const;
+
+            //- Add mean-squared field value to prime-squared mean field
+            template<class Type1, class Type2>
+            void addMeanSqrToPrime2Mean() const;
 
 
-        // IO
+        // I-O
 
             //- Write averages
             virtual void writeAverages() const;
 
             //- Write fields
             template<class Type>
-            void writeFieldList(const wordList&) const;
+            void writeFieldType(const word& fieldName) const;
+
+            //- Write fields
+            template<class Type>
+            void writeFields() const;
 
             //- Write averaging properties - steps and time
             void writeAveragingProperties() const;
 
             //- Read averaging properties - steps and time
             void readAveragingProperties();
-
-
-        // Functions to be over-ridden from IOoutputFilter class
-
-            //- Update mesh
-            virtual void updateMesh(const mapPolyMesh&);
-
-            //- Move points
-            virtual void movePoints(const Field<point>&);
 
 
         //- Disallow default bitwise copy construct
@@ -271,8 +285,7 @@ public:
 
 
     //- Destructor
-
-        virtual ~fieldAverage();
+    virtual ~fieldAverage();
 
 
     // Member Functions
@@ -292,8 +305,17 @@ public:
         //- Execute the averaging at the final time-loop, currently does nothing
         virtual void end();
 
+        //- Called when time was set at the end of the Time::operator++
+        virtual void timeSet();
+
         //- Calculate the field average data and write
         virtual void write();
+
+        //- Update mesh
+        virtual void updateMesh(const mapPolyMesh&);
+
+        //- Move points
+        virtual void movePoints(const pointField&);
 };
 
 

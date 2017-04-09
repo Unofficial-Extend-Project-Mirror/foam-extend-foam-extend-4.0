@@ -56,7 +56,7 @@ Type Foam::sampledSurface::integrate(const Field<Type>& field) const
 
     if (checkFieldSize(field))
     {
-        value = sum(field * magSf());
+        value = sum(field*magSf());
     }
 
     reduce(value, sumOp<Type>());
@@ -80,7 +80,7 @@ Type Foam::sampledSurface::average(const Field<Type>& field) const
 
     if (checkFieldSize(field))
     {
-        value = sum(field * magSf());
+        value = sum(field*magSf());
     }
 
     reduce(value, sumOp<Type>());
@@ -88,7 +88,7 @@ Type Foam::sampledSurface::average(const Field<Type>& field) const
     // avoid divide-by-zero
     if (area())
     {
-        return value / area();
+        return value/area();
     }
     else
     {
@@ -119,7 +119,7 @@ void Foam::sampledSurface::project
 
         forAll(norm, faceI)
         {
-            res[faceI] = field[faceI] & (norm[faceI] / mag(norm[faceI]));
+            res[faceI] = field[faceI] & (norm[faceI]/mag(norm[faceI]));
         }
     }
     else
@@ -151,6 +151,60 @@ Foam::sampledSurface::project
     tmp<Field<ReturnType> > tRes(new Field<ReturnType>(faces().size()));
     project(tRes(), field);
     return tRes;
+}
+
+
+template<class Type>
+Foam::tmp<Foam::GeometricField<Type, Foam::fvPatchField, Foam::volMesh> >
+Foam::sampledSurface::pointAverage
+(
+    const GeometricField<Type, pointPatchField, pointMesh>& pfld
+) const
+{
+    const fvMesh& mesh = dynamic_cast<const fvMesh&>(pfld.mesh()());
+
+    tmp<GeometricField<Type, fvPatchField, volMesh> > tcellAvg
+    (
+        new GeometricField<Type, fvPatchField, volMesh>
+        (
+            IOobject
+            (
+                "cellAvg",
+                mesh.time().timeName(),
+                pfld.db(),
+                IOobject::NO_READ,
+                IOobject::NO_WRITE,
+                false
+            ),
+            mesh,
+            dimensioned<Type>("zero", dimless, pTraits<Type>::zero)
+        )
+    );
+    GeometricField<Type, fvPatchField, volMesh>& cellAvg = tcellAvg();
+
+    labelField nPointCells(mesh.nCells(), 0);
+    {
+        for (label pointI = 0; pointI < mesh.nPoints(); pointI++)
+        {
+            const labelList& pCells = mesh.pointCells(pointI);
+
+            forAll(pCells, i)
+            {
+                label cellI = pCells[i];
+
+                cellAvg[cellI] += pfld[pointI];
+                nPointCells[cellI]++;
+            }
+        }
+    }
+    forAll(cellAvg, cellI)
+    {
+        cellAvg[cellI] /= nPointCells[cellI];
+    }
+    // Give value to calculatedFvPatchFields
+    cellAvg.correctBoundaryConditions();
+
+    return tcellAvg;
 }
 
 

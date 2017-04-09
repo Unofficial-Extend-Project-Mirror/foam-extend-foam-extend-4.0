@@ -55,7 +55,7 @@ void parseOptions
         token nextOption(optionsStream);
 
         // Bug workaround
-        if (nextOption.type() == token::FATALERROR)
+        if (nextOption.type() == token::ERROR)
         {
             break;
         }
@@ -89,7 +89,7 @@ void parseOptions
         token nextOption(optionsStream);
 
         // Bug workaround
-        if (nextOption.type() == token::FATALERROR)
+        if (nextOption.type() == token::ERROR)
         {
             break;
         }

@@ -54,7 +54,7 @@ constitutiveModel::constitutiveModel
             "rheologyProperties",
             sigma.time().constant(),
             sigma.db(),
-            IOobject::MUST_READ,
+            IOobject::MUST_READ_IF_MODIFIED,
             IOobject::NO_WRITE
         )
     ),
@@ -133,7 +133,7 @@ constitutiveModel::constitutiveModel
                         "cohesiveProperties",
                         sigma.time().constant(),
                         sigma.db(),
-                        IOobject::MUST_READ,
+                        IOobject::MUST_READ_IF_MODIFIED,
                         IOobject::NO_WRITE
                     )
                 );

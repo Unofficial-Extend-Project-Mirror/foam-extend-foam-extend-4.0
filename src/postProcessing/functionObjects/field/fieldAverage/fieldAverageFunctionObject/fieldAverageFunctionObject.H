@@ -26,7 +26,7 @@ Typedef
 
 Description
     FunctionObject wrapper around fieldAverage to allow them to be created
-    via the functions list within controlDict.
+    via the functions entry within controlDict.
 
 SourceFiles
     fieldAverageFunctionObject.C

@@ -39,6 +39,7 @@ SourceFiles
 #include "regIOobject.H"
 #include "HashSet.H"
 #include "pointFieldsFwd.H"
+#include "PackedBoolList.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -135,8 +136,17 @@ public:
         //- Return a list of zone names
         wordList names() const;
 
+        //- Return zone indices for all matches
+        labelList findIndices(const keyType&) const;
+
+        //- Return zone index for the first match, return -1 if not found
+        label findIndex(const keyType&) const;
+
         //- Find zone index given a name
         label findZoneID(const word& zoneName) const;
+
+        //- Mark cells that match the zone specification
+        PackedBoolList findMatching(const keyType&) const;
 
         //- Clear the zones
         void clear();
@@ -152,6 +162,17 @@ public:
 
         //- writeData member function required by regIOobject
         bool writeData(Ostream&) const;
+
+    // Member Operators
+
+        //- Return const and non-const reference to ZoneType by index.
+        using PtrList<ZoneType>::operator[];
+
+        //- Return const reference to ZoneType by name.
+        const ZoneType& operator[](const word&) const;
+
+        //- Return reference to ZoneType by name.
+        ZoneType& operator[](const word&);
 
 
     // Ostream operator

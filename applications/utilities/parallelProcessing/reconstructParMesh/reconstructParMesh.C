@@ -50,8 +50,8 @@ Description
 
 int main(int argc, char *argv[])
 {
-    // enable -constant ... if someone really wants it
-    // enable -zeroTime to prevent accidentally trashing the initial fields
+    // disable -constant
+    // enable -noZero to prevent accidentally trashing the initial fields
     timeSelector::addOptions(false, true);
     argList::noParallel();
 #   include "addRegionOption.H"

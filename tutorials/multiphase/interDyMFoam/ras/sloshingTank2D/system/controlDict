@@ -81,6 +81,7 @@ functions
         (
             p
         );
+        interpolationScheme cellPoint;
 
         surfaces
         (

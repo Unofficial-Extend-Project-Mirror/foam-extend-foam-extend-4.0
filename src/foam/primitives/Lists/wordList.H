@@ -39,6 +39,8 @@ Description
 
 namespace Foam
 {
+    typedef UList<word> wordUList;
+
     typedef List<word> wordList;
 }
 

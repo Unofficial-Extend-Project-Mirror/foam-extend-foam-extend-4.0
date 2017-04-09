@@ -24,6 +24,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "fieldValue.H"
+#include "fvMesh.H"
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
@@ -36,6 +37,12 @@ inline const Foam::word& Foam::fieldValue::name() const
 inline const Foam::objectRegistry& Foam::fieldValue::obr() const
 {
     return obr_;
+}
+
+
+inline const Foam::dictionary& Foam::fieldValue::dict() const
+{
+    return dict_;
 }
 
 
@@ -72,6 +79,12 @@ inline const Foam::Switch& Foam::fieldValue::valueOutput() const
 inline const Foam::fvMesh& Foam::fieldValue::mesh() const
 {
     return refCast<const fvMesh>(obr_);
+}
+
+
+inline const Foam::dictionary& Foam::fieldValue::resultDict() const
+{
+    return resultDict_;
 }
 
 

@@ -37,23 +37,12 @@ Foam::autoPtr<Foam::dynamicFvMesh> Foam::dynamicFvMesh::New(const IOobject& io)
     forAll(libNames,i) {
         const word libName("lib"+libNames[i]+".so");
 
-        bool libLoaded = false;
+        dlLibraryTable& ll = const_cast<Time&>(io.time()).libs();
 
-        dlLibraryTable& ll = dlLibraryTable::loadedLibraries;
-
-        forAllConstIter(dlLibraryTable, ll, llI)
+        if (!ll.findLibrary(libName))
         {
-            if (ll(llI.key()) == libName)
+            if(!ll.open(libName))
             {
-                libLoaded = true;
-                break;
-            }
-        }
-
-        if (!libLoaded)
-        {
-            bool ok=dlLibraryTable::open(libName);
-            if(!ok) {
                 WarningIn("dynamicFvMesh::New(const IOobject& io)")
                     << "Loading of dynamic mesh library " << libName
                     << " unsuccesful. Some dynamic mesh  methods may not be "
@@ -74,7 +63,7 @@ Foam::autoPtr<Foam::dynamicFvMesh> Foam::dynamicFvMesh::New(const IOobject& io)
             io.time().constant(),
             (io.name() == dynamicFvMesh::defaultRegion ? "" : io.name() ),
             io.db(),
-            IOobject::MUST_READ,
+            IOobject::MUST_READ_IF_MODIFIED,
             IOobject::NO_WRITE,
             false
         )
@@ -84,7 +73,7 @@ Foam::autoPtr<Foam::dynamicFvMesh> Foam::dynamicFvMesh::New(const IOobject& io)
 
     Info<< "Selecting dynamicFvMesh " << dynamicFvMeshTypeName << endl;
 
-    dlLibraryTable::open
+    const_cast<Time&>(io.time()).libs().open
     (
         dynamicMeshDict,
         "dynamicFvMeshLibs",

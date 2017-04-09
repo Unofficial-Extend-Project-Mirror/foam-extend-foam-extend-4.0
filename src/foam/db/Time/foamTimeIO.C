@@ -240,37 +240,32 @@ void Foam::Time::readModifiedObjects()
 {
     if (runTimeModifiable_)
     {
-        // For parallel runs check if any object's file has been modified
-        // and only call readIfModified on each object if this is the case
-        // to avoid unnecessary reductions in readIfModified for each object
+        // Get state of all monitored objects (=registered objects with a
+        // valid filePath).
+        // Note: requires same ordering in objectRegistries on different
+        // processors!
+        monitorPtr_().updateStates
+        (
+            (
+                regIOobject::fileModificationChecking == inotifyMaster
+             || regIOobject::fileModificationChecking == timeStampMaster
+            ),
+            Pstream::parRun()
+        );
 
-        bool anyModified = true;
+        // Time handling is special since controlDict_ is the one dictionary
+        // that is not registered to any database.
 
-        if (Pstream::parRun())
+        if (controlDict_.readIfModified())
         {
-            anyModified = controlDict_.modified()
-                || objectRegistry::modified();
-
-            bool anyModifiedOnThisProc = anyModified;
-            reduce(anyModified, andOp<bool>());
-
-            if (anyModifiedOnThisProc && !anyModified)
-            {
-                WarningIn("Time::readModifiedObjects()")
-                    << "Delaying reading objects due to inconsistent "
-                       "file time-stamps between processors"
-                    << endl;
-            }
+            readDict();
+            functionObjects_.read();
         }
 
-        if (anyModified)
-        {
-            if (controlDict_.readIfModified())
-            {
-                readDict();
-                functionObjects_.read();
-            }
+        bool registryModified = objectRegistry::modified();
 
+        if (registryModified)
+        {
             objectRegistry::readModifiedObjects();
         }
     }
@@ -343,6 +338,12 @@ bool Foam::Time::writeAndEnd()
     endTime_ = value();
 
     return writeNow();
+}
+
+
+void Foam::Time::writeOnce()
+{
+    writeOnce_ = true;
 }
 
 

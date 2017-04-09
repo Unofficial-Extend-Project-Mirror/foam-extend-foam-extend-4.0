@@ -106,6 +106,7 @@ AccessType ListListOps::combineOffset
     return result;
 }
 
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam

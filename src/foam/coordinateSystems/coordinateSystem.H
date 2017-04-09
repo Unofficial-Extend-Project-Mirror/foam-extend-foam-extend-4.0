@@ -359,7 +359,7 @@ public:
         }
 
         //- Return local-to-global transformation tensor
-        const tensor& R() const
+        const coordinateRotation& R() const
         {
             return R_;
         }

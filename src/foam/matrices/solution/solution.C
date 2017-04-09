@@ -141,7 +141,7 @@ Foam::solution::solution(const objectRegistry& obr, const fileName& dictName)
             dictName,
             obr.time().system(),
             obr,
-            IOobject::READ_IF_PRESENT,  // Allow default dictionary creation
+            IOobject::READ_IF_PRESENT_IF_MODIFIED,  // Allow default dictionary creation
             IOobject::NO_WRITE
         )
     ),

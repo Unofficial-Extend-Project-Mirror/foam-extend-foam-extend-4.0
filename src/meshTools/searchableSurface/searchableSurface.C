@@ -24,7 +24,6 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "searchableSurface.H"
-#include "long.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 

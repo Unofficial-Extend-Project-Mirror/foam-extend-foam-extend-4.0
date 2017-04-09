@@ -25,17 +25,17 @@ License
 
 #include "objectRegistry.H"
 #include "foamTime.H"
+#include "stringListOps.H"
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 template<class Type>
-Foam::wordList
-Foam::objectRegistry::names() const
+Foam::wordList Foam::objectRegistry::names() const
 {
     wordList objectNames(size());
 
     label count=0;
-    for (const_iterator iter = begin(); iter != end(); ++iter)
+    forAllConstIter(HashTable<regIOobject*>, *this, iter)
     {
         if (isA<Type>(*iter()))
         {
@@ -50,19 +50,87 @@ Foam::objectRegistry::names() const
 
 
 template<class Type>
-Foam::HashTable<const Type*>
-Foam::objectRegistry::lookupClass() const
+Foam::wordList Foam::objectRegistry::names(const wordRe& name) const
+{
+    wordList objectNames(size());
+
+    label count = 0;
+    forAllConstIter(HashTable<regIOobject*>, *this, iter)
+    {
+        if (isA<Type>(*iter()))
+        {
+            const word& objectName = iter()->name();
+
+            if (name.match(objectName))
+            {
+                objectNames[count++] = objectName;
+            }
+        }
+    }
+
+    objectNames.setSize(count);
+
+    return objectNames;
+}
+
+
+template<class Type>
+Foam::wordList Foam::objectRegistry::names(const wordReList& patterns) const
+{
+    wordList names(this->names<Type>());
+
+    return wordList(names, findStrings(patterns, names));
+}
+
+
+template<class Type>
+Foam::HashTable<const Type*> Foam::objectRegistry::lookupClass
+(
+    const bool strict
+) const
 {
     HashTable<const Type*> objectsOfClass(size());
 
-    for (const_iterator iter = begin(); iter != end(); ++iter)
+    forAllConstIter(HashTable<regIOobject*>, *this, iter)
     {
-        if (isA<Type>(*iter()))
+        if
+        (
+            (strict && isType<Type>(*iter()))
+         || (!strict && isA<Type>(*iter()))
+        )
         {
             objectsOfClass.insert
             (
                 iter()->name(),
                 dynamic_cast<const Type*>(iter())
+            );
+        }
+    }
+
+    return objectsOfClass;
+}
+
+
+template<class Type>
+Foam::HashTable<Type*> Foam::objectRegistry::lookupClass
+(
+    const bool strict
+)
+{
+    HashTable<Type*> objectsOfClass(size());
+
+    forAllIter(HashTable<regIOobject*>, *this, iter)
+    {
+        if
+        (
+            (strict && isType<Type>(*iter()))
+         || (!strict && isA<Type>(*iter()))
+        )
+        {
+            objectsOfClass.insert
+            (
+                iter()->name(),
+                dynamic_cast<Type*>(iter())
             );
         }
     }
@@ -84,22 +152,13 @@ bool Foam::objectRegistry::foundObject(const word& name) const
         {
             return true;
         }
-        else
-        {
-            return false;
-        }
     }
-    else
+    else if (this->parentNotTime())
     {
-        if (&parent_ != dynamic_cast<const objectRegistry*>(&time_))
-        {
-            return parent_.foundObject<Type>(name);
-        }
-        else
-        {
-            return false;
-        }
+        return parent_.foundObject<Type>(name);
     }
+
+    return false;
 }
 
 
@@ -127,7 +186,7 @@ const Type& Foam::objectRegistry::lookupObject(const word& name) const
     }
     else
     {
-        if (&parent_ != dynamic_cast<const objectRegistry*>(&time_))
+        if (this->parentNotTime())
         {
             return parent_.lookupObject<Type>(name);
         }
@@ -146,7 +205,7 @@ const Type& Foam::objectRegistry::lookupObject(const word& name) const
         }
     }
 
-    return *reinterpret_cast< const Type* >(0);
+    return NullObjectRef<Type>();
 }
 
 

@@ -24,34 +24,78 @@ License
 Class
     Foam::fieldValues::cellSource
 
-Description
-    Cell source variant of field value function object. Values of user-
-    specified fields reported for collections of cells.
+Group
+    grpFieldFunctionObjects
 
-    cellObj1                        // Name also used to identify output folder
+Description
+    This function object provides a 'cell source' variant of the fieldValues
+    function object.  Given a list of user-specified fields and a selection
+    of mesh cells, a number of operations can be performed, such as sums,
+    averages and integrations.
+
+
+    Example of function object specification:
+    \verbatim
+    cellSource1
     {
         type            cellSource;
         functionObjectLibs ("libfieldFunctionObjects.so");
-        enabled         true;
-        outputControl   outputTime;
-        log             true;       // log to screen?
-        valueOutput     true;       // Write values at run-time output times?
-        source          cellZone;   // Type of cell source
+        ...
+        log             true;
+        valueOutput     true;
+        source          cellZone;
         sourceName      c0;
         operation       volAverage;
+        weightField     alpha1;
         fields
         (
             p
             U
         );
     }
+    \endverbatim
 
-    where operation is one of:
-      - none
-      - sum
-      - volAverage
-      - volIntegrate
-      - weightedAverage
+    \heading Function object usage
+    \table
+        Property     | Description             | Required    | Default value
+        type         | Type name: cellSource   | yes         |
+        log          | Write data to standard output | no    | no
+        valueOutput  | Write the raw output values | yes     |
+        writeVolume  | Write the volume of the cellSource | no |
+        source       | cell source: see below  | yes         |
+        sourceName   | name of cell source if required  | no |
+        operation    | operation to perform    | yes         |
+        weightField  | name of field to apply weighting | no |
+        fields       | list of fields to operate on | yes    |
+    \endtable
+
+    \linebreak
+    Where \c source is defined by
+    \plaintable
+        cellZone     | requires a 'sourceName' entry to specify the cellZone
+        all          | all cells
+    \endplaintable
+
+    \linebreak
+    The \c operation is one of:
+    \plaintable
+       none          | no operation
+       sum           | sum
+       sumMag        | sum of component magnitudes
+       average       | ensemble average
+       weightedAverage | weighted average
+       volAverage    | volume weighted average
+       weightedVolAverage | weighted volume average
+       volIntegrate  | volume integral
+       min           | minimum
+       max           | maximum
+       CoV           | coefficient of variation: standard deviation/mean
+    \endplaintable
+
+SeeAlso
+    Foam::fieldValues
+    Foam::functionObject
+    Foam::OutputFilterFunctionObject
 
 SourceFiles
     cellSource.C
@@ -89,11 +133,12 @@ public:
         //- Source type enumeration
         enum sourceType
         {
-            stCellZone
+            stCellZone,
+            stAll
         };
 
         //- Source type names
-        static const NamedEnum<sourceType, 1> sourceTypeNames_;
+        static const NamedEnum<sourceType, 2> sourceTypeNames_;
 
 
         //- Operation type enumeration
@@ -101,26 +146,33 @@ public:
         {
             opNone,
             opSum,
-            opVolAverage,
-            opVolIntegrate,
+            opSumMag,
+            opAverage,
             opWeightedAverage,
+            opVolAverage,
+            opWeightedVolAverage,
+            opVolIntegrate,
             opMin,
-            opMax
+            opMax,
+            opCoV
         };
 
         //- Operation type names
-        static const NamedEnum<operationType, 7> operationTypeNames_;
+        static const NamedEnum<operationType, 11> operationTypeNames_;
 
 
 private:
 
-    // Private member functions
+    // Private Member Functions
 
         //- Set cells to evaluate based on a cell zone
         void setCellZoneCells();
 
         //- Set cells to evaluate based on a patch
         void setPatchCells();
+
+        //- Calculate and return volume of the cellSource: sum(V)
+        scalar volume() const;
 
 
 protected:
@@ -142,8 +194,14 @@ protected:
         //- Weight field name - only used for opWeightedAverage mode
         word weightFieldName_;
 
+        //- Volume of the cellSource
+        scalar volume_;
 
-    // Protected member functions
+        //- Optionally write the volume of the cellSource
+        bool writeVolume_;
+
+
+    // Protected Member Functions
 
         //- Initialise, e.g. cell addressing
         void initialise(const dictionary& dict);
@@ -156,7 +214,8 @@ protected:
         template<class Type>
         tmp<Field<Type> > setFieldValues
         (
-            const word& fieldName
+            const word& fieldName,
+            const bool mustGet = false
         ) const;
 
         //- Apply the 'operation' to the values
@@ -169,7 +228,7 @@ protected:
         ) const;
 
         //- Output file header information
-        virtual void writeFileHeader();
+        virtual void writeFileHeader(const label i);
 
 
 public:
@@ -192,7 +251,7 @@ public:
     virtual ~cellSource();
 
 
-    // Public member functions
+    // Public Member Functions
 
         // Access
 

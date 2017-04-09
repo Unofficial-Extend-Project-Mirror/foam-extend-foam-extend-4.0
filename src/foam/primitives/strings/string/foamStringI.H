@@ -176,6 +176,12 @@ inline String Foam::string::validate(const string& str)
     return ss;
 }
 
+inline bool Foam::string::match(const std::string& str) const
+{
+    // check as string
+    return (str == *this);
+}
+
 
 // * * * * * * * * * * * * * * * Member Operators  * * * * * * * * * * * * * //
 

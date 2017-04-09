@@ -1,6 +1,6 @@
 include $(RULES)/mplib$(WM_MPLIB)
 
-EXE_INC = $(PFLAGS) $(PINC)\
+EXE_INC = $(PFLAGS) $(PINC) \
     -I$(WM_THIRD_PARTY_DIR)/zlib-1.2.3
 
 #if defined(mingw)

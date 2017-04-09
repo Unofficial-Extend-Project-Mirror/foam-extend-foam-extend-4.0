@@ -108,7 +108,7 @@ inline Foam::tmp<T>::~tmp()
 {
     if (isTmp_ && ptr_)
     {
-        if (ptr_->okToDelete())
+        if (ptr_->unique())
         {
             delete ptr_;
             ptr_ = 0;
@@ -173,7 +173,7 @@ inline T* Foam::tmp<T>::ptr() const
 template<class T>
 inline void Foam::tmp<T>::clear() const
 {
-    if (isTmp_ && ptr_)  // skip this bit:  && ptr_->okToDelete())
+    if (isTmp_ && ptr_)  // skip this bit:  && ptr_->unique())
     {
         delete ptr_;
         ptr_ = 0;
@@ -273,7 +273,7 @@ inline void Foam::tmp<T>::operator=(const tmp<T>& t)
 {
     if (isTmp_ && ptr_)
     {
-        if (ptr_->okToDelete())
+        if (ptr_->unique())
         {
             delete ptr_;
             ptr_ = 0;

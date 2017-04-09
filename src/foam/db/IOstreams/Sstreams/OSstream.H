@@ -30,7 +30,6 @@ Description
 SourceFiles
     OSstreamI.H
     OSstream.C
-    chkStream.C
 
 \*---------------------------------------------------------------------------*/
 
@@ -187,6 +186,21 @@ public:
 
             //- Set precision of output field (and return old precision)
             virtual int precision(const int);
+
+
+        // STL stream
+
+            //- Access to underlying std::ostream
+            virtual ostream& stdStream()
+            {
+                return os_;
+            }
+
+            //- Const access to underlying std::ostream
+            virtual const ostream& stdStream() const
+            {
+                return os_;
+            }
 
 
         // Print

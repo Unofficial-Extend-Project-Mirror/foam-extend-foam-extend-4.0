@@ -34,7 +34,7 @@ Author
 #include "tetMetric.H"
 #include "word.H"
 #include "dictionary.H"
-#include "dlLibraryTable.H"
+#include "foamTime.H"
 
 namespace Foam
 {
@@ -54,12 +54,25 @@ tetMetric::New
 {
     Info << "Selecting metric " << metricName << endl;
 
-    dlLibraryTable::open
-    (
-        dict,
-        "tetMetricLibs",
-        metricPointMemberFunctionTablePtr_
-    );
+    // HR 11.02.18: Library table is member of runtime (like in
+    // vanilla). Therefore need runtime here and we get it by
+    // traversing to the top of the dict in the hope that it is
+    // an IOdictionary.
+    const dictionary& topDict = dict.topDict();
+    if (isA<IOdictionary>(topDict))
+    {
+        Time& time = const_cast<Time&>
+        (
+            reinterpret_cast<const Time&>(topDict)
+        );
+
+        time.libs().open
+        (
+            dict,
+            "tetMetricLibs",
+            metricPointMemberFunctionTablePtr_
+        );
+    }
 
     if (!metricPointMemberFunctionTablePtr_)
     {
@@ -69,7 +82,7 @@ tetMetric::New
         )   << "tetMetric table is empty"
             << exit(FatalError);
     }
-
+    
     metricPointMemberFunctionTable::iterator mfIter =
         metricPointMemberFunctionTablePtr_->find(metricName);
 

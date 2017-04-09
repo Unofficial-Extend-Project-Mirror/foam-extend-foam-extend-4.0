@@ -23,8 +23,8 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "error.H"
 #include "sigQuit.H"
+#include "error.H"
 #include "JobInfo.H"
 #include "IOstreams.H"
 
@@ -32,16 +32,17 @@ License
 
 struct sigaction Foam::sigQuit::oldAction_;
 
+
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
-void Foam::sigQuit::sigQuitHandler(int)
+void Foam::sigQuit::sigHandler(int)
 {
     // Reset old handling
     if (sigaction(SIGQUIT, &oldAction_, NULL) < 0)
     {
         FatalErrorIn
         (
-            "Foam::sigQuit::sigQuitHandler()"
+            "Foam::sigQuit::sigHandler()"
         )   << "Cannot reset SIGQUIT trapping"
             << abort(FatalError);
     }
@@ -94,7 +95,7 @@ void Foam::sigQuit::set(const bool verbose)
     }
 
     struct sigaction newAction;
-    newAction.sa_handler = sigQuitHandler;
+    newAction.sa_handler = sigHandler;
     newAction.sa_flags = SA_NODEFER;
     sigemptyset(&newAction.sa_mask);
     if (sigaction(SIGQUIT, &newAction, &oldAction_) < 0)

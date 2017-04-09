@@ -113,16 +113,15 @@ void Foam::sampledSurface::makeCf() const
 
 // * * * * * * * * * * * * * * * * Selectors * * * * * * * * * * * * * * * //
 
-
-Foam::autoPtr<Foam::sampledSurface>
-Foam::sampledSurface::New
+Foam::autoPtr<Foam::sampledSurface> Foam::sampledSurface::New
 (
     const word& name,
     const polyMesh& mesh,
     const dictionary& dict
 )
 {
-    word sampleType(dict.lookup("type"));
+    const word sampleType(dict.lookup("type"));
+
     if (debug)
     {
         Info<< "Selecting sampledType " << sampleType << endl;
@@ -137,8 +136,8 @@ Foam::sampledSurface::New
         (
             "sampledSurface::New"
             "(const word&, const polyMesh&, const dictionary&)"
-        )   << "Unknown sample type " << sampleType
-            << endl << endl
+        )   << "Unknown sample type "
+            << sampleType << nl << nl
             << "Valid sample types : " << endl
             << wordConstructorTablePtr_->sortedToc()
             << exit(FatalError);
@@ -147,17 +146,19 @@ Foam::sampledSurface::New
     return autoPtr<sampledSurface>(cstrIter()(name, mesh, dict));
 }
 
+
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 Foam::sampledSurface::sampledSurface
 (
     const word& name,
-    const polyMesh& mesh
+    const polyMesh& mesh,
+    const bool interpolate
 )
 :
     name_(name),
     mesh_(mesh),
-    interpolate_(false),
+    interpolate_(interpolate),
     SfPtr_(NULL),
     magSfPtr_(NULL),
     CfPtr_(NULL),
@@ -191,6 +192,7 @@ Foam::sampledSurface::~sampledSurface()
 {
     clearGeom();
 }
+
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
@@ -239,7 +241,56 @@ Foam::scalar Foam::sampledSurface::area() const
 }
 
 
-// do not project scalar - just copy values
+Foam::tmp<Foam::scalarField> Foam::sampledSurface::sample
+(
+    const surfaceScalarField& sField
+) const
+{
+    notImplemented("tmp<Foam::scalarField> sampledSurface::sample");
+    return tmp<scalarField>(NULL);
+}
+
+
+Foam::tmp<Foam::vectorField> Foam::sampledSurface::sample
+(
+    const surfaceVectorField& sField
+) const
+{
+    notImplemented("tmp<Foam::vectorField> sampledSurface::sample");
+    return tmp<vectorField>(NULL);
+}
+
+
+Foam::tmp<Foam::sphericalTensorField> Foam::sampledSurface::sample
+(
+    const surfaceSphericalTensorField& sField
+) const
+{
+    notImplemented("tmp<Foam::sphericalTensorField> sampledSurface::sample");
+    return tmp<sphericalTensorField>(NULL);
+}
+
+
+Foam::tmp<Foam::symmTensorField> Foam::sampledSurface::sample
+(
+    const surfaceSymmTensorField& sField
+) const
+{
+    notImplemented("tmp<Foam::symmTensorField> sampledSurface::sample");
+    return tmp<symmTensorField>(NULL);
+}
+
+
+Foam::tmp<Foam::tensorField> Foam::sampledSurface::sample
+(
+    const surfaceTensorField& sField
+) const
+{
+    notImplemented("tmp<Foam::tensorField> sampledSurface::sample");
+    return tmp<tensorField>(NULL);
+}
+
+
 Foam::tmp<Foam::Field<Foam::scalar> >
 Foam::sampledSurface::project(const Field<scalar>& field) const
 {
@@ -296,6 +347,7 @@ void Foam::sampledSurface::print(Ostream& os) const
     os << type();
 }
 
+
 // * * * * * * * * * * * * * * * Friend Operators  * * * * * * * * * * * * * //
 
 Foam::Ostream& Foam::operator<<(Ostream &os, const sampledSurface& s)
@@ -304,5 +356,6 @@ Foam::Ostream& Foam::operator<<(Ostream &os, const sampledSurface& s)
     os.check("Ostream& operator<<(Ostream&, const sampledSurface&");
     return os;
 }
+
 
 // ************************************************************************* //

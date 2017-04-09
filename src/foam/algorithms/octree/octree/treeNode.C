@@ -29,7 +29,6 @@ Description
 #include "octree.H"
 #include "treeLeaf.H"
 #include "treeBoundBox.H"
-#include "long.H"
 #include "linePointRef.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //

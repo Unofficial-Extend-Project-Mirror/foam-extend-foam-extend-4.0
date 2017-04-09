@@ -38,6 +38,7 @@ SourceFiles
 #include "volFieldsFwd.H"
 #include "pointFieldFwd.H"
 #include "Switch.H"
+#include "mapPolyMesh.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -51,7 +52,6 @@ class heatFluxItem;
 class OFstream;
 template<class Type>
 class List;
-class mapPolyMesh;
 
 /*---------------------------------------------------------------------------*\
                          Class heatFlux Declaration
@@ -59,8 +59,6 @@ class mapPolyMesh;
 
 class heatFlux
 {
-protected:
-
     // Private data
 
         //- Name of this set of heat flux check
@@ -81,14 +79,6 @@ protected:
 
             //- Write
             virtual void calcAndPrint();
-
-        // Functions to be over-ridden from IOoutputFilter class
-
-            //- Update mesh
-            virtual void updateMesh(const mapPolyMesh&);
-
-            //- Move points
-            virtual void movePoints(const Field<point>&);
 
 
         //- Disallow default bitwise copy construct
@@ -138,8 +128,17 @@ public:
         //- Execute the averaging at the final time-loop, currently does nothing
         virtual void end();
 
+        //- Called when time was set at the end of the Time::operator++
+        virtual void timeSet();
+
         //- Calculate the field average data and write
         virtual void write();
+
+        //- Update for changes of mesh
+        virtual void updateMesh(const mapPolyMesh&);
+
+        //- Update for changes of mesh
+        virtual void movePoints(const pointField&);
 };
 
 

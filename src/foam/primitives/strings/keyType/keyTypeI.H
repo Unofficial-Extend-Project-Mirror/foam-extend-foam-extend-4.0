@@ -50,7 +50,6 @@ inline Foam::keyType::keyType(const word& s)
 {}
 
 
-// Construct as copy of string. Expect it to be regular expression
 inline Foam::keyType::keyType(const string& s)
 :
     word(s, false),
@@ -58,7 +57,6 @@ inline Foam::keyType::keyType(const string& s)
 {}
 
 
-// Construct as copy of character array
 inline Foam::keyType::keyType(const char* s)
 :
     word(s, false),
@@ -66,7 +64,6 @@ inline Foam::keyType::keyType(const char* s)
 {}
 
 
-//- Construct as copy of std::string
 inline Foam::keyType::keyType
 (
     const std::string& s,

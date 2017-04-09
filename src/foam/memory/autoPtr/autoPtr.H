@@ -67,6 +67,9 @@ public:
         //  setting the arguments pointer to NULL
         inline autoPtr(const autoPtr<T>&);
 
+        //- Construct either by transferring pointer or cloning. Should
+        //  only be called with type that supports cloning.
+        inline autoPtr(const autoPtr<T>&, const bool reuse);
 
     // Destructor
 

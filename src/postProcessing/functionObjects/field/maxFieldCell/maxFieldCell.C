@@ -80,7 +80,7 @@ bool Foam::maxFieldCell::start()
 }
 
 
-bool Foam::maxFieldCell::execute()
+bool Foam::maxFieldCell::execute(const bool forceWrite)
 {
     const fvMesh& mesh =
         time_.lookupObject<fvMesh>(regionName_);

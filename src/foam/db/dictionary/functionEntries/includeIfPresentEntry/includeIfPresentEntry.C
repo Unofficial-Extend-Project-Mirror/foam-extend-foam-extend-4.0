@@ -74,10 +74,15 @@ bool Foam::functionEntries::includeIfPresentEntry::execute
     Istream& is
 )
 {
-    IFstream ifs(includeFileName(is));
+    const fileName fName(includeFileName(is, parentDict));
+    IFstream ifs(fName);
 
     if (ifs)
     {
+        if (Foam::functionEntries::includeEntry::report)
+        {
+            Info<< fName << endl;
+        }
         parentDict.read(ifs);
     }
 
@@ -92,10 +97,15 @@ bool Foam::functionEntries::includeIfPresentEntry::execute
     Istream& is
 )
 {
-    IFstream ifs(includeFileName(is));
+    const fileName fName(includeFileName(is, parentDict));
+    IFstream ifs(fName);
 
     if (ifs)
     {
+        if (Foam::functionEntries::includeEntry::report)
+        {
+            Info<< fName << endl;
+        }
         entry.read(parentDict, ifs);
     }
 

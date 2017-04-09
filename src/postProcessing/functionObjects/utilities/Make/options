@@ -1,17 +1,28 @@
 EXE_INC = \
-    -I$(LIB_SRC)/finiteVolume/lnInclude \
     -I$(LIB_SRC)/lagrangian/basic/lnInclude \
     -I$(LIB_SRC)/lagrangian/dsmc/lnInclude \
-    -I$(LIB_SRC)/thermophysicalModels/specie/lnInclude \
+    -I$(LIB_SRC)/transportModels \
+    -I$(LIB_SRC)/transportModels/incompressible/singlePhaseTransportModel \
+    -I$(LIB_SRC)/turbulenceModels \
+    -I$(LIB_SRC)/turbulenceModels/turbulenceModels/lnInclude \
+    -I$(LIB_SRC)/turbulenceModels/incompressible/lnInclude \
+    -I$(LIB_SRC)/turbulenceModels/compressible/lnInclude \
+    -I$(LIB_SRC)/transportModels/compressible/lnInclude \
     -I$(LIB_SRC)/thermophysicalModels/basic/lnInclude \
+    -I$(LIB_SRC)/finiteVolume/lnInclude \
     -I$(LIB_SRC)/meshTools/lnInclude \
     -I$(LIB_SRC)/sampling/lnInclude
 
 LIB_LIBS = \
-    -lfiniteVolume \
-    -lmeshTools \
-    -lsampling \
+    -lcompressibleLESModels \
+    -lcompressibleRASModels \
+    -lcompressibleTurbulenceModel \
+    -lincompressibleLESModels \
+    -lincompressibleRASModels \
+    -lincompressibleTurbulenceModel \
+    -lspecie \
     -llagrangian \
     -ldsmc \
-    -lbasicThermophysicalModels \
-    -lspecie
+    -lfiniteVolume \
+    -lmeshTools \
+    -lsampling

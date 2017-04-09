@@ -39,7 +39,7 @@ bool Foam::IOobject::readHeader(Istream& is)
     // Check Istream not already bad
     if (!is.good())
     {
-        if (rOpt_ == MUST_READ)
+        if (rOpt_ == MUST_READ || rOpt_ == MUST_READ_IF_MODIFIED)
         {
             FatalIOErrorIn("IOobject::readHeader(Istream&)", is)
                 << " stream not open for reading essential object from file "
@@ -72,7 +72,7 @@ bool Foam::IOobject::readHeader(Istream& is)
         is.format(headerDict.lookup("format"));
         headerClassName_ = word(headerDict.lookup("class"));
 
-        word headerObject(headerDict.lookup("object"));
+        const word headerObject(headerDict.lookup("object"));
         if (IOobject::debug && headerObject != name())
         {
             IOWarningIn("IOobject::readHeader(Istream&)", is)
@@ -102,7 +102,7 @@ bool Foam::IOobject::readHeader(Istream& is)
     }
     else
     {
-        if (rOpt_ == MUST_READ)
+        if (rOpt_ == MUST_READ || rOpt_ == MUST_READ_IF_MODIFIED)
         {
             FatalIOErrorIn("IOobject::readHeader(Istream&)", is)
                 << " stream failure while reading header"

@@ -8,7 +8,7 @@
             "U",
             runTime.timeName(),
             mesh,
-            IOobject::MUST_READ,
+            IOobject::MUST_READ_IF_MODIFIED,
             IOobject::AUTO_WRITE
         ),
         mesh
@@ -23,7 +23,7 @@
             "mechanicalProperties",
             "constant",
             mesh,
-            IOobject::MUST_READ,
+            IOobject::MUST_READ_IF_MODIFIED,
             IOobject::NO_WRITE
         )
     );

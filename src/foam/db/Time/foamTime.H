@@ -51,11 +51,14 @@ SourceFiles
 #include "typeInfo.H"
 #include "dlLibraryTable.H"
 #include "functionObjectList.H"
+#include "fileMonitor.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
+// Forward declaration of classes
+class argList;
 
 /*---------------------------------------------------------------------------*\
                              Class Time Declaration
@@ -70,6 +73,13 @@ class Time
     public TimeState
 {
     // Private data
+
+        //- file-change monitor for all registered files
+        mutable autoPtr<fileMonitor> monitorPtr_;
+
+        //- Any loaded dynamic libraries. Make sure to construct before
+        //  reading controlDict.
+        dlLibraryTable libs_;
 
         //- The controlDict
         IOdictionary controlDict_;
@@ -90,17 +100,17 @@ public:
         //- Stop-run control options
         enum stopAtControls
         {
-            saEndTime,
-            saNoWriteNow,
-            saWriteNow,
-            saNextWrite
+            saEndTime,    /*!< stop when Time reaches the prescribed endTime */
+            saNoWriteNow, /*!< set endTime to stop immediately w/o writing */
+            saWriteNow,   /*!< set endTime to stop immediately w/ writing */
+            saNextWrite   /*!< stop the next time data are written */
         };
 
-        //- Suported time directory name formats
+        //- Supported time directory name formats
         enum fmtflags
         {
-            general = 0,
-            fixed = ios_base::fixed,
+            general    = 0,
+            fixed      = ios_base::fixed,
             scientific = ios_base::scientific
         };
 
@@ -111,30 +121,49 @@ protected:
 
         label  startTimeIndex_;
         scalar startTime_;
-        scalar endTime_;
+        mutable scalar endTime_;
 
         static const NamedEnum<stopAtControls, 4> stopAtControlNames_;
-        stopAtControls stopAt_;
+        mutable stopAtControls stopAt_;
 
         static const NamedEnum<writeControls, 5> writeControlNames_;
         writeControls writeControl_;
 
         scalar writeInterval_;
 
-        label purgeWrite_;
+        // Additional writing
+
+            writeControls secondaryWriteControl_;
+
+            scalar secondaryWriteInterval_;
+
+        label  purgeWrite_;
         mutable FIFOStack<word> previousOutputTimes_;
 
-        //- Is the time currently being sub-cycled
+        // Additional purging
+
+            label  secondaryPurgeWrite_;
+            mutable FIFOStack<word> previousSecondaryOutputTimes_;
+
+
+        // One-shot writing
+        bool writeOnce_;
+
+        //- Is the time currently being sub-cycled?
         bool subCycling_;
 
         //- If time is being sub-cycled this is the previous TimeState
         autoPtr<TimeState> prevTimeState_;
+
 
         //- Time directory name format
         static fmtflags format_;
 
         //- Time directory name precision
         static int precision_;
+
+        //- Maximum time directory name precision
+        static const int maxPrecision_;
 
         //- Adjust the time step so that writing occurs at the specified time
         void adjustDeltaT();
@@ -163,9 +192,6 @@ private:
         //- Is runtime modification of dictionaries allowed?
         Switch runTimeModifiable_;
 
-        //- Instantiate a dummy class to cause the reading of dynamic libraries
-        dlLibraryTable::readDlLibrary readLibs_;
-
         //- Function objects executed at start and on ++, +=
         mutable functionObjectList functionObjects_;
 
@@ -180,7 +206,16 @@ public:
 
     // Constructors
 
-        //- Construct given name, rootPath and casePath
+        //- Construct given name of dictionary to read and argument list
+        Time
+        (
+            const word& name,
+            const argList& args,
+            const word& systemName = "system",
+            const word& constantName = "constant"
+        );
+
+        //- Construct given name of dictionary to read, rootPath and casePath
         Time
         (
             const word& name,
@@ -213,10 +248,8 @@ public:
         );
 
 
-    // Destructor
-
-        //- Virtual destructor
-        virtual ~Time();
+    //- Destructor
+    virtual ~Time();
 
 
     // Member functions
@@ -288,20 +321,46 @@ public:
                 return graphFormat_;
             }
 
+            //- Supports re-reading
+            const Switch& runTimeModifiable() const
+            {
+                return runTimeModifiable_;
+            }
+
             //- Read control dictionary, update controls and time
             virtual bool read();
 
-            //- Read the objects that have been modified
-            void readModifiedObjects();
+            // Automatic rereading
+
+                //- Read the objects that have been modified
+                void readModifiedObjects();
+
+                //- Add watching of a file. Returns handle
+                label addWatch(const fileName&) const;
+
+                //- Remove watch on a file (using handle)
+                bool removeWatch(const label) const;
+
+                //- Get name of file being watched (using handle)
+                const fileName& getFile(const label) const;
+
+                //- Get current state of file (using handle)
+                fileMonitor::fileState getState(const label) const;
+
+                //- Set current state of file (using handle) to unmodified
+                void setUnmodified(const label) const;
+
 
             //- Return the location of "dir" containing the file "name".
             //  (eg, used in reading mesh data)
-            //  If name is null, search for the directory "dir" only
+            //  If name is null, search for the directory "dir" only.
+            //  Does not search beyond stopInstance (if set) or constant.
             word findInstance
             (
                 const fileName& dir,
                 const word& name = word::null,
-                const IOobject::readOption rOpt = IOobject::MUST_READ
+                const IOobject::readOption rOpt = IOobject::MUST_READ,
+                const word& stopInstance = word::null
             ) const;
 
             //- Search the case for valid time directories
@@ -318,7 +377,8 @@ public:
             static label findClosestTimeIndex
             (
                 const instantList&,
-                const scalar
+                const scalar,
+                const word& constantName = "constant"
             );
 
             //- Write using given format, version and compression
@@ -329,23 +389,36 @@ public:
                 IOstream::compressionType
             ) const;
 
-            //- Write the objects now and continue the run
+            //- Write the objects now (not at end of iteration) and continue
+            //  the run
             bool writeNow();
 
-            //- Write the objects now and end the run
+            //- Write the objects now (not at end of iteration) and end the run
             bool writeAndEnd();
+
+            //- Write the objects once (one shot) and continue the run
+            void writeOnce();
 
 
         // Access
 
             //- Return time name of given scalar time
-            static word timeName(const scalar);
+            //  formatted with given precision
+            static word timeName
+            (
+                const scalar,
+                const int precision = precision_
+            );
 
             //- Return current time name
             virtual word timeName() const;
 
             //- Search a given directory for valid time directories
-            static instantList findTimes(const fileName&);
+            static instantList findTimes
+            (
+                const fileName&,
+                const word& constantName = "constant"
+            );
 
             //- Return start time index
             virtual label startTimeIndex() const;
@@ -360,6 +433,18 @@ public:
             const functionObjectList& functionObjects() const
             {
                 return functionObjects_;
+            }
+
+            //- External access to the loaded libraries
+            const dlLibraryTable& libs() const
+            {
+                return libs_;
+            }
+
+            //- External access to the loaded libraries
+            dlLibraryTable& libs()
+            {
+                return libs_;
             }
 
             //- Return true if time currently being sub-cycled, otherwise false
@@ -380,44 +465,49 @@ public:
             //- Return true if run should continue,
             //  also invokes the functionObjectList::end() method
             //  when the time goes out of range
-            //  @note
+            //  \note
             //  For correct behaviour, the following style of time-loop
             //  is recommended:
-            //  @code
+            //  \code
             //      while (runTime.run())
             //      {
             //          runTime++;
             //          solve;
             //          runTime.write();
             //      }
-            //  @endcode
+            //  \endcode
             virtual bool run() const;
 
             //- Return true if run should continue and if so increment time
             //  also invokes the functionObjectList::end() method
             //  when the time goes out of range
-            //  @note
+            //  \note
             //  For correct behaviour, the following style of time-loop
             //  is recommended:
-            //  @code
+            //  \code
             //      while (runTime.loop())
             //      {
             //          solve;
             //          runTime.write();
             //      }
-            //  @endcode
+            //  \endcode
             virtual bool loop();
 
             //- Return true if end of run,
             //  does not invoke any functionObject methods
-            //  @note
+            //  \note
             //      The rounding heuristics near endTime mean that
-            //      @code run() @endcode and @code !end() @endcode may
+            //      \code run() \endcode and \code !end() \endcode may
             //      not yield the same result
             virtual bool end() const;
 
 
         // Edit
+
+            //- Adjust the current stopAtControl. Note that this value
+            //  only persists until the next time the dictionary is read.
+            //  Return true if the stopAtControl changed.
+            virtual bool stopAt(const stopAtControls) const;
 
             //- Reset the time and time-index to those of the given time
             virtual void setTime(const Time&);

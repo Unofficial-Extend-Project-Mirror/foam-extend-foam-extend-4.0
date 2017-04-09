@@ -218,6 +218,12 @@ void Foam::heatFlux::end()
 }
 
 
+void Foam::heatFlux::timeSet()
+{
+    // Do nothing - only valid on write
+}
+
+
 void Foam::heatFlux::write()
 {
     if (active_)

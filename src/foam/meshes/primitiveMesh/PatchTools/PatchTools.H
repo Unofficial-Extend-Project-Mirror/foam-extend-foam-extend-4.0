@@ -166,6 +166,24 @@ public:
     );
 
 
+    //- Gather points and faces onto master and merge into single patch.
+    //  Note: uses faces/points, not localFaces/localPoints.
+    template
+    <
+        class Face,
+        template<class> class FaceList,
+        class PointField,
+        class PointType
+    >
+    static void gatherAndMerge
+    (
+        const scalar mergeDist,
+        const PrimitivePatch<Face, FaceList, PointField, PointType>& p,
+        Field<PointType>& mergedPoints,
+        List<Face>& mergedFaces,
+        labelList& pointMergeMap
+    );
+
 };
 
 

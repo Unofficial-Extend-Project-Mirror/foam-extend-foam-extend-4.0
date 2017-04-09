@@ -32,12 +32,14 @@ Foam::patchIdentifier::patchIdentifier
 (
     const word& name,
     const label index,
-    const word& physicalType
+    const word& physicalType,
+    const wordList& inGroups
 )
 :
     name_(name),
     index_(index),
-    physicalType_(physicalType)
+    physicalType_(physicalType),
+    inGroups_(inGroups)
 {}
 
 
@@ -52,6 +54,7 @@ Foam::patchIdentifier::patchIdentifier
     index_(index)
 {
     dict.readIfPresent("physicalType", physicalType_);
+    dict.readIfPresent("inGroups", inGroups_);
 }
 
 
@@ -63,7 +66,8 @@ Foam::patchIdentifier::patchIdentifier
 :
     name_(p.name_),
     index_(index),
-    physicalType_(p.physicalType_)
+    physicalType_(p.physicalType_),
+    inGroups_(p.inGroups_)
 {}
 
 
@@ -75,11 +79,22 @@ Foam::patchIdentifier::~patchIdentifier()
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
+bool Foam::patchIdentifier::inGroup(const word& name) const
+{
+    return findIndex(inGroups_, name) != -1;
+}
+
+
 void Foam::patchIdentifier::write(Ostream& os) const
 {
     if (physicalType_.size())
     {
         os.writeKeyword("physicalType") << physicalType_
+            << token::END_STATEMENT << nl;
+    }
+    if (inGroups_.size())
+    {
+        os.writeKeyword("inGroups") << inGroups_
             << token::END_STATEMENT << nl;
     }
 }

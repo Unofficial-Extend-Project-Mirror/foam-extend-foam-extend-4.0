@@ -27,16 +27,27 @@ License
 #include "dictionary.H"
 #include "OStringStream.H"
 
+// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
+
+Foam::debug::infoSwitch Foam::entry::disableFunctionEntries
+(
+    "disableFunctionEntries",
+    0
+);
+
+
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 Foam::entry::entry(const keyType& keyword)
 :
+    IDLList<entry>::link(),
     keyword_(keyword)
 {}
 
 
 Foam::entry::entry(const entry& e)
 :
+    IDLList<entry>::link(),
     keyword_(e.keyword_)
 {}
 
@@ -54,7 +65,7 @@ void Foam::entry::operator=(const entry& e)
     // check for assignment to self
     if (this == &e)
     {
-        FatalErrorIn("entry::operator=(const entry&)")
+        FatalErrorInFunction
             << "attempted assignment to self"
             << abort(FatalError);
     }

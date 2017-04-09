@@ -28,38 +28,13 @@ License
 #include "dictionary.H"
 #include "foamTime.H"
 #include "IOmanip.H"
-#include "ListListOps.H"
-#include "mergePoints.H"
 #include "volPointInterpolation.H"
+#include "PatchTools.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
 namespace Foam
 {
-    //- Used to offset faces in Pstream::combineOffset
-    template <>
-    class offsetOp<face>
-    {
-
-    public:
-
-        face operator()
-        (
-            const face& x,
-            const label offset
-        ) const
-        {
-            face result(x.size());
-
-            forAll(x, xI)
-            {
-                result[xI] = x[xI] + offset;
-            }
-            return result;
-        }
-    };
-
-
     defineTypeNameAndDebug(sampledSurfaces, 0);
 }
 
@@ -68,91 +43,6 @@ bool Foam::sampledSurfaces::verbose_(false);
 Foam::scalar Foam::sampledSurfaces::mergeTol_(1e-10);
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
-
-Foam::label Foam::sampledSurfaces::classifyFieldTypes()
-{
-    label nFields = 0;
-
-    scalarFields_.clear();
-    vectorFields_.clear();
-    sphericalTensorFields_.clear();
-    symmTensorFields_.clear();
-    tensorFields_.clear();
-
-    forAll(fieldNames_, fieldI)
-    {
-        const word& fieldName = fieldNames_[fieldI];
-        word fieldType = "";
-
-        // check files for a particular time
-        if (loadFromFiles_)
-        {
-            IOobject io
-            (
-                fieldName,
-                mesh_.time().timeName(),
-                mesh_,
-                IOobject::MUST_READ,
-                IOobject::NO_WRITE,
-                false
-            );
-
-            if (io.headerOk())
-            {
-                fieldType = io.headerClassName();
-            }
-            else
-            {
-                continue;
-            }
-        }
-        else
-        {
-            // check objectRegistry
-            objectRegistry::const_iterator iter = mesh_.find(fieldName);
-
-            if (iter != mesh_.objectRegistry::end())
-            {
-                fieldType = iter()->type();
-            }
-            else
-            {
-                continue;
-            }
-        }
-
-
-        if (fieldType == volScalarField::typeName)
-        {
-            scalarFields_.append(fieldName);
-            nFields++;
-        }
-        else if (fieldType == volVectorField::typeName)
-        {
-            vectorFields_.append(fieldName);
-            nFields++;
-        }
-        else if (fieldType == volSphericalTensorField::typeName)
-        {
-            sphericalTensorFields_.append(fieldName);
-            nFields++;
-        }
-        else if (fieldType == volSymmTensorField::typeName)
-        {
-            symmTensorFields_.append(fieldName);
-            nFields++;
-        }
-        else if (fieldType == volTensorField::typeName)
-        {
-            tensorFields_.append(fieldName);
-            nFields++;
-        }
-
-    }
-
-    return nFields;
-}
-
 
 void Foam::sampledSurfaces::writeGeometry() const
 {
@@ -169,7 +59,7 @@ void Foam::sampledSurfaces::writeGeometry() const
         {
             if (Pstream::master() && mergeList_[surfI].faces.size())
             {
-                genericFormatter_->write
+                formatter_->write
                 (
                     outputDir,
                     s.name(),
@@ -180,7 +70,7 @@ void Foam::sampledSurfaces::writeGeometry() const
         }
         else if (s.faces().size())
         {
-            genericFormatter_->write
+            formatter_->write
             (
                 outputDir,
                 s.name(),
@@ -207,24 +97,18 @@ Foam::sampledSurfaces::sampledSurfaces
     mesh_(refCast<const fvMesh>(obr)),
     loadFromFiles_(loadFromFiles),
     outputPath_(fileName::null),
-    fieldNames_(),
+    fieldSelection_(),
     interpolationScheme_(word::null),
-    writeFormat_(word::null),
     mergeList_(),
-    genericFormatter_(NULL),
-    scalarFields_(),
-    vectorFields_(),
-    sphericalTensorFields_(),
-    symmTensorFields_(),
-    tensorFields_()
+    formatter_(NULL)
 {
     if (Pstream::parRun())
     {
-        outputPath_ = mesh_.time().path()/".."/name_;
+        outputPath_ = mesh_.time().path()/".."/"postProcessing"/name_;
     }
     else
     {
-        outputPath_ = mesh_.time().path()/name_;
+        outputPath_ = mesh_.time().path()/"postProcessing"/name_;
     }
 
     read(dict);
@@ -257,6 +141,12 @@ void Foam::sampledSurfaces::end()
 }
 
 
+void Foam::sampledSurfaces::timeSet()
+{
+    // Do nothing - only valid on write
+}
+
+
 void Foam::sampledSurfaces::write()
 {
     if (size())
@@ -264,19 +154,12 @@ void Foam::sampledSurfaces::write()
         // finalize surfaces, merge points etc.
         update();
 
-        const label nFields = classifyFieldTypes();
+        const label nFields = classifyFields();
 
         if (Pstream::master())
         {
             if (debug)
             {
-                Pout<< "timeName = " << mesh_.time().timeName() << nl
-                    << "scalarFields    " << scalarFields_ << nl
-                    << "vectorFields    " << vectorFields_ << nl
-                    << "sphTensorFields " << sphericalTensorFields_ << nl
-                    << "symTensorFields " << symmTensorFields_ <<nl
-                    << "tensorFields    " << tensorFields_ <<nl;
-
                 Pout<< "Creating directory "
                     << outputPath_/mesh_.time().timeName() << nl << endl;
 
@@ -287,67 +170,76 @@ void Foam::sampledSurfaces::write()
 
         // write geometry first if required, or when no fields would otherwise
         // be written
-        if (nFields == 0 || genericFormatter_->separateFiles())
+        if (nFields == 0 || formatter_->separateGeometry())
         {
             writeGeometry();
         }
 
-        sampleAndWrite(scalarFields_);
-        sampleAndWrite(vectorFields_);
-        sampleAndWrite(sphericalTensorFields_);
-        sampleAndWrite(symmTensorFields_);
-        sampleAndWrite(tensorFields_);
+        const IOobjectList objects(mesh_, mesh_.time().timeName());
+
+        sampleAndWrite<volScalarField>(objects);
+        sampleAndWrite<volVectorField>(objects);
+        sampleAndWrite<volSphericalTensorField>(objects);
+        sampleAndWrite<volSymmTensorField>(objects);
+        sampleAndWrite<volTensorField>(objects);
+
+        sampleAndWrite<surfaceScalarField>(objects);
+        sampleAndWrite<surfaceVectorField>(objects);
+        sampleAndWrite<surfaceSphericalTensorField>(objects);
+        sampleAndWrite<surfaceSymmTensorField>(objects);
+        sampleAndWrite<surfaceTensorField>(objects);
     }
 }
 
 
 void Foam::sampledSurfaces::read(const dictionary& dict)
 {
-    fieldNames_ = wordList(dict.lookup("fields"));
+    bool surfacesFound = dict.found("surfaces");
 
-    const label nFields = fieldNames_.size();
-
-    scalarFields_.reset(nFields);
-    vectorFields_.reset(nFields);
-    sphericalTensorFields_.reset(nFields);
-    symmTensorFields_.reset(nFields);
-    tensorFields_.reset(nFields);
-
-    interpolationScheme_ = dict.lookupOrDefault<word>
-    (
-        "interpolationScheme",
-        "cell"
-    );
-    writeFormat_ = dict.lookupOrDefault<word>
-    (
-        "surfaceFormat",
-        "null"
-    );
-
-
-    // define the generic (geometry) writer
-    genericFormatter_ = surfaceWriter<bool>::New(writeFormat_);
-
-
-    PtrList<sampledSurface> newList
-    (
-        dict.lookup("surfaces"),
-        sampledSurface::iNew(mesh_)
-    );
-
-    transfer(newList);
-
-    if (Pstream::parRun())
+    if (surfacesFound)
     {
-        mergeList_.setSize(size());
-    }
+        dict.lookup("fields") >> fieldSelection_;
 
-    // ensure all surfaces and merge information are expired
-    expire();
+        dict.lookup("interpolationScheme") >> interpolationScheme_;
+        const word writeType(dict.lookup("surfaceFormat"));
+
+        // Define the surface formatter
+        // Optionally defined extra controls for the output formats
+        formatter_ = surfaceWriter::New
+        (
+            writeType,
+            dict.subOrEmptyDict("formatOptions").subOrEmptyDict(writeType)
+        );
+
+        PtrList<sampledSurface> newList
+        (
+            dict.lookup("surfaces"),
+            sampledSurface::iNew(mesh_)
+        );
+        transfer(newList);
+
+        if (Pstream::parRun())
+        {
+            mergeList_.setSize(size());
+        }
+
+        // Ensure all surfaces and merge information are expired
+        expire();
+
+        if (this->size())
+        {
+            Info<< "Reading surface description:" << nl;
+            forAll(*this, surfI)
+            {
+                Info<< "    " << operator[](surfI).name() << nl;
+            }
+            Info<< endl;
+        }
+    }
 
     if (Pstream::master() && debug)
     {
-        Pout<< "sample fields:" << fieldNames_ << nl
+        Pout<< "sample fields:" << fieldSelection_ << nl
             << "sample surfaces:" << nl << "(" << nl;
 
         forAll(*this, surfI)
@@ -362,6 +254,8 @@ void Foam::sampledSurfaces::read(const dictionary& dict)
 void Foam::sampledSurfaces::updateMesh(const mapPolyMesh&)
 {
     expire();
+
+    // pointMesh and interpolation will have been reset in mesh.update
 }
 
 
@@ -411,10 +305,6 @@ bool Foam::sampledSurfaces::expire()
             mergeList_[surfI].clear();
         }
     }
-
-    // reset interpolation
-    pointMesh::Delete(mesh_);
-    volPointInterpolation::Delete(mesh_);
 
     // true if any surfaces just expired
     return justExpired;
@@ -466,80 +356,18 @@ bool Foam::sampledSurfaces::update()
             continue;
         }
 
-
-        // Collect points from all processors
-        List<pointField> gatheredPoints(Pstream::nProcs());
-        gatheredPoints[Pstream::myProcNo()] = s.points();
-        Pstream::gatherList(gatheredPoints);
-
-        if (Pstream::master())
-        {
-            mergeList_[surfI].points = ListListOps::combine<pointField>
-            (
-                gatheredPoints,
-                accessOp<pointField>()
-            );
-        }
-
-        // Collect faces from all processors and renumber using sizes of
-        // gathered points
-        List<faceList> gatheredFaces(Pstream::nProcs());
-        gatheredFaces[Pstream::myProcNo()] = s.faces();
-        Pstream::gatherList(gatheredFaces);
-
-        if (Pstream::master())
-        {
-            mergeList_[surfI].faces = static_cast<const faceList&>
-            (
-                ListListOps::combineOffset<faceList>
-                (
-                    gatheredFaces,
-                    ListListOps::subSizes
-                    (
-                        gatheredPoints,
-                        accessOp<pointField>()
-                    ),
-                    accessOp<faceList>(),
-                    offsetOp<face>()
-                )
-            );
-        }
-
-        pointField newPoints;
-        labelList oldToNew;
-
-        bool hasMerged = mergePoints
+        PatchTools::gatherAndMerge
         (
-            mergeList_[surfI].points,
             mergeDim,
-            false,                  // verbosity
-            oldToNew,
-            newPoints
+            primitivePatch
+            (
+                SubList<face>(s.faces(), s.faces().size()),
+                s.points()
+            ),
+            mergeList_[surfI].points,
+            mergeList_[surfI].faces,
+            mergeList_[surfI].pointsMap
         );
-
-        if (hasMerged)
-        {
-            // Store point mapping
-            mergeList_[surfI].pointsMap.transfer(oldToNew);
-
-            // Copy points
-            mergeList_[surfI].points.transfer(newPoints);
-
-            // Relabel faces
-            faceList& faces = mergeList_[surfI].faces;
-
-            forAll(faces, faceI)
-            {
-                inplaceRenumber(mergeList_[surfI].pointsMap, faces[faceI]);
-            }
-
-            if (Pstream::master() && debug)
-            {
-                Pout<< "For surface " << surfI << " merged from "
-                    << mergeList_[surfI].pointsMap.size() << " points down to "
-                    << mergeList_[surfI].points.size()    << " points" << endl;
-            }
-        }
     }
 
     return updated;

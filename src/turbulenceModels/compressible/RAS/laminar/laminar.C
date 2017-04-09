@@ -77,6 +77,27 @@ tmp<volScalarField> laminar::mut() const
 }
 
 
+tmp<volScalarField> laminar::alphat() const
+{
+    return tmp<volScalarField>
+    (
+        new volScalarField
+        (
+            IOobject
+            (
+                "alphat",
+                runTime_.timeName(),
+                mesh_,
+                IOobject::NO_READ,
+                IOobject::NO_WRITE
+            ),
+            mesh_,
+            dimensionedScalar("alphat", alpha().dimensions(), 0.0)
+        )
+    );
+}
+
+
 tmp<volScalarField> laminar::k() const
 {
     return tmp<volScalarField>

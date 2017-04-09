@@ -46,6 +46,7 @@ Description
 #include "mapPolyMesh.H"
 #include "directTopoChange.H"
 #include "polyModifyFace.H"
+#include "wordReList.H"
 
 using namespace Foam;
 
@@ -698,7 +699,10 @@ int main(int argc, char *argv[])
 
         if (sourceType == "patches")
         {
-            labelHashSet patchSources(patches.patchSet(dict.lookup("patches")));
+            labelHashSet patchSources
+            (
+                patches.patchSet(wordReList(dict.lookup("patches")))
+            );
 
             // Repatch faces of the patches.
             forAllConstIter(labelHashSet, patchSources, iter)

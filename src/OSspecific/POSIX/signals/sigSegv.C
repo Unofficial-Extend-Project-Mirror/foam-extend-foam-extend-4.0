@@ -23,8 +23,8 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "error.H"
 #include "sigSegv.H"
+#include "error.H"
 #include "JobInfo.H"
 #include "IOstreams.H"
 
@@ -34,14 +34,14 @@ struct sigaction Foam::sigSegv::oldAction_;
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
-void Foam::sigSegv::sigSegvHandler(int)
+void Foam::sigSegv::sigHandler(int)
 {
     // Reset old handling
     if (sigaction(SIGSEGV, &oldAction_, NULL) < 0)
     {
         FatalErrorIn
         (
-            "Foam::sigSegv::sigSegvHandler()"
+            "Foam::sigSegv::sigHandler()"
         )   << "Cannot reset SIGSEGV trapping"
             << abort(FatalError);
     }
@@ -82,7 +82,7 @@ Foam::sigSegv::~sigSegv()
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-void Foam::sigSegv::set(const bool verbose)
+void Foam::sigSegv::set(const bool)
 {
     if (oldAction_.sa_handler)
     {
@@ -94,7 +94,7 @@ void Foam::sigSegv::set(const bool verbose)
     }
 
     struct sigaction newAction;
-    newAction.sa_handler = sigSegvHandler;
+    newAction.sa_handler = sigHandler;
     newAction.sa_flags = SA_NODEFER;
     sigemptyset(&newAction.sa_mask);
     if (sigaction(SIGSEGV, &newAction, &oldAction_) < 0)

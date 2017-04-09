@@ -141,6 +141,12 @@ public:
             return mut_;
         }
 
+        //- Return the turbulence thermal diffusivity
+        virtual tmp<volScalarField> alphat() const
+        {
+            return alphat_;
+        }
+
         //- Return the effective turbulent thermal diffusivity
         virtual tmp<volScalarField> alphaEff() const
         {

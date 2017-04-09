@@ -42,6 +42,9 @@ SourceFiles
 #include "polyMesh.H"
 #include "pointField.H"
 #include "volFieldsFwd.H"
+#include "surfaceFieldsFwd.H"
+#include "surfaceMesh.H"
+#include "wordReList.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -59,26 +62,24 @@ class mapPolyMesh;
 \*---------------------------------------------------------------------------*/
 
 class probes
+:
+    public pointField
 {
-    // Private classes
+protected:
+
+    // Protected classes
 
         //- Class used for grouping field types
         template<class Type>
         class fieldGroup
         :
-            public wordList
+            public DynamicList<word>
         {
         public:
             //- Construct null
             fieldGroup()
             :
-                wordList()
-            {}
-
-            //- Construct for a list of field names
-            fieldGroup(const wordList& fieldNames)
-            :
-                wordList(fieldNames)
+                DynamicList<word>(0)
             {}
         };
 
@@ -89,8 +90,8 @@ class probes
         //  Also used as the name of the probes directory.
         word name_;
 
-        //- Const reference to objectRegistry
-        const objectRegistry& obr_;
+        //- Const reference to fvMesh
+        const fvMesh& mesh_;
 
         //- Load fields from files (not from objectRegistry)
         bool loadFromFiles_;
@@ -99,23 +100,41 @@ class probes
         // Read from dictonary
 
             //- Names of fields to probe
-            wordList fieldNames_;
+            wordReList fieldSelection_;
 
-            //- Locations to probe
-            vectorField probeLocations_;
+            //- Fixed locations, default = yes
+            //  Note: set to false for moving mesh calations where locations
+            //        should move with the mesh
+            bool fixedLocations_;
+
+            //- Interpolation scheme name
+            //  Note: only possible when fixedLocations_ is true
+            word interpolationScheme_;
 
 
         // Calculated
 
-            //- Categorized scalar/vector/tensor fields
+            //- Categorized scalar/vector/tensor vol fields
             fieldGroup<scalar> scalarFields_;
             fieldGroup<vector> vectorFields_;
             fieldGroup<sphericalTensor> sphericalTensorFields_;
             fieldGroup<symmTensor> symmTensorFields_;
+            fieldGroup<symmTensor4thOrder> symmTensor4thOrderFields_;
+            fieldGroup<diagTensor> diagTensorFields_;
             fieldGroup<tensor> tensorFields_;
 
+            //- Categorized scalar/vector/tensor surf fields
+            fieldGroup<scalar> surfaceScalarFields_;
+            fieldGroup<vector> surfaceVectorFields_;
+            fieldGroup<sphericalTensor> surfaceSphericalTensorFields_;
+            fieldGroup<symmTensor> surfaceSymmTensorFields_;
+            fieldGroup<tensor> surfaceTensorFields_;
+
             // Cells to be probed (obtained from the locations)
-            labelList cellList_;
+            labelList elementList_;
+
+            // Faces to be probed
+            labelList faceList_;
 
             //- Current open files
             HashPtrTable<OFstream> probeFilePtrs_;
@@ -123,19 +142,24 @@ class probes
 
     // Private Member Functions
 
-        //- Find cells containing probes
-        void findCells(const fvMesh&);
+        //- Clear old field groups
+        void clearFieldGroups();
 
-        //- classify field types, return true if nFields > 0
-        bool checkFieldTypes();
+        //- Append fieldName to the appropriate group
+        label appendFieldGroup(const word& fieldName, const word& fieldType);
 
-        //- Find the fields in the list of the given type, return count
-        template<class Type>
-        label countFields
-        (
-            fieldGroup<Type>& fieldList,
-            const wordList& fieldTypes
-        ) const;
+        //- Classify field types, returns the number of fields
+        label classifyFields();
+
+        //- Find cells and faces containing probes
+        virtual void findElements(const fvMesh&);
+
+        //- Classify field type and Open/close file streams,
+        //  returns number of fields to sample
+        label prepare();
+
+
+private:
 
         //- Sample and write a particular volume field
         template<class Type>
@@ -144,9 +168,21 @@ class probes
             const GeometricField<Type, fvPatchField, volMesh>&
         );
 
+
+        //- Sample and write a particular surface field
+        template<class Type>
+        void sampleAndWrite
+        (
+            const GeometricField<Type, fvsPatchField, surfaceMesh>&
+        );
+
         //- Sample and write all the fields of the given type
-        template <class Type>
+        template<class Type>
         void sampleAndWrite(const fieldGroup<Type>&);
+
+        //- Sample and write all the surface fields of the given type
+        template<class Type>
+        void sampleAndWriteSurfaceFields(const fieldGroup<Type>&);
 
         //- Disallow default bitwise copy construct
         probes(const probes&);
@@ -187,21 +223,27 @@ public:
         }
 
         //- Return names of fields to probe
-        virtual const wordList& fieldNames() const
+        virtual const wordReList& fieldNames() const
         {
-            return fieldNames_;
+            return fieldSelection_;
         }
 
         //- Return locations to probe
-        virtual const vectorField& probeLocations() const
+        virtual const pointField& probeLocations() const
         {
-            return probeLocations_;
+            return *this;
+        }
+
+        //- Return location for probe i
+        virtual const point& probe(const label i) const
+        {
+            return operator[](i);
         }
 
         //- Cells to be probed (obtained from the locations)
-        const labelList& cells() const
+        const labelList& elements() const
         {
-            return cellList_;
+            return elementList_;
         }
 
         //- Execute, currently does nothing
@@ -210,6 +252,9 @@ public:
         //- Execute at the final time-loop, currently does nothing
         virtual void end();
 
+        //- Called when time was set at the end of the Time::operator++
+        virtual void timeSet();
+
         //- Sample and write
         virtual void write();
 
@@ -217,12 +262,10 @@ public:
         virtual void read(const dictionary&);
 
         //- Update for changes of mesh
-        virtual void updateMesh(const mapPolyMesh&)
-        {}
+        virtual void updateMesh(const mapPolyMesh&);
 
         //- Update for changes of mesh
-        virtual void movePoints(const pointField&)
-        {}
+        virtual void movePoints(const pointField&);
 
         //- Update for changes of mesh due to readUpdate
         virtual void readUpdate(const polyMesh::readUpdateState state)
@@ -235,9 +278,20 @@ public:
             const GeometricField<Type, fvPatchField, volMesh>&
         ) const;
 
-        //- Sample a single field on all sample locations
-        template <class Type>
+        //- Sample a single vol field on all sample locations
+        template<class Type>
         tmp<Field<Type> > sample(const word& fieldName) const;
+
+        //- Sample a single scalar field on all sample locations
+        template<class Type>
+        tmp<Field<Type> > sampleSurfaceFields(const word& fieldName) const;
+
+        //- Sample a surface field at all locations
+        template<class Type>
+        tmp<Field<Type> > sample
+        (
+            const GeometricField<Type, fvsPatchField, surfaceMesh>&
+        ) const;
 };
 
 

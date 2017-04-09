@@ -117,8 +117,7 @@ Foam::fvMesh::fvMesh(const IOobject& io)
 {
     if (debug)
     {
-        Info<< "Constructing fvMesh from IOobject"
-            << endl;
+        InfoInFunction << "Constructing fvMesh from IOobject" << endl;
     }
 
     // Check the existance of the cell volumes and read if present

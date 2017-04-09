@@ -231,7 +231,7 @@ void Foam::forces::read(const dictionary& dict)
         const fvMesh& mesh = refCast<const fvMesh>(obr_);
 
         patchSet_ =
-            mesh.boundaryMesh().patchSet(wordList(dict.lookup("patches")));
+            mesh.boundaryMesh().patchSet(wordReList(dict.lookup("patches")));
 
         dict.readIfPresent("directForceDensity", directForceDensity_);
 

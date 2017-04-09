@@ -91,7 +91,7 @@ bool Foam::RBFMotionFunctionObject::start()
 }
 
 
-bool Foam::RBFMotionFunctionObject::execute()
+bool Foam::RBFMotionFunctionObject::execute(const bool forceWrite)
 {
     const polyMesh& mesh =
         time_.lookupObject<polyMesh>(regionName_);

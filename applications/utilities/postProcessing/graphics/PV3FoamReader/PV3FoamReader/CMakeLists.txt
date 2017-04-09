@@ -22,12 +22,14 @@ LINK_DIRECTORIES(
 
 INCLUDE_DIRECTORIES(
     $ENV{WM_PROJECT_DIR}/src/OpenFOAM/lnInclude
+    $ENV{WM_PROJECT_DIR}/src/OSspecific/$ENV{WM_OSTYPE}/lnInclude
     $ENV{WM_PROJECT_DIR}/src/finiteVolume/lnInclude
     ${PROJECT_SOURCE_DIR}/../vtkPV3Foam
 )
 
 ADD_DEFINITIONS(
     -DWM_$ENV{WM_PRECISION_OPTION}
+    -DWM_LABEL_SIZE=$ENV{WM_LABEL_SIZE}
 )
 
 # Set output library destination to plugin folder

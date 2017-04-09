@@ -201,6 +201,8 @@ sets
 
 );
 
+surfaceFormat null;
+
 surfaces
 ();
 

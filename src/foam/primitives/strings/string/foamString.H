@@ -32,8 +32,8 @@ Description
 
     Used as a base class for word and fileName.
 
-See Also
-    Foam::findEtcFile() for information about the site/user FOAM
+See also
+    Foam::findEtcFile() for information about the site/user OpenFOAM
     configuration directory
 
 SourceFiles
@@ -143,6 +143,9 @@ public:
         template<class String>
         static inline string quotemeta(const string&, const char quote='\\');
 
+        //- True when strings match literally
+        inline bool match(const std::string&) const;
+
         //- Avoid masking the normal std::string replace
         using std::string::replace;
 
@@ -167,17 +170,18 @@ public:
         //- Expand initial tildes and all occurences of environment variables
         //  Expansion includes:
         //  -# environment variables
-        //     - "$VAR", "${VAR}"
+        //    - "$VAR", "${VAR}"
         //  -# current directory
-        //     - leading "./" : the current directory
+        //    - leading "./" : the current directory
         //  -# tilde expansion
-        //     - leading "~/" : home directory
-        //     - leading "~user" : home directory for specified user
-        //     - leading "~foam" : site/user FOAM configuration directory
+        //    - leading "~/" : home directory
+        //    - leading "~user" : home directory for specified user
+        //    - leading "~OpenFOAM" : site/user OpenFOAM configuration directory
         //
-        //  @sa
+        //  Any unknown entries are removed silently if allowEmpty is true
+        //  \sa
         //  Foam::findEtcFile
-        string& expand();
+        string& expand(const bool allowEmpty = false);
 
         //- Remove repeated characters returning true if string changed
         bool removeRepeated(const char);
@@ -194,14 +198,14 @@ public:
 
     // Member Operators
 
-        //- Return the sub-string from the i-th character for @a n characters
+        //- Return the sub-string from the i-th character for \a n characters
         inline string operator()
         (
             const size_type i,
             const size_type n
         ) const;
 
-        //- Return the sub-string from the first character for @a n characters
+        //- Return the sub-string from the first character for \a n characters
         inline string operator()
         (
             const size_type n

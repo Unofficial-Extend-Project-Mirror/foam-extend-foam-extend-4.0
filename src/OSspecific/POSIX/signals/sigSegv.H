@@ -38,7 +38,9 @@ SourceFiles
 
 \*---------------------------------------------------------------------------*/
 
-#include "OSspecific.H"
+#ifndef sigSegv_H
+#define sigSegv_H
+
 #include <signal.h>
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -60,23 +62,25 @@ class sigSegv
 
     // Private Member Functions
 
-        static void sigSegvHandler(int);
+        //- Handler for caught signals
+        static void sigHandler(int);
 
 
 public:
 
     // Constructors
 
+        //- Construct null
         sigSegv();
 
 
-    // Destructor
-
-        ~sigSegv();
+    //- Destructor
+    ~sigSegv();
 
 
     // Member functions
 
+        //- Activate SIGSEGV signal handler
         void set(const bool verbose);
 };
 
@@ -84,5 +88,9 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#endif
 
 // ************************************************************************* //

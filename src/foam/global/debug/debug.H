@@ -68,6 +68,8 @@ namespace debug
     static const int DIM_GLOBAL_CONTROL_DICT_SWITCH_SET = 5;
 
     //- The central control dictionary.
+    //  Located in ~/.OpenFOAM/VERSION or $WM_PROJECT_DIR/etc
+    //  \sa Foam::findEtcFile()
     dictionary& controlDict();
 
     //- The DebugSwitches sub-dictionary in the central controlDict.

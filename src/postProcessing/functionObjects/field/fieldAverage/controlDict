@@ -14,7 +14,7 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-application     oodles;
+application     XXX;
 
 startFrom       latestTime;
 
@@ -36,23 +36,29 @@ writeFormat     ascii;
 
 writePrecision  6;
 
-writeCompression uncompressed;
+writeCompression off;
 
 timeFormat      general;
 
 timePrecision   6;
 
-runTimeModifiable yes;
+runTimeModifiable true;
 
 functions
 {
     fieldAverage1
     {
         // Type of functionObject
-        type fieldAverage;
+        type            fieldAverage;
 
         // Where to load it from (if not already in solver)
-        functionObjectLibs ("libfieldAverage.so");
+        functionObjectLibs ("libfieldFunctionObjects.so");
+
+        // Function object enabled flag
+        enabled         true;
+
+        // When to output the average fields
+        outputControl   outputTime;
 
         // Fields to be averaged - runTime modifiable
         fields
@@ -62,6 +68,7 @@ functions
                 mean        on;
                 prime2Mean  on;
                 base        time;
+                window      0.01; // optional averaging window
             }
 
             p
@@ -69,6 +76,7 @@ functions
                 mean        on;
                 prime2Mean  on;
                 base        time;
+                window      0.01; // optional averaging window
             }
         );
     }

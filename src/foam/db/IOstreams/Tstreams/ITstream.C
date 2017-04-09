@@ -90,17 +90,16 @@ Foam::Istream& Foam::ITstream::read(token& t)
             setEof();
         }
 
+        t = token::undefinedToken;
+
         if (size())
         {
-            token::undefinedToken.lineNumber()
-                = operator[](size() - 1).lineNumber();
+            t.lineNumber() = tokenList::last().lineNumber();
         }
         else
         {
-            token::undefinedToken.lineNumber() = lineNumber();
+            t.lineNumber() = lineNumber();
         }
-
-        t = token::undefinedToken;
     }
 
     return *this;
@@ -163,14 +162,13 @@ Foam::Istream& Foam::ITstream::read(char*, std::streamsize)
 }
 
 
-// Rewind the token stream so that it may be read again
 Foam::Istream& Foam::ITstream::rewind()
 {
     tokenIndex_ = 0;
 
     if (size())
     {
-        lineNumber_ = operator[](0).lineNumber();
+        lineNumber_ = tokenList::first().lineNumber();
     }
 
     setGood();

@@ -28,10 +28,11 @@ Description
 \*---------------------------------------------------------------------------*/
 
 #include "IOobject.H"
+#include "objectRegistry.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-bool Foam::IOobject::writeHeader(Ostream& os) const
+bool Foam::IOobject::writeHeader(Ostream& os, const word& type) const
 {
     if (!os.good())
     {
@@ -46,7 +47,7 @@ bool Foam::IOobject::writeHeader(Ostream& os) const
         << "FoamFile\n{\n"
         << "    version     " << os.version() << ";\n"
         << "    format      " << os.format() << ";\n"
-        << "    class       " << type() << ";\n";
+        << "    class       " << type << ";\n";
 
     if (note().size())
     {
@@ -60,6 +61,12 @@ bool Foam::IOobject::writeHeader(Ostream& os) const
     writeDivider(os) << endl;
 
     return true;
+}
+
+
+bool Foam::IOobject::writeHeader(Ostream& os) const
+{
+    return writeHeader(os, type());
 }
 
 

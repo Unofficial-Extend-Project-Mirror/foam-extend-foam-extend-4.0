@@ -28,6 +28,7 @@ License
 #include "functionEntry.H"
 #include "includeEntry.H"
 #include "inputModeEntry.H"
+#include "stringOps.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -98,21 +99,84 @@ bool Foam::entry::New(dictionary& parentDict, Istream& is)
     }
     else  // Keyword starts entry ...
     {
-        if (keyword[0] == '#')         // ... Function entry
+        if
+        (
+           !disableFunctionEntries
+         && keyword[0] == '#'
+        )                           // ... Function entry
         {
             word functionName = keyword(1, keyword.size()-1);
             return functionEntry::execute(functionName, parentDict, is);
         }
-        else if (keyword[0] == '$')    // ... Substitution entry
+        else if
+        (
+           !disableFunctionEntries
+         && keyword[0] == '$'
+        )                           // ... Substitution entry
         {
-            parentDict.substituteKeyword(keyword);
+            token nextToken(is);
+            is.putBack(nextToken);
+
+            if (keyword.size() > 2 && keyword[1] == token::BEGIN_BLOCK)
+            {
+                // Recursive substitution mode. Replace between {} with
+                // expansion and then let standard variable expansion deal
+                // with rest.
+                string s(keyword(2, keyword.size()-3));
+                // Substitute dictionary and environment variables. Do not allow
+                // empty substitutions.
+                stringOps::inplaceExpand(s, parentDict, true, false);
+                keyword.std::string::replace(1, keyword.size()-1, s);
+            }
+
+            if (nextToken == token::BEGIN_BLOCK)
+            {
+                word varName = keyword(1, keyword.size()-1);
+
+                // lookup the variable name in the given dictionary
+                const entry* ePtr = parentDict.lookupScopedEntryPtr
+                (
+                    varName,
+                    true,
+                    true
+                );
+
+                if (ePtr)
+                {
+                    // Read as primitiveEntry
+                    const keyType newKeyword(ePtr->stream());
+
+                    return parentDict.add
+                    (
+                        new dictionaryEntry(newKeyword, parentDict, is),
+                        false
+                    );
+                }
+                else
+                {
+                    FatalIOErrorInFunction(is)
+                        << "Attempt to use undefined variable " << varName
+                        << " as keyword"
+                        << exit(FatalIOError);
+                    return false;
+                }
+            }
+            else
+            {
+                parentDict.substituteScopedKeyword(keyword);
+            }
+
             return true;
         }
-        else if (keyword == "include") // ... For backward compatibility
+        else if
+        (
+           !disableFunctionEntries
+         && keyword == "include"
+        )                           // ... For backward compatibility
         {
             return functionEntries::includeEntry::execute(parentDict, is);
         }
-        else                           // ... Data entries
+        else                        // ... Data entries
         {
             token nextToken(is);
             is.putBack(nextToken);
@@ -158,11 +222,7 @@ bool Foam::entry::New(dictionary& parentDict, Istream& is)
                 }
                 else if (functionEntries::inputModeEntry::error())
                 {
-                    FatalIOErrorIn
-                    (
-                        "entry::New(const dictionary& parentDict, Istream&)",
-                        is
-                    )
+                    FatalIOErrorInFunction(is)
                         << "ERROR! duplicate entry: " << keyword
                         << exit(FatalIOError);
 

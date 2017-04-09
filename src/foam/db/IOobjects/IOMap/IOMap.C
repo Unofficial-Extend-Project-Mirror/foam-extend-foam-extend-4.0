@@ -34,8 +34,12 @@ Foam::IOMap<T>::IOMap(const IOobject& io)
 {
     if
     (
-        io.readOpt() == IOobject::MUST_READ
+        (
+            io.readOpt() == IOobject::MUST_READ
+         || io.readOpt() == IOobject::MUST_READ_IF_MODIFIED
+        )
      || (io.readOpt() == IOobject::READ_IF_PRESENT && headerOk())
+     || (io.readOpt() == IOobject::READ_IF_PRESENT_IF_MODIFIED && headerOk())
     )
     {
         readStream(typeName) >> *this;
@@ -50,8 +54,12 @@ Foam::IOMap<T>::IOMap(const IOobject& io, const label size)
 {
     if
     (
-        io.readOpt() == IOobject::MUST_READ
+        (
+            io.readOpt() == IOobject::MUST_READ
+         || io.readOpt() == IOobject::MUST_READ_IF_MODIFIED
+        )
      || (io.readOpt() == IOobject::READ_IF_PRESENT && headerOk())
+     || (io.readOpt() == IOobject::READ_IF_PRESENT_IF_MODIFIED && headerOk())
     )
     {
         readStream(typeName) >> *this;
@@ -71,8 +79,12 @@ Foam::IOMap<T>::IOMap(const IOobject& io, const Map<T>& map)
 {
     if
     (
-        io.readOpt() == IOobject::MUST_READ
+        (
+            io.readOpt() == IOobject::MUST_READ
+         || io.readOpt() == IOobject::MUST_READ_IF_MODIFIED
+        )
      || (io.readOpt() == IOobject::READ_IF_PRESENT && headerOk())
+     || (io.readOpt() == IOobject::READ_IF_PRESENT_IF_MODIFIED && headerOk())
     )
     {
         readStream(typeName) >> *this;
@@ -94,8 +106,12 @@ Foam::IOMap<T>::IOMap(const IOobject& io, const Xfer<Map<T> >& map)
 
     if
     (
-        io.readOpt() == IOobject::MUST_READ
+        (
+            io.readOpt() == IOobject::MUST_READ
+         || io.readOpt() == IOobject::MUST_READ_IF_MODIFIED
+        )
      || (io.readOpt() == IOobject::READ_IF_PRESENT && headerOk())
+     || (io.readOpt() == IOobject::READ_IF_PRESENT_IF_MODIFIED && headerOk())
     )
     {
         readStream(typeName) >> *this;

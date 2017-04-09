@@ -32,10 +32,27 @@ Foam::IOList<T>::IOList(const IOobject& io)
 :
     regIOobject(io)
 {
+    // Temporary warning
     if
     (
-        io.readOpt() == IOobject::MUST_READ
+        io.readOpt() == IOobject::MUST_READ_IF_MODIFIED
+     || io.readOpt() == IOobject::READ_IF_PRESENT_IF_MODIFIED
+    )
+    {
+        WarningIn("IOList::IOList(const IOobject&)")
+            << "IOList " << name()
+            << " constructed with IOobject::MUST_READ_IF_MODIFIED"
+            " but IOList does not support automatic rereading."
+            << endl;
+    }
+    if
+    (
+        (
+            io.readOpt() == IOobject::MUST_READ
+         || io.readOpt() == IOobject::MUST_READ_IF_MODIFIED
+        )
      || (io.readOpt() == IOobject::READ_IF_PRESENT && headerOk())
+     || (io.readOpt() == IOobject::READ_IF_PRESENT_IF_MODIFIED && headerOk())
     )
     {
         readStream(typeName) >> *this;
@@ -49,10 +66,27 @@ Foam::IOList<T>::IOList(const IOobject& io, const label size)
 :
     regIOobject(io)
 {
+    // Temporary warning
     if
     (
-        io.readOpt() == IOobject::MUST_READ
+        io.readOpt() == IOobject::MUST_READ_IF_MODIFIED
+     || io.readOpt() == IOobject::READ_IF_PRESENT_IF_MODIFIED
+    )
+    {
+        WarningIn("IOList::IOList(const IOobject&, const label)")
+            << "IOList " << name()
+            << " constructed with IOobject::MUST_READ_IF_MODIFIED"
+            " but IOList does not support automatic rereading."
+            << endl;
+    }
+    if
+    (
+        (
+            io.readOpt() == IOobject::MUST_READ
+         || io.readOpt() == IOobject::MUST_READ_IF_MODIFIED
+        )
      || (io.readOpt() == IOobject::READ_IF_PRESENT && headerOk())
+     || (io.readOpt() == IOobject::READ_IF_PRESENT_IF_MODIFIED && headerOk())
     )
     {
         readStream(typeName) >> *this;
@@ -70,10 +104,28 @@ Foam::IOList<T>::IOList(const IOobject& io, const List<T>& list)
 :
     regIOobject(io)
 {
+    // Temporary warning
     if
     (
-        io.readOpt() == IOobject::MUST_READ
+        io.readOpt() == IOobject::MUST_READ_IF_MODIFIED
+     || io.readOpt() == IOobject::READ_IF_PRESENT_IF_MODIFIED
+    )
+    {
+        WarningIn("IOList::IOList(const IOobject&, const List<T>&)")
+            << "IOList " << name()
+            << " constructed with IOobject::MUST_READ_IF_MODIFIED"
+            " but IOList does not support automatic rereading."
+            << endl;
+    }
+
+    if
+    (
+        (
+            io.readOpt() == IOobject::MUST_READ
+         || io.readOpt() == IOobject::MUST_READ_IF_MODIFIED
+        )
      || (io.readOpt() == IOobject::READ_IF_PRESENT && headerOk())
+     || (io.readOpt() == IOobject::READ_IF_PRESENT_IF_MODIFIED && headerOk())
     )
     {
         readStream(typeName) >> *this;
@@ -91,12 +143,32 @@ Foam::IOList<T>::IOList(const IOobject& io, const Xfer<List<T> >& list)
 :
     regIOobject(io)
 {
+    // Temporary warning
+    if
+    (
+        io.readOpt() == IOobject::MUST_READ_IF_MODIFIED
+     || io.readOpt() == IOobject::READ_IF_PRESENT_IF_MODIFIED
+    )
+    {
+        WarningIn
+        (
+            "IOList::IOList(const IOobject&, const Xfer<List<T> >&)"
+        )   << "IOList " << name()
+            << " constructed with IOobject::MUST_READ_IF_MODIFIED"
+            " but IOList does not support automatic rereading."
+            << endl;
+    }
+
     List<T>::transfer(list());
 
     if
     (
-        io.readOpt() == IOobject::MUST_READ
+        (
+            io.readOpt() == IOobject::MUST_READ
+         || io.readOpt() == IOobject::MUST_READ_IF_MODIFIED
+        )
      || (io.readOpt() == IOobject::READ_IF_PRESENT && headerOk())
+     || (io.readOpt() == IOobject::READ_IF_PRESENT_IF_MODIFIED && headerOk())
     )
     {
         readStream(typeName) >> *this;

@@ -46,6 +46,7 @@ IODynList<T, IndexType>::IODynList(const IOobject& io)
     (
         io.readOpt() == IOobject::MUST_READ
      || (io.readOpt() == IOobject::READ_IF_PRESENT && headerOk())
+     || (io.readOpt() == IOobject::READ_IF_PRESENT_IF_MODIFIED && headerOk())
     )
     {
         readStream(typeName) >> *this;
@@ -76,7 +77,11 @@ IODynList<T, IndexType>::IODynList
     regIOobject(io),
     DynList<T, IndexType>()
 {
-    if (io.readOpt() == IOobject::READ_IF_PRESENT && headerOk())
+    if
+    (
+        (io.readOpt() == IOobject::READ_IF_PRESENT && headerOk())
+     || (io.readOpt() == IOobject::READ_IF_PRESENT_IF_MODIFIED && headerOk())
+    )
     {
         readStream(typeName) >> *this;
         close();

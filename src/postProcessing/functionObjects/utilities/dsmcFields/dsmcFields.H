@@ -24,6 +24,9 @@ License
 Class
     Foam::dsmcFields
 
+Group
+    grpUtilitiesFunctionObjects
+
 Description
     Calculate intensive fields:
     - UMean
@@ -41,6 +44,7 @@ SourceFiles
 #ifndef dsmcFields_H
 #define dsmcFields_H
 
+#include "typeInfo.H"
 #include "pointFieldFwd.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -51,10 +55,11 @@ namespace Foam
 // Forward declaration of classes
 class objectRegistry;
 class dictionary;
+class polyMesh;
 class mapPolyMesh;
 
 /*---------------------------------------------------------------------------*\
-                           Class dsmcFields Declaration
+                         Class dsmcFields Declaration
 \*---------------------------------------------------------------------------*/
 
 class dsmcFields
@@ -68,6 +73,7 @@ class dsmcFields
 
         //- on/off switch
         bool active_;
+
 
     // Private Member Functions
 
@@ -97,9 +103,8 @@ public:
         );
 
 
-    // Destructor
-
-        virtual ~dsmcFields();
+    //- Destructor
+    virtual ~dsmcFields();
 
 
     // Member Functions
@@ -118,6 +123,9 @@ public:
 
         //- Execute at the final time-loop, currently does nothing
         virtual void end();
+
+        //- Called when time was set at the end of the Time::operator++
+        virtual void timeSet();
 
         //- Calculate the dsmcFields and write
         virtual void write();

@@ -79,55 +79,66 @@ inline Foam::SHA1& Foam::SHA1::append(const char* str)
 
 // * * * * * * * * * * * * * * * Member Operators  * * * * * * * * * * * * * //
 
+inline bool Foam::SHA1::operator==(const SHA1& rhs) const
+{
+    return this->digest() == rhs.digest();
+}
+
+
 inline bool Foam::SHA1::operator==(const SHA1Digest& rhs) const
 {
     return this->digest() == rhs;
 }
 
 
-inline bool Foam::SHA1::operator!=(const SHA1Digest& rhs) const
+inline bool Foam::SHA1::operator==(const std::string& hexdigits) const
 {
-    return this->digest() != rhs;
+    return this->digest() == hexdigits;
 }
 
 
-inline bool Foam::SHA1::operator==(const SHA1& rhs) const
+inline bool Foam::SHA1::operator==(const char* hexdigits) const
 {
-    return digest() == rhs.digest();
+    return this->digest() == hexdigits;
 }
 
 
 inline bool Foam::SHA1::operator!=(const SHA1& rhs) const
 {
-    return digest() != rhs.digest();
+    return !this->operator==(rhs);
 }
 
 
-inline Foam::SHA1::operator
-Foam::SHA1Digest () const
+inline bool Foam::SHA1::operator!=(const SHA1Digest& rhs) const
+{
+    return !this->operator==(rhs);
+}
+
+
+inline bool Foam::SHA1::operator!=(const std::string& rhs) const
+{
+    return !this->operator==(rhs);
+}
+
+
+inline bool Foam::SHA1::operator!=(const char* rhs) const
+{
+    return !this->operator==(rhs);
+}
+
+
+inline Foam::SHA1::operator Foam::SHA1Digest() const
 {
     return digest();
 }
-
-
-// * * * * * * * * * * * * * * * Friend Functions  * * * * * * * * * * * * * //
-
-
-// * * * * * * * * * * * * * * * Friend Operators  * * * * * * * * * * * * * //
-
-
-// * * * * * * * * * * * * * * IOstream Operators  * * * * * * * * * * * * * //
 
 
 // * * * * * * * * * * * * * * * Ostream Operator  * * * * * * * * * * * * * //
 
 inline Foam::Ostream& Foam::operator<<(Ostream& os, const SHA1& sha)
 {
-    return os << sha.digest();
+    return os  << sha.digest();
 }
-
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 
 // ************************************************************************* //

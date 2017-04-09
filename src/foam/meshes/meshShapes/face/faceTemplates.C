@@ -50,7 +50,7 @@ template<class Type>
 Type Foam::face::average
 (
     const pointField& meshPoints,
-    const Field<Type>& f
+    const Field<Type>& fld
 ) const
 {
     // Calculate the average by breaking the face into triangles and
@@ -62,9 +62,9 @@ Type Foam::face::average
         return
             (1.0/3.0)
            *(
-               f[operator[](0)]
-             + f[operator[](1)]
-             + f[operator[](2)]
+               fld[operator[](0)]
+             + fld[operator[](1)]
+             + fld[operator[](2)]
             );
     }
 
@@ -73,10 +73,10 @@ Type Foam::face::average
     point centrePoint = point::zero;
     Type cf = pTraits<Type>::zero;
 
-    for (register label pI=0; pI<nPoints; pI++)
+    for (label pI=0; pI<nPoints; pI++)
     {
         centrePoint += meshPoints[operator[](pI)];
-        cf += f[operator[](pI)];
+        cf += fld[operator[](pI)];
     }
 
     centrePoint /= nPoints;
@@ -85,13 +85,13 @@ Type Foam::face::average
     scalar sumA = 0;
     Type sumAf = pTraits<Type>::zero;
 
-    for (register label pI=0; pI<nPoints; pI++)
+    for (label pI=0; pI<nPoints; pI++)
     {
         // Calculate 3*triangle centre field value
-        Type ttcf =
+        Type ttcf  =
         (
-            f[operator[](pI)]
-          + f[operator[]((pI + 1) % nPoints)]
+            fld[operator[](pI)]
+          + fld[operator[]((pI + 1) % nPoints)]
           + cf
         );
 
@@ -115,5 +115,6 @@ Type Foam::face::average
         return cf;
     }
 }
+
 
 // ************************************************************************* //

@@ -56,7 +56,7 @@ Foam::Istream& Foam::operator>>(Foam::Istream& is, FixedList<T, Size>& L)
         {
             L = dynamicCast<token::Compound<List<T> > >
             (
-                firstToken.transferCompoundToken()
+                firstToken.transferCompoundToken(is)
             );
         }
         else if (firstToken.isLabel())
@@ -68,7 +68,7 @@ Foam::Istream& Foam::operator>>(Foam::Istream& is, FixedList<T, Size>& L)
         }
         else if (!firstToken.isPunctuation())
         {
-            FatalIOErrorIn("operator>>(Istream&, FixedList<T, Size>&)", is)
+            FatalIOErrorInFunction(is)
                 << "incorrect first token, expected <label> "
                    "or '(' or '{', found "
                 << firstToken.info()

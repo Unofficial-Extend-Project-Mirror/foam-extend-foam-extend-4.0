@@ -25,10 +25,15 @@ Class
     Foam::triFace
 
 Description
-    A triangle face primitive using a FixedList.
+    A triangular face using a FixedList of labels corresponding to mesh
+    vertices.
+
+SeeAlso
+    Foam::face, Foam::triangle
 
 SourceFiles
     triFaceI.H
+    triFaceTemplates.C
 
 \*---------------------------------------------------------------------------*/
 
@@ -41,6 +46,7 @@ SourceFiles
 #include "intersection.H"
 #include "pointField.H"
 #include "triPointRef.H"
+#include "ListListOps.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -204,6 +210,30 @@ template<>
 inline bool contiguous<triFace>()  {return true;}
 
 
+//- Hash specialization to offset faces in ListListOps::combineOffset
+template<>
+class offsetOp<triFace>
+{
+
+public:
+
+    inline triFace operator()
+    (
+        const triFace& x,
+        const label offset
+    ) const
+    {
+        triFace result(x);
+
+        forAll(x, xI)
+        {
+            result[xI] = x[xI] + offset;
+        }
+        return result;
+    }
+};
+
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam
@@ -211,6 +241,7 @@ inline bool contiguous<triFace>()  {return true;}
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #include "triFaceI.H"
+
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

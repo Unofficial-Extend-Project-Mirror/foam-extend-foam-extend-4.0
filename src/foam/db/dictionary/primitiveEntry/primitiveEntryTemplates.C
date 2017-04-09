@@ -29,13 +29,13 @@ License
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 template<class T>
-Foam::primitiveEntry::primitiveEntry(const keyType& keyword, const T& t)
+Foam::primitiveEntry::primitiveEntry(const keyType& key, const T& t)
 :
-    entry(keyword),
-    ITstream(keyword, tokenList(10))
+    entry(key),
+    ITstream(key, tokenList(10))
 {
     OStringStream os;
-    os << t << token::END_STATEMENT;
+    os  << t << token::END_STATEMENT;
     readEntry(dictionary::null, IStringStream(os.str())());
 }
 

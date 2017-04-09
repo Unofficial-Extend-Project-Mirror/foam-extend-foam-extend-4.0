@@ -44,6 +44,25 @@ inline Foam::autoPtr<T>::autoPtr(const autoPtr<T>& ap)
 
 
 template<class T>
+inline Foam::autoPtr<T>::autoPtr(const autoPtr<T>& ap, const bool reuse)
+{
+    if (reuse)
+    {
+        ptr_ = ap.ptr_;
+        ap.ptr_ = 0;
+    }
+    else if (ap.valid())
+    {
+        ptr_ = ap().clone().ptr();
+    }
+    else
+    {
+        ptr_ = NULL;
+    }
+}
+
+
+template<class T>
 inline Foam::autoPtr<T>::~autoPtr()
 {
     clear();

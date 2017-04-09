@@ -45,6 +45,7 @@ SourceFiles
 #include "IDLList.H"
 #include "fileName.H"
 #include "autoPtr.H"
+#include "infoSwitch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -80,6 +81,9 @@ class entry
 
 
 public:
+
+    static debug::infoSwitch disableFunctionEntries;
+
 
     // Constructors
 

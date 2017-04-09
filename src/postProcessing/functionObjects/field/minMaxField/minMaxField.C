@@ -80,7 +80,7 @@ bool Foam::minMaxField::start()
 }
 
 
-bool Foam::minMaxField::execute()
+bool Foam::minMaxField::execute(const bool forceWrite)
 {
     const fvMesh& mesh =
         time_.lookupObject<fvMesh>(regionName_);

@@ -42,6 +42,7 @@ SourceFiles
 #include "autoPtr.H"
 #include "runTimeSelectionTables.H"
 #include "debugSwitch.H"
+#include "pointFieldFwd.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -50,9 +51,10 @@ namespace Foam
 
 // Forward declaration of classes
 class Time;
+class mapPolyMesh;
 
 /*---------------------------------------------------------------------------*\
-                           Class functionObject Declaration
+                       Class functionObject Declaration
 \*---------------------------------------------------------------------------*/
 
 class functionObject
@@ -136,7 +138,7 @@ public:
         );
 
 
-    // Destructor
+    //- Destructor
 
         virtual ~functionObject();
 
@@ -149,15 +151,28 @@ public:
         //- Called at the start of the time-loop
         virtual bool start() = 0;
 
-        //- Called at each ++ or += of the time-loop
-        virtual bool execute() = 0;
+        //- Called at each ++ or += of the time-loop. forceWrite overrides the
+        //  outputControl behaviour.
+        virtual bool execute(const bool forceWrite) = 0;
 
         //- Called when Time::run() determines that the time-loop exits.
         //  By default it simply calls execute().
         virtual bool end();
 
+        //- Called when time was set at the end of the Time::operator++
+        virtual bool timeSet();
+
+        //- Called at the end of Time::adjustDeltaT() if adjustTime is true
+        virtual bool adjustTimeStep();
+
         //- Read and set the function object if its data have changed
         virtual bool read(const dictionary&) = 0;
+
+        //- Update for changes of mesh
+        virtual void updateMesh(const mapPolyMesh& mpm) = 0;
+
+        //- Update for changes of mesh
+        virtual void movePoints(const pointField& points) = 0;
 };
 
 

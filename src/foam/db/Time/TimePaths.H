@@ -52,10 +52,11 @@ class TimePaths
     // Private data
 
         bool processorCase_;
-        fileName rootPath_;
-        fileName case_;
-        word system_;
-        word constant_;
+        const fileName rootPath_;
+        fileName globalCaseName_;
+        const fileName case_;
+        const word system_;
+        const word constant_;
 
 
 public:
@@ -66,6 +67,18 @@ public:
         TimePaths
         (
             const fileName& rootPath,
+            const fileName& caseName,
+            const word& systemName,
+            const word& constantName
+        );
+
+
+        //- Construct given database name, rootPath and casePath
+        TimePaths
+        (
+            const bool processorCase,
+            const fileName& rootPath,
+            const fileName& globalCaseName,
             const fileName& caseName,
             const word& systemName,
             const word& constantName
@@ -84,6 +97,12 @@ public:
             const fileName& rootPath() const
             {
                 return rootPath_;
+            }
+
+            //- Return global case name
+            const fileName& globalCaseName() const
+            {
+                return globalCaseName_;
             }
 
             //- Return case name

@@ -27,6 +27,20 @@ License
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
+template<class Name>
+inline Foam::word Foam::IOobject::groupName(Name name, const word& group)
+{
+    if (group != word::null)
+    {
+        return name + ('.' + group);
+    }
+    else
+    {
+        return name;
+    }
+}
+
+
 template<class Stream>
 inline Stream& Foam::IOobject::writeBanner(Stream& os, bool noHint, bool noCopyright)
 {

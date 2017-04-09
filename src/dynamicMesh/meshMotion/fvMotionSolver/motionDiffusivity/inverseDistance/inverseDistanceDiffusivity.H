@@ -55,7 +55,7 @@ class inverseDistanceDiffusivity
         //- Patches selected to base the distance on
         //  These can contain regular expressions and the actuallt patch names
         //  will be searched for.
-        wordList patchNames_;
+        wordReList patchNames_;
 
 
     // Private Member Functions

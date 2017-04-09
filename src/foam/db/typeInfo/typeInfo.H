@@ -29,22 +29,22 @@ Description
     Used to enhance the standard RTTI to cover I/O.
 
     The user can get the type's type name using the type info access function
-    @code
+    \code
         type()
-    @endcode
+    \endcode
 
     The reference type cast template function:
-    @code
+    \code
         refCast<T>(r)
-    @endcode
+    \endcode
 
     wraps dynamic_cast to handle the bad_cast exception and generate a
     FatalError.
 
     The isA function:
-    @code
+    \code
         isA<T>(r)
-    @endcode
+    \endcode
 
     returns true if r is of type T or derived from type T.
 

@@ -128,7 +128,7 @@ Foam::OSstream& Foam::error::operator()
 }
 
 
-Foam::error::operator OSstream&()
+Foam::error::operator Foam::OSstream&()
 {
     if (!messageStreamPtr_->good())
     {
@@ -142,7 +142,7 @@ Foam::error::operator OSstream&()
 }
 
 
-Foam::error::operator dictionary() const
+Foam::error::operator Foam::dictionary() const
 {
     dictionary errDict;
 
@@ -175,9 +175,6 @@ void Foam::error::exit(const int errNo)
 
     if (abort_)
     {
-        Perr<< endl << *this << endl
-            << "\nFOAM aborting (FOAM_ABORT set)\n" << endl;
-
         abort();
     }
 

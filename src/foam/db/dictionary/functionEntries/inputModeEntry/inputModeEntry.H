@@ -28,18 +28,18 @@ Description
     Specify the input mode when reading dictionaries, expects
     a single word to follow.
 
-    An example of @c \#inputMode directive:
-    @verbatim
+    An example of \c \#inputMode directive:
+    \verbatim
         #inputMode merge
-    @endverbatim
+    \endverbatim
 
     The possible input modes:
-    @param merge      merge sub-dictionaries when possible
-    @param overwrite  keep last entry and silently remove previous ones
-    @param protect    keep initial entry and silently ignore subsequent ones
-    @param warn       keep initial entry and warn about subsequent ones
-    @param error      issue a FatalError for duplicate entries
-    @param default    currently identical to merge
+    \param merge      merge sub-dictionaries when possible
+    \param overwrite  keep last entry and silently remove previous ones
+    \param protect    keep initial entry and silently ignore subsequent ones
+    \param warn       keep initial entry and warn about subsequent ones
+    \param error      issue a FatalError for duplicate entries
+    \param default    currently identical to merge
 
 SourceFiles
     inputModeEntry.C
@@ -73,7 +73,7 @@ class inputModeEntry
             OVERWRITE,
             PROTECT,
             WARN,
-            FATALERROR
+            ERROR
         };
 
         //- The current input mode

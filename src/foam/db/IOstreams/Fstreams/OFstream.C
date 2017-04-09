@@ -81,17 +81,6 @@ Foam::OFstreamAllocator::~OFstreamAllocator()
 }
 
 
-std::ostream& Foam::OFstreamAllocator::stdStream()
-{
-    if (!ofPtr_)
-    {
-        FatalErrorIn("OFstreamAllocator::stdStream()")
-            << "No stream allocated." << abort(FatalError);
-    }
-    return *ofPtr_;
-}
-
-
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 Foam::OFstream::OFstream
@@ -139,6 +128,28 @@ Foam::OFstream::~OFstream()
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+
+std::ostream& Foam::OFstream::stdStream()
+{
+    if (!ofPtr_)
+    {
+        FatalErrorIn("OFstream::stdStream()")
+            << "No stream allocated." << abort(FatalError);
+    }
+    return *ofPtr_;
+}
+
+
+const std::ostream& Foam::OFstream::stdStream() const
+{
+    if (!ofPtr_)
+    {
+        FatalErrorIn("OFstreamAllocator::stdStream() const")
+            << "No stream allocated." << abort(FatalError);
+    }
+    return *ofPtr_;
+}
+
 
 void Foam::OFstream::print(Ostream& os) const
 {

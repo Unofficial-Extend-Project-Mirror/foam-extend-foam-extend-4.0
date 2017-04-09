@@ -32,7 +32,7 @@ License
 
 namespace Foam
 {
-    defineTypeNameAndDebug(dsmcFields, 0);
+defineTypeNameAndDebug(dsmcFields, 0);
 }
 
 
@@ -57,8 +57,13 @@ Foam::dsmcFields::dsmcFields
         WarningIn
         (
             "dsmcFields::dsmcFields"
-            "(const objectRegistry&, const dictionary&)"
-        )   << "No fvMesh available, deactivating." << nl
+            "("
+                "const word&, "
+                "const objectRegistry&, "
+                "const dictionary&, "
+                "const bool"
+            ")"
+        )   << "No fvMesh available, deactivating " << name_ << nl
             << endl;
     }
 
@@ -90,6 +95,12 @@ void Foam::dsmcFields::execute()
 
 
 void Foam::dsmcFields::end()
+{
+    // Do nothing - only valid on write
+}
+
+
+void Foam::dsmcFields::timeSet()
 {
     // Do nothing - only valid on write
 }
@@ -219,7 +230,7 @@ void Foam::dsmcFields::write()
             {
                 const polyPatch& patch = mesh.boundaryMesh()[i];
 
-                if (patch.isWall())
+                if (isA<wallPolyPatch>(patch))
                 {
                     p.boundaryField()[i] =
                         fDMean.boundaryField()[i]

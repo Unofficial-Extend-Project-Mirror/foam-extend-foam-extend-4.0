@@ -37,7 +37,7 @@ Foam::regionProperties::regionProperties(const Time& runTime)
             "regionProperties",
             runTime.time().constant(),
             runTime.db(),
-            IOobject::MUST_READ,
+            IOobject::MUST_READ_IF_MODIFIED,
             IOobject::NO_WRITE
         )
     ),

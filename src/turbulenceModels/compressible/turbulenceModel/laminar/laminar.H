@@ -98,6 +98,9 @@ public:
             return tmp<volScalarField>(new volScalarField("muEff", mu()));
         }
 
+    //- Return the turbulence thermal diffusivity
+        virtual tmp<volScalarField> alphat() const;
+
         //- Return the effective turbulent thermal diffusivity,
         //  i.e. the laminar thermal diffusivity
         virtual tmp<volScalarField> alphaEff() const

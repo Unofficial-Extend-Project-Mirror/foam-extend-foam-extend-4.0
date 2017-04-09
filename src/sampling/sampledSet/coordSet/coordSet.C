@@ -27,6 +27,30 @@ Description
 
 #include "coordSet.H"
 
+// * * * * * * * * * * * * * Static Member Data  * * * * * * * * * * * * * * //
+
+namespace Foam
+{
+    template<>
+    const char* Foam::NamedEnum
+    <
+        Foam::coordSet::coordFormat,
+        5
+    >::names[] =
+    {
+        "xyz",
+        "x",
+        "y",
+        "z",
+        "distance"
+    };
+}
+
+
+const Foam::NamedEnum<Foam::coordSet::coordFormat, 5>
+    Foam::coordSet::coordFormatNames_;
+
+
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 //- Construct from components
@@ -38,8 +62,8 @@ Foam::coordSet::coordSet
 :
     pointField(0),
     name_(name),
-    axis_(axis),
-    refPoint_(vector::zero)
+    axis_(coordFormatNames_[axis]),
+    curveDist_(0)
 {}
 
 
@@ -49,62 +73,21 @@ Foam::coordSet::coordSet
     const word& name,
     const word& axis,
     const List<point>& points,
-    const point& refPoint
+    const scalarList& curveDist
 )
 :
     pointField(points),
     name_(name),
-    axis_(axis),
-    refPoint_(refPoint)
+    axis_(coordFormatNames_[axis]),
+    curveDist_(curveDist)
 {}
-
-
-//- Construct from components
-Foam::coordSet::coordSet
-(
-    const word& name,
-    const word& axis,
-    const scalarField& points,
-    const scalar refPoint
-)
-:
-    pointField(points.size(), point::zero),
-    name_(name),
-    axis_(axis),
-    refPoint_(point::zero)
-{
-    if (axis_ == "x" || axis_ == "distance")
-    {
-        refPoint_.x() = refPoint;
-        replace(point::X, points);
-    }
-    else if (axis_ == "y")
-    {
-        replace(point::Y, points);
-    }
-    else if (axis_ == "z")
-    {
-        replace(point::Z, points);
-    }
-    else
-    {
-        FatalErrorIn
-        (
-            "coordSet::coordSet(const word& name,"
-            "const word& axis, const List<scalar>& points,"
-            "const scalar refPoint)"
-        )   << "Illegal axis specification " << axis_
-            << " for sampling line " << name_
-            << exit(FatalError);
-    }
-}
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 bool Foam::coordSet::hasVectorAxis() const
 {
-    return axis_ == "xyz";
+    return axis_ == XYZ;
 }
 
 
@@ -115,22 +98,22 @@ Foam::scalar Foam::coordSet::scalarCoord
 {
     const point& p = operator[](index);
 
-    if (axis_ == "x")
+    if (axis_ == X)
     {
         return p.x();
     }
-    else if (axis_ == "y")
+    else if (axis_ == Y)
     {
         return p.y();
     }
-    else if (axis_ == "z")
+    else if (axis_ == Z)
     {
         return p.z();
     }
-    else if (axis_ == "distance")
+    else if (axis_ == DISTANCE)
     {
         // Use distance to reference point
-        return mag(p - refPoint_);
+        return curveDist_[index];
     }
     else
     {
@@ -156,7 +139,7 @@ Foam::point Foam::coordSet::vectorCoord(const label index) const
 
 Foam::Ostream& Foam::coordSet::write(Ostream& os) const
 {
-    os  << "name:" << name_ << " axis:" << axis_ << " reference:" << refPoint_
+    os  << "name:" << name_ << " axis:" << axis_
         << endl
         << endl << "\t(coord)"
         << endl;
