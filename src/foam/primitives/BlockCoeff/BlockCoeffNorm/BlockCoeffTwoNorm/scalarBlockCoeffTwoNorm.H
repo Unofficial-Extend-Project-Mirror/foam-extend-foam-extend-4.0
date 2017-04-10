@@ -25,34 +25,48 @@ Class
     BlockCoeffTwoNorm
 
 Description
-    Typedefs for block two norms.
+    Class for two norm of block coeffs. Specilization for scalar. Implemented
+    to avoid issues with asScalar, asSquare etc.
 
 Author
-    Klas Jareteg, 2013-01-30
-
-SourceFiles
-    blockCoeffTwoNorms.C
+    Hrvoje Jasak, Wikki Ltd.  All rights reserved
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef blockCoeffTwoNorms_H
-#define blockCoeffTwoNorms_H
+#ifndef scalarBlockCoeffTwoNorm_H
+#define scalarBlockCoeffTwoNorm_H
 
-#include "scalarBlockCoeffTwoNorm.H"
-#include "tensorBlockCoeffTwoNorm.H"
+#include "blockCoeffs.H"
+#include "blockCoeffNorms.H"
+#include "BlockCoeffNorm.H"
 #include "BlockCoeffTwoNorm.H"
-
+#include "runTimeSelectionTables.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+template<>
+inline scalar BlockCoeffTwoNorm<scalar>::normalize
+(
+    const BlockCoeff<scalar>& a
+)
+{
+        // Note: for two-norm, use mag
+        return mag(a.asScalar());
+}
 
-typedef BlockCoeffTwoNorm<scalar> blockCoeffTwoNormScalar;
-typedef BlockCoeffTwoNorm<vector> blockCoeffTwoNormVector;
-typedef BlockCoeffTwoNorm<tensor> blockCoeffTwoNormTensor;
+
+template<>
+inline void BlockCoeffTwoNorm<scalar>::normalize
+(
+    Field<scalar>& b,
+    const CoeffField<scalar>& a
+)
+{
+        b = mag(a.asScalar());
+}
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

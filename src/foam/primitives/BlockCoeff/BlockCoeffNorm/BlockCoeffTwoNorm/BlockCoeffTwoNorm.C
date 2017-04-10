@@ -61,8 +61,13 @@ Foam::scalar Foam::BlockCoeffTwoNorm<Type>::normalize
     }
     else if (a.activeType() == Foam::BlockCoeff<Type>::SQUARE)
     {
-        // Note: for two-norm, use mag
-        return mag(a.asSquare());
+        // Note: for two-norm, use mag of diag
+        typedef typename BlockCoeff<Type>::linearType linearType;
+
+        linearType diag;
+        contractLinear(diag, a.asSquare());
+        
+        return mag(diag);
     }
     else
     {
@@ -94,13 +99,18 @@ void Foam::BlockCoeffTwoNorm<Type>::normalize
     }
     else if (a.activeType() == Foam::BlockCoeff<Type>::LINEAR)
     {
-        // Note: for two-norm, use mag
+        // Note: for two-norm, use mag = sqrt(sum magSqr(cmpt))
         b = mag(a.asLinear());
     }
     else if (a.activeType() == Foam::BlockCoeff<Type>::SQUARE)
     {
-        // Note: for two-norm, use mag
-        b = mag(a.asSquare());
+        // Note: for two-norm, use mag of diag
+        typedef typename BlockCoeff<Type>::linearTypeField linearTypeField;
+
+        linearTypeField diag(a.size());
+        contractLinear(diag, a.asSquare());
+        
+        b = mag(diag);
     }
     else
     {

@@ -33,9 +33,6 @@ Description
 Author
     Klas Jareteg, 2013-01-30
 
-SourceFiles
-    BlockCoeffTwoNorm.C
-
 \*---------------------------------------------------------------------------*/
 
 #ifndef tensorBlockCoeffTwoNorm_H
@@ -51,11 +48,6 @@ SourceFiles
 
 namespace Foam
 {
-
-
-/*---------------------------------------------------------------------------*\
-                        Class BlockCoeffTwoNorm Declaration
-\*---------------------------------------------------------------------------*/
 
 template<>
 inline scalar BlockCoeffTwoNorm<tensor>::normalize
@@ -115,9 +107,6 @@ inline void BlockCoeffTwoNorm<tensor>::normalize
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
