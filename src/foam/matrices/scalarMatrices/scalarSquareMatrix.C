@@ -47,7 +47,13 @@ Foam::scalarSquareMatrix::scalarSquareMatrix
 {}
 
 
-Foam::scalarSquareMatrix::scalarSquareMatrix(const scalarSquareMatrix& matrix)
+// Foam::scalarSquareMatrix::scalarSquareMatrix(const scalarSquareMatrix& matrix)
+// :
+//     SquareMatrix<scalar>(matrix)
+// {}
+
+
+Foam::scalarSquareMatrix::scalarSquareMatrix(const SquareMatrix<scalar>& matrix)
 :
     SquareMatrix<scalar>(matrix)
 {}
