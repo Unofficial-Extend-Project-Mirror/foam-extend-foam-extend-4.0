@@ -56,14 +56,14 @@ Ostream& operator<<(Ostream& os, const globalIndex& gi);
 
 
 /*---------------------------------------------------------------------------*\
-                           Class globalIndex Declaration
+                        Class globalIndex Declaration
 \*---------------------------------------------------------------------------*/
 
 class globalIndex
 {
     // Private data
 
-        //- Start off procI+1. (so like CompactListList)
+        //- Start off procI + 1. (so like CompactListList)
         labelList offsets_;
 
 
@@ -76,6 +76,9 @@ public:
 
         //- Construct from Istream
         globalIndex(Istream& is);
+
+
+    // Destructor - default
 
 
     // Member Functions
