@@ -198,11 +198,13 @@ public:
                 Field<Type>& f
             ) const
             {
-                notImplemented
+                FatalErrorIn
                 (
                     "ggiFvPatchField<Type>::transformCoupleField"
                     "(Field<Type>& f) const"
-                );
+                )   << "transformCoupleField not implemented for patch "
+                    << this->patch().name()
+                    << abort(FatalError);
             }
 
             //- Initialise neighbour matrix update
