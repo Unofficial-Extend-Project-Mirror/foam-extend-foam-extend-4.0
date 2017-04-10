@@ -39,13 +39,7 @@ namespace Foam
     namespace radiation
     {
         defineTypeNameAndDebug(viewFactor, 0);
-
-        addToRunTimeSelectionTable
-        (
-            radiationModel,
-            viewFactor,
-            dictionary
-        );
+        addToRadiationRunTimeSelectionTables(viewFactor);
     }
 }
 
