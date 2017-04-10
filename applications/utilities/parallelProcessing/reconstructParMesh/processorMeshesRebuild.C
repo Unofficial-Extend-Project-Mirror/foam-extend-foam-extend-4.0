@@ -735,7 +735,7 @@ Foam::processorMeshesReconstructor::reconstructMesh(const Time& db)
 
                 // If patch is a neighbour, its master has already inserted
                 // the points
-                if (procPatch.neighbour())
+                if (procPatch.slave())
                 {
                     const label masterProcID = procPatch.neighbProcNo();
 
@@ -870,7 +870,7 @@ Foam::processorMeshesReconstructor::reconstructMesh(const Time& db)
 
                 // If patch is a master, drop the faces and fill the
                 // owner side addressing
-                if (procPatch.owner())
+                if (procPatch.master())
                 {
                     for
                     (

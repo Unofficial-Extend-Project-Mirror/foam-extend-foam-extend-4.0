@@ -102,7 +102,7 @@ void Foam::fieldValues::faceSource::setFaceZoneFaces()
             const polyPatch& pp = mesh().boundaryMesh()[facePatchId];
             if (isA<processorPolyPatch>(pp))
             {
-                if (refCast<const processorPolyPatch>(pp).owner())
+                if (refCast<const processorPolyPatch>(pp).master())
                 {
                     faceId = pp.whichFace(faceI);
                 }

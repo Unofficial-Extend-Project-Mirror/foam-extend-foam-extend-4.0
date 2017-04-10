@@ -217,16 +217,10 @@ public:
             virtual int tag() const;
 
 
-        //- Does the processor own the patch ?
-        bool owner() const
+        //- Is this the master side?
+        virtual bool master() const
         {
             return (myProcNo_ < neighbProcNo_);
-        }
-
-        //- Is the processor the patch neighbour ?
-        bool neighbour() const
-        {
-            return !owner();
         }
 
         //- Return processor-neighbbour patch face centres

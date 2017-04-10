@@ -360,19 +360,6 @@ const Foam::label& Foam::overlapGgiPolyPatch::nCopies() const
 }
 
 
-bool Foam::overlapGgiPolyPatch::master() const
-{
-    // The first overlapggi interface is master,second one is slave
-    if (angle() == shadow().angle())
-    {
-        return index() < shadowIndex();
-    }
-
-    // Master is the one with the larger angle
-    return angle() > shadow().angle();
-}
-
-
 // Write
 void Foam::overlapGgiPolyPatch::write(Ostream& os) const
 {

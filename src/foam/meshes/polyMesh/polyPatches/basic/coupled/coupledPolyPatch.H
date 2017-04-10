@@ -146,9 +146,8 @@ public:
         );
 
 
-    // Destructor
-
-        virtual ~coupledPolyPatch();
+    //- Destructor
+    virtual ~coupledPolyPatch();
 
 
     // Member Functions
@@ -159,6 +158,15 @@ public:
             virtual bool coupled() const
             {
                 return true;
+            }
+
+            //- Does this side own the patch ?
+            virtual bool master() const = 0;
+
+            //- Does the coupled side own the patch ?
+            virtual bool slave() const
+            {
+                return !master();
             }
 
 
