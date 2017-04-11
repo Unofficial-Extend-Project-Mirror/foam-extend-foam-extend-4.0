@@ -46,10 +46,18 @@ using namespace Foam;
 int main(int argc, char *argv[])
 {
 #   include "addRegionOption.H"
+    argList::validOptions.insert
+    (
+        "dict",
+        "name of dictionary to provide patch agglomeration controls"
+    );
 
 #   include "setRootCase.H"
 #   include "createTime.H"
 #   include "createNamedMesh.H"
+
+    word agglomDictName("faceAgglomerateDict"); 
+    args.optionReadIfPresent("dict", agglomDictName);
 
     const polyBoundaryMesh& patches = mesh.boundaryMesh();
 
@@ -73,7 +81,7 @@ int main(int argc, char *argv[])
     (
         IOobject
         (
-            "faceAgglomerateDict",
+            agglomDictName,
             runTime.constant(),
             mesh,
             IOobject::MUST_READ,

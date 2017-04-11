@@ -26,8 +26,8 @@ Class
 
 Description
     fvMesh as subset of other mesh. Consists of one cell and all original
-    bounday faces. Useful when manipulating boundary data. Single internal
-    cell only needed to be able to manipulate in a standard way.
+    boundary faces.  Useful when manipulating boundary data.  Single internal
+    cell only is needed to be able to manipulate in a standard way.
 
 SourceFiles
     singleCellFvMesh.C
@@ -103,6 +103,8 @@ public:
 
         public:
 
+            // Constructors
+
                 //- Construct given addressing
                 directPatchFieldMapper
                 (
@@ -113,6 +115,11 @@ public:
                     directAddressing_(directAddressing),
                     sizeBeforeMapping_(sizeBeforeMapping)
                 {}
+
+
+            // Destructor - default
+
+            // Member functions
 
                 virtual label size() const
                 {
