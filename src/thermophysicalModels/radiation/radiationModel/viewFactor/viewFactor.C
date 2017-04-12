@@ -395,7 +395,7 @@ void Foam::radiation::viewFactor::calculate()
 {
     // Store previous iteration
     Qr_.storePrevIter();
-    Info<< "map_->constructSize(): " << map_->constructSize() << endl;
+
     scalarField compactCoarseT(map_->constructSize(), 0.0);
     scalarField compactCoarseE(map_->constructSize(), 0.0);
     scalarField compactCoarseHo(map_->constructSize(), 0.0);
