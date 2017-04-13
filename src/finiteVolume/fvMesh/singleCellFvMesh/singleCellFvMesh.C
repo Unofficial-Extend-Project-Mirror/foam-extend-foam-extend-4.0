@@ -94,42 +94,42 @@ void Foam::singleCellFvMesh::agglomerateMesh
         {
             const polyPatch& pp = oldPatches[patchI];
 
-            if (pp.coupled())
-            {
-                label offset = pp.start()-mesh.nInternalFaces();
+            // if (pp.coupled())
+            // {
+            //     label offset = pp.start() - mesh.nInternalFaces();
 
-                forAll (pp, i)
-                {
-                    label bFaceI = offset+i;
-                    label myZone = agglom[patchI][i];
-                    label nbrZone = nbrAgglom[bFaceI];
+            //     forAll (pp, i)
+            //     {
+            //         label bFaceI = offset + i;
+            //         label myZone = agglom[patchI][i];
+            //         label nbrZone = nbrAgglom[bFaceI];
 
-                    Map<label>::const_iterator iter = localToNbr.find(myZone);
+            //         Map<label>::const_iterator iter = localToNbr.find(myZone);
 
-                    if (iter == localToNbr.end())
-                    {
-                        // First occurence of this zone. Store correspondence
-                        // to remote zone number.
-                        localToNbr.insert(myZone, nbrZone);
-                    }
-                    else
-                    {
-                        // Check that zone numbers are still the same.
-                        if (iter() != nbrZone)
-                        {
-                            FatalErrorIn
-                            (
-                                "singleCellFvMesh::agglomerateMesh(..)"
-                            )   << "agglomeration is not synchronised across"
-                                << " coupled patch " << pp.name()
-                                << endl
-                                << "Local agglomeration " << myZone
-                                << ". Remote agglomeration " << nbrZone
-                                << exit(FatalError);
-                        }
-                    }
-                }
-            }
+            //         if (iter == localToNbr.end())
+            //         {
+            //             // First occurence of this zone. Store correspondence
+            //             // to remote zone number.
+            //             localToNbr.insert(myZone, nbrZone);
+            //         }
+            //         else
+            //         {
+            //             // Check that zone numbers are still the same.
+            //             if (iter() != nbrZone)
+            //             {
+            //                 FatalErrorIn
+            //                 (
+            //                     "singleCellFvMesh::agglomerateMesh(..)"
+            //                 )   << "agglomeration is not synchronised across"
+            //                     << " coupled patch " << pp.name()
+            //                     << endl
+            //                     << "Local agglomeration " << myZone
+            //                     << ". Remote agglomeration " << nbrZone
+            //                     << exit(FatalError);
+            //             }
+            //         }
+            //     }
+            // }
         }
     }
 
