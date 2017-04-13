@@ -548,9 +548,11 @@ void Foam::radiation::viewFactor::calculate()
                 }
             }
 
-            Info<< "\nSolving view factor equations..." << endl;
+            Info<< "\nSolving view factor equations (" << CLU_().n()
+                << " ..." << flush;
             // Negative coming into the fluid
             scalarSquareMatrix::LUsolve(C, q);
+            Info<< "Done." << endl;
         }
         else //Constant emissivity
         {
@@ -572,8 +574,10 @@ void Foam::radiation::viewFactor::calculate()
                         }
                     }
                 }
-                Info<< "\nDecomposing C matrix..." << endl;
+                Info<< "\nDecomposing C matrix of size " << CLU_().n()
+                    << " ... " << endl;
                 scalarSquareMatrix::LUDecompose(CLU_(), pivotIndices_);
+                Info<< "Done." << endl;
             }
 
             for (label i=0; i<totalNCoarseFaces_; i++)
@@ -595,8 +599,9 @@ void Foam::radiation::viewFactor::calculate()
                 }
             }
 
-            Info<< "\nLU Back substitute C matrix.." << endl;
+            Info<< "\nLU Back substitute C matrix... " << endl;
             scalarSquareMatrix::LUBacksubstitute(CLU_(), pivotIndices_, q);
+            Info<< "Done." << endl;
             iterCounter_ ++;
         }
     }
