@@ -24,8 +24,9 @@ cd ../wingMotion2D_pimpleDyMFoam
 \cp -r 0.org 0
 runApplication mapFields ../wingMotion2D_simpleFoam -sourceTime latestTime -consistent
 mv 0/pointDisplacement.unmapped 0/pointDisplacement
-runApplication decomposePar
-runParallel pimpleDyMFoam 3
-runApplication reconstructPar
+runApplication pimpleDyMFoam
+#runApplication decomposePar
+#runParallel pimpleDyMFoam 2
+#runApplication reconstructPar
 
 # ----------------------------------------------------------------- end-of-file

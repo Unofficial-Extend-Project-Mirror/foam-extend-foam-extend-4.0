@@ -24,8 +24,14 @@ while [ "$i" -lt 3 ] ; do
     cp system/cellSetDict.${i} system/cellSetDict
     runApplication cellSet
     runRefineMesh
-    cp -r 1e-08/polyMesh/* constant/polyMesh
-    rm -rf 1e-08
+    if [ "$WM_OSTYPE" = "MSWindows" ]
+    then
+        cp -r 1e-008/polyMesh/* constant/polyMesh
+        rm -rf 1e-008
+    else
+        cp -r 1e-08/polyMesh/* constant/polyMesh
+        rm -rf 1e-08
+    fi
     i=`expr $i + 1`
 done
 cp constant/polyMesh/boundary.org constant/polyMesh/boundary

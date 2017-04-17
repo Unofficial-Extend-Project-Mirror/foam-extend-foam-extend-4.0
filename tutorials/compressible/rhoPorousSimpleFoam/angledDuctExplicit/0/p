@@ -9,48 +9,44 @@ FoamFile
 {
     version     2.0;
     format      ascii;
-    class       dictionary;
-    location    "system";
-    object      controlDict;
+    class       volScalarField;
+    object      p;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-libs
-(
-    "liblduSolvers.so"
-);
+dimensions      [1 -1 -2 0 0 0 0];
 
-application     porousSimpleFoam;
+internalField   uniform 1.0e5;
 
-startFrom       startTime;
+boundaryField
+{
+    front
+    {
+        type            zeroGradient;
+    }
+    back
+    {
+        type            zeroGradient;
+    }
+    wall
+    {
+        type            zeroGradient;
+    }
+    porosityWall
+    {
+        type            zeroGradient;
+    }
 
-startTime       0;
-
-stopAt          endTime;
-
-endTime         100;
-
-deltaT          1;
-
-writeControl    timeStep;
-
-writeInterval   10;
-
-purgeWrite      0;
-
-writeFormat     ascii;
-
-writePrecision  6;
-
-writeCompression uncompressed;
-
-timeFormat      general;
-
-timePrecision   6;
-
-graphFormat     raw;
-
-runTimeModifiable yes;
+    inlet
+    {
+        type            zeroGradient;
+    }
+    outlet
+    {
+        type            fixedValue;
+        value           $internalField;
+    }
+}
 
 
 // ************************************************************************* //
