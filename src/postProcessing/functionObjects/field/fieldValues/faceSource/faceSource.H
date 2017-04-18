@@ -185,7 +185,9 @@ public:
         {
             opNone,
             opSum,
+            opWeightedSum,
             opSumMag,
+            opWeightedSumMag,
             opSumDirection,
             opSumDirectionBalance,
             opAverage,
@@ -201,7 +203,7 @@ public:
         };
 
         //- Operation type names
-        static const NamedEnum<operationType, 15> operationTypeNames_;
+        static const NamedEnum<operationType, 17> operationTypeNames_;
 
 
 private:

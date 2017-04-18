@@ -143,9 +143,19 @@ Type Foam::fieldValues::faceSource::processSameTypeValues
             result = sum(values);
             break;
         }
+        case opWeightedSum:
+        {
+            result = sum(weightField*values);
+            break;
+        }
         case opSumMag:
         {
             result = sum(cmptMag(values));
+            break;
+        }
+        case opWeightedSumMag:
+        {
+            result = sum(weightField*cmptMag(values));
             break;
         }
         case opSumDirection:
