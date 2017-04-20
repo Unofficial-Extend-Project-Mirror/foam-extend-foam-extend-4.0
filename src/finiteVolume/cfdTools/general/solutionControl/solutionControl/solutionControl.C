@@ -26,6 +26,7 @@ License
 #include "solutionControl.H"
 #include "lduMatrix.H"
 #include "fvc.H"
+#include "inletOutletFvPatchFields.H"
 #include "slipFvPatchFields.H"
 #include "symmetryFvPatchFields.H"
 
@@ -300,19 +301,27 @@ void Foam::solutionControl::correctBoundaryFlux
     // considerations when calculating the flux. Maybe we can reorganise this in
     // future by relying on distinction between = and == operators for
     // fvsPatchFields. However, that would require serious changes at the
-    // moment. VV, 23/Dec/2016.
+    // moment (e.g. using phi = rUA*UEqn.H() as in most solvers would not update
+    // the boundary values correctly for fixed fvsPatchFields). VV, 20/Apr/2017.
     forAll (phib, patchI)
     {
-        if (Ub[patchI].fixesValue())
+        // Get patch field
+        const fvPatchVectorField& Up = Ub[patchI];
+
+        if
+        (
+            Up.fixesValue()
+         && !isA<inletOutletFvPatchVectorField>(Up)
+        )
         {
             // This is fixed value patch, flux needs to be recalculated
             // with respect to the boundary condition
-            phib[patchI] == (Ub[patchI] & Sb[patchI]);
+            phib[patchI] == (Up & Sb[patchI]);
         }
         else if
         (
-            isA<slipFvPatchVectorField>(Ub[patchI])
-         || isA<symmetryFvPatchVectorField>(Ub[patchI])
+            isA<slipFvPatchVectorField>(Up)
+         || isA<symmetryFvPatchVectorField>(Up)
         )
         {
             // This is slip or symmetry, flux needs to be zero
