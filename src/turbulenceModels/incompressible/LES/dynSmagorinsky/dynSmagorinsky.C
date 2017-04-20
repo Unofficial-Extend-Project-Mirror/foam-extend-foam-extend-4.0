@@ -95,10 +95,12 @@ dynSmagorinsky::dynSmagorinsky
 (
     const volVectorField& U,
     const surfaceScalarField& phi,
-    transportModel& transport
+    transportModel& transport,
+    const word& turbulenceModelName,
+    const word& modelName
 )
 :
-    LESModel(typeName, U, phi, transport),
+    LESModel(modelName, U, phi, transport, turbulenceModelName),
     GenEddyVisc(U, phi, transport),
 
     k_

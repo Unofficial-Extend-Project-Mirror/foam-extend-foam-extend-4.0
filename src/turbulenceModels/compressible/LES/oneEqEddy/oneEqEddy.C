@@ -59,11 +59,13 @@ oneEqEddy::oneEqEddy
     const volScalarField& rho,
     const volVectorField& U,
     const surfaceScalarField& phi,
-    const basicThermo& thermoPhysicalModel
+    const basicThermo& thermophysicalModel,
+    const word& turbulenceModelName,
+    const word& modelName
 )
 :
-    LESModel(typeName, rho, U, phi, thermoPhysicalModel),
-    GenEddyVisc(rho, U, phi, thermoPhysicalModel),
+    LESModel(modelName, rho, U, phi, thermophysicalModel, turbulenceModelName),
+    GenEddyVisc(rho, U, phi, thermophysicalModel),
 
     ck_
     (

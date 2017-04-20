@@ -125,11 +125,6 @@ public:
 
     // Member Functions
 
-        tmp<volScalarField> mut() const
-        {
-            return mut_;
-        }
-
         //- Return the effective diffusivity for k
         tmp<volScalarField> DkEff() const
         {
@@ -146,6 +141,18 @@ public:
             (
                 new volScalarField("DepsilonEff", mut_/sigmaEps_ + mu())
             );
+        }
+
+        //- Return the turbulence viscosity
+        virtual tmp<volScalarField> mut() const
+        {
+            return mut_;
+        }
+
+        //- Return the turbulence thermal diffusivity
+        virtual tmp<volScalarField> alphat() const
+        {
+            return alphat_;
         }
 
         //- Return the effective turbulent thermal diffusivity

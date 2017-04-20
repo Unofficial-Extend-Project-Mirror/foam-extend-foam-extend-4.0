@@ -66,7 +66,8 @@ public:
             const volScalarField& rho,
             const volVectorField& U,
             const surfaceScalarField& phi,
-            const basicThermo& thermophysicalModel
+            const basicThermo& thermophysicalModel,
+            const word& turbulenceModelName = turbulenceModel::typeName
         );
 
 
@@ -78,7 +79,8 @@ public:
             const volScalarField& rho,
             const volVectorField& U,
             const surfaceScalarField& phi,
-            const basicThermo& thermophysicalModel
+            const basicThermo& thermophysicalModel,
+            const word& turbulenceModelName = turbulenceModel::typeName
         );
 
 
@@ -134,7 +136,7 @@ public:
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-} // End namespace incompressible
+} // End namespace compressible
 } // End namespace Foam
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

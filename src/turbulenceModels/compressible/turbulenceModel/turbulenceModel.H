@@ -50,6 +50,7 @@ SourceFiles
 #include "surfaceFieldsFwd.H"
 #include "fvMatricesFwd.H"
 #include "basicThermo.H"
+#include "nearWallDist.H"
 #include "autoPtr.H"
 #include "runTimeSelectionTables.H"
 
@@ -69,6 +70,8 @@ namespace compressible
 \*---------------------------------------------------------------------------*/
 
 class turbulenceModel
+:
+    public regIOobject
 {
 
 protected:
@@ -83,6 +86,9 @@ protected:
         const surfaceScalarField& phi_;
 
         const basicThermo& thermophysicalModel_;
+
+        //- Near wall distance boundary field
+        nearWallDist y_;
 
 
 private:
@@ -114,9 +120,10 @@ public:
                 const volScalarField& rho,
                 const volVectorField& U,
                 const surfaceScalarField& phi,
-                const basicThermo& thermoPhysicalModel
+                const basicThermo& thermoPhysicalModel,
+                const word& turbulenceModelName
             ),
-            (rho, U, phi, thermoPhysicalModel)
+            (rho, U, phi, thermoPhysicalModel, turbulenceModelName)
         );
 #endif
 
@@ -129,19 +136,21 @@ public:
             const volScalarField& rho,
             const volVectorField& U,
             const surfaceScalarField& phi,
-            const basicThermo& thermoPhysicalModel
+            const basicThermo& thermoPhysicalModel,
+            const word& turbulenceModelName = typeName
         );
 
 
     // Selectors
 
         //- Return a reference to the selected turbulence model
-        static autoPtr<compressible::turbulenceModel> New
+        static autoPtr<turbulenceModel> New
         (
             const volScalarField& rho,
             const volVectorField& U,
             const surfaceScalarField& phi,
-            const basicThermo& thermoPhysicalModel
+            const basicThermo& thermoPhysicalModel,
+            const word& turbulenceModelName = typeName
         );
 
 
@@ -175,6 +184,15 @@ public:
         {
              return thermophysicalModel_;
         }
+
+        //- Return the near wall distances
+        const nearWallDist& y() const
+        {
+            return y_;
+        }
+
+        //- Calculate y+ at the edge of the laminar sublayer
+        scalar yPlusLam(const scalar kappa, const scalar E) const;
 
         //- Return the laminar viscosity
         const volScalarField& mu() const
@@ -224,6 +242,13 @@ public:
 
         //- Read turbulenceProperties dictionary
         virtual bool read() = 0;
+
+        //- Default dummy write function
+        virtual bool writeData(Ostream&) const
+        {
+            return true;
+        }
+
 };
 
 

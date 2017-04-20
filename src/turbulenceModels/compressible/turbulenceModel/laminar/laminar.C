@@ -51,10 +51,11 @@ laminar::laminar
     const volScalarField& rho,
     const volVectorField& U,
     const surfaceScalarField& phi,
-    const basicThermo& thermophysicalModel
+    const basicThermo& thermophysicalModel,
+    const word& turbulenceModelName
 )
 :
-    turbulenceModel(rho, U, phi, thermophysicalModel)
+    turbulenceModel(rho, U, phi, thermophysicalModel, turbulenceModelName)
 {}
 
 
@@ -65,10 +66,14 @@ autoPtr<laminar> laminar::New
     const volScalarField& rho,
     const volVectorField& U,
     const surfaceScalarField& phi,
-    const basicThermo& thermophysicalModel
+    const basicThermo& thermophysicalModel,
+    const word& turbulenceModelName
 )
 {
-    return autoPtr<laminar>(new laminar(rho, U, phi, thermophysicalModel));
+    return autoPtr<laminar>
+    (
+        new laminar(rho, U, phi, thermophysicalModel, turbulenceModelName)
+    );
 }
 
 
@@ -229,7 +234,7 @@ void laminar::correct()
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-} // End namespace incompressible
+} // End namespace compressible
 } // End namespace Foam
 
 // ************************************************************************* //

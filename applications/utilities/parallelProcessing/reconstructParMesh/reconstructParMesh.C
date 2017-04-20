@@ -132,7 +132,7 @@ int main(int argc, char *argv[])
     {
         Info<< "Reading database for processor " << procI << endl;
 
-        databases[procI].setTime(runTime.timeName(), runTime.timeIndex());
+        databases[procI].setTime(runTime, runTime.timeIndex());
     }
 
     // Read all meshes and addressing to reconstructed mesh

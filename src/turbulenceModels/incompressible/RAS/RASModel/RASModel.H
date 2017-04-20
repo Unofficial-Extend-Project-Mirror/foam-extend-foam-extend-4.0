@@ -44,7 +44,6 @@ SourceFiles
 #include "incompressible/turbulenceModel/turbulenceModel.H"
 #include "volFields.H"
 #include "surfaceFields.H"
-#include "nearWallDist.H"
 #include "fvm.H"
 #include "fvc.H"
 #include "fvMatrices.H"
@@ -103,9 +102,6 @@ protected:
         //- Laminar to turbulent viscosity ratio
         scalar nuRatio_;
 
-        //- Near wall distance boundary field
-        nearWallDist y_;
-
 
     // Protected member functions
 
@@ -140,9 +136,10 @@ public:
             (
                 const volVectorField& U,
                 const surfaceScalarField& phi,
-                transportModel& lamTransportModel
+                transportModel& transport,
+                const word& turbulenceModelName
             ),
-            (U, phi, lamTransportModel)
+            (U, phi, transport, turbulenceModelName)
         );
 
 
@@ -154,18 +151,20 @@ public:
             const word& type,
             const volVectorField& U,
             const surfaceScalarField& phi,
-            transportModel& lamTransportModel
+            transportModel& transport,
+            const word& turbulenceModelName = turbulenceModel::typeName
         );
 
 
     // Selectors
 
         //- Return a reference to the selected RAS model
-        static autoPtr<incompressible::RASModel> New
+        static autoPtr<RASModel> New
         (
             const volVectorField& U,
             const surfaceScalarField& phi,
-            transportModel& lamTransportModel
+            transportModel& transport,
+            const word& turbulenceModelName = turbulenceModel::typeName
         );
 
 

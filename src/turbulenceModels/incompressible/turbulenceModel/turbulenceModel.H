@@ -49,6 +49,7 @@ SourceFiles
 #include "surfaceFieldsFwd.H"
 #include "fvMatricesFwd.H"
 #include "incompressible/transportModel/transportModel.H"
+#include "nearWallDist.H"
 #include "autoPtr.H"
 #include "runTimeSelectionTables.H"
 
@@ -68,6 +69,8 @@ namespace incompressible
 \*---------------------------------------------------------------------------*/
 
 class turbulenceModel
+:
+    public regIOobject
 {
 
 protected:
@@ -81,6 +84,9 @@ protected:
         const surfaceScalarField& phi_;
 
         transportModel& transportModel_;
+
+        //- Near wall distance boundary field
+        nearWallDist y_;
 
 
 private:
@@ -111,9 +117,10 @@ public:
             (
                 const volVectorField& U,
                 const surfaceScalarField& phi,
-                transportModel& lamTransportModel
+                transportModel& transport,
+                const word& turbulenceModelName
             ),
-            (U, phi, lamTransportModel)
+            (U, phi, transport, turbulenceModelName)
         );
 #endif
 
@@ -125,7 +132,8 @@ public:
         (
             const volVectorField& U,
             const surfaceScalarField& phi,
-            transportModel& lamTransportModel
+            transportModel& transport,
+            const word& turbulenceModelName = typeName
         );
 
 
@@ -136,7 +144,8 @@ public:
         (
             const volVectorField& U,
             const surfaceScalarField& phi,
-            transportModel& lamTransportModel
+            transportModel& transport,
+            const word& turbulenceModelName = typeName
         );
 
 
@@ -164,6 +173,12 @@ public:
         inline transportModel& transport() const
         {
             return transportModel_;
+        }
+
+        //- Return the near wall distances
+        const nearWallDist& y() const
+        {
+            return y_;
         }
 
         //- Return the laminar viscosity
@@ -198,6 +213,12 @@ public:
 
         //- Read turbulenceProperties dictionary
         virtual bool read() = 0;
+
+        //- Default dummy write function
+        virtual bool writeData(Ostream&) const
+        {
+            return true;
+        }
 };
 
 
