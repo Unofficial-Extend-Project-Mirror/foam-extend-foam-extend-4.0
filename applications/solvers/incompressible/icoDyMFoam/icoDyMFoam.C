@@ -116,7 +116,7 @@ int main(int argc, char *argv[])
                 (
                     fvm::laplacian
                     (
-                        fvc::interpolate(rAU)/piso.aCoeff(),
+                        fvc::interpolate(rAU)/piso.aCoeff(U.name()),
                         p,
                         "laplacian(rAU," + p.name() + ')'
                     )

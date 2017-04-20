@@ -15,7 +15,7 @@
         (
             fvm::laplacian
             (
-                fvc::interpolate(rAU)/simple.aCoeff(),
+                fvc::interpolate(rAU)/simple.aCoeff(U.name()),
                 p,
                 "laplacian(rAU," + p.name() + ')'
             )

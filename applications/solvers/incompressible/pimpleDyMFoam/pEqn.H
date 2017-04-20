@@ -21,7 +21,7 @@
         (
             fvm::laplacian
             (
-                fvc::interpolate(rAU)/pimple.aCoeff(),
+                fvc::interpolate(rAU)/pimple.aCoeff(U.name()),
                 p,
                 "laplacian(rAU," + p.name() + ')'
             )

@@ -190,11 +190,16 @@ private:
 
         // Fields necessary for time and under-relaxation consistency
 
-            //- A coeff (A^~) arising from consistency formulation
-            mutable surfaceScalarField* aCoeffPtr_;
+            //- A coeff (A^~) arising from consistency formulation. Note: we can
+            //  have multiple pressure/velocity systems, hence the PtrList
+            mutable PtrList<surfaceScalarField> aCoeffPtrs_;
 
-            //- Face velocity needed for consistent formulation
-            mutable surfaceVectorField* faceUPtr_;
+            //- Face velocity needed for consistent formulation. Note: we can
+            //  have multiple pressure/velocity systems, hence the PtrList
+            mutable PtrList<surfaceVectorField> faceUPtrs_;
+
+            //- Hash Table containing indices of PtrLists for given names
+            mutable HashTable<label> indices_;
 
 
     // Private member functions
@@ -301,8 +306,9 @@ public:
                 const volScalarField& p
             ) const;
 
-            //- Const access to aCoeff (needed for pressure equation)
-            const surfaceScalarField& aCoeff() const;
+            //- Const access to aCoeff (needed for pressure equation) given the
+            //  name of the velocity field
+            const surfaceScalarField& aCoeff(const word& UName) const;
 
 
         // Evolution
