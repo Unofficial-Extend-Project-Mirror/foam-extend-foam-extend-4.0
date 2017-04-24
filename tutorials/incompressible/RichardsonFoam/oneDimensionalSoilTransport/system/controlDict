@@ -1,0 +1,78 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  1.7.1                                 |
+|   \\  /    A nd           | Web:      www.OpenFOAM.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      controlDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+application     porousUnsaturatedFoam;
+
+startFrom       startTime;
+
+startTime       0;
+
+stopAt          endTime;
+
+endTime         86400;
+
+deltaT          300;
+
+writeControl    adjustableRunTime;
+
+writeInterval   7200;
+
+purgeWrite      0;
+
+writeFormat     ascii;
+
+writePrecision  6;
+
+writeCompression uncompressed;
+
+timeFormat      general;
+
+timePrecision   6;
+
+runTimeModifiable yes;
+
+adjustTimeStep  yes;
+
+maxDeltaT       3600;
+
+functions
+    (
+    probes1
+        {
+        type probes; // Type of functionObject
+        // Where to load it from (if not already in solver)
+        functionObjectLibs ("libsampling.so");
+        probeLocations // Locations to be probed. runTime modifiable!
+            (
+                (0.5 0.5 1.)
+            );
+        // Fields to be probed. runTime modifiable!
+        fields
+            (
+             U
+            );
+
+            outputControl timeStep;
+            outputInterval 1;
+        }
+    );
+
+
+//libs ( "libOpenFOAM.so" );
+//libs ("libuserBCs.so");
+
+// ************************************************************************* //
