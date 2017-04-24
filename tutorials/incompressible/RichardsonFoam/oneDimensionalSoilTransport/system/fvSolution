@@ -1,0 +1,44 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  1.7.1                                 |
+|   \\  /    A nd           | Web:      www.OpenFOAM.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      fvSolution;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+solvers
+{
+
+    psi
+    {
+        solver          PCG;
+        preconditioner  DIC;
+        tolerance       1e-6;
+        relTol          0;
+    }
+}
+
+Picard
+{
+    nIterPicard            10; //must be strictly higher than 5 ; 10 should be the best value//
+    nMaxCycle              10;
+    stabilisationThreshold 10;
+    precPicard             1e-4;
+    tFact                  1.3; //1 means fixed time step ; should be lower than 1.5//
+}
+
+relaxationFactor
+{
+//	psi	0.3;
+};
+
+// ************************************************************************* //
