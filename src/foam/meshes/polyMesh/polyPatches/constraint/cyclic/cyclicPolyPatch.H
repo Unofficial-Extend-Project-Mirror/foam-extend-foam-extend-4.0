@@ -204,6 +204,7 @@ protected:
         //- Update of the patch topology
         virtual void updateMesh();
 
+
 public:
 
     //- Runtime type information
