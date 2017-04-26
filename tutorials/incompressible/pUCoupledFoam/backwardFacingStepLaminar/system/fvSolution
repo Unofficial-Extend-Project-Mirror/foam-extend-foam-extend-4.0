@@ -34,7 +34,7 @@ solvers
         cycle           V-cycle;
         coarseningType  AAMG;
         norm            componentNorm;
-        normComponent   0;
+        normComponent   3;
 
         nPreSweeps      2;
         nPostSweeps     2;
