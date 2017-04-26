@@ -22,7 +22,7 @@ solvers
         cycle           W-cycle;
         coarseningType  cluster;
         norm            twoNorm;
-        normComponent   0;
+        normComponent   3;
 
         minGroupSize    2;
         maxGroupSize    4;
