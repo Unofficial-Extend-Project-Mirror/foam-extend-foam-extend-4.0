@@ -58,12 +58,12 @@ inline scalar BlockCoeffTwoNorm<tensor>::normalize
     if (a.activeType() == BlockCoeff<tensor>::SCALAR)
     {
         // Note: for two-norm, use mag
-        return mag(a.asScalar());
+        return sign(a.component(cmpt_))*mag(a.asScalar());
     }
     else if (a.activeType() == BlockCoeff<tensor>::LINEAR)
     {
         // Note: for two-norm, use mag
-        return mag(a.asLinear());
+        return sign(a.component(cmpt_))*mag(a.asLinear());
     }
     else
     {
@@ -87,12 +87,14 @@ inline void BlockCoeffTwoNorm<tensor>::normalize
     if (a.activeType() == BlockCoeff<tensor>::SCALAR)
     {
         // Note: for two-norm, use mag
-        b = mag(a.asScalar());
+        // However, the norm is signed
+        // b = mag(a.asScalar());
+        b = a.asScalar();
     }
     else if (a.activeType() == BlockCoeff<tensor>::LINEAR)
     {
         // Note: for two-norm, use mag
-        b = mag(a.asLinear());
+        b = sign(a.component(cmpt_))*mag(a.asLinear());
     }
     else
     {

@@ -53,8 +53,10 @@ inline scalar BlockCoeffTwoNorm<scalar>::normalize
     const BlockCoeff<scalar>& a
 )
 {
-        // Note: for two-norm, use mag
-        return mag(a.asScalar());
+    // Note: for two-norm, mag should be used.
+    // However, the norm is signed
+    // return mag(a.asScalar());
+    return a.asScalar();
 }
 
 
@@ -65,7 +67,10 @@ inline void BlockCoeffTwoNorm<scalar>::normalize
     const CoeffField<scalar>& a
 )
 {
-        b = mag(a.asScalar());
+    // Note: for two-norm, mag should be used.
+    // However, the norm is signed
+    // b = mag(a.asScalar());
+    b = a.asScalar();
 }
 
 

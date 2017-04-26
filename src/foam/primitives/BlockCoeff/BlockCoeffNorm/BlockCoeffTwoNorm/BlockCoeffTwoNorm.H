@@ -66,6 +66,9 @@ class BlockCoeffTwoNorm
         //- Control data dictionary
         dictionary dict_;
 
+        //- Component from which the sign is determined
+        const direction cmpt_;
+
 
 protected:
 

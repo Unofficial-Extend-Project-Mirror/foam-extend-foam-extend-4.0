@@ -95,6 +95,7 @@ public:
             const dictionary& dict
         );
 
+
     //- Destructor
     virtual ~BlockCoeffComponentNorm()
     {}
