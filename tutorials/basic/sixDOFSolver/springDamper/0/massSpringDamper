@@ -19,14 +19,9 @@ mass                m           [1 0 0 0 0 0 0]      1;
 momentOfInertia     J           [1 2 0 0 0 0 0]     (1 1 1);
 
 equilibriumPosition Xeq         [0 1 0 0 0 0 0]      (2 0 0);
-linearSpring        k           [1 0 -2 0 0 0 0]     (1 0 0);
-linearDamping       d           [1 0 -1 0 0 0 0]     (1 0 0);
 
 force               f           [1 1 -2 0 0 0 0]     (0 0 0);
 moment              m           [1 2 -2 0 0 0 0]     (0 0 0);
-
-forceRelative       fRel        [1 1 -2 0 0 0 0]     (0 0 0);
-momentRelative      mRel        [1 2 -2 0 0 0 0]     (0 0 0);
 
 // Specific input for certain sixDOFODE (here quaternionSixDOF)
 type quaternionSixDOF;
@@ -38,14 +33,6 @@ Uold                Uold        [0 1 -1 0 0 0 0]     (0 0 0);
 rotationVector                  (0 0 1);
 rotationAngle       rotA        [0 0 0 0 0 0 0]      0;
 omega               rotU        [0 0 -1 0 0 0 0]     (0 0 0);
-
-// Motion constraints
-fixedSurge          no;
-fixedSway           no;
-fixedHeave          no;
-fixedRoll           no;
-fixedPitch          no;
-fixedYaw            no;
 
 
 // ************************************************************************* //
