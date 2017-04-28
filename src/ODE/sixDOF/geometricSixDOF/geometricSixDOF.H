@@ -34,7 +34,7 @@ Description
 
     @article {terzeEtAl2016,
         Author = {Terze, Z. and M\"{u}ller, A. and Zlatar, D.},
-        title = {Singularity-free time intergration or rotational quaternions
+        title = {Singularity-free time integration of rotational quaternions
         using non-redundant ordinary differential equations},
         Journal = {Multibody System Dynamics},
         Year = {2016},
