@@ -75,6 +75,12 @@ class ProcessorPointPatchField
         // Non-blocking parallel communications
         // Temporary: move to patch.  HJ, 15/Apr/2008
 
+            //- Outstanding request
+            mutable label outstandingSendRequest_;
+
+            //- Outstanding request
+            mutable label outstandingRecvRequest_;
+
             //- Send buffer.
             //  Only sized and used when compressed or non-blocking comms used.
             mutable List<char> sendBuf_;
