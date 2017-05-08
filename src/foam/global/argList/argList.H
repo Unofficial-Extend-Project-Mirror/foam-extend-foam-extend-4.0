@@ -161,9 +161,8 @@ public:
         );
 
 
-    // Destructor
-
-        virtual ~argList();
+    //- Destructor
+    virtual ~argList();
 
 
     // Member functions
