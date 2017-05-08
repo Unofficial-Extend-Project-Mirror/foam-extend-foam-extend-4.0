@@ -219,6 +219,7 @@ Foam::faMesh::faMesh(const polyMesh& pMesh)
         ),
         *this
     ),
+    comm_(Pstream::worldComm),
     patchPtr_(NULL),
     lduPtr_(NULL),
     curTimeIndex_(time().timeIndex()),
@@ -314,6 +315,7 @@ Foam::faMesh::faMesh
         *this,
         0
     ),
+    comm_(Pstream::worldComm),
     patchPtr_(NULL),
     lduPtr_(NULL),
     curTimeIndex_(time().timeIndex()),
@@ -378,6 +380,7 @@ Foam::faMesh::faMesh
         *this,
         0
     ),
+    comm_(Pstream::worldComm),
     patchPtr_(NULL),
     lduPtr_(NULL),
     curTimeIndex_(time().timeIndex()),
@@ -861,6 +864,7 @@ Foam::faMesh::faMesh
         *this,
         0
     ),
+    comm_(Pstream::worldComm),
     patchPtr_(NULL),
     lduPtr_(NULL),
     curTimeIndex_(time().timeIndex()),
