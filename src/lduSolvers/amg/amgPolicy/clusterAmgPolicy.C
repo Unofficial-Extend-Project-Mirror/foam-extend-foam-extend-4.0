@@ -796,7 +796,7 @@ Foam::autoPtr<Foam::amgMatrix> Foam::clusterAmgPolicy::restrictMatrix
         }
     }
 
-    // Store coefficients to avoid tangled communications
+    // Store neighbour child arrays to avoid tangled communications
     // HJ, 1/Apr/2009
     FieldField<Field, label> fineInterfaceAddr(interfaceFields.size());
 

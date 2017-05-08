@@ -54,10 +54,9 @@ class amgLevel
 {
 public:
 
-    // Destructor
-
-        virtual ~amgLevel()
-        {}
+    //- Destructor
+    virtual ~amgLevel()
+    {}
 
 
     // Member Functions
