@@ -235,15 +235,15 @@ void Foam::coarseBlockAMGLevel<Type>::solve
     }
 
     // Switch of debug in top-level direct solve
-    label oldDebug = BlockLduMatrix<Type>::debug();
+    label oldDebug = blockLduMatrix::debug();
 
-    if (BlockLduMatrix<Type>::debug >= 4)
+    if (blockLduMatrix::debug >= 4)
     {
-        BlockLduMatrix<Type>::debug = 1;
+        blockLduMatrix::debug = 1;
     }
     else
     {
-        BlockLduMatrix<Type>::debug = 0;
+        blockLduMatrix::debug = 0;
     }
 
     if (matrixPtr_->symmetric())
@@ -274,7 +274,7 @@ void Foam::coarseBlockAMGLevel<Type>::solve
     }
 
     // Restore debug
-    BlockLduMatrix<Type>::debug = oldDebug;
+    blockLduMatrix::debug = oldDebug;
 
     // Escape cases of top-level solver divergence
     if
@@ -294,7 +294,7 @@ void Foam::coarseBlockAMGLevel<Type>::solve
         coarseSolverPerf.print();
     }
 
-    if (BlockLduMatrix<Type>::debug >= 3)
+    if (blockLduMatrix::debug >= 3)
     {
         coarseSolverPerf.print();
     }

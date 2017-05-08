@@ -366,7 +366,7 @@ void Foam::BlockMatrixAgglomeration<Type>::calcAgglomeration()
 
     reduce(coarsen_, andOp<bool>());
 
-    if (BlockLduMatrix<Type>::debug >= 3)
+    if (blockLduMatrix::debug >= 3)
     {
         // Count singleton clusters
         label nSingleClusters = 0;
@@ -893,17 +893,14 @@ Foam::BlockMatrixAgglomeration<Type>::restrictMatrix() const
     // Create coarse-level coupled interfaces
 
     // Create coarse interfaces, addressing and coefficients
-    const label interfaceSize =
-        const_cast<BlockLduMatrix<Type>& >(matrix_).interfaces().size();
-
     const typename BlockLduInterfaceFieldPtrsList<Type>::Type&
         interfaceFields =
         const_cast<BlockLduMatrix<Type>&>(matrix_).interfaces();
 
     // Set the coarse interfaces and coefficients
-    lduInterfacePtrsList coarseInterfaces(interfaceSize);
+    lduInterfacePtrsList coarseInterfaces(interfaceFields.size());
 
-    labelListList coarseInterfaceAddr(interfaceSize);
+    labelListList coarseInterfaceAddr(interfaceFields.size());
 
     // Add the coarse level
 
@@ -921,7 +918,7 @@ Foam::BlockMatrixAgglomeration<Type>::restrictMatrix() const
     );
 
     // Initialise transfer of restrict addressing on the interface
-    // HJ, consider blocking comms.  HJ, 9/Jun/2016
+    // HJ, must use blocking comms.  HJ, 9/Jun/2016
     forAll (interfaceFields, intI)
     {
         if (interfaceFields.set(intI))

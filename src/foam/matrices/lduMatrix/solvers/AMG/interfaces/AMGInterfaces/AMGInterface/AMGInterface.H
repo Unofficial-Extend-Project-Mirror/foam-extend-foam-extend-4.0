@@ -61,7 +61,7 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                      Class AMGInterface Declaration
+                         Class AMGInterface Declaration
 \*---------------------------------------------------------------------------*/
 
 class AMGInterface
@@ -162,10 +162,7 @@ public:
 
         //- Construct from fine-level interface,
         //  local and neighbour restrict addressing
-        AMGInterface
-        (
-            const lduPrimitiveMesh& lduMesh
-        )
+        AMGInterface(const lduPrimitiveMesh& lduMesh)
         :
             lduMesh_(lduMesh)
         {}

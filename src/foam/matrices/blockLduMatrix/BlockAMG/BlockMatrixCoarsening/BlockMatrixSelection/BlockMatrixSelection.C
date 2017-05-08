@@ -60,7 +60,7 @@ void Foam::BlockMatrixSelection<Type>::calcCoarsening()
 //------------------------------------------------------------------------------
 //             MATRIX DATA: ADDRESSING, COEFFICIENTS, COEFF NORMS
 //------------------------------------------------------------------------------
-
+    Info<< "Start equation selection" << endl;
     // Get addressing
     const unallocLabelList& rowStart = matrix_.lduAddr().ownerStartAddr();
     const unallocLabelList& losortAddr = matrix_.lduAddr().losortAddr();
@@ -632,6 +632,8 @@ void Foam::BlockMatrixSelection<Type>::calcCoarsening()
         // Coarsening did not succeed.  Delete Pptr
         deleteDemandDrivenData(Pptr_);
     }
+
+    Info<< "End equation selection" << endl;
 }
 
 
@@ -675,6 +677,7 @@ template<class Type>
 Foam::autoPtr<Foam::BlockAMGLevel<Type> >
 Foam::BlockMatrixSelection<Type>::restrictMatrix() const
 {
+    Info<< "Start matrix restriction" << endl;
     if (!coarsen_)
     {
         FatalErrorIn("autoPtr<amgMatrix> samgPolicy::restrictMatrix() const")
@@ -702,8 +705,11 @@ Foam::BlockMatrixSelection<Type>::restrictMatrix() const
      || crR.nRows() != nCoarseEqns_
     )
     {
-        FatalErrorIn("")
-            << "Incompatible matrices for triple product: "
+        FatalErrorIn
+        (
+            "autoPtr<Foam::BlockAMGLevel<Type> >"
+            "BlockMatrixSelection<Type>::restrictMatrix() const"
+        )   << "Incompatible matrices for triple product: "
             << "R( " << crR.nRows() << " ," << crR.nCols() << ") "
             << "A( " << nEqns << " ," << nEqns << ") "
             << "P( " << crP.nRows() << " ," << crP.nCols() << ") "
@@ -989,6 +995,79 @@ Foam::BlockMatrixSelection<Type>::restrictMatrix() const
         )
     );
 
+    const typename BlockLduInterfaceFieldPtrsList<Type>::Type&
+        interfaceFields =
+        const_cast<BlockLduMatrix<Type>&>(matrix_).interfaces();
+
+    // Set the coarse interfaces and coefficients
+    lduInterfacePtrsList coarseInterfaces(interfaceFields.size());
+
+    labelListList coarseInterfaceAddr(interfaceFields.size());
+
+    // Initialise transfer of restrict addressing on the interface
+    // HJ, reconsider blocking comms.  HJ, 9/Jun/2016
+    forAll (interfaceFields, intI)
+    {
+        if (interfaceFields.set(intI))
+        {
+            interfaceFields[intI].coupledInterface().initInternalFieldTransfer
+            (
+                Pstream::blocking,
+                rowLabel_
+            );
+        }
+    }
+
+    // Store coefficients to avoid tangled communications
+    // HJ, 1/Apr/2009
+    FieldField<Field, label> fineInterfaceAddr(interfaceFields.size());
+
+    forAll (interfaceFields, intI)
+    {
+        if (interfaceFields.set(intI))
+        {
+            const lduInterface& fineInterface =
+                interfaceFields[intI].coupledInterface();
+
+            fineInterfaceAddr.set
+            (
+                intI,
+                new labelField
+                (
+                    fineInterface.internalFieldTransfer
+                    (
+                        Pstream::blocking,
+                        rowLabel_
+                    )
+                )
+            );
+        }
+    }
+
+    // Create AMG interfaces
+    forAll (interfaceFields, intI)
+    {
+        if (interfaceFields.set(intI))
+        {
+            const lduInterface& fineInterface =
+                interfaceFields[intI].coupledInterface();
+
+            coarseInterfaces.set
+            (
+                intI,
+                AMGInterface::New
+                (
+                    coarseAddrPtr(),
+                    coarseInterfaces,
+                    fineInterface,
+                    fineInterface.interfaceInternalField(rowLabel_),
+                    fineInterfaceAddr[intI]
+                ).ptr()
+            );
+        }
+    }
+
+    //HJ: Add interface fields
 //------------------------------------------------------------------------------
 //                            CREATE COARSE MATRIX
 //------------------------------------------------------------------------------
@@ -1274,7 +1353,8 @@ Foam::BlockMatrixSelection<Type>::restrictMatrix() const
         )   << "Matrix diagonal of scalar or linear type not implemented"
             << abort(FatalError);
     }
-
+    Info<< "End matrix restriction.  Level size: " << nCoarseEqns_
+        << endl;
     // Create and return BlockAMGLevel
     return autoPtr<BlockAMGLevel<Type> >
     (

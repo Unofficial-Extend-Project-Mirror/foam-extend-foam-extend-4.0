@@ -495,7 +495,7 @@ void Foam::BlockMatrixClustering<Type>::calcClustering()
 
     reduce(coarsen_, andOp<bool>());
 
-    if (BlockLduMatrix<Type>::debug >= 3)
+    if (blockLduMatrix::debug >= 3)
     {
         // Count singleton clusters
         label nSingleClusters = 0;
@@ -1052,7 +1052,7 @@ Foam::BlockMatrixClustering<Type>::restrictMatrix() const
     );
 
     // Initialise transfer of restrict addressing on the interface
-    // HJ, consider blocking comms.  HJ, 9/Jun/2016
+    // HJ, must use blocking comms.  HJ, 9/Jun/2016
     forAll (interfaceFields, intI)
     {
         if (interfaceFields.set(intI))

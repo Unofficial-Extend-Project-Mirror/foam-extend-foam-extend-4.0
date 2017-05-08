@@ -81,6 +81,7 @@ class BlockMatrixSelection
         crMatrix* Rptr_;
 
         //- Coarsening array - array with labels of coarse/fine equations
+        //  (coarse = coarseID / fine = -1)
         labelList rowLabel_;
 
 
@@ -101,9 +102,9 @@ class BlockMatrixSelection
         // Equation type
         enum equationType
         {
-            UNDECIDED = -1,
-            COARSE = 0,
-            FINE = 1
+            UNDECIDED = -2,
+            FINE = -1,
+            COARSE = 0     // Later replaced with coarse matrix equation index
         };
 
 
@@ -136,8 +137,7 @@ public:
 
     // Member Functions
 
-        //- Return array with labels of equations (coarse = 0 / fine = 1)
-        //- (used only for postprocessing)
+        //- Return array with labels of equations
         const labelList& coarseningLabels() const
         {
             return rowLabel_;

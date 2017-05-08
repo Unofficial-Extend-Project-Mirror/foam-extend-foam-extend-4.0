@@ -99,7 +99,7 @@ void Foam::BlockAMGCycle<Type>::makeCoarseLevels(const label nMaxLevels)
             }
         }
 
-        if (BlockLduMatrix<Type>::debug >= 2)
+        if (blockLduMatrix::debug >= 2)
         {
             Info<< "Created " << nLevels_ << " AMG levels" << endl;
         }

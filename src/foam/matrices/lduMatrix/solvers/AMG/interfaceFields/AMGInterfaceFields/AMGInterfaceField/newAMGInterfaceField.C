@@ -42,9 +42,11 @@ Foam::autoPtr<Foam::AMGInterfaceField> Foam::AMGInterfaceField::New
     {
         FatalErrorIn
         (
-            "AMGInterfaceField::New"
-            "(const AMGInterface& AMGCp, "
-            "const lduInterfaceField& fineInterface)"
+            "AMGInterfaceField::New\n"
+            "(\n"
+            "    const AMGInterface& AMGCp,\n"
+            "    const lduInterfaceField& fineInterface\n"
+            ")"
         )   << "Unknown AMGInterfaceField type " << coupleType << ".\n"
             << "Valid AMGInterfaceField types are :"
             << lduInterfaceConstructorTablePtr_->sortedToc()
