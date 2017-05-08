@@ -129,7 +129,7 @@ Foam::lduSolverPerformance Foam::fvMatrix<Type>::solve
 
         // Correct component boundary source for the explicit part of the
         // coupled boundary conditions.  At the moment, the whole
-        // coefficient-field product hass been added into the source,
+        // coefficient-field product has been added into the source,
         // but the implicit part for the current element needs to be taken out
         // (because it is implicit).
         // HJ, 31/May/2013

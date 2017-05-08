@@ -379,7 +379,7 @@ public:
             //- Return patchField on the opposite patch of a coupled patch
             virtual tmp<Field<Type> > patchNeighbourField() const
             {
-                notImplemented(type() + "patchNeighbourField()");
+                notImplemented(type() + "::patchNeighbourField()");
                 return *this;
             }
 
