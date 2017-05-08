@@ -300,7 +300,7 @@ $(AMG)/GAMGSolverAgglomerateMatrix.C
 $(AMG)/GAMGSolverScalingFactor.C
 $(AMG)/GAMGSolverSolve.C
 
-AMGInterfaces = $(AMG)/interfaces
+AMGInterfaces = $(AMG)/interfaces/AMGInterfaces
 $(AMGInterfaces)/AMGInterface/AMGInterface.C
 $(AMGInterfaces)/AMGInterface/newAMGInterface.C
 $(AMGInterfaces)/processorAMGInterface/processorAMGInterface.C
@@ -310,7 +310,12 @@ $(AMGInterfaces)/cyclicGGIAMGInterface/cyclicGGIAMGInterface.C
 $(AMGInterfaces)/regionCoupleAMGInterface/regionCoupleAMGInterface.C
 $(AMGInterfaces)/mixingPlaneAMGInterface/mixingPlaneAMGInterface.C
 
-AMGInterfaceFields = $(AMG)/interfaceFields
+SAMGInterfaces = $(AMG)/interfaces/SAMGInterfaces
+$(SAMGInterfaces)/SAMGInterface/SAMGInterface.C
+$(SAMGInterfaces)/SAMGInterface/newSAMGInterface.C
+$(SAMGInterfaces)/processorSAMGInterface/processorSAMGInterface.C
+
+AMGInterfaceFields = $(AMG)/interfaceFields/AMGInterfaceFields
 $(AMGInterfaceFields)/AMGInterfaceField/AMGInterfaceField.C
 $(AMGInterfaceFields)/AMGInterfaceField/newAMGInterfaceField.C
 $(AMGInterfaceFields)/processorAMGInterfaceField/processorAMGInterfaceField.C
@@ -319,6 +324,11 @@ $(AMGInterfaceFields)/ggiAMGInterfaceField/ggiAMGInterfaceField.C
 $(AMGInterfaceFields)/cyclicGgiAMGInterfaceField/cyclicGgiAMGInterfaceField.C
 $(AMGInterfaceFields)/regionCoupleAMGInterfaceField/regionCoupleAMGInterfaceField.C
 $(AMGInterfaceFields)/mixingPlaneAMGInterfaceField/mixingPlaneAMGInterfaceField.C
+
+SAMGInterfaceFields = $(AMG)/interfaceFields/SAMGInterfaceFields
+$(SAMGInterfaceFields)/SAMGInterfaceField/SAMGInterfaceField.C
+$(SAMGInterfaceFields)/SAMGInterfaceField/newSAMGInterfaceField.C
+$(SAMGInterfaceFields)/processorSAMGInterfaceField/processorSAMGInterfaceField.C
 
 AMGAgglomerations = $(AMG)/AMGAgglomerations
 
@@ -697,6 +707,12 @@ $(BlockAMGInterfaceFields)/BlockAMGInterfaceField/blockAMGInterfaceFields.C
 $(BlockAMGInterfaceFields)/BlockAMGInterfaceField/blockVectorNAMGInterfaceFields.C
 $(BlockAMGInterfaceFields)/ProcessorBlockAMGInterfaceField/ProcessorBlockAMGInterfaceFields.C
 $(BlockAMGInterfaceFields)/GGIBlockAMGInterfaceField/GGIBlockAMGInterfaceFields.C
+
+BlockSAMGInterfaceFields = $(BlockAMG)/BlockSAMGInterfaceFields
+$(BlockSAMGInterfaceFields)/BlockSAMGInterfaceField/blockSAMGInterfaceFields.C
+$(BlockSAMGInterfaceFields)/BlockSAMGInterfaceField/blockVectorNSAMGInterfaceFields.C
+$(BlockSAMGInterfaceFields)/ProcessorBlockSAMGInterfaceField/ProcessorBlockSAMGInterfaceFields.C
+
 
 BlockMatrixCoarsening = $(BlockAMG)/BlockMatrixCoarsening
 $(BlockMatrixCoarsening)/BlockMatrixCoarsening/blockMatrixCoarsenings.C
