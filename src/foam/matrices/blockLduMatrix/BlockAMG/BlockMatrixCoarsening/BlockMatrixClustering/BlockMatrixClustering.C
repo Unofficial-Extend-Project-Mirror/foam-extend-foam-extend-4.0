@@ -459,7 +459,7 @@ void Foam::BlockMatrixClustering<Type>::calcClustering()
                     agglomIndex_[rowI] = agglomIndex_[nextGrouped];
                     sizeOfGroups[agglomIndex_[nextGrouped]]++;
                 }
-                else 
+                else
                 {
                     // No group and no solo group.  Make its own group
                     sizeOfGroups[agglomIndex_[rowI]]++;

@@ -39,7 +39,7 @@ Foam::BlockSAMGInterfaceField<Type>::selectBlockCoeffs
     (
         new CoeffField<Type>(interface_.size())
     );
-    CoeffField<Type>& coarseCoeffs = tcoarseCoeffs();
+    // CoeffField<Type>& coarseCoeffs = tcoarseCoeffs();
     /* HJ, code missing
     typedef CoeffField<Type> TypeCoeffField;
 

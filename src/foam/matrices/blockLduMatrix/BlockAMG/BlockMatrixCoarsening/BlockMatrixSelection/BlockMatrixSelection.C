@@ -34,7 +34,7 @@ Author
 
 #include "BlockMatrixSelection.H"
 #include "coeffFields.H"
-#include "BlockAMGInterfaceField.H"
+#include "BlockSAMGInterfaceField.H"
 #include "coarseBlockAMGLevel.H"
 #include "PriorityList.H"
 #include "crMatrix.H"
@@ -1055,7 +1055,7 @@ Foam::BlockMatrixSelection<Type>::restrictMatrix() const
             coarseInterfaces.set
             (
                 intI,
-                AMGInterface::New
+                SAMGInterface::New
                 (
                     coarseAddrPtr(),
                     coarseInterfaces,
@@ -1067,7 +1067,6 @@ Foam::BlockMatrixSelection<Type>::restrictMatrix() const
         }
     }
 
-    //HJ: Add interface fields
 //------------------------------------------------------------------------------
 //                            CREATE COARSE MATRIX
 //------------------------------------------------------------------------------
@@ -1341,6 +1340,65 @@ Foam::BlockMatrixSelection<Type>::restrictMatrix() const
                         }
                     }
                 }
+            }
+        }
+
+        // Get interfaces from coarse matrix
+        typename BlockLduInterfaceFieldPtrsList<Type>::Type&
+            coarseInterfaceFieldsTransfer = coarseMatrix.interfaces();
+
+        // Aggolmerate the upper and lower coupled coefficients
+        forAll (interfaceFields, intI)
+        {
+            if (interfaceFields.set(intI))
+            {
+                const SAMGInterface& coarseInterface =
+                    refCast<const SAMGInterface>(coarseInterfaces[intI]);
+
+                coarseInterfaceFieldsTransfer.set
+                (
+                    intI,
+                    BlockSAMGInterfaceField<Type>::New
+                    (
+                        coarseInterface,
+                        interfaceFields[intI]
+                    ).ptr()
+                );
+
+                // Since the type of clustering is now templated, clustering
+                // of block coefficients must be done by a FIELD (not interface)
+                // via a new set of virtual functions
+                // HJ, 16/Mar/2016
+
+                // Note: in the scalar AMG, clustering is done by the interface
+                // (always scalar) but in the block matrix it is done by a
+                // templated block interface field
+                // HJ, 16/Mar/2016
+
+                // Cast the interface into AMG type
+                const BlockSAMGInterfaceField<Type>& coarseField =
+                    refCast<const BlockSAMGInterfaceField<Type> >
+                    (
+                        coarseInterfaceFieldsTransfer[intI]
+                    );
+
+                coarseMatrix.coupleUpper().set
+                (
+                    intI,
+                    coarseField.selectBlockCoeffs
+                    (
+                        matrix_.coupleUpper()[intI]
+                    )
+                );
+
+                coarseMatrix.coupleLower().set
+                (
+                    intI,
+                    coarseField.selectBlockCoeffs
+                    (
+                        matrix_.coupleLower()[intI]
+                    )
+                );
             }
         }
     }

@@ -56,6 +56,7 @@ Foam::processorSAMGInterface::processorSAMGInterface
     comm_(fineProcInterface_.comm()),
     tag_(fineProcInterface_.tag())
 {
+    Pout<< "Creating processor SAMG interface" << endl;
     /* HJ, Code missing here
 
     // Make a lookup table of entries for owner/neighbour

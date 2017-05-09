@@ -45,12 +45,12 @@ namespace Foam
 
 Foam::processorSAMGInterfaceField::processorSAMGInterfaceField
 (
-    const SAMGInterface& AMGCp,
+    const SAMGInterface& SAMGCp,
     const lduInterfaceField& fineInterfaceField
 )
 :
-    SAMGInterfaceField(AMGCp, fineInterfaceField),
-    procInterface_(refCast<const processorSAMGInterface>(AMGCp)),
+    SAMGInterfaceField(SAMGCp, fineInterfaceField),
+    procInterface_(refCast<const processorSAMGInterface>(SAMGCp)),
     doTransform_(false),
     rank_(0),
     outstandingSendRequest_(-1),
@@ -58,6 +58,7 @@ Foam::processorSAMGInterfaceField::processorSAMGInterfaceField
     scalarSendBuf_(0),
     scalarReceiveBuf_(0)
 {
+    Pout<< "Creating processor SAMG interface field" << endl;
     const processorLduInterfaceField& p =
         refCast<const processorLduInterfaceField>(fineInterfaceField);
 
