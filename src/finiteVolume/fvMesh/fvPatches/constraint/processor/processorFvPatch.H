@@ -93,6 +93,12 @@ public:
 
     // Member functions
 
+        //- Return interface size
+        virtual label interfaceSize() const
+        {
+            return procPolyPatch_.size();
+        }
+
         //- Return processor number
         int myProcNo() const
         {

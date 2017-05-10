@@ -170,7 +170,13 @@ public:
 
     // Member functions
 
-        //- Return processor number
+        //- Return interface size
+        virtual label interfaceSize() const
+        {
+            return size();
+        }
+
+    //- Return processor number
         int myProcNo() const
         {
             return myProcNo_;

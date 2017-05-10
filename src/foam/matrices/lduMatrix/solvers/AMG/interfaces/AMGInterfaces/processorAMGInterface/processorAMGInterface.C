@@ -157,11 +157,9 @@ Foam::processorAMGInterface::processorAMGInterface
     // All weights are equal to 1: integral matching
     restrictWeights_.setSize(localRestrictAddressing.size(), 1.0);
 
-    labelList contents = neighboursTable.toc();
-
     // Sort makes sure the order is identical on both sides.
     // HJ, 20/Feb.2009
-    sort(contents);
+    const labelList contents = neighboursTable.sortedToc();
 
     // Reset face counter for re-use
     nCoarseFaces = 0;

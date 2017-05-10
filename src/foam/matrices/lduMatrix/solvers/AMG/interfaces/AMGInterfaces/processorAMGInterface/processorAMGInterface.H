@@ -102,6 +102,12 @@ public:
 
         // Access
 
+            //- Return interface size
+            virtual label interfaceSize() const
+            {
+                return AMGInterface::size();
+            }
+
             //- Return true if interface is coupled
             virtual bool coupled() const
             {
