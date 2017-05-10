@@ -100,7 +100,7 @@ public:
         //- Construct from AMG interface and fine level interface field
         processorSAMGInterfaceField
         (
-            const SAMGInterface& AMGCp,
+            const SAMGInterface& SAMGCp,
             const lduInterfaceField& fineInterfaceField
         );
 
@@ -116,7 +116,7 @@ public:
             //- Return size
             label size() const
             {
-                return procInterface_.size();
+                return procInterface_.interfaceSize();
             }
 
 

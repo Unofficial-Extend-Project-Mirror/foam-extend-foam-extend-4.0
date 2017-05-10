@@ -32,10 +32,11 @@ License
 Foam::autoPtr<Foam::SAMGInterface> Foam::SAMGInterface::New
 (
     const lduPrimitiveMesh& lduMesh,
+    const crMatrix& prolongation,
     const lduInterfacePtrsList& coarseInterfaces,
     const lduInterface& fineInterface,
-    const labelField& localRestrictAddressing,
-    const labelField& neighbourRestrictAddressing
+    const labelField& localRowLabel,
+    const labelField& neighbourRowLabel
 )
 {
     word coupleType(fineInterface.type());
@@ -50,10 +51,11 @@ Foam::autoPtr<Foam::SAMGInterface> Foam::SAMGInterface::New
             "SAMGInterface::New\n"
             "(\n"
             "    const lduPrimitiveMesh& lduMesh,\n"
+            "    const crMatrix& prolongation,\n"
             "    const lduInterfacePtrsList& coarseInterfaces,\n"
             "    const lduInterface& fineInterface,\n"
-            "    const labelField& localRestrictAddressing,\n"
-            "    const labelField& neighbourRestrictAddressing\n"
+            "    const labelField& localRowLabel,\n"
+            "    const labelField& neighbourRowLabel\n"
             ")"
         )   << "Unknown SAMGInterface type " << coupleType << ".\n"
             << "Valid SAMGInterface types are :"
@@ -66,10 +68,11 @@ Foam::autoPtr<Foam::SAMGInterface> Foam::SAMGInterface::New
         cstrIter()
         (
             lduMesh,
+            prolongation,
             coarseInterfaces,
             fineInterface,
-            localRestrictAddressing,
-            neighbourRestrictAddressing
+            localRowLabel,
+            neighbourRowLabel
         )
     );
 }

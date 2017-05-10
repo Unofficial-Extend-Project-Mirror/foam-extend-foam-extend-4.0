@@ -32,7 +32,7 @@ Author
 
 SourceFiles
     SAMGInterface.C
-    newAmgInterface.C
+    newSAMGInterface.C
 
 \*---------------------------------------------------------------------------*/
 
@@ -42,7 +42,7 @@ SourceFiles
 #include "lduInterface.H"
 #include "autoPtr.H"
 #include "lduPrimitiveMesh.H"
-#include "coeffFields.H"
+#include "crMatrix.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -62,16 +62,23 @@ class SAMGInterface
         //- Reference to ldu addressing
         const lduPrimitiveMesh& lduMesh_;
 
+        //- Reference to prolongation matrix
+        const crMatrix& prolongation_;
+
 
 protected:
 
     // Protected data
 
-        //- Face-cell addressing.  Contains coarse level addressing
+        //- Local face-cell addressing.  Contains local coarse level addressing
+        //  Detected as coarse cells on local side
         labelField faceCells_;
 
         //- Fine addressing.  Contains fine index for each coarse face
         labelField fineAddressing_;
+
+        //- Fine weights
+        scalarField fineWeights_;
 
 
 private:
@@ -100,17 +107,19 @@ public:
             lduInterface,
             (
                 const lduPrimitiveMesh& lduMesh,
+                const crMatrix& prolongation,
                 const lduInterfacePtrsList& coarseInterfaces,
                 const lduInterface& fineInterface,
-                const labelField& localSelectAddressing,
-                const labelField& neighbourSelectAddressing
+                const labelField& localRowLabel,
+                const labelField& neighbourRowLabel
             ),
             (
                 lduMesh,
+                prolongation,
                 coarseInterfaces,
                 fineInterface,
-                localSelectAddressing,
-                neighbourSelectAddressing
+                localRowLabel,
+                neighbourRowLabel
             )
         );
 
@@ -122,10 +131,11 @@ public:
         static autoPtr<SAMGInterface> New
         (
             const lduPrimitiveMesh& lduMesh,
+            const crMatrix& prolongation,
             const lduInterfacePtrsList& coarseInterfaces,
             const lduInterface& fineInterface,
-            const labelField& localSelectAddressing,
-            const labelField& neighbourSelectAddressing
+            const labelField& localRowLabel,
+            const labelField& neighbourRowLabel
         );
 
 
@@ -133,9 +143,14 @@ public:
 
         //- Construct from fine-level interface,
         //  local and neighbour select addressing
-        SAMGInterface(const lduPrimitiveMesh& lduMesh)
+        SAMGInterface
+        (
+            const lduPrimitiveMesh& lduMesh,
+            const crMatrix& prolongation
+        )
         :
-            lduMesh_(lduMesh)
+            lduMesh_(lduMesh),
+            prolongation_(prolongation)
         {}
 
 
@@ -154,22 +169,40 @@ public:
                 return lduMesh_;
             }
 
-            //- Return size
+            //- Return reference to prolongation matrix
+            const crMatrix& prolongation() const
+            {
+                return prolongation_;
+            }
+
+            //- Return local size
             virtual label size() const
             {
                 return faceCells_.size();
             }
 
-            //- Return faceCell addressing
+            //- Return interface size
+            virtual label interfaceSize() const
+            {
+                return faceCells_.size();
+            }
+
+            //- Return local faceCell addressing
             virtual const unallocLabelList& faceCells() const
             {
                 return faceCells_;
             }
 
-            //- Return fine addressing
+            //- Return fine addressing: fine index for each coarse face
             const labelField& fineAddressing() const
             {
                 return fineAddressing_;
+            }
+
+            //- Return fine weights
+            const scalarField& fineWeights() const
+            {
+                return fineWeights_;
             }
 
             //- Return the interface internal field of the given field
@@ -187,7 +220,7 @@ public:
             ) const;
 
 
-        // Agglomeration
+        // Coefficient selection
 
             //- Select the given fine-level coefficients and return
             virtual tmp<scalarField> selectCoeffs
