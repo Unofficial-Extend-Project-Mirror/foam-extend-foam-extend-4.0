@@ -109,8 +109,8 @@ Foam::tmp<Foam::crMatrix> Foam::crMatrix::T() const
 {
     // My addressing
     const label myNRows = crAddr().nRows();
-    const labelList& myRow = crAddr().row();
-    const labelList& myCol = crAddr().col();
+    const labelList& myRow = crAddr().rowStart();
+    const labelList& myCol = crAddr().column();
     const scalarField& myCoeffs = coeffs();
 
     // Create transpose
@@ -123,8 +123,8 @@ Foam::tmp<Foam::crMatrix> Foam::crMatrix::T() const
     tCoeffs = 0;
 
     // Transpose addressing
-    const labelList& tRow = transpose.crAddr().row();
-    const labelList& tCol = transpose.crAddr().col();
+    const labelList& tRow = transpose.crAddr().rowStart();
+    const labelList& tCol = transpose.crAddr().column();
 
     // Set transpose coefficients
 
@@ -153,8 +153,8 @@ Foam::tmp<Foam::crMatrix> Foam::crMatrix::T() const
 // Calculate b += A*x
 void Foam::crMatrix::dotPlus(scalarField& b, const scalarField& x) const
 {
-    const labelList& row = crAddr_.row();
-    const labelList& col = crAddr_.col();
+    const labelList& row = crAddr_.rowStart();
+    const labelList& col = crAddr_.column();
 
     forAll (b, i)
     {

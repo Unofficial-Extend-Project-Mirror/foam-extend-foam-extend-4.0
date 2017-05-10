@@ -83,14 +83,15 @@ public:
     // Constructors
 
         //- Construct from fine-level interface,
-        //  local and neighbour restrict addressing
+        //  local and neighbour row label
         processorSAMGInterface
         (
             const lduPrimitiveMesh& lduMesh,
+            const crMatrix& prolongation,
             const lduInterfacePtrsList& coarseInterfaces,
             const lduInterface& fineInterface,
-            const labelField& localRestrictAddressing,
-            const labelField& neighbourRestrictAddressing
+            const labelField& localRowLabel,
+            const labelField& neighbourRowLabel
         );
 
 
@@ -101,6 +102,12 @@ public:
     // Member Functions
 
         // Access
+
+            //- Return interface size
+            virtual label interfaceSize() const
+            {
+                return SAMGInterface::size();
+            }
 
             //- Return true if interface is coupled
             virtual bool coupled() const

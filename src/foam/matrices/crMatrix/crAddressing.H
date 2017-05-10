@@ -64,15 +64,15 @@ class crAddressing
 
         //- Row array.
         //  Provides start index for each row, dimensioned to nRows + 1
-        labelList row_;
+        labelList rowStart_;
 
-        //- Column array
-        labelList col_;
+        //- Column index array
+        labelList column_;
 
     // Private Member Functions
 
-        //- Set row count
-        void setRowCount(const labelList& count);
+        //- Set row sizes
+        void setRowSizes(const labelList& count);
 
 
 public:
@@ -84,7 +84,7 @@ public:
         (
             const label nRows,
             const label nCols,
-            const labelList& count
+            const labelList& nEntries
         );
 
         //- Construct from components
@@ -92,8 +92,8 @@ public:
         (
             const label nRows,
             const label nCols,
-            const labelList& row,
-            const labelList& col
+            const labelList& rowStart,
+            const labelList& column
         );
 
         //- Construct as copy
@@ -125,28 +125,28 @@ public:
             //- Return number of coefficients
             label nEntries() const
             {
-                return col_.size();
+                return column_.size();
             }
 
             //- Return row array
-            const labelList& row() const
+            const labelList& rowStart() const
             {
-                return row_;
+                return rowStart_;
             }
 
             //- Return column array
-            const labelList& col() const
+            const labelList& column() const
             {
-                return col_;
+                return column_;
             }
 
 
         // Edit
 
             //- Return column array
-            labelList& col()
+            labelList& column()
             {
-                return col_;
+                return column_;
             }
 
 
@@ -159,6 +159,7 @@ public:
     // Member Operators
 
         void operator=(const crAddressing&);
+
 
     // IOstream Operators
 

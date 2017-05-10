@@ -45,210 +45,215 @@ namespace Foam
 Foam::processorSAMGInterface::processorSAMGInterface
 (
     const lduPrimitiveMesh& lduMesh,
+    const crMatrix& prolongation,
     const lduInterfacePtrsList& coarseInterfaces,
     const lduInterface& fineInterface,
-    const labelField& localRestrictAddressing,
-    const labelField& neighbourRestrictAddressing
+    const labelField& localRowLabel,
+    const labelField& neighbourRowLabel
 )
 :
-    SAMGInterface(lduMesh),
+    SAMGInterface(lduMesh, prolongation),
     fineProcInterface_(refCast<const processorLduInterface>(fineInterface)),
     comm_(fineProcInterface_.comm()),
     tag_(fineProcInterface_.tag())
 {
     Pout<< "Creating processor SAMG interface" << endl;
-    /* HJ, Code missing here
 
-    // Make a lookup table of entries for owner/neighbour
-    HashTable<SLList<label>, label, Hash<label> > neighboursTable
+    // Analyse the local and neighbour row label:
+    //  local coarse, remote coarse = regular coarse face
+    //  local coarse, remote fine = local expanded face: receive prolonged data
+    //  local fine, remote coarse = neighbour expanded face: send prolonged data
+
+    // Algorithm
+    // Go through local row labels and examine cases
+    // 1) coarse local and coarse remote:
+    //    create coarse processor face and set faceCells.  Set weight to 1
+    // 2) coarse local and fine remote:
+    //    will receive coarse neighbours and weights from opposite side
+    // 3) fine local and coarse remote:
+    //    assemble local coarse neighbours and weights from the prolongation
+    // 4) fine local and fine remote - ignore
+    //
+    // On completion of selection:
+    //    send and receive local coarse neighbours for fine local/coarse remote
+    //    sort coarse equations by increasing coarse index from master side
+    //    create faceCells, fineAddressing and fineWeights
+
+    // First collect and communicate internal neighbours from the local fine
+    // side (ie neighbour processor cell is coarse)
+    HashTable<labelList, label, Hash<label> > neighboursFromLocalFine
     (
-        localRestrictAddressing.size()
+        Foam::max(128, fineProcInterface_.interfaceSize()/4)
     );
 
-    // Table of face-sets to be agglomerated
-    HashTable<SLList<SLList<label> >, label, Hash<label> > faceFaceTable
+    HashTable<scalarField, label, Hash<label> > weightsFromLocalFine
     (
-        localRestrictAddressing.size()
+        Foam::max(128, fineProcInterface_.interfaceSize()/4)
     );
 
+    // Get access to the prolongation addressing and coefficients
+    const labelList& pRowStart = prolongation.crAddr().rowStart();
+    const labelList& pColumn = prolongation.crAddr().column();
+    const scalarField& pCoeffs = prolongation.coeffs();
+
+    // Get fine faceCells
+    const labelList& fineFaceCells = fineInterface.faceCells();
+    Pout<< "fineFaceCells: " << fineFaceCells << endl;
+    // Collect local fine to neighbour coarse connections for communication
+    forAll (localRowLabel, faceI)
+    {
+        if
+        (
+            localRowLabel[faceI] < 0
+         && neighbourRowLabel[faceI] >= 0
+        )
+        {
+            // Found local fine to neighbour coarse interface
+
+            // Collect local coarse neighbours and weights from the
+            // prolongation matrix to send to other processor
+            const label curStart = pRowStart[fineFaceCells[faceI]];
+            const label curEnd = pRowStart[fineFaceCells[faceI] + 1];
+            const label nCoarse = curEnd - curStart;
+            Pout<< "Eqn: " << fineFaceCells[faceI] << " Span: " << curStart << " " << curEnd << " = " << nCoarse << endl;
+            labelList nbrs(nCoarse);
+            scalarField weights(nCoarse);
+
+            forAll (nbrs, i)
+            {
+                nbrs[i] = pColumn[curStart + i];
+                weights[i] = pCoeffs[curStart + i];
+            }
+            Pout<< "weights: " << weights << endl;
+            // Insert neighbours under remote coarse index
+            neighboursFromLocalFine.insert(neighbourRowLabel[faceI], nbrs);
+            weightsFromLocalFine.insert(neighbourRowLabel[faceI], weights);
+        }
+    }
+
+    // Receive remote prolongation data
+    HashTable<labelList, label, Hash<label> > neighboursFromRemoteFine;
+    HashTable<scalarField, label, Hash<label> > weightsFromRemoteFine;
+
+    // Send and receive the addressing from the other side
+    {
+        OPstream toNbr(Pstream::blocking, neighbProcNo());
+        toNbr<< neighboursFromLocalFine << weightsFromLocalFine;
+    }
+
+    {
+        IPstream fromNbr(Pstream::blocking, neighbProcNo());
+
+        neighboursFromRemoteFine =
+            HashTable<labelList, label, Hash<label> >(fromNbr);
+
+        weightsFromRemoteFine =
+            HashTable<scalarField, label, Hash<label> >(fromNbr);
+    }
+
+    // Assemble connectivity
+
+    // Resize arrays to size of fine interface
+    // Note: it is technically possible to have MORE coarse processor faces
+    // so a check will be made in the end
+    faceCells_.setSize(5*fineProcInterface_.interfaceSize());
+    fineAddressing_.setSize(5*fineProcInterface_.interfaceSize());
+    fineWeights_.setSize(5*fineProcInterface_.interfaceSize());
+
+    // Count coarse faces
     label nCoarseFaces = 0;
 
-    forAll (localRestrictAddressing, ffi)
+    // Collect coarse-to-fine connections
+    forAll (localRowLabel, faceI)
     {
-        label curMaster = -1;
-        label curSlave = -1;
-
-        // Do switching on master/slave indexes based on the owner/neighbour of
-        // the processor index such that both sides get the same answer.
-        if (myProcNo() < neighbProcNo())
+        if
+        (
+            localRowLabel[faceI] >= 0
+         && neighbourRowLabel[faceI] >= 0
+        )
         {
-            // Master side
-            curMaster = localRestrictAddressing[ffi];
-            curSlave = neighbourRestrictAddressing[ffi];
-        }
-        else
-        {
-            // Slave side
-            curMaster = neighbourRestrictAddressing[ffi];
-            curSlave = localRestrictAddressing[ffi];
-        }
-
-        // Look for the master cell.  If it has already got a face,
-        // add the coefficient to the face.  If not, create a new face.
-        if (neighboursTable.found(curMaster))
-        {
-            // Check all current neighbours to see if the current slave already
-            // exists and if so, add the fine face to the agglomeration.
-
-            SLList<label>& curNbrs = neighboursTable.find(curMaster)();
-
-            SLList<SLList<label> >& curFaceFaces =
-                faceFaceTable.find(curMaster)();
-
-            bool nbrFound = false;
-
-            SLList<label>::iterator nbrsIter = curNbrs.begin();
-
-            SLList<SLList<label> >::iterator faceFacesIter =
-                curFaceFaces.begin();
-
-            for
-            (
-                ;
-                nbrsIter != curNbrs.end(), faceFacesIter != curFaceFaces.end();
-                ++nbrsIter, ++faceFacesIter
-            )
-            {
-                if (nbrsIter() == curSlave)
-                {
-                    nbrFound = true;
-                    faceFacesIter().append(ffi);
-                    break;
-                }
-            }
-
-            if (!nbrFound)
-            {
-                curNbrs.append(curSlave);
-                curFaceFaces.append(SLList<label>(ffi));
-
-                // New coarse face created
-                nCoarseFaces++;
-            }
-        }
-        else
-        {
-            // This master has got no neighbours yet.  Add a neighbour
-            // and a coefficient, thus creating a new face
-            neighboursTable.insert(curMaster, SLList<label>(curSlave));
-            faceFaceTable.insert
-            (
-                curMaster,
-                SLList<SLList<label> >(SLList<label>(ffi))
-            );
-
-            // New coarse face created
+            // Found local coarse to neighbour coarse face
+            Pout<< "face " << faceI << " CC" << endl;
+            // Create new coarse face
+            faceCells_[nCoarseFaces] = localRowLabel[faceI];
+            fineAddressing_[nCoarseFaces] = faceI;
+            fineWeights_[nCoarseFaces] = 1;
             nCoarseFaces++;
         }
-    } // end for all fine faces
-
-
-    faceCells_.setSize(nCoarseFaces, -1);
-    fineAddressing_.setSize(localRestrictAddressing.size(), -1);
-    restrictAddressing_.setSize(localRestrictAddressing.size(), -1);
-
-    // All weights are equal to 1: integral matching
-    restrictWeights_.setSize(localRestrictAddressing.size(), 1.0);
-
-    labelList contents = neighboursTable.toc();
-
-    // Sort makes sure the order is identical on both sides.
-    // HJ, 20/Feb.2009
-    sort(contents);
-
-    // Reset face counter for re-use
-    nCoarseFaces = 0;
-
-    if (myProcNo() < neighbProcNo())
-    {
-        // On master side, the owner addressing is stored in table of contents
-        forAll (contents, masterI)
+        else if
+        (
+            localRowLabel[faceI] < 0
+         && neighbourRowLabel[faceI] >= 0
+        )
         {
-            SLList<label>& curNbrs = neighboursTable.find(contents[masterI])();
+            // Found local fine to neighbour coarse face
 
-            SLList<SLList<label> >& curFaceFaces =
-                faceFaceTable.find(contents[masterI])();
+            // Pick up local prolongation coarse entries and for all
+            // add a new face with appropriate weight
+            // Note: faceCells changes due to (internal) local coarse cells
+            const labelList& curLocalCoarseNbrs =
+                neighboursFromLocalFine[neighbourRowLabel[faceI]];
 
-            SLList<label>::iterator nbrsIter = curNbrs.begin();
-
-            SLList<SLList<label> >::iterator faceFacesIter =
-                curFaceFaces.begin();
-
-            for
-            (
-                ;
-                nbrsIter != curNbrs.end(), faceFacesIter != curFaceFaces.end();
-                ++nbrsIter, ++faceFacesIter
-            )
+            const scalarField& curLocalCoarseWeights =
+                weightsFromLocalFine[neighbourRowLabel[faceI]];
+            Pout<< "face " << faceI << " FC, size: " << curLocalCoarseNbrs.size()
+                << " W: " << curLocalCoarseWeights << endl;
+            forAll (curLocalCoarseNbrs, curNbrI)
             {
-                faceCells_[nCoarseFaces] = contents[masterI];
-
-                for
-                (
-                    SLList<label>::iterator facesIter =
-                        faceFacesIter().begin();
-                    facesIter != faceFacesIter().end();
-                    ++facesIter
-                )
-                {
-                    fineAddressing_[facesIter()] = facesIter();
-                    restrictAddressing_[facesIter()] = nCoarseFaces;
-                }
-
+                // Create new coarse face
+                faceCells_[nCoarseFaces] = curLocalCoarseNbrs[curNbrI];
+                fineAddressing_[nCoarseFaces] = faceI;
+                fineWeights_[nCoarseFaces] = curLocalCoarseWeights[curNbrI];
                 nCoarseFaces++;
             }
         }
-    }
-    else
-    {
-        // On slave side, the owner addressing is stored in linked lists
-        forAll (contents, masterI)
+        else if
+        (
+            localRowLabel[faceI] >= 0
+         && neighbourRowLabel[faceI] < 0
+        )
         {
-            SLList<label>& curNbrs = neighboursTable.find(contents[masterI])();
+            // Found local coarse to neighbour fine face
 
-            SLList<SLList<label> >& curFaceFaces =
-                faceFaceTable.find(contents[masterI])();
+            // Pick up neighbour prolongation coarse entries and for all
+            // add a new face with appropriate weight
+            // Note: faceCells remains the same: single local coarse cell
+            const labelList& curNbrCoarseNbrs =
+                neighboursFromRemoteFine[localRowLabel[faceI]];
 
-            SLList<label>::iterator nbrsIter = curNbrs.begin();
-
-            SLList<SLList<label> >::iterator faceFacesIter =
-                curFaceFaces.begin();
-
-            for
-            (
-                ;
-                nbrsIter != curNbrs.end(), faceFacesIter != curFaceFaces.end();
-                ++nbrsIter, ++faceFacesIter
-            )
+            const scalarField& curNbrCoarseWeights =
+                weightsFromRemoteFine[localRowLabel[faceI]];
+            Pout<< "face " << faceI << " CF, size: " << curNbrCoarseNbrs.size()
+                << " W: " << curNbrCoarseWeights << endl;
+            forAll (curNbrCoarseNbrs, curNbrI)
             {
-                faceCells_[nCoarseFaces] = nbrsIter();
-
-                for
-                (
-                    SLList<label>::iterator facesIter = faceFacesIter().begin();
-                    facesIter != faceFacesIter().end();
-                    ++facesIter
-                )
-                {
-                    fineAddressing_[facesIter()] = facesIter();
-                    restrictAddressing_[facesIter()] = nCoarseFaces;
-                }
-
+                // Create new coarse face
+                faceCells_[nCoarseFaces] = localRowLabel[faceI];
+                fineAddressing_[nCoarseFaces] = faceI;
+                fineWeights_[nCoarseFaces] = curNbrCoarseWeights[curNbrI];
                 nCoarseFaces++;
             }
         }
+        else
+        {
+            // Fine to fine.  Ignore
+        }
     }
-    */
+
+    // Check for fixed lists
+    if (nCoarseFaces > 5*fineProcInterface_.interfaceSize())
+    {
+        FatalErrorIn("processorSAMGInterface::processorSAMGInterface(...)")
+            << "Coarse SAMG processor siginificantly bigger than fine: "
+            << "nCoarseFaces = " << nCoarseFaces
+            << " nFineFaces = " << fineProcInterface_.interfaceSize()
+            << abort(FatalError);
+    }
+    Pout<< "nCoarseFaces: " << nCoarseFaces << endl;
+    // Resize arrays to final size
+    faceCells_.setSize(nCoarseFaces);
+    fineAddressing_.setSize(nCoarseFaces);
+    fineWeights_.setSize(nCoarseFaces);
 }
 
 

@@ -36,28 +36,30 @@ Author
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
-void Foam::crAddressing::setRowCount(const labelList& count)
+void Foam::crAddressing::setRowSizes(const labelList& rowSizes)
 {
-    if (count.size() != nRows_)
+    if (rowSizes.size() != nRows_)
     {
-        FatalErrorIn("void crAddressing::setRowCount(const labelList& count)")
-            << "Incorrect size of count: nRows =" << nRows_
-            << " count = " << count.size()
+        FatalErrorIn
+        (
+            "void crAddressing::setRowSizes(const labelList& rowSizes)"
+        )   << "Incorrect size of rowSizes: nRows =" << nRows_
+            << " rowSizes = " << rowSizes.size()
             << abort(FatalError);
 
     }
 
-    // Accumulate count
-    row_[0] = 0;
+    // Accumulate rowSizes
+    rowStart_[0] = 0;
 
-    forAll (count, i)
+    forAll (rowSizes, i)
     {
-        row_[i + 1] = row_[i] + count[i];
+        rowStart_[i + 1] = rowStart_[i] + rowSizes[i];
     }
 
     // Resize and clear column array
-    col_.setSize(row_[nRows_]);
-    col_ = 0;
+    column_.setSize(rowStart_[nRows_]);
+    column_ = 0;
 }
 
 
@@ -68,16 +70,16 @@ Foam::crAddressing::crAddressing
 (
     const label nRows,
     const label nCols,
-    const labelList& count
+    const labelList& rowSizes
 )
 :
     refCount(),
     nRows_(nRows),
     nCols_(nCols),
-    row_(nRows + 1),
-    col_(0)
+    rowStart_(nRows + 1),
+    column_(0)
 {
-    setRowCount(count);
+    setRowSizes(rowSizes);
 }
 
 
@@ -93,8 +95,8 @@ Foam::crAddressing::crAddressing
     refCount(),
     nRows_(nRows),
     nCols_(nCols),
-    row_(row),
-    col_(col)
+    rowStart_(row),
+    column_(col)
 {}
 
 
@@ -104,8 +106,8 @@ Foam::crAddressing::crAddressing(const crAddressing& a)
     refCount(),
     nRows_(a.nRows_),
     nCols_(a.nCols_),
-    row_(a.row_),
-    col_(a.col_)
+    rowStart_(a.rowStart_),
+    column_(a.column_)
 {}
 
 
@@ -115,8 +117,8 @@ Foam::crAddressing::crAddressing(Istream& is)
     refCount(),
     nRows_(readLabel(is)),
     nCols_(readLabel(is)),
-    row_(is),
-    col_(is)
+    rowStart_(is),
+    column_(is)
 {}
 
 
@@ -124,31 +126,34 @@ Foam::crAddressing::crAddressing(Istream& is)
 
 Foam::tmp<Foam::crAddressing> Foam::crAddressing::T() const
 {
-    const labelList& myRow = row();
-    const labelList& myCol = col();
+    const labelList& myRow = rowStart();
+    const labelList& myCol = column();
 
-    labelList trCount(nCols(), 0);
+    labelList trRowSizes(nCols(), 0);
 
     // Count number of entries in a row
     for (label i = 0; i < nRows(); i++)
     {
         for (label ip = myRow[i]; ip < myRow[i + 1]; ip++)
         {
-            trCount[myCol[ip]]++;
+            trRowSizes[myCol[ip]]++;
         }
     }
 
     // Create transpose addressing
-    tmp<crAddressing> ttranspose(new crAddressing(nCols(), nRows(), trCount));
+    tmp<crAddressing> ttranspose
+    (
+        new crAddressing(nCols(), nRows(), trRowSizes)
+    );
     crAddressing& transpose = ttranspose();
 
     // Set coefficients
-    const labelList& trRow = transpose.row();
-    labelList& trCol = transpose.col();
+    const labelList& trRow = transpose.rowStart();
+    labelList& trCol = transpose.column();
     trCol = 0;
 
-    // Reset count to use as counter
-    trCount = 0;
+    // Reset rowSizes to use as counter
+    trRowSizes = 0;
 
     label j;
 
@@ -158,9 +163,9 @@ Foam::tmp<Foam::crAddressing> Foam::crAddressing::T() const
         {
             j = myCol[ip];
 
-            trCol[trRow[j] + trCount[j]] = i;
+            trCol[trRow[j] + trRowSizes[j]] = i;
 
-            trCount[j]++;
+            trRowSizes[j]++;
         }
     }
 
@@ -184,8 +189,8 @@ void Foam::crAddressing::operator=(const crAddressing& rhs)
 
     nRows_ = rhs.nRows_;
     nCols_ = rhs.nCols_;
-    row_ = rhs.row_;
-    col_ = rhs.col_;
+    rowStart_ = rhs.rowStart_;
+    column_ = rhs.column_;
 }
 
 
@@ -194,8 +199,8 @@ void Foam::crAddressing::operator=(const crAddressing& rhs)
 Foam::Ostream& Foam::operator<<(Ostream& os, const crAddressing& a)
 {
     os  << a.nRows_ << tab << a.nCols_ << nl
-        << a.row_ << nl
-        << a.col_ << endl;
+        << a.rowStart_ << nl
+        << a.column_ << endl;
 
     return os;
 }

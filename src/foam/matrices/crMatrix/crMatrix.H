@@ -83,8 +83,8 @@ public:
         (
             const label nRows,
             const label nCols,
-            const labelList& row,
-            const labelList& col
+            const labelList& rowStart,
+            const labelList& column
         );
 
         //- Construct as copy
@@ -123,9 +123,9 @@ public:
             }
 
             //- Return column array to be set
-            labelList& col()
+            labelList& column()
             {
-                return crAddr_.col();
+                return crAddr_.column();
             }
 
 
