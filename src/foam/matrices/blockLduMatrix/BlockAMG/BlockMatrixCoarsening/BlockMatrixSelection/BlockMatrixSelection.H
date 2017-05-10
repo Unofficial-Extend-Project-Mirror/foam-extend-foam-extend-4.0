@@ -25,10 +25,24 @@ Class
     BlockMatrixSelection
 
 Description
-    Selective AMG policy for block matrices
+    Classical AMG coarsening algorithm for block matrices. The choice of coarse
+    equations is based on the largest number of strong connections with other
+    equations. For optimal performance, strong connections should have sign
+    opposite to diagonal coefficient. Coarse level matrix is obtained by
+    multiplying the restriction matrix, fine level matrix and prolongation
+    matrix. The algorithm closely follows theoretical background from work of
+    Klaus Stueben.
 
 Author
-    Tessa Uroic, FMENA
+    Tessa Uroic, FMENA, 2017
+
+References
+    [1] T. Clees:
+            "AMG strategies for PDE systems with applications in industrial
+            semiconductor simulation", PhD Thesis, University of Cologne,
+            Germany, 2004
+    [2] U. Trottenberg, C. Oosterlee, A. Schueller:
+            "Multigrid", Elsevier, Academic Press, 2001
 
 SourceFiles
     BlockMatrixSelection.C
@@ -65,8 +79,14 @@ class BlockMatrixSelection
         const BlockLduMatrix<Type>& matrix_;
 
         //- Reference to a templated norm calculator
-        //- INFO: Component norm is recommended, based on the pressure equation
-        autoPtr<BlockCoeffNorm<Type> > normPtr_;
+        //- INFO: This norm will be calculated for coarsening process (it can be
+        //- arbitrary: component norm, max norm, two norm)
+        autoPtr<BlockCoeffNorm<Type> > coarseningNormPtr_;
+
+        //- Reference to a templated norm calculator
+        //- INFO: This norm will be used for interpolation. Component norm based
+        //- on a representative equation is recommended.
+        autoPtr<BlockCoeffNorm<Type> > interpolationNormPtr_;
 
         //- Number of coarse equations
         label nCoarseEqns_;

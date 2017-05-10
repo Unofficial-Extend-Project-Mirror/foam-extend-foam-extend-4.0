@@ -175,8 +175,8 @@ void Foam::BlockSelectiveAMG<Type>::calcCoarsening()
     // Set addressing for the matrix:
     // stongCol and strongElement are arrays needed to create a compressed row
     // matrix
-    const labelList& strongRowStart = strong.crAddr().row();
-    labelList& strongCol = strong.col();
+    const labelList& strongRowStart = strong.crAddr().rowStart();
+    labelList& strongCol = strong.column();
     scalarField& strongCoeff = strong.coeffs();
 
     // Counter for counting the strong elements in a row
@@ -220,8 +220,8 @@ void Foam::BlockSelectiveAMG<Type>::calcCoarsening()
 
     // Transpose the compressed row matrix to use for coarsening
     crAddressing Taddr = strong.crAddr().T();
-    const labelList& tRow = Taddr.row();
-    const labelList& tCol = Taddr.col();
+    const labelList& tRow = Taddr.rowStart();
+    const labelList& tCol = Taddr.column();
 
     // Label the equations COARSE and FINE based on the number of
     // influences.
@@ -705,8 +705,8 @@ Foam::BlockSelectiveAMG<Type>::restrictMatrix() const
 //                                GET ADDRESSING
 //------------------------------------------------------------------------------
     // Restriction addressing
-    const labelList& rowStartR = crR.row();
-    const labelList& colR = crR.col();
+    const labelList& rowStartR = crR.rowStart();
+    const labelList& colR = crR.column();
 
     // Matrix A addressing
     const unallocLabelList& rowStartA = matrix_.lduAddr().ownerStartAddr();
@@ -716,8 +716,8 @@ Foam::BlockSelectiveAMG<Type>::restrictMatrix() const
     const unallocLabelList& losortStart = matrix_.lduAddr().losortStartAddr();
 
     // Prolongation addressing
-    const labelList& rowStartP = crP.row();
-    const labelList& colP = crP.col();
+    const labelList& rowStartP = crP.rowStart();
+    const labelList& colP = crP.column();
 
 //------------------------------------------------------------------------------
 //      COUNTING COARSE COEFFICIENTS WHICH WILL APPEAR IN TRIPLE PRODUCT
@@ -1278,8 +1278,8 @@ void Foam::BlockSelectiveAMG<Type>::restrictResidual
 
     // Get restriction addressing
     const crAddressing& crR = R.crAddr();
-    const labelList& rowStartR = crR.row();
-    const labelList& colR = crR.col();
+    const labelList& rowStartR = crR.rowStart();
+    const labelList& colR = crR.column();
 
     // Coefficients of restriction
     const scalarField& coeffR = R.coeffs();
@@ -1318,8 +1318,8 @@ void Foam::BlockSelectiveAMG<Type>::prolongateCorrection
 
     // Get prolongation addressing
     const crAddressing& crP = P.crAddr();
-    const labelList& rowStartP = crP.row();
-    const labelList& colP = crP.col();
+    const labelList& rowStartP = crP.rowStart();
+    const labelList& colP = crP.column();
     const label sizeP = crP.nRows();
 
     // Coefficients of prolongation

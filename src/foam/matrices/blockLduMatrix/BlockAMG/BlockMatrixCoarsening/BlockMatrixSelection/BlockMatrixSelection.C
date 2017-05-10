@@ -25,7 +25,7 @@ Class
     BlockMatrixSelection
 
 Description
-    Selective AMG policy for block matrices
+    Classical AMG coarsening algorithm for block matrices.
 
 Author
     Tessa Uroic, FMENA
@@ -37,7 +37,6 @@ Author
 #include "BlockSAMGInterfaceField.H"
 #include "coarseBlockAMGLevel.H"
 #include "PriorityList.H"
-#include "crMatrix.H"
 #include "SortableList.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
@@ -47,7 +46,7 @@ template<class Type>
 const Foam::debug::tolerancesSwitch
 Foam::BlockMatrixSelection<Type>::epsilon_
 (
-    "samgWeightFactor",
+    "samgStrongConnectionFactor",
     0.25
 );
 
@@ -71,9 +70,13 @@ void Foam::BlockMatrixSelection<Type>::calcCoarsening()
 
     // Note: not taking norm magnitudes.  HJ, 28/Feb/2017
 
+//------------------------------------------------------------------------------
+//                         CALCULATE COARSENING NORM
+//------------------------------------------------------------------------------
+
     // Calculate norm for diagonal coefficients
     scalarField normDiag(matrixSize);
-    normPtr_->normalize(normDiag, matrix_.diag());
+    coarseningNormPtr_->normalize(normDiag, matrix_.diag());
 
     // Note: this needs to be untangled for symmetric matrices.
     // If the matrix is symmetric and you ask for lower, it will be manufactured
@@ -84,15 +87,31 @@ void Foam::BlockMatrixSelection<Type>::calcCoarsening()
 
     // Calculate norm for upper triangle coeffs (magUpper)
     scalarField normUpper(row.size());
-    normPtr_->normalize(normUpper, matrix_.upper());
+    coarseningNormPtr_->normalize(normUpper, matrix_.upper());
 
     // Calculate norm for lower triangle coeffs (magLower)
     scalarField normLower(column.size());
-    normPtr_->normalize(normLower, matrix_.lower());
+    coarseningNormPtr_->normalize(normLower, matrix_.lower());
 
     // Calculate norm magnitudes
     scalarField magNormUpper = mag(normUpper);
     scalarField magNormLower = mag(normLower);
+
+//------------------------------------------------------------------------------
+//                        CALCULATE INTERPOLATION NORM
+//------------------------------------------------------------------------------
+
+        // Calculate norm for diagonal coefficients (store into magDiag)
+        scalarField interpolationNormDiag(matrixSize);
+        coarseningNormPtr_->normalize(interpolationNormDiag, matrix_.diag());
+
+        // Calculate norm for upper triangle coeffs (magUpper)
+        scalarField interpolationNormUpper(column.size());
+        coarseningNormPtr_->normalize(interpolationNormUpper, matrix_.upper());
+
+        // Calculate norm for lower triangle coeffs (magLower)
+        scalarField interpolationNormLower(column.size());
+        coarseningNormPtr_->normalize(interpolationNormLower, matrix_.lower());
 
 //------------------------------------------------------------------------------
 //        CRITERIA FOR COARSENING: FIND STRONG CONNECTIONS FOR EACH ROW
@@ -175,8 +194,8 @@ void Foam::BlockMatrixSelection<Type>::calcCoarsening()
     // Set addressing for the matrix:
     // stongCol and strongElement are arrays needed to create a compressed row
     // matrix
-    const labelList& strongRowStart = strong.crAddr().row();
-    labelList& strongCol = strong.col();
+    const labelList& strongRowStart = strong.crAddr().rowStart();
+    labelList& strongCol = strong.column();
     scalarField& strongCoeff = strong.coeffs();
 
     // Counter for counting the strong elements in a row
@@ -198,7 +217,9 @@ void Foam::BlockMatrixSelection<Type>::calcCoarsening()
                 // to count the number of negative strong elements for
                 // each row i
                 strongCol[strongRowStart[i] + counter[i]] = j;
-                strongCoeff[strongRowStart[i] + counter[i]] = normUpper[k];
+                strongCoeff[strongRowStart[i] + counter[i]] =
+                    interpolationNormUpper[k];
+
                 counter[i]++;
                 influence[j]++;
             }
@@ -207,7 +228,9 @@ void Foam::BlockMatrixSelection<Type>::calcCoarsening()
             if (magNormLower[k] > epsLargestNorm[j])
             {
                 strongCol[strongRowStart[j] + counter[j]] = i;
-                strongCoeff[strongRowStart[j] + counter[j]] = normLower[k];
+                strongCoeff[strongRowStart[j] + counter[j]] =
+                    interpolationNormLower[k];
+
                 counter[j]++;
                 influence[i]++;
             }
@@ -220,8 +243,8 @@ void Foam::BlockMatrixSelection<Type>::calcCoarsening()
 
     // Transpose the compressed row matrix to use for coarsening
     crAddressing Taddr = strong.crAddr().T();
-    const labelList& tRow = Taddr.row();
-    const labelList& tCol = Taddr.col();
+    const labelList& tRow = Taddr.rowStart();
+    const labelList& tCol = Taddr.column();
 
     // Label the equations COARSE and FINE based on the number of
     // influences.
@@ -380,20 +403,20 @@ void Foam::BlockMatrixSelection<Type>::calcCoarsening()
             // Extract diagonal component to compare the sign with the
             // off-diagonal coeffs - search for negative and positive
             // connections
-            scalar diagComponent = normDiag[i];
+                scalar signDiag = sign(interpolationNormDiag[i]);
 
             // Upper triangle - use rowStart
             for (label k = rowStart[i]; k < rowStart[i + 1]; k++)
             {
                 // POSITIVE contribution
-                if (sign(normUpper[k]) == sign(diagComponent))
+                if (sign(normUpper[k]) == signDiag)
                 {
-                    positiveElemSum[i] += normUpper[k];
+                    positiveElemSum[i] += interpolationNormUpper[k];
                 }
                 // NEGATIVE contribution
                 else
                 {
-                    negativeElemSum[i] += normUpper[k];
+                    negativeElemSum[i] += interpolationNormUpper[k];
                 }
             }
 
@@ -406,14 +429,14 @@ void Foam::BlockMatrixSelection<Type>::calcCoarsening()
                 label index = losortAddr[k];
 
                 // POSITIVE contribution
-                if (sign(normLower[index]) == sign(diagComponent))
+                if (sign(normLower[index]) == signDiag)
                 {
-                    positiveElemSum[i] += normLower[index];
+                    positiveElemSum[i] += interpolationNormLower[index];
                 }
                 // NEGATIVE contribution
                 else
                 {
-                    negativeElemSum[i] += normLower[index];
+                    negativeElemSum[i] += interpolationNormLower[index];
                 }
             }
         }
@@ -426,7 +449,8 @@ void Foam::BlockMatrixSelection<Type>::calcCoarsening()
     {
         if (rowLabel_[i] == FINE)
         {
-            scalar diagSign = sign(normDiag[i]);
+            scalar signDiag = sign(interpolationNormDiag[i]);
+
             for
             (
                 label index = strongRowStart[i];
@@ -440,8 +464,8 @@ void Foam::BlockMatrixSelection<Type>::calcCoarsening()
                 // Sum positive connections
                 if
                 (
-                    sign(strongCoeff[index]) == diagSign &&
-                    rowLabel_[j] == COARSE
+                    sign(strongCoeff[index]) == signDiag
+                 && rowLabel_[j] == COARSE
                 )
                 {
                     posCoarseElemSum[i] += strongCoeff[index];
@@ -478,7 +502,7 @@ void Foam::BlockMatrixSelection<Type>::calcCoarsening()
 
         if (rowLabel_[i] == FINE)
         {
-            scalar diagonalCoeff = normDiag[i];
+            scalar diagonalCoeff = interpolationNormDiag[i];
 
             // Check whether this Eqn has COARSE negative strong
             // contributions!
@@ -509,10 +533,8 @@ void Foam::BlockMatrixSelection<Type>::calcCoarsening()
                     {
                         prolongationCoeff.append
                         (
-                            (-positiveElemSum[i])
-                           /posCoarseElemSum[i]
-                           *strongCoeff[k]
-                           /(diagonalCoeff)
+                            (-positiveElemSum[i])/posCoarseElemSum[i]*
+                            strongCoeff[k]/(diagonalCoeff)
                         );
 
                         prolongationCol.append(j - fineRowsCount[j]);
@@ -650,7 +672,14 @@ Foam::BlockMatrixSelection<Type>::BlockMatrixSelection
 :
     BlockMatrixCoarsening<Type>(matrix, dict, groupSize, minCoarseEqns),
     matrix_(matrix),
-    normPtr_(BlockCoeffNorm<Type>::New(dict)),
+    coarseningNormPtr_
+    (
+        BlockCoeffNorm<Type>::New(dict.subDict("coarseningNorm"))
+    ),
+    interpolationNormPtr_
+    (
+        BlockCoeffNorm<Type>::New(dict.subDict("interpolationNorm"))
+    ),
     nCoarseEqns_(0),
     coarsen_(false),
     Pptr_(NULL),
@@ -723,8 +752,8 @@ Foam::BlockMatrixSelection<Type>::restrictMatrix() const
 //------------------------------------------------------------------------------
 
     // Restriction addressing
-    const labelList& rowStartR = crR.row();
-    const labelList& colR = crR.col();
+    const labelList& rowStartR = crR.rowStart();
+    const labelList& colR = crR.column();
 
     // Matrix A addressing
     const unallocLabelList& rowStartA = matrix_.lduAddr().ownerStartAddr();
@@ -734,8 +763,8 @@ Foam::BlockMatrixSelection<Type>::restrictMatrix() const
     const unallocLabelList& losortStart = matrix_.lduAddr().losortStartAddr();
 
     // Prolongation addressing
-    const labelList& rowStartP = crP.row();
-    const labelList& colP = crP.col();
+    const labelList& rowStartP = crP.rowStart();
+    const labelList& colP = crP.column();
 
     // coeffLabel is used for checking if a contribution in that address already
     // exists
@@ -1058,6 +1087,7 @@ Foam::BlockMatrixSelection<Type>::restrictMatrix() const
                 SAMGInterface::New
                 (
                     coarseAddrPtr(),
+                    P,
                     coarseInterfaces,
                     fineInterface,
                     fineInterface.interfaceInternalField(rowLabel_),
@@ -1443,8 +1473,8 @@ void Foam::BlockMatrixSelection<Type>::restrictResidual
 
     // Get restriction addressing
     const crAddressing& crR = R.crAddr();
-    const labelList& rowStartR = crR.row();
-    const labelList& colR = crR.col();
+    const labelList& rowStartR = crR.rowStart();
+    const labelList& colR = crR.column();
 
     // Coefficients of restriction
     const scalarField& coeffR = R.coeffs();
@@ -1483,8 +1513,8 @@ void Foam::BlockMatrixSelection<Type>::prolongateCorrection
 
     // Get prolongation addressing
     const crAddressing& crP = P.crAddr();
-    const labelList& rowStartP = crP.row();
-    const labelList& colP = crP.col();
+    const labelList& rowStartP = crP.rowStart();
+    const labelList& colP = crP.column();
     const label sizeP = crP.nRows();
 
     // Coefficients of prolongation
