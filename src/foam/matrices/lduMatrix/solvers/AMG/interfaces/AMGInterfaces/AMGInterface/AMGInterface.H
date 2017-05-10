@@ -84,7 +84,7 @@ protected:
         //- Fine addressing
         //  On GGI interfaces, a single fine coefficient may contribute to
         //  multiple coarse coefficients using different weights.
-        //  To hanld this, a fine coefficient may be visited multiple times
+        //  To handle this, a fine coefficient may be visited multiple times
         //  which is recorded in fineAddressing.
         //  For simple (matching) interfaces, fineAddressing_[i] = i
         //  HJ, 21/Jun/2016
