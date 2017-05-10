@@ -451,7 +451,7 @@ void Foam::clusterAmgPolicy::calcChild()
 
     reduce(coarsen_, andOp<bool>());
 
-    // if (lduMatrix::debug >= 2)
+    if (lduMatrix::debug >= 2)
     {
         // Count solo cells
         label nSingleClusters = 0;
