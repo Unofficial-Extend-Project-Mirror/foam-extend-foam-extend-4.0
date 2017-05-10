@@ -57,8 +57,6 @@ Foam::processorSAMGInterface::processorSAMGInterface
     comm_(fineProcInterface_.comm()),
     tag_(fineProcInterface_.tag())
 {
-    Pout<< "Creating processor SAMG interface" << endl;
-
     // Analyse the local and neighbour row label:
     //  local coarse, remote coarse = regular coarse face
     //  local coarse, remote fine = local expanded face: receive prolonged data
@@ -98,7 +96,7 @@ Foam::processorSAMGInterface::processorSAMGInterface
 
     // Get fine faceCells
     const labelList& fineFaceCells = fineInterface.faceCells();
-    Pout<< "fineFaceCells: " << fineFaceCells << endl;
+
     // Collect local fine to neighbour coarse connections for communication
     forAll (localRowLabel, faceI)
     {
@@ -115,7 +113,7 @@ Foam::processorSAMGInterface::processorSAMGInterface
             const label curStart = pRowStart[fineFaceCells[faceI]];
             const label curEnd = pRowStart[fineFaceCells[faceI] + 1];
             const label nCoarse = curEnd - curStart;
-            Pout<< "Eqn: " << fineFaceCells[faceI] << " Span: " << curStart << " " << curEnd << " = " << nCoarse << endl;
+
             labelList nbrs(nCoarse);
             scalarField weights(nCoarse);
 
@@ -124,7 +122,7 @@ Foam::processorSAMGInterface::processorSAMGInterface
                 nbrs[i] = pColumn[curStart + i];
                 weights[i] = pCoeffs[curStart + i];
             }
-            Pout<< "weights: " << weights << endl;
+
             // Insert neighbours under remote coarse index
             neighboursFromLocalFine.insert(neighbourRowLabel[faceI], nbrs);
             weightsFromLocalFine.insert(neighbourRowLabel[faceI], weights);
@@ -173,7 +171,7 @@ Foam::processorSAMGInterface::processorSAMGInterface
         )
         {
             // Found local coarse to neighbour coarse face
-            Pout<< "face " << faceI << " CC" << endl;
+
             // Create new coarse face
             faceCells_[nCoarseFaces] = localRowLabel[faceI];
             fineAddressing_[nCoarseFaces] = faceI;
@@ -196,8 +194,7 @@ Foam::processorSAMGInterface::processorSAMGInterface
 
             const scalarField& curLocalCoarseWeights =
                 weightsFromLocalFine[neighbourRowLabel[faceI]];
-            Pout<< "face " << faceI << " FC, size: " << curLocalCoarseNbrs.size()
-                << " W: " << curLocalCoarseWeights << endl;
+
             forAll (curLocalCoarseNbrs, curNbrI)
             {
                 // Create new coarse face
@@ -223,8 +220,7 @@ Foam::processorSAMGInterface::processorSAMGInterface
 
             const scalarField& curNbrCoarseWeights =
                 weightsFromRemoteFine[localRowLabel[faceI]];
-            Pout<< "face " << faceI << " CF, size: " << curNbrCoarseNbrs.size()
-                << " W: " << curNbrCoarseWeights << endl;
+
             forAll (curNbrCoarseNbrs, curNbrI)
             {
                 // Create new coarse face
@@ -249,7 +245,7 @@ Foam::processorSAMGInterface::processorSAMGInterface
             << " nFineFaces = " << fineProcInterface_.interfaceSize()
             << abort(FatalError);
     }
-    Pout<< "nCoarseFaces: " << nCoarseFaces << endl;
+
     // Resize arrays to final size
     faceCells_.setSize(nCoarseFaces);
     fineAddressing_.setSize(nCoarseFaces);

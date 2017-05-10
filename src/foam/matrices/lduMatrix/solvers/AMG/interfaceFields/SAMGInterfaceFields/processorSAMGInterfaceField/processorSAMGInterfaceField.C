@@ -58,7 +58,6 @@ Foam::processorSAMGInterfaceField::processorSAMGInterfaceField
     scalarSendBuf_(0),
     scalarReceiveBuf_(0)
 {
-    Pout<< "Creating processor SAMG interface field" << endl;
     const processorLduInterfaceField& p =
         refCast<const processorLduInterfaceField>(fineInterfaceField);
 
