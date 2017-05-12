@@ -30,17 +30,17 @@ setDestination()
 
 }
 
-# Install Fluid-Structure Interaction package
-if [ ! -d "FluidStructureInteraction" ]; then
-    wget http://openfoamwiki.net/images/5/52/Fsi_31.tar.gz
-    tar zxvf Fsi_31.tar.gz
-    rm Fsi_31.tar.gz
+# Install Fluid-Solid Interaction package
+if [ ! -d "FluidSolidInteraction" ]; then
+    wget https://openfoamwiki.net/images/d/d6/Fsi_40.tar.gz
+    tar zxvf Fsi_40.tar.gz
+    rm Fsi_40.tar.gz
 fi
 
-setDestination FluidStructureInteraction
+setDestination FluidSolidInteraction
 
 (
-    cd FluidStructureInteraction/src
+    cd FluidSolidInteraction/src
     ./Allwmake
 )
 
