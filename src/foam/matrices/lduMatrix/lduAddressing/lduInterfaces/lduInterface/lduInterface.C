@@ -46,7 +46,7 @@ Foam::lduInterface::~lduInterface()
 Foam::tmp<Foam::crMatrix> Foam::lduInterface::prolongationTransfer
 (
     const Pstream::commsTypes commsType,
-    const crMatrix& iF
+    const crMatrix& P
 ) const
 {
     notImplemented
@@ -54,9 +54,13 @@ Foam::tmp<Foam::crMatrix> Foam::lduInterface::prolongationTransfer
         "tmp<crMatrix> lduInterface::prolongationTransfer\n"
         "(\n"
         "    const Pstream::commsTypes commsType,\n"
-        "    const crMatrix& iF\n"
-        ") const"
+        "    const crMatrix& P\n"
+        ") const for type " +
+        this->type()
     );
+
+    // Dummy return to make the compiler happy
+    return P;
 }
 
 

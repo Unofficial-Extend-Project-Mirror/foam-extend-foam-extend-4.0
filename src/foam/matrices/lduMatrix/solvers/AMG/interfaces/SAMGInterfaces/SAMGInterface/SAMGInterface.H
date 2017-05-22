@@ -66,7 +66,7 @@ class SAMGInterface
         const crMatrix& prolongation_;
 
         //- Reference to prolongation matrix
-        const crMatrix& nbrInterfaceProlongation_;
+        const crMatrix nbrInterfaceProlongation_;
 
 
 protected:

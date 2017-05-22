@@ -26,6 +26,7 @@ License
 #include "processorFvPatch.H"
 #include "addToRunTimeSelectionTable.H"
 #include "transformField.H"
+#include "crMatrix.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -171,6 +172,35 @@ tmp<labelField> processorFvPatch::internalFieldTransfer
 ) const
 {
     return receive<label>(commsType, this->size());
+}
+
+
+void processorFvPatch::initProlongationTransfer
+(
+    const Pstream::commsTypes commsType,
+    const crMatrix& P
+) const
+{
+    // Select the part of the prolongation matrix to send
+
+    // Send prolongation matrix
+    Pout<< "HJ, in send for processorFvPatch" << endl;
+}
+
+
+tmp<crMatrix> processorFvPatch::prolongationTransfer
+(
+    const Pstream::commsTypes commsType,
+    const crMatrix& P
+) const
+{
+    // Receive and return prolongation matrix
+    Pout<< "HJ, in receive for processorFvPatch" << endl;
+
+    // Dummy
+    tmp<crMatrix> tcr(new crMatrix(5, 5, labelList(5)));
+
+    return tcr;
 }
 
 

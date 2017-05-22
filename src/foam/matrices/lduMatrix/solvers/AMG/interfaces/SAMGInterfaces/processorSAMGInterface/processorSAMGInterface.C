@@ -305,7 +305,7 @@ Foam::tmp<Foam::labelField> Foam::processorSAMGInterface::internalFieldTransfer
 void Foam::processorSAMGInterface::initProlongationTransfer
 (
     const Pstream::commsTypes commsType,
-    const crMatrix& iF
+    const crMatrix& P
 ) const
 {
     // Select the part of the prolongation matrix to send
@@ -317,7 +317,7 @@ void Foam::processorSAMGInterface::initProlongationTransfer
 Foam::tmp<Foam::crMatrix> Foam::processorSAMGInterface::prolongationTransfer
 (
     const Pstream::commsTypes commsType,
-    const crMatrix& iF
+    const crMatrix& P
 ) const
 {
     // Receive and return prolongation matrix
