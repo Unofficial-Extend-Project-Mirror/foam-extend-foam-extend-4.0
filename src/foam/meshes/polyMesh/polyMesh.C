@@ -1267,7 +1267,7 @@ void Foam::polyMesh::setOldPoints
                 "    const pointField& setPoints\n"
                 ")\n"
             )   << "setPoints size " << setPoints.size()
-                << "different from the mesh points size "
+                << " is different from the mesh points size "
                 << allPoints_.size()
                 << abort(FatalError);
     }
