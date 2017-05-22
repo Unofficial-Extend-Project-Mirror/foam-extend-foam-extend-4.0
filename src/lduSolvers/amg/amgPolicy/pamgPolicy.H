@@ -57,9 +57,6 @@ class pamgPolicy
 {
     // Private Data
 
-        //- Reference to matrix
-        const lduMatrix& matrix_;
-
         //- Child array: for each fine equation give coarse cluster index
         labelField child_;
 
@@ -103,6 +100,9 @@ public:
         pamgPolicy
         (
             const lduMatrix& matrix,
+            const FieldField<Field, scalar>& bouCoeffs,
+            const FieldField<Field, scalar>& intCoeffs,
+            const lduInterfaceFieldPtrsList& interfaceFields,
             const label groupSize,
             const label minCoarseEqns
         );
@@ -121,12 +121,7 @@ public:
         }
 
         //- Restrict matrix
-        virtual autoPtr<amgMatrix> restrictMatrix
-        (
-            const FieldField<Field, scalar>& bouCoeffs,
-            const FieldField<Field, scalar>& intCoeffs,
-            const lduInterfaceFieldPtrsList& interfaces
-        )  const;
+        virtual autoPtr<amgMatrix> restrictMatrix() const;
 
         //- Restrict residual
         virtual void restrictResidual

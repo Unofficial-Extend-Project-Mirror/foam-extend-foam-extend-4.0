@@ -60,6 +60,9 @@ Foam::coarseAmgLevel::coarseAmgLevel
         (
             policyType,
             matrixPtr_->matrix(),
+            matrixPtr_->coupleBouCoeffs(),
+            matrixPtr_->coupleIntCoeffs(),
+            matrixPtr_->interfaceFields(),
             groupSize,
             minCoarseEqns
         )
@@ -338,12 +341,7 @@ Foam::autoPtr<Foam::amgLevel> Foam::coarseAmgLevel::makeNextLevel() const
         (
             new coarseAmgLevel
             (
-                policyPtr_->restrictMatrix
-                (
-                    matrixPtr_->coupleBouCoeffs(),
-                    matrixPtr_->coupleIntCoeffs(),
-                    matrixPtr_->interfaceFields()
-                ),
+                policyPtr_->restrictMatrix(),
                 dict(),
                 policyPtr_->type(),
                 policyPtr_->groupSize(),

@@ -61,7 +61,7 @@ Foam::pamgPolicy::diagFactor_
 
 void Foam::pamgPolicy::calcChild()
 {
-    if (matrix_.diagonal())
+    if (matrix().diagonal())
     {
         // Diag only matrix.  Reset and return
         child_ = 0;
@@ -77,13 +77,13 @@ void Foam::pamgPolicy::calcChild()
     //    neighbour.  If all neighbours are grouped, add equation to best group
 
     // Get addressing
-    const label nEqns = matrix_.lduAddr().size();
+    const label nEqns = matrix().lduAddr().size();
 
-    const unallocLabelList& upperAddr = matrix_.lduAddr().upperAddr();
-    const unallocLabelList& lowerAddr = matrix_.lduAddr().lowerAddr();
+    const unallocLabelList& upperAddr = matrix().lduAddr().upperAddr();
+    const unallocLabelList& lowerAddr = matrix().lduAddr().lowerAddr();
 
     // Get off-diagonal matrix coefficients
-    const scalarField& upper = matrix_.upper();
+    const scalarField& upper = matrix().upper();
 
     // For each equation calculate coeffs
     labelList cols(upperAddr.size() + lowerAddr.size());
@@ -140,17 +140,17 @@ void Foam::pamgPolicy::calcChild()
     // Calculate agglomeration
 
     // Get matrix coefficients
-    const scalarField& diag = matrix_.diag();
+    const scalarField& diag = matrix().diag();
 
     scalarField magOffDiag;
 
-    if (matrix_.asymmetric())
+    if (matrix().asymmetric())
     {
-        magOffDiag = Foam::max(mag(matrix_.upper()), mag(matrix_.lower()));
+        magOffDiag = Foam::max(mag(matrix().upper()), mag(matrix().lower()));
     }
-    else if (matrix_.symmetric())
+    else if (matrix().symmetric())
     {
-        magOffDiag = mag(matrix_.upper());
+        magOffDiag = mag(matrix().upper());
     }
     else
     {
@@ -333,13 +333,23 @@ void Foam::pamgPolicy::calcChild()
 Foam::pamgPolicy::pamgPolicy
 (
     const lduMatrix& matrix,
+    const FieldField<Field, scalar>& bouCoeffs,
+    const FieldField<Field, scalar>& intCoeffs,
+    const lduInterfaceFieldPtrsList& interfaceFields,
     const label groupSize,
     const label minCoarseEqns
 )
 :
-    amgPolicy(groupSize, minCoarseEqns),
-    matrix_(matrix),
-    child_(),
+    amgPolicy
+    (
+        matrix,
+        bouCoeffs,
+        intCoeffs,
+        interfaceFields,
+        groupSize,
+        minCoarseEqns
+    ),
+    child_(matrix.lduAddr().size()),
     nSolo_(0),
     nCoarseEqns_(0),
     coarsen_(false)
@@ -355,12 +365,7 @@ Foam::pamgPolicy::~pamgPolicy()
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-Foam::autoPtr<Foam::amgMatrix> Foam::pamgPolicy::restrictMatrix
-(
-    const FieldField<Field, scalar>& bouCoeffs,
-    const FieldField<Field, scalar>& intCoeffs,
-    const lduInterfaceFieldPtrsList& interfaceFields
-) const
+Foam::autoPtr<Foam::amgMatrix> Foam::pamgPolicy::restrictMatrix() const
 {
     if (!coarsen_)
     {
@@ -383,20 +388,20 @@ Foam::autoPtr<Foam::amgMatrix> Foam::pamgPolicy::restrictMatrix
     // 4) Agglomerate the diagonal by summing up the fine diagonal
 
     // Get addressing
-    const unallocLabelList& upperAddr = matrix_.lduAddr().upperAddr();
-    const unallocLabelList& lowerAddr = matrix_.lduAddr().lowerAddr();
+    const unallocLabelList& upperAddr = matrix().lduAddr().upperAddr();
+    const unallocLabelList& lowerAddr = matrix().lduAddr().lowerAddr();
 
     label nFineCoeffs = upperAddr.size();
 
 #   ifdef FULLDEBUG
-    if (child_.size() != matrix_.lduAddr().size())
+    if (child_.size() != matrix().lduAddr().size())
     {
         FatalErrorIn
         (
             "autoPtr<amgMatrix> pamgPolicy::restrictMatrix() const"
         )   << "Child array does not correspond to fine level. " << endl
             << " Child size: " << child_.size()
-            << " number of equations: " << matrix_.lduAddr().size()
+            << " number of equations: " << matrix().lduAddr().size()
             << abort(FatalError);
     }
 #   endif
@@ -570,24 +575,24 @@ Foam::autoPtr<Foam::amgMatrix> Foam::pamgPolicy::restrictMatrix
 
     // Set the coarse interfaces and coefficients
     lduInterfacePtrsList* coarseInterfacesPtr =
-        new lduInterfacePtrsList(interfaceFields.size());
+        new lduInterfacePtrsList(interfaceFields().size());
     lduInterfacePtrsList& coarseInterfaces = *coarseInterfacesPtr;
 
     // Set the coarse interfaceFields and coefficients
     lduInterfaceFieldPtrsList* coarseInterfaceFieldsPtr =
-        new lduInterfaceFieldPtrsList(interfaceFields.size());
+        new lduInterfaceFieldPtrsList(interfaceFields().size());
     lduInterfaceFieldPtrsList& coarseInterfaceFields =
         *coarseInterfaceFieldsPtr;
 
     FieldField<Field, scalar>* coarseBouCoeffsPtr =
-        new FieldField<Field, scalar>(interfaceFields.size());
+        new FieldField<Field, scalar>(interfaceFields().size());
     FieldField<Field, scalar>& coarseBouCoeffs = *coarseBouCoeffsPtr;
 
     FieldField<Field, scalar>* coarseIntCoeffsPtr =
-        new FieldField<Field, scalar>(interfaceFields.size());
+        new FieldField<Field, scalar>(interfaceFields().size());
     FieldField<Field, scalar>& coarseIntCoeffs = *coarseIntCoeffsPtr;
 
-    labelListList coarseInterfaceAddr(interfaceFields.size());
+    labelListList coarseInterfaceAddr(interfaceFields().size());
 
     // Add the coarse level
 
@@ -602,11 +607,11 @@ Foam::autoPtr<Foam::amgMatrix> Foam::pamgPolicy::restrictMatrix
         );
 
     // Initialise transfer of restrict addressing on the interface
-    forAll (interfaceFields, intI)
+    forAll (interfaceFields(), intI)
     {
-        if (interfaceFields.set(intI))
+        if (interfaceFields().set(intI))
         {
-            interfaceFields[intI].coupledInterface().initInternalFieldTransfer
+            interfaceFields()[intI].coupledInterface().initInternalFieldTransfer
             (
                 Pstream::blocking,
                 child_
@@ -616,14 +621,14 @@ Foam::autoPtr<Foam::amgMatrix> Foam::pamgPolicy::restrictMatrix
 
     // Store coefficients to avoid tangled communications
     // HJ, 1/Apr/2009
-    FieldField<Field, label> fineInterfaceAddr(interfaceFields.size());
+    FieldField<Field, label> fineInterfaceAddr(interfaceFields().size());
 
-    forAll (interfaceFields, intI)
+    forAll (interfaceFields(), intI)
     {
-        if (interfaceFields.set(intI))
+        if (interfaceFields().set(intI))
         {
             const lduInterface& fineInterface =
-                interfaceFields[intI].coupledInterface();
+                interfaceFields()[intI].coupledInterface();
 
             fineInterfaceAddr.set
             (
@@ -641,12 +646,12 @@ Foam::autoPtr<Foam::amgMatrix> Foam::pamgPolicy::restrictMatrix
     }
 
     // Create AMG interfaces
-    forAll (interfaceFields, intI)
+    forAll (interfaceFields(), intI)
     {
-        if (interfaceFields.set(intI))
+        if (interfaceFields().set(intI))
         {
             const lduInterface& fineInterface =
-                interfaceFields[intI].coupledInterface();
+                interfaceFields()[intI].coupledInterface();
 
             coarseInterfaces.set
             (
@@ -663,9 +668,9 @@ Foam::autoPtr<Foam::amgMatrix> Foam::pamgPolicy::restrictMatrix
         }
     }
 
-    forAll (interfaceFields, intI)
+    forAll (interfaceFields(), intI)
     {
-        if (interfaceFields.set(intI))
+        if (interfaceFields().set(intI))
         {
             const AMGInterface& coarseInterface =
                 refCast<const AMGInterface>(coarseInterfaces[intI]);
@@ -676,7 +681,7 @@ Foam::autoPtr<Foam::amgMatrix> Foam::pamgPolicy::restrictMatrix
                 AMGInterfaceField::New
                 (
                     coarseInterface,
-                    interfaceFields[intI]
+                    interfaceFields()[intI]
                 ).ptr()
             );
 
@@ -687,13 +692,13 @@ Foam::autoPtr<Foam::amgMatrix> Foam::pamgPolicy::restrictMatrix
             coarseBouCoeffs.set
             (
                 intI,
-                coarseInterface.agglomerateCoeffs(bouCoeffs[intI])
+                coarseInterface.agglomerateCoeffs(bouCoeffs()[intI])
             );
 
             coarseIntCoeffs.set
             (
                 intI,
-                coarseInterface.agglomerateCoeffs(intCoeffs[intI])
+                coarseInterface.agglomerateCoeffs(intCoeffs()[intI])
             );
 
             coarseInterfaceAddr[intI] = coarseInterface.faceCells();
@@ -705,7 +710,7 @@ Foam::autoPtr<Foam::amgMatrix> Foam::pamgPolicy::restrictMatrix
     (
         *coarseInterfacesPtr,
         coarseInterfaceAddr,
-        matrix_.patchSchedule()
+        matrix().patchSchedule()
     );
 
     // Matrix restriction done!
@@ -717,15 +722,15 @@ Foam::autoPtr<Foam::amgMatrix> Foam::pamgPolicy::restrictMatrix
     // Coarse matrix diagonal initialised by restricting the
     // finer mesh diagonal
     scalarField& coarseDiag = coarseMatrix.diag();
-    restrictResidual(matrix_.diag(), coarseDiag);
+    restrictResidual(matrix().diag(), coarseDiag);
 
     // Check if matrix is assymetric and if so agglomerate both upper and lower
     // coefficients ...
-    if (matrix_.hasLower())
+    if (matrix().hasLower())
     {
         // Get off-diagonal matrix coefficients
-        const scalarField& fineUpper = matrix_.upper();
-        const scalarField& fineLower = matrix_.lower();
+        const scalarField& fineUpper = matrix().upper();
+        const scalarField& fineLower = matrix().lower();
 
         // Coarse matrix upper coefficients
         scalarField& coarseUpper = coarseMatrix.upper();
@@ -761,7 +766,7 @@ Foam::autoPtr<Foam::amgMatrix> Foam::pamgPolicy::restrictMatrix
     else // ... Otherwise it is symmetric so agglomerate just the upper
     {
         // Get off-diagonal matrix coefficients
-        const scalarField& fineUpper = matrix_.upper();
+        const scalarField& fineUpper = matrix().upper();
 
         // Coarse matrix upper coefficients
         scalarField& coarseUpper = coarseMatrix.upper();

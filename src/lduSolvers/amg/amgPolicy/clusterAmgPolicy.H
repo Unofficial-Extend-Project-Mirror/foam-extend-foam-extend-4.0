@@ -57,9 +57,6 @@ class clusterAmgPolicy
 {
     // Private Data
 
-        //- Reference to matrix
-        const lduMatrix& matrix_;
-
         //- Min cluster size
         const label minGroupSize_;
 
@@ -112,6 +109,9 @@ public:
         clusterAmgPolicy
         (
             const lduMatrix& matrix,
+            const FieldField<Field, scalar>& bouCoeffs,
+            const FieldField<Field, scalar>& intCoeffs,
+            const lduInterfaceFieldPtrsList& interfaceFields,
             const label groupSize,
             const label minCoarseEqns
         );
@@ -130,12 +130,7 @@ public:
         }
 
         //- Restrict matrix
-        virtual autoPtr<amgMatrix> restrictMatrix
-        (
-            const FieldField<Field, scalar>& bouCoeffs,
-            const FieldField<Field, scalar>& intCoeffs,
-            const lduInterfaceFieldPtrsList& interfaces
-        )  const;
+        virtual autoPtr<amgMatrix> restrictMatrix()  const;
 
         //- Restrict residual
         virtual void restrictResidual
