@@ -46,6 +46,9 @@ namespace Foam
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
+// Forward declaration of classes
+class crMatrix;
+
 /*---------------------------------------------------------------------------*\
                      Class lduInterface Declaration
 \*---------------------------------------------------------------------------*/
@@ -127,6 +130,22 @@ public:
                 const Pstream::commsTypes commsType,
                 const unallocLabelList& iF
             ) const = 0;
+
+            //- Initialise transfer of prolongation matrix to the interface
+            virtual void initProlongationTransfer
+            (
+                const Pstream::commsTypes commsType,
+                const crMatrix& iF
+            ) const
+            {}
+
+            //- Transfer and return prolongation matrix adjacent to
+            //  the interface
+            virtual tmp<crMatrix> prolongationTransfer
+            (
+                const Pstream::commsTypes commsType,
+                const crMatrix& iF
+            ) const;
 };
 
 

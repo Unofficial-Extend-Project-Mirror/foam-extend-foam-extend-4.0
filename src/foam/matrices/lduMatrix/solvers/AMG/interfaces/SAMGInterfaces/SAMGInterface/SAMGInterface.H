@@ -65,6 +65,9 @@ class SAMGInterface
         //- Reference to prolongation matrix
         const crMatrix& prolongation_;
 
+        //- Reference to prolongation matrix
+        const crMatrix& nbrInterfaceProlongation_;
+
 
 protected:
 
@@ -110,16 +113,14 @@ public:
                 const crMatrix& prolongation,
                 const lduInterfacePtrsList& coarseInterfaces,
                 const lduInterface& fineInterface,
-                const labelField& localRowLabel,
-                const labelField& neighbourRowLabel
+                const crMatrix& nbrInterfaceProlongation
             ),
             (
                 lduMesh,
                 prolongation,
                 coarseInterfaces,
                 fineInterface,
-                localRowLabel,
-                neighbourRowLabel
+                nbrInterfaceProlongation
             )
         );
 
@@ -134,8 +135,7 @@ public:
             const crMatrix& prolongation,
             const lduInterfacePtrsList& coarseInterfaces,
             const lduInterface& fineInterface,
-            const labelField& localRowLabel,
-            const labelField& neighbourRowLabel
+            const crMatrix& nbrInterfaceProlongation
         );
 
 
@@ -146,11 +146,13 @@ public:
         SAMGInterface
         (
             const lduPrimitiveMesh& lduMesh,
-            const crMatrix& prolongation
+            const crMatrix& prolongation,
+            const crMatrix& nbrInterfaceProlongation
         )
         :
             lduMesh_(lduMesh),
-            prolongation_(prolongation)
+            prolongation_(prolongation),
+            nbrInterfaceProlongation_(nbrInterfaceProlongation)
         {}
 
 
@@ -218,6 +220,21 @@ public:
             (
                 const unallocLabelList& internalData
             ) const;
+
+            //- Initialise transfer of prolongation matrix to the interface
+            virtual void initProlongationTransfer
+            (
+                const Pstream::commsTypes commsType,
+                const crMatrix& iF
+            ) const = 0;
+
+            //- Transfer and return prolongation matrix adjacent to
+            //  the interface
+            virtual tmp<crMatrix> prolongationTransfer
+            (
+                const Pstream::commsTypes commsType,
+                const crMatrix& iF
+            ) const = 0;
 
 
         // Coefficient selection

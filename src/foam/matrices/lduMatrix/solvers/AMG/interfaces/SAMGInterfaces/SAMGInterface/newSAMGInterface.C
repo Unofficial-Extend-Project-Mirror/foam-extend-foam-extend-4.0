@@ -35,8 +35,7 @@ Foam::autoPtr<Foam::SAMGInterface> Foam::SAMGInterface::New
     const crMatrix& prolongation,
     const lduInterfacePtrsList& coarseInterfaces,
     const lduInterface& fineInterface,
-    const labelField& localRowLabel,
-    const labelField& neighbourRowLabel
+    const crMatrix& nbrInterfaceProlongation
 )
 {
     word coupleType(fineInterface.type());
@@ -54,8 +53,7 @@ Foam::autoPtr<Foam::SAMGInterface> Foam::SAMGInterface::New
             "    const crMatrix& prolongation,\n"
             "    const lduInterfacePtrsList& coarseInterfaces,\n"
             "    const lduInterface& fineInterface,\n"
-            "    const labelField& localRowLabel,\n"
-            "    const labelField& neighbourRowLabel\n"
+            "    const crMatrix& nbrInterfaceProlongation\n"
             ")"
         )   << "Unknown SAMGInterface type " << coupleType << ".\n"
             << "Valid SAMGInterface types are :"
@@ -71,8 +69,7 @@ Foam::autoPtr<Foam::SAMGInterface> Foam::SAMGInterface::New
             prolongation,
             coarseInterfaces,
             fineInterface,
-            localRowLabel,
-            neighbourRowLabel
+            nbrInterfaceProlongation
         )
     );
 }

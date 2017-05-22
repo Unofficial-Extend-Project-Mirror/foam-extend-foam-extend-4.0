@@ -90,8 +90,7 @@ public:
             const crMatrix& prolongation,
             const lduInterfacePtrsList& coarseInterfaces,
             const lduInterface& fineInterface,
-            const labelField& localRowLabel,
-            const labelField& neighbourRowLabel
+            const crMatrix& nbrInterfaceProlongation
         );
 
 
@@ -159,6 +158,22 @@ public:
             (
                 const Pstream::commsTypes commsType,
                 const unallocLabelList& iF
+            ) const;
+
+
+            //- Initialise transfer of prolongation matrix to the interface
+            virtual void initProlongationTransfer
+            (
+                const Pstream::commsTypes commsType,
+                const crMatrix& iF
+            ) const;
+
+            //- Transfer and return prolongation matrix adjacent to
+            //  the interface
+            virtual tmp<crMatrix> prolongationTransfer
+            (
+                const Pstream::commsTypes commsType,
+                const crMatrix& iF
             ) const;
 
 

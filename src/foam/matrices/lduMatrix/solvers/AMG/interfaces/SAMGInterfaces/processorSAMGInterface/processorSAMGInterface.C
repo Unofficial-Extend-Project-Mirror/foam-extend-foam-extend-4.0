@@ -48,15 +48,15 @@ Foam::processorSAMGInterface::processorSAMGInterface
     const crMatrix& prolongation,
     const lduInterfacePtrsList& coarseInterfaces,
     const lduInterface& fineInterface,
-    const labelField& localRowLabel,
-    const labelField& neighbourRowLabel
+    const crMatrix& nbrInterfaceProlongation
 )
 :
-    SAMGInterface(lduMesh, prolongation),
+    SAMGInterface(lduMesh, prolongation, nbrInterfaceProlongation),
     fineProcInterface_(refCast<const processorLduInterface>(fineInterface)),
     comm_(fineProcInterface_.comm()),
     tag_(fineProcInterface_.tag())
 {
+    /*
     // Analyse the local and neighbour row label:
     //  local coarse, remote coarse = regular coarse face
     //  local coarse, remote fine = local expanded face: receive prolonged data
@@ -250,6 +250,7 @@ Foam::processorSAMGInterface::processorSAMGInterface
     faceCells_.setSize(nCoarseFaces);
     fineAddressing_.setSize(nCoarseFaces);
     fineWeights_.setSize(nCoarseFaces);
+*/
 }
 
 
@@ -298,6 +299,34 @@ Foam::tmp<Foam::labelField> Foam::processorSAMGInterface::internalFieldTransfer
 ) const
 {
     return receive<label>(commsType, this->size());
+}
+
+
+void Foam::processorSAMGInterface::initProlongationTransfer
+(
+    const Pstream::commsTypes commsType,
+    const crMatrix& iF
+) const
+{
+    // Select the part of the prolongation matrix to send
+
+    // Send prolongation matrix
+    Pout<< "HJ, in send" << endl;
+}
+
+Foam::tmp<Foam::crMatrix> Foam::processorSAMGInterface::prolongationTransfer
+(
+    const Pstream::commsTypes commsType,
+    const crMatrix& iF
+) const
+{
+    // Receive and return prolongation matrix
+    Pout<< "HJ, in receive" << endl;
+
+    // Dummy
+    tmp<crMatrix> tcr(new crMatrix(5, 5, labelList(5)));
+
+    return tcr;
 }
 
 

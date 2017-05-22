@@ -1031,25 +1031,23 @@ Foam::BlockMatrixSelection<Type>::restrictMatrix() const
     // Set the coarse interfaces and coefficients
     lduInterfacePtrsList coarseInterfaces(interfaceFields.size());
 
-    labelListList coarseInterfaceAddr(interfaceFields.size());
-
     // Initialise transfer of restrict addressing on the interface
     // HJ, reconsider blocking comms.  HJ, 9/Jun/2016
     forAll (interfaceFields, intI)
     {
         if (interfaceFields.set(intI))
         {
-            interfaceFields[intI].coupledInterface().initInternalFieldTransfer
+            interfaceFields[intI].coupledInterface().initProlongationTransfer
             (
                 Pstream::blocking,
-                rowLabel_
+                P
             );
         }
     }
 
     // Store coefficients to avoid tangled communications
     // HJ, 1/Apr/2009
-    FieldField<Field, label> fineInterfaceAddr(interfaceFields.size());
+    PtrList<crMatrix> nbrInterfaceProlongation(interfaceFields.size());    
 
     forAll (interfaceFields, intI)
     {
@@ -1058,15 +1056,15 @@ Foam::BlockMatrixSelection<Type>::restrictMatrix() const
             const lduInterface& fineInterface =
                 interfaceFields[intI].coupledInterface();
 
-            fineInterfaceAddr.set
+            nbrInterfaceProlongation.set
             (
                 intI,
-                new labelField
+                new crMatrix
                 (
-                    fineInterface.internalFieldTransfer
+                    fineInterface.prolongationTransfer
                     (
                         Pstream::blocking,
-                        rowLabel_
+                        P
                     )
                 )
             );
@@ -1090,8 +1088,7 @@ Foam::BlockMatrixSelection<Type>::restrictMatrix() const
                     P,
                     coarseInterfaces,
                     fineInterface,
-                    fineInterface.interfaceInternalField(rowLabel_),
-                    fineInterfaceAddr[intI]
+                    nbrInterfaceProlongation[intI]
                 ).ptr()
             );
         }
