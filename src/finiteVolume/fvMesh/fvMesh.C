@@ -556,11 +556,11 @@ void Foam::fvMesh::updateMesh(const mapPolyMesh& mpm)
     // This is a temporary solution
     surfaceInterpolation::movePoints();
 
-    // Note: deltaCoeffs cannot be left on lazy evaluation on mesh motion
-    // because tangled comms will occur when they are accessed from
-    // individual boundary conditions
+    // Note:
+    // Not allowed to call deltaCoeffs here because the faces and cells may be
+    // at zero area/volume.  It will be called in movePoints after the
+    // topo change.
     // HJ, VV and IG, 25/Oct/2016
-    deltaCoeffs();
 
     // Function object update moved to polyMesh
     // HJ, 29/Aug/2010
@@ -583,11 +583,11 @@ void Foam::fvMesh::syncUpdateMesh()
     // This is a temporary solution
     surfaceInterpolation::movePoints();
 
-    // Note: deltaCoeffs cannot be left on lazy evaluation on mesh motion
-    // because tangled comms will occur when they are accessed from
-    // individual boundary conditions
+    // Note:
+    // Not allowed to call deltaCoeffs here because the faces and cells may be
+    // at zero area/volume.  It will be called in movePoints after the
+    // topo change.
     // HJ, VV and IG, 25/Oct/2016
-    deltaCoeffs();
 
     // Function object update moved to polyMesh
     // HJ, 29/Aug/2010
