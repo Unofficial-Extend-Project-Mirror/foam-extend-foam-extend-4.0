@@ -522,10 +522,10 @@ void mixingPlaneFvPatchField<Type>::initEvaluate
 template<class Type>
 void mixingPlaneFvPatchField<Type>::evaluate
 (
-    const Pstream::commsTypes
+    const Pstream::commsTypes commsTypes
 )
 {
-    fvPatchField<Type>::evaluate();
+    coupledFvPatchField<Type>::evaluate(commsTypes);
 }
 
 

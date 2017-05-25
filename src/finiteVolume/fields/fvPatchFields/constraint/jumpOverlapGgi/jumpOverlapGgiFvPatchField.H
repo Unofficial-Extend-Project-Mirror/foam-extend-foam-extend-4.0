@@ -22,29 +22,28 @@ License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    jumpMixingPlaneFvPatchField
+    jumpOverlapGgiFvPatchField
 
 Description
-    MixingPlane interface patch field with a jump condition
+    OverlapGgi interface patch field with a jump condition
 
 Author
     Ilaria De Dominicis, General Electric Power, (March 2016)
 
 Contributor
     Hrvoje Jasak, Wikki Ltd.
-    Gregor Cvijetic, FMENA Zagreb.
 
 GE CONFIDENTIAL INFORMATION 2016 General Electric Company. All Rights Reserved
 
 SourceFiles
-    jumpMixingPlaneFvPatchField.C
+    jumpOverlapGgiFvPatchField.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef jumpMixingPlaneFvPatchField_H
-#define jumpMixingPlaneFvPatchField_H
+#ifndef jumpOverlapGgiFvPatchField_H
+#define jumpOverlapGgiFvPatchField_H
 
-#include "mixingPlaneFvPatchField.H"
+#include "overlapGgiFvPatchField.H"
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -53,57 +52,57 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                Class jumpMixingPlaneFvPatchField Declaration
+                Class jumpOverlapGgiFvPatchField Declaration
 \*---------------------------------------------------------------------------*/
 
 template<class Type>
-class jumpMixingPlaneFvPatchField
+class jumpOverlapGgiFvPatchField
 :
-    public mixingPlaneFvPatchField<Type>
+    public overlapGgiFvPatchField<Type>
 {
 public:
 
     //- Runtime type information
-    TypeName("jumpMixingPlane");
+    TypeName("jumpOverlapGgi");
 
 
     // Constructors
 
         //- Construct from patch and internal field
-        jumpMixingPlaneFvPatchField
+        jumpOverlapGgiFvPatchField
         (
             const fvPatch&,
             const DimensionedField<Type, volMesh>&
         );
 
         //- Construct from patch, internal field and dictionary
-        jumpMixingPlaneFvPatchField
+        jumpOverlapGgiFvPatchField
         (
             const fvPatch&,
             const DimensionedField<Type, volMesh>&,
             const dictionary&
         );
 
-        //- Construct by mapping given jumpMixingPlaneFvPatchField
+        //- Construct by mapping given jumpOverlapGgiFvPatchField
         //  onto a new patch
-        jumpMixingPlaneFvPatchField
+        jumpOverlapGgiFvPatchField
         (
-            const jumpMixingPlaneFvPatchField<Type>&,
+            const jumpOverlapGgiFvPatchField<Type>&,
             const fvPatch&,
             const DimensionedField<Type, volMesh>&,
             const fvPatchFieldMapper&
         );
 
         //- Construct as copy
-        jumpMixingPlaneFvPatchField
+        jumpOverlapGgiFvPatchField
         (
-            const jumpMixingPlaneFvPatchField&
+            const jumpOverlapGgiFvPatchField&
         );
 
         //- Construct as copy setting internal field reference
-        jumpMixingPlaneFvPatchField
+        jumpOverlapGgiFvPatchField
         (
-            const jumpMixingPlaneFvPatchField<Type>&,
+            const jumpOverlapGgiFvPatchField<Type>&,
             const DimensionedField<Type, volMesh>&
         );
 
@@ -115,7 +114,7 @@ public:
             //- Return the interface type
             virtual const word& interfaceFieldType() const
             {
-                return mixingPlaneFvPatchField<Type>::type();
+                return overlapGgiFvPatchField<Type>::type();
             }
 
 
@@ -161,7 +160,7 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-#   include "jumpMixingPlaneFvPatchField.C"
+#   include "jumpOverlapGgiFvPatchField.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

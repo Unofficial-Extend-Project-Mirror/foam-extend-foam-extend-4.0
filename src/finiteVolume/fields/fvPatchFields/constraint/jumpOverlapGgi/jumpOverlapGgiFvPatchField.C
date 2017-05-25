@@ -26,85 +26,89 @@ Author
 
 Contributor
     Hrvoje Jasak, Wikki Ltd.
-    Gregor Cvijetic, FMENA Zagreb.
 
 GE CONFIDENTIAL INFORMATION 2016 General Electric Company. All Rights Reserved
 
-Note on parallelisation
-    In order to handle parallelisation correctly, I need to rely on the fact
-    that all patches that require a global gather-scatter come before
-    processor patches.  In that case, the communication pattern
-    will be correct without intervention.  HJ, 6/Aug/2009
-
 \*---------------------------------------------------------------------------*/
 
-#include "jumpGgiFvPatchField.H"
+#include "jumpOverlapGgiFvPatchField.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
-
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 template<class Type>
-jumpGgiFvPatchField<Type>::jumpGgiFvPatchField
+jumpOverlapGgiFvPatchField<Type>::jumpOverlapGgiFvPatchField
 (
     const fvPatch& p,
     const DimensionedField<Type, volMesh>& iF
 )
 :
-    ggiFvPatchField<Type>(p, iF)
+    overlapGgiFvPatchField<Type>(p, iF)
 {}
 
 
 template<class Type>
-jumpGgiFvPatchField<Type>::jumpGgiFvPatchField
+jumpOverlapGgiFvPatchField<Type>::jumpOverlapGgiFvPatchField
 (
     const fvPatch& p,
     const DimensionedField<Type, volMesh>& iF,
     const dictionary& dict
 )
 :
-    ggiFvPatchField<Type>(p, iF, dict)
+    overlapGgiFvPatchField<Type>(p, iF, dict)
 {}
 
 
 template<class Type>
-jumpGgiFvPatchField<Type>::jumpGgiFvPatchField
+jumpOverlapGgiFvPatchField<Type>::jumpOverlapGgiFvPatchField
 (
-    const jumpGgiFvPatchField<Type>& ptf,
+    const jumpOverlapGgiFvPatchField<Type>& ptf,
     const fvPatch& p,
     const DimensionedField<Type, volMesh>& iF,
     const fvPatchFieldMapper& mapper
 )
 :
-    ggiFvPatchField<Type>(ptf, p, iF, mapper)
+    overlapGgiFvPatchField<Type>(ptf, p, iF, mapper)
 {}
 
 
 template<class Type>
-jumpGgiFvPatchField<Type>::jumpGgiFvPatchField
+jumpOverlapGgiFvPatchField<Type>::jumpOverlapGgiFvPatchField
 (
-    const jumpGgiFvPatchField<Type>& ptf,
+    const jumpOverlapGgiFvPatchField<Type>& ptf
+)
+:
+    overlapGgiFvPatchField<Type>(ptf)
+{}
+
+
+template<class Type>
+jumpOverlapGgiFvPatchField<Type>::jumpOverlapGgiFvPatchField
+(
+    const jumpOverlapGgiFvPatchField<Type>& ptf,
     const DimensionedField<Type, volMesh>& iF
 )
 :
-    ggiFvPatchField<Type>(ptf, iF)
+    overlapGgiFvPatchField<Type>(ptf, iF)
 {}
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
+
 template<class Type>
-tmp<Field<Type> > jumpGgiFvPatchField<Type>::patchNeighbourField() const
+tmp<Field<Type> >
+jumpOverlapGgiFvPatchField<Type>::patchNeighbourField() const
 {
-    return ggiFvPatchField<Type>::patchNeighbourField() + jump();
+    return overlapGgiFvPatchField<Type>::patchNeighbourField() + jump();
 }
 
 
 template<class Type>
-void jumpGgiFvPatchField<Type>::initInterfaceMatrixUpdate
+void jumpOverlapGgiFvPatchField<Type>::initInterfaceMatrixUpdate
 (
     const scalarField& psiInternal,
     scalarField& result,
@@ -115,11 +119,9 @@ void jumpGgiFvPatchField<Type>::initInterfaceMatrixUpdate
     const bool switchToLhs
 ) const
 {
-    // Communication is allowed either before or after processor
-    // patch comms.  HJ, 11/Jul/2011
 
     // Get shadow face-cells and assemble shadow field
-    const unallocLabelList& sfc = this->ggiPatch().shadow().faceCells();
+    const unallocLabelList& sfc = this->overlapGgiPatch().shadow().faceCells();
 
     scalarField sField(sfc.size());
 
@@ -128,13 +130,10 @@ void jumpGgiFvPatchField<Type>::initInterfaceMatrixUpdate
         sField[i] = psiInternal[sfc[i]];
     }
 
-    Field<Type> pnf = this->ggiPatch().interpolate(sField);
-
+    scalarField pnf = this->overlapGgiPatch().interpolate(sField);
 
     // Multiply the field by coefficients and add into the result
-    const unallocLabelList& fc = this->ggiPatch().faceCells();
-
-    const Field<scalar> jf = jump()().component(cmpt);
+    const unallocLabelList& fc = this->overlapGgiPatch().faceCells();
 
     if
     (
@@ -142,32 +141,45 @@ void jumpGgiFvPatchField<Type>::initInterfaceMatrixUpdate
      == reinterpret_cast<const void*>(&this->internalField())
     )
     {
-        forAll(pnf, elemI)
+        const Field<scalar> jf = jump()().component(cmpt);
+
+        if (switchToLhs)
         {
-            pnf[elemI] += jf[elemI];
+            forAll(fc, elemI)
+            {
+                 result[fc[elemI]] += coeffs[elemI]*(pnf[elemI] + jf[elemI]);
+            }
         }
-    }
-
-    multiply(pnf, coeffs, pnf);
-
-    if (switchToLhs)
-    {
-        forAll(fc, elemI)
+        else
         {
-            result[fc[elemI]] += pnf[elemI];
+            forAll(fc, elemI)
+            {
+                result[fc[elemI]] -= coeffs[elemI]*(pnf[elemI] + jf[elemI]);
+            }
         }
     }
     else
     {
-        forAll(fc, elemI)
+        if (switchToLhs)
         {
-            result[fc[elemI]] -= pnf[elemI];
+            forAll(fc, elemI)
+            {
+                 result[fc[elemI]] += coeffs[elemI]*(pnf[elemI]);
+            }
+        }
+        else
+        {
+            forAll(fc, elemI)
+            {
+                result[fc[elemI]] -= coeffs[elemI]*(pnf[elemI]);
+            }
         }
     }
 }
 
+
 template<class Type>
-void jumpGgiFvPatchField<Type>::updateInterfaceMatrix
+void jumpOverlapGgiFvPatchField<Type>::updateInterfaceMatrix
 (
     const scalarField& psiInternal,
     scalarField& result,

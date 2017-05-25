@@ -26,6 +26,7 @@ Author
 
 Contributor
     Hrvoje Jasak, Wikki Ltd.
+    Gregor Cvijetic, FMENA Zagreb.
 
 GE CONFIDENTIAL INFORMATION 2016 General Electric Company. All Rights Reserved
 
@@ -58,13 +59,15 @@ void Foam::mixingPlaneEnthalpyJumpFvPatchField<Foam::scalar>::updateCoeffs()
     }
 
     // Get access to relative and rotational velocity
-    const word UrelName("Urel");
-    const word UName("U");
+    const word URotName("URot");
+    const word UThetaName("UTheta");
+
+    jump_ = 0;
 
     if
     (
-        !this->db().objectRegistry::found(UrelName)
-     || !this->db().objectRegistry::found(UName)
+        !this->db().objectRegistry::found(URotName)
+     || !this->db().objectRegistry::found(UThetaName)
     )
     {
         // Velocities not available, do not update
@@ -72,31 +75,40 @@ void Foam::mixingPlaneEnthalpyJumpFvPatchField<Foam::scalar>::updateCoeffs()
         (
             "void gradientEnthalpyFvPatchScalarField::"
             "updateCoeffs(const vectorField& Up)"
-        )   << "Velocity fields " << UrelName << " or "
-            << UName << " not found.  "
+        )   << "Velocity fields " << URotName << " or "
+            << UThetaName << " not found.  "
             << "Performing enthalpy value update" << endl;
 
         jump_ = 0;
     }
     else
     {
-        const fvPatchVectorField& Urelp =
-            lookupPatchField<volVectorField, vector>(UrelName);
+        const fvPatchVectorField& URotp =
+            lookupPatchField<volVectorField, vector>(URotName);
 
-        const fvPatchVectorField& Up =
-            lookupPatchField<volVectorField, vector>(UName);
+        const fvPatchScalarField& UThetap =
+            lookupPatchField<volScalarField, scalar>(UThetaName);
 
         if (rotating_)
         {
-            jump_ =
-                mag(Up.patchInternalField())*mag(Urelp.patchInternalField())
-              - magSqr(Up.patchInternalField());
+            // We can either make jump_ on neighbour field and interpolate (in
+            // jumpOverlapGgi) or interpolate first, then add jump_ for
+            // internalField
+            const scalarField UThetaIn = UThetap.patchInternalField();
+
+            jump_ =  - (
+                         mag(UThetaIn)
+                        *mag(URotp.patchInternalField())
+                       );
         }
         else
         {
-            jump_ =
-                mag(Up.patchNeighbourField())*mag(Urelp.patchNeighbourField())
-              - magSqr(Up.patchNeighbourField());
+            const scalarField UThetaIn = UThetap.patchNeighbourField();
+
+            jump_ =  (
+                        mag(UThetaIn)
+                       *mag(URotp.patchNeighbourField())
+                     );
         }
     }
 

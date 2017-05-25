@@ -22,10 +22,10 @@ License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    jumpMixingPlaneFvPatchField
+    jumpOverlapGgiFvPatchField
 
 Description
-    MixingPlane patch field, providing coupling with a jump condition
+    OverlapGgi patch field, providing coupling with a jump condition
     between arbitrary patches
 
 Author
@@ -33,14 +33,13 @@ Author
 
 Contributor
     Hrvoje Jasak, Wikki Ltd.
-    Gregor Cvijetic, FMENA Zagreb.
 
 GE CONFIDENTIAL INFORMATION 2016 General Electric Company. All Rights Reserved
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef jumpMixingPlaneFvPatchFieldsFwd_H
-#define jumpMixingPlaneFvPatchFieldsFwd_H
+#ifndef jumpOverlapGgiFvPatchFieldsFwd_H
+#define jumpOverlapGgiFvPatchFieldsFwd_H
 
 #include "fieldTypes.H"
 
@@ -51,9 +50,9 @@ namespace Foam
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-template<class Type> class jumpMixingPlaneFvPatchField;
+template<class Type> class jumpOverlapGgiFvPatchField;
 
-makePatchTypeFieldTypedefs(jumpMixingPlane)
+makePatchTypeFieldTypedefs(jumpOverlapGgi)
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
