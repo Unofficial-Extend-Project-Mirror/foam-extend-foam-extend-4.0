@@ -222,6 +222,7 @@ class GGIInterpolation
             //- List of uncovered slave faces
             mutable labelList* uncoveredSlaveAddrPtr_;
 
+
   // Private static data
 
         //- Facet area error tolerance
