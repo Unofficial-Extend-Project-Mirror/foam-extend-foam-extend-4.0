@@ -310,7 +310,7 @@ void Foam::linearValveLayersFvMesh::addZonesAndModifiers()
 }
 
 
-void Foam::linearValveLayersFvMesh::makeLayersLive()
+void Foam::linearValveLayersFvMesh::makeLayersLive() const
 {
     const polyTopoChanger& topoChanges = topoChanger_;
 
@@ -327,7 +327,7 @@ void Foam::linearValveLayersFvMesh::makeLayersLive()
         }
         else
         {
-            FatalErrorIn("void linearValveLayersFvMesh::makeLayersLive()")
+            FatalErrorIn("void linearValveLayersFvMesh::makeLayersLive() const")
                 << "Don't know what to do with mesh modifier "
                 << modI << " of type " << topoChanges[modI].type()
                 << abort(FatalError);
@@ -336,7 +336,7 @@ void Foam::linearValveLayersFvMesh::makeLayersLive()
 }
 
 
-void Foam::linearValveLayersFvMesh::makeSlidersLive()
+void Foam::linearValveLayersFvMesh::makeSlidersLive() const
 {
     const polyTopoChanger& topoChanges = topoChanger_;
 
@@ -353,7 +353,7 @@ void Foam::linearValveLayersFvMesh::makeSlidersLive()
         }
         else
         {
-            FatalErrorIn("void linearValveLayersFvMesh::makeLayersLive()")
+            FatalErrorIn("void linearValveLayersFvMesh::makeLayersLive() const")
                 << "Don't know what to do with mesh modifier "
                 << modI << " of type " << topoChanges[modI].type()
                 << abort(FatalError);
