@@ -125,6 +125,7 @@ $(constraintFvPatchFields)/ggi/ggiFvPatchVectorNFields.C
 $(constraintFvPatchFields)/jumpGgi/jumpGgiFvPatchFields.C
 $(constraintFvPatchFields)/cyclicGgi/cyclicGgiFvPatchFields.C
 $(constraintFvPatchFields)/overlapGgi/overlapGgiFvPatchFields.C
+$(constraintFvPatchFields)/jumpOverlapGgi/jumpOverlapGgiFvPatchFields.C
 $(constraintFvPatchFields)/mixingPlane/mixingPlaneFvPatchFields.C
 $(constraintFvPatchFields)/jumpMixingPlane/jumpMixingPlaneFvPatchFields.C
 $(constraintFvPatchFields)/regionCoupling/regionCouplingFvPatchFields.C

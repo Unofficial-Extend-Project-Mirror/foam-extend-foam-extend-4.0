@@ -234,23 +234,6 @@ void Foam::MRFZone::setMRFFaces()
 }
 
 
-Foam::vector Foam::MRFZone::Omega() const
-{
-    if (rampTime_ < SMALL)
-    {
-        return omega_.value()*axis_.value();
-    }
-    else
-    {
-        // Ramping
-        const scalar t = mesh_.time().value();
-        const scalar ramp = sin(2*pi/(4*rampTime_)*Foam::min(rampTime_, t));
-
-        return ramp*omega_.value()*axis_.value();
-    }
-}
-
-
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 Foam::MRFZone::MRFZone(const fvMesh& mesh, Istream& is)
@@ -328,6 +311,23 @@ Foam::MRFZone::MRFZone(const fvMesh& mesh, Istream& is)
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+
+Foam::vector Foam::MRFZone::Omega() const
+{
+    if (rampTime_ < SMALL)
+    {
+        return omega_.value()*axis_.value();
+    }
+    else
+    {
+        // Ramping
+        const scalar t = mesh_.time().value();
+        const scalar ramp = sin(2*pi/(4*rampTime_)*Foam::min(rampTime_, t));
+        Info<< "ramp: " << ramp << endl;
+        return ramp*omega_.value()*axis_.value();
+    }
+}
+
 
 void Foam::MRFZone::addCoriolis(fvVectorMatrix& UEqn) const
 {

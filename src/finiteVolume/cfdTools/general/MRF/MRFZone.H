@@ -117,9 +117,6 @@ class MRFZone
         //- Divide faces in frame according to patch
         void setMRFFaces();
 
-        //- Return rotational vector
-        vector Omega() const;
-
         //- Make the given absolute mass/vol flux relative within MRF region
         template<class RhoFieldType>
         void relativeRhoFlux
@@ -176,6 +173,38 @@ public:
 
 
     // Member Functions
+
+        // Access Functions
+
+            //- Return the MRFZone name
+            const word& name() const
+            {
+                return name_;
+            }
+
+            //- Return the MRFZone dictionary
+            const dictionary& dict() const
+            {
+                return dict_;
+            }
+
+            //- Return the MRFZone axis of rotation
+            const dimensionedVector& axis() const
+            {
+                return axis_;
+            }
+
+            //- Return rotational vector
+            vector Omega() const;
+
+            //- Return the MRFZone omega as a dimensionedScalar
+            const dimensionedScalar& omega() const
+            {
+                return omega_;
+            }
+
+
+    // Member functions used in a top level solver
 
         //- Update the mesh corresponding to given map
         void updateMesh(const mapPolyMesh& mpm)
