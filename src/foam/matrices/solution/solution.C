@@ -442,8 +442,18 @@ void Foam::solution::setSolverPerformance
         solverPerformance_.readIfPresent(name, perfs);
     }
 
-    // Append to list
-    perfs.setSize(perfs.size() + 1, sp);
+    // Only first iteration and current iteration residuals are required, so
+    // the current iteration residual replaces the previous one and only the
+    // first iteration is always present
+    if (perfs.size() < 2)
+    {
+        // Append to list
+        perfs.setSize(perfs.size() + 1, sp);
+    }
+    else
+    {
+        perfs.last() = sp;
+    }
 
     solverPerformance_.set(name, perfs);
 }
