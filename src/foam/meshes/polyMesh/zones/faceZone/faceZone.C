@@ -449,29 +449,6 @@ const Foam::labelList& Foam::faceZone::meshEdges() const
 {
     if (!mePtr_)
     {
-        // Old form.  Under testing: merge, HJ, 17/Aug/2010
-        //labelList faceCells(size());
-        //
-        //const labelList& own = zoneMesh().mesh().faceOwner();
-        //
-        //const labelList& faceLabels = *this;
-        //
-        //forAll (faceCells, faceI)
-        //{
-        //    faceCells[faceI] = own[faceLabels[faceI]];
-        //}
-        //
-        //mePtr_ =
-        //    new labelList
-        //    (
-        //        operator()().meshEdges
-        //        (
-        //            zoneMesh().mesh().edges(),
-        //            zoneMesh().mesh().cellEdges(),
-        //            faceCells
-        //        )
-        //    );
-
         mePtr_ =
             new labelList
             (
