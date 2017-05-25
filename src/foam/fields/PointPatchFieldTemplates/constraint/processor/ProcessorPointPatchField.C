@@ -470,7 +470,7 @@ initEvaluate
     {
         if (this->isPointField())
         {
-            initAddFieldTempl(Pstream::blocking, this->internalField());
+            initAddFieldTempl(commsType, this->internalField());
         }
     }
 }
@@ -551,7 +551,7 @@ ProcessorPointPatchField
 <PatchField, Mesh, PointPatch, ProcessorPointPatch, MatrixType, Type>::
 initAddField() const
 {
-    initAddFieldTempl(Pstream::blocking, this->internalField());
+    initAddFieldTempl(Pstream::defaultComms(), this->internalField());
 }
 
 
@@ -570,7 +570,7 @@ ProcessorPointPatchField
 <PatchField, Mesh, PointPatch, ProcessorPointPatch, MatrixType, Type>::
 addField(Field<Type>& f) const
 {
-    addFieldTempl(Pstream::blocking, f);
+    addFieldTempl(Pstream::defaultComms(), f);
 }
 
 
@@ -636,7 +636,7 @@ ProcessorPointPatchField
 <PatchField, Mesh, PointPatch, ProcessorPointPatch, MatrixType, Type>::
 initAddDiag(const scalarField& d) const
 {
-    initAddFieldTempl(Pstream::blocking, d);
+    initAddFieldTempl(Pstream::defaultComms(), d);
 }
 
 
@@ -655,7 +655,7 @@ ProcessorPointPatchField
 <PatchField, Mesh, PointPatch, ProcessorPointPatch, MatrixType, Type>::
 initAddSource(const scalarField& s) const
 {
-    initAddFieldTempl(Pstream::blocking, s);
+    initAddFieldTempl(Pstream::defaultComms(), s);
 }
 
 
@@ -674,7 +674,7 @@ ProcessorPointPatchField
 <PatchField, Mesh, PointPatch, ProcessorPointPatch, MatrixType, Type>::
 addDiag(scalarField& d) const
 {
-    addFieldTempl(Pstream::blocking, d);
+    addFieldTempl(Pstream::defaultComms(), d);
 }
 
 
@@ -693,7 +693,7 @@ ProcessorPointPatchField
 <PatchField, Mesh, PointPatch, ProcessorPointPatch, MatrixType, Type>::
 addSource(scalarField& s) const
 {
-    addFieldTempl(Pstream::blocking, s);
+    addFieldTempl(Pstream::defaultComms(), s);
 }
 
 
