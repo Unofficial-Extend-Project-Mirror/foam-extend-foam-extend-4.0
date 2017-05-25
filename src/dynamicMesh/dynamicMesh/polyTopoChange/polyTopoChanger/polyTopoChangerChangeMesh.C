@@ -417,7 +417,7 @@ Foam::autoPtr<Foam::mapPolyMesh> Foam::polyTopoChanger::changeMesh
 
     if (debug)
     {
-        Pout<< "Added retired points: modified = "
+        Pout<< " modified = "
             << nNewPoints - debugPointCounter;
 
         debugPointCounter = nNewPoints;

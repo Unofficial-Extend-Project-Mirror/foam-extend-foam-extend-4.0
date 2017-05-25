@@ -166,9 +166,8 @@ public:
         );
 
 
-    // Destructor
-
-        virtual ~layerAdditionRemoval();
+    //- Destructor
+    virtual ~layerAdditionRemoval();
 
 
     // Member Functions
