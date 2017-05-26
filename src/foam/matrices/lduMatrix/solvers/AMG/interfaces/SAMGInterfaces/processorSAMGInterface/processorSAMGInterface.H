@@ -165,15 +165,15 @@ public:
             virtual void initProlongationTransfer
             (
                 const Pstream::commsTypes commsType,
-                const crMatrix& iF
+                const crMatrix& P
             ) const;
 
             //- Transfer and return prolongation matrix adjacent to
             //  the interface
-            virtual tmp<crMatrix> prolongationTransfer
+            virtual autoPtr<crMatrix> prolongationTransfer
             (
                 const Pstream::commsTypes commsType,
-                const crMatrix& iF
+                const crMatrix& P
             ) const;
 
 

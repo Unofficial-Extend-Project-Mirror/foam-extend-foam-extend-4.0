@@ -49,6 +49,9 @@ namespace Foam
 // Forward declaration of classes
 class crMatrix;
 
+template<class T>
+class autoPtr;
+
 /*---------------------------------------------------------------------------*\
                      Class lduInterface Declaration
 \*---------------------------------------------------------------------------*/
@@ -135,16 +138,18 @@ public:
             virtual void initProlongationTransfer
             (
                 const Pstream::commsTypes commsType,
-                const crMatrix& iF
+                const crMatrix& filteredP
             ) const
-            {}
+            {
+                Pout<< "lduInterface::initProlongationTransfer()" << endl;
+            }
 
             //- Transfer and return prolongation matrix adjacent to
             //  the interface
-            virtual tmp<crMatrix> prolongationTransfer
+            virtual autoPtr<crMatrix> prolongationTransfer
             (
                 const Pstream::commsTypes commsType,
-                const crMatrix& iF
+                const crMatrix& filteredP
             ) const;
 };
 

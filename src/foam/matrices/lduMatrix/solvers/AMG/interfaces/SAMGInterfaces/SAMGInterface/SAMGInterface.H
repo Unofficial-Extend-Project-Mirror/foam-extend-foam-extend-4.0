@@ -43,6 +43,7 @@ SourceFiles
 #include "autoPtr.H"
 #include "lduPrimitiveMesh.H"
 #include "crMatrix.H"
+#include "labelPair.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -73,15 +74,29 @@ protected:
 
     // Protected data
 
-        //- Local face-cell addressing.  Contains local coarse level addressing
-        //  Detected as coarse cells on local side
+        //- Face-cell addressing.  Contains coarse level addressing
         labelField faceCells_;
 
-        //- Fine addressing.  Contains fine index for each coarse face
+        //- Fine addressing
+        //  On SAMG interfaces, a single fine coefficient may contribute to
+        //  multiple coarse coefficients using different weights.
+        //  To handle this, a fine coefficient may be visited multiple times
+        //  which is recorded in fineAddressing.
+        //  For simple (matching) interfaces, fineAddressing_[i] = i
+        //  HJ, 21/Jun/2016
         labelField fineAddressing_;
 
-        //- Fine weights
-        scalarField fineWeights_;
+        //- Restrict addressing
+        //  For each fine coefficient, list coarse cluster index it will be
+        //  agglomerated into
+        //  For cases where the fineAddressing is used, restrict addressing
+        //  and weights are expanded to match multiple hits for a single
+        //  fine coefficient, as dictated by fineAddressing
+        //  HJ, 21/Jun/2016
+        labelField restrictAddressing_;
+
+        //- Fine level agglomeration weights
+        scalarField restrictWeights_;
 
 
 private:
@@ -171,11 +186,18 @@ public:
                 return lduMesh_;
             }
 
-            //- Return reference to prolongation matrix
+            //- Return reference to filtered prolongation matrix
             const crMatrix& prolongation() const
             {
                 return prolongation_;
             }
+
+            //- Return reference to neighbour's filtered prolongation matrix
+            const crMatrix& nbrInterfaceProlongation() const
+            {
+                return nbrInterfaceProlongation_;
+            }
+
 
             //- Return local size
             virtual label size() const
@@ -201,10 +223,16 @@ public:
                 return fineAddressing_;
             }
 
-            //- Return fine weights
-            const scalarField& fineWeights() const
+            //- Return restrict addressing
+            const labelField& restrictAddressing() const
             {
-                return fineWeights_;
+                return restrictAddressing_;
+            }
+
+            //- Return fine level agglomeration weights
+            const scalarField& restrictWeights() const
+            {
+                return restrictWeights_;
             }
 
             //- Return the interface internal field of the given field
@@ -225,15 +253,15 @@ public:
             virtual void initProlongationTransfer
             (
                 const Pstream::commsTypes commsType,
-                const crMatrix& iF
+                const crMatrix& filteredP
             ) const = 0;
 
             //- Transfer and return prolongation matrix adjacent to
             //  the interface
-            virtual tmp<crMatrix> prolongationTransfer
+            virtual autoPtr<crMatrix> prolongationTransfer
             (
                 const Pstream::commsTypes commsType,
-                const crMatrix& iF
+                const crMatrix& filteredP
             ) const = 0;
 
 

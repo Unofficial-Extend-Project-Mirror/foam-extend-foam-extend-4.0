@@ -54,9 +54,10 @@ Foam::tmp<Foam::scalarField> Foam::SAMGInterface::selectCoeffs
     scalarField& coarseCoeffs = tcoarseCoeffs();
 
     // Added weights to account for non-integral matching
-    forAll (fineAddressing_, ffI)
+    forAll (restrictAddressing_, ffi)
     {
-        coarseCoeffs[ffI] = fineWeights_[ffI]*fineCoeffs[fineAddressing_[ffI]];
+        coarseCoeffs[restrictAddressing_[ffi]] +=
+            restrictWeights_[ffi]*fineCoeffs[fineAddressing_[ffi]];
     }
 
     return tcoarseCoeffs;

@@ -57,10 +57,246 @@ Foam::processorSAMGInterface::processorSAMGInterface
     tag_(fineProcInterface_.tag())
 {
     /*
+    // On master:
+    //  - receive slave's filtered prolongation
+    //  - create a transpose of your local prolongation
+    //  - do the triple product: store the coefficients and the addresses
+    //    row = row of restriction, column = column of prolongation
+    //  - the coefficients should be stored row by row, but with randomized
+    //    columns
+    //  - send the addressing to slave to sort its coefficients to match
+    //    the ordering on master (is it possible to sort at the same time?)
+
+    // Needed:
+    //  - labelList masterOwner,
+    //  - labelList masterNeighbour,
+    //  - label nCoarseCoeffs
+
+
+    // Question: Should we put the masterOwner and masterNeighbour into a linked
+    // list which can be searched quickly? In this case we can create the
+    // addressing on master, send and at the same time, calculate the coarse
+    // coefficients on both sides and store into corresponding order
+
+    // Question: How can I save the addressing of the boundary coeffs for
+    // the next level?
+
+    // Question: With such boundary coefficients, my vector-matrix product is a
+    // matrix-matrix product - change multiplication rule in SAMGInterfaceFields
+    // or account for it with addressing?
+//------------------------------------------------------------------------------
+
+    // Count coarse coefficients and create addressing on master
+    if (myProcNo() < neighbProcNo())
+    {
+//------------------------------------------------------------------------------
+//                              COUNT COARSE COEFFS
+//------------------------------------------------------------------------------
+        // Filtered prolongation matrix from my side
+        const labelList& localOwner = prolongation.crAddr().column();
+
+        // Filtered prolongation matrix from my side
+        tmp<crMatrix> tProlongationT(prolongation.T());
+        const labelList& rRowStart = tProlongationT->crAddr().rowStart();
+        const labelList& rColumn = tProlongationT->crAddr().column();
+        const label rNRows = tProlongationT->crAddr().nRows();
+
+        // Filtered prolongation matrix from neighbour - to obtain restriction,
+        // make a transpose
+        const labelList& pRowStart =
+            nbrInterfaceProlongation.crAddr().rowStart();
+        const labelList& pColumn = nbrInterfaceProlongation.crAddr().column();
+        const label pNCols = nbrInterfaceProlongation.crAddr().nCols();
+
+        labelList coeffMark(pNCols, -1);
+        label nCoarseCoeffs = 0;
+
+        // Row of R
+        for (label ir = 0; ir < rNRows; ir++)
+        {
+            //Restart coeffMark for each restriction row
+            coeffMark = -1;
+
+            // Row start addressing R
+            for
+            (
+                label indexR = rRowStart[ir];
+                indexR < rRowStart[ir + 1];
+                indexR++
+            )
+            {
+                // Column of coefficient in R
+                const label jr = rColumn[indexR];
+
+                for
+                (
+                    label indexP = pRowStart[jr];
+                    indexP < pRowStart[jr + 1];
+                    indexP++
+                )
+                {
+                    label jp = pColumn[indexP];
+
+                    if (coeffMark[jp] == -1)
+                    {
+                        // Found a new coarse coeff!
+                        coeffMark[jp] = nCoarseCoeffs;
+                        nCoarseCoeffs++;
+                    }
+                }
+            }
+        }
+
+//------------------------------------------------------------------------------
+//                      CREATE HASH TABLE FOR ADDRESSING
+//------------------------------------------------------------------------------
+
+        HashTable<label, labelPair, Hash<labelPair> > coarseLevel(nCoarseCoeffs);
+        faceCells_.setSize(nCoarseCoeffs);
+
+        // Reset for creating addressing
+        nCoarseCoeffs = 0;
+        coeffMark = -1;
+
+        // Row of R
+        for (label ir = 0; ir < rNRows; ir++)
+        {
+            // Restart coeffMark for each restriction row
+            coeffMark = -1;
+
+            // Row start addressing R
+            for
+            (
+                label indexR = rRowStart[ir];
+                indexR < rRowStart[ir + 1];
+                indexR++
+            )
+            {
+                // Column of coefficient in R
+                const label jr = rColumn[indexR];
+
+                // Grab column of the original prolongation, this is the
+                // faceCell_!
+                const label ja = localOwner[ir];
+
+                for
+                (
+                    label indexP = pRowStart[jr];
+                    indexP < pRowStart[jr + 1];
+                    indexP++
+                )
+                {
+                    label jp = pColumn[indexP];
+
+                    label identify = coeffMark[jp];
+
+                    if (identify == -1)
+                    {
+                        // Found a new coarse coeff!
+                        identify = nCoarseCoeffs;
+                        coeffMark[jp] = nCoarseCoeffs;
+
+                        faceCells_[identify] = ja;
+
+                        // Save address and coeff into HashTable
+                        coarseLevel.insert(labelPair(ir, jp), nCoarseCoeffs);
+                        nCoarseCoeffs++;
+                    }
+                }
+            }
+        }
+
+        // Send to slave
+        OPstream toNbr(Pstream::blocking, neighbProcNo());
+
+        toNbr<< coarseLevel;
+
+    }
+    // Slave
+    else
+    {
+        // Slave must receive the hash table sent by the master to know how to
+        // sort its boundary coefficients
+
+        IPstream fromNbr(Pstream::blocking, neighbProcNo());
+
+        masterCoarseLevel_ =
+            HashTable<label, labelPair, Hash<labelPair> >(fromNbr);
+
+        // Filtered prolongation matrix from my side
+        const labelList& localOwner = prolongation.crAddr().column();
+
+        // Filtered prolongation matrix from my side
+        tmp<crMatrix> tProlongationT(prolongation.T());
+        const labelList& rRowStart = tProlongationT->crAddr().rowStart();
+        const labelList& rColumn = tProlongationT->crAddr().column();
+        const label rNRows = tProlongationT->crAddr().nRows();
+
+        // Filtered prolongation matrix from neighbour - to obtain restriction,
+        // make
+        // a transpose
+        const labelList& pRowStart = nbrInterfaceProlongation.crAddr().rowStart();
+        const labelList& pColumn = nbrInterfaceProlongation.crAddr().column();
+        const label pNCols = nbrInterfaceProlongation.crAddr().nCols();
+
+        faceCells_.setSize(masterCoarseLevel_.size());
+
+        labelList coeffMark(pNCols, -1);
+
+        // Row of R
+        for (label ir = 0; ir < rNRows; ir++)
+        {
+            // Restart coeffMark for each restriction row
+            coeffMark = -1;
+
+            // Row start addressing R
+            for
+            (
+                label indexR = rRowStart[ir];
+                indexR < rRowStart[ir + 1];
+                indexR++
+            )
+            {
+                // Column of coefficient in R
+                const label jr = rColumn[indexR];
+
+                // Grab column of the original prolongation -  this is the
+                // faceCell_!!!
+                label ja = localOwner[ir];
+
+                for
+                (
+                    label indexP = pRowStart[jr];
+                    indexP < pRowStart[jr + 1];
+                    indexP++
+                )
+                {
+                    label jp = pColumn[indexP];
+
+                    label identify = coeffMark[jp];
+
+                    if (identify == -1)
+                    {
+                        label address = masterCoarseLevel_[labelPair(jp,ja)];
+
+                        // Found a new coarse coeff!
+                        identify = address;
+
+                        coeffMark[jp] = address;
+                        faceCells_[identify] = ja;
+                    }
+                }
+            }
+        }
+    }
+
+
     // Analyse the local and neighbour row label:
     //  local coarse, remote coarse = regular coarse face
     //  local coarse, remote fine = local expanded face: receive prolonged data
     //  local fine, remote coarse = neighbour expanded face: send prolonged data
+    //  local fine, remote fine = local and neighbour expanded face: send and
+    //                            receive
 
     // Algorithm
     // Go through local row labels and examine cases
@@ -89,6 +325,19 @@ Foam::processorSAMGInterface::processorSAMGInterface
         Foam::max(128, fineProcInterface_.interfaceSize()/4)
     );
 
+    // For FINE to FINE communication - local boundary coefficient multiplyed by
+    // local weight - send to the other side for triple product
+    HashTable<labelList, label, Hash<label> > neighboursFromLocalFineToFine
+    (
+        Foam::max(128, fineProcInterface_.interfaceSize()/4)
+    );
+
+    HashTable<scalarField, label, Hash<label> > weightsFromLocalFineToFine
+    (
+        Foam::max(128, fineProcInterface_.interfaceSize()/4)
+    );
+
+
     // Get access to the prolongation addressing and coefficients
     const labelList& pRowStart = prolongation.crAddr().rowStart();
     const labelList& pColumn = prolongation.crAddr().column();
@@ -98,6 +347,7 @@ Foam::processorSAMGInterface::processorSAMGInterface
     const labelList& fineFaceCells = fineInterface.faceCells();
 
     // Collect local fine to neighbour coarse connections for communication
+    // TU, 19 May 2017: and fine to fine (communication through triple product)
     forAll (localRowLabel, faceI)
     {
         if
@@ -127,11 +377,45 @@ Foam::processorSAMGInterface::processorSAMGInterface
             neighboursFromLocalFine.insert(neighbourRowLabel[faceI], nbrs);
             weightsFromLocalFine.insert(neighbourRowLabel[faceI], weights);
         }
+        // FINE to FINE communication - TU, May 2017
+        if
+        (
+            localRowLabel[faceI] < 0
+         && neighbourRowLabel[faceI] < 0
+        )
+        {
+            // Found local FINE to neighbour FINE interface
+
+            // First, multiply all local interface boundary coefficients with
+            // local prolongation weights - you will send this to the other side
+            // in localBoundaryProlongation
+
+            // Collect local coarse neighbours and weights from the
+            // prolongation matrix to send to other processor
+            const label curStart = pRowStart[fineFaceCells[faceI]];
+            const label curEnd = pRowStart[fineFaceCells[faceI] + 1];
+            const label nCoeffs = curEnd - curStart;
+
+            labelList nbrs(nCoeffs);
+            scalarField weights(nCoeffs);
+
+            forAll (nbrs, i)
+            {
+                nbrs[i] = pColumn[curStart + i];
+                weights[i] = pCoeffs[curStart + i];
+            }
+
+            // Insert neighbours under remote coarse index
+            neighboursFromLocalFineToFine.insert(neighbourRowLabel[faceI], nbrs);
+            weightsFromLocalFineToFine.insert(neighbourRowLabel[faceI], weights);
+        }
     }
 
     // Receive remote prolongation data
     HashTable<labelList, label, Hash<label> > neighboursFromRemoteFine;
     HashTable<scalarField, label, Hash<label> > weightsFromRemoteFine;
+    HashTable<labelList, label, Hash<label> > neighboursFromRemoteFineToFine;
+    HashTable<scalarField, label, Hash<label> > weightsFromRemoteFineToFine;
 
     // Send and receive the addressing from the other side
     {
@@ -147,6 +431,13 @@ Foam::processorSAMGInterface::processorSAMGInterface
 
         weightsFromRemoteFine =
             HashTable<scalarField, label, Hash<label> >(fromNbr);
+
+        neighboursFromRemoteFineToFine =
+            HashTable<labelList, label, Hash<label> >(fromNbr);
+
+        weightsFromRemoteFineToFine =
+            HashTable<scalarField, label, Hash<label> >(fromNbr);
+
     }
 
     // Assemble connectivity
@@ -232,7 +523,36 @@ Foam::processorSAMGInterface::processorSAMGInterface
         }
         else
         {
-            // Fine to fine.  Ignore
+            // Fine to fine.
+            // Establish connection as in triple product: multiply restriction
+            // matrix on my side, send to the other side and multiply with
+            // prolongation there
+
+            // Get fine faceCells
+            const scalarField& fineLocalCoeffs =
+            // Pick up local prolongation coarse entries and for all
+            // add a new face with appropriate weight
+            // Note: faceCells changes, but how???
+
+            const labelList& curLocalCoarseNbrs =
+                neighboursFromLocalFineToFine[neighbourRowLabel[faceI]];
+
+            const scalarField& curLocalCoarseWeights =
+                weightsFromLocalFineToFine[neighbourRowLabel[faceI]];
+
+            forAll (curLocalCoarseNbrs, curNbrI)
+            {
+                // Create new coarse face
+                faceCells_[nCoarseFaces] = curLocalCoarseNbrs[curNbrI];
+                fineAddressing_[nCoarseFaces] = faceI;
+                fineWeights_[nCoarseFaces] =
+                    curLocalCoarseWeights[curNbrI]*fineLocalCoeffs[faceI];
+                nCoarseFaces++;
+
+                // Store fineFaceCells, recording the fine index of prolonged
+                // cell locally and all coarse neighbours on the other side
+                // HJ, HERE!!!
+            }
         }
     }
 
@@ -305,28 +625,27 @@ Foam::tmp<Foam::labelField> Foam::processorSAMGInterface::internalFieldTransfer
 void Foam::processorSAMGInterface::initProlongationTransfer
 (
     const Pstream::commsTypes commsType,
-    const crMatrix& P
+    const crMatrix& filteredP
 ) const
 {
-    // Select the part of the prolongation matrix to send
-
-    // Send prolongation matrix
-    Pout<< "HJ, in send" << endl;
+    // Send prolongation matrix, using IOstream operators
+    OPstream toNbr(Pstream::blocking, neighbProcNo());
+    toNbr<< filteredP;
 }
 
-Foam::tmp<Foam::crMatrix> Foam::processorSAMGInterface::prolongationTransfer
+
+Foam::autoPtr<Foam::crMatrix>
+Foam::processorSAMGInterface::prolongationTransfer
 (
     const Pstream::commsTypes commsType,
-    const crMatrix& P
+    const crMatrix& filteredP
 ) const
 {
-    // Receive and return prolongation matrix
-    Pout<< "HJ, in receive" << endl;
+    IPstream fromNbr(Pstream::blocking, neighbProcNo());
 
-    // Dummy
-    tmp<crMatrix> tcr(new crMatrix(5, 5, labelList(5)));
+    autoPtr<crMatrix> tnbrP(new crMatrix(fromNbr));
 
-    return tcr;
+    return tnbrP;
 }
 
 
