@@ -178,29 +178,26 @@ tmp<labelField> processorFvPatch::internalFieldTransfer
 void processorFvPatch::initProlongationTransfer
 (
     const Pstream::commsTypes commsType,
-    const crMatrix& P
+    const crMatrix& filteredP
 ) const
 {
-    // Select the part of the prolongation matrix to send
-
-    // Send prolongation matrix
-    Pout<< "HJ, in send for processorFvPatch" << endl;
+    // Send prolongation matrix, using IOstream operators
+    OPstream toNbr(Pstream::blocking, neighbProcNo());
+    toNbr<< filteredP;
 }
 
 
-tmp<crMatrix> processorFvPatch::prolongationTransfer
+autoPtr<crMatrix> processorFvPatch::prolongationTransfer
 (
     const Pstream::commsTypes commsType,
-    const crMatrix& P
+    const crMatrix& filteredP
 ) const
 {
-    // Receive and return prolongation matrix
-    Pout<< "HJ, in receive for processorFvPatch" << endl;
+    IPstream fromNbr(Pstream::blocking, neighbProcNo());
 
-    // Dummy
-    tmp<crMatrix> tcr(new crMatrix(5, 5, labelList(5)));
+    autoPtr<crMatrix> tnbrP(new crMatrix(fromNbr));
 
-    return tcr;
+    return tnbrP;
 }
 
 
