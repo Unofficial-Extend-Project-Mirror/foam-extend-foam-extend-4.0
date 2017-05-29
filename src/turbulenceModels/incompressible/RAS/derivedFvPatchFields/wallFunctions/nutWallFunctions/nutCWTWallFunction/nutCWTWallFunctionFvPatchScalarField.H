@@ -118,7 +118,7 @@ protected:
 public:
 
     //- Runtime type information
-    TypeName("nutCWTWallTreatment");
+    TypeName("nutCWTWallFunction");
 
 
     // Constructors

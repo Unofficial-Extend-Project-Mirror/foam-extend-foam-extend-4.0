@@ -33,6 +33,7 @@ $(nutWallFunctions)/nutSpalartAllmarasStandardWallFunction/nutSpalartAllmarasSta
 $(nutWallFunctions)/nutSpalartAllmarasStandardRoughWallFunction/nutSpalartAllmarasStandardRoughWallFunctionFvPatchScalarField.C
 $(nutWallFunctions)/nutLowReWallFunction/nutLowReWallFunctionFvPatchScalarField.C
 $(nutWallFunctions)/nutCWTWallFunction/nutCWTWallFunctionFvPatchScalarField.C
+$(nutWallFunctions)/nutMEWTWallFunction/nutMEWTWallFunctionFvPatchScalarField.C
 
 epsilonWallFunctions = $(wallFunctions)/epsilonWallFunctions
 $(epsilonWallFunctions)/epsilonWallFunction/epsilonWallFunctionFvPatchScalarField.C
@@ -40,6 +41,7 @@ $(epsilonWallFunctions)/epsilonWallFunction/epsilonWallFunctionFvPatchScalarFiel
 omegaWallFunctions = $(wallFunctions)/omegaWallFunctions
 $(omegaWallFunctions)/omegaWallFunction/omegaWallFunctionFvPatchScalarField.C
 $(omegaWallFunctions)/omegaCWTWallFunction/omegaCWTWallFunctionFvPatchScalarField.C
+$(omegaWallFunctions)/omegaMEWTWallFunction/omegaMEWTWallFunctionFvPatchScalarField.C
 
 kqRWallFunctions = $(wallFunctions)/kqRWallFunctions
 $(kqRWallFunctions)/kqRWallFunction/kqRWallFunctionFvPatchFields.C
