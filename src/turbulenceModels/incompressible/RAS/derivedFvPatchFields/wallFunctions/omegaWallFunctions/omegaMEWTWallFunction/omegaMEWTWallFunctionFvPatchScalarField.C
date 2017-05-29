@@ -23,7 +23,7 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "omegaCWTWallFunctionFvPatchScalarField.H"
+#include "omegaMEWTWallFunctionFvPatchScalarField.H"
 #include "RASModel.H"
 #include "fvPatchFieldMapper.H"
 #include "volFields.H"
@@ -40,11 +40,11 @@ namespace RASModels
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
-void omegaCWTWallFunctionFvPatchScalarField::checkType()
+void omegaMEWTWallFunctionFvPatchScalarField::checkType()
 {
     if (!patch().isWall())
     {
-        FatalErrorIn("omegaCWTWallFunctionFvPatchScalarField::checkType()")
+        FatalErrorIn("omegaMEWTWallFunctionFvPatchScalarField::checkType()")
             << "Invalid wall function specification" << nl
             << "    Patch type for patch " << patch().name()
             << " must be wall" << nl
@@ -56,7 +56,7 @@ void omegaCWTWallFunctionFvPatchScalarField::checkType()
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-omegaCWTWallFunctionFvPatchScalarField::omegaCWTWallFunctionFvPatchScalarField
+omegaMEWTWallFunctionFvPatchScalarField::omegaMEWTWallFunctionFvPatchScalarField
 (
     const fvPatch& p,
     const DimensionedField<scalar, volMesh>& iF
@@ -78,9 +78,9 @@ omegaCWTWallFunctionFvPatchScalarField::omegaCWTWallFunctionFvPatchScalarField
 }
 
 
-omegaCWTWallFunctionFvPatchScalarField::omegaCWTWallFunctionFvPatchScalarField
+omegaMEWTWallFunctionFvPatchScalarField::omegaMEWTWallFunctionFvPatchScalarField
 (
-    const omegaCWTWallFunctionFvPatchScalarField& ptf,
+    const omegaMEWTWallFunctionFvPatchScalarField& ptf,
     const fvPatch& p,
     const DimensionedField<scalar, volMesh>& iF,
     const fvPatchFieldMapper& mapper
@@ -102,7 +102,7 @@ omegaCWTWallFunctionFvPatchScalarField::omegaCWTWallFunctionFvPatchScalarField
 }
 
 
-omegaCWTWallFunctionFvPatchScalarField::omegaCWTWallFunctionFvPatchScalarField
+omegaMEWTWallFunctionFvPatchScalarField::omegaMEWTWallFunctionFvPatchScalarField
 (
     const fvPatch& p,
     const DimensionedField<scalar, volMesh>& iF,
@@ -125,9 +125,9 @@ omegaCWTWallFunctionFvPatchScalarField::omegaCWTWallFunctionFvPatchScalarField
 }
 
 
-omegaCWTWallFunctionFvPatchScalarField::omegaCWTWallFunctionFvPatchScalarField
+omegaMEWTWallFunctionFvPatchScalarField::omegaMEWTWallFunctionFvPatchScalarField
 (
-    const omegaCWTWallFunctionFvPatchScalarField& owfpsf
+    const omegaMEWTWallFunctionFvPatchScalarField& owfpsf
 )
 :
     fixedInternalValueFvPatchField<scalar>(owfpsf),
@@ -146,9 +146,9 @@ omegaCWTWallFunctionFvPatchScalarField::omegaCWTWallFunctionFvPatchScalarField
 }
 
 
-omegaCWTWallFunctionFvPatchScalarField::omegaCWTWallFunctionFvPatchScalarField
+omegaMEWTWallFunctionFvPatchScalarField::omegaMEWTWallFunctionFvPatchScalarField
 (
-    const omegaCWTWallFunctionFvPatchScalarField& owfpsf,
+    const omegaMEWTWallFunctionFvPatchScalarField& owfpsf,
     const DimensionedField<scalar, volMesh>& iF
 )
 :
@@ -170,7 +170,7 @@ omegaCWTWallFunctionFvPatchScalarField::omegaCWTWallFunctionFvPatchScalarField
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-void omegaCWTWallFunctionFvPatchScalarField::updateCoeffs()
+void omegaMEWTWallFunctionFvPatchScalarField::updateCoeffs()
 {
     if (updated())
     {
@@ -181,7 +181,7 @@ void omegaCWTWallFunctionFvPatchScalarField::updateCoeffs()
     // HJ, 20/Mar/2011
     if (!db().foundObject<volScalarField>(GName_))
     {
-        InfoIn("void omegaCWTWallFunctionFvPatchScalarField::updateCoeffs()")
+        InfoIn("void omegaMEWTWallFunctionFvPatchScalarField::updateCoeffs()")
             << "Cannot access " << GName_ << " field for patch "
             << patch().name() << ".  Evaluating as zeroGradient"
             << endl;
@@ -195,16 +195,12 @@ void omegaCWTWallFunctionFvPatchScalarField::updateCoeffs()
     const RASModel& rasModel = db().lookupObject<RASModel>("RASProperties");
     const scalarField& y = rasModel.y()[patch().index()];
 
-    const scalar Cmu25 = pow(Cmu_, 0.25);
-
     volScalarField& G = const_cast<volScalarField&>
         (db().lookupObject<volScalarField>(GName_));
 
     // Note: omega is now a refValue and set in fixedInternalValueFvPatchField
     // HJ, 3/Aug/2011
     scalarField& omega = refValue();
-
-    const scalarField& k = db().lookupObject<volScalarField>(kName_);
 
     const scalarField& nuw =
         lookupPatchField<volScalarField, scalar>(nuName_);
@@ -277,28 +273,38 @@ void omegaCWTWallFunctionFvPatchScalarField::updateCoeffs()
     forAll(nutw, faceI)
     {
         const label faceCellI = fc[faceI];
-        const scalar uStar= Cmu25*sqrt(k[faceCellI]);
 
-        // Note: here yPlus is actually yStar
-        const scalar yPlus = uStar*y[faceI]/nuw[faceI];
+        // Tangential stress at the wall
+        const scalar tauw = (nuw[faceI] + nutw[faceI])*magGradUw[faceI];
 
-        const scalar Cu =  convectionTang[faceI] + gradpTang[faceI];
-        const scalar Psi = 1.0 - Cu/(kappa_*uStar*magGradUw[faceI]);
+        const scalar yPlus = sqrt(tauw)*y[faceI]/nuw[faceI];
 
-        // Kader blend for velocity gradient
+        // Velocity gradient for viscous sublayer
+		const scalar dudyVis= magGradUw[faceI];
+
+        // Velocity gradient for log layer
+        const scalar dudyLog =
+            sqrt
+            (
+                max
+                (
+                    SMALL,
+                    (gradpTang[faceI] + convectionTang[faceI])*y[faceI] +tauw
+                )
+            )/(kappa_*y[faceI]);
+
+        // Kader blending for velocity gradient
         const scalar gamma = -0.01*pow(yPlus, 4)/(1.0 + 5.0*yPlus);
-        const scalar gammaEps = - 0.001*pow(yPlus, 4)/(1.0 + yPlus);
+        const scalar dudy = dudyVis*exp(gamma) + dudyLog*exp(1.0/gamma);
 
         const scalar omegaVis = 6.0*nuw[faceI]/(beta1_*sqr(y[faceI]));
-        const scalar omegaLog = sqrt(k[faceCellI])/(Cmu25*kappa_*y[faceI]);
+        const scalar omegaLog = dudyLog/(sqrt(Cmu_));
 
         // Menter blend for omega
-        omega[faceI] = omegaVis*exp(gammaEps) + omegaLog*exp(1.0/gammaEps);
+        omega[faceI] = sqrt(sqr(omegaVis) + sqr(omegaLog));
 
-        const scalar Gvis = k[faceCellI]*sqr(magGradUw[faceI])/omega[faceI];
-        const scalar Glog = pow(uStar, 3)/(Psi*kappa_*y[faceI]);
-
-        G[faceCellI]= Gvis*exp(gamma) + Glog*exp(1.0/gamma);
+        // Production term
+        G[faceCellI]= tauw*dudy;
     }
 
     // TODO: perform averaging for cells sharing more than one boundary face
@@ -306,7 +312,7 @@ void omegaCWTWallFunctionFvPatchScalarField::updateCoeffs()
     fixedInternalValueFvPatchField<scalar>::updateCoeffs();
 }
 
-void omegaCWTWallFunctionFvPatchScalarField::write(Ostream& os) const
+void omegaMEWTWallFunctionFvPatchScalarField::write(Ostream& os) const
 {
     fixedInternalValueFvPatchField<scalar>::write(os);
     writeEntryIfDifferent<word>(os, "U", "U", UName_);
@@ -327,7 +333,7 @@ void omegaCWTWallFunctionFvPatchScalarField::write(Ostream& os) const
 makePatchTypeField
 (
     fvPatchScalarField,
-    omegaCWTWallFunctionFvPatchScalarField
+    omegaMEWTWallFunctionFvPatchScalarField
 );
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

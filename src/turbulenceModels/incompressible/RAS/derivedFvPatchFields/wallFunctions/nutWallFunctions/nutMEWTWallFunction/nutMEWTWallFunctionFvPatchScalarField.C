@@ -1,0 +1,384 @@
+/*---------------------------------------------------------------------------*\
+  =========                 |
+  \\      /  F ield         | foam-extend: Open Source CFD
+   \\    /   O peration     | Version:     4.0
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
+-------------------------------------------------------------------------------
+License
+    This file is part of foam-extend.
+
+    foam-extend is free software: you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by the
+    Free Software Foundation, either version 3 of the License, or (at your
+    option) any later version.
+
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
+
+\*---------------------------------------------------------------------------*/
+
+#include "nutMEWTWallFunctionFvPatchScalarField.H"
+#include "RASModel.H"
+#include "fvPatchFieldMapper.H"
+#include "volFields.H"
+#include "addToRunTimeSelectionTable.H"
+
+// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
+
+const Foam::debug::tolerancesSwitch
+Foam::incompressible::RASModels::
+nutMEWTWallFunctionFvPatchScalarField::dimlessAFactorTol_
+(
+    "dimlessAFactorMEWTTolerance",
+    1e-6
+);
+
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+namespace Foam
+{
+namespace incompressible
+{
+namespace RASModels
+{
+
+// * * * * * * * * * * * * Protected Member Functions  * * * * * * * * * * * //
+
+void nutMEWTWallFunctionFvPatchScalarField::checkType()
+{
+    if (!patch().isWall())
+    {
+        FatalErrorIn("nutMEWTWallFunctionFvPatchScalarField::checkType()")
+            << "Invalid wall function specification" << nl
+            << "    Patch type for patch " << patch().name()
+            << " must be wall" << nl
+            << "    Current patch type is " << patch().type() << nl << endl
+            << abort(FatalError);
+    }
+}
+
+
+scalar nutMEWTWallFunctionFvPatchScalarField::calcYPlusLam
+(
+    const scalar kappa,
+    const scalar E
+) const
+{
+    scalar ypl = 11.0;
+
+    for (int i = 0; i < 10; i++)
+    {
+        ypl = log(E*ypl)/kappa;
+    }
+
+    return ypl;
+}
+
+
+tmp<scalarField> nutMEWTWallFunctionFvPatchScalarField::calcNut() const
+{
+    const label patchI = patch().index();
+
+    const RASModel& rasModel = db().lookupObject<RASModel>("RASProperties");
+    const scalarField& y = rasModel.y()[patchI];
+    const tmp<volScalarField> tk = rasModel.k();
+    const volScalarField& k = tk();
+    const scalarField& nuw = rasModel.nu().boundaryField()[patchI];
+
+    const scalar Cmu25 = pow(Cmu_, 0.25);
+
+    // Get normals
+    const vectorField n = patch().nf();
+
+    // Patch velocity field at this wall
+    const fvPatchVectorField& Uw =
+          lookupPatchField<volVectorField, vector>(UName_);
+
+    const scalarField magGradUw = mag(Uw.snGrad());
+    const vectorField UwIn = Uw.patchInternalField();
+
+    // Patch internal velocity field tangential to the wall
+    const vectorField UwInTang = UwIn - (UwIn & n)*n;
+    const scalarField magUwInTang = mag(UwInTang);
+
+    // Calculate tangential direction for patch cells
+    const vectorField tDir = UwInTang/magUwInTang;
+
+    // Wall-velocity vector field tangential to the wall
+    const vectorField UwTang = Uw - (Uw & n)*n;
+    const scalarField magUwTang = mag(UwTang);
+
+
+    // Pressure terms
+    const volScalarField& p =
+        this->dimensionedInternalField().mesh().lookupObject
+        <
+            volScalarField
+        >(pName_);
+
+    // Pressure gradient
+    const volVectorField gradp = fvc::grad(p);
+
+    // Pressure gradient in wall adjacent cell
+    const vectorField gradPIn =
+        gradp.boundaryField()[this->patch().index()].patchInternalField();
+
+    // Pressure gradient projected on the wall parallel velocity
+    const scalarField gradpTang= gradPIn & tDir;
+
+
+    // Convective terms
+    const volVectorField& U =
+        this->dimensionedInternalField().mesh().lookupObject
+        <
+            volVectorField
+        >(UName_);
+
+    const surfaceScalarField& phi =
+        this->dimensionedInternalField().mesh().lookupObject
+        <
+            surfaceScalarField
+        >("phi");
+
+    const volVectorField convection = fvc::div(phi, U);
+
+    const vectorField convectionIn =
+        convection.boundaryField()[this->patch().index()].patchInternalField();
+
+    // Convection term projected on the wall parallel velocity
+    const scalarField convectionTang = convectionIn & tDir;
+
+    // Needed to calculate yPlus
+    const scalarField& eddyVis =
+        lookupPatchField<volScalarField, scalar>(nutName_);
+
+    tmp<scalarField> tnutw(new scalarField(patch().size(), SMALL));
+    scalarField& nutw = tnutw();
+
+    // Get face cells
+    const unallocLabelList& fc = patch().faceCells();
+
+    forAll(nutw, faceI)
+    {
+        const label faceCellI = fc[faceI];
+        const scalar uStar = Cmu25*sqrt(k[faceCellI]);
+
+        // Calculate yPlus
+        const scalar yPlus =
+            sqrt
+            (
+                (eddyVis[faceI]+nuw[faceI])*magGradUw[faceI]
+            )*
+            y[faceI]/
+           (nuw[faceI] + SMALL);
+
+        // Relative tangential velocity
+        const scalar magUrel = magUwInTang[faceI] - magUwTang[faceI];
+
+        // Dimless A factor
+        scalar A = nuw[faceI]*
+            (gradpTang[faceI] + convectionTang[faceI])/(pow(uStar, 3) + SMALL);
+
+        // Numerical stabilisation of the A factor
+        if (A < SMALL)
+        {
+            A += dimlessAFactorTol_();
+        }
+
+        // Helper variables
+        const scalar S1 = sqrt(max(SMALL, 1.0 + A*yPlus));
+        const scalar p1 = sqrt(max(SMALL, 1.0 +6.0*A));
+        const scalar uPlusT =
+            (1.0/kappa_)*log(6.0*E_)
+           -(1.0/kappa_)*(2.0*p1 + log(mag(p1 - 1.0)) + log(p1 + 1.0));
+
+        // Dimless velocity in log layer
+        const scalar uLogPlus =
+            (1.0/kappa_)*(2.0*S1 + log(mag(S1 - 1.0)) + log(S1 + 1.0)) + uPlusT;
+
+        // Friction velocity in viscous sublayer
+        const scalar uTauVis = sqrt(nuw[faceI]*magUrel/(y[faceI] + SMALL));
+
+        // Friction velocity in log layer
+        const scalar uTauLog = magUrel/(uLogPlus + SMALL);
+
+        // Kader blending for friction velocity
+        const scalar gamma = -0.01*pow(yPlus, 4)/(1.0 + 5.0*yPlus);
+        const scalar uTau = uTauVis*exp(gamma) + uTauLog*exp(1.0/gamma);
+
+        // Need to limit nutw for stability reasons since at some point, yPlus
+        // is 0 and Kader blending is not defined
+        nutw[faceI] =
+            max
+            (
+                SMALL,
+                sqr(uTau)/(magGradUw[faceI] + SMALL) - nuw[faceI]
+            );
+    }
+
+    return tnutw;
+}
+
+
+void nutMEWTWallFunctionFvPatchScalarField::writeLocalEntries(Ostream& os) const
+{
+    writeEntryIfDifferent<word>(os, "U", "U", UName_);
+    writeEntryIfDifferent<word>(os, "p", "p", pName_);
+    writeEntryIfDifferent<word>(os, "nut", "nut", nutName_);
+    os.writeKeyword("Cmu") << Cmu_ << token::END_STATEMENT << nl;
+    os.writeKeyword("kappa") << kappa_ << token::END_STATEMENT << nl;
+    os.writeKeyword("E") << E_ << token::END_STATEMENT << nl;
+}
+
+
+// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
+
+nutMEWTWallFunctionFvPatchScalarField::nutMEWTWallFunctionFvPatchScalarField
+(
+    const fvPatch& p,
+    const DimensionedField<scalar, volMesh>& iF
+)
+:
+    fixedValueFvPatchScalarField(p, iF),
+    UName_("U"),
+    pName_("p"),
+    nutName_("nut"),
+    Cmu_(0.09),
+    kappa_(0.41),
+    E_(9.8),
+    yPlusLam_(calcYPlusLam(kappa_, E_))
+{
+    checkType();
+}
+
+
+nutMEWTWallFunctionFvPatchScalarField::nutMEWTWallFunctionFvPatchScalarField
+(
+    const fvPatch& p,
+    const DimensionedField<scalar, volMesh>& iF,
+    const dictionary& dict
+)
+:
+    fixedValueFvPatchScalarField(p, iF, dict),
+    UName_(dict.lookupOrDefault<word>("U", "U")),
+    pName_(dict.lookupOrDefault<word>("p", "p")),
+    nutName_(dict.lookupOrDefault<word>("nut", "nut")),
+    Cmu_(dict.lookupOrDefault<scalar>("Cmu", 0.09)),
+    kappa_(dict.lookupOrDefault<scalar>("kappa", 0.41)),
+    E_(dict.lookupOrDefault<scalar>("E", 9.8)),
+    yPlusLam_(calcYPlusLam(kappa_, E_))
+{
+    checkType();
+}
+
+
+nutMEWTWallFunctionFvPatchScalarField::nutMEWTWallFunctionFvPatchScalarField
+(
+    const nutMEWTWallFunctionFvPatchScalarField& ptf,
+    const fvPatch& p,
+    const DimensionedField<scalar, volMesh>& iF,
+    const fvPatchFieldMapper& mapper
+)
+:
+    fixedValueFvPatchScalarField(ptf, p, iF, mapper),
+    UName_(ptf.UName_),
+    pName_(ptf.pName_),
+    nutName_(ptf.nutName_),
+    Cmu_(ptf.Cmu_),
+    kappa_(ptf.kappa_),
+    E_(ptf.E_),
+    yPlusLam_(ptf.yPlusLam_)
+{
+    checkType();
+}
+
+
+nutMEWTWallFunctionFvPatchScalarField::nutMEWTWallFunctionFvPatchScalarField
+(
+    const nutMEWTWallFunctionFvPatchScalarField& wfpsf
+)
+:
+    fixedValueFvPatchScalarField(wfpsf),
+    UName_(wfpsf.UName_),
+    pName_(wfpsf.pName_),
+    nutName_(wfpsf.nutName_),
+    Cmu_(wfpsf.Cmu_),
+    kappa_(wfpsf.kappa_),
+    E_(wfpsf.E_),
+    yPlusLam_(wfpsf.yPlusLam_)
+{
+    checkType();
+}
+
+
+nutMEWTWallFunctionFvPatchScalarField::nutMEWTWallFunctionFvPatchScalarField
+(
+    const nutMEWTWallFunctionFvPatchScalarField& wfpsf,
+    const DimensionedField<scalar, volMesh>& iF
+)
+:
+    fixedValueFvPatchScalarField(wfpsf, iF),
+    UName_(wfpsf.UName_),
+    pName_(wfpsf.pName_),
+    nutName_(wfpsf.nutName_),
+    Cmu_(wfpsf.Cmu_),
+    kappa_(wfpsf.kappa_),
+    E_(wfpsf.E_),
+    yPlusLam_(wfpsf.yPlusLam_)
+{
+    checkType();
+}
+
+
+// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+
+void nutMEWTWallFunctionFvPatchScalarField::updateCoeffs()
+{
+    operator==(calcNut());
+
+    fixedValueFvPatchScalarField::updateCoeffs();
+}
+
+
+tmp<scalarField> nutMEWTWallFunctionFvPatchScalarField::yPlus() const
+{
+    const label patchI = patch().index();
+
+    const RASModel& rasModel = db().lookupObject<RASModel>("RASProperties");
+    const scalarField& y = rasModel.y()[patchI];
+
+    const tmp<volScalarField> tk = rasModel.k();
+    const volScalarField& k = tk();
+    const scalarField kwc = k.boundaryField()[patchI].patchInternalField();
+    const scalarField& nuw = rasModel.nu().boundaryField()[patchI];
+
+    return pow(Cmu_, 0.25)*y*sqrt(kwc)/nuw;
+}
+
+
+void nutMEWTWallFunctionFvPatchScalarField::write(Ostream& os) const
+{
+    fvPatchField<scalar>::write(os);
+    writeLocalEntries(os);
+    writeEntry("value", os);
+}
+
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+makePatchTypeField(fvPatchScalarField, nutMEWTWallFunctionFvPatchScalarField);
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+} // End namespace RASModels
+} // End namespace incompressible
+} // End namespace Foam
+
+// ************************************************************************* //

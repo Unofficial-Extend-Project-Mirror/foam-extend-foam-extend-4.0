@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     3.2
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -22,37 +22,36 @@ License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    Foam::incompressible::RASModels::omegaCWTWallFunctionFvPatchScalarField
+    Foam::incompressible::RASModels::nutMEWTWallFunctionFvPatchScalarField
 
 Description
-    Improved boundary condition for specific dissipation, taking into account
-    non-equilibrium effects and are sensitive to flow unsteadiness and presence
-    of the pressure gradient.
+    Improved boundary condition for turbulent (kinematic) viscosity, taking into
+    account convection and pressure gradient terms.
 
     Reference (bibtex entry):
 
-    @article{popovacHanjalic2007,
-        author = {Popovac, M. and Hanjali\'{c}, K.,}
-        title = {{Compound Wall Treatment for RANS Computation of Complex
-                  Turbulent Flows and Heat Transfer}},
-        journal = {Flow Turbulence Combust},
-        year = {2007},
-        pages = {78--177}
-        DOI = {10.1007/s10494-006-9067-x}
+    @article{sutaloThesis2017,
+        author = {\v{S}utalo, F.}
+        title = {{Evaluation of Variants of Enhanced Wall Treatment Wall
+                  Function in Turbulent Flow Simulations}},
+        school = {Faculty of Mechanical Engineering and Naval Architecture,
+                  University of Zagreb},
+        year = {2017},
     }
 
 SourceFiles
-    omegaCWTWallFunctionFvPatchScalarField.C
+    nutMEWTWallFunctionFvPatchScalarField.C
 
 Author
     Filip Sutalo, FMENA Zagreb.  All rights reserved.
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef omegaCWTWallFunctionFvPatchScalarField_H
-#define omegaCWTWallFunctionFvPatchScalarField_H
+#ifndef nutMEWTWallFunctionFvPatchScalarField_H
+#define nutMEWTWallFunctionFvPatchScalarField_H
 
-#include "fixedInternalValueFvPatchFields.H"
+#include "fixedValueFvPatchFields.H"
+#include "tolerancesSwitch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -64,32 +63,35 @@ namespace RASModels
 {
 
 /*---------------------------------------------------------------------------*\
-           Class omegaCWTWallFunctionFvPatchScalarField Declaration
+             Class nutMEWTWallFunctionFvPatchScalarField Declaration
 \*---------------------------------------------------------------------------*/
 
-class omegaCWTWallFunctionFvPatchScalarField
+class nutMEWTWallFunctionFvPatchScalarField
 :
-    public fixedInternalValueFvPatchScalarField
+    public fixedValueFvPatchScalarField
 {
-    // Private data
 
-         //- Name of pressure field
-        word pName_;
+    // Private static data member
+
+        //- Tolerance for the A dimensionless parameter
+        static const debug::tolerancesSwitch dimlessAFactorTol_;
+
+
+protected:
+
+    // Protected data
 
         //- Name of velocity field
         word UName_;
 
-        //- Name of turbulence kinetic energy field
-        word kName_;
+        //- Name of pressure field
+        word pName_;
 
-        //- Name of turbulence generation field
-        word GName_;
-
-        //- Name of laminar viscosity field
-        word nuName_;
-
-        //- Name of turbulent viscosity field
+        //- Name of eddy viscosity field
         word nutName_;
+
+        //- Name of omega field
+        word omegaName_;
 
         //- Cmu coefficient
         scalar Cmu_;
@@ -100,33 +102,42 @@ class omegaCWTWallFunctionFvPatchScalarField
         //- E coefficient
         scalar E_;
 
-        //- beta1 coefficient
-        scalar beta1_;
+        //- Y+ at the edge of the laminar sublayer
+        scalar yPlusLam_;
 
 
-    // Private member functions
+    // Protected member functions
 
         //- Check the type of the patch
-        void checkType();
+        virtual void checkType();
+
+        //- Calculate the Y+ at the edge of the laminar sublayer
+        virtual scalar calcYPlusLam(const scalar kappa, const scalar E) const;
+
+        //- Calculate the turbulence viscosity
+        virtual tmp<scalarField> calcNut() const;
+
+        //- Write local wall function variables
+        virtual void writeLocalEntries(Ostream&) const;
 
 
 public:
 
     //- Runtime type information
-    TypeName("omegaCWTWallFunction");
+    TypeName("nutMEWTWallFunction");
 
 
     // Constructors
 
         //- Construct from patch and internal field
-        omegaCWTWallFunctionFvPatchScalarField
+        nutMEWTWallFunctionFvPatchScalarField
         (
             const fvPatch&,
             const DimensionedField<scalar, volMesh>&
         );
 
         //- Construct from patch, internal field and dictionary
-        omegaCWTWallFunctionFvPatchScalarField
+        nutMEWTWallFunctionFvPatchScalarField
         (
             const fvPatch&,
             const DimensionedField<scalar, volMesh>&,
@@ -134,20 +145,20 @@ public:
         );
 
         //- Construct by mapping given
-        //  omegaCWTWallFunctionFvPatchScalarField
+        //  nutMEWTWallFunctionFvPatchScalarField
         //  onto a new patch
-        omegaCWTWallFunctionFvPatchScalarField
+        nutMEWTWallFunctionFvPatchScalarField
         (
-            const omegaCWTWallFunctionFvPatchScalarField&,
+            const nutMEWTWallFunctionFvPatchScalarField&,
             const fvPatch&,
             const DimensionedField<scalar, volMesh>&,
             const fvPatchFieldMapper&
         );
 
         //- Construct as copy
-        omegaCWTWallFunctionFvPatchScalarField
+        nutMEWTWallFunctionFvPatchScalarField
         (
-            const omegaCWTWallFunctionFvPatchScalarField&
+            const nutMEWTWallFunctionFvPatchScalarField&
         );
 
         //- Construct and return a clone
@@ -155,14 +166,14 @@ public:
         {
             return tmp<fvPatchScalarField>
             (
-                new omegaCWTWallFunctionFvPatchScalarField(*this)
+                new nutMEWTWallFunctionFvPatchScalarField(*this)
             );
         }
 
         //- Construct as copy setting internal field reference
-        omegaCWTWallFunctionFvPatchScalarField
+        nutMEWTWallFunctionFvPatchScalarField
         (
-            const omegaCWTWallFunctionFvPatchScalarField&,
+            const nutMEWTWallFunctionFvPatchScalarField&,
             const DimensionedField<scalar, volMesh>&
         );
 
@@ -174,7 +185,7 @@ public:
         {
             return tmp<fvPatchScalarField>
             (
-                new omegaCWTWallFunctionFvPatchScalarField(*this, iF)
+                new nutMEWTWallFunctionFvPatchScalarField(*this, iF)
             );
         }
 
@@ -183,6 +194,9 @@ public:
 
         // Evaluation functions
 
+            //- Calculate and return the yPlus at the boundary
+            virtual tmp<scalarField> yPlus() const;
+
             //- Update the coefficients associated with the patch field
             virtual void updateCoeffs();
 
@@ -190,7 +204,7 @@ public:
         // I-O
 
             //- Write
-            void write(Ostream&) const;
+            virtual void write(Ostream&) const;
 };
 
 
