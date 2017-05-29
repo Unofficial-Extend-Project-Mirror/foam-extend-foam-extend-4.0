@@ -32,12 +32,14 @@ $(nutWallFunctions)/nutSpalartAllmarasWallFunction/nutSpalartAllmarasWallFunctio
 $(nutWallFunctions)/nutSpalartAllmarasStandardWallFunction/nutSpalartAllmarasStandardWallFunctionFvPatchScalarField.C
 $(nutWallFunctions)/nutSpalartAllmarasStandardRoughWallFunction/nutSpalartAllmarasStandardRoughWallFunctionFvPatchScalarField.C
 $(nutWallFunctions)/nutLowReWallFunction/nutLowReWallFunctionFvPatchScalarField.C
+$(nutWallFunctions)/nutCWTWallFunction/nutCWTWallFunctionFvPatchScalarField.C
 
 epsilonWallFunctions = $(wallFunctions)/epsilonWallFunctions
 $(epsilonWallFunctions)/epsilonWallFunction/epsilonWallFunctionFvPatchScalarField.C
 
 omegaWallFunctions = $(wallFunctions)/omegaWallFunctions
 $(omegaWallFunctions)/omegaWallFunction/omegaWallFunctionFvPatchScalarField.C
+$(omegaWallFunctions)/omegaCWTWallFunction/omegaCWTWallFunctionFvPatchScalarField.C
 
 kqRWallFunctions = $(wallFunctions)/kqRWallFunctions
 $(kqRWallFunctions)/kqRWallFunction/kqRWallFunctionFvPatchFields.C
