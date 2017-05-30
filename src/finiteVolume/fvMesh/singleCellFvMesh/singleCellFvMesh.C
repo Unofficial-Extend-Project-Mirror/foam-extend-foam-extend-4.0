@@ -92,7 +92,7 @@ void Foam::singleCellFvMesh::agglomerateMesh
 
         forAll (oldPatches, patchI)
         {
-            const polyPatch& pp = oldPatches[patchI];
+            // const polyPatch& pp = oldPatches[patchI];
 
             // if (pp.coupled())
             // {
