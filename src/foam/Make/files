@@ -718,7 +718,7 @@ BlockMatrixCoarsening = $(BlockAMG)/BlockMatrixCoarsening
 $(BlockMatrixCoarsening)/BlockMatrixCoarsening/blockMatrixCoarsenings.C
 $(BlockMatrixCoarsening)/BlockMatrixAgglomeration/blockMatrixAgglomerations.C
 $(BlockMatrixCoarsening)/BlockMatrixClustering/blockMatrixClusterings.C
-$(BlockMatrixCoarsening)/BlockSelectiveAMG/blockSelectiveAMGs.C
+$(BlockMatrixCoarsening)/BlockMatrixReorderedClustering/blockMatrixReorderedClusterings.C
 $(BlockMatrixCoarsening)/BlockMatrixSelection/blockMatrixSelections.C
 
 BlockLduPrecons = matrices/blockLduMatrix/BlockLduPrecons
