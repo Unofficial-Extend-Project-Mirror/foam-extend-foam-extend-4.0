@@ -51,6 +51,7 @@ License
 #include "blockMatrixCoarsenings.H"
 #include "blockMatrixAgglomerations.H"
 #include "blockMatrixClusterings.H"
+#include "blockMatrixReorderedClusterings.H"
 #include "blockMatrixSelections.H"
 #include "blockSelectiveAMGs.H"
 #include "blockCoeffNorms.H"
@@ -152,6 +153,9 @@ makeBlockMatrixCoarsening(block##Type##MatrixCoarsening, block##Type##MatrixAggl
                                                                               \
 typedef BlockMatrixClustering<type > block##Type##MatrixClustering;           \
 makeBlockMatrixCoarsening(block##Type##MatrixCoarsening, block##Type##MatrixClustering); \
+                                                                              \
+typedef BlockMatrixReorderedClustering<type > block##Type##MatrixReorderedClustering;           \
+makeBlockMatrixCoarsening(block##Type##MatrixCoarsening, block##Type##MatrixReorderedClustering); \
                                                                               \
 typedef BlockMatrixSelection<type > block##Type##MatrixSelection;             \
 makeBlockMatrixCoarsening(block##Type##MatrixCoarsening, block##Type##MatrixSelection); \
