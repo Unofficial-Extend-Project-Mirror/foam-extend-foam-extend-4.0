@@ -53,7 +53,6 @@ License
 #include "blockMatrixClusterings.H"
 #include "blockMatrixReorderedClusterings.H"
 #include "blockMatrixSelections.H"
-#include "blockSelectiveAMGs.H"
 #include "blockCoeffNorms.H"
 #include "blockCoeffTwoNorms.H"
 #include "blockCoeffMaxNorms.H"
@@ -159,9 +158,6 @@ makeBlockMatrixCoarsening(block##Type##MatrixCoarsening, block##Type##MatrixReor
                                                                               \
 typedef BlockMatrixSelection<type > block##Type##MatrixSelection;             \
 makeBlockMatrixCoarsening(block##Type##MatrixCoarsening, block##Type##MatrixSelection); \
-                                                                              \
-typedef BlockSelectiveAMG<type > block##Type##SelectiveAMG;                   \
-makeBlockMatrixCoarsening(block##Type##MatrixCoarsening, block##Type##SelectiveAMG); \
                                                                               \
 typedef BlockCoeffNorm<type > block##Type##CoeffNorm;                         \
 defineNamedTemplateTypeNameAndDebug(block##Type##CoeffNorm, 0);               \
