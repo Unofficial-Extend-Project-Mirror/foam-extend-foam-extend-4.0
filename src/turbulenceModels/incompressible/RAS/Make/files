@@ -37,6 +37,7 @@ $(nutWallFunctions)/nutMEWTWallFunction/nutMEWTWallFunctionFvPatchScalarField.C
 
 epsilonWallFunctions = $(wallFunctions)/epsilonWallFunctions
 $(epsilonWallFunctions)/epsilonWallFunction/epsilonWallFunctionFvPatchScalarField.C
+$(epsilonWallFunctions)/epsilonNonEqWallFunction/epsilonNonEqWallFunctionFvPatchScalarField.C
 
 omegaWallFunctions = $(wallFunctions)/omegaWallFunctions
 $(omegaWallFunctions)/omegaWallFunction/omegaWallFunctionFvPatchScalarField.C
@@ -45,6 +46,7 @@ $(omegaWallFunctions)/omegaMEWTWallFunction/omegaMEWTWallFunctionFvPatchScalarFi
 
 kqRWallFunctions = $(wallFunctions)/kqRWallFunctions
 $(kqRWallFunctions)/kqRWallFunction/kqRWallFunctionFvPatchFields.C
+$(kqRWallFunctions)/kNonEqWallFunction/kNonEqWallFunctionFvPatchScalarField.C
 
 RWallFunctions = $(wallFunctions)/RWallFunctions
 $(RWallFunctions)/RWallFunction/RWallFunctionFvPatchSymmTensorField.C
