@@ -125,14 +125,12 @@ public:
 
     // Member Functions
 
-        // Agglomeration
-
-            //- Select the CoeffField fine-level coefficients
-            //  for the coarse level
-            virtual tmp<CoeffField<Type> > selectBlockCoeffs
-            (
-                const CoeffField<Type>& fineCoeffs
-            ) const;
+        //- Select the CoeffField fine-level coefficients
+        //  for the coarse level
+        virtual tmp<CoeffField<Type> > selectBlockCoeffs
+        (
+            const CoeffField<Type>& fineCoeffs
+        ) const;
 };
 
 
@@ -148,13 +146,13 @@ public:
 #endif
 
 #define makeBlockSAMGInterfaceField(BlockSAMGInterfaceFieldType, typeBlockSAMGInterfaceFieldType) \
-                                                                              \
+                                                                               \
 defineNamedTemplateTypeNameAndDebug(typeBlockSAMGInterfaceFieldType, 0);       \
-                                                                              \
+                                                                               \
 addToRunTimeSelectionTable(BlockSAMGInterfaceFieldType, typeBlockSAMGInterfaceFieldType, lduInterface);
 
-#define makeBlockSAMGInterfaceFields(blockSAMGInterfaceFieldType)               \
-                                                                              \
+#define makeBlockSAMGInterfaceFields(blockSAMGInterfaceFieldType)              \
+                                                                               \
 makeBlockSAMGInterfaceField(blockScalarSAMGInterfaceField, blockSAMGInterfaceFieldType##Scalar); \
 makeBlockSAMGInterfaceField(blockVectorSAMGInterfaceField, blockSAMGInterfaceFieldType##Vector); \
 

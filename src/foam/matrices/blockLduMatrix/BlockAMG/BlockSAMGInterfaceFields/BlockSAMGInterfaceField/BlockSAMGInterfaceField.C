@@ -39,8 +39,8 @@ Foam::BlockSAMGInterfaceField<Type>::selectBlockCoeffs
     (
         new CoeffField<Type>(interface_.size())
     );
-    // CoeffField<Type>& coarseCoeffs = tcoarseCoeffs();
-    /* HJ, code missing
+    CoeffField<Type>& coarseCoeffs = tcoarseCoeffs();
+
     typedef CoeffField<Type> TypeCoeffField;
 
     typedef typename TypeCoeffField::linearTypeField linearTypeField;
@@ -92,7 +92,7 @@ Foam::BlockSAMGInterfaceField<Type>::selectBlockCoeffs
         )   << "Scalar type selection currently not handled"
             << abort(FatalError);
     }
-    */
+
     return tcoarseCoeffs;
 }
 

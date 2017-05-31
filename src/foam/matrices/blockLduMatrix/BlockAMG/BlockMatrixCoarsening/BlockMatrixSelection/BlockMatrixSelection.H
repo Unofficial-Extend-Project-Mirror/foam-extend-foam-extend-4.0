@@ -113,6 +113,13 @@ class BlockMatrixSelection
         //- Disallow default bitwise assignment
         void operator=(const BlockMatrixSelection<Type>&);
 
+        //- Filter prolongation
+        autoPtr<crMatrix> filterProlongation
+        (
+            const crMatrix& prolongationMatrix,
+            const labelList& fineFaceCells
+        ) const;
+    
         //- Calculate restriction and prolongation
         void calcCoarsening();
 
