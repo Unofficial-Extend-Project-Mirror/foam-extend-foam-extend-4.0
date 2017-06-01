@@ -761,8 +761,6 @@ Foam::BlockMatrixSelection<Type>::restrictMatrix() const
     label nCoarseCoeffs = 0;
 
     // Create coarse addressing - owner and neighbour pairs
-    // HJ: give a better guess of size of coarse off-diagonal
-    HashTable<label, labelPair, Hash<labelPair> > coarseOwnNbr;
     DynamicList<label> coarseOwner(nCoarseEqns_);
     DynamicList<label> coarseNeighbour(nCoarseEqns_);
 
@@ -795,9 +793,6 @@ Foam::BlockMatrixSelection<Type>::restrictMatrix() const
     // Loop through rows of R
     for (label ir = 0; ir < nCoarseEqns_; ir++)
     {
-        // THIS MUST BE REMOVED: CHECK IN TESTING
-        coeffLabel = -1;
-
         // Compressed row format - get indices of coeffsR in row ir
         for (label indexR = rowR[ir]; indexR < rowR[ir + 1]; indexR++)
         {
@@ -849,12 +844,6 @@ Foam::BlockMatrixSelection<Type>::restrictMatrix() const
                         if (coeffLabel[jp] != ir)
                         {
                             coeffLabel[jp] = ir;
-
-                            coarseOwnNbr.insert
-                            (
-                                labelPair(ir, jp),
-                                nCoarseCoeffs
-                            );
 
                             coarseOwner.append(ir);
                             coarseNeighbour.append(jp);
@@ -910,12 +899,6 @@ Foam::BlockMatrixSelection<Type>::restrictMatrix() const
                         {
                             coeffLabel[jp] = ir;
 
-                            coarseOwnNbr.insert
-                            (
-                                labelPair(ir, jp),
-                                nCoarseCoeffs
-                            );
-
                             coarseOwner.append(ir);
                             coarseNeighbour.append(jp);
 
@@ -957,12 +940,6 @@ Foam::BlockMatrixSelection<Type>::restrictMatrix() const
                     {
                         coeffLabel[jp] = ir;
 
-                        coarseOwnNbr.insert
-                        (
-                            labelPair(ir, jp),
-                            nCoarseCoeffs
-                        );
-
                         coarseOwner.append(ir);
                         coarseNeighbour.append(jp);
 
@@ -994,7 +971,7 @@ Foam::BlockMatrixSelection<Type>::restrictMatrix() const
     );
 
 //------------------------------------------------------------------------------
-//                      CREATE COARSE MATRIX INTERFACES
+//                       CREATE COARSE MATRIX INTERFACES
 //------------------------------------------------------------------------------
 
     const typename BlockLduInterfaceFieldPtrsList<Type>::Type& interfaceFields =
@@ -1153,9 +1130,43 @@ Foam::BlockMatrixSelection<Type>::restrictMatrix() const
         squareTypeField& activeCoarseDiag = coarseDiag.asSquare();
         squareTypeField& activeCoarseLower = coarseLower.asSquare();
 
+        // Get coarse matrix addressing
+        const unallocLabelList& rowC = coarseMatrix.lduAddr().ownerStartAddr();
+        const unallocLabelList& upperCoarseAddr =
+            coarseMatrix.lduAddr().upperAddr();
+        const unallocLabelList& lowerCoarseAddr =
+            coarseMatrix.lduAddr().lowerAddr();
+        const unallocLabelList& losortCoarseAddr =
+            coarseMatrix.lduAddr().losortAddr();
+        const unallocLabelList& losortCoarseStart =
+            coarseMatrix.lduAddr().losortStartAddr();
+
+        // Re-initialise coeffLabel vector
+        coeffLabel = -1;
+
         // Loop through rows of R
         for (label ir = 0; ir < nCoarseEqns_; ir++)
         {
+            // Doing new row: expand nbr cells into coeffLabel
+
+            // Upper triangle expand
+            for (label coarseK = rowC[ir]; coarseK < rowC[ir + 1]; coarseK++)
+            {
+                coeffLabel[upperCoarseAddr[coarseK]] = coarseK;
+            }
+
+            // Lower triangle expand
+            for
+            (
+                label indexC = losortCoarseStart[ir];
+                indexC < losortCoarseStart[ir + 1];
+                indexC++
+            )
+            {
+                coeffLabel[lowerCoarseAddr[losortCoarseAddr[indexC]]] =
+                    losortCoarseAddr[indexC];
+            }
+            
             // Compressed row format, get indices of coeffsR in row ir
             for (label indexR = rowR[ir]; indexR < rowR[ir + 1]; indexR++)
             {
@@ -1197,8 +1208,7 @@ Foam::BlockMatrixSelection<Type>::restrictMatrix() const
                         if (ir > jp)
                         {
                             // Found lower COARSE triangle
-                            // SEARCH: REMOVE BY CHANGING THE ALGORITHM
-                            label face = coarseOwnNbr[labelPair(jp, ir)];
+                            label face = coeffLabel[jp];
                             activeCoarseLower[face] += ra*coeffP[indexP];
                         }
                         else if (ir == jp)
@@ -1209,8 +1219,7 @@ Foam::BlockMatrixSelection<Type>::restrictMatrix() const
                         else
                         {
                             // Found upper COARSE triangle
-                            // SEARCH: REMOVE BY CHANGING THE ALGORITHM
-                            label face = coarseOwnNbr[labelPair(ir, jp)];
+                            label face = coeffLabel[jp];
                             activeCoarseUpper[face] += ra*coeffP[indexP];
                         }
                     }
@@ -1242,8 +1251,7 @@ Foam::BlockMatrixSelection<Type>::restrictMatrix() const
                         if (ir > jp)
                         {
                             // Found lower COARSE triangle
-                            // SEARCH: REMOVE BY CHANGING THE ALGORITHM
-                            label face = coarseOwnNbr[labelPair(jp, ir)];
+                            label face = coeffLabel[jp];
                             activeCoarseLower[face] += ra*coeffP[indexP];
                         }
                         else if (ir == jp)
@@ -1254,8 +1262,7 @@ Foam::BlockMatrixSelection<Type>::restrictMatrix() const
                         else
                         {
                             // Found upper COARSE triangle
-                            // SEARCH: REMOVE BY CHANGING THE ALGORITHM
-                            label face = coarseOwnNbr[labelPair(ir, jp)];
+                            label face = coeffLabel[jp];
                             activeCoarseUpper[face] += ra*coeffP[indexP];
                         }
                     }
@@ -1276,7 +1283,7 @@ Foam::BlockMatrixSelection<Type>::restrictMatrix() const
                     if (ir > jp)
                     {
                         // Found lower COARSE triangle
-                        label face = coarseOwnNbr[labelPair(jp, ir)];
+                        label face = coeffLabel[jp];
                         activeCoarseLower[face] += ra*coeffP[indexP];
                     }
                     else if (ir == jp)
@@ -1287,10 +1294,28 @@ Foam::BlockMatrixSelection<Type>::restrictMatrix() const
                     else
                     {
                         // Found upper COARSE triangle
-                        label face = coarseOwnNbr[labelPair(ir, jp)];
+                        label face = coeffLabel[jp];
                         activeCoarseUpper[face] += ra*coeffP[indexP];
                     }
                 }
+            }
+
+            // Clean out coeffLabel
+            // Upper triangle expand
+            for (label coarseK = rowC[ir]; coarseK < rowC[ir + 1]; coarseK++)
+            {
+                coeffLabel[upperCoarseAddr[coarseK]] = -1;
+            }
+
+            // Lower triangle expand
+            for
+            (
+                label indexC = losortCoarseStart[ir];
+                indexC < losortCoarseStart[ir + 1];
+                indexC++
+            )
+            {
+                coeffLabel[lowerCoarseAddr[losortCoarseAddr[indexC]]] = -1;
             }
         }
 
