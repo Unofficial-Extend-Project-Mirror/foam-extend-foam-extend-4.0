@@ -67,7 +67,7 @@ Foam::scalar Foam::BlockCoeffTwoNorm<Type>::normalize
 
         linearType diag;
         contractLinear(diag, a.asSquare());
-        
+
         return sign(diag.component(cmpt_))*mag(diag);
     }
     else
@@ -113,7 +113,7 @@ void Foam::BlockCoeffTwoNorm<Type>::normalize
 
         linearTypeField diag(a.size());
         contractLinear(diag, a.asSquare());
-        
+
         b = sign(diag.component(cmpt_))*mag(diag);
     }
     else
