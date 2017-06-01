@@ -66,7 +66,7 @@ class BlockMatrixAgglomeration
         //- Reference to matrix
         const BlockLduMatrix<Type>& matrix_;
 
-        //- Reference to a templated norm calculator
+        //- Norm calculator
         autoPtr<BlockCoeffNorm<Type> > normPtr_;
 
         //- Child array: for each fine equation give agglomeration cluster
