@@ -147,40 +147,24 @@ void Foam::BlockMatrixSelection<Type>::calcCoarsening()
     // Note: not taking norm magnitudes.  HJ, 28/Feb/2017
 
 //------------------------------------------------------------------------------
-//                         CALCULATE COARSENING NORM
+//                              CALCULATE NORM
 //------------------------------------------------------------------------------
 
     // Calculate norm for diagonal coefficients
     scalarField normDiag(nRows);
-    coarseningNormPtr_->normalize(normDiag, matrix_.diag());
+    normPtr_->normalize(normDiag, matrix_.diag());
 
     // Calculate norm for upper triangle coeffs (magUpper)
     scalarField normUpper(col.size());
-    coarseningNormPtr_->normalize(normUpper, matrix_.upper());
+    normPtr_->normalize(normUpper, matrix_.upper());
 
     // Calculate norm for lower triangle coeffs (magLower)
     scalarField normLower(col.size());
-    coarseningNormPtr_->normalize(normLower, matrix_.lower());
+    normPtr_->normalize(normLower, matrix_.lower());
 
     // Calculate norm magnitudes
     scalarField magNormUpper = mag(normUpper);
     scalarField magNormLower = mag(normLower);
-
-//------------------------------------------------------------------------------
-//                        CALCULATE INTERPOLATION NORM
-//------------------------------------------------------------------------------
-
-    // Calculate norm for diagonal coefficients (store into magDiag)
-    scalarField interpolationNormDiag(nRows);
-    interpolationNormPtr_->normalize(interpolationNormDiag, matrix_.diag());
-
-    // Calculate norm for upper triangle coeffs (magUpper)
-    scalarField interpolationNormUpper(col.size());
-    interpolationNormPtr_->normalize(interpolationNormUpper, matrix_.upper());
-
-    // Calculate norm for lower triangle coeffs (magLower)
-    scalarField interpolationNormLower(col.size());
-    interpolationNormPtr_->normalize(interpolationNormLower, matrix_.lower());
 
 //------------------------------------------------------------------------------
 //        CRITERIA FOR COARSENING: FIND STRONG CONNECTIONS FOR EACH ROW
@@ -196,6 +180,8 @@ void Foam::BlockMatrixSelection<Type>::calcCoarsening()
 
     // Create largest norm.  It will be multiplied by epsilon later
     scalarField epsilonStrongCoeff(nRows, 0);
+
+    // Select strongest coefficient in each row
 
     for (register label i = 0; i < nRows; i++)
     {
@@ -298,7 +284,7 @@ void Foam::BlockMatrixSelection<Type>::calcCoarsening()
                 // each row i
                 strongCol[strongRow[i] + strongCoeffCounter[i]] = j;
                 strongCoeff[strongRow[i] + strongCoeffCounter[i]] =
-                    interpolationNormUpper[k];
+                    normUpper[k];
 
                 strongCoeffCounter[i]++;
             }
@@ -310,7 +296,7 @@ void Foam::BlockMatrixSelection<Type>::calcCoarsening()
             {
                 strongCol[strongRow[j] + strongCoeffCounter[j]] = i;
                 strongCoeff[strongRow[j] + strongCoeffCounter[j]] =
-                    interpolationNormLower[k];
+                    normLower[k];
 
                 strongCoeffCounter[j]++;
             }
@@ -429,7 +415,7 @@ void Foam::BlockMatrixSelection<Type>::calcCoarsening()
     scalarField num(nRows, 0);
 
     // Sum of positive elements in row (sign equal to diagonal)
-    scalarField Dii(sign(interpolationNormDiag)*interpolationNormDiag);
+    scalarField Dii(sign(normDiag)*normDiag);
 
     scalar Dij, Dji, den, signDii;
 
@@ -462,7 +448,7 @@ void Foam::BlockMatrixSelection<Type>::calcCoarsening()
         {
             // Get norm of boundary coefficients
             scalarField normCplUpper(matrix_.coupleUpper()[intI].size());
-            interpolationNormPtr_->normalize
+            normPtr_->normalize
             (
                 normCplUpper,
                 matrix_.coupleUpper()[intI]
@@ -478,7 +464,7 @@ void Foam::BlockMatrixSelection<Type>::calcCoarsening()
                 const label i = faceCells[coeffI];
 
                 // Get sign of diagonal coeff
-                scalar signDiag = sign(interpolationNormDiag[i]);
+                scalar signDiag = sign(normDiag[i]);
 
                 // Adjust sign of off-diag coeff
                 // Note: additional minus because the sign of interface
@@ -528,12 +514,12 @@ void Foam::BlockMatrixSelection<Type>::calcCoarsening()
 
         // Handle the unknown sign of diagonal: multiplying
         // row coeffs by the sign
-        signDii = sign(interpolationNormDiag[i]);
+        signDii = sign(normDiag[i]);
 
         for (label k = row[i]; k < row[i + 1]; k++)
         {
             // Adjust sign of off-diag coeff
-            Dij = signDii*interpolationNormUpper[k];
+            Dij = signDii*normUpper[k];
 
             // Add negative coeff to num
             // Add positive coeff to diag to eliminate it
@@ -543,7 +529,7 @@ void Foam::BlockMatrixSelection<Type>::calcCoarsening()
             // Scatter lower triangular contribution
             label j = col[k];
 
-            Dji = sign(interpolationNormDiag[j])*interpolationNormLower[k];
+            Dji = sign(normDiag[j])*normLower[k];
             num[j] += Foam::min(Dji, 0);
             Dii[j] += Foam::max(Dji, 0);
         }
@@ -598,27 +584,27 @@ void Foam::BlockMatrixSelection<Type>::calcCoarsening()
 
     prolongation.coeffs().transfer(pCoeff);
 
-    // Check prolongation matrix
-    {
-        scalarField sumRow(nRows, 0);
-        const labelList& prolongationRow = Pptr_->crAddr().rowStart();
-        const scalarField& prolongationCoeff = Pptr_->coeffs();
+    // // Check prolongation matrix
+    // {
+    //     scalarField sumRow(nRows, 0);
+    //     const labelList& prolongationRow = Pptr_->crAddr().rowStart();
+    //     const scalarField& prolongationCoeff = Pptr_->coeffs();
 
-        for (label rowI = 0; rowI < nRows; rowI++)
-        {
-            for
-            (
-                label colI = prolongationRow[rowI];
-                colI < prolongationRow[rowI + 1];
-                colI++
-            )
-            {
-                sumRow[rowI] += prolongationCoeff[colI];
-            }
-        }
-        Pout<< "sumRow (min, max) = (" << min(sumRow) << " "
-            << max(sumRow) << ")" << endl;
-    }
+    //     for (label rowI = 0; rowI < nRows; rowI++)
+    //     {
+    //         for
+    //         (
+    //             label colI = prolongationRow[rowI];
+    //             colI < prolongationRow[rowI + 1];
+    //             colI++
+    //         )
+    //         {
+    //             sumRow[rowI] += prolongationCoeff[colI];
+    //         }
+    //     }
+    //     Pout<< "sumRow (min, max) = (" << min(sumRow) << " "
+    //         << max(sumRow) << ")" << endl;
+    // }
 
     // The decision on parallel agglomeration needs to be made for the
     // whole gang of processes; otherwise I may end up with a different
@@ -676,14 +662,7 @@ Foam::BlockMatrixSelection<Type>::BlockMatrixSelection
 :
     BlockMatrixCoarsening<Type>(matrix, dict, groupSize, minCoarseEqns),
     matrix_(matrix),
-    coarseningNormPtr_
-    (
-        BlockCoeffNorm<Type>::New(dict.subDict("coarseningNorm"))
-    ),
-    interpolationNormPtr_
-    (
-        BlockCoeffNorm<Type>::New(dict.subDict("interpolationNorm"))
-    ),
+    normPtr_(BlockCoeffNorm<Type>::New(dict)),
     nCoarseEqns_(0),
     coarsen_(false),
     Pptr_(NULL),

@@ -78,15 +78,8 @@ class BlockMatrixSelection
         //- Reference to matrix
         const BlockLduMatrix<Type>& matrix_;
 
-        //- Reference to a templated norm calculator
-        //- INFO: This norm will be calculated for coarsening process (it can be
-        //- arbitrary: component norm, max norm, two norm)
-        autoPtr<BlockCoeffNorm<Type> > coarseningNormPtr_;
-
-        //- Reference to a templated norm calculator
-        //- INFO: This norm will be used for interpolation. Component norm based
-        //- on a representative equation is recommended.
-        autoPtr<BlockCoeffNorm<Type> > interpolationNormPtr_;
+        //- Norm calculator
+        autoPtr<BlockCoeffNorm<Type> > normPtr_;
 
         //- Number of coarse equations
         label nCoarseEqns_;
