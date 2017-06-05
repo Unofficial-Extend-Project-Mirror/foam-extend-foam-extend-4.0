@@ -375,7 +375,7 @@ void Foam::BlockMatrixSelection<Type>::calcCoarsening()
                 }
             }
 
-            // Make all neighbours fine and increment cardinality
+            // Make all neighbours fine and increment weight
             for
             (
                 label k = tRow[topElement];
@@ -389,9 +389,9 @@ void Foam::BlockMatrixSelection<Type>::calcCoarsening()
                 {
                     rowLabel_[j] = FINE;
 
-                    for(label jp = strongRow[j]; jp < strongRow[j + 1]; jp++)
+                    for (label jp = strongRow[j]; jp < strongRow[j + 1]; jp++)
                     {
-                        label kp = strongCol[j];
+                        label kp = strongCol[jp];
 
                         if (rowLabel_[kp] == UNDECIDED)
                         {
@@ -474,7 +474,7 @@ void Foam::BlockMatrixSelection<Type>::calcCoarsening()
                 // Add negative/positive contribution into corresponding field
                 // which contributes to prolongation weight factor
                 Dii[i] += Foam::max(Dij, 0);
-                num[i] += Foam::min(Dij, 0);
+                // num[i] += Foam::min(Dij, 0);   // HJ, HERE!!!
             }
         }
     }
