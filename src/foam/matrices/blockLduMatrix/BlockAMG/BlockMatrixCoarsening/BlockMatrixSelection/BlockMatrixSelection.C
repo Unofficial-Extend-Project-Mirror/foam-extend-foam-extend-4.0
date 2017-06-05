@@ -361,8 +361,6 @@ void Foam::BlockMatrixSelection<Type>::calcCoarsening()
                 k++
             )
             {
-                // label neighbour = col[i]; HJ: is this strongCol or col?
-                // see scalar version
                 label j = strongCol[k];
 
                 if (rowLabel_[j] == UNDECIDED)
