@@ -40,6 +40,7 @@ SourceFiles
 
 #include "lduInterface.H"
 #include "primitiveFieldsFwd.H"
+#include "crMatrix.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -65,6 +66,9 @@ protected:
 
         //- Field transfer buffer
         mutable scalarField fieldTransferBuffer_;
+
+        //- crMatrix transfer buffer
+        mutable crMatrix crMatrixTransferBuffer_;
 
 
 public:
@@ -158,6 +162,12 @@ public:
             const scalarField& fieldTransferBuffer() const
             {
                 return fieldTransferBuffer_;
+            }
+
+            //- Return contents of the crMatrix transfer buffer
+            const crMatrix& crMatrixTransferBuffer() const
+            {
+                return crMatrixTransferBuffer_;
             }
 };
 
