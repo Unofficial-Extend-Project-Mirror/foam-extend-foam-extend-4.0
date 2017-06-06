@@ -23,18 +23,18 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "ggiAMGInterface.H"
+#include "ggiSAMGInterface.H"
 #include "addToRunTimeSelectionTable.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
 namespace Foam
 {
-    defineTypeNameAndDebug(ggiAMGInterface, 0);
+    defineTypeNameAndDebug(ggiSAMGInterface, 0);
     addToRunTimeSelectionTable
     (
-        AMGInterface,
-        ggiAMGInterface,
+        SAMGInterface,
+        ggiSAMGInterface,
         lduInterface
     );
 }
@@ -42,18 +42,18 @@ namespace Foam
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
-void Foam::ggiAMGInterface::initFastReduce() const
+void Foam::ggiSAMGInterface::initFastReduce() const
 {
     if (mapPtr_)
     {
-        FatalErrorIn("void ggiAMGInterface::initFastReduce() const")
+        FatalErrorIn("void ggiSAMGInterface::initFastReduce() const")
             << "map already calculated"
             << abort(FatalError);
     }
 
     if (!Pstream::parRun())
     {
-        FatalErrorIn("void ggiAMGInterface::initFastReduce() const")
+        FatalErrorIn("void ggiSAMGInterface::initFastReduce() const")
             << "Requested calculation of send-receive addressing for a "
             << "serial run.  This is not allowed"
             << abort(FatalError);
@@ -71,6 +71,10 @@ void Foam::ggiAMGInterface::initFastReduce() const
 
         return;
     }
+
+//------------------------------------------------------------------------------
+//     Establish a communication pattern: who are my neighbouring processors?
+//------------------------------------------------------------------------------
 
     // From here on, work on processors within the communicator
     // HJ, 20/Sep/2016
@@ -220,16 +224,16 @@ void Foam::ggiAMGInterface::initFastReduce() const
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-Foam::ggiAMGInterface::ggiAMGInterface
+Foam::ggiSAMGInterface::ggiSAMGInterface
 (
     const lduPrimitiveMesh& lduMesh,
+    const crMatrix& prolongation,
     const lduInterfacePtrsList& coarseInterfaces,
     const lduInterface& fineInterface,
-    const labelField& localRestrictAddressing,
-    const labelField& neighbourRestrictAddressing
+    const crMatrix& nbrInterfaceProlongation
 )
 :
-    AMGInterface(lduMesh),
+    SAMGInterface(lduMesh, prolongation, nbrInterfaceProlongation),
     fineGgiInterface_(refCast<const ggiLduInterface>(fineInterface)),
     zoneSize_(0),
     zoneAddressing_(),
@@ -278,20 +282,19 @@ Foam::ggiAMGInterface::ggiAMGInterface
     // Note: local addressing contains only local faces
     const labelList& fineZa =  fineGgiInterface_.zoneAddressing();
 
-    // Create addressing for neighbour faces.  Note: expandAddrToZone will
-    // expand the addressing to zone size, including communications.
-    // Faces which are not used locally will be marked by NaNs
-    // HJ, 13/Jun/2016
-    labelField neighbourExpandAddressing = neighbourRestrictAddressing;
+    // Create crMatrix for neighbour faces.  Note: expandCrMatrixToZone will
+    // expand the matrix to zone size, including communications.
+    // Faces which are not used locally will be marked by empty rows
+    crMatrix nbrExpandProlongation(nbrInterfaceProlongation);
 
     // Expand neighbour side to get all the data required from other
     // processors.
     // Note: neigbour is now the size of remote zone
     if (!fineGgiInterface_.shadowInterface().localParallel())
     {
-        fineGgiInterface_.shadowInterface().expandAddrToZone
+        fineGgiInterface_.shadowInterface().expandCrMatrixToZone
         (
-            neighbourExpandAddressing
+            nbrExpandProlongation
         );
     }
 
@@ -373,14 +376,22 @@ Foam::ggiAMGInterface::ggiAMGInterface
         // Perform analysis only for local faces
         // HJ, 22/Jun/2016
 
-        label curMasterProc, curSlaveProc;
+        label curMasterProc, curSlaveProc, curSide, nbrSide;
         long curMaster, curSlave;
 
+        // Save weights and columns of restriction and prolongation for master
+        // and slave
+        scalarField restrictionWeights, prolongationWeights;
+        labelList restrictionCol, prolongationCol;
+
+        // ZONE
         forAll (fineZa, fineZaI)
         {
             // Get the local face (from zone) to analyse
             const label ffI = fineZa[fineZaI];
 
+            // Who do I talk to in GGI? Which faces do I hit on the other side
+            // and with which weight?
             const labelList& curFineNbrs = fineAddr[ffI];
             const scalarList& curFineWeigts = fineWeights[ffI];
 
@@ -408,338 +419,199 @@ Foam::ggiAMGInterface::ggiAMGInterface
                 // larger max int, which can be changed on request
                 // HJ, 1/Apr/2009
 
+                // FROM GGI
                 // My label = ffI
                 // Nbr label = nnI
+                // Get the weight and face which I hit on the other side.
+                // I will need to grab the prolongation for each of these cells,
+                // while my restriction stays the same (depending on the address
+                // in the zone - fineZaI)
                 const label nnI = curFineNbrs[nbrI];
                 const scalar curNW = curFineWeigts[nbrI];
 
+                // TU, 05/Jun/2017
+                // For this face - take the column of restriction (row of
+                // prolongation) which corresponds to the face, every element of
+                // this column will multiply the boundary coefficient, then take
+                // neighbour's row of prolongation which coressponds to the
+                // face, multiply with each of the weights and save
+
                 if (fineGgiInterface_.master())
                 {
-                    // Master side
-                    curMaster = localRestrictAddressing[fineZaI];
-                    curMasterProc = Pstream::myProcNo();
-                    curSlave = neighbourExpandAddressing[nnI];
-                    curSlaveProc = neighbourExpandProc[nnI];
+                    curSide = fineZaI;
+                    nbrSide = nnI;
                 }
+                // Slave
                 else
                 {
-                    curMaster = neighbourExpandAddressing[nnI];
-                    curMasterProc = neighbourExpandProc[nnI];
-                    curSlave = localRestrictAddressing[fineZaI];
-                    curSlaveProc = Pstream::myProcNo();
+                    curSide = nnI;
+                    nbrSide = fineZaI;
                 }
 
-                // Code in current master and slave
-                curMaster += procOffset*curMasterProc;
-                curSlave += procOffset*curSlaveProc;
-
-                // Look for the master cell.  If it has already got a face,
-                // add the coefficient to the face.  If not, create a new
-                // face
-                if (neighboursTable.found(curMaster))
+                // Triple product for only one row of prolongation and
+                // restriction - with included weights from GGI
+                for
+                (
+                    label indexR = prolongation.crAddr().rowStart()[curSide];
+                    indexR < prolongation.crAddr().rowStart()[curSide + 1];
+                    indexR++
+                )
                 {
-                    // This master side face already exists
+                    // Grab weight from restriction
+                    scalar rWeight = prolongation.coeffs()[indexR];
 
-                    // Check all current neighbours to see if the current
-                    // slave already exists.  If so, add the coefficient.
-
-                    DynamicList<long, 4>& curNbrs =
-                        neighboursTable.find(curMaster)();
-
-                    DynamicList<label, 4>& curNbrsProc =
-                        nbrsProcTable.find(curMaster)();
-
-                    DynamicList<DynamicList<label, 4>, 4>& curFaceFaces =
-                        faceFaceTable.find(curMaster)();
-
-                    DynamicList<DynamicList<label, 4>, 4>& curFaceFaceNbrs =
-                        faceFaceNbrTable.find(curMaster)();
-
-                    DynamicList<DynamicList<scalar, 4>, 4>& curFaceWeights =
-                        faceFaceWeightsTable.find(curMaster)();
-
-                    // Search for coded neighbour
-                    bool nbrFound = false;
-
-                    forAll (curNbrs, curNbrI)
+                    for
+                    (
+                        label indexP = nbrInterfaceProlongation.crAddr().rowStart()[nbrSide];
+                        indexP < nbrInterfaceProlongation.crAddr().rowStart()[nbrSide + 1];
+                        indexP++
+                    )
                     {
-                        // Check neighbour slave
-                        if (curNbrs[curNbrI] == curSlave)
+                        // Grab weight from prolongation
+                        scalar pWeight = nbrInterfaceProlongation.coeffs()[indexP];
+
+                        // Code in the current master and slave - used for
+                        // identifying the face
+                        curMaster =
+                            prolongation.crAddr().column()[indexP]
+                          + procOffset*curMasterProc;
+                        curSlave =
+                            nbrInterfaceProlongation.crAddr().column()[indexP]
+                          + procOffset*curSlaveProc;
+
+                        if (neighboursTable.found(curMaster))
                         {
-                            nbrFound = true;
-                            curFaceFaces[curNbrI].append(ffI);
-                            curFaceFaceNbrs[curNbrI].append(nbrI);
-                            curFaceWeights[curNbrI].append(curNW);
+                            // This contribution already exists - add the result
+                            // to the existing contribution
 
-                            // New agglomeration pair found in already
-                            // existing pair
+                            // This master side face already exists
+
+                            // Check all current neighbours to see if the current
+                            // slave already exists.  If so, add the coefficient.
+
+                            DynamicList<long, 4>& curNbrs =
+                                neighboursTable.find(curMaster)();
+
+                            DynamicList<label, 4>& curNbrsProc =
+                                nbrsProcTable.find(curMaster)();
+
+                            DynamicList<DynamicList<label, 4>, 4>& curFaceFaces =
+                                faceFaceTable.find(curMaster)();
+
+                            DynamicList<DynamicList<label, 4>, 4>& curFaceFaceNbrs =
+                                faceFaceNbrTable.find(curMaster)();
+
+                            DynamicList<DynamicList<scalar, 4>, 4>& curFaceWeights =
+                                faceFaceWeightsTable.find(curMaster)();
+
+                            // Search for coded neighbour
+                            bool nbrFound = false;
+
+                            forAll (curNbrs, curNbrI)
+                            {
+                                // Check neighbour slave
+                                if (curNbrs[curNbrI] == curSlave)
+                                {
+                                    nbrFound = true;
+                                    curFaceFaces[curNbrI].append(ffI);
+                                    curFaceFaceNbrs[curNbrI].append(nbrI);
+                                    curFaceWeights[curNbrI].append(curNW*pWeight*rWeight);
+
+                                    // New agglomeration pair found in already
+                                    // existing pair
+                                    nAgglomPairs++;
+
+                                    break;
+                                }
+                            }
+
+                            if (!nbrFound)
+                            {
+                                curNbrs.append(curSlave);
+                                curNbrsProc.append(curSlaveProc);
+
+                                DynamicList<label, 4> newFF;
+                                newFF.append(ffI);
+                                curFaceFaces.append(newFF);
+
+                                DynamicList<label, 4> newFNbr;
+                                newFNbr.append(nbrI);
+                                curFaceFaceNbrs.append(newFNbr);
+
+                                DynamicList<scalar, 4> newFW;
+                                newFW.append(curNW*pWeight*rWeight);
+                                curFaceWeights.append(newFW);
+
+                                // New coarse face created for an existing master
+                                nCoarseFaces++;
+                                nAgglomPairs++;
+                            }
+                        }
+                        else
+                        {
+                            // This master has got no neighbours yet.
+                            // Add a neighbour, proc and a coefficient as a
+                            // new list, thus creating a new face
+
+                            DynamicList<long, 4> newNbrs;
+                            newNbrs.append(curSlave);
+                            neighboursTable.insert
+                            (
+                                curMaster,
+                                newNbrs
+                            );
+
+                            DynamicList<label, 4> newNbrsProc;
+                            newNbrsProc.append(curSlaveProc);
+                            nbrsProcTable.insert
+                            (
+                                curMaster,
+                                newNbrsProc
+                            );
+
+                            DynamicList<DynamicList<label, 4>, 4> newFF;
+                            newFF.append(DynamicList<label, 4>());
+                            newFF[0].append(ffI);
+                            faceFaceTable.insert
+                            (
+                                curMaster,
+                                newFF
+                            );
+
+                            DynamicList<DynamicList<label, 4>, 4> newFNbr;
+                            newFNbr.append(DynamicList<label, 4>());
+                            newFNbr[0].append(nbrI);
+                            faceFaceNbrTable.insert
+                            (
+                                curMaster,
+                                newFNbr
+                            );
+
+                            DynamicList<DynamicList<scalar, 4>, 4> newFFWeights;
+                            newFFWeights.append(DynamicList<scalar, 4>());
+                            newFFWeights[0].append(curNW*pWeight*rWeight);
+                            faceFaceWeightsTable.insert
+                            (
+                                curMaster,
+                                newFFWeights
+                            );
+
+                            // New coarse face created for a new master
+                            nCoarseFaces++;
                             nAgglomPairs++;
-
-                            break;
                         }
                     }
-
-                    if (!nbrFound)
-                    {
-                        curNbrs.append(curSlave);
-                        curNbrsProc.append(curSlaveProc);
-
-                        DynamicList<label, 4> newFF;
-                        newFF.append(ffI);
-                        curFaceFaces.append(newFF);
-
-                        DynamicList<label, 4> newFNbr;
-                        newFNbr.append(nbrI);
-                        curFaceFaceNbrs.append(newFNbr);
-
-                        DynamicList<scalar, 4> newFW;
-                        newFW.append(curNW);
-                        curFaceWeights.append(newFW);
-
-                        // New coarse face created for an existing master
-                        nCoarseFaces++;
-                        nAgglomPairs++;
-                    }
-                }
-                else
-                {
-                    // This master has got no neighbours yet.
-                    // Add a neighbour, proc and a coefficient as a
-                    // new list, thus creating a new face
-                    DynamicList<long, 4> newNbrs;
-                    newNbrs.append(curSlave);
-                    neighboursTable.insert
-                    (
-                        curMaster,
-                        newNbrs
-                    );
-
-                    DynamicList<label, 4> newNbrsProc;
-                    newNbrsProc.append(curSlaveProc);
-                    nbrsProcTable.insert
-                    (
-                        curMaster,
-                        newNbrsProc
-                    );
-
-                    DynamicList<DynamicList<label, 4>, 4> newFF;
-                    newFF.append(DynamicList<label, 4>());
-                    newFF[0].append(ffI);
-                    faceFaceTable.insert
-                    (
-                        curMaster,
-                        newFF
-                    );
-
-                    DynamicList<DynamicList<label, 4>, 4> newFNbr;
-                    newFNbr.append(DynamicList<label, 4>());
-                    newFNbr[0].append(nbrI);
-                    faceFaceNbrTable.insert
-                    (
-                        curMaster,
-                        newFNbr
-                    );
-
-                    DynamicList<DynamicList<scalar, 4>, 4> newFFWeights;
-                    newFFWeights.append(DynamicList<scalar, 4>());
-                    newFFWeights[0].append(curNW);
-                    faceFaceWeightsTable.insert
-                    (
-                        curMaster,
-                        newFFWeights
-                    );
-
-                    // New coarse face created for a new master
-                    nCoarseFaces++;
-                    nAgglomPairs++;
                 }
             } // end for all current neighbours
         } // end for all fine faces
     }
+//------------------------------------------------------------------------------
+//                               RUBBISH FROM HERE
+//------------------------------------------------------------------------------
     else
     {
-        // Coarse level, addressing is stored in faceCells
-        // This addressing defines which faces from zone are local
-
-        // Perform analysis only for local faces
-        // HJ, 22/Jun/2016
-
-        label curMasterProc, curSlaveProc;
-        long curMaster, curSlave;
-
-        forAll (fineZa, fineZaI)
-        {
-            // Get the local face (from zone) to analyse
-            const label ffI = fineZa[fineZaI];
-
-            curMaster = -1;
-            curMasterProc = -1;
-            curSlave = -1;
-            curSlaveProc = -1;
-
-            // Note.  Signalling in global clustering requires
-            // me to recognise clustering from separate
-            // processors as separate.  In the first phase,
-            // this will be used to recognise cluster from
-            // each processor as separate and in the second
-            // phase it will be used to filter local processor
-            // faces from the global patch.  Currently, I am
-            // calculating unique cluster index as:
-            //
-            // id = cluster + procOffset*myProcID
-            //
-            // With procOffset = 1 million, this should be
-            // sufficient for 2000 CPUs with 2 million coarse
-            // cells each.  For larger numbers, I need a
-            // larger max int, which can be changed on request
-            // HJ, 1/Apr/2009
-
-            if (fineGgiInterface_.master())
-            {
-                // Master side
-                curMaster = localRestrictAddressing[fineZaI];
-                curMasterProc = Pstream::myProcNo();
-                curSlave = neighbourExpandAddressing[ffI];
-                curSlaveProc = neighbourExpandProc[ffI];
-            }
-            else
-            {
-                curMaster = neighbourExpandAddressing[ffI];
-                curMasterProc = neighbourExpandProc[ffI];
-                curSlave = localRestrictAddressing[fineZaI];
-                curSlaveProc = Pstream::myProcNo();
-            }
-
-            // Code in current master and slave
-            curMaster += procOffset*curMasterProc;
-            curSlave += procOffset*curSlaveProc;
-
-            // Look for the master cell.  If it has already got a face,
-            // add the coefficient to the face.  If not, create a new face.
-            if (neighboursTable.found(curMaster))
-            {
-                // This master side face already exists
-
-                // Check all current neighbours to see if the current slave
-                // already exists and if so, add the fine face
-                // to the agglomeration.
-
-                DynamicList<long, 4>& curNbrs =
-                    neighboursTable.find(curMaster)();
-
-                DynamicList<label, 4>& curNbrsProc =
-                    nbrsProcTable.find(curMaster)();
-
-                DynamicList<DynamicList<label, 4>, 4>& curFaceFaces =
-                    faceFaceTable.find(curMaster)();
-
-                DynamicList<DynamicList<label, 4>, 4>& curFaceFaceNbrs =
-                    faceFaceNbrTable.find(curMaster)();
-
-                DynamicList<DynamicList<scalar, 4>, 4>& curFaceWeights =
-                    faceFaceWeightsTable.find(curMaster)();
-
-                // Search for coded neighbour
-                bool nbrFound = false;
-
-                forAll (curNbrs, curNbrI)
-                {
-                    // Check neighbour slave
-                    if (curNbrs[curNbrI] == curSlave)
-                    {
-                        nbrFound = true;
-                        curFaceFaces[curNbrI].append(ffI);
-                        // Add dummy nbr
-                        curFaceFaceNbrs[curNbrI].append(0);
-                        // Add dummy weight
-                        curFaceWeights[curNbrI].append(1.0);
-
-                        // New agglomeration pair found in already
-                        // existing pair
-                        nAgglomPairs++;
-
-                        break;
-                    }
-                }
-
-                if (!nbrFound)
-                {
-                    curNbrs.append(curSlave);
-                    curNbrsProc.append(curSlaveProc);
-
-                    DynamicList<label, 4> newFF;
-                    newFF.append(ffI);
-                    curFaceFaces.append(newFF);
-
-                    // Add dummy nbr
-                    DynamicList<label, 4> newFNbr;
-                    newFNbr.append(0);
-                    curFaceFaceNbrs.append(newFNbr);
-
-                    // Add dummy weight
-                    DynamicList<scalar, 4> newFW;
-                    newFW.append(1.0);
-                    curFaceWeights.append(newFW);
-
-                    // New coarse face created for an existing master
-                    nCoarseFaces++;
-                    nAgglomPairs++;
-                }
-            }
-            else
-            {
-                // This master has got no neighbours yet.  Add a neighbour
-                // and a coefficient, thus creating a new face
-                DynamicList<long, 4> newNbrs;
-                newNbrs.append(curSlave);
-                neighboursTable.insert
-                (
-                    curMaster,
-                    newNbrs
-                );
-
-                DynamicList<label, 4> newNbrsProc;
-                newNbrsProc.append(curSlaveProc);
-                nbrsProcTable.insert
-                (
-                    curMaster,
-                    newNbrsProc
-                );
-
-                DynamicList<DynamicList<label, 4>, 4> newFF;
-                newFF.append(DynamicList<label, 4>());
-                newFF[0].append(ffI);
-                faceFaceTable.insert
-                (
-                    curMaster,
-                    newFF
-                );
-
-                // Add dummy nbr
-                DynamicList<DynamicList<label, 4>, 4> newFNbr;
-                newFNbr.append(DynamicList<label, 4>());
-                newFNbr[0].append(0);
-                faceFaceNbrTable.insert
-                (
-                    curMaster,
-                    newFNbr
-                );
-
-                // Add dummy weight
-                DynamicList<DynamicList<scalar, 4>, 4> newFFWeights;
-                newFFWeights.append(DynamicList<scalar, 4>());
-                newFFWeights[0].append(1.0);
-                faceFaceWeightsTable.insert
-                (
-                    curMaster,
-                    newFFWeights
-                );
-
-                // New coarse face created for a new master
-                nCoarseFaces++;
-                nAgglomPairs++;
-            }
-        } // end for all fine faces
+        Info << "Not yet implementedi Copy from above and remove weights from GGI" << endl;
+                                                 
     } // end of else in fine level (coarse level)
 
     // Since only local faces are analysed, lists can now be resized
@@ -959,8 +831,8 @@ Foam::ggiAMGInterface::ggiAMGInterface
         // the matrix, as the coarse matrix assembly is not complete yet.
         // Further, master has got a lower index in the list, meaning that
         // it has already completed the assembly
-        const ggiAMGInterface& shadowGGI =
-            refCast<const ggiAMGInterface>(coarseInterfaces[shadowIndex()]);
+        const ggiSAMGInterface& shadowGGI =
+            refCast<const ggiSAMGInterface>(coarseInterfaces[shadowIndex()]);
 
         const labelListList& masterProcMasterFaces =
             shadowGGI.procMasterFaces();
@@ -1044,7 +916,7 @@ Foam::ggiAMGInterface::ggiAMGInterface
 
 // * * * * * * * * * * * * * * * * Destructor * * * * * * * * * * * * * * * //
 
-Foam::ggiAMGInterface::~ggiAMGInterface()
+Foam::ggiSAMGInterface::~ggiSAMGInterface()
 {
     deleteDemandDrivenData(mapPtr_);
 }
@@ -1052,100 +924,50 @@ Foam::ggiAMGInterface::~ggiAMGInterface()
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-Foam::tmp<Foam::scalarField> Foam::ggiAMGInterface::agglomerateCoeffs
-(
-    const scalarField& fineCoeffs
-) const
-{
-    // HJ, HERE THIS SHOULD BE REMOVED: NO LONGER NEEDED BECAUSE ALL ADDRESSING IS LOCAL
-
-    // Note: reconsider better parallel communication here.
-    // Currently expanding to full zone size
-    // HJ, 16/Mar/2016
-
-    // Reassemble fine coefficients to full fine zone size
-    // No need to initialise to zero, as only local coefficients
-    // are used.  HJ, 9/Jun/2016
-    scalarField zoneFineCoeffs(fineGgiInterface_.zoneSize());
-
-    const labelList& fineZa = fineGgiInterface_.zoneAddressing();
-
-    forAll (fineZa, i)
-    {
-        zoneFineCoeffs[fineZa[i]] = fineCoeffs[i];
-    }
-
-    // Reduce zone data is not required: all coefficients are local
-    // HJ, 9/Jun/2016
-
-    scalarField zoneCoarseCoeffs(zoneSize(), 0);
-
-    // Restrict coefficient
-    forAll (restrictAddressing_, ffi)
-    {
-        zoneCoarseCoeffs[restrictAddressing_[ffi]] +=
-            restrictWeights_[ffi]*zoneFineCoeffs[fineAddressing_[ffi]];
-    }
-
-    tmp<scalarField> tcoarseCoeffs(new scalarField(size(), 0.0));
-    scalarField& coarseCoeffs = tcoarseCoeffs();
-
-    // Filter zone coefficients to local field
-    const labelList& za = zoneAddressing();
-
-    forAll (za, i)
-    {
-        coarseCoeffs[i] = zoneCoarseCoeffs[za[i]];
-    }
-
-    return tcoarseCoeffs;
-}
-
-
-bool Foam::ggiAMGInterface::master() const
+bool Foam::ggiSAMGInterface::master() const
 {
     return fineGgiInterface_.master();
 }
 
 
-bool Foam::ggiAMGInterface::fineLevel() const
+bool Foam::ggiSAMGInterface::fineLevel() const
 {
     return false;
 }
 
 
-Foam::label Foam::ggiAMGInterface::shadowIndex() const
+Foam::label Foam::ggiSAMGInterface::shadowIndex() const
 {
     return fineGgiInterface_.shadowIndex();
 }
 
 
-const Foam::ggiLduInterface& Foam::ggiAMGInterface::shadowInterface() const
+const Foam::ggiLduInterface& Foam::ggiSAMGInterface::shadowInterface() const
 {
     return refCast<const ggiLduInterface>(ldu().interfaces()[shadowIndex()]);
 }
 
 
-Foam::label Foam::ggiAMGInterface::interfaceSize() const
+Foam::label Foam::ggiSAMGInterface::interfaceSize() const
 {
     return faceCells_.size();
 }
 
-Foam::label Foam::ggiAMGInterface::zoneSize() const
+Foam::label Foam::ggiSAMGInterface::zoneSize() const
 {
     return zoneSize_;
 }
 
 
-const Foam::labelList& Foam::ggiAMGInterface::zoneAddressing() const
+const Foam::labelList& Foam::ggiSAMGInterface::zoneAddressing() const
 {
     return zoneAddressing_;
 }
 
 
-const Foam::labelListList& Foam::ggiAMGInterface::addressing() const
+const Foam::labelListList& Foam::ggiSAMGInterface::addressing() const
 {
-    FatalErrorIn("const labelListList& ggiAMGInterface::addressing() const")
+    FatalErrorIn("const labelListList& ggiSAMGInterface::addressing() const")
         << "Requested fine addressing at coarse level"
         << abort(FatalError);
 
@@ -1153,13 +975,13 @@ const Foam::labelListList& Foam::ggiAMGInterface::addressing() const
 }
 
 
-bool Foam::ggiAMGInterface::localParallel() const
+bool Foam::ggiSAMGInterface::localParallel() const
 {
     return fineGgiInterface_.localParallel();
 }
 
 
-const Foam::labelListList& Foam::ggiAMGInterface::procMasterFaces() const
+const Foam::labelListList& Foam::ggiSAMGInterface::procMasterFaces() const
 {
     if (!master())
     {
@@ -1174,7 +996,7 @@ const Foam::labelListList& Foam::ggiAMGInterface::procMasterFaces() const
 }
 
 
-const Foam::mapDistribute& Foam::ggiAMGInterface::map() const
+const Foam::mapDistribute& Foam::ggiSAMGInterface::map() const
 {
     if (!mapPtr_)
     {
@@ -1185,9 +1007,9 @@ const Foam::mapDistribute& Foam::ggiAMGInterface::map() const
 }
 
 
-const Foam::scalarListList& Foam::ggiAMGInterface::weights() const
+const Foam::scalarListList& Foam::ggiSAMGInterface::weights() const
 {
-    FatalErrorIn("const labelListList& ggiAMGInterface::weights() const")
+    FatalErrorIn("const labelListList& ggiSAMGInterface::weights() const")
         << "Requested fine addressing at coarse level"
         << abort(FatalError);
 
@@ -1195,19 +1017,19 @@ const Foam::scalarListList& Foam::ggiAMGInterface::weights() const
 }
 
 
-const Foam::tensorField& Foam::ggiAMGInterface::forwardT() const
+const Foam::tensorField& Foam::ggiSAMGInterface::forwardT() const
 {
     return fineGgiInterface_.forwardT();
 }
 
 
-const Foam::tensorField& Foam::ggiAMGInterface::reverseT() const
+const Foam::tensorField& Foam::ggiSAMGInterface::reverseT() const
 {
     return fineGgiInterface_.reverseT();
 }
 
 
-void Foam::ggiAMGInterface::initTransfer
+void Foam::ggiSAMGInterface::initTransfer
 (
     const Pstream::commsTypes commsType,
     const unallocLabelList& interfaceData
@@ -1218,7 +1040,7 @@ void Foam::ggiAMGInterface::initTransfer
 }
 
 
-Foam::tmp<Foam::labelField> Foam::ggiAMGInterface::transfer
+Foam::tmp<Foam::labelField> Foam::ggiSAMGInterface::transfer
 (
     const Pstream::commsTypes,
     const unallocLabelList& interfaceData
@@ -1229,7 +1051,7 @@ Foam::tmp<Foam::labelField> Foam::ggiAMGInterface::transfer
 }
 
 
-void Foam::ggiAMGInterface::initInternalFieldTransfer
+void Foam::ggiSAMGInterface::initInternalFieldTransfer
 (
     const Pstream::commsTypes commsType,
     const unallocLabelList& iF
@@ -1240,7 +1062,7 @@ void Foam::ggiAMGInterface::initInternalFieldTransfer
 }
 
 
-Foam::tmp<Foam::labelField> Foam::ggiAMGInterface::internalFieldTransfer
+Foam::tmp<Foam::labelField> Foam::ggiSAMGInterface::internalFieldTransfer
 (
     const Pstream::commsTypes,
     const unallocLabelList&
@@ -1250,7 +1072,7 @@ Foam::tmp<Foam::labelField> Foam::ggiAMGInterface::internalFieldTransfer
 }
 
 
-void Foam::ggiAMGInterface::initInternalFieldTransfer
+void Foam::ggiSAMGInterface::initInternalFieldTransfer
 (
     const Pstream::commsTypes commsType,
     const scalarField& iF
@@ -1263,7 +1085,7 @@ void Foam::ggiAMGInterface::initInternalFieldTransfer
 }
 
 
-Foam::tmp<Foam::scalarField> Foam::ggiAMGInterface::internalFieldTransfer
+Foam::tmp<Foam::scalarField> Foam::ggiSAMGInterface::internalFieldTransfer
 (
     const Pstream::commsTypes,
     const scalarField&
@@ -1273,7 +1095,7 @@ Foam::tmp<Foam::scalarField> Foam::ggiAMGInterface::internalFieldTransfer
 }
 
 
-void Foam::ggiAMGInterface::expandAddrToZone(labelField& lf) const
+void Foam::ggiSAMGInterface::expandAddrToZone(labelField& lf) const
 {
     if (!localParallel())
     {
@@ -1282,17 +1104,40 @@ void Foam::ggiAMGInterface::expandAddrToZone(labelField& lf) const
 }
 
 
-void Foam::ggiAMGInterface::expandCrMatrixToZone(crMatrix&) const
+void Foam::ggiSAMGInterface::expandCrMatrixToZone(crMatrix&) const
 {
-    // This code should be available only in SAMG interfaces
-    // However, because of the base-level lduInterface, the function
-    // needs to be duplicated.
-    // HJ, 6/Jun/2017
-    notImplemented
-    (
-        "void ggiAMGInterface::expandCrMatrixToZone(crMatrix&) const"
-    );
+    if (!localParallel())
+    {
+        notImplemented("expandCrMatrixToZone");
+        // Code missing: collapse crMatrices into a zone crMatrix
+    }
 }
 
+
+void Foam::ggiSAMGInterface::initProlongationTransfer
+(
+    const Pstream::commsTypes commsType,
+    const crMatrix& filteredP
+) const
+{
+    // Send prolongation matrix, using IOstream operators
+    //OPstream toNbr(Pstream::blocking, neighbProcNo());
+    //toNbr<< filteredP;
+}
+
+
+Foam::autoPtr<Foam::crMatrix>
+Foam::ggiSAMGInterface::prolongationTransfer
+(
+    const Pstream::commsTypes commsType,
+    const crMatrix& filteredP
+) const
+{
+    //IPstream fromNbr(Pstream::blocking, neighbProcNo());
+
+    autoPtr<crMatrix> tnbrP(new crMatrix(5,5, labelList(5,1)));
+
+    return tnbrP;
+}
 
 // ************************************************************************* //

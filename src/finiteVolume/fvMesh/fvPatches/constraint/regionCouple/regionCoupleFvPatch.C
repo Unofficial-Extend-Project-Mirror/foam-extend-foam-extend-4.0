@@ -332,6 +332,16 @@ void Foam::regionCoupleFvPatch::expandAddrToZone(labelField& lf) const
 }
 
 
+void Foam::regionCoupleFvPatch::expandCrMatrixToZone(crMatrix&) const
+{
+    // Missing code.  Activate for SAMG solvers across regionCoupleFvPatch
+    notImplemented
+    (
+        "void regionCoupleFvPatch::expandCrMatrixToZone(crMatrix&) const"
+    );
+}
+
+
 Foam::tmp<Foam::labelField> Foam::regionCoupleFvPatch::interfaceInternalField
 (
     const unallocLabelList& internalData

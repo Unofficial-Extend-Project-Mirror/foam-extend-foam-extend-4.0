@@ -283,6 +283,13 @@ void Foam::ggiFvPatch::expandAddrToZone(labelField& lf) const
 }
 
 
+void Foam::ggiFvPatch::expandCrMatrixToZone(crMatrix&) const
+{
+    // Code missing.  HJ, 6/Jun/2017
+    notImplemented("void ggiFvPatch::expandCrMatrixToZone(crMatrix&) const");
+}
+
+
 Foam::tmp<Foam::labelField> Foam::ggiFvPatch::interfaceInternalField
 (
     const unallocLabelList& internalData

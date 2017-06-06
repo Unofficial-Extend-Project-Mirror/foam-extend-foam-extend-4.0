@@ -132,6 +132,10 @@ public:
         //  Used in optimised AMG coarsening
         virtual void expandAddrToZone(labelField&) const = 0;
 
+        //- Expand crMatrix to zone
+        //  Used in optimised SAMG coarsening
+        virtual void expandCrMatrixToZone(crMatrix&) const = 0;
+
 
         // Communications support
 

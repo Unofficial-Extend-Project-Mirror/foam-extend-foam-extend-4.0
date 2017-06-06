@@ -314,6 +314,7 @@ SAMGInterfaces = $(AMG)/interfaces/SAMGInterfaces
 $(SAMGInterfaces)/SAMGInterface/SAMGInterface.C
 $(SAMGInterfaces)/SAMGInterface/newSAMGInterface.C
 $(SAMGInterfaces)/processorSAMGInterface/processorSAMGInterface.C
+$(SAMGInterfaces)/ggiSAMGInterface/ggiSAMGInterface.C
 
 AMGInterfaceFields = $(AMG)/interfaceFields/AMGInterfaceFields
 $(AMGInterfaceFields)/AMGInterfaceField/AMGInterfaceField.C

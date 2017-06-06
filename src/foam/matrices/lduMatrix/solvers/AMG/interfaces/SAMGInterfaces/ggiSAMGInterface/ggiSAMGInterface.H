@@ -22,26 +22,27 @@ License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    Foam::ggiAMGInterface
+    Foam::ggiSAMGInterface
 
 Description
-    AMG agglomerated ggi interface.
+    AMG selected ggi interface.
 
 Author
     Hrvoje Jasak, Wikki Ltd.  All rights reserved.
 
 SourceFiles
-    ggiAMGInterface.C
+    ggiSAMGInterface.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef ggiAMGInterface_H
-#define ggiAMGInterface_H
+#ifndef ggiSAMGInterface_H
+#define ggiSAMGInterface_H
 
-#include "AMGInterface.H"
+#include "SAMGInterface.H"
 #include "ggiLduInterface.H"
 #include "mapDistribute.H"
-
+#include "crMatrix.H"
+#include "lduInterface.H"
 #include "cpuTime.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -50,12 +51,12 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                     Class ggiAMGInterface Declaration
+                        Class ggiSAMGInterface Declaration
 \*---------------------------------------------------------------------------*/
 
-class ggiAMGInterface
+class ggiSAMGInterface
 :
-    public AMGInterface,
+    public SAMGInterface,
     virtual public ggiLduInterface
 {
     // Private data
@@ -94,10 +95,10 @@ class ggiAMGInterface
     // Private Member Functions
 
         //- Disallow default bitwise copy construct
-        ggiAMGInterface(const ggiAMGInterface&);
+        ggiSAMGInterface(const ggiSAMGInterface&);
 
         //- Disallow default bitwise assignment
-        void operator=(const ggiAMGInterface&);
+        void operator=(const ggiSAMGInterface&);
 
 
         //- Init fast reduce
@@ -121,20 +122,20 @@ public:
 
     // Constructors
 
-        //- Construct from fine level interface,
-        //  local and neighbour restrict addressing
-        ggiAMGInterface
+        //- Construct from fine-level interface,
+        //  local and neighbour row label
+        ggiSAMGInterface
         (
             const lduPrimitiveMesh& lduMesh,
+            const crMatrix& prolongation,
             const lduInterfacePtrsList& coarseInterfaces,
             const lduInterface& fineInterface,
-            const labelField& localRestrictAddressing,
-            const labelField& neighbourRestrictAddressing
+            const crMatrix& nbrInterfaceProlongation
         );
 
 
     //- Destructor
-    virtual ~ggiAMGInterface();
+    virtual ~ggiSAMGInterface();
 
 
     // Member Functions
@@ -161,15 +162,6 @@ public:
             {
                 return tag_;
             }
-
-
-        // Agglomeration
-
-            //- Agglomerating the given fine-level coefficients and return
-            virtual tmp<scalarField> agglomerateCoeffs
-            (
-                const scalarField& fineCoeffs
-            ) const;
 
 
         // Interface transfer functions
@@ -208,7 +200,7 @@ public:
                 const unallocLabelList& interfaceData
             ) const;
 
-            //- Initialise transfer of internal field adjacent to the interface
+            //- Initialise neighbour field transfer
             virtual void initInternalFieldTransfer
             (
                 const Pstream::commsTypes commsType,
@@ -232,6 +224,21 @@ public:
             (
                 const Pstream::commsTypes commsType,
                 const scalarField& iF
+            ) const;
+
+            //- Initialise transfer of prolongation matrix to the interface
+            virtual void initProlongationTransfer
+            (
+                const Pstream::commsTypes commsType,
+                const crMatrix& P
+            ) const;
+
+            //- Transfer and return prolongation matrix adjacent to
+            //  the interface
+            virtual autoPtr<crMatrix> prolongationTransfer
+            (
+                const Pstream::commsTypes commsType,
+                const crMatrix& P
             ) const;
 
 
@@ -300,7 +307,7 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-#   include "ggiAMGInterfaceTemplates.C"
+#   include "ggiSAMGInterfaceTemplates.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
