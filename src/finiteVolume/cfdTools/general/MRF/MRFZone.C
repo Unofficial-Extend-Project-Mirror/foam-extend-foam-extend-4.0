@@ -37,7 +37,7 @@ using namespace Foam::mathematicalConstant;
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-defineTypeNameAndDebug(Foam::MRFZone, 1);
+defineTypeNameAndDebug(Foam::MRFZone, 0);
 
 
 const Foam::debug::tolerancesSwitch Foam::MRFZone::rotAngle_
