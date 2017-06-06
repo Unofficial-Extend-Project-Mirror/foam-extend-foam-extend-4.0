@@ -262,17 +262,8 @@ public:
         );
 
 
-    // Destructor
-
-        virtual ~PrimitivePatch();
-
-        void clearOut();
-
-        void clearGeom();
-
-        void clearTopology();
-
-        void clearPatchMeshAddr();
+    //- Destructor
+    virtual ~PrimitivePatch();
 
 
     // Member Functions
@@ -471,6 +462,21 @@ public:
 
             //- Correct patch after moving points
             virtual void movePoints(const Field<PointType>&);
+
+
+        // Clear functions
+
+            //- Clear everything
+            void clearOut();
+
+            //- Clear geometry
+            void clearGeom();
+
+            //- Clear topology
+            void clearTopology();
+
+            //- Clear patch-to-mesh addressing
+            void clearPatchMeshAddr();
 
 
     // Member operators
