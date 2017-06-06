@@ -37,24 +37,21 @@ void Foam::MRFZone::relativeRhoFlux
     surfaceScalarField& phi
 ) const
 {
-    const surfaceVectorField& Cf = mesh_.Cf();
-    const surfaceVectorField& Sf = mesh_.Sf();
-
-    const vector& origin = origin_.value();
-    const vector rotVel = Omega();
-
-    // Internal faces
-    const vectorField& CfIn = Cf.internalField();
-    const vectorField& SfIn = Sf.internalField();
+    // Get mesh velocity calculated from virtual mesh motion
+    // HJ, 6/Jun/2017
+    const surfaceScalarField& meshVel = meshVelocity();
 
     register label faceI, patchFaceI;
+
+    // Internal faces
+    scalarField& phiIn = phi.internalField();
+    const scalarField& meshVelIn = meshVel.internalField();
 
     forAll (internalFaces_, i)
     {
         faceI = internalFaces_[i];
 
-        phi[faceI] -=
-            rho[faceI]*(rotVel ^ (CfIn[faceI] - origin)) & SfIn[faceI];
+        phiIn[faceI] -= rho[faceI]*meshVelIn[faceI];
     }
 
     // Included patches: reset the flux to exactly zero to avoid
@@ -65,7 +62,7 @@ void Foam::MRFZone::relativeRhoFlux
         {
             patchFaceI = includedFaces_[patchI][i];
 
-            phi.boundaryField()[patchI][patchFaceI] = 0.0;
+            phi.boundaryField()[patchI][patchFaceI] = 0;
         }
     }
 
@@ -77,9 +74,8 @@ void Foam::MRFZone::relativeRhoFlux
             patchFaceI = excludedFaces_[patchI][i];
 
             phi.boundaryField()[patchI][patchFaceI] -=
-                rho.boundaryField()[patchI][patchFaceI]
-               *(rotVel ^ (Cf.boundaryField()[patchI][patchFaceI] - origin))
-              & Sf.boundaryField()[patchI][patchFaceI];
+                rho.boundaryField()[patchI][patchFaceI]*
+                meshVel.boundaryField()[patchI][patchFaceI];
         }
     }
 }
@@ -92,23 +88,21 @@ void Foam::MRFZone::absoluteRhoFlux
     surfaceScalarField& phi
 ) const
 {
-    const surfaceVectorField& Cf = mesh_.Cf();
-    const surfaceVectorField& Sf = mesh_.Sf();
-
-    const vector& origin = origin_.value();
-    const vector rotVel = Omega();
-
-    // Internal faces
-    const vectorField& CfIn = Cf.internalField();
-    const vectorField& SfIn = Sf.internalField();
+    // Get mesh velocity calculated from virtual mesh motion
+    // HJ, 6/Jun/2017
+    const surfaceScalarField& meshVel = meshVelocity();
 
     register label faceI, patchFaceI;
+
+    // Internal faces
+    scalarField& phiIn = phi.internalField();
+    const scalarField& meshVelIn = meshVel.internalField();
 
     forAll (internalFaces_, i)
     {
         faceI = internalFaces_[i];
-        
-        phi[faceI] += (rotVel ^ (CfIn[faceI] - origin)) & SfIn[faceI];
+
+        phiIn[faceI] += meshVelIn[faceI];
     }
 
     // Included patches
@@ -119,8 +113,7 @@ void Foam::MRFZone::absoluteRhoFlux
             patchFaceI = includedFaces_[patchI][i];
 
             phi.boundaryField()[patchI][patchFaceI] +=
-                (rotVel ^ (Cf.boundaryField()[patchI][patchFaceI] - origin))
-              & Sf.boundaryField()[patchI][patchFaceI];
+                meshVel.boundaryField()[patchI][patchFaceI];
         }
     }
 
@@ -132,8 +125,7 @@ void Foam::MRFZone::absoluteRhoFlux
             patchFaceI = excludedFaces_[patchI][i];
 
             phi.boundaryField()[patchI][patchFaceI] +=
-                (rotVel ^ (Cf.boundaryField()[patchI][patchFaceI] - origin))
-              & Sf.boundaryField()[patchI][patchFaceI];
+                meshVel.boundaryField()[patchI][patchFaceI];
         }
     }
 }

@@ -104,6 +104,20 @@ class MRFZone
         //- Ramping time scale
         scalar rampTime_;
 
+        //- Mesh velocity
+        //  Note: for precise calculation of the mesh velocity on bad meshes
+        //  the velocity is calculated from the swept volume
+        mutable surfaceScalarField* meshVelocityPtr_;
+
+        //- Time for which mesh velocity is calculated
+        mutable scalar meshVelTime_;
+    
+
+    // Private Static Data
+
+        //- Rotational angle in degrees used to determine the time-step size
+        static const debug::tolerancesSwitch rotAngle_;
+
 
     // Private Member Functions
 
@@ -116,6 +130,10 @@ class MRFZone
 
         //- Divide faces in frame according to patch
         void setMRFFaces();
+
+        //- Calculate mesh velocity
+        void calcMeshVelocity() const;
+
 
         //- Make the given absolute mass/vol flux relative within MRF region
         template<class RhoFieldType>
@@ -171,6 +189,9 @@ public:
             }
         };
 
+    //- Destructor
+    ~MRFZone();
+
 
     // Member Functions
 
@@ -197,11 +218,14 @@ public:
             //- Return rotational vector
             vector Omega() const;
 
-            //- Return the MRFZone omega as a dimensionedScalar
+            //- Return the MRFZone omega
             const dimensionedScalar& omega() const
             {
                 return omega_;
             }
+
+            //- Return mesh velocity for all faces
+            const surfaceScalarField& meshVelocity() const;
 
 
     // Member functions used in a top level solver
@@ -209,6 +233,9 @@ public:
         //- Update the mesh corresponding to given map
         void updateMesh(const mapPolyMesh& mpm)
         {
+            // Clear mesh velocity
+            deleteDemandDrivenData(meshVelocityPtr_);
+            
             // Only updates face addressing
             setMRFFaces();
         }
