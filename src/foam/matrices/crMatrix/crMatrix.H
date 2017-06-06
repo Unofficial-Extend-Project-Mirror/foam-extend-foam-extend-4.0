@@ -67,6 +67,9 @@ public:
 
     // Constructors
 
+        //- Construct null
+        crMatrix();
+
         //- Construct from addressing
         crMatrix(const crAddressing& addr);
 

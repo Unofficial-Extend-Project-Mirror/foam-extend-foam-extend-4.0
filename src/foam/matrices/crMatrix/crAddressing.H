@@ -69,6 +69,7 @@ class crAddressing
         //- Column index array
         labelList column_;
 
+
     // Private Member Functions
 
         //- Set row sizes
@@ -78,6 +79,9 @@ class crAddressing
 public:
 
     // Constructors
+
+        //- Construct null
+        crAddressing();
 
         //- Construct given size.  Column and coefficients set later
         crAddressing

@@ -65,6 +65,19 @@ void Foam::crAddressing::setRowSizes(const labelList& rowSizes)
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
+// Construct null
+Foam::crAddressing::crAddressing()
+:
+    refCount(),
+    nRows_(0),
+    nCols_(0),
+    rowStart_(1),
+    column_(0)
+{
+    rowStart_[0] = 1;
+}
+
+
 // Construct from given size
 Foam::crAddressing::crAddressing
 (

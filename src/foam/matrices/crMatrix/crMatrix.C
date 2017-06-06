@@ -36,6 +36,15 @@ Author
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
+// Construct null
+Foam::crMatrix::crMatrix()
+:
+    refCount(),
+    crAddr_(),
+    coeffs_()
+{}
+
+
 // Construct from addressing
 Foam::crMatrix::crMatrix(const crAddressing& addr)
 :
