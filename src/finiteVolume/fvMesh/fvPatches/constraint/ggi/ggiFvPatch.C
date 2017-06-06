@@ -340,5 +340,27 @@ Foam::tmp<Foam::labelField> Foam::ggiFvPatch::internalFieldTransfer
 }
 
 
+void Foam::ggiFvPatch::initProlongationTransfer
+(
+    const Pstream::commsTypes commsType,
+    const crMatrix& filteredP
+) const
+{
+    // crMatrix transfer is local without global reduction
+    crMatrixTransferBuffer_ = filteredP;
+}
+
+
+Foam::autoPtr<Foam::crMatrix> Foam::ggiFvPatch::prolongationTransfer
+(
+    const Pstream::commsTypes commsType,
+    const crMatrix& filteredP
+) const
+{
+    autoPtr<crMatrix> tnbrP(new crMatrix(shadow().crMatrixTransferBuffer()));
+
+    return tnbrP;
+}
+
 
 // ************************************************************************* //

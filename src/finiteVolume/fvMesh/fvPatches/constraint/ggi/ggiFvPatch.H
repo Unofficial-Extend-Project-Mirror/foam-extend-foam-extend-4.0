@@ -247,6 +247,21 @@ public:
                 const Pstream::commsTypes commsType,
                 const unallocLabelList& internalData
             ) const;
+
+            //- Initialise transfer of prolongation matrix to the interface
+            virtual void initProlongationTransfer
+            (
+                const Pstream::commsTypes commsType,
+                const crMatrix& iF
+            ) const;
+
+            //- Transfer and return prolongation matrix adjacent to
+            //  the interface
+            virtual autoPtr<crMatrix> prolongationTransfer
+            (
+                const Pstream::commsTypes commsType,
+                const crMatrix& iF
+            ) const;
 };
 
 
