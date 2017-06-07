@@ -330,6 +330,7 @@ SAMGInterfaceFields = $(AMG)/interfaceFields/SAMGInterfaceFields
 $(SAMGInterfaceFields)/SAMGInterfaceField/SAMGInterfaceField.C
 $(SAMGInterfaceFields)/SAMGInterfaceField/newSAMGInterfaceField.C
 $(SAMGInterfaceFields)/processorSAMGInterfaceField/processorSAMGInterfaceField.C
+$(SAMGInterfaceFields)/ggiSAMGInterfaceField/ggiSAMGInterfaceField.C
 
 AMGAgglomerations = $(AMG)/AMGAgglomerations
 
