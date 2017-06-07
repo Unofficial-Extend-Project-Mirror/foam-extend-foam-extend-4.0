@@ -271,7 +271,7 @@ Foam::ggiAMGInterface::ggiAMGInterface
         return;
     }
 
-    // Continuing only with interfaces within the GGI comm only.
+    // Continuing with interfaces within the GGI comm only.
     // Note: on interfaces without the GGI comm, zone size will be zero
     // HJ, 11/Oct/2016
 

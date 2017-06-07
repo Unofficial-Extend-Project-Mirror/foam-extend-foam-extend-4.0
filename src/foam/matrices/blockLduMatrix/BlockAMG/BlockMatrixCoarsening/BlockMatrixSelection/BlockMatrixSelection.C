@@ -1034,13 +1034,15 @@ Foam::BlockMatrixSelection<Type>::restrictMatrix() const
             const lduInterface& fineInterface =
                 interfaceFields[intI].coupledInterface();
 
+            // Use filtered prolongation on master and slave side
+            // HJ, 7/Jun/2017
             coarseInterfaces.set
             (
                 intI,
                 SAMGInterface::New
                 (
                     coarseAddrPtr(),
-                    P,
+                    ownInterfaceProlongation[intI],
                     coarseInterfaces,
                     fineInterface,
                     nbrInterfaceProlongation[intI]

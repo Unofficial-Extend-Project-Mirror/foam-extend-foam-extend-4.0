@@ -127,7 +127,7 @@ public:
         ggiSAMGInterface
         (
             const lduPrimitiveMesh& lduMesh,
-            const crMatrix& prolongation,
+            const crMatrix& interfaceProlongation,
             const lduInterfacePtrsList& coarseInterfaces,
             const lduInterface& fineInterface,
             const crMatrix& nbrInterfaceProlongation
@@ -230,7 +230,7 @@ public:
             virtual void initProlongationTransfer
             (
                 const Pstream::commsTypes commsType,
-                const crMatrix& P
+                const crMatrix& filteredP
             ) const;
 
             //- Transfer and return prolongation matrix adjacent to
@@ -238,7 +238,7 @@ public:
             virtual autoPtr<crMatrix> prolongationTransfer
             (
                 const Pstream::commsTypes commsType,
-                const crMatrix& P
+                const crMatrix& filteredP
             ) const;
 
 

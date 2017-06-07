@@ -63,10 +63,10 @@ class SAMGInterface
         //- Reference to ldu addressing
         const lduPrimitiveMesh& lduMesh_;
 
-        //- Reference to prolongation matrix
-        const crMatrix& prolongation_;
+        //- Reference to filtered (interface only) prolongation matrix
+        const crMatrix& interfaceProlongation_;
 
-        //- Reference to prolongation matrix
+        //- Reference to filtered neighbour prolongation matrix
         const crMatrix nbrInterfaceProlongation_;
 
 
@@ -125,14 +125,14 @@ public:
             lduInterface,
             (
                 const lduPrimitiveMesh& lduMesh,
-                const crMatrix& prolongation,
+                const crMatrix& interfaceProlongation,
                 const lduInterfacePtrsList& coarseInterfaces,
                 const lduInterface& fineInterface,
                 const crMatrix& nbrInterfaceProlongation
             ),
             (
                 lduMesh,
-                prolongation,
+                interfaceProlongation,
                 coarseInterfaces,
                 fineInterface,
                 nbrInterfaceProlongation
@@ -147,7 +147,7 @@ public:
         static autoPtr<SAMGInterface> New
         (
             const lduPrimitiveMesh& lduMesh,
-            const crMatrix& prolongation,
+            const crMatrix& interfaceProlongation,
             const lduInterfacePtrsList& coarseInterfaces,
             const lduInterface& fineInterface,
             const crMatrix& nbrInterfaceProlongation
@@ -161,12 +161,12 @@ public:
         SAMGInterface
         (
             const lduPrimitiveMesh& lduMesh,
-            const crMatrix& prolongation,
+            const crMatrix& interfaceProlongation,
             const crMatrix& nbrInterfaceProlongation
         )
         :
             lduMesh_(lduMesh),
-            prolongation_(prolongation),
+            interfaceProlongation_(interfaceProlongation),
             nbrInterfaceProlongation_(nbrInterfaceProlongation)
         {}
 
@@ -187,9 +187,9 @@ public:
             }
 
             //- Return reference to filtered prolongation matrix
-            const crMatrix& prolongation() const
+            const crMatrix& interfaceProlongation() const
             {
-                return prolongation_;
+                return interfaceProlongation_;
             }
 
             //- Return reference to neighbour's filtered prolongation matrix

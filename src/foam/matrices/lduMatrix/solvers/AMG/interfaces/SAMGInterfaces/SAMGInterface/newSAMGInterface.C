@@ -32,7 +32,7 @@ License
 Foam::autoPtr<Foam::SAMGInterface> Foam::SAMGInterface::New
 (
     const lduPrimitiveMesh& lduMesh,
-    const crMatrix& prolongation,
+    const crMatrix& interfaceProlongation,
     const lduInterfacePtrsList& coarseInterfaces,
     const lduInterface& fineInterface,
     const crMatrix& nbrInterfaceProlongation
@@ -50,7 +50,7 @@ Foam::autoPtr<Foam::SAMGInterface> Foam::SAMGInterface::New
             "SAMGInterface::New\n"
             "(\n"
             "    const lduPrimitiveMesh& lduMesh,\n"
-            "    const crMatrix& prolongation,\n"
+            "    const crMatrix& interfaceProlongation,\n"
             "    const lduInterfacePtrsList& coarseInterfaces,\n"
             "    const lduInterface& fineInterface,\n"
             "    const crMatrix& nbrInterfaceProlongation\n"
@@ -66,7 +66,7 @@ Foam::autoPtr<Foam::SAMGInterface> Foam::SAMGInterface::New
         cstrIter()
         (
             lduMesh,
-            prolongation,
+            interfaceProlongation,
             coarseInterfaces,
             fineInterface,
             nbrInterfaceProlongation
