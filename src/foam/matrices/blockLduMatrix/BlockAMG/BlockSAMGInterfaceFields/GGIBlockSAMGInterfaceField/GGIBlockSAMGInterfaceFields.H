@@ -22,47 +22,42 @@ License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    blockVectorNSAMGInterfaceFields
+    GGIBlockSAMGInterfaceField
 
 Description
-    Macros for VectorN types for AMG interface fields with block coeffs
+    Typedefs for block coefficient ggi SAMG interface fields
 
 Author
-    Hrvoje Jasak
+    Hrvoje Jasak, Wikki Ltd.  All rights reserved.
+
+SourceFiles
+    GGIBlockSAMGInterfaceFields.C
 
 \*---------------------------------------------------------------------------*/
 
-#include "BlockSAMGInterfaceField.H"
-#include "ProcessorBlockSAMGInterfaceField.H"
+#ifndef GGIBlockSAMGInterfaceFields_H
+#define GGIBlockSAMGInterfaceFields_H
+
 #include "GGIBlockSAMGInterfaceField.H"
-#include "VectorNFieldTypes.H"
-#include "ExpandTensorNField.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 
-// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-#define makeTemplateTypeNameAndDebug(type, Type, args...)                     \
-                                                                              \
-typedef BlockSAMGInterfaceField<type > block##Type##SAMGInterfaceField;       \
-defineNamedTemplateTypeNameAndDebug(block##Type##SAMGInterfaceField, 0);      \
-defineTemplateRunTimeSelectionTable(block##Type##SAMGInterfaceField, lduInterface); \
-                                                                              \
-typedef ProcessorBlockSAMGInterfaceField<type > block##Type##ProcessorSAMGInterfaceField;  \
-makeBlockSAMGInterfaceField(block##Type##SAMGInterfaceField, block##Type##ProcessorSAMGInterfaceField); \
-                                                                              \
-typedef GGIBlockSAMGInterfaceField<type > block##Type##GGISAMGInterfaceField; \
-makeBlockSAMGInterfaceField(block##Type##SAMGInterfaceField, block##Type##GGISAMGInterfaceField); \
+typedef GGIBlockSAMGInterfaceField<scalar> GGIBlockSAMGInterfaceFieldScalar;
+typedef GGIBlockSAMGInterfaceField<vector> GGIBlockSAMGInterfaceFieldVector;
+typedef GGIBlockSAMGInterfaceField<tensor> GGIBlockSAMGInterfaceFieldTensor;
 
-forAllVectorNTypes(makeTemplateTypeNameAndDebug);
-
-#undef makeTemplateTypeNameAndDebug
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#endif
 
 // ************************************************************************* //

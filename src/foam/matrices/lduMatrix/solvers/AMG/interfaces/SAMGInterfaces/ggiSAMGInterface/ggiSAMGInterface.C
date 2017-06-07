@@ -282,6 +282,20 @@ Foam::ggiSAMGInterface::ggiSAMGInterface
     // Note: local addressing contains only local faces
     const labelList& fineZa =  fineGgiInterface_.zoneAddressing();
 
+    // Expand master prolongation to zone
+    crMatrix masterExpandProlongation(interfaceProlongation);
+
+    //HJ, HERE: expand master prolongation to zone
+    // Note: master is now the size of local zone
+    if (!fineGgiInterface_.localParallel())
+    {
+        // Not line this: expand without communication HJ, HERE
+        // fineGgiInterface_.expandCrMatrixToZone
+        // (
+        //     masterExpandProlongation
+        // );
+    }
+
     // Create crMatrix for neighbour faces.  Note: expandCrMatrixToZone will
     // expand the matrix to zone size, including communications.
     // Faces which are not used locally will be marked by empty rows
@@ -297,10 +311,6 @@ Foam::ggiSAMGInterface::ggiSAMGInterface
             nbrExpandProlongation
         );
     }
-
-    // 
-    const crAddressing& prolongationCr = interfaceProlongation.crAddr();
-    const crAddressing& nbrExpandCr = nbrExpandProlongation.crAddr();
 
     // Create addressing for neighbour processors.  Note: expandAddrToZone will
     // expand the addressing to zone size.  HJ, 13/Jun/2016
@@ -368,6 +378,23 @@ Foam::ggiSAMGInterface::ggiSAMGInterface
 
     // Count the number of agglomeration pairs
     label nAgglomPairs = 0;
+
+    // Switching prolongation matrices
+    const crMatrix* masterP = NULL;
+    const crMatrix* neighbourP = NULL;
+
+    if (fineGgiInterface_.master())
+    {
+        // Grab prolongation matrix
+        masterP = &masterExpandProlongation;
+        neighbourP = &nbrExpandProlongation;
+    }
+    else
+    {
+        // Grab prolongation matrix
+        masterP = &nbrExpandProlongation;
+        neighbourP = &masterExpandProlongation;
+    }
 
     // On the fine level, addressing is made in a labelListList
     if (fineGgiInterface_.fineLevel())
@@ -455,32 +482,31 @@ Foam::ggiSAMGInterface::ggiSAMGInterface
                 // restriction - with included weights from GGI
                 for
                 (
-                    label indexR = prolongationCr.rowStart()[curSide];
-                    indexR < prolongationCr.rowStart()[curSide + 1];
+                    label indexR = masterP->crAddr().rowStart()[curSide];
+                    indexR < masterP->crAddr().rowStart()[curSide + 1];
                     indexR++
                 )
                 {
                     // Grab weight from restriction
-                    scalar rWeight = interfaceProlongation.coeffs()[indexR];
+                    scalar rWeight = masterP->coeffs()[indexR];
 
-                    // HJ, replace nbrInterfaceProlongation with nbrExpandProlongation
                     for
                     (
-                        label indexP = nbrExpandCr.rowStart()[nbrSide];
-                        indexP < nbrExpandCr.rowStart()[nbrSide + 1];
+                        label indexP = neighbourP->crAddr().rowStart()[nbrSide];
+                        indexP < neighbourP->crAddr().rowStart()[nbrSide + 1];
                         indexP++
                     )
                     {
                         // Grab weight from prolongation
-                        scalar pWeight = nbrInterfaceProlongation.coeffs()[indexP];
+                        scalar pWeight = neighbourP->coeffs()[indexP];
 
                         // Code in the current master and slave - used for
                         // identifying the face
                         curMaster =
-                            prolongationCr.column()[indexR]
+                            masterP->crAddr().column()[indexR]
                           + procOffset*curMasterProc;
                         curSlave =
-                            nbrExpandCr.column()[indexP]
+                            neighbourP->crAddr().column()[indexP]
                           + procOffset*curSlaveProc;
 
                         if (neighboursTable.found(curMaster))
@@ -520,7 +546,10 @@ Foam::ggiSAMGInterface::ggiSAMGInterface
                                     nbrFound = true;
                                     curFaceFaces[curNbrI].append(ffI);
                                     curFaceFaceNbrs[curNbrI].append(nbrI);
-                                    curFaceWeights[curNbrI].append(curNW*pWeight*rWeight);
+                                    curFaceWeights[curNbrI].append
+                                    (
+                                        curNW*pWeight*rWeight
+                                    );
 
                                     // New agglomeration pair found in already
                                     // existing pair
@@ -609,16 +638,6 @@ Foam::ggiSAMGInterface::ggiSAMGInterface
                 }
             } // end for all current neighbours
         } // end for all fine faces
-        if (fineGgiInterface_.master())
-        {
-            Info<< "MASTER: ";
-        }
-        else
-        {
-            Info<< "SLAVE: ";
-        }
-        Info<< "Done fine level, 1. Created " << nAgglomPairs << " pairs and "
-            << nCoarseFaces << " faces" << endl;
     }
 //------------------------------------------------------------------------------
 //                          FINE LEVEL - no GGI weights!
@@ -685,30 +704,29 @@ Foam::ggiSAMGInterface::ggiSAMGInterface
             // restriction - with included weights from GGI
             for
             (
-                label indexR = prolongationCr.rowStart()[curSide];
-                indexR < prolongationCr.rowStart()[curSide + 1];
+                label indexR = masterP->crAddr().rowStart()[curSide];
+                indexR < masterP->crAddr().rowStart()[curSide + 1];
                 indexR++
             )
             {
                 // Grab weight from restriction
-                scalar rWeight = interfaceProlongation.coeffs()[indexR];
+                scalar rWeight = masterP->coeffs()[indexR];
 
-                // HJ, replace nbrInterfaceProlongation with nbrExpandProlongation
                 for
                 (
-                    label indexP = nbrExpandCr.rowStart()[nbrSide];
-                    indexP < nbrExpandCr.rowStart()[nbrSide + 1];
+                    label indexP = neighbourP->crAddr().rowStart()[nbrSide];
+                    indexP < neighbourP->crAddr().rowStart()[nbrSide + 1];
                     indexP++
                 )
                 {
                     // Grab weight from prolongation
-                    scalar pWeight = nbrInterfaceProlongation.coeffs()[indexP];
+                    scalar pWeight = neighbourP->coeffs()[indexP];
 
                     // Code in the current master and slave - used for
                     // identifying the face
-                    curMaster = prolongationCr.column()[indexR]
+                    curMaster = masterP->crAddr().column()[indexR]
                         + procOffset*curMasterProc;
-                    curSlave = nbrExpandCr.column()[indexP]
+                    curSlave = neighbourP->crAddr().column()[indexP]
                         + procOffset*curSlaveProc;
 
                     if (neighboursTable.found(curMaster))
@@ -835,8 +853,6 @@ Foam::ggiSAMGInterface::ggiSAMGInterface
                 }
             }
         } // end for all fine faces
-        Info<< "Done coarse level, 1. Created " << nAgglomPairs << " pairs and "
-            << nCoarseFaces << " faces" << endl;
     } // end of else in fine level (coarse level)
 
     // Since only local faces are analysed, lists can now be resized
@@ -894,7 +910,7 @@ Foam::ggiSAMGInterface::ggiSAMGInterface
     // Sort makes sure the order is identical on both sides.
     // HJ, 20/Feb/2009 and 6/Jun/2016
     sort(contents);
-    Info<< "START MATRIX ASSEMBLY" << endl;
+
     // Note: Restriction is done on master side only because this is where
     // the local zone is created.  HJ, 1/Aug/2016
     if (master())
@@ -983,8 +999,6 @@ Foam::ggiSAMGInterface::ggiSAMGInterface
                 nProcFaces++;
             }
         }
-        Info<< "MASTER ASSEMBLY: Created " << nAgglomPairs << " pairs and "
-            << nProcFaces << " master faces" << endl;
 
         // No need to resize arrays only local faces are used
         // HJ, 1/Aug/2016
@@ -1137,11 +1151,7 @@ Foam::ggiSAMGInterface::ggiSAMGInterface
                 nProcFaces++;
             }
         }
-        Info<< "SLAVE ASSEMBLY: Created " << nAgglomPairs << " pairs and "
-            << nProcFaces << " slave faces" << endl;
-
     }
-    Info<< "END MATRIX ASSEMBLY" << endl;
 }
 
 
@@ -1337,7 +1347,6 @@ void Foam::ggiSAMGInterface::expandAddrToZone(labelField& lf) const
 
 void Foam::ggiSAMGInterface::expandCrMatrixToZone(crMatrix&) const
 {
-    notImplemented("expandCrMatrixToZone");
     // Code missing: collapse crMatrices into a zone crMatrix
     if (!localParallel())
     {
@@ -1353,9 +1362,8 @@ void Foam::ggiSAMGInterface::initProlongationTransfer
     const crMatrix& filteredP
 ) const
 {
-    // Send prolongation matrix, using IOstream operators
-    //OPstream toNbr(Pstream::blocking, neighbProcNo());
-    //toNbr<< filteredP;
+    // crMatrix transfer is local without global reduction
+    crMatrixTransferBuffer_ = filteredP;
 }
 
 
@@ -1366,11 +1374,13 @@ Foam::ggiSAMGInterface::prolongationTransfer
     const crMatrix& filteredP
 ) const
 {
-    //IPstream fromNbr(Pstream::blocking, neighbProcNo());
-
-    autoPtr<crMatrix> tnbrP(new crMatrix(5,5, labelList(5,1)));
+    autoPtr<crMatrix> tnbrP
+    (
+        new crMatrix(shadowInterface().crMatrixTransferBuffer())
+    );
 
     return tnbrP;
 }
+
 
 // ************************************************************************* //

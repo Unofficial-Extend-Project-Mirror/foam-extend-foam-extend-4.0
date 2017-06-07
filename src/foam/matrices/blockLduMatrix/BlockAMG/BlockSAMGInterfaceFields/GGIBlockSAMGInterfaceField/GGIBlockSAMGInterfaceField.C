@@ -23,7 +23,7 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "GGIBlockAMGInterfaceField.H"
+#include "GGIBlockSAMGInterfaceField.H"
 #include "ggiLduInterfaceField.H"
 #include "addToRunTimeSelectionTable.H"
 #include "blockLduMatrices.H"
@@ -32,7 +32,7 @@ License
 
 template<class Type>
 template<class Type2>
-void Foam::GGIBlockAMGInterfaceField<Type>::agglomerateBlockType
+void Foam::GGIBlockSAMGInterfaceField<Type>::selectBlockType
 (
     Field<Type2>& coarseCoeffs,
     const Foam::Field<Type2>& fineCoeffs
@@ -91,14 +91,14 @@ void Foam::GGIBlockAMGInterfaceField<Type>::agglomerateBlockType
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 template<class Type>
-Foam::GGIBlockAMGInterfaceField<Type>::GGIBlockAMGInterfaceField
+Foam::GGIBlockSAMGInterfaceField<Type>::GGIBlockSAMGInterfaceField
 (
-    const AMGInterface& AMGCp,
+    const SAMGInterface& SAMGCp,
     const BlockLduInterfaceField<Type>& fineInterfaceField
 )
 :
-    BlockAMGInterfaceField<Type>(AMGCp, fineInterfaceField),
-    ggiInterface_(refCast<const ggiAMGInterface>(AMGCp)),
+    BlockSAMGInterfaceField<Type>(SAMGCp, fineInterfaceField),
+    ggiInterface_(refCast<const ggiSAMGInterface>(SAMGCp)),
     doTransform_(false),
     fieldTransferBuffer_()
 {
@@ -122,7 +122,7 @@ Foam::GGIBlockAMGInterfaceField<Type>::GGIBlockAMGInterfaceField
     }
     else
     {
-        FatalErrorIn("GGIBlockAMGInterfaceField<Type> Constructor")
+        FatalErrorIn("GGIBlockSAMGInterfaceField<Type> Constructor")
             << "fineInterface must be of ggi type and either" << endl
             << "    GGIBlockLduInterfaceField<Type> or " << endl
             << "    ggiFvPatchField<Type> " << endl
@@ -134,7 +134,7 @@ Foam::GGIBlockAMGInterfaceField<Type>::GGIBlockAMGInterfaceField
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
 template<class Type>
-Foam::GGIBlockAMGInterfaceField<Type>::~GGIBlockAMGInterfaceField()
+Foam::GGIBlockSAMGInterfaceField<Type>::~GGIBlockSAMGInterfaceField()
 {}
 
 
@@ -142,7 +142,7 @@ Foam::GGIBlockAMGInterfaceField<Type>::~GGIBlockAMGInterfaceField()
 
 template<class Type>
 Foam::tmp<Foam::CoeffField<Type> >
-Foam::GGIBlockAMGInterfaceField<Type>::agglomerateBlockCoeffs
+Foam::GGIBlockSAMGInterfaceField<Type>::selectBlockCoeffs
 (
     const Foam::CoeffField<Type>& fineCoeffs
 ) const
@@ -161,21 +161,21 @@ Foam::GGIBlockAMGInterfaceField<Type>::agglomerateBlockCoeffs
         squareTypeField& activeCoarseCoeffs = coarseCoeffs.asSquare();
         const squareTypeField& activeFineCoeffs = fineCoeffs.asSquare();
 
-        this->agglomerateBlockType(activeCoarseCoeffs, activeFineCoeffs);
+        this->selectBlockType(activeCoarseCoeffs, activeFineCoeffs);
     }
     else if (fineCoeffs.activeType() == blockCoeffBase::LINEAR)
     {
         linearTypeField& activeCoarseCoeffs = coarseCoeffs.asLinear();
         const linearTypeField& activeFineCoeffs = fineCoeffs.asLinear();
 
-        this->agglomerateBlockType(activeCoarseCoeffs, activeFineCoeffs);
+        this->selectBlockType(activeCoarseCoeffs, activeFineCoeffs);
     }
     else
     {
         FatalErrorIn
         (
             "Foam::tmp<Foam::CoeffField<Type> >\n"
-            "Foam::GGIBlockAMGInterfaceField<Type>::agglomerateBlockCoeffs\n"
+            "Foam::GGIBlockSAMGInterfaceField<Type>::selectBlockCoeffs\n"
             "(\n"
             "    const Foam::CoeffField<Type>& fineCoeffs\n"
             ") const"
@@ -188,7 +188,7 @@ Foam::GGIBlockAMGInterfaceField<Type>::agglomerateBlockCoeffs
 
 
 template<class Type>
-void Foam::GGIBlockAMGInterfaceField<Type>::initInterfaceMatrixUpdate
+void Foam::GGIBlockSAMGInterfaceField<Type>::initInterfaceMatrixUpdate
 (
     const Field<Type>& psiInternal,
     Field<Type>&,
@@ -206,7 +206,7 @@ void Foam::GGIBlockAMGInterfaceField<Type>::initInterfaceMatrixUpdate
 
 
 template<class Type>
-void Foam::GGIBlockAMGInterfaceField<Type>::updateInterfaceMatrix
+void Foam::GGIBlockSAMGInterfaceField<Type>::updateInterfaceMatrix
 (
     const Field<Type>& psiInternal,
     Field<Type>& result,
@@ -217,8 +217,8 @@ void Foam::GGIBlockAMGInterfaceField<Type>::updateInterfaceMatrix
 ) const
 {
     // Get interface from shadow
-    const GGIBlockAMGInterfaceField<Type>& shadowInterface =
-        refCast<const GGIBlockAMGInterfaceField<Type> >
+    const GGIBlockSAMGInterfaceField<Type>& shadowInterface =
+        refCast<const GGIBlockSAMGInterfaceField<Type> >
         (
             matrix.interfaces()[ggiInterface_.shadowIndex()]
         );
