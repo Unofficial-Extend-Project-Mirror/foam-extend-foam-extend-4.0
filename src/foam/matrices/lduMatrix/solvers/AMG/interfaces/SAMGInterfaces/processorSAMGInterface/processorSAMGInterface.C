@@ -86,11 +86,6 @@ Foam::processorSAMGInterface::processorSAMGInterface
         // - restrictWeights_: weights for each fine boundary coefficient in
         //                     natural order of appearance on master
 
-    // Question: Should we put the masterOwner and masterNeighbour into a linked
-    // list which can be searched quickly? In this case we can create the
-    // addressing on master, send and at the same time, calculate the coarse
-    // coefficients on both sides and store into corresponding order
-
         // *Note: (A*B)^T = B^T*A^T, which is exactly what I have. Use the fact
         // on the slave processor!!!
 
@@ -99,10 +94,10 @@ Foam::processorSAMGInterface::processorSAMGInterface
 
         // Lists for saving addressing and weights - give size, but check at the
         // end!
-        faceCells_.setSize(5*fineProcInterface_.interfaceSize());
-        fineAddressing_.setSize(5*fineProcInterface_.interfaceSize());
-        restrictWeights_.setSize(5*fineProcInterface_.interfaceSize());
-        restrictAddressing_.setSize(5*fineProcInterface_.interfaceSize());
+        DynamicList<label> dynFaceCells(5*fineProcInterface_.interfaceSize());
+        DynamicList<label> dynFineAddr(5*fineProcInterface_.interfaceSize());
+        DynamicList<scalar> dynRestrictW(5*fineProcInterface_.interfaceSize());
+        DynamicList<label> dynRestrictAddr(5*fineProcInterface_.interfaceSize());
 
         // Filtered prolongation matrix from my side
         crMatrix prolongationT = interfaceProlongation.T();
@@ -164,7 +159,7 @@ Foam::processorSAMGInterface::processorSAMGInterface
                         identify = nCoarseCoeffs;
                         coeffMark[jp] = nCoarseCoeffs;
 
-                        faceCells_[identify] = ir;
+                        dynFaceCells.append(ir);
 
                         // Save address and coeff into HashTable for sorting
                         // faceCells on slave
@@ -176,10 +171,9 @@ Foam::processorSAMGInterface::processorSAMGInterface
                         nCoarseCoeffs++;
                     }
 
-                    restrictWeights_[nCoarseContribs] =
-                        rCoeffs[indexR]*pCoeffs[indexP];
-                    fineAddressing_[nCoarseContribs] = jr;
-                    restrictAddressing_[nCoarseContribs] = identify;
+                    dynFineAddr.append(jr);
+                    dynRestrictW.append(rCoeffs[indexR]*pCoeffs[indexP]);
+                    dynRestrictAddr.append(identify);
 
                     nCoarseContribs++;
                 }
@@ -189,18 +183,18 @@ Foam::processorSAMGInterface::processorSAMGInterface
         // Check for fixed lists
         if (nCoarseContribs > 5*fineProcInterface_.interfaceSize())
         {
-            FatalErrorIn("processorSAMGInterface::processorSAMGInterface(...)")
+            WarningIn("processorSAMGInterface::processorSAMGInterface(...)")
                 << "Coarse SAMG processor siginificantly bigger than fine: "
                 << "nCoarseFaces = " << nCoarseContribs
                 << " nFineFaces = " << fineProcInterface_.interfaceSize()
-                << abort(FatalError);
+                << endl;
         }
 
         // Resize arrays to final size
-        faceCells_.setSize(nCoarseCoeffs);
-        fineAddressing_.setSize(nCoarseContribs);
-        restrictWeights_.setSize(nCoarseContribs);
-        restrictAddressing_.setSize(nCoarseContribs);
+        faceCells_.transfer(dynFaceCells.shrink());
+        fineAddressing_.transfer(dynFineAddr.shrink());
+        restrictWeights_.transfer(dynRestrictW.shrink());
+        restrictAddressing_.transfer(dynRestrictAddr.shrink());
 
         // Send to slave
         OPstream toNbr(Pstream::blocking, neighbProcNo());
