@@ -56,239 +56,300 @@ Foam::processorSAMGInterface::processorSAMGInterface
     comm_(fineProcInterface_.comm()),
     tag_(fineProcInterface_.tag())
 {
-    // MASTER processor
+    // READ FIRST
+    // This code is written for the FILTERED local matrix
+    // because the addressing is very natural. If this is not ok, filter the
+    // big matrix here using fineInterface.faceCells(), transpose, and use
+    // the same names for crMatrix arrays (then, there is no need to change
+    // the triple product code).
+
+    // Algorithm details:
+    // Go through the triple product similar to SAMG Policy - collect
+    // coarse addressing on master and slave in the same order
+
+    // The resulting contributions from triple product will be saved using
+    // the following arrays:
+    // - faceCells_: for coarse matrix, it tells us the owner of the
+    //               boundary coefficient (on local side)
+    // - fineAddressing_: saves the index of the fine boundary coefficient
+    //                    in the natural order of appearance on master in
+    //                    triple product
+    // - restrictAddressing_: saves the coarse face for which the
+    //                        contribution (coefficient) needs to sum-up
+    // - restrictWeights_: weights for each fine boundary coefficient in
+    //                     natural order of appearance on master
+
+    // *Note: (A*B)^T = B^T*A^T, which is exactly what I have. Use the fact
+    // on the slave processor!!!
+
+    // Pair collection is always done looking for the master side
+    // HJ, 8/Jun/2017
+
+    // Look up neighbours for a master
+    HashTable<DynamicList<label, 4>, label, Hash<label> > neighboursTable
+    (
+        Foam::max(128, fineProcInterface_.interfaceSize())
+    );
+
+    // Neighbour face-faces addressing for a face with multiple neighbours
+    HashTable<DynamicList<DynamicList<label, 4>, 4>, label, Hash<label> >
+    faceFaceTable
+    (
+        Foam::max(128, fineProcInterface_.interfaceSize())
+    );
+
+    // Neighbour face-faces weights for a face with split neighbours
+    HashTable<DynamicList<DynamicList<scalar, 4>, 4>, label, Hash<label> >
+    faceFaceWeightsTable
+    (
+        Foam::max(128, fineProcInterface_.interfaceSize())
+    );
+
+    // Count the number of coarse faces
+    label nCoarseFaces = 0;
+
+    // Count the number of agglomeration pairs
+    label nAgglomPairs = 0;
+
+    // Switching prolongation matrices
+    const crMatrix* masterP = NULL;
+    const crMatrix* neighbourP = NULL;
+
     if (myProcNo() < neighbProcNo())
     {
-        // READ FIRST
-//------------------------------------------------------------------------------
-        // This code is written for the FILTERED local matrix. Why?
-        // Because the addressing is very natural. If this is not ok, filter the
-        // big matrix here using fineInterface.faceCells(), transpose, and use
-        // the same names for crMatrix arrays (then, there is no need to change
-        // the triple product code).
-//------------------------------------------------------------------------------
-
-        // Algorithm details:
-        // Go through the triple product similar to SAMG Policy - collect
-        // coarse addressing on master - send it to slave to sort its addressing
-        // accordingly - HashTable containing labelPair(owner, neighbour) as key
-        // and coarse face index as entry
-
-        // The resulting contributions from triple product will be saved using
-        // the following arrays:
-        // - faceCells_: for coarse matrix, it tells us the owner of the
-        //               boundary coefficient (on local side)
-        // - fineAddressing_: saves the index of the fine boundary coefficient
-        //                    in the natural order of appearance on master in
-        //                    triple product
-        // - restrictAddressing_: saves the coarse face for which the
-        //                        contribution (coefficient) needs to sum-up
-        // - restrictWeights_: weights for each fine boundary coefficient in
-        //                     natural order of appearance on master
-
-        // *Note: (A*B)^T = B^T*A^T, which is exactly what I have. Use the fact
-        // on the slave processor!!!
-
-        // Addressing of coarse faces - for sorting faceCells_ on slave
-        HashTable<label, labelPair, Hash<labelPair> > coarseLevelTable;
-
-        // Lists for saving addressing and weights - give size, but check at the
-        // end!
-        DynamicList<label> dynFaceCells(5*fineProcInterface_.interfaceSize());
-        DynamicList<label> dynFineAddr(5*fineProcInterface_.interfaceSize());
-        DynamicList<scalar> dynRestrictW(5*fineProcInterface_.interfaceSize());
-        DynamicList<label> dynRestrictAddr(5*fineProcInterface_.interfaceSize());
-
-        // Filtered prolongation matrix from my side
-        crMatrix prolongationT = interfaceProlongation.T();
-        const labelList& rRowStart = prolongationT.crAddr().rowStart();
-        const labelList& rColumn = prolongationT.crAddr().column();
-        const scalarField& rCoeffs = prolongationT.coeffs();
-        const label rNRows = prolongationT.crAddr().nRows();
-
-        // Filtered prolongation matrix from neighbour - to obtain restriction,
-        // make a transpose
-        const labelList& pRowStart =
-            nbrInterfaceProlongation.crAddr().rowStart();
-        const labelList& pColumn = nbrInterfaceProlongation.crAddr().column();
-        const scalarField& pCoeffs = nbrInterfaceProlongation.coeffs();
-        const label pNCols = nbrInterfaceProlongation.crAddr().nCols();
-
-        labelList coeffMark(pNCols, -1);
-        label nCoarseCoeffs = 0;
-        label nCoarseContribs = 0;
-
-        // Row of R
-        for (label ir = 0; ir < rNRows; ir++)
-        {
-            // Restart coeffMark for each restriction row
-            coeffMark = -1;
-
-            // Row start addressing R
-            for
-            (
-                label indexR = rRowStart[ir];
-                indexR < rRowStart[ir + 1];
-                indexR++
-            )
-            {
-                // Column of coefficient in R
-                // This is an important information: it tells us which
-                // boundary coefficient this restriction coeff multiplies! It is
-                // the index of the boundary coeff in the boundary array.
-                const label jr = rColumn[indexR];
-
-                for
-                (
-                    label indexP = pRowStart[jr];
-                    indexP < pRowStart[jr + 1];
-                    indexP++
-                )
-                {
-                    // Column of P, goes into coarse address
-                    label jp = pColumn[indexP];
-
-                    // To which coeff do I add myself to? Does the address
-                    // in this row already exist?
-                    label identify = coeffMark[jp];
-
-                    // If the coeff at this address doesn't exist
-                    if (identify == -1)
-                    {
-                        // Found a new coarse coeff!
-                        identify = nCoarseCoeffs;
-                        coeffMark[jp] = nCoarseCoeffs;
-
-                        dynFaceCells.append(ir);
-
-                        // Save address and coeff into HashTable for sorting
-                        // faceCells on slave
-                        coarseLevelTable.insert
-                        (
-                            labelPair(ir, jp),
-                            nCoarseCoeffs
-                        );
-                        nCoarseCoeffs++;
-                    }
-
-                    dynFineAddr.append(jr);
-                    dynRestrictW.append(rCoeffs[indexR]*pCoeffs[indexP]);
-                    dynRestrictAddr.append(identify);
-
-                    nCoarseContribs++;
-                }
-            }
-        }
-
-        // Check for fixed lists
-        if (nCoarseContribs > 5*fineProcInterface_.interfaceSize())
-        {
-            WarningIn("processorSAMGInterface::processorSAMGInterface(...)")
-                << "Coarse SAMG processor siginificantly bigger than fine: "
-                << "nCoarseFaces = " << nCoarseContribs
-                << " nFineFaces = " << fineProcInterface_.interfaceSize()
-                << endl;
-        }
-
-        // Resize arrays to final size
-        faceCells_.transfer(dynFaceCells.shrink());
-        fineAddressing_.transfer(dynFineAddr.shrink());
-        restrictWeights_.transfer(dynRestrictW.shrink());
-        restrictAddressing_.transfer(dynRestrictAddr.shrink());
-
-        // Send to slave
-        OPstream toNbr(Pstream::blocking, neighbProcNo());
-
-        toNbr<< coarseLevelTable << nCoarseContribs;
+        // Grab prolongation matrix, master side
+        masterP = &interfaceProlongation;
+        neighbourP = &nbrInterfaceProlongation;
     }
-    // Slave processor
     else
     {
-        // Slave must receive the hash table sent by the master to know how to
-        // sort its faceCells_
-        IPstream fromNbr(Pstream::blocking, neighbProcNo());
+        // Grab prolongation matrix, slave side
+        masterP = &nbrInterfaceProlongation;
+        neighbourP = &interfaceProlongation;
+    }
 
-        HashTable<label, labelPair, Hash<labelPair> > masterCoarseLevel =
-            HashTable<label, labelPair, Hash<labelPair> >(fromNbr);
+    label curMaster, curSlave;
 
-        const label nCoarseContribs = readLabel(fromNbr);
-
-        // Filtered prolongation matrix from my side
-        crMatrix prolongationT = interfaceProlongation.T();
-        const labelList& rRowStart = prolongationT.crAddr().rowStart();
-        const labelList& rColumn = prolongationT.crAddr().column();
-        const scalarField& rCoeffs = prolongationT.coeffs();
-        const label rNRows = prolongationT.crAddr().nRows();
-
-        // Filtered prolongation matrix from neighbour - to obtain restriction,
-        // make
-        // a transpose
-        const labelList& pRowStart =
-            nbrInterfaceProlongation.crAddr().rowStart();
-        const labelList& pColumn = nbrInterfaceProlongation.crAddr().column();
-        const scalarField& pCoeffs = nbrInterfaceProlongation.coeffs();
-        const label pNCols = nbrInterfaceProlongation.crAddr().nCols();
-
-        faceCells_.setSize(masterCoarseLevel.size(), -1);
-        restrictWeights_.setSize(nCoarseContribs);
-        fineAddressing_.setSize(nCoarseContribs);
-        restrictAddressing_.setSize(nCoarseContribs);
-
-        labelList coeffMark(pNCols, -1);
-        label nCoarseEntries = 0;
-
-        // This loop is only for sorting the faceCells_ on slave side to match
-        // the order on master
-        // Row of R
-        for (label ir = 0; ir < rNRows; ir++)
+    // Loop through the interface and calculate triple product row-by-row
+    for(label faceI = 0; faceI < fineProcInterface_.interfaceSize(); faceI++)
+    {
+        // Triple product for only one row of prolongation and restriction
+        for
+        (
+            label indexR = masterP->crAddr().rowStart()[faceI];
+            indexR < masterP->crAddr().rowStart()[faceI + 1];
+            indexR++
+        )
         {
-            // Restart coeffMark for each restriction row
-            coeffMark = -1;
+            // Grab weight from restriction
+            scalar rWeight = masterP->coeffs()[indexR];
 
-            // Row start addressing R
             for
             (
-                label indexR = rRowStart[ir];
-                indexR < rRowStart[ir + 1];
-                indexR++
+                label indexP = neighbourP->crAddr().rowStart()[faceI];
+                indexP < neighbourP->crAddr().rowStart()[faceI + 1];
+                indexP++
             )
             {
-                // Column of coefficient in R
-                const label jr = rColumn[indexR];
-                for
-                (
-                    label indexP = pRowStart[jr];
-                    indexP < pRowStart[jr + 1];
-                    indexP++
-                )
+                // Grab weight from prolongation
+                scalar pWeight = neighbourP->coeffs()[indexP];
+
+                // Code in the current master and slave - used for
+                // identifying the face
+                curMaster = masterP->crAddr().column()[indexR];
+                curSlave = neighbourP->crAddr().column()[indexP];
+
+                if (neighboursTable.found(curMaster))
                 {
-                    // Column of P, into coarse address
-                    label jp = pColumn[indexP];
+                    // This contribution already exists - add the result
+                    // to the existing contribution
 
-                    // Array for marking new contributions in the row ir
-                    label identify = coeffMark[jp];
+                    // This master side face already exists
 
-                    if (identify == -1)
+                    // Check all current neighbours to see if the current
+                    // slave already exists.  If so, add the coefficient.
+
+                    DynamicList<label, 4>& curNbrs =
+                        neighboursTable.find(curMaster)();
+
+                    DynamicList<DynamicList<label, 4>, 4>& curFaceFaces =
+                        faceFaceTable.find(curMaster)();
+
+                    DynamicList<DynamicList<scalar, 4>, 4>& curFaceWeights =
+                        faceFaceWeightsTable.find(curMaster)();
+
+                    // Search for coded neighbour
+                    bool nbrFound = false;
+
+                    forAll (curNbrs, curNbrI)
                     {
-                        label address = masterCoarseLevel[labelPair(jp, ir)];
+                        // Check neighbour slave
+                        if (curNbrs[curNbrI] == curSlave)
+                        {
+                            nbrFound = true;
+                            curFaceFaces[curNbrI].append(faceI);
+                            curFaceWeights[curNbrI].append(pWeight*rWeight);
 
-                        // Found a new coarse coeff!
-                        identify = address;
+                            // New agglomeration pair found in already
+                            // existing pair
+                            nAgglomPairs++;
 
-                        coeffMark[jp] = address;
-                        faceCells_[identify] = ir;
+                            break;
+                        }
                     }
 
-                    restrictWeights_[nCoarseEntries] =
-                        rCoeffs[indexR]*pCoeffs[indexP];
-                    fineAddressing_[nCoarseEntries] = jr;
-                    restrictAddressing_[nCoarseEntries] = identify;
+                    if (!nbrFound)
+                    {
+                        curNbrs.append(curSlave);
 
-                    nCoarseEntries++;
+                        DynamicList<label, 4> newFF;
+                        newFF.append(faceI);
+                        curFaceFaces.append(newFF);
+
+                        DynamicList<scalar, 4> newFW;
+                        newFW.append(pWeight*rWeight);
+                        curFaceWeights.append(newFW);
+
+                        // New coarse face created for existing master
+                        nCoarseFaces++;
+                        nAgglomPairs++;
+                    }
+                }
+                else
+                {
+                    // This master has got no neighbours yet.
+                    // Add a neighbour and a coefficient as a
+                    // new list, thus creating a new face
+
+                    DynamicList<label, 4> newNbrs;
+                    newNbrs.append(curSlave);
+                    neighboursTable.insert
+                    (
+                        curMaster,
+                        newNbrs
+                    );
+
+                    DynamicList<DynamicList<label, 4>, 4> newFF;
+                    newFF.append(DynamicList<label, 4>());
+                    newFF[0].append(faceI);
+                    faceFaceTable.insert
+                    (
+                        curMaster,
+                        newFF
+                    );
+
+                    DynamicList<DynamicList<scalar, 4>, 4> newFFWeights;
+                    newFFWeights.append(DynamicList<scalar, 4>());
+                    newFFWeights[0].append(pWeight*rWeight);
+                    faceFaceWeightsTable.insert
+                    (
+                        curMaster,
+                        newFFWeights
+                    );
+
+                    // New coarse face created for a new master
+                    nCoarseFaces++;
+                    nAgglomPairs++;
                 }
             }
         }
+    } // end for all fine faces
 
+    // Since only local faces are analysed, lists can now be resized
+    faceCells_.setSize(nCoarseFaces);
+    fineAddressing_.setSize(nAgglomPairs);
+    restrictAddressing_.setSize(nAgglomPairs);
+    restrictWeights_.setSize(nAgglomPairs);
+
+    // Global faces shall be assembled by the increasing label of master
+    // cluster ID.
+    labelList contents = neighboursTable.toc();
+
+    // Sort makes sure the order is identical on both sides.
+    // HJ, 20/Feb/2009 and 6/Jun/2016
+    sort(contents);
+
+    // Note: Restriction is done on master side only
+
+    // Reset face counter for re-use
+    nCoarseFaces = 0;
+    nAgglomPairs = 0;
+
+    // Master side
+    if (myProcNo() < neighbProcNo())
+    {
+        // On master side, the owner addressing is stored in table of contents
+        forAll (contents, masterI)
+        {
+            DynamicList<label, 4>& curNbrs =
+                neighboursTable.find(contents[masterI])();
+
+            DynamicList<DynamicList<label, 4>, 4>& curFaceFaces =
+                faceFaceTable.find(contents[masterI])();
+
+            DynamicList<DynamicList<scalar, 4>, 4>& curFaceWeights =
+                faceFaceWeightsTable.find(contents[masterI])();
+
+            forAll (curNbrs, curNbrI)
+            {
+                // Get faces and weights
+                DynamicList<label, 4>& facesIter = curFaceFaces[curNbrI];
+
+                DynamicList<scalar, 4>& weightsIter = curFaceWeights[curNbrI];
+
+                // Record master cluster index
+                faceCells_[nCoarseFaces] = contents[masterI];
+
+                // Collect agglomeration data
+                forAll (facesIter, facesIterI)
+                {
+                    fineAddressing_[nAgglomPairs] = facesIter[facesIterI];
+                    restrictAddressing_[nAgglomPairs] = nCoarseFaces;
+                    restrictWeights_[nAgglomPairs] = weightsIter[facesIterI];
+
+                    nAgglomPairs++;
+                }
+
+                nCoarseFaces++;
+            }
+        }
+    }
+    // Slave side
+    else
+    {
+        // On slave side, the owner addressing is stored in linked lists
+        forAll (contents, masterI)
+        {
+            DynamicList<label, 4>& curNbrs =
+                neighboursTable.find(contents[masterI])();
+
+            DynamicList<DynamicList<label, 4>, 4>& curFaceFaces =
+                faceFaceTable.find(contents[masterI])();
+
+            DynamicList<DynamicList<scalar, 4>, 4>& curFaceWeights =
+                faceFaceWeightsTable.find(contents[masterI])();
+
+            forAll (curNbrs, curNbrI)
+            {
+                // Get faces and weights
+                DynamicList<label, 4>& facesIter = curFaceFaces[curNbrI];
+
+                DynamicList<scalar, 4>& weightsIter = curFaceWeights[curNbrI];
+
+                faceCells_[nCoarseFaces] = curNbrs[curNbrI];
+
+                forAll (facesIter, facesIterI)
+                {
+                    fineAddressing_[nAgglomPairs] = facesIter[facesIterI];
+                    restrictAddressing_[nAgglomPairs] = nCoarseFaces;
+                    restrictWeights_[nAgglomPairs] = weightsIter[facesIterI];
+
+                    nAgglomPairs++;
+                }
+
+                nCoarseFaces++;
+            }
+        }
     }
 }
 
