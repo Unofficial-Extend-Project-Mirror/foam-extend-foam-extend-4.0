@@ -62,7 +62,7 @@ void Foam::MRFZone::relativeRhoFlux
         {
             patchFaceI = includedFaces_[patchI][i];
 
-            phi.boundaryField()[patchI][patchFaceI] = 0;
+            phi.boundaryField()[patchI][patchFaceI] = 0.0;
         }
     }
 
@@ -102,7 +102,7 @@ void Foam::MRFZone::absoluteRhoFlux
     {
         faceI = internalFaces_[i];
 
-        phiIn[faceI] += meshVelIn[faceI];
+        phiIn[faceI] += rho[faceI]*meshVelIn[faceI];
     }
 
     // Included patches
@@ -113,6 +113,7 @@ void Foam::MRFZone::absoluteRhoFlux
             patchFaceI = includedFaces_[patchI][i];
 
             phi.boundaryField()[patchI][patchFaceI] +=
+                rho.boundaryField()[patchI][patchFaceI]*
                 meshVel.boundaryField()[patchI][patchFaceI];
         }
     }
@@ -125,6 +126,7 @@ void Foam::MRFZone::absoluteRhoFlux
             patchFaceI = excludedFaces_[patchI][i];
 
             phi.boundaryField()[patchI][patchFaceI] +=
+                rho.boundaryField()[patchI][patchFaceI]*
                 meshVel.boundaryField()[patchI][patchFaceI];
         }
     }

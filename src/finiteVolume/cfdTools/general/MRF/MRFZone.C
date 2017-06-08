@@ -695,7 +695,43 @@ void Foam::MRFZone::meshPhi
     surfaceScalarField& phi
 ) const
 {
-    phi += meshVelocity();
+    const surfaceScalarField& meshVel = meshVelocity();
+
+    register label faceI, patchFaceI;
+
+    scalarField& phiIn = phi.internalField();
+    const scalarField& meshVelIn = meshVel.internalField();
+
+    forAll (internalFaces_, i)
+    {
+        faceI = internalFaces_[i];
+        phiIn[faceI] = meshVelIn[faceI];
+    }
+
+    // Included patches
+
+    forAll (includedFaces_, patchI)
+    {
+        forAll (includedFaces_[patchI], i)
+        {
+            patchFaceI = includedFaces_[patchI][i];
+
+            phi.boundaryField()[patchI][patchFaceI] =
+                meshVel.boundaryField()[patchI][patchFaceI];
+        }
+    }
+
+    // Excluded patches
+    forAll (excludedFaces_, patchI)
+    {
+        forAll (excludedFaces_[patchI], i)
+        {
+            patchFaceI = excludedFaces_[patchI][i];
+
+            phi.boundaryField()[patchI][patchFaceI] =
+                meshVel.boundaryField()[patchI][patchFaceI];
+        }
+    }
 }
 
 
