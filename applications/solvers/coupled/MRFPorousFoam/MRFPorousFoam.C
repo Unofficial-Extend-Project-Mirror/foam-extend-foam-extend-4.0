@@ -112,7 +112,9 @@ int main(int argc, char *argv[])
             U.correctBoundaryConditions();
             p.correctBoundaryConditions();
 
-            phi = (fvc::interpolate(U) & mesh.Sf()) + tpEqn().flux() + tpresSource;
+            phi = (fvc::interpolate(U) & mesh.Sf())
+                + tpEqn().flux()
+                + tpresSource;
         }
         
         // Make flux relative in rotating zones
