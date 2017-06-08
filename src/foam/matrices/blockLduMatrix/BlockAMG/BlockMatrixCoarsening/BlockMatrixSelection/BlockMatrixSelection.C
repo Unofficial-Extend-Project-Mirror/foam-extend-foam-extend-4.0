@@ -618,7 +618,7 @@ void Foam::BlockMatrixSelection<Type>::calcCoarsening()
 
     reduce(coarsen_, andOp<bool>());
 
-    if (blockLduMatrix::debug >= 2)
+    if (blockLduMatrix::debug >= 3)
     {
         Pout<< "Coarse level size: " << nCoarseEqns_;
 

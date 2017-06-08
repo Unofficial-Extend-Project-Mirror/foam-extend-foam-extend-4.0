@@ -311,7 +311,7 @@ void Foam::pamgPolicy::calcChild()
 
     reduce(coarsen_, andOp<bool>());
 
-    if (lduMatrix::debug >= 2)
+    if (lduMatrix::debug >= 3)
     {
         Pout<< "Coarse level size: " << nCoarseEqns_
             << " nSolo = " << nSolo_;
