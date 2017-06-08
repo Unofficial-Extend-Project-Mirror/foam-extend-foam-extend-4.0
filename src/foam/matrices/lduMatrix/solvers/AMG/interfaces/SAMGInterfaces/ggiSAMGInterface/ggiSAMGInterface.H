@@ -164,6 +164,15 @@ public:
             }
 
 
+        // Coefficient selection
+
+            //- Select the given fine-level coefficients and return
+            virtual tmp<scalarField> selectCoeffs
+            (
+                const scalarField& fineCoeffs
+            ) const;
+
+
         // Interface transfer functions
 
             //- Fast expand
@@ -297,6 +306,8 @@ public:
             //- Expand crMatrix to zone
             //  Used in optimised SAMG coarsening
             virtual void expandCrMatrixToZone(crMatrix&) const;
+
+
 };
 
 

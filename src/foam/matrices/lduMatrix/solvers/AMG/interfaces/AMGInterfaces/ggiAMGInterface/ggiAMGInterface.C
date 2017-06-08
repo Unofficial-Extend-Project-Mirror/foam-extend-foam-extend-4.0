@@ -1057,8 +1057,6 @@ Foam::tmp<Foam::scalarField> Foam::ggiAMGInterface::agglomerateCoeffs
     const scalarField& fineCoeffs
 ) const
 {
-    // HJ, HERE THIS SHOULD BE REMOVED: NO LONGER NEEDED BECAUSE ALL ADDRESSING IS LOCAL
-
     // Note: reconsider better parallel communication here.
     // Currently expanding to full zone size
     // HJ, 16/Mar/2016

@@ -354,7 +354,7 @@ public:
 
             //- Expand face field to full zone size, including reduction
             template<class Type>
-            tmp<Field<Type> > fastExpand(const Field<Type>& pf) const;
+            tmp<Field<Type> > fastExpand(const UList<Type>& pf) const;
 
             //- Interpolate face field: given field on a the shadow side,
             //  create an interpolated field on this side

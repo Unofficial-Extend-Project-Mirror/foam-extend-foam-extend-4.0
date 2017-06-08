@@ -86,7 +86,7 @@ tmp<Field<Type> > ggiSAMGInterface::fastExpand(const UList<Type>& ff) const
 template<class Type>
 tmp<Field<Type> > ggiSAMGInterface::fastReduce(const UList<Type>& ff) const
 {
-    // Old algorithm: OBOSLETE
+    // Old algorithm: OBSOLETE
     // Local processor contains faceCells part of the zone and requires
     // zoneAddressing part.
     // For fast communications, each processor will send the faceCells and

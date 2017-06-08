@@ -283,10 +283,83 @@ void Foam::ggiFvPatch::expandAddrToZone(labelField& lf) const
 }
 
 
-void Foam::ggiFvPatch::expandCrMatrixToZone(crMatrix&) const
+void Foam::ggiFvPatch::expandCrMatrixToZone(crMatrix& patchP) const
 {
-    // Code missing.  HJ, 6/Jun/2017
-    notImplemented("void ggiFvPatch::expandCrMatrixToZone(crMatrix&) const");
+    if (!localParallel())
+    {
+        // Split the crMatrix into rows and expand it
+        const crAddressing& patchCrAddr = patchP.crAddr();
+        const labelList& patchRowStart = patchCrAddr.rowStart();
+        const labelList& patchCol = patchCrAddr.column();
+        const scalarField& patchCoeff = patchP.coeffs();
+
+        List<labelField> cols(patchCrAddr.nRows());
+        List<scalarField> coeffs(patchCrAddr.nRows());
+
+        for (register label faceI = 0; faceI < patchCrAddr.nRows(); faceI++)
+        {
+            // Unpack row
+            const label rowStart = patchRowStart[faceI];
+            const label rowLength = patchRowStart[faceI + 1] - rowStart;
+
+            cols[faceI].setSize(rowLength);
+            labelField& curCols = cols[faceI];
+
+            coeffs[faceI].setSize(rowLength);
+            scalarField& curCoeffs = coeffs[faceI];
+
+            for (register label coeffI = 0; coeffI < rowLength; coeffI++)
+            {
+                curCols[coeffI] = patchCol[rowStart + coeffI];
+                curCoeffs[coeffI] = patchCoeff[rowStart + coeffI];
+            }
+        }
+
+        // Expand to zone size
+        List<labelField> zoneColsFF = ggiPolyPatch_.fastExpand(cols);
+        List<scalarField> zoneCoeffsFF = ggiPolyPatch_.fastExpand(coeffs);
+
+        scalar nZoneEntries = 0;
+
+        forAll (zoneColsFF, zfI)
+        {
+            nZoneEntries += zoneColsFF[zfI].size();
+        }
+        
+        // Reconstruct matrix
+        labelList zoneRowStart(zoneSize() + 1);
+        labelList zoneCols(nZoneEntries);
+        scalarField zoneCoeffs(nZoneEntries);
+
+        zoneRowStart[0] = 0;
+        // Reset nZoneEntries for use as a counter
+        nZoneEntries = 0;
+        
+        forAll(zoneColsFF, zfI)
+        {
+            const labelField& curCols = zoneColsFF[zfI];
+            const scalarField& corCoeffs = zoneCoeffsFF[zfI];
+            
+            zoneRowStart[zfI + 1] = zoneRowStart[zfI] + curCols.size();
+
+            forAll (curCols, coeffI)
+            {
+                zoneCols[nZoneEntries] = curCols[coeffI];
+                zoneCoeffs[nZoneEntries] = corCoeffs[coeffI];
+                nZoneEntries++;
+            }
+        }
+        patchP = crMatrix
+        (
+            zoneSize(),
+            patchCrAddr.nCols(),
+            zoneRowStart,
+            zoneCols
+        );
+
+        // Set coeffs
+        patchP.coeffs() = zoneCoeffs;        
+    }
 }
 
 

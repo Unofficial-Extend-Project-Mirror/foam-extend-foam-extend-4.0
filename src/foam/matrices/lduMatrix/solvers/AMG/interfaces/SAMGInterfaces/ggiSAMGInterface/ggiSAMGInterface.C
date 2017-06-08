@@ -283,17 +283,87 @@ Foam::ggiSAMGInterface::ggiSAMGInterface
     const labelList& fineZa =  fineGgiInterface_.zoneAddressing();
 
     // Expand master prolongation to zone
-    crMatrix masterExpandProlongation(interfaceProlongation);
+    crMatrix masterExpandProlongation;
 
-    //HJ, HERE: expand master prolongation to zone
     // Note: master is now the size of local zone
     if (!fineGgiInterface_.localParallel())
     {
-        // Not line this: expand without communication HJ, HERE
-        // fineGgiInterface_.expandCrMatrixToZone
-        // (
-        //     masterExpandProlongation
-        // );
+        masterExpandProlongation = interfaceProlongation;
+    }
+    else
+    {
+        // Create a prolongation matrix the size of zone.  For the zone faces
+        // which are not local, the row will be empty.
+        // This is necessary to make sure both the master and neighbour crMatrix
+        // can be accessed with the zone index
+        // HJ, 8/Jun/2017
+        const crAddressing& patchCrAddr = interfaceProlongation.crAddr();
+
+        labelList zoneRowStart(fineGgiInterface_.zoneSize() + 1);
+        labelList zoneCol(patchCrAddr.nEntries());
+        scalarField zoneCoeff(patchCrAddr.nEntries());
+
+        // Make a zone-sized list and fill it in with local face index
+        // that holds and requires the data
+        labelList zoneFaceID(fineGgiInterface_.zoneSize(), -1);
+
+        forAll (fineZa, zaI)
+        {
+            zoneFaceID[fineZa[zaI]] = zaI;
+        }
+
+        // Get patch addressing and coeff
+        const labelList& patchRowStart = patchCrAddr.rowStart();
+        const labelList& patchCol = patchCrAddr.column();
+        const scalarField& patchCoeff = interfaceProlongation.coeffs();
+
+        label nEntries = 0;
+
+        zoneRowStart[0] = 0;
+
+        // Fill in the column and coeff array
+        forAll (zoneFaceID, zfI)
+        {
+            if (zoneFaceID[zfI] == -1)
+            {
+                // Face not in zone.  Record empty row
+                zoneRowStart[zfI + 1] = zoneRowStart[zfI];
+            }
+            else
+            {
+                const label patchFace = zoneFaceID[zfI];
+
+                // Copy row from patch matrix
+                zoneRowStart[zfI + 1] =
+                    zoneRowStart[zfI]
+                  + patchRowStart[patchFace + 1]
+                  - patchRowStart[patchFace];
+
+                for
+                (
+                    register label pfI = patchRowStart[patchFace];
+                    pfI < patchRowStart[patchFace + 1];
+                    pfI++
+                )
+                {
+                    zoneCol[nEntries] = patchCol[pfI];
+                    zoneCoeff[nEntries] = patchCoeff[pfI];
+                    nEntries++;
+                }
+            }
+        }
+
+        // Create zone matrix
+        masterExpandProlongation = crMatrix
+        (
+            fineGgiInterface_.zoneSize(),
+            patchCrAddr.nCols(),
+            zoneRowStart,
+            zoneCol
+        );
+
+        // Set coeffs
+        masterExpandProlongation.coeffs() = zoneCoeff;
     }
 
     // Create crMatrix for neighbour faces.  Note: expandCrMatrixToZone will
@@ -516,8 +586,8 @@ Foam::ggiSAMGInterface::ggiSAMGInterface
 
                             // This master side face already exists
 
-                            // Check all current neighbours to see if the current
-                            // slave already exists.  If so, add the coefficient.
+                            // Check current neighbours to see if the current
+                            // slave already exists.  If so, add coefficient.
 
                             DynamicList<long, 4>& curNbrs =
                                 neighboursTable.find(curMaster)();
@@ -576,7 +646,7 @@ Foam::ggiSAMGInterface::ggiSAMGInterface
                                 newFW.append(curNW*pWeight*rWeight);
                                 curFaceWeights.append(newFW);
 
-                                // New coarse face created for an existing master
+                                // New coarse face created for existing master
                                 nCoarseFaces++;
                                 nAgglomPairs++;
                             }
@@ -792,7 +862,7 @@ Foam::ggiSAMGInterface::ggiSAMGInterface
                             newFW.append(pWeight*rWeight);
                             curFaceWeights.append(newFW);
 
-                            // New coarse face created for an existing master
+                            // New coarse face created for existing master
                             nCoarseFaces++;
                             nAgglomPairs++;
                         }
@@ -1165,6 +1235,54 @@ Foam::ggiSAMGInterface::~ggiSAMGInterface()
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
+Foam::tmp<Foam::scalarField> Foam::ggiSAMGInterface::selectCoeffs
+(
+    const scalarField& fineCoeffs
+) const
+{
+    // Note: reconsider better parallel communication here.
+    // Currently expanding to full zone size
+    // HJ, 16/Mar/2016
+
+    // Reassemble fine coefficients to full fine zone size
+    // No need to initialise to zero, as only local coefficients
+    // are used.  HJ, 9/Jun/2016
+    scalarField zoneFineCoeffs(fineGgiInterface_.zoneSize());
+
+    const labelList& fineZa = fineGgiInterface_.zoneAddressing();
+
+    forAll (fineZa, i)
+    {
+        zoneFineCoeffs[fineZa[i]] = fineCoeffs[i];
+    }
+
+    // Reduce zone data is not required: all coefficients are local
+    // HJ, 9/Jun/2016
+
+    scalarField zoneCoarseCoeffs(zoneSize(), 0);
+
+    // Restrict coefficient
+    forAll (restrictAddressing_, ffi)
+    {
+        zoneCoarseCoeffs[restrictAddressing_[ffi]] +=
+            restrictWeights_[ffi]*zoneFineCoeffs[fineAddressing_[ffi]];
+    }
+
+    tmp<scalarField> tcoarseCoeffs(new scalarField(size(), 0.0));
+    scalarField& coarseCoeffs = tcoarseCoeffs();
+
+    // Filter zone coefficients to local field
+    const labelList& za = zoneAddressing();
+
+    forAll (za, i)
+    {
+        coarseCoeffs[i] = zoneCoarseCoeffs[za[i]];
+    }
+
+    return tcoarseCoeffs;
+}
+
+
 bool Foam::ggiSAMGInterface::master() const
 {
     return fineGgiInterface_.master();
@@ -1345,13 +1463,82 @@ void Foam::ggiSAMGInterface::expandAddrToZone(labelField& lf) const
 }
 
 
-void Foam::ggiSAMGInterface::expandCrMatrixToZone(crMatrix&) const
+void Foam::ggiSAMGInterface::expandCrMatrixToZone(crMatrix& patchP) const
 {
-    // Code missing: collapse crMatrices into a zone crMatrix
     if (!localParallel())
     {
-        notImplemented("expandCrMatrixToZone");
-        // Code missing: collapse crMatrices into a zone crMatrix
+        // Split the crMatrix into rows and expand it
+        const crAddressing& patchCrAddr = patchP.crAddr();
+        const labelList& patchRowStart = patchCrAddr.rowStart();
+        const labelList& patchCol = patchCrAddr.column();
+        const scalarField& patchCoeff = patchP.coeffs();
+
+        List<labelField> cols(patchCrAddr.nRows());
+        List<scalarField> coeffs(patchCrAddr.nRows());
+
+        for (register label faceI = 0; faceI < patchCrAddr.nRows(); faceI++)
+        {
+            // Unpack row
+            const label rowStart = patchRowStart[faceI];
+            const label rowLength = patchRowStart[faceI + 1] - rowStart;
+
+            cols[faceI].setSize(rowLength);
+            labelField& curCols = cols[faceI];
+
+            coeffs[faceI].setSize(rowLength);
+            scalarField& curCoeffs = coeffs[faceI];
+
+            for (register label coeffI = 0; coeffI < rowLength; coeffI++)
+            {
+                curCols[coeffI] = patchCol[rowStart + coeffI];
+                curCoeffs[coeffI] = patchCoeff[rowStart + coeffI];
+            }
+        }
+
+        // Expand to zone size
+        List<labelField> zoneColsFF = fastExpand(cols);
+        List<scalarField> zoneCoeffsFF = fastExpand(coeffs);
+
+        scalar nZoneEntries = 0;
+
+        forAll (zoneColsFF, zfI)
+        {
+            nZoneEntries += zoneColsFF[zfI].size();
+        }
+
+        // Reconstruct matrix
+        labelList zoneRowStart(zoneSize() + 1);
+        labelList zoneCols(nZoneEntries);
+        scalarField zoneCoeffs(nZoneEntries);
+
+        zoneRowStart[0] = 0;
+        // Reset nZoneEntries for use as a counter
+        nZoneEntries = 0;
+
+        forAll(zoneColsFF, zfI)
+        {
+            const labelField& curCols = zoneColsFF[zfI];
+            const scalarField& corCoeffs = zoneCoeffsFF[zfI];
+
+            zoneRowStart[zfI + 1] = zoneRowStart[zfI] + curCols.size();
+
+            forAll (curCols, coeffI)
+            {
+                zoneCols[nZoneEntries] = curCols[coeffI];
+                zoneCoeffs[nZoneEntries] = corCoeffs[coeffI];
+                nZoneEntries++;
+            }
+        }
+        patchP = crMatrix
+        (
+            zoneSize(),
+            patchCrAddr.nCols(),
+            zoneRowStart,
+            zoneCols
+        );
+
+        // Set coeffs
+        patchP.coeffs() = zoneCoeffs;
     }
 }
 
