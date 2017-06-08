@@ -409,38 +409,41 @@ Foam::ggiSAMGInterface::ggiSAMGInterface
     // HJ, 19/Feb/2009
 
     // Note: Guessing size of HashTable to fine interface size
+    // There is about 1/2 of coarse equations with approx 3 coarse
+    // equations in prolongation row.
+    // HJ, 8/Jun/2017
 
     // Coded neighbour index. Note: using long int to simplify encoding
     // HJ, 1/Aug/2016
     HashTable<DynamicList<long, 4>, long, Hash<long> > neighboursTable
     (
-        Foam::max(128, fineGgiInterface_.interfaceSize()/4)
+        Foam::max(128, fineGgiInterface_.interfaceSize())
     );
 
     // Neignbour processor index
     HashTable<DynamicList<label, 4>, label, Hash<label> > nbrsProcTable
     (
-        Foam::max(128, fineGgiInterface_.interfaceSize()/4)
+        Foam::max(128, fineGgiInterface_.interfaceSize())
     );
 
     // Neighbour face-faces addressing for a face with split neighbours
     HashTable<DynamicList<DynamicList<label, 4>, 4>, label, Hash<label> >
     faceFaceTable
     (
-        Foam::max(128, fineGgiInterface_.interfaceSize()/4)
+        Foam::max(128, fineGgiInterface_.interfaceSize())
     );
 
     HashTable<DynamicList<DynamicList<label, 4>, 4>, label, Hash<label> >
     faceFaceNbrTable
     (
-        Foam::max(128, fineGgiInterface_.interfaceSize()/4)
+        Foam::max(128, fineGgiInterface_.interfaceSize())
     );
 
     // Neighbour face-faces weights for a face with split neighbours
     HashTable<DynamicList<DynamicList<scalar, 4>, 4>, label, Hash<label> >
     faceFaceWeightsTable
     (
-        Foam::max(128, fineGgiInterface_.interfaceSize()/4)
+        Foam::max(128, fineGgiInterface_.interfaceSize())
     );
 
     // Count the number of coarse faces
@@ -466,6 +469,9 @@ Foam::ggiSAMGInterface::ggiSAMGInterface
         neighbourP = &masterExpandProlongation;
     }
 
+//------------------------------------------------------------------------------
+//                          FINE LEVEL - use GGI weights!
+//------------------------------------------------------------------------------
     // On the fine level, addressing is made in a labelListList
     if (fineGgiInterface_.fineLevel())
     {
@@ -595,14 +601,16 @@ Foam::ggiSAMGInterface::ggiSAMGInterface
                             DynamicList<label, 4>& curNbrsProc =
                                 nbrsProcTable.find(curMaster)();
 
-                            DynamicList<DynamicList<label, 4>, 4>& curFaceFaces =
+                            DynamicList<DynamicList<label, 4>, 4>&
+                                curFaceFaces =
                                 faceFaceTable.find(curMaster)();
 
                             DynamicList<DynamicList<label, 4>, 4>&
                                 curFaceFaceNbrs =
                                 faceFaceNbrTable.find(curMaster)();
 
-                            DynamicList<DynamicList<scalar, 4>, 4>& curFaceWeights =
+                            DynamicList<DynamicList<scalar, 4>, 4>&
+                                curFaceWeights =
                                 faceFaceWeightsTable.find(curMaster)();
 
                             // Search for coded neighbour
@@ -710,7 +718,7 @@ Foam::ggiSAMGInterface::ggiSAMGInterface
         } // end for all fine faces
     }
 //------------------------------------------------------------------------------
-//                          FINE LEVEL - no GGI weights!
+//                      COARSE LEVEL - no GGI weights!
 //------------------------------------------------------------------------------
     else
     {
@@ -771,7 +779,7 @@ Foam::ggiSAMGInterface::ggiSAMGInterface
             }
 
             // Triple product for only one row of prolongation and
-            // restriction - with included weights from GGI
+            // restriction - no GGI weights on coarse level
             for
             (
                 label indexR = masterP->crAddr().rowStart()[curSide];
