@@ -62,7 +62,9 @@ void Foam::MRFZone::relativeRhoFlux
         {
             patchFaceI = includedFaces_[patchI][i];
 
-            phi.boundaryField()[patchI][patchFaceI] = 0.0;
+            phi.boundaryField()[patchI][patchFaceI] -=
+                rho.boundaryField()[patchI][patchFaceI]*
+                meshVel.boundaryField()[patchI][patchFaceI];
         }
     }
 
