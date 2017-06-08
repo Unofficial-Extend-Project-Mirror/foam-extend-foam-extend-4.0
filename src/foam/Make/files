@@ -714,7 +714,7 @@ BlockSAMGInterfaceFields = $(BlockAMG)/BlockSAMGInterfaceFields
 $(BlockSAMGInterfaceFields)/BlockSAMGInterfaceField/blockSAMGInterfaceFields.C
 $(BlockSAMGInterfaceFields)/BlockSAMGInterfaceField/blockVectorNSAMGInterfaceFields.C
 $(BlockSAMGInterfaceFields)/ProcessorBlockSAMGInterfaceField/ProcessorBlockSAMGInterfaceFields.C
-
+$(BlockSAMGInterfaceFields)/GGIBlockSAMGInterfaceField/GGIBlockSAMGInterfaceFields.C
 
 BlockMatrixCoarsening = $(BlockAMG)/BlockMatrixCoarsening
 $(BlockMatrixCoarsening)/BlockMatrixCoarsening/blockMatrixCoarsenings.C
