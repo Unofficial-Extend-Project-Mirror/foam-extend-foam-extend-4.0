@@ -109,51 +109,76 @@ tmp<scalarField> nutMEWTWallFunctionFvPatchScalarField::calcNut() const
     const scalarField magUwInTang = mag(UwInTang);
 
     // Calculate tangential direction for patch cells
-    const vectorField tDir = UwInTang/magUwInTang;
+    const vectorField tDir = UwInTang/(magUwInTang + SMALL);
 
     // Wall-velocity vector field tangential to the wall
     const vectorField UwTang = Uw - (Uw & n)*n;
     const scalarField magUwTang = mag(UwTang);
 
 
-    // Pressure terms
-    const volScalarField& p =
-        this->dimensionedInternalField().mesh().lookupObject
-        <
-            volScalarField
-        >(pName_);
+    // Pressure effects. Lookup the pressure gradient field from the registry
+    // (created with pressureGradient function object)
 
-    // Pressure gradient
-    const volVectorField gradp = fvc::grad(p);
+    // Pressure gradient projected on the wall parallel velocity direction
+    scalarField gradpTang(magGradUw.size(), 0.0);
 
-    // Pressure gradient in wall adjacent cell
-    const vectorField gradPIn =
-        gradp.boundaryField()[this->patch().index()].patchInternalField();
-
-    // Pressure gradient projected on the wall parallel velocity
-    const scalarField gradpTang= gradPIn & tDir;
-
-
-    // Convective terms
-    const volVectorField& U =
-        this->dimensionedInternalField().mesh().lookupObject
+    if
+    (
+        this->dimensionedInternalField().mesh().foundObject
         <
             volVectorField
-        >(UName_);
+        >("pressureGradient")
+    )
+    {
+        const volVectorField& gradP =
+            this->dimensionedInternalField().mesh().lookupObject
+            <volVectorField>("pressureGradient");
 
-    const surfaceScalarField& phi =
-        this->dimensionedInternalField().mesh().lookupObject
+        // Update pressure gradient projected on the wall parallel velocity
+        gradpTang =
+            gradP.boundaryField()[this->patch().index()].patchInternalField()
+          & tDir;
+    }
+    else
+    {
+        Info<< "Field pressureGradient not found. Neglecting pressure gradient "
+            << "effects for wall functions at patch: " << patch().name()
+            << endl;
+    }
+
+
+    // Convective terms. Lookup the convection field from the registry (created
+    // with velocityConvection function object)
+
+    // Velocity convection projected on the wall parallel velocity direction
+    scalarField convectionTang(magGradUw.size(), 0.0);
+
+    if
+    (
+        this->dimensionedInternalField().mesh().foundObject
         <
-            surfaceScalarField
-        >("phi");
+            volVectorField
+        >("velocityConvection")
+    )
+    {
+        const volVectorField& convection =
+            this->dimensionedInternalField().mesh().lookupObject
+            <volVectorField>("velocityConvection");
 
-    const volVectorField convection = fvc::div(phi, U);
-
-    const vectorField convectionIn =
-        convection.boundaryField()[this->patch().index()].patchInternalField();
-
-    // Convection term projected on the wall parallel velocity
-    const scalarField convectionTang = convectionIn & tDir;
+        // Upate convection term projected on the wall parallel velocity
+        convectionTang =
+            convection.boundaryField()
+            [
+                this->patch().index()
+            ].patchInternalField()
+          & tDir;
+    }
+    else
+    {
+        Info<< "Field velocityConvection not found. Neglecting convection "
+            << "effects for wall functions at patch: " << patch().name()
+            << endl;
+    }
 
     // Needed to calculate yPlus
     const scalarField& eddyVis =
