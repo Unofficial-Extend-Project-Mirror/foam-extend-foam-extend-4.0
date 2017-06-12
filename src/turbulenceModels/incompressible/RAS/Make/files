@@ -51,6 +51,9 @@ $(kqRWallFunctions)/kNonEqWallFunction/kNonEqWallFunctionFvPatchScalarField.C
 RWallFunctions = $(wallFunctions)/RWallFunctions
 $(RWallFunctions)/RWallFunction/RWallFunctionFvPatchSymmTensorField.C
 
+wallFunctionFunctionObjects = $(wallFunctions)/functionObjects
+$(wallFunctionFunctionObjects)/pressureGradient/pressureGradientFunctionObject.C
+$(wallFunctionFunctionObjects)/velocityConvection/velocityConvectionFunctionObject.C
 
 /* Patch fields */
 derivedFvPatchFields/turbulentHeatFluxTemperature/turbulentHeatFluxTemperatureFvPatchScalarField.C
