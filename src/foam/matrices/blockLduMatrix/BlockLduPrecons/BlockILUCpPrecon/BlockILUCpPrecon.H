@@ -149,9 +149,8 @@ public:
         );
 
 
-    // Destructor
-
-        virtual ~BlockILUCpPrecon();
+    //- Destructor
+    virtual ~BlockILUCpPrecon();
 
 
     // Member Functions

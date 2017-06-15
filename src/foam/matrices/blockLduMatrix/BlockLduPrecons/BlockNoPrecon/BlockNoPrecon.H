@@ -83,10 +83,9 @@ public:
         {}
 
 
-    // Destructor
-
-        virtual ~BlockNoPrecon()
-        {}
+    //- Destructor
+    virtual ~BlockNoPrecon()
+    {}
 
 
     // Member Functions

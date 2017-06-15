@@ -84,10 +84,9 @@ public:
         {}
 
 
-    // Destructor
-
-        virtual ~BlockDiagonalPrecon()
-        {}
+    //- Destructor
+    virtual ~BlockDiagonalPrecon()
+    {}
 
 
     // Member Functions

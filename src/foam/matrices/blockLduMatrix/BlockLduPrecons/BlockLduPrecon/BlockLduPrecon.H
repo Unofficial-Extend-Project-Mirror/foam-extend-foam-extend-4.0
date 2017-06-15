@@ -113,10 +113,9 @@ public:
         );
 
 
-    // Destructor
-
-        virtual ~BlockLduPrecon()
-        {}
+    //- Destructor
+    virtual ~BlockLduPrecon()
+    {}
 
 
     // Member Functions

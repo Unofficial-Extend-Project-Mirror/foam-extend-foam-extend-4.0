@@ -95,10 +95,9 @@ public:
         {}
 
 
-    // Destructor
-
-        virtual ~BlockILUSmoother()
-        {}
+    //- Destructor
+    virtual ~BlockILUSmoother()
+    {}
 
 
     // Member Functions
