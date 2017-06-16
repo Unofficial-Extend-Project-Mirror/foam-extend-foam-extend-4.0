@@ -94,7 +94,7 @@ int main(int argc, char *argv[])
             
             solve
             (
-                tpEqn
+                tpEqn()
              ==
               - fvc::div(U)
             );
