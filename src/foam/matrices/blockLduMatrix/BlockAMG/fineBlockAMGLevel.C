@@ -120,9 +120,6 @@ void Foam::fineBlockAMGLevel<Type>::residual
     {
         res[i] = b[i] - res[i];
     }
-
-    //HJ, experimental: rebase to zero for round-off error
-    res -= gAverage(res);
 }
 
 
