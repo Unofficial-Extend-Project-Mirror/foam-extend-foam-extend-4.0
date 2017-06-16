@@ -1166,7 +1166,7 @@ Foam::BlockMatrixSelection<Type>::restrictMatrix() const
                 coeffLabel[lowerCoarseAddr[losortCoarseAddr[indexC]]] =
                     losortCoarseAddr[indexC];
             }
-            
+
             // Compressed row format, get indices of coeffsR in row ir
             for (label indexR = rowR[ir]; indexR < rowR[ir + 1]; indexR++)
             {
@@ -1316,6 +1316,26 @@ Foam::BlockMatrixSelection<Type>::restrictMatrix() const
             )
             {
                 coeffLabel[lowerCoarseAddr[losortCoarseAddr[indexC]]] = -1;
+            }
+        }
+
+
+        // Check if diagonal inverts
+        {
+            typedef typename TypeCoeffField::linearType linearType;
+
+            squareTypeField invCoarseDiag = inv(activeCoarseDiag);
+
+            squareType sqrI;
+            expandLinear(sqrI, linearType::one);
+            scalar checkInverse = gMax
+            (
+                mag((invCoarseDiag & activeCoarseDiag) - sqrI)
+            );
+
+            if (checkInverse > 1e-12)
+            {
+                Info<< "Inverse check max: " << checkInverse << endl;
             }
         }
 
