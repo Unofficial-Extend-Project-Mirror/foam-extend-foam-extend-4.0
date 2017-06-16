@@ -186,8 +186,8 @@ public:
 
 
     // Destructor
-
-        virtual ~BlockCholeskyPrecon();
+    virtual ~BlockCholeskyPrecon()
+    {}
 
 
     // Member Functions

@@ -532,13 +532,6 @@ Foam::BlockCholeskyPrecon<Type>::BlockCholeskyPrecon
 }
 
 
-// * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
-
-template<class Type>
-Foam::BlockCholeskyPrecon<Type>::~BlockCholeskyPrecon()
-{}
-
-
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 template<class Type>
