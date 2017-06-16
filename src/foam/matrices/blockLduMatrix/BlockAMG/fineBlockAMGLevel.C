@@ -113,17 +113,16 @@ void Foam::fineBlockAMGLevel<Type>::residual
     Field<Type>& res
 ) const
 {
-    matrix_.Amul
-    (
-        res,
-        x
-    );
+    matrix_.Amul(res, x);
 
     // residual = b - Ax
     forAll (b, i)
     {
         res[i] = b[i] - res[i];
     }
+
+    //HJ, experimental: rebase to zero for round-off error
+    res -= gAverage(res);
 }
 
 

@@ -128,17 +128,16 @@ void Foam::coarseBlockAMGLevel<Type>::residual
 ) const
 {
     // Calculate residual
-    matrixPtr_->Amul
-    (
-        res,
-        x
-    );
+    matrixPtr_->Amul(res, x);
 
     // residual = b - Ax
     forAll (b, i)
     {
         res[i] = b[i] - res[i];
     }
+
+    //HJ, experimental: rebase to zero for round-off error
+    res -= gAverage(res);
 }
 
 
