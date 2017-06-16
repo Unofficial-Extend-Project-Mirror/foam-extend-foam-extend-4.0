@@ -1,10 +1,4 @@
 {
-    volScalarField divPhi
-    (
-        "divPhi",
-        fvc::div(phi)
-    );
-
     // Update boundary velocity for consistency with the flux
     mrfZones.correctBoundaryVelocity(U);
 
