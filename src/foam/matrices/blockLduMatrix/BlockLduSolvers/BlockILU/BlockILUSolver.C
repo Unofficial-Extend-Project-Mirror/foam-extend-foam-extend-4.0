@@ -76,7 +76,7 @@ Foam::BlockILUSolver<Type>::solve
 
     Field<Type> residual(x.size());
 
-    // Calculate residual.  Note: sign of residual swapped for efficiency
+    // Calculate residual
     matrix.Amul(residual, x);
 
     forAll (b, i)
