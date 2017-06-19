@@ -709,16 +709,10 @@ void Foam::BlockCholeskyPrecon<Type>::diagInterfaceMultiply
         dDiag[fc[coeffI]] +=
             mult.tripleProduct
             (
-                bouCoeffs[coeffI],
+                intCoeffs[coeffI],
                 dDiag[fc[coeffI]],
-                intCoeffs[coeffI]
+                bouCoeffs[coeffI]
             );
-//            mult.tripleProduct
-//            (
-//                intCoeffs[coeffI],
-//                dDiag[fc[coeffI]],
-//                bouCoeffs[coeffI]
-//            );
     }
 }
 
