@@ -77,9 +77,8 @@ void Foam::CholeskyPrecon::calcPreconDiag()
 
                 forAll (fc, coeffI)
                 {
-                    // Note: sign is the same as in main loop below
-                    // HJ and VV, 19/Jun/2017
-                    preconDiag_[fc[coeffI]] -=
+                    // Note: sign fixed by HJ, 19/Jun/2017
+                    preconDiag_[fc[coeffI]] +=
                         sqr(bouCoeffs[coeffI])/preconDiag_[fc[coeffI]];
                 }
             }
