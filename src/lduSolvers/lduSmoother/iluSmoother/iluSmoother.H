@@ -38,7 +38,7 @@ SourceFiles
 #ifndef iluSmoother_H
 #define iluSmoother_H
 
-#include "CholeskyPrecon.H"
+#include "lduMatrix.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -56,7 +56,7 @@ class iluSmoother
     // Private Data
 
         //- Cholesky preconditioner
-        CholeskyPrecon precon_;
+        autoPtr<lduPreconditioner> preconPtr_;
 
         //- Correction array
         mutable scalarField xCorr_;
@@ -92,10 +92,9 @@ public:
         );
 
 
-    // Destructor
-
-        virtual ~iluSmoother()
-        {}
+    //- Destructor
+    virtual ~iluSmoother()
+    {}
 
 
     // Member Functions
