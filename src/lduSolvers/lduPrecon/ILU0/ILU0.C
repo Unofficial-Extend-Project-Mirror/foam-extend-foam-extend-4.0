@@ -260,42 +260,25 @@ void Foam::ILU0::preconditionT
             << abort(FatalError);
     }
 
-    // In order to properly execute parallel preconditioning, re-use
-    // x to zero and execute coupled boundary update first
-    // HJ, 19/Jun/2017
-
-    x = 0;
-
-    // Coupled boundary update
+    // Note: coupled boundary updated is not needed because x is zero
+    // HJ and VV, 19/Jun/2017
+    
+    // Diagonal block
     {
-        matrix_.initMatrixInterfaces
-        (
-            coupleIntCoeffs_, // Note: transpose coupled coeffs
-            interfaces_,
-            x,
-            x,                // put result into x
-            cmpt,
-            false
-        );
+        scalar* __restrict__ xPtr = x.begin();
 
-        matrix_.updateMatrixInterfaces
-        (
-            coupleIntCoeffs_, // Note: transpose coupled coeffs
-            interfaces_,
-            x,
-            x,                // put result into x
-            cmpt,
-            false
-        );
-    }
+        const scalar* __restrict__ preconDiagPtr = preconDiag_.begin();
 
-    // Multiply with inverse diag to precondition
-    x *= preconDiag_;
+        const scalar* __restrict__ bPtr = b.begin();
 
-    // Diagonal block: note +=
-    forAll(x, i)
-    {
-        x[i] += b[i]*preconDiag_[i];
+        const label nRows = x.size();
+
+        // Note: multiplication over-write x: no need to initialise
+        // HJ, and VV, 19/Jun/2017
+        for (register label rowI = 0; rowI < nRows; rowI++)
+        {
+            xPtr[rowI] = bPtr[rowI]*preconDiagPtr[rowI];
+        }
     }
 
     if (matrix_.asymmetric())
