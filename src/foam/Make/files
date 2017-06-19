@@ -756,6 +756,7 @@ $(BlockLduSolvers)/blockVectorNSolvers.C
 $(BlockLduSolvers)/BlockLduSolver/blockLduSolvers.C
 $(BlockLduSolvers)/BlockDiagonal/blockDiagonalSolvers.C
 $(BlockLduSolvers)/BlockGaussSeidel/blockGaussSeidelSolvers.C
+$(BlockLduSolvers)/BlockILU/blockILUSolvers.C
 $(BlockLduSolvers)/BlockCG/blockCGSolvers.C
 $(BlockLduSolvers)/BlockBiCGStab/blockBiCGStabSolvers.C
 $(BlockLduSolvers)/BlockGMRES/blockGMRESSolvers.C

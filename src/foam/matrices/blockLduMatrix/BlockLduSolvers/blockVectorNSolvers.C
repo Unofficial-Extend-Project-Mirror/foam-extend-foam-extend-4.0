@@ -43,6 +43,7 @@ License
 #include "BlockBiCGStabSolver.H"
 #include "BlockCGSolver.H"
 #include "BlockGaussSeidelSolver.H"
+#include "BlockILUSolver.H"
 #include "BlockGMRESSolver.H"
 
 // KRJ: 2012-12-15: Multigrid solver
@@ -137,6 +138,11 @@ typedef BlockGaussSeidelSolver<type > block##Type##GaussSeidelSolver;         \
 makeBlockSolverTypeName(block##Type##GaussSeidelSolver);                      \
 addSolverToBlockMatrix(Type, block##Type##GaussSeidelSolver, symMatrix);      \
 addSolverToBlockMatrix(Type, block##Type##GaussSeidelSolver, asymMatrix);     \
+                                                                              \
+typedef BlockILUSolver<type > block##Type##ILUSolver;                         \
+makeBlockSolverTypeName(block##Type##ILUSolver);                              \
+addSolverToBlockMatrix(Type, block##Type##ILUSolver, symMatrix);              \
+addSolverToBlockMatrix(Type, block##Type##ILUSolver, asymMatrix);             \
                                                                               \
 typedef BlockGMRESSolver<type > block##Type##GMRESSolver;                     \
 makeBlockSolverTypeName(block##Type##GMRESSolver);                            \
