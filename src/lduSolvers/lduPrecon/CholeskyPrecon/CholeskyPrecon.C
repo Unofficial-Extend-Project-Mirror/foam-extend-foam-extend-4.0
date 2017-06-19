@@ -52,8 +52,32 @@ namespace Foam
 void Foam::CholeskyPrecon::calcPreconDiag()
 {
     // Precondition the diagonal
-    if (matrix_.symmetric())
+    if (!matrix_.diagonal())
     {
+        // Do coupled interfaces
+        forAll (interfaces_, patchI)
+        {
+            if (interfaces_.set(patchI))
+            {
+                // Get face-cells addressing
+                const unallocLabelList& fc =
+                    interfaces_[patchI].coupledInterface().faceCells();
+
+                // Get interface coefficiens
+                const scalarField& bouCoeffs = coupleBouCoeffs_[patchI];
+                const scalarField& intCoeffs = coupleIntCoeffs_[patchI];
+
+                forAll (fc, coeffI)
+                {
+                    preconDiag_[fc[coeffI]] +=
+                        bouCoeffs[coeffI]*intCoeffs[coeffI]/
+                        preconDiag_[fc[coeffI]];
+                }
+            }
+        }
+
+        // Do core matrix
+
         const unallocLabelList& upperAddr = matrix_.lduAddr().upperAddr();
         const unallocLabelList& lowerAddr = matrix_.lduAddr().lowerAddr();
 
@@ -132,34 +156,104 @@ void Foam::CholeskyPrecon::precondition
 (
     scalarField& x,
     const scalarField& b,
-    const direction
+    const direction cmpt
 ) const
 {
-    forAll(x, i)
+    if (matrix_.asymmetric())
     {
-        x[i] = b[i]*preconDiag_[i];
+        FatalErrorIn
+        (
+            "void CholeskyPrecon::precondition\n"
+            "(\n"
+            "    scalarField& x,\n"
+            "    const scalarField& b,\n"
+            "    const direction cmpt\n"
+            ") const"
+        )   << "Calling CholeskyPrecon on an assymetric matrix.  "
+            << "Please use ILU0 instead"
+            << abort(FatalError);
+    }
+
+    // In order to properly execute parallel preconditioning, re-use
+    // x to zero and execute coupled boundary update
+    // HJ, 19/Jun/2017
+
+    x = 0;
+
+    // Coupled boundary update
+    {
+        matrix_.initMatrixInterfaces
+        (
+            coupleBouCoeffs_,
+            interfaces_,
+            x,
+            x,               // put result into x
+            cmpt,
+            false
+        );
+
+        matrix_.updateMatrixInterfaces
+        (
+            coupleBouCoeffs_,
+            interfaces_,
+            x,
+            x,               // put result into x
+            cmpt,
+            false
+        );
+    }
+
+    // Multiply with inverse diag to precondition
+    x *= preconDiag_;
+
+    // Diagonal block: note +=
+    {
+        scalar* __restrict__ xPtr = x.begin();
+
+        const scalar* __restrict__ preconDiagPtr = preconDiag_.begin();
+
+        const scalar* __restrict__ bPtr = b.begin();
+
+        const label nRows = x.size();
+
+        for (register label rowI = 0; rowI < nRows; rowI++)
+        {
+            xPtr[rowI] += bPtr[rowI]*preconDiagPtr[rowI];
+        }
     }
 
     if (matrix_.symmetric())
     {
-        const unallocLabelList& upperAddr = matrix_.lduAddr().upperAddr();
-        const unallocLabelList& lowerAddr = matrix_.lduAddr().lowerAddr();
+        scalar* __restrict__ xPtr = x.begin();
 
-        // Get off-diagonal matrix coefficients
-        const scalarField& upper = matrix_.upper();
+        // Addressing
+        const label* const __restrict__ uPtr =
+            matrix_.lduAddr().upperAddr().begin();
 
-        forAll (upper, coeffI)
+        const label* const __restrict__ lPtr =
+            matrix_.lduAddr().lowerAddr().begin();
+
+        // Coeffs
+        const scalar* __restrict__ preconDiagPtr = preconDiag_.begin();
+
+        const scalar* const __restrict__ upperPtr = matrix_.upper().begin();
+
+        const label nCoeffs = matrix_.upper().size();
+
+        // Forward sweep
+        for (register label coeffI = 0; coeffI < nCoeffs; coeffI++)
         {
-            x[upperAddr[coeffI]] -=
-                preconDiag_[upperAddr[coeffI]]*
-                upper[coeffI]*x[lowerAddr[coeffI]];
+            xPtr[uPtr[coeffI]] -=
+                preconDiagPtr[uPtr[coeffI]]*
+                upperPtr[coeffI]*xPtr[lPtr[coeffI]];
         }
 
-        forAllReverse (upper, coeffI)
+        // Reverse sweep
+        for (register label coeffI = nCoeffs - 1; coeffI >= 0; coeffI--)
         {
-            x[lowerAddr[coeffI]] -=
-                preconDiag_[lowerAddr[coeffI]]*
-                upper[coeffI]*x[upperAddr[coeffI]];
+            xPtr[lPtr[coeffI]] -=
+                preconDiagPtr[lPtr[coeffI]]*
+                upperPtr[coeffI]*xPtr[uPtr[coeffI]];
         }
     }
 }

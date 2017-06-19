@@ -51,8 +51,33 @@ namespace Foam
 
 void Foam::ILU0::calcPreconDiag()
 {
-    if (matrix_.asymmetric())
+    // Precondition the diagonal
+    if (!matrix_.diagonal())
     {
+        // Do coupled interfaces
+        forAll (interfaces_, patchI)
+        {
+            if (interfaces_.set(patchI))
+            {
+                // Gte face-cells addressing
+                const unallocLabelList& fc =
+                    interfaces_[patchI].coupledInterface().faceCells() ;
+
+                // Get interface coefficiens
+                const scalarField& bouCoeffs = coupleBouCoeffs_[patchI];
+                const scalarField& intCoeffs = coupleIntCoeffs_[patchI];
+
+                forAll (fc, coeffI)
+                {
+                    preconDiag_[fc[coeffI]] +=
+                        bouCoeffs[coeffI]*intCoeffs[coeffI]/
+                        preconDiag_[fc[coeffI]];
+                }
+            }
+        }
+
+        // Do core matrix
+
         const unallocLabelList& upperAddr = matrix_.lduAddr().upperAddr();
         const unallocLabelList& lowerAddr = matrix_.lduAddr().lowerAddr();
 
@@ -132,12 +157,60 @@ void Foam::ILU0::precondition
 (
     scalarField& x,
     const scalarField& b,
-    const direction
+    const direction cmpt
 ) const
 {
-    forAll(x, i)
+    if (matrix_.symmetric())
     {
-        x[i] = b[i]*preconDiag_[i];
+        FatalErrorIn
+        (
+            "void ILU0::precondition\n"
+            "(\n"
+            "    scalarField& x,\n"
+            "    const scalarField& b,\n"
+            "    const direction cmpt\n"
+            ") const"
+        )   << "Calling ILU0 on a symetric matrix.  "
+            << "Please use CholeskyPrecon instead"
+            << abort(FatalError);
+    }
+
+    // In order to properly execute parallel preconditioning, re-use
+    // x to zero and execute coupled boundary update first
+    // HJ, 19/Jun/2017
+
+    x = 0;
+
+    // Coupled boundary update
+    {
+        matrix_.initMatrixInterfaces
+        (
+            coupleBouCoeffs_,
+            interfaces_,
+            x,
+            x,               // put result into x
+            cmpt,
+            false
+        );
+
+        matrix_.updateMatrixInterfaces
+        (
+            coupleBouCoeffs_,
+            interfaces_,
+            x,
+            x,               // put result into x
+            cmpt,
+            false
+        );
+    }
+
+    // Multiply with inverse diag to precondition
+    x *= preconDiag_;
+
+    // Diagonal block: note +=
+    forAll (x, i)
+    {
+        x[i] += b[i]*preconDiag_[i];
     }
 
     if (matrix_.asymmetric())
@@ -178,9 +251,57 @@ void Foam::ILU0::preconditionT
     const direction cmpt
 ) const
 {
+    if (matrix_.symmetric())
+    {
+        FatalErrorIn
+        (
+            "void ILU0::precondition\n"
+            "(\n"
+            "    scalarField& x,\n"
+            "    const scalarField& b,\n"
+            "    const direction cmpt\n"
+            ") const"
+        )   << "Calling ILU0 on a symetric matrix.  "
+            << "Please use CholeskyPrecon instead"
+            << abort(FatalError);
+    }
+
+    // In order to properly execute parallel preconditioning, re-use
+    // x to zero and execute coupled boundary update first
+    // HJ, 19/Jun/2017
+
+    x = 0;
+
+    // Coupled boundary update
+    {
+        matrix_.initMatrixInterfaces
+        (
+            coupleIntCoeffs_, // Note: transpose coupled coeffs
+            interfaces_,
+            x,
+            x,                // put result into x
+            cmpt,
+            false
+        );
+
+        matrix_.updateMatrixInterfaces
+        (
+            coupleIntCoeffs_, // Note: transpose coupled coeffs
+            interfaces_,
+            x,
+            x,                // put result into x
+            cmpt,
+            false
+        );
+    }
+
+    // Multiply with inverse diag to precondition
+    x *= preconDiag_;
+
+    // Diagonal block: note +=
     forAll(x, i)
     {
-        x[i] = b[i]*preconDiag_[i];
+        x[i] += b[i]*preconDiag_[i];
     }
 
     if (matrix_.asymmetric())

@@ -104,7 +104,18 @@ void Foam::symGaussSeidelPrecon::precondition
     // Execute preconditioning
     if (matrix_.diagonal())
     {
-        x = b/matrix_.diag();
+        scalar* __restrict__ xPtr = x.begin();
+
+        const scalar* __restrict__ diagPtr = matrix_.diag().begin();
+
+        const scalar* __restrict__ bPtr = b.begin();
+
+        const label nRows = x.size();
+
+        for (register label rowI = 0; rowI < nRows; rowI++)
+        {
+            xPtr[rowI] = bPtr[rowI]/diagPtr[rowI];
+        }
     }
     else if (matrix_.symmetric() || matrix_.asymmetric())
     {

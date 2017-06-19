@@ -107,9 +107,8 @@ public:
         );
 
 
-    // Destructor
-
-        virtual ~ILUCp();
+    //- Destructor
+    virtual ~ILUCp();
 
 
     // Member Functions
