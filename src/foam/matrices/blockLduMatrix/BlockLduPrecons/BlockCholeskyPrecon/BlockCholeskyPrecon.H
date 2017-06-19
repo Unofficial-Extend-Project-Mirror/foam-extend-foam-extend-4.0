@@ -98,6 +98,15 @@ class BlockCholeskyPrecon
             const Field<ULType>& upper
         );
 
+        //- Diagonal interface multiplication
+        template<class DiagType, class ULType>
+        void diagInterfaceMultiply
+        (
+            const unallocLabelList& fc,
+            Field<DiagType>& dDiag,
+            const Field<ULType>& bouCoeffs
+        );
+
         //- ILU multiplication, symmetric matrix
         template<class DiagType, class ULType>
         void ILUmultiply

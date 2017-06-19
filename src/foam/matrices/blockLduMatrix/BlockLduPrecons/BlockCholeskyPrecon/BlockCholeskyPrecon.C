@@ -25,6 +25,7 @@ License
 
 #include "error.H"
 #include "BlockCholeskyPrecon.H"
+#include "BlockLduInterfaceFieldPtrsList.H"
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
@@ -35,14 +36,39 @@ void Foam::BlockCholeskyPrecon<Type>::calcPreconDiag()
 
     // Note: Assuming lower and upper triangle have the same active type
 
+    // Precondition the diagonal
+
     if (this->matrix_.symmetric())
     {
+        // Get interface list
+        const typename BlockLduInterfaceFieldPtrsList<Type>::Type& interfaces =
+            this->matrix_.interfaces();
+
         const TypeCoeffField& UpperCoeff = this->matrix_.upper();
 
         if (preconDiag_.activeType() == blockCoeffBase::SCALAR)
         {
             if (UpperCoeff.activeType() == blockCoeffBase::SCALAR)
             {
+                // Do coupled interfaces
+                forAll (interfaces, patchI)
+                {
+                    if (interfaces.set(patchI))
+                    {
+                        // Get face-cells addressing
+                        const unallocLabelList& fc =
+                            interfaces[patchI].coupledInterface().faceCells();
+
+                        diagInterfaceMultiply
+                        (
+                            fc,
+                            preconDiag_.asScalar(),
+                            this->matrix_.coupleUpper()[patchI].asScalar()
+                        );
+                    }
+                }
+
+                // Do core matrix
                 diagMultiply
                 (
                     preconDiag_.asScalar(),
@@ -51,6 +77,25 @@ void Foam::BlockCholeskyPrecon<Type>::calcPreconDiag()
             }
             else if (UpperCoeff.activeType() == blockCoeffBase::LINEAR)
             {
+                // Do coupled interfaces
+                forAll (interfaces, patchI)
+                {
+                    if (interfaces.set(patchI))
+                    {
+                        // Get face-cells addressing
+                        const unallocLabelList& fc =
+                            interfaces[patchI].coupledInterface().faceCells();
+
+                        diagInterfaceMultiply
+                        (
+                            fc,
+                            preconDiag_.asLinear(),
+                            this->matrix_.coupleUpper()[patchI].asLinear()
+                        );
+                    }
+                }
+
+                // Do core matrix
                 diagMultiply
                 (
                     preconDiag_.asLinear(),
@@ -59,6 +104,25 @@ void Foam::BlockCholeskyPrecon<Type>::calcPreconDiag()
             }
             else if (UpperCoeff.activeType() == blockCoeffBase::SQUARE)
             {
+                // Do coupled interfaces
+                forAll (interfaces, patchI)
+                {
+                    if (interfaces.set(patchI))
+                    {
+                        // Get face-cells addressing
+                        const unallocLabelList& fc =
+                            interfaces[patchI].coupledInterface().faceCells();
+
+                        diagInterfaceMultiply
+                        (
+                            fc,
+                            preconDiag_.asSquare(),
+                            this->matrix_.coupleUpper()[patchI].asSquare()
+                        );
+                    }
+                }
+
+                // Do core matrix
                 // Transpose multiplication
                 diagMultiplyCoeffT
                 (
@@ -71,6 +135,25 @@ void Foam::BlockCholeskyPrecon<Type>::calcPreconDiag()
         {
             if (UpperCoeff.activeType() == blockCoeffBase::SCALAR)
             {
+                // Do coupled interfaces
+                forAll (interfaces, patchI)
+                {
+                    if (interfaces.set(patchI))
+                    {
+                        // Get face-cells addressing
+                        const unallocLabelList& fc =
+                            interfaces[patchI].coupledInterface().faceCells();
+
+                        diagInterfaceMultiply
+                        (
+                            fc,
+                            preconDiag_.asLinear(),
+                            this->matrix_.coupleUpper()[patchI].asScalar()
+                        );
+                    }
+                }
+
+                // Do core matrix
                 diagMultiply
                 (
                     preconDiag_.asLinear(),
@@ -79,6 +162,25 @@ void Foam::BlockCholeskyPrecon<Type>::calcPreconDiag()
             }
             else if (UpperCoeff.activeType() == blockCoeffBase::LINEAR)
             {
+                // Do coupled interfaces
+                forAll (interfaces, patchI)
+                {
+                    if (interfaces.set(patchI))
+                    {
+                        // Get face-cells addressing
+                        const unallocLabelList& fc =
+                            interfaces[patchI].coupledInterface().faceCells();
+
+                        diagInterfaceMultiply
+                        (
+                            fc,
+                            preconDiag_.asLinear(),
+                            this->matrix_.coupleUpper()[patchI].asLinear()
+                        );
+                    }
+                }
+
+                // Do core matrix
                 diagMultiply
                 (
                     preconDiag_.asLinear(),
@@ -87,6 +189,25 @@ void Foam::BlockCholeskyPrecon<Type>::calcPreconDiag()
             }
             else if (UpperCoeff.activeType() == blockCoeffBase::SQUARE)
             {
+                // Do coupled interfaces
+                forAll (interfaces, patchI)
+                {
+                    if (interfaces.set(patchI))
+                    {
+                        // Get face-cells addressing
+                        const unallocLabelList& fc =
+                            interfaces[patchI].coupledInterface().faceCells();
+
+                        diagInterfaceMultiply
+                        (
+                            fc,
+                            preconDiag_.asSquare(),
+                            this->matrix_.coupleUpper()[patchI].asSquare()
+                        );
+                    }
+                }
+
+                // Do core matrix
                 // Transpose multiplication
                 diagMultiplyCoeffT
                 (
@@ -99,6 +220,25 @@ void Foam::BlockCholeskyPrecon<Type>::calcPreconDiag()
         {
             if (UpperCoeff.activeType() == blockCoeffBase::SCALAR)
             {
+                // Do coupled interfaces
+                forAll (interfaces, patchI)
+                {
+                    if (interfaces.set(patchI))
+                    {
+                        // Get face-cells addressing
+                        const unallocLabelList& fc =
+                            interfaces[patchI].coupledInterface().faceCells();
+
+                        diagInterfaceMultiply
+                        (
+                            fc,
+                            preconDiag_.asSquare(),
+                            this->matrix_.coupleUpper()[patchI].asScalar()
+                        );
+                    }
+                }
+
+                // Do core matrix
                 diagMultiply
                 (
                     preconDiag_.asSquare(),
@@ -107,6 +247,25 @@ void Foam::BlockCholeskyPrecon<Type>::calcPreconDiag()
             }
             else if (UpperCoeff.activeType() == blockCoeffBase::LINEAR)
             {
+                // Do coupled interfaces
+                forAll (interfaces, patchI)
+                {
+                    if (interfaces.set(patchI))
+                    {
+                        // Get face-cells addressing
+                        const unallocLabelList& fc =
+                            interfaces[patchI].coupledInterface().faceCells();
+
+                        diagInterfaceMultiply
+                        (
+                            fc,
+                            preconDiag_.asSquare(),
+                            this->matrix_.coupleUpper()[patchI].asLinear()
+                        );
+                    }
+                }
+
+                // Do core matrix
                 diagMultiply
                 (
                     preconDiag_.asSquare(),
@@ -115,6 +274,25 @@ void Foam::BlockCholeskyPrecon<Type>::calcPreconDiag()
             }
             else if (UpperCoeff.activeType() == blockCoeffBase::SQUARE)
             {
+                // Do coupled interfaces
+                forAll (interfaces, patchI)
+                {
+                    if (interfaces.set(patchI))
+                    {
+                        // Get face-cells addressing
+                        const unallocLabelList& fc =
+                            interfaces[patchI].coupledInterface().faceCells();
+
+                        diagInterfaceMultiply
+                        (
+                            fc,
+                            preconDiag_.asSquare(),
+                            this->matrix_.coupleUpper()[patchI].asSquare()
+                        );
+                    }
+                }
+
+                // Do core matrix
                 // Transpose multiplication
                 diagMultiplyCoeffT
                 (
@@ -126,6 +304,10 @@ void Foam::BlockCholeskyPrecon<Type>::calcPreconDiag()
     }
     else // Asymmetric matrix
     {
+        // Get interface list
+        const typename BlockLduInterfaceFieldPtrsList<Type>::Type& interfaces =
+            this->matrix_.interfaces();
+
         const TypeCoeffField& LowerCoeff = this->matrix_.lower();
         const TypeCoeffField& UpperCoeff = this->matrix_.upper();
 
@@ -133,6 +315,25 @@ void Foam::BlockCholeskyPrecon<Type>::calcPreconDiag()
         {
             if (UpperCoeff.activeType() == blockCoeffBase::SCALAR)
             {
+                // Do coupled interfaces
+                forAll (interfaces, patchI)
+                {
+                    if (interfaces.set(patchI))
+                    {
+                        // Get face-cells addressing
+                        const unallocLabelList& fc =
+                            interfaces[patchI].coupledInterface().faceCells();
+
+                        diagInterfaceMultiply
+                        (
+                            fc,
+                            preconDiag_.asScalar(),
+                            this->matrix_.coupleUpper()[patchI].asScalar()
+                        );
+                    }
+                }
+
+                // Do core matrix
                 diagMultiply
                 (
                     preconDiag_.asScalar(),
@@ -142,6 +343,25 @@ void Foam::BlockCholeskyPrecon<Type>::calcPreconDiag()
             }
             else if (UpperCoeff.activeType() == blockCoeffBase::LINEAR)
             {
+                // Do coupled interfaces
+                forAll (interfaces, patchI)
+                {
+                    if (interfaces.set(patchI))
+                    {
+                        // Get face-cells addressing
+                        const unallocLabelList& fc =
+                            interfaces[patchI].coupledInterface().faceCells();
+
+                        diagInterfaceMultiply
+                        (
+                            fc,
+                            preconDiag_.asLinear(),
+                            this->matrix_.coupleUpper()[patchI].asLinear()
+                        );
+                    }
+                }
+
+                // Do core matrix
                 diagMultiply
                 (
                     preconDiag_.asLinear(),
@@ -151,6 +371,25 @@ void Foam::BlockCholeskyPrecon<Type>::calcPreconDiag()
             }
             else if (UpperCoeff.activeType() == blockCoeffBase::SQUARE)
             {
+                // Do coupled interfaces
+                forAll (interfaces, patchI)
+                {
+                    if (interfaces.set(patchI))
+                    {
+                        // Get face-cells addressing
+                        const unallocLabelList& fc =
+                            interfaces[patchI].coupledInterface().faceCells();
+
+                        diagInterfaceMultiply
+                        (
+                            fc,
+                            preconDiag_.asSquare(),
+                            this->matrix_.coupleUpper()[patchI].asSquare()
+                        );
+                    }
+                }
+
+                // Do core matrix
                 diagMultiply
                 (
                     preconDiag_.asSquare(),
@@ -163,6 +402,25 @@ void Foam::BlockCholeskyPrecon<Type>::calcPreconDiag()
         {
             if (UpperCoeff.activeType() == blockCoeffBase::SCALAR)
             {
+                // Do coupled interfaces
+                forAll (interfaces, patchI)
+                {
+                    if (interfaces.set(patchI))
+                    {
+                        // Get face-cells addressing
+                        const unallocLabelList& fc =
+                            interfaces[patchI].coupledInterface().faceCells();
+
+                        diagInterfaceMultiply
+                        (
+                            fc,
+                            preconDiag_.asLinear(),
+                            this->matrix_.coupleUpper()[patchI].asScalar()
+                        );
+                    }
+                }
+
+                // Do core matrix
                 diagMultiply
                 (
                     preconDiag_.asLinear(),
@@ -172,6 +430,25 @@ void Foam::BlockCholeskyPrecon<Type>::calcPreconDiag()
             }
             else if (UpperCoeff.activeType() == blockCoeffBase::LINEAR)
             {
+                // Do coupled interfaces
+                forAll (interfaces, patchI)
+                {
+                    if (interfaces.set(patchI))
+                    {
+                        // Get face-cells addressing
+                        const unallocLabelList& fc =
+                            interfaces[patchI].coupledInterface().faceCells();
+
+                        diagInterfaceMultiply
+                        (
+                            fc,
+                            preconDiag_.asLinear(),
+                            this->matrix_.coupleUpper()[patchI].asLinear()
+                        );
+                    }
+                }
+
+                // Do core matrix
                 diagMultiply
                 (
                     preconDiag_.asLinear(),
@@ -181,6 +458,25 @@ void Foam::BlockCholeskyPrecon<Type>::calcPreconDiag()
             }
             else if (UpperCoeff.activeType() == blockCoeffBase::SQUARE)
             {
+                // Do coupled interfaces
+                forAll (interfaces, patchI)
+                {
+                    if (interfaces.set(patchI))
+                    {
+                        // Get face-cells addressing
+                        const unallocLabelList& fc =
+                            interfaces[patchI].coupledInterface().faceCells();
+
+                        diagInterfaceMultiply
+                        (
+                            fc,
+                            preconDiag_.asSquare(),
+                            this->matrix_.coupleUpper()[patchI].asSquare()
+                        );
+                    }
+                }
+
+                // Do core matrix
                 diagMultiply
                 (
                     preconDiag_.asSquare(),
@@ -193,6 +489,25 @@ void Foam::BlockCholeskyPrecon<Type>::calcPreconDiag()
         {
             if (UpperCoeff.activeType() == blockCoeffBase::SCALAR)
             {
+                // Do coupled interfaces
+                forAll (interfaces, patchI)
+                {
+                    if (interfaces.set(patchI))
+                    {
+                        // Get face-cells addressing
+                        const unallocLabelList& fc =
+                            interfaces[patchI].coupledInterface().faceCells();
+
+                        diagInterfaceMultiply
+                        (
+                            fc,
+                            preconDiag_.asSquare(),
+                            this->matrix_.coupleUpper()[patchI].asScalar()
+                        );
+                    }
+                }
+
+                // Do core matrix
                 diagMultiply
                 (
                     preconDiag_.asSquare(),
@@ -202,6 +517,25 @@ void Foam::BlockCholeskyPrecon<Type>::calcPreconDiag()
             }
             else if (UpperCoeff.activeType() == blockCoeffBase::LINEAR)
             {
+                // Do coupled interfaces
+                forAll (interfaces, patchI)
+                {
+                    if (interfaces.set(patchI))
+                    {
+                        // Get face-cells addressing
+                        const unallocLabelList& fc =
+                            interfaces[patchI].coupledInterface().faceCells();
+
+                        diagInterfaceMultiply
+                        (
+                            fc,
+                            preconDiag_.asSquare(),
+                            this->matrix_.coupleUpper()[patchI].asLinear()
+                        );
+                    }
+                }
+
+                // Do core matrix
                 diagMultiply
                 (
                     preconDiag_.asSquare(),
@@ -211,6 +545,25 @@ void Foam::BlockCholeskyPrecon<Type>::calcPreconDiag()
             }
             else if (UpperCoeff.activeType() == blockCoeffBase::SQUARE)
             {
+                // Do coupled interfaces
+                forAll (interfaces, patchI)
+                {
+                    if (interfaces.set(patchI))
+                    {
+                        // Get face-cells addressing
+                        const unallocLabelList& fc =
+                            interfaces[patchI].coupledInterface().faceCells();
+
+                        diagInterfaceMultiply
+                        (
+                            fc,
+                            preconDiag_.asSquare(),
+                            this->matrix_.coupleUpper()[patchI].asSquare()
+                        );
+                    }
+                }
+
+                // Do core matrix
                 diagMultiply
                 (
                     preconDiag_.asSquare(),
@@ -319,6 +672,33 @@ void Foam::BlockCholeskyPrecon<Type>::diagMultiply
 
 template<class Type>
 template<class DiagType, class ULType>
+void Foam::BlockCholeskyPrecon<Type>::diagInterfaceMultiply
+(
+    const unallocLabelList& fc,
+    Field<DiagType>& dDiag,
+    const Field<ULType>& bouCoeffs
+)
+{
+    // Precondition the diagonal for the coupled interface
+
+    // Create multiplication function object
+    typename BlockCoeff<Type>::multiply mult;
+
+    forAll (fc, coeffI)
+    {
+        dDiag[fc[coeffI]] +=
+            mult.tripleProduct
+            (
+                bouCoeffs[coeffI],
+                dDiag[fc[coeffI]],
+                bouCoeffs[coeffI]
+            );
+    }
+}
+
+
+template<class Type>
+template<class DiagType, class ULType>
 void Foam::BlockCholeskyPrecon<Type>::ILUmultiply
 (
     Field<Type>& x,
@@ -330,7 +710,7 @@ void Foam::BlockCholeskyPrecon<Type>::ILUmultiply
     // Create multiplication function object
     typename BlockCoeff<Type>::multiply mult;
 
-    forAll(x, i)
+    forAll (x, i)
     {
         x[i] = mult(dDiag[i], b[i]);
     }
@@ -373,7 +753,7 @@ void Foam::BlockCholeskyPrecon<Type>::ILUmultiplyCoeffT
     // Create multiplication function object
     typename BlockCoeff<Type>::multiply mult;
 
-    forAll(x, i)
+    forAll (x, i)
     {
         x[i] = mult(dDiag[i], b[i]);
     }
@@ -417,7 +797,7 @@ void Foam::BlockCholeskyPrecon<Type>::ILUmultiply
     // Create multiplication function object
     typename BlockCoeff<Type>::multiply mult;
 
-    forAll(x, i)
+    forAll (x, i)
     {
         x[i] = mult(dDiag[i], b[i]);
     }
@@ -466,7 +846,7 @@ void Foam::BlockCholeskyPrecon<Type>::ILUmultiplyTranspose
     // Create multiplication function object
     typename BlockCoeff<Type>::multiply mult;
 
-    forAll(x, i)
+    forAll (x, i)
     {
         x[i] = mult(dDiag[i], b[i]);
     }
