@@ -65,13 +65,12 @@ void Foam::CholeskyPrecon::calcPreconDiag()
 
                 // Get interface coefficiens
                 const scalarField& bouCoeffs = coupleBouCoeffs_[patchI];
-                const scalarField& intCoeffs = coupleIntCoeffs_[patchI];
 
                 forAll (fc, coeffI)
                 {
+                    // Note change of sign for boundary coeffs
                     preconDiag_[fc[coeffI]] +=
-                        bouCoeffs[coeffI]*intCoeffs[coeffI]/
-                        preconDiag_[fc[coeffI]];
+                        sqr(bouCoeffs[coeffI])/preconDiag_[fc[coeffI]];
                 }
             }
         }
@@ -174,39 +173,7 @@ void Foam::CholeskyPrecon::precondition
             << abort(FatalError);
     }
 
-    // In order to properly execute parallel preconditioning, re-use
-    // x to zero and execute coupled boundary update
-    // HJ, 19/Jun/2017
-
-    x = 0;
-
-    // Coupled boundary update
-    {
-        matrix_.initMatrixInterfaces
-        (
-            coupleBouCoeffs_,
-            interfaces_,
-            x,
-            x,               // put result into x
-            cmpt,
-            false
-        );
-
-        matrix_.updateMatrixInterfaces
-        (
-            coupleBouCoeffs_,
-            interfaces_,
-            x,
-            x,               // put result into x
-            cmpt,
-            false
-        );
-    }
-
-    // Multiply with inverse diag to precondition
-    x *= preconDiag_;
-
-    // Diagonal block: note +=
+    // Diagonal block
     {
         scalar* __restrict__ xPtr = x.begin();
 
@@ -218,7 +185,7 @@ void Foam::CholeskyPrecon::precondition
 
         for (register label rowI = 0; rowI < nRows; rowI++)
         {
-            xPtr[rowI] += bPtr[rowI]*preconDiagPtr[rowI];
+            xPtr[rowI] = bPtr[rowI]*preconDiagPtr[rowI];
         }
     }
 
