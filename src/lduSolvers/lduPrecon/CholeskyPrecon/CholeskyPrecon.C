@@ -52,6 +52,14 @@ namespace Foam
 void Foam::CholeskyPrecon::calcPreconDiag()
 {
     // Precondition the diagonal
+
+    // Do coupled interfaces
+
+    // Note: ordering of ILU coefficients on the coupled boundary is
+    // out of sequence.  Formally, this can be fixed by visiting the coupled
+    // boundary from the cell loop, but HJ thinks this does not
+    // make a difference
+    // HJ and VV, 19/Jun/2017
     if (!matrix_.diagonal())
     {
         // Do coupled interfaces
@@ -63,13 +71,16 @@ void Foam::CholeskyPrecon::calcPreconDiag()
                 const unallocLabelList& fc =
                     interfaces_[patchI].coupledInterface().faceCells();
 
-                // Get interface coefficiens
+                // Get interface coefficiens. Note: symmetric matrix
+                // HJ, 19/Jun/2017
                 const scalarField& bouCoeffs = coupleBouCoeffs_[patchI];
+                const scalarField& intCoeffs = coupleIntCoeffs_[patchI];
 
                 forAll (fc, coeffI)
                 {
-                    // Note change of sign for boundary coeffs
-                    preconDiag_[fc[coeffI]] +=
+                    // Note: sign is the same as in main loop below
+                    // HJ and VV, 19/Jun/2017
+                    preconDiag_[fc[coeffI]] -=
                         sqr(bouCoeffs[coeffI])/preconDiag_[fc[coeffI]];
                 }
             }
@@ -183,6 +194,8 @@ void Foam::CholeskyPrecon::precondition
 
         const label nRows = x.size();
 
+        // Note: multiplication over-write x: no need to initialise
+        // HJ, and VV, 19/Jun/2017
         for (register label rowI = 0; rowI < nRows; rowI++)
         {
             xPtr[rowI] = bPtr[rowI]*preconDiagPtr[rowI];

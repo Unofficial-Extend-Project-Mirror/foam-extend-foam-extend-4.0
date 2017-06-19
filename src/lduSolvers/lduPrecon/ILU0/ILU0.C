@@ -52,6 +52,14 @@ namespace Foam
 void Foam::ILU0::calcPreconDiag()
 {
     // Precondition the diagonal
+
+    // Do coupled interfaces
+
+    // Note: ordering of ILU coefficients on the coupled boundary is
+    // out of sequence.  Formally, this can be fixed by visiting the coupled
+    // boundary from the cell loop, but HJ thinks this does not
+    // make a difference
+    // HJ and VV, 19/Jun/2017
     if (!matrix_.diagonal())
     {
         // Do coupled interfaces
@@ -59,24 +67,21 @@ void Foam::ILU0::calcPreconDiag()
         {
             if (interfaces_.set(patchI))
             {
-                // Gte face-cells addressing
+                // Get face-cells addressing
                 const unallocLabelList& fc =
-                    interfaces_[patchI].coupledInterface().faceCells() ;
+                    interfaces_[patchI].coupledInterface().faceCells();
 
                 // Get interface coefficiens
                 const scalarField& bouCoeffs = coupleBouCoeffs_[patchI];
+                const scalarField& intCoeffs = coupleIntCoeffs_[patchI];
 
-                // Note:
-                // In order to do the preconditioning correctly, the lower
-                // triangular coefficient on the coupled interface should
-                // also be available.  Since it is not, we will re-create it
-                // assuming the negSumDiag rule
-                
                 forAll (fc, coeffI)
                 {
-                    // Note consistent sign for boundary coeffs
-                    preconDiag_[fc[coeffI]] -=
-                        bouCoeffs[coeffI]*(1 - bouCoeffs[coeffI])/
+                    // Note: change of the sign compared to main loop below
+                    // This is because lower = -intCoeffs
+                    // HJ and VV, 19/Jun/2017
+                    preconDiag_[fc[coeffI]] +=
+                        bouCoeffs[coeffI]*intCoeffs[coeffI]/
                         preconDiag_[fc[coeffI]];
                 }
             }
@@ -181,40 +186,24 @@ void Foam::ILU0::precondition
             << abort(FatalError);
     }
 
-    // In order to properly execute parallel preconditioning, re-use
-    // x to zero and execute coupled boundary update first
-    // HJ, 19/Jun/2017
 
-    // // Coupled boundary update
-    // {
-    //     matrix_.initMatrixInterfaces
-    //     (
-    //         coupleBouCoeffs_,
-    //         interfaces_,
-    //         x,
-    //         x,               // put result into x
-    //         cmpt,
-    //         false
-    //     );
 
-    //     matrix_.updateMatrixInterfaces
-    //     (
-    //         coupleBouCoeffs_,
-    //         interfaces_,
-    //         x,
-    //         x,               // put result into x
-    //         cmpt,
-    //         false
-    //     );
-    // }
-
-    // // Multiply with inverse diag to precondition
-    // x *= preconDiag_;
-
-    // Diagonal block: note +=
-    forAll (x, i)
+    // Diagonal block
     {
-        x[i] += b[i]*preconDiag_[i];
+        scalar* __restrict__ xPtr = x.begin();
+
+        const scalar* __restrict__ preconDiagPtr = preconDiag_.begin();
+
+        const scalar* __restrict__ bPtr = b.begin();
+
+        const label nRows = x.size();
+
+        // Note: multiplication over-write x: no need to initialise
+        // HJ, and VV, 19/Jun/2017
+        for (register label rowI = 0; rowI < nRows; rowI++)
+        {
+            xPtr[rowI] = bPtr[rowI]*preconDiagPtr[rowI];
+        }
     }
 
     if (matrix_.asymmetric())
@@ -274,10 +263,38 @@ void Foam::ILU0::preconditionT
     // x to zero and execute coupled boundary update first
     // HJ, 19/Jun/2017
 
-    // Diagonal block
-    forAll (x, i)
+    x = 0;
+
+    // Coupled boundary update
     {
-        x[i] = b[i]*preconDiag_[i];
+        matrix_.initMatrixInterfaces
+        (
+            coupleIntCoeffs_, // Note: transpose coupled coeffs
+            interfaces_,
+            x,
+            x,                // put result into x
+            cmpt,
+            false
+        );
+
+        matrix_.updateMatrixInterfaces
+        (
+            coupleIntCoeffs_, // Note: transpose coupled coeffs
+            interfaces_,
+            x,
+            x,                // put result into x
+            cmpt,
+            false
+        );
+    }
+
+    // Multiply with inverse diag to precondition
+    x *= preconDiag_;
+
+    // Diagonal block: note +=
+    forAll(x, i)
+    {
+        x[i] += b[i]*preconDiag_[i];
     }
 
     if (matrix_.asymmetric())
