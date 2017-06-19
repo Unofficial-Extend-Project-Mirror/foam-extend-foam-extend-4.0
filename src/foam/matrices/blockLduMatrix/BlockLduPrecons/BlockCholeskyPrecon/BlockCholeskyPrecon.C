@@ -63,7 +63,8 @@ void Foam::BlockCholeskyPrecon<Type>::calcPreconDiag()
                         (
                             fc,
                             preconDiag_.asScalar(),
-                            this->matrix_.coupleUpper()[patchI].asScalar()
+                            this->matrix_.coupleUpper()[patchI].asScalar(),
+                            this->matrix_.coupleLower()[patchI].asScalar()
                         );
                     }
                 }
@@ -90,7 +91,8 @@ void Foam::BlockCholeskyPrecon<Type>::calcPreconDiag()
                         (
                             fc,
                             preconDiag_.asLinear(),
-                            this->matrix_.coupleUpper()[patchI].asLinear()
+                            this->matrix_.coupleUpper()[patchI].asLinear(),
+                            this->matrix_.coupleLower()[patchI].asLinear()
                         );
                     }
                 }
@@ -117,7 +119,8 @@ void Foam::BlockCholeskyPrecon<Type>::calcPreconDiag()
                         (
                             fc,
                             preconDiag_.asSquare(),
-                            this->matrix_.coupleUpper()[patchI].asSquare()
+                            this->matrix_.coupleUpper()[patchI].asSquare(),
+                            this->matrix_.coupleLower()[patchI].asSquare()
                         );
                     }
                 }
@@ -148,7 +151,8 @@ void Foam::BlockCholeskyPrecon<Type>::calcPreconDiag()
                         (
                             fc,
                             preconDiag_.asLinear(),
-                            this->matrix_.coupleUpper()[patchI].asScalar()
+                            this->matrix_.coupleUpper()[patchI].asScalar(),
+                            this->matrix_.coupleLower()[patchI].asScalar()
                         );
                     }
                 }
@@ -175,7 +179,8 @@ void Foam::BlockCholeskyPrecon<Type>::calcPreconDiag()
                         (
                             fc,
                             preconDiag_.asLinear(),
-                            this->matrix_.coupleUpper()[patchI].asLinear()
+                            this->matrix_.coupleUpper()[patchI].asLinear(),
+                            this->matrix_.coupleLower()[patchI].asLinear()
                         );
                     }
                 }
@@ -202,7 +207,8 @@ void Foam::BlockCholeskyPrecon<Type>::calcPreconDiag()
                         (
                             fc,
                             preconDiag_.asSquare(),
-                            this->matrix_.coupleUpper()[patchI].asSquare()
+                            this->matrix_.coupleUpper()[patchI].asSquare(),
+                            this->matrix_.coupleLower()[patchI].asSquare()
                         );
                     }
                 }
@@ -233,7 +239,8 @@ void Foam::BlockCholeskyPrecon<Type>::calcPreconDiag()
                         (
                             fc,
                             preconDiag_.asSquare(),
-                            this->matrix_.coupleUpper()[patchI].asScalar()
+                            this->matrix_.coupleUpper()[patchI].asScalar(),
+                            this->matrix_.coupleLower()[patchI].asScalar()
                         );
                     }
                 }
@@ -260,7 +267,8 @@ void Foam::BlockCholeskyPrecon<Type>::calcPreconDiag()
                         (
                             fc,
                             preconDiag_.asSquare(),
-                            this->matrix_.coupleUpper()[patchI].asLinear()
+                            this->matrix_.coupleUpper()[patchI].asLinear(),
+                            this->matrix_.coupleLower()[patchI].asLinear()
                         );
                     }
                 }
@@ -287,7 +295,8 @@ void Foam::BlockCholeskyPrecon<Type>::calcPreconDiag()
                         (
                             fc,
                             preconDiag_.asSquare(),
-                            this->matrix_.coupleUpper()[patchI].asSquare()
+                            this->matrix_.coupleUpper()[patchI].asSquare(),
+                            this->matrix_.coupleLower()[patchI].asSquare()
                         );
                     }
                 }
@@ -328,7 +337,8 @@ void Foam::BlockCholeskyPrecon<Type>::calcPreconDiag()
                         (
                             fc,
                             preconDiag_.asScalar(),
-                            this->matrix_.coupleUpper()[patchI].asScalar()
+                            this->matrix_.coupleUpper()[patchI].asScalar(),
+                            this->matrix_.coupleLower()[patchI].asScalar()
                         );
                     }
                 }
@@ -356,7 +366,8 @@ void Foam::BlockCholeskyPrecon<Type>::calcPreconDiag()
                         (
                             fc,
                             preconDiag_.asLinear(),
-                            this->matrix_.coupleUpper()[patchI].asLinear()
+                            this->matrix_.coupleUpper()[patchI].asLinear(),
+                            this->matrix_.coupleLower()[patchI].asLinear()
                         );
                     }
                 }
@@ -384,7 +395,8 @@ void Foam::BlockCholeskyPrecon<Type>::calcPreconDiag()
                         (
                             fc,
                             preconDiag_.asSquare(),
-                            this->matrix_.coupleUpper()[patchI].asSquare()
+                            this->matrix_.coupleUpper()[patchI].asSquare(),
+                            this->matrix_.coupleLower()[patchI].asSquare()
                         );
                     }
                 }
@@ -415,7 +427,8 @@ void Foam::BlockCholeskyPrecon<Type>::calcPreconDiag()
                         (
                             fc,
                             preconDiag_.asLinear(),
-                            this->matrix_.coupleUpper()[patchI].asScalar()
+                            this->matrix_.coupleUpper()[patchI].asScalar(),
+                            this->matrix_.coupleLower()[patchI].asScalar()
                         );
                     }
                 }
@@ -443,7 +456,8 @@ void Foam::BlockCholeskyPrecon<Type>::calcPreconDiag()
                         (
                             fc,
                             preconDiag_.asLinear(),
-                            this->matrix_.coupleUpper()[patchI].asLinear()
+                            this->matrix_.coupleUpper()[patchI].asLinear(),
+                            this->matrix_.coupleLower()[patchI].asLinear()
                         );
                     }
                 }
@@ -471,7 +485,8 @@ void Foam::BlockCholeskyPrecon<Type>::calcPreconDiag()
                         (
                             fc,
                             preconDiag_.asSquare(),
-                            this->matrix_.coupleUpper()[patchI].asSquare()
+                            this->matrix_.coupleUpper()[patchI].asSquare(),
+                            this->matrix_.coupleLower()[patchI].asSquare()
                         );
                     }
                 }
@@ -502,7 +517,8 @@ void Foam::BlockCholeskyPrecon<Type>::calcPreconDiag()
                         (
                             fc,
                             preconDiag_.asSquare(),
-                            this->matrix_.coupleUpper()[patchI].asScalar()
+                            this->matrix_.coupleUpper()[patchI].asScalar(),
+                            this->matrix_.coupleLower()[patchI].asScalar()
                         );
                     }
                 }
@@ -530,7 +546,8 @@ void Foam::BlockCholeskyPrecon<Type>::calcPreconDiag()
                         (
                             fc,
                             preconDiag_.asSquare(),
-                            this->matrix_.coupleUpper()[patchI].asLinear()
+                            this->matrix_.coupleUpper()[patchI].asLinear(),
+                            this->matrix_.coupleLower()[patchI].asLinear()
                         );
                     }
                 }
@@ -558,7 +575,8 @@ void Foam::BlockCholeskyPrecon<Type>::calcPreconDiag()
                         (
                             fc,
                             preconDiag_.asSquare(),
-                            this->matrix_.coupleUpper()[patchI].asSquare()
+                            this->matrix_.coupleUpper()[patchI].asSquare(),
+                            this->matrix_.coupleLower()[patchI].asSquare()
                         );
                     }
                 }
@@ -676,7 +694,8 @@ void Foam::BlockCholeskyPrecon<Type>::diagInterfaceMultiply
 (
     const unallocLabelList& fc,
     Field<DiagType>& dDiag,
-    const Field<ULType>& bouCoeffs
+    const Field<ULType>& bouCoeffs,
+    const Field<ULType>& intCoeffs
 )
 {
     // Precondition the diagonal for the coupled interface
@@ -686,10 +705,11 @@ void Foam::BlockCholeskyPrecon<Type>::diagInterfaceMultiply
 
     forAll (fc, coeffI)
     {
+        // Note: possible sign issue.  HJ and VV, 19/Jun/2017
         dDiag[fc[coeffI]] +=
             mult.tripleProduct
             (
-                bouCoeffs[coeffI],
+                intCoeffs[coeffI],
                 dDiag[fc[coeffI]],
                 bouCoeffs[coeffI]
             );

@@ -104,7 +104,8 @@ class BlockCholeskyPrecon
         (
             const unallocLabelList& fc,
             Field<DiagType>& dDiag,
-            const Field<ULType>& bouCoeffs
+            const Field<ULType>& coupleUpper,
+            const Field<ULType>& coupleLower
         );
 
         //- ILU multiplication, symmetric matrix
