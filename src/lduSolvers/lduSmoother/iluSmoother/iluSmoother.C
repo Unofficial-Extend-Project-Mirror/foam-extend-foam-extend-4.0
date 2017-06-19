@@ -25,7 +25,7 @@ Class
     iluSmoother
 
 Description
-    Symmetric Gauss-Seidel smoother
+    ILU smoother
 
 Author
     Hrvoje Jasak, Wikki Ltd.  All rights reserved.
@@ -33,6 +33,8 @@ Author
 \*---------------------------------------------------------------------------*/
 
 #include "iluSmoother.H"
+#include "CholeskyPrecon.H"
+#include "ILU0.H"
 #include "addToRunTimeSelectionTable.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
@@ -66,16 +68,37 @@ Foam::iluSmoother::iluSmoother
         coupleIntCoeffs,
         interfaces
     ),
-    precon_
-    (
-        matrix,
-        coupleBouCoeffs,
-        coupleIntCoeffs,
-        interfaces
-    ),
+    preconPtr_(),
     xCorr_(matrix.lduAddr().size()),
     residual_(matrix.lduAddr().size())
-{}
+{
+    if (matrix.symmetric())
+    {
+        preconPtr_.set
+        (
+            new CholeskyPrecon
+            (
+                matrix,
+                coupleBouCoeffs,
+                coupleIntCoeffs,
+                interfaces
+            )
+        );
+    }
+    else if (matrix.asymmetric())
+    {
+        preconPtr_.set
+        (
+            new ILU0
+            (
+                matrix,
+                coupleBouCoeffs,
+                coupleIntCoeffs,
+                interfaces
+            )
+        );
+    }
+}
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
@@ -106,7 +129,10 @@ void Foam::iluSmoother::smooth
             residual_[i] = b[i] - residual_[i];
         }
 
-        precon_.precondition(xCorr_, residual_, cmpt);
+        if (!matrix_.diagonal())
+        {
+            preconPtr_->precondition(xCorr_, residual_, cmpt);
+        }
 
         // Add correction to x
         x += xCorr_;

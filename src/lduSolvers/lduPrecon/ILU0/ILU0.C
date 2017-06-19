@@ -65,12 +65,18 @@ void Foam::ILU0::calcPreconDiag()
 
                 // Get interface coefficiens
                 const scalarField& bouCoeffs = coupleBouCoeffs_[patchI];
-                const scalarField& intCoeffs = coupleIntCoeffs_[patchI];
 
+                // Note:
+                // In order to do the preconditioning correctly, the lower
+                // triangular coefficient on the coupled interface should
+                // also be available.  Since it is not, we will re-create it
+                // assuming the negSumDiag rule
+                
                 forAll (fc, coeffI)
                 {
-                    preconDiag_[fc[coeffI]] +=
-                        bouCoeffs[coeffI]*intCoeffs[coeffI]/
+                    // Note consistent sign for boundary coeffs
+                    preconDiag_[fc[coeffI]] -=
+                        bouCoeffs[coeffI]*(1 - bouCoeffs[coeffI])/
                         preconDiag_[fc[coeffI]];
                 }
             }
@@ -179,33 +185,31 @@ void Foam::ILU0::precondition
     // x to zero and execute coupled boundary update first
     // HJ, 19/Jun/2017
 
-    x = 0;
+    // // Coupled boundary update
+    // {
+    //     matrix_.initMatrixInterfaces
+    //     (
+    //         coupleBouCoeffs_,
+    //         interfaces_,
+    //         x,
+    //         x,               // put result into x
+    //         cmpt,
+    //         false
+    //     );
 
-    // Coupled boundary update
-    {
-        matrix_.initMatrixInterfaces
-        (
-            coupleBouCoeffs_,
-            interfaces_,
-            x,
-            x,               // put result into x
-            cmpt,
-            false
-        );
+    //     matrix_.updateMatrixInterfaces
+    //     (
+    //         coupleBouCoeffs_,
+    //         interfaces_,
+    //         x,
+    //         x,               // put result into x
+    //         cmpt,
+    //         false
+    //     );
+    // }
 
-        matrix_.updateMatrixInterfaces
-        (
-            coupleBouCoeffs_,
-            interfaces_,
-            x,
-            x,               // put result into x
-            cmpt,
-            false
-        );
-    }
-
-    // Multiply with inverse diag to precondition
-    x *= preconDiag_;
+    // // Multiply with inverse diag to precondition
+    // x *= preconDiag_;
 
     // Diagonal block: note +=
     forAll (x, i)
@@ -270,38 +274,10 @@ void Foam::ILU0::preconditionT
     // x to zero and execute coupled boundary update first
     // HJ, 19/Jun/2017
 
-    x = 0;
-
-    // Coupled boundary update
+    // Diagonal block
+    forAll (x, i)
     {
-        matrix_.initMatrixInterfaces
-        (
-            coupleIntCoeffs_, // Note: transpose coupled coeffs
-            interfaces_,
-            x,
-            x,                // put result into x
-            cmpt,
-            false
-        );
-
-        matrix_.updateMatrixInterfaces
-        (
-            coupleIntCoeffs_, // Note: transpose coupled coeffs
-            interfaces_,
-            x,
-            x,                // put result into x
-            cmpt,
-            false
-        );
-    }
-
-    // Multiply with inverse diag to precondition
-    x *= preconDiag_;
-
-    // Diagonal block: note +=
-    forAll(x, i)
-    {
-        x[i] += b[i]*preconDiag_[i];
+        x[i] = b[i]*preconDiag_[i];
     }
 
     if (matrix_.asymmetric())
