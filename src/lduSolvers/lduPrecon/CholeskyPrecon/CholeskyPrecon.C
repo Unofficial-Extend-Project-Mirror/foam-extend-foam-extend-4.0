@@ -74,7 +74,6 @@ void Foam::CholeskyPrecon::calcPreconDiag()
                 // Get interface coefficiens. Note: symmetric matrix
                 // HJ, 19/Jun/2017
                 const scalarField& bouCoeffs = coupleBouCoeffs_[patchI];
-                const scalarField& intCoeffs = coupleIntCoeffs_[patchI];
 
                 forAll (fc, coeffI)
                 {
@@ -184,6 +183,9 @@ void Foam::CholeskyPrecon::precondition
             << abort(FatalError);
     }
 
+    // Note: coupled boundary updated is not needed because x is zero
+    // HJ and VV, 19/Jun/2017
+    
     // Diagonal block
     {
         scalar* __restrict__ xPtr = x.begin();
