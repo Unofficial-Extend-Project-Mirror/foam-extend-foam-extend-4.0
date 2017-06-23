@@ -318,11 +318,11 @@ void Foam::MRFZone::calcMeshVelocity() const
     // Create direction by transposing axis
     vector dir;
 
-    if (axis_.value().x() > SMALL || axis_.value().y() > SMALL)
+    if (mag(axis_.value().x()) > SMALL || mag(axis_.value().y()) > SMALL)
     {
         dir = vector(axis_.value().y(), axis_.value().x(), axis_.value().z());
     }
-    else if (axis_.value().z() > SMALL)
+    else if (mag(axis_.value().z()) > SMALL)
     {
         dir = vector(axis_.value().x(), axis_.value().z(), axis_.value().y());
     }
