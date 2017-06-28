@@ -312,12 +312,12 @@ tmp<volSymmTensorField> SpalartAllmaras::devReff() const
 
 tmp<fvVectorMatrix> SpalartAllmaras::divDevReff() const
 {
-    volScalarField nuEff_ = nuEff();
+    const volScalarField nuEffective = nuEff();
 
     return
     (
-      - fvm::laplacian(nuEff_, U_)
-      - fvc::div(nuEff_*dev(T(fvc::grad(U_))))
+      - fvm::laplacian(nuEffective, U_)
+      - (fvc::grad(U_) & fvc::grad(nuEffective))
     );
 }
 
