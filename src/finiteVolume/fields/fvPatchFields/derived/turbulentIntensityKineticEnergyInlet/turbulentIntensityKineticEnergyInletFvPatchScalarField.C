@@ -48,6 +48,7 @@ turbulentIntensityKineticEnergyInletFvPatchScalarField
     this->valueFraction() = 0.0;
 }
 
+
 Foam::turbulentIntensityKineticEnergyInletFvPatchScalarField::
 turbulentIntensityKineticEnergyInletFvPatchScalarField
 (
@@ -100,6 +101,7 @@ turbulentIntensityKineticEnergyInletFvPatchScalarField
     this->refGrad() = 0.0;
     this->valueFraction() = 0.0;
 }
+
 
 Foam::turbulentIntensityKineticEnergyInletFvPatchScalarField::
 turbulentIntensityKineticEnergyInletFvPatchScalarField
