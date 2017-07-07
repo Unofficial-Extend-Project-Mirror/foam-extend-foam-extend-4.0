@@ -48,7 +48,7 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class clusterAmgPolicy Declaration
+                      Class clusterAmgPolicy Declaration
 \*---------------------------------------------------------------------------*/
 
 class clusterAmgPolicy
