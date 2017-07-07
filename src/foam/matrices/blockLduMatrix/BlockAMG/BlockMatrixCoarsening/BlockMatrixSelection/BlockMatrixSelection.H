@@ -133,6 +133,9 @@ class BlockMatrixSelection
         //- Weighting factor
         static const debug::tolerancesSwitch epsilon_;
 
+        //- Diagonal scaling factor
+        static const debug::tolerancesSwitch diagFactor_;
+
 
 public:
 

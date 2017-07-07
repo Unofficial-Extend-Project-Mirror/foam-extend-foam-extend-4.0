@@ -41,13 +41,23 @@ Author
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-// Factor for defining strong negative-coupling of variables
+// Factor defining strong negative-coupling of variables
 template<class Type>
 const Foam::debug::tolerancesSwitch
 Foam::BlockMatrixSelection<Type>::epsilon_
 (
-    "samgStrongConnectionFactor",
-    0.25
+    "blockSamgEpsilon",
+    0.2
+);
+
+
+// Factor defining diagonal dominance
+template<class Type>
+const Foam::debug::tolerancesSwitch
+Foam::BlockMatrixSelection<Type>::diagFactor_
+(
+    "blockSamgDiagFactor",
+    0.2
 );
 
 
@@ -139,10 +149,15 @@ void Foam::BlockMatrixSelection<Type>::calcCoarsening()
 //             MATRIX DATA: ADDRESSING, COEFFICIENTS, COEFF NORMS
 //------------------------------------------------------------------------------
 
-    // Get addressing
     const label nRows = matrix_.lduAddr().size();
     const unallocLabelList& row = matrix_.lduAddr().ownerStartAddr();
     const unallocLabelList& col = matrix_.lduAddr().upperAddr();
+
+    // Addressing for lower triangle loop
+    const unallocLabelList& lowerAddr = matrix_.lduAddr().lowerAddr();
+    const unallocLabelList& upperAddr = matrix_.lduAddr().upperAddr();
+    const unallocLabelList& losortAddr = matrix_.lduAddr().losortAddr();
+    const unallocLabelList& losortStart = matrix_.lduAddr().losortStartAddr();
 
     // Note: not taking norm magnitudes.  HJ, 28/Feb/2017
 
@@ -163,6 +178,7 @@ void Foam::BlockMatrixSelection<Type>::calcCoarsening()
     normPtr_->normalize(normLower, matrix_.lower());
 
     // Calculate norm magnitudes
+    scalarField magNormDiag = mag(normDiag);
     scalarField magNormUpper = mag(normUpper);
     scalarField magNormLower = mag(normLower);
 
@@ -208,6 +224,17 @@ void Foam::BlockMatrixSelection<Type>::calcCoarsening()
             {
                 epsilonStrongCoeff[j] = magAji;
             }
+        }
+        // Check for rows where the strongest off-diagonal coefficient is
+        // smaller than diagFactor*diag
+        if (epsilonStrongCoeff[i] < diagFactor_()*magNormDiag[i])
+        {
+            // This is a strongly diagonally dominant equation
+            // Set strong coefficient to GREAT to eliminate all off-diagonal
+            // connections in the row.  This will make the equation diag-only
+            // (for coarsening purposes), and it remains fine without correction
+            // TU and HJ, 7/Jul/2017
+            epsilonStrongCoeff[i] = GREAT;
         }
     }
 
@@ -310,7 +337,6 @@ void Foam::BlockMatrixSelection<Type>::calcCoarsening()
     // Transpose the compressed row matrix to use for coarsening
     crAddressing Taddr = strong.crAddr().T();
     const labelList& tRow = Taddr.rowStart();
-    const labelList& tCol = Taddr.column();
 
     // Label the equations COARSE and FINE based on the number of
     // influences.
@@ -325,9 +351,10 @@ void Foam::BlockMatrixSelection<Type>::calcCoarsening()
 
     for (label i = 0; i < sNRows; i++)
     {
-        // Set weights for each equation (weight == number of strong
-        // connections in col!)
-        equationWeight.set(i, strongRow[i + 1] - strongRow[i]);
+        // Set weights for each equation
+        // Count equations that my equation is strongly influencing
+        // (dependants). TU, 7/Jul/2017
+        equationWeight.set(i, tRow[i + 1] - tRow[i]);
     }
 
     for (label i = 0; i < nRows; i++)
@@ -373,15 +400,48 @@ void Foam::BlockMatrixSelection<Type>::calcCoarsening()
                 }
             }
 
-            // Make all neighbours fine and increment weight
+            // Make all neighbours fine and increment equationWeight
+            // for all neighbours in the complete matrix
+
+            // Upper triangle
             for
             (
-                label k = tRow[topElement];
-                k < tRow[topElement + 1];
+                label k = row[topElement];
+                k < row[topElement + 1];
                 k++
             )
             {
-                label j = tCol[k];
+                label j = col[k];
+
+                if (rowLabel_[j] == UNDECIDED)
+                {
+                    rowLabel_[j] = FINE;
+
+                    for (label jp = strongRow[j]; jp < strongRow[j + 1]; jp++)
+                    {
+                        label kp = strongCol[jp];
+
+                        if (rowLabel_[kp] == UNDECIDED)
+                        {
+                            equationWeight.updateWeight
+                            (
+                                kp,
+                                equationWeight.weights()[kp] + 2
+                            );
+                        }
+                    }
+                }
+            }
+
+            // Lower triangle
+            for
+            (
+                label ip = losortStart[topElement];
+                ip < losortStart[topElement + 1];
+                ip++
+            )
+            {
+                label j = lowerAddr[losortAddr[ip]];
 
                 if (rowLabel_[j] == UNDECIDED)
                 {
@@ -405,6 +465,36 @@ void Foam::BlockMatrixSelection<Type>::calcCoarsening()
         }
     }
 
+
+    if (blockLduMatrix::debug > 2)
+    {
+        if (min(rowLabel_) < -1)
+        {
+            Pout<< "FOUND UNDECIDED Equations" << endl;
+        }
+        
+        // Check direct coarse-on-coarse
+        label nCoarseOnCoarse = 0;
+        
+        forAll (lowerAddr, coeffI)
+        {
+            if
+            (
+                rowLabel_[lowerAddr[coeffI]] > -1
+             && rowLabel_[upperAddr[coeffI]] > -1
+            )
+            {
+                nCoarseOnCoarse++;
+            }
+        }
+
+        if (nCoarseOnCoarse > 0)
+        {
+            Pout<< "Found " << nCoarseOnCoarse << " coarse on coarse faces"
+                << endl;
+        }
+    }
+    
 //------------------------------------------------------------------------------
 //              CALCULATING CONTRIBUTIONS TO THE SCALING FACTOR
 //------------------------------------------------------------------------------
