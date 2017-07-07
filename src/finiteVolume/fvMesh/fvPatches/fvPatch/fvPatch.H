@@ -136,14 +136,14 @@ public:
         static autoPtr<fvPatch> New(const polyPatch&, const fvBoundaryMesh&);
 
 
-    // Destructor
+    //- Destructor
 
         virtual ~fvPatch();
 
 
     // Member Functions
 
-    // Access
+        // Access
 
             //- Return the polyPatch
             const polyPatch& patch() const

@@ -114,6 +114,12 @@ public:
                 return true;
             }
 
+            //- Does this side own the patch ?
+            virtual bool master() const
+            {
+                return myProcNo() < neighbProcNo();
+            }
+
 
         // Communications support
 

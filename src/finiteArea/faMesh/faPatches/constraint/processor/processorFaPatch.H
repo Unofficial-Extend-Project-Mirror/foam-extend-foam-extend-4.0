@@ -176,7 +176,7 @@ public:
             return size();
         }
 
-    //- Return processor number
+        //- Return processor number
         int myProcNo() const
         {
             return myProcNo_;
@@ -199,6 +199,12 @@ public:
             {
                 return false;
             }
+        }
+
+        //- Is this the master side?
+        virtual bool master() const
+        {
+            return (myProcNo_ < neighbProcNo_);
         }
 
 

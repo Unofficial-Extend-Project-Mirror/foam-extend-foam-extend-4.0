@@ -98,15 +98,20 @@ public:
         {}
 
 
-    // Destructor
-
-        virtual ~cyclicFaPatch()
-        {}
+    //- Destructor
+    virtual ~cyclicFaPatch()
+    {}
 
 
     // Member functions
 
         // Access
+
+            //- Is this the master side?  Yes: it contains both sets of faces
+            virtual bool master() const
+            {
+                return true;
+            }
 
             //- Return face transformation tensor
             virtual const tensorField& forwardT() const

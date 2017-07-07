@@ -97,9 +97,8 @@ public:
         coupledPointPatch(const pointBoundaryMesh& bm);
 
 
-    // Destructor
-
-        virtual ~coupledPointPatch();
+    //- Destructor
+    virtual ~coupledPointPatch();
 
 
     // Member Functions

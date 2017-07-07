@@ -92,9 +92,8 @@ public:
         {}
 
 
-    // Destructor
-
-        virtual ~coupledFvPatch();
+    //- Destructor
+    virtual ~coupledFvPatch();
 
 
     // Member Functions
@@ -105,6 +104,12 @@ public:
             virtual bool coupled() const
             {
                 return coupledPolyPatch_.coupled();
+            }
+
+            //- Return true if patch is coupled
+            virtual bool master() const
+            {
+                return coupledPolyPatch_.master();
             }
 
             //- Return face transformation tensor
