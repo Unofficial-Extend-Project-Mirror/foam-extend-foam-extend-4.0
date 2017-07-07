@@ -641,23 +641,11 @@ public:
             const Field<Type>& pf
         ) const;
 
-//         template<class Type>
-//         tmp<Field<Type> > masterToSlavePointInterpolate
-//         (
-//             const tmp<Field<Type> >& tpf
-//         ) const;
-
         template<class Type>
         tmp<Field<Type> > slaveToMasterPointInterpolate
         (
             const Field<Type>& pf
         ) const;
-
-//         template<class Type>
-//         tmp<Field<Type> > slaveToMasterPointInterpolate
-//         (
-//             const tmp<Field<Type> >& tpf
-//         ) const;
 
 
     // Edit
