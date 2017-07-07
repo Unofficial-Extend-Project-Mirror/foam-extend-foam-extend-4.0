@@ -44,7 +44,7 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class IrreversibleReaction Declaration
+                     Class IrreversibleReaction Declaration
 \*---------------------------------------------------------------------------*/
 
 template<class ReactionThermo, class ReactionRate>

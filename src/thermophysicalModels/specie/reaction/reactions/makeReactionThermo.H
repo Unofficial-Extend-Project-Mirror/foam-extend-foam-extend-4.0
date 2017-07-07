@@ -69,7 +69,7 @@ namespace Foam
     (                                                                         \
         ReactionType::typeName_()                                             \
       + ReactionRate::type()                                                  \
-      + Reaction##Thermo::typeName_()                                 \
+      + Reaction##Thermo::typeName_()                                         \
     );                                                                        \
                                                                               \
     addToRunTimeSelectionTable                                                \
