@@ -51,16 +51,6 @@ Foam::BlockMatrixSelection<Type>::epsilon_
 );
 
 
-// Factor defining diagonal dominance
-template<class Type>
-const Foam::debug::tolerancesSwitch
-Foam::BlockMatrixSelection<Type>::diagFactor_
-(
-    "blockSamgDiagFactor",
-    0.2
-);
-
-
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
 template<class Type>
@@ -149,14 +139,12 @@ void Foam::BlockMatrixSelection<Type>::calcCoarsening()
 //             MATRIX DATA: ADDRESSING, COEFFICIENTS, COEFF NORMS
 //------------------------------------------------------------------------------
 
+    // Get addressing
     const label nRows = matrix_.lduAddr().size();
-    const unallocLabelList& row = matrix_.lduAddr().ownerStartAddr();
-    const unallocLabelList& col = matrix_.lduAddr().upperAddr();
-
-    // Addressing for lower triangle loop
     const unallocLabelList& lowerAddr = matrix_.lduAddr().lowerAddr();
     const unallocLabelList& upperAddr = matrix_.lduAddr().upperAddr();
     const unallocLabelList& losortAddr = matrix_.lduAddr().losortAddr();
+    const unallocLabelList& ownerStart = matrix_.lduAddr().ownerStartAddr();
     const unallocLabelList& losortStart = matrix_.lduAddr().losortStartAddr();
 
     // Note: not taking norm magnitudes.  HJ, 28/Feb/2017
@@ -170,11 +158,11 @@ void Foam::BlockMatrixSelection<Type>::calcCoarsening()
     normPtr_->normalize(normDiag, matrix_.diag());
 
     // Calculate norm for upper triangle coeffs (magUpper)
-    scalarField normUpper(col.size());
+    scalarField normUpper(upperAddr.size());
     normPtr_->normalize(normUpper, matrix_.upper());
 
     // Calculate norm for lower triangle coeffs (magLower)
-    scalarField normLower(col.size());
+    scalarField normLower(upperAddr.size());
     normPtr_->normalize(normLower, matrix_.lower());
 
     // Calculate norm magnitudes
@@ -197,44 +185,32 @@ void Foam::BlockMatrixSelection<Type>::calcCoarsening()
     // Create largest norm.  It will be multiplied by epsilon later
     scalarField epsilonStrongCoeff(nRows, 0);
 
-    // Select strongest coefficient in each row
-
+    // Select the strongest coefficient in each row
     for (register label i = 0; i < nRows; i++)
     {
-        scalar signDiag = sign(normDiag[i]);
+        const scalar signDiag = sign(normDiag[i]);
 
-        for (register label k = row[i]; k < row[i + 1]; k++)
+        // Do lower triangle coefficient for the row first
+        for (register label jp = losortStart[i]; jp < losortStart[i + 1]; jp++)
         {
-            // Lower triangle
-            label j = col[k];
+            const scalar magAij =
+                mag(min(signDiag*normLower[losortAddr[jp]], 0));
 
-            // Do row coefficient
-            scalar magAij = mag(min(signDiag*normUpper[k], 0));
-
-            // Upper triangle
             if (magAij > epsilonStrongCoeff[i])
             {
                 epsilonStrongCoeff[i] = magAij;
             }
-
-            // Do col coefficient
-            scalar magAji = mag(min(signDiag*normLower[k], 0));
-
-            if (magAji > epsilonStrongCoeff[j])
-            {
-                epsilonStrongCoeff[j] = magAji;
-            }
         }
-        // Check for rows where the strongest off-diagonal coefficient is
-        // smaller than diagFactor*diag
-        if (epsilonStrongCoeff[i] < diagFactor_()*magNormDiag[i])
+
+        // Do upper triangle coefficient for the row
+        for (register label ip = ownerStart[i]; ip < ownerStart[i + 1]; ip++)
         {
-            // This is a strongly diagonally dominant equation
-            // Set strong coefficient to GREAT to eliminate all off-diagonal
-            // connections in the row.  This will make the equation diag-only
-            // (for coarsening purposes), and it remains fine without correction
-            // TU and HJ, 7/Jul/2017
-            epsilonStrongCoeff[i] = GREAT;
+            const scalar magAij = mag(min(signDiag*normUpper[ip], 0));
+
+            if (magAij > epsilonStrongCoeff[i])
+            {
+                epsilonStrongCoeff[i] = magAij;
+            }
         }
     }
 
@@ -248,32 +224,31 @@ void Foam::BlockMatrixSelection<Type>::calcCoarsening()
 
     for (register label i = 0; i < nRows; i++)
     {
-        scalar signDiag = sign(normDiag[i]);
+        const scalar signDiag = sign(normDiag[i]);
 
-        for (register label k = row[i]; k < row[i + 1]; k++)
+        // Do lower triangle coefficient for the row first
+        for (register label jp = losortStart[i]; jp < losortStart[i + 1]; jp++)
         {
-            // Col of coefficient k in row i
-            label j = col[k];
+            const scalar magAij =
+                mag(min(signDiag*normLower[losortAddr[jp]], 0));
 
-            // Do row coefficient
-            scalar magAij = mag(min(signDiag*normUpper[k], 0));
-
-            // Upper triangle
             if (magAij > epsilonStrongCoeff[i])
             {
                 strongCoeffCounter[i]++;
             }
+        }
 
-            // Do col coefficient
-            scalar magAji = mag(min(signDiag*normLower[k], 0));
+        // Do upper triangle coefficient for the row
+        for (register label ip = ownerStart[i]; ip < ownerStart[i + 1]; ip++)
+        {
+            const scalar magAij = mag(min(signDiag*normUpper[ip], 0));
 
-            if (magAji > epsilonStrongCoeff[j])
+            if (magAij > epsilonStrongCoeff[i])
             {
-                strongCoeffCounter[j]++;
+                strongCoeffCounter[i]++;
             }
         }
     }
-
 
     // Create a crMatrix that will store all of the strong elements of each row
     // (some will become FINE and some COARSE - and this will determine the
@@ -284,7 +259,6 @@ void Foam::BlockMatrixSelection<Type>::calcCoarsening()
     // Set addressing for the matrix:
     // stongCol and strongElement are arrays needed to create a compressed row
     // matrix
-    const label sNRows = strong.crAddr().nRows();
     const labelList& strongRow = strong.crAddr().rowStart();
     labelList& strongCol = strong.column();
     scalarField& strongCoeff = strong.coeffs();
@@ -294,39 +268,62 @@ void Foam::BlockMatrixSelection<Type>::calcCoarsening()
 
     for (register label i = 0; i < nRows; i++)
     {
-        scalar signDiag = sign(normDiag[i]);
+        const scalar signDiag = sign(normDiag[i]);
 
-        for (register label k = row[i]; k < row[i + 1]; k++)
+        // Do lower triangle coefficient for the row first
+        for (register label jp = losortStart[i]; jp < losortStart[i + 1]; jp++)
         {
-            // Col of coefficient k in row i
-            label j = col[k];
-
-            // Check elements in upper triangle
-            scalar magAij = mag(min(signDiag*normUpper[k], 0));
+            const scalar magAij =
+                mag(min(signDiag*normLower[losortAddr[jp]], 0));
 
             if (magAij > epsilonStrongCoeff[i])
             {
-                // Store the strong elements into crMatrix, use counter
-                // to count the number of negative strong elements for
-                // each row i
-                strongCol[strongRow[i] + strongCoeffCounter[i]] = j;
+                strongCol[strongRow[i] + strongCoeffCounter[i]] =
+                    lowerAddr[losortAddr[jp]];
                 strongCoeff[strongRow[i] + strongCoeffCounter[i]] =
-                    normUpper[k];
+                    normLower[losortAddr[jp]];
 
                 strongCoeffCounter[i]++;
             }
+        }
 
-            // Check elements in lower triangle
-            scalar magAji = mag(min(signDiag*normLower[k], 0));
+        // Do upper triangle coefficient for the row
+        for (label ip = ownerStart[i]; ip < ownerStart[i + 1]; ip++)
+        {
+            const scalar magAij = mag(min(signDiag*normUpper[ip], 0));
 
-            if (magAji > epsilonStrongCoeff[j])
+            if (magAij > epsilonStrongCoeff[i])
             {
-                strongCol[strongRow[j] + strongCoeffCounter[j]] = i;
-                strongCoeff[strongRow[j] + strongCoeffCounter[j]] =
-                    normLower[k];
+                strongCol[strongRow[i] + strongCoeffCounter[i]] = upperAddr[ip];
+                strongCoeff[strongRow[i] + strongCoeffCounter[i]] =
+                    normUpper[ip];
 
-                strongCoeffCounter[j]++;
+                strongCoeffCounter[i]++;
             }
+        }
+    }
+
+    // CHECK
+    forAll (strongCoeffCounter, i)
+    {
+        if (strongCoeffCounter[i] == 0)
+        {
+            Pout<< "Solo strong row " << i
+                << " strongCoeff: " << epsilonStrongCoeff[i]/epsilon_()
+                << endl;
+
+            Pout<< "diag = " << normDiag[i] << " lower = ";
+            // Write coeffs
+            for (register label jp = losortStart[i]; jp < losortStart[i + 1]; jp++)
+            {
+                Pout<< normLower[losortAddr[jp]] << " ";
+            }
+            Pout<< " upper = ";
+            for (label ip = ownerStart[i]; ip < ownerStart[i + 1]; ip++)
+            {
+                Pout<< normUpper[ip] << " ";
+            }
+            Pout<< endl;
         }
     }
 
@@ -337,6 +334,7 @@ void Foam::BlockMatrixSelection<Type>::calcCoarsening()
     // Transpose the compressed row matrix to use for coarsening
     crAddressing Taddr = strong.crAddr().T();
     const labelList& tRow = Taddr.rowStart();
+    const labelList& tCol = Taddr.column();
 
     // Label the equations COARSE and FINE based on the number of
     // influences.
@@ -347,9 +345,9 @@ void Foam::BlockMatrixSelection<Type>::calcCoarsening()
     // Mark equations
     rowLabel_.setSize(nRows, UNDECIDED);
 
-    PriorityList<label> equationWeight(sNRows);
+    PriorityList<label> equationWeight(nRows);
 
-    for (label i = 0; i < sNRows; i++)
+    for (label i = 0; i < nRows; i++)
     {
         // Set weights for each equation
         // Count equations that my equation is strongly influencing
@@ -357,14 +355,19 @@ void Foam::BlockMatrixSelection<Type>::calcCoarsening()
         equationWeight.set(i, tRow[i + 1] - tRow[i]);
     }
 
-    for (label i = 0; i < nRows; i++)
-    {
-        // Label rows without strong connections as FINE
-        if (strongRow[i + 1] == strongRow[i])
-        {
-            rowLabel_[i] = FINE;
-        }
-    }
+    // // HJ, REMOVE THIS: it is not allowed to have empty prolongation rows
+    // // because it destroys the diagonal dominance on the coarse level
+    // // HJ, 29/Jul/2017
+    // // Mark highly diagonally dominant rows as fine. This also removes solo
+    // // equations from coarsening
+    // for (label i = 0; i < nRows; i++)
+    // {
+    //     // Label rows without strong connections as FINE
+    //     if (strongRow[i + 1] == strongRow[i])
+    //     {
+    //         rowLabel_[i] = FINE;
+    //     }
+    // }
 
     // Start counting coarse equations
     nCoarseEqns_ = 0;
@@ -383,12 +386,12 @@ void Foam::BlockMatrixSelection<Type>::calcCoarsening()
             // Decrement weights of neighbouring equations
             for
             (
-                label k = strongRow[topElement];
-                k < strongRow[topElement + 1];
-                k++
+                label ip = strongRow[topElement];
+                ip < strongRow[topElement + 1];
+                ip++
             )
             {
-                label j = strongCol[k];
+                label j = strongCol[ip];
 
                 if (rowLabel_[j] == UNDECIDED)
                 {
@@ -400,48 +403,15 @@ void Foam::BlockMatrixSelection<Type>::calcCoarsening()
                 }
             }
 
-            // Make all neighbours fine and increment equationWeight
-            // for all neighbours in the complete matrix
-
-            // Upper triangle
+            // Make all neighbours fine and increment weight
             for
             (
-                label k = row[topElement];
-                k < row[topElement + 1];
-                k++
-            )
-            {
-                label j = col[k];
-
-                if (rowLabel_[j] == UNDECIDED)
-                {
-                    rowLabel_[j] = FINE;
-
-                    for (label jp = strongRow[j]; jp < strongRow[j + 1]; jp++)
-                    {
-                        label kp = strongCol[jp];
-
-                        if (rowLabel_[kp] == UNDECIDED)
-                        {
-                            equationWeight.updateWeight
-                            (
-                                kp,
-                                equationWeight.weights()[kp] + 2
-                            );
-                        }
-                    }
-                }
-            }
-
-            // Lower triangle
-            for
-            (
-                label ip = losortStart[topElement];
-                ip < losortStart[topElement + 1];
+                label ip = tRow[topElement];
+                ip < tRow[topElement + 1];
                 ip++
             )
             {
-                label j = lowerAddr[losortAddr[ip]];
+                label j = tCol[ip];
 
                 if (rowLabel_[j] == UNDECIDED)
                 {
@@ -465,36 +435,26 @@ void Foam::BlockMatrixSelection<Type>::calcCoarsening()
         }
     }
 
-
-    if (blockLduMatrix::debug > 2)
+    if (min(rowLabel_) < -1)
     {
-        if (min(rowLabel_) < -1)
+        Pout<< "******************************** FOUND UNDECIDED Equations" << endl;
+    }
+
+    // Renumber matrix - coarse equations are renumbered in natural order
+    if (true)
+    {
+        label number = 0;
+
+        for (label eqn = 0; eqn < nRows; eqn++)
         {
-            Pout<< "FOUND UNDECIDED Equations" << endl;
-        }
-        
-        // Check direct coarse-on-coarse
-        label nCoarseOnCoarse = 0;
-        
-        forAll (lowerAddr, coeffI)
-        {
-            if
-            (
-                rowLabel_[lowerAddr[coeffI]] > -1
-             && rowLabel_[upperAddr[coeffI]] > -1
-            )
+            if (rowLabel_[eqn] != FINE)
             {
-                nCoarseOnCoarse++;
+                rowLabel_[eqn] = number;
+                number++;
             }
         }
-
-        if (nCoarseOnCoarse > 0)
-        {
-            Pout<< "Found " << nCoarseOnCoarse << " coarse on coarse faces"
-                << endl;
-        }
     }
-    
+
 //------------------------------------------------------------------------------
 //              CALCULATING CONTRIBUTIONS TO THE SCALING FACTOR
 //------------------------------------------------------------------------------
@@ -505,7 +465,7 @@ void Foam::BlockMatrixSelection<Type>::calcCoarsening()
     // Sum of positive elements in row (sign equal to diagonal)
     scalarField Dii(sign(normDiag)*normDiag);
 
-    scalar Dij, Dji, den, signDii;
+    scalar Dij, den, signDii;
 
     // Coupled boundary tratment
     // In preparation for the calculation of interpolation matrices
@@ -526,6 +486,9 @@ void Foam::BlockMatrixSelection<Type>::calcCoarsening()
     // Positive coefficient = same sign as diagonal (bad)
     // Negative coefficient = opposite sign od diagonal (good)
 
+
+    // HJ: scaling not currently used.  HJ, 30/Jul/2017
+    
     // Collect contributions from coupled boundaries
     const typename BlockLduInterfaceFieldPtrsList<Type>::Type& interfaceFields =
         matrix_.interfaces();
@@ -562,7 +525,7 @@ void Foam::BlockMatrixSelection<Type>::calcCoarsening()
                 // Add negative/positive contribution into corresponding field
                 // which contributes to prolongation weight factor
                 Dii[i] += Foam::max(Dij, 0);
-                // num[i] += Foam::min(Dij, 0);   // HJ, HERE!!!
+                num[i] += Foam::min(Dij, 0);   // HJ, HERE!!!
             }
         }
     }
@@ -596,7 +559,7 @@ void Foam::BlockMatrixSelection<Type>::calcCoarsening()
     // Start row assembly
     pRow[0] = 0;
 
-    for (label i = 0; i < nRows; i++)
+    for (register label i = 0; i < nRows; i++)
     {
         label rowCount = pRow[i];
 
@@ -604,22 +567,28 @@ void Foam::BlockMatrixSelection<Type>::calcCoarsening()
         // row coeffs by the sign
         signDii = sign(normDiag[i]);
 
-        for (label k = row[i]; k < row[i + 1]; k++)
+        // Do lower triangle coefficient for the row first
+        for (register label jp = losortStart[i]; jp < losortStart[i + 1]; jp++)
         {
             // Adjust sign of off-diag coeff
-            Dij = signDii*normUpper[k];
+            Dij = sign(normDiag[i])*normLower[losortAddr[jp]];
 
             // Add negative coeff to num
             // Add positive coeff to diag to eliminate it
             num[i] += Foam::min(Dij, 0);
             Dii[i] += Foam::max(Dij, 0);
+        }
 
-            // Scatter lower triangular contribution
-            label j = col[k];
+        // Do upper triangle coefficient for the row
+        for (register label ip = ownerStart[i]; ip < ownerStart[i + 1]; ip++)
+        {
+            // Adjust sign of off-diag coeff
+            Dij = signDii*normUpper[ip];
 
-            Dji = sign(normDiag[j])*normLower[k];
-            num[j] += Foam::min(Dji, 0);
-            Dii[j] += Foam::max(Dji, 0);
+            // Add negative coeff to num
+            // Add positive coeff to diag to eliminate it
+            num[i] += Foam::min(Dij, 0);
+            Dii[i] += Foam::max(Dij, 0);
         }
 
         // Row i completed.  Calculate weights
@@ -628,23 +597,45 @@ void Foam::BlockMatrixSelection<Type>::calcCoarsening()
             // Fine equation
             den = 0;
 
-            for (label sk = strongRow[i]; sk < strongRow[i + 1]; sk++)
+            for
+            (
+                register label sip = strongRow[i];
+                sip < strongRow[i + 1];
+                sip++
+            )
             {
-                label js = strongCol[sk];
+                const label js = strongCol[sip];
 
                 if (rowLabel_[js] != FINE)
                 {
-                    den += strongCoeff[sk];
+                    den += strongCoeff[sip];
                 }
             }
 
-            for (label sk = strongRow[i]; sk < strongRow[i + 1]; sk++)
+            for
+            (
+                register label sip = strongRow[i];
+                sip < strongRow[i + 1];
+                sip++
+            )
             {
-                label js = strongCol[sk];
+                const label js = strongCol[sip];
 
                 if (rowLabel_[js] != FINE)
                 {
-                    pCoeff[rowCount] = -(num[i]/den)*strongCoeff[sk]/Dii[i];
+                    // Prolongation coefficient with scaling
+                    // pCoeff[rowCount] = -(num[i]/den)*strongCoeff[sip]/Dii[i];
+
+                    // TU, new interpolation: we have to assume all the
+                    // equations are diagonally equal in order to get the row of
+                    // prolongation to sum into 1
+                    // num[i] is a sum of all negative (sign opposite to
+                    // diagonal) off-diagonal coefficients and SHOULD be equal
+                    // to the diagonal. That is why -num[i] and Dii[i] have
+                    // disappeared. Note: if there are positive connections in
+                    // the row, this is not valid.
+                    pCoeff[rowCount] = strongCoeff[sip]/den;
+
                     pCol[rowCount] = rowLabel_[js];
                     rowCount++;
                 }
@@ -658,8 +649,17 @@ void Foam::BlockMatrixSelection<Type>::calcCoarsening()
             rowCount++;
         }
 
-        // Grab row start
+        // Grab row start/end
         pRow[i + 1] = rowCount;
+    }
+
+    // CHECK
+    for (label i = 0; i < nRows; i++)
+    {
+        if (pRow[i + 1] - pRow[i] == 0)
+        {
+            Pout<< "Solo prolongation row " << i << endl;
+        }
     }
 
     // Resize column and coeffs
@@ -672,27 +672,34 @@ void Foam::BlockMatrixSelection<Type>::calcCoarsening()
 
     prolongation.coeffs().transfer(pCoeff);
 
-    // // Check prolongation matrix
-    // {
-    //     scalarField sumRow(nRows, 0);
-    //     const labelList& prolongationRow = Pptr_->crAddr().rowStart();
-    //     const scalarField& prolongationCoeff = Pptr_->coeffs();
+    // Check prolongation matrix
+//    if (blockLduMatrix::debug > 2)
+    {
+        scalarField sumRow(nRows, 0);
+        const labelList& prolongationRow = Pptr_->crAddr().rowStart();
+        const scalarField& prolongationCoeff = Pptr_->coeffs();
 
-    //     for (label rowI = 0; rowI < nRows; rowI++)
-    //     {
-    //         for
-    //         (
-    //             label colI = prolongationRow[rowI];
-    //             colI < prolongationRow[rowI + 1];
-    //             colI++
-    //         )
-    //         {
-    //             sumRow[rowI] += prolongationCoeff[colI];
-    //         }
-    //     }
-    //     Pout<< "sumRow (min, max) = (" << min(sumRow) << " "
-    //         << max(sumRow) << ")" << endl;
-    // }
+        for (register label rowI = 0; rowI < nRows; rowI++)
+        {
+            for
+            (
+                label colI = prolongationRow[rowI];
+                colI < prolongationRow[rowI + 1];
+                colI++
+            )
+            {
+                sumRow[rowI] += prolongationCoeff[colI];
+            }
+        }
+
+        scalar minSumRow = min(sumRow);
+
+        if (minSumRow < 0.99)
+        {
+            Pout<< "sumRow (min, max) = (" << min(sumRow) << " "
+                << max(sumRow) << ")" << endl;
+        }
+    }
 
     // The decision on parallel agglomeration needs to be made for the
     // whole gang of processes; otherwise I may end up with a different
@@ -706,6 +713,20 @@ void Foam::BlockMatrixSelection<Type>::calcCoarsening()
         coarsen_ = true;
     }
 
+    // Dump the level if there is a bad prolongation row
+    // Temporary stability solution.  HJ, 30/Jul/2017
+    for (register label rowI = 0; rowI < nRows; rowI++)
+    {
+        // if (prolongationRow[rowI] == prolongationRow[rowI + 1])
+        if (strongRow[rowI + 1] - strongRow[rowI] == 0)
+        {
+            // Found bad prolongation
+            Pout<< "**************Bad strong matrix" << endl;
+            coarsen_ = false;
+            break;
+        }
+    }
+    
     reduce(coarsen_, andOp<bool>());
 
     if (blockLduMatrix::debug >= 3)

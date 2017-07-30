@@ -112,7 +112,7 @@ class BlockMatrixSelection
             const crMatrix& prolongationMatrix,
             const labelList& fineFaceCells
         ) const;
-    
+
         //- Calculate restriction and prolongation
         void calcCoarsening();
 
@@ -132,9 +132,6 @@ class BlockMatrixSelection
 
         //- Weighting factor
         static const debug::tolerancesSwitch epsilon_;
-
-        //- Diagonal scaling factor
-        static const debug::tolerancesSwitch diagFactor_;
 
 
 public:

@@ -37,8 +37,8 @@ Author
 #include "vector2D.H"
 #include "coeffFields.H"
 #include "BlockSolverPerformance.H"
-// #include "BlockBiCGStabSolver.H"
-// #include "BlockCGSolver.H"
+#include "BlockCGSolver.H"
+#include "BlockBiCGStabSolver.H"
 #include "BlockGMRESSolver.H"
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
@@ -247,8 +247,8 @@ void Foam::coarseBlockAMGLevel<Type>::solve
         topLevelDict.add("preconditioner", "Cholesky");
 
         coarseSolverPerf =
-//         BlockCGSolver<Type>
-        BlockGMRESSolver<Type>
+         BlockCGSolver<Type>
+        // BlockGMRESSolver<Type>
         (
             "topLevelCorr",
             matrixPtr_,
@@ -260,8 +260,8 @@ void Foam::coarseBlockAMGLevel<Type>::solve
         topLevelDict.add("preconditioner", "Cholesky");
 
         coarseSolverPerf =
-//         BlockBiCGStabSolver<Type>
-        BlockGMRESSolver<Type>
+        BlockBiCGStabSolver<Type>
+        // BlockGMRESSolver<Type>
         (
             "topLevelCorr",
             matrixPtr_,
