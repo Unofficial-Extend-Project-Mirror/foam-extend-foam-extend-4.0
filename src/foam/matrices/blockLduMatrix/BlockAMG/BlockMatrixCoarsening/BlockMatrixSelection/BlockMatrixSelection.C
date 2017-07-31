@@ -304,28 +304,28 @@ void Foam::BlockMatrixSelection<Type>::calcCoarsening()
     }
 
     // CHECK
-    forAll (strongCoeffCounter, i)
-    {
-        if (strongCoeffCounter[i] == 0)
-        {
-            Pout<< "Solo strong row " << i
-                << " strongCoeff: " << epsilonStrongCoeff[i]/epsilon_()
-                << endl;
-
-            Pout<< "diag = " << normDiag[i] << " lower = ";
-            // Write coeffs
-            for (register label jp = losortStart[i]; jp < losortStart[i + 1]; jp++)
-            {
-                Pout<< normLower[losortAddr[jp]] << " ";
-            }
-            Pout<< " upper = ";
-            for (label ip = ownerStart[i]; ip < ownerStart[i + 1]; ip++)
-            {
-                Pout<< normUpper[ip] << " ";
-            }
-            Pout<< endl;
-        }
-    }
+//    forAll (strongCoeffCounter, i)
+//    {
+//        if (strongCoeffCounter[i] == 0)
+//        {
+//            Pout<< "Solo strong row " << i
+//                << " strongCoeff: " << epsilonStrongCoeff[i]/epsilon_()
+//                << endl;
+//
+//            Pout<< "diag = " << normDiag[i] << " lower = ";
+//            // Write coeffs
+//            for (register label jp = losortStart[i]; jp < losortStart[i + 1]; jp++)
+//            {
+//                Pout<< normLower[losortAddr[jp]] << " ";
+//            }
+//            Pout<< " upper = ";
+//            for (label ip = ownerStart[i]; ip < ownerStart[i + 1]; ip++)
+//            {
+//                Pout<< normUpper[ip] << " ";
+//            }
+//            Pout<< endl;
+//        }
+//    }
 
 //------------------------------------------------------------------------------
 //           COARSENING: SORT EQUATIONS INTO COARSE AND FINE SUBSETS
@@ -715,17 +715,17 @@ void Foam::BlockMatrixSelection<Type>::calcCoarsening()
 
     // Dump the level if there is a bad prolongation row
     // Temporary stability solution.  HJ, 30/Jul/2017
-    for (register label rowI = 0; rowI < nRows; rowI++)
-    {
-        // if (prolongationRow[rowI] == prolongationRow[rowI + 1])
-        if (strongRow[rowI + 1] - strongRow[rowI] == 0)
-        {
-            // Found bad prolongation
-            Pout<< "**************Bad strong matrix" << endl;
-            coarsen_ = false;
-            break;
-        }
-    }
+//    for (register label rowI = 0; rowI < nRows; rowI++)
+//    {
+//        // if (prolongationRow[rowI] == prolongationRow[rowI + 1])
+//        if (strongRow[rowI + 1] - strongRow[rowI] == 0)
+//        {
+//            // Found bad prolongation
+//            Pout<< "**************Bad strong matrix" << endl;
+//            coarsen_ = false;
+//            break;
+//        }
+//    }
     
     reduce(coarsen_, andOp<bool>());
 
