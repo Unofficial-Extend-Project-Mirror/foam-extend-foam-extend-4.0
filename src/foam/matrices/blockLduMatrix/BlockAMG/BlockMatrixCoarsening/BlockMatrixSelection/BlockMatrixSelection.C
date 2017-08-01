@@ -355,19 +355,17 @@ void Foam::BlockMatrixSelection<Type>::calcCoarsening()
         equationWeight.set(i, tRow[i + 1] - tRow[i]);
     }
 
-    // // HJ, REMOVE THIS: it is not allowed to have empty prolongation rows
-    // // because it destroys the diagonal dominance on the coarse level
-    // // HJ, 29/Jul/2017
-    // // Mark highly diagonally dominant rows as fine. This also removes solo
-    // // equations from coarsening
-    // for (label i = 0; i < nRows; i++)
-    // {
-    //     // Label rows without strong connections as FINE
-    //     if (strongRow[i + 1] == strongRow[i])
-    //     {
-    //         rowLabel_[i] = FINE;
-    //     }
-    // }
+    // Mark disconnected rows as fine. This also removes solo
+    // equations from coarsening
+    // HJ, 29/Jul/2017
+    for (label i = 0; i < nRows; i++)
+    {
+        // Label rows without strong connections as FINE
+        if (strongRow[i + 1] == strongRow[i])
+        {
+            rowLabel_[i] = FINE;
+        }
+    }
 
     // Start counting coarse equations
     nCoarseEqns_ = 0;
