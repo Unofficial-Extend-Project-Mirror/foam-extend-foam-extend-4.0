@@ -4,6 +4,7 @@ linearNormal/linearNormal.C
 linearRadial/linearRadial.C
 sigmaRadial/sigmaRadial.C
 wedge/wedge.C
+gradedNormal/gradedNormal.C
 
 LIB = $(FOAM_LIBBIN)/libextrudeModel
 
