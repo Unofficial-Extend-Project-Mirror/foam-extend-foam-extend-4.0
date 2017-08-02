@@ -80,6 +80,7 @@ void Foam::ILU0::calcPreconDiag()
                     // Note: change of the sign compared to main loop below
                     // This is because lower = -intCoeffs
                     // HJ and VV, 19/Jun/2017
+                    // Note: sign fixed by HJ, 19/Jun/2017
                     preconDiag_[fc[coeffI]] +=
                         bouCoeffs[coeffI]*intCoeffs[coeffI]/
                         preconDiag_[fc[coeffI]];
@@ -217,15 +218,15 @@ void Foam::ILU0::precondition
         const scalarField& upper = matrix_.upper();
         const scalarField& lower = matrix_.lower();
 
-        label losortCoeff;
+        label losortIndex;
 
         forAll (lower, coeffI)
         {
-            losortCoeff = losortAddr[coeffI];
+            losortIndex = losortAddr[coeffI];
 
-            x[upperAddr[losortCoeff]] -=
-                preconDiag_[upperAddr[losortCoeff]]*
-                lower[losortCoeff]*x[lowerAddr[losortCoeff]];
+            x[upperAddr[losortIndex]] -=
+                preconDiag_[upperAddr[losortIndex]]*
+                lower[losortIndex]*x[lowerAddr[losortIndex]];
         }
 
         forAllReverse (upper, coeffI)
@@ -234,6 +235,38 @@ void Foam::ILU0::precondition
                 preconDiag_[lowerAddr[coeffI]]*
                 upper[coeffI]*x[upperAddr[coeffI]];
         }
+/*
+        // Parallel preconditioning
+        // HJ, 19/Jun/2017
+
+        scalarField xCorr(x.size(), 0);
+
+        // Coupled boundary update
+        {
+            matrix_.initMatrixInterfaces
+            (
+                coupleBouCoeffs_,
+                interfaces_,
+                x,
+                xCorr,               // put result into xCorr
+                cmpt,
+                false
+            );
+
+            matrix_.updateMatrixInterfaces
+            (
+                coupleBouCoeffs_,
+                interfaces_,
+                x,
+                xCorr,               // put result into xCorr
+                cmpt,
+                false
+            );
+
+            // Multiply with inverse diag to precondition
+            x += xCorr*preconDiag_;
+        }
+*/
     }
 }
 
@@ -291,7 +324,7 @@ void Foam::ILU0::preconditionT
         const scalarField& upper = matrix_.upper();
         const scalarField& lower = matrix_.lower();
 
-        label losortCoeff;
+        label losortIndex;
 
         forAll (lower, coeffI)
         {
@@ -303,12 +336,12 @@ void Foam::ILU0::preconditionT
 
         forAllReverse (upper, coeffI)
         {
-            losortCoeff = losortAddr[coeffI];
+            losortIndex = losortAddr[coeffI];
 
             // Transpose multiplication.  HJ, 19/Jan/2009
-            x[lowerAddr[losortCoeff]] -=
-                preconDiag_[lowerAddr[losortCoeff]]*
-                lower[losortCoeff]*x[upperAddr[losortCoeff]];
+            x[lowerAddr[losortIndex]] -=
+                preconDiag_[lowerAddr[losortIndex]]*
+                lower[losortIndex]*x[upperAddr[losortIndex]];
         }
     }
 }

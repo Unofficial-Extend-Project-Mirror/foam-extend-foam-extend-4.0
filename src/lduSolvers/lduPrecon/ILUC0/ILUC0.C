@@ -125,13 +125,13 @@ void Foam::ILUC0::calcFactorization()
             )
             {
                 // Get losort coefficient for this face
-                const register label losortCoeff = lsrPtr[faceLsrI];
+                const register label losortIndex = lsrPtr[faceLsrI];
 
                 // Get corresponding row index for upper (i label)
-                const label i = lPtr[losortCoeff];
+                const label i = lPtr[losortIndex];
 
                 // Update diagonal
-                zDiag_ -= lowerPtr[losortCoeff]*upperPtr[losortCoeff];
+                zDiag_ -= lowerPtr[losortIndex]*upperPtr[losortIndex];
 
                 // Get end of row for cell i
                 const register label fEndRowi = ownStartPtr[i + 1];
@@ -140,14 +140,14 @@ void Foam::ILUC0::calcFactorization()
                 // existence of certain upper coeffs)
                 for
                 (
-                    // Diagonal is already updated (losortCoeff + 1 = start)
-                    register label faceI = losortCoeff + 1;
+                    // Diagonal is already updated (losortIndex + 1 = start)
+                    register label faceI = losortIndex + 1;
                     faceI < fEndRowi;
                     ++faceI
                 )
                 {
-                    zPtr[uPtr[faceI]] -= lowerPtr[losortCoeff]*upperPtr[faceI];
-                    wPtr[uPtr[faceI]] -= upperPtr[losortCoeff]*lowerPtr[faceI];
+                    zPtr[uPtr[faceI]] -= lowerPtr[losortIndex]*upperPtr[faceI];
+                    wPtr[uPtr[faceI]] -= upperPtr[losortIndex]*lowerPtr[faceI];
                 }
             }
 
@@ -182,17 +182,17 @@ void Foam::ILUC0::calcFactorization()
             )
             {
                 // Get losort coefficient for this face
-                const register label losortCoeff = lsrPtr[faceLsrI];
+                const register label losortIndex = lsrPtr[faceLsrI];
 
                 // Get corresponding row index for upper (i label)
-                const label i = lPtr[losortCoeff];
+                const label i = lPtr[losortIndex];
 
                 // Get end of row for cell i
                 const register label fEndRowi = ownStartPtr[i + 1];
 
                 for
                 (
-                    register label faceI = losortCoeff + 1;
+                    register label faceI = losortIndex + 1;
                     faceI < fEndRowi;
                     ++faceI
                 )
@@ -297,18 +297,18 @@ void Foam::ILUC0::precondition
         // Initialize x field
         x = b;
 
-        register label losortCoeffI;
+        register label losortIndexI;
         register label rowI;
 
         // Forward substitution loop
         forAll (preconLower_, coeffI)
         {
-            // Get current losortCoeff to ensure row by row access
-            losortCoeffI = losortAddr[coeffI];
+            // Get current losortIndex to ensure row by row access
+            losortIndexI = losortAddr[coeffI];
 
             // Subtract already updated lower part from the solution
-            x[upperAddr[losortCoeffI]] -=
-                preconLower_[losortCoeffI]*x[lowerAddr[losortCoeffI]];
+            x[upperAddr[losortIndexI]] -=
+                preconLower_[losortIndexI]*x[lowerAddr[losortIndexI]];
         }
 
         // Solve Ux = b with back substitution. U is chosen to be upper
@@ -373,21 +373,21 @@ void Foam::ILUC0::preconditionT
             x[i] = b[i]*preconDiag_[i];
         }
 
-        register label losortCoeffI;
+        register label losortIndexI;
         register label rowI;
 
         // Forward substitution loop
         forAll (preconUpper_, coeffI)
         {
-            // Get current losortCoeff to ensure row by row access
-            losortCoeffI = losortAddr[coeffI];
+            // Get current losortIndex to ensure row by row access
+            losortIndexI = losortAddr[coeffI];
 
             // Get row index
-            rowI = upperAddr[losortCoeffI];
+            rowI = upperAddr[losortIndexI];
 
             // Subtract already updated lower (upper transpose) part from the
             // solution
-            x[rowI] -= preconUpper_[losortCoeffI]*x[lowerAddr[losortCoeffI]]*
+            x[rowI] -= preconUpper_[losortIndexI]*x[lowerAddr[losortIndexI]]*
                 preconDiag_[rowI];
         }
 
