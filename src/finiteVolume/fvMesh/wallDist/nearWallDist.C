@@ -33,31 +33,16 @@ License
 
 void Foam::nearWallDist::doAll()
 {
-    cellDistFuncs wallUtils(mesh_);
-
-    // AJ: make sure to pick up all patches that are specified as a wall
-    const polyBoundaryMesh& bMesh = wallUtils.mesh().boundaryMesh();
-    labelHashSet wallPatchIDs(bMesh.size());
-    forAll(bMesh, patchI)
-    {
-        if (bMesh[patchI].isWall())
-        {
-            wallPatchIDs.insert(patchI);
-        }
-    }
-
-    // Get patch ids of walls
-    // labelHashSet wallPatchIDs(wallUtils.getPatchIDs<wallPolyPatch>());
-
-    // Size neighbours array for maximum possible
-
-    labelList neighbours(wallUtils.maxPatchSize(wallPatchIDs));
-
-
     // Correct all cells with face on wall
-
     const volVectorField& cellCentres = mesh_.C();
 
+    // HR 12.02.18: Use hashSet to determine nbs
+    // This should removes a possible error due to wrong sizing since
+    // getPointNeighbours may still run over AND should be faster
+    // since the linear search (again getPointNeighbours) is removed.
+    labelHashSet nbs(20);
+
+    // Correct all cells with face on wall
     forAll(mesh_.boundary(), patchI)
     {
         fvPatchScalarField& ypatch = operator[](patchI);
@@ -67,29 +52,45 @@ void Foam::nearWallDist::doAll()
         if (patch.isWall())
         {
             const polyPatch& pPatch = patch.patch();
-
-            const unallocLabelList& faceCells = patch.faceCells();
+            const pointField& points = pPatch.points();
+            const unallocLabelList& faceCells = pPatch.faceCells();
 
             // Check cells with face on wall
             forAll(patch, patchFaceI)
             {
-                label nNeighbours = wallUtils.getPointNeighbours
-                (
-                    pPatch,
-                    patchFaceI,
-                    neighbours
-                );
+                const face& f = pPatch.localFaces()[patchFaceI];
 
-                label minFaceI = -1;
+                scalar minDist = GREAT;
 
-                ypatch[patchFaceI] = wallUtils.smallestDist
-                (
-                    cellCentres[faceCells[patchFaceI]],
-                    pPatch,
-                    nNeighbours,
-                    neighbours,
-                    minFaceI
-                );
+                // Loop over points
+                forAll(f, fI)
+                {
+                    const labelList& pointNbs = pPatch.pointFaces()[f[fI]];
+
+                    // Loop over faces sharing current point
+                    // This will include the face itself
+                    forAll(pointNbs, pointNbsI)
+                    {
+                        const label nbr = pointNbs[pointNbsI];
+                        if (nbs.insert(nbr))
+                        {
+                            const pointHit curHit = pPatch[nbr].nearestPoint
+                            (
+                                cellCentres[faceCells[nbr]],
+                                points
+                            );
+
+                            if (curHit.distance() < minDist)
+                            {
+                                minDist = curHit.distance();
+                            }
+                        }
+                    }
+                }
+
+                ypatch[patchFaceI] = minDist;
+
+                nbs.clear();
             }
         }
         else
