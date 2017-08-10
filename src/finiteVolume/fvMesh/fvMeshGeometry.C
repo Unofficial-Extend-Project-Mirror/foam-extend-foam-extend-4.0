@@ -548,6 +548,9 @@ const surfaceScalarField& fvMesh::phi() const
 {
     if (!phiPtr_)
     {
+        // If making mesh motion fluxes from nothing, old volumes
+        // must be recorded as well.  HJ, 10/Aug/2017
+        const_cast<fvMesh&>(*this).setV0();
         makePhi();
     }
 
