@@ -10,11 +10,12 @@ FoamFile
     version     2.0;
     format      ascii;
     class       volScalarField;
-    object      p;
+    location    "0";
+    object      nut;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-dimensions      [0 2 -2 0 0 0 0];
+dimensions      [0 2 -1 0 0 0 0];
 
 internalField   uniform 0;
 
@@ -22,41 +23,51 @@ boundaryField
 {
     inlet
     {
-        type            zeroGradient;
-    }
-
-    outlet
-    {
-        type            fixedValue;
+        type            calculated;
         value           uniform 0;
     }
-
+    outlet
+    {
+        type            calculated;
+        value           uniform 0;
+    }
     upperWall
     {
-        type            zeroGradient;
+        type            nutWallFunction;
+        Cmu             0.09;
+        kappa           0.41;
+        E               9.8;
+        value           uniform 0;
     }
-
     lowerWall
     {
-        type            zeroGradient;
+        type            nutWallFunction;
+        Cmu             0.09;
+        kappa           0.41;
+        E               9.8;
+        value           uniform 0;
     }
-
-    lowerWallInlet
-    {
-        type            zeroGradient;
-    }
-
     lowerWallInterface
     {
-        type            zeroGradient;
+        type            nutWallFunction;
+        Cmu             0.09;
+        kappa           0.41;
+        E               9.8;
+        value           uniform 0;
     }
-
-    // Note: patch merged with lowerWallInterface - zero size
+    lowerWallInlet
+    {
+        type            nutWallFunction;
+        Cmu             0.09;
+        kappa           0.41;
+        E               9.8;
+        value           uniform 0;
+    }
     interface
     {
-        type            zeroGradient;
+        type            calculated;
+        value           nonuniform 0();
     }
-
     defaultFaces
     {
         type            empty;

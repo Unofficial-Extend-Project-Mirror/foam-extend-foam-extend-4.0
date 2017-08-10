@@ -18,64 +18,64 @@ solvers
 {
     p
     {
-        solver           PCG;
-        preconditioner   DIC;
+        solver           CG;
+        preconditioner   Cholesky;
 
         minIter          0;
         maxIter          2000;
         tolerance        1e-06;
         relTol           0.01;
-    };
+    }
     U
     {
         solver           BiCGStab;
-        preconditioner   DILU;
+        preconditioner   ILU0;
 
         minIter          0;
         maxIter          500;
         tolerance        1e-05;
         relTol           0.1;
-    };
+    }
     k
     {
         solver           BiCGStab;
-        preconditioner   DILU;
+        preconditioner   ILU0;
 
         minIter          0;
         maxIter          500;
         tolerance        1e-05;
         relTol           0.1;
-    };
-    epsilon BiCGStab
+    }
+    epsilon
     {
         solver           BiCGStab;
-        preconditioner   DILU;
+        preconditioner   ILU0;
 
         minIter          0;
         maxIter          500;
         tolerance        1e-05;
         relTol           0.1;
-    };
-    R BiCGStab
+    }
+    R
     {
         solver           BiCGStab;
-        preconditioner   DILU;
+        preconditioner   ILU0;
 
         minIter          0;
         maxIter          500;
         tolerance        1e-05;
         relTol           0.1;
-    };
-    nuTilda BiCGStab
+    }
+    nuTilda
     {
         solver           BiCGStab;
-        preconditioner   DILU;
+        preconditioner   ILU0;
 
         minIter          0;
         maxIter          500;
         tolerance        1e-05;
         relTol           0.1;
-    };
+    }
 }
 
 SIMPLE
