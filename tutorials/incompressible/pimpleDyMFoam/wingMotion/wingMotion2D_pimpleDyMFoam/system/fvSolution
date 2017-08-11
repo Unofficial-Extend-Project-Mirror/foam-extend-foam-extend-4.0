@@ -24,10 +24,10 @@ solvers
         smoother         GaussSeidel;
         nPreSweeps       0;
         nPostSweeps      2;
-        cacheAgglomeration on;
+        cacheAgglomeration false;
         agglomerator     faceAreaPair;
         nCellsInCoarsestLevel 10;
-        mergeLevels      1;
+        mergeLevels      2;
     }
 
     pFinal
@@ -38,16 +38,16 @@ solvers
         smoother         GaussSeidel;
         nPreSweeps       0;
         nPostSweeps      2;
-        cacheAgglomeration on;
+        cacheAgglomeration false;
         agglomerator     faceAreaPair;
         nCellsInCoarsestLevel 10;
-        mergeLevels      1;
+        mergeLevels      2;
     }
 
     "(U|UFinal|k|omega)"
     {
         solver          BiCGStab;
-        preconditioner  DILU;
+        preconditioner  ILU0;
         tolerance       1e-06;
         relTol          0;
     }

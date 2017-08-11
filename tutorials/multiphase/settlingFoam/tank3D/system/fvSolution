@@ -16,42 +16,43 @@ FoamFile
 
 solvers
 {
-    p PCG
+    p
     {
-        preconditioner   DIC;
+        solver           CG;
+        preconditioner   Cholesky;
         tolerance        1e-07;
         relTol           0;
-    };
-    U BiCGStab
+    }
+    U
     {
-        preconditioner   DILU;
+        solver           BiCGStab;
+        preconditioner   ILU0;
         tolerance        1e-07;
         relTol           0;
-    };
-    k BiCGStab
+    }
+    k
     {
-        preconditioner   DILU;
+        solver           BiCGStab;
+        preconditioner   ILU0;
         tolerance        1e-07;
         relTol           0;
-    };
-    epsilon BiCGStab
+    }
+    epsilon
     {
-        preconditioner   DILU;
+        solver           BiCGStab;
+        preconditioner   ILU0;
         tolerance        1e-07;
         relTol           0;
-    };
-    rho PCG
+    }
+    rho
+    {}
+    Alpha
     {
-        preconditioner   DIC;
+        solver           BiCGStab;
+        preconditioner   ILU0;
         tolerance        1e-07;
         relTol           0;
-    };
-    Alpha BiCGStab
-    {
-        preconditioner   DILU;
-        tolerance        1e-07;
-        relTol           0;
-    };
+    }
 }
 
 PIMPLE

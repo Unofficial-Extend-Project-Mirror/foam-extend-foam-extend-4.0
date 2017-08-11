@@ -20,7 +20,7 @@ solvers
     {
         solver          amgSolver;
         cycle           W-cycle;
-        policy          PAMG;
+        policy          cluster;
         nPreSweeps      2;
         nPostSweeps     2;
         groupSize       4;
@@ -39,7 +39,7 @@ solvers
     {
         solver          amgSolver;
         cycle           W-cycle;
-        policy          PAMG;
+        policy          cluster;
         nPreSweeps      2;
         nPostSweeps     2;
         groupSize       4;

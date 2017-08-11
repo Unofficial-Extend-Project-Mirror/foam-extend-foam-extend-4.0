@@ -22,7 +22,7 @@ solvers
         preconditioner   DIC;
         tolerance        1E-06;
         relTol           0;
-    };
+    }
 }
 
 PISO

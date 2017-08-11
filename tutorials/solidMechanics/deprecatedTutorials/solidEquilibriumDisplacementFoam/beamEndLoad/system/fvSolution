@@ -29,7 +29,7 @@ solvers
 
         agglomerator     faceAreaPair;
         mergeLevels      1;
-    };
+    }
 
     Dcorr GAMG
     {
@@ -44,7 +44,7 @@ solvers
 
         agglomerator     faceAreaPair;
         mergeLevels      1;
-    };
+    }
 }
 
 stressAnalysis

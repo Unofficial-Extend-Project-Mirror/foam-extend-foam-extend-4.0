@@ -16,18 +16,20 @@ FoamFile
 
 solvers
 {
-    phi PCG
+    phi
     {
-        preconditioner   DIC;
+        solver           CG;
+        preconditioner   Cholesky;
         tolerance        1e-08;
         relTol           0.2;
-    };
-    rho BiCGStab
+    }
+    rho
     {
-        preconditioner   DILU;
+        solver           BiCGStab;
+        preconditioner   ILU0;
         tolerance        1e-08;
         relTol           0.2;
-    };
+    }
 }
 
 

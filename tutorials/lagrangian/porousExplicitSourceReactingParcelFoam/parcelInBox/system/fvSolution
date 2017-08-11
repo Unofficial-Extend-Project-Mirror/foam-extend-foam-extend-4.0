@@ -35,34 +35,34 @@ solvers
         mergeLevels      1;
 
         maxIter          100;
-    };
+    }
     pFinal
     {
         $p
         tolerance        1e-6;
         relTol           0;
-    };
+    }
     "(rho|G)"
     {
         solver          PCG;
         preconditioner  DIC;
         tolerance       1e-06;
         relTol          0;
-    };
+    }
     "(Yi|hs)"
     {
         solver          BiCGStab;
         preconditioner  DILU;
         tolerance       1e-06;
         relTol          0;
-    };
+    }
     "(U|k|omega)"
     {
         solver          smoothSolver;
         smoother        GaussSeidel;
         tolerance       1e-06;
         relTol          0;
-    };
+    }
 }
 
 PISO

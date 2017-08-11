@@ -27,8 +27,8 @@ solvers
 
     rho
     {
-        solver          PCG;
-        preconditioner  DIC;
+        solver          CG;
+        preconditioner  Cholesky;
         tolerance       1e-08;
         relTol          0;
     }

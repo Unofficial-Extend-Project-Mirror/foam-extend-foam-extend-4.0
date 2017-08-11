@@ -16,35 +16,36 @@ FoamFile
 
 solvers
 {
-    D GAMG
+    D
     {
+        solver           GAMG;
         tolerance        1e-06;
         relTol           0.9;
 
         smoother         GaussSeidel;
 
-        cacheAgglomeration true;
+        cacheAgglomeration false;
 
         nCellsInCoarsestLevel 20;
 
         agglomerator     faceAreaPair;
-        mergeLevels      1;
-    };
-
-    T GAMG
+        mergeLevels      2;
+    }
+    T
     {
+        solver           GAMG;
         tolerance        1e-06;
         relTol           0.9;
 
         smoother         GaussSeidel;
 
-        cacheAgglomeration true;
+        cacheAgglomeration false;
 
         nCellsInCoarsestLevel 20;
 
         agglomerator     faceAreaPair;
-        mergeLevels      1;
-    };
+        mergeLevels      2;
+    }
 }
 
 stressAnalysis
