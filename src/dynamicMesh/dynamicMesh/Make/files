@@ -60,6 +60,7 @@ $(directActions)/addPatchCellLayer.C
 $(directActions)/edgeCollapser.C
 $(directActions)/faceCollapser.C
 $(directActions)/hexRef8.C
+$(directActions)/polyRef.C
 $(directActions)/removeCells.C
 $(directActions)/removeFaces.C
 $(directActions)/removePoints.C
