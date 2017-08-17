@@ -38,7 +38,7 @@ SourceFiles
 #define dynamicRefinePolyFvMesh_H
 
 #include "dynamicFvMesh.H"
-#include "hexRef8.H"
+#include "polyRef.H"
 #include "PackedBoolList.H"
 #include "Switch.H"
 
@@ -72,7 +72,7 @@ class dynamicRefinePolyFvMesh
 protected:
 
         //- Mesh cutting engine
-        hexRef8 meshCutter_;
+        polyRef meshCutter_;
 
         //- Dump cellLevel for postprocessing
         Switch dumpLevel_;
@@ -197,7 +197,7 @@ public:
     // Member Functions
 
         //- Direct access to the refinement engine
-        const hexRef8& meshCutter() const
+        const polyRef& meshCutter() const
         {
             return meshCutter_;
         }

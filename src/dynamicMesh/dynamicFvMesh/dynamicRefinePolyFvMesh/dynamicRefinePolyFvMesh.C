@@ -1353,7 +1353,7 @@ bool dynamicRefinePolyFvMesh::writeObject
 ) const
 {
     // Force refinement data to go to the current time directory.
-    const_cast<hexRef8&>(meshCutter_).setInstance(time().timeName());
+    const_cast<polyRef&>(meshCutter_).setInstance(time().timeName());
 
     bool writeOk =
         dynamicFvMesh::writeObjects(fmt, ver, cmp)
