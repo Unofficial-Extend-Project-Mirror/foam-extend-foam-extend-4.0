@@ -486,7 +486,7 @@ void Foam::BlockMatrixSelection<Type>::calcCoarsening()
 
 
     // HJ: scaling not currently used.  HJ, 30/Jul/2017
-    
+
     // Collect contributions from coupled boundaries
     const typename BlockLduInterfaceFieldPtrsList<Type>::Type& interfaceFields =
         matrix_.interfaces();
@@ -724,7 +724,7 @@ void Foam::BlockMatrixSelection<Type>::calcCoarsening()
 //            break;
 //        }
 //    }
-    
+
     reduce(coarsen_, andOp<bool>());
 
     if (blockLduMatrix::debug >= 3)
@@ -865,11 +865,10 @@ Foam::BlockMatrixSelection<Type>::restrictMatrix() const
     // HJ, 28/Apr/2017
     labelList coeffLabel(nCoarseEqns_, -1);
 
-    label nCoarseCoeffs = 0;
-
-    // Create coarse addressing - owner and neighbour pairs
-    DynamicList<label> coarseOwner(nCoarseEqns_);
-    DynamicList<label> coarseNeighbour(nCoarseEqns_);
+    // Create coarse addressing: record neighbours for every row
+    // Note: neighbourt indices are added as they appear and will be sorted
+    // on completion
+    List<labelHashSet> coarseNbrsSets(nCoarseEqns_);
 
 //------------------------------------------------------------------------------
 //     COUNT COARSE COEFFICIENTS IN TRIPLE PRODUCT AND CREATE ADDRESSING
@@ -936,27 +935,16 @@ Foam::BlockMatrixSelection<Type>::restrictMatrix() const
                     // (ir = row, jp = col)
                     if (ir > jp)
                     {
-                        // This coeff belongs to the lower triangle, and
-                        // corresponding to lduAddressing, its address won't be
-                        // stored
-                        continue;
+                        // This coeff belongs to the lower triangle
+                        // Record it in the upper triangle
+                        coarseNbrsSets[jp].insert(ir);
                     }
                     // Diag coeff ignored
                     else if (ir != jp)
                     {
-                        // Does any contribution to this address already exist?
-                        // Label the col with the row index in which we found
-                        // the coeff. If there is another one with this address,
-                        // the col is already labeled with the row index.
-                        if (coeffLabel[jp] != ir)
-                        {
-                            coeffLabel[jp] = ir;
-
-                            coarseOwner.append(ir);
-                            coarseNeighbour.append(jp);
-
-                            nCoarseCoeffs++;
-                        }
+                        // This coeff belongs to the upper triangle
+                        // Record it in the upper triangle
+                        coarseNbrsSets[ir].insert(jp);
                     }
                 }
             }
@@ -988,29 +976,18 @@ Foam::BlockMatrixSelection<Type>::restrictMatrix() const
                     // (ir = row, jp = col)
                     if (ir > jp)
                     {
-                        // This coeff belongs to the lower triangle, and
-                        // corresponding to lduAddressing, its address won't be
-                        // stored
-                        continue;
+                        // This coeff belongs to the lower triangle
+                        // Record it in the upper triangle
+                        coarseNbrsSets[jp].insert(ir);
                     }
                     // Diag coeff ignored
                     // Count the coeff if it is an off-diagonal coeff in the
                     // upper triangle
                     else if (ir != jp)
                     {
-                        // Does any contribution to this address already exist?
-                        // We will label the col with the row index in which
-                        // we found the coeff. If there is another one, the
-                        // col is already labeled with the row index.
-                        if (coeffLabel[jp] != ir)
-                        {
-                            coeffLabel[jp] = ir;
-
-                            coarseOwner.append(ir);
-                            coarseNeighbour.append(jp);
-
-                            nCoarseCoeffs++;
-                        }
+                        // This coeff belongs to the upper triangle
+                        // Record it in the upper triangle
+                        coarseNbrsSets[ir].insert(jp);
                     }
                 }
             }
@@ -1030,28 +1007,17 @@ Foam::BlockMatrixSelection<Type>::restrictMatrix() const
                 // (ir = row, jp = col)
                 if (ir > jp)
                 {
-                    // This coeff belongs to the lower triangle, and
-                    // corresponding to lduAddressing, its address won't be
-                    // stored
-                    continue;
+                    // This coeff belongs to the lower triangle
+                    // Record it in the upper triangle
+                    coarseNbrsSets[jp].insert(ir);
                 }
                 // Count the coeff if it is an off-diagonal coeff in the
                 // upper triangle
                 else if (ir != jp)
                 {
-                    // Does any contribution to this address already exist?
-                    // We will label the col with the row index in which
-                    // we found the coeff. If there is another one, the
-                    // col is already labeled with the row index.
-                    if (coeffLabel[jp] != ir)
-                    {
-                        coeffLabel[jp] = ir;
-
-                        coarseOwner.append(ir);
-                        coarseNeighbour.append(jp);
-
-                        nCoarseCoeffs++;
-                    }
+                    // This coeff belongs to the upper triangle
+                    // Record it in the upper triangle
+                    coarseNbrsSets[ir].insert(jp);
                 }
             }
         }
@@ -1061,9 +1027,31 @@ Foam::BlockMatrixSelection<Type>::restrictMatrix() const
 //                      CREATE COARSE MATRIX ADDRESSING
 //------------------------------------------------------------------------------
 
-    // Set size of dynamic list
-    coarseOwner.setSize(nCoarseCoeffs);
-    coarseNeighbour.setSize(nCoarseCoeffs);
+    // Count coarse coeffs
+    label nCoarseCoeffs = 0;
+    forAll (coarseNbrsSets, rowI)
+    {
+        nCoarseCoeffs += coarseNbrsSets[rowI].size();
+    }
+
+    // Create owner and neighbour lists
+    labelList coarseOwner(nCoarseCoeffs);
+    labelList coarseNeighbour(nCoarseCoeffs);
+
+    // Fill the owner and neighbour lists from sets, with sorting
+    label coeffI = 0;
+
+    forAll (coarseNbrsSets, rowI)
+    {
+        const labelList& curNbrs = coarseNbrsSets[rowI].sortedToc();
+
+        forAll (curNbrs, nbrI)
+        {
+            coarseOwner[coeffI] = rowI;
+            coarseNeighbour[coeffI] = curNbrs[nbrI];
+            coeffI++;
+        }
+    }
 
     // Set the coarse ldu addressing onto the list
     autoPtr<lduPrimitiveMesh> coarseAddrPtr
@@ -1318,6 +1306,11 @@ Foam::BlockMatrixSelection<Type>::restrictMatrix() const
                         {
                             // Found lower COARSE triangle
                             label face = coeffLabel[jp];
+                            if (face == -1)
+                            {
+                                FatalErrorIn("BadTripleProduct1")
+                                    << abort(FatalError);
+                            }
                             activeCoarseLower[face] += ra*coeffP[indexP];
                         }
                         else if (ir == jp)
@@ -1329,6 +1322,11 @@ Foam::BlockMatrixSelection<Type>::restrictMatrix() const
                         {
                             // Found upper COARSE triangle
                             label face = coeffLabel[jp];
+                            if (face == -1)
+                            {
+                                FatalErrorIn("BadTripleProduct2")
+                                    << abort(FatalError);
+                            }
                             activeCoarseUpper[face] += ra*coeffP[indexP];
                         }
                     }
@@ -1361,6 +1359,11 @@ Foam::BlockMatrixSelection<Type>::restrictMatrix() const
                         {
                             // Found lower COARSE triangle
                             label face = coeffLabel[jp];
+                            if (face == -1)
+                            {
+                                FatalErrorIn("BadTripleProduct3")
+                                    << abort(FatalError);
+                            }
                             activeCoarseLower[face] += ra*coeffP[indexP];
                         }
                         else if (ir == jp)
@@ -1372,6 +1375,11 @@ Foam::BlockMatrixSelection<Type>::restrictMatrix() const
                         {
                             // Found upper COARSE triangle
                             label face = coeffLabel[jp];
+                            if (face == -1)
+                            {
+                                FatalErrorIn("BadTripleProduct4")
+                                    << abort(FatalError);
+                            }
                             activeCoarseUpper[face] += ra*coeffP[indexP];
                         }
                     }
@@ -1393,6 +1401,11 @@ Foam::BlockMatrixSelection<Type>::restrictMatrix() const
                     {
                         // Found lower COARSE triangle
                         label face = coeffLabel[jp];
+                        if (face == -1)
+                        {
+                            FatalErrorIn("BadTripleProduct5")
+                                << abort(FatalError);
+                        }
                         activeCoarseLower[face] += ra*coeffP[indexP];
                     }
                     else if (ir == jp)
@@ -1404,6 +1417,11 @@ Foam::BlockMatrixSelection<Type>::restrictMatrix() const
                     {
                         // Found upper COARSE triangle
                         label face = coeffLabel[jp];
+                        if (face == -1)
+                        {
+                            FatalErrorIn("BadTripleProduct6")
+                                << abort(FatalError);
+                        }
                         activeCoarseUpper[face] += ra*coeffP[indexP];
                     }
                 }
