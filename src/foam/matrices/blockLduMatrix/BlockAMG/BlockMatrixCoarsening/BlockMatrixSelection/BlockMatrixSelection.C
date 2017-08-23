@@ -652,13 +652,13 @@ void Foam::BlockMatrixSelection<Type>::calcCoarsening()
     }
 
     // CHECK
-    for (label i = 0; i < nRows; i++)
-    {
-        if (pRow[i + 1] - pRow[i] == 0)
-        {
-            Pout<< "Solo prolongation row " << i << endl;
-        }
-    }
+    // for (label i = 0; i < nRows; i++)
+    // {
+    //     if (pRow[i + 1] - pRow[i] == 0)
+    //     {
+    //         Pout<< "Solo prolongation row " << i << endl;
+    //     }
+    // }
 
     // Resize column and coeffs
     pCoeff.setSize(pRow[nRows]);
@@ -671,7 +671,7 @@ void Foam::BlockMatrixSelection<Type>::calcCoarsening()
     prolongation.coeffs().transfer(pCoeff);
 
     // Check prolongation matrix
-//    if (blockLduMatrix::debug > 2)
+    if (blockLduMatrix::debug > 2)
     {
         scalarField sumRow(nRows, 0);
         const labelList& prolongationRow = Pptr_->crAddr().rowStart();
