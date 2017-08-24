@@ -671,7 +671,7 @@ void Foam::BlockMatrixSelection<Type>::calcCoarsening()
     prolongation.coeffs().transfer(pCoeff);
 
     // Check prolongation matrix
-    if (blockLduMatrix::debug > 2)
+    // if (blockLduMatrix::debug > 2)
     {
         scalarField sumRow(nRows, 0);
         const labelList& prolongationRow = Pptr_->crAddr().rowStart();
@@ -995,8 +995,8 @@ Foam::BlockMatrixSelection<Type>::restrictMatrix() const
             // DIAGONAL
             for
             (
-                label indexP = rowP[ir];
-                indexP < rowP[ir + 1];
+                label indexP = rowP[jr];
+                indexP < rowP[jr + 1];
                 indexP++
             )
             {
@@ -1286,7 +1286,7 @@ Foam::BlockMatrixSelection<Type>::restrictMatrix() const
 
                     // Multiply coefficients of R and A
                     // Address is (rowR, colA)
-                    const squareType& ra = activeLower[faceA]*coeffR[indexR];
+                    const squareType ra = activeLower[faceA]*coeffR[indexR];
 
                     // Go into corresponding row of prolongation to find
                     // contributions
@@ -1343,7 +1343,7 @@ Foam::BlockMatrixSelection<Type>::restrictMatrix() const
                     // Get col of coeff in A
                     const label ja = upperAddr[faceA];
 
-                    const squareType& ra = coeffR[indexR]*activeUpper[faceA];
+                    const squareType ra = coeffR[indexR]*activeUpper[faceA];
 
                     for
                     (
@@ -1386,7 +1386,7 @@ Foam::BlockMatrixSelection<Type>::restrictMatrix() const
                 }
 
                 // DIAGONAL
-                const squareType& ra = coeffR[indexR]*activeDiag[jr];
+                const squareType ra = coeffR[indexR]*activeDiag[jr];
 
                 for
                 (
