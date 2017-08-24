@@ -1043,7 +1043,7 @@ Foam::BlockMatrixSelection<Type>::restrictMatrix() const
 
     forAll (coarseNbrsSets, rowI)
     {
-        const labelList& curNbrs = coarseNbrsSets[rowI].sortedToc();
+        const labelList curNbrs = coarseNbrsSets[rowI].sortedToc();
 
         forAll (curNbrs, nbrI)
         {
@@ -1262,6 +1262,17 @@ Foam::BlockMatrixSelection<Type>::restrictMatrix() const
             {
                 coeffLabel[lowerCoarseAddr[losortCoarseAddr[indexC]]] =
                     losortCoarseAddr[indexC];
+                // Stupid check
+                if (upperCoarseAddr[losortCoarseAddr[indexC]] != ir)
+                {
+                    FatalErrorIn("STUPID CHECK")
+                        << "FAILED: ir, upper, lower coeff: "
+                        << ir << " "
+                        << upperCoarseAddr[losortCoarseAddr[indexC]] << " "
+                        << lowerCoarseAddr[losortCoarseAddr[indexC]] << " "
+                        << losortCoarseAddr[indexC]
+                        << abort(FatalError);
+                }
             }
 
             // Compressed row format, get indices of coeffsR in row ir
