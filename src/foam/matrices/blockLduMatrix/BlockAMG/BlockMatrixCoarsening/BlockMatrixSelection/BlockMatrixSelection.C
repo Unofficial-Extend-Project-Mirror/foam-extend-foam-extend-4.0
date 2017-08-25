@@ -303,30 +303,6 @@ void Foam::BlockMatrixSelection<Type>::calcCoarsening()
         }
     }
 
-    // CHECK
-//    forAll (strongCoeffCounter, i)
-//    {
-//        if (strongCoeffCounter[i] == 0)
-//        {
-//            Pout<< "Solo strong row " << i
-//                << " strongCoeff: " << epsilonStrongCoeff[i]/epsilon_()
-//                << endl;
-//
-//            Pout<< "diag = " << normDiag[i] << " lower = ";
-//            // Write coeffs
-//            for (register label jp = losortStart[i]; jp < losortStart[i + 1]; jp++)
-//            {
-//                Pout<< normLower[losortAddr[jp]] << " ";
-//            }
-//            Pout<< " upper = ";
-//            for (label ip = ownerStart[i]; ip < ownerStart[i + 1]; ip++)
-//            {
-//                Pout<< normUpper[ip] << " ";
-//            }
-//            Pout<< endl;
-//        }
-//    }
-
 //------------------------------------------------------------------------------
 //           COARSENING: SORT EQUATIONS INTO COARSE AND FINE SUBSETS
 //------------------------------------------------------------------------------
@@ -433,25 +409,20 @@ void Foam::BlockMatrixSelection<Type>::calcCoarsening()
         }
     }
 
-    if (min(rowLabel_) < -1)
-    {
-        Pout<< "******************************** FOUND UNDECIDED Equations" << endl;
-    }
+    // // Renumber matrix - coarse equations are renumbered in natural order
+    // if (true)
+    // {
+    //     label number = 0;
 
-    // Renumber matrix - coarse equations are renumbered in natural order
-    if (true)
-    {
-        label number = 0;
-
-        for (label eqn = 0; eqn < nRows; eqn++)
-        {
-            if (rowLabel_[eqn] != FINE)
-            {
-                rowLabel_[eqn] = number;
-                number++;
-            }
-        }
-    }
+    //     for (label eqn = 0; eqn < nRows; eqn++)
+    //     {
+    //         if (rowLabel_[eqn] != FINE)
+    //         {
+    //             rowLabel_[eqn] = number;
+    //             number++;
+    //         }
+    //     }
+    // }
 
 //------------------------------------------------------------------------------
 //              CALCULATING CONTRIBUTIONS TO THE SCALING FACTOR
@@ -651,15 +622,6 @@ void Foam::BlockMatrixSelection<Type>::calcCoarsening()
         pRow[i + 1] = rowCount;
     }
 
-    // CHECK
-    // for (label i = 0; i < nRows; i++)
-    // {
-    //     if (pRow[i + 1] - pRow[i] == 0)
-    //     {
-    //         Pout<< "Solo prolongation row " << i << endl;
-    //     }
-    // }
-
     // Resize column and coeffs
     pCoeff.setSize(pRow[nRows]);
     pCol.setSize(pRow[nRows]);
@@ -710,20 +672,6 @@ void Foam::BlockMatrixSelection<Type>::calcCoarsening()
     {
         coarsen_ = true;
     }
-
-    // Dump the level if there is a bad prolongation row
-    // Temporary stability solution.  HJ, 30/Jul/2017
-//    for (register label rowI = 0; rowI < nRows; rowI++)
-//    {
-//        // if (prolongationRow[rowI] == prolongationRow[rowI + 1])
-//        if (strongRow[rowI + 1] - strongRow[rowI] == 0)
-//        {
-//            // Found bad prolongation
-//            Pout<< "**************Bad strong matrix" << endl;
-//            coarsen_ = false;
-//            break;
-//        }
-//    }
 
     reduce(coarsen_, andOp<bool>());
 
@@ -894,7 +842,6 @@ Foam::BlockMatrixSelection<Type>::restrictMatrix() const
     // NOTE: Letters i and j are used to denote the row and the col of the
     // matrix, respectively. In addition, row of matrix A is denoted ia, col
     // ja, row of prolongation is ip, etc.
-
 
     // Loop through rows of R
     for (label ir = 0; ir < nCoarseEqns_; ir++)
@@ -1317,9 +1264,7 @@ Foam::BlockMatrixSelection<Type>::restrictMatrix() const
                             if (face == -1)
                             {
                                 Pout<< "BadTripleProduct1 "
-                                    << ir << " " << jp << " found: "
-                                    << coarseNbrsSets[jp].found(ir)
-                                    << " toc: " << coarseNbrsSets[jp].toc()
+                                    << ir << " " << jp
                                     << endl;
                             }
                             else
@@ -1403,7 +1348,7 @@ Foam::BlockMatrixSelection<Type>::restrictMatrix() const
                             else
                             {
                                 activeCoarseUpper[face] += ra*coeffP[indexP];
-                            }  
+                            }
                         }
                     }
                 }
