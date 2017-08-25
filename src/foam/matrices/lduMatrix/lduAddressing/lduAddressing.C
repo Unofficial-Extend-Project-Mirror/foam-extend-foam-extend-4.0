@@ -124,6 +124,12 @@ void Foam::lduAddressing::calcOwnerStart() const
 
             nOwnStart = curOwn;
         }
+        else
+        {
+            // No neighbours
+            ownStart[i] = ownStart[i - 1];
+            i++;
+        }
     }
 }
 
@@ -137,24 +143,30 @@ void Foam::lduAddressing::calcLosortStart() const
             << abort(FatalError);
     }
 
-    losortStartPtr_ = new labelList(size() + 1, 0);
+    const labelList& nbr = upperAddr();
+
+    losortStartPtr_ = new labelList(size() + 1, nbr.size());
 
     labelList& lsrtStart = *losortStartPtr_;
-
-    const labelList& nbr = upperAddr();
 
     const labelList& lsrt = losortAddr();
 
     // Set up first lookup by hand
     lsrtStart[0] = 0;
-    label nLsrtStart = 0;
-    label i = 0;
 
+    // Record current neighbour as seen from the (sorted) losort face lookup
+    label nLsrtStart = 0;
+
+    // Start filling losort table form 1
+    label i = 1;
+
+    // Go through losort face ordering
     forAll (lsrt, faceI)
     {
-        // Get neighbour
+        // Get neighbour: Because of losort, they will come in increasing order
         const label curNbr = nbr[lsrt[faceI]];
 
+        // If nbr is greater than the 
         if (curNbr > nLsrtStart)
         {
             while (i <= curNbr)
@@ -163,6 +175,12 @@ void Foam::lduAddressing::calcLosortStart() const
             }
 
             nLsrtStart = curNbr;
+        }
+        else
+        {
+            // No owners
+            lsrtStart[i] = lsrtStart[i - 1];
+            i++;
         }
     }
 
