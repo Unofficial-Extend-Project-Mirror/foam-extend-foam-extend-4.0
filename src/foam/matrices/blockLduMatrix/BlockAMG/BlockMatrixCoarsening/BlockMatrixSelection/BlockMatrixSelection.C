@@ -671,7 +671,7 @@ void Foam::BlockMatrixSelection<Type>::calcCoarsening()
     prolongation.coeffs().transfer(pCoeff);
 
     // Check prolongation matrix
-    // if (blockLduMatrix::debug > 2)
+    if (blockLduMatrix::debug > 2)
     {
         scalarField sumRow(nRows, 0);
         const labelList& prolongationRow = Pptr_->crAddr().rowStart();
@@ -939,8 +939,11 @@ Foam::BlockMatrixSelection<Type>::restrictMatrix() const
                         // Record it in the upper triangle
                         coarseNbrsSets[jp].insert(ir);
                     }
-                    // Diag coeff ignored
-                    else if (ir != jp)
+                    else if (ir == jp)
+                    {
+                        // Diag coeff ignored
+                    }
+                    else
                     {
                         // This coeff belongs to the upper triangle
                         // Record it in the upper triangle
@@ -980,10 +983,11 @@ Foam::BlockMatrixSelection<Type>::restrictMatrix() const
                         // Record it in the upper triangle
                         coarseNbrsSets[jp].insert(ir);
                     }
-                    // Diag coeff ignored
-                    // Count the coeff if it is an off-diagonal coeff in the
-                    // upper triangle
-                    else if (ir != jp)
+                    else if (ir == jp)
+                    {
+                        // Diag coeff ignored
+                    }
+                    else
                     {
                         // This coeff belongs to the upper triangle
                         // Record it in the upper triangle
@@ -1011,9 +1015,11 @@ Foam::BlockMatrixSelection<Type>::restrictMatrix() const
                     // Record it in the upper triangle
                     coarseNbrsSets[jp].insert(ir);
                 }
-                // Count the coeff if it is an off-diagonal coeff in the
-                // upper triangle
-                else if (ir != jp)
+                else if (ir == jp)
+                {
+                    // Diag coeff ignored
+                }
+                else
                 {
                     // This coeff belongs to the upper triangle
                     // Record it in the upper triangle
@@ -1061,7 +1067,8 @@ Foam::BlockMatrixSelection<Type>::restrictMatrix() const
             nCoarseEqns_,
             coarseOwner,
             coarseNeighbour,
-            true
+            // true
+            false           // DO NOT REUSE STORAGE!  HJ, HERE
         )
     );
 
@@ -1262,17 +1269,6 @@ Foam::BlockMatrixSelection<Type>::restrictMatrix() const
             {
                 coeffLabel[lowerCoarseAddr[losortCoarseAddr[indexC]]] =
                     losortCoarseAddr[indexC];
-                // Stupid check
-                if (upperCoarseAddr[losortCoarseAddr[indexC]] != ir)
-                {
-                    FatalErrorIn("STUPID CHECK")
-                        << "FAILED: ir, upper, lower coeff: "
-                        << ir << " "
-                        << upperCoarseAddr[losortCoarseAddr[indexC]] << " "
-                        << lowerCoarseAddr[losortCoarseAddr[indexC]] << " "
-                        << losortCoarseAddr[indexC]
-                        << abort(FatalError);
-                }
             }
 
             // Compressed row format, get indices of coeffsR in row ir
@@ -1317,12 +1313,19 @@ Foam::BlockMatrixSelection<Type>::restrictMatrix() const
                         {
                             // Found lower COARSE triangle
                             label face = coeffLabel[jp];
+                            // HACKED!!!
                             if (face == -1)
                             {
-                                FatalErrorIn("BadTripleProduct1")
-                                    << abort(FatalError);
+                                Pout<< "BadTripleProduct1 "
+                                    << ir << " " << jp << " found: "
+                                    << coarseNbrsSets[jp].found(ir)
+                                    << " toc: " << coarseNbrsSets[jp].toc()
+                                    << endl;
                             }
-                            activeCoarseLower[face] += ra*coeffP[indexP];
+                            else
+                            {
+                                activeCoarseLower[face] += ra*coeffP[indexP];
+                            }
                         }
                         else if (ir == jp)
                         {
@@ -1335,10 +1338,13 @@ Foam::BlockMatrixSelection<Type>::restrictMatrix() const
                             label face = coeffLabel[jp];
                             if (face == -1)
                             {
-                                FatalErrorIn("BadTripleProduct2")
-                                    << abort(FatalError);
+                                Pout<< "BadTripleProduct2 "
+                                    << ir << " " << jp << endl;
                             }
-                            activeCoarseUpper[face] += ra*coeffP[indexP];
+                            else
+                            {
+                                activeCoarseUpper[face] += ra*coeffP[indexP];
+                            }
                         }
                     }
                 }
@@ -1372,14 +1378,17 @@ Foam::BlockMatrixSelection<Type>::restrictMatrix() const
                             label face = coeffLabel[jp];
                             if (face == -1)
                             {
-                                FatalErrorIn("BadTripleProduct3")
-                                    << abort(FatalError);
+                                Pout<< "BadTripleProduct3 "
+                                    << ir << " " << jp << endl;
                             }
-                            activeCoarseLower[face] += ra*coeffP[indexP];
+                            else
+                            {
+                                activeCoarseLower[face] += ra*coeffP[indexP];
+                            }
                         }
                         else if (ir == jp)
                         {
-                            // Found COARSE diagonal
+                           // Found COARSE diagonal
                             activeCoarseDiag[ir] += ra*coeffP[indexP];
                         }
                         else
@@ -1388,10 +1397,13 @@ Foam::BlockMatrixSelection<Type>::restrictMatrix() const
                             label face = coeffLabel[jp];
                             if (face == -1)
                             {
-                                FatalErrorIn("BadTripleProduct4")
-                                    << abort(FatalError);
+                                Pout<< "BadTripleProduct4 "
+                                    << ir << " " << jp << endl;
                             }
-                            activeCoarseUpper[face] += ra*coeffP[indexP];
+                            else
+                            {
+                                activeCoarseUpper[face] += ra*coeffP[indexP];
+                            }  
                         }
                     }
                 }
@@ -1401,7 +1413,7 @@ Foam::BlockMatrixSelection<Type>::restrictMatrix() const
 
                 for
                 (
-                    label indexP= rowP[jr];
+                    label indexP = rowP[jr];
                     indexP < rowP[jr + 1];
                     indexP++
                 )
@@ -1414,10 +1426,13 @@ Foam::BlockMatrixSelection<Type>::restrictMatrix() const
                         label face = coeffLabel[jp];
                         if (face == -1)
                         {
-                            FatalErrorIn("BadTripleProduct5")
-                                << abort(FatalError);
+                            Pout<< "BadTripleProduct5 "
+                                << ir << " " << jp << endl;
                         }
-                        activeCoarseLower[face] += ra*coeffP[indexP];
+                        else
+                        {
+                            activeCoarseLower[face] += ra*coeffP[indexP];
+                        }
                     }
                     else if (ir == jp)
                     {
@@ -1430,10 +1445,13 @@ Foam::BlockMatrixSelection<Type>::restrictMatrix() const
                         label face = coeffLabel[jp];
                         if (face == -1)
                         {
-                            FatalErrorIn("BadTripleProduct6")
-                                << abort(FatalError);
+                            Pout<< "BadTripleProduct6 "
+                                << ir << " " << jp << endl;
                         }
-                        activeCoarseUpper[face] += ra*coeffP[indexP];
+                        else
+                        {
+                            activeCoarseUpper[face] += ra*coeffP[indexP];
+                        }
                     }
                 }
             }
@@ -1457,25 +1475,6 @@ Foam::BlockMatrixSelection<Type>::restrictMatrix() const
             }
         }
 
-
-        // Check if diagonal inverts
-        {
-            typedef typename TypeCoeffField::linearType linearType;
-
-            squareTypeField invCoarseDiag = inv(activeCoarseDiag);
-
-            squareType sqrI;
-            expandLinear(sqrI, linearType::one);
-            scalar checkInverse = gMax
-            (
-                mag((invCoarseDiag & activeCoarseDiag) - sqrI)
-            );
-
-            if (checkInverse > 1e-12)
-            {
-                Info<< "Inverse check max: " << checkInverse << endl;
-            }
-        }
 
         // Get interfaces from coarse matrix
         typename BlockLduInterfaceFieldPtrsList<Type>::Type&
