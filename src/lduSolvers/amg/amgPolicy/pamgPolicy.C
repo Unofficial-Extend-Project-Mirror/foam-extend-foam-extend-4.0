@@ -369,8 +369,10 @@ Foam::autoPtr<Foam::amgMatrix> Foam::pamgPolicy::restrictMatrix() const
 {
     if (!coarsen_)
     {
-        FatalErrorIn("autoPtr<amgMatrix> pamgPolicy::restrictMatrix() const")
-            << "Requesting coarse matrix when it cannot be created"
+        FatalErrorIn
+        (
+            "autoPtr<amgMatrix> pAmgPolicy::restrictMatrix() const"
+        )   << "Requesting coarse matrix when it cannot be created"
             << abort(FatalError);
     }
 
@@ -379,11 +381,11 @@ Foam::autoPtr<Foam::amgMatrix> Foam::pamgPolicy::restrictMatrix() const
     // 1) Loop through all fine coeffs. If the child labels on two sides are
     //    different, this creates a coarse coeff. Define owner and neighbour
     //    for this coeff based on cluster IDs.
-    // 2) Check if the coeff has been seen before. If yes, add the coefficient
-    //    to the appropriate field (stored with the equation). If no, create
+    // 2) Check if the coeff has been seen before.  If yes, add the coefficient
+    //    to the appropriate field (stored with the equation).  If no, create
     //    a new coeff with neighbour ID and add the coefficient
     // 3) Once all the coeffs have been created, loop through all clusters and
-    //    insert the coeffs in the upper order. At the same time, collect the
+    //    insert the coeffs in the upper order.  At the same time, collect the
     //    owner and neighbour addressing.
     // 4) Agglomerate the diagonal by summing up the fine diagonal
 
@@ -391,7 +393,7 @@ Foam::autoPtr<Foam::amgMatrix> Foam::pamgPolicy::restrictMatrix() const
     const unallocLabelList& upperAddr = matrix().lduAddr().upperAddr();
     const unallocLabelList& lowerAddr = matrix().lduAddr().lowerAddr();
 
-    label nFineCoeffs = upperAddr.size();
+    const label nFineCoeffs = upperAddr.size();
 
 #   ifdef FULLDEBUG
     if (child_.size() != matrix().lduAddr().size())
@@ -421,8 +423,6 @@ Foam::autoPtr<Foam::amgMatrix> Foam::pamgPolicy::restrictMatrix() const
     // Setup initial packed storage for neighbours and coefficients
     labelList blockNbrsData(maxNnbrs*nCoarseEqns_);
 
-    scalarList blockCoeffsData(maxNnbrs*nCoarseEqns_, 0.0);
-
     // Create face-restriction addressing
     // Note: value of coeffRestrictAddr for off-diagonal coefficients
     // touching solo cells will be invalid
@@ -434,6 +434,11 @@ Foam::autoPtr<Foam::amgMatrix> Foam::pamgPolicy::restrictMatrix() const
 
     // Counter for coarse coeffs
     label nCoarseCoeffs = 0;
+
+    // Note on zero cluster coarsening
+    // If the matrix contains a solo group, it will be in index zero.
+    // Since solo equations are disconnected from the rest of the matrix
+    // they do not create new off-diagonal coefficients
 
     // Loop through all fine coeffs
     forAll (upperAddr, fineCoeffI)
@@ -470,17 +475,16 @@ Foam::autoPtr<Foam::amgMatrix> Foam::pamgPolicy::restrictMatrix() const
             }
 
             // Check the neighbour to see if this coeff has already been found
-            label* ccCoeffs = &blockNbrsData[maxNnbrs*cOwn];
-
             bool nbrFound = false;
             label& ccnCoeffs = blockNnbrs[cOwn];
 
             for (int i = 0; i < ccnCoeffs; i++)
             {
-                if (initCoarseNeighb[ccCoeffs[i]] == cNei)
+                if (initCoarseNeighb[blockNbrsData[maxNnbrs*cOwn + i]] == cNei)
                 {
                     nbrFound = true;
-                    coeffRestrictAddr[fineCoeffI] = ccCoeffs[i];
+                    coeffRestrictAddr[fineCoeffI] =
+                        blockNbrsData[maxNnbrs*cOwn + i];
                     break;
                 }
             }
@@ -489,26 +493,25 @@ Foam::autoPtr<Foam::amgMatrix> Foam::pamgPolicy::restrictMatrix() const
             {
                 if (ccnCoeffs >= maxNnbrs)
                 {
+                    // Double the size of list and copy data
                     label oldMaxNnbrs = maxNnbrs;
                     maxNnbrs *= 2;
 
+                    // Resize and copy list
+                    const labelList oldBlockNbrsData = blockNbrsData;
                     blockNbrsData.setSize(maxNnbrs*nCoarseEqns_);
 
-                    forAllReverse(blockNnbrs, i)
+                    forAllReverse (blockNnbrs, i)
                     {
-                        label* oldCcNbrs = &blockNbrsData[oldMaxNnbrs*i];
-                        label* newCcNbrs = &blockNbrsData[maxNnbrs*i];
-
-                        for (int j=0; j<blockNnbrs[i]; j++)
+                        for (int j = 0; j < blockNnbrs[i]; j++)
                         {
-                            newCcNbrs[j] = oldCcNbrs[j];
+                            blockNbrsData[maxNnbrs*i + j] =
+                                oldBlockNbrsData[oldMaxNnbrs*i + j];
                         }
                     }
-
-                    ccCoeffs = &blockNbrsData[maxNnbrs*cOwn];
                 }
 
-                ccCoeffs[ccnCoeffs] = nCoarseCoeffs;
+                blockNbrsData[maxNnbrs*cOwn + ccnCoeffs] = nCoarseCoeffs;
                 initCoarseNeighb[nCoarseCoeffs] = cNei;
                 coeffRestrictAddr[fineCoeffI] = nCoarseCoeffs;
                 ccnCoeffs++;
@@ -619,7 +622,7 @@ Foam::autoPtr<Foam::amgMatrix> Foam::pamgPolicy::restrictMatrix() const
         }
     }
 
-    // Store coefficients to avoid tangled communications
+    // Store neighbour child arrays to avoid tangled communications
     // HJ, 1/Apr/2009
     FieldField<Field, label> fineInterfaceAddr(interfaceFields().size());
 
