@@ -840,8 +840,6 @@ const Foam::faceZone& Foam::ggiPolyPatch::zone() const
 
 Foam::label Foam::ggiPolyPatch::comm() const
 {
-    //HJ, Testing.  Use optimised comm or a local one
-
     // Note: comm is calculated with localParallel and will use the
     // localParallelPtr_ for signalling.  HJ, 10/Sep/2016
     if (master())
@@ -857,8 +855,6 @@ Foam::label Foam::ggiPolyPatch::comm() const
     {
         return shadow().comm();
     }
-
-//     return boundaryMesh().mesh().comm();
 }
 
 
