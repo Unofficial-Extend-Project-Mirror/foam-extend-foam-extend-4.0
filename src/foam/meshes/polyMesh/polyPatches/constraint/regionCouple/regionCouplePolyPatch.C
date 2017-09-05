@@ -337,41 +337,42 @@ void Foam::regionCouplePolyPatch::calcLocalParallel() const
     localParallelPtr_ = new bool(false);
     bool& emptyOrComplete = *localParallelPtr_;
 
-    // If running in parallel, all GGIs are expanded to zone size.
-    // This happens on decomposition and reconstruction where
-    // size and shadow size may be zero, but zone size may not
-    // HJ, 1/Jun/2011
-    if (!Pstream::parRun())
+    // Check that patch size is greater than the zone size.
+    // This is an indication of the error where the face zone is not global
+    // in a parallel run.  HJ, 9/Nov/2014
+    if (size() > zone().size())
     {
+        FatalErrorIn
+        (
+            "void regionCouplePolyPatch::calcLocalParallel() const"
+        )   << "Patch size is greater than zone size for GGI patch "
+            << name() << ".  This is not allowerd: "
+            << "the face zone must contain all patch faces and be "
+            << "global in parallel runs"
+            << abort(FatalError);
+    }
+    // Calculate localisation on master and shadow
+    if ((size() == 0 && shadow().size() == 0))
+    {
+        // No ggi on this processor
         emptyOrComplete = true;
+    }
+    else if (!zone().empty() || !shadow().zone().empty())
+    {
+        // GGI present on the processor and complete for both
+        emptyOrComplete =
+        (
+            zone().size() == size()
+         && shadow().zone().size() == shadow().size()
+        );
     }
     else
     {
-        // Check that patch size is greater than the zone size.
-        // This is an indication of the error where the face zone is not global
-        // in a parallel run.  HJ, 9/Nov/2014
-        if (size() > zone().size())
-        {
-            FatalErrorIn
-            (
-                "void regionCouplePolyPatch::calcLocalParallel() const"
-            )   << "Patch size is greater than zone size for GGI patch "
-                << name() << ".  This is not allowerd: "
-                << "the face zone must contain all patch faces and be "
-                << "global in parallel runs"
-                << abort(FatalError);
-        }
-
-        // Calculate localisation on master and shadow
-        emptyOrComplete =
-            (
-                zone().size() == size()
-             && shadow().zone().size() == shadow().size()
-            )
-         || (size() == 0 && shadow().size() == 0);
-
-        reduce(emptyOrComplete, andOp<bool>());
+        // Master and shadow on different processors
+        emptyOrComplete = false;
     }
+
+    reduce(emptyOrComplete, andOp<bool>());
 
     if (debug && Pstream::parRun())
     {
