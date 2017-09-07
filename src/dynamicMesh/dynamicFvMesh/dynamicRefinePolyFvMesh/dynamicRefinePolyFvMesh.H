@@ -25,7 +25,7 @@ Class
     Foam::dynamicRefinePolyFvMesh
 
 Description
-    A fvMesh with built-in refinement.
+    A fvMesh with built-in refinement of arbitrary polyhedral cells.
 
     Determines which cells to refine/unrefine and does all in update().
 
@@ -83,18 +83,11 @@ protected:
         //- Number of refinement/unrefinement steps done so far.
         label nRefinementIterations_;
 
-        //- Protected cells (usually since not hexes)
-        PackedBoolList protectedCell_;
-
 
     // Private Member Functions
 
         //- Count set/unset elements in packedlist.
         static label count(const PackedBoolList&, const unsigned int);
-
-        //- Calculate cells that cannot be refined since would trigger
-        //  refinement of protectedCell_ (since 2:1 refinement cascade)
-        void calculateProtectedCells(PackedBoolList& unrefineableCell) const;
 
         //- Read the projection parameters from dictionary
         void readDict();
@@ -162,12 +155,6 @@ protected:
             //- Extend markedCell with cell-face-cell.
             void extendMarkedCells(PackedBoolList& markedCell) const;
 
-            //- Check all cells have 8 anchor points
-            void checkEightAnchorPoints
-            (
-                PackedBoolList& protectedCell,
-                label& nProtected
-            ) const;
 
 private:
 
@@ -200,18 +187,6 @@ public:
         const polyRef& meshCutter() const
         {
             return meshCutter_;
-        }
-
-        //- Cells which should not be refined/unrefined
-        const PackedBoolList& protectedCell() const
-        {
-            return protectedCell_;
-        }
-
-        //- Cells which should not be refined/unrefined
-        PackedBoolList& protectedCell()
-        {
-            return protectedCell_;
         }
 
         //- Update the mesh for both mesh motion and topology change

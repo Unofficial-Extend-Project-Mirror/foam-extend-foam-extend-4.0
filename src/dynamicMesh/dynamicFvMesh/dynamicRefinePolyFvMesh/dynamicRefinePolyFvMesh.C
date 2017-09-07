@@ -74,112 +74,6 @@ label dynamicRefinePolyFvMesh::count
 }
 
 
-void dynamicRefinePolyFvMesh::calculateProtectedCells
-(
-    PackedBoolList& unrefineableCell
-) const
-{
-    if (protectedCell_.empty())
-    {
-        unrefineableCell.clear();
-        return;
-    }
-
-    const labelList& cellLevel = meshCutter_.cellLevel();
-
-    unrefineableCell = protectedCell_;
-
-    // Get neighbouring cell level
-    labelList neiLevel(nFaces()-nInternalFaces());
-
-    for (label faceI = nInternalFaces(); faceI < nFaces(); faceI++)
-    {
-        neiLevel[faceI-nInternalFaces()] = cellLevel[faceOwner()[faceI]];
-    }
-    syncTools::swapBoundaryFaceList(*this, neiLevel, false);
-
-
-    while (true)
-    {
-        // Pick up faces on border of protected cells
-        boolList seedFace(nFaces(), false);
-
-        forAll(faceNeighbour(), faceI)
-        {
-            label own = faceOwner()[faceI];
-            bool ownProtected = (unrefineableCell.get(own) == 1);
-            label nei = faceNeighbour()[faceI];
-            bool neiProtected = (unrefineableCell.get(nei) == 1);
-
-            if (ownProtected && (cellLevel[nei] > cellLevel[own]))
-            {
-                seedFace[faceI] = true;
-            }
-            else if (neiProtected && (cellLevel[own] > cellLevel[nei]))
-            {
-                seedFace[faceI] = true;
-            }
-        }
-        for (label faceI = nInternalFaces(); faceI < nFaces(); faceI++)
-        {
-            label own = faceOwner()[faceI];
-            bool ownProtected = (unrefineableCell.get(own) == 1);
-            if
-            (
-                ownProtected
-             && (neiLevel[faceI-nInternalFaces()] > cellLevel[own])
-            )
-            {
-                seedFace[faceI] = true;
-            }
-        }
-
-        syncTools::syncFaceList(*this, seedFace, orEqOp<bool>(), false);
-
-
-        // Extend unrefineableCell
-        bool hasExtended = false;
-
-        for (label faceI = 0; faceI < nInternalFaces(); faceI++)
-        {
-            if (seedFace[faceI])
-            {
-                label own = faceOwner()[faceI];
-                if (unrefineableCell.get(own) == 0)
-                {
-                    unrefineableCell.set(own, 1);
-                    hasExtended = true;
-                }
-
-                label nei = faceNeighbour()[faceI];
-                if (unrefineableCell.get(nei) == 0)
-                {
-                    unrefineableCell.set(nei, 1);
-                    hasExtended = true;
-                }
-            }
-        }
-        for (label faceI = nInternalFaces(); faceI < nFaces(); faceI++)
-        {
-            if (seedFace[faceI])
-            {
-                label own = faceOwner()[faceI];
-                if (unrefineableCell.get(own) == 0)
-                {
-                    unrefineableCell.set(own, 1);
-                    hasExtended = true;
-                }
-            }
-        }
-
-        if (!returnReduce(hasExtended, orOp<bool>()))
-        {
-            break;
-        }
-    }
-}
-
-
 void dynamicRefinePolyFvMesh::readDict()
 {
     dictionary refineDict
@@ -266,9 +160,10 @@ autoPtr<mapPolyMesh> dynamicRefinePolyFvMesh::refine
         const labelList& faceMap = map().faceMap();
         const labelList& reverseFaceMap = map().reverseFaceMap();
 
-        // Storage for any master faces. These will be the original faces
-        // on the coarse cell that get split into four (or rather the
-        // master face gets modified and three faces get added from the master)
+        // Storage for any master faces. These will be the original faces on the
+        // coarse cell that gets split into four for hex cell and quad
+        // face. Rather, the master face gets modified and three faces get added
+        // from the master.
         labelHashSet masterFaces(4*cellsToRefine.size());
 
         forAll(faceMap, faceI)
@@ -394,19 +289,6 @@ autoPtr<mapPolyMesh> dynamicRefinePolyFvMesh::refine
 
     // Update numbering of cells/vertices.
     meshCutter_.updateMesh(map);
-
-    // Update numbering of protectedCell_
-    if (protectedCell_.size())
-    {
-        PackedBoolList newProtectedCell(nCells());
-
-        forAll(newProtectedCell, cellI)
-        {
-            label oldCellI = map().cellMap()[cellI];
-            newProtectedCell.set(cellI, protectedCell_.get(oldCellI));
-        }
-        protectedCell_.transfer(newProtectedCell);
-    }
 
     // Debug: Check refinement levels (across faces only)
     meshCutter_.checkRefinementLevels(-1, labelList(0));
@@ -548,22 +430,6 @@ autoPtr<mapPolyMesh> dynamicRefinePolyFvMesh::unrefine
     // Update numbering of cells/vertices.
     meshCutter_.updateMesh(map);
 
-    // Update numbering of protectedCell_
-    if (protectedCell_.size())
-    {
-        PackedBoolList newProtectedCell(nCells());
-
-        forAll(newProtectedCell, cellI)
-        {
-            label oldCellI = map().cellMap()[cellI];
-            if (oldCellI >= 0)
-            {
-                newProtectedCell.set(cellI, protectedCell_.get(oldCellI));
-            }
-        }
-        protectedCell_.transfer(newProtectedCell);
-    }
-
     // Debug: Check refinement levels (across faces only)
     meshCutter_.checkRefinementLevels(-1, labelList(0));
 
@@ -691,15 +557,12 @@ labelList dynamicRefinePolyFvMesh::selectRefineCells
     const PackedBoolList& candidateCell
 ) const
 {
-    // Every refined cell causes 7 extra cells
+    // Note: Assuming predominantly hex mesh, i.e. every refined cell causes 7
+    // extra cells. This might lead to slight over shoot of maximum number of
+    // cells.
     label nTotToRefine = (maxCells - globalData().nTotalCells()) / 7;
 
     const labelList& cellLevel = meshCutter_.cellLevel();
-
-    // Mark cells that cannot be refined since they would trigger refinement
-    // of protected cells (since 2:1 cascade)
-    PackedBoolList unrefineableCell;
-    calculateProtectedCells(unrefineableCell);
 
     // Count current selection
     label nCandidates = returnReduce(count(candidateCell, 1), sumOp<label>());
@@ -709,16 +572,14 @@ labelList dynamicRefinePolyFvMesh::selectRefineCells
 
     if (nCandidates < nTotToRefine)
     {
+        // We won't exceed the maximum number of cells. Collect all candidate
+        // cells that have refinement level smaller than max level
         forAll(candidateCell, cellI)
         {
             if
             (
                 cellLevel[cellI] < maxRefinement
              && candidateCell.get(cellI) == 1
-             && (
-                    unrefineableCell.empty()
-                 || unrefineableCell.get(cellI) == 0
-                )
             )
             {
                 candidates.append(cellI);
@@ -727,7 +588,8 @@ labelList dynamicRefinePolyFvMesh::selectRefineCells
     }
     else
     {
-        // Sort by error? For now just truncate.
+        // We will exceed the maximum number of cells. Simply truncate the
+        // list. It is possible to prefer certain cells based on error field.
         for (label level = 0; level < maxRefinement; level++)
         {
             forAll(candidateCell, cellI)
@@ -736,10 +598,6 @@ labelList dynamicRefinePolyFvMesh::selectRefineCells
                 (
                     cellLevel[cellI] == level
                  && candidateCell.get(cellI) == 1
-                 && (
-                        unrefineableCell.empty()
-                     || unrefineableCell.get(cellI) == 0
-                    )
                 )
                 {
                     candidates.append(cellI);
@@ -870,56 +728,6 @@ void dynamicRefinePolyFvMesh::extendMarkedCells(PackedBoolList& markedCell) cons
 }
 
 
-void Foam::dynamicRefinePolyFvMesh::checkEightAnchorPoints
-(
-    PackedBoolList& protectedCell,
-    label& nProtected
-) const
-{
-    const labelList& cellLevel = meshCutter_.cellLevel();
-    const labelList& pointLevel = meshCutter_.pointLevel();
-
-    labelList nAnchorPoints(nCells(), 0);
-
-    forAll(pointLevel, pointI)
-    {
-        const labelList& pCells = pointCells(pointI);
-
-        forAll(pCells, pCellI)
-        {
-            label cellI = pCells[pCellI];
-
-            if (pointLevel[pointI] <= cellLevel[cellI])
-            {
-                // Check if cell has already 8 anchor points -> protect cell
-                if (nAnchorPoints[cellI] == 8)
-                {
-                    if (protectedCell.set(cellI, true))
-                    {
-                        nProtected++;
-                    }
-                }
-
-                if (!protectedCell[cellI])
-                {
-                    nAnchorPoints[cellI]++;
-                }
-            }
-        }
-    }
-
-
-    forAll(protectedCell, cellI)
-    {
-        if (!protectedCell[cellI] && nAnchorPoints[cellI] != 8)
-        {
-            protectedCell.set(cellI, true);
-            nProtected++;
-        }
-    }
-}
-
-
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 dynamicRefinePolyFvMesh::dynamicRefinePolyFvMesh(const IOobject& io)
@@ -944,181 +752,8 @@ dynamicRefinePolyFvMesh::dynamicRefinePolyFvMesh(const IOobject& io)
     curTimeIndex_(-1),
     meshCutter_(*this),
     dumpLevel_(false),
-    nRefinementIterations_(0),
-    protectedCell_(nCells(), 0)
-{
-    const labelList& cellLevel = meshCutter_.cellLevel();
-    const labelList& pointLevel = meshCutter_.pointLevel();
-
-    // Set cells that should not be refined.
-    // This is currently any cell which does not have 8 anchor points or
-    // uses any face which does not have 4 anchor points.
-    // Note: do not use cellPoint addressing
-
-    // Count number of points <= cellLevel
-    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    labelList nAnchors(nCells(), 0);
-
-    label nProtected = 0;
-
-    forAll(pointCells(), pointI)
-    {
-        const labelList& pCells = pointCells()[pointI];
-
-        forAll(pCells, i)
-        {
-            label cellI = pCells[i];
-
-            if (protectedCell_.get(cellI) == 0)
-            {
-                if (pointLevel[pointI] <= cellLevel[cellI])
-                {
-                    nAnchors[cellI]++;
-
-                    if (nAnchors[cellI] > 8)
-                    {
-                        protectedCell_.set(cellI, 1);
-                        nProtected++;
-                    }
-                }
-            }
-        }
-    }
-
-
-    // Count number of points <= faceLevel
-    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // Bit tricky since proc face might be one more refined than the owner since
-    // the coupled one is refined.
-
-    {
-        labelList neiLevel(nFaces());
-
-        for (label faceI = 0; faceI < nInternalFaces(); faceI++)
-        {
-            neiLevel[faceI] = cellLevel[faceNeighbour()[faceI]];
-        }
-        for (label faceI = nInternalFaces(); faceI < nFaces(); faceI++)
-        {
-            neiLevel[faceI] = cellLevel[faceOwner()[faceI]];
-        }
-        syncTools::swapFaceList(*this, neiLevel, false);
-
-
-        boolList protectedFace(nFaces(), false);
-
-        forAll(faceOwner(), faceI)
-        {
-            label faceLevel = max
-            (
-                cellLevel[faceOwner()[faceI]],
-                neiLevel[faceI]
-            );
-
-            const face& f = faces()[faceI];
-
-            label nAnchors = 0;
-
-            forAll(f, fp)
-            {
-                if (pointLevel[f[fp]] <= faceLevel)
-                {
-                    nAnchors++;
-
-                    if (nAnchors > 4)
-                    {
-                        protectedFace[faceI] = true;
-                        break;
-                    }
-                }
-            }
-        }
-
-        syncTools::syncFaceList
-        (
-            *this,
-            protectedFace,
-            orEqOp<bool>(),
-            false
-        );
-
-        for (label faceI = 0; faceI < nInternalFaces(); faceI++)
-        {
-            if (protectedFace[faceI])
-            {
-                protectedCell_.set(faceOwner()[faceI], 1);
-                nProtected++;
-                protectedCell_.set(faceNeighbour()[faceI], 1);
-                nProtected++;
-            }
-        }
-        for (label faceI = nInternalFaces(); faceI < nFaces(); faceI++)
-        {
-            if (protectedFace[faceI])
-            {
-                protectedCell_.set(faceOwner()[faceI], 1);
-                nProtected++;
-            }
-        }
-
-        // Also protect any cells that are less than hex
-        forAll(cells(), cellI)
-        {
-            const cell& cFaces = cells()[cellI];
-
-            if (cFaces.size() < 6)
-            {
-                if (protectedCell_.set(cellI, 1))
-                {
-                    nProtected++;
-                }
-            }
-            else
-            {
-                forAll(cFaces, cFaceI)
-                {
-                    if (faces()[cFaces[cFaceI]].size() < 4)
-                    {
-                        if (protectedCell_.set(cellI, 1))
-                        {
-                            nProtected++;
-                        }
-                        break;
-                    }
-                }
-            }
-        }
-
-        // Check cells for 8 corner points
-        checkEightAnchorPoints(protectedCell_, nProtected);
-    }
-
-    if (returnReduce(nProtected, sumOp<label>()) == 0)
-    {
-        protectedCell_.clear();
-    }
-    else
-    {
-
-        cellSet protectedCells(*this, "protectedCells", nProtected);
-        forAll(protectedCell_, cellI)
-        {
-            if (protectedCell_[cellI])
-            {
-                protectedCells.insert(cellI);
-            }
-        }
-
-        Info<< "Detected " << returnReduce(nProtected, sumOp<label>())
-            << " cells that are protected from refinement."
-            << " Writing these to cellSet "
-            << protectedCells.name()
-            << "." << endl;
-
-        protectedCells.write();
-    }
-}
+    nRefinementIterations_(0)
+{}
 
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //

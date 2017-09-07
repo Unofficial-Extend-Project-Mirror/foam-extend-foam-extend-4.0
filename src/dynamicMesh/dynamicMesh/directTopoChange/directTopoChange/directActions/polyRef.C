@@ -1649,7 +1649,7 @@ void Foam::polyRef::checkWantedRefinementLevels
             FatalErrorIn
             (
                 "polyRef::checkWantedRefinementLevels(const labelList&)"
-            )   << "Celllevel does not satisfy 2:1 constraint."
+            )   << "Cell level does not satisfy 2:1 constraint."
                 << " On coupled face "
                 << faceI
                 << " on patch " << patchI << " "
