@@ -25,10 +25,23 @@ Class
     Foam::polyRef
 
 Description
-    Refinement of (split) hexes using directTopoChange.
+    Refinement of (split) polyhedra using directTopoChange.
+
+    Each polyhedron is split by the following procedure:
+    1. Adding points at the edge centre, face centre and cell centre,
+    2. Adding cells n cells where n is the number of points of the cell,
+    3. Splitting each face into multiple faces going from:
+       existing corner point -> new edge centre point -> new face centre
+       point -> other new edge centre point (sharing the same corner point)
+    4. Adding internal faces going from:
+       new edge centre point -> new face centre point -> new cell centre
+       point -> other new face centre point (sharing the same edge)
 
 SourceFiles
     polyRef.C
+
+Author
+    Vuko Vukcevic, Wikki Ltd.  All rights reserved.
 
 \*---------------------------------------------------------------------------*/
 
@@ -64,7 +77,7 @@ class polyRef
 {
     // Private data
 
-        //- Reference to underlying mesh.
+        //- Reference to underlying mesh
         const polyMesh& mesh_;
 
         //- Per cell the refinement level
@@ -91,7 +104,7 @@ class polyRef
 
     // Private Member Functions
 
-        //- Reorder according to map.
+        //- Reorder according to map
         static void reorder
         (
             const labelList& map,
@@ -109,7 +122,7 @@ class polyRef
             label& zoneFlip
         ) const;
 
-        //- Adds a face on top of existing faceI. Reverses if nessecary.
+        //- Adds a face on top of existing faceI. Reverses if nessecary
         label addFace
         (
             directTopoChange& meshMod,
@@ -119,7 +132,7 @@ class polyRef
             const label nei
         ) const;
 
-        //- Adds internal face from point. No checks on reversal.
+        //- Adds internal face from point. No checks on reversal
         label addInternalFace
         (
             directTopoChange& meshMod,
@@ -131,7 +144,7 @@ class polyRef
         ) const;
 
         //- Modifies existing faceI for either new owner/neighbour or new face
-        //  points. Reverses if nessecary.
+        //  points. Reverses if nessecary
         void modFace
         (
             directTopoChange& meshMod,
@@ -154,7 +167,7 @@ class polyRef
         ) const;
 
         //- Get new owner and neighbour (in unspecified order) of pointI
-        //  on faceI.
+        //  on faceI
         void getFaceNeighbours
         (
             const labelListList& cellAnchorPoints,
@@ -167,16 +180,16 @@ class polyRef
         ) const;
 
 
-        //- Get index of minimum pointlevel.
+        //- Get index of point with minimum pointlevel
         label findMinLevel(const labelList& f) const;
 
-        //- Get maximum pointlevel.
+        //- Get index of point with maximum pointlevel
         label findMaxLevel(const labelList& f) const;
 
         //- Count number of vertices <= anchorLevel
         label countAnchors(const labelList&, const label) const;
 
-        //- Find index of point with wantedLevel, starting from fp.
+        //- Find index of point with wantedLevel, starting from fp
         label findLevel
         (
             const face& f,
@@ -188,7 +201,7 @@ class polyRef
         ////- Print levels of list of points.
         //void printLevels(Ostream&, const labelList&) const;
 
-        //- debug:check orientation of added internal face
+        //- debug: check orientation of added internal face
         static void checkInternalOrientation
         (
             directTopoChange& meshMod,
@@ -199,7 +212,7 @@ class polyRef
             const face& newFace
         );
 
-        //- debug:check orientation of new boundary face
+        //- debug: check orientation of new boundary face
         static void checkBoundaryOrientation
         (
             directTopoChange& meshMod,
@@ -211,7 +224,7 @@ class polyRef
         );
 
         //- If p0 and p1 are existing vertices check if edge is split and insert
-        // splitPoint.
+        //  splitPoint
         void insertEdgeSplit
         (
             const labelList& edgeMidPoint,
@@ -220,7 +233,7 @@ class polyRef
             dynamicLabelList& verts
         ) const;
 
-        //- Store in maps correspondence from midpoint to anchors and faces.
+        //- Store in maps correspondence from midpoint to anchors and faces
         label storeMidPointInfo
         (
             const labelListList& cellAnchorPoints,
@@ -239,7 +252,7 @@ class polyRef
             directTopoChange& meshMod
         ) const;
 
-        //- Create all internal faces from an unsplit face.
+        //- Create all internal faces from an unsplit face
         void createInternalFromSplitFace
         (
             const labelListList& cellAnchorPoints,
@@ -256,7 +269,8 @@ class polyRef
             label& nFacesAdded
         ) const;
 
-        //- Create all internal faces to split cellI into 8.
+        //- Create all internal faces to split cellI into n cells where n is the
+        //  number of cell points
         void createInternalFaces
         (
             const labelListList& cellAnchorPoints,
@@ -270,7 +284,8 @@ class polyRef
         ) const;
 
         //- Store vertices from startFp upto face split point.
-        //  Used when splitting face into 4.
+        //  Used when splitting face into n faces where n is the number of
+        //  points in a face (or number of edges)
         void walkFaceToMid
         (
             const labelList& edgeMidPoint,
@@ -280,7 +295,7 @@ class polyRef
             dynamicLabelList& faceVerts
         ) const;
 
-        //- Same as walkFaceToMid but now walk back.
+        //- Same as walkFaceToMid but now walk back
         void walkFaceFromMid
         (
             const labelList& edgeMidPoint,
@@ -291,7 +306,7 @@ class polyRef
         ) const;
 
         //- Updates refineCell so consistent 2:1 refinement. Returns local
-        //  number of cells changed.
+        //  number of cells changed
         label faceConsistentRefinement
         (
             const bool maxSet,
@@ -302,12 +317,13 @@ class polyRef
         void checkWantedRefinementLevels(const labelList&) const;
 
 
+        // Copy control
 
-        //- Disallow default bitwise copy construct
-        polyRef(const polyRef&);
+            //- Disallow default bitwise copy construct
+            polyRef(const polyRef&);
 
-        //- Disallow default bitwise assignment
-        void operator=(const polyRef&);
+            //- Disallow default bitwise assignment
+            void operator=(const polyRef&);
 
 
 public:
@@ -322,7 +338,7 @@ public:
         //  (from write below)
         polyRef(const polyMesh& mesh);
 
-        //- Construct from mesh and un/refinement data.
+        //- Construct from mesh and un/refinement data
         polyRef
         (
             const polyMesh& mesh,
@@ -366,16 +382,12 @@ public:
             }
 
         // Refinement
-            //- Gets level such that the face has four points <= level.
+
+            //- Gets level such that the face has n points <= level, where n is
+            //  the number of points (or edges) for a face.
             label getAnchorLevel(const label faceI) const;
 
-            //- Given valid mesh and current cell level and proposed
-            //  cells to refine calculate any clashes (due to 2:1) and return
-            //  ok list of cells to refine.
-            //  Either adds cells to refine to set (maxSet = true) or
-            //  removes cells to refine (maxSet = false)
-
-            //- Helper:get points of a cell without using cellPoints addressing
+            //- Helper: get points of a cell without using cellPoints addressing
             labelList cellPoints(const label cellI) const;
 
             //- Given valid mesh and current cell level and proposed
@@ -393,7 +405,7 @@ public:
             //  - specify number of cells between consecutive refinement levels
             //    (consistentRefinement equivalent to 1)
             //  - specify max level difference between point-connected cells.
-            //    (-1 to disable) Note that with normal 2:1 limitation
+            //    (-1 to disable). Note that with normal 2:1 limitation
             //    (maxFaceDiff=1) there can be 8:1 size difference across point
             //    connected cells so maxPointDiff allows you to make that less.
             //  cellsToRefine : cells we're thinking about refining. It will
@@ -413,7 +425,7 @@ public:
 
             //- Like consistentSlowRefinement but uses different meshWave
             //  (proper distance instead of toplogical count). No point checks
-            //  yet.
+            //  yet
             labelList consistentSlowRefinement2
             (
                 const label maxFaceDiff,
@@ -421,14 +433,15 @@ public:
                 const labelList& facesToCheck
             ) const;
 
-            //- Insert refinement. All selected cells will be split into 8.
-            //  Returns per element in cells the 8 cells they were split into.
+            //- Insert refinement. All selected cells will be split into n cells
+            //  where n is the number of points per cell.
+            //  Returns per element in cells the n cells they were split into.
             //  Guarantees that the 0th element is the original cell label.
             //  Mapping:
-            //  -split cells: 7 new ones get added from original
-            //  -split faces: original gets modified; 3 new ones get added
-            //               from original
-            //  -added internal faces: added from original cell face(if
+            //  -split cells: n new ones get added from original
+            //  -split faces: original gets modified; n - 1 new ones get added
+            //                from original
+            //  -added internal faces: added from original cell face (if
             //   that was internal) or created out-of-nothing (so will not
             //   get mapped!). Note: could make this inflate from point but
             //   that will allocate interpolation.
@@ -440,7 +453,7 @@ public:
                 directTopoChange&
             );
 
-            //- Update local numbering for changed mesh.
+            //- Update local numbering for changed mesh
             void updateMesh(const mapPolyMesh&);
 
 
@@ -493,17 +506,17 @@ public:
                 const labelList& pointsToCheck
             ) const;
 
+
         // Unrefinement (undoing refinement, not arbitrary coarsening)
 
             //- Return the points at the centre of top-level split cells
             //  that can be unsplit.
             labelList getSplitPoints() const;
 
-            //- Given proposed
-            //  splitPoints to unrefine according to calculate any clashes
-            //  (due to 2:1) and return ok list of points to unrefine.
-            //  Either adds points to refine to set (maxSet = true) or
-            //  removes points to refine (maxSet = false)
+            //- Given proposed splitPoints to unrefine according to calculate
+            //  any clashes (due to 2:1) and return ok list of points to
+            //  unrefine. Either adds points to refine to set (maxSet = true)
+            //  or removes points to refine (maxSet = false)
             labelList consistentUnrefinement
             (
                 const labelList& pointsToUnrefine,
@@ -512,13 +525,14 @@ public:
 
             //- Remove some refinement. Needs to be supplied output of
             //  consistentUnrefinement. Only call if undoable set.
-            //  All 8 pointCells of a split point will be combined into
-            //  the lowest numbered cell of those 8.
+            //  All n pointCells of a split point will be combined into
+            //  the lowest numbered cell of those n.
             void setUnrefinement
             (
                 const labelList& splitPointLabels,
                 directTopoChange&
             );
+
 
         // Write
 
@@ -527,7 +541,6 @@ public:
 
             //- Force writing refinement+history to polyMesh directory.
             bool write() const;
-
 };
 
 
