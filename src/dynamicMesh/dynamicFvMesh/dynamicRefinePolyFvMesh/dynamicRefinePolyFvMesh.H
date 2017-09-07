@@ -102,24 +102,17 @@ protected:
 
         // Selection of cells to un/refine
 
-            //- Calculates approximate value for refinement level so
-            //  we don't go above maxCell
-            scalar getRefineLevel
-            (
-                const label maxCells,
-                const label maxRefinement,
-                const scalar refineLevel,
-                const scalarField&
-            ) const;
-
             //- Get per cell max of connected point
             scalarField maxPointField(const scalarField&) const;
 
             //- Get point min of connected cell
             scalarField minCellField(const volScalarField&) const;
 
+            //- Simple (non-parallel) interpolation by averaging
             scalarField cellToPoint(const scalarField& vFld) const;
 
+            //- Calculate error (= -1 by default or distance from inbetween
+            //  levels
             scalarField error
             (
                 const scalarField& fld,
@@ -144,7 +137,7 @@ protected:
                 const PackedBoolList& candidateCell
             ) const;
 
-            //- Select points that can be unrefined.
+            //- Select points that can be unrefined
             virtual labelList selectUnrefinePoints
             (
                 const scalar unrefineLevel,
@@ -152,7 +145,7 @@ protected:
                 const scalarField& pFld
             ) const;
 
-            //- Extend markedCell with cell-face-cell.
+            //- Extend markedCell with cell-face-cell
             void extendMarkedCells(PackedBoolList& markedCell) const;
 
 
@@ -202,7 +195,6 @@ public:
             IOstream::versionNumber ver,
             IOstream::compressionType cmp
         ) const;
-
 };
 
 
