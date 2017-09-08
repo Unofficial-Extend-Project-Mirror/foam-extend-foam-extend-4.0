@@ -799,39 +799,6 @@ Foam::label Foam::polyRef::getAnchorLevel(const label faceI) const
             }
         }
     }
-
-    if (debug)
-    {
-        // Print out number of points per level
-        Info<< "nPointsPerLevel: " << nPointsPerLevel << endl;
-    }
-
-    // Find level with maximum number of points
-    const label maxLevelI = findMax(nPointsPerLevel);
-
-    // Check whether there are at least three points with the level <= of this
-    // level with maximum number of occurences
-    label nPointsBelow = 0;
-    for (label belowLevelI = 0; belowLevelI <= maxLevelI; ++belowLevelI)
-    {
-        nPointsBelow += nPointsPerLevel[belowLevelI];
-    }
-
-    if (nPointsBelow < 3)
-    {
-        // For some reason, the minimum requirement that at least three points
-        // have level below the anchor level is not met
-        WarningIn("label polyRef::getAnchorLevel(const label faceI) const")
-            << "Found less than three points below an anchor level."
-            << nl
-            << "Face: " << faceI
-            << ", anchor level: " << allLevels[maxLevelI]
-            << ", n points below level: " << nPointsBelow
-            << ", n total points of this face: " << nPoints
-            << endl;
-    }
-
-    return allLevels[maxLevelI];
 }
 
 
@@ -3842,8 +3809,8 @@ Foam::labelListList Foam::polyRef::setRefinement
                     // Unsplit face that hasn't been handled. Add edge splits to
                     // face.
 
-                    const face& f = meshFaces[faceI];
-                    const labelList& fEdges = meshFaceEdges[faceI];
+                    const face& f = mesh_.faces()[faceI];
+                    const labelList& fEdges = mesh_.faceEdges()[faceI];
 
                     dynamicLabelList newFaceVerts(f.size());
 
