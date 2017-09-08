@@ -3272,6 +3272,9 @@ Foam::labelListList Foam::polyRef::setRefinement
     // >=0 : label of introduced mid point
     labelList faceMidPoint(mesh_.nFaces(), -1);
 
+    // Get necessary mesh data
+    const labelList& meshFaceOwner = mesh_.faceOwner();
+    const labelList& meshFaceNeighbour = mesh_.faceNeighbour();
 
     // Internal faces: look at cells on both sides. Uniquely determined since
     // face itself guaranteed to be same level as most refined neighbour.
@@ -3280,11 +3283,11 @@ Foam::labelListList Foam::polyRef::setRefinement
         // Note: no need to check whether the face has valid anchor level since
         // all faces can be split
 
-        const label own = mesh_.faceOwner()[faceI];
+        const label own = meshFaceOwner[faceI];
         const label ownLevel = cellLevel_[own];
         const label newOwnLevel = ownLevel + (cellMidPoint[own] >= 0 ? 1 : 0);
 
-        const label nei = mesh_.faceNeighbour()[faceI];
+        const label nei = meshFaceNeighbour[faceI];
         const label neiLevel = cellLevel_[nei];
         const label newNeiLevel = neiLevel + (cellMidPoint[nei] >= 0 ? 1 : 0);
 
@@ -3303,43 +3306,42 @@ Foam::labelListList Foam::polyRef::setRefinement
     // Boundary faces are more complicated since the boundary face can
     // be more refined than its owner (or neighbour for coupled patches)
     // (does not happen if refining/unrefining only, but does e.g. when
-    //  refinining and subsetting)
+    // refinining and subsetting)
 
     {
-        labelList newNeiLevel(mesh_.nFaces()-mesh_.nInternalFaces());
+        labelList newNeiLevel(mesh_.nFaces() - mesh_.nInternalFaces());
 
         forAll(newNeiLevel, i)
         {
-            label own = mesh_.faceOwner()[i+mesh_.nInternalFaces()];
-            label ownLevel = cellLevel_[own];
-            label newOwnLevel = ownLevel + (cellMidPoint[own] >= 0 ? 1 : 0);
+            const label own = meshFaceOwner[i + mesh_.nInternalFaces()];
+            const label ownLevel = cellLevel_[own];
+            const label newOwnLevel =
+                ownLevel + (cellMidPoint[own] >= 0 ? 1 : 0);
 
             newNeiLevel[i] = newOwnLevel;
         }
 
-        // Swap.
+        // Swap the list which now contains data from the other side
         syncTools::swapBoundaryFaceList(mesh_, newNeiLevel, false);
-
-        // So now we have information on the neighbour.
 
         forAll(newNeiLevel, i)
         {
-            label faceI = i+mesh_.nInternalFaces();
+            const label faceI = i + mesh_.nInternalFaces();
 
-            if (faceAnchorLevel[faceI] >= 0)
+            // Note: no need to check whether the face has valid anchor level
+            // since all faces can be split
+            const label own = meshFaceOwner[faceI];
+            const label ownLevel = cellLevel_[own];
+            const label newOwnLevel =
+                ownLevel + (cellMidPoint[own] >= 0 ? 1 : 0);
+
+            if
+            (
+                newOwnLevel > faceAnchorLevel[faceI]
+             || newNeiLevel[i] > faceAnchorLevel[faceI]
+            )
             {
-                label own = mesh_.faceOwner()[faceI];
-                label ownLevel = cellLevel_[own];
-                label newOwnLevel = ownLevel + (cellMidPoint[own] >= 0 ? 1 : 0);
-
-                if
-                (
-                    newOwnLevel > faceAnchorLevel[faceI]
-                 || newNeiLevel[i] > faceAnchorLevel[faceI]
-                )
-                {
-                    faceMidPoint[faceI] = 12345;    // mark to be split
-                }
+                faceMidPoint[faceI] = 12345;    // mark to be split
             }
         }
     }
@@ -3359,24 +3361,28 @@ Foam::labelListList Foam::polyRef::setRefinement
     // Introduce face points
     // ~~~~~~~~~~~~~~~~~~~~~
 
+    // Get face centres
+    const vectorField& meshFaceCentres = mesh_.faceCentres();
+
     {
         // Phase 1: determine mid points and sync. See comment for edgeMids
         // above
         pointField bFaceMids
         (
-            mesh_.nFaces()-mesh_.nInternalFaces(),
+            mesh_.nFaces() - mesh_.nInternalFaces(),
             point(-GREAT, -GREAT, -GREAT)
         );
 
         forAll(bFaceMids, i)
         {
-            label faceI = i+mesh_.nInternalFaces();
+            const label faceI = i + mesh_.nInternalFaces();
 
             if (faceMidPoint[faceI] >= 0)
             {
-                bFaceMids[i] = mesh_.faceCentres()[faceI];
+                bFaceMids[i] = meshFaceCentres[faceI];
             }
         }
+
         syncTools::syncBoundaryFaceList
         (
             mesh_,
@@ -3400,8 +3406,8 @@ Foam::labelListList Foam::polyRef::setRefinement
                     (
                         (
                             faceI < mesh_.nInternalFaces()
-                          ? mesh_.faceCentres()[faceI]
-                          : bFaceMids[faceI-mesh_.nInternalFaces()]
+                          ? meshFaceCentres[faceI]
+                          : bFaceMids[faceI - mesh_.nInternalFaces()]
                         ),                          // point
                         f[0],                       // master point
                         -1,                         // zone for point
@@ -3411,7 +3417,7 @@ Foam::labelListList Foam::polyRef::setRefinement
 
                 // Determine the level of the corner points and midpoint will
                 // be one higher.
-                newPointLevel(faceMidPoint[faceI]) = faceAnchorLevel[faceI]+1;
+                newPointLevel(faceMidPoint[faceI]) = faceAnchorLevel[faceI] + 1;
             }
         }
     }
@@ -3455,30 +3461,31 @@ Foam::labelListList Foam::polyRef::setRefinement
             << endl;
     }
 
-    // There will always be 8 points on the hex that have were introduced
-    // with the hex and will have the same or lower refinement level.
-
-    // Per cell the 8 corner points.
-    labelListList cellAnchorPoints(mesh_.nCells());
+    // Get anchor points for each cell: points that have the same or lower
+    // refinement level as the cell.
+    List<dynamicLabelList> cellAnchorPointsDynamic(mesh_.nCells());
 
     {
-        labelList nAnchorPoints(mesh_.nCells(), 0);
-
+        // Loop through all cells
         forAll(cellMidPoint, cellI)
         {
             if (cellMidPoint[cellI] >= 0)
             {
-                cellAnchorPoints[cellI].setSize(8);
+                // Set capacity for this cell (that's supposed to be cut) to 16
+                // anchor points to prevent excessive resizing
+                cellAnchorPointsDynamic[cellI].setCapacity(16);
             }
         }
 
+        // Loop through all points
         forAll(pointLevel_, pointI)
         {
             const labelList& pCells = mesh_.pointCells()[pointI];
 
+            // Loop through all cells sharing this poing
             forAll(pCells, pCellI)
             {
-                label cellI = pCells[pCellI];
+                const label cellI = pCells[pCellI];
 
                 if
                 (
@@ -3486,30 +3493,18 @@ Foam::labelListList Foam::polyRef::setRefinement
                  && pointLevel_[pointI] <= cellLevel_[cellI]
                 )
                 {
-                    if (nAnchorPoints[cellI] == 8)
-                    {
-                        FatalErrorIn
-                        (
-                            "polyRef::setRefinement(const labelList&"
-                            ", directTopoChange&)"
-                        )   << "cell " << cellI
-                            << " of level " << cellLevel_[cellI]
-                            << " uses more than 8 points of equal or"
-                            << " lower level" << nl
-                            << "Points so far:" << cellAnchorPoints[cellI]
-                            << abort(FatalError);
-                    }
-
-                    cellAnchorPoints[cellI][nAnchorPoints[cellI]++] = pointI;
+                    cellAnchorPointsDynamic[cellI].append(pointI);
                 }
             }
         }
 
+        // Loop through all cells and check whether at least 4 anchor points
+        // have been found (minimum requirement for a tet cell)
         forAll(cellMidPoint, cellI)
         {
             if (cellMidPoint[cellI] >= 0)
             {
-                if (nAnchorPoints[cellI] != 8)
+                if (cellAnchorPointsDynamic[cellI].size() <= 3)
                 {
                     const labelList cPoints(cellPoints(cellI));
 
@@ -3519,7 +3514,7 @@ Foam::labelListList Foam::polyRef::setRefinement
                         ", directTopoChange&)"
                     )   << "cell " << cellI
                         << " of level " << cellLevel_[cellI]
-                        << " does not seem to have 8 points of equal or"
+                        << " does not seem to have enough points of "
                         << " lower level" << endl
                         << "cellPoints:" << cPoints << endl
                         << "pointLevels:"
@@ -3530,6 +3525,15 @@ Foam::labelListList Foam::polyRef::setRefinement
         }
     }
 
+    // Collect cellAnchorPoints into a List<labelList> instead of
+    // List<dynamicList>
+    labelListList cellAnchorPoints(mesh_.nCells());
+
+    forAll(cellAnchorPointsDynamic, cellI)
+    {
+        // Tranfer the dynamic list for each cell into an ordinary list
+        cellAnchorPoints[cellI].transfer(cellAnchorPointsDynamic[cellI]);
+    }
 
     // Add the cells
     // ~~~~~~~~~~~~~
@@ -3722,8 +3726,8 @@ Foam::labelListList Foam::polyRef::setRefinement
                     {
                         if (mesh_.isInternalFace(faceI))
                         {
-                            label oldOwn = mesh_.faceOwner()[faceI];
-                            label oldNei = mesh_.faceNeighbour()[faceI];
+                            label oldOwn = meshFaceOwner[faceI];
+                            label oldNei = meshFaceNeighbour[faceI];
 
                             checkInternalOrientation
                             (
@@ -3737,7 +3741,7 @@ Foam::labelListList Foam::polyRef::setRefinement
                         }
                         else
                         {
-                            label oldOwn = mesh_.faceOwner()[faceI];
+                            label oldOwn = meshFaceOwner[faceI];
 
                             checkBoundaryOrientation
                             (
@@ -3745,7 +3749,7 @@ Foam::labelListList Foam::polyRef::setRefinement
                                 oldOwn,
                                 faceI,
                                 mesh_.cellCentres()[oldOwn],
-                                mesh_.faceCentres()[faceI],
+                                meshFaceCentres[faceI],
                                 newFace
                             );
                         }
@@ -3839,8 +3843,8 @@ Foam::labelListList Foam::polyRef::setRefinement
                     {
                         if (mesh_.isInternalFace(faceI))
                         {
-                            label oldOwn = mesh_.faceOwner()[faceI];
-                            label oldNei = mesh_.faceNeighbour()[faceI];
+                            label oldOwn = meshFaceOwner[faceI];
+                            label oldNei = meshFaceNeighbour[faceI];
 
                             checkInternalOrientation
                             (
@@ -3854,7 +3858,7 @@ Foam::labelListList Foam::polyRef::setRefinement
                         }
                         else
                         {
-                            label oldOwn = mesh_.faceOwner()[faceI];
+                            label oldOwn = meshFaceOwner[faceI];
 
                             checkBoundaryOrientation
                             (
@@ -3862,7 +3866,7 @@ Foam::labelListList Foam::polyRef::setRefinement
                                 oldOwn,
                                 faceI,
                                 mesh_.cellCentres()[oldOwn],
-                                mesh_.faceCentres()[faceI],
+                                meshFaceCentres[faceI],
                                 newFace
                             );
                         }
