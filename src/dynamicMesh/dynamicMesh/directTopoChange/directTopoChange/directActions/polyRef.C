@@ -3545,26 +3545,29 @@ Foam::labelListList Foam::polyRef::setRefinement
             << endl;
     }
 
-    // Per cell the 7 added cells (+ original cell)
+    // We should have exactly n new cells per each split cells, where n is the
+    // number of anchor points in a cell
     labelListList cellAddedCells(mesh_.nCells());
 
     forAll(cellAnchorPoints, cellI)
     {
-        const labelList& cAnchors = cellAnchorPoints[cellI];
-
-        if (cAnchors.size() == 8)
+        // Check whether this is a split cell
+        if (cellMidPoint[cellI] >= 0)
         {
+            // Get cell anchors
+            const labelList& cAnchors = cellAnchorPoints[cellI];
+
+            // Set the total number of added cells
             labelList& cAdded = cellAddedCells[cellI];
-            cAdded.setSize(8);
+            cAdded.setSize(cAnchors.size());
 
             // Original cell at 0
             cAdded[0] = cellI;
 
             // Update cell level
-            newCellLevel[cellI] = cellLevel_[cellI]+1;
+            newCellLevel[cellI] = cellLevel_[cellI] + 1;
 
-
-            for (label i = 1; i < 8; i++)
+            for (label i = 1; i < cAdded.size(); ++i)
             {
                 cAdded[i] = meshMod.setAction
                 (
@@ -3578,7 +3581,8 @@ Foam::labelListList Foam::polyRef::setRefinement
                     )
                 );
 
-                newCellLevel(cAdded[i]) = cellLevel_[cellI]+1;
+                // Update level for this cell
+                newCellLevel(cAdded[i]) = cellLevel_[cellI] + 1;
             }
         }
     }
