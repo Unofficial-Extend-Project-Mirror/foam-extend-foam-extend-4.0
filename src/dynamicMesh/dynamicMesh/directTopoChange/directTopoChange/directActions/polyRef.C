@@ -3263,21 +3263,18 @@ Foam::labelListList Foam::polyRef::setRefinement
         // Note: no need to check whether the face has valid anchor level since
         // all faces can be split
 
-        const label own = meshFaceOwner[faceI];
-        const label ownLevel = cellLevel_[own];
-        const label newOwnLevel = ownLevel + (cellMidPoint[own] >= 0 ? 1 : 0);
+            label nei = mesh_.faceNeighbour()[faceI];
+            label neiLevel = cellLevel_[nei];
+            label newNeiLevel = neiLevel + (cellMidPoint[nei] >= 0 ? 1 : 0);
 
-        const label nei = meshFaceNeighbour[faceI];
-        const label neiLevel = cellLevel_[nei];
-        const label newNeiLevel = neiLevel + (cellMidPoint[nei] >= 0 ? 1 : 0);
-
-        if
-        (
-            newOwnLevel > faceAnchorLevel[faceI]
-         || newNeiLevel > faceAnchorLevel[faceI]
-        )
-        {
-            faceMidPoint[faceI] = 12345;    // mark to be split
+            if
+            (
+                newOwnLevel > faceAnchorLevel[faceI]
+             || newNeiLevel > faceAnchorLevel[faceI]
+            )
+            {
+                faceMidPoint[faceI] = 12345;    // mark to be split
+            }
         }
     }
 
