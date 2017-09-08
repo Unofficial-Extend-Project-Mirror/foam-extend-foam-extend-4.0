@@ -753,41 +753,78 @@ Foam::label Foam::polyRef::findLevel
 }
 
 
-// Gets cell level such that the face has four points <= level.
+// Get cell level such that the face has the most points that are <= level (at
+// least three points)
 Foam::label Foam::polyRef::getAnchorLevel(const label faceI) const
 {
     const face& f = mesh_.faces()[faceI];
 
-    if (f.size() <= 4)
-    {
-        return pointLevel_[f[findMaxLevel(f)]];
-    }
-    else
-    {
-        label ownLevel = cellLevel_[mesh_.faceOwner()[faceI]];
+    // Get number of points in this face
+    const label nPoints = f.size();
 
-        if (countAnchors(f, ownLevel) == 4)
-        {
-            return ownLevel;
-        }
-        else if (countAnchors(f, ownLevel+1) == 4)
-        {
-            return ownLevel+1;
-        }
-        else
-        {
-            //FatalErrorIn("polyRef::getAnchorLevel(const label) const")
-            //    << "face:" << faceI
-            //    << " centre:" << mesh_.faceCentres()[faceI]
-            //    << " verts:" << f
-            //    << " point levels:" << IndirectList<label>(pointLevel_, f)()
-            //    << " own:" << mesh_.faceOwner()[faceI]
-            //    << " ownLevel:" << cellLevel_[mesh_.faceOwner()[faceI]]
-            //    << abort(FatalError);
+    // Get unique levels that can be found in this face
+    labelHashSet uniqueLevels(nPoints);
+    forAll(f, fp)
+    {
+        uniqueLevels.insert(pointLevel_[f[fp]]);
+    }
 
-            return -1;
+    // Get sorted levels (in increasing order)
+    const labelList allLevels = uniqueLevels.sortedToc();
+
+    // Count number of points per level
+    labelList nPointsPerLevel(allLevels.size(), 0);
+
+    // Loop through all points
+    forAll(f, fp)
+    {
+        const label curPointLevel = pointLevel_[f[fp]];
+
+        // Loop through all levels
+        forAll(allLevels, levelI)
+        {
+            // Get current level
+            const label curLevel = allLevels[levelI];
+
+            if (curPointLevel == curLevel)
+            {
+                // Note: storing nPoints per level based on list index, not
+                // actual level
+                ++nPointsPerLevel[levelI];
+
+                break;
+            }
         }
     }
+
+    Info<< "nPointsPerLevel: " << nPointsPerLevel << endl;
+
+    // Find level with maximum number of points
+    const label maxLevelI = findMax(nPointsPerLevel);
+
+    // Check whether there are at least three points with the level <= of this
+    // level with maximum number of occurences
+    label nPointsBelow = 0;
+    for (label belowLevelI = 0; belowLevelI <= maxLevelI; ++belowLevelI)
+    {
+        nPointsBelow += nPointsPerLevel[belowLevelI];
+    }
+
+    if (nPointsBelow < 3)
+    {
+        // For some reason, the minimum requirement that at least three points
+        // have level below the anchor level is not met
+        WarningIn("label polyRef::getAnchorLevel(const label faceI) const")
+            << "Found less than three points below an anchor level."
+            << nl
+            << "Face: " << faceI
+            << ", anchor level: " << allLevels[maxLevelI]
+            << ", n points below level: " << nPointsBelow
+            << ", n total points of this face: " << nPoints
+            << endl;
+    }
+
+    return allLevels[maxLevelI];
 }
 
 
@@ -3017,6 +3054,9 @@ Foam::labelListList Foam::polyRef::setRefinement
             << endl;
     }
 
+    // Get necessary mesh data
+    const faceList& meshFaces = mesh_.faces();
+    const cellList& meshCells = mesh_.cells();
 
     // Mid point per refined cell.
     // -1 : not refined
@@ -3027,7 +3067,7 @@ Foam::labelListList Foam::polyRef::setRefinement
     {
         label cellI = cellLabels[i];
 
-        label anchorPointI = mesh_.faces()[mesh_.cells()[cellI][0]][0];
+        label anchorPointI = meshFaces[meshCells[cellI][0]][0];
 
         cellMidPoint[cellI] = meshMod.setAction
         (
@@ -3078,6 +3118,10 @@ Foam::labelListList Foam::polyRef::setRefinement
     // Unrefined edges are ones between cellLevel or lower points.
     // If any cell using this edge gets split then the edge needs to be split.
 
+    // Get necessary mesh data
+    const labelListList& meshCellEdges = mesh_.cellEdges();
+    const edgeList& meshEdges = mesh_.edges();
+
     // -1  : no need to split edge
     // >=0 : label of introduced mid point
     labelList edgeMidPoint(mesh_.nEdges(), -1);
@@ -3087,13 +3131,13 @@ Foam::labelListList Foam::polyRef::setRefinement
     {
         if (cellMidPoint[cellI] >= 0)
         {
-            const labelList& cEdges = mesh_.cellEdges()[cellI];
+            const labelList& cEdges = meshCellEdges[cellI];
 
             forAll(cEdges, i)
             {
                 label edgeI = cEdges[i];
 
-                const edge& e = mesh_.edges()[edgeI];
+                const edge& e = meshEdges[edgeI];
 
                 if
                 (
@@ -3122,6 +3166,9 @@ Foam::labelListList Foam::polyRef::setRefinement
     // Introduce edge points
     // ~~~~~~~~~~~~~~~~~~~~~
 
+    // Get necessary mesh data
+    const pointField& meshPoints = mesh_.points();
+
     {
         // Phase 1: calculate midpoints and sync.
         // This needs doing for if people do not write binary and we slowly
@@ -3134,9 +3181,10 @@ Foam::labelListList Foam::polyRef::setRefinement
             if (edgeMidPoint[edgeI] >= 0)
             {
                 // Edge marked to be split.
-                edgeMids[edgeI] = mesh_.edges()[edgeI].centre(mesh_.points());
+                edgeMids[edgeI] = meshEdges[edgeI].centre(meshPoints);
             }
         }
+
         syncTools::syncEdgeList
         (
             mesh_,
@@ -3155,7 +3203,7 @@ Foam::labelListList Foam::polyRef::setRefinement
                 // Edge marked to be split. Replace edgeMidPoint with actual
                 // point label.
 
-                const edge& e = mesh_.edges()[edgeI];
+                const edge& e = meshEdges[edgeI];
 
                 edgeMidPoint[edgeI] = meshMod.setAction
                 (
@@ -3168,6 +3216,8 @@ Foam::labelListList Foam::polyRef::setRefinement
                     )
                 );
 
+                // Update level: take maximum of the two points in the original
+                // edge and increment
                 newPointLevel(edgeMidPoint[edgeI]) =
                     max
                     (
@@ -3187,9 +3237,9 @@ Foam::labelListList Foam::polyRef::setRefinement
         {
             if (edgeMidPoint[edgeI] >= 0)
             {
-                const edge& e = mesh_.edges()[edgeI];
+                const edge& e = meshEdges[edgeI];
 
-                meshTools::writeOBJ(str, e.centre(mesh_.points()));
+                meshTools::writeOBJ(str, e.centre(meshPoints));
             }
         }
 
@@ -3342,7 +3392,7 @@ Foam::labelListList Foam::polyRef::setRefinement
                 // Face marked to be split. Replace faceMidPoint with actual
                 // point label.
 
-                const face& f = mesh_.faces()[faceI];
+                const face& f = meshFaces[faceI];
 
                 faceMidPoint[faceI] = meshMod.setAction
                 (
@@ -3552,7 +3602,7 @@ Foam::labelListList Foam::polyRef::setRefinement
         {
             if (cellMidPoint[cellI] >= 0)
             {
-                const cell& cFaces = mesh_.cells()[cellI];
+                const cell& cFaces = meshCells[cellI];
 
                 forAll(cFaces, i)
                 {
@@ -3600,7 +3650,7 @@ Foam::labelListList Foam::polyRef::setRefinement
             // (affectedFace - is impossible since this is first change but
             //  just for completeness)
 
-            const face& f = mesh_.faces()[faceI];
+            const face& f = meshFaces[faceI];
 
             // Has original faceI been used (three faces added, original gets
             // modified)
@@ -3747,7 +3797,7 @@ Foam::labelListList Foam::polyRef::setRefinement
                 {
                     // Unsplit face. Add edge splits to face.
 
-                    const face& f = mesh_.faces()[faceI];
+                    const face& f = meshFaces[faceI];
                     const labelList& fEdges = mesh_.faceEdges()[faceI];
 
                     dynamicLabelList newFaceVerts(f.size());
@@ -3842,7 +3892,7 @@ Foam::labelListList Foam::polyRef::setRefinement
     {
         if (affectedFace.get(faceI) == 1)
         {
-            const face& f = mesh_.faces()[faceI];
+            const face& f = meshFaces[faceI];
 
             // The point with the lowest level should be an anchor
             // point of the neighbouring cells.
@@ -4410,6 +4460,9 @@ void Foam::polyRef::checkMesh() const
     // Check face areas.
     // ~~~~~~~~~~~~~~~~~
 
+    // Get necessary mesh data
+    const faceList& meshFaces = mesh_.faces();
+
     {
         scalarField neiFaceAreas(mesh_.nFaces()-mesh_.nInternalFaces());
         forAll(neiFaceAreas, i)
@@ -4428,7 +4481,7 @@ void Foam::polyRef::checkMesh() const
 
             if (mag(magArea - neiFaceAreas[i]) > smallDim)
             {
-                const face& f = mesh_.faces()[faceI];
+                const face& f = meshFaces[faceI];
                 label patchI = mesh_.boundaryMesh().whichPatch(faceI);
 
                 FatalErrorIn("polyRef::checkMesh()")
@@ -4455,7 +4508,7 @@ void Foam::polyRef::checkMesh() const
 
         forAll(nVerts, i)
         {
-            nVerts[i] = mesh_.faces()[i+mesh_.nInternalFaces()].size();
+            nVerts[i] = meshFaces[i+mesh_.nInternalFaces()].size();
         }
 
         // Replace data on coupled patches with their neighbour ones.
@@ -4465,7 +4518,7 @@ void Foam::polyRef::checkMesh() const
         {
             label faceI = i+mesh_.nInternalFaces();
 
-            const face& f = mesh_.faces()[faceI];
+            const face& f = meshFaces[faceI];
 
             if (f.size() != nVerts[i])
             {
@@ -4497,7 +4550,7 @@ void Foam::polyRef::checkMesh() const
         {
             label faceI = i+mesh_.nInternalFaces();
             const point& fc = mesh_.faceCentres()[faceI];
-            const face& f = mesh_.faces()[faceI];
+            const face& f = meshFaces[faceI];
             const vector anchorVec(mesh_.points()[f[0]] - fc);
 
             anchorPoints[i] = anchorVec;
@@ -4512,7 +4565,7 @@ void Foam::polyRef::checkMesh() const
         {
             label faceI = i+mesh_.nInternalFaces();
             const point& fc = mesh_.faceCentres()[faceI];
-            const face& f = mesh_.faces()[faceI];
+            const face& f = meshFaces[faceI];
             const vector anchorVec(mesh_.points()[f[0]] - fc);
 
             if (mag(anchorVec - anchorPoints[i]) > smallDim)

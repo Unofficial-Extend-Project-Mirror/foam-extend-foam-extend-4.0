@@ -383,8 +383,8 @@ public:
 
         // Refinement
 
-            //- Gets level such that the face has n points <= level, where n is
-            //  the number of points (or edges) for a face.
+            // Get cell level such that the face has the most points that are
+            // <= level (at least three points)
             label getAnchorLevel(const label faceI) const;
 
             //- Helper: get points of a cell without using cellPoints addressing
