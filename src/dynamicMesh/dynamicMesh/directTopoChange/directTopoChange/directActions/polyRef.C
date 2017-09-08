@@ -3263,18 +3263,21 @@ Foam::labelListList Foam::polyRef::setRefinement
         // Note: no need to check whether the face has valid anchor level since
         // all faces can be split
 
-            label nei = mesh_.faceNeighbour()[faceI];
-            label neiLevel = cellLevel_[nei];
-            label newNeiLevel = neiLevel + (cellMidPoint[nei] >= 0 ? 1 : 0);
+        const label own = mesh_.faceOwner()[faceI];
+        const label ownLevel = cellLevel_[own];
+        const label newOwnLevel = ownLevel + (cellMidPoint[own] >= 0 ? 1 : 0);
 
-            if
-            (
-                newOwnLevel > faceAnchorLevel[faceI]
-             || newNeiLevel > faceAnchorLevel[faceI]
-            )
-            {
-                faceMidPoint[faceI] = 12345;    // mark to be split
-            }
+        const label nei = mesh_.faceNeighbour()[faceI];
+        const label neiLevel = cellLevel_[nei];
+        const label newNeiLevel = neiLevel + (cellMidPoint[nei] >= 0 ? 1 : 0);
+
+        if
+        (
+            newOwnLevel > faceAnchorLevel[faceI]
+         || newNeiLevel > faceAnchorLevel[faceI]
+        )
+        {
+            faceMidPoint[faceI] = 12345;    // mark to be split
         }
     }
 
@@ -3459,7 +3462,6 @@ Foam::labelListList Foam::polyRef::setRefinement
         {
             const labelList& pCells = mesh_.pointCells()[pointI];
 
-            // Loop through all cells sharing this point
             forAll(pCells, pCellI)
             {
                 const label cellI = pCells[pCellI];
@@ -3749,8 +3751,8 @@ Foam::labelListList Foam::polyRef::setRefinement
                                 meshMod,
                                 oldOwn,
                                 faceI,
-                                meshCellCentres[oldOwn],
-                                meshFaceCentres[faceI],
+                                mesh_.cellCentres()[oldOwn],
+                                mesh_.faceCentres()[faceI],
                                 newFace
                             );
                         }
@@ -3875,8 +3877,8 @@ Foam::labelListList Foam::polyRef::setRefinement
                                 meshMod,
                                 oldOwn,
                                 faceI,
-                                meshCellCentres[oldOwn],
-                                meshFaceCentres[faceI],
+                                mesh_.cellCentres()[oldOwn],
+                                mesh_.faceCentres()[faceI],
                                 newFace
                             );
                         }
