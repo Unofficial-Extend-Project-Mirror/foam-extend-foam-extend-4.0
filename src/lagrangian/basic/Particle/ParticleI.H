@@ -37,6 +37,7 @@ inline Foam::scalar Foam::Particle<ParticleType>::lambda
 ) const
 {
     const polyMesh& mesh = cloud_.polyMesh_;
+    const polyBoundaryMesh& patches = mesh.boundaryMesh();
     bool movingMesh = mesh.moving();
 
     if (movingMesh)
@@ -46,7 +47,11 @@ inline Foam::scalar Foam::Particle<ParticleType>::lambda
         vector Cf = mesh.faceCentres()[facei];
 
         // move reference point for wall
-        if (!cloud_.internalFace(facei))
+        if
+        (
+            !cloud_.internalFace(facei)
+         && isA<wallPolyPatch>(patches[cloud_.facePatch(facei)])
+        )
         {
             const vector& C = mesh.cellCentres()[celli_];
             scalar CCf = mag((C - Cf) & Sf);
@@ -184,13 +189,18 @@ inline Foam::scalar Foam::Particle<ParticleType>::lambda
 ) const
 {
     const polyMesh& mesh = cloud_.polyMesh_;
+    const polyBoundaryMesh& patches = mesh.boundaryMesh();
 
     vector Sf = mesh.faceAreas()[facei];
     Sf /= mag(Sf);
     vector Cf = mesh.faceCentres()[facei];
 
     // move reference point for wall
-    if (!cloud_.internalFace(facei))
+    if
+    (
+        !cloud_.internalFace(facei)
+     && isA<wallPolyPatch>(patches[cloud_.facePatch(facei)])
+    )
     {
         const vector& C = mesh.cellCentres()[celli_];
         scalar CCf = mag((C - Cf) & Sf);
