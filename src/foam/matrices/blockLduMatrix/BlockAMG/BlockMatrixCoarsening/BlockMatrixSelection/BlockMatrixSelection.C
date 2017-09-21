@@ -409,21 +409,6 @@ void Foam::BlockMatrixSelection<Type>::calcCoarsening()
         }
     }
 
-    // // Renumber matrix - coarse equations are renumbered in natural order
-    // if (true)
-    // {
-    //     label number = 0;
-
-    //     for (label eqn = 0; eqn < nRows; eqn++)
-    //     {
-    //         if (rowLabel_[eqn] != FINE)
-    //         {
-    //             rowLabel_[eqn] = number;
-    //             number++;
-    //         }
-    //     }
-    // }
-
 //------------------------------------------------------------------------------
 //              CALCULATING CONTRIBUTIONS TO THE SCALING FACTOR
 //------------------------------------------------------------------------------
@@ -592,9 +577,13 @@ void Foam::BlockMatrixSelection<Type>::calcCoarsening()
 
                 if (rowLabel_[js] != FINE)
                 {
+                    // PROLONGATION NOT SUMMING INTO 1 FOR DIAGONALLY UNEQUAL
+                    // ROWS:
                     // Prolongation coefficient with scaling
-                    // pCoeff[rowCount] = -(num[i]/den)*strongCoeff[sip]/Dii[i];
+                    pCoeff[rowCount] = -(num[i]/den)*strongCoeff[sip]/Dii[i];
 
+
+                    // FOR PROLONGATION ROW SUMMING INTO 1:
                     // TU, new interpolation: we have to assume all the
                     // equations are diagonally equal in order to get the row of
                     // prolongation to sum into 1
@@ -603,7 +592,8 @@ void Foam::BlockMatrixSelection<Type>::calcCoarsening()
                     // to the diagonal. That is why -num[i] and Dii[i] have
                     // disappeared. Note: if there are positive connections in
                     // the row, this is not valid.
-                    pCoeff[rowCount] = strongCoeff[sip]/den;
+
+                    // pCoeff[rowCount] = strongCoeff[sip]/den;
 
                     pCol[rowCount] = rowLabel_[js];
                     rowCount++;
@@ -1260,17 +1250,7 @@ Foam::BlockMatrixSelection<Type>::restrictMatrix() const
                         {
                             // Found lower COARSE triangle
                             label face = coeffLabel[jp];
-                            // HACKED!!!
-                            if (face == -1)
-                            {
-                                Pout<< "BadTripleProduct1 "
-                                    << ir << " " << jp
-                                    << endl;
-                            }
-                            else
-                            {
-                                activeCoarseLower[face] += ra*coeffP[indexP];
-                            }
+                            activeCoarseLower[face] += ra*coeffP[indexP];
                         }
                         else if (ir == jp)
                         {
@@ -1281,15 +1261,7 @@ Foam::BlockMatrixSelection<Type>::restrictMatrix() const
                         {
                             // Found upper COARSE triangle
                             label face = coeffLabel[jp];
-                            if (face == -1)
-                            {
-                                Pout<< "BadTripleProduct2 "
-                                    << ir << " " << jp << endl;
-                            }
-                            else
-                            {
-                                activeCoarseUpper[face] += ra*coeffP[indexP];
-                            }
+                            activeCoarseUpper[face] += ra*coeffP[indexP];
                         }
                     }
                 }
@@ -1321,15 +1293,7 @@ Foam::BlockMatrixSelection<Type>::restrictMatrix() const
                         {
                             // Found lower COARSE triangle
                             label face = coeffLabel[jp];
-                            if (face == -1)
-                            {
-                                Pout<< "BadTripleProduct3 "
-                                    << ir << " " << jp << endl;
-                            }
-                            else
-                            {
-                                activeCoarseLower[face] += ra*coeffP[indexP];
-                            }
+                            activeCoarseLower[face] += ra*coeffP[indexP];
                         }
                         else if (ir == jp)
                         {
@@ -1340,15 +1304,7 @@ Foam::BlockMatrixSelection<Type>::restrictMatrix() const
                         {
                             // Found upper COARSE triangle
                             label face = coeffLabel[jp];
-                            if (face == -1)
-                            {
-                                Pout<< "BadTripleProduct4 "
-                                    << ir << " " << jp << endl;
-                            }
-                            else
-                            {
-                                activeCoarseUpper[face] += ra*coeffP[indexP];
-                            }
+                            activeCoarseUpper[face] += ra*coeffP[indexP];
                         }
                     }
                 }
@@ -1369,15 +1325,7 @@ Foam::BlockMatrixSelection<Type>::restrictMatrix() const
                     {
                         // Found lower COARSE triangle
                         label face = coeffLabel[jp];
-                        if (face == -1)
-                        {
-                            Pout<< "BadTripleProduct5 "
-                                << ir << " " << jp << endl;
-                        }
-                        else
-                        {
-                            activeCoarseLower[face] += ra*coeffP[indexP];
-                        }
+                        activeCoarseLower[face] += ra*coeffP[indexP];
                     }
                     else if (ir == jp)
                     {
@@ -1388,15 +1336,7 @@ Foam::BlockMatrixSelection<Type>::restrictMatrix() const
                     {
                         // Found upper COARSE triangle
                         label face = coeffLabel[jp];
-                        if (face == -1)
-                        {
-                            Pout<< "BadTripleProduct6 "
-                                << ir << " " << jp << endl;
-                        }
-                        else
-                        {
-                            activeCoarseUpper[face] += ra*coeffP[indexP];
-                        }
+                        activeCoarseUpper[face] += ra*coeffP[indexP];
                     }
                 }
             }
@@ -1419,7 +1359,6 @@ Foam::BlockMatrixSelection<Type>::restrictMatrix() const
                 coeffLabel[lowerCoarseAddr[losortCoarseAddr[indexC]]] = -1;
             }
         }
-
 
         // Get interfaces from coarse matrix
         typename BlockLduInterfaceFieldPtrsList<Type>::Type&
