@@ -22,22 +22,28 @@ License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    Foam::ODESolver
+    OutputControlDictionary
 
 Description
-    Selection for ODE solver
+    Host template class used to control input/output for a given type. Used to
+    enable a combination of run-time selection using the TypeName macro (see
+    typeInfo.H) and automatic read/write provided by regIOobject part of the
+    IOdictionary.
+
+    For example of usage, see $FOAM_SRC/ODE/sixDOFODE/sixDOFODE.H
+
+Author
+    Vuko Vukcevic, Wikki Ltd.  All rights reserved.
 
 SourceFiles
-    ODESolver.C
+    OutputControlDictionary.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef ODESolver_H
-#define ODESolver_H
+#ifndef OutputControlDictionary_H
+#define OutputControlDictionary_H
 
-#include "ODE.H"
-#include "typeInfo.H"
-#include "autoPtr.H"
+#include "IOdictionary.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -45,102 +51,50 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class ODESolver Declaration
+                  Class OutputControlDictionary Declaration
 \*---------------------------------------------------------------------------*/
 
-class ODESolver
+template <class PolicyType>
+class OutputControlDictionary
+:
+    public IOdictionary
 {
+    // Private data
 
-protected:
-
-    // Protected data
-
-        //- Reference to ODE
-        ODE& ode_;
-
-        mutable scalarField yScale_;
-        mutable scalarField dydx_;
-
-
-private:
-
-    // Private Member Functions
-
-        //- Disallow default bitwise copy construct
-        ODESolver(const ODESolver&);
-
-        //- Disallow default bitwise assignment
-        void operator=(const ODESolver&);
+        //- Const reference to the policy class
+        const PolicyType& pt_;
 
 
 public:
 
-    //- Runtime type information
-    TypeName("ODESolver");
-
-
-    // Declare run-time constructor selection table
-
-        declareRunTimeSelectionTable
-        (
-            autoPtr,
-            ODESolver,
-            ODE,
-            (ODE& ode),
-            (ode)
-        );
-
-
     // Constructors
 
-        //- Construct for given ODE
-        ODESolver(ODE& ode);
-
-
-    // Selectors
-
-        //- Select null constructed
-        static autoPtr<ODESolver> New
-        (
-            const word& ODESolverTypeName,
-            ODE& ode
-        );
+        //- Construct from IOobject and policy
+        OutputControlDictionary(const IOobject& io, const PolicyType& pt);
 
 
     // Destructor
 
-        virtual ~ODESolver()
-        {}
+        virtual ~OutputControlDictionary();
 
 
-    // Member Functions
+        // Write control
 
-        virtual void solve
-        (
-            scalar& x,
-            scalarField& y,
-            scalarField& dydx,
-            const scalar eps,
-            const scalarField& yScale,
-            const scalar hTry,
-            scalar& hDid,
-            scalar& hNext
-        ) const = 0;
-
-
-        void solve
-        (
-            const scalar xStart,
-            const scalar xEnd,
-            const scalar eps,
-            scalar& hEst
-        ) const;
+            //- writeData member function controlling output. Calls
+            //  PolicyType::writeData(Ostream& os) member function
+            virtual bool writeData(Ostream& os) const;
 };
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#ifdef NoRepository
+#   include "OutputControlDictionary.C"
+#endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

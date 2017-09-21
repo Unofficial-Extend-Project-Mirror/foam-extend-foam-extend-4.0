@@ -26,7 +26,8 @@ Class
 
 Author
     Dubravko Matijasevic, FSB Zagreb.  All rights reserved.
-    Updated by Hrvoje Jasak
+    Hrvoje Jasak, FSB Zagreb.  All rights reserved.
+    Vuko Vukcevic, FSB Zagreb.  All rights reserved.
 
 SourceFiles
     finiteRotation.C
@@ -61,20 +62,6 @@ class finiteRotation
         tensor rotIncrementTensor_;
 
 
-    // Private Member Functions
-
-        //- Calculate unit rotation vector from given rotation tensor
-        static vector rotVector(const tensor& rotT);
-
-        //- Calculate rotation angle from given rotation tensor
-        static scalar rotAngle(const tensor& rotT);
-
-        //- Calculate Euler angles (x-y-z (roll-pitch-yaw) convention) from
-        //  given rotation tensor. Reference: Mike Day, Insomniac Games,
-        //  Extracting Euler Angles from a Rotation Matrix.
-        static vector eulerAngles(const tensor& rotT);
-
-
 public:
 
     // Constructors
@@ -89,16 +76,39 @@ public:
             const scalar& angle
         );
 
+        //- Construct from rotation tensor
+        explicit finiteRotation(const tensor& R);
+
 
     // Destructor
 
         ~finiteRotation();
 
 
+    // Static Functions
+
+        //- Calculate unit rotation vector from given rotation tensor
+        static vector rotVector(const tensor& rotT);
+
+        //- Calculate rotation angle from given rotation tensor
+        static scalar rotAngle(const tensor& rotT);
+
+        //- Calculate Euler angles (x-y-z (roll-pitch-yaw) convention by Bryan)
+        //  given the rotation tensor (global-to-local transformation).
+        //  Reference: Nikravesh: Computer-Aided Analysis of Mechanical Systems
+        static vector eulerAngles(const tensor& rotT);
+
+
     // Member Functions
 
-        //- Update rotation
+        //- Update rotation given rotation tensor
+        void updateRotation(const tensor& R);
+
+        //- Update rotation given HamiltonRodriguezRot (quaternions)
         void updateRotation(const HamiltonRodriguezRot& rot);
+
+        //- Update rotation given increment rotation tensor
+        void updateRotationWithIncrement(const tensor& incR);
 
         //- Return initial quaternions
         const HamiltonRodriguezRot& eInitial() const;

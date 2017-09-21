@@ -64,7 +64,7 @@ protected:
 
     // Protected data
 
-        //- Solid bodi motion coefficients dictionary
+        //- Solid body motion coefficients dictionary
         dictionary SBMFCoeffs_;
 
         //- Time

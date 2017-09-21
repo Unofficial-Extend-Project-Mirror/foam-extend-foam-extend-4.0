@@ -26,22 +26,21 @@ Class
 
 Author
     Dubravko Matijasevic, FSB Zagreb.  All rights reserved.
-    Update by Hrvoje Jasak
+    Hrvoje Jasak, FSB Zagreb.  All rights reserved.
+    Vuko Vukcevic, FSB Zagreb.  All rights reserved.
 
 \*---------------------------------------------------------------------------*/
 
 #include "objectRegistry.H"
 #include "finiteRotation.H"
 
-// * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
+// * * * * * * * * * * * * * * * Static Functions  * * * * * * * * * * * * * //
 
 Foam::vector Foam::finiteRotation::rotVector(const tensor& rotT)
 {
     vector ur = - *( inv(I + rotT) & (I - rotT) );
 
-    // Scaling to a unit vector.  HJ, problems with round-off
-    // HJ, 4/Aug/2008
-
+    // Scaling to a unit vector. Problems with round-off. HJ, 4/Aug/2008
     if (mag(ur) > SMALL)
     {
         return ur/(mag(ur) + SMALL);
@@ -49,8 +48,7 @@ Foam::vector Foam::finiteRotation::rotVector(const tensor& rotT)
     else
     {
         // Rotation vector is undertermined at zero rotation
-        // Returning arbitrary unit vector
-        // HJ, 4/Mar/2015
+        // Returning arbitrary unit vector. HJ, 4/Mar/2015
         return vector(0, 0, 1);
     }
 }
@@ -79,22 +77,15 @@ Foam::vector Foam::finiteRotation::eulerAngles(const tensor& rotT)
     scalar& pitchAngle = eulerAngles.y();
     scalar& yawAngle = eulerAngles.z();
 
-    // Calculate roll angle
-    rollAngle = atan2(rotT.yz(), rotT.zz());
-
-    // Use mag to avoid negative value due to round-off
-    // HJ, 24/Feb/2016
-    // Bugfix: sqr. SS, 18/Apr/2016
-    const scalar c2 = sqrt(sqr(rotT.xx()) + sqr(rotT.xy()));
-
     // Calculate pitch angle
-    pitchAngle = atan2(-rotT.xz(), c2);
+    pitchAngle = asin(rotT.xz());
 
-    const scalar s1 = sin(rollAngle);
-    const scalar c1 = cos(rollAngle);
+    // Calculate roll angle
+    const scalar cosPitch = cos(pitchAngle);
+    rollAngle = asin(-rotT.yz()/cosPitch);
 
     // Calculate yaw angle
-    yawAngle = atan2(s1*rotT.zx() - c1*rotT.yx(), c1*rotT.yy() - s1*rotT.zy());
+    yawAngle = asin(-rotT.xy()/cosPitch);
 
     return eulerAngles;
 }
@@ -122,6 +113,14 @@ Foam::finiteRotation::finiteRotation
 {}
 
 
+Foam::finiteRotation::finiteRotation(const tensor& R)
+:
+    eInitial_(R),
+    rotTensor_(R),
+    rotIncrementTensor_(tensor::zero)
+{}
+
+
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
 Foam::finiteRotation::~finiteRotation()
@@ -130,12 +129,23 @@ Foam::finiteRotation::~finiteRotation()
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
+void Foam::finiteRotation::updateRotation(const tensor& R)
+{
+    rotIncrementTensor_ = (R & rotTensor_.T());
+    rotTensor_ = R;
+}
+
+
 void Foam::finiteRotation::updateRotation(const HamiltonRodriguezRot& rot)
 {
-    tensor rotR = rot.R();
+    updateRotation(rot.R());
+}
 
-    rotIncrementTensor_ = (rotR & (rotTensor_.T()));
-    rotTensor_ = rotR;
+
+void Foam::finiteRotation::updateRotationWithIncrement(const tensor& incR)
+{
+    rotIncrementTensor_ = incR;
+    rotTensor_ = (incR & rotTensor_);
 }
 
 

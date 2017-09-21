@@ -22,22 +22,24 @@ License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    Foam::ODESolver
+    Foam::angularDamper
 
 Description
-    Selection for ODE solver
+    Rotational restraint corresponding to angular damper defined by angular
+    damping coefficients.
+
+Author
+    Vuko Vukcevic, FSB Zagreb.  All rights reserved.
 
 SourceFiles
-    ODESolver.C
+    angularDamper.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef ODESolver_H
-#define ODESolver_H
+#ifndef angularDamper_H
+#define angularDamper_H
 
-#include "ODE.H"
-#include "typeInfo.H"
-#include "autoPtr.H"
+#include "rotationalRestraint.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -45,96 +47,64 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class ODESolver Declaration
+                   Class angularDamper Declaration
 \*---------------------------------------------------------------------------*/
 
-class ODESolver
+class angularDamper
+:
+    public rotationalRestraint
 {
+    // Private Data
 
-protected:
+        //- Angular damping coefficients
+        diagTensor angDampingCoeffs_;
 
-    // Protected data
-
-        //- Reference to ODE
-        ODE& ode_;
-
-        mutable scalarField yScale_;
-        mutable scalarField dydx_;
-
-
-private:
-
-    // Private Member Functions
-
-        //- Disallow default bitwise copy construct
-        ODESolver(const ODESolver&);
-
-        //- Disallow default bitwise assignment
-        void operator=(const ODESolver&);
+        //- Whether the damper is applied in global or local c. s.
+        Switch inGlobal_;
 
 
 public:
 
     //- Runtime type information
-    TypeName("ODESolver");
-
-
-    // Declare run-time constructor selection table
-
-        declareRunTimeSelectionTable
-        (
-            autoPtr,
-            ODESolver,
-            ODE,
-            (ODE& ode),
-            (ode)
-        );
+    TypeName("angularDamper");
 
 
     // Constructors
 
-        //- Construct for given ODE
-        ODESolver(ODE& ode);
-
-
-    // Selectors
-
-        //- Select null constructed
-        static autoPtr<ODESolver> New
+        //- Construct from dictionary
+        angularDamper
         (
-            const word& ODESolverTypeName,
-            ODE& ode
+            const word& name,
+            const dictionary& dict,
+            const sixDOFODE& sixDOF
         );
+
+        //- Construct and return a clone
+        virtual autoPtr<rotationalRestraint> clone() const;
 
 
     // Destructor
 
-        virtual ~ODESolver()
-        {}
+        virtual ~angularDamper();
 
 
     // Member Functions
 
-        virtual void solve
-        (
-            scalar& x,
-            scalarField& y,
-            scalarField& dydx,
-            const scalar eps,
-            const scalarField& yScale,
-            const scalar hTry,
-            scalar& hDid,
-            scalar& hNext
-        ) const = 0;
+        // Restraint specific functions
+
+            //- Return restraining moment (in the global coordinate system)
+            virtual vector restrainingMoment
+            (
+                const scalar t,
+                const tensor& toRelative,
+                const vector& omega
+            ) const;
 
 
-        void solve
-        (
-            const scalar xStart,
-            const scalar xEnd,
-            const scalar eps,
-            scalar& hEst
-        ) const;
+    // I-O Functions and Operators
+
+        //- Virtual write function
+        virtual void write(Ostream& os) const;
 };
 
 

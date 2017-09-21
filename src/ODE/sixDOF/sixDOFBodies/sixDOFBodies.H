@@ -22,22 +22,27 @@ License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    Foam::ODESolver
+    sixDOFBodies
 
 Description
-    Selection for ODE solver
+    6-DOF solver for multiple bodies
+
+Author
+    Dubravko Matijasevic, FSB Zagreb.  All rights reserved.
 
 SourceFiles
-    ODESolver.C
+    sixDOFBodies.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef ODESolver_H
-#define ODESolver_H
+#ifndef sixDOFBodies_H
+#define sixDOFBodies_H
 
-#include "ODE.H"
-#include "typeInfo.H"
-#include "autoPtr.H"
+#include "foamTime.H"
+#include "IOdictionary.H"
+#include "sixDOFODE.H"
+#include "ODESolver.H"
+#include "primitiveFields.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -45,96 +50,64 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class ODESolver Declaration
+                        Class sixDOFBodies Declaration
 \*---------------------------------------------------------------------------*/
 
-class ODESolver
+class sixDOFBodies
+:
+    public IOdictionary
 {
+    // Private data
 
-protected:
+        //- Reference to time
+        const Time& runTime_;
 
-    // Protected data
+        // Pointer list of Foam::sixDOFODE objects
+        PtrList<sixDOFODE> odes_;
 
-        //- Reference to ODE
-        ODE& ode_;
+        // Pointer list of Foam::sixDOFODE solvers
+        PtrList<ODESolver> solvers_;
 
-        mutable scalarField yScale_;
-        mutable scalarField dydx_;
+        // Name list of solved bodies
+        const wordList names_;
 
-
-private:
 
     // Private Member Functions
 
         //- Disallow default bitwise copy construct
-        ODESolver(const ODESolver&);
+        sixDOFBodies(const sixDOFBodies&);
 
         //- Disallow default bitwise assignment
-        void operator=(const ODESolver&);
+        void operator=(const sixDOFBodies&);
+
+        //- Set bodies
+        void setBodies();
 
 
 public:
 
-    //- Runtime type information
-    TypeName("ODESolver");
-
-
-    // Declare run-time constructor selection table
-
-        declareRunTimeSelectionTable
-        (
-            autoPtr,
-            ODESolver,
-            ODE,
-            (ODE& ode),
-            (ode)
-        );
-
-
     // Constructors
 
-        //- Construct for given ODE
-        ODESolver(ODE& ode);
-
-
-    // Selectors
-
-        //- Select null constructed
-        static autoPtr<ODESolver> New
-        (
-            const word& ODESolverTypeName,
-            ODE& ode
-        );
+        //- Construct from Time
+        sixDOFBodies(const Time& runTime);
 
 
     // Destructor
 
-        virtual ~ODESolver()
+        virtual ~sixDOFBodies()
         {}
 
 
     // Member Functions
 
-        virtual void solve
-        (
-            scalar& x,
-            scalarField& y,
-            scalarField& dydx,
-            const scalar eps,
-            const scalarField& yScale,
-            const scalar hTry,
-            scalar& hDid,
-            scalar& hNext
-        ) const = 0;
+        //- Return list of names
+        const wordList& names() const;
 
+        //- Return list of bodies
+        const PtrList<sixDOFODE>& operator()() const;
 
-        void solve
-        (
-            const scalar xStart,
-            const scalar xEnd,
-            const scalar eps,
-            scalar& hEst
-        ) const;
+        //- Solve ODEs and update position
+        void solve();
 };
 
 
