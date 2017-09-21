@@ -138,6 +138,11 @@ class fvMatrix
         mutable GeometricField<Type, fvsPatchField, surfaceMesh>
             *faceFluxCorrectionPtr_;
 
+        //- Jump face flux field for non-orthogonal correction
+        //  in case of a psi with jump discontinuity in grad(psi)
+        mutable GeometricField<Type, fvsPatchField, surfaceMesh>
+            *jumpFaceFluxCorrectionPtr_;
+
 
     // Private member functions
 
@@ -291,6 +296,13 @@ public:
                 return faceFluxCorrectionPtr_;
             }
 
+            //- Return pointer to the jump face-flux non-orthogonal correction
+            //  field in case of a psi with jump discontinuity in grad(psi)
+            surfaceTypeFieldPtr& jumpFaceFluxCorrectionPtr()
+            {
+                return jumpFaceFluxCorrectionPtr_;
+            }
+
 
         // Matrix completion functionality
 
@@ -398,6 +410,10 @@ public:
             //- Return the face-flux field from the matrix
             tmp<GeometricField<Type, fvsPatchField, surfaceMesh> >
             flux() const;
+
+            //- Return the jump face-flux field from the matrix
+            tmp<GeometricField<Type, fvsPatchField, surfaceMesh> >
+            jumpFlux() const;
 
 
     // Member operators
