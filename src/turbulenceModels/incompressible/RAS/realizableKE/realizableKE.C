@@ -233,10 +233,12 @@ tmp<volSymmTensorField> realizableKE::devReff() const
 
 tmp<fvVectorMatrix> realizableKE::divDevReff() const
 {
+    const volScalarField nuEffective = nuEff();
+
     return
     (
-      - fvm::laplacian(nuEff(), U_)
-      - fvc::div(nuEff()*dev(T(fvc::grad(U_))))
+      - fvm::laplacian(nuEffective, U_)
+      - (fvc::grad(U_) & fvc::grad(nuEffective))
     );
 }
 

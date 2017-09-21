@@ -346,11 +346,13 @@ tmp<volSymmTensorField> LienCubicKELowRe::devReff() const
 
 tmp<fvVectorMatrix> LienCubicKELowRe::divDevReff() const
 {
+    const volScalarField nuEffective = nuEff();
+
     return
     (
         fvc::div(nonlinearStress_)
-      - fvm::laplacian(nuEff(), U_)
-      - fvc::div(nuEff()*dev(T(fvc::grad(U_))))
+      - fvm::laplacian(nuEffective, U_)
+      - (fvc::grad(U_) & fvc::grad(nuEffective))
     );
 }
 

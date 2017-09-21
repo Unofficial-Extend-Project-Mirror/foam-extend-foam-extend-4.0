@@ -23,24 +23,25 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "turbulentIntensityKineticEnergyInletFvPatchScalarField.H"
+#include "nuRatioEpsilonFvPatchScalarField.H"
 #include "addToRunTimeSelectionTable.H"
+#include "RASModel.H"
 #include "fvPatchFieldMapper.H"
 #include "surfaceFields.H"
 #include "volFields.H"
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-Foam::turbulentIntensityKineticEnergyInletFvPatchScalarField::
-turbulentIntensityKineticEnergyInletFvPatchScalarField
+Foam::nuRatioEpsilonFvPatchScalarField::nuRatioEpsilonFvPatchScalarField
 (
     const fvPatch& p,
     const DimensionedField<scalar, volMesh>& iF
 )
 :
     inletOutletFvPatchScalarField(p, iF),
-    intensity_(0.0),
-    UName_("undefined-U"),
+    nuRatio_(1),
+    Cmu_(0.09),
+    kName_("undefined-k"),
     phiName_("undefined-phi")
 {
     this->refValue() = 0.0;
@@ -49,24 +50,23 @@ turbulentIntensityKineticEnergyInletFvPatchScalarField
 }
 
 
-Foam::turbulentIntensityKineticEnergyInletFvPatchScalarField::
-turbulentIntensityKineticEnergyInletFvPatchScalarField
+Foam::nuRatioEpsilonFvPatchScalarField::nuRatioEpsilonFvPatchScalarField
 (
-    const turbulentIntensityKineticEnergyInletFvPatchScalarField& ptf,
+    const nuRatioEpsilonFvPatchScalarField& ptf,
     const fvPatch& p,
     const DimensionedField<scalar, volMesh>& iF,
     const fvPatchFieldMapper& mapper
 )
 :
     inletOutletFvPatchScalarField(ptf, p, iF, mapper),
-    intensity_(ptf.intensity_),
-    UName_(ptf.UName_),
+    nuRatio_(ptf.nuRatio_),
+    Cmu_(ptf.Cmu_),
+    kName_(ptf.kName_),
     phiName_(ptf.phiName_)
 {}
 
 
-Foam::turbulentIntensityKineticEnergyInletFvPatchScalarField::
-turbulentIntensityKineticEnergyInletFvPatchScalarField
+Foam::nuRatioEpsilonFvPatchScalarField::nuRatioEpsilonFvPatchScalarField
 (
     const fvPatch& p,
     const DimensionedField<scalar, volMesh>& iF,
@@ -74,21 +74,33 @@ turbulentIntensityKineticEnergyInletFvPatchScalarField
 )
 :
     inletOutletFvPatchScalarField(p, iF),
-    intensity_(readScalar(dict.lookup("intensity"))),
-    UName_(dict.lookupOrDefault<word>("U", "U")),
-    phiName_(dict.lookupOrDefault<word>("phi", "phi"))
+    nuRatio_(readScalar(dict.lookup("nuRatio"))),
+    Cmu_(dict.lookupOrDefault<scalar>("Cmu", 0.09)),
+    kName_(dict.lookupOrDefault<word>("kName", "k")),
+    phiName_(dict.lookupOrDefault<word>("phiName", "phi"))
 {
-    if (intensity_ < 0 || intensity_ > 1)
+    if (nuRatio_< SMALL)
     {
         FatalErrorIn
         (
-            "turbulentIntensityKineticEnergyInletFvPatchScalarField::"
-            "turbulentIntensityKineticEnergyInletFvPatchScalarField"
+            "nuRatioEpsilonFvPatchScalarField::nuRatioEpsilonFvPatchScalarField"
             "(const fvPatch& p, const DimensionedField<scalar, volMesh>& iF, "
             "const dictionary& dict)"
-        )   << "Turbulence intensity should be specified as a fraction 0-1 "
-               "of the mean velocity\n"
-               "    value given is " << intensity_
+        )   << "Invalid eddy viscosity ratio (nuRatio) specified: " << nuRatio_
+            << "\n    on patch " << this->patch().name()
+            << " of field " << this->dimensionedInternalField().name()
+            << " in file " << this->dimensionedInternalField().objectPath()
+            << exit(FatalError);
+    }
+
+    if (Cmu_ < SMALL)
+    {
+        FatalErrorIn
+        (
+            "nuRatioEpsilonFvPatchScalarField::nuRatioEpsilonFvPatchScalarField"
+            "(const fvPatch& p, const DimensionedField<scalar, volMesh>& iF, "
+            "const dictionary& dict)"
+        )   << "Invalid Cmu_ constant specified: " << Cmu_
             << "\n    on patch " << this->patch().name()
             << " of field " << this->dimensionedInternalField().name()
             << " in file " << this->dimensionedInternalField().objectPath()
@@ -103,65 +115,78 @@ turbulentIntensityKineticEnergyInletFvPatchScalarField
 }
 
 
-Foam::turbulentIntensityKineticEnergyInletFvPatchScalarField::
-turbulentIntensityKineticEnergyInletFvPatchScalarField
+Foam::nuRatioEpsilonFvPatchScalarField::nuRatioEpsilonFvPatchScalarField
 (
-    const turbulentIntensityKineticEnergyInletFvPatchScalarField& ptf
+    const nuRatioEpsilonFvPatchScalarField& ptf
 )
 :
     inletOutletFvPatchScalarField(ptf),
-    intensity_(ptf.intensity_),
-    UName_(ptf.UName_),
+    nuRatio_(ptf.nuRatio_),
+    Cmu_(ptf.Cmu_),
+    kName_(ptf.kName_),
     phiName_(ptf.phiName_)
 {}
 
 
-Foam::turbulentIntensityKineticEnergyInletFvPatchScalarField::
-turbulentIntensityKineticEnergyInletFvPatchScalarField
+Foam::nuRatioEpsilonFvPatchScalarField::nuRatioEpsilonFvPatchScalarField
 (
-    const turbulentIntensityKineticEnergyInletFvPatchScalarField& ptf,
+    const nuRatioEpsilonFvPatchScalarField& ptf,
     const DimensionedField<scalar, volMesh>& iF
 )
 :
     inletOutletFvPatchScalarField(ptf, iF),
-    intensity_(ptf.intensity_),
-    UName_(ptf.UName_),
+    nuRatio_(ptf.nuRatio_),
+    Cmu_(ptf.Cmu_),
+    kName_(ptf.kName_),
     phiName_(ptf.phiName_)
 {}
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-void Foam::turbulentIntensityKineticEnergyInletFvPatchScalarField::
-updateCoeffs()
+void Foam::nuRatioEpsilonFvPatchScalarField::updateCoeffs()
 {
     if (updated())
     {
         return;
     }
 
-    const fvPatchVectorField& Up =
-        lookupPatchField<volVectorField, vector>(UName_);
+    // Get turbulent kinetic energy field for this patch
+    const fvPatchScalarField& kp =
+        lookupPatchField<volScalarField, vector>(kName_);
 
+    // Get flux field for this patch
     const fvsPatchScalarField& phip =
         lookupPatchField<surfaceScalarField, scalar>(phiName_);
 
-    this->refValue() = SMALL + 1.5*sqr(intensity_)*magSqr(Up);
+    // Get RASModel
+    const incompressible::RASModel& rasModel =
+        this->dimensionedInternalField().mesh().lookupObject
+        <
+            incompressible::RASModel
+        >("RASProperties");
+
+    // Get laminar viscosity for this patch
+    const fvPatchScalarField& nup =
+        rasModel.nu().boundaryField()[this->patch().index()];
+
+    this->refValue() = Cmu_*sqrt(kp)/nuRatio_/nup;
     this->valueFraction() = neg(phip);
 
     inletOutletFvPatchScalarField::updateCoeffs();
 }
 
 
-void Foam::turbulentIntensityKineticEnergyInletFvPatchScalarField::write
+void Foam::nuRatioEpsilonFvPatchScalarField::write
 (
     Ostream& os
 ) const
 {
     fvPatchScalarField::write(os);
-    os.writeKeyword("intensity") << intensity_ << token::END_STATEMENT << nl;
-    os.writeKeyword("U") << UName_ << token::END_STATEMENT << nl;
-    os.writeKeyword("phi") << phiName_ << token::END_STATEMENT << nl;
+    os.writeKeyword("nuRatio") << nuRatio_ << token::END_STATEMENT << nl;
+    os.writeKeyword("Cmu") << Cmu_ << token::END_STATEMENT << nl;
+    os.writeKeyword("kName") << kName_ << token::END_STATEMENT << nl;
+    os.writeKeyword("phiName") << phiName_ << token::END_STATEMENT << nl;
     writeEntry("value", os);
 }
 
@@ -173,7 +198,7 @@ namespace Foam
     makePatchTypeField
     (
         fvPatchScalarField,
-        turbulentIntensityKineticEnergyInletFvPatchScalarField
+        nuRatioEpsilonFvPatchScalarField
     );
 }
 
