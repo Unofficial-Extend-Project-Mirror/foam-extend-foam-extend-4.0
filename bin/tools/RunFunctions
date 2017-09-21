@@ -71,6 +71,11 @@ runParallel ()
         LOG_NAME=log.$APP_NAME
     fi
 
+    if [ "$WM_OSTYPE" = "MSWindows" ]
+    then
+        APP_RUN="${APP_RUN}.exe"
+    fi
+
     if [ -f $LOG_NAME ] ; then
         echo "$APP_NAME already run on $PWD: remove log file to run"
     else
@@ -135,27 +140,52 @@ cloneCase ()
 
 makeFsiCaseLinks ()
 {
-    cd $1
-    cd system
-    ln -s ../../$2/system $2
-    cd ../constant
-    ln -s ../../$2/constant $2
-    cd ../0
-    ln -s ../../$2/0 $2
-    cd ../..
+    if [ "$WM_OSTYPE" = "MSWindows" ]
+    then
+        cd $1
+        cd system
+        cp -r ../../$2/system $2
+        cd ../constant
+        cp -r ../../$2/constant $2
+        cd ../0
+        cp -r ../../$2/0 $2
+        cd ../..
+    else
+        cd $1
+        cd system
+        ln -s ../../$2/system $2
+        cd ../constant
+        ln -s ../../$2/constant $2
+        cd ../0
+        ln -s ../../$2/0 $2
+        cd ../..
+    fi
 }
 
 makeFsiResultsLinks ()
 {
-    cd $1
-    TIME_DIRS=`foamInfoExec -times | sed '1,/constant/d'`
-    echo "makeFsiResultsLinks for" $TIME_DIRS
-    cd ../$2
-    for T in $TIME_DIRS
-    do
-        ln -s ../$1/${T}/solid ${T}
-    done
-    cd ..
+    if [ "$WM_OSTYPE" = "MSWindows" ]
+    then
+        cd $1
+        TIME_DIRS=`foamInfoExec -times | sed '1,/constant/d'`
+        echo "makeFsiResultsLinks for" $TIME_DIRS
+        cd ../$2
+        for T in $TIME_DIRS
+        do
+            cp -r ../$1/${T}/solid ${T}
+        done
+        cd ..
+    else
+        cd $1
+        TIME_DIRS=`foamInfoExec -times | sed '1,/constant/d'`
+        echo "makeFsiResultsLinks for" $TIME_DIRS
+        cd ../$2
+        for T in $TIME_DIRS
+        do
+            ln -s ../$1/${T}/solid ${T}
+        done
+        cd ..
+    fi
 }
 
 #------------------------------------------------------------------------------

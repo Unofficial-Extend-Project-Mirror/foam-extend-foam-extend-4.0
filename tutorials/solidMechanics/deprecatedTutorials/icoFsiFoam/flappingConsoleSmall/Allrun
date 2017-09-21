@@ -7,17 +7,20 @@ application=icoFsiFoam
 
 cd fluid
 runApplication blockMesh
+cd ../solid
+runApplication blockMesh
+cd ../fluid
 cd constant
-ln -s ../../solid/constant solid
+cp -r ../../solid/constant solid
 cd ..
 cd 0
-ln -s ../../solid/0 solid
+cp -r ../../solid/0 solid
 cd ..
 cd ..
 
-cd solid
-runApplication blockMesh
-cd ..
+#cd solid
+#runApplication blockMesh
+#cd ..
 pwd
 
 makeFsiCaseLinks fluid solid

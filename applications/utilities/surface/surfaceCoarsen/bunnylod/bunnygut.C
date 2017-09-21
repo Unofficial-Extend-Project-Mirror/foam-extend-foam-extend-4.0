@@ -19,7 +19,7 @@
 #include <GL/gl.h>
 #pragma warning(disable : 4244)
 
-#include "vector.h"
+#include "vectorb.h"
 #include "font.h"
 #include "progmesh.h"
 #include "rabdata.h"
