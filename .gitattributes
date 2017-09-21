@@ -1,0 +1,3 @@
+
+*.H gitlab-language=cpp
+*.C gitlab-language=cpp
