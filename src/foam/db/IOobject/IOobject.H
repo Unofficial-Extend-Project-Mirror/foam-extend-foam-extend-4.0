@@ -229,9 +229,8 @@ public:
         }
 
 
-    // Destructor
-
-        virtual ~IOobject();
+    //- Destructor
+    virtual ~IOobject();
 
 
     // Member Functions
@@ -333,7 +332,7 @@ public:
             fileName path
             (
                 const word& instance,
-                const fileName& local = ""
+                const fileName& local = fileName::null
             ) const;
 
             //- Return complete path + object name
@@ -364,8 +363,8 @@ public:
             static inline Stream& writeBanner
             (
                 Stream& os,
-                bool noHint=false,
-                bool noCopyRight=false
+                bool noHint = false,
+                bool noCopyRight = false
             );
 
             //- Write the standard file section divider
