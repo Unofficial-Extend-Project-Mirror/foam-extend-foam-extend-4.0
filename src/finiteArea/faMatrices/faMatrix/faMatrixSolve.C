@@ -84,7 +84,7 @@ lduSolverPerformance faMatrix<Type>::solve(const dictionary& solverControls)
         // copy field and source
 
         scalarField psiCmpt = psi_.internalField().component(cmpt);
-        addBoundaryDiag(diag(), solvingComponent);
+        addBoundaryDiag(diag(), cmpt);
 
         scalarField sourceCmpt = source.component(cmpt);
 

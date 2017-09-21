@@ -92,8 +92,6 @@ class faMatrix
         mutable GeometricField<Type, faePatchField, edgeMesh>
             *faceFluxCorrectionPtr_;
 
-        direction solvingComponent;
-
 
     // Private member functions
 
