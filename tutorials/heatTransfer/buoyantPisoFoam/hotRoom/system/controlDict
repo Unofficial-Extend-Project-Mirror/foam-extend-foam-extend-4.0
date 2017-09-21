@@ -18,6 +18,7 @@ FoamFile
 libs
 (
     "libcompressibleRASModels.so"
+    "liblduSolvers.so"
 )
 
 application     buoyantPisoFoam;

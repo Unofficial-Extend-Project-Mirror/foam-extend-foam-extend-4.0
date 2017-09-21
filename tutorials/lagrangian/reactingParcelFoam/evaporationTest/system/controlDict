@@ -15,6 +15,11 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
+libs
+(
+    "liblduSolvers.so"
+);
+
 application     reactingParcelFoam;
 
 startFrom       startTime;

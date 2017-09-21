@@ -15,7 +15,12 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-libs            ("libcompressibleTurbulenceModel.so" "libcompressibleRASModels.so");
+libs
+(
+    "libcompressibleTurbulenceModel.so"
+    "libcompressibleRASModels.so"
+    "liblduSolvers.so"
+);
 
 application     snappyHexMesh;
 

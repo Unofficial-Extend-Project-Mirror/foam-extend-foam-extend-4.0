@@ -17,6 +17,7 @@ FoamFile
 libs
 (
     "libincompressibleRASModels.so"
+    "liblduSolvers.so"
 )
 
 startFrom                  latestTime;

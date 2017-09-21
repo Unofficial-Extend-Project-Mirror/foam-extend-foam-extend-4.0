@@ -6,11 +6,23 @@ if [ "$#" -ne 2 ]; then
   exit 1
 fi
 
-cd $1
-cd constant
-ln -s ../../$2/constant solid
-cd ../system
-ln -s ../../$2/system solid
-cd ../0
-ln -s ../../$2/0 solid
-cd ../..
+if [ "$WM_OSTYPE" = "MSWindows" ]
+then
+    cd $1
+    cd constant
+    cp -r ../../$2/constant solid
+    cd ../system
+    cp -r ../../$2/system solid
+    cd ../0
+    cp -r ../../$2/0 solid
+    cd ../..
+else
+    cd $1
+    cd constant
+    ln -s ../../$2/constant solid
+    cd ../system
+    ln -s ../../$2/system solid
+    cd ../0
+    ln -s ../../$2/0 solid
+    cd ../..
+fi

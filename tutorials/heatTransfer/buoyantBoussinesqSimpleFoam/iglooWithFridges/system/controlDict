@@ -15,7 +15,11 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-libs            ("libparMetisDecomp.so");
+libs
+(
+    "libparMetisDecomp.so"
+    "liblduSolvers.so"
+)
 
 application     buoyantBoussinesqSimpleFoam;
 

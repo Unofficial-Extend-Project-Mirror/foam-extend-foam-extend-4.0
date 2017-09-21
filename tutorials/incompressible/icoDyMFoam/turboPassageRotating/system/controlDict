@@ -17,6 +17,7 @@ FoamFile
 libs
 (
     "libscotchDecomp.so"
+    "liblduSolvers.so"
 )
 
 application icoDyMFoam;
