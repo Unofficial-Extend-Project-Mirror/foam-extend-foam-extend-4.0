@@ -376,7 +376,7 @@ Foam::scalar Foam::Particle<ParticleType>::trackToFace
                     );
                 }
                 else
-            {
+                {
                     p.hitPatch(patch, td);
                 }
             }

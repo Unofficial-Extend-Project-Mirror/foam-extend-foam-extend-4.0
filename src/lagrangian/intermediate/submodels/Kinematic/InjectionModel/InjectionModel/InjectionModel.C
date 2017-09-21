@@ -137,6 +137,8 @@ void Foam::InjectionModel<CloudType>::findCellAtPosition
 
     bool foundCell = false;
 
+    // Force creation of mesh.C() to avoid dead-lock in comms
+    owner_.mesh().C();
     cellI = owner_.mesh().findCell(position);
 
     if (cellI >= 0)
