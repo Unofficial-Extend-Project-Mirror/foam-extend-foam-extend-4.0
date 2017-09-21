@@ -62,8 +62,6 @@ int main(int argc, char *argv[])
 #       include "CourantNo.H"
         //#       include "setSurfaceStabilityDeltaT.H"
 
-#       include "readPISOControls.H"
-
         interface.moveMeshPointsForOldFreeSurfDisplacement();
 
         interface.updateDisplacementDirections();
