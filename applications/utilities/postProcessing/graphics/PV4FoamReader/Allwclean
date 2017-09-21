@@ -3,6 +3,6 @@ cd ${0%/*} || exit 1    # run from this directory
 set -x
 
 rm -rf PV4FoamReader/Make
-wclean libso vtkPV4Foam
+wclean vtkPV4Foam
 
 # ----------------------------------------------------------------- end-of-file
