@@ -102,7 +102,8 @@ Foam::Istream& Foam::regIOobject::readStream(const word& expectName)
         (
             expectName.size()
          && headerClassName() != expectName
-         && headerClassName() != "dictionary"
+         && headerClassName() != dictionary::typeName
+         && headerClassName() != IOdictionary::typeName
         )
         {
             FatalIOErrorIn("regIOobject::readStream(const word&)", *isPtr_)
