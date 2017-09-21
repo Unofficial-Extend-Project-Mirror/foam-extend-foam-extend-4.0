@@ -241,6 +241,8 @@ void edgeInterpolation::makeLPN() const
     const unallocLabelList& owner = mesh().owner();
     const unallocLabelList& neighbour = mesh().neighbour();
 
+    scalarField& lPNIn = lPN.internalField();
+
     forAll(owner, edgeI)
     {
         vector curSkewCorrVec = vector::zero;
@@ -266,7 +268,7 @@ void edgeInterpolation::makeLPN() const
               + curSkewCorrVec
             );
 
-        lPN.internalField()[edgeI] = (lPE + lEN);
+        lPNIn[edgeI] = (lPE + lEN);
     }
 
 
@@ -323,6 +325,8 @@ void edgeInterpolation::makeWeights() const
     const unallocLabelList& owner = mesh().owner();
     const unallocLabelList& neighbour = mesh().neighbour();
 
+    scalarField& weightingFactorsIn = weightingFactors.internalField();
+
     forAll(owner, edgeI)
     {
         vector curSkewCorrVec = vector::zero;
@@ -348,7 +352,7 @@ void edgeInterpolation::makeWeights() const
               + curSkewCorrVec
             );
 
-        weightingFactors.internalField()[edgeI] =
+        weightingFactorsIn[edgeI] =
             lEN
             /(
                 lPE
@@ -404,8 +408,7 @@ void edgeInterpolation::makeDeltaCoeffs() const
         dimless/dimLength
     );
     edgeScalarField& DeltaCoeffs = *differenceFactors_;
-    scalarField& dc = DeltaCoeffs.internalField();
-
+    scalarField& dcIn = DeltaCoeffs.internalField();
 
     // Set local references to mesh data
     const edgeVectorField& edgeCentres = mesh().edgeCentres();
@@ -467,10 +470,10 @@ void edgeInterpolation::makeDeltaCoeffs() const
         edgeNormal = lengths[edgeI]/mag(lengths[edgeI]);
 
         // Delta coefficient as per definition
-//         dc[edgeI] = 1.0/(lPN*(unitDelta & edgeNormal));
+//         dcIn[edgeI] = 1.0/(lPN*(unitDelta & edgeNormal));
 
         // Stabilised form for bad meshes.  HJ, 23/Jul/2009
-        dc[edgeI] = 1.0/max((lPN*(unitDelta & edgeNormal)), 0.05*lPN);
+        dcIn[edgeI] = 1.0/max((lPN*(unitDelta & edgeNormal)), 0.05*lPN);
     }
 
 
@@ -523,6 +526,8 @@ void edgeInterpolation::makeCorrectionVectors() const
 
     scalarField deltaCoeffs(owner.size());
 
+    vectorField& CorrVecsIn = CorrVecs.internalField();
+
     forAll(owner, edgeI)
     {
         // Edge normal - area normal
@@ -545,7 +550,7 @@ void edgeInterpolation::makeCorrectionVectors() const
         deltaCoeffs[edgeI] = 1.0/(unitDelta & edgeNormal);
 
         // Edge correction vector
-        CorrVecs.internalField()[edgeI] =
+        CorrVecsIn[edgeI] =
             edgeNormal
           - deltaCoeffs[edgeI]*unitDelta;
     }
