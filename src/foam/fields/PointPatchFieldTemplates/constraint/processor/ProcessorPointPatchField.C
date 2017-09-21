@@ -82,9 +82,9 @@ sendField
 {
     const Field<Type2>& f = tf();
 
-    // This needs complete rewrite:
+    //HJ: This needs complete rewrite:
     // - move communications into a patch
-    // - allow for various types of communication
+    // HR, 12/6/2017
     // HJ, 15/Apr/2009
 
     if (commsType == Pstream::blocking || commsType == Pstream::scheduled)
@@ -101,6 +101,7 @@ sendField
     {
         resizeBuf(receiveBuf_, f.size()*sizeof(Type));
 
+        outstandingRecvRequest_ = Pstream::nRequests();
         IPstream::read
         (
             commsType,
@@ -112,6 +113,7 @@ sendField
         resizeBuf(sendBuf_, f.byteSize());
         memcpy(sendBuf_.begin(), f.begin(), f.byteSize());
 
+        outstandingSendRequest_ = Pstream::nRequests();
         OPstream::write
         (
             commsType,
@@ -126,22 +128,6 @@ sendField
             << "Unsupported communications type " << commsType
             << exit(FatalError);
     }
-
-    // Not using non-blocking comms
-//     if (commsType == Pstream::nonBlocking)
-//     {
-//         FatalErrorIn("void ProcessorPointPatchField::sendField")
-//             << "Non-blocking comms not implemented"
-//             << abort(FatalError);
-//     }
-
-//     OPstream::write
-//     (
-//         commsType,
-//         procPatch_.neighbProcNo(),
-//         reinterpret_cast<const char*>(f.begin()),
-//         f.byteSize()
-//     );
 
     tf.clear();
 }
@@ -167,17 +153,35 @@ receivePointField
 {
     tmp<Field<Type2> > tf(new Field<Type2>(this->size()));
 
-    // Bugfix: need to read only if blocking on scheduled comms are used (see
-    // sendField function). VV, 2/Mar/2017.
-    if (commsType == Pstream::blocking || commsType == Pstream::scheduled)
+    if (Pstream::parRun())
     {
-        IPstream::read
-        (
-            commsType,
-            procPatch_.neighbProcNo(),
-            reinterpret_cast<char*>(tf().begin()),
-            tf().byteSize()
-        );
+        if (commsType == Pstream::nonBlocking)
+        {
+            // Receive into tf
+
+            if
+            (
+                outstandingRecvRequest_ >= 0
+             && outstandingRecvRequest_ < Pstream::nRequests()
+            )
+            {
+                Pstream::waitRequest(outstandingRecvRequest_);
+            }
+            outstandingSendRequest_ = -1;
+            outstandingRecvRequest_ = -1;
+
+            memcpy(tf().begin(), receiveBuf_.begin(), tf().byteSize());
+        }
+        else
+        {
+            IPstream::read
+            (
+                commsType,
+                procPatch_.neighbProcNo(),
+                reinterpret_cast<char*>(tf().begin()),
+                tf().byteSize()
+            );
+        }
     }
 
     return tf;
@@ -207,13 +211,36 @@ receiveEdgeField
         new Field<Type2>(procPatch_.localEdgeIndices().size())
     );
 
-    IPstream::read
-    (
-        commsType,
-        procPatch_.neighbProcNo(),
-        reinterpret_cast<char*>(tf().begin()),
-        tf().byteSize()
-    );
+    if (Pstream::parRun())
+    {
+        if (commsType == Pstream::nonBlocking)
+        {
+            // Receive into tf
+
+            if
+            (
+                outstandingRecvRequest_ >= 0
+             && outstandingRecvRequest_ < Pstream::nRequests()
+            )
+            {
+                Pstream::waitRequest(outstandingRecvRequest_);
+            }
+            outstandingSendRequest_ = -1;
+            outstandingRecvRequest_ = -1;
+
+            memcpy(tf().begin(), receiveBuf_.begin(), tf().byteSize());
+        }
+        else
+        {
+            IPstream::read
+            (
+                commsType,
+                procPatch_.neighbProcNo(),
+                reinterpret_cast<char*>(tf().begin()),
+                tf().byteSize()
+            );
+        }
+    }
 
     return tf;
 }
@@ -475,7 +502,7 @@ initEvaluate
     {
         if (this->isPointField())
         {
-            initAddFieldTempl(Pstream::blocking, this->internalField());
+            initAddFieldTempl(commsType, this->internalField());
         }
     }
 }
@@ -556,7 +583,7 @@ ProcessorPointPatchField
 <PatchField, Mesh, PointPatch, ProcessorPointPatch, MatrixType, Type>::
 initAddField() const
 {
-    initAddFieldTempl(Pstream::blocking, this->internalField());
+    initAddFieldTempl(Pstream::defaultComms(), this->internalField());
 }
 
 
@@ -575,7 +602,7 @@ ProcessorPointPatchField
 <PatchField, Mesh, PointPatch, ProcessorPointPatch, MatrixType, Type>::
 addField(Field<Type>& f) const
 {
-    addFieldTempl(Pstream::blocking, f);
+    addFieldTempl(Pstream::defaultComms(), f);
 }
 
 
@@ -641,7 +668,7 @@ ProcessorPointPatchField
 <PatchField, Mesh, PointPatch, ProcessorPointPatch, MatrixType, Type>::
 initAddDiag(const scalarField& d) const
 {
-    initAddFieldTempl(Pstream::blocking, d);
+    initAddFieldTempl(Pstream::defaultComms(), d);
 }
 
 
@@ -660,7 +687,7 @@ ProcessorPointPatchField
 <PatchField, Mesh, PointPatch, ProcessorPointPatch, MatrixType, Type>::
 initAddSource(const scalarField& s) const
 {
-    initAddFieldTempl(Pstream::blocking, s);
+    initAddFieldTempl(Pstream::defaultComms(), s);
 }
 
 
@@ -679,7 +706,7 @@ ProcessorPointPatchField
 <PatchField, Mesh, PointPatch, ProcessorPointPatch, MatrixType, Type>::
 addDiag(scalarField& d) const
 {
-    addFieldTempl(Pstream::blocking, d);
+    addFieldTempl(Pstream::defaultComms(), d);
 }
 
 
@@ -698,7 +725,7 @@ ProcessorPointPatchField
 <PatchField, Mesh, PointPatch, ProcessorPointPatch, MatrixType, Type>::
 addSource(scalarField& s) const
 {
-    addFieldTempl(Pstream::blocking, s);
+    addFieldTempl(Pstream::defaultComms(), s);
 }
 
 
