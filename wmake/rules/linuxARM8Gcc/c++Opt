@@ -1,0 +1,2 @@
+c++DBUG     =
+c++OPT      = -O3 -floop-optimize -falign-loops -falign-labels -falign-functions -falign-jumps -fprefetch-loop-arrays -march=native -mtune=native
