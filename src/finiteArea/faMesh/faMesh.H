@@ -82,6 +82,9 @@ class faMesh
         //- Boundary mesh
         faBoundaryMesh boundary_;
 
+        //- Edge index
+        labelList edgeIndex_;
+
 
         // Primitive mesh data
 
@@ -397,6 +400,11 @@ public:
                 return faceLabels_;
             }
 
+            //- Return faMesh edge indices
+            const labelList& edgeIndex() const
+            {
+                return edgeIndex_;
+            }
 
             //- Return parallel info
             const faGlobalMeshData& globalData() const;

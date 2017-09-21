@@ -202,23 +202,27 @@ WedgePointPatchField
     const Pstream::commsTypes commsType
 )
 {
-    // In order to ensure that the wedge patch is always flat, take the
-    // normal vector from the first point
-    const vector& nHat = this->patch().pointNormals()[0];
-
-    tmp<Field<Type> > tvalues =
-        transform(I - nHat*nHat, this->patchInternalField());
-    const Field<Type>& values = tvalues();
-
-    // Get internal field to insert values into
-    Field<Type>& iF = const_cast<Field<Type>&>(this->internalField());
-
-    // Get addressing
-    const labelList& meshPoints = this->patch().meshPoints();
-
-    forAll (meshPoints, pointI)
+    // ZT, 26/02/2017: Size of the patch could be zero in parallel runs
+    if (this->patch().meshPoints().size())
     {
-        iF[meshPoints[pointI]] = values[pointI];
+        // In order to ensure that the wedge patch is always flat, take the
+        // normal vector from the first point
+        const vector& nHat = this->patch().pointNormals()[0];
+
+        tmp<Field<Type> > tvalues =
+            transform(I - nHat*nHat, this->patchInternalField());
+        const Field<Type>& values = tvalues();
+
+        // Get internal field to insert values into
+        Field<Type>& iF = const_cast<Field<Type>&>(this->internalField());
+
+        // Get addressing
+        const labelList& meshPoints = this->patch().meshPoints();
+
+        forAll (meshPoints, pointI)
+        {
+            iF[meshPoints[pointI]] = values[pointI];
+        }
     }
 }
 
