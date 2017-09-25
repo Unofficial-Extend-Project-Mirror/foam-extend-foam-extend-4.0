@@ -139,7 +139,7 @@ Foam::label Foam::polyRef::addFace
 
     if ((nei == -1) || (own < nei))
     {
-        // Ordering ok.
+        // Ordering ok
         newFaceI = meshMod.setAction
         (
             polyAddFace
@@ -312,6 +312,7 @@ void Foam::polyRef::modFace
     {
         if ((nei == -1) || (own < nei))
         {
+            // Ordering ok
             meshMod.setAction
             (
                 polyModifyFace
@@ -330,6 +331,7 @@ void Foam::polyRef::modFace
         }
         else
         {
+            // Reverse owner/neighbour
             meshMod.setAction
             (
                 polyModifyFace
@@ -574,15 +576,16 @@ Foam::label Foam::polyRef::getAnchorCell
         // Pick up points of the cell
         const labelList cPoints(cellPoints(cellI));
 
-        Perr<< "cell:" << cellI << " points:" << endl;
+        Perr<< "cell: " << cellI << ", points: " << endl;
         forAll(cPoints, i)
         {
             label pointI = cPoints[i];
 
-            Perr<< "    " << pointI << " coord:" << mesh_.points()[pointI]
+            Perr<< "    " << pointI << " coord: " << mesh_.points()[pointI]
                 << nl;
         }
-        Perr<< "cell:" << cellI << " anchorPoints:" << cellAnchorPoints[cellI]
+
+        Perr<< "cell: " << cellI << " anchorPoints: " << cellAnchorPoints[cellI]
             << endl;
 
         FatalErrorIn("polyRef::getAnchorCell(..)")
@@ -1461,16 +1464,16 @@ void Foam::polyRef::walkFaceToMid
             // above.
             return;
         }
-        else if (pointLevel_[f[fp]] == cLevel+1)
+        else if (pointLevel_[f[fp]] == cLevel + 1)
         {
             // Mid level
             faceVerts.append(f[fp]);
 
             return;
         }
-        else if (pointLevel_[f[fp]] == cLevel+2)
+        else if (pointLevel_[f[fp]] == cLevel + 2)
         {
-            // Store and continue to cLevel+1.
+            // Store and continue to cLevel + 1.
             faceVerts.append(f[fp]);
         }
     }
@@ -1499,13 +1502,13 @@ void Foam::polyRef::walkFaceFromMid
             // anchor.
             break;
         }
-        else if (pointLevel_[f[fp]] == cLevel+1)
+        else if (pointLevel_[f[fp]] == cLevel + 1)
         {
             // Mid level
             faceVerts.append(f[fp]);
             break;
         }
-        else if (pointLevel_[f[fp]] == cLevel+2)
+        else if (pointLevel_[f[fp]] == cLevel + 2)
         {
             // Continue to cLevel+1.
         }
@@ -3590,7 +3593,8 @@ Foam::labelListList Foam::polyRef::setRefinement
 
     // Faces
     // ~~~~~
-    // 1. existing faces that get split (into four always)
+    // 1. existing faces that get split (into n faces where n is the number of
+    //    points or edges)
     // 2. existing faces that do not get split but only edges get split
     // 3. existing faces that do not get split but get new owner/neighbour
     // 4. new internal faces inside split cells.
@@ -3605,7 +3609,11 @@ Foam::labelListList Foam::polyRef::setRefinement
     // Get all affected faces.
     PackedList<1> affectedFace(mesh_.nFaces(), 0);
 
+    // Get mesh edges
+    const labelListList& meshEdgeFaces = mesh_.edgeFaces();
+
     {
+        // All faces of a cell that's being split
         forAll(cellMidPoint, cellI)
         {
             if (cellMidPoint[cellI] >= 0)
@@ -3619,6 +3627,7 @@ Foam::labelListList Foam::polyRef::setRefinement
             }
         }
 
+        // All faces that are being split
         forAll(faceMidPoint, faceI)
         {
             if (faceMidPoint[faceI] >= 0)
@@ -3627,11 +3636,12 @@ Foam::labelListList Foam::polyRef::setRefinement
             }
         }
 
+        // Both faces of an edge that are being split
         forAll(edgeMidPoint, edgeI)
         {
             if (edgeMidPoint[edgeI] >= 0)
             {
-                const labelList& eFaces = mesh_.edgeFaces()[edgeI];
+                const labelList& eFaces = meshEdgeFaces[edgeI];
 
                 forAll(eFaces, i)
                 {
@@ -3656,28 +3666,31 @@ Foam::labelListList Foam::polyRef::setRefinement
         {
             // Face needs to be split and hasn't yet been done in some way
             // (affectedFace - is impossible since this is first change but
-            //  just for completeness)
+            // just for completeness)
 
             const face& f = meshFaces[faceI];
 
-            // Has original faceI been used (three faces added, original gets
-            // modified)
+            // Has original faceI been used (n - 1 faces added, original gets
+            // modified). n is the number of points/edges of a face
             bool modifiedFace = false;
 
             label anchorLevel = faceAnchorLevel[faceI];
 
+            // New face always has four points/edges
             face newFace(4);
 
+            // Loop through all points of original face
             forAll(f, fp)
             {
-                label pointI = f[fp];
+                const label pointI = f[fp];
 
                 if (pointLevel_[pointI] <= anchorLevel)
                 {
                     // point is anchor. Start collecting face.
 
+                    // Create a dynamic storage for face vertices and append the
+                    // first (anchor) point
                     dynamicLabelList faceVerts(4);
-
                     faceVerts.append(pointI);
 
                     // Walk forward to mid point.
@@ -3685,6 +3698,7 @@ Foam::labelListList Foam::polyRef::setRefinement
                     // - if next is +1 it is midpoint
                     // - if next is +0 there has to be edgeMidPoint
 
+                    // Appends all points from this point to face mid point
                     walkFaceToMid
                     (
                         edgeMidPoint,
@@ -3694,8 +3708,10 @@ Foam::labelListList Foam::polyRef::setRefinement
                         faceVerts
                     );
 
+                    // Append face mid point
                     faceVerts.append(faceMidPoint[faceI]);
 
+                    // Append all points from face mid point to starting point
                     walkFaceFromMid
                     (
                         edgeMidPoint,
@@ -3705,12 +3721,15 @@ Foam::labelListList Foam::polyRef::setRefinement
                         faceVerts
                     );
 
-                    // Convert dynamiclist to face.
+                    // Transfer dynamic list to a face (ordinary list)
                     newFace.transfer(faceVerts.shrink());
                     faceVerts.clear();
 
-                    //Pout<< "Split face:" << faceI << " verts:" << f
-                    //    << " into quad:" << newFace << endl;
+                    if (debug)
+                    {
+                        Pout<< "Split face: " << faceI << ", verts: " << f
+                            << ", into quad: " << newFace << endl;
+                    }
 
                     // Get new owner/neighbour
                     label own, nei;
@@ -3728,6 +3747,10 @@ Foam::labelListList Foam::polyRef::setRefinement
 
                     if (debug)
                     {
+                        // Get mesh cell centres
+                        const vectorField& meshCellCentres =
+                            mesh_.cellCentres();
+
                         if (mesh_.isInternalFace(faceI))
                         {
                             label oldOwn = meshFaceOwner[faceI];
@@ -3738,8 +3761,8 @@ Foam::labelListList Foam::polyRef::setRefinement
                                 meshMod,
                                 oldOwn,
                                 faceI,
-                                mesh_.cellCentres()[oldOwn],
-                                mesh_.cellCentres()[oldNei],
+                                meshCellCentres[oldOwn],
+                                meshCellCentres[oldNei],
                                 newFace
                             );
                         }
@@ -3752,12 +3775,12 @@ Foam::labelListList Foam::polyRef::setRefinement
                                 meshMod,
                                 oldOwn,
                                 faceI,
-                                mesh_.cellCentres()[oldOwn],
+                                meshCellCentres[oldOwn],
                                 meshFaceCentres[faceI],
                                 newFace
                             );
                         }
-                    }
+                    } // End debug
 
 
                     if (!modifiedFace)
@@ -3770,8 +3793,8 @@ Foam::labelListList Foam::polyRef::setRefinement
                     {
                         addFace(meshMod, faceI, newFace, own, nei);
                     }
-                }
-            }
+                } // End point anchor chech
+            } // End for all points
 
             // Mark face as having been handled
             affectedFace.set(faceI, 0);
@@ -3795,7 +3818,7 @@ Foam::labelListList Foam::polyRef::setRefinement
         {
             // Split edge. Check that face not already handled above.
 
-            const labelList& eFaces = mesh_.edgeFaces()[edgeI];
+            const labelList& eFaces = meshEdgeFaces[edgeI];
 
             forAll(eFaces, i)
             {
