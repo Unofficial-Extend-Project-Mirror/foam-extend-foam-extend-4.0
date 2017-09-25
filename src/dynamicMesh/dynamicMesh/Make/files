@@ -52,6 +52,7 @@ motionSolver/motionSolver.C
 refinementData/refinementData.C
 refinementData/refinementDistanceData.C
 refinementData/refinementHistory.C
+refinementData/polyRefinementHistory.C
 
 directTopoChange/directTopoChange/directTopoChange.C
 

@@ -1746,7 +1746,7 @@ Foam::polyRef::polyRef(const polyMesh& mesh)
     (
         IOobject
         (
-            "refinementHistory",
+            "polyRefinementHistory",
             mesh_.facesInstance(),
             polyMesh::meshSubDir,
             mesh_,
@@ -1809,7 +1809,7 @@ Foam::polyRef::polyRef
     const polyMesh& mesh,
     const labelList& cellLevel,
     const labelList& pointLevel,
-    const refinementHistory& history
+    const polyRefinementHistory& history
 )
 :
     mesh_(mesh),
@@ -1844,7 +1844,7 @@ Foam::polyRef::polyRef
     (
         IOobject
         (
-            "refinementHistory",
+            "polyRefinementHistory",
             mesh_.facesInstance(),
             polyMesh::meshSubDir,
             mesh_,
@@ -1862,7 +1862,7 @@ Foam::polyRef::polyRef
         FatalErrorIn
         (
             "polyRef::polyRef(const polyMesh&, const labelList&"
-            ", const labelList&, const refinementHistory&)"
+            ", const labelList&, const polyRefinementHistory&)"
         )   << "History enabled but number of visible cells in it "
             << history_.visibleCells().size()
             << " is not equal to the number of cells in the mesh "
@@ -1878,7 +1878,7 @@ Foam::polyRef::polyRef
         FatalErrorIn
         (
             "polyRef::polyRef(const polyMesh&, const labelList&"
-            ", const labelList&, const refinementHistory&)"
+            ", const labelList&, const polyRefinementHistory&)"
         )   << "Incorrect cellLevel or pointLevel size." << endl
             << "Number of cells in mesh:" << mesh_.nCells()
             << " does not equal size of cellLevel:" << cellLevel_.size() << endl
@@ -1940,14 +1940,14 @@ Foam::polyRef::polyRef
     (
         IOobject
         (
-            "refinementHistory",
+            "polyRefinementHistory",
             mesh_.facesInstance(),
             polyMesh::meshSubDir,
             mesh_,
             IOobject::NO_READ,
             IOobject::AUTO_WRITE
         ),
-        List<refinementHistory::splitCell8>(0),
+        List<polyRefinementHistory::splitPolyCell>(0),
         labelList(0)
     ),
     faceRemover_(mesh_, GREAT),     // merge boundary faces wherever possible
@@ -3071,7 +3071,7 @@ Foam::labelListList Foam::polyRef::setRefinement
             )
         );
 
-        newPointLevel(cellMidPoint[cellI]) = cellLevel_[cellI]+1;
+        newPointLevel(cellMidPoint[cellI]) = cellLevel_[cellI] + 1;
     }
 
 

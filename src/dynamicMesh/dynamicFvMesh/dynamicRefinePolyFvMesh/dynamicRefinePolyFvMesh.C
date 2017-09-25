@@ -968,8 +968,11 @@ bool dynamicRefinePolyFvMesh::update()
         if ((nRefinementIterations_ % 10) == 0)
         {
             // Compact refinement history occassionally (how often?).
-            // Unrefinement causes holes in the refinementHistory.
-            const_cast<refinementHistory&>(meshCutter().history()).compact();
+            // Unrefinement causes holes in the polyRefinementHistory.
+            const_cast<polyRefinementHistory&>
+            (
+                meshCutter().history()
+            ).compact();
         }
         nRefinementIterations_++;
     }

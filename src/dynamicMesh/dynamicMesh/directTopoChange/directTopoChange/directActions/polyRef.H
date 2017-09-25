@@ -54,7 +54,7 @@ Author
 #include "DynamicList.H"
 #include "primitivePatch.H"
 #include "removeFaces.H"
-#include "refinementHistory.H"
+#include "polyRefinementHistory.H"
 #include "PackedList.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -90,7 +90,7 @@ class polyRef
         const scalar level0Edge_;
 
         //- Refinement history
-        refinementHistory history_;
+        polyRefinementHistory history_;
 
         //- Face remover engine
         removeFaces faceRemover_;
@@ -344,7 +344,7 @@ public:
             const polyMesh& mesh,
             const labelList& cellLevel,
             const labelList& pointLevel,
-            const refinementHistory& history
+            const polyRefinementHistory& history
         );
 
         //- Construct from mesh and refinement data.
@@ -370,7 +370,7 @@ public:
                 return pointLevel_;
             }
 
-            const refinementHistory& history() const
+            const polyRefinementHistory& history() const
             {
                 return history_;
             }
