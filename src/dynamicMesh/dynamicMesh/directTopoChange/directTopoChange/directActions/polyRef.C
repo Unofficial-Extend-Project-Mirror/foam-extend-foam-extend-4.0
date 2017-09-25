@@ -1118,6 +1118,8 @@ Foam::label Foam::polyRef::storeMidPointInfo
             anchors.otherVertex(anchorPointI)
         );
 
+        // Get mesh points
+        const pointField& meshPoints = mesh_.points();
 
         label own, nei;
         point ownPt, neiPt;
@@ -1127,8 +1129,8 @@ Foam::label Foam::polyRef::storeMidPointInfo
             own = anchorCell0;
             nei = anchorCell1;
 
-            ownPt = mesh_.points()[anchorPointI];
-            neiPt = mesh_.points()[anchors.otherVertex(anchorPointI)];
+            ownPt = meshPoints[anchorPointI];
+            neiPt = meshPoints[anchors.otherVertex(anchorPointI)];
 
         }
         else
@@ -1137,8 +1139,8 @@ Foam::label Foam::polyRef::storeMidPointInfo
             nei = anchorCell0;
             newFace = newFace.reverseFace();
 
-            ownPt = mesh_.points()[anchors.otherVertex(anchorPointI)];
-            neiPt = mesh_.points()[anchorPointI];
+            ownPt = meshPoints[anchors.otherVertex(anchorPointI)];
+            neiPt = meshPoints[anchorPointI];
         }
 
         if (debug)
@@ -1147,13 +1149,13 @@ Foam::label Foam::polyRef::storeMidPointInfo
 
             if (anchorCell0 < anchorCell1)
             {
-                ownPt = mesh_.points()[anchorPointI];
-                neiPt = mesh_.points()[anchors.otherVertex(anchorPointI)];
+                ownPt = meshPoints[anchorPointI];
+                neiPt = meshPoints[anchors.otherVertex(anchorPointI)];
             }
             else
             {
-                ownPt = mesh_.points()[anchors.otherVertex(anchorPointI)];
-                neiPt = mesh_.points()[anchorPointI];
+                ownPt = meshPoints[anchors.otherVertex(anchorPointI)];
+                neiPt = meshPoints[anchorPointI];
             }
 
             checkInternalOrientation
@@ -1184,7 +1186,7 @@ Foam::label Foam::polyRef::storeMidPointInfo
 }
 
 
-// Creates all the 12 internal faces for cellI.
+// Creates all internal faces for cellI.
 void Foam::polyRef::createInternalFaces
 (
     const labelListList& cellAnchorPoints,
@@ -1198,7 +1200,7 @@ void Foam::polyRef::createInternalFaces
     directTopoChange& meshMod
 ) const
 {
-    // Find in every face the cellLevel+1 points (from edge subdivision)
+    // Find in every face the cellLevel + 1 points (from edge subdivision)
     // and the anchor points.
 
     const cell& cFaces = mesh_.cells()[cellI];
@@ -1219,17 +1221,18 @@ void Foam::polyRef::createInternalFaces
         const face& f = mesh_.faces()[faceI];
         const labelList& fEdges = mesh_.faceEdges()[faceI];
 
-        // We are on the cellI side of face f. The face will have 1 or 4
-        // cLevel points and lots of higher numbered ones.
+        // We are on the cellI side of face f. The face will have 1 or n
+        // cLevel points (where n is the number of points/edges of a face)
+        // and lots of higher numbered ones.
 
         label faceMidPointI = -1;
 
-        label nAnchors = countAnchors(f, cLevel);
+        const label nAnchors = countAnchors(f, cLevel);
 
         if (nAnchors == 1)
         {
             // Only one anchor point. So the other side of the face has already
-            // been split using cLevel+1 and cLevel+2 points.
+            // been split using cLevel + 1 and cLevel + 2 points.
 
             // Find the one anchor.
             label anchorFp = -1;
@@ -1243,13 +1246,13 @@ void Foam::polyRef::createInternalFaces
                 }
             }
 
-            // Now the face mid point is the second cLevel+1 point
-            label edgeMid = findLevel(f, f.fcIndex(anchorFp), true, cLevel+1);
-            label faceMid = findLevel(f, f.fcIndex(edgeMid), true, cLevel+1);
+            // Now the face mid point is the second cLevel + 1 point
+            label edgeMid = findLevel(f, f.fcIndex(anchorFp), true, cLevel + 1);
+            label faceMid = findLevel(f, f.fcIndex(edgeMid), true, cLevel + 1);
 
             faceMidPointI = f[faceMid];
         }
-        else if (nAnchors == 4)
+        else if (nAnchors == f.size())
         {
             // There is no face middle yet but the face will be marked for
             // splitting.
@@ -1259,8 +1262,8 @@ void Foam::polyRef::createInternalFaces
         else
         {
             FatalErrorIn("createInternalFaces")
-                << "nAnchors:" << nAnchors
-                << " faceI:" << faceI
+                << "nAnchors: " << nAnchors
+                << " faceI: " << faceI
                 << abort(FatalError);
         }
 
@@ -1272,7 +1275,7 @@ void Foam::polyRef::createInternalFaces
 
         forAll(f, fp0)
         {
-            label point0 = f[fp0];
+            const label point0 = f[fp0];
 
             if (pointLevel_[point0] <= cLevel)
             {
@@ -1280,17 +1283,17 @@ void Foam::polyRef::createInternalFaces
 
                 // Walk forward
                 // ~~~~~~~~~~~~
-                // to cLevel+1 or edgeMidPoint of this level.
+                // to cLevel + 1 or edgeMidPoint of this level.
 
 
                 label edgeMidPointI = -1;
 
-                label fp1 = f.fcIndex(fp0);
+                const label fp1 = f.fcIndex(fp0);
 
                 if (pointLevel_[f[fp1]] <= cLevel)
                 {
                     // Anchor. Edge will be split.
-                    label edgeI = fEdges[fp0];
+                    const label edgeI = fEdges[fp0];
 
                     edgeMidPointI = edgeMidPoint[edgeI];
 
@@ -1316,8 +1319,8 @@ void Foam::polyRef::createInternalFaces
                 }
                 else
                 {
-                    // Search forward in face to clevel+1
-                    label edgeMid = findLevel(f, fp1, true, cLevel+1);
+                    // Search forward in face to clevel + 1
+                    const label edgeMid = findLevel(f, fp1, true, cLevel + 1);
 
                     edgeMidPointI = f[edgeMid];
                 }
@@ -1343,12 +1346,7 @@ void Foam::polyRef::createInternalFaces
 
                 if (newFaceI != -1)
                 {
-                    nFacesAdded++;
-
-                    if (nFacesAdded == 12)
-                    {
-                        break;
-                    }
+                    ++nFacesAdded;
                 }
 
 
@@ -1387,8 +1385,8 @@ void Foam::polyRef::createInternalFaces
                 }
                 else
                 {
-                    // Search back to clevel+1
-                    label edgeMid = findLevel(f, fpMin1, false, cLevel+1);
+                    // Search back to clevel + 1
+                    label edgeMid = findLevel(f, fpMin1, false, cLevel + 1);
 
                     edgeMidPointI = f[edgeMid];
                 }
@@ -1414,21 +1412,11 @@ void Foam::polyRef::createInternalFaces
 
                 if (newFaceI != -1)
                 {
-                    nFacesAdded++;
-
-                    if (nFacesAdded == 12)
-                    {
-                        break;
-                    }
+                    ++nFacesAdded;
                 }
-            }   // done anchor
-        }   // done face
-
-        if (nFacesAdded == 12)
-        {
-            break;
-        }
-    }
+            } // End for this anchor point
+        } // End for all face points
+    } // End for all cell faces
 }
 
 
@@ -3485,7 +3473,7 @@ Foam::labelListList Foam::polyRef::setRefinement
         {
             const labelList& pCells = mesh_.pointCells()[pointI];
 
-            // Loop through all cells sharing this poing
+            // Loop through all cells sharing this point
             forAll(pCells, pCellI)
             {
                 const label cellI = pCells[pCellI];
