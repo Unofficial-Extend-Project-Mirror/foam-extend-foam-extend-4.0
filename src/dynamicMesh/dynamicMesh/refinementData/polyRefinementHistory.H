@@ -66,12 +66,15 @@ Description
 SourceFiles
     polyRefinementHistory.C
 
+<<<<<<< 7cd6e2357adfdf4cf68d7a6c8b8131585a0c68b7
 Author
     Vuko Vukcevic, Wikki Ltd.  All rights reserved
 
 Notes
     Generalisation of refinementHistory for polyhedral cells
 
+=======
+>>>>>>> Created polyRefinementHistory
 \*---------------------------------------------------------------------------*/
 
 #ifndef polyRefinementHistory_H
