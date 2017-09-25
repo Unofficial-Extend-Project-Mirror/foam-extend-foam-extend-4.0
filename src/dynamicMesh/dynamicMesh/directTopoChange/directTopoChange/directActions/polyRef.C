@@ -653,7 +653,7 @@ Foam::label Foam::polyRef::findMinLevel(const labelList& f) const
 
     forAll(f, fp)
     {
-        label level = pointLevel_[f[fp]];
+        const label level = pointLevel_[f[fp]];
 
         if (level < minLevel)
         {
@@ -674,7 +674,7 @@ Foam::label Foam::polyRef::findMaxLevel(const labelList& f) const
 
     forAll(f, fp)
     {
-        label level = pointLevel_[f[fp]];
+        const label level = pointLevel_[f[fp]];
 
         if (level > maxLevel)
         {
@@ -3812,6 +3812,9 @@ Foam::labelListList Foam::polyRef::setRefinement
             << endl;
     }
 
+    // Get face edges
+    const labelListList& meshFaceEdges = mesh_.faceEdges();
+
     forAll(edgeMidPoint, edgeI)
     {
         if (edgeMidPoint[edgeI] >= 0)
@@ -3822,22 +3825,24 @@ Foam::labelListList Foam::polyRef::setRefinement
 
             forAll(eFaces, i)
             {
-                label faceI = eFaces[i];
+                const label faceI = eFaces[i];
 
                 if (faceMidPoint[faceI] < 0 && affectedFace.get(faceI) == 1)
                 {
-                    // Unsplit face. Add edge splits to face.
+                    // Unsplit face that hasn't been handled. Add edge splits to
+                    // face.
 
                     const face& f = meshFaces[faceI];
-                    const labelList& fEdges = mesh_.faceEdges()[faceI];
+                    const labelList& fEdges = meshFaceEdges[faceI];
 
                     dynamicLabelList newFaceVerts(f.size());
 
+                    // Append all original points and all edge mid points
                     forAll(f, fp)
                     {
                         newFaceVerts.append(f[fp]);
 
-                        label edgeI = fEdges[fp];
+                        const label edgeI = fEdges[fp];
 
                         if (edgeMidPoint[edgeI] >= 0)
                         {
@@ -3851,7 +3856,7 @@ Foam::labelListList Foam::polyRef::setRefinement
 
                     // The point with the lowest level should be an anchor
                     // point of the neighbouring cells.
-                    label anchorFp = findMinLevel(f);
+                    const label anchorFp = findMinLevel(f);
 
                     label own, nei;
                     getFaceNeighbours
@@ -3868,6 +3873,10 @@ Foam::labelListList Foam::polyRef::setRefinement
 
                     if (debug)
                     {
+                        // Get mesh cell centres
+                        const vectorField& meshCellCentres =
+                            mesh_.cellCentres();
+
                         if (mesh_.isInternalFace(faceI))
                         {
                             label oldOwn = meshFaceOwner[faceI];
@@ -3878,8 +3887,8 @@ Foam::labelListList Foam::polyRef::setRefinement
                                 meshMod,
                                 oldOwn,
                                 faceI,
-                                mesh_.cellCentres()[oldOwn],
-                                mesh_.cellCentres()[oldNei],
+                                meshCellCentres[oldOwn],
+                                meshCellCentres[oldNei],
                                 newFace
                             );
                         }
@@ -3892,21 +3901,21 @@ Foam::labelListList Foam::polyRef::setRefinement
                                 meshMod,
                                 oldOwn,
                                 faceI,
-                                mesh_.cellCentres()[oldOwn],
+                                meshCellCentres[oldOwn],
                                 meshFaceCentres[faceI],
                                 newFace
                             );
                         }
-                    }
+                    } // End debug
 
                     modFace(meshMod, faceI, newFace, own, nei);
 
                     // Mark face as having been handled
                     affectedFace.set(faceI, 0);
-                }
-            }
-        }
-    }
+                } // End if unsplit, unhandled face
+            } // End for all edge faces
+        } // End if edge has been cut
+    } // End for all edges
 
 
     // 3. faces that do not get split but whose owner/neighbour change
