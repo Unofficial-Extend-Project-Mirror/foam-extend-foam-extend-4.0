@@ -4852,25 +4852,11 @@ Foam::labelList Foam::polyRef::getSplitPoints() const
     labelList splitMaster(mesh_.nPoints(), -1);
     labelList splitMasterLevel(mesh_.nPoints(), 0);
 
-    // Unmark all with not 8 cells
-    const labelListList& pointCells = mesh_.pointCells();
-
-    forAll(pointCells, pointI)
-    {
-        const labelList& pCells = pointCells[pointI];
-
-        if (pCells.size() != 8)
-        {
-            splitMaster[pointI] = -2;
-        }
-    }
-
     // Unmark all with different master cells
     const labelList& visibleCells = history_.visibleCells();
 
     forAll(visibleCells, cellI)
     {
-        //const labelList& cPoints = mesh_.cellPoints()[cellI];
         const labelList cPoints(cellPoints(cellI));
 
         if (visibleCells[cellI] != -1 && history_.parentIndex(cellI) >= 0)
@@ -5375,18 +5361,6 @@ void Foam::polyRef::setUnrefinement
 
         const labelList& pCells = mesh_.pointCells()[pointI];
 
-        // Check
-        if (pCells.size() != 8)
-        {
-            FatalErrorIn
-            (
-                "polyRef::setUnrefinement(const labelList&, polyTopoChange&)"
-            )   << "splitPoint " << pointI
-                << " should have 8 cells using it. It has " << pCells
-                << abort(FatalError);
-        }
-
-
         // Check that the lowest numbered pCells is the master of the region
         // (should be guaranteed by directRemoveFaces)
         //if (debug)
@@ -5434,9 +5408,9 @@ void Foam::polyRef::setUnrefinement
         meshMod
     );
 
-    // Remove the 8 cells that originated from merging around the split point
+    // Remove the n cells that originated from merging around the split point
     // and adapt cell levels (not that pointLevels stay the same since points
-    // either get removed or stay at the same position.
+    // either get removed or stay at the same position).
     forAll(splitPointLabels, i)
     {
         label pointI = splitPointLabels[i];
