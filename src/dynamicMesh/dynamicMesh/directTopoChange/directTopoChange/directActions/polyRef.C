@@ -841,13 +841,17 @@ void Foam::polyRef::checkInternalOrientation
     const face& newFace
 )
 {
-    face compactFace(identity(newFace.size()));
-    pointField compactPoints(IndirectList<point>(meshMod.points(), newFace)());
+    const face compactFace(identity(newFace.size()));
+    const pointField compactPoints
+    (
+        IndirectList<point>(meshMod.points(), newFace)()
+    );
 
-    vector n(compactFace.normal(compactPoints));
+    const vector n(compactFace.normal(compactPoints));
 
-    vector dir(neiPt - ownPt);
+    const vector dir(neiPt - ownPt);
 
+    // Check orientation error
     if ((dir & n) < 0)
     {
         FatalErrorIn("checkInternalOrientation(..)")
@@ -859,20 +863,30 @@ void Foam::polyRef::checkInternalOrientation
             << abort(FatalError);
     }
 
-    vector fcToOwn(compactFace.centre(compactPoints) - ownPt);
+    // Note: report significant non-orthogonality error
+    const scalar severeNonOrthogonalityThreshold =
+      ::cos
+        (
+            primitiveMesh::nonOrthThreshold_()/180.0*mathematicalConstant::pi
+        );
 
-    scalar s = (fcToOwn&n) / (dir&n);
+    const vector fcToOwn(compactFace.centre(compactPoints) - ownPt);
 
-    if (s < 0.1 || s > 0.9)
+    // Note: normal vector already normalised
+    const scalar dDotN = (fcToOwn & n)/(mag(fcToOwn) + VSMALL);
+
+    if (dDotN > severeNonOrthogonalityThreshold)
     {
-        FatalErrorIn("checkInternalOrientation(..)")
+        WarningIn("checkInternalOrientation(..)")
+            << "Detected severely non-orthogonal face with non-orthogonality: "
+            << ::acos(dDotN)/mathematicalConstant::pi*180.0
             << "cell:" << cellI << " old face:" << faceI
             << " newFace:" << newFace << endl
             << " coords:" << compactPoints
             << " ownPt:" << ownPt
             << " neiPt:" << neiPt
-            << " s:" << s
-            << abort(FatalError);
+            << " dDotN:" << dDotN
+            << endl;
     }
 }
 
@@ -887,13 +901,17 @@ void Foam::polyRef::checkBoundaryOrientation
     const face& newFace
 )
 {
-    face compactFace(identity(newFace.size()));
-    pointField compactPoints(IndirectList<point>(meshMod.points(), newFace)());
+    const face compactFace(identity(newFace.size()));
+    const pointField compactPoints
+    (
+        IndirectList<point>(meshMod.points(), newFace)()
+    );
 
-    vector n(compactFace.normal(compactPoints));
+    const vector n(compactFace.normal(compactPoints));
 
-    vector dir(boundaryPt - ownPt);
+    const vector dir(boundaryPt - ownPt);
 
+    // Check orientation error
     if ((dir & n) < 0)
     {
         FatalErrorIn("checkBoundaryOrientation(..)")
@@ -905,21 +923,30 @@ void Foam::polyRef::checkBoundaryOrientation
             << abort(FatalError);
     }
 
-    vector fcToOwn(compactFace.centre(compactPoints) - ownPt);
+    // Note: report significant non-orthogonality error
+    const scalar severeNonOrthogonalityThreshold =
+      ::cos
+        (
+            primitiveMesh::nonOrthThreshold_()/180.0*mathematicalConstant::pi
+        );
 
-    scalar s = (fcToOwn&dir) / magSqr(dir);
+    const vector fcToOwn(compactFace.centre(compactPoints) - ownPt);
 
-    if (s < 0.7 || s > 1.3)
+    // Note: normal vector already normalised
+    const scalar dDotN = (fcToOwn & n)/(mag(fcToOwn) + VSMALL);
+
+    if (dDotN > severeNonOrthogonalityThreshold)
     {
         WarningIn("checkBoundaryOrientation(..)")
+            << "Detected severely non-orthogonal face with non-orthogonality: "
+            << ::acos(dDotN)/mathematicalConstant::pi*180.0
             << "cell:" << cellI << " old face:" << faceI
             << " newFace:" << newFace
             << " coords:" << compactPoints
             << " ownPt:" << ownPt
             << " boundaryPt:" << boundaryPt
-            << " s:" << s
+            << " dDotN:" << dDotN
             << endl;
-            //<< abort(FatalError);
     }
 }
 
