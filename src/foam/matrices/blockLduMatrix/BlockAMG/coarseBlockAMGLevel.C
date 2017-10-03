@@ -39,7 +39,6 @@ Author
 #include "BlockSolverPerformance.H"
 #include "BlockCGSolver.H"
 #include "BlockBiCGStabSolver.H"
-#include "BlockGMRESSolver.H"
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
@@ -202,7 +201,7 @@ void Foam::coarseBlockAMGLevel<Type>::solve
 {
     BlockSolverPerformance<Type> coarseSolverPerf
     (
-        BlockGMRESSolver<Type>::typeName,
+        BlockBiCGStabSolver<Type>::typeName,
         "topLevelCorr"
     );
 
@@ -221,15 +220,6 @@ void Foam::coarseBlockAMGLevel<Type>::solve
     // Create multiplication function object
     typename BlockCoeff<Type>::multiply mult;
 
-    CoeffField<Type> invDiag = inv(matrixPtr_->diag());
-    multiply(x, invDiag, b);
-
-    // Do not solve if the number of equations is smaller than 5
-    if (coarseningPtr_->minCoarseEqns() < 5)
-    {
-        return;
-    }
-
     // Switch of debug in top-level direct solve
     label oldDebug = blockLduMatrix::debug();
 
@@ -244,11 +234,11 @@ void Foam::coarseBlockAMGLevel<Type>::solve
 
     if (matrixPtr_->symmetric())
     {
+        // Note: top-level preconditioner is incorrect: FIX.  HJ, 3/Oct/2017
         topLevelDict.add("preconditioner", "Cholesky");
 
         coarseSolverPerf =
          BlockCGSolver<Type>
-        // BlockGMRESSolver<Type>
         (
             "topLevelCorr",
             matrixPtr_,
@@ -257,11 +247,10 @@ void Foam::coarseBlockAMGLevel<Type>::solve
     }
     else
     {
-        topLevelDict.add("preconditioner", "Cholesky");
+        topLevelDict.add("preconditioner", "ILUC0");
 
         coarseSolverPerf =
         BlockBiCGStabSolver<Type>
-        // BlockGMRESSolver<Type>
         (
             "topLevelCorr",
             matrixPtr_,
@@ -271,24 +260,6 @@ void Foam::coarseBlockAMGLevel<Type>::solve
 
     // Restore debug
     blockLduMatrix::debug = oldDebug;
-
-    // Escape cases of top-level solver divergence
-    if
-    (
-        coarseSolverPerf.nIterations() == maxIter
-     && (
-            coarseSolverPerf.finalResidual()
-         >= coarseSolverPerf.initialResidual()
-        )
-    )
-    {
-        // Top-level solution failed.  Attempt rescue
-        // HJ, 27/Jul/2013
-        multiply(x, invDiag, b);
-
-        // Print top level correction failure as info for user
-        coarseSolverPerf.print();
-    }
 
     if (blockLduMatrix::debug >= 3)
     {
