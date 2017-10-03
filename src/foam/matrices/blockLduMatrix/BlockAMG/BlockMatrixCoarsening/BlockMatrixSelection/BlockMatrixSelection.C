@@ -441,8 +441,6 @@ void Foam::BlockMatrixSelection<Type>::calcCoarsening()
     // Negative coefficient = opposite sign od diagonal (good)
 
 
-    // HJ: scaling not currently used.  HJ, 30/Jul/2017
-
     // Collect contributions from coupled boundaries
     const typename BlockLduInterfaceFieldPtrsList<Type>::Type& interfaceFields =
         matrix_.interfaces();
@@ -581,19 +579,6 @@ void Foam::BlockMatrixSelection<Type>::calcCoarsening()
                     // ROWS:
                     // Prolongation coefficient with scaling
                     pCoeff[rowCount] = -(num[i]/den)*strongCoeff[sip]/Dii[i];
-
-
-                    // FOR PROLONGATION ROW SUMMING INTO 1:
-                    // TU, new interpolation: we have to assume all the
-                    // equations are diagonally equal in order to get the row of
-                    // prolongation to sum into 1
-                    // num[i] is a sum of all negative (sign opposite to
-                    // diagonal) off-diagonal coefficients and SHOULD be equal
-                    // to the diagonal. That is why -num[i] and Dii[i] have
-                    // disappeared. Note: if there are positive connections in
-                    // the row, this is not valid.
-
-                    // pCoeff[rowCount] = strongCoeff[sip]/den;
 
                     pCol[rowCount] = rowLabel_[js];
                     rowCount++;
