@@ -143,6 +143,9 @@ public:
             return nLevels_;
         }
 
+        //- Return coarse matrix
+        BlockLduMatrix<Type>& coarseMatrix();
+
         //- Calculate residual
         void residual
         (
@@ -166,6 +169,9 @@ public:
             const label nPostSweeps,
             const bool scale
         ) const;
+
+        //- Re-initialise preconditioner after matrix coefficient update
+        void initMatrix();
 };
 
 

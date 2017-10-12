@@ -192,6 +192,9 @@ public:
             Field<Type>& x,
             const Field<Type>& coarseX
         ) const;
+
+        //- Update coarse matrix using same coefficients
+        virtual void updateMatrix(BlockLduMatrix<Type>& coarseMatrix) const;
 };
 
 

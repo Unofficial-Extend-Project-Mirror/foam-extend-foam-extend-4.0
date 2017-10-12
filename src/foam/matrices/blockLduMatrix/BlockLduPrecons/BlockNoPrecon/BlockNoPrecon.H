@@ -109,6 +109,10 @@ public:
         {
             precondition(xT, bT);
         }
+
+        //- Re-initialise preconditioner after matrix coefficient update
+        virtual void initMatrix()
+        {}
 };
 
 

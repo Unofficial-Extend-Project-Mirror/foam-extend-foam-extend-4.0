@@ -105,6 +105,13 @@ Foam::coarseBlockAMGLevel<Type>::~coarseBlockAMGLevel()
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 template<class Type>
+Foam::BlockLduMatrix<Type>& Foam::coarseBlockAMGLevel<Type>::matrix()
+{
+    return matrixPtr_();
+}
+
+
+template<class Type>
 Foam::Field<Type>& Foam::coarseBlockAMGLevel<Type>::x()
 {
     return x_;
@@ -330,6 +337,25 @@ Foam::coarseBlockAMGLevel<Type>::makeNextLevel() const
     {
         // Final level: cannot coarsen
         return autoPtr<BlockAMGLevel<Type> >();
+    }
+}
+
+
+template<class Type>
+void Foam::coarseBlockAMGLevel<Type>::initLevel
+(
+    autoPtr<Foam::BlockAMGLevel<Type> >& coarseLevelPtr
+)
+{
+    // Update matrix by repeating coarsening
+    
+    // Update smoother for new matrix
+    smootherPtr_->initMatrix();
+
+    // Update coarse matrix if it exists
+    if (coarseLevelPtr.valid())
+    {
+        coarseningPtr_->updateMatrix(coarseLevelPtr->matrix());
     }
 }
 

@@ -127,6 +127,12 @@ public:
                 x += xCorr_;
             }
         }
+
+        //- Re-initialise preconditioner after matrix coefficient update
+        virtual void initMatrix()
+        {
+            precon_.initMatrix();
+        }
 };
 
 

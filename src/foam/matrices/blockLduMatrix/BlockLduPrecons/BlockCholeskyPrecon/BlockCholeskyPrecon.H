@@ -25,7 +25,7 @@ Class
     BlockCholeskyPrecon
 
 Description
-    Incomplete Cholesky preconditioning with no fill-in.
+    Incomplete Cholesky preconditioning with no fill-in for block matrices.
 
 Author
     Hrvoje Jasak, Wikki Ltd.  All rights reserved.
@@ -215,6 +215,9 @@ public:
             Field<Type>& xT,
             const Field<Type>& bT
         ) const;
+
+        //- Re-initialise preconditioner after matrix coefficient update
+        virtual void initMatrix();
 };
 
 

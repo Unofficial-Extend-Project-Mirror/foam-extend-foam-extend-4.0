@@ -76,7 +76,10 @@ class BlockMatrixClustering
         autoPtr<BlockCoeffNorm<Type> > normPtr_;
 
         //- Child array: for each fine equation give a clustering index
-        labelField agglomIndex_;
+        labelList agglomIndex_;
+
+        //- Face-restriction addressing
+        labelList coeffRestrictAddr_;
 
         //- Group size
         label groupSize_;
@@ -116,7 +119,6 @@ class BlockMatrixClustering
         template<class DiagType, class ULType>
         void agglomerateCoeffs
         (
-            const labelList& coeffRestrictAddr,
             Field<DiagType>& activeCoarseDiag,
             Field<ULType>& activeCoarseUpper,
             const Field<ULType>& activeFineUpper,
@@ -127,7 +129,6 @@ class BlockMatrixClustering
         template<class DiagType, class ULType>
         void agglomerateCoeffs
         (
-            const labelList& coeffRestrictAddr,
             Field<DiagType>& activeCoarseDiag,
             Field<ULType>& activeCoarseUpper,
             const Field<ULType>& activeFineUpper,
@@ -197,6 +198,9 @@ public:
             Field<Type>& x,
             const Field<Type>& coarseX
         ) const;
+
+        //- Update coarse matrix using same coefficients
+        virtual void updateMatrix(BlockLduMatrix<Type>& coarseMatrix) const;
 };
 
 

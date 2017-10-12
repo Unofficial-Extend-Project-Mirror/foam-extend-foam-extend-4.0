@@ -111,6 +111,12 @@ public:
                 gs_.precondition(x, b);
             }
         }
+
+        //- Re-initialise preconditioner after matrix coefficient update
+        virtual void initMatrix()
+        {
+            gs_.initMatrix();
+        }
 };
 
 

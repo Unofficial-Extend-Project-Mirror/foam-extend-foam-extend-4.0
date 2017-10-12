@@ -989,8 +989,7 @@ Foam::BlockMatrixSelection<Type>::restrictMatrix() const
             nCoarseEqns_,
             coarseOwner,
             coarseNeighbour,
-            // true
-            false           // DO NOT REUSE STORAGE!  HJ, HERE
+            false           // DO NOT REUSE STORAGE!
         )
     );
 

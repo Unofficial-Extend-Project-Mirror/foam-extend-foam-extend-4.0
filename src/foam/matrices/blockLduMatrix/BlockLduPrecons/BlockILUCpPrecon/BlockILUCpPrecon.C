@@ -840,4 +840,17 @@ void Foam::BlockILUCpPrecon<Type>::preconditionT
 }
 
 
+template<class Type>
+void Foam::BlockILUCpPrecon<Type>::initMatrix()
+{
+    // Clear extended matrix
+    extBlockMatrix_.extendedLower().clear();
+    extBlockMatrix_.extendedLower().clear();
+
+    preconDiag_.clear();
+
+    this->calcFactorization();
+}
+
+
 // ************************************************************************* //

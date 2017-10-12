@@ -51,7 +51,7 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class BlockAMGSolver Declaration
+                      Class BlockAMGSolver Declaration
 \*---------------------------------------------------------------------------*/
 
 template<class Type>
@@ -93,10 +93,9 @@ public:
         );
 
 
-    // Destructor
-
-        virtual ~BlockAMGSolver()
-        {}
+    //- Destructor
+    virtual ~BlockAMGSolver()
+    {}
 
 
     // Member Functions

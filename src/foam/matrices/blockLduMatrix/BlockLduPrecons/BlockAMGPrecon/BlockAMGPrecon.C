@@ -141,4 +141,11 @@ void Foam::BlockAMGPrecon<Type>::precondition
 }
 
 
+template<class Type>
+void Foam::BlockAMGPrecon<Type>::initMatrix()
+{
+    amgPtr_->initMatrix();
+}
+
+
 // ************************************************************************* //

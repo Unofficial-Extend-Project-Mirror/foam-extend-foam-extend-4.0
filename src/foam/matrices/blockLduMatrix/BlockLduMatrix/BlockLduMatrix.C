@@ -67,7 +67,6 @@ Foam::BlockLduMatrix<Type>::BlockLduMatrix(const lduMesh& ldu)
         coupleUpper_.set(i, new CoeffField<Type>(addr.patchAddr(i).size()));
         coupleLower_.set(i, new CoeffField<Type>(addr.patchAddr(i).size()));
     }
-
 }
 
 

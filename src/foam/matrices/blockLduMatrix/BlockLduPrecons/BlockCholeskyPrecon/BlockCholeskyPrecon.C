@@ -914,7 +914,7 @@ Foam::BlockCholeskyPrecon<Type>::BlockCholeskyPrecon
     BlockLduPrecon<Type>(matrix),
     preconDiag_(matrix.diag())
 {
-    calcPreconDiag();
+    this->calcPreconDiag();
 }
 
 
@@ -1298,6 +1298,14 @@ void Foam::BlockCholeskyPrecon<Type>::preconditionT
             }
         }
     }
+}
+
+
+template<class Type>
+void Foam::BlockCholeskyPrecon<Type>::initMatrix()
+{
+    preconDiag_.clear();
+    this->calcPreconDiag();
 }
 
 
