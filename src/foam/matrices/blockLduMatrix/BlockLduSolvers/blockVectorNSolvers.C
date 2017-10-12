@@ -153,14 +153,8 @@ typedef BlockMatrixCoarsening<type > block##Type##MatrixCoarsening;           \
 defineNamedTemplateTypeNameAndDebug(block##Type##MatrixCoarsening, 0);        \
 defineTemplateRunTimeSelectionTable(block##Type##MatrixCoarsening, matrix);   \
                                                                               \
-typedef BlockMatrixAgglomeration<type > block##Type##MatrixAgglomeration;     \
-makeBlockMatrixCoarsening(block##Type##MatrixCoarsening, block##Type##MatrixAgglomeration); \
-                                                                              \
 typedef BlockMatrixClustering<type > block##Type##MatrixClustering;           \
 makeBlockMatrixCoarsening(block##Type##MatrixCoarsening, block##Type##MatrixClustering); \
-                                                                              \
-typedef BlockMatrixReorderedClustering<type > block##Type##MatrixReorderedClustering;           \
-makeBlockMatrixCoarsening(block##Type##MatrixCoarsening, block##Type##MatrixReorderedClustering); \
                                                                               \
 typedef BlockMatrixSelection<type > block##Type##MatrixSelection;             \
 makeBlockMatrixCoarsening(block##Type##MatrixCoarsening, block##Type##MatrixSelection); \

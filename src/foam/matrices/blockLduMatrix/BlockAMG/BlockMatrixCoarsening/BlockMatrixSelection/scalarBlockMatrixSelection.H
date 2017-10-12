@@ -49,18 +49,17 @@ namespace Foam
 // Disable restrict matrix
 // HJ: remove inline in refactoring
 template<>
-inline autoPtr<BlockAMGLevel<scalar> >
-BlockMatrixSelection<scalar>::restrictMatrix() const
+inline void BlockMatrixSelection<scalar>::updateMatrix
+(
+    BlockLduMatrix<scalar>& coarseMatrix
+) const
 {
     FatalErrorIn
     (
         "autoPtr<BlockAMGLevel<scalar> > "
-        "BlockMatrixSelection<Type>::restrictMatrix() const"
+        "BlockMatrixSelection<Type>::updateMatrix(...) const"
     )   << "Function not implemented for Type=scalar. " << endl
         << abort(FatalError);
-
-    // Dummy return to keep compiler happy
-    return autoPtr<BlockAMGLevel<scalar> >(NULL);
 }
 
 

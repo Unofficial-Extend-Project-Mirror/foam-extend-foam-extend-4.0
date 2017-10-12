@@ -1304,7 +1304,8 @@ void Foam::BlockCholeskyPrecon<Type>::preconditionT
 template<class Type>
 void Foam::BlockCholeskyPrecon<Type>::initMatrix()
 {
-    preconDiag_.clear();
+    preconDiag_ = this->matrix_.diag();
+
     this->calcPreconDiag();
 }
 

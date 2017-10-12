@@ -217,12 +217,12 @@ void Foam::BlockAMGCycle<Type>::fixedCycle
 template<class Type>
 void Foam::BlockAMGCycle<Type>::initMatrix()
 {
-    // Update current level
-    levelPtr_->initLevel(coarseLevelPtr_);
-
     // If present, update coarse levels recursively
     if (coarseLevelPtr_)
     {
+        // Update current level
+        levelPtr_->initLevel(coarseLevelPtr_->levelPtr_);
+
         coarseLevelPtr_->initMatrix();
     }
 }

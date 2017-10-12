@@ -847,7 +847,7 @@ void Foam::BlockILUCpPrecon<Type>::initMatrix()
     extBlockMatrix_.extendedLower().clear();
     extBlockMatrix_.extendedLower().clear();
 
-    preconDiag_.clear();
+    preconDiag_ = this->matrix_.diag();
 
     this->calcFactorization();
 }

@@ -57,18 +57,18 @@ namespace Foam
 
 // Disable restrict matrix: no square type
 template<>
-inline autoPtr<BlockAMGLevel<scalar> >
-BlockMatrixClustering<scalar>::restrictMatrix() const
+inline void
+BlockMatrixClustering<scalar>::updateMatrix
+(
+    BlockLduMatrix<scalar>& coarseMatrix
+) const
 {
     FatalErrorIn
     (
         "autoPtr<BlockAMGLevel<scalar> > "
-        "BlockMatrixClustering<Type>::restrictMatrix() const"
+        "BlockMatrixClustering<Type>::updateMatrix(...) const"
     )   << "Function not implemented for Type=scalar. " << endl
         << abort(FatalError);
-
-    // Dummy return to keep compiler happy
-    return autoPtr<BlockAMGLevel<scalar> >(NULL);
 }
 
 

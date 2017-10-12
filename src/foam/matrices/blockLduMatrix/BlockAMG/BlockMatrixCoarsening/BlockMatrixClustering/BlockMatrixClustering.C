@@ -495,163 +495,6 @@ void Foam::BlockMatrixClustering<Type>::calcClustering()
 
     reduce(coarsen_, andOp<bool>());
 
-    // If the matrix will be coarsened, create off-diagonal agglomeration
-        // Does the matrix have solo equations
-    bool soloEqns = nSolo_ > 0;
-
-    // Storage for block neighbours and coefficients
-
-    // Guess initial maximum number of neighbours in block
-    label maxNnbrs = 10;
-
-    // Number of neighbours per block
-    labelList blockNnbrs(nCoarseEqns_, 0);
-
-    // Setup initial packed storage for neighbours and coefficients
-    labelList blockNbrsData(maxNnbrs*nCoarseEqns_);
-
-    const label nFineCoeffs = upperAddr.size();
-
-    // Create face-restriction addressing
-    coeffRestrictAddr_.setSize(nFineCoeffs);
-
-    // Initial neighbour array (not in upper-triangle order)
-    labelList initCoarseNeighb(nFineCoeffs);
-
-    // Counter for coarse coeffs
-    label nCoarseCoeffs = 0;
-
-    // Loop through all fine coeffs
-    forAll (upperAddr, fineCoeffi)
-    {
-        label rmUpperAddr = agglomIndex_[upperAddr[fineCoeffi]];
-        label rmLowerAddr = agglomIndex_[lowerAddr[fineCoeffi]];
-
-        // If the coefficient touches block zero and solo equations are
-        // present, skip it
-        if (soloEqns && (rmUpperAddr == 0 || rmLowerAddr == 0))
-        {
-            continue;
-        }
-
-        if (rmUpperAddr == rmLowerAddr)
-        {
-            // For each fine coeff inside of a coarse cluster keep the address
-            // of the cluster corresponding to the coeff in the
-            // coeffRestrictAddr_ as a negative index
-            coeffRestrictAddr_[fineCoeffi] = -(rmUpperAddr + 1);
-        }
-        else
-        {
-            // This coeff is a part of a coarse coeff
-
-            label cOwn = rmUpperAddr;
-            label cNei = rmLowerAddr;
-
-            // Get coarse owner and neighbour
-            if (rmUpperAddr > rmLowerAddr)
-            {
-                cOwn = rmLowerAddr;
-                cNei = rmUpperAddr;
-            }
-
-            // Check the neighbour to see if this coeff has already been found
-            bool nbrFound = false;
-            label& ccnCoeffs = blockNnbrs[cOwn];
-
-            for (int i = 0; i < ccnCoeffs; i++)
-            {
-                if (initCoarseNeighb[blockNbrsData[maxNnbrs*cOwn + i]] == cNei)
-                {
-                    nbrFound = true;
-                    coeffRestrictAddr_[fineCoeffi] =
-                        blockNbrsData[maxNnbrs*cOwn + i];
-                    break;
-                }
-            }
-
-            if (!nbrFound)
-            {
-                if (ccnCoeffs >= maxNnbrs)
-                {
-                    // Double the size of list and copy data
-                    label oldMaxNnbrs = maxNnbrs;
-                    maxNnbrs *= 2;
-
-                    // Resize and copy list
-                    const labelList oldBlockNbrsData = blockNbrsData;
-                    blockNbrsData.setSize(maxNnbrs*nCoarseEqns_);
-
-                    forAll (blockNnbrs, i)
-                    {
-                        for (int j = 0; j < blockNnbrs[i]; j++)
-                        {
-                            blockNbrsData[maxNnbrs*i + j] =
-                                oldBlockNbrsData[oldMaxNnbrs*i + j];
-                        }
-                    }
-                }
-
-                blockNbrsData[maxNnbrs*cOwn + ccnCoeffs] = nCoarseCoeffs;
-                initCoarseNeighb[nCoarseCoeffs] = cNei;
-                coeffRestrictAddr_[fineCoeffi] = nCoarseCoeffs;
-                ccnCoeffs++;
-
-                // New coarse coeff created
-                nCoarseCoeffs++;
-            }
-        }
-    } // End for all fine coeffs
-
-
-    // Renumber into upper-triangular order
-
-    // All coarse owner-neighbour storage
-    labelList coarseOwner(nCoarseCoeffs);
-    labelList coarseNeighbour(nCoarseCoeffs);
-    labelList coarseCoeffMap(nCoarseCoeffs);
-
-    label coarseCoeffi = 0;
-
-    forAll (blockNnbrs, cci)
-    {
-        label* cCoeffs = &blockNbrsData[maxNnbrs*cci];
-        label ccnCoeffs = blockNnbrs[cci];
-
-        for (int i = 0; i < ccnCoeffs; i++)
-        {
-            coarseOwner[coarseCoeffi] = cci;
-            coarseNeighbour[coarseCoeffi] = initCoarseNeighb[cCoeffs[i]];
-            coarseCoeffMap[cCoeffs[i]] = coarseCoeffi;
-            coarseCoeffi++;
-        }
-    }
-
-    forAll(coeffRestrictAddr_, fineCoeffi)
-    {
-        label rmUpperAddr = agglomIndex_[upperAddr[fineCoeffi]];
-        label rmLowerAddr = agglomIndex_[lowerAddr[fineCoeffi]];
-
-        // If the coefficient touches block zero and solo equations are
-        // present, skip it
-        if (soloEqns && (rmUpperAddr == 0 || rmLowerAddr == 0))
-        {
-            continue;
-        }
-
-        if (coeffRestrictAddr_[fineCoeffi] >= 0)
-        {
-            coeffRestrictAddr_[fineCoeffi] =
-                coarseCoeffMap[coeffRestrictAddr_[fineCoeffi]];
-        }
-    }
-
-    // Clear the temporary storage for the coarse matrix data
-    blockNnbrs.setSize(0);
-    blockNbrsData.setSize(0);
-    initCoarseNeighb.setSize(0);
-    coarseCoeffMap.setSize(0);
-  
     if (blockLduMatrix::debug >= 3)
     {
         // Count singleton clusters
@@ -1017,6 +860,162 @@ Foam::BlockMatrixClustering<Type>::restrictMatrix() const
     }
 #   endif
 
+    // If the matrix will be coarsened, create off-diagonal agglomeration
+        // Does the matrix have solo equations
+    bool soloEqns = nSolo_ > 0;
+
+    // Storage for block neighbours and coefficients
+
+    // Guess initial maximum number of neighbours in block
+    label maxNnbrs = 10;
+
+    // Number of neighbours per block
+    labelList blockNnbrs(nCoarseEqns_, 0);
+
+    // Setup initial packed storage for neighbours and coefficients
+    labelList blockNbrsData(maxNnbrs*nCoarseEqns_);
+
+    const label nFineCoeffs = upperAddr.size();
+
+    // Create face-restriction addressing
+    coeffRestrictAddr_.setSize(nFineCoeffs);
+
+    // Initial neighbour array (not in upper-triangle order)
+    labelList initCoarseNeighb(nFineCoeffs);
+
+    // Counter for coarse coeffs
+    label nCoarseCoeffs = 0;
+
+    // Loop through all fine coeffs
+    forAll (upperAddr, fineCoeffi)
+    {
+        label rmUpperAddr = agglomIndex_[upperAddr[fineCoeffi]];
+        label rmLowerAddr = agglomIndex_[lowerAddr[fineCoeffi]];
+
+        // If the coefficient touches block zero and solo equations are
+        // present, skip it
+        if (soloEqns && (rmUpperAddr == 0 || rmLowerAddr == 0))
+        {
+            continue;
+        }
+
+        if (rmUpperAddr == rmLowerAddr)
+        {
+            // For each fine coeff inside of a coarse cluster keep the address
+            // of the cluster corresponding to the coeff in the
+            // coeffRestrictAddr_ as a negative index
+            coeffRestrictAddr_[fineCoeffi] = -(rmUpperAddr + 1);
+        }
+        else
+        {
+            // This coeff is a part of a coarse coeff
+
+            label cOwn = rmUpperAddr;
+            label cNei = rmLowerAddr;
+
+            // Get coarse owner and neighbour
+            if (rmUpperAddr > rmLowerAddr)
+            {
+                cOwn = rmLowerAddr;
+                cNei = rmUpperAddr;
+            }
+
+            // Check the neighbour to see if this coeff has already been found
+            bool nbrFound = false;
+            label& ccnCoeffs = blockNnbrs[cOwn];
+
+            for (int i = 0; i < ccnCoeffs; i++)
+            {
+                if (initCoarseNeighb[blockNbrsData[maxNnbrs*cOwn + i]] == cNei)
+                {
+                    nbrFound = true;
+                    coeffRestrictAddr_[fineCoeffi] =
+                        blockNbrsData[maxNnbrs*cOwn + i];
+                    break;
+                }
+            }
+
+            if (!nbrFound)
+            {
+                if (ccnCoeffs >= maxNnbrs)
+                {
+                    // Double the size of list and copy data
+                    label oldMaxNnbrs = maxNnbrs;
+                    maxNnbrs *= 2;
+
+                    // Resize and copy list
+                    const labelList oldBlockNbrsData = blockNbrsData;
+                    blockNbrsData.setSize(maxNnbrs*nCoarseEqns_);
+
+                    forAll (blockNnbrs, i)
+                    {
+                        for (int j = 0; j < blockNnbrs[i]; j++)
+                        {
+                            blockNbrsData[maxNnbrs*i + j] =
+                                oldBlockNbrsData[oldMaxNnbrs*i + j];
+                        }
+                    }
+                }
+
+                blockNbrsData[maxNnbrs*cOwn + ccnCoeffs] = nCoarseCoeffs;
+                initCoarseNeighb[nCoarseCoeffs] = cNei;
+                coeffRestrictAddr_[fineCoeffi] = nCoarseCoeffs;
+                ccnCoeffs++;
+
+                // New coarse coeff created
+                nCoarseCoeffs++;
+            }
+        }
+    } // End for all fine coeffs
+
+
+    // Renumber into upper-triangular order
+
+    // All coarse owner-neighbour storage
+    labelList coarseOwner(nCoarseCoeffs);
+    labelList coarseNeighbour(nCoarseCoeffs);
+    labelList coarseCoeffMap(nCoarseCoeffs);
+
+    label coarseCoeffi = 0;
+
+    forAll (blockNnbrs, cci)
+    {
+        label* cCoeffs = &blockNbrsData[maxNnbrs*cci];
+        label ccnCoeffs = blockNnbrs[cci];
+
+        for (int i = 0; i < ccnCoeffs; i++)
+        {
+            coarseOwner[coarseCoeffi] = cci;
+            coarseNeighbour[coarseCoeffi] = initCoarseNeighb[cCoeffs[i]];
+            coarseCoeffMap[cCoeffs[i]] = coarseCoeffi;
+            coarseCoeffi++;
+        }
+    }
+
+    forAll(coeffRestrictAddr_, fineCoeffi)
+    {
+        label rmUpperAddr = agglomIndex_[upperAddr[fineCoeffi]];
+        label rmLowerAddr = agglomIndex_[lowerAddr[fineCoeffi]];
+
+        // If the coefficient touches block zero and solo equations are
+        // present, skip it
+        if (soloEqns && (rmUpperAddr == 0 || rmLowerAddr == 0))
+        {
+            continue;
+        }
+
+        if (coeffRestrictAddr_[fineCoeffi] >= 0)
+        {
+            coeffRestrictAddr_[fineCoeffi] =
+                coarseCoeffMap[coeffRestrictAddr_[fineCoeffi]];
+        }
+    }
+
+    // Clear the temporary storage for the coarse matrix data
+    blockNnbrs.setSize(0);
+    blockNbrsData.setSize(0);
+    initCoarseNeighb.setSize(0);
+    coarseCoeffMap.setSize(0);
     // Create coarse-level coupled interfaces
 
     // Create coarse interfaces, addressing and coefficients

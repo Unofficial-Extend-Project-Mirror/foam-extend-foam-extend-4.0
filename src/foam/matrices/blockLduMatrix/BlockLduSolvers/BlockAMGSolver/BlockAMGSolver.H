@@ -106,6 +106,13 @@ public:
             Field<Type>& x,
             const Field<Type>& b
         );
+
+        //- Re-initialise solver after matrix coefficient update
+        virtual void initMatrix()
+        {
+            Info<< "REINITIALISE AMG" << endl;
+            amg_.initMatrix();
+        }
 };
 
 

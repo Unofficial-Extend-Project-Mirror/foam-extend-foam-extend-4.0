@@ -79,7 +79,7 @@ class BlockMatrixClustering
         labelList agglomIndex_;
 
         //- Face-restriction addressing
-        labelList coeffRestrictAddr_;
+        mutable labelList coeffRestrictAddr_;
 
         //- Group size
         label groupSize_;
