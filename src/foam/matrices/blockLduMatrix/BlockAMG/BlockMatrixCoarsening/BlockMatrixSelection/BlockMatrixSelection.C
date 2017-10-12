@@ -727,7 +727,6 @@ Foam::BlockMatrixSelection<Type>::restrictMatrix() const
     }
 
     // Get references to restriction and prolongation matrix
-
     const crMatrix& R = *Rptr_;
     const crMatrix& P = *Pptr_;
 
@@ -989,8 +988,7 @@ Foam::BlockMatrixSelection<Type>::restrictMatrix() const
             nCoarseEqns_,
             coarseOwner,
             coarseNeighbour,
-            // true
-            false           // DO NOT REUSE STORAGE!  HJ, HERE
+            false           // DO NOT REUSE STORAGE!
         )
     );
 
@@ -1110,11 +1108,76 @@ Foam::BlockMatrixSelection<Type>::restrictMatrix() const
     );
     BlockLduMatrix<Type>& coarseMatrix = coarseMatrixPtr();
 
+    // Build matrix coefficients
+    this->updateMatrix(coarseMatrix);
+
+    // Create and return BlockAMGLevel
+    return autoPtr<BlockAMGLevel<Type> >
+    (
+        new coarseBlockAMGLevel<Type>
+        (
+            coarseAddrPtr,
+            coarseMatrixPtr,
+            this->dict(),
+            this->type(),
+            0,                      // Group size is not used in SAMG
+            this->minCoarseEqns()
+        )
+    );
+}
+
+
+template<class Type>
+void Foam::BlockMatrixSelection<Type>::updateMatrix
+(
+    BlockLduMatrix<Type>& coarseMatrix
+) const
+{
+    // Get references to restriction and prolongation matrix
+    const crMatrix& R = *Rptr_;
+    const crMatrix& P = *Pptr_;
+
+    // Get connectivity
+    const crAddressing& crR = R.crAddr();
+    const crAddressing& crP = P.crAddr();
+
+    // Restriction addressing
+    const labelList& rowR = crR.rowStart();
+    const labelList& colR = crR.column();
+
+    // Matrix A addressing
+    const unallocLabelList& rowA = matrix_.lduAddr().ownerStartAddr();
+    const unallocLabelList& upperAddr = matrix_.lduAddr().upperAddr();
+
+    // Get interfaces from fine matrix
+    const typename BlockLduInterfaceFieldPtrsList<Type>::Type&
+        interfaceFields = matrix_.interfaces();
+
+    // Addressing for lower triangle loop
+    const unallocLabelList& lowerAddr = matrix_.lduAddr().lowerAddr();
+    const unallocLabelList& losortAddr = matrix_.lduAddr().losortAddr();
+    const unallocLabelList& losortStart = matrix_.lduAddr().losortStartAddr();
+
+    // Prolongation addressing
+    const labelList& rowP = crP.rowStart();
+    const labelList& colP = crP.column();
+
+    // In order to avoid searching for the off-diagonal coefficient,
+    // a mark array is used for each row's assembly.
+    // Mark records the index of the off-diagonal coefficient in the row
+    // for each neighbour entry.  It is reset after completing each row of the
+    // coarse matrix.
+    // HJ, 28/Apr/2017
+    labelList coeffLabel(nCoarseEqns_, -1);
+
     typedef CoeffField<Type> TypeCoeffField;
 
     TypeCoeffField& coarseUpper = coarseMatrix.upper();
     TypeCoeffField& coarseDiag = coarseMatrix.diag();
     TypeCoeffField& coarseLower = coarseMatrix.lower();
+
+    // Get the coarse interfaces and coefficients
+    lduInterfacePtrsList coarseInterfaces = coarseMatrix.mesh().interfaces();
 
 //------------------------------------------------------------------------------
 //                           GET COEFFICIENTS
@@ -1413,20 +1476,6 @@ Foam::BlockMatrixSelection<Type>::restrictMatrix() const
         )   << "Matrix diagonal of scalar or linear type not implemented"
             << abort(FatalError);
     }
-
-    // Create and return BlockAMGLevel
-    return autoPtr<BlockAMGLevel<Type> >
-    (
-        new coarseBlockAMGLevel<Type>
-        (
-            coarseAddrPtr,
-            coarseMatrixPtr,
-            this->dict(),
-            this->type(),
-            0,                      // Group size is not used in SAMG
-            this->minCoarseEqns()
-        )
-    );
 }
 
 

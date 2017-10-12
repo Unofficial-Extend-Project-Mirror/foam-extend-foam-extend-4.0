@@ -49,24 +49,21 @@ namespace Foam
                    Class BlockMatrixClustering Declaration
 \*---------------------------------------------------------------------------*/
 
-// Disable restrict matrix: no square type
+// Disable updateMatrix matrix: no square type
 template<>
-inline autoPtr<BlockAMGLevel<tensor> >
-BlockMatrixClustering<tensor>::restrictMatrix
-() const
+inline void
+BlockMatrixClustering<tensor>::updateMatrix
+(
+    BlockLduMatrix<tensor>& coarseMatrix
+) const
 {
     FatalErrorIn
     (
-        "autoPtr<BlockAMGLevel<tensor> > "
-        "BlockMatrixClustering<Type>::"
-        "restrictMatrix() const"
+        "void BlockMatrixClustering<Type>::"
+        "updateMatrix(...) const"
     )   << "Function not implemented for Type=tensor. " << endl
         << abort(FatalError);
-
-    // Dummy return to keep compiler happy
-    return autoPtr<BlockAMGLevel<tensor> >(NULL);
 }
-
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

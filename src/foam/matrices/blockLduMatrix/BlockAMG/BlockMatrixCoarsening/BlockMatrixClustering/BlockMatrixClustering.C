@@ -555,10 +555,8 @@ void Foam::BlockMatrixClustering<Type>::restrictDiag
         squareTypeField& activeCoarseCoeff = coarseCoeff.asSquare();
         const squareTypeField& activeCoeff = Coeff.asSquare();
 
-        forAll (coarseCoeff, i)
-        {
-            activeCoarseCoeff[i] = pTraits<squareType>::zero;
-        }
+        // Reset coefficients to zero
+        activeCoarseCoeff = pTraits<squareType>::zero;
 
         forAll (Coeff, i)
         {
@@ -577,10 +575,8 @@ void Foam::BlockMatrixClustering<Type>::restrictDiag
         linearTypeField& activeCoarseCoeff = coarseCoeff.asLinear();
         const linearTypeField& activeCoeff = Coeff.asLinear();
 
-        forAll (coarseCoeff, i)
-        {
-            activeCoarseCoeff[i] = pTraits<linearType>::zero;
-        }
+        // Reset coefficients to zero
+        activeCoarseCoeff = pTraits<linearType>::zero;
 
         forAll (Coeff, i)
         {
@@ -599,10 +595,8 @@ void Foam::BlockMatrixClustering<Type>::restrictDiag
         scalarTypeField& activeCoarseCoeff = coarseCoeff.asScalar();
         const scalarTypeField& activeCoeff = Coeff.asScalar();
 
-        forAll (coarseCoeff, i)
-        {
-            activeCoarseCoeff[i] = pTraits<scalarType>::zero;
-        }
+        // Reset coefficients to zero
+        activeCoarseCoeff = pTraits<scalarType>::zero;
 
         forAll (Coeff, i)
         {
@@ -624,7 +618,6 @@ template<class Type>
 template<class DiagType, class ULType>
 void Foam::BlockMatrixClustering<Type>::agglomerateCoeffs
 (
-    const labelList& coeffRestrictAddr,
     Field<DiagType>& activeCoarseDiag,
     Field<ULType>& activeCoarseUpper,
     const Field<ULType>& activeFineUpper,
@@ -638,7 +631,10 @@ void Foam::BlockMatrixClustering<Type>::agglomerateCoeffs
     const unallocLabelList& upperAddr = matrix_.lduAddr().upperAddr();
     const unallocLabelList& lowerAddr = matrix_.lduAddr().lowerAddr();
 
-    forAll(coeffRestrictAddr, fineCoeffI)
+    // Reset coefficients to zero.  Cannot touch the diagonal
+    activeCoarseUpper = pTraits<ULType>::zero;
+    
+    forAll(coeffRestrictAddr_, fineCoeffI)
     {
         label rmUpperAddr = agglomIndex_[upperAddr[fineCoeffI]];
         label rmLowerAddr = agglomIndex_[lowerAddr[fineCoeffI]];
@@ -650,7 +646,7 @@ void Foam::BlockMatrixClustering<Type>::agglomerateCoeffs
             continue;
         }
 
-        label cCoeff = coeffRestrictAddr[fineCoeffI];
+        label cCoeff = coeffRestrictAddr_[fineCoeffI];
 
         if (cCoeff >= 0)
         {
@@ -673,7 +669,6 @@ template<class Type>
 template<class DiagType, class ULType>
 void Foam::BlockMatrixClustering<Type>::agglomerateCoeffs
 (
-    const labelList& coeffRestrictAddr,
     Field<DiagType>& activeCoarseDiag,
     Field<ULType>& activeCoarseUpper,
     const Field<ULType>& activeFineUpper,
@@ -688,7 +683,11 @@ void Foam::BlockMatrixClustering<Type>::agglomerateCoeffs
     const unallocLabelList& upperAddr = matrix_.lduAddr().upperAddr();
     const unallocLabelList& lowerAddr = matrix_.lduAddr().lowerAddr();
 
-    forAll(coeffRestrictAddr, fineCoeffI)
+    // Reset coefficients to zero.  Cannot touch the diagonal
+    activeCoarseUpper = pTraits<ULType>::zero;
+    activeCoarseLower = pTraits<ULType>::zero;
+    
+    forAll(coeffRestrictAddr_, fineCoeffI)
     {
         label rmUpperAddr = agglomIndex_[upperAddr[fineCoeffI]];
         label rmLowerAddr = agglomIndex_[lowerAddr[fineCoeffI]];
@@ -700,7 +699,7 @@ void Foam::BlockMatrixClustering<Type>::agglomerateCoeffs
             continue;
         }
 
-        label cCoeff = coeffRestrictAddr[fineCoeffI];
+        label cCoeff = coeffRestrictAddr_[fineCoeffI];
 
         if (cCoeff >= 0)
         {
@@ -739,10 +738,8 @@ void Foam::BlockMatrixClustering<Type>::restrictDiagDecoupled
         linearTypeField& activeCoarseCoeff = coarseCoeff.asLinear();
         const linearTypeField& activeCoeff = Coeff.asLinear();
 
-        forAll (coarseCoeff, i)
-        {
-            activeCoarseCoeff[i] = pTraits<linearType>::zero;
-        }
+        // Reset coefficients to zero
+        activeCoarseCoeff = pTraits<linearType>::zero;
 
         forAll (Coeff, i)
         {
@@ -761,10 +758,8 @@ void Foam::BlockMatrixClustering<Type>::restrictDiagDecoupled
         scalarTypeField& activeCoarseCoeff = coarseCoeff.asScalar();
         const scalarTypeField& activeCoeff = Coeff.asScalar();
 
-        forAll (coarseCoeff, i)
-        {
-            activeCoarseCoeff[i] = pTraits<scalarType>::zero;
-        }
+        // Reset coefficients to zero
+        activeCoarseCoeff = pTraits<scalarType>::zero;
 
         forAll (Coeff, i)
         {
@@ -800,6 +795,7 @@ Foam::BlockMatrixClustering<Type>::BlockMatrixClustering
     maxGroupSize_(readLabel(dict.lookup("maxGroupSize"))),
     normPtr_(BlockCoeffNorm<Type>::New(dict)),
     agglomIndex_(matrix_.lduAddr().size()),
+    coeffRestrictAddr_(),
     groupSize_(groupSize),
     nSolo_(0),
     nCoarseEqns_(0),
@@ -850,8 +846,6 @@ Foam::BlockMatrixClustering<Type>::restrictMatrix() const
     const unallocLabelList& upperAddr = matrix_.lduAddr().upperAddr();
     const unallocLabelList& lowerAddr = matrix_.lduAddr().lowerAddr();
 
-    const label nFineCoeffs = upperAddr.size();
-
 #   ifdef FULLDEBUG
     if (agglomIndex_.size() != matrix_.lduAddr().size())
     {
@@ -866,7 +860,8 @@ Foam::BlockMatrixClustering<Type>::restrictMatrix() const
     }
 #   endif
 
-    // Does the matrix have solo equations
+    // If the matrix will be coarsened, create off-diagonal agglomeration
+        // Does the matrix have solo equations
     bool soloEqns = nSolo_ > 0;
 
     // Storage for block neighbours and coefficients
@@ -880,8 +875,10 @@ Foam::BlockMatrixClustering<Type>::restrictMatrix() const
     // Setup initial packed storage for neighbours and coefficients
     labelList blockNbrsData(maxNnbrs*nCoarseEqns_);
 
+    const label nFineCoeffs = upperAddr.size();
+
     // Create face-restriction addressing
-    labelList coeffRestrictAddr(nFineCoeffs);
+    coeffRestrictAddr_.setSize(nFineCoeffs);
 
     // Initial neighbour array (not in upper-triangle order)
     labelList initCoarseNeighb(nFineCoeffs);
@@ -906,8 +903,8 @@ Foam::BlockMatrixClustering<Type>::restrictMatrix() const
         {
             // For each fine coeff inside of a coarse cluster keep the address
             // of the cluster corresponding to the coeff in the
-            // coeffRestrictAddr as a negative index
-            coeffRestrictAddr[fineCoeffi] = -(rmUpperAddr + 1);
+            // coeffRestrictAddr_ as a negative index
+            coeffRestrictAddr_[fineCoeffi] = -(rmUpperAddr + 1);
         }
         else
         {
@@ -932,7 +929,7 @@ Foam::BlockMatrixClustering<Type>::restrictMatrix() const
                 if (initCoarseNeighb[blockNbrsData[maxNnbrs*cOwn + i]] == cNei)
                 {
                     nbrFound = true;
-                    coeffRestrictAddr[fineCoeffi] =
+                    coeffRestrictAddr_[fineCoeffi] =
                         blockNbrsData[maxNnbrs*cOwn + i];
                     break;
                 }
@@ -962,7 +959,7 @@ Foam::BlockMatrixClustering<Type>::restrictMatrix() const
 
                 blockNbrsData[maxNnbrs*cOwn + ccnCoeffs] = nCoarseCoeffs;
                 initCoarseNeighb[nCoarseCoeffs] = cNei;
-                coeffRestrictAddr[fineCoeffi] = nCoarseCoeffs;
+                coeffRestrictAddr_[fineCoeffi] = nCoarseCoeffs;
                 ccnCoeffs++;
 
                 // New coarse coeff created
@@ -995,7 +992,7 @@ Foam::BlockMatrixClustering<Type>::restrictMatrix() const
         }
     }
 
-    forAll(coeffRestrictAddr, fineCoeffi)
+    forAll(coeffRestrictAddr_, fineCoeffi)
     {
         label rmUpperAddr = agglomIndex_[upperAddr[fineCoeffi]];
         label rmLowerAddr = agglomIndex_[lowerAddr[fineCoeffi]];
@@ -1007,10 +1004,10 @@ Foam::BlockMatrixClustering<Type>::restrictMatrix() const
             continue;
         }
 
-        if (coeffRestrictAddr[fineCoeffi] >= 0)
+        if (coeffRestrictAddr_[fineCoeffi] >= 0)
         {
-            coeffRestrictAddr[fineCoeffi] =
-                coarseCoeffMap[coeffRestrictAddr[fineCoeffi]];
+            coeffRestrictAddr_[fineCoeffi] =
+                coarseCoeffMap[coeffRestrictAddr_[fineCoeffi]];
         }
     }
 
@@ -1019,8 +1016,6 @@ Foam::BlockMatrixClustering<Type>::restrictMatrix() const
     blockNbrsData.setSize(0);
     initCoarseNeighb.setSize(0);
     coarseCoeffMap.setSize(0);
-
-
     // Create coarse-level coupled interfaces
 
     // Create coarse interfaces, addressing and coefficients
@@ -1028,8 +1023,7 @@ Foam::BlockMatrixClustering<Type>::restrictMatrix() const
         const_cast<BlockLduMatrix<Type>& >(matrix_).interfaces().size();
 
     const typename BlockLduInterfaceFieldPtrsList<Type>::Type&
-        interfaceFields =
-        const_cast<BlockLduMatrix<Type>&>(matrix_).interfaces();
+        interfaceFields = matrix_.interfaces();
 
     // Set the coarse interfaces and coefficients
     lduInterfacePtrsList coarseInterfaces(interfaceSize);
@@ -1046,7 +1040,7 @@ Foam::BlockMatrixClustering<Type>::restrictMatrix() const
             nCoarseEqns_,
             coarseOwner,
             coarseNeighbour,
-            Pstream::worldComm, //HJ, AMG Comm fineMesh.comm(),
+            Pstream::worldComm,
             true
         )
     );
@@ -1140,7 +1134,39 @@ Foam::BlockMatrixClustering<Type>::restrictMatrix() const
     );
     BlockLduMatrix<Type>& coarseMatrix = coarseMatrixPtr();
 
+    // Build matrix coefficients
+    this->updateMatrix(coarseMatrix);
+
+    // Create and return BlockAMGLevel
+    return autoPtr<BlockAMGLevel<Type> >
+    (
+        new coarseBlockAMGLevel<Type>
+        (
+            coarseAddrPtr,
+            coarseMatrixPtr,
+            this->dict(),
+            this->type(),
+            this->groupSize(),
+            this->minCoarseEqns()
+        )
+    );
+}
+
+
+template<class Type>
+void Foam::BlockMatrixClustering<Type>::updateMatrix
+(
+    BlockLduMatrix<Type>& coarseMatrix
+) const
+{
+    // Get interfaces from fine matrix
+    const typename BlockLduInterfaceFieldPtrsList<Type>::Type&
+        interfaceFields = matrix_.interfaces();
+
     // Get interfaces from coarse matrix
+    lduInterfacePtrsList coarseInterfaces = coarseMatrix.mesh().interfaces();
+    
+    // Get interfaces fields from coarse matrix
     typename BlockLduInterfaceFieldPtrsList<Type>::Type&
         coarseInterfaceFieldsTransfer = coarseMatrix.interfaces();
 
@@ -1242,7 +1268,6 @@ Foam::BlockMatrixClustering<Type>::restrictMatrix() const
 
             agglomerateCoeffs
             (
-                coeffRestrictAddr,
                 activeCoarseDiag,
                 activeCoarseUpper,
                 activeFineUpper,
@@ -1264,7 +1289,6 @@ Foam::BlockMatrixClustering<Type>::restrictMatrix() const
 
             agglomerateCoeffs
             (
-                coeffRestrictAddr,
                 activeCoarseDiag,
                 activeCoarseUpper,
                 activeFineUpper,
@@ -1286,7 +1310,6 @@ Foam::BlockMatrixClustering<Type>::restrictMatrix() const
 
             agglomerateCoeffs
             (
-                coeffRestrictAddr,
                 activeCoarseDiag,
                 activeCoarseUpper,
                 activeFineUpper,
@@ -1326,7 +1349,6 @@ Foam::BlockMatrixClustering<Type>::restrictMatrix() const
 
             agglomerateCoeffs
             (
-                coeffRestrictAddr,
                 activeCoarseDiag,
                 activeCoarseUpper,
                 activeFineUpper,
@@ -1352,7 +1374,6 @@ Foam::BlockMatrixClustering<Type>::restrictMatrix() const
 
             agglomerateCoeffs
             (
-                coeffRestrictAddr,
                 activeCoarseDiag,
                 activeCoarseUpper,
                 activeFineUpper,
@@ -1378,7 +1399,6 @@ Foam::BlockMatrixClustering<Type>::restrictMatrix() const
 
             agglomerateCoeffs
             (
-                coeffRestrictAddr,
                 activeCoarseDiag,
                 activeCoarseUpper,
                 activeFineUpper,
@@ -1396,20 +1416,6 @@ Foam::BlockMatrixClustering<Type>::restrictMatrix() const
                 << abort(FatalError);
         }
     }
-
-    // Create and return BlockAMGLevel
-    return autoPtr<BlockAMGLevel<Type> >
-    (
-        new coarseBlockAMGLevel<Type>
-        (
-            coarseAddrPtr,
-            coarseMatrixPtr,
-            this->dict(),
-            this->type(),
-            this->groupSize(),
-            this->minCoarseEqns()
-        )
-    );
 }
 
 

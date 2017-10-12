@@ -51,7 +51,7 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class BlockAMGSolver Declaration
+                      Class BlockAMGSolver Declaration
 \*---------------------------------------------------------------------------*/
 
 template<class Type>
@@ -93,10 +93,9 @@ public:
         );
 
 
-    // Destructor
-
-        virtual ~BlockAMGSolver()
-        {}
+    //- Destructor
+    virtual ~BlockAMGSolver()
+    {}
 
 
     // Member Functions
@@ -107,6 +106,13 @@ public:
             Field<Type>& x,
             const Field<Type>& b
         );
+
+        //- Re-initialise solver after matrix coefficient update
+        virtual void initMatrix()
+        {
+            Info<< "REINITIALISE AMG" << endl;
+            amg_.initMatrix();
+        }
 };
 
 
