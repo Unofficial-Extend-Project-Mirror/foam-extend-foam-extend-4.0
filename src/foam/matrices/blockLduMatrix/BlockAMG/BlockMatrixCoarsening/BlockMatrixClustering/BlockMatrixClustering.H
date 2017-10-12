@@ -155,7 +155,7 @@ class BlockMatrixClustering
 public:
 
     //- Runtime type information
-    TypeName("cluster");
+    TypeName("AAMG");
 
 
     // Constructors
