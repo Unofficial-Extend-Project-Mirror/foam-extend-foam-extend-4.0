@@ -62,14 +62,14 @@ void Foam::ggiFvPatch::makeWeights(scalarField& w) const
     // HJ, 2/Aug/2007
     if (ggiPolyPatch_.master())
     {
-        vectorField n = nf();
+        const vectorField n = nf();
 
         // Note: mag in the dot-product.
         // For all valid meshes, the non-orthogonality will be less than
         // 90 deg and the dot-product will be positive.  For invalid
         // meshes (d & s <= 0), this will stabilise the calculation
         // but the result will be poor.  HJ, 24/Aug/2011
-        scalarField nfc =
+        const scalarField nfc =
             mag(n & (ggiPolyPatch_.reconFaceCellCentres() - Cf()));
 
         w = nfc/(mag(n & (Cf() - Cn())) + nfc);
@@ -80,6 +80,8 @@ void Foam::ggiFvPatch::makeWeights(scalarField& w) const
             // for interpolation.  HJ, 21/Jan/2009
             bridge(scalarField(size(), 0.5), w);
         }
+
+        Info<< "Master weights: " << w << endl;
     }
     else
     {
@@ -87,7 +89,7 @@ void Foam::ggiFvPatch::makeWeights(scalarField& w) const
         scalarField masterWeights(shadow().size());
         shadow().makeWeights(masterWeights);
 
-        scalarField oneMinusW = 1 - masterWeights;
+        const scalarField oneMinusW = 1 - masterWeights;
 
         w = interpolate(oneMinusW);
 
@@ -97,6 +99,8 @@ void Foam::ggiFvPatch::makeWeights(scalarField& w) const
             // for interpolation.  HJ, 21/Jan/2009
             bridge(scalarField(size(), 0.5), w);
         }
+      
+        Info<< "Slave weights: " << w << endl;
     }
 }
 

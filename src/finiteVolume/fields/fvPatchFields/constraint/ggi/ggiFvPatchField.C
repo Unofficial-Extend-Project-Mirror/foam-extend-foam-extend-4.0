@@ -180,11 +180,11 @@ tmp<Field<Type> > ggiFvPatchField<Type>::patchNeighbourField() const
     if (ggiPatch_.bridgeOverlap())
     {
         // Symmetry treatment used for overlap
-        vectorField nHat = this->patch().nf();
+        const vectorField nHat = this->patch().nf();
 
         // Use mirrored neighbour field for interpolation
         // HJ, 21/Jan/2009
-        Field<Type> bridgeField =
+        const Field<Type> bridgeField =
             transform(I - 2.0*sqr(nHat), this->patchInternalField());
 
         ggiPatch_.bridge(bridgeField, pnf);
@@ -211,20 +211,18 @@ void ggiFvPatchField<Type>::initEvaluate
       + (1.0 - this->patch().weights())*this->patchNeighbourField()
     );
 
-//  Note: bridging already carried out when calling patchNeighbourField()
+    if (ggiPatch_.bridgeOverlap())
+    {
+        // Symmetry treatment used for overlap
+        vectorField nHat = this->patch().nf();
 
-//    if (ggiPatch_.bridgeOverlap())
-//    {
-//        // Symmetry treatment used for overlap
-//        vectorField nHat = this->patch().nf();
-//
-//        Field<Type> pif = this->patchInternalField();
-//
-//        Field<Type> bridgeField =
-//            0.5*(pif + transform(I - 2.0*sqr(nHat), pif));
-//
-//        ggiPatch_.bridge(bridgeField, pf);
-//    }
+        Field<Type> pif = this->patchInternalField();
+
+        Field<Type> bridgeField =
+            0.5*(pif + transform(I - 2.0*sqr(nHat), pif));
+
+        ggiPatch_.bridge(bridgeField, pf);
+    }
 
     Field<Type>::operator=(pf);
 }

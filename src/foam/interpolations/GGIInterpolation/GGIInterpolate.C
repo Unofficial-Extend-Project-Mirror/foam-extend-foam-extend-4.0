@@ -110,11 +110,13 @@ void GGIInterpolation<MasterPatch, SlavePatch>::bridge
 
     // Partially covered faces. Note the operator+= since we assume that the
     // interpolation part is carried out before bridging (see
-    // e.g. ggiFvPatchField::patchNeighbourField())
-    forAll (partiallyCoveredAddr, faceI)
-    {
-        ff[addr[faceI]] += uncoveredFractions[faceI]*bridgeField[addr[faceI]];
-    }
+    // e.g. ggiFvPatchField::patchNeighbourField()) using weights that do not
+    // sum up to 1
+//    forAll (partiallyCoveredAddr, faceI)
+//    {
+//        ff[partiallyCoveredAddr[faceI]] +=
+//            uncoveredFractions[faceI]*bridgeField[partiallyCoveredAddr[faceI]];
+//    }
 }
 
 
