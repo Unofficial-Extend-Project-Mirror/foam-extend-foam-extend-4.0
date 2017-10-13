@@ -211,18 +211,20 @@ void ggiFvPatchField<Type>::initEvaluate
       + (1.0 - this->patch().weights())*this->patchNeighbourField()
     );
 
-    if (ggiPatch_.bridgeOverlap())
-    {
-        // Symmetry treatment used for overlap
-        vectorField nHat = this->patch().nf();
+//  Note: bridging already carried out when calling patchNeighbourField()
 
-        Field<Type> pif = this->patchInternalField();
-
-        Field<Type> bridgeField =
-            0.5*(pif + transform(I - 2.0*sqr(nHat), pif));
-
-        ggiPatch_.bridge(bridgeField, pf);
-    }
+//    if (ggiPatch_.bridgeOverlap())
+//    {
+//        // Symmetry treatment used for overlap
+//        vectorField nHat = this->patch().nf();
+//
+//        Field<Type> pif = this->patchInternalField();
+//
+//        Field<Type> bridgeField =
+//            0.5*(pif + transform(I - 2.0*sqr(nHat), pif));
+//
+//        ggiPatch_.bridge(bridgeField, pf);
+//    }
 
     Field<Type>::operator=(pf);
 }

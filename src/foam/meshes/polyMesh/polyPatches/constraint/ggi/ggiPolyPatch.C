@@ -227,7 +227,11 @@ void Foam::ggiPolyPatch::calcPatchToPatch() const
                 // HJ, 30/Jun/2013
                 SMALL,         // Non-overlapping face tolerances
                 SMALL,         // HJ, 24/Oct/2008
-                true,          // Rescale weighting factors.  Bug fix, MB.
+                bridgeOverlap_ ? false : true,  // Do not rescale weights if
+                                                // bridge overlap is switched on
+                                                // as this will mess up
+                                                // partially overlapped
+                                                // faces. VV, 12/Oct/2017.
                 reject_        // Quick rejection algorithm, default BB_OCTREE
             );
 

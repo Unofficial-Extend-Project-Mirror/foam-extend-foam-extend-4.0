@@ -97,12 +97,23 @@ void GGIInterpolation<MasterPatch, SlavePatch>::bridge
 (
     const Field<Type>& bridgeField,
     Field<Type>& ff,
-    const labelList& addr
+    const labelList& addr,
+    const labelList& partiallyCoveredAddr,
+    const scalarField& uncoveredFractions
 )
 {
+    // Fully uncovered faces
     forAll (addr, faceI)
     {
         ff[addr[faceI]] = bridgeField[addr[faceI]];
+    }
+
+    // Partially covered faces. Note the operator+= since we assume that the
+    // interpolation part is carried out before bridging (see
+    // e.g. ggiFvPatchField::patchNeighbourField())
+    forAll (partiallyCoveredAddr, faceI)
+    {
+        ff[addr[faceI]] += uncoveredFractions[faceI]*bridgeField[addr[faceI]];
     }
 }
 
@@ -527,7 +538,14 @@ void GGIInterpolation<MasterPatch, SlavePatch>::bridgeMaster
             << abort(FatalError);
     }
 
-    bridge(bridgeField, ff, uncoveredMasterFaces());
+    bridge
+    (
+        bridgeField,
+        ff,
+        uncoveredMasterFaces(),
+        partiallyCoveredMasterFaces(),
+        masterFaceUncoveredFractions()
+    );
 }
 
 
@@ -592,7 +610,14 @@ void GGIInterpolation<MasterPatch, SlavePatch>::bridgeSlave
             << abort(FatalError);
     }
 
-    bridge(bridgeField, ff, uncoveredSlaveFaces());
+    bridge
+    (
+        bridgeField,
+        ff,
+        uncoveredSlaveFaces(),
+        partiallyCoveredSlaveFaces(),
+        slaveFaceUncoveredFractions()
+    );
 }
 
 

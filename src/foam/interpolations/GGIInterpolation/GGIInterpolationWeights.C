@@ -68,6 +68,16 @@ GGIInterpolation<MasterPatch, SlavePatch>::featureCosTol_
 );
 
 
+template<class MasterPatch, class SlavePatch>
+const Foam::debug::tolerancesSwitch
+GGIInterpolation<MasterPatch, SlavePatch>::uncoveredFaceAreaTol_
+(
+    "GGIUncoveredFaceAreaTol",
+    0.95,
+    "Fraction of face area mismatch (sum of weights) to consider a face "
+    "as uncovered, i.e. not to rescale weights."
+);
+
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
 template<class MasterPatch, class SlavePatch>
@@ -80,7 +90,11 @@ void GGIInterpolation<MasterPatch, SlavePatch>::calcAddressing() const
      || slaveAddrPtr_
      || slaveWeightsPtr_
      || uncoveredMasterAddrPtr_
+     || partiallyCoveredMasterAddrPtr_
+     || masterFaceUncoveredFractionsPtr_
      || uncoveredSlaveAddrPtr_
+     || partiallyCoveredSlaveAddrPtr_
+     || slaveFaceUncoveredFractionsPtr_
     )
     {
         FatalErrorIn
@@ -601,6 +615,29 @@ void GGIInterpolation<MasterPatch, SlavePatch>::calcAddressing() const
             findNonOverlappingFaces(saW, slaveNonOverlapFaceTol_)
         );
 
+    // Calculate master and slave partially covered addressing
+
+    // Note: This function allocates:
+    // 1. partiallyCoveredMasterAddrPtr_
+    // 2. masterFaceCoveredFractionsPtr_
+    calcPartiallyCoveredFaces
+    (
+        maW,
+        masterNonOverlapFaceTol_,
+        true // This is master
+    );
+
+    // Note: this function allocates:
+    // 1. partiallyCoveredSlaveAddrPtr_
+    // 2. slaveFaceCoveredFractionsPtr_
+    calcPartiallyCoveredFaces
+    (
+        saW,
+        slaveNonOverlapFaceTol_,
+        false // This is not master
+    );
+
+
     // Rescaling the weighting factors so they will sum up to 1.0
     // See the comment for the method ::rescaleWeightingFactors() for
     // more information.  By default, we always rescale.  But for some
@@ -608,7 +645,10 @@ void GGIInterpolation<MasterPatch, SlavePatch>::calcAddressing() const
     // then we need the brute values, so no rescaling in that
     // case. Hence the little flag rescaleGGIWeightingFactors_
 
-    // Not parallelised.  HJ, 27/Apr/2016
+    // Not parallelised.  HJ, 27/Apr/2016. Rescaling is currently switched off
+    // if the bridge overlap option is used. We should maybe perform rescaling
+    // for faces that are considered to fully overlap according to
+    // uncoveredFaceAreaTol_? Reconsider, VV, 12/Oct/2017
     if (rescaleGGIWeightingFactors_)
     {
         rescaleWeightingFactors();
@@ -766,6 +806,111 @@ GGIInterpolation<MasterPatch, SlavePatch>::findNonOverlappingFaces
 
     return tpatchFaceNonOverlapAddr;
 }
+
+
+template<class MasterPatch, class SlavePatch>
+void GGIInterpolation<MasterPatch, SlavePatch>::calcPartiallyCoveredFaces
+(
+    const scalarListList& patchWeights,
+    const scalar& nonOverlapFaceTol,
+    const bool isMaster
+) const
+{
+    // Sanity checks first
+    if
+    (
+        isMaster
+     && (partiallyCoveredMasterAddrPtr_ || masterFaceUncoveredFractionsPtr_)
+    )
+    {
+        FatalErrorIn
+        (
+            "void GGIInterpolation<MasterPatch, SlavePatch>::"
+            "calcPartiallyCoveredFaces() const"
+        )   << "Already calculated master partially covered faces"
+            << abort(FatalError);
+    }
+
+    if
+    (
+        !isMaster
+     && (partiallyCoveredSlaveAddrPtr_ || slaveFaceUncoveredFractionsPtr_)
+    )
+    {
+        FatalErrorIn
+        (
+            "void GGIInterpolation<MasterPatch, SlavePatch>::"
+            "calcPartiallyCoveredFaces() const"
+        )   << "Already calculated slave partially covered faces"
+            << abort(FatalError);
+    }
+
+    // Temporary storage
+    DynamicList<label, 64> patchFacePartialOverlap(patchWeights.size());
+    DynamicList<scalar, 64> uncoveredFaceFractions(patchWeights.size());
+
+    // Scan the list of patch weights and collect ones inbetween
+    // nonOverlapFaceTol and uncoveredFaceAreaTol_
+    forAll (patchWeights, paWi)
+    {
+        const scalar sumWeightsFace = sum(patchWeights[paWi]);
+
+        if
+        (
+            sumWeightsFace > nonOverlapFaceTol
+         && sumWeightsFace <= uncoveredFaceAreaTol_()
+        )
+        {
+            // This is considered partially overlapped face, store the index and
+            // the non-overlapping area (1 - sum of weights)
+            patchFacePartialOverlap.append(paWi);
+            uncoveredFaceFractions.append(1.0 - sumWeightsFace);
+        }
+    }
+
+    // Transfer the storage
+    if (isMaster)
+    {
+        // Allocate master side
+        partiallyCoveredMasterAddrPtr_ =
+            new labelList(patchFacePartialOverlap.xfer());
+        masterFaceUncoveredFractionsPtr_ =
+            new scalarField(uncoveredFaceFractions.xfer());
+
+        if (debug)
+        {
+            InfoIn("GGIInterpolation::calcPartiallyCoveredFaces")
+                << "   : Found " << partiallyCoveredMasterAddrPtr_->size()
+                << " partially overlapping faces for this GGI patch" << nl
+                << "Max uncoverage: "
+                << max(*masterFaceUncoveredFractionsPtr_)
+                << ", min uncoverage: "
+                << min(*masterFaceUncoveredFractionsPtr_)
+                << endl;
+        }
+    }
+    else
+    {
+        // Allocate slave side
+        partiallyCoveredSlaveAddrPtr_ =
+            new labelList(patchFacePartialOverlap.xfer());
+        slaveFaceUncoveredFractionsPtr_ =
+            new scalarField(uncoveredFaceFractions.xfer());
+
+        if (debug)
+        {
+            InfoIn("GGIInterpolation::calcPartiallyCoveredFaces")
+                << "   : Found " << partiallyCoveredSlaveAddrPtr_->size()
+                << " partially overlapping faces for this GGI patch" << nl
+                << "Max uncoverage: "
+                << max(*slaveFaceUncoveredFractionsPtr_)
+                << ", min uncoverage: "
+                << min(*slaveFaceUncoveredFractionsPtr_)
+                << endl;
+        }
+    }
+}
+
 
 template<class FromPatch, class ToPatch>
 void GGIInterpolation<FromPatch, ToPatch>::
