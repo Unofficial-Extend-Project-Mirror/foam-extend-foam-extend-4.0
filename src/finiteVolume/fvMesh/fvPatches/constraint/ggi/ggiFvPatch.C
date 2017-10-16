@@ -106,7 +106,6 @@ void Foam::ggiFvPatch::makeWeights(scalarField& w) const
             correctPartialFaces(bridgedField, w);
         }
 
-//        w = 0.5;      
         Info<< "Slave weights: " << w << endl;
     }
 }
@@ -146,7 +145,6 @@ void Foam::ggiFvPatch::makeDeltaCoeffs(scalarField& dc) const
             correctPartialFaces(bridgeDeltas, dc);
         }
 
-        dc = 1.0;
         Info<< "Slave deltaCoeffs: " << dc << endl;
     }
 }
@@ -204,7 +202,6 @@ Foam::tmp<Foam::vectorField> Foam::ggiFvPatch::delta() const
             correctPartialFaces(bridgeDeltas, tDelta());
         }
 
-        tDelta() = vector(0, 0, -1);
         Info<< "Slave deltas: " << tDelta() << endl;
 
         return tDelta;
