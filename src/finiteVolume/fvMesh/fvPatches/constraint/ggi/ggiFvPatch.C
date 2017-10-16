@@ -78,7 +78,10 @@ void Foam::ggiFvPatch::makeWeights(scalarField& w) const
         {
             // Set overlap weights to 0.5 and use mirrored neighbour field
             // for interpolation.  HJ, 21/Jan/2009
-            bridge(scalarField(size(), 0.5), w);
+            const scalarField bridgedField(size(), 0.5);
+
+            bridge(bridgedField, w);
+            correctPartialFaces(bridgedField, w);
         }
 
         Info<< "Master weights: " << w << endl;
@@ -97,9 +100,13 @@ void Foam::ggiFvPatch::makeWeights(scalarField& w) const
         {
             // Set overlap weights to 0.5 and use mirrored neighbour field
             // for interpolation.  HJ, 21/Jan/2009
-            bridge(scalarField(size(), 0.5), w);
+            const scalarField bridgedField(size(), 0.5);
+
+            bridge(bridgedField, w);
+            correctPartialFaces(bridgedField, w);
         }
-      
+
+//        w = 0.5;      
         Info<< "Slave weights: " << w << endl;
     }
 }
@@ -117,11 +124,12 @@ void Foam::ggiFvPatch::makeDeltaCoeffs(scalarField& dc) const
 
         if (bridgeOverlap())
         {
-            scalarField bridgeDeltas = nf() & fvPatch::delta();
+            const scalarField bridgeDeltas = nf() & fvPatch::delta();
 
             bridge(bridgeDeltas, dc);
+            correctPartialFaces(bridgeDeltas, dc);
         }
-        
+
         Info<< "Master deltaCoeffs: " << dc << endl;
     }
     else
@@ -132,11 +140,13 @@ void Foam::ggiFvPatch::makeDeltaCoeffs(scalarField& dc) const
 
         if (bridgeOverlap())
         {
-            scalarField bridgeDeltas = nf() & fvPatch::delta();
+            const scalarField bridgeDeltas = nf() & fvPatch::delta();
 
             bridge(bridgeDeltas, dc);
+            correctPartialFaces(bridgeDeltas, dc);
         }
 
+        dc = 1.0;
         Info<< "Slave deltaCoeffs: " << dc << endl;
     }
 }
@@ -169,10 +179,13 @@ Foam::tmp<Foam::vectorField> Foam::ggiFvPatch::delta() const
 
         if (bridgeOverlap())
         {
-            vectorField bridgeDeltas = Cf() - Cn();
+            const vectorField bridgeDeltas = Cf() - Cn();
 
             bridge(bridgeDeltas, tDelta());
+            correctPartialFaces(bridgeDeltas, tDelta());
         }
+
+        Info<< "Master deltas: " << tDelta() << endl;
 
         return tDelta;
     }
@@ -185,10 +198,14 @@ Foam::tmp<Foam::vectorField> Foam::ggiFvPatch::delta() const
 
         if (bridgeOverlap())
         {
-            vectorField bridgeDeltas = Cf() - Cn();
+            const vectorField bridgeDeltas = Cf() - Cn();
 
             bridge(bridgeDeltas, tDelta());
+            correctPartialFaces(bridgeDeltas, tDelta());
         }
+
+        tDelta() = vector(0, 0, -1);
+        Info<< "Slave deltas: " << tDelta() << endl;
 
         return tDelta;
     }

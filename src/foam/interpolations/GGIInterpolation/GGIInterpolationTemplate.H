@@ -501,6 +501,7 @@ class GGIInterpolation
         template<class Type>
         static void correctPartiallyCoveredFaces
         (
+            const Field<Type>& bridgeField,
             Field<Type>& result,
             const labelList& partiallyCoveredAddr,
             const scalarField& coveredFractions
@@ -511,6 +512,7 @@ class GGIInterpolation
         template<class Type>
         static void maskedCorrectPartiallyCoveredFaces
         (
+            const Field<Type>& bridgeField,
             Field<Type>& result,
             const labelList& mask,
             const labelList& partiallyCoveredAddr,
@@ -683,13 +685,18 @@ public:
 
         //- Correct partially covered master patch field
         template<class Type>
-        void correctPartialMaster(Field<Type>& ff) const;
+        void correctPartialMaster
+        (
+            const Field<Type>& bridgeField,
+            Field<Type>& ff
+        ) const;
 
         //- Correct partially covered master patch field, only for marked master
         //  faces
         template<class Type>
         void maskedCorrectPartialMaster
         (
+            const Field<Type>& bridgeField,
             Field<Type>& ff,
             const labelList& mask
         ) const;
@@ -713,13 +720,18 @@ public:
 
         //- Correct partially covered slave patch field
         template<class Type>
-        void correctPartialSlave(Field<Type>& ff) const;
+        void correctPartialSlave
+        (
+            const Field<Type>& bridgeField,
+            Field<Type>& ff
+        ) const;
 
         //- Correct partially covered slave patch field, only for marked slave
         //  faces
         template<class Type>
         void maskedCorrectPartialSlave
         (
+            const Field<Type>& bridgeField,
             Field<Type>& ff,
             const labelList& mask
         ) const;

@@ -268,7 +268,11 @@ void Foam::ggiPolyPatch::bridge
 
 
 template<class Type>
-void Foam::ggiPolyPatch::correctPartialFaces(Field<Type>& ff) const
+void Foam::ggiPolyPatch::correctPartialFaces
+(
+    const Field<Type>& bridgeField,
+    Field<Type>& ff
+) const
 {
     // Check
     if (ff.size() != size())
@@ -296,11 +300,11 @@ void Foam::ggiPolyPatch::correctPartialFaces(Field<Type>& ff) const
         {
             if (master())
             {
-                patchToPatch().correctPartialMaster(ff);
+                patchToPatch().correctPartialMaster(bridgeField, ff);
             }
             else
             {
-                patchToPatch().correctPartialSlave(ff);
+                patchToPatch().correctPartialSlave(bridgeField, ff);
             }
         }
         else
@@ -310,6 +314,7 @@ void Foam::ggiPolyPatch::correctPartialFaces(Field<Type>& ff) const
             {
                 patchToPatch().maskedCorrectPartialMaster
                 (
+                    bridgeField,
                     ff,
                     zoneAddressing()
                 );
@@ -318,6 +323,7 @@ void Foam::ggiPolyPatch::correctPartialFaces(Field<Type>& ff) const
             {
                 patchToPatch().maskedCorrectPartialSlave
                 (
+                    bridgeField,
                     ff,
                     zoneAddressing()
                 );

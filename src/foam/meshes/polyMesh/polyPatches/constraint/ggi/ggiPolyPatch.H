@@ -380,7 +380,11 @@ public:
 
             //- Correct interpolated face field for partially covered faces
             template<class Type>
-            void correctPartialFaces(Field<Type>& ff) const;
+            void correctPartialFaces
+            (
+                const Field<Type>& bridgeField,
+                Field<Type>& ff
+            ) const;
 
 
         // Geometric data

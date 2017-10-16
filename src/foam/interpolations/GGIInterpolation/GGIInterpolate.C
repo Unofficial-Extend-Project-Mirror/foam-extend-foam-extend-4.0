@@ -162,27 +162,30 @@ template<class MasterPatch, class SlavePatch>
 template<class Type>
 void GGIInterpolation<MasterPatch, SlavePatch>::correctPartiallyCoveredFaces
 (
+    const Field<Type>& bridgeField,
     Field<Type>& result,
     const labelList& partiallyCoveredAddr,
     const scalarField& coveredFractions
 )
 {
-    // Loop through partially covered faces and scale them down with the covered
-    // face fraction. Note the operator*= since we assume that the interpolation
-    // part is carried out before bridging (see
-    // e.g. ggiFvPatchField::patchNeighbourField()) using weights that do not
-    // sum up to 1
+    // Loop through partially covered faces and correct them. Note the
+    // operator+= since we assume that the interpolation part is carried out
+    // before bridging (see e.g. ggiFvPatchField::patchNeighbourField()) using
+    // weights that do not sum up to 1
     forAll (partiallyCoveredAddr, pcfI)
     {
-        result[partiallyCoveredAddr[pcfI]] *= coveredFractions[pcfI];
+        result[partiallyCoveredAddr[pcfI]] +=
+            coveredFractions[pcfI]*bridgeField[partiallyCoveredAddr[pcfI]];
     }
 }
 
 
 template<class MasterPatch, class SlavePatch>
 template<class Type>
-void GGIInterpolation<MasterPatch, SlavePatch>::maskedCorrectPartiallyCoveredFaces
+void GGIInterpolation<MasterPatch, SlavePatch>::
+maskedCorrectPartiallyCoveredFaces
 (
+    const Field<Type>& bridgeField,
     Field<Type>& result,
     const labelList& mask,
     const labelList& partiallyCoveredAddr,
@@ -203,7 +206,8 @@ void GGIInterpolation<MasterPatch, SlavePatch>::maskedCorrectPartiallyCoveredFac
             if (faceI == mask[maskAddrI])
             {
                 // Found masked partially covered face
-                result[maskAddrI] *= coveredFractions[pcfI];
+                result[maskAddrI] +=
+                    coveredFractions[pcfI]*bridgeField[partiallyCoveredAddr[pcfI]];
 
                 break;
             }
@@ -639,10 +643,15 @@ template<class MasterPatch, class SlavePatch>
 template<class Type>
 void GGIInterpolation<MasterPatch, SlavePatch>::correctPartialMaster
 (
+    const Field<Type>& bridgeField,
     Field<Type>& ff
 ) const
 {
-    if (ff.size() != masterPatch_.size())
+    if
+    (
+        bridgeField.size() != masterPatch_.size()
+     || ff.size() != masterPatch_.size()
+    )
     {
         FatalErrorIn
         (
@@ -659,6 +668,7 @@ void GGIInterpolation<MasterPatch, SlavePatch>::correctPartialMaster
 
     correctPartiallyCoveredFaces
     (
+        bridgeField,
         ff,
         partiallyCoveredMasterFaces(),
         masterFaceCoveredFractions()
@@ -670,6 +680,7 @@ template<class MasterPatch, class SlavePatch>
 template<class Type>
 void GGIInterpolation<MasterPatch, SlavePatch>::maskedCorrectPartialMaster
 (
+    const Field<Type>& bridgeField,
     Field<Type>& ff,
     const labelList& mask
 ) const
@@ -691,6 +702,7 @@ void GGIInterpolation<MasterPatch, SlavePatch>::maskedCorrectPartialMaster
 
     maskedCorrectPartiallyCoveredFaces
     (
+        bridgeField,
         ff,
         mask,
         partiallyCoveredMasterFaces(),
@@ -773,10 +785,15 @@ template<class MasterPatch, class SlavePatch>
 template<class Type>
 void GGIInterpolation<MasterPatch, SlavePatch>::correctPartialSlave
 (
+    const Field<Type>& bridgeField,
     Field<Type>& ff
 ) const
 {
-    if (ff.size() != slavePatch_.size())
+    if
+    (
+        bridgeField.size() != slavePatch_.size()
+     || ff.size() != slavePatch_.size()
+    )
     {
         FatalErrorIn
         (
@@ -793,6 +810,7 @@ void GGIInterpolation<MasterPatch, SlavePatch>::correctPartialSlave
 
     correctPartiallyCoveredFaces
     (
+        bridgeField,
         ff,
         partiallyCoveredSlaveFaces(),
         slaveFaceCoveredFractions()
@@ -804,6 +822,7 @@ template<class MasterPatch, class SlavePatch>
 template<class Type>
 void GGIInterpolation<MasterPatch, SlavePatch>::maskedCorrectPartialSlave
 (
+    const Field<Type>& bridgeField,
     Field<Type>& ff,
     const labelList& mask
 ) const
@@ -825,6 +844,7 @@ void GGIInterpolation<MasterPatch, SlavePatch>::maskedCorrectPartialSlave
 
     maskedCorrectPartiallyCoveredFaces
     (
+        bridgeField,
         ff,
         mask,
         partiallyCoveredSlaveFaces(),

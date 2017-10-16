@@ -156,9 +156,14 @@ public:
 
             //- Correct partially overlapping (partially bridged) faces
             template<class Type>
-            void correctPartialFaces(Field<Type>& ff) const
+            void correctPartialFaces
+            (
+                const Field<Type>& bridgeField,
+                Field<Type>& ff
+            )
+            const
             {
-                return ggiPolyPatch_.correctPartialFaces(ff);
+                return ggiPolyPatch_.correctPartialFaces(bridgeField, ff);
             }
 
 

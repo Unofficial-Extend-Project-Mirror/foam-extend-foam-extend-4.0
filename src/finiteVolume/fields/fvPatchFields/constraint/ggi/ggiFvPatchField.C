@@ -189,8 +189,8 @@ tmp<Field<Type> > ggiFvPatchField<Type>::patchNeighbourField() const
 
         ggiPatch_.bridge(bridgeField, pnf);
 
-        // Correct partially overlapping (bridged) faces
-        ggiPatch_.correctPartialFaces(pnf);
+        // Correct partially overlapping (partially bridged) faces
+        ggiPatch_.correctPartialFaces(bridgeField, pnf);
     }
 
     return tpnf;
