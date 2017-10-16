@@ -105,10 +105,10 @@ void GGIInterpolation<MasterPatch, SlavePatch>::clearOut()
 
     deleteDemandDrivenData(uncoveredMasterAddrPtr_);
     deleteDemandDrivenData(partiallyCoveredMasterAddrPtr_);
-    deleteDemandDrivenData(masterFaceUncoveredFractionsPtr_);
+    deleteDemandDrivenData(masterFaceCoveredFractionsPtr_);
     deleteDemandDrivenData(uncoveredSlaveAddrPtr_);
     deleteDemandDrivenData(partiallyCoveredSlaveAddrPtr_);
-    deleteDemandDrivenData(slaveFaceUncoveredFractionsPtr_);
+    deleteDemandDrivenData(slaveFaceCoveredFractionsPtr_);
 
     deleteDemandDrivenData(masterPointAddressingPtr_);
     deleteDemandDrivenData(masterPointWeightsPtr_);
@@ -160,10 +160,10 @@ GGIInterpolation<MasterPatch, SlavePatch>::GGIInterpolation
     slavePointDistancePtr_(NULL),
     uncoveredMasterAddrPtr_(NULL),
     partiallyCoveredMasterAddrPtr_(NULL),
-    masterFaceUncoveredFractionsPtr_(NULL),
+    masterFaceCoveredFractionsPtr_(NULL),
     uncoveredSlaveAddrPtr_(NULL),
     partiallyCoveredSlaveAddrPtr_(NULL),
-    slaveFaceUncoveredFractionsPtr_(NULL)
+    slaveFaceCoveredFractionsPtr_(NULL)
 {
     // Check size of transform.  They should be equal to slave patch size
     // if the transform is not constant
@@ -279,14 +279,14 @@ GGIInterpolation<MasterPatch, SlavePatch>::partiallyCoveredMasterFaces() const
 
 template<class MasterPatch, class SlavePatch>
 const scalarField&
-GGIInterpolation<MasterPatch, SlavePatch>::masterFaceUncoveredFractions() const
+GGIInterpolation<MasterPatch, SlavePatch>::masterFaceCoveredFractions() const
 {
-    if (!masterFaceUncoveredFractionsPtr_)
+    if (!masterFaceCoveredFractionsPtr_)
     {
         calcAddressing();
     }
 
-    return *masterFaceUncoveredFractionsPtr_;
+    return *masterFaceCoveredFractionsPtr_;
 }
 
 
@@ -318,14 +318,14 @@ GGIInterpolation<MasterPatch, SlavePatch>::partiallyCoveredSlaveFaces() const
 
 template<class MasterPatch, class SlavePatch>
 const scalarField&
-GGIInterpolation<MasterPatch, SlavePatch>::slaveFaceUncoveredFractions() const
+GGIInterpolation<MasterPatch, SlavePatch>::slaveFaceCoveredFractions() const
 {
-    if (!slaveFaceUncoveredFractionsPtr_)
+    if (!slaveFaceCoveredFractionsPtr_)
     {
         calcAddressing();
     }
 
-    return *slaveFaceUncoveredFractionsPtr_;
+    return *slaveFaceCoveredFractionsPtr_;
 }
 
 

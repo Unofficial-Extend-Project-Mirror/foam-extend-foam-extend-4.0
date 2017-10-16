@@ -121,6 +121,8 @@ void Foam::ggiFvPatch::makeDeltaCoeffs(scalarField& dc) const
 
             bridge(bridgeDeltas, dc);
         }
+        
+        Info<< "Master deltaCoeffs: " << dc << endl;
     }
     else
     {
@@ -134,6 +136,8 @@ void Foam::ggiFvPatch::makeDeltaCoeffs(scalarField& dc) const
 
             bridge(bridgeDeltas, dc);
         }
+
+        Info<< "Slave deltaCoeffs: " << dc << endl;
     }
 }
 

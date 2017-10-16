@@ -226,8 +226,8 @@ class GGIInterpolation
 
             //- List of face fractions for partially covered master faces. Range
             //  anywhere from 1 to uncoveredFaceAreaTol_ (e.g. 0.2 means
-            //  that the face area is covered by 80% on the other side)
-            mutable scalarField* masterFaceUncoveredFractionsPtr_;
+            //  that the face area is covered by 20% on the other side)
+            mutable scalarField* masterFaceCoveredFractionsPtr_;
 
             //- List of uncovered slave faces
             mutable labelList* uncoveredSlaveAddrPtr_;
@@ -239,8 +239,8 @@ class GGIInterpolation
 
             //- List of face fractions for partially covered slave faces. Range
             //  anywhere from 1 to uncoveredFaceAreaTol_ (e.g. 0.2 means
-            //  that the face area is covered by 80% on the other side)
-            mutable scalarField* slaveFaceUncoveredFractionsPtr_;
+            //  that the face area is covered by 20% on the other side)
+            mutable scalarField* slaveFaceCoveredFractionsPtr_;
 
 
   // Private static data
@@ -483,9 +483,7 @@ class GGIInterpolation
         (
             const Field<Type>& bridgeField,
             Field<Type>& ff,
-            const labelList& addr,
-            const labelList& partiallyCoveredAddr,
-            const scalarField& uncoveredFractions
+            const labelList& addr
         );
 
         //- Bridge uncovered faces given addressing
@@ -497,6 +495,26 @@ class GGIInterpolation
             Field<Type>& ff,
             const labelList& mask,
             const labelList& uncoveredFaces
+        );
+
+        //- Correct partially covered faces given addressing
+        template<class Type>
+        static void correctPartiallyCoveredFaces
+        (
+            Field<Type>& result,
+            const labelList& partiallyCoveredAddr,
+            const scalarField& coveredFractions
+        );
+
+        //- Correct partially covered faces given addressing for masked faces
+        //  only
+        template<class Type>
+        static void maskedCorrectPartiallyCoveredFaces
+        (
+            Field<Type>& result,
+            const labelList& mask,
+            const labelList& partiallyCoveredAddr,
+            const scalarField& coveredFractions
         );
 
         //- Is a transform required?
@@ -570,8 +588,8 @@ public:
             //- Return reference to master list of partially covered faces
             const labelList& partiallyCoveredMasterFaces() const;
 
-            //- Return uncovered fractions of partially covered master faces
-            const scalarField& masterFaceUncoveredFractions() const;
+            //- Return covered fractions of partially covered master faces
+            const scalarField& masterFaceCoveredFractions() const;
 
             //- Return reference to the slave list of non-overlap faces
             const labelList& uncoveredSlaveFaces() const;
@@ -579,8 +597,8 @@ public:
             //- Return reference to slave list of partially covered faces
             const labelList& partiallyCoveredSlaveFaces() const;
 
-            //- Return uncovered fractions of partially covered slave faces
-            const scalarField& slaveFaceUncoveredFractions() const;
+            //- Return covered fractions of partially covered slave faces
+            const scalarField& slaveFaceCoveredFractions() const;
 
             //- Return reference to point addressing
             const List<labelPair>& masterPointAddr() const;
@@ -663,6 +681,19 @@ public:
             const labelList& mask
         ) const;
 
+        //- Correct partially covered master patch field
+        template<class Type>
+        void correctPartialMaster(Field<Type>& ff) const;
+
+        //- Correct partially covered master patch field, only for marked master
+        //  faces
+        template<class Type>
+        void maskedCorrectPartialMaster
+        (
+            Field<Type>& ff,
+            const labelList& mask
+        ) const;
+
         //- Bridge uncovered slave patch field
         template<class Type>
         void bridgeSlave
@@ -676,6 +707,19 @@ public:
         void maskedBridgeSlave
         (
             const Field<Type>& bridgeField,
+            Field<Type>& ff,
+            const labelList& mask
+        ) const;
+
+        //- Correct partially covered slave patch field
+        template<class Type>
+        void correctPartialSlave(Field<Type>& ff) const;
+
+        //- Correct partially covered slave patch field, only for marked slave
+        //  faces
+        template<class Type>
+        void maskedCorrectPartialSlave
+        (
             Field<Type>& ff,
             const labelList& mask
         ) const;

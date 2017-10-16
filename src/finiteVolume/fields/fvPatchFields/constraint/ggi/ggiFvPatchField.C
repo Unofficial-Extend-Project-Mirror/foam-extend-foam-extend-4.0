@@ -188,6 +188,9 @@ tmp<Field<Type> > ggiFvPatchField<Type>::patchNeighbourField() const
             transform(I - 2.0*sqr(nHat), this->patchInternalField());
 
         ggiPatch_.bridge(bridgeField, pnf);
+
+        // Correct partially overlapping (bridged) faces
+        ggiPatch_.correctPartialFaces(pnf);
     }
 
     return tpnf;
@@ -211,18 +214,8 @@ void ggiFvPatchField<Type>::initEvaluate
       + (1.0 - this->patch().weights())*this->patchNeighbourField()
     );
 
-    if (ggiPatch_.bridgeOverlap())
-    {
-        // Symmetry treatment used for overlap
-        vectorField nHat = this->patch().nf();
-
-        Field<Type> pif = this->patchInternalField();
-
-        Field<Type> bridgeField =
-            0.5*(pif + transform(I - 2.0*sqr(nHat), pif));
-
-        ggiPatch_.bridge(bridgeField, pf);
-    }
+    // Note: bridging and correction of partially overlapping faces taken into
+    // account in patchNeighbourField(). VV, 16/Oct/2017.
 
     Field<Type>::operator=(pf);
 }
