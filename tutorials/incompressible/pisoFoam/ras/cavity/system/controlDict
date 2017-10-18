@@ -18,6 +18,7 @@ FoamFile
 libs
 (
    "libincompressibleRASModels.so"
+    "liblduSolvers.so"
 )
 
 application     pisoFoam;

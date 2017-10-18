@@ -17,6 +17,7 @@ FoamFile
 libs
 (
     "libtopoChangerFvMesh.so"
+    "liblduSolvers.so"
 )
 
 application     icoDyMFoam;

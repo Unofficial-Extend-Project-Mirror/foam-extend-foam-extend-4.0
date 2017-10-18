@@ -77,7 +77,7 @@ Foam::fileName Foam::functionEntries::includeEntry::includeFileName
     fileName fName(is);
     fName.expand();
 
-    if (fName.size() && fName[0] != '/')
+    if (fName.size() && fName[0] != '/' && fName[1] != ':')
     {
         fName = fileName(is.name()).path()/fName;
     }

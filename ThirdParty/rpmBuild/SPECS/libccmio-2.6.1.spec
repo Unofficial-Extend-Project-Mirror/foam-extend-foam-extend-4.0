@@ -105,6 +105,7 @@ Patch0:                 libccmio-2.6.1.patch_0
     [ ! -d config/i386-apple-darwin13 ] && cp -r config/i386-apple-darwin8 config/i386-apple-darwin13
     [ ! -d config/i386-apple-darwin14 ] && cp -r config/i386-apple-darwin8 config/i386-apple-darwin14
     [ ! -d config/i386-apple-darwin15 ] && cp -r config/i386-apple-darwin8 config/i386-apple-darwin15
+    [ ! -d config/i386-apple-darwin16 ] && cp -r config/i386-apple-darwin8 config/i386-apple-darwin16
 %endif
     # Warning:
     #  1: The name of the ADF library will be renamed to libadf_ccmio since this

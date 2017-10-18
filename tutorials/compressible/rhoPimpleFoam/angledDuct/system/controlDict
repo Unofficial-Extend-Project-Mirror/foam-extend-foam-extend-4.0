@@ -18,6 +18,7 @@ FoamFile
 libs
 (
     "libcompressibleRASModels"
+    "liblduSolvers.so"
 )
 
 application     rhoPimpleFoam;

@@ -15,6 +15,12 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
+libs
+(
+    "libcompressibleLESModels.so"
+    "liblduSolvers.so"
+);
+
 application     coalChemistryFoam;
 
 startFrom       latestTime;

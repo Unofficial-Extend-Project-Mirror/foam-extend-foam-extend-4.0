@@ -83,6 +83,23 @@ runApplicationAndReportOnError ()
 # We force the display of a stack trace if we encounter problems
 export FOAM_ABORT=1
 
+# Symbolic links don't work on MS Windows so we make real copies
+if [ "$WM_OSTYPE" = "MSWindows" ]
+then
+    echo "MSWindows detected -> we need to recreate symbolic links which will be actual copies of orginal files (MSWin does not support symbolic links)"
+    # Symbolic links for topAir
+    ln -sf "$PWD/constant/bottomAir/thermophysicalProperties" "$PWD/constant/topAir/thermophysicalProperties"
+    ln -sf "$PWD/constant/bottomAir/g" "$PWD/constant/topAir/g"
+    ln -sf "$PWD/constant/bottomAir/turbulenceProperties" "$PWD/constant/topAir/turbulenceProperties"
+    ln -sf "$PWD/system/bottomAir/fvSolution" "$PWD/system/topAir/fvSolution"
+    ln -sf "$PWD/system/bottomAir/fvSchemes" "$PWD/system/topAir/fvSchemes"
+    # Symbolic links for leftSolid
+    ln -sf "$PWD/system/heater/fvSchemes" "$PWD/system/leftSolid/fvSchemes"
+    ln -sf "$PWD/system/heater/fvSolution" "$PWD/system/leftSolid/fvSolution"
+    # Symbolic links for rightSolid
+    ln -sf "$PWD/system/heater/fvSchemes" "$PWD/system/rightSolid/fvSchemes"
+    ln -sf "$PWD/system/heater/fvSolution" "$PWD/system/rightSolid/fvSolution"
+fi
 rm -rf constant/polyMesh/sets
 runApplicationAndReportOnError blockMesh
 runApplicationAndReportOnError setSet -batch makeCellSets.setSet
