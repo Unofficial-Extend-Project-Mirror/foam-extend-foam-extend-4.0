@@ -63,10 +63,6 @@ class basicSymmetryFvPatchField
 
 public:
 
-    //- Runtime type information
-    TypeName(symmetryFvPatch::typeName_());
-
-
     // Constructors
 
         //- Construct from patch and internal field
