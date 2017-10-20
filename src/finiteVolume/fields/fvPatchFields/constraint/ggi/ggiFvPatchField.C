@@ -163,8 +163,7 @@ tmp<Field<Type> > ggiFvPatchField<Type>::patchNeighbourField() const
 
     // Get shadow face-cells and assemble shadow field
     // This is a patchInternalField of neighbour but access is inconvenient.
-    // Assemble by hand.
-    // HJ, 27/Sep/2011
+    // Assemble by hand. HJ, 27/Sep/2011
     const unallocLabelList& sfc = ggiPatch_.shadow().faceCells();
 
     Field<Type> sField(sfc.size());
@@ -180,13 +179,15 @@ tmp<Field<Type> > ggiFvPatchField<Type>::patchNeighbourField() const
     if (ggiPatch_.bridgeOverlap())
     {
         // Symmetry treatment used for overlap
-        vectorField nHat = this->patch().nf();
+        const vectorField nHat = this->patch().nf();
 
         // Use mirrored neighbour field for interpolation
         // HJ, 21/Jan/2009
-        Field<Type> bridgeField =
+        const Field<Type> bridgeField =
             transform(I - 2.0*sqr(nHat), this->patchInternalField());
 
+        // Note: bridging now takes into account fully uncovered and partially
+        // covered faces. VV, 18/Oct/2017.
         ggiPatch_.bridge(bridgeField, pnf);
     }
 
@@ -211,18 +212,8 @@ void ggiFvPatchField<Type>::initEvaluate
       + (1.0 - this->patch().weights())*this->patchNeighbourField()
     );
 
-    if (ggiPatch_.bridgeOverlap())
-    {
-        // Symmetry treatment used for overlap
-        vectorField nHat = this->patch().nf();
-
-        Field<Type> pif = this->patchInternalField();
-
-        Field<Type> bridgeField =
-            0.5*(pif + transform(I - 2.0*sqr(nHat), pif));
-
-        ggiPatch_.bridge(bridgeField, pf);
-    }
+    // Note: bridging and correction of partially overlapping faces taken into
+    // account in patchNeighbourField(). VV, 16/Oct/2017.
 
     Field<Type>::operator=(pf);
 }
@@ -265,6 +256,21 @@ void ggiFvPatchField<Type>::initInterfaceMatrixUpdate
     }
 
     scalarField pnf = ggiPatch_.interpolate(sField);
+
+    if (ggiPatch_.bridgeOverlap())
+    {
+        // Note: will not work properly for types with rank > 0 (everything
+        // above scalar) if the symmetry plane is not aligned with one of the
+        // coordinate axes. VV, 18/Oct/2017.
+        const scalarField bridgeField =
+            transform
+            (
+                I - 2.0*sqr(this->patch().nf()),
+                ggiPatch_.patchInternalField(psiInternal)
+            );
+
+        ggiPatch_.bridge(bridgeField, pnf);
+    }
 
     // Multiply the field by coefficients and add into the result
     const unallocLabelList& fc = ggiPatch_.faceCells();
@@ -326,6 +332,21 @@ void ggiFvPatchField<Type>::initInterfaceMatrixUpdate
     }
 
     Field<Type> pnf = ggiPatch_.interpolate(sField);
+
+    if (ggiPatch_.bridgeOverlap())
+    {
+        // Note: will not work properly for types with rank > 0 (everything
+        // above scalar) if the symmetry plane is not aligned with one of the
+        // coordinate axes. VV, 18/Oct/2017.
+        const Field<Type> bridgeField =
+            transform
+            (
+                I - 2.0*sqr(this->patch().nf()),
+                ggiPatch_.patchInternalField(psiInternal)
+            );
+
+        ggiPatch_.bridge(bridgeField, pnf);
+    }
 
     // Multiply neighbour field with coeffs and re-use pnf for result
     // of multiplication

@@ -68,6 +68,16 @@ GGIInterpolation<MasterPatch, SlavePatch>::featureCosTol_
 );
 
 
+template<class MasterPatch, class SlavePatch>
+const Foam::debug::tolerancesSwitch
+GGIInterpolation<MasterPatch, SlavePatch>::uncoveredFaceAreaTol_
+(
+    "GGIUncoveredFaceAreaTol",
+    0.999,
+    "Fraction of face area mismatch (sum of weights) to consider a face "
+    "as uncovered, i.e. not to rescale weights."
+);
+
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
 template<class MasterPatch, class SlavePatch>
@@ -80,7 +90,11 @@ void GGIInterpolation<MasterPatch, SlavePatch>::calcAddressing() const
      || slaveAddrPtr_
      || slaveWeightsPtr_
      || uncoveredMasterAddrPtr_
+     || partiallyCoveredMasterAddrPtr_
+     || masterFaceCoveredFractionsPtr_
      || uncoveredSlaveAddrPtr_
+     || partiallyCoveredSlaveAddrPtr_
+     || slaveFaceCoveredFractionsPtr_
     )
     {
         FatalErrorIn
@@ -431,7 +445,7 @@ void GGIInterpolation<MasterPatch, SlavePatch>::calcAddressing() const
                     );
 
                 // Fix: previously checked for VSMALL.
-                // HJ, 19/Sep2/106
+                // HJ, 19/Sep/2016
                 if (intersectionArea > intersectionTestArea)
                 {
                     // We compute the GGI weights based on this
@@ -555,7 +569,7 @@ void GGIInterpolation<MasterPatch, SlavePatch>::calcAddressing() const
         const labelList& curMa = ma[mfI];
         const scalarList& cursmaW = smaW[mfI];
 
-        // Current master face indes
+        // Current master face index
         const label faceMaster = mfI;
 
         forAll (curMa, mAI)
@@ -601,6 +615,29 @@ void GGIInterpolation<MasterPatch, SlavePatch>::calcAddressing() const
             findNonOverlappingFaces(saW, slaveNonOverlapFaceTol_)
         );
 
+    // Calculate master and slave partially covered addressing
+
+    // Note: This function allocates:
+    // 1. partiallyCoveredMasterAddrPtr_
+    // 2. masterFaceCoveredFractionsPtr_
+    calcPartiallyCoveredFaces
+    (
+        maW,
+        masterNonOverlapFaceTol_,
+        true // This is master
+    );
+
+    // Note: this function allocates:
+    // 1. partiallyCoveredSlaveAddrPtr_
+    // 2. slaveFaceCoveredFractionsPtr_
+    calcPartiallyCoveredFaces
+    (
+        saW,
+        slaveNonOverlapFaceTol_,
+        false // This is not master
+    );
+
+
     // Rescaling the weighting factors so they will sum up to 1.0
     // See the comment for the method ::rescaleWeightingFactors() for
     // more information.  By default, we always rescale.  But for some
@@ -608,7 +645,8 @@ void GGIInterpolation<MasterPatch, SlavePatch>::calcAddressing() const
     // then we need the brute values, so no rescaling in that
     // case. Hence the little flag rescaleGGIWeightingFactors_
 
-    // Not parallelised.  HJ, 27/Apr/2016
+    // Not parallelised.  HJ, 27/Apr/2016. Rescaling is not performed for
+    // partially overlapping faces for their correct treatment. VV, 16/Oct/2017.
     if (rescaleGGIWeightingFactors_)
     {
         rescaleWeightingFactors();
@@ -656,6 +694,35 @@ void GGIInterpolation<MasterPatch, SlavePatch>::rescaleWeightingFactors() const
     scalar sumMWC = 0;
     scalar curMWC = 0;
 
+    // Note: do not rescale weighting factors for partially covered faces
+    if (!partiallyCoveredMasterAddrPtr_ || !partiallyCoveredSlaveAddrPtr_)
+    {
+        FatalErrorIn
+        (
+            "void GGIInterpolation<MasterPatch, SlavePatch>::"
+            "rescaleWeightingFactors() const"
+        )   << "Master or slave partially covered faces are not calculated."
+            << abort(FatalError);
+    }
+
+    const labelList& partiallyCoveredMasterFaces =
+        *partiallyCoveredMasterAddrPtr_;
+    const labelList& partiallyCoveredSlaveFaces =
+        *partiallyCoveredSlaveAddrPtr_;
+
+    // Create a mask for partially covered master/slave faces
+    boolList masterPCMask(maW.size(), false);
+    boolList slavePCMask(saW.size(), false);
+
+    forAll (partiallyCoveredMasterFaces, pfmI)
+    {
+        masterPCMask[partiallyCoveredMasterFaces[pfmI]] = true;
+    }
+    forAll (partiallyCoveredSlaveFaces, pfsI)
+    {
+        slavePCMask[partiallyCoveredSlaveFaces[pfsI]] = true;
+    }
+
     // Rescaling the slave weights
     if (debug)
     {
@@ -679,7 +746,7 @@ void GGIInterpolation<MasterPatch, SlavePatch>::rescaleWeightingFactors() const
     {
         scalar slaveWeightSum = Foam::sum(saW[saWi]);
 
-        if (saW[saWi].size() > 0)
+        if (saW[saWi].size() > 0 && !slavePCMask[saWi])
         {
             saW[saWi] = saW[saWi]/slaveWeightSum;
 
@@ -696,7 +763,7 @@ void GGIInterpolation<MasterPatch, SlavePatch>::rescaleWeightingFactors() const
     {
         scalar masterWeightSum = Foam::sum(maW[maWi]);
 
-        if (maW[maWi].size() > 0)
+        if (maW[maWi].size() > 0 && !masterPCMask[maWi])
         {
             maW[maWi] = maW[maWi]/masterWeightSum;
 
@@ -766,6 +833,119 @@ GGIInterpolation<MasterPatch, SlavePatch>::findNonOverlappingFaces
 
     return tpatchFaceNonOverlapAddr;
 }
+
+
+template<class MasterPatch, class SlavePatch>
+void GGIInterpolation<MasterPatch, SlavePatch>::calcPartiallyCoveredFaces
+(
+    const scalarListList& patchWeights,
+    const scalar& nonOverlapFaceTol,
+    const bool isMaster
+) const
+{
+    // Sanity checks first
+    if
+    (
+        isMaster
+     && (partiallyCoveredMasterAddrPtr_ || masterFaceCoveredFractionsPtr_)
+    )
+    {
+        FatalErrorIn
+        (
+            "void GGIInterpolation<MasterPatch, SlavePatch>::"
+            "calcPartiallyCoveredFaces() const"
+        )   << "Already calculated master partially covered faces"
+            << abort(FatalError);
+    }
+
+    if
+    (
+        !isMaster
+     && (partiallyCoveredSlaveAddrPtr_ || slaveFaceCoveredFractionsPtr_)
+    )
+    {
+        FatalErrorIn
+        (
+            "void GGIInterpolation<MasterPatch, SlavePatch>::"
+            "calcPartiallyCoveredFaces() const"
+        )   << "Already calculated slave partially covered faces"
+            << abort(FatalError);
+    }
+
+    // Temporary storage
+    DynamicList<label, 64> patchFacePartialOverlap(patchWeights.size());
+    DynamicList<scalar, 64> uncoveredFaceFractions(patchWeights.size());
+
+    // Scan the list of patch weights and collect ones inbetween
+    // nonOverlapFaceTol and uncoveredFaceAreaTol_
+    forAll (patchWeights, paWi)
+    {
+        const scalar sumWeightsFace = sum(patchWeights[paWi]);
+
+        if
+        (
+            sumWeightsFace > nonOverlapFaceTol
+         && sumWeightsFace <= uncoveredFaceAreaTol_()
+        )
+        {
+            // This is considered partially overlapped face, store the index and
+            // the non-overlapping area (1 - sum of weights)
+            patchFacePartialOverlap.append(paWi);
+            uncoveredFaceFractions.append(1.0 - sumWeightsFace);
+        }
+    }
+
+    // Transfer the storage
+    if (isMaster)
+    {
+        // Allocate master side
+        partiallyCoveredMasterAddrPtr_ =
+            new labelList(patchFacePartialOverlap.xfer());
+        masterFaceCoveredFractionsPtr_ =
+            new scalarField(uncoveredFaceFractions.xfer());
+
+        if (debug)
+        {
+            InfoIn("GGIInterpolation::calcPartiallyCoveredFaces")
+                << "   : Found " << partiallyCoveredMasterAddrPtr_->size()
+                << " partially overlapping faces for master GGI patch" << endl;
+            
+            if (partiallyCoveredMasterAddrPtr_->size())
+            {
+                Info<< "Max coverage: "
+                    << max(*masterFaceCoveredFractionsPtr_)
+                    << ", min coverage: "
+                    << min(*masterFaceCoveredFractionsPtr_)
+                    << endl;
+            }
+        }
+    }
+    else
+    {
+        // Allocate slave side
+        partiallyCoveredSlaveAddrPtr_ =
+            new labelList(patchFacePartialOverlap.xfer());
+        slaveFaceCoveredFractionsPtr_ =
+            new scalarField(uncoveredFaceFractions.xfer());
+
+        if (debug)
+        {
+            InfoIn("GGIInterpolation::calcPartiallyCoveredFaces")
+                << "   : Found " << partiallyCoveredSlaveAddrPtr_->size()
+                << " partially overlapping faces for slave GGI patch" << endl;
+
+            if (partiallyCoveredSlaveAddrPtr_->size())
+            {
+                Info<< "Max coverage: "
+                    << max(*slaveFaceCoveredFractionsPtr_)
+                    << ", min coverage: "
+                    << min(*slaveFaceCoveredFractionsPtr_)
+                    << endl;
+            }
+        }
+    }
+}
+
 
 template<class FromPatch, class ToPatch>
 void GGIInterpolation<FromPatch, ToPatch>::
