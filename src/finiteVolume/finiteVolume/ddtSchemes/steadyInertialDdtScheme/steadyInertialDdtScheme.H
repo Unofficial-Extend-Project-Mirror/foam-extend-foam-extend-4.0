@@ -25,7 +25,8 @@ Class
     Foam::fv::steadyInertialDdtScheme
 
 Description
-    Stabilised local time-step first-order Euler implicit/explicit ddt.
+    Stabilised local time-step first-order Euler implicit/explicit ddt
+    for intertially relaxed steady-state simulations.
     The time-step is adjusted locally so that an advective equations remains
     diagonally dominant.
 
@@ -34,6 +35,9 @@ Description
     under-relaxation for transport consistency reasons.
 
     See also CoEulerDdtScheme.
+
+Author
+    Hrvoje Jasak, Wikki Ltd.  All rights reserved.
 
 SourceFiles
     steadyInertialDdtScheme.C
@@ -66,8 +70,13 @@ class steadyInertialDdtScheme
 {
     // Private Data
 
-        //- Name of the flux field used to calculate the local time-step
-        word phiName_;
+        //- Name of the flux field used to calculate the local
+        //  convective time-step
+        word phiName_; 
+
+        //- Name of the diffusivity field used to calculate the local
+        //  diffusive time-step
+        word nuName_;
 
         //- Name of the density field used to obtain the volumetric flux
         //  from the mass flux if required
@@ -89,7 +98,19 @@ class steadyInertialDdtScheme
         tmp<volScalarField> CorDeltaT() const;
 
         //- Return the reciprocal of the face-Courant-number limited time-step
-        tmp<surfaceScalarField> CofrDeltaT() const;
+        //  for convective transport
+        tmp<surfaceScalarField> convectionCofrDeltaT() const;
+
+        //- Return the reciprocal of the face-Courant-number limited time-step
+        //  for diffusive transport
+        tmp<surfaceScalarField> diffusionCofrDeltaT() const;
+
+        //- Return the reciprocal of the face-Courant-number limited time-step
+        //  for diffusive transport ginev face diffusivity
+        tmp<surfaceScalarField> diffusionCofrDeltaT
+        (
+            const surfaceScalarField& nuf
+        ) const;
 
 
 public:
@@ -105,6 +126,7 @@ public:
         :
             ddtScheme<Type>(mesh, is),
             phiName_(is),
+            nuName_(is),
             rhoName_(is),
             maxCo_(readScalar(is))
         {}
