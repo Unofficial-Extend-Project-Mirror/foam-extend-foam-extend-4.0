@@ -62,14 +62,14 @@ void Foam::ggiFvPatch::makeWeights(scalarField& w) const
     // HJ, 2/Aug/2007
     if (ggiPolyPatch_.master())
     {
-        vectorField n = nf();
+        const vectorField n = nf();
 
         // Note: mag in the dot-product.
         // For all valid meshes, the non-orthogonality will be less than
         // 90 deg and the dot-product will be positive.  For invalid
         // meshes (d & s <= 0), this will stabilise the calculation
         // but the result will be poor.  HJ, 24/Aug/2011
-        scalarField nfc =
+        const scalarField nfc =
             mag(n & (ggiPolyPatch_.reconFaceCellCentres() - Cf()));
 
         w = nfc/(mag(n & (Cf() - Cn())) + nfc);
@@ -78,7 +78,9 @@ void Foam::ggiFvPatch::makeWeights(scalarField& w) const
         {
             // Set overlap weights to 0.5 and use mirrored neighbour field
             // for interpolation.  HJ, 21/Jan/2009
-            bridge(scalarField(size(), 0.5), w);
+            const scalarField bridgedField(size(), 0.5);
+
+            bridge(bridgedField, w);
         }
     }
     else
@@ -87,7 +89,7 @@ void Foam::ggiFvPatch::makeWeights(scalarField& w) const
         scalarField masterWeights(shadow().size());
         shadow().makeWeights(masterWeights);
 
-        scalarField oneMinusW = 1 - masterWeights;
+        const scalarField oneMinusW = 1 - masterWeights;
 
         w = interpolate(oneMinusW);
 
@@ -95,7 +97,9 @@ void Foam::ggiFvPatch::makeWeights(scalarField& w) const
         {
             // Set overlap weights to 0.5 and use mirrored neighbour field
             // for interpolation.  HJ, 21/Jan/2009
-            bridge(scalarField(size(), 0.5), w);
+            const scalarField bridgedField(size(), 0.5);
+
+            bridge(bridgedField, w);
         }
     }
 }
@@ -107,16 +111,12 @@ void Foam::ggiFvPatch::makeDeltaCoeffs(scalarField& dc) const
     if (ggiPolyPatch_.master())
     {
         // Stabilised form for bad meshes.  HJ, 24/Aug/2011
-        vectorField d = delta();
+        const vectorField d = delta();
 
         dc = 1.0/max(nf() & d, 0.05*mag(d));
 
-        if (bridgeOverlap())
-        {
-            scalarField bridgeDeltas = nf() & fvPatch::delta();
-
-            bridge(bridgeDeltas, dc);
-        }
+        // Note: no need to bridge the overlap since delta already takes it into
+        // account. VV, 18/Oct/2017.
     }
     else
     {
@@ -126,7 +126,11 @@ void Foam::ggiFvPatch::makeDeltaCoeffs(scalarField& dc) const
 
         if (bridgeOverlap())
         {
-            scalarField bridgeDeltas = nf() & fvPatch::delta();
+            // Note: double the deltaCoeffs because this is symmetry treatment
+            // and fvPatch::deltaCoeffs() is cell to face inverse distance,
+            // while we need cell to "symmetry neighbour cell" distance.
+            // VV, 18/Oct/2017.
+            const scalarField bridgeDeltas = 2.0*fvPatch::deltaCoeffs();
 
             bridge(bridgeDeltas, dc);
         }
@@ -143,8 +147,8 @@ void Foam::ggiFvPatch::makeCorrVecs(vectorField& cv) const
     // Calculate correction vectors on coupled patches
     const scalarField& patchDeltaCoeffs = deltaCoeffs();
 
-    vectorField patchDeltas = delta();
-    vectorField n = nf();
+    const vectorField patchDeltas = delta();
+    const vectorField n = nf();
 
     // If non-orthogonality is over 90 deg, kill correction vector
     // HJ, 6/Jan/2011
@@ -161,7 +165,10 @@ Foam::tmp<Foam::vectorField> Foam::ggiFvPatch::delta() const
 
         if (bridgeOverlap())
         {
-            vectorField bridgeDeltas = Cf() - Cn();
+            // Note: double the deltas because this is symmetry treatment and
+            // fvPatch::delta() is cell to face distance, while we need cell to
+            // "symmetry neighbour cell" distance. VV, 18/Oct/2017.
+            const vectorField bridgeDeltas = 2.0*fvPatch::delta();
 
             bridge(bridgeDeltas, tDelta());
         }
@@ -177,7 +184,10 @@ Foam::tmp<Foam::vectorField> Foam::ggiFvPatch::delta() const
 
         if (bridgeOverlap())
         {
-            vectorField bridgeDeltas = Cf() - Cn();
+            // Note: double the deltas because this is symmetry treatment and
+            // fvPatch::delta() is cell to face distance, while we need cell to
+            // "symmetry neighbour cell" distance. VV, 18/Oct/2017.
+            const vectorField bridgeDeltas = 2.0*fvPatch::delta();
 
             bridge(bridgeDeltas, tDelta());
         }

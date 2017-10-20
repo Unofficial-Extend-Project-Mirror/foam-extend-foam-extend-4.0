@@ -324,7 +324,7 @@ void Foam::ggiPolyPatch::calcLocalParallel() const
     {
         FatalErrorIn("void ggiPolyPatch::calcLocalParallel() const")
             << "Patch size is greater than zone size for GGI patch "
-            << name() << ".  This is not allowerd: "
+            << name() << ".  This is not allowed: "
             << "the face zone must contain all patch faces and be "
             << "global in parallel runs"
             << abort(FatalError);
