@@ -94,10 +94,9 @@ public:
         BlockLduSystem(const BlockLduSystem<blockType, sourceType>&);
 
 
-    // Destructor
-
-       virtual ~BlockLduSystem()
-       {}
+    //- Destructor
+    virtual ~BlockLduSystem()
+    {}
 
 
     // Member functions

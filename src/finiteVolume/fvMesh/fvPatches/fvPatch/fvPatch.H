@@ -137,8 +137,7 @@ public:
 
 
     //- Destructor
-
-        virtual ~fvPatch();
+    virtual ~fvPatch();
 
 
     // Member Functions
@@ -164,7 +163,7 @@ public:
             }
 
             //- Return true if this patch is coupled
-            bool coupled() const
+            virtual bool coupled() const
             {
                 return polyPatch_.coupled();
             }

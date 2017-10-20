@@ -175,10 +175,9 @@ public:
         fvBlockMatrix(const fvBlockMatrix<Type>&);
 
 
-    // Destructor
-
-       virtual ~fvBlockMatrix()
-       {}
+    //- Destructor
+    virtual ~fvBlockMatrix()
+    {}
 
 
     // Member functions
