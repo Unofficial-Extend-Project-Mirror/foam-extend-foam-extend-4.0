@@ -35,6 +35,7 @@ Description
 \*---------------------------------------------------------------------------*/
 
 #include "argList.H"
+#include "objectRegistry.H"
 #include "foamTime.H"
 #include "volFields.H"
 #include "cellModeller.H"

@@ -79,8 +79,8 @@ diff -ruN ParMGridGen-1.0_orig/MGridGen/Programs/Makefile ParMGridGen-1.0/MGridG
  ifeq ($(ddmalloc),yes)
    DEBUGFLAGS := $(DEBUGFLAGS) -DDMALLOC -DDEBUG
 diff -ruN ParMGridGen-1.0_orig/Makefile.in ParMGridGen-1.0/Makefile.in
---- ParMGridGen-1.0_orig/Makefile.in	2011-12-24 13:54:44.000000000 -0500
-+++ ParMGridGen-1.0/Makefile.in	2011-12-24 13:49:26.000000000 -0500
+--- ParMGridGen-1.0_orig/Makefile.in	2001-12-05 01:30:33.000000000 +0100
++++ ParMGridGen-1.0/Makefile.in	2017-04-04 15:36:04.695980033 +0200
 @@ -1,6 +1,6 @@
  #--------------------------------------------------------------------------
  # Which make to use 
@@ -98,6 +98,15 @@ diff -ruN ParMGridGen-1.0_orig/Makefile.in ParMGridGen-1.0/Makefile.in
  
  # Which loader to use
  LD = cc
+@@ -22,7 +22,7 @@
+ LDOPTIONS = -O3
+ 
+ # Where to put the executable 
+-BINDIR = ../..
++BINDIR = ../../bin
+ 
+ # Additional libraries
+ DMALLOCDIR = /usr/local
 @@ -33,22 +33,25 @@
  
  # In which directories to look for any additional libraries
@@ -129,3 +138,28 @@ diff -ruN ParMGridGen-1.0_orig/Makefile.in ParMGridGen-1.0/Makefile.in
  
  #--------------------------------------------------------------------------
  # 
+diff -ruN ParMGridGen-1.0_orig/Makefile ParMGridGen-1.0/Makefile
+--- ParMGridGen-1.0_orig/Makefile	2001-11-09 00:41:22.000000000 +0100
++++ ParMGridGen-1.0/Makefile	2017-04-04 14:51:04.033914737 +0200
+@@ -1,16 +1,21 @@
+ default:
++	(mkdir bin)
+ 	(cd MGridGen ; make)
+ 
+ serial:
++	(mkdir bin)
+ 	(cd MGridGen ; make)
+ 
+ parallel:
++	(mkdir bin)
+ 	(cd MGridGen ; make)
+ 	(cd ParMGridGen ; make)
+ clean:
++	(mkdir bin)
+ 	(cd MGridGen ; make clean)
+ 	(cd ParMGridGen ; make clean )
+ 
+ realclean:
++	(mkdir bin)
+ 	(cd MGridGen ; make realclean )
+ 	(cd ParMGridGen ; make realclean )
