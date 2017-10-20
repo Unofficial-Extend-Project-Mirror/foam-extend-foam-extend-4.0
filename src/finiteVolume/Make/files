@@ -86,7 +86,6 @@ $(fvPatchFields)/fvPatchField/fvPatchFields.C
 $(fvPatchFields)/fvPatchField/fvPatchVectorNFields.C
 
 basicFvPatchFields = $(fvPatchFields)/basic
-$(basicFvPatchFields)/basicSymmetry/basicSymmetryFvPatchFields.C
 $(basicFvPatchFields)/basicSymmetry/basicSymmetryFvPatchScalarField.C
 $(basicFvPatchFields)/calculated/calculatedFvPatchFields.C
 $(basicFvPatchFields)/calculated/calculatedFvPatchVectorNFields.C
