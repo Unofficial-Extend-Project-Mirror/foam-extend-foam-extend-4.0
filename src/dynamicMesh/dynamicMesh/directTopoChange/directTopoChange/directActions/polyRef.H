@@ -43,6 +43,9 @@ SourceFiles
 Author
     Vuko Vukcevic, Wikki Ltd.  All rights reserved.
 
+Notes
+    Generalisation of hexRef8 for polyhedral cells
+
 \*---------------------------------------------------------------------------*/
 
 #ifndef polyRef_H

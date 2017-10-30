@@ -32,6 +32,12 @@ Description
 SourceFiles
     dynamicRefinePolyFvMesh.C
 
+Author
+    Vuko Vukcevic, Wikki Ltd.  All rights reserved
+
+Notes
+    Generalisation of dynamicRefineMesh for polyhedral cells
+
 \*---------------------------------------------------------------------------*/
 
 #ifndef dynamicRefinePolyFvMesh_H
