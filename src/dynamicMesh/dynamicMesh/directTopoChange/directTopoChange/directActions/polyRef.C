@@ -800,7 +800,11 @@ Foam::label Foam::polyRef::getAnchorLevel(const label faceI) const
         }
     }
 
-    Info<< "nPointsPerLevel: " << nPointsPerLevel << endl;
+    if (debug)
+    {
+        // Print out number of points per level
+        Info<< "nPointsPerLevel: " << nPointsPerLevel << endl;
+    }
 
     // Find level with maximum number of points
     const label maxLevelI = findMax(nPointsPerLevel);
