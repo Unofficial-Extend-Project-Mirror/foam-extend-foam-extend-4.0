@@ -1253,8 +1253,7 @@ void Foam::polyRef::createInternalFaces
         const labelList& fEdges = mesh_.faceEdges()[faceI];
 
         // We are on the cellI side of face f. The face will have 1 or n
-        // cLevel points (where n is the number of points/edges of a face)
-        // and lots of higher numbered ones.
+        // cLevel points
 
         label faceMidPointI = -1;
 
@@ -1283,21 +1282,13 @@ void Foam::polyRef::createInternalFaces
 
             faceMidPointI = f[faceMid];
         }
-        else if (nAnchors == f.size())
+        else
         {
             // There is no face middle yet but the face will be marked for
             // splitting.
 
             faceMidPointI = faceMidPoint[faceI];
         }
-        else
-        {
-            FatalErrorIn("createInternalFaces")
-                << "nAnchors: " << nAnchors
-                << " faceI: " << faceI
-                << abort(FatalError);
-        }
-
 
 
         // Now loop over all the anchors (might be just one) and store
