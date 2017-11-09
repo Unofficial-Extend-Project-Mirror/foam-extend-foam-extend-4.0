@@ -45,6 +45,12 @@ namespace Foam
 {
     defineTypeNameAndDebug(ILUC0, 0);
 
+    // Register with symmetric and asymmetric run-time selection table
+    // HJ and VV, 31/Oct/2017
+    lduPreconditioner::
+        addsymMatrixConstructorToTable<ILUC0>
+        addILUC0ditionerSymMatrixConstructorToTable_;
+
     lduPreconditioner::
         addasymMatrixConstructorToTable<ILUC0>
         addILUC0ditionerAsymMatrixConstructorToTable_;
