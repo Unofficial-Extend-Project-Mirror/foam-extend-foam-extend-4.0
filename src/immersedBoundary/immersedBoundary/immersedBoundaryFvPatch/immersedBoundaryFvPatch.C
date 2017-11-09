@@ -1327,11 +1327,11 @@ void Foam::immersedBoundaryFvPatch::makeIbCellCells() const
             // to find local IB support
             for (label procI = 0; procI < Pstream::nProcs(); procI++)
             {
-                labelHashSet procCellSet(csEst());
-
                 // Search all processor apart from self
                 if (procI != Pstream::myProcNo())
                 {
+                    labelHashSet procCellSet(csEst());
+
                     // Get points to search
                     const vectorList& curCtrs = ctrs[procI];
                     const scalarList& curRMax = procRMax[procI];
@@ -1350,86 +1350,73 @@ void Foam::immersedBoundaryFvPatch::makeIbCellCells() const
                             // Get index obtained by octree
                             const label nearestCellID = pih.index();
 
-                            // Check if a cell was actually hit
-                            if
-                            (
-                                mesh_.pointInCellBB
+                            // Valid hit found.  Check radius
+
+                            // Calculate radius
+                            scalar R = mag(C[nearestCellID] - curP);
+
+                            if (R < curRMax[cellI])
+                            {
+                                // Insert cell as support
+                                // Search not needed: duplicates
+                                // automatically filtered
+                                // HJ, 2/May/2017
+                                procCellSet.insert(nearestCellID);
+
+                                // Search neighbourhood
+                                labelList tmpCellList;
+
+                                // Collect extended neighbourhood
+                                // for search
+                                findCellCells
                                 (
                                     curP,
-                                    nearestCellID
-                                )
-                            )
-                            {
-                                // Valid hit found.  Check radius
+                                    nearestCellID,
+                                    tmpCellList
+                                );
 
-                                // Calculate radius
-                                scalar R = mag(C[nearestCellID] - curP);
-
-                                if (R < curRMax[cellI])
+                                forAll (tmpCellList, cI)
                                 {
-                                    // Insert cell as support
-                                    // Search not needed: duplicates
-                                    // automatically filtered
-                                    // HJ, 2/May/2017
-                                    procCellSet.insert(nearestCellID);
+                                    const scalar r =
+                                        mag
+                                        (
+                                            C[tmpCellList[cI]]
+                                          - curP
+                                        );
 
-                                    // Search neighbourhood
-                                    labelList tmpCellList;
-
-                                    // Collect extended neighbourhood
-                                    // for search
-                                    findCellCells
-                                    (
-                                        curP,
-                                        nearestCellID,
-                                        tmpCellList
-                                    );
-
-                                    forAll (tmpCellList, cI)
+                                    if (r <= procRMax[procI][cellI])
                                     {
-                                        const scalar r =
-                                            mag
-                                            (
-                                                C[tmpCellList[cI]]
-                                                - curP
-                                            );
+                                        // Within distance.
+                                        // Search direction
+                                        vector dir = (C[nearestCellID] - curP);
+                                        dir /= mag(dir) + SMALL;
 
-                                        if (r <= procRMax[procI][cellI])
+                                        // Change of sign of normal.
+                                        // HJ, 21/May/2012
+                                        if
+                                        (
+                                            (-procIbn[procI][cellI] & dir)
+                                         >= angleLimit
+                                        )
                                         {
-                                            // Within distance.
-                                            // Search direction
-                                            vector dir =
-                                                (C[nearestCellID] - curP);
-
-                                            dir /= mag(dir) + SMALL;
-
-                                            // Change of sign of normal.
-                                            // HJ, 21/May/2012
-                                            if
+                                            // Search not needed: duplicates
+                                            // automatically filtered
+                                            // HJ, 2/May/2017
+                                            procCellSet.insert
                                             (
-                                                (-procIbn[procI][cellI] & dir)
-                                             >= angleLimit
-                                            )
-                                            {
-                                                // Search not needed: duplicates
-                                                // automatically filtered
-                                                // HJ, 2/May/2017
-                                                procCellSet.insert
-                                                (
-                                                    tmpCellList[cI]
-                                                );
-                                            }
+                                                tmpCellList[cI]
+                                            );
                                         }
                                     }
                                 }
                             }
                         }
                     }
-                }
 
-                // Collected all local cells that may act as support for
-                // other processor IB points
-                procCells[procI] = procCellSet.toc();
+                    // Collected all local cells that may act as support for
+                    // other processor IB points
+                    procCells[procI] = procCellSet.toc();
+                }
             }
         }
 
