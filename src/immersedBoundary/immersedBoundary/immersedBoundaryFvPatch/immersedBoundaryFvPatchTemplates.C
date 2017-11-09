@@ -29,86 +29,6 @@ License
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 template<class Type>
-Foam::tmp<Foam::FieldField<Foam::Field, Type> >
-Foam::immersedBoundaryFvPatch::sendAndReceive
-(
-    const Field<Type>& psi
-) const
-{
-    tmp<FieldField<Field, Type> > tprocPsi
-    (
-        new FieldField<Field, Type>(Pstream::nProcs())
-    );
-    FieldField<Field, Type>& procPsi = tprocPsi();
-
-    // This requires a rewrite useng mapDistribute
-    // HJ, 11/Aug/2016
-
-    forAll (procPsi, procI)
-    {
-        procPsi.set
-        (
-            procI,
-            new Field<Type>
-            (
-                ibProcCentres()[procI].size(),
-                pTraits<Type>::zero
-            )
-        );
-    }
-
-    if (Pstream::parRun())
-    {
-        // Send
-        for (label procI = 0; procI < Pstream::nProcs(); procI++)
-        {
-            if (procI != Pstream::myProcNo())
-            {
-                // Do not send empty lists
-                if (!ibProcCells()[procI].empty())
-                {
-                    Field<Type> curPsi(psi, ibProcCells()[procI]);
-
-                    // Parallel data exchange
-                    OPstream toProc
-                    (
-                        Pstream::blocking,
-                        procI,
-                        curPsi.size()*sizeof(Type)
-                    );
-
-                    toProc << curPsi;
-                }
-            }
-        }
-
-        // Receive
-        for (label procI = 0; procI < Pstream::nProcs(); procI++)
-        {
-            if (procI != Pstream::myProcNo())
-            {
-                // Do not receive empty lists
-                if (!procPsi[procI].empty())
-                {
-                    // Parallel data exchange
-                    IPstream fromProc
-                    (
-                        Pstream::blocking,
-                        procI,
-                        procPsi[procI].size()*sizeof(Type)
-                    );
-
-                    fromProc >> procPsi[procI];
-                }
-            }
-        }
-    }
-
-    return tprocPsi;
-}
-
-
-template<class Type>
 Foam::tmp<Foam::Field<Type> >
 Foam::immersedBoundaryFvPatch::toIbPoints
 (
@@ -206,8 +126,8 @@ Foam::immersedBoundaryFvPatch::toTriFaces
             << abort(FatalError);
     }
 
-    const labelListList& ctfAddr = cellsToTriAddr();
-    const scalarListList& ctfWeights = cellsToTriWeights();
+    const labelListList& ctfAddr = this->cellsToTriAddr();
+    const scalarListList& ctfWeights = this->cellsToTriWeights();
 
     tmp<Field<Type> > tIbPsi
     (
@@ -270,13 +190,13 @@ Foam::immersedBoundaryFvPatch::toSamplingPoints
     }
 
     // Get addressing
-    const labelList& ibc = ibCells();
-    const labelListList& ibcc = ibCellCells();
-    const List<List<labelPair> >& ibcProcC = ibCellProcCells();
+    const labelList& ibc = this->ibCells();
+    const labelListList& ibcc = this->ibCellCells();
+    const labelListList& ibcProcC = this->ibCellProcCells();
 
     // Get weights
-    const scalarListList& cellWeights = ibSamplingWeights();
-    const scalarListList& cellProcWeights = ibSamplingProcWeights();
+    const scalarListList& cellWeights = this->ibSamplingWeights();
+    const scalarListList& cellProcWeights = this->ibSamplingProcWeights();
 
     tmp<Field<Type> > tIbPsi
     (
@@ -296,26 +216,25 @@ Foam::immersedBoundaryFvPatch::toSamplingPoints
         }
     }
 
-    // Parallel communication for psi
-    FieldField<Field, Type> procCellValues = sendAndReceive(cellValues);
+    Field<Type> procCellValues;
+
+    // Parallel communication for psi, using mapDistribute
+    if (Pstream::parRun())
+    {
+        procCellValues = cellValues;
+        ibMap().distribute(procCellValues);
+    }
 
     // Do interpolation, cell data from other processors
     forAll (ibc, cellI)
     {
-        const List<labelPair>& curProcCells = ibcProcC[cellI];
+        const labelList& curProcCells = ibcProcC[cellI];
         const scalarList& curProcWeights = cellProcWeights[cellI];
 
         forAll (curProcCells, cpcI)
         {
             ibPsi[cellI] +=
-                curProcWeights[cpcI]*
-                procCellValues
-                [
-                    curProcCells[cpcI].first()
-                ]
-                [
-                    curProcCells[cpcI].second()
-                ];
+                curProcWeights[cpcI]*procCellValues[curProcCells[cpcI]];
         }
     }
 

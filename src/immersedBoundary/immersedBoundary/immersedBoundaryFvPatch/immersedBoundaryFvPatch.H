@@ -27,9 +27,15 @@ Class
 Description
     Immersed boundary FV patch
 
+Notes
+    Rewrite of the immersed boundary method for increased efficiency
+    and robustness.  Main changes
+    - using octree for fast search of eligible cells using indexedOctree
+    - parallel communication using mapDistribute
+
 Author
     Zeljko Tukovic
-    Reorganisation by Hrvoje Jasak
+    Reorganisation and optimisation by Hrvoje Jasak
 
 SourceFiles
     immersedBoundaryFvPatch.C
@@ -48,11 +54,13 @@ SourceFiles
 #include "volFieldsFwd.H"
 #include "surfaceFieldsFwd.H"
 #include "dynamicLabelList.H"
-#include "labelPair.H"
 #include "scalarList.H"
 #include "vectorList.H"
 #include "FieldFields.H"
 #include "scalarMatrices.H"
+#include "indexedOctree.H"
+#include "treeDataCell.H"
+#include "mapDistribute.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -63,7 +71,7 @@ namespace Foam
 class fvMesh;
 
 /*---------------------------------------------------------------------------*\
-                    Class immersedBoundaryFvPatch Declaration
+                   Class immersedBoundaryFvPatch Declaration
 \*---------------------------------------------------------------------------*/
 
 class immersedBoundaryFvPatch
@@ -84,13 +92,13 @@ class immersedBoundaryFvPatch
 
     // Static data
 
-        //- Fitting angle rejection factor (deg)
-        //  Cells within the the radius will be used for the fitting function
-        static const debug::tolerancesSwitch angleFactor_;
-
         //- Fitting radius factor
-        //  Cells within the the radius will be used for the fitting function
+        //  Cells within the radius will be used for the fitting function
         static const debug::tolerancesSwitch radiusFactor_;
+
+        //- Fitting angle rejection factor (deg)
+        //  Cells outside of the angle will not be used for the fitting function
+        static const debug::tolerancesSwitch angleFactor_;
 
         //- Maximum number of rows in cell-cell search
         static const debug::optimisationSwitch maxCellCellRows_;
@@ -166,17 +174,20 @@ class immersedBoundaryFvPatch
             //  (extended stencil)
             mutable labelListList* ibCellCellsPtr_;
 
-            //- List of cells needed by neighbour processors
+            //- List of cells needed by other processors
             mutable labelListList* ibProcCellsPtr_;
 
-            //- Centres of cells from neighbour processors
-            mutable vectorListList* ibProcCentresPtr_;
+            //- Processor mapDistribute
+            mutable mapDistribute* ibMapPtr_;
 
-            //- Gamma of cells from neighbour processors
-            mutable scalarListList* ibProcGammaPtr_;
+            //- Centres of cells from other processors
+            mutable vectorList* ibProcCentresPtr_;
 
-            //- Cell-proc-cell addressing
-            mutable List<List<labelPair> >* ibCellProcCellsPtr_;
+            //- Gamma of cells from other processors (needed for sampling)
+            mutable scalarList* ibProcGammaPtr_;
+
+            //- Neighbour IB cell-proc-cell addressing
+            mutable labelListList* ibCellProcCellsPtr_;
 
             //- Dead cells list
             mutable labelList* deadCellsPtr_;
@@ -221,6 +232,13 @@ class immersedBoundaryFvPatch
             mutable dynamicLabelList triFacesInMesh_;
 
 
+        // Cell surface search
+
+            //- Cell octree for search in local region
+            //  Used in donor cell search
+            mutable indexedOctree<treeDataCell>* cellSearchPtr_;
+
+
     // Private Member Functions
 
 
@@ -228,6 +246,9 @@ class immersedBoundaryFvPatch
 
             //- Clear all demand-driven data
             void clearOut();
+
+            //- Return cell set size estimate for hash sets
+            label csEst() const;
 
 
         // Make demand-driven data
@@ -297,10 +318,11 @@ class immersedBoundaryFvPatch
             //- Make triangular surface face area vectors
             void makeTriSf() const;
 
-            //- Find nearest cell
-            label findNearestCell(const point& location) const;
+            //- Calculate cell octree
+            void calcCellSearch() const;
 
-            //- Return extended cell-cell addressing
+            //- Prepare a list of cell candidates for cell-cell addressing
+            //  The list is sorted in increasing distance from pt
             void findCellCells
             (
                 const vector& pt,
@@ -446,23 +468,26 @@ public:
             //- Return IB cell extended stencil
             const labelListList& ibCellCells() const;
 
-            //- Return neighbour proc centres
-            //  These are centres from neighbouring processors the
-            //  local processor needs to receive
-            const vectorListList& ibProcCentres() const;
-
-            //- Return neighbour proc gamma
-            //  These are gamma values from neighbouring processors the
-            //  local processor needs to receive
-            const scalarListList& ibProcGamma() const;
-
-            //- Return neighbour cell addressing
-            const List<List<labelPair> >& ibCellProcCells() const;
-
             //- Return neighbour proc cells
             //  These are cell data that other processors need from
             //  local processor
             const labelListList& ibProcCells() const;
+
+            //- Processor mapDistribute
+            const mapDistribute& ibMap() const;
+
+            //- Return neighbour proc centres
+            //  These are centres from neighbouring processors the
+            //  local processor needs to receive
+            const vectorList& ibProcCentres() const;
+
+            //- Return neighbour cell addressing
+            const labelListList& ibCellProcCells() const;
+
+            //- Return neighbour proc gamma
+            //  These are gamma values from neighbouring processors the
+            //  local processor needs to receive
+            const scalarList& ibProcGamma() const;
 
             //- Return dead cells
             const labelList& deadCells() const;
@@ -510,14 +535,11 @@ public:
             const dynamicLabelList&  triFacesInMesh() const;
 
 
-        // Parallel communication
+        // Donor cell search functionality
 
-            //- Send and receive
-            template<class Type>
-            tmp<FieldField<Field, Type> > sendAndReceive
-            (
-                const Field<Type>& psi
-            ) const;
+            //- Return cell octree for search in local region
+            //  Only eligible cells are in the tree
+            const indexedOctree<treeDataCell>& cellSearch() const;
 
 
         // Interpolation functions to and from triangular surface

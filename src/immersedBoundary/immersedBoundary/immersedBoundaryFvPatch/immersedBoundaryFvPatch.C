@@ -50,7 +50,6 @@ Foam::immersedBoundaryFvPatch::radiusFactor_
 (
     "immersedBoundaryRadiusFactor",
     3.5
-//     5
 );
 
 
@@ -59,7 +58,6 @@ Foam::immersedBoundaryFvPatch::angleFactor_
 (
     "immersedBoundaryAngleFactor",
     80
-//     170
 );
 
 
@@ -68,7 +66,6 @@ Foam::immersedBoundaryFvPatch::maxCellCellRows_
 (
     "immersedBoundaryMaxCellCellRows",
     4
-//     5
 );
 
 
@@ -81,6 +78,12 @@ Foam::immersedBoundaryFvPatch::distFactor_
 
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
+
+Foam::label Foam::immersedBoundaryFvPatch::csEst() const
+{
+    return Foam::max(100, 0.1*mesh_.nCells());
+}
+
 
 void Foam::immersedBoundaryFvPatch::makeGamma() const
 {
@@ -124,9 +127,10 @@ void Foam::immersedBoundaryFvPatch::makeGamma() const
 
     const labelList& ibc = ibCells();
 
+    // Remove IB cells from gammaExt to create gamma
     forAll (ibc, cellI)
     {
-        gammaI[ibc[cellI]] = 0.0;
+        gammaI[ibc[cellI]] = 0;
     }
 
     // Not allowed to call correctBoundaryConditions.  HJ, 16/Apr/2012
@@ -284,6 +288,7 @@ void Foam::immersedBoundaryFvPatch::makeSGamma() const
     forAll (sGammaI, faceI)
     {
         // If both cells are live, flux is live
+        // Note: checking 0:1 indicator
         if
         (
             gExtIn[owner[faceI]] > SMALL
@@ -298,6 +303,7 @@ void Foam::immersedBoundaryFvPatch::makeSGamma() const
     forAll (sGammaI, faceI)
     {
         // If both cells are live, flux is live
+        // Note: checking 0:1 indicator
         if
         (
             gIbIn[owner[faceI]] > SMALL
@@ -321,6 +327,7 @@ void Foam::immersedBoundaryFvPatch::makeSGamma() const
 
             forAll (gammaOwn, faceI)
             {
+                // Note: checking 0:1 indicator
                 if
                 (
                     gammaOwn[faceI] > SMALL
@@ -338,6 +345,7 @@ void Foam::immersedBoundaryFvPatch::makeSGamma() const
 
             forAll (gammaOwn, faceI)
             {
+                // Note: checking 0:1 indicator
                 if
                 (
                     gammaIbOwn[faceI] > SMALL
@@ -360,6 +368,7 @@ void Foam::immersedBoundaryFvPatch::makeSGamma() const
 
             forAll (gammaFc, faceI)
             {
+                // Note: checking 0:1 indicator
                 if (gammaFc[faceI] > SMALL)
                 {
                    gP[faceI] = 1;
@@ -390,7 +399,8 @@ void Foam::immersedBoundaryFvPatch::makeIbCells() const
             << abort(FatalError);
     }
 
-    labelHashSet ibCellSet;
+    // Collect IB cells in hashSet to eliminate duplicates
+    labelHashSet ibCellSet(csEst());
 
     const unallocLabelList& owner = mesh_.owner();
     const unallocLabelList& neighbour = mesh_.neighbour();
@@ -398,23 +408,26 @@ void Foam::immersedBoundaryFvPatch::makeIbCells() const
     const volScalarField gE = gammaExt();
     const scalarField& gammaExtI = gE.internalField();
 
+    // IB cell is identified by having a dead neighbour
     forAll (neighbour, faceI)
     {
+        // Note: checking 0:1 indicator
         if (mag(gammaExtI[neighbour[faceI]] - gammaExtI[owner[faceI]]) > SMALL)
         {
+            // Note: checking 0:1 indicator
             if (gammaExtI[owner[faceI]] > SMALL)
             {
-                if (!ibCellSet.found(owner[faceI]))
-                {
-                    ibCellSet.insert(owner[faceI]);
-                }
+                // Owner is live: IB cell
+                // Search not needed: duplicates automatically filtered
+                // HJ, 2/May/2017
+                ibCellSet.insert(owner[faceI]);
             }
             else
             {
-                if (!ibCellSet.found(neighbour[faceI]))
-                {
-                    ibCellSet.insert(neighbour[faceI]);
-                }
+                // Neighbour is live: IB cell
+                // Search not needed: duplicates automatically filtered
+                // HJ, 2/May/2017
+                ibCellSet.insert(neighbour[faceI]);
             }
         }
     }
@@ -426,6 +439,7 @@ void Foam::immersedBoundaryFvPatch::makeIbCells() const
             scalarField gammaExtOwn =
                 gE.boundaryField()[patchI].patchInternalField();
 
+            // Get gamma from other side of a coupled patch
             scalarField gammaExtNei =
                 gE.boundaryField()[patchI].patchNeighbourField();
 
@@ -434,6 +448,7 @@ void Foam::immersedBoundaryFvPatch::makeIbCells() const
 
             forAll (gammaExtOwn, faceI)
             {
+                // Note: checking 0:1 indicator
                 if
                 (
                     mag(gammaExtNei[faceI] - gammaExtOwn[faceI])
@@ -442,36 +457,19 @@ void Foam::immersedBoundaryFvPatch::makeIbCells() const
                 {
                     if (gammaExtOwn[faceI] > SMALL)
                     {
-                        if (!ibCellSet.found(fCells[faceI]))
-                        {
-                            ibCellSet.insert(fCells[faceI]);
-                        }
+                        // Search not needed: duplicates automatically filtered
+                        // HJ, 2/May/2017
+                        ibCellSet.insert(fCells[faceI]);
                     }
-                    else if (2*gammaExtOwn.size() == fCells.size())
-                    {
-                        if
-                        (
-                           !ibCellSet.found
-                            (
-                                fCells[gammaExtOwn.size() + faceI]
-                            )
-                        )
-                        {
-                            ibCellSet.insert
-                            (
-                                fCells[gammaExtOwn.size() + faceI]
-                            );
-                        }
-                    }
+                    // Bugfix: Removed special handling for cyclic patch
                 }
             }
         }
     }
 
-    ibCellsPtr_ = new labelList(ibCellSet.toc());
-    sort(*ibCellsPtr_);
+    ibCellsPtr_ = new labelList(ibCellSet.sortedToc());
 
-    Pout << "Number of IB cells: " << ibCellsPtr_->size() << endl;
+    Pout<< "Number of IB cells: " << ibCellsPtr_->size() << endl;
 }
 
 
@@ -494,9 +492,10 @@ void Foam::immersedBoundaryFvPatch::addIbCornerCells() const
     const unallocLabelList& nei = mesh_.neighbour();
 
     label nCornerCells = 0;
-    labelList cornerCells;
 
     const triSurfaceSearch& tss = ibPolyPatch_.triSurfSearch();
+
+    labelList cornerCells;
 
     do
     {
@@ -511,7 +510,7 @@ void Foam::immersedBoundaryFvPatch::addIbCornerCells() const
 
         const scalarField& gammaI = gamma().internalField();
 
-        labelHashSet cornerIbCellSet;
+        labelHashSet cornerIbCellSet(csEst());
 
         const labelList& ibf = ibFaces();
 
@@ -520,17 +519,15 @@ void Foam::immersedBoundaryFvPatch::addIbCornerCells() const
             const label& ownCell = own[ibf[faceI]];
             const label& neiCell = nei[ibf[faceI]];
 
-//             label ibCell = -1;
             label liveCell = -1;
 
+            // Note: checking 0:1 indicator
             if (gammaI[ownCell] > SMALL)
             {
-//                 ibCell = neiCell;
                 liveCell = ownCell;
             }
             else
             {
-//                 ibCell = ownCell;
                 liveCell = neiCell;
             }
 
@@ -583,7 +580,6 @@ void Foam::immersedBoundaryFvPatch::addIbCornerCells() const
 
                         label neiCell = -1;
 
-                        //HJ bug fix?
                         if (mesh_.isInternalFace(curFace))
                         {
                             if (own[curFace] == liveCell)
@@ -611,10 +607,8 @@ void Foam::immersedBoundaryFvPatch::addIbCornerCells() const
 
                 if (area/totalArea < 0.5)
                 {
-                    if (!cornerIbCellSet.found(liveCell))
-                    {
-                        cornerIbCellSet.insert(liveCell);
-                    }
+                    // Insert corner cell without checking
+                    cornerIbCellSet.insert(liveCell);
                 }
             }
         }
@@ -677,8 +671,6 @@ void Foam::immersedBoundaryFvPatch::makeIbFaces() const
 
     const unallocLabelList& owner = mesh_.owner();
     const unallocLabelList& neighbour = mesh_.neighbour();
-
-//     const scalarField& gammaI = gamma().internalField();
 
     forAll (neighbour, faceI)
     {
@@ -784,7 +776,8 @@ void Foam::immersedBoundaryFvPatch::makeIbInsideFaces() const
             << abort(FatalError);
     }
 
-    labelHashSet ibInsideFSet;
+    // Create face hash set with estimated size
+    labelHashSet ibInsideFSet(Foam::max(100, 0.1*mesh_.nFaces()));
 
     const labelList& owner = mesh_.faceOwner();
     const labelList& neighbour = mesh_.faceNeighbour();
@@ -794,6 +787,7 @@ void Foam::immersedBoundaryFvPatch::makeIbInsideFaces() const
 
     forAll (neighbour, faceI)
     {
+        // Note: checking 0:1 indicator
         if (mag(gammaExtI[neighbour[faceI]] - gammaExtI[owner[faceI]]) > SMALL)
         {
             ibInsideFSet.insert(faceI);
@@ -810,44 +804,25 @@ void Foam::immersedBoundaryFvPatch::makeIbInsideFaces() const
             scalarField gammaNei =
                 gE.boundaryField()[patchI].patchNeighbourField();
 
-            label size = mesh_.boundaryMesh()[patchI].size();
-            label start = mesh_.boundaryMesh()[patchI].start();
+            label patchStart = mesh_.boundaryMesh()[patchI].start();
 
             forAll (gammaOwn, faceI)
             {
+                // Note: checking 0:1 indicator
                 if
                 (
                     mag(gammaNei[faceI] - gammaOwn[faceI]) > SMALL
                 )
                 {
-                    if (!ibInsideFSet.found(start + faceI))
-                    {
-                        ibInsideFSet.insert(start + faceI);
-                    }
-
-                    if (2*gammaOwn.size() == size)
-                    {
-                        if
-                        (
-                           !ibInsideFSet.found
-                            (
-                                start + size/2 + faceI
-                            )
-                        )
-                        {
-                            ibInsideFSet.insert
-                            (
-                                start + size/2 + faceI
-                            );
-                        }
-                    }
+                    // Search not needed: duplicates automatically filtered
+                    // HJ, 2/May/2017
+                    ibInsideFSet.insert(patchStart + faceI);
                 }
             }
         }
     }
 
-    ibInsideFacesPtr_ = new labelList(ibInsideFSet.toc());
-    sort(*ibInsideFacesPtr_);
+    ibInsideFacesPtr_ = new labelList(ibInsideFSet.sortedToc());
 }
 
 
@@ -869,7 +844,8 @@ void Foam::immersedBoundaryFvPatch::makeIbInternalFaces() const
             << abort(FatalError);
     }
 
-    labelHashSet ibInternalFacesSet;
+    // Create face hash set with estimated size
+    labelHashSet ibInternalFacesSet(Foam::max(100, 0.1*mesh_.nFaces()));
 
     const labelList& owner = mesh_.faceOwner();
     const labelList& neighbour = mesh_.faceNeighbour();
@@ -883,6 +859,7 @@ void Foam::immersedBoundaryFvPatch::makeIbInternalFaces() const
 
     forAll (neighbour, faceI)
     {
+        // Note: checking 0:1 indicator
         if
         (
             (gammaTmpI[neighbour[faceI]] > SMALL)
@@ -903,45 +880,26 @@ void Foam::immersedBoundaryFvPatch::makeIbInternalFaces() const
             scalarField gammaNei =
                 gammaTmp.boundaryField()[patchI].patchNeighbourField();
 
-            label size = mesh_.boundaryMesh()[patchI].size();
-            label start = mesh_.boundaryMesh()[patchI].start();
+            label patchStart = mesh_.boundaryMesh()[patchI].start();
 
             forAll (gammaOwn, faceI)
             {
+                // Note: checking 0:1 indicator
                 if
                 (
                     (gammaNei[faceI] > SMALL)
                  && (gammaOwn[faceI] > SMALL)
                 )
                 {
-                    if (!ibInternalFacesSet.found(start + faceI))
-                    {
-                        ibInternalFacesSet.insert(start + faceI);
-                    }
-
-                    if (2*gammaOwn.size() == size)
-                    {
-                        if
-                        (
-                           !ibInternalFacesSet.found
-                            (
-                                start + size/2 + faceI
-                            )
-                        )
-                        {
-                            ibInternalFacesSet.insert
-                            (
-                                start + size/2 + faceI
-                            );
-                        }
-                    }
+                    // Search not needed: duplicates automatically filtered
+                    // HJ, 2/May/2017
+                    ibInternalFacesSet.insert(patchStart + faceI);
                 }
             }
         }
     }
 
-    ibInternalFacesPtr_ = new labelList(ibInternalFacesSet.toc());
-    sort(*ibInternalFacesPtr_);
+    ibInternalFacesPtr_ = new labelList(ibInternalFacesSet.sortedToc());
 }
 
 
@@ -970,10 +928,10 @@ void Foam::immersedBoundaryFvPatch::makeIbPointsAndNormals() const
             << abort(FatalError);
     }
 
-    // Find average cell dimension
+    // Find representative cell dimension for IB cells
     const labelList& ibc = ibCells();
 
-    scalarField delta(ibc.size(), 0.0);
+    scalarField delta(ibc.size());
 
     forAll (delta, cellI)
     {
@@ -981,21 +939,24 @@ void Foam::immersedBoundaryFvPatch::makeIbPointsAndNormals() const
     }
 
     // Find nearest triSurface point for each interface cell centre
-    ibPointsPtr_ = new vectorField(ibc.size(), vector::zero);
-    ibNormalsPtr_ = new vectorField(ibc.size(), vector::zero);
-    hitFacesPtr_ = new labelList(ibc.size(), -1);
-    ibSamplingPointsPtr_ = new vectorField(ibc.size(), vector::zero);
 
+    // Allocate storage
+    ibPointsPtr_ = new vectorField(ibc.size(), vector::zero);
     vectorField& ibPoints = *ibPointsPtr_;
+
+    ibNormalsPtr_ = new vectorField(ibc.size(), vector::zero);
     vectorField& ibNormals = *ibNormalsPtr_;
+
+    hitFacesPtr_ = new labelList(ibc.size(), -1);
     labelList& ibHitFaces = *hitFacesPtr_;
+
+    ibSamplingPointsPtr_ = new vectorField(ibc.size(), vector::zero);
     vectorField& ibSamplingPoints = *ibSamplingPointsPtr_;
 
-    const vectorField& C = mesh_.C().internalField();
+    // Get IB cell centres by subsetting
+    vectorField ibCellCentres(mesh_.cellCentres(), ibc);
 
-    // Get IB cell centres
-    vectorField ibCellCentres(C, ibc);
-
+    // Get surface search
     const triSurfaceSearch& tss = ibPolyPatch_.triSurfSearch();
 
     forAll (ibc, cellI)
@@ -1078,6 +1039,8 @@ void Foam::immersedBoundaryFvPatch::makeIbCellCells() const
     if
     (
         ibCellCellsPtr_
+     || ibProcCellsPtr_
+     || ibMapPtr_
      || ibProcCentresPtr_
      || ibProcGammaPtr_
      || ibCellProcCellsPtr_
@@ -1090,30 +1053,62 @@ void Foam::immersedBoundaryFvPatch::makeIbCellCells() const
             << abort(FatalError);
     }
 
-    const labelList& ibc = ibCells();
-
-    ibCellCellsPtr_ = new labelListList(ibc.size());
-    labelListList& cellCells = *ibCellCellsPtr_;
-
-    ibProcCentresPtr_ = new vectorListList(Pstream::nProcs());
-    vectorListList& procCentres = *ibProcCentresPtr_;
-
-    ibProcGammaPtr_ = new scalarListList(Pstream::nProcs());
-    scalarListList& procGamma = *ibProcGammaPtr_;
-
-
-    ibCellProcCellsPtr_ = new List<List<labelPair> >(ibc.size());
-    List<List<labelPair> >& cellProcCells = *ibCellProcCellsPtr_;
-
+    // Get mesh cells
     const cellList& meshCells = mesh_.cells();
 
     // In geometry initialisation, fields are not available: use raw mesh data
     // HJ after ZT, 6/Dec/2012
     const vectorField& C = mesh_.cellCentres();
 
-    scalarField rM(ibCellSizes());
-    rM *= radiusFactor_();
+    // Get IB cells
+    const labelList& ibc = ibCells();
 
+    // Allocate storage
+
+    // Local IB support: cellCells
+    ibCellCellsPtr_ = new labelListList(ibc.size());
+    labelListList& cellCells = *ibCellCellsPtr_;
+
+    // Dummy map: for parallel run it will be reset below
+    {
+        labelListList zeroList;
+
+        ibMapPtr_ = new mapDistribute
+        (
+            0,
+            zeroList,
+            zeroList,
+            false            // Do not reuse
+        );
+    }
+
+    // Cells that support interpolation on other
+    ibProcCellsPtr_ = new labelListList(Pstream::nProcs());
+    labelListList& procCells = *ibProcCellsPtr_;
+
+    // Centres of other supporting processors.  Sized only in parallel run
+    ibProcCentresPtr_ = new vectorList();
+    vectorList& procCentres = *ibProcCentresPtr_;
+
+    // Gamma from other processorss.  Sized only in parallel run
+    ibProcGammaPtr_ = new scalarList();
+    scalarList& procGamma = *ibProcGammaPtr_;
+
+    // Neighbour IB cell-proc-cell addressing
+    ibCellProcCellsPtr_ = new labelListList(ibc.size());
+    labelListList& cellProcCells = *ibCellProcCellsPtr_;
+
+
+    // Get characteristic cell size for IB cells
+    const scalarField& cellSizes = ibCellSizes();
+
+    // Calculate angle limit
+    scalar angleLimit = -Foam::cos(angleFactor_()*mathematicalConstant::pi/180);
+
+    // Calculate radius for all ibCells
+    scalarField rM = radiusFactor_()*cellSizes;
+
+    // Get IB points
     const vectorField& ibp = ibPoints();
 
     // Note: the algorithm is originally written with inward-facing normals
@@ -1121,32 +1116,34 @@ void Foam::immersedBoundaryFvPatch::makeIbCellCells() const
     // HJ, 21/May/2012
     const vectorField& ibn = ibNormals();
 
-    forAll (cellCells, cellI)
+    forAll (ibc, cellI)
     {
+        // Get IB cell centre
+        const vector curIbCentre = C[ibc[cellI]];
+
+        // Collect extended neighbourhood for search
         labelList curCells;
 
         findCellCells
         (
-            C[ibc[cellI]],
+            curIbCentre,
             ibc[cellI],
             curCells
         );
 
+        // Filter the cellCells for the direction angle
         cellCells[cellI] = labelList(curCells.size(), -1);
 
         label cI = 0;
 
-        for (label i = 0; i < curCells.size(); i++)
+        forAll (curCells, i)
         {
             label curCell = curCells[i];
-            scalar r = mag(C[curCell] - C[ibc[cellI]]);
 
             // Collect the cells within rM of the fitting cell
-            if (r <= rM[cellI])
+            if (mag(C[curCell] - C[ibc[cellI]]) <= rM[cellI])
             {
-                scalar angleLimit =
-                    -Foam::cos(angleFactor_()*mathematicalConstant::pi/180);
-
+                // Within distance.  Search direction
                 vector dir = (C[curCell] - ibp[cellI]);
                 dir /= mag(dir) + SMALL;
 
@@ -1161,16 +1158,33 @@ void Foam::immersedBoundaryFvPatch::makeIbCellCells() const
         cellCells[cellI].setSize(cI);
     }
 
+    // Establish immersed boundary support spanning across processor
+    // boundaries
+    // Algorithm:
+    // 1) Find all local IB clusters that touch a processor boundary.
+    //    For each such cluster collect the cell index, centroid and rMax
+    // 2) Using gather-scatter distribute the search data to all processors
+    // 3) For each processor, perform a local search for all other processors
+    //    (but not for self)
+
+    // Check the need for parallel communication
+    // If the cellCell cluster touches a processor boundary, it may be possible
+    // to locate interpolation support on other processors
     if (Pstream::parRun())
     {
+        // Set the fields that exist only for a parallel run.  They were
+        // created empty
+        procCells.setSize(Pstream::nProcs());
+
         // Find immersed boundary cells next to processor boundaries
-        labelHashSet procIbCellsSet;
+        labelHashSet procIbCellsSet(csEst());
 
         forAll (ibc, cellI)
         {
             const labelList& curCellCells = cellCells[cellI];
 
-            if (curCellCells.size())
+            // If there are local neighbours, check them
+            if (!curCellCells.empty())
             {
                 forAll (curCellCells, cI)
                 {
@@ -1180,11 +1194,16 @@ void Foam::immersedBoundaryFvPatch::makeIbCellCells() const
 
                     forAll (faces, faceI)
                     {
-                        label patchID =
-                            mesh_.boundaryMesh().whichPatch(faces[faceI]);
-
-                        if (patchID != -1)
+                        if (!mesh_.isInternalFace(faces[faceI]))
                         {
+                            // Face is not internal.  Find patch
+                            label patchID =
+                                mesh_.boundaryMesh().whichPatch(faces[faceI]);
+
+                            // If a processor patch is hit, prepare search
+                            // on other processors
+                            // HJ, Rewrite: this requires generalisation
+                            // HJ, 1/Oct/2017
                             if
                             (
                                 isA<processorPolyPatch>
@@ -1207,17 +1226,23 @@ void Foam::immersedBoundaryFvPatch::makeIbCellCells() const
             }
             else
             {
+                // No local neighbours detected.  Check IB cell
                 const labelList& faces = meshCells[ibc[cellI]];
 
                 bool foundProcessorFace = false;
 
                 forAll (faces, faceI)
                 {
-                    label patchID =
-                        mesh_.boundaryMesh().whichPatch(faces[faceI]);
-
-                    if (patchID != -1)
+                    if (!mesh_.isInternalFace(faces[faceI]))
                     {
+                        // Face is not internal.  Find patch
+                        label patchID =
+                            mesh_.boundaryMesh().whichPatch(faces[faceI]);
+
+                        // If a processor patch is hit, prepare search
+                        // on other processors
+                        // HJ, Rewrite: this requires generalisation
+                        // HJ, 1/Oct/2017
                         if
                         (
                             isA<processorPolyPatch>
@@ -1237,13 +1262,23 @@ void Foam::immersedBoundaryFvPatch::makeIbCellCells() const
                 }
             }
         }
-        labelList procIbCells = procIbCellsSet.toc();
-        sort(procIbCells);
+
+        // Collect all IB cells that require processor search
+        labelList procIbCells = procIbCellsSet.sortedToc();
 
         // Note: new gather-scatter operations
         // HJ, 11/Aug/2016
 
+        // Note: possible optimisation
+        // It is possible to avoid sending all IB cell seeds to all processors
+        // if the seed point is "sufficiently far" from the processor mesh
+        // bounding box.
+        // This reduces communication, but does not affect search time
+        // For details, see equivalent overset mesh code in oversetRegion.C
+        // HJ, 4/Oct/2017
+
         // Send and receive ibc centres and radii
+        // This is used for search on other processors
         vectorListList ctrs(Pstream::nProcs());
 
         ctrs[Pstream::myProcNo()].setSize(procIbCells.size());
@@ -1254,141 +1289,311 @@ void Foam::immersedBoundaryFvPatch::makeIbCellCells() const
             centres[cellI] = C[ibc[procIbCells[cellI]]];
         }
 
+        // Broadcast ibc centres
         Pstream::gatherList(ctrs);
         Pstream::scatterList(ctrs);
 
-        scalarListList rMax(Pstream::nProcs());
+        // Send and receive IB procRMax
+        scalarListList procRMax(Pstream::nProcs());
+        procRMax[Pstream::myProcNo()] = scalarField(rM, procIbCells);
 
-        rMax[Pstream::myProcNo()] = scalarField(rM, procIbCells);
+        // Broadcast procRMax
+        // This is used for search on other processors
+        Pstream::gatherList(procRMax);
+        Pstream::scatterList(procRMax);
 
-        Pstream::gatherList(rMax);
-        Pstream::scatterList(rMax);
+        // Send and receive IB procIbn
+        vectorListList procIbn(Pstream::nProcs());
+        procIbn[Pstream::myProcNo()] = vectorField(ibn, procIbCells);
 
-        // Find cells needed by other processors
-        if (ibProcCellsPtr_)
+        // Broadcast procRMax
+        // This is used for search on other processors
+        Pstream::gatherList(procIbn);
+        Pstream::scatterList(procIbn);
+
+        // Get search tree
+        const indexedOctree<treeDataCell>& tree = cellSearch();
+
+        const scalar span = tree.bb().mag();
+
+        // Using octree search, establish send-receive maps for parallel data
+        // collection.  HJ, 4/Oct/2017
+
+        // It is possible that an octree is empty.  If there are no eligible
+        // cells on this processor, do not search
+        if (!tree.nodes().empty())
         {
-            FatalErrorIn("immersedBoundaryFvPatch::makeIbCellCells() const")
-                << "procCells addressing already exists"
-                << abort(FatalError);
-        }
-
-        ibProcCellsPtr_ = new labelListList(Pstream::nProcs());
-        labelListList& procCells = *ibProcCellsPtr_;
-
-        for (label procI = 0; procI < Pstream::nProcs(); procI++)
-        {
-            labelHashSet procCellSet;
-
-            if (procI != Pstream::myProcNo())
+            // Search all processor clusters from other processors
+            // to find local IB support
+            for (label procI = 0; procI < Pstream::nProcs(); procI++)
             {
-                forAll (ctrs[procI], cellI)
+                labelHashSet procCellSet(csEst());
+
+                // Search all processor apart from self
+                if (procI != Pstream::myProcNo())
                 {
-                    label nearestCellID =
-                        findNearestCell(ctrs[procI][cellI]);
+                    // Get points to search
+                    const vectorList& curCtrs = ctrs[procI];
+                    const scalarList& curRMax = procRMax[procI];
 
-                    if (nearestCellID == -1)
+                    forAll (curCtrs, cellI)
                     {
-                        FatalErrorIn
-                        (
-                            "immersedBoundaryFvPatch::makeIbCellCells() const"
-                        ) << "Can't find nearest cell."
-                            << abort(FatalError);
-                    }
+                        // Get current point
+                        const point& curP = curCtrs[cellI];
 
-                    scalar R = mag(C[nearestCellID] - ctrs[procI][cellI]);
+                        // Find nearest cell with octree. Note: octree only
+                        // contains eligible cells.  HJ, 10/Jan/2015.
+                        const pointIndexHit pih = tree.findNearest(curP, span);
 
-                    if (R < rMax[procI][cellI])
-                    {
-                        if (!procCellSet.found(nearestCellID))
+                        if (pih.hit())
                         {
-                            procCellSet.insert(nearestCellID);
-                        }
+                            // Get index obtained by octree
+                            const label nearestCellID = pih.index();
 
-                        labelList tmpCellList;
-
-                        findCellCells
-                        (
-                            ctrs[procI][cellI],
-                            nearestCellID,
-                            tmpCellList
-                        );
-
-                        forAll (tmpCellList, cI)
-                        {
-                            scalar r =
-                                mag
+                            // Check if a cell was actually hit
+                            if
+                            (
+                                mesh_.pointInCellBB
                                 (
-                                    C[tmpCellList[cI]]
-                                  - ctrs[procI][cellI]
-                                );
-
-                            if (r <= rMax[procI][cellI])
+                                    curP,
+                                    nearestCellID
+                                )
+                            )
                             {
-                                if (!procCellSet.found(tmpCellList[cI]))
+                                // Valid hit found.  Check radius
+
+                                // Calculate radius
+                                scalar R = mag(C[nearestCellID] - curP);
+
+                                if (R < curRMax[cellI])
                                 {
-                                    procCellSet.insert(tmpCellList[cI]);
+                                    // Insert cell as support
+                                    // Search not needed: duplicates
+                                    // automatically filtered
+                                    // HJ, 2/May/2017
+                                    procCellSet.insert(nearestCellID);
+
+                                    // Search neighbourhood
+                                    labelList tmpCellList;
+
+                                    // Collect extended neighbourhood
+                                    // for search
+                                    findCellCells
+                                    (
+                                        curP,
+                                        nearestCellID,
+                                        tmpCellList
+                                    );
+
+                                    forAll (tmpCellList, cI)
+                                    {
+                                        const scalar r =
+                                            mag
+                                            (
+                                                C[tmpCellList[cI]]
+                                                - curP
+                                            );
+
+                                        if (r <= procRMax[procI][cellI])
+                                        {
+                                            // Within distance.
+                                            // Search direction
+                                            vector dir =
+                                                (C[nearestCellID] - curP);
+
+                                            dir /= mag(dir) + SMALL;
+
+                                            // Change of sign of normal.
+                                            // HJ, 21/May/2012
+                                            if
+                                            (
+                                                (-procIbn[procI][cellI] & dir)
+                                             >= angleLimit
+                                            )
+                                            {
+                                                // Search not needed: duplicates
+                                                // automatically filtered
+                                                // HJ, 2/May/2017
+                                                procCellSet.insert
+                                                (
+                                                    tmpCellList[cI]
+                                                );
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }
                     }
                 }
-            }
 
-            procCells[procI] = procCellSet.toc();
+                // Collected all local cells that may act as support for
+                // other processor IB points
+                procCells[procI] = procCellSet.toc();
+            }
         }
 
-        Pstream::gatherList(procCells);
-        Pstream::scatterList(procCells);
+        // Note:
+        // procCells is the send map.  The receive map is calculated by
+        // finding out how many cells are passed from each processor
+        // and ordering them in processor order
+        // This will be a square matrix in which each processor fills its row
+        labelListList nAllProcUsed(Pstream::nProcs());
+        labelList& curProcUsed = nAllProcUsed[Pstream::myProcNo()];
+        curProcUsed.setSize(Pstream::nProcs(), 0);
 
-        procCentres[Pstream::myProcNo()] =
-            vectorField
-            (
-                C,
-                procCells[Pstream::myProcNo()]
-            );
-
-        Pstream::gatherList(procCentres);
-        Pstream::scatterList(procCentres);
-
-        // Send cell gamma
-        procGamma[Pstream::myProcNo()] =
-            scalarField
-            (
-                gamma().internalField(),
-                procCells[Pstream::myProcNo()]
-            );
-        // Reset own size to zero?  HJ, 11/Aug/2016
-
-        // Cell-procCells addressing
-        forAll (cellProcCells, cellI)
+        forAll (curProcUsed, procI)
         {
-            scalar rMax = rM[cellI];
+            curProcUsed[procI] = procCells[procI].size();
+        }
 
-            cellProcCells[cellI].setSize(100);
+        // Gather/scatter number of used points going to each processor from
+        // each processor so that all processors have all necessary information
+        // when creating the map distribute tool for distributing points
+        Pstream::gatherList(nAllProcUsed);
+        Pstream::scatterList(nAllProcUsed);
 
-            label index = 0;
-            forAll (procCentres, procI)
+        // Create components for mapDistribute
+        // Numbering of received points: all points from proc 1,
+        // followed by all points from proc 2 etc.
+
+        // Record how to assemble points from which processor
+        labelListList constructMap(Pstream::nProcs());
+
+        label constructSize = 0;
+
+        forAll (nAllProcUsed, procI)
+        {
+            // Get column size
+            const label colSize = nAllProcUsed[procI][Pstream::myProcNo()];
+
+            // Fill the map
+            labelList& curConstructMap = constructMap[procI];
+
+            curConstructMap.setSize(colSize);
+
+            forAll (curConstructMap, i)
             {
-                forAll (procCentres[procI], pointI)
-                {
-                    scalar r =
-                        mag
-                        (
-                            procCentres[procI][pointI]
-                          - C[ibc[cellI]]
-                        );
+                curConstructMap[i] = constructSize;
+                constructSize++;
+            }
+        }
 
-                    if (r <= rMax)
+        // Create mapDistribute
+        deleteDemandDrivenData(ibMapPtr_);
+
+        ibMapPtr_ = new mapDistribute
+        (
+            constructSize,
+            procCells,
+            constructMap,
+            false            // Do not reuse
+        );
+        const mapDistribute& ibm = *ibMapPtr_;
+
+        // Use mapDistribute to assemble other data
+
+        // Centres from other processors
+        procCentres = C;
+        ibm.distribute(procCentres);
+
+        // Gamma from other processors
+        procGamma = gamma().internalField();
+        ibm.distribute(procGamma);
+
+        // Algorithm
+        // At this stage, all possible cells providing support for IB points
+        // on other processor have been collected and broadcast.
+        // Go through all ib cells and select the points
+        // that are used for individual local IB cells.
+
+        forAll (ibc, cellI)
+        {
+            // Get IB cell centre
+            const vector curIbCentre = C[ibc[cellI]];
+
+            labelList& curCellProcCells = cellProcCells[cellI];
+
+            curCellProcCells.setSize(procCentres.size());
+
+            // Count number of proceCells to use
+            label cI = 0;
+
+            // Check all procCentres
+            // Note
+            // This is a problematic algorithm because it is squared in
+            // the number of IB cells and procCells, neither of which
+            // can be controlled
+            // Formally, an IB cell which is further away from the processor
+            // boundary may also have support on other processors.
+            // To handle this, all IB cells are checked against all other
+            // procCells that support
+
+            forAll (procCentres, i)
+            {
+                // Collect the cells within rM of the fitting cell
+                if (mag(procCentres[i] - curIbCentre) <= rM[cellI])
+                {
+                    // Within distance.  Search direction
+                    vector dir = (procCentres[i] -  ibp[cellI]);
+                    dir /= mag(dir) + SMALL;
+
+                    // Change of sign of normal.  HJ, 21/May/2012
+                    if ((-ibn[cellI] & dir) >= angleLimit)
                     {
-                        cellProcCells[cellI][index].first() = procI;
-                        cellProcCells[cellI][index].second() = pointI;
-                        index++;
+                        curCellProcCells[cI++] = i;
                     }
                 }
             }
 
-            cellProcCells[cellI].setSize(index);
+            // Resize the cell list
+            curCellProcCells.setSize(cI);
         }
+    }
+
+    // if (debug)
+    {
+        // Check size of cellCells, cellProcCells and sum for all ibCells
+        label minCC = INT_MAX;
+        label minProcCC = INT_MAX;
+        label minTotCC = INT_MAX;
+
+        label maxCC = 0;
+        label maxProcCC = 0;
+        label maxTotCC = 0;
+
+        forAll (cellCells, ibpI)
+        {
+            minCC = Foam::min(minCC, cellCells[ibpI].size());
+            minProcCC = Foam::min(minProcCC, cellProcCells[ibpI].size());
+            minTotCC = Foam::min
+            (
+                minTotCC,
+                cellCells[ibpI].size() + cellProcCells[ibpI].size()
+            );
+
+            maxCC = Foam::max(maxCC, cellCells[ibpI].size());
+            maxProcCC = Foam::max(maxProcCC, cellProcCells[ibpI].size());
+            maxTotCC = Foam::max
+            (
+                maxTotCC,
+                cellCells[ibpI].size() + cellProcCells[ibpI].size()
+            );
+        }
+
+        reduce(minCC, minOp<label>());
+        reduce(minProcCC, minOp<label>());
+        reduce(minTotCC, minOp<label>());
+
+        reduce(maxCC, maxOp<label>());
+        reduce(maxProcCC, maxOp<label>());
+        reduce(maxTotCC, maxOp<label>());
+
+        Info<< "Min/Max support CC, procCC, total = ("
+            << minCC << token::SPACE << minProcCC << token::SPACE << minTotCC
+            << ", "
+            << maxCC << token::SPACE << maxProcCC << token::SPACE << maxTotCC
+            << ")" << endl;
     }
 }
 
@@ -1761,37 +1966,69 @@ void Foam::immersedBoundaryFvPatch::makeTriSf() const
 }
 
 
-// Find the cell with the nearest cell centre
-Foam::label Foam::immersedBoundaryFvPatch::findNearestCell
-(
-    const point& location
-) const
+void Foam::immersedBoundaryFvPatch::calcCellSearch() const
 {
-    const vectorField& C = mesh_.cellCentres();
+    if (cellSearchPtr_)
+    {
+        FatalErrorIn("void immersedBoundaryFvPatch::calcCellSearch() const")
+            << "Cell tree already calculated"
+            << abort(FatalError);
+    }
 
+    // Create the octree search for this mesh.  It will be used by other
+    // processors when searching for  cells
+
+    // Bounding box containing only local region cells
+    treeBoundBox overallBb(mesh_.allPoints());
+    Random rndGen(123456);
+    overallBb = overallBb.extend(rndGen, 1E-4);
+    overallBb.min() -= point(ROOTVSMALL, ROOTVSMALL, ROOTVSMALL);
+    overallBb.max() += point(ROOTVSMALL, ROOTVSMALL, ROOTVSMALL);
+
+    // Collect eligible cells
     const scalarField& gammaExtI = gammaExt().internalField();
 
-    label nearestCellI = -1;
-    scalar minProximity = GREAT;
+    labelList eligibleCells(gammaExtI.size());
+    label nElig = 0;
 
-    for (label cellI = 0; cellI < C.size(); cellI++)
+    forAll (gammaExtI, cellI)
     {
+        // Note: checking 0:1 indicator
         if (gammaExtI[cellI] > SMALL)
         {
-            scalar proximity = magSqr(C[cellI] - location);
-
-            if (proximity < minProximity)
-            {
-                nearestCellI = cellI;
-                minProximity = proximity;
-            }
+            eligibleCells[nElig] = cellI;
+            nElig++;
         }
     }
 
-    return nearestCellI;
+    // Resize eligible list
+    eligibleCells.setSize(nElig);
+
+    if (nElig == 0)
+    {
+        WarningIn("void immersedBoundaryFvPatch::calcCellSearch() const")
+            << "No eligible cells: cellSearch empty"
+            << endl;
+    }
+
+    // Search
+    cellSearchPtr_ = new indexedOctree<treeDataCell>
+    (
+        treeDataCell
+        (
+            false,  //  Cache bb.  Reconsider for moving mesh cases
+            mesh_,
+            eligibleCells
+        ),
+        overallBb,  // overall search domain
+        8,          // maxLevel
+        10,         // leafsize
+        3.0         // duplicity
+    );
 }
 
 
+// Find the cell with the nearest cell centre
 void Foam::immersedBoundaryFvPatch::findCellCells
 (
     const vector& pt,
@@ -1804,7 +2041,8 @@ void Foam::immersedBoundaryFvPatch::findCellCells
 
     const scalarField& gammaExtI = gammaExt().internalField();
 
-    labelHashSet cellSet;
+    // Create a hash set with estimated size
+    labelHashSet cellSet(maxCellCellRows_()*primitiveMesh::facesPerCell_);
     cellSet.insert(cellID);
 
     // First row
@@ -1812,17 +2050,18 @@ void Foam::immersedBoundaryFvPatch::findCellCells
 
     forAll (curCellPoints, pointI)
     {
-        label curPoint = curCellPoints[pointI];
+        const label curPoint = curCellPoints[pointI];
         const labelList& curPointCells = pointCells[curPoint];
 
         forAll (curPointCells, cI)
         {
+            // Note: checking 0:1 indicator
             if (gammaExtI[curPointCells[cI]] > SMALL)
             {
-                if (!cellSet.found(curPointCells[cI]))
-                {
-                    cellSet.insert(curPointCells[cI]);
-                }
+                // Insert cell as support
+                // Search not needed: duplicates automatically filtered
+                // HJ, 2/May/2017
+                cellSet.insert(curPointCells[cI]);
             }
         }
     }
@@ -1836,22 +2075,22 @@ void Foam::immersedBoundaryFvPatch::findCellCells
 
         forAll (curCells, cellI)
         {
-            label curCell = curCells[cellI];
+            const label curCell = curCells[cellI];
             const labelList& curCellPoints = cellPoints[curCell];
 
             forAll (curCellPoints, pointI)
             {
-                label curPoint = curCellPoints[pointI];
+                const label curPoint = curCellPoints[pointI];
                 const labelList& curPointCells = pointCells[curPoint];
 
                 forAll (curPointCells, cI)
                 {
                     if (gammaExtI[curPointCells[cI]] > SMALL)
                     {
-                        if (!cellSet.found(curPointCells[cI]))
-                        {
-                            cellSet.insert(curPointCells[cI]);
-                        }
+                        // Insert cell as support
+                        // Search not needed: duplicates automatically filtered
+                        // HJ, 2/May/2017
+                        cellSet.insert(curPointCells[cI]);
                     }
                 }
             }
@@ -1889,15 +2128,15 @@ void Foam::immersedBoundaryFvPatch::findCellCells
 
 Foam::scalar Foam::immersedBoundaryFvPatch::cellSize(label cellID) const
 {
-    scalar delta;
-
+    // Inefficient: reconsider.  HJ, 4/Oct/2017
     if (mesh_.nGeometricD() == 3)
     {
-        delta = Foam::pow(mesh_.V().field()[cellID], 1.0/3.0);
+        return Foam::pow(mesh_.V().field()[cellID], 1.0/3.0);
     }
     else
     {
-        scalar thickness = 0.0;
+        scalar thickness = 0;
+
         const Vector<label>& directions = mesh_.geometricD();
         for (direction dir = 0; dir < directions.nComponents; dir++)
         {
@@ -1908,10 +2147,8 @@ Foam::scalar Foam::immersedBoundaryFvPatch::cellSize(label cellID) const
             }
         }
 
-        delta = sqrt(mesh_.V().field()[cellID]/thickness);
+        return sqrt(mesh_.V().field()[cellID]/thickness);
     }
-
-    return delta;
 }
 
 
@@ -1974,9 +2211,11 @@ void Foam::immersedBoundaryFvPatch::clearOut()
 
     deleteDemandDrivenData(ibCellCellsPtr_);
     deleteDemandDrivenData(ibProcCellsPtr_);
+    deleteDemandDrivenData(ibMapPtr_);
     deleteDemandDrivenData(ibProcCentresPtr_);
     deleteDemandDrivenData(ibProcGammaPtr_);
     deleteDemandDrivenData(ibCellProcCellsPtr_);
+
     deleteDemandDrivenData(deadCellsPtr_);
     deleteDemandDrivenData(deadCellsExtPtr_);
     deleteDemandDrivenData(deadFacesPtr_);
@@ -1992,6 +2231,8 @@ void Foam::immersedBoundaryFvPatch::clearOut()
     deleteDemandDrivenData(ibSamplingPointDeltaPtr_);
 
     deleteDemandDrivenData(triSfPtr_);
+
+    deleteDemandDrivenData(cellSearchPtr_);
 }
 
 
@@ -2037,6 +2278,7 @@ Foam::immersedBoundaryFvPatch::immersedBoundaryFvPatch
     cellsToTriWeightsPtr_(NULL),
     ibCellCellsPtr_(NULL),
     ibProcCellsPtr_(NULL),
+    ibMapPtr_(NULL),
     ibProcCentresPtr_(NULL),
     ibProcGammaPtr_(NULL),
     ibCellProcCellsPtr_(NULL),
@@ -2051,7 +2293,8 @@ Foam::immersedBoundaryFvPatch::immersedBoundaryFvPatch
     ibMagSfPtr_(NULL),
     ibDeltaPtr_(NULL),
     ibSamplingPointDeltaPtr_(NULL),
-    triSfPtr_(NULL)
+    triSfPtr_(NULL),
+    cellSearchPtr_(NULL)
 {}
 
 
@@ -2212,7 +2455,40 @@ const Foam::labelListList& Foam::immersedBoundaryFvPatch::ibCellCells() const
 }
 
 
-const Foam::vectorListList&
+const Foam::labelListList& Foam::immersedBoundaryFvPatch::ibProcCells() const
+{
+    if (!ibProcCellsPtr_)
+    {
+        makeIbCellCells();
+    }
+
+    return *ibProcCellsPtr_;
+}
+
+
+const Foam::mapDistribute&
+Foam::immersedBoundaryFvPatch::ibMap() const
+{
+    if (!Pstream::parRun())
+    {
+        FatalErrorIn
+        (
+            "const mapDistribute& immersedBoundaryFvPatch::ibMap() const"
+        )   << "Requested mapDistribute in serial run.  "
+            << "This is not allowed"
+            << abort(FatalError);
+    }
+
+    if (!ibCellProcCellsPtr_)
+    {
+        makeIbCellCells();
+    }
+
+    return *ibMapPtr_;
+}
+
+
+const Foam::vectorList&
 Foam::immersedBoundaryFvPatch::ibProcCentres() const
 {
     if (!ibProcCentresPtr_)
@@ -2224,7 +2500,7 @@ Foam::immersedBoundaryFvPatch::ibProcCentres() const
 }
 
 
-const Foam::scalarListList&
+const Foam::scalarList&
 Foam::immersedBoundaryFvPatch::ibProcGamma() const
 {
     if (!ibProcGammaPtr_)
@@ -2236,7 +2512,7 @@ Foam::immersedBoundaryFvPatch::ibProcGamma() const
 }
 
 
-const Foam::List<Foam::List<Foam::labelPair> >&
+const Foam::labelListList&
 Foam::immersedBoundaryFvPatch::ibCellProcCells() const
 {
     if (!ibCellProcCellsPtr_)
@@ -2245,17 +2521,6 @@ Foam::immersedBoundaryFvPatch::ibCellProcCells() const
     }
 
     return *ibCellProcCellsPtr_;
-}
-
-
-const Foam::labelListList& Foam::immersedBoundaryFvPatch::ibProcCells() const
-{
-    if (!ibProcCellsPtr_)
-    {
-        makeIbCellCells();
-    }
-
-    return *ibProcCellsPtr_;
 }
 
 
@@ -2373,6 +2638,18 @@ const Foam::vectorField& Foam::immersedBoundaryFvPatch::triSf() const
 const Foam::vectorField& Foam::immersedBoundaryFvPatch::triCf() const
 {
     return ibMesh().faceCentres();
+}
+
+
+const Foam::indexedOctree<Foam::treeDataCell>&
+Foam::immersedBoundaryFvPatch::cellSearch() const
+{
+    if (!cellSearchPtr_)
+    {
+        calcCellSearch();
+    }
+
+    return *cellSearchPtr_;
 }
 
 

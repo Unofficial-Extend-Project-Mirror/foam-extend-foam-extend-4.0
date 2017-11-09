@@ -52,7 +52,7 @@ void Foam::immersedBoundaryFvPatch::makeInvDirichletMatrices() const
     // Get addressing
     const labelList& ibc = ibCells();
     const labelListList& ibcc = ibCellCells();
-    const List<List<labelPair> >& ibcProcC = ibCellProcCells();
+    const labelListList& ibcProcC = ibCellProcCells();
     const vectorField& ibp = ibPoints();
 
     invDirichletMatricesPtr_ =
@@ -66,7 +66,7 @@ void Foam::immersedBoundaryFvPatch::makeInvDirichletMatrices() const
     // Initialize maxRowSum for debug
     scalar maxRowSum = 0.0;
 
-    const vectorListList& procC = ibProcCentres();
+    const vectorList& procC = ibProcCentres();
 
     label nCoeffs = 5;
 
@@ -78,7 +78,7 @@ void Foam::immersedBoundaryFvPatch::makeInvDirichletMatrices() const
     forAll (idm, cellI)
     {
         const labelList& interpCells = ibcc[cellI];
-        const List<labelPair>& interpProcCells = ibcProcC[cellI];
+        const labelList& interpProcCells = ibcProcC[cellI];
 
         vectorField allPoints
         (
@@ -107,14 +107,7 @@ void Foam::immersedBoundaryFvPatch::makeInvDirichletMatrices() const
         // Processor cells
         for (label i = 0; i < interpProcCells.size(); i++)
         {
-            allPoints[pointID++] =
-                procC
-                [
-                    interpProcCells[i].first()
-                ]
-                [
-                    interpProcCells[i].second()
-                ];
+            allPoints[pointID++] = procC[interpProcCells[i]];
         }
 
         // Weights calculation
@@ -286,7 +279,7 @@ void Foam::immersedBoundaryFvPatch::makeInvNeumannMatrices() const
     // Get addressing
     const labelList& ibc = ibCells();
     const labelListList& ibcc = ibCellCells();
-    const List<List<labelPair> >& ibcProcC = ibCellProcCells();
+    const labelListList& ibcProcC = ibCellProcCells();
     const vectorField& ibp = ibPoints();
 
     // Note: the algorithm is originally written with inward-facing normals
@@ -305,7 +298,7 @@ void Foam::immersedBoundaryFvPatch::makeInvNeumannMatrices() const
     // Initialize maxRowSum for debug
     scalar maxRowSum = 0.0;
 
-    const vectorListList& procC = ibProcCentres();
+    const vectorList& procC = ibProcCentres();
 
     label nCoeffs = 6;
 
@@ -317,7 +310,7 @@ void Foam::immersedBoundaryFvPatch::makeInvNeumannMatrices() const
     forAll (inm, cellI)
     {
         const labelList& interpCells = ibcc[cellI];
-        const List<labelPair>& interpProcCells = ibcProcC[cellI];
+        const labelList& interpProcCells = ibcProcC[cellI];
 
         vectorField allPoints
         (
@@ -340,14 +333,7 @@ void Foam::immersedBoundaryFvPatch::makeInvNeumannMatrices() const
         // Processor cells
         for (label i = 0; i < interpProcCells.size(); i++)
         {
-            allPoints[pointID++] =
-                procC
-                [
-                    interpProcCells[i].first()
-                ]
-                [
-                    interpProcCells[i].second()
-                ];
+            allPoints[pointID++] = procC[interpProcCells[i]];
         }
 
         // Weights calculation
@@ -358,7 +344,6 @@ void Foam::immersedBoundaryFvPatch::makeInvNeumannMatrices() const
 
         // Calculate weights
         scalarField W = 1 - curR/(1.1*max(curR));
-
 
         inm.set
         (

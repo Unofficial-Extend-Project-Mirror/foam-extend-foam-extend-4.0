@@ -92,7 +92,7 @@ immersedBoundaryFvPatchField<Type>::imposeDirichletCondition() const
     // Get addressing
     const labelList& ibc = ibPatch_.ibCells();
     const labelListList& ibCellCells = ibPatch_.ibCellCells();
-    const List<List<labelPair> >& ibCellProcCells = ibPatch_.ibCellProcCells();
+    const labelListList& ibCellProcCells = ibPatch_.ibCellProcCells();
     const PtrList<scalarRectangularMatrix>& invMat =
         ibPatch_.invDirichletMatrices();
 
@@ -140,7 +140,17 @@ immersedBoundaryFvPatchField<Type>::imposeDirichletCondition() const
         counter++;
 
         // Parallel communication for psi
-        FieldField<Field, Type> procPsi = ibPatch_.sendAndReceive(psiI);
+        // Parallel communication for psi
+        List<Type> procPsi;
+
+        if (Pstream::parRun())
+        {
+            // Get reference to mapDistribute for global comms
+            const mapDistribute& ibm = ibPatch_.ibMap();
+    
+            procPsi = psiI;
+            ibm.distribute(procPsi);
+        }
 
         // Prepare error normalisation
         scalar maxMagPolyPsi = 0;
@@ -151,7 +161,7 @@ immersedBoundaryFvPatchField<Type>::imposeDirichletCondition() const
 
             const labelList& curCells = ibCellCells[cellI];
 
-            const List<labelPair>& curProcCells = ibCellProcCells[cellI];
+            const labelList& curProcCells = ibCellProcCells[cellI];
 
             const scalarRectangularMatrix& curInvMatrix = invMat[cellI];
 
@@ -171,14 +181,7 @@ immersedBoundaryFvPatchField<Type>::imposeDirichletCondition() const
             for (label i = 0; i < curProcCells.size(); i++)
             {
                 source[pointID++] =
-                    procPsi
-                    [
-                        curProcCells[i].first()
-                    ]
-                    [
-                        curProcCells[i].second()
-                    ]
-                  - ibValue_[cellI];
+                    procPsi[curProcCells[i]] - ibValue_[cellI];
             }
 
             for (label i = 0; i < nCoeffs; i++)
@@ -288,7 +291,7 @@ immersedBoundaryFvPatchField<Type>::imposeNeumannCondition() const
 
     const labelListList& ibCellCells = ibPatch_.ibCellCells();
 
-    const List<List<labelPair> >& ibCellProcCells = ibPatch_.ibCellProcCells();
+    const labelListList& ibCellProcCells = ibPatch_.ibCellProcCells();
 
     const PtrList<scalarRectangularMatrix>& invMat =
         ibPatch_.invNeumannMatrices();
@@ -336,7 +339,16 @@ immersedBoundaryFvPatchField<Type>::imposeNeumannCondition() const
         counter++;
 
         // Parallel communication for psi
-        FieldField<Field, Type> procPsi = ibPatch_.sendAndReceive(psiI);
+        List<Type> procPsi;
+
+        if (Pstream::parRun())
+        {
+            // Get reference to mapDistribute for global comms
+            const mapDistribute& ibm = ibPatch_.ibMap();
+    
+            procPsi = psiI;
+            ibm.distribute(procPsi);
+        }
 
         // Prepare error normalisation
         scalar maxMagPolyPsi = 0;
@@ -346,7 +358,7 @@ immersedBoundaryFvPatchField<Type>::imposeNeumannCondition() const
             label curCell = ibc[cellI];
 
             const labelList& curCells = ibCellCells[cellI];
-            const List<labelPair>& curProcCells = ibCellProcCells[cellI];
+            const labelList& curProcCells = ibCellProcCells[cellI];
 
             const scalarRectangularMatrix& curInvMatrix = invMat[cellI];
 
@@ -367,14 +379,7 @@ immersedBoundaryFvPatchField<Type>::imposeNeumannCondition() const
 
             for (label i = 0; i < curProcCells.size(); i++)
             {
-                source[pointID++] =
-                    procPsi
-                    [
-                        curProcCells[i].first()
-                    ]
-                    [
-                        curProcCells[i].second()
-                    ];
+                source[pointID++] = procPsi[curProcCells[i]];
             }
 
             for (label i = 0; i < nCoeffs; i++)

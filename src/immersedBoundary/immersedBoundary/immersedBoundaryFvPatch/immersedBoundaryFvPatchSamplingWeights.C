@@ -50,7 +50,7 @@ void Foam::immersedBoundaryFvPatch::makeIbSamplingWeights() const
     // Get addressing
     const labelList& ibc = ibCells();
     const labelListList& ibcc = ibCellCells();
-    const List<List<labelPair> >& ibcProcC = ibCellProcCells();
+    const labelListList& ibcProcC = ibCellProcCells();
 
     // Initialise the weights
     ibSamplingWeightsPtr_ = new scalarListList(ibc.size());
@@ -74,8 +74,8 @@ void Foam::immersedBoundaryFvPatch::makeIbSamplingWeights() const
     const scalarField& gammaIn = gamma().internalField();
     const vectorField& CIn = mesh_.C().internalField();
 
-    const scalarListList& gammaProc = ibProcGamma();
-    const vectorListList& CProc = ibProcCentres();
+    const scalarList& gammaProc = ibProcGamma();
+    const vectorList& CProc = ibProcCentres();
 
     // Go through all cellCells and calculate inverse distance for
     // all live points
@@ -105,7 +105,7 @@ void Foam::immersedBoundaryFvPatch::makeIbSamplingWeights() const
         }
 
         // Processor weights
-        const List<labelPair>& interpProcCells = ibcProcC[cellI];
+        const labelList& interpProcCells = ibcProcC[cellI];
 
         scalarList& curProcCW = cellProcWeights[cellI];
 
@@ -113,26 +113,11 @@ void Foam::immersedBoundaryFvPatch::makeIbSamplingWeights() const
         {
             if
             (
-                gammaProc
-                [
-                    interpProcCells[cProcI].first()
-                ]
-                [
-                    interpProcCells[cProcI].second()
-                ] > SMALL
+                gammaProc[interpProcCells[cProcI]] > SMALL
             )
             {
                 curProcCW[cProcI] =
-                    1/mag
-                    (
-                        CProc
-                        [
-                            interpProcCells[cProcI].first()
-                        ]
-                        [
-                            interpProcCells[cProcI].second()
-                        ] - curP
-                    );
+                    1/mag(CProc[interpProcCells[cProcI]]);
 
                 sumW += curProcCW[cProcI];
             }
