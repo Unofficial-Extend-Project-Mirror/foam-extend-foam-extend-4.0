@@ -85,6 +85,7 @@ void Foam::foamFileSurfaceWriter<Type>::write
     const faceList& faces,
     const fileName& fieldName,
     const Field<Type>& values,
+    const surfaceWriterBase::surfaceData sdType,
     const bool verbose
 ) const
 {

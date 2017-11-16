@@ -443,6 +443,7 @@ namespace Foam
         const faceList& faces,
         const fileName& fieldName,
         const Field<bool>& values,
+        const surfaceWriterBase::surfaceData sdType,
         const bool verbose
     ) const
     {}
@@ -458,6 +459,7 @@ void Foam::rawSurfaceWriter<Type>::write
     const faceList& faces,
     const fileName& fieldName,
     const Field<Type>& values,
+    const surfaceWriterBase::surfaceData sdType,
     const bool verbose
 ) const
 {
@@ -479,13 +481,31 @@ void Foam::rawSurfaceWriter<Type>::write
 
     // header
     os  << "# " << fieldName;
-    if (values.size() == points.size())
+    switch (sdType)
     {
-        os  << "  POINT_DATA ";
-    }
-    else
-    {
-        os  << "  FACE_DATA ";
+        case surfaceWriterBase::POINT_DATA:
+            // writing point data
+            if (values.size() != points.size())
+            {
+                FatalErrorIn("void rawSurfaceWriter<Type>::write(...)")
+                    << "Data size does not match the number of points.  "
+                    << "Points: " << points.size() << " data: " << values.size()
+                    << abort(FatalError);
+            }
+            os  << "POINT_DATA ";
+            break;
+
+        case surfaceWriterBase::FACE_DATA:
+            // writing face data
+            if (values.size() != faces.size())
+            {
+                FatalErrorIn("void rawSurfaceWriter<Type>::write(...)")
+                    << "Data size does not match the number of faces.  "
+                    << "Faces: " << faces.size() << " data: " << values.size()
+                    << abort(FatalError);
+            }
+            os  << "FACE_DATA ";
+            break;
     }
 
     os  << values.size() << nl;

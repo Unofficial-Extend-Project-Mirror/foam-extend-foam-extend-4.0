@@ -250,6 +250,7 @@ void Foam::dxSurfaceWriter<Type>::write
     const faceList& faces,
     const fileName& fieldName,
     const Field<Type>& values,
+    const surfaceWriterBase::surfaceData sdType,
     const bool verbose
 ) const
 {
@@ -272,15 +273,33 @@ void Foam::dxSurfaceWriter<Type>::write
 
     writeData(os, values);
 
-    if (values.size() == points.size())
+    switch (sdType)
     {
-        os  << nl << "attribute \"dep\" string \"positions\""
-            << nl << nl;
-    }
-    else
-    {
-        os  << nl << "attribute \"dep\" string \"connections\""
-            << nl << nl;
+        case surfaceWriterBase::POINT_DATA:
+            // writing point data
+            if (values.size() != points.size())
+            {
+                FatalErrorIn("void dxSurfaceWriter<Type>::write(...)")
+                    << "Data size does not match the number of points.  "
+                    << "Points: " << points.size() << " data: " << values.size()
+                    << abort(FatalError);
+            }
+            os  << nl << "attribute \"dep\" string \"positions\""
+                << nl << nl;
+            break;
+
+        case surfaceWriterBase::FACE_DATA:
+            // writing face data
+            if (values.size() != faces.size())
+            {
+                FatalErrorIn("void dxSurfaceWriter<Type>::write(...)")
+                    << "Data size does not match the number of faces.  "
+                    << "Faces: " << faces.size() << " data: " << values.size()
+                    << abort(FatalError);
+            }
+            os  << nl << "attribute \"dep\" string \"connections\""
+                << nl << nl;
+            break;
     }
 
     writeTrailer(os);

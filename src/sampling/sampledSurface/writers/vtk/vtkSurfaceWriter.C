@@ -267,6 +267,7 @@ void Foam::vtkSurfaceWriter<Type>::write
     const faceList& faces,
     const fileName& fieldName,
     const Field<Type>& values,
+    const surfaceWriterBase::surfaceData sdType,
     const bool verbose
 ) const
 {
@@ -287,23 +288,44 @@ void Foam::vtkSurfaceWriter<Type>::write
 
     writeGeometry(os, points, faces);
 
-    // start writing data
-    if (values.size() == points.size())
+    switch (sdType)
     {
-        os  << "POINT_DATA ";
+        case surfaceWriterBase::POINT_DATA:
+            // writing point data
+            if (values.size() != points.size())
+            {
+                FatalErrorIn("void vtkSurfaceWriter<Type>::write(...)")
+                    << "Data size does not match the number of points.  "
+                    << "Points: " << points.size() << " data: " << values.size()
+                    << abort(FatalError);
+            }
+            os  << "POINT_DATA "
+                << values.size() << nl
+                << "FIELD attributes 1" << nl
+                << fieldName.c_str() << " ";
+
+            // Write data
+            writeData(os, values);
+            break;
+
+        case surfaceWriterBase::FACE_DATA:
+            // writing face data
+            if (values.size() != faces.size())
+            {
+                FatalErrorIn("void vtkSurfaceWriter<Type>::write(...)")
+                    << "Data size does not match the number of faces.  "
+                    << "Faces: " << faces.size() << " data: " << values.size()
+                    << abort(FatalError);
+            }
+            os  << "CELL_DATA "
+                << values.size() << nl
+                << "FIELD attributes 1" << nl
+                << fieldName.c_str() << " ";
+
+            // Write data
+            writeData(os, values);
+            break;
     }
-    else
-    {
-        os  << "CELL_DATA ";
-    }
-
-    os  << values.size() << nl
-        << "FIELD attributes 1" << nl
-        << fieldName.c_str() << " ";
-
-    // Write data
-    writeData(os, values);
-
 }
 
 

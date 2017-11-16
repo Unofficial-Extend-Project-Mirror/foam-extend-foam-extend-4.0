@@ -54,15 +54,40 @@ template<class Type> class surfaceWriter;
 template<class Type> class nullSurfaceWriter;
 template<class Type> class proxySurfaceWriter;
 
+class surfaceWriterBase
+{
+public:
+
+    // Public enumerations
+
+        //- Surface data type
+        enum surfaceData
+        {
+            POINT_DATA,
+            FACE_DATA
+        };
+
+
+    // Constructors
+
+        //- Construct null
+        surfaceWriterBase()
+        {}
+};
+
+
 /*---------------------------------------------------------------------------*\
                         Class surfaceWriter Declaration
 \*---------------------------------------------------------------------------*/
 
 template<class Type>
 class surfaceWriter
+:
+    public surfaceWriterBase
 {
-    //- friendship between writer data types
+    //- Friendship between writer data types
     template<class Type2> friend class surfaceWriter;
+
 
 public:
 
@@ -93,9 +118,8 @@ public:
         surfaceWriter();
 
 
-    // Destructor
-
-        virtual ~surfaceWriter();
+    //- Destructor
+    virtual ~surfaceWriter();
 
 
     // Member Functions
@@ -118,9 +142,21 @@ public:
         ) const
         {}
 
-
         //- Writes single surface to file. Either one value per vertex or
         //  one value per face (detected by values.size()==faces.size())
+        void write
+        (
+            const fileName& outputDir,      // <root>/<case>/surface/TIME
+            const fileName& surfaceName,    // name of surface
+            const pointField& points,
+            const faceList& faces,
+            const fileName& fieldName,      // name of field
+            const Field<Type>& values,
+            const bool verbose = false
+        ) const;
+
+        //- Writes single surface to file. Either one value per vertex or
+        //  one value per face, defined by type
         virtual void write
         (
             const fileName& outputDir,      // <root>/<case>/surface/TIME
@@ -129,6 +165,7 @@ public:
             const faceList& faces,
             const fileName& fieldName,      // name of field
             const Field<Type>& values,
+            const surfaceWriterBase::surfaceData sdType,
             const bool verbose = false
         ) const = 0;
 };
