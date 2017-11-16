@@ -34,7 +34,8 @@ Author
 
 #include "coarseAmgLevel.H"
 #include "SubField.H"
-#include "gmresSolver.H"
+#include "cgSolver.H"
+#include "bicgStabSolver.H"
 #include "vector2D.H"
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
@@ -195,30 +196,30 @@ void Foam::coarseAmgLevel::solve
     label maxIter = Foam::min(2*policyPtr_->minCoarseEqns(), 1000);
 
     dictionary topLevelDict;
-    topLevelDict.add("nDirections", "5");
     topLevelDict.add("minIter", 1);
     topLevelDict.add("maxIter", maxIter);
     topLevelDict.add("tolerance", tolerance);
     topLevelDict.add("relTol", relTol);
 
-    // Avoid issues with round-off on strict tolerance setup
-    // HJ, 27/Jun/2013
-    x = b/matrixPtr_->matrix().diag();
-
-    // Do not solve if the number of equations is smaller than 5
-    if (policyPtr_->minCoarseEqns() < 5)
-    {
-        return;
-    }
-
     // Switch off debug in top-level direct solve
-    label oldDebug = lduMatrix::debug();
+    label oldDebug = blockLduMatrix::debug();
+
+    if (blockLduMatrix::debug >= 4)
+    {
+        blockLduMatrix::debug = 1;
+    }
+    else
+    {
+        blockLduMatrix::debug = 0;
+    }
 
     if (matrixPtr_->matrix().symmetric())
     {
-        topLevelDict.add("preconditioner", "Cholesky");
+        // Note: must change preconditioner to C0.  HJ. 10/Oct/2017
+        // topLevelDict.add("preconditioner", "Cholesky");
+        topLevelDict.add("preconditioner", "ILUC0");
 
-        coarseSolverPerf = gmresSolver
+        coarseSolverPerf = cgSolver
         (
             "topLevelCorr",
             matrixPtr_->matrix(),
@@ -230,9 +231,9 @@ void Foam::coarseAmgLevel::solve
     }
     else
     {
-        topLevelDict.add("preconditioner", "ILU0");
+        topLevelDict.add("preconditioner", "ILUC0");
 
-        coarseSolverPerf = gmresSolver
+        coarseSolverPerf = bicgStabSolver
         (
             "topLevelCorr",
             matrixPtr_->matrix(),
@@ -244,27 +245,9 @@ void Foam::coarseAmgLevel::solve
     }
 
     // Restore debug
-    lduMatrix::debug = oldDebug;
+    blockLduMatrix::debug = oldDebug;
 
-    // Escape cases of top-level solver divergence
-    if
-    (
-        coarseSolverPerf.nIterations() == maxIter
-     && (
-            coarseSolverPerf.finalResidual()
-         >= coarseSolverPerf.initialResidual()
-        )
-    )
-    {
-        // Top-level solution failed.  Attempt rescue
-        // HJ, 27/Jul/2013
-        x = b/matrixPtr_->matrix().diag();
-
-        // Print top level correction failure as info for user
-        coarseSolverPerf.print();
-    }
-
-    if (lduMatrix::debug >= 3)
+    if (blockLduMatrix::debug >= 3)
     {
         coarseSolverPerf.print();
     }
