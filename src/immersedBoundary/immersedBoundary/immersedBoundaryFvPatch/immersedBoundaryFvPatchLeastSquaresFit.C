@@ -68,12 +68,7 @@ void Foam::immersedBoundaryFvPatch::makeInvDirichletMatrices() const
 
     const vectorList& procC = ibProcCentres();
 
-    label nCoeffs = 5;
-
-    if (mesh_.nGeometricD() == 3)
-    {
-        nCoeffs += 4;
-    }
+    const label nCoeffs = nInterpolationCoeffs();
 
     forAll (idm, cellI)
     {
@@ -300,12 +295,8 @@ void Foam::immersedBoundaryFvPatch::makeInvNeumannMatrices() const
 
     const vectorList& procC = ibProcCentres();
 
-    label nCoeffs = 6;
-
-    if (mesh_.nGeometricD() == 3)
-    {
-        nCoeffs += 4;
-    }
+    // Note: Neumann matrix is one larger than Dirichlet
+    label nCoeffs = nInterpolationCoeffs() + 1;
 
     forAll (inm, cellI)
     {

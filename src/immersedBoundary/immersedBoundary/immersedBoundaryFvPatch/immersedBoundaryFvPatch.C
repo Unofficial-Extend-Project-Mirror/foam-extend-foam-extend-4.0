@@ -61,6 +61,14 @@ Foam::immersedBoundaryFvPatch::angleFactor_
 );
 
 
+const Foam::debug::tolerancesSwitch
+Foam::immersedBoundaryFvPatch::directHitFactor_
+(
+    "immersedBoundaryDirectHitFactor",
+    0.04
+);
+
+
 const Foam::debug::optimisationSwitch
 Foam::immersedBoundaryFvPatch::maxCellCellRows_
 (
@@ -82,6 +90,19 @@ Foam::immersedBoundaryFvPatch::distFactor_
 Foam::label Foam::immersedBoundaryFvPatch::csEst() const
 {
     return Foam::max(100, 0.1*mesh_.nCells());
+}
+
+
+Foam::label Foam::immersedBoundaryFvPatch::nInterpolationCoeffs() const
+{
+    label nCoeffs = 5;
+
+    if (mesh_.nGeometricD() == 3)
+    {
+        nCoeffs += 4;
+    }
+
+    return nCoeffs;
 }
 
 
@@ -493,7 +514,11 @@ void Foam::immersedBoundaryFvPatch::addIbCornerCells() const
 
     label nCornerCells = 0;
 
+    // Get tri surface search
     const triSurfaceSearch& tss = ibPolyPatch_.triSurfSearch();
+
+    // Get cell sizes
+    const scalarField& cellSizes = ibCellSizes();
 
     labelList cornerCells;
 
@@ -531,14 +556,14 @@ void Foam::immersedBoundaryFvPatch::addIbCornerCells() const
                 liveCell = neiCell;
             }
 
-            scalar delta = cellSize(liveCell);
-            vector span(2*delta, 2*delta, 2*delta);
+            const scalar delta = cellSizes[liveCell];
+            const vector span(2*delta, 2*delta, 2*delta);
 
-            pointIndexHit pih = tss.nearest(C[liveCell], span);
+            const pointIndexHit pih = tss.nearest(C[liveCell], span);
 
             if (pih.hit())
             {
-                vector n =
+                const vector n =
                     triSurfaceTools::surfaceNormal
                     (
                         ibPolyPatch_.ibMesh(),
@@ -626,6 +651,7 @@ void Foam::immersedBoundaryFvPatch::addIbCornerCells() const
         deleteDemandDrivenData(ibPointsPtr_);
         deleteDemandDrivenData(ibNormalsPtr_);
         deleteDemandDrivenData(hitFacesPtr_);
+        deleteDemandDrivenData(directHitPtr_);
         deleteDemandDrivenData(ibSamplingPointsPtr_);
 
         deleteDemandDrivenData(ibSamplingWeightsPtr_);
@@ -917,7 +943,14 @@ void Foam::immersedBoundaryFvPatch::makeIbPointsAndNormals() const
 
     // It is an error to attempt to recalculate
     // if the pointer is already set
-    if (ibPointsPtr_ || ibNormalsPtr_ || hitFacesPtr_ || ibSamplingPointsPtr_)
+    if
+    (
+        ibPointsPtr_
+     || ibNormalsPtr_
+     || hitFacesPtr_
+     || directHitPtr_
+     || ibSamplingPointsPtr_
+    )
     {
         FatalErrorIn
         (
@@ -931,12 +964,8 @@ void Foam::immersedBoundaryFvPatch::makeIbPointsAndNormals() const
     // Find representative cell dimension for IB cells
     const labelList& ibc = ibCells();
 
-    scalarField delta(ibc.size());
-
-    forAll (delta, cellI)
-    {
-        delta[cellI] = cellSize(ibc[cellI]);
-    }
+    // Get cell sizes
+    const scalarField& cellSizes = ibCellSizes();
 
     // Find nearest triSurface point for each interface cell centre
 
@@ -950,6 +979,9 @@ void Foam::immersedBoundaryFvPatch::makeIbPointsAndNormals() const
     hitFacesPtr_ = new labelList(ibc.size(), -1);
     labelList& ibHitFaces = *hitFacesPtr_;
 
+    directHitPtr_ = new boolList(ibc.size(), false);
+    boolList& ibDirectHit = *directHitPtr_;
+
     ibSamplingPointsPtr_ = new vectorField(ibc.size(), vector::zero);
     vectorField& ibSamplingPoints = *ibSamplingPointsPtr_;
 
@@ -962,12 +994,9 @@ void Foam::immersedBoundaryFvPatch::makeIbPointsAndNormals() const
     forAll (ibc, cellI)
     {
         // Adjust search span if needed.  HJ, 14/Dec/2012
-        vector span
-        (
-            2*radiusFactor_()*delta[cellI],
-            2*radiusFactor_()*delta[cellI],
-            2*radiusFactor_()*delta[cellI]
-        );
+        const scalar z = 2*radiusFactor_()*cellSizes[cellI];
+
+        vector span(z, z, z);
 
         pointIndexHit pih = tss.nearest(ibCellCentres[cellI], span);
 
@@ -1020,6 +1049,16 @@ void Foam::immersedBoundaryFvPatch::makeIbPointsAndNormals() const
         }
     }
 
+    // Calculate direct hit mask
+    // Mask is true is distance between the cell centre and hit point is smaller
+    // than the directHitFactor_ fraction of cell size
+    forAll (ibPoints, i)
+    {
+        ibDirectHit[i] =
+            mag(ibPoints[i] - ibCellCentres[i])
+          < directHitFactor_()*cellSizes[i];
+    }
+
     // Calculate sampling points locations
     ibSamplingPoints = ibPoints + distFactor_()*(ibCellCentres - ibPoints);
 }
@@ -1063,6 +1102,9 @@ void Foam::immersedBoundaryFvPatch::makeIbCellCells() const
     // Get IB cells
     const labelList& ibc = ibCells();
 
+    // Get IB points
+    const vectorField& ibp = ibPoints();
+
     // Allocate storage
 
     // Local IB support: cellCells
@@ -1098,7 +1140,6 @@ void Foam::immersedBoundaryFvPatch::makeIbCellCells() const
     ibCellProcCellsPtr_ = new labelListList(ibc.size());
     labelListList& cellProcCells = *ibCellProcCellsPtr_;
 
-
     // Get characteristic cell size for IB cells
     const scalarField& cellSizes = ibCellSizes();
 
@@ -1108,9 +1149,6 @@ void Foam::immersedBoundaryFvPatch::makeIbCellCells() const
     // Calculate radius for all ibCells
     scalarField rM = radiusFactor_()*cellSizes;
 
-    // Get IB points
-    const vectorField& ibp = ibPoints();
-
     // Note: the algorithm is originally written with inward-facing normals
     // and subsequently changed: IB surface normals point outwards
     // HJ, 21/May/2012
@@ -1118,8 +1156,8 @@ void Foam::immersedBoundaryFvPatch::makeIbCellCells() const
 
     forAll (ibc, cellI)
     {
-        // Get IB cell centre
-        const vector curIbCentre = C[ibc[cellI]];
+        // Get IB point
+        const vector& curIbCentre = ibp[cellI];
 
         // Collect extended neighbourhood for search
         labelList curCells;
@@ -1496,8 +1534,8 @@ void Foam::immersedBoundaryFvPatch::makeIbCellCells() const
 
         forAll (ibc, cellI)
         {
-            // Get IB cell centre
-            const vector curIbCentre = C[ibc[cellI]];
+            // Get IB point
+            const vector curIbCentre = ibp[cellI];
 
             labelList& curCellProcCells = cellProcCells[cellI];
 
@@ -1537,6 +1575,72 @@ void Foam::immersedBoundaryFvPatch::makeIbCellCells() const
             curCellProcCells.setSize(cI);
         }
     }
+
+    // Filter cellCells and cellProcCells to minimise the computational molecule
+    const label nCoeffs = nInterpolationCoeffs();
+    label nCC = 0;
+    label nProcC = 0;
+
+    /*
+    forAll (ibc, cellI)
+    {
+        // Keep accumulating distances until the appropriate number of points
+        // is collected.
+        // Choose cellCell or cellProcCell, depending on which is closer
+
+        // Get currect cellCells
+        const labelList& curCellCells = cellCells[cellI];
+
+        // Get current cellProcCells
+        const labelList& curCellProcCells = cellProcCells[cellI];
+
+        // CC distance
+        scalar ccDist = GREAT;
+
+        // CProcC distance
+        scalar pcDist = GREAT;
+
+        // Select closer of cc and pcc until the 2*nCoeffs is reached
+        // Option: use live cells only?  HJ, 15/Nov/2017
+        while (nCC + nProcC < 2*nCoeffs)
+        {
+            // Calculate CC distance if there are any remaining entries
+            if  (nCC < curCellCells.size())
+            {
+                ccDist = mag(C[curCellCells[nCC]] - ibp[cellI]);
+            }
+            else
+            {
+                ccDist = GREAT;
+            }
+
+            // Calculate PC distance if there are any remaining entries
+            if (nProcC < curCellProcCells.size())
+            {
+                pcDist =
+                    mag(procCentres[curCellProcCells[nProcC]] - ibp[cellI]);
+            }
+            else
+            {
+                pcDist = GREAT;
+            }
+
+            // Check for closer and increment
+            if (ccDist <= pcDist)
+            {
+                nCC++;
+            }
+            else
+            {
+                nProcC++;
+            }
+        }
+
+        // Truncate lists
+        cellCells[cellI].setSize(nCC);
+        cellProcCells[cellI].setSize(nProcC);
+    }
+    */
 
     // if (debug)
     {
@@ -1790,7 +1894,7 @@ void Foam::immersedBoundaryFvPatch::makeIbCellSizes() const
             << abort(FatalError);
     }
 
-    ibCellSizesPtr_ = new scalarField(ibPoints().size(), 0.0);
+    ibCellSizesPtr_ = new scalarField(ibCells().size(), 0.0);
     scalarField& delta = *ibCellSizesPtr_;
 
     if (mesh_.nGeometricD() == 3)
@@ -2113,32 +2217,6 @@ void Foam::immersedBoundaryFvPatch::findCellCells
 }
 
 
-Foam::scalar Foam::immersedBoundaryFvPatch::cellSize(label cellID) const
-{
-    // Inefficient: reconsider.  HJ, 4/Oct/2017
-    if (mesh_.nGeometricD() == 3)
-    {
-        return Foam::pow(mesh_.V().field()[cellID], 1.0/3.0);
-    }
-    else
-    {
-        scalar thickness = 0;
-
-        const Vector<label>& directions = mesh_.geometricD();
-        for (direction dir = 0; dir < directions.nComponents; dir++)
-        {
-            if (directions[dir] == -1)
-            {
-                thickness = mesh_.bounds().span()[dir];
-                break;
-            }
-        }
-
-        return sqrt(mesh_.V().field()[cellID]/thickness);
-    }
-}
-
-
 Foam::scalar Foam::immersedBoundaryFvPatch::cellProjection
 (
     label cellID,
@@ -2188,6 +2266,7 @@ void Foam::immersedBoundaryFvPatch::clearOut()
     deleteDemandDrivenData(ibPointsPtr_);
     deleteDemandDrivenData(ibNormalsPtr_);
     deleteDemandDrivenData(hitFacesPtr_);
+    deleteDemandDrivenData(directHitPtr_);
     deleteDemandDrivenData(ibSamplingPointsPtr_);
 
     deleteDemandDrivenData(ibSamplingWeightsPtr_);
@@ -2258,6 +2337,7 @@ Foam::immersedBoundaryFvPatch::immersedBoundaryFvPatch
     ibPointsPtr_(NULL),
     ibNormalsPtr_(NULL),
     hitFacesPtr_(NULL),
+    directHitPtr_(NULL),
     ibSamplingPointsPtr_(NULL),
     ibSamplingWeightsPtr_(NULL),
     ibSamplingProcWeightsPtr_(NULL),
@@ -2416,6 +2496,17 @@ const Foam::labelList& Foam::immersedBoundaryFvPatch::hitFaces() const
     }
 
     return *hitFacesPtr_;
+}
+
+
+const Foam::boolList& Foam::immersedBoundaryFvPatch::directHit() const
+{
+    if (!directHitPtr_)
+    {
+        makeIbPointsAndNormals();
+    }
+
+    return *directHitPtr_;
 }
 
 

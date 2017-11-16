@@ -86,17 +86,22 @@ void immersedBoundaryFvPatchField<Type>::updateIbValues() const
 
 
 template<class Type>
-Foam::tmp<Foam::Field<Type> >
-immersedBoundaryFvPatchField<Type>::imposeDirichletCondition() const
+void immersedBoundaryFvPatchField<Type>::imposeDirichletCondition() const
 {
     // Get addressing
     const labelList& ibc = ibPatch_.ibCells();
     const labelListList& ibCellCells = ibPatch_.ibCellCells();
     const labelListList& ibCellProcCells = ibPatch_.ibCellProcCells();
+
+    // Get Dirichlet matrix
     const PtrList<scalarRectangularMatrix>& invMat =
         ibPatch_.invDirichletMatrices();
 
+    // Get IB points
     const vectorField& ibp = ibPatch_.ibPoints();
+
+    // Get direct hit mask
+    const boolList& directHit = ibPatch_.directHit();
 
     // Note: the algorithm is originally written with inward-facing normals
     // and subsequently changed: IB surface normals point outwards
@@ -114,8 +119,7 @@ immersedBoundaryFvPatchField<Type>::imposeDirichletCondition() const
     const Field<Type>& psiI = this->internalField();
 
     // Collect polynomially interpolated values in IB cells
-    tmp<Field<Type> > tpolyPsi(new Field<Type>(psiI, ibc));
-    Field<Type>& polyPsi = tpolyPsi();
+    Field<Type> polyPsi(psiI, ibc);
 
     const vectorField& C = mesh_.cellCentres();
 
@@ -140,14 +144,13 @@ immersedBoundaryFvPatchField<Type>::imposeDirichletCondition() const
         counter++;
 
         // Parallel communication for psi
-        // Parallel communication for psi
         List<Type> procPsi;
 
         if (Pstream::parRun())
         {
             // Get reference to mapDistribute for global comms
             const mapDistribute& ibm = ibPatch_.ibMap();
-    
+
             procPsi = psiI;
             ibm.distribute(procPsi);
         }
@@ -157,75 +160,85 @@ immersedBoundaryFvPatchField<Type>::imposeDirichletCondition() const
 
         forAll (ibc, cellI)
         {
-            label curCell = ibc[cellI];
+            // Set Dirichlet value without extrapolation
+            polyPsi[cellI] = ibValue_[cellI];
+            error[cellI] = 0;
 
-            const labelList& curCells = ibCellCells[cellI];
-
-            const labelList& curProcCells = ibCellProcCells[cellI];
-
-            const scalarRectangularMatrix& curInvMatrix = invMat[cellI];
-
-            Field<Type> coeffs(nCoeffs, pTraits<Type>::zero);
-            Field<Type> source
-            (
-                curCells.size() + curProcCells.size(),
-                pTraits<Type>::zero
-            );
-
-            label pointID = 0;
-            for (label i = 0; i < curCells.size(); i++)
+            // For direct hit, impose the Dirichlet value without extrapolation
+            // Otherwise, add extrapolated data
+            // HJ, 10/Nov/2017
+            if (!directHit[cellI])
             {
-                source[pointID++] = psiI[curCells[i]] - ibValue_[cellI];
-            }
+                label curCell = ibc[cellI];
 
-            for (label i = 0; i < curProcCells.size(); i++)
-            {
-                source[pointID++] =
-                    procPsi[curProcCells[i]] - ibValue_[cellI];
-            }
+                const labelList& curCells = ibCellCells[cellI];
 
-            for (label i = 0; i < nCoeffs; i++)
-            {
-                for (label j = 0; j < source.size(); j++)
+                const labelList& curProcCells = ibCellProcCells[cellI];
+
+                const scalarRectangularMatrix& curInvMatrix = invMat[cellI];
+
+                Field<Type> coeffs(nCoeffs, pTraits<Type>::zero);
+                Field<Type> source
+                (
+                    curCells.size() + curProcCells.size(),
+                    pTraits<Type>::zero
+                );
+
+                label pointID = 0;
+                for (label i = 0; i < curCells.size(); i++)
                 {
-                    coeffs[i] += curInvMatrix[i][j]*source[j];
+                    source[pointID++] = psiI[curCells[i]] - ibValue_[cellI];
                 }
-            }
 
-            Type oldPolyPsi = polyPsi[cellI];
+                for (label i = 0; i < curProcCells.size(); i++)
+                {
+                    source[pointID++] =
+                        procPsi[curProcCells[i]] - ibValue_[cellI];
+                }
 
-            vector R =  C[curCell] - ibp[cellI];
+                for (label i = 0; i < nCoeffs; i++)
+                {
+                    for (label j = 0; j < source.size(); j++)
+                    {
+                        coeffs[i] += curInvMatrix[i][j]*source[j];
+                    }
+                }
 
-            polyPsi[cellI] =
-                ibValue_[cellI]
-              + coeffs[0]*R.x()
-              + coeffs[1]*R.y()
-              + coeffs[2]*R.x()*R.y()
-              + coeffs[3]*sqr(R.x())
-              + coeffs[4]*sqr(R.y());
+                Type oldPolyPsi = polyPsi[cellI];
 
-            if (mesh_.nGeometricD() == 3)
-            {
+                vector R =  C[curCell] - ibp[cellI];
+
+                // Note: IB value is added first above.
                 polyPsi[cellI] +=
-                    coeffs[5]*R.z()
-                  + coeffs[6]*R.x()*R.z()
-                  + coeffs[7]*R.y()*R.z()
-                  + coeffs[8]*sqr(R.z());
-            }
+                      coeffs[0]*R.x()
+                    + coeffs[1]*R.y()
+                    + coeffs[2]*R.x()*R.y()
+                    + coeffs[3]*sqr(R.x())
+                    + coeffs[4]*sqr(R.y());
 
-            // Change of sign of ibn
-            ibGrad_[cellI] =
-               -coeffs[0]*ibn[cellI].x()
-              - coeffs[1]*ibn[cellI].y();
+                if (mesh_.nGeometricD() == 3)
+                {
+                    polyPsi[cellI] +=
+                        coeffs[5]*R.z()
+                      + coeffs[6]*R.x()*R.z()
+                      + coeffs[7]*R.y()*R.z()
+                      + coeffs[8]*sqr(R.z());
+                }
 
-            if (mesh_.nGeometricD() == 3)
-            {
                 // Change of sign of ibn
-                ibGrad_[cellI] +=
-                    -coeffs[5]*ibn[cellI].z();
-            }
+                ibGrad_[cellI] =
+                    -coeffs[0]*ibn[cellI].x()
+                   - coeffs[1]*ibn[cellI].y();
 
-            error[cellI] = mag(polyPsi[cellI] - oldPolyPsi);
+                if (mesh_.nGeometricD() == 3)
+                {
+                    // Change of sign of ibn
+                    ibGrad_[cellI] +=
+                        -coeffs[5]*ibn[cellI].z();
+                }
+
+                error[cellI] = mag(polyPsi[cellI] - oldPolyPsi);
+            }
         }
 
         // Insert polynomial values into the internal field
@@ -267,9 +280,7 @@ immersedBoundaryFvPatchField<Type>::imposeDirichletCondition() const
     {
         InfoIn
         (
-            "template<class Type>\n"
-            "tmp<Foam::Field<Type> >\n"
-            "immersedBoundaryFvPatchField<Type>::"
+            "void immersedBoundaryFvPatchField<Type>::"
             "imposeDirichletCondition() const"
         )   << this->dimensionedInternalField().name()
             << " for patch " << this->patch().name()
@@ -277,14 +288,11 @@ immersedBoundaryFvPatchField<Type>::imposeDirichletCondition() const
             << ", min: " << gMin(error)
             << ", avg: "  << gAverage(error) << endl;
     }
-
-    return tpolyPsi;
 }
 
 
 template<class Type>
-Foam::tmp<Foam::Field<Type> >
-immersedBoundaryFvPatchField<Type>::imposeNeumannCondition() const
+void immersedBoundaryFvPatchField<Type>::imposeNeumannCondition() const
 {
     // Get addressing
     const labelList& ibc = ibPatch_.ibCells();
@@ -309,8 +317,7 @@ immersedBoundaryFvPatchField<Type>::imposeNeumannCondition() const
     const Field<Type>& psiI = this->internalField();
 
     // Collect polynomially interpolated values in IB cells
-    tmp<Field<Type> > tpolyPsi(new Field<Type>(psiI, ibc));
-    Field<Type>& polyPsi = tpolyPsi();
+    Field<Type> polyPsi(psiI, ibc);
 
     const vectorField& C = mesh_.cellCentres();
 
@@ -345,7 +352,7 @@ immersedBoundaryFvPatchField<Type>::imposeNeumannCondition() const
         {
             // Get reference to mapDistribute for global comms
             const mapDistribute& ibm = ibPatch_.ibMap();
-    
+
             procPsi = psiI;
             ibm.distribute(procPsi);
         }
@@ -455,9 +462,7 @@ immersedBoundaryFvPatchField<Type>::imposeNeumannCondition() const
     {
         InfoIn
         (
-            "template<class Type>\n"
-            "tmp<Foam::Field<Type> >\n"
-            "immersedBoundaryFvPatchField<Type>::"
+            "void immersedBoundaryFvPatchField<Type>::"
             "imposeNeumannCondition() const"
         )   << this->dimensionedInternalField().name()
             << " for patch " << this->patch().name()
@@ -465,13 +470,6 @@ immersedBoundaryFvPatchField<Type>::imposeNeumannCondition() const
             << ", min: " << gMin(error)
             << ", avg: "  << gAverage(error) << endl;
     }
-
-//     Info<< "Neumann condition for " << ibc.size() << " cells of field "
-//         << this->dimensionedInternalField().name() << " = "
-//         << polyPsi
-//         << endl;
-
-    return tpolyPsi;
 }
 
 
@@ -479,11 +477,6 @@ template<class Type>
 void immersedBoundaryFvPatchField<Type>::imposeDeadCondition()
 {
     const labelList& dc = ibPatch_.deadCells();
-
-//     Info<< "Dead condition for " << dc.size()  << " cells of field "
-//         << this->dimensionedInternalField().name()
-//         << " set to value " << deadCellValue_
-//         << endl;
 
     // Get non-const access to internal field
     Field<Type>& psiI = const_cast<Field<Type>&>(this->internalField());
@@ -1081,28 +1074,35 @@ void immersedBoundaryFvPatchField<Type>::write(Ostream& os) const
 
     this->writeEntry("value", os);
 
-    // Write immersed boundary data as a vtk file
-    autoPtr<surfaceWriter<Type> > writerPtr =
-        surfaceWriter<Type>::New("vtk");
-
-    const triSurface& ts = ibPatch_.ibMesh();
-
-    // Make a face list for writing
-    faceList f(ts.size());
-    forAll (ts, faceI)
+    // Write VTK on master only
+    Field<Type> triData = this->triValue();
+    reduce(triData, sumOp<List<Type> >());
+    if (Pstream::master())
     {
-        f[faceI] = ts[faceI].triFaceFace();
-    }
+        // Write immersed boundary data as a vtk file
+        autoPtr<surfaceWriter<Type> > writerPtr =
+            surfaceWriter<Type>::New("vtk");
 
-    writerPtr->write
-    (
-        this->dimensionedInternalField().path(),
-        ibPatch_.name(),
-        ts.points(),
-        f,
-        this->dimensionedInternalField().name(),
-        this->triValue()()
-    );
+        const triSurface& ts = ibPatch_.ibMesh();
+
+        // Make a face list for writing
+        faceList f(ts.size());
+        forAll (ts, faceI)
+        {
+            f[faceI] = ts[faceI].triFaceFace();
+        }
+
+        writerPtr->write
+        (
+            this->dimensionedInternalField().path(),
+            ibPatch_.name(),
+            ts.points(),
+            f,
+            this->dimensionedInternalField().name(),
+            triData,
+            surfaceWriterBase::FACE_DATA
+        );
+    }
 }
 
 

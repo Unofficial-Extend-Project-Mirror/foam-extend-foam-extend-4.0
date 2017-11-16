@@ -107,11 +107,11 @@ class immersedBoundaryFvPatchField
 
         //- Impose Dirichlet BC at IB cells and return corrected cells values
         //  Calculate value and gradient on IB intersection points
-        tmp<Field<Type> > imposeDirichletCondition() const;
+        void imposeDirichletCondition() const;
 
         //- Impose Neumann BC at IB cells and return corrected cells values
         //  Calculate value and gradient on IB intersection points
-        tmp<Field<Type> > imposeNeumannCondition() const;
+        void imposeNeumannCondition() const;
 
         //- Impose condition in dead cells
         void imposeDeadCondition();

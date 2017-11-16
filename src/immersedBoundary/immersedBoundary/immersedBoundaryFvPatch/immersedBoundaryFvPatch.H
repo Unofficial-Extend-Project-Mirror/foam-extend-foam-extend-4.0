@@ -100,6 +100,11 @@ class immersedBoundaryFvPatch
         //  Cells outside of the angle will not be used for the fitting function
         static const debug::tolerancesSwitch angleFactor_;
 
+        //- Direct hit factor
+        //  Fraction of cell size from IB point to IB centre which is considered
+        //  a direct hit
+        static const debug::tolerancesSwitch directHitFactor_;
+
         //- Maximum number of rows in cell-cell search
         static const debug::optimisationSwitch maxCellCellRows_;
 
@@ -154,6 +159,10 @@ class immersedBoundaryFvPatch
             //- List of faces (triangles) which are part of IB mesh
             //  nearest to the IB cell centres
             mutable labelList* hitFacesPtr_;
+
+            //- Direct hit flag, indicating direct hit of IB surface to
+            //  IB cell centre
+            mutable boolList* directHitPtr_;
 
             //- Sampling points for IB cells
             mutable vectorField* ibSamplingPointsPtr_;
@@ -250,6 +259,9 @@ class immersedBoundaryFvPatch
             //- Return cell set size estimate for hash sets
             label csEst() const;
 
+            //- Return number of interpolation cells
+            label nInterpolationCoeffs() const;
+
 
         // Make demand-driven data
 
@@ -329,9 +341,6 @@ class immersedBoundaryFvPatch
                 const label cellID,
                 labelList& cellCells
             ) const;
-
-            //- Calc cell size
-            scalar cellSize(label cellID) const;
 
             //- Calc cell projection area
             scalar cellProjection(label cellID, const vector& dir) const;
@@ -449,6 +458,10 @@ public:
             //- Return list of triangles in IB mesh nearest
             //  nearest to IB cell centres
             const labelList& hitFaces() const;
+
+            //- Return direct hit flag, indicating direct hit of IB surface to
+            //  IB cell centre
+            const boolList& directHit() const;
 
             //- Return IB sampling points
             const vectorField& ibSamplingPoints() const;
