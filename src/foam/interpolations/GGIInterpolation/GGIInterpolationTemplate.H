@@ -119,7 +119,6 @@ public:
         //- Construct null
         GGIInterpolationName()
         {}
-
 };
 
 
