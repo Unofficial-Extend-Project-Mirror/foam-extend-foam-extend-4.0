@@ -17,32 +17,23 @@ FoamFile
 ddtSchemes
 {
     default Euler;
-    ddt(U)  backward;
 }
 
 gradSchemes
 {
     default         Gauss linear;
-    grad(p)         Gauss linear;
 }
 
 divSchemes
 {
     default         none;
 //     div(phi,U)      Gauss upwind;
-    div(phi,U)      Gauss linear;
-//     div(phi,U)      Gauss linearUpwind Gauss linear;
-//     div(phi,U)      Gauss vanLeer;
-//     div(phi,U)      Gauss GammaV 0.2;
+    div(phi,U)      Gauss linearUpwind Gauss linear;
 }
 
 laplacianSchemes
 {
-    default         none;
-    laplacian(nu,U) Gauss linear corrected;
-    laplacian((1|A(U)),p) Gauss linear corrected;
-
-    laplacian(1,p) Gauss linear corrected;
+    default         Gauss linear corrected;
 }
 
 interpolationSchemes
