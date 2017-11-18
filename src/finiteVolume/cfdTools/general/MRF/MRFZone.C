@@ -581,6 +581,20 @@ void Foam::MRFZone::addCoriolis
 }
 
 
+void Foam::MRFZone::addOmega(volVectorField& omg) const
+{
+    const vector rotVel = Omega();
+
+    // Set omega in all cells of the rotating cell zone
+    const labelList& cells = mesh_.cellZones()[cellZoneID_];
+
+    forAll (cells, i)
+    {
+        omg[cells[i]] = rotVel;
+    }
+}
+
+
 void Foam::MRFZone::relativeVelocity(volVectorField& U) const
 {
     const volVectorField& C = mesh_.C();

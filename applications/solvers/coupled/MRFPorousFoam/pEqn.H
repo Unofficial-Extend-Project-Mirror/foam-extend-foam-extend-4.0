@@ -2,7 +2,7 @@
 tmp<fvScalarMatrix> tpEqn;
 tmp<surfaceScalarField> tpresSource;
 
-if (addPorosity)
+if (addMRF || addPorosity)
 {
     // Collect pressure source with tensorial 1/Ap
     const volTensorField& rTU = trTU();

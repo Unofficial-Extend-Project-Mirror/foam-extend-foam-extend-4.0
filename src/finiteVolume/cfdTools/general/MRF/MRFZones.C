@@ -57,6 +57,35 @@ Foam::MRFZones::MRFZones(const fvMesh& mesh)
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
+Foam::tmp<Foam::volVectorField> Foam::MRFZones::omega() const
+{
+    tmp<volVectorField> tMRFZonesOmega
+    (
+        new volVectorField
+        (
+            IOobject
+            (
+                "MRFZonesOmega",
+                mesh_.time().timeName(),
+                mesh_,
+                IOobject::NO_READ,
+                IOobject::NO_WRITE
+            ),
+            mesh_,
+            dimensionedVector("zero", dimless/dimTime, vector::zero)
+        )
+    );
+    volVectorField& MRFZonesOmega = tMRFZonesOmega();
+
+    forAll (*this, i)
+    {
+        operator[](i).addOmega(MRFZonesOmega);
+    }
+
+    return tMRFZonesOmega;
+}
+
+
 Foam::tmp<Foam::surfaceScalarField> Foam::MRFZones::fluxCorrection() const
 {
     tmp<surfaceScalarField> tMRFZonesPhiCorr
@@ -88,7 +117,7 @@ Foam::tmp<Foam::surfaceScalarField> Foam::MRFZones::fluxCorrection() const
 
 Foam::tmp<Foam::surfaceScalarField> Foam::MRFZones::meshPhi() const
 {
-    tmp<surfaceScalarField> tMRFZonesPhiCorr
+    tmp<surfaceScalarField> tMRFZonesFaceU
     (
         new surfaceScalarField
         (
@@ -104,14 +133,14 @@ Foam::tmp<Foam::surfaceScalarField> Foam::MRFZones::meshPhi() const
             dimensionedScalar("zero", dimVolume/dimTime, 0)
         )
     );
-    surfaceScalarField& MRFZonesPhiCorr = tMRFZonesPhiCorr();
+    surfaceScalarField& MRFZonesFaceU = tMRFZonesFaceU();
 
     forAll (*this, i)
     {
-        operator[](i).meshPhi(MRFZonesPhiCorr);
+        operator[](i).meshPhi(MRFZonesFaceU);
     }
 
-    return tMRFZonesPhiCorr;
+    return tMRFZonesFaceU;
 }
 
 
