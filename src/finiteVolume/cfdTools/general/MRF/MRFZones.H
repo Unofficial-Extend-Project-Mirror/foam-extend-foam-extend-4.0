@@ -77,11 +77,15 @@ public:
 
     // Member Functions
 
+        //- Return cell centre omega over all zones
+        tmp<volVectorField> omega() const;
+
         //- Return raw correction flux
         tmp<surfaceScalarField> fluxCorrection() const;
 
         //- Return pseudo mesh flux
         tmp<surfaceScalarField> meshPhi() const;
+
 
         // Incompressible MRF
 

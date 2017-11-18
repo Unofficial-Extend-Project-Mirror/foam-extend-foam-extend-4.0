@@ -111,7 +111,7 @@ class MRFZone
 
         //- Time for which mesh velocity is calculated
         mutable scalar meshVelTime_;
-    
+
 
     // Private Static Data
 
@@ -203,6 +203,18 @@ public:
                 return name_;
             }
 
+            //- Return cellZone number
+            label zoneId() const
+            {
+                return cellZoneID_;
+            }
+
+            //- Return cellZone
+            const cellZone& zone() const
+            {
+                return mesh_.cellZones()[cellZoneID_];
+            }
+
             //- Return the MRFZone dictionary
             const dictionary& dict() const
             {
@@ -235,7 +247,7 @@ public:
         {
             // Clear mesh velocity
             deleteDemandDrivenData(meshVelocityPtr_);
-            
+
             // Only updates face addressing
             setMRFFaces();
         }
@@ -249,6 +261,9 @@ public:
             const volScalarField& rho,
             fvVectorMatrix& UEqn
         ) const;
+
+        //- Add omega within the MRF region
+        void addOmega(volVectorField& omg) const;
 
         //- Make the given absolute velocity relative within the MRF region
         void relativeVelocity(volVectorField& U) const;
@@ -276,7 +291,7 @@ public:
             surfaceScalarField& phi
         ) const;
 
-        //- Compute the pseudo mesh phi of the MRF region
+        //- Compute pseudo mesh phi for the MRF region
         void meshPhi(surfaceScalarField& phi) const;
 
         //- Correct the boundary velocity for the roation of the MRF region
