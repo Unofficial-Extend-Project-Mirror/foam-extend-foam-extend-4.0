@@ -756,47 +756,31 @@ Foam::label Foam::polyRef::findLevel
 }
 
 
-// Get cell level such that the face has the most points that are <= level (at
-// least three points)
+// Get least cell level such that the face has at least three points smaller
+// than the level
 Foam::label Foam::polyRef::getAnchorLevel(const label faceI) const
 {
     const face& f = mesh_.faces()[faceI];
 
-    // Get number of points in this face
-    const label nPoints = f.size();
-
-    // Get unique levels that can be found in this face
-    labelHashSet uniqueLevels(nPoints);
-    forAll(f, fp)
+    if (f.size() <= 3)
     {
-        uniqueLevels.insert(pointLevel_[f[fp]]);
+        return pointLevel_[f[findMaxLevel(f)]];
     }
-
-    // Get sorted levels (in increasing order)
-    const labelList allLevels = uniqueLevels.sortedToc();
-
-    // Count number of points per level
-    labelList nPointsPerLevel(allLevels.size(), 0);
-
-    // Loop through all points
-    forAll(f, fp)
+    else
     {
-        const label curPointLevel = pointLevel_[f[fp]];
+        label ownLevel = cellLevel_[mesh_.faceOwner()[faceI]];
 
-        // Loop through all levels
-        forAll(allLevels, levelI)
+        if (countAnchors(f, ownLevel) >= 3)
         {
-            // Get current level
-            const label curLevel = allLevels[levelI];
-
-            if (curPointLevel == curLevel)
-            {
-                // Note: storing nPoints per level based on list index, not
-                // actual level
-                ++nPointsPerLevel[levelI];
-
-                break;
-            }
+            return ownLevel;
+        }
+        else if (countAnchors(f, ownLevel + 1) >= 3)
+        {
+            return ownLevel + 1;
+        }
+        else
+        {
+            return -1;
         }
     }
 }
@@ -1220,7 +1204,8 @@ void Foam::polyRef::createInternalFaces
         const labelList& fEdges = mesh_.faceEdges()[faceI];
 
         // We are on the cellI side of face f. The face will have 1 or n
-        // cLevel points
+        // cLevel points (where n is the number of points/edges of a face)
+        // and lots of higher numbered ones.
 
         label faceMidPointI = -1;
 
