@@ -874,8 +874,19 @@ void Foam::removeFaces::setRefinement
                 }
                 else
                 {
+                    // Get edge and all its cells
                     const edge& e = mesh_.edges()[edgeI];
+                    const labelListList& ec = mesh_.edgeCells();
 
+                    // Get point cells
+                    const labelListList& pc = mesh_.pointCells();
+
+                    // Write mesh before termination
+                    mesh_.write();
+
+                    // Write all edge point cells
+
+                    // Additionally write all edge cells for debugging
                     FatalErrorIn("removeFaces::setRefinement")
                         << "Problem : edge has too few face neighbours:"
                         << eFaces << endl
@@ -883,6 +894,10 @@ void Foam::removeFaces::setRefinement
                         << " vertices:" << e
                         << " coords:" << mesh_.points()[e[0]]
                         << mesh_.points()[e[1]]
+                        << endl
+                        << "Edge cells: " << ec[edgeI] << nl
+                        << "First point cells: " << pc[e[0]] << nl
+                        << "Second point cells: " << pc[e[1]] << nl
                         << abort(FatalError);
                 }
             }
