@@ -74,6 +74,11 @@ class dynamicRefinePolyFvMesh
             //- Helper varaible: current time index
             label curTimeIndex_;
 
+            //- Switch whether to use point based refinement (ensures 4:1 point
+            //  consistency, along with the 2:1 face consistency
+            //  consistency). Set based on max refinement level and user input
+            Switch pointBasedRefinement_;
+
 
 protected:
 

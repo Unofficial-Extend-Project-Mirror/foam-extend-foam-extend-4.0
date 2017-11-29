@@ -308,12 +308,35 @@ class polyRef
             dynamicLabelList& faceVerts
         ) const;
 
-        //- Updates refineCell so consistent 2:1 refinement. Returns local
-        //  number of cells changed
+        //- Updates refineCell such that a face consistent 2:1 refinement is
+        //  obtained. Returns local number of cells changed
         label faceConsistentRefinement
         (
             const bool maxSet,
             PackedList<1>& refineCell
+        ) const;
+
+        //- Updates refineCell such that a point consistent 4:1 refinement is
+        //  obtained. Returns local number of cells changed
+        label pointConsistentRefinement
+        (
+            PackedList<1>& refineCell
+        ) const;
+
+        //- Updates unrefineCell such that a face consistent 2:1 unrefinement is
+        //  obtained. Returns local number of cells changed
+        label faceConsistentUnrefinement
+        (
+            const bool maxSet,
+            PackedList<1>& unrefineCell
+        ) const;
+
+        //- Updates unrefineCell such that a point consistent 4:1 unrefinement
+        //  is obtained. Returns local number of cells changed
+        label pointConsistentUnrefinement
+        (
+            const PackedList<1>& unrefinePoints,
+            PackedList<1>& unrefineCell
         ) const;
 
         //- Check wanted refinement for 2:1 consistency
@@ -398,10 +421,11 @@ public:
             //  ok list of cells to refine.
             //  Either adds cells to refine to set (maxSet = true) or
             //  removes cells to refine (maxSet = false)
-            labelList consistentRefinement
+            Xfer<labelList> consistentRefinement
             (
                 const labelList& cellsToRefine,
-                const bool maxSet
+                const bool maxSet,
+                const bool pointBasedRefinement
             ) const;
 
             //- Like consistentRefinement but slower:
@@ -417,7 +441,7 @@ public:
             //  facesToCheck  : additional faces where to implement the
             //                  maxFaceDiff thickness (usually only boundary
             //                  faces)
-            labelList consistentSlowRefinement
+            Xfer<labelList> consistentSlowRefinement
             (
                 const label maxFaceDiff,
                 const labelList& cellsToRefine,
@@ -429,7 +453,7 @@ public:
             //- Like consistentSlowRefinement but uses different meshWave
             //  (proper distance instead of toplogical count). No point checks
             //  yet
-            labelList consistentSlowRefinement2
+            Xfer<labelList> consistentSlowRefinement2
             (
                 const label maxFaceDiff,
                 const labelList& cellsToRefine,
@@ -523,7 +547,8 @@ public:
             labelList consistentUnrefinement
             (
                 const labelList& pointsToUnrefine,
-                const bool maxSet
+                const bool maxSet,
+                const bool pointBasedUnrefinement
             ) const;
 
             //- Remove some refinement. Needs to be supplied output of

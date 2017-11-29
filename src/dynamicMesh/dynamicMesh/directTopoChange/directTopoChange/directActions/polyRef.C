@@ -1584,6 +1584,341 @@ Foam::label Foam::polyRef::faceConsistentRefinement
 }
 
 
+// Updates refineCell (cells marked for refinement) such that across all points
+// there will be 4:1 consistency after refinement.
+Foam::label Foam::polyRef::pointConsistentRefinement
+(
+    PackedList<1>& refineCell
+) const
+{
+    // Count number of changed cells
+    label nChanged = 0;
+
+    // Collect all points from cells to refine. Assume that 10% of mesh points
+    // are going to be affected to prevent excessive resizing.
+    labelHashSet pointsToConsider(mesh_.nPoints()/10);
+
+    // Get cell points
+    const labelListList& cellPoints = mesh_.cellPoints();
+
+    // Collect points
+    forAll (cellPoints, cellI)
+    {
+        // Get current points
+        const labelList& curPoints = cellPoints[cellI];
+
+        forAll (curPoints, pointI)
+        {
+            pointsToConsider.insert(curPoints[pointI]);
+        }
+    }
+
+    // Maximum cell refinement level for each point
+    labelList maxRefLevel(mesh_.nPoints(), 0);
+
+    // Get point cells
+    const labelListList& pointCells = mesh_.pointCells();
+
+    // Loop through all points and collect maximum point level for each point
+    forAllConstIter (labelHashSet, pointsToConsider, iter)
+    {
+        // Get point index
+        const label pointI = iter.key();
+
+        // Get the cells for this point
+        const labelList& curCells = pointCells[pointI];
+
+        // Find maximum refinement level for this points
+        forAll (curCells, cellI)
+        {
+            const label curCellI = curCells[cellI];
+            const label curLevel =
+                cellLevel_[curCellI] + refineCell.get(curCellI);
+
+            if (curLevel > maxRefLevel[pointI])
+            {
+                maxRefLevel[pointI] = curLevel;
+            }
+        }
+    }
+
+    // Sync maximum refinement level across coupled boundaries
+    syncTools::syncPointList
+    (
+        mesh_,
+        maxRefLevel,
+        maxEqOp<label>(),
+        0,   // Null value
+        true // Apply separation for parallel cyclics
+    );
+
+    // Now that the levels are synced, go through considered points and add
+    // cells to refine
+    forAllConstIter (labelHashSet, pointsToConsider, iter)
+    {
+        // Get point index
+        const label pointI = iter.key();
+
+        // Get the cells for this point
+        const labelList& curCells = pointCells[iter.key()];
+
+        // Loop through these point cells and set cells for refinement which
+        // would end up having refinement level smaller than maximum level - 1
+        forAll (curCells, cellI)
+        {
+            const label curCellI = curCells[cellI];
+            const label willBeRefined = refineCell.get(curCellI);
+            const label curLevel = cellLevel_[curCellI] + willBeRefined;
+
+            if (curLevel < maxRefLevel[pointI] - 1)
+            {
+                if (willBeRefined == 0)
+                {
+                    // Set the cell for refinement and increment the counter
+                    refineCell.set(curCellI, 1);
+                    ++nChanged;
+                }
+                else
+                {
+                    FatalErrorIn
+                    (
+                        "label polyRef::pointConsistentRefinement"
+                        "(PackedList<1>& refineCells) const"
+                    )   << "Cell is marked for refinement, but the 4:1 point"
+                        << " consistency cannot be ensured." << nl
+                        << "Something went wrong before this step."
+                        << endl;
+                }
+            }
+        }
+    }
+
+    return nChanged;
+}
+
+
+// Updates unrefineCell (cells marked for unrefinement) so across all faces
+// there will be 2:1 consistency after unrefinement.
+Foam::label Foam::polyRef::faceConsistentUnrefinement
+(
+    const bool maxSet,
+    PackedList<1>& unrefineCell
+) const
+{
+    label nChanged = 0;
+
+    // Internal faces.
+    for (label faceI = 0; faceI < mesh_.nInternalFaces(); faceI++)
+    {
+        label own = mesh_.faceOwner()[faceI];
+        label ownLevel = cellLevel_[own] - unrefineCell.get(own);
+
+        label nei = mesh_.faceNeighbour()[faceI];
+        label neiLevel = cellLevel_[nei] - unrefineCell.get(nei);
+
+        if (ownLevel < (neiLevel - 1))
+        {
+            if (maxSet)
+            {
+                unrefineCell.set(nei, 1);
+            }
+            else
+            {
+                if (unrefineCell.get(own) == 0)
+                {
+                    FatalErrorIn("label polyRef::faceConsistentUnrefinement(..)")
+                        << "Unrefinement problem" << abort(FatalError);
+                }
+
+                unrefineCell.set(own, 0);
+            }
+
+            ++nChanged;
+        }
+        else if (neiLevel < (ownLevel - 1))
+        {
+            if (maxSet)
+            {
+                unrefineCell.set(own, 1);
+            }
+            else
+            {
+                if (unrefineCell.get(nei) == 0)
+                {
+                    FatalErrorIn("label polyRef::faceConsistentUnrefinement(..)")
+                        << "Unrefinement problem" << abort(FatalError);
+                }
+                unrefineCell.set(nei, 0);
+            }
+            ++nChanged;
+        }
+    }
+
+
+    // Coupled faces. Swap owner level to get neighbouring cell level.
+    // (only boundary faces of neiLevel used)
+    labelList neiLevel(mesh_.nFaces() - mesh_.nInternalFaces());
+
+    forAll(neiLevel, i)
+    {
+        label own = mesh_.faceOwner()[i + mesh_.nInternalFaces()];
+
+        neiLevel[i] = cellLevel_[own] - unrefineCell.get(own);
+    }
+
+    // Swap to neighbour
+    syncTools::swapBoundaryFaceList(mesh_, neiLevel, false);
+
+    // Now we have neighbour value see which cells need refinement
+    forAll(neiLevel, i)
+    {
+        label own = mesh_.faceOwner()[i + mesh_.nInternalFaces()];
+        label ownLevel = cellLevel_[own] - unrefineCell.get(own);
+
+        if (ownLevel < (neiLevel[i] - 1))
+        {
+            if (!maxSet)
+            {
+                if (unrefineCell.get(own) == 0)
+                {
+                    FatalErrorIn("label polyRef::faceConsistentUnrefinement(..)")
+                        << "Unrefinement problem" << abort(FatalError);
+                }
+
+                unrefineCell.set(own, 0);
+                ++nChanged;
+            }
+        }
+        else if (neiLevel[i] < (ownLevel - 1))
+        {
+            if (maxSet)
+            {
+                if (unrefineCell.get(own) == 1)
+                {
+                    FatalErrorIn("label polyRef::faceConsistentUnrefinement(..)")
+                        << "Unrefinement problem" << abort(FatalError);
+                }
+
+                unrefineCell.set(own, 1);
+                ++nChanged;
+            }
+        }
+    }
+
+    return nChanged;
+}
+
+
+// Updates unrefineCell (cells marked for unrefinement) such that across all
+// points there will be 4:1 consistency after unrefinement.
+Foam::label Foam::polyRef::pointConsistentUnrefinement
+(
+    const PackedList<1>& unrefinePoint,
+    PackedList<1>& unrefineCell
+) const
+{
+    // Count number of changed cells
+    label nChanged = 0;
+
+    // Get a dynamicList for all unrefine point candidates. Assume that 10% of
+    // mesh points are going to be affected to prevent excessive resizing
+    dynamicLabelList pointsToConsider(mesh_.nPoints()/10);
+
+    forAll (unrefinePoint, pointI)
+    {
+        if (unrefinePoint.get(pointI) == 1)
+        {
+            pointsToConsider.append(pointI);
+        }
+    }
+
+    // Minimum cell refinement level for each point
+    labelList minRefLevel(mesh_.nPoints(), 0);
+
+    // Get point cells
+    const labelListList& pointCells = mesh_.pointCells();
+
+    // Loop through all points and collect minimum point level for each point
+    forAll (pointsToConsider, i)
+    {
+        // Get point index
+        const label pointI = pointsToConsider[i];
+
+        // Get cells for this point
+        const labelList& curCells = pointCells[pointI];
+
+        // Find minimum refinement level for this points
+        forAll (curCells, cellI)
+        {
+            const label curCellI = curCells[cellI];
+            const label curLevel =
+                cellLevel_[curCellI] - unrefineCell.get(curCellI);
+
+            if (curLevel < minRefLevel[pointI])
+            {
+                minRefLevel[pointI] = curLevel;
+            }
+        }
+    }
+
+    // Sync minimum refinement level across coupled boundaries
+    syncTools::syncPointList
+    (
+        mesh_,
+        minRefLevel,
+        minEqOp<label>(),
+        0,   // Null value
+        true // Apply separation for parallel cyclics
+    );
+
+    // Now that the levels are synced, go through considered points and add
+    // cells to unrefine
+    forAll (pointsToConsider, i)
+    {
+        // Get point index
+        const label pointI = pointsToConsider[i];
+
+        // Get the cells for this point
+        const labelList& curCells = pointCells[pointI];
+
+        // Loop through these point cells and set cells for unrefinement which
+        // would end up having refinement level greater than level + 1
+        forAll (curCells, cellI)
+        {
+            const label curCellI = curCells[cellI];
+            const label willBeUnrefined = unrefineCell.get(curCellI);
+            const label curLevel = cellLevel_[curCellI] - willBeUnrefined;
+
+            if (curLevel > minRefLevel[pointI] + 1)
+            {
+                if (willBeUnrefined == 0)
+                {
+                    // Set the cell for unrefinement and increment the counter
+                    unrefineCell.set(curCellI, 1);
+                    ++nChanged;
+                }
+                else
+                {
+                    FatalErrorIn
+                    (
+                        "label polyRef::pointConsistentUnrefinement"
+                        "\n("
+                        "\n    const PackedList<1>& unrefinePoints,"
+                        "\n    PackedList<1>& unrefineCells"
+                        "\n) const"
+                    )   << "Cell is marked for unrefinement, but the 4:1 point"
+                        << " consistency cannot be ensured." << nl
+                        << "Something went wrong before this step."
+                        << endl;
+                }
+            }
+        }
+    }
+
+    return nChanged;
+}
+
+
 // Debug: check if wanted refinement is compatible with 2:1
 void Foam::polyRef::checkWantedRefinementLevels
 (
@@ -1981,14 +2316,15 @@ Foam::labelList Foam::polyRef::cellPoints(const label cellI) const
 }
 
 
-Foam::labelList Foam::polyRef::consistentRefinement
+Foam::Xfer<Foam::labelList> Foam::polyRef::consistentRefinement
 (
     const labelList& cellsToRefine,
-    const bool maxSet
+    const bool maxSet,
+    const bool pointBasedRefinement
 ) const
 {
-    // Loop, modifying cellsToRefine, until no more changes to due to 2:1
-    // conflicts.
+    // Loop, modifying cellsToRefine, until no more changes to due to 2:1 face
+    // conflicts and optionally 4:1 point conflicts.
     // maxSet = false : unselect cells to refine
     // maxSet = true  : select cells to refine
 
@@ -2001,7 +2337,16 @@ Foam::labelList Foam::polyRef::consistentRefinement
 
     while (true)
     {
-        label nChanged = faceConsistentRefinement(maxSet, refineCell);
+        label nChanged = 0;
+
+        if (pointBasedRefinement)
+        {
+            // Check for 4:1 point based consistent unrefinement
+            nChanged += pointConsistentRefinement(refineCell);
+        }
+
+        // Check for 2:1 face based consistent unrefinement
+        nChanged += faceConsistentRefinement(maxSet, refineCell);
 
         reduce(nChanged, sumOp<label>());
 
@@ -2046,7 +2391,7 @@ Foam::labelList Foam::polyRef::consistentRefinement
         checkWantedRefinementLevels(newCellsToRefine);
     }
 
-    return newCellsToRefine;
+    return xferMove<labelList>(newCellsToRefine);
 }
 
 
@@ -2056,7 +2401,7 @@ Foam::labelList Foam::polyRef::consistentRefinement
 // - satisfies maxPointDiff (e.g. 4:1) across selected point connected
 //   cells. This is used to ensure that e.g. cells on the surface are not
 //   point connected to cells which are 8 times smaller.
-Foam::labelList Foam::polyRef::consistentSlowRefinement
+Foam::Xfer<Foam::labelList> Foam::polyRef::consistentSlowRefinement
 (
     const label maxFaceDiff,
     const labelList& cellsToRefine,
@@ -2542,11 +2887,11 @@ Foam::labelList Foam::polyRef::consistentSlowRefinement
             << " cells to refine." << endl;
     }
 
-    return newCellsToRefine;
+    return xferMove<labelList>(newCellsToRefine);
 }
 
 
-Foam::labelList Foam::polyRef::consistentSlowRefinement2
+Foam::Xfer<Foam::labelList> Foam::polyRef::consistentSlowRefinement2
 (
     const label maxFaceDiff,
     const labelList& cellsToRefine,
@@ -2974,7 +3319,7 @@ Foam::labelList Foam::polyRef::consistentSlowRefinement2
         }
     }
 
-    return newCellsToRefine;
+    return xferMove<labelList>(newCellsToRefine);
 }
 
 
@@ -4990,7 +5335,8 @@ Foam::labelList Foam::polyRef::getSplitPoints() const
 Foam::labelList Foam::polyRef::consistentUnrefinement
 (
     const labelList& pointsToUnrefine,
-    const bool maxSet
+    const bool maxSet,
+    const bool pointBasedUnrefinement
 ) const
 {
     if (debug)
@@ -5047,109 +5393,15 @@ Foam::labelList Foam::polyRef::consistentUnrefinement
 
         label nChanged = 0;
 
-
-        // Check 2:1 consistency taking refinement into account
-        // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-        // Internal faces.
-        for (label faceI = 0; faceI < mesh_.nInternalFaces(); faceI++)
+        if (pointBasedUnrefinement)
         {
-            label own = mesh_.faceOwner()[faceI];
-            label ownLevel = cellLevel_[own] - unrefineCell.get(own);
-
-            label nei = mesh_.faceNeighbour()[faceI];
-            label neiLevel = cellLevel_[nei] - unrefineCell.get(nei);
-
-            if (ownLevel < (neiLevel-1))
-            {
-                // Since was 2:1 this can only occur if own is marked for
-                // unrefinement.
-
-                if (maxSet)
-                {
-                    unrefineCell.set(nei, 1);
-                }
-                else
-                {
-                    if (unrefineCell.get(own) == 0)
-                    {
-                        FatalErrorIn("polyRef::consistentUnrefinement(..)")
-                            << "problem" << abort(FatalError);
-                    }
-
-                    unrefineCell.set(own, 0);
-                }
-                nChanged++;
-            }
-            else if (neiLevel < (ownLevel-1))
-            {
-                if (maxSet)
-                {
-                    unrefineCell.set(own, 1);
-                }
-                else
-                {
-                    if (unrefineCell.get(nei) == 0)
-                    {
-                        FatalErrorIn("polyRef::consistentUnrefinement(..)")
-                            << "problem" << abort(FatalError);
-                    }
-
-                    unrefineCell.set(nei, 0);
-                }
-                nChanged++;
-            }
+            // Check for 4:1 point based consistent unrefinement
+            nChanged +=
+                pointConsistentUnrefinement(unrefinePoint, unrefineCell);
         }
 
-
-        // Coupled faces. Swap owner level to get neighbouring cell level.
-        labelList neiLevel(mesh_.nFaces()-mesh_.nInternalFaces());
-
-        forAll(neiLevel, i)
-        {
-            label own = mesh_.faceOwner()[i+mesh_.nInternalFaces()];
-
-            neiLevel[i] = cellLevel_[own] - unrefineCell.get(own);
-        }
-
-        // Swap to neighbour
-        syncTools::swapBoundaryFaceList(mesh_, neiLevel, false);
-
-        forAll(neiLevel, i)
-        {
-            label faceI = i+mesh_.nInternalFaces();
-            label own = mesh_.faceOwner()[faceI];
-            label ownLevel = cellLevel_[own] - unrefineCell.get(own);
-
-            if (ownLevel < (neiLevel[i]-1))
-            {
-                if (!maxSet)
-                {
-                    if (unrefineCell.get(own) == 0)
-                    {
-                        FatalErrorIn("polyRef::consistentUnrefinement(..)")
-                            << "problem" << abort(FatalError);
-                    }
-
-                    unrefineCell.set(own, 0);
-                    nChanged++;
-                }
-            }
-            else if (neiLevel[i] < (ownLevel-1))
-            {
-                if (maxSet)
-                {
-                    if (unrefineCell.get(own) == 1)
-                    {
-                        FatalErrorIn("polyRef::consistentUnrefinement(..)")
-                            << "problem" << abort(FatalError);
-                    }
-
-                    unrefineCell.set(own, 1);
-                    nChanged++;
-                }
-            }
-        }
+        // Check for 2:1 face based consistent unrefinement
+        nChanged += faceConsistentUnrefinement(maxSet, unrefineCell);
 
         reduce(nChanged, sumOp<label>());
 

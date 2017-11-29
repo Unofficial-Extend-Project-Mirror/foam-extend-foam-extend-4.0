@@ -611,15 +611,23 @@ labelList dynamicRefinePolyFvMesh::selectRefineCells
         }
     }
 
-    // Guarantee 2:1 refinement after refinement
-    labelList consistentSet
+    // Guarantee 2:1 refinement after refinement.
+
+    // Create a label list for consistent set
+    labelList consistentSet;
+
+    // Note: the return type of consistentRefinement is Xfer<labelList>, so
+    // we will transfer its contents into this list
+    labelList transferredConsistentSet
     (
         meshCutter_.consistentRefinement
         (
             candidates.shrink(),
-            true               // Add to set to guarantee 2:1
+            true,                 // Add to set to guarantee 2:1,
+            pointBasedRefinement_ // Whether to use point based refinement
         )
     );
+    consistentSet.transfer(transferredConsistentSet);
 
     Info<< "Selected " << returnReduce(consistentSet.size(), sumOp<label>())
         << " cells for refinement out of " << globalData().nTotalCells()
@@ -677,9 +685,11 @@ labelList dynamicRefinePolyFvMesh::selectUnrefinePoints
         meshCutter_.consistentUnrefinement
         (
             newSplitPoints,
-            false
+            false,                // Remove from the set
+            pointBasedRefinement_ // Whether to use point based unrefinement
         )
     );
+
     Info<< "Selected " << returnReduce(consistentSet.size(), sumOp<label>())
         << " split points out of a possible "
         << returnReduce(splitPoints.size(), sumOp<label>())
@@ -750,6 +760,7 @@ dynamicRefinePolyFvMesh::dynamicRefinePolyFvMesh(const IOobject& io)
         .lookupOrDefault<Switch>("singleMotionUpdate", true)
     ),
     curTimeIndex_(-1),
+    pointBasedRefinement_(false), // Set in the update() member function
     meshCutter_(*this),
     dumpLevel_(false),
     nRefinementIterations_(0)
@@ -848,6 +859,42 @@ bool dynamicRefinePolyFvMesh::update()
                 << exit(FatalError);
         }
 
+        // Determining preferred consistency refinement based on maxRefinement
+        if (maxRefinement > 2)
+        {
+            // Refinement level higher than 2 might produce 8:1 point
+            // inconsistency, make sure that the point based consistency check
+            // is used
+            pointBasedRefinement_ = true;
+        }
+
+        // Check whether the user insists on specifying refinement strategy
+        if (refineDict.found("pointBasedRefinement"))
+        {
+            const Switch userPointBasedRefinement =
+                refineDict.lookup("pointBasedRefinement");
+
+            // Check whether the user insisted on not using point based checking
+            // and in case we determined that it should be used, issue a
+            // warning and let the user have a try at it
+            if (!userPointBasedRefinement && pointBasedRefinement_)
+            {
+                WarningIn("dynamicRefinePolyFvMesh::update()")
+                    << "You are insisting on using face based consistency"
+                    << " check for dynamic refinement."
+                    << nl
+                    << "Since you are allowing more than two maximum"
+                    << " refinement levels, this might produce erroneous mesh"
+                    << " due to 8:1 point conflicts."
+                    << nl
+                    << "In order to supress this message and use point based"
+                    << " consistency checks, set pointBasedRefinement to on."
+                    << endl;
+            }
+
+            pointBasedRefinement_ = userPointBasedRefinement;
+        }
+
         const word fieldName(refineDict.lookup("field"));
 
         const volScalarField& vFld = lookupObject<volScalarField>(fieldName);
@@ -861,7 +908,7 @@ bool dynamicRefinePolyFvMesh::update()
         const label nBufferLayers =
             readLabel(refineDict.lookup("nBufferLayers"));
 
-        // Cells marked for refinement or otherwise protected from unrefinement.
+        // Cells marked for refinement
         PackedBoolList refineCell(nCells());
 
         if (globalData().nTotalCells() < maxCells)
