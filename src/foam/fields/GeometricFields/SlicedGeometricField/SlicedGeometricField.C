@@ -54,7 +54,7 @@ slicedBoundaryField
     {
         if (preserveCouples && mesh.boundary()[patchi].coupled())
         {
-            // For coupled patched construct the correct patch field type
+            // For coupled patches construct the correct patch field type
             // This is a normal patch field where we can assign the values
             // Bug fix: New will already create the correct type on the boundary
             // HJ, 4/Jan/2009
@@ -127,7 +127,7 @@ slicedBoundaryField
     {
         if (preserveCouples && mesh.boundary()[patchi].coupled())
         {
-            // For coupled patched construct the correct patch field type
+            // For coupled patches construct the correct patch field type
             bf.set
             (
                 patchi,
@@ -362,6 +362,73 @@ DimensionedInternalField::~DimensionedInternalField()
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+
+template
+<
+    class Type,
+    template<class> class PatchField,
+    template<class> class SlicedPatchField,
+    class GeoMesh
+>
+void
+Foam::SlicedGeometricField<Type, PatchField, SlicedPatchField, GeoMesh>::reset
+(
+    const Field<Type>& completeField
+)
+{
+    // Set the internalField to the slice of the complete field
+    UList<Type>::operator=
+    (
+        typename Field<Type>::subField(completeField, this->size())
+    );
+
+    FieldField<PatchField, Type>& bf = this->boundaryField();
+
+    const fvBoundaryMesh& bMesh = this->mesh().boundary();
+    
+    forAll (bMesh, patchi)
+    {
+        bf[patchi].UList<Type>::operator=
+        (
+            bMesh[patchi].patchSlice(completeField)
+        );
+    }
+}
+
+
+template
+<
+    class Type,
+    template<class> class PatchField,
+    template<class> class SlicedPatchField,
+    class GeoMesh
+>
+void
+Foam::SlicedGeometricField<Type, PatchField, SlicedPatchField, GeoMesh>::reset
+(
+    const Field<Type>& completeIField,
+    const Field<Type>& completeBField
+)
+{
+    // Set the internalField to the slice of the complete field
+    UList<Type>::operator=
+    (
+        typename Field<Type>::subField(completeIField, this->size())
+    );
+
+    FieldField<PatchField, Type>& bf = this->boundaryField();
+
+    const fvBoundaryMesh& bMesh = this->mesh().boundary();
+    
+    forAll (bMesh, patchi)
+    {
+        bf[patchi].UList<Type>::operator=
+        (
+            bMesh[patchi].patchSlice(completeBField)
+        );
+    }
+}
+
 
 template
 <
