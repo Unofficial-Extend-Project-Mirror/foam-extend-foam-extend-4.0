@@ -203,10 +203,10 @@ public:
             virtual const mixingPlaneLduInterface& shadowInterface() const;
 
             //- Return addressing
-            virtual const labelListList& addressing() const;
+            virtual const labelListList& ggiAddressing() const;
 
             //- Return weights
-            virtual const scalarListList& weights() const;
+            virtual const scalarListList& ggiWeights() const;
 
             //- Return face transformation tensor
             virtual const tensorField& forwardT() const;
