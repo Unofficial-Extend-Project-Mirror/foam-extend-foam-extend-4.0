@@ -30,8 +30,6 @@ License
 #include "slicedVolFields.H"
 #include "slicedSurfaceFields.H"
 #include "SubField.H"
-#include "cyclicFvPatchFields.H"
-#include "cyclicGgiFvPatchFields.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -71,6 +69,15 @@ void fvMesh::makeSf() const
         dimArea,
         faceAreas()
     );
+
+    // Boundary update.  Used in complex geometries, eg. immersed boundary
+    // HJ, 29/Nov/2017
+    slicedSurfaceVectorField& S = *SfPtr_;
+
+    forAll (S.boundaryField(), patchI)
+    {
+        boundary()[patchI].makeSf(S);
+    }
 }
 
 
@@ -109,6 +116,9 @@ void fvMesh::makeMagSf() const
         ),
         mag(Sf()) + dimensionedScalar("vs", dimArea, VSMALL)
     );
+
+    // Note: boundaryupdated not required, as magSf is calculated from Sf
+    // HJ, 29/Nov/2017
 }
 
 
@@ -157,12 +167,12 @@ void fvMesh::makeC() const
     // only pertinent for 3D coordinates, and the method ::patchNeighbourField()
     // does not discriminate the type of field it is operating on.
     // So, because the separationOffset transform is not applied, the evaluation
-    // of a 3D position field like 'C' will always be wrong on the shadow patches
-    // of translational cyclic and cyclicGgi interfaces.
+    // of a 3D position field like 'C' will always be wrong on the shadow
+    // patches of translational cyclic and cyclicGgi interfaces.
     // For cyclic and cyclicGgi interfaces using a rotational transform, the
     // evaluation of the field C will be valid, but since we are only
-    // interested in the patch face centers for these interfaces, we can override
-    // those values as well.
+    // interested in the patch face centers for these interfaces, we can
+    // override those values as well.
     // See also:
     //    https://sourceforge.net/apps/mantisbt/openfoam-extend/view.php?id=42
     // MB, 12/Dec/2010
@@ -170,26 +180,22 @@ void fvMesh::makeC() const
     // Need to correct for cyclics transformation since absolute quantity.
     // Ok on processor patches since hold opposite cell centre (no
     // transformation)
+
+    // Note: moved into virtual functions
+    // HJ, 29/Nov/2017
+
+    // Boundary update.  Used in complex geometries, eg. immersed boundary
+    // HJ, 29/Nov/2017
     slicedVolVectorField& C = *CPtr_;
 
-    forAll(C.boundaryField(), patchi)
+    forAll (C.boundaryField(), patchI)
     {
-        if
-        (
-            isA<cyclicFvPatchVectorField>(C.boundaryField()[patchi])
-         || isA<cyclicGgiFvPatchVectorField>(C.boundaryField()[patchi])
-        )
-        {
-            // Note: cyclic is not slice but proper field
-            C.boundaryField()[patchi] == static_cast<const vectorField&>
-            (
-                static_cast<const List<vector>&>
-                (
-                    boundary_[patchi].patchSlice(faceCentres())
-                )
-            );
-        }
+        boundary()[patchI].makeC(C);
     }
+    // Note:
+    // Functionality for cyclic and cyclicGgiFvPatch, which used to be here
+    // with RTTI is moved into respective patched under virtual functions
+    // HJ, 29/Nov/2017
 }
 
 
@@ -227,6 +233,15 @@ void fvMesh::makeCf() const
         dimLength,
         faceCentres()
     );
+
+    // Boundary update.  Used in complex geometries, eg. immersed boundary
+    // HJ, 29/Nov/2017
+    slicedSurfaceVectorField& Cf = *CfPtr_;
+
+    forAll (Cf.boundaryField(), patchI)
+    {
+        boundary()[patchI].makeCf(Cf);
+    }
 }
 
 
@@ -369,6 +384,15 @@ const volScalarField::DimensionedInternalField& fvMesh::V() const
             dimVolume,
             cellVolumes()
         );
+
+        // Boundary update.  Used in complex geometries, eg. immersed boundary
+        // HJ, 29/Nov/2017
+        scalarField& V = *VPtr_;
+
+        forAll (boundary(), patchI)
+        {
+            boundary()[patchI].makeV(V);
+        }
     }
 
     return *VPtr_;
