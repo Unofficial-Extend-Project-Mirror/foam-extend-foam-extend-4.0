@@ -24,9 +24,10 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "processorFvPatch.H"
-#include "addToRunTimeSelectionTable.H"
-#include "transformField.H"
 #include "crMatrix.H"
+#include "transformField.H"
+#include "fvPatchFields.H"
+#include "addToRunTimeSelectionTable.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -41,7 +42,7 @@ addToRunTimeSelectionTable(fvPatch, processorFvPatch, polyPatch);
 
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
 
-void processorFvPatch::makeWeights(scalarField& w) const
+void processorFvPatch::makeWeights(fvsPatchScalarField& w) const
 {
     if (Pstream::parRun())
     {
@@ -75,7 +76,7 @@ void processorFvPatch::makeWeights(scalarField& w) const
 }
 
 
-void processorFvPatch::makeDeltaCoeffs(scalarField& dc) const
+void processorFvPatch::makeDeltaCoeffs(fvsPatchScalarField& dc) const
 {
     if (Pstream::parRun())
     {

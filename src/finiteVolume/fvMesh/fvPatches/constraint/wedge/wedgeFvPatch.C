@@ -26,6 +26,7 @@ Description
 \*---------------------------------------------------------------------------*/
 
 #include "wedgeFvPatch.H"
+#include "fvPatchFields.H"
 #include "addToRunTimeSelectionTable.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -41,7 +42,7 @@ addToRunTimeSelectionTable(fvPatch, wedgeFvPatch, polyPatch);
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
-void wedgeFvPatch::makeCorrVecs(vectorField& cv) const
+void wedgeFvPatch::makeCorrVecs(fvsPatchVectorField& cv) const
 {
     // Non-orthogonal correction not allowed.  HJ, 16/Apr/2009
     cv = vector::zero;

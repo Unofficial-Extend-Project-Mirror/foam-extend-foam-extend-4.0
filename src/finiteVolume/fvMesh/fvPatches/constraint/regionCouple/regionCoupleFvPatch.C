@@ -30,11 +30,13 @@ Author
 \*---------------------------------------------------------------------------*/
 
 #include "regionCoupleFvPatch.H"
-#include "addToRunTimeSelectionTable.H"
+#include "foamTime.H"
 #include "fvMesh.H"
 #include "fvBoundaryMesh.H"
-#include "foamTime.H"
 #include "mapDistribute.H"
+#include "fvPatchFields.H"
+#include "fvsPatchFields.H"
+#include "addToRunTimeSelectionTable.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -54,7 +56,7 @@ Foam::regionCoupleFvPatch::~regionCoupleFvPatch()
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
 // Make patch weighting factors
-void Foam::regionCoupleFvPatch::makeWeights(scalarField& w) const
+void Foam::regionCoupleFvPatch::makeWeights(fvsPatchScalarField& w) const
 {
     if (rcPolyPatch_.coupled())
     {
@@ -82,7 +84,12 @@ void Foam::regionCoupleFvPatch::makeWeights(scalarField& w) const
         else
         {
             // Pick up weights from the master side
-            scalarField masterWeights(shadow().size());
+            fvsPatchScalarField masterWeights
+            (
+                shadow(),
+                w.dimensionedInternalField()
+            );
+
             shadow().makeWeights(masterWeights);
 
             scalarField oneMinusW = 1 - masterWeights;
@@ -105,7 +112,7 @@ void Foam::regionCoupleFvPatch::makeWeights(scalarField& w) const
 
 
 // Make patch face - neighbour cell distances
-void Foam::regionCoupleFvPatch::makeDeltaCoeffs(scalarField& dc) const
+void Foam::regionCoupleFvPatch::makeDeltaCoeffs(fvsPatchScalarField& dc) const
 {
     if (rcPolyPatch_.coupled())
     {
@@ -125,8 +132,14 @@ void Foam::regionCoupleFvPatch::makeDeltaCoeffs(scalarField& dc) const
         }
         else
         {
-            scalarField masterDeltas(shadow().size());
+            fvsPatchScalarField masterDeltas
+            (
+                shadow(),
+                dc.dimensionedInternalField()
+            );
+
             shadow().makeDeltaCoeffs(masterDeltas);
+
             dc = interpolate(masterDeltas);
 
             if (bridgeOverlap())
@@ -145,7 +158,7 @@ void Foam::regionCoupleFvPatch::makeDeltaCoeffs(scalarField& dc) const
 
 
 // Make patch face non-orthogonality correction vectors
-void Foam::regionCoupleFvPatch::makeCorrVecs(vectorField& cv) const
+void Foam::regionCoupleFvPatch::makeCorrVecs(fvsPatchVectorField& cv) const
 {
     if (rcPolyPatch_.coupled())
     {
@@ -284,7 +297,7 @@ const Foam::labelList& Foam::regionCoupleFvPatch::zoneAddressing() const
 }
 
 
-const Foam::labelListList& Foam::regionCoupleFvPatch::addressing() const
+const Foam::labelListList& Foam::regionCoupleFvPatch::ggiAddressing() const
 {
     if (rcPolyPatch_.master())
     {
@@ -309,7 +322,7 @@ const Foam::mapDistribute& Foam::regionCoupleFvPatch::map() const
 }
 
 
-const Foam::scalarListList& Foam::regionCoupleFvPatch::weights() const
+const Foam::scalarListList& Foam::regionCoupleFvPatch::ggiWeights() const
 {
     if (rcPolyPatch_.master())
     {

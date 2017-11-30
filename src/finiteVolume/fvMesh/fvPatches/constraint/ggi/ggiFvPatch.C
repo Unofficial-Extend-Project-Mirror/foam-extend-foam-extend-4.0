@@ -34,8 +34,9 @@ Contributor
 \*---------------------------------------------------------------------------*/
 
 #include "ggiFvPatch.H"
-#include "addToRunTimeSelectionTable.H"
+#include "fvPatchFields.H"
 #include "fvBoundaryMesh.H"
+#include "addToRunTimeSelectionTable.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -55,7 +56,7 @@ Foam::ggiFvPatch::~ggiFvPatch()
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
 
 // Make patch weighting factors
-void Foam::ggiFvPatch::makeWeights(scalarField& w) const
+void Foam::ggiFvPatch::makeWeights(fvsPatchScalarField& w) const
 {
     // Calculation of weighting factors is performed from the master
     // position, using reconstructed shadow cell centres
@@ -84,7 +85,12 @@ void Foam::ggiFvPatch::makeWeights(scalarField& w) const
     else
     {
         // Pick up weights from the master side
-        scalarField masterWeights(shadow().size());
+        fvsPatchScalarField masterWeights
+        (
+            shadow(),
+            w.dimensionedInternalField()
+        );
+
         shadow().makeWeights(masterWeights);
 
         scalarField oneMinusW = 1 - masterWeights;
@@ -102,7 +108,7 @@ void Foam::ggiFvPatch::makeWeights(scalarField& w) const
 
 
 // Make patch face - neighbour cell distances
-void Foam::ggiFvPatch::makeDeltaCoeffs(scalarField& dc) const
+void Foam::ggiFvPatch::makeDeltaCoeffs(fvsPatchScalarField& dc) const
 {
     if (ggiPolyPatch_.master())
     {
@@ -120,8 +126,14 @@ void Foam::ggiFvPatch::makeDeltaCoeffs(scalarField& dc) const
     }
     else
     {
-        scalarField masterDeltas(shadow().size());
+        fvsPatchScalarField masterDeltas
+        (
+            shadow(),
+            dc.dimensionedInternalField()
+        );
+
         shadow().makeDeltaCoeffs(masterDeltas);
+
         dc = interpolate(masterDeltas);
 
         if (bridgeOverlap())
@@ -135,7 +147,7 @@ void Foam::ggiFvPatch::makeDeltaCoeffs(scalarField& dc) const
 
 
 // Make patch face non-orthogonality correction vectors
-void Foam::ggiFvPatch::makeCorrVecs(vectorField& cv) const
+void Foam::ggiFvPatch::makeCorrVecs(fvsPatchVectorField& cv) const
 {
     // Non-orthogonality correction on a ggi interface
     // MB, 7/April/2009
@@ -239,7 +251,7 @@ const Foam::labelList& Foam::ggiFvPatch::zoneAddressing() const
 }
 
 
-const Foam::labelListList& Foam::ggiFvPatch::addressing() const
+const Foam::labelListList& Foam::ggiFvPatch::ggiAddressing() const
 {
     if (ggiPolyPatch_.master())
     {
@@ -264,7 +276,7 @@ const Foam::mapDistribute& Foam::ggiFvPatch::map() const
 }
 
 
-const Foam::scalarListList& Foam::ggiFvPatch::weights() const
+const Foam::scalarListList& Foam::ggiFvPatch::ggiWeights() const
 {
     if (ggiPolyPatch_.master())
     {
@@ -325,7 +337,7 @@ void Foam::ggiFvPatch::expandCrMatrixToZone(crMatrix& patchP) const
         {
             nZoneEntries += zoneColsFF[zfI].size();
         }
-        
+
         // Reconstruct matrix
         labelList zoneRowStart(zoneSize() + 1);
         labelList zoneCols(nZoneEntries);
@@ -334,12 +346,12 @@ void Foam::ggiFvPatch::expandCrMatrixToZone(crMatrix& patchP) const
         zoneRowStart[0] = 0;
         // Reset nZoneEntries for use as a counter
         nZoneEntries = 0;
-        
+
         forAll(zoneColsFF, zfI)
         {
             const labelField& curCols = zoneColsFF[zfI];
             const scalarField& corCoeffs = zoneCoeffsFF[zfI];
-            
+
             zoneRowStart[zfI + 1] = zoneRowStart[zfI] + curCols.size();
 
             forAll (curCols, coeffI)
@@ -358,7 +370,7 @@ void Foam::ggiFvPatch::expandCrMatrixToZone(crMatrix& patchP) const
         );
 
         // Set coeffs
-        patchP.coeffs() = zoneCoeffs;        
+        patchP.coeffs() = zoneCoeffs;
     }
 }
 

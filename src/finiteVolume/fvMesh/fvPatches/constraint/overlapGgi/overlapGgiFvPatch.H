@@ -74,13 +74,13 @@ protected:
     // Protected Member functions
 
         //- Make patch weighting factors
-        virtual void makeWeights(scalarField&) const;
+        virtual void makeWeights(fvsPatchScalarField&) const;
 
         //- Make patch face - neighbour cell distances
-        virtual void makeDeltaCoeffs(scalarField&) const;
+        virtual void makeDeltaCoeffs(fvsPatchScalarField&) const;
 
         //- Make patch face non-orthogonality correction vectors
-        virtual void makeCorrVecs(vectorField&) const;
+        virtual void makeCorrVecs(fvsPatchVectorField&) const;
 
 
 public:
@@ -99,10 +99,9 @@ public:
         {}
 
 
-    // Destructor
-
-        virtual ~overlapGgiFvPatch()
-        {}
+    //- Destructor
+    virtual ~overlapGgiFvPatch()
+    {}
 
 
     // Member functions

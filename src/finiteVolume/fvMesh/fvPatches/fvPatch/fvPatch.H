@@ -44,6 +44,9 @@ SourceFiles
 #include "primitiveFields.H"
 #include "SubField.H"
 #include "fvPatchFieldsFwd.H"
+#include "fvsPatchFieldsFwd.H"
+#include "slicedVolFieldsFwd.H"
+#include "slicedSurfaceFieldsFwd.H"
 #include "autoPtr.H"
 #include "runTimeSelectionTables.H"
 
@@ -52,6 +55,7 @@ SourceFiles
 namespace Foam
 {
 
+class fvMesh;
 class fvBoundaryMesh;
 class surfaceInterpolation;
 
@@ -83,26 +87,48 @@ protected:
 
     // Protected Member Functions
 
-        //- Make patch weighting factors
-        virtual void makeWeights(scalarField&) const;
+        // Geometry correction functions
 
-        //- Make patch face - neighbour cell distances
-        virtual void makeDeltaCoeffs(scalarField&) const;
+            //- Make mesh face centres
+            virtual void makeCf(slicedSurfaceVectorField&) const
+            {}
 
-        //- Make patch face non-orthogonality correction vectors
-        virtual void makeCorrVecs(vectorField&) const;
+            //- Make mesh face areas
+            virtual void makeSf(slicedSurfaceVectorField&) const
+            {}
 
-        //- Initialise the patches for moving points
-        virtual void initMovePoints();
+            //- Make mesh cell centres
+            virtual void makeC(slicedVolVectorField&) const
+            {}
 
-        //- Correct patches after moving points
-        virtual void movePoints();
+            //- Make mesh cell volumes
+            virtual void makeV(scalarField&) const
+            {}
+
+
+        // Discretisation correction functions
+
+            //- Make patch weighting factors
+            virtual void makeWeights(fvsPatchScalarField&) const;
+
+            //- Make patch face - neighbour cell distances
+            virtual void makeDeltaCoeffs(fvsPatchScalarField&) const;
+
+            //- Make patch face non-orthogonality correction vectors
+            virtual void makeCorrVecs(fvsPatchVectorField&) const;
+
+            //- Initialise the patches for moving points
+            virtual void initMovePoints();
+
+            //- Correct patches after moving points
+            virtual void movePoints();
 
 
 public:
 
     typedef fvBoundaryMesh BoundaryMesh;
 
+    friend class fvMesh;
     friend class fvBoundaryMesh;
     friend class surfaceInterpolation;
 

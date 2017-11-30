@@ -115,7 +115,9 @@ tmp<vectorField> fvPatch::Cn() const
     const unallocLabelList& faceCells = this->faceCells();
 
     // Get reference to global cell centres
-    const vectorField& gcc = boundaryMesh().mesh().cellCentres();
+    // Bugfix: access cell centres from fvMesh data, not polyMesh.
+    // HJ, 30/Nov/2017
+    const vectorField& gcc = boundaryMesh().mesh().C().internalField();
 
     forAll (faceCells, faceI)
     {
@@ -150,19 +152,19 @@ tmp<vectorField> fvPatch::delta() const
 }
 
 
-void fvPatch::makeWeights(scalarField& w) const
+void fvPatch::makeWeights(fvsPatchScalarField& w) const
 {
     w = 1.0;
 }
 
 
-void fvPatch::makeDeltaCoeffs(scalarField& dc) const
+void fvPatch::makeDeltaCoeffs(fvsPatchScalarField& dc) const
 {
     dc = 1.0/(nf() & delta());
 }
 
 
-void fvPatch::makeCorrVecs(vectorField& cv) const
+void fvPatch::makeCorrVecs(fvsPatchVectorField& cv) const
 {
     cv = vector::zero;
 }

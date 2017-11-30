@@ -24,6 +24,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "directMappedWallFvPatch.H"
+#include "fvPatchFields.H"
 #include "addToRunTimeSelectionTable.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -36,7 +37,7 @@ namespace Foam
 
 // * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * * //
 
-void Foam::directMappedWallFvPatch::makeCorrVecs(vectorField& cv) const
+void Foam::directMappedWallFvPatch::makeCorrVecs(fvsPatchVectorField& cv) const
 {
     cv = vector::zero;
 }

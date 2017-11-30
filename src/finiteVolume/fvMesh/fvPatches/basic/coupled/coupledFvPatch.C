@@ -28,6 +28,7 @@ Description
 \*---------------------------------------------------------------------------*/
 
 #include "coupledFvPatch.H"
+#include "fvPatchFields.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -47,7 +48,7 @@ coupledFvPatch::~coupledFvPatch()
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-void coupledFvPatch::makeCorrVecs(vectorField& cv) const
+void coupledFvPatch::makeCorrVecs(fvsPatchVectorField& cv) const
 {
     // Calculate correction vectors on coupled patches
     const scalarField& patchDeltaCoeffs = deltaCoeffs();

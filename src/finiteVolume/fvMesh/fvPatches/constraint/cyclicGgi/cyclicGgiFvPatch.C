@@ -30,8 +30,12 @@ Contributor
 \*---------------------------------------------------------------------------*/
 
 #include "cyclicGgiFvPatch.H"
+#include "fvMesh.H"
+#include "fvPatchFields.H"
+#include "fvPatchFields.H"
+#include "fvsPatchFields.H"
+#include "slicedSurfaceFields.H"
 #include "addToRunTimeSelectionTable.H"
-#include "fvBoundaryMesh.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -44,8 +48,18 @@ namespace Foam
 
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
 
+// Make mesh cell centres.  Moved from fvMeshGeometry
+void Foam::cyclicGgiFvPatch::makeC(slicedSurfaceVectorField& C) const
+{
+    C.boundaryField()[index()].UList<vector>::operator=
+    (
+        patchSlice(cyclicGgiPolyPatch_.boundaryMesh().mesh().faceCentres())
+    );
+}
+
+    
 // Make patch weighting factors
-void Foam::cyclicGgiFvPatch::makeWeights(scalarField& w) const
+void Foam::cyclicGgiFvPatch::makeWeights(fvsPatchScalarField& w) const
 {
     // Calculation of weighting factors is performed from the master
     // position, using reconstructed shadow cell centres
@@ -77,7 +91,12 @@ void Foam::cyclicGgiFvPatch::makeWeights(scalarField& w) const
     else
     {
         // Pick up weights from the master side
-        scalarField masterWeights(shadow().size());
+        fvsPatchScalarField masterWeights
+        (
+            shadow(),
+            w.dimensionedInternalField()
+        );
+
         shadow().makeWeights(masterWeights);
 
         w = interpolate(1 - masterWeights);
@@ -93,7 +112,7 @@ void Foam::cyclicGgiFvPatch::makeWeights(scalarField& w) const
 
 
 // Make patch face - neighbour cell distances
-void Foam::cyclicGgiFvPatch::makeDeltaCoeffs(scalarField& dc) const
+void Foam::cyclicGgiFvPatch::makeDeltaCoeffs(fvsPatchScalarField& dc) const
 {
     if (cyclicGgiPolyPatch_.master())
     {
@@ -111,8 +130,14 @@ void Foam::cyclicGgiFvPatch::makeDeltaCoeffs(scalarField& dc) const
     }
     else
     {
-        scalarField masterDeltas(shadow().size());
+        fvsPatchScalarField masterDeltas
+        (
+            shadow(),
+            dc.dimensionedInternalField()
+        );
+
         shadow().makeDeltaCoeffs(masterDeltas);
+
         dc = interpolate(masterDeltas);
 
         if (bridgeOverlap())
