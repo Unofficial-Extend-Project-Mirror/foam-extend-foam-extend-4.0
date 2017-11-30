@@ -18,20 +18,6 @@
         dimensionedScalar("one", dimless, 1)
     );
 
-    volScalarField cellIbMaskExt
-    (
-        IOobject
-        (
-            "cellIbMaskExt",
-            runTime.timeName(),
-            mesh,
-            IOobject::NO_READ,
-            IOobject::AUTO_WRITE
-        ),
-        mesh,
-        dimensionedScalar("one", dimless, 1)
-    );
-
     Info<< "Create immersed boundary face mask" << endl;
     surfaceScalarField faceIbMask
     (
@@ -47,26 +33,41 @@
         dimensionedScalar("one", dimless, 1)
     );
 
-    forAll (mesh.boundary(), patchI)
+    // Multiple IB patches currently not supported.
+    // This required IB geometry update to re-combine the corrected fields in
+    // Geometry correction functions in immersedBoundaryFvPatch
+    // HJ, 30/Nov/2017
     {
-        if (isA<immersedBoundaryFvPatch>(mesh.boundary()[patchI]))
+        label nIbPatches = 0;
+
+        forAll (mesh.boundary(), patchI)
         {
-            Info<< "Found immersed boundary patch " << patchI
-                << " named " << mesh.boundary()[patchI].name()
-                << endl;
+            if (isA<immersedBoundaryFvPatch>(mesh.boundary()[patchI]))
+            {
+                Info<< "Found immersed boundary patch " << patchI
+                    << " named " << mesh.boundary()[patchI].name()
+                    << endl;
 
-            const immersedBoundaryFvPatch& ibPatch =
-                refCast<const immersedBoundaryFvPatch>
-                (
-                    mesh.boundary()[patchI]
-                );
+                nIbPatches++;
+                
+                const immersedBoundaryFvPatch& ibPatch =
+                    refCast<const immersedBoundaryFvPatch>
+                    (
+                        mesh.boundary()[patchI]
+                    );
 
-            cellIbMask *= ibPatch.gamma();
-            cellIbMaskExt *= ibPatch.gammaExt();
-            faceIbMask *= ibPatch.sGamma();
+                cellIbMask = Foam::min(cellIbMask, ibPatch.gamma());
+                faceIbMask *= Foam::min(faceIbMask, ibPatch.sGamma());
+            }
+        }
+
+        if (nIbPatches > 1)
+        {
+            FatalErrorIn(args.executable())
+                << "Multiple Immersed boundary patches currently not supported"
+                << abort(FatalError);
         }
     }
 
     // Evaluate boundary conditions for IB masks
     cellIbMask.boundaryField().evaluateCoupled();
-    cellIbMaskExt.boundaryField().evaluateCoupled();

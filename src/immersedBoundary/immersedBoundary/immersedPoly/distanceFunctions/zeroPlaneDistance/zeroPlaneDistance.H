@@ -21,24 +21,74 @@ License
     You should have received a copy of the GNU General Public License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
+Class
+    Foam::zeroPlaneDistance
+
+Description
+    Distance class to zero plane
+
+Author
+    Hrvoje Jasak, Wikki Ltd.  All rights reserved
+
+SourceFiles
+
 \*---------------------------------------------------------------------------*/
 
-#include "volFields.H"
-#include "fvPatchFields.H"
-#include "immersedBoundaryFvPatchFields.H"
-#include "addToRunTimeSelectionTable.H"
+#ifndef zeroPlaneDistance_H
+#define zeroPlaneDistance_H
+
+#include "scalarField.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 
-// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
+/*---------------------------------------------------------------------------*\
+                     Class zeroPlaneDistance Declaration
+\*---------------------------------------------------------------------------*/
 
-makePatchFields(immersedBoundary);
+class zeroPlaneDistance
+{
+public:
+
+    // Constructors
+
+        //- Construct null
+        zeroPlaneDistance();
+
+
+    //- Destructor - default
+
+
+    // Member Functions
+
+        // Iterate distance
+        inline bool iterateDistance() const
+        {
+            return false;
+        }
+
+        // Return distance to xy-plane at z = 0
+        inline scalar distance(const point& p) const
+        {
+            return p.z();
+        }
+
+        // Return distance to xy-plane at z = 0
+        inline tmp<scalarField> distance(const vectorField& p) const
+        {
+            return p.component(vector::Z);
+        }
+};
+
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#endif
 
 // ************************************************************************* //

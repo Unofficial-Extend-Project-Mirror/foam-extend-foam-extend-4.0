@@ -57,7 +57,7 @@ class immersedBoundaryFvPatchField
 {
     // Private data
 
-        //- Local reference cast into the processor patch
+        //- Local reference to immersed boundary patch
         const immersedBoundaryFvPatch& ibPatch_;
 
         //- Local reference to fvMesh
@@ -73,9 +73,8 @@ class immersedBoundaryFvPatchField
             //- Defining normal gradient field
             Field<Type> refGrad_;
 
-
-        //- Does the boundary condition fix the value
-        Switch fixesValue_;
+            //- Fraction (0-1) of value used for boundary condition
+            scalarField refValueFraction_;
 
 
         // Dead cell controls
@@ -87,7 +86,7 @@ class immersedBoundaryFvPatchField
             Type deadCellValue_;
 
 
-        // Fields on the IB intersection points
+        // Fields on the IB face centres
         // Field size equals the number of cells intesected with the IB
 
             //- Time index for last update of mesh or moving boundary
@@ -99,19 +98,14 @@ class immersedBoundaryFvPatchField
             //- Normal gradient field
             mutable Field<Type> ibGrad_;
 
+            //- Value fraction
+            mutable scalarField ibValueFraction_;
+
 
     // Private Member Functions
 
         //- Update IB value and gradient
         void updateIbValues() const;
-
-        //- Impose Dirichlet BC at IB cells and return corrected cells values
-        //  Calculate value and gradient on IB intersection points
-        void imposeDirichletCondition() const;
-
-        //- Impose Neumann BC at IB cells and return corrected cells values
-        //  Calculate value and gradient on IB intersection points
-        void imposeNeumannCondition() const;
 
         //- Impose condition in dead cells
         void imposeDeadCondition();
@@ -144,23 +138,11 @@ protected:
         //- Execute immersed boundary patch field motion update
         virtual void motionUpdate() const;
 
-        //- Set IB cell values
-        virtual void setIbCellValues(const Field<Type>&) const;
-
 
 public:
 
     //- Runtime type information
     TypeName(immersedBoundaryFvPatch::typeName_());
-
-
-    // Static algorithm control data
-
-        //- Number of boundary condition update iterations
-        static const debug::optimisationSwitch nBcIter_;
-
-        //- Boundary condition update tolerance
-        static const debug::tolerancesSwitch bcTolerance_;
 
 
     // Constructors
@@ -243,40 +225,40 @@ public:
         // Note: defining fields carry values on faces of the IB patch
         // represented as a triangulated surface
 
-            //- Return access to reference value
-            virtual Field<Type>& refValue()
-            {
-                return refValue_;
-            }
-
             //- Return reference value
-            virtual const Field<Type>& refValue() const
+            const Field<Type>& refValue() const
             {
                 return refValue_;
             }
 
-            //- Return access to reference gradient
-            virtual Field<Type>& refGrad()
+            //- Return access to reference value
+            Field<Type>& refValue()
             {
-                return refGrad_;
+                return refValue_;
             }
 
             //- Return reference gradient
-            virtual const Field<Type>& refGrad() const
+            const Field<Type>& refGrad() const
             {
                 return refGrad_;
             }
 
-            //- Return true if this patch field fixes a value
-            virtual bool fixesValue() const
+            //- Return access to reference gradient
+            Field<Type>& refGrad()
+            {
+                return refGrad_;
+            }
+
+            //- Return value fraction
+            virtual const scalarField& valueFraction() const
             {
                 return fixesValue_;
             }
 
-            //- Return access to fixes value switch
-            Switch& fixesValue()
+            //- Return access to value fraction
+            scalarField& valueFraction()
             {
-                return fixesValue_;
+                return valueFraction_;
             }
 
 
@@ -293,15 +275,6 @@ public:
 
             //- Return IB sample point field
             tmp<Field<Type> > ibSamplingPointValue() const;
-
-
-        //- Return fields on triangular faces
-
-            //- Return IB field
-            tmp<Field<Type> > triValue() const;
-
-            //- Return IB surface-normal gradient
-            tmp<Field<Type> > triGrad() const;
 
 
         // Mapping functions

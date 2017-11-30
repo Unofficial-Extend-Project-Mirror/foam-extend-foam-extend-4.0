@@ -35,7 +35,7 @@ SourceFiles
 #ifndef refineImmersedBoundaryMesh_H
 #define refineImmersedBoundaryMesh_H
 
-#include "fvMesh.H"
+#include "polyMesh.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -70,7 +70,7 @@ private:
     // Private data
 
         //- Reference to mesh
-        fvMesh& mesh_;
+        polyMesh& mesh_;
 
 
     // Private Member Functions
@@ -106,7 +106,7 @@ public:
     // Constructors
 
         //- Construct from mesh
-        refineImmersedBoundaryMesh(fvMesh& mesh);
+        refineImmersedBoundaryMesh(polyMesh& mesh);
 
 
     //- Destructor
