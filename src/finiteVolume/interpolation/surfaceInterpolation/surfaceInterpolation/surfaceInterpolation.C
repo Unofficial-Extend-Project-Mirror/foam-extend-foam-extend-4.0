@@ -139,7 +139,6 @@ void Foam::surfaceInterpolation::makeWeights() const
             << endl;
     }
 
-
     weightingFactors_ = new surfaceScalarField
     (
         IOobject
