@@ -24,6 +24,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "slicedFvsPatchFields.H"
+#include "fvPatchFields.H"
 #include "fvsPatchFields.H"
 #include "addToRunTimeSelectionTable.H"
 
