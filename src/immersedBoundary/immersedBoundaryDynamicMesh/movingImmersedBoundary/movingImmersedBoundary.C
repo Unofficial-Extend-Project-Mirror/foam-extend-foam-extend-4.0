@@ -25,6 +25,7 @@ License
 
 #include "movingImmersedBoundary.H"
 #include "immersedBoundaryPolyPatch.H"
+#include "mixedIbFvPatchFields.H"
 #include "transformField.H"
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
@@ -32,7 +33,7 @@ License
 Foam::movingImmersedBoundary::movingImmersedBoundary
 (
     const word& name,
-    const fvMesh& mesh,
+    const polyMesh& mesh,
     const dictionary& dict
 )
 :
@@ -84,8 +85,8 @@ void Foam::movingImmersedBoundary::movePoints() const
     );
 
     // Get non-const reference to patch field
-    immersedBoundaryFvPatchVectorField& ibPatchField =
-        refCast<immersedBoundaryFvPatchVectorField>
+    mixedIbFvPatchVectorField& ibPatchField =
+        refCast<mixedIbFvPatchVectorField>
         (
             U.boundaryField()[patchID]
         );

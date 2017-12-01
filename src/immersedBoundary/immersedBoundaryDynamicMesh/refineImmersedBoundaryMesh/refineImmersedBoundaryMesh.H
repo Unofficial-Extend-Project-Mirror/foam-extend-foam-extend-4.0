@@ -22,24 +22,20 @@ License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    Foam::movingImmersedBoundary
+    Foam::refineImmersedBoundaryMesh
 
 Description
-    Moving immesed boundary.  Motion is prescribed using a solid body motion
-    function.
+    Refine a mesh with immersed boundary
 
 SourceFiles
-    movingImmersedBoundary.C
+    refineImmersedBoundaryMesh.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef movingImmersedBoundary_H
-#define movingImmersedBoundary_H
+#ifndef refineImmersedBoundaryMesh_H
+#define refineImmersedBoundaryMesh_H
 
 #include "polyMesh.H"
-#include "solidBodyMotionFunction.H"
-#include "triSurfaceMesh.H"
-#include "fvPatchFields.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -47,67 +43,86 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                    Class movingImmersedBoundary Declaration
+                 Class refineImmersedBoundaryMesh Declaration
 \*---------------------------------------------------------------------------*/
 
-class movingImmersedBoundary
+class refineImmersedBoundaryMesh
 {
+public:
+
+    // Public enumerations
+
+        //- Cell collection method
+        enum ibCellCollection
+        {
+            UNDEFINED_COLLECTION = 0,
+            IB_CELLS,
+            IB_CELL_CELLS
+        };
+
+        //- Projection method names
+        static const NamedEnum<ibCellCollection, 3> ibCellCollectionNames_;
+
+
+private:
+
     // Private data
 
-        //- Patch name
-        const word name_;
-
-        //- Mesh reference
-        const polyMesh& mesh_;
-
-        //- Overset region motion control function
-        autoPtr<solidBodyMotionFunction> sbmfPtr_;
-
-        //- Reference tri surface mesh position
-        triSurfaceMesh refIbSurface_;
+        //- Reference to mesh
+        polyMesh& mesh_;
 
 
     // Private Member Functions
 
         //- Disallow default bitwise copy construct
-        movingImmersedBoundary(const movingImmersedBoundary&);
+        refineImmersedBoundaryMesh(const refineImmersedBoundaryMesh&);
 
         //- Disallow default bitwise assignment
-        void operator=(const movingImmersedBoundary&);
+        void operator=(const refineImmersedBoundaryMesh&);
+
+
+        // Mesh refinement
+
+            //- Add ibCells for refinement
+            void addIbCells(labelHashSet& refCellSet) const;
+
+            //- Add ibCellCells for refinement
+            void addIbCellCells(labelHashSet& refCellSet) const;
+
+            //- Add ibCellCellFaces for refinement
+            void addIbCellCellFaces(labelHashSet& refCellSet) const;
+
+
+            //- From refineMesh application
+            label axis(const vector& normal) const;
+
+            //- From refineMesh application
+            label twoDNess() const;
 
 
 public:
 
     // Constructors
 
-        //- Construct from dictionary
-        movingImmersedBoundary
-        (
-            const word& name,
-            const polyMesh& mesh,
-            const dictionary& dict
-        );
+        //- Construct from mesh
+        refineImmersedBoundaryMesh(polyMesh& mesh);
 
 
     //- Destructor
-    ~movingImmersedBoundary();
+    ~refineImmersedBoundaryMesh();
+
 
     // Member Functions
 
-        //- Return name
-        const word& name() const
-        {
-            return name_;
-        }
+        //- Return list of cells for refinement based on specifie collection
+        //  type (see enumeration)
+        labelList refinementCells
+        (
+            const ibCellCollection& collectionType
+        ) const;
 
-        //- Return mesh
-        const polyMesh& mesh() const
-        {
-            return mesh_;
-        }
-
-        //- Move immersed boundary patch points
-        void movePoints() const;
+        // Refine mesh given a list of cells for refinement
+        void refineMesh(const labelList& refCells) const;
 };
 
 
