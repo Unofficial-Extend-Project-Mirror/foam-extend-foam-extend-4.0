@@ -23,7 +23,7 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "immersedBoundaryFvPatchField.H"
+#include "mixedIbFvPatchField.H"
 #include "surfaceWriter.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -37,7 +37,7 @@ namespace Foam
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
 template<class Type>
-void immersedBoundaryFvPatchField<Type>::updateIbValues()
+void mixedIbFvPatchField<Type>::updateIbValues()
 {
     // Interpolate the values form tri surface using nearest triangle
     const labelList& nt = ibPatch_.ibPolyPatch().nearestTri();
@@ -45,13 +45,11 @@ void immersedBoundaryFvPatchField<Type>::updateIbValues()
     this->refValue() = Field<Type>(triValue_, nt);
     this->refGrad() = Field<Type>(triGrad_, nt);
     this->valueFraction() = scalarField(triValueFraction_, nt);
-    Info<< "this->refValue(): " << this->refValue() << endl;
-    mixedFvPatchField<Type>::evaluate();
 }
 
 
 template<class Type>
-void immersedBoundaryFvPatchField<Type>::setDeadValues()
+void mixedIbFvPatchField<Type>::setDeadValues()
 {
     // Fix the value in dead cells
     if (setDeadValue_)
@@ -70,7 +68,7 @@ void immersedBoundaryFvPatchField<Type>::setDeadValues()
 
 
 template<class Type>
-void immersedBoundaryFvPatchField<Type>::correctDiag
+void mixedIbFvPatchField<Type>::correctDiag
 (
     fvMatrix<Type>& eqn
 ) const
@@ -103,7 +101,7 @@ void immersedBoundaryFvPatchField<Type>::correctDiag
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 template<class Type>
-immersedBoundaryFvPatchField<Type>::immersedBoundaryFvPatchField
+mixedIbFvPatchField<Type>::mixedIbFvPatchField
 (
     const fvPatch& p,
     const DimensionedField<Type, volMesh>& iF
@@ -120,7 +118,7 @@ immersedBoundaryFvPatchField<Type>::immersedBoundaryFvPatchField
 
 
 template<class Type>
-immersedBoundaryFvPatchField<Type>::immersedBoundaryFvPatchField
+mixedIbFvPatchField<Type>::mixedIbFvPatchField
 (
     const fvPatch& p,
     const DimensionedField<Type, volMesh>& iF,
@@ -139,8 +137,8 @@ immersedBoundaryFvPatchField<Type>::immersedBoundaryFvPatchField
     {
         FatalIOErrorIn
         (
-            "immersedBoundaryFvPatchField<Type>::"
-            "immersedBoundaryFvPatchField\n"
+            "mixedIbFvPatchField<Type>::"
+            "mixedIbFvPatchField\n"
             "(\n"
             "    const fvPatch& p,\n"
             "    const Field<Type>& field,\n"
@@ -157,19 +155,21 @@ immersedBoundaryFvPatchField<Type>::immersedBoundaryFvPatchField
 
     // Re-interpolate the data related to immersed boundary
     this->updateIbValues();
+
+    mixedFvPatchField<Type>::evaluate();
 }
 
 
 template<class Type>
-immersedBoundaryFvPatchField<Type>::immersedBoundaryFvPatchField
+mixedIbFvPatchField<Type>::mixedIbFvPatchField
 (
-    const immersedBoundaryFvPatchField<Type>& ptf,
+    const mixedIbFvPatchField<Type>& ptf,
     const fvPatch& p,
     const DimensionedField<Type, volMesh>& iF,
     const fvPatchFieldMapper& mapper
 )
 :
-    mixedFvPatchField<Type>(ptf, p, iF, mapper),
+    mixedFvPatchField<Type>(p, iF),  // Do not map mixed data
     ibPatch_(refCast<const immersedBoundaryFvPatch>(p)),
     triValue_(ptf.triValue()),
     triGrad_(ptf.triGrad()),
@@ -183,10 +183,10 @@ immersedBoundaryFvPatchField<Type>::immersedBoundaryFvPatchField
     {
         FatalErrorIn
         (
-            "immersedBoundaryFvPatchField<Type>::"
-            "immersedBoundaryFvPatchField\n"
+            "mixedIbFvPatchField<Type>::"
+            "mixedIbFvPatchField\n"
             "(\n"
-            "    const immersedBoundaryFvPatchField<Type>&,\n"
+            "    const mixedIbFvPatchField<Type>&,\n"
             "    const fvPatch& p,\n"
             "    const DimensionedField<Type, volMesh>& iF,\n"
             "    const fvPatchFieldMapper& mapper\n"
@@ -201,13 +201,18 @@ immersedBoundaryFvPatchField<Type>::immersedBoundaryFvPatchField
 
     // Re-interpolate the data related to immersed boundary
     this->updateIbValues();
+
+    // On creation of the mapped field, the internal field is dummy and
+    // cannot be used.  Initialise the value to avoid errors
+    // HJ, 1/Dec/2017
+    Field<Type>::operator=(pTraits<Type>::zero);
 }
 
 
 template<class Type>
-immersedBoundaryFvPatchField<Type>::immersedBoundaryFvPatchField
+mixedIbFvPatchField<Type>::mixedIbFvPatchField
 (
-    const immersedBoundaryFvPatchField<Type>& ptf
+    const mixedIbFvPatchField<Type>& ptf
 )
 :
     mixedFvPatchField<Type>(ptf),
@@ -221,9 +226,9 @@ immersedBoundaryFvPatchField<Type>::immersedBoundaryFvPatchField
 
 
 template<class Type>
-immersedBoundaryFvPatchField<Type>::immersedBoundaryFvPatchField
+mixedIbFvPatchField<Type>::mixedIbFvPatchField
 (
-    const immersedBoundaryFvPatchField<Type>& ptf,
+    const mixedIbFvPatchField<Type>& ptf,
     const DimensionedField<Type, volMesh>& iF
 )
 :
@@ -240,7 +245,7 @@ immersedBoundaryFvPatchField<Type>::immersedBoundaryFvPatchField
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 template<class Type>
-void immersedBoundaryFvPatchField<Type>::autoMap
+void mixedIbFvPatchField<Type>::autoMap
 (
     const fvPatchFieldMapper& m
 )
@@ -251,7 +256,7 @@ void immersedBoundaryFvPatchField<Type>::autoMap
 
 
 template<class Type>
-void immersedBoundaryFvPatchField<Type>::rmap
+void mixedIbFvPatchField<Type>::rmap
 (
     const fvPatchField<Type>& ptf,
     const labelList&
@@ -259,8 +264,8 @@ void immersedBoundaryFvPatchField<Type>::rmap
 {
     // Base fields do not rmap: re-interpolate them from tri data
 
-    const immersedBoundaryFvPatchField<Type>& mptf =
-        refCast<const immersedBoundaryFvPatchField<Type> >(ptf);
+    const mixedIbFvPatchField<Type>& mptf =
+        refCast<const mixedIbFvPatchField<Type> >(ptf);
 
     // Set rmap tri data
     triValue_ = mptf.triValue_;
@@ -272,7 +277,7 @@ void immersedBoundaryFvPatchField<Type>::rmap
 
 
 template<class Type>
-void immersedBoundaryFvPatchField<Type>::evaluate
+void mixedIbFvPatchField<Type>::evaluate
 (
     const Pstream::commsTypes
 )
@@ -286,7 +291,7 @@ void immersedBoundaryFvPatchField<Type>::evaluate
 
 
 // template<class Type>
-// void immersedBoundaryFvPatchField<Type>::manipulateMatrix
+// void mixedIbFvPatchField<Type>::manipulateMatrix
 // (
 //     fvMatrix<Type>& eqn
 // )
@@ -311,7 +316,7 @@ void immersedBoundaryFvPatchField<Type>::evaluate
 
 
 template<class Type>
-void immersedBoundaryFvPatchField<Type>::write(Ostream& os) const
+void mixedIbFvPatchField<Type>::write(Ostream& os) const
 {
     // to resolve the post-processing issues.  HJ, 1/Dec/2017
     fvPatchField<Type>::write(os);

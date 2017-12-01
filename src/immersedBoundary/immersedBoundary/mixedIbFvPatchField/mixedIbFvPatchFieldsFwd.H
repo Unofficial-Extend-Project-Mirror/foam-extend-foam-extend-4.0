@@ -23,8 +23,8 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef immersedBoundaryFvPatchFieldsFwd_H
-#define immersedBoundaryFvPatchFieldsFwd_H
+#ifndef mixedIbFvPatchFieldsFwd_H
+#define mixedIbFvPatchFieldsFwd_H
 
 #include "fvPatchField.H"
 #include "fieldTypes.H"
@@ -36,9 +36,9 @@ namespace Foam
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-template<class Type> class immersedBoundaryFvPatchField;
+template<class Type> class mixedIbFvPatchField;
 
-makePatchTypeFieldTypedefs(immersedBoundary)
+makePatchTypeFieldTypedefs(mixedIb)
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

@@ -22,21 +22,21 @@ License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    Foam::immersedBoundaryFvPatchField
+    Foam::mixedIbFvPatchField
 
 Description
-    Foam::immersedBoundaryFvPatchField
+    Foam::mixedIbFvPatchField
 
 Author
     Hrvoje Jasak
 
 SourceFiles
-    immersedBoundaryFvPatchField.C
+    mixedIbFvPatchField.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef immersedBoundaryFvPatchField_H
-#define immersedBoundaryFvPatchField_H
+#ifndef mixedIbFvPatchField_H
+#define mixedIbFvPatchField_H
 
 #include "mixedFvPatchFields.H"
 #include "immersedBoundaryFvPatch.H"
@@ -47,11 +47,11 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                  Class immersedBoundaryFvPatchField Declaration
+                  Class mixedIbFvPatchField Declaration
 \*---------------------------------------------------------------------------*/
 
 template<class Type>
-class immersedBoundaryFvPatchField
+class mixedIbFvPatchField
 :
     public mixedFvPatchField<Type>
 {
@@ -104,40 +104,40 @@ class immersedBoundaryFvPatchField
 public:
 
     //- Runtime type information
-    TypeName("mixedImmersedBoundary");
+    TypeName("mixedIb");
 
 
     // Constructors
 
         //- Construct from patch and internal field
-        immersedBoundaryFvPatchField
+        mixedIbFvPatchField
         (
             const fvPatch&,
             const DimensionedField<Type, volMesh>&
         );
 
         //- Construct from patch, internal field and dictionary
-        immersedBoundaryFvPatchField
+        mixedIbFvPatchField
         (
             const fvPatch&,
             const DimensionedField<Type, volMesh>&,
             const dictionary&
         );
 
-        //- Construct by mapping given immersedBoundaryFvPatchField
+        //- Construct by mapping given mixedIbFvPatchField
         //  onto a new patch
-        immersedBoundaryFvPatchField
+        mixedIbFvPatchField
         (
-            const immersedBoundaryFvPatchField<Type>&,
+            const mixedIbFvPatchField<Type>&,
             const fvPatch&,
             const DimensionedField<Type, volMesh>&,
             const fvPatchFieldMapper&
         );
 
         //- Construct as copy
-        immersedBoundaryFvPatchField
+        mixedIbFvPatchField
         (
-            const immersedBoundaryFvPatchField<Type>&
+            const mixedIbFvPatchField<Type>&
         );
 
         //- Construct and return a clone
@@ -145,14 +145,14 @@ public:
         {
             return tmp<fvPatchField<Type> >
             (
-                new immersedBoundaryFvPatchField<Type>(*this)
+                new mixedIbFvPatchField<Type>(*this)
             );
         }
 
         //- Construct as copy setting internal field reference
-        immersedBoundaryFvPatchField
+        mixedIbFvPatchField
         (
-            const immersedBoundaryFvPatchField<Type>&,
+            const mixedIbFvPatchField<Type>&,
             const DimensionedField<Type, volMesh>&
         );
 
@@ -164,13 +164,13 @@ public:
         {
             return tmp<fvPatchField<Type> >
             (
-                new immersedBoundaryFvPatchField<Type>(*this, iF)
+                new mixedIbFvPatchField<Type>(*this, iF)
             );
         }
 
 
     //- Destructor
-    virtual ~immersedBoundaryFvPatchField()
+    virtual ~mixedIbFvPatchField()
     {}
 
 
@@ -266,7 +266,7 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-#   include "immersedBoundaryFvPatchField.C"
+#   include "mixedIbFvPatchField.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

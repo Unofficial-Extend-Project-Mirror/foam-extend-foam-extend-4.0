@@ -25,7 +25,7 @@ License
 
 #include "volFields.H"
 #include "fvPatchFields.H"
-#include "immersedBoundaryFvPatchFields.H"
+#include "mixedIbFvPatchFields.H"
 #include "addToRunTimeSelectionTable.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -35,7 +35,7 @@ namespace Foam
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-makePatchFields(immersedBoundary);
+makePatchFields(mixedIb);
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

@@ -69,30 +69,19 @@ Foam::vector Foam::immersedBoundaryPolyPatch::cellSpan
 {
     const polyMesh& mesh = boundaryMesh().mesh();
 
-    scalar delta;
-
-    if (mesh.nGeometricD() == 3)
-    {
-        delta = 2*pow(mesh.cellVolumes()[cellID], 1.0/3.0);
-    }
-    else
-    {
-        const Vector<label>& directions = mesh.geometricD();
-
-        scalar thickness = 0.0;
-
-        for (direction dir = 0; dir < directions.nComponents; dir++)
-        {
-            if (directions[dir] == -1)
-            {
-                thickness = mesh.bounds().span()[dir];
-                break;
-            }
-        }
-
-        // Field created with mapping for IB cells only
-        delta = 2*sqrt(mesh.cellVolumes()[cellID]/thickness);
-    }
+    // Calculate span as twice the bounding box size
+    const scalar delta = 2*cmptMax
+    (
+        boundBox
+        (
+            mesh.cells()[cellID].points
+            (
+                mesh.faces(),
+                mesh.points()
+            ),
+            false // Do not reduce
+        ).span()
+    );
 
     return vector(delta, delta, delta);
 }
@@ -1291,6 +1280,8 @@ void Foam::immersedBoundaryPolyPatch::write(Ostream& os) const
 {
     polyPatch::write(os);
     os.writeKeyword("internalFlow") << internalFlow_
+        << token::END_STATEMENT << nl;
+    os.writeKeyword("isWall") << isWall_
         << token::END_STATEMENT << nl;
 }
 
