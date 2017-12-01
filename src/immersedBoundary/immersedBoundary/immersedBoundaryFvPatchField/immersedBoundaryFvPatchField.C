@@ -24,8 +24,6 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "immersedBoundaryFvPatchField.H"
-#include "fvPatchFieldMapper.H"
-#include "fvMatrix.H"
 #include "surfaceWriter.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -39,26 +37,34 @@ namespace Foam
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
 template<class Type>
-void immersedBoundaryFvPatchField<Type>::updateIbValues() const
+void immersedBoundaryFvPatchField<Type>::updateIbValues()
 {
     // Interpolate the values form tri surface using nearest triangle
-    ibValue_ = Field<Type>(refValue, ibPatch_.nearestTri());
-    ibGrad_ = Field<Type>(refGrad, ibPatch_.nearestTri());
-    ibValueFraction_ = scalarField(refValueFraction, ibPatch_.nearestTri());
+    const labelList& nt = ibPatch_.ibPolyPatch().nearestTri();
+
+    this->refValue() = Field<Type>(triValue_, nt);
+    this->refGrad() = Field<Type>(triGrad_, nt);
+    this->valueFraction() = scalarField(triValueFraction_, nt);
+    Info<< "this->refValue(): " << this->refValue() << endl;
+    mixedFvPatchField<Type>::evaluate();
 }
 
 
 template<class Type>
-void immersedBoundaryFvPatchField<Type>::imposeDeadCondition()
+void immersedBoundaryFvPatchField<Type>::setDeadValues()
 {
-    const labelList& dc = ibPatch_.deadCells();
-
-    // Get non-const access to internal field
-    Field<Type>& psiI = const_cast<Field<Type>&>(this->internalField());
-
-    forAll (dc, dcI)
+    // Fix the value in dead cells
+    if (setDeadValue_)
     {
-        psiI[dc[dcI]] = deadCellValue_;
+        const labelList& dc = ibPatch_.ibPolyPatch().deadCells();
+
+        // Get non-const access to internal field
+        Field<Type>& psiI = const_cast<Field<Type>&>(this->internalField());
+
+        forAll (dc, dcI)
+        {
+            psiI[dc[dcI]] = deadValue_;
+        }
     }
 }
 
@@ -71,225 +77,26 @@ void immersedBoundaryFvPatchField<Type>::correctDiag
 {
     scalarField& Diag = eqn.diag();
 
-    const labelList& dce = ibPatch_.deadCellsExt();
+    const labelList& deadCells = ibPatch_.ibPolyPatch().deadCells();
 
     // Estimate diagonal in live cells
     scalar liveDiag = 1;
 
-    if (dce.size() < Diag.size())
+    if (deadCells.size() < Diag.size())
     {
-        liveDiag = gSumMag(Diag)/(Diag.size() - dce.size());
+        liveDiag = gSumMag(Diag)/(Diag.size() - deadCells.size());
 
         // Correct for sign
         liveDiag *= sign(gMax(Diag));
     }
 
-    forAll (dce, cellI)
+    forAll (deadCells, cellI)
     {
-        if (mag(Diag[dce[cellI]]) < SMALL)
+        if (mag(Diag[deadCells[cellI]]) < SMALL)
         {
-            Diag[dce[cellI]] = liveDiag;
+            Diag[deadCells[cellI]] = liveDiag;
         }
     }
-}
-
-
-template<class Type>
-void immersedBoundaryFvPatchField<Type>::correctOffDiag
-(
-    fvMatrix<Type>& eqn
-) const
-{
-    // Calculate gradient contribution
-    const labelList& ibFaces = ibPatch_.ibFaces();
-    const labelList& ibFaceCells = ibPatch_.ibFaceCells();
-
-    const scalarField& ibGamma = ibPatch_.gamma().internalField();
-
-    const unallocLabelList& own = mesh_.owner();
-    const unallocLabelList& nei = mesh_.neighbour();
-
-    // Get delta coefficients
-    const surfaceScalarField& dc = mesh_.deltaCoeffs();
-    const scalarField& dcI = dc.internalField();
-
-    if (eqn.symmetric())
-    {
-        scalarField& diag = eqn.diag();
-        scalarField& upper = eqn.upper();
-        Field<Type>& source = eqn.source();
-
-//         Info<< "Symmetric correctOffDiag for field "
-//             << this->dimensionedInternalField().name() << endl;
-
-        forAll (ibFaces, faceI)
-        {
-            const label curFace = ibFaces[faceI];
-
-            if (curFace < nei.size())
-            {
-                // Internal face.  One side is an ibCell and another is a
-                // live cell. Add gradient to the source of the live cell
-                // and kill the off-diagonal coefficient
-                if (ibGamma[own[curFace]] > SMALL)
-                {
-                    diag[own[curFace]] += upper[curFace];
-
-                    source[own[curFace]] +=
-                        upper[curFace]*ibGrad_[ibFaceCells[faceI]]
-                        /dcI[curFace];
-                }
-                else
-                {
-                    diag[nei[curFace]] += upper[curFace];
-
-                    source[nei[curFace]] -=
-                        upper[curFace]*ibGrad_[ibFaceCells[faceI]]
-                        /dcI[curFace];
-                }
-
-                upper[curFace] = 0;
-            }
-            else
-            {
-                // else MPH
-                label patchi = mesh_.boundaryMesh().whichPatch(curFace);
-
-                if (!eqn.internalCoeffs()[patchi].empty())
-                {
-                    label patchFacei =
-                        mesh_.boundaryMesh()[patchi].whichFace(curFace);
-
-                    eqn.internalCoeffs()[patchi][patchFacei] =
-                        pTraits<Type>::zero;
-
-                    eqn.boundaryCoeffs()[patchi][patchFacei] =
-                        pTraits<Type>::zero;
-
-                    // Check if the live cell is on local or neighbour side
-                    // HJ, 7/Dec/2012
-                    if (ibFaceCells[faceI] > -1)
-                    {
-                        if (ibGamma[ibFaceCells[faceI]] > SMALL)
-                        {
-                            source[ibFaceCells[faceI]] +=
-                                ibGrad_[ibFaceCells[faceI]]
-                                /dc.boundaryField()[patchi][patchFacei];
-                        }
-                    }
-                }
-            }
-        }
-    }
-    else if (eqn.asymmetric())
-    {
-        scalarField& diag = eqn.diag();
-        scalarField& upper = eqn.upper();
-        scalarField& lower = eqn.lower();
-        Field<Type>& source = eqn.source();
-
-//         Info<< "Asymmetric correctOffDiag for field "
-//             << this->dimensionedInternalField().name() << endl;
-
-        forAll (ibFaces, faceI)
-        {
-            const label curFace = ibFaces[faceI];
-
-            if (curFace < nei.size())
-            {
-                // Internal face.  One side is an ibCell and another is a
-                // live cell. Add gradient to the source of the live cell
-                // and kill the off-diagonal coefficient
-                if (ibGamma[own[curFace]] > SMALL)
-                {
-                    diag[own[curFace]] += upper[curFace];
-
-                    source[own[curFace]] +=
-                        upper[curFace]*ibGrad_[ibFaceCells[faceI]]/dcI[faceI];
-                }
-                else
-                {
-                    diag[nei[curFace]] += lower[curFace];
-
-                    source[nei[curFace]] -=
-                        lower[curFace]*ibGrad_[ibFaceCells[faceI]]/dcI[faceI];
-                }
-
-                upper[curFace] = 0;
-                lower[curFace] = 0;
-            }
-            else
-            {
-                // else MPH
-                label patchi = mesh_.boundaryMesh().whichPatch(curFace);
-
-                if (!eqn.internalCoeffs()[patchi].empty())
-                {
-                    label patchFacei =
-                        mesh_.boundaryMesh()[patchi].whichFace(curFace);
-
-                    eqn.internalCoeffs()[patchi][patchFacei] =
-                        pTraits<Type>::zero;
-
-                    eqn.boundaryCoeffs()[patchi][patchFacei] =
-                        pTraits<Type>::zero;
-
-                    // Check if the live cell is on local or neighbour side
-                    // HJ, 7/Dec/2012
-                    if (ibFaceCells[faceI] > -1)
-                    {
-                        if (ibGamma[ibFaceCells[faceI]] > SMALL)
-                        {
-                            source[ibFaceCells[faceI]] +=
-                                ibGrad_[ibFaceCells[faceI]]
-                                /dc.boundaryField()[patchi][patchFacei];
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    // Note: potentially deal with face flux correction ptr.
-    // HJ, 16/Apr/2012
-}
-
-
-// * * * * * * * * * * * * * Protected Member Functions  * * * * * * * * * * //
-
-template<class Type>
-bool immersedBoundaryFvPatchField<Type>::motionUpdateRequired() const
-{
-    if
-    (
-        ibPatch_.movingIb()
-     || ibPatch_.boundaryMesh().mesh().moving()
-    )
-    {
-        if
-        (
-            ibUpdateTimeIndex_
-         != ibPatch_.boundaryMesh().mesh().time().timeIndex()
-        )
-        {
-            // Mesh is moving and current time has not been updated
-            return true;
-        }
-    }
-
-    return false;
-}
-
-
-template<class Type>
-void immersedBoundaryFvPatchField<Type>::motionUpdate() const
-{
-    // Motion update, clear data related to immersed boundary points
-    ibValue_.clear();
-    ibGrad_.clear();
-
-    // Record motion update time
-    ibUpdateTimeIndex_ = ibPatch_.boundaryMesh().mesh().time().timeIndex();
 }
 
 
@@ -302,16 +109,13 @@ immersedBoundaryFvPatchField<Type>::immersedBoundaryFvPatchField
     const DimensionedField<Type, volMesh>& iF
 )
 :
-    fvPatchField<Type>(p, iF),
+    mixedFvPatchField<Type>(p, iF),
     ibPatch_(refCast<const immersedBoundaryFvPatch>(p)),
-    mesh_(p.boundaryMesh().mesh()),
-    refValue_(ibPatch_.ibMesh().size(), pTraits<Type>::zero),
-    refGrad_(ibPatch_.ibMesh().size(), pTraits<Type>::zero),
-    refValueFraction_(false),
-    setDeadCellValue_(false),
-    deadCellValue_(pTraits<Type>::zero),
-    ibValue_(),
-    ibGrad_()
+    triValue_(ibPatch_.ibMesh().size(), pTraits<Type>::zero),
+    triGrad_(ibPatch_.ibMesh().size(), pTraits<Type>::zero),
+    triValueFraction_(false),
+    setDeadValue_(false),
+    deadValue_(pTraits<Type>::zero)
 {}
 
 
@@ -323,16 +127,13 @@ immersedBoundaryFvPatchField<Type>::immersedBoundaryFvPatchField
     const dictionary& dict
 )
 :
-    fvPatchField<Type>(p, iF, dict),
+    mixedFvPatchField<Type>(p, iF),   // Do not read mixed data
     ibPatch_(refCast<const immersedBoundaryFvPatch>(p)),
-    mesh_(p.boundaryMesh().mesh()),
-    refValue_("refValue", dict, ibPatch_.ibMesh().size()),
-    refGrad_("refGradient", dict, ibPatch_.ibMesh().size()),
-    refValueFraction_(dict.lookup("valueFraction")),
-    setDeadCellValue_(dict.lookup("setDeadCellValue")),
-    deadCellValue_(pTraits<Type>(dict.lookup("deadCellValue"))),
-    ibValue_(),
-    ibGrad_()
+    triValue_("triValue", dict, ibPatch_.ibMesh().size()),
+    triGrad_("triGradient", dict, ibPatch_.ibMesh().size()),
+    triValueFraction_("triValueFraction", dict, ibPatch_.ibMesh().size()),
+    setDeadValue_(dict.lookup("setDeadValue")),
+    deadValue_(pTraits<Type>(dict.lookup("deadValue")))
 {
     if (!isType<immersedBoundaryFvPatch>(p))
     {
@@ -353,6 +154,9 @@ immersedBoundaryFvPatchField<Type>::immersedBoundaryFvPatchField
             << " in file " << this->dimensionedInternalField().objectPath()
             << exit(FatalIOError);
     }
+
+    // Re-interpolate the data related to immersed boundary
+    this->updateIbValues();
 }
 
 
@@ -365,16 +169,13 @@ immersedBoundaryFvPatchField<Type>::immersedBoundaryFvPatchField
     const fvPatchFieldMapper& mapper
 )
 :
-    fvPatchField<Type>(ptf, p, iF, mapper),
+    mixedFvPatchField<Type>(ptf, p, iF, mapper),
     ibPatch_(refCast<const immersedBoundaryFvPatch>(p)),
-    mesh_(p.boundaryMesh().mesh()),
-    refValue_(ptf.refValue()),
-    refGrad_(ptf.refGrad()),
-    refValueFraction_(ptf.refValueFraction()),
-    setDeadCellValue_(ptf.setDeadCellValue_),
-    deadCellValue_(ptf.deadCellValue_),
-    ibValue_(),
-    ibGrad_()
+    triValue_(ptf.triValue()),
+    triGrad_(ptf.triGrad()),
+    triValueFraction_(ptf.triValueFraction()),
+    setDeadValue_(ptf.setDeadValue_),
+    deadValue_(ptf.deadValue_)
 {
     // Note: NO MAPPING.  Fields are created on the immersed boundary
     // HJ, 12/Apr/2012
@@ -397,6 +198,9 @@ immersedBoundaryFvPatchField<Type>::immersedBoundaryFvPatchField
             << " in file " << this->dimensionedInternalField().objectPath()
             << exit(FatalIOError);
     }
+
+    // Re-interpolate the data related to immersed boundary
+    this->updateIbValues();
 }
 
 
@@ -406,16 +210,13 @@ immersedBoundaryFvPatchField<Type>::immersedBoundaryFvPatchField
     const immersedBoundaryFvPatchField<Type>& ptf
 )
 :
-    fvPatchField<Type>(ptf),
+    mixedFvPatchField<Type>(ptf),
     ibPatch_(ptf.ibPatch()),
-    mesh_(ptf.patch().boundaryMesh().mesh()),
-    refValue_(ptf.refValue()),
-    refGrad_(ptf.refGrad()),
-    refValueFraction_(ptf.refValueFraction()),
-    setDeadCellValue_(ptf.setDeadCellValue_),
-    deadCellValue_(ptf.deadCellValue_),
-    ibValue_(),
-    ibGrad_()
+    triValue_(ptf.triValue()),
+    triGrad_(ptf.triGrad()),
+    triValueFraction_(ptf.triValueFraction()),
+    setDeadValue_(ptf.setDeadValue_),
+    deadValue_(ptf.deadValue_)
 {}
 
 
@@ -426,129 +227,47 @@ immersedBoundaryFvPatchField<Type>::immersedBoundaryFvPatchField
     const DimensionedField<Type, volMesh>& iF
 )
 :
-    fvPatchField<Type>(ptf, iF),
+    mixedFvPatchField<Type>(ptf, iF),
     ibPatch_(ptf.ibPatch()),
-    mesh_(ptf.patch().boundaryMesh().mesh()),
-    refValue_(ptf.refValue()),
-    refGrad_(ptf.refGrad()),
-    refValueFraction_(ptf.refValueFraction()),
-    setDeadCellValue_(ptf.setDeadCellValue_),
-    deadCellValue_(ptf.deadCellValue_),
-    ibValue_(),
-    ibGrad_()
+    triValue_(ptf.triValue()),
+    triGrad_(ptf.triGrad()),
+    triValueFraction_(ptf.triValueFraction()),
+    setDeadValue_(ptf.setDeadValue_),
+    deadValue_(ptf.deadValue_)
 {}
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 template<class Type>
-const Field<Type>& immersedBoundaryFvPatchField<Type>::ibValue() const
-{
-    // Note: on a moving mesh, the intersection has changed and
-    // ibValue and ibGrad fields should be cleared and recalculated.
-    // HJ, 17/Oct/2012
-    if (this->motionUpdateRequired())
-    {
-        motionUpdate();
-    }
-
-    if (ibValue_.empty())
-    {
-        this->updateIbValues();
-    }
-
-    return ibValue_;
-}
-
-
-template<class Type>
-const Field<Type>& immersedBoundaryFvPatchField<Type>::ibGrad() const
-{
-    // Note: on a moving mesh, the intersection has changed and
-    // ibValue and ibGrad fields should be cleared and recalculated.
-    // HJ, 17/Oct/2012
-    if (this->motionUpdateRequired())
-    {
-        motionUpdate();
-    }
-
-    if (ibGrad_.empty())
-    {
-        this->updateIbValues();
-    }
-
-    return ibGrad_;
-}
-
-
-template<class Type>
-tmp<Field<Type> > immersedBoundaryFvPatchField<Type>::ibCellValue() const
-{
-    // Collect IB cell values
-    tmp<Field<Type> > tibcv
-    (
-        new Field<Type>
-        (
-            this->internalField(),
-            ibPatch_.ibCells()
-        )
-    );
-
-    return tibcv;
-}
-
-
-template<class Type>
-tmp<Field<Type> >
-immersedBoundaryFvPatchField<Type>::ibSamplingPointValue() const
-{
-    return ibPatch_.toSamplingPoints(this->internalField());
-}
-
-
-template<class Type>
-tmp<Field<Type> > immersedBoundaryFvPatchField<Type>::triValue() const
-{
-    return ibPatch_.toTriFaces(this->ibValue());
-}
-
-
-template<class Type>
-tmp<Field<Type> > immersedBoundaryFvPatchField<Type>::triGrad() const
-{
-    return ibPatch_.toTriFaces(this->ibGrad());
-}
-
-
-template<class Type>
-void immersedBoundaryFvPatchField<Type>::updateCoeffs()
-{
-    if (this->fixesValue())
-    {
-        this->imposeDirichletCondition();
-    }
-    else
-    {
-        this->imposeNeumannCondition();
-    }
-
-    // Fix the value in dead cells
-    if (setDeadCellValue_)
-    {
-        this->imposeDeadCondition();
-    }
-
-    fvPatchField<Type>::updateCoeffs();
-}
-
-
-template<class Type>
-void immersedBoundaryFvPatchField<Type>::initEvaluate
+void immersedBoundaryFvPatchField<Type>::autoMap
 (
-    const Pstream::commsTypes
+    const fvPatchFieldMapper& m
 )
 {
-    this->updateCoeffs();
+    // Base fields do not map: re-interpolate them from tri data
+    this->updateIbValues();
+}
+
+
+template<class Type>
+void immersedBoundaryFvPatchField<Type>::rmap
+(
+    const fvPatchField<Type>& ptf,
+    const labelList&
+)
+{
+    // Base fields do not rmap: re-interpolate them from tri data
+
+    const immersedBoundaryFvPatchField<Type>& mptf =
+        refCast<const immersedBoundaryFvPatchField<Type> >(ptf);
+
+    // Set rmap tri data
+    triValue_ = mptf.triValue_;
+    triGrad_ = mptf.triGrad_;
+    triValueFraction_ = mptf.triValueFraction_;
+
+    this->updateIbValues();
 }
 
 
@@ -558,93 +277,79 @@ void immersedBoundaryFvPatchField<Type>::evaluate
     const Pstream::commsTypes
 )
 {
-    // Note
-    // Since the boundary condition is performed by data fitting with the
-    // internal field, fitting must be performed both on updateCoeffs
-    // and on evaluate (internal field has changed in the meantime).
-    // Bug fix, Zeljko Tukovic, 21/Jun/2012
-//     this->updateCoeffs();
+    // Set dead value
+    this->setDeadValues();
 
-    fvPatchField<Type>::evaluate();
+    // Evaluate mixed condition
+    mixedFvPatchField<Type>::evaluate();
 }
 
 
-template<class Type>
-void immersedBoundaryFvPatchField<Type>::manipulateMatrix
-(
-    fvMatrix<Type>& eqn
-)
-{
-    this->initEvaluate();
+// template<class Type>
+// void immersedBoundaryFvPatchField<Type>::manipulateMatrix
+// (
+//     fvMatrix<Type>& eqn
+// )
+// {
+//     // Build matrix diagonal for cells where it is missing
+//     this->correctDiag(eqn);
 
-    // Build matrix diagonal for cells where it is missing
-    this->correctDiag(eqn);
+//     // Set values in IB cells
+//     Field<Type> polyPsi(eqn.psi(), ibPatch_.ibCells());
+//     eqn.setValues(ibPatch_.ibCells(), polyPsi);
 
-    // For Neumann boundary condition, manipulate matrix off-diagonal
-    if (!this->fixesValue())
-    {
-        this->correctOffDiag(eqn);
-    }
+//     // Correct equation for dead cells
+//     Field<Type> deadCellsPsi
+//     (
+//         ibPatch_.deadCells().size(),
+//         deadValue_
+//     );
+//     eqn.setValues(ibPatch_.deadCells(), deadCellsPsi);
 
-    // Set values in IB cells
-    Field<Type> polyPsi(eqn.psi(), ibPatch_.ibCells());
-    eqn.setValues(ibPatch_.ibCells(), polyPsi);
-
-    // Correct equation for dead cells
-    Field<Type> deadCellsPsi
-    (
-        ibPatch_.deadCells().size(),
-        deadCellValue_
-    );
-    eqn.setValues(ibPatch_.deadCells(), deadCellsPsi);
-
-    fvPatchField<Type>::manipulateMatrix(eqn);
-}
+//     fvPatchField<Type>::manipulateMatrix(eqn);
+// }
 
 
 template<class Type>
 void immersedBoundaryFvPatchField<Type>::write(Ostream& os) const
 {
+    // to resolve the post-processing issues.  HJ, 1/Dec/2017
     fvPatchField<Type>::write(os);
-    refValue_.writeEntry("refValue", os);
-    refGrad_.writeEntry("refGradient", os);
-    refValueFraction_.writeEntry("valueFraction", os);
-    os.writeKeyword("setDeadCellValue")
-        << setDeadCellValue_ << token::END_STATEMENT << nl;
-    os.writeKeyword("deadCellValue")
-        << deadCellValue_ << token::END_STATEMENT << nl;
+    triValue_.writeEntry("triValue", os);
+    triGrad_.writeEntry("triGradient", os);
+    triValueFraction_.writeEntry("triValueFraction", os);
+    os.writeKeyword("setDeadValue")
+        << setDeadValue_ << token::END_STATEMENT << nl;
+    os.writeKeyword("deadValue")
+        << deadValue_ << token::END_STATEMENT << nl;
 
-    this->writeEntry("value", os);
+    // The value entry needs to be written with zero size
+    Field<Type>::null().writeEntry("value", os);
 
     // Write VTK on master only
-    // HJ. fix here!!!
+    if (Pstream::master())
+    {
+        // Add parallel reduction of all faces and data to proc 0
+        // and write the whola patch together
+        
+        // Write immersed boundary data as a vtk file
+        autoPtr<surfaceWriter<Type> > writerPtr =
+            surfaceWriter<Type>::New("vtk");
 
-    // if (Pstream::master())
-    // {
-    //     // Write immersed boundary data as a vtk file
-    //     autoPtr<surfaceWriter<Type> > writerPtr =
-    //         surfaceWriter<Type>::New("vtk");
+        // Get the intersected patch
+        const standAlonePatch& ts = ibPatch_.ibPolyPatch().ibPatch();
 
-    //     const triSurface& ts = ibPatch_.ibMesh();
-
-    //     // Make a face list for writing
-    //     faceList f(ts.size());
-    //     forAll (ts, faceI)
-    //     {
-    //         f[faceI] = ts[faceI].triFaceFace();
-    //     }
-
-    //     writerPtr->write
-    //     (
-    //         this->dimensionedInternalField().path(),
-    //         ibPatch_.name(),
-    //         ts.points(),
-    //         f,
-    //         this->dimensionedInternalField().name(),
-    //         triData,
-    //         surfaceWriterBase::FACE_DATA
-    //     );
-    // }
+        writerPtr->write
+        (
+            this->dimensionedInternalField().path(),
+            ibPatch_.name(),
+            ts.points(),
+            ts,
+            this->dimensionedInternalField().name(),
+            *this,
+            surfaceWriterBase::FACE_DATA
+        );
+    }
 }
 
 

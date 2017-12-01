@@ -4,11 +4,7 @@ immersedPoly/distanceFunctions/triSurfaceDistance/triSurfaceDistance.C
 immersedBoundaryPolyPatch/immersedBoundaryPolyPatch.C
 immersedBoundaryPointPatch/immersedBoundaryPointPatch.C
 immersedBoundaryFvPatch/immersedBoundaryFvPatch.C
-/* immersedBoundaryFvPatchField/immersedBoundaryFvPatchFields.C */
+immersedBoundaryFvPatchField/immersedBoundaryFvPatchFields.C
 /* immersedBoundaryFvsPatchField/immersedBoundaryFvsPatchFields.C */
-
-/* refineImmersedBoundaryMesh/refineImmersedBoundaryMesh.C */
-
-/* ibSwirlFlowRateInletVelocity/ibSwirlFlowRateInletVelocityFvPatchVectorField.C */
 
 LIB = $(FOAM_LIBBIN)/libimmersedBoundary

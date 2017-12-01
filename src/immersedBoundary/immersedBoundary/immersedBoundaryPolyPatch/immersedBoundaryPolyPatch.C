@@ -437,6 +437,7 @@ void Foam::immersedBoundaryPolyPatch::calcImmersedBoundary() const
     ibCells.setSize(nIbCells);
     ibCellCentres.setSize(nIbCells);
     ibCellVolumes.setSize(nIbCells);
+    nearestTri.setSize(nIbCells);
 
     // Build stand-alone patch
     // Memory management
