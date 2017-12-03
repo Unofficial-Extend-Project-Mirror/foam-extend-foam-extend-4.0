@@ -439,7 +439,10 @@ Foam::meshSearch::meshSearch(const polyMesh& mesh, const bool faceDecomp)
     boundaryTreePtr_(NULL),
     cellTreePtr_(NULL),
     cellCentreTreePtr_(NULL)
-{}
+{
+    // HR 29.11.17: Might register multiple times. Therefore do not register.
+    cloud_.regIOobject::checkOut();
+}
 
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //

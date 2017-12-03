@@ -146,6 +146,9 @@ public:
             //- Release ownership of this object from its registry
             inline void release();
 
+            //- Mark as unregistered to avoid side effects of checking out
+            inline void deregister();
+
 
         // Dependency checking
 
