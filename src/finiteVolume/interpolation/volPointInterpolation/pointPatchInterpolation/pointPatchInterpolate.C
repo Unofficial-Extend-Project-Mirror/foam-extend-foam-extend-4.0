@@ -110,28 +110,6 @@ void pointPatchInterpolation::interpolate
         }
     }
 
-    // Add missing contributions across the coupled boundaries. The weights are
-    // constructed and normalised by correctly taking into account their
-    // contributions from the other side, so we need to add the field
-    // contributions from the other side. VV, 21/June/2016.
-    forAll(pf.boundaryField(), patchi)
-    {
-        if (pf.boundaryField()[patchi].coupled())
-        {
-            pf.boundaryField()[patchi].initAddField();
-        }
-    }
-
-    forAll(pf.boundaryField(), patchi)
-    {
-        if (pf.boundaryField()[patchi].coupled())
-        {
-            pf.boundaryField()[patchi].addField
-            (
-                pf.internalField()
-            );
-        }
-    }
 
     // Correct patch-patch boundary points by interpolation "around" corners
     const labelListList& PointFaces = fvMesh_.pointFaces();
@@ -170,8 +148,32 @@ void pointPatchInterpolation::interpolate
     }
 
 
-    // Update coupled and constrained boundaries
-    pf.correctBoundaryConditions();
+    // Add missing contributions across the coupled boundaries. The weights are
+    // constructed and normalised by correctly taking into account their
+    // contributions from the other side, so we need to add the field
+    // contributions from the other side. VV, 21/June/2016.
+    // Bugfix: Coupled boundary update needs to happen after patch-patch
+    // boundary points handling. VV, 4/Dec/2017.
+    forAll(pf.boundaryField(), patchi)
+    {
+        if (pf.boundaryField()[patchi].coupled())
+        {
+            pf.boundaryField()[patchi].initAddField();
+        }
+    }
+
+    forAll(pf.boundaryField(), patchi)
+    {
+        if (pf.boundaryField()[patchi].coupled())
+        {
+            pf.boundaryField()[patchi].addField
+            (
+                pf.internalField()
+            );
+        }
+    }
+
+    // Coupled boundaries already updated. Nothing to do. VV, 4/Dec/2017.
 
     if (debug)
     {
