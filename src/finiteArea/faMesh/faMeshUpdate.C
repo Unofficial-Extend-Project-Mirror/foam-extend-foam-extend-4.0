@@ -237,7 +237,6 @@ void Foam::faMesh::mapOldAreas(const faMeshMapper& mapper) const
             }
         }
     }
-
 }
 
 
