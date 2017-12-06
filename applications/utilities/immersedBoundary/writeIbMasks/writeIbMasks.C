@@ -29,32 +29,94 @@ Description
 
 \*---------------------------------------------------------------------------*/
 
-#include "fvCFD.H"
+#include "calc.H"
+#include "fvc.H"
+#include "fvMatrices.H"
 #include "immersedBoundaryFvPatch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-int main(int argc, char *argv[])
+void Foam::calc(const argList& args, const Time& runTime, const fvMesh& mesh)
 {
-#   include "setRootCase.H"
-#   include "createTime.H"
-#   include "createMesh.H"
-#   include "createIbMasks.H"
+    Info<< nl << "Calculating gamma" << endl;
+    volScalarField gamma
+    (
+        IOobject
+        (
+            "gamma",
+            runTime.timeName(),
+            mesh,
+            IOobject::NO_READ,
+            IOobject::AUTO_WRITE
+        ),
+        mesh,
+        dimensionedScalar("one", dimless, 0)
+    );
+    gamma.internalField() = mesh.V()/mesh.cellVolumes();
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+    Info<< nl << "Calculating sGamma" << endl;
+    surfaceScalarField sGamma
+    (
+        IOobject
+        (
+            "sGamma",
+            runTime.timeName(),
+            mesh,
+            IOobject::NO_READ,
+            IOobject::AUTO_WRITE
+        ),
+        mesh,
+        dimensionedScalar("one", dimless, 0)
+    );
 
-    Info<< "Time = " << runTime.timeName() << nl << endl;
+    const surfaceScalarField& magSf = mesh.magSf();
+    const scalarField magFaceAreas = mag(mesh.faceAreas());
+    
+    sGamma.internalField() =
+        magSf.internalField()/
+        scalarField::subField(magFaceAreas, mesh.nInternalFaces());
 
-    cellIbMask.write();
-    cellIbMaskExt.write();
+    forAll (mesh.boundary(), patchI)
+    {
+        if (!isA<immersedBoundaryFvPatch>(mesh.boundary()[patchI]))
+        {
+            sGamma.boundaryField()[patchI] =
+                magSf.boundaryField()[patchI]/
+                mesh.boundary()[patchI].patchSlice(magFaceAreas);
 
-    Info<< "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
-        << "  ClockTime = " << runTime.elapsedClockTime() << " s"
-        << nl << endl;
+            gamma.boundaryField()[patchI] =
+                sGamma.boundaryField()[patchI];
+        }
+    }
+    
+    gamma.write();
+    sGamma.write();
 
-    Info<< "End\n" << endl;
+    // Check consistency of face area vectors
 
-    return 0;
+    Info<< nl << "Calculating divSf" << endl;
+    volVectorField divSf
+    (
+        "divSf",
+        fvc::div(mesh.Sf())
+    );
+    divSf.write();
+
+    // Check divergence of face area vectors
+    scalarField magDivSf = mag(divSf)().internalField();
+
+    Info<< "Face areas divergence (min, max, average): "
+        << "(" << min(magDivSf) << " " << max(magDivSf)
+        << " " << average(magDivSf) << ")"
+        << endl;
+
+    if (max(magDivSf) > 1e-9)
+    {
+        WarningIn("writeIbMasks")
+            << "Possible problem with immersed boundary face area vectors: "
+            << max(magDivSf)
+            << endl;
+    }
 }
 
 
