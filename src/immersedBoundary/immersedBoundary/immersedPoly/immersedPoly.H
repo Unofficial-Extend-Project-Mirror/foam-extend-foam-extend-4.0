@@ -59,8 +59,10 @@ public:
         //- Wet type enumeration
         enum immersedType
         {
+            UNKNOWN = -1,      // Unknown
             WET = 0,           // Inside
-            DRY = 1            // Outside
+            DRY = 1,           // Outside
+            CUT = 2            // Cut
         };
 
         //- Number of iterations in the iterative intersection

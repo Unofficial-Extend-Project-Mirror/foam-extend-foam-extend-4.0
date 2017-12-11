@@ -75,17 +75,18 @@ void Foam::ImmersedCell<Distance>::getBase
 
 
 template<class Distance>
-Foam::label Foam::ImmersedCell<Distance>::insertIntersectionPoints
-(
-    scalarField& depth
-)
+Foam::label Foam::ImmersedCell<Distance>::insertIntersectionPoints()
 {
     // Get list of edges
-    edgeList edges = this->edges();
+    const edgeList& edges = this->edges();
 
-    // Expandable list with additional points and depths
-    DynamicList<point> extraPoints(edges.size());
-    DynamicList<scalar> extraDepths(edges.size());
+    // Get edge-face addressing
+    const labelListList& edgeFaces = this->edgeFaces();
+
+    // There may be an extra point on every edge.  Resize the list of points
+    const label oldSize = points_.size();
+    points_.setSize(oldSize + edges.size());
+    label nPoints = oldSize;
 
     // Loop through all edges
     forAll (edges, edgeI)
@@ -96,49 +97,42 @@ Foam::label Foam::ImmersedCell<Distance>::insertIntersectionPoints
         const label start = curEdge.start();
         const label end = curEdge.end();
 
-        const scalar edgeLength = curEdge.mag(points_);
+        const scalar edgeLength = mag(points_[end] - points_[start]);
 
         // Check if there is a legitimate cut to be found
         if
         (
-            depth[start]*depth[end] < 0
+            depth_[start]*depth_[end] < 0
          && edgeLength > SMALL
-         && mag(depth[start]) > absTol_
-         && mag(depth[end]) > absTol_
+         && mag(depth_[start]) > absTol_
+         && mag(depth_[end]) > absTol_
         )
         {
             // Prepare a new point to insert
             point cutPoint;
-            scalar depthAtCut = 0;
 
-            // and determine its location
-            if (!dist_.iterateDistance())
-            {
-                // Intersection is along the edge length (pf[end] - pf[start])
-                // times the ratio of the depth at start and the difference
-                // between depth at start and end; add to this the start point
-                // and you have the location
-                cutPoint =
-                    points_[start]
-                  + depth[start]/(depth[start] - depth[end])*
-                    (points_[end] - points_[start]);
-            }
-            else
+            // Intersection is along the edge length (pf[end] - pf[start])
+            // times the ratio of the depth at start and the difference
+            // between depth at start and end; add to this the start point
+            // and you have the location
+            cutPoint =
+                points_[start]
+              + depth_[start]/(depth_[start] - depth_[end])*
+                (points_[end] - points_[start]);
+
+            // Execute iterative cut if necessary
+            if (dist_.iterateDistance())
             {
                 // Initialize bisection starting points
                 point p0 = points_[start];
                 point p1 = points_[end];
 
                 // Depth at starting points
-                scalar d0 = depth[start];
-                scalar d1 = depth[end];
+                scalar d0 = depth_[start];
+                scalar d1 = depth_[end];
 
-                // initial guess of starting point same
-                // as in non-iterative approach
-                cutPoint = p0 + mag(d0)/(mag(d0) + mag(d1))*(p1 - p0);
-
-                // convergence criterion is the depth at newP
-                depthAtCut = dist_.distance(cutPoint);
+                // Convergence criterion is the depth at newP
+                scalar depthAtCut = dist_.distance(cutPoint);
 
                 // initialize loop counter
                 label iters = 0;
@@ -157,97 +151,100 @@ Foam::label Foam::ImmersedCell<Distance>::insertIntersectionPoints
                         d0 = depthAtCut;
                         p0 = cutPoint;
                     }
-                    // otherwise, shorten the other side
+                    // Otherwise, shorten the other side
                     else
                     {
                         d1 = depthAtCut;
                         p1 = cutPoint;
                     }
 
-                    // Determine new intersection point
-                    cutPoint =  p0 + mag(d0)/(mag(d0) + mag(d1))*(p1 - p0);
+                    // Determine new intersection point and its depth
+                    cutPoint = p0 + mag(d0)/(mag(d0) + mag(d1))*(p1 - p0);
 
-                    // and calculate its depth
                     depthAtCut = dist_.distance(cutPoint);
 
                     iters++;
                 }
             }
 
-            // and store the newly found cut point
-            extraPoints.append(cutPoint);
-            extraDepths.append(depthAtCut);
-
-            // Index of last inserted point in expanded point list
-            label cutPointID = points_.size() + extraPoints.size() - 1;
+            // Store the newly found cut point
+            points_[nPoints] = cutPoint;
 
             // Find faces connected to edge
-            labelList edgeFaceIDs = this->edgeFaces()[edgeI];
+            const labelList& edgeFaceIDs = edgeFaces[edgeI];
 
-            // Add the new point to each connected face,
-            // but at the right position!
+            // Add the new point to each connected face at the right position!
             forAll (edgeFaceIDs, edgeFaceI)
             {
-                // Get reference edgeFace
-                face& edgeFace = faces_[edgeFaceIDs[edgeFaceI]];
+                // Get old face
+                const face& oldFace = faces_[edgeFaceIDs[edgeFaceI]];
 
-                // Find edge that is identical to the one we selected to cut
-                edgeList edgeFaceEdges = edgeFace.edges();
+                // Make new face with one extra label
+                face newFace(oldFace.size() + 1);
 
-                // New face point list will have one more point
-                DynamicList<label> newFacePointLabels(edgeFace.size()+1);
+                // Count points added to new face
+                label nfp = 0;
 
-                // therefore, loop through all edges of the current face
-                forAll (edgeFaceEdges, edgeFaceEgdeI)
+                // Loop throuhg old face.  If this edge is found, add the
+                // cut point label into the edge
+                forAll (oldFace, fpI)
                 {
-                    if (edgeFaceEdges[edgeFaceEgdeI] == curEdge)
-                    {
-                        //if that edge is identical to the current edge
-                        //insert both intersection and old edge end point
-                        newFacePointLabels.append(cutPointID);
-                        newFacePointLabels.append
-                        (
-                            edgeFaceEdges[edgeFaceEgdeI].end()
-                        );
+                    // Add the point
+                    newFace[nfp] = oldFace[fpI];
+                    nfp++;
 
-                    }
-                    else
+                    const label curPoint = oldFace[fpI];
+                    const label nextPoint = oldFace.nextLabel(fpI);
+
+                    if
+                    (
+                        (curPoint == start && nextPoint == end)
+                     || (curPoint == end && nextPoint == start)
+                    )
                     {
-                        //if not, just insert the old edge end point
-                        newFacePointLabels.append
-                        (
-                            edgeFaceEdges[edgeFaceEgdeI].end()
-                        );
+                        // Found the edge.  Inser the point
+                        newFace[nfp] = nPoints;
+                        nfp++;
                     }
                 }
 
-                newFacePointLabels.shrink();
+                // Debug: check if point insertion was successful
+                if (nfp < newFace.size())
+                {
+                    FatalErrorIn("badInsertion")
+                        << abort(FatalError);
+                }
 
-                // and replace with the face with an extra point added
-                edgeFace = face(newFacePointLabels);
+                faces_[edgeFaceIDs[edgeFaceI]] = newFace;
             }
+
+            // Finished point insertion
+            nPoints++;
         }
     }
 
-    // Reduce memory usage of extraPoints to min required amount
-    extraPoints.shrink();
-    extraDepths.shrink();
+    // Resize the points list
+    points_.setSize(nPoints);
 
-    // Update points list and depths
-    points_.append(extraPoints);
-    depth.append(extraDepths);
+    // Extra depths are all zero
+    depth_.setSize(nPoints);
+
+    for (label i = oldSize; i < depth_.size(); i++)
+    {
+        depth_[i] = 0;
+    }
 
     // Check for successful intersection: more than 3 added points
     // can form an internal face
-    return extraPoints.size();
+    return nPoints - oldSize;
 }
 
 
 template<class Distance>
-void Foam::ImmersedCell<Distance>::createInternalFace
+Foam::face Foam::ImmersedCell<Distance>::createInternalFace
 (
     const label nIntersections
-)
+) const
 {
     // Sanity check: Do we have at least 3 intersection points?
     if (nIntersections < 3)
@@ -262,23 +259,18 @@ void Foam::ImmersedCell<Distance>::createInternalFace
     // Declare internal face with mixed-up point ordering
     face unorderedInternalFace(nIntersections);
 
-    // Make a local list of intersection points
-    pointField intersectionPoints(nIntersections);
-
     forAll (unorderedInternalFace, i)
     {
         label pointID = points_.size() - nIntersections + i;
 
         unorderedInternalFace[i] = pointID;
-
-        intersectionPoints[i] = points_[pointID];
     }
 
     // Order points, so that they form a polygon
     // Algorithm in analogy to geomCellLooper.C
 
     // Calculate centre
-    point centre = average(intersectionPoints);
+    point centre = average(unorderedInternalFace.points(points_));
 
     // Get base vectors of coordinate system normal
     // define plane that approximates the surface from 3 points
@@ -287,17 +279,23 @@ void Foam::ImmersedCell<Distance>::createInternalFace
     // Note: face orientation is unknown and needs to be adjusted
     // after the face has been created
     // HJ, 28/Nov/2017
-    vector S0 = intersectionPoints[1] - intersectionPoints[0];
+    vector S0 =
+        points_[unorderedInternalFace[1]]
+      - points_[unorderedInternalFace[0]];
+
     S0 /= mag(S0) + SMALL;
 
     label pointID = -1;
     scalar minDotProd = 1 - SMALL;
 
     // Take best non-colinear value
-    for (label pI = 2; pI < intersectionPoints.size(); pI++)
+    for (label pI = 2; pI < unorderedInternalFace.size(); pI++)
     {
         // Create second line segment
-        vector S1 = intersectionPoints[pI] - intersectionPoints[0];
+        vector S1 =
+            points_[unorderedInternalFace[pI]]
+          - points_[unorderedInternalFace[0]];
+
         S1 /= mag(S1) + SMALL;
         scalar curDotProd = mag(S0 & S1);
 
@@ -311,26 +309,27 @@ void Foam::ImmersedCell<Distance>::createInternalFace
     if (pointID == -1)
     {
         // All intersection points are colinear
-        return;
+        FatalErrorIn("Colinear points in cut")
+            << abort(FatalError);
     }
 
     // Now create surface
     plane surface
     (
-        intersectionPoints[0],
-        intersectionPoints[1],
-        intersectionPoints[pointID]
+        points_[unorderedInternalFace[0]],
+        points_[unorderedInternalFace[1]],
+        points_[unorderedInternalFace[pointID]]
     );
 
     vector e0, e1;
     getBase(surface.normal(), e0, e1);
 
     // Get sorted angles from point on loop to centre of loop.
-    SortableList<scalar> sortedAngles(intersectionPoints.size());
+    SortableList<scalar> sortedAngles(unorderedInternalFace.size());
 
     forAll (sortedAngles, angleI)
     {
-        vector toCentre(intersectionPoints[angleI] - centre);
+        vector toCentre(points_[unorderedInternalFace[angleI]] - centre);
         toCentre /= mag(toCentre);
 
         sortedAngles[angleI] = pseudoAngle(e0, e1, toCentre);
@@ -340,89 +339,53 @@ void Foam::ImmersedCell<Distance>::createInternalFace
     // Re-order points
     const labelList& indices = sortedAngles.indices();
 
-    face orderedInternalFace(intersectionPoints.size());
+    face orderedInternalFace(unorderedInternalFace.size());
 
     forAll (indices, i)
     {
         orderedInternalFace[i] = unorderedInternalFace[indices[i]];
     }
 
-    // Put cut face on front of faces_ since it is the only internal face
-
-    faceList externalFaces = faces_;
-
-    faces_.setSize(externalFaces.size() + 1);
-    faces_[0] = orderedInternalFace;
-
-    // Copy the outside faces into the list
-    for (label i = 0; i < externalFaces.size(); i++)
-    {
-        faces_[i + 1] = externalFaces[i];
-    }
-}
-
-
-template<class Distance>
-void Foam::ImmersedCell<Distance>::splitFace
-(
-    const label faceID,
-    const scalarField& depth
-)
-{
-    // Get old face with inserted point(s)
-    const face& oldFace = faces_[faceID];
-
-    // now make two faces: wet and dry
-    // Wet face: wet points and intersection points
-    face wetFace(oldFace.size());
+    // Check direction of the new face using average wet and dry point
+    // HJ, 5/Dec/2017
+    point wetPoint = vector::zero;
     label nWet = 0;
 
-    // Dry face: dry points and intersection points
-    face dryFace(oldFace.size());
+    point dryPoint = vector::zero;
     label nDry = 0;
 
-    forAll (oldFace, pointI)
+    forAll (depth_, i)
     {
-        if (mag(depth[oldFace[pointI]]) < absTol_)
+        if (depth_[i] > absTol_)
         {
-            // Point close to surface => intersection point, add to both lists
-            wetFace[nWet] = oldFace[pointI];
-            nWet++;
-
-            dryFace[nDry] = oldFace[pointI];
+            dryPoint += points_[i];
             nDry++;
         }
-        else if (depth[oldFace[pointI]] < 0)
+        else if  (depth_[i] < -absTol_)
         {
-            // Point is submerged, add to wetFace
-            wetFace[nWet] = oldFace[pointI];
+            wetPoint += points_[i];
             nWet++;
-        }
-        else
-        {
-            // Otherwise point must be dry, add to dryFace
-            dryFace[nDry] = oldFace[pointI];
-            nDry++;
         }
     }
 
-    // Sanity check
-    if (nWet >= 3 && nDry >= 3)
+    wetPoint /= nWet;
+    dryPoint /= nDry;
+
+    // Good direction points out of the wet cell
+    vector dir = dryPoint - wetPoint;
+    dir /= mag(dir);
+
+    vector n = orderedInternalFace.normal(points_);
+    n /= mag(n);
+
+    if ((dir & n) < 0)
     {
-        // Two valid faces are produced.  Insert them into the list
-
-        // Shrink faces to minimum size
-        wetFace.setSize(nWet);
-        dryFace.setSize(nDry);
-
-        // Replace original face by wet face
-        faces_[faceID] = wetFace;
-
-        // Append dry face as new face to faces
-        faces_.setSize(faces_.size() + 1);
-        faces_[faces_.size() - 1] = dryFace;
+        orderedInternalFace = orderedInternalFace.reverseFace();
     }
-    // else face cut has failed.  Do nothing
+
+    // Note: the face may have wrong orientation here.  It is corrected later
+    // HJ, 5/Dec/2017
+    return orderedInternalFace;
 }
 
 
@@ -454,47 +417,12 @@ Foam::ImmersedCell<Distance>::ImmersedCell
     faces_(),
     // We start with single cell with ID = 0, so it owns all faces
     faceOwner_(faces_.size(), 0),
-    faceNeighbour_()
+    faceNeighbour_(),
+    depth_(dist.distance(points_))
 {
     const cell& origCell = mesh.cells()[cellID];
 
-    // Distance from the surface for every point of cell
-    // Depth will be modified with distance for added points
-    // HJ, 28/Nov/2017
-    scalarField depth = dist_.distance(points_);
-
-    // Calculating absolute tolerances based on minimum edge length
-    // Note: use original cell for calculation because the mesh is not
-    // complete until faces are set.  HJ, 21/Jan/2014
-    const edgeList cellEdges = origCell.edges(mesh.faces());
-
-    // Calculate min edge length for a quick check
-    scalar minEdgeLength = GREAT;
-
-    // Note: expensive calculation of min length.  HJ, 28/May/2015
-    forAll (cellEdges, edgeI)
-    {
-        minEdgeLength =
-            Foam::min(minEdgeLength, cellEdges[edgeI].mag(mesh.points()));
-    }
-
-    absTol_ = minEdgeLength*immersedPoly::tolerance_();
-
-    // Check if we have to perform cut at all
-    if (max(depth) < absTol_)
-    {
-        // All points of cell are below water surface
-        isAllWet_ = true;
-
-        return;
-    }
-    else if (min(depth) > -absTol_)
-    {
-        // All points are above water surface
-        isAllDry_ = true;
-
-        return;
-    }
+    // Build a valid 1-cell mesh in local addressing
 
     // Create hash table that maps points on global mesh to local point list
     HashTable<label, label, Hash<label> > pointMapTable(points_.size());
@@ -508,6 +436,8 @@ Foam::ImmersedCell<Distance>::ImmersedCell
     }
 
     // Make local face list by remapping the faces of the cell
+    // Maximum number of new faces is twice the number of original faces
+    // plus one internal face
     faces_ = faceList(origCell.size());
 
     forAll (origCell, faceI)
@@ -520,6 +450,7 @@ Foam::ImmersedCell<Distance>::ImmersedCell
         if (!(mesh.faceOwner()[origCell[faceI]] == cellID))
         {
             // Cell is not owner of face, revert face orientation
+            // for the use in a 1-cell mesh
             origFace = origFace.reverseFace();
         }
 
@@ -537,32 +468,90 @@ Foam::ImmersedCell<Distance>::ImmersedCell
         faces_[faceI] = face(newLabels);
     }
 
-    /*********************************************************************/
-    // Starting to modify the 1-cell primitiveMesh,
-    // beyond this point be sure to know what points_, faces_, etc. contain,
-    // before calling inherited primitiveMesh functions.
-    // Here be dragons!
-    /*********************************************************************/
+    // At this point, a 1-cell mesh is valid
 
-    // Cut all edges that are intersected by the zero distance surface:
-    // Add cutting points to points_
-    // Add cutting points to faces connected to edge (will be reordered later)
+    // Calculating absolute tolerances based on minimum edge length
+    {
+        // Use local edges
+        const edgeList& cellEdges = edges();
+
+        // Calculate min edge length for a quick check
+        scalar minEdgeLength = GREAT;
+
+        // Note: expensive calculation of min length.  HJ, 28/May/2015
+        forAll (cellEdges, edgeI)
+        {
+            minEdgeLength =
+                Foam::min(minEdgeLength, cellEdges[edgeI].mag(points_));
+        }
+
+        absTol_ = minEdgeLength*immersedPoly::tolerance_();
+    }
+
+    // Check if we have to perform cut at all
+    if (max(depth_) < absTol_)
+    {
+        // All points of cell are below water surface
+        isAllWet_ = true;
+
+        return;
+    }
+    else if (min(depth_) > -absTol_)
+    {
+        // All points are above water surface
+        isAllDry_ = true;
+
+        return;
+    }
 
 #   ifdef WET_DEBUG
     Info << "Cell ID: " << cellID << "  BEFORE" << nl
         << "points: " << points_ << nl
         << "faces: " << faces_ << nl
-        << "depth: " << depth << endl;
+        << "depth: " << depth_ << endl;
 #   endif
 
+    /*********************************************************************/
+    // Starting to modify the 1-cell primitiveMesh.
+    // Beyond this point be sure to know what points_, faces_, etc. contain,
+    // before calling inherited primitiveMesh functions of this class.
+    // Here be dragons!
+    /*********************************************************************/
+
+    // Created expanded point and face lists
+
     // Insert intersection points and adjust depth for intersections
-    label nIntersections = insertIntersectionPoints(depth);
+    // This will add further points into the intersected face
+    // Depth at intersectin will be zero.  HJ, 5/Dec/2017
+    label nIntersections = insertIntersectionPoints();
+
+    // Update primitiveMesh parameters
+    this->reset
+    (
+        points_.size(),         // nPoints
+        0,                      // nInternalFaces
+        faces_.size(),          // nFaces
+        1                       // nCells
+    );
+
+#   ifdef WET_DEBUG
+    Info << "Cell ID: " << cellID << "  ENRICHED" << nl
+        << "points: " << points_ << nl
+        << "faces: " << faces_ << nl
+        << "depth: " << depth_ << endl;
+#   endif
+    // At this point, a 1-cell mesh with faces enriched for intersections
+    // is valid.  HJ, 5/Dec/2017
 
     // Recheck, if there has been a successful cut at all
     if (nIntersections < 3)
     {
-        // Check if improvised cell centre is wet or dry
-        if (dist_.distance(average(points_)) < 0)
+        // Check if cell centre is wet or dry, depending on greatest distance
+        // away from the cutting surface
+        // Note: cannot measure  distance geometrically because of
+        // the unknown resolution of the immersed surface
+        // HJ, 5/Dec/2017
+        if (mag(min(depth_)) > mag(max(depth_)))
         {
             // All points of cell are below water surface
             isAllWet_ = true;
@@ -580,79 +569,124 @@ Foam::ImmersedCell<Distance>::ImmersedCell
 
     // From here on, there exists a valid intersection
 
-#   ifdef WET_DEBUG
-    Info << "Cell ID: " << cellID << "  AFTER" << nl
-        << "points: " << points_ << nl
-        << "faces: " << faces_ << nl
-        << "depth: " << depth << endl;
-#   endif
+    // Resize the face list.  Each face can be split into two, with one
+    // extra internal face.  HJ, 5/Dec/2017
 
-    // For all faces with inserted points, do face splitting
-    forAll (origCell, oldFaceI)
-    {
-        const face& oldFace = mesh.faces()[origCell[oldFaceI]];
-        const face& newFace = faces_[oldFaceI];
+    // Make a copy of enriched faces, on which the cutting is performed
+    faceList enrichedFaces = faces_;
 
-        if (newFace.size() != oldFace.size())
-        {
-            splitFace(oldFaceI, depth);
-        }
-    }
-
-    // Assign owners and neighbors to faces
-    faceOwner_.setSize(faces_.size());
-
-    forAll (faces_, faceI)
-    {
-        if (dist_.distance(faces_[faceI].centre(points_)) > 0)
-        {
-            // Face is dry
-            faceOwner_[faceI] = DRY;
-        }
-        else
-        {
-            // Face is wet
-            faceOwner_[faceI] = WET;
-        }
-    }
+    // Reset face lists, preserving existing faces
+    faces_.setSize(2*faces_.size() + 1);
+    faceOwner_.setSize(2*faces_.size() + 1);
+    faceNeighbour_.setSize(1);
 
     // If we are not merely touching the water surface
     // with one point or edge, insert internal face that
     // connects all intersection points
-    // create internal face, which gets inserted at front of faces_
-    createInternalFace(nIntersections);
+    // create internal face, which gets inserted at front of faces_ list
+    faces_[0] = createInternalFace(nIntersections);
 
-    // ... and add owner of new face at beginning of faceOwner_
-    // Additional faces will be added after the internal face
-    labelList faceOwnerExternal = faceOwner_;
-    faceOwner_.setSize(faceOwnerExternal.size() + 1);
-    faceNeighbour_.setSize(1);
-
-    // Face needs to point out of the wet cell.  Make the wet cell its owner
+    // Internal face points out of the wet cell.  Make the wet cell its owner
     faceOwner_[0] = WET;
     faceNeighbour_[0] = DRY;
 
-    forAll (faceOwnerExternal, i)
+    // Count new faces
+    label nFaces = 1;
+
+    // For all faces with inserted points, do face splitting
+    forAll (enrichedFaces, oldFaceI)
     {
-        faceOwner_[i + 1] = faceOwnerExternal[i];
+        const face& oldFace = mesh.faces()[origCell[oldFaceI]];
+        const face& newFace = enrichedFaces[oldFaceI];
+
+        // If a face has been modified, it will have extra points
+        if (newFace.size() != oldFace.size())
+        {
+            // Make two faces: wet and dry
+            // Wet face: wet points and intersection points
+            face wetFace(enrichedFaces.size());
+            label nWet = 0;
+
+            // Dry face: dry points and intersection points
+            face dryFace(enrichedFaces.size());
+            label nDry = 0;
+
+            forAll (newFace, pointI)
+            {
+                if (mag(depth_[newFace[pointI]]) < absTol_)
+                {
+                    // Intersection point. Add to both faces
+                    wetFace[nWet] = newFace[pointI];
+                    nWet++;
+
+                    dryFace[nDry] = newFace[pointI];
+                    nDry++;
+                }
+                else if (depth_[newFace[pointI]] < 0)
+                {
+                    // Point is submerged, add to wetFace
+                    wetFace[nWet] = newFace[pointI];
+                    nWet++;
+                }
+                else
+                {
+                    // Otherwise point must be dry, add to dryFace
+                    dryFace[nDry] = newFace[pointI];
+                    nDry++;
+                }
+            }
+
+            // Check for a successful cut
+            if (nWet >= 3)
+            {
+                // Insert wet face
+                wetFace.setSize(nWet);
+                faces_[nFaces] = wetFace;
+                faceOwner_[nFaces] = WET;
+
+                nFaces++;
+            }
+
+            if (nDry >= 3)
+            {
+                // Insert dry face
+                dryFace.setSize(nDry);
+                faces_[nFaces] = dryFace;
+                faceOwner_[nFaces] = DRY;
+
+                nFaces++;
+            }
+        }
+        else
+        {
+            // Face cut has failed.  Insert original face and owner
+            faces_[nFaces] = newFace;
+
+            // Determine wet/dry based on distance to face centre
+            // Note: cannot measure  distance geometrically because of
+            // the unknown resolution of the immersed surface
+            // HJ, 5/Dec/2017
+
+            // Create face depth distance as a subset
+            scalarField faceDepth(depth_, newFace);
+
+            if (mag(min(faceDepth)) > mag(max(faceDepth)))
+            {
+                // Negative distance: wet face
+                faceOwner_[nFaces] = WET;
+            }
+            else
+            {
+                // Positive distance: dry face
+                faceOwner_[nFaces] = DRY;
+            }
+
+            nFaces++;
+        }
     }
 
-    // Set ownership depending on internal face orientation
-    // Create a point just below the face and find out if it is wet or dry
-    const vector cutFaceCentre = faces_[0].centre(points_);
-    const vector cutFaceNormal = faces_[0].normal(points_);
-
-    // Calculate sampling point below the face centre using normal
-    // Normal is sized with face area.  Possible tolerance issue for
-    // very small faces.  Reconsider
-    // HJ, 28/Nov/2017
-    const vector samplePoint = cutFaceCentre - cutFaceNormal;
-
-    if (dist_.distance(samplePoint) > 0)
-    {
-        // Face pointing out of dry cell.  Turn it
-        faces_[0] = faces_[0].reverseFace();
-    }
+    faces_.setSize(nFaces);
+    faceOwner_.setSize(nFaces);
 
     // Update primitiveMesh parameters
     this->reset
@@ -662,6 +696,15 @@ Foam::ImmersedCell<Distance>::ImmersedCell
         faces_.size(),                  // nFaces
         faceNeighbour_.size() + 1       // nCells
     );
+
+
+#   ifdef WET_DEBUG
+    this->checkMesh();
+    Info << "Cell ID: " << cellID << "  AFTER" << nl
+        << "points: " << points_ << nl
+        << "faces: " << faces_ << nl
+        << "depth: " << depth_ << endl;
+#   endif
 
     // Recheck, if the cut cell has significant volume.  If not, reset it
     scalar wetCut = cellVolumes()[WET]/mesh_.cellVolumes()[cellID_];

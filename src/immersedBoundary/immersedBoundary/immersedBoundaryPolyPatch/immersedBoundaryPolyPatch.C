@@ -56,7 +56,7 @@ const Foam::debug::tolerancesSwitch
 Foam::immersedBoundaryPolyPatch::liveFactor_
 (
     "immersedBoundaryLiveFactor",
-    1e-9
+    1e-7
 );
 
 
@@ -134,8 +134,6 @@ void Foam::immersedBoundaryPolyPatch::calcImmersedBoundary() const
      || nearestTriPtr_
      || deadCellsPtr_
      || deadFacesPtr_
-     || gammaPtr_
-     || sGammaPtr_
     )
     {
         FatalErrorIn("immersedBoundaryPolyPatch::calcImmersedBoundary() const")
@@ -150,176 +148,156 @@ void Foam::immersedBoundaryPolyPatch::calcImmersedBoundary() const
     // Get triSurface search
     const triSurfaceSearch& tss = triSurfSearch();
 
+    // Get mesh points
+    const pointField& p = mesh.points();
+
+    // Get mesh faces
+    const faceList& f = mesh.faces();
+
+    // Get mesh face centres
+    const vectorField& Cf = mesh.faceCentres();
+
     // Get mesh face areas
     const vectorField& S = mesh.faceAreas();
 
-    // Get mesh cell volumes
-    const scalarField& V = mesh.cellVolumes();
-
     // Get mesh cell centres
     const vectorField& C = mesh.cellCentres();
+
+    // Get mesh cell volumes
+    const scalarField& V = mesh.cellVolumes();
 
     // Get face addressing
     const labelList& owner = mesh.faceOwner();
     const labelList& neighbour = mesh.faceNeighbour();
 
+    // Get cell-point addressing
+    const labelListList& cellPoints = mesh.cellPoints();
+
     // Algorithm
-    // Initialise the search by marking the inside cells using calcInside
-    // Based on inside cells addressing, for every mesh face straddling
-    // the surface, check if the cell straddles the free surface
-    // For cells next to the coupled boundary, check if the points on the
-    // boundary have a different inside index from the cell centres next to it.
-    // Collect all intersected cells
+    // Initialise the search by marking the inside points using calcInside
+    // Based on inside points addressing, check intersected faces and cells
     // For all intersected cells, calculate the actual intersection and
-    // - calculate the intersection face, its centre, and area vector
-    // - adjust the cell volume, using a cell blending factor 0 < gamma < 1
-    // - adjust the face area for all cell faces, using a
-    //   face blending factor 0 < gamma < 1
+    // - calculate the (cell) intersection face, its centre, and area vector
+    // - adjust the cell volume and centre
+    // - adjust the face area and face centre
 
-    // Mark cells that are inside or outside of the triangular surface
-    boolList cellsInside = tss.calcInside(C);
+    // Mark points that are inside or outside of the triangular surface
+    boolList pointsInside = tss.calcInside(p);
 
-    // Initialise intersected
-    boolList intersectedCell(mesh.nCells(), false);
-
-    // Go through the faces at the interface between a live and dead cell
-    // and mark the band of possible intersections
-    forAll (neighbour, faceI)
-    {
-        if (cellsInside[owner[faceI]] != cellsInside[neighbour[faceI]])
-        {
-            // Check both cell for intersection
-            intersectedCell[owner[faceI]] = true;
-            intersectedCell[neighbour[faceI]] = true;
-        }
-    }
-
-    // Go through the patches and repeat the check with patch points
-    // Note: checking all patches for IB cut close to the boundary
-    // HJ. 24/Nov/2017
-    forAll (bMesh, patchI)
-    {
-        // Check all cells next to a patch
-        const polyPatch& curPatch = bMesh[patchI];
-
-        // Skip empty patch
-        if (isA<emptyPolyPatch>(curPatch))
-        {
-            continue;
-        }
-
-        const labelList& faceCells = curPatch.faceCells();
-        const faceList& localFaces = curPatch.localFaces();
-
-        // For all points on the patch, check intersection status
-        boolList facePointInside = tss.calcInside(curPatch.localPoints());
-
-        // For each cell next to the patch, check whether all points
-        // are on the same side of the patch as the cell centre
-
-        forAll (faceCells, faceI)
-        {
-            // Get cell centre status
-            const bool curCellInside = cellsInside[faceCells[faceI]];
-
-            const face& curFace = localFaces[faceI];
-
-            forAll (curFace, pointI)
-            {
-                if (facePointInside[curFace[pointI]] != curCellInside)
-                {
-                    // Cell is cut.  Mark it
-                    intersectedCell[faceCells[faceI]] = true;
-
-                    break;
-                }
-            }
-        }
-    }
-
-    // Count intersected cells and allocate memory
-    // Note: some cells marked as possibly intersected may be rejected later
-    label nIbCells = 0;
-
-    forAll (intersectedCell, cellI)
-    {
-        if (intersectedCell[cellI])
-        {
-            nIbCells++;
-        }
-    }
-    Info<< "nIntersectedCells: " << nIbCells << endl;
-    // Collect intersection points and faces.  Primitive patch will be created
-    // after renumbering
-
-    // IB points
-    DynamicList<point> unmergedPoints(nIbCells*primitiveMesh::pointsPerFace_);
-    label nIbPoints = 0;
-
-    // IB patch faces: Cell intersections with the IB patch
-    faceList unmergedFaces(nIbCells);
-
-    // IB cells: cells intersected by the IB patch
-    // This also corresponds to faceCells next to the IB patch
-    ibCellsPtr_ = new labelList(nIbCells);
-    labelList& ibCells = *ibCellsPtr_;
-
-    // IB cellCentres: centre of live part of the intersected cell
-    // next to the IB patch
-    ibCellCentresPtr_ = new vectorField(nIbCells);
-    vectorField& ibCellCentres = *ibCellCentresPtr_;
-
-    // IB cellCentres: centre of live part of the intersected cell
-    // next to the IB patch
-    ibCellVolumesPtr_ = new scalarField(nIbCells);
-    scalarField& ibCellVolumes = *ibCellVolumesPtr_;
-
-    // Nearest triangle
-    nearestTriPtr_ = new labelList(nIbCells);
-    labelList& nearestTri = *nearestTriPtr_;
-
-    // Reset the counter
-    nIbCells = 0;
-
-    // Calculate gamma
-    gammaPtr_ = new scalarField(mesh.nCells(), 1);
-    scalarField& gamma = *gammaPtr_;
-
-    // Collect dead cells
-    boolList deadCells(mesh.nCells(), false);
-
-    // Adjust selection of cells: inside or outside of immersed boundary
+    // Adjust selection of points: inside or outside of immersed boundary
     if (internalFlow())
     {
         Info<< "Internal flow" << endl;
-        forAll (gamma, cellI)
-        {
-            if (!cellsInside[cellI])
-            {
-                gamma[cellI] = 0;
-                deadCells[cellI] = true;
-            }
-        }
     }
     else
     {
         Info<< "External flow" << endl;
-        forAll (gamma, cellI)
+
+        // Flip all points inside identifier
+        forAll (pointsInside, i)
         {
-            if (cellsInside[cellI])
-            {
-                gamma[cellI] = 0;
-                deadCells[cellI] = true;
-            }
+            pointsInside[i] = !pointsInside[i];
         }
     }
+
+    // Check cell intersections
+    labelList intersectedCell(mesh.nCells(), immersedPoly::UNKNOWN);
+
+    // Estimate the number of intersected cells.
+    // Used for sizing of dynamic list only
+    // HJ, 11/Dec/2017
+    label nIntersectedCells = 0;
+    
+    // Go through the faces at the interface between a live and dead cell
+    // and mark the band of possible intersections
+    forAll (intersectedCell, cellI)
+    {
+        // Get current cell points
+        const labelList& curCp = cellPoints[cellI];
+
+        bool foundInside = false;
+        bool foundOutside = false;
+
+        forAll (curCp, cpI)
+        {
+            if (pointsInside[curCp[cpI]])
+            {
+                // Found a point inside
+                foundInside = true;
+            }
+            else
+            {
+                // Found a points outside
+                foundOutside = true;
+            }
+        }
+
+        // Check cell classification
+        if (foundInside && !foundOutside)
+        {
+            // All points inside: cell is wet
+            intersectedCell[cellI] = immersedPoly::WET;
+        }
+        else if (!foundInside && foundOutside)
+        {
+            // All points outside: cell is dry
+            intersectedCell[cellI] = immersedPoly::DRY;
+        }
+        else if (foundInside && foundOutside)
+        {
+            // Intersected cell
+            intersectedCell[cellI] = immersedPoly::CUT;
+            nIntersectedCells++;
+        }
+    }
+
+    // Collect intersection points and faces.  Primitive patch will be created
+    // after renumbering
+
+    // IB points
+    // Note: it is difficult to estimate the correct size, so use a guessed
+    // number of intersected cells and a dynamic list for automatic resizing
+    // HJ, 11/Dec/2017
+    DynamicList<point> unmergedPoints
+    (
+        nIntersectedCells*primitiveMesh::pointsPerFace_
+    );
+    label nIbPoints = 0;
+
+    // IB patch faces: Cell intersections with the IB patch
+    faceList unmergedFaces(mesh.nCells());
+
+    // IB cells: cells intersected by the IB patch
+    // This also corresponds to faceCells next to the IB patch
+    ibCellsPtr_ = new labelList(mesh.nCells());
+    labelList& ibCells = *ibCellsPtr_;
+
+    // IB cellCentres: centre of live part of the intersected cell
+    // next to the IB patch
+    ibCellCentresPtr_ = new vectorField(mesh.nCells());
+    vectorField& ibCellCentres = *ibCellCentresPtr_;
+
+    // IB cellCentres: centre of live part of the intersected cell
+    // next to the IB patch
+    ibCellVolumesPtr_ = new scalarField(mesh.nCells());
+    scalarField& ibCellVolumes = *ibCellVolumesPtr_;
+
+    // Nearest triangle
+    nearestTriPtr_ = new labelList(mesh.nCells());
+    labelList& nearestTri = *nearestTriPtr_;
+
+    // Count interected cells
+    label nIbCells = 0;
+
+    // Collect dead cells
+    boolList deadCells(mesh.nCells(), false);
 
     // At this point, all live cells are marked with 1
     // Intesect all cells that are marked for intersection
 
     forAll (intersectedCell, cellI)
     {
-        if (intersectedCell[cellI])
+        if (intersectedCell[cellI] == immersedPoly::CUT)
         {
             // Found intersected cell
 
@@ -346,13 +324,11 @@ void Foam::immersedBoundaryPolyPatch::calcImmersedBoundary() const
             // Check for irregular intersections
             if (cutCell.isAllWet())
             {
-                gamma[cellI] = 1;
+                intersectedCell[cellI] = immersedPoly::WET;
             }
             else if (cutCell.isAllDry())
             {
-                gamma[cellI] = 0;
-                deadCells[cellI] = true;
-
+                intersectedCell[cellI] = immersedPoly::DRY;
             }
             else
             {
@@ -362,20 +338,19 @@ void Foam::immersedBoundaryPolyPatch::calcImmersedBoundary() const
                 if (cellFactor < liveFactor_())
                 {
                     // Thin cut: cell is dry
-                    gamma[cellI] = 0;
-                    deadCells[cellI] = true;
+                    Info<< "Dry cell from intersection" << cellI << endl;
+                    intersectedCell[cellI] = immersedPoly::DRY;
                 }
                 else if (cellFactor > (1 - liveFactor_()))
                 {
                     // Thick cut: cell is wet
-                    gamma[cellI] = 0;
-                    deadCells[cellI] = true;
+                    Info<< "Wet cell from intersection" << cellI << endl;
+                    intersectedCell[cellI] = immersedPoly::WET;
                 }
                 else
                 {
                     // True intersection.  Cut the cell and store all
                     // derived data
-                    deadCells[cellI] = false;
 
                     // Store ibFace with local points. Points merge will
                     // take place later
@@ -412,13 +387,110 @@ void Foam::immersedBoundaryPolyPatch::calcImmersedBoundary() const
                         tss.nearest(cutFace.centre(cutPoints), span).index();
 
                     nIbCells++;
-
-                    // Record the live volume
-                    gamma[cellI] = cellFactor;
                 }
             }
         }
     }
+
+    // Pick up direct face cuts after regular cell cuts are collected
+    forAll (neighbour, faceI)
+    {
+        if
+        (
+            intersectedCell[owner[faceI]] == immersedPoly::WET
+         && intersectedCell[neighbour[faceI]] == immersedPoly::DRY
+        )
+        {
+            // Direct face cut, owner
+
+            // Grab a point and wet cell and make an IB face
+            pointField facePoints = f[faceI].points(p);
+            face renumberedFace(facePoints.size());
+
+            // Insert points
+            forAll (facePoints, fpI)
+            {
+                unmergedPoints.append(facePoints[fpI]);
+                renumberedFace[fpI] = nIbPoints;
+                nIbPoints++;
+            }
+            
+            // Record the face
+            unmergedFaces[nIbCells] = renumberedFace;
+
+            // Collect cut cell index
+            ibCells[nIbCells] = owner[faceI];
+
+            // Record the live centre
+            ibCellCentres[nIbCells] = C[owner[faceI]];
+
+            // Record the live volume: equal to owner volume
+            ibCellVolumes[nIbCells] = V[owner[faceI]];
+
+            // Get span of owner and neighbour
+            vector span = cellSpan(owner[faceI]);
+
+            span = Foam::max
+            (
+                span,
+                cellSpan(neighbour[faceI])
+            );
+
+            // Record the nearest triangle to the face centre
+            nearestTri[nIbCells] = tss.nearest(Cf[faceI], span).index();
+
+            nIbCells++;
+        }
+        else if
+        (
+            intersectedCell[owner[faceI]] == immersedPoly::DRY
+         && intersectedCell[neighbour[faceI]] == immersedPoly::WET
+        )
+        {
+            // Direct face cut, neighbour
+
+            // Grab a point and wet cell and make an IB face
+            // Note: reverse face in cut
+            pointField facePoints = f[faceI].reverseFace().points(p);
+
+            face renumberedFace(facePoints.size());
+
+            // Insert points
+            forAll (facePoints, fpI)
+            {
+                unmergedPoints.append(facePoints[fpI]);
+                renumberedFace[fpI] = nIbPoints;
+                nIbPoints++;
+            }
+            
+            // Record the face
+            unmergedFaces[nIbCells] = renumberedFace;
+
+            // Collect cut cell index
+            ibCells[nIbCells] = neighbour[faceI];
+
+            // Record the live centre
+            ibCellCentres[nIbCells] = C[neighbour[faceI]];
+
+            // Record the live volume: equal to neighbour volume
+            ibCellVolumes[nIbCells] = V[neighbour[faceI]];
+
+            // Get span of neighbour and neighbour
+            vector span = cellSpan(neighbour[faceI]);
+
+            span = Foam::max
+            (
+                span,
+                cellSpan(owner[faceI])
+            );
+
+            // Record the nearest triangle to the face centre
+            nearestTri[nIbCells] = tss.nearest(Cf[faceI], span).index();
+
+            nIbCells++;
+        }
+    }
+
 
     // Reset the cell lists
     Info<< "nIbCells: " << nIbCells << endl;
@@ -428,6 +500,14 @@ void Foam::immersedBoundaryPolyPatch::calcImmersedBoundary() const
     ibCellVolumes.setSize(nIbCells);
     nearestTri.setSize(nIbCells);
 
+    // Check tri addressing
+    if (min(nearestTri) == -1)
+    {
+        FatalErrorIn("immersedBoundaryPolyPatch::calcImmersedBoundary() const")
+            << "Cannot find nearestTri for all points"
+            << abort(FatalError);
+    }
+    
     // Build stand-alone patch
     // Memory management
     {
@@ -482,9 +562,9 @@ void Foam::immersedBoundaryPolyPatch::calcImmersedBoundary() const
     {
         label nDeadCells = 0;
 
-        forAll (deadCells, cellI)
+        forAll (intersectedCell, cellI)
         {
-            if (deadCells[cellI])
+            if (intersectedCell[cellI] == immersedPoly::DRY)
             {
                 nDeadCells++;
             }
@@ -498,9 +578,9 @@ void Foam::immersedBoundaryPolyPatch::calcImmersedBoundary() const
         // Reset the counter
         nDeadCells = 0;
 
-        forAll (deadCells, cellI)
+        forAll (intersectedCell, cellI)
         {
-            if (deadCells[cellI])
+            if (intersectedCell[cellI] == immersedPoly::DRY)
             {
                 dc[nDeadCells] = cellI;
                 nDeadCells++;
@@ -524,133 +604,206 @@ void Foam::immersedBoundaryPolyPatch::calcImmersedBoundary() const
     vectorField& ibFaceAreas = *ibFaceAreasPtr_;
     label nIbFaces = 0;
 
-    // Calculate sGamma
-    sGammaPtr_ = new scalarField(mesh.nFaces(), 1);
-    scalarField& sGamma = *sGammaPtr_;
+    // Classify faces
+    labelList intersectedFace(mesh.nFaces(), immersedPoly::UNKNOWN);
 
-    // Collect dead faces
-    boolList deadFaces(mesh.nFaces(), false);
-
+    // Resolve simple face intersections based on the cell intersection data
     // First, kill all faces touching dead cells, including internal
-    // and boundary faces
-    // The intersection belt will be handled separately
-    forAll (neighbour, faceI)
-    {
-        if (deadCells[neighbour[faceI]])
-        {
-            deadFaces[faceI] = true;
-        }
-    }
+    // and boundary faces.
+    // If a face touches a live cell, it is live
+    // The intersection belt will be handled separately by detailed intersection
 
-    // Internal and boundary faces
-    forAll (owner, faceI)
-    {
-        if (deadCells[owner[faceI]])
-        {
-            deadFaces[faceI] = true;
-        }
-    }
-    
-    // For all internal faces, check if the owner or neighbour cell has been cut
-    // For all boundary faces, check if the internal cell has been cut
+    // Quick intersection scan: if owner and neighbour are in the same state
+    // the face is in the same state
 
-    // Internal face check
+    // Internal faces
     forAll (neighbour, faceI)
     {
         if
         (
-            intersectedCell[owner[faceI]]
-         || intersectedCell[neighbour[faceI]]
+            intersectedCell[owner[faceI]] == immersedPoly::WET
+         && intersectedCell[neighbour[faceI]] == immersedPoly::WET
         )
         {
-            // Possibly intersected face  Try to cut it
-            // Create a cutting object with a local tolerance
-            triSurfaceDistance dist
+            intersectedFace[faceI] = immersedPoly::WET;
+        }
+
+        if
+        (
+            intersectedCell[owner[faceI]] == immersedPoly::DRY
+         && intersectedCell[neighbour[faceI]] == immersedPoly::DRY
+        )
+        {
+            intersectedFace[faceI] = immersedPoly::DRY;
+        }
+
+        // Special check for directly cut faces
+        // Wet-to-dry and dry-to-wet is a direct face cut
+        // Dry-to-cut or cut-to-dry are cutting errors.  They will be
+        // corrected later in corrected face areas, based on closed cell
+        // tolerance.  HJ, 11/Dec/2017
+        if
+        (
             (
-                tss,
-                Foam::max
-                (
-                    cellSpan(owner[faceI]),
-                    cellSpan(neighbour[faceI])
-                ),
-                internalFlow(),
-                false               // iterate intersection
-            );
+                intersectedCell[owner[faceI]] == immersedPoly::WET
+             && intersectedCell[neighbour[faceI]] == immersedPoly::DRY
+            )
+         || (
+                intersectedCell[owner[faceI]] == immersedPoly::DRY
+             && intersectedCell[neighbour[faceI]] == immersedPoly::WET
+             )
+         || (
+                intersectedCell[owner[faceI]] == immersedPoly::DRY
+             && intersectedCell[neighbour[faceI]] == immersedPoly::CUT
+             )
+         || (
+                intersectedCell[owner[faceI]] == immersedPoly::CUT
+             && intersectedCell[neighbour[faceI]] == immersedPoly::DRY
+             )
+        )
+        {
+            // Note:
+            // Wet-to-dry: this face has been declared to be a
+            //             cut face and needs to be taken out as live face
+            // Cut-to-dry: this is either an outside edge of cut faces or
+            //             a cutting error
+            intersectedFace[faceI] = immersedPoly::DRY;
+        }
+    }
 
-            // Calculate the intersection
-            ImmersedFace<triSurfaceDistance> cutFace
-            (
-                faceI,
-                mesh,
-                dist
-            );
+    // Boundary faces
+    for (label faceI = mesh.nInternalFaces(); faceI < owner.size(); faceI++)
+    {
+        if
+        (
+            intersectedCell[owner[faceI]] == immersedPoly::WET
+        )
+        {
+            intersectedFace[faceI] = immersedPoly::WET;
+        }
 
-            if (cutFace.isAllWet())
-            {
-                sGamma[faceI] = 1;
-            }
-            else if (cutFace.isAllDry())
-            {
-                sGamma[faceI] = 0;
-                deadFaces[faceI] = true;
-            }
-            else
-            {
-                // Real intesection.  Check cut
-                const scalar faceFactor = cutFace.wetAreaMag()/mag(S[faceI]);
+        if
+        (
+            intersectedCell[owner[faceI]] == immersedPoly::DRY
+        )
+        {
+            intersectedFace[faceI] = immersedPoly::DRY;
+        }
+    }
 
-                if (faceFactor < liveFactor_())
+    // Detailed face check after initial rejection scan
+    forAll (intersectedFace, faceI)
+    {
+        if (intersectedFace[faceI] == immersedPoly::UNKNOWN)
+        {
+            // Possibly intersected face.  Check existance of intersection
+            // via points
+            const labelList& curF = f[faceI];
+
+            bool foundInside = false;
+            bool foundOutside = false;
+
+            forAll (curF, fI)
+            {
+                if (pointsInside[curF[fI]])
                 {
-                    // Thin cut: face is dry
-                    sGamma[faceI] = 0;
-                    deadFaces[faceI] = true;
-                }
-                else if (faceFactor > (1 - liveFactor_()))
-                {
-                    // Thick cut: face is wet
-                    sGamma[faceI] = 0;
+                    // Found a point inside
+                    foundInside = true;
                 }
                 else
                 {
-                    // True intersection.  Collect data
-
-                    // Get intersected face index
-                    ibFaces[nIbFaces] = faceI;
-
-                    // Get wet centre
-                    ibFaceCentres[nIbFaces] = cutFace.wetAreaCentre();
-
-                    // Get wet area
-                    ibFaceAreas[nIbFaces] = faceFactor*S[faceI];
-
-                    // Calculate wet fraction from wet area magnitude and
-                    // original area magnitude
-                    sGamma[faceI] = faceFactor;
-
-                    nIbFaces++;
+                    // Found a points outside
+                    foundOutside = true;
                 }
             }
-        }
-        else
-        {
-            // No intersection
 
-            // Debug check: if neither owner nor neighbour has been cut, they
-            // need to have the same value of gamma
-            // Comparing 0:1 indicator function
-            if (mag(gamma[owner[faceI]] - gamma[neighbour[faceI]]) > SMALL)
+            // Check face classification
+            if (foundInside && !foundOutside)
             {
-                FatalErrorIn
-                (
-                    "void immersedBoundaryPolyPatch::"
-                    "calcImmersedBoundary() const"
-                )
-                    << "Topological face cutting error for patch "
-                    << name() << ", face " << faceI
-                    << abort(FatalError);
+                // All points inside: cell is wet
+                intersectedFace[faceI] = immersedPoly::WET;
             }
+            else if (!foundInside && foundOutside)
+            {
+                // All points outside: cell is dry
+                intersectedFace[faceI] = immersedPoly::DRY;
+            }
+            else if (foundInside && foundOutside)
+            {
+                // Real intersection.  Try to cut the face
 
-            sGamma[faceI] = gamma[owner[faceI]];
+                // Get search span
+                vector span = cellSpan(owner[faceI]);
+
+                // For internal face, check the neighbour span as well
+                if (mesh.isInternalFace(faceI))
+                {
+                    span = Foam::max
+                    (
+                        span,
+                        cellSpan(neighbour[faceI])
+                    );
+                }
+
+                // Create a cutting object with a local tolerance
+                triSurfaceDistance dist
+                (
+                    tss,
+                    span,
+                    internalFlow(),
+                    false               // iterate intersection
+                );
+
+                // Calculate the intersection
+                ImmersedFace<triSurfaceDistance> cutFace
+                (
+                    faceI,
+                    mesh,
+                    dist
+                );
+
+                if (cutFace.isAllWet())
+                {
+                    intersectedFace[faceI] = immersedPoly::WET;
+                }
+                else if (cutFace.isAllDry())
+                {
+                    intersectedFace[faceI] = immersedPoly::DRY;
+                }
+                else
+                {
+                    // Real intesection.  Check cut
+                    const scalar faceFactor =
+                        cutFace.wetAreaMag()/mag(S[faceI]);
+
+                    if (faceFactor < liveFactor_())
+                    {
+                        // Thin cut: face is dry
+                        intersectedFace[faceI] = immersedPoly::DRY;
+                    }
+                    else if (faceFactor > (1 - liveFactor_()))
+                    {
+                        // Thick cut: face is wet
+                        intersectedFace[faceI] = immersedPoly::DRY;
+                    }
+                    else
+                    {
+                        // True intersection.  Collect data
+                        intersectedFace[faceI] = immersedPoly::CUT;
+
+                        // Get intersected face index
+                        ibFaces[nIbFaces] = faceI;
+
+                        // Get wet centre
+                        ibFaceCentres[nIbFaces] = cutFace.wetAreaCentre();
+
+                        // Get wet area, preserving original normal direction
+                        ibFaceAreas[nIbFaces] = faceFactor*S[faceI];
+
+                        nIbFaces++;
+                    }
+                }
+            }
         }
     }
 
@@ -664,9 +817,9 @@ void Foam::immersedBoundaryPolyPatch::calcImmersedBoundary() const
     {
         label nDeadFaces = 0;
 
-        forAll (deadFaces, faceI)
+        forAll (intersectedFace, faceI)
         {
-            if (deadFaces[faceI])
+            if (intersectedFace[faceI] == immersedPoly::DRY)
             {
                 nDeadFaces++;
             }
@@ -680,9 +833,9 @@ void Foam::immersedBoundaryPolyPatch::calcImmersedBoundary() const
         // Reset the counter
         nDeadFaces = 0;
 
-        forAll (deadFaces, faceI)
+        forAll (intersectedFace, faceI)
         {
-            if (deadFaces[faceI])
+            if (intersectedFace[faceI] == immersedPoly::DRY)
             {
                 df[nDeadFaces] = faceI;
                 nDeadFaces++;
@@ -703,13 +856,12 @@ void Foam::immersedBoundaryPolyPatch::clearOut()
     deleteDemandDrivenData(nearestTriPtr_);
     deleteDemandDrivenData(deadCellsPtr_);
     deleteDemandDrivenData(deadFacesPtr_);
-    deleteDemandDrivenData(gammaPtr_);
-    deleteDemandDrivenData(sGammaPtr_);
 
     deleteDemandDrivenData(correctedCellCentresPtr_);
     deleteDemandDrivenData(correctedFaceCentresPtr_);
     deleteDemandDrivenData(correctedCellVolumesPtr_);
     deleteDemandDrivenData(correctedFaceAreasPtr_);
+    deleteDemandDrivenData(correctedIbPatchFaceAreasPtr_);
 }
 
 
@@ -732,6 +884,7 @@ void Foam::immersedBoundaryPolyPatch::calcCorrectedGeometry() const
      || correctedFaceCentresPtr_
      || correctedCellVolumesPtr_
      || correctedFaceAreasPtr_
+     || correctedIbPatchFaceAreasPtr_
     )
     {
         FatalErrorIn
@@ -757,56 +910,96 @@ void Foam::immersedBoundaryPolyPatch::calcCorrectedGeometry() const
     correctedFaceAreasPtr_ = new vectorField(mesh.faceAreas());
     vectorField& Sf = *correctedFaceAreasPtr_;
 
+    // Initialise IB patch face areas with the areas of the stand-alone patch
+    // They will be corrected using the Marooney Maneouvre
+    correctedIbPatchFaceAreasPtr_ = new vectorField(ibPatch().areas());
+    vectorField& ibSf = *correctedIbPatchFaceAreasPtr_;
+
     // Correct for all cut cells
 
-    // Memory management
+    // Get cut cells
+    const labelList& cutCells = ibCells();
+    const vectorField& cutCellCentres = ibCellCentres();
+    const scalarField& cutCellVolumes = ibCellVolumes();
+
+    forAll (cutCells, ccI)
     {
-        // Get cut cells
-        const labelList& cutCells = ibCells();
-        const vectorField& cutCellCentres = ibCellCentres();
-        const scalarField& cutCellVolumes = ibCellVolumes();
+        // Correct the volume and area
+        C[cutCells[ccI]] = cutCellCentres[ccI];
 
-        forAll (cutCells, ccI)
-        {
-            // Correct the volume and area
-            C[cutCells[ccI]] = cutCellCentres[ccI];
+        V[cutCells[ccI]] = cutCellVolumes[ccI];
+    }
 
-            V[cutCells[ccI]] = cutCellVolumes[ccI];
-        }
+    // Deactivate dead cells
+    const labelList& dc = deadCells();
 
-        // Deactivate dead cells
-        const labelList& dc = deadCells();
-
-        forAll (dc, dcI)
-        {
-            // Set dead volume to small
-            V[dc[dcI]] = SMALL;
-        }
+    forAll (dc, dcI)
+    {
+        // Set dead volume to small
+        V[dc[dcI]] = SMALL;
     }
 
     // Correct for all cut faces
-    // Memory management
+
+    // Get cut faces
+    const labelList& cutFaces = ibFaces();
+    const vectorField& cutFaceCentres = ibFaceCentres();
+    const vectorField& cutFaceAreas = ibFaceAreas();
+
+    forAll (cutFaces, cfI)
     {
-        // Get cut faces
-        const labelList& cutFaces = ibFaces();
-        const vectorField& cutFaceCentres = ibFaceCentres();
-        const vectorField& cutFaceAreas = ibFaceAreas();
+        Cf[cutFaces[cfI]] = cutFaceCentres[cfI];
 
-        forAll (cutFaces, cfI)
+        // Preserve the original face normal
+        Sf[cutFaces[cfI]] = cutFaceAreas[cfI];
+    }
+
+    // Deactivate dead faces
+    const labelList& df = deadFaces();
+
+    forAll (df, dfI)
+    {
+        // Set dead area to small
+        Sf[df[dfI]] *= SMALL;
+    }
+
+    // In case of cutting errors due to finite tolerance, some cut cells may
+    // remain opened and have to be closed by force.  This will be achieved
+    // by the Marooney Maneouvre, where the face sum imbalance is compensated
+    // in the cut face.  HJ, 11/Dec/2017
+
+    vectorField sumSf(mesh.nCells(), vector::zero);
+
+    // Get face addressing
+    const labelList& owner = mesh.faceOwner();
+    const labelList& neighbour = mesh.faceNeighbour();
+
+    forAll (owner, faceI)
+    {
+        sumSf[owner[faceI]] += Sf[faceI];
+    }
+
+    forAll (neighbour, faceI)
+    {
+        sumSf[neighbour[faceI]] -= Sf[faceI];
+    }
+
+    forAll (cutCells, cutCellI)
+    {
+        const label ccc = cutCells[cutCellI];
+        if
+        (
+            mag(sumSf[ccc]) > 1e-12
+         && mag(sumSf[ccc] + ibSf[cutCellI])/cutCellVolumes[cutCellI] > 1e-6
+        )
         {
-            Cf[cutFaces[cfI]] = cutFaceCentres[cfI];
-
-            // Preserve the original face normal
-            Sf[cutFaces[cfI]] = cutFaceAreas[cfI];
-        }
-
-        // Deactivate dead faces
-        const labelList& df = deadFaces();
-
-        forAll (df, dfI)
-        {
-            // Set dead area to small
-            Sf[df[dfI]] *= SMALL;
+            Info<< "Marooney Maneouvre for cell " << ccc
+                << " error: " << mag(sumSf[ccc] + ibSf[cutCellI]) << " "
+                << mag(sumSf[ccc] + ibSf[cutCellI])/cutCellVolumes[cutCellI]
+                << " " << sumSf[ccc] << " "
+                << " V: " << cutCellVolumes[cutCellI]
+                << " Sf: " << ibSf[cutCellI] << endl;
+            ibSf[cutCellI] = -sumSf[ccc];
         }
     }
 }
@@ -858,12 +1051,11 @@ Foam::immersedBoundaryPolyPatch::immersedBoundaryPolyPatch
     nearestTriPtr_(NULL),
     deadCellsPtr_(NULL),
     deadFacesPtr_(NULL),
-    gammaPtr_(NULL),
-    sGammaPtr_(NULL),
     correctedCellCentresPtr_(NULL),
     correctedFaceCentresPtr_(NULL),
     correctedCellVolumesPtr_(NULL),
-    correctedFaceAreasPtr_(NULL)
+    correctedFaceAreasPtr_(NULL),
+    correctedIbPatchFaceAreasPtr_(NULL)
 {}
 
 
@@ -903,12 +1095,11 @@ Foam::immersedBoundaryPolyPatch::immersedBoundaryPolyPatch
     nearestTriPtr_(NULL),
     deadCellsPtr_(NULL),
     deadFacesPtr_(NULL),
-    gammaPtr_(NULL),
-    sGammaPtr_(NULL),
     correctedCellCentresPtr_(NULL),
     correctedFaceCentresPtr_(NULL),
     correctedCellVolumesPtr_(NULL),
-    correctedFaceAreasPtr_(NULL)
+    correctedFaceAreasPtr_(NULL),
+    correctedIbPatchFaceAreasPtr_(NULL)
 {
     if (size() > 0)
     {
@@ -962,12 +1153,11 @@ Foam::immersedBoundaryPolyPatch::immersedBoundaryPolyPatch
     nearestTriPtr_(NULL),
     deadCellsPtr_(NULL),
     deadFacesPtr_(NULL),
-    gammaPtr_(NULL),
-    sGammaPtr_(NULL),
     correctedCellCentresPtr_(NULL),
     correctedFaceCentresPtr_(NULL),
     correctedCellVolumesPtr_(NULL),
-    correctedFaceAreasPtr_(NULL)
+    correctedFaceAreasPtr_(NULL),
+    correctedIbPatchFaceAreasPtr_(NULL)
 {}
 
 
@@ -1006,12 +1196,11 @@ Foam::immersedBoundaryPolyPatch::immersedBoundaryPolyPatch
     nearestTriPtr_(NULL),
     deadCellsPtr_(NULL),
     deadFacesPtr_(NULL),
-    gammaPtr_(NULL),
-    sGammaPtr_(NULL),
     correctedCellCentresPtr_(NULL),
     correctedFaceCentresPtr_(NULL),
     correctedCellVolumesPtr_(NULL),
-    correctedFaceAreasPtr_(NULL)
+    correctedFaceAreasPtr_(NULL),
+    correctedIbPatchFaceAreasPtr_(NULL)
 {}
 
 
@@ -1156,30 +1345,6 @@ Foam::immersedBoundaryPolyPatch::deadFaces() const
 }
 
 
-const Foam::scalarField&
-Foam::immersedBoundaryPolyPatch::gamma() const
-{
-    if (!gammaPtr_)
-    {
-        calcImmersedBoundary();
-    }
-
-    return *gammaPtr_;
-}
-
-
-const Foam::scalarField&
-Foam::immersedBoundaryPolyPatch::sGamma() const
-{
-    if (!sGammaPtr_)
-    {
-        calcImmersedBoundary();
-    }
-
-    return *sGammaPtr_;
-}
-
-
 const Foam::vectorField&
 Foam::immersedBoundaryPolyPatch::correctedCellCentres() const
 {
@@ -1225,6 +1390,18 @@ Foam::immersedBoundaryPolyPatch::correctedFaceAreas() const
     }
 
     return *correctedFaceAreasPtr_;
+}
+
+
+const Foam::vectorField&
+Foam::immersedBoundaryPolyPatch::correctedIbPatchFaceAreas() const
+{
+    if (!correctedIbPatchFaceAreasPtr_)
+    {
+        calcCorrectedGeometry();
+    }
+
+    return *correctedIbPatchFaceAreasPtr_;
 }
 
 

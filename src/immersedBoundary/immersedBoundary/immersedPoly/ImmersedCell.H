@@ -32,6 +32,10 @@ Description
     Based on the data, the cell is cut by the distance = 0 plane/face into
     two sub-cells and data for the wet cell part is provided.
 
+Implementation
+    The class builds a primitiveMesh with the local point, face and cell list
+    which is then manipulated as needed.
+
 SourceFiles
     ImmersedCell.C
 
@@ -100,6 +104,10 @@ class ImmersedCell
             // Face neigbour
             labelList faceNeighbour_;
 
+        //- Depth to immersed surface for cell points and intersections
+        //  Note: positive depth is dry
+        scalarField depth_;
+    
 
     // Private member functions
 
@@ -109,14 +117,10 @@ class ImmersedCell
         //- Create points where the water surface intersects face edges
         //  Return number of inserted points
         //  and if so, insert additional points into points_ and adjust depth
-        label insertIntersectionPoints(scalarField& depth);
+        label insertIntersectionPoints();
 
         //- Make an internal face out of the intersection points
-        void createInternalFace(const label nIntersections);
-
-        //- Make a face from point list, place at faceID in faces_, if
-        //  faceID is negative append face to faces_
-        void splitFace(const label faceID, const scalarField& depth);
+        face createInternalFace(const label nIntersections) const;
 
 
 public:
@@ -169,7 +173,6 @@ public:
             {
                 return points_;
             }
-
 
 
         //- Is the cell all wet?

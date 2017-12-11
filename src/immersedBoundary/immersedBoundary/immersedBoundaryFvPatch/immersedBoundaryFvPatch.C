@@ -40,7 +40,14 @@ namespace Foam
     addToRunTimeSelectionTable(fvPatch, immersedBoundaryFvPatch, polyPatch);
 }
 
-// * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
+// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
+
+const Foam::debug::tolerancesSwitch
+Foam::immersedBoundaryFvPatch::nonOrthogonalFactor_
+(
+    "immersedBoundaryNonOrthogonalFactor",
+    0.1
+);
 
 
 // * * * * * * * * * * * * Protected Member Functions  * * * * * * * * * * * //
@@ -68,11 +75,13 @@ void Foam::immersedBoundaryFvPatch::makeSf(slicedSurfaceVectorField& Sf) const
     Sf.reset(ibPolyPatch_.correctedFaceAreas());
 
     // Insert the patch data for the immersed boundary
-    // Note: use the face centres from the stand-alone patch within the IB
+    // Note: use the corrected face areas from immersed boundary instead of
+    // the stand-alone patch areas within the IB
     // HJ, 30/Nov/2017
     Sf.boundaryField()[index()].UList::operator=
     (
-        vectorField::subField(ibPolyPatch_.ibPatch().areas(), size())
+        // vectorField::subField(ibPolyPatch_.ibPatch().areas(), size())
+        vectorField::subField(ibPolyPatch_.correctedIbPatchFaceAreas(), size())
     );
 }
 
@@ -105,6 +114,39 @@ void Foam::immersedBoundaryFvPatch::makeV(scalarField& V) const
 }
 
 
+void Foam::immersedBoundaryFvPatch::makeCorrVecs(fvsPatchVectorField& cv) const
+{
+    // Set patch non-orthogonality correction to zero
+    cv = vector::zero;
+
+    vectorField& cvIn = const_cast<vectorField&>(cv.internalField());
+
+    const fvMesh& mesh = boundaryMesh().mesh();
+ 
+    // Get face addressing
+    const unallocLabelList& owner = mesh.owner();
+    const unallocLabelList& neighbour = mesh.neighbour();
+
+    // Calculate volume fraction for all cells
+    const scalarField gamma = mesh.V().field()/mesh.cellVolumes();
+
+    // Visit all internal faces.  If a corrected volume fraction is smaller
+    // than a threshold, reset non-orthogonality for the face
+    forAll (neighbour, faceI)
+    {
+        if
+        (
+            gamma[owner[faceI]] < nonOrthogonalFactor_()
+         || gamma[owner[faceI]] < nonOrthogonalFactor_()
+        )
+        {
+            // Thin live cut.  Reset correction vectors
+            cvIn[faceI] = vector::zero;
+        }
+    }
+}
+
+
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 Foam::immersedBoundaryFvPatch::immersedBoundaryFvPatch
@@ -133,6 +175,18 @@ const Foam::unallocLabelList&
 Foam::immersedBoundaryFvPatch::faceCells() const
 {
     return ibPolyPatch_.ibCells();
+}
+
+
+Foam::tmp<Foam::vectorField> Foam::immersedBoundaryFvPatch::nf() const
+{
+    return ibPolyPatch_.ibPatch().faceNormals();
+}
+
+
+Foam::tmp<Foam::vectorField> Foam::immersedBoundaryFvPatch::delta() const
+{
+    return ibPolyPatch_.ibPatch().faceCentres() - ibPolyPatch_.ibCellCentres();
 }
 
 

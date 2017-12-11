@@ -131,14 +131,6 @@ class immersedBoundaryPolyPatch
             //- Dead faces list
             mutable labelList* deadFacesPtr_;
 
-            //- Active cells mask, giving volume fraction for live cells
-            //  by multiplying with the original cell volume
-            mutable scalarField* gammaPtr_;
-
-            //- Active faces mask, giving area fraction for live faces
-            //  by multiplying with the original face area
-            mutable scalarField* sGammaPtr_;
-
 
         // Corrected mesh geometry
 
@@ -153,6 +145,9 @@ class immersedBoundaryPolyPatch
 
             //- Corrected face areas
             mutable vectorField* correctedFaceAreasPtr_;
+
+            //- Corrected face areas for the immersed boundary patch
+            mutable vectorField* correctedIbPatchFaceAreasPtr_;
 
 
     // Private Member Functions
@@ -338,14 +333,6 @@ public:
             //- Return dead faces
             const labelList& deadFaces() const;
 
-            //- Return active cells mask, giving volume fraction
-            //  for live cells by multiplying with the original cell volume
-            const scalarField& gamma() const;
-
-            //- Active faces mask, giving area fraction for live faces
-            //  by multiplying with the original face area
-            const scalarField& sGamma() const;
-
 
         // Corrected mesh geometry
 
@@ -360,6 +347,12 @@ public:
 
             //- Corrected face areas
             const vectorField& correctedFaceAreas() const;
+
+
+        // Corrected immersed patch geometry
+    
+            //- Corrected ib patch face areas
+            const vectorField& correctedIbPatchFaceAreas() const;
 
 
         // Edit

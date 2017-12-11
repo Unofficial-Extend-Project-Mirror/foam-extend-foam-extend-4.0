@@ -80,6 +80,14 @@ class immersedBoundaryFvPatch
         const fvMesh& mesh_;
 
 
+    // Static data
+
+        //- Live volume factor
+        //  Fraction of cell volume for which the non-orthogonal correction
+        //  is deactivated
+        static const debug::tolerancesSwitch nonOrthogonalFactor_;
+
+
 protected:
 
     // Protected Member Functions
@@ -97,6 +105,12 @@ protected:
 
             //- Make mesh cell volumes
             virtual void makeV(scalarField&) const;
+
+
+        // Discretisation correction functions
+
+            //- Make patch face non-orthogonality correction vectors
+            virtual void makeCorrVecs(fvsPatchVectorField&) const;
 
 
 public:
@@ -129,6 +143,17 @@ public:
 
             //- Return faceCells next to the IB surface
             virtual const unallocLabelList& faceCells() const;
+
+
+        // Access functions for geometrical data
+
+            //- Return face normals
+            //  Reconsider. HJ, 11/Dec/2017
+            tmp<vectorField> nf() const;
+
+            //- Return cell-centre to face-centre vector
+            //  Reconsider. HJ, 11/Dec/2017
+            virtual tmp<vectorField> delta() const;
 
 
         // Access to immersed boundary components
