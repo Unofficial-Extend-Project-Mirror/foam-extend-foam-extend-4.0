@@ -106,10 +106,10 @@ bool Foam::immersedBoundarySolidBodyMotionFvMesh::update()
         ibMotions_[ibI].movePoints();
     }
 
-    // Force flux and addressing recalculation as in topo change
-    pointField newAllPoints = allPoints();
-
-    movePoints(newAllPoints);
+    // Force quasi-topological cange to rebuild addressng on motion of the
+    // immersed boundary
+    // HJ, 12/Dec/2017
+    fvMesh::syncUpdateMesh();
 
     return true;
 }
