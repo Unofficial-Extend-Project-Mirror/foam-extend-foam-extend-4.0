@@ -385,13 +385,31 @@ Foam::SlicedGeometricField<Type, PatchField, SlicedPatchField, GeoMesh>::reset
     FieldField<PatchField, Type>& bf = this->boundaryField();
 
     const fvBoundaryMesh& bMesh = this->mesh().boundary();
-    
+
     forAll (bMesh, patchi)
     {
-        bf[patchi].UList<Type>::operator=
-        (
-            bMesh[patchi].patchSlice(completeField)
-        );
+        // Note: assuming preserveCouples = true
+        // HJ, 1/Dec/2017
+        if (bMesh[patchi].coupled())
+        {
+            // Initialize the values on the coupled patch to those of the slice
+            // of the given field.
+            // Note: these will usually be over-ridden by the boundary field
+            // evaluation e.g. in the case of processor and cyclic patches.
+            bf[patchi] = SlicedPatchField<Type>
+            (
+                bMesh[patchi],
+                DimensionedField<Type, GeoMesh>::null(),
+                completeField
+            );
+        }
+        else
+        {
+            bf[patchi].UList<Type>::operator=
+            (
+                bMesh[patchi].patchSlice(completeField)
+            );
+        }
     }
 }
 
@@ -419,13 +437,28 @@ Foam::SlicedGeometricField<Type, PatchField, SlicedPatchField, GeoMesh>::reset
     FieldField<PatchField, Type>& bf = this->boundaryField();
 
     const fvBoundaryMesh& bMesh = this->mesh().boundary();
-    
+
     forAll (bMesh, patchi)
     {
-        bf[patchi].UList<Type>::operator=
-        (
-            bMesh[patchi].patchSlice(completeBField)
-        );
+        // Note: assuming preserveCouples = true
+        // HJ, 1/Dec/2017
+        if (bMesh[patchi].coupled())
+        {
+            // Assign field
+            bf[patchi] = SlicedPatchField<Type>
+            (
+                bMesh[patchi],
+                DimensionedField<Type, GeoMesh>::null(),
+                completeBField
+            );
+        }
+        else
+        {
+            bf[patchi].UList<Type>::operator=
+            (
+                bMesh[patchi].patchSlice(completeBField)
+            );
+        }
     }
 }
 
