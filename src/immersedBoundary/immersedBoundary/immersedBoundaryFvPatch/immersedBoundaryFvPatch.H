@@ -112,6 +112,9 @@ protected:
             //- Make patch face non-orthogonality correction vectors
             virtual void makeCorrVecs(fvsPatchVectorField&) const;
 
+            //- Correct patches after moving points
+            virtual void movePoints();
+
 
 public:
 
@@ -147,13 +150,13 @@ public:
 
         // Access functions for geometrical data
 
-            //- Return face normals
-            //  Reconsider. HJ, 11/Dec/2017
-            tmp<vectorField> nf() const;
+            // //- Return face normals
+            // //  Reconsider. HJ, 11/Dec/2017
+            // tmp<vectorField> nf() const;
 
-            //- Return cell-centre to face-centre vector
-            //  Reconsider. HJ, 11/Dec/2017
-            virtual tmp<vectorField> delta() const;
+            // //- Return cell-centre to face-centre vector
+            // //  Reconsider. HJ, 11/Dec/2017
+            // virtual tmp<vectorField> delta() const;
 
 
         // Access to immersed boundary components

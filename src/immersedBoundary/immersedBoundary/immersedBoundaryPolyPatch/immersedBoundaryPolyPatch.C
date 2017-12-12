@@ -56,7 +56,7 @@ const Foam::debug::tolerancesSwitch
 Foam::immersedBoundaryPolyPatch::liveFactor_
 (
     "immersedBoundaryLiveFactor",
-    1e-7
+    1e-4
 );
 
 
@@ -338,13 +338,11 @@ void Foam::immersedBoundaryPolyPatch::calcImmersedBoundary() const
                 if (cellFactor < liveFactor_())
                 {
                     // Thin cut: cell is dry
-                    Info<< "Dry cell from intersection" << cellI << endl;
                     intersectedCell[cellI] = immersedPoly::DRY;
                 }
                 else if (cellFactor > (1 - liveFactor_()))
                 {
                     // Thick cut: cell is wet
-                    Info<< "Wet cell from intersection" << cellI << endl;
                     intersectedCell[cellI] = immersedPoly::WET;
                 }
                 else
@@ -845,28 +843,6 @@ void Foam::immersedBoundaryPolyPatch::calcImmersedBoundary() const
 }
 
 
-void Foam::immersedBoundaryPolyPatch::clearOut()
-{
-    deleteDemandDrivenData(triSurfSearchPtr_);
-    deleteDemandDrivenData(ibPatchPtr_);
-    deleteDemandDrivenData(ibCellsPtr_);
-    deleteDemandDrivenData(ibCellCentresPtr_);
-    deleteDemandDrivenData(ibFacesPtr_);
-    deleteDemandDrivenData(ibFaceCentresPtr_);
-    deleteDemandDrivenData(nearestTriPtr_);
-    deleteDemandDrivenData(deadCellsPtr_);
-    deleteDemandDrivenData(deadFacesPtr_);
-
-    deleteDemandDrivenData(correctedCellCentresPtr_);
-    deleteDemandDrivenData(correctedFaceCentresPtr_);
-    deleteDemandDrivenData(correctedCellVolumesPtr_);
-    deleteDemandDrivenData(correctedFaceAreasPtr_);
-    deleteDemandDrivenData(correctedIbPatchFaceAreasPtr_);
-}
-
-
-// * * * * * * * * * * * * Protected Member Functions  * * * * * * * * * * * //
-
 void Foam::immersedBoundaryPolyPatch::calcCorrectedGeometry() const
 {
     if (debug)
@@ -1005,8 +981,20 @@ void Foam::immersedBoundaryPolyPatch::calcCorrectedGeometry() const
 }
 
 
+// * * * * * * * * * * * * Protected Member Functions  * * * * * * * * * * * //
+
 void Foam::immersedBoundaryPolyPatch::movePoints(const pointField& p)
 {
+    if (debug)
+    {
+        InfoIn
+        (
+            "void immersedBoundaryPolyPatch::"
+            "movePoints(const pointField&) const"
+        )   << "creating triSurface search algorithm"
+            << endl;
+    }
+
     // Handle motion of immersed boundary
     clearOut();
 
@@ -1450,6 +1438,48 @@ void Foam::immersedBoundaryPolyPatch::moveTriSurfacePoints
     );
 
     clearOut();
+}
+
+
+void Foam::immersedBoundaryPolyPatch::clearGeom()
+{
+    clearOut();
+}
+
+
+void Foam::immersedBoundaryPolyPatch::clearAddressing()
+{
+    clearOut();
+}
+
+
+void Foam::immersedBoundaryPolyPatch::clearOut() const
+{
+    if (debug)
+    {
+        InfoIn("void immersedBoundaryPolyPatch::clearOut() const")
+            << "Clear immersed boundary polyPatch"
+            << endl;
+    }
+
+    deleteDemandDrivenData(triSurfSearchPtr_);
+
+    deleteDemandDrivenData(ibPatchPtr_);
+    deleteDemandDrivenData(ibCellsPtr_);
+    deleteDemandDrivenData(ibCellCentresPtr_);
+    deleteDemandDrivenData(ibCellVolumesPtr_);
+    deleteDemandDrivenData(ibFacesPtr_);
+    deleteDemandDrivenData(ibFaceCentresPtr_);
+    deleteDemandDrivenData(ibFaceAreasPtr_);
+    deleteDemandDrivenData(nearestTriPtr_);
+    deleteDemandDrivenData(deadCellsPtr_);
+    deleteDemandDrivenData(deadFacesPtr_);
+
+    deleteDemandDrivenData(correctedCellCentresPtr_);
+    deleteDemandDrivenData(correctedFaceCentresPtr_);
+    deleteDemandDrivenData(correctedCellVolumesPtr_);
+    deleteDemandDrivenData(correctedFaceAreasPtr_);
+    deleteDemandDrivenData(correctedIbPatchFaceAreasPtr_);
 }
 
 

@@ -152,13 +152,8 @@ class immersedBoundaryPolyPatch
 
     // Private Member Functions
 
-        // Storage management
-
-            //- Clear all demand-driven data
-            void clearOut();
-
-            //- Check cell intersection
-            vector cellSpan(const label cellID) const;
+        //- Check cell intersection
+        vector cellSpan(const label cellID) const;
 
 
         // Make demand-driven data
@@ -359,6 +354,15 @@ public:
 
             //- Correct patches after moving points
             void moveTriSurfacePoints(const pointField& p);
+
+            //- Clear geometry
+            virtual void clearGeom();
+
+            //- Clear addressing
+            virtual void clearAddressing();
+
+            //- Clear all demand-driven data
+            void clearOut() const;
 
 
         //- Write

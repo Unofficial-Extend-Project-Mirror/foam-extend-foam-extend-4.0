@@ -282,6 +282,8 @@ void mixedIbFvPatchField<Type>::evaluate
     const Pstream::commsTypes
 )
 {
+    this->updateIbValues();
+
     // Set dead value
     this->setDeadValues();
 

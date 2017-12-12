@@ -147,16 +147,14 @@ public:
             virtual void autoMap
             (
                 const fvPatchFieldMapper&
-            )
-            {}
+            );
 
             //- Reverse map the given fvsPatchField onto this fvsPatchField
             virtual void rmap
             (
                 const fvPatchField<Type>&,
                 const labelList&
-            )
-            {}
+            );
 
 
     // Member functions

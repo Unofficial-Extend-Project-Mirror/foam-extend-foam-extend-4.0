@@ -147,6 +147,13 @@ void Foam::immersedBoundaryFvPatch::makeCorrVecs(fvsPatchVectorField& cv) const
 }
 
 
+void Foam::immersedBoundaryFvPatch::movePoints()
+{
+    Info<< "immersedBoundaryFvPatch::movePoints()" << endl;
+    ibPolyPatch_.clearOut();
+}
+
+
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 Foam::immersedBoundaryFvPatch::immersedBoundaryFvPatch
@@ -158,7 +165,9 @@ Foam::immersedBoundaryFvPatch::immersedBoundaryFvPatch
     fvPatch(patch, bm),
     ibPolyPatch_(refCast<const immersedBoundaryPolyPatch>(patch)),
     mesh_(bm.mesh())
-{}
+{
+    ibPolyPatch_.clearOut();
+}
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
@@ -178,16 +187,16 @@ Foam::immersedBoundaryFvPatch::faceCells() const
 }
 
 
-Foam::tmp<Foam::vectorField> Foam::immersedBoundaryFvPatch::nf() const
-{
-    return ibPolyPatch_.ibPatch().faceNormals();
-}
+// Foam::tmp<Foam::vectorField> Foam::immersedBoundaryFvPatch::nf() const
+// {
+//     return ibPolyPatch_.ibPatch().faceNormals();
+// }
 
 
-Foam::tmp<Foam::vectorField> Foam::immersedBoundaryFvPatch::delta() const
-{
-    return ibPolyPatch_.ibPatch().faceCentres() - ibPolyPatch_.ibCellCentres();
-}
+// Foam::tmp<Foam::vectorField> Foam::immersedBoundaryFvPatch::delta() const
+// {
+//     return ibPolyPatch_.ibPatch().faceCentres() - ibPolyPatch_.ibCellCentres();
+// }
 
 
 // ************************************************************************* //
