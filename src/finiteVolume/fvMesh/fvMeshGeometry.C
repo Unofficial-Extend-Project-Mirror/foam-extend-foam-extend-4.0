@@ -117,7 +117,7 @@ void fvMesh::makeMagSf() const
         mag(Sf()) + dimensionedScalar("vs", dimArea, VSMALL)
     );
 
-    // Note: boundaryupdated not required, as magSf is calculated from Sf
+    // Note: boundary update not required, as magSf is calculated from Sf
     // HJ, 29/Nov/2017
 }
 
