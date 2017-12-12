@@ -187,7 +187,6 @@ void Foam::surfaceInterpolation::makeWeights() const
         );
     }
 
-
     if (debug)
     {
         Info<< "surfaceInterpolation::makeWeights() : "
