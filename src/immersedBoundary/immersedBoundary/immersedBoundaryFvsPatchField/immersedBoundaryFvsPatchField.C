@@ -39,7 +39,6 @@ void immersedBoundaryFvsPatchField<Type>::updateSize()
 {
     if (this->patch().size() != this->size())
     {
-        Info<< "RESIZING immersedBoundaryFvsPatchField" << endl;
         this->setSize(this->patch().size());
     }
 }
@@ -115,7 +114,6 @@ void immersedBoundaryFvsPatchField<Type>::autoMap
     const fvPatchFieldMapper& m
 )
 {
-    Info<< "immersedBoundaryFvsPatchField<Type><Type>::autoMap" << endl;
     Field<Type>::operator=
     (
         Field<Type>(this->patch().size(), pTraits<Type>::zero)
@@ -143,7 +141,6 @@ void immersedBoundaryFvsPatchField<Type>::evaluate
     const Pstream::commsTypes
 )
 {
-    Info<< "immersedBoundaryFvsPatchField<Type>::evaluate" << endl;
     this->updateSize();
     Field<Type>::operator=
     (
