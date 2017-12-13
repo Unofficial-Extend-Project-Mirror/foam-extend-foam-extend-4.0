@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     3.2
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -22,23 +22,29 @@ License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    Foam::immersedBoundaryFvsPatchField
+    Foam::immersedBoundaryFvPatchField
 
 Description
-    Foam::immersedBoundaryFvsPatchField
+    Constrained immersedBoundaryFvPatchField of calculated functionality
+    with appropriate resizing on topo change or motion of the immersed surface.
+    The patch field shall take the values of intersected cells.
+
+    Note: This patch field is used instead of the calculated type in the
+    immersedBoundaryFvPatch.  It does not support discretisation.
+    For matrix operations, use the mixedIbFvPatchField.
 
 Author
     Hrvoje Jasak
 
 SourceFiles
-    immersedBoundaryFvsPatchField.C
+    immersedBoundaryFvPatchField.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef immersedBoundaryFvsPatchField_H
-#define immersedBoundaryFvsPatchField_H
+#ifndef immersedBoundaryFvPatchField_H
+#define immersedBoundaryFvPatchField_H
 
-#include "fvsPatchField.H"
+#include "fvPatchField.H"
 #include "immersedBoundaryFvPatch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -46,102 +52,91 @@ SourceFiles
 namespace Foam
 {
 
-// Forward declaration of classes
-
-template<class Type>
-class immersedBoundaryFvPatchField;
-
 /*---------------------------------------------------------------------------*\
-                  Class immersedBoundaryFvsPatch Declaration
+                  Class immersedBoundaryFvPatchField Declaration
 \*---------------------------------------------------------------------------*/
 
 template<class Type>
-class immersedBoundaryFvsPatchField
+class immersedBoundaryFvPatchField
 :
-    public fvsPatchField<Type>
+    public fvPatchField<Type>
 {
     // Private data
 
-        //- Local reference cast into the processor patch
+        //- Local reference to immersed boundary patch
         const immersedBoundaryFvPatch& ibPatch_;
-
-
-    // Private Member Functions
-
-        //- Update field size to match the patch
-        void updateSize();
 
 
 public:
 
-    //- Runtime type information
+    //- Runtime type information: constrained type
     TypeName(immersedBoundaryFvPatch::typeName_());
 
 
     // Constructors
 
         //- Construct from patch and internal field
-        immersedBoundaryFvsPatchField
+        immersedBoundaryFvPatchField
         (
             const fvPatch&,
-            const DimensionedField<Type, surfaceMesh>&
+            const DimensionedField<Type, volMesh>&
         );
 
         //- Construct from patch, internal field and dictionary
-        immersedBoundaryFvsPatchField
+        immersedBoundaryFvPatchField
         (
             const fvPatch&,
-            const DimensionedField<Type, surfaceMesh>&,
+            const DimensionedField<Type, volMesh>&,
             const dictionary&
         );
 
-        //- Construct by mapping given immersedBoundaryFvsPatchField
+        //- Construct by mapping given immersedBoundaryFvPatchField
         //  onto a new patch
-        immersedBoundaryFvsPatchField
+        immersedBoundaryFvPatchField
         (
-            const immersedBoundaryFvsPatchField<Type>&,
+            const immersedBoundaryFvPatchField<Type>&,
             const fvPatch&,
-            const DimensionedField<Type, surfaceMesh>&,
+            const DimensionedField<Type, volMesh>&,
             const fvPatchFieldMapper&
         );
 
         //- Construct as copy
-        immersedBoundaryFvsPatchField
+        immersedBoundaryFvPatchField
         (
-            const immersedBoundaryFvsPatchField<Type>&
+            const immersedBoundaryFvPatchField<Type>&
         );
 
         //- Construct and return a clone
-        virtual tmp<fvsPatchField<Type> > clone() const
+        virtual tmp<fvPatchField<Type> > clone() const
         {
-            return tmp<fvsPatchField<Type> >
+            return tmp<fvPatchField<Type> >
             (
-                new immersedBoundaryFvsPatchField<Type>(*this)
+                new immersedBoundaryFvPatchField<Type>(*this)
             );
         }
 
         //- Construct as copy setting internal field reference
-        immersedBoundaryFvsPatchField
+        immersedBoundaryFvPatchField
         (
-            const immersedBoundaryFvsPatchField<Type>&,
-            const DimensionedField<Type, surfaceMesh>&
+            const immersedBoundaryFvPatchField<Type>&,
+            const DimensionedField<Type, volMesh>&
         );
 
         //- Construct and return a clone setting internal field reference
-        virtual tmp<fvsPatchField<Type> > clone
+        virtual tmp<fvPatchField<Type> > clone
         (
-            const DimensionedField<Type, surfaceMesh>& iF
+            const DimensionedField<Type, volMesh>& iF
         ) const
         {
-            return tmp<fvsPatchField<Type> >
+            return tmp<fvPatchField<Type> >
             (
-                new immersedBoundaryFvsPatchField<Type>(*this, iF)
+                new immersedBoundaryFvPatchField<Type>(*this, iF)
             );
         }
 
 
     //- Destructor
-    virtual ~immersedBoundaryFvsPatchField()
+    virtual ~immersedBoundaryFvPatchField()
     {}
 
 
@@ -164,46 +159,27 @@ public:
                 const fvPatchFieldMapper&
             );
 
-            //- Reverse map the given fvsPatchField onto this fvsPatchField
+            //- Reverse map the given fvPatchField onto this fvPatchField
             virtual void rmap
             (
-                const fvsPatchField<Type>&,
+                const fvPatchField<Type>&,
                 const labelList&
             );
 
 
         // Evaluation functions
 
-            //- Evaluate the patch field, sets Updated to false
+            //- Evaluate the patch field
             virtual void evaluate
             (
                 const Pstream::commsTypes commsType = Pstream::blocking
             );
 
 
-        //- Write
-        virtual void write(Ostream&) const;
+        // I-O
 
-
-    // Member operators
-
-        // Note: All assignment operators can check size and resize
-        // Other operators cannot, as they assume an existing valid value
-        // HJ, 13/Dec/2017
-
-
-        virtual void operator=(const UList<Type>&);
-        virtual void operator=(const fvsPatchField<Type>&);
-        virtual void operator=(const fvPatchField<Type>&);
-
-        virtual void operator=(const Type&);
-
-
-        // Force an assignment irrespective of form of patch
-
-        virtual void operator==(const fvsPatchField<Type>&);
-        virtual void operator==(const Field<Type>&);
-        virtual void operator==(const Type&);
+            //- Write
+            virtual void write(Ostream&) const;
 };
 
 
@@ -214,7 +190,7 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-#   include "immersedBoundaryFvsPatchField.C"
+#   include "immersedBoundaryFvPatchField.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

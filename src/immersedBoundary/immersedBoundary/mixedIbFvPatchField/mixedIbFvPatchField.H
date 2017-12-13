@@ -47,7 +47,7 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                  Class mixedIbFvPatchField Declaration
+                    Class mixedIbFvPatchField Declaration
 \*---------------------------------------------------------------------------*/
 
 template<class Type>
@@ -176,11 +176,13 @@ public:
 
     // Member functions
 
-        //- Return reference to immersed boundary patch
-        const immersedBoundaryFvPatch& ibPatch() const
-        {
-            return ibPatch_;
-        }
+        // Access
+
+            //- Return reference to immersed boundary patch
+            const immersedBoundaryFvPatch& ibPatch() const
+            {
+                return ibPatch_;
+            }
 
 
         // Return defining fields

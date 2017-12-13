@@ -31,9 +31,6 @@ License
 namespace Foam
 {
 
-// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
-
-
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
 template<class Type>
@@ -320,8 +317,10 @@ void mixedIbFvPatchField<Type>::evaluate
 template<class Type>
 void mixedIbFvPatchField<Type>::write(Ostream& os) const
 {
-    // to resolve the post-processing issues.  HJ, 1/Dec/2017
+    // Resolve post-processing issues.  HJ, 1/Dec/2017
     fvPatchField<Type>::write(os);
+    os.writeKeyword("patchType")
+        << immersedBoundaryFvPatch::typeName << token::END_STATEMENT << nl;
     triValue_.writeEntry("triValue", os);
     triGrad_.writeEntry("triGradient", os);
     triValueFraction_.writeEntry("triValueFraction", os);
@@ -338,7 +337,7 @@ void mixedIbFvPatchField<Type>::write(Ostream& os) const
     {
         // Add parallel reduction of all faces and data to proc 0
         // and write the whola patch together
-        
+
         // Write immersed boundary data as a vtk file
         autoPtr<surfaceWriter<Type> > writerPtr =
             surfaceWriter<Type>::New("vtk");
