@@ -6,6 +6,8 @@ immersedBoundaryPointPatch/immersedBoundaryPointPatch.C
 immersedBoundaryFvPatch/immersedBoundaryFvPatch.C
 immersedBoundaryFvPatchField/immersedBoundaryFvPatchFields.C
 immersedBoundaryFvsPatchField/immersedBoundaryFvsPatchFields.C
+
 mixedIbFvPatchField/mixedIbFvPatchFields.C
+movingImmersedBoundaryVelocity/movingImmersedBoundaryVelocityFvPatchVectorField.C
 
 LIB = $(FOAM_LIBBIN)/libimmersedBoundary

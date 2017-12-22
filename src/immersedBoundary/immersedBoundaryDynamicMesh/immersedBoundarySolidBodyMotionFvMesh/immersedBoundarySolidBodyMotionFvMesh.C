@@ -41,9 +41,6 @@ namespace Foam
 }
 
 
-// * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
-
-
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 Foam::immersedBoundarySolidBodyMotionFvMesh::
@@ -67,7 +64,8 @@ immersedBoundarySolidBodyMotionFvMesh
             )
         ).subDict(typeName + "Coeffs")
     ),
-    ibMotions_()
+    ibMotions_(),
+    curTimeIndex_(-1)
 {
     // Read motion function for all regions
     PtrList<entry> motionDicts(dynamicMeshCoeffs_.lookup("motionFunctions"));
@@ -101,15 +99,28 @@ Foam::immersedBoundarySolidBodyMotionFvMesh::
 
 bool Foam::immersedBoundarySolidBodyMotionFvMesh::update()
 {
+    // Move points based on new motion
+    if (curTimeIndex_ < this->time().timeIndex())
+    {
+        // Grab old volumes before moving the mesh
+        setV0();
+
+        curTimeIndex_ = this->time().timeIndex();
+    }
+
     forAll (ibMotions_, ibI)
     {
         ibMotions_[ibI].movePoints();
     }
 
-    // Force quasi-topological cange to rebuild addressng on motion of the
+    // Force quasi-topological change to rebuild addressng on motion of the
     // immersed boundary
     // HJ, 12/Dec/2017
     fvMesh::syncUpdateMesh();
+
+    // Execute dummy mesh motion for the background mesh
+    const pointField oldPoints = allPoints();
+    fvMesh::movePoints(oldPoints);
 
     return true;
 }

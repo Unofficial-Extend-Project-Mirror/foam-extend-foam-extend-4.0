@@ -22,23 +22,21 @@ License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    Foam::mixedIbFvPatchField
+    Foam::movingImmersedBoundaryVelocityFvPatchVectorField
 
 Description
-    Foam::mixedIbFvPatchField
-
-Author
-    Hrvoje Jasak
+    Foam::movingImmersedBoundaryVelocityFvPatchVectorField
 
 SourceFiles
-    mixedIbFvPatchField.C
+    movingImmersedBoundaryVelocityFvPatchVectorField.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef mixedIbFvPatchField_H
-#define mixedIbFvPatchField_H
+#ifndef movingImmersedBoundaryVelocityFvPatchVectorField_H
+#define movingImmersedBoundaryVelocityFvPatchVectorField_H
 
-#include "mixedFvPatchFields.H"
+#include "fvPatchFields.H"
+#include "fixedValueFvPatchFields.H"
 #include "immersedBoundaryFvPatch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -47,31 +45,17 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                    Class mixedIbFvPatchField Declaration
+             Class movingImmersedBoundaryVelocityFvPatch Declaration
 \*---------------------------------------------------------------------------*/
 
-template<class Type>
-class mixedIbFvPatchField
+class movingImmersedBoundaryVelocityFvPatchVectorField
 :
-    public mixedFvPatchField<Type>
+    public fixedValueFvPatchVectorField
 {
     // Private data
 
         //- Local reference to immersed boundary patch
         const immersedBoundaryFvPatch& ibPatch_;
-
-        // Defining fields
-        // Note: defining fields carry values on faces of the IB patch
-        // represented as a triangulated surface
-
-            //- Defining value field
-            Field<Type> triValue_;
-
-            //- Defining normal gradient field
-            Field<Type> triGrad_;
-
-            //- Fraction (0-1) of value used for boundary condition
-            scalarField triValueFraction_;
 
 
         // Dead cell controls
@@ -80,13 +64,10 @@ class mixedIbFvPatchField
             Switch setDeadValue_;
 
             //- Dead cell value
-            Type deadValue_;
+            vector deadValue_;
 
 
     // Private Member Functions
-
-        //- Update IB value and gradient
-        void updateIbValues();
 
         //- Set value in dead cells
         void setDeadValues();
@@ -95,74 +76,70 @@ class mixedIbFvPatchField
 public:
 
     //- Runtime type information
-    TypeName("mixedIb");
+    TypeName("movingImmersedBoundaryVelocity");
 
 
     // Constructors
 
         //- Construct from patch and internal field
-        mixedIbFvPatchField
+        movingImmersedBoundaryVelocityFvPatchVectorField
         (
             const fvPatch&,
-            const DimensionedField<Type, volMesh>&
+            const DimensionedField<vector, volMesh>&
         );
 
         //- Construct from patch, internal field and dictionary
-        mixedIbFvPatchField
+        movingImmersedBoundaryVelocityFvPatchVectorField
         (
             const fvPatch&,
-            const DimensionedField<Type, volMesh>&,
+            const DimensionedField<vector, volMesh>&,
             const dictionary&
         );
 
-        //- Construct by mapping given mixedIbFvPatchField
+        //- Construct by mapping given
+        //  movingImmersedBoundaryVelocityFvPatchVectorField
         //  onto a new patch
-        mixedIbFvPatchField
+        movingImmersedBoundaryVelocityFvPatchVectorField
         (
-            const mixedIbFvPatchField<Type>&,
+            const movingImmersedBoundaryVelocityFvPatchVectorField&,
             const fvPatch&,
-            const DimensionedField<Type, volMesh>&,
+            const DimensionedField<vector, volMesh>&,
             const fvPatchFieldMapper&
         );
 
         //- Construct as copy
-        mixedIbFvPatchField
+        movingImmersedBoundaryVelocityFvPatchVectorField
         (
-            const mixedIbFvPatchField<Type>&
+            const movingImmersedBoundaryVelocityFvPatchVectorField&
         );
 
         //- Construct and return a clone
-        virtual tmp<fvPatchField<Type> > clone() const
+        virtual tmp<fvPatchVectorField> clone() const
         {
-            return tmp<fvPatchField<Type> >
+            return tmp<fvPatchVectorField>
             (
-                new mixedIbFvPatchField<Type>(*this)
+                new movingImmersedBoundaryVelocityFvPatchVectorField(*this)
             );
         }
 
         //- Construct as copy setting internal field reference
-        mixedIbFvPatchField
+        movingImmersedBoundaryVelocityFvPatchVectorField
         (
-            const mixedIbFvPatchField<Type>&,
-            const DimensionedField<Type, volMesh>&
+            const movingImmersedBoundaryVelocityFvPatchVectorField&,
+            const DimensionedField<vector, volMesh>&
         );
 
         //- Construct and return a clone setting internal field reference
-        virtual tmp<fvPatchField<Type> > clone
+        virtual tmp<fvPatchVectorField> clone
         (
-            const DimensionedField<Type, volMesh>& iF
+            const DimensionedField<vector, volMesh>& iF
         ) const
         {
-            return tmp<fvPatchField<Type> >
+            return tmp<fvPatchVectorField>
             (
-                new mixedIbFvPatchField<Type>(*this, iF)
+                new movingImmersedBoundaryVelocityFvPatchVectorField(*this, iF)
             );
         }
-
-
-    //- Destructor
-    virtual ~mixedIbFvPatchField()
-    {}
 
 
     // Member functions
@@ -176,64 +153,10 @@ public:
             }
 
 
-        // Return defining fields
-        // Note: defining fields carry values on faces of the IB patch
-        // represented as a triangulated surface
-
-            //- Return reference value
-            const Field<Type>& triValue() const
-            {
-                return triValue_;
-            }
-
-            //- Return access to reference value
-            Field<Type>& triValue()
-            {
-                return triValue_;
-            }
-
-            //- Return reference gradient
-            const Field<Type>& triGrad() const
-            {
-                return triGrad_;
-            }
-
-            //- Return access to reference gradient
-            Field<Type>& triGrad()
-            {
-                return triGrad_;
-            }
-
-            //- Return value fraction
-            virtual const scalarField& triValueFraction() const
-            {
-                return triValueFraction_;
-            }
-
-            //- Return access to value fraction
-            scalarField& triValueFraction()
-            {
-                return triValueFraction_;
-            }
-
-
-        // Mapping functions
-
-            //- Map (and resize as needed) from self given a mapping object
-            virtual void autoMap
-            (
-                const fvPatchFieldMapper&
-            );
-
-            //- Reverse map the given fvPatchField onto this fvPatchField
-            virtual void rmap
-            (
-                const fvPatchField<Type>&,
-                const labelList&
-            );
-
-
         // Evaluation functions
+
+            //- Update the coefficients associated with the patch field
+            virtual void updateCoeffs();
 
             //- Evaluate the patch field
             virtual void evaluate
@@ -252,12 +175,6 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-#ifdef NoRepository
-#   include "mixedIbFvPatchField.C"
-#endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

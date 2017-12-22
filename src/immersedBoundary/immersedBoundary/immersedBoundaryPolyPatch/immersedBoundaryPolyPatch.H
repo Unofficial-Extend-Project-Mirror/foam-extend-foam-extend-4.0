@@ -150,6 +150,12 @@ class immersedBoundaryPolyPatch
             mutable vectorField* correctedIbPatchFaceAreasPtr_;
 
 
+        // Immersed boundary motion
+
+            //- Old points
+            mutable pointField* oldIbPointsPtr_;
+
+
     // Private Member Functions
 
         //- Check cell intersection
@@ -350,10 +356,22 @@ public:
             const vectorField& correctedIbPatchFaceAreas() const;
 
 
-        // Edit
+        // Immersed boundary motion
 
             //- Correct patches after moving points
             void moveTriSurfacePoints(const pointField& p);
+
+            //- Return old IB points
+            const pointField& oldIbPoints() const;
+
+            //- Motion distance vector for triangular immersed boundary faces
+            tmp<vectorField> triMotionDistance() const;
+
+            //- Motion distance vector for active immersed boundary faces
+            tmp<vectorField> motionDistance() const;
+
+
+        // Clear
 
             //- Clear geometry
             virtual void clearGeom();

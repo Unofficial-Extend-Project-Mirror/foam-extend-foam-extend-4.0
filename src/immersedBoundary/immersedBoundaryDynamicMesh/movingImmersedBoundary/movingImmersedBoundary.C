@@ -88,56 +88,11 @@ void Foam::movingImmersedBoundary::movePoints() const
     immersedBoundaryPolyPatch& ibPatch =
         const_cast<immersedBoundaryPolyPatch&>(cibPatch);
 
-    const vectorField oldIbPoints = ibPatch.ibMesh().coordinates();
-
     // Move points
     ibPatch.moveTriSurfacePoints
     (
         transform(sbmfPtr_->transformation(), refIbSurface_.points())
     );
-
-    // Get non-const reference to velocity field
-    if (mesh().foundObject<volVectorField>("U"))
-    {
-        volVectorField& U = const_cast<volVectorField&>
-        (
-            mesh().lookupObject<volVectorField>("U")
-        );
-
-        if (isA<mixedIbFvPatchVectorField>(U.boundaryField()[patchID]))
-        {
-            // Get non-const reference to patch field
-            mixedIbFvPatchVectorField& ibPatchField =
-                refCast<mixedIbFvPatchVectorField>
-                (
-                    U.boundaryField()[patchID]
-                );
-
-            // Set refValue_ to moving boundary velocity
-            ibPatchField.triValue() =
-                (ibPatch.ibMesh().coordinates() - oldIbPoints)/
-                mesh().time().deltaT().value();
-        }
-        else
-        {
-            InfoIn
-            (
-                "void movingImmersedBoundary::movePoints() const"
-            )   <<  "Velocity field for patch "
-                << name() << "is not a mixedIb type.  "
-                << "Immersed boundary velocity is not updated"
-                << endl;
-        }
-    }
-    else
-    {
-        InfoIn
-        (
-            "void movingImmersedBoundary::movePoints() const"
-        )   <<  "Velocity field not found for patch "
-            << name() << ".  Immersed boundary velocity is not updated"
-            << endl;
-    }
 }
 
 

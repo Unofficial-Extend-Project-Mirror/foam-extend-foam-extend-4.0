@@ -106,14 +106,22 @@ protected:
             //- Make mesh cell volumes
             virtual void makeV(scalarField&) const;
 
+            //- Update mesh motion fluxes
+            virtual void updatePhi
+            (
+                DimensionedField<scalar, volMesh>& V,
+                DimensionedField<scalar, volMesh>& V0,
+                surfaceScalarField& phi
+            ) const;
+
 
         // Discretisation correction functions
 
             //- Make patch face non-orthogonality correction vectors
             virtual void makeCorrVecs(fvsPatchVectorField&) const;
 
-            //- Correct patches after moving points
-            virtual void movePoints();
+            // //- Correct patches after moving points
+            // virtual void movePoints();
 
 
 public:

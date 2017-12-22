@@ -192,6 +192,7 @@ void immersedBoundaryFvPatchField<Type>::write(Ostream& os) const
 
     // The value entry needs to be written with zero size
     Field<Type>::null().writeEntry("value", os);
+    // this->writeEntry("value", os);
 
     // Write VTK on master only
     if (Pstream::master())

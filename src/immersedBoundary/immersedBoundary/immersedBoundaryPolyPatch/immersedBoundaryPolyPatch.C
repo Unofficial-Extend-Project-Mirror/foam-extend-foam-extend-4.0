@@ -56,7 +56,7 @@ const Foam::debug::tolerancesSwitch
 Foam::immersedBoundaryPolyPatch::liveFactor_
 (
     "immersedBoundaryLiveFactor",
-    1e-4
+    1e-3
 );
 
 
@@ -207,7 +207,7 @@ void Foam::immersedBoundaryPolyPatch::calcImmersedBoundary() const
     // Used for sizing of dynamic list only
     // HJ, 11/Dec/2017
     label nIntersectedCells = 0;
-    
+
     // Go through the faces at the interface between a live and dead cell
     // and mark the band of possible intersections
     forAll (intersectedCell, cellI)
@@ -412,7 +412,7 @@ void Foam::immersedBoundaryPolyPatch::calcImmersedBoundary() const
                 renumberedFace[fpI] = nIbPoints;
                 nIbPoints++;
             }
-            
+
             // Record the face
             unmergedFaces[nIbCells] = renumberedFace;
 
@@ -460,7 +460,7 @@ void Foam::immersedBoundaryPolyPatch::calcImmersedBoundary() const
                 renumberedFace[fpI] = nIbPoints;
                 nIbPoints++;
             }
-            
+
             // Record the face
             unmergedFaces[nIbCells] = renumberedFace;
 
@@ -505,7 +505,7 @@ void Foam::immersedBoundaryPolyPatch::calcImmersedBoundary() const
             << "Cannot find nearestTri for all points"
             << abort(FatalError);
     }
-    
+
     // Build stand-alone patch
     // Memory management
     {
@@ -541,18 +541,29 @@ void Foam::immersedBoundaryPolyPatch::calcImmersedBoundary() const
         // Create IB patch from renumbered points and faces
         ibPatchPtr_ = new standAlonePatch(ibPatchFaces, ibPatchPoints);
 
-        Info << "Writing immersed patch as VTK" << endl;
+        if (mesh.time().outputTime())
+        {
+            Info << "Writing immersed patch as VTK" << endl;
 
-        fileName fvPath(mesh.time().path()/"VTK");
-        mkDir(fvPath);
+            fileName fvPath(mesh.time().path()/"VTK");
+            mkDir(fvPath);
 
-        OStringStream outputFilename;
-        outputFilename << "immersed" << name();
+            fileName surfaceFileName
+            (
+                "immersed" + name() + "_live_"
+              + Foam::name(boundaryMesh().mesh().time().timeIndex())
+            );
 
-        ibPatchPtr_->writeVTK(fvPath/fileName(outputFilename.str()));
+            ibPatchPtr_->writeVTK(fvPath/surfaceFileName);
 
-        outputFilename << "normals";
-        ibPatchPtr_->writeVTKNormals(fvPath/fileName(outputFilename.str()));
+            fileName normalsFileName
+            (
+                "normals" + name() + "_live_"
+              + Foam::name(boundaryMesh().mesh().time().timeIndex())
+            );
+
+            ibPatchPtr_->writeVTKNormals(fvPath/normalsFileName);
+        }
     }
 
     // Count and collect dead cells
@@ -969,12 +980,13 @@ void Foam::immersedBoundaryPolyPatch::calcCorrectedGeometry() const
          && mag(sumSf[ccc] + ibSf[cutCellI])/cutCellVolumes[cutCellI] > 1e-6
         )
         {
-            Info<< "Marooney Maneouvre for cell " << ccc
-                << " error: " << mag(sumSf[ccc] + ibSf[cutCellI]) << " "
-                << mag(sumSf[ccc] + ibSf[cutCellI])/cutCellVolumes[cutCellI]
-                << " " << sumSf[ccc] << " "
-                << " V: " << cutCellVolumes[cutCellI]
-                << " Sf: " << ibSf[cutCellI] << endl;
+            // Info<< "Marooney Maneouvre for cell " << ccc
+            //     << " error: " << mag(sumSf[ccc] + ibSf[cutCellI]) << " "
+            //     << mag(sumSf[ccc] + ibSf[cutCellI])/cutCellVolumes[cutCellI]
+            //     << " " << sumSf[ccc] << " "
+            //     << " V: " << cutCellVolumes[cutCellI]
+            //     << " Sf: " << ibSf[cutCellI] << endl;
+
             ibSf[cutCellI] = -sumSf[ccc];
         }
     }
@@ -991,14 +1003,20 @@ void Foam::immersedBoundaryPolyPatch::movePoints(const pointField& p)
         (
             "void immersedBoundaryPolyPatch::"
             "movePoints(const pointField&) const"
-        )   << "creating triSurface search algorithm"
+        )   << "Moving mesh: immersedBoundary update"
             << endl;
     }
 
-    // Handle motion of immersed boundary
-    clearOut();
+    // Handle motion of the mesh for new immersed boundary position
+    if (ibUpdateTimeIndex_ < boundaryMesh().mesh().time().timeIndex())
+    {
+        // New motion in the current time step.  Clear
+        ibUpdateTimeIndex_ = boundaryMesh().mesh().time().timeIndex();
 
-    primitivePatch::movePoints(p);
+        clearOut();
+    }
+
+    polyPatch::movePoints(p);
 }
 
 
@@ -1043,7 +1061,8 @@ Foam::immersedBoundaryPolyPatch::immersedBoundaryPolyPatch
     correctedFaceCentresPtr_(NULL),
     correctedCellVolumesPtr_(NULL),
     correctedFaceAreasPtr_(NULL),
-    correctedIbPatchFaceAreasPtr_(NULL)
+    correctedIbPatchFaceAreasPtr_(NULL),
+    oldIbPointsPtr_(NULL)
 {}
 
 
@@ -1087,7 +1106,8 @@ Foam::immersedBoundaryPolyPatch::immersedBoundaryPolyPatch
     correctedFaceCentresPtr_(NULL),
     correctedCellVolumesPtr_(NULL),
     correctedFaceAreasPtr_(NULL),
-    correctedIbPatchFaceAreasPtr_(NULL)
+    correctedIbPatchFaceAreasPtr_(NULL),
+    oldIbPointsPtr_(NULL)
 {
     if (size() > 0)
     {
@@ -1145,7 +1165,8 @@ Foam::immersedBoundaryPolyPatch::immersedBoundaryPolyPatch
     correctedFaceCentresPtr_(NULL),
     correctedCellVolumesPtr_(NULL),
     correctedFaceAreasPtr_(NULL),
-    correctedIbPatchFaceAreasPtr_(NULL)
+    correctedIbPatchFaceAreasPtr_(NULL),
+    oldIbPointsPtr_(NULL)
 {}
 
 
@@ -1188,7 +1209,8 @@ Foam::immersedBoundaryPolyPatch::immersedBoundaryPolyPatch
     correctedFaceCentresPtr_(NULL),
     correctedCellVolumesPtr_(NULL),
     correctedFaceAreasPtr_(NULL),
-    correctedIbPatchFaceAreasPtr_(NULL)
+    correctedIbPatchFaceAreasPtr_(NULL),
+    oldIbPointsPtr_(NULL)
 {}
 
 
@@ -1197,6 +1219,8 @@ Foam::immersedBoundaryPolyPatch::immersedBoundaryPolyPatch
 Foam::immersedBoundaryPolyPatch::~immersedBoundaryPolyPatch()
 {
     clearOut();
+
+    deleteDemandDrivenData(oldIbPointsPtr_);
 }
 
 
@@ -1393,6 +1417,47 @@ Foam::immersedBoundaryPolyPatch::correctedIbPatchFaceAreas() const
 }
 
 
+const Foam::pointField&
+Foam::immersedBoundaryPolyPatch::oldIbPoints() const
+{
+    if (!oldIbPointsPtr_)
+    {
+        // The mesh has never moved: old points are equal to current points
+        ibUpdateTimeIndex_ = boundaryMesh().mesh().time().timeIndex();
+
+        oldIbPointsPtr_ = new pointField(ibMesh_.points());
+    }
+
+    return *oldIbPointsPtr_;
+}
+
+Foam::tmp<Foam::vectorField>
+Foam::immersedBoundaryPolyPatch::triMotionDistance() const
+{
+    // Calculate the distance between new and old coordinates on
+    // the ibPatch face centres
+
+    // Calculate the motion on the triangular mesh face centres
+    return ibMesh_.coordinates()
+      - PrimitivePatch<labelledTri, List, const pointField&>
+        (
+            ibMesh_,
+            oldIbPoints()
+        ).faceCentres();
+}
+
+
+Foam::tmp<Foam::vectorField>
+Foam::immersedBoundaryPolyPatch::motionDistance() const
+{
+    // Interpolate the values from tri surface using nearest triangle
+    return tmp<vectorField>
+    (
+        new vectorField(triMotionDistance(), nearestTri())
+    );
+}
+
+
 void Foam::immersedBoundaryPolyPatch::moveTriSurfacePoints
 (
     const pointField& p
@@ -1418,26 +1483,42 @@ void Foam::immersedBoundaryPolyPatch::moveTriSurfacePoints
             << abort(FatalError);
     }
 
+    if (ibUpdateTimeIndex_ < boundaryMesh().mesh().time().timeIndex())
+    {
+        // New motion in the current time step.  Store old points
+        ibUpdateTimeIndex_ = boundaryMesh().mesh().time().timeIndex();
+
+        deleteDemandDrivenData(oldIbPointsPtr_);
+        Info<< "Storing old points for time index " << ibUpdateTimeIndex_
+            << endl;
+        oldIbPointsPtr_ = new pointField(oldPoints);
+    }
+
     Info<< "Moving immersed boundary points for patch " << name()
         << endl;
 
     ibMesh_.movePoints(p);
 
-    fileName path(boundaryMesh().mesh().time().path()/"VTK");
+    if (boundaryMesh().mesh().time().outputTime())
+    {
+        fileName path(boundaryMesh().mesh().time().path()/"VTK");
 
-    mkDir(path);
-    ibMesh_.triSurface::write
-    (
-        path/
-        word
+        mkDir(path);
+        ibMesh_.triSurface::write
         (
-            name() + "_"
-          + Foam::name(boundaryMesh().mesh().time().timeIndex())
-          + ".stl"
-        )
-    );
+            path/
+            word
+            (
+                name() + "_tri_"
+                + Foam::name(boundaryMesh().mesh().time().timeIndex())
+                + ".stl"
+            )
+        );
+    }
 
-    clearOut();
+    // Note: the IB patch is now in the new position, but the mesh has not
+    // been updated yet.  movePoints() needs to be executed to update the
+    // fv mesh data
 }
 
 
@@ -1480,6 +1561,8 @@ void Foam::immersedBoundaryPolyPatch::clearOut() const
     deleteDemandDrivenData(correctedCellVolumesPtr_);
     deleteDemandDrivenData(correctedFaceAreasPtr_);
     deleteDemandDrivenData(correctedIbPatchFaceAreasPtr_);
+
+    // Cannot delete old motion points.  HJ, 10/Dec/2017
 }
 
 

@@ -61,6 +61,9 @@ class immersedBoundarySolidBodyMotionFvMesh
         //- Immersed boundary motion control function
         PtrList<movingImmersedBoundary> ibMotions_;
 
+        //- Current mesh motion time index
+        label curTimeIndex_;
+
 
     // Private Member Functions
 

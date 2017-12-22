@@ -36,7 +36,7 @@ namespace Foam
 template<class Type>
 void mixedIbFvPatchField<Type>::updateIbValues()
 {
-    // Interpolate the values form tri surface using nearest triangle
+    // Interpolate the values from tri surface using nearest triangle
     const labelList& nt = ibPatch_.ibPolyPatch().nearestTri();
 
     this->refValue() = Field<Type>(triValue_, nt);
@@ -59,37 +59,6 @@ void mixedIbFvPatchField<Type>::setDeadValues()
         forAll (dc, dcI)
         {
             psiI[dc[dcI]] = deadValue_;
-        }
-    }
-}
-
-
-template<class Type>
-void mixedIbFvPatchField<Type>::correctDiag
-(
-    fvMatrix<Type>& eqn
-) const
-{
-    scalarField& Diag = eqn.diag();
-
-    const labelList& deadCells = ibPatch_.ibPolyPatch().deadCells();
-
-    // Estimate diagonal in live cells
-    scalar liveDiag = 1;
-
-    if (deadCells.size() < Diag.size())
-    {
-        liveDiag = gSumMag(Diag)/(Diag.size() - deadCells.size());
-
-        // Correct for sign
-        liveDiag *= sign(gMax(Diag));
-    }
-
-    forAll (deadCells, cellI)
-    {
-        if (mag(Diag[deadCells[cellI]]) < SMALL)
-        {
-            Diag[deadCells[cellI]] = liveDiag;
         }
     }
 }
@@ -289,31 +258,6 @@ void mixedIbFvPatchField<Type>::evaluate
 }
 
 
-// template<class Type>
-// void mixedIbFvPatchField<Type>::manipulateMatrix
-// (
-//     fvMatrix<Type>& eqn
-// )
-// {
-//     // Build matrix diagonal for cells where it is missing
-//     this->correctDiag(eqn);
-
-//     // Set values in IB cells
-//     Field<Type> polyPsi(eqn.psi(), ibPatch_.ibCells());
-//     eqn.setValues(ibPatch_.ibCells(), polyPsi);
-
-//     // Correct equation for dead cells
-//     Field<Type> deadCellsPsi
-//     (
-//         ibPatch_.deadCells().size(),
-//         deadValue_
-//     );
-//     eqn.setValues(ibPatch_.deadCells(), deadCellsPsi);
-
-//     fvPatchField<Type>::manipulateMatrix(eqn);
-// }
-
-
 template<class Type>
 void mixedIbFvPatchField<Type>::write(Ostream& os) const
 {
@@ -331,6 +275,7 @@ void mixedIbFvPatchField<Type>::write(Ostream& os) const
 
     // The value entry needs to be written with zero size
     Field<Type>::null().writeEntry("value", os);
+    // this->writeEntry("value", os);
 
     // Write VTK on master only
     if (Pstream::master())
