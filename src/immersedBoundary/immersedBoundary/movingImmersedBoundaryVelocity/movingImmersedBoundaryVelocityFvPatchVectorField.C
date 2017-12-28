@@ -197,6 +197,13 @@ void Foam::movingImmersedBoundaryVelocityFvPatchVectorField::write
 ) const
 {
     fvPatchVectorField::write(os);
+    os.writeKeyword("patchType")
+        << immersedBoundaryFvPatch::typeName << token::END_STATEMENT << nl;
+    os.writeKeyword("setDeadValue")
+        << setDeadValue_ << token::END_STATEMENT << nl;
+    os.writeKeyword("deadValue")
+        << deadValue_ << token::END_STATEMENT << nl;
+
     vectorField::null().writeEntry("value", os);
     // writeEntry("value", os);
 
