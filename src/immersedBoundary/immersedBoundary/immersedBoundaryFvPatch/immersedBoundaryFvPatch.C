@@ -78,7 +78,6 @@ void Foam::immersedBoundaryFvPatch::makeSf(slicedSurfaceVectorField& Sf) const
     // HJ, 30/Nov/2017
     Sf.boundaryField()[index()].UList::operator=
     (
-        // vectorField::subField(ibPolyPatch_.ibPatch().areas(), size())
         vectorField::subField(ibPolyPatch_.correctedIbPatchFaceAreas(), size())
     );
 }
@@ -152,11 +151,10 @@ void Foam::immersedBoundaryFvPatch::updatePhi
 
     // Check and adjust the immersed boundary space conservation law
     // The mesh motion fluxes come from the actual mesh motion or the motion
-    // of the oimmersed boundary
+    // of the immersed boundary
     // The new cell volumes come from the current mesh configuration
-    // Neither can be touched.
-    // The space conservation law will be satisfied by adjusting the old cell
-    // volume.  HJ, 15/Dec/2017
+    // The space conservation law will be satisfied by adjusting either
+    // the old or the new cell volume.  HJ, 15/Dec/2017
 
     // First sum up all the fluxes
     scalarField divPhi(mesh.nCells(), 0);
@@ -201,16 +199,14 @@ void Foam::immersedBoundaryFvPatch::updatePhi
     {
         if (magDivPhi[cellI] > SMALL)
         {
-            scalar corrOldVol = V[cellI] - divPhi[cellI]*deltaT;
+            // Attempt to correct via old volume
+            scalar corrOldVol = newVols[cellI] - divPhi[cellI]*deltaT;
+
             // Info<< "Flux maneouvre for cell " << cellI << ": "
-            //     << " V: " << V[cellI]
+            //     << " V: " << newVols[cellI]
             //     << " V0: " << oldVols[cellI]
             //     << " divPhi: " << divPhi[cellI]
-            //     << " Vcorr: " << corrOldVol
-            //     << " error: " << magDivPhi[cellI]
-            //     << " corr: "
-            //     << (V[cellI] - Foam::max(corrOldVol, SMALL))*rDeltaT - divPhi[cellI]
-            //     << endl;
+            //     << " error: " << magDivPhi[cellI];
 
             if (corrOldVol < SMALL)
             {
