@@ -56,7 +56,7 @@ const Foam::debug::tolerancesSwitch
 Foam::immersedBoundaryPolyPatch::liveFactor_
 (
     "immersedBoundaryLiveFactor",
-    1e-3
+    1e-5
 );
 
 
@@ -69,8 +69,8 @@ Foam::vector Foam::immersedBoundaryPolyPatch::cellSpan
 {
     const polyMesh& mesh = boundaryMesh().mesh();
 
-    // Calculate span as twice the bounding box size
-    const scalar delta = 2*cmptMax
+    // Calculate span from the bounding box size
+    const scalar delta = 3*cmptMax
     (
         boundBox
         (
