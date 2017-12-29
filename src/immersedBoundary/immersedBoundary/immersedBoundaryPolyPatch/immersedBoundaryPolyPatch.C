@@ -491,147 +491,146 @@ void Foam::immersedBoundaryPolyPatch::calcImmersedBoundary() const
     }
 
     // Check coupled boundaries for direct face cuts
-    // Memory management
+
+    // Assemble local and neighbour cuts for coupled patches only
+    labelListList coupledPatchOwnCut(bMesh.size());
+    labelListList coupledPatchNbrCut(bMesh.size());
+
+    // Note: this part requires a rewrite using virtual functions
+    // to communicate the cut data from the shadow cell
+    // (across the coupled interface) in order to determine
+    // the coupled face status.
+    // Currently, this is enabled only for processor boundaries.
+    // HJ, 28/Dec/2017
+
+    // Send loop
+    forAll (bMesh, patchI)
     {
-        labelListList ownCut(bMesh.size());
-        labelListList nbrCut(bMesh.size());
-
-        // Note: this part requires a rewrite using virtual functions
-        // to communicate the cut data from the shadow cell
-        // (across the coupled interface) in order to determine
-        // the coupled face status.
-        // Currently, this is enabled only for processor boundaries.
-        // HJ, 28/Dec/2017
-
-        // Send loop
-        forAll (bMesh, patchI)
+        if (bMesh[patchI].coupled())
         {
-            if (bMesh[patchI].coupled())
+            if (isA<processorPolyPatch>(bMesh[patchI]))
             {
-                if (isA<processorPolyPatch>(bMesh[patchI]))
+                if (Pstream::parRun())
                 {
-                    if (Pstream::parRun())
-                    {
-                        const processorPolyPatch& curProcPatch =
-                            refCast<const processorPolyPatch>(bMesh[patchI]);
-                
-                        // Send internal cut
-                        ownCut[patchI] = labelList
-                        (
-                            intersectedCell,
-                            bMesh[patchI].faceCells()
-                        );
-
-                        OPstream toNeighbProc
-                        (
-                            Pstream::blocking,
-                            curProcPatch.neighbProcNo(),
-                            sizeof(label)*curProcPatch.size()
-                        );
-
-                        toNeighbProc << ownCut[patchI];
-                    }
-                }
-                else
-                {
-                    WarningIn
+                    const processorPolyPatch& curProcPatch =
+                        refCast<const processorPolyPatch>(bMesh[patchI]);
+            
+                    // Send internal cut
+                    coupledPatchOwnCut[patchI] = labelList
                     (
-                        "void immersedBoundaryPolyPatch::"
-                        "calcImmersedBoundary() const"
-                    )   << "Non-processor coupled patch detected for "
-                        << "immersed boundary.  "
-                        << "Direct face cut may not be detected"
-                        << endl;
-                }
-            }
-        }
+                        intersectedCell,
+                        bMesh[patchI].faceCells()
+                    );
 
-        // Receive loop
-        forAll (bMesh, patchI)
-        {
-            if (bMesh[patchI].coupled())
-            {
-                if (isA<processorPolyPatch>(bMesh[patchI]))
-                {
-                    if (Pstream::parRun())
-                    {
-                        const processorPolyPatch& curProcPatch =
-                            refCast<const processorPolyPatch>(bMesh[patchI]);
-
-                        IPstream fromNeighbProc
-                        (
-                            Pstream::blocking,
-                            curProcPatch.neighbProcNo(),
-                            sizeof(label)*curProcPatch.size()
-                        );
-
-                        nbrCut[patchI] = labelList(fromNeighbProc);
-                    }
-                }
-            }
-        }
-
-        // Analyse the cut
-        forAll (bMesh, patchI)
-        {
-            if (!ownCut[patchI].empty())
-            {
-                const labelList& curOwnCut = ownCut[patchI];
-                const labelList& curNbrCut = nbrCut[patchI];
-
-                const labelList& fc = bMesh[patchI].faceCells();
-                
-                forAll (curOwnCut, patchFaceI)
-                {
-                    if
+                    OPstream toNeighbProc
                     (
-                        curOwnCut[patchFaceI] == immersedPoly::WET
-                     && curNbrCut[patchFaceI] == immersedPoly::DRY
-                    )
-                    {
-                        // Direct face cut, coupled
+                        Pstream::blocking,
+                        curProcPatch.neighbProcNo(),
+                        sizeof(label)*curProcPatch.size()
+                    );
 
-                        // Get face index.  Noye the difference between faceI
-                        // and patchFaceI
-                        const label faceI = bMesh[patchI].start() + patchFaceI;
+                    toNeighbProc << coupledPatchOwnCut[patchI];
+                }
+            }
+            else
+            {
+                WarningIn
+                (
+                    "void immersedBoundaryPolyPatch::"
+                    "calcImmersedBoundary() const"
+                )   << "Non-processor coupled patch detected for "
+                    << "immersed boundary.  "
+                    << "Direct face cut may not be detected"
+                    << endl;
+            }
+        }
+    }
 
-                        // Grab a point and wet cell and make an IB face
-                        pointField facePoints = f[faceI].points(p);
-                        face renumberedFace(facePoints.size());
+    // Receive loop
+    forAll (bMesh, patchI)
+    {
+        if (bMesh[patchI].coupled())
+        {
+            if (isA<processorPolyPatch>(bMesh[patchI]))
+            {
+                if (Pstream::parRun())
+                {
+                    const processorPolyPatch& curProcPatch =
+                        refCast<const processorPolyPatch>(bMesh[patchI]);
 
-                        // Insert points
-                        forAll (facePoints, fpI)
-                        {
-                            unmergedPoints.append(facePoints[fpI]);
-                            renumberedFace[fpI] = nIbPoints;
-                            nIbPoints++;
-                        }
+                    IPstream fromNeighbProc
+                    (
+                        Pstream::blocking,
+                        curProcPatch.neighbProcNo(),
+                        sizeof(label)*curProcPatch.size()
+                    );
 
-                        // Record the face
-                        unmergedFaces[nIbCells] = renumberedFace;
-
-                        // Collect cut cell index
-                        ibCells[nIbCells] = fc[patchFaceI];
-
-                        // Record the live centre
-                        ibCellCentres[nIbCells] = C[fc[patchFaceI]];
-
-                        // Record the live volume: equal to owner volume
-                        ibCellVolumes[nIbCells] = V[fc[patchFaceI]];
-
-                        // Get span of owner.  Cannot reach neighbour
-                        vector span = cellSpan(fc[patchFaceI]);
-
-                        // Record the nearest triangle to the face centre
-                        nearestTri[nIbCells] =
-                            tss.nearest(Cf[faceI], span).index();
-
-                        nIbCells++;
-                    }
+                    coupledPatchNbrCut[patchI] = labelList(fromNeighbProc);
                 }
             }
         }
-    }   
+    }
+
+    // Analyse the cut
+    forAll (bMesh, patchI)
+    {
+        if (!coupledPatchOwnCut[patchI].empty())
+        {
+            const labelList& curOwnCut = coupledPatchOwnCut[patchI];
+            const labelList& curNbrCut = coupledPatchNbrCut[patchI];
+
+            const labelList& fc = bMesh[patchI].faceCells();
+            
+            forAll (curOwnCut, patchFaceI)
+            {
+                if
+                (
+                    curOwnCut[patchFaceI] == immersedPoly::WET
+                 && curNbrCut[patchFaceI] == immersedPoly::DRY
+                )
+                {
+                    // Direct face cut, coupled on live side
+
+                    // Get face index.  Noye the difference between faceI
+                    // and patchFaceI
+                    const label faceI = bMesh[patchI].start() + patchFaceI;
+
+                    // Grab a point and wet cell and make an IB face
+                    pointField facePoints = f[faceI].points(p);
+                    face renumberedFace(facePoints.size());
+
+                    // Insert points
+                    forAll (facePoints, fpI)
+                    {
+                        unmergedPoints.append(facePoints[fpI]);
+                        renumberedFace[fpI] = nIbPoints;
+                        nIbPoints++;
+                    }
+
+                    // Record the face
+                    unmergedFaces[nIbCells] = renumberedFace;
+
+                    // Collect cut cell index
+                    ibCells[nIbCells] = fc[patchFaceI];
+
+                    // Record the live centre
+                    ibCellCentres[nIbCells] = C[fc[patchFaceI]];
+
+                    // Record the live volume: equal to owner volume
+                    ibCellVolumes[nIbCells] = V[fc[patchFaceI]];
+
+                    // Get span of owner.  Cannot reach neighbour
+                    vector span = cellSpan(fc[patchFaceI]);
+
+                    // Record the nearest triangle to the face centre
+                    nearestTri[nIbCells] =
+                        tss.nearest(Cf[faceI], span).index();
+                    Info<< "ADDED COUPLED PROC FACE: " << patchFaceI << endl;
+                    nIbCells++;
+                }
+            }
+        }
+    }
         
     // Reset the cell lists
     Info<< "nIbCells: " << nIbCells << endl;
@@ -825,22 +824,73 @@ void Foam::immersedBoundaryPolyPatch::calcImmersedBoundary() const
     }
 
     // Boundary faces
-    for (label faceI = mesh.nInternalFaces(); faceI < owner.size(); faceI++)
+    forAll (bMesh, patchI)
     {
-        if
-        (
-            intersectedCell[owner[faceI]] == immersedPoly::WET
-        )
-        {
-            intersectedFace[faceI] = immersedPoly::WET;
-        }
+        const label patchStart = bMesh[patchI].start();
 
-        if
-        (
-            intersectedCell[owner[faceI]] == immersedPoly::DRY
-        )
+        if (bMesh[patchI].coupled())
         {
-            intersectedFace[faceI] = immersedPoly::DRY;
+            // Coupled patch: two-sided check
+            const labelList& curOwnCut = coupledPatchOwnCut[patchI];
+            const labelList& curNbrCut = coupledPatchNbrCut[patchI];
+
+            forAll (curOwnCut, patchFaceI)
+            {
+                if
+                (
+                    (
+                        curOwnCut[patchFaceI] == immersedPoly::WET
+                      && curNbrCut[patchFaceI] == immersedPoly::DRY
+                    )
+                 || (
+                        curOwnCut[patchFaceI] == immersedPoly::DRY
+                     && curNbrCut[patchFaceI] == immersedPoly::WET
+                    )
+                 || (
+                        curOwnCut[patchFaceI] == immersedPoly::DRY
+                     && curNbrCut[patchFaceI] == immersedPoly::CUT
+                    )
+                 || (
+                        curOwnCut[patchFaceI] == immersedPoly::CUT
+                     && curNbrCut[patchFaceI] == immersedPoly::DRY
+                     )
+                )
+                {
+                    // Note:
+                    // Wet-to-dry: this face has been declared to be a
+                    // cut face and needs to be taken out as live face
+                    // Cut-to-dry: this is either an outside edge of cut faces
+                    // or a cutting error
+                    intersectedFace[patchStart + patchFaceI] =
+                        immersedPoly::DRY;
+                }
+            }
+        }
+        else
+        {
+            // Regular patch: one-sided check
+            const labelList& fc = bMesh[patchI].faceCells();
+            
+            forAll (fc, patchFaceI)
+            {
+                if
+                (
+                    intersectedCell[fc[patchFaceI]] == immersedPoly::WET
+                )
+                {
+                    intersectedFace[patchStart + patchFaceI] =
+                        immersedPoly::WET;
+                }
+
+                if
+                (
+                    intersectedCell[fc[patchFaceI]] == immersedPoly::DRY
+                )
+                {
+                    intersectedFace[patchStart + patchFaceI] =
+                        immersedPoly::DRY;
+                }
+            }
         }
     }
 
