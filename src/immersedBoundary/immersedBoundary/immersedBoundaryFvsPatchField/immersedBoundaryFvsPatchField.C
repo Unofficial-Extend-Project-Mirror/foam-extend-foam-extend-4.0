@@ -66,9 +66,11 @@ immersedBoundaryFvsPatchField<Type>::immersedBoundaryFvsPatchField
     const dictionary& dict
 )
 :
-    fvsPatchField<Type>(p, iF, dict),
+    fvsPatchField<Type>(p, iF),   // Do not read base data
     ibPatch_(refCast<const immersedBoundaryFvPatch>(p))
-{}
+{
+    operator=(pTraits<Type>::zero);
+}
 
 
 template<class Type>
@@ -80,7 +82,7 @@ immersedBoundaryFvsPatchField<Type>::immersedBoundaryFvsPatchField
     const fvPatchFieldMapper& mapper
 )
 :
-    fvsPatchField<Type>(ptf, p, iF, mapper),
+    fvsPatchField<Type>(p, iF),  // Do not map base data
     ibPatch_(refCast<const immersedBoundaryFvPatch>(p))
 {}
 
@@ -153,7 +155,9 @@ template<class Type>
 void immersedBoundaryFvsPatchField<Type>::write(Ostream& os) const
 {
     fvsPatchField<Type>::write(os);
-    this->writeEntry("value", os);
+    // The value entry needs to be written with zero size
+    Field<Type>::null().writeEntry("value", os);
+    // this->writeEntry("value", os);
 }
 
 

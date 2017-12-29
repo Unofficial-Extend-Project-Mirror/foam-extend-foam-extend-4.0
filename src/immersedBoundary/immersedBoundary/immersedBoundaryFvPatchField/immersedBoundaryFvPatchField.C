@@ -166,8 +166,8 @@ void immersedBoundaryFvPatchField<Type>::rmap
     const labelList&
 )
 {
-    // Use internal values
-    Field<Type>::operator=(this->patchInternalField());
+    // Base fields do not rmap
+    this->setSize(this->patch().size(), pTraits<Type>::zero);
 }
 
 
