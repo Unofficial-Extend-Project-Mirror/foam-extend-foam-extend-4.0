@@ -56,7 +56,7 @@ const Foam::debug::tolerancesSwitch
 Foam::immersedBoundaryPolyPatch::liveFactor_
 (
     "immersedBoundaryLiveFactor",
-    1e-5
+    1e-3
 );
 
 
@@ -1052,8 +1052,10 @@ Foam::immersedBoundaryPolyPatch::immersedBoundaryPolyPatch
     ibPatchPtr_(NULL),
     ibCellsPtr_(NULL),
     ibCellCentresPtr_(NULL),
+    ibCellVolumesPtr_(NULL),
     ibFacesPtr_(NULL),
     ibFaceCentresPtr_(NULL),
+    ibFaceAreasPtr_(NULL),
     nearestTriPtr_(NULL),
     deadCellsPtr_(NULL),
     deadFacesPtr_(NULL),
@@ -1156,8 +1158,10 @@ Foam::immersedBoundaryPolyPatch::immersedBoundaryPolyPatch
     ibPatchPtr_(NULL),
     ibCellsPtr_(NULL),
     ibCellCentresPtr_(NULL),
+    ibCellVolumesPtr_(NULL),
     ibFacesPtr_(NULL),
     ibFaceCentresPtr_(NULL),
+    ibFaceAreasPtr_(NULL),
     nearestTriPtr_(NULL),
     deadCellsPtr_(NULL),
     deadFacesPtr_(NULL),
@@ -1200,8 +1204,10 @@ Foam::immersedBoundaryPolyPatch::immersedBoundaryPolyPatch
     ibPatchPtr_(NULL),
     ibCellsPtr_(NULL),
     ibCellCentresPtr_(NULL),
+    ibCellVolumesPtr_(NULL),
     ibFacesPtr_(NULL),
     ibFaceCentresPtr_(NULL),
+    ibFaceAreasPtr_(NULL),
     nearestTriPtr_(NULL),
     deadCellsPtr_(NULL),
     deadFacesPtr_(NULL),
