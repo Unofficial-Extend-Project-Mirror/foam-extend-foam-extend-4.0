@@ -50,7 +50,11 @@ immersedBoundarySolidBodyMotionFvMesh
 )
 :
     dynamicFvMesh(io),
-    dynamicMeshCoeffs_
+    ibMotions_(),
+    curTimeIndex_(-1)
+{
+    // Read motion function for all regions
+    dictionary dynamicMeshCoeffs
     (
         IOdictionary
         (
@@ -63,12 +67,9 @@ immersedBoundarySolidBodyMotionFvMesh
                 IOobject::NO_WRITE
             )
         ).subDict(typeName + "Coeffs")
-    ),
-    ibMotions_(),
-    curTimeIndex_(-1)
-{
-    // Read motion function for all regions
-    PtrList<entry> motionDicts(dynamicMeshCoeffs_.lookup("motionFunctions"));
+    );
+
+    PtrList<entry> motionDicts(dynamicMeshCoeffs.lookup("motionFunctions"));
 
     ibMotions_.setSize(motionDicts.size());
 
