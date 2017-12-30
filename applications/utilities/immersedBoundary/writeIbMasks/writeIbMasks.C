@@ -50,9 +50,42 @@ void Foam::calc(const argList& args, const Time& runTime, const fvMesh& mesh)
             IOobject::AUTO_WRITE
         ),
         mesh,
-        dimensionedScalar("one", dimless, 0)
+        dimensionedScalar("one", dimless, 1)
     );
     gamma.internalField() = mesh.V()/mesh.cellVolumes();
+    gamma.write();
+
+    // Report minimal live cell volume
+    scalar minLiveGamma = GREAT;
+    label minLiveCell = -1;
+    const scalarField& gammaIn = gamma.internalField();
+    
+    forAll (mesh.boundary(), patchI)
+    {
+        if (isA<immersedBoundaryFvPatch>(mesh.boundary()[patchI]))
+        {
+            const immersedBoundaryFvPatch& ibPatch =
+                refCast<const immersedBoundaryFvPatch>
+                (
+                    mesh.boundary()[patchI]
+                );
+
+            const labelList& ibCells = ibPatch.ibPolyPatch().ibCells();
+
+            forAll (ibCells, dcI)
+            {
+                if (gammaIn[ibCells[dcI]] < minLiveGamma)
+                {
+                    minLiveGamma = gammaIn[ibCells[dcI]];
+                    minLiveCell = ibCells[dcI];
+                }
+            }
+        }
+    }
+
+    Info<< "Min live cell " << minLiveCell
+        << " gamma = " << minLiveGamma
+        << endl;
 
     Info<< nl << "Calculating sGamma" << endl;
     surfaceScalarField sGamma
@@ -71,7 +104,7 @@ void Foam::calc(const argList& args, const Time& runTime, const fvMesh& mesh)
 
     const surfaceScalarField& magSf = mesh.magSf();
     const scalarField magFaceAreas = mag(mesh.faceAreas());
-    
+
     sGamma.internalField() =
         magSf.internalField()/
         scalarField::subField(magFaceAreas, mesh.nInternalFaces());
@@ -88,8 +121,7 @@ void Foam::calc(const argList& args, const Time& runTime, const fvMesh& mesh)
                 sGamma.boundaryField()[patchI];
         }
     }
-    
-    gamma.write();
+
     sGamma.write();
 
     // Check consistency of face area vectors
@@ -117,6 +149,8 @@ void Foam::calc(const argList& args, const Time& runTime, const fvMesh& mesh)
             << max(magDivSf)
             << endl;
     }
+
+    Info<< endl;
 }
 
 
