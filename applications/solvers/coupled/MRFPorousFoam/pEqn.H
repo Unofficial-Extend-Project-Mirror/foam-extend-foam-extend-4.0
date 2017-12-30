@@ -10,7 +10,7 @@ if (addMRF || addPorosity)
     tpresSource =
     (
         (mesh.Sf() & fvc::interpolate(rTU))
-        & fvc::interpolate(fvc::grad(p))
+      & fvc::interpolate(fvc::grad(p))
     );
     const surfaceScalarField& presSource = tpresSource();
 
