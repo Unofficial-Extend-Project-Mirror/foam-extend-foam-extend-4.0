@@ -84,7 +84,7 @@ sendField
 
     //HJ: This needs complete rewrite:
     // - move communications into a patch
-    // - allow for various types of communication
+    // HR, 12/6/2017
     // HJ, 15/Apr/2009
 
     if (commsType == Pstream::blocking || commsType == Pstream::scheduled)
@@ -101,6 +101,7 @@ sendField
     {
         resizeBuf(receiveBuf_, f.size()*sizeof(Type));
 
+        outstandingRecvRequest_ = Pstream::nRequests();
         IPstream::read
         (
             commsType,
@@ -112,6 +113,7 @@ sendField
         resizeBuf(sendBuf_, f.byteSize());
         memcpy(sendBuf_.begin(), f.begin(), f.byteSize());
 
+        outstandingSendRequest_ = Pstream::nRequests();
         OPstream::write
         (
             commsType,
@@ -126,22 +128,6 @@ sendField
             << "Unsupported communications type " << commsType
             << exit(FatalError);
     }
-
-    // Not using non-blocking comms
-//     if (commsType == Pstream::nonBlocking)
-//     {
-//         FatalErrorIn("void ProcessorPointPatchField::sendField")
-//             << "Non-blocking comms not implemented"
-//             << abort(FatalError);
-//     }
-
-//     OPstream::write
-//     (
-//         commsType,
-//         procPatch_.neighbProcNo(),
-//         reinterpret_cast<const char*>(f.begin()),
-//         f.byteSize()
-//     );
 
     tf.clear();
 }
@@ -167,13 +153,36 @@ receivePointField
 {
     tmp<Field<Type2> > tf(new Field<Type2>(this->size()));
 
-    IPstream::read
-    (
-        commsType,
-        procPatch_.neighbProcNo(),
-        reinterpret_cast<char*>(tf().begin()),
-        tf().byteSize()
-    );
+    if (Pstream::parRun())
+    {
+        if (commsType == Pstream::nonBlocking)
+        {
+            // Receive into tf
+
+            if
+            (
+                outstandingRecvRequest_ >= 0
+             && outstandingRecvRequest_ < Pstream::nRequests()
+            )
+            {
+                Pstream::waitRequest(outstandingRecvRequest_);
+            }
+            outstandingSendRequest_ = -1;
+            outstandingRecvRequest_ = -1;
+
+            memcpy(tf().begin(), receiveBuf_.begin(), tf().byteSize());
+        }
+        else
+        {
+            IPstream::read
+            (
+                commsType,
+                procPatch_.neighbProcNo(),
+                reinterpret_cast<char*>(tf().begin()),
+                tf().byteSize()
+            );
+        }
+    }
 
     return tf;
 }
@@ -202,13 +211,36 @@ receiveEdgeField
         new Field<Type2>(procPatch_.localEdgeIndices().size())
     );
 
-    IPstream::read
-    (
-        commsType,
-        procPatch_.neighbProcNo(),
-        reinterpret_cast<char*>(tf().begin()),
-        tf().byteSize()
-    );
+    if (Pstream::parRun())
+    {
+        if (commsType == Pstream::nonBlocking)
+        {
+            // Receive into tf
+
+            if
+            (
+                outstandingRecvRequest_ >= 0
+             && outstandingRecvRequest_ < Pstream::nRequests()
+            )
+            {
+                Pstream::waitRequest(outstandingRecvRequest_);
+            }
+            outstandingSendRequest_ = -1;
+            outstandingRecvRequest_ = -1;
+
+            memcpy(tf().begin(), receiveBuf_.begin(), tf().byteSize());
+        }
+        else
+        {
+            IPstream::read
+            (
+                commsType,
+                procPatch_.neighbProcNo(),
+                reinterpret_cast<char*>(tf().begin()),
+                tf().byteSize()
+            );
+        }
+    }
 
     return tf;
 }

@@ -218,8 +218,28 @@ class GGIInterpolation
             //- List of uncovered master faces
             mutable labelList* uncoveredMasterAddrPtr_;
 
+            //- List of partially covered master faces. Contains faces with
+            //  weights between masterNonOverlapFaceTol_ and
+            //  uncoveredFaceAreaTol_. Used in bridging
+            mutable labelList* partiallyCoveredMasterAddrPtr_;
+
+            //- List of face fractions for partially covered master faces. Range
+            //  anywhere from 1 to uncoveredFaceAreaTol_ (e.g. 0.2 means
+            //  that the face area is covered by 20% on the other side)
+            mutable scalarField* masterFaceCoveredFractionsPtr_;
+
             //- List of uncovered slave faces
             mutable labelList* uncoveredSlaveAddrPtr_;
+
+            //- List of partially covered slave faces. Contains faces with
+            //  weights between masterNonOverlapFaceTol_ and
+            //  uncoveredFaceAreaTol_. Used in bridging
+            mutable labelList* partiallyCoveredSlaveAddrPtr_;
+
+            //- List of face fractions for partially covered slave faces. Range
+            //  anywhere from 1 to uncoveredFaceAreaTol_ (e.g. 0.2 means
+            //  that the face area is covered by 20% on the other side)
+            mutable scalarField* slaveFaceCoveredFractionsPtr_;
 
 
   // Private static data
@@ -232,6 +252,9 @@ class GGIInterpolation
 
         //- Facet bound box extension factor
         static const debug::tolerancesSwitch faceBoundBoxExtendSpanFraction_;
+
+        //- Tolerance for uncovered face areas
+        static const debug::tolerancesSwitch uncoveredFaceAreaTol_;
 
        //- The next 3 attributes are parameters controlling the creation
        //  of an octree search engine for the GGI facets neighbourhood
@@ -417,6 +440,14 @@ class GGIInterpolation
             const scalar& nonOverlapFaceTol
         ) const;
 
+        //- Calculate partially covered faces
+        void calcPartiallyCoveredFaces
+        (
+            const scalarListList& patchWeights,
+            const scalar& nonOverlapFaceTo,
+            const bool isMaster
+        ) const;
+
         //- Clear all geometry and addressing
         void clearOut();
 
@@ -451,7 +482,9 @@ class GGIInterpolation
         (
             const Field<Type>& bridgeField,
             Field<Type>& ff,
-            const labelList& addr
+            const labelList& addr,
+            const labelList& partiallyCoveredAddr,
+            const scalarField& coveredFractions
         );
 
         //- Bridge uncovered faces given addressing
@@ -462,7 +495,9 @@ class GGIInterpolation
             const Field<Type>& bridgeField,
             Field<Type>& ff,
             const labelList& mask,
-            const labelList& uncoveredFaces
+            const labelList& uncoveredFaces,
+            const labelList& partiallyCoveredAddr,
+            const scalarField& coveredFractions
         );
 
         //- Is a transform required?
@@ -533,8 +568,20 @@ public:
             //- Return reference to the master list of non-overlap faces
             const labelList& uncoveredMasterFaces() const;
 
+            //- Return reference to master list of partially covered faces
+            const labelList& partiallyCoveredMasterFaces() const;
+
+            //- Return covered fractions of partially covered master faces
+            const scalarField& masterFaceCoveredFractions() const;
+
             //- Return reference to the slave list of non-overlap faces
             const labelList& uncoveredSlaveFaces() const;
+
+            //- Return reference to slave list of partially covered faces
+            const labelList& partiallyCoveredSlaveFaces() const;
+
+            //- Return covered fractions of partially covered slave faces
+            const scalarField& slaveFaceCoveredFractions() const;
 
             //- Return reference to point addressing
             const List<labelPair>& masterPointAddr() const;
@@ -553,6 +600,7 @@ public:
 
             //- Return distance to intersection for patch points
             const scalarField& slavePointDistanceToIntersection() const;
+
 
     // Interpolation functions
 
@@ -636,12 +684,6 @@ public:
         //- Interpolate point field
         template<class Type>
         tmp<Field<Type> > masterToSlavePointInterpolate
-        (
-            const Field<Type>& pf
-        ) const;
-
-        template<class Type>
-        tmp<Field<Type> > slaveToMasterPointInterpolate
         (
             const Field<Type>& pf
         ) const;

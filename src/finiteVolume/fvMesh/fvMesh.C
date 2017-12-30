@@ -144,7 +144,7 @@ Foam::fvMesh::fvMesh(const IOobject& io)
 
     // Check the existance of the cell volumes and read if present
     // and set the storage of V00
-    if (isFile(time().timePath()/"V0"))
+    if (isFile(time().timePath()/polyMesh::dbDir()/"V0"))
     {
         if (debug)
         {
@@ -169,7 +169,7 @@ Foam::fvMesh::fvMesh(const IOobject& io)
 
     // Check the existance of the mesh fluxes, read if present and set the
     // mesh to be moving
-    if (isFile(time().timePath()/"meshPhi"))
+    if (isFile(time().timePath()/polyMesh::dbDir()/"meshPhi"))
     {
         if (debug)
         {

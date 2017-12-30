@@ -1185,7 +1185,11 @@ void faMesh::calcPointAreaNormals() const
     // Processor patch points correction
     forAll (boundary(), patchI)
     {
-        if(boundary()[patchI].type() == processorFaPatch::typeName)
+        if
+        (
+            Pstream::parRun()
+         && boundary()[patchI].type() == processorFaPatch::typeName
+        )
         {
             const processorFaPatch& procPatch =
                 refCast<const processorFaPatch>(boundary()[patchI]);

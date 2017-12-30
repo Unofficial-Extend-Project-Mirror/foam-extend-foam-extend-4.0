@@ -22,28 +22,24 @@ License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    sixDOFbodies
+    Foam::linearSpringDamper
 
 Description
-    6-DOF solver for multiple bodies
+    Translational restraint corresponding to linear spring and linear damper
+    defined by linear spring coefficients and linear damping coefficients.
 
 Author
-    Dubravko Matijasevic, FSB Zagreb.  All rights reserved.
+    Vuko Vukcevic, FSB Zagreb.  All rights reserved.
 
 SourceFiles
-    sixDOFbodies.C
+    linearSpringDamper.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef sixDOFbodies_H
-#define sixDOFbodies_H
+#ifndef linearSpringDamper_H
+#define linearSpringDamper_H
 
-#include "foamTime.H"
-#include "IOdictionary.H"
-#include "sixDOFqODE.H"
-#include "ODESolver.H"
-#include "finiteRotation.H"
-#include "primitiveFields.H"
+#include "translationalRestraint.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -51,64 +47,65 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                        Class sixDOFbodies Declaration
+                   Class linearSpringDamper Declaration
 \*---------------------------------------------------------------------------*/
 
-class sixDOFbodies
+class linearSpringDamper
 :
-    public IOdictionary
+    public translationalRestraint
 {
-    // Private data
+    // Private Data
 
-        //- Reference to time
-        const Time& runTime_;
-
-        // Pointer list of Foam::sixDOFqODE objects
-        PtrList<sixDOFqODE> odes_;
-
-        // Pointer list of Foam::sixDOFqODE solvers
-        PtrList<ODESolver> solvers_;
-
-        // Name list of solved bodies
-        const wordList names_;
-
-
-    // Private Member Functions
-
-        //- Disallow default bitwise copy construct
-        sixDOFbodies(const sixDOFbodies&);
-
-        //- Disallow default bitwise assignment
-        void operator=(const sixDOFbodies&);
-
-        //- Set bodies
-        void setBodies();
+        //- Linear spring coefficients
+        diagTensor linSpringCoeffs_;
+    
+        //- Linear damping coefficients
+        diagTensor linDampingCoeffs_;
 
 
 public:
 
+    //- Runtime type information
+    TypeName("linearSpringDamper");
+
+
     // Constructors
 
-        //- Construct from Time
-        sixDOFbodies(const Time& runTime);
+        //- Construct from dictionary
+        linearSpringDamper
+        (
+            const word& name,
+            const dictionary& dict,
+            const sixDOFODE& sixDOF
+        );
+
+        //- Construct and return a clone
+        virtual autoPtr<translationalRestraint> clone() const;
 
 
     // Destructor
 
-        virtual ~sixDOFbodies()
-        {}
+        virtual ~linearSpringDamper();
 
 
     // Member Functions
 
-        //- Return list of names
-        const wordList& names() const;
+        // Restraint specific functions
 
-        //- Return list of bodies
-        const PtrList<sixDOFqODE>& operator()() const;
+            //- Return restraining force (in the global coordinate system)
+            virtual vector restrainingForce
+            (
+                const scalar t,
+                const tensor& toRelative,
+                const vector& x,
+                const vector& u 
+            ) const;
 
-        //- Solve ODEs and update position
-        void solve();
+
+    // I-O Functions and Operators
+
+        //- Virtual write function
+        virtual void write(Ostream& os) const;
 };
 
 

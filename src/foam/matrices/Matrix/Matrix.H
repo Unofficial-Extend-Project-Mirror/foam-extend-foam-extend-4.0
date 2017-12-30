@@ -112,7 +112,7 @@ public:
         Matrix(const label n, const label m, const Type&);
 
         //- Copy constructor.
-    Matrix(const Matrix<Form, Type>&);
+        Matrix(const Matrix<Form, Type>&);
 
         //- Construct from Istream.
         Matrix(Istream&);

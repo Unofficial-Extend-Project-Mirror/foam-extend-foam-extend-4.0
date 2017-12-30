@@ -3,7 +3,7 @@
 #include <math.h>
 #include <assert.h>
 
-#include "vector.h"
+#include "vectorb.h"
 
 float  sqr(float a) {return a*a;}
 

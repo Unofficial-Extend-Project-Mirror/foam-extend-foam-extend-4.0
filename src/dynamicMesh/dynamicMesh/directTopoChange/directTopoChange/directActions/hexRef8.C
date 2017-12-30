@@ -353,6 +353,16 @@ void Foam::hexRef8::modFace
 // Bit complex way to determine the unrefined edge length.
 Foam::scalar Foam::hexRef8::getLevel0EdgeLength() const
 {
+    if (cellLevel_.size() != mesh_.nCells())
+    {
+        FatalErrorIn("scalar hexRef8::getLevel0EdgeLength() const")
+            << "Number of cells in mesh:" << mesh_.nCells()
+            << " does not equal size of cellLevel:" << cellLevel_.size()
+            << endl
+            << "This might be because of a restart with inconsistent cellLevel."
+            << abort(FatalError);
+    }
+
     // Determine minimum edge length per refinement level
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

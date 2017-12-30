@@ -103,6 +103,37 @@ bool domainDecomposition::writeDecomposition()
     label maxProcFaces = 0;
 
 
+    // Note: get cellLevel and pointLevel. Avoid checking whether they exist or
+    // not by hand. If they don't exist, simpy assume that the level is 0
+    const labelIOList globalCellLevel
+    (
+        IOobject
+        (
+            "cellLevel",
+            this->facesInstance(),
+            polyMesh::meshSubDir,
+            *this,
+            IOobject::READ_IF_PRESENT,
+            IOobject::NO_WRITE
+        ),
+        labelList(nCells(), 0)
+    );
+
+    const labelIOList globalPointLevel
+    (
+        IOobject
+        (
+            "pointLevel",
+            this->facesInstance(),
+            polyMesh::meshSubDir,
+            *this,
+            IOobject::READ_IF_PRESENT,
+            IOobject::NO_WRITE
+        ),
+        labelList(nPoints(), 0)
+    );
+
+
     // Write out the meshes
     for (label procI = 0; procI < nProcs_; procI++)
     {
@@ -615,6 +646,39 @@ bool domainDecomposition::writeDecomposition()
             procBoundaryAddressing_[procI]
         );
         boundaryProcAddressing.write();
+
+        // Create and write cellLevel and pointLevel information
+        const unallocLabelList& cellMap = cellProcAddressing;
+        labelIOList procCellLevel
+        (
+            IOobject
+            (
+                "cellLevel",
+                procMesh.facesInstance(),
+                procMesh.meshSubDir,
+                procMesh,
+                IOobject::NO_READ,
+                IOobject::NO_WRITE
+            ),
+            labelList(globalCellLevel, cellMap)
+        );
+        procCellLevel.write();
+
+        const unallocLabelList& pointMap = pointProcAddressing;
+        labelIOList procPointLevel
+        (
+            IOobject
+            (
+                "pointLevel",
+                procMesh.facesInstance(),
+                procMesh.meshSubDir,
+                procMesh,
+                IOobject::NO_READ,
+                IOobject::NO_WRITE
+            ),
+            labelList(globalPointLevel, pointMap)
+        );
+        procPointLevel.write();
     }
 
     Info<< nl

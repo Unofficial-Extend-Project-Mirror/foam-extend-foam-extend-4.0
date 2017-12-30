@@ -234,11 +234,12 @@ tmp<volSymmTensorField> LienLeschzinerLowRe::devReff() const
 
 tmp<fvVectorMatrix> LienLeschzinerLowRe::divDevReff() const
 {
+    const volScalarField nuEffective = nuEff();
+
     return
     (
-      - fvm::laplacian(nuEff(), U_)
-    //- (fvc::grad(U_) & fvc::grad(nuEff()))
-      - fvc::div(nuEff()*T(fvc::grad(U_)))
+      - fvm::laplacian(nuEffective, U_)
+      - (fvc::grad(U_) & fvc::grad(nuEffective))
     );
 }
 

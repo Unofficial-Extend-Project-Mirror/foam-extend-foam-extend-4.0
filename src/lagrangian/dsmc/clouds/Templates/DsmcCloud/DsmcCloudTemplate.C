@@ -1144,7 +1144,7 @@ Foam::scalar Foam::DsmcCloud<ParcelType>::equipartitionInternalEnergy
     else if (iDof < 2.0 + SMALL && iDof > 2.0 - SMALL)
     {
         // Special case for iDof = 2, i.e. diatomics;
-        Ei = -log(rndGen_.scalar01())*kb*temperature;
+        Ei = -log(max(rndGen_.scalar01(), VSMALL))*kb*temperature;
     }
     else
     {

@@ -48,8 +48,6 @@ bool Foam::primitiveMesh::pointInCell(const point& p, label celli) const
     const vectorField& cf = faceCentres();
     const vectorField& Sf = faceAreas();
 
-    bool inCell = true;
-
     forAll(f, facei)
     {
         label nFace = f[facei];
@@ -59,10 +57,14 @@ bool Foam::primitiveMesh::pointInCell(const point& p, label celli) const
         {
             normal = -normal;
         }
-        inCell = inCell && ((normal & proj) <= 0);
+
+        if ((normal & proj) > 0)
+        {
+            return false;
+        }
     }
 
-    return inCell;
+    return true;
 }
 
 

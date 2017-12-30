@@ -660,7 +660,8 @@ autoPtr<mapPolyMesh> createRegionMesh
     const EdgeMap<label>& interfaceToPatch,
     const fvMesh& mesh,
     const label regionI,
-    const word& regionName
+    const word& regionName,
+    const word& newMeshInstance
 )
 {
     // Neighbour cellRegion.
@@ -758,7 +759,7 @@ autoPtr<mapPolyMesh> createRegionMesh
         IOobject
         (
             regionName,
-            mesh.time().timeName(),
+            newMeshInstance,
             mesh.time(),
             IOobject::NO_READ,
             IOobject::AUTO_WRITE
@@ -977,7 +978,8 @@ void createAndWriteRegion
         interfaceToPatch,
         mesh,
         regionI,
-        regionNames[regionI]
+        regionNames[regionI],
+        newMeshInstance
     );
 
     // Read in mesh as fvMesh for mapping.  HJ, 19/May/2011

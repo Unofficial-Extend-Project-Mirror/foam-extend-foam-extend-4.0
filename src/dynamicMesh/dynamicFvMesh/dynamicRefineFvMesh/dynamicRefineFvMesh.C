@@ -31,6 +31,7 @@ License
 #include "syncTools.H"
 #include "pointFields.H"
 #include "directTopoChange.H"
+#include "cellSet.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -59,7 +60,16 @@ label dynamicRefineFvMesh::count
         {
             n++;
         }
+
+        // debug also serves to get-around Clang compiler trying to optimise
+        // out this forAll loop under O3 optimisation
+
+        if (debug)
+        {
+            Info<< "n=" << n << endl;
+        }
     }
+
     return n;
 }
 
@@ -860,11 +870,78 @@ void dynamicRefineFvMesh::extendMarkedCells(PackedBoolList& markedCell) const
 }
 
 
+void Foam::dynamicRefineFvMesh::checkEightAnchorPoints
+(
+    PackedBoolList& protectedCell,
+    label& nProtected
+) const
+{
+    const labelList& cellLevel = meshCutter_.cellLevel();
+    const labelList& pointLevel = meshCutter_.pointLevel();
+
+    labelList nAnchorPoints(nCells(), 0);
+
+    forAll(pointLevel, pointI)
+    {
+        const labelList& pCells = pointCells(pointI);
+
+        forAll(pCells, pCellI)
+        {
+            label cellI = pCells[pCellI];
+
+            if (pointLevel[pointI] <= cellLevel[cellI])
+            {
+                // Check if cell has already 8 anchor points -> protect cell
+                if (nAnchorPoints[cellI] == 8)
+                {
+                    if (protectedCell.set(cellI, true))
+                    {
+                        nProtected++;
+                    }
+                }
+
+                if (!protectedCell[cellI])
+                {
+                    nAnchorPoints[cellI]++;
+                }
+            }
+        }
+    }
+
+
+    forAll(protectedCell, cellI)
+    {
+        if (!protectedCell[cellI] && nAnchorPoints[cellI] != 8)
+        {
+            protectedCell.set(cellI, true);
+            nProtected++;
+        }
+    }
+}
+
+
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 dynamicRefineFvMesh::dynamicRefineFvMesh(const IOobject& io)
 :
     dynamicFvMesh(io),
+    singleMotionUpdate_
+    (
+        IOdictionary
+        (
+            IOobject
+            (
+                "dynamicMeshDict",
+                time().constant(),
+                *this,
+                IOobject::MUST_READ,
+                IOobject::NO_WRITE,
+                false
+            )
+        ).subDict(typeName + "Coeffs")
+        .lookupOrDefault<Switch>("singleMotionUpdate", true)
+    ),
+    curTimeIndex_(-1),
     meshCutter_(*this),
     dumpLevel_(false),
     nRefinementIterations_(0),
@@ -984,11 +1061,62 @@ dynamicRefineFvMesh::dynamicRefineFvMesh(const IOobject& io)
                 nProtected++;
             }
         }
+
+        // Also protect any cells that are less than hex
+        forAll(cells(), cellI)
+        {
+            const cell& cFaces = cells()[cellI];
+
+            if (cFaces.size() < 6)
+            {
+                if (protectedCell_.set(cellI, 1))
+                {
+                    nProtected++;
+                }
+            }
+            else
+            {
+                forAll(cFaces, cFaceI)
+                {
+                    if (faces()[cFaces[cFaceI]].size() < 4)
+                    {
+                        if (protectedCell_.set(cellI, 1))
+                        {
+                            nProtected++;
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+
+        // Check cells for 8 corner points
+        checkEightAnchorPoints(protectedCell_, nProtected);
     }
 
     if (returnReduce(nProtected, sumOp<label>()) == 0)
     {
         protectedCell_.clear();
+    }
+    else
+    {
+
+        cellSet protectedCells(*this, "protectedCells", nProtected);
+        forAll(protectedCell_, cellI)
+        {
+            if (protectedCell_[cellI])
+            {
+                protectedCells.insert(cellI);
+            }
+        }
+
+        Info<< "Detected " << returnReduce(nProtected, sumOp<label>())
+            << " cells that are protected from refinement."
+            << " Writing these to cellSet "
+            << protectedCells.name()
+            << "." << endl;
+
+        protectedCells.write();
     }
 }
 
@@ -1003,6 +1131,20 @@ dynamicRefineFvMesh::~dynamicRefineFvMesh()
 
 bool dynamicRefineFvMesh::update()
 {
+    // Handling multiple calls in a single time step
+    if
+    (
+        singleMotionUpdate_
+     && curTimeIndex_ == this->time().timeIndex()
+    )
+    {
+        // This is not the first call to update, simply return false
+        return false;
+    }
+
+    // Update local time index
+    curTimeIndex_ = this->time().timeIndex();
+
     // Re-read dictionary. Choosen since usually -small so trivial amount
     // of time compared to actual refinement. Also very useful to be able
     // to modify on-the-fly.
@@ -1071,9 +1213,9 @@ bool dynamicRefineFvMesh::update()
                 << exit(FatalError);
         }
 
-        word field(refineDict.lookup("field"));
+        const word fieldName(refineDict.lookup("field"));
 
-        const volScalarField& vFld = lookupObject<volScalarField>(field);
+        const volScalarField& vFld = lookupObject<volScalarField>(fieldName);
 
         const scalar lowerRefineLevel =
             readScalar(refineDict.lookup("lowerRefineLevel"));

@@ -925,6 +925,18 @@ operator&&(const Tensor<Cmpt>& t1, const SymmTensor<Cmpt>& st2)
 }
 
 
+//- Return skew-symmetric tensor calculated with Lie bracket operator given two
+//  vectors
+template <class Cmpt>
+inline Tensor<Cmpt> lieBracket(const Vector<Cmpt>& v1, const Vector<Cmpt>& v2)
+{
+    const Tensor<Cmpt> skewV1(*v1);
+    const Tensor<Cmpt> skewV2(*v2);
+
+    return (skewV1 & skewV2) - (skewV2 & skewV1);
+}
+
+
 template<class Cmpt>
 class typeOfSum<SymmTensor<Cmpt>, Tensor<Cmpt> >
 {
