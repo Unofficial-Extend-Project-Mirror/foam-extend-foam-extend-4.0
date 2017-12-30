@@ -99,7 +99,7 @@ int main(int argc, char *argv[])
             incompressible::LESModel::New(U, phi, laminarTransport)
         );
 
-        volScalarField::GeometricBoundaryField d = nearWallDist(mesh).y();
+        volScalarField::GeometricBoundaryField d = nearWallDist(mesh);
         volScalarField nuEff = sgsModel->nuEff();
 
         const fvPatchList& patches = mesh.boundary();
