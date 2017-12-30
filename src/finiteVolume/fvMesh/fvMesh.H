@@ -353,7 +353,7 @@ public:
             //- Return cell face motion fluxes
             surfaceScalarField& setPhi();
 
-            //- Return old-time cell volumes
+            //- Set old-time cell volumes
             DimensionedField<scalar, volMesh>& setV0();
 
 

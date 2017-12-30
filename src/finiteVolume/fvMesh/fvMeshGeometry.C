@@ -249,9 +249,8 @@ void fvMesh::makePhi() const
 {
     if (debug)
     {
-        Info<< "void fvMesh::makePhi() const : "
-            << "reading old time flux field if present and creating "
-            << "zero current time flux field"
+        InfoIn("void fvMesh::makePhi() const")
+            << "Preparing mesh flux field"
             << endl;
     }
 
@@ -267,12 +266,12 @@ void fvMesh::makePhi() const
     // Reading old time mesh motion flux if it exists and
     // creating zero current time mesh motion flux
 
-    scalar t0 = this->time().value() - this->time().deltaT().value();
+    scalar t0 = time().value() - time().deltaT().value();
 
     IOobject meshPhiHeader
     (
         "meshPhi",
-        this->time().timeName(t0),
+        time().timeName(t0),
         *this,
         IOobject::NO_READ
     );
@@ -290,7 +289,7 @@ void fvMesh::makePhi() const
             IOobject
             (
                 "meshPhi",
-                this->time().timeName(t0),
+                time().timeName(t0),
                 *this,
                 IOobject::MUST_READ,
                 IOobject::AUTO_WRITE
@@ -317,7 +316,7 @@ void fvMesh::makePhi() const
             IOobject
             (
                 "meshPhi",
-                this->time().timeName(),
+                time().timeName(),
                 *this,
                 IOobject::NO_READ,
                 IOobject::AUTO_WRITE
@@ -338,19 +337,38 @@ void fvMesh::updatePhi(const scalarField& sweptVols) const
         makePhi();
     }
 
-    surfaceScalarField& phi = *phiPtr_;
-
     scalar rDeltaT = 1.0/time().deltaT().value();
+
+    surfaceScalarField& phi = *phiPtr_;
 
     phi.internalField() = scalarField::subField(sweptVols, nInternalFaces());
     phi.internalField() *= rDeltaT;
 
     const fvPatchList& patches = boundary();
 
+    // Calculate regular values first and then allow patches to update them
+    // HJ, 15/Dec/2017
     forAll (patches, patchI)
     {
         phi.boundaryField()[patchI] = patches[patchI].patchSlice(sweptVols);
         phi.boundaryField()[patchI] *= rDeltaT;
+    }
+
+    // Make sure V and V0 are constructed before the correction
+    // HJ, 22/Dec/2017
+    V0();
+    V();
+    
+    // Boundary update.  Used in complex geometries, eg. immersed boundary
+    // HJ, 29/Nov/2017
+    forAll (phi.boundaryField(), patchI)
+    {
+        boundary()[patchI].updatePhi
+        (
+            *VPtr_,
+            *V0Ptr_,
+            phi
+        );
     }
 }
 
@@ -424,6 +442,9 @@ DimensionedField<scalar, volMesh>& fvMesh::setV0()
         InfoIn("DimensionedField<scalar, volMesh>& fvMesh::setV0()")
             << "Setting old cell volumes" << endl;
     }
+
+    // Update time index
+    curTimeIndex_ = time().timeIndex();
 
     V0Ptr_ = new DimensionedField<scalar, volMesh>
     (
