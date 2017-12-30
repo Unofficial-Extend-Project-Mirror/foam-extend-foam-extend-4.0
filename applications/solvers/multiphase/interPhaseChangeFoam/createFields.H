@@ -104,7 +104,6 @@
     label pdRefCell = 0;
     scalar pdRefValue = 0.0;
     setRefCell(pd, pimple.dict(), pdRefCell, pdRefValue);
-    mesh.schemesDict().setFluxRequired(pd.name());
 
     scalar pRefValue = 0.0;
 
@@ -128,3 +127,6 @@
     (
         incompressible::turbulenceModel::New(U, phi, twoPhaseProperties())
     );
+
+    mesh.schemesDict().setFluxRequired(pd.name());
+    mesh.schemesDict().setFluxRequired(alpha1.name());
