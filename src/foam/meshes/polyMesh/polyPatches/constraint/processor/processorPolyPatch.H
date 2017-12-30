@@ -81,7 +81,6 @@ class processorPolyPatch
         mutable labelList* neighbEdgesPtr_;
 
 
-
     // Private static data
 
         //- Whether to use geometric or topological matching
