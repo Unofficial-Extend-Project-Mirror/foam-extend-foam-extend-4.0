@@ -48,6 +48,17 @@ movingWallVelocityFvPatchVectorField::movingWallVelocityFvPatchVectorField
 
 movingWallVelocityFvPatchVectorField::movingWallVelocityFvPatchVectorField
 (
+    const fvPatch& p,
+    const DimensionedField<vector, volMesh>& iF,
+    const dictionary& dict
+)
+:
+    fixedValueFvPatchVectorField(p, iF, dict)
+{}
+
+
+movingWallVelocityFvPatchVectorField::movingWallVelocityFvPatchVectorField
+(
     const movingWallVelocityFvPatchVectorField& ptf,
     const fvPatch& p,
     const DimensionedField<vector, volMesh>& iF,
@@ -56,19 +67,6 @@ movingWallVelocityFvPatchVectorField::movingWallVelocityFvPatchVectorField
 :
     fixedValueFvPatchVectorField(ptf, p, iF, mapper)
 {}
-
-
-movingWallVelocityFvPatchVectorField::movingWallVelocityFvPatchVectorField
-(
-    const fvPatch& p,
-    const DimensionedField<vector, volMesh>& iF,
-    const dictionary& dict
-)
-:
-    fixedValueFvPatchVectorField(p, iF)
-{
-    fvPatchVectorField::operator=(vectorField("value", dict, p.size()));
-}
 
 
 movingWallVelocityFvPatchVectorField::movingWallVelocityFvPatchVectorField
