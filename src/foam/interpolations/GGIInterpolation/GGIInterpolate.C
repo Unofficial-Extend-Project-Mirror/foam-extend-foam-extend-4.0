@@ -97,25 +97,12 @@ void GGIInterpolation<MasterPatch, SlavePatch>::bridge
 (
     const Field<Type>& bridgeField,
     Field<Type>& ff,
-    const labelList& addr,
-    const labelList& partiallyCoveredAddr,
-    const scalarField& coveredFractions
+    const labelList& addr
 )
 {
-    // Fully uncovered faces
     forAll (addr, faceI)
     {
         ff[addr[faceI]] = bridgeField[addr[faceI]];
-    }
-
-    // Loop through partially covered faces and correct them. Note the
-    // operator+= since we assume that the interpolation part is carried out
-    // before bridging (see e.g. ggiFvPatchField::patchNeighbourField()) using
-    // weights that do not sum up to 1
-    forAll (partiallyCoveredAddr, pcfI)
-    {
-        ff[partiallyCoveredAddr[pcfI]] +=
-            coveredFractions[pcfI]*bridgeField[partiallyCoveredAddr[pcfI]];
     }
 }
 
@@ -127,9 +114,7 @@ void GGIInterpolation<MasterPatch, SlavePatch>::maskedBridge
     const Field<Type>& bridgeField,
     Field<Type>& ff,
     const labelList& mask,
-    const labelList& uncoveredFaces,
-    const labelList& partiallyCoveredAddr,
-    const scalarField& coveredFractions
+    const labelList& uncoveredFaces
 )
 {
     // Note: tricky algorithm
@@ -146,7 +131,7 @@ void GGIInterpolation<MasterPatch, SlavePatch>::maskedBridge
         const label faceI = uncoveredFaces[uncoI];
 
         // Search through the mask
-        for (; maskAddrI < mask.size(); ++maskAddrI)
+        for (; maskAddrI < mask.size(); maskAddrI++)
         {
             if (faceI == mask[maskAddrI])
             {
@@ -162,38 +147,7 @@ void GGIInterpolation<MasterPatch, SlavePatch>::maskedBridge
                 // Go one back and check for next uncovered face
                 if (maskAddrI > 0)
                 {
-                    --maskAddrI;
-                }
-
-                break;
-            }
-        }
-    }
-
-    // Reset maskAddrI
-    maskAddrI = 0;
-
-    forAll (partiallyCoveredAddr, pcfI)
-    {
-        // Pick partially covered face
-        const label faceI = partiallyCoveredAddr[pcfI];
-
-        for (; maskAddrI < mask.size(); ++maskAddrI)
-        {
-            if (faceI == mask[maskAddrI])
-            {
-                // Found masked partially covered face
-                ff[maskAddrI] += coveredFractions[pcfI]*bridgeField[maskAddrI];
-
-                break;
-            }
-            else if (mask[maskAddrI] > faceI)
-            {
-                // Gone beyond my index: my face is not present in the mask
-                // Go one back and check for next uncovered face
-                if (maskAddrI > 0)
-                {
-                    --maskAddrI;
+                    maskAddrI--;
                 }
 
                 break;
@@ -557,8 +511,7 @@ void GGIInterpolation<MasterPatch, SlavePatch>::bridgeMaster
     if
     (
         bridgeField.size() != masterPatch_.size()
-     || ff.size() != masterPatch_.size()
-    )
+     || ff.size() != masterPatch_.size())
     {
         FatalErrorIn
         (
@@ -574,14 +527,7 @@ void GGIInterpolation<MasterPatch, SlavePatch>::bridgeMaster
             << abort(FatalError);
     }
 
-    bridge
-    (
-        bridgeField,
-        ff,
-        uncoveredMasterFaces(),
-        partiallyCoveredMasterFaces(),
-        masterFaceCoveredFractions()
-    );
+    bridge(bridgeField, ff, uncoveredMasterFaces());
 }
 
 
@@ -605,7 +551,7 @@ void GGIInterpolation<MasterPatch, SlavePatch>::maskedBridgeMaster
             "    Field<Type>& ff,\n"
             "    const labelList& mask\n"
             ") const"
-        )   << "given field does not correspond to patch. Patch (mask) size: "
+        )   << "given field does not correspond to patch. Patch size: "
             << masterPatch_.size()
             << " bridge field size: " << bridgeField.size()
             << " field size: " << ff.size()
@@ -613,15 +559,7 @@ void GGIInterpolation<MasterPatch, SlavePatch>::maskedBridgeMaster
             << abort(FatalError);
     }
 
-    maskedBridge
-    (
-        bridgeField,
-        ff,
-        mask,
-        uncoveredMasterFaces(),
-        partiallyCoveredMasterFaces(),
-        masterFaceCoveredFractions()
-    );
+    maskedBridge(bridgeField, ff, mask, uncoveredMasterFaces());
 }
 
 
@@ -654,14 +592,7 @@ void GGIInterpolation<MasterPatch, SlavePatch>::bridgeSlave
             << abort(FatalError);
     }
 
-    bridge
-    (
-        bridgeField,
-        ff,
-        uncoveredSlaveFaces(),
-        partiallyCoveredSlaveFaces(),
-        slaveFaceCoveredFractions()
-    );
+    bridge(bridgeField, ff, uncoveredSlaveFaces());
 }
 
 
@@ -685,7 +616,7 @@ void GGIInterpolation<MasterPatch, SlavePatch>::maskedBridgeSlave
             "    Field<Type>& ff\n,"
             "    const labelList& mask\n"
             ") const"
-        )   << "given field does not correspond to patch. Patch (mask) size: "
+        )   << "given field does not correspond to patch. Patch size: "
             << slavePatch_.size()
             << " bridge field size: " << bridgeField.size()
             << " field size: " << ff.size()
@@ -693,16 +624,10 @@ void GGIInterpolation<MasterPatch, SlavePatch>::maskedBridgeSlave
             << abort(FatalError);
     }
 
-    maskedBridge
-    (
-        bridgeField,
-        ff,
-        mask,
-        uncoveredSlaveFaces(),
-        partiallyCoveredSlaveFaces(),
-        slaveFaceCoveredFractions()
-    );
+    maskedBridge(bridgeField, ff, mask, uncoveredSlaveFaces());
 }
+
+
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
