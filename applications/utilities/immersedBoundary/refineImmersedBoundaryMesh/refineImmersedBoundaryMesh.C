@@ -63,13 +63,6 @@ int main(int argc, char *argv[])
             refineImmersedBoundaryMesh::IB_CELL_CELLS
         );
     }
-    else if (args.optionFound("ibCellCellFaces"))
-    {
-        rc = rib.refinementCells
-        (
-            refineImmersedBoundaryMesh::IB_CELL_CELL_FACES
-        );
-    }
     else
     {
         FatalErrorIn(args.executable())
