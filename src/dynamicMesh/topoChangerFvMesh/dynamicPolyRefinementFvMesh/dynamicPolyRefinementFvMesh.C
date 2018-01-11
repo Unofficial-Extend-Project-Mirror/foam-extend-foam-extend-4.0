@@ -135,30 +135,25 @@ bool dynamicPolyRefinementFvMesh::update()
             refCast<polyhedralRefinement>(topoChanger_[0]);
 
         // Get refinement candidates from refinement selection algorithm
-        labelList cellsToRefine
+        const labelList refCandidates
         (
-            refinementSelectionPtr_->cellsToRefine()
+            refinementSelectionPtr_->refinementCellCandidates()
         );
 
-        // Set cells to refine.
-        // Notes:
-        // 1. Invalidates the argument list
-        // 2. polyhedralRefinement ensures that face and point consistent
-        //    refinement is performed
-        polyRefModifier.setCellsToRefine(cellsToRefine);
+        // Set cells to refine. Note: polyhedralRefinement ensures that face and
+        // point consistent refinement is performed
+        polyRefModifier.setCellsToRefine(refCandidates);
 
-        // Get unrefinement split points from refinement selection algorithm
-        labelList splitPointsToUnrefine
+        // Get unrefinement point candidates from refinement selection algorithm
+        const labelList unrefCandidates
         (
-            refinementSelectionPtr_->splitPointsToUnrefine()
+            refinementSelectionPtr_->unrefinementPointCandidates()
         );
 
-        // Set split points to unrefine around.
-        // Notes:
-        // 1. Invalidates the argument list
-        // 2. polyhedralRefinement ensures that only a consistent set of
-        //    split points is used for unrefinement
-        polyRefModifier.setSplitPointsToUnrefine(splitPointsToUnrefine);
+        // Set split points to unrefine around. Note: polyhedralRefinement
+        // ensures that only a consistent set of split points is used for
+        // unrefinement
+        polyRefModifier.setSplitPointsToUnrefine(unrefCandidates);
 
         // Perform refinement and unrefinement in one go
         autoPtr<mapPolyMesh> topoChangeMap = topoChanger_.changeMesh();

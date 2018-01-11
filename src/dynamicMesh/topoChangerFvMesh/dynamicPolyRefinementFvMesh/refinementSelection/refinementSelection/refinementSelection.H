@@ -30,9 +30,11 @@ Description
     algorithms. The interface provides two functionalities:
 
     1. Selects candidate cells to refine based on chosen criteria through
-       refinementCellCandidates() member function,
+       refinementCellCandidates() member function. Returns a list of all cells
+       that satisfy given criteria,
     2. Selects candidate split points to unrefine based on chosen criteria
-       through unrefinementPointCandidates() member function.
+       through unrefinementPointCandidates() member function. Returns a list of
+       all points (not just split points!) that satisfy the criteria.
 
     Note: Here, we do not check that the unrefinement point candidates do not
     clash the points of cells marked as candidates for refinement. This is taken
@@ -61,8 +63,7 @@ namespace Foam
 {
 
 // Forward declaration of classes
-class dynamicPolyRefinementFvMesh;
-class polyhedralRefinement;
+class fvMesh;
 
 /*---------------------------------------------------------------------------*\
                    Class refinementSelection Declaration
@@ -72,11 +73,8 @@ class refinementSelection
 {
     // Private data
 
-        //- Const reference to dynamicPolyRefinementFvMesh
-        const dynamicPolyRefinementFvMesh& dynamicRefMesh_;
-
-        //- Const reference to polyhedralRefinement mesh modifier
-        const polyhedralRefinement& pRef_;
+        //- Const reference to fvMesh
+        const fvMesh& mesh_;
 
         //- Refinement selection dictionary (subdictionary of
         //  dynamicPolyRefinementFvMeshCoeffs dictionary)
@@ -98,16 +96,10 @@ protected:
 
         // Access functions for derived classes
 
-            //- Const access to the dynamic refinement mesh
-            const dynamicPolyRefinementFvMesh& dynamicRefMesh() const
+            //- Const access to the fvMesh
+            const fvMesh& mesh() const
             {
-                return dynamicRefMesh_;
-            }
-
-            //- Const access to the polyhedral refinement mesh modifier
-            const polyhedralRefinement& polyRef() const
-            {
-                return polyRef_;
+                return mesh_;
             }
 
             //- Const access to the coefficient dictionary
@@ -131,23 +123,17 @@ public:
             refinementSelection,
             dictionary,
             (
-                const dynamicPolyRefinementFvMesh& dynamicRefMesh,
-                const polyhedralRefinement& pRef,
+                const fvMesh& mesh,
                 const dictionary& dict
             ),
-            (dynamicRefMesh, pRef, dict)
+            (mesh, dict)
         );
 
 
     // Constructors
 
         //- Construct from components
-        refinementSelection
-        (
-            const dynamicPolyRefinementFvMesh& dynamicRefMesh,
-            const polyhedralRefinement& pRef,
-            const dictionary& dict
-        );
+        refinementSelection(const fvMesh& mesh, const dictionary& dict);
 
 
     // Selectors
@@ -155,8 +141,7 @@ public:
         //- Return an autoPtr to the selected refinementSelection
         static autoPtr<refinementSelection> New
         (
-            const dynamicPolyRefinementFvMesh& dynamicRefMesh,
-            const polyhedralRefinement& pRef,
+            const fvMesh& mesh,
             const dictionary& dict
         );
 

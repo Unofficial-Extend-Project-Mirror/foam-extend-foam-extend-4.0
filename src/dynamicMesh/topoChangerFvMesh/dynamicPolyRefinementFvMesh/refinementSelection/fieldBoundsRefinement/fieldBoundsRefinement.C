@@ -53,12 +53,11 @@ addToRunTimeSelectionTable
 
 Foam::fieldBoundsRefinement::fieldBoundsRefinement
 (
-    const dynamicPolyRefinementFvMesh& dynamicRefMesh,
-    const polyhedralRefinement& pRef,
+    const fvMesh& mesh,
     const dictionary& dict
 )
 :
-    refinementSelection_(dynamicRefMesh, pRef, dict),
+    refinementSelection_(mesh, dict),
     fieldName_(coeffDict().lookup("fieldName")),
     lowerBound_(readScalar(coeffDict().lookup("lowerBound"))),
     upperBound_(readScalar(coeffDict().lookup("upperBound"))),
@@ -80,12 +79,9 @@ Foam::fieldBoundsRefinement::~fieldBoundsRefinement()
 Foam::Xfer<Foam::labelList>
 Foam::fieldBoundsRefinement::refinementCellCandidates() const
 {
-    // Get reference to fvMesh
-    const fvMesh& mesh = dynamicRefMesh();
-
     // Get the field
     const volScalarField& vField =
-        mesh.lookupObject<volScalarField>(fieldName_);
+        mesh().lookupObject<volScalarField>(fieldName_);
 
     // Create temporary for the field (sharing the reference to volume field)
     tmp<volScalarField> tvf(vField);
@@ -94,14 +90,14 @@ Foam::fieldBoundsRefinement::refinementCellCandidates() const
     if (cellPointCellSmoothing_)
     {
         // Create volume to point interpolation object
-        const volPointInterpolation& vpi = volPointInterpolation::New(mesh);
+        const volPointInterpolation& vpi = volPointInterpolation::New(mesh());
 
         // Interpolate from cell centres to points
         pointScalarField pField(vpi.interpolate(vField));
 
         // Create point to volume interpolation object
-        const pointMesh pMesh(mesh);
-        const pointVolInterpolation pvi(pMesh, mesh);
+        const pointMesh pMesh(mesh());
+        const pointVolInterpolation pvi(pMesh, mesh());
 
         // Interpolate from points back to cell centres
         tmp<volScalarField> tInterpolatedVf = pvi.interpolate(pField);
@@ -115,7 +111,7 @@ Foam::fieldBoundsRefinement::refinementCellCandidates() const
 
     // Create storage for collection of cells. Assume that one in five cells
     // will be refined to prevent excessive resizing.
-    dynamicLabelList refinementCandidates(mesh.nCells()/5);
+    dynamicLabelList refinementCandidates(mesh().nCells()/5);
 
     // Loop through internal field and collect cells to refine
     const scalarField& vfIn = vf.internalField();
@@ -146,34 +142,26 @@ Foam::fieldBoundsRefinement::refinementCellCandidates() const
 Foam::Xfer<Foam::labelList>
 Foam::fieldBoundsRefinement::unrefinementPointCandidates() const
 {
-    // Get reference to fvMesh
-    const fvMesh& mesh = dynamicRefMesh();
-
     // Get the field
     const volScalarField& vField =
-        mesh.lookupObject<volScalarField>(fieldName_);
-
-    // Get all points that can be unrefined from the polyhedralRefinement mesh
-    // modifier engine
-    const labelList splitPoints(polyRef().splitPoints());
+        mesh().lookupObject<volScalarField>(fieldName_);
 
     // Create volume to point interpolation object
-    const volPointInterpolation& vpi = volPointInterpolation::New(mesh);
+    const volPointInterpolation& vpi = volPointInterpolation::New(mesh());
 
-    // Interpolate from the volume field from cell centres to points and get
-    // the internal field
+    // Interpolate the volume field from cell centres to points and get the
+    // internal point field
     pointScalarField pField(vpi.interpolate(vField));
     const scalarField& pFieldIn = pField.internalField();
 
-    // Create storage for collection of split cells. Assume that one in five
-    // split points will be unrefined to prevent excessive resizing
-    dynamicLabelList unrefinementCandidates(splitPoints.size()/5);
+    // Create storage for collection of candidates. Assume that one in ten
+    // mesh points will be unrefined to prevent excessive resizing
+    dynamicLabelList unrefinementCandidates(mesh().nPoints()/10);
 
     // Loop through all split points and select candidates to unrefine
-    forAll (splitPoints, i)
+    forAll (pField, pointI)
     {
-        // Get point index and point value
-        const label& pointI = splitPoints[i];
+        // Get point value
         const scalar pointValue = pFieldIn[pointI];
 
         if (pointValue > upperBound || pointValue < lowerBound)

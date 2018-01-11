@@ -88,12 +88,7 @@ public:
     // Constructors
 
         //- Construct from components
-        fieldBoundsRefinement
-        (
-            const dynamicPolyRefinementFvMesh& dynamicRefMesh,
-            const polyhedralRefinement& pRef,
-            const dictionary& dict
-        );
+        fieldBoundsRefinement(const fvMesh& mesh, const dictionary& dict);
 
 
     //- Destructor

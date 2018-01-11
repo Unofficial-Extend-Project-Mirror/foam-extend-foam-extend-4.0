@@ -28,8 +28,7 @@ Author
 \*---------------------------------------------------------------------------*/
 
 #include "refinementSelection.H"
-#include "dynamicPolyRefinementFvMesh.H"
-#include "polyhedralRefinement.H"
+#include "fvMesh.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -45,17 +44,12 @@ defineRunTimeSelectionTable(refinementSelection, dictionary);
 
 Foam::refinementSelection::refinementSelection
 (
-    const dynamicPolyRefinementFvMesh& dynamicRefMesh,
-    const polyhedralRefinement& pRef,
+    const fvMesh& mesh,
     const dictionary& dict
 )
 :
-    dynamicRefMesh_(dynamicRefMesh),
-    pRef_(pRef),
-    coeffDict_
-    (
-        dict.subDict("refinementSelection")
-    )
+    mesh_(mesh),
+    coeffDict_(dict.subDict("refinementSelection"))
 {}
 
 
@@ -63,8 +57,7 @@ Foam::refinementSelection::refinementSelection
 
 Foam::autoPtr<Foam::refinementSelection> Foam::refinementSelection::New
 (
-    const dynamicPolyRefinementFvMesh& dynamicRefMesh,
-    const polyhedralRefinement& pRef,
+    const fvMesh& mesh,
     const dictionary& dict
 )
 {
@@ -83,8 +76,7 @@ Foam::autoPtr<Foam::refinementSelection> Foam::refinementSelection::New
             (
             "refinementSelection::refinementSelection::New\n"
             "(\n"
-            "    const dynamicPolyRefinementFvMesh& dynamicRefMesh,\n"
-            "    const polyhedralRefinement& pRef,\n"
+            "    const fvMesh& mesh,\n"
             "    const dictionary& dict\n"
             ")"
             )   << "Unknown refinementSelection type "
@@ -94,8 +86,7 @@ Foam::autoPtr<Foam::refinementSelection> Foam::refinementSelection::New
                 << exit(FatalError);
     }
 
-    return
-        autoPtr<refinementSelection>(cstrIter()(dynamicRefMesh, pRef, dict));
+    return autoPtr<refinementSelection>(cstrIter()(mesh, dict));
 }
 
 

@@ -76,6 +76,7 @@ class dynamicPolyRefinementFvMesh
         //- Helper function for reading the dictionary and updating the data
         void readDict();
 
+
         // Copy control
 
             //- Disallow default bitwise copy construct
