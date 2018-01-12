@@ -134,7 +134,8 @@ bool dynamicPolyRefinementFvMesh::update()
         polyhedralRefinement& polyRefModifier =
             refCast<polyhedralRefinement>(topoChanger_[0]);
 
-        // Get refinement candidates from refinement selection algorithm
+        // Get refinement candidates from refinement selection algorithm. Note:
+        // return type is Xfer<labelList> so there's no copying
         const labelList refCandidates
         (
             refinementSelectionPtr_->refinementCellCandidates()
@@ -144,7 +145,8 @@ bool dynamicPolyRefinementFvMesh::update()
         // point consistent refinement is performed
         polyRefModifier.setCellsToRefine(refCandidates);
 
-        // Get unrefinement point candidates from refinement selection algorithm
+        // Get unrefinement point candidates from refinement selection
+        // algorithm. Note: return type is Xfer<labelList> so there's no copying
         const labelList unrefCandidates
         (
             refinementSelectionPtr_->unrefinementPointCandidates()
@@ -154,6 +156,17 @@ bool dynamicPolyRefinementFvMesh::update()
         // ensures that only a consistent set of split points is used for
         // unrefinement
         polyRefModifier.setSplitPointsToUnrefine(unrefCandidates);
+
+        // Activate the polyhedral refinement engine if there are some cells to
+        // refine or there are some split points to unrefine around
+        if (!refCandidates.empty() || !unrefCandidates.empty())
+        {
+            polyRefModifier.enable();
+        }
+        else
+        {
+            polyRefModifier.disable();
+        }
 
         // Perform refinement and unrefinement in one go
         autoPtr<mapPolyMesh> topoChangeMap = topoChanger_.changeMesh();
