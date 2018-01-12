@@ -55,7 +55,7 @@ Notes
 #include "polyMeshModifier.H"
 #include "labelIOList.H"
 #include "polyRefinementHistory.H"
-#include "removeFaces.H"
+#include "removePolyFaces.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -72,26 +72,41 @@ class polyhedralRefinement
 {
     // Private data
 
-        //- Cell refinement level
-        labelIOList cellLevel_;
+        //- Reference to polyMesh for easy access in helper functions
+        polyMesh& mesh_;
 
-        //- Point refinement level
-        labelIOList pointLevel_;
 
-        //- Typical edge length between unrefined points
-        const scalar level0EdgeLength_;
+        // Refinement control and handling
 
-        //- Refinement history
-        polyRefinementHistory history_;
+            //- List of cells to refine in this time step
+            labelList cellsToRefine_;
 
-        //- Face remover engine
-        removeFaces faceRemover_;
+            //- List of split point labels to unrefine in this time step
+            labelList splitPointsToUnrefine_;
 
-        //- List of cells to refine in this time step
-        labelList cellsToRefine_;
+            //- Cell refinement level
+            labelIOList cellLevel_;
 
-        //- List of split point labels to unrefine in this time step
-        labelList splitPointLabels_;
+            //- Point refinement level
+            labelIOList pointLevel_;
+
+            //- Typical edge length between unrefined points
+            const scalar level0EdgeLength_;
+
+            //- Refinement history
+            polyRefinementHistory history_;
+
+            //- Face remover engine
+            removePolyFaces faceRemover_;
+
+            //- Switch whether to use point based consistency on refinement
+            Switch pointBasedRefinement_;
+
+            //- Number of buffer layers for refinement
+            label nBufferLayers_;
+
+            //- Number of refinement/unrefinement iterations done so far
+            label nRefinementIterations_;
 
 
     // Private Member Functions
@@ -112,12 +127,16 @@ class polyhedralRefinement
             //  points smaller than the level
             label getAnchorLevel(const label faceI) const;
 
-            //- Get points of a cell by going through its faces (without using
-            //  cellPoints addressing)
-            Xfer<labelList> cellPoints(const label cellI) const;
-
             //- Calculate level0EdgeLength_ (constructor helper)
             void calcLevel0EdgeLength() const;
+
+            //- Set file instance for cellLevel_, pointLevel_ and history_
+            void setInstance(const fileName& inst);
+
+            //- Extend cells to refine. Given a markup field of refinement
+            //  candidates (true for cells to refine), marks the neigbhours of
+            //  marked cells as well
+            void extendMarkedCells(boolList& refineCell) const;
 
 
         // Global topology modification functions (operate on whole polyMesh)
@@ -136,13 +155,13 @@ class polyhedralRefinement
             //   that will allocate interpolation.
             //  -points added to split edge: added from edge start()
             //  -midpoints added: added from cellPoints[0].
-            void setPolyhedralRefinement() const;
+            void setPolyhedralRefinement(polyTopoChange& ref);
 
             //- Remove some of the previously performed refinement. Uses
             //  splitPointLabels_ to determine the unrefinement.
             //  All n pointCells of a split point will be combined into
             //  the lowest numbered cell of those n.
-            void setUnrefinement() const;
+            void setPolyhedralUnrefinement(polyTopoChange& ref);
 
 
         // Local topology modification functions (operate on cells/faces)
@@ -150,7 +169,7 @@ class polyhedralRefinement
             //- Adds a face on top of existing faceI. Reverses if nessecary
             label addFace
             (
-                polyTopoChange& meshMod,
+                polyTopoChange& ref,
                 const label faceI,
                 const face& newFace,
                 const label own,
@@ -160,7 +179,7 @@ class polyhedralRefinement
             //- Adds internal face from point. No checks on reversal
             label addInternalFace
             (
-                polyTopoChange& meshMod,
+                polyTopoChange& ref,
                 const label meshFaceI,
                 const label meshPointI,
                 const face& newFace,
@@ -172,7 +191,7 @@ class polyhedralRefinement
             //  points. Reverses if nessecary
             void modifyFace
             (
-                polyTopoChange& meshMod,
+                polyTopoChange& ref,
                 const label faceI,
                 const face& newFace,
                 const label own,
@@ -190,7 +209,7 @@ class polyhedralRefinement
                 const labelList& faceAnchorLevel,
                 const labelList& edgeMidPoint,
                 const label cellI,
-                polyTopoChange& meshMod
+                polyTopoChange& ref
             ) const;
 
 
@@ -243,7 +262,7 @@ class polyhedralRefinement
 
             //- Get index of point with minimum or maximum point level
             template<class BinaryOp>
-            label findMinMaxLevel(const labelList& f) const;
+            label findMinMaxLevel(const labelList& f, BinaryOp& op) const;
 
             //- Count number of vertices <= anchorLevel for a given face
             label countAnchors
@@ -278,7 +297,7 @@ class polyhedralRefinement
 
                 Map<edge>& midPointToAnchors,
                 Map<edge>& midPointToFaceMids,
-                polyTopoChange& meshMod
+                polyTopoChange& ref
             ) const;
 
             //- If p0 and p1 are existing vertices check if edge is split and insert
@@ -297,7 +316,7 @@ class polyhedralRefinement
             //- Check orientation of added internal face
             void checkInternalOrientation
             (
-                polyTopoChange& meshMod,
+                polyTopoChange& ref,
                 const label cellI,
                 const label faceI,
                 const point& ownPt,
@@ -308,7 +327,7 @@ class polyhedralRefinement
             //- Check orientation of a new boundary face
             void checkBoundaryOrientation
             (
-                polyTopoChange& meshMod,
+                polyTopoChange& ref,
                 const label cellI,
                 const label faceI,
                 const point& ownPt,
@@ -319,45 +338,24 @@ class polyhedralRefinement
 
         // Refinement/unrefinement consistency checks
 
-            //- Given valid mesh, current cell level and proposed
-            //  cells to refine calculate any clashes (due to 2:1) and return
-            //  ok list of cells to refine.
-            Xfer<labelList> consistentRefinement
-            (
-                const labelList& cellsToRefine,
-                const bool pointBasedRefinement
-            ) const;
-
-            //- Given proposed splitPoints to unrefine calculate
-            //  any clashes (due to 2:1) and return ok list of points to
-            //  unrefine.
-            Xfer<labelList> consistentUnrefinement
-            (
-                const labelList& pointsToUnrefine,
-                const bool pointBasedUnrefinement
-            ) const;
-
-            //- Updates refineCell such that a face consistent 2:1 refinement
+            //- Updates cellsToRefine such that a face consistent 2:1 refinement
             //  is obtained. Returns local number of cells changed
-            label faceConsistentRefinement(PackedBoolList& refineCell) const;
+            label faceConsistentRefinement(boolList& cellsToRefine) const;
 
-            //- Updates refineCell such that a point consistent 4:1 refinement
+            //- Updates cellsToRefine such that a point consistent 4:1 refinement
             //  is obtained. Returns local number of cells changed
-            label pointConsistentRefinement(PackedBoolList& refineCell) const;
+            label pointConsistentRefinement(boolList& cellsToRefine) const;
 
-            //- Updates unrefineCell such that a face consistent 2:1
-            //  unrefinement is obtained. Returns local number of cells changed
-            label faceConsistentUnrefinement
-            (
-                PackedBoolList& unrefineCell
-            ) const;
+            //- Updates cellsToUnrefine such that a face consistent 2:1
+            //  unrefinement is obtained. Returns local number of points changed
+            label faceConsistentUnrefinement(boolList& cellsToUnrefine) const;
 
-            //- Updates unrefineCell such that a point consistent 4:1
-            //  unrefinement is obtained. Returns local number of cells changed
+            //- Updates cellsToUnrefine such that a point consistent 4:1
+            //  unrefinement is obtained. Returns local number of points changed
             label pointConsistentUnrefinement
             (
-                const PackedBoolList& unrefinePoints,
-                PackedBoolList& unrefineCell
+                const boolList& splitPointsToUnrefine,
+                boolList& cellsToUnrefine
             ) const;
 
 
@@ -421,14 +419,26 @@ public:
 
         // Edit
 
-            //- Set cells to refine
-            void setCellsToRefine(const labelList& cellsToRefine);
+            //- Set cells to refine given a list of refinement
+            //  candidates. Refinement candidates are extended within the
+            //  function due to possible 4:1 conflicts and specified number of
+            //  buffer layers.
+            //  Note: must be called BEFORE setSplitPointsToUnrefine
+            void setCellsToRefine(const labelList& refinementCellCandidates);
 
-            //- Update split points to unrefine
-            void updateSplitPointsToUnrefine();
+            //- Set split points to unrefine given a list of all mesh points
+            //  that are candidates for unrefinement. Split points are
+            //  determined as a subset of unrefinement candidates, avoiding
+            //  splitting points of cells that are going to be refined at the
+            //  same time and ensuring consistent unrefinement.
+            //  Note: must be called AFTER setCellsToRefine
+            void setSplitPointsToUnrefine
+            (
+                const labelList& unrefinementPointCandidates
+            );
 
 
-        // polyMeshModifier interface
+        // Inherited interface from polyMeshModifier
 
             //- Check for topology change
             virtual bool changeTopology() const;
