@@ -99,14 +99,17 @@ class polyhedralRefinement
             //- Face remover engine
             removePolyFaces faceRemover_;
 
+            //- Maximum number of cells in the mesh. Note: not strictly enforced
+            label maxCells_;
+
+            //- Maximum number of refinement levels for a given cell
+            label maxRefinementLevel_;
+
             //- Switch whether to use point based consistency on refinement
             Switch pointBasedRefinement_;
 
             //- Number of buffer layers for refinement
             label nBufferLayers_;
-
-            //- Number of refinement/unrefinement iterations done so far
-            label nRefinementIterations_;
 
 
     // Private Member Functions

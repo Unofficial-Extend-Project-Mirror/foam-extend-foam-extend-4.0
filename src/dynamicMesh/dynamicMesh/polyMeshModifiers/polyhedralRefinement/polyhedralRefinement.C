@@ -420,7 +420,10 @@ void Foam::polyhedralRefinement::setPolyhedralRefinement
 
     // New point and cell levels. Insert original lists into dynamic list for
     // easy insertion. Note: dynamic lists shall be resized with multiplier 2 on
-    // the first insertion using operator() for non existing element
+    // the first insertion using operator() for non existing element.  Note: I'm
+    // pretty sure that we don't need to update newCellLevel for new cells and
+    // newPointLevel for new points here as this information will be correctly
+    // set in updateMesh member function after the topo change is performed.
     dynamicLabelList newCellLevel(cellLevel_);
     dynamicLabelList newPointLevel(pointLevel_);
 
@@ -608,9 +611,9 @@ void Foam::polyhedralRefinement::setPolyhedralRefinement
                     )
                 );
 
-                // Update level new point level: take maximum of the two points
-                // in the original edge and increment. Note: operator() resizes
-                // the list if necessary
+                // Update new point level: take maximum of the two points in the
+                // original edge and increment. Note: operator() resizes the
+                // list if necessary
                 newPointLevel(edgeMidPoint[edgeI]) =
                     max
                     (
@@ -3230,34 +3233,6 @@ Foam::label Foam::polyhedralRefinement::pointConsistentUnrefinement
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-// Construct from components
-Foam::polyhedralRefinement::polyhedralRefinement
-(
-    const word& name,
-    const label index,
-    const polyTopoChanger& mme,
-    const word& zoneName,
-    const scalar minThickness,
-    const scalar maxThickness,
-    const label cellZone
-)
-:
-    polyMeshModifier(name, index, mme, true),
-    faceZoneID_(zoneName, mme.mesh().faceZones()),
-    minLayerThickness_(minThickness),
-    maxLayerThickness_(maxThickness),
-    oldLayerThickness_(-1.0),
-    pointsPairingPtr_(NULL),
-    facesPairingPtr_(NULL),
-    triggerRemoval_(-1),
-    triggerAddition_(-1),
-    cellZone_(cellZone)
-{
-    checkDefinition();
-}
-
-
-// Construct from dictionary
 Foam::polyhedralRefinement::polyhedralRefinement
 (
     const word& name,
@@ -3267,17 +3242,186 @@ Foam::polyhedralRefinement::polyhedralRefinement
 )
 :
     polyMeshModifier(name, index, mme, Switch(dict.lookup("active"))),
-    faceZoneID_(dict.lookup("faceZoneName"), mme.mesh().faceZones()),
-    minLayerThickness_(readScalar(dict.lookup("minLayerThickness"))),
-    maxLayerThickness_(readScalar(dict.lookup("maxLayerThickness"))),
-    oldLayerThickness_(readOldThickness(dict)),
-    pointsPairingPtr_(NULL),
-    facesPairingPtr_(NULL),
-    triggerRemoval_(-1),
-    triggerAddition_(-1),
-    cellZone_(-1)
+    mesh_(mme.mesh()),
+    cellsToRefine_(),
+    splitPointsToUnrefine_(),
+    cellLevel_
+    (
+        IOobject
+        (
+            "cellLevel",
+            mesh_.facesInstance(),
+            polyMesh::meshSubDir,
+            mesh_,
+            IOobject::READ_IF_PRESENT,
+            IOobject::AUTO_WRITE
+        ),
+        labelList(mesh_.nCells(), 0)
+    ),
+    pointLevel_
+    (
+        IOobject
+        (
+            "pointLevel",
+            mesh_.facesInstance(),
+            polyMesh::meshSubDir,
+            mesh_,
+            IOobject::READ_IF_PRESENT,
+            IOobject::AUTO_WRITE
+        ),
+        labelList(mesh_.nPoints(), 0)
+    ),
+    level0EdgeLength(), // Initialised in constructor body
+    history_
+    (
+        IOobject
+        (
+            "polyRefinementHistory",
+            mesh_.facesInstance(),
+            polyMesh::meshSubDir,
+            mesh_,
+            IOobject::READ_IF_PRESENT,
+            IOobject::AUTO_WRITE
+        ),
+        mesh_.nCells() // All are visible if not read
+    ),
+    faceRemover_(mesh_, GREAT), // Merge boundary faces wherever possible
+    maxCells_(readLabel(dict.lookup("maxCells"))),
+    maxRefinementLevel_(readLabel(dict.lookup("maxRefinementLevel"))),
+    pointBasedRefinement_
+    (
+        dict.lookupOrDefault<Switch>("pointBasedRefinement", true)
+    ),
+    nBufferLayers_(readScalar(dict.lookup("nBufferLayers")))
 {
-    checkDefinition();
+    // Calculate level 0 edge length
+    calcLevel0EdgeLength();
+
+    // Check consistency between history and number of cells in the mesh
+    if (history_.active() && history_.visibleCells().size() != mesh_.nCells())
+    {
+        FatalErrorIn
+        (
+            "polyhedralRefinement::polyhedralRefinement"
+            "\n("
+            "\n    const word& name,"
+            "\n    const dictionary& dict,"
+            "\n    const label index,"
+            "\n    const polyTopoChanger& mme"
+            "\n)"
+        )   << "History enabled but number of visible cells: "
+            << history_.visibleCells().size()
+            << nl
+            << " is not equal to the number of cells in the mesh: "
+            << mesh_.nCells()
+            << nl
+            << abort(FatalError);
+    }
+
+    // Check consistency between cellLevel and number of cells and pointLevel
+    // and number of points in the mesh
+    if
+    (
+        cellLevel_.size() != mesh_.nCells()
+     || pointLevel_.size() != mesh_.nPoints()
+    )
+    {
+        FatalErrorIn
+        (
+            "polyhedralRefinement::polyhedralRefinement"
+            "\n("
+            "\n    const word& name,"
+            "\n    const dictionary& dict,"
+            "\n    const label index,"
+            "\n    const polyTopoChanger& mme"
+            "\n)"
+        )   << "Restarted from inconsistent cellLevel or pointLevel files."
+            << endl
+            << "Number of cells in mesh: " << mesh_.nCells()
+            << " does not equal size of cellLevel: " << cellLevel_.size() << nl
+            << "Number of points in mesh: " << mesh_.nPoints()
+            << " does not equal size of pointLevel: " << pointLevel_.size()
+            << abort(FatalError);
+    }
+
+    // Check specified number of maximum cells
+    if (maxCells_ < 1)
+    {
+        FatalErrorIn
+        (
+            "polyhedralRefinement::polyhedralRefinement"
+            "\n("
+            "\n    const word& name,"
+            "\n    const dictionary& dict,"
+            "\n    const label index,"
+            "\n    const polyTopoChanger& mme"
+            "\n)"
+        )   << "Specified zero or negative maxCells."
+            << nl
+            << "This is not allowed."
+            << abort(FatalError);
+    }
+
+    // Check maximum refinement level
+    if (maxRefinementLevel_ < 0)
+    {
+        FatalErrorIn
+        (
+            "polyhedralRefinement::polyhedralRefinement"
+            "\n("
+            "\n    const word& name,"
+            "\n    const dictionary& dict,"
+            "\n    const label index,"
+            "\n    const polyTopoChanger& mme"
+            "\n)"
+        )   << "Negative maxRefinementLevel specified."
+            << nl
+            << "This is not allowed."
+            << abort(FatalError);
+    }
+
+    // If the maximum refinementLevel is greater than 2 and the user insists on
+    // not using point based refinement strategy, issue a warning
+    if (!pointBasedRefinement_ && maxRefinementLevel_ > 2)
+    {
+        WarningIn
+        (
+            "polyhedralRefinement::polyhedralRefinement"
+            "\n("
+            "\n    const word& name,"
+            "\n    const dictionary& dict,"
+            "\n    const label index,"
+            "\n    const polyTopoChanger& mme"
+            "\n)"
+        )   << "You are not using point based consistency for dynamic"
+            << " refinement."
+            << nl
+            << "Since you are allowing more than two maximum refinement"
+            << " refinement levels, this might produce erroneous mesh due to"
+            << " 8:1 point conflicts."
+            << nl
+            << "In order to supress this message and use point based"
+            << " consistency checks, set pointBasedRefinement to true."
+            << abort(FatalError);
+    }
+
+    // Check number of buffer layers
+    if (nBufferLayers_ < 0)
+    {
+        FatalErrorIn
+        (
+            "polyhedralRefinement::polyhedralRefinement"
+            "\n("
+            "\n    const word& name,"
+            "\n    const dictionary& dict,"
+            "\n    const label index,"
+            "\n    const polyTopoChanger& mme"
+            "\n)"
+        )   << "Negative nBufferLayers specified."
+            << nl
+            << "This is not allowed."
+            << abort(FatalError);
+    }
 }
 
 
@@ -3313,10 +3457,32 @@ void Foam::polyhedralRefinement::setCellsToRefine
     // Create a mark-up field for cells to refine
     boolList refineCell(mesh_.nCells(), false);
 
-    // Mark initial refinement candidates for refinement
+    // Roughly count how many cells we are going to end up with
+    label roughCellCountAfterRefinement = mesh_.nCells();
+
+    // Get cell points to count number of additional cells
+    const labelListList& meshCellPoints = mesh_.cellPoints();
+
+    // Mark initial refinement candidates for refinement only if the cell level
+    // is smaller than the maximum refinement level. Note: stop marking them if
+    // we exceed the rough cell count
     forAll (refinementCellCandidates, i)
     {
-        refineCell[refinementCellCandidates[i]] = true;
+        // Get cell index
+        const label& cellI = refinementCellCandidates[i];
+
+        if
+        (
+            roughCellCountAfterRefinement < maxCells_
+         && cellLevel_[cellI] < maxRefinementLevel_
+        )
+        {
+            // Mark cell for refinement
+            refineCell[cellI] = true;
+
+            // Increment number of cells (nPoints - 1 new cells per cell)
+            roughCellCountAfterRefinement += meshCellPoints[cellI].size() - 1;
+        }
     }
 
     // Extend cells using a specified number of buffer layers
@@ -3690,75 +3856,119 @@ void Foam::polyhedralRefinement::setRefinement(polyTopoChange& ref) const
 }
 
 
-void Foam::polyhedralRefinement::updateMesh(const mapPolyMesh&)
+void Foam::polyhedralRefinement::modifyMotionPoints
+(
+    pointField& motionPoints
+) const
+{
+    if (debug)
+    {
+        Pout<< "void polyhedralRefinement::modifyMotionPoints("
+            << "pointField& motionPoints) const for object "
+            << name() << " : ";
+    }
+
+    if (debug)
+    {
+        Pout << "No motion point adjustment" << endl;
+    }
+}
+
+
+
+void Foam::polyhedralRefinement::updateMesh(const mapPolyMesh& map)
 {
     if (debug)
     {
         Info<< "polyhedralRefinement::updateMesh(const mapPolyMesh&) "
             << " for object " << name() << " : "
-            << "Clearing addressing on external request. ";
+            << "Updating cell and point levels."
+            << endl;
+    }
 
-        if (pointsPairingPtr_ || facesPairingPtr_)
+    // Mesh has changed topologically, we need to update cell and point levels,
+    // refinement history object and face remover object
+
+    // Get cell map: from current mesh cells to previous mesh cells
+    const labelList& cellMap = map.cellMap();
+
+    // Create new cell level
+    labelList newCellLevel(cellMap.size());
+
+    // Loop through all new cells
+    forAll (cellMap, newCellI)
+    {
+        // Get index of the corresponding old cell
+        const label& oldCellI = cellMap[newCellI];
+
+        if (oldCellI == -1)
         {
-            Info << "Pointers set." << endl;
+            // This cell is inflated (does not originate from other cell), set
+            // cell level to -1
+            newCellLevel[newCellI] = -1;
         }
         else
         {
-            Info << "Pointers not set." << endl;
+            // Map the "old" level (updated in setRefinement)
+            newCellLevel[newCellI] = cellLevel_[oldCellI];
         }
     }
 
-    // Mesh has changed topologically.  Update local topological data
-    faceZoneID_.update(topoChanger().mesh().faceZones());
-
-    clearAddressing();
-}
+    // Transfer the new cell level into the data member
+    cellLevel_.transfer(newCellLevel);
 
 
-void Foam::polyhedralRefinement::setMinLayerThickness(const scalar t) const
-{
-    if
-    (
-        t < VSMALL
-     || maxLayerThickness_ < t
-    )
+    // Get point map: from current mesh points to previous mesh points
+    const labelList& pointMap = map.pointMap();
+
+    // Create new point level
+    labelList newPointLevel(pointMap.size());
+
+    // Loop through all new points
+    forAll (pointMap, newPointI)
     {
-        FatalErrorIn
-        (
-            "void polyhedralRefinement::setMinLayerThickness("
-            "const scalar t) const"
-        )   << "Incorrect layer thickness definition."
-            << abort(FatalError);
+        // Get index of the corresponding old point
+        const label& oldPointI = pointMap[newPointI];
+
+        if (oldPointI == -1)
+        {
+            // This point has been appended without any master point, set point
+            // level to -1
+            newPointLevel[newPointI] = -1;
+        }
+        else
+        {
+            // Map the "old" level (updated in setRefinement)
+            newPointLevel[newPointI] = pointLevel_[oldPointI];
+        }
     }
 
-    minLayerThickness_ = t;
-}
+    // Transfer the new point level into the data member
+    pointLevel_.transfer(newPointLevel);
 
 
-void Foam::polyhedralRefinement::setMaxLayerThickness(const scalar t) const
-{
-    if (t < minLayerThickness_)
+    // Update refinement history
+    if (history_.active())
     {
-        FatalErrorIn
-        (
-            "void polyhedralRefinement::setMaxLayerThickness("
-            "const scalar t) const"
-        )   << "Incorrect layer thickness definition."
-            << abort(FatalError);
+        history_.updateMesh(map);
     }
 
-    maxLayerThickness_ = t;
+    // Mark files as changed
+    setInstance(mesh_.facesInstance());
+
+    // Update face remover
+    faceRemover_.updateMesh(map);
 }
 
 
 void Foam::polyhedralRefinement::write(Ostream& os) const
 {
     os  << nl << type() << nl
-        << name()<< nl
-        << faceZoneID_ << nl
-        << minLayerThickness_ << nl
-        << oldLayerThickness_ << nl
-        << maxLayerThickness_ << endl;
+        << name() << nl
+        << maxCells_ << nl
+        << maxRefinementLevel_ << nl
+        << pointBasedRefinement_ << nl
+        << nBufferLayers_ << endl;
 }
 
 
@@ -3767,13 +3977,13 @@ void Foam::polyhedralRefinement::writeDict(Ostream& os) const
     os  << nl << name() << nl << token::BEGIN_BLOCK << nl
         << "    type " << type()
         << token::END_STATEMENT << nl
-        << "    faceZoneName " << faceZoneID_.name()
+        << "    maxCells " << maxCells_
         << token::END_STATEMENT << nl
-        << "    minLayerThickness " << minLayerThickness_
+        << "    maxRefinementLevel " << maxRefinementLevel_
         << token::END_STATEMENT << nl
-        << "    maxLayerThickness " << maxLayerThickness_
+        << "    pointBasedRefinement " << pointBasedRefinement_
         << token::END_STATEMENT << nl
-        << "    oldLayerThickness " << oldLayerThickness_
+        << "    nBufferLayers " << nBufferLayers_
         << token::END_STATEMENT << nl
         << "    active " << active()
         << token::END_STATEMENT << nl
