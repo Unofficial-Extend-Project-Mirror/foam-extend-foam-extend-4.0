@@ -44,8 +44,8 @@ Author
     Vuko Vukcevic, Wikki Ltd.  All rights reserved.
 
 Notes
-    Generalisation of hexRef8 for polyhedral cells and refactorisation into mesh
-    modifier engine.
+    Generalisation of hexRef8 for polyhedral cells and refactorisation using
+    polyMesh modifier engine.
 
 \*---------------------------------------------------------------------------*/
 
@@ -55,7 +55,7 @@ Notes
 #include "polyMeshModifier.H"
 #include "labelIOList.H"
 #include "polyRefinementHistory.H"
-#include "removePolyFaces.H"
+#include "removeFaces.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -73,31 +73,31 @@ class polyhedralRefinement
     // Private data
 
         //- Reference to polyMesh for easy access in helper functions
-        polyMesh& mesh_;
+        const polyMesh& mesh_;
 
 
         // Refinement control and handling
 
             //- List of cells to refine in this time step
-            labelList cellsToRefine_;
+            mutable labelList cellsToRefine_;
 
             //- List of split point labels to unrefine in this time step
-            labelList splitPointsToUnrefine_;
+            mutable labelList splitPointsToUnrefine_;
 
             //- Cell refinement level
-            labelIOList cellLevel_;
+            mutable labelIOList cellLevel_;
 
             //- Point refinement level
-            labelIOList pointLevel_;
+            mutable labelIOList pointLevel_;
 
             //- Typical edge length between unrefined points
-            const scalar level0EdgeLength_;
+            scalar level0EdgeLength_;
 
             //- Refinement history
-            polyRefinementHistory history_;
+            mutable polyRefinementHistory history_;
 
             //- Face remover engine
-            removePolyFaces faceRemover_;
+            mutable removeFaces faceRemover_;
 
             //- Maximum number of cells in the mesh. Note: not strictly enforced
             label maxCells_;
@@ -131,10 +131,10 @@ class polyhedralRefinement
             label getAnchorLevel(const label faceI) const;
 
             //- Calculate level0EdgeLength_ (constructor helper)
-            void calcLevel0EdgeLength() const;
+            void calcLevel0EdgeLength();
 
             //- Set file instance for cellLevel_, pointLevel_ and history_
-            void setInstance(const fileName& inst);
+            void setInstance(const fileName& inst) const;
 
             //- Extend cells to refine. Given a markup field of refinement
             //  candidates (true for cells to refine), marks the neigbhours of
@@ -158,13 +158,13 @@ class polyhedralRefinement
             //   that will allocate interpolation.
             //  -points added to split edge: added from edge start()
             //  -midpoints added: added from cellPoints[0].
-            void setPolyhedralRefinement(polyTopoChange& ref);
+            void setPolyhedralRefinement(polyTopoChange& ref) const;
 
             //- Remove some of the previously performed refinement. Uses
             //  splitPointLabels_ to determine the unrefinement.
             //  All n pointCells of a split point will be combined into
             //  the lowest numbered cell of those n.
-            void setPolyhedralUnrefinement(polyTopoChange& ref);
+            void setPolyhedralUnrefinement(polyTopoChange& ref) const;
 
 
         // Local topology modification functions (operate on cells/faces)
@@ -263,9 +263,11 @@ class polyhedralRefinement
                 dynamicLabelList& faceVerts
             ) const;
 
-            //- Get index of point with minimum or maximum point level
-            template<class BinaryOp>
-            label findMinMaxLevel(const labelList& f, BinaryOp& op) const;
+            //- Get index of point with minimum point level
+            label findMinLevel(const labelList& f) const;
+
+            //- Get index of point with maximum point level
+            label findMaxLevel(const labelList& f) const;
 
             //- Count number of vertices <= anchorLevel for a given face
             label countAnchors
@@ -416,7 +418,7 @@ public:
             //- Typical edge length between unrefined points
             scalar level0EdgeLength() const
             {
-                return level0Edge_;
+                return level0EdgeLength_;
             }
 
 
