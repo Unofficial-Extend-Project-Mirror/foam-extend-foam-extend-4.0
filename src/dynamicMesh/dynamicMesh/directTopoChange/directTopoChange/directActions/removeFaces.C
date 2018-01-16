@@ -48,8 +48,6 @@ defineTypeNameAndDebug(removeFaces, 0);
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
-// Changes region of connected set of cells. Can be recursive since hopefully
-// only small area of faces removed in one go.
 void Foam::removeFaces::changeCellRegion
 (
     const label cellI,
@@ -62,8 +60,7 @@ void Foam::removeFaces::changeCellRegion
     {
         cellRegion[cellI] = newRegion;
 
-        // Step to neighbouring cells
-
+        // Go through all neighbouring cells
         const labelList& cCells = mesh_.cellCells()[cellI];
 
         forAll(cCells, i)
@@ -129,7 +126,7 @@ Foam::label Foam::removeFaces::changeFaceRegion
 // - removal of faces
 // - removal of edges
 // - removal of points
-Foam::boolList Foam::removeFaces::getFacesAffected
+Foam::Xfer<boolList> Foam::removeFaces::affectedFaces
 (
     const labelList& cellRegion,
     const labelList& cellRegionMaster,
@@ -185,7 +182,8 @@ Foam::boolList Foam::removeFaces::getFacesAffected
             affectedFace[pFaces[pFaceI]] = true;
         }
     }
-    return affectedFace;
+
+    return affectedFace.xfer();
 }
 
 
@@ -579,20 +577,24 @@ Foam::label Foam::removeFaces::compatibleRemoves
     labelList& newFacesToRemove
 ) const
 {
+    // Get necessary mesh data
     const labelList& faceOwner = mesh_.faceOwner();
     const labelList& faceNeighbour = mesh_.faceNeighbour();
 
-    cellRegion.setSize(mesh_.nCells());
-    cellRegion = -1;
+    const label nCells = mesh_.nCells();
 
-    regionMaster.setSize(mesh_.nCells());
-    regionMaster = -1;
+    // Resize the lists and set elements to -1 by default
+    cellRegion.setSize(nCells, -1);
+    regionMaster.setSize(nCells, -1);
 
+    // Count regions
     label nRegions = 0;
 
+    // Loop through initial set of faces to remove
     forAll(facesToRemove, i)
     {
-        label faceI = facesToRemove[i];
+        // Get face index
+        const label& faceI = facesToRemove[i];
 
         if (!mesh_.isInternalFace(faceI))
         {
@@ -600,103 +602,119 @@ Foam::label Foam::removeFaces::compatibleRemoves
             (
                 "removeFaces::compatibleRemoves(const labelList&"
                 ", labelList&, labelList&, labelList&)"
-            )   << "Not internal face:" << faceI << abort(FatalError);
+            )   << "Attempting to remove boundary face with face index: "
+                << faceI << nl
+                << "This is not allowed. Check facesToRemove list."
+                << abort(FatalError);
         }
 
+        // Get owner and neighbour data
+        const label& own = faceOwner[faceI];
+        const label& nei = faceNeighbour[faceI];
 
-        label own = faceOwner[faceI];
-        label nei = faceNeighbour[faceI];
+        // Get region data for owner and neighbour
+        label& ownRegion = cellRegion[own];
+        label& neiRegion = cellRegion[nei];
 
-        label region0 = cellRegion[own];
-        label region1 = cellRegion[nei];
-
-        if (region0 == -1)
+        if (ownRegion == -1)
         {
-            if (region1 == -1)
-            {
-                // Create new region
-                cellRegion[own] = nRegions;
-                cellRegion[nei] = nRegions;
+            // Owner region is not set
 
-                // Make owner (lowest numbered!) the master of the region
+            if (neiRegion == -1)
+            {
+                // Neighbour region is also not set, create new region
+                ownRegion = nRegions;
+                neiRegion = nRegions;
+
+                // Make owner (lowest numbered!) the master of the region and
+                // increment the number of regions
                 regionMaster[nRegions] = own;
-                nRegions++;
+                ++nRegions;
             }
             else
             {
-                // Add owner to neighbour region
-                cellRegion[own] = region1;
-                // See if owner becomes the master of the region
+                // Neighbour region is set, add owner to neighbour region
+                ownRegion = neiRegion;
+
+                // See if owner becomes the master of the region (if its index
+                // is lower than the current master of the region)
                 regionMaster[region1] = min(own, regionMaster[region1]);
             }
         }
         else
         {
-            if (region1 == -1)
+            // Owner region is set
+
+            if (neiRegion == -1)
             {
-                // Add neighbour to owner region
-                cellRegion[nei] = region0;
-                // nei is higher numbered than own so guaranteed not lower
-                // than master of region0.
+                // Neighbour region is not set, add neighbour to owner region
+                neiRegion = ownRegion;
+
+                // Note: nei has higher index than own so neighbour can't be the
+                // master of this region
             }
-            else if (region0 != region1)
+            else if (ownRegion != neiRegion)
             {
-                // Both have regions. Keep lowest numbered region and master.
+                // Both have regions. Keep lowest numbered region and master
                 label freedRegion = -1;
                 label keptRegion = -1;
 
-                if (region0 < region1)
+                if (ownRegion < neiRegion)
                 {
                     changeCellRegion
                     (
                         nei,
-                        region1,    // old region
-                        region0,    // new region
+                        neiRegion,    // old region
+                        ownRegion,    // new region
                         cellRegion
                     );
 
-                    keptRegion = region0;
-                    freedRegion = region1;
+                    keptRegion = ownRegion;
+                    freedRegion = neiRegion;
                 }
-                else if (region1 < region0)
+                else if (ownRegion < neiRegion)
                 {
                     changeCellRegion
                     (
                         own,
-                        region0,    // old region
-                        region1,    // new region
+                        ownRegion,    // old region
+                        neiRegion,    // new region
                         cellRegion
                     );
 
-                    keptRegion = region1;
-                    freedRegion = region0;
+                    keptRegion = neiRegion;
+                    freedRegion = ownRegion;
                 }
 
-                label master0 = regionMaster[region0];
-                label master1 = regionMaster[region1];
+                const label& ownRegionMaster = regionMaster[ownRegion];
+                const label& neiRegionMaster = regionMaster[neiRegion];
 
                 regionMaster[freedRegion] = -1;
-                regionMaster[keptRegion] = min(master0, master1);
+                regionMaster[keptRegion] = min(ownRegionMaster, neiRegionMaster);
             }
         }
     }
 
+    // Set size
     regionMaster.setSize(nRegions);
 
-
-    // Various checks
+    // Various checks, additional scope for clarity
     // - master is lowest numbered in any region
     // - regions have more than 1 cell
     {
+        // Number of cells per region
         labelList nCells(regionMaster.size(), 0);
 
+        // Loop through cell regions
         forAll(cellRegion, cellI)
         {
-            label r = cellRegion[cellI];
+            // Get region for this cell
+            const label& r = cellRegion[cellI];
 
             if (r != -1)
             {
-                nCells[r]++;
+                // Region found, increment number of cells per region
+                ++nCells[r];
 
                 if (cellI < regionMaster[r])
                 {
@@ -704,24 +722,25 @@ Foam::label Foam::removeFaces::compatibleRemoves
                     (
                         "removeFaces::compatibleRemoves(const labelList&"
                         ", labelList&, labelList&, labelList&)"
-                    )   << "Not lowest numbered : cell:" << cellI
-                        << " region:" << r
-                        << " regionmaster:" << regionMaster[r]
+                    )   << "Not lowest numbered! Cell: " << cellI
+                        << " region: " << r
+                        << " region master: " << regionMaster[r]
                         << abort(FatalError);
                 }
             }
         }
 
-        forAll(nCells, region)
+        // Loop through all regions
+        forAll(nCells, regionI)
         {
-            if (nCells[region] == 1)
+            if (nCells[regionI] == 1)
             {
                 FatalErrorIn
                 (
                     "removeFaces::compatibleRemoves(const labelList&"
                     ", labelList&, labelList&, labelList&)"
                 )   << "Region " << region
-                    << " has only " << nCells[region] << " cells in it"
+                    << " has only " << nCells[region] << " cell in it."
                     << abort(FatalError);
             }
         }
@@ -735,28 +754,33 @@ Foam::label Foam::removeFaces::compatibleRemoves
     {
         if (regionMaster[i] != -1)
         {
-            nUsedRegions++;
+            ++nUsedRegions;
         }
     }
 
-    // Recreate facesToRemove to be consistent with the cellRegions.
+    // Recreate facesToRemove to be consistent with the cellRegions
     dynamicLabelList allFacesToRemove(facesToRemove.size());
 
-    for (label faceI = 0; faceI < mesh_.nInternalFaces(); faceI++)
+    // Get number of internal faces
+    const label nInternalFaces = mesh_.nInternalFaces();
+
+    // Loop through internal faces
+    for (label faceI = 0; faceI < nInternalFaces; ++faceI)
     {
-        label own = faceOwner[faceI];
-        label nei = faceNeighbour[faceI];
+        // Get owner and neighbour labels
+        const label& own = faceOwner[faceI];
+        const label& nei = faceNeighbour[faceI];
 
         if (cellRegion[own] != -1 && cellRegion[own] == cellRegion[nei])
         {
-            // Both will become the same cell so add face to list of faces
-            // to be removed.
+            // Both owner and neighbour of the face will become the same cell so
+            // we can add this face to final list of faces to be removed
             allFacesToRemove.append(faceI);
         }
     }
 
-    newFacesToRemove.transfer(allFacesToRemove.shrink());
-    allFacesToRemove.clear();
+    // Transfer dynamic list into the ordinary list
+    newFacesToRemove.transfer(allFacesToRemove);
 
     return nUsedRegions;
 }
@@ -1358,7 +1382,7 @@ void Foam::removeFaces::setRefinement
     // Get all faces affected in any way by removal of points/edges/faces/cells
     boolList affectedFace
     (
-        getFacesAffected
+        affectedFaces
         (
             cellRegion,
             cellRegionMaster,
