@@ -26,6 +26,7 @@ License
 #include "meshTools.H"
 #include "polyMesh.H"
 #include "hexMatcher.H"
+#include "faceZone.H"
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
@@ -894,6 +895,35 @@ Foam::label Foam::meshTools::cutDirToEdge
     }
 
     return maxEdgeI;
+}
+
+
+void Foam::meshTools::setFaceInfo
+(
+    const polyMesh& mesh,
+    const label faceI,
+    label& patchID,
+    label& zoneID,
+    label& zoneFlip
+)
+{
+    patchID = -1;
+
+    if (!mesh.isInternalFace(faceI))
+    {
+        patchID = mesh.boundaryMesh().whichPatch(faceI);
+    }
+
+    zoneID = mesh.faceZones().whichZone(faceI);
+
+    zoneFlip = false;
+
+    if (zoneID > -1)
+    {
+        const faceZone& fZone = mesh.faceZones()[zoneID];
+
+        zoneFlip = fZone.flipMap()[fZone.whichFace(faceI)];
+    }
 }
 
 
