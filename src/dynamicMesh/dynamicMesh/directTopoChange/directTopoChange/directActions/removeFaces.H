@@ -90,10 +90,12 @@ class removeFaces
             const label cellI,
             const label oldRegion,
             const label newRegion,
+
             labelList& cellRegion
         ) const;
 
-        //- Changes region of connected set of faces
+        //- Changes region of connected set of faces. Returns number of changed
+        //  faces
         label changeFaceRegion
         (
             const labelList& cellRegion,
@@ -101,6 +103,7 @@ class removeFaces
             const labelList& nFacesPerEdge,
             const label faceI,
             const label newRegion,
+
             labelList& faceRegion
         ) const;
 
@@ -132,26 +135,20 @@ class removeFaces
                 const labelList& cellRegionMaster,
                 const labelHashSet& pointsToRemove,
                 const labelList& faceLabels,
+
                 TopoChangeEngine& ref
             ) const;
 
-            //- Get patch, zone info for faceI
-            void getFaceInfo
-            (
-                const label faceI,
-                label& patchID,
-                label& zoneID,
-                label& zoneFlip
-            ) const;
-
-            //- Return face with all pointsToRemove removed.
+            //- Return face with all pointsToRemove removed
             face filterFace
             (
-                const labelHashSet& pointsToRemove, const label
+                const labelHashSet& pointsToRemove,
+                const label
             ) const;
 
             //- Wrapper for meshMod.modifyFace. Reverses face if own>nei.
-            void modFace
+            template<class TopoChangeEngine>
+            void modifyFace
             (
                 const face& f,
                 const label masterFaceID,
@@ -163,7 +160,7 @@ class removeFaces
                 const label zoneID,
                 const bool zoneFlip,
 
-                directTopoChange& meshMod
+                TopoChangeEngine& ref
             ) const;
 
 
@@ -190,7 +187,7 @@ public:
 
     // Member Functions
 
-        //- Given set of faces to pierce calculates:
+        //- Given a set of faces to pierce calculates:
         //  - region for connected cells
         //  - mastercell for each region. This is the lowest numbered cell
         //    of all cells that get merged.
@@ -200,26 +197,30 @@ public:
         label compatibleRemoves
         (
             const labelList& inPiercedFaces,
+
             labelList& cellRegion,
             labelList& cellRegionMaster,
             labelList& outPiercedFaces
         ) const;
 
 
-        //- Play commands into directTopoChange to remove faces.
+        //- Play commands into TopoChangeEngine to remove faces.
+        template<class TopoChangeEngine>
         void setRefinement
         (
             const labelList& piercedFaces,
             const labelList& cellRegion,
             const labelList& cellRegionMaster,
-            directTopoChange&
+            TopoChangeEngine& ref
         ) const;
 
-        //- Force recalculation of locally stored data on topological change
+        //- Force recalculation of locally stored data on topological
+        //  change. Does nothing
         void updateMesh(const mapPolyMesh&)
         {}
 
-        //- Force recalculation of locally stored data for mesh distribution
+        //- Force recalculation of locally stored data for mesh
+        //  distribution. Does nothing.
         void distribute(const mapDistributePolyMesh&)
         {}
 };
@@ -228,6 +229,10 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam
+
+#ifdef NoRepository
+#   include "removeFacesTemplates.C"
+#endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

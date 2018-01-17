@@ -26,11 +26,8 @@ License
 #include "removeFaces.H"
 #include "polyMesh.H"
 #include "directTopoChange.H"
+#include "polyTopoChange.H"
 #include "meshTools.H"
-#include "polyModifyFace.H"
-#include "polyRemoveFace.H"
-#include "polyRemoveCell.H"
-#include "polyRemovePoint.H"
 #include "syncTools.H"
 #include "OFstream.H"
 #include "indirectPrimitivePatch.H"
@@ -71,7 +68,6 @@ void Foam::removeFaces::changeCellRegion
 }
 
 
-// Changes region of connected set of faces. Returns number of changed faces.
 Foam::label Foam::removeFaces::changeFaceRegion
 (
     const labelList& cellRegion,
@@ -79,9 +75,11 @@ Foam::label Foam::removeFaces::changeFaceRegion
     const labelList& nFacesPerEdge,
     const label faceI,
     const label newRegion,
+
     labelList& faceRegion
 ) const
 {
+    // Count number of changed faces
     label nChanged = 0;
 
     if (faceRegion[faceI] == -1 && !removedFace[faceI])
@@ -90,17 +88,20 @@ Foam::label Foam::removeFaces::changeFaceRegion
 
         nChanged = 1;
 
-        // Step to neighbouring faces across edges that will get removed
+        // Get mesh data
+        const labelListList& meshFaceEdges = mesh_.faceEdges();
+        const labelListList& meshEdgeFaces = mesh_.edgeFaces();
 
-        const labelList& fEdges = mesh_.faceEdges()[faceI];
+        // Step to neighbouring faces across edges that will get removed
+        const labelList& fEdges = meshFaceEdges[faceI];
 
         forAll(fEdges, i)
         {
-            label edgeI = fEdges[i];
+            const label& edgeI = fEdges[i];
 
             if (nFacesPerEdge[edgeI] >= 0 && nFacesPerEdge[edgeI] <= 2)
             {
-                const labelList& eFaces = mesh_.edgeFaces()[edgeI];
+                const labelList& eFaces = meshEdgeFaces[edgeI];
 
                 forAll(eFaces, j)
                 {
@@ -111,12 +112,14 @@ Foam::label Foam::removeFaces::changeFaceRegion
                         nFacesPerEdge,
                         eFaces[j],
                         newRegion,
+
                         faceRegion
                     );
                 }
             }
         }
     }
+
     return nChanged;
 }
 
@@ -135,17 +138,21 @@ Foam::Xfer<boolList> Foam::removeFaces::affectedFaces
     const labelHashSet& pointsToRemove
 ) const
 {
+    // Create a marker field for affected faces
     boolList affectedFace(mesh_.nFaces(), false);
+
+    // Get mesh cells
+    const cellList& meshCells = mesh_.cells();
 
     // Mark faces affected by removal of cells
     forAll(cellRegion, cellI)
     {
-        label region = cellRegion[cellI];
+        const label& region = cellRegion[cellI];
 
         if (region != -1 && (cellI != cellRegionMaster[region]))
         {
-            const labelList& cFaces = mesh_.cells()[cellI];
-
+            // Get this cell (list of cell faces) and mark all of its faces
+            const labelList& cFaces = cellList[cellI];
             forAll(cFaces, cFaceI)
             {
                 affectedFace[cFaces[cFaceI]] = true;
@@ -153,30 +160,34 @@ Foam::Xfer<boolList> Foam::removeFaces::affectedFaces
         }
     }
 
-    // Mark faces affected by removal of face.
+    // Mark faces affected by removal of face
     forAll(facesToRemove, i)
     {
          affectedFace[facesToRemove[i]] = true;
     }
 
-    //  Mark faces affected by removal of edges
+    // Get edge faces
+    const labelListList& meshEdgeFaces = mesh_.edgeFaces();
+
+    // Mark faces affected by removal of edges
     forAllConstIter(labelHashSet, edgesToRemove, iter)
     {
-        const labelList& eFaces = mesh_.edgeFaces()[iter.key()];
-
+        // Get all faces of this edge and mark them
+        const labelList& eFaces = meshEdgeFaces[iter.key()];
         forAll(eFaces, eFaceI)
         {
             affectedFace[eFaces[eFaceI]] = true;
         }
     }
 
+    // Get point faces
+    const labelListList& meshPointFaces = mesh_.pointFaces();
+
     // Mark faces affected by removal of points
     forAllConstIter(labelHashSet, pointsToRemove, iter)
     {
-        label pointI = iter.key();
-
-        const labelList& pFaces = mesh_.pointFaces()[pointI];
-
+        // Get all faces of this point and mark them
+        const labelList& pFaces = meshPointFaces[iter.key()];
         forAll(pFaces, pFaceI)
         {
             affectedFace[pFaces[pFaceI]] = true;
@@ -214,342 +225,48 @@ void Foam::removeFaces::writeOBJ
 
         forAll(f, fp)
         {
-            str<< ' ' << f[fp]+1;
+            str<< token::SPACE << f[fp] + 1;
         }
         str<< nl;
     }
 }
 
 
-// Inserts commands to merge faceLabels into one face.
-void Foam::removeFaces::mergeFaces
-(
-    const labelList& cellRegion,
-    const labelList& cellRegionMaster,
-    const labelHashSet& pointsToRemove,
-    const labelList& faceLabels,
-    directTopoChange& meshMod
-) const
-{
-    // Construct addressing engine from faceLabels (in order of faceLabels as
-    // well)
-    indirectPrimitivePatch fp
-    (
-        IndirectList<face>
-        (
-            mesh_.faces(),
-            faceLabels
-        ),
-        mesh_.points()
-    );
-
-    // Get outside vertices (in local vertex numbering)
-
-    if (fp.edgeLoops().size() != 1)
-    {
-        writeOBJ(fp, mesh_.time().path()/"facesToBeMerged.obj");
-        FatalErrorIn("removeFaces::mergeFaces")
-            << "Cannot merge faces " << faceLabels
-            << " into single face since outside vertices " << fp.edgeLoops()
-            << " do not form single loop but form " << fp.edgeLoops().size()
-            << " loops instead." << abort(FatalError);
-    }
-
-    const labelList& edgeLoop = fp.edgeLoops()[0];
-
-    // Get outside vertices in order of one of the faces in faceLabels.
-    // (this becomes the master face)
-    // Find the first face that uses edgeLoop[0] and edgeLoop[1] as consecutive
-    // vertices.
-
-    label masterIndex = -1;
-    bool reverseLoop = false;
-
-    const labelList& pFaces = fp.pointFaces()[edgeLoop[0]];
-
-    // Find face among pFaces which uses edgeLoop[1]
-    forAll(pFaces, i)
-    {
-        label faceI = pFaces[i];
-
-        const face& f = fp.localFaces()[faceI];
-
-        label index1 = findIndex(f, edgeLoop[1]);
-
-        if (index1 != -1)
-        {
-            // Check whether consecutive to edgeLoop[0]
-            label index0 = findIndex(f, edgeLoop[0]);
-
-            if (index0 != -1)
-            {
-                if (index1 == f.fcIndex(index0))
-                {
-                    masterIndex = faceI;
-                    reverseLoop = false;
-                    break;
-                }
-                else if (index1 == f.rcIndex(index0))
-                {
-                    masterIndex = faceI;
-                    reverseLoop = true;
-                    break;
-                }
-            }
-        }
-    }
-
-    if (masterIndex == -1)
-    {
-        writeOBJ(fp, mesh_.time().path()/"facesToBeMerged.obj");
-        FatalErrorIn("removeFaces::mergeFaces")
-            << "Problem" << abort(FatalError);
-    }
-
-
-    // Modify the master face.
-    // ~~~~~~~~~~~~~~~~~~~~~~~
-
-    // Modify first face.
-    label faceI = faceLabels[masterIndex];
-
-    label own = mesh_.faceOwner()[faceI];
-
-    if (cellRegion[own] != -1)
-    {
-        own = cellRegionMaster[cellRegion[own]];
-    }
-
-    label patchID, zoneID, zoneFlip;
-
-    getFaceInfo(faceI, patchID, zoneID, zoneFlip);
-
-    label nei = -1;
-
-    if (mesh_.isInternalFace(faceI))
-    {
-        nei = mesh_.faceNeighbour()[faceI];
-
-        if (cellRegion[nei] != -1)
-        {
-            nei = cellRegionMaster[cellRegion[nei]];
-        }
-    }
-
-
-    dynamicLabelList faceVerts(edgeLoop.size());
-
-    forAll(edgeLoop, i)
-    {
-        label pointI = fp.meshPoints()[edgeLoop[i]];
-
-        if (pointsToRemove.found(pointI))
-        {
-            //Pout<< "**Removing point " << pointI << " from "
-            //    << edgeLoop << endl;
-        }
-        else
-        {
-            faceVerts.append(pointI);
-        }
-    }
-
-    face mergedFace;
-    mergedFace.transfer(faceVerts.shrink());
-    faceVerts.clear();
-
-    if (reverseLoop)
-    {
-        reverse(mergedFace);
-    }
-
-    //{
-    //    Pout<< "Modifying masterface " << faceI
-    //        << " from faces:" << faceLabels
-    //        << " old verts:" << IndirectList<face>(mesh_.faces(), faceLabels)
-    //        << " for new verts:"
-    //        << mergedFace
-    //        << " possibly new owner " << own
-    //        << " or new nei " << nei
-    //        << endl;
-    //}
-
-    modFace
-    (
-        mergedFace,         // modified face
-        faceI,              // label of face being modified
-        own,                // owner
-        nei,                // neighbour
-        false,              // face flip
-        patchID,            // patch for face
-        false,              // remove from zone
-        zoneID,             // zone for face
-        zoneFlip,           // face flip in zone
-
-        meshMod
-    );
-
-
-    // Remove all but master face.
-    forAll(faceLabels, patchFaceI)
-    {
-        if (patchFaceI != masterIndex)
-        {
-            //Pout<< "Removing face " << faceLabels[patchFaceI] << endl;
-
-            meshMod.setAction(polyRemoveFace(faceLabels[patchFaceI], faceI));
-        }
-    }
-}
-
-
-// Get patch, zone info for faceI
-void Foam::removeFaces::getFaceInfo
-(
-    const label faceI,
-
-    label& patchID,
-    label& zoneID,
-    label& zoneFlip
-) const
-{
-    patchID = -1;
-
-    if (!mesh_.isInternalFace(faceI))
-    {
-        patchID = mesh_.boundaryMesh().whichPatch(faceI);
-    }
-
-    zoneID = mesh_.faceZones().whichZone(faceI);
-
-    zoneFlip = false;
-
-    if (zoneID >= 0)
-    {
-        const faceZone& fZone = mesh_.faceZones()[zoneID];
-
-        zoneFlip = fZone.flipMap()[fZone.whichFace(faceI)];
-    }
-}
-
-
-// Return face with all pointsToRemove removed.
 Foam::face Foam::removeFaces::filterFace
 (
     const labelHashSet& pointsToRemove,
     const label faceI
 ) const
 {
+    // Get the face
     const face& f = mesh_.faces()[faceI];
 
+    // Create a new face as plain list
     labelList newFace(f.size(), -1);
 
     label newFp = 0;
 
     forAll(f, fp)
     {
-        label vertI = f[fp];
+        // Get face vertex
+        const label& vertI = f[fp];
 
         if (!pointsToRemove.found(vertI))
         {
+            // Point not found, it won't be removed, append the vertex
             newFace[newFp++] = vertI;
         }
     }
 
+    // Resize and return the face
     newFace.setSize(newFp);
 
     return face(newFace);
 }
 
 
-// Wrapper for meshMod.modifyFace. Reverses face if own>nei.
-void Foam::removeFaces::modFace
-(
-    const face& f,
-    const label masterFaceID,
-    const label own,
-    const label nei,
-    const bool flipFaceFlux,
-    const label newPatchID,
-    const bool removeFromZone,
-    const label zoneID,
-    const bool zoneFlip,
-
-    directTopoChange& meshMod
-) const
-{
-    if ((nei == -1) || (own < nei))
-    {
-//        if (debug)
-//        {
-//            Pout<< "ModifyFace (unreversed) :"
-//                << "  faceI:" << masterFaceID
-//                << "  f:" << f
-//                << "  own:" << own
-//                << "  nei:" << nei
-//                << "  flipFaceFlux:" << flipFaceFlux
-//                << "  newPatchID:" << newPatchID
-//                << "  removeFromZone:" << removeFromZone
-//                << "  zoneID:" << zoneID
-//                << "  zoneFlip:" << zoneFlip
-//                << endl;
-//        }
-
-        meshMod.setAction
-        (
-            polyModifyFace
-            (
-                f,              // modified face
-                masterFaceID,   // label of face being modified
-                own,            // owner
-                nei,            // neighbour
-                flipFaceFlux,   // face flip
-                newPatchID,     // patch for face
-                removeFromZone, // remove from zone
-                zoneID,         // zone for face
-                zoneFlip        // face flip in zone
-            )
-        );
-    }
-    else
-    {
-//        if (debug)
-//        {
-//            Pout<< "ModifyFace (!reversed) :"
-//                << "  faceI:" << masterFaceID
-//                << "  f:" << f.reverseFace()
-//                << "  own:" << nei
-//                << "  nei:" << own
-//                << "  flipFaceFlux:" << flipFaceFlux
-//                << "  newPatchID:" << newPatchID
-//                << "  removeFromZone:" << removeFromZone
-//                << "  zoneID:" << zoneID
-//                << "  zoneFlip:" << zoneFlip
-//                << endl;
-//        }
-
-        meshMod.setAction
-        (
-            polyModifyFace
-            (
-                f.reverseFace(),// modified face
-                masterFaceID,   // label of face being modified
-                nei,            // owner
-                own,            // neighbour
-                flipFaceFlux,   // face flip
-                newPatchID,     // patch for face
-                removeFromZone, // remove from zone
-                zoneID,         // zone for face
-                zoneFlip        // face flip in zone
-            )
-        );
-    }
-}
-
-
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-// Construct from mesh
 Foam::removeFaces::removeFaces
 (
     const polyMesh& mesh,
@@ -563,12 +280,6 @@ Foam::removeFaces::removeFaces
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-// Removing face connects cells. This function works out a consistent set of
-// cell regions.
-// - returns faces to remove. Can be extended with additional faces
-//   (if owner would become neighbour)
-// - sets cellRegion to -1 or to region number
-// - regionMaster contains for every region number a master cell.
 Foam::label Foam::removeFaces::compatibleRemoves
 (
     const labelList& facesToRemove,
@@ -698,7 +409,7 @@ Foam::label Foam::removeFaces::compatibleRemoves
     // Set size
     regionMaster.setSize(nRegions);
 
-    // Various checks, additional scope for clarity
+    // Various checks, additional scope for clarity and memory management
     // - master is lowest numbered in any region
     // - regions have more than 1 cell
     {
@@ -783,768 +494,6 @@ Foam::label Foam::removeFaces::compatibleRemoves
     newFacesToRemove.transfer(allFacesToRemove);
 
     return nUsedRegions;
-}
-
-
-void Foam::removeFaces::setRefinement
-(
-    const labelList& faceLabels,
-    const labelList& cellRegion,
-    const labelList& cellRegionMaster,
-    directTopoChange& meshMod
-) const
-{
-    if (debug)
-    {
-        faceSet facesToRemove
-        (
-            mesh_,
-            "facesToRemove",
-            labelHashSet(faceLabels)
-        );
-        Pout<< "Writing faces to remove to faceSet " << facesToRemove.name()
-            << endl;
-        facesToRemove.write();
-    }
-
-    // Make map of all faces to be removed
-    boolList removedFace(mesh_.nFaces(), false);
-
-    forAll(faceLabels, i)
-    {
-        label faceI = faceLabels[i];
-
-        if (!mesh_.isInternalFace(faceI))
-        {
-            FatalErrorIn
-            (
-                "removeFaces::setRefinement(const labelList&"
-                ", const labelList&, const labelList&, directTopoChange&)"
-            )   << "Face to remove is not internal face:" << faceI
-                << abort(FatalError);
-        }
-
-        removedFace[faceI] = true;
-    }
-
-
-    // Edges to be removed
-    // ~~~~~~~~~~~~~~~~~~~
-
-
-    // Edges to remove
-    labelHashSet edgesToRemove(faceLabels.size());
-
-    // Per face the region it is in. -1 for removed faces, -2 for regions
-    // consisting of single face only.
-    labelList faceRegion(mesh_.nFaces(), -1);
-
-    // Number of connected face regions
-    label nRegions = 0;
-
-
-    {
-        const polyBoundaryMesh& patches = mesh_.boundaryMesh();
-
-        // Usage of edges by non-removed faces.
-        // See below about initialization.
-        labelList nFacesPerEdge(mesh_.nEdges(), -1);
-
-        // Count usage of edges by non-removed faces.
-        forAll(faceLabels, i)
-        {
-            label faceI = faceLabels[i];
-
-            const labelList& fEdges = mesh_.faceEdges()[faceI];
-
-            forAll(fEdges, i)
-            {
-                label edgeI = fEdges[i];
-
-                if (nFacesPerEdge[edgeI] == -1)
-                {
-                    nFacesPerEdge[edgeI] =
-                        mesh_.edgeFaces()[edgeI].size()-1;
-                }
-                else
-                {
-                    nFacesPerEdge[edgeI]--;
-                }
-            }
-        }
-
-        // Count usage for edges not on faces-to-be-removed.
-        // Note that this only needs to be done for possibly coupled edges
-        // so we could choose to loop only over boundary faces and use faceEdges
-        // of those.
-        const labelListList& edgeFaces = mesh_.edgeFaces();
-
-        forAll(edgeFaces, edgeI)
-        {
-            if (nFacesPerEdge[edgeI] == -1)
-            {
-                // Edge not yet handled in loop above so is not used by any
-                // face to be removed.
-
-                const labelList& eFaces = edgeFaces[edgeI];
-
-                if (eFaces.size() > 2)
-                {
-                    nFacesPerEdge[edgeI] = eFaces.size();
-                }
-                else if (eFaces.size() == 2)
-                {
-                    // nFacesPerEdge already -1 so do nothing.
-                }
-                else
-                {
-                    // Get edge and all its cells
-                    const edge& e = mesh_.edges()[edgeI];
-                    const labelListList& ec = mesh_.edgeCells();
-
-                    // Get point cells
-                    const labelListList& pc = mesh_.pointCells();
-
-                    // Write mesh before termination
-                    mesh_.write();
-
-                    // Write all edge point cells
-
-                    // Additionally write all edge cells for debugging
-                    FatalErrorIn("removeFaces::setRefinement")
-                        << "Problem : edge has too few face neighbours:"
-                        << eFaces << endl
-                        << "edge:" << edgeI
-                        << " vertices:" << e
-                        << " coords:" << mesh_.points()[e[0]]
-                        << mesh_.points()[e[1]]
-                        << endl
-                        << "Edge cells: " << ec[edgeI] << nl
-                        << "First point cells: " << pc[e[0]] << nl
-                        << "Second point cells: " << pc[e[1]] << nl
-                        << abort(FatalError);
-                }
-            }
-        }
-
-
-
-        if (debug)
-        {
-            OFstream str(mesh_.time().path()/"edgesWithTwoFaces.obj");
-            Pout<< "Dumping edgesWithTwoFaces to " << str.name() << endl;
-            label vertI = 0;
-
-            forAll(nFacesPerEdge, edgeI)
-            {
-                if (nFacesPerEdge[edgeI] == 2)
-                {
-                    // Edge will get removed.
-                    const edge& e = mesh_.edges()[edgeI];
-
-                    meshTools::writeOBJ(str, mesh_.points()[e[0]]);
-                    vertI++;
-                    meshTools::writeOBJ(str, mesh_.points()[e[1]]);
-                    vertI++;
-                    str<< "l " << vertI-1 << ' ' << vertI << nl;
-                }
-            }
-        }
-
-
-        // Now all unaffected edges will have labelMax, all affected edges the
-        // number of unremoved faces.
-
-        // Filter for edges inbetween two remaining boundary faces that
-        // make too big an angle.
-        forAll(nFacesPerEdge, edgeI)
-        {
-            if (nFacesPerEdge[edgeI] == 2)
-            {
-                // See if they are two boundary faces
-                label f0 = -1;
-                label f1 = -1;
-
-                const labelList& eFaces = mesh_.edgeFaces()[edgeI];
-
-                forAll(eFaces, i)
-                {
-                    label faceI = eFaces[i];
-
-                    if (!removedFace[faceI] && !mesh_.isInternalFace(faceI))
-                    {
-                        if (f0 == -1)
-                        {
-                            f0 = faceI;
-                        }
-                        else
-                        {
-                            f1 = faceI;
-                            break;
-                        }
-                    }
-                }
-
-                if (f0 != -1 && f1 != -1)
-                {
-                    // Edge has two boundary faces remaining.
-                    // See if should be merged.
-
-                    label patch0 = patches.whichPatch(f0);
-                    label patch1 = patches.whichPatch(f1);
-
-                    if (patch0 != patch1)
-                    {
-                        // Different patches. Do not merge edge.
-                        WarningIn("removeFaces::setRefinement")
-                            << "not merging faces " << f0 << " and "
-                            << f1 << " across patch boundary edge " << edgeI
-                            << endl;
-
-                        // Mark so it gets preserved
-                        nFacesPerEdge[edgeI] = 3;
-                    }
-                    else if (minCos_ < 1 && minCos_ > -1)
-                    {
-                        const polyPatch& pp0 = patches[patch0];
-                        const vectorField& n0 = pp0.faceNormals();
-
-                        if
-                        (
-                            mag
-                            (
-                                n0[f0 - pp0.start()]
-                              & n0[f1 - pp0.start()]
-                            )
-                            < minCos_
-                        )
-                        {
-                            WarningIn("removeFaces::setRefinement")
-                                << "not merging faces " << f0 << " and "
-                                << f1 << " across edge " << edgeI
-                                << endl;
-
-                            // Angle between two remaining faces too large.
-                            // Mark so it gets preserved
-                            nFacesPerEdge[edgeI] = 3;
-                        }
-                    }
-                }
-                else if (f0 != -1 || f1 != -1)
-                {
-                    const edge& e = mesh_.edges()[edgeI];
-
-                    // Only found one boundary face. Problem.
-                    FatalErrorIn("removeFaces::setRefinement")
-                        << "Problem : edge would have one boundary face"
-                        << " and one internal face using it." << endl
-                        << "Your remove pattern is probably incorrect." << endl
-                        << "edge:" << edgeI
-                        << " nFaces:" << nFacesPerEdge[edgeI]
-                        << " vertices:" << e
-                        << " coords:" << mesh_.points()[e[0]]
-                        << mesh_.points()[e[1]]
-                        << " face0:" << f0
-                        << " face1:" << f1
-                        << abort(FatalError);
-                }
-            }
-        }
-
-
-
-        // Check locally (before synchronizing) for strangeness
-        forAll(nFacesPerEdge, edgeI)
-        {
-            if (nFacesPerEdge[edgeI] == 1)
-            {
-                const edge& e = mesh_.edges()[edgeI];
-
-                FatalErrorIn("removeFaces::setRefinement")
-                    << "Problem : edge would get 1 face using it only"
-                    << " edge:" << edgeI
-                    << " nFaces:" << nFacesPerEdge[edgeI]
-                    << " vertices:" << e
-                    << " coords:" << mesh_.points()[e[0]]
-                    << ' ' << mesh_.points()[e[1]]
-                    << abort(FatalError);
-            }
-            // Could check here for boundary edge with <=1 faces remaining.
-        }
-
-
-        // Synchronize edge usage. This is to make sure that both sides remove
-        // (or not remove) an edge on the boundary at the same time.
-        //
-        // Coupled edges (edge0, edge1 are opposite each other)
-        // a. edge not on face to be removed, edge has >= 3 faces
-        // b.  ,,                             edge has 2 faces
-        // c. edge has >= 3 remaining faces
-        // d. edge has 2 remaining faces (assume angle>minCos already handled)
-        //
-        // - a + a: do not remove edge
-        // - a + b: do not remove edge
-        // - a + c: do not remove edge
-        // - a + d: do not remove edge
-        //
-        // - b + b: do not remove edge
-        // - b + c: do not remove edge
-        // - b + d: remove edge
-        //
-        // - c + c: do not remove edge
-        // - c + d: do not remove edge
-        // - d + d: remove edge
-        //
-        //
-        // So code situation a. with >= 3
-        //                   b. with -1
-        //                   c. with >=3
-        //                   d. with 2
-        // then do max and check result.
-        //
-        // a+a : max(3,3) = 3. do not remove
-        // a+b : max(3,-1) = 3. do not remove
-        // a+c : max(3,3) = 3. do not remove
-        // a+d : max(3,2) = 3. do not remove
-        //
-        // b+b : max(-1,-1) = -1. do not remove
-        // b+c : max(-1,3) = 3. do not remove
-        // b+d : max(-1,2) = 2. remove
-        //
-        // c+c : max(3,3) = 3. do not remove
-        // c+d : max(3,2) = 3. do not remove
-        //
-        // d+d : max(2,2) = 2. remove
-
-        syncTools::syncEdgeList
-        (
-            mesh_,
-            nFacesPerEdge,
-            maxEqOp<label>(),
-            labelMin,               // guaranteed to be overridden by maxEqOp
-            false                   // no separation
-        );
-
-        // Convert to labelHashSet
-        forAll(nFacesPerEdge, edgeI)
-        {
-            if (nFacesPerEdge[edgeI] == 0)
-            {
-                // 0: edge not used anymore.
-                edgesToRemove.insert(edgeI);
-            }
-            else if (nFacesPerEdge[edgeI] == 1)
-            {
-                // 1: illegal. Tested above.
-            }
-            else if (nFacesPerEdge[edgeI] == 2)
-            {
-                // 2: merge faces.
-                edgesToRemove.insert(edgeI);
-            }
-        }
-
-        if (debug)
-        {
-            OFstream str(mesh_.time().path()/"edgesToRemove.obj");
-            Pout<< "Dumping edgesToRemove to " << str.name() << endl;
-            label vertI = 0;
-
-            forAllConstIter(labelHashSet, edgesToRemove, iter)
-            {
-                // Edge will get removed.
-                const edge& e = mesh_.edges()[iter.key()];
-
-                meshTools::writeOBJ(str, mesh_.points()[e[0]]);
-                vertI++;
-                meshTools::writeOBJ(str, mesh_.points()[e[1]]);
-                vertI++;
-                str<< "l " << vertI-1 << ' ' << vertI << nl;
-            }
-        }
-
-
-        // Walk to fill faceRegion with faces that will be connected across
-        // edges that will be removed.
-
-        label startFaceI = 0;
-
-        while (true)
-        {
-            // Find unset region.
-            for (; startFaceI < mesh_.nFaces(); startFaceI++)
-            {
-                if (faceRegion[startFaceI] == -1 && !removedFace[startFaceI])
-                {
-                    break;
-                }
-            }
-
-            if (startFaceI == mesh_.nFaces())
-            {
-                break;
-            }
-
-            // Start walking face-edge-face, crossing edges that will get
-            // removed. Every thus connected region will get single region
-            // number.
-            label nRegion = changeFaceRegion
-            (
-                cellRegion,
-                removedFace,
-                nFacesPerEdge,
-                startFaceI,
-                nRegions,
-                faceRegion
-            );
-
-            if (nRegion < 1)
-            {
-                FatalErrorIn("setRefinement") << "Problem" << abort(FatalError);
-            }
-            else if (nRegion == 1)
-            {
-                // Reset face to be single region.
-                faceRegion[startFaceI] = -2;
-            }
-            else
-            {
-                nRegions++;
-            }
-        }
-
-
-        // Check we're deciding the same on both sides. Since the regioning
-        // is done based on nFacesPerEdge (which is synced) this should
-        // indeed be the case.
-
-        labelList nbrFaceRegion(faceRegion);
-
-        syncTools::swapFaceList
-        (
-            mesh_,
-            nbrFaceRegion,
-            false                   // no separation
-        );
-
-        labelList toNbrRegion(nRegions, -1);
-
-        for
-        (
-            label faceI = mesh_.nInternalFaces();
-            faceI < mesh_.nFaces();
-            faceI++
-        )
-        {
-            // Get the neighbouring region.
-            label nbrRegion = nbrFaceRegion[faceI];
-            label myRegion = faceRegion[faceI];
-
-            if (myRegion <= -1 || nbrRegion <= -1)
-            {
-                if (nbrRegion != myRegion)
-                {
-                    FatalErrorIn("removeFaces::setRefinement")
-                        << "Inconsistent face region across coupled patches."
-                        << endl
-                        << "This side has for faceI:" << faceI
-                        << " region:" << myRegion << endl
-                        << "The other side has region:" << nbrRegion
-                        << endl
-                        << "(region -1 means face is to be deleted)"
-                        << abort(FatalError);
-                }
-            }
-            else if (toNbrRegion[myRegion] == -1)
-            {
-                // First visit of region. Store correspondence.
-                toNbrRegion[myRegion] = nbrRegion;
-            }
-            else
-            {
-                // Second visit of this region.
-                if (toNbrRegion[myRegion] != nbrRegion)
-                {
-                    FatalErrorIn("removeFaces::setRefinement")
-                        << "Inconsistent face region across coupled patches."
-                        << endl
-                        << "This side has for faceI:" << faceI
-                        << " region:" << myRegion
-                        << " with coupled neighbouring regions:"
-                        << toNbrRegion[myRegion] << " and "
-                        << nbrRegion
-                        << abort(FatalError);
-                }
-            }
-        }
-    }
-
-    //if (debug)
-    //{
-    //    labelListList regionToFaces(invertOneToMany(nRegions, faceRegion));
-    //
-    //    forAll(regionToFaces, regionI)
-    //    {
-    //        Pout<< "    " << regionI << " faces:" << regionToFaces[regionI]
-    //            << endl;
-    //    }
-    //}
-
-
-    // Points to be removed
-    // ~~~~~~~~~~~~~~~~~~~~
-
-    labelHashSet pointsToRemove(4*faceLabels.size());
-
-
-    // Per point count the number of unremoved edges. Store the ones that
-    // are only used by 2 unremoved edges.
-    {
-        // Usage of points by non-removed edges.
-        labelList nEdgesPerPoint(mesh_.nPoints());
-
-        const labelListList& pointEdges = mesh_.pointEdges();
-
-        forAll(pointEdges, pointI)
-        {
-            nEdgesPerPoint[pointI] = pointEdges[pointI].size();
-        }
-
-        forAllConstIter(labelHashSet, edgesToRemove, iter)
-        {
-            // Edge will get removed.
-            const edge& e = mesh_.edges()[iter.key()];
-
-            forAll(e, i)
-            {
-                nEdgesPerPoint[e[i]]--;
-            }
-        }
-
-        // Check locally (before synchronizing) for strangeness
-        forAll(nEdgesPerPoint, pointI)
-        {
-            if (nEdgesPerPoint[pointI] == 1)
-            {
-                FatalErrorIn("removeFaces::setRefinement")
-                    << "Problem : point would get 1 edge using it only."
-                    << " pointI:" << pointI
-                    << " coord:" << mesh_.points()[pointI]
-                    << abort(FatalError);
-            }
-        }
-
-        // Synchronize point usage. This is to make sure that both sides remove
-        // (or not remove) a point on the boundary at the same time.
-        syncTools::syncPointList
-        (
-            mesh_,
-            nEdgesPerPoint,
-            maxEqOp<label>(),
-            labelMin,
-            false                   // no separation
-        );
-
-        forAll(nEdgesPerPoint, pointI)
-        {
-            if (nEdgesPerPoint[pointI] == 0)
-            {
-                pointsToRemove.insert(pointI);
-            }
-            else if (nEdgesPerPoint[pointI] == 1)
-            {
-                // Already checked before
-            }
-            else if (nEdgesPerPoint[pointI] == 2)
-            {
-                // Remove point and merge edges.
-                pointsToRemove.insert(pointI);
-            }
-        }
-    }
-
-
-    if (debug)
-    {
-        OFstream str(mesh_.time().path()/"pointsToRemove.obj");
-        Pout<< "Dumping pointsToRemove to " << str.name() << endl;
-
-        forAllConstIter(labelHashSet, pointsToRemove, iter)
-        {
-            meshTools::writeOBJ(str, mesh_.points()[iter.key()]);
-        }
-    }
-
-
-    // All faces affected in any way
-    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    // Get all faces affected in any way by removal of points/edges/faces/cells
-    boolList affectedFace
-    (
-        affectedFaces
-        (
-            cellRegion,
-            cellRegionMaster,
-            faceLabels,
-            edgesToRemove,
-            pointsToRemove
-        )
-    );
-
-    //
-    // Now we know
-    // - faceLabels         : faces to remove (sync since no boundary faces)
-    // - cellRegion/Master  : cells to remove (sync since cells)
-    // - pointsToRemove     : points to remove (sync)
-    // - faceRegion         : connected face region of faces to be merged (sync)
-    // - affectedFace       : faces with points removed and/or owner/neighbour
-    //                        changed (non sync)
-
-
-    // Start modifying mesh and keep track of faces changed.
-
-
-    // Do all removals
-    // ~~~~~~~~~~~~~~~
-
-    // Remove split faces.
-    forAll(faceLabels, labelI)
-    {
-        label faceI = faceLabels[labelI];
-
-        // Remove face if not yet uptodate (which is never; but want to be
-        // consistent with rest of face removals/modifications)
-        if (affectedFace[faceI])
-        {
-            affectedFace[faceI] = false;
-
-            meshMod.setAction(polyRemoveFace(faceI, -1));
-        }
-    }
-
-
-    // Remove points.
-    forAllConstIter(labelHashSet, pointsToRemove, iter)
-    {
-        label pointI = iter.key();
-
-        meshMod.setAction(polyRemovePoint(pointI, -1));
-    }
-
-
-    // Remove cells.
-    forAll(cellRegion, cellI)
-    {
-        label region = cellRegion[cellI];
-
-        if (region != -1 && (cellI != cellRegionMaster[region]))
-        {
-            meshMod.setAction(polyRemoveCell(cellI, cellRegionMaster[region]));
-        }
-    }
-
-
-
-    // Merge faces across edges to be merged
-    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    // Invert faceRegion so we get region to faces.
-    {
-        labelListList regionToFaces(invertOneToMany(nRegions, faceRegion));
-
-        forAll(regionToFaces, regionI)
-        {
-            const labelList& rFaces = regionToFaces[regionI];
-
-            if (rFaces.size() <= 1)
-            {
-                FatalErrorIn("setRefinement")
-                    << "Region:" << regionI
-                    << " contains only faces " << rFaces
-                    << abort(FatalError);
-            }
-
-            // rFaces[0] is master, rest gets removed.
-            mergeFaces
-            (
-                cellRegion,
-                cellRegionMaster,
-                pointsToRemove,
-                rFaces,
-                meshMod
-            );
-
-            forAll(rFaces, i)
-            {
-                affectedFace[rFaces[i]] = false;
-            }
-        }
-    }
-
-
-    // Remaining affected faces
-    // ~~~~~~~~~~~~~~~~~~~~~~~~
-
-    // Check if any remaining faces have not been updated for new slave/master
-    // or points removed.
-    forAll(affectedFace, faceI)
-    {
-        if (affectedFace[faceI])
-        {
-            affectedFace[faceI] = false;
-
-            face f(filterFace(pointsToRemove, faceI));
-
-            label own = mesh_.faceOwner()[faceI];
-
-            if (cellRegion[own] != -1)
-            {
-                own = cellRegionMaster[cellRegion[own]];
-            }
-
-            label patchID, zoneID, zoneFlip;
-
-            getFaceInfo(faceI, patchID, zoneID, zoneFlip);
-
-            label nei = -1;
-
-            if (mesh_.isInternalFace(faceI))
-            {
-                nei = mesh_.faceNeighbour()[faceI];
-
-                if (cellRegion[nei] != -1)
-                {
-                    nei = cellRegionMaster[cellRegion[nei]];
-                }
-            }
-
-//            if (debug)
-//            {
-//                Pout<< "Modifying " << faceI
-//                    << " old verts:" << mesh_.faces()[faceI]
-//                    << " for new verts:" << f
-//                    << " or for new owner " << own << " or for new nei "
-//                    << nei
-//                    << endl;
-//            }
-
-            modFace
-            (
-                f,                  // modified face
-                faceI,              // label of face being modified
-                own,                // owner
-                nei,                // neighbour
-                false,              // face flip
-                patchID,            // patch for face
-                false,              // remove from zone
-                zoneID,             // zone for face
-                zoneFlip,           // face flip in zone
-
-                meshMod
-            );
-        }
-    }
 }
 
 
