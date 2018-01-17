@@ -60,34 +60,6 @@ namespace Foam
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
-void Foam::polyhedralRefinement::setFaceInfo
-(
-    const label faceI,
-    label& patchID,
-    label& zoneID,
-    label& zoneFlip
-) const
-{
-    patchID = -1;
-
-    if (!mesh_.isInternalFace(faceI))
-    {
-        patchID = mesh_.boundaryMesh().whichPatch(faceI);
-    }
-
-    zoneID = mesh_.faceZones().whichZone(faceI);
-
-    zoneFlip = false;
-
-    if (zoneID > -1)
-    {
-        const faceZone& fZone = mesh_.faceZones()[zoneID];
-
-        zoneFlip = fZone.flipMap()[fZone.whichFace(faceI)];
-    }
-}
-
-
 Foam::label Foam::polyhedralRefinement::getAnchorLevel
 (
     const label faceI
@@ -1626,6 +1598,7 @@ void Foam::polyhedralRefinement::setPolyhedralUnrefinement
         faceRemover_.compatibleRemoves
         (
             splitFaces.toc(),   // Pierced faces
+
             cellRegion,         // Region merged into (-1 for no region)
             cellRegionMaster,   // Master cell for region
             facesToRemove       // List of faces to be removed
@@ -1691,7 +1664,7 @@ Foam::label Foam::polyhedralRefinement::addFace
 {
     // Set face information
     label patchID, zoneID, zoneFlip;
-    setFaceInfo(faceI, patchID, zoneID, zoneFlip);
+    meshTools::setFaceInfo(mesh_, faceI, patchID, zoneID, zoneFlip);
 
     // Set new face index to -1
     label newFaceI = -1;
@@ -1803,9 +1776,9 @@ void Foam::polyhedralRefinement::modifyFace
     const label nei
 ) const
 {
-    // Set face info
+    // Set face inforomation
     label patchID, zoneID, zoneFlip;
-    setFaceInfo(faceI, patchID, zoneID, zoneFlip);
+    meshTools::setFaceInfo(mesh_, faceI, patchID, zoneID, zoneFlip);
 
     // Get owner/neighbour addressing and mesh faces
     const labelList& owner = mesh_.faceOwner();

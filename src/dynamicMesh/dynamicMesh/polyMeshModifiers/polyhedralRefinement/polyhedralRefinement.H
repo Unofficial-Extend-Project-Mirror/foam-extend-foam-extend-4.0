@@ -116,16 +116,6 @@ class polyhedralRefinement
 
         // Helper functions
 
-            //- Set patch and zone info for a face
-            void setFaceInfo
-            (
-                const label faceI,
-                label& patchID,
-                label& zoneID,
-                label& zoneFlip
-            ) const;
-
-
             //- Get least cell level such that the face has at least three
             //  points smaller than the level
             label getAnchorLevel(const label faceI) const;
