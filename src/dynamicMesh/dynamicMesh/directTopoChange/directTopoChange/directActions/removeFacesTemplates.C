@@ -130,7 +130,7 @@ void Foam::removeFaces::mergeFaces
 
     if (masterIndex == -1)
     {
-        writeOBJ(fp, mesh_.time().path()/"facesToBeMerged.obj")
+        writeOBJ(fp, mesh_.time().path()/"facesToBeMerged.obj");
         FatalErrorIn
         (
             "template<class TopoChangeEngine>"
@@ -202,17 +202,6 @@ void Foam::removeFaces::mergeFaces
     {
         // Reverse the merged face
         reverse(mergedFace);
-    }
-
-    if (debug)
-    {
-        Pout<< "Modifying masterface " << faceI
-            << " from faces: " << faceLabels
-            << " old verts: " << IndirectList<face>(mesh_.faces(), faceLabels)
-            << " for new verts: " << mergedFace
-            << " possibly new owner " << own
-            << " or new neighbour " << nei
-            << endl;
     }
 
     // Finally modify merged face
@@ -312,15 +301,16 @@ void Foam::removeFaces::setRefinement
 {
     if (debug)
     {
-        Pout<< "Writing faces to remove to faceSet " << facesToRemove.name()
-            << endl;
-
         const faceSet facesToRemove
         (
             mesh_,
             "facesToRemove",
             labelHashSet(faceLabels)
         );
+
+        Pout<< "Writing faces to remove to faceSet " << facesToRemove.name()
+            << endl;
+
         facesToRemove.write();
     }
 
@@ -508,7 +498,7 @@ void Foam::removeFaces::setRefinement
                 label f0 = -1;
                 label f1 = -1;
 
-                const labelList& eFaces = meshEdgeFaces()[edgeI];
+                const labelList& eFaces = meshEdgeFaces[edgeI];
 
                 forAll(eFaces, i)
                 {
@@ -816,7 +806,7 @@ void Foam::removeFaces::setRefinement
 
         for
         (
-            label faceI = nInternalFaces
+            label faceI = nInternalFaces;
             faceI < nFaces;
             ++faceI
         )
@@ -908,7 +898,7 @@ void Foam::removeFaces::setRefinement
         // Initialise to number of edges per point
         forAll(meshPointEdges, pointI)
         {
-            nEdgesPerPoint[pointI] = pointEdges[pointI].size();
+            nEdgesPerPoint[pointI] = meshPointEdges[pointI].size();
         }
 
         // Loop through edges to remove
@@ -1117,8 +1107,8 @@ void Foam::removeFaces::setRefinement
     // PART 6: Remaining affected faces
 
     // Get necessary mesh data
-    const labelList& owner = mesh_.faceOwners();
-    const lableList& neighbour = mesh_.faceNeighbours();
+    const labelList& owner = mesh_.faceOwner();
+    const labelList& neighbour = mesh_.faceNeighbour();
 
 
     // Check any remaining faces that have not been updated for either new

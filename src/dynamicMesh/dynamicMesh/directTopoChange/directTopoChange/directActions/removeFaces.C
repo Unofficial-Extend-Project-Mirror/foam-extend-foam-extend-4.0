@@ -129,7 +129,7 @@ Foam::label Foam::removeFaces::changeFaceRegion
 // - removal of faces
 // - removal of edges
 // - removal of points
-Foam::Xfer<boolList> Foam::removeFaces::affectedFaces
+Foam::Xfer<Foam::boolList> Foam::removeFaces::affectedFaces
 (
     const labelList& cellRegion,
     const labelList& cellRegionMaster,
@@ -152,7 +152,7 @@ Foam::Xfer<boolList> Foam::removeFaces::affectedFaces
         if (region != -1 && (cellI != cellRegionMaster[region]))
         {
             // Get this cell (list of cell faces) and mark all of its faces
-            const labelList& cFaces = cellList[cellI];
+            const labelList& cFaces = meshCells[cellI];
             forAll(cFaces, cFaceI)
             {
                 affectedFace[cFaces[cFaceI]] = true;
@@ -349,7 +349,7 @@ Foam::label Foam::removeFaces::compatibleRemoves
 
                 // See if owner becomes the master of the region (if its index
                 // is lower than the current master of the region)
-                regionMaster[region1] = min(own, regionMaster[region1]);
+                regionMaster[neiRegion] = min(own, regionMaster[neiRegion]);
             }
         }
         else
@@ -450,8 +450,8 @@ Foam::label Foam::removeFaces::compatibleRemoves
                 (
                     "removeFaces::compatibleRemoves(const labelList&"
                     ", labelList&, labelList&, labelList&)"
-                )   << "Region " << region
-                    << " has only " << nCells[region] << " cell in it."
+                )   << "Region " << regionI
+                    << " has only " << nCells[regionI] << " cell in it."
                     << abort(FatalError);
             }
         }
