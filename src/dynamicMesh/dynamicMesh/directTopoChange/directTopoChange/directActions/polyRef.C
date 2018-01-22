@@ -1604,12 +1604,15 @@ Foam::label Foam::polyRef::pointConsistentRefinement
     // Collect points
     forAll (cellPoints, cellI)
     {
-        // Get current points
-        const labelList& curPoints = cellPoints[cellI];
-
-        forAll (curPoints, pointI)
+        if (refineCell.get(cellI))
         {
-            pointsToConsider.insert(curPoints[pointI]);
+            // This cell is marked for refinement get current points
+            const labelList& curPoints = cellPoints[cellI];
+    
+            forAll (curPoints, pointI)
+            {
+                pointsToConsider.insert(curPoints[pointI]);
+            }
         }
     }
 
@@ -1628,7 +1631,7 @@ Foam::label Foam::polyRef::pointConsistentRefinement
         // Get the cells for this point
         const labelList& curCells = pointCells[pointI];
 
-        // Find maximum refinement level for this points
+        // Find maximum refinement level for this point
         forAll (curCells, cellI)
         {
             const label curCellI = curCells[cellI];
@@ -1660,7 +1663,7 @@ Foam::label Foam::polyRef::pointConsistentRefinement
         const label pointI = iter.key();
 
         // Get the cells for this point
-        const labelList& curCells = pointCells[iter.key()];
+        const labelList& curCells = pointCells[pointI];
 
         // Loop through these point cells and set cells for refinement which
         // would end up having refinement level smaller than maximum level - 1
@@ -1677,17 +1680,6 @@ Foam::label Foam::polyRef::pointConsistentRefinement
                     // Set the cell for refinement and increment the counter
                     refineCell.set(curCellI, 1);
                     ++nChanged;
-                }
-                else
-                {
-                    FatalErrorIn
-                    (
-                        "label polyRef::pointConsistentRefinement"
-                        "(PackedList<1>& refineCells) const"
-                    )   << "Cell is marked for refinement, but the 4:1 point"
-                        << " consistency cannot be ensured." << nl
-                        << "Something went wrong before this step."
-                        << endl;
                 }
             }
         }
