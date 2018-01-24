@@ -260,7 +260,7 @@ void Foam::polyhedralRefinement::calcLevel0EdgeLength()
 
     if (debug)
     {
-        Pout<< "polyRef::getLevel0EdgeLength() :"
+        Pout<< "polyhedralRefinement::calcLevel0EdgeLength() :"
             << " Final edge lengths squared per refinementlevel:"
             << typEdgeLenSqr << endl;
     }
@@ -420,15 +420,12 @@ void Foam::polyhedralRefinement::setPolyhedralRefinement
         // Get cell idnex
         const label& cellI = cellsToRefine_[i];
 
-        // Get anchor point: first point of a first face in a cell
-        const label& anchorPointI = meshFaces[meshCells[cellI][0]][0];
-
         cellMidPoint[cellI] = ref.setAction
         (
             polyAddPoint
             (
                 meshCellCentres[cellI], // Point to add (cell centre)
-                anchorPointI,           // Master point
+                -1,                     // Appended point: no master ID
                 -1,                     // Zone for point
                 true                    // Supports a cell
             )
@@ -572,7 +569,7 @@ void Foam::polyhedralRefinement::setPolyhedralRefinement
                     polyAddPoint
                     (
                         edgeMids[edgeI], // Point
-                        e[0],            // Master point
+                        -1,              // Appended point, no master ID
                         -1,              // Zone for point
                         true             // Supports a cell
                     )
@@ -782,9 +779,6 @@ void Foam::polyhedralRefinement::setPolyhedralRefinement
                 // Face marked to be split. Add the point at face centre and
                 // replace faceMidPoint with actual point label
 
-                // Get mesh face
-                const face& f = meshFaces[faceI];
-
                 faceMidPoint[faceI] = ref.setAction
                 (
                     polyAddPoint
@@ -794,7 +788,7 @@ void Foam::polyhedralRefinement::setPolyhedralRefinement
                           ? meshFaceCentres[faceI]
                           : bFaceMids[faceI - nInternalFaces]
                         ),    // Point
-                        f[0], // Master point
+                        -1,   // Appended point, no master ID
                         -1,   // Zone for point
                         true  // Supports a cell
                     )
