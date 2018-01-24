@@ -54,9 +54,9 @@ void Foam::dynamicPolyRefinementFvMesh::readDict()
     if (refineInterval_ < 1)
     {
         FatalErrorIn("dynamicPolyRefinementFvMesh::readDict()")
-            << "Illegal refineInterval found: " << refineInterval << nl
+            << "Illegal refineInterval found: " << refineInterval_ << nl
             << "The refineInterval controls the refinement/unrefinement"
-            << " trigerring within a certain time step and should be > 0".
+            << " trigerring within a certain time step and should be > 0"
             << exit(FatalError);
     }
 }
@@ -64,9 +64,12 @@ void Foam::dynamicPolyRefinementFvMesh::readDict()
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-dynamicPolyRefinementFvMesh::dynamicPolyRefinementFvMesh(const IOobject& io)
+Foam::dynamicPolyRefinementFvMesh::dynamicPolyRefinementFvMesh
+(
+    const IOobject& io
+)
 :
-    dynamicFvMesh(io),
+    topoChangerFvMesh(io),
     refinementDict_
     (
         IOdictionary
@@ -110,13 +113,13 @@ dynamicPolyRefinementFvMesh::dynamicPolyRefinementFvMesh(const IOobject& io)
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
-dynamicPolyRefinementFvMesh::~dynamicPolyRefinementFvMesh()
+Foam::dynamicPolyRefinementFvMesh::~dynamicPolyRefinementFvMesh()
 {}
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-bool dynamicPolyRefinementFvMesh::update()
+bool Foam::dynamicPolyRefinementFvMesh::update()
 {
     // Re-read the data from dictionary for on-the-fly changes
     readDict();
@@ -127,7 +130,7 @@ bool dynamicPolyRefinementFvMesh::update()
     if
     (
         time().timeIndex() > 0
-     && time().timeIndex() % refineInterval == 0
+     && time().timeIndex() % refineInterval_ == 0
     )
     {
         // Get reference to polyhedralRefinement polyMeshModifier
@@ -178,9 +181,5 @@ bool dynamicPolyRefinementFvMesh::update()
     return false;
 }
 
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // ************************************************************************* //

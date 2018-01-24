@@ -42,6 +42,7 @@ Notes
 #define dynamicPolyRefinementFvMesh_H
 
 #include "topoChangerFvMesh.H"
+#include "refinementSelection.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

@@ -42,6 +42,7 @@ Author
 #define fieldBoundsRefinement_H
 
 #include "refinementSelection.H"
+#include "Switch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -53,6 +54,8 @@ namespace Foam
 \*---------------------------------------------------------------------------*/
 
 class fieldBoundsRefinement
+:
+    public refinementSelection
 {
     // Private data
 
@@ -100,10 +103,10 @@ public:
         // Selection of refinement/unrefinement candidates
 
             //- Return transferable list of cells to refine
-            const Xfer<labelList> refinementCellCandidates() const;
+            virtual Xfer<labelList> refinementCellCandidates() const;
 
             //- Return transferable list of split points to unrefine
-            const Xfer<labelList> unrefinementPointCandidates() const;
+            virtual Xfer<labelList> unrefinementPointCandidates() const;
 };
 
 

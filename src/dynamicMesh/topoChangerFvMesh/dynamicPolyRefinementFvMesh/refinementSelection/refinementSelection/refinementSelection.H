@@ -155,10 +155,10 @@ public:
         // Selection of refinement/unrefinement candidates
 
             //- Return transferable list of refinement cell candidates
-            const Xfer<labelList> refinementCellCandidates() const = 0;
+            virtual Xfer<labelList> refinementCellCandidates() const = 0;
 
             //- Return transferable list of unrefinement split point candidates
-            const Xfer<labelList> unrefinementPointCandidates() const = 0;
+            virtual Xfer<labelList> unrefinementPointCandidates() const = 0;
 };
 
 

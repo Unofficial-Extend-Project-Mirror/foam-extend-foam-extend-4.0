@@ -57,13 +57,13 @@ Foam::fieldBoundsRefinement::fieldBoundsRefinement
     const dictionary& dict
 )
 :
-    refinementSelection_(mesh, dict),
+    refinementSelection(mesh, dict),
     fieldName_(coeffDict().lookup("fieldName")),
     lowerBound_(readScalar(coeffDict().lookup("lowerBound"))),
     upperBound_(readScalar(coeffDict().lookup("upperBound"))),
     cellPointCellSmoothing_
     (
-        coeffDict.lookupOrDefault<Switch>("cellPointCellSmothing", false)
+        coeffDict().lookupOrDefault<Switch>("cellPointCellSmothing", false)
     )
 {}
 
@@ -121,18 +121,18 @@ Foam::fieldBoundsRefinement::refinementCellCandidates() const
         // Get current cell value
         const scalar& cellValue = vfIn[cellI];
 
-        if (cellValue > lowerBound && cellValue < upperBound)
+        if (cellValue > lowerBound_ && cellValue < upperBound_)
         {
             // Cell value is within the bounds, append cell for potential
             // refinement
-            refinementCandidates.append(cellI];
+            refinementCandidates.append(cellI);
         }
     }
 
     // Print out some information
-    Info<< "Selection algorithm " << typeName() << " selected "
+    Info<< "Selection algorithm " << type() << " selected "
         << refinementCandidates.size() << " cells as refinement candidates."
-        << endl
+        << endl;
 
     // Return the list in the Xfer container to prevent copying
     return refinementCandidates.xfer();
@@ -164,7 +164,7 @@ Foam::fieldBoundsRefinement::unrefinementPointCandidates() const
         // Get point value
         const scalar pointValue = pFieldIn[pointI];
 
-        if (pointValue > upperBound || pointValue < lowerBound)
+        if (pointValue > upperBound_ || pointValue < lowerBound_)
         {
             // Point value is outside of bounds, append point for potential
             // unrefinement
@@ -173,10 +173,10 @@ Foam::fieldBoundsRefinement::unrefinementPointCandidates() const
     }
 
     // Print out some information
-    Info<< "Selection algorithm " << typeName() << " selected "
+    Info<< "Selection algorithm " << type() << " selected "
         << unrefinementCandidates.size()
         << " split points as unrefinement candidates."
-        << endl
+        << endl;
 
     // Return the list in the Xfer container to prevent copying
     return unrefinementCandidates.xfer();
