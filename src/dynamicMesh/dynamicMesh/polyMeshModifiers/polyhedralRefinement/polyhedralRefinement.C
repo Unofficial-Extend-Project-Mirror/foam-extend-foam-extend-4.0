@@ -2936,11 +2936,14 @@ Foam::label Foam::polyhedralRefinement::pointConsistentRefinement
     // Collect all points
     forAll (meshCellPoints, cellI)
     {
-        // Get current cell points and insert them into hash set
-        const labelList& curPoints = meshCellPoints[cellI];
-        forAll (curPoints, pointI)
+        if (cellsToRefine[cellI])
         {
-            pointsToConsider.insert(curPoints[pointI]);
+            // Get current cell points and insert them into hash set
+            const labelList& curPoints = meshCellPoints[cellI];
+            forAll (curPoints, pointI)
+            {
+                pointsToConsider.insert(curPoints[pointI]);
+            }
         }
     }
 
