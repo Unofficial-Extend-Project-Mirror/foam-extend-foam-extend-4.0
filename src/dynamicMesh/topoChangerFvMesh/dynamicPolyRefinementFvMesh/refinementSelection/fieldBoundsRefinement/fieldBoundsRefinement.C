@@ -63,7 +63,7 @@ Foam::fieldBoundsRefinement::fieldBoundsRefinement
     upperBound_(readScalar(coeffDict().lookup("upperBound"))),
     cellPointCellSmoothing_
     (
-        coeffDict().lookupOrDefault<Switch>("cellPointCellSmothing", false)
+        coeffDict().lookupOrDefault<Switch>("cellPointCellSmoothing", false)
     )
 {}
 
