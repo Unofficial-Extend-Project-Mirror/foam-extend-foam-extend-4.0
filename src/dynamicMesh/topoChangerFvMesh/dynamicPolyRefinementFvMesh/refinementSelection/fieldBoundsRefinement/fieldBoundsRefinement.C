@@ -175,7 +175,7 @@ Foam::fieldBoundsRefinement::unrefinementPointCandidates() const
     // Print out some information
     Info<< "Selection algorithm " << type() << " selected "
         << unrefinementCandidates.size()
-        << " split points as unrefinement candidates."
+        << " points as unrefinement candidates."
         << endl;
 
     // Return the list in the Xfer container to prevent copying
