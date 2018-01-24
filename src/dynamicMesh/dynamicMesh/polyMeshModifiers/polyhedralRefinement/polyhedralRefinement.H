@@ -366,7 +366,7 @@ class polyhedralRefinement
 public:
 
     //- Runtime type information
-    ClassName("polyhedralRefinement");
+    TypeName("polyhedralRefinement");
 
 
     // Constructors

@@ -2691,17 +2691,27 @@ void Foam::polyhedralRefinement::checkInternalOrientation
     // Get list of polyAddPoint objects
     const DynamicList<polyAddPoint>& polyAddedPoints(ref.addedPoints());
 
-    // Create a list of newly added points
-    pointField addedPoints(polyAddedPoints.size());
-    forAll (addedPoints, i)
+    // Create a list of all points
+    const label nOrigPoints = mesh_.nPoints();
+    pointField allPoints(nOrigPoints + polyAddedPoints.size());
+
+    // Set ordinary points first
+    const pointField& meshPoints = mesh_.points();
+    forAll (meshPoints, i)
     {
-        addedPoints[i] = polyAddedPoints[i].newPoint();
+        allPoints[i] = meshPoints[i];
+    }
+
+    // Set newly added points next
+    forAll (polyAddedPoints, i)
+    {
+        allPoints[i + nOrigPoints] = polyAddedPoints[i].newPoint();
     }
 
     // Get compact points
     const pointField compactPoints
     (
-        IndirectList<point>(addedPoints, newFace)()
+        IndirectList<point>(allPoints, newFace)()
     );
 
     const vector n(compactFace.normal(compactPoints));
@@ -2768,17 +2778,27 @@ void Foam::polyhedralRefinement::checkBoundaryOrientation
     // Get list of polyAddPoint objects
     const DynamicList<polyAddPoint>& polyAddedPoints(ref.addedPoints());
 
-    // Create a list of newly added points
-    pointField addedPoints(polyAddedPoints.size());
-    forAll (addedPoints, i)
+    // Create a list of all points
+    const label nOrigPoints = mesh_.nPoints();
+    pointField allPoints(nOrigPoints + polyAddedPoints.size());
+
+    // Set ordinary points first
+    const pointField& meshPoints = mesh_.points();
+    forAll (meshPoints, i)
     {
-        addedPoints[i] = polyAddedPoints[i].newPoint();
+        allPoints[i] = meshPoints[i];
+    }
+
+    // Set newly added points next
+    forAll (polyAddedPoints, i)
+    {
+        allPoints[i + nOrigPoints] = polyAddedPoints[i].newPoint();
     }
 
     // Get compact points
     const pointField compactPoints
     (
-        IndirectList<point>(addedPoints, newFace)()
+        IndirectList<point>(allPoints, newFace)()
     );
 
     const vector n(compactFace.normal(compactPoints));
