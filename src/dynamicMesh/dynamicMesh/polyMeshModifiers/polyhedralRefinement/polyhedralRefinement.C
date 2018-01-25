@@ -604,7 +604,7 @@ void Foam::polyhedralRefinement::setPolyhedralRefinement
             }
         }
 
-        Pout<< "polyhedralRefinement::setPolyhedralRefinement(...)"
+        Pout<< "polyhedralRefinement::setPolyhedralRefinement(...)" << nl
             << "Writing centres of edges to split to file " << str.name()
             << endl;
     }
@@ -998,7 +998,7 @@ void Foam::polyhedralRefinement::setPolyhedralRefinement
     // a) All faces of a cell being split
     // b) All faces that are being split
     // c) Both faces of an edge that is being split
-    PackedBoolList facesToSplit(mesh_.nFaces(), 0);
+    boolList facesToSplit(mesh_.nFaces(), false);
 
     // Get edge faces
     const labelListList& meshEdgeFaces = mesh_.edgeFaces();
@@ -1012,7 +1012,7 @@ void Foam::polyhedralRefinement::setPolyhedralRefinement
 
             forAll(cFaces, i)
             {
-                facesToSplit.set(cFaces[i], 1);
+                facesToSplit[cFaces[i]] = true;
             }
         }
     }
@@ -1022,7 +1022,7 @@ void Foam::polyhedralRefinement::setPolyhedralRefinement
     {
         if (faceMidPoint[faceI] > -1)
         {
-            facesToSplit.set(faceI, 1);
+            facesToSplit[faceI] = true;
         }
     }
 
@@ -1035,7 +1035,7 @@ void Foam::polyhedralRefinement::setPolyhedralRefinement
 
             forAll(eFaces, i)
             {
-                facesToSplit.set(eFaces[i], 1);
+                facesToSplit[eFaces[i]] = true;
             }
         }
     }
@@ -1054,7 +1054,7 @@ void Foam::polyhedralRefinement::setPolyhedralRefinement
 
     forAll(faceMidPoint, faceI)
     {
-        if (faceMidPoint[faceI] > -1 && facesToSplit.get(faceI) == 1)
+        if (faceMidPoint[faceI] > -1 && facesToSplit[faceI])
         {
             // Face has not been split.
             // Note: although facesToSplit can't be different than 1 here and
@@ -1117,7 +1117,7 @@ void Foam::polyhedralRefinement::setPolyhedralRefinement
                     );
 
                     // Transfer dynamic list to a face (ordinary list)
-                    newFace.transfer(faceVerts.shrink());
+                    newFace.transfer(faceVerts);
                     faceVerts.clear();
 
                     if (debug)
@@ -1193,7 +1193,7 @@ void Foam::polyhedralRefinement::setPolyhedralRefinement
             } // End for all points
 
             // Mark face as handled
-            facesToSplit.set(faceI, 0);
+            facesToSplit[faceI] = false;
         }
     }
 
@@ -1228,7 +1228,7 @@ void Foam::polyhedralRefinement::setPolyhedralRefinement
                 // splitting and that the face has not been handled yet. The
                 // second check is necessary since we go through edge faces
                 // instead of just faces
-                if (faceMidPoint[faceI] < 0 && facesToSplit.get(faceI) == 1)
+                if (faceMidPoint[faceI] < 0 && facesToSplit[faceI])
                 {
                     // This is unsplit face that has not been handled
 
@@ -1314,7 +1314,8 @@ void Foam::polyhedralRefinement::setPolyhedralRefinement
                     modifyFace(ref, faceI, newFace, own, nei);
 
                     // Mark face as handled
-                    facesToSplit.set(faceI, 0);
+                    facesToSplit[faceI] = false;
+
                 }// End if unsplit, unhandled face
             } // End for all edge faces
         } // End if edge has been cut
@@ -1335,7 +1336,7 @@ void Foam::polyhedralRefinement::setPolyhedralRefinement
     {
         // All remaining unnaffected faces are the ones whose owner/neighbour
         // changed
-        if (facesToSplit.get(faceI) == 1)
+        if (facesToSplit[faceI])
         {
             // Get the face
             const face& f = meshFaces[faceI];
@@ -1360,7 +1361,7 @@ void Foam::polyhedralRefinement::setPolyhedralRefinement
             modifyFace(ref, faceI, f, own, nei);
 
             // Mark face as handled
-            facesToSplit.set(faceI, 0);
+            facesToSplit[faceI] = false;
         }
     }
 
@@ -2172,7 +2173,7 @@ void Foam::polyhedralRefinement::setNewFaceNeighbours
 
     if (mesh_.isInternalFace(faceI))
     {
-        // Get nachor cell for this anchor point on neighbour side
+        // Get anchor cell for this anchor point on neighbour side
         nei = getAnchorCell
         (
             cellAnchorPoints,
@@ -3973,8 +3974,10 @@ void Foam::polyhedralRefinement::updateMesh(const mapPolyMesh& map)
         }
         else
         {
-            // Map the "old" level (updated in setRefinement)
-            newCellLevel[newCellI] = cellLevel_[oldCellI];
+            // New level is the level of old (master) cell incremented by one.
+            // Note: the cellLevel is actually updated in setRefinement(), but
+            // we can't use it since we may have additional topology changes
+            newCellLevel[newCellI] = cellLevel_[oldCellI] + 1;
         }
     }
 
@@ -4002,8 +4005,8 @@ void Foam::polyhedralRefinement::updateMesh(const mapPolyMesh& map)
         }
         else
         {
-            // Map the "old" level (updated in setRefinement)
-            newPointLevel[newPointI] = pointLevel_[oldPointI];
+            // New level is the level of old
+            newPointLevel[newPointI] = pointLevel_[oldPointI] + 1;
         }
     }
 
