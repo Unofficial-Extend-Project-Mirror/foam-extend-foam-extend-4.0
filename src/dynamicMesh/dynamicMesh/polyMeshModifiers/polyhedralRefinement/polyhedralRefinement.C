@@ -388,11 +388,9 @@ void Foam::polyhedralRefinement::setPolyhedralRefinement
         return;
     }
 
-    // New point and cell levels. Insert original lists into dynamic list for
-    // easy insertion. Note: dynamic lists shall be resized with multiplier 2 on
-    // the first insertion using operator() for non existing element
-    dynamicLabelList newCellLevel(cellLevel_);
-    dynamicLabelList newPointLevel(pointLevel_);
+    // Reset refinementLevelIndicator field
+    refinementLevelIndicator_.clear();
+    refinementLevelIndicator_.setSize(mesh_.nCells(), UNCHANGED);
 
     if (debug)
     {
@@ -430,11 +428,6 @@ void Foam::polyhedralRefinement::setPolyhedralRefinement
                 true                    // Supports a cell
             )
         );
-
-        // Add a level for the new point into the dynamic list.
-        // Note: operator() resizes the list if necessary and returns the
-        // reference to newly created element
-        newPointLevel(cellMidPoint[cellI]) = cellLevel_[cellI] + 1;
     }
 
     // Write out split cells as a cell set for debug
@@ -560,10 +553,6 @@ void Foam::polyhedralRefinement::setPolyhedralRefinement
         {
             if (edgeMidPoint[edgeI] > -1)
             {
-                // Edge marked to be split: replace edgeMidPoint with actual
-                // point label
-                const edge& e = meshEdges[edgeI];
-
                 edgeMidPoint[edgeI] = ref.setAction
                 (
                     polyAddPoint
@@ -574,17 +563,6 @@ void Foam::polyhedralRefinement::setPolyhedralRefinement
                         true             // Supports a cell
                     )
                 );
-
-                // Update new point level: take maximum of the two points in the
-                // original edge and increment. Note: operator() resizes the
-                // list if necessary
-                newPointLevel(edgeMidPoint[edgeI]) =
-                    max
-                    (
-                        pointLevel_[e[0]],
-                        pointLevel_[e[1]]
-                    )
-                  + 1;
             }
         }
     } // End memory management for syncing/adding edge points
@@ -793,11 +771,6 @@ void Foam::polyhedralRefinement::setPolyhedralRefinement
                         true  // Supports a cell
                     )
                 );
-
-                // The point level of the added point will be one higher than
-                // the faceAnchorLevel (corner point). Note: operator() resizes
-                // the list if necessary
-                newPointLevel(faceMidPoint[faceI]) = faceAnchorLevel[faceI] + 1;
             }
         }
     } // End memory management for syncing boundary data and adding face mids
@@ -938,6 +911,12 @@ void Foam::polyhedralRefinement::setPolyhedralRefinement
     // number of anchor points in a cell
     labelListList cellAddedCells(mesh_.nCells());
 
+    // Count number of new cells needed to update refinement history
+    label nNewCells = 0;
+
+    // Get cell zone mesh
+    const cellZoneMesh& cellZones = mesh_.cellZones();
+
     forAll(cellAnchorPoints, cellI)
     {
         // Check whether this is a split cell
@@ -950,11 +929,12 @@ void Foam::polyhedralRefinement::setPolyhedralRefinement
             labelList& cAdded = cellAddedCells[cellI];
             cAdded.setSize(cAnchors.size());
 
-            // Original cell has index 0. Nothing to do except add the index
+            // Original cell has index 0
             cAdded[0] = cellI;
 
-            // Update cell level
-            newCellLevel[cellI] = cellLevel_[cellI] + 1;
+            // Update refinement level indicator field to 1 since this original
+            // cell will be refined
+            refinementLevelIndicator_[cellI] = REFINED;
 
             // Add other cells
             for (label i = 1; i < cAdded.size(); ++i)
@@ -963,17 +943,15 @@ void Foam::polyhedralRefinement::setPolyhedralRefinement
                 (
                     polyAddCell
                     (
-                        -1,                                 // Master point
-                        -1,                                 // Master edge
-                        -1,                                 // Master face
-                        cellI,                              // Master cell
-                        mesh_.cellZones().whichZone(cellI)  // Zone for cell
+                        -1,                         // Master point
+                        -1,                         // Master edge
+                        -1,                         // Master face
+                        cellI,                      // Master cell
+                        cellZones.whichZone(cellI)  // Zone for cell
                     )
                 );
 
-                // Update level for this cell. Note: operator() resizes the list
-                // if necessary
-                newCellLevel(cAdded[i]) = cellLevel_[cellI] + 1;
+                ++nNewCells;
             }
         }
     }
@@ -1120,12 +1098,6 @@ void Foam::polyhedralRefinement::setPolyhedralRefinement
                     newFace.transfer(faceVerts);
                     faceVerts.clear();
 
-                    if (debug)
-                    {
-                        Pout<< "Split face: " << faceI << ", verts: " << f
-                            << ", into quad: " << newFace << endl;
-                    }
-
                     // Set new owner/neighbour indices based on split cells
                     label own, nei;
                     setNewFaceNeighbours
@@ -1151,6 +1123,12 @@ void Foam::polyhedralRefinement::setPolyhedralRefinement
                             const label oldOwn = meshFaceOwner[faceI];
                             const label oldNei = meshFaceNeighbour[faceI];
 
+                            Pout<< "Split internal face: " << faceI
+                                << ", verts: " << f
+                                << ", into quad: " << newFace << nl
+                                << "owner: " << oldOwn
+                                << ", neighbour: " << oldNei << endl;
+
                             checkInternalOrientation
                             (
                                 ref,
@@ -1164,6 +1142,11 @@ void Foam::polyhedralRefinement::setPolyhedralRefinement
                         else
                         {
                             const label oldOwn = meshFaceOwner[faceI];
+
+                            Pout<< "Split boundary face: " << faceI
+                                << ", verts: " << f
+                                << ", into quad: " << newFace << nl
+                                << "owner: " << oldOwn << endl;
 
                             checkBoundaryOrientation
                             (
@@ -1443,16 +1426,6 @@ void Foam::polyhedralRefinement::setPolyhedralRefinement
         }
     }
 
-    // Update cell/point levels
-    pointLevel_.transfer(newPointLevel.shrink());
-    newPointLevel.clear();
-    cellLevel_.transfer(newCellLevel.shrink());
-    newCellLevel.clear();
-
-    // Mark files as changed
-    setInstance(mesh_.facesInstance());
-
-
     // Update polyehdral refinement history (live split cells tree)
     if (history_.active())
     {
@@ -1464,7 +1437,7 @@ void Foam::polyhedralRefinement::setPolyhedralRefinement
         }
 
         // Extend refinement history for new cells
-        history_.resize(cellLevel_.size());
+        history_.resize(mesh_.nCells() + nNewCells);
 
         forAll(cellAddedCells, cellI)
         {
@@ -1496,6 +1469,9 @@ void Foam::polyhedralRefinement::setPolyhedralUnrefinement
             << " the refinement history. This is not allowed."
             << abort(FatalError);
     }
+
+    // Note: no need to reset refinementLevelIndicator_ list since the
+    // unrefinement set-up always needs to happen after refinement set-up
 
     // Get point cells necessary for debug and face removal
     const labelListList& meshPointCells = mesh_.pointCells();
@@ -1633,18 +1609,15 @@ void Foam::polyhedralRefinement::setPolyhedralUnrefinement
         // Get master cell index by searching for minimum of cell labels
         const label masterCellI = min(pCells);
 
-        // Loop through cells and decrement their cell level
+        // Loop through cells and mark that they will be unrefined (-1)
         forAll(pCells, j)
         {
-            --cellLevel_[pCells[j]];
+            refinementLevelIndicator_[pCells[j]] = UNREFINED;
         }
 
         // Combine cells in the history
         history_.combineCells(masterCellI, pCells);
     }
-
-    // Mark files as changed
-    setInstance(mesh_.facesInstance());
 }
 
 
@@ -3334,6 +3307,7 @@ Foam::polyhedralRefinement::polyhedralRefinement
         ),
         labelList(mesh_.nPoints(), 0)
     ),
+    refinementLevelIndicator_(mesh_.nCells(), UNCHANGED),
     level0EdgeLength_(), // Initialised in constructor body
     history_
     (
@@ -3556,8 +3530,10 @@ void Foam::polyhedralRefinement::setCellsToRefine
     // point consistent (4:1 consistency) if necessary
 
     // Counter for additional cells to refine due to consistency in each
-    // iteration
+    // iteration and number of iterations
     label nAddCells = 0;
+    label nIters = 0;
+    label nTotalAddCells = 0;
 
     do
     {
@@ -3578,14 +3554,16 @@ void Foam::polyhedralRefinement::setCellsToRefine
         // Global reduction
         reduce(nAddCells, sumOp<label>());
 
-        if (debug)
-        {
-            Info<< "Added " << nAddCells
-                << " cells to obtain consistent refinement."
-                << endl;
-        }
+        // Increment number of iterations and total number of added cells
+        ++nIters;
+        nTotalAddCells += nAddCells;
 
     } while (nAddCells > 0);
+
+    Info<< "Added " << nTotalAddCells // nTotalAddCells already reduced
+        << " cells in " << returnReduce(nIters, maxOp<label>())
+        << " iterations to obtain consistent refinement."
+        << endl;
 
     // Collect all cells to refine in a dynamic list
     dynamicLabelList cellsToRefineDynamic(mesh_.nCells());
@@ -3601,6 +3579,11 @@ void Foam::polyhedralRefinement::setCellsToRefine
 
     // Transfer the contents into the data member (ordinary list)
     cellsToRefine_.transfer(cellsToRefineDynamic);
+
+    Info<< "polyhedralRefinement::setCellsToRefine"
+        << "(const labelList& refinementCellCandidates)" << nl
+        << "Selected " << returnReduce(cellsToRefine_.size(), sumOp<label>())
+        << " cells to refine." << endl;
 }
 
 
@@ -3613,7 +3596,7 @@ void Foam::polyhedralRefinement::setSplitPointsToUnrefine
     {
         Info<< "polyhedralRefinement::setSplitPointsToUnrefine"
             << "(const labelList& unrefinementPointCandidates)" << nl
-            << "Setting cells to refine" << endl;
+            << "Setting split points to unrefine." << endl;
     }
 
     if (unrefinementPointCandidates.empty())
@@ -3778,8 +3761,10 @@ void Foam::polyhedralRefinement::setSplitPointsToUnrefine
     const labelListList& meshPointCells = mesh_.pointCells();
 
     // Count number of removed cells from unrefinement (cells that will not be
-    // unrefined) in each iteration
+    // unrefined) in each iteration and number of iterations
     label nRemCells = 0;
+    label nIters = 0;
+    label nTotalRemCells = 0;
 
     do
     {
@@ -3804,20 +3789,18 @@ void Foam::polyhedralRefinement::setSplitPointsToUnrefine
         // Reset number of removed cells from unrefinement for this iteration
         nRemCells = 0;
 
-        // Note: No need to check for point consistent unrefinement if a point
-        // consistent refinement process has been ensured. Skip it.
-//        if (pointBasedRefinement_)
-//        {
-//            // Check for 4:1 point based consistent unrefinement. Updates
-//            // cellsToUnrefine and returns number of removed cells from
-//            // unrefinement in this iteration
-//            nRemCells +=
-//                pointConsistentUnrefinement
-//                (
-//                    splitPointsToUnrefine,
-//                    cellsToUnrefine
-//                );
-//        }
+        if (pointBasedRefinement_)
+        {
+            // Check for 4:1 point based consistent unrefinement. Updates
+            // cellsToUnrefine and returns number of removed cells from
+            // unrefinement in this iteration
+            nRemCells +=
+                pointConsistentUnrefinement
+                (
+                    splitPointsToUnrefine,
+                    cellsToUnrefine
+                );
+        }
 
         // Check for 2:1 face based consistent unrefinement. Updates
         // cellsToUnrefine and returns number of removed cells from unrefinement
@@ -3826,13 +3809,6 @@ void Foam::polyhedralRefinement::setSplitPointsToUnrefine
 
         // Global reduction
         reduce(nRemCells, sumOp<label>());
-
-        if (debug)
-        {
-            Info<< "Removed " << nRemCells
-                << " cells to obtain consistent unrefinement."
-                << endl;
-        }
 
         // If we have removed at least one cell from unrefinement, we need to
         // protect its split points as well from unrefinement
@@ -3864,7 +3840,16 @@ void Foam::polyhedralRefinement::setSplitPointsToUnrefine
             }
         }
 
+        // Increment number of iterations and number of total removed cells
+        ++nIters;
+        nTotalRemCells += nRemCells;
+
     } while (nRemCells > 0);
+
+    Info<< "Removed " << nTotalRemCells // nTotalRemCells already reduced
+        << " cells in " << returnReduce(nIters, maxOp<label>())
+        << " iterations to obtain consistent unrefinement."
+        << endl;
 
     // Collect all split points to unrefine in a dynamic list
     dynamicLabelList splitPointsToUnrefineDynamic(nPoints);
@@ -3883,6 +3868,12 @@ void Foam::polyhedralRefinement::setSplitPointsToUnrefine
 
     // Make the refinement history more compact
     history_.compact();
+
+    Info<< "polyhedralRefinement::setSplitPointsToUnrefine"
+        << "(const labelList& unrefinementPointCandidates)" << nl
+        << "Selected "
+        << returnReduce(splitPointsToUnrefine_.size(), sumOp<label>())
+        << " split points to unrefine." << endl;
 }
 
 
@@ -3974,10 +3965,39 @@ void Foam::polyhedralRefinement::updateMesh(const mapPolyMesh& map)
         }
         else
         {
-            // New level is the level of old (master) cell incremented by one.
-            // Note: the cellLevel is actually updated in setRefinement(), but
-            // we can't use it since we may have additional topology changes
-            newCellLevel[newCellI] = cellLevel_[oldCellI] + 1;
+            // This cell has either been added based on another cell or it
+            // hasn't changed. Update new cell level according to refinement
+            // level indicator and old cell level
+
+            // Get refinement status of the old cell
+            const label& refStatus = refinementLevelIndicator_[oldCellI];
+
+            if (refStatus == UNREFINED)
+            {
+                // New cell has been obtained by unrefining other cells - this
+                // is the remaining "master" cell. Decrement cell level
+                newCellLevel[newCellI] = cellLevel_[oldCellI] - 1;
+            }
+            else if (refStatus == UNCHANGED)
+            {
+                // Cell hasn't been changed during this refinement, copy old
+                // cell level
+                newCellLevel[newCellI] = cellLevel_[oldCellI];
+            }
+            else if (refStatus == REFINED)
+            {
+                // Cell has been refined, increment cell level
+                newCellLevel[newCellI] = cellLevel_[oldCellI] + 1;
+            }
+            else
+            {
+                FatalErrorIn
+                (
+                    "polyhedralRefinement::updateMesh(const mapPolyMesh& map)"
+                )   << "Invalid refinement status detected: " << refStatus << nl
+                    << "Old cell index: " << oldCellI << nl
+                    << "New cell index: " << newCellI << abort(FatalError);
+            }
         }
     }
 
@@ -3985,8 +4005,16 @@ void Foam::polyhedralRefinement::updateMesh(const mapPolyMesh& map)
     cellLevel_.transfer(newCellLevel);
 
 
+    // Point level will be updated based on already updated cell level. Level
+    // for newly added points has to be equal to the maximum cell level of
+    // surrounding points. At this point, mesh is fully topologically valid so
+    // it is safe to use pointCells
+
     // Get point map: from current mesh points to previous mesh points
     const labelList& pointMap = map.pointMap();
+
+    // Get point cell
+    const labelListList& meshPointCells = mesh_.pointCells();
 
     // Create new point level
     labelList newPointLevel(pointMap.size());
@@ -3999,14 +4027,27 @@ void Foam::polyhedralRefinement::updateMesh(const mapPolyMesh& map)
 
         if (oldPointI == -1)
         {
-            // This point has been appended without any master point, set point
-            // level to -1
-            newPointLevel[newPointI] = -1;
+            // This point has been appended without any master point, use
+            // surrounding cells to determine new point level
+
+            // Get new cells surrounding this new point
+            const labelList& pCells = meshPointCells[newPointI];
+
+            // Find maximum cell level for this point
+            label maxCellLevel = 0;
+            forAll (pCells, i)
+            {
+                maxCellLevel = max(maxCellLevel, cellLevel_[pCells[i]]);
+            }
+
+            // Set new point level as the maximum of the surrounding cells
+            newPointLevel[newPointI] = maxCellLevel;
         }
         else
         {
-            // New level is the level of old
-            newPointLevel[newPointI] = pointLevel_[oldPointI] + 1;
+            // This point is either old point or it has been added in terms of
+            // another point. New point level is equal to the old point level
+            newPointLevel[newPointI] = pointLevel_[oldPointI];
         }
     }
 

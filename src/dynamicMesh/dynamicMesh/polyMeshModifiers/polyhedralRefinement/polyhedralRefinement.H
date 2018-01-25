@@ -70,6 +70,19 @@ class polyhedralRefinement
 :
     public polyMeshModifier
 {
+public:
+
+    // Public enumeration for refinement status
+    enum refinementStatus
+    {
+        UNREFINED = -1,
+        UNCHANGED = 0,
+        REFINED = 1
+    };
+
+
+private:
+
     // Private data
 
         //- Reference to polyMesh for easy access in helper functions
@@ -89,6 +102,16 @@ class polyhedralRefinement
 
             //- Point refinement level
             mutable labelIOList pointLevel_;
+
+            //- Helper list for original (old) cells that will be refined or
+            //  unrefined. The list is updated in setPolyhedralRefinement and
+            //  setPolyhedralUnfereinement and is used in updateMesh to update
+            //  the cellLevel on the new mesh.
+            //  Values stored in the list are:
+            //  a) UNREFINED = -1 = cell is unrefined
+            //  b) UNCHANGED =  0 = cell is untouched
+            //  c) REFINED   = +1 = cell is refined
+            mutable labelList refinementLevelIndicator_;
 
             //- Typical edge length between unrefined points
             scalar level0EdgeLength_;
