@@ -54,7 +54,6 @@ Notes
 
 #include "polyMeshModifier.H"
 #include "labelIOList.H"
-#include "polyRefinementHistory.H"
 #include "removeFaces.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -116,9 +115,6 @@ private:
             //- Typical edge length between unrefined points
             scalar level0EdgeLength_;
 
-            //- Refinement history
-            mutable polyRefinementHistory history_;
-
             //- Face remover engine
             mutable removeFaces faceRemover_;
 
@@ -146,7 +142,7 @@ private:
             //- Calculate level0EdgeLength_ (constructor helper)
             void calcLevel0EdgeLength();
 
-            //- Set file instance for cellLevel_, pointLevel_ and history_
+            //- Set file instance for cellLevel_ and pointLevel_
             void setInstance(const fileName& inst) const;
 
             //- Extend cells to refine. Given a markup field of refinement
@@ -421,11 +417,6 @@ public:
             const labelIOList& pointLevel() const
             {
                 return pointLevel_;
-            }
-
-            const polyRefinementHistory& history() const
-            {
-                return history_;
             }
 
             //- Typical edge length between unrefined points

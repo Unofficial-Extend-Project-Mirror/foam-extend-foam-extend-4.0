@@ -194,7 +194,7 @@ Foam::Xfer<Foam::boolList> Foam::removeFaces::affectedFaces
         }
     }
 
-    return affectedFace.xfer();
+    return xferMove(affectedFace);
 }
 
 
@@ -295,8 +295,11 @@ Foam::label Foam::removeFaces::compatibleRemoves
     const label nCells = mesh_.nCells();
 
     // Resize the lists and set elements to -1 by default
-    cellRegion.setSize(nCells, -1);
-    regionMaster.setSize(nCells, -1);
+    cellRegion.setSize(nCells);
+    cellRegion = -1;
+
+    regionMaster.setSize(nCells);
+    regionMaster = -1;
 
     // Count regions
     label nRegions = 0;
@@ -324,18 +327,18 @@ Foam::label Foam::removeFaces::compatibleRemoves
         const label& nei = faceNeighbour[faceI];
 
         // Get region data for owner and neighbour
-        label& ownRegion = cellRegion[own];
-        label& neiRegion = cellRegion[nei];
+        label region0 = cellRegion[own];
+        label region1 = cellRegion[nei];
 
-        if (ownRegion == -1)
+        if (region0 == -1)
         {
-            // Owner region is not set
+            // Region 0 (owner) is not set
 
-            if (neiRegion == -1)
+            if (region1 == -1)
             {
-                // Neighbour region is also not set, create new region
-                ownRegion = nRegions;
-                neiRegion = nRegions;
+                // Region 1 (neighbour) is also not set, create new region
+                cellRegion[own] = nRegions;
+                cellRegion[nei] = nRegions;
 
                 // Make owner (lowest numbered!) the master of the region and
                 // increment the number of regions
@@ -344,64 +347,64 @@ Foam::label Foam::removeFaces::compatibleRemoves
             }
             else
             {
-                // Neighbour region is set, add owner to neighbour region
-                ownRegion = neiRegion;
+                // Region 1 (neighbour) is set, add owner to neighbour region
+                cellRegion[own] = region1;
 
                 // See if owner becomes the master of the region (if its index
                 // is lower than the current master of the region)
-                regionMaster[neiRegion] = min(own, regionMaster[neiRegion]);
+                regionMaster[region1] = min(own, regionMaster[region1]);
             }
         }
         else
         {
-            // Owner region is set
+            // Region 0 (owner) is set
 
-            if (neiRegion == -1)
+            if (region1 == -1)
             {
                 // Neighbour region is not set, add neighbour to owner region
-                neiRegion = ownRegion;
+                cellRegion[nei] = region0;
 
                 // Note: nei has higher index than own so neighbour can't be the
                 // master of this region
             }
-            else if (ownRegion != neiRegion)
+            else if (region0 != region1)
             {
                 // Both have regions. Keep lowest numbered region and master
                 label freedRegion = -1;
                 label keptRegion = -1;
 
-                if (ownRegion < neiRegion)
+                if (region0 < region1)
                 {
                     changeCellRegion
                     (
                         nei,
-                        neiRegion,    // old region
-                        ownRegion,    // new region
+                        region1,    // old region
+                        region0,    // new region
                         cellRegion
                     );
 
-                    keptRegion = ownRegion;
-                    freedRegion = neiRegion;
+                    keptRegion = region0;
+                    freedRegion = region1;
                 }
-                else if (neiRegion < ownRegion)
+                else if (region1 < region0)
                 {
                     changeCellRegion
                     (
                         own,
-                        ownRegion,    // old region
-                        neiRegion,    // new region
+                        region0,    // old region
+                        region1,    // new region
                         cellRegion
                     );
 
-                    keptRegion = neiRegion;
-                    freedRegion = ownRegion;
+                    keptRegion = region1;
+                    freedRegion = region0;
                 }
 
-                const label& ownRegionMaster = regionMaster[ownRegion];
-                const label& neiRegionMaster = regionMaster[neiRegion];
+                label master0 = regionMaster[region0];
+                label master1 = regionMaster[region1];
 
                 regionMaster[freedRegion] = -1;
-                regionMaster[keptRegion] = min(ownRegionMaster, neiRegionMaster);
+                regionMaster[keptRegion] = min(master0, master1);
             }
         }
     }

@@ -312,7 +312,6 @@ void Foam::polyhedralRefinement::setInstance(const fileName& inst) const
 
     cellLevel_.instance() = inst;
     pointLevel_.instance() = inst;
-    history_.instance() = inst;
 }
 
 
@@ -932,9 +931,6 @@ void Foam::polyhedralRefinement::setPolyhedralRefinement
     // number of anchor points in a cell
     labelListList cellAddedCells(mesh_.nCells());
 
-    // Count number of new cells needed to update refinement history
-    label nNewCells = 0;
-
     // Get cell zone mesh
     const cellZoneMesh& cellZones = mesh_.cellZones();
 
@@ -971,8 +967,6 @@ void Foam::polyhedralRefinement::setPolyhedralRefinement
                         cellZones.whichZone(cellI)  // Zone for cell
                     )
                 );
-
-                ++nNewCells;
             }
         }
     }
@@ -1446,31 +1440,6 @@ void Foam::polyhedralRefinement::setPolyhedralRefinement
                 << abort(FatalError);
         }
     }
-
-    // Update polyehdral refinement history (live split cells tree)
-    if (history_.active())
-    {
-        if (debug)
-        {
-            Pout<< "polyhedralRefinement::setPolyhedralRefinement(...)"
-                << " Updating refinement history to " << cellLevel_.size()
-                << " cells." << endl;
-        }
-
-        // Extend refinement history for new cells
-        history_.resize(mesh_.nCells() + nNewCells);
-
-        forAll(cellAddedCells, cellI)
-        {
-            const labelList& addedCells = cellAddedCells[cellI];
-
-            if (addedCells.size() > 0)
-            {
-                // Cell was split, store the split
-                history_.storeSplit(cellI, addedCells);
-            }
-        }
-    }
 }
 
 
@@ -1479,18 +1448,6 @@ void Foam::polyhedralRefinement::setPolyhedralUnrefinement
     polyTopoChange& ref
 ) const
 {
-    // It is an error to attempt to unrefine if the history is inactive
-    if (!history_.active())
-    {
-        FatalErrorIn
-        (
-            "polyhedralRefinement::setPolyhedralUnrefinement"
-            "(polyTopoChange& ref)"
-        )   << "Attempt to unrefine polyhedral cells without storing"
-            << " the refinement history. This is not allowed."
-            << abort(FatalError);
-    }
-
     // Resize refinementLevelIndicator field if necessary
     if (refinementLevelIndicator_.empty())
     {
@@ -1624,26 +1581,6 @@ void Foam::polyhedralRefinement::setPolyhedralUnrefinement
         cellRegionMaster,
         ref
     );
-
-    // Update history for removal of cells and refinement level indicator field
-    forAll(splitPointsToUnrefine_, i)
-    {
-        // Get point index and point cells
-        const label& pointI = splitPointsToUnrefine_[i];
-        const labelList& pCells = meshPointCells[pointI];
-
-        // Get master cell index by searching for minimum of cell labels
-        const label masterCellI = min(pCells);
-
-        // Loop through cells and mark that they will be unrefined (-1)
-        forAll(pCells, j)
-        {
-            refinementLevelIndicator_[pCells[j]] = UNREFINED;
-        }
-
-        // Combine cells in the history
-        history_.combineCells(masterCellI, pCells);
-    }
 }
 
 
@@ -3335,19 +3272,6 @@ Foam::polyhedralRefinement::polyhedralRefinement
     ),
     refinementLevelIndicator_(0), // Must be empty before setting refinement
     level0EdgeLength_(), // Initialised in constructor body
-    history_
-    (
-        IOobject
-        (
-            "polyRefinementHistory",
-            mesh_.facesInstance(),
-            polyMesh::meshSubDir,
-            mesh_,
-            IOobject::READ_IF_PRESENT,
-            IOobject::AUTO_WRITE
-        ),
-        mesh_.nCells() // All are visible if not read
-    ),
     faceRemover_(mesh_, GREAT), // Merge boundary faces wherever possible
     maxCells_(readLabel(dict.lookup("maxCells"))),
     maxRefinementLevel_(readLabel(dict.lookup("maxRefinementLevel"))),
@@ -3359,27 +3283,6 @@ Foam::polyhedralRefinement::polyhedralRefinement
 {
     // Calculate level 0 edge length
     calcLevel0EdgeLength();
-
-    // Check consistency between history and number of cells in the mesh
-    if (history_.active() && history_.visibleCells().size() != mesh_.nCells())
-    {
-        FatalErrorIn
-        (
-            "polyhedralRefinement::polyhedralRefinement"
-            "\n("
-            "\n    const word& name,"
-            "\n    const dictionary& dict,"
-            "\n    const label index,"
-            "\n    const polyTopoChanger& mme"
-            "\n)"
-        )   << "History enabled but number of visible cells: "
-            << history_.visibleCells().size()
-            << nl
-            << " is not equal to the number of cells in the mesh: "
-            << mesh_.nCells()
-            << nl
-            << abort(FatalError);
-    }
 
     // Check consistency between cellLevel and number of cells and pointLevel
     // and number of points in the mesh
@@ -3639,103 +3542,88 @@ void Foam::polyhedralRefinement::setSplitPointsToUnrefine
     // PART 1: Mark all split points in the mesh (points that can be unrefined)
     boolList splitPointsMarkup(nPoints, false);
 
-    // Field indicating whether the point has been split:
-    // -1 = undetermined yet
-    // -2 = certainly not a split point
-    // > -1 = label of master cell
-    labelList splitMaster(nPoints, -1);
+    // Algorithm: split point is uniquely defined as a point that:
+    // 1. Has pointLevel_ > 0 (obviously),
+    // 2. A point that has the same pointLevel_ as ALL of the points of its
+    //    faces. In other words, for each point, we will look through all the
+    //    faes of the point. For each of the face, we will visit points and
+    //    check the point level of all of these points. All point levels must be
+    //    the same for this point candidate to be split point. This is quite
+    //    useful since there is no need to store the refinement history
 
-    // Level of split point
-    labelList splitMasterLevel(nPoints, 0);
-
-    // Get visible cells from history: -1 if the cell is unrefined and otherwise
-    // index into history::splitCells_
-    const labelList& visibleCells = history_.visibleCells();
-
-    // Unmark all points with different master cell
-    forAll (visibleCells, cellI)
-    {
-        // Get cell points of this cell
-        const labelList& cPoints = meshCellPoints[cellI];
-
-        if (visibleCells[cellI] != -1 && history_.parentIndex(cellI) > -1)
-        {
-            // Get parent index
-            const label parentIndex = history_.parentIndex(cellI);
-
-            // Check whether the master is the same
-            forAll (cPoints, i)
-            {
-                // Get point index and master cell index
-                const label& pointI = cPoints[i];
-                const label& masterCellI = splitMaster[pointI];
-
-                if (masterCellI == -1)
-                {
-                    // This is the first time we visisted the point. Store
-                    // parent cell and level of the parent cell (with respect to
-                    // cellI). This is additional guarantee that we're referring
-                    // to the same master at the same refinement level.
-                    splitMaster[pointI] = parentIndex;
-                    splitMasterLevel[pointI] = cellLevel_[cellI] - 1;
-                }
-                else if (masterCellI == -2)
-                {
-                    // Already decided that point is definitely not split point,
-                    // see below
-                }
-                else if
-                (
-                    (masterCellI != parentIndex)
-                 || (splitMasterLevel[pointI] != cellLevel_[cellI] - 1)
-                )
-                {
-                    // Point has different masters so it can't be a split point
-                    // as it is on two different refinement patterns
-                    splitMaster[pointI] = -2;
-                }
-            } // End for all cell points
-        }
-        else
-        {
-            // The cell is either not visible or it is unrefined cell, all
-            // points can't be split points
-            forAll (cPoints, i)
-            {
-                splitMaster[cPoints[i]] = -2;
-            }
-        }
-    } // End for all visible cells
-
-    // Points at boundaries can't be split points, unmark them
-
-    // Get necessary mesh data for this step
-    const label nFaces = mesh_.nFaces();
-    const label nInternalFaces = mesh_.nInternalFaces();
-
+    // Get necessary mesh data
     const faceList& meshFaces = mesh_.faces();
+    const labelListList& meshPointFaces = mesh_.pointFaces();
 
-    // Loop through all boundary faces
-    for (label faceI = nInternalFaces; faceI < nFaces; ++faceI)
+    label nSplitPoints = 0;
+
+    // Loop through all points
+    forAll (meshPointFaces, pointI)
     {
-        // Get current boundary face and mark all its points as ordinary (not
-        // split) points
-        const face& f = meshFaces[faceI];
-        forAll (f, fpI)
+        // Get point level of this point
+        const label& centralPointLevel = pointLevel_[pointI];
+
+        if (centralPointLevel < 1)
         {
-            splitMaster[f[fpI]] = -2;
+            // Point can't be unrefined as its level is either 0 or
+            // invalid. Continue immediately
+            continue;
         }
-    }
 
-    // Finally, mark all split points
-    forAll (splitMaster, pointI)
-    {
-        if (splitMaster[pointI] > -1)
+        // Flag to see whether this is a split point candidate
+        bool splitPointCandidate = true;
+
+        // Get face labels for this point
+        const labelList& pFaces = meshPointFaces[pointI];
+
+        // Loop through all point faces
+        forAll (pFaces, i)
+        {
+            // Get face index and the face
+            const label& faceI = pFaces[i];
+            const face& curFace = meshFaces[faceI];
+
+            // Loop through points of the face
+            forAll (curFace, j)
+            {
+                // Get point index
+                const label& pointJ = curFace[j];
+
+                if (pointLevel_[pointJ] != centralPointLevel)
+                {
+                    // Point levels are different, this can't be a split point,
+                    // set flag to false and break immediatelly
+                    splitPointCandidate = false;
+                    break;
+                }
+                // else: this is still potential split point candidate so
+                //       there's nothing to do
+            } // End for all points of this face
+
+            // Check whether this can't be a split point already and break out
+            // immediately
+            if (!splitPointCandidate)
+            {
+                break;
+            }
+        } // End for all point faces
+
+        // At this point, if the flag is still true, this is a split point
+        if (splitPointCandidate)
         {
             splitPointsMarkup[pointI] = true;
+            ++nSplitPoints;
         }
     }
 
+    Info<< "nSplitPoints: " << nSplitPoints << endl;
+
+    // Note: If there is no dynamic load balancing, points at the boundary can't
+    // be split points by definition of refinement pattern. However, if there is
+    // dynamic load balancing, it may be possible that the split point ends up
+    // at the boundary. In that case, the split point should be correctly marked
+    // on both sides and unrefined, but this has not been tested. In case of
+    // problems, look here first. VV, 26/Jan/2018.
 
     // PART 2: Mark all unrefinement point candidates that are split points at
     // the same time (basically the intersection of split points and candidates)
@@ -3892,9 +3780,6 @@ void Foam::polyhedralRefinement::setSplitPointsToUnrefine
     // Transfer the contents into the data member (ordinary list)
     splitPointsToUnrefine_.transfer(splitPointsToUnrefineDynamic);
 
-    // Make the refinement history more compact
-    history_.compact();
-
     Info<< "polyhedralRefinement::setSplitPointsToUnrefine"
         << "(const labelList& unrefinementPointCandidates)" << nl
         << "Selected "
@@ -3968,8 +3853,8 @@ void Foam::polyhedralRefinement::updateMesh(const mapPolyMesh& map)
             << endl;
     }
 
-    // Mesh has changed topologically, we need to update cell and point levels,
-    // refinement history object and face remover object
+    // Mesh has changed topologically, we need to update cell and point levels
+    // and optionally face removal object
 
     // Get cell map: from current mesh cells to previous mesh cells
     const labelList& cellMap = map.cellMap();
@@ -4083,13 +3968,6 @@ void Foam::polyhedralRefinement::updateMesh(const mapPolyMesh& map)
     // Transfer the new point level into the data member
     pointLevel_.transfer(newPointLevel);
 
-
-    // Update refinement history
-    if (history_.active())
-    {
-        history_.updateMesh(map);
-    }
-
     // Mark files as changed
     setInstance(mesh_.facesInstance());
 
@@ -4114,11 +3992,6 @@ void Foam::polyhedralRefinement::writeDict(Ostream& os) const
     // Write necessary data before writing dictionary
     cellLevel_.write();
     pointLevel_.write();
-
-    if (history_.active())
-    {
-        history_.write();
-    }
 
     os  << nl << name() << nl << token::BEGIN_BLOCK << nl
         << "    type " << type()

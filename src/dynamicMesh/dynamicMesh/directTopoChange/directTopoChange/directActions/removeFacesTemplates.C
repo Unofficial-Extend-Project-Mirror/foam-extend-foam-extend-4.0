@@ -248,9 +248,26 @@ void Foam::removeFaces::modifyFace
     TopoChangeEngine& ref
 ) const
 {
+    if (debug)
+    {
+        if (mesh_.isInternalFace(masterFaceID))
+        {
+            Pout<< "Modifying face " << masterFaceID
+                << ", old verts: " << mesh_.faces()[masterFaceID]
+                << " for new verts:" << f
+                << nl
+                << " or for new owner " << own
+                << " (old owner: " << mesh_.faceOwner()[masterFaceID] << ")"
+                << nl
+                << " or for new nei " << nei << " (old neighbour: "
+                << mesh_.faceNeighbour()[masterFaceID] << ")"
+                << endl;
+        }
+    }
+
     if ((nei == -1) || (own < nei))
     {
-        // No need to revet the face, use original owner/neighbour
+        // No need to revert the face, use original owner/neighbour
         ref.setAction
         (
             polyModifyFace
