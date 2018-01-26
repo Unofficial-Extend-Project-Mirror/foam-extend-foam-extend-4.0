@@ -383,7 +383,7 @@ Foam::label Foam::removeFaces::compatibleRemoves
                     keptRegion = ownRegion;
                     freedRegion = neiRegion;
                 }
-                else if (ownRegion < neiRegion)
+                else if (neiRegion < ownRegion)
                 {
                     changeCellRegion
                     (

@@ -388,9 +388,30 @@ void Foam::polyhedralRefinement::setPolyhedralRefinement
         return;
     }
 
-    // Reset refinementLevelIndicator field
-    refinementLevelIndicator_.clear();
-    refinementLevelIndicator_.setSize(mesh_.nCells(), UNCHANGED);
+    // Reset refinementLevelIndicator field. Note: the list is cleared in
+    // updateMesh member function after updating cell and point levels
+    if (refinementLevelIndicator_.empty())
+    {
+        // List has been resetted correctly, initialise it for this iteration
+        refinementLevelIndicator_.setSize(mesh_.nCells(), UNCHANGED);
+    }
+    else
+    {
+        // List has not been resetted correctly, issue an error
+        FatalErrorIn
+        (
+            "polyhedralRefinement::setPolyhedralRefinement(...)"
+        )   << "Refinement level indicator list has not been"
+            << " resetted properly." << nl
+            << "Either the call to updateMesh() after performing"
+            << " refinement has not been made or the call to"
+            << " setPolyhedralRefinement(...) and"
+            << " setPolyhedralUnrefinement(...) has not been made in"
+            << " correct order." << nl
+            << "Make sure to set refinement, set unrefinement and call"
+            << " updateMesh after performing the topo change."
+            << abort(FatalError);
+    }
 
     if (debug)
     {
@@ -1470,8 +1491,15 @@ void Foam::polyhedralRefinement::setPolyhedralUnrefinement
             << abort(FatalError);
     }
 
-    // Note: no need to reset refinementLevelIndicator_ list since the
-    // unrefinement set-up always needs to happen after refinement set-up
+    // Resize refinementLevelIndicator field if necessary
+    if (refinementLevelIndicator_.empty())
+    {
+        // The list is empty: meaning that we do not have any cells to refine in
+        // this iteration. Resize the list and mark all cells as unchanged
+        refinementLevelIndicator_.setSize(mesh_.nCells(), UNCHANGED);
+    }
+    // else we have some cells to refine and the list has already been set in
+    // setPolyhedralRefinement member function
 
     // Get point cells necessary for debug and face removal
     const labelListList& meshPointCells = mesh_.pointCells();
@@ -1597,9 +1625,7 @@ void Foam::polyhedralRefinement::setPolyhedralUnrefinement
         ref
     );
 
-    // Remove the n cells that originated from merging around the split point
-    // and adapt cell levels. Note that pointLevels stay the same since points
-    // either get removed or stay at the same position.
+    // Update history for removal of cells and refinement level indicator field
     forAll(splitPointsToUnrefine_, i)
     {
         // Get point index and point cells
@@ -3307,7 +3333,7 @@ Foam::polyhedralRefinement::polyhedralRefinement
         ),
         labelList(mesh_.nPoints(), 0)
     ),
-    refinementLevelIndicator_(mesh_.nCells(), UNCHANGED),
+    refinementLevelIndicator_(0), // Must be empty before setting refinement
     level0EdgeLength_(), // Initialised in constructor body
     history_
     (
@@ -4004,6 +4030,9 @@ void Foam::polyhedralRefinement::updateMesh(const mapPolyMesh& map)
     // Transfer the new cell level into the data member
     cellLevel_.transfer(newCellLevel);
 
+    // Clear out refinementLevelIndicator_ field for next refinement step
+    refinementLevelIndicator_.clear();
+
 
     // Point level will be updated based on already updated cell level. Level
     // for newly added points has to be equal to the maximum cell level of
@@ -4082,6 +4111,15 @@ void Foam::polyhedralRefinement::write(Ostream& os) const
 
 void Foam::polyhedralRefinement::writeDict(Ostream& os) const
 {
+    // Write necessary data before writing dictionary
+    cellLevel_.write();
+    pointLevel_.write();
+
+    if (history_.active())
+    {
+        history_.write();
+    }
+
     os  << nl << name() << nl << token::BEGIN_BLOCK << nl
         << "    type " << type()
         << token::END_STATEMENT << nl
