@@ -248,7 +248,8 @@ void Foam::removeFaces::modifyFace
     TopoChangeEngine& ref
 ) const
 {
-    if (debug)
+    // Print info with deep debug level only
+    if (debug > 1)
     {
         if (mesh_.isInternalFace(masterFaceID))
         {

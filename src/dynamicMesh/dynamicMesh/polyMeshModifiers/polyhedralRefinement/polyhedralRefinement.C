@@ -1138,11 +1138,15 @@ void Foam::polyhedralRefinement::setPolyhedralRefinement
                             const label oldOwn = meshFaceOwner[faceI];
                             const label oldNei = meshFaceNeighbour[faceI];
 
-                            Pout<< "Split internal face: " << faceI
-                                << ", verts: " << f
-                                << ", into quad: " << newFace << nl
-                                << "owner: " << oldOwn
-                                << ", neighbour: " << oldNei << endl;
+                            // Print info only with deep debug level
+                            if (debug > 1)
+                            {
+                                Pout<< "Split internal face: " << faceI
+                                    << ", verts: " << f
+                                    << ", into quad: " << newFace << nl
+                                    << "owner: " << oldOwn
+                                    << ", neighbour: " << oldNei << endl;
+                            }
 
                             checkInternalOrientation
                             (
@@ -1158,10 +1162,14 @@ void Foam::polyhedralRefinement::setPolyhedralRefinement
                         {
                             const label oldOwn = meshFaceOwner[faceI];
 
-                            Pout<< "Split boundary face: " << faceI
-                                << ", verts: " << f
-                                << ", into quad: " << newFace << nl
-                                << "owner: " << oldOwn << endl;
+                            // Print info only with deep debug level
+                            if (debug > 1)
+                            {
+                                Pout<< "Split boundary face: " << faceI
+                                    << ", verts: " << f
+                                    << ", into quad: " << newFace << nl
+                                    << "owner: " << oldOwn << endl;
+                            }
 
                             checkBoundaryOrientation
                             (
@@ -3648,21 +3656,35 @@ void Foam::polyhedralRefinement::setSplitPointsToUnrefine
 
 
     // PART 3: Make sure that we skip unrefining around split points that
-    // possibly have cells around that will be refined. This might happen if
-    // someone uses an inconsistent refinement/unrefinement selection procedure
+    // possibly have cells around that will be refined
 
-    // Loop through cells to refine
+    // Mark cells that need to be protected (will be refined in this iteration)
+    boolList protectedCell(mesh_.nCells(), false);
+
+    // Loop through cells to refine and mark them
     forAll (cellsToRefine_, i)
     {
-        // Get cell index and the list of cell points
-        const label& cellI = cellsToRefine_[i];
-        const labelList& cPoints = meshCellPoints[cellI];
+        protectedCell[cellsToRefine_[i]] = true;
+    }
 
-        // Loop through cell points and make sure they are not marked for
-        // unrefinement
-        forAll (cPoints, j)
+    // Extend protected cells across face neighbours
+    extendMarkedCells(protectedCell);
+
+    // Loop through all cells and if the cell should be protected, protect all
+    // of its points from unrefinement
+    forAll (protectedCell, cellI)
+    {
+        if (protectedCell[cellI])
         {
-            splitPointsToUnrefine[cPoints[j]] = false;
+            // Get list of cell points for this protected cell
+            const labelList& cPoints = meshCellPoints[cellI];
+
+            // Loop through cell points and make sure that they are not marked
+            // for unrefinement
+            forAll (cPoints, j)
+            {
+                splitPointsToUnrefine[cPoints[j]] = false;
+            }
         }
     }
 
@@ -3807,19 +3829,21 @@ void Foam::polyhedralRefinement::setRefinement(polyTopoChange& ref) const
 {
     if (!cellsToRefine_.empty())
     {
-        // There are some cells to refine, insert the refinement instruction and
-        // clear the list of cells
+        // There are some cells to refine, insert the refinement instruction
         setPolyhedralRefinement(ref);
-        cellsToRefine_.clear();
     }
 
     if (!splitPointsToUnrefine_.empty())
     {
-        // There are some split points to unrefine around, inser the
-        // unrefinement instruction and clear the list of split points
+        // There are some split points to unrefine around, insert the
+        // unrefinement instruction
         setPolyhedralUnrefinement(ref);
-        splitPointsToUnrefine_.clear();
     }
+
+    // Clear the list of cells to refine and split points to unrefine since the
+    // refinement/unrefinement instructions have been set
+    cellsToRefine_.clear();
+    splitPointsToUnrefine_.clear();
 }
 
 
