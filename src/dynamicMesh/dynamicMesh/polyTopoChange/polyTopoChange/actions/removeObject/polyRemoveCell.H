@@ -56,6 +56,7 @@ class polyRemoveCell
         //- Merge cell ID or -1
         label mergeCellID_;
 
+
 public:
 
     // Static data members

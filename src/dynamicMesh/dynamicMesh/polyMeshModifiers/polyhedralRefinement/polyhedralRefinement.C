@@ -1531,6 +1531,17 @@ void Foam::polyhedralRefinement::setPolyhedralUnrefinement
             << endl;
     }
 
+    // Update refinementLevelIndicator for all cells that will be unrefined
+    forAll(splitPointsToUnrefine_, i)
+    {
+        // Get point cells and mark them for unrefinement
+        const labelList& pCells = meshPointCells[splitPointsToUnrefine_[i]];
+
+        forAll(pCells, j)
+        {
+            refinementLevelIndicator_[pCells[j]] = UNREFINED;
+        }
+    }
 
     // Create lists needed by face remover
     labelList cellRegion;
@@ -3040,9 +3051,14 @@ Foam::label Foam::polyhedralRefinement::faceConsistentUnrefinement
                 FatalErrorIn
                 (
                     "label polyhedralRefinement::faceConsistentUnrefinement"
-                    "(...)"
+                    "(boolList& cellsToUnrefine)"
                 )   << "Cell not marked for unrefinement, indicating a"
                     << " previous unnoticed problem with unrefinement."
+                    << nl
+                    << "Owner: " << own << ", neighbour: " << nei
+                    << nl
+                    << "Owner level: " << ownLevel
+                    << ", neighbour level: " << neiLevel
                     << abort(FatalError);
             }
 
@@ -3060,9 +3076,14 @@ Foam::label Foam::polyhedralRefinement::faceConsistentUnrefinement
                 FatalErrorIn
                 (
                     "label polyhedralRefinement::faceConsistentUnrefinement"
-                    "(...)"
+                    "(boolList& cellsToUnrefine)"
                 )   << "Cell not marked for unrefinement, indicating a"
                     << " previous unnoticed problem with unrefinement."
+                    << nl
+                    << "Owner: " << own << ", neighbour: " << nei
+                    << nl
+                    << "Owner level: " << ownLevel
+                    << ", neighbour level: " << neiLevel
                     << abort(FatalError);
             }
 
@@ -3108,9 +3129,14 @@ Foam::label Foam::polyhedralRefinement::faceConsistentUnrefinement
                 FatalErrorIn
                 (
                     "label polyhedralRefinement::faceConsistentUnrefinement"
-                    "(...)"
-                )   << "Cell not marked for unrefinement, indicating a"
+                    "(boolList& cellsToUnrefine)"
+                )   << "Boundary cell not marked for unrefinement, indicating a"
                     << " previous unnoticed problem with unrefinement."
+                    << nl
+                    << "Owner: " << own
+                    << nl
+                    << "Owner level: " << curOwnLevel
+                    << ", neighbour level: " << neiLevel[i]
                     << abort(FatalError);
             }
 
@@ -3376,7 +3402,7 @@ Foam::polyhedralRefinement::polyhedralRefinement
             << nl
             << "In order to supress this message and use point based"
             << " consistency checks, set pointBasedRefinement to true."
-            << abort(FatalError);
+            << endl;
     }
 
     // Check number of buffer layers
@@ -3563,8 +3589,6 @@ void Foam::polyhedralRefinement::setSplitPointsToUnrefine
     const faceList& meshFaces = mesh_.faces();
     const labelListList& meshPointFaces = mesh_.pointFaces();
 
-    label nSplitPoints = 0;
-
     // Loop through all points
     forAll (meshPointFaces, pointI)
     {
@@ -3620,11 +3644,8 @@ void Foam::polyhedralRefinement::setSplitPointsToUnrefine
         if (splitPointCandidate)
         {
             splitPointsMarkup[pointI] = true;
-            ++nSplitPoints;
         }
     }
-
-    Info<< "nSplitPoints: " << nSplitPoints << endl;
 
     // Note: If there is no dynamic load balancing, points at the boundary can't
     // be split points by definition of refinement pattern. However, if there is
