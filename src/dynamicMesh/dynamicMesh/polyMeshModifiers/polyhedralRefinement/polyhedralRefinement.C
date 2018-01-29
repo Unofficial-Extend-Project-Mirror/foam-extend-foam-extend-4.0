@@ -315,32 +315,32 @@ void Foam::polyhedralRefinement::setInstance(const fileName& inst) const
 }
 
 
-void Foam::polyhedralRefinement::extendMarkedCells(boolList& refineCell) const
+void Foam::polyhedralRefinement::extendMarkedCells(boolList& markedCell) const
 {
     // Mark all faces for all marked cells
     const label nFaces = mesh_.nFaces();
-    boolList refineFace(nFaces, false);
+    boolList markedFace(nFaces, false);
 
     // Get mesh cells
     const cellList& meshCells = mesh_.cells();
 
     // Loop through all cells
-    forAll (refineCell, cellI)
+    forAll (markedCell, cellI)
     {
-        if (refineCell[cellI])
+        if (markedCell[cellI])
         {
-            // This cell is a refinement candidate, get its faces
+            // This cell is marked, get its faces
             const cell& cFaces = meshCells[cellI];
 
             forAll (cFaces, i)
             {
-                refineFace[cFaces[i]] = true;
+                markedFace[cFaces[i]] = true;
             }
         }
     }
 
     // Snyc the face list across processor boundaries
-    syncTools::syncFaceList(mesh_, refineFace, orEqOp<bool>(), false);
+    syncTools::syncFaceList(mesh_, markedFace, orEqOp<bool>(), false);
 
     // Get necessary mesh data
     const label nInternalFaces = mesh_.nInternalFaces();
@@ -350,21 +350,21 @@ void Foam::polyhedralRefinement::extendMarkedCells(boolList& refineCell) const
     // Internal faces
     for (label faceI = 0; faceI < nInternalFaces; ++faceI)
     {
-        if (refineFace[faceI])
+        if (markedFace[faceI])
         {
-            // Face will be refined, mark both owner and neighbour
-            refineCell[owner[faceI]] = true;
-            refineCell[neighbour[faceI]] = true;
+            // Face will be marked, mark both owner and neighbour
+            markedCell[owner[faceI]] = true;
+            markedCell[neighbour[faceI]] = true;
         }
     }
 
     // Boundary faces
     for (label faceI = nInternalFaces; faceI < nFaces; ++faceI)
     {
-        if (refineFace[faceI])
+        if (markedFace[faceI])
         {
-            // Face will be refined, mark owner
-            refineCell[owner[faceI]] = true;
+            // Face will be markedd, mark owner
+            markedCell[owner[faceI]] = true;
         }
     }
 }
@@ -380,9 +380,12 @@ void Foam::polyhedralRefinement::setPolyhedralRefinement
     // Do nothing if there are no cells to refine
     if (cellsToRefine_.empty())
     {
-        Pout<< "polyehdralRefinement::setPolyhedralRefinement(...)" << nl
-            << "There are no cells selected for refinement. Returning... "
-            << endl;
+        if (debug)
+        {
+            Pout<< "polyehdralRefinement::setPolyhedralRefinement(...)" << nl
+                << "There are no cells selected for refinement. Returning... "
+                << endl;
+        }
 
         return;
     }
@@ -1456,6 +1459,20 @@ void Foam::polyhedralRefinement::setPolyhedralUnrefinement
     polyTopoChange& ref
 ) const
 {
+    // Do nothing if there are no cells to refine
+    if (splitPointsToUnrefine_.empty())
+    {
+        if (debug)
+        {
+            Pout<< "polyehdralRefinement::setPolyhedralUnrefinement(...)" << nl
+                << "There are no split points selected for unrefinement."
+                << " Returning... "
+                << endl;
+        }
+
+        return;
+    }
+
     // Resize refinementLevelIndicator field if necessary
     if (refinementLevelIndicator_.empty())
     {
@@ -1810,7 +1827,7 @@ void Foam::polyhedralRefinement::createInternalFaces
     // and the anchor points
 
     // Get current cell and its level
-    const cell& meshCells = mesh_.cells()[cellI];
+    const cell& curCell = mesh_.cells()[cellI];
     const label& cLevel = cellLevel_[cellI];
 
     // Get mesh faces and face edges
@@ -1829,10 +1846,10 @@ void Foam::polyhedralRefinement::createInternalFaces
     label nFacesAdded = 0;
 
     // Loop through faces of the cell
-    forAll(meshCells, i)
+    forAll(curCell, i)
     {
         // Get face index
-        const label& faceI = meshCells[i];
+        const label& faceI = curCell[i];
 
         // Get current face and its edges
         const face& f = meshFaces[faceI];
@@ -3309,11 +3326,12 @@ Foam::polyhedralRefinement::polyhedralRefinement
     faceRemover_(mesh_, GREAT), // Merge boundary faces wherever possible
     maxCells_(readLabel(dict.lookup("maxCells"))),
     maxRefinementLevel_(readLabel(dict.lookup("maxRefinementLevel"))),
-    pointBasedRefinement_
+    pointBasedConsistency_
     (
-        dict.lookupOrDefault<Switch>("pointBasedRefinement", true)
+        dict.lookupOrDefault<Switch>("pointBasedConsistency", true)
     ),
-    nBufferLayers_(readScalar(dict.lookup("nBufferLayers")))
+    nBufferLayers_(readScalar(dict.lookup("nBufferLayers"))),
+    changingTopology_(false)
 {
     // Calculate level 0 edge length
     calcLevel0EdgeLength();
@@ -3382,7 +3400,7 @@ Foam::polyhedralRefinement::polyhedralRefinement
 
     // If the maximum refinementLevel is greater than 2 and the user insists on
     // not using point based refinement strategy, issue a warning
-    if (!pointBasedRefinement_ && maxRefinementLevel_ > 2)
+    if (!pointBasedConsistency_ && maxRefinementLevel_ > 2)
     {
         WarningIn
         (
@@ -3401,7 +3419,7 @@ Foam::polyhedralRefinement::polyhedralRefinement
             << " 8:1 point conflicts."
             << nl
             << "In order to supress this message and use point based"
-            << " consistency checks, set pointBasedRefinement to true."
+            << " consistency checks, set pointBasedConsistency to true."
             << endl;
     }
 
@@ -3449,6 +3467,9 @@ void Foam::polyhedralRefinement::setCellsToRefine
     {
         // Set cells to refine to empty list and return
         cellsToRefine_.clear();
+
+        // Note: changingTopology already set to false
+
         return;
     }
 
@@ -3503,7 +3524,7 @@ void Foam::polyhedralRefinement::setCellsToRefine
         // Reset counter at the beginning of each iteration
         nAddCells = 0;
 
-        if (pointBasedRefinement_)
+        if (pointBasedConsistency_)
         {
             // Check for 4:1 point based consistent refinement. Updates
             // cellsToRefine and returns number of cells added in this iteration
@@ -3543,6 +3564,9 @@ void Foam::polyhedralRefinement::setCellsToRefine
     // Transfer the contents into the data member (ordinary list)
     cellsToRefine_.transfer(cellsToRefineDynamic);
 
+    // Update topo change flag accordingly
+    changingTopology_ = changingTopology_ || !cellsToRefine_.empty();
+
     Info<< "polyhedralRefinement::setCellsToRefine"
         << "(const labelList& refinementCellCandidates)" << nl
         << "Selected " << returnReduce(cellsToRefine_.size(), sumOp<label>())
@@ -3566,6 +3590,9 @@ void Foam::polyhedralRefinement::setSplitPointsToUnrefine
     {
         // Set split points to unrefine to empty list and return
         splitPointsToUnrefine_.clear();
+
+        // Note: changingTopology already set to false
+
         return;
     }
 
@@ -3688,8 +3715,12 @@ void Foam::polyhedralRefinement::setSplitPointsToUnrefine
         protectedCell[cellsToRefine_[i]] = true;
     }
 
-    // Extend protected cells across face neighbours
-    extendMarkedCells(protectedCell);
+    // Extend protected cells using a specified number of buffer layers + 1
+    // in order to stay far away from cells that are going to be refined
+    for (label i = 0; i < nBufferLayers_ + 1; ++i)
+    {
+        extendMarkedCells(protectedCell);
+    }
 
     // Loop through all cells and if the cell should be protected, protect all
     // of its points from unrefinement
@@ -3746,7 +3777,7 @@ void Foam::polyhedralRefinement::setSplitPointsToUnrefine
         // Reset number of removed cells from unrefinement for this iteration
         nRemCells = 0;
 
-        if (pointBasedRefinement_)
+        if (pointBasedConsistency_)
         {
             // Check for 4:1 point based consistent unrefinement. Updates
             // cellsToUnrefine and returns number of removed cells from
@@ -3823,6 +3854,9 @@ void Foam::polyhedralRefinement::setSplitPointsToUnrefine
     // Transfer the contents into the data member (ordinary list)
     splitPointsToUnrefine_.transfer(splitPointsToUnrefineDynamic);
 
+    // Update topo change flag accordingly
+    changingTopology_ = changingTopology_ || !splitPointsToUnrefine_.empty();
+
     Info<< "polyhedralRefinement::setSplitPointsToUnrefine"
         << "(const labelList& unrefinementPointCandidates)" << nl
         << "Selected "
@@ -3833,33 +3867,17 @@ void Foam::polyhedralRefinement::setSplitPointsToUnrefine
 
 bool Foam::polyhedralRefinement::changeTopology() const
 {
-    // If either cellsToRefine_ or splitPointsToUnrefine_ have at least one
-    // entry, the topology is changing
-    if (!cellsToRefine_.empty() || !splitPointsToUnrefine_.empty())
-    {
-        return true;
-    }
-
-    // Otherwise, there is no topo change (at least on this processor in this
-    // time step): return false
-    return false;
+    // Note: topo change trigger needs to be set for all processors in order to
+    // consistently update pointLevel across processor boundaries
+    return returnReduce(changingTopology_, orOp<bool>());
 }
 
 
 void Foam::polyhedralRefinement::setRefinement(polyTopoChange& ref) const
 {
-    if (!cellsToRefine_.empty())
-    {
-        // There are some cells to refine, insert the refinement instruction
-        setPolyhedralRefinement(ref);
-    }
-
-    if (!splitPointsToUnrefine_.empty())
-    {
-        // There are some split points to unrefine around, insert the
-        // unrefinement instruction
-        setPolyhedralUnrefinement(ref);
-    }
+    // Set refinement and unrefinement
+    setPolyhedralRefinement(ref);
+    setPolyhedralUnrefinement(ref);
 
     // Clear the list of cells to refine and split points to unrefine since the
     // refinement/unrefinement instructions have been set
@@ -4010,6 +4028,16 @@ void Foam::polyhedralRefinement::updateMesh(const mapPolyMesh& map)
         }
     }
 
+    // Parallel update of new point level
+    syncTools::syncPointList
+    (
+        mesh_,
+        newPointLevel,
+        maxEqOp<label>(),
+        0,   // Null value
+        true // Apply separation for parallel cyclics
+    );
+
     // Transfer the new point level into the data member
     pointLevel_.transfer(newPointLevel);
 
@@ -4018,6 +4046,9 @@ void Foam::polyhedralRefinement::updateMesh(const mapPolyMesh& map)
 
     // Update face remover
     faceRemover_.updateMesh(map);
+
+    // Deactivate changingTopology flag since we are done for this time step
+    changingTopology_ = false;
 }
 
 
@@ -4027,7 +4058,7 @@ void Foam::polyhedralRefinement::write(Ostream& os) const
         << name() << nl
         << maxCells_ << nl
         << maxRefinementLevel_ << nl
-        << pointBasedRefinement_ << nl
+        << pointBasedConsistency_ << nl
         << nBufferLayers_ << endl;
 }
 
@@ -4045,7 +4076,7 @@ void Foam::polyhedralRefinement::writeDict(Ostream& os) const
         << token::END_STATEMENT << nl
         << "    maxRefinementLevel " << maxRefinementLevel_
         << token::END_STATEMENT << nl
-        << "    pointBasedRefinement " << pointBasedRefinement_
+        << "    pointBasedConsistency " << pointBasedConsistency_
         << token::END_STATEMENT << nl
         << "    nBufferLayers " << nBufferLayers_
         << token::END_STATEMENT << nl
