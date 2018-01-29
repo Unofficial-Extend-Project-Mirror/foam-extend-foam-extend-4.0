@@ -162,7 +162,14 @@ bool Foam::dynamicPolyRefinementFvMesh::update()
 
         // Activate the polyhedral refinement engine if there are some cells to
         // refine or there are some split points to unrefine around
-        if (!refCandidates.empty() || !unrefCandidates.empty())
+        bool enableTopoChange =
+            !refCandidates.empty() || !unrefCandidates.empty();
+
+        // Note: must enable topo change for all processors since face and point
+        // consistent refinement must be ensured across coupled patches
+        reduce(enableTopoChange, orOp<bool>());
+
+        if (enableTopoChange)
         {
             polyRefModifier.enable();
         }

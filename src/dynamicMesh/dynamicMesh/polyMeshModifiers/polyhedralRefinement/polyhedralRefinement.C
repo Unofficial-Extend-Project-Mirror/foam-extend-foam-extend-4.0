@@ -377,19 +377,6 @@ void Foam::polyhedralRefinement::setPolyhedralRefinement
 {
     // Note: assumes that cellsToRefine_ are set prior to the function call
 
-    // Do nothing if there are no cells to refine
-    if (cellsToRefine_.empty())
-    {
-        if (debug)
-        {
-            Pout<< "polyehdralRefinement::setPolyhedralRefinement(...)" << nl
-                << "There are no cells selected for refinement. Returning... "
-                << endl;
-        }
-
-        return;
-    }
-
     // Reset refinementLevelIndicator field. Note: the list is cleared in
     // updateMesh member function after updating cell and point levels
     if (refinementLevelIndicator_.empty())
@@ -1375,7 +1362,7 @@ void Foam::polyhedralRefinement::setPolyhedralRefinement
     }
 
 
-    // PART 6.4. Addd new internal faces inside split cells
+    // PART 6.4. Add new internal faces inside split cells
 
     // We have to find the splitting points between the anchor points. But the
     // edges between the anchor points might have been split (into two, three or
@@ -1459,29 +1446,23 @@ void Foam::polyhedralRefinement::setPolyhedralUnrefinement
     polyTopoChange& ref
 ) const
 {
-    // Do nothing if there are no cells to refine
-    if (splitPointsToUnrefine_.empty())
-    {
-        if (debug)
-        {
-            Pout<< "polyehdralRefinement::setPolyhedralUnrefinement(...)" << nl
-                << "There are no split points selected for unrefinement."
-                << " Returning... "
-                << endl;
-        }
+    // Note: assumes that splitPointsToUnrefine_ are set prior to the function
+    // call
 
-        return;
-    }
-
-    // Resize refinementLevelIndicator field if necessary
-    if (refinementLevelIndicator_.empty())
+    // Check whether the refinementLevelIndicator is valid
+    if (refinementLevelIndicator_.size() != mesh_.nCells())
     {
-        // The list is empty: meaning that we do not have any cells to refine in
-        // this iteration. Resize the list and mark all cells as unchanged
-        refinementLevelIndicator_.setSize(mesh_.nCells(), UNCHANGED);
+        FatalErrorIn
+        (
+            "polyhedralRefinement::setPolyhedralUnrefinement(...)"
+        )   << "Refinement level indicator list has invalid size: "
+            << refinementLevelIndicator_.size()
+            << ", number of cells: " << mesh_.nCells()
+            << nl
+            << "Make sure to call setPolyhedralRefinement(...) before"
+            << " calling setPolyhedralRefinement(...)."
+            << abort(FatalError);
     }
-    // else we have some cells to refine and the list has already been set in
-    // setPolyhedralRefinement member function
 
     // Get point cells necessary for debug and face removal
     const labelListList& meshPointCells = mesh_.pointCells();
@@ -1576,7 +1557,7 @@ void Foam::polyhedralRefinement::setPolyhedralUnrefinement
 
         forAll(splitPointsToUnrefine_, i)
         {
-            // Loop through all faces of this point insert face index
+            // Loop through all faces of this point and insert face index
             const labelList& pFaces = meshPointFaces[splitPointsToUnrefine_[i]];
 
             forAll(pFaces, j)
@@ -2913,7 +2894,7 @@ Foam::label Foam::polyhedralRefinement::pointConsistentRefinement
     // Count number of cells that will be added
     label nAddCells = 0;
 
-    // Collect all points from cells to refine. Assume that 10% of mesh poitns
+    // Collect all points from cells to refine. Assume that 10% of mesh points
     // are going to be affected to prevent excessive resizing
     labelHashSet pointsToConsider(mesh_.nPoints()/10);
 
@@ -3330,8 +3311,7 @@ Foam::polyhedralRefinement::polyhedralRefinement
     (
         dict.lookupOrDefault<Switch>("pointBasedConsistency", true)
     ),
-    nBufferLayers_(readScalar(dict.lookup("nBufferLayers"))),
-    changingTopology_(false)
+    nBufferLayers_(readScalar(dict.lookup("nBufferLayers")))
 {
     // Calculate level 0 edge length
     calcLevel0EdgeLength();
@@ -3463,16 +3443,6 @@ void Foam::polyhedralRefinement::setCellsToRefine
             << "Setting cells to refine" << endl;
     }
 
-    if (refinementCellCandidates.empty())
-    {
-        // Set cells to refine to empty list and return
-        cellsToRefine_.clear();
-
-        // Note: changingTopology already set to false
-
-        return;
-    }
-
     // Create a mark-up field for cells to refine
     boolList refineCell(mesh_.nCells(), false);
 
@@ -3564,9 +3534,6 @@ void Foam::polyhedralRefinement::setCellsToRefine
     // Transfer the contents into the data member (ordinary list)
     cellsToRefine_.transfer(cellsToRefineDynamic);
 
-    // Update topo change flag accordingly
-    changingTopology_ = changingTopology_ || !cellsToRefine_.empty();
-
     Info<< "polyhedralRefinement::setCellsToRefine"
         << "(const labelList& refinementCellCandidates)" << nl
         << "Selected " << returnReduce(cellsToRefine_.size(), sumOp<label>())
@@ -3584,16 +3551,6 @@ void Foam::polyhedralRefinement::setSplitPointsToUnrefine
         Info<< "polyhedralRefinement::setSplitPointsToUnrefine"
             << "(const labelList& unrefinementPointCandidates)" << nl
             << "Setting split points to unrefine." << endl;
-    }
-
-    if (unrefinementPointCandidates.empty())
-    {
-        // Set split points to unrefine to empty list and return
-        splitPointsToUnrefine_.clear();
-
-        // Note: changingTopology already set to false
-
-        return;
     }
 
     // Get necessary mesh data
@@ -3854,9 +3811,6 @@ void Foam::polyhedralRefinement::setSplitPointsToUnrefine
     // Transfer the contents into the data member (ordinary list)
     splitPointsToUnrefine_.transfer(splitPointsToUnrefineDynamic);
 
-    // Update topo change flag accordingly
-    changingTopology_ = changingTopology_ || !splitPointsToUnrefine_.empty();
-
     Info<< "polyhedralRefinement::setSplitPointsToUnrefine"
         << "(const labelList& unrefinementPointCandidates)" << nl
         << "Selected "
@@ -3867,14 +3821,40 @@ void Foam::polyhedralRefinement::setSplitPointsToUnrefine
 
 bool Foam::polyhedralRefinement::changeTopology() const
 {
-    // Note: topo change trigger needs to be set for all processors in order to
-    // consistently update pointLevel across processor boundaries
-    return returnReduce(changingTopology_, orOp<bool>());
+    if (!active())
+    {
+        // Modifier is inactive, skip topo change
+        if (debug)
+        {
+            Pout<< "bool polyhedralRefinement::changeTopology() const"
+                << "for object " << name() << " : "
+                << "Inactive" << endl;
+        }
+
+        return false;
+    }
+    else
+    {
+        return true;
+    }
 }
 
 
 void Foam::polyhedralRefinement::setRefinement(polyTopoChange& ref) const
 {
+    // Make sure that the point levels are updated across coupled patches before
+    // setting refinement and unrefinement. Note: not sure why the sync is not
+    // performed correctly if I do it in updateMesh. This is a temporary
+    // solution, need to investigate in detail. VV, 31/Jan/2018.
+    syncTools::syncPointList
+    (
+        mesh_,
+        pointLevel_,
+        maxEqOp<label>(),
+        0,   // Null value
+        true // Apply separation for parallel cyclics
+    );
+
     // Set refinement and unrefinement
     setPolyhedralRefinement(ref);
     setPolyhedralUnrefinement(ref);
@@ -4028,16 +4008,6 @@ void Foam::polyhedralRefinement::updateMesh(const mapPolyMesh& map)
         }
     }
 
-    // Parallel update of new point level
-    syncTools::syncPointList
-    (
-        mesh_,
-        newPointLevel,
-        maxEqOp<label>(),
-        0,   // Null value
-        true // Apply separation for parallel cyclics
-    );
-
     // Transfer the new point level into the data member
     pointLevel_.transfer(newPointLevel);
 
@@ -4046,9 +4016,6 @@ void Foam::polyhedralRefinement::updateMesh(const mapPolyMesh& map)
 
     // Update face remover
     faceRemover_.updateMesh(map);
-
-    // Deactivate changingTopology flag since we are done for this time step
-    changingTopology_ = false;
 }
 
 

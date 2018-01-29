@@ -391,10 +391,10 @@ void Foam::removeFaces::setRefinement
             const label& faceI = faceLabels[i];
             const labelList& fEdges = meshFaceEdges[faceI];
 
-            forAll(fEdges, i)
+            forAll(fEdges, j)
             {
                 // Get edge index
-                const label& edgeI = fEdges[i];
+                const label& edgeI = fEdges[j];
 
                 if (nFacesPerEdge[edgeI] == -1)
                 {
@@ -432,7 +432,7 @@ void Foam::removeFaces::setRefinement
                 }
                 else
                 {
-                    // Error: edge has less than one face. Print additional
+                    // Error: edge has less than two faces. Print additional
                     // information and issue an error
 
                     // Get edge and all its cells

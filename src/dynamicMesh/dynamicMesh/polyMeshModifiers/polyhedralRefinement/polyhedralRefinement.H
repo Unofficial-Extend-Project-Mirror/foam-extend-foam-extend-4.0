@@ -130,14 +130,6 @@ private:
             //- Number of buffer layers for refinement
             label nBufferLayers_;
 
-            //- Flag indicating whether we currently have topo changes
-            //  Set to true in setRefinement member function
-            //  Set to false in updateMesh member function
-            //  Note: must be reduced. Even if a certain processor does not go
-            //  through topo changes, it must call updateMesh to correctly
-            //  update point levels of points on coupled patches
-            mutable bool changingTopology_;
-
 
     // Private Member Functions
 
