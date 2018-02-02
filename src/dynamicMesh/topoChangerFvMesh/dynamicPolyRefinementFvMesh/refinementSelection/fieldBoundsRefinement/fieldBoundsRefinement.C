@@ -96,7 +96,7 @@ Foam::fieldBoundsRefinement::refinementCellCandidates() const
         pointScalarField pField(vpi.interpolate(vField));
 
         // Create point to volume interpolation object
-        const pointMesh pMesh(mesh());
+        const pointMesh& pMesh = pointMesh::New(mesh());
         const pointVolInterpolation pvi(pMesh, mesh());
 
         // Interpolate from points back to cell centres
@@ -131,7 +131,8 @@ Foam::fieldBoundsRefinement::refinementCellCandidates() const
 
     // Print out some information
     Info<< "Selection algorithm " << type() << " selected "
-        << refinementCandidates.size() << " cells as refinement candidates."
+        << returnReduce(refinementCandidates.size(), sumOp<label>())
+        << " cells as refinement candidates."
         << endl;
 
     // Return the list in the Xfer container to prevent copying
@@ -174,7 +175,7 @@ Foam::fieldBoundsRefinement::unrefinementPointCandidates() const
 
     // Print out some information
     Info<< "Selection algorithm " << type() << " selected "
-        << unrefinementCandidates.size()
+        << returnReduce(unrefinementCandidates.size(), sumOp<label>())
         << " points as unrefinement candidates."
         << endl;
 

@@ -361,16 +361,12 @@ private:
             label pointConsistentRefinement(boolList& cellsToRefine) const;
 
             //- Updates cellsToUnrefine such that a face consistent 2:1
-            //  unrefinement is obtained. Returns local number of points changed
+            //  unrefinement is obtained. Returns local number of cells changed
             label faceConsistentUnrefinement(boolList& cellsToUnrefine) const;
 
             //- Updates cellsToUnrefine such that a point consistent 4:1
-            //  unrefinement is obtained. Returns local number of points changed
-            label pointConsistentUnrefinement
-            (
-                const boolList& splitPointsToUnrefine,
-                boolList& cellsToUnrefine
-            ) const;
+            //  unrefinement is obtained. Returns local number of cells changed
+            label pointConsistentUnrefinement(boolList& cellsToUnrefine) const;
 
 
         // Copy control

@@ -2930,21 +2930,21 @@ Foam::label Foam::polyhedralRefinement::pointConsistentRefinement
         // Get the cells for this point
         const labelList& curCells = meshPointCells[pointI];
 
-        // Find maximum refinement level for this points
-        forAll (curCells, cellI)
+        // Get reference to maximum pooint level for this point
+        label& curMaxPointLevel = maxRefLevel[pointI];
+
+        // Find maximum refinement level for this point
+        forAll (curCells, i)
         {
-            // Get cell index and cell level
-            const label& curCellI = curCells[cellI];
-            const label curLevel =
+            // Get cell index and "future" cell level
+            const label& curCellI = curCells[i];
+            const label curCellLevel =
                 cellsToRefine[curCellI]
               ? cellLevel_[curCellI] + 1
               : cellLevel_[curCellI];
 
-            // Set the maximum point refinement level
-            if (curLevel > maxRefLevel[pointI])
-            {
-                maxRefLevel[pointI] = curLevel;
-            }
+            // Update maximum point level if the curCellLevel is higher
+            curMaxPointLevel = max(curMaxPointLevel, curCellLevel);
         }
     }
 
@@ -2970,17 +2970,18 @@ Foam::label Foam::polyhedralRefinement::pointConsistentRefinement
 
         // Loop through these point cells and set cells for refinement which
         // would end up having refinement level smaller than maximum level - 1
-        forAll (curCells, cellI)
+        forAll (curCells, i)
         {
-            // Get cell index, reference to refinement flag and cell level
-            const label& curCellI = curCells[cellI];
+            // Get cell index, reference to refinement flag and "future" cell
+            // level
+            const label& curCellI = curCells[i];
             bool& willBeRefined = cellsToRefine[curCellI];
-            const label curLevel =
+            const label curCellLevel =
                 willBeRefined
               ? cellLevel_[curCellI] + 1
               : cellLevel_[curCellI];
 
-            if (curLevel < maxRefLevel[pointI] - 1)
+            if (curCellLevel < maxRefLevel[pointI] - 1)
             {
                 if (!willBeRefined)
                 {
@@ -3153,7 +3154,6 @@ Foam::label Foam::polyhedralRefinement::faceConsistentUnrefinement
 
 Foam::label Foam::polyhedralRefinement::pointConsistentUnrefinement
 (
-    const boolList& splitPointsToUnrefine,
     boolList& cellsToUnrefine
 ) const
 {
@@ -3162,38 +3162,57 @@ Foam::label Foam::polyhedralRefinement::pointConsistentUnrefinement
 
     // Get necessary mesh data
     const label nPoints = mesh_.nPoints();
-    const labelListList& meshPointCells = mesh_.pointCells();
+    const labelListList& meshCellPoints = mesh_.cellPoints();
+
+    // Collect all points to consider from cells to unrefine. Assume that 10% of
+    // mesh points are going to be affected to prevent excessive resizing
+    labelHashSet pointsToConsider(nPoints/10);
+
+    // Collect all points
+    forAll (meshCellPoints, cellI)
+    {
+        if (cellsToUnrefine[cellI])
+        {
+            // Get current cell points and insert them into hash set
+            const labelList& curPoints = meshCellPoints[cellI];
+            forAll (curPoints, pointI)
+            {
+                pointsToConsider.insert(curPoints[pointI]);
+            }
+        }
+    }
 
     // Minimum cell refinement level for each point. Note: initialise with
     // labelMax
     labelList minRefLevel(nPoints, labelMax);
 
+    // Get point cells
+    const labelListList& meshPointCells = mesh_.pointCells();
+
     // Loop through all points and collect minimum point level for each point
-    forAll (splitPointsToUnrefine, pointI)
+    forAllConstIter (labelHashSet, pointsToConsider, iter)
     {
-        // Check whether the point is marked for unrefinement
-        if (splitPointsToUnrefine[pointI])
+        // Get point index
+        const label& pointI = iter.key();
+
+        // Get the cell for this point
+        const labelList& curCells = meshPointCells[pointI];
+
+        // Get reference to minimum point level for this point
+        label& curMinPointLevel = minRefLevel[pointI];
+
+        // Find minimum refinement level for this point
+        forAll (curCells, i)
         {
-            // Get cells for this point
-            const labelList& curCells = meshPointCells[pointI];
+            // Get cell index and "future" cell level
+            const label& curCellI = curCells[i];
+            const label curCellLevel =
+                cellsToUnrefine[curCellI]
+              ? cellLevel_[curCellI] - 1
+              : cellLevel_[curCellI];
 
-            // Find minimum refinement level for this points
-            forAll (curCells, cellI)
-            {
-                // Get current cell and its new level
-                const label curCellI = curCells[cellI];
-                const label curLevel =
-                    cellsToUnrefine[curCellI]
-                  ? cellLevel_[curCellI] - 1
-                  : cellLevel_[curCellI];
-
-                // If the current level is smaller than current minimum
-                // refinement level, update the minimum refinement level
-                if (curLevel < minRefLevel[pointI])
-                {
-                    minRefLevel[pointI] = curLevel;
-                }
-            }
+            // Update minimum point level if the curCellLevel is smaller
+            curMinPointLevel = min(curMinPointLevel, curCellLevel);
         }
     }
 
@@ -3207,52 +3226,49 @@ Foam::label Foam::polyhedralRefinement::pointConsistentUnrefinement
         true // Apply separation for parallel cyclics
     );
 
-    // Now that the levels are synced, go through split point candidates and add
-    // cells to unrefine
-    forAll (splitPointsToUnrefine, pointI)
+    // Now that the levels are synced, go through considered points and protect
+    // some cells from unrefinement
+    forAllConstIter (labelHashSet, pointsToConsider, iter)
     {
-        // Check whether the point is marked for unrefinement
-        if (splitPointsToUnrefine[pointI])
+        // Get point index
+        const label& pointI = iter.key();
+
+        // Get the cells for this point
+        const labelList& curCells = meshPointCells[pointI];
+
+        // Loop through these point cells and protected cells from unrefinement
+        // which would end up having refinement level greater than level + 1
+        forAll (curCells, i)
         {
-            // Get the cells for this point
-            const labelList& curCells = meshPointCells[pointI];
+            // Get cell index, reference to unrefinement flag and "future" cell
+            // level
+            const label& curCellI = curCells[i];
+            bool& willBeUnrefined = cellsToUnrefine[curCellI];
+            const label curCellLevel =
+                willBeUnrefined
+              ? cellLevel_[curCellI] - 1
+              : cellLevel_[curCellI];
 
-            // Loop through these point cells and set cells for unrefinement which
-            // would end up having refinement level greater than level + 1
-            forAll (curCells, cellI)
+            if (curCellLevel > minRefLevel[pointI] + 1)
             {
-                // Get current cell index and level
-                const label curCellI = curCells[cellI];
-                const label curLevel =
-                    cellsToUnrefine[curCellI]
-                  ? cellLevel_[curCellI] - 1
-                  : cellLevel_[curCellI];
-
-                if (curLevel > minRefLevel[pointI] + 1)
+                if (willBeUnrefined)
                 {
-                    // Check whether the cell has not been marked for unrefinement
-                    if (!cellsToUnrefine[curCellI])
-                    {
-                        // Set the cell for unrefinement and increment the
-                        // counter
-                        cellsToUnrefine[curCellI] = true;
-                        ++nRemCells;
-                    }
-                    else
-                    {
-                        FatalErrorIn
-                        (
-                            "label"
-                            "polyhedralRefinement::pointConsistentUnrefinement"
-                            "\n("
-                            "\n    const boolList& splitPointsToUnrefine,"
-                            "\n    boolList& cellsToUnrefine"
-                            "\n) const"
-                        )   << "Cell is marked for unrefinement, but the 4:1 point"
-                            << " consistency cannot be ensured." << nl
-                            << "Something went wrong before this step."
-                            << endl;
-                    }
+                    // Cell has been marked for unrefinement, protect the cell
+                    // from unrefinement and increment the counter
+                    willBeUnrefined = false;
+                    ++nRemCells;
+                }
+                else
+                {
+                    FatalErrorIn
+                    (
+                        "label polyhedralRefinement::"
+                        "pointConsistentUnrefinement"
+                        "(boolList cellsToRefine) const"
+                    )   << "Cell is not marked for unrefinement, but the 4:1"
+                        << " point consistency cannot be ensured." << nl
+                        << "Something went wrong before this step."
+                        << endl;
                 }
             }
         }
@@ -3564,10 +3580,10 @@ void Foam::polyhedralRefinement::setSplitPointsToUnrefine
     // 1. Has pointLevel_ > 0 (obviously),
     // 2. A point that has the same pointLevel_ as ALL of the points of its
     //    faces. In other words, for each point, we will look through all the
-    //    faes of the point. For each of the face, we will visit points and
-    //    check the point level of all of these points. All point levels must be
-    //    the same for this point candidate to be split point. This is quite
-    //    useful since there is no need to store the refinement history
+    //    faces of the point. For each face, we will visit points and check the
+    //    point level of all of these points. All point levels must be the same
+    //    for this point candidate to be split point. This is quite useful since
+    //    there is no need to store the refinement history
 
     // Get necessary mesh data
     const faceList& meshFaces = mesh_.faces();
@@ -3631,12 +3647,27 @@ void Foam::polyhedralRefinement::setSplitPointsToUnrefine
         }
     }
 
+    const label nInternalFaces = mesh_.nInternalFaces();
+    const label nFaces = mesh_.nFaces();
+
+    for (label faceI = nInternalFaces; faceI < nFaces; ++faceI)
+    {
+        // Get the face and make sure that the points are unarked
+        const face& f = meshFaces[faceI];
+
+        forAll (f, fpI)
+        {
+            splitPointsMarkup[f[fpI]] = false;
+        }
+    }
+
     // Note: If there is no dynamic load balancing, points at the boundary can't
-    // be split points by definition of refinement pattern. However, if there is
-    // dynamic load balancing, it may be possible that the split point ends up
-    // at the boundary. In that case, the split point should be correctly marked
-    // on both sides and unrefined, but this has not been tested. In case of
-    // problems, look here first. VV, 26/Jan/2018.
+    // be split points by definition of refinement pattern and we may skip
+    // the redundacy boundary face loop above. It seems that even without
+    // dynamic load balancing, I end up having problems where certain points at
+    // processor boundaries are marked as split points erroneusly. There is
+    // something I don't understand and this is why I left the redundancy check
+    // above. VV, 30/Jan/2018.
 
     // PART 2: Mark all unrefinement point candidates that are split points at
     // the same time (basically the intersection of split points and candidates)
@@ -3739,12 +3770,7 @@ void Foam::polyhedralRefinement::setSplitPointsToUnrefine
             // Check for 4:1 point based consistent unrefinement. Updates
             // cellsToUnrefine and returns number of removed cells from
             // unrefinement in this iteration
-            nRemCells +=
-                pointConsistentUnrefinement
-                (
-                    splitPointsToUnrefine,
-                    cellsToUnrefine
-                );
+            nRemCells += pointConsistentUnrefinement(cellsToUnrefine);
         }
 
         // Check for 2:1 face based consistent unrefinement. Updates
@@ -4007,6 +4033,10 @@ void Foam::polyhedralRefinement::updateMesh(const mapPolyMesh& map)
             newPointLevel[newPointI] = pointLevel_[oldPointI];
         }
     }
+
+    // Note: new point level is going to be synced at processor boundaries just
+    // before the next step in setRefinement. Need to investigate why the sync
+    // is not done properly if I put it here. VV, 31/Jan/2018.
 
     // Transfer the new point level into the data member
     pointLevel_.transfer(newPointLevel);
