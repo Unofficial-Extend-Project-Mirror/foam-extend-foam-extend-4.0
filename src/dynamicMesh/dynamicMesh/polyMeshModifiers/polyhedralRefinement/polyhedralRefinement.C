@@ -2894,27 +2894,6 @@ Foam::label Foam::polyhedralRefinement::pointConsistentRefinement
     // Count number of cells that will be added
     label nAddCells = 0;
 
-    // Collect all points from cells to refine. Assume that 10% of mesh points
-    // are going to be affected to prevent excessive resizing
-    labelHashSet pointsToConsider(mesh_.nPoints()/10);
-
-    // Get cell points
-    const labelListList& meshCellPoints = mesh_.cellPoints();
-
-    // Collect all points
-    forAll (meshCellPoints, cellI)
-    {
-        if (cellsToRefine[cellI])
-        {
-            // Get current cell points and insert them into hash set
-            const labelList& curPoints = meshCellPoints[cellI];
-            forAll (curPoints, pointI)
-            {
-                pointsToConsider.insert(curPoints[pointI]);
-            }
-        }
-    }
-
     // Maximum surrounding cell refinement level for each point
     labelList maxRefLevel(mesh_.nPoints(), 0);
 
@@ -2922,11 +2901,8 @@ Foam::label Foam::polyhedralRefinement::pointConsistentRefinement
     const labelListList& meshPointCells = mesh_.pointCells();
 
     // Loop through all points and collect maximum point level for each point
-    forAllConstIter (labelHashSet, pointsToConsider, iter)
+    forAll (maxRefLevel, pointI)
     {
-        // Get point index
-        const label& pointI = iter.key();
-
         // Get the cells for this point
         const labelList& curCells = meshPointCells[pointI];
 
@@ -2958,13 +2934,10 @@ Foam::label Foam::polyhedralRefinement::pointConsistentRefinement
         true // Apply separation for parallel cyclics
     );
 
-    // Now that the levels are synced, go through considered points and add
-    // cells to refine
-    forAllConstIter (labelHashSet, pointsToConsider, iter)
+    // Now that the levels are synced, go through all points and add cells to
+    // refine
+    forAll (maxRefLevel, pointI)
     {
-        // Get point index
-        const label& pointI = iter.key();
-
         // Get the cells for this point
         const labelList& curCells = meshPointCells[pointI];
 
@@ -3160,41 +3133,16 @@ Foam::label Foam::polyhedralRefinement::pointConsistentUnrefinement
     // Count number of cells removed from unrefinement
     label nRemCells = 0;
 
-    // Get necessary mesh data
-    const label nPoints = mesh_.nPoints();
-    const labelListList& meshCellPoints = mesh_.cellPoints();
-
-    // Collect all points to consider from cells to unrefine. Assume that 10% of
-    // mesh points are going to be affected to prevent excessive resizing
-    labelHashSet pointsToConsider(nPoints/10);
-
-    // Collect all points
-    forAll (meshCellPoints, cellI)
-    {
-        if (cellsToUnrefine[cellI])
-        {
-            // Get current cell points and insert them into hash set
-            const labelList& curPoints = meshCellPoints[cellI];
-            forAll (curPoints, pointI)
-            {
-                pointsToConsider.insert(curPoints[pointI]);
-            }
-        }
-    }
-
     // Minimum cell refinement level for each point. Note: initialise with
     // labelMax
-    labelList minRefLevel(nPoints, labelMax);
+    labelList minRefLevel(mesh_.nPoints(), labelMax);
 
     // Get point cells
     const labelListList& meshPointCells = mesh_.pointCells();
 
     // Loop through all points and collect minimum point level for each point
-    forAllConstIter (labelHashSet, pointsToConsider, iter)
+    forAll (minRefLevel, pointI)
     {
-        // Get point index
-        const label& pointI = iter.key();
-
         // Get the cell for this point
         const labelList& curCells = meshPointCells[pointI];
 
@@ -3226,13 +3174,10 @@ Foam::label Foam::polyhedralRefinement::pointConsistentUnrefinement
         true // Apply separation for parallel cyclics
     );
 
-    // Now that the levels are synced, go through considered points and protect
-    // some cells from unrefinement
-    forAllConstIter (labelHashSet, pointsToConsider, iter)
+    // Now that the levels are synced, go through all points and protect some
+    // cells from unrefinement
+    forAll (minRefLevel, pointI)
     {
-        // Get point index
-        const label& pointI = iter.key();
-
         // Get the cells for this point
         const labelList& curCells = meshPointCells[pointI];
 
