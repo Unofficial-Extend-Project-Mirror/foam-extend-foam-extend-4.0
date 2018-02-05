@@ -60,9 +60,9 @@ class volPointInterpolation
         //- Boundary interpolation engine
         pointPatchInterpolation boundaryInterpolator_;
 
-        //- Interpolation scheme weighting factor array
+        //- Interpolation scheme weighting factor array using lazy evaluation
         //  Updated for MeshObject.  HJ, 30/Aug/2010
-        mutable scalarListList pointWeights_;
+        mutable scalarListList* pointWeightsPtr_;
 
 
     // Private member functions
@@ -92,17 +92,21 @@ public:
 
     // Destructor
 
-        ~volPointInterpolation();
+        virtual ~volPointInterpolation();
 
 
     // Member functions
 
         // Access
 
+            //- Const reference to fvMesh
             const fvMesh& mesh() const
             {
                 return boundaryInterpolator_.mesh();
             }
+
+            //- Return interpolation weights (lazy evaluation)
+            const scalarListList& pointWeights() const;
 
 
         // Edit

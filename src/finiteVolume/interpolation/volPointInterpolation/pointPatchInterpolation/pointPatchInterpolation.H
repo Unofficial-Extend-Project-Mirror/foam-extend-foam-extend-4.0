@@ -63,26 +63,31 @@ class pointPatchInterpolation
         const fvMesh& fvMesh_;
 
         //- Primitive patch interpolators
-        PtrList<primitivePatchInterpolation> patchInterpolators_;
+        mutable PtrList<primitivePatchInterpolation> patchInterpolators_;
 
         //- List of patch-patch edge points that require special treatement
-        labelList patchPatchPoints_;
+        mutable labelList* patchPatchPointsPtr_;
+
+        //- List of constraint points
+        mutable labelList* patchPatchPointConstraintPointsPtr_;
+
+        //- List of constraint tensors for constrained points
+        mutable tensorField* patchPatchPointConstraintTensorsPtr_;
 
         //- Weights for patch-patch boundary points
-        scalarListList patchPatchPointWeights_;
-
-        labelList patchPatchPointConstraintPoints_;
-        tensorField patchPatchPointConstraintTensors_;
+        mutable scalarListList* patchPatchPointWeightsPtr_;
 
 
     // Private member functions
 
         //- Construct addressing for patch-patch boundary points
-        void makePatchPatchAddressing();
+        void makePatchPatchAddressing() const;
 
         //- Construct weights for patch-patch boundary points
-        void makePatchPatchWeights();
+        void makePatchPatchWeights() const;
 
+        //- Clear all demand driven data
+        void clearOut() const;
 
         //- Disallow default bitwise copy construct
         pointPatchInterpolation(const pointPatchInterpolation&);
@@ -112,10 +117,27 @@ public:
 
         // Access
 
+            //- Return const reference to fvMesh
             const fvMesh& mesh() const
             {
                 return fvMesh_;
             }
+
+            //- Return primitive patch interpolators
+            const PtrList<primitivePatchInterpolation>& patchInterpolators
+            () const;
+
+            //- Return patch-patch edge points that require special treatment
+            const labelList& patchPatchPoints() const;
+
+            //- Return weights for patch-patch boundary points
+            const scalarListList& patchPatchPointWeights() const;
+
+            //- Return constraint points
+            const labelList& patchPatchPointConstraintPoints() const;
+
+            //- Return constraint tensors
+            const tensorField& patchPatchPointConstraintTensors() const;
 
 
         // Edit

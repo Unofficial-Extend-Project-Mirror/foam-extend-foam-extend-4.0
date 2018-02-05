@@ -62,6 +62,11 @@ void pointPatchInterpolation::interpolate
 
     const fvBoundaryMesh& bm = fvMesh_.boundary();
 
+    // Get patch interpolators
+    const PtrList<primitivePatchInterpolation>& patchInterp =
+        patchInterpolators();
+
+
     forAll(bm, patchi)
     {
         if (!isA<emptyFvPatch>(bm[patchi]) && !bm[patchi].coupled())
@@ -73,7 +78,7 @@ void pointPatchInterpolation::interpolate
             ppf.setInInternalField
             (
                 pf.internalField(),
-                patchInterpolators_[patchi].faceToPointInterpolate
+                patchInterp[patchi].faceToPointInterpolate
                 (
                     vf.boundaryField()[patchi]
                 )()
@@ -114,9 +119,13 @@ void pointPatchInterpolation::interpolate
     // Correct patch-patch boundary points by interpolation "around" corners
     const labelListList& PointFaces = fvMesh_.pointFaces();
 
-    forAll(patchPatchPoints_, pointi)
+    // Get patch-patch edge points and weights
+    const labelList& patchPatchPts = patchPatchPoints();
+    const scalarListList& patchPatchPtsWeights = patchPatchPointWeights();
+
+    forAll(patchPatchPts, pointi)
     {
-        const label curPoint = patchPatchPoints_[pointi];
+        const label curPoint = patchPatchPts[pointi];
         const labelList& curFaces = PointFaces[curPoint];
 
         label fI = 0;
@@ -138,7 +147,7 @@ void pointPatchInterpolation::interpolate
                         bm[patchi].patch().whichFace(curFaces[facei]);
 
                     pf[curPoint] +=
-                        patchPatchPointWeights_[pointi][fI]
+                        patchPatchPtsWeights[pointi][fI]
                        *vf.boundaryField()[patchi][faceInPatchi];
 
                     fI++;
@@ -192,12 +201,18 @@ void pointPatchInterpolation::applyCornerConstraints
     GeometricField<Type, pointPatchField, pointMesh>& pf
 ) const
 {
-    forAll(patchPatchPointConstraintPoints_, pointi)
+    // Get data for constraints
+    const labelList& pointConstraintPoints =
+        patchPatchPointConstraintPoints();
+    const tensorField& pointConstraintTensors =
+        patchPatchPointConstraintTensors();
+
+    forAll(pointConstraintPoints, pointi)
     {
-        pf[patchPatchPointConstraintPoints_[pointi]] = transform
+        pf[pointConstraintPoints[pointi]] = transform
         (
-            patchPatchPointConstraintTensors_[pointi],
-            pf[patchPatchPointConstraintPoints_[pointi]]
+            pointConstraintTensors[pointi],
+            pf[pointConstraintPoints[pointi]]
         );
     }
 }
