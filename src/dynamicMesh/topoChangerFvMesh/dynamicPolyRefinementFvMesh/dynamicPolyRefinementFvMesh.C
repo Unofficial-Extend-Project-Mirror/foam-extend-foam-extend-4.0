@@ -163,9 +163,11 @@ bool Foam::dynamicPolyRefinementFvMesh::update()
             refinementSelectionPtr_->unrefinementPointCandidates()
         );
 
-        // Set split points to unrefine around. Note: polyhedralRefinement
-        // ensures that only a consistent set of split points is used for
-        // unrefinement
+        // Set split points to unrefine around.
+        // Notes:
+        // 1. polyhedralRefinement ensures that only a consistent set of split
+        //    points is used for unrefinement
+        // 2. Must be called after polyhedralRefinement::setCellsToRefine
         polyRefModifier.setSplitPointsToUnrefine(unrefCandidates);
 
         // Activate the polyhedral refinement engine if there are some cells to
@@ -188,6 +190,14 @@ bool Foam::dynamicPolyRefinementFvMesh::update()
 
         // Perform refinement and unrefinement in one go
         autoPtr<mapPolyMesh> topoChangeMap = topoChanger_.changeMesh();
+
+        // Output cell balance
+        Info<< "Successfully performed polyhedral refinement. "
+            << "Changed from "
+            << returnReduce(topoChangeMap->nOldCells(), sumOp<label>())
+            << " to "
+            << returnReduce(topoChangeMap->cellMap().size(), sumOp<label>())
+            << " cells." << endl;
 
         return topoChangeMap->morphing();
     }
