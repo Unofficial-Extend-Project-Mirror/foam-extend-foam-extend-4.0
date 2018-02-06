@@ -145,10 +145,11 @@ private:
             //- Set file instance for cellLevel_ and pointLevel_
             void setInstance(const fileName& inst) const;
 
-            //- Extend cells to refine. Given a markup field of refinement
-            //  candidates (true for cells to refine), marks the neigbhours of
-            //  marked cells as well
-            void extendMarkedCells(boolList& refineCell) const;
+            //- Extend marked cells across faces
+            void extendMarkedCellsAcrossFaces(boolList& markedCell) const;
+
+            //- Extend marked cells across points
+            void extendMarkedCellsAcrossPoints(boolList& markedCell) const;
 
 
         // Global topology modification functions (operate on whole polyMesh)

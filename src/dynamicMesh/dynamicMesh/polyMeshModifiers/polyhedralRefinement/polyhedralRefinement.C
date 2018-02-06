@@ -315,7 +315,10 @@ void Foam::polyhedralRefinement::setInstance(const fileName& inst) const
 }
 
 
-void Foam::polyhedralRefinement::extendMarkedCells(boolList& markedCell) const
+void Foam::polyhedralRefinement::extendMarkedCellsAcrossFaces
+(
+    boolList& markedCell
+) const
 {
     // Mark all faces for all marked cells
     const label nFaces = mesh_.nFaces();
@@ -365,6 +368,63 @@ void Foam::polyhedralRefinement::extendMarkedCells(boolList& markedCell) const
         {
             // Face will be markedd, mark owner
             markedCell[owner[faceI]] = true;
+        }
+    }
+}
+
+
+void Foam::polyhedralRefinement::extendMarkedCellsAcrossPoints
+(
+    boolList& markedCell
+) const
+{
+    // Mark all points for all marked cells
+    const label nPoints = mesh_.nPoints();
+    boolList markedPoint(nPoints, false);
+
+    // Get cell points
+    const labelListList& meshCellPoints = mesh_.cellPoints();
+
+    // Loop through all cells
+    forAll (markedCell, cellI)
+    {
+        if (markedCell[cellI])
+        {
+            // This cell is marked, get its points
+            const labelList& cPoints = meshCellPoints[cellI];
+
+            forAll (cPoints, i)
+            {
+                markedPoint[cPoints[i]] = true;
+            }
+        }
+    }
+
+    // Snyc point list across processor boundaries
+    syncTools::syncPointList
+    (
+        mesh_,
+        markedPoint,
+        orEqOp<bool>(),
+        true, // Default value
+        true  // Apply separation for parallel cyclics
+    );
+
+    // Get point cells
+    const labelListList& meshPointCells = mesh_.pointCells();
+
+    // Loop through all points
+    forAll (markedPoint, pointI)
+    {
+        if (markedPoint[pointI])
+        {
+            // This point is marked, mark all of its cells
+            const labelList& pCells = meshPointCells[pointI];
+
+            forAll (pCells, i)
+            {
+                markedCell[pCells[i]] = true;
+            }
         }
     }
 }
@@ -3435,10 +3495,10 @@ void Foam::polyhedralRefinement::setCellsToRefine
         }
     }
 
-    // Extend cells using a specified number of buffer layers
+    // Extend cells across faces using a specified number of buffer layers
     for (label i = 0; i < nBufferLayers_; ++i)
     {
-        extendMarkedCells(refineCell);
+        extendMarkedCellsAcrossFaces(refineCell);
     }
 
     // Make sure that the refinement is face consistent (2:1 consistency) and
@@ -3648,11 +3708,12 @@ void Foam::polyhedralRefinement::setSplitPointsToUnrefine
         protectedCell[cellsToRefine_[i]] = true;
     }
 
-    // Extend protected cells using a specified number of buffer layers + 1
-    // in order to stay far away from cells that are going to be refined
+    // Extend protected cells across points using a specified number of buffer
+    // layers + 1 in order to stay far away from cells that are going to be
+    // refined
     for (label i = 0; i < nBufferLayers_ + 1; ++i)
     {
-        extendMarkedCells(protectedCell);
+        extendMarkedCellsAcrossPoints(protectedCell);
     }
 
     // Loop through all cells and if the cell should be protected, protect all
