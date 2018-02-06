@@ -65,6 +65,10 @@ class dynamicPolyRefinementFvMesh
         //- Refinement interval
         label refineInterval_;
 
+        //- Current time index (helper variable to skip multiple topo changes in
+        //  a single time step)
+        label curTimeIndex_;
+
         //- Refinement selection algorithm that has two jobs:
         //  1. Selects cells to refine from all cells
         //  2. Selects split points that are ok to refine based on given set of

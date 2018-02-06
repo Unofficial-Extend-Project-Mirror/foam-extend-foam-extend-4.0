@@ -86,6 +86,8 @@ Foam::dynamicPolyRefinementFvMesh::dynamicPolyRefinementFvMesh
         ).subDict(typeName + "Coeffs")
     ),
     refineInterval_(readLabel(refinementDict_.lookup("refineInterval"))),
+    curTimeIndex_(-1),
+
     refinementSelectionPtr_(refinementSelection::New(*this, refinementDict_))
 {
     // Add the topology modifier engine
@@ -127,12 +129,18 @@ bool Foam::dynamicPolyRefinementFvMesh::update()
     // Performing refinement/unrefinement when:
     // 1. We are at the first time step
     // 2. Time step is a multiplier of specified refineInterval
+    // 3. Only once per time step
     if
     (
         time().timeIndex() > 0
      && time().timeIndex() % refineInterval_ == 0
+     && curTimeIndex_ < time().timeIndex()
     )
     {
+        // Update current time index to skip multiple topo changes per single
+        // time step
+        curTimeIndex_ = time().timeIndex();
+
         // Get reference to polyhedralRefinement polyMeshModifier
         polyhedralRefinement& polyRefModifier =
             refCast<polyhedralRefinement>(topoChanger_[0]);
