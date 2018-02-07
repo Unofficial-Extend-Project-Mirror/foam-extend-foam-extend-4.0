@@ -410,8 +410,7 @@ public:
 
 
     //- Destructor
-
-        virtual ~GeometricField();
+    virtual ~GeometricField();
 
 
     // Member Functions
