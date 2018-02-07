@@ -40,7 +40,10 @@ Description
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-defineTypeNameAndDebug(Foam::tetPolyMesh, 0);
+namespace Foam
+{
+    defineTypeNameAndDebug(tetPolyMesh, 0);
+}
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -88,6 +91,12 @@ tetPolyMesh::tetPolyMesh(const polyMesh& pMesh)
     }
 
     addParallelPointPatch();
+
+    if (debug)
+    {
+        Pout<< "tetPolyMesh::tetPolyMesh(const polyMesh&) : "
+            << "Finished creating tetPolyMesh" << endl;
+    }
 }
 
 
