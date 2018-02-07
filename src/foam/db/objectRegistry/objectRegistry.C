@@ -106,6 +106,13 @@ Foam::objectRegistry::~objectRegistry()
         {
             myObjects[nMyObjects++] = iter();
         }
+        else
+        {
+            // HR 29.11.17: Object needs to be marked a unregistered.
+            // Overwise regIOobject::checkOut uses the object registry
+            // we are deleting
+            iter()->deregister();
+        }
     }
 
     for (label i=0; i<nMyObjects; i++)

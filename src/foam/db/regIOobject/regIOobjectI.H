@@ -79,10 +79,17 @@ inline void Foam::regIOobject::release()
 }
 
 
+inline void Foam::regIOobject::deregister()
+{
+    registered_ = false;
+}
+
+
 inline Foam::label Foam::regIOobject::eventNo() const
 {
     return eventNo_;
 }
+
 
 inline Foam::label& Foam::regIOobject::eventNo()
 {
