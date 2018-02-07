@@ -104,23 +104,36 @@ public:
             scientific = ios_base::scientific
         };
 
+        //- Stop at control names
+        static const NamedEnum<stopAtControls, 4> stopAtControlNames_;
+
+        //- Write control names
+        static const NamedEnum<writeControls, 5> writeControlNames_;
+
 
 protected:
 
     // Protected data
 
+        //- Start time index
         label  startTimeIndex_;
+
+        //- Start time
         scalar startTime_;
+
+        //- End time
         scalar endTime_;
 
-        static const NamedEnum<stopAtControls, 4> stopAtControlNames_;
+        //- Stop at
         stopAtControls stopAt_;
 
-        static const NamedEnum<writeControls, 5> writeControlNames_;
+        //- Write control
         writeControls writeControl_;
 
+        //- Write interval
         scalar writeInterval_;
 
+        //- Purge write
         label purgeWrite_;
         mutable FIFOStack<word> previousOutputTimes_;
 
@@ -213,10 +226,8 @@ public:
         );
 
 
-    // Destructor
-
-        //- Virtual destructor
-        virtual ~Time();
+    //- Destructor
+    virtual ~Time();
 
 
     // Member functions

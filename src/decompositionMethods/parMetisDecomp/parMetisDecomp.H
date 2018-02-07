@@ -49,6 +49,7 @@ class parMetisDecomp
 {
     // Private data
 
+        //- Mesh reference
         const polyMesh& mesh_;
 
 
@@ -98,10 +99,9 @@ public:
         );
 
 
-    // Destructor
-
-        ~parMetisDecomp()
-        {}
+    //- Destructor
+    virtual ~parMetisDecomp()
+    {}
 
 
     // Member Functions
