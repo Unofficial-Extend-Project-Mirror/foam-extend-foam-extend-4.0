@@ -54,6 +54,7 @@ libs
     "libdynamicFvMesh.so"
     "libimmersedBoundary.so"
     "libimmersedBoundaryDynamicFvMesh.so"
+    "liblduSolvers.so"
 );
 
 

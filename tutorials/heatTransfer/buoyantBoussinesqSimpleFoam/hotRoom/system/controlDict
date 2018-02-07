@@ -15,6 +15,10 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
+libs
+(
+    "liblduSolvers.so"
+);
 application     buoyantBoussinesqSimpleFoam;
 
 startFrom       latestTime;

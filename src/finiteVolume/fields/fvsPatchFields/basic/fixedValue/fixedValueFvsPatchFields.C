@@ -24,7 +24,8 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "fixedValueFvsPatchFields.H"
-#include "surfaceFields.H"
+#include "fvPatchFields.H"
+#include "fvsPatchFields.H"
 #include "addToRunTimeSelectionTable.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

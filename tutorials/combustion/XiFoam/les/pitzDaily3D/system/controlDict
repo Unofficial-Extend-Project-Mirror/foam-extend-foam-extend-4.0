@@ -18,6 +18,7 @@ FoamFile
 libs
 (
     "libcompressibleLESModels.so"
+    "liblduSolvers.so"
 )
 
 application     XiFoam;

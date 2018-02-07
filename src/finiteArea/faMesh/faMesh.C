@@ -71,6 +71,7 @@ void Foam::faMesh::setPrimitiveMeshData()
 
     // Set faMesh edges
     edges_.setSize(bp.nEdges());
+    edgeIndex_.setSize(bp.nEdges());
 
     label edgeI = -1;
 
@@ -80,6 +81,7 @@ void Foam::faMesh::setPrimitiveMeshData()
     for (label curEdge = 0; curEdge < nIntEdges; curEdge++)
     {
         edges_[++edgeI] = bp.edges()[curEdge];
+        edgeIndex_[curEdge] = edgeI;
     }
 
     forAll (boundary(), patchI)
@@ -89,6 +91,7 @@ void Foam::faMesh::setPrimitiveMeshData()
         forAll (curP, eI)
         {
             edges_[++edgeI] = bp.edges()[curP[eI]];
+            edgeIndex_[curP[eI]] = edgeI;
         }
     }
 
@@ -259,7 +262,7 @@ Foam::faMesh::faMesh(const polyMesh& pMesh)
     // Calculate the geometry for the patches (transformation tensors etc.)
     boundary_.calcGeometry();
 
-    if (isFile(pMesh.time().timePath()/"S0"))
+    if (isFile(pMesh.time().timePath()/pMesh.dbDir()/"S0"))
     {
         S0Ptr_ = new DimensionedField<scalar, areaMesh>
         (
@@ -808,7 +811,7 @@ Foam::faMesh::faMesh
     // Calculate the geometry for the patches (transformation tensors etc.)
     boundary_.calcGeometry();
 
-    if (isFile(mesh().time().timePath()/"S0"))
+    if (isFile(mesh().time().timePath()/mesh().dbDir()/"S0"))
     {
         S0Ptr_ = new DimensionedField<scalar, areaMesh>
         (

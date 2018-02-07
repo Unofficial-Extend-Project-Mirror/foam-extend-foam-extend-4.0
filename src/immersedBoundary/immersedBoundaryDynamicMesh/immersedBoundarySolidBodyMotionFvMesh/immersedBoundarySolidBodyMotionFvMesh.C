@@ -41,9 +41,6 @@ namespace Foam
 }
 
 
-// * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
-
-
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 Foam::immersedBoundarySolidBodyMotionFvMesh::
@@ -53,7 +50,11 @@ immersedBoundarySolidBodyMotionFvMesh
 )
 :
     dynamicFvMesh(io),
-    dynamicMeshCoeffs_
+    ibMotions_(),
+    curTimeIndex_(-1)
+{
+    // Read motion function for all regions
+    dictionary dynamicMeshCoeffs
     (
         IOdictionary
         (
@@ -66,11 +67,9 @@ immersedBoundarySolidBodyMotionFvMesh
                 IOobject::NO_WRITE
             )
         ).subDict(typeName + "Coeffs")
-    ),
-    ibMotions_()
-{
-    // Read motion function for all regions
-    PtrList<entry> motionDicts(dynamicMeshCoeffs_.lookup("motionFunctions"));
+    );
+
+    PtrList<entry> motionDicts(dynamicMeshCoeffs.lookup("motionFunctions"));
 
     ibMotions_.setSize(motionDicts.size());
 
@@ -101,15 +100,28 @@ Foam::immersedBoundarySolidBodyMotionFvMesh::
 
 bool Foam::immersedBoundarySolidBodyMotionFvMesh::update()
 {
+    // Move points based on new motion
+    if (curTimeIndex_ < this->time().timeIndex())
+    {
+        // Grab old volumes before moving the mesh
+        setV0();
+
+        curTimeIndex_ = this->time().timeIndex();
+    }
+
     forAll (ibMotions_, ibI)
     {
         ibMotions_[ibI].movePoints();
     }
 
-    // Force flux and addressing recalculation as in topo change
-    pointField newAllPoints = allPoints();
+    // Force quasi-topological change to rebuild addressng on motion of the
+    // immersed boundary
+    // HJ, 12/Dec/2017
+    fvMesh::syncUpdateMesh();
 
-    movePoints(newAllPoints);
+    // Execute dummy mesh motion for the background mesh
+    const pointField oldPoints = allPoints();
+    fvMesh::movePoints(oldPoints);
 
     return true;
 }

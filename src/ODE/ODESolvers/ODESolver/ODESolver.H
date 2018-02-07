@@ -53,7 +53,7 @@ class ODESolver
 
 protected:
 
-    // Private data
+    // Protected data
 
         //- Reference to ODE
         ODE& ode_;
@@ -61,6 +61,8 @@ protected:
         mutable scalarField yScale_;
         mutable scalarField dydx_;
 
+
+private:
 
     // Private Member Functions
 
@@ -126,7 +128,7 @@ public:
         ) const = 0;
 
 
-        virtual void solve
+        void solve
         (
             const scalar xStart,
             const scalar xEnd,

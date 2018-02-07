@@ -48,6 +48,13 @@ defineTypeNameAndDebug(Foam::fvMesh, 0);
 
 void Foam::fvMesh::clearGeomNotOldVol()
 {
+    if (debug)
+    {
+        InfoIn("void Foam::fvMesh::clearGeomNotOldVol()")
+            << "Clearing geometry but not old volumes"
+            << endl;
+    }
+
     deleteDemandDrivenData(VPtr_);
 
     deleteDemandDrivenData(SfPtr_);
@@ -59,6 +66,13 @@ void Foam::fvMesh::clearGeomNotOldVol()
 
 void Foam::fvMesh::clearGeom()
 {
+    if (debug)
+    {
+        InfoIn("void Foam::fvMesh::clearGeomNotOldVol()")
+            << "Clearing geometry"
+            << endl;
+    }
+
     clearGeomNotOldVol();
 
     deleteDemandDrivenData(V0Ptr_);
@@ -75,6 +89,13 @@ void Foam::fvMesh::clearGeom()
 
 void Foam::fvMesh::clearAddressing()
 {
+    if (debug)
+    {
+        InfoIn("void Foam::fvMesh::clearAddressing()")
+            << "Clearing addressing"
+            << endl;
+    }
+
     deleteDemandDrivenData(lduPtr_);
 
     // Geometry dependent object updated through call-back
@@ -123,7 +144,7 @@ Foam::fvMesh::fvMesh(const IOobject& io)
 
     // Check the existance of the cell volumes and read if present
     // and set the storage of V00
-    if (isFile(time().timePath()/"V0"))
+    if (isFile(time().timePath()/polyMesh::dbDir()/"V0"))
     {
         if (debug)
         {
@@ -148,7 +169,7 @@ Foam::fvMesh::fvMesh(const IOobject& io)
 
     // Check the existance of the mesh fluxes, read if present and set the
     // mesh to be moving
-    if (isFile(time().timePath()/"meshPhi"))
+    if (isFile(time().timePath()/polyMesh::dbDir()/"meshPhi"))
     {
         if (debug)
         {
@@ -569,10 +590,8 @@ void Foam::fvMesh::updateMesh(const mapPolyMesh& mpm)
 
 void Foam::fvMesh::syncUpdateMesh()
 {
-    // Update polyMesh. This needs to keep volume existent!
+    // Update polyMesh. This needs to keep cell volumes
     polyMesh::syncUpdateMesh();
-
-    // Not sure how much clean-up is needed here.  HJ, 27/Nov/2009
 
     surfaceInterpolation::clearOut();
     clearGeomNotOldVol();

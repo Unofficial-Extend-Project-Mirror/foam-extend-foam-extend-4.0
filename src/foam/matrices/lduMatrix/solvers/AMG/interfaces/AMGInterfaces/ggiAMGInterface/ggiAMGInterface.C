@@ -367,8 +367,8 @@ Foam::ggiAMGInterface::ggiAMGInterface
     {
         // This addressing defines how to interpolate for all zone faces
         // across the interface
-        const labelListList& fineAddr = fineGgiInterface_.addressing();
-        const scalarListList& fineWeights = fineGgiInterface_.weights();
+        const labelListList& fineAddr = fineGgiInterface_.ggiAddressing();
+        const scalarListList& fineWeights = fineGgiInterface_.ggiWeights();
 
         // Perform analysis only for local faces
         // HJ, 22/Jun/2016
@@ -1005,7 +1005,7 @@ Foam::ggiAMGInterface::ggiAMGInterface
                 if (fineGgiInterface_.fineLevel())
                 {
                     const labelListList& fineAddr =
-                        fineGgiInterface_.addressing();
+                        fineGgiInterface_.ggiAddressing();
 
                     nbrProc = neighbourExpandProc
                         [fineAddr[facesIter[0]][faceNbrsIter[0]]];
@@ -1141,9 +1141,9 @@ const Foam::labelList& Foam::ggiAMGInterface::zoneAddressing() const
 }
 
 
-const Foam::labelListList& Foam::ggiAMGInterface::addressing() const
+const Foam::labelListList& Foam::ggiAMGInterface::ggiAddressing() const
 {
-    FatalErrorIn("const labelListList& ggiAMGInterface::addressing() const")
+    FatalErrorIn("const labelListList& ggiAMGInterface::ggiAddressing() const")
         << "Requested fine addressing at coarse level"
         << abort(FatalError);
 
@@ -1183,9 +1183,9 @@ const Foam::mapDistribute& Foam::ggiAMGInterface::map() const
 }
 
 
-const Foam::scalarListList& Foam::ggiAMGInterface::weights() const
+const Foam::scalarListList& Foam::ggiAMGInterface::ggiWeights() const
 {
-    FatalErrorIn("const labelListList& ggiAMGInterface::weights() const")
+    FatalErrorIn("const labelListList& ggiAMGInterface::ggiWeights() const")
         << "Requested fine addressing at coarse level"
         << abort(FatalError);
 

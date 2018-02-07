@@ -14,6 +14,11 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
+libs
+(
+    "liblduSolvers.so"
+);
+
 // Foam Application Class
 application boundaryFoam;
 

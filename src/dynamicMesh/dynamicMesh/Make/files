@@ -52,6 +52,7 @@ motionSolver/motionSolver.C
 refinementData/refinementData.C
 refinementData/refinementDistanceData.C
 refinementData/refinementHistory.C
+refinementData/polyRefinementHistory.C
 
 directTopoChange/directTopoChange/directTopoChange.C
 
@@ -60,6 +61,7 @@ $(directActions)/addPatchCellLayer.C
 $(directActions)/edgeCollapser.C
 $(directActions)/faceCollapser.C
 $(directActions)/hexRef8.C
+$(directActions)/polyRef.C
 $(directActions)/removeCells.C
 $(directActions)/removeFaces.C
 $(directActions)/removePoints.C

@@ -28,7 +28,7 @@ Description
     All refinement history. Used in unrefinement.
 
     - visibleCells: valid for the current mesh and contains per cell -1
-    (cell unrefined) or an index into splitCells_.
+      (cell unrefined) or an index into splitCells_.
     - splitCells: for every split contains the parent (also index into
       splitCells) and optionally a subsplit as 8 indices into splitCells.
       Note that the numbers in splitCells are not cell labels, they are purely

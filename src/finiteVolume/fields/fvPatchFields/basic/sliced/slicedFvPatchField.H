@@ -119,9 +119,8 @@ public:
         ) const;
 
 
-    // Destructor
-
-        virtual ~slicedFvPatchField();
+    //- Destructor
+    virtual ~slicedFvPatchField();
 
 
     // Member functions

@@ -52,7 +52,8 @@ void Foam::fvMatrix<Type>::addToInternalField
         (
             "fvMatrix<Type>::addToInternalField(const unallocLabelList&, "
             "const Field&, Field&)"
-        )   << "sizes of addressing and field are different"
+        )   << "sizes of addressing and field are different.  Addr: "
+            << addr.size() << " pf: " << pf.size()
             << abort(FatalError);
     }
 
@@ -92,7 +93,8 @@ void Foam::fvMatrix<Type>::subtractFromInternalField
         (
             "fvMatrix<Type>::addToInternalField(const unallocLabelList&, "
             "const Field&, Field&)"
-        )   << "sizes of addressing and field are different"
+        )   << "sizes of addressing and field are different.  Addr: "
+            << addr.size() << " pf: " << pf.size()
             << abort(FatalError);
     }
 
@@ -257,7 +259,8 @@ Foam::fvMatrix<Type>::fvMatrix
     internalCoeffs_(psi.mesh().boundary().size()),
     boundaryCoeffs_(psi.mesh().boundary().size()),
     assemblyCompleted_(false),
-    faceFluxCorrectionPtr_(NULL)
+    faceFluxCorrectionPtr_(NULL),
+    jumpFaceFluxCorrectionPtr_(NULL)
 {
     if (debug)
     {
@@ -315,7 +318,8 @@ Foam::fvMatrix<Type>::fvMatrix(const fvMatrix<Type>& fvm)
     internalCoeffs_(fvm.internalCoeffs_),
     boundaryCoeffs_(fvm.boundaryCoeffs_),
     assemblyCompleted_(fvm.assemblyCompleted_),
-    faceFluxCorrectionPtr_(NULL)
+    faceFluxCorrectionPtr_(NULL),
+    jumpFaceFluxCorrectionPtr_(NULL)
 {
     if (debug)
     {
@@ -330,6 +334,15 @@ Foam::fvMatrix<Type>::fvMatrix(const fvMatrix<Type>& fvm)
         GeometricField<Type, fvsPatchField, surfaceMesh>
         (
             *(fvm.faceFluxCorrectionPtr_)
+        );
+    }
+
+    if (fvm.jumpFaceFluxCorrectionPtr_)
+    {
+        jumpFaceFluxCorrectionPtr_ = new
+        GeometricField<Type, fvsPatchField, surfaceMesh>
+        (
+            *(fvm.jumpFaceFluxCorrectionPtr_)
         );
     }
 }
@@ -363,7 +376,8 @@ Foam::fvMatrix<Type>::fvMatrix(const tmp<fvMatrix<Type> >& tfvm)
         tfvm.isTmp()
     ),
     assemblyCompleted_(tfvm().assemblyCompleted()),
-    faceFluxCorrectionPtr_(NULL)
+    faceFluxCorrectionPtr_(NULL),
+    jumpFaceFluxCorrectionPtr_(NULL)
 {
     if (debug)
     {
@@ -389,6 +403,23 @@ Foam::fvMatrix<Type>::fvMatrix(const tmp<fvMatrix<Type> >& tfvm)
         }
     }
 
+    if (tfvm().jumpFaceFluxCorrectionPtr_)
+    {
+        if (tfvm.isTmp())
+        {
+            jumpFaceFluxCorrectionPtr_ = tfvm().jumpFaceFluxCorrectionPtr_;
+            tfvm().jumpFaceFluxCorrectionPtr_ = NULL;
+        }
+        else
+        {
+            jumpFaceFluxCorrectionPtr_ = new
+                GeometricField<Type, fvsPatchField, surfaceMesh>
+                (
+                    *(tfvm().jumpFaceFluxCorrectionPtr_)
+                );
+        }
+    }
+
     tfvm.clear();
 }
 #endif
@@ -408,7 +439,8 @@ Foam::fvMatrix<Type>::fvMatrix
     internalCoeffs_(psi.mesh().boundary().size()),
     boundaryCoeffs_(psi.mesh().boundary().size()),
     assemblyCompleted_(false),
-    faceFluxCorrectionPtr_(NULL)
+    faceFluxCorrectionPtr_(NULL),
+    jumpFaceFluxCorrectionPtr_(NULL)
 {
     if (debug)
     {
@@ -458,6 +490,11 @@ Foam::fvMatrix<Type>::~fvMatrix()
     if (faceFluxCorrectionPtr_)
     {
         delete faceFluxCorrectionPtr_;
+    }
+
+    if (jumpFaceFluxCorrectionPtr_)
+    {
+        delete jumpFaceFluxCorrectionPtr_;
     }
 }
 
@@ -1099,6 +1136,75 @@ flux() const
 }
 
 
+template<class Type>
+Foam::tmp<Foam::GeometricField<Type, Foam::fvsPatchField, Foam::surfaceMesh> >
+Foam::fvMatrix<Type>::
+jumpFlux() const
+{
+    if (!psi_.mesh().schemesDict().fluxRequired(psi_.name()))
+    {
+        FatalErrorIn("fvMatrix<Type>::jumpFlux()")
+            << "jumpFlux requested but " << psi_.name()
+            << " not specified in the fluxRequired sub-dictionary"
+               " of fvSchemes."
+            << abort(FatalError);
+    }
+
+    // construct GeometricField<Type, fvsPatchField, surfaceMesh>
+    tmp<GeometricField<Type, fvsPatchField, surfaceMesh> > tfieldFlux
+    (
+        new GeometricField<Type, fvsPatchField, surfaceMesh>
+        (
+            IOobject
+            (
+                "flux("+psi_.name()+')',
+                psi_.instance(),
+                psi_.mesh(),
+                IOobject::NO_READ,
+                IOobject::NO_WRITE
+            ),
+            psi_.mesh(),
+            dimensions()
+        )
+    );
+    GeometricField<Type, fvsPatchField, surfaceMesh>& fieldFlux = tfieldFlux();
+
+    for (direction cmpt=0; cmpt<pTraits<Type>::nComponents; cmpt++)
+    {
+        fieldFlux.internalField().replace
+        (
+            cmpt,
+            lduMatrix::faceH(psi_.internalField().component(cmpt))
+        );
+    }
+
+    // This needs to go into virtual functions for all coupled patches
+    // in order to simplify handling of overset meshes
+    // HJ, 29/May/2013
+    forAll (psi_.boundaryField(), patchI)
+    {
+        psi_.boundaryField()[patchI].patchFlux
+        (
+            fieldFlux,
+            *this
+        );
+    }
+
+    if (jumpFaceFluxCorrectionPtr_)
+    {
+        // If grad(psi) is not continuous, jumpFlux() differs from flux()
+        fieldFlux += *jumpFaceFluxCorrectionPtr_;
+    }
+    else if (faceFluxCorrectionPtr_)
+    {
+        // If grad(psi) is continuous, jumpFlux() equals flux()
+        fieldFlux += *faceFluxCorrectionPtr_;
+    }
+
+    return tfieldFlux;
+}
+
+
 // * * * * * * * * * * * * * * * Member Operators  * * * * * * * * * * * * * //
 
 template<class Type>
@@ -1133,6 +1239,17 @@ void Foam::fvMatrix<Type>::operator=(const fvMatrix<Type>& fvmv)
             new GeometricField<Type, fvsPatchField, surfaceMesh>
         (*fvmv.faceFluxCorrectionPtr_);
     }
+
+    if (jumpFaceFluxCorrectionPtr_ && fvmv.jumpFaceFluxCorrectionPtr_)
+    {
+        *jumpFaceFluxCorrectionPtr_ = *fvmv.jumpFaceFluxCorrectionPtr_;
+    }
+    else if (fvmv.jumpFaceFluxCorrectionPtr_)
+    {
+        jumpFaceFluxCorrectionPtr_ =
+            new GeometricField<Type, fvsPatchField, surfaceMesh>
+        (*fvmv.jumpFaceFluxCorrectionPtr_);
+    }
 }
 
 
@@ -1155,6 +1272,11 @@ void Foam::fvMatrix<Type>::negate()
     if (faceFluxCorrectionPtr_)
     {
         faceFluxCorrectionPtr_->negate();
+    }
+
+    if (jumpFaceFluxCorrectionPtr_)
+    {
+        jumpFaceFluxCorrectionPtr_->negate();
     }
 }
 
@@ -1180,6 +1302,19 @@ void Foam::fvMatrix<Type>::operator+=(const fvMatrix<Type>& fvmv)
         GeometricField<Type, fvsPatchField, surfaceMesh>
         (
             *fvmv.faceFluxCorrectionPtr_
+        );
+    }
+
+    if (jumpFaceFluxCorrectionPtr_ && fvmv.jumpFaceFluxCorrectionPtr_)
+    {
+        *jumpFaceFluxCorrectionPtr_ += *fvmv.jumpFaceFluxCorrectionPtr_;
+    }
+    else if (fvmv.jumpFaceFluxCorrectionPtr_)
+    {
+        jumpFaceFluxCorrectionPtr_ = new
+        GeometricField<Type, fvsPatchField, surfaceMesh>
+        (
+            *fvmv.jumpFaceFluxCorrectionPtr_
         );
     }
 }
@@ -1213,6 +1348,17 @@ void Foam::fvMatrix<Type>::operator-=(const fvMatrix<Type>& fvmv)
         faceFluxCorrectionPtr_ =
             new GeometricField<Type, fvsPatchField, surfaceMesh>
         (-*fvmv.faceFluxCorrectionPtr_);
+    }
+
+    if (jumpFaceFluxCorrectionPtr_ && fvmv.jumpFaceFluxCorrectionPtr_)
+    {
+        *jumpFaceFluxCorrectionPtr_ -= *fvmv.jumpFaceFluxCorrectionPtr_;
+    }
+    else if (fvmv.jumpFaceFluxCorrectionPtr_)
+    {
+        jumpFaceFluxCorrectionPtr_ =
+            new GeometricField<Type, fvsPatchField, surfaceMesh>
+        (-*fvmv.jumpFaceFluxCorrectionPtr_);
     }
 }
 
@@ -1357,6 +1503,16 @@ void Foam::fvMatrix<Type>::operator*=
         )   << "cannot scale a matrix containing a faceFluxCorrection"
             << abort(FatalError);
     }
+
+    if (jumpFaceFluxCorrectionPtr_)
+    {
+        FatalErrorIn
+        (
+            "fvMatrix<Type>::operator*="
+            "(const DimensionedField<scalar, volMesh>&)"
+        )   << "cannot scale a matrix containing a jumpFaceFluxCorrection"
+            << abort(FatalError);
+    }
 }
 
 
@@ -1396,7 +1552,12 @@ void Foam::fvMatrix<Type>::operator*=
 
     if (faceFluxCorrectionPtr_)
     {
-        *faceFluxCorrectionPtr_ *= ds.value();
+        *faceFluxCorrectionPtr_ *= ds;
+    }
+
+    if (jumpFaceFluxCorrectionPtr_)
+    {
+        *jumpFaceFluxCorrectionPtr_ *= ds;
     }
 }
 
@@ -1572,6 +1733,7 @@ Foam::tmp<Foam::fvMatrix<Type> > Foam::correction
     )
     {
         tAcorr().faceFluxCorrectionPtr() = (-A.flux()).ptr();
+        tAcorr().jumpFaceFluxCorrectionPtr() = (-A.jumpFlux()).ptr();
     }
 
     return tAcorr;
@@ -1596,6 +1758,7 @@ Foam::tmp<Foam::fvMatrix<Type> > Foam::correction
     )
     {
         tAcorr().faceFluxCorrectionPtr() = (-A.flux()).ptr();
+        tAcorr().jumpFaceFluxCorrectionPtr() = (-A.jumpFlux()).ptr();
     }
 
     return tAcorr;

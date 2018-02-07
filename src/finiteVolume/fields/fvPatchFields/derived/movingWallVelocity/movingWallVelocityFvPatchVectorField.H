@@ -120,7 +120,6 @@ public:
         }
 
 
-
     // Member functions
 
         //- Update the coefficients associated with the patch field

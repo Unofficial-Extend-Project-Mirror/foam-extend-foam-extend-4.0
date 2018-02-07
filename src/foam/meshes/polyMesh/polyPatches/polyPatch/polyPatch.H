@@ -427,8 +427,11 @@ public:
             //- Return global edge index for local edges
             const labelList& meshEdges() const;
 
+            //- Clear geometry
+            virtual void clearGeom();
+
             //- Clear addressing
-            void clearAddressing();
+            virtual void clearAddressing();
 
 
         // Other patch operations

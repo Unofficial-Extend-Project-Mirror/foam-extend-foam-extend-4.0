@@ -284,6 +284,7 @@ int main(int argc, char *argv[])
                 (
                     "cellDist",
                     runTime.timeName(),
+                    mesh.dbDir(),
                     mesh,
                     IOobject::NO_READ,
                     IOobject::NO_WRITE
@@ -914,7 +915,7 @@ int main(int argc, char *argv[])
         "faBoundary",
         mesh.time().findInstance
         (
-            mesh.dbDir()/polyMesh::meshSubDir,
+            mesh.meshDir(),
             "boundary"
         ),
         faMesh::meshSubDir,
@@ -989,12 +990,20 @@ int main(int argc, char *argv[])
 
             faMesh procMesh(procFvMesh);
 
+            word faceLabelsInstance =
+                procMesh.time().findInstance
+                (
+                    procMesh.meshDir(),
+                    "faceLabels"
+                );
+
+
             labelIOList faceProcAddressing
             (
                 IOobject
                 (
                     "faceProcAddressing",
-                    "constant",
+                    faceLabelsInstance,
                     procMesh.meshSubDir,
                     procFvMesh,
                     IOobject::MUST_READ,
@@ -1007,7 +1016,7 @@ int main(int argc, char *argv[])
                 IOobject
                 (
                     "boundaryProcAddressing",
-                    "constant",
+                    faceLabelsInstance,
                     procMesh.meshSubDir,
                     procFvMesh,
                     IOobject::MUST_READ,
@@ -1031,7 +1040,7 @@ int main(int argc, char *argv[])
                     IOobject
                     (
                         "edgeProcAddressing",
-                        "constant",
+                        faceLabelsInstance,
                         procMesh.meshSubDir,
                         procFvMesh,
                         IOobject::MUST_READ,

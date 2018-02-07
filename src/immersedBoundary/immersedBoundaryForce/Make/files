@@ -1,4 +1,0 @@
-immersedBoundaryForces.C
-immersedBoundaryForcesFunctionObject.C
-
-LIB = $(FOAM_LIBBIN)/libimmersedBoundaryForceFunctionObject

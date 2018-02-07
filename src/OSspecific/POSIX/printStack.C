@@ -130,7 +130,7 @@ void printSourceFileAndLine
     }
 
 #ifndef darwin
-    if (filename[0] == '/')
+    if (filename[0] == '/' || filename[1] == ':')
 #else
     if (1)
 #endif
@@ -175,7 +175,10 @@ void getSymbolForRaw
     const word& address
 )
 {
-    if (filename.size() && filename[0] == '/')
+    if
+    (
+        filename.size() && (filename[0] == '/' || filename[1] == ':')
+    )
     {
         string fcnt = pOpen
         (
@@ -224,7 +227,10 @@ void error::printStack(Ostream& os)
             string::size_type space = line.rfind(' ') + 1;
             fileName libPath = line.substr(space, line.size()-space);
 
-            if (libPath.size() && libPath[0] == '/')
+            if
+            (
+                libPath.size() && (libPath[0] == '/' || libPath[1] == ':')
+            )
             {
                 string offsetString(line.substr(0, line.find('-')));
                 IStringStream offsetStr(offsetString);
@@ -268,10 +274,10 @@ void error::printStack(Ostream& os)
                 programFile = msg.substr(0, min(spacePos, bracketPos));
 
                 // not an absolute path
-                if (programFile[0] != '/')
+                if (programFile[0] != '/' && programFile[1] != ':')
                 {
                     string tmp = pOpen("which " + programFile);
-                    if (tmp[0] == '/' || tmp[0] == '~')
+                    if (tmp[0] == '/' || tmp[1] == ':' || tmp[0] == '~')
                     {
                         programFile = tmp;
                     }

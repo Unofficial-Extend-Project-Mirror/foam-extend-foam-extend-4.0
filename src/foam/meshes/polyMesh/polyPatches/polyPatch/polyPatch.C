@@ -534,6 +534,12 @@ const Foam::labelList& Foam::polyPatch::meshEdges() const
 }
 
 
+void Foam::polyPatch::clearGeom()
+{
+    primitivePatch::clearGeom();
+}
+
+
 void Foam::polyPatch::clearAddressing()
 {
     // Missing base level clear-out  HJ, 1/Mar/2009

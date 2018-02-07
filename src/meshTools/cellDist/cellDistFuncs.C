@@ -188,7 +188,6 @@ Foam::label Foam::cellDistFuncs::getPointNeighbours
         }
     }
 
-
     if (debug)
     {
         // Check for duplicates
@@ -263,9 +262,10 @@ Foam::label Foam::cellDistFuncs::maxPatchSize(const labelHashSet& patchIDs)
         {
             const polyPatch& patch = mesh().boundaryMesh()[patchI];
 
-            maxSize = Foam::max(maxSize, patch.size());
+            maxSize = Foam::max(maxSize, patch.faceCells().size());
         }
     }
+
     return maxSize;
 }
 

@@ -190,7 +190,7 @@ void Foam::fixedFluxPressureFvPatchScalarField::write(Ostream& os) const
     writeEntryIfDifferent<word>(os, "U", "U", UName_);
     writeEntryIfDifferent<word>(os, "phi", "phi", phiName_);
     writeEntryIfDifferent<word>(os, "rho", "rho", rhoName_);
-    writeEntryIfDifferent<word>(os, "rAU", "rAU", rAUName_);
+    writeEntryIfDifferent<word>(os, "rAU", "(1|A(" + UName_ + "))", rAUName_);
     writeEntryIfDifferent<Switch>(os, "adjoint", false, adjoint_);
 
     gradient().writeEntry("gradient", os);

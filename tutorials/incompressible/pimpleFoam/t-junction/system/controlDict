@@ -15,6 +15,12 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
+libs
+(
+    "libincompressibleRASModels.so"
+    "liblduSolvers.so"
+);
+
 application     pimpleFoam;
 
 startFrom       startTime;

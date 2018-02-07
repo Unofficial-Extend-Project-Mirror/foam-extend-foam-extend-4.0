@@ -18,7 +18,8 @@ FoamFile
 libs
 (
     "libincompressibleLESModels.so"
-)
+    "liblduSolvers.so"
+);
 
 application     cavitatingFoam;
 

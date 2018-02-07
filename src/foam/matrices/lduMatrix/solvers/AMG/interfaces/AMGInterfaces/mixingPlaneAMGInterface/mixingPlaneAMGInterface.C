@@ -110,11 +110,11 @@ Foam::mixingPlaneAMGInterface::shadowInterface() const
 }
 
 
-const Foam::labelListList& Foam::mixingPlaneAMGInterface::addressing() const
+const Foam::labelListList& Foam::mixingPlaneAMGInterface::ggiAddressing() const
 {
     FatalErrorIn
     (
-        "const labelListList& mixingPlaneAMGInterface::addressing() const"
+        "const labelListList& mixingPlaneAMGInterface::ggiAddressing() const"
     )   << "Requested fine addressing at coarse level"
         << abort(FatalError);
 
@@ -122,11 +122,11 @@ const Foam::labelListList& Foam::mixingPlaneAMGInterface::addressing() const
 }
 
 
-const Foam::scalarListList& Foam::mixingPlaneAMGInterface::weights() const
+const Foam::scalarListList& Foam::mixingPlaneAMGInterface::ggiWeights() const
 {
     FatalErrorIn
     (
-        "const labelListList& mixingPlaneAMGInterface::weights() const"
+        "const labelListList& mixingPlaneAMGInterface::ggiWeights() const"
     )   << "Requested fine addressing at coarse level"
         << abort(FatalError);
     return scalarListList::null();

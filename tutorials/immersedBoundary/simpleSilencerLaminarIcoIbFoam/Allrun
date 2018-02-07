@@ -14,7 +14,7 @@ runApplication blockMesh
 runApplication refineImmersedBoundaryMesh -ibCellCellFaces
 
 \rm -rf constant/polyMesh
-\mv 0/polyMesh constant/polyMesh/
+\mv 0/polyMesh constant/polyMesh
 
 \rm -rf 0
 \mkdir 0

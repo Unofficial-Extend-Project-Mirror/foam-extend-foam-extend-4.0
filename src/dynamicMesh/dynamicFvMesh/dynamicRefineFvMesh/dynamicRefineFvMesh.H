@@ -55,6 +55,20 @@ class dynamicRefineFvMesh
 :
     public dynamicFvMesh
 {
+
+    // Private data
+
+        // Helper variables to enable switching between a single and multiple
+        // mesh motion updates within a time step (if update() is called more
+        // than once in a single time step)
+
+            //- Switch for single motion update (true by default)
+            Switch singleMotionUpdate_;
+
+            //- Helper varaible: current time index
+            label curTimeIndex_;
+
+
 protected:
 
         //- Mesh cutting engine
@@ -148,6 +162,12 @@ protected:
             //- Extend markedCell with cell-face-cell.
             void extendMarkedCells(PackedBoolList& markedCell) const;
 
+            //- Check all cells have 8 anchor points
+            void checkEightAnchorPoints
+            (
+                PackedBoolList& protectedCell,
+                label& nProtected
+            ) const;
 
 private:
 

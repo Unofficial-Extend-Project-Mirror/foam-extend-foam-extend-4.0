@@ -376,43 +376,42 @@ template
 >
 void
 Foam::PrimitivePatch<Face, FaceList, PointField, PointType>::
-calcFaceNormals() const
+calcFaceAreas() const
 {
     if (debug)
     {
         Pout<< "PrimitivePatch<Face, FaceList, PointField, PointType>::"
-               "calcFaceNormals() : "
-               "calculating faceNormals in PrimitivePatch"
+               "calcFaceAreas() : "
+               "calculating faceAreas in PrimitivePatch"
             << endl;
     }
 
-    // It is considered an error to attempt to recalculate faceNormals
+    // It is considered an error to attempt to recalculate faceAreas
     // if they have already been calculated.
-    if (faceNormalsPtr_)
+    if (faceAreasPtr_)
     {
         FatalErrorIn
         (
             "PrimitivePatch<Face, FaceList, PointField, PointType>::"
-            "calcFaceNormals()"
-        )   << "faceNormalsPtr_ already allocated"
+            "calcFaceAreas()"
+        )   << "faceAreasPtr_ already allocated"
             << abort(FatalError);
     }
 
-    faceNormalsPtr_ = new Field<PointType>(this->size());
+    faceAreasPtr_ = new Field<PointType>(this->size());
 
-    Field<PointType>& n = *faceNormalsPtr_;
+    Field<PointType>& n = *faceAreasPtr_;
 
     forAll (n, faceI)
     {
         n[faceI] = this->operator[](faceI).normal(points_);
-        n[faceI] /= mag(n[faceI]) + VSMALL;
     }
 
     if (debug)
     {
         Pout<< "PrimitivePatch<Face, FaceList, PointField, PointType>::"
-               "calcFaceNormals() : "
-               "finished calculating faceNormals in PrimitivePatch"
+               "calcFaceAreas() : "
+               "finished calculating faceAreas in PrimitivePatch"
             << endl;
     }
 }

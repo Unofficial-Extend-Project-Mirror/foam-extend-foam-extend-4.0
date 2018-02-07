@@ -24,8 +24,9 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "cohesiveFvPatch.H"
-#include "addToRunTimeSelectionTable.H"
 #include "fvMesh.H"
+#include "fvsPatchFields.H"
+#include "addToRunTimeSelectionTable.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -39,7 +40,7 @@ namespace Foam
 
 // * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * * //
 
-void Foam::cohesiveFvPatch::makeCorrVecs(vectorField& cv) const
+void Foam::cohesiveFvPatch::makeCorrVecs(fvsPatchVectorField& cv) const
 {
     cv = vector::zero;
 }

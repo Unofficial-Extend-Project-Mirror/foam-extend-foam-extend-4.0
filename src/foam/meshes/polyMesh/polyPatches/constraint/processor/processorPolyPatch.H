@@ -81,7 +81,6 @@ class processorPolyPatch
         mutable labelList* neighbEdgesPtr_;
 
 
-
     // Private static data
 
         //- Whether to use geometric or topological matching
@@ -99,16 +98,16 @@ protected:
         virtual void calcAddressing();
 
         //- Initialise the calculation of the patch geometry
-        void initGeometry();
+        virtual void initGeometry();
 
         //- Calculate the patch geometry
-        void calcGeometry();
+        virtual void calcGeometry();
 
         //- Initialise the patches for moving points
-        void initMovePoints(const pointField&);
+        virtual void initMovePoints(const pointField&);
 
         //- Correct patches after moving points
-        void movePoints(const pointField&);
+        virtual void movePoints(const pointField&);
 
         //- Initialise the update of the patch topology
         virtual void initUpdateMesh();

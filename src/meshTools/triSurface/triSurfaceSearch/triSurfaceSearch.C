@@ -82,30 +82,35 @@ triSurfaceSearch::triSurfaceSearch(const triSurface& surface)
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 // Determine inside/outside for samples
+bool triSurfaceSearch::calcInside(const point& p) const
+{
+    if (!tree().bb().contains(p))
+    {
+        return false;
+    }
+    else if
+    (
+        tree().getVolumeType(p)
+     == indexedOctree<treeDataTriSurface>::INSIDE
+    )
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+
+// Determine inside/outside for samples
 boolList triSurfaceSearch::calcInside(const pointField& samples) const
 {
     boolList inside(samples.size());
 
     forAll(samples, sampleI)
     {
-        const point& sample = samples[sampleI];
-
-        if (!tree().bb().contains(sample))
-        {
-            inside[sampleI] = false;
-        }
-        else if
-        (
-            tree().getVolumeType(sample)
-         == indexedOctree<treeDataTriSurface>::INSIDE
-        )
-        {
-            inside[sampleI] = true;
-        }
-        else
-        {
-            inside[sampleI] = false;
-        }
+        inside[sampleI] = calcInside(samples[sampleI]);
     }
 
     return inside;

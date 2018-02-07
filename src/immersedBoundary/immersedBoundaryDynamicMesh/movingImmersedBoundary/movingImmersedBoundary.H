@@ -36,11 +36,10 @@ SourceFiles
 #ifndef movingImmersedBoundary_H
 #define movingImmersedBoundary_H
 
-#include "fvMesh.H"
+#include "polyMesh.H"
 #include "solidBodyMotionFunction.H"
 #include "triSurfaceMesh.H"
 #include "fvPatchFields.H"
-#include "immersedBoundaryFvPatchFields.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -59,7 +58,7 @@ class movingImmersedBoundary
         const word name_;
 
         //- Mesh reference
-        const fvMesh& mesh_;
+        const polyMesh& mesh_;
 
         //- Overset region motion control function
         autoPtr<solidBodyMotionFunction> sbmfPtr_;
@@ -85,13 +84,14 @@ public:
         movingImmersedBoundary
         (
             const word& name,
-            const fvMesh& mesh,
+            const polyMesh& mesh,
             const dictionary& dict
         );
 
 
     //- Destructor
     ~movingImmersedBoundary();
+
 
     // Member Functions
 
@@ -102,7 +102,7 @@ public:
         }
 
         //- Return mesh
-        const fvMesh& mesh() const
+        const polyMesh& mesh() const
         {
             return mesh_;
         }

@@ -419,12 +419,13 @@ void faMatrix<Type>::setValues
                 }
                 else
                 {
-                    label patchi = mesh.boundary().whichPatch(edgei);
+                    const label& curEdgeIndex = mesh.edgeIndex()[edgei];
+                    label patchi = mesh.boundary().whichPatch(curEdgeIndex);
 
                     if (internalCoeffs_[patchi].size())
                     {
                         label patchEdgei =
-                            mesh.boundary()[patchi].whichEdge(edgei);
+                            mesh.boundary()[patchi].whichEdge(curEdgeIndex);
 
                         internalCoeffs_[patchi][patchEdgei] =
                             pTraits<Type>::zero;

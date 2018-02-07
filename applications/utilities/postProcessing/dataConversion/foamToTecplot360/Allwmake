@@ -5,10 +5,16 @@
 cd ${0%/*} || exit 1    # run from this directory
 set -x
 
-# build tecio
-wmake libso tecio/tecsrc
+# foamToTecplot360 will not compile on MS Windows
+if [ "$WM_OSTYPE" = "MSWindows" ]
+then
+    echo MSWindows detected. Skipping compilation of foamToTecplot360.
+else
+    # build tecio
+    wmake libso tecio/tecsrc
 
-# build converter
-wmake
+    # build converter
+    wmake
+fi
 
 # ----------------------------------------------------------------- end-of-file

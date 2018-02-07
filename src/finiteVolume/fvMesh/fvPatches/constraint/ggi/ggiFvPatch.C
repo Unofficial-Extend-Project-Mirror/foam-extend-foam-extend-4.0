@@ -34,8 +34,9 @@ Contributor
 \*---------------------------------------------------------------------------*/
 
 #include "ggiFvPatch.H"
-#include "addToRunTimeSelectionTable.H"
+#include "fvPatchFields.H"
 #include "fvBoundaryMesh.H"
+#include "addToRunTimeSelectionTable.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -55,21 +56,21 @@ Foam::ggiFvPatch::~ggiFvPatch()
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
 
 // Make patch weighting factors
-void Foam::ggiFvPatch::makeWeights(scalarField& w) const
+void Foam::ggiFvPatch::makeWeights(fvsPatchScalarField& w) const
 {
     // Calculation of weighting factors is performed from the master
     // position, using reconstructed shadow cell centres
     // HJ, 2/Aug/2007
     if (ggiPolyPatch_.master())
     {
-        vectorField n = nf();
+        const vectorField n = nf();
 
         // Note: mag in the dot-product.
         // For all valid meshes, the non-orthogonality will be less than
         // 90 deg and the dot-product will be positive.  For invalid
         // meshes (d & s <= 0), this will stabilise the calculation
         // but the result will be poor.  HJ, 24/Aug/2011
-        scalarField nfc =
+        const scalarField nfc =
             mag(n & (ggiPolyPatch_.reconFaceCellCentres() - Cf()));
 
         w = nfc/(mag(n & (Cf() - Cn())) + nfc);
@@ -78,16 +79,23 @@ void Foam::ggiFvPatch::makeWeights(scalarField& w) const
         {
             // Set overlap weights to 0.5 and use mirrored neighbour field
             // for interpolation.  HJ, 21/Jan/2009
-            bridge(scalarField(size(), 0.5), w);
+            const scalarField bridgedField(size(), 0.5);
+
+            bridge(bridgedField, w);
         }
     }
     else
     {
         // Pick up weights from the master side
-        scalarField masterWeights(shadow().size());
+        fvsPatchScalarField masterWeights
+        (
+            shadow(),
+            w.dimensionedInternalField()
+        );
+
         shadow().makeWeights(masterWeights);
 
-        scalarField oneMinusW = 1 - masterWeights;
+        const scalarField oneMinusW = 1 - masterWeights;
 
         w = interpolate(oneMinusW);
 
@@ -95,38 +103,46 @@ void Foam::ggiFvPatch::makeWeights(scalarField& w) const
         {
             // Set overlap weights to 0.5 and use mirrored neighbour field
             // for interpolation.  HJ, 21/Jan/2009
-            bridge(scalarField(size(), 0.5), w);
+            const scalarField bridgedField(size(), 0.5);
+
+            bridge(bridgedField, w);
         }
     }
 }
 
 
 // Make patch face - neighbour cell distances
-void Foam::ggiFvPatch::makeDeltaCoeffs(scalarField& dc) const
+void Foam::ggiFvPatch::makeDeltaCoeffs(fvsPatchScalarField& dc) const
 {
     if (ggiPolyPatch_.master())
     {
         // Stabilised form for bad meshes.  HJ, 24/Aug/2011
-        vectorField d = delta();
+        const vectorField d = delta();
 
         dc = 1.0/max(nf() & d, 0.05*mag(d));
 
-        if (bridgeOverlap())
-        {
-            scalarField bridgeDeltas = nf() & fvPatch::delta();
-
-            bridge(bridgeDeltas, dc);
-        }
+        // Note: no need to bridge the overlap since delta already takes it into
+        // account. VV, 18/Oct/2017.
     }
     else
     {
-        scalarField masterDeltas(shadow().size());
+        fvsPatchScalarField masterDeltas
+        (
+            shadow(),
+            dc.dimensionedInternalField()
+        );
+
         shadow().makeDeltaCoeffs(masterDeltas);
+
         dc = interpolate(masterDeltas);
 
         if (bridgeOverlap())
         {
-            scalarField bridgeDeltas = nf() & fvPatch::delta();
+            // Note: double the deltaCoeffs because this is symmetry treatment
+            // and fvPatch::deltaCoeffs() is cell to face inverse distance,
+            // while we need cell to "symmetry neighbour cell" distance.
+            // VV, 18/Oct/2017.
+            const scalarField bridgeDeltas = 2.0*fvPatch::deltaCoeffs();
 
             bridge(bridgeDeltas, dc);
         }
@@ -135,7 +151,7 @@ void Foam::ggiFvPatch::makeDeltaCoeffs(scalarField& dc) const
 
 
 // Make patch face non-orthogonality correction vectors
-void Foam::ggiFvPatch::makeCorrVecs(vectorField& cv) const
+void Foam::ggiFvPatch::makeCorrVecs(fvsPatchVectorField& cv) const
 {
     // Non-orthogonality correction on a ggi interface
     // MB, 7/April/2009
@@ -143,8 +159,8 @@ void Foam::ggiFvPatch::makeCorrVecs(vectorField& cv) const
     // Calculate correction vectors on coupled patches
     const scalarField& patchDeltaCoeffs = deltaCoeffs();
 
-    vectorField patchDeltas = delta();
-    vectorField n = nf();
+    const vectorField patchDeltas = delta();
+    const vectorField n = nf();
 
     // If non-orthogonality is over 90 deg, kill correction vector
     // HJ, 6/Jan/2011
@@ -161,7 +177,10 @@ Foam::tmp<Foam::vectorField> Foam::ggiFvPatch::delta() const
 
         if (bridgeOverlap())
         {
-            vectorField bridgeDeltas = Cf() - Cn();
+            // Note: double the deltas because this is symmetry treatment and
+            // fvPatch::delta() is cell to face distance, while we need cell to
+            // "symmetry neighbour cell" distance. VV, 18/Oct/2017.
+            const vectorField bridgeDeltas = 2.0*fvPatch::delta();
 
             bridge(bridgeDeltas, tDelta());
         }
@@ -177,7 +196,10 @@ Foam::tmp<Foam::vectorField> Foam::ggiFvPatch::delta() const
 
         if (bridgeOverlap())
         {
-            vectorField bridgeDeltas = Cf() - Cn();
+            // Note: double the deltas because this is symmetry treatment and
+            // fvPatch::delta() is cell to face distance, while we need cell to
+            // "symmetry neighbour cell" distance. VV, 18/Oct/2017.
+            const vectorField bridgeDeltas = 2.0*fvPatch::delta();
 
             bridge(bridgeDeltas, tDelta());
         }
@@ -239,7 +261,7 @@ const Foam::labelList& Foam::ggiFvPatch::zoneAddressing() const
 }
 
 
-const Foam::labelListList& Foam::ggiFvPatch::addressing() const
+const Foam::labelListList& Foam::ggiFvPatch::ggiAddressing() const
 {
     if (ggiPolyPatch_.master())
     {
@@ -264,7 +286,7 @@ const Foam::mapDistribute& Foam::ggiFvPatch::map() const
 }
 
 
-const Foam::scalarListList& Foam::ggiFvPatch::weights() const
+const Foam::scalarListList& Foam::ggiFvPatch::ggiWeights() const
 {
     if (ggiPolyPatch_.master())
     {
@@ -325,7 +347,7 @@ void Foam::ggiFvPatch::expandCrMatrixToZone(crMatrix& patchP) const
         {
             nZoneEntries += zoneColsFF[zfI].size();
         }
-        
+
         // Reconstruct matrix
         labelList zoneRowStart(zoneSize() + 1);
         labelList zoneCols(nZoneEntries);
@@ -334,12 +356,12 @@ void Foam::ggiFvPatch::expandCrMatrixToZone(crMatrix& patchP) const
         zoneRowStart[0] = 0;
         // Reset nZoneEntries for use as a counter
         nZoneEntries = 0;
-        
+
         forAll(zoneColsFF, zfI)
         {
             const labelField& curCols = zoneColsFF[zfI];
             const scalarField& corCoeffs = zoneCoeffsFF[zfI];
-            
+
             zoneRowStart[zfI + 1] = zoneRowStart[zfI] + curCols.size();
 
             forAll (curCols, coeffI)
@@ -358,7 +380,7 @@ void Foam::ggiFvPatch::expandCrMatrixToZone(crMatrix& patchP) const
         );
 
         // Set coeffs
-        patchP.coeffs() = zoneCoeffs;        
+        patchP.coeffs() = zoneCoeffs;
     }
 }
 

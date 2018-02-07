@@ -26,6 +26,7 @@ Description
 \*---------------------------------------------------------------------------*/
 
 #include "wallFvPatch.H"
+#include "fvPatchFields.H"
 #include "addToRunTimeSelectionTable.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -41,7 +42,7 @@ addToRunTimeSelectionTable(fvPatch, wallFvPatch, polyPatch);
 
 // * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * * //
 
-void wallFvPatch::makeCorrVecs(vectorField& cv) const
+void wallFvPatch::makeCorrVecs(fvsPatchVectorField& cv) const
 {
     cv = vector::zero;
 }

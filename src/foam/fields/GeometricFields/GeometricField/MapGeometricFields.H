@@ -95,8 +95,8 @@ void MapGeometricFields
             const_cast<GeometricField<Type, PatchField, GeoMesh>&>
             (*fieldIter());
 
-        //Note: check can be removed once pointFields are actually stored on
-        //      the pointMesh instead of now on the polyMesh!
+        // Note: check can be removed once pointFields are actually stored on
+        //       the pointMesh instead of now on the polyMesh!
         if (&field.mesh() == &mapper.mesh())
         {
             field.storeOldTimes();
@@ -119,7 +119,8 @@ void MapGeometricFields
         {
             if (polyMesh::debug)
             {
-                Info<< "Mapping " << field.typeName << ' ' << field.name()
+                InfoIn("void MapGeometricFields(const MeshMapper& mapper)")
+                    << "Mapping " << field.typeName << ' ' << field.name()
                     << endl;
             }
 
@@ -131,7 +132,7 @@ void MapGeometricFields
             );
 
             // Map the patch fields
-            forAll(field.boundaryField(), patchi)
+            forAll (field.boundaryField(), patchi)
             {
                 // Cannot check sizes for patch fields because of
                 // empty fields in FV and because point fields get their size
@@ -145,11 +146,15 @@ void MapGeometricFields
 
             field.instance() = field.time().timeName();
         }
-        else if (polyMesh::debug)
+        else
         {
-            Info<< "Not mapping " << field.typeName << ' ' << field.name()
-                << " since originating mesh differs from that of mapper."
-                << endl;
+            if (polyMesh::debug)
+            {
+                InfoIn("void MapGeometricFields(const MeshMapper& mapper)")
+                    << "Not mapping " << field.typeName << ' ' << field.name()
+                    << " since originating mesh differs from that of mapper."
+                    << endl;
+            }
         }
     }
 }

@@ -266,7 +266,7 @@ public:
             virtual const labelList& zoneAddressing() const;
 
             //- Return addressing
-            virtual const labelListList& addressing() const;
+            virtual const labelListList& ggiAddressing() const;
 
             //- Is the patch localised on a single processor
             virtual bool localParallel() const;
@@ -275,7 +275,7 @@ public:
             const labelListList& procMasterFaces() const;
 
             //- Return weights
-            virtual const scalarListList& weights() const;
+            virtual const scalarListList& ggiWeights() const;
 
             //- Return face transformation tensor
             virtual const tensorField& forwardT() const;

@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | foam-extend: Open Source CFD
-   \\    /   O peration     | Version:     4.0
+   \\    /   O peration     | Version:     3.2
     \\  /    A nd           | Web:         http://www.foam-extend.org
      \\/     M anipulation  | For copyright notice see file Copyright
 -------------------------------------------------------------------------------
@@ -25,7 +25,13 @@ Class
     Foam::immersedBoundaryFvPatchField
 
 Description
-    Foam::immersedBoundaryFvPatchField
+    Constrained immersedBoundaryFvPatchField of calculated functionality
+    with appropriate resizing on topo change or motion of the immersed surface.
+    The patch field shall take the values of intersected cells.
+
+    Note: This patch field is used instead of the calculated type in the
+    immersedBoundaryFvPatch.  It does not support discretisation.
+    For matrix operations, use the mixedIbFvPatchField.
 
 Author
     Hrvoje Jasak
@@ -57,110 +63,14 @@ class immersedBoundaryFvPatchField
 {
     // Private data
 
-        //- Local reference cast into the processor patch
+        //- Local reference to immersed boundary patch
         const immersedBoundaryFvPatch& ibPatch_;
-
-        //- Local reference to fvMesh
-        const fvMesh& mesh_;
-
-        // Defining fields
-        // Note: defining fields carry values on faces of the IB patch
-        // represented as a triangulated surface
-
-            //- Defining value field
-            Field<Type> refValue_;
-
-            //- Defining normal gradient field
-            Field<Type> refGrad_;
-
-
-        //- Does the boundary condition fix the value
-        Switch fixesValue_;
-
-
-        // Dead cell controls
-
-            //- Set dead cell value
-            Switch setDeadCellValue_;
-
-            //- Dead cell value
-            Type deadCellValue_;
-
-
-        // Fields on the IB intersection points
-        // Field size equals the number of cells intesected with the IB
-
-            //- Time index for last update of mesh or moving boundary
-            mutable label ibUpdateTimeIndex_;
-
-            //- Value field
-            mutable Field<Type> ibValue_;
-
-            //- Normal gradient field
-            mutable Field<Type> ibGrad_;
-
-
-    // Private Member Functions
-
-        //- Update IB value and gradient
-        void updateIbValues() const;
-
-        //- Impose Dirichlet BC at IB cells and return corrected cells values
-        //  Calculate value and gradient on IB intersection points
-        void imposeDirichletCondition() const;
-
-        //- Impose Neumann BC at IB cells and return corrected cells values
-        //  Calculate value and gradient on IB intersection points
-        void imposeNeumannCondition() const;
-
-        //- Impose condition in dead cells
-        void imposeDeadCondition();
-
-
-        // Manipulate matrix
-
-            //- Check and correct zero diagonal in dead cells
-            void correctDiag
-            (
-                fvMatrix<Type>& eqn
-            ) const;
-
-            //- Impose fixed gradient condition by manipulating matrix
-            //  Note: reconsider pre-factor for diffusivity
-            //  HJ, 16/Apr/2012
-            void correctOffDiag
-            (
-                fvMatrix<Type>& eqn
-            ) const;
-
-
-protected:
-
-    // Protected Member Functions
-
-        //- Does immersed boundary patch field need motion update?
-        bool motionUpdateRequired() const;
-
-        //- Execute immersed boundary patch field motion update
-        virtual void motionUpdate() const;
-
-        //- Set IB cell values
-        virtual void setIbCellValues(const Field<Type>&) const;
 
 
 public:
 
-    //- Runtime type information
+    //- Runtime type information: constrained type
     TypeName(immersedBoundaryFvPatch::typeName_());
-
-
-    // Static algorithm control data
-
-        //- Number of boundary condition update iterations
-        static const debug::optimisationSwitch nBcIter_;
-
-        //- Boundary condition update tolerance
-        static const debug::tolerancesSwitch bcTolerance_;
 
 
     // Constructors
@@ -232,76 +142,13 @@ public:
 
     // Member functions
 
-        //- Return reference to immersed boundary patch
-        const immersedBoundaryFvPatch& ibPatch() const
-        {
-            return ibPatch_;
-        }
+        // Access
 
-
-        // Return defining fields
-        // Note: defining fields carry values on faces of the IB patch
-        // represented as a triangulated surface
-
-            //- Return access to reference value
-            virtual Field<Type>& refValue()
+            //- Return reference to immersed boundary patch
+            const immersedBoundaryFvPatch& ibPatch() const
             {
-                return refValue_;
+                return ibPatch_;
             }
-
-            //- Return reference value
-            virtual const Field<Type>& refValue() const
-            {
-                return refValue_;
-            }
-
-            //- Return access to reference gradient
-            virtual Field<Type>& refGrad()
-            {
-                return refGrad_;
-            }
-
-            //- Return reference gradient
-            virtual const Field<Type>& refGrad() const
-            {
-                return refGrad_;
-            }
-
-            //- Return true if this patch field fixes a value
-            virtual bool fixesValue() const
-            {
-                return fixesValue_;
-            }
-
-            //- Return access to fixes value switch
-            Switch& fixesValue()
-            {
-                return fixesValue_;
-            }
-
-
-        //- Return fields on intersection points interacting with the IB
-
-            //- Return IB field
-            const Field<Type>& ibValue() const;
-
-            //- Return IB surface-normal gradient
-            const Field<Type>& ibGrad() const;
-
-            //- Return IB cell field
-            tmp<Field<Type> > ibCellValue() const;
-
-            //- Return IB sample point field
-            tmp<Field<Type> > ibSamplingPointValue() const;
-
-
-        //- Return fields on triangular faces
-
-            //- Return IB field
-            tmp<Field<Type> > triValue() const;
-
-            //- Return IB surface-normal gradient
-            tmp<Field<Type> > triGrad() const;
 
 
         // Mapping functions
@@ -310,71 +157,23 @@ public:
             virtual void autoMap
             (
                 const fvPatchFieldMapper&
-            )
-            {}
+            );
 
             //- Reverse map the given fvPatchField onto this fvPatchField
             virtual void rmap
             (
                 const fvPatchField<Type>&,
                 const labelList&
-            )
-            {}
+            );
 
 
         // Evaluation functions
-
-            //- Update the coefficients associated with the patch field
-            void updateCoeffs();
-
-            //- Initialise the evaluation of the patch field
-            virtual void initEvaluate
-            (
-                const Pstream::commsTypes commsType = Pstream::blocking
-            );
 
             //- Evaluate the patch field
             virtual void evaluate
             (
                 const Pstream::commsTypes commsType = Pstream::blocking
             );
-
-            //- Return the matrix diagonal coefficients corresponding to the
-            //  evaluation of the value of this patchField with given weights
-            virtual tmp<Field<Type> > valueInternalCoeffs
-            (
-                const tmp<scalarField>&
-            ) const
-            {
-                return tmp<Field<Type> >(new Field<Type>(0));
-            }
-
-            //- Return the matrix source coefficients corresponding to the
-            //  evaluation of the value of this patchField with given weights
-            virtual tmp<Field<Type> > valueBoundaryCoeffs
-            (
-                const tmp<scalarField>&
-            ) const
-            {
-                return tmp<Field<Type> >(new Field<Type>(0));
-            }
-
-            //- Return the matrix diagonal coefficients corresponding to the
-            //  evaluation of the gradient of this patchField
-            tmp<Field<Type> > gradientInternalCoeffs() const
-            {
-                return tmp<Field<Type> >(new Field<Type>(0));
-            }
-
-            //- Return the matrix source coefficients corresponding to the
-            //  evaluation of the gradient of this patchField
-            tmp<Field<Type> > gradientBoundaryCoeffs() const
-            {
-                return tmp<Field<Type> >(new Field<Type>(0));
-            }
-
-            //- Manipulate matrix
-            virtual void manipulateMatrix(fvMatrix<Type>& matrix);
 
 
         // I-O
