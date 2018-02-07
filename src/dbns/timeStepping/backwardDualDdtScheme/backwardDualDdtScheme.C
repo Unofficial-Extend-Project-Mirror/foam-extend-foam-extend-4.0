@@ -841,6 +841,31 @@ backwardDualDdtScheme<Type>::fvcDdtPhiCorr
 
 
 template<class Type>
+tmp<typename backwardDualDdtScheme<Type>::fluxFieldType>
+backwardDualDdtScheme<Type>::fvcDdtConsistentPhiCorr
+(
+    const GeometricField<Type, fvsPatchField, surfaceMesh>& faceU,
+    const GeometricField<Type, fvPatchField, volMesh>& U,
+    const surfaceScalarField& rAUf
+)
+{
+    notImplemented
+    (
+        type()
+      + "::fvcDdtConsistentPhiCorr"
+      + "\n("
+      + "\n    const GeometricField<Type, fvsPatchField, surfaceMesh>& faceU,"
+      + "\n    const GeometricField<Type, fvPatchField, volMesh>& U"
+      + "\n    const surfaceScalarField rAUf"
+      + "\n)"
+    );
+
+    // Dummy return
+    return tmp<fluxFieldType>(NULL);
+}
+
+
+template<class Type>
 tmp<surfaceScalarField> backwardDualDdtScheme<Type>::meshPhi
 (
     const GeometricField<Type, fvPatchField, volMesh>& vf

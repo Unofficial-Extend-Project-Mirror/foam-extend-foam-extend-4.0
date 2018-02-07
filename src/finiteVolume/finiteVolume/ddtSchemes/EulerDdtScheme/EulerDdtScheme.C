@@ -514,6 +514,19 @@ EulerDdtScheme<Type>::fvcDdtPhiCorr
 
 
 template<class Type>
+tmp<typename EulerDdtScheme<Type>::fluxFieldType>
+EulerDdtScheme<Type>::fvcDdtConsistentPhiCorr
+(
+    const GeometricField<Type, fvsPatchField, surfaceMesh>& faceU,
+    const GeometricField<Type, fvPatchField, volMesh>& U,
+    const surfaceScalarField& rAUf
+)
+{
+    return (mesh().Sf() & faceU.oldTime())*rAUf/mesh().time().deltaT();
+}
+
+
+template<class Type>
 tmp<surfaceScalarField> EulerDdtScheme<Type>::meshPhi
 (
     const GeometricField<Type, fvPatchField, volMesh>&

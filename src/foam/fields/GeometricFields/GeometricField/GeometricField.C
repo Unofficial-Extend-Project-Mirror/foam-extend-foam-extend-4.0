@@ -38,7 +38,7 @@ if ((gf1).mesh() != (gf2).mesh())                                   \
     FatalErrorIn("checkField(gf1, gf2, op)")                        \
         << "different mesh for fields "                             \
         << (gf1).name() << " and " << (gf2).name()                  \
-        << " during operatrion " <<  op                             \
+        << " during operation " <<  op                              \
         << abort(FatalError);                                       \
 }
 

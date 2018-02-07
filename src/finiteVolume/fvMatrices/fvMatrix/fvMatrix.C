@@ -1670,6 +1670,24 @@ Foam::tmp<Foam::fvMatrix<Type> > Foam::relax(const fvMatrix<Type>& m)
 
 
 template<class Type>
+Foam::tmp<Foam::fvMatrix<Type> > Foam::relax
+(
+    const tmp<fvMatrix<Type> >& tm,
+    const scalar alpha
+)
+{
+    return relax(tm(), alpha);
+}
+
+
+template<class Type>
+Foam::tmp<Foam::fvMatrix<Type> > Foam::relax(const tmp<fvMatrix<Type> >& tm)
+{
+    return relax(tm());
+}
+
+
+template<class Type>
 Foam::lduSolverPerformance Foam::solve
 (
     fvMatrix<Type>& fvm,

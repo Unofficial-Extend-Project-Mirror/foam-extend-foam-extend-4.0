@@ -1,0 +1,10 @@
+This test case serves to verify the time and under-relaxation consistent
+formulation developed by CFD@FSB group (University of Zagreb). Pressure is
+probed at four corners and in the centre of the lid driven cavity. Four
+simulations are performed with four different time steps spanning four orders of
+magnitude: 0.01, 0.001, 0.0001 and 0.00001 s. Tolerances for all equations are
+very small, yielding extremely small (O(1e-11)) differences in converged
+pressure field. If the differences are larger - it means that the converged
+solution is not independent to time step size.
+
+Author: Vuko Vukcevic, vuko.vukcevic@fsb.hr

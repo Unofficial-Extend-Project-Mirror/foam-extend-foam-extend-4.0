@@ -170,6 +170,25 @@ Foam::pimpleControl::~pimpleControl()
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
+const Foam::dimensionedScalar Foam::pimpleControl::relaxFactor
+(
+    const Foam::volVectorField& U
+) const
+{
+    scalar urf = 1;
+
+    if (mesh_.solutionDict().relaxEquation(U.select(finalIter())))
+    {
+        urf = mesh_.solutionDict().equationRelaxationFactor
+            (
+                U.select(finalIter())
+            );
+    }
+
+    return dimensionedScalar("alphaU", dimless, urf);
+}
+
+
 bool Foam::pimpleControl::loop()
 {
     read();

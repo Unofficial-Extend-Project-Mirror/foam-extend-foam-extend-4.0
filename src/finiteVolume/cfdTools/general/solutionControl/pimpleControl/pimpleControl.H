@@ -91,6 +91,15 @@ protected:
         virtual bool criteriaSatisfied();
 
 
+        // Time and under-relaxation consistency
+
+            //- Get relaxation factor for velocity field
+            virtual const dimensionedScalar relaxFactor
+            (
+                const volVectorField& U
+            ) const;
+
+
 public:
 
     // Static Data Members

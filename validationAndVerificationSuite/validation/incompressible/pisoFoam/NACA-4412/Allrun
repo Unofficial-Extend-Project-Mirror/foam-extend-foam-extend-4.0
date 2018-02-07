@@ -1,0 +1,19 @@
+#!/bin/bash 
+. $WM_PROJECT_DIR/bin/tools/RunFunctions
+
+application=pisoFoam
+
+runApplication $application
+runApplication sample -latestTime
+
+timeStep=$(grep "^endTime" system/controlDict | awk '{ print $2 }' | sed 's/;//g')
+
+cp -v surfaces/$timeStep/p_solidWall.raw validationData/
+
+./validationData/gnuplot
+
+mkdir -v validationResults
+
+mv -v *.png validationResults/
+
+gnome-open validationResults/Cp.png

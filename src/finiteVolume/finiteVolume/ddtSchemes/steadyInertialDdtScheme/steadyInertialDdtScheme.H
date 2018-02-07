@@ -174,6 +174,16 @@ public:
             const fluxFieldType& phi
         );
 
+
+        // Member functions for the new time consistent formulation
+        tmp<fluxFieldType> fvcDdtConsistentPhiCorr
+        (
+            const GeometricField<Type, fvsPatchField, surfaceMesh>& faceU,
+            const GeometricField<Type, fvPatchField, volMesh>& U,
+            const surfaceScalarField& rAUf
+        );
+
+
         tmp<surfaceScalarField> meshPhi
         (
             const GeometricField<Type, fvPatchField, volMesh>&
@@ -197,6 +207,15 @@ tmp<surfaceScalarField> steadyInertialDdtScheme<scalar>::fvcDdtPhiCorr
     const volScalarField& rho,
     const volScalarField& U,
     const surfaceScalarField& phi
+);
+
+
+template<>
+tmp<surfaceScalarField> steadyInertialDdtScheme<scalar>::fvcDdtConsistentPhiCorr
+(
+    const surfaceScalarField& faceU,
+    const volScalarField& U,
+    const surfaceScalarField& rAUf
 );
 
 

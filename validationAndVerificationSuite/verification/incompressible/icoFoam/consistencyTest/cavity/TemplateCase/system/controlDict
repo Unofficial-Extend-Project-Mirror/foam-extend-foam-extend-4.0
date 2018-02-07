@@ -1,0 +1,75 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | foam-extend: Open Source CFD                    |
+|  \\    /   O peration     | Version:     4.0                                |
+|   \\  /    A nd           | Web:         http://www.foam-extend.org         |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      controlDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+application     icoFoam;
+
+startFrom       startTime;
+
+startTime       0;
+
+stopAt          endTime;
+
+endTime         0.5;
+
+deltaT          TimeStepSize;
+
+writeControl    runTime;
+
+writeInterval   0.1;
+
+writeFormat     ascii;
+
+writePrecision  12;
+
+writeCompression uncompressed;
+
+timeFormat      general;
+
+timePrecision   6;
+
+runTimeModifiable yes;
+
+functions
+{
+    probes
+    {
+        // Where to load it from
+        functionObjectLibs ( "libsampling.so" );
+
+        type        probes;
+
+        // Name of the directory for probe data
+        name        probes;
+        probeLocations
+        (
+            ( 0.0025 0.0025 0.005 )  // lower left corner cell centre
+            ( 0.0975 0.0025 0.005 )  // lower right corner cell centre
+            ( 0.0025 0.0975 0.005 )  // upper left corner cell centre
+            ( 0.0975 0.0975 0.005 )  // upper right corner cell centre
+            ( 0.05 0.05 0.005 )  // centre
+        );
+
+        // Fields to be probed
+        fields ( p U );
+
+        // Write at same frequency as fields
+        outputControl   timeStep;
+        outputInterval  ProbeOutputInterval;
+    }
+}
+
+
+// ************************************************************************* //

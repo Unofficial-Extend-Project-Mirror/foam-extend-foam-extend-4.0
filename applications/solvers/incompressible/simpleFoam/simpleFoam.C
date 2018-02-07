@@ -25,8 +25,9 @@ Application
     simpleFoam
 
 Description
-    Steady-state solver for incompressible, turbulent flow
+    Steady-state solver for incompressible, turbulent flow.
     Consistent formulation without time-step and relaxation dependence by Jasak
+    and Tukovic.
 
 Author
     Hrvoje Jasak, Wikki Ltd.  All rights reserved

@@ -652,6 +652,19 @@ CoEulerDdtScheme<Type>::fvcDdtPhiCorr
 
 
 template<class Type>
+tmp<typename CoEulerDdtScheme<Type>::fluxFieldType>
+CoEulerDdtScheme<Type>::fvcDdtConsistentPhiCorr
+(
+    const GeometricField<Type, fvsPatchField, surfaceMesh>& faceU,
+    const GeometricField<Type, fvPatchField, volMesh>& U,
+    const surfaceScalarField& rAUf
+)
+{
+    return (mesh().Sf() & faceU.oldTime())*rAUf*CofrDeltaT();
+}
+
+
+template<class Type>
 tmp<surfaceScalarField> CoEulerDdtScheme<Type>::meshPhi
 (
     const GeometricField<Type, fvPatchField, volMesh>&

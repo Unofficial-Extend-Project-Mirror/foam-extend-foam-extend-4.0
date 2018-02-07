@@ -25,15 +25,16 @@ Application
     pimpleDyMFoam.C
 
 Description
-    Transient solver for incompressible, flow of Newtonian fluids
+    Transient solver for incompressible, turbulent flow of Newtonian fluids
     with dynamic mesh using the PIMPLE (merged PISO-SIMPLE) algorithm.
 
     Turbulence modelling is generic, i.e. laminar, RAS or LES may be selected.
 
     Consistent formulation without time-step and relaxation dependence by Jasak
+    and Tukovic.
 
 Author
-    Hrvoje Jasak, Wikki Ltd.  All rights reserved
+    Hrvoje Jasak, Wikki Ltd.  All rights reserved.
 
 \*---------------------------------------------------------------------------*/
 
@@ -76,15 +77,10 @@ int main(int argc, char *argv[])
         Info<< "Time = " << runTime.timeName() << nl << endl;
 
         bool meshChanged = mesh.update();
+        reduce(meshChanged, orOp<bool>());
 
 #       include "volContinuity.H"
 
-        if (checkMeshCourantNo)
-        {
-#           include "meshCourantNo.H"
-        }
-
-        // Mesh motion update
         if (correctPhi && meshChanged)
         {
             // Fluxes will be corrected to absolute velocity
@@ -92,13 +88,18 @@ int main(int argc, char *argv[])
 #           include "correctPhi.H"
         }
 
+        // Make the fluxes relative to the mesh motion
+        fvc::makeRelative(phi, U);
+
+        if (mesh.moving() && checkMeshCourantNo)
+        {
+#           include "meshCourantNo.H"
+        }
+
         if (meshChanged)
         {
 #           include "CourantNo.H"
         }
-
-        // Make the fluxes relative to the mesh motion
-        fvc::makeRelative(phi, U);
 
         // --- PIMPLE loop
         while (pimple.loop())

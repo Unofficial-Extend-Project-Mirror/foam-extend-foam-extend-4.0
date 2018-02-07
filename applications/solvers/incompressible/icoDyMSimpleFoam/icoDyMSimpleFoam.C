@@ -26,8 +26,10 @@ Application
 
 Description
     Transient solver for incompressible, laminar flow of Newtonian fluids
-    with dynamic mesh.  Solver implements a SIMPLE-based algorithm
+    with dynamic mesh. Solver implements a SIMPLE-based algorithm
     in time-stepping mode.
+    Consistent formulation without time-step and relaxation dependence by Jasak
+    and Tukovic.
 
 Author
     Hrvoje Jasak, Wikki Ltd.  All rights reserved.
@@ -100,11 +102,14 @@ int main(int argc, char *argv[])
 
 #           include "UEqn.H"
 
-            rAU = 1.0/UEqn.A();
+            // Prepare clean 1/a_p without time derivative contribution
+            rAU = 1.0/HUEqn.A();
 
-            U = rAU*UEqn.H();
-            phi = (fvc::interpolate(U) & mesh.Sf());
-              //+ fvc::ddtPhiCorr(rAU, U, phi);
+            // Calculate U from convection-diffusion matrix
+            U = rAU*HUEqn.H();
+
+            // Consistently calculate flux
+            piso.calcTransientConsistentFlux(phi, U, rAU, ddtUEqn);
 
             adjustPhi(phi, U, p);
 
@@ -115,7 +120,14 @@ int main(int argc, char *argv[])
             {
                 fvScalarMatrix pEqn
                 (
-                    fvm::laplacian(rAU, p) == fvc::div(phi)
+                    fvm::laplacian
+                    (
+                        fvc::interpolate(rAU)/piso.aCoeff(U.name()),
+                        p,
+                        "laplacian(rAU," + p.name() + ')'
+                    )
+                 ==
+                    fvc::div(phi)
                 );
 
                 pEqn.setReference(pRefCell, pRefValue);
@@ -135,11 +147,9 @@ int main(int argc, char *argv[])
             // Explicitly relax pressure for momentum corrector
             p.relax();
 
-            // Make the fluxes relative to the mesh motion
-            fvc::makeRelative(phi, U);
-
-            U -= rAU*fvc::grad(p);
-            U.correctBoundaryConditions();
+            // Consistently reconstruct velocity after pressure equation.
+            // Note: flux is made relative inside the function
+            piso.reconstructTransientVelocity(U, phi, ddtUEqn, rAU, p);
         }
 
         runTime.write();

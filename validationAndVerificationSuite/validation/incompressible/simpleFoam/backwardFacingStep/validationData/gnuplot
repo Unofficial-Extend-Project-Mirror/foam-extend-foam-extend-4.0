@@ -1,0 +1,148 @@
+#!/bin/bash
+
+# If you want to change the output format change
+# set term pngcairo dashed size 1024,768 font "Arial,12"
+# to
+# set terminal postscript eps color enhanced
+# and change the format in the output file name
+
+gnuplot -persist << EOF
+
+# Legend position
+# set key left top
+# Turn off legend
+# set nokey
+
+#set term x11 0
+
+set style line 1 lt 2 lc rgb "black" lw 1
+set style line 2 lt 2 lc rgb "black" lw 1 dt 2
+set style line 3 lt 2 lc rgb "black" lw 1 dt 3
+set style line 4 lt 2 lc rgb "blue" lw 1 dt 1
+set style line 5 lt 2 lc rgb "blue" lw 1 dt 2
+set style line 6 lt 2 lc rgb "blue" lw 1 dt 3
+
+set term pngcairo dashed size 1024,768 font "Arial,12"
+set output "Cp.png"
+set key left top
+set title "Lower Wall"
+set xlabel "{/:Italic x}/{/:Italic H}"
+set ylabel "{/:Italic C_p}"
+set xrange [-5:30]
+set yrange [-0.25:0.1]
+#set logscale y 10; set format y '%.0e'
+
+plot "./validationData/p_lowerWall.raw" using 1:(\$4/(0.5*2165.6)) ls 1 title 'CFD'with lines, "./validationData/cp_exp.dat" using 1:2 ls 1 title 'EXP'
+
+reset
+#set term x11 1
+
+set style line 1 lt 2 lc rgb "black" lw 1
+set style line 2 lt 2 lc rgb "black" lw 1 dt 2
+set style line 3 lt 2 lc rgb "black" lw 1 dt 3
+set style line 4 lt 2 lc rgb "blue" lw 1 dt 1
+set style line 5 lt 2 lc rgb "blue" lw 1 dt 2
+set style line 6 lt 2 lc rgb "blue" lw 1 dt 3
+
+
+set term pngcairo dashed size 1024,768 font "Arial,12"
+set output "Profile_1.png"
+set key left top
+set title "Line 1 ({/:Italic x}/{/:Italic H} = -4)"
+set xlabel "{/:Italic u}/{/:Italic U_{ref}}"
+set ylabel "({/:Italic y}-{/:Italic y_0})/{/:Italic H}"
+set xrange [-0.4:1.2]
+set yrange [0:3]
+#set logscale y 10; set format y '%.0e'
+
+plot "./validationData/profile_1_U.xy" using (\$2/46.536):1 ls 1 title 'CFD'with lines, "./validationData/profile_1_exp.dat" using 3:(\$2-1) ls 1 title 'EXP'
+
+reset
+#set term x11 2
+
+set style line 1 lt 2 lc rgb "black" lw 1
+set style line 2 lt 2 lc rgb "black" lw 1 dt 2
+set style line 3 lt 2 lc rgb "black" lw 1 dt 3
+set style line 4 lt 2 lc rgb "blue" lw 1 dt 1
+set style line 5 lt 2 lc rgb "blue" lw 1 dt 2
+set style line 6 lt 2 lc rgb "blue" lw 1 dt 3
+
+set term pngcairo dashed size 1024,768 font "Arial,12"
+set output "Profile_2.png"
+set key left top
+set title "Line 2 ({/:Italic x}/{/:Italic H} = 1)"
+set xlabel "{/:Italic u}/{/:Italic U_{ref}}"
+set ylabel "{/:Italic y}/{/:Italic H}"
+set xrange [-0.4:1.2]
+set yrange [0:3]
+#set logscale y 10; set format y '%.0e'
+
+plot "./validationData/profile_2_U.xy" using (\$2/46.536):1 ls 1 title 'CFD'with lines, "./validationData/profile_2_exp.dat" using 3:2 ls 1 title 'EXP'
+
+reset
+#set term x11 3
+
+set style line 1 lt 2 lc rgb "black" lw 1
+set style line 2 lt 2 lc rgb "black" lw 1 dt 2
+set style line 3 lt 2 lc rgb "black" lw 1 dt 3
+set style line 4 lt 2 lc rgb "blue" lw 1 dt 1
+set style line 5 lt 2 lc rgb "blue" lw 1 dt 2
+set style line 6 lt 2 lc rgb "blue" lw 1 dt 3
+
+set term pngcairo dashed size 1024,768 font "Arial,12"
+set output "Profile_3.png"
+set key left top
+set title "Line 3 ({/:Italic x}/{/:Italic H} = 4)"
+set xlabel "{/:Italic u}/{/:Italic U_{ref}}"
+set ylabel "{/:Italic y}/{/:Italic H}"
+set xrange [-0.4:1.2]
+set yrange [0:3]
+#set logscale y 10; set format y '%.0e'
+
+plot "./validationData/profile_3_U.xy" using (\$2/46.536):1 ls 1 title 'CFD'with lines, "./validationData/profile_3_exp.dat" using 3:2 ls 1 title 'EXP'
+
+reset
+#set term x11 4
+
+set style line 1 lt 2 lc rgb "black" lw 1
+set style line 2 lt 2 lc rgb "black" lw 1 dt 2
+set style line 3 lt 2 lc rgb "black" lw 1 dt 3
+set style line 4 lt 2 lc rgb "blue" lw 1 dt 1
+set style line 5 lt 2 lc rgb "blue" lw 1 dt 2
+set style line 6 lt 2 lc rgb "blue" lw 1 dt 3
+
+set term pngcairo dashed size 1024,768 font "Arial,12"
+set output "Profile_4.png"
+set key left top
+set title "Line 4 ({/:Italic x}/{/:Italic H} = 6)"
+set xlabel "{/:Italic u}/{/:Italic U_{ref}}"
+set ylabel "{/:Italic y}/{/:Italic H}"
+set xrange [-0.4:1.2]
+set yrange [0:3]
+#set logscale y 10; set format y '%.0e'
+
+plot "./validationData/profile_4_U.xy" using (\$2/46.536):1 ls 1 title 'CFD'with lines, "./validationData/profile_4_exp.dat" using 3:2 ls 1 title 'EXP'
+
+reset
+#set term x11 5
+
+set style line 1 lt 2 lc rgb "black" lw 1
+set style line 2 lt 2 lc rgb "black" lw 1 dt 2
+set style line 3 lt 2 lc rgb "black" lw 1 dt 3
+set style line 4 lt 2 lc rgb "blue" lw 1 dt 1
+set style line 5 lt 2 lc rgb "blue" lw 1 dt 2
+set style line 6 lt 2 lc rgb "blue" lw 1 dt 3
+
+set term pngcairo dashed size 1024,768 font "Arial,12"
+set output "Profile_5.png"
+set key left top
+set title "Line 5 ({/:Italic x}/{/:Italic H} = 10)"
+set xlabel "{/:Italic u}/{/:Italic U_{ref}}"
+set ylabel "{/:Italic y}/{/:Italic H}"
+set xrange [-0.4:1.2]
+set yrange [0:3]
+#set logscale y 10; set format y '%.0e'
+
+plot "./validationData/profile_5_U.xy" using (\$2/46.536):1 ls 1 title 'CFD'with lines, "./validationData/profile_5_exp.dat" using 3:2 ls 1 title 'EXP'
+
+EOF

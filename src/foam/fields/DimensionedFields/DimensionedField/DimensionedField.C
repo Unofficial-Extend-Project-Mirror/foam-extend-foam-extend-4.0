@@ -40,7 +40,7 @@ if (&(df1).mesh() != &(df2).mesh())                                 \
     FatalErrorIn("checkField(df1, df2, op)")                        \
         << "different mesh for fields "                             \
         << (df1).name() << " and " << (df2).name()                  \
-        << " during operatrion " <<  op                             \
+        << " during operation " <<  op                              \
         << abort(FatalError);                                       \
 }
 

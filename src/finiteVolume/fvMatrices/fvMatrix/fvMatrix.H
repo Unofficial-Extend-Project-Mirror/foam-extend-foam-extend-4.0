@@ -521,6 +521,7 @@ void checkMethod
     const char*
 );
 
+
 template<class Type>
 void checkMethod
 (
@@ -528,6 +529,7 @@ void checkMethod
     const DimensionedField<Type, volMesh>&,
     const char*
 );
+
 
 template<class Type>
 void checkMethod
@@ -537,7 +539,8 @@ void checkMethod
     const char*
 );
 
-//- Relax and return a copy of the matrix giver relaxation factor
+
+//- Relax and return a copy of the matrix given relaxation factor
 template<class Type>
 tmp<fvMatrix<Type> > relax
 (
@@ -549,6 +552,21 @@ tmp<fvMatrix<Type> > relax
 //- Relax and return a copy of the matrix
 template<class Type>
 tmp<fvMatrix<Type> > relax(const fvMatrix<Type>&);
+
+
+//- Relax and return a copy of the matrix given tmp to a matrix and relaxation
+//  factor
+template<class Type>
+tmp<fvMatrix<Type> > relax
+(
+    const tmp<fvMatrix<Type> >&,
+    const scalar
+);
+
+
+//- Relax and return a copy of the matrix given tmp to a matrix
+template<class Type>
+tmp<fvMatrix<Type> > relax(const tmp<fvMatrix<Type> >&);
 
 
 //- Solve returning the solution statistics given convergence tolerance

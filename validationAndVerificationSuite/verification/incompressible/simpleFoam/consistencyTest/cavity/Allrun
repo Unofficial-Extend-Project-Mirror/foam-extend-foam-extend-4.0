@@ -1,0 +1,21 @@
+#!/bin/sh
+
+# Source tutorial run and clean functions
+. $WM_PROJECT_DIR/bin/tools/RunFunctions
+
+for j in 0.8 0.7 0.6 0.5 0.4 0.3
+do
+    (
+        cp -r TemplateCase alphaU-$j
+        cd alphaU-$j
+        sed -i s/URelaxFactor/$j/g system/fvSolution
+        pRelaxFactor=$(echo "scale=1;1-$j" | bc)
+        sed -i s/pRelaxFactor/$pRelaxFactor/g system/fvSolution
+        runApplication blockMesh
+        runApplication simpleFoam
+    )
+done
+
+# Print out the converged pressure for all relaxation factors for visual check
+# whether the solution does not depend on the under-relaxation factors
+tail -n 1 */probes/0/p

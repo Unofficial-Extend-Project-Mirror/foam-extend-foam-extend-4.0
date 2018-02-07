@@ -1,11 +1,14 @@
-    fvVectorMatrix UEqn
+    // Time-derivative matrix
+    fvVectorMatrix ddtUEqn(fvm::ddt(U));
+
+    // Convection-diffusion matrix
+    fvVectorMatrix HUEqn
     (
-        fvm::ddt(U)
-      + fvm::div(phi, U)
+        fvm::div(phi, U)
       - fvm::laplacian(nu, U)
     );
 
     if (piso.momentumPredictor())
     {
-        solve(UEqn == -fvc::grad(p));
+        solve(ddtUEqn + HUEqn == -fvc::grad(p));
     }

@@ -156,6 +156,23 @@ ddtPhiCorr
 }
 
 
+template<class Type>
+tmp<GeometricField<typename flux<Type>::type, fvsPatchField, surfaceMesh> >
+ddtConsistentPhiCorr
+(
+    const GeometricField<Type, fvsPatchField, surfaceMesh>& faceU,
+    const GeometricField<Type, fvPatchField, volMesh>& U,
+    const surfaceScalarField& rAUf
+)
+{
+    return fv::ddtScheme<Type>::New
+    (
+        U.mesh(),
+        U.mesh().schemesDict().ddtScheme("ddt(" + U.name() + ')')
+    )().fvcDdtConsistentPhiCorr(faceU, U, rAUf);
+}
+
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace fvc
