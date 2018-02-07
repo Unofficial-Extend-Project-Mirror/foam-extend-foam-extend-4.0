@@ -186,6 +186,7 @@ $(derivedFvPatchFields)/uniformDensityHydrostaticPressure/uniformDensityHydrosta
 $(derivedFvPatchFields)/pulseFixedValue/pulseFixedValueFvPatchFields.C
 $(derivedFvPatchFields)/waveTransmissiveInlet/waveTransmissiveInletFvPatchFields.C
 $(derivedFvPatchFields)/noSlipWall/noSlipWallFvPatchVectorField.C
+$(derivedFvPatchFields)/noSlipMovingWall/noSlipMovingWallFvPatchVectorField.C
 
 fvsPatchFields = fields/fvsPatchFields
 $(fvsPatchFields)/fvsPatchField/fvsPatchFields.C

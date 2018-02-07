@@ -22,7 +22,7 @@ License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    Foam::refinementHistory
+    Foam::polyRefinementHistory
 
 Description
     All refinement history. Used in unrefinement.
@@ -30,9 +30,9 @@ Description
     - visibleCells: valid for the current mesh and contains per cell -1
       (cell unrefined) or an index into splitCells_.
     - splitCells: for every split contains the parent (also index into
-      splitCells) and optionally a subsplit as 8 indices into splitCells.
-      Note that the numbers in splitCells are not cell labels, they are purely
-      indices into splitCells.
+      splitCells) and optionally a subsplit as n indices into splitCells, where
+      n is the number of points of a cell. Note that the numbers in splitCells
+      are not cell labels, they are purely indices into splitCells.
 
     E.g. 2 cells, cell 1 gets refined so end up with 9 cells:
     @verbatim
@@ -64,12 +64,18 @@ Description
 
 
 SourceFiles
-    refinementHistory.C
+    polyRefinementHistory.C
+
+Author
+    Vuko Vukcevic, Wikki Ltd.  All rights reserved
+
+Notes
+    Generalisation of refinementHistory for polyhedral cells
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef refinementHistory_H
-#define refinementHistory_H
+#ifndef polyRefinementHistory_H
+#define polyRefinementHistory_H
 
 #include "DynamicList.H"
 #include "dynamicLabelList.H"
@@ -89,16 +95,16 @@ class mapPolyMesh;
 class mapDistributePolyMesh;
 
 /*---------------------------------------------------------------------------*\
-                           Class refinementHistory Declaration
+                     Class polyRefinementHistory Declaration
 \*---------------------------------------------------------------------------*/
 
-class refinementHistory
+class polyRefinementHistory
 :
     public regIOobject
 {
 public:
 
-    class splitCell8
+    class splitPolyCell
     {
     public:
 
@@ -108,28 +114,30 @@ public:
         label parent_;
 
         //- cells this cell was refined into
-        autoPtr<FixedList<label, 8> > addedCellsPtr_;
+        autoPtr<labelList> addedCellsPtr_;
 
         //- Construct null (parent = -1)
-        splitCell8();
+        splitPolyCell();
 
         //- Construct from parent
-        splitCell8(const label parent);
+        splitPolyCell(const label parent);
 
         //- Construct from Istream
-        splitCell8(Istream& is);
+        splitPolyCell(Istream& is);
 
         //- Construct as deep copy
-        splitCell8(const splitCell8&);
+        splitPolyCell(const splitPolyCell&);
 
         //- Copy operator since autoPtr otherwise 'steals' storage.
-        void operator=(const splitCell8& s)
+        void operator=(const splitPolyCell& s)
         {
             // Check for assignment to self
             if (this == &s)
             {
-                FatalErrorIn("splitCell8::operator=(const Foam::splitCell8&)")
-                    << "Attempted assignment to self"
+                FatalErrorIn
+                (
+                    "splitPolyCell::operator=(const Foam::splitPolyCell&)"
+                )   << "Attempted assignment to self"
                     << abort(FatalError);
             }
 
@@ -138,12 +146,12 @@ public:
             addedCellsPtr_.reset
             (
                 s.addedCellsPtr_.valid()
-              ? new FixedList<label, 8>(s.addedCellsPtr_())
+              ? new labelList(s.addedCellsPtr_())
               : NULL
             );
         }
 
-        bool operator==(const splitCell8& s) const
+        bool operator==(const splitPolyCell& s) const
         {
             if (addedCellsPtr_.valid() != s.addedCellsPtr_.valid())
             {
@@ -163,24 +171,24 @@ public:
             }
         }
 
-        bool operator!=(const splitCell8& s) const
+        bool operator!=(const splitPolyCell& s) const
         {
             return !operator==(s);
         }
 
-        friend Istream& operator>>(Istream&, splitCell8&);
-        friend Ostream& operator<<(Ostream&, const splitCell8&);
+        friend Istream& operator>>(Istream&, splitPolyCell&);
+        friend Ostream& operator<<(Ostream&, const splitPolyCell&);
     };
 
 
 private:
 
-    TypeName("refinementHistory");
+    TypeName("polyRefinementHistory");
 
     // Private data
 
         //- Storage for splitCells
-        DynamicList<splitCell8> splitCells_;
+        DynamicList<splitPolyCell> splitCells_;
 
         //- Unused indices in splitCells
         dynamicLabelList freeSplitCells_;
@@ -194,21 +202,27 @@ private:
         //- Debug write
         static void writeEntry
         (
-            const List<splitCell8>&,
-            const splitCell8&
+            const List<splitPolyCell>&,
+            const splitPolyCell&
         );
+
         //- Debug write
         static void writeDebug
         (
             const labelList&,
-            const List<splitCell8>&
+            const List<splitPolyCell>&
         );
 
         //- Check consistency of structure, i.e. indices into splitCells_.
         void checkIndices() const;
 
         //- Allocate a splitCell. Return index in splitCells_.
-        label allocateSplitCell(const label parent, const label i);
+        label allocateSplitCell
+        (
+            const label parent,
+            const label i,
+            const label nCells
+        );
 
         //- Free a splitCell.
         void freeSplitCell(const label index);
@@ -218,7 +232,7 @@ private:
         (
             const label,
             labelList& oldToNew,
-            DynamicList<splitCell8>&
+            DynamicList<splitPolyCell>&
         ) const;
 
         void countProc
@@ -234,29 +248,28 @@ public:
     // Constructors
 
         //- Construct (read) given an IOobject
-        refinementHistory(const IOobject&);
+        polyRefinementHistory(const IOobject&);
 
         //- Construct (read) or construct null
-        refinementHistory
+        polyRefinementHistory
         (
             const IOobject&,
-            const List<splitCell8>& splitCells,
+            const List<splitPolyCell>& splitCells,
             const labelList& visibleCells
         );
 
         //- Construct (read) or construct from initial number of cells
         //  (all visible)
-        refinementHistory(const IOobject&, const label nCells);
+        polyRefinementHistory(const IOobject&, const label nCells);
 
         //- Construct as copy
-        refinementHistory(const IOobject&, const refinementHistory&);
+        polyRefinementHistory(const IOobject&, const polyRefinementHistory&);
 
         //- Construct from Istream
-        refinementHistory(const IOobject&, Istream&);
+        polyRefinementHistory(const IOobject&, Istream&);
 
 
     // Member Functions
-
 
         //- Per cell in the current mesh (i.e. visible) either -1 (unrefined)
         //  or an index into splitCells.
@@ -265,8 +278,8 @@ public:
             return visibleCells_;
         }
 
-        //- Storage for splitCell8s.
-        const DynamicList<splitCell8>& splitCells() const
+        //- Storage for splitPolyCells.
+        const DynamicList<splitPolyCell>& splitCells() const
         {
             return splitCells_;
         }
@@ -292,27 +305,26 @@ public:
 
             if (index < 0)
             {
-                FatalErrorIn("refinementHistory::parentIndex(const label)")
+                FatalErrorIn("polyRefinementHistory::parentIndex(const label)")
                     << "Cell " << cellI << " is not visible"
                     << abort(FatalError);
             }
             return splitCells_[index].parent_;
         }
 
-        //- Store splitting of cell into 8
+        //- Store splitting of cell into n (number of points for a cell)
         void storeSplit
         (
             const label cellI,
             const labelList& addedCells
         );
 
-        //- Store combining 8 cells into master
+        //- Store combining n cells into master
         void combineCells
         (
             const label masterCellI,
             const labelList& combinedCells
         );
-
 
         //- Update numbering for mesh changes
         void updateMesh(const mapPolyMesh&);
@@ -329,7 +341,6 @@ public:
         //  Can only distribute clusters sent across in one go; cannot
         //  handle parts recombined in multiple passes.
         void distribute(const mapDistributePolyMesh&);
-
 
         //- Compact splitCells_. Removes all freeSplitCells_ elements.
         void compact();
@@ -349,14 +360,10 @@ public:
         virtual bool writeData(Ostream&) const;
 
 
-    // Friend Functions
-
-    // Friend Operators
-
     // IOstream Operators
 
-        friend Istream& operator>>(Istream&, refinementHistory&);
-        friend Ostream& operator<<(Ostream&, const refinementHistory&);
+        friend Istream& operator>>(Istream&, polyRefinementHistory&);
+        friend Ostream& operator<<(Ostream&, const polyRefinementHistory&);
 };
 
 
