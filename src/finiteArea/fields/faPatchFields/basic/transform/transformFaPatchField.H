@@ -43,7 +43,7 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                        Class transformFvPatch Declaration
+                        Class transformFaPatch Declaration
 \*---------------------------------------------------------------------------*/
 
 template<class Type>

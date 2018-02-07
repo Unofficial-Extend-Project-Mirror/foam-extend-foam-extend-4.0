@@ -22,7 +22,7 @@ License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    wedgeFvPatchField
+    wedgeFaPatchField
 
 \*---------------------------------------------------------------------------*/
 
@@ -39,12 +39,6 @@ namespace Foam
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 template<class Type> class wedgeFaPatchField;
-
-// typedef wedgeFaPatchField<scalar> wedgeFaPatchScalarField;
-// typedef wedgeFaPatchField<vector> wedgeFaPatchVectorField;
-// typedef wedgeFaPatchField<tensor> wedgeFaPatchTensorField;
-
-// template<class Type> class wedgeFvPatchField;
 
 makeFaPatchTypeFieldTypedefs(wedge)
 

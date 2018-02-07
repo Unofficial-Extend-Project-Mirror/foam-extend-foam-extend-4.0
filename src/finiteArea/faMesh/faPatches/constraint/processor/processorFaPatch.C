@@ -215,7 +215,7 @@ void processorFaPatch::calcGeometry()
             {
                 FatalErrorIn
                 (
-                    "processorFvPatch::makeWeights(scalarField& w) const"
+                    "processorFaPatch::makeWeights(scalarField& w) const"
                 )   << "edge " << edgei
                     << " length does not match neighbour by "
                     << 100*mag(magEl[edgei] - nmagEl)/avEl
