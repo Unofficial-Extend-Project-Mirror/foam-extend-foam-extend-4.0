@@ -50,29 +50,27 @@ adjustTimeStep  yes;
 maxDeltaT       3600;
 
 functions
-    (
+(
     probes1
         {
         type probes; // Type of functionObject
         // Where to load it from (if not already in solver)
         functionObjectLibs ("libsampling.so");
         probeLocations // Locations to be probed. runTime modifiable!
-            (
-                (0.5 0.5 1.)
-            );
+        (
+            (0.5 0.5 1.)
+        );
+
         // Fields to be probed. runTime modifiable!
         fields
-            (
-             U
-            );
+        (
+            U
+        );
 
-            outputControl timeStep;
-            outputInterval 1;
-        }
-    );
+        outputControl timeStep;
+        outputInterval 1;
+    }
+);
 
-
-//libs ( "libOpenFOAM.so" );
-//libs ("libuserBCs.so");
 
 // ************************************************************************* //

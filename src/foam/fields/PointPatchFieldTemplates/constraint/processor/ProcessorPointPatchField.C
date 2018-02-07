@@ -84,7 +84,7 @@ sendField
 
     // This needs complete rewrite:
     // - move communications into a patch
-    // - allow for various types of communication - done HR, 12/6/2017
+    // HR, 12/6/2017
     // HJ, 15/Apr/2009
 
     if (commsType == Pstream::blocking || commsType == Pstream::scheduled)

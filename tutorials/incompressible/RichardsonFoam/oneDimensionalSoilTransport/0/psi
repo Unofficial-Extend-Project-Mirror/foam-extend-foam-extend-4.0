@@ -23,14 +23,14 @@ boundaryField
 {
     top
     {
-    type            fixedValue;
-    value           uniform 0.01;
+        type            fixedValue;
+        value           uniform 0.01;
     }
 
     bottom
     {
-    type            fixedGradient;
-    gradient        uniform 0;
+        type            fixedGradient;
+        gradient        uniform 0;
     }
 
     sides

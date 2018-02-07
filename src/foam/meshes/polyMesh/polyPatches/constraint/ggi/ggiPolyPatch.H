@@ -378,6 +378,14 @@ public:
                 Field<Type>& ff
             ) const;
 
+            //- Correct interpolated face field for partially covered faces
+            template<class Type>
+            void correctPartialFaces
+            (
+                const Field<Type>& bridgeField,
+                Field<Type>& ff
+            ) const;
+
 
         // Geometric data
 

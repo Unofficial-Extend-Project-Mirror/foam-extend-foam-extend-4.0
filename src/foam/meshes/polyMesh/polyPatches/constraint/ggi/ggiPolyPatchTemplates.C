@@ -267,4 +267,70 @@ void Foam::ggiPolyPatch::bridge
 }
 
 
+template<class Type>
+void Foam::ggiPolyPatch::correctPartialFaces
+(
+    const Field<Type>& bridgeField,
+    Field<Type>& ff
+) const
+{
+    // Check
+    if (ff.size() != size())
+    {
+        FatalErrorIn
+        (
+            "tmp<Field<Type> > ggiPolyPatch::correctPartialFaces\n"
+            "(\n"
+            "    Field<Type>& ff\n"
+            ") const"
+        )   << "Incorrect patch field size for partial face correction. "
+            << "Field size: " << ff.size() << " patch size: " << size()
+            << abort(FatalError);
+    }
+
+    if (bridgeOverlap())
+    {
+        if (empty())
+        {
+            // Patch empty, no bridging
+            return;
+        }
+
+        if (localParallel())
+        {
+            if (master())
+            {
+                patchToPatch().correctPartialMaster(bridgeField, ff);
+            }
+            else
+            {
+                patchToPatch().correctPartialSlave(bridgeField, ff);
+            }
+        }
+        else
+        {
+            // Note: since bridging is only a local operation
+            if (master())
+            {
+                patchToPatch().maskedCorrectPartialMaster
+                (
+                    bridgeField,
+                    ff,
+                    zoneAddressing()
+                );
+            }
+            else
+            {
+                patchToPatch().maskedCorrectPartialSlave
+                (
+                    bridgeField,
+                    ff,
+                    zoneAddressing()
+                );
+            }
+        }
+    }
+}
+
+
 // ************************************************************************* //
