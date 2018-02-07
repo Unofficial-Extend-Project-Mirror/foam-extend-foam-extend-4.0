@@ -1,0 +1,20 @@
+decomposeTools/finiteVolume/domainDecomposition.C
+decomposeTools/finiteVolume/distributeCells.C
+decomposeTools/finiteVolume/decomposeMesh.C
+decomposeTools/finiteVolume/fvFieldDecomposer.C
+decomposeTools/finiteArea/faMeshDecomposition.C
+decomposeTools/finiteArea/faFieldDecomposer.C
+decomposeTools/point/pointFieldDecomposer.C
+decomposeTools/tetFiniteElement/tetPointFieldDecomposer.C
+decomposeTools/lagrangian/lagrangianFieldDecomposer.C
+
+reconstructTools/finiteVolume/processorMeshesReconstructor.C
+reconstructTools/finiteVolume/processorMeshesRebuild.C
+reconstructTools/finiteVolume/fvFieldReconstructor.C
+reconstructTools/finiteArea/processorFaMeshes.C
+reconstructTools/finiteArea/faFieldReconstructor.C
+reconstructTools/point/pointFieldReconstructor.C
+reconstructTools/tetFiniteElement/tetPointFieldReconstructor.C
+reconstructTools/lagrangian/reconstructLagrangianPositions.C
+
+LIB = $(FOAM_LIBBIN)/libdecomposeReconstruct

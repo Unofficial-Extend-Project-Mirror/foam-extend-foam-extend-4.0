@@ -1,10 +1,4 @@
 processorMeshes.C
-processorFaMeshes.C
-fvFieldReconstructor.C
-faFieldReconstructor.C
-pointFieldReconstructor.C
-tetPointFieldReconstructor.C
-reconstructLagrangianPositions.C
 reconstructPar.C
 
 EXE = $(FOAM_APPBIN)/reconstructPar

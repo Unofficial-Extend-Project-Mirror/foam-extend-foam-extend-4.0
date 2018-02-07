@@ -276,6 +276,7 @@ public:
             const GeometricField<Type, fvsPatchField, surfaceMesh>& field
         ) const;
 
+        //- Decompose and write all fields from the list
         template<class GeoField>
         void decomposeFields(const PtrList<GeoField>& fields) const;
 };

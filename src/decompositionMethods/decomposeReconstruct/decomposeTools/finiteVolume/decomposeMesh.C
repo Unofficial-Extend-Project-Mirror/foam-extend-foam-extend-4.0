@@ -40,7 +40,7 @@ Description
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
-void domainDecomposition::decomposeMesh(const bool filterEmptyPatches)
+void Foam::domainDecomposition::decomposeMesh(const bool filterEmptyPatches)
 {
     // Decide which cell goes to which processor
     distributeCells();
@@ -51,12 +51,12 @@ void domainDecomposition::decomposeMesh(const bool filterEmptyPatches)
     Info<< "\nCalculating original mesh data" << endl;
 
     // set references to the original mesh
-    const polyBoundaryMesh& patches = boundaryMesh();
+    const polyBoundaryMesh& patches = mesh_.boundaryMesh();
 
     // Access all faces to grab the zones
-    const faceList& fcs = allFaces();
-    const labelList& owner = faceOwner();
-    const labelList& neighbour = faceNeighbour();
+    const faceList& fcs = mesh_.allFaces();
+    const labelList& owner = mesh_.faceOwner();
+    const labelList& neighbour = mesh_.faceNeighbour();
 
     // loop through the list of processor labels for the cell and add the
     // cell shape to the list of cells for the appropriate processor
@@ -483,7 +483,7 @@ void domainDecomposition::decomposeMesh(const bool filterEmptyPatches)
         {
             wordList fzNames(decompositionDict_.lookup("globalFaceZones"));
 
-            const faceZoneMesh& fz = faceZones();
+            const faceZoneMesh& fz = mesh_.faceZones();
 
             forAll (fzNames, nameI)
             {
@@ -767,7 +767,7 @@ void domainDecomposition::decomposeMesh(const bool filterEmptyPatches)
     forAll (procPointAddressing_, procI)
     {
         // Dimension list to all points in the mesh.  HJ, 27/Mar/2009
-        boolList pointLabels(allPoints().size(), false);
+        boolList pointLabels(mesh_.allPoints().size(), false);
 
         // Get reference to list of used faces
         const labelList& procFaceLabels = procFaceAddressing_[procI];
@@ -813,7 +813,7 @@ void domainDecomposition::decomposeMesh(const bool filterEmptyPatches)
         // Second pass: zone faces
 
         // Reset point usage list
-        boolList pointLabelsSecondPass(allPoints().size(), false);
+        boolList pointLabelsSecondPass(mesh_.allPoints().size(), false);
 
         for
         (
@@ -854,13 +854,13 @@ void domainDecomposition::decomposeMesh(const bool filterEmptyPatches)
     // Memory management
     {
         // Dimension list to all points in the mesh.  HJ, 27/Mar/2009
-        labelList pointsUsage(allPoints().size(), 0);
+        labelList pointsUsage(mesh_.allPoints().size(), 0);
 
         // Globally shared points are the ones used by more than 2 processors
         // Size the list approximately and gather the points
         labelHashSet gSharedPoints
         (
-            min(100, nPoints()/1000)
+            min(100, mesh_.nPoints()/1000)
         );
 
         // Loop through all the processors and mark up points used by
@@ -923,3 +923,6 @@ void domainDecomposition::decomposeMesh(const bool filterEmptyPatches)
         sort(globallySharedPoints_);
     }
 }
+
+
+// ************************************************************************* //

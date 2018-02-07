@@ -29,6 +29,8 @@ Description
 
 SourceFiles
     domainDecomposition.C
+    distributeCells.C
+    decomposeMesh.C
 
 \*---------------------------------------------------------------------------*/
 
@@ -41,23 +43,24 @@ SourceFiles
 #include "PtrList.H"
 #include "point.H"
 
-#ifndef namespaceFoam
-#define namespaceFoam
-    using namespace Foam;
-#endif
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+namespace Foam
+{
 
 /*---------------------------------------------------------------------------*\
                      Class domainDecomposition Declaration
 \*---------------------------------------------------------------------------*/
 
 class domainDecomposition
-:
-    public fvMesh
 {
     // Private data
 
+        //- Mesh reference
+        const fvMesh& mesh_;
+
         //- Mesh decomposition control dictionary
-        IOdictionary decompositionDict_;
+        dictionary decompositionDict_;
 
         //- Number of processors in decomposition
         label nProcs_;
@@ -119,23 +122,36 @@ class domainDecomposition
 
     // Private Member Functions
 
+        //- Create cell-to processor list using domain decomposition tools
         void distributeCells();
 
 
 public:
 
+    // Declare name of the class and its debug switch
+    ClassName("domainDecomposition");
+
     // Constructors
 
-        //- Construct from IOobject
-        domainDecomposition(const IOobject& io);
+        //- Construct from mesh and dictionary
+        domainDecomposition
+        (
+            const fvMesh& mesh,
+            const dictionary& dict
+        );
 
 
-    // Destructor
-
-        ~domainDecomposition();
+    //- Destructor
+    ~domainDecomposition();
 
 
     // Member Functions
+
+        //- Return mesh reference
+        const fvMesh& mesh() const
+        {
+            return mesh_;
+        }
 
         //- Number of processor in decomposition
         label nProcs() const
@@ -149,19 +165,58 @@ public:
             return distributed_;
         }
 
-        //- Decompose mesh. Optionally remove zero-sized patches.
-        void decomposeMesh(const bool filterEmptyPatches);
-
-        //- Write decomposition
-        bool writeDecomposition();
-
-        //- Cell-processor decomposition labels
+        //- Return cell-processor decomposition labels
         const labelList& cellToProc() const
         {
             return cellToProc_;
         }
+
+        //- Decompose mesh. Optionally remove zero-sized patches.
+        void decomposeMesh(const bool filterEmptyPatches);
+
+
+        // Decomposed mesh and addressing
+
+            //- Decompose mesh for a given processor
+            autoPtr<fvMesh> processorMesh
+            (
+                const label procI,
+                const Time& procDb
+            ) const;
+
+            //- Return processor point addressing
+            const labelListList& procPointAddressing() const
+            {
+                return procPointAddressing_;
+            }
+
+            //- Return processor face addressing
+            const labelListList& procFaceAddressing() const
+            {
+                return procFaceAddressing_;
+            }
+
+            //- Return processor cell addressing
+            const labelListList& procCellAddressing() const
+            {
+                return procCellAddressing_;
+            }
+
+            //- Return processor boundary addressing
+            const labelListList& procBoundaryAddressing() const
+            {
+                return procBoundaryAddressing_;
+            }
+
+
+        //- Write decomposition
+        bool writeDecomposition();
 };
 
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+} // End namespace Foam
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

@@ -32,7 +32,7 @@ License
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-void domainDecomposition::distributeCells()
+void Foam::domainDecomposition::distributeCells()
 {
     Info<< "\nCalculating distribution of cells" << endl;
 
@@ -51,7 +51,7 @@ void domainDecomposition::distributeCells()
         Info<< "Keeping owner and neighbour of faces in patches " << pNames
             << " on same processor" << endl;
 
-        const polyBoundaryMesh& patches = boundaryMesh();
+        const polyBoundaryMesh& patches = mesh_.boundaryMesh();
 
         forAll(pNames, i)
         {
@@ -73,6 +73,7 @@ void domainDecomposition::distributeCells()
             }
         }
     }
+
     if (decompositionDict_.found("preserveFaceZones"))
     {
         wordList zNames(decompositionDict_.lookup("preserveFaceZones"));
@@ -80,7 +81,7 @@ void domainDecomposition::distributeCells()
         Info<< "Keeping owner and neighbour of faces in zones " << zNames
             << " on same processor" << endl;
 
-        const faceZoneMesh& fZones = faceZones();
+        const faceZoneMesh& fZones = mesh_.faceZones();
 
         forAll(zNames, i)
         {
@@ -111,12 +112,12 @@ void domainDecomposition::distributeCells()
     autoPtr<decompositionMethod> decomposePtr = decompositionMethod::New
     (
         decompositionDict_,
-        *this
+        mesh_
     );
 
     if (sameProcFaces.empty())
     {
-        cellToProc_ = decomposePtr().decompose(cellCentres());
+        cellToProc_ = decomposePtr().decompose(mesh_.cellCentres());
     }
     else
     {
@@ -126,7 +127,7 @@ void domainDecomposition::distributeCells()
 
         // Faces where owner and neighbour are not 'connected' (= all except
         // sameProcFaces)
-        boolList blockedFace(nFaces(), true);
+        boolList blockedFace(mesh_.nFaces(), true);
 
         forAllConstIter(labelHashSet, sameProcFaces, iter)
         {
@@ -134,7 +135,7 @@ void domainDecomposition::distributeCells()
         }
 
         // Connect coupled boundary faces
-        const polyBoundaryMesh& patches =  boundaryMesh();
+        const polyBoundaryMesh& patches =  mesh_.boundaryMesh();
 
         forAll(patches, patchI)
         {
@@ -150,7 +151,7 @@ void domainDecomposition::distributeCells()
         }
 
         // Determine global regions, separated by blockedFaces
-        regionSplit globalRegion(*this, blockedFace);
+        regionSplit globalRegion(mesh_, blockedFace);
 
 
         // Determine region cell centres
@@ -171,7 +172,7 @@ void domainDecomposition::distributeCells()
 
             if (regionCentres[regionI] == greatPoint)
             {
-                regionCentres[regionI] = cellCentres()[cellI];
+                regionCentres[regionI] = mesh_.cellCentres()[cellI];
             }
         }
 

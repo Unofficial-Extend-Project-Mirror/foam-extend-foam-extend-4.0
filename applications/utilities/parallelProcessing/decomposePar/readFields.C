@@ -48,7 +48,7 @@ void Foam::readFields
     // Construct the vol scalar fields
     fields.setSize(fieldObjects.size());
 
-    label fieldi=0;
+    label fieldI = 0;
     for
     (
         IOobjectList::iterator iter = fieldObjects.begin();
@@ -58,7 +58,7 @@ void Foam::readFields
     {
         fields.set
         (
-            fieldi++,
+            fieldI++,
             new GeoField
             (
                 *iter(),

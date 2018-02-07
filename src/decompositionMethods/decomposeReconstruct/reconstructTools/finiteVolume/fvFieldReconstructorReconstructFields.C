@@ -34,6 +34,177 @@ License
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 template<class Type>
+void Foam::fvFieldReconstructor::reconstructFvVolumeField
+(
+    GeometricField<Type, fvPatchField, volMesh>& reconField,
+    const PtrList<GeometricField<Type, fvPatchField, volMesh> >& procFields
+)
+{
+    // Get references to internal and boundary field
+    Field<Type>& iField = reconField.internalField();
+    GeometricField<Type, fvPatchField, volMesh>::BoundaryField& boundaryField =
+        reconField.boundaryField();
+
+    forAll (procMeshes_, procI)
+    {
+        const GeometricField<Type, fvPatchField, volMesh>& procField =
+            procFields[procI];
+
+        // Set the cell values in the reconstructed field
+        iField.rmap
+        (
+            procField.internalField(),
+            cellProcAddressing_[procI]
+        );
+
+        // Set the boundary patch values in the reconstructed field
+        forAll (boundaryProcAddressing_[procI], patchI)
+        {
+            // Get patch index of the original patch
+            const label curBPatch = boundaryProcAddressing_[procI][patchI];
+
+            // Get addressing slice for this patch
+            const labelList::subList cp =
+                procMeshes_[procI].boundary()[patchI].patchSlice
+                (
+                    faceProcAddressing_[procI]
+                );
+
+            // check if the boundary patch is not a processor patch
+            if (curBPatch >= 0)
+            {
+                // Regular patch. Fast looping
+
+                if (!boundaryField(curBPatch))
+                {
+                    boundaryField.set
+                    (
+                        curBPatch,
+                        fvPatchField<Type>::New
+                        (
+                            procField.boundaryField()[patchI],
+                            mesh_.boundary()[curBPatch],
+                            DimensionedField<Type, volMesh>::null(),
+                            fvPatchFieldReconstructor
+                            (
+                                mesh_.boundary()[curBPatch].size(),
+                                procField.boundaryField()[patchI].size()
+                            )
+                        )
+                    );
+                }
+
+                const label curPatchStart =
+                    mesh_.boundaryMesh()[curBPatch].start();
+
+                labelList reverseAddressing(cp.size());
+
+                forAll (cp, faceI)
+                {
+                    // Subtract one to take into account offsets for
+                    // face direction.
+                    reverseAddressing[faceI] = cp[faceI] - 1 - curPatchStart;
+                }
+
+                boundaryField[curBPatch].rmap
+                (
+                    procField.boundaryField()[patchI],
+                    reverseAddressing
+                );
+            }
+            else
+            {
+                const Field<Type>& curProcPatch =
+                    procField.boundaryField()[patchI];
+
+                // In processor patches, there's a mix of internal faces (some
+                // of them turned) and possible cyclics. Slow loop
+                forAll (cp, faceI)
+                {
+                    // Subtract one to take into account offsets for
+                    // face direction.
+                    label curF = cp[faceI] - 1;
+
+                    // Is the face on the boundary?
+                    if (curF >= mesh_.nInternalFaces())
+                    {
+                        label curBPatch =
+                            mesh_.boundaryMesh().whichPatch(curF);
+
+                        if (!boundaryField(curBPatch))
+                        {
+                            boundaryField.set
+                            (
+                                curBPatch,
+                                fvPatchField<Type>::New
+                                (
+                                    mesh_.boundary()[curBPatch].type(),
+                                    mesh_.boundary()[curBPatch],
+                                    DimensionedField<Type, volMesh>::null()
+                                )
+                            );
+                        }
+
+                        // add the face
+                        label curPatchFace =
+                            mesh_.boundaryMesh()
+                                [curBPatch].whichFace(curF);
+
+                        boundaryField[curBPatch][curPatchFace] =
+                            curProcPatch[faceI];
+                    }
+                }
+            }
+        }
+    }
+
+    forAll (mesh_.boundary(), patchI)
+    {
+        // add empty patches
+        if
+        (
+            isType<emptyFvPatch>(mesh_.boundary()[patchI])
+         && !boundaryField(patchI)
+        )
+        {
+            boundaryField.set
+            (
+                patchI,
+                fvPatchField<Type>::New
+                (
+                    emptyFvPatchField<Type>::typeName,
+                    mesh_.boundary()[patchI],
+                    DimensionedField<Type, volMesh>::null()
+                )
+            );
+        }
+    }
+
+
+    // Now construct and write the field
+    // setting the internalField and boundaryField
+    return tmp<GeometricField<Type, fvPatchField, volMesh> >
+    (
+        new GeometricField<Type, fvPatchField, volMesh>
+        (
+            IOobject
+            (
+                fieldIoObject.name(),
+                mesh_.time().timeName(),
+                mesh_,
+                IOobject::NO_READ,
+                IOobject::NO_WRITE
+            ),
+            mesh_,
+            procFields[0].dimensions(),
+            iField,
+            patchFields
+        )
+    );
+}
+
+
+template<class Type>
 Foam::tmp<Foam::GeometricField<Type, Foam::fvPatchField, Foam::volMesh> >
 Foam::fvFieldReconstructor::reconstructFvVolumeField
 (
@@ -66,153 +237,8 @@ Foam::fvFieldReconstructor::reconstructFvVolumeField
         );
     }
 
-
-    // Create the internalField
-    Field<Type> internalField(mesh_.nCells());
-
-    // Create the patch fields
-    PtrList<fvPatchField<Type> > patchFields(mesh_.boundary().size());
-
-
-    forAll (procMeshes_, procI)
-    {
-        const GeometricField<Type, fvPatchField, volMesh>& procField =
-            procFields[procI];
-
-        // Set the cell values in the reconstructed field
-        internalField.rmap
-        (
-            procField.internalField(),
-            cellProcAddressing_[procI]
-        );
-
-        // Set the boundary patch values in the reconstructed field
-        forAll (boundaryProcAddressing_[procI], patchI)
-        {
-            // Get patch index of the original patch
-            const label curBPatch = boundaryProcAddressing_[procI][patchI];
-
-            // Get addressing slice for this patch
-            const labelList::subList cp =
-                procMeshes_[procI].boundary()[patchI].patchSlice
-                (
-                    faceProcAddressing_[procI]
-                );
-
-            // check if the boundary patch is not a processor patch
-            if (curBPatch >= 0)
-            {
-                // Regular patch. Fast looping
-
-                if (!patchFields(curBPatch))
-                {
-                    patchFields.set
-                    (
-                        curBPatch,
-                        fvPatchField<Type>::New
-                        (
-                            procField.boundaryField()[patchI],
-                            mesh_.boundary()[curBPatch],
-                            DimensionedField<Type, volMesh>::null(),
-                            fvPatchFieldReconstructor
-                            (
-                                mesh_.boundary()[curBPatch].size(),
-                                procField.boundaryField()[patchI].size()
-                            )
-                        )
-                    );
-                }
-
-                const label curPatchStart =
-                    mesh_.boundaryMesh()[curBPatch].start();
-
-                labelList reverseAddressing(cp.size());
-
-                forAll (cp, faceI)
-                {
-                    // Subtract one to take into account offsets for
-                    // face direction.
-                    reverseAddressing[faceI] = cp[faceI] - 1 - curPatchStart;
-                }
-
-                patchFields[curBPatch].rmap
-                (
-                    procField.boundaryField()[patchI],
-                    reverseAddressing
-                );
-            }
-            else
-            {
-                const Field<Type>& curProcPatch =
-                    procField.boundaryField()[patchI];
-
-                // In processor patches, there's a mix of internal faces (some
-                // of them turned) and possible cyclics. Slow loop
-                forAll (cp, faceI)
-                {
-                    // Subtract one to take into account offsets for
-                    // face direction.
-                    label curF = cp[faceI] - 1;
-
-                    // Is the face on the boundary?
-                    if (curF >= mesh_.nInternalFaces())
-                    {
-                        label curBPatch =
-                            mesh_.boundaryMesh().whichPatch(curF);
-
-                        if (!patchFields(curBPatch))
-                        {
-                            patchFields.set
-                            (
-                                curBPatch,
-                                fvPatchField<Type>::New
-                                (
-                                    mesh_.boundary()[curBPatch].type(),
-                                    mesh_.boundary()[curBPatch],
-                                    DimensionedField<Type, volMesh>::null()
-                                )
-                            );
-                        }
-
-                        // add the face
-                        label curPatchFace =
-                            mesh_.boundaryMesh()
-                                [curBPatch].whichFace(curF);
-
-                        patchFields[curBPatch][curPatchFace] =
-                            curProcPatch[faceI];
-                    }
-                }
-            }
-        }
-    }
-
-    forAll (mesh_.boundary(), patchI)
-    {
-        // add empty patches
-        if
-        (
-            isType<emptyFvPatch>(mesh_.boundary()[patchI])
-         && !patchFields(patchI)
-        )
-        {
-            patchFields.set
-            (
-                patchI,
-                fvPatchField<Type>::New
-                (
-                    emptyFvPatchField<Type>::typeName,
-                    mesh_.boundary()[patchI],
-                    DimensionedField<Type, volMesh>::null()
-                )
-            );
-        }
-    }
-
-
-    // Now construct and write the field
-    // setting the internalField and patchFields
-    return tmp<GeometricField<Type, fvPatchField, volMesh> >
+    // Construct the reconstructed field
+    tmp<GeometricField<Type, fvPatchField, volMesh> > tReconField
     (
         new GeometricField<Type, fvPatchField, volMesh>
         (
@@ -225,11 +251,18 @@ Foam::fvFieldReconstructor::reconstructFvVolumeField
                 IOobject::NO_WRITE
             ),
             mesh_,
-            procFields[0].dimensions(),
-            internalField,
-            patchFields
+            procFields[0].dimensions()
         )
     );
+
+    // Reconstruct fields
+    reconstructFvVolumeField
+    (
+        tReconField(),
+        procFields
+    );
+
+    return treconField;
 }
 
 
