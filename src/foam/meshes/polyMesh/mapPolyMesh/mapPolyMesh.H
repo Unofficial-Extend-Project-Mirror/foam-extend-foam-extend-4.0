@@ -286,7 +286,7 @@ public:
 
     // Constructors
 
-        //- Construcy empty: no update
+        //- Construct empty: no update
         mapPolyMesh(const polyMesh& mesh);
 
         //- Construct from components
@@ -353,6 +353,7 @@ public:
             labelList& oldPatchNMeshPoints,
             const bool reUse
         );
+
 
     // Member Functions
 
