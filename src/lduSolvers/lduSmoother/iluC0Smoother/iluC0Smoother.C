@@ -1,0 +1,131 @@
+/*---------------------------------------------------------------------------*\
+  =========                 |
+  \\      /  F ield         | foam-extend: Open Source CFD
+   \\    /   O peration     | Version:     4.0
+    \\  /    A nd           | Web:         http://www.foam-extend.org
+     \\/     M anipulation  | For copyright notice see file Copyright
+-------------------------------------------------------------------------------
+License
+    This file is part of foam-extend.
+
+    foam-extend is free software: you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by the
+    Free Software Foundation, either version 3 of the License, or (at your
+    option) any later version.
+
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
+
+Class
+    iluC0Smoother
+
+Description
+    ILU smoother
+
+Author
+    Hrvoje Jasak, Wikki Ltd.  All rights reserved.
+
+\*---------------------------------------------------------------------------*/
+
+#include "iluC0Smoother.H"
+#include "CholeskyPrecon.H"
+#include "ILUC0.H"
+#include "addToRunTimeSelectionTable.H"
+
+// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
+
+namespace Foam
+{
+    defineTypeNameAndDebug(iluC0Smoother, 0);
+
+    lduSmoother::addsymMatrixConstructorToTable<iluC0Smoother>
+        addiluC0SmootherSymMatrixConstructorToTable_;
+
+    lduSmoother::addasymMatrixConstructorToTable<iluC0Smoother>
+        addiluC0SmootherAsymMatrixConstructorToTable_;
+}
+
+
+// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
+
+Foam::iluC0Smoother::iluC0Smoother
+(
+    const lduMatrix& matrix,
+    const FieldField<Field, scalar>& coupleBouCoeffs,
+    const FieldField<Field, scalar>& coupleIntCoeffs,
+    const lduInterfaceFieldPtrsList& interfaces
+)
+:
+    lduSmoother
+    (
+        matrix,
+        coupleBouCoeffs,
+        coupleIntCoeffs,
+        interfaces
+    ),
+    preconPtr_(),
+    xCorr_(matrix.lduAddr().size()),
+    residual_(matrix.lduAddr().size())
+{
+    // Preconditioner is identical for symmetric and asymmetric matrices
+    // Reconsider re storage of lower triangle coefficients
+    // HJ and VV, 31/Oct/2017
+    preconPtr_.set
+    (
+        new ILUC0
+        (
+            matrix,
+            coupleBouCoeffs,
+            coupleIntCoeffs,
+            interfaces
+        )
+    );
+}
+
+
+// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+
+void Foam::iluC0Smoother::smooth
+(
+    scalarField& x,
+    const scalarField& b,
+    const direction cmpt,
+    const label nSweeps
+) const
+{
+    for (label sweep = 0; sweep < nSweeps; sweep++)
+    {
+        // Calculate residual
+        matrix_.Amul
+        (
+            residual_,
+            x,
+            coupleBouCoeffs_,
+            interfaces_,
+            cmpt
+        );
+
+        // residual = b - Ax
+        forAll (b, i)
+        {
+            residual_[i] = b[i] - residual_[i];
+        }
+
+        if (!matrix_.diagonal())
+        {
+            preconPtr_->precondition(xCorr_, residual_, cmpt);
+        }
+
+        // Add correction to x
+        x += xCorr_;
+    }
+}
+
+
+
+// ************************************************************************* //

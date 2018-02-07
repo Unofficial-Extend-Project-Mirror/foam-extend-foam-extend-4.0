@@ -31,6 +31,6 @@ amgPolicy = $(amg)/amgPolicy
 $(amgPolicy)/amgPolicy.C
 $(amgPolicy)/pamgPolicy.C
 $(amgPolicy)/clusterAmgPolicy.C
-$(amgPolicy)/StuebenPolicy.C
+$(amgPolicy)/selectionAmgPolicy.C
 
 LIB = $(FOAM_LIBBIN)/liblduSolvers
