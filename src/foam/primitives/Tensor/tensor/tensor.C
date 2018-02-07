@@ -151,7 +151,9 @@ vector eigenValues(const tensor& t)
             if (R2 < Q3)
             {
                 scalar sqrtQ = sqrt(Q);
-                scalar theta = acos(R/(Q*sqrtQ));
+                scalar cosTheta = R/(Q*sqrtQ);
+                cosTheta += (neg(cosTheta) - pos(cosTheta))*SMALL;
+                scalar theta = acos(cosTheta);
 
                 scalar m2SqrtQ = -2*sqrtQ;
                 scalar aBy3 = a/3;
@@ -406,7 +408,9 @@ vector eigenValues(const symmTensor& t)
             if (R2 < Q3)
             {
                 scalar sqrtQ = sqrt(Q);
-                scalar theta = acos(R/(Q*sqrtQ));
+                scalar cosTheta = R/(Q*sqrtQ);
+                cosTheta += (neg(cosTheta) - pos(cosTheta))*SMALL;
+                scalar theta = acos(cosTheta);
 
                 scalar m2SqrtQ = -2*sqrtQ;
                 scalar aBy3 = a/3;
