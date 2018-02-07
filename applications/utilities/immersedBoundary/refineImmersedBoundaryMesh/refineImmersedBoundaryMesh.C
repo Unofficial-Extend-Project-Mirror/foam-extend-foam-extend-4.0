@@ -38,7 +38,6 @@ int main(int argc, char *argv[])
 {
     argList::validOptions.insert("ibCells", "");
     argList::validOptions.insert("ibCellCells", "");
-    argList::validOptions.insert("ibCellCellFaces", "");
 
 #   include "setRootCase.H"
 
