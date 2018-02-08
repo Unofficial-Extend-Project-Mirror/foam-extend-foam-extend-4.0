@@ -9,7 +9,6 @@ $(lduPrecon)/amgPrecon/amgPrecon.C
 lduSmoother = lduSmoother
 $(lduSmoother)/symGaussSeidelSmoother/symGaussSeidelSmoother.C
 $(lduSmoother)/iluSmoother/iluSmoother.C
-$(lduSmoother)/iluC0Smoother/iluC0Smoother.C
 
 lduSolver = lduSolver
 $(lduSolver)/cgSolver/cgSolver.C
@@ -31,6 +30,5 @@ amgPolicy = $(amg)/amgPolicy
 $(amgPolicy)/amgPolicy.C
 $(amgPolicy)/pamgPolicy.C
 $(amgPolicy)/clusterAmgPolicy.C
-$(amgPolicy)/StuebenPolicy.C
 
 LIB = $(FOAM_LIBBIN)/liblduSolvers
