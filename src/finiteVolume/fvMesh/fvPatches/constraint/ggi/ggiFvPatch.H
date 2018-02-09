@@ -154,18 +154,6 @@ public:
                 return ggiPolyPatch_.bridge(bridgeField, ff);
             }
 
-            //- Correct partially overlapping (partially bridged) faces
-            template<class Type>
-            void correctPartialFaces
-            (
-                const Field<Type>& bridgeField,
-                Field<Type>& ff
-            )
-            const
-            {
-                return ggiPolyPatch_.correctPartialFaces(bridgeField, ff);
-            }
-
 
         // Interface transfer functions
 

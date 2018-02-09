@@ -189,9 +189,6 @@ tmp<Field<Type> > ggiFvPatchField<Type>::patchNeighbourField() const
         // Note: bridging now takes into account fully uncovered and partially
         // covered faces. VV, 18/Oct/2017.
         ggiPatch_.bridge(bridgeField, pnf);
-
-        // Correct partially overlapping (partially bridged) faces
-        ggiPatch_.correctPartialFaces(bridgeField, pnf);
     }
 
     return tpnf;

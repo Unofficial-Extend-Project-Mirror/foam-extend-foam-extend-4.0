@@ -501,28 +501,6 @@ class GGIInterpolation
             const scalarField& coveredFractions
         );
 
-        //- Correct partially covered faces given addressing
-        template<class Type>
-        static void correctPartiallyCoveredFaces
-        (
-            const Field<Type>& bridgeField,
-            Field<Type>& result,
-            const labelList& partiallyCoveredAddr,
-            const scalarField& coveredFractions
-        );
-
-        //- Correct partially covered faces given addressing for masked faces
-        //  only
-        template<class Type>
-        static void maskedCorrectPartiallyCoveredFaces
-        (
-            const Field<Type>& bridgeField,
-            Field<Type>& result,
-            const labelList& mask,
-            const labelList& partiallyCoveredAddr,
-            const scalarField& coveredFractions
-        );
-
         //- Is a transform required?
         inline bool doTransform() const
         {
@@ -687,24 +665,6 @@ public:
             const labelList& mask
         ) const;
 
-        //- Correct partially covered master patch field
-        template<class Type>
-        void correctPartialMaster
-        (
-            const Field<Type>& bridgeField,
-            Field<Type>& ff
-        ) const;
-
-        //- Correct partially covered master patch field, only for marked master
-        //  faces
-        template<class Type>
-        void maskedCorrectPartialMaster
-        (
-            const Field<Type>& bridgeField,
-            Field<Type>& ff,
-            const labelList& mask
-        ) const;
-
         //- Bridge uncovered slave patch field
         template<class Type>
         void bridgeSlave
@@ -716,24 +676,6 @@ public:
         //- Bridge uncovered slave patch field, only for marked slave faces
         template<class Type>
         void maskedBridgeSlave
-        (
-            const Field<Type>& bridgeField,
-            Field<Type>& ff,
-            const labelList& mask
-        ) const;
-
-        //- Correct partially covered slave patch field
-        template<class Type>
-        void correctPartialSlave
-        (
-            const Field<Type>& bridgeField,
-            Field<Type>& ff
-        ) const;
-
-        //- Correct partially covered slave patch field, only for marked slave
-        //  faces
-        template<class Type>
-        void maskedCorrectPartialSlave
         (
             const Field<Type>& bridgeField,
             Field<Type>& ff,
