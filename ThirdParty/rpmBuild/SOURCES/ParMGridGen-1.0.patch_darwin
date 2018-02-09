@@ -129,7 +129,7 @@ diff -ruN ParMGridGen-1.0_orig/Makefile.in ParMGridGen-1.0/Makefile.in
  
  # What archiving to use
 -AR = ar rv
-+AR = gcc -dynamiclib -undefined dynamic_lookup -shared -o
++AR = clang -dynamiclib -headerpad_max_install_names -undefined dynamic_lookup -shared -o
  
  # What to use for indexing the archive
  #RANLIB = ranlib
