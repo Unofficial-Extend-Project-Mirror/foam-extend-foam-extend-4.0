@@ -127,6 +127,15 @@ void Foam::solution::read(const dictionary& dict)
     {
         solverPerformance_ = dict.subDict("solverPerformance");
     }
+
+    if (dict.found("residuals"))
+    {
+        storeAllResiduals_ =
+            dict.subDict("residuals").lookupOrDefault
+            (
+                "storeAllResiduals", false
+            );
+    }
 }
 
 
@@ -153,7 +162,8 @@ Foam::solution::solution(const objectRegistry& obr, const fileName& dictName)
     eqnRelaxDefault_(0),
     solvers_(dictionary::null),
     solverPerformance_(dictionary::null),
-    prevTimeIndex_(0)
+    prevTimeIndex_(0),
+    storeAllResiduals_(false)
 {
     if (!headerOk())
     {

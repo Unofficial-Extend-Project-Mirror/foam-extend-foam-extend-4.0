@@ -82,6 +82,10 @@ class solution
         //- Previously used time-index, used for reset between iterations
         mutable label prevTimeIndex_;
 
+        //- Switch for storing residuals of every iteration inside a single
+        //  timestep
+        bool storeAllResiduals_;
+
 
     // Private Member Functions
 

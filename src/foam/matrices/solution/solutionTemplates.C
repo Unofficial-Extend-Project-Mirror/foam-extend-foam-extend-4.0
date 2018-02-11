@@ -65,8 +65,20 @@ void Foam::solution::setSolverPerformance
         solverPerformance_.readIfPresent(name, perfs);
     }
 
-    // Append to list
-    perfs.setSize(perfs.size() + 1, sp);
+    // If storeAllResiduals_ is true, we are storing residual of every iteration
+    // inside a single time step. Otherwise, only the first iteration residual
+    // and the current iteration residual are required, so the current
+    // iteration residual replaces the previous one and only the first iteration
+    // residual is always present, VS 2018-02-11
+    if (storeAllResiudals_ || perfs.size() < 2)
+    {
+        // Append to list
+        perfs.setSize(perfs.size() + 1, sp);
+    }
+    else
+    {
+        perfs.last() = sp;
+    }
 
     solverPerformance_.set(name, perfs);
 }
