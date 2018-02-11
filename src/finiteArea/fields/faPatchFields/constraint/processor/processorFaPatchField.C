@@ -83,7 +83,7 @@ processorFaPatchField<Type>::processorFaPatchField
             "(\n"
             "    const processorFaPatchField<Type>& ptf,\n"
             "    const faPatch& p,\n"
-            "    const DimensionedField<Type, volMesh>& iF,\n"
+            "    const DimensionedField<Type, areaMesh>& iF,\n"
             "    const faPatchFieldMapper& mapper\n"
             ")\n"
         )   << "\n    patch type '" << p.type()

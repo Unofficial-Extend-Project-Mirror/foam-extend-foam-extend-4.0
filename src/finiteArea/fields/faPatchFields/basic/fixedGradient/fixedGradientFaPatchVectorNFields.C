@@ -21,39 +21,39 @@ License
     You should have received a copy of the GNU General Public License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
-Class
-    wedgeFaPatchField
-
 \*---------------------------------------------------------------------------*/
 
-#ifndef wedgeFaPatchFieldsFwd_H
-#define wedgeFaPatchFieldsFwd_H
-
-#include "fieldTypes.H"
+#include "fixedGradientFaPatchVectorNFields.H"
+#include "addToRunTimeSelectionTable.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-template<class Type> class wedgeFaPatchField;
+#define doMakePatchTypeField(type, Type, args...)                             \
+                                                                              \
+makeTemplateFaPatchTypeField                                                    \
+(                                                                             \
+    faPatch##Type##Field,                                                     \
+    fixedGradientFaPatch##Type##Field                                         \
+);
 
-// typedef wedgeFaPatchField<scalar> wedgeFaPatchScalarField;
-// typedef wedgeFaPatchField<vector> wedgeFaPatchVectorField;
-// typedef wedgeFaPatchField<tensor> wedgeFaPatchTensorField;
+forAllVectorNTypes(doMakePatchTypeField)
 
-// template<class Type> class wedgeFaPatchField;
+forAllTensorNTypes(doMakePatchTypeField)
 
-makeFaPatchTypeFieldTypedefs(wedge)
+forAllDiagTensorNTypes(doMakePatchTypeField)
+
+forAllSphericalTensorNTypes(doMakePatchTypeField)
+
+
+#undef doMakePatchTypeField
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-#endif
 
 // ************************************************************************* //

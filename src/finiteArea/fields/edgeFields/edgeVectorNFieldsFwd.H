@@ -22,14 +22,21 @@ License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    wedgeFaPatchField
+    edgeVectorNFields
+
+Description
+
+SourceFiles
+    edgeVectorNFields.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef wedgeFaPatchFieldsFwd_H
-#define wedgeFaPatchFieldsFwd_H
+#ifndef edgeVectorNFieldsFwd_H
+#define edgeVectorNFieldsFwd_H
 
-#include "fieldTypes.H"
+#include "edgeFieldsFwd.H"
+
+#include "VectorNFieldTypes.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -38,15 +45,26 @@ namespace Foam
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-template<class Type> class wedgeFaPatchField;
+class edgeMesh;
 
-// typedef wedgeFaPatchField<scalar> wedgeFaPatchScalarField;
-// typedef wedgeFaPatchField<vector> wedgeFaPatchVectorField;
-// typedef wedgeFaPatchField<tensor> wedgeFaPatchTensorField;
+template<class Type>
+class faePatchField;
 
-// template<class Type> class wedgeFaPatchField;
+template<class Type, template<class> class PatchField, class GeoMesh>
+class GeometricField;
 
-makeFaPatchTypeFieldTypedefs(wedge)
+#define doMakeTypedefs(type, Type, args...)         \
+    typedef GeometricField<type, faePatchField, edgeMesh> edge##Type##Field;
+
+forAllVectorNTypes(doMakeTypedefs)
+
+forAllTensorNTypes(doMakeTypedefs)
+
+forAllDiagTensorNTypes(doMakeTypedefs)
+
+forAllSphericalTensorNTypes(doMakeTypedefs)
+
+#undef doMakeTypedefs
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

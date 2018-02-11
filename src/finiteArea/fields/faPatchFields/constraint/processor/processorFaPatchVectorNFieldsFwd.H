@@ -21,15 +21,12 @@ License
     You should have received a copy of the GNU General Public License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
-Class
-    wedgeFaPatchField
-
 \*---------------------------------------------------------------------------*/
 
-#ifndef wedgeFaPatchFieldsFwd_H
-#define wedgeFaPatchFieldsFwd_H
+#ifndef processorFaPatchVectorNFieldsFwd_H
+#define processorFaPatchVectorNFieldsFwd_H
 
-#include "fieldTypes.H"
+#include "VectorNFieldTypes.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -38,15 +35,14 @@ namespace Foam
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-template<class Type> class wedgeFaPatchField;
+template<class Type> class processorFaPatchField;
 
-// typedef wedgeFaPatchField<scalar> wedgeFaPatchScalarField;
-// typedef wedgeFaPatchField<vector> wedgeFaPatchVectorField;
-// typedef wedgeFaPatchField<tensor> wedgeFaPatchTensorField;
+#define makeTypedef(type, Type, args...)                                \
+    typedef processorFaPatchField<type> processorFaPatch##Type##Field;
 
-// template<class Type> class wedgeFaPatchField;
+forAllVectorNTypes(makeTypedef)
 
-makeFaPatchTypeFieldTypedefs(wedge)
+#undef makeTypedef
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

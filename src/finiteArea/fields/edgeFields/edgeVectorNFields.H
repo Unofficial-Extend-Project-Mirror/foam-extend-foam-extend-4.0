@@ -22,37 +22,24 @@ License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    wedgeFaPatchField
+    edgeVectorNFields
+
+Description
+
+SourceFiles
+    edgeVectorNFields.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef wedgeFaPatchFieldsFwd_H
-#define wedgeFaPatchFieldsFwd_H
+#ifndef edgeVectorNFields_H
+#define edgeVectorNFields_H
 
-#include "fieldTypes.H"
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-namespace Foam
-{
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-template<class Type> class wedgeFaPatchField;
-
-// typedef wedgeFaPatchField<scalar> wedgeFaPatchScalarField;
-// typedef wedgeFaPatchField<vector> wedgeFaPatchVectorField;
-// typedef wedgeFaPatchField<tensor> wedgeFaPatchTensorField;
-
-// template<class Type> class wedgeFaPatchField;
-
-makeFaPatchTypeFieldTypedefs(wedge)
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+#include "edgeFields.H"
+#include "edgeVectorNFieldsFwd.H"
+#include "GeometricVectorNFields.H"
+#include "GeometricTensorNFields.H"
+#include "GeometricDiagTensorNFields.H"
+#include "GeometricSphericalTensorNFields.H"
 
 #endif
 

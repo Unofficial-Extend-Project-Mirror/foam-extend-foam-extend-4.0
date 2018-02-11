@@ -21,39 +21,28 @@ License
     You should have received a copy of the GNU General Public License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
-Class
-    wedgeFaPatchField
-
 \*---------------------------------------------------------------------------*/
 
-#ifndef wedgeFaPatchFieldsFwd_H
-#define wedgeFaPatchFieldsFwd_H
-
-#include "fieldTypes.H"
+#include "processorFaePatchVectorNFields.H"
+#include "faePatchFields.H"
+#include "addToRunTimeSelectionTable.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-template<class Type> class wedgeFaPatchField;
+#define doMakeFaePatchTypeField(type, Type, args...)                          \
+    makeFaePatchTypeField(faePatch##Type##Field, processorFaePatch##Type##Field);
 
-// typedef wedgeFaPatchField<scalar> wedgeFaPatchScalarField;
-// typedef wedgeFaPatchField<vector> wedgeFaPatchVectorField;
-// typedef wedgeFaPatchField<tensor> wedgeFaPatchTensorField;
+forAllVectorNTypes(doMakeFaePatchTypeField)
 
-// template<class Type> class wedgeFaPatchField;
-
-makeFaPatchTypeFieldTypedefs(wedge)
+#undef doMakeFaePatchTypeField
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-#endif
 
 // ************************************************************************* //

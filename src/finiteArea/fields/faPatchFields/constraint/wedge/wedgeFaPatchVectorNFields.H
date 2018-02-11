@@ -21,15 +21,16 @@ License
     You should have received a copy of the GNU General Public License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
-Class
-    wedgeFaPatchField
-
 \*---------------------------------------------------------------------------*/
 
-#ifndef wedgeFaPatchFieldsFwd_H
-#define wedgeFaPatchFieldsFwd_H
+#ifndef wedgeFaPatchVectorNFields_H
+#define wedgeFaPatchVectorNFields_H
 
-#include "fieldTypes.H"
+#include "areaVectorNFields.H"
+#include "faPatchVectorNFields.H"
+
+#include "wedgeFaPatchVectorNFieldsFwd.H"
+#include "wedgeFaPatchField.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -38,15 +39,29 @@ namespace Foam
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-template<class Type> class wedgeFaPatchField;
+#define doMakeVectorTensorNWedgeFuncDefs(type, Type, args...)       \
+template<>                                                          \
+tmp<Field<type > > wedgeFaPatchField<type >::snGrad() const;        \
+                                                                    \
+template<>                                                          \
+void wedgeFaPatchField<type >::evaluate                             \
+(                                                                   \
+    const Pstream::commsTypes commsType                             \
+);                                                                  \
+                                                                    \
+template<>                                                          \
+tmp<Field<type > >                                                  \
+wedgeFaPatchField<type >::snGradTransformDiag() const;
 
-// typedef wedgeFaPatchField<scalar> wedgeFaPatchScalarField;
-// typedef wedgeFaPatchField<vector> wedgeFaPatchVectorField;
-// typedef wedgeFaPatchField<tensor> wedgeFaPatchTensorField;
+forAllVectorNTypes(doMakeVectorTensorNWedgeFuncDefs)
 
-// template<class Type> class wedgeFaPatchField;
+forAllTensorNTypes(doMakeVectorTensorNWedgeFuncDefs)
 
-makeFaPatchTypeFieldTypedefs(wedge)
+forAllDiagTensorNTypes(doMakeVectorTensorNWedgeFuncDefs)
+
+forAllSphericalTensorNTypes(doMakeVectorTensorNWedgeFuncDefs)
+
+#undef doMakeVectorTensorNWedgeFuncDefs
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

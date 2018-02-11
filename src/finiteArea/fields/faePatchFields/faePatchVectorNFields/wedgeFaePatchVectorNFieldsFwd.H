@@ -21,15 +21,12 @@ License
     You should have received a copy of the GNU General Public License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
-Class
-    wedgeFaPatchField
-
 \*---------------------------------------------------------------------------*/
 
-#ifndef wedgeFaPatchFieldsFwd_H
-#define wedgeFaPatchFieldsFwd_H
+#ifndef wedgeFaePatchVectorNFieldsFwd_H
+#define wedgeFaePatchVectorNFieldsFwd_H
 
-#include "fieldTypes.H"
+#include "VectorNFieldTypes.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -38,15 +35,20 @@ namespace Foam
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-template<class Type> class wedgeFaPatchField;
+template<class Type> class wedgeFaePatchField;
 
-// typedef wedgeFaPatchField<scalar> wedgeFaPatchScalarField;
-// typedef wedgeFaPatchField<vector> wedgeFaPatchVectorField;
-// typedef wedgeFaPatchField<tensor> wedgeFaPatchTensorField;
+#define doMakeTypedef(type, Type, args...)                                  \
+    typedef wedgeFaePatchField<type > wedgeFaePatch##Type##Field;
 
-// template<class Type> class wedgeFaPatchField;
+forAllVectorNTypes(doMakeTypedef)
 
-makeFaPatchTypeFieldTypedefs(wedge)
+forAllTensorNTypes(doMakeTypedef)
+
+forAllDiagTensorNTypes(doMakeTypedef)
+
+forAllSphericalTensorNTypes(doMakeTypedef)
+
+#undef doMakeTypedef
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

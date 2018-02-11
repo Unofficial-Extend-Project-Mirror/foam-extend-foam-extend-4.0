@@ -21,15 +21,12 @@ License
     You should have received a copy of the GNU General Public License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
-Class
-    wedgeFaPatchField
-
 \*---------------------------------------------------------------------------*/
 
-#ifndef wedgeFaPatchFieldsFwd_H
-#define wedgeFaPatchFieldsFwd_H
+#ifndef faePatchVectorNFieldsFwd_H
+#define faePatchVectorNFieldsFwd_H
 
-#include "fieldTypes.H"
+#include "VectorNFieldTypes.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -38,15 +35,31 @@ namespace Foam
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-template<class Type> class wedgeFaPatchField;
+template<class Type> class faePatchField;
 
-// typedef wedgeFaPatchField<scalar> wedgeFaPatchScalarField;
-// typedef wedgeFaPatchField<vector> wedgeFaPatchVectorField;
-// typedef wedgeFaPatchField<tensor> wedgeFaPatchTensorField;
+typedef faePatchField<vector2> faePatchVector2Field;
+typedef faePatchField<vector3> faePatchVector3Field;
+typedef faePatchField<vector4> faePatchVector4Field;
+typedef faePatchField<vector6> faePatchVector6Field;
+typedef faePatchField<vector8> faePatchVector8Field;
 
-// template<class Type> class wedgeFaPatchField;
+typedef faePatchField<tensor2> faePatchTensor2Field;
+typedef faePatchField<tensor3> faePatchTensor3Field;
+typedef faePatchField<tensor4> faePatchTensor4Field;
+typedef faePatchField<tensor6> faePatchTensor6Field;
+typedef faePatchField<tensor8> faePatchTensor8Field;
 
-makeFaPatchTypeFieldTypedefs(wedge)
+typedef faePatchField<diagTensor2> faePatchDiagTensor2Field;
+typedef faePatchField<diagTensor3> faePatchDiagTensor3Field;
+typedef faePatchField<diagTensor4> faePatchDiagTensor4Field;
+typedef faePatchField<diagTensor6> faePatchDiagTensor6Field;
+typedef faePatchField<diagTensor8> faePatchDiagTensor8Field;
+
+typedef faePatchField<sphericalTensor2> faePatchSphericalTensor2Field;
+typedef faePatchField<sphericalTensor3> faePatchSphericalTensor3Field;
+typedef faePatchField<sphericalTensor4> faePatchSphericalTensor4Field;
+typedef faePatchField<sphericalTensor6> faePatchSphericalTensor6Field;
+typedef faePatchField<sphericalTensor8> faePatchSphericalTensor8Field;
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

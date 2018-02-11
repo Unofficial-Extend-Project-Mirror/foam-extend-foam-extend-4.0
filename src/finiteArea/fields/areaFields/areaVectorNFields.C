@@ -21,39 +21,35 @@ License
     You should have received a copy of the GNU General Public License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
-Class
-    wedgeFaPatchField
-
 \*---------------------------------------------------------------------------*/
 
-#ifndef wedgeFaPatchFieldsFwd_H
-#define wedgeFaPatchFieldsFwd_H
-
-#include "fieldTypes.H"
+#include "areaVectorNFields.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-template<class Type> class wedgeFaPatchField;
+#define doMakeAreaFields(type, Type, args...)                    \
+    defineTemplateTypeNameAndDebug(                             \
+        area##Type##Field::DimensionedInternalField, 0);         \
+                                                                \
+    defineTemplateTypeNameAndDebug(area##Type##Field, 0);
 
-// typedef wedgeFaPatchField<scalar> wedgeFaPatchScalarField;
-// typedef wedgeFaPatchField<vector> wedgeFaPatchVectorField;
-// typedef wedgeFaPatchField<tensor> wedgeFaPatchTensorField;
+forAllVectorNTypes(doMakeAreaFields)
 
-// template<class Type> class wedgeFaPatchField;
+forAllTensorNTypes(doMakeAreaFields)
 
-makeFaPatchTypeFieldTypedefs(wedge)
+forAllDiagTensorNTypes(doMakeAreaFields)
+
+forAllSphericalTensorNTypes(doMakeAreaFields)
+
+#undef doMakeAreaFields
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-#endif
-
-// ************************************************************************* //

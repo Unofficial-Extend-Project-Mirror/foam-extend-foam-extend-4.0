@@ -164,7 +164,37 @@ public:
                 const direction cmpt
             ) const
             {
-                cyclicLduInterfaceField::transformCoupleField(f, cmpt);
+                // See comments in cyclicLduInterfaceField
+                // HJ, 3/Sep/2015
+//                 cyclicLduInterfaceField::transformCoupleField(f, cmpt);
+                if (doTransform())
+                {
+                    label sizeby2 = f.size()/2;
+
+                    Type powFwdTransform = transform
+                    (
+                        this->forwardT()[0],
+                        pTraits<Type>::one
+                    );
+
+                    scalar forwardScale =
+                        pow(component(powFwdTransform, cmpt), rank());
+
+                    Type powRevTransform = transform
+                    (
+                        this->reverseT()[0],
+                        pTraits<Type>::one
+                    );
+
+                    scalar reverseScale =
+                        pow(component(powRevTransform, cmpt), rank());
+
+                    for (label facei = 0; facei < sizeby2; facei++)
+                    {
+                        f[facei] *= forwardScale;
+                        f[facei + sizeby2] *= reverseScale;
+                    }
+                }
             }
 
             //- Update result field based on interface functionality
@@ -178,6 +208,27 @@ public:
                 const Pstream::commsTypes commsType,
                 const bool switchToLhs
             ) const;
+
+
+        // Block coupled interface functionality
+
+            //- Update result field based on interface functionality
+            virtual void updateInterfaceMatrix
+            (
+                const Field<Type>&,
+                Field<Type>&,
+                const BlockLduMatrix<Type>&,
+                const CoeffField<Type>&,
+                const Pstream::commsTypes commsType,
+                const bool switchToLhs
+            ) const
+            {
+                notImplemented
+                (
+                    "cyclicFaPatchField<Type>::"
+                    "updateInterfaceMatrix for block matrices"
+                );
+            }
 
 
         //- Cyclic coupled interface functions
