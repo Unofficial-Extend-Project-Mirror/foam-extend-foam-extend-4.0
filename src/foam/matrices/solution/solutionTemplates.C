@@ -70,7 +70,7 @@ void Foam::solution::setSolverPerformance
     // and the current iteration residual are required, so the current
     // iteration residual replaces the previous one and only the first iteration
     // residual is always present, VS 2018-02-11
-    if (storeAllResiudals_ || perfs.size() < 2)
+    if (storeAllResiduals_ || perfs.size() < 2)
     {
         // Append to list
         perfs.setSize(perfs.size() + 1, sp);
