@@ -37,7 +37,8 @@ SourceFiles
 
 #include "IOdictionary.H"
 #include "debugSwitch.H"
-#include "lduSolverPerformance.H"
+#include "foamTime.H"
+#include "BlockSolverPerformance.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -156,17 +157,19 @@ public:
             //  checking
             dictionary& solverPerformanceDict() const;
 
-            //- Add/set the solverPerformance entry for the named field
+            //- Add/set the BlockSolverPerformance entry for the named field
+            template<class Type>
             void setSolverPerformance
             (
                 const word& name,
-                const lduSolverPerformance&
+                const BlockSolverPerformance<Type>&
             ) const;
 
-            //- Add/set the solverPerformance entry, using its fieldName
+            //- Add/set the BlockSolverPerformance entry, using its fieldName
+            template<class Type>
             void setSolverPerformance
             (
-                const lduSolverPerformance&
+                const BlockSolverPerformance<Type>&
             ) const;
 
 

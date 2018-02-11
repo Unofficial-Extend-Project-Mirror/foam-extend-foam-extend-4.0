@@ -52,7 +52,7 @@ lduSolverPerformance tetFemMatrix<Type>::solve
         this->check();
     }
 
-    lduSolverPerformance solverPerfVec
+    BlockSolverPerformance<Type> solverPerfVec
     (
         "tetFemMatrix<Type>::solve",
         psi_.name()
@@ -152,14 +152,7 @@ lduSolverPerformance tetFemMatrix<Type>::solve
 
         solverPerf.print();
 
-        if
-        (
-            solverPerf.initialResidual() > solverPerfVec.initialResidual()
-         && !solverPerf.singular()
-        )
-        {
-            solverPerfVec = solverPerf;
-        }
+        solverPerfVec.replace(cmpt, solverPerf);
 
         psi.internalField().replace(cmpt, psiCmpt);
 
@@ -174,7 +167,9 @@ lduSolverPerformance tetFemMatrix<Type>::solve
 
     psi.correctBoundaryConditions();
 
-    return solverPerfVec;
+    psi_.mesh().solutionDict().setSolverPerformance(psi_.name(), solverPerfVec);
+
+    return solverPerfVec.max();
 }
 
 

@@ -45,6 +45,43 @@ void Foam::solution::cachePrintMessage
 }
 
 
+template<class Type>
+void Foam::solution::setSolverPerformance
+(
+    const word& name,
+    const BlockSolverPerformance<Type>& sp
+) const
+{
+    List<BlockSolverPerformance<Type> > perfs;
+
+    if (prevTimeIndex_ != this->time().timeIndex())
+    {
+        // Reset solver performance between iterations
+        prevTimeIndex_ = this->time().timeIndex();
+        solverPerformance_.clear();
+    }
+    else
+    {
+        solverPerformance_.readIfPresent(name, perfs);
+    }
+
+    // Append to list
+    perfs.setSize(perfs.size() + 1, sp);
+
+    solverPerformance_.set(name, perfs);
+}
+
+
+template<class Type>
+void Foam::solution::setSolverPerformance
+(
+    const BlockSolverPerformance<Type>& sp
+) const
+{
+    setSolverPerformance(sp.fieldName(), sp);
+}
+
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 
