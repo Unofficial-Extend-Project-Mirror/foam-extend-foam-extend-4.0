@@ -113,7 +113,7 @@ bool Foam::pressureGradientFunctionObject::start()
 }
 
 
-bool Foam::pressureGradientFunctionObject::execute()
+bool Foam::pressureGradientFunctionObject::execute(const bool forceWrite)
 {
     const fvMesh& mesh =
         time_.lookupObject<fvMesh>(regionName_);

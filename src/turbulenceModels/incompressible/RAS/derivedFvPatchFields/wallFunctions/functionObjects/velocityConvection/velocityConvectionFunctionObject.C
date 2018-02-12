@@ -124,7 +124,7 @@ bool Foam::velocityConvectionFunctionObject::start()
 }
 
 
-bool Foam::velocityConvectionFunctionObject::execute()
+bool Foam::velocityConvectionFunctionObject::execute(const bool forceWrite)
 {
     const fvMesh& mesh = time_.lookupObject<fvMesh>(regionName_);
 
