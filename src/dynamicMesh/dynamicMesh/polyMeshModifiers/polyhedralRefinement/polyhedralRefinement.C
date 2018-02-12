@@ -3652,27 +3652,27 @@ void Foam::polyhedralRefinement::setSplitPointsToUnrefine
         }
     }
 
-    const label nInternalFaces = mesh_.nInternalFaces();
-    const label nFaces = mesh_.nFaces();
-
-    for (label faceI = nInternalFaces; faceI < nFaces; ++faceI)
-    {
-        // Get the face and make sure that the points are unarked
-        const face& f = meshFaces[faceI];
-
-        forAll (f, fpI)
-        {
-            splitPointsMarkup[f[fpI]] = false;
-        }
-    }
-
-    // Note: If there is no dynamic load balancing, points at the boundary can't
-    // be split points by definition of refinement pattern and we may skip
-    // the redundacy boundary face loop above. It seems that even without
-    // dynamic load balancing, I end up having problems where certain points at
-    // processor boundaries are marked as split points erroneusly. There is
-    // something I don't understand and this is why I left the redundancy check
-    // above. VV, 30/Jan/2018.
+    // Note: if there is no dynamic load balancing, points at the boundary
+    // cannot be split points by definition. When we implement dynamic load
+    // balancing, it is possible that a split point ends up on the boundary and
+    // the code should work. However, this has not been tested yet since we do
+    // not have all the capability. In case there are some problems with dynamic
+    // load balancing, uncomment these lines to avoid unrefining around split
+    // points near processor boundaries. This might help debug the thing,
+    // although I think that it should work. VV, 12/Feb/2018.
+//    const label nInternalFaces = mesh_.nInternalFaces();
+//    const label nFaces = mesh_.nFaces();
+//
+//    for (label faceI = nInternalFaces; faceI < nFaces; ++faceI)
+//    {
+//        // Get the face and make sure that the points are unarked
+//        const face& f = meshFaces[faceI];
+//
+//        forAll (f, fpI)
+//        {
+//            splitPointsMarkup[f[fpI]] = false;
+//        }
+//    }
 
     // PART 2: Mark all unrefinement point candidates that are split points at
     // the same time (basically the intersection of split points and candidates)
@@ -3877,7 +3877,8 @@ void Foam::polyhedralRefinement::setRefinement(polyTopoChange& ref) const
     // Make sure that the point levels are updated across coupled patches before
     // setting refinement and unrefinement. Note: not sure why the sync is not
     // performed correctly if I do it in updateMesh. This is a temporary
-    // solution, need to investigate in detail. VV, 31/Jan/2018.
+    // solution, need to investigate in detail, but I assume something is not
+    // updated yet in that case. VV, 31/Jan/2018.
     syncTools::syncPointList
     (
         mesh_,
@@ -4042,7 +4043,8 @@ void Foam::polyhedralRefinement::updateMesh(const mapPolyMesh& map)
 
     // Note: new point level is going to be synced at processor boundaries just
     // before the next step in setRefinement. Need to investigate why the sync
-    // is not done properly if I put it here. VV, 31/Jan/2018.
+    // is not done properly if I put it here. Something is not updated yet.
+    // VV, 31/Jan/2018.
 
     // Transfer the new point level into the data member
     pointLevel_.transfer(newPointLevel);
