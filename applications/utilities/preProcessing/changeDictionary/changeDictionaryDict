@@ -20,7 +20,7 @@ dictionaryReplacement
     {
         ".*"
         {
-            type            directMappedPatch;
+            type            mappedPatch;
         }
     }
 
@@ -85,6 +85,5 @@ dictionaryReplacement
         }
     }
 }
-
 
 // ************************************************************************* //
