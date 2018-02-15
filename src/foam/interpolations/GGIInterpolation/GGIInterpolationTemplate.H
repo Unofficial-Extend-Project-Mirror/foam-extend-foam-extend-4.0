@@ -219,28 +219,28 @@ class GGIInterpolation
             //- List of uncovered master faces
             mutable labelList* uncoveredMasterAddrPtr_;
 
-            //- List of partially covered master faces. Contains faces with
-            //  weights between masterNonOverlapFaceTol_ and
+            //- List of partially covered/uncovered master faces. Contains faces
+            //  with weights between masterNonOverlapFaceTol_ and
             //  uncoveredFaceAreaTol_. Used in bridging
-            mutable labelList* partiallyCoveredMasterAddrPtr_;
+            mutable labelList* partiallyUncoveredMasterAddrPtr_;
 
-            //- List of face fractions for partially covered master faces. Range
-            //  anywhere from 1 to uncoveredFaceAreaTol_ (e.g. 0.2 means
-            //  that the face area is covered by 20% on the other side)
-            mutable scalarField* masterFaceCoveredFractionsPtr_;
+            //- List of face fractions for partially uncovered master faces.
+            //  Example: 0.2 means that the 20% of the face area is NOT covered
+            //  on the other side
+            mutable scalarField* masterFaceUncoveredFractionsPtr_;
 
             //- List of uncovered slave faces
             mutable labelList* uncoveredSlaveAddrPtr_;
 
-            //- List of partially covered slave faces. Contains faces with
-            //  weights between masterNonOverlapFaceTol_ and
+            //- List of partially covered/uncovered slave faces. Contains faces
+            //  with weights between masterNonOverlapFaceTol_ and
             //  uncoveredFaceAreaTol_. Used in bridging
-            mutable labelList* partiallyCoveredSlaveAddrPtr_;
+            mutable labelList* partiallyUncoveredSlaveAddrPtr_;
 
             //- List of face fractions for partially covered slave faces. Range
             //  anywhere from 1 to uncoveredFaceAreaTol_ (e.g. 0.2 means
             //  that the face area is covered by 20% on the other side)
-            mutable scalarField* slaveFaceCoveredFractionsPtr_;
+            mutable scalarField* slaveFaceUncoveredFractionsPtr_;
 
 
   // Private static data
@@ -477,29 +477,58 @@ class GGIInterpolation
             const scalarListList& weights
         );
 
-        //- Bridge uncovered faces given addressing
-        template<class Type>
-        static void bridge
-        (
-            const Field<Type>& bridgeField,
-            Field<Type>& ff,
-            const labelList& addr,
-            const labelList& partiallyCoveredAddr,
-            const scalarField& coveredFractions
-        );
 
-        //- Bridge uncovered faces given addressing
-        //  for masked faces only
-        template<class Type>
-        static void maskedBridge
-        (
-            const Field<Type>& bridgeField,
-            Field<Type>& ff,
-            const labelList& mask,
-            const labelList& uncoveredFaces,
-            const labelList& partiallyCoveredAddr,
-            const scalarField& coveredFractions
-        );
+        // Bridging operations, taking into account partially covered faces
+
+            //- Bridge uncovered faces given addressing
+            template<class Type>
+            static void bridge
+            (
+                const Field<Type>& bridgeField,
+                Field<Type>& ff,
+                const labelList& addr,
+                const labelList& partiallyUncoveredAddr,
+                const scalarField& uncoveredFractions
+            );
+    
+            //- Bridge uncovered faces given addressing
+            //  for masked faces only
+            template<class Type>
+            static void maskedBridge
+            (
+                const Field<Type>& bridgeField,
+                Field<Type>& ff,
+                const labelList& mask,
+                const labelList& uncoveredFaces,
+                const labelList& partiallyUncoveredAddr,
+                const scalarField& uncoveredFractions
+            );
+
+
+        // Scaling operations for partially covered faces
+    
+            //- Scale partially covered faces given addressing
+            template<class Type>
+            static void scale
+            (
+                Field<Type>& fieldToScale,
+                const labelList& addr,
+                const labelList& partiallyUncoveredAddr,
+                const scalarField& uncoveredFractions
+            );
+    
+            //- Scale partially covered faces given addressing
+            //  for masked faces only
+            template<class Type>
+            static void maskedScale
+            (
+                Field<Type>& fieldToScale,
+                const labelList& mask,
+                const labelList& uncoveredFaces,
+                const labelList& partiallyUncoveredAddr,
+                const scalarField& uncoveredFractions
+            );
+
 
         //- Is a transform required?
         inline bool doTransform() const
@@ -570,19 +599,19 @@ public:
             const labelList& uncoveredMasterFaces() const;
 
             //- Return reference to master list of partially covered faces
-            const labelList& partiallyCoveredMasterFaces() const;
+            const labelList& partiallyUncoveredMasterFaces() const;
 
             //- Return covered fractions of partially covered master faces
-            const scalarField& masterFaceCoveredFractions() const;
+            const scalarField& masterFaceUncoveredFractions() const;
 
             //- Return reference to the slave list of non-overlap faces
             const labelList& uncoveredSlaveFaces() const;
 
             //- Return reference to slave list of partially covered faces
-            const labelList& partiallyCoveredSlaveFaces() const;
+            const labelList& partiallyUncoveredSlaveFaces() const;
 
             //- Return covered fractions of partially covered slave faces
-            const scalarField& slaveFaceCoveredFractions() const;
+            const scalarField& slaveFaceUncoveredFractions() const;
 
             //- Return reference to point addressing
             const List<labelPair>& masterPointAddr() const;
@@ -648,39 +677,79 @@ public:
         ) const;
 
 
-        //- Bridge uncovered master patch field
-        template<class Type>
-        void bridgeMaster
-        (
-            const Field<Type>& bridgeField,
-            Field<Type>& ff
-        ) const;
+        // Bridging operations taking into account partially uncovered faces
 
-        //- Bridge uncovered master patch field, only for marked master faces
-        template<class Type>
-        void maskedBridgeMaster
-        (
-            const Field<Type>& bridgeField,
-            Field<Type>& ff,
-            const labelList& mask
-        ) const;
+            //- Bridge uncovered master patch field
+            template<class Type>
+            void bridgeMaster
+            (
+                const Field<Type>& bridgeField,
+                Field<Type>& ff
+            ) const;
+        
+    
+            //- Bridge uncovered master patch field, only for marked master
+            //  faces
+            template<class Type>
+            void maskedBridgeMaster
+            (
+                const Field<Type>& bridgeField,
+                Field<Type>& ff,
+                const labelList& mask
+            ) const;
+        
+            //- Bridge uncovered slave patch field
+            template<class Type>
+            void bridgeSlave
+            (
+                const Field<Type>& bridgeField,
+                Field<Type>& ff
+            ) const;
+        
+            //- Bridge uncovered slave patch field, only for marked slave faces
+            template<class Type>
+            void maskedBridgeSlave
+            (
+                const Field<Type>& bridgeField,
+                Field<Type>& ff,
+                const labelList& mask
+            ) const;
 
-        //- Bridge uncovered slave patch field
-        template<class Type>
-        void bridgeSlave
-        (
-            const Field<Type>& bridgeField,
-            Field<Type>& ff
-        ) const;
 
-        //- Bridge uncovered slave patch field, only for marked slave faces
-        template<class Type>
-        void maskedBridgeSlave
-        (
-            const Field<Type>& bridgeField,
-            Field<Type>& ff,
-            const labelList& mask
-        ) const;
+        // Scaling operations for correction of partially uncovered faces
+    
+            //- Scale partially uncovered master patch field
+            template<class Type>
+            void scaleMaster
+            (
+                Field<Type>& fieldToScale
+            ) const;
+    
+            //- Scale partially uncovered master patch field, only for marked
+            //  master faces
+            template<class Type>
+            void maskedScaleMaster
+            (
+                Field<Type>& fieldToScale,
+                const labelList& mask
+            ) const;
+    
+            //- Scale partially uncovered slave patch field
+            template<class Type>
+            void scaleSlave
+            (
+                Field<Type>& fieldToScale
+            ) const;
+    
+            //- Scale partially uncovered slave patch field, only for marked
+            //  slave faces
+            template<class Type>
+            void maskedScaleSlave
+            (
+                Field<Type>& fieldToScale,
+                const labelList& mask
+            ) const;
+
 
         //- Interpolate point field
         template<class Type>

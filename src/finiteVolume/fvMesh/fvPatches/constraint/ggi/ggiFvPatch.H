@@ -154,6 +154,17 @@ public:
                 return ggiPolyPatch_.bridge(bridgeField, ff);
             }
 
+            //- Scale field for partially covered faces. Needed for correct
+            //  calculation of fvPatch data: delta, deltaCoeffs and weights
+            template<class Type>
+            void scaleForPartialCoverage
+            (
+                Field<Type>& fieldToScale
+            ) const
+            {
+                return ggiPolyPatch_.scaleForPartialCoverage(fieldToScale);
+            }
+
 
         // Interface transfer functions
 

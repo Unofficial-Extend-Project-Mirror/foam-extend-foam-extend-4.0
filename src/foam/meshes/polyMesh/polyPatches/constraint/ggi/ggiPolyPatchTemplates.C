@@ -212,7 +212,7 @@ void Foam::ggiPolyPatch::bridge
     {
         FatalErrorIn
         (
-            "tmp<Field<Type> > ggiPolyPatch::bridge\n"
+            "template<class Type> void ggiPolyPatch::bridge\n"
             "(\n"
             "    const Field<Type>& ff,\n"
             "    Field<Type>& ff\n"
@@ -259,6 +259,69 @@ void Foam::ggiPolyPatch::bridge
                 (
                     bridgeField,
                     ff,
+                    zoneAddressing()
+                );
+            }
+        }
+    }
+}
+
+
+template<class Type>
+void Foam::ggiPolyPatch::scaleForPartialCoverage
+(
+    Field<Type>& fieldToScale
+) const
+{
+    // Check and expand the field from patch size to zone size
+    if (fieldToScale.size() != size())
+    {
+        FatalErrorIn
+        (
+            "template<class Type> ggiPolyPatch::scaleForPartialCoverage\n"
+            "(\n"
+            "    const Field<Type>& bridgeField,\n"
+            ") const"
+        )   << "Incorrect patch field size for scaling.  Field size: "
+            << fieldToScale.size() << " patch size: " << size()
+            << abort(FatalError);
+    }
+
+    if (bridgeOverlap())
+    {
+        if (empty())
+        {
+            // Patch empty, no bridging
+            return;
+        }
+
+        if (localParallel())
+        {
+            if (master())
+            {
+                patchToPatch().scaleMaster(fieldToScale);
+            }
+            else
+            {
+                patchToPatch().scaleSlave(fieldToScale);
+            }
+        }
+        else
+        {
+            // Note: since bridging is only a local operation
+            if (master())
+            {
+                patchToPatch().maskedScaleMaster
+                (
+                    fieldToScale,
+                    zoneAddressing()
+                );
+            }
+            else
+            {
+                patchToPatch().maskedScaleSlave
+                (
+                    fieldToScale,
                     zoneAddressing()
                 );
             }

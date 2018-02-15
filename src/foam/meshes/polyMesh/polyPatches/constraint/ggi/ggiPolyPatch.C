@@ -39,6 +39,7 @@ Contributor
 #include "SubField.H"
 #include "foamTime.H"
 #include "indirectPrimitivePatch.H"
+#include "symmTransformField.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
@@ -286,17 +287,35 @@ void Foam::ggiPolyPatch::calcReconFaceCellCentres() const
     {
         const label shadowID = shadowIndex();
 
-        // Get the transformed and interpolated shadow face cell centers
-        reconFaceCellCentresPtr_ =
-            new vectorField
-            (
-                interpolate
-                (
-                    boundaryMesh()[shadowID].faceCellCentres()
-                  - boundaryMesh()[shadowID].faceCentres()
-                )
-              + faceCentres()
-            );
+        // Get interpolated shadow face centre to face cell centre vectors
+        tmp<vectorField> tdf = interpolate
+        (
+            boundaryMesh()[shadowID].faceCellCentres()
+          - boundaryMesh()[shadowID].faceCentres()
+        );
+
+        // The field is now interpolated, but we need to bridge it as well for
+        // possible partially covered faces
+        if (bridgeOverlap_)
+        {
+            // Get necessary mesh data from polyPatch on this (master) side
+            const vectorField::subField cf = faceCentres();
+            const vectorField::subField Sf = faceAreas();
+
+            const vectorField ccf = faceCellCentres();
+            const vectorField nf = Sf/mag(Sf);
+
+            // Mirrored field since bridging assumes symmetry plane treatment.
+            // Mirror centre-to-face cell centre vectors to other side
+            const vectorField mirrorField =
+                transform(I - 2.0*sqr(nf), ccf - cf);
+
+            // Take into account fully uncovered and partially covered faces
+            bridge(mirrorField, tdf());
+        }
+
+        // Calculate the reconstructed cell centres
+        reconFaceCellCentresPtr_ = new vectorField(tdf() + faceCentres());
     }
     else
     {

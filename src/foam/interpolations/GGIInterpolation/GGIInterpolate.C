@@ -98,8 +98,8 @@ void GGIInterpolation<MasterPatch, SlavePatch>::bridge
     const Field<Type>& bridgeField,
     Field<Type>& ff,
     const labelList& addr,
-    const labelList& partiallyCoveredAddr,
-    const scalarField& coveredFractions
+    const labelList& partiallyUncoveredAddr,
+    const scalarField& uncoveredFractions
 )
 {
     // Fully uncovered faces
@@ -112,10 +112,10 @@ void GGIInterpolation<MasterPatch, SlavePatch>::bridge
     // operator+= since we assume that the interpolation part is carried out
     // before bridging (see e.g. ggiFvPatchField::patchNeighbourField()) using
     // weights that do not sum up to 1
-    forAll (partiallyCoveredAddr, pcfI)
+    forAll (partiallyUncoveredAddr, pcfI)
     {
-        ff[partiallyCoveredAddr[pcfI]] +=
-            coveredFractions[pcfI]*bridgeField[partiallyCoveredAddr[pcfI]];
+        ff[partiallyUncoveredAddr[pcfI]] +=
+            uncoveredFractions[pcfI]*bridgeField[partiallyUncoveredAddr[pcfI]];
     }
 }
 
@@ -128,8 +128,8 @@ void GGIInterpolation<MasterPatch, SlavePatch>::maskedBridge
     Field<Type>& ff,
     const labelList& mask,
     const labelList& uncoveredFaces,
-    const labelList& partiallyCoveredAddr,
-    const scalarField& coveredFractions
+    const labelList& partiallyUncoveredAddr,
+    const scalarField& uncoveredFractions
 )
 {
     // Note: tricky algorithm
@@ -173,17 +173,85 @@ void GGIInterpolation<MasterPatch, SlavePatch>::maskedBridge
     // Reset maskAddrI
     maskAddrI = 0;
 
-    forAll (partiallyCoveredAddr, pcfI)
+    forAll (partiallyUncoveredAddr, pcfI)
     {
         // Pick partially covered face
-        const label faceI = partiallyCoveredAddr[pcfI];
+        const label faceI = partiallyUncoveredAddr[pcfI];
 
         for (; maskAddrI < mask.size(); ++maskAddrI)
         {
             if (faceI == mask[maskAddrI])
             {
                 // Found masked partially covered face
-                ff[maskAddrI] += coveredFractions[pcfI]*bridgeField[maskAddrI];
+                ff[maskAddrI] += uncoveredFractions[pcfI]*bridgeField[maskAddrI];
+
+                break;
+            }
+            else if (mask[maskAddrI] > faceI)
+            {
+                // Gone beyond my index: my face is not present in the mask
+                // Go one back and check for next uncovered face
+                if (maskAddrI > 0)
+                {
+                    --maskAddrI;
+                }
+
+                break;
+            }
+        }
+    }
+}
+
+
+template<class MasterPatch, class SlavePatch>
+template<class Type>
+void GGIInterpolation<MasterPatch, SlavePatch>::scale
+(
+    Field<Type>& fieldToScale,
+    const labelList& addr,
+    const labelList& partiallyUncoveredAddr,
+    const scalarField& uncoveredFractions
+)
+{
+    // Loop through partially covered faces and scale them up
+    forAll (partiallyUncoveredAddr, pcfI)
+    {
+        fieldToScale[partiallyUncoveredAddr[pcfI]] /=
+            (1.0 - uncoveredFractions[pcfI]);
+    }
+}
+
+
+template<class MasterPatch, class SlavePatch>
+template<class Type>
+void GGIInterpolation<MasterPatch, SlavePatch>::maskedScale
+(
+    Field<Type>& fieldToScale,
+    const labelList& mask,
+    const labelList& uncoveredFaces,
+    const labelList& partiallyUncoveredAddr,
+    const scalarField& uncoveredFractions
+)
+{
+    // Note: tricky algorithm
+    // In order for a face to be bridged it needs to be both in the
+    // mask and in selection of faces that are bridged (addr).
+    // This implies an n-squared search, but we can avoid it by
+    // using the fact that both lists are ordered.
+
+    label maskAddrI = 0;
+
+    forAll (partiallyUncoveredAddr, pcfI)
+    {
+        // Pick partially covered face
+        const label faceI = partiallyUncoveredAddr[pcfI];
+
+        for (; maskAddrI < mask.size(); ++maskAddrI)
+        {
+            if (faceI == mask[maskAddrI])
+            {
+                // Found masked partially covered face
+                fieldToScale[maskAddrI] /= (1.0 - uncoveredFractions[pcfI]);
 
                 break;
             }
@@ -579,8 +647,8 @@ void GGIInterpolation<MasterPatch, SlavePatch>::bridgeMaster
         bridgeField,
         ff,
         uncoveredMasterFaces(),
-        partiallyCoveredMasterFaces(),
-        masterFaceCoveredFractions()
+        partiallyUncoveredMasterFaces(),
+        masterFaceUncoveredFractions()
     );
 }
 
@@ -619,8 +687,8 @@ void GGIInterpolation<MasterPatch, SlavePatch>::maskedBridgeMaster
         ff,
         mask,
         uncoveredMasterFaces(),
-        partiallyCoveredMasterFaces(),
-        masterFaceCoveredFractions()
+        partiallyUncoveredMasterFaces(),
+        masterFaceUncoveredFractions()
     );
 }
 
@@ -659,8 +727,8 @@ void GGIInterpolation<MasterPatch, SlavePatch>::bridgeSlave
         bridgeField,
         ff,
         uncoveredSlaveFaces(),
-        partiallyCoveredSlaveFaces(),
-        slaveFaceCoveredFractions()
+        partiallyUncoveredSlaveFaces(),
+        slaveFaceUncoveredFractions()
     );
 }
 
@@ -699,8 +767,143 @@ void GGIInterpolation<MasterPatch, SlavePatch>::maskedBridgeSlave
         ff,
         mask,
         uncoveredSlaveFaces(),
-        partiallyCoveredSlaveFaces(),
-        slaveFaceCoveredFractions()
+        partiallyUncoveredSlaveFaces(),
+        slaveFaceUncoveredFractions()
+    );
+}
+
+
+template<class MasterPatch, class SlavePatch>
+template<class Type>
+void GGIInterpolation<MasterPatch, SlavePatch>::scaleMaster
+(
+    Field<Type>& fieldToScale
+) const
+{
+    if (fieldToScale.size() != masterPatch_.size())
+    {
+        FatalErrorIn
+        (
+            "void GGIInterpolation<MasterPatch, SlavePatch>::scaleMaster\n"
+            "(\n"
+            "    Field<Type>& fieldToScale\n"
+            ") const"
+        )   << "given field does not correspond to patch. Patch size: "
+            << masterPatch_.size()
+            << " scale field size: " << fieldToScale.size()
+            << abort(FatalError);
+    }
+
+    scale
+    (
+        fieldToScale,
+        uncoveredMasterFaces(),
+        partiallyUncoveredMasterFaces(),
+        masterFaceUncoveredFractions()
+    );
+}
+
+
+template<class MasterPatch, class SlavePatch>
+template<class Type>
+void GGIInterpolation<MasterPatch, SlavePatch>::maskedScaleMaster
+(
+    Field<Type>& fieldToScale,
+    const labelList& mask
+) const
+{
+    if (fieldToScale.size() != mask.size())
+    {
+        FatalErrorIn
+        (
+            "void GGIInterpolation<MasterPatch, SlavePatch>::"
+            "maskedScaleMaster\n"
+            "(\n"
+            "    Field<Type>& fieldToScale,\n"
+            "    const labelList& mask\n"
+            ") const"
+        )   << "given field does not correspond to patch. Patch (mask) size: "
+            << masterPatch_.size()
+            << " scale field size: " << fieldToScale.size()
+            << " mask size: " << mask.size()
+            << abort(FatalError);
+    }
+
+    maskedScale
+    (
+        fieldToScale,
+        mask,
+        uncoveredMasterFaces(),
+        partiallyUncoveredMasterFaces(),
+        masterFaceUncoveredFractions()
+    );
+}
+
+
+template<class MasterPatch, class SlavePatch>
+template<class Type>
+void GGIInterpolation<MasterPatch, SlavePatch>::scaleSlave
+(
+    Field<Type>& fieldToScale
+) const
+{
+    if (fieldToScale.size() != slavePatch_.size())
+    {
+        FatalErrorIn
+        (
+            "void GGIInterpolation<MasterPatch, SlavePatch>::"
+            "scaleSlave\n"
+            "(\n"
+            "    Field<Type>& fieldToScale"
+            ") const"
+        )   << "given field does not correspond to patch. Patch size: "
+            << slavePatch_.size()
+            << " scale field size: " << fieldToScale.size()
+            << abort(FatalError);
+    }
+
+    scale
+    (
+        fieldToScale,
+        uncoveredSlaveFaces(),
+        partiallyUncoveredSlaveFaces(),
+        slaveFaceUncoveredFractions()
+    );
+}
+
+
+template<class MasterPatch, class SlavePatch>
+template<class Type>
+void GGIInterpolation<MasterPatch, SlavePatch>::maskedScaleSlave
+(
+    Field<Type>& fieldToScale,
+    const labelList& mask
+) const
+{
+    if (fieldToScale.size() != mask.size())
+    {
+        FatalErrorIn
+        (
+            "void GGIInterpolation<MasterPatch, SlavePatch>::"
+            "maskedScaleSlave\n"
+            "(\n"
+            "    Field<Type>& fieldToScale\n,"
+            "    const labelList& mask\n"
+            ") const"
+        )   << "given field does not correspond to patch. Patch (mask) size: "
+            << slavePatch_.size()
+            << " scale field size: " << fieldToScale.size()
+            << " mask size: " << mask.size()
+            << abort(FatalError);
+    }
+
+    maskedScale
+    (
+        fieldToScale,
+        mask,
+        uncoveredSlaveFaces(),
+        partiallyUncoveredSlaveFaces(),
+        slaveFaceUncoveredFractions()
     );
 }
 

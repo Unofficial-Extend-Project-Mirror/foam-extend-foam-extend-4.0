@@ -104,11 +104,11 @@ void GGIInterpolation<MasterPatch, SlavePatch>::clearOut()
     deleteDemandDrivenData(slaveWeightsPtr_);
 
     deleteDemandDrivenData(uncoveredMasterAddrPtr_);
-    deleteDemandDrivenData(partiallyCoveredMasterAddrPtr_);
-    deleteDemandDrivenData(masterFaceCoveredFractionsPtr_);
+    deleteDemandDrivenData(partiallyUncoveredMasterAddrPtr_);
+    deleteDemandDrivenData(masterFaceUncoveredFractionsPtr_);
     deleteDemandDrivenData(uncoveredSlaveAddrPtr_);
-    deleteDemandDrivenData(partiallyCoveredSlaveAddrPtr_);
-    deleteDemandDrivenData(slaveFaceCoveredFractionsPtr_);
+    deleteDemandDrivenData(partiallyUncoveredSlaveAddrPtr_);
+    deleteDemandDrivenData(slaveFaceUncoveredFractionsPtr_);
 
     deleteDemandDrivenData(masterPointAddressingPtr_);
     deleteDemandDrivenData(masterPointWeightsPtr_);
@@ -159,11 +159,11 @@ GGIInterpolation<MasterPatch, SlavePatch>::GGIInterpolation
     slavePointWeightsPtr_(NULL),
     slavePointDistancePtr_(NULL),
     uncoveredMasterAddrPtr_(NULL),
-    partiallyCoveredMasterAddrPtr_(NULL),
-    masterFaceCoveredFractionsPtr_(NULL),
+    partiallyUncoveredMasterAddrPtr_(NULL),
+    masterFaceUncoveredFractionsPtr_(NULL),
     uncoveredSlaveAddrPtr_(NULL),
-    partiallyCoveredSlaveAddrPtr_(NULL),
-    slaveFaceCoveredFractionsPtr_(NULL)
+    partiallyUncoveredSlaveAddrPtr_(NULL),
+    slaveFaceUncoveredFractionsPtr_(NULL)
 {
     // Check size of transform.  They should be equal to slave patch size
     // if the transform is not constant
@@ -266,27 +266,27 @@ GGIInterpolation<MasterPatch, SlavePatch>::uncoveredMasterFaces() const
 
 template<class MasterPatch, class SlavePatch>
 const labelList&
-GGIInterpolation<MasterPatch, SlavePatch>::partiallyCoveredMasterFaces() const
+GGIInterpolation<MasterPatch, SlavePatch>::partiallyUncoveredMasterFaces() const
 {
-    if (!partiallyCoveredMasterAddrPtr_)
+    if (!partiallyUncoveredMasterAddrPtr_)
     {
         calcAddressing();
     }
 
-    return *partiallyCoveredMasterAddrPtr_;
+    return *partiallyUncoveredMasterAddrPtr_;
 }
 
 
 template<class MasterPatch, class SlavePatch>
 const scalarField&
-GGIInterpolation<MasterPatch, SlavePatch>::masterFaceCoveredFractions() const
+GGIInterpolation<MasterPatch, SlavePatch>::masterFaceUncoveredFractions() const
 {
-    if (!masterFaceCoveredFractionsPtr_)
+    if (!masterFaceUncoveredFractionsPtr_)
     {
         calcAddressing();
     }
 
-    return *masterFaceCoveredFractionsPtr_;
+    return *masterFaceUncoveredFractionsPtr_;
 }
 
 
@@ -305,27 +305,27 @@ GGIInterpolation<MasterPatch, SlavePatch>::uncoveredSlaveFaces() const
 
 template<class MasterPatch, class SlavePatch>
 const labelList&
-GGIInterpolation<MasterPatch, SlavePatch>::partiallyCoveredSlaveFaces() const
+GGIInterpolation<MasterPatch, SlavePatch>::partiallyUncoveredSlaveFaces() const
 {
-    if (!partiallyCoveredSlaveAddrPtr_)
+    if (!partiallyUncoveredSlaveAddrPtr_)
     {
         calcAddressing();
     }
 
-    return *partiallyCoveredSlaveAddrPtr_;
+    return *partiallyUncoveredSlaveAddrPtr_;
 }
 
 
 template<class MasterPatch, class SlavePatch>
 const scalarField&
-GGIInterpolation<MasterPatch, SlavePatch>::slaveFaceCoveredFractions() const
+GGIInterpolation<MasterPatch, SlavePatch>::slaveFaceUncoveredFractions() const
 {
-    if (!slaveFaceCoveredFractionsPtr_)
+    if (!slaveFaceUncoveredFractionsPtr_)
     {
         calcAddressing();
     }
 
-    return *slaveFaceCoveredFractionsPtr_;
+    return *slaveFaceUncoveredFractionsPtr_;
 }
 
 
